@@ -1,0 +1,8 @@
+{
+    "compilerOptions": {
+        "module": "system",
+        "lib": ["es5", "es6", "dom"],
+        "rootDir": "./src/",
+        "outFile": "./docs/app.js"
+    }
+}
