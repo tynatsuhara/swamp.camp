@@ -7,4 +7,8 @@ export class Point {
         this.x = x
         this.y = y
     }
+
+    times(multiplier: number): Point {
+        return new Point(this.x * multiplier, this.y * multiplier);
+    }
 }

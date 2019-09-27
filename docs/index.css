@@ -1,12 +1,13 @@
 body {
     margin: 0;
+    background-color: #472d3c;
 }
 
 #column {
     margin: auto;
-    margin-top: 50px;
-    width: 800px;
-    height: 640px;
+    margin-top: 40px;
+    width: 1000px;
+    height: 800px;
 }
 
 #canvas {
