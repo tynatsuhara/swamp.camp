@@ -67,19 +67,25 @@ System.register("renderer", [], function (exports_3, context_3) {
             TILE_SET = document.getElementById("tileset");
             TILE_SET_SIZE = 32;
             TILE_SIZE = 16;
+            CANVAS_CONTEXT.imageSmoothingEnabled = false;
             Renderer = /** @class */ (function () {
                 function Renderer() {
                     this.cameraOffsetX = 0;
                     this.cameraOffsetY = 0;
-                    this.zoom = 2;
+                    this.zoom = 1;
                 }
                 Renderer.prototype.render = function (tiles) {
                     var _this = this;
-                    CANVAS_CONTEXT.clearRect(0, 0, CANVAS.width, CANVAS.height);
+                    CANVAS.width = CANVAS.clientWidth;
+                    CANVAS.height = CANVAS.clientHeight;
+                    CANVAS_CONTEXT.fillStyle = "#472d3c";
+                    CANVAS_CONTEXT.rect(0, 0, CANVAS.width, CANVAS.height);
+                    CANVAS_CONTEXT.fill();
+                    // CANVAS_CONTEXT.clearRect(0, 0, CANVAS.width, CANVAS.height)
                     tiles.forEach(function (t) { return _this.renderTile(t); });
                 };
                 Renderer.prototype.renderTile = function (tile) {
-                    CANVAS_CONTEXT.drawImage(TILE_SET, tile.tileSetIndex.x * TILE_SIZE, tile.tileSetIndex.y * TILE_SIZE, TILE_SIZE, TILE_SIZE, tile.position.x * TILE_SIZE + this.cameraOffsetX, tile.position.y * TILE_SIZE + this.cameraOffsetY, TILE_SIZE * this.zoom, TILE_SIZE * this.zoom);
+                    CANVAS_CONTEXT.drawImage(TILE_SET, tile.tileSetIndex.x * TILE_SIZE, tile.tileSetIndex.y * TILE_SIZE, TILE_SIZE, TILE_SIZE, tile.position.x * TILE_SIZE * this.zoom + this.cameraOffsetX, tile.position.y * TILE_SIZE * this.zoom + this.cameraOffsetY, TILE_SIZE * this.zoom, TILE_SIZE * this.zoom);
                 };
                 return Renderer;
             }());
@@ -87,12 +93,58 @@ System.register("renderer", [], function (exports_3, context_3) {
         }
     };
 });
-System.register("app", ["tile", "renderer", "util"], function (exports_4, context_4) {
+System.register("input", [], function (exports_4, context_4) {
     "use strict";
-    var tile_1, renderer_1, util_2, currentSessionTicks;
+    var Input, CapturedInput;
     var __moduleName = context_4 && context_4.id;
+    return {
+        setters: [],
+        execute: function () {
+            Input = /** @class */ (function () {
+                function Input() {
+                    var _this = this;
+                    this.keys = new Set();
+                    window.onkeydown = function (e) { return _this.keys.add(e.keyCode); };
+                    window.onkeyup = function (e) { return _this.keys["delete"](e.keyCode); };
+                }
+                Input.prototype.captureInput = function () {
+                    var _this = this;
+                    var keys = Array.from(this.keys);
+                    this.lastCapture = new CapturedInput(new Set(keys.filter(function (key) { return !_this.lastCapture.isKeyHeld(key); })), new Set(keys.slice()));
+                    return this.lastCapture;
+                };
+                return Input;
+            }());
+            exports_4("Input", Input);
+            CapturedInput = /** @class */ (function () {
+                function CapturedInput(down, held) {
+                    this.down = down;
+                    this.held = held;
+                }
+                CapturedInput.prototype.isKeyDown = function (key) {
+                    return this.down.has(key);
+                };
+                CapturedInput.prototype.isKeyHeld = function (key) {
+                    return this.held.has(key);
+                };
+                return CapturedInput;
+            }());
+            exports_4("CapturedInput", CapturedInput);
+        }
+    };
+});
+System.register("app", ["tile", "renderer", "util", "input"], function (exports_5, context_5) {
+    "use strict";
+    var tile_1, renderer_1, util_2, input_1, RENDERER, INPUT, currentSessionTicks;
+    var __moduleName = context_5 && context_5.id;
     function tick() {
-        var RENDERER = new renderer_1.Renderer();
+        var input = INPUT.captureInput();
+        if (input.isKeyDown(65 /* A */)) {
+            console.log("a");
+        }
+        if (input.isKeyHeld(68 /* D */)) {
+            console.log("d");
+        }
         RENDERER.render([
             new tile_1.Tile(tile_1.TileType.GRASS_1, new util_2.Point(1, 2)),
             new tile_1.Tile(tile_1.TileType.BLANK, new util_2.Point(1, 3)),
@@ -111,9 +163,14 @@ System.register("app", ["tile", "renderer", "util"], function (exports_4, contex
             },
             function (util_2_1) {
                 util_2 = util_2_1;
+            },
+            function (input_1_1) {
+                input_1 = input_1_1;
             }
         ],
         execute: function () {
+            RENDERER = new renderer_1.Renderer();
+            INPUT = new input_1.Input();
             currentSessionTicks = 0;
             setInterval(tick, 1 / 60);
         }
