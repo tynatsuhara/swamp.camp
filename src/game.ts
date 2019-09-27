@@ -8,7 +8,7 @@ export class Game {
     readonly worldEntities = [
         new Entity(Tile.GRASS_1, new Point(1, 1).times(TILE_SIZE)),
 
-        new Player(Tile.GUY_1, new Point(0, 0))
+        new Player(Tile.GUY_1, new Point(2, 2).times(TILE_SIZE))
     ]
 
     // entities in the world space

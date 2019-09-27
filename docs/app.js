@@ -212,7 +212,7 @@ System.register("game", ["entity", "util", "renderer"], function (exports_5, con
                 function Game() {
                     this.worldEntities = [
                         new entity_1.Entity(entity_1.Tile.GRASS_1, new util_3.Point(1, 1).times(renderer_1.TILE_SIZE)),
-                        new entity_1.Player(entity_1.Tile.GUY_1, new util_3.Point(0, 0))
+                        new entity_1.Player(entity_1.Tile.GUY_1, new util_3.Point(2, 2).times(renderer_1.TILE_SIZE))
                     ];
                 }
                 // entities in the world space

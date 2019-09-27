@@ -20,3 +20,7 @@ canvas {
     image-rendering: -webkit-crisp-edges; /* Webkit (Safari) */
     image-rendering: pixelated;           /* Chrome */
 }
+
+html {
+    cursor: url(cursor.png), default;	
+}
