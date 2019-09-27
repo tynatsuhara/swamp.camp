@@ -1,3 +1,16 @@
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 System.register("util", [], function (exports_1, context_1) {
     "use strict";
     var Point;
@@ -16,87 +29,10 @@ System.register("util", [], function (exports_1, context_1) {
         }
     };
 });
-System.register("tile", ["util"], function (exports_2, context_2) {
-    "use strict";
-    var util_1, TileType, Tile;
-    var __moduleName = context_2 && context_2.id;
-    return {
-        setters: [
-            function (util_1_1) {
-                util_1 = util_1_1;
-            }
-        ],
-        execute: function () {
-            TileType = /** @class */ (function () {
-                function TileType() {
-                }
-                TileType.BLANK = new util_1.Point(0, 0);
-                TileType.GROUND_1 = new util_1.Point(1, 0);
-                TileType.GROUND_2 = new util_1.Point(2, 0);
-                TileType.GROUND_3 = new util_1.Point(3, 0);
-                TileType.GROUND_4 = new util_1.Point(4, 0);
-                TileType.GRASS_1 = new util_1.Point(5, 0);
-                TileType.GRASS_2 = new util_1.Point(6, 0);
-                TileType.GRASS_3 = new util_1.Point(7, 0);
-                return TileType;
-            }());
-            exports_2("TileType", TileType);
-            Tile = /** @class */ (function () {
-                function Tile(tileSetIndex, position) {
-                    this.tileSetIndex = tileSetIndex;
-                    this.position = position;
-                }
-                Tile.prototype.setPosition = function (position) {
-                    this.position = position;
-                };
-                return Tile;
-            }());
-            exports_2("Tile", Tile);
-        }
-    };
-});
-System.register("renderer", [], function (exports_3, context_3) {
-    "use strict";
-    var CANVAS, CANVAS_CONTEXT, TILE_SET, TILE_SET_SIZE, TILE_SIZE, Renderer;
-    var __moduleName = context_3 && context_3.id;
-    return {
-        setters: [],
-        execute: function () {
-            CANVAS = document.getElementById('canvas');
-            CANVAS_CONTEXT = CANVAS.getContext('2d');
-            TILE_SET = document.getElementById("tileset");
-            TILE_SET_SIZE = 32;
-            TILE_SIZE = 16;
-            CANVAS_CONTEXT.imageSmoothingEnabled = false;
-            Renderer = /** @class */ (function () {
-                function Renderer() {
-                    this.cameraOffsetX = 0;
-                    this.cameraOffsetY = 0;
-                    this.zoom = 1;
-                }
-                Renderer.prototype.render = function (tiles) {
-                    var _this = this;
-                    CANVAS.width = CANVAS.clientWidth;
-                    CANVAS.height = CANVAS.clientHeight;
-                    CANVAS_CONTEXT.fillStyle = "#472d3c";
-                    CANVAS_CONTEXT.rect(0, 0, CANVAS.width, CANVAS.height);
-                    CANVAS_CONTEXT.fill();
-                    // CANVAS_CONTEXT.clearRect(0, 0, CANVAS.width, CANVAS.height)
-                    tiles.forEach(function (t) { return _this.renderTile(t); });
-                };
-                Renderer.prototype.renderTile = function (tile) {
-                    CANVAS_CONTEXT.drawImage(TILE_SET, tile.tileSetIndex.x * TILE_SIZE, tile.tileSetIndex.y * TILE_SIZE, TILE_SIZE, TILE_SIZE, tile.position.x * TILE_SIZE * this.zoom + this.cameraOffsetX, tile.position.y * TILE_SIZE * this.zoom + this.cameraOffsetY, TILE_SIZE * this.zoom, TILE_SIZE * this.zoom);
-                };
-                return Renderer;
-            }());
-            exports_3("Renderer", Renderer);
-        }
-    };
-});
-System.register("input", [], function (exports_4, context_4) {
+System.register("input", [], function (exports_2, context_2) {
     "use strict";
     var Input, CapturedInput;
-    var __moduleName = context_4 && context_4.id;
+    var __moduleName = context_2 && context_2.id;
     return {
         setters: [],
         execute: function () {
@@ -115,7 +51,7 @@ System.register("input", [], function (exports_4, context_4) {
                 };
                 return Input;
             }());
-            exports_4("Input", Input);
+            exports_2("Input", Input);
             CapturedInput = /** @class */ (function () {
                 function CapturedInput(down, held) {
                     this.down = down;
@@ -129,48 +65,159 @@ System.register("input", [], function (exports_4, context_4) {
                 };
                 return CapturedInput;
             }());
-            exports_4("CapturedInput", CapturedInput);
+            exports_2("CapturedInput", CapturedInput);
         }
     };
 });
-System.register("app", ["tile", "renderer", "util", "input"], function (exports_5, context_5) {
+System.register("entity", ["util"], function (exports_3, context_3) {
     "use strict";
-    var tile_1, renderer_1, util_2, input_1, RENDERER, INPUT, currentSessionTicks;
-    var __moduleName = context_5 && context_5.id;
-    function tick() {
-        var input = INPUT.captureInput();
-        if (input.isKeyDown(65 /* A */)) {
-            console.log("a");
-        }
-        if (input.isKeyHeld(68 /* D */)) {
-            console.log("d");
-        }
-        RENDERER.render([
-            new tile_1.Tile(tile_1.TileType.GRASS_1, new util_2.Point(1, 2)),
-            new tile_1.Tile(tile_1.TileType.BLANK, new util_2.Point(1, 3)),
-            new tile_1.Tile(tile_1.TileType.GROUND_1, new util_2.Point(1, 4)),
-            new tile_1.Tile(tile_1.TileType.GROUND_3, new util_2.Point(1, 6))
-        ]);
-        currentSessionTicks;
-    }
+    var util_1, Tile, Entity, Player;
+    var __moduleName = context_3 && context_3.id;
     return {
         setters: [
-            function (tile_1_1) {
-                tile_1 = tile_1_1;
-            },
-            function (renderer_1_1) {
-                renderer_1 = renderer_1_1;
+            function (util_1_1) {
+                util_1 = util_1_1;
+            }
+        ],
+        execute: function () {
+            Tile = /** @class */ (function () {
+                function Tile() {
+                }
+                Tile.BLANK = new util_1.Point(0, 0);
+                Tile.GROUND_1 = new util_1.Point(1, 0);
+                Tile.GROUND_2 = new util_1.Point(2, 0);
+                Tile.GROUND_3 = new util_1.Point(3, 0);
+                Tile.GROUND_4 = new util_1.Point(4, 0);
+                Tile.GRASS_1 = new util_1.Point(5, 0);
+                Tile.GRASS_2 = new util_1.Point(6, 0);
+                Tile.GRASS_3 = new util_1.Point(7, 0);
+                return Tile;
+            }());
+            exports_3("Tile", Tile);
+            Entity = /** @class */ (function () {
+                function Entity(tileSetIndex, position) {
+                    this.tileSetIndex = tileSetIndex;
+                    this.position = position;
+                }
+                Entity.prototype.update = function (input) { };
+                return Entity;
+            }());
+            exports_3("Entity", Entity);
+            Player = /** @class */ (function (_super) {
+                __extends(Player, _super);
+                function Player() {
+                    return _super !== null && _super.apply(this, arguments) || this;
+                }
+                Player.prototype.update = function (input) {
+                    if (input.isKeyDown(68 /* D */)) {
+                        this.position = new util_1.Point(this.position.x + 1, this.position.y);
+                        console.log(this.position);
+                    }
+                };
+                return Player;
+            }(Entity));
+            exports_3("Player", Player);
+        }
+    };
+});
+System.register("renderer", [], function (exports_4, context_4) {
+    "use strict";
+    var CANVAS, CANVAS_CONTEXT, TILE_SET, TILE_SET_SIZE, TILE_SIZE, Renderer;
+    var __moduleName = context_4 && context_4.id;
+    return {
+        setters: [],
+        execute: function () {
+            CANVAS = document.getElementById('canvas');
+            CANVAS_CONTEXT = CANVAS.getContext('2d');
+            TILE_SET = document.getElementById("tileset");
+            TILE_SET_SIZE = 32;
+            TILE_SIZE = 16;
+            Renderer = /** @class */ (function () {
+                function Renderer() {
+                    this.cameraOffsetX = 0;
+                    this.cameraOffsetY = 0;
+                    this.zoom = 2.5;
+                }
+                Renderer.prototype.render = function (entities) {
+                    var _this = this;
+                    CANVAS.width = CANVAS.clientWidth;
+                    CANVAS.height = CANVAS.clientHeight;
+                    CANVAS_CONTEXT.imageSmoothingEnabled = false;
+                    CANVAS_CONTEXT.fillStyle = "#472d3c";
+                    CANVAS_CONTEXT.rect(0, 0, CANVAS.width, CANVAS.height);
+                    CANVAS_CONTEXT.fill();
+                    // CANVAS_CONTEXT.clearRect(0, 0, CANVAS.width, CANVAS.height)
+                    entities.forEach(function (e) { return _this.renderEntity(e); });
+                };
+                Renderer.prototype.renderEntity = function (entity) {
+                    CANVAS_CONTEXT.drawImage(TILE_SET, entity.tileSetIndex.x * TILE_SIZE, entity.tileSetIndex.y * TILE_SIZE, TILE_SIZE, TILE_SIZE, entity.position.x * TILE_SIZE * this.zoom + this.cameraOffsetX, entity.position.y * TILE_SIZE * this.zoom + this.cameraOffsetY, TILE_SIZE * this.zoom, TILE_SIZE * this.zoom);
+                };
+                return Renderer;
+            }());
+            exports_4("Renderer", Renderer);
+        }
+    };
+});
+System.register("game", ["entity", "util"], function (exports_5, context_5) {
+    "use strict";
+    var entity_1, util_2, Game;
+    var __moduleName = context_5 && context_5.id;
+    return {
+        setters: [
+            function (entity_1_1) {
+                entity_1 = entity_1_1;
             },
             function (util_2_1) {
                 util_2 = util_2_1;
+            }
+        ],
+        execute: function () {
+            Game = /** @class */ (function () {
+                function Game() {
+                    this.tiles = [
+                        new entity_1.Player(entity_1.Tile.GROUND_4, new util_2.Point(0, 0)),
+                        new entity_1.Entity(entity_1.Tile.GRASS_1, new util_2.Point(1, 2)),
+                        new entity_1.Entity(entity_1.Tile.GRASS_3, new util_2.Point(1, 3)),
+                        new entity_1.Entity(entity_1.Tile.GROUND_1, new util_2.Point(1, 4)),
+                        new entity_1.Entity(entity_1.Tile.GROUND_3, new util_2.Point(1, 6))
+                    ];
+                }
+                Game.prototype.getEntities = function () {
+                    return this.tiles;
+                };
+                return Game;
+            }());
+            exports_5("Game", Game);
+        }
+    };
+});
+System.register("app", ["renderer", "input", "game"], function (exports_6, context_6) {
+    "use strict";
+    var renderer_1, input_1, game_1, RENDERER, INPUT, GAME, currentSessionTicks;
+    var __moduleName = context_6 && context_6.id;
+    function tick() {
+        var input = INPUT.captureInput();
+        var entities = GAME.getEntities();
+        entities.forEach(function (tile) { return tile.update(input); });
+        RENDERER.render(entities);
+        currentSessionTicks++;
+    }
+    return {
+        setters: [
+            function (renderer_1_1) {
+                renderer_1 = renderer_1_1;
             },
             function (input_1_1) {
                 input_1 = input_1_1;
+            },
+            function (game_1_1) {
+                game_1 = game_1_1;
             }
         ],
         execute: function () {
             RENDERER = new renderer_1.Renderer();
             INPUT = new input_1.Input();
+            GAME = new game_1.Game();
             currentSessionTicks = 0;
             setInterval(tick, 1 / 60);
         }

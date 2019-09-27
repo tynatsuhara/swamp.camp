@@ -1,6 +1,7 @@
 import { Point } from "./util";
+import { CapturedInput, InputKey } from "./input";
 
-export class TileType {
+export class Tile {
     static BLANK = new Point(0, 0)
     static GROUND_1 = new Point(1, 0)
     static GROUND_2 = new Point(2, 0)
@@ -11,7 +12,7 @@ export class TileType {
     static GRASS_3 = new Point(7, 0)
 }
 
-export class Tile {
+export class Entity {
     readonly tileSetIndex: Point
     position: Point
 
@@ -20,7 +21,14 @@ export class Tile {
         this.position = position
     }
 
-    setPosition(position: Point) {
-        this.position = position
+    update(input: CapturedInput) {}
+}
+
+export class Player extends Entity {
+    update(input: CapturedInput) {
+        if (input.isKeyDown(InputKey.D)) {
+            this.position = new Point(this.position.x + 1, this.position.y)
+            console.log(this.position)
+        }
     }
 }
