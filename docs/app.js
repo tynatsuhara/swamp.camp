@@ -142,11 +142,11 @@ System.register("engine/renderer", ["engine/point"], function (exports_4, contex
                     var _this = this;
                     view.entities.forEach(function (e) {
                         var img = e.getRenderImage();
-                        var position = e.position.plus(img.dimensions.div(2)); // center of object to draw
-                        var rotation = img.rotation * Math.PI / 180;
+                        var position = e.position.plus(img.dimensions.div(2)).times(view.zoom); // center of object to draw
+                        var rotation = 0 * Math.PI / 180;
                         _this.context.translate(position.x, position.y);
                         _this.context.rotate(rotation);
-                        _this.context.drawImage(img.source, img.position.x, img.position.y, img.dimensions.x, img.dimensions.y, -img.dimensions.x / 2, -img.dimensions.y / 2, img.dimensions.x, img.dimensions.y);
+                        _this.context.drawImage(img.source, img.position.x, img.position.y, img.dimensions.x, img.dimensions.y, -img.dimensions.x / 2 * view.zoom, -img.dimensions.y / 2 * view.zoom, img.dimensions.x * view.zoom, img.dimensions.y * view.zoom);
                         _this.context.rotate(-rotation);
                         _this.context.translate(-position.x, -position.y);
                         // this.context.drawImage(

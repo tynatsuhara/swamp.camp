@@ -34,8 +34,8 @@ export class Renderer {
 
         view.entities.forEach(e => {
             const img = e.getRenderImage()
-            const position = e.position.plus(img.dimensions.div(2))  // center of object to draw
-            const rotation = img.rotation * Math.PI/180
+            const position = e.position.plus(img.dimensions.div(2)).times(view.zoom)  // center of object to draw
+            const rotation = 0 * Math.PI/180
 
             this.context.translate(position.x, position.y);
             this.context.rotate(rotation);
@@ -45,10 +45,10 @@ export class Renderer {
                 img.position.y, 
                 img.dimensions.x, 
                 img.dimensions.y, 
-                -img.dimensions.x/2, 
-                -img.dimensions.y/2, 
-                img.dimensions.x, 
-                img.dimensions.y
+                -img.dimensions.x / 2 * view.zoom, 
+                -img.dimensions.y / 2 * view.zoom, 
+                img.dimensions.x * view.zoom, 
+                img.dimensions.y * view.zoom
             );
             this.context.rotate(-rotation);
             this.context.translate(-position.x, -position.y);
