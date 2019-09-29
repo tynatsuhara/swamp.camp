@@ -2,7 +2,7 @@ import { Entity } from "./entity"
 import { Point } from "./point";
 
 export class View {
-    readonly zoom: number
-    readonly offset: Point
-    readonly entities: Entity[]
+    zoom: number = 0
+    offset: Point = new Point(0, 0)
+    entities: Entity[] = []
 }

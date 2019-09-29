@@ -12,7 +12,19 @@ export class Point {
         return new Point(this.x * multiplier, this.y * multiplier)
     }
 
+    div(denominator: number): Point {
+        return new Point(this.x / denominator, this.y / denominator)
+    }
+
     plus(other: Point): Point {
         return new Point(this.x + other.x, this.y + other.y)
+    }
+
+    minus(other: Point): Point {
+        return new Point(this.x - other.x, this.y - other.y)
+    }
+
+    lerp(multiplier: number, goal: Point): Point {
+        return new Point(this.x + (goal.x - this.x) * multiplier, this.y + (goal.y - this.y) * multiplier)
     }
 }

@@ -26,8 +26,17 @@ System.register("engine/point", [], function (exports_1, context_1) {
                 Point.prototype.times = function (multiplier) {
                     return new Point(this.x * multiplier, this.y * multiplier);
                 };
+                Point.prototype.div = function (denominator) {
+                    return new Point(this.x / denominator, this.y / denominator);
+                };
                 Point.prototype.plus = function (other) {
                     return new Point(this.x + other.x, this.y + other.y);
+                };
+                Point.prototype.minus = function (other) {
+                    return new Point(this.x - other.x, this.y - other.y);
+                };
+                Point.prototype.lerp = function (multiplier, goal) {
+                    return new Point(this.x + (goal.x - this.x) * multiplier, this.y + (goal.y - this.y) * multiplier);
                 };
                 return Point;
             }());
@@ -75,15 +84,22 @@ System.register("engine/input", [], function (exports_2, context_2) {
         }
     };
 });
-System.register("engine/view", [], function (exports_3, context_3) {
+System.register("engine/view", ["engine/point"], function (exports_3, context_3) {
     "use strict";
-    var View;
+    var point_1, View;
     var __moduleName = context_3 && context_3.id;
     return {
-        setters: [],
+        setters: [
+            function (point_1_1) {
+                point_1 = point_1_1;
+            }
+        ],
         execute: function () {
             View = /** @class */ (function () {
                 function View() {
+                    this.zoom = 0;
+                    this.offset = new point_1.Point(0, 0);
+                    this.entities = [];
                 }
                 return View;
             }());
@@ -93,12 +109,12 @@ System.register("engine/view", [], function (exports_3, context_3) {
 });
 System.register("engine/renderer", ["engine/point"], function (exports_4, context_4) {
     "use strict";
-    var point_1, Renderer, RenderImage;
+    var point_2, Renderer, RenderImage;
     var __moduleName = context_4 && context_4.id;
     return {
         setters: [
-            function (point_1_1) {
-                point_1 = point_1_1;
+            function (point_2_1) {
+                point_2 = point_2_1;
             }
         ],
         execute: function () {
@@ -119,7 +135,7 @@ System.register("engine/renderer", ["engine/point"], function (exports_4, contex
                     views.forEach(function (v) { return _this.renderView(v); });
                 };
                 Renderer.prototype.getDimensions = function () {
-                    return new point_1.Point(this.canvas.width, this.canvas.height);
+                    return new point_2.Point(this.canvas.width, this.canvas.height);
                 };
                 Renderer.prototype.renderView = function (view) {
                     var _this = this;
@@ -232,15 +248,15 @@ System.register("engine/entity", [], function (exports_7, context_7) {
 });
 System.register("game/tiles", ["engine/entity", "engine/point"], function (exports_8, context_8) {
     "use strict";
-    var entity_1, point_2, TILE_SET, TILE_SIZE, Tile, TileEntity, Player;
+    var entity_1, point_3, TILE_SET, TILE_SIZE, Tile, TileEntity, Player;
     var __moduleName = context_8 && context_8.id;
     return {
         setters: [
             function (entity_1_1) {
                 entity_1 = entity_1_1;
             },
-            function (point_2_1) {
-                point_2 = point_2_1;
+            function (point_3_1) {
+                point_3 = point_3_1;
             }
         ],
         execute: function () {
@@ -249,23 +265,44 @@ System.register("game/tiles", ["engine/entity", "engine/point"], function (expor
             Tile = /** @class */ (function () {
                 function Tile() {
                 }
-                Tile.BLANK = new point_2.Point(0, 0);
-                Tile.GROUND_1 = new point_2.Point(1, 0);
-                Tile.GROUND_2 = new point_2.Point(2, 0);
-                Tile.GROUND_3 = new point_2.Point(3, 0);
-                Tile.GROUND_4 = new point_2.Point(4, 0);
-                Tile.GRASS_1 = new point_2.Point(5, 0);
-                Tile.GRASS_2 = new point_2.Point(6, 0);
-                Tile.GRASS_3 = new point_2.Point(7, 0);
-                Tile.GUY_1 = new point_2.Point(24, 0);
-                Tile.BORDER_1 = new point_2.Point(0, 16);
-                Tile.BORDER_2 = new point_2.Point(1, 16);
-                Tile.BORDER_3 = new point_2.Point(2, 16);
-                Tile.BORDER_4 = new point_2.Point(2, 17);
-                Tile.BORDER_5 = new point_2.Point(2, 18);
-                Tile.BORDER_6 = new point_2.Point(1, 18);
-                Tile.BORDER_7 = new point_2.Point(0, 18);
-                Tile.BORDER_8 = new point_2.Point(0, 17);
+                // environment
+                Tile.GROUND_1 = new point_3.Point(1, 0);
+                Tile.GROUND_2 = new point_3.Point(2, 0);
+                Tile.GROUND_3 = new point_3.Point(3, 0);
+                Tile.GROUND_4 = new point_3.Point(4, 0);
+                Tile.GRASS_1 = new point_3.Point(5, 0);
+                Tile.GRASS_2 = new point_3.Point(6, 0);
+                Tile.GRASS_3 = new point_3.Point(7, 0);
+                Tile.TREE_1 = new point_3.Point(0, 1);
+                Tile.TREE_2 = new point_3.Point(1, 1);
+                Tile.TREE_3 = new point_3.Point(2, 1);
+                Tile.TREE_4 = new point_3.Point(3, 1);
+                Tile.TREE_5 = new point_3.Point(4, 1);
+                Tile.TREE_6 = new point_3.Point(5, 1);
+                Tile.CACTUS = new point_3.Point(6, 1);
+                Tile.CACTI = new point_3.Point(7, 1);
+                Tile.TALL_GRASS = new point_3.Point(0, 2);
+                Tile.VINES_TOP = new point_3.Point(1, 2);
+                Tile.VINES_BOTTOM = new point_3.Point(2, 2);
+                Tile.TREES = new point_3.Point(3, 2);
+                Tile.ROUND_TREE = new point_3.Point(4, 2);
+                Tile.ROCKS = new point_3.Point(5, 2);
+                Tile.DEAD_TREE = new point_3.Point(6, 2);
+                Tile.PALM_TREE = new point_3.Point(7, 2);
+                // characters
+                Tile.GUY_1 = new point_3.Point(24, 0);
+                // items
+                Tile.COIN = new point_3.Point(22, 4);
+                Tile.DIAMOND = new point_3.Point(23, 4);
+                // ui
+                Tile.BORDER_1 = new point_3.Point(0, 16);
+                Tile.BORDER_2 = new point_3.Point(1, 16);
+                Tile.BORDER_3 = new point_3.Point(2, 16);
+                Tile.BORDER_4 = new point_3.Point(2, 17);
+                Tile.BORDER_5 = new point_3.Point(2, 18);
+                Tile.BORDER_6 = new point_3.Point(1, 18);
+                Tile.BORDER_7 = new point_3.Point(0, 18);
+                Tile.BORDER_8 = new point_3.Point(0, 17);
                 return Tile;
             }());
             exports_8("Tile", Tile);
@@ -279,8 +316,8 @@ System.register("game/tiles", ["engine/entity", "engine/point"], function (expor
                 TileEntity.prototype.getRenderImage = function () {
                     return {
                         source: TILE_SET,
-                        position: new point_2.Point(this.tileSetIndex.x, this.tileSetIndex.y).times(TILE_SIZE + 1),
-                        dimensions: new point_2.Point(TILE_SIZE, TILE_SIZE)
+                        position: new point_3.Point(this.tileSetIndex.x, this.tileSetIndex.y).times(TILE_SIZE + 1),
+                        dimensions: new point_3.Point(TILE_SIZE, TILE_SIZE)
                     };
                 };
                 return TileEntity;
@@ -308,7 +345,7 @@ System.register("game/tiles", ["engine/entity", "engine/point"], function (expor
                     if (updateData.input.isKeyHeld(68 /* D */)) {
                         dx++;
                     }
-                    this.position = new point_2.Point(this.position.x + dx / updateData.elapsedTimeMillis * this.speed, this.position.y + dy / updateData.elapsedTimeMillis * this.speed);
+                    this.position = new point_3.Point(this.position.x + dx / updateData.elapsedTimeMillis * this.speed, this.position.y + dy / updateData.elapsedTimeMillis * this.speed);
                 };
                 return Player;
             }(TileEntity));
@@ -316,65 +353,75 @@ System.register("game/tiles", ["engine/entity", "engine/point"], function (expor
         }
     };
 });
-System.register("game/quest_game", ["engine/point", "engine/game", "game/tiles"], function (exports_9, context_9) {
+System.register("game/quest_game", ["engine/point", "engine/game", "engine/view", "game/tiles"], function (exports_9, context_9) {
     "use strict";
-    var point_3, game_1, tiles_1, TILE_SET, QuestGame;
+    var point_4, game_1, view_1, tiles_1, ZOOM, QuestGame;
     var __moduleName = context_9 && context_9.id;
     return {
         setters: [
-            function (point_3_1) {
-                point_3 = point_3_1;
+            function (point_4_1) {
+                point_4 = point_4_1;
             },
             function (game_1_1) {
                 game_1 = game_1_1;
+            },
+            function (view_1_1) {
+                view_1 = view_1_1;
             },
             function (tiles_1_1) {
                 tiles_1 = tiles_1_1;
             }
         ],
         execute: function () {
-            TILE_SET = document.getElementById("tileset");
+            ZOOM = 2.5;
             QuestGame = /** @class */ (function (_super) {
                 __extends(QuestGame, _super);
                 function QuestGame() {
                     var _this = _super !== null && _super.apply(this, arguments) || this;
+                    _this.player = new tiles_1.Player(tiles_1.Tile.GUY_1, new point_4.Point(2, 2).times(tiles_1.TILE_SIZE));
                     _this.worldEntities = [
-                        new tiles_1.TileEntity(tiles_1.Tile.GRASS_1, new point_3.Point(1, 1).times(tiles_1.TILE_SIZE)),
-                        new tiles_1.Player(tiles_1.Tile.GUY_1, new point_3.Point(2, 2).times(tiles_1.TILE_SIZE))
+                        new tiles_1.TileEntity(tiles_1.Tile.GRASS_1, new point_4.Point(1, 1).times(tiles_1.TILE_SIZE)),
+                        _this.player
                     ];
+                    _this.gameEntityView = new view_1.View();
+                    _this.uiView = new view_1.View();
                     return _this;
                 }
                 // entities in the world space
                 QuestGame.prototype.getViews = function (updateData) {
-                    var gameEntityView = {
-                        zoom: 2.5,
-                        offset: new point_3.Point(0, 0),
+                    this.updateViews(updateData);
+                    return [this.gameEntityView, this.uiView];
+                };
+                QuestGame.prototype.updateViews = function (updateData) {
+                    var cameraGoal = updateData.dimensions.div(2).minus(this.player.position.times(ZOOM));
+                    this.gameEntityView = {
+                        zoom: ZOOM,
+                        offset: this.gameEntityView.offset.lerp(.05 / updateData.elapsedTimeMillis, cameraGoal),
                         entities: this.worldEntities
                     };
-                    var uiView = {
-                        zoom: 2.5,
-                        offset: new point_3.Point(0, 0),
+                    this.uiView = {
+                        zoom: ZOOM,
+                        offset: new point_4.Point(0, 0),
                         entities: this.getUIEntities()
                     };
-                    return [gameEntityView, uiView];
                 };
                 // entities whose position is fixed on the camera
                 QuestGame.prototype.getUIEntities = function () {
-                    var dimensions = new point_3.Point(25, 20); // tile dimensions
+                    var dimensions = new point_4.Point(25, 20); // tile dimensions
                     var result = [];
-                    result.push(new tiles_1.TileEntity(tiles_1.Tile.BORDER_1, new point_3.Point(0, 0)));
-                    result.push(new tiles_1.TileEntity(tiles_1.Tile.BORDER_3, new point_3.Point(dimensions.x - 1, 0).times(tiles_1.TILE_SIZE)));
-                    result.push(new tiles_1.TileEntity(tiles_1.Tile.BORDER_5, new point_3.Point(dimensions.x - 1, dimensions.y - 1).times(tiles_1.TILE_SIZE)));
-                    result.push(new tiles_1.TileEntity(tiles_1.Tile.BORDER_7, new point_3.Point(0, dimensions.y - 1).times(tiles_1.TILE_SIZE)));
+                    result.push(new tiles_1.TileEntity(tiles_1.Tile.BORDER_1, new point_4.Point(0, 0)));
+                    result.push(new tiles_1.TileEntity(tiles_1.Tile.BORDER_3, new point_4.Point(dimensions.x - 1, 0).times(tiles_1.TILE_SIZE)));
+                    result.push(new tiles_1.TileEntity(tiles_1.Tile.BORDER_5, new point_4.Point(dimensions.x - 1, dimensions.y - 1).times(tiles_1.TILE_SIZE)));
+                    result.push(new tiles_1.TileEntity(tiles_1.Tile.BORDER_7, new point_4.Point(0, dimensions.y - 1).times(tiles_1.TILE_SIZE)));
                     // horizontal lines
                     for (var i = 1; i < dimensions.x - 1; i++) {
-                        result.push(new tiles_1.TileEntity(tiles_1.Tile.BORDER_2, new point_3.Point(i, 0).times(tiles_1.TILE_SIZE)));
-                        result.push(new tiles_1.TileEntity(tiles_1.Tile.BORDER_6, new point_3.Point(i, dimensions.y - 1).times(tiles_1.TILE_SIZE)));
+                        result.push(new tiles_1.TileEntity(tiles_1.Tile.BORDER_2, new point_4.Point(i, 0).times(tiles_1.TILE_SIZE)));
+                        result.push(new tiles_1.TileEntity(tiles_1.Tile.BORDER_6, new point_4.Point(i, dimensions.y - 1).times(tiles_1.TILE_SIZE)));
                     }
                     // vertical lines
                     for (var j = 1; j < dimensions.y - 1; j++) {
-                        result.push(new tiles_1.TileEntity(tiles_1.Tile.BORDER_4, new point_3.Point(dimensions.x - 1, j).times(tiles_1.TILE_SIZE)));
-                        result.push(new tiles_1.TileEntity(tiles_1.Tile.BORDER_8, new point_3.Point(0, j).times(tiles_1.TILE_SIZE)));
+                        result.push(new tiles_1.TileEntity(tiles_1.Tile.BORDER_4, new point_4.Point(dimensions.x - 1, j).times(tiles_1.TILE_SIZE)));
+                        result.push(new tiles_1.TileEntity(tiles_1.Tile.BORDER_8, new point_4.Point(0, j).times(tiles_1.TILE_SIZE)));
                     }
                     return result;
                 };

@@ -5,30 +5,39 @@ import { UpdateData } from "../engine/engine"
 import { View } from "../engine/view";
 import { TileEntity, Player, Tile, TILE_SIZE } from "./tiles";
 
-const TILE_SET = <HTMLImageElement>document.getElementById("tileset")
+const ZOOM = 2.5
 
 export class QuestGame extends Game {
     
-    readonly worldEntities = [
+    readonly player: Player = new Player(Tile.GUY_1, new Point(2, 2).times(TILE_SIZE))
+    readonly worldEntities: Entity[] = [
         new TileEntity(Tile.GRASS_1, new Point(1, 1).times(TILE_SIZE)),
-        new Player(Tile.GUY_1, new Point(2, 2).times(TILE_SIZE))
+        this.player
     ]
+    
+    gameEntityView: View = new View()
+    uiView: View = new View()
 
     // entities in the world space
     getViews(updateData: UpdateData): View[] {
-        const gameEntityView: View = {
-            zoom: 2.5,
-            offset: new Point(0, 0),
+        this.updateViews(updateData)
+        return [this.gameEntityView, this.uiView]
+    }
+
+    updateViews(updateData: UpdateData) {
+        const cameraGoal = updateData.dimensions.div(2).minus(this.player.position.times(ZOOM))
+
+        this.gameEntityView = { 
+            zoom: ZOOM,
+            offset: this.gameEntityView.offset.lerp(.05 / updateData.elapsedTimeMillis, cameraGoal),
             entities: this.worldEntities
         }
 
-        const uiView: View = {
-            zoom: 2.5,
+        this.uiView = {
+            zoom: ZOOM,
             offset: new Point(0, 0),
             entities: this.getUIEntities()
         }
-
-        return [gameEntityView, uiView]
     }
 
     // entities whose position is fixed on the camera
