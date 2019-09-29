@@ -138,7 +138,6 @@ System.register("engine/renderer", ["engine/point"], function (exports_4, contex
                     return new point_2.Point(this.canvas.width, this.canvas.height);
                 };
                 Renderer.prototype.renderView = function (view) {
-                    // TODO support rotateable tiles
                     var _this = this;
                     view.entities.forEach(function (e) {
                         var img = e.getRenderImage();
@@ -146,20 +145,9 @@ System.register("engine/renderer", ["engine/point"], function (exports_4, contex
                         var rotation = 0 * Math.PI / 180;
                         _this.context.translate(position.x, position.y);
                         _this.context.rotate(rotation);
-                        _this.context.drawImage(img.source, img.position.x, img.position.y, img.dimensions.x, img.dimensions.y, -img.dimensions.x / 2 * view.zoom, -img.dimensions.y / 2 * view.zoom, img.dimensions.x * view.zoom, img.dimensions.y * view.zoom);
+                        _this.context.drawImage(img.source, img.position.x, img.position.y, img.dimensions.x, img.dimensions.y, _this.pixelNum(view.zoom * (-img.dimensions.x / 2 + view.offset.x), view.zoom), _this.pixelNum(view.zoom * (-img.dimensions.y / 2 + view.offset.y), view.zoom), img.dimensions.x * view.zoom, img.dimensions.y * view.zoom);
                         _this.context.rotate(-rotation);
                         _this.context.translate(-position.x, -position.y);
-                        // this.context.drawImage(
-                        //     img.source, 
-                        //     img.position.x, 
-                        //     img.position.y, 
-                        //     img.dimensions.x, 
-                        //     img.dimensions.y, 
-                        //     this.pixelNum(e.position.x * view.zoom + view.offset.x, view.zoom), 
-                        //     this.pixelNum(e.position.y * view.zoom + view.offset.y, view.zoom), 
-                        //     img.dimensions.x * view.zoom, 
-                        //     img.dimensions.y * view.zoom
-                        // )
                     });
                 };
                 Renderer.prototype.pixelNum = function (val, zoom) {
@@ -419,10 +407,10 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/view"
                     return [this.gameEntityView, this.uiView];
                 };
                 QuestGame.prototype.updateViews = function (updateData) {
-                    var cameraGoal = updateData.dimensions.div(2).minus(this.player.position.times(ZOOM));
+                    var cameraGoal = updateData.dimensions.div(ZOOM).div(2).minus(this.player.position);
                     this.gameEntityView = {
                         zoom: ZOOM,
-                        offset: this.gameEntityView.offset.lerp(.05 / updateData.elapsedTimeMillis, cameraGoal),
+                        offset: this.gameEntityView.offset.lerp(.03 / updateData.elapsedTimeMillis, cameraGoal),
                         entities: this.worldEntities
                     };
                     this.uiView = {

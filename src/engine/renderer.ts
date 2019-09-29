@@ -1,6 +1,6 @@
 import { Entity } from "./entity"
 import { Point } from "./point"
-import { View } from "./view";
+import { View } from "./view"
 
 export class Renderer {
     readonly canvas: HTMLCanvasElement
@@ -29,41 +29,26 @@ export class Renderer {
     }
 
     renderView(view: View) {
-
-        // TODO support rotateable tiles
-
         view.entities.forEach(e => {
             const img = e.getRenderImage()
             const position = e.position.plus(img.dimensions.div(2)).times(view.zoom)  // center of object to draw
             const rotation = 0 * Math.PI/180
 
-            this.context.translate(position.x, position.y);
-            this.context.rotate(rotation);
+            this.context.translate(position.x, position.y)
+            this.context.rotate(rotation)
             this.context.drawImage(
                 img.source, 
                 img.position.x,
                 img.position.y, 
                 img.dimensions.x, 
                 img.dimensions.y, 
-                -img.dimensions.x / 2 * view.zoom, 
-                -img.dimensions.y / 2 * view.zoom, 
+                this.pixelNum(view.zoom * (-img.dimensions.x / 2 + view.offset.x), view.zoom), 
+                this.pixelNum(view.zoom * (-img.dimensions.y / 2 + view.offset.y), view.zoom), 
                 img.dimensions.x * view.zoom, 
                 img.dimensions.y * view.zoom
-            );
-            this.context.rotate(-rotation);
-            this.context.translate(-position.x, -position.y);
-
-            // this.context.drawImage(
-            //     img.source, 
-            //     img.position.x, 
-            //     img.position.y, 
-            //     img.dimensions.x, 
-            //     img.dimensions.y, 
-            //     this.pixelNum(e.position.x * view.zoom + view.offset.x, view.zoom), 
-            //     this.pixelNum(e.position.y * view.zoom + view.offset.y, view.zoom), 
-            //     img.dimensions.x * view.zoom, 
-            //     img.dimensions.y * view.zoom
-            // )
+            )
+            this.context.rotate(-rotation)
+            this.context.translate(-position.x, -position.y)
         })
     }
 

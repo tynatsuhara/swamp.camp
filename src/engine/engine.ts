@@ -7,7 +7,7 @@ export class UpdateData {
     readonly currentSessionTicks: number
     readonly elapsedTimeMillis: number
     readonly input: CapturedInput
-    readonly dimensions: Point  // unscaled input
+    readonly dimensions: Point  // unscaled input dimensions
 }
 
 export class Engine {

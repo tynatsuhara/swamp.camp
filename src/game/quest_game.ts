@@ -25,11 +25,11 @@ export class QuestGame extends Game {
     }
 
     updateViews(updateData: UpdateData) {
-        const cameraGoal = updateData.dimensions.div(2).minus(this.player.position.times(ZOOM))
+        const cameraGoal = updateData.dimensions.div(ZOOM).div(2).minus(this.player.position)
 
         this.gameEntityView = { 
             zoom: ZOOM,
-            offset: this.gameEntityView.offset.lerp(.05 / updateData.elapsedTimeMillis, cameraGoal),
+            offset: this.gameEntityView.offset.lerp(.03 / updateData.elapsedTimeMillis, cameraGoal),
             entities: this.worldEntities
         }
 
