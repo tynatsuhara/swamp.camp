@@ -138,10 +138,28 @@ System.register("engine/renderer", ["engine/point"], function (exports_4, contex
                     return new point_2.Point(this.canvas.width, this.canvas.height);
                 };
                 Renderer.prototype.renderView = function (view) {
+                    // TODO support rotateable tiles
                     var _this = this;
                     view.entities.forEach(function (e) {
                         var img = e.getRenderImage();
-                        _this.context.drawImage(img.source, img.position.x, img.position.y, img.dimensions.x, img.dimensions.y, _this.pixelNum(e.position.x * view.zoom + view.offset.x, view.zoom), _this.pixelNum(e.position.y * view.zoom + view.offset.y, view.zoom), img.dimensions.x * view.zoom, img.dimensions.y * view.zoom);
+                        var position = e.position.plus(img.dimensions.div(2)); // center of object to draw
+                        var rotation = img.rotation * Math.PI / 180;
+                        _this.context.translate(position.x, position.y);
+                        _this.context.rotate(rotation);
+                        _this.context.drawImage(img.source, img.position.x, img.position.y, img.dimensions.x, img.dimensions.y, -img.dimensions.x / 2, -img.dimensions.y / 2, img.dimensions.x, img.dimensions.y);
+                        _this.context.rotate(-rotation);
+                        _this.context.translate(-position.x, -position.y);
+                        // this.context.drawImage(
+                        //     img.source, 
+                        //     img.position.x, 
+                        //     img.position.y, 
+                        //     img.dimensions.x, 
+                        //     img.dimensions.y, 
+                        //     this.pixelNum(e.position.x * view.zoom + view.offset.x, view.zoom), 
+                        //     this.pixelNum(e.position.y * view.zoom + view.offset.y, view.zoom), 
+                        //     img.dimensions.x * view.zoom, 
+                        //     img.dimensions.y * view.zoom
+                        // )
                     });
                 };
                 Renderer.prototype.pixelNum = function (val, zoom) {
@@ -151,7 +169,12 @@ System.register("engine/renderer", ["engine/point"], function (exports_4, contex
             }());
             exports_4("Renderer", Renderer);
             RenderImage = /** @class */ (function () {
-                function RenderImage() {
+                function RenderImage(source, position, dimensions, rotation) {
+                    if (rotation === void 0) { rotation = 0; }
+                    this.source = source;
+                    this.position = position;
+                    this.dimensions = dimensions;
+                    this.rotation = rotation;
                 }
                 return RenderImage;
             }());
@@ -246,9 +269,9 @@ System.register("engine/entity", [], function (exports_7, context_7) {
         }
     };
 });
-System.register("game/tiles", ["engine/entity", "engine/point"], function (exports_8, context_8) {
+System.register("game/tiles", ["engine/entity", "engine/point", "engine/renderer"], function (exports_8, context_8) {
     "use strict";
-    var entity_1, point_3, TILE_SET, TILE_SIZE, Tile, TileEntity, Player;
+    var entity_1, point_3, renderer_2, TILE_SET, TILE_SIZE, Tile, TileEntity, Player;
     var __moduleName = context_8 && context_8.id;
     return {
         setters: [
@@ -257,6 +280,9 @@ System.register("game/tiles", ["engine/entity", "engine/point"], function (expor
             },
             function (point_3_1) {
                 point_3 = point_3_1;
+            },
+            function (renderer_2_1) {
+                renderer_2 = renderer_2_1;
             }
         ],
         execute: function () {
@@ -289,6 +315,10 @@ System.register("game/tiles", ["engine/entity", "engine/point"], function (expor
                 Tile.ROCKS = new point_3.Point(5, 2);
                 Tile.DEAD_TREE = new point_3.Point(6, 2);
                 Tile.PALM_TREE = new point_3.Point(7, 2);
+                Tile.DOOR_1 = new point_3.Point(9, 3);
+                Tile.DOOR_2 = new point_3.Point(9, 4);
+                Tile.DOOR_3 = new point_3.Point(9, 5);
+                Tile.DOOR_OPEN = new point_3.Point(9, 6);
                 // characters
                 Tile.GUY_1 = new point_3.Point(24, 0);
                 // items
@@ -314,11 +344,7 @@ System.register("game/tiles", ["engine/entity", "engine/point"], function (expor
                     return _this;
                 }
                 TileEntity.prototype.getRenderImage = function () {
-                    return {
-                        source: TILE_SET,
-                        position: new point_3.Point(this.tileSetIndex.x, this.tileSetIndex.y).times(TILE_SIZE + 1),
-                        dimensions: new point_3.Point(TILE_SIZE, TILE_SIZE)
-                    };
+                    return new renderer_2.RenderImage(TILE_SET, new point_3.Point(this.tileSetIndex.x, this.tileSetIndex.y).times(TILE_SIZE + 1), new point_3.Point(TILE_SIZE, TILE_SIZE));
                 };
                 return TileEntity;
             }(entity_1.Entity));

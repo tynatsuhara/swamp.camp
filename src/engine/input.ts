@@ -1,4 +1,5 @@
 export const enum InputKey {
+    E = 69,
     W = 87,
     A = 65,
     S = 83,

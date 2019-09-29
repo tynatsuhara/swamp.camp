@@ -29,19 +29,41 @@ export class Renderer {
     }
 
     renderView(view: View) {
+
+        // TODO support rotateable tiles
+
         view.entities.forEach(e => {
             const img = e.getRenderImage()
+            const position = e.position.plus(img.dimensions.div(2))  // center of object to draw
+            const rotation = img.rotation * Math.PI/180
+
+            this.context.translate(position.x, position.y);
+            this.context.rotate(rotation);
             this.context.drawImage(
                 img.source, 
-                img.position.x, 
+                img.position.x,
                 img.position.y, 
                 img.dimensions.x, 
                 img.dimensions.y, 
-                this.pixelNum(e.position.x * view.zoom + view.offset.x, view.zoom), 
-                this.pixelNum(e.position.y * view.zoom + view.offset.y, view.zoom), 
-                img.dimensions.x * view.zoom, 
-                img.dimensions.y * view.zoom
-            )
+                -img.dimensions.x/2, 
+                -img.dimensions.y/2, 
+                img.dimensions.x, 
+                img.dimensions.y
+            );
+            this.context.rotate(-rotation);
+            this.context.translate(-position.x, -position.y);
+
+            // this.context.drawImage(
+            //     img.source, 
+            //     img.position.x, 
+            //     img.position.y, 
+            //     img.dimensions.x, 
+            //     img.dimensions.y, 
+            //     this.pixelNum(e.position.x * view.zoom + view.offset.x, view.zoom), 
+            //     this.pixelNum(e.position.y * view.zoom + view.offset.y, view.zoom), 
+            //     img.dimensions.x * view.zoom, 
+            //     img.dimensions.y * view.zoom
+            // )
         })
     }
 
@@ -52,6 +74,14 @@ export class Renderer {
 
 export class RenderImage {
     source: CanvasImageSource
-    position: Point
+    position: Point  // the top-left coordinate position on the source image
     dimensions: Point
+    rotation: number  // clockwise rotation in degrees
+
+    constructor(source: CanvasImageSource, position: Point, dimensions: Point, rotation = 0) {
+        this.source = source
+        this.position = position
+        this.dimensions = dimensions
+        this.rotation = rotation
+    }
 }

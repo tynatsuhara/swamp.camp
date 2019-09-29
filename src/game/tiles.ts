@@ -32,6 +32,10 @@ export class Tile {
     static ROCKS = new Point(5, 2)
     static DEAD_TREE = new Point(6, 2)
     static PALM_TREE = new Point(7, 2)
+    static DOOR_1 = new Point(9, 3)
+    static DOOR_2 = new Point(9, 4)
+    static DOOR_3 = new Point(9, 5)
+    static DOOR_OPEN = new Point(9, 6)
 
     // characters
     static GUY_1 = new Point(24, 0)
@@ -60,11 +64,11 @@ export class TileEntity extends Entity {
     }
 
     getRenderImage(): RenderImage {
-        return {
-            source: TILE_SET,
-            position: new Point(this.tileSetIndex.x, this.tileSetIndex.y).times(TILE_SIZE + 1),
-            dimensions: new Point(TILE_SIZE, TILE_SIZE)
-        }
+        return new RenderImage(
+            TILE_SET,
+            new Point(this.tileSetIndex.x, this.tileSetIndex.y).times(TILE_SIZE + 1),
+            new Point(TILE_SIZE, TILE_SIZE)
+        )
     }
 }
 
