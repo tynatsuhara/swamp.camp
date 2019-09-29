@@ -44,8 +44,8 @@ export class Renderer {
                 img.dimensions.y, 
                 this.pixelNum(view.zoom * (-img.dimensions.x / 2 + view.offset.x), view.zoom), 
                 this.pixelNum(view.zoom * (-img.dimensions.y / 2 + view.offset.y), view.zoom), 
-                img.dimensions.x * view.zoom, 
-                img.dimensions.y * view.zoom
+                img.dimensions.x * view.zoom * img.scale, 
+                img.dimensions.y * view.zoom * img.scale
             )
             this.context.rotate(-rotation)
             this.context.translate(-position.x, -position.y)
@@ -62,11 +62,19 @@ export class RenderImage {
     position: Point  // the top-left coordinate position on the source image
     dimensions: Point
     rotation: number  // clockwise rotation in degrees
+    scale: number
 
-    constructor(source: CanvasImageSource, position: Point, dimensions: Point, rotation = 0) {
+    constructor(
+        source: CanvasImageSource, 
+        position: Point, 
+        dimensions: Point, 
+        rotation: number = 0, 
+        scale: number = 1
+    ) {
         this.source = source
         this.position = position
         this.dimensions = dimensions
         this.rotation = rotation
+        this.scale = scale
     }
 }

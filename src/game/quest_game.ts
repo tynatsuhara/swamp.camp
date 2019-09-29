@@ -1,9 +1,9 @@
 import { Entity } from "../engine/entity"
 import { Point } from "../engine/point"
 import { Game } from "../engine/game"
-import { UpdateData } from "../engine/engine"
-import { View } from "../engine/view";
-import { TileEntity, Player, Tile, TILE_SIZE } from "./tiles";
+import { UpdateViewsContext } from "../engine/engine"
+import { View } from "../engine/view"
+import { TileEntity, Player, Tile, TILE_SIZE } from "./tiles"
 
 const ZOOM = 2.5
 
@@ -19,17 +19,18 @@ export class QuestGame extends Game {
     uiView: View = new View()
 
     // entities in the world space
-    getViews(updateData: UpdateData): View[] {
-        this.updateViews(updateData)
+    getViews(updateViewsContext: UpdateViewsContext): View[] {
+        this.updateViews(updateViewsContext)
         return [this.gameEntityView, this.uiView]
     }
 
-    updateViews(updateData: UpdateData) {
-        const cameraGoal = updateData.dimensions.div(ZOOM).div(2).minus(this.player.position)
+    updateViews(updateViewsContext: UpdateViewsContext) {
+        // TODO: figure out how to abstract zoom from entities
+        const cameraGoal = updateViewsContext.dimensions.div(ZOOM).div(2).minus(this.player.position)
 
         this.gameEntityView = { 
             zoom: ZOOM,
-            offset: this.gameEntityView.offset.lerp(.03 / updateData.elapsedTimeMillis, cameraGoal),
+            offset: this.gameEntityView.offset.lerp(.03 / updateViewsContext.elapsedTimeMillis, cameraGoal),
             entities: this.worldEntities
         }
 

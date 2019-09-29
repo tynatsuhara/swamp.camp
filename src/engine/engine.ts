@@ -3,24 +3,29 @@ import { Input, CapturedInput } from "./input"
 import { Game } from "./game";
 import { Point } from "./point";
 
-export class UpdateData {
-    readonly currentSessionTicks: number
+export class UpdateViewsContext {  
     readonly elapsedTimeMillis: number
     readonly input: CapturedInput
-    readonly dimensions: Point  // unscaled input dimensions
+    readonly dimensions: Point
+}
+
+export class UpdateData {
+    readonly elapsedTimeMillis: number
+    readonly input: CapturedInput
+    readonly dimensions: Point
 }
 
 export class Engine {
-    private readonly input = new Input()
     private readonly game: Game
     private readonly renderer: Renderer
+    private readonly input: Input
 
-    private currentSessionTicks: number
     private lastUpdateMillis = new Date().getTime()
 
     constructor(game: Game, canvas: HTMLCanvasElement) {
         this.game = game
         this.renderer = new Renderer(canvas)
+        this.input = new Input(canvas)
 
         setInterval(() => this.tick(), 1/60)
     }
@@ -33,19 +38,25 @@ export class Engine {
             return
         }
     
-        const updateData: UpdateData = {
-            currentSessionTicks: this.currentSessionTicks,
+        const updateViewsContext: UpdateViewsContext = {
             elapsedTimeMillis: elapsed,
             input: this.input.captureInput(),
             dimensions: this.renderer.getDimensions()
         }
 
-        const views = this.game.getViews(updateData)
+        const views = this.game.getViews(updateViewsContext)
 
-        views.forEach(v => v.entities.forEach(e => e.update(updateData)))
+        views.forEach(v => {
+            const updateData: UpdateData = {
+                elapsedTimeMillis: updateViewsContext.elapsedTimeMillis,
+                input: updateViewsContext.input.scaled(v.zoom),
+                dimensions: updateViewsContext.dimensions.div(v.zoom)
+            }
+            v.entities.forEach(e => e.update(updateData))
+        })
+        
         this.renderer.render(views)
         
-        this.currentSessionTicks++
         this.lastUpdateMillis = time
     }
 }

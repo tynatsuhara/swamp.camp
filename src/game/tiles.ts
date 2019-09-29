@@ -53,13 +53,26 @@ export class Tile {
     static BORDER_6 = new Point(1, 18)
     static BORDER_7 = new Point(0, 18)
     static BORDER_8 = new Point(0, 17)
+    static DPAD_DEFAULT = new Point(27, 22)
+    static DPAD_UP = new Point(28, 22)
+    static DPAD_RIGHT = new Point(29, 22)
+    static DPAD_DOWN = new Point(30, 22)
+    static DPAD_LEFT = new Point(31, 22)
 }
 
 export class TileEntity extends Entity {
-    private readonly tileSetIndex: Point
+    private tileSetIndex: Point
+    private rotation: number
+    private scale: number
 
-    constructor(tileSetIndex: Point, position: Point) {
+    constructor(tileSetIndex: Point, position: Point, rotation: number = 0, scale: number = 1) {
         super(position)
+        this.tileSetIndex = tileSetIndex
+        this.rotation = rotation
+        this.scale = scale
+    }
+
+    setTileSetIndex(tileSetIndex: Point) {
         this.tileSetIndex = tileSetIndex
     }
 
@@ -67,7 +80,9 @@ export class TileEntity extends Entity {
         return new RenderImage(
             TILE_SET,
             new Point(this.tileSetIndex.x, this.tileSetIndex.y).times(TILE_SIZE + 1),
-            new Point(TILE_SIZE, TILE_SIZE)
+            new Point(TILE_SIZE, TILE_SIZE),
+            this.rotation,
+            this.scale
         )
     }
 }
