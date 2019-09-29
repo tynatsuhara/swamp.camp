@@ -1,7 +1,7 @@
 import { Renderer } from "./renderer"
 import { Input, CapturedInput } from "./input"
-import { Game } from "./game";
-import { Point } from "./point";
+import { Game } from "./game"
+import { Point } from "./point"
 
 export class UpdateViewsContext {  
     readonly elapsedTimeMillis: number
@@ -54,7 +54,7 @@ export class Engine {
             }
             v.entities.forEach(e => e.update(updateData))
         })
-        
+
         this.renderer.render(views)
         
         this.lastUpdateMillis = time

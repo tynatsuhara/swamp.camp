@@ -44,9 +44,9 @@ System.register("engine/point", [], function (exports_1, context_1) {
         }
     };
 });
-System.register("engine/input", ["engine/point"], function (exports_2, context_2) {
+System.register("engine/view", ["engine/point"], function (exports_2, context_2) {
     "use strict";
-    var point_1, Input, CapturedInput;
+    var point_1, View;
     var __moduleName = context_2 && context_2.id;
     return {
         setters: [
@@ -55,12 +55,100 @@ System.register("engine/input", ["engine/point"], function (exports_2, context_2
             }
         ],
         execute: function () {
+            View = /** @class */ (function () {
+                function View() {
+                    this.zoom = 0; // scale of the view
+                    this.offset = new point_1.Point(0, 0); // transform applied to all entities in the view (scaled by zoom)
+                    this.entities = []; // entities ordered by depth (back to front)
+                }
+                return View;
+            }());
+            exports_2("View", View);
+        }
+    };
+});
+System.register("engine/renderer", ["engine/point"], function (exports_3, context_3) {
+    "use strict";
+    var point_2, Renderer, RenderImage;
+    var __moduleName = context_3 && context_3.id;
+    return {
+        setters: [
+            function (point_2_1) {
+                point_2 = point_2_1;
+            }
+        ],
+        execute: function () {
+            Renderer = /** @class */ (function () {
+                function Renderer(canvas) {
+                    this.cameraOffsetX = 0;
+                    this.cameraOffsetY = 0;
+                    this.canvas = canvas;
+                    this.context = canvas.getContext('2d');
+                }
+                Renderer.prototype.render = function (views) {
+                    var _this = this;
+                    // make sure stuff doesn't get stretched
+                    this.canvas.width = this.canvas.clientWidth;
+                    this.canvas.height = this.canvas.clientHeight;
+                    this.context.imageSmoothingEnabled = false;
+                    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                    views.forEach(function (v) { return _this.renderView(v); });
+                };
+                Renderer.prototype.getDimensions = function () {
+                    return new point_2.Point(this.canvas.width, this.canvas.height);
+                };
+                Renderer.prototype.renderView = function (view) {
+                    var _this = this;
+                    view.entities.forEach(function (e) {
+                        var img = e.getRenderImage();
+                        var position = e.position.plus(img.dimensions.div(2)).times(view.zoom); // center of object to draw
+                        var rotation = 0 * Math.PI / 180;
+                        _this.context.translate(position.x, position.y);
+                        _this.context.rotate(rotation);
+                        _this.context.drawImage(img.source, img.position.x, img.position.y, img.dimensions.x, img.dimensions.y, _this.pixelNum(view.zoom * (-img.dimensions.x / 2 + view.offset.x), view.zoom), _this.pixelNum(view.zoom * (-img.dimensions.y / 2 + view.offset.y), view.zoom), img.dimensions.x * view.zoom * img.scale, img.dimensions.y * view.zoom * img.scale);
+                        _this.context.rotate(-rotation);
+                        _this.context.translate(-position.x, -position.y);
+                    });
+                };
+                Renderer.prototype.pixelNum = function (val, zoom) {
+                    return val - (val % zoom);
+                };
+                return Renderer;
+            }());
+            exports_3("Renderer", Renderer);
+            RenderImage = /** @class */ (function () {
+                function RenderImage(source, position, dimensions, rotation, scale) {
+                    if (rotation === void 0) { rotation = 0; }
+                    if (scale === void 0) { scale = 1; }
+                    this.source = source;
+                    this.position = position;
+                    this.dimensions = dimensions;
+                    this.rotation = rotation;
+                    this.scale = scale;
+                }
+                return RenderImage;
+            }());
+            exports_3("RenderImage", RenderImage);
+        }
+    };
+});
+System.register("engine/input", ["engine/point"], function (exports_4, context_4) {
+    "use strict";
+    var point_3, Input, CapturedInput;
+    var __moduleName = context_4 && context_4.id;
+    return {
+        setters: [
+            function (point_3_1) {
+                point_3 = point_3_1;
+            }
+        ],
+        execute: function () {
             Input = /** @class */ (function () {
                 function Input(canvas) {
                     var _this = this;
                     this.keys = new Set();
                     this.lastCapture = new CapturedInput();
-                    this.mousePos = new point_1.Point(0, 0);
+                    this.mousePos = new point_3.Point(0, 0);
                     this.isMouseDown = false;
                     this.isMouseHeld = false;
                     this.isMouseUp = false;
@@ -76,7 +164,7 @@ System.register("engine/input", ["engine/point"], function (exports_2, context_2
                         _this.isMouseUp = true;
                     };
                     canvas.onmousemove = function (e) {
-                        _this.mousePos = new point_1.Point(e.x - canvas.offsetLeft, e.y - canvas.offsetTop);
+                        _this.mousePos = new point_3.Point(e.x - canvas.offsetLeft, e.y - canvas.offsetTop);
                     };
                     window.onkeydown = function (e) { return _this.keys.add(e.keyCode); };
                     window.onkeyup = function (e) { return _this.keys["delete"](e.keyCode); };
@@ -92,18 +180,18 @@ System.register("engine/input", ["engine/point"], function (exports_2, context_2
                 };
                 return Input;
             }());
-            exports_2("Input", Input);
+            exports_4("Input", Input);
             // TODO: Capture mouse input for clickable elements
             CapturedInput = /** @class */ (function () {
                 function CapturedInput(keysDown, keysHeld, keysUp, mousePos, isMouseDown, isMouseHeld, isMouseUp) {
                     if (keysDown === void 0) { keysDown = new Set(); }
                     if (keysHeld === void 0) { keysHeld = new Set(); }
                     if (keysUp === void 0) { keysUp = new Set(); }
-                    if (mousePos === void 0) { mousePos = new point_1.Point(0, 0); }
+                    if (mousePos === void 0) { mousePos = new point_3.Point(0, 0); }
                     if (isMouseDown === void 0) { isMouseDown = false; }
                     if (isMouseHeld === void 0) { isMouseHeld = false; }
                     if (isMouseUp === void 0) { isMouseUp = false; }
-                    this.mousePos = new point_1.Point(0, 0);
+                    this.mousePos = new point_3.Point(0, 0);
                     this.isMouseDown = false;
                     this.isMouseHeld = false;
                     this.isMouseUp = false;
@@ -132,95 +220,7 @@ System.register("engine/input", ["engine/point"], function (exports_2, context_2
                 };
                 return CapturedInput;
             }());
-            exports_2("CapturedInput", CapturedInput);
-        }
-    };
-});
-System.register("engine/view", ["engine/point"], function (exports_3, context_3) {
-    "use strict";
-    var point_2, View;
-    var __moduleName = context_3 && context_3.id;
-    return {
-        setters: [
-            function (point_2_1) {
-                point_2 = point_2_1;
-            }
-        ],
-        execute: function () {
-            View = /** @class */ (function () {
-                function View() {
-                    this.zoom = 0; // scale of the view
-                    this.offset = new point_2.Point(0, 0); // transform applied to all entities in the view (scaled by zoom)
-                    this.entities = []; // entities ordered by depth (back to front)
-                }
-                return View;
-            }());
-            exports_3("View", View);
-        }
-    };
-});
-System.register("engine/renderer", ["engine/point"], function (exports_4, context_4) {
-    "use strict";
-    var point_3, Renderer, RenderImage;
-    var __moduleName = context_4 && context_4.id;
-    return {
-        setters: [
-            function (point_3_1) {
-                point_3 = point_3_1;
-            }
-        ],
-        execute: function () {
-            Renderer = /** @class */ (function () {
-                function Renderer(canvas) {
-                    this.cameraOffsetX = 0;
-                    this.cameraOffsetY = 0;
-                    this.canvas = canvas;
-                    this.context = canvas.getContext('2d');
-                }
-                Renderer.prototype.render = function (views) {
-                    var _this = this;
-                    // make sure stuff doesn't get stretched
-                    this.canvas.width = this.canvas.clientWidth;
-                    this.canvas.height = this.canvas.clientHeight;
-                    this.context.imageSmoothingEnabled = false;
-                    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                    views.forEach(function (v) { return _this.renderView(v); });
-                };
-                Renderer.prototype.getDimensions = function () {
-                    return new point_3.Point(this.canvas.width, this.canvas.height);
-                };
-                Renderer.prototype.renderView = function (view) {
-                    var _this = this;
-                    view.entities.forEach(function (e) {
-                        var img = e.getRenderImage();
-                        var position = e.position.plus(img.dimensions.div(2)).times(view.zoom); // center of object to draw
-                        var rotation = 0 * Math.PI / 180;
-                        _this.context.translate(position.x, position.y);
-                        _this.context.rotate(rotation);
-                        _this.context.drawImage(img.source, img.position.x, img.position.y, img.dimensions.x, img.dimensions.y, _this.pixelNum(view.zoom * (-img.dimensions.x / 2 + view.offset.x), view.zoom), _this.pixelNum(view.zoom * (-img.dimensions.y / 2 + view.offset.y), view.zoom), img.dimensions.x * view.zoom * img.scale, img.dimensions.y * view.zoom * img.scale);
-                        _this.context.rotate(-rotation);
-                        _this.context.translate(-position.x, -position.y);
-                    });
-                };
-                Renderer.prototype.pixelNum = function (val, zoom) {
-                    return val - (val % zoom);
-                };
-                return Renderer;
-            }());
-            exports_4("Renderer", Renderer);
-            RenderImage = /** @class */ (function () {
-                function RenderImage(source, position, dimensions, rotation, scale) {
-                    if (rotation === void 0) { rotation = 0; }
-                    if (scale === void 0) { scale = 1; }
-                    this.source = source;
-                    this.position = position;
-                    this.dimensions = dimensions;
-                    this.rotation = rotation;
-                    this.scale = scale;
-                }
-                return RenderImage;
-            }());
-            exports_4("RenderImage", RenderImage);
+            exports_4("CapturedInput", CapturedInput);
         }
     };
 });
@@ -397,6 +397,7 @@ System.register("game/tiles", ["engine/entity", "engine/point", "engine/renderer
             TileEntity = /** @class */ (function (_super) {
                 __extends(TileEntity, _super);
                 function TileEntity(tileSetIndex, position, rotation, scale) {
+                    if (position === void 0) { position = new point_4.Point(0, 0); }
                     if (rotation === void 0) { rotation = 0; }
                     if (scale === void 0) { scale = 1; }
                     var _this = _super.call(this, position) || this;
@@ -444,10 +445,38 @@ System.register("game/tiles", ["engine/entity", "engine/point", "engine/renderer
         }
     };
 });
-System.register("game/quest_game", ["engine/point", "engine/game", "engine/view", "game/tiles"], function (exports_9, context_9) {
+System.register("game/grid", [], function (exports_9, context_9) {
     "use strict";
-    var point_5, game_1, view_1, tiles_1, ZOOM, QuestGame;
+    var Grid;
     var __moduleName = context_9 && context_9.id;
+    return {
+        setters: [],
+        execute: function () {
+            // an infinite grid using x/y coordinates (x increases to the right, y increases down)
+            Grid = /** @class */ (function () {
+                function Grid() {
+                    this.map = new Map();
+                }
+                Grid.prototype.set = function (pt, entry) {
+                    this.map.set(pt, entry);
+                };
+                // returns null if not present in the grid
+                Grid.prototype.get = function (pt) {
+                    return this.map.get(pt);
+                };
+                Grid.prototype.entries = function () {
+                    return Array.from(this.map.values());
+                };
+                return Grid;
+            }());
+            exports_9("Grid", Grid);
+        }
+    };
+});
+System.register("game/quest_game", ["engine/point", "engine/game", "engine/view", "game/tiles", "game/grid"], function (exports_10, context_10) {
+    "use strict";
+    var point_5, game_1, view_1, tiles_1, grid_1, ZOOM, QuestGame;
+    var __moduleName = context_10 && context_10.id;
     return {
         setters: [
             function (point_5_1) {
@@ -461,6 +490,9 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/view"
             },
             function (tiles_1_1) {
                 tiles_1 = tiles_1_1;
+            },
+            function (grid_1_1) {
+                grid_1 = grid_1_1;
             }
         ],
         execute: function () {
@@ -468,16 +500,19 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/view"
             QuestGame = /** @class */ (function (_super) {
                 __extends(QuestGame, _super);
                 function QuestGame() {
-                    var _this = _super !== null && _super.apply(this, arguments) || this;
+                    var _this = _super.call(this) || this;
+                    _this.grid = new grid_1.Grid();
                     _this.player = new tiles_1.Player(tiles_1.Tile.GUY_1, new point_5.Point(2, 2).times(tiles_1.TILE_SIZE));
-                    _this.worldEntities = [
-                        new tiles_1.TileEntity(tiles_1.Tile.GRASS_1, new point_5.Point(1, 1).times(tiles_1.TILE_SIZE)),
-                        _this.player
-                    ];
                     _this.gameEntityView = new view_1.View();
                     _this.uiView = new view_1.View();
+                    _this.addTileEntityToGrid(1, 1, new tiles_1.TileEntity(tiles_1.Tile.GRASS_1));
                     return _this;
                 }
+                QuestGame.prototype.addTileEntityToGrid = function (x, y, entity) {
+                    var pt = new point_5.Point(x, y);
+                    entity.position = pt.times(tiles_1.TILE_SIZE);
+                    this.grid.set(pt, entity);
+                };
                 // entities in the world space
                 QuestGame.prototype.getViews = function (updateViewsContext) {
                     this.updateViews(updateViewsContext);
@@ -489,7 +524,7 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/view"
                     this.gameEntityView = {
                         zoom: ZOOM,
                         offset: this.gameEntityView.offset.lerp(.03 / updateViewsContext.elapsedTimeMillis, cameraGoal),
-                        entities: this.worldEntities
+                        entities: this.grid.entries().concat([this.player])
                     };
                     this.uiView = {
                         zoom: ZOOM,
@@ -519,14 +554,14 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/view"
                 };
                 return QuestGame;
             }(game_1.Game));
-            exports_9("QuestGame", QuestGame);
+            exports_10("QuestGame", QuestGame);
         }
     };
 });
-System.register("app", ["game/quest_game", "engine/engine"], function (exports_10, context_10) {
+System.register("app", ["game/quest_game", "engine/engine"], function (exports_11, context_11) {
     "use strict";
     var quest_game_1, engine_1;
-    var __moduleName = context_10 && context_10.id;
+    var __moduleName = context_11 && context_11.id;
     return {
         setters: [
             function (quest_game_1_1) {

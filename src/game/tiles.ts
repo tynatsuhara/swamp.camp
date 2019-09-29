@@ -1,8 +1,8 @@
-import { Entity } from "../engine/entity";
-import { Point } from "../engine/point";
-import { UpdateData } from "../engine/engine";
-import { InputKey } from "../engine/input";
-import { RenderImage } from "../engine/renderer";
+import { Entity } from "../engine/entity"
+import { Point } from "../engine/point"
+import { UpdateData } from "../engine/engine"
+import { InputKey } from "../engine/input"
+import { RenderImage } from "../engine/renderer"
 
 const TILE_SET = <HTMLImageElement>document.getElementById("tileset")
 export const TILE_SIZE = 16
@@ -65,7 +65,7 @@ export class TileEntity extends Entity {
     private rotation: number
     private scale: number
 
-    constructor(tileSetIndex: Point, position: Point, rotation: number = 0, scale: number = 1) {
+    constructor(tileSetIndex: Point, position: Point = new Point(0, 0), rotation: number = 0, scale: number = 1) {
         super(position)
         this.tileSetIndex = tileSetIndex
         this.rotation = rotation

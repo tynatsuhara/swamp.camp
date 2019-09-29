@@ -4,19 +4,29 @@ import { Game } from "../engine/game"
 import { UpdateViewsContext } from "../engine/engine"
 import { View } from "../engine/view"
 import { TileEntity, Player, Tile, TILE_SIZE } from "./tiles"
+import { Grid } from "./grid"
 
 const ZOOM = 2.5
 
 export class QuestGame extends Game {
+
+    private readonly grid: Grid<TileEntity> = new Grid()
+    private readonly player: Player = new Player(Tile.GUY_1, new Point(2, 2).times(TILE_SIZE))
     
-    readonly player: Player = new Player(Tile.GUY_1, new Point(2, 2).times(TILE_SIZE))
-    readonly worldEntities: Entity[] = [
-        new TileEntity(Tile.GRASS_1, new Point(1, 1).times(TILE_SIZE)),
-        this.player
-    ]
-    
-    gameEntityView: View = new View()
-    uiView: View = new View()
+    private gameEntityView: View = new View()
+    private uiView: View = new View()
+
+    constructor() {
+        super()
+
+        this.addTileEntityToGrid(1, 1, new TileEntity(Tile.GRASS_1))
+    }
+
+    addTileEntityToGrid(x: number, y: number, entity: TileEntity) {
+        const pt = new Point(x, y)
+        entity.position = pt.times(TILE_SIZE)
+        this.grid.set(pt, entity)
+    }
 
     // entities in the world space
     getViews(updateViewsContext: UpdateViewsContext): View[] {
@@ -31,7 +41,7 @@ export class QuestGame extends Game {
         this.gameEntityView = { 
             zoom: ZOOM,
             offset: this.gameEntityView.offset.lerp(.03 / updateViewsContext.elapsedTimeMillis, cameraGoal),
-            entities: this.worldEntities
+            entities: this.grid.entries().concat([this.player])
         }
 
         this.uiView = {

@@ -1,5 +1,5 @@
 import { Entity } from "./entity"
-import { Point } from "./point";
+import { Point } from "./point"
 
 export class View {
     zoom: number = 0  // scale of the view
