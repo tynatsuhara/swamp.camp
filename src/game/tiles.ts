@@ -1,6 +1,11 @@
-import { Point } from "./util";
-import { CapturedInput, InputKey } from "./input";
-import { UpdateData } from "./app";
+import { Entity } from "../engine/entity";
+import { Point } from "../engine/point";
+import { UpdateData } from "../engine/engine";
+import { InputKey } from "../engine/input";
+import { RenderImage } from "../engine/renderer";
+
+const TILE_SET = <HTMLImageElement>document.getElementById("tileset")
+export const TILE_SIZE = 16
 
 export class Tile {
     static BLANK = new Point(0, 0)
@@ -24,19 +29,24 @@ export class Tile {
     static BORDER_8 = new Point(0, 17)
 }
 
-export class Entity {
-    readonly tileSetIndex: Point
-    position: Point  // "pixel" position (according to the sprite sheet)
+export class TileEntity extends Entity {
+    private readonly tileSetIndex: Point
 
     constructor(tileSetIndex: Point, position: Point) {
+        super(position)
         this.tileSetIndex = tileSetIndex
-        this.position = position
     }
 
-    update(updateData: UpdateData) {}
+    getRenderImage(): RenderImage {
+        return {
+            source: TILE_SET,
+            position: new Point(this.tileSetIndex.x, this.tileSetIndex.y).times(TILE_SIZE + 1),
+            dimensions: new Point(TILE_SIZE, TILE_SIZE)
+        }
+    }
 }
 
-export class Player extends Entity {
+export class Player extends TileEntity {
     readonly speed = 1.2
 
     update(updateData: UpdateData) {

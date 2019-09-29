@@ -9,6 +9,10 @@ export class Point {
     }
 
     times(multiplier: number): Point {
-        return new Point(this.x * multiplier, this.y * multiplier);
+        return new Point(this.x * multiplier, this.y * multiplier)
+    }
+
+    plus(other: Point): Point {
+        return new Point(this.x + other.x, this.y + other.y)
     }
 }
