@@ -20,6 +20,10 @@ export class QuestGame extends Game {
         super()
 
         this.addTileEntityToGrid(1, 1, new TileEntity(Tile.GRASS_1))
+        this.addTileEntityToGrid(2, 1, new TileEntity(Tile.GRASS_1))
+        this.addTileEntityToGrid(1, 2, new TileEntity(Tile.GRASS_1))
+        this.addTileEntityToGrid(1, 4, new TileEntity(Tile.GRASS_1))
+        this.addTileEntityToGrid(2, 3, new TileEntity(Tile.GRASS_1))
     }
 
     addTileEntityToGrid(x: number, y: number, entity: TileEntity) {

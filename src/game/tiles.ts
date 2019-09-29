@@ -40,6 +40,12 @@ export class Tile {
     // characters
     static GUY_1 = new Point(24, 0)
 
+    // animations
+    static SLASH = new Point(16, 19)
+    static ARC = new Point(17, 19)
+    static TRIPLE_SLASH = new Point(18, 19)
+    static BUBBLES = new Point(19, 19)
+
     // items
     static COIN = new Point(22, 4)
     static DIAMOND = new Point(23, 4)

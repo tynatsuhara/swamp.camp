@@ -102,12 +102,13 @@ System.register("engine/renderer", ["engine/point"], function (exports_3, contex
                     view.entities.forEach(function (e) {
                         var img = e.getRenderImage();
                         var position = e.position.plus(img.dimensions.div(2)).times(view.zoom); // center of object to draw
+                        var pixelPos = new point_2.Point(_this.pixelNum(position.x, view.zoom), _this.pixelNum(position.y, view.zoom)); // center of object to draw
                         var rotation = 0 * Math.PI / 180;
-                        _this.context.translate(position.x, position.y);
+                        _this.context.translate(pixelPos.x, pixelPos.y);
                         _this.context.rotate(rotation);
                         _this.context.drawImage(img.source, img.position.x, img.position.y, img.dimensions.x, img.dimensions.y, _this.pixelNum(view.zoom * (-img.dimensions.x / 2 + view.offset.x), view.zoom), _this.pixelNum(view.zoom * (-img.dimensions.y / 2 + view.offset.y), view.zoom), img.dimensions.x * view.zoom * img.scale, img.dimensions.y * view.zoom * img.scale);
                         _this.context.rotate(-rotation);
-                        _this.context.translate(-position.x, -position.y);
+                        _this.context.translate(-pixelPos.x, -pixelPos.y);
                     });
                 };
                 Renderer.prototype.pixelNum = function (val, zoom) {
@@ -374,6 +375,11 @@ System.register("game/tiles", ["engine/entity", "engine/point", "engine/renderer
                 Tile.DOOR_OPEN = new point_4.Point(9, 6);
                 // characters
                 Tile.GUY_1 = new point_4.Point(24, 0);
+                // animations
+                Tile.SLASH = new point_4.Point(16, 19);
+                Tile.ARC = new point_4.Point(17, 19);
+                Tile.TRIPLE_SLASH = new point_4.Point(18, 19);
+                Tile.BUBBLES = new point_4.Point(19, 19);
                 // items
                 Tile.COIN = new point_4.Point(22, 4);
                 Tile.DIAMOND = new point_4.Point(23, 4);
@@ -506,6 +512,10 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/view"
                     _this.gameEntityView = new view_1.View();
                     _this.uiView = new view_1.View();
                     _this.addTileEntityToGrid(1, 1, new tiles_1.TileEntity(tiles_1.Tile.GRASS_1));
+                    _this.addTileEntityToGrid(2, 1, new tiles_1.TileEntity(tiles_1.Tile.GRASS_1));
+                    _this.addTileEntityToGrid(1, 2, new tiles_1.TileEntity(tiles_1.Tile.GRASS_1));
+                    _this.addTileEntityToGrid(1, 4, new tiles_1.TileEntity(tiles_1.Tile.GRASS_1));
+                    _this.addTileEntityToGrid(2, 3, new tiles_1.TileEntity(tiles_1.Tile.GRASS_1));
                     return _this;
                 }
                 QuestGame.prototype.addTileEntityToGrid = function (x, y, entity) {
