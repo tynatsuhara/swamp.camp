@@ -54,6 +54,7 @@ System.register("engine/input", [], function (exports_2, context_2) {
             Input = /** @class */ (function () {
                 function Input() {
                     var _this = this;
+                    this.lastCapture = new CapturedInput();
                     this.keys = new Set();
                     window.onkeydown = function (e) { return _this.keys.add(e.keyCode); };
                     window.onkeyup = function (e) { return _this.keys["delete"](e.keyCode); };
@@ -61,22 +62,33 @@ System.register("engine/input", [], function (exports_2, context_2) {
                 Input.prototype.captureInput = function () {
                     var _this = this;
                     var keys = Array.from(this.keys);
-                    this.lastCapture = new CapturedInput(new Set(keys.filter(function (key) { return !_this.lastCapture.isKeyHeld(key); })), new Set(keys.slice()));
+                    this.lastCapture = new CapturedInput(new Set(keys.filter(function (key) { return !_this.lastCapture.isKeyHeld(key); })), new Set(keys.slice()), new Set(this.lastCapture.getKeysHeld().filter(function (key) { return !_this.keys.has(key); })));
                     return this.lastCapture;
                 };
                 return Input;
             }());
             exports_2("Input", Input);
+            // TODO: Capture mouse input for clickable elements
             CapturedInput = /** @class */ (function () {
-                function CapturedInput(down, held) {
+                function CapturedInput(down, held, up) {
+                    if (down === void 0) { down = new Set(); }
+                    if (held === void 0) { held = new Set(); }
+                    if (up === void 0) { up = new Set(); }
                     this.down = down;
                     this.held = held;
+                    this.up = up;
                 }
+                CapturedInput.prototype.getKeysHeld = function () {
+                    return Array.from(this.held);
+                };
                 CapturedInput.prototype.isKeyDown = function (key) {
                     return this.down.has(key);
                 };
                 CapturedInput.prototype.isKeyHeld = function (key) {
                     return this.held.has(key);
+                };
+                CapturedInput.prototype.isKeyUp = function (key) {
+                    return this.up.has(key);
                 };
                 return CapturedInput;
             }());
