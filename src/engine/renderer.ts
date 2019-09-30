@@ -31,23 +31,27 @@ export class Renderer {
     renderView(view: View) {
         view.entities.forEach(e => {
             const img = e.getRenderImage()
-            const position = e.position.plus(img.dimensions.div(2)).times(view.zoom)  // center of object to draw
-            const pixelPos = new Point(this.pixelNum(position.x, view.zoom), this.pixelNum(position.y, view.zoom))  // center of object to draw
+            const position = e.position.plus(img.dimensions.div(2)).times(view.zoom)  // where to draw the img on the canvas (center)
+            const pixelPos = new Point(this.pixelNum(position.x, view.zoom), this.pixelNum(position.y, view.zoom))
             const rotation = 0 * Math.PI/180
 
             this.context.translate(pixelPos.x, pixelPos.y)
             this.context.rotate(rotation)
+            this.context.scale(img.mirrorX ? -1 : 1, img.mirrorY ? -1 : 1)
+
             this.context.drawImage(
                 img.source, 
                 img.position.x,
                 img.position.y, 
                 img.dimensions.x, 
                 img.dimensions.y, 
-                this.pixelNum(view.zoom * (-img.dimensions.x / 2 + view.offset.x), view.zoom), 
-                this.pixelNum(view.zoom * (-img.dimensions.y / 2 + view.offset.y), view.zoom), 
+                this.pixelNum(view.zoom * (-img.dimensions.x / 2 + (img.mirrorX ? -1 : 1) * view.offset.x), view.zoom), 
+                this.pixelNum(view.zoom * (-img.dimensions.y / 2 + (img.mirrorY ? -1 : 1) * view.offset.y), view.zoom), 
                 img.dimensions.x * view.zoom * img.scale, 
                 img.dimensions.y * view.zoom * img.scale
             )
+
+            this.context.scale(img.mirrorX ? -1 : 1, img.mirrorY ? -1 : 1)
             this.context.rotate(-rotation)
             this.context.translate(-pixelPos.x, -pixelPos.y)
         })
@@ -64,18 +68,24 @@ export class RenderImage {
     dimensions: Point
     rotation: number  // clockwise rotation in degrees
     scale: number
+    mirrorX: boolean
+    mirrorY: boolean
 
     constructor(
         source: CanvasImageSource, 
         position: Point, 
         dimensions: Point, 
         rotation: number = 0, 
-        scale: number = 1
+        scale: number = 1,
+        mirrorX: boolean = false,
+        mirrorY: boolean = false
     ) {
         this.source = source
         this.position = position
         this.dimensions = dimensions
         this.rotation = rotation
         this.scale = scale
+        this.mirrorX = mirrorX,
+        this.mirrorY = mirrorY
     }
 }

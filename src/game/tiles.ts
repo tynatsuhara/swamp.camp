@@ -38,7 +38,7 @@ export class Tile {
     static DOOR_OPEN = new Point(9, 6)
 
     // characters
-    static GUY_1 = new Point(24, 0)
+    static GUY_1 = new Point(24, 1)
 
     // animations
     static SLASH = new Point(16, 19)
@@ -67,15 +67,18 @@ export class Tile {
 }
 
 export class TileEntity extends Entity {
-    private tileSetIndex: Point
-    private rotation: number
-    private scale: number
+    tileSetIndex: Point
+    rotation: number
+    scale: number = 1
+    mirrorX: boolean = false
+    mirrorY: boolean = false
 
-    constructor(tileSetIndex: Point, position: Point = new Point(0, 0), rotation: number = 0, scale: number = 1) {
+    constructor(
+        tileSetIndex: Point, 
+        position: Point = new Point(0, 0)
+    ) {
         super(position)
         this.tileSetIndex = tileSetIndex
-        this.rotation = rotation
-        this.scale = scale
     }
 
     setTileSetIndex(tileSetIndex: Point) {
@@ -88,7 +91,9 @@ export class TileEntity extends Entity {
             new Point(this.tileSetIndex.x, this.tileSetIndex.y).times(TILE_SIZE + 1),
             new Point(TILE_SIZE, TILE_SIZE),
             this.rotation,
-            this.scale
+            this.scale,
+            this.mirrorX,
+            this.mirrorY
         )
     }
 }
@@ -104,6 +109,12 @@ export class Player extends TileEntity {
         if (updateData.input.isKeyHeld(InputKey.S)) { dy++ }
         if (updateData.input.isKeyHeld(InputKey.A)) { dx-- }
         if (updateData.input.isKeyHeld(InputKey.D)) { dx++ }
+
+        if (dx < 0) {
+            this.mirrorX = true
+        } else if (dx > 0) {
+            this.mirrorX = false
+        }
         
         this.position = new Point(
             this.position.x + dx / updateData.elapsedTimeMillis * this.speed, 

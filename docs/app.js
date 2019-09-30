@@ -101,12 +101,14 @@ System.register("engine/renderer", ["engine/point"], function (exports_3, contex
                     var _this = this;
                     view.entities.forEach(function (e) {
                         var img = e.getRenderImage();
-                        var position = e.position.plus(img.dimensions.div(2)).times(view.zoom); // center of object to draw
-                        var pixelPos = new point_2.Point(_this.pixelNum(position.x, view.zoom), _this.pixelNum(position.y, view.zoom)); // center of object to draw
+                        var position = e.position.plus(img.dimensions.div(2)).times(view.zoom); // where to draw the img on the canvas (center)
+                        var pixelPos = new point_2.Point(_this.pixelNum(position.x, view.zoom), _this.pixelNum(position.y, view.zoom));
                         var rotation = 0 * Math.PI / 180;
                         _this.context.translate(pixelPos.x, pixelPos.y);
                         _this.context.rotate(rotation);
-                        _this.context.drawImage(img.source, img.position.x, img.position.y, img.dimensions.x, img.dimensions.y, _this.pixelNum(view.zoom * (-img.dimensions.x / 2 + view.offset.x), view.zoom), _this.pixelNum(view.zoom * (-img.dimensions.y / 2 + view.offset.y), view.zoom), img.dimensions.x * view.zoom * img.scale, img.dimensions.y * view.zoom * img.scale);
+                        _this.context.scale(img.mirrorX ? -1 : 1, img.mirrorY ? -1 : 1);
+                        _this.context.drawImage(img.source, img.position.x, img.position.y, img.dimensions.x, img.dimensions.y, _this.pixelNum(view.zoom * (-img.dimensions.x / 2 + (img.mirrorX ? -1 : 1) * view.offset.x), view.zoom), _this.pixelNum(view.zoom * (-img.dimensions.y / 2 + (img.mirrorY ? -1 : 1) * view.offset.y), view.zoom), img.dimensions.x * view.zoom * img.scale, img.dimensions.y * view.zoom * img.scale);
+                        _this.context.scale(img.mirrorX ? -1 : 1, img.mirrorY ? -1 : 1);
                         _this.context.rotate(-rotation);
                         _this.context.translate(-pixelPos.x, -pixelPos.y);
                     });
@@ -118,14 +120,18 @@ System.register("engine/renderer", ["engine/point"], function (exports_3, contex
             }());
             exports_3("Renderer", Renderer);
             RenderImage = /** @class */ (function () {
-                function RenderImage(source, position, dimensions, rotation, scale) {
+                function RenderImage(source, position, dimensions, rotation, scale, mirrorX, mirrorY) {
                     if (rotation === void 0) { rotation = 0; }
                     if (scale === void 0) { scale = 1; }
+                    if (mirrorX === void 0) { mirrorX = false; }
+                    if (mirrorY === void 0) { mirrorY = false; }
                     this.source = source;
                     this.position = position;
                     this.dimensions = dimensions;
                     this.rotation = rotation;
                     this.scale = scale;
+                    this.mirrorX = mirrorX,
+                        this.mirrorY = mirrorY;
                 }
                 return RenderImage;
             }());
@@ -374,7 +380,7 @@ System.register("game/tiles", ["engine/entity", "engine/point", "engine/renderer
                 Tile.DOOR_3 = new point_4.Point(9, 5);
                 Tile.DOOR_OPEN = new point_4.Point(9, 6);
                 // characters
-                Tile.GUY_1 = new point_4.Point(24, 0);
+                Tile.GUY_1 = new point_4.Point(24, 1);
                 // animations
                 Tile.SLASH = new point_4.Point(16, 19);
                 Tile.ARC = new point_4.Point(17, 19);
@@ -402,21 +408,20 @@ System.register("game/tiles", ["engine/entity", "engine/point", "engine/renderer
             exports_8("Tile", Tile);
             TileEntity = /** @class */ (function (_super) {
                 __extends(TileEntity, _super);
-                function TileEntity(tileSetIndex, position, rotation, scale) {
+                function TileEntity(tileSetIndex, position) {
                     if (position === void 0) { position = new point_4.Point(0, 0); }
-                    if (rotation === void 0) { rotation = 0; }
-                    if (scale === void 0) { scale = 1; }
                     var _this = _super.call(this, position) || this;
+                    _this.scale = 1;
+                    _this.mirrorX = false;
+                    _this.mirrorY = false;
                     _this.tileSetIndex = tileSetIndex;
-                    _this.rotation = rotation;
-                    _this.scale = scale;
                     return _this;
                 }
                 TileEntity.prototype.setTileSetIndex = function (tileSetIndex) {
                     this.tileSetIndex = tileSetIndex;
                 };
                 TileEntity.prototype.getRenderImage = function () {
-                    return new renderer_2.RenderImage(TILE_SET, new point_4.Point(this.tileSetIndex.x, this.tileSetIndex.y).times(TILE_SIZE + 1), new point_4.Point(TILE_SIZE, TILE_SIZE), this.rotation, this.scale);
+                    return new renderer_2.RenderImage(TILE_SET, new point_4.Point(this.tileSetIndex.x, this.tileSetIndex.y).times(TILE_SIZE + 1), new point_4.Point(TILE_SIZE, TILE_SIZE), this.rotation, this.scale, this.mirrorX, this.mirrorY);
                 };
                 return TileEntity;
             }(entity_1.Entity));
@@ -442,6 +447,12 @@ System.register("game/tiles", ["engine/entity", "engine/point", "engine/renderer
                     }
                     if (updateData.input.isKeyHeld(68 /* D */)) {
                         dx++;
+                    }
+                    if (dx < 0) {
+                        this.mirrorX = true;
+                    }
+                    else if (dx > 0) {
+                        this.mirrorX = false;
                     }
                     this.position = new point_4.Point(this.position.x + dx / updateData.elapsedTimeMillis * this.speed, this.position.y + dy / updateData.elapsedTimeMillis * this.speed);
                 };
