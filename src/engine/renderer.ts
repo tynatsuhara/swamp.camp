@@ -30,30 +30,32 @@ export class Renderer {
 
     renderView(view: View) {
         view.entities.forEach(e => {
-            const img = e.getRenderImage()
-            const position = e.position.plus(img.dimensions.div(2)).times(view.zoom)  // where to draw the img on the canvas (center)
-            const pixelPos = new Point(this.pixelNum(position.x, view.zoom), this.pixelNum(position.y, view.zoom))
-            const rotation = 0 * Math.PI/180
+            const images = e.getRenderImages()
+            images.forEach(img => {
+                const position = e.position.plus(img.dimensions.div(2)).times(view.zoom)  // where to draw the img on the canvas (center)
+                const pixelPos = new Point(this.pixelNum(position.x, view.zoom), this.pixelNum(position.y, view.zoom))
+                const rotation = 0 * Math.PI/180
 
-            this.context.translate(pixelPos.x, pixelPos.y)
-            this.context.rotate(rotation)
-            this.context.scale(img.mirrorX ? -1 : 1, img.mirrorY ? -1 : 1)
+                this.context.translate(pixelPos.x, pixelPos.y)
+                this.context.rotate(rotation)
+                this.context.scale(img.mirrorX ? -1 : 1, img.mirrorY ? -1 : 1)
 
-            this.context.drawImage(
-                img.source, 
-                img.position.x,
-                img.position.y, 
-                img.dimensions.x, 
-                img.dimensions.y, 
-                this.pixelNum(view.zoom * (-img.dimensions.x / 2 + (img.mirrorX ? -1 : 1) * view.offset.x), view.zoom), 
-                this.pixelNum(view.zoom * (-img.dimensions.y / 2 + (img.mirrorY ? -1 : 1) * view.offset.y), view.zoom), 
-                img.dimensions.x * view.zoom * img.scale, 
-                img.dimensions.y * view.zoom * img.scale
-            )
+                this.context.drawImage(
+                    img.source, 
+                    img.position.x,
+                    img.position.y, 
+                    img.dimensions.x, 
+                    img.dimensions.y, 
+                    this.pixelNum(view.zoom * (-img.dimensions.x / 2 + (img.mirrorX ? -1 : 1) * view.offset.x), view.zoom), 
+                    this.pixelNum(view.zoom * (-img.dimensions.y / 2 + (img.mirrorY ? -1 : 1) * view.offset.y), view.zoom), 
+                    img.dimensions.x * view.zoom * img.scale, 
+                    img.dimensions.y * view.zoom * img.scale
+                )
 
-            this.context.scale(img.mirrorX ? -1 : 1, img.mirrorY ? -1 : 1)
-            this.context.rotate(-rotation)
-            this.context.translate(-pixelPos.x, -pixelPos.y)
+                this.context.scale(img.mirrorX ? -1 : 1, img.mirrorY ? -1 : 1)
+                this.context.rotate(-rotation)
+                this.context.translate(-pixelPos.x, -pixelPos.y)
+            })
         })
     }
 

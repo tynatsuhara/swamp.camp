@@ -3,13 +3,16 @@ import { Point } from "../engine/point"
 import { Game } from "../engine/game"
 import { UpdateViewsContext } from "../engine/engine"
 import { View } from "../engine/view"
-import { TileEntity, Player, Tile, TILE_SIZE } from "./tiles"
-import { Grid } from "./grid"
+import { Tile, TILE_SIZE } from "./tiles"
+import { Grid } from "../engine/grid"
+import { TileEntity, AnimatedTileEntity, TileSetAnimation, TileSource } from "../engine/tileset"
+import { Player } from "./player"
 
 const ZOOM = 2.5
 
 export class QuestGame extends Game {
 
+    // todo: is there any reason to have this "grid"? is it redundant?
     private readonly grid: Grid<TileEntity> = new Grid()
     private readonly player: Player = new Player(Tile.GUY_1, new Point(2, 2).times(TILE_SIZE))
     
@@ -19,17 +22,30 @@ export class QuestGame extends Game {
     constructor() {
         super()
 
-        this.addTileEntityToGrid(1, 1, new TileEntity(Tile.GRASS_1))
-        this.addTileEntityToGrid(2, 1, new TileEntity(Tile.GRASS_1))
-        this.addTileEntityToGrid(1, 2, new TileEntity(Tile.GRASS_1))
-        this.addTileEntityToGrid(1, 4, new TileEntity(Tile.GRASS_1))
-        this.addTileEntityToGrid(2, 3, new TileEntity(Tile.GRASS_1))
+        this.addTileEntityToGrid(1, 1, Tile.GRASS_1)
+        this.addTileEntityToGrid(2, 1, Tile.GRASS_3)
+        this.addTileEntityToGrid(1, 2, Tile.GRASS_1)
+        this.addTileEntityToGrid(1, 4, Tile.GRASS_1)
+        this.addTileEntityToGrid(2, 3, Tile.ROCKS)
+        this.addTileEntityToGrid(4, 4, Tile.SWORD)
+
+        this.grid.set(new Point(5, 6), new AnimatedTileEntity(new TileSetAnimation([
+            [Tile.NUM_0, 1000],
+            [Tile.NUM_1, 1000],
+            [Tile.NUM_2, 1000],
+            [Tile.NUM_3, 1000],
+            [Tile.NUM_4, 1000],
+            [Tile.NUM_5, 1000],
+            [Tile.NUM_6, 1000],
+            [Tile.NUM_7, 1000],
+            [Tile.NUM_8, 1000],
+            [Tile.NUM_9, 1000]
+        ])))
     }
 
-    addTileEntityToGrid(x: number, y: number, entity: TileEntity) {
+    addTileEntityToGrid(x: number, y: number, source: TileSource) {
         const pt = new Point(x, y)
-        entity.position = pt.times(TILE_SIZE)
-        this.grid.set(pt, entity)
+        this.grid.set(pt, new TileEntity(source, pt.times(TILE_SIZE)))
     }
 
     // entities in the world space

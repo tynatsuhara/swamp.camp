@@ -1,124 +1,87 @@
-import { Entity } from "../engine/entity"
 import { Point } from "../engine/point"
-import { UpdateData } from "../engine/engine"
-import { InputKey } from "../engine/input"
-import { RenderImage } from "../engine/renderer"
+import { TileSet, TileSource } from "../engine/tileset"
 
-const TILE_SET = <HTMLImageElement>document.getElementById("tileset")
 export const TILE_SIZE = 16
+const TILE_SET = new TileSet(
+    <HTMLImageElement>document.getElementById("tileset"),
+    TILE_SIZE,
+    1
+)
 
 export class Tile {
     // environment
-    static GROUND_1 = new Point(1, 0)
-    static GROUND_2 = new Point(2, 0)
-    static GROUND_3 = new Point(3, 0)
-    static GROUND_4 = new Point(4, 0)
-    static GRASS_1 = new Point(5, 0)
-    static GRASS_2 = new Point(6, 0)
-    static GRASS_3 = new Point(7, 0)
-    static TREE_1 = new Point(0, 1)
-    static TREE_2 = new Point(1, 1)
-    static TREE_3 = new Point(2, 1)
-    static TREE_4 = new Point(3, 1)
-    static TREE_5 = new Point(4, 1)
-    static TREE_6 = new Point(5, 1)
-    static CACTUS = new Point(6, 1)
-    static CACTI = new Point(7, 1)
-    static TALL_GRASS = new Point(0, 2)
-    static VINES_TOP = new Point(1, 2)
-    static VINES_BOTTOM = new Point(2, 2)
-    static TREES = new Point(3, 2)
-    static ROUND_TREE = new Point(4, 2)
-    static ROCKS = new Point(5, 2)
-    static DEAD_TREE = new Point(6, 2)
-    static PALM_TREE = new Point(7, 2)
-    static DOOR_1 = new Point(9, 3)
-    static DOOR_2 = new Point(9, 4)
-    static DOOR_3 = new Point(9, 5)
-    static DOOR_OPEN = new Point(9, 6)
+    static GROUND_1 = Tile.get(1, 0)
+    static GROUND_2 = Tile.get(2, 0)
+    static GROUND_3 = Tile.get(3, 0)
+    static GROUND_4 = Tile.get(4, 0)
+    static GRASS_1 = Tile.get(5, 0)
+    static GRASS_2 = Tile.get(6, 0)
+    static GRASS_3 = Tile.get(7, 0)
+    static TREE_1 = Tile.get(0, 1)
+    static TREE_2 = Tile.get(1, 1)
+    static TREE_3 = Tile.get(2, 1)
+    static TREE_4 = Tile.get(3, 1)
+    static TREE_5 = Tile.get(4, 1)
+    static TREE_6 = Tile.get(5, 1)
+    static CACTUS = Tile.get(6, 1)
+    static CACTI = Tile.get(7, 1)
+    static TALL_GRASS = Tile.get(0, 2)
+    static VINES_TOP = Tile.get(1, 2)
+    static VINES_BOTTOM = Tile.get(2, 2)
+    static TREES = Tile.get(3, 2)
+    static ROUND_TREE = Tile.get(4, 2)
+    static ROCKS = Tile.get(5, 2)
+    static DEAD_TREE = Tile.get(6, 2)
+    static PALM_TREE = Tile.get(7, 2)
+    static DOOR_1 = Tile.get(9, 3)
+    static DOOR_2 = Tile.get(9, 4)
+    static DOOR_3 = Tile.get(9, 5)
+    static DOOR_OPEN = Tile.get(9, 6)
 
     // characters
-    static GUY_1 = new Point(24, 1)
+    static GUY_1 = Tile.get(24, 0)
+
+    // weapons
+    static CLUB = Tile.get(0, 24)
+    static SWORD = Tile.get(0, 29)
 
     // animations
-    static SLASH = new Point(16, 19)
-    static ARC = new Point(17, 19)
-    static TRIPLE_SLASH = new Point(18, 19)
-    static BUBBLES = new Point(19, 19)
+    static SLASH = Tile.get(16, 19)
+    static ARC = Tile.get(17, 19)
+    static TRIPLE_SLASH = Tile.get(18, 19)
+    static BUBBLES = Tile.get(19, 19)
 
     // items
-    static COIN = new Point(22, 4)
-    static DIAMOND = new Point(23, 4)
+    static COIN = Tile.get(22, 4)
+    static DIAMOND = Tile.get(23, 4)
 
     // ui
-    static BORDER_1 = new Point(0, 16)
-    static BORDER_2 = new Point(1, 16)
-    static BORDER_3 = new Point(2, 16)
-    static BORDER_4 = new Point(2, 17)
-    static BORDER_5 = new Point(2, 18)
-    static BORDER_6 = new Point(1, 18)
-    static BORDER_7 = new Point(0, 18)
-    static BORDER_8 = new Point(0, 17)
-    static DPAD_DEFAULT = new Point(27, 22)
-    static DPAD_UP = new Point(28, 22)
-    static DPAD_RIGHT = new Point(29, 22)
-    static DPAD_DOWN = new Point(30, 22)
-    static DPAD_LEFT = new Point(31, 22)
-}
+    static BORDER_1 = Tile.get(0, 16)
+    static BORDER_2 = Tile.get(1, 16)
+    static BORDER_3 = Tile.get(2, 16)
+    static BORDER_4 = Tile.get(2, 17)
+    static BORDER_5 = Tile.get(2, 18)
+    static BORDER_6 = Tile.get(1, 18)
+    static BORDER_7 = Tile.get(0, 18)
+    static BORDER_8 = Tile.get(0, 17)
+    static DPAD_DEFAULT = Tile.get(27, 22)
+    static DPAD_UP = Tile.get(28, 22)
+    static DPAD_RIGHT = Tile.get(29, 22)
+    static DPAD_DOWN = Tile.get(30, 22)
+    static DPAD_LEFT = Tile.get(31, 22)
 
-export class TileEntity extends Entity {
-    tileSetIndex: Point
-    rotation: number
-    scale: number = 1
-    mirrorX: boolean = false
-    mirrorY: boolean = false
+    static NUM_0 = Tile.get(19, 29)
+    static NUM_1 = Tile.get(20, 29)
+    static NUM_2 = Tile.get(21, 29)
+    static NUM_3 = Tile.get(22, 29)
+    static NUM_4 = Tile.get(23, 29)
+    static NUM_5 = Tile.get(24, 29)
+    static NUM_6 = Tile.get(25, 29)
+    static NUM_7 = Tile.get(26, 29)
+    static NUM_8 = Tile.get(27, 29)
+    static NUM_9 = Tile.get(28, 29)
 
-    constructor(
-        tileSetIndex: Point, 
-        position: Point = new Point(0, 0)
-    ) {
-        super(position)
-        this.tileSetIndex = tileSetIndex
-    }
-
-    setTileSetIndex(tileSetIndex: Point) {
-        this.tileSetIndex = tileSetIndex
-    }
-
-    getRenderImage(): RenderImage {
-        return new RenderImage(
-            TILE_SET,
-            new Point(this.tileSetIndex.x, this.tileSetIndex.y).times(TILE_SIZE + 1),
-            new Point(TILE_SIZE, TILE_SIZE),
-            this.rotation,
-            this.scale,
-            this.mirrorX,
-            this.mirrorY
-        )
-    }
-}
-
-export class Player extends TileEntity {
-    readonly speed = 1.2
-
-    update(updateData: UpdateData) {
-        let dx = 0
-        let dy = 0
-
-        if (updateData.input.isKeyHeld(InputKey.W)) { dy-- }
-        if (updateData.input.isKeyHeld(InputKey.S)) { dy++ }
-        if (updateData.input.isKeyHeld(InputKey.A)) { dx-- }
-        if (updateData.input.isKeyHeld(InputKey.D)) { dx++ }
-
-        if (dx < 0) {
-            this.mirrorX = true
-        } else if (dx > 0) {
-            this.mirrorX = false
-        }
-        
-        this.position = new Point(
-            this.position.x + dx / updateData.elapsedTimeMillis * this.speed, 
-            this.position.y + dy / updateData.elapsedTimeMillis * this.speed
-        )
+    private static get(x: number, y: number) {
+        return new TileSource(TILE_SET, new Point(x, y))
     }
 }

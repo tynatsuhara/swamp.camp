@@ -52,6 +52,7 @@ export class Engine {
                 input: updateViewsContext.input.scaled(v.zoom),
                 dimensions: updateViewsContext.dimensions.div(v.zoom)
             }
+            // TODO: consider the behavior where an entity belongs to multiple views (eg splitscreen)
             v.entities.forEach(e => e.update(updateData))
         })
 

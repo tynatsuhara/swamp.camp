@@ -1,4 +1,4 @@
-import { Point } from "../engine/point";
+import { Point } from "./point"
 
 // an infinite grid using x/y coordinates (x increases to the right, y increases down)
 export class Grid<T> {
