@@ -15,7 +15,7 @@ export class QuestGame extends Game {
 
     // todo: is there any reason to have this "grid"? is it redundant?
     private readonly grid: Grid<Entity> = new Grid()
-    // private readonly player: Entity = new Entity([new Player(new Point(2, 2).times(TILE_SIZE))])
+    private readonly player: Player = new Entity([new Player(new Point(2, 2).times(TILE_SIZE))]).getComponent(Player)
     
     private gameEntityView: View = new View()
     private uiView: View = {
@@ -34,13 +34,8 @@ export class QuestGame extends Game {
         this.addTileEntityToGrid(2, 3, Tile.ROCKS)
         this.addTileEntityToGrid(4, 4, Tile.SWORD)
 
-        // TESTING getComponent
         const tickerComponent = new AnimatedTileComponent(new TileSetAnimation(Tile.string('wowie!').map(tile => [tile, 300])))
-        const tickerEntity = new Entity([tickerComponent])
-        this.grid.set(new Point(5, 6), tickerEntity)
-
-        const ticketTest: AnimatedTileComponent = tickerEntity.getComponent(AnimatedTileComponent)
-        console.log(tickerComponent == ticketTest)
+        this.grid.set(new Point(5, 6), new Entity([tickerComponent]))
     }
 
     addTileEntityToGrid(x: number, y: number, source: TileSource) {
@@ -59,12 +54,12 @@ export class QuestGame extends Game {
 
     updateViews(updateViewsContext: UpdateViewsContext) {
         // TODO: figure out how to abstract zoom from entities
-        const cameraGoal = updateViewsContext.dimensions.div(ZOOM).div(2)//.minus(this.player.get(Player).characterAnim.transform.position)
+        const cameraGoal = updateViewsContext.dimensions.div(ZOOM).div(2).minus(this.player.position)
 
         this.gameEntityView = { 
             zoom: ZOOM,
             offset: this.gameEntityView.offset.lerp(.03 / updateViewsContext.elapsedTimeMillis, cameraGoal),
-            entities: this.grid.entries()//.concat([this.player])
+            entities: this.grid.entries().concat([this.player.entity])
         }
     }
 

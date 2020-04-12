@@ -11,7 +11,7 @@ export class Entity {
     // TODO: support hierarchical components?
 
     constructor(components: Component[] = []) {
-        this.components = components
+        components.forEach(c => this.addComponent(c))
     }
 
     addComponent<T extends Component>(component: T): T {

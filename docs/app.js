@@ -178,7 +178,7 @@ System.register("engine/input", ["engine/point"], function (exports_4, context_4
                         _this.mousePos = new point_3.Point(e.x - canvas.offsetLeft, e.y - canvas.offsetTop);
                     };
                     window.onkeydown = function (e) { return _this.keys.add(e.keyCode); };
-                    window.onkeyup = function (e) { return _this.keys["delete"](e.keyCode); };
+                    window.onkeyup = function (e) { return _this.keys.delete(e.keyCode); };
                 }
                 Input.prototype.captureInput = function () {
                     var _this = this;
@@ -253,7 +253,7 @@ System.register("engine/game", [], function (exports_5, context_5) {
 });
 System.register("engine/engine", ["engine/renderer", "engine/input"], function (exports_6, context_6) {
     "use strict";
-    var renderer_1, input_1, UpdateViewsContext, StartData, UpdateData, Engine;
+    var renderer_1, input_1, UpdateViewsContext, StartData, UpdateData, Engine, ALREADY_STARTED_COMPONENT;
     var __moduleName = context_6 && context_6.id;
     return {
         setters: [
@@ -311,7 +311,13 @@ System.register("engine/engine", ["engine/renderer", "engine/input"], function (
                             dimensions: updateViewsContext.dimensions.div(v.zoom)
                         };
                         // TODO: consider the behavior where an entity belongs to multiple views (eg splitscreen)
-                        v.entities.forEach(function (e) { return e.components.forEach(function (c) { return c.update(updateData); }); });
+                        v.entities.forEach(function (e) { return e.components.forEach(function (c) {
+                            if (c.start !== ALREADY_STARTED_COMPONENT) {
+                                c.start({});
+                                c.start = ALREADY_STARTED_COMPONENT;
+                            }
+                            c.update(updateData);
+                        }); });
                     });
                     this.renderer.render(views);
                     this.lastUpdateMillis = time;
@@ -319,6 +325,9 @@ System.register("engine/engine", ["engine/renderer", "engine/input"], function (
                 return Engine;
             }());
             exports_6("Engine", Engine);
+            ALREADY_STARTED_COMPONENT = function (startData) {
+                throw new Error("start() has already been called on this component");
+            };
         }
     };
 });
@@ -621,9 +630,10 @@ System.register("engine/entity", [], function (exports_10, context_10) {
             Entity = /** @class */ (function () {
                 // TODO: support hierarchical components?
                 function Entity(components) {
+                    var _this = this;
                     if (components === void 0) { components = []; }
                     this.components = [];
-                    this.components = components;
+                    components.forEach(function (c) { return _this.addComponent(c); });
                 }
                 Entity.prototype.addComponent = function (component) {
                     component.entity = this;
@@ -700,16 +710,26 @@ System.register("game/player", ["engine/tileset", "engine/point", "game/tiles", 
             };
             Player = /** @class */ (function (_super) {
                 __extends(Player, _super);
-                function Player(pos) {
+                function Player(position) {
                     var _this = _super.call(this) || this;
                     _this.speed = 1.2;
-                    _this.characterAnim = _this.entity.addComponent(new tileset_2.TileComponent(tiles_1.Tile.GUY_1, pos));
-                    _this.swordAnim = _this.entity.addComponent(new tileset_2.AnimatedTileComponent(new tileset_2.TileSetAnimation([
+                    _this._position = position;
+                    return _this;
+                }
+                Object.defineProperty(Player.prototype, "position", {
+                    get: function () {
+                        return this._position;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+                Player.prototype.start = function (startData) {
+                    this.characterAnim = this.entity.addComponent(new tileset_2.TileComponent(tiles_1.Tile.GUY_1));
+                    this.swordAnim = this.entity.addComponent(new tileset_2.AnimatedTileComponent(new tileset_2.TileSetAnimation([
                         [tiles_1.Tile.SWORD_1, 500],
                         [tiles_1.Tile.ARC, 100]
                     ])));
-                    return _this;
-                }
+                };
                 Player.prototype.update = function (updateData) {
                     _super.prototype.update.call(this, updateData);
                     var dx = 0;
@@ -732,7 +752,9 @@ System.register("game/player", ["engine/tileset", "engine/point", "game/tiles", 
                     else if (dx > 0) {
                         this.characterAnim.transform.mirrorX = false;
                     }
-                    this.characterAnim.transform.position = new point_6.Point(this.characterAnim.transform.position.x + dx / updateData.elapsedTimeMillis * this.speed, this.characterAnim.transform.position.y + dy / updateData.elapsedTimeMillis * this.speed);
+                    this._position = new point_6.Point(this._position.x + dx / updateData.elapsedTimeMillis * this.speed, this._position.y + dy / updateData.elapsedTimeMillis * this.speed);
+                    this.characterAnim.transform.position = this._position;
+                    this.swordAnim.transform.position = this._position;
                 };
                 return Player;
             }(component_2.Component));
@@ -740,9 +762,9 @@ System.register("game/player", ["engine/tileset", "engine/point", "game/tiles", 
         }
     };
 });
-System.register("game/quest_game", ["engine/entity", "engine/point", "engine/game", "engine/view", "game/tiles", "engine/grid", "engine/tileset"], function (exports_13, context_13) {
+System.register("game/quest_game", ["engine/entity", "engine/point", "engine/game", "engine/view", "game/tiles", "engine/grid", "engine/tileset", "game/player"], function (exports_13, context_13) {
     "use strict";
-    var entity_2, point_7, game_1, view_1, tiles_2, grid_1, tileset_3, ZOOM, QuestGame;
+    var entity_2, point_7, game_1, view_1, tiles_2, grid_1, tileset_3, player_1, ZOOM, QuestGame;
     var __moduleName = context_13 && context_13.id;
     return {
         setters: [
@@ -766,6 +788,9 @@ System.register("game/quest_game", ["engine/entity", "engine/point", "engine/gam
             },
             function (tileset_3_1) {
                 tileset_3 = tileset_3_1;
+            },
+            function (player_1_1) {
+                player_1 = player_1_1;
             }
         ],
         execute: function () {
@@ -776,7 +801,7 @@ System.register("game/quest_game", ["engine/entity", "engine/point", "engine/gam
                     var _this = _super.call(this) || this;
                     // todo: is there any reason to have this "grid"? is it redundant?
                     _this.grid = new grid_1.Grid();
-                    // private readonly player: Entity = new Entity([new Player(new Point(2, 2).times(TILE_SIZE))])
+                    _this.player = new entity_2.Entity([new player_1.Player(new point_7.Point(2, 2).times(tiles_2.TILE_SIZE))]).getComponent(player_1.Player);
                     _this.gameEntityView = new view_1.View();
                     _this.uiView = {
                         zoom: ZOOM,
@@ -789,12 +814,8 @@ System.register("game/quest_game", ["engine/entity", "engine/point", "engine/gam
                     _this.addTileEntityToGrid(1, 4, tiles_2.Tile.GRASS_1);
                     _this.addTileEntityToGrid(2, 3, tiles_2.Tile.ROCKS);
                     _this.addTileEntityToGrid(4, 4, tiles_2.Tile.SWORD);
-                    // TESTING getComponent
                     var tickerComponent = new tileset_3.AnimatedTileComponent(new tileset_3.TileSetAnimation(tiles_2.Tile.string('wowie!').map(function (tile) { return [tile, 300]; })));
-                    var tickerEntity = new entity_2.Entity([tickerComponent]);
-                    _this.grid.set(new point_7.Point(5, 6), tickerEntity);
-                    var ticketTest = tickerEntity.getComponent(tileset_3.AnimatedTileComponent);
-                    console.log(tickerComponent == ticketTest);
+                    _this.grid.set(new point_7.Point(5, 6), new entity_2.Entity([tickerComponent]));
                     return _this;
                 }
                 QuestGame.prototype.addTileEntityToGrid = function (x, y, source) {
@@ -811,11 +832,11 @@ System.register("game/quest_game", ["engine/entity", "engine/point", "engine/gam
                 };
                 QuestGame.prototype.updateViews = function (updateViewsContext) {
                     // TODO: figure out how to abstract zoom from entities
-                    var cameraGoal = updateViewsContext.dimensions.div(ZOOM).div(2); //.minus(this.player.get(Player).characterAnim.transform.position)
+                    var cameraGoal = updateViewsContext.dimensions.div(ZOOM).div(2).minus(this.player.position);
                     this.gameEntityView = {
                         zoom: ZOOM,
                         offset: this.gameEntityView.offset.lerp(.03 / updateViewsContext.elapsedTimeMillis, cameraGoal),
-                        entities: this.grid.entries() //.concat([this.player])
+                        entities: this.grid.entries().concat([this.player.entity])
                     };
                 };
                 // entities whose position is fixed on the camera

@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "module": "system",
+        "target": "es5",
         "lib": ["es5", "es6", "dom", "es2019"],
         "rootDir": "./src/",
         "outFile": "./docs/app.js"

@@ -57,11 +57,21 @@ export class Engine {
                 dimensions: updateViewsContext.dimensions.div(v.zoom)
             }
             // TODO: consider the behavior where an entity belongs to multiple views (eg splitscreen)
-            v.entities.forEach(e => e.components.forEach(c => c.update(updateData)))
+            v.entities.forEach(e => e.components.forEach(c => {
+                if (c.start !== ALREADY_STARTED_COMPONENT) {
+                    c.start({})
+                    c.start = ALREADY_STARTED_COMPONENT
+                }
+                c.update(updateData) 
+            }))
         })
 
         this.renderer.render(views)
         
         this.lastUpdateMillis = time
     }
+}
+
+const ALREADY_STARTED_COMPONENT = (startData: StartData) => {
+    throw new Error("start() has already been called on this component")
 }
