@@ -1,24 +1,30 @@
-import { Point } from "./point"
-import { UpdateData } from "./engine"
-import { RenderImage } from "./renderer"
+import { Component } from "./component"
+import { TileComponent } from "./tileset"
+import { Tile } from "../game/tiles"
 
 /**
  * An object which exists in the game world and updated by the engine. Should be attached to a game view.
  */
-export abstract class Entity {
-    position: Point  // "pixel" position
+export class Entity {
+    components: Component[] = []
 
-    constructor(position: Point) {
-        this.position = position
+    // TODO: support hierarchical components?
+
+    constructor(components: Component[] = []) {
+        this.components = components
     }
 
-    /**
-     * Called on each update step
-     */
-    update(updateData: UpdateData) {}
+    addComponent<T extends Component>(component: T): T {
+        component.entity = this
+        this.components.push(component)
+        return component
+    }
 
-    /**
-     * Returns a list of RenderImages, which will be rendered in order
-     */
-    abstract getRenderImages(): RenderImage[]
+    getComponent<T extends Component>(componentType: { new(...args: any[]): T }): T {
+        return this.getComponents(componentType)[0]
+    }
+
+    getComponents<T extends Component>(componentType: { new(...args: any[]): T }): T[] {
+        return this.components.filter(c => c instanceof componentType).map(c => c as T)
+    }
 }

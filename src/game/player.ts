@@ -1,19 +1,37 @@
-import { TileEntity, TileTransform, TileSetAnimator, TileSetAnimation } from "../engine/tileset"
+import { TileComponent, TileTransform, TileSetAnimation, AnimatedTileComponent } from "../engine/tileset"
 import { UpdateData } from "../engine/engine"
 import { InputKey } from "../engine/input"
 import { Point } from "../engine/point"
 import { Tile } from "./tiles"
 import { RenderImage } from "../engine/renderer"
+import { Entity } from "../engine/entity"
+import { Component } from "../engine/component"
 
-export class Player extends TileEntity {
+const instantiatePlayer = (): Entity => {
+    
+    return new Entity([
+        new Player(new Point(0, 0))
+    ])
+}
+
+export class Player extends Component {
     readonly speed = 1.2
 
-    swordAnim: TileSetAnimator = new TileSetAnimator(new TileSetAnimation([
-        [Tile.SWORD_1, 500],
-        [Tile.ARC, 100]
-    ]))
+    characterAnim: TileComponent
+    swordAnim: AnimatedTileComponent
+
+    constructor(pos: Point) {
+        super()
+        this.characterAnim = this.entity.addComponent(new TileComponent(Tile.GUY_1, pos))
+        this.swordAnim = this.entity.addComponent(new AnimatedTileComponent(new TileSetAnimation([
+            [Tile.SWORD_1, 500],
+            [Tile.ARC, 100]
+        ])))
+    }
 
     update(updateData: UpdateData) {
+        super.update(updateData)
+
         let dx = 0
         let dy = 0
 
@@ -23,20 +41,18 @@ export class Player extends TileEntity {
         if (updateData.input.isKeyHeld(InputKey.D)) { dx++ }
 
         if (dx < 0) {
-            this.transform.mirrorX = true
+            this.characterAnim.transform.mirrorX = true
         } else if (dx > 0) {
-            this.transform.mirrorX = false
+            this.characterAnim.transform.mirrorX = false
         }
         
-        this.position = new Point(
-            this.position.x + dx / updateData.elapsedTimeMillis * this.speed, 
-            this.position.y + dy / updateData.elapsedTimeMillis * this.speed
+        this.characterAnim.transform.position = new Point(
+            this.characterAnim.transform.position.x + dx / updateData.elapsedTimeMillis * this.speed, 
+            this.characterAnim.transform.position.y + dy / updateData.elapsedTimeMillis * this.speed
         )
-
-        // TODO: figure out how to structure components so that we can have a sword, shield, etc with animations
-        this.swordAnim.update(updateData.elapsedTimeMillis)
     }
-
+    
+    /*
     getRenderImages(): RenderImage[] {
         const mirrored: TileTransform = {
             rotation: this.transform.rotation,
@@ -50,4 +66,5 @@ export class Player extends TileEntity {
             this.swordAnim.getCurrentTileSource().toRenderImage(this.transform)
         ]
     }
+    */
 }

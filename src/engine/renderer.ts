@@ -30,9 +30,10 @@ export class Renderer {
 
     renderView(view: View) {
         view.entities.filter(e => !!e).forEach(e => {
-            const images = e.getRenderImages()
+            // TODO: render image ordering?
+            const images = e.components.flatMap(c => c.getRenderImages())
             images.filter(img => !!img).forEach(img => {
-                const position = e.position.plus(img.dimensions.div(2)).times(view.zoom)  // where to draw the img on the canvas (center)
+                const position = img.position.plus(img.dimensions.div(2)).times(view.zoom)  // where to draw the img on the canvas (centered)
                 const pixelPos = new Point(this.pixelNum(position.x, view.zoom), this.pixelNum(position.y, view.zoom))
                 const rotation = 0 * Math.PI/180
 
@@ -42,8 +43,8 @@ export class Renderer {
 
                 this.context.drawImage(
                     img.source, 
-                    img.position.x,
-                    img.position.y, 
+                    img.sourcePosition.x,
+                    img.sourcePosition.y, 
                     img.dimensions.x, 
                     img.dimensions.y, 
                     this.pixelNum(view.zoom * (-img.dimensions.x / 2 + (img.mirrorX ? -1 : 1) * view.offset.x), view.zoom), 
@@ -66,8 +67,9 @@ export class Renderer {
 
 export class RenderImage {
     source: CanvasImageSource
-    position: Point  // the top-left coordinate position on the source image
+    sourcePosition: Point  // the top-left coordinate position on the source image
     dimensions: Point
+    position: Point
     rotation: number  // clockwise rotation in degrees
     scale: number
     mirrorX: boolean
@@ -75,16 +77,18 @@ export class RenderImage {
 
     constructor(
         source: CanvasImageSource, 
-        position: Point, 
+        sourcePosition: Point, 
         dimensions: Point, 
+        position: Point, 
         rotation: number = 0, 
         scale: number = 1,
         mirrorX: boolean = false,
         mirrorY: boolean = false
     ) {
         this.source = source
-        this.position = position
+        this.sourcePosition = sourcePosition, 
         this.dimensions = dimensions
+        this.position = position
         this.rotation = rotation
         this.scale = scale
         this.mirrorX = mirrorX,

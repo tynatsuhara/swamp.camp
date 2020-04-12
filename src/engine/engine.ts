@@ -9,6 +9,10 @@ export class UpdateViewsContext {
     readonly dimensions: Point
 }
 
+export class StartData {
+    
+}
+
 export class UpdateData {
     readonly elapsedTimeMillis: number
     readonly input: CapturedInput
@@ -53,7 +57,7 @@ export class Engine {
                 dimensions: updateViewsContext.dimensions.div(v.zoom)
             }
             // TODO: consider the behavior where an entity belongs to multiple views (eg splitscreen)
-            v.entities.forEach(e => e.update(updateData))
+            v.entities.forEach(e => e.components.forEach(c => c.update(updateData)))
         })
 
         this.renderer.render(views)

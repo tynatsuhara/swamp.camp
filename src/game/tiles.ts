@@ -71,16 +71,56 @@ export class Tile {
     static DPAD_RIGHT = Tile.get(29, 22)
     static DPAD_DOWN = Tile.get(30, 22)
     static DPAD_LEFT = Tile.get(31, 22)
-    static NUM_0 = Tile.get(19, 29)
-    static NUM_1 = Tile.get(20, 29)
-    static NUM_2 = Tile.get(21, 29)
-    static NUM_3 = Tile.get(22, 29)
-    static NUM_4 = Tile.get(23, 29)
-    static NUM_5 = Tile.get(24, 29)
-    static NUM_6 = Tile.get(25, 29)
-    static NUM_7 = Tile.get(26, 29)
-    static NUM_8 = Tile.get(27, 29)
-    static NUM_9 = Tile.get(28, 29)
+
+    static CHARACTER_MAP = {
+        '0': Tile.get(19, 29),
+        '1': Tile.get(20, 29),
+        '2': Tile.get(21, 29),
+        '3': Tile.get(22, 29),
+        '4': Tile.get(23, 29),
+        '5': Tile.get(24, 29),
+        '6': Tile.get(25, 29),
+        '7': Tile.get(26, 29),
+        '8': Tile.get(27, 29),
+        '9': Tile.get(28, 29),
+        ':': Tile.get(29, 29),
+        '.': Tile.get(30, 29),
+        '%': Tile.get(31, 29),
+        '!': Tile.get(19, 25),
+        '?': Tile.get(21, 25),
+        '$': Tile.get(19, 28),
+        ' ': Tile.get(0, 0),
+        'a': Tile.get(19, 30),
+        'b': Tile.get(20, 30),
+        'c': Tile.get(21, 30),
+        'd': Tile.get(22, 30),
+        'e': Tile.get(23, 30),
+        'f': Tile.get(24, 30),
+        'g': Tile.get(25, 30),
+        'h': Tile.get(26, 30),
+        'i': Tile.get(27, 30),
+        'j': Tile.get(28, 30),
+        'k': Tile.get(29, 30),
+        'l': Tile.get(30, 30),
+        'm': Tile.get(31, 30),
+        'n': Tile.get(19, 31),
+        'o': Tile.get(20, 31),
+        'p': Tile.get(21, 31),
+        'q': Tile.get(22, 31),
+        'r': Tile.get(23, 31),
+        's': Tile.get(24, 31),
+        't': Tile.get(25, 31),
+        'u': Tile.get(26, 31),
+        'v': Tile.get(27, 31),
+        'w': Tile.get(28, 31),
+        'x': Tile.get(29, 31),
+        'y': Tile.get(30, 31),
+        'z': Tile.get(31, 31)
+    }
+
+    static string(s: String) {
+        return Array.from(s).map(c => Tile.CHARACTER_MAP[c])
+    }
 
     private static get(x: number, y: number) {
         return new TileSource(TILE_SET, new Point(x, y))

@@ -2,6 +2,9 @@ import { Point } from "./point"
 import { Entity } from "./entity"
 import { RenderImage } from "./renderer"
 import { UpdateData } from "./engine"
+import { Component } from "./component"
+
+// TODO: audit encapsulation of all these classes
 
 export class TileSet {
     image: HTMLImageElement
@@ -20,6 +23,7 @@ export class TileSet {
 }
 
 export class TileTransform {
+    position: Point
     rotation: number
     scale: number
     mirrorX: boolean
@@ -49,6 +53,7 @@ export class TileSource {
                 this.tileSetIndex.y
             ).times(this.tileSet.tileSize + this.tileSet.padding),
             new Point(this.tileSet.tileSize, this.tileSet.tileSize),
+            transform.position,
             transform.rotation,
             transform.scale,
             transform.mirrorX,
@@ -60,18 +65,17 @@ export class TileSource {
 /**
  * Represents a static (non-animated) tile entity
  */
-export class TileEntity extends Entity {
+export class TileComponent extends Component {
     tileSource: TileSource
-    transform: TileTransform
+    transform: TileTransform = new TileTransform()
 
     constructor(
         tileSource: TileSource,
-        position: Point = new Point(0, 0),
-        transform = new TileTransform()
+        position: Point = new Point(0, 0)
     ) {
-        super(position)
+        super()
         this.tileSource = tileSource
-        this.transform = transform
+        this.transform.position = position
     }
 
     getRenderImages(): RenderImage[] {
@@ -97,7 +101,7 @@ export class TileSetAnimation {
     }
 }
 
-export class TileSetAnimator {
+class TileSetAnimator {
     animation: TileSetAnimation
     time: number = 0
     index: number = 0
@@ -108,13 +112,11 @@ export class TileSetAnimator {
 
     update(elapsedTimeMillis: number) {
         this.time += elapsedTimeMillis
-        if (this.time > this.animation.frames[this.index][1]) {
+        while (this.time > this.animation.frames[this.index][1]) {
             this.index++
-            if (this.index == this.animation.frames.length) {
-                this.index = 0
-            }
+            this.index %= this.animation.frames.length
+            this.time %= this.animation.duration
         }
-        this.time %= this.animation.duration
         return this.getCurrentTileSource()
     }
 
@@ -123,7 +125,7 @@ export class TileSetAnimator {
     }
 }
 
-export class AnimatedTileEntity extends TileEntity {
+export class AnimatedTileComponent extends TileComponent {
     animator: TileSetAnimator
 
     constructor(
@@ -131,7 +133,7 @@ export class AnimatedTileEntity extends TileEntity {
         position: Point = new Point(0, 0)
     ) {
         const animator = new TileSetAnimator(animation)
-        super(new TileSetAnimator(animation).getCurrentTileSource(), position)
+        super(animator.getCurrentTileSource(), position)
         this.animator = animator
     }
 
