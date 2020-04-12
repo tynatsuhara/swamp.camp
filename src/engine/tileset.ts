@@ -115,6 +115,10 @@ export class TileSetAnimator {
             }
         }
         this.time %= this.animation.duration
+        return this.getCurrentTileSource()
+    }
+
+    getCurrentTileSource() {
         return this.animation.frames[this.index][0]
     }
 }
@@ -126,8 +130,9 @@ export class AnimatedTileEntity extends TileEntity {
         animation: TileSetAnimation,
         position: Point = new Point(0, 0)
     ) {
-        super(animation.frames[0][0], position)
-        this.animator = new TileSetAnimator(animation)
+        const animator = new TileSetAnimator(animation)
+        super(new TileSetAnimator(animation).getCurrentTileSource(), position)
+        this.animator = animator
     }
 
     update(updateData: UpdateData) {

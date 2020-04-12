@@ -99,9 +99,9 @@ System.register("engine/renderer", ["engine/point"], function (exports_3, contex
                 };
                 Renderer.prototype.renderView = function (view) {
                     var _this = this;
-                    view.entities.forEach(function (e) {
+                    view.entities.filter(function (e) { return !!e; }).forEach(function (e) {
                         var images = e.getRenderImages();
-                        images.forEach(function (img) {
+                        images.filter(function (img) { return !!img; }).forEach(function (img) {
                             var position = e.position.plus(img.dimensions.div(2)).times(view.zoom); // where to draw the img on the canvas (center)
                             var pixelPos = new point_2.Point(_this.pixelNum(position.x, view.zoom), _this.pixelNum(position.y, view.zoom));
                             var rotation = 0 * Math.PI / 180;
@@ -436,6 +436,9 @@ System.register("engine/tileset", ["engine/point", "engine/entity", "engine/rend
                         }
                     }
                     this.time %= this.animation.duration;
+                    return this.getCurrentTileSource();
+                };
+                TileSetAnimator.prototype.getCurrentTileSource = function () {
                     return this.animation.frames[this.index][0];
                 };
                 return TileSetAnimator;
@@ -445,8 +448,10 @@ System.register("engine/tileset", ["engine/point", "engine/entity", "engine/rend
                 __extends(AnimatedTileEntity, _super);
                 function AnimatedTileEntity(animation, position) {
                     if (position === void 0) { position = new point_4.Point(0, 0); }
-                    var _this = _super.call(this, animation.frames[0][0], position) || this;
-                    _this.animator = new TileSetAnimator(animation);
+                    var _this = this;
+                    var animator = new TileSetAnimator(animation);
+                    _this = _super.call(this, new TileSetAnimator(animation).getCurrentTileSource(), position) || this;
+                    _this.animator = animator;
                     return _this;
                 }
                 AnimatedTileEntity.prototype.update = function (updateData) {
@@ -510,14 +515,16 @@ System.register("game/tiles", ["engine/point", "engine/tileset"], function (expo
                 Tile.DOOR_OPEN = Tile.get(9, 6);
                 // characters
                 Tile.GUY_1 = Tile.get(24, 0);
+                Tile.SWORD_1 = Tile.get(35, 0);
+                Tile.SWORD_2 = Tile.get(36, 0);
                 // weapons
                 Tile.CLUB = Tile.get(0, 24);
                 Tile.SWORD = Tile.get(0, 29);
                 // animations
-                Tile.SLASH = Tile.get(16, 19);
-                Tile.ARC = Tile.get(17, 19);
-                Tile.TRIPLE_SLASH = Tile.get(18, 19);
-                Tile.BUBBLES = Tile.get(19, 19);
+                Tile.SLASH = Tile.get(24, 11);
+                Tile.ARC = Tile.get(25, 11);
+                Tile.TRIPLE_SLASH = Tile.get(26, 11);
+                Tile.BUBBLES = Tile.get(27, 11);
                 // items
                 Tile.COIN = Tile.get(22, 4);
                 Tile.DIAMOND = Tile.get(23, 4);
@@ -579,9 +586,9 @@ System.register("engine/grid", [], function (exports_10, context_10) {
         }
     };
 });
-System.register("game/player", ["engine/tileset", "engine/point"], function (exports_11, context_11) {
+System.register("game/player", ["engine/tileset", "engine/point", "game/tiles"], function (exports_11, context_11) {
     "use strict";
-    var tileset_2, point_6, Player;
+    var tileset_2, point_6, tiles_1, Player;
     var __moduleName = context_11 && context_11.id;
     return {
         setters: [
@@ -590,6 +597,9 @@ System.register("game/player", ["engine/tileset", "engine/point"], function (exp
             },
             function (point_6_1) {
                 point_6 = point_6_1;
+            },
+            function (tiles_1_1) {
+                tiles_1 = tiles_1_1;
             }
         ],
         execute: function () {
@@ -598,6 +608,10 @@ System.register("game/player", ["engine/tileset", "engine/point"], function (exp
                 function Player() {
                     var _this = _super !== null && _super.apply(this, arguments) || this;
                     _this.speed = 1.2;
+                    _this.swordAnim = new tileset_2.TileSetAnimator(new tileset_2.TileSetAnimation([
+                        [tiles_1.Tile.SWORD_1, 500],
+                        [tiles_1.Tile.ARC, 100]
+                    ]));
                     return _this;
                 }
                 Player.prototype.update = function (updateData) {
@@ -623,6 +637,19 @@ System.register("game/player", ["engine/tileset", "engine/point"], function (exp
                     }
                     this.position = new point_6.Point(this.position.x + dx / updateData.elapsedTimeMillis * this.speed, this.position.y + dy / updateData.elapsedTimeMillis * this.speed);
                     // TODO: figure out how to structure components so that we can have a sword, shield, etc with animations
+                    this.swordAnim.update(updateData.elapsedTimeMillis);
+                };
+                Player.prototype.getRenderImages = function () {
+                    var mirrored = {
+                        rotation: this.transform.rotation,
+                        scale: this.transform.scale,
+                        mirrorX: false,
+                        mirrorY: this.transform.mirrorY
+                    };
+                    return [
+                        this.tileSource.toRenderImage(this.transform),
+                        this.swordAnim.getCurrentTileSource().toRenderImage(this.transform)
+                    ];
                 };
                 return Player;
             }(tileset_2.TileEntity));
@@ -632,7 +659,7 @@ System.register("game/player", ["engine/tileset", "engine/point"], function (exp
 });
 System.register("game/quest_game", ["engine/point", "engine/game", "engine/view", "game/tiles", "engine/grid", "engine/tileset", "game/player"], function (exports_12, context_12) {
     "use strict";
-    var point_7, game_1, view_1, tiles_1, grid_1, tileset_3, player_1, ZOOM, QuestGame;
+    var point_7, game_1, view_1, tiles_2, grid_1, tileset_3, player_1, ZOOM, QuestGame;
     var __moduleName = context_12 && context_12.id;
     return {
         setters: [
@@ -645,8 +672,8 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/view"
             function (view_1_1) {
                 view_1 = view_1_1;
             },
-            function (tiles_1_1) {
-                tiles_1 = tiles_1_1;
+            function (tiles_2_1) {
+                tiles_2 = tiles_2_1;
             },
             function (grid_1_1) {
                 grid_1 = grid_1_1;
@@ -666,32 +693,32 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/view"
                     var _this = _super.call(this) || this;
                     // todo: is there any reason to have this "grid"? is it redundant?
                     _this.grid = new grid_1.Grid();
-                    _this.player = new player_1.Player(tiles_1.Tile.GUY_1, new point_7.Point(2, 2).times(tiles_1.TILE_SIZE));
+                    _this.player = new player_1.Player(tiles_2.Tile.GUY_1, new point_7.Point(2, 2).times(tiles_2.TILE_SIZE));
                     _this.gameEntityView = new view_1.View();
                     _this.uiView = new view_1.View();
-                    _this.addTileEntityToGrid(1, 1, tiles_1.Tile.GRASS_1);
-                    _this.addTileEntityToGrid(2, 1, tiles_1.Tile.GRASS_3);
-                    _this.addTileEntityToGrid(1, 2, tiles_1.Tile.GRASS_1);
-                    _this.addTileEntityToGrid(1, 4, tiles_1.Tile.GRASS_1);
-                    _this.addTileEntityToGrid(2, 3, tiles_1.Tile.ROCKS);
-                    _this.addTileEntityToGrid(4, 4, tiles_1.Tile.SWORD);
+                    _this.addTileEntityToGrid(1, 1, tiles_2.Tile.GRASS_1);
+                    _this.addTileEntityToGrid(2, 1, tiles_2.Tile.GRASS_3);
+                    _this.addTileEntityToGrid(1, 2, tiles_2.Tile.GRASS_1);
+                    _this.addTileEntityToGrid(1, 4, tiles_2.Tile.GRASS_1);
+                    _this.addTileEntityToGrid(2, 3, tiles_2.Tile.ROCKS);
+                    _this.addTileEntityToGrid(4, 4, tiles_2.Tile.SWORD);
                     _this.grid.set(new point_7.Point(5, 6), new tileset_3.AnimatedTileEntity(new tileset_3.TileSetAnimation([
-                        [tiles_1.Tile.NUM_0, 1000],
-                        [tiles_1.Tile.NUM_1, 1000],
-                        [tiles_1.Tile.NUM_2, 1000],
-                        [tiles_1.Tile.NUM_3, 1000],
-                        [tiles_1.Tile.NUM_4, 1000],
-                        [tiles_1.Tile.NUM_5, 1000],
-                        [tiles_1.Tile.NUM_6, 1000],
-                        [tiles_1.Tile.NUM_7, 1000],
-                        [tiles_1.Tile.NUM_8, 1000],
-                        [tiles_1.Tile.NUM_9, 1000]
+                        [tiles_2.Tile.NUM_0, 1000],
+                        [tiles_2.Tile.NUM_1, 1000],
+                        [tiles_2.Tile.NUM_2, 1000],
+                        [tiles_2.Tile.NUM_3, 1000],
+                        [tiles_2.Tile.NUM_4, 1000],
+                        [tiles_2.Tile.NUM_5, 1000],
+                        [tiles_2.Tile.NUM_6, 1000],
+                        [tiles_2.Tile.NUM_7, 1000],
+                        [tiles_2.Tile.NUM_8, 1000],
+                        [tiles_2.Tile.NUM_9, 1000]
                     ])));
                     return _this;
                 }
                 QuestGame.prototype.addTileEntityToGrid = function (x, y, source) {
                     var pt = new point_7.Point(x, y);
-                    this.grid.set(pt, new tileset_3.TileEntity(source, pt.times(tiles_1.TILE_SIZE)));
+                    this.grid.set(pt, new tileset_3.TileEntity(source, pt.times(tiles_2.TILE_SIZE)));
                 };
                 // entities in the world space
                 QuestGame.prototype.getViews = function (updateViewsContext) {
@@ -716,19 +743,19 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/view"
                 QuestGame.prototype.getUIEntities = function () {
                     var dimensions = new point_7.Point(25, 20); // tile dimensions
                     var result = [];
-                    result.push(new tileset_3.TileEntity(tiles_1.Tile.BORDER_1, new point_7.Point(0, 0)));
-                    result.push(new tileset_3.TileEntity(tiles_1.Tile.BORDER_3, new point_7.Point(dimensions.x - 1, 0).times(tiles_1.TILE_SIZE)));
-                    result.push(new tileset_3.TileEntity(tiles_1.Tile.BORDER_5, new point_7.Point(dimensions.x - 1, dimensions.y - 1).times(tiles_1.TILE_SIZE)));
-                    result.push(new tileset_3.TileEntity(tiles_1.Tile.BORDER_7, new point_7.Point(0, dimensions.y - 1).times(tiles_1.TILE_SIZE)));
+                    result.push(new tileset_3.TileEntity(tiles_2.Tile.BORDER_1, new point_7.Point(0, 0)));
+                    result.push(new tileset_3.TileEntity(tiles_2.Tile.BORDER_3, new point_7.Point(dimensions.x - 1, 0).times(tiles_2.TILE_SIZE)));
+                    result.push(new tileset_3.TileEntity(tiles_2.Tile.BORDER_5, new point_7.Point(dimensions.x - 1, dimensions.y - 1).times(tiles_2.TILE_SIZE)));
+                    result.push(new tileset_3.TileEntity(tiles_2.Tile.BORDER_7, new point_7.Point(0, dimensions.y - 1).times(tiles_2.TILE_SIZE)));
                     // horizontal lines
                     for (var i = 1; i < dimensions.x - 1; i++) {
-                        result.push(new tileset_3.TileEntity(tiles_1.Tile.BORDER_2, new point_7.Point(i, 0).times(tiles_1.TILE_SIZE)));
-                        result.push(new tileset_3.TileEntity(tiles_1.Tile.BORDER_6, new point_7.Point(i, dimensions.y - 1).times(tiles_1.TILE_SIZE)));
+                        result.push(new tileset_3.TileEntity(tiles_2.Tile.BORDER_2, new point_7.Point(i, 0).times(tiles_2.TILE_SIZE)));
+                        result.push(new tileset_3.TileEntity(tiles_2.Tile.BORDER_6, new point_7.Point(i, dimensions.y - 1).times(tiles_2.TILE_SIZE)));
                     }
                     // vertical lines
                     for (var j = 1; j < dimensions.y - 1; j++) {
-                        result.push(new tileset_3.TileEntity(tiles_1.Tile.BORDER_4, new point_7.Point(dimensions.x - 1, j).times(tiles_1.TILE_SIZE)));
-                        result.push(new tileset_3.TileEntity(tiles_1.Tile.BORDER_8, new point_7.Point(0, j).times(tiles_1.TILE_SIZE)));
+                        result.push(new tileset_3.TileEntity(tiles_2.Tile.BORDER_4, new point_7.Point(dimensions.x - 1, j).times(tiles_2.TILE_SIZE)));
+                        result.push(new tileset_3.TileEntity(tiles_2.Tile.BORDER_8, new point_7.Point(0, j).times(tiles_2.TILE_SIZE)));
                     }
                     return result;
                 };

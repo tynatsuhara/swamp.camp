@@ -40,16 +40,18 @@ export class Tile {
 
     // characters
     static GUY_1 = Tile.get(24, 0)
+    static SWORD_1 = Tile.get(35, 0)
+    static SWORD_2 = Tile.get(36, 0)
 
     // weapons
     static CLUB = Tile.get(0, 24)
     static SWORD = Tile.get(0, 29)
 
     // animations
-    static SLASH = Tile.get(16, 19)
-    static ARC = Tile.get(17, 19)
-    static TRIPLE_SLASH = Tile.get(18, 19)
-    static BUBBLES = Tile.get(19, 19)
+    static SLASH = Tile.get(24, 11)
+    static ARC = Tile.get(25, 11)
+    static TRIPLE_SLASH = Tile.get(26, 11)
+    static BUBBLES = Tile.get(27, 11)
 
     // items
     static COIN = Tile.get(22, 4)
@@ -69,7 +71,6 @@ export class Tile {
     static DPAD_RIGHT = Tile.get(29, 22)
     static DPAD_DOWN = Tile.get(30, 22)
     static DPAD_LEFT = Tile.get(31, 22)
-
     static NUM_0 = Tile.get(19, 29)
     static NUM_1 = Tile.get(20, 29)
     static NUM_2 = Tile.get(21, 29)

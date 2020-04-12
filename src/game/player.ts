@@ -1,10 +1,17 @@
-import { TileEntity } from "../engine/tileset"
+import { TileEntity, TileTransform, TileSetAnimator, TileSetAnimation } from "../engine/tileset"
 import { UpdateData } from "../engine/engine"
 import { InputKey } from "../engine/input"
 import { Point } from "../engine/point"
+import { Tile } from "./tiles"
+import { RenderImage } from "../engine/renderer"
 
 export class Player extends TileEntity {
     readonly speed = 1.2
+
+    swordAnim: TileSetAnimator = new TileSetAnimator(new TileSetAnimation([
+        [Tile.SWORD_1, 500],
+        [Tile.ARC, 100]
+    ]))
 
     update(updateData: UpdateData) {
         let dx = 0
@@ -27,5 +34,20 @@ export class Player extends TileEntity {
         )
 
         // TODO: figure out how to structure components so that we can have a sword, shield, etc with animations
+        this.swordAnim.update(updateData.elapsedTimeMillis)
+    }
+
+    getRenderImages(): RenderImage[] {
+        const mirrored: TileTransform = {
+            rotation: this.transform.rotation,
+            scale: this.transform.scale,
+            mirrorX: false,
+            mirrorY: this.transform.mirrorY
+        }
+
+        return [
+            this.tileSource.toRenderImage(this.transform),
+            this.swordAnim.getCurrentTileSource().toRenderImage(this.transform)
+        ]
     }
 }

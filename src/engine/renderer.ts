@@ -29,9 +29,9 @@ export class Renderer {
     }
 
     renderView(view: View) {
-        view.entities.forEach(e => {
+        view.entities.filter(e => !!e).forEach(e => {
             const images = e.getRenderImages()
-            images.forEach(img => {
+            images.filter(img => !!img).forEach(img => {
                 const position = e.position.plus(img.dimensions.div(2)).times(view.zoom)  // where to draw the img on the canvas (center)
                 const pixelPos = new Point(this.pixelNum(position.x, view.zoom), this.pixelNum(position.y, view.zoom))
                 const rotation = 0 * Math.PI/180
