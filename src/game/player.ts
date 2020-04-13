@@ -2,10 +2,11 @@ import { TileComponent, TileTransform, TileSetAnimation, AnimatedTileComponent }
 import { UpdateData, StartData } from "../engine/engine"
 import { InputKey } from "../engine/input"
 import { Point } from "../engine/point"
-import { Tile } from "./tiles"
-import { RenderImage } from "../engine/renderer"
+import { Tile, TILE_SIZE } from "./tiles"
+import { ImageRender } from "../engine/renderer/ImageRender"
 import { Entity } from "../engine/entity"
 import { Component } from "../engine/component"
+import { BoxCollider } from "../engine/collision"
 
 const instantiatePlayer = (): Entity => {
 
@@ -15,9 +16,10 @@ const instantiatePlayer = (): Entity => {
 }
 
 export class Player extends Component {
-    readonly speed = 1.2
+    readonly speed = 0.07
     private characterAnim: TileComponent
     private swordAnim: AnimatedTileComponent
+    private collider: BoxCollider
 
     private _position: Point
     get position(): Point {
@@ -35,11 +37,10 @@ export class Player extends Component {
             [Tile.SWORD_1, 500],
             [Tile.ARC, 100]
         ])))
+        this.collider = this.entity.addComponent(new BoxCollider(this.position, new Point(TILE_SIZE, TILE_SIZE)))
     }
 
     update(updateData: UpdateData) {
-        super.update(updateData)
-
         let dx = 0
         let dy = 0
 
@@ -54,28 +55,13 @@ export class Player extends Component {
             this.characterAnim.transform.mirrorX = false
         }
         
-        this._position = new Point(
-            this._position.x + dx / updateData.elapsedTimeMillis * this.speed, 
-            this._position.y + dy / updateData.elapsedTimeMillis * this.speed
+        const newPos = new Point(
+            this._position.x + dx * updateData.elapsedTimeMillis * this.speed, 
+            this._position.y + dy * updateData.elapsedTimeMillis * this.speed
         )
+        this._position = this.collider.moveTo(newPos)
 
         this.characterAnim.transform.position = this._position
         this.swordAnim.transform.position = this._position
     }
-    
-    /*
-    getRenderImages(): RenderImage[] {
-        const mirrored: TileTransform = {
-            rotation: this.transform.rotation,
-            scale: this.transform.scale,
-            mirrorX: false,
-            mirrorY: this.transform.mirrorY
-        }
-
-        return [
-            this.tileSource.toRenderImage(this.transform),
-            this.swordAnim.getCurrentTileSource().toRenderImage(this.transform)
-        ]
-    }
-    */
 }

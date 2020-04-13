@@ -14,7 +14,7 @@ const ZOOM = 2.5
 export class QuestGame extends Game {
 
     // todo: is there any reason to have this "grid"? is it redundant?
-    private readonly grid: Grid<Entity> = new Grid()
+    private readonly entities: Entity[] = []
     private readonly player: Player = new Entity([new Player(new Point(2, 2).times(TILE_SIZE))]).getComponent(Player)
     
     private gameEntityView: View = new View()
@@ -27,20 +27,30 @@ export class QuestGame extends Game {
     constructor() {
         super()
 
-        this.addTileEntityToGrid(1, 1, Tile.GRASS_1)
-        this.addTileEntityToGrid(2, 1, Tile.GRASS_3)
-        this.addTileEntityToGrid(1, 2, Tile.GRASS_1)
-        this.addTileEntityToGrid(1, 4, Tile.GRASS_1)
-        this.addTileEntityToGrid(2, 3, Tile.ROCKS)
-        this.addTileEntityToGrid(4, 4, Tile.SWORD)
+        this.addTileEntity(1, 1, Tile.GRASS_1)
+        this.addTileEntity(2, 1, Tile.GRASS_3)
+        this.addTileEntity(1, 2, Tile.GRASS_1)
+        this.addTileEntity(1, 4, Tile.GRASS_1)
+        this.addTileEntity(2, 3, Tile.ROCKS)
+        this.addTileEntity(4, 4, Tile.SWORD)
 
-        const tickerComponent = new AnimatedTileComponent(new TileSetAnimation(Tile.string('wowie!').map(tile => [tile, 300])))
-        this.grid.set(new Point(5, 6), new Entity([tickerComponent]))
+        const flutteringGrass = new AnimatedTileComponent(
+            new TileSetAnimation([
+                [Tile.GRASS_1, 900],
+                [Tile.GRASS_3, 750]
+            ]),
+            new Point(10, 10).times(TILE_SIZE)
+        )
+        this.entities.push(new Entity([flutteringGrass]))
+
+        const tickerComponent = new AnimatedTileComponent(new TileSetAnimation(
+            Tile.string('wowie!').map(tile => [tile, 300])
+        ))
+        this.entities.push(new Entity([tickerComponent]))
     }
 
-    addTileEntityToGrid(x: number, y: number, source: TileSource) {
-        const pt = new Point(x, y)
-        this.grid.set(pt, new Entity([new TileComponent(source, pt.times(TILE_SIZE))]))
+    addTileEntity(x: number, y: number, source: TileSource) {
+        this.entities.push(new Entity([new TileComponent(source, new Point(x, y).times(TILE_SIZE))]))
     }
 
     // entities in the world space
@@ -58,8 +68,8 @@ export class QuestGame extends Game {
 
         this.gameEntityView = { 
             zoom: ZOOM,
-            offset: this.gameEntityView.offset.lerp(.03 / updateViewsContext.elapsedTimeMillis, cameraGoal),
-            entities: this.grid.entries().concat([this.player.entity])
+            offset: this.gameEntityView.offset.lerp(.0018 * updateViewsContext.elapsedTimeMillis, cameraGoal),
+            entities: this.entities.concat([this.player.entity])
         }
     }
 

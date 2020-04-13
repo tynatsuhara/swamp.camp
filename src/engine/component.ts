@@ -1,6 +1,6 @@
 import { UpdateData, StartData } from "./engine";
 import { Entity } from "./entity";
-import { RenderImage } from "./renderer";
+import { RenderMethod } from "./renderer/renderer";
 
 export abstract class Component {
 
@@ -19,7 +19,7 @@ export abstract class Component {
     /**
      * Should be overridden by renderable components
      */
-    getRenderImages(): RenderImage[] {
+    getRenderMethods(): RenderMethod[] {
         return []
     }
 }

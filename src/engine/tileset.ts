@@ -1,6 +1,6 @@
 import { Point } from "./point"
 import { Entity } from "./entity"
-import { RenderImage } from "./renderer"
+import { ImageRender } from "./renderer/ImageRender"
 import { UpdateData } from "./engine"
 import { Component } from "./component"
 
@@ -46,7 +46,7 @@ export class TileSource {
     }
 
     toRenderImage(transform: TileTransform) {
-        return new RenderImage(
+        return new ImageRender(
             this.tileSet.image,
             new Point(
                 this.tileSetIndex.x, 
@@ -78,7 +78,7 @@ export class TileComponent extends Component {
         this.transform.position = position
     }
 
-    getRenderImages(): RenderImage[] {
+    getRenderMethods(): ImageRender[] {
         return [this.tileSource.toRenderImage(this.transform)]
     }
 }
@@ -92,7 +92,7 @@ export class TileSetAnimation {
      */
     constructor(frames: [TileSource, number][]) {
         this.frames = []
-        var timestamp = 0
+        let timestamp = 0
         frames.forEach((frame: [TileSource, number]) => {
             timestamp += frame[1]
             this.frames.push([frame[0], timestamp])

@@ -27,4 +27,9 @@ export class Entity {
     getComponents<T extends Component>(componentType: { new(...args: any[]): T }): T[] {
         return this.components.filter(c => c instanceof componentType).map(c => c as T)
     }
+
+    removeComponent(component: Component) {
+        this.components = this.components.filter(c => c !== component)
+        component.entity = null
+    }
 }

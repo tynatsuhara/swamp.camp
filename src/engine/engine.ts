@@ -1,7 +1,8 @@
-import { Renderer } from "./renderer"
+import { Renderer } from "./renderer/renderer"
 import { Input, CapturedInput } from "./input"
 import { Game } from "./game"
 import { Point } from "./point"
+import { View } from "./view"
 
 export class UpdateViewsContext {  
     readonly elapsedTimeMillis: number
@@ -14,6 +15,7 @@ export class StartData {
 }
 
 export class UpdateData {
+    readonly view: View
     readonly elapsedTimeMillis: number
     readonly input: CapturedInput
     readonly dimensions: Point
@@ -31,7 +33,7 @@ export class Engine {
         this.renderer = new Renderer(canvas)
         this.input = new Input(canvas)
 
-        setInterval(() => this.tick(), 1/60)
+        setInterval(() => this.tick(), 1000/60)
     }
 
     tick() {
@@ -51,15 +53,18 @@ export class Engine {
         const views = this.game.getViews(updateViewsContext)
 
         views.forEach(v => {
+            const startData: StartData = {}
             const updateData: UpdateData = {
+                view: v,
                 elapsedTimeMillis: updateViewsContext.elapsedTimeMillis,
                 input: updateViewsContext.input.scaled(v.zoom),
                 dimensions: updateViewsContext.dimensions.div(v.zoom)
             }
             // TODO: consider the behavior where an entity belongs to multiple views (eg splitscreen)
             v.entities.forEach(e => e.components.forEach(c => {
+                // TODO: maybe do ALL start() calls before we begin updating?
                 if (c.start !== ALREADY_STARTED_COMPONENT) {
-                    c.start({})
+                    c.start(startData)
                     c.start = ALREADY_STARTED_COMPONENT
                 }
                 c.update(updateData) 
