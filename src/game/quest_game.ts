@@ -8,14 +8,14 @@ import { Grid } from "../engine/grid"
 import { TileComponent, AnimatedTileComponent, TileSetAnimation, TileSource } from "../engine/tileset"
 import { Player } from "./player"
 import { Component } from "../engine/component"
+import { BoxCollider } from "../engine/collision"
 
 const ZOOM = 2.5
 
 export class QuestGame extends Game {
 
-    // todo: is there any reason to have this "grid"? is it redundant?
     private readonly entities: Entity[] = []
-    private readonly player: Player = new Entity([new Player(new Point(2, 2).times(TILE_SIZE))]).getComponent(Player)
+    private readonly player: Player = new Entity([new Player(new Point(-2, 2).times(TILE_SIZE))]).getComponent(Player)
     
     private gameEntityView: View = new View()
     private uiView: View = {
@@ -31,8 +31,9 @@ export class QuestGame extends Game {
         this.addTileEntity(2, 1, Tile.GRASS_3)
         this.addTileEntity(1, 2, Tile.GRASS_1)
         this.addTileEntity(1, 4, Tile.GRASS_1)
-        this.addTileEntity(2, 3, Tile.ROCKS)
         this.addTileEntity(4, 4, Tile.SWORD)
+
+        this.addTileEntity(2, 3, Tile.ROCKS).addComponent(new BoxCollider(new Point(2*TILE_SIZE, 3*TILE_SIZE), new Point(TILE_SIZE, TILE_SIZE)))
 
         const flutteringGrass = new AnimatedTileComponent(
             new TileSetAnimation([
@@ -50,7 +51,9 @@ export class QuestGame extends Game {
     }
 
     addTileEntity(x: number, y: number, source: TileSource) {
-        this.entities.push(new Entity([new TileComponent(source, new Point(x, y).times(TILE_SIZE))]))
+        const entity = new Entity([new TileComponent(source, new Point(x, y).times(TILE_SIZE))])
+        this.entities.push(entity)
+        return entity
     }
 
     // entities in the world space

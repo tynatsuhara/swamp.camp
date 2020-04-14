@@ -29,4 +29,4 @@ function observe(obj) {
     return result
 }
 
-window['DEBUG'] = observe(DEBUG)
+window['debug'] = observe(DEBUG)

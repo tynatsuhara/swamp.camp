@@ -781,13 +781,13 @@ System.register("engine/renderer/LineRender", [], function (exports_14, context_
         setters: [],
         execute: function () {
             LineRender = /** @class */ (function () {
-                function LineRender(start, end, width, color) {
-                    if (width === void 0) { width = 1; }
+                function LineRender(start, end, color, width) {
                     if (color === void 0) { color = "#ff0000"; }
+                    if (width === void 0) { width = 1; }
                     this.start = start;
                     this.end = end;
-                    this.width = width;
                     this.color = color;
+                    this.width = width;
                 }
                 LineRender.prototype.render = function (context) {
                     context.lineWidth = this.width;
@@ -839,13 +839,13 @@ System.register("engine/debug", [], function (exports_15, context_15) {
             exports_15("DEBUG", DEBUG = loadDebug() || {
                 showColliders: false
             });
-            window['DEBUG'] = observe(DEBUG);
+            window['debug'] = observe(DEBUG);
         }
     };
 });
 System.register("engine/collision", ["engine/component", "engine/point", "engine/renderer/LineRender", "engine/debug"], function (exports_16, context_16) {
     "use strict";
-    var component_2, point_7, LineRender_1, debug_1, BoxCollider;
+    var component_2, point_7, LineRender_1, debug_1, CollisionEngine, ENGINE, BoxCollider;
     var __moduleName = context_16 && context_16.id;
     return {
         setters: [
@@ -863,37 +863,79 @@ System.register("engine/collision", ["engine/component", "engine/point", "engine
             }
         ],
         execute: function () {
+            CollisionEngine = /** @class */ (function () {
+                function CollisionEngine() {
+                    this.colliders = [];
+                }
+                CollisionEngine.prototype.registerCollider = function (collider) {
+                    this.colliders.push(collider);
+                };
+                CollisionEngine.prototype.unregisterCollider = function (collider) {
+                    this.colliders.filter(function (c) { return c !== collider; });
+                };
+                CollisionEngine.prototype.checkCollider = function (collider) {
+                    this.colliders.filter(function (other) { return other != collider && other.entity; }).forEach(function (other) {
+                        var isColliding = !(collider.position.x + collider.dimensions.x < other.position.x // to the left of other
+                            || collider.position.x > other.position.x + other.dimensions.x // to the right of other
+                            || collider.position.y + collider.dimensions.y < other.position.y // above other
+                            || collider.position.y > other.position.y + other.dimensions.y // below other
+                        );
+                        collider.updateColliding(other, isColliding);
+                        other.updateColliding(collider, isColliding);
+                    });
+                };
+                return CollisionEngine;
+            }());
+            ENGINE = new CollisionEngine();
             BoxCollider = /** @class */ (function (_super) {
                 __extends(BoxCollider, _super);
                 function BoxCollider(position, dimensions) {
                     var _this = _super.call(this) || this;
-                    _this.dirty = true;
-                    _this.position = position;
+                    _this.collidingWith = new Set();
+                    _this.onColliderEnterCallback = function () { };
+                    _this._position = position;
                     _this.dimensions = dimensions;
+                    ENGINE.registerCollider(_this);
                     return _this;
                 }
-                BoxCollider.prototype.start = function (startData) { };
-                BoxCollider.prototype.update = function (updateData) {
-                    if (!this.dirty) {
-                        return;
-                    }
-                    this.dirty = false;
+                Object.defineProperty(BoxCollider.prototype, "position", {
+                    get: function () { return this._position; },
+                    enumerable: true,
+                    configurable: true
+                });
+                BoxCollider.prototype.start = function (startData) {
+                    ENGINE.checkCollider(this);
                 };
+                BoxCollider.prototype.update = function (updateData) { };
                 BoxCollider.prototype.moveTo = function (point) {
-                    // TODO: figure out how we want to do collision!
-                    this.position = point;
+                    this._position = point;
+                    ENGINE.checkCollider(this); // since this is all syncronous, it will work
                     return this.position;
                 };
                 BoxCollider.prototype.getRenderMethods = function () {
                     if (!debug_1.DEBUG.showColliders) {
                         return [];
                     }
+                    var color = this.collidingWith.size > 0 ? "#00ff00" : "#ff0000";
                     return [
-                        new LineRender_1.LineRender(this.position, this.position.plus(new point_7.Point(this.dimensions.x, 0))),
-                        new LineRender_1.LineRender(this.position, this.position.plus(new point_7.Point(0, this.dimensions.y))),
-                        new LineRender_1.LineRender(this.position.plus(this.dimensions), this.position.plus(new point_7.Point(this.dimensions.x, 0))),
-                        new LineRender_1.LineRender(this.position.plus(this.dimensions), this.position.plus(new point_7.Point(0, this.dimensions.y))),
+                        new LineRender_1.LineRender(this.position, this.position.plus(new point_7.Point(this.dimensions.x, 0)), color),
+                        new LineRender_1.LineRender(this.position, this.position.plus(new point_7.Point(0, this.dimensions.y)), color),
+                        new LineRender_1.LineRender(this.position.plus(this.dimensions), this.position.plus(new point_7.Point(this.dimensions.x, 0)), color),
+                        new LineRender_1.LineRender(this.position.plus(this.dimensions), this.position.plus(new point_7.Point(0, this.dimensions.y)), color),
                     ];
+                };
+                BoxCollider.prototype.updateColliding = function (other, isColliding) {
+                    if (isColliding && !this.collidingWith.has(other)) {
+                        this.onColliderEnterCallback(other);
+                        this.collidingWith.add(other);
+                    }
+                    else if (!isColliding && this.collidingWith.has(other)) {
+                        // TODO call onExit
+                        this.collidingWith.delete(other);
+                    }
+                };
+                BoxCollider.prototype.onColliderEnter = function (callback) {
+                    this.onColliderEnterCallback = callback;
                 };
                 return BoxCollider;
             }(component_2.Component));
@@ -951,9 +993,9 @@ System.register("game/player", ["engine/tileset", "engine/point", "game/tiles", 
                     this.characterAnim = this.entity.addComponent(new tileset_2.TileComponent(tiles_1.Tile.GUY_1));
                     this.swordAnim = this.entity.addComponent(new tileset_2.AnimatedTileComponent(new tileset_2.TileSetAnimation([
                         [tiles_1.Tile.SWORD_1, 500],
-                        [tiles_1.Tile.ARC, 100]
                     ])));
                     this.collider = this.entity.addComponent(new collision_1.BoxCollider(this.position, new point_8.Point(tiles_1.TILE_SIZE, tiles_1.TILE_SIZE)));
+                    this.collider.onColliderEnter(function (c) { return console.log("player collided!"); });
                 };
                 Player.prototype.update = function (updateData) {
                     var dx = 0;
@@ -976,8 +1018,10 @@ System.register("game/player", ["engine/tileset", "engine/point", "game/tiles", 
                     else if (dx > 0) {
                         this.characterAnim.transform.mirrorX = false;
                     }
-                    var newPos = new point_8.Point(this._position.x + dx * updateData.elapsedTimeMillis * this.speed, this._position.y + dy * updateData.elapsedTimeMillis * this.speed);
-                    this._position = this.collider.moveTo(newPos);
+                    if (dx != 0 || dy != 0) {
+                        var newPos = new point_8.Point(this._position.x + dx * updateData.elapsedTimeMillis * this.speed, this._position.y + dy * updateData.elapsedTimeMillis * this.speed);
+                        this._position = this.collider.moveTo(newPos);
+                    }
                     this.characterAnim.transform.position = this._position;
                     this.swordAnim.transform.position = this._position;
                 };
@@ -987,9 +1031,9 @@ System.register("game/player", ["engine/tileset", "engine/point", "game/tiles", 
         }
     };
 });
-System.register("game/quest_game", ["engine/entity", "engine/point", "engine/game", "engine/view", "game/tiles", "engine/tileset", "game/player"], function (exports_18, context_18) {
+System.register("game/quest_game", ["engine/entity", "engine/point", "engine/game", "engine/view", "game/tiles", "engine/tileset", "game/player", "engine/collision"], function (exports_18, context_18) {
     "use strict";
-    var entity_2, point_9, game_1, view_1, tiles_2, tileset_3, player_1, ZOOM, QuestGame;
+    var entity_2, point_9, game_1, view_1, tiles_2, tileset_3, player_1, collision_2, ZOOM, QuestGame;
     var __moduleName = context_18 && context_18.id;
     return {
         setters: [
@@ -1013,6 +1057,9 @@ System.register("game/quest_game", ["engine/entity", "engine/point", "engine/gam
             },
             function (player_1_1) {
                 player_1 = player_1_1;
+            },
+            function (collision_2_1) {
+                collision_2 = collision_2_1;
             }
         ],
         execute: function () {
@@ -1021,9 +1068,8 @@ System.register("game/quest_game", ["engine/entity", "engine/point", "engine/gam
                 __extends(QuestGame, _super);
                 function QuestGame() {
                     var _this = _super.call(this) || this;
-                    // todo: is there any reason to have this "grid"? is it redundant?
                     _this.entities = [];
-                    _this.player = new entity_2.Entity([new player_1.Player(new point_9.Point(2, 2).times(tiles_2.TILE_SIZE))]).getComponent(player_1.Player);
+                    _this.player = new entity_2.Entity([new player_1.Player(new point_9.Point(-2, 2).times(tiles_2.TILE_SIZE))]).getComponent(player_1.Player);
                     _this.gameEntityView = new view_1.View();
                     _this.uiView = {
                         zoom: ZOOM,
@@ -1034,8 +1080,8 @@ System.register("game/quest_game", ["engine/entity", "engine/point", "engine/gam
                     _this.addTileEntity(2, 1, tiles_2.Tile.GRASS_3);
                     _this.addTileEntity(1, 2, tiles_2.Tile.GRASS_1);
                     _this.addTileEntity(1, 4, tiles_2.Tile.GRASS_1);
-                    _this.addTileEntity(2, 3, tiles_2.Tile.ROCKS);
                     _this.addTileEntity(4, 4, tiles_2.Tile.SWORD);
+                    _this.addTileEntity(2, 3, tiles_2.Tile.ROCKS).addComponent(new collision_2.BoxCollider(new point_9.Point(2 * tiles_2.TILE_SIZE, 3 * tiles_2.TILE_SIZE), new point_9.Point(tiles_2.TILE_SIZE, tiles_2.TILE_SIZE)));
                     var flutteringGrass = new tileset_3.AnimatedTileComponent(new tileset_3.TileSetAnimation([
                         [tiles_2.Tile.GRASS_1, 900],
                         [tiles_2.Tile.GRASS_3, 750]
@@ -1046,7 +1092,9 @@ System.register("game/quest_game", ["engine/entity", "engine/point", "engine/gam
                     return _this;
                 }
                 QuestGame.prototype.addTileEntity = function (x, y, source) {
-                    this.entities.push(new entity_2.Entity([new tileset_3.TileComponent(source, new point_9.Point(x, y).times(tiles_2.TILE_SIZE))]));
+                    var entity = new entity_2.Entity([new tileset_3.TileComponent(source, new point_9.Point(x, y).times(tiles_2.TILE_SIZE))]);
+                    this.entities.push(entity);
+                    return entity;
                 };
                 // entities in the world space
                 QuestGame.prototype.getViews = function (updateViewsContext) {

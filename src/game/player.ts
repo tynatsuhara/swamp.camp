@@ -9,7 +9,6 @@ import { Component } from "../engine/component"
 import { BoxCollider } from "../engine/collision"
 
 const instantiatePlayer = (): Entity => {
-
     return new Entity([
         new Player(new Point(0, 0))
     ])
@@ -35,9 +34,10 @@ export class Player extends Component {
         this.characterAnim = this.entity.addComponent(new TileComponent(Tile.GUY_1))
         this.swordAnim = this.entity.addComponent(new AnimatedTileComponent(new TileSetAnimation([
             [Tile.SWORD_1, 500],
-            [Tile.ARC, 100]
+            // [Tile.ARC, 100]
         ])))
         this.collider = this.entity.addComponent(new BoxCollider(this.position, new Point(TILE_SIZE, TILE_SIZE)))
+        this.collider.onColliderEnter(c => console.log("player collided!"))
     }
 
     update(updateData: UpdateData) {
@@ -55,11 +55,13 @@ export class Player extends Component {
             this.characterAnim.transform.mirrorX = false
         }
         
-        const newPos = new Point(
-            this._position.x + dx * updateData.elapsedTimeMillis * this.speed, 
-            this._position.y + dy * updateData.elapsedTimeMillis * this.speed
-        )
-        this._position = this.collider.moveTo(newPos)
+        if (dx != 0 || dy != 0) {
+            const newPos = new Point(
+                this._position.x + dx * updateData.elapsedTimeMillis * this.speed, 
+                this._position.y + dy * updateData.elapsedTimeMillis * this.speed
+            )
+            this._position = this.collider.moveTo(newPos)
+        }
 
         this.characterAnim.transform.position = this._position
         this.swordAnim.transform.position = this._position
