@@ -33,7 +33,11 @@ export class QuestGame extends Game {
         this.addTileEntity(1, 4, Tile.GRASS_1)
         this.addTileEntity(4, 4, Tile.SWORD)
 
-        this.addTileEntity(2, 3, Tile.ROCKS).addComponent(new BoxCollider(new Point(2*TILE_SIZE, 3*TILE_SIZE), new Point(TILE_SIZE, TILE_SIZE)))
+        for (let i = 0; i < 25; i++){
+            for (let j = 0; j < 25; j++){
+                this.addTileEntity(i, j, Tile.ROCKS).addComponent(new BoxCollider(new Point(i*TILE_SIZE, j*TILE_SIZE), new Point(TILE_SIZE, TILE_SIZE).times(0.9)))
+            }
+        }
 
         const flutteringGrass = new AnimatedTileComponent(
             new TileSetAnimation([

@@ -1,6 +1,7 @@
-export const DEBUG = loadDebug() || {
-    showColliders: false
-}
+export const debug = Object.assign({}, {
+    showColliders: false,
+    showProfiler: false
+}, loadDebug())
 
 function loadDebug(): any {
     const stored = localStorage.state
@@ -8,6 +9,7 @@ function loadDebug(): any {
         console.log("loaded debug state from local storage")
         return JSON.parse(stored)
     }
+    return {}
 }
 
 // wrap the DEBUG state so that property changes are observed and saved in local storage
@@ -19,8 +21,8 @@ function observe(obj) {
                 return val;
             },
             set: function (value) {
-                DEBUG[key] = value
-                localStorage.state = JSON.stringify(DEBUG)
+                debug[key] = value
+                localStorage.state = JSON.stringify(debug)
             },
             enumerable: true,
             configurable: true
@@ -29,4 +31,4 @@ function observe(obj) {
     return result
 }
 
-window['debug'] = observe(DEBUG)
+window['debug'] = observe(debug)

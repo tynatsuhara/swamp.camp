@@ -3,7 +3,7 @@ import { StartData, UpdateData } from "./engine";
 import { Point } from "./point";
 import { RenderMethod } from "./renderer/renderer";
 import { LineRender } from "./renderer/LineRender";
-import { DEBUG } from "./debug";
+import { debug } from "./debug";
 
 class CollisionEngine {
     private colliders: BoxCollider[] = []
@@ -61,7 +61,7 @@ export class BoxCollider extends Component {
     }
 
     getRenderMethods(): RenderMethod[] {
-        if (!DEBUG.showColliders) {
+        if (!debug.showColliders) {
             return []
         }
         const color = this.collidingWith.size > 0 ? "#00ff00" : "#ff0000"

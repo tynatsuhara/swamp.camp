@@ -37,7 +37,6 @@ export class Player extends Component {
             // [Tile.ARC, 100]
         ])))
         this.collider = this.entity.addComponent(new BoxCollider(this.position, new Point(TILE_SIZE, TILE_SIZE)))
-        this.collider.onColliderEnter(c => console.log("player collided!"))
     }
 
     update(updateData: UpdateData) {

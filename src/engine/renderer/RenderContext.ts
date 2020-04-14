@@ -14,6 +14,14 @@ export class RenderContext {
     set lineWidth(value: number) { this.context.lineWidth = value }
     set strokeStyle(value: string) { this.context.strokeStyle = value }
 
+    set font(value: string) { this.context.font = value }
+    set fillStyle(value: string) { this.context.fillStyle = value }
+
+    fillText(text: string, point: Point) {
+        point = point.plus(this.view.offset).times(this.view.zoom)
+        this.context.fillText(text, point.x, point.y)
+    }
+
     clearRect(x: number, y: number, w: number, h: number): void {
         this.context.clearRect(x, y, w, h)
     }

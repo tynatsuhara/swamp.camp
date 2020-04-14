@@ -3,6 +3,10 @@ import { Input, CapturedInput } from "./input"
 import { Game } from "./game"
 import { Point } from "./point"
 import { View } from "./view"
+import { profiler } from "./profiler"
+import { debug } from "./debug"
+
+const FPS = 60
 
 export class UpdateViewsContext {  
     readonly elapsedTimeMillis: number
@@ -33,12 +37,14 @@ export class Engine {
         this.renderer = new Renderer(canvas)
         this.input = new Input(canvas)
 
-        setInterval(() => this.tick(), 1000/60)
+        setInterval(() => this.tick(), 1000/FPS)
     }
 
     tick() {
         const time = new Date().getTime()
         const elapsed = time - this.lastUpdateMillis
+
+        profiler.update(elapsed)
 
         if (elapsed == 0) {
             return
@@ -51,6 +57,10 @@ export class Engine {
         }
 
         const views = this.game.getViews(updateViewsContext)
+        
+        if (debug.showProfiler) {
+            views.push(profiler.getView())
+        }
 
         views.forEach(v => {
             const startData: StartData = {}
