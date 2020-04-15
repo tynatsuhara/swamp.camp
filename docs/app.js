@@ -356,8 +356,17 @@ System.register("engine/renderer/TextRender", ["engine/component"], function (ex
 });
 System.register("engine/profiler", ["engine/view", "engine/entity", "engine/renderer/TextRender", "engine/point"], function (exports_8, context_8) {
     "use strict";
-    var view_1, entity_1, TextRender_1, point_5, Profiler, MovingAverage, profiler;
+    var view_1, entity_1, TextRender_1, point_5, Profiler, round, MovingAverage, profiler;
     var __moduleName = context_8 && context_8.id;
+    /**
+     * Executes the given function and returns the duration it took to execute as well as the result
+     */
+    function measure(fn) {
+        var start = new Date().getTime();
+        var result = fn();
+        return [new Date().getTime() - start, result];
+    }
+    exports_8("measure", measure);
     return {
         setters: [
             function (view_1_1) {
@@ -377,25 +386,37 @@ System.register("engine/profiler", ["engine/view", "engine/entity", "engine/rend
             Profiler = /** @class */ (function () {
                 function Profiler() {
                     this.start = new Date().getTime();
-                    this.lastElapsedTimeMillis = 0;
                     this.fpsTracker = new MovingAverage();
+                    this.updateTracker = new MovingAverage();
+                    this.renderTracker = new MovingAverage();
                 }
-                Profiler.prototype.update = function (elapsedTimeMillis) {
-                    this.lastElapsedTimeMillis = elapsedTimeMillis;
-                    this.fpsTracker.record(elapsedTimeMillis);
+                Profiler.prototype.update = function (msSinceLastUpdate, msForUpdate, msForRender) {
+                    this.fpsTracker.record(msSinceLastUpdate);
+                    this.updateTracker.record(msForUpdate);
+                    this.renderTracker.record(msForRender);
                 };
                 Profiler.prototype.getView = function () {
+                    var s = [
+                        "FPS: " + round(1000 / this.fpsTracker.get()) + " (" + round(this.fpsTracker.get()) + " ms per frame)",
+                        "update() duration ms: " + round(this.updateTracker.get(), 2),
+                        "render() duration ms: " + round(this.renderTracker.get(), 2)
+                    ];
                     return new view_1.View([
-                        new entity_1.Entity([new TextRender_1.TextRenderComponent("FPS: " + Math.round(1000 / this.fpsTracker.get()), new point_5.Point(70, 70))])
+                        new entity_1.Entity(s.map(function (str, i) { return new TextRender_1.TextRenderComponent(str, new point_5.Point(60, 70 + 25 * i)); }))
                     ]);
                 };
                 return Profiler;
             }());
+            round = function (val, pow) {
+                if (pow === void 0) { pow = 0; }
+                var decimals = Math.pow(10, pow);
+                return Math.round(val * decimals) / decimals;
+            };
             MovingAverage = /** @class */ (function () {
                 function MovingAverage() {
                     this.pts = [];
                     this.sum = 0;
-                    this.lifetime = 10;
+                    this.lifetime = 1; // in seconds
                 }
                 MovingAverage.prototype.record = function (val) {
                     var now = new Date().getTime();
@@ -507,9 +528,9 @@ System.register("engine/engine", ["engine/renderer/renderer", "engine/input", "e
                     setInterval(function () { return _this.tick(); }, 1000 / FPS);
                 }
                 Engine.prototype.tick = function () {
+                    var _this = this;
                     var time = new Date().getTime();
                     var elapsed = time - this.lastUpdateMillis;
-                    profiler_1.profiler.update(elapsed);
                     if (elapsed == 0) {
                         return;
                     }
@@ -518,29 +539,33 @@ System.register("engine/engine", ["engine/renderer/renderer", "engine/input", "e
                         input: this.input.captureInput(),
                         dimensions: this.renderer.getDimensions()
                     };
-                    var views = this.game.getViews(updateViewsContext);
+                    var views = this.game.getViews(updateViewsContext).concat(debug_1.debug.showProfiler ? [profiler_1.profiler.getView()] : []);
+                    var updateDuration = profiler_1.measure(function () {
+                        views.forEach(function (v) {
+                            var startData = {};
+                            var updateData = {
+                                view: v,
+                                elapsedTimeMillis: updateViewsContext.elapsedTimeMillis,
+                                input: updateViewsContext.input.scaled(v.zoom),
+                                dimensions: updateViewsContext.dimensions.div(v.zoom)
+                            };
+                            // TODO: consider the behavior where an entity belongs to multiple views (eg splitscreen)
+                            v.entities.forEach(function (e) { return e.components.forEach(function (c) {
+                                // TODO: maybe do ALL start() calls before we begin updating?
+                                if (c.start !== ALREADY_STARTED_COMPONENT) {
+                                    c.start(startData);
+                                    c.start = ALREADY_STARTED_COMPONENT;
+                                }
+                                c.update(updateData);
+                            }); });
+                        });
+                    })[0];
+                    var renderDuration = profiler_1.measure(function () {
+                        _this.renderer.render(views);
+                    })[0];
                     if (debug_1.debug.showProfiler) {
-                        views.push(profiler_1.profiler.getView());
+                        profiler_1.profiler.update(elapsed, updateDuration, renderDuration);
                     }
-                    views.forEach(function (v) {
-                        var startData = {};
-                        var updateData = {
-                            view: v,
-                            elapsedTimeMillis: updateViewsContext.elapsedTimeMillis,
-                            input: updateViewsContext.input.scaled(v.zoom),
-                            dimensions: updateViewsContext.dimensions.div(v.zoom)
-                        };
-                        // TODO: consider the behavior where an entity belongs to multiple views (eg splitscreen)
-                        v.entities.forEach(function (e) { return e.components.forEach(function (c) {
-                            // TODO: maybe do ALL start() calls before we begin updating?
-                            if (c.start !== ALREADY_STARTED_COMPONENT) {
-                                c.start(startData);
-                                c.start = ALREADY_STARTED_COMPONENT;
-                            }
-                            c.update(updateData);
-                        }); });
-                    });
-                    this.renderer.render(views);
                     this.lastUpdateMillis = time;
                 };
                 return Engine;

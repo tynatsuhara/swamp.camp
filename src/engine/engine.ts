@@ -3,7 +3,7 @@ import { Input, CapturedInput } from "./input"
 import { Game } from "./game"
 import { Point } from "./point"
 import { View } from "./view"
-import { profiler } from "./profiler"
+import { profiler, measure } from "./profiler"
 import { debug } from "./debug"
 
 const FPS = 60
@@ -44,8 +44,6 @@ export class Engine {
         const time = new Date().getTime()
         const elapsed = time - this.lastUpdateMillis
 
-        profiler.update(elapsed)
-
         if (elapsed == 0) {
             return
         }
@@ -56,32 +54,36 @@ export class Engine {
             dimensions: this.renderer.getDimensions()
         }
 
-        const views = this.game.getViews(updateViewsContext)
-        
-        if (debug.showProfiler) {
-            views.push(profiler.getView())
-        }
+        const views = this.game.getViews(updateViewsContext).concat(debug.showProfiler ? [profiler.getView()] : [])
 
-        views.forEach(v => {
-            const startData: StartData = {}
-            const updateData: UpdateData = {
-                view: v,
-                elapsedTimeMillis: updateViewsContext.elapsedTimeMillis,
-                input: updateViewsContext.input.scaled(v.zoom),
-                dimensions: updateViewsContext.dimensions.div(v.zoom)
-            }
-            // TODO: consider the behavior where an entity belongs to multiple views (eg splitscreen)
-            v.entities.forEach(e => e.components.forEach(c => {
-                // TODO: maybe do ALL start() calls before we begin updating?
-                if (c.start !== ALREADY_STARTED_COMPONENT) {
-                    c.start(startData)
-                    c.start = ALREADY_STARTED_COMPONENT
+        const [updateDuration] = measure(() => {
+            views.forEach(v => {
+                const startData: StartData = {}
+                const updateData: UpdateData = {
+                    view: v,
+                    elapsedTimeMillis: updateViewsContext.elapsedTimeMillis,
+                    input: updateViewsContext.input.scaled(v.zoom),
+                    dimensions: updateViewsContext.dimensions.div(v.zoom)
                 }
-                c.update(updateData) 
-            }))
+                // TODO: consider the behavior where an entity belongs to multiple views (eg splitscreen)
+                v.entities.forEach(e => e.components.forEach(c => {
+                    // TODO: maybe do ALL start() calls before we begin updating?
+                    if (c.start !== ALREADY_STARTED_COMPONENT) {
+                        c.start(startData)
+                        c.start = ALREADY_STARTED_COMPONENT
+                    }
+                    c.update(updateData) 
+                }))
+            })
         })
 
-        this.renderer.render(views)
+        const [renderDuration] = measure(() => {
+            this.renderer.render(views)
+        })
+
+        if (debug.showProfiler) {
+            profiler.update(elapsed, updateDuration, renderDuration)
+        }
         
         this.lastUpdateMillis = time
     }

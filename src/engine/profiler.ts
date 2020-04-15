@@ -5,25 +5,41 @@ import { Point } from "./point"
 
 class Profiler {
     private start: number = new Date().getTime()
-    private lastElapsedTimeMillis: number = 0
     private fpsTracker = new MovingAverage()
+    private updateTracker = new MovingAverage()
+    private renderTracker = new MovingAverage()
 
-    update(elapsedTimeMillis: number) {
-        this.lastElapsedTimeMillis = elapsedTimeMillis
-        this.fpsTracker.record(elapsedTimeMillis)
+    update(
+        msSinceLastUpdate: number, 
+        msForUpdate: number,
+        msForRender: number
+    ) {
+        this.fpsTracker.record(msSinceLastUpdate)
+        this.updateTracker.record(msForUpdate)
+        this.renderTracker.record(msForRender)
     }
 
     getView(): View {
+        const s = [
+            `FPS: ${round(1000/this.fpsTracker.get())} (${round(this.fpsTracker.get())} ms per frame)`,
+            `update() duration ms: ${round(this.updateTracker.get(), 2)}`,
+            `render() duration ms: ${round(this.renderTracker.get(), 2)}`
+        ]
         return new View([
-            new Entity([new TextRenderComponent("FPS: " + Math.round(1000/this.fpsTracker.get()), new Point(70, 70))])
+            new Entity(s.map((str, i) => new TextRenderComponent(str, new Point(60, 70 + 25 * i))))
         ])
     }
+}
+
+const round = (val, pow=0) => {
+    const decimals = Math.pow(10, pow)
+    return Math.round(val * decimals)/decimals
 }
 
 class MovingAverage {
     pts: [number, number][] = []
     sum = 0
-    lifetime = 10
+    lifetime = 1  // in seconds
 
     record(val: number) {
         const now = new Date().getTime()
@@ -42,3 +58,12 @@ class MovingAverage {
 }
 
 export const profiler = new Profiler()
+
+/**
+ * Executes the given function and returns the duration it took to execute as well as the result
+ */
+export function measure<T>(fn: () => T): [number, T] {
+    const start = new Date().getTime()
+    const result = fn()
+    return [new Date().getTime() - start, result]
+}
