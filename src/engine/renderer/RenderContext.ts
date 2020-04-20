@@ -54,7 +54,11 @@ export class RenderContext {
 
         this.context.translate(scaledDestPosition.x, scaledDestPosition.y)
         this.context.scale(mirrorX ? -1 : 1, mirrorY ? -1 : 1)
+
+        const rotationTranslate = destDimensions.div(2).times(this.view.zoom)
+        this.context.translate(rotationTranslate.x, rotationTranslate.y)
         this.context.rotate(rotation * Math.PI/180)
+        this.context.translate(-rotationTranslate.x, -rotationTranslate.y)
 
         const scaledDestDimensions = destDimensions.times(this.view.zoom)
 

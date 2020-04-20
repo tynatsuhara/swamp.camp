@@ -144,7 +144,10 @@ System.register("engine/renderer/RenderContext", ["engine/point"], function (exp
                     }
                     this.context.translate(scaledDestPosition.x, scaledDestPosition.y);
                     this.context.scale(mirrorX ? -1 : 1, mirrorY ? -1 : 1);
+                    var rotationTranslate = destDimensions.div(2).times(this.view.zoom);
+                    this.context.translate(rotationTranslate.x, rotationTranslate.y);
                     this.context.rotate(rotation * Math.PI / 180);
+                    this.context.translate(-rotationTranslate.x, -rotationTranslate.y);
                     var scaledDestDimensions = destDimensions.times(this.view.zoom);
                     this.context.drawImage(source, sourcePosition.x, sourcePosition.y, sourceDimensions.x, sourceDimensions.y, 0, 0, scaledDestDimensions.x, scaledDestDimensions.y);
                     this.context.restore();
@@ -1175,7 +1178,7 @@ System.register("engine/tiles/ConnectingTileSchema", ["engine/point", "engine/ti
                     return this;
                 };
                 ConnectingTileSchema.prototype.canConnect = function (schema) {
-                    return schema == this;
+                    return schema === this;
                 };
                 /**
                  * Renders the tile source based on the given grid and position

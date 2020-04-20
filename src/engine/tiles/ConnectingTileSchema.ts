@@ -65,7 +65,7 @@ export class ConnectingTileSchema {
     }
   
     canConnect(schema: ConnectingTileSchema) {
-        return schema == this;
+        return schema === this;
     }
    
     /**
