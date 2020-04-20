@@ -10,15 +10,15 @@ import { TileSetAnimation } from "../engine/tiles/TileSetAnimation"
 import { TileComponent } from "../engine/tiles/TileComponent"
 import { TileSource } from "../engine/tiles/TileSource"
 import { Player } from "./player"
-import { Component } from "../engine/component"
 import { BoxCollider } from "../engine/collision"
+import { TileGrid } from "../engine/tiles/TileGrid"
 
 const ZOOM = 2.5
 
 export class QuestGame extends Game {
 
-    private readonly entities: Entity[] = []
-    private readonly player: Player = new Entity([new Player(new Point(-2, 2).times(TILE_SIZE))]).getComponent(Player)
+    private readonly tiles = new TileGrid(TILE_SIZE)
+    private readonly player = new Entity([new Player(new Point(-2, 2).times(TILE_SIZE))]).getComponent(Player)
     
     private gameEntityView: View = new View()
     private uiView: View = {
@@ -30,6 +30,12 @@ export class QuestGame extends Game {
     constructor() {
         super()
 
+        const start = new Point(-5, 10)
+        const end = new Point(5, -5)
+
+        this.tiles.renderPath(start, end, Tile.GRASS_1, pt => pt.distanceTo(end) + Math.random()*15)
+
+        /*
         this.addTileEntity(1, 1, Tile.GRASS_1)
         this.addTileEntity(2, 1, Tile.GRASS_3)
         this.addTileEntity(1, 2, Tile.GRASS_1)
@@ -55,13 +61,14 @@ export class QuestGame extends Game {
             Tile.string('wowie!').map(tile => [tile, 300])
         ))
         this.entities.push(new Entity([tickerComponent]))
+        */
     }
 
-    addTileEntity(x: number, y: number, source: TileSource) {
-        const entity = new Entity([new TileComponent(source, new Point(x, y).times(TILE_SIZE))])
-        this.entities.push(entity)
-        return entity
-    }
+    // addTileEntity(x: number, y: number, source: TileSource) {
+        // const entity = new Entity([new TileComponent(source, new Point(x, y).times(TILE_SIZE))])
+        // this.entities.push(entity)
+        // return entity
+    // }
 
     // entities in the world space
     getViews(updateViewsContext: UpdateViewsContext): View[] {
@@ -79,7 +86,7 @@ export class QuestGame extends Game {
         this.gameEntityView = { 
             zoom: ZOOM,
             offset: this.gameEntityView.offset.lerp(.0018 * updateViewsContext.elapsedTimeMillis, cameraGoal),
-            entities: this.entities.concat([this.player.entity])
+            entities: this.tiles.entities().concat([this.player.entity])
         }
     }
 
