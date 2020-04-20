@@ -1,4 +1,4 @@
-import { View } from "../view";
+import { View } from "../View";
 import { RenderMethod } from "./RenderMethod";
 import { Point } from "../point";
 import { RenderContext } from "./RenderContext";

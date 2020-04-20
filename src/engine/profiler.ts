@@ -1,5 +1,5 @@
-import { View } from "./view"
-import { Entity } from "./entity"
+import { View } from "./View"
+import { Entity } from "./Entity"
 import { TextRenderComponent } from "./renderer/TextRender"
 import { Point } from "./point"
 

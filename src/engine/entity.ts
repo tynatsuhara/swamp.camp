@@ -1,6 +1,4 @@
 import { Component } from "./component"
-import { TileComponent } from "./tileset"
-import { Tile } from "../game/tiles"
 
 /**
  * An object which exists in the game world and updated by the engine. Should be attached to a game view.

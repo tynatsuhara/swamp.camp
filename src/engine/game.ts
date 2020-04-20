@@ -1,4 +1,4 @@
-import { View } from "./view"
+import { View } from "./View"
 import { UpdateViewsContext } from "./engine"
 
 export abstract class Game {

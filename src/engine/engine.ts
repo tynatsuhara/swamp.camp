@@ -2,7 +2,7 @@ import { Renderer } from "./renderer/Renderer"
 import { Input, CapturedInput } from "./input"
 import { Game } from "./game"
 import { Point } from "./point"
-import { View } from "./view"
+import { View } from "./View"
 import { profiler, measure } from "./profiler"
 import { debug } from "./debug"
 

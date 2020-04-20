@@ -1,5 +1,5 @@
 import { Point } from "../point"
-import { View } from "../view"
+import { View } from "../View"
 import { RenderContext } from "./RenderContext"
 
 export class Renderer {

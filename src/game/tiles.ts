@@ -1,5 +1,6 @@
 import { Point } from "../engine/point"
-import { TileSet, TileSource } from "../engine/tileset"
+import { TileSet } from "../engine/tiles/TileSet"
+import { TileSource } from "../engine/tiles/TileSource"
 
 export const TILE_SIZE = 16
 const TILE_SET = new TileSet(

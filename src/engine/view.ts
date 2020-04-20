@@ -1,4 +1,4 @@
-import { Entity } from "./entity"
+import { Entity } from "./Entity"
 import { Point } from "./point"
 
 export class View {
