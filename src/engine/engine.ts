@@ -1,4 +1,4 @@
-import { Renderer } from "./renderer/renderer"
+import { Renderer } from "./renderer/Renderer"
 import { Input, CapturedInput } from "./input"
 import { Game } from "./game"
 import { Point } from "./point"

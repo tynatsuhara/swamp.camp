@@ -1,6 +1,6 @@
 import { UpdateData, StartData } from "./engine";
 import { Entity } from "./entity";
-import { RenderMethod } from "./renderer/renderer";
+import { RenderMethod } from "./renderer/RenderMethod";
 
 export abstract class Component {
 

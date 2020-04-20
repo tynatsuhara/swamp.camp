@@ -118,7 +118,7 @@ export class Tile {
         'z': Tile.get(31, 31)
     }
 
-    static string(s: String) {
+    static string(s: string) {
         return Array.from(s).map(c => Tile.CHARACTER_MAP[c])
     }
 

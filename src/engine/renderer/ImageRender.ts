@@ -1,5 +1,5 @@
 import { Point } from "../point";
-import { RenderMethod } from "./renderer";
+import { RenderMethod } from "./RenderMethod";
 import { RenderContext } from "./RenderContext";
 
 export class ImageRender implements RenderMethod {

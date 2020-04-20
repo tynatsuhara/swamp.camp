@@ -27,4 +27,18 @@ export class Point {
     lerp(multiplier: number, goal: Point): Point {
         return new Point(this.x + (goal.x - this.x) * multiplier, this.y + (goal.y - this.y) * multiplier)
     }
+
+    distanceTo(pt: Point) {
+        const dx = pt.x - this.x
+        const dy = pt.y - this.y
+        return Math.sqrt(dx * dx + dy * dy)
+    }
+
+    toString(): string {
+        return `(${this.x},${this.y})`
+    }
+
+    equals(pt: Point) {
+        return pt.x == this.x && pt.y == this.y
+    }
 }

@@ -39,6 +39,4 @@ export class Renderer {
     }
 }
 
-export interface RenderMethod {
-    render(context: RenderContext): void
-}
+

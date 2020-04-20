@@ -1,5 +1,5 @@
 import { View } from "../view";
-import { RenderMethod } from "./renderer";
+import { RenderMethod } from "./RenderMethod";
 import { Point } from "../point";
 import { RenderContext } from "./RenderContext";
 import { Component } from "../component";
