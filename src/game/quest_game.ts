@@ -15,10 +15,10 @@ import { TileGrid } from "../engine/tiles/TileGrid"
 
 const ZOOM = 2.5
 
-export class QuestGame extends Game {
+class QuestGame extends Game {
 
-    private readonly tiles = new TileGrid(TILE_SIZE)
-    private readonly player = new Entity([new Player(new Point(-2, 2).times(TILE_SIZE))]).getComponent(Player)
+    readonly tiles = new TileGrid(TILE_SIZE)
+    readonly player = new Entity([new Player(new Point(-2, 2).times(TILE_SIZE))]).getComponent(Player)
     
     private gameEntityView: View = new View()
     private uiView: View = {
@@ -86,3 +86,5 @@ export class QuestGame extends Game {
         return [new Entity(result)]
     }
 }
+
+export const game = new QuestGame()

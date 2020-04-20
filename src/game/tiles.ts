@@ -80,7 +80,7 @@ export class Tile {
             .tShape(Tile.get(10, 1))
             .plusShape(Tile.get(11, 1))
             .cap(Tile.get(12, 1))
-            .single(Tile.get(0, 4))
+            .single(Tile.get(3, 0))
             .fallback(Tile.get(23, 2))
 
     static CHARACTER_MAP = {

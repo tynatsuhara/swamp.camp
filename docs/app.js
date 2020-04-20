@@ -924,6 +924,9 @@ System.register("engine/util/Grid", ["engine/point", "engine/util/BinaryHeap"], 
                 Grid.prototype.get = function (pt) {
                     return this.map.get(pt.toString());
                 };
+                Grid.prototype.remove = function (pt) {
+                    this.map.delete(pt.toString());
+                };
                 Grid.prototype.entries = function () {
                     return Array.from(this.map.values());
                 };
@@ -1038,7 +1041,6 @@ System.register("engine/tiles/ConnectingTile", ["engine/point", "engine/componen
                 __extends(ConnectingTile, _super);
                 /**
                  * Connecting tiles require a tile grid. The position parameter should be tile-scale, not pixel-scale.
-                 * TODO: figure out if that's tru about the position
                  */
                 function ConnectingTile(schema, grid, position) {
                     if (position === void 0) { position = new point_10.Point(0, 0); }
@@ -1093,6 +1095,9 @@ System.register("engine/tiles/TileGrid", ["engine/util/Grid", "engine/Entity", "
                 };
                 TileGrid.prototype.get = function (pos) {
                     return this.grid.get(pos);
+                };
+                TileGrid.prototype.remove = function (pos) {
+                    this.grid.remove(pos);
                 };
                 TileGrid.prototype.entities = function () {
                     return this.grid.entries();
@@ -1263,7 +1268,7 @@ System.register("engine/tiles/ConnectingTileSchema", ["engine/point", "engine/ti
                         }
                     }
                     else {
-                        result = this._cap;
+                        result = this._single;
                     }
                     if (!result) {
                         result = this._fallback;
@@ -1381,7 +1386,7 @@ System.register("game/tiles", ["engine/point", "engine/tiles/TileSet", "engine/t
                     .tShape(Tile.get(10, 1))
                     .plusShape(Tile.get(11, 1))
                     .cap(Tile.get(12, 1))
-                    .single(Tile.get(0, 4))
+                    .single(Tile.get(3, 0))
                     .fallback(Tile.get(23, 2));
                 Tile.CHARACTER_MAP = {
                     '0': Tile.get(19, 29),
@@ -1644,9 +1649,9 @@ System.register("engine/collision", ["engine/component", "engine/point", "engine
         }
     };
 });
-System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/tiles/TileSetAnimation", "engine/tiles/TileComponent", "engine/point", "game/tiles", "engine/Entity", "engine/component", "engine/collision"], function (exports_29, context_29) {
+System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/tiles/TileSetAnimation", "engine/tiles/TileComponent", "engine/point", "game/tiles", "engine/Entity", "engine/component", "engine/collision", "game/quest_game"], function (exports_29, context_29) {
     "use strict";
-    var AnimatedTileComponent_1, TileSetAnimation_1, TileComponent_3, point_15, tiles_1, Entity_3, component_5, collision_1, instantiatePlayer, Player;
+    var AnimatedTileComponent_1, TileSetAnimation_1, TileComponent_3, point_15, tiles_1, Entity_3, component_5, collision_1, quest_game_1, instantiatePlayer, Player;
     var __moduleName = context_29 && context_29.id;
     return {
         setters: [
@@ -1673,6 +1678,9 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
             },
             function (collision_1_1) {
                 collision_1 = collision_1_1;
+            },
+            function (quest_game_1_1) {
+                quest_game_1 = quest_game_1_1;
             }
         ],
         execute: function () {
@@ -1724,6 +1732,9 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
                     else if (dx > 0) {
                         this.characterAnim.transform.mirrorX = false;
                     }
+                    if (updateData.input.isKeyDown(70 /* F */)) {
+                        quest_game_1.game.tiles.remove(this.position.plus(this.collider.dimensions.div(2)).floorDiv(tiles_1.TILE_SIZE));
+                    }
                     if (dx != 0 || dy != 0) {
                         var newPos = new point_15.Point(this._position.x + dx * updateData.elapsedTimeMillis * this.speed, this._position.y + dy * updateData.elapsedTimeMillis * this.speed);
                         this._position = this.collider.moveTo(newPos);
@@ -1739,7 +1750,7 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
 });
 System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/game", "engine/View", "game/tiles", "engine/tiles/TileComponent", "game/player", "engine/tiles/TileGrid"], function (exports_30, context_30) {
     "use strict";
-    var Entity_4, point_16, game_1, View_2, tiles_2, TileComponent_4, player_1, TileGrid_1, ZOOM, QuestGame;
+    var Entity_4, point_16, game_1, View_2, tiles_2, TileComponent_4, player_1, TileGrid_1, ZOOM, QuestGame, game;
     var __moduleName = context_30 && context_30.id;
     return {
         setters: [
@@ -1830,25 +1841,25 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
                 };
                 return QuestGame;
             }(game_1.Game));
-            exports_30("QuestGame", QuestGame);
+            exports_30("game", game = new QuestGame());
         }
     };
 });
 System.register("app", ["game/quest_game", "engine/engine"], function (exports_31, context_31) {
     "use strict";
-    var quest_game_1, engine_1;
+    var quest_game_2, engine_1;
     var __moduleName = context_31 && context_31.id;
     return {
         setters: [
-            function (quest_game_1_1) {
-                quest_game_1 = quest_game_1_1;
+            function (quest_game_2_1) {
+                quest_game_2 = quest_game_2_1;
             },
             function (engine_1_1) {
                 engine_1 = engine_1_1;
             }
         ],
         execute: function () {
-            new engine_1.Engine(new quest_game_1.QuestGame(), document.getElementById('canvas'));
+            new engine_1.Engine(quest_game_2.game, document.getElementById('canvas'));
         }
     };
 });

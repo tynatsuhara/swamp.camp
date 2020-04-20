@@ -29,6 +29,10 @@ export class TileGrid {
         return this.grid.get(pos)
     }
 
+    remove(pos) {
+        this.grid.remove(pos)
+    }
+
     entities(): Entity[] {
         return this.grid.entries()
     }

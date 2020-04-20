@@ -14,6 +14,10 @@ export class Grid<T> {
         return this.map.get(pt.toString())
     }
 
+    remove(pt: Point) {
+        this.map.delete(pt.toString())
+    }
+
     entries(): T[] {
         return Array.from(this.map.values())
     }

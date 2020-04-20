@@ -8,6 +8,7 @@ import { Tile, TILE_SIZE } from "./tiles"
 import { Entity } from "../engine/Entity"
 import { Component } from "../engine/component"
 import { BoxCollider } from "../engine/collision"
+import { game } from "./quest_game"
 
 const instantiatePlayer = (): Entity => {
     return new Entity([
@@ -53,6 +54,10 @@ export class Player extends Component {
             this.characterAnim.transform.mirrorX = true
         } else if (dx > 0) {
             this.characterAnim.transform.mirrorX = false
+        }
+
+        if (updateData.input.isKeyDown(InputKey.F)) {
+            game.tiles.remove(this.position.plus(this.collider.dimensions.div(2)).floorDiv(TILE_SIZE))
         }
         
         if (dx != 0 || dy != 0) {
