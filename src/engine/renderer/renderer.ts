@@ -38,5 +38,3 @@ export class Renderer {
                 .forEach(renderMethod => renderMethod.render(viewRenderContext))
     }
 }
-
-

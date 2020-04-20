@@ -9,15 +9,15 @@ import { TileSource } from "./TileSource";
  */
 export class TileComponent extends Component {
     tileSource: TileSource;
-    readonly transform: TileTransform = new TileTransform();
+    readonly transform: TileTransform
 
     constructor(tileSource: TileSource, position: Point = new Point(0, 0)) {
         super();
         this.tileSource = tileSource;
-        this.transform.position = position;
+        this.transform = new TileTransform(position);
     }
     
     getRenderMethods(): ImageRender[] {
-        return [this.tileSource.toRenderImage(this.transform)];
+        return [this.tileSource.toImageRender(this.transform)];
     }
 }

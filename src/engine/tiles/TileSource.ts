@@ -15,7 +15,7 @@ export class TileSource {
         this.tileSetIndex = tileSetIndex;
     }
 
-    toRenderImage(transform: TileTransform) {
+    toImageRender(transform: TileTransform) {
         return new ImageRender(
             this.tileSet.image, 
             new Point(this.tileSetIndex.x, this.tileSetIndex.y).times(this.tileSet.tileSize + this.tileSet.padding), 

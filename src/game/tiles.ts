@@ -1,6 +1,7 @@
 import { Point } from "../engine/point"
 import { TileSet } from "../engine/tiles/TileSet"
 import { TileSource } from "../engine/tiles/TileSource"
+import { ConnectingTileSchema } from "../engine/tiles/ConnectingTileSchema"
 
 export const TILE_SIZE = 16
 const TILE_SET = new TileSet(
@@ -72,6 +73,15 @@ export class Tile {
     static DPAD_RIGHT = Tile.get(29, 22)
     static DPAD_DOWN = Tile.get(30, 22)
     static DPAD_LEFT = Tile.get(31, 22)
+
+    static PATH = new ConnectingTileSchema()
+            .vertical(Tile.get(8, 1))
+            .angle(Tile.get(9, 1))
+            .tShape(Tile.get(10, 1))
+            .plusShape(Tile.get(11, 1))
+            .cap(Tile.get(12, 1))
+            .single(Tile.get(0, 4))
+            .fallback(Tile.get(23, 2))
 
     static CHARACTER_MAP = {
         '0': Tile.get(19, 29),

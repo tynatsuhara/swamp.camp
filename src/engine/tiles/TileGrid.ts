@@ -3,6 +3,9 @@ import { TileSource } from "./TileSource";
 import { Entity } from "../Entity";
 import { TileComponent } from "./TileComponent";
 import { Point } from "../point";
+import { ConnectingTileSchema } from "./ConnectingTileSchema";
+import { ConnectingTile } from "./ConnectingTile";
+import { Tile } from "../../game/tiles";
 
 /**
  * A tile grid that uses tile dimensions instead of pixel dimensions
@@ -10,7 +13,7 @@ import { Point } from "../point";
  */
 export class TileGrid {
     private readonly grid = new Grid<Entity>()
-    private readonly tileSize: number
+    readonly tileSize: number
 
     constructor(tileSize: number) {
         this.tileSize = tileSize
@@ -20,6 +23,10 @@ export class TileGrid {
         const entity = new Entity([new TileComponent(source, pos.times(this.tileSize))])
         this.grid.set(pos, entity)
         return entity
+    }
+
+    get(pos: Point): Entity {
+        return this.grid.get(pos)
     }
 
     entities(): Entity[] {
@@ -36,6 +43,9 @@ export class TileGrid {
         if (!path) {
             return
         }
-        path.forEach(pt => this.createTileEntity(source, pt))
+        path.forEach(pt => {
+            const entity = new Entity([new ConnectingTile(Tile.PATH, this, pt)])
+            this.grid.set(pt, entity)
+        })
     }
 }

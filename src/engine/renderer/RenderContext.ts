@@ -22,45 +22,51 @@ export class RenderContext {
         this.context.fillText(text, point.x, point.y)
     }
 
-    clearRect(x: number, y: number, w: number, h: number): void {
-        this.context.clearRect(x, y, w, h)
-    }
-
-    translate(point: Point, pixelPerfect: boolean = false): void {
-        let pos = point.times(this.view.zoom)
-        if (pixelPerfect) {
-            pos = this.pixelize(pos)
-        }
-        this.context.translate(pos.x, pos.y)
-    }
-
+    /**
+     * @param source 
+     * @param sourcePosition 
+     * @param sourceDimensions 
+     * @param destPosition the top left corner where the image will be drawn
+     * @param destDimensions 
+     * @param rotation (will be mirrored by mirrorX or mirrorY)
+     * @param pixelPerfect 
+     * @param mirrorX 
+     * @param mirrorY 
+     */
     drawImage(
         source: CanvasImageSource, 
         sourcePosition: Point, 
         sourceDimensions: Point, 
+        destPosition: Point,
         destDimensions: Point, 
+        rotation: number,
         pixelPerfect: boolean,
         mirrorX: boolean,
         mirrorY: boolean
     ): void {
-        let scaledDestPosition = new Point(
-            -sourceDimensions.x / 2 + (mirrorX ? -1 : 1) * this.view.offset.x,
-            -sourceDimensions.y / 2 + (mirrorY ? -1 : 1) * this.view.offset.y
-        ).times(this.view.zoom)
+        this.context.save()
 
+        const mirroredOffset = new Point(mirrorX ? destDimensions.x : 0, mirrorY ? destDimensions.y : 0)
+        let scaledDestPosition = destPosition.plus(this.view.offset).plus(mirroredOffset).times(this.view.zoom)
         if (pixelPerfect) {
             scaledDestPosition = this.pixelize(scaledDestPosition)
         }
 
-        let scaledDestDimensions = destDimensions.times(this.view.zoom)
+        this.context.translate(scaledDestPosition.x, scaledDestPosition.y)
+        this.context.scale(mirrorX ? -1 : 1, mirrorY ? -1 : 1)
+        this.context.rotate(rotation * Math.PI/180)
+
+        const scaledDestDimensions = destDimensions.times(this.view.zoom)
 
         this.context.drawImage(
             source, 
             sourcePosition.x, sourcePosition.y, 
             sourceDimensions.x, sourceDimensions.y, 
-            scaledDestPosition.x, scaledDestPosition.y, 
+            0, 0,
             scaledDestDimensions.x, scaledDestDimensions.y
         )
+
+        this.context.restore()
     }
 
     rotate(angle: number): void {

@@ -33,25 +33,18 @@ export class ImageRender implements RenderMethod {
     }
 
     render(context: RenderContext) {
-        const position = this.position.plus(this.dimensions.div(2)) // where to draw the this on the canvas (centered)
-        const rotation = 0 * Math.PI/180
-        const pixelPerfect = true
+        const pixelPerfect = false  // this can cause flickering between adjacent tiles, TODO make configurable
 
-        context.translate(position, pixelPerfect)
-        context.rotate(rotation)
-        context.scale(this.mirrorX ? -1 : 1, this.mirrorY ? -1 : 1)
         context.drawImage(
             this.source, 
             this.sourcePosition, 
             this.dimensions, 
+            this.position,
             this.dimensions.times(this.scale),
+            this.rotation,
             pixelPerfect,
             this.mirrorX,
             this.mirrorY
         )
-
-        context.scale(this.mirrorX ? -1 : 1, this.mirrorY ? -1 : 1)
-        context.rotate(-rotation)
-        context.translate(position.times(-1), pixelPerfect)
     }
 }
