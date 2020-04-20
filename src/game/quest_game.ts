@@ -30,45 +30,16 @@ export class QuestGame extends Game {
     constructor() {
         super()
 
-        const start = new Point(-5, 10)
-        const end = new Point(5, -5)
+        this.renderPath(new Point(-10, -10), new Point(10, 10), 5)
+        this.renderPath(new Point(10, -10), new Point(-10, 10), 15)
 
-        this.tiles.renderPath(start, end, Tile.GRASS_1, pt => pt.distanceTo(end) + Math.random()*15)
-
-        /*
-        this.addTileEntity(1, 1, Tile.GRASS_1)
-        this.addTileEntity(2, 1, Tile.GRASS_3)
-        this.addTileEntity(1, 2, Tile.GRASS_1)
-        this.addTileEntity(1, 4, Tile.GRASS_1)
-        this.addTileEntity(4, 4, Tile.SWORD)
-
-        for (let i = 0; i < 25; i++){
-            for (let j = 0; j < 25; j++){
-                this.addTileEntity(i, j, Tile.ROCKS).addComponent(new BoxCollider(new Point(i*TILE_SIZE, j*TILE_SIZE), new Point(TILE_SIZE, TILE_SIZE).times(0.9)))
-            }
-        }
-
-        const flutteringGrass = new AnimatedTileComponent(
-            new TileSetAnimation([
-                [Tile.GRASS_1, 900],
-                [Tile.GRASS_3, 750]
-            ]),
-            new Point(10, 10).times(TILE_SIZE)
-        )
-        this.entities.push(new Entity([flutteringGrass]))
-
-        const tickerComponent = new AnimatedTileComponent(new TileSetAnimation(
-            Tile.string('wowie!').map(tile => [tile, 300])
-        ))
-        this.entities.push(new Entity([tickerComponent]))
-        */
+        // this.renderPath(new Point(0, -10), new Point(0, 10), 15)
+        // this.renderPath(new Point(10, 0), new Point(-10, 0), 15)
     }
 
-    // addTileEntity(x: number, y: number, source: TileSource) {
-        // const entity = new Entity([new TileComponent(source, new Point(x, y).times(TILE_SIZE))])
-        // this.entities.push(entity)
-        // return entity
-    // }
+    renderPath(start: Point, end: Point, randomness) {
+        this.tiles.renderPath(start, end, Tile.PATH, randomness)
+    }
 
     // entities in the world space
     getViews(updateViewsContext: UpdateViewsContext): View[] {

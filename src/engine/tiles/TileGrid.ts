@@ -33,18 +33,51 @@ export class TileGrid {
         return this.grid.entries()
     }
 
+    // TODO this should be part of the game, not the engine
     renderPath(
         start: Point, 
         end: Point, 
-        source: TileSource,
-        heuristic: (pt: Point) => number = pt => pt.distanceTo(end)
+        tileSchema: ConnectingTileSchema,
+        randomness: number
     ) {
-        const path = this.grid.findPath(start, end, heuristic)
+        const heuristic = (pt: Point): number => {
+            const v = pt.distanceTo(end) * Math.random() * randomness
+            const el = this.grid.get(pt)
+            if (!el) {
+                return v
+            }
+            const ct = el.getComponent(ConnectingTile)
+            if (!ct || !ct.schema.canConnect(tileSchema)) {
+                return v
+            }
+            return v/12
+        }
+
+        const occupiedCannotConnect = (pt: Point) => {
+            const el = this.grid.get(pt)
+            if (!el) {
+                return false  // definitely not occupied
+            }
+            const ct = el.getComponent(ConnectingTile)
+            if (!ct) {
+                return true  // can't connect, therefore occupied
+            }
+            return !tileSchema.canConnect(ct.schema)
+        }
+
+        const path = this.grid.findPath(
+            start, 
+            end, 
+            heuristic, 
+            occupiedCannotConnect
+        )
+
         if (!path) {
             return
         }
+
         path.forEach(pt => {
-            const entity = new Entity([new ConnectingTile(Tile.PATH, this, pt)])
+            const entity = new Entity([new ConnectingTile(tileSchema, this, pt)])
             this.grid.set(pt, entity)
         })
     }

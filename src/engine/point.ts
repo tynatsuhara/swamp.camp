@@ -16,6 +16,13 @@ export class Point {
         return new Point(this.x / denominator, this.y / denominator)
     }
 
+    floorDiv(denominator: number): Point {
+        return new Point(
+            Math.floor(this.x / denominator), 
+            Math.floor(this.y / denominator)
+        )
+    }
+
     plus(other: Point): Point {
         return new Point(this.x + other.x, this.y + other.y)
     }

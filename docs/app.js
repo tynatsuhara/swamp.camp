@@ -29,6 +29,9 @@ System.register("engine/point", [], function (exports_1, context_1) {
                 Point.prototype.div = function (denominator) {
                     return new Point(this.x / denominator, this.y / denominator);
                 };
+                Point.prototype.floorDiv = function (denominator) {
+                    return new Point(Math.floor(this.x / denominator), Math.floor(this.y / denominator));
+                };
                 Point.prototype.plus = function (other) {
                     return new Point(this.x + other.x, this.y + other.y);
                 };
@@ -1054,9 +1057,9 @@ System.register("engine/tiles/ConnectingTile", ["engine/point", "engine/componen
         }
     };
 });
-System.register("engine/tiles/TileGrid", ["engine/util/Grid", "engine/Entity", "engine/tiles/TileComponent", "engine/tiles/ConnectingTile", "game/tiles"], function (exports_22, context_22) {
+System.register("engine/tiles/TileGrid", ["engine/util/Grid", "engine/Entity", "engine/tiles/TileComponent", "engine/tiles/ConnectingTile"], function (exports_22, context_22) {
     "use strict";
-    var Grid_1, Entity_2, TileComponent_1, ConnectingTile_1, tiles_1, TileGrid;
+    var Grid_1, Entity_2, TileComponent_1, ConnectingTile_1, TileGrid;
     var __moduleName = context_22 && context_22.id;
     return {
         setters: [
@@ -1071,9 +1074,6 @@ System.register("engine/tiles/TileGrid", ["engine/util/Grid", "engine/Entity", "
             },
             function (ConnectingTile_1_1) {
                 ConnectingTile_1 = ConnectingTile_1_1;
-            },
-            function (tiles_1_1) {
-                tiles_1 = tiles_1_1;
             }
         ],
         execute: function () {
@@ -1097,15 +1097,38 @@ System.register("engine/tiles/TileGrid", ["engine/util/Grid", "engine/Entity", "
                 TileGrid.prototype.entities = function () {
                     return this.grid.entries();
                 };
-                TileGrid.prototype.renderPath = function (start, end, source, heuristic) {
+                // TODO this should be part of the game, not the engine
+                TileGrid.prototype.renderPath = function (start, end, tileSchema, randomness) {
                     var _this = this;
-                    if (heuristic === void 0) { heuristic = function (pt) { return pt.distanceTo(end); }; }
-                    var path = this.grid.findPath(start, end, heuristic);
+                    var heuristic = function (pt) {
+                        var v = pt.distanceTo(end) * Math.random() * randomness;
+                        var el = _this.grid.get(pt);
+                        if (!el) {
+                            return v;
+                        }
+                        var ct = el.getComponent(ConnectingTile_1.ConnectingTile);
+                        if (!ct || !ct.schema.canConnect(tileSchema)) {
+                            return v;
+                        }
+                        return v / 12;
+                    };
+                    var occupiedCannotConnect = function (pt) {
+                        var el = _this.grid.get(pt);
+                        if (!el) {
+                            return false; // definitely not occupied
+                        }
+                        var ct = el.getComponent(ConnectingTile_1.ConnectingTile);
+                        if (!ct) {
+                            return true; // can't connect, therefore occupied
+                        }
+                        return !tileSchema.canConnect(ct.schema);
+                    };
+                    var path = this.grid.findPath(start, end, heuristic, occupiedCannotConnect);
                     if (!path) {
                         return;
                     }
                     path.forEach(function (pt) {
-                        var entity = new Entity_2.Entity([new ConnectingTile_1.ConnectingTile(tiles_1.Tile.PATH, _this, pt)]);
+                        var entity = new Entity_2.Entity([new ConnectingTile_1.ConnectingTile(tileSchema, _this, pt)]);
                         _this.grid.set(pt, entity);
                     });
                 };
@@ -1623,7 +1646,7 @@ System.register("engine/collision", ["engine/component", "engine/point", "engine
 });
 System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/tiles/TileSetAnimation", "engine/tiles/TileComponent", "engine/point", "game/tiles", "engine/Entity", "engine/component", "engine/collision"], function (exports_29, context_29) {
     "use strict";
-    var AnimatedTileComponent_1, TileSetAnimation_1, TileComponent_3, point_15, tiles_2, Entity_3, component_5, collision_1, instantiatePlayer, Player;
+    var AnimatedTileComponent_1, TileSetAnimation_1, TileComponent_3, point_15, tiles_1, Entity_3, component_5, collision_1, instantiatePlayer, Player;
     var __moduleName = context_29 && context_29.id;
     return {
         setters: [
@@ -1639,8 +1662,8 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
             function (point_15_1) {
                 point_15 = point_15_1;
             },
-            function (tiles_2_1) {
-                tiles_2 = tiles_2_1;
+            function (tiles_1_1) {
+                tiles_1 = tiles_1_1;
             },
             function (Entity_3_1) {
                 Entity_3 = Entity_3_1;
@@ -1674,11 +1697,11 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
                     configurable: true
                 });
                 Player.prototype.start = function (startData) {
-                    this.characterAnim = this.entity.addComponent(new TileComponent_3.TileComponent(tiles_2.Tile.GUY_1));
+                    this.characterAnim = this.entity.addComponent(new TileComponent_3.TileComponent(tiles_1.Tile.GUY_1));
                     this.swordAnim = this.entity.addComponent(new AnimatedTileComponent_1.AnimatedTileComponent(new TileSetAnimation_1.TileSetAnimation([
-                        [tiles_2.Tile.SWORD_1, 500],
+                        [tiles_1.Tile.SWORD_1, 500],
                     ])));
-                    this.collider = this.entity.addComponent(new collision_1.BoxCollider(this.position, new point_15.Point(tiles_2.TILE_SIZE, tiles_2.TILE_SIZE)));
+                    this.collider = this.entity.addComponent(new collision_1.BoxCollider(this.position, new point_15.Point(tiles_1.TILE_SIZE, tiles_1.TILE_SIZE)));
                 };
                 Player.prototype.update = function (updateData) {
                     var dx = 0;
@@ -1716,7 +1739,7 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
 });
 System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/game", "engine/View", "game/tiles", "engine/tiles/TileComponent", "game/player", "engine/tiles/TileGrid"], function (exports_30, context_30) {
     "use strict";
-    var Entity_4, point_16, game_1, View_2, tiles_3, TileComponent_4, player_1, TileGrid_1, ZOOM, QuestGame;
+    var Entity_4, point_16, game_1, View_2, tiles_2, TileComponent_4, player_1, TileGrid_1, ZOOM, QuestGame;
     var __moduleName = context_30 && context_30.id;
     return {
         setters: [
@@ -1732,8 +1755,8 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
             function (View_2_1) {
                 View_2 = View_2_1;
             },
-            function (tiles_3_1) {
-                tiles_3 = tiles_3_1;
+            function (tiles_2_1) {
+                tiles_2 = tiles_2_1;
             },
             function (TileComponent_4_1) {
                 TileComponent_4 = TileComponent_4_1;
@@ -1751,51 +1774,23 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
                 __extends(QuestGame, _super);
                 function QuestGame() {
                     var _this = _super.call(this) || this;
-                    _this.tiles = new TileGrid_1.TileGrid(tiles_3.TILE_SIZE);
-                    _this.player = new Entity_4.Entity([new player_1.Player(new point_16.Point(-2, 2).times(tiles_3.TILE_SIZE))]).getComponent(player_1.Player);
+                    _this.tiles = new TileGrid_1.TileGrid(tiles_2.TILE_SIZE);
+                    _this.player = new Entity_4.Entity([new player_1.Player(new point_16.Point(-2, 2).times(tiles_2.TILE_SIZE))]).getComponent(player_1.Player);
                     _this.gameEntityView = new View_2.View();
                     _this.uiView = {
                         zoom: ZOOM,
                         offset: new point_16.Point(0, 0),
                         entities: _this.getUIEntities()
                     };
-                    var start = new point_16.Point(-5, 10);
-                    var end = new point_16.Point(5, -5);
-                    _this.tiles.renderPath(start, end, tiles_3.Tile.GRASS_1, function (pt) { return pt.distanceTo(end) + Math.random() * 15; });
+                    _this.renderPath(new point_16.Point(-10, -10), new point_16.Point(10, 10), 5);
+                    _this.renderPath(new point_16.Point(10, -10), new point_16.Point(-10, 10), 15);
                     return _this;
-                    /*
-                    this.addTileEntity(1, 1, Tile.GRASS_1)
-                    this.addTileEntity(2, 1, Tile.GRASS_3)
-                    this.addTileEntity(1, 2, Tile.GRASS_1)
-                    this.addTileEntity(1, 4, Tile.GRASS_1)
-                    this.addTileEntity(4, 4, Tile.SWORD)
-            
-                    for (let i = 0; i < 25; i++){
-                        for (let j = 0; j < 25; j++){
-                            this.addTileEntity(i, j, Tile.ROCKS).addComponent(new BoxCollider(new Point(i*TILE_SIZE, j*TILE_SIZE), new Point(TILE_SIZE, TILE_SIZE).times(0.9)))
-                        }
-                    }
-            
-                    const flutteringGrass = new AnimatedTileComponent(
-                        new TileSetAnimation([
-                            [Tile.GRASS_1, 900],
-                            [Tile.GRASS_3, 750]
-                        ]),
-                        new Point(10, 10).times(TILE_SIZE)
-                    )
-                    this.entities.push(new Entity([flutteringGrass]))
-            
-                    const tickerComponent = new AnimatedTileComponent(new TileSetAnimation(
-                        Tile.string('wowie!').map(tile => [tile, 300])
-                    ))
-                    this.entities.push(new Entity([tickerComponent]))
-                    */
+                    // this.renderPath(new Point(0, -10), new Point(0, 10), 15)
+                    // this.renderPath(new Point(10, 0), new Point(-10, 0), 15)
                 }
-                // addTileEntity(x: number, y: number, source: TileSource) {
-                // const entity = new Entity([new TileComponent(source, new Point(x, y).times(TILE_SIZE))])
-                // this.entities.push(entity)
-                // return entity
-                // }
+                QuestGame.prototype.renderPath = function (start, end, randomness) {
+                    this.tiles.renderPath(start, end, tiles_2.Tile.PATH, randomness);
+                };
                 // entities in the world space
                 QuestGame.prototype.getViews = function (updateViewsContext) {
                     this.updateViews(updateViewsContext);
@@ -1817,19 +1812,19 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
                 QuestGame.prototype.getUIEntities = function () {
                     var dimensions = new point_16.Point(25, 20); // tile dimensions
                     var result = [];
-                    result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_1, new point_16.Point(0, 0)));
-                    result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_3, new point_16.Point(dimensions.x - 1, 0).times(tiles_3.TILE_SIZE)));
-                    result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_5, new point_16.Point(dimensions.x - 1, dimensions.y - 1).times(tiles_3.TILE_SIZE)));
-                    result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_7, new point_16.Point(0, dimensions.y - 1).times(tiles_3.TILE_SIZE)));
+                    result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_1, new point_16.Point(0, 0)));
+                    result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_3, new point_16.Point(dimensions.x - 1, 0).times(tiles_2.TILE_SIZE)));
+                    result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_5, new point_16.Point(dimensions.x - 1, dimensions.y - 1).times(tiles_2.TILE_SIZE)));
+                    result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_7, new point_16.Point(0, dimensions.y - 1).times(tiles_2.TILE_SIZE)));
                     // horizontal lines
                     for (var i = 1; i < dimensions.x - 1; i++) {
-                        result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_2, new point_16.Point(i, 0).times(tiles_3.TILE_SIZE)));
-                        result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_6, new point_16.Point(i, dimensions.y - 1).times(tiles_3.TILE_SIZE)));
+                        result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_2, new point_16.Point(i, 0).times(tiles_2.TILE_SIZE)));
+                        result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_6, new point_16.Point(i, dimensions.y - 1).times(tiles_2.TILE_SIZE)));
                     }
                     // vertical lines
                     for (var j = 1; j < dimensions.y - 1; j++) {
-                        result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_4, new point_16.Point(dimensions.x - 1, j).times(tiles_3.TILE_SIZE)));
-                        result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_8, new point_16.Point(0, j).times(tiles_3.TILE_SIZE)));
+                        result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_4, new point_16.Point(dimensions.x - 1, j).times(tiles_2.TILE_SIZE)));
+                        result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_8, new point_16.Point(0, j).times(tiles_2.TILE_SIZE)));
                     }
                     return [new Entity_4.Entity(result)];
                 };
