@@ -6,8 +6,6 @@ import { View } from "./View"
 import { profiler, measure } from "./profiler"
 import { debug } from "./debug"
 
-const FPS = 60
-
 export class UpdateViewsContext {  
     readonly elapsedTimeMillis: number
     readonly input: CapturedInput
@@ -37,7 +35,7 @@ export class Engine {
         this.renderer = new Renderer(canvas)
         this.input = new Input(canvas)
 
-        setInterval(() => this.tick(), 1000/FPS)
+        requestAnimationFrame(() => this.tick())
     }
 
     tick() {
@@ -86,6 +84,8 @@ export class Engine {
         }
         
         this.lastUpdateMillis = time
+
+        requestAnimationFrame(() => this.tick())
     }
 }
 

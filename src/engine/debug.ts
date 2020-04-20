@@ -18,7 +18,7 @@ function observe(obj) {
     Object.entries(obj).forEach(([key, val]) => {
         Object.defineProperty(result, key, {
             get: function () {
-                return val;
+                return val
             },
             set: function (value) {
                 debug[key] = value
@@ -26,7 +26,7 @@ function observe(obj) {
             },
             enumerable: true,
             configurable: true
-        });
+        })
     })
     return result
 }

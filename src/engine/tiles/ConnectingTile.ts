@@ -1,9 +1,9 @@
-import { TileComponent } from "./TileComponent";
-import { Point } from "../point";
-import { TileGrid } from "./TileGrid";
-import { ImageRender } from "../renderer/ImageRender";
-import { Component } from "../component";
-import { ConnectingTileSchema } from "./ConnectingTileSchema";
+import { TileComponent } from "./TileComponent"
+import { Point } from "../point"
+import { TileGrid } from "./TileGrid"
+import { ImageRender } from "../renderer/ImageRender"
+import { Component } from "../component"
+import { ConnectingTileSchema } from "./ConnectingTileSchema"
 
 // TODO unify tile components with a single base class?
 export class ConnectingTile extends Component {
@@ -22,6 +22,6 @@ export class ConnectingTile extends Component {
     }
 
     getRenderMethods(): ImageRender[] {
-        return [this.schema.render(this.grid, this.position)];
+        return [this.schema.render(this.grid, this.position)]
     }
 }

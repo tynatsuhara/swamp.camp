@@ -1,7 +1,7 @@
-import { View } from "../View";
-import { RenderMethod } from "./RenderMethod";
-import { Point } from "../point";
-import { RenderContext } from "./RenderContext";
+import { View } from "../View"
+import { RenderMethod } from "./RenderMethod"
+import { Point } from "../point"
+import { RenderContext } from "./RenderContext"
 
 export class LineRender implements RenderMethod {
     start: Point
@@ -19,9 +19,9 @@ export class LineRender implements RenderMethod {
     render(context: RenderContext): void {
         context.lineWidth = this.width
         context.strokeStyle = this.color
-        context.beginPath();
-        context.moveTo(this.start);
-        context.lineTo(this.end);
-        context.stroke();
+        context.beginPath()
+        context.moveTo(this.start)
+        context.lineTo(this.end)
+        context.stroke()
     }
 }

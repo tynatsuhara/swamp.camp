@@ -1,5 +1,5 @@
-import { RenderContext } from "./RenderContext";
+import { RenderContext } from "./RenderContext"
 
 export interface RenderMethod {
-    render(context: RenderContext): void;
+    render(context: RenderContext): void
 }

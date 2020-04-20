@@ -1,9 +1,9 @@
-import { Component } from "./component";
-import { StartData, UpdateData } from "./engine";
-import { Point } from "./point";
-import { RenderMethod } from "./renderer/RenderMethod";
-import { LineRender } from "./renderer/LineRender";
-import { debug } from "./debug";
+import { Component } from "./component"
+import { StartData, UpdateData } from "./engine"
+import { Point } from "./point"
+import { RenderMethod } from "./renderer/RenderMethod"
+import { LineRender } from "./renderer/LineRender"
+import { debug } from "./debug"
 
 class CollisionEngine {
     private colliders: BoxCollider[] = []
@@ -22,7 +22,7 @@ class CollisionEngine {
                 || collider.position.x > other.position.x + other.dimensions.x       // to the right of other
                 || collider.position.y + collider.dimensions.y < other.position.y  // above other
                 || collider.position.y > other.position.y + other.dimensions.y       // below other
-            );
+            )
             collider.updateColliding(other, isColliding)
             other.updateColliding(collider, isColliding)
         }) 

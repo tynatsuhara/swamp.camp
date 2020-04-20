@@ -1,18 +1,18 @@
-import { Point } from "../point";
-import { ImageRender } from "../renderer/ImageRender";
-import { TileTransform } from "./TileTransform";
-import { TileSet } from "./TileSet";
+import { Point } from "../point"
+import { ImageRender } from "../renderer/ImageRender"
+import { TileTransform } from "./TileTransform"
+import { TileSet } from "./TileSet"
 
 export class TileSource {
-    private tileSet: TileSet;
-    private tileSetIndex: Point;
+    private tileSet: TileSet
+    private tileSetIndex: Point
     
     /**
      * Constructs a static (non-animated) tile source
      */
     constructor(tileSet: TileSet, tileSetIndex: Point) {
-        this.tileSet = tileSet;
-        this.tileSetIndex = tileSetIndex;
+        this.tileSet = tileSet
+        this.tileSetIndex = tileSetIndex
     }
 
     toImageRender(transform: TileTransform) {
@@ -25,6 +25,6 @@ export class TileSource {
             transform.scale, 
             transform.mirrorX, 
             transform.mirrorY
-        );
+        )
     }
 }

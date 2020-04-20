@@ -1,11 +1,11 @@
-import { Grid } from "../util/Grid";
-import { TileSource } from "./TileSource";
-import { Entity } from "../Entity";
-import { TileComponent } from "./TileComponent";
-import { Point } from "../point";
-import { ConnectingTileSchema } from "./ConnectingTileSchema";
-import { ConnectingTile } from "./ConnectingTile";
-import { Tile } from "../../game/tiles";
+import { Grid } from "../util/Grid"
+import { TileSource } from "./TileSource"
+import { Entity } from "../Entity"
+import { TileComponent } from "./TileComponent"
+import { Point } from "../point"
+import { ConnectingTileSchema } from "./ConnectingTileSchema"
+import { ConnectingTile } from "./ConnectingTile"
+import { Tile } from "../../game/tiles"
 
 /**
  * A tile grid that uses tile dimensions instead of pixel dimensions

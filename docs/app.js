@@ -513,7 +513,7 @@ System.register("engine/debug", [], function (exports_10, context_10) {
 });
 System.register("engine/engine", ["engine/renderer/Renderer", "engine/input", "engine/profiler", "engine/debug"], function (exports_11, context_11) {
     "use strict";
-    var Renderer_1, input_1, profiler_1, debug_1, FPS, UpdateViewsContext, StartData, UpdateData, Engine, ALREADY_STARTED_COMPONENT;
+    var Renderer_1, input_1, profiler_1, debug_1, UpdateViewsContext, StartData, UpdateData, Engine, ALREADY_STARTED_COMPONENT;
     var __moduleName = context_11 && context_11.id;
     return {
         setters: [
@@ -531,7 +531,6 @@ System.register("engine/engine", ["engine/renderer/Renderer", "engine/input", "e
             }
         ],
         execute: function () {
-            FPS = 60;
             UpdateViewsContext = /** @class */ (function () {
                 function UpdateViewsContext() {
                 }
@@ -557,7 +556,7 @@ System.register("engine/engine", ["engine/renderer/Renderer", "engine/input", "e
                     this.game = game;
                     this.renderer = new Renderer_1.Renderer(canvas);
                     this.input = new input_1.Input(canvas);
-                    setInterval(function () { return _this.tick(); }, 1000 / FPS);
+                    requestAnimationFrame(function () { return _this.tick(); });
                 }
                 Engine.prototype.tick = function () {
                     var _this = this;
@@ -599,6 +598,7 @@ System.register("engine/engine", ["engine/renderer/Renderer", "engine/input", "e
                         profiler_1.profiler.update(elapsed, updateDuration, renderDuration);
                     }
                     this.lastUpdateMillis = time;
+                    requestAnimationFrame(function () { return _this.tick(); });
                 };
                 return Engine;
             }());

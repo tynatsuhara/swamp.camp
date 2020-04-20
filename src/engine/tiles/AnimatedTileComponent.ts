@@ -1,19 +1,19 @@
-import { Point } from "../point";
-import { UpdateData } from "../engine";
-import { TileComponent } from "./TileComponent";
-import { TileSetAnimation } from "./TileSetAnimation";
+import { Point } from "../point"
+import { UpdateData } from "../engine"
+import { TileComponent } from "./TileComponent"
+import { TileSetAnimation } from "./TileSetAnimation"
 
 export class AnimatedTileComponent extends TileComponent {
-    private animator: TileSetAnimator;
+    private animator: TileSetAnimator
 
     constructor(animation: TileSetAnimation, position: Point = new Point(0, 0)) {
-        const animator = new TileSetAnimator(animation);
-        super(animator.getCurrentTileSource(), position);
-        this.animator = animator;
+        const animator = new TileSetAnimator(animation)
+        super(animator.getCurrentTileSource(), position)
+        this.animator = animator
     }
     
     update(updateData: UpdateData) {
-        this.tileSource = this.animator.update(updateData.elapsedTimeMillis);
+        this.tileSource = this.animator.update(updateData.elapsedTimeMillis)
     }
 }
 
