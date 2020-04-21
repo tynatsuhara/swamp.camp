@@ -4,11 +4,7 @@ import { TileSource } from "../engine/tiles/TileSource"
 import { ConnectingTileSchema } from "../engine/tiles/ConnectingTileSchema"
 
 export const TILE_SIZE = 16
-const TILE_SET = new TileSet(
-    <HTMLImageElement>document.getElementById("tileset"),
-    TILE_SIZE,
-    1
-)
+const TILE_SET = new TileSet("tileset", TILE_SIZE, 1)
 
 export class Tile {
     // environment

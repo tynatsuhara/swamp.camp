@@ -6,7 +6,7 @@ import { View } from "./View"
 import { profiler, measure } from "./profiler"
 import { debug } from "./debug"
 
-export class UpdateViewsContext {  
+export class UpdateViewsContext {
     readonly elapsedTimeMillis: number
     readonly input: CapturedInput
     readonly dimensions: Point
@@ -52,7 +52,7 @@ export class Engine {
             dimensions: this.renderer.getDimensions()
         }
 
-        const views = this.game.getViews(updateViewsContext).concat(debug.showProfiler ? [profiler.getView()] : [])
+        const views = this.getViews(updateViewsContext)
 
         const [updateDuration] = measure(() => {
             views.forEach(v => {
@@ -86,6 +86,11 @@ export class Engine {
         this.lastUpdateMillis = time
 
         requestAnimationFrame(() => this.tick())
+    }
+
+    private getViews(context: UpdateViewsContext): View[] {
+        // TODO editor
+        return this.game.getViews(context).concat(debug.showProfiler ? [profiler.getView()] : [])
     }
 }
 

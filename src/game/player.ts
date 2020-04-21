@@ -10,12 +10,6 @@ import { Component } from "../engine/component"
 import { BoxCollider } from "../engine/collision"
 import { game } from "./quest_game"
 
-const instantiatePlayer = (): Entity => {
-    return new Entity([
-        new Player(new Point(0, 0))
-    ])
-}
-
 export class Player extends Component {
     readonly speed = 0.07
     private characterAnim: TileComponent
