@@ -35,10 +35,14 @@ export class Point {
         return new Point(this.x + (goal.x - this.x) * multiplier, this.y + (goal.y - this.y) * multiplier)
     }
 
-    distanceTo(pt: Point) {
+    distanceTo(pt: Point): number {
         const dx = pt.x - this.x
         const dy = pt.y - this.y
         return Math.sqrt(dx * dx + dy * dy)
+    }
+
+    magnitude(): number {
+        return this.distanceTo(new Point(0, 0))
     }
 
     toString(): string {

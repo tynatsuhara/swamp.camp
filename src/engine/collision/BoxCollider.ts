@@ -3,6 +3,7 @@ import { RenderMethod } from "../renderer/RenderMethod"
 import { debug } from "../debug"
 import { LineRender } from "../renderer/LineRender"
 import { Point } from "../point"
+import { rectContains } from "./utils"
 
 export class BoxCollider extends Collider {
 
@@ -23,12 +24,6 @@ export class BoxCollider extends Collider {
     }
 
     isWithinBounds(pt: Point): boolean {
-        return pt.x >= this.position.x && pt.x < this.position.x + this.dimensions.x
-                && pt.y >= this.position.y && pt.y < this.position.y + this.dimensions.y
-    }
-
-    lineIntersection(start: Point, end: Point): Point {
-        // TODO math
-        return null
+        return rectContains(this.position, this.dimensions, pt)
     }
 }
