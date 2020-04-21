@@ -1889,26 +1889,17 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
         }
     };
 });
-System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTile", "engine/Entity", "engine/collision/BoxCollider", "game/tiles"], function (exports_33, context_33) {
+System.register("game/MapGenerator", ["engine/tiles/ConnectingTile", "engine/Entity"], function (exports_33, context_33) {
     "use strict";
-    var point_17, ConnectingTile_2, Entity_3, BoxCollider_2, tiles_2, MapGenerator;
+    var ConnectingTile_2, Entity_3, MapGenerator;
     var __moduleName = context_33 && context_33.id;
     return {
         setters: [
-            function (point_17_1) {
-                point_17 = point_17_1;
-            },
             function (ConnectingTile_2_1) {
                 ConnectingTile_2 = ConnectingTile_2_1;
             },
             function (Entity_3_1) {
                 Entity_3 = Entity_3_1;
-            },
-            function (BoxCollider_2_1) {
-                BoxCollider_2 = BoxCollider_2_1;
-            },
-            function (tiles_2_1) {
-                tiles_2 = tiles_2_1;
             }
         ],
         execute: function () {
@@ -1947,7 +1938,6 @@ System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTi
                     path.forEach(function (pt) {
                         var entity = new Entity_3.Entity([
                             new ConnectingTile_2.ConnectingTile(tileSchema, grid, pt),
-                            new BoxCollider_2.BoxCollider(pt.times(tiles_2.TILE_SIZE), new point_17.Point(tiles_2.TILE_SIZE, tiles_2.TILE_SIZE))
                         ]);
                         grid.set(pt, entity);
                     });
@@ -1960,15 +1950,15 @@ System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTi
 });
 System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/game", "engine/View", "game/tiles", "engine/tiles/TileComponent", "game/player", "engine/tiles/TileGrid", "game/MapGenerator"], function (exports_34, context_34) {
     "use strict";
-    var Entity_4, point_18, game_1, View_2, tiles_3, TileComponent_4, player_1, TileGrid_1, MapGenerator_1, ZOOM, QuestGame, game;
+    var Entity_4, point_17, game_1, View_2, tiles_2, TileComponent_4, player_1, TileGrid_1, MapGenerator_1, ZOOM, QuestGame, game;
     var __moduleName = context_34 && context_34.id;
     return {
         setters: [
             function (Entity_4_1) {
                 Entity_4 = Entity_4_1;
             },
-            function (point_18_1) {
-                point_18 = point_18_1;
+            function (point_17_1) {
+                point_17 = point_17_1;
             },
             function (game_1_1) {
                 game_1 = game_1_1;
@@ -1976,8 +1966,8 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
             function (View_2_1) {
                 View_2 = View_2_1;
             },
-            function (tiles_3_1) {
-                tiles_3 = tiles_3_1;
+            function (tiles_2_1) {
+                tiles_2 = tiles_2_1;
             },
             function (TileComponent_4_1) {
                 TileComponent_4 = TileComponent_4_1;
@@ -1998,17 +1988,17 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
                 __extends(QuestGame, _super);
                 function QuestGame() {
                     var _this = _super.call(this) || this;
-                    _this.tiles = new TileGrid_1.TileGrid(tiles_3.TILE_SIZE);
-                    _this.player = new Entity_4.Entity([new player_1.Player(new point_18.Point(-2, 2).times(tiles_3.TILE_SIZE))]).getComponent(player_1.Player);
+                    _this.tiles = new TileGrid_1.TileGrid(tiles_2.TILE_SIZE);
+                    _this.player = new Entity_4.Entity([new player_1.Player(new point_17.Point(-2, 2).times(tiles_2.TILE_SIZE))]).getComponent(player_1.Player);
                     _this.gameEntityView = new View_2.View();
                     _this.uiView = {
                         zoom: ZOOM,
-                        offset: new point_18.Point(0, 0),
+                        offset: new point_17.Point(0, 0),
                         entities: _this.getUIEntities()
                     };
                     var mapGen = new MapGenerator_1.MapGenerator();
-                    mapGen.renderPath(_this.tiles, new point_18.Point(-10, -10), new point_18.Point(10, 10), tiles_3.Tile.PATH, 2);
-                    mapGen.renderPath(_this.tiles, new point_18.Point(10, -10), new point_18.Point(-10, 10), tiles_3.Tile.PATH, 5);
+                    mapGen.renderPath(_this.tiles, new point_17.Point(-10, -10), new point_17.Point(10, 10), tiles_2.Tile.PATH, 2);
+                    mapGen.renderPath(_this.tiles, new point_17.Point(10, -10), new point_17.Point(-10, 10), tiles_2.Tile.PATH, 5);
                     return _this;
                 }
                 // entities in the world space
@@ -2030,21 +2020,21 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
                 };
                 // entities whose position is fixed on the camera
                 QuestGame.prototype.getUIEntities = function () {
-                    var dimensions = new point_18.Point(25, 20); // tile dimensions
+                    var dimensions = new point_17.Point(25, 20); // tile dimensions
                     var result = [];
-                    result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_1, new point_18.Point(0, 0)));
-                    result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_3, new point_18.Point(dimensions.x - 1, 0).times(tiles_3.TILE_SIZE)));
-                    result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_5, new point_18.Point(dimensions.x - 1, dimensions.y - 1).times(tiles_3.TILE_SIZE)));
-                    result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_7, new point_18.Point(0, dimensions.y - 1).times(tiles_3.TILE_SIZE)));
+                    result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_1, new point_17.Point(0, 0)));
+                    result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_3, new point_17.Point(dimensions.x - 1, 0).times(tiles_2.TILE_SIZE)));
+                    result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_5, new point_17.Point(dimensions.x - 1, dimensions.y - 1).times(tiles_2.TILE_SIZE)));
+                    result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_7, new point_17.Point(0, dimensions.y - 1).times(tiles_2.TILE_SIZE)));
                     // horizontal lines
                     for (var i = 1; i < dimensions.x - 1; i++) {
-                        result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_2, new point_18.Point(i, 0).times(tiles_3.TILE_SIZE)));
-                        result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_6, new point_18.Point(i, dimensions.y - 1).times(tiles_3.TILE_SIZE)));
+                        result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_2, new point_17.Point(i, 0).times(tiles_2.TILE_SIZE)));
+                        result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_6, new point_17.Point(i, dimensions.y - 1).times(tiles_2.TILE_SIZE)));
                     }
                     // vertical lines
                     for (var j = 1; j < dimensions.y - 1; j++) {
-                        result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_4, new point_18.Point(dimensions.x - 1, j).times(tiles_3.TILE_SIZE)));
-                        result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_8, new point_18.Point(0, j).times(tiles_3.TILE_SIZE)));
+                        result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_4, new point_17.Point(dimensions.x - 1, j).times(tiles_2.TILE_SIZE)));
+                        result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_8, new point_17.Point(0, j).times(tiles_2.TILE_SIZE)));
                     }
                     return [new Entity_4.Entity(result)];
                 };
