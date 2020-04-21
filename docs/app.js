@@ -1112,6 +1112,8 @@ System.register("engine/tiles/TileGrid", ["engine/util/Grid", "engine/Entity", "
             /**
              * A tile grid that uses tile dimensions instead of pixel dimensions
              * (A tile is 1x1 instead of TILE_SIZExTILE_SIZE, then scaled to render)
+             *
+             * TODO is this class serving a purpose?
              */
             TileGrid = /** @class */ (function (_super) {
                 __extends(TileGrid, _super);
@@ -1537,17 +1539,14 @@ System.register("engine/renderer/LineRender", [], function (exports_28, context_
         }
     };
 });
-System.register("engine/collision", ["engine/component", "engine/point", "engine/renderer/LineRender", "engine/debug"], function (exports_29, context_29) {
+System.register("engine/collision/Collider", ["engine/component", "engine/renderer/LineRender", "engine/debug"], function (exports_29, context_29) {
     "use strict";
-    var component_4, point_14, LineRender_1, debug_2, CollisionEngine, ENGINE, BoxCollider;
+    var component_4, LineRender_1, debug_2, CollisionEngine, ENGINE, Collider;
     var __moduleName = context_29 && context_29.id;
     return {
         setters: [
             function (component_4_1) {
                 component_4 = component_4_1;
-            },
-            function (point_14_1) {
-                point_14 = point_14_1;
             },
             function (LineRender_1_1) {
                 LineRender_1 = LineRender_1_1;
@@ -1569,11 +1568,7 @@ System.register("engine/collision", ["engine/component", "engine/point", "engine
                 };
                 CollisionEngine.prototype.checkCollider = function (collider) {
                     this.colliders.filter(function (other) { return other != collider && other.entity; }).forEach(function (other) {
-                        var isColliding = !(collider.position.x + collider.dimensions.x < other.position.x // to the left of other
-                            || collider.position.x > other.position.x + other.dimensions.x // to the right of other
-                            || collider.position.y + collider.dimensions.y < other.position.y // above other
-                            || collider.position.y > other.position.y + other.dimensions.y // below other
-                        );
+                        var isColliding = other.getPoints().some(function (pt) { return collider.isWithinBounds(pt); });
                         collider.updateColliding(other, isColliding);
                         other.updateColliding(collider, isColliding);
                     });
@@ -1581,44 +1576,35 @@ System.register("engine/collision", ["engine/component", "engine/point", "engine
                 return CollisionEngine;
             }());
             ENGINE = new CollisionEngine();
-            BoxCollider = /** @class */ (function (_super) {
-                __extends(BoxCollider, _super);
-                function BoxCollider(position, dimensions) {
+            /**
+             *
+             */
+            Collider = /** @class */ (function (_super) {
+                __extends(Collider, _super);
+                function Collider(position) {
                     var _this = _super.call(this) || this;
                     _this.collidingWith = new Set();
                     _this.onColliderEnterCallback = function () { };
                     _this._position = position;
-                    _this.dimensions = dimensions;
                     ENGINE.registerCollider(_this);
                     return _this;
                 }
-                Object.defineProperty(BoxCollider.prototype, "position", {
+                Object.defineProperty(Collider.prototype, "position", {
                     get: function () { return this._position; },
                     enumerable: true,
                     configurable: true
                 });
-                BoxCollider.prototype.start = function (startData) {
+                Collider.prototype.start = function (startData) {
                     ENGINE.checkCollider(this);
                 };
-                BoxCollider.prototype.update = function (updateData) { };
-                BoxCollider.prototype.moveTo = function (point) {
+                Collider.prototype.update = function (updateData) { };
+                Collider.prototype.moveTo = function (point) {
+                    // TODO revisit this to account for objects in the way
                     this._position = point;
                     ENGINE.checkCollider(this); // since this is all syncronous, it will work
                     return this.position;
                 };
-                BoxCollider.prototype.getRenderMethods = function () {
-                    if (!debug_2.debug.showColliders) {
-                        return [];
-                    }
-                    var color = this.collidingWith.size > 0 ? "#00ff00" : "#ff0000";
-                    return [
-                        new LineRender_1.LineRender(this.position, this.position.plus(new point_14.Point(this.dimensions.x, 0)), color),
-                        new LineRender_1.LineRender(this.position, this.position.plus(new point_14.Point(0, this.dimensions.y)), color),
-                        new LineRender_1.LineRender(this.position.plus(this.dimensions), this.position.plus(new point_14.Point(this.dimensions.x, 0)), color),
-                        new LineRender_1.LineRender(this.position.plus(this.dimensions), this.position.plus(new point_14.Point(0, this.dimensions.y)), color),
-                    ];
-                };
-                BoxCollider.prototype.updateColliding = function (other, isColliding) {
+                Collider.prototype.updateColliding = function (other, isColliding) {
                     if (isColliding && !this.collidingWith.has(other)) {
                         this.onColliderEnterCallback(other);
                         this.collidingWith.add(other);
@@ -1628,19 +1614,77 @@ System.register("engine/collision", ["engine/component", "engine/point", "engine
                         this.collidingWith.delete(other);
                     }
                 };
-                BoxCollider.prototype.onColliderEnter = function (callback) {
+                Collider.prototype.onColliderEnter = function (callback) {
                     this.onColliderEnterCallback = callback;
                 };
-                return BoxCollider;
+                Collider.prototype.getRenderMethods = function () {
+                    if (!debug_2.debug.showColliders) {
+                        return [];
+                    }
+                    var color = this.collidingWith.size > 0 ? "#00ff00" : "#ff0000";
+                    var pts = this.getPoints();
+                    var lines = [];
+                    var lastPt = pts[pts.length - 1];
+                    for (var _i = 0, pts_1 = pts; _i < pts_1.length; _i++) {
+                        var pt = pts_1[_i];
+                        lines.push(new LineRender_1.LineRender(pt, lastPt, color));
+                        lastPt = pt;
+                    }
+                    return lines;
+                };
+                return Collider;
             }(component_4.Component));
-            exports_29("BoxCollider", BoxCollider);
+            exports_29("Collider", Collider);
         }
     };
 });
-System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/tiles/TileSetAnimation", "engine/tiles/TileComponent", "engine/point", "game/tiles", "engine/component", "engine/collision", "game/quest_game"], function (exports_30, context_30) {
+System.register("engine/collision/BoxCollider", ["engine/collision/Collider", "engine/point"], function (exports_30, context_30) {
     "use strict";
-    var AnimatedTileComponent_1, TileSetAnimation_1, TileComponent_3, point_15, tiles_1, component_5, collision_1, quest_game_1, Player;
+    var Collider_1, point_14, BoxCollider;
     var __moduleName = context_30 && context_30.id;
+    return {
+        setters: [
+            function (Collider_1_1) {
+                Collider_1 = Collider_1_1;
+            },
+            function (point_14_1) {
+                point_14 = point_14_1;
+            }
+        ],
+        execute: function () {
+            BoxCollider = /** @class */ (function (_super) {
+                __extends(BoxCollider, _super);
+                function BoxCollider(position, dimensions) {
+                    var _this = _super.call(this, position) || this;
+                    _this.dimensions = dimensions;
+                    return _this;
+                }
+                BoxCollider.prototype.getPoints = function () {
+                    return [
+                        new point_14.Point(this.position.x, this.position.y),
+                        new point_14.Point(this.position.x + this.dimensions.x, this.position.y),
+                        new point_14.Point(this.position.x + this.dimensions.x, this.position.y + this.dimensions.y),
+                        new point_14.Point(this.position.x, this.position.y + this.dimensions.y)
+                    ];
+                };
+                BoxCollider.prototype.isWithinBounds = function (pt) {
+                    return pt.x >= this.position.x && pt.x < this.position.x + this.dimensions.x
+                        && pt.y >= this.position.y && pt.y < this.position.y + this.dimensions.y;
+                };
+                BoxCollider.prototype.lineIntersection = function (start, end) {
+                    // TODO math
+                    return null;
+                };
+                return BoxCollider;
+            }(Collider_1.Collider));
+            exports_30("BoxCollider", BoxCollider);
+        }
+    };
+});
+System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/tiles/TileSetAnimation", "engine/tiles/TileComponent", "engine/point", "game/tiles", "engine/component", "engine/collision/BoxCollider", "game/quest_game"], function (exports_31, context_31) {
+    "use strict";
+    var AnimatedTileComponent_1, TileSetAnimation_1, TileComponent_3, point_15, tiles_1, component_5, BoxCollider_1, quest_game_1, Player;
+    var __moduleName = context_31 && context_31.id;
     return {
         setters: [
             function (AnimatedTileComponent_1_1) {
@@ -1661,8 +1705,8 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
             function (component_5_1) {
                 component_5 = component_5_1;
             },
-            function (collision_1_1) {
-                collision_1 = collision_1_1;
+            function (BoxCollider_1_1) {
+                BoxCollider_1 = BoxCollider_1_1;
             },
             function (quest_game_1_1) {
                 quest_game_1 = quest_game_1_1;
@@ -1674,7 +1718,6 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
                 function Player(position) {
                     var _this = _super.call(this) || this;
                     _this.speed = 0.07;
-                    _this._isMoving = false;
                     _this._position = position;
                     return _this;
                 }
@@ -1690,7 +1733,7 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
                     this.swordAnim = this.entity.addComponent(new AnimatedTileComponent_1.AnimatedTileComponent(new TileSetAnimation_1.TileSetAnimation([
                         [tiles_1.Tile.SWORD_1, 500],
                     ])));
-                    this.collider = this.entity.addComponent(new collision_1.BoxCollider(this.position, new point_15.Point(tiles_1.TILE_SIZE, tiles_1.TILE_SIZE)));
+                    this.collider = this.entity.addComponent(new BoxCollider_1.BoxCollider(this.position, new point_15.Point(tiles_1.TILE_SIZE, tiles_1.TILE_SIZE)));
                 };
                 Player.prototype.update = function (updateData) {
                     var dx = 0;
@@ -1716,35 +1759,40 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
                     if (updateData.input.isKeyDown(70 /* F */)) {
                         quest_game_1.game.tiles.remove(this.position.plus(this.collider.dimensions.div(2)).floorDiv(tiles_1.TILE_SIZE));
                     }
-                    var wasMoving = this._isMoving;
-                    this._isMoving = dx != 0 || dy != 0;
-                    if (this._isMoving) {
+                    var isMoving = dx != 0 || dy != 0;
+                    if (isMoving) {
                         var newPos = new point_15.Point(this._position.x + dx * updateData.elapsedTimeMillis * this.speed, this._position.y + dy * updateData.elapsedTimeMillis * this.speed);
                         this._position = this.collider.moveTo(newPos);
-                    }
-                    else if (wasMoving) {
-                        console.log("stopped moving");
                     }
                     this.characterAnim.transform.position = this._position;
                     this.swordAnim.transform.position = this._position;
                 };
                 return Player;
             }(component_5.Component));
-            exports_30("Player", Player);
+            exports_31("Player", Player);
         }
     };
 });
-System.register("game/MapGenerator", ["engine/tiles/ConnectingTile", "engine/Entity"], function (exports_31, context_31) {
+System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTile", "engine/Entity", "engine/collision/BoxCollider", "game/tiles"], function (exports_32, context_32) {
     "use strict";
-    var ConnectingTile_2, Entity_3, MapGenerator;
-    var __moduleName = context_31 && context_31.id;
+    var point_16, ConnectingTile_2, Entity_3, BoxCollider_2, tiles_2, MapGenerator;
+    var __moduleName = context_32 && context_32.id;
     return {
         setters: [
+            function (point_16_1) {
+                point_16 = point_16_1;
+            },
             function (ConnectingTile_2_1) {
                 ConnectingTile_2 = ConnectingTile_2_1;
             },
             function (Entity_3_1) {
                 Entity_3 = Entity_3_1;
+            },
+            function (BoxCollider_2_1) {
+                BoxCollider_2 = BoxCollider_2_1;
+            },
+            function (tiles_2_1) {
+                tiles_2 = tiles_2_1;
             }
         ],
         execute: function () {
@@ -1781,27 +1829,30 @@ System.register("game/MapGenerator", ["engine/tiles/ConnectingTile", "engine/Ent
                         return;
                     }
                     path.forEach(function (pt) {
-                        var entity = new Entity_3.Entity([new ConnectingTile_2.ConnectingTile(tileSchema, grid, pt)]);
+                        var entity = new Entity_3.Entity([
+                            new ConnectingTile_2.ConnectingTile(tileSchema, grid, pt),
+                            new BoxCollider_2.BoxCollider(pt.times(tiles_2.TILE_SIZE), new point_16.Point(tiles_2.TILE_SIZE, tiles_2.TILE_SIZE))
+                        ]);
                         grid.set(pt, entity);
                     });
                 };
                 return MapGenerator;
             }());
-            exports_31("MapGenerator", MapGenerator);
+            exports_32("MapGenerator", MapGenerator);
         }
     };
 });
-System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/game", "engine/View", "game/tiles", "engine/tiles/TileComponent", "game/player", "engine/tiles/TileGrid", "game/MapGenerator"], function (exports_32, context_32) {
+System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/game", "engine/View", "game/tiles", "engine/tiles/TileComponent", "game/player", "engine/tiles/TileGrid", "game/MapGenerator"], function (exports_33, context_33) {
     "use strict";
-    var Entity_4, point_16, game_1, View_2, tiles_2, TileComponent_4, player_1, TileGrid_1, MapGenerator_1, ZOOM, QuestGame, game;
-    var __moduleName = context_32 && context_32.id;
+    var Entity_4, point_17, game_1, View_2, tiles_3, TileComponent_4, player_1, TileGrid_1, MapGenerator_1, ZOOM, QuestGame, game;
+    var __moduleName = context_33 && context_33.id;
     return {
         setters: [
             function (Entity_4_1) {
                 Entity_4 = Entity_4_1;
             },
-            function (point_16_1) {
-                point_16 = point_16_1;
+            function (point_17_1) {
+                point_17 = point_17_1;
             },
             function (game_1_1) {
                 game_1 = game_1_1;
@@ -1809,8 +1860,8 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
             function (View_2_1) {
                 View_2 = View_2_1;
             },
-            function (tiles_2_1) {
-                tiles_2 = tiles_2_1;
+            function (tiles_3_1) {
+                tiles_3 = tiles_3_1;
             },
             function (TileComponent_4_1) {
                 TileComponent_4 = TileComponent_4_1;
@@ -1831,17 +1882,17 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
                 __extends(QuestGame, _super);
                 function QuestGame() {
                     var _this = _super.call(this) || this;
-                    _this.tiles = new TileGrid_1.TileGrid(tiles_2.TILE_SIZE);
-                    _this.player = new Entity_4.Entity([new player_1.Player(new point_16.Point(-2, 2).times(tiles_2.TILE_SIZE))]).getComponent(player_1.Player);
+                    _this.tiles = new TileGrid_1.TileGrid(tiles_3.TILE_SIZE);
+                    _this.player = new Entity_4.Entity([new player_1.Player(new point_17.Point(-2, 2).times(tiles_3.TILE_SIZE))]).getComponent(player_1.Player);
                     _this.gameEntityView = new View_2.View();
                     _this.uiView = {
                         zoom: ZOOM,
-                        offset: new point_16.Point(0, 0),
+                        offset: new point_17.Point(0, 0),
                         entities: _this.getUIEntities()
                     };
                     var mapGen = new MapGenerator_1.MapGenerator();
-                    mapGen.renderPath(_this.tiles, new point_16.Point(-10, -10), new point_16.Point(10, 10), tiles_2.Tile.PATH, 2);
-                    mapGen.renderPath(_this.tiles, new point_16.Point(10, -10), new point_16.Point(-10, 10), tiles_2.Tile.PATH, 5);
+                    mapGen.renderPath(_this.tiles, new point_17.Point(-10, -10), new point_17.Point(10, 10), tiles_3.Tile.PATH, 2);
+                    mapGen.renderPath(_this.tiles, new point_17.Point(10, -10), new point_17.Point(-10, 10), tiles_3.Tile.PATH, 5);
                     return _this;
                 }
                 // entities in the world space
@@ -1863,34 +1914,34 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
                 };
                 // entities whose position is fixed on the camera
                 QuestGame.prototype.getUIEntities = function () {
-                    var dimensions = new point_16.Point(25, 20); // tile dimensions
+                    var dimensions = new point_17.Point(25, 20); // tile dimensions
                     var result = [];
-                    result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_1, new point_16.Point(0, 0)));
-                    result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_3, new point_16.Point(dimensions.x - 1, 0).times(tiles_2.TILE_SIZE)));
-                    result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_5, new point_16.Point(dimensions.x - 1, dimensions.y - 1).times(tiles_2.TILE_SIZE)));
-                    result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_7, new point_16.Point(0, dimensions.y - 1).times(tiles_2.TILE_SIZE)));
+                    result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_1, new point_17.Point(0, 0)));
+                    result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_3, new point_17.Point(dimensions.x - 1, 0).times(tiles_3.TILE_SIZE)));
+                    result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_5, new point_17.Point(dimensions.x - 1, dimensions.y - 1).times(tiles_3.TILE_SIZE)));
+                    result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_7, new point_17.Point(0, dimensions.y - 1).times(tiles_3.TILE_SIZE)));
                     // horizontal lines
                     for (var i = 1; i < dimensions.x - 1; i++) {
-                        result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_2, new point_16.Point(i, 0).times(tiles_2.TILE_SIZE)));
-                        result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_6, new point_16.Point(i, dimensions.y - 1).times(tiles_2.TILE_SIZE)));
+                        result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_2, new point_17.Point(i, 0).times(tiles_3.TILE_SIZE)));
+                        result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_6, new point_17.Point(i, dimensions.y - 1).times(tiles_3.TILE_SIZE)));
                     }
                     // vertical lines
                     for (var j = 1; j < dimensions.y - 1; j++) {
-                        result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_4, new point_16.Point(dimensions.x - 1, j).times(tiles_2.TILE_SIZE)));
-                        result.push(new TileComponent_4.TileComponent(tiles_2.Tile.BORDER_8, new point_16.Point(0, j).times(tiles_2.TILE_SIZE)));
+                        result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_4, new point_17.Point(dimensions.x - 1, j).times(tiles_3.TILE_SIZE)));
+                        result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_8, new point_17.Point(0, j).times(tiles_3.TILE_SIZE)));
                     }
                     return [new Entity_4.Entity(result)];
                 };
                 return QuestGame;
             }(game_1.Game));
-            exports_32("game", game = new QuestGame());
+            exports_33("game", game = new QuestGame());
         }
     };
 });
-System.register("app", ["game/quest_game", "engine/engine"], function (exports_33, context_33) {
+System.register("app", ["game/quest_game", "engine/engine"], function (exports_34, context_34) {
     "use strict";
     var quest_game_2, engine_1;
-    var __moduleName = context_33 && context_33.id;
+    var __moduleName = context_34 && context_34.id;
     return {
         setters: [
             function (quest_game_2_1) {

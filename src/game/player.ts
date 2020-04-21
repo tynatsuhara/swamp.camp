@@ -5,9 +5,8 @@ import { UpdateData, StartData } from "../engine/engine"
 import { InputKey } from "../engine/input"
 import { Point } from "../engine/point"
 import { Tile, TILE_SIZE } from "./tiles"
-import { Entity } from "../engine/Entity"
 import { Component } from "../engine/component"
-import { BoxCollider } from "../engine/collision"
+import { BoxCollider } from "../engine/collision/BoxCollider"
 import { game } from "./quest_game"
 
 export class Player extends Component {
@@ -20,7 +19,6 @@ export class Player extends Component {
     get position(): Point {
         return this._position
     }
-    private _isMoving: boolean = false
 
     constructor(position: Point) {
         super()
@@ -55,17 +53,14 @@ export class Player extends Component {
             game.tiles.remove(this.position.plus(this.collider.dimensions.div(2)).floorDiv(TILE_SIZE))
         }
         
-        const wasMoving = this._isMoving
-        this._isMoving = dx != 0 || dy != 0
+        const isMoving = dx != 0 || dy != 0
 
-        if (this._isMoving) {
+        if (isMoving) {
             const newPos = new Point(
                 this._position.x + dx * updateData.elapsedTimeMillis * this.speed, 
                 this._position.y + dy * updateData.elapsedTimeMillis * this.speed
             )
             this._position = this.collider.moveTo(newPos)
-        } else if (wasMoving) {
-            console.log("stopped moving")
         }
 
         this.characterAnim.transform.position = this._position

@@ -3,6 +3,8 @@ import { ConnectingTileSchema } from "../engine/tiles/ConnectingTileSchema"
 import { ConnectingTile } from "../engine/tiles/ConnectingTile"
 import { TileGrid } from "../engine/tiles/TileGrid"
 import { Entity } from "../engine/Entity"
+import { BoxCollider } from "../engine/collision/BoxCollider"
+import { TILE_SIZE } from "./tiles"
 
 export class MapGenerator {
 
@@ -51,7 +53,10 @@ export class MapGenerator {
         }
 
         path.forEach(pt => {
-            const entity = new Entity([new ConnectingTile(tileSchema, grid, pt)])
+            const entity = new Entity([
+                new ConnectingTile(tileSchema, grid, pt),
+                new BoxCollider(pt.times(TILE_SIZE), new Point(TILE_SIZE, TILE_SIZE))
+            ])
             grid.set(pt, entity)
         })
     }

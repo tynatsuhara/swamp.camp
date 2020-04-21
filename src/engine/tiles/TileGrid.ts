@@ -10,6 +10,8 @@ import { Tile } from "../../game/tiles"
 /**
  * A tile grid that uses tile dimensions instead of pixel dimensions
  * (A tile is 1x1 instead of TILE_SIZExTILE_SIZE, then scaled to render)
+ * 
+ * TODO is this class serving a purpose?
  */
 export class TileGrid extends Grid<Entity> {
     readonly tileSize: number
