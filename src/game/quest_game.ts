@@ -12,6 +12,7 @@ import { TileSource } from "../engine/tiles/TileSource"
 import { Player } from "./player"
 import { BoxCollider } from "../engine/collision"
 import { TileGrid } from "../engine/tiles/TileGrid"
+import { MapGenerator } from "./MapGenerator"
 
 const ZOOM = 2.5
 
@@ -30,15 +31,10 @@ class QuestGame extends Game {
     constructor() {
         super()
 
-        this.renderPath(new Point(-10, -10), new Point(10, 10), 5)
-        this.renderPath(new Point(10, -10), new Point(-10, 10), 15)
+        const mapGen = new MapGenerator()
 
-        // this.renderPath(new Point(0, -10), new Point(0, 10), 15)
-        // this.renderPath(new Point(10, 0), new Point(-10, 0), 15)
-    }
-
-    renderPath(start: Point, end: Point, randomness) {
-        this.tiles.renderPath(start, end, Tile.PATH, randomness)
+        mapGen.renderPath(this.tiles, new Point(-10, -10), new Point(10, 10), Tile.PATH, 2)
+        mapGen.renderPath(this.tiles, new Point(10, -10), new Point(-10, 10), Tile.PATH, 5)
     }
 
     // entities in the world space
@@ -57,7 +53,7 @@ class QuestGame extends Game {
         this.gameEntityView = { 
             zoom: ZOOM,
             offset: this.gameEntityView.offset.lerp(.0018 * updateViewsContext.elapsedTimeMillis, cameraGoal),
-            entities: this.tiles.entities().concat([this.player.entity])
+            entities: this.tiles.entries().concat([this.player.entity])
         }
     }
 
