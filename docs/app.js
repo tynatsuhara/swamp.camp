@@ -102,7 +102,8 @@ System.register("engine/renderer/RenderContext", ["engine/point"], function (exp
         ],
         execute: function () {
             RenderContext = /** @class */ (function () {
-                function RenderContext(context, view) {
+                function RenderContext(canvas, context, view) {
+                    this.canvas = canvas;
                     this.context = context;
                     this.view = view;
                 }
@@ -142,19 +143,25 @@ System.register("engine/renderer/RenderContext", ["engine/point"], function (exp
                  * @param mirrorY
                  */
                 RenderContext.prototype.drawImage = function (source, sourcePosition, sourceDimensions, destPosition, destDimensions, rotation, pixelPerfect, mirrorX, mirrorY) {
-                    this.context.save();
                     var mirroredOffset = new point_2.Point(mirrorX ? destDimensions.x : 0, mirrorY ? destDimensions.y : 0);
                     var scaledDestPosition = destPosition.plus(this.view.offset).plus(mirroredOffset).times(this.view.zoom);
                     if (pixelPerfect) {
                         scaledDestPosition = this.pixelize(scaledDestPosition);
                     }
+                    var scaledDestDimensions = destDimensions.times(this.view.zoom);
+                    if (scaledDestPosition.x > this.canvas.width
+                        || scaledDestPosition.x + scaledDestDimensions.x < 0
+                        || scaledDestPosition.y > this.canvas.height
+                        || scaledDestPosition.y + scaledDestDimensions.y < 0) {
+                        return;
+                    }
+                    this.context.save();
                     this.context.translate(scaledDestPosition.x, scaledDestPosition.y);
                     this.context.scale(mirrorX ? -1 : 1, mirrorY ? -1 : 1);
                     var rotationTranslate = destDimensions.div(2).times(this.view.zoom);
                     this.context.translate(rotationTranslate.x, rotationTranslate.y);
                     this.context.rotate(rotation * Math.PI / 180);
                     this.context.translate(-rotationTranslate.x, -rotationTranslate.y);
-                    var scaledDestDimensions = destDimensions.times(this.view.zoom);
                     this.context.drawImage(source, sourcePosition.x, sourcePosition.y, sourceDimensions.x, sourceDimensions.y, 0, 0, scaledDestDimensions.x, scaledDestDimensions.y);
                     this.context.restore();
                 };
@@ -221,7 +228,7 @@ System.register("engine/renderer/Renderer", ["engine/point", "engine/renderer/Re
                     return new point_3.Point(this.canvas.width, this.canvas.height);
                 };
                 Renderer.prototype.renderView = function (view) {
-                    var viewRenderContext = new RenderContext_1.RenderContext(this.context, view);
+                    var viewRenderContext = new RenderContext_1.RenderContext(this.canvas, this.context, view);
                     view.entities
                         .filter(function (entity) { return !!entity; })
                         .flatMap(function (entity) { return entity.components; })

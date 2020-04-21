@@ -2,11 +2,12 @@ import { View } from "../View"
 import { Point } from "../point"
 
 export class RenderContext {
-
+    private readonly canvas: HTMLCanvasElement
     private readonly context: CanvasRenderingContext2D
     private readonly view: View
 
-    constructor(context: CanvasRenderingContext2D, view: View) {
+    constructor(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, view: View) {
+        this.canvas = canvas
         this.context = context
         this.view = view
     }
@@ -44,14 +45,21 @@ export class RenderContext {
         mirrorX: boolean,
         mirrorY: boolean
     ): void {
-        this.context.save()
-
         const mirroredOffset = new Point(mirrorX ? destDimensions.x : 0, mirrorY ? destDimensions.y : 0)
         let scaledDestPosition = destPosition.plus(this.view.offset).plus(mirroredOffset).times(this.view.zoom)
         if (pixelPerfect) {
             scaledDestPosition = this.pixelize(scaledDestPosition)
         }
+        const scaledDestDimensions = destDimensions.times(this.view.zoom)
 
+        if (scaledDestPosition.x > this.canvas.width 
+            || scaledDestPosition.x + scaledDestDimensions.x < 0
+            || scaledDestPosition.y > this.canvas.height
+            || scaledDestPosition.y + scaledDestDimensions.y < 0) {
+            return
+        }
+
+        this.context.save()
         this.context.translate(scaledDestPosition.x, scaledDestPosition.y)
         this.context.scale(mirrorX ? -1 : 1, mirrorY ? -1 : 1)
 
@@ -59,8 +67,6 @@ export class RenderContext {
         this.context.translate(rotationTranslate.x, rotationTranslate.y)
         this.context.rotate(rotation * Math.PI/180)
         this.context.translate(-rotationTranslate.x, -rotationTranslate.y)
-
-        const scaledDestDimensions = destDimensions.times(this.view.zoom)
 
         this.context.drawImage(
             source, 

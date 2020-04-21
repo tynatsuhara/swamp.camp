@@ -29,7 +29,7 @@ export class Renderer {
     }
 
     renderView(view: View) {
-        const viewRenderContext = new RenderContext(this.context, view)
+        const viewRenderContext = new RenderContext(this.canvas, this.context, view)
         view.entities
                 .filter(entity => !!entity)
                 .flatMap(entity => entity.components)
