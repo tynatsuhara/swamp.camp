@@ -1842,6 +1842,7 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
                 function Player(position) {
                     var _this = _super.call(this) || this;
                     _this.speed = 0.07;
+                    _this.lastMoveDir = new point_16.Point(1, 0);
                     _this._position = position;
                     return _this;
                 }
@@ -1858,6 +1859,7 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
                         [tiles_1.Tile.SWORD_1, 500],
                     ])));
                     this.collider = this.entity.addComponent(new BoxCollider_1.BoxCollider(this.position, new point_16.Point(tiles_1.TILE_SIZE, tiles_1.TILE_SIZE)));
+                    this.crosshairs = this.entity.addComponent(new TileComponent_3.TileComponent(tiles_1.Tile.CROSSHAIRS));
                 };
                 Player.prototype.update = function (updateData) {
                     var dx = 0;
@@ -1880,16 +1882,19 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
                     else if (dx > 0) {
                         this.characterAnim.transform.mirrorX = false;
                     }
-                    if (updateData.input.isKeyDown(70 /* F */)) {
-                        quest_game_1.game.tiles.remove(this.position.plus(this.collider.dimensions.div(2)).floorDiv(tiles_1.TILE_SIZE));
-                    }
                     var isMoving = dx != 0 || dy != 0;
                     if (isMoving) {
                         var newPos = new point_16.Point(this._position.x + dx * updateData.elapsedTimeMillis * this.speed, this._position.y + dy * updateData.elapsedTimeMillis * this.speed);
                         this._position = this.collider.moveTo(newPos);
+                        this.lastMoveDir = new point_16.Point(dx, dy);
                     }
-                    this.characterAnim.transform.position = this._position;
-                    this.swordAnim.transform.position = this._position;
+                    this.characterAnim.transform.position = this.position;
+                    this.swordAnim.transform.position = this.position;
+                    this.crosshairs.transform.position = this.crosshairs.transform.position.lerp(0.4, this.position.plus(this.lastMoveDir.times(tiles_1.TILE_SIZE)));
+                    if (updateData.input.isKeyDown(70 /* F */)) {
+                        var cursorPos = this.crosshairs.transform.position;
+                        quest_game_1.game.tiles.remove(this.crosshairs.transform.position.plus(new point_16.Point(tiles_1.TILE_SIZE, tiles_1.TILE_SIZE).div(2)).floorDiv(tiles_1.TILE_SIZE));
+                    }
                 };
                 return Player;
             }(component_5.Component));

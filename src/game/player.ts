@@ -14,6 +14,8 @@ export class Player extends Component {
     private characterAnim: TileComponent
     private swordAnim: AnimatedTileComponent
     private collider: BoxCollider
+    private crosshairs: TileComponent
+    private lastMoveDir: Point = new Point(1, 0)
 
     private _position: Point
     get position(): Point {
@@ -32,6 +34,8 @@ export class Player extends Component {
             // [Tile.ARC, 100]
         ])))
         this.collider = this.entity.addComponent(new BoxCollider(this.position, new Point(TILE_SIZE, TILE_SIZE)))
+        
+        this.crosshairs = this.entity.addComponent(new TileComponent(Tile.CROSSHAIRS))
     }
 
     update(updateData: UpdateData) {
@@ -48,10 +52,6 @@ export class Player extends Component {
         } else if (dx > 0) {
             this.characterAnim.transform.mirrorX = false
         }
-
-        if (updateData.input.isKeyDown(InputKey.F)) {
-            game.tiles.remove(this.position.plus(this.collider.dimensions.div(2)).floorDiv(TILE_SIZE))
-        }
         
         const isMoving = dx != 0 || dy != 0
 
@@ -61,9 +61,16 @@ export class Player extends Component {
                 this._position.y + dy * updateData.elapsedTimeMillis * this.speed
             )
             this._position = this.collider.moveTo(newPos)
+            this.lastMoveDir = new Point(dx, dy)
         }
 
-        this.characterAnim.transform.position = this._position
-        this.swordAnim.transform.position = this._position
+        this.characterAnim.transform.position = this.position
+        this.swordAnim.transform.position = this.position
+        this.crosshairs.transform.position = this.crosshairs.transform.position.lerp(0.4, this.position.plus(this.lastMoveDir.times(TILE_SIZE)))
+
+        if (updateData.input.isKeyDown(InputKey.F)) {
+            const cursorPos = this.crosshairs.transform.position
+            game.tiles.remove(this.crosshairs.transform.position.plus(new Point(TILE_SIZE, TILE_SIZE).div(2)).floorDiv(TILE_SIZE))
+        }
     }
 }
