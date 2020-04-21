@@ -9,8 +9,8 @@ export class BoxCollider extends Collider {
 
     readonly dimensions: Point
 
-    constructor(position: Point, dimensions: Point) {
-        super(position)
+    constructor(position: Point, dimensions: Point, isTrigger: boolean = false) {
+        super(position, isTrigger)
         this.dimensions = dimensions
     }
 

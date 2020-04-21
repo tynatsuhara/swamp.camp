@@ -47,7 +47,7 @@ class CollisionEngine {
     }
 
     checkCollider(collider: Collider) {
-        this.colliders.filter(other => other !== collider && other.entity).forEach(other => {
+        this.colliders.filter(other => other !== collider && other.entity && other.isTrigger).forEach(other => {
             const isColliding = other.getPoints().some(pt => collider.isWithinBounds(pt))
             collider.updateColliding(other, isColliding)
             other.updateColliding(collider, isColliding)
@@ -58,7 +58,7 @@ class CollisionEngine {
     // This DOES NOT check for any possible colliders in the path of the collision and should only be used for small translations.
     canTranslate(collider, translation: Point): boolean {
         const translatedPoints = collider.getPoints().map(pt => pt.plus(translation))
-        return !this.colliders.filter(other => other !== collider && other.entity).some(other => {
+        return !this.colliders.filter(other => other !== collider && other.entity && !other.isTrigger).some(other => {
             return translatedPoints.some(pt => other.isWithinBounds(pt))
         }) 
     }
@@ -67,19 +67,23 @@ class CollisionEngine {
 const ENGINE = new CollisionEngine()
 
 /**
- * 
+ * A collider detects intersections with other colliders. If isTrigger=true, a collider
+ * just calls the callback functions and does not block the other collider. If isTrigger=false,
+ * other colliders will not be able to move in to this collider's space, and callbacks won't be triggered.
  */
 export abstract class Collider extends Component {
 
     private _position: Point  // top-left
     get position() { return this._position }
+    isTrigger: boolean
     
     readonly collidingWith: Set<Collider> = new Set()
     private onColliderEnterCallback: (collider: Collider) => void = () => {}
 
-    constructor(position: Point) {
+    constructor(position: Point, isTrigger: boolean) {
         super()
         this._position = position
+        this.isTrigger = isTrigger
         ENGINE.registerCollider(this)
     }
 
@@ -92,14 +96,17 @@ export abstract class Collider extends Component {
     moveTo(point: Point): Point {
         const dx = point.x - this.position.x
         const dy = point.y - this.position.y
+        // TODO: Should these branches be handled by the caller?
         if (ENGINE.canTranslate(this, new Point(dx, dy))) {
             this._position = point
+            ENGINE.checkCollider(this)
         } else if (ENGINE.canTranslate(this, new Point(dx, 0))) {
             this._position = this._position.plus(new Point(dx, 0))
+            ENGINE.checkCollider(this)
         } else if (ENGINE.canTranslate(this, new Point(0, dy))) {
             this._position = this._position.plus(new Point(0, dy))
+            ENGINE.checkCollider(this)
         }
-        ENGINE.checkCollider(this)  // since this is all syncronous, it will work
         return this.position
     }
 

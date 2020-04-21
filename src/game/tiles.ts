@@ -69,6 +69,7 @@ export class Tile {
     static DPAD_RIGHT = Tile.get(29, 22)
     static DPAD_DOWN = Tile.get(30, 22)
     static DPAD_LEFT = Tile.get(31, 22)
+    static CROSSHAIRS = Tile.get(25, 14)
 
     static PATH = new ConnectingTileSchema()
             .vertical(Tile.get(8, 1))

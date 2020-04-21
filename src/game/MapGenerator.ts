@@ -55,6 +55,7 @@ export class MapGenerator {
         path.forEach(pt => {
             const entity = new Entity([
                 new ConnectingTile(tileSchema, grid, pt),
+                new BoxCollider(pt.times(TILE_SIZE), new Point(TILE_SIZE, TILE_SIZE), true)
             ])
             grid.set(pt, entity)
         })
