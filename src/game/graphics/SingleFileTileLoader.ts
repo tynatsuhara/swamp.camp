@@ -10,7 +10,7 @@ export class SingleFileTileLoader implements TileLoader {
     private readonly tileSize: number
     private readonly padding: number
 
-    constructor(filename: string, map: Map<string, Point>, tileSize: number = 16, padding = 1) {
+    constructor(filename: string, map: Map<string, Point> = new Map(), tileSize: number = 16, padding = 1) {
         this.filename = filename
         this.map = map
         this.tileSize = tileSize
@@ -22,9 +22,13 @@ export class SingleFileTileLoader implements TileLoader {
         if (!!result) {
             return null
         }
+        return this.getTileAt(result)
+    }
+
+    getTileAt(pos: Point) {
         return new TileSource(
             assets.getImageByFileName(this.filename), 
-            result.times(this.tileSize + this.padding), 
+            pos.times(this.tileSize + this.padding), 
             new Point(this.tileSize, this.tileSize)
         )
     }

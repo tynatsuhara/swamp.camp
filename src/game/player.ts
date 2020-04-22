@@ -31,7 +31,9 @@ export class Player extends Component {
     }
 
     start(startData: StartData) {
-        this.characterAnim = this.entity.addComponent(new AnimatedTileComponent(TileManager.instance.getTileSetAnimation("knight_f_idle_anim", 120)))
+        // TODO make animations triggerable so we can switch between run and idle
+        this.characterAnim = this.entity.addComponent(new AnimatedTileComponent(TileManager.instance.dungeonCharacters.getTileSetAnimation("knight_f_idle_anim", 120)))
+        
         // this.swordAnim = this.entity.addComponent(new AnimatedTileComponent(new TileSetAnimation([
         //     [Tile.SWORD_1, 500],
         //     // [Tile.ARC, 100]

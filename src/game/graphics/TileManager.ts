@@ -5,6 +5,7 @@ import { TileSource } from "../../engine/tiles/TileSource"
 import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
 import { assets } from "../../engine/Assets"
 import { SplitFileTileLoader } from "./SplitFileTileLoader"
+import { Point } from "../../engine/point"
 
 // standard tile size
 export const TILE_SIZE = 16
@@ -16,39 +17,14 @@ export class TileManager {
 
     static instance: TileManager
 
-    private readonly sources: TileLoader[]
+    readonly dungeonCharacters = new DungeonTilesetII()
+    readonly dungeonTiles = new SingleFileTileLoader("images/env_dungeon.png")
+    readonly indoorTiles = new SingleFileTileLoader("images/env_indoor.png", new Map())
+    readonly outdoorTiles = new SingleFileTileLoader("images/env_outdoor.png", new Map())
+    readonly otherCharacters = new SplitFileTileLoader("images/individual_characters")
 
     constructor() {
         TileManager.instance = this
-        
-        this.sources = [
-            new DungeonTilesetII(),
-            new SingleFileTileLoader("images/env_dungeon.png", new Map()),  // todo add key to point mappings
-            new SingleFileTileLoader("images/env_indoor.png", new Map()),
-            new SingleFileTileLoader("images/env_outdoor.png", new Map()),
-            new SplitFileTileLoader("images/individual_characters")
-        ]
-    }
-
-    getTileSource(key: string): TileSource {
-        for (const source of this.sources) {
-            const result = source.getTileSource(key)
-            if (!!result) {
-                return result
-            }
-        }
-    }
-
-    /**
-     * @param speed the ms spent on each frame
-     */
-    getTileSetAnimation(key: string, speed: number): TileSetAnimation {
-        for (const source of this.sources) {
-            const result = source.getTileSetAnimation(key, speed)
-            if (!!result) {
-                return result
-            }
-        }
     }
 
     // loaded before the engine starts running the game

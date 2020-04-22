@@ -7,12 +7,9 @@ import { TileComponent } from "../engine/tiles/TileComponent"
 import { Player } from "./player"
 import { TileGrid } from "../engine/tiles/TileGrid"
 import { MapGenerator } from "./MapGenerator"
-import { Clickable } from "../engine/ui/Clickable"
-import { Interactable } from "./Interactable"
-import { BoxCollider } from "../engine/collision/BoxCollider"
 import { AnimatedTileComponent } from "../engine/tiles/AnimatedTileComponent"
 import { TileManager, TILE_SIZE } from "./graphics/TileManager"
-import { assets } from "../engine/Assets"
+import { ConnectingTileSchema } from "../engine/tiles/ConnectingTileSchema"
 
 
 const ZOOM = 3.125
@@ -32,8 +29,8 @@ export class QuestGame extends Game {
     }
 
     initialize() {
-        this.enemies.push(new Entity([new AnimatedTileComponent(this.tileManager.getTileSetAnimation("knight_f_run_anim", 100), new Point(20, 30))]))
-        this.enemies.push(new Entity([new AnimatedTileComponent(this.tileManager.getTileSetAnimation("knight_f_idle_anim", 100), new Point(40, 30))]))
+        this.enemies.push(new Entity([new AnimatedTileComponent(this.tileManager.dungeonCharacters.getTileSetAnimation("knight_f_run_anim", 100), new Point(20, 30))]))
+        this.enemies.push(new Entity([new AnimatedTileComponent(this.tileManager.dungeonCharacters.getTileSetAnimation("knight_f_idle_anim", 100), new Point(40, 30))]))
 
         // const rockPt = new Point(5, 5)
         // this.tiles.set(rockPt, new Entity([
@@ -43,10 +40,10 @@ export class QuestGame extends Game {
         //     new BoxCollider(rockPt.times(TILE_SIZE), new Point(TILE_SIZE, TILE_SIZE))
         // ]))
 
-        // const mapGen = new MapGenerator()
+        const mapGen = new MapGenerator()
 
-        // mapGen.renderPath(this.tiles, new Point(-10, -10), new Point(10, 10), Tile.PATH, 2)
-        // mapGen.renderPath(this.tiles, new Point(10, -10), new Point(-10, 10), Tile.PATH, 5)
+        mapGen.renderPath(this.tiles, new Point(-10, -10), new Point(10, 10), mapGen.pathSchema, 2)
+        mapGen.renderPath(this.tiles, new Point(10, -10), new Point(-10, 10), mapGen.pathSchema, 5)
     }
 
     // entities in the world space
@@ -74,7 +71,7 @@ export class QuestGame extends Game {
     // entities whose position is fixed on the camera
     getUIEntities(): Entity[] {
 
-        const coin = new AnimatedTileComponent(this.tileManager.getTileSetAnimation("coin_anim", 150))
+        const coin = new AnimatedTileComponent(this.tileManager.dungeonCharacters.getTileSetAnimation("coin_anim", 150))
 
 
         const dimensions = new Point(20, 16)  // tile dimensions

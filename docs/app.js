@@ -1286,6 +1286,7 @@ System.register("game/graphics/SingleFileTileLoader", ["engine/point", "engine/t
         execute: function () {
             SingleFileTileLoader = /** @class */ (function () {
                 function SingleFileTileLoader(filename, map, tileSize, padding) {
+                    if (map === void 0) { map = new Map(); }
                     if (tileSize === void 0) { tileSize = 16; }
                     if (padding === void 0) { padding = 1; }
                     this.filename = filename;
@@ -1298,7 +1299,10 @@ System.register("game/graphics/SingleFileTileLoader", ["engine/point", "engine/t
                     if (!!result) {
                         return null;
                     }
-                    return new TileSource_1.TileSource(Assets_1.assets.getImageByFileName(this.filename), result.times(this.tileSize + this.padding), new point_11.Point(this.tileSize, this.tileSize));
+                    return this.getTileAt(result);
+                };
+                SingleFileTileLoader.prototype.getTileAt = function (pos) {
+                    return new TileSource_1.TileSource(Assets_1.assets.getImageByFileName(this.filename), pos.times(this.tileSize + this.padding), new point_11.Point(this.tileSize, this.tileSize));
                 };
                 SingleFileTileLoader.prototype.getTileSetAnimation = function (key, speed) {
                     throw new Error("Method not implemented.");
@@ -1434,36 +1438,13 @@ System.register("game/graphics/TileManager", ["game/graphics/SingleFileTileLoade
              */
             TileManager = /** @class */ (function () {
                 function TileManager() {
+                    this.dungeonCharacters = new DungeonTilesetII_1.DungeonTilesetII();
+                    this.dungeonTiles = new SingleFileTileLoader_1.SingleFileTileLoader("images/env_dungeon.png");
+                    this.indoorTiles = new SingleFileTileLoader_1.SingleFileTileLoader("images/env_indoor.png", new Map());
+                    this.outdoorTiles = new SingleFileTileLoader_1.SingleFileTileLoader("images/env_outdoor.png", new Map());
+                    this.otherCharacters = new SplitFileTileLoader_1.SplitFileTileLoader("images/individual_characters");
                     TileManager.instance = this;
-                    this.sources = [
-                        new DungeonTilesetII_1.DungeonTilesetII(),
-                        new SingleFileTileLoader_1.SingleFileTileLoader("images/env_dungeon.png", new Map()),
-                        new SingleFileTileLoader_1.SingleFileTileLoader("images/env_indoor.png", new Map()),
-                        new SingleFileTileLoader_1.SingleFileTileLoader("images/env_outdoor.png", new Map()),
-                        new SplitFileTileLoader_1.SplitFileTileLoader("images/individual_characters")
-                    ];
                 }
-                TileManager.prototype.getTileSource = function (key) {
-                    for (var _i = 0, _a = this.sources; _i < _a.length; _i++) {
-                        var source = _a[_i];
-                        var result = source.getTileSource(key);
-                        if (!!result) {
-                            return result;
-                        }
-                    }
-                };
-                /**
-                 * @param speed the ms spent on each frame
-                 */
-                TileManager.prototype.getTileSetAnimation = function (key, speed) {
-                    for (var _i = 0, _a = this.sources; _i < _a.length; _i++) {
-                        var source = _a[_i];
-                        var result = source.getTileSetAnimation(key, speed);
-                        if (!!result) {
-                            return result;
-                        }
-                    }
-                };
                 // loaded before the engine starts running the game
                 TileManager.getFilesToLoad = function () {
                     return [
@@ -1884,7 +1865,8 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/po
                     configurable: true
                 });
                 Player.prototype.start = function (startData) {
-                    this.characterAnim = this.entity.addComponent(new AnimatedTileComponent_1.AnimatedTileComponent(TileManager_1.TileManager.instance.getTileSetAnimation("knight_f_idle_anim", 120)));
+                    // TODO make animations triggerable so we can switch between run and idle
+                    this.characterAnim = this.entity.addComponent(new AnimatedTileComponent_1.AnimatedTileComponent(TileManager_1.TileManager.instance.dungeonCharacters.getTileSetAnimation("knight_f_idle_anim", 120)));
                     // this.swordAnim = this.entity.addComponent(new AnimatedTileComponent(new TileSetAnimation([
                     //     [Tile.SWORD_1, 500],
                     //     // [Tile.ARC, 100]
@@ -2364,14 +2346,17 @@ System.register("engine/tiles/ConnectingTileSchema", ["engine/point", "engine/ti
         }
     };
 });
-System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTile", "engine/Entity", "engine/collision/BoxCollider", "game/graphics/TileManager"], function (exports_37, context_37) {
+System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTileSchema", "engine/tiles/ConnectingTile", "engine/Entity", "engine/collision/BoxCollider", "game/graphics/TileManager"], function (exports_37, context_37) {
     "use strict";
-    var point_18, ConnectingTile_2, Entity_3, BoxCollider_2, TileManager_2, MapGenerator;
+    var point_18, ConnectingTileSchema_1, ConnectingTile_2, Entity_3, BoxCollider_2, TileManager_2, MapGenerator;
     var __moduleName = context_37 && context_37.id;
     return {
         setters: [
             function (point_18_1) {
                 point_18 = point_18_1;
+            },
+            function (ConnectingTileSchema_1_1) {
+                ConnectingTileSchema_1 = ConnectingTileSchema_1_1;
             },
             function (ConnectingTile_2_1) {
                 ConnectingTile_2 = ConnectingTile_2_1;
@@ -2389,6 +2374,13 @@ System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTi
         execute: function () {
             MapGenerator = /** @class */ (function () {
                 function MapGenerator() {
+                    this.pathSchema = new ConnectingTileSchema_1.ConnectingTileSchema()
+                        .vertical(TileManager_2.TileManager.instance.outdoorTiles.getTileAt(new point_18.Point(9, 7)))
+                        .angle(TileManager_2.TileManager.instance.outdoorTiles.getTileAt(new point_18.Point(7, 7)))
+                        .tShape(TileManager_2.TileManager.instance.outdoorTiles.getTileAt(new point_18.Point(5, 8)))
+                        .plusShape(TileManager_2.TileManager.instance.outdoorTiles.getTileAt(new point_18.Point(7, 12)))
+                        .cap(TileManager_2.TileManager.instance.outdoorTiles.getTileAt(new point_18.Point(6, 11)))
+                        .single(TileManager_2.TileManager.instance.outdoorTiles.getTileAt(new point_18.Point(8, 12)));
                 }
                 MapGenerator.prototype.renderPath = function (grid, start, end, tileSchema, randomness) {
                     var heuristic = function (pt) {
@@ -2433,44 +2425,10 @@ System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTi
         }
     };
 });
-System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"], function (exports_38, context_38) {
+System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/game", "engine/View", "game/player", "engine/tiles/TileGrid", "game/MapGenerator", "engine/tiles/AnimatedTileComponent", "game/graphics/TileManager"], function (exports_38, context_38) {
     "use strict";
-    var component_7, utils_3, Clickable;
+    var Entity_4, point_19, game_1, View_2, player_1, TileGrid_1, MapGenerator_1, AnimatedTileComponent_2, TileManager_3, ZOOM, QuestGame;
     var __moduleName = context_38 && context_38.id;
-    return {
-        setters: [
-            function (component_7_1) {
-                component_7 = component_7_1;
-            },
-            function (utils_3_1) {
-                utils_3 = utils_3_1;
-            }
-        ],
-        execute: function () {
-            Clickable = /** @class */ (function (_super) {
-                __extends(Clickable, _super);
-                function Clickable(position, dimensions, onClick) {
-                    var _this = _super.call(this) || this;
-                    _this.position = position;
-                    _this.dimensions = dimensions;
-                    _this.onClick = onClick;
-                    return _this;
-                }
-                Clickable.prototype.update = function (updateData) {
-                    if (updateData.input.isMouseDown && utils_3.rectContains(this.position, this.dimensions, updateData.input.mousePos)) {
-                        this.onClick();
-                    }
-                };
-                return Clickable;
-            }(component_7.Component));
-            exports_38("Clickable", Clickable);
-        }
-    };
-});
-System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/game", "engine/View", "game/player", "engine/tiles/TileGrid", "engine/tiles/AnimatedTileComponent", "game/graphics/TileManager"], function (exports_39, context_39) {
-    "use strict";
-    var Entity_4, point_19, game_1, View_2, player_1, TileGrid_1, AnimatedTileComponent_2, TileManager_3, ZOOM, QuestGame;
-    var __moduleName = context_39 && context_39.id;
     return {
         setters: [
             function (Entity_4_1) {
@@ -2490,6 +2448,9 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
             },
             function (TileGrid_1_1) {
                 TileGrid_1 = TileGrid_1_1;
+            },
+            function (MapGenerator_1_1) {
+                MapGenerator_1 = MapGenerator_1_1;
             },
             function (AnimatedTileComponent_2_1) {
                 AnimatedTileComponent_2 = AnimatedTileComponent_2_1;
@@ -2517,8 +2478,8 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
                     return _this;
                 }
                 QuestGame.prototype.initialize = function () {
-                    this.enemies.push(new Entity_4.Entity([new AnimatedTileComponent_2.AnimatedTileComponent(this.tileManager.getTileSetAnimation("knight_f_run_anim", 100), new point_19.Point(20, 30))]));
-                    this.enemies.push(new Entity_4.Entity([new AnimatedTileComponent_2.AnimatedTileComponent(this.tileManager.getTileSetAnimation("knight_f_idle_anim", 100), new point_19.Point(40, 30))]));
+                    this.enemies.push(new Entity_4.Entity([new AnimatedTileComponent_2.AnimatedTileComponent(this.tileManager.dungeonCharacters.getTileSetAnimation("knight_f_run_anim", 100), new point_19.Point(20, 30))]));
+                    this.enemies.push(new Entity_4.Entity([new AnimatedTileComponent_2.AnimatedTileComponent(this.tileManager.dungeonCharacters.getTileSetAnimation("knight_f_idle_anim", 100), new point_19.Point(40, 30))]));
                     // const rockPt = new Point(5, 5)
                     // this.tiles.set(rockPt, new Entity([
                     //     new TileComponent(Tile.ROCKS, rockPt.times(TILE_SIZE)),
@@ -2526,9 +2487,9 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
                     //     new Interactable(() => console.log("interacted with a fuckin' rock!")),
                     //     new BoxCollider(rockPt.times(TILE_SIZE), new Point(TILE_SIZE, TILE_SIZE))
                     // ]))
-                    // const mapGen = new MapGenerator()
-                    // mapGen.renderPath(this.tiles, new Point(-10, -10), new Point(10, 10), Tile.PATH, 2)
-                    // mapGen.renderPath(this.tiles, new Point(10, -10), new Point(-10, 10), Tile.PATH, 5)
+                    var mapGen = new MapGenerator_1.MapGenerator();
+                    mapGen.renderPath(this.tiles, new point_19.Point(-10, -10), new point_19.Point(10, 10), mapGen.pathSchema, 2);
+                    mapGen.renderPath(this.tiles, new point_19.Point(10, -10), new point_19.Point(-10, 10), mapGen.pathSchema, 5);
                 };
                 // entities in the world space
                 QuestGame.prototype.getViews = function (updateViewsContext) {
@@ -2551,7 +2512,7 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
                 };
                 // entities whose position is fixed on the camera
                 QuestGame.prototype.getUIEntities = function () {
-                    var coin = new AnimatedTileComponent_2.AnimatedTileComponent(this.tileManager.getTileSetAnimation("coin_anim", 150));
+                    var coin = new AnimatedTileComponent_2.AnimatedTileComponent(this.tileManager.dungeonCharacters.getTileSetAnimation("coin_anim", 150));
                     var dimensions = new point_19.Point(20, 16); // tile dimensions
                     var result = [];
                     // result.push(new TileComponent(Tile.BORDER_1, new Point(0, 0)))
@@ -2572,14 +2533,14 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
                 };
                 return QuestGame;
             }(game_1.Game));
-            exports_39("QuestGame", QuestGame);
+            exports_38("QuestGame", QuestGame);
         }
     };
 });
-System.register("app", ["game/quest_game", "engine/engine", "game/graphics/TileManager", "engine/Assets"], function (exports_40, context_40) {
+System.register("app", ["game/quest_game", "engine/engine", "game/graphics/TileManager", "engine/Assets"], function (exports_39, context_39) {
     "use strict";
     var quest_game_1, engine_1, TileManager_4, Assets_4;
-    var __moduleName = context_40 && context_40.id;
+    var __moduleName = context_39 && context_39.id;
     return {
         setters: [
             function (quest_game_1_1) {
@@ -2599,6 +2560,40 @@ System.register("app", ["game/quest_game", "engine/engine", "game/graphics/TileM
             Assets_4.assets.loadImageFiles(TileManager_4.TileManager.getFilesToLoad()).then(function () {
                 new engine_1.Engine(new quest_game_1.QuestGame(), document.getElementById('canvas'));
             });
+        }
+    };
+});
+System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"], function (exports_40, context_40) {
+    "use strict";
+    var component_7, utils_3, Clickable;
+    var __moduleName = context_40 && context_40.id;
+    return {
+        setters: [
+            function (component_7_1) {
+                component_7 = component_7_1;
+            },
+            function (utils_3_1) {
+                utils_3 = utils_3_1;
+            }
+        ],
+        execute: function () {
+            Clickable = /** @class */ (function (_super) {
+                __extends(Clickable, _super);
+                function Clickable(position, dimensions, onClick) {
+                    var _this = _super.call(this) || this;
+                    _this.position = position;
+                    _this.dimensions = dimensions;
+                    _this.onClick = onClick;
+                    return _this;
+                }
+                Clickable.prototype.update = function (updateData) {
+                    if (updateData.input.isMouseDown && utils_3.rectContains(this.position, this.dimensions, updateData.input.mousePos)) {
+                        this.onClick();
+                    }
+                };
+                return Clickable;
+            }(component_7.Component));
+            exports_40("Clickable", Clickable);
         }
     };
 });

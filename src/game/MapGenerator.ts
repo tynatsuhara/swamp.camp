@@ -4,9 +4,17 @@ import { ConnectingTile } from "../engine/tiles/ConnectingTile"
 import { TileGrid } from "../engine/tiles/TileGrid"
 import { Entity } from "../engine/Entity"
 import { BoxCollider } from "../engine/collision/BoxCollider"
-import { TILE_SIZE } from "./graphics/TileManager"
+import { TILE_SIZE, TileManager } from "./graphics/TileManager"
 
 export class MapGenerator {
+
+    readonly pathSchema = new ConnectingTileSchema()
+            .vertical(TileManager.instance.outdoorTiles.getTileAt(new Point(9, 7)))
+            .angle(TileManager.instance.outdoorTiles.getTileAt(new Point(7, 7)))
+            .tShape(TileManager.instance.outdoorTiles.getTileAt(new Point(5, 8)))
+            .plusShape(TileManager.instance.outdoorTiles.getTileAt(new Point(7, 12)))
+            .cap(TileManager.instance.outdoorTiles.getTileAt(new Point(6, 11)))
+            .single(TileManager.instance.outdoorTiles.getTileAt(new Point(8, 12)))
 
     renderPath(
         grid: TileGrid,
