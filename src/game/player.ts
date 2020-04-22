@@ -15,7 +15,7 @@ export class Player extends Component {
     private swordAnim: AnimatedTileComponent
     private collider: BoxCollider
     private crosshairs: TileComponent
-    private lastMoveDir: Point = new Point(1, 0)  // normalized relative to player
+    private lerpedLastMoveDir: Point = new Point(1, 0)  // used for crosshair
 
     private _position: Point
     get position(): Point {
@@ -34,7 +34,6 @@ export class Player extends Component {
             // [Tile.ARC, 100]
         ])))
         this.collider = this.entity.addComponent(new BoxCollider(this.position, new Point(TILE_SIZE, TILE_SIZE)))
-        
         this.crosshairs = this.entity.addComponent(new TileComponent(Tile.CROSSHAIRS))
     }
 
@@ -45,7 +44,7 @@ export class Player extends Component {
 
         // update crosshair position
         const crosshairDistance = 17
-        const relativeLerpedPos = originalCrosshairPosRelative.lerp(0.18, this.lastMoveDir.times(crosshairDistance))
+        const relativeLerpedPos = originalCrosshairPosRelative.lerp(0.18, this.lerpedLastMoveDir.normalized().times(crosshairDistance))
         this.crosshairs.transform.position = this.position.plus(relativeLerpedPos)
 
         if (updateData.input.isKeyDown(InputKey.F)) {
@@ -71,10 +70,10 @@ export class Player extends Component {
         const isMoving = dx != 0 || dy != 0
 
         if (isMoving) {
-            const translation = new Point(dx, dy).normalized()
+            const translation = new Point(dx, dy)
+            this.lerpedLastMoveDir = this.lerpedLastMoveDir.lerp(0.25, translation)
             const newPos = this._position.plus(translation.times(updateData.elapsedTimeMillis * this.speed))
             this._position = this.collider.moveTo(newPos)
-            this.lastMoveDir = translation
         }
 
         this.characterAnim.transform.position = this.position

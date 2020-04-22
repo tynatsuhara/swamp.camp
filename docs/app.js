@@ -1845,7 +1845,7 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
                 function Player(position) {
                     var _this = _super.call(this) || this;
                     _this.speed = 0.08;
-                    _this.lastMoveDir = new point_16.Point(1, 0); // normalized relative to player
+                    _this.lerpedLastMoveDir = new point_16.Point(1, 0); // used for crosshair
                     _this._position = position;
                     return _this;
                 }
@@ -1869,7 +1869,7 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
                     this.move(updateData);
                     // update crosshair position
                     var crosshairDistance = 17;
-                    var relativeLerpedPos = originalCrosshairPosRelative.lerp(0.18, this.lastMoveDir.times(crosshairDistance));
+                    var relativeLerpedPos = originalCrosshairPosRelative.lerp(0.18, this.lerpedLastMoveDir.normalized().times(crosshairDistance));
                     this.crosshairs.transform.position = this.position.plus(relativeLerpedPos);
                     if (updateData.input.isKeyDown(70 /* F */)) {
                         quest_game_1.game.tiles.remove(this.crosshairs.transform.position.plus(new point_16.Point(tiles_1.TILE_SIZE, tiles_1.TILE_SIZE).div(2)).floorDiv(tiles_1.TILE_SIZE));
@@ -1898,10 +1898,10 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
                     }
                     var isMoving = dx != 0 || dy != 0;
                     if (isMoving) {
-                        var translation = new point_16.Point(dx, dy).normalized();
+                        var translation = new point_16.Point(dx, dy);
+                        this.lerpedLastMoveDir = this.lerpedLastMoveDir.lerp(0.25, translation);
                         var newPos = this._position.plus(translation.times(updateData.elapsedTimeMillis * this.speed));
                         this._position = this.collider.moveTo(newPos);
-                        this.lastMoveDir = translation;
                     }
                     this.characterAnim.transform.position = this.position;
                     this.swordAnim.transform.position = this.position;
