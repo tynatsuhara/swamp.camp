@@ -5,21 +5,27 @@ import { TileSet } from "./TileSet"
 
 export class TileSource {
     private tileSet: TileSet
-    private tileSetIndex: Point
-    
+    private position: Point
+    private dimensions: Point
+
     /**
      * Constructs a static (non-animated) tile source
      */
-    constructor(tileSet: TileSet, tileSetIndex: Point) {
+    constructor(
+        tileSet: TileSet, 
+        position: Point,
+        dimensions: Point
+    ) {
         this.tileSet = tileSet
-        this.tileSetIndex = tileSetIndex
+        this.position = position
+        this.dimensions = dimensions
     }
 
     toImageRender(transform: TileTransform) {
         return new ImageRender(
             this.tileSet.image, 
-            new Point(this.tileSetIndex.x, this.tileSetIndex.y).times(this.tileSet.tileSize + this.tileSet.padding), 
-            new Point(this.tileSet.tileSize, this.tileSet.tileSize), 
+            this.position, //new Point(this.tileSetIndex.x, this.tileSetIndex.y).times(this.tileSet.tileSize + this.tileSet.padding), 
+            this.dimensions, 
             transform.position, 
             transform.rotation, 
             transform.scale, 

@@ -4,7 +4,7 @@ import { TileSource } from "../engine/tiles/TileSource"
 import { ConnectingTileSchema } from "../engine/tiles/ConnectingTileSchema"
 
 export const TILE_SIZE = 16
-const TILE_SET = new TileSet("tileset", TILE_SIZE, 1)
+const TILE_SET = new TileSet("tileset")
 
 export class Tile {
     // environment
@@ -131,6 +131,6 @@ export class Tile {
     }
 
     private static get(x: number, y: number) {
-        return new TileSource(TILE_SET, new Point(x, y))
+        return new TileSource(TILE_SET, new Point(x, y).times(TILE_SIZE + 1), new Point(TILE_SIZE, TILE_SIZE))
     }
 }
