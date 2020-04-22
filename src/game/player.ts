@@ -10,12 +10,12 @@ import { BoxCollider } from "../engine/collision/BoxCollider"
 import { game } from "./quest_game"
 
 export class Player extends Component {
-    readonly speed = 0.07
+    readonly speed = 0.08
     private characterAnim: TileComponent
     private swordAnim: AnimatedTileComponent
     private collider: BoxCollider
     private crosshairs: TileComponent
-    private lastMoveDir: Point = new Point(1, 0)
+    private lastMoveDir: Point = new Point(1, 0)  // normalized relative to player
 
     private _position: Point
     get position(): Point {
@@ -39,6 +39,21 @@ export class Player extends Component {
     }
 
     update(updateData: UpdateData) {
+        const originalCrosshairPosRelative = this.crosshairs.transform.position.minus(this.position)
+
+        this.move(updateData)
+
+        // update crosshair position
+        const crosshairDistance = 17
+        const relativeLerpedPos = originalCrosshairPosRelative.lerp(0.18, this.lastMoveDir.times(crosshairDistance))
+        this.crosshairs.transform.position = this.position.plus(relativeLerpedPos)
+
+        if (updateData.input.isKeyDown(InputKey.F)) {
+            game.tiles.remove(this.crosshairs.transform.position.plus(new Point(TILE_SIZE, TILE_SIZE).div(2)).floorDiv(TILE_SIZE))
+        }
+    }
+
+    private move(updateData: UpdateData) {
         let dx = 0
         let dy = 0
 
@@ -56,21 +71,13 @@ export class Player extends Component {
         const isMoving = dx != 0 || dy != 0
 
         if (isMoving) {
-            const newPos = new Point(
-                this._position.x + dx * updateData.elapsedTimeMillis * this.speed, 
-                this._position.y + dy * updateData.elapsedTimeMillis * this.speed
-            )
+            const translation = new Point(dx, dy).normalized()
+            const newPos = this._position.plus(translation.times(updateData.elapsedTimeMillis * this.speed))
             this._position = this.collider.moveTo(newPos)
-            this.lastMoveDir = new Point(dx, dy)
+            this.lastMoveDir = translation
         }
 
         this.characterAnim.transform.position = this.position
         this.swordAnim.transform.position = this.position
-        this.crosshairs.transform.position = this.crosshairs.transform.position.lerp(0.4, this.position.plus(this.lastMoveDir.times(TILE_SIZE)))
-
-        if (updateData.input.isKeyDown(InputKey.F)) {
-            const cursorPos = this.crosshairs.transform.position
-            game.tiles.remove(this.crosshairs.transform.position.plus(new Point(TILE_SIZE, TILE_SIZE).div(2)).floorDiv(TILE_SIZE))
-        }
     }
 }

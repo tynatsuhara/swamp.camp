@@ -32,7 +32,7 @@ export class Point {
     }
 
     lerp(multiplier: number, goal: Point): Point {
-        return new Point(this.x + (goal.x - this.x) * multiplier, this.y + (goal.y - this.y) * multiplier)
+        return this.plus(goal.minus(this).times(multiplier))
     }
 
     distanceTo(pt: Point): number {
@@ -43,6 +43,10 @@ export class Point {
 
     magnitude(): number {
         return this.distanceTo(new Point(0, 0))
+    }
+
+    normalized(): Point {
+        return this.div(this.magnitude())
     }
 
     toString(): string {

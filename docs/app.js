@@ -39,7 +39,7 @@ System.register("engine/point", [], function (exports_1, context_1) {
                     return new Point(this.x - other.x, this.y - other.y);
                 };
                 Point.prototype.lerp = function (multiplier, goal) {
-                    return new Point(this.x + (goal.x - this.x) * multiplier, this.y + (goal.y - this.y) * multiplier);
+                    return this.plus(goal.minus(this).times(multiplier));
                 };
                 Point.prototype.distanceTo = function (pt) {
                     var dx = pt.x - this.x;
@@ -48,6 +48,9 @@ System.register("engine/point", [], function (exports_1, context_1) {
                 };
                 Point.prototype.magnitude = function () {
                     return this.distanceTo(new Point(0, 0));
+                };
+                Point.prototype.normalized = function () {
+                    return this.div(this.magnitude());
                 };
                 Point.prototype.toString = function () {
                     return "(" + this.x + "," + this.y + ")";
@@ -1841,8 +1844,8 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
                 __extends(Player, _super);
                 function Player(position) {
                     var _this = _super.call(this) || this;
-                    _this.speed = 0.07;
-                    _this.lastMoveDir = new point_16.Point(1, 0);
+                    _this.speed = 0.08;
+                    _this.lastMoveDir = new point_16.Point(1, 0); // normalized relative to player
                     _this._position = position;
                     return _this;
                 }
@@ -1862,6 +1865,17 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
                     this.crosshairs = this.entity.addComponent(new TileComponent_3.TileComponent(tiles_1.Tile.CROSSHAIRS));
                 };
                 Player.prototype.update = function (updateData) {
+                    var originalCrosshairPosRelative = this.crosshairs.transform.position.minus(this.position);
+                    this.move(updateData);
+                    // update crosshair position
+                    var crosshairDistance = 17;
+                    var relativeLerpedPos = originalCrosshairPosRelative.lerp(0.18, this.lastMoveDir.times(crosshairDistance));
+                    this.crosshairs.transform.position = this.position.plus(relativeLerpedPos);
+                    if (updateData.input.isKeyDown(70 /* F */)) {
+                        quest_game_1.game.tiles.remove(this.crosshairs.transform.position.plus(new point_16.Point(tiles_1.TILE_SIZE, tiles_1.TILE_SIZE).div(2)).floorDiv(tiles_1.TILE_SIZE));
+                    }
+                };
+                Player.prototype.move = function (updateData) {
                     var dx = 0;
                     var dy = 0;
                     if (updateData.input.isKeyHeld(87 /* W */)) {
@@ -1884,17 +1898,13 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
                     }
                     var isMoving = dx != 0 || dy != 0;
                     if (isMoving) {
-                        var newPos = new point_16.Point(this._position.x + dx * updateData.elapsedTimeMillis * this.speed, this._position.y + dy * updateData.elapsedTimeMillis * this.speed);
+                        var translation = new point_16.Point(dx, dy).normalized();
+                        var newPos = this._position.plus(translation.times(updateData.elapsedTimeMillis * this.speed));
                         this._position = this.collider.moveTo(newPos);
-                        this.lastMoveDir = new point_16.Point(dx, dy);
+                        this.lastMoveDir = translation;
                     }
                     this.characterAnim.transform.position = this.position;
                     this.swordAnim.transform.position = this.position;
-                    this.crosshairs.transform.position = this.crosshairs.transform.position.lerp(0.4, this.position.plus(this.lastMoveDir.times(tiles_1.TILE_SIZE)));
-                    if (updateData.input.isKeyDown(70 /* F */)) {
-                        var cursorPos = this.crosshairs.transform.position;
-                        quest_game_1.game.tiles.remove(this.crosshairs.transform.position.plus(new point_16.Point(tiles_1.TILE_SIZE, tiles_1.TILE_SIZE).div(2)).floorDiv(tiles_1.TILE_SIZE));
-                    }
                 };
                 return Player;
             }(component_5.Component));
