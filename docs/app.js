@@ -1871,6 +1871,7 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/po
                 function Player(position) {
                     var _this = _super.call(this) || this;
                     _this.speed = 0.075;
+                    _this.relativeColliderPos = new point_14.Point(3, 15);
                     _this.lerpedLastMoveDir = new point_14.Point(1, 0); // used for crosshair
                     _this._position = position;
                     return _this;
@@ -1888,7 +1889,7 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/po
                     //     [Tile.SWORD_1, 500],
                     //     // [Tile.ARC, 100]
                     // ])))
-                    this.collider = this.entity.addComponent(new BoxCollider_1.BoxCollider(this.position, new point_14.Point(TileManager_1.TILE_SIZE, TileManager_1.TILE_SIZE)));
+                    this.collider = this.entity.addComponent(new BoxCollider_1.BoxCollider(this.position.plus(this.relativeColliderPos), new point_14.Point(10, 12)));
                     // this.crosshairs = this.entity.addComponent(new TileComponent(Tile.CROSSHAIRS))
                 };
                 Player.prototype.update = function (updateData) {
@@ -1932,7 +1933,7 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/po
                         var translation = new point_14.Point(dx, dy);
                         this.lerpedLastMoveDir = this.lerpedLastMoveDir.lerp(0.25, translation);
                         var newPos = this._position.plus(translation.times(updateData.elapsedTimeMillis * this.speed));
-                        this._position = this.collider.moveTo(newPos);
+                        this._position = this.collider.moveTo(newPos.plus(this.relativeColliderPos)).minus(this.relativeColliderPos);
                     }
                     this.characterAnim.transform.position = this.position;
                     // this.swordAnim.transform.position = this.position

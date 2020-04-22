@@ -13,7 +13,10 @@ export class Player extends Component {
     readonly speed = 0.075
     private characterAnim: TileComponent
     private swordAnim: AnimatedTileComponent
+
     private collider: BoxCollider
+    private relativeColliderPos: Point = new Point(3, 15)
+    
     private crosshairs: TileComponent
     private lerpedLastMoveDir: Point = new Point(1, 0)  // used for crosshair
 
@@ -33,7 +36,7 @@ export class Player extends Component {
         //     [Tile.SWORD_1, 500],
         //     // [Tile.ARC, 100]
         // ])))
-        this.collider = this.entity.addComponent(new BoxCollider(this.position, new Point(TILE_SIZE, TILE_SIZE)))
+        this.collider = this.entity.addComponent(new BoxCollider(this.position.plus(this.relativeColliderPos), new Point(10, 12)))
         // this.crosshairs = this.entity.addComponent(new TileComponent(Tile.CROSSHAIRS))
     }
 
@@ -78,7 +81,7 @@ export class Player extends Component {
             const translation = new Point(dx, dy)
             this.lerpedLastMoveDir = this.lerpedLastMoveDir.lerp(0.25, translation)
             const newPos = this._position.plus(translation.times(updateData.elapsedTimeMillis * this.speed))
-            this._position = this.collider.moveTo(newPos)
+            this._position = this.collider.moveTo(newPos.plus(this.relativeColliderPos)).minus(this.relativeColliderPos)
         }
 
         this.characterAnim.transform.position = this.position
