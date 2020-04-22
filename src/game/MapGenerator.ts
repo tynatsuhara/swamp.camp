@@ -4,7 +4,7 @@ import { ConnectingTile } from "../engine/tiles/ConnectingTile"
 import { TileGrid } from "../engine/tiles/TileGrid"
 import { Entity } from "../engine/Entity"
 import { BoxCollider } from "../engine/collision/BoxCollider"
-import { TILE_SIZE } from "./tiles"
+import { TILE_SIZE } from "./graphics/TileManager"
 
 export class MapGenerator {
 

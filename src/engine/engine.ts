@@ -5,6 +5,7 @@ import { Point } from "./point"
 import { View } from "./View"
 import { profiler, measure } from "./profiler"
 import { debug } from "./debug"
+import { assets } from "./Assets"
 
 export class UpdateViewsContext {
     readonly elapsedTimeMillis: number
@@ -34,7 +35,8 @@ export class Engine {
         this.game = game
         this.renderer = new Renderer(canvas)
         this.input = new Input(canvas)
-
+        
+        this.game.initialize()
         requestAnimationFrame(() => this.tick())
     }
 

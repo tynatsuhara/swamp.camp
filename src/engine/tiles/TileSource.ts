@@ -1,10 +1,9 @@
 import { Point } from "../point"
 import { ImageRender } from "../renderer/ImageRender"
 import { TileTransform } from "./TileTransform"
-import { TileSet } from "./TileSet"
 
 export class TileSource {
-    private tileSet: TileSet
+    private image: CanvasImageSource
     private position: Point
     private dimensions: Point
 
@@ -12,18 +11,18 @@ export class TileSource {
      * Constructs a static (non-animated) tile source
      */
     constructor(
-        tileSet: TileSet, 
+        image: CanvasImageSource, 
         position: Point,
         dimensions: Point
     ) {
-        this.tileSet = tileSet
+        this.image = image
         this.position = position
         this.dimensions = dimensions
     }
 
     toImageRender(transform: TileTransform) {
         return new ImageRender(
-            this.tileSet.image, 
+            this.image, 
             this.position, //new Point(this.tileSetIndex.x, this.tileSetIndex.y).times(this.tileSet.tileSize + this.tileSet.padding), 
             this.dimensions, 
             transform.position, 

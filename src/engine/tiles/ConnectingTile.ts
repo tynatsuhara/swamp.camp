@@ -1,4 +1,3 @@
-import { TileComponent } from "./TileComponent"
 import { Point } from "../point"
 import { TileGrid } from "./TileGrid"
 import { ImageRender } from "../renderer/ImageRender"

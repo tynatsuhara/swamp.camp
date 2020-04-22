@@ -1,4 +1,9 @@
-import { game } from "./game/quest_game"
+import { QuestGame } from "./game/quest_game"
 import { Engine } from "./engine/engine"
+import { TileManager } from "./game/graphics/TileManager"
+import { assets } from "./engine/Assets"
 
-new Engine(game, <HTMLCanvasElement>document.getElementById('canvas'))
+assets.loadImageFiles(TileManager.getFilesToLoad()).then(() => {
+    new Engine(new QuestGame(), <HTMLCanvasElement>document.getElementById('canvas'))
+})
+
