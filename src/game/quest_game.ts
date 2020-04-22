@@ -9,6 +9,7 @@ import { Player } from "./player"
 import { TileGrid } from "../engine/tiles/TileGrid"
 import { MapGenerator } from "./MapGenerator"
 import { Clickable } from "../engine/ui/Clickable"
+import { Interactable } from "./Interactable"
 
 const ZOOM = 3.125
 
@@ -30,7 +31,8 @@ class QuestGame extends Game {
         const rockPt = new Point(5, 5)
         this.tiles.set(rockPt, new Entity([
             new TileComponent(Tile.ROCKS, rockPt.times(TILE_SIZE)),
-            new Clickable(rockPt.times(TILE_SIZE), new Point(TILE_SIZE, TILE_SIZE), () => console.log("clicked a fuckin' rock!"))
+            new Clickable(rockPt.times(TILE_SIZE), new Point(TILE_SIZE, TILE_SIZE), () => console.log("clicked a fuckin' rock!")),
+            new Interactable(() => console.log("interacted with a fuckin' rock!"))
         ]))
 
         const mapGen = new MapGenerator()
