@@ -60,7 +60,7 @@ export class Engine {
                 const updateData: UpdateData = {
                     view: v,
                     elapsedTimeMillis: updateViewsContext.elapsedTimeMillis,
-                    input: updateViewsContext.input.scaled(v.zoom),
+                    input: updateViewsContext.input.scaledForView(v),
                     dimensions: updateViewsContext.dimensions.div(v.zoom)
                 }
                 // TODO: consider the behavior where an entity belongs to multiple views (eg splitscreen)

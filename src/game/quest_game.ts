@@ -8,8 +8,9 @@ import { TileComponent } from "../engine/tiles/TileComponent"
 import { Player } from "./player"
 import { TileGrid } from "../engine/tiles/TileGrid"
 import { MapGenerator } from "./MapGenerator"
+import { Clickable } from "../engine/ui/Clickable"
 
-const ZOOM = 2.5
+const ZOOM = 3.125
 
 class QuestGame extends Game {
 
@@ -25,6 +26,12 @@ class QuestGame extends Game {
 
     constructor() {
         super()
+
+        const rockPt = new Point(5, 5)
+        this.tiles.set(rockPt, new Entity([
+            new TileComponent(Tile.ROCKS, rockPt.times(TILE_SIZE)),
+            new Clickable(rockPt.times(TILE_SIZE), new Point(TILE_SIZE, TILE_SIZE), () => console.log("clicked a fuckin' rock!"))
+        ]))
 
         const mapGen = new MapGenerator()
 
@@ -54,7 +61,7 @@ class QuestGame extends Game {
 
     // entities whose position is fixed on the camera
     getUIEntities(): Entity[] {
-        const dimensions = new Point(25, 20)  // tile dimensions
+        const dimensions = new Point(20, 16)  // tile dimensions
 
         const result: TileComponent[] = []
         result.push(new TileComponent(Tile.BORDER_1, new Point(0, 0)))

@@ -1,4 +1,5 @@
 import { Point } from "./point"
+import { View } from "./View"
 
 // TODO: Consider switching to using event.code string instead of keycode
 export const enum InputKey {
@@ -85,12 +86,12 @@ export class CapturedInput {
         this.isMouseUp = isMouseUp
     }
 
-    scaled(zoom: number): CapturedInput {
+    scaledForView(view: View): CapturedInput {
         return new CapturedInput(
             this.keysDown,
             this.keysHeld,
             this.keysUp,
-            this.mousePos.div(zoom),
+            this.mousePos.div(view.zoom).minus(view.offset),
             this.isMouseDown,
             this.isMouseHeld,
             this.isMouseUp

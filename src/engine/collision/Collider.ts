@@ -4,7 +4,7 @@ import { Point } from "../point"
 import { RenderMethod } from "../renderer/RenderMethod"
 import { LineRender } from "../renderer/LineRender"
 import { debug } from "../debug"
-import { rectContains } from "./utils"
+import { rectContains } from "../util/utils"
 
 class CollisionEngine {
     private colliders: Collider[] = []

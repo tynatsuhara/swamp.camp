@@ -3,7 +3,7 @@ import { RenderMethod } from "../renderer/RenderMethod"
 import { debug } from "../debug"
 import { LineRender } from "../renderer/LineRender"
 import { Point } from "../point"
-import { rectContains } from "./utils"
+import { rectContains } from "../util/utils"
 
 export class BoxCollider extends Collider {
 

@@ -316,8 +316,8 @@ System.register("engine/input", ["engine/point"], function (exports_5, context_5
                     this.isMouseHeld = isMouseHeld;
                     this.isMouseUp = isMouseUp;
                 }
-                CapturedInput.prototype.scaled = function (zoom) {
-                    return new CapturedInput(this.keysDown, this.keysHeld, this.keysUp, this.mousePos.div(zoom), this.isMouseDown, this.isMouseHeld, this.isMouseUp);
+                CapturedInput.prototype.scaledForView = function (view) {
+                    return new CapturedInput(this.keysDown, this.keysHeld, this.keysUp, this.mousePos.div(view.zoom).minus(view.offset), this.isMouseDown, this.isMouseHeld, this.isMouseUp);
                 };
                 CapturedInput.prototype.getKeysHeld = function () {
                     return Array.from(this.keysUp);
@@ -590,7 +590,7 @@ System.register("engine/engine", ["engine/renderer/Renderer", "engine/input", "e
                             var updateData = {
                                 view: v,
                                 elapsedTimeMillis: updateViewsContext.elapsedTimeMillis,
-                                input: updateViewsContext.input.scaled(v.zoom),
+                                input: updateViewsContext.input.scaledForView(v),
                                 dimensions: updateViewsContext.dimensions.div(v.zoom)
                             };
                             // TODO: consider the behavior where an entity belongs to multiple views (eg splitscreen)
@@ -1553,7 +1553,7 @@ System.register("engine/renderer/LineRender", [], function (exports_28, context_
         }
     };
 });
-System.register("engine/collision/utils", [], function (exports_29, context_29) {
+System.register("engine/util/utils", [], function (exports_29, context_29) {
     "use strict";
     var __moduleName = context_29 && context_29.id;
     function rectContains(rectPosition, rectDimensions, pt) {
@@ -1567,7 +1567,7 @@ System.register("engine/collision/utils", [], function (exports_29, context_29) 
         }
     };
 });
-System.register("engine/collision/Collider", ["engine/component", "engine/point", "engine/renderer/LineRender", "engine/debug", "engine/collision/utils"], function (exports_30, context_30) {
+System.register("engine/collision/Collider", ["engine/component", "engine/point", "engine/renderer/LineRender", "engine/debug", "engine/util/utils"], function (exports_30, context_30) {
     "use strict";
     var component_4, point_14, LineRender_1, debug_2, utils_1, CollisionEngine, ENGINE, Collider;
     var __moduleName = context_30 && context_30.id;
@@ -1766,7 +1766,7 @@ System.register("engine/collision/Collider", ["engine/component", "engine/point"
         }
     };
 });
-System.register("engine/collision/BoxCollider", ["engine/collision/Collider", "engine/point", "engine/collision/utils"], function (exports_31, context_31) {
+System.register("engine/collision/BoxCollider", ["engine/collision/Collider", "engine/point", "engine/util/utils"], function (exports_31, context_31) {
     "use strict";
     var Collider_1, point_15, utils_2, BoxCollider;
     var __moduleName = context_31 && context_31.id;
@@ -1808,10 +1808,44 @@ System.register("engine/collision/BoxCollider", ["engine/collision/Collider", "e
         }
     };
 });
-System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/tiles/TileSetAnimation", "engine/tiles/TileComponent", "engine/point", "game/tiles", "engine/component", "engine/collision/BoxCollider", "game/quest_game"], function (exports_32, context_32) {
+System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"], function (exports_32, context_32) {
     "use strict";
-    var AnimatedTileComponent_1, TileSetAnimation_1, TileComponent_3, point_16, tiles_1, component_5, BoxCollider_1, quest_game_1, Player;
+    var component_5, utils_3, Clickable;
     var __moduleName = context_32 && context_32.id;
+    return {
+        setters: [
+            function (component_5_1) {
+                component_5 = component_5_1;
+            },
+            function (utils_3_1) {
+                utils_3 = utils_3_1;
+            }
+        ],
+        execute: function () {
+            Clickable = /** @class */ (function (_super) {
+                __extends(Clickable, _super);
+                function Clickable(position, dimensions, onClick) {
+                    var _this = _super.call(this) || this;
+                    _this.position = position;
+                    _this.dimensions = dimensions;
+                    _this.onClick = onClick;
+                    return _this;
+                }
+                Clickable.prototype.update = function (updateData) {
+                    if (updateData.input.isMouseDown && utils_3.rectContains(this.position, this.dimensions, updateData.input.mousePos)) {
+                        this.onClick();
+                    }
+                };
+                return Clickable;
+            }(component_5.Component));
+            exports_32("Clickable", Clickable);
+        }
+    };
+});
+System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/tiles/TileSetAnimation", "engine/tiles/TileComponent", "engine/point", "game/tiles", "engine/component", "engine/collision/BoxCollider", "game/quest_game"], function (exports_33, context_33) {
+    "use strict";
+    var AnimatedTileComponent_1, TileSetAnimation_1, TileComponent_3, point_16, tiles_1, component_6, BoxCollider_1, quest_game_1, Player;
+    var __moduleName = context_33 && context_33.id;
     return {
         setters: [
             function (AnimatedTileComponent_1_1) {
@@ -1829,8 +1863,8 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
             function (tiles_1_1) {
                 tiles_1 = tiles_1_1;
             },
-            function (component_5_1) {
-                component_5 = component_5_1;
+            function (component_6_1) {
+                component_6 = component_6_1;
             },
             function (BoxCollider_1_1) {
                 BoxCollider_1 = BoxCollider_1_1;
@@ -1869,7 +1903,7 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
                     this.move(updateData);
                     // update crosshair position
                     var crosshairDistance = 17;
-                    var relativeLerpedPos = originalCrosshairPosRelative.lerp(0.18, this.lerpedLastMoveDir.normalized().times(crosshairDistance));
+                    var relativeLerpedPos = originalCrosshairPosRelative.lerp(0.16, this.lerpedLastMoveDir.normalized().times(crosshairDistance));
                     this.crosshairs.transform.position = this.position.plus(relativeLerpedPos);
                     if (updateData.input.isKeyDown(70 /* F */)) {
                         quest_game_1.game.tiles.remove(this.crosshairs.transform.position.plus(new point_16.Point(tiles_1.TILE_SIZE, tiles_1.TILE_SIZE).div(2)).floorDiv(tiles_1.TILE_SIZE));
@@ -1907,15 +1941,15 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
                     this.swordAnim.transform.position = this.position;
                 };
                 return Player;
-            }(component_5.Component));
-            exports_32("Player", Player);
+            }(component_6.Component));
+            exports_33("Player", Player);
         }
     };
 });
-System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTile", "engine/Entity", "engine/collision/BoxCollider", "game/tiles"], function (exports_33, context_33) {
+System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTile", "engine/Entity", "engine/collision/BoxCollider", "game/tiles"], function (exports_34, context_34) {
     "use strict";
     var point_17, ConnectingTile_2, Entity_3, BoxCollider_2, tiles_2, MapGenerator;
-    var __moduleName = context_33 && context_33.id;
+    var __moduleName = context_34 && context_34.id;
     return {
         setters: [
             function (point_17_1) {
@@ -1977,14 +2011,14 @@ System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTi
                 };
                 return MapGenerator;
             }());
-            exports_33("MapGenerator", MapGenerator);
+            exports_34("MapGenerator", MapGenerator);
         }
     };
 });
-System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/game", "engine/View", "game/tiles", "engine/tiles/TileComponent", "game/player", "engine/tiles/TileGrid", "game/MapGenerator"], function (exports_34, context_34) {
+System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/game", "engine/View", "game/tiles", "engine/tiles/TileComponent", "game/player", "engine/tiles/TileGrid", "game/MapGenerator", "engine/ui/Clickable"], function (exports_35, context_35) {
     "use strict";
-    var Entity_4, point_18, game_1, View_2, tiles_3, TileComponent_4, player_1, TileGrid_1, MapGenerator_1, ZOOM, QuestGame, game;
-    var __moduleName = context_34 && context_34.id;
+    var Entity_4, point_18, game_1, View_2, tiles_3, TileComponent_4, player_1, TileGrid_1, MapGenerator_1, Clickable_1, ZOOM, QuestGame, game;
+    var __moduleName = context_35 && context_35.id;
     return {
         setters: [
             function (Entity_4_1) {
@@ -2013,10 +2047,13 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
             },
             function (MapGenerator_1_1) {
                 MapGenerator_1 = MapGenerator_1_1;
+            },
+            function (Clickable_1_1) {
+                Clickable_1 = Clickable_1_1;
             }
         ],
         execute: function () {
-            ZOOM = 2.5;
+            ZOOM = 3.125;
             QuestGame = /** @class */ (function (_super) {
                 __extends(QuestGame, _super);
                 function QuestGame() {
@@ -2029,6 +2066,11 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
                         offset: new point_18.Point(0, 0),
                         entities: _this.getUIEntities()
                     };
+                    var rockPt = new point_18.Point(5, 5);
+                    _this.tiles.set(rockPt, new Entity_4.Entity([
+                        new TileComponent_4.TileComponent(tiles_3.Tile.ROCKS, rockPt.times(tiles_3.TILE_SIZE)),
+                        new Clickable_1.Clickable(rockPt.times(tiles_3.TILE_SIZE), new point_18.Point(tiles_3.TILE_SIZE, tiles_3.TILE_SIZE), function () { return console.log("clicked a fuckin' rock!"); })
+                    ]));
                     var mapGen = new MapGenerator_1.MapGenerator();
                     mapGen.renderPath(_this.tiles, new point_18.Point(-10, -10), new point_18.Point(10, 10), tiles_3.Tile.PATH, 2);
                     mapGen.renderPath(_this.tiles, new point_18.Point(10, -10), new point_18.Point(-10, 10), tiles_3.Tile.PATH, 5);
@@ -2053,7 +2095,7 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
                 };
                 // entities whose position is fixed on the camera
                 QuestGame.prototype.getUIEntities = function () {
-                    var dimensions = new point_18.Point(25, 20); // tile dimensions
+                    var dimensions = new point_18.Point(20, 16); // tile dimensions
                     var result = [];
                     result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_1, new point_18.Point(0, 0)));
                     result.push(new TileComponent_4.TileComponent(tiles_3.Tile.BORDER_3, new point_18.Point(dimensions.x - 1, 0).times(tiles_3.TILE_SIZE)));
@@ -2073,14 +2115,14 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
                 };
                 return QuestGame;
             }(game_1.Game));
-            exports_34("game", game = new QuestGame());
+            exports_35("game", game = new QuestGame());
         }
     };
 });
-System.register("app", ["game/quest_game", "engine/engine"], function (exports_35, context_35) {
+System.register("app", ["game/quest_game", "engine/engine"], function (exports_36, context_36) {
     "use strict";
     var quest_game_2, engine_1;
-    var __moduleName = context_35 && context_35.id;
+    var __moduleName = context_36 && context_36.id;
     return {
         setters: [
             function (quest_game_2_1) {
