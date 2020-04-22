@@ -1813,44 +1813,10 @@ System.register("engine/collision/BoxCollider", ["engine/collision/Collider", "e
         }
     };
 });
-System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"], function (exports_32, context_32) {
+System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/tiles/TileSetAnimation", "engine/tiles/TileComponent", "engine/point", "game/tiles", "engine/component", "engine/collision/BoxCollider", "game/quest_game"], function (exports_32, context_32) {
     "use strict";
-    var component_5, utils_3, Clickable;
+    var AnimatedTileComponent_1, TileSetAnimation_1, TileComponent_3, point_16, tiles_1, component_5, BoxCollider_1, quest_game_1, Player;
     var __moduleName = context_32 && context_32.id;
-    return {
-        setters: [
-            function (component_5_1) {
-                component_5 = component_5_1;
-            },
-            function (utils_3_1) {
-                utils_3 = utils_3_1;
-            }
-        ],
-        execute: function () {
-            Clickable = /** @class */ (function (_super) {
-                __extends(Clickable, _super);
-                function Clickable(position, dimensions, onClick) {
-                    var _this = _super.call(this) || this;
-                    _this.position = position;
-                    _this.dimensions = dimensions;
-                    _this.onClick = onClick;
-                    return _this;
-                }
-                Clickable.prototype.update = function (updateData) {
-                    if (updateData.input.isMouseDown && utils_3.rectContains(this.position, this.dimensions, updateData.input.mousePos)) {
-                        this.onClick();
-                    }
-                };
-                return Clickable;
-            }(component_5.Component));
-            exports_32("Clickable", Clickable);
-        }
-    };
-});
-System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/tiles/TileSetAnimation", "engine/tiles/TileComponent", "engine/point", "game/tiles", "engine/component", "engine/collision/BoxCollider", "game/quest_game"], function (exports_33, context_33) {
-    "use strict";
-    var AnimatedTileComponent_1, TileSetAnimation_1, TileComponent_3, point_16, tiles_1, component_6, BoxCollider_1, quest_game_1, Player;
-    var __moduleName = context_33 && context_33.id;
     return {
         setters: [
             function (AnimatedTileComponent_1_1) {
@@ -1868,8 +1834,8 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
             function (tiles_1_1) {
                 tiles_1 = tiles_1_1;
             },
-            function (component_6_1) {
-                component_6 = component_6_1;
+            function (component_5_1) {
+                component_5 = component_5_1;
             },
             function (BoxCollider_1_1) {
                 BoxCollider_1 = BoxCollider_1_1;
@@ -1883,7 +1849,7 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
                 __extends(Player, _super);
                 function Player(position) {
                     var _this = _super.call(this) || this;
-                    _this.speed = 0.08;
+                    _this.speed = 0.075;
                     _this.lerpedLastMoveDir = new point_16.Point(1, 0); // used for crosshair
                     _this._position = position;
                     return _this;
@@ -1907,8 +1873,7 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
                     var originalCrosshairPosRelative = this.crosshairs.transform.position.minus(this.position);
                     this.move(updateData);
                     // update crosshair position
-                    var crosshairDistance = 17;
-                    var relativeLerpedPos = originalCrosshairPosRelative.lerp(0.16, this.lerpedLastMoveDir.normalized().times(crosshairDistance));
+                    var relativeLerpedPos = originalCrosshairPosRelative.lerp(0.16, this.lerpedLastMoveDir.normalized().times(tiles_1.TILE_SIZE));
                     this.crosshairs.transform.position = this.position.plus(relativeLerpedPos);
                     if (updateData.input.isKeyDown(70 /* F */)) {
                         quest_game_1.game.tiles.remove(this.crosshairs.transform.position.plus(new point_16.Point(tiles_1.TILE_SIZE, tiles_1.TILE_SIZE).div(2)).floorDiv(tiles_1.TILE_SIZE));
@@ -1935,6 +1900,7 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
                     else if (dx > 0) {
                         this.characterAnim.transform.mirrorX = false;
                     }
+                    this.swordAnim.transform.mirrorX = this.characterAnim.transform.mirrorX;
                     var isMoving = dx != 0 || dy != 0;
                     if (isMoving) {
                         var translation = new point_16.Point(dx, dy);
@@ -1946,15 +1912,15 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/ti
                     this.swordAnim.transform.position = this.position;
                 };
                 return Player;
-            }(component_6.Component));
-            exports_33("Player", Player);
+            }(component_5.Component));
+            exports_32("Player", Player);
         }
     };
 });
-System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTile", "engine/Entity", "engine/collision/BoxCollider", "game/tiles"], function (exports_34, context_34) {
+System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTile", "engine/Entity", "engine/collision/BoxCollider", "game/tiles"], function (exports_33, context_33) {
     "use strict";
     var point_17, ConnectingTile_2, Entity_3, BoxCollider_2, tiles_2, MapGenerator;
-    var __moduleName = context_34 && context_34.id;
+    var __moduleName = context_33 && context_33.id;
     return {
         setters: [
             function (point_17_1) {
@@ -2016,7 +1982,41 @@ System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTi
                 };
                 return MapGenerator;
             }());
-            exports_34("MapGenerator", MapGenerator);
+            exports_33("MapGenerator", MapGenerator);
+        }
+    };
+});
+System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"], function (exports_34, context_34) {
+    "use strict";
+    var component_6, utils_3, Clickable;
+    var __moduleName = context_34 && context_34.id;
+    return {
+        setters: [
+            function (component_6_1) {
+                component_6 = component_6_1;
+            },
+            function (utils_3_1) {
+                utils_3 = utils_3_1;
+            }
+        ],
+        execute: function () {
+            Clickable = /** @class */ (function (_super) {
+                __extends(Clickable, _super);
+                function Clickable(position, dimensions, onClick) {
+                    var _this = _super.call(this) || this;
+                    _this.position = position;
+                    _this.dimensions = dimensions;
+                    _this.onClick = onClick;
+                    return _this;
+                }
+                Clickable.prototype.update = function (updateData) {
+                    if (updateData.input.isMouseDown && utils_3.rectContains(this.position, this.dimensions, updateData.input.mousePos)) {
+                        this.onClick();
+                    }
+                };
+                return Clickable;
+            }(component_6.Component));
+            exports_34("Clickable", Clickable);
         }
     };
 });

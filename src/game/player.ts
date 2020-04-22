@@ -8,10 +8,9 @@ import { Tile, TILE_SIZE } from "./tiles"
 import { Component } from "../engine/component"
 import { BoxCollider } from "../engine/collision/BoxCollider"
 import { game } from "./quest_game"
-import { Clickable } from "../engine/ui/Clickable"
 
 export class Player extends Component {
-    readonly speed = 0.08
+    readonly speed = 0.075
     private characterAnim: TileComponent
     private swordAnim: AnimatedTileComponent
     private collider: BoxCollider
@@ -44,8 +43,7 @@ export class Player extends Component {
         this.move(updateData)
 
         // update crosshair position
-        const crosshairDistance = 17
-        const relativeLerpedPos = originalCrosshairPosRelative.lerp(0.16, this.lerpedLastMoveDir.normalized().times(crosshairDistance))
+        const relativeLerpedPos = originalCrosshairPosRelative.lerp(0.16, this.lerpedLastMoveDir.normalized().times(TILE_SIZE))
         this.crosshairs.transform.position = this.position.plus(relativeLerpedPos)
 
         if (updateData.input.isKeyDown(InputKey.F)) {
@@ -67,6 +65,7 @@ export class Player extends Component {
         } else if (dx > 0) {
             this.characterAnim.transform.mirrorX = false
         }
+        this.swordAnim.transform.mirrorX = this.characterAnim.transform.mirrorX
         
         const isMoving = dx != 0 || dy != 0
 
