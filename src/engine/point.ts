@@ -56,4 +56,8 @@ export class Point {
     equals(pt: Point) {
         return pt.x == this.x && pt.y == this.y
     }
+
+    apply(fn: (n: number) => number) {
+        return new Point(fn(this.x), fn(this.y))
+    }
 }

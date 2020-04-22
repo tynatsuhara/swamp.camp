@@ -33,7 +33,7 @@ export class ImageRender implements RenderMethod {
     }
 
     render(context: RenderContext) {
-        const pixelPerfect = false  // this can cause flickering between adjacent tiles, TODO make configurable
+        const pixelPerfect = false  // TODO make this work properly
 
         context.drawImage(
             this.source, 

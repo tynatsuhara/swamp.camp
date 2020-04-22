@@ -58,6 +58,9 @@ System.register("engine/point", [], function (exports_1, context_1) {
                 Point.prototype.equals = function (pt) {
                     return pt.x == this.x && pt.y == this.y;
                 };
+                Point.prototype.apply = function (fn) {
+                    return new Point(fn(this.x), fn(this.y));
+                };
                 return Point;
             }());
             exports_1("Point", Point);
@@ -159,7 +162,8 @@ System.register("engine/renderer/RenderContext", ["engine/point"], function (exp
                         return;
                     }
                     this.context.save();
-                    this.context.translate(scaledDestPosition.x, scaledDestPosition.y);
+                    // Use Math.floor() to prevent tearing between images
+                    this.context.translate(Math.floor(scaledDestPosition.x), Math.floor(scaledDestPosition.y));
                     this.context.scale(mirrorX ? -1 : 1, mirrorY ? -1 : 1);
                     var rotationTranslate = destDimensions.div(2).times(this.view.zoom);
                     this.context.translate(rotationTranslate.x, rotationTranslate.y);
@@ -767,7 +771,7 @@ System.register("engine/renderer/ImageRender", [], function (exports_16, context
                         this.mirrorY = mirrorY;
                 }
                 ImageRender.prototype.render = function (context) {
-                    var pixelPerfect = false; // this can cause flickering between adjacent tiles, TODO make configurable
+                    var pixelPerfect = true; // TODO make this work properly
                     context.drawImage(this.source, this.sourcePosition, this.dimensions, this.position, this.dimensions.times(this.scale), this.rotation, pixelPerfect, this.mirrorX, this.mirrorY);
                 };
                 return ImageRender;

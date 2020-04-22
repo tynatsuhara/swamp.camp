@@ -60,7 +60,13 @@ export class RenderContext {
         }
 
         this.context.save()
-        this.context.translate(scaledDestPosition.x, scaledDestPosition.y)
+
+        // Use Math.floor() to prevent tearing between images
+        this.context.translate(
+            Math.floor(scaledDestPosition.x),
+            Math.floor(scaledDestPosition.y)
+        )
+
         this.context.scale(mirrorX ? -1 : 1, mirrorY ? -1 : 1)
 
         const rotationTranslate = destDimensions.div(2).times(this.view.zoom)
