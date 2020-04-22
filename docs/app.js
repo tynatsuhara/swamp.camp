@@ -150,7 +150,8 @@ System.register("engine/renderer/RenderContext", ["engine/point"], function (exp
                  */
                 RenderContext.prototype.drawImage = function (source, sourcePosition, sourceDimensions, destPosition, destDimensions, rotation, pixelPerfect, mirrorX, mirrorY) {
                     var mirroredOffset = new point_2.Point(mirrorX ? destDimensions.x : 0, mirrorY ? destDimensions.y : 0);
-                    var scaledDestPosition = destPosition.plus(this.view.offset).plus(mirroredOffset).times(this.view.zoom);
+                    var offset = this.view.offset.times(this.view.zoom).apply(Math.floor);
+                    var scaledDestPosition = destPosition.plus(mirroredOffset).times(this.view.zoom).plus(offset);
                     if (pixelPerfect) {
                         scaledDestPosition = this.pixelize(scaledDestPosition);
                     }
@@ -771,7 +772,7 @@ System.register("engine/renderer/ImageRender", [], function (exports_16, context
                         this.mirrorY = mirrorY;
                 }
                 ImageRender.prototype.render = function (context) {
-                    var pixelPerfect = true; // TODO make this work properly
+                    var pixelPerfect = false; // TODO make this work properly
                     context.drawImage(this.source, this.sourcePosition, this.dimensions, this.position, this.dimensions.times(this.scale), this.rotation, pixelPerfect, this.mirrorX, this.mirrorY);
                 };
                 return ImageRender;

@@ -46,7 +46,8 @@ export class RenderContext {
         mirrorY: boolean
     ): void {
         const mirroredOffset = new Point(mirrorX ? destDimensions.x : 0, mirrorY ? destDimensions.y : 0)
-        let scaledDestPosition = destPosition.plus(this.view.offset).plus(mirroredOffset).times(this.view.zoom)
+        const offset = this.view.offset.times(this.view.zoom).apply(Math.floor)
+        let scaledDestPosition = destPosition.plus(mirroredOffset).times(this.view.zoom).plus(offset)
         if (pixelPerfect) {
             scaledDestPosition = this.pixelize(scaledDestPosition)
         }
