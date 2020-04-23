@@ -16,6 +16,10 @@ export class AnimatedTileComponent extends TileComponent {
         this.animations = [defaultAnimation].concat(additionalAnimations)
     }
 
+    currentFrame() {
+        return this.animator.index
+    }
+
     play(animation: number) {
         this.animator = new TileSetAnimator(this.animations[animation])
     }

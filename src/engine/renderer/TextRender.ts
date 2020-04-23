@@ -4,22 +4,18 @@ import { Point } from "../point"
 import { RenderContext } from "./RenderContext"
 import { Component } from "../component"
 
-export class TextRenderComponent extends Component implements RenderMethod {
+export class TextRender extends RenderMethod {
     text: string
     position: Point
     font: string
     color: string
 
     constructor(text: string, position: Point, font: string = "20px Comic Sans MS Regular", color: string = "red") {
-        super()
+        super(Number.MAX_SAFE_INTEGER)
         this.text = text
         this.position = position
         this.font = font
         this.color = color
-    }
-
-    getRenderMethods() {
-        return [this]
     }
 
     render(context: RenderContext): void {

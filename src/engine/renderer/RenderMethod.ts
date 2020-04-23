@@ -1,5 +1,11 @@
 import { RenderContext } from "./RenderContext"
 
-export interface RenderMethod {
-    render(context: RenderContext): void
+export abstract class RenderMethod {
+    depth: number
+
+    constructor(depth: number) {
+        this.depth = depth
+    }
+
+    abstract render(context: RenderContext): void
 }

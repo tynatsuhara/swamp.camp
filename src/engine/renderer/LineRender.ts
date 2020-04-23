@@ -3,13 +3,14 @@ import { RenderMethod } from "./RenderMethod"
 import { Point } from "../point"
 import { RenderContext } from "./RenderContext"
 
-export class LineRender implements RenderMethod {
+export class LineRender extends RenderMethod {
     start: Point
     end: Point
     color: string
     width: number
 
     constructor(start: Point, end: Point, color: string = "#ff0000", width: number = 1) {
+        super(Number.MAX_SAFE_INTEGER)
         this.start = start
         this.end = end
         this.color = color

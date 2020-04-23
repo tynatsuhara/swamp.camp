@@ -2,7 +2,7 @@ import { Point } from "../point"
 import { RenderMethod } from "./RenderMethod"
 import { RenderContext } from "./RenderContext"
 
-export class ImageRender implements RenderMethod {
+export class ImageRender extends RenderMethod {
     source: CanvasImageSource
     sourcePosition: Point  // the top-left coordinate position on the source image
     dimensions: Point
@@ -17,11 +17,13 @@ export class ImageRender implements RenderMethod {
         sourcePosition: Point, 
         dimensions: Point, 
         position: Point, 
+        depth: number = 0,
         rotation: number = 0, 
         scale: number = 1,
         mirrorX: boolean = false,
-        mirrorY: boolean = false
+        mirrorY: boolean = false,
     ) {
+        super(depth)
         this.source = source
         this.sourcePosition = sourcePosition, 
         this.dimensions = dimensions

@@ -12,7 +12,9 @@ import { TILE_SIZE, TileManager } from "./graphics/TileManager"
 export class Player extends Component {
     readonly speed = 0.085
     private characterAnim: AnimatedTileComponent
-    private swordAnim: AnimatedTileComponent
+
+    private swordAnim: TileComponent
+    private relativeSwordPos: Point = new Point(-2, 5)
 
     private collider: BoxCollider
     private relativeColliderPos: Point = new Point(3, 15)
@@ -32,13 +34,19 @@ export class Player extends Component {
     }
 
     start(startData: StartData) {
-        // TODO make animations triggerable so we can switch between run and idle
         this.characterAnim = this.entity.addComponent(
             new AnimatedTileComponent(
                 new Point(0, 0), 
                 TileManager.instance.dungeonCharacters.getTileSetAnimation("knight_f_idle_anim", 150),
                 TileManager.instance.dungeonCharacters.getTileSetAnimation("knight_f_run_anim", 80),
                 TileManager.instance.dungeonCharacters.getTileSetAnimation("knight_f_hit_anim", 1000),
+            )
+        )
+        this.characterAnim.transform.depth = 10
+
+        this.swordAnim = this.entity.addComponent(
+            new TileComponent(
+                TileManager.instance.dungeonCharacters.getTileSource("weapon_rusty_sword")
             )
         )
         
@@ -83,7 +91,6 @@ export class Player extends Component {
         } else if (dx > 0) {
             this.characterAnim.transform.mirrorX = false
         }
-        // this.swordAnim.transform.mirrorX = this.characterAnim.transform.mirrorX
         
         const wasMoving = this.isMoving
         this.isMoving = dx != 0 || dy != 0
@@ -101,6 +108,24 @@ export class Player extends Component {
         }
 
         this.characterAnim.transform.position = this.position
-        // this.swordAnim.transform.position = this.position
+
+        this.updateSwordPos()
+    }
+
+    private updateSwordPos() {
+        if (!!this.swordAnim) {
+            // magic based on the animations
+            let pos = this.relativeSwordPos
+            const f = this.characterAnim.currentFrame()
+            if (!this.isMoving) {
+                pos = pos.plus(new Point(0, f == 3 ? 1 : f))
+            } else {
+                pos = pos.plus(new Point(0, f == 0 ? -1 : -((3 - this.characterAnim.currentFrame()))))
+            }
+
+            this.swordAnim.transform.position = this.position.plus(pos)
+            // show behind if mirrored
+            this.swordAnim.transform.depth = this.characterAnim.transform.depth - (this.characterAnim.transform.mirrorX ? 1 : 0)
+        }
     }
 }

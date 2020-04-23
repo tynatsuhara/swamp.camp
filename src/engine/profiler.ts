@@ -1,7 +1,9 @@
 import { View } from "./View"
 import { Entity } from "./Entity"
-import { TextRenderComponent } from "./renderer/TextRender"
 import { Point } from "./point"
+import { TextRender } from "./renderer/TextRender"
+import { Component } from "./component"
+import { BasicRenderComponent } from "./renderer/BasicRenderComponent"
 
 class Profiler {
     private start: number = new Date().getTime()
@@ -26,7 +28,7 @@ class Profiler {
             `render() duration ms: ${round(this.renderTracker.get(), 2)}`
         ]
         return new View([
-            new Entity(s.map((str, i) => new TextRenderComponent(str, new Point(60, 70 + 25 * i))))
+            new Entity(s.map((str, i) => new BasicRenderComponent(new TextRender(str, new Point(60, 70 + 25 * i)))))
         ])
     }
 }

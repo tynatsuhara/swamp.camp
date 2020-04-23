@@ -23,9 +23,10 @@ export class TileSource {
     toImageRender(transform: TileTransform) {
         return new ImageRender(
             this.image, 
-            this.position, //new Point(this.tileSetIndex.x, this.tileSetIndex.y).times(this.tileSet.tileSize + this.tileSet.padding), 
+            this.position,
             this.dimensions, 
             transform.position, 
+            transform.depth,
             transform.rotation, 
             transform.scale, 
             transform.mirrorX, 

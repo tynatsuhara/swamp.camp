@@ -14,7 +14,7 @@ class Assets {
             loadingImage.src = path
         }))
 
-        return Promise.all(promises).then(() => console.log(this.map))
+        return Promise.all(promises)
     }
 
     getImageByFileName(fileName: string): HTMLImageElement {

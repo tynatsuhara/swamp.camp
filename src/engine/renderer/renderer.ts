@@ -35,6 +35,7 @@ export class Renderer {
                 .flatMap(entity => entity.components)
                 .filter(component => !!component)
                 .flatMap(component => component.getRenderMethods())
+                .sort((a, b) => a.depth - b.depth)  // TODO possibly improve this
                 .forEach(renderMethod => renderMethod.render(viewRenderContext))
     }
 }
