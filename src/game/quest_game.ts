@@ -4,13 +4,14 @@ import { Game } from "../engine/game"
 import { UpdateViewsContext } from "../engine/engine"
 import { View } from "../engine/View"
 import { TileComponent } from "../engine/tiles/TileComponent"
-import { Dude } from "./Dude"
+import { Dude } from "./characters/Dude"
 import { TileGrid } from "../engine/tiles/TileGrid"
 import { MapGenerator } from "./MapGenerator"
 import { AnimatedTileComponent } from "../engine/tiles/AnimatedTileComponent"
 import { TileManager, TILE_SIZE } from "./graphics/TileManager"
-import { Player } from "./Player"
-import { NPC } from "./NPC"
+import { Player } from "./characters/Player"
+import { NPC } from "./characters/NPC"
+import { DudeFactory } from "./characters/DudeFactory"
 
 
 const ZOOM = 3.125
@@ -19,8 +20,8 @@ export class QuestGame extends Game {
 
     readonly tileManager = new TileManager()
     readonly tiles = new TileGrid(TILE_SIZE)
-    readonly player = new Entity([new Dude("knight_f", new Point(-2, 2).times(TILE_SIZE)), new Player()]).getComponent(Dude)
-    readonly enemies: Entity[] = []
+    readonly dudeFactory = new DudeFactory()
+    readonly player = this.dudeFactory.newPlayer(new Point(-2, 2).times(TILE_SIZE))
     
     private gameEntityView: View = new View()
     private uiView: View = {
@@ -30,7 +31,8 @@ export class QuestGame extends Game {
     }
 
     initialize() {
-        this.enemies.push(new Entity([new Dude("elf_m", new Point(20, 30)), new NPC()]))
+        this.dudeFactory.newElf(new Point(20, 30))
+
         // this.enemies.push(new Entity([new Dude("goblin", new Point(80, 30)), new NPC()]))
 
         // const rockPt = new Point(5, 5)
@@ -79,9 +81,7 @@ export class QuestGame extends Game {
         this.gameEntityView = { 
             zoom: ZOOM,
             offset: this.gameEntityView.offset.lerp(.0018 * updateViewsContext.elapsedTimeMillis, cameraGoal),
-            entities: this.tiles.entries()
-                    .concat([this.player.entity])
-                    .concat(this.enemies)
+            entities: this.tiles.entries().concat(this.dudeFactory.getSpawnedEntities())
         }
     }
 

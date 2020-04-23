@@ -1,8 +1,8 @@
-import { Component } from "../engine/component"
-import { UpdateData, StartData } from "../engine/engine"
+import { Component } from "../../engine/component"
+import { UpdateData, StartData } from "../../engine/engine"
 import { Dude } from "./Dude"
 import { Player } from "./Player"
-import { Point } from "../engine/point"
+import { Point } from "../../engine/point"
 
 export class NPC extends Component {
 

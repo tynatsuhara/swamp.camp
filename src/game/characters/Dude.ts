@@ -1,11 +1,11 @@
-import { AnimatedTileComponent } from "../engine/tiles/AnimatedTileComponent"
-import { TileComponent } from "../engine/tiles/TileComponent"
-import { UpdateData, StartData } from "../engine/engine"
-import { InputKey } from "../engine/input"
-import { Point } from "../engine/point"
-import { Component } from "../engine/component"
-import { BoxCollider } from "../engine/collision/BoxCollider"
-import { TileManager } from "./graphics/TileManager"
+import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
+import { TileComponent } from "../../engine/tiles/TileComponent"
+import { UpdateData, StartData } from "../../engine/engine"
+import { InputKey } from "../../engine/input"
+import { Point } from "../../engine/point"
+import { Component } from "../../engine/component"
+import { BoxCollider } from "../../engine/collision/BoxCollider"
+import { TileManager } from "../graphics/TileManager"
 
 export class Dude extends Component {
     speed = 0.085
@@ -37,22 +37,21 @@ export class Dude extends Component {
     }
 
     start(startData: StartData) {
-        this.characterAnim = this.entity.addComponent(
-            new AnimatedTileComponent(
-                new Point(0, 0), 
-                TileManager.instance.dungeonCharacters.getTileSetAnimation(`${this.archetype}_idle_anim`, 150),
-                TileManager.instance.dungeonCharacters.getTileSetAnimation(`${this.archetype}_run_anim`, 80),
-                // TileManager.instance.dungeonCharacters.getTileSetAnimation(`${this.archetype}_hit_anim`, 1000),  // TODO handle missing animation for some archetypes
-            )
-        )
+        const idleAnim = TileManager.instance.dungeonCharacters.getTileSetAnimation(`${this.archetype}_idle_anim`, 150)
+        const runAnim = TileManager.instance.dungeonCharacters.getTileSetAnimation(`${this.archetype}_run_anim`, 80)
+        // TileManager.instance.dungeonCharacters.getTileSetAnimation(`${this.archetype}_hit_anim`, 1000),  // TODO handle missing animation for some archetypes
+        this.characterAnim = this.entity.addComponent(new AnimatedTileComponent(new Point(0, 0), idleAnim, runAnim))
 
         this.swordAnim = this.entity.addComponent(
             new TileComponent(
                 TileManager.instance.dungeonCharacters.getTileSource("weapon_baton_with_spikes")
             )
         )
-        
-        this.collider = this.entity.addComponent(new BoxCollider(this.position.plus(this.relativeColliderPos), new Point(10, 12)))
+
+        const colliderShrinkage = new Point(6, 20)
+        const colliderSize = this.characterAnim.transform.dimensions.minus(colliderShrinkage)
+        this.relativeColliderPos = new Point(colliderShrinkage.x/2, this.characterAnim.transform.dimensions.y - colliderSize.y)
+        this.collider = this.entity.addComponent(new BoxCollider(this.position.plus(this.relativeColliderPos), colliderSize))
     }
 
     move(updateData: UpdateData, direction: Point) {
