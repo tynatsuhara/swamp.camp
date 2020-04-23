@@ -1957,35 +1957,43 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                         this.animator.update(updateData.elapsedTimeMillis);
                     }
                 };
-                Weapon.prototype.syncWithPlayerAnimation = function (character, anim) {
+                Weapon.prototype.syncWithPlayerAnimation = function (character, characterAnim) {
                     if (!!this.weaponSprite) {
-                        // relative position for DRAWN state
-                        var offset = new point_14.Point(6, 26);
-                        var pos = offset.minus(this.weaponSprite.transform.dimensions);
+                        var offsetFromEdge = new point_14.Point(6, 26).minus(this.weaponSprite.transform.dimensions); // for DRAWN/SHEATHED
+                        // relative position for DRAWN state when characer is facing right (mirroring logic below)
+                        var pos = new point_14.Point(0, 0);
                         var rotation = 0;
-                        if (this.state == State.SHEATHED) {
-                            // center on back
-                            pos = new point_14.Point(anim.transform.dimensions.x / 2 - this.weaponSprite.transform.dimensions.x / 2, pos.y)
-                                .plus(new point_14.Point(anim.transform.mirrorX ? 1 : -1, -1));
+                        if (this.state === State.DRAWN) {
+                            pos = offsetFromEdge;
                         }
-                        else if (this.state == State.ATTACKING) {
-                            var posWithRotation = this.getAttackAnimationPosition();
-                            pos = pos.plus(posWithRotation[0]);
+                        else if (this.state === State.SHEATHED) {
+                            // center on back
+                            pos = offsetFromEdge.plus(new point_14.Point(3, -1));
+                        }
+                        else if (this.state === State.ATTACKING) {
+                            var posWithRotation = this.getAttackAnimationPosition(characterAnim.transform.dimensions.y);
+                            pos = posWithRotation[0].plus(offsetFromEdge);
                             rotation = posWithRotation[1];
                         }
                         this.weaponSprite.transform.rotation = rotation;
+                        this.weaponSprite.transform.mirrorY = this.state == State.SHEATHED;
                         // magic based on the animations
-                        var f = anim.currentFrame();
+                        var f = characterAnim.currentFrame();
                         if (!character.isMoving) {
                             pos = pos.plus(new point_14.Point(0, f == 3 ? 1 : f));
                         }
                         else {
-                            pos = pos.plus(new point_14.Point(0, f == 0 ? -1 : -((3 - anim.currentFrame()))));
+                            pos = pos.plus(new point_14.Point(0, f == 0 ? -1 : -((3 - characterAnim.currentFrame()))));
                         }
-                        this.weaponSprite.transform.position = anim.transform.position.plus(pos);
+                        // mirror
+                        if (characterAnim.transform.mirrorX) {
+                            pos = new point_14.Point(characterAnim.transform.dimensions.x - pos.x - this.weaponSprite.transform.dimensions.x, pos.y);
+                        }
+                        // set position relative to the character
+                        this.weaponSprite.transform.position = characterAnim.transform.position.plus(pos);
                         // show sword behind character if mirrored
-                        this.weaponSprite.transform.depth = anim.transform.depth - (anim.transform.mirrorX || this.state == State.SHEATHED ? 1 : 0);
-                        this.weaponSprite.transform.mirrorX = anim.transform.mirrorX;
+                        this.weaponSprite.transform.depth = characterAnim.transform.depth + 1 - (this.state == State.SHEATHED ? 2 : 0);
+                        this.weaponSprite.transform.mirrorX = characterAnim.transform.mirrorX;
                         // TODO add attack animation
                     }
                 };
@@ -2013,7 +2021,7 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                 /**
                  * Returns (position, rotation)
                  */
-                Weapon.prototype.getAttackAnimationPosition = function () {
+                Weapon.prototype.getAttackAnimationPosition = function (charHeight) {
                     var swingStartFrame = 3;
                     var resettingFrame = 7;
                     if (this.currentAnimationFrame < swingStartFrame) {
@@ -2021,13 +2029,11 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                     }
                     else if (this.currentAnimationFrame < resettingFrame) {
                         return [
-                            new point_14.Point((8 - this.currentAnimationFrame) + this.weaponSprite.transform.dimensions.y - this.weaponSprite.transform.dimensions.x, 10 // TODO make this work with other weapon sizes
-                            ),
+                            new point_14.Point((6 - this.currentAnimationFrame) + this.weaponSprite.transform.dimensions.y - swingStartFrame * 3, Math.floor(this.weaponSprite.transform.dimensions.y / 2 - 1)),
                             90
                         ];
                     }
                     else {
-                        console.log(-this.currentAnimationFrame + resettingFrame);
                         return [new point_14.Point((1 - this.currentAnimationFrame + resettingFrame) * 3, 2), 0];
                     }
                 };
