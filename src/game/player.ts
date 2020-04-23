@@ -10,8 +10,8 @@ import { Interactable } from "./Interactable"
 import { TILE_SIZE, TileManager } from "./graphics/TileManager"
 
 export class Player extends Component {
-    readonly speed = 0.075
-    private characterAnim: TileComponent
+    readonly speed = 0.085
+    private characterAnim: AnimatedTileComponent
     private swordAnim: AnimatedTileComponent
 
     private collider: BoxCollider
@@ -24,6 +24,7 @@ export class Player extends Component {
     get position(): Point {
         return this._position
     }
+    private isMoving: boolean
 
     constructor(position: Point) {
         super()
@@ -32,7 +33,14 @@ export class Player extends Component {
 
     start(startData: StartData) {
         // TODO make animations triggerable so we can switch between run and idle
-        this.characterAnim = this.entity.addComponent(new AnimatedTileComponent(TileManager.instance.dungeonCharacters.getTileSetAnimation("knight_f_idle_anim", 120)))
+        this.characterAnim = this.entity.addComponent(
+            new AnimatedTileComponent(
+                new Point(0, 0), 
+                TileManager.instance.dungeonCharacters.getTileSetAnimation("knight_f_idle_anim", 150),
+                TileManager.instance.dungeonCharacters.getTileSetAnimation("knight_f_run_anim", 80),
+                TileManager.instance.dungeonCharacters.getTileSetAnimation("knight_f_hit_anim", 1000),
+            )
+        )
         
         // this.swordAnim = this.entity.addComponent(new AnimatedTileComponent(new TileSetAnimation([
         //     [Tile.SWORD_1, 500],
@@ -77,13 +85,19 @@ export class Player extends Component {
         }
         // this.swordAnim.transform.mirrorX = this.characterAnim.transform.mirrorX
         
-        const isMoving = dx != 0 || dy != 0
+        const wasMoving = this.isMoving
+        this.isMoving = dx != 0 || dy != 0
 
-        if (isMoving) {
-            const translation = new Point(dx, dy)
+        if (this.isMoving) {
+            if (!wasMoving) {
+                this.characterAnim.play(1)
+            }
+            const translation = new Point(dx, dy).normalized()
             this.lerpedLastMoveDir = this.lerpedLastMoveDir.lerp(0.25, translation)
             const newPos = this._position.plus(translation.times(updateData.elapsedTimeMillis * this.speed))
             this._position = this.collider.moveTo(newPos.plus(this.relativeColliderPos)).minus(this.relativeColliderPos)
+        } else if (wasMoving) {
+            this.characterAnim.play(0)
         }
 
         this.characterAnim.transform.position = this.position

@@ -2,14 +2,22 @@ import { Point } from "../point"
 import { UpdateData } from "../engine"
 import { TileComponent } from "./TileComponent"
 import { TileSetAnimation } from "./TileSetAnimation"
+import { TileSource } from "./TileSource"
 
 export class AnimatedTileComponent extends TileComponent {
     private animator: TileSetAnimator
+    private animations: TileSetAnimation[]
 
-    constructor(animation: TileSetAnimation, position: Point = new Point(0, 0)) {
-        const animator = new TileSetAnimator(animation)
+    // defaultAnimation has a key of 0, the following is 1, etc
+    constructor(position: Point, defaultAnimation: TileSetAnimation, ...additionalAnimations: TileSetAnimation[]) {
+        const animator = new TileSetAnimator(defaultAnimation)
         super(animator.getCurrentTileSource(), position)
         this.animator = animator
+        this.animations = [defaultAnimation].concat(additionalAnimations)
+    }
+
+    play(animation: number) {
+        this.animator = new TileSetAnimator(this.animations[animation])
     }
     
     update(updateData: UpdateData) {
@@ -26,7 +34,7 @@ class TileSetAnimator {
         this.animation = animation
     }
 
-    update(elapsedTimeMillis: number) {
+    update(elapsedTimeMillis: number): TileSource {
         this.time += elapsedTimeMillis
         while (this.time > this.animation.frames[this.index][1]) {
             this.index++
@@ -36,7 +44,7 @@ class TileSetAnimator {
         return this.getCurrentTileSource()
     }
 
-    getCurrentTileSource() {
+    getCurrentTileSource(): TileSource {
         return this.animation.frames[this.index][0]
     }
 }

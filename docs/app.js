@@ -895,15 +895,12 @@ System.register("engine/tiles/TileSetAnimation", [], function (exports_19, conte
         }
     };
 });
-System.register("engine/tiles/AnimatedTileComponent", ["engine/point", "engine/tiles/TileComponent"], function (exports_20, context_20) {
+System.register("engine/tiles/AnimatedTileComponent", ["engine/tiles/TileComponent"], function (exports_20, context_20) {
     "use strict";
-    var point_8, TileComponent_1, AnimatedTileComponent, TileSetAnimator;
+    var TileComponent_1, AnimatedTileComponent, TileSetAnimator;
     var __moduleName = context_20 && context_20.id;
     return {
         setters: [
-            function (point_8_1) {
-                point_8 = point_8_1;
-            },
             function (TileComponent_1_1) {
                 TileComponent_1 = TileComponent_1_1;
             }
@@ -911,14 +908,22 @@ System.register("engine/tiles/AnimatedTileComponent", ["engine/point", "engine/t
         execute: function () {
             AnimatedTileComponent = /** @class */ (function (_super) {
                 __extends(AnimatedTileComponent, _super);
-                function AnimatedTileComponent(animation, position) {
-                    if (position === void 0) { position = new point_8.Point(0, 0); }
+                // defaultAnimation has a key of 0, the following is 1, etc
+                function AnimatedTileComponent(position, defaultAnimation) {
+                    var additionalAnimations = [];
+                    for (var _i = 2; _i < arguments.length; _i++) {
+                        additionalAnimations[_i - 2] = arguments[_i];
+                    }
                     var _this = this;
-                    var animator = new TileSetAnimator(animation);
+                    var animator = new TileSetAnimator(defaultAnimation);
                     _this = _super.call(this, animator.getCurrentTileSource(), position) || this;
                     _this.animator = animator;
+                    _this.animations = [defaultAnimation].concat(additionalAnimations);
                     return _this;
                 }
+                AnimatedTileComponent.prototype.play = function (animation) {
+                    this.animator = new TileSetAnimator(this.animations[animation]);
+                };
                 AnimatedTileComponent.prototype.update = function (updateData) {
                     this.tileSource = this.animator.update(updateData.elapsedTimeMillis);
                 };
@@ -994,15 +999,15 @@ System.register("engine/util/utils", [], function (exports_22, context_22) {
 });
 System.register("engine/collision/Collider", ["engine/component", "engine/point", "engine/renderer/LineRender", "engine/debug", "engine/util/utils"], function (exports_23, context_23) {
     "use strict";
-    var component_3, point_9, LineRender_1, debug_2, utils_1, CollisionEngine, ENGINE, Collider;
+    var component_3, point_8, LineRender_1, debug_2, utils_1, CollisionEngine, ENGINE, Collider;
     var __moduleName = context_23 && context_23.id;
     return {
         setters: [
             function (component_3_1) {
                 component_3 = component_3_1;
             },
-            function (point_9_1) {
-                point_9 = point_9_1;
+            function (point_8_1) {
+                point_8 = point_8_1;
             },
             function (LineRender_1_1) {
                 LineRender_1 = LineRender_1_1;
@@ -1035,7 +1040,7 @@ System.register("engine/collision/Collider", ["engine/component", "engine/point"
                     var yMin = Math.min.apply(Math, pts.map(function (pt) { return pt.y + Math.min(translation.y, 0); }));
                     var yMax = Math.max.apply(Math, pts.map(function (pt) { return pt.y + Math.max(translation.y, 0); }));
                     var potentialCollisions = this.colliders.filter(function (other) { return other !== collider && other.getPoints().some(function (pt) {
-                        return utils_1.rectContains(new point_9.Point(xMax, yMin), new point_9.Point(xMax - xMin, yMax - yMin), pt);
+                        return utils_1.rectContains(new point_8.Point(xMax, yMin), new point_8.Point(xMax - xMin, yMax - yMin), pt);
                     }); });
                     // for all pts and all those colliders, find the closest intersection
                     var collisions = pts.flatMap(function (pt) { return potentialCollisions
@@ -1098,16 +1103,16 @@ System.register("engine/collision/Collider", ["engine/component", "engine/point"
                     var dx = point.x - this.position.x;
                     var dy = point.y - this.position.y;
                     // TODO: Should these branches be handled by the caller?
-                    if (ENGINE.canTranslate(this, new point_9.Point(dx, dy))) {
+                    if (ENGINE.canTranslate(this, new point_8.Point(dx, dy))) {
                         this._position = point;
                         ENGINE.checkCollider(this);
                     }
-                    else if (ENGINE.canTranslate(this, new point_9.Point(dx, 0))) {
-                        this._position = this._position.plus(new point_9.Point(dx, 0));
+                    else if (ENGINE.canTranslate(this, new point_8.Point(dx, 0))) {
+                        this._position = this._position.plus(new point_8.Point(dx, 0));
                         ENGINE.checkCollider(this);
                     }
-                    else if (ENGINE.canTranslate(this, new point_9.Point(0, dy))) {
-                        this._position = this._position.plus(new point_9.Point(0, dy));
+                    else if (ENGINE.canTranslate(this, new point_8.Point(0, dy))) {
+                        this._position = this._position.plus(new point_8.Point(0, dy));
                         ENGINE.checkCollider(this);
                     }
                     return this.position;
@@ -1181,7 +1186,7 @@ System.register("engine/collision/Collider", ["engine/component", "engine/point"
                     var denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
                     if (tNumerator >= 0 && tNumerator <= denominator && uNumerator >= 0 && uNumerator <= denominator) {
                         var t = tNumerator / denominator;
-                        return new point_9.Point(x1 + t * (x2 - x1), y1 + t * (y2 - y1));
+                        return new point_8.Point(x1 + t * (x2 - x1), y1 + t * (y2 - y1));
                     }
                     return null;
                 };
@@ -1193,15 +1198,15 @@ System.register("engine/collision/Collider", ["engine/component", "engine/point"
 });
 System.register("engine/collision/BoxCollider", ["engine/collision/Collider", "engine/point", "engine/util/utils"], function (exports_24, context_24) {
     "use strict";
-    var Collider_1, point_10, utils_2, BoxCollider;
+    var Collider_1, point_9, utils_2, BoxCollider;
     var __moduleName = context_24 && context_24.id;
     return {
         setters: [
             function (Collider_1_1) {
                 Collider_1 = Collider_1_1;
             },
-            function (point_10_1) {
-                point_10 = point_10_1;
+            function (point_9_1) {
+                point_9 = point_9_1;
             },
             function (utils_2_1) {
                 utils_2 = utils_2_1;
@@ -1218,10 +1223,10 @@ System.register("engine/collision/BoxCollider", ["engine/collision/Collider", "e
                 }
                 BoxCollider.prototype.getPoints = function () {
                     return [
-                        new point_10.Point(this.position.x, this.position.y),
-                        new point_10.Point(this.position.x + this.dimensions.x, this.position.y),
-                        new point_10.Point(this.position.x + this.dimensions.x, this.position.y + this.dimensions.y),
-                        new point_10.Point(this.position.x, this.position.y + this.dimensions.y)
+                        new point_9.Point(this.position.x, this.position.y),
+                        new point_9.Point(this.position.x + this.dimensions.x, this.position.y),
+                        new point_9.Point(this.position.x + this.dimensions.x, this.position.y + this.dimensions.y),
+                        new point_9.Point(this.position.x, this.position.y + this.dimensions.y)
                     ];
                 };
                 BoxCollider.prototype.isWithinBounds = function (pt) {
@@ -1269,12 +1274,12 @@ System.register("game/graphics/TileLoader", [], function (exports_26, context_26
 });
 System.register("game/graphics/SingleFileTileLoader", ["engine/point", "engine/tiles/TileSource", "engine/Assets"], function (exports_27, context_27) {
     "use strict";
-    var point_11, TileSource_1, Assets_1, SingleFileTileLoader;
+    var point_10, TileSource_1, Assets_1, SingleFileTileLoader;
     var __moduleName = context_27 && context_27.id;
     return {
         setters: [
-            function (point_11_1) {
-                point_11 = point_11_1;
+            function (point_10_1) {
+                point_10 = point_10_1;
             },
             function (TileSource_1_1) {
                 TileSource_1 = TileSource_1_1;
@@ -1302,7 +1307,7 @@ System.register("game/graphics/SingleFileTileLoader", ["engine/point", "engine/t
                     return this.getTileAt(result);
                 };
                 SingleFileTileLoader.prototype.getTileAt = function (pos) {
-                    return new TileSource_1.TileSource(Assets_1.assets.getImageByFileName(this.filename), pos.times(this.tileSize + this.padding), new point_11.Point(this.tileSize, this.tileSize));
+                    return new TileSource_1.TileSource(Assets_1.assets.getImageByFileName(this.filename), pos.times(this.tileSize + this.padding), new point_10.Point(this.tileSize, this.tileSize));
                 };
                 SingleFileTileLoader.prototype.getTileSetAnimation = function (key, speed) {
                     throw new Error("Method not implemented.");
@@ -1315,15 +1320,15 @@ System.register("game/graphics/SingleFileTileLoader", ["engine/point", "engine/t
 });
 System.register("game/graphics/DungeonTilesetII", ["engine/tiles/TileSource", "engine/point", "engine/tiles/TileSetAnimation", "engine/Assets"], function (exports_28, context_28) {
     "use strict";
-    var TileSource_2, point_12, TileSetAnimation_1, Assets_2, map, DungeonTilesetII;
+    var TileSource_2, point_11, TileSetAnimation_1, Assets_2, map, DungeonTilesetII;
     var __moduleName = context_28 && context_28.id;
     return {
         setters: [
             function (TileSource_2_1) {
                 TileSource_2 = TileSource_2_1;
             },
-            function (point_12_1) {
-                point_12 = point_12_1;
+            function (point_11_1) {
+                point_11 = point_11_1;
             },
             function (TileSetAnimation_1_1) {
                 TileSetAnimation_1 = TileSetAnimation_1_1;
@@ -1333,7 +1338,7 @@ System.register("game/graphics/DungeonTilesetII", ["engine/tiles/TileSource", "e
             }
         ],
         execute: function () {
-            map = new Map("\n    wall_top_left 16 0 16 16\n    wall_top_mid 32 0 16 16\n    wall_top_right 48 0 16 16\n\n    wall_left 16 16 16 16\n    wall_mid 32 16 16 16\n    wall_right 48 16 16 16\n\n    wall_fountain_top 64 0 16 16\n    wall_fountain_mid_red_anim 64 16 16 16 3\n    wall_fountain_basin_red_anim 64 32 16 16 3\n    wall_fountain_mid_blue_anim 64 48 16 16 3\n    wall_fountain_basin_blue_anim 64 64 16 16 3\n\n    wall_hole_1 48 32 16 16\n    wall_hole_2 48 48 16 16\n\n    wall_banner_red 16 32 16 16\n    wall_banner_blue 32 32 16 16\n    wall_banner_green 16 48 16 16\n    wall_banner_yellow 32 48 16 16\n\n    column_top 80 80 16 16\n    column_mid 80 96 16 16\n    coulmn_base 80 112 16 16\n    wall_column_top 96 80 16 16\n    wall_column_mid 96 96 16 16\n    wall_coulmn_base 96 112 16 16\n\n    wall_goo 64 80 16 16\n    wall_goo_base 64 96 16 16\n\n    floor_1 16 64 16 16\n    floor_2 32 64 16 16\n    floor_3 48 64 16 16\n    floor_4 16 80 16 16\n    floor_5 32 80 16 16\n    floor_6 48 80 16 16\n    floor_7 16 96 16 16\n    floor_8 32 96 16 16\n    floor_ladder 48 96 16 16\n\n    floor_spikes_anim 16 176 16 16 4\n\n    wall_side_top_left 0 112 16 16\n    wall_side_top_right 16 112 16 16\n    wall_side_mid_left 0 128 16 16\n    wall_side_mid_right 16 128 16 16\n    wall_side_front_left 0 144 16 16\n    wall_side_front_right 16 144 16 16\n\n    wall_corner_top_left 32 112 16 16\n    wall_corner_top_right 48 112 16 16\n    wall_corner_left 32 128 16 16\n    wall_corner_right 48 128 16 16\n    wall_corner_bottom_left 32 144 16 16\n    wall_corner_bottom_right 48 144 16 16\n    wall_corner_front_left 32 160 16 16\n    wall_corner_front_right 48 160 16 16\n\n    wall_inner_corner_l_top_left 80 128 16 16\n    wall_inner_corner_l_top_rigth 64 128 16 16\n    wall_inner_corner_mid_left 80 144 16 16\n    wall_inner_corner_mid_rigth 64 144 16 16\n    wall_inner_corner_t_top_left 80 160 16 16\n    wall_inner_corner_t_top_rigth 64 160 16 16\n\n    edge 96 128 16 16\n    hole  96 144 16 16\n\n    doors_all 16 221 64 35\n    doors_frame_left 16 224 16 32\n    doors_frame_top 32 221 32 3\n    doors_frame_righ 63 224 16 32\n    doors_leaf_closed 32 224 32 32\n    doors_leaf_open 80 224 32 32\n\n    chest_empty_open_anim 304 288 16 16 3\n    chest_full_open_anim 304 304 16 16 3\n    chest_mimic_open_anim 304 320 16 16 3\n\n    flask_big_red 288 224 16 16\n    flask_big_blue 304 224 16 16\n    flask_big_green 320 224 16 16\n    flask_big_yellow 336 224 16 16\n\n    flask_red 288 240 16 16\n    flask_blue 304 240 16 16\n    flask_green 320 240 16 16\n    flask_yellow 336 240 16 16\n\n    skull 288 320 16 16\n    crate 288 298 16 22\n\n    coin_anim 288 272 8 8 4\n\n    ui_heart_full 288 256 16 16\n    ui_heart_half 304 256 16 16\n    ui_heart_empty 320 256 16 16\n\n    weapon_knife 293 18 6 13\n    weapon_rusty_sword 307 26 10 21\n    weapon_regular_sword 323 26 10 21\n    weapon_red_gem_sword 339 26 10 21\n    weapon_big_hammer 291 42 10 37\n    weapon_hammer 307 55 10 24\n    weapon_baton_with_spikes 323 57 10 22\n    weapon_mace 339 55 10 24\n    weapon_katana 293 82 6 29\n    weapon_saw_sword 307 86 10 25\n    weapon_anime_sword 322 81 12 30\n    weapon_axe 341 90 9 21\n    weapon_machete 294 121 5 22\n    weapon_cleaver 310 124 8 19\n    weapon_duel_sword 325 113 9 30\n    weapon_knight_sword 339 114 10 29\n    weapon_golden_sword 291 153 10 22\n    weapon_lavish_sword 307 145 10 30\n    weapon_red_magic_staff 324 145 8 30\n    weapon_green_magic_staff 340 145 8 30\n    weapon_spear 293 177 6 30\n\n    tiny_zombie_idle_anim 368 16 16 16 4\n    tiny_zombie_run_anim 432 16 16 16 4\n    goblin_idle_anim 368 32 16 16 4\n    goblin_run_anim 432 32 16 16 4\n    imp_idle_anim 368 48 16 16 4\n    imp_run_anim 432 48 16 16 4\n    skelet_idle_anim 368 80 16 16 4\n    skelet_run_anim 432 80 16 16 4\n    muddy_idle_anim 368 112 16 16 4\n    muddy_run_anim 368 112 16 16 4\n    swampy_idle_anim 432 112 16 16 4\n    swampy_run_anim 432 112 16 16 4\n    zombie_idle_anim 368 144 16 16 4\n    zombie_run_anim 368 144 16 16 4\n    ice_zombie_idle_anim 432 144 16 16 4\n    ice_zombie_run_anim 432 144 16 16 4\n    masked_orc_idle_anim 368 172 16 20 4\n    masked_orc_run_anim 432 172 16 20 4\n    orc_warrior_idle_anim 368 204 16 20 4\n    orc_warrior_run_anim 432 204 16 20 4\n    orc_shaman_idle_anim 368 236 16 20 4\n    orc_shaman_run_anim 432 236 16 20 4\n    necromancer_idle_anim 368 268 16 20 4\n    necromancer_run_anim 368 268 16 20 4\n    wogol_idle_anim 368 300 16 20 4\n    wogol_run_anim 432 300 16 20 4\n    chort_idle_anim 368 328 16 24 4\n    chort_run_anim 432 328 16 24 4\n    big_zombie_idle_anim 16 270 32 34 4\n    big_zombie_run_anim 144 270 32 34 4\n    ogre_idle_anim  16 320 32 32 4\n    ogre_run_anim 144 320 32 32 4\n    big_demon_idle_anim  16 364 32 36 4\n    big_demon_run_anim 144 364 32 36 4\n\n    elf_f_idle_anim 128 4 16 28 4\n    elf_f_run_anim 192 4 16 28 4\n    elf_f_hit_anim 256 4 16 28 1\n\n    elf_m_idle_anim 128 36 16 28 4\n    elf_m_run_anim 192 36 16 28 4\n    elf_m_hit_anim 256 36 16 28 1\n\n    knight_f_idle_anim 128 68 16 28 4\n    knight_f_run_anim 192 68 16 28 4\n    knight_f_hit_anim 256 68 16 28 1\n\n    knight_m_idle_anim 128 100 16 28 4\n    knight_m_run_anim 192 100 16 28 4\n    knight_m_hit_anim 256 100 16 28 1\n\n    wizzard_f_idle_anim 128 132 16 28 4\n    wizzard_f_run_anim 192 132 16 28 4\n    wizzard_f_hit_anim 256 132 16 28 1\n\n    wizzard_m_idle_anim 128 164 16 28 4\n    wizzard_m_run_anim 192 164 16 28 4\n    wizzard_m_hit_anim 256 164 16 28 1\n\n    lizard_f_idle_anim 128 196 16 28 4\n    lizard_f_run_anim 192 196 16 28 4\n    lizard_f_hit_anim 256 196 16 28 1\n\n    lizard_m_idle_anim 128 228 16 28 4\n    lizard_m_run_anim 192 228 16 28 4\n    lizard_m_hit_anim 256 228 16 28 1\n    ".split("\n")
+            map = new Map("\n    wall_top_left 16 0 16 16\n    wall_top_mid 32 0 16 16\n    wall_top_right 48 0 16 16\n\n    wall_left 16 16 16 16\n    wall_mid 32 16 16 16\n    wall_right 48 16 16 16\n\n    wall_fountain_top 64 0 16 16\n    wall_fountain_mid_red_anim 64 16 16 16 3\n    wall_fountain_basin_red_anim 64 32 16 16 3\n    wall_fountain_mid_blue_anim 64 48 16 16 3\n    wall_fountain_basin_blue_anim 64 64 16 16 3\n\n    wall_hole_1 48 32 16 16\n    wall_hole_2 48 48 16 16\n\n    wall_banner_red 16 32 16 16\n    wall_banner_blue 32 32 16 16\n    wall_banner_green 16 48 16 16\n    wall_banner_yellow 32 48 16 16\n\n    column_top 80 80 16 16\n    column_mid 80 96 16 16\n    coulmn_base 80 112 16 16\n    wall_column_top 96 80 16 16\n    wall_column_mid 96 96 16 16\n    wall_coulmn_base 96 112 16 16\n\n    wall_goo 64 80 16 16\n    wall_goo_base 64 96 16 16\n\n    floor_1 16 64 16 16\n    floor_2 32 64 16 16\n    floor_3 48 64 16 16\n    floor_4 16 80 16 16\n    floor_5 32 80 16 16\n    floor_6 48 80 16 16\n    floor_7 16 96 16 16\n    floor_8 32 96 16 16\n    floor_ladder 48 96 16 16\n\n    floor_spikes_anim 16 176 16 16 4\n\n    wall_side_top_left 0 112 16 16\n    wall_side_top_right 16 112 16 16\n    wall_side_mid_left 0 128 16 16\n    wall_side_mid_right 16 128 16 16\n    wall_side_front_left 0 144 16 16\n    wall_side_front_right 16 144 16 16\n\n    wall_corner_top_left 32 112 16 16\n    wall_corner_top_right 48 112 16 16\n    wall_corner_left 32 128 16 16\n    wall_corner_right 48 128 16 16\n    wall_corner_bottom_left 32 144 16 16\n    wall_corner_bottom_right 48 144 16 16\n    wall_corner_front_left 32 160 16 16\n    wall_corner_front_right 48 160 16 16\n\n    wall_inner_corner_l_top_left 80 128 16 16\n    wall_inner_corner_l_top_rigth 64 128 16 16\n    wall_inner_corner_mid_left 80 144 16 16\n    wall_inner_corner_mid_rigth 64 144 16 16\n    wall_inner_corner_t_top_left 80 160 16 16\n    wall_inner_corner_t_top_rigth 64 160 16 16\n\n    edge 96 128 16 16\n    hole  96 144 16 16\n\n    doors_all 16 221 64 35\n    doors_frame_left 16 224 16 32\n    doors_frame_top 32 221 32 3\n    doors_frame_righ 63 224 16 32\n    doors_leaf_closed 32 224 32 32\n    doors_leaf_open 80 224 32 32\n\n    chest_empty_open_anim 304 288 16 16 3\n    chest_full_open_anim 304 304 16 16 3\n    chest_mimic_open_anim 304 320 16 16 3\n\n    flask_big_red 288 224 16 16\n    flask_big_blue 304 224 16 16\n    flask_big_green 320 224 16 16\n    flask_big_yellow 336 224 16 16\n\n    flask_red 288 240 16 16\n    flask_blue 304 240 16 16\n    flask_green 320 240 16 16\n    flask_yellow 336 240 16 16\n\n    skull 288 320 16 16\n    crate 288 298 16 22\n\n    coin_anim 288 272 8 8 4\n\n    ui_heart_full 288 256 16 16\n    ui_heart_half 304 256 16 16\n    ui_heart_empty 320 256 16 16\n\n    weapon_knife 293 18 6 13\n    weapon_rusty_sword 307 26 10 21\n    weapon_regular_sword 323 26 10 21\n    weapon_red_gem_sword 339 26 10 21\n    weapon_big_hammer 291 42 10 37\n    weapon_hammer 307 55 10 24\n    weapon_baton_with_spikes 323 57 10 22\n    weapon_mace 339 55 10 24\n    weapon_katana 293 82 6 29\n    weapon_saw_sword 307 86 10 25\n    weapon_anime_sword 322 81 12 30\n    weapon_axe 341 90 9 21\n    weapon_machete 294 121 5 22\n    weapon_cleaver 310 124 8 19\n    weapon_duel_sword 325 113 9 30\n    weapon_knight_sword 339 114 10 29\n    weapon_golden_sword 291 153 10 22\n    weapon_lavish_sword 307 145 10 30\n    weapon_red_magic_staff 324 145 8 30\n    weapon_green_magic_staff 340 145 8 30\n    weapon_spear 293 177 6 30\n\n    tiny_zombie_idle_anim 368 16 16 16 4\n    tiny_zombie_run_anim 432 16 16 16 4\n\n    goblin_idle_anim 368 32 16 16 4\n    goblin_run_anim 432 32 16 16 4\n\n    imp_idle_anim 368 48 16 16 4\n    imp_run_anim 432 48 16 16 4\n\n    skelet_idle_anim 368 80 16 16 4\n    skelet_run_anim 432 80 16 16 4\n\n    muddy_idle_anim 368 112 16 16 4\n    muddy_run_anim 368 112 16 16 4\n\n    swampy_idle_anim 432 112 16 16 4\n    swampy_run_anim 432 112 16 16 4\n\n    zombie_idle_anim 368 144 16 16 4\n    zombie_run_anim 368 144 16 16 4\n\n    ice_zombie_idle_anim 432 144 16 16 4\n    ice_zombie_run_anim 432 144 16 16 4\n\n    masked_orc_idle_anim 368 172 16 20 4\n    masked_orc_run_anim 432 172 16 20 4\n\n    orc_warrior_idle_anim 368 204 16 20 4\n    orc_warrior_run_anim 432 204 16 20 4\n\n    orc_shaman_idle_anim 368 236 16 20 4\n    orc_shaman_run_anim 432 236 16 20 4\n\n    necromancer_idle_anim 368 268 16 20 4\n    necromancer_run_anim 368 268 16 20 4\n\n    wogol_idle_anim 368 300 16 20 4\n    wogol_run_anim 432 300 16 20 4\n\n    chort_idle_anim 368 328 16 24 4\n    chort_run_anim 432 328 16 24 4\n\n    big_zombie_idle_anim 16 270 32 34 4\n    big_zombie_run_anim 144 270 32 34 4\n\n    ogre_idle_anim  16 320 32 32 4\n    ogre_run_anim 144 320 32 32 4\n    \n    big_demon_idle_anim  16 364 32 36 4\n    big_demon_run_anim 144 364 32 36 4\n\n    elf_f_idle_anim 128 4 16 28 4\n    elf_f_run_anim 192 4 16 28 4\n    elf_f_hit_anim 256 4 16 28 1\n\n    elf_m_idle_anim 128 36 16 28 4\n    elf_m_run_anim 192 36 16 28 4\n    elf_m_hit_anim 256 36 16 28 1\n\n    knight_f_idle_anim 128 68 16 28 4\n    knight_f_run_anim 192 68 16 28 4\n    knight_f_hit_anim 256 68 16 28 1\n\n    knight_m_idle_anim 128 100 16 28 4\n    knight_m_run_anim 192 100 16 28 4\n    knight_m_hit_anim 256 100 16 28 1\n\n    wizzard_f_idle_anim 128 132 16 28 4\n    wizzard_f_run_anim 192 132 16 28 4\n    wizzard_f_hit_anim 256 132 16 28 1\n\n    wizzard_m_idle_anim 128 164 16 28 4\n    wizzard_m_run_anim 192 164 16 28 4\n    wizzard_m_hit_anim 256 164 16 28 1\n\n    lizard_f_idle_anim 128 196 16 28 4\n    lizard_f_run_anim 192 196 16 28 4\n    lizard_f_hit_anim 256 196 16 28 1\n\n    lizard_m_idle_anim 128 228 16 28 4\n    lizard_m_run_anim 192 228 16 28 4\n    lizard_m_hit_anim 256 228 16 28 1\n    ".split("\n")
                 .map(function (line) { return line.trim(); })
                 .filter(function (line) { return !!line; })
                 .map(function (line) { return line.split(" "); })
@@ -1349,8 +1354,8 @@ System.register("game/graphics/DungeonTilesetII", ["engine/tiles/TileSource", "e
                     if ((row === null || row === void 0 ? void 0 : row.length) != 4) {
                         throw Error("invalid tile spec");
                     }
-                    var pos = new point_12.Point(+row[0], +row[1]);
-                    var dim = new point_12.Point(+row[2], +row[3]);
+                    var pos = new point_11.Point(+row[0], +row[1]);
+                    var dim = new point_11.Point(+row[2], +row[3]);
                     return new TileSource_2.TileSource(this.getFile(), pos, dim);
                 };
                 DungeonTilesetII.prototype.getTileSetAnimation = function (key, speed) {
@@ -1361,8 +1366,8 @@ System.register("game/graphics/DungeonTilesetII", ["engine/tiles/TileSource", "e
                     }
                     var frames = Array.from({ length: +row[4] }, function (value, key) { return key; })
                         .map(function (frameIndex) {
-                        var pos = new point_12.Point(+row[0] + frameIndex * +row[2], +row[1]);
-                        var dim = new point_12.Point(+row[2], +row[3]);
+                        var pos = new point_11.Point(+row[0] + frameIndex * +row[2], +row[1]);
+                        var dim = new point_11.Point(+row[2], +row[3]);
                         return new TileSource_2.TileSource(_this.getFile(), pos, dim);
                     })
                         .map(function (tileSource) { return [tileSource, speed]; });
@@ -1379,7 +1384,7 @@ System.register("game/graphics/DungeonTilesetII", ["engine/tiles/TileSource", "e
 });
 System.register("game/graphics/SplitFileTileLoader", ["engine/tiles/TileSource", "engine/Assets", "engine/point"], function (exports_29, context_29) {
     "use strict";
-    var TileSource_3, Assets_3, point_13, SplitFileTileLoader;
+    var TileSource_3, Assets_3, point_12, SplitFileTileLoader;
     var __moduleName = context_29 && context_29.id;
     return {
         setters: [
@@ -1389,8 +1394,8 @@ System.register("game/graphics/SplitFileTileLoader", ["engine/tiles/TileSource",
             function (Assets_3_1) {
                 Assets_3 = Assets_3_1;
             },
-            function (point_13_1) {
-                point_13 = point_13_1;
+            function (point_12_1) {
+                point_12 = point_12_1;
             }
         ],
         execute: function () {
@@ -1403,7 +1408,7 @@ System.register("game/graphics/SplitFileTileLoader", ["engine/tiles/TileSource",
                     if (!!image) {
                         return null;
                     }
-                    return new TileSource_3.TileSource(image, new point_13.Point(image.width, image.height), new point_13.Point(0, 0));
+                    return new TileSource_3.TileSource(image, new point_12.Point(image.width, image.height), new point_12.Point(0, 0));
                 };
                 SplitFileTileLoader.prototype.getTileSetAnimation = function (key, speed) {
                     throw new Error("Method not implemented.");
@@ -1829,15 +1834,15 @@ System.register("game/graphics/TileManager", ["game/graphics/SingleFileTileLoade
 });
 System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/point", "engine/component", "engine/collision/BoxCollider", "game/graphics/TileManager"], function (exports_31, context_31) {
     "use strict";
-    var AnimatedTileComponent_1, point_14, component_5, BoxCollider_1, TileManager_1, Player;
+    var AnimatedTileComponent_1, point_13, component_5, BoxCollider_1, TileManager_1, Player;
     var __moduleName = context_31 && context_31.id;
     return {
         setters: [
             function (AnimatedTileComponent_1_1) {
                 AnimatedTileComponent_1 = AnimatedTileComponent_1_1;
             },
-            function (point_14_1) {
-                point_14 = point_14_1;
+            function (point_13_1) {
+                point_13 = point_13_1;
             },
             function (component_5_1) {
                 component_5 = component_5_1;
@@ -1854,9 +1859,9 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/po
                 __extends(Player, _super);
                 function Player(position) {
                     var _this = _super.call(this) || this;
-                    _this.speed = 0.075;
-                    _this.relativeColliderPos = new point_14.Point(3, 15);
-                    _this.lerpedLastMoveDir = new point_14.Point(1, 0); // used for crosshair
+                    _this.speed = 0.085;
+                    _this.relativeColliderPos = new point_13.Point(3, 15);
+                    _this.lerpedLastMoveDir = new point_13.Point(1, 0); // used for crosshair
                     _this._position = position;
                     return _this;
                 }
@@ -1869,12 +1874,12 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/po
                 });
                 Player.prototype.start = function (startData) {
                     // TODO make animations triggerable so we can switch between run and idle
-                    this.characterAnim = this.entity.addComponent(new AnimatedTileComponent_1.AnimatedTileComponent(TileManager_1.TileManager.instance.dungeonCharacters.getTileSetAnimation("knight_f_idle_anim", 120)));
+                    this.characterAnim = this.entity.addComponent(new AnimatedTileComponent_1.AnimatedTileComponent(new point_13.Point(0, 0), TileManager_1.TileManager.instance.dungeonCharacters.getTileSetAnimation("knight_f_idle_anim", 150), TileManager_1.TileManager.instance.dungeonCharacters.getTileSetAnimation("knight_f_run_anim", 80), TileManager_1.TileManager.instance.dungeonCharacters.getTileSetAnimation("knight_f_hit_anim", 1000)));
                     // this.swordAnim = this.entity.addComponent(new AnimatedTileComponent(new TileSetAnimation([
                     //     [Tile.SWORD_1, 500],
                     //     // [Tile.ARC, 100]
                     // ])))
-                    this.collider = this.entity.addComponent(new BoxCollider_1.BoxCollider(this.position.plus(this.relativeColliderPos), new point_14.Point(10, 12)));
+                    this.collider = this.entity.addComponent(new BoxCollider_1.BoxCollider(this.position.plus(this.relativeColliderPos), new point_13.Point(10, 12)));
                     // this.crosshairs = this.entity.addComponent(new TileComponent(Tile.CROSSHAIRS))
                 };
                 Player.prototype.update = function (updateData) {
@@ -1913,12 +1918,19 @@ System.register("game/player", ["engine/tiles/AnimatedTileComponent", "engine/po
                         this.characterAnim.transform.mirrorX = false;
                     }
                     // this.swordAnim.transform.mirrorX = this.characterAnim.transform.mirrorX
-                    var isMoving = dx != 0 || dy != 0;
-                    if (isMoving) {
-                        var translation = new point_14.Point(dx, dy);
+                    var wasMoving = this.isMoving;
+                    this.isMoving = dx != 0 || dy != 0;
+                    if (this.isMoving) {
+                        if (!wasMoving) {
+                            this.characterAnim.play(1);
+                        }
+                        var translation = new point_13.Point(dx, dy).normalized();
                         this.lerpedLastMoveDir = this.lerpedLastMoveDir.lerp(0.25, translation);
                         var newPos = this._position.plus(translation.times(updateData.elapsedTimeMillis * this.speed));
                         this._position = this.collider.moveTo(newPos.plus(this.relativeColliderPos)).minus(this.relativeColliderPos);
+                    }
+                    else if (wasMoving) {
+                        this.characterAnim.play(0);
                     }
                     this.characterAnim.transform.position = this.position;
                     // this.swordAnim.transform.position = this.position
@@ -2038,12 +2050,12 @@ System.register("engine/util/BinaryHeap", [], function (exports_32, context_32) 
 });
 System.register("engine/util/Grid", ["engine/point", "engine/util/BinaryHeap"], function (exports_33, context_33) {
     "use strict";
-    var point_15, BinaryHeap_1, Grid;
+    var point_14, BinaryHeap_1, Grid;
     var __moduleName = context_33 && context_33.id;
     return {
         setters: [
-            function (point_15_1) {
-                point_15 = point_15_1;
+            function (point_14_1) {
+                point_14 = point_14_1;
             },
             function (BinaryHeap_1_1) {
                 BinaryHeap_1 = BinaryHeap_1_1;
@@ -2072,7 +2084,7 @@ System.register("engine/util/Grid", ["engine/point", "engine/util/BinaryHeap"], 
                     var _this = this;
                     if (heuristic === void 0) { heuristic = function (pt) { return pt.distanceTo(end); }; }
                     if (isOccupied === void 0) { isOccupied = function (pt) { return !!_this.get(pt); }; }
-                    if (getNeighbors === void 0) { getNeighbors = function (pt) { return [new point_15.Point(pt.x, pt.y - 1), new point_15.Point(pt.x - 1, pt.y), new point_15.Point(pt.x + 1, pt.y), new point_15.Point(pt.x, pt.y + 1)]; }; }
+                    if (getNeighbors === void 0) { getNeighbors = function (pt) { return [new point_14.Point(pt.x, pt.y - 1), new point_14.Point(pt.x - 1, pt.y), new point_14.Point(pt.x + 1, pt.y), new point_14.Point(pt.x, pt.y + 1)]; }; }
                     if (isOccupied(start) || isOccupied(end)) {
                         return null;
                     }
@@ -2165,12 +2177,12 @@ System.register("engine/tiles/TileGrid", ["engine/util/Grid", "engine/Entity", "
 });
 System.register("engine/tiles/ConnectingTile", ["engine/point", "engine/component"], function (exports_35, context_35) {
     "use strict";
-    var point_16, component_6, ConnectingTile;
+    var point_15, component_6, ConnectingTile;
     var __moduleName = context_35 && context_35.id;
     return {
         setters: [
-            function (point_16_1) {
-                point_16 = point_16_1;
+            function (point_15_1) {
+                point_15 = point_15_1;
             },
             function (component_6_1) {
                 component_6 = component_6_1;
@@ -2184,7 +2196,7 @@ System.register("engine/tiles/ConnectingTile", ["engine/point", "engine/componen
                  * Connecting tiles require a tile grid. The position parameter should be tile-scale, not pixel-scale.
                  */
                 function ConnectingTile(schema, grid, position) {
-                    if (position === void 0) { position = new point_16.Point(0, 0); }
+                    if (position === void 0) { position = new point_15.Point(0, 0); }
                     var _this = _super.call(this) || this;
                     _this.schema = schema;
                     _this.grid = grid;
@@ -2202,12 +2214,12 @@ System.register("engine/tiles/ConnectingTile", ["engine/point", "engine/componen
 });
 System.register("engine/tiles/ConnectingTileSchema", ["engine/point", "engine/tiles/TileTransform", "engine/tiles/ConnectingTile"], function (exports_36, context_36) {
     "use strict";
-    var point_17, TileTransform_2, ConnectingTile_1, ConnectingTileSchema;
+    var point_16, TileTransform_2, ConnectingTile_1, ConnectingTileSchema;
     var __moduleName = context_36 && context_36.id;
     return {
         setters: [
-            function (point_17_1) {
-                point_17 = point_17_1;
+            function (point_16_1) {
+                point_16 = point_16_1;
             },
             function (TileTransform_2_1) {
                 TileTransform_2 = TileTransform_2_1;
@@ -2272,10 +2284,10 @@ System.register("engine/tiles/ConnectingTileSchema", ["engine/point", "engine/ti
                     var x = position.x;
                     var y = position.y;
                     // TODO: add diagonals?
-                    var n = this.get(grid, new point_17.Point(x, y - 1));
-                    var s = this.get(grid, new point_17.Point(x, y + 1));
-                    var e = this.get(grid, new point_17.Point(x + 1, y));
-                    var w = this.get(grid, new point_17.Point(x - 1, y));
+                    var n = this.get(grid, new point_16.Point(x, y - 1));
+                    var s = this.get(grid, new point_16.Point(x, y + 1));
+                    var e = this.get(grid, new point_16.Point(x + 1, y));
+                    var w = this.get(grid, new point_16.Point(x - 1, y));
                     var count = [n, s, e, w].filter(function (dir) { return !!dir; }).length;
                     var result;
                     var rotation = 0;
@@ -2351,12 +2363,12 @@ System.register("engine/tiles/ConnectingTileSchema", ["engine/point", "engine/ti
 });
 System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTileSchema", "engine/tiles/ConnectingTile", "engine/Entity", "engine/collision/BoxCollider", "game/graphics/TileManager"], function (exports_37, context_37) {
     "use strict";
-    var point_18, ConnectingTileSchema_1, ConnectingTile_2, Entity_3, BoxCollider_2, TileManager_2, MapGenerator;
+    var point_17, ConnectingTileSchema_1, ConnectingTile_2, Entity_3, BoxCollider_2, TileManager_2, MapGenerator;
     var __moduleName = context_37 && context_37.id;
     return {
         setters: [
-            function (point_18_1) {
-                point_18 = point_18_1;
+            function (point_17_1) {
+                point_17 = point_17_1;
             },
             function (ConnectingTileSchema_1_1) {
                 ConnectingTileSchema_1 = ConnectingTileSchema_1_1;
@@ -2378,19 +2390,19 @@ System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTi
             MapGenerator = /** @class */ (function () {
                 function MapGenerator() {
                     this.oldPathSchema = new ConnectingTileSchema_1.ConnectingTileSchema()
-                        .vertical(TileManager_2.TileManager.instance.outdoorTiles.getTileAt(new point_18.Point(9, 7)))
-                        .angle(TileManager_2.TileManager.instance.outdoorTiles.getTileAt(new point_18.Point(7, 7)))
-                        .tShape(TileManager_2.TileManager.instance.outdoorTiles.getTileAt(new point_18.Point(5, 8)))
-                        .plusShape(TileManager_2.TileManager.instance.outdoorTiles.getTileAt(new point_18.Point(7, 12)))
-                        .cap(TileManager_2.TileManager.instance.outdoorTiles.getTileAt(new point_18.Point(6, 11)))
-                        .single(TileManager_2.TileManager.instance.outdoorTiles.getTileAt(new point_18.Point(8, 12)));
+                        .vertical(TileManager_2.TileManager.instance.outdoorTiles.getTileAt(new point_17.Point(9, 7)))
+                        .angle(TileManager_2.TileManager.instance.outdoorTiles.getTileAt(new point_17.Point(7, 7)))
+                        .tShape(TileManager_2.TileManager.instance.outdoorTiles.getTileAt(new point_17.Point(5, 8)))
+                        .plusShape(TileManager_2.TileManager.instance.outdoorTiles.getTileAt(new point_17.Point(7, 12)))
+                        .cap(TileManager_2.TileManager.instance.outdoorTiles.getTileAt(new point_17.Point(6, 11)))
+                        .single(TileManager_2.TileManager.instance.outdoorTiles.getTileAt(new point_17.Point(8, 12)));
                     this.pathSchema = new ConnectingTileSchema_1.ConnectingTileSchema()
-                        .vertical(TileManager_2.TileManager.instance.tilemap.getTileAt(new point_18.Point(2, 6)))
-                        .angle(TileManager_2.TileManager.instance.tilemap.getTileAt(new point_18.Point(0, 5)))
-                        .tShape(TileManager_2.TileManager.instance.tilemap.getTileAt(new point_18.Point(3, 5)))
-                        .plusShape(TileManager_2.TileManager.instance.tilemap.getTileAt(new point_18.Point(6, 5)))
-                        .cap(TileManager_2.TileManager.instance.tilemap.getTileAt(new point_18.Point(2, 6)))
-                        .single(TileManager_2.TileManager.instance.tilemap.getTileAt(new point_18.Point(7, 5)));
+                        .vertical(TileManager_2.TileManager.instance.tilemap.getTileAt(new point_17.Point(2, 6)))
+                        .angle(TileManager_2.TileManager.instance.tilemap.getTileAt(new point_17.Point(0, 5)))
+                        .tShape(TileManager_2.TileManager.instance.tilemap.getTileAt(new point_17.Point(3, 5)))
+                        .plusShape(TileManager_2.TileManager.instance.tilemap.getTileAt(new point_17.Point(5, 5)))
+                        .cap(TileManager_2.TileManager.instance.tilemap.getTileAt(new point_17.Point(2, 6)))
+                        .single(TileManager_2.TileManager.instance.tilemap.getTileAt(new point_17.Point(7, 5)));
                 }
                 MapGenerator.prototype.renderPath = function (grid, start, end, tileSchema, randomness) {
                     var heuristic = function (pt) {
@@ -2424,7 +2436,7 @@ System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTi
                     path.forEach(function (pt) {
                         var entity = new Entity_3.Entity([
                             new ConnectingTile_2.ConnectingTile(tileSchema, grid, pt),
-                            new BoxCollider_2.BoxCollider(pt.times(TileManager_2.TILE_SIZE), new point_18.Point(TileManager_2.TILE_SIZE, TileManager_2.TILE_SIZE), true)
+                            new BoxCollider_2.BoxCollider(pt.times(TileManager_2.TILE_SIZE), new point_17.Point(TileManager_2.TILE_SIZE, TileManager_2.TILE_SIZE), true)
                         ]);
                         grid.set(pt, entity);
                     });
@@ -2437,15 +2449,15 @@ System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTi
 });
 System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/game", "engine/View", "engine/tiles/TileComponent", "game/player", "engine/tiles/TileGrid", "game/MapGenerator", "engine/tiles/AnimatedTileComponent", "game/graphics/TileManager"], function (exports_38, context_38) {
     "use strict";
-    var Entity_4, point_19, game_1, View_2, TileComponent_3, player_1, TileGrid_1, MapGenerator_1, AnimatedTileComponent_2, TileManager_3, ZOOM, QuestGame;
+    var Entity_4, point_18, game_1, View_2, TileComponent_3, player_1, TileGrid_1, MapGenerator_1, AnimatedTileComponent_2, TileManager_3, ZOOM, QuestGame;
     var __moduleName = context_38 && context_38.id;
     return {
         setters: [
             function (Entity_4_1) {
                 Entity_4 = Entity_4_1;
             },
-            function (point_19_1) {
-                point_19 = point_19_1;
+            function (point_18_1) {
+                point_18 = point_18_1;
             },
             function (game_1_1) {
                 game_1 = game_1_1;
@@ -2480,19 +2492,19 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
                     var _this = _super !== null && _super.apply(this, arguments) || this;
                     _this.tileManager = new TileManager_3.TileManager();
                     _this.tiles = new TileGrid_1.TileGrid(TileManager_3.TILE_SIZE);
-                    _this.player = new Entity_4.Entity([new player_1.Player(new point_19.Point(-2, 2).times(TileManager_3.TILE_SIZE))]).getComponent(player_1.Player);
+                    _this.player = new Entity_4.Entity([new player_1.Player(new point_18.Point(-2, 2).times(TileManager_3.TILE_SIZE))]).getComponent(player_1.Player);
                     _this.enemies = [];
                     _this.gameEntityView = new View_2.View();
                     _this.uiView = {
                         zoom: ZOOM,
-                        offset: new point_19.Point(0, 0),
+                        offset: new point_18.Point(0, 0),
                         entities: _this.getUIEntities()
                     };
                     return _this;
                 }
                 QuestGame.prototype.initialize = function () {
-                    this.enemies.push(new Entity_4.Entity([new AnimatedTileComponent_2.AnimatedTileComponent(this.tileManager.dungeonCharacters.getTileSetAnimation("elf_m_idle_anim", 100), new point_19.Point(20, 30))]));
-                    this.enemies.push(new Entity_4.Entity([new AnimatedTileComponent_2.AnimatedTileComponent(this.tileManager.dungeonCharacters.getTileSetAnimation("goblin_idle_anim", 100), new point_19.Point(40, 30))]));
+                    this.enemies.push(new Entity_4.Entity([new AnimatedTileComponent_2.AnimatedTileComponent(new point_18.Point(20, 30), this.tileManager.dungeonCharacters.getTileSetAnimation("elf_m_idle_anim", 100))]));
+                    this.enemies.push(new Entity_4.Entity([new AnimatedTileComponent_2.AnimatedTileComponent(new point_18.Point(40, 30), this.tileManager.dungeonCharacters.getTileSetAnimation("goblin_idle_anim", 100))]));
                     // const rockPt = new Point(5, 5)
                     // this.tiles.set(rockPt, new Entity([
                     //     new TileComponent(Tile.ROCKS, rockPt.times(TILE_SIZE)),
@@ -2501,18 +2513,18 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
                     //     new BoxCollider(rockPt.times(TILE_SIZE), new Point(TILE_SIZE, TILE_SIZE))
                     // ]))
                     var mapGen = new MapGenerator_1.MapGenerator();
-                    mapGen.renderPath(this.tiles, new point_19.Point(-10, -10), new point_19.Point(10, 10), mapGen.pathSchema, 2);
-                    mapGen.renderPath(this.tiles, new point_19.Point(10, -10), new point_19.Point(-10, 10), mapGen.pathSchema, 5);
+                    mapGen.renderPath(this.tiles, new point_18.Point(-10, -10), new point_18.Point(10, 10), mapGen.pathSchema, 2);
+                    mapGen.renderPath(this.tiles, new point_18.Point(10, -10), new point_18.Point(-10, 10), mapGen.pathSchema, 5);
                     for (var i = -20; i < 20; i++) {
                         for (var j = -20; j < 20; j++) {
-                            var pt = new point_19.Point(i, j);
+                            var pt = new point_18.Point(i, j);
                             if (!this.tiles.get(pt)) {
                                 var tile = void 0;
-                                if (Math.random() < .8) {
-                                    tile = this.tileManager.tilemap.getTileAt(new point_19.Point(0, Math.floor(Math.random() * 4)));
+                                if (Math.random() < .65) {
+                                    tile = this.tileManager.tilemap.getTileAt(new point_18.Point(0, Math.floor(Math.random() * 4)));
                                 }
                                 else {
-                                    tile = this.tileManager.tilemap.getTileAt(new point_19.Point(0, 7));
+                                    tile = this.tileManager.tilemap.getTileAt(new point_18.Point(0, 7));
                                 }
                                 this.tiles.set(pt, new Entity_4.Entity([new TileComponent_3.TileComponent(tile, pt.times(TileManager_3.TILE_SIZE))]));
                             }
@@ -2540,8 +2552,8 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
                 };
                 // entities whose position is fixed on the camera
                 QuestGame.prototype.getUIEntities = function () {
-                    var coin = new AnimatedTileComponent_2.AnimatedTileComponent(this.tileManager.dungeonCharacters.getTileSetAnimation("coin_anim", 150));
-                    var dimensions = new point_19.Point(20, 16); // tile dimensions
+                    var coin = new AnimatedTileComponent_2.AnimatedTileComponent(new point_18.Point(4, 4), this.tileManager.dungeonCharacters.getTileSetAnimation("coin_anim", 150));
+                    var dimensions = new point_18.Point(20, 16); // tile dimensions
                     var result = [];
                     // result.push(new TileComponent(Tile.BORDER_1, new Point(0, 0)))
                     // result.push(new TileComponent(Tile.BORDER_3, new Point(dimensions.x - 1, 0).times(TILE_SIZE)))

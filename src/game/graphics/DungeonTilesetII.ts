@@ -129,36 +129,52 @@ const map = new Map(`
 
     tiny_zombie_idle_anim 368 16 16 16 4
     tiny_zombie_run_anim 432 16 16 16 4
+
     goblin_idle_anim 368 32 16 16 4
     goblin_run_anim 432 32 16 16 4
+
     imp_idle_anim 368 48 16 16 4
     imp_run_anim 432 48 16 16 4
+
     skelet_idle_anim 368 80 16 16 4
     skelet_run_anim 432 80 16 16 4
+
     muddy_idle_anim 368 112 16 16 4
     muddy_run_anim 368 112 16 16 4
+
     swampy_idle_anim 432 112 16 16 4
     swampy_run_anim 432 112 16 16 4
+
     zombie_idle_anim 368 144 16 16 4
     zombie_run_anim 368 144 16 16 4
+
     ice_zombie_idle_anim 432 144 16 16 4
     ice_zombie_run_anim 432 144 16 16 4
+
     masked_orc_idle_anim 368 172 16 20 4
     masked_orc_run_anim 432 172 16 20 4
+
     orc_warrior_idle_anim 368 204 16 20 4
     orc_warrior_run_anim 432 204 16 20 4
+
     orc_shaman_idle_anim 368 236 16 20 4
     orc_shaman_run_anim 432 236 16 20 4
+
     necromancer_idle_anim 368 268 16 20 4
     necromancer_run_anim 368 268 16 20 4
+
     wogol_idle_anim 368 300 16 20 4
     wogol_run_anim 432 300 16 20 4
+
     chort_idle_anim 368 328 16 24 4
     chort_run_anim 432 328 16 24 4
+
     big_zombie_idle_anim 16 270 32 34 4
     big_zombie_run_anim 144 270 32 34 4
+
     ogre_idle_anim  16 320 32 32 4
     ogre_run_anim 144 320 32 32 4
+    
     big_demon_idle_anim  16 364 32 36 4
     big_demon_run_anim 144 364 32 36 4
 

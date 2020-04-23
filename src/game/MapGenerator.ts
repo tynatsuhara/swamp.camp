@@ -20,7 +20,7 @@ export class MapGenerator {
             .vertical(TileManager.instance.tilemap.getTileAt(new Point(2, 6)))
             .angle(TileManager.instance.tilemap.getTileAt(new Point(0, 5)))
             .tShape(TileManager.instance.tilemap.getTileAt(new Point(3, 5)))
-            .plusShape(TileManager.instance.tilemap.getTileAt(new Point(6, 5)))
+            .plusShape(TileManager.instance.tilemap.getTileAt(new Point(5, 5)))
             .cap(TileManager.instance.tilemap.getTileAt(new Point(2, 6)))
             .single(TileManager.instance.tilemap.getTileAt(new Point(7, 5)))
 

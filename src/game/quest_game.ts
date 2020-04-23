@@ -28,8 +28,8 @@ export class QuestGame extends Game {
     }
 
     initialize() {
-        this.enemies.push(new Entity([new AnimatedTileComponent(this.tileManager.dungeonCharacters.getTileSetAnimation("elf_m_idle_anim", 100), new Point(20, 30))]))
-        this.enemies.push(new Entity([new AnimatedTileComponent(this.tileManager.dungeonCharacters.getTileSetAnimation("goblin_idle_anim", 100), new Point(40, 30))]))
+        this.enemies.push(new Entity([new AnimatedTileComponent(new Point(20, 30), this.tileManager.dungeonCharacters.getTileSetAnimation("elf_m_idle_anim", 100))]))
+        this.enemies.push(new Entity([new AnimatedTileComponent(new Point(40, 30), this.tileManager.dungeonCharacters.getTileSetAnimation("goblin_idle_anim", 100))]))
 
         // const rockPt = new Point(5, 5)
         // this.tiles.set(rockPt, new Entity([
@@ -50,7 +50,7 @@ export class QuestGame extends Game {
                 const pt = new Point(i, j)
                 if (!this.tiles.get(pt)) {
                     let tile
-                    if (Math.random() < .8) {
+                    if (Math.random() < .65) {
                         tile = this.tileManager.tilemap.getTileAt(new Point(0, Math.floor(Math.random() * 4)))
                     } else {
                         tile = this.tileManager.tilemap.getTileAt(new Point(0, 7))
@@ -86,7 +86,7 @@ export class QuestGame extends Game {
     // entities whose position is fixed on the camera
     getUIEntities(): Entity[] {
 
-        const coin = new AnimatedTileComponent(this.tileManager.dungeonCharacters.getTileSetAnimation("coin_anim", 150))
+        const coin = new AnimatedTileComponent(new Point(4, 4), this.tileManager.dungeonCharacters.getTileSetAnimation("coin_anim", 150))
 
 
         const dimensions = new Point(20, 16)  // tile dimensions
