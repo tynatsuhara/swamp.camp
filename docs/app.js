@@ -1155,7 +1155,7 @@ System.register("engine/collision/Collider", ["engine/component", "engine/point"
                     }
                 };
                 CollisionEngine.prototype.checkCollider = function (collider) {
-                    this.colliders.filter(function (other) { return other !== collider && other.entity && other.isTrigger; }).forEach(function (other) {
+                    this.colliders.filter(function (other) { return other !== collider && other.entity && other.enabled && other.isTrigger; }).forEach(function (other) {
                         var isColliding = other.getPoints().some(function (pt) { return collider.isWithinBounds(pt); });
                         collider.updateColliding(other, isColliding);
                         other.updateColliding(collider, isColliding);
@@ -1164,8 +1164,11 @@ System.register("engine/collision/Collider", ["engine/component", "engine/point"
                 // Returns true if the collider can be translated and will not intersect a non-trigger collider in the new position.
                 // This DOES NOT check for any possible colliders in the path of the collision and should only be used for small translations.
                 CollisionEngine.prototype.canTranslate = function (collider, translation) {
+                    if (collider.isTrigger) { // nothing will ever block this collider
+                        return true;
+                    }
                     var translatedPoints = collider.getPoints().map(function (pt) { return pt.plus(translation); });
-                    return !this.colliders.filter(function (other) { return other !== collider && other.entity && !other.isTrigger; }).some(function (other) {
+                    return !this.colliders.filter(function (other) { return other !== collider && other.entity && other.enabled && !other.isTrigger; }).some(function (other) {
                         return translatedPoints.some(function (pt) { return other.isWithinBounds(pt); });
                     });
                 };
@@ -1910,9 +1913,9 @@ System.register("game/graphics/TileManager", ["game/graphics/SingleFileTileLoade
         }
     };
 });
-System.register("game/characters/Weapon", ["engine/component", "engine/tiles/TileComponent", "game/graphics/TileManager", "engine/point", "engine/util/Animator"], function (exports_32, context_32) {
+System.register("game/characters/Weapon", ["engine/component", "engine/tiles/TileComponent", "game/graphics/TileManager", "engine/point", "game/characters/Dude", "engine/util/Animator"], function (exports_32, context_32) {
     "use strict";
-    var component_4, TileComponent_2, TileManager_1, point_14, Animator_2, State, Weapon;
+    var component_4, TileComponent_2, TileManager_1, point_14, Dude_1, Animator_2, State, Weapon;
     var __moduleName = context_32 && context_32.id;
     return {
         setters: [
@@ -1927,6 +1930,9 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
             },
             function (point_14_1) {
                 point_14 = point_14_1;
+            },
+            function (Dude_1_1) {
+                Dude_1 = Dude_1_1;
             },
             function (Animator_2_1) {
                 Animator_2 = Animator_2_1;
@@ -1950,15 +1956,31 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                 }
                 Weapon.prototype.start = function (startData) {
                     this.weaponSprite = this.entity.addComponent(new TileComponent_2.TileComponent(TileManager_1.TileManager.instance.dungeonCharacters.getTileSource(this.id)));
-                    this.slashSprite = this.entity.addComponent(new TileComponent_2.TileComponent(TileManager_1.TileManager.instance.oneBit.getTileSource("slash")));
-                    this.slashSprite.enabled = false;
+                    // this.slashSprite = this.entity.addComponent(
+                    //     new TileComponent(
+                    //         TileManager.instance.oneBit.getTileSource("slash")
+                    //     )
+                    // )
+                    // this.slashSprite.enabled = false
                 };
                 Weapon.prototype.update = function (updateData) {
+                    var _this = this;
                     if (!!this.animator) {
                         this.animator.update(updateData.elapsedTimeMillis);
                     }
+                    if (this.state === State.ATTACKING && !!this.dude && this.shouldCheckHits) {
+                        this.shouldCheckHits = false;
+                        var attackDistance_1 = this.weaponSprite.transform.dimensions.y + 3; // add a tiny buffer for small weapons like the dagger to still work
+                        updateData.view.entities
+                            .map(function (e) { return e.getComponent(Dude_1.Dude); })
+                            .filter(function (d) { return !!d && d !== _this.dude; })
+                            .filter(function (d) { return _this.weaponSprite.transform.mirrorX === (d.standingPosition.x < _this.dude.standingPosition.x); })
+                            .filter(function (d) { return d.standingPosition.distanceTo(_this.dude.standingPosition) < attackDistance_1; })
+                            .forEach(function (d) { return d.damage(d.standingPosition.minus(_this.dude.standingPosition), 10); });
+                    }
                 };
                 Weapon.prototype.syncWithPlayerAnimation = function (character, characterAnim) {
+                    this.dude = character;
                     if (!!this.weaponSprite) {
                         var offsetFromEdge = new point_14.Point(6, 26).minus(this.weaponSprite.transform.dimensions); // for DRAWN/SHEATHED
                         // relative position for DRAWN state when characer is facing right (mirroring logic below)
@@ -1986,7 +2008,7 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                         else {
                             pos = pos.plus(new point_14.Point(0, f == 0 ? -1 : -((3 - characterAnim.currentFrame()))));
                         }
-                        // mirror
+                        // mirror weapon pos
                         var charMirror = characterAnim.transform.mirrorX;
                         if (charMirror) {
                             pos = new point_14.Point(characterAnim.transform.dimensions.x - pos.x - this.weaponSprite.transform.dimensions.x, pos.y);
@@ -1996,10 +2018,13 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                         // show sword behind character if mirrored
                         this.weaponSprite.transform.depth = characterAnim.transform.depth + 1 - (this.state == State.SHEATHED ? 2 : 0);
                         this.weaponSprite.transform.mirrorX = charMirror;
+                        // TODO maybe keep the slash stuff later
                         // this.slashSprite.enabled = this.animator?.getCurrentFrame() === 3
-                        this.slashSprite.transform.depth = characterAnim.transform.depth + 2;
-                        this.slashSprite.transform.mirrorX = charMirror;
-                        this.slashSprite.transform.position = characterAnim.transform.position.plus(new point_14.Point((charMirror ? -1 : 1) * (this.weaponSprite.transform.dimensions.y - 8), 8));
+                        // this.slashSprite.transform.depth = characterAnim.transform.depth + 2
+                        // this.slashSprite.transform.mirrorX = charMirror
+                        // this.slashSprite.transform.position = characterAnim.transform.position.plus(
+                        //     new Point((charMirror ? -1 : 1) * (this.weaponSprite.transform.dimensions.y - 8), 8)
+                        // )
                     }
                 };
                 Weapon.prototype.toggleSheathed = function () {
@@ -2011,7 +2036,9 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                     }
                 };
                 Weapon.prototype.attack = function () {
+                    var _this = this;
                     if (this.state === State.DRAWN) {
+                        setTimeout(function () { return _this.shouldCheckHits = true; }, 150);
                         this.playAttackAnimation();
                     }
                 };
@@ -2099,6 +2126,14 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     enumerable: true,
                     configurable: true
                 });
+                Object.defineProperty(Dude.prototype, "standingPosition", {
+                    // bottom center of the tile
+                    get: function () {
+                        return this.position.plus(new point_15.Point(this.characterAnim.transform.dimensions.x / 2, this.characterAnim.transform.dimensions.y));
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
                 Object.defineProperty(Dude.prototype, "isMoving", {
                     get: function () {
                         return this._isMoving;
@@ -2117,6 +2152,10 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     var colliderSize = new point_15.Point(10, 8);
                     this.relativeColliderPos = new point_15.Point(this.characterAnim.transform.dimensions.x / 2 - colliderSize.x / 2, this.characterAnim.transform.dimensions.y - colliderSize.y);
                     this.collider = this.entity.addComponent(new BoxCollider_1.BoxCollider(this.position.plus(this.relativeColliderPos), colliderSize));
+                };
+                Dude.prototype.damage = function (direction, knockback) {
+                    // TODO
+                    console.log("ow!");
                 };
                 Dude.prototype.move = function (updateData, direction) {
                     var dx = direction.x;
@@ -2657,7 +2696,7 @@ System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTi
 });
 System.register("game/characters/Player", ["engine/point", "engine/component", "game/characters/Dude"], function (exports_40, context_40) {
     "use strict";
-    var point_20, component_7, Dude_1, Player;
+    var point_20, component_7, Dude_2, Player;
     var __moduleName = context_40 && context_40.id;
     return {
         setters: [
@@ -2667,8 +2706,8 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
             function (component_7_1) {
                 component_7 = component_7_1;
             },
-            function (Dude_1_1) {
-                Dude_1 = Dude_1_1;
+            function (Dude_2_1) {
+                Dude_2 = Dude_2_1;
             }
         ],
         execute: function () {
@@ -2681,7 +2720,7 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
                     return _this;
                 }
                 Player.prototype.start = function (startData) {
-                    this.dude = this.entity.getComponent(Dude_1.Dude);
+                    this.dude = this.entity.getComponent(Dude_2.Dude);
                 };
                 Player.prototype.update = function (updateData) {
                     // const originalCrosshairPosRelative = this.crosshairs.transform.position.minus(this.position)
@@ -2725,15 +2764,15 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
 });
 System.register("game/characters/NPC", ["engine/component", "game/characters/Dude", "game/characters/Player", "engine/point"], function (exports_41, context_41) {
     "use strict";
-    var component_8, Dude_2, Player_1, point_21, NPC;
+    var component_8, Dude_3, Player_1, point_21, NPC;
     var __moduleName = context_41 && context_41.id;
     return {
         setters: [
             function (component_8_1) {
                 component_8 = component_8_1;
             },
-            function (Dude_2_1) {
-                Dude_2 = Dude_2_1;
+            function (Dude_3_1) {
+                Dude_3 = Dude_3_1;
             },
             function (Player_1_1) {
                 Player_1 = Player_1_1;
@@ -2749,15 +2788,15 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     return _super !== null && _super.apply(this, arguments) || this;
                 }
                 NPC.prototype.start = function (startData) {
-                    this.dude = this.entity.getComponent(Dude_2.Dude);
+                    this.dude = this.entity.getComponent(Dude_3.Dude);
                     this.dude.speed *= Math.random(); // TODO configure speed for different enemies
                 };
                 NPC.prototype.update = function (updateData) {
                     var followDistance = 75;
                     var buffer = 40; // this basically determines how long they will stop for if they get too close
-                    var dist = Player_1.Player.instance.entity.getComponent(Dude_2.Dude).position.minus(this.dude.position);
+                    var dist = Player_1.Player.instance.entity.getComponent(Dude_3.Dude).position.minus(this.dude.position);
                     var mag = dist.magnitude();
-                    if (mag > followDistance || ((followDistance - mag) < buffer && Player_1.Player.instance.entity.getComponent(Dude_2.Dude).isMoving) && this.dude.isMoving) {
+                    if (mag > followDistance || ((followDistance - mag) < buffer && Player_1.Player.instance.entity.getComponent(Dude_3.Dude).isMoving) && this.dude.isMoving) {
                         this.dude.move(updateData, dist);
                     }
                     else {
@@ -2772,7 +2811,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
 });
 System.register("game/characters/DudeFactory", ["engine/Entity", "game/characters/Player", "game/characters/Dude", "game/characters/NPC"], function (exports_42, context_42) {
     "use strict";
-    var Entity_4, Player_2, Dude_3, NPC_1, DudeFactory;
+    var Entity_4, Player_2, Dude_4, NPC_1, DudeFactory;
     var __moduleName = context_42 && context_42.id;
     return {
         setters: [
@@ -2782,8 +2821,8 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "game/character
             function (Player_2_1) {
                 Player_2 = Player_2_1;
             },
-            function (Dude_3_1) {
-                Dude_3 = Dude_3_1;
+            function (Dude_4_1) {
+                Dude_4 = Dude_4_1;
             },
             function (NPC_1_1) {
                 NPC_1 = NPC_1_1;
@@ -2798,9 +2837,8 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "game/character
                     return this.dudeEntities;
                 };
                 DudeFactory.prototype.newPlayer = function (pos) {
-                    return this.make("knight_f", pos, 
-                    // "weapon_baton_with_spikes", 
-                    "weapon_katana", 
+                    return this.make("knight_f", pos, "weapon_baton_with_spikes", 
+                    // "weapon_katana", 
                     // "weapon_knife", 
                     new Player_2.Player());
                 };
@@ -2815,9 +2853,9 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "game/character
                     for (var _i = 3; _i < arguments.length; _i++) {
                         additionalComponents[_i - 3] = arguments[_i];
                     }
-                    var e = new Entity_4.Entity([new Dude_3.Dude(archetype, pos, weapon)].concat(additionalComponents));
+                    var e = new Entity_4.Entity([new Dude_4.Dude(archetype, pos, weapon)].concat(additionalComponents));
                     this.dudeEntities.push(e);
-                    return e.getComponent(Dude_3.Dude);
+                    return e.getComponent(Dude_4.Dude);
                 };
                 return DudeFactory;
             }());

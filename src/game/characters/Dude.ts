@@ -26,11 +26,14 @@ export class Dude extends Component {
     get position(): Point {
         return this._position
     }
+    // bottom center of the tile
+    get standingPosition(): Point {
+        return this.position.plus(new Point(this.characterAnim.transform.dimensions.x/2, this.characterAnim.transform.dimensions.y))
+    }
     private _isMoving: boolean
     get isMoving() {
         return this._isMoving
     }
-
 
     constructor(
         archetype: string,
@@ -59,6 +62,11 @@ export class Dude extends Component {
             this.characterAnim.transform.dimensions.y - colliderSize.y
         )
         this.collider = this.entity.addComponent(new BoxCollider(this.position.plus(this.relativeColliderPos), colliderSize))
+    }
+
+    damage(direction: Point, knockback: number) {
+        // TODO
+        console.log("ow!")
     }
 
     move(updateData: UpdateData, direction: Point) {

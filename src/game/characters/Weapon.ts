@@ -7,6 +7,7 @@ import { Point } from "../../engine/point"
 import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
 import { Dude } from "./Dude"
 import { Animator } from "../../engine/util/Animator"
+import { BoxCollider } from "../../engine/collision/BoxCollider"
 
 enum State {
     SHEATHED,
@@ -19,7 +20,9 @@ export class Weapon extends Component {
     private readonly id: string
     private weaponSprite: TileComponent
     private state: State = State.DRAWN
-    private slashSprite: TileComponent
+    // private slashSprite: TileComponent
+    private dude: Dude
+    private shouldCheckHits: boolean
 
     constructor(id: string) {
         super()
@@ -33,21 +36,34 @@ export class Weapon extends Component {
             )
         )
 
-        this.slashSprite = this.entity.addComponent(
-            new TileComponent(
-                TileManager.instance.oneBit.getTileSource("slash")
-            )
-        )
-        this.slashSprite.enabled = false
+        // this.slashSprite = this.entity.addComponent(
+        //     new TileComponent(
+        //         TileManager.instance.oneBit.getTileSource("slash")
+        //     )
+        // )
+        // this.slashSprite.enabled = false
     }
 
     update(updateData: UpdateData) {
         if (!!this.animator) {
             this.animator.update(updateData.elapsedTimeMillis)
         }
+
+        if (this.state === State.ATTACKING && !!this.dude && this.shouldCheckHits) {
+            this.shouldCheckHits = false
+            const attackDistance = this.weaponSprite.transform.dimensions.y + 3  // add a tiny buffer for small weapons like the dagger to still work
+            updateData.view.entities
+                    .map(e => e.getComponent(Dude))
+                    .filter(d => !!d && d !== this.dude)
+                    .filter(d => this.weaponSprite.transform.mirrorX === (d.standingPosition.x < this.dude.standingPosition.x))
+                    .filter(d => d.standingPosition.distanceTo(this.dude.standingPosition) < attackDistance)
+                    .forEach(d => d.damage(d.standingPosition.minus(this.dude.standingPosition), 10))
+        }
     }
 
     syncWithPlayerAnimation(character: Dude, characterAnim: AnimatedTileComponent) {
+        this.dude = character
+
         if (!!this.weaponSprite) {
             const offsetFromEdge = new Point(6, 26).minus(this.weaponSprite.transform.dimensions)  // for DRAWN/SHEATHED
 
@@ -77,7 +93,7 @@ export class Weapon extends Component {
                 pos = pos.plus(new Point(0, f == 0 ? -1 : -((3 - characterAnim.currentFrame()))))
             }
 
-            // mirror
+            // mirror weapon pos
             const charMirror = characterAnim.transform.mirrorX
             if (charMirror) {
                 pos = new Point(characterAnim.transform.dimensions.x - pos.x - this.weaponSprite.transform.dimensions.x, pos.y)
@@ -90,12 +106,17 @@ export class Weapon extends Component {
             this.weaponSprite.transform.depth = characterAnim.transform.depth + 1 - (this.state == State.SHEATHED ? 2 : 0)
             this.weaponSprite.transform.mirrorX = charMirror
 
+
+
+
+
+            // TODO maybe keep the slash stuff later
             // this.slashSprite.enabled = this.animator?.getCurrentFrame() === 3
-            this.slashSprite.transform.depth = characterAnim.transform.depth + 2
-            this.slashSprite.transform.mirrorX = charMirror
-            this.slashSprite.transform.position = characterAnim.transform.position.plus(
-                new Point((charMirror ? -1 : 1) * (this.weaponSprite.transform.dimensions.y - 8), 8)
-            )
+            // this.slashSprite.transform.depth = characterAnim.transform.depth + 2
+            // this.slashSprite.transform.mirrorX = charMirror
+            // this.slashSprite.transform.position = characterAnim.transform.position.plus(
+            //     new Point((charMirror ? -1 : 1) * (this.weaponSprite.transform.dimensions.y - 8), 8)
+            // )
         }
     }
 
@@ -109,6 +130,7 @@ export class Weapon extends Component {
 
     attack() {
         if (this.state === State.DRAWN) {
+            setTimeout(() => this.shouldCheckHits = true, 150)
             this.playAttackAnimation()
         }
     }

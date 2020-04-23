@@ -47,7 +47,7 @@ class CollisionEngine {
     }
 
     checkCollider(collider: Collider) {
-        this.colliders.filter(other => other !== collider && other.entity && other.isTrigger).forEach(other => {
+        this.colliders.filter(other => other !== collider && other.entity && other.enabled && other.isTrigger).forEach(other => {
             const isColliding = other.getPoints().some(pt => collider.isWithinBounds(pt))
             collider.updateColliding(other, isColliding)
             other.updateColliding(collider, isColliding)
@@ -57,8 +57,11 @@ class CollisionEngine {
     // Returns true if the collider can be translated and will not intersect a non-trigger collider in the new position.
     // This DOES NOT check for any possible colliders in the path of the collision and should only be used for small translations.
     canTranslate(collider, translation: Point): boolean {
+        if (collider.isTrigger) {  // nothing will ever block this collider
+            return true
+        }
         const translatedPoints = collider.getPoints().map(pt => pt.plus(translation))
-        return !this.colliders.filter(other => other !== collider && other.entity && !other.isTrigger).some(other => {
+        return !this.colliders.filter(other => other !== collider && other.entity && other.enabled && !other.isTrigger).some(other => {
             return translatedPoints.some(pt => other.isWithinBounds(pt))
         }) 
     }
