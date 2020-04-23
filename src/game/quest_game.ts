@@ -4,11 +4,13 @@ import { Game } from "../engine/game"
 import { UpdateViewsContext } from "../engine/engine"
 import { View } from "../engine/View"
 import { TileComponent } from "../engine/tiles/TileComponent"
-import { Player } from "./player"
+import { Dude } from "./Dude"
 import { TileGrid } from "../engine/tiles/TileGrid"
 import { MapGenerator } from "./MapGenerator"
 import { AnimatedTileComponent } from "../engine/tiles/AnimatedTileComponent"
 import { TileManager, TILE_SIZE } from "./graphics/TileManager"
+import { Player } from "./Player"
+import { NPC } from "./NPC"
 
 
 const ZOOM = 3.125
@@ -17,7 +19,7 @@ export class QuestGame extends Game {
 
     readonly tileManager = new TileManager()
     readonly tiles = new TileGrid(TILE_SIZE)
-    readonly player = new Entity([new Player(new Point(-2, 2).times(TILE_SIZE))]).getComponent(Player)
+    readonly player = new Entity([new Dude("knight_f", new Point(-2, 2).times(TILE_SIZE)), new Player()]).getComponent(Dude)
     readonly enemies: Entity[] = []
     
     private gameEntityView: View = new View()
@@ -28,8 +30,8 @@ export class QuestGame extends Game {
     }
 
     initialize() {
-        this.enemies.push(new Entity([new AnimatedTileComponent(new Point(20, 30), this.tileManager.dungeonCharacters.getTileSetAnimation("elf_m_idle_anim", 100))]))
-        this.enemies.push(new Entity([new AnimatedTileComponent(new Point(40, 30), this.tileManager.dungeonCharacters.getTileSetAnimation("goblin_idle_anim", 100))]))
+        this.enemies.push(new Entity([new Dude("elf_m", new Point(20, 30)), new NPC()]))
+        // this.enemies.push(new Entity([new Dude("goblin", new Point(80, 30)), new NPC()]))
 
         // const rockPt = new Point(5, 5)
         // this.tiles.set(rockPt, new Entity([

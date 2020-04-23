@@ -14,7 +14,7 @@ export class TileTransform {
         scale: number = 1,
         mirrorX: boolean = false,
         mirrorY: boolean = false,
-        depth: number = 0
+        depth: number = Number.MIN_SAFE_INTEGER
     ) {
         this.position = position
         this.rotation = rotation
