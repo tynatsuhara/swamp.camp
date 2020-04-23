@@ -39,7 +39,11 @@ export class Player extends Component {
         this.dude.move(updateData, new Point(dx, dy))
 
         if (updateData.input.isKeyDown(InputKey.F)) {
-            // this.dude.weaponSheathed = !this.dude.weaponSheathed
+            this.dude.weapon.toggleSheathed()
+        }
+
+        if (updateData.input.isMouseDown) {
+            this.dude.weapon.attack()
         }
 
         // update crosshair position

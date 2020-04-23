@@ -1,11 +1,12 @@
 import { Component } from "../../engine/component"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { TileManager } from "../graphics/TileManager"
-import { StartData } from "../../engine/engine"
+import { StartData, UpdateData } from "../../engine/engine"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Point } from "../../engine/point"
 import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
 import { Dude } from "./Dude"
+import { Animator } from "../../engine/util/Animator"
 
 enum State {
     SHEATHED,
@@ -16,8 +17,9 @@ enum State {
 export class Weapon extends Component {
 
     private readonly id: string
-    private swordAnim: TileComponent
+    private weaponSprite: TileComponent
     private state: State = State.DRAWN
+    private slashSprite: TileComponent
 
     constructor(id: string) {
         super()
@@ -25,25 +27,43 @@ export class Weapon extends Component {
     }
 
     start(startData: StartData) {
-        this.swordAnim = this.entity.addComponent(
+        this.weaponSprite = this.entity.addComponent(
             new TileComponent(
                 TileManager.instance.dungeonCharacters.getTileSource(this.id)
             )
         )
+
+        this.slashSprite = this.entity.addComponent(
+            new TileComponent(
+                TileManager.instance.oneBit.getTileSource("slash")
+            )
+        )
+    }
+
+    update(updateData: UpdateData) {
+        if (!!this.animator) {
+            this.animator.update(updateData.elapsedTimeMillis)
+        }
     }
 
     syncWithPlayerAnimation(character: Dude, anim: AnimatedTileComponent) {
-        if (!!this.swordAnim) {
+        if (!!this.weaponSprite) {
             // relative position for DRAWN state
-            let pos: Point = new Point(6, 26).minus(this.swordAnim.transform.dimensions)
+            const offset = new Point(6, 26)
+            let pos: Point = offset.minus(this.weaponSprite.transform.dimensions)
+            let rotation = 0
 
             if (this.state == State.SHEATHED) {
                 // center on back
-                pos = new Point(anim.transform.dimensions.x/2 - this.swordAnim.transform.dimensions.x/2, pos.y)
+                pos = new Point(anim.transform.dimensions.x/2 - this.weaponSprite.transform.dimensions.x/2, pos.y)
                         .plus(new Point(anim.transform.mirrorX ? 1 : -1, -1))
             } else if (this.state == State.ATTACKING) {
-                // TODO
+                const posWithRotation = this.getAttackAnimationPosition()
+                pos = pos.plus(posWithRotation[0])
+                rotation = posWithRotation[1]
             }
+
+            this.weaponSprite.transform.rotation = rotation
 
             // magic based on the animations
             const f = anim.currentFrame()
@@ -53,14 +73,66 @@ export class Weapon extends Component {
                 pos = pos.plus(new Point(0, f == 0 ? -1 : -((3 - anim.currentFrame()))))
             }
 
-            this.swordAnim.transform.position = anim.transform.position.plus(pos)
+            this.weaponSprite.transform.position = anim.transform.position.plus(pos)
 
             // show sword behind character if mirrored
-            this.swordAnim.transform.depth = anim.transform.depth - (anim.transform.mirrorX || this.state == State.SHEATHED ? 1 : 0)
-            this.swordAnim.transform.mirrorX = anim.transform.mirrorX
+            this.weaponSprite.transform.depth = anim.transform.depth - (anim.transform.mirrorX || this.state == State.SHEATHED ? 1 : 0)
+            this.weaponSprite.transform.mirrorX = anim.transform.mirrorX
 
 
             // TODO add attack animation
+        }
+    }
+
+    toggleSheathed() {
+        if (this.state === State.SHEATHED) {
+            this.state = State.DRAWN
+        } else if (this.state === State.DRAWN) {
+            this.state = State.SHEATHED
+        }
+    }
+
+    attack() {
+        if (this.state === State.DRAWN) {
+            this.playAttackAnimation()
+        }
+    }
+
+    private animator: Animator
+    private currentAnimationFrame: number = 0
+    private currentAnimation: number = 0
+    private playAttackAnimation() {
+        this.state = State.ATTACKING
+        this.animator = new Animator(
+            Animator.frames(8, 40), 
+            (index) => this.currentAnimationFrame = index, 
+            () => {
+                this.state = State.DRAWN  // reset to DRAWN when animation finishes
+                this.animator = null
+            }
+        ) 
+    }
+
+    /**
+     * Returns (position, rotation)
+     */
+    private getAttackAnimationPosition(): [Point, number] {
+        const swingStartFrame = 3
+        const resettingFrame = 7
+
+        if (this.currentAnimationFrame < swingStartFrame) {
+            return [new Point(this.currentAnimationFrame * 3, 0), 0]
+        } else if (this.currentAnimationFrame < resettingFrame) {
+            return [
+                new Point(
+                    (8-this.currentAnimationFrame) + this.weaponSprite.transform.dimensions.y-this.weaponSprite.transform.dimensions.x, 
+                    10  // TODO make this work with other weapon sizes
+                ),
+                90
+            ]
+        } else {
+            console.log(-this.currentAnimationFrame+resettingFrame)
+            return [new Point((1-this.currentAnimationFrame+resettingFrame) * 3, 2), 0]
         }
     }
 

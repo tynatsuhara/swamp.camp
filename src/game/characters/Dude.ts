@@ -14,7 +14,10 @@ export class Dude extends Component {
     private archetype: string
 
     private readonly weaponId: string
-    private weapon: Weapon
+    private _weapon: Weapon
+    get weapon() {
+        return this._weapon
+    }
 
     private collider: BoxCollider
     private relativeColliderPos: Point = new Point(3, 15)
@@ -47,7 +50,7 @@ export class Dude extends Component {
         this.characterAnim = this.entity.addComponent(new AnimatedTileComponent(new Point(0, 0), idleAnim, runAnim))
 
         if (!!this.weaponId) {
-            this.weapon = this.entity.addComponent(new Weapon(this.weaponId))
+            this._weapon = this.entity.addComponent(new Weapon(this.weaponId))
         }
 
         const colliderSize = new Point(10, 8)

@@ -22,7 +22,7 @@ export class TileManager {
     readonly dungeonTiles = new SingleFileTileLoader("images/env_dungeon.png")
     readonly indoorTiles = new SingleFileTileLoader("images/env_indoor.png")
     readonly outdoorTiles = new SingleFileTileLoader("images/env_outdoor_recolor.png")
-    readonly oneBit = new SingleFileTileLoader("images/monochrome_transparent_1_bit.png", new Map([["slash", new Point(24, 11)]]))
+    readonly oneBit = new SingleFileTileLoader("images/monochrome_transparent_1_bit.png", new Map([["slash", new Point(25, 11)]]))
     readonly otherCharacters = new SplitFileTileLoader("images/individual_characters")
 
     constructor() {

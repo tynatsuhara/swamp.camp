@@ -19,7 +19,7 @@ export class SingleFileTileLoader implements TileLoader {
 
     getTileSource(key: string): TileSource {
         const result = this.map.get(key)
-        if (!!result) {
+        if (!result) {
             return null
         }
         return this.getTileAt(result)

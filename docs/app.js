@@ -953,11 +953,14 @@ System.register("engine/util/Animator", [], function (exports_21, context_21) {
                  * @param frames A list of frame durations
                  * @param fn A callback that will be called each time a frame changes, passing the zero-based frame index
                  */
-                function Animator(frames, fn) {
+                function Animator(frames, onFrameChange, onFinish) {
                     var _this = this;
+                    if (onFrameChange === void 0) { onFrameChange = function () { }; }
+                    if (onFinish === void 0) { onFinish = function () { }; }
                     this.time = 0;
                     this.index = 0;
-                    this.fn = fn;
+                    this.onFrameChange = onFrameChange;
+                    this.onFinish = onFinish;
                     this.frames = [];
                     var durationSoFar = 0;
                     frames.forEach(function (frameDuration) {
@@ -965,20 +968,29 @@ System.register("engine/util/Animator", [], function (exports_21, context_21) {
                         _this.frames.push(durationSoFar);
                     });
                     this.duration = durationSoFar;
-                    fn(0);
+                    this.update(0);
                 }
                 Animator.prototype.update = function (elapsedTimeMillis) {
                     this.time += elapsedTimeMillis;
                     while (this.time > this.frames[this.index]) {
                         this.index++;
+                        if (this.index === this.frames.length) {
+                            this.onFinish();
+                        }
                         this.index %= this.frames.length;
                         this.time %= this.duration;
-                        this.fn(this.index);
+                        this.onFrameChange(this.index);
                     }
-                    return this.getCurrentFrame();
                 };
                 Animator.prototype.getCurrentFrame = function () {
                     return this.index;
+                };
+                Animator.frames = function (count, msPerFrame) {
+                    var result = [];
+                    for (var i = 0; i < count; i++) {
+                        result.push(msPerFrame);
+                    }
+                    return result;
                 };
                 return Animator;
             }());
@@ -1362,7 +1374,7 @@ System.register("game/graphics/SingleFileTileLoader", ["engine/point", "engine/t
                 }
                 SingleFileTileLoader.prototype.getTileSource = function (key) {
                     var result = this.map.get(key);
-                    if (!!result) {
+                    if (!result) {
                         return null;
                     }
                     return this.getTileAt(result);
@@ -1512,7 +1524,7 @@ System.register("game/graphics/TileManager", ["game/graphics/SingleFileTileLoade
                     this.dungeonTiles = new SingleFileTileLoader_1.SingleFileTileLoader("images/env_dungeon.png");
                     this.indoorTiles = new SingleFileTileLoader_1.SingleFileTileLoader("images/env_indoor.png");
                     this.outdoorTiles = new SingleFileTileLoader_1.SingleFileTileLoader("images/env_outdoor_recolor.png");
-                    this.oneBit = new SingleFileTileLoader_1.SingleFileTileLoader("images/monochrome_transparent_1_bit.png", new Map([["slash", new point_13.Point(24, 11)]]));
+                    this.oneBit = new SingleFileTileLoader_1.SingleFileTileLoader("images/monochrome_transparent_1_bit.png", new Map([["slash", new point_13.Point(25, 11)]]));
                     this.otherCharacters = new SplitFileTileLoader_1.SplitFileTileLoader("images/individual_characters");
                     TileManager.instance = this;
                 }
@@ -1898,9 +1910,9 @@ System.register("game/graphics/TileManager", ["game/graphics/SingleFileTileLoade
         }
     };
 });
-System.register("game/characters/Weapon", ["engine/component", "engine/tiles/TileComponent", "game/graphics/TileManager", "engine/point"], function (exports_32, context_32) {
+System.register("game/characters/Weapon", ["engine/component", "engine/tiles/TileComponent", "game/graphics/TileManager", "engine/point", "engine/util/Animator"], function (exports_32, context_32) {
     "use strict";
-    var component_4, TileComponent_2, TileManager_1, point_14, State, Weapon;
+    var component_4, TileComponent_2, TileManager_1, point_14, Animator_2, State, Weapon;
     var __moduleName = context_32 && context_32.id;
     return {
         setters: [
@@ -1915,6 +1927,9 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
             },
             function (point_14_1) {
                 point_14 = point_14_1;
+            },
+            function (Animator_2_1) {
+                Animator_2 = Animator_2_1;
             }
         ],
         execute: function () {
@@ -1928,24 +1943,37 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                 function Weapon(id) {
                     var _this = _super.call(this) || this;
                     _this.state = State.DRAWN;
+                    _this.currentAnimationFrame = 0;
+                    _this.currentAnimation = 0;
                     _this.id = id;
                     return _this;
                 }
                 Weapon.prototype.start = function (startData) {
-                    this.swordAnim = this.entity.addComponent(new TileComponent_2.TileComponent(TileManager_1.TileManager.instance.dungeonCharacters.getTileSource(this.id)));
+                    this.weaponSprite = this.entity.addComponent(new TileComponent_2.TileComponent(TileManager_1.TileManager.instance.dungeonCharacters.getTileSource(this.id)));
+                    this.slashSprite = this.entity.addComponent(new TileComponent_2.TileComponent(TileManager_1.TileManager.instance.oneBit.getTileSource("slash")));
+                };
+                Weapon.prototype.update = function (updateData) {
+                    if (!!this.animator) {
+                        this.animator.update(updateData.elapsedTimeMillis);
+                    }
                 };
                 Weapon.prototype.syncWithPlayerAnimation = function (character, anim) {
-                    if (!!this.swordAnim) {
+                    if (!!this.weaponSprite) {
                         // relative position for DRAWN state
-                        var pos = new point_14.Point(6, 26).minus(this.swordAnim.transform.dimensions);
+                        var offset = new point_14.Point(6, 26);
+                        var pos = offset.minus(this.weaponSprite.transform.dimensions);
+                        var rotation = 0;
                         if (this.state == State.SHEATHED) {
                             // center on back
-                            pos = new point_14.Point(anim.transform.dimensions.x / 2 - this.swordAnim.transform.dimensions.x / 2, pos.y)
+                            pos = new point_14.Point(anim.transform.dimensions.x / 2 - this.weaponSprite.transform.dimensions.x / 2, pos.y)
                                 .plus(new point_14.Point(anim.transform.mirrorX ? 1 : -1, -1));
                         }
                         else if (this.state == State.ATTACKING) {
-                            // TODO
+                            var posWithRotation = this.getAttackAnimationPosition();
+                            pos = pos.plus(posWithRotation[0]);
+                            rotation = posWithRotation[1];
                         }
+                        this.weaponSprite.transform.rotation = rotation;
                         // magic based on the animations
                         var f = anim.currentFrame();
                         if (!character.isMoving) {
@@ -1954,11 +1982,53 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                         else {
                             pos = pos.plus(new point_14.Point(0, f == 0 ? -1 : -((3 - anim.currentFrame()))));
                         }
-                        this.swordAnim.transform.position = anim.transform.position.plus(pos);
+                        this.weaponSprite.transform.position = anim.transform.position.plus(pos);
                         // show sword behind character if mirrored
-                        this.swordAnim.transform.depth = anim.transform.depth - (anim.transform.mirrorX || this.state == State.SHEATHED ? 1 : 0);
-                        this.swordAnim.transform.mirrorX = anim.transform.mirrorX;
+                        this.weaponSprite.transform.depth = anim.transform.depth - (anim.transform.mirrorX || this.state == State.SHEATHED ? 1 : 0);
+                        this.weaponSprite.transform.mirrorX = anim.transform.mirrorX;
                         // TODO add attack animation
+                    }
+                };
+                Weapon.prototype.toggleSheathed = function () {
+                    if (this.state === State.SHEATHED) {
+                        this.state = State.DRAWN;
+                    }
+                    else if (this.state === State.DRAWN) {
+                        this.state = State.SHEATHED;
+                    }
+                };
+                Weapon.prototype.attack = function () {
+                    if (this.state === State.DRAWN) {
+                        this.playAttackAnimation();
+                    }
+                };
+                Weapon.prototype.playAttackAnimation = function () {
+                    var _this = this;
+                    this.state = State.ATTACKING;
+                    this.animator = new Animator_2.Animator(Animator_2.Animator.frames(8, 40), function (index) { return _this.currentAnimationFrame = index; }, function () {
+                        _this.state = State.DRAWN; // reset to DRAWN when animation finishes
+                        _this.animator = null;
+                    });
+                };
+                /**
+                 * Returns (position, rotation)
+                 */
+                Weapon.prototype.getAttackAnimationPosition = function () {
+                    var swingStartFrame = 3;
+                    var resettingFrame = 7;
+                    if (this.currentAnimationFrame < swingStartFrame) {
+                        return [new point_14.Point(this.currentAnimationFrame * 3, 0), 0];
+                    }
+                    else if (this.currentAnimationFrame < resettingFrame) {
+                        return [
+                            new point_14.Point((8 - this.currentAnimationFrame) + this.weaponSprite.transform.dimensions.y - this.weaponSprite.transform.dimensions.x, 10 // TODO make this work with other weapon sizes
+                            ),
+                            90
+                        ];
+                    }
+                    else {
+                        console.log(-this.currentAnimationFrame + resettingFrame);
+                        return [new point_14.Point((1 - this.currentAnimationFrame + resettingFrame) * 3, 2), 0];
                     }
                 };
                 return Weapon;
@@ -2004,6 +2074,13 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     _this.weaponId = weaponId;
                     return _this;
                 }
+                Object.defineProperty(Dude.prototype, "weapon", {
+                    get: function () {
+                        return this._weapon;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
                 Object.defineProperty(Dude.prototype, "position", {
                     get: function () {
                         return this._position;
@@ -2024,7 +2101,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     // TileManager.instance.dungeonCharacters.getTileSetAnimation(`${this.archetype}_hit_anim`, 1000),  // TODO handle missing animation for some archetypes
                     this.characterAnim = this.entity.addComponent(new AnimatedTileComponent_1.AnimatedTileComponent(new point_15.Point(0, 0), idleAnim, runAnim));
                     if (!!this.weaponId) {
-                        this.weapon = this.entity.addComponent(new Weapon_1.Weapon(this.weaponId));
+                        this._weapon = this.entity.addComponent(new Weapon_1.Weapon(this.weaponId));
                     }
                     var colliderSize = new point_15.Point(10, 8);
                     this.relativeColliderPos = new point_15.Point(this.characterAnim.transform.dimensions.x / 2 - colliderSize.x / 2, this.characterAnim.transform.dimensions.y - colliderSize.y);
@@ -2613,7 +2690,10 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
                     }
                     this.dude.move(updateData, new point_20.Point(dx, dy));
                     if (updateData.input.isKeyDown(70 /* F */)) {
-                        // this.dude.weaponSheathed = !this.dude.weaponSheathed
+                        this.dude.weapon.toggleSheathed();
+                    }
+                    if (updateData.input.isMouseDown) {
+                        this.dude.weapon.attack();
                     }
                     // update crosshair position
                     // const relativeLerpedPos = originalCrosshairPosRelative.lerp(0.16, this.lerpedLastMoveDir.normalized().times(TILE_SIZE))
@@ -2659,7 +2739,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                 }
                 NPC.prototype.start = function (startData) {
                     this.dude = this.entity.getComponent(Dude_2.Dude);
-                    this.dude.speed *= 0.9; // enemies should be slower
+                    this.dude.speed *= Math.random(); // TODO configure speed for different enemies
                 };
                 NPC.prototype.update = function (updateData) {
                     var followDistance = 75;
@@ -2707,7 +2787,11 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "game/character
                     return this.dudeEntities;
                 };
                 DudeFactory.prototype.newPlayer = function (pos) {
-                    return this.make("knight_f", pos, "weapon_baton_with_spikes", new Player_2.Player());
+                    return this.make("knight_f", pos, 
+                    // "weapon_baton_with_spikes", 
+                    "weapon_katana", 
+                    // "weapon_knife", 
+                    new Player_2.Player());
                 };
                 DudeFactory.prototype.newElf = function (pos) {
                     return this.make("elf_m", pos, "weapon_katana", new NPC_1.NPC());

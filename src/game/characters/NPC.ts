@@ -10,7 +10,7 @@ export class NPC extends Component {
 
     start(startData: StartData) {
         this.dude = this.entity.getComponent(Dude)
-        this.dude.speed *= 0.9  // enemies should be slower
+        this.dude.speed *= Math.random()  // TODO configure speed for different enemies
     }
 
     update(updateData: UpdateData) {
