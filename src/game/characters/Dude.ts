@@ -64,20 +64,34 @@ export class Dude extends Component {
         this.collider = this.entity.addComponent(new BoxCollider(this.position.plus(this.relativeColliderPos), colliderSize))
     }
 
+    private beingKnockedBack = false
+
     damage(direction: Point, knockback: number) {
-        // TODO
         console.log("ow!")
+        this.beingKnockedBack = true
+        const goal = this.position.plus(direction.normalized().times(knockback))
+        let intervalsRemaining = 50
+        const interval = setInterval(() => {
+            this.placeAt(this.position.lerp(.07, goal))
+            intervalsRemaining--
+            if (intervalsRemaining === 0 || goal.minus(this.position).magnitude() < 2) {
+                clearInterval(interval)
+                this.beingKnockedBack = false
+            }
+        }, 10)
+
+        // TODO health
     }
 
-    move(updateData: UpdateData, direction: Point) {
+    move(updateData: UpdateData, direction: Point, facingLeft: () => boolean = () => direction.x < 0) {
+        if (this.beingKnockedBack) {
+            direction = direction.times(0)
+        }
+
         const dx = direction.x
         const dy = direction.y
 
-        if (dx < 0) {
-            this.characterAnim.transform.mirrorX = true
-        } else if (dx > 0) {
-            this.characterAnim.transform.mirrorX = false
-        }
+        this.characterAnim.transform.mirrorX = facingLeft()
         
         const wasMoving = this.isMoving
         this._isMoving = dx != 0 || dy != 0
@@ -89,7 +103,7 @@ export class Dude extends Component {
             const translation = direction.normalized()
             // this.lerpedLastMoveDir = this.lerpedLastMoveDir.lerp(0.25, translation)
             const newPos = this._position.plus(translation.times(updateData.elapsedTimeMillis * this.speed))
-            this._position = this.collider.moveTo(newPos.plus(this.relativeColliderPos)).minus(this.relativeColliderPos)
+            this.placeAt(newPos)
         } else if (wasMoving) {
             this.characterAnim.play(0)
         }
@@ -100,5 +114,9 @@ export class Dude extends Component {
         if (!!this.weapon) {
             this.weapon.syncWithPlayerAnimation(this, this.characterAnim)
         }
+    }
+
+    placeAt(point: Point) {
+        this._position = this.collider.moveTo(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos)
     }
 }

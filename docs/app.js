@@ -1976,7 +1976,7 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                             .filter(function (d) { return !!d && d !== _this.dude; })
                             .filter(function (d) { return _this.weaponSprite.transform.mirrorX === (d.standingPosition.x < _this.dude.standingPosition.x); })
                             .filter(function (d) { return d.standingPosition.distanceTo(_this.dude.standingPosition) < attackDistance_1; })
-                            .forEach(function (d) { return d.damage(d.standingPosition.minus(_this.dude.standingPosition), 10); });
+                            .forEach(function (d) { return d.damage(d.standingPosition.minus(_this.dude.standingPosition), 30); });
                     }
                 };
                 Weapon.prototype.syncWithPlayerAnimation = function (character, characterAnim) {
@@ -2107,6 +2107,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     var _this = _super.call(this) || this;
                     _this.speed = 0.085;
                     _this.relativeColliderPos = new point_15.Point(3, 15);
+                    _this.beingKnockedBack = false;
                     _this.archetype = archetype;
                     _this._position = position;
                     _this.weaponId = weaponId;
@@ -2154,18 +2155,29 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     this.collider = this.entity.addComponent(new BoxCollider_1.BoxCollider(this.position.plus(this.relativeColliderPos), colliderSize));
                 };
                 Dude.prototype.damage = function (direction, knockback) {
-                    // TODO
+                    var _this = this;
                     console.log("ow!");
+                    this.beingKnockedBack = true;
+                    var goal = this.position.plus(direction.normalized().times(knockback));
+                    var intervalsRemaining = 50;
+                    var interval = setInterval(function () {
+                        _this.placeAt(_this.position.lerp(.07, goal));
+                        intervalsRemaining--;
+                        if (intervalsRemaining === 0 || goal.minus(_this.position).magnitude() < 2) {
+                            clearInterval(interval);
+                            _this.beingKnockedBack = false;
+                        }
+                    }, 10);
+                    // TODO health
                 };
-                Dude.prototype.move = function (updateData, direction) {
+                Dude.prototype.move = function (updateData, direction, facingLeft) {
+                    if (facingLeft === void 0) { facingLeft = function () { return direction.x < 0; }; }
+                    if (this.beingKnockedBack) {
+                        direction = direction.times(0);
+                    }
                     var dx = direction.x;
                     var dy = direction.y;
-                    if (dx < 0) {
-                        this.characterAnim.transform.mirrorX = true;
-                    }
-                    else if (dx > 0) {
-                        this.characterAnim.transform.mirrorX = false;
-                    }
+                    this.characterAnim.transform.mirrorX = facingLeft();
                     var wasMoving = this.isMoving;
                     this._isMoving = dx != 0 || dy != 0;
                     if (this.isMoving) {
@@ -2175,7 +2187,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                         var translation = direction.normalized();
                         // this.lerpedLastMoveDir = this.lerpedLastMoveDir.lerp(0.25, translation)
                         var newPos = this._position.plus(translation.times(updateData.elapsedTimeMillis * this.speed));
-                        this._position = this.collider.moveTo(newPos.plus(this.relativeColliderPos)).minus(this.relativeColliderPos);
+                        this.placeAt(newPos);
                     }
                     else if (wasMoving) {
                         this.characterAnim.play(0);
@@ -2185,6 +2197,9 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     if (!!this.weapon) {
                         this.weapon.syncWithPlayerAnimation(this, this.characterAnim);
                     }
+                };
+                Dude.prototype.placeAt = function (point) {
+                    this._position = this.collider.moveTo(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos);
                 };
                 return Dude;
             }(component_5.Component));
@@ -2724,6 +2739,7 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
                 };
                 Player.prototype.update = function (updateData) {
                     // const originalCrosshairPosRelative = this.crosshairs.transform.position.minus(this.position)
+                    var _this = this;
                     var dx = 0;
                     var dy = 0;
                     if (updateData.input.isKeyHeld(87 /* W */)) {
@@ -2738,7 +2754,7 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
                     if (updateData.input.isKeyHeld(68 /* D */)) {
                         dx++;
                     }
-                    this.dude.move(updateData, new point_20.Point(dx, dy));
+                    this.dude.move(updateData, new point_20.Point(dx, dy), function () { return updateData.input.mousePos.x < _this.dude.standingPosition.x; });
                     if (updateData.input.isKeyDown(70 /* F */)) {
                         this.dude.weapon.toggleSheathed();
                     }

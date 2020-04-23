@@ -57,7 +57,7 @@ export class Weapon extends Component {
                     .filter(d => !!d && d !== this.dude)
                     .filter(d => this.weaponSprite.transform.mirrorX === (d.standingPosition.x < this.dude.standingPosition.x))
                     .filter(d => d.standingPosition.distanceTo(this.dude.standingPosition) < attackDistance)
-                    .forEach(d => d.damage(d.standingPosition.minus(this.dude.standingPosition), 10))
+                    .forEach(d => d.damage(d.standingPosition.minus(this.dude.standingPosition), 30))
         }
     }
 
