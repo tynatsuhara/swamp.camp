@@ -27,13 +27,17 @@ export class Dude extends Component {
         return this._isMoving
     }
 
+    private readonly weapon: string
+
     constructor(
         archetype: string,
-        position: Point
+        position: Point,
+        weapon: string
     ) {
         super()
         this.archetype = archetype
         this._position = position
+        this.weapon = weapon
     }
 
     start(startData: StartData) {
@@ -42,15 +46,19 @@ export class Dude extends Component {
         // TileManager.instance.dungeonCharacters.getTileSetAnimation(`${this.archetype}_hit_anim`, 1000),  // TODO handle missing animation for some archetypes
         this.characterAnim = this.entity.addComponent(new AnimatedTileComponent(new Point(0, 0), idleAnim, runAnim))
 
-        this.swordAnim = this.entity.addComponent(
-            new TileComponent(
-                TileManager.instance.dungeonCharacters.getTileSource("weapon_baton_with_spikes")
+        if (!!this.weapon) {
+            this.swordAnim = this.entity.addComponent(
+                new TileComponent(
+                    TileManager.instance.dungeonCharacters.getTileSource(this.weapon)
+                )
             )
-        )
+        }
 
-        const colliderShrinkage = new Point(6, 20)
-        const colliderSize = this.characterAnim.transform.dimensions.minus(colliderShrinkage)
-        this.relativeColliderPos = new Point(colliderShrinkage.x/2, this.characterAnim.transform.dimensions.y - colliderSize.y)
+        const colliderSize = new Point(10, 8)
+        this.relativeColliderPos = new Point(
+            this.characterAnim.transform.dimensions.x/2 - colliderSize.x/2, 
+            this.characterAnim.transform.dimensions.y - colliderSize.y
+        )
         this.collider = this.entity.addComponent(new BoxCollider(this.position.plus(this.relativeColliderPos), colliderSize))
     }
 
@@ -80,7 +88,7 @@ export class Dude extends Component {
         }
 
         this.characterAnim.transform.position = this.position
-        this.characterAnim.transform.depth = this.position.y
+        this.characterAnim.transform.depth = this.position.y + this.characterAnim.transform.dimensions.y
 
         this.updateSwordPos(updateData)
     }

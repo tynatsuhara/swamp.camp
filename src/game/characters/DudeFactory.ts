@@ -14,15 +14,19 @@ export class DudeFactory {
     }
 
     newPlayer(pos: Point) {
-        return this.make("knight_f", pos, new Player())
+        return this.make("knight_f", pos, "weapon_baton_with_spikes", new Player())
     }
 
     newElf(pos: Point) {
-        return this.make("elf_m", pos, new NPC())
+        return this.make("elf_m", pos, "weapon_katana", new NPC())
     }
 
-    private make(archetype: string, pos: Point, ...additionalComponents: Component[]) {
-        const e = new Entity([new Dude(archetype, pos) as Component].concat(additionalComponents))
+    newImp(pos: Point) {
+        return this.make("skelet", pos, null, new NPC())
+    }
+
+    private make(archetype: string, pos: Point, weapon: string, ...additionalComponents: Component[]) {
+        const e = new Entity([new Dude(archetype, pos, weapon) as Component].concat(additionalComponents))
         this.dudeEntities.push(e)
         return e.getComponent(Dude)
     }

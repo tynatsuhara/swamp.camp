@@ -1892,13 +1892,14 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
         execute: function () {
             Dude = /** @class */ (function (_super) {
                 __extends(Dude, _super);
-                function Dude(archetype, position) {
+                function Dude(archetype, position, weapon) {
                     var _this = _super.call(this) || this;
                     _this.speed = 0.085;
                     _this.relativeSwordPos = new point_13.Point(6, 26);
                     _this.relativeColliderPos = new point_13.Point(3, 15);
                     _this.archetype = archetype;
                     _this._position = position;
+                    _this.weapon = weapon;
                     return _this;
                 }
                 Object.defineProperty(Dude.prototype, "position", {
@@ -1920,10 +1921,11 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     var runAnim = TileManager_1.TileManager.instance.dungeonCharacters.getTileSetAnimation(this.archetype + "_run_anim", 80);
                     // TileManager.instance.dungeonCharacters.getTileSetAnimation(`${this.archetype}_hit_anim`, 1000),  // TODO handle missing animation for some archetypes
                     this.characterAnim = this.entity.addComponent(new AnimatedTileComponent_1.AnimatedTileComponent(new point_13.Point(0, 0), idleAnim, runAnim));
-                    this.swordAnim = this.entity.addComponent(new TileComponent_2.TileComponent(TileManager_1.TileManager.instance.dungeonCharacters.getTileSource("weapon_baton_with_spikes")));
-                    var colliderShrinkage = new point_13.Point(6, 20);
-                    var colliderSize = this.characterAnim.transform.dimensions.minus(colliderShrinkage);
-                    this.relativeColliderPos = new point_13.Point(colliderShrinkage.x / 2, this.characterAnim.transform.dimensions.y - colliderSize.y);
+                    if (!!this.weapon) {
+                        this.swordAnim = this.entity.addComponent(new TileComponent_2.TileComponent(TileManager_1.TileManager.instance.dungeonCharacters.getTileSource(this.weapon)));
+                    }
+                    var colliderSize = new point_13.Point(10, 8);
+                    this.relativeColliderPos = new point_13.Point(this.characterAnim.transform.dimensions.x / 2 - colliderSize.x / 2, this.characterAnim.transform.dimensions.y - colliderSize.y);
                     this.collider = this.entity.addComponent(new BoxCollider_1.BoxCollider(this.position.plus(this.relativeColliderPos), colliderSize));
                 };
                 Dude.prototype.move = function (updateData, direction) {
@@ -1950,7 +1952,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                         this.characterAnim.play(0);
                     }
                     this.characterAnim.transform.position = this.position;
-                    this.characterAnim.transform.depth = this.position.y;
+                    this.characterAnim.transform.depth = this.position.y + this.characterAnim.transform.dimensions.y;
                     this.updateSwordPos(updateData);
                 };
                 Dude.prototype.updateSwordPos = function (updateData) {
@@ -2415,9 +2417,9 @@ System.register("engine/tiles/ConnectingTileSchema", ["engine/point", "engine/ti
         }
     };
 });
-System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTileSchema", "engine/tiles/ConnectingTile", "engine/Entity", "engine/collision/BoxCollider", "game/graphics/TileManager"], function (exports_37, context_37) {
+System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTileSchema", "engine/tiles/ConnectingTile", "engine/Entity", "game/graphics/TileManager"], function (exports_37, context_37) {
     "use strict";
-    var point_17, ConnectingTileSchema_1, ConnectingTile_2, Entity_3, BoxCollider_2, TileManager_2, MapGenerator;
+    var point_17, ConnectingTileSchema_1, ConnectingTile_2, Entity_3, TileManager_2, MapGenerator;
     var __moduleName = context_37 && context_37.id;
     return {
         setters: [
@@ -2432,9 +2434,6 @@ System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTi
             },
             function (Entity_3_1) {
                 Entity_3 = Entity_3_1;
-            },
-            function (BoxCollider_2_1) {
-                BoxCollider_2 = BoxCollider_2_1;
             },
             function (TileManager_2_1) {
                 TileManager_2 = TileManager_2_1;
@@ -2490,7 +2489,6 @@ System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTi
                     path.forEach(function (pt) {
                         var entity = new Entity_3.Entity([
                             new ConnectingTile_2.ConnectingTile(tileSchema, grid, pt),
-                            new BoxCollider_2.BoxCollider(pt.times(TileManager_2.TILE_SIZE), new point_17.Point(TileManager_2.TILE_SIZE, TileManager_2.TILE_SIZE), true)
                         ]);
                         grid.set(pt, entity);
                     });
@@ -2641,17 +2639,20 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "game/character
                     return this.dudeEntities;
                 };
                 DudeFactory.prototype.newPlayer = function (pos) {
-                    return this.make("knight_f", pos, new Player_2.Player());
+                    return this.make("knight_f", pos, "weapon_baton_with_spikes", new Player_2.Player());
                 };
                 DudeFactory.prototype.newElf = function (pos) {
-                    return this.make("elf_m", pos, new NPC_1.NPC());
+                    return this.make("elf_m", pos, "weapon_katana", new NPC_1.NPC());
                 };
-                DudeFactory.prototype.make = function (archetype, pos) {
+                DudeFactory.prototype.newImp = function (pos) {
+                    return this.make("skelet", pos, null, new NPC_1.NPC());
+                };
+                DudeFactory.prototype.make = function (archetype, pos, weapon) {
                     var additionalComponents = [];
-                    for (var _i = 2; _i < arguments.length; _i++) {
-                        additionalComponents[_i - 2] = arguments[_i];
+                    for (var _i = 3; _i < arguments.length; _i++) {
+                        additionalComponents[_i - 3] = arguments[_i];
                     }
-                    var e = new Entity_4.Entity([new Dude_3.Dude(archetype, pos)].concat(additionalComponents));
+                    var e = new Entity_4.Entity([new Dude_3.Dude(archetype, pos, weapon)].concat(additionalComponents));
                     this.dudeEntities.push(e);
                     return e.getComponent(Dude_3.Dude);
                 };
@@ -2718,6 +2719,7 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
                 }
                 QuestGame.prototype.initialize = function () {
                     this.dudeFactory.newElf(new point_20.Point(20, 30));
+                    this.dudeFactory.newImp(new point_20.Point(80, 30));
                     // this.enemies.push(new Entity([new Dude("goblin", new Point(80, 30)), new NPC()]))
                     // const rockPt = new Point(5, 5)
                     // this.tiles.set(rockPt, new Entity([

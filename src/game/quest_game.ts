@@ -32,6 +32,7 @@ export class QuestGame extends Game {
 
     initialize() {
         this.dudeFactory.newElf(new Point(20, 30))
+        this.dudeFactory.newImp(new Point(80, 30))
 
         // this.enemies.push(new Entity([new Dude("goblin", new Point(80, 30)), new NPC()]))
 
