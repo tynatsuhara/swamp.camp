@@ -5,31 +5,31 @@ import { RenderContext } from "./RenderContext"
 export class ImageRender extends RenderMethod {
     source: CanvasImageSource
     sourcePosition: Point  // the top-left coordinate position on the source image
+    sourceDimensions: Point
     dimensions: Point
     position: Point  // top-left coordinate position in the view
     rotation: number  // clockwise rotation in degrees
-    scale: number
     mirrorX: boolean
     mirrorY: boolean
 
     constructor(
         source: CanvasImageSource, 
         sourcePosition: Point, 
-        dimensions: Point, 
+        sourceDimensions: Point, 
         position: Point, 
+        dimensions: Point,
         depth: number = 0,
         rotation: number = 0, 
-        scale: number = 1,
         mirrorX: boolean = false,
         mirrorY: boolean = false,
     ) {
         super(depth)
         this.source = source
         this.sourcePosition = sourcePosition, 
-        this.dimensions = dimensions
+        this.sourceDimensions = sourceDimensions
         this.position = position
+        this.dimensions = dimensions
         this.rotation = rotation
-        this.scale = scale
         this.mirrorX = mirrorX,
         this.mirrorY = mirrorY
     }
@@ -40,9 +40,9 @@ export class ImageRender extends RenderMethod {
         context.drawImage(
             this.source, 
             this.sourcePosition, 
-            this.dimensions, 
+            this.sourceDimensions, 
             this.position,
-            this.dimensions.times(this.scale),
+            this.dimensions,
             this.rotation,
             pixelPerfect,
             this.mirrorX,

@@ -45,6 +45,7 @@ export class RenderContext {
         mirrorX: boolean,
         mirrorY: boolean
     ): void {
+        destDimensions = destDimensions ?? sourceDimensions
         const mirroredOffset = new Point(mirrorX ? destDimensions.x : 0, mirrorY ? destDimensions.y : 0)
         const offset = this.view.offset.times(this.view.zoom).apply(Math.floor)
         let scaledDestPosition = destPosition.plus(mirroredOffset).times(this.view.zoom).plus(offset)

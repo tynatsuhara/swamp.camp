@@ -149,6 +149,7 @@ System.register("engine/renderer/RenderContext", ["engine/point"], function (exp
                  * @param mirrorY
                  */
                 RenderContext.prototype.drawImage = function (source, sourcePosition, sourceDimensions, destPosition, destDimensions, rotation, pixelPerfect, mirrorX, mirrorY) {
+                    destDimensions = destDimensions !== null && destDimensions !== void 0 ? destDimensions : sourceDimensions;
                     var mirroredOffset = new point_2.Point(mirrorX ? destDimensions.x : 0, mirrorY ? destDimensions.y : 0);
                     var offset = this.view.offset.times(this.view.zoom).apply(Math.floor);
                     var scaledDestPosition = destPosition.plus(mirroredOffset).times(this.view.zoom).plus(offset);
@@ -787,26 +788,25 @@ System.register("engine/renderer/ImageRender", ["engine/renderer/RenderMethod"],
         execute: function () {
             ImageRender = /** @class */ (function (_super) {
                 __extends(ImageRender, _super);
-                function ImageRender(source, sourcePosition, dimensions, position, depth, rotation, scale, mirrorX, mirrorY) {
+                function ImageRender(source, sourcePosition, sourceDimensions, position, dimensions, depth, rotation, mirrorX, mirrorY) {
                     if (depth === void 0) { depth = 0; }
                     if (rotation === void 0) { rotation = 0; }
-                    if (scale === void 0) { scale = 1; }
                     if (mirrorX === void 0) { mirrorX = false; }
                     if (mirrorY === void 0) { mirrorY = false; }
                     var _this = _super.call(this, depth) || this;
                     _this.source = source;
                     _this.sourcePosition = sourcePosition,
-                        _this.dimensions = dimensions;
+                        _this.sourceDimensions = sourceDimensions;
                     _this.position = position;
+                    _this.dimensions = dimensions;
                     _this.rotation = rotation;
-                    _this.scale = scale;
                     _this.mirrorX = mirrorX,
                         _this.mirrorY = mirrorY;
                     return _this;
                 }
                 ImageRender.prototype.render = function (context) {
                     var pixelPerfect = false; // TODO make this work properly
-                    context.drawImage(this.source, this.sourcePosition, this.dimensions, this.position, this.dimensions.times(this.scale), this.rotation, pixelPerfect, this.mirrorX, this.mirrorY);
+                    context.drawImage(this.source, this.sourcePosition, this.sourceDimensions, this.position, this.dimensions, this.rotation, pixelPerfect, this.mirrorX, this.mirrorY);
                 };
                 return ImageRender;
             }(RenderMethod_2.RenderMethod));
@@ -826,16 +826,17 @@ System.register("engine/tiles/TileTransform", ["engine/point"], function (export
         ],
         execute: function () {
             TileTransform = /** @class */ (function () {
-                function TileTransform(position, rotation, scale, mirrorX, mirrorY, depth) {
+                function TileTransform(position, dimensions, // if null, match the dimensions of the source image
+                rotation, mirrorX, mirrorY, depth) {
                     if (position === void 0) { position = new point_6.Point(0, 0); }
+                    if (dimensions === void 0) { dimensions = null; }
                     if (rotation === void 0) { rotation = 0; }
-                    if (scale === void 0) { scale = 1; }
                     if (mirrorX === void 0) { mirrorX = false; }
                     if (mirrorY === void 0) { mirrorY = false; }
                     if (depth === void 0) { depth = Number.MIN_SAFE_INTEGER; }
                     this.position = position;
+                    this.dimensions = dimensions;
                     this.rotation = rotation;
-                    this.scale = scale;
                     this.mirrorX = mirrorX;
                     this.mirrorY = mirrorY;
                     this.depth = depth;
@@ -867,7 +868,8 @@ System.register("engine/tiles/TileSource", ["engine/renderer/ImageRender"], func
                     this.dimensions = dimensions;
                 }
                 TileSource.prototype.toImageRender = function (transform) {
-                    return new ImageRender_1.ImageRender(this.image, this.position, this.dimensions, transform.position, transform.depth, transform.rotation, transform.scale, transform.mirrorX, transform.mirrorY);
+                    var _a;
+                    return new ImageRender_1.ImageRender(this.image, this.position, this.dimensions, transform.position, (_a = transform.dimensions) !== null && _a !== void 0 ? _a : this.dimensions, transform.depth, transform.rotation, transform.mirrorX, transform.mirrorY);
                 };
                 return TileSource;
             }());
@@ -901,7 +903,7 @@ System.register("engine/tiles/TileComponent", ["engine/point", "engine/component
                     if (position === void 0) { position = new point_7.Point(0, 0); }
                     var _this = _super.call(this) || this;
                     _this.tileSource = tileSource;
-                    _this.transform = new TileTransform_1.TileTransform(position);
+                    _this.transform = new TileTransform_1.TileTransform(position, tileSource.dimensions);
                     return _this;
                 }
                 TileComponent.prototype.getRenderMethods = function () {
@@ -1893,7 +1895,7 @@ System.register("game/Dude", ["engine/tiles/AnimatedTileComponent", "engine/tile
                 function Dude(archetype, position) {
                     var _this = _super.call(this) || this;
                     _this.speed = 0.085;
-                    _this.relativeSwordPos = new point_13.Point(-4, 5);
+                    _this.relativeSwordPos = new point_13.Point(6, 26);
                     _this.relativeColliderPos = new point_13.Point(3, 15);
                     _this.archetype = archetype;
                     _this._position = position;
@@ -1915,7 +1917,7 @@ System.register("game/Dude", ["engine/tiles/AnimatedTileComponent", "engine/tile
                 });
                 Dude.prototype.start = function (startData) {
                     this.characterAnim = this.entity.addComponent(new AnimatedTileComponent_1.AnimatedTileComponent(new point_13.Point(0, 0), TileManager_1.TileManager.instance.dungeonCharacters.getTileSetAnimation(this.archetype + "_idle_anim", 150), TileManager_1.TileManager.instance.dungeonCharacters.getTileSetAnimation(this.archetype + "_run_anim", 80)));
-                    this.swordAnim = this.entity.addComponent(new TileComponent_2.TileComponent(TileManager_1.TileManager.instance.dungeonCharacters.getTileSource("weapon_rusty_sword")));
+                    this.swordAnim = this.entity.addComponent(new TileComponent_2.TileComponent(TileManager_1.TileManager.instance.dungeonCharacters.getTileSource("weapon_red_gem_sword")));
                     this.collider = this.entity.addComponent(new BoxCollider_1.BoxCollider(this.position.plus(this.relativeColliderPos), new point_13.Point(10, 12)));
                 };
                 Dude.prototype.move = function (updateData, direction) {
@@ -1948,7 +1950,7 @@ System.register("game/Dude", ["engine/tiles/AnimatedTileComponent", "engine/tile
                 Dude.prototype.updateSwordPos = function () {
                     if (!!this.swordAnim) {
                         // magic based on the animations
-                        var pos = this.relativeSwordPos;
+                        var pos = this.relativeSwordPos.minus(this.swordAnim.transform.dimensions);
                         var f = this.characterAnim.currentFrame();
                         if (!this.isMoving) {
                             pos = pos.plus(new point_13.Point(0, f == 3 ? 1 : f));
@@ -1957,8 +1959,11 @@ System.register("game/Dude", ["engine/tiles/AnimatedTileComponent", "engine/tile
                             pos = pos.plus(new point_13.Point(0, f == 0 ? -1 : -((3 - this.characterAnim.currentFrame()))));
                         }
                         this.swordAnim.transform.position = this.position.plus(pos);
-                        // show sword behind if mirrored
+                        // show sword behind character if mirrored
                         this.swordAnim.transform.depth = this.characterAnim.transform.depth - (this.characterAnim.transform.mirrorX ? 1 : 0);
+                        this.swordAnim.transform.mirrorX = this.characterAnim.transform.mirrorX;
+                        // TODO make it so a weapon can be sheathed on your back
+                        // this.swordAnim.transform.mirrorY = true
                     }
                 };
                 return Dude;
@@ -2370,7 +2375,7 @@ System.register("engine/tiles/ConnectingTileSchema", ["engine/point", "engine/ti
                         rotation = 0;
                     }
                     // TODO trigger adjacent to update?
-                    return result.toImageRender(new TileTransform_2.TileTransform(position.times(grid.tileSize), rotation));
+                    return result.toImageRender(new TileTransform_2.TileTransform(position.times(grid.tileSize), null, rotation));
                 };
                 ConnectingTileSchema.prototype.get = function (grid, pt) {
                     var el = grid.get(pt);
@@ -2566,10 +2571,9 @@ System.register("game/NPC", ["engine/component", "game/Dude", "game/Player", "en
                 };
                 NPC.prototype.update = function (updateData) {
                     var followDistance = 75;
-                    var buffer = 40; // this basically determines how long they will stop if they get too close
+                    var buffer = 40; // this basically determines how long they will stop for if they get too close
                     var dist = Player_1.Player.instance.entity.getComponent(Dude_2.Dude).position.minus(this.dude.position);
                     var mag = dist.magnitude();
-                    console.log(followDistance - mag);
                     if (mag > followDistance || ((followDistance - mag) < buffer && Player_1.Player.instance.entity.getComponent(Dude_2.Dude).isMoving) && this.dude.isMoving) {
                         this.dude.move(updateData, dist);
                     }

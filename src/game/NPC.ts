@@ -15,11 +15,10 @@ export class NPC extends Component {
 
     update(updateData: UpdateData) {
         const followDistance = 75
-        const buffer = 40  // this basically determines how long they will stop if they get too close
+        const buffer = 40  // this basically determines how long they will stop for if they get too close
 
         const dist = Player.instance.entity.getComponent(Dude).position.minus(this.dude.position)
         const mag = dist.magnitude()
-        console.log(followDistance-mag)
 
         if (mag > followDistance || ((followDistance-mag) < buffer && Player.instance.entity.getComponent(Dude).isMoving) && this.dude.isMoving) {
             this.dude.move(updateData, dist)

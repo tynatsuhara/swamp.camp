@@ -13,7 +13,7 @@ export class Dude extends Component {
     private archetype: string
 
     private swordAnim: TileComponent
-    private relativeSwordPos: Point = new Point(-4, 5)
+    private relativeSwordPos: Point = new Point(6, 26)
 
     private collider: BoxCollider
     private relativeColliderPos: Point = new Point(3, 15)
@@ -48,7 +48,7 @@ export class Dude extends Component {
 
         this.swordAnim = this.entity.addComponent(
             new TileComponent(
-                TileManager.instance.dungeonCharacters.getTileSource("weapon_rusty_sword")
+                TileManager.instance.dungeonCharacters.getTileSource("weapon_red_gem_sword")
             )
         )
         
@@ -89,7 +89,7 @@ export class Dude extends Component {
     private updateSwordPos() {
         if (!!this.swordAnim) {
             // magic based on the animations
-            let pos = this.relativeSwordPos
+            let pos = this.relativeSwordPos.minus(this.swordAnim.transform.dimensions)
             const f = this.characterAnim.currentFrame()
             if (!this.isMoving) {
                 pos = pos.plus(new Point(0, f == 3 ? 1 : f))
@@ -98,8 +98,12 @@ export class Dude extends Component {
             }
 
             this.swordAnim.transform.position = this.position.plus(pos)
-            // show sword behind if mirrored
+            // show sword behind character if mirrored
             this.swordAnim.transform.depth = this.characterAnim.transform.depth - (this.characterAnim.transform.mirrorX ? 1 : 0)
+            this.swordAnim.transform.mirrorX = this.characterAnim.transform.mirrorX
+
+            // TODO make it so a weapon can be sheathed on your back
+            // this.swordAnim.transform.mirrorY = true
         }
     }
 }

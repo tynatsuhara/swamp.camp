@@ -5,7 +5,7 @@ import { TileTransform } from "./TileTransform"
 export class TileSource {
     private image: CanvasImageSource
     private position: Point
-    private dimensions: Point
+    readonly dimensions: Point
 
     /**
      * Constructs a static (non-animated) tile source
@@ -26,9 +26,9 @@ export class TileSource {
             this.position,
             this.dimensions, 
             transform.position, 
+            transform.dimensions ?? this.dimensions,
             transform.depth,
             transform.rotation, 
-            transform.scale, 
             transform.mirrorX, 
             transform.mirrorY
         )

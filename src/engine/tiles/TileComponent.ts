@@ -14,7 +14,7 @@ export class TileComponent extends Component {
     constructor(tileSource: TileSource, position: Point = new Point(0, 0)) {
         super()
         this.tileSource = tileSource
-        this.transform = new TileTransform(position)
+        this.transform = new TileTransform(position, tileSource.dimensions)
     }
     
     getRenderMethods(): ImageRender[] {

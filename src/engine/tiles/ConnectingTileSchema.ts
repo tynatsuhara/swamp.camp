@@ -129,7 +129,7 @@ export class ConnectingTileSchema {
         }
 
         // TODO trigger adjacent to update?
-        return result.toImageRender(new TileTransform(position.times(grid.tileSize), rotation))
+        return result.toImageRender(new TileTransform(position.times(grid.tileSize), null, rotation))
     }
 
     private get(grid: TileGrid, pt: Point): ConnectingTile {
