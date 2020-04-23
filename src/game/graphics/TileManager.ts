@@ -18,9 +18,10 @@ export class TileManager {
     static instance: TileManager
 
     readonly dungeonCharacters = new DungeonTilesetII()
+    readonly tilemap = new SingleFileTileLoader("images/tilemap.png")
     readonly dungeonTiles = new SingleFileTileLoader("images/env_dungeon.png")
     readonly indoorTiles = new SingleFileTileLoader("images/env_indoor.png", new Map())
-    readonly outdoorTiles = new SingleFileTileLoader("images/env_outdoor.png", new Map())
+    readonly outdoorTiles = new SingleFileTileLoader("images/env_outdoor_recolor.png", new Map())
     readonly otherCharacters = new SplitFileTileLoader("images/individual_characters")
 
     constructor() {
@@ -34,6 +35,8 @@ export class TileManager {
             "images/env_dungeon.png",
             "images/env_indoor.png",
             "images/env_outdoor.png",
+            "images/env_outdoor_recolor.png",
+            "images/tilemap.png",
             "images/individual_characters/Alchemist_Idle_1.png",
             "images/individual_characters/Alchemist_Idle_2.png",
             "images/individual_characters/Alchemist_Idle_3.png",

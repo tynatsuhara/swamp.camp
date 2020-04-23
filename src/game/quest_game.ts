@@ -9,7 +9,6 @@ import { TileGrid } from "../engine/tiles/TileGrid"
 import { MapGenerator } from "./MapGenerator"
 import { AnimatedTileComponent } from "../engine/tiles/AnimatedTileComponent"
 import { TileManager, TILE_SIZE } from "./graphics/TileManager"
-import { ConnectingTileSchema } from "../engine/tiles/ConnectingTileSchema"
 
 
 const ZOOM = 3.125
@@ -29,8 +28,8 @@ export class QuestGame extends Game {
     }
 
     initialize() {
-        this.enemies.push(new Entity([new AnimatedTileComponent(this.tileManager.dungeonCharacters.getTileSetAnimation("knight_f_run_anim", 100), new Point(20, 30))]))
-        this.enemies.push(new Entity([new AnimatedTileComponent(this.tileManager.dungeonCharacters.getTileSetAnimation("knight_f_idle_anim", 100), new Point(40, 30))]))
+        this.enemies.push(new Entity([new AnimatedTileComponent(this.tileManager.dungeonCharacters.getTileSetAnimation("elf_m_idle_anim", 100), new Point(20, 30))]))
+        this.enemies.push(new Entity([new AnimatedTileComponent(this.tileManager.dungeonCharacters.getTileSetAnimation("goblin_idle_anim", 100), new Point(40, 30))]))
 
         // const rockPt = new Point(5, 5)
         // this.tiles.set(rockPt, new Entity([
@@ -44,6 +43,22 @@ export class QuestGame extends Game {
 
         mapGen.renderPath(this.tiles, new Point(-10, -10), new Point(10, 10), mapGen.pathSchema, 2)
         mapGen.renderPath(this.tiles, new Point(10, -10), new Point(-10, 10), mapGen.pathSchema, 5)
+
+
+        for (let i = -20; i < 20; i++) {
+            for (let j = -20; j < 20; j++) {
+                const pt = new Point(i, j)
+                if (!this.tiles.get(pt)) {
+                    let tile
+                    if (Math.random() < .8) {
+                        tile = this.tileManager.tilemap.getTileAt(new Point(0, Math.floor(Math.random() * 4)))
+                    } else {
+                        tile = this.tileManager.tilemap.getTileAt(new Point(0, 7))
+                    }
+                    this.tiles.set(pt, new Entity([new TileComponent(tile, pt.times(TILE_SIZE))]))
+                }
+            }
+        }
     }
 
     // entities in the world space

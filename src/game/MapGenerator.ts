@@ -8,13 +8,21 @@ import { TILE_SIZE, TileManager } from "./graphics/TileManager"
 
 export class MapGenerator {
 
-    readonly pathSchema = new ConnectingTileSchema()
+    readonly oldPathSchema = new ConnectingTileSchema()
             .vertical(TileManager.instance.outdoorTiles.getTileAt(new Point(9, 7)))
             .angle(TileManager.instance.outdoorTiles.getTileAt(new Point(7, 7)))
             .tShape(TileManager.instance.outdoorTiles.getTileAt(new Point(5, 8)))
             .plusShape(TileManager.instance.outdoorTiles.getTileAt(new Point(7, 12)))
             .cap(TileManager.instance.outdoorTiles.getTileAt(new Point(6, 11)))
             .single(TileManager.instance.outdoorTiles.getTileAt(new Point(8, 12)))
+
+    readonly pathSchema = new ConnectingTileSchema()
+            .vertical(TileManager.instance.tilemap.getTileAt(new Point(2, 6)))
+            .angle(TileManager.instance.tilemap.getTileAt(new Point(0, 5)))
+            .tShape(TileManager.instance.tilemap.getTileAt(new Point(3, 5)))
+            .plusShape(TileManager.instance.tilemap.getTileAt(new Point(6, 5)))
+            .cap(TileManager.instance.tilemap.getTileAt(new Point(2, 6)))
+            .single(TileManager.instance.tilemap.getTileAt(new Point(7, 5)))
 
     renderPath(
         grid: TileGrid,
