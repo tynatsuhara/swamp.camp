@@ -1917,7 +1917,7 @@ System.register("game/Dude", ["engine/tiles/AnimatedTileComponent", "engine/tile
                 });
                 Dude.prototype.start = function (startData) {
                     this.characterAnim = this.entity.addComponent(new AnimatedTileComponent_1.AnimatedTileComponent(new point_13.Point(0, 0), TileManager_1.TileManager.instance.dungeonCharacters.getTileSetAnimation(this.archetype + "_idle_anim", 150), TileManager_1.TileManager.instance.dungeonCharacters.getTileSetAnimation(this.archetype + "_run_anim", 80)));
-                    this.swordAnim = this.entity.addComponent(new TileComponent_2.TileComponent(TileManager_1.TileManager.instance.dungeonCharacters.getTileSource("weapon_red_gem_sword")));
+                    this.swordAnim = this.entity.addComponent(new TileComponent_2.TileComponent(TileManager_1.TileManager.instance.dungeonCharacters.getTileSource("weapon_baton_with_spikes")));
                     this.collider = this.entity.addComponent(new BoxCollider_1.BoxCollider(this.position.plus(this.relativeColliderPos), new point_13.Point(10, 12)));
                 };
                 Dude.prototype.move = function (updateData, direction) {
@@ -1945,12 +1945,18 @@ System.register("game/Dude", ["engine/tiles/AnimatedTileComponent", "engine/tile
                     }
                     this.characterAnim.transform.position = this.position;
                     this.characterAnim.transform.depth = this.position.y;
-                    this.updateSwordPos();
+                    this.updateSwordPos(updateData);
                 };
-                Dude.prototype.updateSwordPos = function () {
+                Dude.prototype.updateSwordPos = function (updateData) {
                     if (!!this.swordAnim) {
-                        // magic based on the animations
+                        // relative position
                         var pos = this.relativeSwordPos.minus(this.swordAnim.transform.dimensions);
+                        if (this.weaponSheathed) {
+                            // center on back
+                            pos = new point_13.Point(this.characterAnim.transform.dimensions.x / 2 - this.swordAnim.transform.dimensions.x / 2, pos.y)
+                                .plus(new point_13.Point(this.characterAnim.transform.mirrorX ? 1 : -1, -1));
+                        }
+                        // magic based on the animations
                         var f = this.characterAnim.currentFrame();
                         if (!this.isMoving) {
                             pos = pos.plus(new point_13.Point(0, f == 3 ? 1 : f));
@@ -1960,12 +1966,23 @@ System.register("game/Dude", ["engine/tiles/AnimatedTileComponent", "engine/tile
                         }
                         this.swordAnim.transform.position = this.position.plus(pos);
                         // show sword behind character if mirrored
-                        this.swordAnim.transform.depth = this.characterAnim.transform.depth - (this.characterAnim.transform.mirrorX ? 1 : 0);
+                        this.swordAnim.transform.depth = this.characterAnim.transform.depth - (this.characterAnim.transform.mirrorX || this.weaponSheathed ? 1 : 0);
                         this.swordAnim.transform.mirrorX = this.characterAnim.transform.mirrorX;
-                        // TODO make it so a weapon can be sheathed on your back
-                        // this.swordAnim.transform.mirrorY = true
+                        // TODO add attack animation
                     }
                 };
+                Object.defineProperty(Dude.prototype, "weaponSheathed", {
+                    get: function () {
+                        // TODO make it so a weapon can be sheathed on your back
+                        return this._weaponSheathed;
+                    },
+                    set: function (value) {
+                        this._weaponSheathed = value;
+                        this.swordAnim.transform.mirrorY = value;
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
                 return Dude;
             }(component_4.Component));
             exports_31("Dude", Dude);
@@ -2523,6 +2540,9 @@ System.register("game/Player", ["engine/point", "engine/component", "game/Dude"]
                         dx++;
                     }
                     this.dude.move(updateData, new point_18.Point(dx, dy));
+                    if (updateData.input.isKeyDown(70 /* F */)) {
+                        this.dude.weaponSheathed = !this.dude.weaponSheathed;
+                    }
                     // update crosshair position
                     // const relativeLerpedPos = originalCrosshairPosRelative.lerp(0.16, this.lerpedLastMoveDir.normalized().times(TILE_SIZE))
                     // this.crosshairs.transform.position = this.position.plus(relativeLerpedPos)

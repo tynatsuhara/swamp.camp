@@ -38,6 +38,10 @@ export class Player extends Component {
 
         this.dude.move(updateData, new Point(dx, dy))
 
+        if (updateData.input.isKeyDown(InputKey.F)) {
+            this.dude.weaponSheathed = !this.dude.weaponSheathed
+        }
+
         // update crosshair position
         // const relativeLerpedPos = originalCrosshairPosRelative.lerp(0.16, this.lerpedLastMoveDir.normalized().times(TILE_SIZE))
         // this.crosshairs.transform.position = this.position.plus(relativeLerpedPos)

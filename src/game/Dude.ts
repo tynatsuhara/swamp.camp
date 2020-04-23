@@ -48,7 +48,7 @@ export class Dude extends Component {
 
         this.swordAnim = this.entity.addComponent(
             new TileComponent(
-                TileManager.instance.dungeonCharacters.getTileSource("weapon_red_gem_sword")
+                TileManager.instance.dungeonCharacters.getTileSource("weapon_baton_with_spikes")
             )
         )
         
@@ -83,13 +83,21 @@ export class Dude extends Component {
         this.characterAnim.transform.position = this.position
         this.characterAnim.transform.depth = this.position.y
 
-        this.updateSwordPos()
+        this.updateSwordPos(updateData)
     }
 
-    private updateSwordPos() {
+    private updateSwordPos(updateData: UpdateData) {
         if (!!this.swordAnim) {
-            // magic based on the animations
+            // relative position
             let pos = this.relativeSwordPos.minus(this.swordAnim.transform.dimensions)
+
+            if (this.weaponSheathed) {
+                // center on back
+                pos = new Point(this.characterAnim.transform.dimensions.x/2 - this.swordAnim.transform.dimensions.x/2, pos.y)
+                        .plus(new Point(this.characterAnim.transform.mirrorX ? 1 : -1, -1))
+            }
+
+            // magic based on the animations
             const f = this.characterAnim.currentFrame()
             if (!this.isMoving) {
                 pos = pos.plus(new Point(0, f == 3 ? 1 : f))
@@ -98,12 +106,23 @@ export class Dude extends Component {
             }
 
             this.swordAnim.transform.position = this.position.plus(pos)
+
             // show sword behind character if mirrored
-            this.swordAnim.transform.depth = this.characterAnim.transform.depth - (this.characterAnim.transform.mirrorX ? 1 : 0)
+            this.swordAnim.transform.depth = this.characterAnim.transform.depth - (this.characterAnim.transform.mirrorX || this.weaponSheathed ? 1 : 0)
             this.swordAnim.transform.mirrorX = this.characterAnim.transform.mirrorX
 
-            // TODO make it so a weapon can be sheathed on your back
-            // this.swordAnim.transform.mirrorY = true
+
+            // TODO add attack animation
         }
+    }
+
+    private _weaponSheathed: boolean
+    set weaponSheathed(value: boolean) {
+        this._weaponSheathed = value
+        this.swordAnim.transform.mirrorY = value
+    }
+    get weaponSheathed() {
+        // TODO make it so a weapon can be sheathed on your back
+         return this._weaponSheathed
     }
 }
