@@ -5,6 +5,7 @@ import { RenderMethod } from "./renderer/RenderMethod"
 export abstract class Component {
 
     entity: Entity
+    enabled: boolean = true
 
     /**
      * Called once, after the component is added to a valid entity and before update() is called

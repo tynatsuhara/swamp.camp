@@ -67,7 +67,9 @@ export class Engine {
                 }
                 // TODO: consider the behavior where an entity belongs to multiple views (eg splitscreen)
                 v.entities.forEach(e => e.components.forEach(c => {
-                    // TODO: maybe do ALL start() calls before we begin updating?
+                    if (!c.enabled) {
+                        return
+                    }
                     if (c.start !== ALREADY_STARTED_COMPONENT) {
                         c.start(startData)
                         c.start = ALREADY_STARTED_COMPONENT
