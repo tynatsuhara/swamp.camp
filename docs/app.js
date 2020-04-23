@@ -241,7 +241,7 @@ System.register("engine/renderer/Renderer", ["engine/point", "engine/renderer/Re
                     view.entities
                         .filter(function (entity) { return !!entity; })
                         .flatMap(function (entity) { return entity.components; })
-                        .filter(function (component) { return !!component; })
+                        .filter(function (component) { return !!component && component.enabled; })
                         .flatMap(function (component) { return component.getRenderMethods(); })
                         .sort(function (a, b) { return a.depth - b.depth; }) // TODO possibly improve this
                         .forEach(function (renderMethod) { return renderMethod.render(viewRenderContext); });
@@ -1951,6 +1951,7 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                 Weapon.prototype.start = function (startData) {
                     this.weaponSprite = this.entity.addComponent(new TileComponent_2.TileComponent(TileManager_1.TileManager.instance.dungeonCharacters.getTileSource(this.id)));
                     this.slashSprite = this.entity.addComponent(new TileComponent_2.TileComponent(TileManager_1.TileManager.instance.oneBit.getTileSource("slash")));
+                    this.slashSprite.enabled = false;
                 };
                 Weapon.prototype.update = function (updateData) {
                     if (!!this.animator) {
@@ -1966,7 +1967,7 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                         if (this.state === State.DRAWN) {
                             pos = offsetFromEdge;
                         }
-                        else if (this.state === State.SHEATHED) {
+                        else if (this.state === State.SHEATHED) { // TODO add side sheath for swords
                             // center on back
                             pos = offsetFromEdge.plus(new point_14.Point(3, -1));
                         }
@@ -1986,15 +1987,19 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                             pos = pos.plus(new point_14.Point(0, f == 0 ? -1 : -((3 - characterAnim.currentFrame()))));
                         }
                         // mirror
-                        if (characterAnim.transform.mirrorX) {
+                        var charMirror = characterAnim.transform.mirrorX;
+                        if (charMirror) {
                             pos = new point_14.Point(characterAnim.transform.dimensions.x - pos.x - this.weaponSprite.transform.dimensions.x, pos.y);
                         }
                         // set position relative to the character
                         this.weaponSprite.transform.position = characterAnim.transform.position.plus(pos);
                         // show sword behind character if mirrored
                         this.weaponSprite.transform.depth = characterAnim.transform.depth + 1 - (this.state == State.SHEATHED ? 2 : 0);
-                        this.weaponSprite.transform.mirrorX = characterAnim.transform.mirrorX;
-                        // TODO add attack animation
+                        this.weaponSprite.transform.mirrorX = charMirror;
+                        // this.slashSprite.enabled = this.animator?.getCurrentFrame() === 3
+                        this.slashSprite.transform.depth = characterAnim.transform.depth + 2;
+                        this.slashSprite.transform.mirrorX = charMirror;
+                        this.slashSprite.transform.position = characterAnim.transform.position.plus(new point_14.Point((charMirror ? -1 : 1) * (this.weaponSprite.transform.dimensions.y - 8), 8));
                     }
                 };
                 Weapon.prototype.toggleSheathed = function () {

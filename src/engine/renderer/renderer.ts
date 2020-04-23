@@ -33,7 +33,7 @@ export class Renderer {
         view.entities
                 .filter(entity => !!entity)
                 .flatMap(entity => entity.components)
-                .filter(component => !!component)
+                .filter(component => !!component && component.enabled)
                 .flatMap(component => component.getRenderMethods())
                 .sort((a, b) => a.depth - b.depth)  // TODO possibly improve this
                 .forEach(renderMethod => renderMethod.render(viewRenderContext))

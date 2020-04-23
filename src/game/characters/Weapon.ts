@@ -38,6 +38,7 @@ export class Weapon extends Component {
                 TileManager.instance.oneBit.getTileSource("slash")
             )
         )
+        this.slashSprite.enabled = false
     }
 
     update(updateData: UpdateData) {
@@ -56,7 +57,7 @@ export class Weapon extends Component {
 
             if (this.state === State.DRAWN) {
                 pos = offsetFromEdge
-            } else if (this.state === State.SHEATHED) {
+            } else if (this.state === State.SHEATHED) {  // TODO add side sheath for swords
                 // center on back
                 pos = offsetFromEdge.plus(new Point(3, -1))
             } else if (this.state === State.ATTACKING) {
@@ -77,7 +78,8 @@ export class Weapon extends Component {
             }
 
             // mirror
-            if (characterAnim.transform.mirrorX) {
+            const charMirror = characterAnim.transform.mirrorX
+            if (charMirror) {
                 pos = new Point(characterAnim.transform.dimensions.x - pos.x - this.weaponSprite.transform.dimensions.x, pos.y)
             }
 
@@ -86,10 +88,14 @@ export class Weapon extends Component {
 
             // show sword behind character if mirrored
             this.weaponSprite.transform.depth = characterAnim.transform.depth + 1 - (this.state == State.SHEATHED ? 2 : 0)
-            this.weaponSprite.transform.mirrorX = characterAnim.transform.mirrorX
+            this.weaponSprite.transform.mirrorX = charMirror
 
-
-            // TODO add attack animation
+            // this.slashSprite.enabled = this.animator?.getCurrentFrame() === 3
+            this.slashSprite.transform.depth = characterAnim.transform.depth + 2
+            this.slashSprite.transform.mirrorX = charMirror
+            this.slashSprite.transform.position = characterAnim.transform.position.plus(
+                new Point((charMirror ? -1 : 1) * (this.weaponSprite.transform.dimensions.y - 8), 8)
+            )
         }
     }
 
