@@ -6,14 +6,15 @@ import { Point } from "../../engine/point"
 import { Component } from "../../engine/component"
 import { BoxCollider } from "../../engine/collision/BoxCollider"
 import { TileManager } from "../graphics/TileManager"
+import { Weapon } from "./Weapon"
 
 export class Dude extends Component {
     speed = 0.085
     private characterAnim: AnimatedTileComponent
     private archetype: string
 
-    private swordAnim: TileComponent
-    private relativeSwordPos: Point = new Point(6, 26)
+    private readonly weaponId: string
+    private weapon: Weapon
 
     private collider: BoxCollider
     private relativeColliderPos: Point = new Point(3, 15)
@@ -27,17 +28,16 @@ export class Dude extends Component {
         return this._isMoving
     }
 
-    private readonly weapon: string
 
     constructor(
         archetype: string,
         position: Point,
-        weapon: string
+        weaponId: string
     ) {
         super()
         this.archetype = archetype
         this._position = position
-        this.weapon = weapon
+        this.weaponId = weaponId
     }
 
     start(startData: StartData) {
@@ -46,12 +46,8 @@ export class Dude extends Component {
         // TileManager.instance.dungeonCharacters.getTileSetAnimation(`${this.archetype}_hit_anim`, 1000),  // TODO handle missing animation for some archetypes
         this.characterAnim = this.entity.addComponent(new AnimatedTileComponent(new Point(0, 0), idleAnim, runAnim))
 
-        if (!!this.weapon) {
-            this.swordAnim = this.entity.addComponent(
-                new TileComponent(
-                    TileManager.instance.dungeonCharacters.getTileSource(this.weapon)
-                )
-            )
+        if (!!this.weaponId) {
+            this.weapon = this.entity.addComponent(new Weapon(this.weaponId))
         }
 
         const colliderSize = new Point(10, 8)
@@ -90,46 +86,8 @@ export class Dude extends Component {
         this.characterAnim.transform.position = this.position
         this.characterAnim.transform.depth = this.position.y + this.characterAnim.transform.dimensions.y
 
-        this.updateSwordPos(updateData)
-    }
-
-    private updateSwordPos(updateData: UpdateData) {
-        if (!!this.swordAnim) {
-            // relative position
-            let pos = this.relativeSwordPos.minus(this.swordAnim.transform.dimensions)
-
-            if (this.weaponSheathed) {
-                // center on back
-                pos = new Point(this.characterAnim.transform.dimensions.x/2 - this.swordAnim.transform.dimensions.x/2, pos.y)
-                        .plus(new Point(this.characterAnim.transform.mirrorX ? 1 : -1, -1))
-            }
-
-            // magic based on the animations
-            const f = this.characterAnim.currentFrame()
-            if (!this.isMoving) {
-                pos = pos.plus(new Point(0, f == 3 ? 1 : f))
-            } else {
-                pos = pos.plus(new Point(0, f == 0 ? -1 : -((3 - this.characterAnim.currentFrame()))))
-            }
-
-            this.swordAnim.transform.position = this.position.plus(pos)
-
-            // show sword behind character if mirrored
-            this.swordAnim.transform.depth = this.characterAnim.transform.depth - (this.characterAnim.transform.mirrorX || this.weaponSheathed ? 1 : 0)
-            this.swordAnim.transform.mirrorX = this.characterAnim.transform.mirrorX
-
-
-            // TODO add attack animation
+        if (!!this.weapon) {
+            this.weapon.syncWithPlayerAnimation(this, this.characterAnim)
         }
-    }
-
-    private _weaponSheathed: boolean
-    set weaponSheathed(value: boolean) {
-        this._weaponSheathed = value
-        this.swordAnim.transform.mirrorY = value
-    }
-    get weaponSheathed() {
-        // TODO make it so a weapon can be sheathed on your back
-         return this._weaponSheathed
     }
 }

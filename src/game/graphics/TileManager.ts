@@ -20,8 +20,9 @@ export class TileManager {
     readonly dungeonCharacters = new DungeonTilesetII()
     readonly tilemap = new SingleFileTileLoader("images/tilemap.png")
     readonly dungeonTiles = new SingleFileTileLoader("images/env_dungeon.png")
-    readonly indoorTiles = new SingleFileTileLoader("images/env_indoor.png", new Map())
-    readonly outdoorTiles = new SingleFileTileLoader("images/env_outdoor_recolor.png", new Map())
+    readonly indoorTiles = new SingleFileTileLoader("images/env_indoor.png")
+    readonly outdoorTiles = new SingleFileTileLoader("images/env_outdoor_recolor.png")
+    readonly oneBit = new SingleFileTileLoader("images/monochrome_transparent_1_bit.png", new Map([["slash", new Point(24, 11)]]))
     readonly otherCharacters = new SplitFileTileLoader("images/individual_characters")
 
     constructor() {
@@ -31,6 +32,7 @@ export class TileManager {
     // loaded before the engine starts running the game
     static getFilesToLoad() {
         return [
+            "images/monochrome_transparent_1_bit.png",
             "images/dungeon_base.png",
             "images/env_dungeon.png",
             "images/env_indoor.png",
