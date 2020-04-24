@@ -82,6 +82,12 @@ export class Dude extends Component {
         }, 10)
     }
 
+    /**
+     * Should be called on EVERY update step for 
+     * @param updateData 
+     * @param direction the direction they are moving in
+     * @param facingOverride if < 0, will face left, if > 0, will face right. if == 0, will face the direction they're moving
+     */
     move(updateData: UpdateData, direction: Point, facingOverride: number = 0) {
         if (this.beingKnockedBack) {
             direction = direction.times(0)

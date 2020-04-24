@@ -41,7 +41,6 @@ export class Player extends Component {
             new Point(dx, dy), 
             this.dude.weapon.isDrawn() ? updateData.input.mousePos.x - this.dude.standingPosition.x : 0
         )
-        console.log(updateData.input.mousePos.x - this.dude.standingPosition.x)
 
         if (updateData.input.isKeyDown(InputKey.F)) {
             this.dude.weapon.toggleSheathed()
