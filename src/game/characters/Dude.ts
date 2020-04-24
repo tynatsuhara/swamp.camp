@@ -13,7 +13,7 @@ import { Coin } from "../items/Coin"
 
 export class Dude extends Component {
 
-    private health = 5
+    private health = 3
     speed = 0.085
     private _animation: AnimatedTileComponent
     get animation() { return this._animation }
@@ -98,15 +98,15 @@ export class Dude extends Component {
         this.deathOffset = this.animation.transform.position.minus(prePos)
         this.animation.play(0)
         this.animation.paused = true
-        this.spawnDrop()
+        setTimeout(() => this.spawnDrop(), 100)
         this.dropWeapon()
     }
 
-    spawnDrop() {
-        EntityManager.instance.add(new Entity([new Coin(this.standingPosition)]))
+    private spawnDrop() {
+        EntityManager.instance.add(new Entity([new Coin(this.standingPosition.minus(new Point(0, 2)))]))
     }
 
-    dropWeapon() {
+    private dropWeapon() {
         // TODO
     }
 

@@ -772,6 +772,16 @@ System.register("engine/Entity", [], function (exports_15, context_15) {
                     this.components = this.components.filter(function (c) { return c !== component; });
                     component.entity = null;
                 };
+                /**
+                 * Disables and removes all components.
+                 * Passing a self-destructed entity to the engine will have no effects.
+                 */
+                Entity.prototype.selfDestruct = function () {
+                    this.components.forEach(function (c) {
+                        c.entity = null;
+                        c.enabled = false;
+                    });
+                };
                 return Entity;
             }());
             exports_15("Entity", Entity);
@@ -1235,9 +1245,6 @@ System.register("engine/collision/Collider", ["engine/component", "engine/point"
                 CollisionEngine.prototype.registerCollider = function (collider) {
                     this.colliders.push(collider);
                 };
-                CollisionEngine.prototype.unregisterCollider = function (collider) {
-                    this.colliders.filter(function (c) { return c !== collider; });
-                };
                 // Needs further testing. No active use case right now.
                 CollisionEngine.prototype.tryMove = function (collider, to) {
                     var translation = to.minus(collider.position);
@@ -1265,7 +1272,8 @@ System.register("engine/collision/Collider", ["engine/component", "engine/point"
                     }
                 };
                 CollisionEngine.prototype.checkCollider = function (collider) {
-                    this.colliders.filter(function (other) { return other !== collider && other.entity && other.enabled && other.isTrigger; }).forEach(function (other) {
+                    this.removeDanglingColliders();
+                    this.colliders.filter(function (other) { return other !== collider && other.enabled && other.isTrigger; }).forEach(function (other) {
                         var isColliding = other.getPoints().some(function (pt) { return collider.isWithinBounds(pt); });
                         collider.updateColliding(other, isColliding);
                         other.updateColliding(collider, isColliding);
@@ -1277,10 +1285,15 @@ System.register("engine/collision/Collider", ["engine/component", "engine/point"
                     if (collider.isTrigger) { // nothing will ever block this collider
                         return true;
                     }
+                    this.removeDanglingColliders();
                     var translatedPoints = collider.getPoints().map(function (pt) { return pt.plus(translation); });
-                    return !this.colliders.filter(function (other) { return other !== collider && other.entity && other.enabled && !other.isTrigger; }).some(function (other) {
+                    return !this.colliders.filter(function (other) { return other !== collider && other.enabled && !other.isTrigger; }).some(function (other) {
                         return translatedPoints.some(function (pt) { return other.isWithinBounds(pt); });
                     });
+                };
+                // unregisters any colliders without an entity
+                CollisionEngine.prototype.removeDanglingColliders = function () {
+                    this.colliders = this.colliders.filter(function (other) { return !!other.entity; });
                 };
                 return CollisionEngine;
             }());
@@ -1340,6 +1353,7 @@ System.register("engine/collision/Collider", ["engine/component", "engine/point"
                 };
                 Collider.prototype.onColliderEnter = function (callback) {
                     this.onColliderEnterCallback = callback;
+                    return this;
                 };
                 Collider.prototype.getRenderMethods = function () {
                     if (!debug_2.debug.showColliders) {
@@ -2274,6 +2288,7 @@ System.register("game/EntityManager", [], function (exports_34, context_34) {
                     this.set.add(e);
                 };
                 EntityManager.prototype.delete = function (e) {
+                    e.selfDestruct();
                     this.set.delete(e);
                 };
                 EntityManager.prototype.getEntities = function () {
@@ -2285,9 +2300,9 @@ System.register("game/EntityManager", [], function (exports_34, context_34) {
         }
     };
 });
-System.register("game/items/Coin", ["engine/component", "engine/tiles/AnimatedTileComponent", "engine/point", "game/graphics/TileManager"], function (exports_35, context_35) {
+System.register("game/items/Coin", ["engine/component", "engine/tiles/AnimatedTileComponent", "engine/point", "game/graphics/TileManager", "engine/collision/BoxCollider", "game/characters/Player", "game/EntityManager"], function (exports_35, context_35) {
     "use strict";
-    var component_6, AnimatedTileComponent_1, point_16, TileManager_2, Coin;
+    var component_6, AnimatedTileComponent_1, point_16, TileManager_2, BoxCollider_1, Player_1, EntityManager_1, Coin;
     var __moduleName = context_35 && context_35.id;
     return {
         setters: [
@@ -2302,6 +2317,15 @@ System.register("game/items/Coin", ["engine/component", "engine/tiles/AnimatedTi
             },
             function (TileManager_2_1) {
                 TileManager_2 = TileManager_2_1;
+            },
+            function (BoxCollider_1_1) {
+                BoxCollider_1 = BoxCollider_1_1;
+            },
+            function (Player_1_1) {
+                Player_1 = Player_1_1;
+            },
+            function (EntityManager_1_1) {
+                EntityManager_1 = EntityManager_1_1;
             }
         ],
         execute: function () {
@@ -2316,8 +2340,16 @@ System.register("game/items/Coin", ["engine/component", "engine/tiles/AnimatedTi
                     _this.start = function (startData) {
                         var anim = TileManager_2.TileManager.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150);
                         _this.animation = _this.entity.addComponent(new AnimatedTileComponent_1.AnimatedTileComponent([anim]));
-                        _this.animation.transform.position = position.minus(new point_16.Point(_this.animation.transform.dimensions.x / 2, _this.animation.transform.dimensions.y));
-                        _this.animation.transform.depth = position.y;
+                        var pos = position.minus(new point_16.Point(_this.animation.transform.dimensions.x / 2, _this.animation.transform.dimensions.y));
+                        _this.animation.transform.position = pos;
+                        _this.animation.transform.depth = pos.y;
+                        _this.collider = _this.entity.addComponent(new BoxCollider_1.BoxCollider(pos, _this.animation.transform.dimensions, true).onColliderEnter(function (c) {
+                            var player = c.entity.getComponent(Player_1.Player);
+                            if (!!player) {
+                                console.log("picked up coin!");
+                                EntityManager_1.EntityManager.instance.delete(_this.entity);
+                            }
+                        }));
                     };
                     return _this;
                 }
@@ -2330,7 +2362,7 @@ System.register("game/items/Coin", ["engine/component", "engine/tiles/AnimatedTi
 });
 System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "engine/point", "engine/component", "engine/collision/BoxCollider", "game/graphics/TileManager", "game/characters/Weapon", "engine/Entity", "game/EntityManager", "game/items/Coin"], function (exports_36, context_36) {
     "use strict";
-    var AnimatedTileComponent_2, point_17, component_7, BoxCollider_1, TileManager_3, Weapon_1, Entity_2, EntityManager_1, Coin_1, Dude;
+    var AnimatedTileComponent_2, point_17, component_7, BoxCollider_2, TileManager_3, Weapon_1, Entity_2, EntityManager_2, Coin_1, Dude;
     var __moduleName = context_36 && context_36.id;
     return {
         setters: [
@@ -2343,8 +2375,8 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
             function (component_7_1) {
                 component_7 = component_7_1;
             },
-            function (BoxCollider_1_1) {
-                BoxCollider_1 = BoxCollider_1_1;
+            function (BoxCollider_2_1) {
+                BoxCollider_2 = BoxCollider_2_1;
             },
             function (TileManager_3_1) {
                 TileManager_3 = TileManager_3_1;
@@ -2355,8 +2387,8 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
             function (Entity_2_1) {
                 Entity_2 = Entity_2_1;
             },
-            function (EntityManager_1_1) {
-                EntityManager_1 = EntityManager_1_1;
+            function (EntityManager_2_1) {
+                EntityManager_2 = EntityManager_2_1;
             },
             function (Coin_1_1) {
                 Coin_1 = Coin_1_1;
@@ -2367,7 +2399,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                 __extends(Dude, _super);
                 function Dude(archetype, position, weaponId) {
                     var _this = _super.call(this) || this;
-                    _this.health = 5;
+                    _this.health = 3;
                     _this.speed = 0.085;
                     _this.relativeColliderPos = new point_17.Point(3, 15);
                     _this.beingKnockedBack = false;
@@ -2381,7 +2413,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                         }
                         var colliderSize = new point_17.Point(10, 8);
                         _this.relativeColliderPos = new point_17.Point(_this.animation.transform.dimensions.x / 2 - colliderSize.x / 2, _this.animation.transform.dimensions.y - colliderSize.y);
-                        _this.collider = _this.entity.addComponent(new BoxCollider_1.BoxCollider(_this.position.plus(_this.relativeColliderPos), colliderSize));
+                        _this.collider = _this.entity.addComponent(new BoxCollider_2.BoxCollider(_this.position.plus(_this.relativeColliderPos), colliderSize));
                     };
                     return _this;
                 }
@@ -2440,6 +2472,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     this.knockback(direction, knockback);
                 };
                 Dude.prototype.die = function (direction) {
+                    var _this = this;
                     if (direction === void 0) { direction = new point_17.Point(-1, 0); }
                     this.health = 0;
                     var prePos = this.animation.transform.position;
@@ -2447,11 +2480,11 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     this.deathOffset = this.animation.transform.position.minus(prePos);
                     this.animation.play(0);
                     this.animation.paused = true;
-                    this.spawnDrop();
+                    setTimeout(function () { return _this.spawnDrop(); }, 100);
                     this.dropWeapon();
                 };
                 Dude.prototype.spawnDrop = function () {
-                    EntityManager_1.EntityManager.instance.add(new Entity_2.Entity([new Coin_1.Coin(this.standingPosition)]));
+                    EntityManager_2.EntityManager.instance.add(new Entity_2.Entity([new Coin_1.Coin(this.standingPosition.minus(new point_17.Point(0, 2)))]));
                 };
                 Dude.prototype.dropWeapon = function () {
                     // TODO
@@ -3017,7 +3050,7 @@ System.register("game/MapGenerator", ["engine/point", "engine/tiles/ConnectingTi
 });
 System.register("game/characters/NPC", ["engine/component", "game/characters/Dude", "game/characters/Player", "engine/point"], function (exports_43, context_43) {
     "use strict";
-    var component_9, Dude_3, Player_1, point_22, NPC;
+    var component_9, Dude_3, Player_2, point_22, NPC;
     var __moduleName = context_43 && context_43.id;
     return {
         setters: [
@@ -3027,8 +3060,8 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
             function (Dude_3_1) {
                 Dude_3 = Dude_3_1;
             },
-            function (Player_1_1) {
-                Player_1 = Player_1_1;
+            function (Player_2_1) {
+                Player_2 = Player_2_1;
             },
             function (point_22_1) {
                 point_22 = point_22_1;
@@ -3047,9 +3080,9 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                 NPC.prototype.update = function (updateData) {
                     var followDistance = 75;
                     var buffer = 40; // this basically determines how long they will stop for if they get too close
-                    var dist = Player_1.Player.instance.entity.getComponent(Dude_3.Dude).position.minus(this.dude.position);
+                    var dist = Player_2.Player.instance.entity.getComponent(Dude_3.Dude).position.minus(this.dude.position);
                     var mag = dist.magnitude();
-                    if (mag > followDistance || ((followDistance - mag) < buffer && Player_1.Player.instance.entity.getComponent(Dude_3.Dude).isMoving) && this.dude.isMoving) {
+                    if (mag > followDistance || ((followDistance - mag) < buffer && Player_2.Player.instance.entity.getComponent(Dude_3.Dude).isMoving) && this.dude.isMoving) {
                         this.dude.move(updateData, dist);
                     }
                     else {
@@ -3064,15 +3097,15 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
 });
 System.register("game/characters/DudeFactory", ["engine/Entity", "game/characters/Player", "game/characters/Dude", "game/characters/NPC", "game/EntityManager"], function (exports_44, context_44) {
     "use strict";
-    var Entity_5, Player_2, Dude_4, NPC_1, EntityManager_2, DudeFactory;
+    var Entity_5, Player_3, Dude_4, NPC_1, EntityManager_3, DudeFactory;
     var __moduleName = context_44 && context_44.id;
     return {
         setters: [
             function (Entity_5_1) {
                 Entity_5 = Entity_5_1;
             },
-            function (Player_2_1) {
-                Player_2 = Player_2_1;
+            function (Player_3_1) {
+                Player_3 = Player_3_1;
             },
             function (Dude_4_1) {
                 Dude_4 = Dude_4_1;
@@ -3080,8 +3113,8 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "game/character
             function (NPC_1_1) {
                 NPC_1 = NPC_1_1;
             },
-            function (EntityManager_2_1) {
-                EntityManager_2 = EntityManager_2_1;
+            function (EntityManager_3_1) {
+                EntityManager_3 = EntityManager_3_1;
             }
         ],
         execute: function () {
@@ -3092,7 +3125,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "game/character
                     return this.make("knight_f", pos, "weapon_baton_with_spikes", 
                     // "weapon_katana", 
                     // "weapon_knife", 
-                    new Player_2.Player());
+                    new Player_3.Player());
                 };
                 DudeFactory.prototype.newElf = function (pos) {
                     return this.make("elf_m", pos, "weapon_katana", new NPC_1.NPC());
@@ -3106,7 +3139,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "game/character
                         additionalComponents[_i - 3] = arguments[_i];
                     }
                     var e = new Entity_5.Entity([new Dude_4.Dude(archetype, pos, weapon)].concat(additionalComponents));
-                    EntityManager_2.EntityManager.instance.add(e);
+                    EntityManager_3.EntityManager.instance.add(e);
                     return e.getComponent(Dude_4.Dude);
                 };
                 return DudeFactory;
@@ -3117,7 +3150,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "game/character
 });
 System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/game", "engine/View", "engine/tiles/TileGrid", "game/MapGenerator", "engine/tiles/AnimatedTileComponent", "game/graphics/TileManager", "game/characters/DudeFactory", "game/EntityManager", "engine/tiles/TileTransform"], function (exports_45, context_45) {
     "use strict";
-    var Entity_6, point_23, game_1, View_2, TileGrid_1, MapGenerator_1, AnimatedTileComponent_3, TileManager_5, DudeFactory_1, EntityManager_3, TileTransform_6, ZOOM, QuestGame;
+    var Entity_6, point_23, game_1, View_2, TileGrid_1, MapGenerator_1, AnimatedTileComponent_3, TileManager_5, DudeFactory_1, EntityManager_4, TileTransform_6, ZOOM, QuestGame;
     var __moduleName = context_45 && context_45.id;
     return {
         setters: [
@@ -3148,8 +3181,8 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
             function (DudeFactory_1_1) {
                 DudeFactory_1 = DudeFactory_1_1;
             },
-            function (EntityManager_3_1) {
-                EntityManager_3 = EntityManager_3_1;
+            function (EntityManager_4_1) {
+                EntityManager_4 = EntityManager_4_1;
             },
             function (TileTransform_6_1) {
                 TileTransform_6 = TileTransform_6_1;
@@ -3162,7 +3195,7 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
                 function QuestGame() {
                     var _this = _super !== null && _super.apply(this, arguments) || this;
                     _this.tileManager = new TileManager_5.TileManager();
-                    _this.entityManager = new EntityManager_3.EntityManager();
+                    _this.entityManager = new EntityManager_4.EntityManager();
                     _this.tiles = new TileGrid_1.TileGrid(TileManager_5.TILE_SIZE);
                     _this.dudeFactory = new DudeFactory_1.DudeFactory();
                     _this.player = _this.dudeFactory.newPlayer(new point_23.Point(-2, 2).times(TileManager_5.TILE_SIZE));

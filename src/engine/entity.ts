@@ -30,4 +30,15 @@ export class Entity {
         this.components = this.components.filter(c => c !== component)
         component.entity = null
     }
+
+    /**
+     * Disables and removes all components. 
+     * Passing a self-destructed entity to the engine will have no effects.
+     */
+    selfDestruct() {
+        this.components.forEach(c => {
+            c.entity = null
+            c.enabled = false
+        })
+    }
 }

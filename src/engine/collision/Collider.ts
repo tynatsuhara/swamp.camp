@@ -13,10 +13,6 @@ class CollisionEngine {
         this.colliders.push(collider)
     }
 
-    unregisterCollider(collider: Collider) {
-        this.colliders.filter(c => c !== collider)
-    }
-
     // Needs further testing. No active use case right now.
     tryMove(collider: Collider, to: Point): Point {
         const translation = to.minus(collider.position)
@@ -47,7 +43,8 @@ class CollisionEngine {
     }
 
     checkCollider(collider: Collider) {
-        this.colliders.filter(other => other !== collider && other.entity && other.enabled && other.isTrigger).forEach(other => {
+        this.removeDanglingColliders()
+        this.colliders.filter(other => other !== collider && other.enabled && other.isTrigger).forEach(other => {
             const isColliding = other.getPoints().some(pt => collider.isWithinBounds(pt))
             collider.updateColliding(other, isColliding)
             other.updateColliding(collider, isColliding)
@@ -60,10 +57,16 @@ class CollisionEngine {
         if (collider.isTrigger) {  // nothing will ever block this collider
             return true
         }
+        this.removeDanglingColliders()
         const translatedPoints = collider.getPoints().map(pt => pt.plus(translation))
-        return !this.colliders.filter(other => other !== collider && other.entity && other.enabled && !other.isTrigger).some(other => {
+        return !this.colliders.filter(other => other !== collider && other.enabled && !other.isTrigger).some(other => {
             return translatedPoints.some(pt => other.isWithinBounds(pt))
         }) 
+    }
+
+    // unregisters any colliders without an entity
+    private removeDanglingColliders() {
+        this.colliders = this.colliders.filter(other => !!other.entity)
     }
 }
 
@@ -123,8 +126,9 @@ export abstract class Collider extends Component {
         }
     }
 
-    onColliderEnter(callback: (collider: Collider) => void) {
+    onColliderEnter(callback: (collider: Collider) => void): Collider {
         this.onColliderEnterCallback = callback
+        return this
     }
 
     getRenderMethods(): RenderMethod[] {
