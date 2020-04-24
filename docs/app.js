@@ -2112,10 +2112,38 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
         }
     };
 });
-System.register("game/characters/Weapon", ["engine/component", "engine/tiles/TileComponent", "game/graphics/TileManager", "engine/tiles/TileTransform", "engine/point", "game/characters/Dude", "engine/util/Animator"], function (exports_33, context_33) {
+System.register("game/EntityManager", [], function (exports_33, context_33) {
     "use strict";
-    var component_5, TileComponent_3, TileManager_1, TileTransform_4, point_15, Dude_2, Animator_2, State, Weapon;
+    var EntityManager;
     var __moduleName = context_33 && context_33.id;
+    return {
+        setters: [],
+        execute: function () {
+            EntityManager = /** @class */ (function () {
+                function EntityManager() {
+                    this.set = new Set();
+                    EntityManager.instance = this;
+                }
+                EntityManager.prototype.add = function (e) {
+                    this.set.add(e);
+                };
+                EntityManager.prototype.delete = function (e) {
+                    e.selfDestruct();
+                    this.set.delete(e);
+                };
+                EntityManager.prototype.getEntities = function () {
+                    return Array.from(this.set);
+                };
+                return EntityManager;
+            }());
+            exports_33("EntityManager", EntityManager);
+        }
+    };
+});
+System.register("game/characters/Weapon", ["engine/component", "engine/tiles/TileComponent", "game/graphics/TileManager", "engine/tiles/TileTransform", "engine/point", "game/characters/Dude", "engine/util/Animator", "game/EntityManager"], function (exports_34, context_34) {
+    "use strict";
+    var component_5, TileComponent_3, TileManager_1, TileTransform_4, point_15, Dude_2, Animator_2, EntityManager_1, State, Weapon;
+    var __moduleName = context_34 && context_34.id;
     return {
         setters: [
             function (component_5_1) {
@@ -2138,6 +2166,9 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
             },
             function (Animator_2_1) {
                 Animator_2 = Animator_2_1;
+            },
+            function (EntityManager_1_1) {
+                EntityManager_1 = EntityManager_1_1;
             }
         ],
         execute: function () {
@@ -2146,41 +2177,35 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                 State[State["DRAWN"] = 1] = "DRAWN";
                 State[State["ATTACKING"] = 2] = "ATTACKING";
             })(State || (State = {}));
+            /**
+             * A weapon being wielded by a dude
+             */
             Weapon = /** @class */ (function (_super) {
                 __extends(Weapon, _super);
-                function Weapon(id) {
+                function Weapon(weaponId) {
                     var _this = _super.call(this) || this;
                     _this.state = State.DRAWN;
                     _this.currentAnimationFrame = 0;
-                    _this.id = id;
+                    _this.start = function (startData) {
+                        _this.dude = _this.entity.getComponent(Dude_2.Dude);
+                        _this.weaponSprite = _this.entity.addComponent(new TileComponent_3.TileComponent(TileManager_1.TileManager.instance.dungeonCharacters.getTileSource(weaponId), new TileTransform_4.TileTransform().relativeTo(_this.dude.animation.transform)));
+                    };
                     return _this;
                 }
-                Weapon.prototype.start = function (startData) {
-                    this.dude = this.entity.getComponent(Dude_2.Dude);
-                    this.weaponSprite = this.entity.addComponent(new TileComponent_3.TileComponent(TileManager_1.TileManager.instance.dungeonCharacters.getTileSource(this.id), new TileTransform_4.TileTransform().relativeTo(this.dude.animation.transform)));
-                    // this.slashSprite = this.entity.addComponent(
-                    //     new TileComponent(
-                    //         TileManager.instance.oneBit.getTileSource("slash")
-                    //     )
-                    // )
-                    // this.slashSprite.enabled = false
-                };
                 Weapon.prototype.update = function (updateData) {
-                    var _this = this;
                     if (!!this.animator) {
                         this.animator.update(updateData.elapsedTimeMillis);
                     }
-                    if (this.state === State.ATTACKING && !!this.dude && this.shouldCheckHits) {
-                        this.shouldCheckHits = false;
-                        var attackDistance_1 = this.weaponSprite.transform.dimensions.y + 4; // add a tiny buffer for small weapons like the dagger to still work
-                        updateData.view.entities
-                            .map(function (e) { return e.getComponent(Dude_2.Dude); })
-                            .filter(function (d) { return !!d && d !== _this.dude; })
-                            .filter(function (d) { return _this.weaponSprite.transform.mirrorX === (d.standingPosition.x < _this.dude.standingPosition.x); })
-                            .filter(function (d) { return d.standingPosition.distanceTo(_this.dude.standingPosition) < attackDistance_1; })
-                            .forEach(function (d) { return d.damage(1, d.standingPosition.minus(_this.dude.standingPosition), 30); });
-                    }
                     this.animate();
+                };
+                // TODO find a better place for this?
+                Weapon.damageInFrontOfDude = function (dude, attackDistance) {
+                    EntityManager_1.EntityManager.instance.getEntities()
+                        .map(function (e) { return e.getComponent(Dude_2.Dude); })
+                        .filter(function (d) { return !!d && d !== dude; })
+                        .filter(function (d) { return dude.animation.transform.mirrorX === (d.standingPosition.x < dude.standingPosition.x); }) // enemies the dude is facing
+                        .filter(function (d) { return d.standingPosition.distanceTo(dude.standingPosition) < attackDistance; })
+                        .forEach(function (d) { return d.damage(1, d.standingPosition.minus(dude.standingPosition), 30); });
                 };
                 Weapon.prototype.animate = function () {
                     var offsetFromEdge = new point_15.Point(6, 26).minus(this.weaponSprite.transform.dimensions); // for DRAWN/SHEATHED
@@ -2235,7 +2260,10 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                 Weapon.prototype.attack = function () {
                     var _this = this;
                     if (this.state === State.DRAWN) {
-                        setTimeout(function () { return _this.shouldCheckHits = true; }, 100);
+                        setTimeout(function () {
+                            var attackDistance = _this.weaponSprite.transform.dimensions.y + 4; // add a tiny buffer for small weapons like the dagger to still work
+                            Weapon.damageInFrontOfDude(_this.dude, attackDistance);
+                        }, 100);
                         this.playAttackAnimation();
                     }
                 };
@@ -2268,41 +2296,13 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                 };
                 return Weapon;
             }(component_5.Component));
-            exports_33("Weapon", Weapon);
-        }
-    };
-});
-System.register("game/EntityManager", [], function (exports_34, context_34) {
-    "use strict";
-    var EntityManager;
-    var __moduleName = context_34 && context_34.id;
-    return {
-        setters: [],
-        execute: function () {
-            EntityManager = /** @class */ (function () {
-                function EntityManager() {
-                    this.set = new Set();
-                    EntityManager.instance = this;
-                }
-                EntityManager.prototype.add = function (e) {
-                    this.set.add(e);
-                };
-                EntityManager.prototype.delete = function (e) {
-                    e.selfDestruct();
-                    this.set.delete(e);
-                };
-                EntityManager.prototype.getEntities = function () {
-                    return Array.from(this.set);
-                };
-                return EntityManager;
-            }());
-            exports_34("EntityManager", EntityManager);
+            exports_34("Weapon", Weapon);
         }
     };
 });
 System.register("game/items/Coin", ["engine/component", "engine/tiles/AnimatedTileComponent", "engine/point", "game/graphics/TileManager", "engine/collision/BoxCollider", "game/characters/Player", "game/EntityManager"], function (exports_35, context_35) {
     "use strict";
-    var component_6, AnimatedTileComponent_1, point_16, TileManager_2, BoxCollider_1, Player_1, EntityManager_1, Coin;
+    var component_6, AnimatedTileComponent_1, point_16, TileManager_2, BoxCollider_1, Player_1, EntityManager_2, Coin;
     var __moduleName = context_35 && context_35.id;
     return {
         setters: [
@@ -2324,8 +2324,8 @@ System.register("game/items/Coin", ["engine/component", "engine/tiles/AnimatedTi
             function (Player_1_1) {
                 Player_1 = Player_1_1;
             },
-            function (EntityManager_1_1) {
-                EntityManager_1 = EntityManager_1_1;
+            function (EntityManager_2_1) {
+                EntityManager_2 = EntityManager_2_1;
             }
         ],
         execute: function () {
@@ -2347,7 +2347,7 @@ System.register("game/items/Coin", ["engine/component", "engine/tiles/AnimatedTi
                             var player = c.entity.getComponent(Player_1.Player);
                             if (!!player) {
                                 console.log("picked up coin!");
-                                EntityManager_1.EntityManager.instance.delete(_this.entity);
+                                EntityManager_2.EntityManager.instance.delete(_this.entity);
                             }
                         }));
                     };
@@ -2362,7 +2362,7 @@ System.register("game/items/Coin", ["engine/component", "engine/tiles/AnimatedTi
 });
 System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "engine/point", "engine/component", "engine/collision/BoxCollider", "game/graphics/TileManager", "game/characters/Weapon", "engine/Entity", "game/EntityManager", "game/items/Coin"], function (exports_36, context_36) {
     "use strict";
-    var AnimatedTileComponent_2, point_17, component_7, BoxCollider_2, TileManager_3, Weapon_1, Entity_2, EntityManager_2, Coin_1, Dude;
+    var AnimatedTileComponent_2, point_17, component_7, BoxCollider_2, TileManager_3, Weapon_1, Entity_2, EntityManager_3, Coin_1, Dude;
     var __moduleName = context_36 && context_36.id;
     return {
         setters: [
@@ -2387,8 +2387,8 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
             function (Entity_2_1) {
                 Entity_2 = Entity_2_1;
             },
-            function (EntityManager_2_1) {
-                EntityManager_2 = EntityManager_2_1;
+            function (EntityManager_3_1) {
+                EntityManager_3 = EntityManager_3_1;
             },
             function (Coin_1_1) {
                 Coin_1 = Coin_1_1;
@@ -2484,7 +2484,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     this.dropWeapon();
                 };
                 Dude.prototype.spawnDrop = function () {
-                    EntityManager_2.EntityManager.instance.add(new Entity_2.Entity([new Coin_1.Coin(this.standingPosition.minus(new point_17.Point(0, 2)))]));
+                    EntityManager_3.EntityManager.instance.add(new Entity_2.Entity([new Coin_1.Coin(this.standingPosition.minus(new point_17.Point(0, 2)))]));
                 };
                 Dude.prototype.dropWeapon = function () {
                     // TODO
@@ -3097,7 +3097,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
 });
 System.register("game/characters/DudeFactory", ["engine/Entity", "game/characters/Player", "game/characters/Dude", "game/characters/NPC", "game/EntityManager"], function (exports_44, context_44) {
     "use strict";
-    var Entity_5, Player_3, Dude_4, NPC_1, EntityManager_3, DudeFactory;
+    var Entity_5, Player_3, Dude_4, NPC_1, EntityManager_4, DudeFactory;
     var __moduleName = context_44 && context_44.id;
     return {
         setters: [
@@ -3113,8 +3113,8 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "game/character
             function (NPC_1_1) {
                 NPC_1 = NPC_1_1;
             },
-            function (EntityManager_3_1) {
-                EntityManager_3 = EntityManager_3_1;
+            function (EntityManager_4_1) {
+                EntityManager_4 = EntityManager_4_1;
             }
         ],
         execute: function () {
@@ -3139,7 +3139,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "game/character
                         additionalComponents[_i - 3] = arguments[_i];
                     }
                     var e = new Entity_5.Entity([new Dude_4.Dude(archetype, pos, weapon)].concat(additionalComponents));
-                    EntityManager_3.EntityManager.instance.add(e);
+                    EntityManager_4.EntityManager.instance.add(e);
                     return e.getComponent(Dude_4.Dude);
                 };
                 return DudeFactory;
@@ -3150,7 +3150,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "game/character
 });
 System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/game", "engine/View", "engine/tiles/TileGrid", "game/MapGenerator", "engine/tiles/AnimatedTileComponent", "game/graphics/TileManager", "game/characters/DudeFactory", "game/EntityManager", "engine/tiles/TileTransform"], function (exports_45, context_45) {
     "use strict";
-    var Entity_6, point_23, game_1, View_2, TileGrid_1, MapGenerator_1, AnimatedTileComponent_3, TileManager_5, DudeFactory_1, EntityManager_4, TileTransform_6, ZOOM, QuestGame;
+    var Entity_6, point_23, game_1, View_2, TileGrid_1, MapGenerator_1, AnimatedTileComponent_3, TileManager_5, DudeFactory_1, EntityManager_5, TileTransform_6, ZOOM, QuestGame;
     var __moduleName = context_45 && context_45.id;
     return {
         setters: [
@@ -3181,8 +3181,8 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
             function (DudeFactory_1_1) {
                 DudeFactory_1 = DudeFactory_1_1;
             },
-            function (EntityManager_4_1) {
-                EntityManager_4 = EntityManager_4_1;
+            function (EntityManager_5_1) {
+                EntityManager_5 = EntityManager_5_1;
             },
             function (TileTransform_6_1) {
                 TileTransform_6 = TileTransform_6_1;
@@ -3195,7 +3195,7 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
                 function QuestGame() {
                     var _this = _super !== null && _super.apply(this, arguments) || this;
                     _this.tileManager = new TileManager_5.TileManager();
-                    _this.entityManager = new EntityManager_4.EntityManager();
+                    _this.entityManager = new EntityManager_5.EntityManager();
                     _this.tiles = new TileGrid_1.TileGrid(TileManager_5.TILE_SIZE);
                     _this.dudeFactory = new DudeFactory_1.DudeFactory();
                     _this.player = _this.dudeFactory.newPlayer(new point_23.Point(-2, 2).times(TileManager_5.TILE_SIZE));

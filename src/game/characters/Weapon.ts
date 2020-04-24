@@ -9,6 +9,7 @@ import { Dude } from "./Dude"
 import { Animator } from "../../engine/util/Animator"
 import { BoxCollider } from "../../engine/collision/BoxCollider"
 import { Player } from "./Player"
+import { EntityManager } from "../EntityManager"
 
 enum State {
     SHEATHED,
@@ -16,36 +17,27 @@ enum State {
     ATTACKING
 }
 
+/**
+ * A weapon being wielded by a dude
+ */
 export class Weapon extends Component {
 
-    private readonly id: string
     private weaponSprite: TileComponent
     private state: State = State.DRAWN
     // private slashSprite: TileComponent
     private dude: Dude
-    private shouldCheckHits: boolean
 
-    constructor(id: string) {
+    constructor(weaponId: string) {
         super()
-        this.id = id
-    }
-
-    start(startData: StartData) {
-        this.dude = this.entity.getComponent(Dude)
-
-        this.weaponSprite = this.entity.addComponent(
-            new TileComponent(
-                TileManager.instance.dungeonCharacters.getTileSource(this.id),
-                new TileTransform().relativeTo(this.dude.animation.transform)
+        this.start = (startData) => {
+            this.dude = this.entity.getComponent(Dude)
+            this.weaponSprite = this.entity.addComponent(
+                new TileComponent(
+                    TileManager.instance.dungeonCharacters.getTileSource(weaponId),
+                    new TileTransform().relativeTo(this.dude.animation.transform)
+                )
             )
-        )
-
-        // this.slashSprite = this.entity.addComponent(
-        //     new TileComponent(
-        //         TileManager.instance.oneBit.getTileSource("slash")
-        //     )
-        // )
-        // this.slashSprite.enabled = false
+        }
     }
 
     update(updateData: UpdateData) {
@@ -53,18 +45,17 @@ export class Weapon extends Component {
             this.animator.update(updateData.elapsedTimeMillis)
         }
 
-        if (this.state === State.ATTACKING && !!this.dude && this.shouldCheckHits) {
-            this.shouldCheckHits = false
-            const attackDistance = this.weaponSprite.transform.dimensions.y + 4  // add a tiny buffer for small weapons like the dagger to still work
-            updateData.view.entities
-                    .map(e => e.getComponent(Dude))
-                    .filter(d => !!d && d !== this.dude)
-                    .filter(d => this.weaponSprite.transform.mirrorX === (d.standingPosition.x < this.dude.standingPosition.x))
-                    .filter(d => d.standingPosition.distanceTo(this.dude.standingPosition) < attackDistance)
-                    .forEach(d => d.damage(1, d.standingPosition.minus(this.dude.standingPosition), 30))
-        }
-
         this.animate()
+    }
+
+    // TODO find a better place for this?
+    static damageInFrontOfDude(dude: Dude, attackDistance: number) {
+        EntityManager.instance.getEntities()
+                .map(e => e.getComponent(Dude))
+                .filter(d => !!d && d !== dude)
+                .filter(d => dude.animation.transform.mirrorX === (d.standingPosition.x < dude.standingPosition.x))  // enemies the dude is facing
+                .filter(d => d.standingPosition.distanceTo(dude.standingPosition) < attackDistance)
+                .forEach(d => d.damage(1, d.standingPosition.minus(dude.standingPosition), 30))
     }
 
     animate() {
@@ -125,7 +116,10 @@ export class Weapon extends Component {
 
     attack() {
         if (this.state === State.DRAWN) {
-            setTimeout(() => this.shouldCheckHits = true, 100)
+            setTimeout(() => {
+                const attackDistance = this.weaponSprite.transform.dimensions.y + 4  // add a tiny buffer for small weapons like the dagger to still work
+                Weapon.damageInFrontOfDude(this.dude, attackDistance)
+            }, 100)
             this.playAttackAnimation()
         }
     }
