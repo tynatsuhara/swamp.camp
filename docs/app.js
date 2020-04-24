@@ -150,9 +150,9 @@ System.register("engine/renderer/RenderContext", ["engine/point"], function (exp
                  */
                 RenderContext.prototype.drawImage = function (source, sourcePosition, sourceDimensions, destPosition, destDimensions, rotation, pixelPerfect, mirrorX, mirrorY) {
                     destDimensions = destDimensions !== null && destDimensions !== void 0 ? destDimensions : sourceDimensions;
-                    var mirroredOffset = new point_2.Point(mirrorX ? destDimensions.x : 0, mirrorY ? destDimensions.y : 0);
+                    // const mirroredOffset = new Point(mirrorX ? destDimensions.x : 0, mirrorY ? destDimensions.y : 0)
                     var offset = this.view.offset.times(this.view.zoom).apply(Math.floor);
-                    var scaledDestPosition = destPosition.plus(mirroredOffset).times(this.view.zoom).plus(offset);
+                    var scaledDestPosition = destPosition. /*plus(mirroredOffset).*/times(this.view.zoom).plus(offset);
                     if (pixelPerfect) {
                         scaledDestPosition = this.pixelize(scaledDestPosition);
                     }
@@ -166,12 +166,11 @@ System.register("engine/renderer/RenderContext", ["engine/point"], function (exp
                     this.context.save();
                     // Use Math.floor() to prevent tearing between images
                     this.context.translate(Math.floor(scaledDestPosition.x), Math.floor(scaledDestPosition.y));
-                    this.context.scale(mirrorX ? -1 : 1, mirrorY ? -1 : 1);
                     var rotationTranslate = destDimensions.div(2).times(this.view.zoom);
                     this.context.translate(rotationTranslate.x, rotationTranslate.y);
                     this.context.rotate(rotation * Math.PI / 180);
-                    this.context.translate(-rotationTranslate.x, -rotationTranslate.y);
-                    this.context.drawImage(source, sourcePosition.x, sourcePosition.y, sourceDimensions.x, sourceDimensions.y, 0, 0, scaledDestDimensions.x, scaledDestDimensions.y);
+                    this.context.scale(mirrorX ? -1 : 1, mirrorY ? -1 : 1);
+                    this.context.drawImage(source, sourcePosition.x, sourcePosition.y, sourceDimensions.x, sourceDimensions.y, -rotationTranslate.x, -rotationTranslate.y, scaledDestDimensions.x, scaledDestDimensions.y);
                     this.context.restore();
                 };
                 RenderContext.prototype.rotate = function (angle) {
@@ -844,6 +843,15 @@ System.register("engine/tiles/TileTransform", ["engine/point"], function (export
                     this.mirrorY = mirrorY;
                     this.depth = depth;
                 }
+                TileTransform.prototype.rotateAround = function (pt, angle) {
+                    var cx = pt.x;
+                    var cy = pt.y;
+                    var x = this.position.x + this.dimensions.x / 2;
+                    var y = this.position.y + this.dimensions.y / 2;
+                    var radians = (Math.PI / 180) * -angle, cos = Math.cos(radians), sin = Math.sin(radians), nx = (cos * (x - cx)) + (sin * (y - cy)) + cx, ny = (cos * (y - cy)) - (sin * (x - cx)) + cy;
+                    this.position = new point_6.Point(nx - this.dimensions.x / 2, ny - this.dimensions.y / 2);
+                    this.rotation += angle;
+                };
                 return TileTransform;
             }());
             exports_17("TileTransform", TileTransform);
@@ -1976,10 +1984,10 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                             .filter(function (d) { return !!d && d !== _this.dude; })
                             .filter(function (d) { return _this.weaponSprite.transform.mirrorX === (d.standingPosition.x < _this.dude.standingPosition.x); })
                             .filter(function (d) { return d.standingPosition.distanceTo(_this.dude.standingPosition) < attackDistance_1; })
-                            .forEach(function (d) { return d.damage(d.standingPosition.minus(_this.dude.standingPosition), 30); });
+                            .forEach(function (d) { return d.damage(1, d.standingPosition.minus(_this.dude.standingPosition), 30); });
                     }
                 };
-                Weapon.prototype.syncWithPlayerAnimation = function (character, characterAnim) {
+                Weapon.prototype.syncWithCharacterAnimation = function (character, characterAnim) {
                     this.dude = character;
                     if (!!this.weaponSprite) {
                         var offsetFromEdge = new point_14.Point(6, 26).minus(this.weaponSprite.transform.dimensions); // for DRAWN/SHEATHED
@@ -1994,7 +2002,7 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                             pos = offsetFromEdge.plus(new point_14.Point(3, -1));
                         }
                         else if (this.state === State.ATTACKING) {
-                            var posWithRotation = this.getAttackAnimationPosition(characterAnim.transform.dimensions.y);
+                            var posWithRotation = this.getAttackAnimationPosition(characterAnim.transform.mirrorX);
                             pos = posWithRotation[0].plus(offsetFromEdge);
                             rotation = posWithRotation[1];
                         }
@@ -2056,7 +2064,7 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                 /**
                  * Returns (position, rotation)
                  */
-                Weapon.prototype.getAttackAnimationPosition = function (charHeight) {
+                Weapon.prototype.getAttackAnimationPosition = function (facingLeft) {
                     var swingStartFrame = 3;
                     var resettingFrame = 7;
                     if (this.currentAnimationFrame < swingStartFrame) {
@@ -2065,7 +2073,7 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                     else if (this.currentAnimationFrame < resettingFrame) {
                         return [
                             new point_14.Point((6 - this.currentAnimationFrame) + this.weaponSprite.transform.dimensions.y - swingStartFrame * 3, Math.floor(this.weaponSprite.transform.dimensions.y / 2 - 1)),
-                            90
+                            90 * (facingLeft ? -1 : 1)
                         ];
                     }
                     else {
@@ -2108,6 +2116,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                 __extends(Dude, _super);
                 function Dude(archetype, position, weaponId) {
                     var _this = _super.call(this) || this;
+                    _this.health = 5;
                     _this.speed = 0.085;
                     _this.relativeColliderPos = new point_15.Point(3, 15);
                     _this.beingKnockedBack = false;
@@ -2157,9 +2166,45 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     this.relativeColliderPos = new point_15.Point(this.characterAnim.transform.dimensions.x / 2 - colliderSize.x / 2, this.characterAnim.transform.dimensions.y - colliderSize.y);
                     this.collider = this.entity.addComponent(new BoxCollider_1.BoxCollider(this.position.plus(this.relativeColliderPos), colliderSize));
                 };
-                Dude.prototype.damage = function (direction, knockback) {
+                Dude.prototype.update = function (updateData) {
+                    if (this.health > 0) {
+                        this.characterAnim.transform.position = this.position;
+                        this.characterAnim.transform.depth = this.position.y + this.characterAnim.transform.dimensions.y;
+                    }
+                    else {
+                        this.characterAnim.transform.position = this.position.plus(this.deathOffset);
+                        this.characterAnim.transform.depth = this.position.y + this.characterAnim.transform.dimensions.x;
+                    }
+                    this.characterAnim.transform.depth = this.collider.position.y + this.collider.dimensions.y;
+                    if (!!this.weapon) {
+                        this.weapon.syncWithCharacterAnimation(this, this.characterAnim);
+                    }
+                };
+                Dude.prototype.damage = function (damage, direction, knockback) {
+                    if (this.health - damage <= 0) {
+                        this.die(direction);
+                    }
+                    else {
+                        this.health -= damage;
+                    }
+                    this.knockback(direction, knockback);
+                };
+                Dude.prototype.die = function (direction) {
+                    if (direction === void 0) { direction = new point_15.Point(-1, 0); }
+                    if (this.health === 0) {
+                        return;
+                    }
+                    this.dropWeapon();
+                    this.health = 0;
+                    var prePos = this.characterAnim.transform.position;
+                    this.characterAnim.transform.rotateAround(this.standingPosition.minus(new point_15.Point(0, 5)), 90 * Math.sign(direction.x));
+                    this.deathOffset = this.characterAnim.transform.position.minus(prePos);
+                };
+                Dude.prototype.dropWeapon = function () {
+                    // TODO
+                };
+                Dude.prototype.knockback = function (direction, knockback) {
                     var _this = this;
-                    console.log("ow!"); // TODO add health
                     this.beingKnockedBack = true;
                     var goal = this.position.plus(direction.normalized().times(knockback));
                     var intervalsRemaining = 50;
@@ -2172,8 +2217,17 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                         }
                     }, 10);
                 };
+                /**
+                 * Should be called on EVERY update step for
+                 * @param updateData
+                 * @param direction the direction they are moving in
+                 * @param facingOverride if < 0, will face left, if > 0, will face right. if == 0, will face the direction they're moving
+                 */
                 Dude.prototype.move = function (updateData, direction, facingOverride) {
                     if (facingOverride === void 0) { facingOverride = 0; }
+                    if (this.health <= 0) {
+                        return;
+                    }
                     if (this.beingKnockedBack) {
                         direction = direction.times(0);
                     }
@@ -2198,11 +2252,6 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     }
                     else if (wasMoving) {
                         this.characterAnim.play(0);
-                    }
-                    this.characterAnim.transform.position = this.position;
-                    this.characterAnim.transform.depth = this.position.y + this.characterAnim.transform.dimensions.y;
-                    if (!!this.weapon) {
-                        this.weapon.syncWithPlayerAnimation(this, this.characterAnim);
                     }
                 };
                 Dude.prototype.placeAt = function (point) {
@@ -2761,12 +2810,15 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
                         dx++;
                     }
                     this.dude.move(updateData, new point_20.Point(dx, dy), this.dude.weapon.isDrawn() ? updateData.input.mousePos.x - this.dude.standingPosition.x : 0);
-                    console.log(updateData.input.mousePos.x - this.dude.standingPosition.x);
                     if (updateData.input.isKeyDown(70 /* F */)) {
                         this.dude.weapon.toggleSheathed();
                     }
                     if (updateData.input.isMouseDown) {
                         this.dude.weapon.attack();
+                    }
+                    // FOR TESTING
+                    if (updateData.input.isKeyDown(80 /* P */)) {
+                        this.dude.die();
                     }
                     // update crosshair position
                     // const relativeLerpedPos = originalCrosshairPosRelative.lerp(0.16, this.lerpedLastMoveDir.normalized().times(TILE_SIZE))

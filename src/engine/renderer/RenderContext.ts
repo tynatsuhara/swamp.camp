@@ -46,9 +46,9 @@ export class RenderContext {
         mirrorY: boolean
     ): void {
         destDimensions = destDimensions ?? sourceDimensions
-        const mirroredOffset = new Point(mirrorX ? destDimensions.x : 0, mirrorY ? destDimensions.y : 0)
+        // const mirroredOffset = new Point(mirrorX ? destDimensions.x : 0, mirrorY ? destDimensions.y : 0)
         const offset = this.view.offset.times(this.view.zoom).apply(Math.floor)
-        let scaledDestPosition = destPosition.plus(mirroredOffset).times(this.view.zoom).plus(offset)
+        let scaledDestPosition = destPosition./*plus(mirroredOffset).*/times(this.view.zoom).plus(offset)
         if (pixelPerfect) {
             scaledDestPosition = this.pixelize(scaledDestPosition)
         }
@@ -69,18 +69,16 @@ export class RenderContext {
             Math.floor(scaledDestPosition.y)
         )
 
-        this.context.scale(mirrorX ? -1 : 1, mirrorY ? -1 : 1)
-
         const rotationTranslate = destDimensions.div(2).times(this.view.zoom)
         this.context.translate(rotationTranslate.x, rotationTranslate.y)
         this.context.rotate(rotation * Math.PI/180)
-        this.context.translate(-rotationTranslate.x, -rotationTranslate.y)
+        this.context.scale(mirrorX ? -1 : 1, mirrorY ? -1 : 1)
 
         this.context.drawImage(
             source, 
             sourcePosition.x, sourcePosition.y, 
             sourceDimensions.x, sourceDimensions.y, 
-            0, 0,
+            -rotationTranslate.x, -rotationTranslate.y,
             scaledDestDimensions.x, scaledDestDimensions.y
         )
 

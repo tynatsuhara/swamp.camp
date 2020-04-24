@@ -50,6 +50,11 @@ export class Player extends Component {
             this.dude.weapon.attack()
         }
 
+        // FOR TESTING
+        if (updateData.input.isKeyDown(InputKey.P)) {
+            this.dude.die()
+        }
+
         // update crosshair position
         // const relativeLerpedPos = originalCrosshairPosRelative.lerp(0.16, this.lerpedLastMoveDir.normalized().times(TILE_SIZE))
         // this.crosshairs.transform.position = this.position.plus(relativeLerpedPos)

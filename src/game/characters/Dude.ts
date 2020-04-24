@@ -9,6 +9,8 @@ import { TileManager } from "../graphics/TileManager"
 import { Weapon } from "./Weapon"
 
 export class Dude extends Component {
+
+    private health = 5
     speed = 0.085
     private characterAnim: AnimatedTileComponent
     private archetype: string
@@ -64,11 +66,50 @@ export class Dude extends Component {
         this.collider = this.entity.addComponent(new BoxCollider(this.position.plus(this.relativeColliderPos), colliderSize))
     }
 
+    update(updateData: UpdateData) {
+        if (this.health > 0) {
+            this.characterAnim.transform.position = this.position
+            this.characterAnim.transform.depth = this.position.y + this.characterAnim.transform.dimensions.y
+        } else {
+            this.characterAnim.transform.position = this.position.plus(this.deathOffset)
+            this.characterAnim.transform.depth = this.position.y + this.characterAnim.transform.dimensions.x
+        }
+
+        this.characterAnim.transform.depth = this.collider.position.y + this.collider.dimensions.y
+
+        if (!!this.weapon) {
+            this.weapon.syncWithCharacterAnimation(this, this.characterAnim)
+        }
+    }
+
     private beingKnockedBack = false
 
-    damage(direction: Point, knockback: number) {
-        console.log("ow!")  // TODO add health
+    damage(damage: number, direction: Point, knockback: number) {
+        if (this.health-damage <= 0) {
+            this.die(direction)
+        } else {
+            this.health -= damage
+        }
+        this.knockback(direction, knockback)
+    }
 
+    private deathOffset: Point
+    die(direction: Point = new Point(-1, 0)) {
+        if (this.health === 0) {
+            return
+        }
+        this.dropWeapon()
+        this.health = 0
+        const prePos = this.characterAnim.transform.position
+        this.characterAnim.transform.rotateAround(this.standingPosition.minus(new Point(0, 5)), 90 * Math.sign(direction.x))
+        this.deathOffset = this.characterAnim.transform.position.minus(prePos)
+    }
+
+    dropWeapon() {
+        // TODO
+    }
+
+    private knockback(direction: Point, knockback: number) {
         this.beingKnockedBack = true
         const goal = this.position.plus(direction.normalized().times(knockback))
         let intervalsRemaining = 50
@@ -89,6 +130,10 @@ export class Dude extends Component {
      * @param facingOverride if < 0, will face left, if > 0, will face right. if == 0, will face the direction they're moving
      */
     move(updateData: UpdateData, direction: Point, facingOverride: number = 0) {
+        if (this.health <= 0) {
+            return
+        }
+
         if (this.beingKnockedBack) {
             direction = direction.times(0)
         }
@@ -115,13 +160,6 @@ export class Dude extends Component {
             this.placeAt(newPos)
         } else if (wasMoving) {
             this.characterAnim.play(0)
-        }
-
-        this.characterAnim.transform.position = this.position
-        this.characterAnim.transform.depth = this.position.y + this.characterAnim.transform.dimensions.y
-
-        if (!!this.weapon) {
-            this.weapon.syncWithPlayerAnimation(this, this.characterAnim)
         }
     }
 

@@ -57,11 +57,11 @@ export class Weapon extends Component {
                     .filter(d => !!d && d !== this.dude)
                     .filter(d => this.weaponSprite.transform.mirrorX === (d.standingPosition.x < this.dude.standingPosition.x))
                     .filter(d => d.standingPosition.distanceTo(this.dude.standingPosition) < attackDistance)
-                    .forEach(d => d.damage(d.standingPosition.minus(this.dude.standingPosition), 30))
+                    .forEach(d => d.damage(1, d.standingPosition.minus(this.dude.standingPosition), 30))
         }
     }
 
-    syncWithPlayerAnimation(character: Dude, characterAnim: AnimatedTileComponent) {
+    syncWithCharacterAnimation(character: Dude, characterAnim: AnimatedTileComponent) {
         this.dude = character
 
         if (!!this.weaponSprite) {
@@ -77,7 +77,7 @@ export class Weapon extends Component {
                 // center on back
                 pos = offsetFromEdge.plus(new Point(3, -1))
             } else if (this.state === State.ATTACKING) {
-                const posWithRotation = this.getAttackAnimationPosition(characterAnim.transform.dimensions.y)
+                const posWithRotation = this.getAttackAnimationPosition(characterAnim.transform.mirrorX)
                 pos = posWithRotation[0].plus(offsetFromEdge)
                 rotation = posWithRotation[1]
             }
@@ -153,7 +153,7 @@ export class Weapon extends Component {
     /**
      * Returns (position, rotation)
      */
-    private getAttackAnimationPosition(charHeight: number): [Point, number] {
+    private getAttackAnimationPosition(facingLeft: boolean): [Point, number] {
         const swingStartFrame = 3
         const resettingFrame = 7
 
@@ -165,7 +165,7 @@ export class Weapon extends Component {
                     (6-this.currentAnimationFrame) + this.weaponSprite.transform.dimensions.y - swingStartFrame*3, 
                     Math.floor(this.weaponSprite.transform.dimensions.y/2 - 1)
                 ),
-                90
+                90 * (facingLeft ? -1 : 1)
             ]
         } else {
             return [new Point((1-this.currentAnimationFrame+resettingFrame) * 3, 2), 0]
