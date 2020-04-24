@@ -85,10 +85,5 @@ export class HUD {
                 new TextRender(`x${coins}`, new Point(9, 9).plus(this.offset).plus(this.coinsOffset), "24px 'Press Start 2P'", "#facb3e")
             )
         )
-        // if (!coins) {
-        //     this.coinCount.clear()
-        // } else {
-        //     this.coinCount.say(`${coins}`)
-        // }
     }
 }

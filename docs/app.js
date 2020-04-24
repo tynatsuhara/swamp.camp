@@ -2867,7 +2867,7 @@ System.register("game/items/Inventory", [], function (exports_42, context_42) {
             // TODO flesh this out more when we have more items
             Inventory = /** @class */ (function () {
                 function Inventory() {
-                    this.coins = 108;
+                    this.coins = 0;
                 }
                 return Inventory;
             }());
@@ -3386,11 +3386,6 @@ System.register("game/ui/HUD", ["engine/tiles/AnimatedTileComponent", "game/grap
                         this.entity.removeComponent(this.coinCount);
                     }
                     this.coinCount = this.entity.addComponent(new BasicRenderComponent_2.BasicRenderComponent(new TextRender_2.TextRender("x" + coins, new point_24.Point(9, 9).plus(this.offset).plus(this.coinsOffset), "24px 'Press Start 2P'", "#facb3e")));
-                    // if (!coins) {
-                    //     this.coinCount.clear()
-                    // } else {
-                    //     this.coinCount.say(`${coins}`)
-                    // }
                 };
                 return HUD;
             }());

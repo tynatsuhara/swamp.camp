@@ -1,4 +1,4 @@
 // TODO flesh this out more when we have more items
 export class Inventory {
-    coins: number = 108
+    coins: number = 0
 }
