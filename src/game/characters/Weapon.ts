@@ -106,10 +106,6 @@ export class Weapon extends Component {
             this.weaponSprite.transform.depth = characterAnim.transform.depth + 1 - (this.state == State.SHEATHED ? 2 : 0)
             this.weaponSprite.transform.mirrorX = charMirror
 
-
-
-
-
             // TODO maybe keep the slash stuff later
             // this.slashSprite.enabled = this.animator?.getCurrentFrame() === 3
             // this.slashSprite.transform.depth = characterAnim.transform.depth + 2
@@ -118,6 +114,10 @@ export class Weapon extends Component {
             //     new Point((charMirror ? -1 : 1) * (this.weaponSprite.transform.dimensions.y - 8), 8)
             // )
         }
+    }
+
+    isDrawn() {
+        return this.state !== State.SHEATHED
     }
 
     toggleSheathed() {
@@ -130,7 +130,7 @@ export class Weapon extends Component {
 
     attack() {
         if (this.state === State.DRAWN) {
-            setTimeout(() => this.shouldCheckHits = true, 150)
+            setTimeout(() => this.shouldCheckHits = true, 100)
             this.playAttackAnimation()
         }
     }

@@ -67,7 +67,8 @@ export class Dude extends Component {
     private beingKnockedBack = false
 
     damage(direction: Point, knockback: number) {
-        console.log("ow!")
+        console.log("ow!")  // TODO add health
+
         this.beingKnockedBack = true
         const goal = this.position.plus(direction.normalized().times(knockback))
         let intervalsRemaining = 50
@@ -79,11 +80,9 @@ export class Dude extends Component {
                 this.beingKnockedBack = false
             }
         }, 10)
-
-        // TODO health
     }
 
-    move(updateData: UpdateData, direction: Point, facingLeft: () => boolean = () => direction.x < 0) {
+    move(updateData: UpdateData, direction: Point, facingOverride: number = 0) {
         if (this.beingKnockedBack) {
             direction = direction.times(0)
         }
@@ -91,14 +90,18 @@ export class Dude extends Component {
         const dx = direction.x
         const dy = direction.y
 
-        this.characterAnim.transform.mirrorX = facingLeft()
+        if ((dx < 0 && facingOverride === 0) || facingOverride < 0) {
+            this.characterAnim.transform.mirrorX = true
+        } else if ((dx > 0 && facingOverride === 0) || facingOverride > 0) {
+            this.characterAnim.transform.mirrorX = false
+        }
         
         const wasMoving = this.isMoving
         this._isMoving = dx != 0 || dy != 0
 
         if (this.isMoving) {
             if (!wasMoving) {
-                this.characterAnim.play(1)
+                this.characterAnim.play(1)  // TODO make the run animation backwards if they run backwards :)
             }
             const translation = direction.normalized()
             // this.lerpedLastMoveDir = this.lerpedLastMoveDir.lerp(0.25, translation)

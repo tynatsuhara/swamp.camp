@@ -2027,6 +2027,9 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                         // )
                     }
                 };
+                Weapon.prototype.isDrawn = function () {
+                    return this.state !== State.SHEATHED;
+                };
                 Weapon.prototype.toggleSheathed = function () {
                     if (this.state === State.SHEATHED) {
                         this.state = State.DRAWN;
@@ -2038,7 +2041,7 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                 Weapon.prototype.attack = function () {
                     var _this = this;
                     if (this.state === State.DRAWN) {
-                        setTimeout(function () { return _this.shouldCheckHits = true; }, 150);
+                        setTimeout(function () { return _this.shouldCheckHits = true; }, 100);
                         this.playAttackAnimation();
                     }
                 };
@@ -2156,7 +2159,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                 };
                 Dude.prototype.damage = function (direction, knockback) {
                     var _this = this;
-                    console.log("ow!");
+                    console.log("ow!"); // TODO add health
                     this.beingKnockedBack = true;
                     var goal = this.position.plus(direction.normalized().times(knockback));
                     var intervalsRemaining = 50;
@@ -2168,21 +2171,25 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                             _this.beingKnockedBack = false;
                         }
                     }, 10);
-                    // TODO health
                 };
-                Dude.prototype.move = function (updateData, direction, facingLeft) {
-                    if (facingLeft === void 0) { facingLeft = function () { return direction.x < 0; }; }
+                Dude.prototype.move = function (updateData, direction, facingOverride) {
+                    if (facingOverride === void 0) { facingOverride = 0; }
                     if (this.beingKnockedBack) {
                         direction = direction.times(0);
                     }
                     var dx = direction.x;
                     var dy = direction.y;
-                    this.characterAnim.transform.mirrorX = facingLeft();
+                    if ((dx < 0 && facingOverride === 0) || facingOverride < 0) {
+                        this.characterAnim.transform.mirrorX = true;
+                    }
+                    else if ((dx > 0 && facingOverride === 0) || facingOverride > 0) {
+                        this.characterAnim.transform.mirrorX = false;
+                    }
                     var wasMoving = this.isMoving;
                     this._isMoving = dx != 0 || dy != 0;
                     if (this.isMoving) {
                         if (!wasMoving) {
-                            this.characterAnim.play(1);
+                            this.characterAnim.play(1); // TODO make the run animation backwards if they run backwards :)
                         }
                         var translation = direction.normalized();
                         // this.lerpedLastMoveDir = this.lerpedLastMoveDir.lerp(0.25, translation)
@@ -2739,7 +2746,6 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
                 };
                 Player.prototype.update = function (updateData) {
                     // const originalCrosshairPosRelative = this.crosshairs.transform.position.minus(this.position)
-                    var _this = this;
                     var dx = 0;
                     var dy = 0;
                     if (updateData.input.isKeyHeld(87 /* W */)) {
@@ -2754,7 +2760,8 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
                     if (updateData.input.isKeyHeld(68 /* D */)) {
                         dx++;
                     }
-                    this.dude.move(updateData, new point_20.Point(dx, dy), function () { return updateData.input.mousePos.x < _this.dude.standingPosition.x; });
+                    this.dude.move(updateData, new point_20.Point(dx, dy), this.dude.weapon.isDrawn() ? updateData.input.mousePos.x - this.dude.standingPosition.x : 0);
+                    console.log(updateData.input.mousePos.x - this.dude.standingPosition.x);
                     if (updateData.input.isKeyDown(70 /* F */)) {
                         this.dude.weapon.toggleSheathed();
                     }
@@ -2959,6 +2966,7 @@ System.register("game/quest_game", ["engine/Entity", "engine/point", "engine/gam
                                 else {
                                     tile = this.tileManager.tilemap.getTileAt(new point_22.Point(0, 7));
                                 }
+                                // tile = this.tileManager.outdoorTiles.getTileAt(new Point(5, 0))
                                 this.tiles.set(pt, new Entity_5.Entity([new TileComponent_4.TileComponent(tile, pt.times(TileManager_4.TILE_SIZE))]));
                             }
                         }
