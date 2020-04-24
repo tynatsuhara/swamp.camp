@@ -1,11 +1,8 @@
-import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { UpdateData, StartData } from "../../engine/engine"
 import { InputKey } from "../../engine/input"
 import { Point } from "../../engine/point"
 import { Component } from "../../engine/component"
-import { BoxCollider } from "../../engine/collision/BoxCollider"
-import { TileManager } from "../graphics/TileManager"
 import { Dude } from "./Dude"
 
 export class Player extends Component {
@@ -55,7 +52,7 @@ export class Player extends Component {
 
         // FOR TESTING
         if (updateData.input.isKeyDown(InputKey.P)) {
-            this.dude.die()
+            this.dude.damage(.25, new Point(Math.random()-.5, Math.random()-.5), 30)
         }
 
         // update crosshair position

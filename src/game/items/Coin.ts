@@ -8,6 +8,7 @@ import { Collider } from "../../engine/collision/Collider"
 import { BoxCollider } from "../../engine/collision/BoxCollider"
 import { Player } from "../characters/Player"
 import { EntityManager } from "../EntityManager"
+import { Dude } from "../characters/Dude"
 
 // TODO: Some kind of "item" base class for dropped items
 export class Coin extends Component {
@@ -34,7 +35,7 @@ export class Coin extends Component {
                 new BoxCollider(pos, this.animation.transform.dimensions, true).onColliderEnter(c => {
                     const player = c.entity.getComponent(Player)
                     if (!!player) {
-                        console.log("picked up coin!")
+                        player.entity.getComponent(Dude).inventory.coins++
                         EntityManager.instance.delete(this.entity)
                     }
                 })

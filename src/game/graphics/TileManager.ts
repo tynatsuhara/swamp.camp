@@ -6,6 +6,7 @@ import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
 import { assets } from "../../engine/Assets"
 import { SplitFileTileLoader } from "./SplitFileTileLoader"
 import { Point } from "../../engine/point"
+import { OneBitTileset } from "./OneBitTileset"
 
 // standard tile size
 export const TILE_SIZE = 16
@@ -22,7 +23,7 @@ export class TileManager {
     readonly dungeonTiles = new SingleFileTileLoader("images/env_dungeon.png")
     readonly indoorTiles = new SingleFileTileLoader("images/env_indoor.png")
     readonly outdoorTiles = new SingleFileTileLoader("images/env_outdoor_recolor.png")
-    readonly oneBit = new SingleFileTileLoader("images/monochrome_transparent_1_bit.png", new Map([["slash", new Point(25, 11)]]))
+    readonly oneBit = new OneBitTileset()
     readonly otherCharacters = new SplitFileTileLoader("images/individual_characters")
 
     constructor() {

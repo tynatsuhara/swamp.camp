@@ -10,10 +10,14 @@ import { Weapon } from "./Weapon"
 import { Entity } from "../../engine/Entity"
 import { EntityManager } from "../EntityManager"
 import { Coin } from "../items/Coin"
+import { Inventory } from "../items/Inventory"
 
 export class Dude extends Component {
-
-    private health = 3
+    
+    readonly inventory = new Inventory()
+    readonly maxHealth = 4
+    private _health = this.maxHealth
+    get health() { return this._health }
     speed = 0.085
     private _animation: AnimatedTileComponent
     get animation() { return this._animation }
@@ -72,12 +76,11 @@ export class Dude extends Component {
         this.animation.transform.depth = this.collider.position.y + this.collider.dimensions.y
     }
 
-    private beingKnockedBack = false
-    get isAlive() { return this.health > 0 }
+    get isAlive() { return this._health > 0 }
 
     damage(damage: number, direction: Point, knockback: number) {
         if (this.isAlive) {
-            this.health -= damage
+            this._health -= damage
             if (!this.isAlive) {
                 this.die(direction)
                 knockback *= (1 + Math.random())
@@ -89,7 +92,7 @@ export class Dude extends Component {
 
     private deathOffset: Point
     die(direction: Point = new Point(-1, 0)) {
-        this.health = 0
+        this._health = 0
         const prePos = this.animation.transform.position
         this.animation.transform.rotate(
             90 * (direction.x >= 0 ? 1 : -1), 
@@ -110,14 +113,17 @@ export class Dude extends Component {
         // TODO
     }
 
+    private beingKnockedBack = false
+
     private knockback(direction: Point, knockback: number) {
         this.beingKnockedBack = true
         const goal = this.position.plus(direction.normalized().times(knockback))
+        const distToStop = 2
         let intervalsRemaining = 50
         const interval = setInterval(() => {
             this.moveTo(this.position.lerp(.07, goal))
             intervalsRemaining--
-            if (intervalsRemaining === 0 || goal.minus(this.position).magnitude() < 2) {
+            if (intervalsRemaining === 0 || goal.minus(this.position).magnitude() < distToStop) {
                 clearInterval(interval)
                 this.beingKnockedBack = false
             }
@@ -131,7 +137,7 @@ export class Dude extends Component {
      * @param facingOverride if < 0, will face left, if > 0, will face right. if == 0, will face the direction they're moving
      */
     move(updateData: UpdateData, direction: Point, facingOverride: number = 0) {
-        if (this.health <= 0) {
+        if (this._health <= 0) {
             return
         }
 
