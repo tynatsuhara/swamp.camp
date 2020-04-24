@@ -88,7 +88,6 @@ export class Weapon extends Component {
         this.weaponSprite.transform.rotation = rotation
         this.weaponSprite.transform.mirrorY = this.state == State.SHEATHED
 
-        // TODO this is 
         // magic based on the animations
         const f = this.dude.animation.currentFrame()
         if (!this.dude.isMoving) {
@@ -97,22 +96,11 @@ export class Weapon extends Component {
             pos = pos.plus(new Point(0, f == 0 ? -1 : -((3 - this.dude.animation.currentFrame()))))
         }
 
-        // mirror weapon pos
-        // const charMirror = this.dude.animation.transform.mirrorX
-        // if (charMirror) {
-        //     pos = new Point(this.dude.animation.transform.dimensions.x - pos.x - this.weaponSprite.transform.dimensions.x, pos.y)
-        // }
-
-        // set position relative to the character
-        // this.weaponSprite.transform.position = this.dude.animation.transform.position.plus(pos)
         this.weaponSprite.transform.position = pos
 
         // show sword behind character if sheathed
         this.weaponSprite.transform.depth = this.state == State.SHEATHED ? -1 : 1
         // this.weaponSprite.transform.mirrorX = charMirror
-
-
-
 
         // TODO maybe keep the slash stuff later
         // this.slashSprite.enabled = this.animator?.getCurrentFrame() === 3

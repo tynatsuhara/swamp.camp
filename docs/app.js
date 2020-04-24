@@ -157,10 +157,11 @@ System.register("engine/renderer/RenderContext", ["engine/point"], function (exp
                         scaledDestPosition = this.pixelize(scaledDestPosition);
                     }
                     var scaledDestDimensions = destDimensions.times(this.view.zoom);
-                    if (scaledDestPosition.x > this.canvas.width
-                        || scaledDestPosition.x + scaledDestDimensions.x < 0
-                        || scaledDestPosition.y > this.canvas.height
-                        || scaledDestPosition.y + scaledDestDimensions.y < 0) {
+                    var biggestDimension = Math.max(scaledDestDimensions.x, scaledDestDimensions.y); // to make sure things get rendered if rotated at the edge of the screen
+                    if (scaledDestPosition.x > this.canvas.width + biggestDimension
+                        || scaledDestPosition.x + scaledDestDimensions.x < -biggestDimension
+                        || scaledDestPosition.y > this.canvas.height + biggestDimension
+                        || scaledDestPosition.y + scaledDestDimensions.y < -biggestDimension) {
                         return;
                     }
                     this.context.save();
@@ -2046,6 +2047,9 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
                     this.dude = this.entity.getComponent(Dude_1.Dude);
                 };
                 Player.prototype.update = function (updateData) {
+                    if (!this.dude.isAlive) {
+                        return;
+                    }
                     // const originalCrosshairPosRelative = this.crosshairs.transform.position.minus(this.position)
                     var dx = 0;
                     var dy = 0;
@@ -2178,7 +2182,6 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                     }
                     this.weaponSprite.transform.rotation = rotation;
                     this.weaponSprite.transform.mirrorY = this.state == State.SHEATHED;
-                    // TODO this is 
                     // magic based on the animations
                     var f = this.dude.animation.currentFrame();
                     if (!this.dude.isMoving) {
@@ -2187,13 +2190,6 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                     else {
                         pos = pos.plus(new point_15.Point(0, f == 0 ? -1 : -((3 - this.dude.animation.currentFrame()))));
                     }
-                    // mirror weapon pos
-                    // const charMirror = this.dude.animation.transform.mirrorX
-                    // if (charMirror) {
-                    //     pos = new Point(this.dude.animation.transform.dimensions.x - pos.x - this.weaponSprite.transform.dimensions.x, pos.y)
-                    // }
-                    // set position relative to the character
-                    // this.weaponSprite.transform.position = this.dude.animation.transform.position.plus(pos)
                     this.weaponSprite.transform.position = pos;
                     // show sword behind character if sheathed
                     this.weaponSprite.transform.depth = this.state == State.SHEATHED ? -1 : 1;
@@ -2343,41 +2339,31 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     this.collider = this.entity.addComponent(new BoxCollider_1.BoxCollider(this.position.plus(this.relativeColliderPos), colliderSize));
                 };
                 Dude.prototype.update = function (updateData) {
-                    if (this.health > 0) {
+                    if (this.isAlive) {
                         this.animation.transform.position = this.position;
-                        this.animation.transform.depth = this.position.y + this.animation.transform.dimensions.y;
                     }
                     else {
                         this.animation.transform.position = this.position.plus(this.deathOffset);
-                        this.animation.transform.depth = this.position.y + this.animation.transform.dimensions.x;
                     }
                     this.animation.transform.depth = this.collider.position.y + this.collider.dimensions.y;
-                    // if (!!this.weapon) {
-                    //     this.weapon.syncWithCharacterAnimation(this, this.characterAnim)
-                    // }
                 };
                 Object.defineProperty(Dude.prototype, "isAlive", {
-                    get: function () { return this.health !== 0; },
+                    get: function () { return this.health > 0; },
                     enumerable: true,
                     configurable: true
                 });
                 Dude.prototype.damage = function (damage, direction, knockback) {
                     if (this.isAlive) {
-                        if (this.health - damage <= 0) {
+                        this.health -= damage;
+                        if (!this.isAlive) {
                             this.die(direction);
                             knockback *= (1 + Math.random());
-                        }
-                        else {
-                            this.health -= damage;
                         }
                     }
                     this.knockback(direction, knockback);
                 };
                 Dude.prototype.die = function (direction) {
                     if (direction === void 0) { direction = new point_16.Point(-1, 0); }
-                    if (this.health === 0) {
-                        return;
-                    }
                     this.health = 0;
                     this.dropWeapon();
                     var prePos = this.animation.transform.position;
@@ -2395,7 +2381,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     var goal = this.position.plus(direction.normalized().times(knockback));
                     var intervalsRemaining = 50;
                     var interval = setInterval(function () {
-                        _this.placeAt(_this.position.lerp(.07, goal));
+                        _this.moveTo(_this.position.lerp(.07, goal));
                         intervalsRemaining--;
                         if (intervalsRemaining === 0 || goal.minus(_this.position).magnitude() < 2) {
                             clearInterval(interval);
@@ -2434,13 +2420,13 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                         var translation = direction.normalized();
                         // this.lerpedLastMoveDir = this.lerpedLastMoveDir.lerp(0.25, translation)
                         var newPos = this._position.plus(translation.times(updateData.elapsedTimeMillis * this.speed));
-                        this.placeAt(newPos);
+                        this.moveTo(newPos);
                     }
                     else if (wasMoving) {
                         this.animation.play(0);
                     }
                 };
-                Dude.prototype.placeAt = function (point) {
+                Dude.prototype.moveTo = function (point) {
                     this._position = this.collider.moveTo(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos);
                 };
                 return Dude;

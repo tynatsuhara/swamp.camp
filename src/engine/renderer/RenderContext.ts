@@ -54,10 +54,11 @@ export class RenderContext {
         }
         const scaledDestDimensions = destDimensions.times(this.view.zoom)
 
-        if (scaledDestPosition.x > this.canvas.width 
-            || scaledDestPosition.x + scaledDestDimensions.x < 0
-            || scaledDestPosition.y > this.canvas.height
-            || scaledDestPosition.y + scaledDestDimensions.y < 0) {
+        const biggestDimension = Math.max(scaledDestDimensions.x, scaledDestDimensions.y) // to make sure things get rendered if rotated at the edge of the screen
+        if (scaledDestPosition.x > this.canvas.width + biggestDimension
+            || scaledDestPosition.x + scaledDestDimensions.x < -biggestDimension
+            || scaledDestPosition.y > this.canvas.height + biggestDimension
+            || scaledDestPosition.y + scaledDestDimensions.y < -biggestDimension) {
             return
         }
 

@@ -26,6 +26,9 @@ export class Player extends Component {
     }
 
     update(updateData: UpdateData) {
+        if (!this.dude.isAlive) {
+            return
+        }
         // const originalCrosshairPosRelative = this.crosshairs.transform.position.minus(this.position)
 
         let dx = 0

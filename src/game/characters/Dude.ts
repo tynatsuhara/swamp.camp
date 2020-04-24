@@ -69,31 +69,24 @@ export class Dude extends Component {
     }
 
     update(updateData: UpdateData) {
-        if (this.health > 0) {
+        if (this.isAlive) {
             this.animation.transform.position = this.position
-            this.animation.transform.depth = this.position.y + this.animation.transform.dimensions.y
         } else {
             this.animation.transform.position = this.position.plus(this.deathOffset)
-            this.animation.transform.depth = this.position.y + this.animation.transform.dimensions.x
         }
 
         this.animation.transform.depth = this.collider.position.y + this.collider.dimensions.y
-
-        // if (!!this.weapon) {
-        //     this.weapon.syncWithCharacterAnimation(this, this.characterAnim)
-        // }
     }
 
     private beingKnockedBack = false
-    get isAlive() { return this.health !== 0 }
+    get isAlive() { return this.health > 0 }
 
     damage(damage: number, direction: Point, knockback: number) {
         if (this.isAlive) {
-            if (this.health-damage <= 0) {
+            this.health -= damage
+            if (!this.isAlive) {
                 this.die(direction)
                 knockback *= (1 + Math.random())
-            } else {
-                this.health -= damage
             }
         }
 
@@ -102,9 +95,6 @@ export class Dude extends Component {
 
     private deathOffset: Point
     die(direction: Point = new Point(-1, 0)) {
-        if (this.health === 0) {
-            return
-        }
         this.health = 0
         this.dropWeapon()
         const prePos = this.animation.transform.position
@@ -123,7 +113,7 @@ export class Dude extends Component {
         const goal = this.position.plus(direction.normalized().times(knockback))
         let intervalsRemaining = 50
         const interval = setInterval(() => {
-            this.placeAt(this.position.lerp(.07, goal))
+            this.moveTo(this.position.lerp(.07, goal))
             intervalsRemaining--
             if (intervalsRemaining === 0 || goal.minus(this.position).magnitude() < 2) {
                 clearInterval(interval)
@@ -166,13 +156,13 @@ export class Dude extends Component {
             const translation = direction.normalized()
             // this.lerpedLastMoveDir = this.lerpedLastMoveDir.lerp(0.25, translation)
             const newPos = this._position.plus(translation.times(updateData.elapsedTimeMillis * this.speed))
-            this.placeAt(newPos)
+            this.moveTo(newPos)
         } else if (wasMoving) {
             this.animation.play(0)
         }
     }
 
-    placeAt(point: Point) {
+    private moveTo(point: Point) {
         this._position = this.collider.moveTo(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos)
     }
 }
