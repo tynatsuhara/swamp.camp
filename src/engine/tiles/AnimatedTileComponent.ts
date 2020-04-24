@@ -11,7 +11,7 @@ export class AnimatedTileComponent extends TileComponent {
 
     // defaultAnimation has a key of 0, the following is 1, etc
     constructor(position: Point, defaultAnimation: TileSetAnimation, ...additionalAnimations: TileSetAnimation[]) {
-        super(defaultAnimation.getTile(0), position)
+        super(defaultAnimation.getTile(0))
         this.animations = [defaultAnimation].concat(additionalAnimations)
         this.play(0)
     }

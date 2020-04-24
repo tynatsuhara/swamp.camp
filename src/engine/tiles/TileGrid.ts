@@ -19,7 +19,7 @@ export class TileGrid extends Grid<Entity> {
     }
 
     createTileEntity(source: TileSource, pos: Point): Entity {
-        const entity = new Entity([new TileComponent(source, pos.times(this.tileSize))])
+        const entity = new Entity([source.at(pos)])
         this.set(pos, entity)
         return entity
     }

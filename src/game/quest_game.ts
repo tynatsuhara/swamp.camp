@@ -60,8 +60,7 @@ export class QuestGame extends Game {
                     } else {
                         tile = this.tileManager.tilemap.getTileAt(new Point(0, 7))
                     }
-                    // tile = this.tileManager.outdoorTiles.getTileAt(new Point(5, 0))
-                    this.tiles.set(pt, new Entity([new TileComponent(tile, pt.times(TILE_SIZE))]))
+                    this.tiles.set(pt, new Entity([tile.at(pt)]))
                 }
             }
         }

@@ -12,7 +12,8 @@ export class Dude extends Component {
 
     private health = 5
     speed = 0.085
-    private characterAnim: AnimatedTileComponent
+    private _animation: AnimatedTileComponent
+    get animation() { return this._animation }
     private archetype: string
 
     private readonly weaponId: string
@@ -30,7 +31,7 @@ export class Dude extends Component {
     }
     // bottom center of the tile
     get standingPosition(): Point {
-        return this.position.plus(new Point(this.characterAnim.transform.dimensions.x/2, this.characterAnim.transform.dimensions.y))
+        return this.position.plus(new Point(this.animation.transform.dimensions.x/2, this.animation.transform.dimensions.y))
     }
     private _isMoving: boolean
     get isMoving() {
@@ -52,7 +53,8 @@ export class Dude extends Component {
         const idleAnim = TileManager.instance.dungeonCharacters.getTileSetAnimation(`${this.archetype}_idle_anim`, 150)
         const runAnim = TileManager.instance.dungeonCharacters.getTileSetAnimation(`${this.archetype}_run_anim`, 80)
         // TileManager.instance.dungeonCharacters.getTileSetAnimation(`${this.archetype}_hit_anim`, 1000),  // TODO handle missing animation for some archetypes
-        this.characterAnim = this.entity.addComponent(new AnimatedTileComponent(new Point(0, 0), idleAnim, runAnim))
+        
+        this._animation = this.entity.addComponent(new AnimatedTileComponent(new Point(0, 0), idleAnim, runAnim))
 
         if (!!this.weaponId) {
             this._weapon = this.entity.addComponent(new Weapon(this.weaponId))
@@ -60,26 +62,26 @@ export class Dude extends Component {
 
         const colliderSize = new Point(10, 8)
         this.relativeColliderPos = new Point(
-            this.characterAnim.transform.dimensions.x/2 - colliderSize.x/2, 
-            this.characterAnim.transform.dimensions.y - colliderSize.y
+            this.animation.transform.dimensions.x/2 - colliderSize.x/2, 
+            this.animation.transform.dimensions.y - colliderSize.y
         )
         this.collider = this.entity.addComponent(new BoxCollider(this.position.plus(this.relativeColliderPos), colliderSize))
     }
 
     update(updateData: UpdateData) {
         if (this.health > 0) {
-            this.characterAnim.transform.position = this.position
-            this.characterAnim.transform.depth = this.position.y + this.characterAnim.transform.dimensions.y
+            this.animation.transform.position = this.position
+            this.animation.transform.depth = this.position.y + this.animation.transform.dimensions.y
         } else {
-            this.characterAnim.transform.position = this.position.plus(this.deathOffset)
-            this.characterAnim.transform.depth = this.position.y + this.characterAnim.transform.dimensions.x
+            this.animation.transform.position = this.position.plus(this.deathOffset)
+            this.animation.transform.depth = this.position.y + this.animation.transform.dimensions.x
         }
 
-        this.characterAnim.transform.depth = this.collider.position.y + this.collider.dimensions.y
+        this.animation.transform.depth = this.collider.position.y + this.collider.dimensions.y
 
-        if (!!this.weapon) {
-            this.weapon.syncWithCharacterAnimation(this, this.characterAnim)
-        }
+        // if (!!this.weapon) {
+        //     this.weapon.syncWithCharacterAnimation(this, this.characterAnim)
+        // }
     }
 
     private beingKnockedBack = false
@@ -100,9 +102,10 @@ export class Dude extends Component {
         }
         this.dropWeapon()
         this.health = 0
-        const prePos = this.characterAnim.transform.position
-        this.characterAnim.transform.rotateAround(this.standingPosition.minus(new Point(0, 5)), 90 * Math.sign(direction.x))
-        this.deathOffset = this.characterAnim.transform.position.minus(prePos)
+        const prePos = this.animation.transform.position
+        this.animation.transform.rotate(90 * Math.sign(direction.x), this.standingPosition.minus(new Point(0, 5)))
+        // this.animation.transform.rotation = 90
+        this.deathOffset = this.animation.transform.position.minus(prePos)
     }
 
     dropWeapon() {
@@ -142,9 +145,9 @@ export class Dude extends Component {
         const dy = direction.y
 
         if ((dx < 0 && facingOverride === 0) || facingOverride < 0) {
-            this.characterAnim.transform.mirrorX = true
+            this.animation.transform.mirrorX = true
         } else if ((dx > 0 && facingOverride === 0) || facingOverride > 0) {
-            this.characterAnim.transform.mirrorX = false
+            this.animation.transform.mirrorX = false
         }
         
         const wasMoving = this.isMoving
@@ -152,14 +155,14 @@ export class Dude extends Component {
 
         if (this.isMoving) {
             if (!wasMoving) {
-                this.characterAnim.play(1)  // TODO make the run animation backwards if they run backwards :)
+                this.animation.play(1)  // TODO make the run animation backwards if they run backwards :)
             }
             const translation = direction.normalized()
             // this.lerpedLastMoveDir = this.lerpedLastMoveDir.lerp(0.25, translation)
             const newPos = this._position.plus(translation.times(updateData.elapsedTimeMillis * this.speed))
             this.placeAt(newPos)
         } else if (wasMoving) {
-            this.characterAnim.play(0)
+            this.animation.play(0)
         }
     }
 
