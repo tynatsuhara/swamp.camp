@@ -1138,7 +1138,9 @@ System.register("engine/tiles/AnimatedTileComponent", ["engine/tiles/TileCompone
                     });
                 };
                 AnimatedTileComponent.prototype.update = function (updateData) {
-                    this.animator.update(updateData.elapsedTimeMillis);
+                    if (!this.paused) {
+                        this.animator.update(updateData.elapsedTimeMillis);
+                    }
                 };
                 return AnimatedTileComponent;
             }(TileComponent_2.TileComponent));
@@ -2354,12 +2356,20 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     //     this.weapon.syncWithCharacterAnimation(this, this.characterAnim)
                     // }
                 };
+                Object.defineProperty(Dude.prototype, "isAlive", {
+                    get: function () { return this.health !== 0; },
+                    enumerable: true,
+                    configurable: true
+                });
                 Dude.prototype.damage = function (damage, direction, knockback) {
-                    if (this.health - damage <= 0) {
-                        this.die(direction);
-                    }
-                    else {
-                        this.health -= damage;
+                    if (this.isAlive) {
+                        if (this.health - damage <= 0) {
+                            this.die(direction);
+                            knockback *= (1 + Math.random());
+                        }
+                        else {
+                            this.health -= damage;
+                        }
                     }
                     this.knockback(direction, knockback);
                 };
@@ -2368,12 +2378,13 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     if (this.health === 0) {
                         return;
                     }
-                    this.dropWeapon();
                     this.health = 0;
+                    this.dropWeapon();
                     var prePos = this.animation.transform.position;
                     this.animation.transform.rotate(90 * Math.sign(direction.x), this.standingPosition.minus(new point_16.Point(0, 5)));
-                    // this.animation.transform.rotation = 90
                     this.deathOffset = this.animation.transform.position.minus(prePos);
+                    this.animation.play(0);
+                    this.animation.paused = true;
                 };
                 Dude.prototype.dropWeapon = function () {
                     // TODO
@@ -3012,10 +3023,10 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "game/character
                     return this.dudeEntities;
                 };
                 DudeFactory.prototype.newPlayer = function (pos) {
-                    return this.make("knight_f", pos, 
-                    // "weapon_baton_with_spikes", 
+                    return this.make("knight_f", pos, "weapon_baton_with_spikes", 
                     // "weapon_katana", 
-                    "weapon_knife", new Player_2.Player());
+                    // "weapon_knife", 
+                    new Player_2.Player());
                 };
                 DudeFactory.prototype.newElf = function (pos) {
                     return this.make("elf_m", pos, "weapon_katana", new NPC_1.NPC());

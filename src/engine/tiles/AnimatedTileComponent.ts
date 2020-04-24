@@ -6,6 +6,8 @@ import { TileSource } from "./TileSource"
 import { Animator } from "../util/Animator"
 
 export class AnimatedTileComponent extends TileComponent {
+    paused: boolean 
+
     private animator: Animator
     private animations: TileSetAnimation[]
 
@@ -31,6 +33,8 @@ export class AnimatedTileComponent extends TileComponent {
     }
     
     update(updateData: UpdateData) {
-        this.animator.update(updateData.elapsedTimeMillis)
+        if (!this.paused) {
+            this.animator.update(updateData.elapsedTimeMillis)
+        }
     }
 }

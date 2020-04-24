@@ -85,13 +85,18 @@ export class Dude extends Component {
     }
 
     private beingKnockedBack = false
+    get isAlive() { return this.health !== 0 }
 
     damage(damage: number, direction: Point, knockback: number) {
-        if (this.health-damage <= 0) {
-            this.die(direction)
-        } else {
-            this.health -= damage
+        if (this.isAlive) {
+            if (this.health-damage <= 0) {
+                this.die(direction)
+                knockback *= (1 + Math.random())
+            } else {
+                this.health -= damage
+            }
         }
+
         this.knockback(direction, knockback)
     }
 
@@ -100,12 +105,13 @@ export class Dude extends Component {
         if (this.health === 0) {
             return
         }
-        this.dropWeapon()
         this.health = 0
+        this.dropWeapon()
         const prePos = this.animation.transform.position
         this.animation.transform.rotate(90 * Math.sign(direction.x), this.standingPosition.minus(new Point(0, 5)))
-        // this.animation.transform.rotation = 90
         this.deathOffset = this.animation.transform.position.minus(prePos)
+        this.animation.play(0)
+        this.animation.paused = true
     }
 
     dropWeapon() {

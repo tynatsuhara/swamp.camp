@@ -15,9 +15,9 @@ export class DudeFactory {
 
     newPlayer(pos: Point) {
         return this.make("knight_f", pos, 
-        // "weapon_baton_with_spikes", 
+        "weapon_baton_with_spikes", 
         // "weapon_katana", 
-        "weapon_knife", 
+        // "weapon_knife", 
         new Player())
     }
 

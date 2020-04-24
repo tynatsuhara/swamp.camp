@@ -1,4 +1,4 @@
-export class Animator {
+export class Animator {    
     private readonly frames: number[]  // a list of end-of-frame timestamps
     private readonly duration: number  // total duration
 
