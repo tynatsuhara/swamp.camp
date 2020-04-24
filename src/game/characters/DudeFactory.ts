@@ -4,14 +4,9 @@ import { Component } from "../../engine/component"
 import { Player } from "./Player"
 import { Dude } from "./Dude"
 import { NPC } from "./NPC"
+import { EntityManager } from "../EntityManager"
 
 export class DudeFactory {
-
-    private readonly dudeEntities: Entity[] = []
-
-    getSpawnedEntities() {
-        return this.dudeEntities
-    }
 
     newPlayer(pos: Point) {
         return this.make("knight_f", pos, 
@@ -31,7 +26,7 @@ export class DudeFactory {
 
     private make(archetype: string, pos: Point, weapon: string, ...additionalComponents: Component[]) {
         const e = new Entity([new Dude(archetype, pos, weapon) as Component].concat(additionalComponents))
-        this.dudeEntities.push(e)
+        EntityManager.instance.add(e)
         return e.getComponent(Dude)
     }
 }

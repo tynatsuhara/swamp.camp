@@ -4,6 +4,7 @@ import { TileComponent } from "./TileComponent"
 import { TileSetAnimation } from "./TileSetAnimation"
 import { TileSource } from "./TileSource"
 import { Animator } from "../util/Animator"
+import { TileTransform } from "./TileTransform"
 
 export class AnimatedTileComponent extends TileComponent {
     paused: boolean 
@@ -12,9 +13,13 @@ export class AnimatedTileComponent extends TileComponent {
     private animations: TileSetAnimation[]
 
     // defaultAnimation has a key of 0, the following is 1, etc
-    constructor(position: Point, defaultAnimation: TileSetAnimation, ...additionalAnimations: TileSetAnimation[]) {
-        super(defaultAnimation.getTile(0))
-        this.animations = [defaultAnimation].concat(additionalAnimations)
+    constructor(animations: TileSetAnimation[], transform: TileTransform = new TileTransform()) {
+        if (animations.length < 1) {
+            throw new Error("needs at least one animation!")
+        }
+        const defaultAnimation = animations[0]
+        super(defaultAnimation.getTile(0), transform)
+        this.animations = animations
         this.play(0)
     }
 

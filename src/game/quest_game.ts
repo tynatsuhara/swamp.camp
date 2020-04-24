@@ -12,6 +12,8 @@ import { TileManager, TILE_SIZE } from "./graphics/TileManager"
 import { Player } from "./characters/Player"
 import { NPC } from "./characters/NPC"
 import { DudeFactory } from "./characters/DudeFactory"
+import { EntityManager } from "./EntityManager"
+import { TileTransform } from "../engine/tiles/TileTransform"
 
 
 const ZOOM = 3.125
@@ -19,6 +21,7 @@ const ZOOM = 3.125
 export class QuestGame extends Game {
 
     readonly tileManager = new TileManager()
+    readonly entityManager = new EntityManager()
     readonly tiles = new TileGrid(TILE_SIZE)
     readonly dudeFactory = new DudeFactory()
     readonly player = this.dudeFactory.newPlayer(new Point(-2, 2).times(TILE_SIZE))
@@ -82,14 +85,14 @@ export class QuestGame extends Game {
         this.gameEntityView = { 
             zoom: ZOOM,
             offset: this.gameEntityView.offset.lerp(.0018 * updateViewsContext.elapsedTimeMillis, cameraGoal),
-            entities: this.tiles.entries().concat(this.dudeFactory.getSpawnedEntities())
+            entities: this.tiles.entries().concat(this.entityManager.getEntities())
         }
     }
 
     // entities whose position is fixed on the camera
     getUIEntities(): Entity[] {
 
-        const coin = new AnimatedTileComponent(new Point(4, 4), this.tileManager.dungeonCharacters.getTileSetAnimation("coin_anim", 150))
+        const coin = new AnimatedTileComponent([this.tileManager.dungeonCharacters.getTileSetAnimation("coin_anim", 150)], new TileTransform(new Point(4, 4)))
 
 
         const dimensions = new Point(20, 16)  // tile dimensions

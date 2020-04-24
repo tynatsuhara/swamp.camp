@@ -7,6 +7,9 @@ import { Component } from "../../engine/component"
 import { BoxCollider } from "../../engine/collision/BoxCollider"
 import { TileManager } from "../graphics/TileManager"
 import { Weapon } from "./Weapon"
+import { Entity } from "../../engine/Entity"
+import { EntityManager } from "../EntityManager"
+import { Coin } from "../items/Coin"
 
 export class Dude extends Component {
 
@@ -14,9 +17,7 @@ export class Dude extends Component {
     speed = 0.085
     private _animation: AnimatedTileComponent
     get animation() { return this._animation }
-    private archetype: string
 
-    private readonly weaponId: string
     private _weapon: Weapon
     get weapon() {
         return this._weapon
@@ -44,36 +45,29 @@ export class Dude extends Component {
         weaponId: string
     ) {
         super()
-        this.archetype = archetype
         this._position = position
-        this.weaponId = weaponId
-    }
-
-    start(startData: StartData) {
-        const idleAnim = TileManager.instance.dungeonCharacters.getTileSetAnimation(`${this.archetype}_idle_anim`, 150)
-        const runAnim = TileManager.instance.dungeonCharacters.getTileSetAnimation(`${this.archetype}_run_anim`, 80)
-        // TileManager.instance.dungeonCharacters.getTileSetAnimation(`${this.archetype}_hit_anim`, 1000),  // TODO handle missing animation for some archetypes
-        
-        this._animation = this.entity.addComponent(new AnimatedTileComponent(new Point(0, 0), idleAnim, runAnim))
-
-        if (!!this.weaponId) {
-            this._weapon = this.entity.addComponent(new Weapon(this.weaponId))
+        this.start = (startData) => {
+            const idleAnim = TileManager.instance.dungeonCharacters.getTileSetAnimation(`${archetype}_idle_anim`, 150)
+            const runAnim = TileManager.instance.dungeonCharacters.getTileSetAnimation(`${archetype}_run_anim`, 80)
+            
+            this._animation = this.entity.addComponent(new AnimatedTileComponent([idleAnim, runAnim]))
+    
+            if (!!weaponId) {
+                this._weapon = this.entity.addComponent(new Weapon(weaponId))
+            }
+    
+            const colliderSize = new Point(10, 8)
+            this.relativeColliderPos = new Point(
+                this.animation.transform.dimensions.x/2 - colliderSize.x/2, 
+                this.animation.transform.dimensions.y - colliderSize.y
+            )
+            this.collider = this.entity.addComponent(new BoxCollider(this.position.plus(this.relativeColliderPos), colliderSize))
         }
-
-        const colliderSize = new Point(10, 8)
-        this.relativeColliderPos = new Point(
-            this.animation.transform.dimensions.x/2 - colliderSize.x/2, 
-            this.animation.transform.dimensions.y - colliderSize.y
-        )
-        this.collider = this.entity.addComponent(new BoxCollider(this.position.plus(this.relativeColliderPos), colliderSize))
     }
 
     update(updateData: UpdateData) {
-        if (this.isAlive) {
-            this.animation.transform.position = this.position
-        } else {
-            this.animation.transform.position = this.position.plus(this.deathOffset)
-        }
+        // All other transforms (eg the weapon) are positioned relative to the animation
+        this.animation.transform.position = this.position.plus(this.isAlive ? new Point(0, 0) : this.deathOffset)
 
         this.animation.transform.depth = this.collider.position.y + this.collider.dimensions.y
     }
@@ -96,12 +90,20 @@ export class Dude extends Component {
     private deathOffset: Point
     die(direction: Point = new Point(-1, 0)) {
         this.health = 0
-        this.dropWeapon()
         const prePos = this.animation.transform.position
-        this.animation.transform.rotate(90 * Math.sign(direction.x), this.standingPosition.minus(new Point(0, 5)))
+        this.animation.transform.rotate(
+            90 * (direction.x >= 0 ? 1 : -1), 
+            this.standingPosition.minus(new Point(0, 5))
+        )
         this.deathOffset = this.animation.transform.position.minus(prePos)
         this.animation.play(0)
         this.animation.paused = true
+        this.spawnDrop()
+        this.dropWeapon()
+    }
+
+    spawnDrop() {
+        EntityManager.instance.add(new Entity([new Coin(this.standingPosition)]))
     }
 
     dropWeapon() {
