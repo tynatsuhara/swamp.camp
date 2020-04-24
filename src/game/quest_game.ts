@@ -3,21 +3,23 @@ import { Point } from "../engine/point"
 import { Game } from "../engine/game"
 import { UpdateViewsContext } from "../engine/engine"
 import { View } from "../engine/View"
-import { TileGrid } from "../engine/tiles/TileGrid"
 import { MapGenerator } from "./MapGenerator"
-import { TileManager, TILE_SIZE } from "./graphics/TileManager"
+import { Tilesets, TILE_SIZE } from "./graphics/Tilesets"
 import { DudeFactory } from "./characters/DudeFactory"
-import { EntityManager } from "./EntityManager"
+import { DynamicEntityManager } from "./DynamicEntityManager"
 import { HUD } from "./ui/HUD"
+import { TileEntityManager } from "./TileEntityManager"
 
 
 const ZOOM = 3.125
 
 export class QuestGame extends Game {
 
-    readonly tileManager = new TileManager()
-    readonly entityManager = new EntityManager()
-    readonly tiles = new TileGrid(TILE_SIZE)
+    readonly tilesets = new Tilesets()
+
+    readonly dynamicEntityManager = new DynamicEntityManager()
+    readonly tileEntityManager = new TileEntityManager()
+
     readonly dudeFactory = new DudeFactory()
     readonly player = this.dudeFactory.newPlayer(new Point(-2, 2).times(TILE_SIZE))
     readonly hud = new HUD()
@@ -40,25 +42,7 @@ export class QuestGame extends Game {
         // ]))
 
         const mapGen = new MapGenerator()
-
-        mapGen.renderPath(this.tiles, new Point(-10, -10), new Point(10, 10), mapGen.pathSchema, 2)
-        mapGen.renderPath(this.tiles, new Point(10, -10), new Point(-10, 10), mapGen.pathSchema, 5)
-
-
-        for (let i = -20; i < 20; i++) {
-            for (let j = -20; j < 20; j++) {
-                const pt = new Point(i, j)
-                if (!this.tiles.get(pt)) {
-                    let tile
-                    if (Math.random() < .65) {
-                        tile = this.tileManager.tilemap.getTileAt(new Point(0, Math.floor(Math.random() * 4)))
-                    } else {
-                        tile = this.tileManager.tilemap.getTileAt(new Point(0, 7))
-                    }
-                    this.tiles.set(pt, new Entity([tile.at(pt)]))
-                }
-            }
-        }
+        mapGen.doIt()
     }
 
     // entities in the world space
@@ -77,7 +61,7 @@ export class QuestGame extends Game {
         this.gameEntityView = { 
             zoom: ZOOM,
             offset: this.gameEntityView.offset.lerp(.0018 * updateViewsContext.elapsedTimeMillis, cameraGoal),
-            entities: this.tiles.entries().concat(this.entityManager.getEntities())
+            entities: this.tileEntityManager.entries().concat(this.dynamicEntityManager.getEntities())
         }
 
         this.uiView = {

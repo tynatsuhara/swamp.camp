@@ -1,12 +1,15 @@
 import { Entity } from "../engine/Entity"
 
-export class EntityManager {
+/**
+ * Used for tracking things that do not align to the x/y grid
+ */
+export class DynamicEntityManager {
 
-    static instance: EntityManager
+    static instance: DynamicEntityManager
     private set = new Set<Entity>()
 
     constructor() {
-        EntityManager.instance = this
+        DynamicEntityManager.instance = this
     }
 
     add(e: Entity) {

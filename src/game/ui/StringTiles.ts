@@ -1,6 +1,6 @@
 import { Component } from "../../engine/component"
 import { RenderMethod } from "../../engine/renderer/RenderMethod"
-import { TileManager } from "../graphics/TileManager"
+import { Tilesets } from "../graphics/Tilesets"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Point } from "../../engine/point"
 import { TextRender } from "../../engine/renderer/TextRender"
@@ -21,7 +21,7 @@ export class StringTiles extends Component {
             return
         }
         this.tiles = Array.from(s).map((c, i) => {
-            return TileManager.instance.oneBit.getTileSource(c).toImageRender(
+            return Tilesets.instance.oneBit.getTileSource(c).toImageRender(
                 new TileTransform(this.topLeftPos.plus(new Point(10 * i, 0)))
             )
         })

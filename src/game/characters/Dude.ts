@@ -1,14 +1,12 @@
 import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
-import { TileComponent } from "../../engine/tiles/TileComponent"
-import { UpdateData, StartData } from "../../engine/engine"
-import { InputKey } from "../../engine/input"
+import { UpdateData } from "../../engine/engine"
 import { Point } from "../../engine/point"
 import { Component } from "../../engine/component"
 import { BoxCollider } from "../../engine/collision/BoxCollider"
-import { TileManager } from "../graphics/TileManager"
+import { Tilesets } from "../graphics/Tilesets"
 import { Weapon } from "./Weapon"
 import { Entity } from "../../engine/Entity"
-import { EntityManager } from "../EntityManager"
+import { DynamicEntityManager } from "../DynamicEntityManager"
 import { Coin } from "../items/Coin"
 import { Inventory } from "../items/Inventory"
 
@@ -51,8 +49,8 @@ export class Dude extends Component {
         super()
         this._position = position
         this.start = (startData) => {
-            const idleAnim = TileManager.instance.dungeonCharacters.getTileSetAnimation(`${archetype}_idle_anim`, 150)
-            const runAnim = TileManager.instance.dungeonCharacters.getTileSetAnimation(`${archetype}_run_anim`, 80)
+            const idleAnim = Tilesets.instance.dungeonCharacters.getTileSetAnimation(`${archetype}_idle_anim`, 150)
+            const runAnim = Tilesets.instance.dungeonCharacters.getTileSetAnimation(`${archetype}_run_anim`, 80)
             
             this._animation = this.entity.addComponent(new AnimatedTileComponent([idleAnim, runAnim]))
     
@@ -106,7 +104,7 @@ export class Dude extends Component {
     }
 
     private spawnDrop() {
-        EntityManager.instance.add(new Entity([new Coin(this.standingPosition.minus(new Point(0, 2)))]))
+        DynamicEntityManager.instance.add(new Entity([new Coin(this.standingPosition.minus(new Point(0, 2)))]))
     }
 
     private dropWeapon() {

@@ -1,9 +1,9 @@
 import { QuestGame } from "./game/quest_game"
 import { Engine } from "./engine/engine"
-import { TileManager } from "./game/graphics/TileManager"
+import { Tilesets } from "./game/graphics/Tilesets"
 import { assets } from "./engine/Assets"
 
-assets.loadImageFiles(TileManager.getFilesToLoad()).then(() => {
+assets.loadImageFiles(Tilesets.getFilesToLoad()).then(() => {
     new Engine(new QuestGame(), <HTMLCanvasElement>document.getElementById('canvas'))
 })
 

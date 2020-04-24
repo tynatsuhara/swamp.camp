@@ -1,5 +1,5 @@
 import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
-import { TileManager } from "../graphics/TileManager"
+import { Tilesets } from "../graphics/Tilesets"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Point } from "../../engine/point"
 import { Dude } from "../characters/Dude"
@@ -26,7 +26,7 @@ export class HUD {
 
     constructor() {
         this.entity.addComponent(new AnimatedTileComponent(
-            [TileManager.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)],
+            [Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)],
             new TileTransform(this.offset.plus(this.coinsOffset))
         ))
     }
@@ -48,9 +48,9 @@ export class HUD {
         this.hearts.forEach(c => this.entity.removeComponent(c))
 
         const heartOffset = new Point(16, 0)
-        const full = TileManager.instance.dungeonCharacters.getTileSource("ui_heart_full")
-        const half = TileManager.instance.dungeonCharacters.getTileSource("ui_heart_half")
-        const empty = TileManager.instance.dungeonCharacters.getTileSource("ui_heart_empty")
+        const full = Tilesets.instance.dungeonCharacters.getTileSource("ui_heart_full")
+        const half = Tilesets.instance.dungeonCharacters.getTileSource("ui_heart_half")
+        const empty = Tilesets.instance.dungeonCharacters.getTileSource("ui_heart_empty")
         const result = []
 
         const fullHearts = Math.floor(health)

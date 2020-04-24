@@ -1,6 +1,6 @@
 import { Component } from "../../engine/component"
 import { TileComponent } from "../../engine/tiles/TileComponent"
-import { TileManager } from "../graphics/TileManager"
+import { Tilesets } from "../graphics/Tilesets"
 import { StartData, UpdateData } from "../../engine/engine"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Point } from "../../engine/point"
@@ -9,7 +9,7 @@ import { Dude } from "./Dude"
 import { Animator } from "../../engine/util/Animator"
 import { BoxCollider } from "../../engine/collision/BoxCollider"
 import { Player } from "./Player"
-import { EntityManager } from "../EntityManager"
+import { DynamicEntityManager } from "../DynamicEntityManager"
 
 enum State {
     SHEATHED,
@@ -33,7 +33,7 @@ export class Weapon extends Component {
             this.dude = this.entity.getComponent(Dude)
             this.weaponSprite = this.entity.addComponent(
                 new TileComponent(
-                    TileManager.instance.dungeonCharacters.getTileSource(weaponId),
+                    Tilesets.instance.dungeonCharacters.getTileSource(weaponId),
                     new TileTransform().relativeTo(this.dude.animation.transform)
                 )
             )
@@ -50,7 +50,7 @@ export class Weapon extends Component {
 
     // TODO find a better place for this?
     static damageInFrontOfDude(dude: Dude, attackDistance: number) {
-        EntityManager.instance.getEntities()
+        DynamicEntityManager.instance.getEntities()
                 .map(e => e.getComponent(Dude))
                 .filter(d => !!d && d !== dude)
                 .filter(d => dude.animation.transform.mirrorX === (d.standingPosition.x < dude.standingPosition.x))  // enemies the dude is facing

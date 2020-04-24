@@ -14,20 +14,23 @@ export const TILE_SIZE = 16
 /**
  * Manages different tile sources
  */
-export class TileManager {
+export class Tilesets {
 
-    static instance: TileManager
+    static instance: Tilesets
 
     readonly dungeonCharacters = new DungeonTilesetII()
     readonly tilemap = new SingleFileTileLoader("images/tilemap.png")
     readonly dungeonTiles = new SingleFileTileLoader("images/env_dungeon.png")
     readonly indoorTiles = new SingleFileTileLoader("images/env_indoor.png")
-    readonly outdoorTiles = new SingleFileTileLoader("images/env_outdoor_recolor.png")
+    readonly outdoorTiles = new SingleFileTileLoader("images/env_outdoor_recolor.png", new Map([
+        ["tree1base", new Point(13, 11)],
+        ["tree1top", new Point(13, 10)]
+    ]))
     readonly oneBit = new OneBitTileset()
     readonly otherCharacters = new SplitFileTileLoader("images/individual_characters")
 
     constructor() {
-        TileManager.instance = this
+        Tilesets.instance = this
     }
 
     // loaded before the engine starts running the game

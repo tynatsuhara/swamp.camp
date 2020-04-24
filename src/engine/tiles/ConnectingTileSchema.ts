@@ -1,12 +1,14 @@
 import { TileSource } from "./TileSource"
 import { Point } from "../point"
-import { TileGrid } from "./TileGrid"
 import { ImageRender } from "../renderer/ImageRender"
 import { TileTransform } from "./TileTransform"
 import { ConnectingTile } from "./ConnectingTile"
+import { Entity } from "../Entity"
+import { Grid } from "../util/Grid"
 
 /**
  * Defines how a type of connecting tiles interacts with other types of connecting tiles.
+ * TODO: This could probably be a lot better and support more complex connecting logic
  */
 export class ConnectingTileSchema {
     private _vertical: TileSource
@@ -71,7 +73,7 @@ export class ConnectingTileSchema {
     /**
      * Renders the tile source based on the given grid and position
      */
-    render(grid: TileGrid, position: Point): ImageRender {
+    render(grid: Grid<Entity>, position: Point): ImageRender {
         const x = position.x
         const y = position.y
 
@@ -129,10 +131,10 @@ export class ConnectingTileSchema {
         }
 
         // TODO trigger adjacent to update?
-        return result.toImageRender(new TileTransform(position.times(grid.tileSize), null, rotation))
+        return result.toImageRender(new TileTransform(position.times(result.dimensions.x), null, rotation))
     }
 
-    private get(grid: TileGrid, pt: Point): ConnectingTile {
+    private get(grid: Grid<Entity>, pt: Point): ConnectingTile {
         const el = grid.get(pt)
         if (el) {
             const ct = el.getComponent(ConnectingTile)
