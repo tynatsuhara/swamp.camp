@@ -2840,17 +2840,20 @@ System.register("game/items/Coin", ["engine/component", "engine/tiles/AnimatedTi
                         var pos = position.minus(new point_19.Point(_this.animation.transform.dimensions.x / 2, _this.animation.transform.dimensions.y));
                         _this.animation.transform.position = pos;
                         _this.animation.transform.depth = pos.y;
-                        _this.collider = _this.entity.addComponent(new BoxCollider_1.BoxCollider(pos, _this.animation.transform.dimensions, true).onColliderEnter(function (c) {
-                            var player = c.entity.getComponent(Player_1.Player);
-                            if (!!player) {
-                                player.entity.getComponent(Dude_2.Dude).inventory.coins++;
-                                EntityManager_2.EntityManager.instance.delete(_this.entity);
-                            }
-                        }));
+                        _this.collider = _this.entity.addComponent(new BoxCollider_1.BoxCollider(pos, _this.animation.transform.dimensions, true).onColliderEnter(function (c) { return _this.collide(c); }));
                     };
                     return _this;
                 }
-                Coin.prototype.update = function (updateData) { };
+                Coin.prototype.collide = function (c) {
+                    var player = c.entity.getComponent(Player_1.Player);
+                    if (!!player) {
+                        var d = player.entity.getComponent(Dude_2.Dude);
+                        if (d.isAlive) {
+                            player.entity.getComponent(Dude_2.Dude).inventory.coins++;
+                            EntityManager_2.EntityManager.instance.delete(this.entity);
+                        }
+                    }
+                };
                 return Coin;
             }(component_6.Component));
             exports_41("Coin", Coin);

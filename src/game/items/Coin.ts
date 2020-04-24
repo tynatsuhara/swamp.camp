@@ -32,16 +32,19 @@ export class Coin extends Component {
             this.animation.transform.depth = pos.y
 
             this.collider = this.entity.addComponent(
-                new BoxCollider(pos, this.animation.transform.dimensions, true).onColliderEnter(c => {
-                    const player = c.entity.getComponent(Player)
-                    if (!!player) {
-                        player.entity.getComponent(Dude).inventory.coins++
-                        EntityManager.instance.delete(this.entity)
-                    }
-                })
+                new BoxCollider(pos, this.animation.transform.dimensions, true).onColliderEnter(c => this.collide(c))
             )
         }
     }
 
-    update(updateData: UpdateData) {}
+    private collide(c: Collider) {
+        const player = c.entity.getComponent(Player)
+        if (!!player) {
+            const d = player.entity.getComponent(Dude)
+            if (d.isAlive) {
+                player.entity.getComponent(Dude).inventory.coins++
+                EntityManager.instance.delete(this.entity)
+            }
+        }
+    }
 }
