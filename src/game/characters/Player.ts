@@ -78,7 +78,7 @@ export class Player extends Component {
 
     private interact(updateData: UpdateData) {
         const interactDistance = 20
-        const interactCenter = this.dude.standingPosition.minus(new Point(0, 5))
+        const interactCenter = this.dude.standingPosition.minus(new Point(0, 7))
         const possibilities = updateData.view.entities
                 .map(e => e.getComponent(Interactable))
                 .filter(e => !!e)
@@ -100,7 +100,7 @@ export class Player extends Component {
     // for trees and rocks
     private hitResource(updateData: UpdateData) {
         const interactDistance = 20
-        const interactCenter = this.dude.standingPosition.minus(new Point(0, 5))
+        const interactCenter = this.dude.standingPosition.minus(new Point(0, 7))
         const possibilities = updateData.view.entities
                 .map(e => e.getComponent(Hittable))
                 .filter(e => !!e)

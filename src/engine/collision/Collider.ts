@@ -16,14 +16,21 @@ export abstract class Collider extends Component {
     private _position: Point  // top-left
     get position() { return this._position }
     isTrigger: boolean
+    readonly layer: string
     
     readonly collidingWith: Set<Collider> = new Set()
     private onColliderEnterCallback: (collider: Collider) => void = () => {}
 
-    constructor(position: Point, isTrigger: boolean) {
+    /**
+     * @param position top left position
+     * @param isTrigger won't be checked for blocking collisions, only used for callbacks 
+     * @param layer determines which colliders collide based on the collision matrix
+     */
+    constructor(position: Point, isTrigger: boolean, layer = CollisionEngine.DEFAULT_LAYER) {
         super()
         this._position = position
         this.isTrigger = isTrigger
+        this.layer = layer
         CollisionEngine.instance.markCollider(this)
     }
 

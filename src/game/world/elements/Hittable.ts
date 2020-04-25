@@ -25,8 +25,12 @@ export class Hittable extends Component {
 
     // TODO limit to certain tools 
     hit(dir: Point) {
+        if (!!this.animator) {  // already being hit
+            return 
+        }
+        
         dir = dir.normalized()
-        const frames = [0, 3, 6, 3, 2, 1]
+        const frames = [0, 0, 0, 3, 6, 3, 2, 1]
 
         this.animator = new Animator(
             Animator.frames(frames.length, 40), 

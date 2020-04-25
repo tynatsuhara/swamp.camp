@@ -684,12 +684,19 @@ System.register("engine/collision/Collider", ["engine/component", "engine/point"
              */
             Collider = /** @class */ (function (_super) {
                 __extends(Collider, _super);
-                function Collider(position, isTrigger) {
+                /**
+                 * @param position top left position
+                 * @param isTrigger won't be checked for blocking collisions, only used for callbacks
+                 * @param layer determines which colliders collide based on the collision matrix
+                 */
+                function Collider(position, isTrigger, layer) {
+                    if (layer === void 0) { layer = CollisionEngine_1.CollisionEngine.DEFAULT_LAYER; }
                     var _this = _super.call(this) || this;
                     _this.collidingWith = new Set();
                     _this.onColliderEnterCallback = function () { };
                     _this._position = position;
                     _this.isTrigger = isTrigger;
+                    _this.layer = layer;
                     CollisionEngine_1.CollisionEngine.instance.markCollider(_this);
                     return _this;
                 }
@@ -811,7 +818,7 @@ System.register("engine/collision/Collider", ["engine/component", "engine/point"
 });
 System.register("engine/collision/CollisionEngine", ["engine/point", "engine/util/utils"], function (exports_16, context_16) {
     "use strict";
-    var point_7, utils_1, CollisionEngine;
+    var point_7, utils_1, CollisionEngine, engine;
     var __moduleName = context_16 && context_16.id;
     return {
         setters: [
@@ -828,7 +835,29 @@ System.register("engine/collision/CollisionEngine", ["engine/point", "engine/uti
                     this.colliders = [];
                     this.nextUpdateColliders = [];
                     CollisionEngine.instance = this;
+                    this.setCollisionMatrix(new Map());
                 }
+                /**
+                 * @param matrix Each key in the matrix will collide with all of the values in the corresponding list (and vice-versa)
+                 *               DEFAULT_LAYER will always collide with DEFAULT_LAYER
+                 */
+                CollisionEngine.prototype.setCollisionMatrix = function (matrix) {
+                    var bidirectional = new Map();
+                    bidirectional.set(CollisionEngine.DEFAULT_LAYER, new Set(CollisionEngine.DEFAULT_LAYER));
+                    for (var _i = 0, _a = Array.from(matrix.keys()); _i < _a.length; _i++) {
+                        var r = _a[_i];
+                        for (var _b = 0, _c = matrix.get(r); _b < _c.length; _b++) {
+                            var c = _c[_b];
+                            if (!bidirectional.has(r))
+                                bidirectional.set(r, new Set());
+                            bidirectional.get(r).add(c);
+                            if (!bidirectional.has(c))
+                                bidirectional.set(c, new Set());
+                            bidirectional.get(c).add(r);
+                        }
+                    }
+                    this.matrix = bidirectional;
+                };
                 /**
                  * A collider must mark itself in order to be included in any collision calculations in the next update step.
                  * This allows us to keep track of any colliders that are "active"
@@ -868,9 +897,10 @@ System.register("engine/collision/CollisionEngine", ["engine/point", "engine/uti
                 };
                 CollisionEngine.prototype.checkCollider = function (collider) {
                     this.removeDanglingColliders();
-                    this.colliders.filter(function (other) { return other !== collider && other.enabled && other.isTrigger; }).forEach(function (other) {
-                        var isColliding = other.getPoints().some(function (pt) { return collider.isWithinBounds(pt); })
-                            || collider.getPoints().some(function (pt) { return other.isWithinBounds(pt); });
+                    var collidingLayers = this.matrix.get(collider.layer);
+                    this.colliders.filter(function (other) { return other !== collider; }).forEach(function (other) {
+                        var isColliding = other.enabled && collidingLayers.has(other.layer)
+                            && (other.getPoints().some(function (pt) { return collider.isWithinBounds(pt); }) || collider.getPoints().some(function (pt) { return other.isWithinBounds(pt); }));
                         collider.updateColliding(other, isColliding);
                         other.updateColliding(collider, isColliding);
                     });
@@ -892,10 +922,11 @@ System.register("engine/collision/CollisionEngine", ["engine/point", "engine/uti
                 CollisionEngine.prototype.removeDanglingColliders = function () {
                     this.colliders = this.colliders.filter(function (other) { return !!other.entity; });
                 };
-                CollisionEngine.instance = new CollisionEngine();
+                CollisionEngine.DEFAULT_LAYER = "default";
                 return CollisionEngine;
             }());
             exports_16("CollisionEngine", CollisionEngine);
+            engine = new CollisionEngine();
         }
     };
 });
@@ -3187,8 +3218,11 @@ System.register("game/world/elements/Hittable", ["engine/component", "engine/uti
                 // TODO limit to certain tools 
                 Hittable.prototype.hit = function (dir) {
                     var _this = this;
+                    if (!!this.animator) { // already being hit
+                        return;
+                    }
                     dir = dir.normalized();
-                    var frames = [0, 3, 6, 3, 2, 1];
+                    var frames = [0, 0, 0, 3, 6, 3, 2, 1];
                     this.animator = new Animator_3.Animator(Animator_3.Animator.frames(frames.length, 40), function (index) {
                         _this.tileTransforms.forEach(function (pt, tr) { return tr.position = pt.plus(dir.times(frames[index])); });
                     }, function () { return _this.animator = null; });
@@ -3281,7 +3315,7 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
                 Player.prototype.interact = function (updateData) {
                     var _this = this;
                     var interactDistance = 20;
-                    var interactCenter = this.dude.standingPosition.minus(new point_23.Point(0, 5));
+                    var interactCenter = this.dude.standingPosition.minus(new point_23.Point(0, 7));
                     var possibilities = updateData.view.entities
                         .map(function (e) { return e.getComponent(Interactable_2.Interactable); })
                         .filter(function (e) { return !!e; })
@@ -3302,7 +3336,7 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
                 Player.prototype.hitResource = function (updateData) {
                     var _this = this;
                     var interactDistance = 20;
-                    var interactCenter = this.dude.standingPosition.minus(new point_23.Point(0, 5));
+                    var interactCenter = this.dude.standingPosition.minus(new point_23.Point(0, 7));
                     var possibilities = updateData.view.entities
                         .map(function (e) { return e.getComponent(Hittable_1.Hittable); })
                         .filter(function (e) { return !!e; })
@@ -3502,7 +3536,7 @@ System.register("game/world/elements/Rock", ["engine/point", "game/graphics/Tile
                 var variation = Math.floor(Math.random() * 3) + 1;
                 var mossy = Math.random() > .7;
                 var tile = e.addComponent(new TileComponent_7.TileComponent(Tilesets_7.Tilesets.instance.outdoorTiles.getTileSource("rock" + variation + (mossy ? 'mossy' : '')), new TileTransform_9.TileTransform(pos.times(Tilesets_7.TILE_SIZE))));
-                tile.transform.depth = (pos.y + 1) * Tilesets_7.TILE_SIZE;
+                tile.transform.depth = (pos.y + 1) * Tilesets_7.TILE_SIZE - /* prevent weapon from clipping */ 5;
                 tile.transform.mirrorX = Math.random() > .5;
                 // TODO
                 var hitboxDims = new point_26.Point(12, 4);
@@ -3963,6 +3997,9 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/View"
                     return _this;
                 }
                 QuestGame.prototype.initialize = function () {
+                    // CollisionEngine.instance.setCollisionMatrix(new Map([
+                    //     []
+                    // ]))
                     // World must be initialized before we do anything else
                     var mapGen = new MapGenerator_1.MapGenerator();
                     var world = mapGen.doIt();

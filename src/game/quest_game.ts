@@ -9,6 +9,7 @@ import { DudeFactory } from "./characters/DudeFactory"
 import { HUD } from "./ui/HUD"
 import { LocationManager } from "./world/LocationManager"
 import { Dude } from "./characters/Dude"
+import { CollisionEngine } from "../engine/collision/CollisionEngine"
 
 
 const ZOOM = 3.125
@@ -26,6 +27,10 @@ export class QuestGame extends Game {
     private uiView: View = new View()
 
     initialize() {
+        // CollisionEngine.instance.setCollisionMatrix(new Map([
+        //     []
+        // ]))
+
         // World must be initialized before we do anything else
         const mapGen = new MapGenerator()
         const world = mapGen.doIt()

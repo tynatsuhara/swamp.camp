@@ -17,7 +17,7 @@ export const makeRock = (wl: WorldLocation, pos: Point) => {
         Tilesets.instance.outdoorTiles.getTileSource(`rock${variation}${mossy ? 'mossy' : ''}`), 
         new TileTransform(pos.times(TILE_SIZE))
     ))
-    tile.transform.depth = (pos.y + 1) * TILE_SIZE
+    tile.transform.depth = (pos.y + 1) * TILE_SIZE - /* prevent weapon from clipping */ 5
     tile.transform.mirrorX = Math.random() > .5
 
     // TODO

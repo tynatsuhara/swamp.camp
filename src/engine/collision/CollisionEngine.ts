@@ -2,15 +2,40 @@ import { Point } from "../point"
 import { rectContains } from "../util/utils"
 import { Collider } from "./Collider"
 
+// TODO: This probably all breaks if there are colliders on multiple views
 export class CollisionEngine {
 
-    static instance: CollisionEngine = new CollisionEngine()
+    static instance: CollisionEngine
+    static readonly DEFAULT_LAYER = "default"
 
     private colliders: Collider[] = []
     private nextUpdateColliders: Collider[] = []
 
+    private matrix: Map<string, Set<string>>
+
     constructor() {
         CollisionEngine.instance = this
+        this.setCollisionMatrix(new Map())
+    }
+
+    /**
+     * @param matrix Each key in the matrix will collide with all of the values in the corresponding list (and vice-versa)
+     *               DEFAULT_LAYER will always collide with DEFAULT_LAYER
+     */
+    setCollisionMatrix(matrix: Map<string, string[]>) {
+        const bidirectional = new Map<string, Set<string>>()
+        bidirectional.set(CollisionEngine.DEFAULT_LAYER, new Set(CollisionEngine.DEFAULT_LAYER))
+
+        for (const r of Array.from(matrix.keys())) {
+            for (const c of matrix.get(r)) {
+                if (!bidirectional.has(r)) bidirectional.set(r, new Set())
+                bidirectional.get(r).add(c)
+                if (!bidirectional.has(c)) bidirectional.set(c, new Set())
+                bidirectional.get(c).add(r)
+            }
+        }
+
+        this.matrix = bidirectional
     }
 
     /**
@@ -57,9 +82,11 @@ export class CollisionEngine {
 
     checkCollider(collider: Collider) {
         this.removeDanglingColliders()
-        this.colliders.filter(other => other !== collider && other.enabled && other.isTrigger).forEach(other => {
-            const isColliding = other.getPoints().some(pt => collider.isWithinBounds(pt)) 
-                    || collider.getPoints().some(pt => other.isWithinBounds(pt))
+        const collidingLayers = this.matrix.get(collider.layer)
+
+        this.colliders.filter(other => other !== collider).forEach(other => {
+            const isColliding = other.enabled && collidingLayers.has(other.layer)
+                    && (other.getPoints().some(pt => collider.isWithinBounds(pt)) ||  collider.getPoints().some(pt => other.isWithinBounds(pt)))
             collider.updateColliding(other, isColliding)
             other.updateColliding(collider, isColliding)
         }) 
@@ -84,3 +111,5 @@ export class CollisionEngine {
         this.colliders = this.colliders.filter(other => !!other.entity)
     }
 }
+
+const engine = new CollisionEngine()
