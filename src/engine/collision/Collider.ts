@@ -35,7 +35,7 @@ export abstract class Collider extends Component {
     }
 
     start(startData: StartData) {
-        CollisionEngine.instance.checkCollider(this)
+        CollisionEngine.instance.checkAndUpdateCollisions(this)
     }
     
     update(updateData: UpdateData) {
@@ -48,13 +48,13 @@ export abstract class Collider extends Component {
         // TODO: Should these branches be handled by the caller?
         if (CollisionEngine.instance.canTranslate(this, new Point(dx, dy))) {
             this._position = point
-            CollisionEngine.instance.checkCollider(this)
+            CollisionEngine.instance.checkAndUpdateCollisions(this)
         } else if (CollisionEngine.instance.canTranslate(this, new Point(dx, 0))) {
             this._position = this._position.plus(new Point(dx, 0))
-            CollisionEngine.instance.checkCollider(this)
+            CollisionEngine.instance.checkAndUpdateCollisions(this)
         } else if (CollisionEngine.instance.canTranslate(this, new Point(0, dy))) {
             this._position = this._position.plus(new Point(0, dy))
-            CollisionEngine.instance.checkCollider(this)
+            CollisionEngine.instance.checkAndUpdateCollisions(this)
         }
         return this.position
     }

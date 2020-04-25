@@ -24,7 +24,7 @@ export class CollisionEngine {
      */
     setCollisionMatrix(matrix: Map<string, string[]>) {
         const bidirectional = new Map<string, Set<string>>()
-        bidirectional.set(CollisionEngine.DEFAULT_LAYER, new Set(CollisionEngine.DEFAULT_LAYER))
+        bidirectional.set(CollisionEngine.DEFAULT_LAYER, new Set([CollisionEngine.DEFAULT_LAYER]))
 
         for (const r of Array.from(matrix.keys())) {
             for (const c of matrix.get(r)) {
@@ -80,7 +80,7 @@ export class CollisionEngine {
         }
     }
 
-    checkCollider(collider: Collider) {
+    checkAndUpdateCollisions(collider: Collider) {
         this.removeDanglingColliders()
         const collidingLayers = this.matrix.get(collider.layer)
 

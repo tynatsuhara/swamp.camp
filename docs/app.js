@@ -706,7 +706,7 @@ System.register("engine/collision/Collider", ["engine/component", "engine/point"
                     configurable: true
                 });
                 Collider.prototype.start = function (startData) {
-                    CollisionEngine_1.CollisionEngine.instance.checkCollider(this);
+                    CollisionEngine_1.CollisionEngine.instance.checkAndUpdateCollisions(this);
                 };
                 Collider.prototype.update = function (updateData) {
                     CollisionEngine_1.CollisionEngine.instance.markCollider(this);
@@ -717,15 +717,15 @@ System.register("engine/collision/Collider", ["engine/component", "engine/point"
                     // TODO: Should these branches be handled by the caller?
                     if (CollisionEngine_1.CollisionEngine.instance.canTranslate(this, new point_6.Point(dx, dy))) {
                         this._position = point;
-                        CollisionEngine_1.CollisionEngine.instance.checkCollider(this);
+                        CollisionEngine_1.CollisionEngine.instance.checkAndUpdateCollisions(this);
                     }
                     else if (CollisionEngine_1.CollisionEngine.instance.canTranslate(this, new point_6.Point(dx, 0))) {
                         this._position = this._position.plus(new point_6.Point(dx, 0));
-                        CollisionEngine_1.CollisionEngine.instance.checkCollider(this);
+                        CollisionEngine_1.CollisionEngine.instance.checkAndUpdateCollisions(this);
                     }
                     else if (CollisionEngine_1.CollisionEngine.instance.canTranslate(this, new point_6.Point(0, dy))) {
                         this._position = this._position.plus(new point_6.Point(0, dy));
-                        CollisionEngine_1.CollisionEngine.instance.checkCollider(this);
+                        CollisionEngine_1.CollisionEngine.instance.checkAndUpdateCollisions(this);
                     }
                     return this.position;
                 };
@@ -843,7 +843,7 @@ System.register("engine/collision/CollisionEngine", ["engine/point", "engine/uti
                  */
                 CollisionEngine.prototype.setCollisionMatrix = function (matrix) {
                     var bidirectional = new Map();
-                    bidirectional.set(CollisionEngine.DEFAULT_LAYER, new Set(CollisionEngine.DEFAULT_LAYER));
+                    bidirectional.set(CollisionEngine.DEFAULT_LAYER, new Set([CollisionEngine.DEFAULT_LAYER]));
                     for (var _i = 0, _a = Array.from(matrix.keys()); _i < _a.length; _i++) {
                         var r = _a[_i];
                         for (var _b = 0, _c = matrix.get(r); _b < _c.length; _b++) {
@@ -895,7 +895,7 @@ System.register("engine/collision/CollisionEngine", ["engine/point", "engine/uti
                         return to;
                     }
                 };
-                CollisionEngine.prototype.checkCollider = function (collider) {
+                CollisionEngine.prototype.checkAndUpdateCollisions = function (collider) {
                     this.removeDanglingColliders();
                     var collidingLayers = this.matrix.get(collider.layer);
                     this.colliders.filter(function (other) { return other !== collider; }).forEach(function (other) {
@@ -2947,7 +2947,7 @@ System.register("game/items/Coin", ["engine/component", "engine/tiles/AnimatedTi
                         var pos = position.minus(new point_21.Point(_this.animation.transform.dimensions.x / 2, _this.animation.transform.dimensions.y));
                         _this.animation.transform.position = pos;
                         _this.animation.transform.depth = pos.y;
-                        _this.collider = _this.entity.addComponent(new BoxCollider_2.BoxCollider(pos, _this.animation.transform.dimensions, true).onColliderEnter(function (c) { return _this.collide(c); }));
+                        _this.entity.addComponent(new BoxCollider_2.BoxCollider(pos, _this.animation.transform.dimensions, true).onColliderEnter(function (c) { return _this.collide(c); }));
                     };
                     return _this;
                 }

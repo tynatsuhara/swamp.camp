@@ -12,7 +12,6 @@ import { LocationManager } from "../world/LocationManager"
 export class Coin extends Component {
 
     private animation: AnimatedTileComponent
-    private collider: Collider
 
     /**
      * @param position The bottom center where the item should be placed
@@ -29,7 +28,7 @@ export class Coin extends Component {
             this.animation.transform.position = pos
             this.animation.transform.depth = pos.y
 
-            this.collider = this.entity.addComponent(
+            this.entity.addComponent(
                 new BoxCollider(pos, this.animation.transform.dimensions, true).onColliderEnter(c => this.collide(c))
             )
         }
