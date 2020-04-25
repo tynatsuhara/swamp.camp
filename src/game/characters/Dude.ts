@@ -6,9 +6,9 @@ import { BoxCollider } from "../../engine/collision/BoxCollider"
 import { Tilesets } from "../graphics/Tilesets"
 import { Weapon } from "./Weapon"
 import { Entity } from "../../engine/Entity"
-import { DynamicEntityManager } from "../DynamicEntityManager"
 import { Coin } from "../items/Coin"
 import { Inventory } from "../items/Inventory"
+import { LocationManager } from "../world/LocationManager"
 
 export class Dude extends Component {
     
@@ -104,7 +104,7 @@ export class Dude extends Component {
     }
 
     private spawnDrop() {
-        DynamicEntityManager.instance.add(new Entity([new Coin(this.standingPosition.minus(new Point(0, 2)))]))
+        LocationManager.instance.currentLocation.dynamic.add(new Entity([new Coin(this.standingPosition.minus(new Point(0, 2)))]))
     }
 
     private dropWeapon() {

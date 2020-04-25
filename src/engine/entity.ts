@@ -6,8 +6,6 @@ import { Component } from "./component"
 export class Entity {
     components: Component[] = []
 
-    // TODO: support hierarchical components?
-
     constructor(components: Component[] = []) {
         components.forEach(c => this.addComponent(c))
     }

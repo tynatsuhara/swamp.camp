@@ -1,14 +1,12 @@
 import { Component } from "../../engine/component"
-import { UpdateData } from "../../engine/engine"
 import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
 import { Point } from "../../engine/point"
 import { Tilesets } from "../graphics/Tilesets"
-import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Collider } from "../../engine/collision/Collider"
 import { BoxCollider } from "../../engine/collision/BoxCollider"
 import { Player } from "../characters/Player"
-import { DynamicEntityManager } from "../DynamicEntityManager"
 import { Dude } from "../characters/Dude"
+import { LocationManager } from "../world/LocationManager"
 
 // TODO: Some kind of "item" base class for dropped items
 export class Coin extends Component {
@@ -43,7 +41,8 @@ export class Coin extends Component {
             const d = player.entity.getComponent(Dude)
             if (d.isAlive) {
                 player.entity.getComponent(Dude).inventory.coins++
-                DynamicEntityManager.instance.delete(this.entity)
+                LocationManager.instance.currentLocation.dynamic.delete(this.entity)
+                this.entity.selfDestruct()
             }
         }
     }

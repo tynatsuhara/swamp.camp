@@ -4,6 +4,7 @@ import { InputKey } from "../../engine/input"
 import { Point } from "../../engine/point"
 import { Component } from "../../engine/component"
 import { Dude } from "./Dude"
+import { Interactable } from "../interact/Interactable"
 
 export class Player extends Component {
 
@@ -50,6 +51,10 @@ export class Player extends Component {
             this.dude.weapon.attack()
         }
 
+        if (updateData.input.isKeyDown(InputKey.E)) {
+            this.interact(updateData)
+        }
+
         // FOR TESTING
         if (updateData.input.isKeyDown(InputKey.P)) {
             this.dude.damage(.25, new Point(Math.random()-.5, Math.random()-.5), 30)
@@ -67,5 +72,26 @@ export class Player extends Component {
         // if (updateData.input.isKeyDown(InputKey.E)) {
         //     game.tiles.get(crosshairTilePosition)?.getComponent(Interactable)?.interact()
         // }
+    }
+
+    private interact(updateData: UpdateData) {
+        const interactDistance = 20
+        const interactCenter = this.dude.standingPosition.minus(new Point(0, 5))
+        const possibilities = updateData.view.entities
+                .map(e => e.getComponent(Interactable))
+                .filter(e => !!e)
+                .filter(e => this.dude.animation.transform.mirrorX === (e.position.x < interactCenter.x))  // interactables the dude is facing
+        
+        let closestDist = Number.MAX_SAFE_INTEGER
+        let closest: Interactable
+        for (const i of possibilities) {
+            const dist = i.position.distanceTo(interactCenter)
+            if (dist < interactDistance && dist < closestDist) {
+                closestDist = dist
+                closest = i
+            }
+        }
+
+        closest?.interact()
     }
 }

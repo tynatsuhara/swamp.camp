@@ -1,4 +1,3 @@
-import { TileLoader } from "./TileLoader"
 import { SingleFileTileLoader } from "./SingleFileTileLoader"
 import { DungeonTilesetII } from "./DungeonTilesetII"
 import { TileSource } from "../../engine/tiles/TileSource"
@@ -24,7 +23,13 @@ export class Tilesets {
     readonly indoorTiles = new SingleFileTileLoader("images/env_indoor.png")
     readonly outdoorTiles = new SingleFileTileLoader("images/env_outdoor_recolor.png", new Map([
         ["tree1base", new Point(13, 11)],
-        ["tree1top", new Point(13, 10)]
+        ["tree1top", new Point(13, 10)],
+        ["redtentNW", new Point(46, 10)],
+        ["redtentNE", new Point(47, 10)],
+        ["redtentSW", new Point(46, 11)],
+        ["redtentSE", new Point(47, 11)],
+        ["campfireOff", new Point(13, 8)],
+        ["campfireOn", new Point(14, 8)],
     ]))
     readonly oneBit = new OneBitTileset()
     readonly otherCharacters = new SplitFileTileLoader("images/individual_characters")

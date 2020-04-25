@@ -9,7 +9,7 @@ import { Dude } from "./Dude"
 import { Animator } from "../../engine/util/Animator"
 import { BoxCollider } from "../../engine/collision/BoxCollider"
 import { Player } from "./Player"
-import { DynamicEntityManager } from "../DynamicEntityManager"
+import { LocationManager } from "../world/LocationManager"
 
 enum State {
     SHEATHED,
@@ -50,7 +50,7 @@ export class Weapon extends Component {
 
     // TODO find a better place for this?
     static damageInFrontOfDude(dude: Dude, attackDistance: number) {
-        DynamicEntityManager.instance.getEntities()
+        Array.from(LocationManager.instance.currentLocation.dynamic)
                 .map(e => e.getComponent(Dude))
                 .filter(d => !!d && d !== dude)
                 .filter(d => dude.animation.transform.mirrorX === (d.standingPosition.x < dude.standingPosition.x))  // enemies the dude is facing
@@ -117,6 +117,9 @@ export class Weapon extends Component {
     attack() {
         if (this.state === State.DRAWN) {
             setTimeout(() => {
+                if (!this.enabled) {
+                    return
+                }
                 const attackDistance = this.weaponSprite.transform.dimensions.y + 4  // add a tiny buffer for small weapons like the dagger to still work
                 Weapon.damageInFrontOfDude(this.dude, attackDistance)
             }, 100)

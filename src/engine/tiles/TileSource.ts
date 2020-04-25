@@ -2,6 +2,7 @@ import { Point } from "../point"
 import { ImageRender } from "../renderer/ImageRender"
 import { TileTransform } from "./TileTransform"
 import { TileComponent } from "./TileComponent"
+import { Entity } from "../Entity"
 
 export class TileSource {
     private image: CanvasImageSource
@@ -35,8 +36,11 @@ export class TileSource {
         )
     }
 
-    // Shorthand for turning a TileSource into a TileComponent at a given point (will be multiplied by the dimensions)
-    at(pt: Point) {
-        return new TileComponent(this, new TileTransform(new Point(pt.x * this.dimensions.x, pt.y * this.dimensions.y)))
+    // Shorthand for turning a TileSource into an Entity at a given point (will be multiplied by the dimensions)
+    at(pt: Point): Entity {
+        return new Entity([new TileComponent(
+            this, 
+            new TileTransform(new Point(pt.x * this.dimensions.x, pt.y * this.dimensions.y)))
+        ])
     }
 }

@@ -4,7 +4,7 @@ import { Component } from "../../engine/component"
 import { Player } from "./Player"
 import { Dude } from "./Dude"
 import { NPC } from "./NPC"
-import { DynamicEntityManager } from "../DynamicEntityManager"
+import { LocationManager } from "../world/LocationManager"
 
 export class DudeFactory {
 
@@ -26,7 +26,7 @@ export class DudeFactory {
 
     private make(archetype: string, pos: Point, weapon: string, ...additionalComponents: Component[]) {
         const e = new Entity([new Dude(archetype, pos, weapon) as Component].concat(additionalComponents))
-        DynamicEntityManager.instance.add(e)
+        LocationManager.instance.currentLocation.dynamic.add(e)
         return e.getComponent(Dude)
     }
 }

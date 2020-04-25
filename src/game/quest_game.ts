@@ -3,46 +3,39 @@ import { Point } from "../engine/point"
 import { Game } from "../engine/game"
 import { UpdateViewsContext } from "../engine/engine"
 import { View } from "../engine/View"
-import { MapGenerator } from "./MapGenerator"
+import { MapGenerator } from "./world/MapGenerator"
 import { Tilesets, TILE_SIZE } from "./graphics/Tilesets"
 import { DudeFactory } from "./characters/DudeFactory"
-import { DynamicEntityManager } from "./DynamicEntityManager"
 import { HUD } from "./ui/HUD"
-import { TileEntityManager } from "./TileEntityManager"
+import { LocationManager } from "./world/LocationManager"
+import { Dude } from "./characters/Dude"
 
 
 const ZOOM = 3.125
 
 export class QuestGame extends Game {
 
+    private locationManager: LocationManager
+    private player: Dude
+
     readonly tilesets = new Tilesets()
-
-    readonly dynamicEntityManager = new DynamicEntityManager()
-    readonly tileEntityManager = new TileEntityManager()
-
     readonly dudeFactory = new DudeFactory()
-    readonly player = this.dudeFactory.newPlayer(new Point(-2, 2).times(TILE_SIZE))
     readonly hud = new HUD()
     
     private gameEntityView: View = new View()
     private uiView: View = new View()
 
     initialize() {
+        // World must be initialized before we do anything else
+        const mapGen = new MapGenerator()
+        const world = mapGen.doIt()
+        this.locationManager = new LocationManager(world)
+
+        this.player = this.dudeFactory.newPlayer(new Point(-2, 2).times(TILE_SIZE))
+
+        // TEST: Spawn some guys
         this.dudeFactory.newElf(new Point(20, 30))
         this.dudeFactory.newImp(new Point(80, 30))
-
-        // this.enemies.push(new Entity([new Dude("goblin", new Point(80, 30)), new NPC()]))
-
-        // const rockPt = new Point(5, 5)
-        // this.tiles.set(rockPt, new Entity([
-        //     new TileComponent(Tile.ROCKS, rockPt.times(TILE_SIZE)),
-        //     new Clickable(rockPt.times(TILE_SIZE), new Point(TILE_SIZE, TILE_SIZE), () => console.log("clicked a fuckin' rock!")),
-        //     new Interactable(() => console.log("interacted with a fuckin' rock!")),
-        //     new BoxCollider(rockPt.times(TILE_SIZE), new Point(TILE_SIZE, TILE_SIZE))
-        // ]))
-
-        const mapGen = new MapGenerator()
-        mapGen.doIt()
     }
 
     // entities in the world space
@@ -61,7 +54,7 @@ export class QuestGame extends Game {
         this.gameEntityView = { 
             zoom: ZOOM,
             offset: this.gameEntityView.offset.lerp(.0018 * updateViewsContext.elapsedTimeMillis, cameraGoal),
-            entities: this.tileEntityManager.entries().concat(this.dynamicEntityManager.getEntities())
+            entities: this.locationManager.currentLocation.getEntities()
         }
 
         this.uiView = {

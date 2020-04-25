@@ -4,6 +4,7 @@ html, body {
     height: 100%;
     -webkit-font-smoothing: none;
     -moz-osx-font-smoothing: none;
+    cursor: url(cursor.png), default;	
 }
 
 #column {
@@ -25,8 +26,4 @@ canvas {
     image-rendering: -webkit-crisp-edges; /* Webkit (Safari) */
     image-rendering: pixelated;           /* Chrome */
     image-rendering: crisp-edges;
-}
-
-html {
-    cursor: url(cursor.png), default;	
 }

@@ -1,7 +1,6 @@
 import { TileSource } from "../../engine/tiles/TileSource"
 import { Point } from "../../engine/point"
 import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
-import { TileLoader } from "./TileLoader"
 import { assets } from "../../engine/Assets"
 
 const map = new Map(`
@@ -220,7 +219,7 @@ const map = new Map(`
 /**
  * A custom tile loader for the special string-based format 
  */
-export class DungeonTilesetII implements TileLoader {
+export class DungeonTilesetII {
 
     getTileSource(key: string): TileSource {
         const row = map.get(key)

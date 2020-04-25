@@ -1,9 +1,9 @@
-import { TileLoader } from "./TileLoader"
 import { TileSource } from "../../engine/tiles/TileSource"
 import { assets } from "../../engine/Assets"
 import { Point } from "../../engine/point"
+import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
 
-export class SplitFileTileLoader implements TileLoader {
+export class SplitFileTileLoader {
 
     private readonly dirPath: string
 
@@ -23,7 +23,7 @@ export class SplitFileTileLoader implements TileLoader {
         )
     }
     
-    getTileSetAnimation(key: string, speed: number): import("engine/tiles/TileSetAnimation").TileSetAnimation {
+    getTileSetAnimation(key: string, speed: number): TileSetAnimation {
         throw new Error("Method not implemented.")
     }
 }

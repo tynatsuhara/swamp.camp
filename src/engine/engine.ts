@@ -6,6 +6,7 @@ import { View } from "./View"
 import { profiler, measure } from "./profiler"
 import { debug } from "./debug"
 import { assets } from "./Assets"
+import { CollisionEngine } from "./collision/CollisionEngine"
 
 export class UpdateViewsContext {
     readonly elapsedTimeMillis: number
@@ -47,6 +48,8 @@ export class Engine {
         if (elapsed == 0) {
             return
         }
+
+        CollisionEngine.instance.nextUpdate()
     
         const updateViewsContext: UpdateViewsContext = {
             elapsedTimeMillis: elapsed,
@@ -65,7 +68,7 @@ export class Engine {
                     input: updateViewsContext.input.scaledForView(v),
                     dimensions: updateViewsContext.dimensions.div(v.zoom)
                 }
-                // TODO: consider the behavior where an entity belongs to multiple views (eg splitscreen)
+                // Behavior where an entity belongs to multiple views is undefined (revisit later, eg for splitscreen)
                 v.entities.forEach(e => e.components.forEach(c => {
                     if (!c.enabled) {
                         return
@@ -93,7 +96,6 @@ export class Engine {
     }
 
     private getViews(context: UpdateViewsContext): View[] {
-        // TODO editor
         return this.game.getViews(context).concat(debug.showProfiler ? [profiler.getView()] : [])
     }
 }
