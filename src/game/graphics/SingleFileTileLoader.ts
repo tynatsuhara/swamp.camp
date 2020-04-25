@@ -20,7 +20,7 @@ export class SingleFileTileLoader {
     getTileSource(key: string): TileSource {
         const result = this.map.get(key)
         if (!result) {
-            return null
+            throw new Error(`${key} is not a valid tile`)
         }
         return this.getTileAt(result)
     }

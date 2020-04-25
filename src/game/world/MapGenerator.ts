@@ -9,10 +9,12 @@ import { Campfire } from "./elements/Campfire"
 import { makeTent, TentColor } from "./elements/Tent"
 import { makeTree, TreeType } from "./elements/Tree"
 import { TileComponent } from "../../engine/tiles/TileComponent"
+import { makeRock } from "./elements/Rock"
 
 const MAP_SIZE = 40
 
 export class MapGenerator {
+
 
     readonly oldPathSchema = new ConnectingTileSchema()
             .vertical(Tilesets.instance.outdoorTiles.getTileAt(new Point(9, 7)))
@@ -47,6 +49,7 @@ export class MapGenerator {
         this.renderPath(new Point(10, -10), new Point(-10, 10), this.pathSchema, 5)
 
         this.spawnTrees()
+        this.spawnRocks()
 
         // spawn grass last, stuff checks for existing paths prior to this by the lack of ground items
         this.placeGrass()
@@ -64,6 +67,20 @@ export class MapGenerator {
             const occupiedPoints = [pt, pt.plus(new Point(0, 1))]
             if (occupiedPoints.every(p => !this.location.stuff.get(p) && !this.location.ground.get(p))) {
                 makeTree(this.location, pt, Math.random() < .7 ? TreeType.POINTY : TreeType.ROUND)
+            }
+        }
+    }
+
+    spawnRocks() {
+        let placedRocks = 0
+        while (placedRocks < 20) {
+            const p = new Point(
+                Math.floor(Math.random() * MAP_SIZE) - MAP_SIZE/2,
+                Math.floor(Math.random() * (MAP_SIZE)) - MAP_SIZE/2,
+            )
+            if (!this.location.stuff.get(p) && !this.location.ground.get(p)) {
+                makeRock(this.location, p)
+                placedRocks++
             }
         }
     }
