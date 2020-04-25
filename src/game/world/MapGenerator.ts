@@ -9,7 +9,8 @@ import { TileSource } from "../../engine/tiles/TileSource"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { Collider } from "../../engine/collision/Collider"
 import { WorldLocation } from "./WorldLocation"
-import { Campfire } from "../interact/Campfire"
+import { Campfire } from "./elements/Campfire"
+import { makeTent, TentColor } from "./elements/Tent"
 
 export class MapGenerator {
 
@@ -33,26 +34,22 @@ export class MapGenerator {
 
     doIt(): WorldLocation {
         // spawn tent
-        const tentPt = new Point(5, 5)
-        this.spawnStuff(tentPt, Tilesets.instance.outdoorTiles.getTileSource("redtentNW"), false, true)
-        this.spawnStuff(tentPt.plus(new Point(1, 0)), Tilesets.instance.outdoorTiles.getTileSource("redtentNE"), false, true)
-        this.spawnStuff(tentPt.plus(new Point(0, 1)), Tilesets.instance.outdoorTiles.getTileSource("redtentSW"), true, false)
-        this.spawnStuff(tentPt.plus(new Point(1, 1)), Tilesets.instance.outdoorTiles.getTileSource("redtentSE"), true, false)
+        makeTent(this.location, new Point(5, 5), TentColor.red)
 
         // spawn campfire
-        const campfirePos = tentPt.plus(new Point(-2, 4))
+        const campfirePos = new Point(3, 9)
         this.location.stuff.set(campfirePos, new Entity([new Campfire(campfirePos)]))
 
-        // make some roads
+
+        // make the ground
         this.renderPath(new Point(-10, -10), new Point(10, 10), this.pathSchema, 2)
         this.renderPath(new Point(10, -10), new Point(-10, 10), this.pathSchema, 5)
-
         this.placeGrass()
 
         return this.location
     }
 
-    private spawnStuff(pt: Point, tileSource: TileSource, addCollider: boolean = false, walkBehind: boolean = false) {
+    private spawnStuff(pt: Point, tileSource: TileSource, addCollider: boolean = false, walkBehind: boolean = false): Entity {
         const e = tileSource.at(pt)
         this.location.stuff.set(pt, e)
         if (addCollider) {
@@ -60,6 +57,7 @@ export class MapGenerator {
         } else if (walkBehind) {
             e.getComponent(TileComponent).transform.depth = (pt.y + 1) * TILE_SIZE + /* prevent clipping */ 5
         }
+        return e
     }
 
     renderPath(

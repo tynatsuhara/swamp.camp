@@ -1,5 +1,5 @@
-import { Component } from "../../engine/component";
-import { Point } from "../../engine/point"
+import { Component } from "../../../engine/component";
+import { Point } from "../../../engine/point"
 
 export class Interactable extends Component {
 

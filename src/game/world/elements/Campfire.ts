@@ -1,11 +1,11 @@
-import { Component } from "../../engine/component"
-import { TileComponent } from "../../engine/tiles/TileComponent"
-import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
-import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
-import { TileTransform } from "../../engine/tiles/TileTransform"
-import { Point } from "../../engine/point"
+import { Component } from "../../../engine/component"
+import { TileComponent } from "../../../engine/tiles/TileComponent"
+import { AnimatedTileComponent } from "../../../engine/tiles/AnimatedTileComponent"
+import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
+import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { Point } from "../../../engine/point"
 import { Interactable } from "./Interactable"
-import { BoxCollider } from "../../engine/collision/BoxCollider"
+import { BoxCollider } from "../../../engine/collision/BoxCollider"
 
 export class Campfire extends Component {
 

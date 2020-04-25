@@ -4,7 +4,7 @@ import { InputKey } from "../../engine/input"
 import { Point } from "../../engine/point"
 import { Component } from "../../engine/component"
 import { Dude } from "./Dude"
-import { Interactable } from "../interact/Interactable"
+import { Interactable } from "../world/elements/Interactable"
 
 export class Player extends Component {
 
