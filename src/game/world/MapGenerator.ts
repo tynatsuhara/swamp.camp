@@ -33,13 +33,14 @@ export class MapGenerator {
     private readonly location = new WorldLocation()
 
     doIt(): WorldLocation {
+        const tentLocation = new WorldLocation()
+        
         // spawn tent
-        makeTent(this.location, new Point(5, 5), TentColor.red)
+        makeTent(this.location, new Point(5, 5), TentColor.red, tentLocation)
 
         // spawn campfire
         const campfirePos = new Point(3, 9)
         this.location.stuff.set(campfirePos, new Entity([new Campfire(campfirePos)]))
-
 
         // make the ground
         this.renderPath(new Point(-10, -10), new Point(10, 10), this.pathSchema, 2)
@@ -47,17 +48,6 @@ export class MapGenerator {
         this.placeGrass()
 
         return this.location
-    }
-
-    private spawnStuff(pt: Point, tileSource: TileSource, addCollider: boolean = false, walkBehind: boolean = false): Entity {
-        const e = tileSource.at(pt)
-        this.location.stuff.set(pt, e)
-        if (addCollider) {
-            e.addComponent(new BoxCollider(pt.times(TILE_SIZE), new Point(TILE_SIZE, TILE_SIZE)))
-        } else if (walkBehind) {
-            e.getComponent(TileComponent).transform.depth = (pt.y + 1) * TILE_SIZE + /* prevent clipping */ 5
-        }
-        return e
     }
 
     renderPath(

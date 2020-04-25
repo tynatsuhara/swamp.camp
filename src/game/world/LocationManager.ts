@@ -1,4 +1,5 @@
 import { WorldLocation } from "./WorldLocation"
+import { Player } from "../characters/Player"
 
 export class LocationManager {
     
@@ -15,7 +16,10 @@ export class LocationManager {
     }
 
     transition(to: WorldLocation) {
+        // Move player
+        this.currentLocation.dynamic.delete(Player.instance.entity)
+        to.dynamic.add(Player.instance.entity)
+
         this.current = to
-        // TODO
     }
 }

@@ -6,6 +6,7 @@ import { assets } from "../../engine/Assets"
 import { SplitFileTileLoader } from "./SplitFileTileLoader"
 import { Point } from "../../engine/point"
 import { OneBitTileset } from "./OneBitTileset"
+import { OutdoorTileset } from "./OutdoorTileset"
 
 // standard tile size
 export const TILE_SIZE = 16
@@ -21,16 +22,7 @@ export class Tilesets {
     readonly tilemap = new SingleFileTileLoader("images/tilemap.png")
     readonly dungeonTiles = new SingleFileTileLoader("images/env_dungeon.png")
     readonly indoorTiles = new SingleFileTileLoader("images/env_indoor.png")
-    readonly outdoorTiles = new SingleFileTileLoader("images/env_outdoor_recolor.png", new Map([
-        ["tree1base", new Point(13, 11)],
-        ["tree1top", new Point(13, 10)],
-        ["redtentNW", new Point(46, 10)],
-        ["redtentNE", new Point(47, 10)],
-        ["redtentSW", new Point(46, 11)],
-        ["redtentSE", new Point(47, 11)],
-        ["campfireOff", new Point(13, 8)],
-        ["campfireOn", new Point(14, 8)],
-    ]))
+    readonly outdoorTiles = new OutdoorTileset()
     readonly oneBit = new OneBitTileset()
     readonly otherCharacters = new SplitFileTileLoader("images/individual_characters")
 
