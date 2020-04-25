@@ -2947,10 +2947,11 @@ System.register("game/items/DroppedItem", ["engine/component", "engine/tiles/Ani
                 /**
                  * @param position The bottom center where the item should be placed
                  */
-                function DroppedItem(position, animation) {
+                function DroppedItem(position, item) {
                     var _this = _super.call(this) || this;
+                    _this.itemType = item;
                     _this.start = function (startData) {
-                        _this.animation = _this.entity.addComponent(new AnimatedTileComponent_2.AnimatedTileComponent([animation]));
+                        _this.animation = _this.entity.addComponent(new AnimatedTileComponent_2.AnimatedTileComponent([item.droppedIconSupplier()]));
                         var pos = position.minus(new point_21.Point(_this.animation.transform.dimensions.x / 2, _this.animation.transform.dimensions.y));
                         _this.animation.transform.position = pos;
                         _this.animation.transform.depth = pos.y;
@@ -2963,7 +2964,7 @@ System.register("game/items/DroppedItem", ["engine/component", "engine/tiles/Ani
                     if (!!player) {
                         var d = player.entity.getComponent(Dude_2.Dude);
                         if (d.isAlive) {
-                            player.entity.getComponent(Dude_2.Dude).inventory.coins++;
+                            player.entity.getComponent(Dude_2.Dude).inventory.addItem(this.itemType);
                             LocationManager_2.LocationManager.instance.currentLocation.dynamic.delete(this.entity);
                             this.entity.selfDestruct();
                         }
@@ -2976,56 +2977,104 @@ System.register("game/items/DroppedItem", ["engine/component", "engine/tiles/Ani
         }
     };
 });
-System.register("game/items/Coin", ["game/graphics/Tilesets", "game/items/DroppedItem"], function (exports_43, context_43) {
+System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", "game/world/LocationManager", "game/items/DroppedItem"], function (exports_43, context_43) {
     "use strict";
-    var Tilesets_3, DroppedItem_1, Coin;
+    var Tilesets_3, Entity_3, LocationManager_3, DroppedItem_1, Item, Items, spawnItem;
     var __moduleName = context_43 && context_43.id;
     return {
         setters: [
             function (Tilesets_3_1) {
                 Tilesets_3 = Tilesets_3_1;
             },
+            function (Entity_3_1) {
+                Entity_3 = Entity_3_1;
+            },
+            function (LocationManager_3_1) {
+                LocationManager_3 = LocationManager_3_1;
+            },
             function (DroppedItem_1_1) {
                 DroppedItem_1 = DroppedItem_1_1;
             }
         ],
         execute: function () {
-            // TODO: Some kind of "item" base class for dropped items
-            Coin = /** @class */ (function (_super) {
-                __extends(Coin, _super);
-                /**
-                 * @param position The bottom center where the item should be placed
-                 */
-                function Coin(position) {
-                    return _super.call(this, position, Tilesets_3.Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)) || this;
+            Item = /** @class */ (function () {
+                function Item(droppedIconSupplier, stackLimit) {
+                    if (stackLimit === void 0) { stackLimit = 1; }
+                    this.droppedIconSupplier = droppedIconSupplier;
+                    this.stackLimit = stackLimit;
                 }
-                return Coin;
-            }(DroppedItem_1.DroppedItem));
-            exports_43("Coin", Coin);
+                return Item;
+            }());
+            exports_43("Item", Item);
+            exports_43("Items", Items = {
+                COIN: new Item(function () { return Tilesets_3.Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150); }),
+                WOOD: new Item(function () { return Tilesets_3.Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150); }, 100),
+            });
+            exports_43("spawnItem", spawnItem = function (pos, item) {
+                LocationManager_3.LocationManager.instance.currentLocation.dynamic.add(new Entity_3.Entity([new DroppedItem_1.DroppedItem(pos, item)]));
+            });
         }
     };
 });
 System.register("game/items/Inventory", [], function (exports_44, context_44) {
     "use strict";
-    var Inventory;
+    var ItemStack, Inventory;
     var __moduleName = context_44 && context_44.id;
     return {
         setters: [],
         execute: function () {
+            ItemStack = /** @class */ (function () {
+                function ItemStack(item, count) {
+                    this.item = item;
+                    this.count = count;
+                }
+                return ItemStack;
+            }());
             // TODO flesh this out more when we have more items
             Inventory = /** @class */ (function () {
                 function Inventory() {
-                    this.coins = 0;
+                    this.inventory = Array.from({ length: 20 });
+                    this.countMap = new Map();
                 }
+                /**
+                 * returns true if the item can fit in the inventory
+                 */
+                Inventory.prototype.addItem = function (item) {
+                    var _a, _b;
+                    var firstEmptySlot = -1;
+                    for (var i = 0; i < this.inventory.length; i++) {
+                        var slotValue = this.inventory[i];
+                        if (!!slotValue) {
+                            if (slotValue.item === item && slotValue.count < item.stackLimit) {
+                                slotValue.count++;
+                                this.countMap.set(item, 1 + ((_a = this.countMap.get(item)) !== null && _a !== void 0 ? _a : 0));
+                                return true;
+                            }
+                        }
+                        else if (firstEmptySlot === -1) {
+                            firstEmptySlot = i;
+                        }
+                    }
+                    if (firstEmptySlot !== -1) {
+                        this.inventory[firstEmptySlot] = new ItemStack(item, 1);
+                        this.countMap.set(item, 1 + ((_b = this.countMap.get(item)) !== null && _b !== void 0 ? _b : 0));
+                        return true;
+                    }
+                    return false;
+                };
+                Inventory.prototype.getItemCount = function (item) {
+                    var _a;
+                    return (_a = this.countMap.get(item)) !== null && _a !== void 0 ? _a : 0;
+                };
                 return Inventory;
             }());
             exports_44("Inventory", Inventory);
         }
     };
 });
-System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "engine/point", "engine/component", "engine/collision/BoxCollider", "game/graphics/Tilesets", "game/characters/Weapon", "engine/Entity", "game/items/Coin", "game/items/Inventory", "game/world/LocationManager"], function (exports_45, context_45) {
+System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "engine/point", "engine/component", "engine/collision/BoxCollider", "game/graphics/Tilesets", "game/characters/Weapon", "game/items/Inventory", "game/items/Items"], function (exports_45, context_45) {
     "use strict";
-    var AnimatedTileComponent_3, point_22, component_9, BoxCollider_3, Tilesets_4, Weapon_1, Entity_3, Coin_1, Inventory_1, LocationManager_3, Dude;
+    var AnimatedTileComponent_3, point_22, component_9, BoxCollider_3, Tilesets_4, Weapon_1, Inventory_1, Items_1, Dude;
     var __moduleName = context_45 && context_45.id;
     return {
         setters: [
@@ -3047,17 +3096,11 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
             function (Weapon_1_1) {
                 Weapon_1 = Weapon_1_1;
             },
-            function (Entity_3_1) {
-                Entity_3 = Entity_3_1;
-            },
-            function (Coin_1_1) {
-                Coin_1 = Coin_1_1;
-            },
             function (Inventory_1_1) {
                 Inventory_1 = Inventory_1_1;
             },
-            function (LocationManager_3_1) {
-                LocationManager_3 = LocationManager_3_1;
+            function (Items_1_1) {
+                Items_1 = Items_1_1;
             }
         ],
         execute: function () {
@@ -3157,7 +3200,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     this.dropWeapon();
                 };
                 Dude.prototype.spawnDrop = function () {
-                    LocationManager_3.LocationManager.instance.currentLocation.dynamic.add(new Entity_3.Entity([new Coin_1.Coin(this.standingPosition.minus(new point_22.Point(0, 2)))]));
+                    Items_1.spawnItem(this.standingPosition.minus(new point_22.Point(0, 2)), Items_1.Items.COIN);
                 };
                 Dude.prototype.dropWeapon = function () {
                     // TODO
@@ -3657,6 +3700,7 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/Connec
                     this.renderPath(new point_27.Point(10, -10), new point_27.Point(-10, 10), this.pathSchema, 5);
                     this.spawnTrees();
                     this.spawnRocks();
+                    // TODO short trees, bushes, fruit, tall grass, etc
                     // spawn grass last, stuff checks for existing paths prior to this by the lack of ground items
                     this.placeGrass();
                     return this.location;
@@ -3897,9 +3941,9 @@ System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tiles
         }
     };
 });
-System.register("game/ui/HUD", ["engine/tiles/AnimatedTileComponent", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point", "engine/tiles/TileComponent", "engine/Entity", "engine/renderer/BasicRenderComponent", "engine/renderer/TextRender"], function (exports_56, context_56) {
+System.register("game/ui/HUD", ["engine/tiles/AnimatedTileComponent", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point", "engine/tiles/TileComponent", "engine/Entity", "engine/renderer/BasicRenderComponent", "engine/renderer/TextRender", "game/items/Items"], function (exports_56, context_56) {
     "use strict";
-    var AnimatedTileComponent_4, Tilesets_10, TileTransform_11, point_30, TileComponent_8, Entity_9, BasicRenderComponent_2, TextRender_2, HUD;
+    var AnimatedTileComponent_4, Tilesets_10, TileTransform_11, point_30, TileComponent_8, Entity_9, BasicRenderComponent_2, TextRender_2, Items_2, HUD;
     var __moduleName = context_56 && context_56.id;
     return {
         setters: [
@@ -3926,6 +3970,9 @@ System.register("game/ui/HUD", ["engine/tiles/AnimatedTileComponent", "game/grap
             },
             function (TextRender_2_1) {
                 TextRender_2 = TextRender_2_1;
+            },
+            function (Items_2_1) {
+                Items_2 = Items_2_1;
             }
         ],
         execute: function () {
@@ -3943,7 +3990,7 @@ System.register("game/ui/HUD", ["engine/tiles/AnimatedTileComponent", "game/grap
                 }
                 HUD.prototype.get = function (player) {
                     this.updateHearts(player.health, player.maxHealth);
-                    this.updateCoins(player.inventory.coins);
+                    this.updateCoins(player.inventory.getItemCount(Items_2.Items.COIN));
                     return this.entity;
                 };
                 HUD.prototype.updateHearts = function (health, maxHealth) {

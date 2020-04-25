@@ -8,20 +8,23 @@ import { Player } from "../characters/Player"
 import { Dude } from "../characters/Dude"
 import { LocationManager } from "../world/LocationManager"
 import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
+import { Item } from "./Items"
 
 export class DroppedItem extends Component {
 
     static readonly COLLISION_LAYER = "item"
 
     private animation: AnimatedTileComponent
+    private itemType: Item
 
     /**
      * @param position The bottom center where the item should be placed
      */
-    constructor(position: Point, animation: TileSetAnimation) {
+    constructor(position: Point, item: Item) {
         super()
+        this.itemType = item
         this.start = (startData) => {
-            this.animation = this.entity.addComponent(new AnimatedTileComponent([animation]))
+            this.animation = this.entity.addComponent(new AnimatedTileComponent([item.droppedIconSupplier()]))
             const pos = position.minus(new Point(
                 this.animation.transform.dimensions.x/2,
                 this.animation.transform.dimensions.y
@@ -40,7 +43,7 @@ export class DroppedItem extends Component {
         if (!!player) {
             const d = player.entity.getComponent(Dude)
             if (d.isAlive) {
-                player.entity.getComponent(Dude).inventory.coins++
+                player.entity.getComponent(Dude).inventory.addItem(this.itemType)
                 LocationManager.instance.currentLocation.dynamic.delete(this.entity)
                 this.entity.selfDestruct()
             }

@@ -51,6 +51,8 @@ export class MapGenerator {
         this.spawnTrees()
         this.spawnRocks()
 
+        // TODO short trees, bushes, fruit, tall grass, etc
+
         // spawn grass last, stuff checks for existing paths prior to this by the lack of ground items
         this.placeGrass()
 

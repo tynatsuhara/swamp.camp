@@ -9,6 +9,7 @@ import { StringTiles } from "./StringTiles"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
 import { TextRender } from "../../engine/renderer/TextRender"
 import { Component } from "../../engine/component"
+import { Items } from "../items/Items"
 
 export class HUD {
 
@@ -33,7 +34,7 @@ export class HUD {
 
     get(player: Dude): Entity {
         this.updateHearts(player.health, player.maxHealth)
-        this.updateCoins(player.inventory.coins)
+        this.updateCoins(player.inventory.getItemCount(Items.COIN))
 
         return this.entity
     }
