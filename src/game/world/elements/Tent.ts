@@ -9,8 +9,8 @@ import { Interactable } from "./Interactable"
 import { LocationManager } from "../LocationManager"
 
 export enum TentColor {
-    red = "red",
-    blue = "blue"
+    RED = "red",
+    BLUE = "blue"
 }
 
 export const makeTent = (wl: WorldLocation, pos: Point, color: TentColor, teleportTo: WorldLocation) => {

@@ -4,13 +4,13 @@ import { ConnectingTile } from "../../engine/tiles/ConnectingTile"
 import { Entity } from "../../engine/Entity"
 import { BoxCollider } from "../../engine/collision/BoxCollider"
 import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
-import { Grid } from "../../engine/util/Grid"
-import { TileSource } from "../../engine/tiles/TileSource"
-import { TileComponent } from "../../engine/tiles/TileComponent"
-import { Collider } from "../../engine/collision/Collider"
 import { WorldLocation } from "./WorldLocation"
 import { Campfire } from "./elements/Campfire"
 import { makeTent, TentColor } from "./elements/Tent"
+import { makeTree, TreeType } from "./elements/Tree"
+import { TileComponent } from "../../engine/tiles/TileComponent"
+
+const MAP_SIZE = 40
 
 export class MapGenerator {
 
@@ -36,7 +36,7 @@ export class MapGenerator {
         const tentLocation = new WorldLocation()
         
         // spawn tent
-        makeTent(this.location, new Point(5, 5), TentColor.red, tentLocation)
+        makeTent(this.location, new Point(5, 5), TentColor.RED, tentLocation)
 
         // spawn campfire
         const campfirePos = new Point(3, 9)
@@ -45,9 +45,27 @@ export class MapGenerator {
         // make the ground
         this.renderPath(new Point(-10, -10), new Point(10, 10), this.pathSchema, 2)
         this.renderPath(new Point(10, -10), new Point(-10, 10), this.pathSchema, 5)
+
+        this.spawnTrees()
+
+        // spawn grass last, stuff checks for existing paths prior to this by the lack of ground items
         this.placeGrass()
 
         return this.location
+    }
+
+    spawnTrees() {
+        const trees = Math.random() * 150 + 50
+        for (let i = 0; i < trees; i++) {
+            const pt = new Point(
+                Math.floor(Math.random() * MAP_SIZE) - MAP_SIZE/2,
+                Math.floor(Math.random() * (MAP_SIZE-1)) - MAP_SIZE/2,
+            )
+            const occupiedPoints = [pt, pt.plus(new Point(0, 1))]
+            if (occupiedPoints.every(p => !this.location.stuff.get(p) && !this.location.ground.get(p))) {
+                makeTree(this.location, pt, Math.random() < .7 ? TreeType.POINTY : TreeType.ROUND)
+            }
+        }
     }
 
     renderPath(
@@ -109,8 +127,8 @@ export class MapGenerator {
     }
 
     placeGrass() {
-        for (let i = -20; i < 20; i++) {
-            for (let j = -20; j < 20; j++) {
+        for (let i = -MAP_SIZE/2; i < MAP_SIZE/2; i++) {
+            for (let j = -MAP_SIZE/2; j < MAP_SIZE/2; j++) {
                 const pt = new Point(i, j)
                 if (!this.location.ground.get(pt)) {
                     let tile

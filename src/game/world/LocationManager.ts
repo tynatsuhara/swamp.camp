@@ -16,7 +16,6 @@ export class LocationManager {
     }
 
     transition(to: WorldLocation) {
-        // Move player
         this.currentLocation.dynamic.delete(Player.instance.entity)
         to.dynamic.add(Player.instance.entity)
 

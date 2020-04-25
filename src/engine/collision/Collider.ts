@@ -109,6 +109,13 @@ export abstract class Collider extends Component {
         return result
     }
 
+    checkWithinBoundsAfterTranslation(translation: Point, other: Collider) {
+        this._position = this._position.plus(translation)
+        const result = other.getPoints().some(p => this.isWithinBounds(p))
+        this._position = this._position.minus(translation)
+        return result
+    }
+
     private lineIntersect(line1Start, line1End, line2Start, line2End): Point {
         // https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_two_points_on_each_line
         const x1 = line1Start.x
