@@ -5,6 +5,7 @@ import { WorldLocation } from "../WorldLocation"
 import { TileComponent } from "../../../engine/tiles/TileComponent"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
 import { Entity } from "../../../engine/Entity"
+import { Hittable } from "./Hittable"
 
 
 export const makeRock = (wl: WorldLocation, pos: Point) => {
@@ -25,6 +26,8 @@ export const makeRock = (wl: WorldLocation, pos: Point) => {
         pos.plus(new Point(.5, 1)).times(TILE_SIZE).minus(new Point(hitboxDims.x/2, hitboxDims.y + 2)), 
         hitboxDims
     ))
+
+    e.addComponent(new Hittable(pos.plus(new Point(.5, .5)).times(TILE_SIZE), [tile.transform]))
 
     wl.stuff.set(pos, e)
 }

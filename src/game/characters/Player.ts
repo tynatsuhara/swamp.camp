@@ -5,6 +5,7 @@ import { Point } from "../../engine/point"
 import { Component } from "../../engine/component"
 import { Dude } from "./Dude"
 import { Interactable } from "../world/elements/Interactable"
+import { Hittable } from "../world/elements/Hittable"
 
 export class Player extends Component {
 
@@ -49,6 +50,7 @@ export class Player extends Component {
 
         if (updateData.input.isMouseDown) {
             this.dude.weapon.attack()
+            this.hitResource(updateData)
         }
 
         if (updateData.input.isKeyDown(InputKey.E)) {
@@ -93,5 +95,27 @@ export class Player extends Component {
         }
 
         closest?.interact()
+    }
+
+    // for trees and rocks
+    private hitResource(updateData: UpdateData) {
+        const interactDistance = 20
+        const interactCenter = this.dude.standingPosition.minus(new Point(0, 5))
+        const possibilities = updateData.view.entities
+                .map(e => e.getComponent(Hittable))
+                .filter(e => !!e)
+                .filter(e => this.dude.animation.transform.mirrorX === (e.position.x < interactCenter.x))  // hittables the dude is facing
+        
+        let closestDist = Number.MAX_SAFE_INTEGER
+        let closest: Hittable
+        for (const i of possibilities) {
+            const dist = i.position.distanceTo(interactCenter)
+            if (dist < interactDistance && dist < closestDist) {
+                closestDist = dist
+                closest = i
+            }
+        }
+
+        closest?.hit(closest.position.minus(interactCenter))
     }
 }
