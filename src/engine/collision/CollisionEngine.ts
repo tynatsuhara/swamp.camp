@@ -3,6 +3,12 @@ import { rectContains } from "../util/utils"
 import { Collider } from "./Collider"
 
 // TODO: This probably all breaks if there are colliders on multiple views
+
+/**
+ * This class manages two types of collisions:
+ *   - BLOCKING collisons, where a collider will prevent another collider from moving through its space
+ *   - OVERLAP collisions, which trigger callbacks when colliders intersect
+ */
 export class CollisionEngine {
 
     static instance: CollisionEngine
@@ -19,8 +25,8 @@ export class CollisionEngine {
     }
 
     /**
-     * @param matrix Each key in the matrix will collide with all of the values in the corresponding list (and vice-versa)
-     *               DEFAULT_LAYER will always collide with DEFAULT_LAYER
+     * @param matrix Each layer key in the matrix will trigger BLOCKING collisions with all of the layer values in the corresponding list (and vice-versa)
+     *               DEFAULT_LAYER will always have BLOCKING collisions with DEFAULT_LAYER
      */
     setCollisionMatrix(matrix: Map<string, string[]>) {
         const bidirectional = new Map<string, Set<string>>()
@@ -82,10 +88,9 @@ export class CollisionEngine {
 
     checkAndUpdateCollisions(collider: Collider) {
         this.removeDanglingColliders()
-        const collidingLayers = this.matrix.get(collider.layer)
 
         this.colliders.filter(other => other !== collider).forEach(other => {
-            const isColliding = other.enabled && collidingLayers.has(other.layer)
+            const isColliding = other.enabled
                     && (other.getPoints().some(pt => collider.isWithinBounds(pt)) ||  collider.getPoints().some(pt => other.isWithinBounds(pt)))
             collider.updateColliding(other, isColliding)
             other.updateColliding(collider, isColliding)
@@ -95,15 +100,18 @@ export class CollisionEngine {
     // Returns true if the collider can be translated and will not intersect a non-trigger collider in the new position.
     // This DOES NOT check for any possible colliders in the path of the collision and should only be used for small translations.
     canTranslate(collider: Collider, translation: Point): boolean {
-        if (collider.isTrigger) {  // nothing will ever block this collider
+        const collidingLayers = this.matrix.get(collider.layer)
+        if (!collidingLayers || collidingLayers.size === 0) {  // nothing will ever block this collider
             return true
         }
         this.removeDanglingColliders()
         const translatedPoints = collider.getPoints().map(pt => pt.plus(translation))
-        return !this.colliders.filter(other => other !== collider && other.enabled && !other.isTrigger).some(other => {
-            return translatedPoints.some(pt => other.isWithinBounds(pt))  // TODO 
-                    || collider.checkWithinBoundsAfterTranslation(translation, other)
-        }) 
+        return !this.colliders
+                .filter(other => other !== collider && other.enabled && collidingLayers.has(other.layer))  // potential collisions
+                .some(other => {
+                    return translatedPoints.some(pt => other.isWithinBounds(pt))  // TODO 
+                            || collider.checkWithinBoundsAfterTranslation(translation, other)
+                }) 
     }
 
     // unregisters any colliders without an entity

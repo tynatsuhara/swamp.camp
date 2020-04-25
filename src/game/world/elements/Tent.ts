@@ -20,7 +20,7 @@ export const makeTent = (wl: WorldLocation, pos: Point, color: TentColor, telepo
     addTile(wl, e, `${color}tentNE`, pos.plus(new Point(1, 0)), depth)
     addTile(wl, e, `${color}tentSW`, pos.plus(new Point(0, 1)), depth)
     addTile(wl, e, `${color}tentSE`, pos.plus(new Point(1, 1)), depth)
-    e.addComponent(new BoxCollider(pos.plus(new Point(0, 1)).times(TILE_SIZE), new Point(TILE_SIZE*2, TILE_SIZE), false))
+    e.addComponent(new BoxCollider(pos.plus(new Point(0, 1)).times(TILE_SIZE), new Point(TILE_SIZE*2, TILE_SIZE)))
     e.addComponent(new Interactable(pos.plus(new Point(1, 2)).times(TILE_SIZE), () => {
         LocationManager.instance.transition(teleportTo)
     }))

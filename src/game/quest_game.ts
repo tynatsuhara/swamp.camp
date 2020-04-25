@@ -10,6 +10,7 @@ import { HUD } from "./ui/HUD"
 import { LocationManager } from "./world/LocationManager"
 import { Dude } from "./characters/Dude"
 import { CollisionEngine } from "../engine/collision/CollisionEngine"
+import { DroppedItem } from "./items/DroppedItem"
 
 
 const ZOOM = 3.125
@@ -27,9 +28,10 @@ export class QuestGame extends Game {
     private uiView: View = new View()
 
     initialize() {
-        // CollisionEngine.instance.setCollisionMatrix(new Map([
-        //     []
-        // ]))
+        CollisionEngine.instance.setCollisionMatrix(new Map([
+            [CollisionEngine.DEFAULT_LAYER, [DroppedItem.COLLISION_LAYER, Dude.COLLISION_LAYER]],
+            [Dude.COLLISION_LAYER, [Dude.COLLISION_LAYER]],
+        ]))
 
         // World must be initialized before we do anything else
         const mapGen = new MapGenerator()

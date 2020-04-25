@@ -7,42 +7,27 @@ import { BoxCollider } from "../../engine/collision/BoxCollider"
 import { Player } from "../characters/Player"
 import { Dude } from "../characters/Dude"
 import { LocationManager } from "../world/LocationManager"
+import { DroppedItem } from "./DroppedItem"
 
 // TODO: Some kind of "item" base class for dropped items
-export class Coin extends Component {
-
-    private animation: AnimatedTileComponent
+export class Coin extends DroppedItem {
 
     /**
      * @param position The bottom center where the item should be placed
      */
     constructor(position: Point) {
-        super()
-        this.start = (startData) => {
-            const anim = Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)
-            this.animation = this.entity.addComponent(new AnimatedTileComponent([anim]))
-            const pos = position.minus(new Point(
-                this.animation.transform.dimensions.x/2,
-                this.animation.transform.dimensions.y
-            ))
-            this.animation.transform.position = pos
-            this.animation.transform.depth = pos.y
-
-            this.entity.addComponent(
-                new BoxCollider(pos, this.animation.transform.dimensions, true).onColliderEnter(c => this.collide(c))
-            )
-        }
+        super(position, Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150))
     }
 
-    private collide(c: Collider) {
-        const player = c.entity.getComponent(Player)
-        if (!!player) {
-            const d = player.entity.getComponent(Dude)
-            if (d.isAlive) {
-                player.entity.getComponent(Dude).inventory.coins++
-                LocationManager.instance.currentLocation.dynamic.delete(this.entity)
-                this.entity.selfDestruct()
-            }
-        }
-    }
+    // private collide(c: Collider) {
+    //     const player = c.entity.getComponent(Player)
+    //     if (!!player) {
+    //         const d = player.entity.getComponent(Dude)
+    //         if (d.isAlive) {
+    //             player.entity.getComponent(Dude).inventory.coins++
+    //             LocationManager.instance.currentLocation.dynamic.delete(this.entity)
+    //             this.entity.selfDestruct()
+    //         }
+    //     }
+    // }
 }

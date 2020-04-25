@@ -15,7 +15,6 @@ export abstract class Collider extends Component {
 
     private _position: Point  // top-left
     get position() { return this._position }
-    isTrigger: boolean
     readonly layer: string
     
     readonly collidingWith: Set<Collider> = new Set()
@@ -23,13 +22,11 @@ export abstract class Collider extends Component {
 
     /**
      * @param position top left position
-     * @param isTrigger won't be checked for blocking collisions, only used for callbacks 
      * @param layer determines which colliders collide based on the collision matrix
      */
-    constructor(position: Point, isTrigger: boolean, layer = CollisionEngine.DEFAULT_LAYER) {
+    constructor(position: Point, layer = CollisionEngine.DEFAULT_LAYER) {
         super()
         this._position = position
-        this.isTrigger = isTrigger
         this.layer = layer
         CollisionEngine.instance.markCollider(this)
     }
@@ -61,8 +58,8 @@ export abstract class Collider extends Component {
 
     updateColliding(other: Collider, isColliding: boolean) {
         if (isColliding && !this.collidingWith.has(other)) {
-            this.onColliderEnterCallback(other)
             this.collidingWith.add(other)
+            this.onColliderEnterCallback(other)
         } else if (!isColliding && this.collidingWith.has(other)) {
             // TODO call onExit
             this.collidingWith.delete(other)
@@ -121,6 +118,11 @@ export abstract class Collider extends Component {
         const result = other.getPoints().some(p => this.isWithinBounds(p))
         this._position = this._position.minus(translation)
         return result
+    }
+
+    delete() {
+        this.collidingWith.forEach(c => c.updateColliding(this, false))
+        super.delete()
     }
 
     private lineIntersect(line1Start, line1End, line2Start, line2End): Point {

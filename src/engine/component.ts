@@ -23,4 +23,11 @@ export abstract class Component {
     getRenderMethods(): RenderMethod[] {
         return []
     }
+
+    /**
+     * Override if custom logic is desired when a component or parent entity is deleted
+     */
+    delete() {
+        this.entity?.removeComponent(this)
+    }
 }

@@ -37,8 +37,7 @@ export class Campfire extends Component {
             const offset = new Point(0, 5)
             this.entity.addComponent(new BoxCollider(
                 pos.plus(offset), 
-                new Point(TILE_SIZE, TILE_SIZE).minus(offset), 
-                false
+                new Point(TILE_SIZE, TILE_SIZE).minus(offset)
             ))
 
             // Toggle between on/off when interacted with

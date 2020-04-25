@@ -4,13 +4,14 @@ import { debug } from "../debug"
 import { LineRender } from "../renderer/LineRender"
 import { Point } from "../point"
 import { rectContains } from "../util/utils"
+import { CollisionEngine } from "./CollisionEngine"
 
 export class BoxCollider extends Collider {
 
     readonly dimensions: Point
 
-    constructor(position: Point, dimensions: Point, isTrigger: boolean = false) {
-        super(position, isTrigger)
+    constructor(position: Point, dimensions: Point, layer: string = CollisionEngine.DEFAULT_LAYER) {
+        super(position, layer)
         this.dimensions = dimensions
     }
 

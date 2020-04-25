@@ -11,6 +11,8 @@ import { Inventory } from "../items/Inventory"
 import { LocationManager } from "../world/LocationManager"
 
 export class Dude extends Component {
+
+    static readonly COLLISION_LAYER = "dube"
     
     readonly inventory = new Inventory()
     readonly maxHealth = 4
@@ -63,7 +65,7 @@ export class Dude extends Component {
                 this.animation.transform.dimensions.x/2 - colliderSize.x/2, 
                 this.animation.transform.dimensions.y - colliderSize.y
             )
-            this.collider = this.entity.addComponent(new BoxCollider(this.position.plus(this.relativeColliderPos), colliderSize))
+            this.collider = this.entity.addComponent(new BoxCollider(this.position.plus(this.relativeColliderPos), colliderSize, Dude.COLLISION_LAYER))
         }
     }
 
