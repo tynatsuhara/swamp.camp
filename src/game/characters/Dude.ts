@@ -106,6 +106,7 @@ export class Dude extends Component {
     }
 
     private spawnDrop() {
+        // TODO add velocity
         spawnItem(this.standingPosition.minus(new Point(0, 2)), Items.COIN)
     }
 

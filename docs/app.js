@@ -2130,6 +2130,9 @@ System.register("game/graphics/OneBitTileset", ["engine/point", "game/graphics/S
                 __extends(OneBitTileset, _super);
                 function OneBitTileset() {
                     return _super.call(this, "images/monochrome_transparent_1_bit.png", new Map([
+                        ["coin", new point_16.Point(22, 4)],
+                        ["wood", new point_16.Point(18, 6)],
+                        ["rock", new point_16.Point(5, 2)],
                         ["slash", new point_16.Point(25, 11)],
                         [" ", new point_16.Point(0, 0)],
                         ["0", new point_16.Point(19, 29)],
@@ -3042,18 +3045,19 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
         ],
         execute: function () {
             Item = /** @class */ (function () {
-                function Item(droppedIconSupplier, stackLimit) {
-                    if (stackLimit === void 0) { stackLimit = 1; }
+                function Item(droppedIconSupplier, inventoryIconSupplier, stackLimit) {
+                    if (stackLimit === void 0) { stackLimit = Number.MAX_SAFE_INTEGER; }
                     this.droppedIconSupplier = droppedIconSupplier;
+                    this.inventoryIconSupplier = inventoryIconSupplier;
                     this.stackLimit = stackLimit;
                 }
                 return Item;
             }());
             exports_44("Item", Item);
             exports_44("Items", Items = {
-                COIN: new Item(function () { return Tilesets_3.Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150); }),
-                ROCK: new Item(function () { return Tilesets_3.Tilesets.instance.outdoorTiles.getTileSource("rockItem"); }, 100),
-                WOOD: new Item(function () { return Tilesets_3.Tilesets.instance.outdoorTiles.getTileSource("woodItem"); }, 100),
+                COIN: new Item(function () { return Tilesets_3.Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150); }, function () { return Tilesets_3.Tilesets.instance.oneBit.getTileSource("coin"); }),
+                ROCK: new Item(function () { return Tilesets_3.Tilesets.instance.outdoorTiles.getTileSource("rockItem"); }, function () { return Tilesets_3.Tilesets.instance.oneBit.getTileSource("rock"); }, 100),
+                WOOD: new Item(function () { return Tilesets_3.Tilesets.instance.outdoorTiles.getTileSource("woodItem"); }, function () { return Tilesets_3.Tilesets.instance.oneBit.getTileSource("wood"); }, 100)
             });
             /**
              * @param position The bottom center where the item should be placed
@@ -3114,6 +3118,9 @@ System.register("game/items/Inventory", [], function (exports_45, context_45) {
                     }
                     return false;
                 };
+                /**
+                 * Returns the total amount of an item in the inventory
+                 */
                 Inventory.prototype.getItemCount = function (item) {
                     var _a;
                     return (_a = this.countMap.get(item)) !== null && _a !== void 0 ? _a : 0;
@@ -3252,6 +3259,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     this.dropWeapon();
                 };
                 Dude.prototype.spawnDrop = function () {
+                    // TODO add velocity
                     Items_1.spawnItem(this.standingPosition.minus(new point_22.Point(0, 2)), Items_1.Items.COIN);
                 };
                 Dude.prototype.dropWeapon = function () {
@@ -3614,7 +3622,7 @@ System.register("game/world/elements/HittableResource", ["game/world/elements/Hi
                 transforms, function (hitDir) {
                     knockedItemCount--;
                     var finishingMove = knockedItemCount === 0;
-                    var velocityMultiplier = finishingMove ? .5 : 1;
+                    var velocityMultiplier = finishingMove ? .6 : 1;
                     var placeDistance = finishingMove ? 2 : 8;
                     var itemsOut = finishingMove ? 3 : 1;
                     for (var i = 0; i < itemsOut; i++) {
@@ -4003,59 +4011,123 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "game/character
         }
     };
 });
-System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point"], function (exports_57, context_57) {
+System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point", "engine/util/utils", "game/graphics/Tilesets", "game/characters/Player", "game/characters/Dude"], function (exports_57, context_57) {
     "use strict";
-    var component_13, Tilesets_10, TileTransform_9, point_30, StringTiles;
+    var component_13, point_30, utils_3, Tilesets_10, Player_5, Dude_6, InventoryDisplay;
     var __moduleName = context_57 && context_57.id;
     return {
         setters: [
             function (component_13_1) {
                 component_13 = component_13_1;
             },
+            function (point_30_1) {
+                point_30 = point_30_1;
+            },
+            function (utils_3_1) {
+                utils_3 = utils_3_1;
+            },
             function (Tilesets_10_1) {
                 Tilesets_10 = Tilesets_10_1;
             },
-            function (TileTransform_9_1) {
-                TileTransform_9 = TileTransform_9_1;
+            function (Player_5_1) {
+                Player_5 = Player_5_1;
             },
-            function (point_30_1) {
-                point_30 = point_30_1;
+            function (Dude_6_1) {
+                Dude_6 = Dude_6_1;
             }
         ],
         execute: function () {
-            StringTiles = /** @class */ (function (_super) {
-                __extends(StringTiles, _super);
-                function StringTiles(position) {
-                    var _this = _super.call(this) || this;
-                    _this.tiles = [];
-                    _this.topLeftPos = position;
+            InventoryDisplay = /** @class */ (function (_super) {
+                __extends(InventoryDisplay, _super);
+                function InventoryDisplay() {
+                    var _this = _super !== null && _super.apply(this, arguments) || this;
+                    _this.showingInv = false;
                     return _this;
+                    // private getInventoryIndexForPosition(pos: Point) {
+                    //     return i * 
+                    //     return new Point(i % 10, Math.floor(i/10))
+                    // }
                 }
-                StringTiles.prototype.say = function (s) {
+                InventoryDisplay.prototype.update = function (updateData) {
                     var _this = this;
-                    if (s.length === 0) {
-                        this.tiles = [];
+                    if (updateData.input.isKeyDown(73 /* I */)) {
+                        if (this.showingInv) {
+                            this.hide();
+                        }
+                        else {
+                            this.show();
+                        }
+                    }
+                    if (!this.showingInv) {
                         return;
                     }
-                    this.tiles = Array.from(s).map(function (c, i) {
-                        return Tilesets_10.Tilesets.instance.oneBit.getTileSource(c).toImageRender(new TileTransform_9.TileTransform(_this.topLeftPos.plus(new point_30.Point(10 * i, 0))));
+                    this.updatePos(updateData);
+                    if (!!this.trackedTile) {
+                        if (updateData.input.isMouseUp) {
+                            // TODO drop
+                            this.trackedTile = null;
+                        }
+                        else { // track
+                            this.trackedTile.transform.position = this.trackedTile.transform.position.plus(updateData.input.mousePos.minus(this.lastMousPos));
+                        }
+                    }
+                    if (updateData.input.isMouseDown) {
+                        this.inventory.inventory.forEach(function (stack, index) {
+                            if (utils_3.rectContains(_this.getPositionForInventoryIndex(index), new point_30.Point(Tilesets_10.TILE_SIZE, Tilesets_10.TILE_SIZE), updateData.input.mousePos)) {
+                                _this.lastMousPos = updateData.input.mousePos;
+                                _this.trackedTile = _this.tiles[index];
+                            }
+                        });
+                    }
+                };
+                InventoryDisplay.prototype.hide = function () {
+                    var _this = this;
+                    if (!!this.trackedTile) {
+                        return;
+                    }
+                    this.showingInv = false;
+                    this.tiles.forEach(function (c, index) {
+                        if (!!c) {
+                            _this.entity.removeComponent(c);
+                            _this.tiles[index] = null;
+                        }
                     });
                 };
-                StringTiles.prototype.clear = function () {
-                    this.say("");
+                InventoryDisplay.prototype.show = function () {
+                    var _this = this;
+                    this.showingInv = true;
+                    this.inventory = Player_5.Player.instance.entity.getComponent(Dude_6.Dude).inventory;
+                    this.tiles = this.inventory.inventory.map(function (stack, index) {
+                        if (!!stack) {
+                            var c = stack.item.inventoryIconSupplier().toComponent();
+                            return _this.entity.addComponent(c);
+                        }
+                    });
                 };
-                StringTiles.prototype.getRenderMethods = function () {
-                    return this.tiles;
+                InventoryDisplay.prototype.updatePos = function (updateData) {
+                    var _this = this;
+                    var _a;
+                    var displayDimensions = new point_30.Point(InventoryDisplay.COLUMNS, this.inventory.inventory.length / InventoryDisplay.COLUMNS).times(Tilesets_10.TILE_SIZE);
+                    this.offset = new point_30.Point(updateData.dimensions.x / 2 - displayDimensions.x / 2, updateData.dimensions.y / 6);
+                    (_a = this.tiles) === null || _a === void 0 ? void 0 : _a.forEach(function (tile, index) {
+                        if (!!tile) {
+                            tile.transform.position = _this.getPositionForInventoryIndex(index);
+                        }
+                    });
                 };
-                return StringTiles;
+                InventoryDisplay.prototype.getPositionForInventoryIndex = function (i) {
+                    return new point_30.Point(i % InventoryDisplay.COLUMNS, Math.floor(i / InventoryDisplay.COLUMNS)).times(Tilesets_10.TILE_SIZE).plus(this.offset);
+                };
+                InventoryDisplay.COLUMNS = 10;
+                return InventoryDisplay;
             }(component_13.Component));
-            exports_57("StringTiles", StringTiles);
+            exports_57("InventoryDisplay", InventoryDisplay);
         }
     };
 });
-System.register("game/ui/HUD", ["engine/tiles/AnimatedTileComponent", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point", "engine/tiles/TileComponent", "engine/Entity", "engine/renderer/BasicRenderComponent", "engine/renderer/TextRender", "game/items/Items"], function (exports_58, context_58) {
+System.register("game/ui/HUD", ["engine/tiles/AnimatedTileComponent", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point", "engine/tiles/TileComponent", "engine/Entity", "engine/renderer/BasicRenderComponent", "engine/renderer/TextRender", "game/items/Items", "game/ui/InventoryDisplay"], function (exports_58, context_58) {
     "use strict";
-    var AnimatedTileComponent_4, Tilesets_11, TileTransform_10, point_31, TileComponent_8, Entity_8, BasicRenderComponent_2, TextRender_2, Items_5, HUD;
+    var AnimatedTileComponent_4, Tilesets_11, TileTransform_9, point_31, TileComponent_8, Entity_8, BasicRenderComponent_2, TextRender_2, Items_5, InventoryDisplay_1, HUD;
     var __moduleName = context_58 && context_58.id;
     return {
         setters: [
@@ -4065,8 +4137,8 @@ System.register("game/ui/HUD", ["engine/tiles/AnimatedTileComponent", "game/grap
             function (Tilesets_11_1) {
                 Tilesets_11 = Tilesets_11_1;
             },
-            function (TileTransform_10_1) {
-                TileTransform_10 = TileTransform_10_1;
+            function (TileTransform_9_1) {
+                TileTransform_9 = TileTransform_9_1;
             },
             function (point_31_1) {
                 point_31 = point_31_1;
@@ -4085,6 +4157,9 @@ System.register("game/ui/HUD", ["engine/tiles/AnimatedTileComponent", "game/grap
             },
             function (Items_5_1) {
                 Items_5 = Items_5_1;
+            },
+            function (InventoryDisplay_1_1) {
+                InventoryDisplay_1 = InventoryDisplay_1_1;
             }
         ],
         execute: function () {
@@ -4098,7 +4173,8 @@ System.register("game/ui/HUD", ["engine/tiles/AnimatedTileComponent", "game/grap
                     this.lastHealthCount = 0;
                     this.lastMaxHealthCount = 0;
                     this.lastCoinsCount = -1;
-                    this.entity.addComponent(new AnimatedTileComponent_4.AnimatedTileComponent([Tilesets_11.Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)], new TileTransform_10.TileTransform(this.offset.plus(this.coinsOffset))));
+                    this.entity.addComponent(new AnimatedTileComponent_4.AnimatedTileComponent([Tilesets_11.Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)], new TileTransform_9.TileTransform(this.offset.plus(this.coinsOffset))));
+                    this.entity.addComponent(new InventoryDisplay_1.InventoryDisplay());
                 }
                 HUD.prototype.get = function (player) {
                     this.updateHearts(player.health, player.maxHealth);
@@ -4120,16 +4196,16 @@ System.register("game/ui/HUD", ["engine/tiles/AnimatedTileComponent", "game/grap
                     var result = [];
                     var fullHearts = Math.floor(health);
                     for (var i = 0; i < fullHearts; i++) {
-                        result.push(new TileComponent_8.TileComponent(full, new TileTransform_10.TileTransform(this.offset.plus(heartOffset.times(i)))));
+                        result.push(new TileComponent_8.TileComponent(full, new TileTransform_9.TileTransform(this.offset.plus(heartOffset.times(i)))));
                     }
                     if (health % 1 > .5) {
-                        result.push(new TileComponent_8.TileComponent(full, new TileTransform_10.TileTransform(this.offset.plus(heartOffset.times(result.length)))));
+                        result.push(new TileComponent_8.TileComponent(full, new TileTransform_9.TileTransform(this.offset.plus(heartOffset.times(result.length)))));
                     }
                     else if (health % 1 > 0) {
-                        result.push(new TileComponent_8.TileComponent(half, new TileTransform_10.TileTransform(this.offset.plus(heartOffset.times(result.length)))));
+                        result.push(new TileComponent_8.TileComponent(half, new TileTransform_9.TileTransform(this.offset.plus(heartOffset.times(result.length)))));
                     }
                     while (result.length < maxHealth) {
-                        result.push(new TileComponent_8.TileComponent(empty, new TileTransform_10.TileTransform(this.offset.plus(heartOffset.times(result.length)))));
+                        result.push(new TileComponent_8.TileComponent(empty, new TileTransform_9.TileTransform(this.offset.plus(heartOffset.times(result.length)))));
                     }
                     result.forEach(function (c) { return _this.entity.addComponent(c); });
                 };
@@ -4151,7 +4227,7 @@ System.register("game/ui/HUD", ["engine/tiles/AnimatedTileComponent", "game/grap
 });
 System.register("game/quest_game", ["engine/point", "engine/game", "engine/View", "game/world/MapGenerator", "game/graphics/Tilesets", "game/characters/DudeFactory", "game/ui/HUD", "game/world/LocationManager", "game/characters/Dude", "engine/collision/CollisionEngine", "game/items/DroppedItem"], function (exports_59, context_59) {
     "use strict";
-    var point_32, game_1, View_2, MapGenerator_1, Tilesets_12, DudeFactory_1, HUD_1, LocationManager_6, Dude_6, CollisionEngine_4, DroppedItem_2, ZOOM, QuestGame;
+    var point_32, game_1, View_2, MapGenerator_1, Tilesets_12, DudeFactory_1, HUD_1, LocationManager_6, Dude_7, CollisionEngine_4, DroppedItem_2, ZOOM, QuestGame;
     var __moduleName = context_59 && context_59.id;
     return {
         setters: [
@@ -4179,8 +4255,8 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/View"
             function (LocationManager_6_1) {
                 LocationManager_6 = LocationManager_6_1;
             },
-            function (Dude_6_1) {
-                Dude_6 = Dude_6_1;
+            function (Dude_7_1) {
+                Dude_7 = Dude_7_1;
             },
             function (CollisionEngine_4_1) {
                 CollisionEngine_4 = CollisionEngine_4_1;
@@ -4204,8 +4280,8 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/View"
                 }
                 QuestGame.prototype.initialize = function () {
                     CollisionEngine_4.CollisionEngine.instance.setCollisionMatrix(new Map([
-                        [CollisionEngine_4.CollisionEngine.DEFAULT_LAYER, [DroppedItem_2.DroppedItem.COLLISION_LAYER, Dude_6.Dude.COLLISION_LAYER]],
-                        [Dude_6.Dude.COLLISION_LAYER, [Dude_6.Dude.COLLISION_LAYER]],
+                        [CollisionEngine_4.CollisionEngine.DEFAULT_LAYER, [DroppedItem_2.DroppedItem.COLLISION_LAYER, Dude_7.Dude.COLLISION_LAYER]],
+                        [Dude_7.Dude.COLLISION_LAYER, [Dude_7.Dude.COLLISION_LAYER]],
                     ]));
                     // World must be initialized before we do anything else
                     var mapGen = new MapGenerator_1.MapGenerator();
@@ -4297,15 +4373,15 @@ System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tiles
 });
 System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"], function (exports_61, context_61) {
     "use strict";
-    var component_14, utils_3, Clickable;
+    var component_14, utils_4, Clickable;
     var __moduleName = context_61 && context_61.id;
     return {
         setters: [
             function (component_14_1) {
                 component_14 = component_14_1;
             },
-            function (utils_3_1) {
-                utils_3 = utils_3_1;
+            function (utils_4_1) {
+                utils_4 = utils_4_1;
             }
         ],
         execute: function () {
@@ -4319,13 +4395,63 @@ System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"]
                     return _this;
                 }
                 Clickable.prototype.update = function (updateData) {
-                    if (updateData.input.isMouseDown && utils_3.rectContains(this.position, this.dimensions, updateData.input.mousePos)) {
+                    if (updateData.input.isMouseDown && utils_4.rectContains(this.position, this.dimensions, updateData.input.mousePos)) {
                         this.onClick();
                     }
                 };
                 return Clickable;
             }(component_14.Component));
             exports_61("Clickable", Clickable);
+        }
+    };
+});
+System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point"], function (exports_62, context_62) {
+    "use strict";
+    var component_15, Tilesets_14, TileTransform_10, point_33, StringTiles;
+    var __moduleName = context_62 && context_62.id;
+    return {
+        setters: [
+            function (component_15_1) {
+                component_15 = component_15_1;
+            },
+            function (Tilesets_14_1) {
+                Tilesets_14 = Tilesets_14_1;
+            },
+            function (TileTransform_10_1) {
+                TileTransform_10 = TileTransform_10_1;
+            },
+            function (point_33_1) {
+                point_33 = point_33_1;
+            }
+        ],
+        execute: function () {
+            StringTiles = /** @class */ (function (_super) {
+                __extends(StringTiles, _super);
+                function StringTiles(position) {
+                    var _this = _super.call(this) || this;
+                    _this.tiles = [];
+                    _this.topLeftPos = position;
+                    return _this;
+                }
+                StringTiles.prototype.say = function (s) {
+                    var _this = this;
+                    if (s.length === 0) {
+                        this.tiles = [];
+                        return;
+                    }
+                    this.tiles = Array.from(s).map(function (c, i) {
+                        return Tilesets_14.Tilesets.instance.oneBit.getTileSource(c).toImageRender(new TileTransform_10.TileTransform(_this.topLeftPos.plus(new point_33.Point(10 * i, 0))));
+                    });
+                };
+                StringTiles.prototype.clear = function () {
+                    this.say("");
+                };
+                StringTiles.prototype.getRenderMethods = function () {
+                    return this.tiles;
+                };
+                return StringTiles;
+            }(component_15.Component));
+            exports_62("StringTiles", StringTiles);
         }
     };
 });

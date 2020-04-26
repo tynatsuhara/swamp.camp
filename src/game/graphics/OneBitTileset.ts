@@ -5,6 +5,9 @@ export class OneBitTileset extends SingleFileTileLoader {
 
     constructor() {
         super("images/monochrome_transparent_1_bit.png", new Map([
+            ["coin", new Point(22, 4)],
+            ["wood", new Point(18, 6)],
+            ["rock", new Point(5, 2)],
             ["slash", new Point(25, 11)],
             [" ", new Point(0, 0)],
             ["0", new Point(19, 29)],

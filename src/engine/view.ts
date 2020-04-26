@@ -6,7 +6,11 @@ export class View {
     zoom: number = 1  // scale of the view
     offset: Point = new Point(0, 0)  // transform applied to all entities in the view (scaled by zoom)
 
-    constructor(entities: Entity[] = [], zoom: number = 1, offset: Point = new Point(0, 0)) {
+    constructor(
+        entities: Entity[] = [], 
+        zoom: number = 1, 
+        offset: Point = new Point(0, 0),
+    ) {
         this.entities = entities
         this.zoom = zoom
         this.offset = offset

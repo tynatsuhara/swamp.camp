@@ -5,11 +5,11 @@ import { Point } from "../../engine/point"
 import { Dude } from "../characters/Dude"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { Entity } from "../../engine/Entity"
-import { StringTiles } from "./StringTiles"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
 import { TextRender } from "../../engine/renderer/TextRender"
 import { Component } from "../../engine/component"
 import { Items } from "../items/Items"
+import { InventoryDisplay } from "./InventoryDisplay"
 
 export class HUD {
 
@@ -25,11 +25,15 @@ export class HUD {
     private lastMaxHealthCount = 0
     private lastCoinsCount = -1
 
+    private inventory: InventoryDisplay
+
     constructor() {
         this.entity.addComponent(new AnimatedTileComponent(
             [Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)],
             new TileTransform(this.offset.plus(this.coinsOffset))
         ))
+
+        this.entity.addComponent(new InventoryDisplay())
     }
 
     get(player: Dude): Entity {

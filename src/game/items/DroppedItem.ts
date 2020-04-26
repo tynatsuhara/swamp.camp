@@ -1,13 +1,10 @@
 import { Component } from "../../engine/component"
-import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
 import { Point } from "../../engine/point"
-import { Tilesets } from "../graphics/Tilesets"
 import { Collider } from "../../engine/collision/Collider"
 import { BoxCollider } from "../../engine/collision/BoxCollider"
 import { Player } from "../characters/Player"
 import { Dude } from "../characters/Dude"
 import { LocationManager } from "../world/LocationManager"
-import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
 import { Item } from "./Items"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 

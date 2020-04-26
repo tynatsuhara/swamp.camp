@@ -16,7 +16,7 @@ export const makeHittable = (e: Entity, pos: Point, transforms: TileTransform[],
         hitDir => {
             knockedItemCount--
             const finishingMove = knockedItemCount === 0
-            let velocityMultiplier = finishingMove ? .5 : 1
+            let velocityMultiplier = finishingMove ? .6 : 1
             let placeDistance = finishingMove ? 2 : 8
             let itemsOut = finishingMove ? 3 : 1
 

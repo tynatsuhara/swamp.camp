@@ -15,7 +15,7 @@ class ItemStack {
 
 // TODO flesh this out more when we have more items
 export class Inventory {
-    private readonly inventory: ItemStack[] = Array.from({ length: 20 })
+    readonly inventory: ItemStack[] = Array.from({ length: 20 })
     private readonly countMap = new Map<Item, number>()
 
     /**
@@ -45,6 +45,9 @@ export class Inventory {
         return false
     }
 
+    /**
+     * Returns the total amount of an item in the inventory
+     */
     getItemCount(item: Item): number {
         return this.countMap.get(item) ?? 0
     }

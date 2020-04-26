@@ -5,8 +5,7 @@ import { WorldLocation } from "../WorldLocation"
 import { TileComponent } from "../../../engine/tiles/TileComponent"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
 import { Entity } from "../../../engine/Entity"
-import { Hittable } from "./Hittable"
-import { Items, spawnItem } from "../../items/Items"
+import { Items } from "../../items/Items"
 import { makeHittable } from "./HittableResource"
 
 export enum TreeType {
