@@ -2,6 +2,7 @@ import { Point } from "../../engine/point"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { assets } from "../../engine/Assets"
 import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
+import { TileSource } from "../../engine/tiles/TileSource"
 
 export class SingleFileTileLoader {
 
@@ -15,6 +16,20 @@ export class SingleFileTileLoader {
         this.map = map
         this.tileSize = tileSize
         this.padding = padding
+    }
+
+    getNineSlice(key: string): TileSource[] {
+        const pt = this.map.get(key)
+        if (!pt) {
+            throw new Error(`${key} is not a valid tile`)
+        }
+        const result = []
+        for (let y = 0; y < 3; y++) {
+            for (let x = 0; x < 3; x++) {
+                result.push(this.getTileAt(pt.plus(new Point(x, y))))
+            }
+        }
+        return result
     }
 
     getTileSource(key: string): StaticTileSource {

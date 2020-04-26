@@ -11,6 +11,7 @@ import { Dude } from "../characters/Dude"
 import { Entity } from "../../engine/Entity"
 import { InputKey } from "../../engine/input"
 import { UIStateManager } from "./UIStateManager"
+import { makeNineSliceTileComponents } from "../../engine/tiles/NineSlice"
 
 export class InventoryDisplay extends Component {
 
@@ -81,39 +82,18 @@ export class InventoryDisplay extends Component {
     }
 
     private spawnBG() {
-        const dimensions = new Point(
-            1 + InventoryDisplay.COLUMNS, 
-            1 + this.inventory().inventory.length/InventoryDisplay.COLUMNS
-        )
-        const ui = Tilesets.instance.oneBit
-        this.bgTiles = []
-        this.bgTiles.push(ui.getTileSource("invBoxNW").toComponent(new TileTransform(new Point(0, 0))))
-        this.bgTiles.push(ui.getTileSource("invBoxNE").toComponent(new TileTransform(new Point(dimensions.x - 1, 0))))
-        this.bgTiles.push(ui.getTileSource("invBoxSE").toComponent(new TileTransform(new Point(dimensions.x - 1, dimensions.y - 1))))
-        this.bgTiles.push(ui.getTileSource("invBoxSW").toComponent(new TileTransform(new Point(0, dimensions.y - 1))))
-        // horizontal lines
-        for (let i = 1; i < dimensions.x - 1; i++) {
-            this.bgTiles.push(ui.getTileSource("invBoxN").toComponent(new TileTransform(new Point(i, 0))))
-            this.bgTiles.push(ui.getTileSource("invBoxS").toComponent(new TileTransform(new Point(i, dimensions.y - 1))))
-        }
-        // vertical lines
-        for (let j = 1; j < dimensions.y - 1; j++) {
-            this.bgTiles.push(ui.getTileSource("invBoxE").toComponent(new TileTransform(new Point(dimensions.x - 1, j))))
-            this.bgTiles.push(ui.getTileSource("invBoxW").toComponent(new TileTransform(new Point(0, j))))
-        }
-        
-        const uiOffset = new Point(TILE_SIZE/2, TILE_SIZE/2)
-        this.bgTiles.forEach(c => {
-            c.transform.position = c.transform.position.times(TILE_SIZE).plus(this.offset).minus(uiOffset)
-            this.e.addComponent(c)
-        })
-
-        this.bgTiles.push(this.e.addComponent(ui.getTileSource("invBoxCenter").toComponent(
-            new TileTransform(
-                uiOffset.plus(this.offset), 
-                new Point(InventoryDisplay.COLUMNS-1, this.inventory().inventory.length/InventoryDisplay.COLUMNS-1).times(TILE_SIZE)
+        this.bgTiles = makeNineSliceTileComponents(
+            Tilesets.instance.oneBit.getNineSlice("invBoxNW"), 
+            this.offset.minus(new Point(TILE_SIZE/2, TILE_SIZE/2)),
+            new Point(
+                1 + InventoryDisplay.COLUMNS, 
+                1 + this.inventory().inventory.length/InventoryDisplay.COLUMNS
             )
-        )))
+        )
+
+        this.bgTiles.forEach(tile => {
+            this.e.addComponent(tile)
+        })
     }
 
     getEntity() {
