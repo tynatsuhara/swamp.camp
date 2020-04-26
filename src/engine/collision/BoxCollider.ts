@@ -10,8 +10,8 @@ export class BoxCollider extends Collider {
 
     readonly dimensions: Point
 
-    constructor(position: Point, dimensions: Point, layer: string = CollisionEngine.DEFAULT_LAYER) {
-        super(position, layer)
+    constructor(position: Point, dimensions: Point, layer: string = CollisionEngine.DEFAULT_LAYER, ignoredColliders: Collider[] = []) {
+        super(position, layer, ignoredColliders)
         this.dimensions = dimensions
     }
 

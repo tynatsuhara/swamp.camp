@@ -16,16 +16,16 @@ export class DroppedItem extends Component {
     static readonly COLLISION_LAYER = "item"
 
     private tile: TileComponent
+    private collider: Collider
     private itemType: Item
 
     /**
      * @param position The bottom center where the item should be placed
+     * @param sourceCollider will be ignored to prevent physics issues
      * 
      * TODO: Add initial velocity
      */
-    constructor(position: Point, item: Item, velocity: Point) {
-        velocity = velocity.normalized().times(2 + 5 * Math.random())
-
+    constructor(position: Point, item: Item, velocity: Point, sourceCollider: Collider = null) {
         super()
         this.itemType = item
         this.start = () => {
@@ -35,11 +35,16 @@ export class DroppedItem extends Component {
                 this.tile.transform.dimensions.y
             ))
             this.tile.transform.position = pos
-            this.reposition()
 
-            this.entity.addComponent(
-                new BoxCollider(pos, this.tile.transform.dimensions, DroppedItem.COLLISION_LAYER).onColliderEnter(c => this.collide(c))
-            )
+            const colliderSize = new Point(8, 8)
+            this.collider = this.entity.addComponent(new BoxCollider(
+                pos.plus(this.tile.transform.dimensions.minus(colliderSize).div(2)), 
+                colliderSize, 
+                DroppedItem.COLLISION_LAYER,
+                !!sourceCollider ? [sourceCollider] : []
+            ).onColliderEnter(c => this.collide(c)))
+
+            this.reposition()
         }
 
         const moveInterval = setInterval(() => {
@@ -52,19 +57,22 @@ export class DroppedItem extends Component {
     }
 
     private reposition(delta = new Point(0, 0)) {
-        this.tile.transform.position = this.tile.transform.position.plus(delta)
+        const colliderOffset = this.collider.position.minus(this.tile.transform.position)
+        this.tile.transform.position = this.collider.moveTo(this.collider.position.plus(delta)).minus(colliderOffset)
         this.tile.transform.depth = this.tile.transform.position.y
     }
 
     private collide(c: Collider) {
         const player = c.entity.getComponent(Player)
         if (!!player) {
-            const d = player.entity.getComponent(Dude)
-            if (d.isAlive) {
-                player.entity.getComponent(Dude).inventory.addItem(this.itemType)
-                LocationManager.instance.currentLocation.dynamic.delete(this.entity)
-                this.entity.selfDestruct()
-            }
+            setTimeout(() => {
+                const d = player.entity.getComponent(Dude)
+                if (d.isAlive) {
+                    player.entity.getComponent(Dude).inventory.addItem(this.itemType)
+                    LocationManager.instance.currentLocation.dynamic.delete(this.entity)
+                    this.entity.selfDestruct()
+                }
+            }, 150)
         }
     }
 }

@@ -19,15 +19,17 @@ export abstract class Collider extends Component {
     
     readonly collidingWith: Set<Collider> = new Set()
     private onColliderEnterCallback: (collider: Collider) => void = () => {}
+    readonly ignoredColliders: Collider[]
 
     /**
      * @param position top left position
      * @param layer determines which colliders collide based on the collision matrix
      */
-    constructor(position: Point, layer = CollisionEngine.DEFAULT_LAYER) {
+    constructor(position: Point, layer = CollisionEngine.DEFAULT_LAYER, ignoredColliders: Collider[] = []) {
         super()
         this._position = position
         this.layer = layer
+        this.ignoredColliders = ignoredColliders
         CollisionEngine.instance.markCollider(this)
     }
 
@@ -59,7 +61,11 @@ export abstract class Collider extends Component {
     updateColliding(other: Collider, isColliding: boolean) {
         if (isColliding && !this.collidingWith.has(other)) {
             this.collidingWith.add(other)
-            this.onColliderEnterCallback(other)
+            try {
+                this.onColliderEnterCallback(other)
+            } catch (error) {
+                console.log(`collider callback threw error: ${error}`)
+            }
         } else if (!isColliding && this.collidingWith.has(other)) {
             // TODO call onExit
             this.collidingWith.delete(other)

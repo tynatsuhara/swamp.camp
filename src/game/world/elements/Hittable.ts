@@ -13,7 +13,7 @@ export class Hittable extends Component {
     private readonly onHit: (dir: Point) => void
 
     /**
-     * @param position world pixel position
+     * @param position world pixel position (probably centered) referenced for finding hittables
      */
     constructor(position: Point, tileTransforms: TileTransform[], onHit: (dir: Point) => void) {
         super()

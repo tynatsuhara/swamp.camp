@@ -107,7 +107,9 @@ export class CollisionEngine {
         this.removeDanglingColliders()
         const translatedPoints = collider.getPoints().map(pt => pt.plus(translation))
         return !this.colliders
-                .filter(other => other !== collider && other.enabled && collidingLayers.has(other.layer))  // potential collisions
+                .filter(other => 
+                    other !== collider && other.enabled && collidingLayers.has(other.layer) 
+                            && collider.ignoredColliders.indexOf(other) === -1 && other.ignoredColliders.indexOf(collider) === -1)  // potential collisions
                 .some(other => {
                     return translatedPoints.some(pt => other.isWithinBounds(pt))  // TODO 
                             || collider.checkWithinBoundsAfterTranslation(translation, other)
@@ -116,7 +118,12 @@ export class CollisionEngine {
 
     // unregisters any colliders without an entity
     private removeDanglingColliders() {
+        const removed = this.colliders.filter(other => !other.entity)
+        if (removed.length === 0) {
+            return
+        }
         this.colliders = this.colliders.filter(other => !!other.entity)
+        removed.forEach(r => this.colliders.forEach(c => c.updateColliding(r, false)))
     }
 }
 
