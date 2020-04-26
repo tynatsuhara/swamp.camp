@@ -11,6 +11,7 @@ import { LocationManager } from "./world/LocationManager"
 import { Dude } from "./characters/Dude"
 import { CollisionEngine } from "../engine/collision/CollisionEngine"
 import { DroppedItem } from "./items/DroppedItem"
+import { UIStateManager } from "./ui/UIStateManager"
 
 
 const ZOOM = 3.125
@@ -22,7 +23,7 @@ export class QuestGame extends Game {
 
     readonly tilesets = new Tilesets()
     readonly dudeFactory = new DudeFactory()
-    readonly hud = new HUD()
+    readonly uiStateManager = new UIStateManager()
     
     private gameEntityView: View = new View()
     private uiView: View = new View()
@@ -67,34 +68,7 @@ export class QuestGame extends Game {
         this.uiView = {
             zoom: ZOOM,
             offset: new Point(0, 0),
-            entities: this.getUIEntities()
+            entities: this.uiStateManager.get(updateViewsContext)
         }
-    }
-
-    // entities whose position is fixed on the camera
-    getUIEntities(): Entity[] {
-        return [this.hud.get(this.player)]
-
-        /*
-        const dimensions = new Point(20, 16)  // tile dimensions
-
-        const result: TileComponent[] = []
-        result.push(new TileComponent(Tile.BORDER_1, new Point(0, 0)))
-        result.push(new TileComponent(Tile.BORDER_3, new Point(dimensions.x - 1, 0).times(TILE_SIZE)))
-        result.push(new TileComponent(Tile.BORDER_5, new Point(dimensions.x - 1, dimensions.y - 1).times(TILE_SIZE)))
-        result.push(new TileComponent(Tile.BORDER_7, new Point(0, dimensions.y - 1).times(TILE_SIZE)))
-
-        // horizontal lines
-        for (let i = 1; i < dimensions.x - 1; i++) {
-            result.push(new TileComponent(Tile.BORDER_2, new Point(i, 0).times(TILE_SIZE)))            
-            result.push(new TileComponent(Tile.BORDER_6, new Point(i, dimensions.y - 1).times(TILE_SIZE)))            
-        }
-
-        // vertical lines
-        for (let j = 1; j < dimensions.y - 1; j++) {
-            result.push(new TileComponent(Tile.BORDER_4, new Point(dimensions.x - 1, j).times(TILE_SIZE)))
-            result.push(new TileComponent(Tile.BORDER_8, new Point(0, j).times(TILE_SIZE)))            
-        }
-        */
     }
 }

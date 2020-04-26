@@ -6,6 +6,8 @@ import { Component } from "../../engine/component"
 import { Dude } from "./Dude"
 import { Interactable } from "../world/elements/Interactable"
 import { Hittable } from "../world/elements/Hittable"
+import { HUD } from "../ui/HUD"
+import { UIStateManager } from "../ui/UIStateManager"
 
 export class Player extends Component {
 
@@ -25,7 +27,7 @@ export class Player extends Component {
     }
 
     update(updateData: UpdateData) {
-        if (!this.dude.isAlive) {
+        if (!this.dude.isAlive || UIStateManager.instance.isMenuOpen) {
             return
         }
         // const originalCrosshairPosRelative = this.crosshairs.transform.position.minus(this.position)

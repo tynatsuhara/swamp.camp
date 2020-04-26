@@ -37,7 +37,7 @@ export class StaticTileSource implements TileSource {
         )
     }
 
-    toComponent(): TileComponent {
-        return new TileComponent(this)
+    toComponent(transform: TileTransform = new TileTransform()): TileComponent {
+        return new TileComponent(this, transform)
     }
 }

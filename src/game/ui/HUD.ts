@@ -25,18 +25,14 @@ export class HUD {
     private lastMaxHealthCount = 0
     private lastCoinsCount = -1
 
-    private inventory: InventoryDisplay
-
     constructor() {
         this.entity.addComponent(new AnimatedTileComponent(
             [Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)],
             new TileTransform(this.offset.plus(this.coinsOffset))
         ))
-
-        this.entity.addComponent(new InventoryDisplay())
     }
 
-    get(player: Dude): Entity {
+    getEntity(player: Dude): Entity {
         this.updateHearts(player.health, player.maxHealth)
         this.updateCoins(player.inventory.getItemCount(Items.COIN))
 

@@ -19,7 +19,7 @@ export class TileSetAnimation implements TileSource {
         return this.frames[index][0]
     }
 
-    toComponent(): TileComponent {
+    toComponent(transform: TileTransform = new TileTransform()): TileComponent {
         return new AnimatedTileComponent([this])
     }
 }
