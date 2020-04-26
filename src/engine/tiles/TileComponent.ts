@@ -2,16 +2,16 @@ import { Point } from "../point"
 import { ImageRender } from "../renderer/ImageRender"
 import { Component } from "../component"
 import { TileTransform } from "./TileTransform"
-import { TileSource } from "./TileSource"
+import { StaticTileSource } from "./StaticTileSource"
 
 /**
  * Represents a static (non-animated) tile entity
  */
 export class TileComponent extends Component {
-    tileSource: TileSource
+    tileSource: StaticTileSource
     readonly transform: TileTransform
 
-    constructor(tileSource: TileSource, transform: TileTransform = new TileTransform()) {
+    constructor(tileSource: StaticTileSource, transform: TileTransform = new TileTransform()) {
         super()
         this.tileSource = tileSource
         this.transform = transform

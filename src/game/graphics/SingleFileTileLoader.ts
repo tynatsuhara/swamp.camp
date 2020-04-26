@@ -1,5 +1,5 @@
 import { Point } from "../../engine/point"
-import { TileSource } from "../../engine/tiles/TileSource"
+import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { assets } from "../../engine/Assets"
 import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
 
@@ -17,7 +17,7 @@ export class SingleFileTileLoader {
         this.padding = padding
     }
 
-    getTileSource(key: string): TileSource {
+    getTileSource(key: string): StaticTileSource {
         const result = this.map.get(key)
         if (!result) {
             throw new Error(`${key} is not a valid tile`)
@@ -26,7 +26,7 @@ export class SingleFileTileLoader {
     }
 
     getTileAt(pos: Point) {
-        return new TileSource(
+        return new StaticTileSource(
             this.image(), 
             pos.times(this.tileSize + this.padding), 
             new Point(this.tileSize, this.tileSize)

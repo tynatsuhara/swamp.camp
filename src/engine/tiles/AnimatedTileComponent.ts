@@ -2,7 +2,7 @@ import { Point } from "../point"
 import { UpdateData } from "../engine"
 import { TileComponent } from "./TileComponent"
 import { TileSetAnimation } from "./TileSetAnimation"
-import { TileSource } from "./TileSource"
+import { StaticTileSource } from "./StaticTileSource"
 import { Animator } from "../util/Animator"
 import { TileTransform } from "./TileTransform"
 

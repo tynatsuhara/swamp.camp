@@ -3,14 +3,14 @@ import { Entity } from "../../engine/Entity"
 import { LocationManager } from "../world/LocationManager"
 import { DroppedItem } from "./DroppedItem"
 import { Point } from "../../engine/point"
-import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
+import { TileSource } from "../../engine/tiles/TileSource"
 
 export class Item {
-    readonly droppedIconSupplier: () => TileSetAnimation
+    readonly droppedIconSupplier: () => TileSource
     readonly stackLimit: number
 
     constructor(
-        droppedIconSupplier: () => TileSetAnimation,
+        droppedIconSupplier: () => TileSource,
         stackLimit: number = 1
     ) {
         this.droppedIconSupplier = droppedIconSupplier
@@ -20,9 +20,10 @@ export class Item {
 
 export const Items = {
     COIN: new Item(() => Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)),
-    WOOD: new Item(() => Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150), 100),
+    ROCK: new Item(() => Tilesets.instance.outdoorTiles.getTileSource("rockItem"), 100),
+    WOOD: new Item(() => Tilesets.instance.dungeonCharacters.getTileSource("coin_anim"), 100),
 }
 
-export const spawnItem = (pos: Point, item: Item) => {
-    LocationManager.instance.currentLocation.dynamic.add(new Entity([new DroppedItem(pos, item)]))
+export const spawnItem = (pos: Point, item: Item, velocity: Point = new Point(0, 0)) => {
+    LocationManager.instance.currentLocation.dynamic.add(new Entity([new DroppedItem(pos, item, velocity)]))
 }

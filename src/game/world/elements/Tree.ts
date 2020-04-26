@@ -6,6 +6,7 @@ import { TileComponent } from "../../../engine/tiles/TileComponent"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
 import { Entity } from "../../../engine/Entity"
 import { Hittable } from "./Hittable"
+import { Items, spawnItem } from "../../items/Items"
 
 export enum TreeType {
     ROUND = 1,
@@ -23,9 +24,17 @@ export const makeTree = (wl: WorldLocation, pos: Point, type: TreeType) => {
         hitboxDims
     ))
 
+    const hittableCenter = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE/2, TILE_SIZE + TILE_SIZE/2))
     e.addComponent(new Hittable(
-        pos.times(TILE_SIZE).plus(new Point(TILE_SIZE/2, TILE_SIZE + TILE_SIZE/2)), 
-        [top.transform, bottom.transform]
+        hittableCenter,
+        [top.transform, bottom.transform],
+        hitDir => {
+            spawnItem(
+                hittableCenter.plus(new Point(0, TILE_SIZE/2)).plus(hitDir.times(10)), 
+                Items.WOOD, 
+                hitDir
+            )  // TODO rock item
+        }
     ))
 }
 

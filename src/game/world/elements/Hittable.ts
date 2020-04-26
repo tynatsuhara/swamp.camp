@@ -3,20 +3,23 @@ import { Point } from "../../../engine/point"
 import { Animator } from "../../../engine/util/Animator"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
 import { UpdateData } from "../../../engine/engine"
+import { spawnItem } from "../../items/Items"
 
 export class Hittable extends Component {
 
     readonly position: Point
     private tileTransforms: Map<TileTransform, Point>
     private animator: Animator
+    private readonly onHit: (dir: Point) => void
 
     /**
      * @param position world pixel position
      */
-    constructor(position: Point, tileTransforms: TileTransform[]) {
+    constructor(position: Point, tileTransforms: TileTransform[], onHit: (dir: Point) => void) {
         super()
         this.position = position
         this.tileTransforms = new Map(tileTransforms.map(t => [t, t.position]))
+        this.onHit = onHit
     }
 
     update(updateData: UpdateData) {
@@ -39,5 +42,7 @@ export class Hittable extends Component {
             }, 
             () => this.animator = null
         ) 
+
+        setTimeout(() => this.onHit(dir), 200)
     }
 }

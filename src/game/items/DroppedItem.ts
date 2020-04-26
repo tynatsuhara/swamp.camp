@@ -9,33 +9,51 @@ import { Dude } from "../characters/Dude"
 import { LocationManager } from "../world/LocationManager"
 import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
 import { Item } from "./Items"
+import { TileComponent } from "../../engine/tiles/TileComponent"
 
 export class DroppedItem extends Component {
 
     static readonly COLLISION_LAYER = "item"
 
-    private animation: AnimatedTileComponent
+    private tile: TileComponent
     private itemType: Item
 
     /**
      * @param position The bottom center where the item should be placed
+     * 
+     * TODO: Add initial velocity
      */
-    constructor(position: Point, item: Item) {
+    constructor(position: Point, item: Item, velocity: Point) {
+        velocity = velocity.normalized().times(2 + 5 * Math.random())
+
         super()
         this.itemType = item
-        this.start = (startData) => {
-            this.animation = this.entity.addComponent(new AnimatedTileComponent([item.droppedIconSupplier()]))
+        this.start = () => {
+            this.tile = this.entity.addComponent(item.droppedIconSupplier().toComponent())
             const pos = position.minus(new Point(
-                this.animation.transform.dimensions.x/2,
-                this.animation.transform.dimensions.y
+                this.tile.transform.dimensions.x/2,
+                this.tile.transform.dimensions.y
             ))
-            this.animation.transform.position = pos
-            this.animation.transform.depth = pos.y
+            this.tile.transform.position = pos
+            this.reposition()
 
             this.entity.addComponent(
-                new BoxCollider(pos, this.animation.transform.dimensions, DroppedItem.COLLISION_LAYER).onColliderEnter(c => this.collide(c))
+                new BoxCollider(pos, this.tile.transform.dimensions, DroppedItem.COLLISION_LAYER).onColliderEnter(c => this.collide(c))
             )
         }
+
+        const moveInterval = setInterval(() => {
+            this.reposition(velocity)
+            velocity = velocity.times(.6)
+            if (velocity.magnitude() < .1) {
+                clearInterval(moveInterval)
+            }
+        }, 10)
+    }
+
+    private reposition(delta = new Point(0, 0)) {
+        this.tile.transform.position = this.tile.transform.position.plus(delta)
+        this.tile.transform.depth = this.tile.transform.position.y
     }
 
     private collide(c: Collider) {

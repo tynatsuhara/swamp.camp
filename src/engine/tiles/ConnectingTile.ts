@@ -5,7 +5,6 @@ import { ConnectingTileSchema } from "./ConnectingTileSchema"
 import { Entity } from "../Entity"
 import { Grid } from "../util/Grid"
 
-// TODO unify tile components with a single base class?
 export class ConnectingTile extends Component {
     readonly schema: ConnectingTileSchema
     private readonly grid: Grid<Entity>

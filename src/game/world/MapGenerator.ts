@@ -10,6 +10,7 @@ import { makeTent, TentColor } from "./elements/Tent"
 import { makeTree, TreeType } from "./elements/Tree"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { makeRock } from "./elements/Rock"
+import { TileSource } from "../../engine/tiles/TileSource"
 
 const MAP_SIZE = 40
 
@@ -150,13 +151,15 @@ export class MapGenerator {
             for (let j = -MAP_SIZE/2; j < MAP_SIZE/2; j++) {
                 const pt = new Point(i, j)
                 if (!this.location.ground.get(pt)) {
-                    let tile
+                    let tile: TileSource
                     if (Math.random() < .65) {
                         tile = Tilesets.instance.tilemap.getTileAt(new Point(0, Math.floor(Math.random() * 4)))
                     } else {
                         tile = Tilesets.instance.tilemap.getTileAt(new Point(0, 7))
                     }
-                    this.location.ground.set(pt, tile.at(pt))
+                    const tileComponent = tile.toComponent()
+                    tileComponent.transform.position = pt.times(TILE_SIZE)
+                    this.location.ground.set(pt, new Entity([tileComponent]))
                 }
             }
         }

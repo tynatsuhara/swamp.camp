@@ -1,4 +1,4 @@
-import { TileSource } from "../../engine/tiles/TileSource"
+import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { Point } from "../../engine/point"
 import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
 import { assets } from "../../engine/Assets"
@@ -221,14 +221,14 @@ const map = new Map(`
  */
 export class DungeonTilesetII {
 
-    getTileSource(key: string): TileSource {
+    getTileSource(key: string): StaticTileSource {
         const row = map.get(key)
         if (row?.length != 4) {
             throw Error("invalid tile spec")
         }
         const pos = new Point(+row[0], +row[1])
         const dim = new Point(+row[2], +row[3])
-        return new TileSource(this.getFile(), pos, dim)
+        return new StaticTileSource(this.getFile(), pos, dim)
     }
 
     getTileSetAnimation(key: string, speed: number): TileSetAnimation {
@@ -237,11 +237,11 @@ export class DungeonTilesetII {
             throw Error("invalid animation spec")
         }
     
-        const frames: [TileSource, number][] = Array.from({length: +row[4]}, (value, key) => key)
+        const frames: [StaticTileSource, number][] = Array.from({length: +row[4]}, (value, key) => key)
                 .map(frameIndex => {
                     const pos = new Point(+row[0] + frameIndex * +row[2], +row[1])
                     const dim = new Point(+row[2], +row[3])
-                    return new TileSource(this.getFile(), pos, dim)
+                    return new StaticTileSource(this.getFile(), pos, dim)
                 })
                 .map(tileSource => [tileSource, speed])
         

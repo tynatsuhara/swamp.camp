@@ -1,4 +1,4 @@
-import { TileSource } from "../../engine/tiles/TileSource"
+import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { assets } from "../../engine/Assets"
 import { Point } from "../../engine/point"
 import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
@@ -11,12 +11,12 @@ export class SplitFileTileLoader {
         this.dirPath = dirPath
     }
 
-    getTileSource(key: string): TileSource {
+    getTileSource(key: string): StaticTileSource {
         const image = assets.getImageByFileName(`${this.dirPath}/${key}.png`)
         if (!!image) {
             return null
         }
-        return new TileSource(
+        return new StaticTileSource(
             image, 
             new Point(image.width, image.height), 
             new Point(0, 0)

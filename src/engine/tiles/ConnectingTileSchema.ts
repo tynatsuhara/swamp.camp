@@ -1,4 +1,4 @@
-import { TileSource } from "./TileSource"
+import { StaticTileSource } from "./StaticTileSource"
 import { Point } from "../point"
 import { ImageRender } from "../renderer/ImageRender"
 import { TileTransform } from "./TileTransform"
@@ -11,52 +11,52 @@ import { Grid } from "../util/Grid"
  * TODO: This could probably be a lot better and support more complex connecting logic
  */
 export class ConnectingTileSchema {
-    private _vertical: TileSource
-    private _angle: TileSource
-    private _tShape: TileSource
-    private _plusShape: TileSource
-    private _cap: TileSource
-    private _single: TileSource
-    private _fallback: TileSource
+    private _vertical: StaticTileSource
+    private _angle: StaticTileSource
+    private _tShape: StaticTileSource
+    private _plusShape: StaticTileSource
+    private _cap: StaticTileSource
+    private _single: StaticTileSource
+    private _fallback: StaticTileSource
 
     // a vertical line
-    vertical(source: TileSource): ConnectingTileSchema {
+    vertical(source: StaticTileSource): ConnectingTileSchema {
         this._vertical = source
         return this
     }
 
     // a 90 degree angle, connecting to bottom and right by default
-    angle(source: TileSource): ConnectingTileSchema {
+    angle(source: StaticTileSource): ConnectingTileSchema {
         this._angle = source
         return this
     }
 
     // a T-shaped tile (with the bottom part pointing right)
-    tShape(source: TileSource): ConnectingTileSchema {
+    tShape(source: StaticTileSource): ConnectingTileSchema {
         this._tShape = source
         return this
     }
    
     // a plus-shaped tile
-    plusShape(source: TileSource): ConnectingTileSchema {
+    plusShape(source: StaticTileSource): ConnectingTileSchema {
         this._plusShape = source
         return this
     }
   
     // a tile with one connection (on the bottom)
-    cap(source: TileSource): ConnectingTileSchema {
+    cap(source: StaticTileSource): ConnectingTileSchema {
         this._cap = source
         return this
     }
    
     // a tile with no connections
-    single(source: TileSource): ConnectingTileSchema {
+    single(source: StaticTileSource): ConnectingTileSchema {
         this._single = source
         return this
     }
  
     // used if we can't figure
-    fallback(source: TileSource): ConnectingTileSchema {
+    fallback(source: StaticTileSource): ConnectingTileSchema {
         this._fallback = source
         return this
     }
@@ -84,7 +84,7 @@ export class ConnectingTileSchema {
         const w = this.get(grid, new Point(x - 1, y))
         const count = [n, s, e, w].filter(dir => !!dir).length
 
-        let result: TileSource
+        let result: StaticTileSource
         let rotation = 0
 
         if (count == 4) {
