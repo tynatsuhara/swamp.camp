@@ -10,7 +10,7 @@ import { Entity } from "../../engine/Entity"
 import { InputKey } from "../../engine/input"
 import { UIStateManager } from "./UIStateManager"
 import { makeNineSliceTileComponents } from "../../engine/tiles/NineSlice"
-import { TextBox } from "./TextBox"
+import { Tooltip } from "./Tooltip"
 
 export class InventoryDisplay extends Component {
 
@@ -25,12 +25,12 @@ export class InventoryDisplay extends Component {
     private showingInv = false
     get isOpen() { return this.showingInv }
     private offset: Point
-    private tooltip: TextBox
+    private tooltip: Tooltip
 
     constructor() {
         super()
         this.e.addComponent(this)
-        this.tooltip = this.e.addComponent(new TextBox("wood x2"))
+        this.tooltip = this.e.addComponent(new Tooltip("wood x2"))
     }
 
     inventory() {
@@ -56,7 +56,7 @@ export class InventoryDisplay extends Component {
         if (newIndex !== -1 && !!inv[newIndex]) {
             this.tooltip.position = updateData.input.mousePos
             const stack = inv[newIndex]
-            this.tooltip.say(`${stack.item.displayName}${stack.count > 1 ? '  x' + stack.count : ''}`)
+            this.tooltip.say(`${stack.item.displayName}${stack.count > 1 ? ' x' + stack.count : ''}`)
         } else {
             this.tooltip.clear()
         }

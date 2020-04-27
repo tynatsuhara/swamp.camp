@@ -44,6 +44,8 @@ export class QuestGame extends Game {
         // TEST: Spawn some guys
         this.dudeFactory.newElf(new Point(20, 30))
         this.dudeFactory.newImp(new Point(80, 30))
+
+        setTimeout(() => console.log(JSON.stringify(this)), 5000)
     }
 
     // entities in the world space

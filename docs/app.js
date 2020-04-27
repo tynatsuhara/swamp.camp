@@ -2160,7 +2160,9 @@ System.register("game/graphics/OneBitTileset", ["engine/point", "game/graphics/S
                         ["rock", new point_16.Point(5, 2)],
                         ["invBoxNW", new point_16.Point(16, 19)],
                         ["textBoxNW", new point_16.Point(16, 16)],
-                        ["textBoxCenter", new point_16.Point(17, 17)],
+                        ["tooltipLeft", new point_16.Point(16, 17)],
+                        ["tooltipCenter", new point_16.Point(17, 17)],
+                        ["tooltipRight", new point_16.Point(18, 17)],
                         ["slash", new point_16.Point(25, 11)],
                         [" ", new point_16.Point(0, 0)],
                         ["0", new point_16.Point(19, 29)],
@@ -3536,30 +3538,43 @@ System.register("game/ui/Color", [], function (exports_51, context_51) {
         execute: function () {
             exports_51("Color", Color = {
                 BLACK: "#222222",
-                // "#5f2d56
-                // "#993970
-                // "#dc4a7b
-                // "#f78697
-                // "#9f294e
+                DARK_DARK_PINK: "#5f2d56",
+                DARK_PINK: "#993970",
+                PINK: "#dc4a7b",
+                LIGHT_PINK: "#f78697",
+                RED: "#9f294e",
                 DARK_RED: "#62232f",
-                // "#8f4029
-                // "#c56025
-                // "#ee8e2e
-                // "#fccba3
-                // "#da4e38
+                DARK_ORANGE: "#8f4029",
+                ORANGE: "#c56025",
+                LIGHT_ORANGE: "#ee8e2e",
+                FLESH: "#fccba3",
+                SUPER_ORANGE: "#da4e38",
                 YELLOW: "#facb3e",
-                // "#97da3f
-                // "#4ba747
-                // "#3d734f
-                // "#314152
+                LIME: "#97da3f",
+                GREEN: "#4ba747",
+                DARK_GREEN: "#3d734f",
+                DARK_DARK_BLUE: "#314152",
                 DARK_BLUE: "#417089",
+                TEAL: "#49a790",
+                BRIGHT_BLUE: "#72d6ce",
+                LIGHT_BLUE: "#5698cc",
+                PURPLE: "#5956bd",
+                DARK_PURPLE: "#473579",
+                DARK_PINKLE: "#8156aa",
+                PINKLE: "#c278d0",
+                LIGHT_PINKLE: "#f0b3dd",
+                WHITE: "#fdf7ed",
+                TAN: "#d3bfa9",
+                LIGHT_BROWN: "#aa8d7a",
+                BROWN: "#775c55",
+                DARK_BROWN: "#483b3ai",
             });
         }
     };
 });
-System.register("game/ui/TextBox", ["engine/component", "game/graphics/Tilesets", "engine/point", "engine/renderer/TextRender", "game/ui/Text", "game/ui/Color"], function (exports_52, context_52) {
+System.register("game/ui/Tooltip", ["engine/component", "game/graphics/Tilesets", "engine/point", "engine/renderer/TextRender", "game/ui/Text", "game/ui/Color"], function (exports_52, context_52) {
     "use strict";
-    var component_11, Tilesets_5, point_24, TextRender_2, Text_1, Color_1, TextBox;
+    var component_11, Tilesets_5, point_24, TextRender_2, Text_1, Color_1, Tooltip;
     var __moduleName = context_52 && context_52.id;
     return {
         setters: [
@@ -3583,56 +3598,58 @@ System.register("game/ui/TextBox", ["engine/component", "game/graphics/Tilesets"
             }
         ],
         execute: function () {
-            TextBox = /** @class */ (function (_super) {
-                __extends(TextBox, _super);
-                function TextBox(text) {
+            Tooltip = /** @class */ (function (_super) {
+                __extends(Tooltip, _super);
+                function Tooltip(text) {
                     var _this = _super.call(this) || this;
                     _this.position = new point_24.Point(0, 0);
                     _this.text = text;
                     _this.start = function () {
-                        _this.tiles = [_this.entity.addComponent(Tilesets_5.Tilesets.instance.oneBit.getTileSource("textBoxCenter").toComponent())];
-                        // this.tiles = makeNineSliceTileComponents(
-                        //     Tilesets.instance.oneBit.getNineSlice("textBoxNW"), 
-                        //     pos,
-                        //     dimensions
-                        // )
-                        // this.tiles.forEach(t => this.entity.addComponent(t))
-                        _this.tiles[0].transform.depth = 100000;
+                        _this.left = _this.entity.addComponent(Tilesets_5.Tilesets.instance.oneBit.getTileSource("tooltipLeft").toComponent());
+                        _this.center = _this.entity.addComponent(Tilesets_5.Tilesets.instance.oneBit.getTileSource("tooltipCenter").toComponent());
+                        _this.right = _this.entity.addComponent(Tilesets_5.Tilesets.instance.oneBit.getTileSource("tooltipRight").toComponent());
                     };
                     return _this;
                 }
-                TextBox.prototype.say = function (text) {
+                Tooltip.prototype.say = function (text) {
                     this.text = text;
                 };
-                TextBox.prototype.clear = function () {
+                Tooltip.prototype.clear = function () {
                     this.text = null;
                 };
-                TextBox.prototype.update = function (updateData) {
-                    this.tiles[0].enabled = this.text !== null;
+                Tooltip.prototype.update = function (updateData) {
+                    var _this = this;
+                    var tiles = [this.left, this.center, this.right];
+                    tiles.forEach(function (t) { return t.enabled = _this.text !== null; });
                     if (this.text === null) {
                         return;
                     }
                     var width = this.text.length * 8; // this will break if we change ZOOM or text size
-                    this.tiles[0].transform.dimensions = new point_24.Point(width + TextBox.margin * 2, Tilesets_5.TILE_SIZE);
-                    this.tiles[0].transform.position = this.position.plus(new point_24.Point(Tilesets_5.TILE_SIZE / 2, -Tilesets_5.TILE_SIZE)).apply(Math.floor);
+                    var leftPos = this.position.plus(new point_24.Point(Tilesets_5.TILE_SIZE / 2, -Tilesets_5.TILE_SIZE)).apply(Math.floor);
+                    var centerPos = leftPos.plus(new point_24.Point(Tilesets_5.TILE_SIZE, 0));
+                    var rightPos = leftPos.plus(new point_24.Point(width - Tilesets_5.TILE_SIZE + Tooltip.margin * 2, 0)).apply(Math.floor);
+                    this.left.transform.position = leftPos;
+                    this.center.transform.position = centerPos;
+                    this.right.transform.position = rightPos;
+                    this.center.transform.dimensions = new point_24.Point(width + Tooltip.margin * 2 - Tilesets_5.TILE_SIZE * 2, Tilesets_5.TILE_SIZE);
                 };
-                TextBox.prototype.getRenderMethods = function () {
+                Tooltip.prototype.getRenderMethods = function () {
                     if (this.text === null) {
                         return [];
                     }
-                    return [new TextRender_2.TextRender(this.text, this.tiles[0].transform.position.plus(TextBox.textOffset), Text_1.TEXT_STYLE, Color_1.Color.DARK_RED)];
+                    return [new TextRender_2.TextRender(this.text, this.left.transform.position.plus(Tooltip.textOffset), Text_1.TEXT_STYLE, Color_1.Color.DARK_RED)];
                 };
-                TextBox.margin = 4;
-                TextBox.textOffset = new point_24.Point(TextBox.margin, 12);
-                return TextBox;
+                Tooltip.margin = 6;
+                Tooltip.textOffset = new point_24.Point(Tooltip.margin, 13);
+                return Tooltip;
             }(component_11.Component));
-            exports_52("TextBox", TextBox);
+            exports_52("Tooltip", Tooltip);
         }
     };
 });
-System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point", "engine/util/utils", "game/graphics/Tilesets", "game/characters/Player", "game/characters/Dude", "engine/Entity", "game/ui/UIStateManager", "engine/tiles/NineSlice", "game/ui/TextBox"], function (exports_53, context_53) {
+System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point", "engine/util/utils", "game/graphics/Tilesets", "game/characters/Player", "game/characters/Dude", "engine/Entity", "game/ui/UIStateManager", "engine/tiles/NineSlice", "game/ui/Tooltip"], function (exports_53, context_53) {
     "use strict";
-    var component_12, point_25, utils_3, Tilesets_6, Player_3, Dude_4, Entity_3, UIStateManager_1, NineSlice_1, TextBox_1, InventoryDisplay;
+    var component_12, point_25, utils_3, Tilesets_6, Player_3, Dude_4, Entity_3, UIStateManager_1, NineSlice_1, Tooltip_1, InventoryDisplay;
     var __moduleName = context_53 && context_53.id;
     return {
         setters: [
@@ -3663,8 +3680,8 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point",
             function (NineSlice_1_1) {
                 NineSlice_1 = NineSlice_1_1;
             },
-            function (TextBox_1_1) {
-                TextBox_1 = TextBox_1_1;
+            function (Tooltip_1_1) {
+                Tooltip_1 = Tooltip_1_1;
             }
         ],
         execute: function () {
@@ -3675,7 +3692,7 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point",
                     _this.e = new Entity_3.Entity();
                     _this.showingInv = false;
                     _this.e.addComponent(_this);
-                    _this.tooltip = _this.e.addComponent(new TextBox_1.TextBox("wood x2"));
+                    _this.tooltip = _this.e.addComponent(new Tooltip_1.Tooltip("wood x2"));
                     return _this;
                 }
                 Object.defineProperty(InventoryDisplay.prototype, "isOpen", {
@@ -3704,7 +3721,7 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point",
                     if (newIndex !== -1 && !!inv[newIndex]) {
                         this.tooltip.position = updateData.input.mousePos;
                         var stack = inv[newIndex];
-                        this.tooltip.say("" + stack.item.displayName + (stack.count > 1 ? '  x' + stack.count : ''));
+                        this.tooltip.say("" + stack.item.displayName + (stack.count > 1 ? ' x' + stack.count : ''));
                     }
                     else {
                         this.tooltip.clear();
@@ -4596,6 +4613,7 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/View"
                     return _this;
                 }
                 QuestGame.prototype.initialize = function () {
+                    var _this = this;
                     CollisionEngine_4.CollisionEngine.instance.setCollisionMatrix(new Map([
                         [CollisionEngine_4.CollisionEngine.DEFAULT_LAYER, [DroppedItem_2.DroppedItem.COLLISION_LAYER, Dude_8.Dude.COLLISION_LAYER]],
                         [Dude_8.Dude.COLLISION_LAYER, [Dude_8.Dude.COLLISION_LAYER]],
@@ -4608,6 +4626,7 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/View"
                     // TEST: Spawn some guys
                     this.dudeFactory.newElf(new point_34.Point(20, 30));
                     this.dudeFactory.newImp(new point_34.Point(80, 30));
+                    setTimeout(function () { return console.log(JSON.stringify(_this)); }, 5000);
                 };
                 // entities in the world space
                 QuestGame.prototype.getViews = function (updateViewsContext) {

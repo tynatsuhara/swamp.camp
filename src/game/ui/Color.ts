@@ -1,34 +1,34 @@
 export const Color = {
     BLACK: "#222222",
-// "#5f2d56
-// "#993970
-// "#dc4a7b
-// "#f78697
-// "#9f294e
+    DARK_DARK_PINK: "#5f2d56",
+    DARK_PINK: "#993970",
+    PINK: "#dc4a7b",
+    LIGHT_PINK: "#f78697",
+    RED: "#9f294e",
     DARK_RED: "#62232f",
-// "#8f4029
-// "#c56025
-// "#ee8e2e
-// "#fccba3
-// "#da4e38
+    DARK_ORANGE: "#8f4029",
+    ORANGE: "#c56025",
+    LIGHT_ORANGE: "#ee8e2e",
+    FLESH: "#fccba3",
+    SUPER_ORANGE: "#da4e38",
     YELLOW: "#facb3e",
-// "#97da3f
-// "#4ba747
-// "#3d734f
-// "#314152
+    LIME: "#97da3f",
+    GREEN: "#4ba747",
+    DARK_GREEN: "#3d734f",
+    DARK_DARK_BLUE: "#314152",
     DARK_BLUE: "#417089",
-// "#49a790
-// "#72d6ce
-// "#5698cc
-// "#5956bd
-// "#473579
-// "#8156aa
-// "#c278d0
-// "#f0b3dd
-// "#fdf7ed
-// "#d3bfa9
-// "#aa8d7a
-// "#775c55
-// "#483b3ai
+    TEAL: "#49a790",
+    BRIGHT_BLUE: "#72d6ce",
+    LIGHT_BLUE: "#5698cc",
+    PURPLE: "#5956bd",
+    DARK_PURPLE: "#473579",
+    DARK_PINKLE: "#8156aa",
+    PINKLE: "#c278d0",
+    LIGHT_PINKLE: "#f0b3dd",
+    WHITE: "#fdf7ed",
+    TAN: "#d3bfa9",
+    LIGHT_BROWN: "#aa8d7a",
+    BROWN: "#775c55",
+    DARK_BROWN: "#483b3ai",
 }
 
