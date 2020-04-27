@@ -5,12 +5,17 @@ import { RenderContext } from "./RenderContext"
 import { Component } from "../component"
 
 export class TextRender extends RenderMethod {
-    text: string
-    position: Point
-    font: string
-    color: string
+    readonly text: string
+    readonly position: Point
+    readonly font: string
+    readonly color: string
 
-    constructor(text: string, position: Point, font: string = "20px Comic Sans MS Regular", color: string = "red") {
+    constructor(
+        text: string, 
+        position: Point, 
+        font: string = "20px Comic Sans MS Regular", 
+        color: string = "red",
+    ) {
         super(Number.MAX_SAFE_INTEGER)
         this.text = text
         this.position = position

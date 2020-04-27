@@ -4,14 +4,13 @@ import { Point } from "../../engine/point"
 import { rectContains } from "../../engine/util/utils"
 import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
 import { TileComponent } from "../../engine/tiles/TileComponent"
-import { Inventory } from "../items/Inventory"
-import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Player } from "../characters/Player"
 import { Dude } from "../characters/Dude"
 import { Entity } from "../../engine/Entity"
 import { InputKey } from "../../engine/input"
 import { UIStateManager } from "./UIStateManager"
 import { makeNineSliceTileComponents } from "../../engine/tiles/NineSlice"
+import { TextBox } from "./TextBox"
 
 export class InventoryDisplay extends Component {
 
@@ -26,10 +25,12 @@ export class InventoryDisplay extends Component {
     private showingInv = false
     get isOpen() { return this.showingInv }
     private offset: Point
+    private tooltip: TextBox
 
     constructor() {
         super()
         this.e.addComponent(this)
+        this.tooltip = this.e.addComponent(new TextBox("wood x2"))
     }
 
     inventory() {
@@ -51,9 +52,17 @@ export class InventoryDisplay extends Component {
             return
         }
 
+        const newIndex = this.getInventoryIndexForPosition(updateData.input.mousePos)
+        if (newIndex !== -1 && !!inv[newIndex]) {
+            this.tooltip.position = updateData.input.mousePos
+            const stack = inv[newIndex]
+            this.tooltip.say(`${stack.item.displayName}${stack.count > 1 ? '  x' + stack.count : ''}`)
+        } else {
+            this.tooltip.clear()
+        }
+        
         if (!!this.trackedTile) {
             if (updateData.input.isMouseUp) {  // drop n swap
-                const newIndex = this.getInventoryIndexForPosition(updateData.input.mousePos)
                 if (newIndex !== -1) {
                     const value = inv[this.trackedTileIndex]
                     const currentlyOccupiedSpot = inv[newIndex]
@@ -115,6 +124,7 @@ export class InventoryDisplay extends Component {
             c.delete()
         })
         this.bgTiles = []
+        this.tooltip.clear()
     }
 
     show(screenDimensions: Point) {

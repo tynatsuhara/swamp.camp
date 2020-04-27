@@ -14,7 +14,7 @@ import { DroppedItem } from "./items/DroppedItem"
 import { UIStateManager } from "./ui/UIStateManager"
 
 
-const ZOOM = 3.125
+const ZOOM = 3
 
 export class QuestGame extends Game {
 

@@ -8,10 +8,14 @@ import { TileComponent } from "./TileComponent"
  * @param slice the 9 parts to use to make a rectangle
  * @param pos top-left top-left position
  * @param dimensions dimensions of the desired rectangle in tile units
+ * @return All the tiles instantiated. The first element in the list is the main transform, the rest are relative.
  */
 export const makeNineSliceTileComponents = (slice: TileSource[], pos: Point, dimensions: Point): TileComponent[] => {
     if (slice.length !== 9) {
         throw new Error("nine slice gotta have nine slices ya dip")
+    }
+    if (dimensions.x < 2 || dimensions.y < 2) {
+        throw new Error("9 slice must be at least 2x2")
     }
     const tiles: TileComponent[] = []
     tiles.push(slice[0].toComponent(new TileTransform(new Point(0, 0))))
@@ -35,9 +39,14 @@ export const makeNineSliceTileComponents = (slice: TileSource[], pos: Point, dim
         }
     }
     
-    tiles.forEach(c => {
-        c.transform.position = c.transform.position.times(tiles[0].transform.dimensions.x).plus(pos)
+    const mainTransform = tiles[0].transform
+    tiles.forEach((c, i) => {
+        c.transform.position = c.transform.position.times(tiles[0].transform.dimensions.x)
+        if (i > 0) {
+            c.transform.relativeTo(mainTransform)
+        }
     })
+    mainTransform.position = mainTransform.position.plus(pos)
 
     return tiles
 }

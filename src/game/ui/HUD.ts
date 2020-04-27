@@ -10,6 +10,8 @@ import { TextRender } from "../../engine/renderer/TextRender"
 import { Component } from "../../engine/component"
 import { Items } from "../items/Items"
 import { InventoryDisplay } from "./InventoryDisplay"
+import { TEXT_STYLE } from "./Text"
+import { Color } from "./Color"
 
 export class HUD {
 
@@ -83,7 +85,7 @@ export class HUD {
         }
         this.coinCount = this.entity.addComponent(
             new BasicRenderComponent(
-                new TextRender(`x${coins}`, new Point(9, 9).plus(this.offset).plus(this.coinsOffset), "24px 'Press Start 2P'", "#facb3e")
+                new TextRender(`x${coins}`, new Point(9, 9).plus(this.offset).plus(this.coinsOffset), TEXT_STYLE, Color.YELLOW)
             )
         )
     }
