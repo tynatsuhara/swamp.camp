@@ -51,5 +51,5 @@ export const Items = {
  * TODO: Add initial velocity
  */
 export const spawnItem = (pos: Point, item: Item, velocity: Point = new Point(0, 0), sourceCollider: Collider = null) => {
-    LocationManager.instance.currentLocation.dynamic.add(new Entity([new DroppedItem(pos, item, velocity, sourceCollider)]))
+    LocationManager.instance.currentLocation.droppedItems.add(new Entity([new DroppedItem(pos, item, velocity, sourceCollider)]))
 }

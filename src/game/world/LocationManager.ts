@@ -30,8 +30,8 @@ export class LocationManager {
 
     transition(toUUID: string) {
         const location = this.locations.get(toUUID)
-        this.currentLocation.dynamic.delete(Player.instance.entity)
-        location.dynamic.add(Player.instance.entity)
+        this.currentLocation.droppedItems.delete(Player.instance.entity)
+        location.droppedItems.add(Player.instance.entity)
 
         this.current = location
     }

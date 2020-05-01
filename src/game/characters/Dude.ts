@@ -5,15 +5,15 @@ import { Component } from "../../engine/component"
 import { BoxCollider } from "../../engine/collision/BoxCollider"
 import { Tilesets } from "../graphics/Tilesets"
 import { Weapon } from "./Weapon"
-import { Entity } from "../../engine/Entity"
 import { Inventory } from "../items/Inventory"
-import { LocationManager } from "../world/LocationManager"
 import { spawnItem, Items } from "../items/Items"
+import { DudeType } from "./DudeFactory"
 
 export class Dude extends Component {
 
     static readonly COLLISION_LAYER = "dube"
     
+    readonly type: DudeType
     readonly inventory = new Inventory()
     readonly maxHealth = 4
     private _health = this.maxHealth
@@ -44,15 +44,17 @@ export class Dude extends Component {
     }
 
     constructor(
-        archetype: string,
+        type: DudeType,
+        characterAnimName: string,
         position: Point,
         weaponId: string
     ) {
         super()
+        this.type = type
         this._position = position
         this.start = (startData) => {
-            const idleAnim = Tilesets.instance.dungeonCharacters.getTileSetAnimation(`${archetype}_idle_anim`, 150)
-            const runAnim = Tilesets.instance.dungeonCharacters.getTileSetAnimation(`${archetype}_run_anim`, 80)
+            const idleAnim = Tilesets.instance.dungeonCharacters.getTileSetAnimation(`${characterAnimName}_idle_anim`, 150)
+            const runAnim = Tilesets.instance.dungeonCharacters.getTileSetAnimation(`${characterAnimName}_run_anim`, 80)
             
             this._animation = this.entity.addComponent(new AnimatedTileComponent([idleAnim, runAnim]))
     
@@ -122,7 +124,7 @@ export class Dude extends Component {
         const distToStop = 2
         let intervalsRemaining = 50
         const interval = setInterval(() => {
-            this.moveTo(this.position.lerp(.07, goal))
+            this.moveTo(this.position.lerp(.15, goal))
             intervalsRemaining--
             if (intervalsRemaining === 0 || goal.minus(this.position).magnitude() < distToStop) {
                 clearInterval(interval)

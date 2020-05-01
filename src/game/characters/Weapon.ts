@@ -50,8 +50,7 @@ export class Weapon extends Component {
 
     // TODO find a better place for this?
     static damageInFrontOfDude(dude: Dude, attackDistance: number) {
-        Array.from(LocationManager.instance.currentLocation.dynamic)
-                .map(e => e.getComponent(Dude))
+        Array.from(LocationManager.instance.currentLocation.dudes)
                 .filter(d => !!d && d !== dude)
                 .filter(d => dude.animation.transform.mirrorX === (d.standingPosition.x < dude.standingPosition.x))  // enemies the dude is facing
                 .filter(d => d.standingPosition.distanceTo(dude.standingPosition) < attackDistance)

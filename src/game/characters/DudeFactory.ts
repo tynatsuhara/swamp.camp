@@ -6,27 +6,36 @@ import { Dude } from "./Dude"
 import { NPC } from "./NPC"
 import { LocationManager } from "../world/LocationManager"
 
+export enum DudeType {
+    PLAYER,
+    ELF,
+
+}
+
 export class DudeFactory {
 
-    newPlayer(pos: Point) {
-        return this.make("knight_f", pos, 
-        "weapon_baton_with_spikes", 
-        // "weapon_katana", 
-        // "weapon_knife", 
-        new Player())
+    new(type: DudeType, pos: Point): Dude {
+        switch(type) {
+            case DudeType.PLAYER: {
+                return this.make(type, "knight_f", pos, "weapon_baton_with_spikes", new Player())
+            }
+            case DudeType.ELF: {
+                return this.make(type, "elf_m", pos, "weapon_katana", new NPC())
+            }
+        }
+        throw new Error(`DudeType ${type} can't be instantiated`)
     }
 
-    newElf(pos: Point) {
-        return this.make("elf_m", pos, "weapon_katana", new NPC())
-    }
-
-    newImp(pos: Point) {
-        return this.make("skelet", pos, null, new NPC())
-    }
-
-    private make(archetype: string, pos: Point, weapon: string, ...additionalComponents: Component[]) {
-        const e = new Entity([new Dude(archetype, pos, weapon) as Component].concat(additionalComponents))
-        LocationManager.instance.currentLocation.dynamic.add(e)
-        return e.getComponent(Dude)
+    private make(
+        type: DudeType, 
+        characterAnimName: string, 
+        pos: Point, 
+        weapon: string, 
+        ...additionalComponents: Component[]
+    ) {
+        const e = new Entity([new Dude(type, characterAnimName, pos, weapon) as Component].concat(additionalComponents))
+        const d = e.getComponent(Dude)
+        LocationManager.instance.currentLocation.dudes.add(d)
+        return d
     }
 }

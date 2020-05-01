@@ -7,7 +7,8 @@ import { SavedElement, ElementType, Elements } from "./elements/Elements"
 import { Point } from "../../engine/point"
 import { LocationManager } from "./LocationManager"
 import { GroundComponent } from "./ground/GroundComponent"
-import { GroundType, Ground } from "./ground/Ground"
+import { GroundType, Ground, SavedGround } from "./ground/Ground"
+import { Dude } from "../characters/Dude"
 
 export class WorldLocation {
 
@@ -24,8 +25,10 @@ export class WorldLocation {
     // BUT an entity should only be in one of these data structures
     readonly elements = new Grid<ElementComponent>()
 
-    // Entities with a dynamic position
-    readonly dynamic = new Set<Entity>()
+    readonly dudes = new Set<Dude>()
+
+    // TODO: Make dropped items saveable
+    readonly droppedItems = new Set<Entity>()
 
     constructor(manager: LocationManager) {
         this.manager = manager
@@ -54,20 +57,21 @@ export class WorldLocation {
     getEntities() {
         return Array.from(new Set(this.ground.values().map(c => c.entity)))
                 .concat(this.elements.values().map(c => c.entity))
-                .concat(Array.from(this.dynamic))
+                .concat(Array.from(this.dudes.values()).map(d => d.entity))
+                .concat(Array.from(this.droppedItems))
     }
 
     save(): LocationSaveState {
         return {
             uuid: this.uuid,
-            ground: null,  //this.ground.save()
+            ground: this.saveGround(),
             elements: this.saveElements(),
             dudes: null,  //Array.from()
         }
     }
 
     private saveElements(): SavedElement[] {
-        const topLeftCornerMap = new Map<ElementComponent, Point>()  // TODO filter out duplicate entries
+        const topLeftCornerMap = new Map<ElementComponent, Point>()
 
         this.elements.entries().forEach(tuple => {
             const elementComponent = tuple[1]
@@ -83,6 +87,16 @@ export class WorldLocation {
             el.pos = kv[1]
             el.type = kv[0].type
             el.obj = kv[0].save()
+            return el
+        })
+    }
+
+    private saveGround(): SavedGround[] {
+        return this.ground.entries().map(kv => {
+            const el = new SavedGround()
+            el.pos = kv[0]
+            el.type = kv[1].type
+            el.obj = kv[1].save()
             return el
         })
     }

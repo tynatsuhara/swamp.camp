@@ -5,7 +5,7 @@ import { UpdateViewsContext } from "../engine/engine"
 import { View } from "../engine/View"
 import { MapGenerator } from "./world/MapGenerator"
 import { Tilesets, TILE_SIZE } from "./graphics/Tilesets"
-import { DudeFactory } from "./characters/DudeFactory"
+import { DudeFactory, DudeType } from "./characters/DudeFactory"
 import { HUD } from "./ui/HUD"
 import { LocationManager } from "./world/LocationManager"
 import { Dude } from "./characters/Dude"
@@ -42,16 +42,18 @@ export class QuestGame extends Game {
         new Elements()
         new Ground()
 
-        // World must be initialized before we do anything else
-        new MapGenerator().doIt()
 
-        this.player = this.dudeFactory.newPlayer(new Point(-2, 2).times(TILE_SIZE))
+        const newGame = true
 
-        // TEST: Spawn some guys
-        this.dudeFactory.newElf(new Point(20, 30))
-        this.dudeFactory.newImp(new Point(80, 30))
-
-
+        if (newGame) {
+            // World must be initialized before we do anything else
+            new MapGenerator().doIt()
+            this.player = this.dudeFactory.new(DudeType.PLAYER, new Point(-2, 2).times(TILE_SIZE))
+            // TEST: Spawn some guys
+            this.dudeFactory.new(DudeType.ELF, new Point(20, 30))
+        } else {
+            
+        }
 
         setTimeout(() => this.save(), 1000)
     }
@@ -87,7 +89,7 @@ export class QuestGame extends Game {
             // storyState: StoryState.INTRODUCTION,
             locations: this.locationManager.save()
         } 
-        console.log(JSON.stringify(save, null, "  "))
+        console.log(JSON.stringify(save, null, " "))
     }
 
     load(save: Save) {

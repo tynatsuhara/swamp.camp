@@ -16,6 +16,7 @@ export const enum GroundType {
 export class SavedGround {
     pos: Point
     type: GroundType
+    obj: object
 }
 
 /**

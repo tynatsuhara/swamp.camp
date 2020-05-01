@@ -67,7 +67,7 @@ export class DroppedItem extends Component {
                 const d = player.entity.getComponent(Dude)
                 if (d.isAlive) {
                     player.entity.getComponent(Dude).inventory.addItem(this.itemType)
-                    LocationManager.instance.currentLocation.dynamic.delete(this.entity)
+                    LocationManager.instance.currentLocation.droppedItems.delete(this.entity)
                     this.entity.selfDestruct()
                 }
             }, 150)
