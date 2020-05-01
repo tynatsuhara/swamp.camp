@@ -296,16 +296,34 @@ System.register("engine/input", ["engine/point"], function (exports_5, context_5
                     this.isMouseDown = false;
                     this.isMouseHeld = false;
                     this.isMouseUp = false;
+                    this.isRightMouseDown = false;
+                    this.isRightMouseHeld = false;
+                    this.isRightMouseUp = false;
                     this.canvas = canvas;
+                    canvas.oncontextmenu = function () { return false; };
                     canvas.onmousedown = function (e) {
-                        _this.isMouseDown = true;
-                        _this.isMouseHeld = true;
-                        _this.isMouseUp = false;
+                        if (e.button === 0) {
+                            _this.isMouseDown = true;
+                            _this.isMouseHeld = true;
+                            _this.isMouseUp = false;
+                        }
+                        else if (e.button == 2) {
+                            _this.isRightMouseDown = true;
+                            _this.isRightMouseHeld = true;
+                            _this.isRightMouseUp = false;
+                        }
                     };
                     canvas.onmouseup = function (e) {
-                        _this.isMouseDown = false;
-                        _this.isMouseHeld = false;
-                        _this.isMouseUp = true;
+                        if (e.button === 0) {
+                            _this.isMouseDown = false;
+                            _this.isMouseHeld = false;
+                            _this.isMouseUp = true;
+                        }
+                        else if (e.button === 1) {
+                            _this.isRightMouseDown = false;
+                            _this.isRightMouseHeld = false;
+                            _this.isRightMouseUp = true;
+                        }
                     };
                     canvas.onmousemove = function (e) {
                         _this.mousePos = new point_4.Point(e.x - canvas.offsetLeft, e.y - canvas.offsetTop);
@@ -320,6 +338,8 @@ System.register("engine/input", ["engine/point"], function (exports_5, context_5
                     // reset since these should only be true for 1 tick
                     this.isMouseDown = false;
                     this.isMouseUp = false;
+                    this.isRightMouseDown = false;
+                    this.isRightMouseUp = false;
                     return this.lastCapture;
                 };
                 return Input;
@@ -327,7 +347,7 @@ System.register("engine/input", ["engine/point"], function (exports_5, context_5
             exports_5("Input", Input);
             // TODO: Capture mouse input for clickable elements
             CapturedInput = /** @class */ (function () {
-                function CapturedInput(keysDown, keysHeld, keysUp, mousePos, isMouseDown, isMouseHeld, isMouseUp) {
+                function CapturedInput(keysDown, keysHeld, keysUp, mousePos, isMouseDown, isMouseHeld, isMouseUp, isRightMouseDown, isRightMouseHeld, isRightMouseUp) {
                     if (keysDown === void 0) { keysDown = new Set(); }
                     if (keysHeld === void 0) { keysHeld = new Set(); }
                     if (keysUp === void 0) { keysUp = new Set(); }
@@ -335,10 +355,16 @@ System.register("engine/input", ["engine/point"], function (exports_5, context_5
                     if (isMouseDown === void 0) { isMouseDown = false; }
                     if (isMouseHeld === void 0) { isMouseHeld = false; }
                     if (isMouseUp === void 0) { isMouseUp = false; }
+                    if (isRightMouseDown === void 0) { isRightMouseDown = false; }
+                    if (isRightMouseHeld === void 0) { isRightMouseHeld = false; }
+                    if (isRightMouseUp === void 0) { isRightMouseUp = false; }
                     this.mousePos = new point_4.Point(0, 0);
                     this.isMouseDown = false;
                     this.isMouseHeld = false;
                     this.isMouseUp = false;
+                    this.isRightMouseDown = false;
+                    this.isRightMouseHeld = false;
+                    this.isRightMouseUp = false;
                     this.keysDown = keysDown;
                     this.keysHeld = keysHeld;
                     this.keysUp = keysUp;
@@ -346,9 +372,12 @@ System.register("engine/input", ["engine/point"], function (exports_5, context_5
                     this.isMouseDown = isMouseDown;
                     this.isMouseHeld = isMouseHeld;
                     this.isMouseUp = isMouseUp;
+                    this.isRightMouseDown = isRightMouseDown;
+                    this.isRightMouseHeld = isRightMouseHeld;
+                    this.isRightMouseUp = isRightMouseUp;
                 }
                 CapturedInput.prototype.scaledForView = function (view) {
-                    return new CapturedInput(this.keysDown, this.keysHeld, this.keysUp, this.mousePos.div(view.zoom).minus(view.offset), this.isMouseDown, this.isMouseHeld, this.isMouseUp);
+                    return new CapturedInput(this.keysDown, this.keysHeld, this.keysUp, this.mousePos.div(view.zoom).minus(view.offset), this.isMouseDown, this.isMouseHeld, this.isMouseUp, this.isRightMouseDown, this.isRightMouseHeld, this.isRightMouseUp);
                 };
                 CapturedInput.prototype.getKeysHeld = function () {
                     return Array.from(this.keysUp);
