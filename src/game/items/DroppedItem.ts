@@ -42,15 +42,16 @@ export class DroppedItem extends Component {
             ).onColliderEnter(c => this.collide(c)))
 
             this.reposition()
-        }
 
-        const moveInterval = setInterval(() => {
-            this.reposition(velocity)
-            velocity = velocity.times(.6)
-            if (velocity.magnitude() < .1) {
-                clearInterval(moveInterval)
-            }
-        }, 10)
+            const moveInterval = setInterval(() => {
+                if (!this.enabled) return
+                this.reposition(velocity)
+                velocity = velocity.times(.6)
+                if (velocity.magnitude() < .1) {
+                    clearInterval(moveInterval)
+                }
+            }, 10)
+        }
     }
 
     private reposition(delta = new Point(0, 0)) {

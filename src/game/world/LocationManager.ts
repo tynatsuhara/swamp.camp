@@ -1,5 +1,6 @@
 import { WorldLocation } from "./WorldLocation"
 import { Player } from "../characters/Player"
+import { LocationManagerSaveState } from "../saves/LocationManagerSaveState"
 
 export class LocationManager {
     
@@ -7,18 +8,46 @@ export class LocationManager {
 
     private current: WorldLocation
     get currentLocation() {
+        if (!this.current) {
+            throw new Error("no locations have been added")
+        }
         return this.current
     }
+    private locations: Map<string, WorldLocation> = new Map()  // uuid -> location
 
-    constructor(startingLocation: WorldLocation) {
+    constructor() {
         LocationManager.instance = this
-        this.current = startingLocation
     }
 
-    transition(to: WorldLocation) {
-        this.currentLocation.dynamic.delete(Player.instance.entity)
-        to.dynamic.add(Player.instance.entity)
+    newLocation() {
+        const l = new WorldLocation(this)
+        this.locations.set(l.uuid, l)
+        if (!this.current) {
+            this.current = l
+        }
+        return l
+    }
 
-        this.current = to
+    transition(toUUID: string) {
+        const location = this.locations.get(toUUID)
+        this.currentLocation.dynamic.delete(Player.instance.entity)
+        location.dynamic.add(Player.instance.entity)
+
+        this.current = location
+    }
+
+    save(): LocationManagerSaveState {
+        return {
+            locations: Array.from(this.locations.values()).map(l => l.save()),
+            currentLocationUUID: this.currentLocation.uuid
+        }
+    }
+
+    static load(saveState: LocationManagerSaveState): LocationManager {
+        const result = new LocationManager()
+        result.locations = new Map()
+        saveState.locations.map(l => result.locations.set(l.uuid, WorldLocation.load(l)))
+        result.current = result.locations.get(saveState.currentLocationUUID)
+        return result
     }
 }

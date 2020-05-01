@@ -27,6 +27,14 @@ export class Point {
         return new Point(this.x + other.x, this.y + other.y)
     }
 
+    plusX(dx: number): Point {
+        return new Point(this.x + dx, this.y)
+    }
+
+    plusY(dy: number): Point {
+        return new Point(this.x, this.y + dy)
+    }
+
     minus(other: Point): Point {
         return new Point(this.x - other.x, this.y - other.y)
     }
@@ -51,6 +59,15 @@ export class Point {
 
     toString(): string {
         return `(${this.x},${this.y})`
+    }
+
+    /**
+     * Parses a string of the format "(x,y)"
+     * Behavior is undefined when the paramter is incorrectly formatted.
+     */
+    static fromString(s: string) : Point {
+        const halves = s.replace("(", "").replace(")", "").split(",").map(n => Number.parseInt(n))
+        return new Point(halves[0], halves[1])
     }
 
     equals(pt: Point) {

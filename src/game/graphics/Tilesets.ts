@@ -1,10 +1,6 @@
 import { SingleFileTileLoader } from "./SingleFileTileLoader"
 import { DungeonTilesetII } from "./DungeonTilesetII"
-import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
-import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
-import { assets } from "../../engine/Assets"
 import { SplitFileTileLoader } from "./SplitFileTileLoader"
-import { Point } from "../../engine/point"
 import { OneBitTileset } from "./OneBitTileset"
 import { OutdoorTileset } from "./OutdoorTileset"
 

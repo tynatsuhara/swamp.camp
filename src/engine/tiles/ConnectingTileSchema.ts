@@ -5,10 +5,13 @@ import { TileTransform } from "./TileTransform"
 import { ConnectingTile } from "./ConnectingTile"
 import { Entity } from "../Entity"
 import { Grid } from "../util/Grid"
+import { GroundType } from "../../game/world/ground/Ground"
+import { GroundComponent } from "../../game/world/ground/GroundComponent"
 
 /**
  * Defines how a type of connecting tiles interacts with other types of connecting tiles.
  * TODO: This could probably be a lot better and support more complex connecting logic
+ * TODO: Move this out of engine 
  */
 export class ConnectingTileSchema {
     private _vertical: StaticTileSource
@@ -73,7 +76,7 @@ export class ConnectingTileSchema {
     /**
      * Renders the tile source based on the given grid and position
      */
-    render(grid: Grid<Entity>, position: Point): ImageRender {
+    render(grid: Grid<GroundComponent>, position: Point): ImageRender {
         const x = position.x
         const y = position.y
 
@@ -134,10 +137,10 @@ export class ConnectingTileSchema {
         return result.toImageRender(new TileTransform(position.times(result.dimensions.x), null, rotation))
     }
 
-    private get(grid: Grid<Entity>, pt: Point): ConnectingTile {
+    private get(grid: Grid<GroundComponent>, pt: Point): ConnectingTile {
         const el = grid.get(pt)
         if (el) {
-            const ct = el.getComponent(ConnectingTile)
+            const ct = el.entity.getComponent(ConnectingTile)
             if (ct && ct.schema.canConnect(this)) {
                 return ct
             }

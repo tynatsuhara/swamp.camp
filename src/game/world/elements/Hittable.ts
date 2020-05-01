@@ -28,7 +28,7 @@ export class Hittable extends Component {
 
     // TODO limit to certain tools 
     hit(dir: Point) {
-        if (!!this.animator) {  // already being hit
+        if (!!this.animator || !this.entity) {  // already being hit
             return 
         }
         

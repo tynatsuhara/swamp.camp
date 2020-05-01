@@ -3,23 +3,27 @@ import { BinaryHeap } from "./BinaryHeap"
 
 // an infinite grid using x/y coordinates (x increases to the right, y increases down)
 export class Grid<T> {
-    private readonly map: Map<string, T> = new Map()
+    private map: { [key: string]: T } = {}
     
     set(pt: Point, entry: T) {
-        this.map.set(pt.toString(), entry)
+        this.map[pt.toString()] = entry
     }
     
     // returns null if not present in the grid
     get(pt: Point): T {
-        return this.map.get(pt.toString())
+        return this.map[pt.toString()]
     }
 
     remove(pt: Point) {
-        this.map.delete(pt.toString())
+        delete this.map[pt.toString()]
     }
 
-    entries(): T[] {
-        return Array.from(this.map.values())
+    entries(): [Point, T][] {
+        return Object.entries(this.map).map(tuple => [Point.fromString(tuple[0]), tuple[1]])
+    }
+
+    values(): T[] {
+        return Object.values(this.map)
     }
 
     findPath(
@@ -79,5 +83,15 @@ export class Grid<T> {
         }
 
         return null
+    }
+
+    save(): { [key: string]: T } {
+        return this.map
+    }
+
+    static load<T>(map: { [key: string]: T }): Grid<T> {
+        const g = new Grid<T>()
+        g.map = map
+        return g
     }
 }

@@ -59,8 +59,10 @@ export class Engine {
 
         const views = this.getViews(updateViewsContext)
 
-        const [updateDuration] = measure(() => {
+        const [updateDuration] = measure(() => {            
             views.forEach(v => {
+                v.entities = v.entities.filter(e => !!e)
+
                 const startData: StartData = {}
                 const updateData: UpdateData = {
                     view: v,

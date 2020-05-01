@@ -1,53 +1,31 @@
 import { Point } from "../../engine/point"
-import { ConnectingTileSchema } from "../../engine/tiles/ConnectingTileSchema"
 import { ConnectingTile } from "../../engine/tiles/ConnectingTile"
-import { Entity } from "../../engine/Entity"
 import { BoxCollider } from "../../engine/collision/BoxCollider"
-import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
 import { WorldLocation } from "./WorldLocation"
-import { Campfire } from "./elements/Campfire"
-import { makeTent, TentColor } from "./elements/Tent"
-import { makeTree, TreeType } from "./elements/Tree"
-import { TileComponent } from "../../engine/tiles/TileComponent"
-import { makeRock } from "./elements/Rock"
-import { TileSource } from "../../engine/tiles/TileSource"
+import { TentColor } from "./elements/Tent"
+import { ElementType } from "./elements/Elements"
+import { LocationManager } from "./LocationManager"
+import { GroundType, Ground } from "./ground/Ground"
 
 const MAP_SIZE = 40
 
 export class MapGenerator {
 
-
-    readonly oldPathSchema = new ConnectingTileSchema()
-            .vertical(Tilesets.instance.outdoorTiles.getTileAt(new Point(9, 7)))
-            .angle(Tilesets.instance.outdoorTiles.getTileAt(new Point(7, 7)))
-            .tShape(Tilesets.instance.outdoorTiles.getTileAt(new Point(5, 8)))
-            .plusShape(Tilesets.instance.outdoorTiles.getTileAt(new Point(7, 12)))
-            .cap(Tilesets.instance.outdoorTiles.getTileAt(new Point(6, 11)))
-            .single(Tilesets.instance.outdoorTiles.getTileAt(new Point(8, 12)))
-
-    readonly pathSchema = new ConnectingTileSchema()
-            .vertical(Tilesets.instance.tilemap.getTileAt(new Point(2, 6)))
-            .angle(Tilesets.instance.tilemap.getTileAt(new Point(0, 5)))
-            .tShape(Tilesets.instance.tilemap.getTileAt(new Point(3, 5)))
-            .plusShape(Tilesets.instance.tilemap.getTileAt(new Point(5, 5)))
-            .cap(Tilesets.instance.tilemap.getTileAt(new Point(2, 6)))
-            .single(Tilesets.instance.tilemap.getTileAt(new Point(7, 5)))
-
-    private readonly location = new WorldLocation()
+    private readonly location = LocationManager.instance.newLocation()
 
     doIt(): WorldLocation {
-        const tentLocation = new WorldLocation()
+        const tentLocation = LocationManager.instance.newLocation()
         
         // spawn tent
-        makeTent(this.location, new Point(5, 5), TentColor.RED, tentLocation)
+        this.location.addWorldElement(ElementType.TENT, new Point(5, 5), tentLocation.uuid, TentColor.RED)
 
         // spawn campfire
         const campfirePos = new Point(3, 9)
-        this.location.stuff.set(campfirePos, new Entity([new Campfire(campfirePos)]))
-
+        this.location.addWorldElement(ElementType.CAMPFIRE, campfirePos)
+        
         // make the ground
-        this.renderPath(new Point(-10, -10), new Point(10, 10), this.pathSchema, 2)
-        this.renderPath(new Point(10, -10), new Point(-10, 10), this.pathSchema, 5)
+        this.renderPath(new Point(-10, -10), new Point(10, 10), 2)
+        this.renderPath(new Point(10, -10), new Point(-10, 10), 5)
 
         this.spawnTrees()
         this.spawnRocks()
@@ -68,8 +46,8 @@ export class MapGenerator {
                 Math.floor(Math.random() * (MAP_SIZE-1)) - MAP_SIZE/2,
             )
             const occupiedPoints = [pt, pt.plus(new Point(0, 1))]
-            if (occupiedPoints.every(p => !this.location.stuff.get(p) && !this.location.ground.get(p))) {
-                makeTree(this.location, pt, Math.random() < .7 ? TreeType.POINTY : TreeType.ROUND)
+            if (occupiedPoints.every(p => !this.location.ground.get(p))) {
+                this.location.addWorldElement(ElementType.TREE, pt)
             }
         }
     }
@@ -81,8 +59,7 @@ export class MapGenerator {
                 Math.floor(Math.random() * MAP_SIZE) - MAP_SIZE/2,
                 Math.floor(Math.random() * (MAP_SIZE)) - MAP_SIZE/2,
             )
-            if (!this.location.stuff.get(p) && !this.location.ground.get(p)) {
-                makeRock(this.location, p)
+            if (!this.location.ground.get(p) && this.location.addWorldElement(ElementType.ROCK, p)) {
                 placedRocks++
             }
         }
@@ -91,11 +68,10 @@ export class MapGenerator {
     renderPath(
         start: Point, 
         end: Point, 
-        tileSchema: ConnectingTileSchema,
         randomness: number
     ) {
         const ground = this.location.ground
-        const stuff = this.location.stuff
+        const stuff = this.location.elements
 
         const heuristic = (pt: Point): number => {
             const v = pt.distanceTo(end) * Math.random() * randomness
@@ -103,8 +79,8 @@ export class MapGenerator {
             if (!el) {
                 return v
             }
-            const ct = el.getComponent(ConnectingTile)
-            if (!ct || !ct.schema.canConnect(tileSchema)) {
+            const ct = el.entity.getComponent(ConnectingTile)
+            if (!ct || !ct.schema.canConnect(Ground.instance.PATH_CONNECTING_SCHEMA)) {
                 return v
             }
             const reuseCostMultiplier = 1/10
@@ -112,18 +88,18 @@ export class MapGenerator {
         }
 
         const isOccupiedFunc = (pt: Point) => {
-            if (!!stuff.get(pt)?.getComponent(BoxCollider)) {
+            if (!!stuff.get(pt)?.entity.getComponent(BoxCollider)) {
                 return true
             }
             const el = ground.get(pt)
             if (!el) {
                 return false  // definitely not occupied
             }
-            const ct = el.getComponent(ConnectingTile)
+            const ct = el.entity.getComponent(ConnectingTile)
             if (!ct) {
                 return true  // can't connect, therefore occupied
             }
-            return !tileSchema.canConnect(ct.schema)
+            return !Ground.instance.PATH_CONNECTING_SCHEMA.canConnect(ct.schema)
         }
 
         const path = ground.findPath(
@@ -137,30 +113,14 @@ export class MapGenerator {
             return
         }
 
-        path.forEach(pt => {
-            const entity = new Entity([
-                new ConnectingTile(tileSchema, ground, pt),
-                // new BoxCollider(pt.times(TILE_SIZE), new Point(TILE_SIZE, TILE_SIZE), true)
-            ])
-            ground.set(pt, entity)
-        })
+        path.forEach(pt => this.location.addGroundElement(GroundType.PATH, pt))
     }
 
     placeGrass() {
         for (let i = -MAP_SIZE/2; i < MAP_SIZE/2; i++) {
             for (let j = -MAP_SIZE/2; j < MAP_SIZE/2; j++) {
                 const pt = new Point(i, j)
-                if (!this.location.ground.get(pt)) {
-                    let tile: TileSource
-                    if (Math.random() < .65) {
-                        tile = Tilesets.instance.tilemap.getTileAt(new Point(0, Math.floor(Math.random() * 4)))
-                    } else {
-                        tile = Tilesets.instance.tilemap.getTileAt(new Point(0, 7))
-                    }
-                    const tileComponent = tile.toComponent()
-                    tileComponent.transform.position = pt.times(TILE_SIZE)
-                    this.location.ground.set(pt, new Entity([tileComponent]))
-                }
+                this.location.addGroundElement(GroundType.GRASS, pt)
             }
         }
     }

@@ -6,45 +6,46 @@ import { TileTransform } from "../../../engine/tiles/TileTransform"
 import { Point } from "../../../engine/point"
 import { Interactable } from "./Interactable"
 import { BoxCollider } from "../../../engine/collision/BoxCollider"
+import { ElementComponent } from "./ElementComponent"
+import { WorldLocation } from "../WorldLocation"
+import { Entity } from "../../../engine/Entity"
+import { ElementType } from "./Elements"
 
-export class Campfire extends Component {
+export const makeCampfire = (wl: WorldLocation, pos: Point, on: boolean): ElementComponent => {
+    const e = new Entity()
+    const scaledPos = pos.times(TILE_SIZE)
+    on = on ?? true
+    
+    const campfireOff = e.addComponent(new TileComponent(
+        Tilesets.instance.outdoorTiles.getTileSource("campfireOff"), 
+        new TileTransform(scaledPos)
+    ))
+    campfireOff.enabled = !on
+    campfireOff.transform.depth = scaledPos.y + TILE_SIZE
 
-    private campfireOff: TileComponent
-    private campfireOn: AnimatedTileComponent
+    const campfireOn = e.addComponent(new AnimatedTileComponent(
+        [Tilesets.instance.outdoorTiles.getTileSetAnimation("campfireOn", 2, 200)],
+        new TileTransform(scaledPos)
+    ))
+    campfireOn.enabled = on
+    campfireOn.transform.depth = scaledPos.y + TILE_SIZE
 
-    /**
-     * @param pos relative tile point
-     */
-    constructor(pos: Point) {
-        super()
-        this.start = () => {
-            pos = pos.times(TILE_SIZE)
+    const offset = new Point(0, 5)
+    e.addComponent(new BoxCollider(
+        scaledPos.plus(offset), 
+        new Point(TILE_SIZE, TILE_SIZE).minus(offset)
+    ))
 
-            this.campfireOff = this.entity.addComponent(new TileComponent(
-                Tilesets.instance.outdoorTiles.getTileSource("campfireOff"), 
-                new TileTransform(pos)
-            ))
-            this.campfireOff.enabled = false
-            this.campfireOff.transform.depth = pos.y + TILE_SIZE
+    // Toggle between on/off when interacted with
+    e.addComponent(new Interactable(scaledPos.plus(new Point(TILE_SIZE/2, TILE_SIZE/2)), () => {
+        on = !on
+        campfireOff.enabled = !on
+        campfireOn.enabled = on
+    }))
 
-            this.campfireOn = this.entity.addComponent(new AnimatedTileComponent(
-                [Tilesets.instance.outdoorTiles.getTileSetAnimation("campfireOn", 2, 200)],
-                new TileTransform(pos)
-            ))
-            this.campfireOn.enabled = true
-            this.campfireOn.transform.depth = pos.y + TILE_SIZE
-
-            const offset = new Point(0, 5)
-            this.entity.addComponent(new BoxCollider(
-                pos.plus(offset), 
-                new Point(TILE_SIZE, TILE_SIZE).minus(offset)
-            ))
-
-            // Toggle between on/off when interacted with
-            this.entity.addComponent(new Interactable(pos.plus(new Point(TILE_SIZE/2, TILE_SIZE/2)), () => {
-                this.campfireOff.enabled = this.campfireOn.enabled
-                this.campfireOn.enabled = !this.campfireOn.enabled
-            }))
-        }
-    }
+    return e.addComponent(new ElementComponent(
+        ElementType.CAMPFIRE, 
+        [pos], 
+        () => { return { on } }
+    ))
 }

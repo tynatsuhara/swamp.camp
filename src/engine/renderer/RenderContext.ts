@@ -24,9 +24,6 @@ export class RenderContext {
 
     fillText(text: string, point: Point) {
         point = point.plus(this.view.offset).times(this.view.zoom)
-
-        // console.log(this.context.measureText(text))
-
         this.context.fillText(text, point.x, point.y)
     }
 

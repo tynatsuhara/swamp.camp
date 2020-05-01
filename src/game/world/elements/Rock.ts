@@ -8,18 +8,21 @@ import { Entity } from "../../../engine/Entity"
 import { Hittable } from "./Hittable"
 import { spawnItem, Items } from "../../items/Items"
 import { makeHittable } from "./HittableResource"
+import { ElementComponent } from "./ElementComponent"
+import { ElementType } from "./Elements"
 
-export const makeRock = (wl: WorldLocation, pos: Point) => {
+export const makeRock = (wl: WorldLocation, pos: Point, variation: number, mossy: boolean, flipped: boolean): ElementComponent => {
     const e = new Entity()
-    const variation = Math.floor(Math.random() * 3) + 1
-    const mossy = Math.random() > .7
+    variation = variation ?? Math.floor(Math.random() * 3) + 1
+    mossy = mossy ?? Math.random() > .7
+    flipped = Math.random() > .5
 
     const tile = e.addComponent(new TileComponent(
         Tilesets.instance.outdoorTiles.getTileSource(`rock${variation}${mossy ? 'mossy' : ''}`), 
         new TileTransform(pos.times(TILE_SIZE))
     ))
     tile.transform.depth = (pos.y + 1) * TILE_SIZE - /* prevent weapon from clipping */ 5
-    tile.transform.mirrorX = Math.random() > .5
+    tile.transform.mirrorX = flipped
 
     // TODO
     const hitboxDims = new Point(12, 4)
@@ -30,5 +33,9 @@ export const makeRock = (wl: WorldLocation, pos: Point) => {
 
     makeHittable(e, pos.plus(new Point(.5, .5)).times(TILE_SIZE), [tile.transform], Items.ROCK)
 
-    wl.stuff.set(pos, e)
+    return e.addComponent(new ElementComponent(
+        ElementType.ROCK, 
+        [pos], 
+        () => { return { var: variation, mossy: mossy } }
+    ))
 }

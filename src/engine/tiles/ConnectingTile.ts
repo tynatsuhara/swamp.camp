@@ -2,18 +2,18 @@ import { Point } from "../point"
 import { ImageRender } from "../renderer/ImageRender"
 import { Component } from "../component"
 import { ConnectingTileSchema } from "./ConnectingTileSchema"
-import { Entity } from "../Entity"
 import { Grid } from "../util/Grid"
+import { GroundComponent } from "../../game/world/ground/GroundComponent"
 
 export class ConnectingTile extends Component {
     readonly schema: ConnectingTileSchema
-    private readonly grid: Grid<Entity>
+    private readonly grid: Grid<GroundComponent>
     private readonly position: Point
 
     /**
      * Connecting tiles require a tile grid. The position parameter should be tile-scale, not pixel-scale.
      */
-    constructor(schema: ConnectingTileSchema, grid: Grid<Entity>, position: Point = new Point(0, 0)) {
+    constructor(schema: ConnectingTileSchema, grid: Grid<GroundComponent>, position: Point = new Point(0, 0)) {
         super()
         this.schema = schema
         this.grid = grid
