@@ -103,6 +103,8 @@ export class InventoryDisplay extends Component {
         this.bgTiles.forEach(tile => {
             this.e.addComponent(tile)
         })
+
+        this.bgTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
     }
 
     getEntity() {
@@ -145,6 +147,7 @@ export class InventoryDisplay extends Component {
         this.tiles = this.inventory().inventory.map((stack, index) => {
             if (!!stack) {
                 const c = stack.item.inventoryIconSupplier().toComponent()
+                c.transform.depth = UIStateManager.UI_SPRITE_DEPTH + 1
                 return this.e.addComponent(c)
             }
         })

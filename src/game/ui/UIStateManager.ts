@@ -7,6 +7,7 @@ import { UpdateViewsContext } from "../../engine/engine"
 
 export class UIStateManager {
     static instance: UIStateManager
+    static UI_SPRITE_DEPTH = Number.MAX_SAFE_INTEGER/2
 
     private readonly hud = new HUD()
     private readonly inventory = new InventoryDisplay()

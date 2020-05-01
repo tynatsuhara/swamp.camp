@@ -8,6 +8,7 @@ import { TEXT_STYLE, TEXT_PIXEL_HEIGHT, TEXT_PIXEL_WIDTH } from "./Text"
 import { UpdateData } from "../../engine/engine"
 import { Color } from "./Color"
 import { TileTransform } from "../../engine/tiles/TileTransform"
+import { UIStateManager } from "./UIStateManager"
 
 export class Tooltip extends Component {
     
@@ -43,7 +44,10 @@ export class Tooltip extends Component {
 
     update(updateData: UpdateData) {
         const tiles = [this.left, this.center, this.right]
-        tiles.forEach(t => t.enabled = this.text !== null)
+        tiles.forEach(t => {
+            t.enabled = this.text !== null
+            t.transform.depth = UIStateManager.UI_SPRITE_DEPTH + 1
+        })
 
         if (this.text === null) {
             return

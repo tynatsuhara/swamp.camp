@@ -98,6 +98,8 @@ const map = new Map(`
     skull 288 320 16 16
     crate 288 298 16 22
 
+    shield0 288 336 16 16
+
     coin_anim 288 272 8 8 4
 
     ui_heart_full 288 256 16 16

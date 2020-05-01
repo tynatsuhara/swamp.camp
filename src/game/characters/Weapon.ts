@@ -1,14 +1,11 @@
 import { Component } from "../../engine/component"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { Tilesets } from "../graphics/Tilesets"
-import { StartData, UpdateData } from "../../engine/engine"
+import { UpdateData } from "../../engine/engine"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Point } from "../../engine/point"
-import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
 import { Dude } from "./Dude"
 import { Animator } from "../../engine/util/Animator"
-import { BoxCollider } from "../../engine/collision/BoxCollider"
-import { Player } from "./Player"
 import { LocationManager } from "../world/LocationManager"
 
 enum State {
@@ -78,13 +75,7 @@ export class Weapon extends Component {
         this.weaponSprite.transform.rotation = rotation
         this.weaponSprite.transform.mirrorY = this.state == State.SHEATHED
 
-        // magic based on the animations
-        const f = this.dude.animation.currentFrame()
-        if (!this.dude.isMoving) {
-            pos = pos.plus(new Point(0, f == 3 ? 1 : f))
-        } else {
-            pos = pos.plus(new Point(0, f == 0 ? -1 : -((3 - this.dude.animation.currentFrame()))))
-        }
+        pos = pos.plus(this.dude.getAnimationOffsetPosition())
 
         this.weaponSprite.transform.position = pos
 

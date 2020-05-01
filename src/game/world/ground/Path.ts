@@ -24,6 +24,7 @@ import { GroundType, Ground } from "./Ground"
 
 export const makePath = (wl: WorldLocation, pos: Point): GroundComponent => {
     const e = new Entity()
-    e.addComponent(new ConnectingTile(Ground.instance.PATH_CONNECTING_SCHEMA, wl.ground, pos))
+    const c = new ConnectingTile(Ground.instance.PATH_CONNECTING_SCHEMA, wl.ground, pos)
+    e.addComponent(c)
     return e.addComponent(new GroundComponent(GroundType.PATH))
 }

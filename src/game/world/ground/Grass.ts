@@ -17,7 +17,7 @@ export const makeGrass = (wl: WorldLocation, pos: Point, index: number): GroundC
         tile = Tilesets.instance.tilemap.getTileAt(new Point(0, 7))
     }
 
-    return new Entity([
-        tile.toComponent(new TileTransform(pos.times(TILE_SIZE)))
-    ]).addComponent(new GroundComponent(GroundType.GRASS))
+    const c = tile.toComponent(new TileTransform(pos.times(TILE_SIZE)))
+    c.transform.depth = Number.MIN_SAFE_INTEGER
+    return new Entity([c]).addComponent(new GroundComponent(GroundType.GRASS))
 }

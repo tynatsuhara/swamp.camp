@@ -8,6 +8,7 @@ import { Weapon } from "./Weapon"
 import { Inventory } from "../items/Inventory"
 import { spawnItem, Items } from "../items/Items"
 import { DudeType } from "./DudeFactory"
+import { Shield } from "./Shield"
 
 export class Dude extends Component {
 
@@ -23,6 +24,7 @@ export class Dude extends Component {
     get animation() { return this._animation }
 
     private _weapon: Weapon
+    private _shield: Shield
     get weapon() {
         return this._weapon
     }
@@ -52,6 +54,7 @@ export class Dude extends Component {
         super()
         this.type = type
         this._position = position
+
         this.start = (startData) => {
             const idleAnim = Tilesets.instance.dungeonCharacters.getTileSetAnimation(`${characterAnimName}_idle_anim`, 150)
             const runAnim = Tilesets.instance.dungeonCharacters.getTileSetAnimation(`${characterAnimName}_run_anim`, 80)
@@ -68,6 +71,11 @@ export class Dude extends Component {
                 this.animation.transform.dimensions.y - colliderSize.y
             )
             this.collider = this.entity.addComponent(new BoxCollider(this.position.plus(this.relativeColliderPos), colliderSize, Dude.COLLISION_LAYER))
+
+
+
+            // TODO MOVE THIS TO THE FACTORY
+            this._shield = this.entity.addComponent(new Shield("blah"))
         }
     }
 
@@ -175,5 +183,15 @@ export class Dude extends Component {
 
     private moveTo(point: Point) {
         this._position = this.collider.moveTo(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos)
+    }
+
+    getAnimationOffsetPosition(): Point {
+        // magic based on the animations
+        const f = this.animation.currentFrame()
+        if (!this.isMoving) {
+            return new Point(0, f == 3 ? 1 : f)
+        } else {
+            return new Point(0, f == 0 ? -1 : -((3 - this.animation.currentFrame())))
+        }
     }
 }
