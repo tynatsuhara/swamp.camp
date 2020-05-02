@@ -526,7 +526,6 @@ System.register("engine/profiler", ["engine/View", "engine/Entity", "engine/poin
         execute: function () {
             Profiler = /** @class */ (function () {
                 function Profiler() {
-                    this.start = new Date().getTime();
                     this.fpsTracker = new MovingAverage();
                     this.updateTracker = new MovingAverage();
                     this.renderTracker = new MovingAverage();
@@ -4118,7 +4117,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                 }
                 NPC.prototype.start = function (startData) {
                     this.dude = this.entity.getComponent(Dude_7.Dude);
-                    this.dude.speed *= Math.random(); // TODO configure speed for different enemies
+                    this.dude.speed *= (.3 + Math.random() / 2); // TODO configure speed for different enemies
                 };
                 NPC.prototype.update = function (updateData) {
                     var followDistance = 75;
@@ -4165,7 +4164,7 @@ System.register("game/characters/Enemy", ["engine/component", "game/characters/D
                 }
                 Enemy.prototype.start = function (startData) {
                     this.dude = this.entity.getComponent(Dude_8.Dude);
-                    this.dude.speed *= Math.random(); // TODO configure speed for different enemies
+                    this.dude.speed *= (.3 + Math.random() / 2); // TODO configure speed for different enemies
                     this.dude.weapon.delay = 500;
                 };
                 Enemy.prototype.update = function (updateData) {
@@ -5451,8 +5450,10 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/View"
                         new MapGenerator_1.MapGenerator().doIt();
                         this.player = this.dudeFactory.new(DudeFactory_1.DudeType.PLAYER, new point_38.Point(-2, 2).times(Tilesets_15.TILE_SIZE));
                         // TEST: Spawn some guys
-                        this.dudeFactory.new(DudeFactory_1.DudeType.ELF, new point_38.Point(20, 30));
-                        // this.dudeFactory.new(DudeType.ORC_WARRIOR, new Point(40, 30))
+                        // this.dudeFactory.new(DudeType.ELF, new Point(20, 30))
+                        for (var i = 0; i < 5; i++) {
+                            this.dudeFactory.new(DudeFactory_1.DudeType.ORC_WARRIOR, new point_38.Point(40, 30 + 20 * i));
+                        }
                     }
                     else {
                     }

@@ -51,8 +51,10 @@ export class QuestGame extends Game {
             this.player = this.dudeFactory.new(DudeType.PLAYER, new Point(-2, 2).times(TILE_SIZE))
 
             // TEST: Spawn some guys
-            this.dudeFactory.new(DudeType.ELF, new Point(20, 30))
-            // this.dudeFactory.new(DudeType.ORC_WARRIOR, new Point(40, 30))
+            // this.dudeFactory.new(DudeType.ELF, new Point(20, 30))
+            for (let i = 0; i < 5; i++) {
+                this.dudeFactory.new(DudeType.ORC_WARRIOR, new Point(40, 30 + 20 * i))
+            }
         } else {
             
         }

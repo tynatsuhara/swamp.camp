@@ -6,7 +6,6 @@ import { Component } from "./component"
 import { BasicRenderComponent } from "./renderer/BasicRenderComponent"
 
 class Profiler {
-    private start: number = new Date().getTime()
     private fpsTracker = new MovingAverage()
     private updateTracker = new MovingAverage()
     private renderTracker = new MovingAverage()
