@@ -9,7 +9,7 @@ import { LocationManager } from "../world/LocationManager"
 export enum DudeType {
     PLAYER,
     ELF,
-
+    ORC_WARRIOR
 }
 
 export class DudeFactory {
@@ -17,10 +17,13 @@ export class DudeFactory {
     new(type: DudeType, pos: Point): Dude {
         switch(type) {
             case DudeType.PLAYER: {
-                return this.make(type, "knight_f", pos, "weapon_baton_with_spikes", new Player())
+                return this.make(type, "knight_f", pos, "weapon_regular_sword", new Player())
             }
             case DudeType.ELF: {
                 return this.make(type, "elf_m", pos, "weapon_katana", new NPC())
+            }
+            case DudeType.ORC_WARRIOR: {
+                return this.make(type, "orc_warrior", pos, "weapon_baton_with_spikes", new NPC())
             }
         }
         throw new Error(`DudeType ${type} can't be instantiated`)

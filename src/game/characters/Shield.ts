@@ -24,7 +24,6 @@ enum State {
 export class Shield extends Component {
 
     private blockingShieldSprite: TileComponent
-    private readonly baseOffset = new Point(3, 12)
     private state: State = State.DRAWN
     // private slashSprite: TileComponent  // TODO try adding particles when someone hits a blocking shield
     private dude: Dude
@@ -53,7 +52,7 @@ export class Shield extends Component {
     animate() {
         // TODO: add shield animations
 
-        let pos = this.baseOffset
+        let pos = this.dude.animation.transform.dimensions.minus(new Point(12, 16))
 
         if (this.state === State.ON_BACK) {
             pos = new Point(-3, 10)

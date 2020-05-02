@@ -55,7 +55,9 @@ export class Weapon extends Component {
     }
 
     animate() {
-        const offsetFromEdge = new Point(6, 26).minus(this.weaponSprite.transform.dimensions)  // for DRAWN/SHEATHED
+        const offsetFromEdge = this.dude.animation.transform.dimensions
+                .minus(new Point(9, 2))
+                .minus(this.weaponSprite.transform.dimensions)
 
         let pos = new Point(0, 0)
         let rotation = 0

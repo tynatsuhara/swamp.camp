@@ -9,6 +9,7 @@ import { Inventory } from "../items/Inventory"
 import { spawnItem, Items } from "../items/Items"
 import { DudeType } from "./DudeFactory"
 import { Shield } from "./Shield"
+import { TileTransform } from "../../engine/tiles/TileTransform"
 
 export class Dude extends Component {
 
@@ -57,8 +58,10 @@ export class Dude extends Component {
         this.start = (startData) => {
             const idleAnim = Tilesets.instance.dungeonCharacters.getTileSetAnimation(`${characterAnimName}_idle_anim`, 150)
             const runAnim = Tilesets.instance.dungeonCharacters.getTileSetAnimation(`${characterAnimName}_run_anim`, 80)
+
+            const height = idleAnim.getTile(0).dimensions.y
             
-            this._animation = this.entity.addComponent(new AnimatedTileComponent([idleAnim, runAnim]))
+            this._animation = this.entity.addComponent(new AnimatedTileComponent([idleAnim, runAnim], new TileTransform(new Point(0, 28-height))))
     
             if (!!weaponId) {
                 this._weapon = this.entity.addComponent(new Weapon(weaponId))
