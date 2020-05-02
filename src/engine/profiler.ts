@@ -9,7 +9,7 @@ class Profiler {
     private fpsTracker = new MovingAverage()
     private updateTracker = new MovingAverage()
     private renderTracker = new MovingAverage()
-    private componentTracker = new MovingAverage()
+    private componentsUpdated: number
 
     update(
         msSinceLastUpdate: number, 
@@ -20,7 +20,7 @@ class Profiler {
         this.fpsTracker.record(msSinceLastUpdate)
         this.updateTracker.record(msForUpdate)
         this.renderTracker.record(msForRender)
-        this.componentTracker.record(componentsUpdated)
+        this.componentsUpdated = componentsUpdated
     }
 
     getView(): View {
@@ -28,7 +28,7 @@ class Profiler {
             `FPS: ${round(1000/this.fpsTracker.get())} (${round(this.fpsTracker.get())} ms per frame)`,
             `update() duration ms: ${round(this.updateTracker.get(), 2)}`,
             `render() duration ms: ${round(this.renderTracker.get(), 2)}`,
-            `components updated: ${round(this.componentTracker.get(), 2)}`
+            `components updated: ${this.componentsUpdated}`
         ]
         return new View([
             new Entity(s.map((str, i) => new BasicRenderComponent(new TextRender(str, new Point(60, 70 + 25 * i)))))

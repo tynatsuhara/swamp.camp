@@ -529,20 +529,19 @@ System.register("engine/profiler", ["engine/View", "engine/Entity", "engine/poin
                     this.fpsTracker = new MovingAverage();
                     this.updateTracker = new MovingAverage();
                     this.renderTracker = new MovingAverage();
-                    this.componentTracker = new MovingAverage();
                 }
                 Profiler.prototype.update = function (msSinceLastUpdate, msForUpdate, msForRender, componentsUpdated) {
                     this.fpsTracker.record(msSinceLastUpdate);
                     this.updateTracker.record(msForUpdate);
                     this.renderTracker.record(msForRender);
-                    this.componentTracker.record(componentsUpdated);
+                    this.componentsUpdated = componentsUpdated;
                 };
                 Profiler.prototype.getView = function () {
                     var s = [
                         "FPS: " + round(1000 / this.fpsTracker.get()) + " (" + round(this.fpsTracker.get()) + " ms per frame)",
                         "update() duration ms: " + round(this.updateTracker.get(), 2),
                         "render() duration ms: " + round(this.renderTracker.get(), 2),
-                        "components updated: " + round(this.componentTracker.get(), 2)
+                        "components updated: " + this.componentsUpdated
                     ];
                     return new View_1.View([
                         new Entity_1.Entity(s.map(function (str, i) { return new BasicRenderComponent_1.BasicRenderComponent(new TextRender_1.TextRender(str, new point_5.Point(60, 70 + 25 * i))); }))
