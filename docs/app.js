@@ -3511,8 +3511,6 @@ System.register("game/ui/HUD", ["game/graphics/Tilesets", "engine/tiles/TileTran
                 function HUD() {
                     this.entity = new Entity_3.Entity();
                     this.offset = new point_21.Point(4, 4);
-                    this.coinsOffset = new point_21.Point(0, 18);
-                    this.hearts = [];
                     // used for determining what should be updated
                     this.lastHealthCount = 0;
                     this.lastMaxHealthCount = 0;
@@ -3528,8 +3526,7 @@ System.register("game/ui/HUD", ["game/graphics/Tilesets", "engine/tiles/TileTran
                     }
                     this.lastHealthCount = health;
                     this.lastMaxHealthCount = maxHealth;
-                    this.hearts.forEach(function (c) { return c.delete(); });
-                    this.hearts = [];
+                    this.entity = new Entity_3.Entity();
                     var heartOffset = new point_21.Point(16, 0);
                     var full = Tilesets_5.Tilesets.instance.dungeonCharacters.getTileSource("ui_heart_full");
                     var half = Tilesets_5.Tilesets.instance.dungeonCharacters.getTileSource("ui_heart_half");

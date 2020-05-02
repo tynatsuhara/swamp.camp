@@ -14,11 +14,8 @@ import { Color } from "./Color"
 
 export class HUD {
 
-    private readonly entity = new Entity()
+    private entity: Entity = new Entity()
     private readonly offset = new Point(4, 4)
-    private readonly coinsOffset = new Point(0, 18)
-
-    private hearts: TileComponent[] = []
 
     // used for determining what should be updated
     private lastHealthCount = 0
@@ -37,8 +34,7 @@ export class HUD {
         this.lastHealthCount = health
         this.lastMaxHealthCount = maxHealth
 
-        this.hearts.forEach(c => c.delete())
-        this.hearts = []
+        this.entity = new Entity()
 
         const heartOffset = new Point(16, 0)
         const full = Tilesets.instance.dungeonCharacters.getTileSource("ui_heart_full")
