@@ -30,7 +30,7 @@ export class Enemy extends Component {
         const dist = Player.instance.entity.getComponent(Dude).position.minus(this.dude.position)
         const mag = dist.magnitude()
 
-        if (mag > followDistance || ((followDistance-mag) < buffer && Player.instance.entity.getComponent(Dude).isMoving) && this.dude.isMoving) {
+        if (mag > followDistance || ((followDistance-mag) < buffer && Player.instance.dude.isMoving) && this.dude.isMoving) {
             this.dude.move(updateData, dist)
         } else {
             this.dude.move(updateData, new Point(0, 0))

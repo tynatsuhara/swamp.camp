@@ -4180,7 +4180,7 @@ System.register("game/characters/Enemy", ["engine/component", "game/characters/D
                     var buffer = 0; // this basically determines how long they will stop for if they get too close
                     var dist = Player_6.Player.instance.entity.getComponent(Dude_8.Dude).position.minus(this.dude.position);
                     var mag = dist.magnitude();
-                    if (mag > followDistance || ((followDistance - mag) < buffer && Player_6.Player.instance.entity.getComponent(Dude_8.Dude).isMoving) && this.dude.isMoving) {
+                    if (mag > followDistance || ((followDistance - mag) < buffer && Player_6.Player.instance.dude.isMoving) && this.dude.isMoving) {
                         this.dude.move(updateData, dist);
                     }
                     else {
@@ -4736,13 +4736,13 @@ System.register("game/world/WorldLocation", ["engine/util/Grid", "game/saves/uui
             WorldLocation = /** @class */ (function () {
                 function WorldLocation(manager) {
                     this._uuid = uuid_1.newUUID();
-                    this.ground = new Grid_1.Grid();
+                    this.dudes = new Set();
                     // Non-moving entities with tile coords (not pixel coords)
                     // Entities may be duplicated in multiple spots 
                     // (entities spawning multiple tiles eg a tent)
                     // BUT an entity should only be in one of these data structures
                     this.elements = new Grid_1.Grid();
-                    this.dudes = new Set();
+                    this.ground = new Grid_1.Grid();
                     // TODO: Make dropped items saveable
                     this.droppedItems = new Set();
                     this.manager = manager;
@@ -4782,9 +4782,9 @@ System.register("game/world/WorldLocation", ["engine/util/Grid", "game/saves/uui
                     return elementComponent;
                 };
                 WorldLocation.prototype.getEntities = function () {
-                    return Array.from(new Set(this.ground.values().map(function (c) { return c.entity; })))
+                    return Array.from(Array.from(this.dudes.values()).map(function (d) { return d.entity; }))
                         .concat(this.elements.values().map(function (c) { return c.entity; }))
-                        .concat(Array.from(this.dudes.values()).map(function (d) { return d.entity; }))
+                        .concat(this.ground.values().map(function (c) { return c.entity; }))
                         .concat(Array.from(this.droppedItems));
                 };
                 WorldLocation.prototype.save = function () {

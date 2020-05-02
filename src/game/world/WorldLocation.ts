@@ -17,15 +17,14 @@ export class WorldLocation {
     private _uuid: string = newUUID()
     get uuid() { return this._uuid }
 
-    readonly ground = new Grid<GroundComponent>()
+    readonly dudes = new Set<Dude>()
 
     // Non-moving entities with tile coords (not pixel coords)
     // Entities may be duplicated in multiple spots 
     // (entities spawning multiple tiles eg a tent)
     // BUT an entity should only be in one of these data structures
     readonly elements = new Grid<ElementComponent>()
-
-    readonly dudes = new Set<Dude>()
+    readonly ground = new Grid<GroundComponent>()
 
     // TODO: Make dropped items saveable
     readonly droppedItems = new Set<Entity>()
@@ -55,9 +54,9 @@ export class WorldLocation {
     }
 
     getEntities() {
-        return Array.from(new Set(this.ground.values().map(c => c.entity)))
+        return Array.from(Array.from(this.dudes.values()).map(d => d.entity))
                 .concat(this.elements.values().map(c => c.entity))
-                .concat(Array.from(this.dudes.values()).map(d => d.entity))
+                .concat(this.ground.values().map(c => c.entity))
                 .concat(Array.from(this.droppedItems))
     }
 
