@@ -15,7 +15,8 @@ export class Player extends Component {
     
     private crosshairs: TileComponent
     private lerpedLastMoveDir: Point = new Point(1, 0)  // used for crosshair
-    private dude: Dude
+    private _dude: Dude
+    get dude() { return this._dude }
 
     constructor() {
         super()
@@ -23,7 +24,7 @@ export class Player extends Component {
     }
 
     start(startData: StartData) {
-        this.dude = this.entity.getComponent(Dude)
+        this._dude = this.entity.getComponent(Dude)
     }
 
     update(updateData: UpdateData) {

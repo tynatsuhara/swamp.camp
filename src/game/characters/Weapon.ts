@@ -23,6 +23,8 @@ export class Weapon extends Component {
     private state: State = State.DRAWN
     // private slashSprite: TileComponent
     private dude: Dude
+    private _range: number
+    get range() { return this._range }
 
     constructor(weaponId: string) {
         super()
@@ -34,6 +36,7 @@ export class Weapon extends Component {
                     new TileTransform().relativeTo(this.dude.animation.transform)
                 )
             )
+            this._range = this.weaponSprite.transform.dimensions.y
         }
     }
 
@@ -118,7 +121,7 @@ export class Weapon extends Component {
                 if (!this.enabled) {
                     return
                 }
-                const attackDistance = this.weaponSprite.transform.dimensions.y + 4  // add a tiny buffer for small weapons like the dagger to still work
+                const attackDistance = this.range + 4  // add a tiny buffer for small weapons like the dagger to still work
                 Weapon.damageInFrontOfDude(this.dude, attackDistance)
             }, 100)
             this.playAttackAnimation()

@@ -5,6 +5,7 @@ import { Player } from "./Player"
 import { Dude } from "./Dude"
 import { NPC } from "./NPC"
 import { LocationManager } from "../world/LocationManager"
+import { Enemy } from "./Enemy"
 
 export enum DudeType {
     PLAYER,
@@ -23,7 +24,7 @@ export class DudeFactory {
                 return this.make(type, "elf_m", pos, "weapon_katana", new NPC())
             }
             case DudeType.ORC_WARRIOR: {
-                return this.make(type, "orc_warrior", pos, "weapon_baton_with_spikes", new NPC())
+                return this.make(type, "orc_warrior", pos, "weapon_baton_with_spikes", new Enemy())
             }
         }
         throw new Error(`DudeType ${type} can't be instantiated`)
