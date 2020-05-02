@@ -68,8 +68,15 @@ export class QuestGame extends Game {
     }
 
     updateViews(updateViewsContext: UpdateViewsContext) {
-        // TODO: figure out how to abstract zoom from entities
-        const cameraGoal = updateViewsContext.dimensions.div(ZOOM).div(2).minus(this.player.position)
+        const clamp = (val: number, min: number, max: number) => Math.min(Math.max(val, min), max);
+        const dimensions = updateViewsContext.dimensions.div(ZOOM)
+        const xLimit = MapGenerator.MAP_SIZE / 2 * TILE_SIZE - dimensions.x/2
+        const yLimit = MapGenerator.MAP_SIZE / 2 * TILE_SIZE - dimensions.y/2
+        const clampedPlayerPos = new Point(
+            clamp(this.player.position.x, -xLimit, xLimit),
+            clamp(this.player.position.y, -yLimit, yLimit)
+        )
+        const cameraGoal = dimensions.div(2).minus(clampedPlayerPos)
 
         this.gameEntityView = { 
             zoom: ZOOM,

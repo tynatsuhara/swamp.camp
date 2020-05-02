@@ -3209,7 +3209,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     // absorb damage if facing the direction of the enemy
                     if (((_a = this.shield) === null || _a === void 0 ? void 0 : _a.isBlocking()) && !this.isFacing(this.standingPosition.plus(direction))) {
                         damage *= .25;
-                        knockback *= .25;
+                        knockback *= .3;
                     }
                     if (this.isAlive) {
                         this._health -= damage;
@@ -5058,7 +5058,7 @@ System.register("engine/tiles/ConnectingTile", ["engine/point", "engine/componen
 });
 System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/ConnectingTile", "engine/collision/BoxCollider", "game/world/elements/Tent", "game/world/LocationManager", "game/world/ground/Ground"], function (exports_74, context_74) {
     "use strict";
-    var point_36, ConnectingTile_3, BoxCollider_8, Tent_2, LocationManager_5, Ground_3, MAP_SIZE, MapGenerator;
+    var point_36, ConnectingTile_3, BoxCollider_8, Tent_2, LocationManager_5, Ground_3, MapGenerator;
     var __moduleName = context_74 && context_74.id;
     return {
         setters: [
@@ -5082,7 +5082,6 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/Connec
             }
         ],
         execute: function () {
-            MAP_SIZE = 60;
             MapGenerator = /** @class */ (function () {
                 function MapGenerator() {
                     this.location = LocationManager_5.LocationManager.instance.newLocation();
@@ -5108,7 +5107,7 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/Connec
                     var _this = this;
                     var trees = Math.random() * 150 + 50;
                     for (var i = 0; i < trees; i++) {
-                        var pt = new point_36.Point(Math.floor(Math.random() * MAP_SIZE) - MAP_SIZE / 2, Math.floor(Math.random() * (MAP_SIZE - 1)) - MAP_SIZE / 2);
+                        var pt = new point_36.Point(Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_SIZE / 2, Math.floor(Math.random() * (MapGenerator.MAP_SIZE - 1)) - MapGenerator.MAP_SIZE / 2);
                         var occupiedPoints = [pt, pt.plus(new point_36.Point(0, 1))];
                         if (occupiedPoints.every(function (p) { return !_this.location.ground.get(p); })) {
                             this.location.addWorldElement(0 /* TREE */, pt);
@@ -5118,7 +5117,7 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/Connec
                 MapGenerator.prototype.spawnRocks = function () {
                     var placedRocks = 0;
                     while (placedRocks < 20) {
-                        var p = new point_36.Point(Math.floor(Math.random() * MAP_SIZE) - MAP_SIZE / 2, Math.floor(Math.random() * (MAP_SIZE)) - MAP_SIZE / 2);
+                        var p = new point_36.Point(Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_SIZE / 2, Math.floor(Math.random() * (MapGenerator.MAP_SIZE)) - MapGenerator.MAP_SIZE / 2);
                         if (!this.location.ground.get(p) && this.location.addWorldElement(1 /* ROCK */, p)) {
                             placedRocks++;
                         }
@@ -5163,13 +5162,14 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/Connec
                     path.forEach(function (pt) { return _this.location.addGroundElement(1 /* PATH */, pt); });
                 };
                 MapGenerator.prototype.placeGrass = function () {
-                    for (var i = -MAP_SIZE / 2; i < MAP_SIZE / 2; i++) {
-                        for (var j = -MAP_SIZE / 2; j < MAP_SIZE / 2; j++) {
+                    for (var i = -MapGenerator.MAP_SIZE / 2; i < MapGenerator.MAP_SIZE / 2; i++) {
+                        for (var j = -MapGenerator.MAP_SIZE / 2; j < MapGenerator.MAP_SIZE / 2; j++) {
                             var pt = new point_36.Point(i, j);
                             this.location.addGroundElement(0 /* GRASS */, pt);
                         }
                     }
                 };
+                MapGenerator.MAP_SIZE = 50;
                 return MapGenerator;
             }());
             exports_74("MapGenerator", MapGenerator);
@@ -5355,8 +5355,12 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/View"
                     ];
                 };
                 QuestGame.prototype.updateViews = function (updateViewsContext) {
-                    // TODO: figure out how to abstract zoom from entities
-                    var cameraGoal = updateViewsContext.dimensions.div(ZOOM).div(2).minus(this.player.position);
+                    var clamp = function (val, min, max) { return Math.min(Math.max(val, min), max); };
+                    var dimensions = updateViewsContext.dimensions.div(ZOOM);
+                    var xLimit = MapGenerator_1.MapGenerator.MAP_SIZE / 2 * Tilesets_15.TILE_SIZE - dimensions.x / 2;
+                    var yLimit = MapGenerator_1.MapGenerator.MAP_SIZE / 2 * Tilesets_15.TILE_SIZE - dimensions.y / 2;
+                    var clampedPlayerPos = new point_37.Point(clamp(this.player.position.x, -xLimit, xLimit), clamp(this.player.position.y, -yLimit, yLimit));
+                    var cameraGoal = dimensions.div(2).minus(clampedPlayerPos);
                     this.gameEntityView = {
                         zoom: ZOOM,
                         offset: this.gameEntityView.offset.lerp(.0018 * updateViewsContext.elapsedTimeMillis, cameraGoal),

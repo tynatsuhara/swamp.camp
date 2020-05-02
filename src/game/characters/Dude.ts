@@ -91,7 +91,7 @@ export class Dude extends Component {
         // absorb damage if facing the direction of the enemy
         if (this.shield?.isBlocking() && !this.isFacing(this.standingPosition.plus(direction))) {
             damage *= .25
-            knockback *= .25
+            knockback *= .3
         }
         
         if (this.isAlive) {

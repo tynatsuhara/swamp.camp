@@ -7,9 +7,10 @@ import { ElementType } from "./elements/Elements"
 import { LocationManager } from "./LocationManager"
 import { GroundType, Ground } from "./ground/Ground"
 
-const MAP_SIZE = 60
 
 export class MapGenerator {
+
+    static readonly MAP_SIZE = 50
 
     private readonly location = LocationManager.instance.newLocation()
 
@@ -42,8 +43,8 @@ export class MapGenerator {
         const trees = Math.random() * 150 + 50
         for (let i = 0; i < trees; i++) {
             const pt = new Point(
-                Math.floor(Math.random() * MAP_SIZE) - MAP_SIZE/2,
-                Math.floor(Math.random() * (MAP_SIZE-1)) - MAP_SIZE/2,
+                Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_SIZE/2,
+                Math.floor(Math.random() * (MapGenerator.MAP_SIZE-1)) - MapGenerator.MAP_SIZE/2,
             )
             const occupiedPoints = [pt, pt.plus(new Point(0, 1))]
             if (occupiedPoints.every(p => !this.location.ground.get(p))) {
@@ -56,8 +57,8 @@ export class MapGenerator {
         let placedRocks = 0
         while (placedRocks < 20) {
             const p = new Point(
-                Math.floor(Math.random() * MAP_SIZE) - MAP_SIZE/2,
-                Math.floor(Math.random() * (MAP_SIZE)) - MAP_SIZE/2,
+                Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_SIZE/2,
+                Math.floor(Math.random() * (MapGenerator.MAP_SIZE)) - MapGenerator.MAP_SIZE/2,
             )
             if (!this.location.ground.get(p) && this.location.addWorldElement(ElementType.ROCK, p)) {
                 placedRocks++
@@ -117,8 +118,8 @@ export class MapGenerator {
     }
 
     placeGrass() {
-        for (let i = -MAP_SIZE/2; i < MAP_SIZE/2; i++) {
-            for (let j = -MAP_SIZE/2; j < MAP_SIZE/2; j++) {
+        for (let i = -MapGenerator.MAP_SIZE/2; i < MapGenerator.MAP_SIZE/2; i++) {
+            for (let j = -MapGenerator.MAP_SIZE/2; j < MapGenerator.MAP_SIZE/2; j++) {
                 const pt = new Point(i, j)
                 this.location.addGroundElement(GroundType.GRASS, pt)
             }
