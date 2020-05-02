@@ -142,15 +142,23 @@ export class Dude extends Component {
         const goal = this.position.plus(direction.normalized().times(knockback))
         const distToStop = 2
         let intervalsRemaining = 50
-        // TODO debug the glitchyness of this movement, try requestAnimationFrame
-        const interval = setInterval(() => {
-            this.moveTo(this.position.lerp(.15, goal))
+        
+        let last = new Date().getMilliseconds()
+        const knock = () => {
+            const now = new Date().getMilliseconds()
+            const diff = now - last
+            if (diff > 0) {
+                this.moveTo(this.position.lerp(.15 * diff/30, goal))
+            }
             intervalsRemaining--
             if (intervalsRemaining === 0 || goal.minus(this.position).magnitude() < distToStop) {
-                clearInterval(interval)
                 this.beingKnockedBack = false
+            } else {
+                requestAnimationFrame(knock)
             }
-        }, 10)
+            last = now
+        }
+        requestAnimationFrame(knock)
     }
 
     heal(amount: number) {

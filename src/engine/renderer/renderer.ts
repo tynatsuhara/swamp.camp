@@ -10,7 +10,7 @@ export class Renderer {
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas
-        this.context = canvas.getContext('2d')
+        this.context = canvas.getContext('2d', { alpha: false })
     }
 
     render(views: View[]) {

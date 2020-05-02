@@ -246,7 +246,7 @@ System.register("engine/renderer/Renderer", ["engine/point", "engine/renderer/Re
                     this.cameraOffsetX = 0;
                     this.cameraOffsetY = 0;
                     this.canvas = canvas;
-                    this.context = canvas.getContext('2d');
+                    this.context = canvas.getContext('2d', { alpha: false });
                 }
                 Renderer.prototype.render = function (views) {
                     var _this = this;
@@ -2854,16 +2854,23 @@ System.register("game/items/DroppedItem", ["engine/component", "engine/point", "
                         var colliderSize = new point_17.Point(8, 8);
                         _this.collider = _this.entity.addComponent(new BoxCollider_1.BoxCollider(pos.plus(_this.tile.transform.dimensions.minus(colliderSize).div(2)), colliderSize, DroppedItem.COLLISION_LAYER, !!sourceCollider ? [sourceCollider] : []).onColliderEnter(function (c) { return _this.collide(c); }));
                         _this.reposition();
-                        // TODO replace with requestAnimationFrame
-                        var moveInterval = setInterval(function () {
-                            if (!_this.enabled)
+                        var last = new Date().getMilliseconds();
+                        var move = function () {
+                            if (!_this.enabled) {
                                 return;
-                            _this.reposition(velocity);
-                            velocity = velocity.times(.6);
-                            if (velocity.magnitude() < .1) {
-                                clearInterval(moveInterval);
                             }
-                        }, 10);
+                            var now = new Date().getMilliseconds();
+                            var diff = now - last;
+                            if (diff > 0) {
+                                _this.reposition(velocity);
+                                velocity = velocity.times(.6);
+                            }
+                            if (velocity.magnitude() >= .1) {
+                                requestAnimationFrame(move);
+                            }
+                            last = now;
+                        };
+                        requestAnimationFrame(move);
                     };
                     return _this;
                 }
@@ -3263,15 +3270,23 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     var goal = this.position.plus(direction.normalized().times(knockback));
                     var distToStop = 2;
                     var intervalsRemaining = 50;
-                    // TODO debug the glitchyness of this movement, try requestAnimationFrame
-                    var interval = setInterval(function () {
-                        _this.moveTo(_this.position.lerp(.15, goal));
+                    var last = new Date().getMilliseconds();
+                    var knock = function () {
+                        var now = new Date().getMilliseconds();
+                        var diff = now - last;
+                        if (diff > 0) {
+                            _this.moveTo(_this.position.lerp(.15 * diff / 30, goal));
+                        }
                         intervalsRemaining--;
                         if (intervalsRemaining === 0 || goal.minus(_this.position).magnitude() < distToStop) {
-                            clearInterval(interval);
                             _this.beingKnockedBack = false;
                         }
-                    }, 10);
+                        else {
+                            requestAnimationFrame(knock);
+                        }
+                        last = now;
+                    };
+                    requestAnimationFrame(knock);
                 };
                 Dude.prototype.heal = function (amount) {
                     if (this.isAlive) {
@@ -5436,8 +5451,8 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/View"
                         new MapGenerator_1.MapGenerator().doIt();
                         this.player = this.dudeFactory.new(DudeFactory_1.DudeType.PLAYER, new point_38.Point(-2, 2).times(Tilesets_15.TILE_SIZE));
                         // TEST: Spawn some guys
-                        // this.dudeFactory.new(DudeType.ELF, new Point(20, 30))
-                        this.dudeFactory.new(DudeFactory_1.DudeType.ORC_WARRIOR, new point_38.Point(40, 30));
+                        this.dudeFactory.new(DudeFactory_1.DudeType.ELF, new point_38.Point(20, 30));
+                        // this.dudeFactory.new(DudeType.ORC_WARRIOR, new Point(40, 30))
                     }
                     else {
                     }
