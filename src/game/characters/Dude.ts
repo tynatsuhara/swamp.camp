@@ -139,6 +139,7 @@ export class Dude extends Component {
         const goal = this.position.plus(direction.normalized().times(knockback))
         const distToStop = 2
         let intervalsRemaining = 50
+        // TODO debug the glitchyness of this movement, try requestAnimationFrame
         const interval = setInterval(() => {
             this.moveTo(this.position.lerp(.15, goal))
             intervalsRemaining--

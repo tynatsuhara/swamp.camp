@@ -25,6 +25,7 @@ export class Weapon extends Component {
     private dude: Dude
     private _range: number
     get range() { return this._range }
+    public delay = 0  // delay after the animation ends before the weapon can attack again in millis
 
     constructor(weaponId: string) {
         super()
@@ -117,6 +118,7 @@ export class Weapon extends Component {
             return
         }
         if (this.state === State.DRAWN) {
+            this.state = State.ATTACKING
             setTimeout(() => {
                 if (!this.enabled) {
                     return
@@ -131,13 +133,15 @@ export class Weapon extends Component {
     private animator: Animator
     private currentAnimationFrame: number = 0
     private playAttackAnimation() {
-        this.state = State.ATTACKING
         this.animator = new Animator(
             Animator.frames(8, 40), 
             (index) => this.currentAnimationFrame = index, 
             () => {
-                this.state = State.DRAWN  // reset to DRAWN when animation finishes
                 this.animator = null
+                setTimeout(() => {
+                    console.log(`delayed ${this.delay} ms`)
+                    this.state = State.DRAWN  // reset to DRAWN when animation finishes
+                }, this.delay)
             }
         ) 
     }

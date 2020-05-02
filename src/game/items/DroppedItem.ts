@@ -43,6 +43,7 @@ export class DroppedItem extends Component {
 
             this.reposition()
 
+            // TODO replace with requestAnimationFrame
             const moveInterval = setInterval(() => {
                 if (!this.enabled) return
                 this.reposition(velocity)

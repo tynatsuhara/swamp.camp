@@ -11,6 +11,7 @@ export class Enemy extends Component {
     start(startData: StartData) {
         this.dude = this.entity.getComponent(Dude)
         this.dude.speed *= Math.random()  // TODO configure speed for different enemies
+        this.dude.weapon.delay = 500
     }
 
     update(updateData: UpdateData) {

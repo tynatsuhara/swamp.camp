@@ -2682,6 +2682,7 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                 function Weapon(weaponId) {
                     var _this = _super.call(this) || this;
                     _this.state = State.DRAWN;
+                    _this.delay = 0; // delay after the animation ends before the weapon can attack again in millis
                     _this.currentAnimationFrame = 0;
                     _this.start = function (startData) {
                         _this.dude = _this.entity.getComponent(Dude_1.Dude);
@@ -2763,6 +2764,7 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                         return;
                     }
                     if (this.state === State.DRAWN) {
+                        this.state = State.ATTACKING;
                         setTimeout(function () {
                             if (!_this.enabled) {
                                 return;
@@ -2775,10 +2777,12 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                 };
                 Weapon.prototype.playAttackAnimation = function () {
                     var _this = this;
-                    this.state = State.ATTACKING;
                     this.animator = new Animator_2.Animator(Animator_2.Animator.frames(8, 40), function (index) { return _this.currentAnimationFrame = index; }, function () {
-                        _this.state = State.DRAWN; // reset to DRAWN when animation finishes
                         _this.animator = null;
+                        setTimeout(function () {
+                            console.log("delayed " + _this.delay + " ms");
+                            _this.state = State.DRAWN; // reset to DRAWN when animation finishes
+                        }, _this.delay);
                     });
                 };
                 /**
@@ -2851,6 +2855,7 @@ System.register("game/items/DroppedItem", ["engine/component", "engine/point", "
                         var colliderSize = new point_17.Point(8, 8);
                         _this.collider = _this.entity.addComponent(new BoxCollider_1.BoxCollider(pos.plus(_this.tile.transform.dimensions.minus(colliderSize).div(2)), colliderSize, DroppedItem.COLLISION_LAYER, !!sourceCollider ? [sourceCollider] : []).onColliderEnter(function (c) { return _this.collide(c); }));
                         _this.reposition();
+                        // TODO replace with requestAnimationFrame
                         var moveInterval = setInterval(function () {
                             if (!_this.enabled)
                                 return;
@@ -3256,6 +3261,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     var goal = this.position.plus(direction.normalized().times(knockback));
                     var distToStop = 2;
                     var intervalsRemaining = 50;
+                    // TODO debug the glitchyness of this movement, try requestAnimationFrame
                     var interval = setInterval(function () {
                         _this.moveTo(_this.position.lerp(.15, goal));
                         intervalsRemaining--;
@@ -4137,6 +4143,7 @@ System.register("game/characters/Enemy", ["engine/component", "game/characters/D
                 Enemy.prototype.start = function (startData) {
                     this.dude = this.entity.getComponent(Dude_8.Dude);
                     this.dude.speed *= Math.random(); // TODO configure speed for different enemies
+                    this.dude.weapon.delay = 500;
                 };
                 Enemy.prototype.update = function (updateData) {
                     var _a, _b;
