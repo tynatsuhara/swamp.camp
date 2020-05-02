@@ -302,24 +302,24 @@ System.register("engine/input", ["engine/point"], function (exports_5, context_5
                     this.canvas = canvas;
                     canvas.oncontextmenu = function () { return false; };
                     canvas.onmousedown = function (e) {
-                        if (e.button === 0) {
+                        if (e.button === 0 /* LEFT */) {
                             _this.isMouseDown = true;
                             _this.isMouseHeld = true;
                             _this.isMouseUp = false;
                         }
-                        else if (e.button == 2) {
+                        else if (e.button == 2 /* RIGHT */) {
                             _this.isRightMouseDown = true;
                             _this.isRightMouseHeld = true;
                             _this.isRightMouseUp = false;
                         }
                     };
                     canvas.onmouseup = function (e) {
-                        if (e.button === 0) {
+                        if (e.button === 0 /* LEFT */) {
                             _this.isMouseDown = false;
                             _this.isMouseHeld = false;
                             _this.isMouseUp = true;
                         }
-                        else if (e.button === 1) {
+                        else if (e.button === 2 /* RIGHT */) {
                             _this.isRightMouseDown = false;
                             _this.isRightMouseHeld = false;
                             _this.isRightMouseUp = true;
@@ -334,7 +334,7 @@ System.register("engine/input", ["engine/point"], function (exports_5, context_5
                 Input.prototype.captureInput = function () {
                     var _this = this;
                     var keys = Array.from(this.keys);
-                    this.lastCapture = new CapturedInput(new Set(keys.filter(function (key) { return !_this.lastCapture.isKeyHeld(key); })), new Set(keys.slice()), new Set(this.lastCapture.getKeysHeld().filter(function (key) { return !_this.keys.has(key); })), this.mousePos, this.isMouseDown, this.isMouseHeld, this.isMouseUp);
+                    this.lastCapture = new CapturedInput(new Set(keys.filter(function (key) { return !_this.lastCapture.isKeyHeld(key); })), new Set(keys.slice()), new Set(this.lastCapture.getKeysHeld().filter(function (key) { return !_this.keys.has(key); })), this.mousePos, this.isMouseDown, this.isMouseHeld, this.isMouseUp, this.isRightMouseDown, this.isRightMouseHeld, this.isRightMouseUp);
                     // reset since these should only be true for 1 tick
                     this.isMouseDown = false;
                     this.isMouseUp = false;
@@ -1931,7 +1931,7 @@ System.register("game/graphics/DungeonTilesetII", ["engine/tiles/StaticTileSourc
             }
         ],
         execute: function () {
-            map = new Map("\n    wall_top_left 16 0 16 16\n    wall_top_mid 32 0 16 16\n    wall_top_right 48 0 16 16\n\n    wall_left 16 16 16 16\n    wall_mid 32 16 16 16\n    wall_right 48 16 16 16\n\n    wall_fountain_top 64 0 16 16\n    wall_fountain_mid_red_anim 64 16 16 16 3\n    wall_fountain_basin_red_anim 64 32 16 16 3\n    wall_fountain_mid_blue_anim 64 48 16 16 3\n    wall_fountain_basin_blue_anim 64 64 16 16 3\n\n    wall_hole_1 48 32 16 16\n    wall_hole_2 48 48 16 16\n\n    wall_banner_red 16 32 16 16\n    wall_banner_blue 32 32 16 16\n    wall_banner_green 16 48 16 16\n    wall_banner_yellow 32 48 16 16\n\n    column_top 80 80 16 16\n    column_mid 80 96 16 16\n    coulmn_base 80 112 16 16\n    wall_column_top 96 80 16 16\n    wall_column_mid 96 96 16 16\n    wall_coulmn_base 96 112 16 16\n\n    wall_goo 64 80 16 16\n    wall_goo_base 64 96 16 16\n\n    floor_1 16 64 16 16\n    floor_2 32 64 16 16\n    floor_3 48 64 16 16\n    floor_4 16 80 16 16\n    floor_5 32 80 16 16\n    floor_6 48 80 16 16\n    floor_7 16 96 16 16\n    floor_8 32 96 16 16\n    floor_ladder 48 96 16 16\n\n    floor_spikes_anim 16 176 16 16 4\n\n    wall_side_top_left 0 112 16 16\n    wall_side_top_right 16 112 16 16\n    wall_side_mid_left 0 128 16 16\n    wall_side_mid_right 16 128 16 16\n    wall_side_front_left 0 144 16 16\n    wall_side_front_right 16 144 16 16\n\n    wall_corner_top_left 32 112 16 16\n    wall_corner_top_right 48 112 16 16\n    wall_corner_left 32 128 16 16\n    wall_corner_right 48 128 16 16\n    wall_corner_bottom_left 32 144 16 16\n    wall_corner_bottom_right 48 144 16 16\n    wall_corner_front_left 32 160 16 16\n    wall_corner_front_right 48 160 16 16\n\n    wall_inner_corner_l_top_left 80 128 16 16\n    wall_inner_corner_l_top_rigth 64 128 16 16\n    wall_inner_corner_mid_left 80 144 16 16\n    wall_inner_corner_mid_rigth 64 144 16 16\n    wall_inner_corner_t_top_left 80 160 16 16\n    wall_inner_corner_t_top_rigth 64 160 16 16\n\n    edge 96 128 16 16\n    hole  96 144 16 16\n\n    doors_all 16 221 64 35\n    doors_frame_left 16 224 16 32\n    doors_frame_top 32 221 32 3\n    doors_frame_righ 63 224 16 32\n    doors_leaf_closed 32 224 32 32\n    doors_leaf_open 80 224 32 32\n\n    chest_empty_open_anim 304 288 16 16 3\n    chest_full_open_anim 304 304 16 16 3\n    chest_mimic_open_anim 304 320 16 16 3\n\n    flask_big_red 288 224 16 16\n    flask_big_blue 304 224 16 16\n    flask_big_green 320 224 16 16\n    flask_big_yellow 336 224 16 16\n\n    flask_red 288 240 16 16\n    flask_blue 304 240 16 16\n    flask_green 320 240 16 16\n    flask_yellow 336 240 16 16\n\n    skull 288 320 16 16\n    crate 288 298 16 22\n\n    shield0 288 336 16 16\n\n    coin_anim 288 272 8 8 4\n\n    ui_heart_full 288 256 16 16\n    ui_heart_half 304 256 16 16\n    ui_heart_empty 320 256 16 16\n\n    weapon_knife 293 18 6 13\n    weapon_rusty_sword 307 26 10 21\n    weapon_regular_sword 323 26 10 21\n    weapon_red_gem_sword 339 26 10 21\n    weapon_big_hammer 291 42 10 37\n    weapon_hammer 307 55 10 24\n    weapon_baton_with_spikes 323 57 10 22\n    weapon_mace 339 55 10 24\n    weapon_katana 293 82 6 29\n    weapon_saw_sword 307 86 10 25\n    weapon_anime_sword 322 81 12 30\n    weapon_axe 341 90 9 21\n    weapon_machete 294 121 5 22\n    weapon_cleaver 310 124 8 19\n    weapon_duel_sword 325 113 9 30\n    weapon_knight_sword 339 114 10 29\n    weapon_golden_sword 291 153 10 22\n    weapon_lavish_sword 307 145 10 30\n    weapon_red_magic_staff 324 145 8 30\n    weapon_green_magic_staff 340 145 8 30\n    weapon_spear 293 177 6 30\n\n    tiny_zombie_idle_anim 368 16 16 16 4\n    tiny_zombie_run_anim 432 16 16 16 4\n\n    goblin_idle_anim 368 32 16 16 4\n    goblin_run_anim 432 32 16 16 4\n\n    imp_idle_anim 368 48 16 16 4\n    imp_run_anim 432 48 16 16 4\n\n    skelet_idle_anim 368 80 16 16 4\n    skelet_run_anim 432 80 16 16 4\n\n    muddy_idle_anim 368 112 16 16 4\n    muddy_run_anim 368 112 16 16 4\n\n    swampy_idle_anim 432 112 16 16 4\n    swampy_run_anim 432 112 16 16 4\n\n    zombie_idle_anim 368 144 16 16 4\n    zombie_run_anim 368 144 16 16 4\n\n    ice_zombie_idle_anim 432 144 16 16 4\n    ice_zombie_run_anim 432 144 16 16 4\n\n    masked_orc_idle_anim 368 172 16 20 4\n    masked_orc_run_anim 432 172 16 20 4\n\n    orc_warrior_idle_anim 368 204 16 20 4\n    orc_warrior_run_anim 432 204 16 20 4\n\n    orc_shaman_idle_anim 368 236 16 20 4\n    orc_shaman_run_anim 432 236 16 20 4\n\n    necromancer_idle_anim 368 268 16 20 4\n    necromancer_run_anim 368 268 16 20 4\n\n    wogol_idle_anim 368 300 16 20 4\n    wogol_run_anim 432 300 16 20 4\n\n    chort_idle_anim 368 328 16 24 4\n    chort_run_anim 432 328 16 24 4\n\n    big_zombie_idle_anim 16 270 32 34 4\n    big_zombie_run_anim 144 270 32 34 4\n\n    ogre_idle_anim  16 320 32 32 4\n    ogre_run_anim 144 320 32 32 4\n    \n    big_demon_idle_anim  16 364 32 36 4\n    big_demon_run_anim 144 364 32 36 4\n\n    elf_f_idle_anim 128 4 16 28 4\n    elf_f_run_anim 192 4 16 28 4\n    elf_f_hit_anim 256 4 16 28 1\n\n    elf_m_idle_anim 128 36 16 28 4\n    elf_m_run_anim 192 36 16 28 4\n    elf_m_hit_anim 256 36 16 28 1\n\n    knight_f_idle_anim 128 68 16 28 4\n    knight_f_run_anim 192 68 16 28 4\n    knight_f_hit_anim 256 68 16 28 1\n\n    knight_m_idle_anim 128 100 16 28 4\n    knight_m_run_anim 192 100 16 28 4\n    knight_m_hit_anim 256 100 16 28 1\n\n    wizzard_f_idle_anim 128 132 16 28 4\n    wizzard_f_run_anim 192 132 16 28 4\n    wizzard_f_hit_anim 256 132 16 28 1\n\n    wizzard_m_idle_anim 128 164 16 28 4\n    wizzard_m_run_anim 192 164 16 28 4\n    wizzard_m_hit_anim 256 164 16 28 1\n\n    lizard_f_idle_anim 128 196 16 28 4\n    lizard_f_run_anim 192 196 16 28 4\n    lizard_f_hit_anim 256 196 16 28 1\n\n    lizard_m_idle_anim 128 228 16 28 4\n    lizard_m_run_anim 192 228 16 28 4\n    lizard_m_hit_anim 256 228 16 28 1\n    ".split("\n")
+            map = new Map("\n    wall_top_left 16 0 16 16\n    wall_top_mid 32 0 16 16\n    wall_top_right 48 0 16 16\n\n    wall_left 16 16 16 16\n    wall_mid 32 16 16 16\n    wall_right 48 16 16 16\n\n    wall_fountain_top 64 0 16 16\n    wall_fountain_mid_red_anim 64 16 16 16 3\n    wall_fountain_basin_red_anim 64 32 16 16 3\n    wall_fountain_mid_blue_anim 64 48 16 16 3\n    wall_fountain_basin_blue_anim 64 64 16 16 3\n\n    wall_hole_1 48 32 16 16\n    wall_hole_2 48 48 16 16\n\n    wall_banner_red 16 32 16 16\n    wall_banner_blue 32 32 16 16\n    wall_banner_green 16 48 16 16\n    wall_banner_yellow 32 48 16 16\n\n    column_top 80 80 16 16\n    column_mid 80 96 16 16\n    coulmn_base 80 112 16 16\n    wall_column_top 96 80 16 16\n    wall_column_mid 96 96 16 16\n    wall_coulmn_base 96 112 16 16\n\n    wall_goo 64 80 16 16\n    wall_goo_base 64 96 16 16\n\n    floor_1 16 64 16 16\n    floor_2 32 64 16 16\n    floor_3 48 64 16 16\n    floor_4 16 80 16 16\n    floor_5 32 80 16 16\n    floor_6 48 80 16 16\n    floor_7 16 96 16 16\n    floor_8 32 96 16 16\n    floor_ladder 48 96 16 16\n\n    floor_spikes_anim 16 176 16 16 4\n\n    wall_side_top_left 0 112 16 16\n    wall_side_top_right 16 112 16 16\n    wall_side_mid_left 0 128 16 16\n    wall_side_mid_right 16 128 16 16\n    wall_side_front_left 0 144 16 16\n    wall_side_front_right 16 144 16 16\n\n    wall_corner_top_left 32 112 16 16\n    wall_corner_top_right 48 112 16 16\n    wall_corner_left 32 128 16 16\n    wall_corner_right 48 128 16 16\n    wall_corner_bottom_left 32 144 16 16\n    wall_corner_bottom_right 48 144 16 16\n    wall_corner_front_left 32 160 16 16\n    wall_corner_front_right 48 160 16 16\n\n    wall_inner_corner_l_top_left 80 128 16 16\n    wall_inner_corner_l_top_rigth 64 128 16 16\n    wall_inner_corner_mid_left 80 144 16 16\n    wall_inner_corner_mid_rigth 64 144 16 16\n    wall_inner_corner_t_top_left 80 160 16 16\n    wall_inner_corner_t_top_rigth 64 160 16 16\n\n    edge 96 128 16 16\n    hole  96 144 16 16\n\n    doors_all 16 221 64 35\n    doors_frame_left 16 224 16 32\n    doors_frame_top 32 221 32 3\n    doors_frame_righ 63 224 16 32\n    doors_leaf_closed 32 224 32 32\n    doors_leaf_open 80 224 32 32\n\n    chest_empty_open_anim 304 288 16 16 3\n    chest_full_open_anim 304 304 16 16 3\n    chest_mimic_open_anim 304 320 16 16 3\n\n    flask_big_red 288 224 16 16\n    flask_big_blue 304 224 16 16\n    flask_big_green 320 224 16 16\n    flask_big_yellow 336 224 16 16\n\n    flask_red 288 240 16 16\n    flask_blue 304 240 16 16\n    flask_green 320 240 16 16\n    flask_yellow 336 240 16 16\n\n    skull 288 320 16 16\n    crate 288 298 16 22\n\n    shield_0 288 336 16 16\n    shield_1 304 336 16 16\n    shield_2 320 336 16 16\n    shield_3 336 336 16 16\n    shield_4 288 352 16 16\n    shield_5 304 352 16 16\n    shield_6 320 352 16 16\n    shield_7 336 352 16 16\n    shield_8 288 368 16 16\n    shield_9 304 368 16 16\n    shield_10 320 368 16 16\n    shield_11 336 368 16 16\n\n    coin_anim 288 272 8 8 4\n\n    ui_heart_full 288 256 16 16\n    ui_heart_half 304 256 16 16\n    ui_heart_empty 320 256 16 16\n\n    weapon_knife 293 18 6 13\n    weapon_rusty_sword 307 26 10 21\n    weapon_regular_sword 323 26 10 21\n    weapon_red_gem_sword 339 26 10 21\n    weapon_big_hammer 291 42 10 37\n    weapon_hammer 307 55 10 24\n    weapon_baton_with_spikes 323 57 10 22\n    weapon_mace 339 55 10 24\n    weapon_katana 293 82 6 29\n    weapon_saw_sword 307 86 10 25\n    weapon_anime_sword 322 81 12 30\n    weapon_axe 341 90 9 21\n    weapon_machete 294 121 5 22\n    weapon_cleaver 310 124 8 19\n    weapon_duel_sword 325 113 9 30\n    weapon_knight_sword 339 114 10 29\n    weapon_golden_sword 291 153 10 22\n    weapon_lavish_sword 307 145 10 30\n    weapon_red_magic_staff 324 145 8 30\n    weapon_green_magic_staff 340 145 8 30\n    weapon_spear 293 177 6 30\n\n    tiny_zombie_idle_anim 368 16 16 16 4\n    tiny_zombie_run_anim 432 16 16 16 4\n\n    goblin_idle_anim 368 32 16 16 4\n    goblin_run_anim 432 32 16 16 4\n\n    imp_idle_anim 368 48 16 16 4\n    imp_run_anim 432 48 16 16 4\n\n    skelet_idle_anim 368 80 16 16 4\n    skelet_run_anim 432 80 16 16 4\n\n    muddy_idle_anim 368 112 16 16 4\n    muddy_run_anim 368 112 16 16 4\n\n    swampy_idle_anim 432 112 16 16 4\n    swampy_run_anim 432 112 16 16 4\n\n    zombie_idle_anim 368 144 16 16 4\n    zombie_run_anim 368 144 16 16 4\n\n    ice_zombie_idle_anim 432 144 16 16 4\n    ice_zombie_run_anim 432 144 16 16 4\n\n    masked_orc_idle_anim 368 172 16 20 4\n    masked_orc_run_anim 432 172 16 20 4\n\n    orc_warrior_idle_anim 368 204 16 20 4\n    orc_warrior_run_anim 432 204 16 20 4\n\n    orc_shaman_idle_anim 368 236 16 20 4\n    orc_shaman_run_anim 432 236 16 20 4\n\n    necromancer_idle_anim 368 268 16 20 4\n    necromancer_run_anim 368 268 16 20 4\n\n    wogol_idle_anim 368 300 16 20 4\n    wogol_run_anim 432 300 16 20 4\n\n    chort_idle_anim 368 328 16 24 4\n    chort_run_anim 432 328 16 24 4\n\n    big_zombie_idle_anim 16 270 32 34 4\n    big_zombie_run_anim 144 270 32 34 4\n\n    ogre_idle_anim  16 320 32 32 4\n    ogre_run_anim 144 320 32 32 4\n    \n    big_demon_idle_anim  16 364 32 36 4\n    big_demon_run_anim 144 364 32 36 4\n\n    elf_f_idle_anim 128 4 16 28 4\n    elf_f_run_anim 192 4 16 28 4\n    elf_f_hit_anim 256 4 16 28 1\n\n    elf_m_idle_anim 128 36 16 28 4\n    elf_m_run_anim 192 36 16 28 4\n    elf_m_hit_anim 256 36 16 28 1\n\n    knight_f_idle_anim 128 68 16 28 4\n    knight_f_run_anim 192 68 16 28 4\n    knight_f_hit_anim 256 68 16 28 1\n\n    knight_m_idle_anim 128 100 16 28 4\n    knight_m_run_anim 192 100 16 28 4\n    knight_m_hit_anim 256 100 16 28 1\n\n    wizzard_f_idle_anim 128 132 16 28 4\n    wizzard_f_run_anim 192 132 16 28 4\n    wizzard_f_hit_anim 256 132 16 28 1\n\n    wizzard_m_idle_anim 128 164 16 28 4\n    wizzard_m_run_anim 192 164 16 28 4\n    wizzard_m_hit_anim 256 164 16 28 1\n\n    lizard_f_idle_anim 128 196 16 28 4\n    lizard_f_run_anim 192 196 16 28 4\n    lizard_f_hit_anim 256 196 16 28 1\n\n    lizard_m_idle_anim 128 228 16 28 4\n    lizard_m_run_anim 192 228 16 28 4\n    lizard_m_hit_anim 256 228 16 28 1\n    ".split("\n")
                 .map(function (line) { return line.trim(); })
                 .filter(function (line) { return !!line; })
                 .map(function (line) { return line.split(" "); })
@@ -2699,13 +2699,12 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                 Weapon.damageInFrontOfDude = function (dude, attackDistance) {
                     Array.from(LocationManager_1.LocationManager.instance.currentLocation.dudes)
                         .filter(function (d) { return !!d && d !== dude; })
-                        .filter(function (d) { return dude.animation.transform.mirrorX === (d.standingPosition.x < dude.standingPosition.x); }) // enemies the dude is facing
+                        .filter(function (d) { return dude.isFacing(d.standingPosition); })
                         .filter(function (d) { return d.standingPosition.distanceTo(dude.standingPosition) < attackDistance; })
                         .forEach(function (d) { return d.damage(1, d.standingPosition.minus(dude.standingPosition), 30); });
                 };
                 Weapon.prototype.animate = function () {
                     var offsetFromEdge = new point_16.Point(6, 26).minus(this.weaponSprite.transform.dimensions); // for DRAWN/SHEATHED
-                    // relative position for DRAWN state when characer is facing right (mirroring logic below)
                     var pos = new point_16.Point(0, 0);
                     var rotation = 0;
                     if (this.state === State.DRAWN) {
@@ -2725,7 +2724,7 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                     pos = pos.plus(this.dude.getAnimationOffsetPosition());
                     this.weaponSprite.transform.position = pos;
                     // show sword behind character if sheathed
-                    this.weaponSprite.transform.depth = this.state == State.SHEATHED ? -1 : 1;
+                    this.weaponSprite.transform.depth = this.state == State.SHEATHED ? -.5 : .5;
                     // this.weaponSprite.transform.mirrorX = charMirror
                     // TODO maybe keep the slash stuff later
                     // this.slashSprite.enabled = this.animator?.getCurrentFrame() === 3
@@ -2738,6 +2737,9 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                 Weapon.prototype.isDrawn = function () {
                     return this.state !== State.SHEATHED;
                 };
+                Weapon.prototype.isAttacking = function () {
+                    return this.state === State.ATTACKING;
+                };
                 Weapon.prototype.toggleSheathed = function () {
                     if (this.state === State.SHEATHED) {
                         this.state = State.DRAWN;
@@ -2748,6 +2750,10 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                 };
                 Weapon.prototype.attack = function () {
                     var _this = this;
+                    var _a;
+                    if ((_a = this.dude.shield) === null || _a === void 0 ? void 0 : _a.isBlocking()) {
+                        return;
+                    }
                     if (this.state === State.DRAWN) {
                         setTimeout(function () {
                             if (!_this.enabled) {
@@ -3014,8 +3020,9 @@ System.register("game/characters/Shield", ["engine/component", "engine/tiles/Til
         ],
         execute: function () {
             (function (State) {
-                State[State["NOT_BLOCKING"] = 0] = "NOT_BLOCKING";
-                State[State["BLOCKING"] = 1] = "BLOCKING";
+                State[State["ON_BACK"] = 0] = "ON_BACK";
+                State[State["DRAWN"] = 1] = "DRAWN";
+                State[State["BLOCKING"] = 2] = "BLOCKING";
             })(State || (State = {}));
             /**
              * A weapon being wielded by a dude
@@ -3025,12 +3032,11 @@ System.register("game/characters/Shield", ["engine/component", "engine/tiles/Til
                 function Shield(shieldId) {
                     var _this = _super.call(this) || this;
                     _this.baseOffset = new point_19.Point(3, 12);
-                    _this.state = State.NOT_BLOCKING;
+                    _this.state = State.DRAWN;
                     _this.currentAnimationFrame = 0;
                     _this.start = function (startData) {
                         _this.dude = _this.entity.getComponent(Dude_3.Dude);
-                        _this.blockingShieldSprite = _this.entity.addComponent(new TileComponent_4.TileComponent(Tilesets_3.Tilesets.instance.dungeonCharacters.getTileSource("shield0"), new TileTransform_6.TileTransform().relativeTo(_this.dude.animation.transform)));
-                        _this.blockingShieldSprite.transform.depth = -.5;
+                        _this.blockingShieldSprite = _this.entity.addComponent(new TileComponent_4.TileComponent(Tilesets_3.Tilesets.instance.dungeonCharacters.getTileSource(shieldId), new TileTransform_6.TileTransform().relativeTo(_this.dude.animation.transform)));
                     };
                     return _this;
                 }
@@ -3041,38 +3047,42 @@ System.register("game/characters/Shield", ["engine/component", "engine/tiles/Til
                     this.animate();
                 };
                 Shield.prototype.animate = function () {
+                    // TODO: add shield animations
                     var pos = this.baseOffset;
-                    // const offsetFromEdge = new Point(6, 26).minus(this.weaponSprite.transform.dimensions)  // for DRAWN/SHEATHED
-                    // // relative position for DRAWN state when characer is facing right (mirroring logic below)
-                    // let pos = new Point(0, 0)
-                    // let rotation = 0
-                    // if (this.state === State.DRAWN) {
-                    //     pos = offsetFromEdge
-                    // } else if (this.state === State.SHEATHED) {  // TODO add side sheath for swords
-                    //     // center on back
-                    //     pos = offsetFromEdge.plus(new Point(3, -1))
-                    // } else if (this.state === State.ATTACKING) {
-                    //     const posWithRotation = this.getAttackAnimationPosition()
-                    //     pos = posWithRotation[0].plus(offsetFromEdge)
-                    //     rotation = posWithRotation[1]
-                    // }
-                    // this.weaponSprite.transform.rotation = rotation
-                    // this.weaponSprite.transform.mirrorY = this.state == State.SHEATHED
+                    if (this.state === State.ON_BACK) {
+                        pos = new point_19.Point(-3, 10);
+                    }
+                    else if (this.state === State.BLOCKING) {
+                        pos = pos.plus(new point_19.Point(3, 3));
+                    }
                     pos = pos.plus(this.dude.getAnimationOffsetPosition());
                     this.blockingShieldSprite.transform.position = pos;
-                    // this.weaponSprite.transform.position = pos
-                    // // show sword behind character if sheathed
-                    // this.weaponSprite.transform.depth = this.state == State.SHEATHED ? -1 : 1
+                    this.blockingShieldSprite.transform.depth = this.state === State.BLOCKING ? .75 : -.75;
                 };
-                Shield.prototype.isDrawn = function () {
-                    // return this.state !== State.SHEATHED
+                // isDrawn() {
+                // return this.state !== State.SHEATHED
+                // }
+                Shield.prototype.toggleOnBack = function () {
+                    if (this.state === State.DRAWN || this.state === State.BLOCKING) {
+                        this.state = State.ON_BACK;
+                    }
+                    else {
+                        this.state = State.DRAWN;
+                    }
                 };
-                Shield.prototype.toggleSheathed = function () {
-                    // if (this.state === State.SHEATHED) {
-                    //     this.state = State.DRAWN
-                    // } else if (this.state === State.DRAWN) {
-                    //     this.state = State.SHEATHED
-                    // }
+                Shield.prototype.block = function (blockingActive) {
+                    if (this.state === State.ON_BACK) {
+                        return;
+                    }
+                    if (blockingActive && (!this.dude.weapon || !this.dude.weapon.isAttacking())) {
+                        this.state = State.BLOCKING;
+                    }
+                    else {
+                        this.state = State.DRAWN;
+                    }
+                };
+                Shield.prototype.isBlocking = function () {
+                    return this.state === State.BLOCKING;
                 };
                 return Shield;
             }(component_6.Component));
@@ -3138,7 +3148,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                         _this.relativeColliderPos = new point_20.Point(_this.animation.transform.dimensions.x / 2 - colliderSize.x / 2, _this.animation.transform.dimensions.y - colliderSize.y);
                         _this.collider = _this.entity.addComponent(new BoxCollider_2.BoxCollider(_this.position.plus(_this.relativeColliderPos), colliderSize, Dude.COLLISION_LAYER));
                         // TODO MOVE THIS TO THE FACTORY
-                        _this._shield = _this.entity.addComponent(new Shield_1.Shield("blah"));
+                        _this._shield = _this.entity.addComponent(new Shield_1.Shield("shield_2"));
                     };
                     return _this;
                 }
@@ -3153,9 +3163,12 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     configurable: true
                 });
                 Object.defineProperty(Dude.prototype, "weapon", {
-                    get: function () {
-                        return this._weapon;
-                    },
+                    get: function () { return this._weapon; },
+                    enumerable: true,
+                    configurable: true
+                });
+                Object.defineProperty(Dude.prototype, "shield", {
+                    get: function () { return this._shield; },
                     enumerable: true,
                     configurable: true
                 });
@@ -3192,6 +3205,12 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     configurable: true
                 });
                 Dude.prototype.damage = function (damage, direction, knockback) {
+                    var _a;
+                    // absorb damage if facing the direction of the enemy
+                    if (((_a = this.shield) === null || _a === void 0 ? void 0 : _a.isBlocking()) && !this.isFacing(this.standingPosition.plus(direction))) {
+                        damage *= .25;
+                        knockback *= .25;
+                    }
                     if (this.isAlive) {
                         this._health -= damage;
                         if (!this.isAlive) {
@@ -3274,6 +3293,9 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                 };
                 Dude.prototype.moveTo = function (point) {
                     this._position = this.collider.moveTo(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos);
+                };
+                Dude.prototype.isFacing = function (pt) {
+                    return this.animation.transform.mirrorX === (pt.x < this.standingPosition.x);
                 };
                 Dude.prototype.getAnimationOffsetPosition = function () {
                     // magic based on the animations
@@ -3485,7 +3507,7 @@ System.register("game/ui/Text", [], function (exports_49, context_49) {
         setters: [],
         execute: function () {
             exports_49("TEXT_PIXEL_WIDTH", TEXT_PIXEL_WIDTH = 11);
-            exports_49("TEXT_PIXEL_HEIGHT", TEXT_PIXEL_HEIGHT = 24);
+            exports_49("TEXT_PIXEL_HEIGHT", TEXT_PIXEL_HEIGHT = 24); // 8 * ZOOM
             exports_49("TEXT_STYLE", TEXT_STYLE = TEXT_PIXEL_HEIGHT + "px 'Press Start 2P'");
         }
     };
@@ -3949,17 +3971,22 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
                     this.dude.move(updateData, new point_25.Point(dx, dy), this.dude.weapon.isDrawn() ? updateData.input.mousePos.x - this.dude.standingPosition.x : 0);
                     if (updateData.input.isKeyDown(70 /* F */)) {
                         this.dude.weapon.toggleSheathed();
+                        this.dude.shield.toggleOnBack();
+                    }
+                    if (!!this.dude.shield) {
+                        this.dude.shield.block(updateData.input.isRightMouseHeld);
                     }
                     if (updateData.input.isMouseDown) {
                         this.dude.weapon.attack();
-                        this.hitResource(updateData);
+                        this.hitResource(updateData); // TODO: restrict the speed at which you can do this (probably easiest once we introduce tools)
                     }
                     if (updateData.input.isKeyDown(69 /* E */)) {
                         this.interact(updateData);
                     }
                     // FOR TESTING
                     if (updateData.input.isKeyDown(80 /* P */)) {
-                        this.dude.damage(.25, new point_25.Point(Math.random() - .5, Math.random() - .5), 30);
+                        // this.dude.damage(.25, new Point(Math.random()-.5, Math.random()-.5), 30)
+                        this.dude.damage(.25, new point_25.Point(-1, Math.random() - .5), 30);
                     }
                     // update crosshair position
                     // const relativeLerpedPos = originalCrosshairPosRelative.lerp(0.16, this.lerpedLastMoveDir.normalized().times(TILE_SIZE))
@@ -4000,7 +4027,7 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
                     var possibilities = updateData.view.entities
                         .map(function (e) { return e.getComponent(Hittable_1.Hittable); })
                         .filter(function (e) { return !!e; })
-                        .filter(function (e) { return _this.dude.animation.transform.mirrorX === (e.position.x < interactCenter.x); }); // hittables the dude is facing
+                        .filter(function (e) { return _this.dude.isFacing(e.position); });
                     var closestDist = Number.MAX_SAFE_INTEGER;
                     var closest;
                     for (var _i = 0, possibilities_2 = possibilities; _i < possibilities_2.length; _i++) {
@@ -5055,7 +5082,7 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/Connec
             }
         ],
         execute: function () {
-            MAP_SIZE = 40;
+            MAP_SIZE = 60;
             MapGenerator = /** @class */ (function () {
                 function MapGenerator() {
                     this.location = LocationManager_5.LocationManager.instance.newLocation();

@@ -48,20 +48,28 @@ export class Player extends Component {
 
         if (updateData.input.isKeyDown(InputKey.F)) {
             this.dude.weapon.toggleSheathed()
+            this.dude.shield.toggleOnBack()
+        }
+
+        if (!!this.dude.shield) {
+            this.dude.shield.block(updateData.input.isRightMouseHeld)
         }
 
         if (updateData.input.isMouseDown) {
             this.dude.weapon.attack()
-            this.hitResource(updateData)
+            this.hitResource(updateData)  // TODO: restrict the speed at which you can do this (probably easiest once we introduce tools)
         }
 
         if (updateData.input.isKeyDown(InputKey.E)) {
             this.interact(updateData)
         }
 
+
+
         // FOR TESTING
         if (updateData.input.isKeyDown(InputKey.P)) {
-            this.dude.damage(.25, new Point(Math.random()-.5, Math.random()-.5), 30)
+            // this.dude.damage(.25, new Point(Math.random()-.5, Math.random()-.5), 30)
+            this.dude.damage(.25, new Point(-1, Math.random()-.5), 30)
         }
 
         // update crosshair position
@@ -106,7 +114,7 @@ export class Player extends Component {
         const possibilities = updateData.view.entities
                 .map(e => e.getComponent(Hittable))
                 .filter(e => !!e)
-                .filter(e => this.dude.animation.transform.mirrorX === (e.position.x < interactCenter.x))  // hittables the dude is facing
+                .filter(e => this.dude.isFacing(e.position))
         
         let closestDist = Number.MAX_SAFE_INTEGER
         let closest: Hittable

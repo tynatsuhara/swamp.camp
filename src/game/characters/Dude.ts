@@ -24,10 +24,9 @@ export class Dude extends Component {
     get animation() { return this._animation }
 
     private _weapon: Weapon
+    get weapon() { return this._weapon }
     private _shield: Shield
-    get weapon() {
-        return this._weapon
-    }
+    get shield() { return this._shield }
 
     private collider: BoxCollider
     private relativeColliderPos: Point = new Point(3, 15)
@@ -75,7 +74,7 @@ export class Dude extends Component {
 
 
             // TODO MOVE THIS TO THE FACTORY
-            this._shield = this.entity.addComponent(new Shield("blah"))
+            this._shield = this.entity.addComponent(new Shield("shield_2"))
         }
     }
 
@@ -89,6 +88,12 @@ export class Dude extends Component {
     get isAlive() { return this._health > 0 }
 
     damage(damage: number, direction: Point, knockback: number) {
+        // absorb damage if facing the direction of the enemy
+        if (this.shield?.isBlocking() && !this.isFacing(this.standingPosition.plus(direction))) {
+            damage *= .25
+            knockback *= .25
+        }
+        
         if (this.isAlive) {
             this._health -= damage
             if (!this.isAlive) {
@@ -183,6 +188,10 @@ export class Dude extends Component {
 
     private moveTo(point: Point) {
         this._position = this.collider.moveTo(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos)
+    }
+
+    isFacing(pt: Point) {
+        return this.animation.transform.mirrorX === (pt.x < this.standingPosition.x)
     }
 
     getAnimationOffsetPosition(): Point {

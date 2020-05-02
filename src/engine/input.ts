@@ -10,6 +10,11 @@ export const enum InputKey {
     SHIFT = 16, SPACE = 32
 }
 
+const enum MouseButton {
+    LEFT = 0,
+    RIGHT = 2
+}
+
 export class Input {
     private readonly canvas: HTMLCanvasElement
     private readonly keys: Set<number> = new Set()
@@ -28,22 +33,22 @@ export class Input {
         canvas.oncontextmenu = () => false
 
         canvas.onmousedown = (e) => { 
-            if (e.button === 0) {
+            if (e.button === MouseButton.LEFT) {
                 this.isMouseDown = true 
                 this.isMouseHeld = true
                 this.isMouseUp = false
-            } else if (e.button == 2) {
+            } else if (e.button == MouseButton.RIGHT) {
                 this.isRightMouseDown = true 
                 this.isRightMouseHeld = true
                 this.isRightMouseUp = false
             }
         }
         canvas.onmouseup = (e) => { 
-            if (e.button === 0) {
+            if (e.button === MouseButton.LEFT) {
                 this.isMouseDown = false
                 this.isMouseHeld = false
                 this.isMouseUp = true 
-            } else if (e.button === 1) {
+            } else if (e.button === MouseButton.RIGHT) {
                 this.isRightMouseDown = false 
                 this.isRightMouseHeld = false
                 this.isRightMouseUp = true
@@ -65,7 +70,10 @@ export class Input {
             this.mousePos,
             this.isMouseDown,
             this.isMouseHeld,
-            this.isMouseUp
+            this.isMouseUp,
+            this.isRightMouseDown,
+            this.isRightMouseHeld,
+            this.isRightMouseUp
         )
 
         // reset since these should only be true for 1 tick

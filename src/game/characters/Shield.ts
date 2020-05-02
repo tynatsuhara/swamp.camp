@@ -10,9 +10,11 @@ import { Animator } from "../../engine/util/Animator"
 import { BoxCollider } from "../../engine/collision/BoxCollider"
 import { Player } from "./Player"
 import { LocationManager } from "../world/LocationManager"
+import { Weapon } from "./Weapon"
 
 enum State {
-    NOT_BLOCKING,
+    ON_BACK,
+    DRAWN,
     BLOCKING
 }
 
@@ -23,7 +25,7 @@ export class Shield extends Component {
 
     private blockingShieldSprite: TileComponent
     private readonly baseOffset = new Point(3, 12)
-    private state: State = State.NOT_BLOCKING
+    private state: State = State.DRAWN
     // private slashSprite: TileComponent  // TODO try adding particles when someone hits a blocking shield
     private dude: Dude
 
@@ -33,11 +35,10 @@ export class Shield extends Component {
             this.dude = this.entity.getComponent(Dude)
             this.blockingShieldSprite = this.entity.addComponent(
                 new TileComponent(
-                    Tilesets.instance.dungeonCharacters.getTileSource("shield0"),
+                    Tilesets.instance.dungeonCharacters.getTileSource(shieldId),
                     new TileTransform().relativeTo(this.dude.animation.transform)
                 )
             )
-            this.blockingShieldSprite.transform.depth = -.5
         }
     }
 
@@ -50,48 +51,48 @@ export class Shield extends Component {
     }
 
     animate() {
+        // TODO: add shield animations
+
         let pos = this.baseOffset
-        // const offsetFromEdge = new Point(6, 26).minus(this.weaponSprite.transform.dimensions)  // for DRAWN/SHEATHED
 
-        // // relative position for DRAWN state when characer is facing right (mirroring logic below)
-        // let pos = new Point(0, 0)
-        // let rotation = 0
+        if (this.state === State.ON_BACK) {
+            pos = new Point(-3, 10)
+        } else if (this.state === State.BLOCKING) {
+            pos = pos.plus(new Point(3, 3))
+        }
 
-        // if (this.state === State.DRAWN) {
-        //     pos = offsetFromEdge
-        // } else if (this.state === State.SHEATHED) {  // TODO add side sheath for swords
-        //     // center on back
-        //     pos = offsetFromEdge.plus(new Point(3, -1))
-        // } else if (this.state === State.ATTACKING) {
-        //     const posWithRotation = this.getAttackAnimationPosition()
-        //     pos = posWithRotation[0].plus(offsetFromEdge)
-        //     rotation = posWithRotation[1]
-        // }
-
-        // this.weaponSprite.transform.rotation = rotation
-        // this.weaponSprite.transform.mirrorY = this.state == State.SHEATHED
-
-        
         pos = pos.plus(this.dude.getAnimationOffsetPosition())
 
         this.blockingShieldSprite.transform.position = pos
 
-        // this.weaponSprite.transform.position = pos
-
-        // // show sword behind character if sheathed
-        // this.weaponSprite.transform.depth = this.state == State.SHEATHED ? -1 : 1
+        this.blockingShieldSprite.transform.depth = this.state === State.BLOCKING ? .75 : -.75
     }
 
-    isDrawn() {
+    // isDrawn() {
         // return this.state !== State.SHEATHED
+    // }
+
+    toggleOnBack() {
+        if (this.state === State.DRAWN || this.state === State.BLOCKING) {
+            this.state = State.ON_BACK
+        } else {
+            this.state = State.DRAWN
+        }
     }
 
-    toggleSheathed() {
-        // if (this.state === State.SHEATHED) {
-        //     this.state = State.DRAWN
-        // } else if (this.state === State.DRAWN) {
-        //     this.state = State.SHEATHED
-        // }
+    block(blockingActive: boolean) {
+        if (this.state === State.ON_BACK) {
+            return
+        }
+        if (blockingActive && (!this.dude.weapon || !this.dude.weapon.isAttacking())) {
+            this.state = State.BLOCKING
+        } else {
+            this.state = State.DRAWN
+        }
+    }
+
+    isBlocking() {
+        return this.state === State.BLOCKING
     }
 
     private animator: Animator

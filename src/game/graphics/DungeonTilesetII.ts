@@ -98,7 +98,18 @@ const map = new Map(`
     skull 288 320 16 16
     crate 288 298 16 22
 
-    shield0 288 336 16 16
+    shield_0 288 336 16 16
+    shield_1 304 336 16 16
+    shield_2 320 336 16 16
+    shield_3 336 336 16 16
+    shield_4 288 352 16 16
+    shield_5 304 352 16 16
+    shield_6 320 352 16 16
+    shield_7 336 352 16 16
+    shield_8 288 368 16 16
+    shield_9 304 368 16 16
+    shield_10 320 368 16 16
+    shield_11 336 368 16 16
 
     coin_anim 288 272 8 8 4
 

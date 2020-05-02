@@ -49,7 +49,7 @@ export class Weapon extends Component {
     static damageInFrontOfDude(dude: Dude, attackDistance: number) {
         Array.from(LocationManager.instance.currentLocation.dudes)
                 .filter(d => !!d && d !== dude)
-                .filter(d => dude.animation.transform.mirrorX === (d.standingPosition.x < dude.standingPosition.x))  // enemies the dude is facing
+                .filter(d => dude.isFacing(d.standingPosition))
                 .filter(d => d.standingPosition.distanceTo(dude.standingPosition) < attackDistance)
                 .forEach(d => d.damage(1, d.standingPosition.minus(dude.standingPosition), 30))
     }
@@ -57,7 +57,6 @@ export class Weapon extends Component {
     animate() {
         const offsetFromEdge = new Point(6, 26).minus(this.weaponSprite.transform.dimensions)  // for DRAWN/SHEATHED
 
-        // relative position for DRAWN state when characer is facing right (mirroring logic below)
         let pos = new Point(0, 0)
         let rotation = 0
 
@@ -80,7 +79,7 @@ export class Weapon extends Component {
         this.weaponSprite.transform.position = pos
 
         // show sword behind character if sheathed
-        this.weaponSprite.transform.depth = this.state == State.SHEATHED ? -1 : 1
+        this.weaponSprite.transform.depth = this.state == State.SHEATHED ? -.5 : .5
         // this.weaponSprite.transform.mirrorX = charMirror
 
         // TODO maybe keep the slash stuff later
@@ -96,6 +95,10 @@ export class Weapon extends Component {
         return this.state !== State.SHEATHED
     }
 
+    isAttacking() {
+        return this.state === State.ATTACKING
+    }
+
     toggleSheathed() {
         if (this.state === State.SHEATHED) {
             this.state = State.DRAWN
@@ -105,6 +108,9 @@ export class Weapon extends Component {
     }
 
     attack() {
+        if (this.dude.shield?.isBlocking()) {
+            return
+        }
         if (this.state === State.DRAWN) {
             setTimeout(() => {
                 if (!this.enabled) {

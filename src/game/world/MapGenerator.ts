@@ -7,7 +7,7 @@ import { ElementType } from "./elements/Elements"
 import { LocationManager } from "./LocationManager"
 import { GroundType, Ground } from "./ground/Ground"
 
-const MAP_SIZE = 40
+const MAP_SIZE = 60
 
 export class MapGenerator {
 
