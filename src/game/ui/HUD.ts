@@ -9,7 +9,6 @@ import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent
 import { TextRender } from "../../engine/renderer/TextRender"
 import { Component } from "../../engine/component"
 import { Items } from "../items/Items"
-import { InventoryDisplay } from "./InventoryDisplay"
 import { TEXT_STYLE } from "./Text"
 import { Color } from "./Color"
 
@@ -19,24 +18,14 @@ export class HUD {
     private readonly offset = new Point(4, 4)
     private readonly coinsOffset = new Point(0, 18)
 
-    private coinCount: Component
     private hearts: TileComponent[] = []
 
     // used for determining what should be updated
     private lastHealthCount = 0
     private lastMaxHealthCount = 0
-    private lastCoinsCount = -1
-
-    constructor() {
-        this.entity.addComponent(new AnimatedTileComponent(
-            [Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)],
-            new TileTransform(this.offset.plus(this.coinsOffset))
-        ))
-    }
 
     getEntity(player: Dude): Entity {
         this.updateHearts(player.health, player.maxHealth)
-        this.updateCoins(player.inventory.getItemCount(Items.COIN))
 
         return this.entity
     }
@@ -48,7 +37,8 @@ export class HUD {
         this.lastHealthCount = health
         this.lastMaxHealthCount = maxHealth
 
-        this.hearts.forEach(c => this.entity.removeComponent(c))
+        this.hearts.forEach(c => c.delete())
+        this.hearts = []
 
         const heartOffset = new Point(16, 0)
         const full = Tilesets.instance.dungeonCharacters.getTileSource("ui_heart_full")
@@ -72,21 +62,5 @@ export class HUD {
         }
 
         result.forEach(c => this.entity.addComponent(c))
-    }
-
-    private updateCoins(coins: number) {
-        if (this.lastCoinsCount === coins) {
-            return
-        }
-        this.lastCoinsCount = coins
-
-        if (!!this.coinCount) {
-            this.entity.removeComponent(this.coinCount)
-        }
-        this.coinCount = this.entity.addComponent(
-            new BasicRenderComponent(
-                new TextRender(`x${coins}`, new Point(9, 9).plus(this.offset).plus(this.coinsOffset), TEXT_STYLE, Color.YELLOW)
-            )
-        )
     }
 }

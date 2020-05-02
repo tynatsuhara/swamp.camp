@@ -52,9 +52,9 @@ export class QuestGame extends Game {
 
             // TEST: Spawn some guys
             // this.dudeFactory.new(DudeType.ELF, new Point(20, 30))
-            for (let i = 0; i < 5; i++) {
-                this.dudeFactory.new(DudeType.ORC_WARRIOR, new Point(40, 30 + 20 * i))
-            }
+            // for (let i = 0; i < 5; i++) {
+            //     this.dudeFactory.new(DudeType.ORC_WARRIOR, new Point(40, 30 + 20 * i))
+            // }
         } else {
             
         }

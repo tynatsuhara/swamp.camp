@@ -27,7 +27,7 @@ export class Enemy extends Component {
         const followDistance = this.dude.weapon.range/2 ?? 20
         const buffer = 0  // this basically determines how long they will stop for if they get too close
 
-        const dist = Player.instance.entity.getComponent(Dude).position.minus(this.dude.position)
+        const dist = Player.instance.dude.position.minus(this.dude.position)
         const mag = dist.magnitude()
 
         if (mag > followDistance || ((followDistance-mag) < buffer && Player.instance.dude.isMoving) && this.dude.isMoving) {

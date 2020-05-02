@@ -11,12 +11,20 @@ import { InputKey } from "../../engine/input"
 import { UIStateManager } from "./UIStateManager"
 import { makeNineSliceTileComponents } from "../../engine/tiles/NineSlice"
 import { Tooltip } from "./Tooltip"
+import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
+import { TileTransform } from "../../engine/tiles/TileTransform"
+import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
+import { TextRender } from "../../engine/renderer/TextRender"
+import { Items } from "../items/Items"
+import { TEXT_STYLE } from "./Text"
+import { Color } from "./Color"
 
 export class InventoryDisplay extends Component {
 
     private static COLUMNS = 10
 
-    private readonly e: Entity = new Entity()
+    private readonly e: Entity = new Entity()  // entity for this component
+    private displayEntity: Entity
     private trackedTileIndex: number
     private trackedTile: TileComponent  // non-null when being dragged
     private lastMousPos: Point  
@@ -26,6 +34,8 @@ export class InventoryDisplay extends Component {
     get isOpen() { return this.showingInv }
     private offset: Point
     private tooltip: Tooltip
+    private readonly coinAnimation: TileComponent
+    private readonly coinsOffset = new Point(0, -18)
 
     constructor() {
         super()
@@ -34,7 +44,7 @@ export class InventoryDisplay extends Component {
     }
 
     inventory() {
-        return Player.instance.entity.getComponent(Dude).inventory
+        return Player.instance.dude.inventory
     }
 
     update(updateData: UpdateData) {
@@ -71,7 +81,6 @@ export class InventoryDisplay extends Component {
                 }
                 this.trackedTile = null
                 // refresh view
-                this.hide()
                 this.show(updateData.dimensions)
             } else {  // track
                 this.trackedTile.transform.position = this.trackedTile.transform.position.plus(updateData.input.mousePos.minus(this.lastMousPos))
@@ -101,14 +110,14 @@ export class InventoryDisplay extends Component {
         )
 
         this.bgTiles.forEach(tile => {
-            this.e.addComponent(tile)
+            this.displayEntity.addComponent(tile)
         })
 
         this.bgTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
     }
 
-    getEntity() {
-        return this.e
+    getEntities(): Entity[] {
+        return [this.e, this.displayEntity]
     }
 
     hide() {
@@ -117,16 +126,14 @@ export class InventoryDisplay extends Component {
         }
         this.showingInv = false
         this.tiles.forEach((c, index) => {
-            if (!!c) {
-                c.delete()
-                this.tiles[index] = null
-            }
+            this.tiles[index] = null
         })
         this.bgTiles.forEach(c => {
             c.delete()
         })
         this.bgTiles = []
         this.tooltip.clear()
+        this.displayEntity = null
     }
 
     show(screenDimensions: Point) {
@@ -142,13 +149,31 @@ export class InventoryDisplay extends Component {
             Math.floor(screenDimensions.y/6)
         )
 
+        this.displayEntity = new Entity()
+
+        // coins
+        this.displayEntity.addComponent(new AnimatedTileComponent(
+            [Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)],
+            new TileTransform(this.offset.plus(this.coinsOffset))
+        ))
+        this.displayEntity.addComponent(
+            new BasicRenderComponent(
+                new TextRender(
+                    `x${this.inventory().getItemCount(Items.COIN)}`, 
+                    new Point(9, 9).plus(this.offset).plus(this.coinsOffset), TEXT_STYLE, Color.YELLOW
+                )
+            )
+        )
+
+        // background
         this.spawnBG()
 
+        // icons
         this.tiles = this.inventory().inventory.map((stack, index) => {
             if (!!stack) {
                 const c = stack.item.inventoryIconSupplier().toComponent()
                 c.transform.depth = UIStateManager.UI_SPRITE_DEPTH + 1
-                return this.e.addComponent(c)
+                return this.displayEntity.addComponent(c)
             }
         })
 

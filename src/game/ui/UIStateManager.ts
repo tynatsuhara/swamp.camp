@@ -23,12 +23,12 @@ export class UIStateManager {
     }
 
     get(context: UpdateViewsContext): Entity[] {
+        if (!Player.instance.dude) {
+            return []
+        }
 
         this.captureInput = this.inventory.isOpen
 
-        return [
-            this.hud.getEntity(Player.instance.entity.getComponent(Dude)),
-            this.inventory.getEntity()
-        ]
+        return [this.hud.getEntity(Player.instance.dude)].concat(this.inventory.getEntities())
     }
 }

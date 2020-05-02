@@ -59,6 +59,8 @@ export class Engine {
 
         const views = this.getViews(updateViewsContext)
 
+        let componentsUpdated = 0
+
         const [updateDuration] = measure(() => {            
             views.forEach(v => {
                 v.entities = v.entities.filter(e => !!e)
@@ -80,6 +82,7 @@ export class Engine {
                         c.start = ALREADY_STARTED_COMPONENT
                     }
                     c.update(updateData) 
+                    componentsUpdated++
                 }))
             })
         })
@@ -89,7 +92,7 @@ export class Engine {
         })
 
         if (debug.showProfiler) {
-            profiler.update(elapsed, updateDuration, renderDuration)
+            profiler.update(elapsed, updateDuration, renderDuration, componentsUpdated)
         }
         
         this.lastUpdateMillis = time

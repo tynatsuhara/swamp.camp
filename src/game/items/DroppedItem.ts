@@ -73,9 +73,9 @@ export class DroppedItem extends Component {
         const player = c.entity.getComponent(Player)
         if (!!player) {
             setTimeout(() => {
-                const d = player.entity.getComponent(Dude)
+                const d = player.dude
                 if (d.isAlive) {
-                    player.entity.getComponent(Dude).inventory.addItem(this.itemType)
+                    player.dude.inventory.addItem(this.itemType)
                     LocationManager.instance.currentLocation.droppedItems.delete(this.entity)
                     this.entity.selfDestruct()
                 }
