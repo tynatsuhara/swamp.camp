@@ -55,7 +55,7 @@ export class Shield extends Component {
         let pos = this.dude.animation.transform.dimensions.minus(new Point(12, 16))
 
         if (this.state === State.ON_BACK) {
-            pos = new Point(-3, 10)
+            pos = pos.plus(new Point(-6, -1))
         } else if (this.state === State.BLOCKING) {
             pos = pos.plus(new Point(3, 3))
         }

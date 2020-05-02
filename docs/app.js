@@ -3068,7 +3068,7 @@ System.register("game/characters/Shield", ["engine/component", "engine/tiles/Til
                     // TODO: add shield animations
                     var pos = this.dude.animation.transform.dimensions.minus(new point_19.Point(12, 16));
                     if (this.state === State.ON_BACK) {
-                        pos = new point_19.Point(-3, 10);
+                        pos = pos.plus(new point_19.Point(-6, -1));
                     }
                     else if (this.state === State.BLOCKING) {
                         pos = pos.plus(new point_19.Point(3, 3));
