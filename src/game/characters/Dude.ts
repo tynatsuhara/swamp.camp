@@ -135,6 +135,9 @@ export class Dude extends Component {
     private beingKnockedBack = false
 
     private knockback(direction: Point, knockback: number) {
+        if (this.beingKnockedBack) {
+            return
+        }
         this.beingKnockedBack = true
         const goal = this.position.plus(direction.normalized().times(knockback))
         const distToStop = 2
@@ -148,6 +151,12 @@ export class Dude extends Component {
                 this.beingKnockedBack = false
             }
         }, 10)
+    }
+
+    heal(amount: number) {
+        if (this.isAlive) {
+            this._health = Math.min(this.maxHealth, this.health + amount)
+        }
     }
 
     /**

@@ -2780,7 +2780,6 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                     this.animator = new Animator_2.Animator(Animator_2.Animator.frames(8, 40), function (index) { return _this.currentAnimationFrame = index; }, function () {
                         _this.animator = null;
                         setTimeout(function () {
-                            console.log("delayed " + _this.delay + " ms");
                             _this.state = State.DRAWN; // reset to DRAWN when animation finishes
                         }, _this.delay);
                     });
@@ -3257,6 +3256,9 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                 };
                 Dude.prototype.knockback = function (direction, knockback) {
                     var _this = this;
+                    if (this.beingKnockedBack) {
+                        return;
+                    }
                     this.beingKnockedBack = true;
                     var goal = this.position.plus(direction.normalized().times(knockback));
                     var distToStop = 2;
@@ -3270,6 +3272,11 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                             _this.beingKnockedBack = false;
                         }
                     }, 10);
+                };
+                Dude.prototype.heal = function (amount) {
+                    if (this.isAlive) {
+                        this._health = Math.min(this.maxHealth, this.health + amount);
+                    }
                 };
                 /**
                  * Should be called on EVERY update step for
@@ -3975,6 +3982,7 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
                     if (!this.dude.isAlive || UIStateManager_3.UIStateManager.instance.isMenuOpen) {
                         return;
                     }
+                    this.dude.heal(updateData.elapsedTimeMillis / 6500);
                     // const originalCrosshairPosRelative = this.crosshairs.transform.position.minus(this.position)
                     var dx = 0;
                     var dy = 0;

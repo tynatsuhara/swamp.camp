@@ -139,7 +139,6 @@ export class Weapon extends Component {
             () => {
                 this.animator = null
                 setTimeout(() => {
-                    console.log(`delayed ${this.delay} ms`)
                     this.state = State.DRAWN  // reset to DRAWN when animation finishes
                 }, this.delay)
             }

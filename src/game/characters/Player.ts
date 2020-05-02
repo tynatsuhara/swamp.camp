@@ -31,6 +31,9 @@ export class Player extends Component {
         if (!this.dude.isAlive || UIStateManager.instance.isMenuOpen) {
             return
         }
+
+        this.dude.heal(updateData.elapsedTimeMillis/6500)
+
         // const originalCrosshairPosRelative = this.crosshairs.transform.position.minus(this.position)
 
         let dx = 0
