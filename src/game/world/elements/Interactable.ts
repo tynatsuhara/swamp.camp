@@ -3,7 +3,7 @@ import { Point } from "../../../engine/point"
 
 export class Interactable extends Component {
 
-    readonly position: Point
+    position: Point
 
     constructor(position: Point, fn: () => void) {
         super()

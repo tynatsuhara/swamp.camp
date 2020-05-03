@@ -11,10 +11,10 @@ import { WorldLocation } from "../WorldLocation"
 import { Entity } from "../../../engine/Entity"
 import { ElementType } from "./Elements"
 
-export const makeCampfire = (wl: WorldLocation, pos: Point, on: boolean): ElementComponent => {
+export const makeCampfire = (wl: WorldLocation, pos: Point, data: object): ElementComponent => {
     const e = new Entity()
     const scaledPos = pos.times(TILE_SIZE)
-    on = on ?? true
+    let on = data["on"] ?? true
     
     const campfireOff = e.addComponent(new TileComponent(
         Tilesets.instance.outdoorTiles.getTileSource("campfireOff"), 

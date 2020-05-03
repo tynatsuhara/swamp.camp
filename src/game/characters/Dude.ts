@@ -10,6 +10,7 @@ import { spawnItem, Items } from "../items/Items"
 import { DudeType } from "./DudeFactory"
 import { Shield } from "./Shield"
 import { TileTransform } from "../../engine/tiles/TileTransform"
+import { Interactable } from "../world/elements/Interactable"
 
 export class Dude extends Component {
 
@@ -45,6 +46,8 @@ export class Dude extends Component {
         return this._isMoving
     }
 
+    private dialogueInteract: Interactable
+
     constructor(
         type: DudeType,
         characterAnimName: string,
@@ -56,17 +59,17 @@ export class Dude extends Component {
         this._position = position
 
         this.start = (startData) => {
+            // Set up animations
             const idleAnim = Tilesets.instance.dungeonCharacters.getTileSetAnimation(`${characterAnimName}_idle_anim`, 150)
             const runAnim = Tilesets.instance.dungeonCharacters.getTileSetAnimation(`${characterAnimName}_run_anim`, 80)
-
             const height = idleAnim.getTile(0).dimensions.y
-            
             this._animation = this.entity.addComponent(new AnimatedTileComponent([idleAnim, runAnim], new TileTransform(new Point(0, 28-height))))
     
             if (!!weaponId) {
                 this._weapon = this.entity.addComponent(new Weapon(weaponId))
             }
     
+            // Set up collider
             const colliderSize = new Point(10, 8)
             this.relativeColliderPos = new Point(
                 this.animation.transform.dimensions.x/2 - colliderSize.x/2, 
@@ -74,7 +77,7 @@ export class Dude extends Component {
             )
             this.collider = this.entity.addComponent(new BoxCollider(this.position.plus(this.relativeColliderPos), colliderSize, Dude.COLLISION_LAYER))
 
-
+            this.dialogueInteract = this.entity.addComponent(new Interactable(new Point(0, 0), () => console.log("hi!")))
 
             // TODO MOVE THIS TO THE FACTORY
             this._shield = this.entity.addComponent(new Shield("shield_2"))
@@ -84,8 +87,9 @@ export class Dude extends Component {
     update(updateData: UpdateData) {
         // All other transforms (eg the weapon) are positioned relative to the animation
         this.animation.transform.position = this.position.plus(this.isAlive ? new Point(0, 0) : this.deathOffset)
-
         this.animation.transform.depth = this.collider.position.y + this.collider.dimensions.y
+
+        this.dialogueInteract.position = this.standingPosition.minus(new Point(0, 5))
     }
 
     get isAlive() { return this._health > 0 }
@@ -219,9 +223,9 @@ export class Dude extends Component {
         // magic based on the animations
         const f = this.animation.currentFrame()
         if (!this.isMoving) {
-            return new Point(0, f == 3 ? 1 : f)
+            return new Point(0, [0, 1, 2, 1][f])
         } else {
-            return new Point(0, f == 0 ? -1 : -((3 - this.animation.currentFrame())))
+            return new Point(0, [-1, -2, -1, 0][f])
         }
     }
 }

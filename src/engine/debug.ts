@@ -4,7 +4,7 @@ export const debug = Object.assign({}, {
 }, loadDebug())
 
 function loadDebug(): any {
-    const stored = localStorage.state
+    const stored = localStorage.getItem("debug_state")
     if (stored) {
         console.log("loaded debug state from local storage")
         return JSON.parse(stored)
@@ -22,7 +22,7 @@ function observe(obj) {
             },
             set: function (value) {
                 debug[key] = value
-                localStorage.state = JSON.stringify(debug)
+                localStorage.setItem("debug_state", JSON.stringify(debug))
             },
             enumerable: true,
             configurable: true

@@ -11,11 +11,11 @@ import { makeHittable } from "./HittableResource"
 import { ElementComponent } from "./ElementComponent"
 import { ElementType } from "./Elements"
 
-export const makeRock = (wl: WorldLocation, pos: Point, variation: number, mossy: boolean, flipped: boolean): ElementComponent => {
+export const makeRock = (wl: WorldLocation, pos: Point, data: object): ElementComponent => {
     const e = new Entity()
-    variation = variation ?? Math.floor(Math.random() * 3) + 1
-    mossy = mossy ?? Math.random() > .7
-    flipped = Math.random() > .5
+    const variation = data["v"] ?? Math.floor(Math.random() * 3) + 1
+    const mossy = data["m"] ?? Math.random() > .7
+    const flipped = data["f"] ?? Math.random() > .5
 
     const tile = e.addComponent(new TileComponent(
         Tilesets.instance.outdoorTiles.getTileSource(`rock${variation}${mossy ? 'mossy' : ''}`), 
@@ -36,6 +36,6 @@ export const makeRock = (wl: WorldLocation, pos: Point, variation: number, mossy
     return e.addComponent(new ElementComponent(
         ElementType.ROCK, 
         [pos], 
-        () => { return { var: variation, mossy: mossy } }
+        () => { return { v: variation, m: mossy, f: flipped } }
     ))
 }

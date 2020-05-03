@@ -33,8 +33,8 @@ export class WorldLocation {
         this.manager = manager
     }
 
-    addGroundElement(type: GroundType, pos: Point, ...args: any[]): GroundComponent {
-        const groundComponent = Ground.instance.make(type, this, pos, ...args)
+    addGroundElement(type: GroundType, pos: Point, data: object = {}): GroundComponent {
+        const groundComponent = Ground.instance.make(type, this, pos, data)
         if (!!this.ground.get(pos)) {
             groundComponent.entity.selfDestruct()
             return null
@@ -43,8 +43,8 @@ export class WorldLocation {
         return groundComponent
     }
 
-    addWorldElement(type: ElementType, pos: Point, ...args: any[]): ElementComponent {
-        const elementComponent = Elements.instance.make(type, this, pos, ...args)
+    addWorldElement(type: ElementType, pos: Point, data: object = {}): ElementComponent {
+        const elementComponent = Elements.instance.make(type, this, pos, data)
         if (elementComponent.occupiedPoints.some(pos => !!this.elements.get(pos))) {
             elementComponent.entity.selfDestruct()
             return null
@@ -83,7 +83,7 @@ export class WorldLocation {
 
         return Array.from(topLeftCornerMap.entries()).map(kv => {
             const el = new SavedElement()
-            el.pos = kv[1]
+            el.pos = kv[1].toString()
             el.type = kv[0].type
             el.obj = kv[0].save()
             return el
@@ -93,7 +93,7 @@ export class WorldLocation {
     private saveGround(): SavedGround[] {
         return this.ground.entries().map(kv => {
             const el = new SavedGround()
-            el.pos = kv[0]
+            el.pos = kv[0].toString()
             el.type = kv[1].type
             el.obj = kv[1].save()
             return el
@@ -103,7 +103,9 @@ export class WorldLocation {
     static load(saveState: LocationSaveState): WorldLocation {
         const n = new WorldLocation(null)
         n._uuid = saveState.uuid
+        saveState.elements.forEach(el => n.addWorldElement(el.type, Point.fromString(el.pos), el.obj))
+        saveState.ground.forEach(el => n.addGroundElement(el.type, Point.fromString(el.pos), el.obj))
         // n.  TODO set this up
-        return null
+        return n
     }
 }

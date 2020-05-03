@@ -46,7 +46,11 @@ export class LocationManager {
     static load(saveState: LocationManagerSaveState): LocationManager {
         const result = new LocationManager()
         result.locations = new Map()
-        saveState.locations.map(l => result.locations.set(l.uuid, WorldLocation.load(l)))
+        saveState.locations.forEach(l => {
+            const loadedLocation = WorldLocation.load(l)
+            console.log(`loaded location ${loadedLocation.uuid}`)
+            result.locations.set(l.uuid, loadedLocation)
+        })
         result.current = result.locations.get(saveState.currentLocationUUID)
         return result
     }

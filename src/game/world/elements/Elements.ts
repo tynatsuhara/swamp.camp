@@ -14,7 +14,7 @@ export const enum ElementType {
 }
 
 export class SavedElement {
-    pos: Point
+    pos: string
     type: ElementType
     obj: object
 }
@@ -29,15 +29,15 @@ export class Elements {
     * @param pos the top-left corner of the element
     * @param args the element's metadata
     */
-    private readonly ELEMENT_FUNCTION_MAP: { [key: number]: (wl: WorldLocation, pos: Point, ...args: any[]) => ElementComponent } = {
+    private readonly ELEMENT_FUNCTION_MAP: { [key: number]: (wl: WorldLocation, pos: Point, data: object) => ElementComponent } = {
        [ElementType.TREE]: makeTree,
        [ElementType.ROCK]: makeRock,
        [ElementType.TENT]: makeTent,
        [ElementType.CAMPFIRE]: makeCampfire
    }
 
-    make(type: ElementType, wl: WorldLocation, pos: Point, ...args: any[]) {
-        return this.ELEMENT_FUNCTION_MAP[type](wl, pos, ...args)
+    make(type: ElementType, wl: WorldLocation, pos: Point, data: object) {
+        return this.ELEMENT_FUNCTION_MAP[type](wl, pos, data)
     }
 
     constructor() {

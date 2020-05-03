@@ -16,13 +16,15 @@ import { serialize } from "./saves/SerializeObject"
 import { Save, StoryState } from "./saves/SaveGame"
 import { Elements } from "./world/elements/Elements"
 import { Ground } from "./world/ground/Ground"
+import { InputKey } from "../engine/input"
+import { Player } from "./characters/Player"
 
 
 const ZOOM = 3
 
 export class QuestGame extends Game {
 
-    private locationManager = new LocationManager()
+    private locationManager: LocationManager
     private player: Dude
 
     readonly tilesets = new Tilesets()
@@ -43,9 +45,10 @@ export class QuestGame extends Game {
         new Ground()
 
 
-        const newGame = true
+        const newGame = true//!this.load()
 
         if (newGame) {
+            this.locationManager = new LocationManager()
             // World must be initialized before we do anything else
             new MapGenerator().doIt()
             this.player = this.dudeFactory.new(DudeType.PLAYER, new Point(-2, 2).times(TILE_SIZE))
@@ -55,15 +58,24 @@ export class QuestGame extends Game {
             // for (let i = 0; i < 5; i++) {
             //     this.dudeFactory.new(DudeType.ORC_WARRIOR, new Point(40, 30 + 20 * i))
             // }
-        } else {
-            
         }
-
-        setTimeout(() => this.save(), 1000)
     }
 
     // entities in the world space
     getViews(updateViewsContext: UpdateViewsContext): View[] {
+        // TEMPORARY TEST INPUTS
+        if (updateViewsContext.input.isKeyDown(InputKey.J)) {
+            this.save()
+        } else if (updateViewsContext.input.isKeyDown(InputKey.K)) {
+            this.load()
+        }
+        if (updateViewsContext.input.isKeyDown(InputKey.L)) {
+            this.dudeFactory.new(DudeType.ORC_WARRIOR, new Point(40, 30))
+        }
+
+
+
+
         this.updateViews(updateViewsContext)
         return [
             this.gameEntityView, 
@@ -98,12 +110,35 @@ export class QuestGame extends Game {
     save() {
         const save: Save = {
             // storyState: StoryState.INTRODUCTION,
-            locations: this.locationManager.save()
+            locations: this.locationManager.save(),
+            time: new Date().getMilliseconds()
         } 
-        console.log(JSON.stringify(save, null, " "))
+        console.log("saved game")
+        localStorage.setItem("save", JSON.stringify(save))
     }
 
-    load(save: Save) {
+    /**
+     * @return true if a save was loaded successfully
+     */
+    load(): boolean {
+        const blob = localStorage.getItem("save")
+        if (!blob) {
+            console.log("no save found")
+            return false
+        }
+        
+        const save: Save = JSON.parse(blob)
+        const prettyPrintTimestamp = new Date()
+        prettyPrintTimestamp.setMilliseconds(save.time)
+        console.log(`loaded save from ${prettyPrintTimestamp}`)
+
         this.locationManager = LocationManager.load(save.locations)
+        this.player = Array.from(this.locationManager.currentLocation.dudes)
+                .map(d => d.entity.getComponent(Player))
+                .filter(c => !!c)
+                .shift()
+                .dude
+        
+        return true
     }
 }

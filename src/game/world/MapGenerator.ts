@@ -18,7 +18,7 @@ export class MapGenerator {
         const tentLocation = LocationManager.instance.newLocation()
         
         // spawn tent
-        this.location.addWorldElement(ElementType.TENT, new Point(5, 5), tentLocation.uuid, TentColor.RED)
+        this.location.addWorldElement(ElementType.TENT, new Point(5, 5), { destinationUUID: tentLocation.uuid, color: TentColor.RED })
 
         // spawn campfire
         const campfirePos = new Point(3, 9)

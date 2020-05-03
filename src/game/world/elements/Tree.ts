@@ -15,10 +15,10 @@ export enum TreeType {
     POINTY = 2,
 }
 
-export const makeTree = (wl: WorldLocation, pos: Point, type: TreeType): ElementComponent => {
+export const makeTree = (wl: WorldLocation, pos: Point, data: object): ElementComponent => {
     const e = new Entity()
     const depth = (pos.y + 2) * TILE_SIZE
-    type = type ?? Math.random() < .7 ? TreeType.POINTY : TreeType.ROUND
+    const type = data["type"] ?? Math.random() < .7 ? TreeType.POINTY : TreeType.ROUND
     const top = addTile(e, `tree${type}top`, pos, depth)
     const bottom = addTile(e, `tree${type}base`, pos.plus(new Point(0, 1)), depth)
     const hitboxDims = new Point(8, 3)
@@ -34,7 +34,7 @@ export const makeTree = (wl: WorldLocation, pos: Point, type: TreeType): Element
     return e.addComponent(new ElementComponent(
         ElementType.TREE, 
         [pos, pos.plusY(1)], 
-        () => { return { treeType: type } }
+        () => { return { type } }
     ))
 }
 

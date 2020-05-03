@@ -15,13 +15,15 @@ export enum TentColor {
     BLUE = "blue"
 }
 
-export const makeTent = (wl: WorldLocation, pos: Point, destinationUUID: string, color: TentColor): ElementComponent => {
+export const makeTent = (wl: WorldLocation, pos: Point, data: object): ElementComponent => {
     const e = new Entity()
+
+    const destinationUUID: string = data["destinationUUID"]
+    const color: TentColor = data["color"] ?? TentColor.RED
 
     if (!destinationUUID) {
         throw new Error("tent must have a uuid")
     }
-    color = color ?? TentColor.RED
     
     const depth = (pos.y + 1) * TILE_SIZE + /* prevent clipping */ 5
     addTile(wl, e, `${color}tentNW`, pos, depth)

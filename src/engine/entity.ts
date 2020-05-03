@@ -1,7 +1,8 @@
 import { Component } from "./component"
 
 /**
- * An object which exists in the game world and updated by the engine. Should be attached to a game view.
+ * An object which is updated by the engine. Should be attached to a game view.
+ * An Entity is essentially a logical grouping of components.
  */
 export class Entity {
     components: Component[] = []

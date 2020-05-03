@@ -10,11 +10,10 @@ import { Tilesets } from "../../graphics/Tilesets"
 export const enum GroundType {
     GRASS,
     PATH,
-    WATER,
 }
 
 export class SavedGround {
-    pos: Point
+    pos: string
     type: GroundType
     obj: object
 }
@@ -26,14 +25,13 @@ export class Ground {
 
     static instance: Ground
 
-    private readonly GROUND_FUNCTION_MAP: { [key: number]: (wl: WorldLocation, pos: Point, ...args: any[]) => GroundComponent } = {
+    private readonly GROUND_FUNCTION_MAP: { [key: number]: (wl: WorldLocation, pos: Point, data: object) => GroundComponent } = {
         [GroundType.GRASS]: makeGrass,
         [GroundType.PATH]: makePath,
-        // [GroundType.WATER]: makeTent,
     }
 
-    make(type: GroundType, wl: WorldLocation, pos: Point, ...args: any[]) {
-        return this.GROUND_FUNCTION_MAP[type](wl, pos, ...args)
+    make(type: GroundType, wl: WorldLocation, pos: Point, data: object) {
+        return this.GROUND_FUNCTION_MAP[type](wl, pos, data)
     }
 
     constructor() {

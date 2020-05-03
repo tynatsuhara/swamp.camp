@@ -10,8 +10,5 @@ export enum StoryState {
 export class Save {
     // storyState: StoryState
     locations: LocationManagerSaveState
-
-    static fromJSON(json: string): Save {
-        return JSON.parse(json)
-    }
+    time: number
 }
