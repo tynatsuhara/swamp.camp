@@ -80,7 +80,7 @@ export class Shield extends Component {
     }
 
     block(blockingActive: boolean) {
-        if (this.state === State.ON_BACK) {
+        if (this.state === State.ON_BACK || !this.dude) {
             return
         }
         if (blockingActive && (!this.dude.weapon || !this.dude.weapon.isAttacking())) {

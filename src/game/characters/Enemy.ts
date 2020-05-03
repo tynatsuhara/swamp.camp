@@ -10,7 +10,6 @@ export class Enemy extends Component {
 
     start(startData: StartData) {
         this.dude = this.entity.getComponent(Dude)
-        this.dude.speed *= (.3 + Math.random()/2)  // TODO configure speed for different enemies
         this.dude.weapon.delay = 500
     }
 

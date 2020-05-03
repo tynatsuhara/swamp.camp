@@ -1,12 +1,15 @@
-import { Point } from "../../engine/point"
 import { DudeType } from "../characters/DudeFactory"
+import { ItemStack } from "../items/Inventory"
 
 export class DudeSaveState {
     type: DudeType
-    pos: Point
-    // inventory: TODO
+    pos: string
+    // TODO make weapon and shield saveable objects instead of just keys
+    weapon: string
+    shield: string
     maxHealth: number
     health: number
-    // weapon: TODO  move weapon (and shield) to separate saveable structure
-    // shield: TODO
+    speed: number
+    inventory: ItemStack[]
+    // dialogue: TODO
 }

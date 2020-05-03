@@ -28,7 +28,6 @@ export class QuestGame extends Game {
     private player: Dude
 
     readonly tilesets = new Tilesets()
-    readonly dudeFactory = new DudeFactory()
     readonly uiStateManager = new UIStateManager()
     
     private gameEntityView: View = new View()
@@ -41,6 +40,7 @@ export class QuestGame extends Game {
         ]))
 
         // Initialize singletons
+        new DudeFactory()
         new Elements()
         new Ground()
 
@@ -51,7 +51,7 @@ export class QuestGame extends Game {
             this.locationManager = new LocationManager()
             // World must be initialized before we do anything else
             new MapGenerator().doIt()
-            this.player = this.dudeFactory.new(DudeType.PLAYER, new Point(-2, 2).times(TILE_SIZE))
+            this.player = DudeFactory.instance.new(DudeType.PLAYER, new Point(-2, 2).times(TILE_SIZE))
 
             // TEST: Spawn some guys
             // this.dudeFactory.new(DudeType.ELF, new Point(20, 30))
@@ -70,7 +70,7 @@ export class QuestGame extends Game {
             this.load()
         }
         if (updateViewsContext.input.isKeyDown(InputKey.L)) {
-            this.dudeFactory.new(DudeType.ORC_WARRIOR, new Point(40, 30))
+            DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(40, 30))
         }
 
 
@@ -108,11 +108,15 @@ export class QuestGame extends Game {
     }
 
     save() {
+        if (!Player.instance.dude.isAlive) {
+            console.log("cannot save after death")
+            return
+        }
         const save: Save = {
             // storyState: StoryState.INTRODUCTION,
             locations: this.locationManager.save(),
-            time: new Date().getMilliseconds()
-        } 
+            time: new Date().getTime()
+        }
         console.log("saved game")
         localStorage.setItem("save", JSON.stringify(save))
     }
@@ -129,15 +133,14 @@ export class QuestGame extends Game {
         
         const save: Save = JSON.parse(blob)
         const prettyPrintTimestamp = new Date()
-        prettyPrintTimestamp.setMilliseconds(save.time)
+        prettyPrintTimestamp.setTime(save.time)
         console.log(`loaded save from ${prettyPrintTimestamp}`)
 
         this.locationManager = LocationManager.load(save.locations)
+
         this.player = Array.from(this.locationManager.currentLocation.dudes)
-                .map(d => d.entity.getComponent(Player))
-                .filter(c => !!c)
+                .filter(d => !!d.entity.getComponent(Player))
                 .shift()
-                .dude
         
         return true
     }

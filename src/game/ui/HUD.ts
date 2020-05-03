@@ -1,16 +1,9 @@
-import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
 import { Tilesets } from "../graphics/Tilesets"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Point } from "../../engine/point"
 import { Dude } from "../characters/Dude"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { Entity } from "../../engine/Entity"
-import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
-import { TextRender } from "../../engine/renderer/TextRender"
-import { Component } from "../../engine/component"
-import { Items } from "../items/Items"
-import { TEXT_STYLE } from "./Text"
-import { Color } from "./Color"
 
 export class HUD {
 

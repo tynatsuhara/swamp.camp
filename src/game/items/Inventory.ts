@@ -1,6 +1,6 @@
-import { Item } from "./Items"
+import { ItemMetadata, Item, ITEM_METADATA_MAP } from "./Items"
 
-class ItemStack {
+export class ItemStack {
     readonly item: Item
     count: number
 
@@ -15,8 +15,9 @@ class ItemStack {
 
 // TODO flesh this out more when we have more items
 export class Inventory {
-    readonly inventory: ItemStack[] = Array.from({ length: 20 })
-    private readonly countMap = new Map<Item, number>()
+    private _inventory: ItemStack[] = Array.from({ length: 20 })
+    get inventory() { return this._inventory }
+    private countMap = new Map<Item, number>()
 
     /**
      * returns true if the item can fit in the inventory
@@ -26,7 +27,7 @@ export class Inventory {
         for (let i = 0; i < this.inventory.length; i++) {
             const slotValue = this.inventory[i]
             if (!!slotValue) {
-                if (slotValue.item === item && slotValue.count < item.stackLimit) {
+                if (slotValue.item === item && slotValue.count < ITEM_METADATA_MAP[item].stackLimit) {
                     slotValue.count++
                     this.countMap.set(item, 1 + (this.countMap.get(item) ?? 0))
                     return true
@@ -50,5 +51,20 @@ export class Inventory {
      */
     getItemCount(item: Item): number {
         return this.countMap.get(item) ?? 0
+    }
+
+    save() {
+        return this.inventory
+    }
+
+    static load(stacks: ItemStack[]) {
+        const inv = new Inventory()
+        inv._inventory = stacks
+        stacks.forEach(stack => {
+            if (!!stack) {
+                inv.countMap.set(stack.item, stack.count + (inv.countMap.get(stack.item) ?? 0))
+            }
+        })
+        return inv
     }
 }

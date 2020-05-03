@@ -30,8 +30,8 @@ export class LocationManager {
 
     transition(toUUID: string) {
         const location = this.locations.get(toUUID)
-        this.currentLocation.droppedItems.delete(Player.instance.entity)
-        location.droppedItems.add(Player.instance.entity)
+        this.currentLocation.dudes.delete(Player.instance.dude)
+        location.dudes.add(Player.instance.dude)
 
         this.current = location
     }
@@ -47,8 +47,7 @@ export class LocationManager {
         const result = new LocationManager()
         result.locations = new Map()
         saveState.locations.forEach(l => {
-            const loadedLocation = WorldLocation.load(l)
-            console.log(`loaded location ${loadedLocation.uuid}`)
+            const loadedLocation = WorldLocation.load(result, l)
             result.locations.set(l.uuid, loadedLocation)
         })
         result.current = result.locations.get(saveState.currentLocationUUID)

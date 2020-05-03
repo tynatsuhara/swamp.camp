@@ -5,7 +5,7 @@ import { WorldLocation } from "../WorldLocation"
 import { TileComponent } from "../../../engine/tiles/TileComponent"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
 import { Entity } from "../../../engine/Entity"
-import { Items } from "../../items/Items"
+import { Item } from "../../items/Items"
 import { makeHittable } from "./HittableResource"
 import { ElementComponent } from "./ElementComponent"
 import { ElementType } from "./Elements"
@@ -29,7 +29,7 @@ export const makeTree = (wl: WorldLocation, pos: Point, data: object): ElementCo
     ))
 
     const hittableCenter = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE/2, TILE_SIZE + TILE_SIZE/2))  // center of bottom tile
-    makeHittable(e, hittableCenter, [top.transform, bottom.transform], Items.WOOD)
+    makeHittable(e, hittableCenter, [top.transform, bottom.transform], Item.WOOD)
 
     return e.addComponent(new ElementComponent(
         ElementType.TREE, 

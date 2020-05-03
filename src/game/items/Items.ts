@@ -6,7 +6,7 @@ import { Point } from "../../engine/point"
 import { TileSource } from "../../engine/tiles/TileSource"
 import { Collider } from "../../engine/collision/Collider"
 
-export class Item {
+export class ItemMetadata {
     readonly displayName: string
     readonly droppedIconSupplier: () => TileSource
     readonly inventoryIconSupplier: () => TileSource
@@ -25,19 +25,25 @@ export class Item {
     }
 }
 
-export const Items = {
-    COIN: new Item(
+export enum Item {
+    COIN,
+    ROCK,
+    WOOD,
+}
+
+export const ITEM_METADATA_MAP = {
+    [Item.COIN]: new ItemMetadata(
         "Coin",
         () => Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150),
         () => Tilesets.instance.oneBit.getTileSource("coin"),
     ),
-    ROCK: new Item(
+    [Item.ROCK]: new ItemMetadata(
         "Rock",
         () => Tilesets.instance.outdoorTiles.getTileSource("rockItem"),
         () => Tilesets.instance.oneBit.getTileSource("rock"), 
         100
     ),
-    WOOD: new Item(
+    [Item.WOOD]: new ItemMetadata(
         "Wood",
         () => Tilesets.instance.outdoorTiles.getTileSource("woodItem"),
         () => Tilesets.instance.oneBit.getTileSource("wood"), 
@@ -51,5 +57,7 @@ export const Items = {
  * TODO: Add initial velocity
  */
 export const spawnItem = (pos: Point, item: Item, velocity: Point = new Point(0, 0), sourceCollider: Collider = null) => {
-    LocationManager.instance.currentLocation.droppedItems.add(new Entity([new DroppedItem(pos, item, velocity, sourceCollider)]))
+    LocationManager.instance.currentLocation.droppedItems.add(new Entity([
+        new DroppedItem(pos, item, velocity, sourceCollider)
+    ]))
 }

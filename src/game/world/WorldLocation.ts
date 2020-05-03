@@ -9,6 +9,7 @@ import { LocationManager } from "./LocationManager"
 import { GroundComponent } from "./ground/GroundComponent"
 import { GroundType, Ground, SavedGround } from "./ground/Ground"
 import { Dude } from "../characters/Dude"
+import { DudeFactory } from "../characters/DudeFactory"
 
 export class WorldLocation {
 
@@ -65,7 +66,7 @@ export class WorldLocation {
             uuid: this.uuid,
             ground: this.saveGround(),
             elements: this.saveElements(),
-            dudes: null,  //Array.from()
+            dudes: Array.from(this.dudes).filter(d => d.isAlive).map(d => d.save()),
         }
     }
 
@@ -100,12 +101,13 @@ export class WorldLocation {
         })
     }
 
-    static load(saveState: LocationSaveState): WorldLocation {
-        const n = new WorldLocation(null)
+    static load(locationManager: LocationManager, saveState: LocationSaveState): WorldLocation {
+        // BUG: RELOADING RETURNS ELEMENTS THAT HAVE BEEN DESTROYED
+        const n = new WorldLocation(locationManager)
         n._uuid = saveState.uuid
         saveState.elements.forEach(el => n.addWorldElement(el.type, Point.fromString(el.pos), el.obj))
         saveState.ground.forEach(el => n.addGroundElement(el.type, Point.fromString(el.pos), el.obj))
-        // n.  TODO set this up
+        saveState.dudes.forEach(d => n.dudes.add(DudeFactory.instance.load(d)))
         return n
     }
 }

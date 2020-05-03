@@ -5,7 +5,7 @@ import { BoxCollider } from "../../engine/collision/BoxCollider"
 import { Player } from "../characters/Player"
 import { Dude } from "../characters/Dude"
 import { LocationManager } from "../world/LocationManager"
-import { Item } from "./Items"
+import { ItemMetadata, Item, ITEM_METADATA_MAP } from "./Items"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 
 export class DroppedItem extends Component {
@@ -26,7 +26,7 @@ export class DroppedItem extends Component {
         super()
         this.itemType = item
         this.start = () => {
-            this.tile = this.entity.addComponent(item.droppedIconSupplier().toComponent())
+            this.tile = this.entity.addComponent(ITEM_METADATA_MAP[item].droppedIconSupplier().toComponent())
             const pos = position.minus(new Point(
                 this.tile.transform.dimensions.x/2,
                 this.tile.transform.dimensions.y
@@ -43,12 +43,12 @@ export class DroppedItem extends Component {
 
             this.reposition()
 
-            let last = new Date().getMilliseconds()
+            let last = new Date().getTime()
             const move = () => {
                 if (!this.enabled) {
                     return
                 }
-                const now = new Date().getMilliseconds()
+                const now = new Date().getTime()
                 const diff = now - last
                 if (diff > 0) {
                     this.reposition(velocity)

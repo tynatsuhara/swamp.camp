@@ -1,11 +1,13 @@
 import { Hittable } from "./Hittable"
 import { Point } from "../../../engine/point"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
-import { spawnItem, Item } from "../../items/Items"
+import { spawnItem, ItemMetadata, Item } from "../../items/Items"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Entity } from "../../../engine/Entity"
 import { Collider } from "../../../engine/collision/Collider"
 import { BoxCollider } from "../../../engine/collision/BoxCollider"
+import { LocationManager } from "../LocationManager"
+import { ElementComponent } from "./ElementComponent"
 
 export const makeHittable = (e: Entity, pos: Point, transforms: TileTransform[], item: Item) => {
     let knockedItemCount = 5
@@ -33,6 +35,7 @@ export const makeHittable = (e: Entity, pos: Point, transforms: TileTransform[],
             }
 
             if (finishingMove) {
+                LocationManager.instance.currentLocation.elements.removeAll(e.getComponent(ElementComponent))
                 e.selfDestruct()
             }
         }

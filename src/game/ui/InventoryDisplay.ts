@@ -5,7 +5,6 @@ import { rectContains } from "../../engine/util/utils"
 import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { Player } from "../characters/Player"
-import { Dude } from "../characters/Dude"
 import { Entity } from "../../engine/Entity"
 import { InputKey } from "../../engine/input"
 import { UIStateManager } from "./UIStateManager"
@@ -15,7 +14,7 @@ import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
 import { TextRender } from "../../engine/renderer/TextRender"
-import { Items } from "../items/Items"
+import { Item, ITEM_METADATA_MAP } from "../items/Items"
 import { TEXT_STYLE } from "./Text"
 import { Color } from "./Color"
 
@@ -66,7 +65,7 @@ export class InventoryDisplay extends Component {
         if (newIndex !== -1 && !!inv[newIndex]) {
             this.tooltip.position = updateData.input.mousePos
             const stack = inv[newIndex]
-            this.tooltip.say(`${stack.item.displayName}${stack.count > 1 ? ' x' + stack.count : ''}`)
+            this.tooltip.say(`${ITEM_METADATA_MAP[stack.item].displayName}${stack.count > 1 ? ' x' + stack.count : ''}`)
         } else {
             this.tooltip.clear()
         }
@@ -159,7 +158,7 @@ export class InventoryDisplay extends Component {
         this.displayEntity.addComponent(
             new BasicRenderComponent(
                 new TextRender(
-                    `x${this.inventory().getItemCount(Items.COIN)}`, 
+                    `x${this.inventory().getItemCount(Item.COIN)}`, 
                     new Point(9, 9).plus(this.offset).plus(this.coinsOffset), TEXT_STYLE, Color.YELLOW
                 )
             )
@@ -171,7 +170,7 @@ export class InventoryDisplay extends Component {
         // icons
         this.tiles = this.inventory().inventory.map((stack, index) => {
             if (!!stack) {
-                const c = stack.item.inventoryIconSupplier().toComponent()
+                const c = ITEM_METADATA_MAP[stack.item].inventoryIconSupplier().toComponent()
                 c.transform.depth = UIStateManager.UI_SPRITE_DEPTH + 1
                 return this.displayEntity.addComponent(c)
             }

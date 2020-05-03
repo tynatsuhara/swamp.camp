@@ -18,6 +18,12 @@ export class Grid<T> {
         delete this.map[pt.toString()]
     }
 
+    removeAll(element: T) {
+        Object.entries(this.map)
+                .filter(kv => kv[1] === element)
+                .forEach(kv => delete this.map[kv[0]])
+    }
+
     entries(): [Point, T][] {
         return Object.entries(this.map).map(tuple => [Point.fromString(tuple[0]), tuple[1]])
     }

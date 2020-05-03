@@ -6,7 +6,7 @@ import { TileComponent } from "../../../engine/tiles/TileComponent"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
 import { Entity } from "../../../engine/Entity"
 import { Hittable } from "./Hittable"
-import { spawnItem, Items } from "../../items/Items"
+import { spawnItem, Item } from "../../items/Items"
 import { makeHittable } from "./HittableResource"
 import { ElementComponent } from "./ElementComponent"
 import { ElementType } from "./Elements"
@@ -31,11 +31,11 @@ export const makeRock = (wl: WorldLocation, pos: Point, data: object): ElementCo
         hitboxDims
     ))
 
-    makeHittable(e, pos.plus(new Point(.5, .5)).times(TILE_SIZE), [tile.transform], Items.ROCK)
+    makeHittable(e, pos.plus(new Point(.5, .5)).times(TILE_SIZE), [tile.transform], Item.ROCK)
 
     return e.addComponent(new ElementComponent(
         ElementType.ROCK, 
         [pos], 
-        () => { return { v: variation, m: mossy, f: flipped } }
+        () => { return { v: variation, m: mossy, f: flipped  } }
     ))
 }

@@ -6,28 +6,31 @@ import { BoxCollider } from "../../engine/collision/BoxCollider"
 import { Tilesets } from "../graphics/Tilesets"
 import { Weapon } from "./Weapon"
 import { Inventory } from "../items/Inventory"
-import { spawnItem, Items } from "../items/Items"
+import { spawnItem, Item } from "../items/Items"
 import { DudeType } from "./DudeFactory"
 import { Shield } from "./Shield"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Interactable } from "../world/elements/Interactable"
+import { DudeSaveState } from "../saves/DudeSaveState"
 
 export class Dude extends Component {
 
     static readonly COLLISION_LAYER = "dube"
     
     readonly type: DudeType
-    readonly inventory = new Inventory()
-    readonly maxHealth = 4
-    private _health = this.maxHealth
+    readonly inventory: Inventory
+    readonly maxHealth: number
+    private _health: number
     get health() { return this._health }
-    speed = 0.085
+    speed: number
     private _animation: AnimatedTileComponent
     get animation() { return this._animation }
 
     private _weapon: Weapon
+    private weaponId: string
     get weapon() { return this._weapon }
     private _shield: Shield
+    private shieldId: string
     get shield() { return this._shield }
 
     private collider: BoxCollider
@@ -52,11 +55,22 @@ export class Dude extends Component {
         type: DudeType,
         characterAnimName: string,
         position: Point,
-        weaponId: string
+        weaponId: string,
+        shieldId: string,
+        maxHealth: number,
+        health: number,
+        speed: number,
+        inventory: Inventory
     ) {
         super()
         this.type = type
         this._position = position
+        this.weaponId = weaponId
+        this.shieldId = shieldId
+        this.maxHealth = maxHealth
+        this._health = health
+        this.speed = speed
+        this.inventory = inventory
 
         this.start = (startData) => {
             // Set up animations
@@ -68,7 +82,10 @@ export class Dude extends Component {
             if (!!weaponId) {
                 this._weapon = this.entity.addComponent(new Weapon(weaponId))
             }
-    
+            if (!!shieldId) {
+                this._shield = this.entity.addComponent(new Shield(shieldId))
+            }
+
             // Set up collider
             const colliderSize = new Point(10, 8)
             this.relativeColliderPos = new Point(
@@ -77,10 +94,7 @@ export class Dude extends Component {
             )
             this.collider = this.entity.addComponent(new BoxCollider(this.position.plus(this.relativeColliderPos), colliderSize, Dude.COLLISION_LAYER))
 
-            this.dialogueInteract = this.entity.addComponent(new Interactable(new Point(0, 0), () => console.log("hi!")))
-
-            // TODO MOVE THIS TO THE FACTORY
-            this._shield = this.entity.addComponent(new Shield("shield_2"))
+            // this.dialogueInteract = this.entity.addComponent(new Interactable(new Point(0, 0), () => console.log("hi!")))
         }
     }
 
@@ -89,12 +103,14 @@ export class Dude extends Component {
         this.animation.transform.position = this.position.plus(this.isAlive ? new Point(0, 0) : this.deathOffset)
         this.animation.transform.depth = this.collider.position.y + this.collider.dimensions.y
 
-        this.dialogueInteract.position = this.standingPosition.minus(new Point(0, 5))
+        // this.dialogueInteract.position = this.standingPosition.minus(new Point(0, 5))
     }
 
     get isAlive() { return this._health > 0 }
 
     damage(damage: number, direction: Point, knockback: number) {
+        // TODO: disable friendly fire
+
         // absorb damage if facing the direction of the enemy
         if (this.shield?.isBlocking() && !this.isFacing(this.standingPosition.plus(direction))) {
             damage *= .25
@@ -129,7 +145,7 @@ export class Dude extends Component {
 
     private spawnDrop() {
         // TODO add velocity
-        spawnItem(this.standingPosition.minus(new Point(0, 2)), Items.COIN)
+        spawnItem(this.standingPosition.minus(new Point(0, 2)), Item.COIN)
     }
 
     private dropWeapon() {
@@ -147,9 +163,9 @@ export class Dude extends Component {
         const distToStop = 2
         let intervalsRemaining = 50
         
-        let last = new Date().getMilliseconds()
+        let last = new Date().getTime()
         const knock = () => {
-            const now = new Date().getMilliseconds()
+            const now = new Date().getTime()
             const diff = now - last
             if (diff > 0) {
                 this.moveTo(this.position.lerp(.15 * diff/30, goal))
@@ -226,6 +242,19 @@ export class Dude extends Component {
             return new Point(0, [0, 1, 2, 1][f])
         } else {
             return new Point(0, [-1, -2, -1, 0][f])
+        }
+    }
+
+    save(): DudeSaveState {
+        return {
+            type: this.type,
+            pos: this.position.toString(),
+            maxHealth: this.maxHealth,
+            health: this._health,
+            speed: this.speed,
+            weapon: this.weaponId,
+            shield: this.shieldId,
+            inventory: this.inventory.save()
         }
     }
 }
