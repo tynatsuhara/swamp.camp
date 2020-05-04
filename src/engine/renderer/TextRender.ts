@@ -5,11 +5,11 @@ import { RenderContext } from "./RenderContext"
 import { Component } from "../component"
 
 export class TextRender extends RenderMethod {
-    readonly text: string
-    readonly position: Point  // top-left
-    readonly size: number
-    readonly font: string
-    readonly color: string
+    text: string
+    position: Point  // top-left
+    size: number
+    font: string
+    color: string
 
     constructor(
         text: string, 
@@ -17,8 +17,9 @@ export class TextRender extends RenderMethod {
         fontSizePx: number = 20,
         font: string = "Comic Sans MS Regular", 
         color: string = "red",
+        depth: number = 0
     ) {
-        super(Number.MAX_SAFE_INTEGER)
+        super(depth)
         this.text = text
         this.position = position
         this.size = fontSizePx

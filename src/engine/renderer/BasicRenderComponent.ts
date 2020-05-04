@@ -3,14 +3,14 @@ import { RenderMethod } from "./RenderMethod"
 
 export class BasicRenderComponent extends Component {
 
-    private readonly render: RenderMethod
+    private readonly renders: RenderMethod[]
 
-    constructor(render: RenderMethod) {
+    constructor(...renders: RenderMethod[]) {
         super()
-        this.render = render
+        this.renders = renders
     }
 
     getRenderMethods(): RenderMethod[] {
-        return [this.render]
+        return this.renders
     }
 }

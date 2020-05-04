@@ -74,6 +74,7 @@ export class Tooltip extends Component {
             TEXT_SIZE,
             TEXT_FONT,
             Color.DARK_RED,
+            UIStateManager.UI_SPRITE_DEPTH + 2
         )]
     }
 }

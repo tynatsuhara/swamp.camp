@@ -8,6 +8,7 @@ import { Interactable } from "../world/elements/Interactable"
 import { Hittable } from "../world/elements/Hittable"
 import { HUD } from "../ui/HUD"
 import { UIStateManager } from "../ui/UIStateManager"
+import { Controls } from "../Controls"
 
 export class Player extends Component {
 
@@ -70,7 +71,7 @@ export class Player extends Component {
             this.hitResource(updateData)  // TODO: restrict the speed at which you can do this (probably easiest once we introduce tools)
         }
 
-        if (updateData.input.isKeyDown(InputKey.E)) {
+        if (Controls.interact(updateData.input)) {
             this.interact(updateData)
         }
 
