@@ -8,9 +8,11 @@ import { LocationManager } from "../world/LocationManager"
 import { Enemy } from "./Enemy"
 import { DudeSaveState } from "../saves/DudeSaveState"
 import { Inventory } from "../items/Inventory"
+import { Dialogue } from "./Dialogue"
 
-export enum DudeType {
+export const enum DudeType {
     PLAYER,
+    DIP,
     ELF,
     ORC_WARRIOR
 }
@@ -49,6 +51,7 @@ export class DudeFactory {
         let shield: string = null
         let maxHealth: number
         let speed: number = 0.085
+        let dialogue: Dialogue = null
         let additionalComponents: Component[] = []
 
         switch(type) {
@@ -58,6 +61,13 @@ export class DudeFactory {
                 shield = "shield_0"
                 maxHealth = 4
                 additionalComponents = [new Player()]
+                break
+            }
+            case DudeType.DIP: {
+                animationName = "lizard_f"
+                maxHealth = Number.MAX_SAFE_INTEGER
+                additionalComponents = [new NPC()]
+                dialogue = Dialogue.DIP_0
                 break
             }
             case DudeType.ELF: {
@@ -94,7 +104,8 @@ export class DudeFactory {
             saveState?.maxHealth ?? maxHealth,
             saveState?.health ?? health,
             saveState?.speed ?? speed,
-            inventory
+            inventory,
+            saveState?.dialogue ?? dialogue
         )
 
         new Entity([d as Component].concat(additionalComponents))

@@ -10,7 +10,7 @@ import { makeHittable } from "./HittableResource"
 import { ElementComponent } from "./ElementComponent"
 import { ElementType } from "./Elements"
 
-export enum TreeType {
+export const enum TreeType {
     ROUND = 1,
     POINTY = 2,
 }

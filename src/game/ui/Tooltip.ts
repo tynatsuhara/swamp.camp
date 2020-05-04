@@ -1,13 +1,11 @@
 import { Component } from "../../engine/component"
-import { makeNineSliceTileComponents } from "../../engine/tiles/NineSlice"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Point } from "../../engine/point"
 import { TextRender } from "../../engine/renderer/TextRender"
-import { TEXT_STYLE, TEXT_PIXEL_HEIGHT, TEXT_PIXEL_WIDTH } from "./Text"
+import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
 import { UpdateData } from "../../engine/engine"
 import { Color } from "./Color"
-import { TileTransform } from "../../engine/tiles/TileTransform"
 import { UIStateManager } from "./UIStateManager"
 
 export class Tooltip extends Component {
@@ -15,7 +13,7 @@ export class Tooltip extends Component {
     position: Point = new Point(0, 0)
 
     private static readonly margin = 6
-    private static readonly textOffset = new Point(Tooltip.margin, 13)
+    private static readonly textOffset = new Point(Tooltip.margin, Tooltip.margin-1)
     private text: string
 
     private left: TileComponent
@@ -53,7 +51,7 @@ export class Tooltip extends Component {
             return
         }
         
-        const width = this.text.length * 8  // this will break if we change ZOOM or text size
+        const width = this.text.length * TEXT_PIXEL_WIDTH
 
         const leftPos = this.position.plus(new Point(TILE_SIZE/2, -TILE_SIZE)).apply(Math.floor)
         const centerPos = leftPos.plus(new Point(TILE_SIZE, 0))
@@ -73,7 +71,8 @@ export class Tooltip extends Component {
         return [new TextRender(
             this.text,
             this.left.transform.position.plus(Tooltip.textOffset),
-            TEXT_STYLE,
+            TEXT_SIZE,
+            TEXT_FONT,
             Color.DARK_RED,
         )]
     }

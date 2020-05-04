@@ -28,7 +28,7 @@ export class QuestGame extends Game {
     private player: Dude
 
     readonly tilesets = new Tilesets()
-    readonly uiStateManager = new UIStateManager()
+    private uiStateManager = new UIStateManager()
     
     private gameEntityView: View = new View()
     private uiView: View = new View()
@@ -53,11 +53,7 @@ export class QuestGame extends Game {
             new MapGenerator().doIt()
             this.player = DudeFactory.instance.new(DudeType.PLAYER, new Point(-2, 2).times(TILE_SIZE))
 
-            // TEST: Spawn some guys
-            // this.dudeFactory.new(DudeType.ELF, new Point(20, 30))
-            // for (let i = 0; i < 5; i++) {
-            //     this.dudeFactory.new(DudeType.ORC_WARRIOR, new Point(40, 30 + 20 * i))
-            // }
+            DudeFactory.instance.new(DudeType.DIP, new Point(-10, -10))
         }
     }
 
@@ -141,6 +137,8 @@ export class QuestGame extends Game {
         this.player = Array.from(this.locationManager.currentLocation.dudes)
                 .filter(d => !!d.entity.getComponent(Player))
                 .shift()
+
+        this.uiStateManager = new UIStateManager()
         
         return true
     }

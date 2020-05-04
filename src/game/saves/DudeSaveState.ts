@@ -1,5 +1,6 @@
 import { DudeType } from "../characters/DudeFactory"
 import { ItemStack } from "../items/Inventory"
+import { Dialogue } from "../characters/Dialogue"
 
 export class DudeSaveState {
     type: DudeType
@@ -11,5 +12,5 @@ export class DudeSaveState {
     health: number
     speed: number
     inventory: ItemStack[]
-    // dialogue: TODO
+    dialogue: Dialogue
 }

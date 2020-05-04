@@ -15,7 +15,7 @@ import { TileTransform } from "../../engine/tiles/TileTransform"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
 import { TextRender } from "../../engine/renderer/TextRender"
 import { Item, ITEM_METADATA_MAP } from "../items/Items"
-import { TEXT_STYLE } from "./Text"
+import { TEXT_FONT, TEXT_SIZE } from "./Text"
 import { Color } from "./Color"
 
 export class InventoryDisplay extends Component {
@@ -159,7 +159,10 @@ export class InventoryDisplay extends Component {
             new BasicRenderComponent(
                 new TextRender(
                     `x${this.inventory().getItemCount(Item.COIN)}`, 
-                    new Point(9, 9).plus(this.offset).plus(this.coinsOffset), TEXT_STYLE, Color.YELLOW
+                    new Point(9, 1).plus(this.offset).plus(this.coinsOffset), 
+                    TEXT_SIZE, 
+                    TEXT_FONT, 
+                    Color.YELLOW
                 )
             )
         )

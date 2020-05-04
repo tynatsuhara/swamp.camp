@@ -25,7 +25,7 @@ export class ItemMetadata {
     }
 }
 
-export enum Item {
+export const enum Item {
     COIN,
     ROCK,
     WOOD,

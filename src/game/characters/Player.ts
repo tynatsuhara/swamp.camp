@@ -28,7 +28,7 @@ export class Player extends Component {
     }
 
     update(updateData: UpdateData) {
-        if (!this.dude.isAlive || UIStateManager.instance.isMenuOpen) {
+        if (!this.dude.isAlive) {
             return
         }
 
@@ -39,16 +39,22 @@ export class Player extends Component {
         let dx = 0
         let dy = 0
 
-        if (updateData.input.isKeyHeld(InputKey.W)) { dy-- }
-        if (updateData.input.isKeyHeld(InputKey.S)) { dy++ }
-        if (updateData.input.isKeyHeld(InputKey.A)) { dx-- }
-        if (updateData.input.isKeyHeld(InputKey.D)) { dx++ }
+        if (!UIStateManager.instance.isMenuOpen) {
+            if (updateData.input.isKeyHeld(InputKey.W)) { dy-- }
+            if (updateData.input.isKeyHeld(InputKey.S)) { dy++ }
+            if (updateData.input.isKeyHeld(InputKey.A)) { dx-- }
+            if (updateData.input.isKeyHeld(InputKey.D)) { dx++ }
+        }
 
         this.dude.move(
             updateData, 
             new Point(dx, dy), 
             this.dude.weapon.isDrawn() ? updateData.input.mousePos.x - this.dude.standingPosition.x : 0
         )
+
+        if (UIStateManager.instance.isMenuOpen) {
+            return
+        }
 
         if (updateData.input.isKeyDown(InputKey.F)) {
             this.dude.weapon.toggleSheathed()
@@ -95,7 +101,7 @@ export class Player extends Component {
         const interactCenter = this.dude.standingPosition.minus(new Point(0, 7))
         const possibilities = updateData.view.entities
                 .map(e => e.getComponent(Interactable))
-                .filter(e => !!e)
+                .filter(e => e?.enabled)
                 .filter(e => this.dude.animation.transform.mirrorX === (e.position.x < interactCenter.x))  // interactables the dude is facing
         
         let closestDist = Number.MAX_SAFE_INTEGER

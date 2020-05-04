@@ -22,9 +22,11 @@ export class RenderContext {
         return this.context.measureText(text)
     }
 
-    fillText(text: string, point: Point) {
+    fillText(size: number, font: string, color: string, text: string, point: Point) {
+        this.context.font = `${size * this.view.zoom}px '${font}'`
+        this.context.fillStyle = color
         point = point.plus(this.view.offset).times(this.view.zoom)
-        this.context.fillText(text, point.x, point.y)
+        this.context.fillText(text, point.x, point.y + size*this.view.zoom)
     }
 
     /**

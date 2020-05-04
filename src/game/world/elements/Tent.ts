@@ -10,7 +10,7 @@ import { LocationManager } from "../LocationManager"
 import { ElementComponent } from "./ElementComponent"
 import { ElementType } from "./Elements"
 
-export enum TentColor {
+export const enum TentColor {
     RED = "red",
     BLUE = "blue"
 }

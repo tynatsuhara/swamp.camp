@@ -1,7 +1,7 @@
 import { LocationManagerSaveState } from "./LocationManagerSaveState"
 
 // Linear progression through the game
-export enum StoryState {
+export const enum StoryState {
     INTRODUCTION = 0,
     ARRIVING_IN_FOREST = 1,
     KILLED_ORCS = 2,

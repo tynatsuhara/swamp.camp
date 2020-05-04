@@ -12,6 +12,9 @@ import { Shield } from "./Shield"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Interactable } from "../world/elements/Interactable"
 import { DudeSaveState } from "../saves/DudeSaveState"
+import { DialogueInstance, Dialogue } from "./Dialogue"
+import { UIStateManager } from "../ui/UIStateManager"
+import { DialogueDisplay } from "../ui/DialogueDisplay"
 
 export class Dude extends Component {
 
@@ -50,6 +53,7 @@ export class Dude extends Component {
     }
 
     private dialogueInteract: Interactable
+    private dialogue: Dialogue
 
     constructor(
         type: DudeType,
@@ -60,7 +64,8 @@ export class Dude extends Component {
         maxHealth: number,
         health: number,
         speed: number,
-        inventory: Inventory
+        inventory: Inventory,
+        dialogue: Dialogue
     ) {
         super()
         this.type = type
@@ -71,6 +76,7 @@ export class Dude extends Component {
         this._health = health
         this.speed = speed
         this.inventory = inventory
+        this.dialogue = dialogue
 
         this.start = (startData) => {
             // Set up animations
@@ -94,7 +100,7 @@ export class Dude extends Component {
             )
             this.collider = this.entity.addComponent(new BoxCollider(this.position.plus(this.relativeColliderPos), colliderSize, Dude.COLLISION_LAYER))
 
-            // this.dialogueInteract = this.entity.addComponent(new Interactable(new Point(0, 0), () => console.log("hi!")))
+            this.dialogueInteract = this.entity.addComponent(new Interactable(new Point(0, 0), () => DialogueDisplay.instance.startDialogue(this.dialogue)))
         }
     }
 
@@ -103,7 +109,8 @@ export class Dude extends Component {
         this.animation.transform.position = this.position.plus(this.isAlive ? new Point(0, 0) : this.deathOffset)
         this.animation.transform.depth = this.collider.position.y + this.collider.dimensions.y
 
-        // this.dialogueInteract.position = this.standingPosition.minus(new Point(0, 5))
+        this.dialogueInteract.position = this.standingPosition.minus(new Point(0, 5))
+        this.dialogueInteract.enabled = !!this.dialogue
     }
 
     get isAlive() { return this._health > 0 }
@@ -254,7 +261,8 @@ export class Dude extends Component {
             speed: this.speed,
             weapon: this.weaponId,
             shield: this.shieldId,
-            inventory: this.inventory.save()
+            inventory: this.inventory.save(),
+            dialogue: this.dialogue
         }
     }
 }
