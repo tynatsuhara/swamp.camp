@@ -17,7 +17,7 @@ export const formatText = (
     position: Point, 
     width: number, 
     alignment: TextAlign = TextAlign.LEFT,
-    lineSpacing: number = 4
+    lineSpacing: number = 5
 ): TextRender[] => {
     const words = s.split(" ")
     const rows: string[] = []

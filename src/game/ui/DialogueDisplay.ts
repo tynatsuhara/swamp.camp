@@ -7,11 +7,12 @@ import { UpdateData } from "../../engine/engine"
 import { Entity } from "../../engine/Entity"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
 import { TextRender } from "../../engine/renderer/TextRender"
-import { TEXT_FONT, TEXT_SIZE, TextAlign, formatText } from "./Text"
+import { TEXT_FONT, TEXT_SIZE, TextAlign, formatText, TEXT_PIXEL_WIDTH } from "./Text"
 import { Color } from "./Color"
 import { RenderMethod } from "../../engine/renderer/RenderMethod"
 import { Controls } from "../Controls"
 import { UIStateManager } from "./UIStateManager"
+import { TextButton } from "./TextButton"
 
 export class DialogueDisplay extends Component {
 
@@ -37,25 +38,34 @@ export class DialogueDisplay extends Component {
             return
         }
 
+        const showOptions = this.dialogue.options.length > 0 && this.lineIndex === this.dialogue.lines.length-1
+
         if (this.letterTicker !== 0 && (updateData.input.isMouseDown || Controls.interact(updateData.input))) {
             if (this.finishedPrinting) {
-                this.lineIndex++
-                this.letterTicker = 0
-                this.finishedPrinting = false
+                if (!showOptions) {
+                    this.lineIndex++
+                    this.letterTicker = 0
+                    this.finishedPrinting = false
+                }
             } else {
-                this.letterTicker += 3.6e+6  // hack to finish printing, presumably there won't be an hours worth of text
+                this.letterTicker += 3.6e+6  // hack to finish printing, presumably there won't be an hour of text
             }
         }
 
         if (this.lineIndex === this.dialogue.lines.length) {
-            this.dialogue = null
-            this.displayEntity = null
+            this.close()
             return
         }
 
         this.letterTicker += updateData.elapsedTimeMillis
 
+        // Overwrite previously displayed tiles each time
+        this.displayEntity = new Entity()
+
         this.renderNextLine(updateData.dimensions)
+        if (showOptions && this.finishedPrinting) {
+            this.renderOptions(updateData.dimensions)
+        }
     }
 
     getEntities(): Entity[] {
@@ -66,6 +76,11 @@ export class DialogueDisplay extends Component {
         }
     }
 
+    close() {
+        this.dialogue = null
+        this.displayEntity = null
+    }
+
     startDialogue(dialogue: Dialogue) {
         this.dialogue = getDialogue(dialogue)
         this.lineIndex = 0
@@ -74,7 +89,7 @@ export class DialogueDisplay extends Component {
     }
 
     private renderNextLine(screenDimensions: Point) {
-        const dimensions = new Point(14, 5)
+        const dimensions = new Point(18, 5)
         const bottomBuffer = TILE_SIZE
         const topLeft = new Point(
             Math.floor(screenDimensions.x/2 - dimensions.x/2*TILE_SIZE),
@@ -92,7 +107,6 @@ export class DialogueDisplay extends Component {
         const margin = 12
         const width = dimensions.x*TILE_SIZE - margin*2
 
-        const millisPerCharacter = 35
 
         const formattedRenders = formatText(
             this.dialogue.lines[this.lineIndex], 
@@ -104,27 +118,69 @@ export class DialogueDisplay extends Component {
         formattedRenders.forEach(fr => fr.depth = UIStateManager.UI_SPRITE_DEPTH + 1)
 
         // "type" out the letters
-        let charactersToShow = Math.floor(this.letterTicker/millisPerCharacter)
-        for (let i = 0; i < formattedRenders.length; i++) {
-            const fr = formattedRenders[i]
-            let newStr = ""
-            for (let j = 0; j < fr.text.length; j++) {
-                if (charactersToShow === 0) {
-                    break
+        if (!this.finishedPrinting) {
+            const millisPerCharacter = 35
+            let charactersToShow = Math.floor(this.letterTicker/millisPerCharacter)
+            for (let i = 0; i < formattedRenders.length; i++) {
+                const fr = formattedRenders[i]
+                let newStr = ""
+                for (let j = 0; j < fr.text.length; j++) {
+                    if (charactersToShow === 0) {
+                        break
+                    }
+                    newStr += fr.text.charAt(j)
+                    if (fr.text.charAt(j) !== ' ') {
+                        charactersToShow--
+                    }
+                    if (j === fr.text.length-1 && i === formattedRenders.length-1) {
+                        this.finishedPrinting = true
+                    }
                 }
-                newStr += fr.text.charAt(j)
-                if (fr.text.charAt(j) !== ' ') {
-                    charactersToShow--
-                }
-                if (j === fr.text.length-1 && i === formattedRenders.length-1) {
-                    this.finishedPrinting = true
-                }
+                fr.text = newStr
             }
-            fr.text = newStr
         }
 
-        const textComponent = new BasicRenderComponent(...formattedRenders)
+        backgroundTiles.forEach(tile => this.displayEntity.addComponent(tile))
+        this.displayEntity.addComponent(new BasicRenderComponent(...formattedRenders))
+    }
 
-        this.displayEntity = new Entity((backgroundTiles as Component[]).concat([textComponent]))
+    private renderOptions(screenDimensions: Point) {
+        const options = this.dialogue.options
+        const longestOption = Math.max(...options.map(o => o[0].length))
+
+        const tilesWide = Math.ceil(longestOption * TEXT_PIXEL_WIDTH/TILE_SIZE)
+
+        // TODO determine dimensions from string lengths
+        const dimensions = new Point(tilesWide + 2, options.length + 1)
+        
+        const topLeft = screenDimensions.div(2).minus(dimensions.times(TILE_SIZE).div(2))
+
+        const backgroundTiles = makeNineSliceTileComponents(
+            Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"), 
+            topLeft,
+            dimensions
+        )
+        backgroundTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
+
+        const topOffset = 2
+        const margin = 12
+        const width = dimensions.x*TILE_SIZE - margin*2
+
+        backgroundTiles.forEach(tile => this.displayEntity.addComponent(tile))
+
+        options.forEach((option, i) => this.displayEntity.addComponent(
+            new TextButton(
+                topLeft.plus(new Point(dimensions.x + (dimensions.x-width)/2, i * (TILE_SIZE + 2))),
+                option[0],
+                () => {
+                    const buttonFnResult = option[1]()
+                    if (!!buttonFnResult) {
+                        this.startDialogue(buttonFnResult)
+                    } else {
+                        this.close()
+                    }
+                }
+            )
+        ))
     }
 }

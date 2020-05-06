@@ -1,7 +1,7 @@
 export class DialogueInstance {
     readonly id: Dialogue
     readonly lines: string[]
-    readonly options: [string, () => void][]
+    readonly options: [string, () => void|Dialogue][]
 
     /**
      * @param lines Will be said one-by-one. TODO: Size restrictions based on UI
@@ -17,15 +17,16 @@ export class DialogueInstance {
 }
 
 export const enum Dialogue {
-    DIP_0 = "dip_0"
+    DIP_0 = 1, DIP_1
 }
 
 export const getDialogue = (d: Dialogue): DialogueInstance => DIALOGUE_MAP[d]()
 
-const DIALOGUE_MAP: { [key: string]: () => DialogueInstance } = {
+const DIALOGUE_MAP: { [key: number]: () => DialogueInstance } = {
     [Dialogue.DIP_0]: () => new DialogueInstance(Dialogue.DIP_0, 
-        ["Hello! This is my string that should be long enough to wrap to the next line :)", "My name is DIP."],
-        ["Nice to meet you!", () => console.log("option A")],
-        ["...", () => console.log("option B")],
-    )
+        ["Hello! This is my string that should be long enough to wrap to the next line :) (Plus more for four lines)", "My name is DIP."],
+        ["Nice to meet you!", () => Dialogue.DIP_1],
+        ["...", () => Dialogue.DIP_1],
+    ),
+    [Dialogue.DIP_1]: () => new DialogueInstance(Dialogue.DIP_1, ["See ya later!"])
 }
