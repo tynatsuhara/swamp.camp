@@ -3872,6 +3872,7 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
                     var showOptions = this.dialogue.options.length > 0 && this.lineIndex === this.dialogue.lines.length - 1;
                     if (this.letterTicker !== 0 && (updateData.input.isMouseDown || Controls_1.Controls.interact(updateData.input))) {
                         if (this.finishedPrinting) {
+                            // go to the next dialogue line
                             if (!showOptions) {
                                 this.lineIndex++;
                                 this.letterTicker = 0;
@@ -3879,11 +3880,13 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
                             }
                         }
                         else {
+                            // fast-forward the letter printing
                             this.letterTicker += 3.6e+6; // hack to finish printing, presumably there won't be an hour of text
                         }
                     }
                     if (this.lineIndex === this.dialogue.lines.length) {
                         this.close();
+                        this.dude.dialogue = null;
                         return;
                     }
                     this.letterTicker += updateData.elapsedTimeMillis;
@@ -3906,8 +3909,9 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
                     this.dialogue = null;
                     this.displayEntity = null;
                 };
-                DialogueDisplay.prototype.startDialogue = function (dialogue) {
-                    this.dialogue = Dialogue_1.getDialogue(dialogue);
+                DialogueDisplay.prototype.startDialogue = function (dude) {
+                    this.dude = dude;
+                    this.dialogue = Dialogue_1.getDialogue(dude.dialogue);
                     this.lineIndex = 0;
                     this.letterTicker = 0;
                     this.finishedPrinting = false;
@@ -3949,6 +3953,7 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
                     backgroundTiles.forEach(function (tile) { return _this.displayEntity.addComponent(tile); });
                     this.displayEntity.addComponent(new (BasicRenderComponent_3.BasicRenderComponent.bind.apply(BasicRenderComponent_3.BasicRenderComponent, __spreadArrays([void 0], formattedRenders)))());
                 };
+                // TODO make this UI not bad
                 DialogueDisplay.prototype.renderOptions = function (screenDimensions) {
                     var _this = this;
                     var options = this.dialogue.options;
@@ -3966,9 +3971,11 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
                     options.forEach(function (option, i) { return _this.displayEntity.addComponent(new TextButton_1.TextButton(topLeft.plus(new point_26.Point(dimensions.x + (dimensions.x - width) / 2, i * (Tilesets_8.TILE_SIZE + 2))), option[0], function () {
                         var buttonFnResult = option[1]();
                         if (!!buttonFnResult) {
-                            _this.startDialogue(buttonFnResult);
+                            _this.dude.dialogue = buttonFnResult;
+                            _this.startDialogue(_this.dude);
                         }
                         else {
+                            _this.dude.dialogue = null;
                             _this.close();
                         }
                     })); });
@@ -4103,7 +4110,11 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                         var colliderSize = new point_27.Point(10, 8);
                         _this.relativeColliderPos = new point_27.Point(_this.animation.transform.dimensions.x / 2 - colliderSize.x / 2, _this.animation.transform.dimensions.y - colliderSize.y);
                         _this.collider = _this.entity.addComponent(new BoxCollider_2.BoxCollider(_this.position.plus(_this.relativeColliderPos), colliderSize, Dude.COLLISION_LAYER));
-                        _this.dialogueInteract = _this.entity.addComponent(new Interactable_1.Interactable(new point_27.Point(0, 0), function () { return DialogueDisplay_2.DialogueDisplay.instance.startDialogue(_this.dialogue); }));
+                        _this.dialogueInteract = _this.entity.addComponent(new Interactable_1.Interactable(new point_27.Point(0, 0), function () {
+                            if (!!_this.dialogue) {
+                                DialogueDisplay_2.DialogueDisplay.instance.startDialogue(_this);
+                            }
+                        }));
                     };
                     return _this;
                 }

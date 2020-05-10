@@ -53,7 +53,7 @@ export class Dude extends Component {
     }
 
     private dialogueInteract: Interactable
-    private dialogue: Dialogue
+    dialogue: Dialogue
 
     constructor(
         type: DudeType,
@@ -100,7 +100,11 @@ export class Dude extends Component {
             )
             this.collider = this.entity.addComponent(new BoxCollider(this.position.plus(this.relativeColliderPos), colliderSize, Dude.COLLISION_LAYER))
 
-            this.dialogueInteract = this.entity.addComponent(new Interactable(new Point(0, 0), () => DialogueDisplay.instance.startDialogue(this.dialogue)))
+            this.dialogueInteract = this.entity.addComponent(new Interactable(new Point(0, 0), () => {
+                if (!!this.dialogue) {
+                    DialogueDisplay.instance.startDialogue(this)
+                }
+            }))
         }
     }
 

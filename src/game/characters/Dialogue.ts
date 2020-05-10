@@ -14,6 +14,8 @@ export class DialogueInstance {
         this.lines = lines
         this.options = options
     }
+
+    
 }
 
 export const enum Dialogue {

@@ -13,6 +13,7 @@ import { RenderMethod } from "../../engine/renderer/RenderMethod"
 import { Controls } from "../Controls"
 import { UIStateManager } from "./UIStateManager"
 import { TextButton } from "./TextButton"
+import { Dude } from "../characters/Dude"
 
 export class DialogueDisplay extends Component {
 
@@ -20,6 +21,7 @@ export class DialogueDisplay extends Component {
 
     private e: Entity = new Entity([this])
     private displayEntity: Entity
+    private dude: Dude
     private dialogue: DialogueInstance
     private lineIndex: number
 
@@ -42,18 +44,21 @@ export class DialogueDisplay extends Component {
 
         if (this.letterTicker !== 0 && (updateData.input.isMouseDown || Controls.interact(updateData.input))) {
             if (this.finishedPrinting) {
+                // go to the next dialogue line
                 if (!showOptions) {
                     this.lineIndex++
                     this.letterTicker = 0
                     this.finishedPrinting = false
                 }
             } else {
+                // fast-forward the letter printing
                 this.letterTicker += 3.6e+6  // hack to finish printing, presumably there won't be an hour of text
             }
         }
 
         if (this.lineIndex === this.dialogue.lines.length) {
             this.close()
+            this.dude.dialogue = null
             return
         }
 
@@ -63,6 +68,7 @@ export class DialogueDisplay extends Component {
         this.displayEntity = new Entity()
 
         this.renderNextLine(updateData.dimensions)
+
         if (showOptions && this.finishedPrinting) {
             this.renderOptions(updateData.dimensions)
         }
@@ -81,8 +87,9 @@ export class DialogueDisplay extends Component {
         this.displayEntity = null
     }
 
-    startDialogue(dialogue: Dialogue) {
-        this.dialogue = getDialogue(dialogue)
+    startDialogue(dude: Dude) {
+        this.dude = dude
+        this.dialogue = getDialogue(dude.dialogue)
         this.lineIndex = 0
         this.letterTicker = 0
         this.finishedPrinting = false
@@ -144,6 +151,7 @@ export class DialogueDisplay extends Component {
         this.displayEntity.addComponent(new BasicRenderComponent(...formattedRenders))
     }
 
+    // TODO make this UI not bad
     private renderOptions(screenDimensions: Point) {
         const options = this.dialogue.options
         const longestOption = Math.max(...options.map(o => o[0].length))
@@ -175,8 +183,10 @@ export class DialogueDisplay extends Component {
                 () => {
                     const buttonFnResult = option[1]()
                     if (!!buttonFnResult) {
-                        this.startDialogue(buttonFnResult)
+                        this.dude.dialogue = buttonFnResult
+                        this.startDialogue(this.dude)
                     } else {
+                        this.dude.dialogue = null
                         this.close()
                     }
                 }
