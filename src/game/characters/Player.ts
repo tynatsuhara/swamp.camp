@@ -71,7 +71,7 @@ export class Player extends Component {
             this.hitResource(updateData)  // TODO: restrict the speed at which you can do this (probably easiest once we introduce tools)
         }
 
-        if (Controls.interact(updateData.input)) {
+        if (updateData.input.isKeyDown(Controls.interactButton)) {
             this.interact(updateData)
         }
 

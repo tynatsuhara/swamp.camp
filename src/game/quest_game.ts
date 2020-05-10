@@ -16,6 +16,7 @@ import { Elements } from "./world/elements/Elements"
 import { Ground } from "./world/ground/Ground"
 import { InputKey } from "../engine/input"
 import { Player } from "./characters/Player"
+import { Item } from "./items/Items"
 
 
 const ZOOM = 3
@@ -52,6 +53,11 @@ export class QuestGame extends Game {
             this.player = DudeFactory.instance.new(DudeType.PLAYER, new Point(-2, 2).times(TILE_SIZE))
 
             DudeFactory.instance.new(DudeType.DIP, new Point(-10, -10))
+
+
+
+            // TEMP
+            this.player.inventory.addItem(Item.TENT)
         }
     }
 

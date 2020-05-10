@@ -17,6 +17,7 @@ import { TextRender } from "../../engine/renderer/TextRender"
 import { Item, ITEM_METADATA_MAP } from "../items/Items"
 import { TEXT_FONT, TEXT_SIZE } from "./Text"
 import { Color } from "./Color"
+import { Controls } from "../Controls"
 
 export class InventoryDisplay extends Component {
 
@@ -49,12 +50,13 @@ export class InventoryDisplay extends Component {
     update(updateData: UpdateData) {
         const inv = this.inventory().inventory
 
-        if (updateData.input.isKeyDown(InputKey.I)) {
-            if (this.isOpen) {
-                this.hide()
-            } else if (!UIStateManager.instance.isMenuOpen) {
-                this.show(updateData.dimensions)
-            }
+        const pressI = updateData.input.isKeyDown(InputKey.I)
+        const pressEsc = updateData.input.isKeyDown(InputKey.ESC)
+
+        if (this.isOpen && (pressI || pressEsc)) {
+            this.hide()
+        } else if (pressI && !UIStateManager.instance.isMenuOpen) {
+            this.show(updateData.dimensions)
         }
 
         if (!this.isOpen) {
@@ -65,7 +67,10 @@ export class InventoryDisplay extends Component {
         if (newIndex !== -1 && !!inv[newIndex]) {
             this.tooltip.position = updateData.input.mousePos
             const stack = inv[newIndex]
-            this.tooltip.say(`${ITEM_METADATA_MAP[stack.item].displayName}${stack.count > 1 ? ' x' + stack.count : ''}`)
+            const name = ITEM_METADATA_MAP[stack.item].displayName
+            const count = stack.count > 1 ? ' x' + stack.count : ''
+            const placePrompt = !!ITEM_METADATA_MAP[stack.item].element ? ` [${String.fromCharCode(Controls.placeElementButton)} to place]` : ''
+            this.tooltip.say(`${name}${count}${placePrompt}`)
         } else {
             this.tooltip.clear()
         }

@@ -1,5 +1,7 @@
 import { InputKey, CapturedInput } from "../engine/input"
 
 export const Controls = {
-    interact: (ci: CapturedInput) => ci.isKeyDown(InputKey.E)
+    placeElementButton: InputKey.X,
+    interactButton: InputKey.E,
+    closeButton: InputKey.ESC,
 }

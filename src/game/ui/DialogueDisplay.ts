@@ -40,9 +40,14 @@ export class DialogueDisplay extends Component {
             return
         }
 
+        if (updateData.input.isKeyDown(Controls.closeButton)) {
+            this.close()
+            return
+        }
+
         const showOptions = this.dialogue.options.length > 0 && this.lineIndex === this.dialogue.lines.length-1
 
-        if (this.letterTicker !== 0 && (updateData.input.isMouseDown || Controls.interact(updateData.input))) {
+        if (this.letterTicker !== 0 && (updateData.input.isMouseDown || updateData.input.isKeyDown(Controls.interactButton))) {
             if (this.finishedPrinting) {
                 // go to the next dialogue line
                 if (!showOptions) {

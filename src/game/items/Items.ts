@@ -5,23 +5,27 @@ import { DroppedItem } from "./DroppedItem"
 import { Point } from "../../engine/point"
 import { TileSource } from "../../engine/tiles/TileSource"
 import { Collider } from "../../engine/collision/Collider"
+import { ElementType, Elements } from "../world/elements/Elements"
 
 export class ItemMetadata {
     readonly displayName: string
     readonly droppedIconSupplier: () => TileSource
     readonly inventoryIconSupplier: () => TileSource
     readonly stackLimit: number
+    readonly element: ElementType
 
     constructor(
         displayName: string,
         droppedIconSupplier: () => TileSource,
         inventoryIconSupplier: () => TileSource,
-        stackLimit: number = Number.MAX_SAFE_INTEGER
+        stackLimit: number = Number.MAX_SAFE_INTEGER,
+        element: ElementType = null,  // for placing elements
     ) {
         this.displayName = displayName
         this.droppedIconSupplier = droppedIconSupplier
         this.inventoryIconSupplier = inventoryIconSupplier
         this.stackLimit = stackLimit
+        this.element = element
     }
 }
 
@@ -29,8 +33,10 @@ export const enum Item {
     COIN,
     ROCK,
     WOOD,
+    TENT,
 }
 
+// Data that doesn't get serialized (TODO make builder pattern)
 export const ITEM_METADATA_MAP = {
     [Item.COIN]: new ItemMetadata(
         "Coin",
@@ -48,7 +54,14 @@ export const ITEM_METADATA_MAP = {
         () => Tilesets.instance.outdoorTiles.getTileSource("woodItem"),
         () => Tilesets.instance.oneBit.getTileSource("wood"), 
         100
-    )
+    ),
+    [Item.TENT]: new ItemMetadata(
+        "Tent",
+        () => null,
+        () => Tilesets.instance.oneBit.getTileSource("tent"), 
+        1,
+        ElementType.TENT
+    ),
 }
 
 /**
