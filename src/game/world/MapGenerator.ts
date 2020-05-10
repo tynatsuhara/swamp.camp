@@ -6,6 +6,7 @@ import { TentColor } from "./elements/Tent"
 import { ElementType } from "./elements/Elements"
 import { LocationManager } from "./LocationManager"
 import { GroundType, Ground } from "./ground/Ground"
+import { Noise } from "../../engine/util/Noise"
 
 
 export class MapGenerator {
@@ -15,6 +16,8 @@ export class MapGenerator {
     private readonly location = LocationManager.instance.newLocation()
 
     doIt(): WorldLocation {
+        this.noise()
+
         const tentLocation = LocationManager.instance.newLocation()
         
         // spawn tent
@@ -124,5 +127,28 @@ export class MapGenerator {
                 this.location.addGroundElement(GroundType.GRASS, pt)
             }
         }
+    }
+
+    private noise() {
+        const noise = new Noise(Math.random())
+
+        let val = ""
+
+        for (var x = 0; x < MapGenerator.MAP_SIZE; x++) {
+            for (var y = 0; y < MapGenerator.MAP_SIZE; y++) {
+                // All noise functions return values in the range of -1 to 1.
+
+                // noise.simplex2 and noise.perlin2 for 2d noise
+                var value = noise.simplex2(x / 100, y / 100);
+                val += (Math.floor(2 * (value + 1)))
+                // ... or noise.simplex3 and noise.perlin3:
+                // var value = noise.simplex3(x / 100, y / 100, time);
+
+                // image[x][y].r = Math.abs(value) * 256; // Or whatever. Open demo.html to see it used with canvas.
+            }
+            val += "\n"
+        }
+
+        console.log(val)
     }
 }

@@ -5658,10 +5658,363 @@ System.register("engine/tiles/ConnectingTile", ["engine/point", "engine/componen
         }
     };
 });
-System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/ConnectingTile", "engine/collision/BoxCollider", "game/world/LocationManager", "game/world/ground/Ground"], function (exports_79, context_79) {
+/*
+* A speed-improved perlin and simplex noise algorithms for 2D.
+*
+* Based on example code by Stefan Gustavson (stegu@itn.liu.se).
+* Optimisations by Peter Eastman (peastman@drizzle.stanford.edu).
+* Better rank ordering method by Stefan Gustavson in 2012.
+* Converted to Javascript by Joseph Gentle.
+*
+* Version 2012-03-09
+*
+* This code was placed in the public domain by its original author,
+* Stefan Gustavson. You may use it as you see fit, but
+* attribution is appreciated.
+*
+*/
+System.register("engine/util/Noise", [], function (exports_79, context_79) {
     "use strict";
-    var point_42, ConnectingTile_3, BoxCollider_8, LocationManager_6, Ground_3, MapGenerator;
+    var grad3, p, perm, gradP, Noise;
     var __moduleName = context_79 && context_79.id;
+    function Grad(x, y, z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+    return {
+        setters: [],
+        execute: function () {/*
+            * A speed-improved perlin and simplex noise algorithms for 2D.
+            *
+            * Based on example code by Stefan Gustavson (stegu@itn.liu.se).
+            * Optimisations by Peter Eastman (peastman@drizzle.stanford.edu).
+            * Better rank ordering method by Stefan Gustavson in 2012.
+            * Converted to Javascript by Joseph Gentle.
+            *
+            * Version 2012-03-09
+            *
+            * This code was placed in the public domain by its original author,
+            * Stefan Gustavson. You may use it as you see fit, but
+            * attribution is appreciated.
+            *
+            */
+            Grad.prototype.dot2 = function (x, y) {
+                return this.x * x + this.y * y;
+            };
+            Grad.prototype.dot3 = function (x, y, z) {
+                return this.x * x + this.y * y + this.z * z;
+            };
+            grad3 = [new Grad(1, 1, 0), new Grad(-1, 1, 0), new Grad(1, -1, 0), new Grad(-1, -1, 0),
+                new Grad(1, 0, 1), new Grad(-1, 0, 1), new Grad(1, 0, -1), new Grad(-1, 0, -1),
+                new Grad(0, 1, 1), new Grad(0, -1, 1), new Grad(0, 1, -1), new Grad(0, -1, -1)];
+            p = [151, 160, 137, 91, 90, 15,
+                131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23,
+                190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35, 11, 32, 57, 177, 33,
+                88, 237, 149, 56, 87, 174, 20, 125, 136, 171, 168, 68, 175, 74, 165, 71, 134, 139, 48, 27, 166,
+                77, 146, 158, 231, 83, 111, 229, 122, 60, 211, 133, 230, 220, 105, 92, 41, 55, 46, 245, 40, 244,
+                102, 143, 54, 65, 25, 63, 161, 1, 216, 80, 73, 209, 76, 132, 187, 208, 89, 18, 169, 200, 196,
+                135, 130, 116, 188, 159, 86, 164, 100, 109, 198, 173, 186, 3, 64, 52, 217, 226, 250, 124, 123,
+                5, 202, 38, 147, 118, 126, 255, 82, 85, 212, 207, 206, 59, 227, 47, 16, 58, 17, 182, 189, 28, 42,
+                223, 183, 170, 213, 119, 248, 152, 2, 44, 154, 163, 70, 221, 153, 101, 155, 167, 43, 172, 9,
+                129, 22, 39, 253, 19, 98, 108, 110, 79, 113, 224, 232, 178, 185, 112, 104, 218, 246, 97, 228,
+                251, 34, 242, 193, 238, 210, 144, 12, 191, 179, 162, 241, 81, 51, 145, 235, 249, 14, 239, 107,
+                49, 192, 214, 31, 181, 199, 106, 157, 184, 84, 204, 176, 115, 121, 50, 45, 127, 4, 150, 254,
+                138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180];
+            // To remove the need for index wrapping, double the permutation table length
+            perm = new Array(512);
+            gradP = new Array(512);
+            Noise = /** @class */ (function () {
+                function Noise(seed) {
+                    // This isn't a very good seeding function, but it works ok. It supports 2^16
+                    // different seed values. Write something better if you need more seeds.
+                    this.seed = function (seed) {
+                        if (seed > 0 && seed < 1) {
+                            // Scale the seed out
+                            seed *= 65536;
+                        }
+                        seed = Math.floor(seed);
+                        if (seed < 256) {
+                            seed |= seed << 8;
+                        }
+                        for (var i = 0; i < 256; i++) {
+                            var v;
+                            if (i & 1) {
+                                v = p[i] ^ (seed & 255);
+                            }
+                            else {
+                                v = p[i] ^ ((seed >> 8) & 255);
+                            }
+                            perm[i] = perm[i + 256] = v;
+                            gradP[i] = gradP[i + 256] = grad3[v % 12];
+                        }
+                    };
+                    /*
+                    for(var i=0; i<256; i++) {
+                      perm[i] = perm[i + 256] = p[i];
+                      gradP[i] = gradP[i + 256] = grad3[perm[i] % 12];
+                    }*/
+                    // Skewing and unskewing factors for 2, 3, and 4 dimensions
+                    this.F2 = 0.5 * (Math.sqrt(3) - 1);
+                    this.G2 = (3 - Math.sqrt(3)) / 6;
+                    this.F3 = 1 / 3;
+                    this.G3 = 1 / 6;
+                    // 2D simplex noise
+                    this.simplex2 = function (xin, yin) {
+                        var n0, n1, n2; // Noise contributions from the three corners
+                        // Skew the input space to determine which simplex cell we're in
+                        var s = (xin + yin) * this.F2; // Hairy factor for 2D
+                        var i = Math.floor(xin + s);
+                        var j = Math.floor(yin + s);
+                        var t = (i + j) * this.G2;
+                        var x0 = xin - i + t; // The x,y distances from the cell origin, unskewed.
+                        var y0 = yin - j + t;
+                        // For the 2D case, the simplex shape is an equilateral triangle.
+                        // Determine which simplex we are in.
+                        var i1, j1; // Offsets for second (middle) corner of simplex in (i,j) coords
+                        if (x0 > y0) { // lower triangle, XY order: (0,0)->(1,0)->(1,1)
+                            i1 = 1;
+                            j1 = 0;
+                        }
+                        else { // upper triangle, YX order: (0,0)->(0,1)->(1,1)
+                            i1 = 0;
+                            j1 = 1;
+                        }
+                        // A step of (1,0) in (i,j) means a step of (1-c,-c) in (x,y), and
+                        // a step of (0,1) in (i,j) means a step of (-c,1-c) in (x,y), where
+                        // c = (3-sqrt(3))/6
+                        var x1 = x0 - i1 + this.G2; // Offsets for middle corner in (x,y) unskewed coords
+                        var y1 = y0 - j1 + this.G2;
+                        var x2 = x0 - 1 + 2 * this.G2; // Offsets for last corner in (x,y) unskewed coords
+                        var y2 = y0 - 1 + 2 * this.G2;
+                        // Work out the hashed gradient indices of the three simplex corners
+                        i &= 255;
+                        j &= 255;
+                        var gi0 = gradP[i + perm[j]];
+                        var gi1 = gradP[i + i1 + perm[j + j1]];
+                        var gi2 = gradP[i + 1 + perm[j + 1]];
+                        // Calculate the contribution from the three corners
+                        var t0 = 0.5 - x0 * x0 - y0 * y0;
+                        if (t0 < 0) {
+                            n0 = 0;
+                        }
+                        else {
+                            t0 *= t0;
+                            n0 = t0 * t0 * gi0.dot2(x0, y0); // (x,y) of grad3 used for 2D gradient
+                        }
+                        var t1 = 0.5 - x1 * x1 - y1 * y1;
+                        if (t1 < 0) {
+                            n1 = 0;
+                        }
+                        else {
+                            t1 *= t1;
+                            n1 = t1 * t1 * gi1.dot2(x1, y1);
+                        }
+                        var t2 = 0.5 - x2 * x2 - y2 * y2;
+                        if (t2 < 0) {
+                            n2 = 0;
+                        }
+                        else {
+                            t2 *= t2;
+                            n2 = t2 * t2 * gi2.dot2(x2, y2);
+                        }
+                        // Add contributions from each corner to get the final noise value.
+                        // The result is scaled to return values in the interval [-1,1].
+                        return 70 * (n0 + n1 + n2);
+                    };
+                    // 3D simplex noise
+                    this.simplex3 = function (xin, yin, zin) {
+                        var n0, n1, n2, n3; // Noise contributions from the four corners
+                        // Skew the input space to determine which simplex cell we're in
+                        var s = (xin + yin + zin) * this.F3; // Hairy factor for 2D
+                        var i = Math.floor(xin + s);
+                        var j = Math.floor(yin + s);
+                        var k = Math.floor(zin + s);
+                        var t = (i + j + k) * this.G3;
+                        var x0 = xin - i + t; // The x,y distances from the cell origin, unskewed.
+                        var y0 = yin - j + t;
+                        var z0 = zin - k + t;
+                        // For the 3D case, the simplex shape is a slightly irregular tetrahedron.
+                        // Determine which simplex we are in.
+                        var i1, j1, k1; // Offsets for second corner of simplex in (i,j,k) coords
+                        var i2, j2, k2; // Offsets for third corner of simplex in (i,j,k) coords
+                        if (x0 >= y0) {
+                            if (y0 >= z0) {
+                                i1 = 1;
+                                j1 = 0;
+                                k1 = 0;
+                                i2 = 1;
+                                j2 = 1;
+                                k2 = 0;
+                            }
+                            else if (x0 >= z0) {
+                                i1 = 1;
+                                j1 = 0;
+                                k1 = 0;
+                                i2 = 1;
+                                j2 = 0;
+                                k2 = 1;
+                            }
+                            else {
+                                i1 = 0;
+                                j1 = 0;
+                                k1 = 1;
+                                i2 = 1;
+                                j2 = 0;
+                                k2 = 1;
+                            }
+                        }
+                        else {
+                            if (y0 < z0) {
+                                i1 = 0;
+                                j1 = 0;
+                                k1 = 1;
+                                i2 = 0;
+                                j2 = 1;
+                                k2 = 1;
+                            }
+                            else if (x0 < z0) {
+                                i1 = 0;
+                                j1 = 1;
+                                k1 = 0;
+                                i2 = 0;
+                                j2 = 1;
+                                k2 = 1;
+                            }
+                            else {
+                                i1 = 0;
+                                j1 = 1;
+                                k1 = 0;
+                                i2 = 1;
+                                j2 = 1;
+                                k2 = 0;
+                            }
+                        }
+                        // A step of (1,0,0) in (i,j,k) means a step of (1-c,-c,-c) in (x,y,z),
+                        // a step of (0,1,0) in (i,j,k) means a step of (-c,1-c,-c) in (x,y,z), and
+                        // a step of (0,0,1) in (i,j,k) means a step of (-c,-c,1-c) in (x,y,z), where
+                        // c = 1/6.
+                        var x1 = x0 - i1 + this.G3; // Offsets for second corner
+                        var y1 = y0 - j1 + this.G3;
+                        var z1 = z0 - k1 + this.G3;
+                        var x2 = x0 - i2 + 2 * this.G3; // Offsets for third corner
+                        var y2 = y0 - j2 + 2 * this.G3;
+                        var z2 = z0 - k2 + 2 * this.G3;
+                        var x3 = x0 - 1 + 3 * this.G3; // Offsets for fourth corner
+                        var y3 = y0 - 1 + 3 * this.G3;
+                        var z3 = z0 - 1 + 3 * this.G3;
+                        // Work out the hashed gradient indices of the four simplex corners
+                        i &= 255;
+                        j &= 255;
+                        k &= 255;
+                        var gi0 = gradP[i + perm[j + perm[k]]];
+                        var gi1 = gradP[i + i1 + perm[j + j1 + perm[k + k1]]];
+                        var gi2 = gradP[i + i2 + perm[j + j2 + perm[k + k2]]];
+                        var gi3 = gradP[i + 1 + perm[j + 1 + perm[k + 1]]];
+                        // Calculate the contribution from the four corners
+                        var t0 = 0.6 - x0 * x0 - y0 * y0 - z0 * z0;
+                        if (t0 < 0) {
+                            n0 = 0;
+                        }
+                        else {
+                            t0 *= t0;
+                            n0 = t0 * t0 * gi0.dot3(x0, y0, z0); // (x,y) of grad3 used for 2D gradient
+                        }
+                        var t1 = 0.6 - x1 * x1 - y1 * y1 - z1 * z1;
+                        if (t1 < 0) {
+                            n1 = 0;
+                        }
+                        else {
+                            t1 *= t1;
+                            n1 = t1 * t1 * gi1.dot3(x1, y1, z1);
+                        }
+                        var t2 = 0.6 - x2 * x2 - y2 * y2 - z2 * z2;
+                        if (t2 < 0) {
+                            n2 = 0;
+                        }
+                        else {
+                            t2 *= t2;
+                            n2 = t2 * t2 * gi2.dot3(x2, y2, z2);
+                        }
+                        var t3 = 0.6 - x3 * x3 - y3 * y3 - z3 * z3;
+                        if (t3 < 0) {
+                            n3 = 0;
+                        }
+                        else {
+                            t3 *= t3;
+                            n3 = t3 * t3 * gi3.dot3(x3, y3, z3);
+                        }
+                        // Add contributions from each corner to get the final noise value.
+                        // The result is scaled to return values in the interval [-1,1].
+                        return 32 * (n0 + n1 + n2 + n3);
+                    };
+                    // 2D Perlin Noise
+                    this.perlin2 = function (x, y) {
+                        // Find unit grid cell containing point
+                        var X = Math.floor(x), Y = Math.floor(y);
+                        // Get relative xy coordinates of point within that cell
+                        x = x - X;
+                        y = y - Y;
+                        // Wrap the integer cells at 255 (smaller integer period can be introduced here)
+                        X = X & 255;
+                        Y = Y & 255;
+                        // Calculate noise contributions from each of the four corners
+                        var n00 = gradP[X + perm[Y]].dot2(x, y);
+                        var n01 = gradP[X + perm[Y + 1]].dot2(x, y - 1);
+                        var n10 = gradP[X + 1 + perm[Y]].dot2(x - 1, y);
+                        var n11 = gradP[X + 1 + perm[Y + 1]].dot2(x - 1, y - 1);
+                        // Compute the fade curve value for x
+                        var u = this.fade(x);
+                        // Interpolate the four results
+                        return this.lerp(this.lerp(n00, n10, u), this.lerp(n01, n11, u), this.fade(y));
+                    };
+                    // 3D Perlin Noise
+                    this.perlin3 = function (x, y, z) {
+                        // Find unit grid cell containing point
+                        var X = Math.floor(x), Y = Math.floor(y), Z = Math.floor(z);
+                        // Get relative xyz coordinates of point within that cell
+                        x = x - X;
+                        y = y - Y;
+                        z = z - Z;
+                        // Wrap the integer cells at 255 (smaller integer period can be introduced here)
+                        X = X & 255;
+                        Y = Y & 255;
+                        Z = Z & 255;
+                        // Calculate noise contributions from each of the eight corners
+                        var n000 = gradP[X + perm[Y + perm[Z]]].dot3(x, y, z);
+                        var n001 = gradP[X + perm[Y + perm[Z + 1]]].dot3(x, y, z - 1);
+                        var n010 = gradP[X + perm[Y + 1 + perm[Z]]].dot3(x, y - 1, z);
+                        var n011 = gradP[X + perm[Y + 1 + perm[Z + 1]]].dot3(x, y - 1, z - 1);
+                        var n100 = gradP[X + 1 + perm[Y + perm[Z]]].dot3(x - 1, y, z);
+                        var n101 = gradP[X + 1 + perm[Y + perm[Z + 1]]].dot3(x - 1, y, z - 1);
+                        var n110 = gradP[X + 1 + perm[Y + 1 + perm[Z]]].dot3(x - 1, y - 1, z);
+                        var n111 = gradP[X + 1 + perm[Y + 1 + perm[Z + 1]]].dot3(x - 1, y - 1, z - 1);
+                        // Compute the fade curve value for x, y, z
+                        var u = this.fade(x);
+                        var v = this.fade(y);
+                        var w = this.fade(z);
+                        // Interpolate
+                        return this.lerp(this.lerp(this.lerp(n000, n100, u), this.lerp(n001, n101, u), w), this.lerp(this.lerp(n010, n110, u), this.lerp(n011, n111, u), w), v);
+                    };
+                    this.seed(seed);
+                }
+                // ##### Perlin noise stuff
+                Noise.prototype.fade = function (t) {
+                    return t * t * t * (t * (t * 6 - 15) + 10);
+                };
+                Noise.prototype.lerp = function (a, b, t) {
+                    return (1 - t) * a + t * b;
+                };
+                return Noise;
+            }());
+            exports_79("Noise", Noise);
+        }
+    };
+});
+System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/ConnectingTile", "engine/collision/BoxCollider", "game/world/LocationManager", "game/world/ground/Ground", "engine/util/Noise"], function (exports_80, context_80) {
+    "use strict";
+    var point_42, ConnectingTile_3, BoxCollider_8, LocationManager_6, Ground_3, Noise_1, MapGenerator;
+    var __moduleName = context_80 && context_80.id;
     return {
         setters: [
             function (point_42_1) {
@@ -5678,6 +6031,9 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/Connec
             },
             function (Ground_3_1) {
                 Ground_3 = Ground_3_1;
+            },
+            function (Noise_1_1) {
+                Noise_1 = Noise_1_1;
             }
         ],
         execute: function () {
@@ -5686,6 +6042,7 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/Connec
                     this.location = LocationManager_6.LocationManager.instance.newLocation();
                 }
                 MapGenerator.prototype.doIt = function () {
+                    this.noise();
                     var tentLocation = LocationManager_6.LocationManager.instance.newLocation();
                     // spawn tent
                     this.location.addWorldElement(2 /* TENT */, new point_42.Point(5, 5), { destinationUUID: tentLocation.uuid, color: "red" /* RED */ });
@@ -5768,17 +6125,34 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/Connec
                         }
                     }
                 };
+                MapGenerator.prototype.noise = function () {
+                    var noise = new Noise_1.Noise(Math.random());
+                    var val = "";
+                    for (var x = 0; x < MapGenerator.MAP_SIZE; x++) {
+                        for (var y = 0; y < MapGenerator.MAP_SIZE; y++) {
+                            // All noise functions return values in the range of -1 to 1.
+                            // noise.simplex2 and noise.perlin2 for 2d noise
+                            var value = noise.simplex2(x / 100, y / 100);
+                            val += (Math.floor(2 * (value + 1)));
+                            // ... or noise.simplex3 and noise.perlin3:
+                            // var value = noise.simplex3(x / 100, y / 100, time);
+                            // image[x][y].r = Math.abs(value) * 256; // Or whatever. Open demo.html to see it used with canvas.
+                        }
+                        val += "\n";
+                    }
+                    console.log(val);
+                };
                 MapGenerator.MAP_SIZE = 50;
                 return MapGenerator;
             }());
-            exports_79("MapGenerator", MapGenerator);
+            exports_80("MapGenerator", MapGenerator);
         }
     };
 });
-System.register("game/saves/SaveGame", [], function (exports_80, context_80) {
+System.register("game/saves/SaveGame", [], function (exports_81, context_81) {
     "use strict";
     var Save;
-    var __moduleName = context_80 && context_80.id;
+    var __moduleName = context_81 && context_81.id;
     return {
         setters: [],
         execute: function () {
@@ -5787,14 +6161,14 @@ System.register("game/saves/SaveGame", [], function (exports_80, context_80) {
                 }
                 return Save;
             }());
-            exports_80("Save", Save);
+            exports_81("Save", Save);
         }
     };
 });
-System.register("game/quest_game", ["engine/point", "engine/game", "engine/View", "game/world/MapGenerator", "game/graphics/Tilesets", "game/characters/DudeFactory", "game/world/LocationManager", "game/characters/Dude", "engine/collision/CollisionEngine", "game/items/DroppedItem", "game/ui/UIStateManager", "game/world/elements/Elements", "game/world/ground/Ground", "game/characters/Player"], function (exports_81, context_81) {
+System.register("game/quest_game", ["engine/point", "engine/game", "engine/View", "game/world/MapGenerator", "game/graphics/Tilesets", "game/characters/DudeFactory", "game/world/LocationManager", "game/characters/Dude", "engine/collision/CollisionEngine", "game/items/DroppedItem", "game/ui/UIStateManager", "game/world/elements/Elements", "game/world/ground/Ground", "game/characters/Player"], function (exports_82, context_82) {
     "use strict";
     var point_43, game_1, View_2, MapGenerator_1, Tilesets_17, DudeFactory_2, LocationManager_7, Dude_7, CollisionEngine_4, DroppedItem_2, UIStateManager_6, Elements_2, Ground_4, Player_8, ZOOM, QuestGame;
-    var __moduleName = context_81 && context_81.id;
+    var __moduleName = context_82 && context_82.id;
     return {
         setters: [
             function (point_43_1) {
@@ -5941,14 +6315,14 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/View"
                 };
                 return QuestGame;
             }(game_1.Game));
-            exports_81("QuestGame", QuestGame);
+            exports_82("QuestGame", QuestGame);
         }
     };
 });
-System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tilesets", "engine/Assets"], function (exports_82, context_82) {
+System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tilesets", "engine/Assets"], function (exports_83, context_83) {
     "use strict";
     var quest_game_1, engine_1, Tilesets_18, Assets_4;
-    var __moduleName = context_82 && context_82.id;
+    var __moduleName = context_83 && context_83.id;
     return {
         setters: [
             function (quest_game_1_1) {
@@ -5971,10 +6345,10 @@ System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tiles
         }
     };
 });
-System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"], function (exports_83, context_83) {
+System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"], function (exports_84, context_84) {
     "use strict";
     var component_20, utils_5, Clickable;
-    var __moduleName = context_83 && context_83.id;
+    var __moduleName = context_84 && context_84.id;
     return {
         setters: [
             function (component_20_1) {
@@ -6001,14 +6375,14 @@ System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"]
                 };
                 return Clickable;
             }(component_20.Component));
-            exports_83("Clickable", Clickable);
+            exports_84("Clickable", Clickable);
         }
     };
 });
-System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uuid"], function (exports_84, context_84) {
+System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uuid"], function (exports_85, context_85) {
     "use strict";
     var profiler_2, uuid_2, serialize, buildObject;
-    var __moduleName = context_84 && context_84.id;
+    var __moduleName = context_85 && context_85.id;
     return {
         setters: [
             function (profiler_2_1) {
@@ -6022,7 +6396,7 @@ System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uu
             /**
              * Serializes an object and removes all circular references
              */
-            exports_84("serialize", serialize = function (object) {
+            exports_85("serialize", serialize = function (object) {
                 var resultObject = {}; // maps string->object with subobjects as uuids
                 var topLevelUuidMap = {}; // maps string->object with subobjects as uuids
                 var objectUuidMap = new Map(); // maps unique object ref to uuid
@@ -6068,10 +6442,10 @@ System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uu
         }
     };
 });
-System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point"], function (exports_85, context_85) {
+System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point"], function (exports_86, context_86) {
     "use strict";
     var component_21, Tilesets_19, TileTransform_17, point_44, StringTiles;
-    var __moduleName = context_85 && context_85.id;
+    var __moduleName = context_86 && context_86.id;
     return {
         setters: [
             function (component_21_1) {
@@ -6114,7 +6488,7 @@ System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tiles
                 };
                 return StringTiles;
             }(component_21.Component));
-            exports_85("StringTiles", StringTiles);
+            exports_86("StringTiles", StringTiles);
         }
     };
 });
