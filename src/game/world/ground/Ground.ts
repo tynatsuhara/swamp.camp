@@ -6,10 +6,13 @@ import { makeGrass } from "./Grass"
 import { makePath } from "./Path"
 import { ConnectingTileSchema } from "../../../engine/tiles/ConnectingTileSchema"
 import { Tilesets } from "../../graphics/Tilesets"
+import { makeBasicGround } from "./BasicGround"
+import { makeLedge } from "./Ledge"
 
 export const enum GroundType {
     GRASS,
     PATH,
+    LEDGE
 }
 
 export class SavedGround {
@@ -28,6 +31,7 @@ export class Ground {
     private readonly GROUND_FUNCTION_MAP: { [key: number]: (wl: WorldLocation, pos: Point, data: object) => GroundComponent } = {
         [GroundType.GRASS]: makeGrass,
         [GroundType.PATH]: makePath,
+        [GroundType.LEDGE]: makeLedge,
     }
 
     make(type: GroundType, wl: WorldLocation, pos: Point, data: object) {

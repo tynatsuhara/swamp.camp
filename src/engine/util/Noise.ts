@@ -14,6 +14,8 @@
 *
 */
 
+// All noise functions return values in the range of -1 to 1.
+
 function Grad(x, y, z) {
   this.x = x; this.y = y; this.z = z;
 }
