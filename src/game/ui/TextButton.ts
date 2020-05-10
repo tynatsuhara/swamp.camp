@@ -12,7 +12,7 @@ import { rectContains } from "../../engine/util/utils"
 
 export class TextButton extends Component {
 
-    private static readonly margin = 6
+    static readonly margin = 6
     private static readonly textOffset = new Point(TextButton.margin, TextButton.margin-2)
 
     private readonly position: Point

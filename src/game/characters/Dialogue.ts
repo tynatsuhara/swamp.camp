@@ -14,8 +14,6 @@ export class DialogueInstance {
         this.lines = lines
         this.options = options
     }
-
-    
 }
 
 export const enum Dialogue {
@@ -26,7 +24,7 @@ export const getDialogue = (d: Dialogue): DialogueInstance => DIALOGUE_MAP[d]()
 
 const DIALOGUE_MAP: { [key: number]: () => DialogueInstance } = {
     [Dialogue.DIP_0]: () => new DialogueInstance(Dialogue.DIP_0, 
-        ["Hello! This is my string that should be long enough to wrap to the next line :) (Plus more for four lines)", "My name is DIP."],
+        ["Hello! This is my string that should be long enough to wrap to the next line :) (Plus more for four lines) (Plus more for four lines)", "My name is DIP."],
         ["Nice to meet you!", () => Dialogue.DIP_1],
         ["...", () => Dialogue.DIP_1],
     ),

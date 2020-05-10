@@ -1,6 +1,6 @@
 import { DialogueInstance, Dialogue, getDialogue } from "../characters/Dialogue"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
-import { makeNineSliceTileComponents } from "../../engine/tiles/NineSlice"
+import { makeNineSliceComponents, makeStretchedNineSliceComponents } from "../../engine/tiles/NineSlice"
 import { Point } from "../../engine/point"
 import { Component } from "../../engine/component"
 import { UpdateData } from "../../engine/engine"
@@ -57,8 +57,7 @@ export class DialogueDisplay extends Component {
         }
 
         if (this.lineIndex === this.dialogue.lines.length) {
-            this.close()
-            this.dude.dialogue = null
+            this.completeDudeDialogue()
             return
         }
 
@@ -82,6 +81,11 @@ export class DialogueDisplay extends Component {
         }
     }
 
+    private completeDudeDialogue() {
+        this.dude.dialogue = null
+        this.close()
+    }
+
     close() {
         this.dialogue = null
         this.displayEntity = null
@@ -96,14 +100,14 @@ export class DialogueDisplay extends Component {
     }
 
     private renderNextLine(screenDimensions: Point) {
-        const dimensions = new Point(18, 5)
+        const dimensions = new Point(288, 83)
         const bottomBuffer = TILE_SIZE
         const topLeft = new Point(
-            Math.floor(screenDimensions.x/2 - dimensions.x/2*TILE_SIZE),
-            Math.floor(screenDimensions.y - dimensions.y*TILE_SIZE - bottomBuffer)
+            Math.floor(screenDimensions.x/2 - dimensions.x/2),
+            Math.floor(screenDimensions.y - dimensions.y - bottomBuffer)
         )
 
-        const backgroundTiles = makeNineSliceTileComponents(
+        const backgroundTiles = makeStretchedNineSliceComponents(
             Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"), 
             topLeft,
             dimensions
@@ -112,7 +116,7 @@ export class DialogueDisplay extends Component {
 
         const topOffset = 2
         const margin = 12
-        const width = dimensions.x*TILE_SIZE - margin*2
+        const width = dimensions.x - margin*2
 
 
         const formattedRenders = formatText(
@@ -151,34 +155,34 @@ export class DialogueDisplay extends Component {
         this.displayEntity.addComponent(new BasicRenderComponent(...formattedRenders))
     }
 
-    // TODO make this UI not bad
     private renderOptions(screenDimensions: Point) {
         const options = this.dialogue.options
         const longestOption = Math.max(...options.map(o => o[0].length))
 
-        const tilesWide = Math.ceil(longestOption * TEXT_PIXEL_WIDTH/TILE_SIZE)
+        const marginTop = 13
+        const marginBottom = 12
+        const marginSide = 9
+        const buttonPadding = 3
 
-        // TODO determine dimensions from string lengths
-        const dimensions = new Point(tilesWide + 2, options.length + 1)
+        const dimensions = new Point(
+            longestOption * TEXT_PIXEL_WIDTH + marginSide*2 + TextButton.margin*2, 
+            (options.length-1)*buttonPadding + options.length*TILE_SIZE + marginTop + marginBottom
+        )
         
-        const topLeft = screenDimensions.div(2).minus(dimensions.times(TILE_SIZE).div(2))
+        const topLeft = screenDimensions.div(2).minus(dimensions.div(2))
 
-        const backgroundTiles = makeNineSliceTileComponents(
+        const backgroundTiles = makeStretchedNineSliceComponents(
             Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"), 
             topLeft,
             dimensions
         )
         backgroundTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
 
-        const topOffset = 2
-        const margin = 12
-        const width = dimensions.x*TILE_SIZE - margin*2
-
         backgroundTiles.forEach(tile => this.displayEntity.addComponent(tile))
 
         options.forEach((option, i) => this.displayEntity.addComponent(
             new TextButton(
-                topLeft.plus(new Point(dimensions.x + (dimensions.x-width)/2, i * (TILE_SIZE + 2))),
+                topLeft.plus(new Point(marginSide, marginTop + i * (TILE_SIZE + buttonPadding))),
                 option[0],
                 () => {
                     const buttonFnResult = option[1]()
@@ -186,8 +190,7 @@ export class DialogueDisplay extends Component {
                         this.dude.dialogue = buttonFnResult
                         this.startDialogue(this.dude)
                     } else {
-                        this.dude.dialogue = null
-                        this.close()
+                        this.completeDudeDialogue()
                     }
                 }
             )

@@ -3215,7 +3215,7 @@ System.register("game/characters/Dialogue", [], function (exports_45, context_45
             exports_45("DialogueInstance", DialogueInstance);
             exports_45("getDialogue", getDialogue = function (d) { return DIALOGUE_MAP[d](); });
             DIALOGUE_MAP = (_a = {},
-                _a[1 /* DIP_0 */] = function () { return new DialogueInstance(1 /* DIP_0 */, ["Hello! This is my string that should be long enough to wrap to the next line :) (Plus more for four lines)", "My name is DIP."], ["Nice to meet you!", function () { return 2 /* DIP_1 */; }], ["...", function () { return 2 /* DIP_1 */; }]); },
+                _a[1 /* DIP_0 */] = function () { return new DialogueInstance(1 /* DIP_0 */, ["Hello! This is my string that should be long enough to wrap to the next line :) (Plus more for four lines) (Plus more for four lines)", "My name is DIP."], ["Nice to meet you!", function () { return 2 /* DIP_1 */; }], ["...", function () { return 2 /* DIP_1 */; }]); },
                 _a[2 /* DIP_1 */] = function () { return new DialogueInstance(2 /* DIP_1 */, ["See ya later!"]); },
                 _a);
         }
@@ -3292,7 +3292,7 @@ System.register("game/ui/HUD", ["game/graphics/Tilesets", "engine/tiles/TileTran
 });
 System.register("engine/tiles/NineSlice", ["engine/point", "engine/tiles/TileTransform"], function (exports_47, context_47) {
     "use strict";
-    var point_21, TileTransform_8, makeNineSliceTileComponents;
+    var point_21, TileTransform_8, makeNineSliceComponents, makeStretchedNineSliceComponents;
     var __moduleName = context_47 && context_47.id;
     return {
         setters: [
@@ -3310,7 +3310,7 @@ System.register("engine/tiles/NineSlice", ["engine/point", "engine/tiles/TileTra
              * @param dimensions dimensions of the desired rectangle in tile units
              * @return All the tiles instantiated. The first element in the list is the main transform, the rest are relative.
              */
-            exports_47("makeNineSliceTileComponents", makeNineSliceTileComponents = function (slice, pos, dimensions) {
+            exports_47("makeNineSliceComponents", makeNineSliceComponents = function (slice, pos, dimensions) {
                 if (slice.length !== 9) {
                     throw new Error("nine slice gotta have nine slices ya dip");
                 }
@@ -3320,8 +3320,8 @@ System.register("engine/tiles/NineSlice", ["engine/point", "engine/tiles/TileTra
                 var tiles = [];
                 tiles.push(slice[0].toComponent(new TileTransform_8.TileTransform(new point_21.Point(0, 0))));
                 tiles.push(slice[2].toComponent(new TileTransform_8.TileTransform(new point_21.Point(dimensions.x - 1, 0))));
-                tiles.push(slice[8].toComponent(new TileTransform_8.TileTransform(new point_21.Point(dimensions.x - 1, dimensions.y - 1))));
                 tiles.push(slice[6].toComponent(new TileTransform_8.TileTransform(new point_21.Point(0, dimensions.y - 1))));
+                tiles.push(slice[8].toComponent(new TileTransform_8.TileTransform(new point_21.Point(dimensions.x - 1, dimensions.y - 1))));
                 // horizontal lines
                 for (var i = 1; i < dimensions.x - 1; i++) {
                     tiles.push(slice[1].toComponent(new TileTransform_8.TileTransform(new point_21.Point(i, 0))));
@@ -3329,8 +3329,8 @@ System.register("engine/tiles/NineSlice", ["engine/point", "engine/tiles/TileTra
                 }
                 // vertical lines
                 for (var j = 1; j < dimensions.y - 1; j++) {
-                    tiles.push(slice[5].toComponent(new TileTransform_8.TileTransform(new point_21.Point(dimensions.x - 1, j))));
                     tiles.push(slice[3].toComponent(new TileTransform_8.TileTransform(new point_21.Point(0, j))));
+                    tiles.push(slice[5].toComponent(new TileTransform_8.TileTransform(new point_21.Point(dimensions.x - 1, j))));
                 }
                 // middle
                 for (var x = 1; x < dimensions.x - 1; x++) {
@@ -3341,6 +3341,48 @@ System.register("engine/tiles/NineSlice", ["engine/point", "engine/tiles/TileTra
                 var mainTransform = tiles[0].transform;
                 tiles.forEach(function (c, i) {
                     c.transform.position = c.transform.position.times(tiles[0].transform.dimensions.x);
+                    if (i > 0) {
+                        c.transform.relativeTo(mainTransform);
+                    }
+                });
+                mainTransform.position = mainTransform.position.plus(pos);
+                return tiles;
+            });
+            /**
+             * Same as makeNineSliceComponents, but will stretch the middle parts instead of tiling.
+             * This lets you make nine-slices whose dimensions aren't a multiple of the tile size.
+             * @param slice the 9 parts to use to make a rectangle
+             * @param pos top-left top-left position
+             * @param dimensions dimensions of the desired rectangle in pixels. Should be at least TILE_SIZExTILE_SIZE
+             * @return All the tiles instantiated. The first element in the list is the main transform, the rest are relative.
+             */
+            exports_47("makeStretchedNineSliceComponents", makeStretchedNineSliceComponents = function (slice, pos, dimensions) {
+                if (slice.length !== 9) {
+                    throw new Error("nine slice gotta have nine slices ya dip");
+                }
+                // if (dimensions.x < 2 || dimensions.y < 2) {
+                // throw new Error("9 slice must be at least 2x2")
+                // }
+                var tiles = [];
+                var topLeft = slice[0].toComponent(new TileTransform_8.TileTransform(new point_21.Point(0, 0)));
+                var tileSize = topLeft.transform.dimensions.x;
+                // corners
+                tiles.push(topLeft);
+                tiles.push(slice[2].toComponent(new TileTransform_8.TileTransform(new point_21.Point(dimensions.x - tileSize, 0))));
+                tiles.push(slice[6].toComponent(new TileTransform_8.TileTransform(new point_21.Point(0, dimensions.y - tileSize))));
+                tiles.push(slice[8].toComponent(new TileTransform_8.TileTransform(new point_21.Point(dimensions.x - tileSize, dimensions.y - tileSize))));
+                // horizontal lines
+                var horizontalDimensions = new point_21.Point(dimensions.x - tileSize * 2, tileSize);
+                tiles.push(slice[1].toComponent(new TileTransform_8.TileTransform(new point_21.Point(tileSize, 0), horizontalDimensions)));
+                tiles.push(slice[7].toComponent(new TileTransform_8.TileTransform(new point_21.Point(tileSize, dimensions.y - tileSize), horizontalDimensions)));
+                // vertical lines
+                var verticalDimensions = new point_21.Point(tileSize, dimensions.y - tileSize * 2);
+                tiles.push(slice[3].toComponent(new TileTransform_8.TileTransform(new point_21.Point(0, tileSize), verticalDimensions)));
+                tiles.push(slice[5].toComponent(new TileTransform_8.TileTransform(new point_21.Point(dimensions.x - tileSize, tileSize), verticalDimensions)));
+                // middle
+                tiles.push(slice[4].toComponent(new TileTransform_8.TileTransform(new point_21.Point(tileSize, tileSize), new point_21.Point(dimensions.x - tileSize * 2, dimensions.y - tileSize * 2))));
+                var mainTransform = tiles[0].transform;
+                tiles.forEach(function (c, i) {
                     if (i > 0) {
                         c.transform.relativeTo(mainTransform);
                     }
@@ -3370,7 +3412,7 @@ System.register("game/ui/Text", ["engine/point", "engine/renderer/TextRender"], 
             exports_48("TEXT_FONT", TEXT_FONT = "Press Start 2P");
             exports_48("formatText", formatText = function (s, color, position, width, alignment, lineSpacing) {
                 if (alignment === void 0) { alignment = 0 /* LEFT */; }
-                if (lineSpacing === void 0) { lineSpacing = 5; }
+                if (lineSpacing === void 0) { lineSpacing = 4; }
                 var words = s.split(" ");
                 var rows = [];
                 var row = "";
@@ -3650,7 +3692,7 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point",
                 };
                 InventoryDisplay.prototype.spawnBG = function () {
                     var _this = this;
-                    this.bgTiles = NineSlice_1.makeNineSliceTileComponents(Tilesets_6.Tilesets.instance.oneBit.getNineSlice("invBoxNW"), this.offset.minus(new point_24.Point(Tilesets_6.TILE_SIZE / 2, Tilesets_6.TILE_SIZE / 2)), new point_24.Point(1 + InventoryDisplay.COLUMNS, 1 + this.inventory().inventory.length / InventoryDisplay.COLUMNS));
+                    this.bgTiles = NineSlice_1.makeNineSliceComponents(Tilesets_6.Tilesets.instance.oneBit.getNineSlice("invBoxNW"), this.offset.minus(new point_24.Point(Tilesets_6.TILE_SIZE / 2, Tilesets_6.TILE_SIZE / 2)), new point_24.Point(1 + InventoryDisplay.COLUMNS, 1 + this.inventory().inventory.length / InventoryDisplay.COLUMNS));
                     this.bgTiles.forEach(function (tile) {
                         _this.displayEntity.addComponent(tile);
                     });
@@ -3885,8 +3927,7 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
                         }
                     }
                     if (this.lineIndex === this.dialogue.lines.length) {
-                        this.close();
-                        this.dude.dialogue = null;
+                        this.completeDudeDialogue();
                         return;
                     }
                     this.letterTicker += updateData.elapsedTimeMillis;
@@ -3905,6 +3946,10 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
                         return [this.e, this.displayEntity];
                     }
                 };
+                DialogueDisplay.prototype.completeDudeDialogue = function () {
+                    this.dude.dialogue = null;
+                    this.close();
+                };
                 DialogueDisplay.prototype.close = function () {
                     this.dialogue = null;
                     this.displayEntity = null;
@@ -3918,14 +3963,14 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
                 };
                 DialogueDisplay.prototype.renderNextLine = function (screenDimensions) {
                     var _this = this;
-                    var dimensions = new point_26.Point(18, 5);
+                    var dimensions = new point_26.Point(288, 83);
                     var bottomBuffer = Tilesets_8.TILE_SIZE;
-                    var topLeft = new point_26.Point(Math.floor(screenDimensions.x / 2 - dimensions.x / 2 * Tilesets_8.TILE_SIZE), Math.floor(screenDimensions.y - dimensions.y * Tilesets_8.TILE_SIZE - bottomBuffer));
-                    var backgroundTiles = NineSlice_2.makeNineSliceTileComponents(Tilesets_8.Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"), topLeft, dimensions);
+                    var topLeft = new point_26.Point(Math.floor(screenDimensions.x / 2 - dimensions.x / 2), Math.floor(screenDimensions.y - dimensions.y - bottomBuffer));
+                    var backgroundTiles = NineSlice_2.makeStretchedNineSliceComponents(Tilesets_8.Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"), topLeft, dimensions);
                     backgroundTiles[0].transform.depth = UIStateManager_4.UIStateManager.UI_SPRITE_DEPTH;
                     var topOffset = 2;
                     var margin = 12;
-                    var width = dimensions.x * Tilesets_8.TILE_SIZE - margin * 2;
+                    var width = dimensions.x - margin * 2;
                     var formattedRenders = Text_4.formatText(this.dialogue.lines[this.lineIndex], Color_4.Color.DARK_RED, topLeft.plus(new point_26.Point(margin, topOffset + margin)), width, 1 /* CENTER */);
                     formattedRenders.forEach(function (fr) { return fr.depth = UIStateManager_4.UIStateManager.UI_SPRITE_DEPTH + 1; });
                     // "type" out the letters
@@ -3953,30 +3998,27 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
                     backgroundTiles.forEach(function (tile) { return _this.displayEntity.addComponent(tile); });
                     this.displayEntity.addComponent(new (BasicRenderComponent_3.BasicRenderComponent.bind.apply(BasicRenderComponent_3.BasicRenderComponent, __spreadArrays([void 0], formattedRenders)))());
                 };
-                // TODO make this UI not bad
                 DialogueDisplay.prototype.renderOptions = function (screenDimensions) {
                     var _this = this;
                     var options = this.dialogue.options;
                     var longestOption = Math.max.apply(Math, options.map(function (o) { return o[0].length; }));
-                    var tilesWide = Math.ceil(longestOption * Text_4.TEXT_PIXEL_WIDTH / Tilesets_8.TILE_SIZE);
-                    // TODO determine dimensions from string lengths
-                    var dimensions = new point_26.Point(tilesWide + 2, options.length + 1);
-                    var topLeft = screenDimensions.div(2).minus(dimensions.times(Tilesets_8.TILE_SIZE).div(2));
-                    var backgroundTiles = NineSlice_2.makeNineSliceTileComponents(Tilesets_8.Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"), topLeft, dimensions);
+                    var marginTop = 13;
+                    var marginBottom = 12;
+                    var marginSide = 9;
+                    var buttonPadding = 3;
+                    var dimensions = new point_26.Point(longestOption * Text_4.TEXT_PIXEL_WIDTH + marginSide * 2 + TextButton_1.TextButton.margin * 2, (options.length - 1) * buttonPadding + options.length * Tilesets_8.TILE_SIZE + marginTop + marginBottom);
+                    var topLeft = screenDimensions.div(2).minus(dimensions.div(2));
+                    var backgroundTiles = NineSlice_2.makeStretchedNineSliceComponents(Tilesets_8.Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"), topLeft, dimensions);
                     backgroundTiles[0].transform.depth = UIStateManager_4.UIStateManager.UI_SPRITE_DEPTH;
-                    var topOffset = 2;
-                    var margin = 12;
-                    var width = dimensions.x * Tilesets_8.TILE_SIZE - margin * 2;
                     backgroundTiles.forEach(function (tile) { return _this.displayEntity.addComponent(tile); });
-                    options.forEach(function (option, i) { return _this.displayEntity.addComponent(new TextButton_1.TextButton(topLeft.plus(new point_26.Point(dimensions.x + (dimensions.x - width) / 2, i * (Tilesets_8.TILE_SIZE + 2))), option[0], function () {
+                    options.forEach(function (option, i) { return _this.displayEntity.addComponent(new TextButton_1.TextButton(topLeft.plus(new point_26.Point(marginSide, marginTop + i * (Tilesets_8.TILE_SIZE + buttonPadding))), option[0], function () {
                         var buttonFnResult = option[1]();
                         if (!!buttonFnResult) {
                             _this.dude.dialogue = buttonFnResult;
                             _this.startDialogue(_this.dude);
                         }
                         else {
-                            _this.dude.dialogue = null;
-                            _this.close();
+                            _this.completeDudeDialogue();
                         }
                     })); });
                 };

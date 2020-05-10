@@ -8,7 +8,7 @@ import { Player } from "../characters/Player"
 import { Entity } from "../../engine/Entity"
 import { InputKey } from "../../engine/input"
 import { UIStateManager } from "./UIStateManager"
-import { makeNineSliceTileComponents } from "../../engine/tiles/NineSlice"
+import { makeNineSliceComponents } from "../../engine/tiles/NineSlice"
 import { Tooltip } from "./Tooltip"
 import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
 import { TileTransform } from "../../engine/tiles/TileTransform"
@@ -99,7 +99,7 @@ export class InventoryDisplay extends Component {
     }
 
     private spawnBG() {
-        this.bgTiles = makeNineSliceTileComponents(
+        this.bgTiles = makeNineSliceComponents(
             Tilesets.instance.oneBit.getNineSlice("invBoxNW"), 
             this.offset.minus(new Point(TILE_SIZE/2, TILE_SIZE/2)),
             new Point(
