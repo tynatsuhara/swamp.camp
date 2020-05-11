@@ -4280,8 +4280,7 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point",
                         var placeableElement = Items_4.ITEM_METADATA_MAP[stack.item].element;
                         var placePrompt = !!placeableElement ? " [" + String.fromCharCode(Controls_2.Controls.placeElementButton) + " to place]" : '';
                         this.tooltip.say("" + name_1 + count + placePrompt);
-                        if (updateData.input.isKeyDown(Controls_2.Controls.placeElementButton)) {
-                            console.log("placing " + name_1);
+                        if (!!placeableElement && updateData.input.isKeyDown(Controls_2.Controls.placeElementButton)) {
                             this.close();
                             // TODO this won't work properly with items that stack
                             PlaceElementDisplay_2.PlaceElementDisplay.instance.startPlacing(placeableElement, function () { return inv[newIndex] = null; });

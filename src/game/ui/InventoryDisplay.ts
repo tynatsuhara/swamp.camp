@@ -75,8 +75,7 @@ export class InventoryDisplay extends Component {
             const placePrompt = !!placeableElement ? ` [${String.fromCharCode(Controls.placeElementButton)} to place]` : ''
             this.tooltip.say(`${name}${count}${placePrompt}`)
 
-            if (updateData.input.isKeyDown(Controls.placeElementButton)) {
-                console.log(`placing ${name}`)
+            if (!!placeableElement && updateData.input.isKeyDown(Controls.placeElementButton)) {
                 this.close()
                 // TODO this won't work properly with items that stack
                 PlaceElementDisplay.instance.startPlacing(placeableElement, () => inv[newIndex] = null)
