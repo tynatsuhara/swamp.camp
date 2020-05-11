@@ -27,7 +27,9 @@ export class OutdoorTileset extends SingleFileTileLoader {
             ["rock3mossy", new Point(56, 22)],
             ["rockItem", new Point(33, 9)],
             ["woodItem", new Point(34, 9)],
-            ["dialogueBG", new Point(6, 28)]
+            ["dialogueBG", new Point(6, 28)],
+            ["placingElementFrame_good", new Point(3, 28)],
+            ["placingElementFrame_bad", new Point(0, 28)],
         ]))
     }
 }

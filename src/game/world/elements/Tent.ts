@@ -19,11 +19,12 @@ export const makeTent = (wl: WorldLocation, pos: Point, data: object): ElementCo
     const e = new Entity()
 
     const destinationUUID: string = data["destinationUUID"]
-    const color: TentColor = data["color"] ?? TentColor.RED
+    const color: TentColor = data["color"] ?? TentColor.BLUE
 
-    if (!destinationUUID) {
-        throw new Error("tent must have a uuid")
-    }
+    // TODO set up interior for tents
+    // if (!destinationUUID) {
+        // throw new Error("tent must have a uuid")
+    // }
     
     const depth = (pos.y + 1) * TILE_SIZE + /* prevent clipping */ 5
     addTile(wl, e, `${color}tentNW`, pos, depth)
@@ -31,9 +32,10 @@ export const makeTent = (wl: WorldLocation, pos: Point, data: object): ElementCo
     addTile(wl, e, `${color}tentSW`, pos.plus(new Point(0, 1)), depth)
     addTile(wl, e, `${color}tentSE`, pos.plus(new Point(1, 1)), depth)
     e.addComponent(new BoxCollider(pos.plus(new Point(0, 1)).times(TILE_SIZE), new Point(TILE_SIZE*2, TILE_SIZE)))
-    e.addComponent(new Interactable(pos.plus(new Point(1, 2)).times(TILE_SIZE), () => {
-        wl.manager.transition(destinationUUID)  // TODO WTF
-    }))
+
+    // e.addComponent(new Interactable(pos.plus(new Point(1, 2)).times(TILE_SIZE), () => {
+    //     wl.manager.transition(destinationUUID)
+    // }))
 
     return e.addComponent(new ElementComponent(
         ElementType.TENT, 

@@ -17,6 +17,11 @@ export class Entity {
         return component
     }
 
+    addComponents<T extends Component>(components: T[]): T[] {
+        components.forEach(e => this.addComponent(e))
+        return components
+    }
+
     getComponent<T extends Component>(componentType: { new(...args: any[]): T }): T {
         return this.getComponents(componentType)[0]
     }

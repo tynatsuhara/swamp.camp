@@ -18,6 +18,8 @@ import { Item, ITEM_METADATA_MAP } from "../items/Items"
 import { TEXT_FONT, TEXT_SIZE } from "./Text"
 import { Color } from "./Color"
 import { Controls } from "../Controls"
+import { PlaceElementDisplay } from "./PlaceElementDisplay"
+import { LocationManager } from "../world/LocationManager"
 
 export class InventoryDisplay extends Component {
 
@@ -54,7 +56,7 @@ export class InventoryDisplay extends Component {
         const pressEsc = updateData.input.isKeyDown(InputKey.ESC)
 
         if (this.isOpen && (pressI || pressEsc)) {
-            this.hide()
+            this.close()
         } else if (pressI && !UIStateManager.instance.isMenuOpen) {
             this.show(updateData.dimensions)
         }
@@ -64,13 +66,21 @@ export class InventoryDisplay extends Component {
         }
 
         const newIndex = this.getInventoryIndexForPosition(updateData.input.mousePos)
-        if (newIndex !== -1 && !!inv[newIndex]) {
+        if (newIndex !== -1 && !!inv[newIndex]) {  // we're hovering over an item
             this.tooltip.position = updateData.input.mousePos
             const stack = inv[newIndex]
             const name = ITEM_METADATA_MAP[stack.item].displayName
             const count = stack.count > 1 ? ' x' + stack.count : ''
-            const placePrompt = !!ITEM_METADATA_MAP[stack.item].element ? ` [${String.fromCharCode(Controls.placeElementButton)} to place]` : ''
+            const placeableElement = ITEM_METADATA_MAP[stack.item].element
+            const placePrompt = !!placeableElement ? ` [${String.fromCharCode(Controls.placeElementButton)} to place]` : ''
             this.tooltip.say(`${name}${count}${placePrompt}`)
+
+            if (updateData.input.isKeyDown(Controls.placeElementButton)) {
+                console.log(`placing ${name}`)
+                this.close()
+                // TODO this won't work properly with items that stack
+                PlaceElementDisplay.instance.startPlacing(placeableElement, () => inv[newIndex] = null)
+            }
         } else {
             this.tooltip.clear()
         }
@@ -124,7 +134,7 @@ export class InventoryDisplay extends Component {
         return [this.e, this.displayEntity]
     }
 
-    hide() {
+    close() {
         if (!!this.trackedTile) {
             return 
         }
