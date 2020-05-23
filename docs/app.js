@@ -82,6 +82,7 @@ System.register("engine/point", [], function (exports_1, context_1) {
                 Point.prototype.apply = function (fn) {
                     return new Point(fn(this.x), fn(this.y));
                 };
+                Point.ZERO = new Point(0, 0);
                 return Point;
             }());
             exports_1("Point", Point);
@@ -249,12 +250,16 @@ System.register("engine/renderer/Renderer", ["engine/point", "engine/renderer/Re
                     this.cameraOffsetY = 0;
                     this.canvas = canvas;
                     this.context = canvas.getContext('2d', { alpha: false });
+                    this.resizeCanvas();
                 }
-                Renderer.prototype.render = function (views) {
-                    var _this = this;
+                Renderer.prototype.resizeCanvas = function () {
                     // make sure stuff doesn't get stretched
                     this.canvas.width = this.canvas.clientWidth;
                     this.canvas.height = this.canvas.clientHeight;
+                };
+                Renderer.prototype.render = function (views) {
+                    var _this = this;
+                    this.resizeCanvas();
                     this.context.imageSmoothingEnabled = false;
                     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
                     views.forEach(function (v) { return _this.renderView(v); });
@@ -4919,7 +4924,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                 /**
                  * Should be called on EVERY update step for
                  * @param updateData
-                 * @param direction the direction they are moving in
+                 * @param direction the direction they are moving in, will be normalized by this code
                  * @param facingOverride if < 0, will face left, if > 0, will face right. if == 0, will face the direction they're moving
                  */
                 Dude.prototype.move = function (updateData, direction, facingOverride) {
@@ -5241,23 +5246,78 @@ System.register("game/characters/Enemy", ["engine/component", "game/characters/D
         }
     };
 });
-System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point", "game/characters/Player", "game/characters/Dude", "game/characters/NPC", "game/world/LocationManager", "game/characters/Enemy", "game/items/Inventory"], function (exports_70, context_70) {
+System.register("game/cutscenes/CutscenePlayerController", ["engine/component", "game/characters/Player", "game/characters/Dude", "engine/point"], function (exports_70, context_70) {
     "use strict";
-    var Entity_11, point_38, Player_8, Dude_6, NPC_1, LocationManager_7, Enemy_1, Inventory_1, DudeFactory;
+    var component_20, Player_8, Dude_6, point_38, CutscenePlayerController;
     var __moduleName = context_70 && context_70.id;
     return {
         setters: [
-            function (Entity_11_1) {
-                Entity_11 = Entity_11_1;
-            },
-            function (point_38_1) {
-                point_38 = point_38_1;
+            function (component_20_1) {
+                component_20 = component_20_1;
             },
             function (Player_8_1) {
                 Player_8 = Player_8_1;
             },
             function (Dude_6_1) {
                 Dude_6 = Dude_6_1;
+            },
+            function (point_38_1) {
+                point_38 = point_38_1;
+            }
+        ],
+        execute: function () {
+            CutscenePlayerController = /** @class */ (function (_super) {
+                __extends(CutscenePlayerController, _super);
+                function CutscenePlayerController() {
+                    var _this = _super.call(this) || this;
+                    _this.moveDir = point_38.Point.ZERO;
+                    CutscenePlayerController.instance = _this;
+                    _this.enabled = false;
+                    return _this;
+                }
+                CutscenePlayerController.prototype.start = function () {
+                    this._dude = this.entity.getComponent(Dude_6.Dude);
+                };
+                CutscenePlayerController.prototype.update = function (updateData) {
+                    this._dude.move(updateData, this.moveDir);
+                };
+                CutscenePlayerController.prototype.startMoving = function (moveDir) {
+                    this.moveDir = moveDir;
+                };
+                CutscenePlayerController.prototype.stopMoving = function () {
+                    this.moveDir = point_38.Point.ZERO;
+                };
+                CutscenePlayerController.prototype.enable = function () {
+                    this.enabled = true;
+                    Player_8.Player.instance.enabled = false;
+                };
+                CutscenePlayerController.prototype.disable = function () {
+                    this.enabled = false;
+                    Player_8.Player.instance.enabled = true;
+                };
+                return CutscenePlayerController;
+            }(component_20.Component));
+            exports_70("CutscenePlayerController", CutscenePlayerController);
+        }
+    };
+});
+System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point", "game/characters/Player", "game/characters/Dude", "game/characters/NPC", "game/world/LocationManager", "game/characters/Enemy", "game/items/Inventory", "game/cutscenes/CutscenePlayerController"], function (exports_71, context_71) {
+    "use strict";
+    var Entity_11, point_39, Player_9, Dude_7, NPC_1, LocationManager_7, Enemy_1, Inventory_1, CutscenePlayerController_1, DudeFactory;
+    var __moduleName = context_71 && context_71.id;
+    return {
+        setters: [
+            function (Entity_11_1) {
+                Entity_11 = Entity_11_1;
+            },
+            function (point_39_1) {
+                point_39 = point_39_1;
+            },
+            function (Player_9_1) {
+                Player_9 = Player_9_1;
+            },
+            function (Dude_7_1) {
+                Dude_7 = Dude_7_1;
             },
             function (NPC_1_1) {
                 NPC_1 = NPC_1_1;
@@ -5270,6 +5330,9 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
             },
             function (Inventory_1_1) {
                 Inventory_1 = Inventory_1_1;
+            },
+            function (CutscenePlayerController_1_1) {
+                CutscenePlayerController_1 = CutscenePlayerController_1_1;
             }
         ],
         execute: function () {
@@ -5289,7 +5352,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                  * Instantiates a Dude+Entity, which needs to be attached to a location
                  */
                 DudeFactory.prototype.load = function (saveState) {
-                    return this.make(saveState.type, point_38.Point.fromString(saveState.pos), saveState);
+                    return this.make(saveState.type, point_39.Point.fromString(saveState.pos), saveState);
                 };
                 DudeFactory.prototype.make = function (type, pos, saveState) {
                     if (saveState === void 0) { saveState = null; }
@@ -5307,7 +5370,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                             weapon = "weapon_regular_sword";
                             shield = "shield_0";
                             maxHealth = 4;
-                            additionalComponents = [new Player_8.Player()];
+                            additionalComponents = [new Player_9.Player(), new CutscenePlayerController_1.CutscenePlayerController()];
                             break;
                         }
                         case 1 /* DIP */: {
@@ -5340,20 +5403,20 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                     }
                     var health = maxHealth;
                     var inventory = !!(saveState === null || saveState === void 0 ? void 0 : saveState.inventory) ? Inventory_1.Inventory.load(saveState.inventory) : new Inventory_1.Inventory();
-                    var d = new Dude_6.Dude(type, animationName, pos, (_a = saveState === null || saveState === void 0 ? void 0 : saveState.weapon) !== null && _a !== void 0 ? _a : weapon, (_b = saveState === null || saveState === void 0 ? void 0 : saveState.shield) !== null && _b !== void 0 ? _b : shield, (_c = saveState === null || saveState === void 0 ? void 0 : saveState.maxHealth) !== null && _c !== void 0 ? _c : maxHealth, (_d = saveState === null || saveState === void 0 ? void 0 : saveState.health) !== null && _d !== void 0 ? _d : health, (_e = saveState === null || saveState === void 0 ? void 0 : saveState.speed) !== null && _e !== void 0 ? _e : speed, inventory, (_f = saveState === null || saveState === void 0 ? void 0 : saveState.dialogue) !== null && _f !== void 0 ? _f : dialogue);
+                    var d = new Dude_7.Dude(type, animationName, pos, (_a = saveState === null || saveState === void 0 ? void 0 : saveState.weapon) !== null && _a !== void 0 ? _a : weapon, (_b = saveState === null || saveState === void 0 ? void 0 : saveState.shield) !== null && _b !== void 0 ? _b : shield, (_c = saveState === null || saveState === void 0 ? void 0 : saveState.maxHealth) !== null && _c !== void 0 ? _c : maxHealth, (_d = saveState === null || saveState === void 0 ? void 0 : saveState.health) !== null && _d !== void 0 ? _d : health, (_e = saveState === null || saveState === void 0 ? void 0 : saveState.speed) !== null && _e !== void 0 ? _e : speed, inventory, (_f = saveState === null || saveState === void 0 ? void 0 : saveState.dialogue) !== null && _f !== void 0 ? _f : dialogue);
                     new Entity_11.Entity([d].concat(additionalComponents));
                     return d;
                 };
                 return DudeFactory;
             }());
-            exports_70("DudeFactory", DudeFactory);
+            exports_71("DudeFactory", DudeFactory);
         }
     };
 });
-System.register("game/saves/DudeSaveState", [], function (exports_71, context_71) {
+System.register("game/saves/DudeSaveState", [], function (exports_72, context_72) {
     "use strict";
     var DudeSaveState;
-    var __moduleName = context_71 && context_71.id;
+    var __moduleName = context_72 && context_72.id;
     return {
         setters: [],
         execute: function () {
@@ -5362,14 +5425,14 @@ System.register("game/saves/DudeSaveState", [], function (exports_71, context_71
                 }
                 return DudeSaveState;
             }());
-            exports_71("DudeSaveState", DudeSaveState);
+            exports_72("DudeSaveState", DudeSaveState);
         }
     };
 });
-System.register("game/saves/LocationSaveState", [], function (exports_72, context_72) {
+System.register("game/saves/LocationSaveState", [], function (exports_73, context_73) {
     "use strict";
     var LocationSaveState;
-    var __moduleName = context_72 && context_72.id;
+    var __moduleName = context_73 && context_73.id;
     return {
         setters: [],
         execute: function () {
@@ -5378,19 +5441,19 @@ System.register("game/saves/LocationSaveState", [], function (exports_72, contex
                 }
                 return LocationSaveState;
             }());
-            exports_72("LocationSaveState", LocationSaveState);
+            exports_73("LocationSaveState", LocationSaveState);
         }
     };
 });
-System.register("game/saves/uuid", [], function (exports_73, context_73) {
+System.register("game/saves/uuid", [], function (exports_74, context_74) {
     "use strict";
     var newUUID;
-    var __moduleName = context_73 && context_73.id;
+    var __moduleName = context_74 && context_74.id;
     return {
         setters: [],
         execute: function () {
             // from https://stackoverflow.com/questions/105034/how-to-create-guid-uuid
-            exports_73("newUUID", newUUID = function () {
+            exports_74("newUUID", newUUID = function () {
                 return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
                     var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
                     return v.toString(16);
@@ -5399,14 +5462,14 @@ System.register("game/saves/uuid", [], function (exports_73, context_73) {
         }
     };
 });
-System.register("game/world/ground/GroundComponent", ["engine/component"], function (exports_74, context_74) {
+System.register("game/world/ground/GroundComponent", ["engine/component"], function (exports_75, context_75) {
     "use strict";
-    var component_20, GroundComponent;
-    var __moduleName = context_74 && context_74.id;
+    var component_21, GroundComponent;
+    var __moduleName = context_75 && context_75.id;
     return {
         setters: [
-            function (component_20_1) {
-                component_20 = component_20_1;
+            function (component_21_1) {
+                component_21 = component_21_1;
             }
         ],
         execute: function () {
@@ -5427,15 +5490,15 @@ System.register("game/world/ground/GroundComponent", ["engine/component"], funct
                     throw new Error("yikes");
                 };
                 return GroundComponent;
-            }(component_20.Component));
-            exports_74("GroundComponent", GroundComponent);
+            }(component_21.Component));
+            exports_75("GroundComponent", GroundComponent);
         }
     };
 });
-System.register("game/world/WorldLocation", ["engine/util/Grid", "game/saves/uuid", "game/world/elements/Elements", "engine/point", "game/world/ground/Ground", "game/characters/DudeFactory"], function (exports_75, context_75) {
+System.register("game/world/WorldLocation", ["engine/util/Grid", "game/saves/uuid", "game/world/elements/Elements", "engine/point", "game/world/ground/Ground", "game/characters/DudeFactory"], function (exports_76, context_76) {
     "use strict";
-    var Grid_1, uuid_1, Elements_2, point_39, Ground_1, DudeFactory_1, WorldLocation;
-    var __moduleName = context_75 && context_75.id;
+    var Grid_1, uuid_1, Elements_2, point_40, Ground_1, DudeFactory_1, WorldLocation;
+    var __moduleName = context_76 && context_76.id;
     return {
         setters: [
             function (Grid_1_1) {
@@ -5447,8 +5510,8 @@ System.register("game/world/WorldLocation", ["engine/util/Grid", "game/saves/uui
             function (Elements_2_1) {
                 Elements_2 = Elements_2_1;
             },
-            function (point_39_1) {
-                point_39 = point_39_1;
+            function (point_40_1) {
+                point_40 = point_40_1;
             },
             function (Ground_1_1) {
                 Ground_1 = Ground_1_1;
@@ -5543,25 +5606,25 @@ System.register("game/world/WorldLocation", ["engine/util/Grid", "game/saves/uui
                     // BUG: RELOADING RETURNS ELEMENTS THAT HAVE BEEN DESTROYED
                     var n = new WorldLocation(locationManager);
                     n._uuid = saveState.uuid;
-                    saveState.elements.forEach(function (el) { return n.addWorldElement(el.type, point_39.Point.fromString(el.pos), el.obj); });
-                    saveState.ground.forEach(function (el) { return n.addGroundElement(el.type, point_39.Point.fromString(el.pos), el.obj); });
+                    saveState.elements.forEach(function (el) { return n.addWorldElement(el.type, point_40.Point.fromString(el.pos), el.obj); });
+                    saveState.ground.forEach(function (el) { return n.addGroundElement(el.type, point_40.Point.fromString(el.pos), el.obj); });
                     saveState.dudes.forEach(function (d) { return n.dudes.add(DudeFactory_1.DudeFactory.instance.load(d)); });
                     return n;
                 };
                 return WorldLocation;
             }());
-            exports_75("WorldLocation", WorldLocation);
+            exports_76("WorldLocation", WorldLocation);
         }
     };
 });
-System.register("game/world/ground/Grass", ["engine/point", "game/graphics/Tilesets", "game/world/ground/GroundComponent", "engine/Entity", "engine/tiles/TileTransform"], function (exports_76, context_76) {
+System.register("game/world/ground/Grass", ["engine/point", "game/graphics/Tilesets", "game/world/ground/GroundComponent", "engine/Entity", "engine/tiles/TileTransform"], function (exports_77, context_77) {
     "use strict";
-    var point_40, Tilesets_16, GroundComponent_1, Entity_12, TileTransform_15, makeGrass;
-    var __moduleName = context_76 && context_76.id;
+    var point_41, Tilesets_16, GroundComponent_1, Entity_12, TileTransform_15, makeGrass;
+    var __moduleName = context_77 && context_77.id;
     return {
         setters: [
-            function (point_40_1) {
-                point_40 = point_40_1;
+            function (point_41_1) {
+                point_41 = point_41_1;
             },
             function (Tilesets_16_1) {
                 Tilesets_16 = Tilesets_16_1;
@@ -5577,15 +5640,15 @@ System.register("game/world/ground/Grass", ["engine/point", "game/graphics/Tiles
             }
         ],
         execute: function () {
-            exports_76("makeGrass", makeGrass = function (wl, pos, data) {
+            exports_77("makeGrass", makeGrass = function (wl, pos, data) {
                 var _a;
                 var tile;
                 var index = (_a = data["index"]) !== null && _a !== void 0 ? _a : (Math.random() < .65 ? Math.floor(Math.random() * 4) : 0);
                 if (index > 0) {
-                    tile = Tilesets_16.Tilesets.instance.tilemap.getTileAt(new point_40.Point(0, index));
+                    tile = Tilesets_16.Tilesets.instance.tilemap.getTileAt(new point_41.Point(0, index));
                 }
                 else {
-                    tile = Tilesets_16.Tilesets.instance.tilemap.getTileAt(new point_40.Point(0, 7));
+                    tile = Tilesets_16.Tilesets.instance.tilemap.getTileAt(new point_41.Point(0, 7));
                 }
                 var c = tile.toComponent(new TileTransform_15.TileTransform(pos.times(Tilesets_16.TILE_SIZE)));
                 c.transform.depth = Number.MIN_SAFE_INTEGER;
@@ -5594,10 +5657,10 @@ System.register("game/world/ground/Grass", ["engine/point", "game/graphics/Tiles
         }
     };
 });
-System.register("game/world/ground/Path", ["game/world/ground/GroundComponent", "engine/Entity", "engine/tiles/ConnectingTile", "game/world/ground/Ground"], function (exports_77, context_77) {
+System.register("game/world/ground/Path", ["game/world/ground/GroundComponent", "engine/Entity", "engine/tiles/ConnectingTile", "game/world/ground/Ground"], function (exports_78, context_78) {
     "use strict";
     var GroundComponent_2, Entity_13, ConnectingTile_1, Ground_2, makePath;
-    var __moduleName = context_77 && context_77.id;
+    var __moduleName = context_78 && context_78.id;
     return {
         setters: [
             function (GroundComponent_2_1) {
@@ -5629,7 +5692,7 @@ System.register("game/world/ground/Path", ["game/world/ground/GroundComponent", 
             //         .plusShape(Tilesets.instance.tilemap.getTileAt(new Point(5, 5)))
             //         .cap(Tilesets.instance.tilemap.getTileAt(new Point(2, 6)))
             //         .single(Tilesets.instance.tilemap.getTileAt(new Point(7, 5)))
-            exports_77("makePath", makePath = function (wl, pos) {
+            exports_78("makePath", makePath = function (wl, pos) {
                 var e = new Entity_13.Entity();
                 var c = new ConnectingTile_1.ConnectingTile(Ground_2.Ground.instance.PATH_CONNECTING_SCHEMA, wl.ground, pos);
                 e.addComponent(c);
@@ -5638,10 +5701,10 @@ System.register("game/world/ground/Path", ["game/world/ground/GroundComponent", 
         }
     };
 });
-System.register("game/world/ground/BasicGround", ["game/graphics/Tilesets", "game/world/ground/GroundComponent", "engine/Entity", "engine/tiles/TileTransform"], function (exports_78, context_78) {
+System.register("game/world/ground/BasicGround", ["game/graphics/Tilesets", "game/world/ground/GroundComponent", "engine/Entity", "engine/tiles/TileTransform"], function (exports_79, context_79) {
     "use strict";
     var Tilesets_17, GroundComponent_3, Entity_14, TileTransform_16, makeBasicGround;
-    var __moduleName = context_78 && context_78.id;
+    var __moduleName = context_79 && context_79.id;
     return {
         setters: [
             function (Tilesets_17_1) {
@@ -5659,7 +5722,7 @@ System.register("game/world/ground/BasicGround", ["game/graphics/Tilesets", "gam
         ],
         execute: function () {
             // Function that takes a tileSource and returns a ground generation function for it
-            exports_78("makeBasicGround", makeBasicGround = function (tile) {
+            exports_79("makeBasicGround", makeBasicGround = function (tile) {
                 return function (wl, pos, data) {
                     var c = tile.toComponent(new TileTransform_16.TileTransform(pos.times(Tilesets_17.TILE_SIZE)));
                     c.transform.depth = Number.MIN_SAFE_INTEGER;
@@ -5669,14 +5732,14 @@ System.register("game/world/ground/BasicGround", ["game/graphics/Tilesets", "gam
         }
     };
 });
-System.register("game/world/ground/Ledge", ["engine/point", "game/graphics/Tilesets", "game/world/ground/GroundComponent", "engine/Entity", "engine/tiles/TileTransform"], function (exports_79, context_79) {
+System.register("game/world/ground/Ledge", ["engine/point", "game/graphics/Tilesets", "game/world/ground/GroundComponent", "engine/Entity", "engine/tiles/TileTransform"], function (exports_80, context_80) {
     "use strict";
-    var point_41, Tilesets_18, GroundComponent_4, Entity_15, TileTransform_17, makeLedge;
-    var __moduleName = context_79 && context_79.id;
+    var point_42, Tilesets_18, GroundComponent_4, Entity_15, TileTransform_17, makeLedge;
+    var __moduleName = context_80 && context_80.id;
     return {
         setters: [
-            function (point_41_1) {
-                point_41 = point_41_1;
+            function (point_42_1) {
+                point_42 = point_42_1;
             },
             function (Tilesets_18_1) {
                 Tilesets_18 = Tilesets_18_1;
@@ -5692,22 +5755,22 @@ System.register("game/world/ground/Ledge", ["engine/point", "game/graphics/Tiles
             }
         ],
         execute: function () {
-            exports_79("makeLedge", makeLedge = function (wl, pos, data) {
-                var c = Tilesets_18.Tilesets.instance.tilemap.getTileAt(new point_41.Point(3, 2)).toComponent(new TileTransform_17.TileTransform(pos.times(Tilesets_18.TILE_SIZE)));
+            exports_80("makeLedge", makeLedge = function (wl, pos, data) {
+                var c = Tilesets_18.Tilesets.instance.tilemap.getTileAt(new point_42.Point(3, 2)).toComponent(new TileTransform_17.TileTransform(pos.times(Tilesets_18.TILE_SIZE)));
                 c.transform.depth = Number.MIN_SAFE_INTEGER;
                 return new Entity_15.Entity([c]).addComponent(new GroundComponent_4.GroundComponent(0 /* GRASS */, function () { return {}; }));
             });
         }
     };
 });
-System.register("game/world/ground/Ground", ["engine/point", "game/world/ground/Grass", "game/world/ground/Path", "engine/tiles/ConnectingTileSchema", "game/graphics/Tilesets", "game/world/ground/Ledge"], function (exports_80, context_80) {
+System.register("game/world/ground/Ground", ["engine/point", "game/world/ground/Grass", "game/world/ground/Path", "engine/tiles/ConnectingTileSchema", "game/graphics/Tilesets", "game/world/ground/Ledge"], function (exports_81, context_81) {
     "use strict";
-    var point_42, Grass_1, Path_1, ConnectingTileSchema_1, Tilesets_19, Ledge_1, SavedGround, Ground;
-    var __moduleName = context_80 && context_80.id;
+    var point_43, Grass_1, Path_1, ConnectingTileSchema_1, Tilesets_19, Ledge_1, SavedGround, Ground;
+    var __moduleName = context_81 && context_81.id;
     return {
         setters: [
-            function (point_42_1) {
-                point_42 = point_42_1;
+            function (point_43_1) {
+                point_43 = point_43_1;
             },
             function (Grass_1_1) {
                 Grass_1 = Grass_1_1;
@@ -5731,7 +5794,7 @@ System.register("game/world/ground/Ground", ["engine/point", "game/world/ground/
                 }
                 return SavedGround;
             }());
-            exports_80("SavedGround", SavedGround);
+            exports_81("SavedGround", SavedGround);
             /**
              * Ground and elements are very similar, except that ground components are always 1x1
              */
@@ -5744,12 +5807,12 @@ System.register("game/world/ground/Ground", ["engine/point", "game/world/ground/
                         _a[2 /* LEDGE */] = Ledge_1.makeLedge,
                         _a);
                     this.PATH_CONNECTING_SCHEMA = new ConnectingTileSchema_1.ConnectingTileSchema()
-                        .vertical(Tilesets_19.Tilesets.instance.tilemap.getTileAt(new point_42.Point(2, 6)))
-                        .angle(Tilesets_19.Tilesets.instance.tilemap.getTileAt(new point_42.Point(0, 5)))
-                        .tShape(Tilesets_19.Tilesets.instance.tilemap.getTileAt(new point_42.Point(3, 5)))
-                        .plusShape(Tilesets_19.Tilesets.instance.tilemap.getTileAt(new point_42.Point(5, 5)))
-                        .cap(Tilesets_19.Tilesets.instance.tilemap.getTileAt(new point_42.Point(2, 6)))
-                        .single(Tilesets_19.Tilesets.instance.tilemap.getTileAt(new point_42.Point(7, 5)));
+                        .vertical(Tilesets_19.Tilesets.instance.tilemap.getTileAt(new point_43.Point(2, 6)))
+                        .angle(Tilesets_19.Tilesets.instance.tilemap.getTileAt(new point_43.Point(0, 5)))
+                        .tShape(Tilesets_19.Tilesets.instance.tilemap.getTileAt(new point_43.Point(3, 5)))
+                        .plusShape(Tilesets_19.Tilesets.instance.tilemap.getTileAt(new point_43.Point(5, 5)))
+                        .cap(Tilesets_19.Tilesets.instance.tilemap.getTileAt(new point_43.Point(2, 6)))
+                        .single(Tilesets_19.Tilesets.instance.tilemap.getTileAt(new point_43.Point(7, 5)));
                     Ground.instance = this;
                 }
                 Ground.prototype.make = function (type, wl, pos, data) {
@@ -5757,18 +5820,18 @@ System.register("game/world/ground/Ground", ["engine/point", "game/world/ground/
                 };
                 return Ground;
             }());
-            exports_80("Ground", Ground);
+            exports_81("Ground", Ground);
         }
     };
 });
-System.register("engine/tiles/ConnectingTileSchema", ["engine/point", "engine/tiles/TileTransform", "engine/tiles/ConnectingTile"], function (exports_81, context_81) {
+System.register("engine/tiles/ConnectingTileSchema", ["engine/point", "engine/tiles/TileTransform", "engine/tiles/ConnectingTile"], function (exports_82, context_82) {
     "use strict";
-    var point_43, TileTransform_18, ConnectingTile_2, ConnectingTileSchema;
-    var __moduleName = context_81 && context_81.id;
+    var point_44, TileTransform_18, ConnectingTile_2, ConnectingTileSchema;
+    var __moduleName = context_82 && context_82.id;
     return {
         setters: [
-            function (point_43_1) {
-                point_43 = point_43_1;
+            function (point_44_1) {
+                point_44 = point_44_1;
             },
             function (TileTransform_18_1) {
                 TileTransform_18 = TileTransform_18_1;
@@ -5835,10 +5898,10 @@ System.register("engine/tiles/ConnectingTileSchema", ["engine/point", "engine/ti
                     var x = position.x;
                     var y = position.y;
                     // TODO: add diagonals?
-                    var n = this.get(grid, new point_43.Point(x, y - 1));
-                    var s = this.get(grid, new point_43.Point(x, y + 1));
-                    var e = this.get(grid, new point_43.Point(x + 1, y));
-                    var w = this.get(grid, new point_43.Point(x - 1, y));
+                    var n = this.get(grid, new point_44.Point(x, y - 1));
+                    var s = this.get(grid, new point_44.Point(x, y + 1));
+                    var e = this.get(grid, new point_44.Point(x + 1, y));
+                    var w = this.get(grid, new point_44.Point(x - 1, y));
                     var count = [n, s, e, w].filter(function (dir) { return !!dir; }).length;
                     var result;
                     var rotation = 0;
@@ -5908,21 +5971,21 @@ System.register("engine/tiles/ConnectingTileSchema", ["engine/point", "engine/ti
                 };
                 return ConnectingTileSchema;
             }());
-            exports_81("ConnectingTileSchema", ConnectingTileSchema);
+            exports_82("ConnectingTileSchema", ConnectingTileSchema);
         }
     };
 });
-System.register("engine/tiles/ConnectingTile", ["engine/point", "engine/component"], function (exports_82, context_82) {
+System.register("engine/tiles/ConnectingTile", ["engine/point", "engine/component"], function (exports_83, context_83) {
     "use strict";
-    var point_44, component_21, ConnectingTile;
-    var __moduleName = context_82 && context_82.id;
+    var point_45, component_22, ConnectingTile;
+    var __moduleName = context_83 && context_83.id;
     return {
         setters: [
-            function (point_44_1) {
-                point_44 = point_44_1;
+            function (point_45_1) {
+                point_45 = point_45_1;
             },
-            function (component_21_1) {
-                component_21 = component_21_1;
+            function (component_22_1) {
+                component_22 = component_22_1;
             }
         ],
         execute: function () {
@@ -5932,7 +5995,7 @@ System.register("engine/tiles/ConnectingTile", ["engine/point", "engine/componen
                  * Connecting tiles require a tile grid. The position parameter should be tile-scale, not pixel-scale.
                  */
                 function ConnectingTile(schema, grid, position) {
-                    if (position === void 0) { position = new point_44.Point(0, 0); }
+                    if (position === void 0) { position = new point_45.Point(0, 0); }
                     var _this = _super.call(this) || this;
                     _this.schema = schema;
                     _this.grid = grid;
@@ -5943,8 +6006,8 @@ System.register("engine/tiles/ConnectingTile", ["engine/point", "engine/componen
                     return [this.schema.render(this.grid, this.position)];
                 };
                 return ConnectingTile;
-            }(component_21.Component));
-            exports_82("ConnectingTile", ConnectingTile);
+            }(component_22.Component));
+            exports_83("ConnectingTile", ConnectingTile);
         }
     };
 });
@@ -5963,10 +6026,10 @@ System.register("engine/tiles/ConnectingTile", ["engine/point", "engine/componen
 * attribution is appreciated.
 *
 */
-System.register("engine/util/Noise", [], function (exports_83, context_83) {
+System.register("engine/util/Noise", [], function (exports_84, context_84) {
     "use strict";
     var grad3, p, perm, gradP, Noise;
-    var __moduleName = context_83 && context_83.id;
+    var __moduleName = context_84 && context_84.id;
     // All noise functions return values in the range of -1 to 1.
     function Grad(x, y, z) {
         this.x = x;
@@ -6298,18 +6361,18 @@ System.register("engine/util/Noise", [], function (exports_83, context_83) {
                 };
                 return Noise;
             }());
-            exports_83("Noise", Noise);
+            exports_84("Noise", Noise);
         }
     };
 });
-System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/ConnectingTile", "engine/collision/BoxCollider", "game/world/LocationManager", "game/world/ground/Ground", "engine/util/Noise", "engine/util/Grid"], function (exports_84, context_84) {
+System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/ConnectingTile", "engine/collision/BoxCollider", "game/world/LocationManager", "game/world/ground/Ground", "engine/util/Noise", "engine/util/Grid"], function (exports_85, context_85) {
     "use strict";
-    var point_45, ConnectingTile_3, BoxCollider_8, LocationManager_8, Ground_3, Noise_1, Grid_2, MapGenerator;
-    var __moduleName = context_84 && context_84.id;
+    var point_46, ConnectingTile_3, BoxCollider_8, LocationManager_8, Ground_3, Noise_1, Grid_2, MapGenerator;
+    var __moduleName = context_85 && context_85.id;
     return {
         setters: [
-            function (point_45_1) {
-                point_45 = point_45_1;
+            function (point_46_1) {
+                point_46 = point_46_1;
             },
             function (ConnectingTile_3_1) {
                 ConnectingTile_3 = ConnectingTile_3_1;
@@ -6338,13 +6401,13 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/Connec
                 MapGenerator.prototype.doIt = function () {
                     var tentLocation = LocationManager_8.LocationManager.instance.newLocation();
                     // spawn tent
-                    this.location.addWorldElement(2 /* TENT */, new point_45.Point(5, 5), { destinationUUID: tentLocation.uuid, color: "red" /* RED */ });
+                    this.location.addWorldElement(2 /* TENT */, new point_46.Point(5, 5), { destinationUUID: tentLocation.uuid, color: "red" /* RED */ });
                     // spawn campfire
-                    var campfirePos = new point_45.Point(3, 9);
+                    var campfirePos = new point_46.Point(3, 9);
                     this.location.addWorldElement(3 /* CAMPFIRE */, campfirePos);
                     // make the ground
-                    this.renderPath(new point_45.Point(-10, -10), new point_45.Point(10, 10), 2);
-                    this.renderPath(new point_45.Point(10, -10), new point_45.Point(-10, 10), 5);
+                    this.renderPath(new point_46.Point(-10, -10), new point_46.Point(10, 10), 2);
+                    this.renderPath(new point_46.Point(10, -10), new point_46.Point(-10, 10), 5);
                     this.spawnTrees();
                     this.spawnRocks();
                     // TODO short trees, bushes, fruit, tall grass, etc
@@ -6356,8 +6419,8 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/Connec
                     var _this = this;
                     var trees = Math.random() * 150 + 50;
                     for (var i = 0; i < trees; i++) {
-                        var pt = new point_45.Point(Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_SIZE / 2, Math.floor(Math.random() * (MapGenerator.MAP_SIZE - 1)) - MapGenerator.MAP_SIZE / 2);
-                        var occupiedPoints = [pt, pt.plus(new point_45.Point(0, 1))];
+                        var pt = new point_46.Point(Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_SIZE / 2, Math.floor(Math.random() * (MapGenerator.MAP_SIZE - 1)) - MapGenerator.MAP_SIZE / 2);
+                        var occupiedPoints = [pt, pt.plus(new point_46.Point(0, 1))];
                         if (occupiedPoints.every(function (p) { return !_this.location.ground.get(p); })) {
                             this.location.addWorldElement(0 /* TREE */, pt);
                         }
@@ -6366,7 +6429,7 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/Connec
                 MapGenerator.prototype.spawnRocks = function () {
                     var placedRocks = 0;
                     while (placedRocks < 20) {
-                        var p = new point_45.Point(Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_SIZE / 2, Math.floor(Math.random() * (MapGenerator.MAP_SIZE)) - MapGenerator.MAP_SIZE / 2);
+                        var p = new point_46.Point(Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_SIZE / 2, Math.floor(Math.random() * (MapGenerator.MAP_SIZE)) - MapGenerator.MAP_SIZE / 2);
                         if (!this.location.ground.get(p) && this.location.addWorldElement(1 /* ROCK */, p)) {
                             placedRocks++;
                         }
@@ -6414,7 +6477,7 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/Connec
                     // const levels = this.noise()
                     for (var i = -MapGenerator.MAP_SIZE / 2; i < MapGenerator.MAP_SIZE / 2; i++) {
                         for (var j = -MapGenerator.MAP_SIZE / 2; j < MapGenerator.MAP_SIZE / 2; j++) {
-                            var pt = new point_45.Point(i, j);
+                            var pt = new point_46.Point(i, j);
                             // TODO revisit levels
                             // const thisLevel = levels.get(pt)
                             var isLedge = false; //[pt.plusY(1), pt.plusY(-1), pt.plusX(1), pt.plusX(-1)]
@@ -6438,7 +6501,7 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/Connec
                             var value = noise.simplex2(i / 100, j / 100);
                             var v = (Math.floor(2 * (value + 1)));
                             str += v;
-                            grid.set(new point_45.Point(j, i), v);
+                            grid.set(new point_46.Point(j, i), v);
                         }
                         str += "\n";
                     }
@@ -6448,14 +6511,14 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/Connec
                 MapGenerator.MAP_SIZE = 50;
                 return MapGenerator;
             }());
-            exports_84("MapGenerator", MapGenerator);
+            exports_85("MapGenerator", MapGenerator);
         }
     };
 });
-System.register("game/saves/SaveGame", [], function (exports_85, context_85) {
+System.register("game/saves/SaveGame", [], function (exports_86, context_86) {
     "use strict";
     var Save;
-    var __moduleName = context_85 && context_85.id;
+    var __moduleName = context_86 && context_86.id;
     return {
         setters: [],
         execute: function () {
@@ -6464,30 +6527,170 @@ System.register("game/saves/SaveGame", [], function (exports_85, context_85) {
                 }
                 return Save;
             }());
-            exports_85("Save", Save);
+            exports_86("Save", Save);
         }
     };
 });
-System.register("game/quest_game", ["engine/point", "engine/game", "engine/View", "game/world/MapGenerator", "game/graphics/Tilesets", "game/characters/DudeFactory", "game/world/LocationManager", "game/characters/Dude", "engine/collision/CollisionEngine", "game/items/DroppedItem", "game/ui/UIStateManager", "game/world/elements/Elements", "game/world/ground/Ground", "game/characters/Player"], function (exports_86, context_86) {
+System.register("game/cutscenes/CutsceneManager", ["engine/Entity"], function (exports_87, context_87) {
     "use strict";
-    var point_46, game_1, View_2, MapGenerator_1, Tilesets_20, DudeFactory_2, LocationManager_9, Dude_7, CollisionEngine_4, DroppedItem_2, UIStateManager_7, Elements_3, Ground_4, Player_9, ZOOM, QuestGame;
-    var __moduleName = context_86 && context_86.id;
+    var Entity_16, CutsceneManager;
+    var __moduleName = context_87 && context_87.id;
     return {
         setters: [
-            function (point_46_1) {
-                point_46 = point_46_1;
-            },
-            function (game_1_1) {
-                game_1 = game_1_1;
-            },
-            function (View_2_1) {
-                View_2 = View_2_1;
+            function (Entity_16_1) {
+                Entity_16 = Entity_16_1;
+            }
+        ],
+        execute: function () {
+            CutsceneManager = /** @class */ (function () {
+                function CutsceneManager() {
+                    this.entity = new Entity_16.Entity();
+                    CutsceneManager.instance = this;
+                }
+                /**
+                 * TODO: Handle the case where a cutscene starts, overlapping (this might not matter if we are careful with how we use them)
+                 */
+                CutsceneManager.prototype.startCutscene = function (cutsceneComponent) {
+                    this.entity = new Entity_16.Entity([cutsceneComponent]);
+                };
+                CutsceneManager.prototype.getEntities = function () {
+                    return !!this.entity ? [this.entity] : [];
+                };
+                return CutsceneManager;
+            }());
+            exports_87("CutsceneManager", CutsceneManager);
+        }
+    };
+});
+System.register("game/cutscenes/Camera", ["engine/point", "game/world/MapGenerator", "game/graphics/Tilesets"], function (exports_88, context_88) {
+    "use strict";
+    var point_47, MapGenerator_1, Tilesets_20, Camera;
+    var __moduleName = context_88 && context_88.id;
+    return {
+        setters: [
+            function (point_47_1) {
+                point_47 = point_47_1;
             },
             function (MapGenerator_1_1) {
                 MapGenerator_1 = MapGenerator_1_1;
             },
             function (Tilesets_20_1) {
                 Tilesets_20 = Tilesets_20_1;
+            }
+        ],
+        execute: function () {
+            Camera = /** @class */ (function () {
+                function Camera() {
+                    Camera.instance = this;
+                }
+                Camera.prototype.focusOnDude = function (dude) {
+                    this.dudeTarget = dude;
+                    this.pointTarget = null;
+                };
+                Camera.prototype.focusOnPoint = function (point) {
+                    this.pointTarget = point;
+                    this.dudeTarget = null;
+                };
+                Camera.prototype.getGoalPosition = function (dimensions) {
+                    var _a, _b;
+                    var xLimit = MapGenerator_1.MapGenerator.MAP_SIZE / 2 * Tilesets_20.TILE_SIZE - dimensions.x / 2;
+                    var yLimit = MapGenerator_1.MapGenerator.MAP_SIZE / 2 * Tilesets_20.TILE_SIZE - dimensions.y / 2;
+                    var trackedPoint = (_b = (_a = this.dudeTarget) === null || _a === void 0 ? void 0 : _a.position) !== null && _b !== void 0 ? _b : this.pointTarget;
+                    var clampedPlayerPos = new point_47.Point(this.clamp(trackedPoint.x, -xLimit, xLimit), this.clamp(trackedPoint.y, -yLimit, yLimit));
+                    return dimensions.div(2).minus(clampedPlayerPos);
+                };
+                Camera.prototype.clamp = function (val, min, max) {
+                    return Math.min(Math.max(val, min), max);
+                };
+                return Camera;
+            }());
+            exports_88("Camera", Camera);
+        }
+    };
+});
+System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutscenes/CutscenePlayerController", "game/characters/Player", "engine/point", "game/cutscenes/Camera"], function (exports_89, context_89) {
+    "use strict";
+    var component_23, CutscenePlayerController_2, Player_10, point_48, Camera_1, IntroCutscene;
+    var __moduleName = context_89 && context_89.id;
+    return {
+        setters: [
+            function (component_23_1) {
+                component_23 = component_23_1;
+            },
+            function (CutscenePlayerController_2_1) {
+                CutscenePlayerController_2 = CutscenePlayerController_2_1;
+            },
+            function (Player_10_1) {
+                Player_10 = Player_10_1;
+            },
+            function (point_48_1) {
+                point_48 = point_48_1;
+            },
+            function (Camera_1_1) {
+                Camera_1 = Camera_1_1;
+            }
+        ],
+        execute: function () {
+            // This is the cutscene that plays when the player arrives in the new land
+            IntroCutscene = /** @class */ (function (_super) {
+                __extends(IntroCutscene, _super);
+                function IntroCutscene() {
+                    var _this = _super !== null && _super.apply(this, arguments) || this;
+                    // durations in ms
+                    _this.STOP_WALKING_IN = 1500;
+                    _this.PAN_TO_DIP = _this.STOP_WALKING_IN + 1000;
+                    _this.PAN_BACK = _this.PAN_TO_DIP + 5000;
+                    return _this;
+                }
+                /**
+                 * 1. position player in corner
+                 * 2. player walks in
+                 * 3. camera pan to DIP
+                 * 4. camera pan back to player
+                 * TODO later (maybe in a separate mechanism?):
+                 * 5. combat tutorial
+                 * ...
+                 * N. Once enemies are dead, progress StoryState and autosave
+                 */
+                IntroCutscene.prototype.start = function (startData) {
+                    CutscenePlayerController_2.CutscenePlayerController.instance.enable();
+                    CutscenePlayerController_2.CutscenePlayerController.instance.startMoving(new point_48.Point(-1, 0)); // TODO: Make sure there are no trees in their way
+                    setTimeout(function () {
+                        CutscenePlayerController_2.CutscenePlayerController.instance.stopMoving();
+                    }, this.STOP_WALKING_IN);
+                    setTimeout(function () {
+                        Camera_1.Camera.instance.focusOnPoint(new point_48.Point(0, 0));
+                    }, this.PAN_TO_DIP);
+                    setTimeout(function () {
+                        Camera_1.Camera.instance.focusOnDude(Player_10.Player.instance.dude);
+                        CutscenePlayerController_2.CutscenePlayerController.instance.disable();
+                    }, this.PAN_BACK);
+                };
+                IntroCutscene.prototype.update = function (updateData) {
+                };
+                return IntroCutscene;
+            }(component_23.Component));
+            exports_89("IntroCutscene", IntroCutscene);
+        }
+    };
+});
+System.register("game/quest_game", ["engine/point", "engine/game", "game/world/MapGenerator", "game/graphics/Tilesets", "game/characters/DudeFactory", "game/world/LocationManager", "game/characters/Dude", "engine/collision/CollisionEngine", "game/items/DroppedItem", "game/ui/UIStateManager", "game/world/elements/Elements", "game/world/ground/Ground", "game/characters/Player", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/cutscenes/Camera"], function (exports_90, context_90) {
+    "use strict";
+    var point_49, game_1, MapGenerator_2, Tilesets_21, DudeFactory_2, LocationManager_9, Dude_8, CollisionEngine_4, DroppedItem_2, UIStateManager_7, Elements_3, Ground_4, Player_11, CutsceneManager_1, IntroCutscene_1, Camera_2, ZOOM, QuestGame;
+    var __moduleName = context_90 && context_90.id;
+    return {
+        setters: [
+            function (point_49_1) {
+                point_49 = point_49_1;
+            },
+            function (game_1_1) {
+                game_1 = game_1_1;
+            },
+            function (MapGenerator_2_1) {
+                MapGenerator_2 = MapGenerator_2_1;
+            },
+            function (Tilesets_21_1) {
+                Tilesets_21 = Tilesets_21_1;
             },
             function (DudeFactory_2_1) {
                 DudeFactory_2 = DudeFactory_2_1;
@@ -6495,8 +6698,8 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/View"
             function (LocationManager_9_1) {
                 LocationManager_9 = LocationManager_9_1;
             },
-            function (Dude_7_1) {
-                Dude_7 = Dude_7_1;
+            function (Dude_8_1) {
+                Dude_8 = Dude_8_1;
             },
             function (CollisionEngine_4_1) {
                 CollisionEngine_4 = CollisionEngine_4_1;
@@ -6513,8 +6716,17 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/View"
             function (Ground_4_1) {
                 Ground_4 = Ground_4_1;
             },
-            function (Player_9_1) {
-                Player_9 = Player_9_1;
+            function (Player_11_1) {
+                Player_11 = Player_11_1;
+            },
+            function (CutsceneManager_1_1) {
+                CutsceneManager_1 = CutsceneManager_1_1;
+            },
+            function (IntroCutscene_1_1) {
+                IntroCutscene_1 = IntroCutscene_1_1;
+            },
+            function (Camera_2_1) {
+                Camera_2 = Camera_2_1;
             }
         ],
         execute: function () {
@@ -6523,28 +6735,33 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/View"
                 __extends(QuestGame, _super);
                 function QuestGame() {
                     var _this = _super !== null && _super.apply(this, arguments) || this;
-                    _this.tilesets = new Tilesets_20.Tilesets();
+                    _this.tilesets = new Tilesets_21.Tilesets();
                     _this.uiStateManager = new UIStateManager_7.UIStateManager();
-                    _this.gameEntityView = new View_2.View();
-                    _this.uiView = new View_2.View();
                     return _this;
                 }
                 QuestGame.prototype.initialize = function () {
                     CollisionEngine_4.CollisionEngine.instance.setCollisionMatrix(new Map([
-                        [CollisionEngine_4.CollisionEngine.DEFAULT_LAYER, [DroppedItem_2.DroppedItem.COLLISION_LAYER, Dude_7.Dude.COLLISION_LAYER]],
-                        [Dude_7.Dude.COLLISION_LAYER, [Dude_7.Dude.COLLISION_LAYER]],
+                        [CollisionEngine_4.CollisionEngine.DEFAULT_LAYER, [DroppedItem_2.DroppedItem.COLLISION_LAYER, Dude_8.Dude.COLLISION_LAYER]],
+                        [Dude_8.Dude.COLLISION_LAYER, [Dude_8.Dude.COLLISION_LAYER]],
                     ]));
                     // Initialize singletons
                     new DudeFactory_2.DudeFactory();
                     new Elements_3.Elements();
                     new Ground_4.Ground();
+                    new Camera_2.Camera();
+                    new CutsceneManager_1.CutsceneManager();
                     var newGame = true; //!this.load()
                     if (newGame) {
                         this.locationManager = new LocationManager_9.LocationManager();
                         // World must be initialized before we do anything else
-                        new MapGenerator_1.MapGenerator().doIt();
-                        this.player = DudeFactory_2.DudeFactory.instance.new(0 /* PLAYER */, new point_46.Point(-2, 2).times(Tilesets_20.TILE_SIZE));
-                        DudeFactory_2.DudeFactory.instance.new(1 /* DIP */, new point_46.Point(-10, -10));
+                        new MapGenerator_2.MapGenerator().doIt();
+                        var playerStartPos = new point_49.Point(1, 1).times(MapGenerator_2.MapGenerator.MAP_SIZE / 2 * Tilesets_21.TILE_SIZE)
+                            .plusY(-Tilesets_21.TILE_SIZE * 10)
+                            .plusX(Tilesets_21.TILE_SIZE * 2);
+                        this.player = DudeFactory_2.DudeFactory.instance.new(0 /* PLAYER */, playerStartPos);
+                        Camera_2.Camera.instance.focusOnDude(this.player);
+                        DudeFactory_2.DudeFactory.instance.new(1 /* DIP */, new point_49.Point(-10, -10));
+                        CutsceneManager_1.CutsceneManager.instance.startCutscene(new IntroCutscene_1.IntroCutscene());
                         // TEMP
                         this.player.inventory.addItem(3 /* TENT */);
                     }
@@ -6552,14 +6769,13 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/View"
                 // entities in the world space
                 QuestGame.prototype.getViews = function (updateViewsContext) {
                     // TEMPORARY TEST INPUTS
-                    if (updateViewsContext.input.isKeyDown(74 /* J */)) {
-                        this.save();
-                    }
-                    else if (updateViewsContext.input.isKeyDown(75 /* K */)) {
-                        this.load();
-                    }
+                    // if (updateViewsContext.input.isKeyDown(InputKey.J)) {
+                    //     this.save()
+                    // } else if (updateViewsContext.input.isKeyDown(InputKey.K)) {
+                    //     this.load()
+                    // }
                     if (updateViewsContext.input.isKeyDown(76 /* L */)) {
-                        DudeFactory_2.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_46.Point(40, 30));
+                        DudeFactory_2.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_49.Point(40, 30));
                     }
                     this.updateViews(updateViewsContext);
                     return [
@@ -6568,25 +6784,22 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/View"
                     ];
                 };
                 QuestGame.prototype.updateViews = function (updateViewsContext) {
-                    var clamp = function (val, min, max) { return Math.min(Math.max(val, min), max); };
                     var dimensions = updateViewsContext.dimensions.div(ZOOM);
-                    var xLimit = MapGenerator_1.MapGenerator.MAP_SIZE / 2 * Tilesets_20.TILE_SIZE - dimensions.x / 2;
-                    var yLimit = MapGenerator_1.MapGenerator.MAP_SIZE / 2 * Tilesets_20.TILE_SIZE - dimensions.y / 2;
-                    var clampedPlayerPos = new point_46.Point(clamp(this.player.position.x, -xLimit, xLimit), clamp(this.player.position.y, -yLimit, yLimit));
-                    var cameraGoal = dimensions.div(2).minus(clampedPlayerPos);
+                    var cameraGoal = Camera_2.Camera.instance.getGoalPosition(dimensions);
                     this.gameEntityView = {
                         zoom: ZOOM,
-                        offset: this.gameEntityView.offset.lerp(.0018 * updateViewsContext.elapsedTimeMillis, cameraGoal),
+                        offset: !this.gameEntityView ? cameraGoal : this.gameEntityView.offset.lerp(.0018 * updateViewsContext.elapsedTimeMillis, cameraGoal),
                         entities: this.locationManager.currentLocation.getEntities()
+                            .concat(CutsceneManager_1.CutsceneManager.instance.getEntities())
                     };
                     this.uiView = {
                         zoom: ZOOM,
-                        offset: new point_46.Point(0, 0),
+                        offset: point_49.Point.ZERO,
                         entities: this.uiStateManager.get(dimensions)
                     };
                 };
                 QuestGame.prototype.save = function () {
-                    if (!Player_9.Player.instance.dude.isAlive) {
+                    if (!Player_11.Player.instance.dude.isAlive) {
                         console.log("cannot save after death");
                         return;
                     }
@@ -6613,21 +6826,21 @@ System.register("game/quest_game", ["engine/point", "engine/game", "engine/View"
                     console.log("loaded save from " + prettyPrintTimestamp);
                     this.locationManager = LocationManager_9.LocationManager.load(save.locations);
                     this.player = Array.from(this.locationManager.currentLocation.dudes)
-                        .filter(function (d) { return !!d.entity.getComponent(Player_9.Player); })
+                        .filter(function (d) { return !!d.entity.getComponent(Player_11.Player); })
                         .shift();
                     this.uiStateManager = new UIStateManager_7.UIStateManager();
                     return true;
                 };
                 return QuestGame;
             }(game_1.Game));
-            exports_86("QuestGame", QuestGame);
+            exports_90("QuestGame", QuestGame);
         }
     };
 });
-System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tilesets", "engine/Assets"], function (exports_87, context_87) {
+System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tilesets", "engine/Assets"], function (exports_91, context_91) {
     "use strict";
-    var quest_game_1, engine_1, Tilesets_21, Assets_4;
-    var __moduleName = context_87 && context_87.id;
+    var quest_game_1, engine_1, Tilesets_22, Assets_4;
+    var __moduleName = context_91 && context_91.id;
     return {
         setters: [
             function (quest_game_1_1) {
@@ -6636,28 +6849,28 @@ System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tiles
             function (engine_1_1) {
                 engine_1 = engine_1_1;
             },
-            function (Tilesets_21_1) {
-                Tilesets_21 = Tilesets_21_1;
+            function (Tilesets_22_1) {
+                Tilesets_22 = Tilesets_22_1;
             },
             function (Assets_4_1) {
                 Assets_4 = Assets_4_1;
             }
         ],
         execute: function () {
-            Assets_4.assets.loadImageFiles(Tilesets_21.Tilesets.getFilesToLoad()).then(function () {
+            Assets_4.assets.loadImageFiles(Tilesets_22.Tilesets.getFilesToLoad()).then(function () {
                 new engine_1.Engine(new quest_game_1.QuestGame(), document.getElementById('canvas'));
             });
         }
     };
 });
-System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"], function (exports_88, context_88) {
+System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"], function (exports_92, context_92) {
     "use strict";
-    var component_22, utils_6, Clickable;
-    var __moduleName = context_88 && context_88.id;
+    var component_24, utils_6, Clickable;
+    var __moduleName = context_92 && context_92.id;
     return {
         setters: [
-            function (component_22_1) {
-                component_22 = component_22_1;
+            function (component_24_1) {
+                component_24 = component_24_1;
             },
             function (utils_6_1) {
                 utils_6 = utils_6_1;
@@ -6679,15 +6892,15 @@ System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"]
                     }
                 };
                 return Clickable;
-            }(component_22.Component));
-            exports_88("Clickable", Clickable);
+            }(component_24.Component));
+            exports_92("Clickable", Clickable);
         }
     };
 });
-System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uuid"], function (exports_89, context_89) {
+System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uuid"], function (exports_93, context_93) {
     "use strict";
     var profiler_2, uuid_2, serialize, buildObject;
-    var __moduleName = context_89 && context_89.id;
+    var __moduleName = context_93 && context_93.id;
     return {
         setters: [
             function (profiler_2_1) {
@@ -6701,7 +6914,7 @@ System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uu
             /**
              * Serializes an object and removes all circular references
              */
-            exports_89("serialize", serialize = function (object) {
+            exports_93("serialize", serialize = function (object) {
                 var resultObject = {}; // maps string->object with subobjects as uuids
                 var topLevelUuidMap = {}; // maps string->object with subobjects as uuids
                 var objectUuidMap = new Map(); // maps unique object ref to uuid
@@ -6747,23 +6960,23 @@ System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uu
         }
     };
 });
-System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point"], function (exports_90, context_90) {
+System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point"], function (exports_94, context_94) {
     "use strict";
-    var component_23, Tilesets_22, TileTransform_19, point_47, StringTiles;
-    var __moduleName = context_90 && context_90.id;
+    var component_25, Tilesets_23, TileTransform_19, point_50, StringTiles;
+    var __moduleName = context_94 && context_94.id;
     return {
         setters: [
-            function (component_23_1) {
-                component_23 = component_23_1;
+            function (component_25_1) {
+                component_25 = component_25_1;
             },
-            function (Tilesets_22_1) {
-                Tilesets_22 = Tilesets_22_1;
+            function (Tilesets_23_1) {
+                Tilesets_23 = Tilesets_23_1;
             },
             function (TileTransform_19_1) {
                 TileTransform_19 = TileTransform_19_1;
             },
-            function (point_47_1) {
-                point_47 = point_47_1;
+            function (point_50_1) {
+                point_50 = point_50_1;
             }
         ],
         execute: function () {
@@ -6782,7 +6995,7 @@ System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tiles
                         return;
                     }
                     this.tiles = Array.from(s).map(function (c, i) {
-                        return Tilesets_22.Tilesets.instance.oneBit.getTileSource(c).toImageRender(new TileTransform_19.TileTransform(_this.topLeftPos.plus(new point_47.Point(10 * i, 0))));
+                        return Tilesets_23.Tilesets.instance.oneBit.getTileSource(c).toImageRender(new TileTransform_19.TileTransform(_this.topLeftPos.plus(new point_50.Point(10 * i, 0))));
                     });
                 };
                 StringTiles.prototype.clear = function () {
@@ -6792,15 +7005,15 @@ System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tiles
                     return this.tiles;
                 };
                 return StringTiles;
-            }(component_23.Component));
-            exports_90("StringTiles", StringTiles);
+            }(component_25.Component));
+            exports_94("StringTiles", StringTiles);
         }
     };
 });
-System.register("game/world/interior/Tent", ["game/world/LocationManager"], function (exports_91, context_91) {
+System.register("game/world/interior/Tent", ["game/world/LocationManager"], function (exports_95, context_95) {
     "use strict";
     var LocationManager_10, makeTentInterior;
-    var __moduleName = context_91 && context_91.id;
+    var __moduleName = context_95 && context_95.id;
     return {
         setters: [
             function (LocationManager_10_1) {
@@ -6808,7 +7021,7 @@ System.register("game/world/interior/Tent", ["game/world/LocationManager"], func
             }
         ],
         execute: function () {
-            exports_91("makeTentInterior", makeTentInterior = function () {
+            exports_95("makeTentInterior", makeTentInterior = function () {
                 var l = LocationManager_10.LocationManager.instance.newLocation();
                 return l;
             });

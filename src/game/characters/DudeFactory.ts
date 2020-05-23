@@ -9,6 +9,7 @@ import { Enemy } from "./Enemy"
 import { DudeSaveState } from "../saves/DudeSaveState"
 import { Inventory } from "../items/Inventory"
 import { Dialogue } from "./Dialogue"
+import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 
 export const enum DudeType {
     PLAYER,
@@ -60,7 +61,7 @@ export class DudeFactory {
                 weapon = "weapon_regular_sword"
                 shield = "shield_0"
                 maxHealth = 4
-                additionalComponents = [new Player()]
+                additionalComponents = [new Player(), new CutscenePlayerController()]
                 break
             }
             case DudeType.DIP: {

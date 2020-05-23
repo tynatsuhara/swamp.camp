@@ -17,6 +17,9 @@ import { Ground } from "./world/ground/Ground"
 import { InputKey } from "../engine/input"
 import { Player } from "./characters/Player"
 import { Item } from "./items/Items"
+import { CutsceneManager } from "./cutscenes/CutsceneManager"
+import { IntroCutscene } from "./cutscenes/IntroCutscene"
+import { Camera } from "./cutscenes/Camera"
 
 
 const ZOOM = 3
@@ -29,8 +32,8 @@ export class QuestGame extends Game {
     readonly tilesets = new Tilesets()
     private uiStateManager = new UIStateManager()
     
-    private gameEntityView: View = new View()
-    private uiView: View = new View()
+    private gameEntityView: View
+    private uiView: View
 
     initialize() {
         CollisionEngine.instance.setCollisionMatrix(new Map([
@@ -42,7 +45,8 @@ export class QuestGame extends Game {
         new DudeFactory()
         new Elements()
         new Ground()
-
+        new Camera()
+        new CutsceneManager()
 
         const newGame = true//!this.load()
 
@@ -50,9 +54,15 @@ export class QuestGame extends Game {
             this.locationManager = new LocationManager()
             // World must be initialized before we do anything else
             new MapGenerator().doIt()
-            this.player = DudeFactory.instance.new(DudeType.PLAYER, new Point(-2, 2).times(TILE_SIZE))
 
+            const playerStartPos = new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE)
+                    .plusY(-TILE_SIZE * 10)
+                    .plusX(TILE_SIZE * 2)
+            this.player = DudeFactory.instance.new(DudeType.PLAYER, playerStartPos)
+
+            Camera.instance.focusOnDude(this.player)
             DudeFactory.instance.new(DudeType.DIP, new Point(-10, -10))
+            CutsceneManager.instance.startCutscene(new IntroCutscene())
 
 
 
@@ -64,11 +74,11 @@ export class QuestGame extends Game {
     // entities in the world space
     getViews(updateViewsContext: UpdateViewsContext): View[] {
         // TEMPORARY TEST INPUTS
-        if (updateViewsContext.input.isKeyDown(InputKey.J)) {
-            this.save()
-        } else if (updateViewsContext.input.isKeyDown(InputKey.K)) {
-            this.load()
-        }
+        // if (updateViewsContext.input.isKeyDown(InputKey.J)) {
+        //     this.save()
+        // } else if (updateViewsContext.input.isKeyDown(InputKey.K)) {
+        //     this.load()
+        // }
         if (updateViewsContext.input.isKeyDown(InputKey.L)) {
             DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(40, 30))
         }
@@ -84,25 +94,19 @@ export class QuestGame extends Game {
     }
 
     updateViews(updateViewsContext: UpdateViewsContext) {
-        const clamp = (val: number, min: number, max: number) => Math.min(Math.max(val, min), max);
         const dimensions = updateViewsContext.dimensions.div(ZOOM)
-        const xLimit = MapGenerator.MAP_SIZE / 2 * TILE_SIZE - dimensions.x/2
-        const yLimit = MapGenerator.MAP_SIZE / 2 * TILE_SIZE - dimensions.y/2
-        const clampedPlayerPos = new Point(
-            clamp(this.player.position.x, -xLimit, xLimit),
-            clamp(this.player.position.y, -yLimit, yLimit)
-        )
-        const cameraGoal = dimensions.div(2).minus(clampedPlayerPos)
+        const cameraGoal = Camera.instance.getGoalPosition(dimensions)
 
         this.gameEntityView = { 
             zoom: ZOOM,
-            offset: this.gameEntityView.offset.lerp(.0018 * updateViewsContext.elapsedTimeMillis, cameraGoal),
+            offset: !this.gameEntityView ? cameraGoal : this.gameEntityView.offset.lerp(.0018 * updateViewsContext.elapsedTimeMillis, cameraGoal),
             entities: this.locationManager.currentLocation.getEntities()
+                    .concat(CutsceneManager.instance.getEntities())
         }
 
         this.uiView = {
             zoom: ZOOM,
-            offset: new Point(0, 0),
+            offset: Point.ZERO,
             entities: this.uiStateManager.get(dimensions)
         }
     }

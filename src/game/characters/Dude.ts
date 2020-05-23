@@ -201,7 +201,7 @@ export class Dude extends Component {
     /**
      * Should be called on EVERY update step for 
      * @param updateData 
-     * @param direction the direction they are moving in
+     * @param direction the direction they are moving in, will be normalized by this code
      * @param facingOverride if < 0, will face left, if > 0, will face right. if == 0, will face the direction they're moving
      */
     move(updateData: UpdateData, direction: Point, facingOverride: number = 0) {
@@ -238,7 +238,7 @@ export class Dude extends Component {
         }
     }
 
-    private moveTo(point: Point) {
+    moveTo(point: Point) {
         this._position = this.collider.moveTo(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos)
     }
 
