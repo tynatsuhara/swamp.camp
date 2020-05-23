@@ -6,6 +6,7 @@ import { Point } from "../../engine/point"
 import { MapGenerator } from "../world/MapGenerator"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Camera } from "./Camera"
+import { CutsceneManager } from "./CutsceneManager"
 
 // This is the cutscene that plays when the player arrives in the new land
 export class IntroCutscene extends Component {
@@ -41,6 +42,7 @@ export class IntroCutscene extends Component {
         setTimeout(() => { 
             Camera.instance.focusOnDude(Player.instance.dude)
             CutscenePlayerController.instance.disable()
+            CutsceneManager.instance.finishCutscene()
         }, this.PAN_BACK)
     }
 

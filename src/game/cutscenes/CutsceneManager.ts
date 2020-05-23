@@ -17,6 +17,11 @@ export class CutsceneManager {
         this.entity = new Entity([cutsceneComponent])
     }
 
+    finishCutscene() {
+        this.entity = null
+        // TODO autosave
+    }
+
     getEntities(): Entity[] {
         return !!this.entity ? [this.entity] : []
     }
