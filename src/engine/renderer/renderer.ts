@@ -11,13 +11,17 @@ export class Renderer {
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas
         this.context = canvas.getContext('2d', { alpha: false })
+        this.resizeCanvas()
     }
 
-    render(views: View[]) {
+    private resizeCanvas() {
         // make sure stuff doesn't get stretched
         this.canvas.width = this.canvas.clientWidth
         this.canvas.height = this.canvas.clientHeight
+    }
 
+    render(views: View[]) {
+        this.resizeCanvas()
         this.context.imageSmoothingEnabled = false
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
         
