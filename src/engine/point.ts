@@ -1,4 +1,7 @@
 export class Point {
+
+    static readonly ZERO = new Point(0, 0)
+
     // relative to top left corner
     readonly x: number
     readonly y: number
