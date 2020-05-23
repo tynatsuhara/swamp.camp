@@ -1,23 +1,30 @@
-import { Tilesets } from "../graphics/Tilesets"
+import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Point } from "../../engine/point"
 import { Dude } from "../characters/Dude"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { Entity } from "../../engine/Entity"
+import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
 
 export class HUD {
 
-    private entity: Entity = new Entity()
+    private heartsEntity: Entity = new Entity()
+    private autosaveComponent: AnimatedTileComponent = new Entity().addComponent(
+        new AnimatedTileComponent([
+            Tilesets.instance.oneBit.getTileSetAnimation("autosave", 6, 100)
+        ])
+    )
     private readonly offset = new Point(4, 4)
 
     // used for determining what should be updated
     private lastHealthCount = 0
     private lastMaxHealthCount = 0
 
-    getEntity(player: Dude): Entity {
+    getEntities(player: Dude, screenDimensions: Point): Entity[] {
         this.updateHearts(player.health, player.maxHealth)
+        this.updateAutosave(screenDimensions);
 
-        return this.entity
+        return [this.heartsEntity, this.autosaveComponent.entity]
     }
 
     private updateHearts(health: number, maxHealth: number) {
@@ -27,7 +34,7 @@ export class HUD {
         this.lastHealthCount = health
         this.lastMaxHealthCount = maxHealth
 
-        this.entity = new Entity()
+        this.heartsEntity = new Entity()
 
         const heartOffset = new Point(16, 0)
         const full = Tilesets.instance.dungeonCharacters.getTileSource("ui_heart_full")
@@ -50,6 +57,10 @@ export class HUD {
             result.push(new TileComponent(empty, new TileTransform(this.offset.plus(heartOffset.times(result.length)))))
         }
 
-        result.forEach(c => this.entity.addComponent(c))
+        result.forEach(c => this.heartsEntity.addComponent(c))
+    }
+
+    private updateAutosave(screenDimensions: Point) {
+        this.autosaveComponent.transform.position = screenDimensions.minus(this.offset).minus(new Point(TILE_SIZE, TILE_SIZE))
     }
 }

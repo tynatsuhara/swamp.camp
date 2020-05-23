@@ -63,7 +63,8 @@ export class OneBitTileset extends SingleFileTileLoader {
             ["w", new Point(28, 31)],
             ["x", new Point(29, 31)],
             ["y", new Point(30, 31)],
-            ["z", new Point(31, 31)]
+            ["z", new Point(31, 31)],
+            ["autosave", new Point(18, 8)],
         ]))
     }
 }

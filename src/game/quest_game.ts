@@ -103,7 +103,7 @@ export class QuestGame extends Game {
         this.uiView = {
             zoom: ZOOM,
             offset: new Point(0, 0),
-            entities: this.uiStateManager.get(updateViewsContext)
+            entities: this.uiStateManager.get(dimensions)
         }
     }
 
