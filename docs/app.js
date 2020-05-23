@@ -6553,6 +6553,10 @@ System.register("game/cutscenes/CutsceneManager", ["engine/Entity"], function (e
                 CutsceneManager.prototype.startCutscene = function (cutsceneComponent) {
                     this.entity = new Entity_16.Entity([cutsceneComponent]);
                 };
+                CutsceneManager.prototype.finishCutscene = function () {
+                    this.entity = null;
+                    // TODO autosave
+                };
                 CutsceneManager.prototype.getEntities = function () {
                     return !!this.entity ? [this.entity] : [];
                 };
@@ -6608,9 +6612,9 @@ System.register("game/cutscenes/Camera", ["engine/point", "game/world/MapGenerat
         }
     };
 });
-System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutscenes/CutscenePlayerController", "game/characters/Player", "engine/point", "game/cutscenes/Camera"], function (exports_89, context_89) {
+System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutscenes/CutscenePlayerController", "game/characters/Player", "engine/point", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager"], function (exports_89, context_89) {
     "use strict";
-    var component_23, CutscenePlayerController_2, Player_10, point_48, Camera_1, IntroCutscene;
+    var component_23, CutscenePlayerController_2, Player_10, point_48, Camera_1, CutsceneManager_1, IntroCutscene;
     var __moduleName = context_89 && context_89.id;
     return {
         setters: [
@@ -6628,6 +6632,9 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
             },
             function (Camera_1_1) {
                 Camera_1 = Camera_1_1;
+            },
+            function (CutsceneManager_1_1) {
+                CutsceneManager_1 = CutsceneManager_1_1;
             }
         ],
         execute: function () {
@@ -6664,6 +6671,7 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
                     setTimeout(function () {
                         Camera_1.Camera.instance.focusOnDude(Player_10.Player.instance.dude);
                         CutscenePlayerController_2.CutscenePlayerController.instance.disable();
+                        CutsceneManager_1.CutsceneManager.instance.finishCutscene();
                     }, this.PAN_BACK);
                 };
                 IntroCutscene.prototype.update = function (updateData) {
@@ -6676,7 +6684,7 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
 });
 System.register("game/quest_game", ["engine/point", "engine/game", "game/world/MapGenerator", "game/graphics/Tilesets", "game/characters/DudeFactory", "game/world/LocationManager", "game/characters/Dude", "engine/collision/CollisionEngine", "game/items/DroppedItem", "game/ui/UIStateManager", "game/world/elements/Elements", "game/world/ground/Ground", "game/characters/Player", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/cutscenes/Camera"], function (exports_90, context_90) {
     "use strict";
-    var point_49, game_1, MapGenerator_2, Tilesets_21, DudeFactory_2, LocationManager_9, Dude_8, CollisionEngine_4, DroppedItem_2, UIStateManager_7, Elements_3, Ground_4, Player_11, CutsceneManager_1, IntroCutscene_1, Camera_2, ZOOM, QuestGame;
+    var point_49, game_1, MapGenerator_2, Tilesets_21, DudeFactory_2, LocationManager_9, Dude_8, CollisionEngine_4, DroppedItem_2, UIStateManager_7, Elements_3, Ground_4, Player_11, CutsceneManager_2, IntroCutscene_1, Camera_2, ZOOM, QuestGame;
     var __moduleName = context_90 && context_90.id;
     return {
         setters: [
@@ -6719,8 +6727,8 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
             function (Player_11_1) {
                 Player_11 = Player_11_1;
             },
-            function (CutsceneManager_1_1) {
-                CutsceneManager_1 = CutsceneManager_1_1;
+            function (CutsceneManager_2_1) {
+                CutsceneManager_2 = CutsceneManager_2_1;
             },
             function (IntroCutscene_1_1) {
                 IntroCutscene_1 = IntroCutscene_1_1;
@@ -6749,7 +6757,7 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
                     new Elements_3.Elements();
                     new Ground_4.Ground();
                     new Camera_2.Camera();
-                    new CutsceneManager_1.CutsceneManager();
+                    new CutsceneManager_2.CutsceneManager();
                     var newGame = true; //!this.load()
                     if (newGame) {
                         this.locationManager = new LocationManager_9.LocationManager();
@@ -6761,7 +6769,7 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
                         this.player = DudeFactory_2.DudeFactory.instance.new(0 /* PLAYER */, playerStartPos);
                         Camera_2.Camera.instance.focusOnDude(this.player);
                         DudeFactory_2.DudeFactory.instance.new(1 /* DIP */, new point_49.Point(-10, -10));
-                        CutsceneManager_1.CutsceneManager.instance.startCutscene(new IntroCutscene_1.IntroCutscene());
+                        CutsceneManager_2.CutsceneManager.instance.startCutscene(new IntroCutscene_1.IntroCutscene());
                         // TEMP
                         this.player.inventory.addItem(3 /* TENT */);
                     }
@@ -6790,7 +6798,7 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
                         zoom: ZOOM,
                         offset: !this.gameEntityView ? cameraGoal : this.gameEntityView.offset.lerp(.0018 * updateViewsContext.elapsedTimeMillis, cameraGoal),
                         entities: this.locationManager.currentLocation.getEntities()
-                            .concat(CutsceneManager_1.CutsceneManager.instance.getEntities())
+                            .concat(CutsceneManager_2.CutsceneManager.instance.getEntities())
                     };
                     this.uiView = {
                         zoom: ZOOM,
