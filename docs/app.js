@@ -89,43 +89,14 @@ System.register("engine/point", [], function (exports_1, context_1) {
         }
     };
 });
-System.register("engine/View", ["engine/point"], function (exports_2, context_2) {
+System.register("engine/renderer/RenderContext", ["engine/point"], function (exports_2, context_2) {
     "use strict";
-    var point_1, View;
+    var point_1, RenderContext;
     var __moduleName = context_2 && context_2.id;
     return {
         setters: [
             function (point_1_1) {
                 point_1 = point_1_1;
-            }
-        ],
-        execute: function () {
-            View = /** @class */ (function () {
-                function View(entities, zoom, offset) {
-                    if (entities === void 0) { entities = []; }
-                    if (zoom === void 0) { zoom = 1; }
-                    if (offset === void 0) { offset = new point_1.Point(0, 0); }
-                    this.entities = []; // entities ordered by depth (back to front)
-                    this.zoom = 1; // scale of the view
-                    this.offset = new point_1.Point(0, 0); // transform applied to all entities in the view (scaled by zoom)
-                    this.entities = entities;
-                    this.zoom = zoom;
-                    this.offset = offset;
-                }
-                return View;
-            }());
-            exports_2("View", View);
-        }
-    };
-});
-System.register("engine/renderer/RenderContext", ["engine/point"], function (exports_3, context_3) {
-    "use strict";
-    var point_2, RenderContext;
-    var __moduleName = context_3 && context_3.id;
-    return {
-        setters: [
-            function (point_2_1) {
-                point_2 = point_2_1;
             }
         ],
         execute: function () {
@@ -222,22 +193,22 @@ System.register("engine/renderer/RenderContext", ["engine/point"], function (exp
                     this.context.stroke();
                 };
                 RenderContext.prototype.pixelize = function (point) {
-                    return new point_2.Point(point.x - (point.x % this.view.zoom), point.y - (point.y % this.view.zoom));
+                    return new point_1.Point(point.x - (point.x % this.view.zoom), point.y - (point.y % this.view.zoom));
                 };
                 return RenderContext;
             }());
-            exports_3("RenderContext", RenderContext);
+            exports_2("RenderContext", RenderContext);
         }
     };
 });
-System.register("engine/renderer/Renderer", ["engine/point", "engine/renderer/RenderContext"], function (exports_4, context_4) {
+System.register("engine/renderer/Renderer", ["engine/point", "engine/renderer/RenderContext"], function (exports_3, context_3) {
     "use strict";
-    var point_3, RenderContext_1, Renderer;
-    var __moduleName = context_4 && context_4.id;
+    var point_2, RenderContext_1, Renderer;
+    var __moduleName = context_3 && context_3.id;
     return {
         setters: [
-            function (point_3_1) {
-                point_3 = point_3_1;
+            function (point_2_1) {
+                point_2 = point_2_1;
             },
             function (RenderContext_1_1) {
                 RenderContext_1 = RenderContext_1_1;
@@ -265,7 +236,7 @@ System.register("engine/renderer/Renderer", ["engine/point", "engine/renderer/Re
                     views.forEach(function (v) { return _this.renderView(v); });
                 };
                 Renderer.prototype.getDimensions = function () {
-                    return new point_3.Point(this.canvas.width, this.canvas.height);
+                    return new point_2.Point(this.canvas.width, this.canvas.height);
                 };
                 Renderer.prototype.renderView = function (view) {
                     var viewRenderContext = new RenderContext_1.RenderContext(this.canvas, this.context, view);
@@ -279,18 +250,18 @@ System.register("engine/renderer/Renderer", ["engine/point", "engine/renderer/Re
                 };
                 return Renderer;
             }());
-            exports_4("Renderer", Renderer);
+            exports_3("Renderer", Renderer);
         }
     };
 });
-System.register("engine/input", ["engine/point"], function (exports_5, context_5) {
+System.register("engine/input", ["engine/point"], function (exports_4, context_4) {
     "use strict";
-    var point_4, Input, CapturedInput;
-    var __moduleName = context_5 && context_5.id;
+    var point_3, Input, CapturedInput;
+    var __moduleName = context_4 && context_4.id;
     return {
         setters: [
-            function (point_4_1) {
-                point_4 = point_4_1;
+            function (point_3_1) {
+                point_3 = point_3_1;
             }
         ],
         execute: function () {
@@ -299,7 +270,7 @@ System.register("engine/input", ["engine/point"], function (exports_5, context_5
                     var _this = this;
                     this.keys = new Set();
                     this.lastCapture = new CapturedInput();
-                    this.mousePos = new point_4.Point(0, 0);
+                    this.mousePos = new point_3.Point(0, 0);
                     this.isMouseDown = false;
                     this.isMouseHeld = false;
                     this.isMouseUp = false;
@@ -333,7 +304,7 @@ System.register("engine/input", ["engine/point"], function (exports_5, context_5
                         }
                     };
                     canvas.onmousemove = function (e) {
-                        _this.mousePos = new point_4.Point(e.x - canvas.offsetLeft, e.y - canvas.offsetTop);
+                        _this.mousePos = new point_3.Point(e.x - canvas.offsetLeft, e.y - canvas.offsetTop);
                     };
                     window.onkeydown = function (e) { return _this.keys.add(e.keyCode); };
                     window.onkeyup = function (e) { return _this.keys.delete(e.keyCode); };
@@ -351,21 +322,21 @@ System.register("engine/input", ["engine/point"], function (exports_5, context_5
                 };
                 return Input;
             }());
-            exports_5("Input", Input);
+            exports_4("Input", Input);
             // TODO: Capture mouse input for clickable elements
             CapturedInput = /** @class */ (function () {
                 function CapturedInput(keysDown, keysHeld, keysUp, mousePos, isMouseDown, isMouseHeld, isMouseUp, isRightMouseDown, isRightMouseHeld, isRightMouseUp) {
                     if (keysDown === void 0) { keysDown = new Set(); }
                     if (keysHeld === void 0) { keysHeld = new Set(); }
                     if (keysUp === void 0) { keysUp = new Set(); }
-                    if (mousePos === void 0) { mousePos = new point_4.Point(0, 0); }
+                    if (mousePos === void 0) { mousePos = new point_3.Point(0, 0); }
                     if (isMouseDown === void 0) { isMouseDown = false; }
                     if (isMouseHeld === void 0) { isMouseHeld = false; }
                     if (isMouseUp === void 0) { isMouseUp = false; }
                     if (isRightMouseDown === void 0) { isRightMouseDown = false; }
                     if (isRightMouseHeld === void 0) { isRightMouseHeld = false; }
                     if (isRightMouseUp === void 0) { isRightMouseUp = false; }
-                    this.mousePos = new point_4.Point(0, 0);
+                    this.mousePos = new point_3.Point(0, 0);
                     this.isMouseDown = false;
                     this.isMouseHeld = false;
                     this.isMouseUp = false;
@@ -400,31 +371,14 @@ System.register("engine/input", ["engine/point"], function (exports_5, context_5
                 };
                 return CapturedInput;
             }());
-            exports_5("CapturedInput", CapturedInput);
+            exports_4("CapturedInput", CapturedInput);
         }
     };
 });
-System.register("engine/game", [], function (exports_6, context_6) {
-    "use strict";
-    var Game;
-    var __moduleName = context_6 && context_6.id;
-    return {
-        setters: [],
-        execute: function () {
-            Game = /** @class */ (function () {
-                function Game() {
-                }
-                Game.prototype.initialize = function () { };
-                return Game;
-            }());
-            exports_6("Game", Game);
-        }
-    };
-});
-System.register("engine/renderer/RenderMethod", [], function (exports_7, context_7) {
+System.register("engine/renderer/RenderMethod", [], function (exports_5, context_5) {
     "use strict";
     var RenderMethod;
-    var __moduleName = context_7 && context_7.id;
+    var __moduleName = context_5 && context_5.id;
     return {
         setters: [],
         execute: function () {
@@ -434,14 +388,14 @@ System.register("engine/renderer/RenderMethod", [], function (exports_7, context
                 }
                 return RenderMethod;
             }());
-            exports_7("RenderMethod", RenderMethod);
+            exports_5("RenderMethod", RenderMethod);
         }
     };
 });
-System.register("engine/renderer/TextRender", ["engine/renderer/RenderMethod"], function (exports_8, context_8) {
+System.register("engine/renderer/TextRender", ["engine/renderer/RenderMethod"], function (exports_6, context_6) {
     "use strict";
     var RenderMethod_1, TextRender;
-    var __moduleName = context_8 && context_8.id;
+    var __moduleName = context_6 && context_6.id;
     return {
         setters: [
             function (RenderMethod_1_1) {
@@ -469,14 +423,14 @@ System.register("engine/renderer/TextRender", ["engine/renderer/RenderMethod"], 
                 };
                 return TextRender;
             }(RenderMethod_1.RenderMethod));
-            exports_8("TextRender", TextRender);
+            exports_6("TextRender", TextRender);
         }
     };
 });
-System.register("engine/renderer/BasicRenderComponent", ["engine/component"], function (exports_9, context_9) {
+System.register("engine/renderer/BasicRenderComponent", ["engine/component"], function (exports_7, context_7) {
     "use strict";
     var component_1, BasicRenderComponent;
-    var __moduleName = context_9 && context_9.id;
+    var __moduleName = context_7 && context_7.id;
     return {
         setters: [
             function (component_1_1) {
@@ -500,14 +454,14 @@ System.register("engine/renderer/BasicRenderComponent", ["engine/component"], fu
                 };
                 return BasicRenderComponent;
             }(component_1.Component));
-            exports_9("BasicRenderComponent", BasicRenderComponent);
+            exports_7("BasicRenderComponent", BasicRenderComponent);
         }
     };
 });
-System.register("engine/profiler", ["engine/View", "engine/Entity", "engine/point", "engine/renderer/TextRender", "engine/renderer/BasicRenderComponent"], function (exports_10, context_10) {
+System.register("engine/profiler", ["engine/View", "engine/Entity", "engine/point", "engine/renderer/TextRender", "engine/renderer/BasicRenderComponent"], function (exports_8, context_8) {
     "use strict";
-    var View_1, Entity_1, point_5, TextRender_1, BasicRenderComponent_1, Profiler, round, MovingAverage, profiler;
-    var __moduleName = context_10 && context_10.id;
+    var View_1, Entity_1, point_4, TextRender_1, BasicRenderComponent_1, Profiler, round, MovingAverage, profiler;
+    var __moduleName = context_8 && context_8.id;
     /**
      * Executes the given function and returns the duration it took to execute as well as the result
      */
@@ -516,7 +470,7 @@ System.register("engine/profiler", ["engine/View", "engine/Entity", "engine/poin
         var result = fn();
         return [new Date().getTime() - start, result];
     }
-    exports_10("measure", measure);
+    exports_8("measure", measure);
     return {
         setters: [
             function (View_1_1) {
@@ -525,8 +479,8 @@ System.register("engine/profiler", ["engine/View", "engine/Entity", "engine/poin
             function (Entity_1_1) {
                 Entity_1 = Entity_1_1;
             },
-            function (point_5_1) {
-                point_5 = point_5_1;
+            function (point_4_1) {
+                point_4 = point_4_1;
             },
             function (TextRender_1_1) {
                 TextRender_1 = TextRender_1_1;
@@ -556,7 +510,7 @@ System.register("engine/profiler", ["engine/View", "engine/Entity", "engine/poin
                         "components updated: " + this.componentsUpdated
                     ];
                     return new View_1.View([
-                        new Entity_1.Entity(s.map(function (str, i) { return new BasicRenderComponent_1.BasicRenderComponent(new TextRender_1.TextRender(str, new point_5.Point(60, 70 + 25 * i))); }))
+                        new Entity_1.Entity(s.map(function (str, i) { return new BasicRenderComponent_1.BasicRenderComponent(new TextRender_1.TextRender(str, new point_4.Point(60, 70 + 25 * i))); }))
                     ]);
                 };
                 return Profiler;
@@ -587,14 +541,14 @@ System.register("engine/profiler", ["engine/View", "engine/Entity", "engine/poin
                 };
                 return MovingAverage;
             }());
-            exports_10("profiler", profiler = new Profiler());
+            exports_8("profiler", profiler = new Profiler());
         }
     };
 });
-System.register("engine/debug", [], function (exports_11, context_11) {
+System.register("engine/debug", [], function (exports_9, context_9) {
     "use strict";
     var debug;
-    var __moduleName = context_11 && context_11.id;
+    var __moduleName = context_9 && context_9.id;
     function loadDebug() {
         var stored = localStorage.getItem("debug_state");
         if (stored) {
@@ -625,7 +579,7 @@ System.register("engine/debug", [], function (exports_11, context_11) {
     return {
         setters: [],
         execute: function () {
-            exports_11("debug", debug = Object.assign({}, {
+            exports_9("debug", debug = Object.assign({}, {
                 showColliders: false,
                 showProfiler: false
             }, loadDebug()));
@@ -633,10 +587,10 @@ System.register("engine/debug", [], function (exports_11, context_11) {
         }
     };
 });
-System.register("engine/Assets", [], function (exports_12, context_12) {
+System.register("engine/Assets", [], function (exports_10, context_10) {
     "use strict";
     var Assets, assets;
-    var __moduleName = context_12 && context_12.id;
+    var __moduleName = context_10 && context_10.id;
     return {
         setters: [],
         execute: function () {
@@ -665,28 +619,28 @@ System.register("engine/Assets", [], function (exports_12, context_12) {
                 };
                 return Assets;
             }());
-            exports_12("assets", assets = new Assets());
+            exports_10("assets", assets = new Assets());
         }
     };
 });
-System.register("engine/util/utils", [], function (exports_13, context_13) {
+System.register("engine/util/utils", [], function (exports_11, context_11) {
     "use strict";
-    var __moduleName = context_13 && context_13.id;
+    var __moduleName = context_11 && context_11.id;
     function rectContains(rectPosition, rectDimensions, pt) {
         return pt.x >= rectPosition.x && pt.x < rectPosition.x + rectDimensions.x
             && pt.y >= rectPosition.y && pt.y < rectPosition.y + rectDimensions.y;
     }
-    exports_13("rectContains", rectContains);
+    exports_11("rectContains", rectContains);
     return {
         setters: [],
         execute: function () {
         }
     };
 });
-System.register("engine/renderer/LineRender", ["engine/renderer/RenderMethod"], function (exports_14, context_14) {
+System.register("engine/renderer/LineRender", ["engine/renderer/RenderMethod"], function (exports_12, context_12) {
     "use strict";
     var RenderMethod_2, LineRender;
-    var __moduleName = context_14 && context_14.id;
+    var __moduleName = context_12 && context_12.id;
     return {
         setters: [
             function (RenderMethod_2_1) {
@@ -716,21 +670,21 @@ System.register("engine/renderer/LineRender", ["engine/renderer/RenderMethod"], 
                 };
                 return LineRender;
             }(RenderMethod_2.RenderMethod));
-            exports_14("LineRender", LineRender);
+            exports_12("LineRender", LineRender);
         }
     };
 });
-System.register("engine/collision/Collider", ["engine/component", "engine/point", "engine/renderer/LineRender", "engine/debug", "engine/collision/CollisionEngine"], function (exports_15, context_15) {
+System.register("engine/collision/Collider", ["engine/component", "engine/point", "engine/renderer/LineRender", "engine/debug", "engine/collision/CollisionEngine"], function (exports_13, context_13) {
     "use strict";
-    var component_2, point_6, LineRender_1, debug_1, CollisionEngine_1, Collider;
-    var __moduleName = context_15 && context_15.id;
+    var component_2, point_5, LineRender_1, debug_1, CollisionEngine_1, Collider;
+    var __moduleName = context_13 && context_13.id;
     return {
         setters: [
             function (component_2_1) {
                 component_2 = component_2_1;
             },
-            function (point_6_1) {
-                point_6 = point_6_1;
+            function (point_5_1) {
+                point_5 = point_5_1;
             },
             function (LineRender_1_1) {
                 LineRender_1 = LineRender_1_1;
@@ -781,16 +735,16 @@ System.register("engine/collision/Collider", ["engine/component", "engine/point"
                     var dx = point.x - this.position.x;
                     var dy = point.y - this.position.y;
                     // TODO: Should these branches be handled by the caller?
-                    if (CollisionEngine_1.CollisionEngine.instance.canTranslate(this, new point_6.Point(dx, dy))) {
+                    if (CollisionEngine_1.CollisionEngine.instance.canTranslate(this, new point_5.Point(dx, dy))) {
                         this._position = point;
                         CollisionEngine_1.CollisionEngine.instance.checkAndUpdateCollisions(this);
                     }
-                    else if (CollisionEngine_1.CollisionEngine.instance.canTranslate(this, new point_6.Point(dx, 0))) {
-                        this._position = this._position.plus(new point_6.Point(dx, 0));
+                    else if (CollisionEngine_1.CollisionEngine.instance.canTranslate(this, new point_5.Point(dx, 0))) {
+                        this._position = this._position.plus(new point_5.Point(dx, 0));
                         CollisionEngine_1.CollisionEngine.instance.checkAndUpdateCollisions(this);
                     }
-                    else if (CollisionEngine_1.CollisionEngine.instance.canTranslate(this, new point_6.Point(0, dy))) {
-                        this._position = this._position.plus(new point_6.Point(0, dy));
+                    else if (CollisionEngine_1.CollisionEngine.instance.canTranslate(this, new point_5.Point(0, dy))) {
+                        this._position = this._position.plus(new point_5.Point(0, dy));
                         CollisionEngine_1.CollisionEngine.instance.checkAndUpdateCollisions(this);
                     }
                     return this.position;
@@ -882,24 +836,24 @@ System.register("engine/collision/Collider", ["engine/component", "engine/point"
                     var denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
                     if (tNumerator >= 0 && tNumerator <= denominator && uNumerator >= 0 && uNumerator <= denominator) {
                         var t = tNumerator / denominator;
-                        return new point_6.Point(x1 + t * (x2 - x1), y1 + t * (y2 - y1));
+                        return new point_5.Point(x1 + t * (x2 - x1), y1 + t * (y2 - y1));
                     }
                     return null;
                 };
                 return Collider;
             }(component_2.Component));
-            exports_15("Collider", Collider);
+            exports_13("Collider", Collider);
         }
     };
 });
-System.register("engine/collision/CollisionEngine", ["engine/point", "engine/util/utils"], function (exports_16, context_16) {
+System.register("engine/collision/CollisionEngine", ["engine/point", "engine/util/utils"], function (exports_14, context_14) {
     "use strict";
-    var point_7, utils_1, CollisionEngine, engine;
-    var __moduleName = context_16 && context_16.id;
+    var point_6, utils_1, CollisionEngine, engine;
+    var __moduleName = context_14 && context_14.id;
     return {
         setters: [
-            function (point_7_1) {
-                point_7 = point_7_1;
+            function (point_6_1) {
+                point_6 = point_6_1;
             },
             function (utils_1_1) {
                 utils_1 = utils_1_1;
@@ -955,7 +909,7 @@ System.register("engine/collision/CollisionEngine", ["engine/point", "engine/uti
                     var yMin = Math.min.apply(Math, pts.map(function (pt) { return pt.y + Math.min(translation.y, 0); }));
                     var yMax = Math.max.apply(Math, pts.map(function (pt) { return pt.y + Math.max(translation.y, 0); }));
                     var potentialCollisions = this.colliders.filter(function (other) { return other !== collider && other.getPoints().some(function (pt) {
-                        return utils_1.rectContains(new point_7.Point(xMax, yMin), new point_7.Point(xMax - xMin, yMax - yMin), pt);
+                        return utils_1.rectContains(new point_6.Point(xMax, yMin), new point_6.Point(xMax - xMin, yMax - yMin), pt);
                     }); });
                     // for all pts and all those colliders, find the closest intersection
                     var collisions = pts.flatMap(function (pt) { return potentialCollisions
@@ -1012,15 +966,15 @@ System.register("engine/collision/CollisionEngine", ["engine/point", "engine/uti
                 CollisionEngine.DEFAULT_LAYER = "default";
                 return CollisionEngine;
             }());
-            exports_16("CollisionEngine", CollisionEngine);
+            exports_14("CollisionEngine", CollisionEngine);
             engine = new CollisionEngine();
         }
     };
 });
-System.register("engine/engine", ["engine/renderer/Renderer", "engine/input", "engine/profiler", "engine/debug", "engine/collision/CollisionEngine"], function (exports_17, context_17) {
+System.register("engine/engine", ["engine/renderer/Renderer", "engine/input", "engine/profiler", "engine/debug", "engine/collision/CollisionEngine"], function (exports_15, context_15) {
     "use strict";
     var Renderer_1, input_1, profiler_1, debug_2, CollisionEngine_2, UpdateViewsContext, StartData, UpdateData, Engine, ALREADY_STARTED_COMPONENT;
-    var __moduleName = context_17 && context_17.id;
+    var __moduleName = context_15 && context_15.id;
     return {
         setters: [
             function (Renderer_1_1) {
@@ -1045,19 +999,19 @@ System.register("engine/engine", ["engine/renderer/Renderer", "engine/input", "e
                 }
                 return UpdateViewsContext;
             }());
-            exports_17("UpdateViewsContext", UpdateViewsContext);
+            exports_15("UpdateViewsContext", UpdateViewsContext);
             StartData = /** @class */ (function () {
                 function StartData() {
                 }
                 return StartData;
             }());
-            exports_17("StartData", StartData);
+            exports_15("StartData", StartData);
             UpdateData = /** @class */ (function () {
                 function UpdateData() {
                 }
                 return UpdateData;
             }());
-            exports_17("UpdateData", UpdateData);
+            exports_15("UpdateData", UpdateData);
             Engine = /** @class */ (function () {
                 function Engine(game, canvas) {
                     var _this = this;
@@ -1121,17 +1075,17 @@ System.register("engine/engine", ["engine/renderer/Renderer", "engine/input", "e
                 };
                 return Engine;
             }());
-            exports_17("Engine", Engine);
+            exports_15("Engine", Engine);
             ALREADY_STARTED_COMPONENT = function (startData) {
                 throw new Error("start() has already been called on this component");
             };
         }
     };
 });
-System.register("engine/component", [], function (exports_18, context_18) {
+System.register("engine/component", [], function (exports_16, context_16) {
     "use strict";
     var Component;
-    var __moduleName = context_18 && context_18.id;
+    var __moduleName = context_16 && context_16.id;
     return {
         setters: [],
         execute: function () {
@@ -1162,14 +1116,14 @@ System.register("engine/component", [], function (exports_18, context_18) {
                 };
                 return Component;
             }());
-            exports_18("Component", Component);
+            exports_16("Component", Component);
         }
     };
 });
-System.register("engine/Entity", [], function (exports_19, context_19) {
+System.register("engine/Entity", [], function (exports_17, context_17) {
     "use strict";
     var Entity;
-    var __moduleName = context_19 && context_19.id;
+    var __moduleName = context_17 && context_17.id;
     return {
         setters: [],
         execute: function () {
@@ -1213,7 +1167,53 @@ System.register("engine/Entity", [], function (exports_19, context_19) {
                 };
                 return Entity;
             }());
-            exports_19("Entity", Entity);
+            exports_17("Entity", Entity);
+        }
+    };
+});
+System.register("engine/View", ["engine/point"], function (exports_18, context_18) {
+    "use strict";
+    var point_7, View;
+    var __moduleName = context_18 && context_18.id;
+    return {
+        setters: [
+            function (point_7_1) {
+                point_7 = point_7_1;
+            }
+        ],
+        execute: function () {
+            View = /** @class */ (function () {
+                function View(entities, zoom, offset) {
+                    if (entities === void 0) { entities = []; }
+                    if (zoom === void 0) { zoom = 1; }
+                    if (offset === void 0) { offset = new point_7.Point(0, 0); }
+                    this.entities = []; // entities ordered by depth (back to front)
+                    this.zoom = 1; // scale of the view
+                    this.offset = new point_7.Point(0, 0); // transform applied to all entities in the view (scaled by zoom)
+                    this.entities = entities;
+                    this.zoom = zoom;
+                    this.offset = offset;
+                }
+                return View;
+            }());
+            exports_18("View", View);
+        }
+    };
+});
+System.register("engine/game", [], function (exports_19, context_19) {
+    "use strict";
+    var Game;
+    var __moduleName = context_19 && context_19.id;
+    return {
+        setters: [],
+        execute: function () {
+            Game = /** @class */ (function () {
+                function Game() {
+                }
+                Game.prototype.initialize = function () { };
+                return Game;
+            }());
+            exports_19("Game", Game);
         }
     };
 });
@@ -4002,6 +4002,8 @@ System.register("game/ui/HUD", ["game/graphics/Tilesets", "engine/tiles/TileTran
                     // used for determining what should be updated
                     this.lastHealthCount = 0;
                     this.lastMaxHealthCount = 0;
+                    HUD.instance = this;
+                    this.autosaveComponent.enabled = false;
                 }
                 HUD.prototype.getEntities = function (player, screenDimensions) {
                     this.updateHearts(player.health, player.maxHealth);
@@ -4035,6 +4037,11 @@ System.register("game/ui/HUD", ["game/graphics/Tilesets", "engine/tiles/TileTran
                         result.push(new TileComponent_9.TileComponent(empty, new TileTransform_12.TileTransform(this.offset.plus(heartOffset.times(result.length)))));
                     }
                     result.forEach(function (c) { return _this.heartsEntity.addComponent(c); });
+                };
+                HUD.prototype.showSaveIcon = function () {
+                    var _this = this;
+                    this.autosaveComponent.enabled = true;
+                    setTimeout(function () { _this.autosaveComponent.enabled = false; }, 4000);
                 };
                 HUD.prototype.updateAutosave = function (screenDimensions) {
                     this.autosaveComponent.transform.position = screenDimensions.minus(this.offset).minus(new point_28.Point(Tilesets_9.TILE_SIZE, Tilesets_9.TILE_SIZE));
@@ -6711,46 +6718,10 @@ System.register("game/saves/SaveGame", [], function (exports_87, context_87) {
         }
     };
 });
-System.register("game/cutscenes/CutsceneManager", ["engine/Entity"], function (exports_88, context_88) {
-    "use strict";
-    var Entity_16, CutsceneManager;
-    var __moduleName = context_88 && context_88.id;
-    return {
-        setters: [
-            function (Entity_16_1) {
-                Entity_16 = Entity_16_1;
-            }
-        ],
-        execute: function () {
-            CutsceneManager = /** @class */ (function () {
-                function CutsceneManager() {
-                    this.entity = new Entity_16.Entity();
-                    CutsceneManager.instance = this;
-                }
-                /**
-                 * TODO: Handle the case where a cutscene starts, overlapping (this might not matter if we are careful with how we use them)
-                 */
-                CutsceneManager.prototype.startCutscene = function (cutsceneComponent) {
-                    this.entity = new Entity_16.Entity([cutsceneComponent]);
-                };
-                CutsceneManager.prototype.finishCutscene = function () {
-                    this.entity = null;
-                    console.log("cutscene finished");
-                    // TODO autosave
-                };
-                CutsceneManager.prototype.getEntities = function () {
-                    return !!this.entity ? [this.entity] : [];
-                };
-                return CutsceneManager;
-            }());
-            exports_88("CutsceneManager", CutsceneManager);
-        }
-    };
-});
-System.register("game/cutscenes/Camera", ["engine/point", "game/world/MapGenerator", "game/graphics/Tilesets"], function (exports_89, context_89) {
+System.register("game/cutscenes/Camera", ["engine/point", "game/world/MapGenerator", "game/graphics/Tilesets"], function (exports_88, context_88) {
     "use strict";
     var point_47, MapGenerator_1, Tilesets_21, Camera;
-    var __moduleName = context_89 && context_89.id;
+    var __moduleName = context_88 && context_88.id;
     return {
         setters: [
             function (point_47_1) {
@@ -6789,14 +6760,118 @@ System.register("game/cutscenes/Camera", ["engine/point", "game/world/MapGenerat
                 };
                 return Camera;
             }());
-            exports_89("Camera", Camera);
+            exports_88("Camera", Camera);
         }
     };
 });
-System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutscenes/CutscenePlayerController", "game/characters/Player", "engine/point", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/world/LocationManager"], function (exports_90, context_90) {
+System.register("game/SaveManager", ["game/characters/Player", "game/world/LocationManager", "game/ui/UIStateManager", "game/cutscenes/Camera", "game/ui/HUD"], function (exports_89, context_89) {
     "use strict";
-    var component_23, CutscenePlayerController_2, Player_10, point_48, Camera_1, CutsceneManager_1, LocationManager_11, IntroCutscene;
+    var Player_10, LocationManager_11, UIStateManager_7, Camera_1, HUD_2, SaveManager;
+    var __moduleName = context_89 && context_89.id;
+    return {
+        setters: [
+            function (Player_10_1) {
+                Player_10 = Player_10_1;
+            },
+            function (LocationManager_11_1) {
+                LocationManager_11 = LocationManager_11_1;
+            },
+            function (UIStateManager_7_1) {
+                UIStateManager_7 = UIStateManager_7_1;
+            },
+            function (Camera_1_1) {
+                Camera_1 = Camera_1_1;
+            },
+            function (HUD_2_1) {
+                HUD_2 = HUD_2_1;
+            }
+        ],
+        execute: function () {
+            SaveManager = /** @class */ (function () {
+                function SaveManager() {
+                    SaveManager.instance = this;
+                }
+                SaveManager.prototype.save = function () {
+                    if (!Player_10.Player.instance.dude.isAlive) {
+                        console.log("cannot save after death");
+                        return;
+                    }
+                    HUD_2.HUD.instance.showSaveIcon();
+                    var save = {
+                        // storyState: StoryState.INTRODUCTION,
+                        locations: LocationManager_11.LocationManager.instance.save(),
+                        time: new Date().getTime()
+                    };
+                    console.log("saved game");
+                    localStorage.setItem("save", JSON.stringify(save));
+                };
+                /**
+                 * @return true if a save was loaded successfully
+                 */
+                SaveManager.prototype.load = function () {
+                    var blob = localStorage.getItem("save");
+                    if (!blob) {
+                        console.log("no save found");
+                        return false;
+                    }
+                    var save = JSON.parse(blob);
+                    var prettyPrintTimestamp = new Date();
+                    prettyPrintTimestamp.setTime(save.time);
+                    console.log("loaded save from " + prettyPrintTimestamp);
+                    LocationManager_11.LocationManager.load(save.locations);
+                    Camera_1.Camera.instance.focusOnDude(Array.from(LocationManager_11.LocationManager.instance.currentLocation.dudes).filter(function (d) { return d.type === 0 /* PLAYER */; })[0]);
+                    // clear existing UI state by overwriting singleton
+                    new UIStateManager_7.UIStateManager();
+                    return true;
+                };
+                return SaveManager;
+            }());
+            exports_89("SaveManager", SaveManager);
+        }
+    };
+});
+System.register("game/cutscenes/CutsceneManager", ["engine/Entity", "game/SaveManager"], function (exports_90, context_90) {
+    "use strict";
+    var Entity_16, SaveManager_1, CutsceneManager;
     var __moduleName = context_90 && context_90.id;
+    return {
+        setters: [
+            function (Entity_16_1) {
+                Entity_16 = Entity_16_1;
+            },
+            function (SaveManager_1_1) {
+                SaveManager_1 = SaveManager_1_1;
+            }
+        ],
+        execute: function () {
+            CutsceneManager = /** @class */ (function () {
+                function CutsceneManager() {
+                    this.entity = new Entity_16.Entity();
+                    CutsceneManager.instance = this;
+                }
+                /**
+                 * TODO: Handle the case where a cutscene starts, overlapping (this might not matter if we are careful with how we use them)
+                 */
+                CutsceneManager.prototype.startCutscene = function (cutsceneComponent) {
+                    this.entity = new Entity_16.Entity([cutsceneComponent]);
+                };
+                CutsceneManager.prototype.finishCutscene = function () {
+                    this.entity = null;
+                    SaveManager_1.SaveManager.instance.save();
+                };
+                CutsceneManager.prototype.getEntities = function () {
+                    return !!this.entity ? [this.entity] : [];
+                };
+                return CutsceneManager;
+            }());
+            exports_90("CutsceneManager", CutsceneManager);
+        }
+    };
+});
+System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutscenes/CutscenePlayerController", "game/characters/Player", "engine/point", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/world/LocationManager"], function (exports_91, context_91) {
+    "use strict";
+    var component_23, CutscenePlayerController_2, Player_11, point_48, Camera_2, CutsceneManager_1, LocationManager_12, IntroCutscene;
+    var __moduleName = context_91 && context_91.id;
     return {
         setters: [
             function (component_23_1) {
@@ -6805,20 +6880,20 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
             function (CutscenePlayerController_2_1) {
                 CutscenePlayerController_2 = CutscenePlayerController_2_1;
             },
-            function (Player_10_1) {
-                Player_10 = Player_10_1;
+            function (Player_11_1) {
+                Player_11 = Player_11_1;
             },
             function (point_48_1) {
                 point_48 = point_48_1;
             },
-            function (Camera_1_1) {
-                Camera_1 = Camera_1_1;
+            function (Camera_2_1) {
+                Camera_2 = Camera_2_1;
             },
             function (CutsceneManager_1_1) {
                 CutsceneManager_1 = CutsceneManager_1_1;
             },
-            function (LocationManager_11_1) {
-                LocationManager_11 = LocationManager_11_1;
+            function (LocationManager_12_1) {
+                LocationManager_12 = LocationManager_12_1;
             }
         ],
         execute: function () {
@@ -6852,10 +6927,10 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
                         CutscenePlayerController_2.CutscenePlayerController.instance.stopMoving();
                     }, this.STOP_WALKING_IN);
                     setTimeout(function () {
-                        Camera_1.Camera.instance.focusOnPoint(new point_48.Point(0, 0));
+                        Camera_2.Camera.instance.focusOnPoint(new point_48.Point(0, 0));
                     }, this.PAN_TO_DIP);
                     setTimeout(function () {
-                        Camera_1.Camera.instance.focusOnDude(Player_10.Player.instance.dude);
+                        Camera_2.Camera.instance.focusOnDude(Player_11.Player.instance.dude);
                         CutscenePlayerController_2.CutscenePlayerController.instance.disable();
                         _this.waitingForOrcsToDie = true;
                     }, this.PAN_BACK);
@@ -6865,7 +6940,7 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
                         return;
                     }
                     if (!this.orcs) {
-                        this.orcs = Array.from(LocationManager_11.LocationManager.instance.currentLocation.dudes).filter(function (d) { return d.faction === 1 /* ORCS */; });
+                        this.orcs = Array.from(LocationManager_12.LocationManager.instance.currentLocation.dudes).filter(function (d) { return d.faction === 1 /* ORCS */; });
                     }
                     if (!this.orcs.some(function (o) { return o.isAlive; })) {
                         CutsceneManager_1.CutsceneManager.instance.finishCutscene();
@@ -6873,14 +6948,14 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
                 };
                 return IntroCutscene;
             }(component_23.Component));
-            exports_90("IntroCutscene", IntroCutscene);
+            exports_91("IntroCutscene", IntroCutscene);
         }
     };
 });
-System.register("game/quest_game", ["engine/point", "engine/game", "game/world/MapGenerator", "game/graphics/Tilesets", "game/characters/DudeFactory", "game/world/LocationManager", "game/characters/Dude", "engine/collision/CollisionEngine", "game/items/DroppedItem", "game/ui/UIStateManager", "game/world/elements/Elements", "game/world/ground/Ground", "game/characters/Player", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/cutscenes/Camera"], function (exports_91, context_91) {
+System.register("game/quest_game", ["engine/point", "engine/game", "game/world/MapGenerator", "game/graphics/Tilesets", "game/characters/DudeFactory", "game/world/LocationManager", "game/characters/Dude", "engine/collision/CollisionEngine", "game/items/DroppedItem", "game/ui/UIStateManager", "game/world/elements/Elements", "game/world/ground/Ground", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/cutscenes/Camera", "game/SaveManager"], function (exports_92, context_92) {
     "use strict";
-    var point_49, game_1, MapGenerator_2, Tilesets_22, DudeFactory_2, LocationManager_12, Dude_8, CollisionEngine_4, DroppedItem_2, UIStateManager_7, Elements_3, Ground_4, Player_11, CutsceneManager_2, IntroCutscene_1, Camera_2, ZOOM, QuestGame;
-    var __moduleName = context_91 && context_91.id;
+    var point_49, game_1, MapGenerator_2, Tilesets_22, DudeFactory_2, LocationManager_13, Dude_8, CollisionEngine_4, DroppedItem_2, UIStateManager_8, Elements_3, Ground_4, CutsceneManager_2, IntroCutscene_1, Camera_3, SaveManager_2, ZOOM, QuestGame;
+    var __moduleName = context_92 && context_92.id;
     return {
         setters: [
             function (point_49_1) {
@@ -6898,8 +6973,8 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
             function (DudeFactory_2_1) {
                 DudeFactory_2 = DudeFactory_2_1;
             },
-            function (LocationManager_12_1) {
-                LocationManager_12 = LocationManager_12_1;
+            function (LocationManager_13_1) {
+                LocationManager_13 = LocationManager_13_1;
             },
             function (Dude_8_1) {
                 Dude_8 = Dude_8_1;
@@ -6910,8 +6985,8 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
             function (DroppedItem_2_1) {
                 DroppedItem_2 = DroppedItem_2_1;
             },
-            function (UIStateManager_7_1) {
-                UIStateManager_7 = UIStateManager_7_1;
+            function (UIStateManager_8_1) {
+                UIStateManager_8 = UIStateManager_8_1;
             },
             function (Elements_3_1) {
                 Elements_3 = Elements_3_1;
@@ -6919,17 +6994,17 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
             function (Ground_4_1) {
                 Ground_4 = Ground_4_1;
             },
-            function (Player_11_1) {
-                Player_11 = Player_11_1;
-            },
             function (CutsceneManager_2_1) {
                 CutsceneManager_2 = CutsceneManager_2_1;
             },
             function (IntroCutscene_1_1) {
                 IntroCutscene_1 = IntroCutscene_1_1;
             },
-            function (Camera_2_1) {
-                Camera_2 = Camera_2_1;
+            function (Camera_3_1) {
+                Camera_3 = Camera_3_1;
+            },
+            function (SaveManager_2_1) {
+                SaveManager_2 = SaveManager_2_1;
             }
         ],
         execute: function () {
@@ -6937,10 +7012,7 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
             QuestGame = /** @class */ (function (_super) {
                 __extends(QuestGame, _super);
                 function QuestGame() {
-                    var _this = _super !== null && _super.apply(this, arguments) || this;
-                    _this.tilesets = new Tilesets_22.Tilesets();
-                    _this.uiStateManager = new UIStateManager_7.UIStateManager();
-                    return _this;
+                    return _super !== null && _super.apply(this, arguments) || this;
                 }
                 QuestGame.prototype.initialize = function () {
                     CollisionEngine_4.CollisionEngine.instance.setCollisionMatrix(new Map([
@@ -6948,21 +7020,24 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
                         [Dude_8.Dude.COLLISION_LAYER, [Dude_8.Dude.COLLISION_LAYER]],
                     ]));
                     // Initialize singletons
+                    new Tilesets_22.Tilesets();
+                    new UIStateManager_8.UIStateManager();
+                    new SaveManager_2.SaveManager();
                     new DudeFactory_2.DudeFactory();
                     new Elements_3.Elements();
                     new Ground_4.Ground();
-                    new Camera_2.Camera();
+                    new Camera_3.Camera();
                     new CutsceneManager_2.CutsceneManager();
-                    var newGame = true; //!this.load()
+                    new LocationManager_13.LocationManager();
+                    var newGame = !SaveManager_2.SaveManager.instance.load();
                     if (newGame) {
-                        this.locationManager = new LocationManager_12.LocationManager();
                         // World must be initialized before we do anything else
                         new MapGenerator_2.MapGenerator().doIt();
                         var playerStartPos = new point_49.Point(1, 1).times(MapGenerator_2.MapGenerator.MAP_SIZE / 2 * Tilesets_22.TILE_SIZE)
                             .plusY(-Tilesets_22.TILE_SIZE * 10)
                             .plusX(Tilesets_22.TILE_SIZE * 2);
-                        this.player = DudeFactory_2.DudeFactory.instance.new(0 /* PLAYER */, playerStartPos);
-                        Camera_2.Camera.instance.focusOnDude(this.player);
+                        var playerDude = DudeFactory_2.DudeFactory.instance.new(0 /* PLAYER */, playerStartPos);
+                        Camera_3.Camera.instance.focusOnDude(playerDude);
                         DudeFactory_2.DudeFactory.instance.new(1 /* DIP */, new point_49.Point(-10, -10));
                         CutsceneManager_2.CutsceneManager.instance.startCutscene(new IntroCutscene_1.IntroCutscene());
                     }
@@ -6986,62 +7061,29 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
                 };
                 QuestGame.prototype.updateViews = function (updateViewsContext) {
                     var dimensions = updateViewsContext.dimensions.div(ZOOM);
-                    var cameraGoal = Camera_2.Camera.instance.getGoalPosition(dimensions);
+                    var cameraGoal = Camera_3.Camera.instance.getGoalPosition(dimensions);
                     this.gameEntityView = {
                         zoom: ZOOM,
                         offset: !this.gameEntityView ? cameraGoal : this.gameEntityView.offset.lerp(.0018 * updateViewsContext.elapsedTimeMillis, cameraGoal),
-                        entities: this.locationManager.currentLocation.getEntities()
+                        entities: LocationManager_13.LocationManager.instance.currentLocation.getEntities()
                             .concat(CutsceneManager_2.CutsceneManager.instance.getEntities())
                     };
                     this.uiView = {
                         zoom: ZOOM,
                         offset: point_49.Point.ZERO,
-                        entities: this.uiStateManager.get(dimensions)
+                        entities: UIStateManager_8.UIStateManager.instance.get(dimensions)
                     };
-                };
-                QuestGame.prototype.save = function () {
-                    if (!Player_11.Player.instance.dude.isAlive) {
-                        console.log("cannot save after death");
-                        return;
-                    }
-                    var save = {
-                        // storyState: StoryState.INTRODUCTION,
-                        locations: this.locationManager.save(),
-                        time: new Date().getTime()
-                    };
-                    console.log("saved game");
-                    localStorage.setItem("save", JSON.stringify(save));
-                };
-                /**
-                 * @return true if a save was loaded successfully
-                 */
-                QuestGame.prototype.load = function () {
-                    var blob = localStorage.getItem("save");
-                    if (!blob) {
-                        console.log("no save found");
-                        return false;
-                    }
-                    var save = JSON.parse(blob);
-                    var prettyPrintTimestamp = new Date();
-                    prettyPrintTimestamp.setTime(save.time);
-                    console.log("loaded save from " + prettyPrintTimestamp);
-                    this.locationManager = LocationManager_12.LocationManager.load(save.locations);
-                    this.player = Array.from(this.locationManager.currentLocation.dudes)
-                        .filter(function (d) { return !!d.entity.getComponent(Player_11.Player); })
-                        .shift();
-                    this.uiStateManager = new UIStateManager_7.UIStateManager();
-                    return true;
                 };
                 return QuestGame;
             }(game_1.Game));
-            exports_91("QuestGame", QuestGame);
+            exports_92("QuestGame", QuestGame);
         }
     };
 });
-System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tilesets", "engine/Assets"], function (exports_92, context_92) {
+System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tilesets", "engine/Assets"], function (exports_93, context_93) {
     "use strict";
     var quest_game_1, engine_1, Tilesets_23, Assets_4;
-    var __moduleName = context_92 && context_92.id;
+    var __moduleName = context_93 && context_93.id;
     return {
         setters: [
             function (quest_game_1_1) {
@@ -7064,10 +7106,10 @@ System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tiles
         }
     };
 });
-System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"], function (exports_93, context_93) {
+System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"], function (exports_94, context_94) {
     "use strict";
     var component_24, utils_6, Clickable;
-    var __moduleName = context_93 && context_93.id;
+    var __moduleName = context_94 && context_94.id;
     return {
         setters: [
             function (component_24_1) {
@@ -7094,14 +7136,14 @@ System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"]
                 };
                 return Clickable;
             }(component_24.Component));
-            exports_93("Clickable", Clickable);
+            exports_94("Clickable", Clickable);
         }
     };
 });
-System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uuid"], function (exports_94, context_94) {
+System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uuid"], function (exports_95, context_95) {
     "use strict";
     var profiler_2, uuid_2, serialize, buildObject;
-    var __moduleName = context_94 && context_94.id;
+    var __moduleName = context_95 && context_95.id;
     return {
         setters: [
             function (profiler_2_1) {
@@ -7115,7 +7157,7 @@ System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uu
             /**
              * Serializes an object and removes all circular references
              */
-            exports_94("serialize", serialize = function (object) {
+            exports_95("serialize", serialize = function (object) {
                 var resultObject = {}; // maps string->object with subobjects as uuids
                 var topLevelUuidMap = {}; // maps string->object with subobjects as uuids
                 var objectUuidMap = new Map(); // maps unique object ref to uuid
@@ -7161,10 +7203,10 @@ System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uu
         }
     };
 });
-System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point"], function (exports_95, context_95) {
+System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point"], function (exports_96, context_96) {
     "use strict";
     var component_25, Tilesets_24, TileTransform_20, point_50, StringTiles;
-    var __moduleName = context_95 && context_95.id;
+    var __moduleName = context_96 && context_96.id;
     return {
         setters: [
             function (component_25_1) {
@@ -7207,23 +7249,23 @@ System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tiles
                 };
                 return StringTiles;
             }(component_25.Component));
-            exports_95("StringTiles", StringTiles);
+            exports_96("StringTiles", StringTiles);
         }
     };
 });
-System.register("game/world/interior/Tent", ["game/world/LocationManager"], function (exports_96, context_96) {
+System.register("game/world/interior/Tent", ["game/world/LocationManager"], function (exports_97, context_97) {
     "use strict";
-    var LocationManager_13, makeTentInterior;
-    var __moduleName = context_96 && context_96.id;
+    var LocationManager_14, makeTentInterior;
+    var __moduleName = context_97 && context_97.id;
     return {
         setters: [
-            function (LocationManager_13_1) {
-                LocationManager_13 = LocationManager_13_1;
+            function (LocationManager_14_1) {
+                LocationManager_14 = LocationManager_14_1;
             }
         ],
         execute: function () {
-            exports_96("makeTentInterior", makeTentInterior = function () {
-                var l = LocationManager_13.LocationManager.instance.newLocation();
+            exports_97("makeTentInterior", makeTentInterior = function () {
+                var l = LocationManager_14.LocationManager.instance.newLocation();
                 return l;
             });
         }

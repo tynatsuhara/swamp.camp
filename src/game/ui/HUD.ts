@@ -8,6 +8,8 @@ import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
 
 export class HUD {
 
+    static instance: HUD
+
     private heartsEntity: Entity = new Entity()
     private autosaveComponent: AnimatedTileComponent = new Entity().addComponent(
         new AnimatedTileComponent([
@@ -19,6 +21,12 @@ export class HUD {
     // used for determining what should be updated
     private lastHealthCount = 0
     private lastMaxHealthCount = 0
+
+    constructor() {
+        HUD.instance = this
+
+        this.autosaveComponent.enabled = false
+    }
 
     getEntities(player: Dude, screenDimensions: Point): Entity[] {
         this.updateHearts(player.health, player.maxHealth)
@@ -58,6 +66,11 @@ export class HUD {
         }
 
         result.forEach(c => this.heartsEntity.addComponent(c))
+    }
+
+    showSaveIcon() {
+        this.autosaveComponent.enabled = true
+        setTimeout(() => { this.autosaveComponent.enabled = false }, 4000);
     }
 
     private updateAutosave(screenDimensions: Point) {
