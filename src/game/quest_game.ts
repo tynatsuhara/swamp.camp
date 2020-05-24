@@ -87,11 +87,10 @@ export class QuestGame extends Game {
 
     updateViews(updateViewsContext: UpdateViewsContext) {
         const dimensions = updateViewsContext.dimensions.div(ZOOM)
-        const cameraGoal = Camera.instance.getGoalPosition(dimensions)
 
         this.gameEntityView = { 
             zoom: ZOOM,
-            offset: !this.gameEntityView ? cameraGoal : this.gameEntityView.offset.lerp(.0018 * updateViewsContext.elapsedTimeMillis, cameraGoal),
+            offset: Camera.instance.updatePosition(dimensions, updateViewsContext.elapsedTimeMillis),
             entities: LocationManager.instance.currentLocation.getEntities()
                     .concat(CutsceneManager.instance.getEntities())
         }

@@ -44,7 +44,7 @@ export class PlaceElementDisplay extends Component {
     startPlacing(element: ElementType, successFn: () => void) {
         this.element = element
         this.successFn = successFn
-        this.dimensions = Elements.instance.dimensions(element)
+        this.dimensions = Elements.instance.dimensionsForPlacing(element)
         this.placingFrame = Player.instance.entity.addComponent(new PlaceElementFrame(this.dimensions))
     }
 

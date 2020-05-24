@@ -9,6 +9,7 @@ import { Interactable } from "./Interactable"
 import { LocationManager } from "../LocationManager"
 import { ElementComponent } from "./ElementComponent"
 import { ElementType } from "./Elements"
+import { ElementUtils } from "./ElementUtils"
 
 export const enum TentColor {
     RED = "red",
@@ -27,11 +28,11 @@ export const makeTent = (wl: WorldLocation, pos: Point, data: object): ElementCo
     // }
     
     const depth = (pos.y + 1) * TILE_SIZE + /* prevent clipping */ 5
-    addTile(wl, e, `${color}tentNW`, pos, depth)
-    addTile(wl, e, `${color}tentNE`, pos.plus(new Point(1, 0)), depth)
-    addTile(wl, e, `${color}tentSW`, pos.plus(new Point(0, 1)), depth)
-    addTile(wl, e, `${color}tentSE`, pos.plus(new Point(1, 1)), depth)
-    e.addComponent(new BoxCollider(pos.plus(new Point(0, 1)).times(TILE_SIZE), new Point(TILE_SIZE*2, TILE_SIZE)))
+    addTile(wl, e, `${color}tentNW`, pos.plusX(1), depth)
+    addTile(wl, e, `${color}tentNE`, pos.plus(new Point(2, 0)), depth)
+    addTile(wl, e, `${color}tentSW`, pos.plus(new Point(1, 1)), depth)
+    addTile(wl, e, `${color}tentSE`, pos.plus(new Point(2, 1)), depth)
+    e.addComponent(new BoxCollider(pos.plus(new Point(1, 1)).times(TILE_SIZE), new Point(TILE_SIZE*2, TILE_SIZE)))
 
     // e.addComponent(new Interactable(pos.plus(new Point(1, 2)).times(TILE_SIZE), () => {
     //     wl.manager.transition(destinationUUID)
@@ -39,7 +40,7 @@ export const makeTent = (wl: WorldLocation, pos: Point, data: object): ElementCo
 
     return e.addComponent(new ElementComponent(
         ElementType.TENT, 
-        [pos, pos.plusX(1), pos.plusY(1), new Point(pos.x+1, pos.y+1)], 
+        ElementUtils.rectPoints(pos, new Point(4, 3)),
         () => { return { destinationUUID, color } }
     ))
 }

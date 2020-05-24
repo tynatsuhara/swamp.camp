@@ -3,6 +3,7 @@ import { Item } from "../items/Items"
 import { Controls } from "../Controls"
 import { LocationManager } from "../world/LocationManager"
 import { ElementType } from "../world/elements/Elements"
+import { TILE_SIZE } from "../graphics/Tilesets"
 
 export class DialogueInstance {
     readonly lines: string[]
@@ -71,13 +72,13 @@ const DIALOGUE_MAP: { [key: number]: () => DialogueInstance } = {
     [Dialogue.DIP_3]: () => part(["Swamp Lizard butt is an Orcish delicacy. My species has been hunted to extinction by those savages. I'm the only one left."], () => new NextDialogue(Dialogue.DIP_BEFRIEND)),
     
     [Dialogue.DIP_BEFRIEND]: () => part([
+        "You know, this is a very dangerous place. It's tough to survive without someone watching your back.",
         "How about I help you set up camp? I know these woods better than anyone.",
-        "This is a dangerous place. It's tough to survive without someone watching your back.",
         "I'll put together a tent for you, if you collect rocks for a campfire.",
     ], () => new NextDialogue(Dialogue.DIP_MAKE_CAMPFIRE, false)),
     
     [Dialogue.DIP_MAKE_CAMPFIRE]: () => {
-        if (Player.instance.dude.inventory.getItemCount(Item.ROCK) > ROCKS_NEEDED_FOR_CAMPFIRE) {
+        if (Player.instance.dude.inventory.getItemCount(Item.ROCK) >= ROCKS_NEEDED_FOR_CAMPFIRE) {
             return d(
                 [`It looks like you have enough rocks. Can I have ${ROCKS_NEEDED_FOR_CAMPFIRE} to make a campfire?`],
                 new DialogueOption("<Give rocks>", () => {
@@ -98,11 +99,18 @@ const DIALOGUE_MAP: { [key: number]: () => DialogueInstance } = {
 
     [Dialogue.DIP_CAMPFIRE_DONE]: () => {
         const campfires = LocationManager.instance.currentLocation.elements.values().filter(e => e.type === ElementType.CAMPFIRE)
+        const dipTent = LocationManager.instance.currentLocation.elements.values().filter(e => e.type === ElementType.TENT)[0]
         if (campfires.length > 0) {
             Player.instance.dude.inventory.addItem(Item.TENT)
-            const lines = ["Here, I've finished putting together your tent."]
+            console.log(dipTent.occupiedPoints[0].distanceTo(campfires[0].occupiedPoints[0]))
+            const lines = [
+                dipTent.occupiedPoints[0].distanceTo(campfires[0].occupiedPoints[0]) < 5
+                        ? "That should keep up warm tonight!"
+                        : "Well, the fire is a bit far from my tent, but that's okay!",
+                "Here, I've finished putting together your tent. Find a nice spot and plop it down!"
+            ]
             if (!campfires[0].save()["on"]) {
-                lines.push(`By the way, you can light the fire by standing close to it and pressing [${String.fromCharCode(Controls.interactButton)}].`)
+                lines.push(`By the way, you can light the fire by standing close to it and pressing [${Controls.keyString(Controls.interactButton)}].`)
             }
             return d(lines)
         } else {

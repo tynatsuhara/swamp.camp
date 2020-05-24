@@ -72,7 +72,7 @@ export class InventoryDisplay extends Component {
             const name = ITEM_METADATA_MAP[stack.item].displayName
             const count = stack.count > 1 ? ' x' + stack.count : ''
             const placeableElement = ITEM_METADATA_MAP[stack.item].element
-            const placePrompt = !!placeableElement ? ` [${String.fromCharCode(Controls.placeElementButton)} to place]` : ''
+            const placePrompt = !!placeableElement ? ` [${Controls.keyString(Controls.placeElementButton)} to place]` : ''
             this.tooltip.say(`${name}${count}${placePrompt}`)
 
             if (!!placeableElement && updateData.input.isKeyDown(Controls.placeElementButton)) {

@@ -33,7 +33,7 @@ export class Elements {
     private readonly ELEMENT_FUNCTION_MAP: { [key: number]: [(wl: WorldLocation, pos: Point, data: object) => ElementComponent , Point] } = {
        [ElementType.TREE]: [makeTree, new Point(1, 2)],
        [ElementType.ROCK]: [makeRock, new Point(1, 1)],
-       [ElementType.TENT]: [makeTent, new Point(2, 2)],
+       [ElementType.TENT]: [makeTent, new Point(4, 3)],
        [ElementType.CAMPFIRE]: [makeCampfire, new Point(1, 1)]
    }
 
@@ -41,8 +41,7 @@ export class Elements {
         return this.ELEMENT_FUNCTION_MAP[type][0](wl, pos, data)
     }
 
-    dimensions(type: ElementType) {
-        // TODO this is a pretty bad hack and will break if elements have dynamic sizing or if they try
+    dimensionsForPlacing(type: ElementType) {
         return this.ELEMENT_FUNCTION_MAP[type][1]
     }
 
