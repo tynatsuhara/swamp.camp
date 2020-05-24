@@ -13,7 +13,6 @@ export class PlaceElementDisplay extends Component {
     static instance: PlaceElementDisplay
 
     private e: Entity = new Entity([this])
-    private displayEntity: Entity
 
     private element: ElementType
     private dimensions: Point
@@ -46,9 +45,6 @@ export class PlaceElementDisplay extends Component {
         this.element = element
         this.successFn = successFn
         this.dimensions = Elements.instance.dimensions(element)
-        if (this.dimensions.x < 2 || this.dimensions.y < 2) {
-            throw new Error("haven't implemented small element placing yet :(")
-        }
         this.placingFrame = Player.instance.entity.addComponent(new PlaceElementFrame(this.dimensions))
     }
 

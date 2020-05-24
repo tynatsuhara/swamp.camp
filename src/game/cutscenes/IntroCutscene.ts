@@ -7,14 +7,20 @@ import { MapGenerator } from "../world/MapGenerator"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Camera } from "./Camera"
 import { CutsceneManager } from "./CutsceneManager"
+import { Dude } from "../characters/Dude"
+import { LocationManager } from "../world/LocationManager"
+import { DudeFaction } from "../characters/DudeFactory"
 
 // This is the cutscene that plays when the player arrives in the new land
 export class IntroCutscene extends Component {
 
     // durations in ms
-    private readonly STOP_WALKING_IN = 1500
+    private readonly STOP_WALKING_IN = 2000
     private readonly PAN_TO_DIP = this.STOP_WALKING_IN + 1000
     private readonly PAN_BACK = this.PAN_TO_DIP + 5000
+
+    private waitingForOrcsToDie = false
+    private orcs: Dude[]
 
     /**
      * 1. position player in corner
@@ -42,11 +48,21 @@ export class IntroCutscene extends Component {
         setTimeout(() => { 
             Camera.instance.focusOnDude(Player.instance.dude)
             CutscenePlayerController.instance.disable()
-            CutsceneManager.instance.finishCutscene()
+            this.waitingForOrcsToDie = true
         }, this.PAN_BACK)
     }
 
     update(updateData: UpdateData) {
+        if (!this.waitingForOrcsToDie) {
+            return
+        }
         
+        if (!this.orcs) {
+            this.orcs = Array.from(LocationManager.instance.currentLocation.dudes).filter(d => d.faction === DudeFaction.ORCS)
+        }
+
+        if (!this.orcs.some(o => o.isAlive)) {
+            CutsceneManager.instance.finishCutscene()
+        }
     }
 }

@@ -30,6 +30,8 @@ export class OutdoorTileset extends SingleFileTileLoader {
             ["dialogueBG", new Point(6, 28)],
             ["placingElementFrame_good", new Point(3, 28)],
             ["placingElementFrame_bad", new Point(0, 28)],
+            ["placingElementFrame_small_good", new Point(0, 25)],
+            ["placingElementFrame_small_bad", new Point(1, 25)],
         ]))
     }
 }

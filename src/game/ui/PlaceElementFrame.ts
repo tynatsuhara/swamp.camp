@@ -8,6 +8,7 @@ import { LocationManager } from "../world/LocationManager"
 import { UpdateData } from "../../engine/engine"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
 import { rectContains } from "../../engine/util/utils"
+import { TileTransform } from "../../engine/tiles/TileTransform"
 
 /**
  * This is a separate component which exists in the game view instead of the UI view, since it aligns with world tile coordinates
@@ -21,22 +22,28 @@ export class PlaceElementFrame extends Component {
     constructor(dimensions: Point) {
         super()
         this.dimensions = dimensions
+        if ((this.dimensions.x === 1 && this.dimensions.y !== 1) || (this.dimensions.y === 1 && this.dimensions.x !== 1)) {
+            throw new Error("haven't implemented small element placing yet :(")
+        }
     }
 
     start() {
-        this.goodTiles = this.entity.addComponents(makeNineSliceComponents(
-            Tilesets.instance.outdoorTiles.getNineSlice("placingElementFrame_good"), 
-            new Point(0, 0),
-            this.dimensions
-        ))
+        this.goodTiles = this.entity.addComponents(this.getTiles("good"))
         this.goodTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
         
-        this.badTiles = this.entity.addComponents(makeNineSliceComponents(
-            Tilesets.instance.outdoorTiles.getNineSlice("placingElementFrame_bad"), 
+        this.badTiles = this.entity.addComponents(this.getTiles("bad"))
+        this.badTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
+    }
+
+    private getTiles(suffix: string): TileComponent[] {
+        if (this.dimensions.x === 1 || this.dimensions.y ===1) {
+            return [Tilesets.instance.outdoorTiles.getTileSource(`placingElementFrame_small_${suffix}`).toComponent(new TileTransform())]
+        }
+        return makeNineSliceComponents(
+            Tilesets.instance.outdoorTiles.getNineSlice(`placingElementFrame_${suffix}`), 
             new Point(0, 0),
             this.dimensions
-        ))
-        this.badTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
+        )
     }
 
     update(updateData: UpdateData) {

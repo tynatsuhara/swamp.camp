@@ -19,6 +19,7 @@ export class CutsceneManager {
 
     finishCutscene() {
         this.entity = null
+        console.log("cutscene finished")
         // TODO autosave
     }
 

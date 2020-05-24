@@ -63,11 +63,6 @@ export class QuestGame extends Game {
             Camera.instance.focusOnDude(this.player)
             DudeFactory.instance.new(DudeType.DIP, new Point(-10, -10))
             CutsceneManager.instance.startCutscene(new IntroCutscene())
-
-
-
-            // TEMP
-            this.player.inventory.addItem(Item.TENT)
         }
     }
 

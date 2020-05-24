@@ -14,6 +14,7 @@ export class ItemMetadata {
     readonly stackLimit: number
     readonly element: ElementType
 
+    // TODO maybe make this a builder
     constructor(
         displayName: string,
         droppedIconSupplier: () => TileSource,
@@ -34,6 +35,7 @@ export const enum Item {
     ROCK,
     WOOD,
     TENT,
+    CAMPFIRE,
 }
 
 // Data that doesn't get serialized (TODO make builder pattern)
@@ -61,6 +63,13 @@ export const ITEM_METADATA_MAP = {
         () => Tilesets.instance.oneBit.getTileSource("tent"), 
         1,
         ElementType.TENT
+    ),
+    [Item.CAMPFIRE]: new ItemMetadata(
+        "Campfire",
+        () => null,
+        () => Tilesets.instance.oneBit.getTileSource("campfire"), 
+        1,
+        ElementType.CAMPFIRE
     ),
 }
 

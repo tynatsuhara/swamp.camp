@@ -12,8 +12,7 @@ import { Shield } from "./Shield"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Interactable } from "../world/elements/Interactable"
 import { DudeSaveState } from "../saves/DudeSaveState"
-import { DialogueInstance, Dialogue } from "./Dialogue"
-import { UIStateManager } from "../ui/UIStateManager"
+import { Dialogue } from "./Dialogue"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
 
 export class Dude extends Component {

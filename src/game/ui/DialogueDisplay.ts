@@ -1,15 +1,13 @@
-import { DialogueInstance, Dialogue, getDialogue } from "../characters/Dialogue"
+import { DialogueInstance, getDialogue, NextDialogue } from "../characters/Dialogue"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
-import { makeNineSliceComponents, makeStretchedNineSliceComponents } from "../../engine/tiles/NineSlice"
+import { makeStretchedNineSliceComponents } from "../../engine/tiles/NineSlice"
 import { Point } from "../../engine/point"
 import { Component } from "../../engine/component"
 import { UpdateData } from "../../engine/engine"
 import { Entity } from "../../engine/Entity"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
-import { TextRender } from "../../engine/renderer/TextRender"
-import { TEXT_FONT, TEXT_SIZE, TextAlign, formatText, TEXT_PIXEL_WIDTH } from "./Text"
+import { TextAlign, formatText, TEXT_PIXEL_WIDTH } from "./Text"
 import { Color } from "./Color"
-import { RenderMethod } from "../../engine/renderer/RenderMethod"
 import { Controls } from "../Controls"
 import { UIStateManager } from "./UIStateManager"
 import { TextButton } from "./TextButton"
@@ -62,7 +60,7 @@ export class DialogueDisplay extends Component {
         }
 
         if (this.lineIndex === this.dialogue.lines.length) {
-            this.completeDudeDialogue()
+            this.completeDudeDialogue(!this.dialogue.next ? null : this.dialogue.next())
             return
         }
 
@@ -86,9 +84,13 @@ export class DialogueDisplay extends Component {
         }
     }
 
-    private completeDudeDialogue() {
-        this.dude.dialogue = null
-        this.close()
+    private completeDudeDialogue(next: NextDialogue) {
+        this.dude.dialogue = next?.dialogue ?? null
+        if (next?.open) {
+            this.startDialogue(this.dude)
+        } else {
+            this.close()
+        }
     }
 
     close() {
@@ -162,7 +164,7 @@ export class DialogueDisplay extends Component {
 
     private renderOptions(screenDimensions: Point) {
         const options = this.dialogue.options
-        const longestOption = Math.max(...options.map(o => o[0].length))
+        const longestOption = Math.max(...options.map(o => o.text.length))
 
         const marginTop = 13
         const marginBottom = 12
@@ -188,14 +190,13 @@ export class DialogueDisplay extends Component {
         options.forEach((option, i) => this.displayEntity.addComponent(
             new TextButton(
                 topLeft.plus(new Point(marginSide, marginTop + i * (TILE_SIZE + buttonPadding))),
-                option[0],
+                option.text,
                 () => {
-                    const buttonFnResult = option[1]()
+                    const buttonFnResult = option.next()
                     if (!!buttonFnResult) {
-                        this.dude.dialogue = buttonFnResult
-                        this.startDialogue(this.dude)
+                        this.completeDudeDialogue(buttonFnResult)
                     } else {
-                        this.completeDudeDialogue()
+                        this.completeDudeDialogue(null)
                     }
                 }
             )

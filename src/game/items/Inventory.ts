@@ -46,6 +46,30 @@ export class Inventory {
         return false
     }
 
+    removeItem(item: Item, count: number = 1) {
+        const currentCount = this.getItemCount(item)
+        if (currentCount < count) {
+            throw new Error("inventory cannot go negative")
+        }
+        this.countMap.set(item, currentCount-count)
+
+        for (let i = 0; i < this.inventory.length; i++) {
+            const slotValue = this.inventory[i]
+            if (slotValue?.item === item) {
+                while (slotValue.count > 0 && count > 0) {
+                    count--
+                    slotValue.count--
+                }
+                if (slotValue.count === 0) {
+                    this.inventory[i] = null
+                }
+                if (count === 0) {
+                    return
+                }
+            }
+        }
+    }
+
     /**
      * Returns the total amount of an item in the inventory
      */

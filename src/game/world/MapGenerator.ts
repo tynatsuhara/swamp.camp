@@ -21,10 +21,6 @@ export class MapGenerator {
         
         // spawn tent
         this.location.addWorldElement(ElementType.TENT, new Point(5, 5), { destinationUUID: tentLocation.uuid, color: TentColor.RED })
-
-        // spawn campfire
-        const campfirePos = new Point(3, 9)
-        this.location.addWorldElement(ElementType.CAMPFIRE, campfirePos)
         
         // make the ground
         this.renderPath(new Point(-10, -10), new Point(10, 10), 2)

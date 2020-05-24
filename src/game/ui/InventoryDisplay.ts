@@ -52,7 +52,7 @@ export class InventoryDisplay extends Component {
     update(updateData: UpdateData) {
         const inv = this.inventory().inventory
 
-        const pressI = updateData.input.isKeyDown(InputKey.I)
+        const pressI = updateData.input.isKeyDown(Controls.inventoryButton)
         const pressEsc = updateData.input.isKeyDown(InputKey.ESC)
 
         if (this.isOpen && (pressI || pressEsc)) {
