@@ -52,7 +52,7 @@ export class Weapon extends Component {
     // TODO find a better place for this?
     static damageInFrontOfDude(dude: Dude, attackDistance: number) {
         Array.from(LocationManager.instance.currentLocation.dudes)
-                .filter(d => !!d && d !== dude)
+                .filter(d => !!d && d !== dude && d.faction !== dude.faction)
                 .filter(d => dude.isFacing(d.standingPosition))
                 .filter(d => d.standingPosition.distanceTo(dude.standingPosition) < attackDistance)
                 .forEach(d => d.damage(1, d.standingPosition.minus(dude.standingPosition), 30))

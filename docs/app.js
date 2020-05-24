@@ -2746,7 +2746,7 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                 // TODO find a better place for this?
                 Weapon.damageInFrontOfDude = function (dude, attackDistance) {
                     Array.from(LocationManager_1.LocationManager.instance.currentLocation.dudes)
-                        .filter(function (d) { return !!d && d !== dude; })
+                        .filter(function (d) { return !!d && d !== dude && d.faction !== dude.faction; })
                         .filter(function (d) { return dude.isFacing(d.standingPosition); })
                         .filter(function (d) { return d.standingPosition.distanceTo(dude.standingPosition) < attackDistance; })
                         .forEach(function (d) { return d.damage(1, d.standingPosition.minus(dude.standingPosition), 30); });
