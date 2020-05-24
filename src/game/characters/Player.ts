@@ -9,6 +9,7 @@ import { Hittable } from "../world/elements/Hittable"
 import { HUD } from "../ui/HUD"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Controls } from "../Controls"
+import { Lists } from "../../engine/util/Lists"
 
 export class Player extends Component {
 
@@ -103,19 +104,10 @@ export class Player extends Component {
         const possibilities = updateData.view.entities
                 .map(e => e.getComponent(Interactable))
                 .filter(e => e?.enabled)
-                .filter(e => this.dude.animation.transform.mirrorX === (e.position.x < interactCenter.x))  // interactables the dude is facing
-        
-        let closestDist = Number.MAX_SAFE_INTEGER
-        let closest: Interactable
-        for (const i of possibilities) {
-            const dist = i.position.distanceTo(interactCenter)
-            if (dist < interactDistance && dist < closestDist) {
-                closestDist = dist
-                closest = i
-            }
-        }
+                .filter(e => this.dude.isFacing(e.position))  // interactables the dude is facing
+                .filter(e => e.position.distanceTo(interactCenter) < interactDistance)
 
-        closest?.interact()
+        Lists.minBy(possibilities, e => e.position.distanceTo(interactCenter))?.interact()
     }
 
     // for trees and rocks

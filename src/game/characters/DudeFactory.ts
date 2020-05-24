@@ -11,6 +11,13 @@ import { Inventory } from "../items/Inventory"
 import { Dialogue } from "./Dialogue"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 
+export const enum DudeFaction {
+    VILLAGERS,
+    ORCS,
+    UNDEAD,
+    DEMONS,
+}
+
 export const enum DudeType {
     PLAYER,
     DIP,
@@ -47,6 +54,7 @@ export class DudeFactory {
         pos: Point,
         saveState: DudeSaveState = null
     ): Dude {
+        let faction: DudeFaction = DudeFaction.VILLAGERS
         let animationName: string
         let weapon: string = null
         let shield: string = null
@@ -81,6 +89,7 @@ export class DudeFactory {
                 break
             }
             case DudeType.ORC_WARRIOR: {
+                faction = DudeFaction.ORCS
                 animationName = "orc_warrior"
                 weapon = "weapon_baton_with_spikes"
                 additionalComponents = [new Enemy()]
@@ -98,6 +107,7 @@ export class DudeFactory {
         
         const d = new Dude(
             type, 
+            faction,
             animationName, 
             pos, 
             saveState?.weapon ?? weapon, 

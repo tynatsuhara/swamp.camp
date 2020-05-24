@@ -7,7 +7,7 @@ import { Tilesets } from "../graphics/Tilesets"
 import { Weapon } from "./Weapon"
 import { Inventory } from "../items/Inventory"
 import { spawnItem, Item } from "../items/Items"
-import { DudeType } from "./DudeFactory"
+import { DudeType, DudeFaction } from "./DudeFactory"
 import { Shield } from "./Shield"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Interactable } from "../world/elements/Interactable"
@@ -21,6 +21,7 @@ export class Dude extends Component {
     static readonly COLLISION_LAYER = "dube"
     
     readonly type: DudeType
+    readonly faction: DudeFaction
     readonly inventory: Inventory
     readonly maxHealth: number
     private _health: number
@@ -57,6 +58,7 @@ export class Dude extends Component {
 
     constructor(
         type: DudeType,
+        faction: DudeFaction,
         characterAnimName: string,
         position: Point,
         weaponId: string,
@@ -69,6 +71,7 @@ export class Dude extends Component {
     ) {
         super()
         this.type = type
+        this.faction = faction
         this._position = position
         this.weaponId = weaponId
         this.shieldId = shieldId

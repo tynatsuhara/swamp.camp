@@ -13,6 +13,11 @@ export class NPC extends Component {
     }
 
     update(updateData: UpdateData) {
+        // TODO: reenable once we have a use case for following
+        // this.follow(updateData)
+    }
+
+    private follow(updateData) {
         const followDistance = 75
         const buffer = 40  // this basically determines how long they will stop for if they get too close
 
