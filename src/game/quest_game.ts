@@ -57,8 +57,12 @@ export class QuestGame extends Game {
 
             Camera.instance.focusOnDude(playerDude)
 
-            DudeFactory.instance.new(DudeType.DIP, new Point(-10, -10))
+            DudeFactory.instance.new(DudeType.DIP, Point.ZERO)
+            DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(3, 1).times(TILE_SIZE))
+            DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(-1, 3).times(TILE_SIZE))
+            DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(-4, 0).times(TILE_SIZE))
 
+            // TODO clean up obstacles (trees, rocks, etc) so intro goes smoothly
             CutsceneManager.instance.startCutscene(new IntroCutscene())
         }
     }

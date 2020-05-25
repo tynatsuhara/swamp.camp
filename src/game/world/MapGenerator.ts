@@ -20,11 +20,11 @@ export class MapGenerator {
         const tentLocation = LocationManager.instance.newLocation()
         
         // spawn tent
-        this.location.addWorldElement(ElementType.TENT, new Point(5, 5), { destinationUUID: tentLocation.uuid, color: TentColor.RED })
+        this.location.addWorldElement(ElementType.TENT, new Point(-3, -3), { destinationUUID: tentLocation.uuid, color: TentColor.RED })
         
         // make the ground
-        this.renderPath(new Point(-10, -10), new Point(10, 10), 2)
-        this.renderPath(new Point(10, -10), new Point(-10, 10), 5)
+        // this.renderPath(new Point(-10, -10), new Point(10, 10), 2)
+        // this.renderPath(new Point(10, -10), new Point(-10, 10), 5)
 
         this.spawnTrees()
         this.spawnRocks()

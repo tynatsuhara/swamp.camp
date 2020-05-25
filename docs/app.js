@@ -5195,7 +5195,10 @@ System.register("engine/util/Lists", [], function (exports_68, context_68) {
                         }
                     }
                     return smallest;
-                }
+                },
+                oneOf: function (list) {
+                    return list[Math.floor(Math.random() * list.length)];
+                },
             });
         }
     };
@@ -6628,10 +6631,10 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/Connec
                 MapGenerator.prototype.doIt = function () {
                     var tentLocation = LocationManager_10.LocationManager.instance.newLocation();
                     // spawn tent
-                    this.location.addWorldElement(2 /* TENT */, new point_47.Point(5, 5), { destinationUUID: tentLocation.uuid, color: "red" /* RED */ });
+                    this.location.addWorldElement(2 /* TENT */, new point_47.Point(-3, -3), { destinationUUID: tentLocation.uuid, color: "red" /* RED */ });
                     // make the ground
-                    this.renderPath(new point_47.Point(-10, -10), new point_47.Point(10, 10), 2);
-                    this.renderPath(new point_47.Point(10, -10), new point_47.Point(-10, 10), 5);
+                    // this.renderPath(new Point(-10, -10), new Point(10, 10), 2)
+                    // this.renderPath(new Point(10, -10), new Point(-10, 10), 5)
                     this.spawnTrees();
                     this.spawnRocks();
                     // TODO short trees, bushes, fruit, tall grass, etc
@@ -7083,7 +7086,11 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
                             .plusX(Tilesets_22.TILE_SIZE * 2);
                         var playerDude = DudeFactory_2.DudeFactory.instance.new(0 /* PLAYER */, playerStartPos);
                         Camera_3.Camera.instance.focusOnDude(playerDude);
-                        DudeFactory_2.DudeFactory.instance.new(1 /* DIP */, new point_50.Point(-10, -10));
+                        DudeFactory_2.DudeFactory.instance.new(1 /* DIP */, point_50.Point.ZERO);
+                        DudeFactory_2.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_50.Point(3, 1).times(Tilesets_22.TILE_SIZE));
+                        DudeFactory_2.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_50.Point(-1, 3).times(Tilesets_22.TILE_SIZE));
+                        DudeFactory_2.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_50.Point(-4, 0).times(Tilesets_22.TILE_SIZE));
+                        // TODO clean up obstacles (trees, rocks, etc) so intro goes smoothly
                         CutsceneManager_2.CutsceneManager.instance.startCutscene(new IntroCutscene_1.IntroCutscene());
                     }
                 };
