@@ -16,7 +16,6 @@ export const enum TreeType {
 }
 
 export const makeTree = (wl: WorldLocation, pos: Point, data: object): ElementComponent => {
-    console.log(data["type"])
     const type = data["type"] ?? (Math.random() < .7 ? TreeType.POINTY : TreeType.ROUND)
 
     const e = new Entity()
