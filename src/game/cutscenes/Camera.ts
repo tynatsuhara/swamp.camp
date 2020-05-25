@@ -10,7 +10,9 @@ export class Camera {
     private pointTarget: Point
 
     private _position: Point
-    // get position() { return this._position }
+    get position() { 
+        return this._position.times(-1)  // multiply by -1 because views use "offset"
+    }
     
     constructor() {
         Camera.instance = this

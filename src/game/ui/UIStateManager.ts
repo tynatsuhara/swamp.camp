@@ -1,9 +1,7 @@
 import { Entity } from "../../engine/Entity"
 import { HUD } from "./HUD"
 import { Player } from "../characters/Player"
-import { Dude } from "../characters/Dude"
 import { InventoryDisplay } from "./InventoryDisplay"
-import { UpdateViewsContext } from "../../engine/engine"
 import { DialogueDisplay } from "./DialogueDisplay"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
 import { Point } from "../../engine/point"
@@ -27,7 +25,7 @@ export class UIStateManager {
         UIStateManager.instance = this
     }
 
-    get(dimensions: Point): Entity[] {
+    get(dimensions: Point, elapsedMillis: number): Entity[] {
         if (!Player.instance.dude) {
             return []
         }
@@ -36,7 +34,7 @@ export class UIStateManager {
                 || this.dialogueDisplay.isOpen 
                 || this.placeElementDisplay.isOpen
 
-        return this.hud.getEntities(Player.instance.dude, dimensions)
+        return this.hud.getEntities(Player.instance.dude, dimensions, elapsedMillis)
                 .concat(this.inventory.getEntities())
                 .concat(this.dialogueDisplay.getEntities())
                 .concat(this.placeElementDisplay.getEntities())

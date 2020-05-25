@@ -5,32 +5,38 @@ import { Dude } from "../characters/Dude"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { Entity } from "../../engine/Entity"
 import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
+import { OffScreenMarker } from "./OffScreenMarker"
 
 export class HUD {
 
     static instance: HUD
 
     private heartsEntity: Entity = new Entity()
-    private autosaveComponent: AnimatedTileComponent = new Entity().addComponent(
-        new AnimatedTileComponent([
-            Tilesets.instance.oneBit.getTileSetAnimation("autosave", 6, 100)
-        ])
+    private autosaveComponent: TileComponent = new Entity().addComponent(
+        Tilesets.instance.oneBit.getTileSource("floppy_drive").toComponent()
     )
+    private isShowingAutosaveIcon = false
     private readonly offset = new Point(4, 4)
 
     // used for determining what should be updated
     private lastHealthCount = 0
     private lastMaxHealthCount = 0
 
+
+
+    private offScreenMarker: OffScreenMarker = this.autosaveComponent.entity.addComponent(
+        new OffScreenMarker()
+    )
+
+
+
     constructor() {
         HUD.instance = this
-
-        this.autosaveComponent.enabled = false
     }
 
-    getEntities(player: Dude, screenDimensions: Point): Entity[] {
+    getEntities(player: Dude, screenDimensions: Point, elapsedMillis: number): Entity[] {
         this.updateHearts(player.health, player.maxHealth)
-        this.updateAutosave(screenDimensions);
+        this.updateAutosave(screenDimensions, elapsedMillis);
 
         return [this.heartsEntity, this.autosaveComponent.entity]
     }
@@ -69,11 +75,19 @@ export class HUD {
     }
 
     showSaveIcon() {
-        this.autosaveComponent.enabled = true
-        setTimeout(() => { this.autosaveComponent.enabled = false }, 4000);
+        this.isShowingAutosaveIcon = true
+        setTimeout(() => { this.isShowingAutosaveIcon = false }, 5000);
     }
 
-    private updateAutosave(screenDimensions: Point) {
-        this.autosaveComponent.transform.position = screenDimensions.minus(this.offset).minus(new Point(TILE_SIZE, TILE_SIZE))
+    private updateAutosave(screenDimensions: Point, elapsedMillis: number) {
+        const base = screenDimensions.minus(this.offset).minus(new Point(TILE_SIZE, TILE_SIZE))
+        if (this.autosaveComponent.transform.position.equals(Point.ZERO)) {  // for initializing
+            this.autosaveComponent.transform.position = base
+        }
+        const goal = this.isShowingAutosaveIcon ? Point.ZERO : new Point(0, 40)
+        this.autosaveComponent.transform.position = this.autosaveComponent.transform.position
+                .minus(base)
+                .lerp(0.005 * elapsedMillis, goal)
+                .plus(base)
     }
 }
