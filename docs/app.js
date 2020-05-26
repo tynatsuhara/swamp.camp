@@ -2235,7 +2235,6 @@ System.register("game/graphics/Tilesets", ["game/graphics/SingleFileTileLoader",
                 // loaded before the engine starts running the game
                 Tilesets.getFilesToLoad = function () {
                     return [
-                        "images/circles.png",
                         "images/monochrome_transparent_1_bit.png",
                         "images/dungeon_base.png",
                         "images/env_dungeon.png",
@@ -4827,9 +4826,9 @@ System.register("game/ui/UIStateManager", ["game/ui/HUD", "game/characters/Playe
         }
     };
 });
-System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/renderer/ImageRender", "engine/Entity", "engine/renderer/BasicRenderComponent", "game/cutscenes/Camera", "game/world/MapGenerator", "game/graphics/Tilesets", "engine/Assets", "engine/util/Grid", "game/ui/UIStateManager"], function (exports_67, context_67) {
+System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/renderer/ImageRender", "engine/Entity", "engine/renderer/BasicRenderComponent", "game/cutscenes/Camera", "game/world/MapGenerator", "game/graphics/Tilesets", "engine/util/Grid", "game/ui/UIStateManager"], function (exports_67, context_67) {
     "use strict";
-    var point_33, ImageRender_2, Entity_9, BasicRenderComponent_4, Camera_3, MapGenerator_2, Tilesets_14, Assets_4, Grid_1, UIStateManager_7, PointLightMaskRenderer;
+    var point_33, ImageRender_2, Entity_9, BasicRenderComponent_4, Camera_3, MapGenerator_2, Tilesets_14, Grid_1, UIStateManager_7, PointLightMaskRenderer;
     var __moduleName = context_67 && context_67.id;
     return {
         setters: [
@@ -4854,9 +4853,6 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
             function (Tilesets_14_1) {
                 Tilesets_14 = Tilesets_14_1;
             },
-            function (Assets_4_1) {
-                Assets_4 = Assets_4_1;
-            },
             function (Grid_1_1) {
                 Grid_1 = Grid_1_1;
             },
@@ -4876,11 +4872,16 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                     this.canvas = document.createElement("canvas");
                     this.canvas.width = this.size;
                     this.canvas.height = this.size;
+                    this.context = this.canvas.getContext("2d");
                     this.renderToOffscreenCanvas();
                 }
-                PointLightMaskRenderer.prototype.addLight = function (tilePos) {
+                PointLightMaskRenderer.prototype.addLight = function (tilePos, diameter) {
+                    if (diameter === void 0) { diameter = 16; }
+                    if (diameter % 2 !== 0) {
+                        throw new Error("only even circle px diameters work right now");
+                    }
                     this.checkPt(tilePos);
-                    this.lightTiles.set(tilePos, true);
+                    this.lightTiles.set(tilePos, diameter);
                     this.gridDirty = true;
                 };
                 PointLightMaskRenderer.prototype.removeLight = function (tilePos) {
@@ -4897,19 +4898,31 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                 };
                 PointLightMaskRenderer.prototype.renderToOffscreenCanvas = function () {
                     var _this = this;
-                    var context = this.canvas.getContext("2d");
-                    context.globalCompositeOperation = "source-over";
-                    context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                    context.fillStyle = "rgba(0, 0, 0, 0.4)";
-                    context.fillRect(0, 0, this.canvas.width, this.canvas.height);
-                    context.globalCompositeOperation = "destination-out";
-                    var circle = Assets_4.assets.getImageByFileName("images/circles.png");
-                    // right now all lights are 5x5 tiles
-                    var circleOffset = new point_33.Point(-2, -2).times(Tilesets_14.TILE_SIZE);
-                    this.lightTiles.entries().map(function (entry) { return entry[0]; }).forEach(function (pos) {
-                        var adjustedPos = pos.times(Tilesets_14.TILE_SIZE).plus(_this.shift).plus(circleOffset);
-                        context.drawImage(circle, adjustedPos.x, adjustedPos.y);
+                    this.context.fillStyle = "rgba(0, 0, 0, 0.4)";
+                    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                    this.lightTiles.entries().forEach(function (entry) {
+                        var pos = entry[0];
+                        var diameter = entry[1];
+                        var circleOffset = new point_33.Point(-.5, -.5).times(diameter);
+                        var adjustedPos = pos.times(Tilesets_14.TILE_SIZE).plus(_this.shift).plus(circleOffset).plus(new point_33.Point(Tilesets_14.TILE_SIZE / 2, Tilesets_14.TILE_SIZE / 2));
+                        _this.makeCircleAlpha(diameter, adjustedPos);
                     });
+                };
+                PointLightMaskRenderer.prototype.makeCircleAlpha = function (diameter, position) {
+                    var center = new point_33.Point(diameter / 2, diameter / 2).minus(new point_33.Point(.5, .5));
+                    var imageData = this.context.getImageData(position.x, position.y, diameter, diameter);
+                    for (var x = 0; x < diameter; x++) {
+                        for (var y = 0; y < diameter; y++) {
+                            var i = (x + y * diameter) * 4;
+                            var pt = new point_33.Point(x, y);
+                            var withinCircle = pt.distanceTo(center) < diameter / 2;
+                            if (withinCircle) {
+                                imageData.data[i + 3] = 0; // set alpha to 0
+                            }
+                        }
+                    }
+                    this.context.putImageData(imageData, position.x, position.y);
                 };
                 PointLightMaskRenderer.prototype.getEntities = function () {
                     if (this.gridDirty) {
@@ -4918,7 +4931,7 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                     }
                     // prevent tint not extending to the edge
                     var dimensions = Camera_3.Camera.instance.dimensions.plus(new point_33.Point(1, 1));
-                    return [new Entity_9.Entity([new BasicRenderComponent_4.BasicRenderComponent(new ImageRender_2.ImageRender(this.canvas, Camera_3.Camera.instance.position.plus(this.shift), dimensions, Camera_3.Camera.instance.position, dimensions, UIStateManager_7.UIStateManager.UI_SPRITE_DEPTH - 100 // make sure all UI goes on top of light
+                    return [new Entity_9.Entity([new BasicRenderComponent_4.BasicRenderComponent(new ImageRender_2.ImageRender(this.canvas, Camera_3.Camera.instance.position.plus(this.shift).apply(Math.floor), dimensions, Camera_3.Camera.instance.position.apply(Math.floor), dimensions, UIStateManager_7.UIStateManager.UI_SPRITE_DEPTH - 100 // make sure all UI goes on top of light
                             ))])];
                 };
                 return PointLightMaskRenderer;
@@ -4983,7 +4996,7 @@ System.register("game/world/elements/Campfire", ["engine/tiles/TileComponent", "
                     campfireOff.enabled = !nowOn;
                     campfireOn.enabled = nowOn;
                     if (nowOn) {
-                        PointLightMaskRenderer_1.PointLightMaskRenderer.instance.addLight(pos);
+                        PointLightMaskRenderer_1.PointLightMaskRenderer.instance.addLight(pos, Tilesets_15.TILE_SIZE * 6);
                     }
                     else {
                         PointLightMaskRenderer_1.PointLightMaskRenderer.instance.removeLight(pos);
@@ -7422,7 +7435,7 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
 });
 System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tilesets", "engine/Assets"], function (exports_97, context_97) {
     "use strict";
-    var quest_game_1, engine_1, Tilesets_25, Assets_5;
+    var quest_game_1, engine_1, Tilesets_25, Assets_4;
     var __moduleName = context_97 && context_97.id;
     return {
         setters: [
@@ -7435,12 +7448,12 @@ System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tiles
             function (Tilesets_25_1) {
                 Tilesets_25 = Tilesets_25_1;
             },
-            function (Assets_5_1) {
-                Assets_5 = Assets_5_1;
+            function (Assets_4_1) {
+                Assets_4 = Assets_4_1;
             }
         ],
         execute: function () {
-            Assets_5.assets.loadImageFiles(Tilesets_25.Tilesets.getFilesToLoad()).then(function () {
+            Assets_4.assets.loadImageFiles(Tilesets_25.Tilesets.getFilesToLoad()).then(function () {
                 new engine_1.Engine(new quest_game_1.QuestGame(), document.getElementById('canvas'));
             });
         }

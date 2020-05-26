@@ -16,9 +16,12 @@ export class PointLightMaskRenderer {
     // no lights should live outside of this range
     private size = MapGenerator.MAP_SIZE * TILE_SIZE * 2
     private shift = new Point(this.size/2, this.size/2)
-    private lightTiles: Grid<boolean> = new Grid()
+
+    private lightTiles: Grid<number> = new Grid()
     private gridDirty = true
+
     private canvas: HTMLCanvasElement
+    private context: CanvasRenderingContext2D
 
     constructor() {
         PointLightMaskRenderer.instance = this
@@ -26,13 +29,17 @@ export class PointLightMaskRenderer {
         this.canvas = document.createElement("canvas")
         this.canvas.width = this.size
         this.canvas.height = this.size
+        this.context = this.canvas.getContext("2d")
 
         this.renderToOffscreenCanvas()
     }
 
-    addLight(tilePos: Point) {
+    addLight(tilePos: Point, diameter: number = 16) {
+        if (diameter % 2 !== 0) {
+            throw new Error("only even circle px diameters work right now")
+        }
         this.checkPt(tilePos)
-        this.lightTiles.set(tilePos, true)
+        this.lightTiles.set(tilePos, diameter)
         this.gridDirty = true
     }
 
@@ -51,22 +58,35 @@ export class PointLightMaskRenderer {
     }
 
     renderToOffscreenCanvas() {
-        const context = this.canvas.getContext("2d")
-        context.globalCompositeOperation = "source-over"
-        context.clearRect(0, 0, this.canvas.width, this.canvas.height)
+        this.context.fillStyle = "rgba(0, 0, 0, 0.4)"
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
+        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
 
-        context.fillStyle = "rgba(0, 0, 0, 0.4)"
-        context.fillRect(0, 0, this.canvas.width, this.canvas.height)
-        context.globalCompositeOperation = "destination-out"
-
-        const circle = assets.getImageByFileName("images/circles.png")
-        // right now all lights are 5x5 tiles
-        const circleOffset = new Point(-2, -2).times(TILE_SIZE)
-
-        this.lightTiles.entries().map(entry => entry[0]).forEach(pos => {
-            const adjustedPos = pos.times(TILE_SIZE).plus(this.shift).plus(circleOffset)
-            context.drawImage(circle, adjustedPos.x, adjustedPos.y)
+        this.lightTiles.entries().forEach(entry => {
+            const pos = entry[0]
+            const diameter = entry[1]
+            const circleOffset = new Point(-.5, -.5).times(diameter)
+            const adjustedPos = pos.times(TILE_SIZE).plus(this.shift).plus(circleOffset).plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
+            this.makeCircleAlpha(diameter, adjustedPos)
         })
+    }
+
+    makeCircleAlpha(diameter: number, position: Point) {
+        const center = new Point(diameter/2, diameter/2).minus(new Point(.5, .5))
+        const imageData = this.context.getImageData(position.x, position.y, diameter, diameter)
+
+        for (let x = 0; x < diameter; x++) {
+            for (let y = 0; y < diameter; y++) {
+                const i = (x + y * diameter) * 4
+                const pt = new Point(x, y)
+                const withinCircle = pt.distanceTo(center) < diameter/2
+                if (withinCircle) {
+                    imageData.data[i+3] = 0  // set alpha to 0
+                }
+            }
+        }
+
+        this.context.putImageData(imageData, position.x, position.y)
     }
 
     getEntities() {
@@ -80,9 +100,9 @@ export class PointLightMaskRenderer {
 
         return [new Entity([new BasicRenderComponent(new ImageRender(
             this.canvas,
-            Camera.instance.position.plus(this.shift),
+            Camera.instance.position.plus(this.shift).apply(Math.floor),
             dimensions,
-            Camera.instance.position,
+            Camera.instance.position.apply(Math.floor),
             dimensions,
             UIStateManager.UI_SPRITE_DEPTH - 100  // make sure all UI goes on top of light
         ))])]
