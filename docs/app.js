@@ -4868,6 +4868,7 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                     this.shift = new point_33.Point(this.size / 2, this.size / 2);
                     this.lightTiles = new Grid_1.Grid();
                     this.gridDirty = true;
+                    this.darkness = 0.6;
                     PointLightMaskRenderer.instance = this;
                     this.canvas = document.createElement("canvas");
                     this.canvas.width = this.size;
@@ -4898,7 +4899,7 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                 };
                 PointLightMaskRenderer.prototype.renderToOffscreenCanvas = function () {
                     var _this = this;
-                    this.context.fillStyle = "rgba(0, 0, 0, 0.4)";
+                    this.context.fillStyle = "rgba(0, 0, 0, " + this.darkness + ")";
                     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
                     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
                     this.lightTiles.entries().forEach(function (entry) {
@@ -4906,10 +4907,12 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                         var diameter = entry[1];
                         var circleOffset = new point_33.Point(-.5, -.5).times(diameter);
                         var adjustedPos = pos.times(Tilesets_14.TILE_SIZE).plus(_this.shift).plus(circleOffset).plus(new point_33.Point(Tilesets_14.TILE_SIZE / 2, Tilesets_14.TILE_SIZE / 2));
-                        _this.makeCircleAlpha(diameter, adjustedPos);
+                        _this.makeCircle(diameter, adjustedPos, _this.darkness / 2);
+                        var innerOffset = Math.floor(diameter / 2 * 1 / 4);
+                        _this.makeCircle(diameter - innerOffset * 2, adjustedPos.plus(new point_33.Point(innerOffset, innerOffset)), 0);
                     });
                 };
-                PointLightMaskRenderer.prototype.makeCircleAlpha = function (diameter, position) {
+                PointLightMaskRenderer.prototype.makeCircle = function (diameter, position, alpha) {
                     var center = new point_33.Point(diameter / 2, diameter / 2).minus(new point_33.Point(.5, .5));
                     var imageData = this.context.getImageData(position.x, position.y, diameter, diameter);
                     for (var x = 0; x < diameter; x++) {
@@ -4918,7 +4921,8 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                             var pt = new point_33.Point(x, y);
                             var withinCircle = pt.distanceTo(center) < diameter / 2;
                             if (withinCircle) {
-                                imageData.data[i + 3] = 0; // set alpha to 0
+                                // imageData.data[i+3] -= Math.max(0, Math.ceil(255 * alphaSubtraction))
+                                imageData.data[i + 3] = Math.min(imageData.data[i + 3], Math.ceil(255 * alpha));
                             }
                         }
                     }
@@ -4996,7 +5000,7 @@ System.register("game/world/elements/Campfire", ["engine/tiles/TileComponent", "
                     campfireOff.enabled = !nowOn;
                     campfireOn.enabled = nowOn;
                     if (nowOn) {
-                        PointLightMaskRenderer_1.PointLightMaskRenderer.instance.addLight(pos, Tilesets_15.TILE_SIZE * 6);
+                        PointLightMaskRenderer_1.PointLightMaskRenderer.instance.addLight(pos, Tilesets_15.TILE_SIZE * 8);
                     }
                     else {
                         PointLightMaskRenderer_1.PointLightMaskRenderer.instance.removeLight(pos);
@@ -5645,6 +5649,7 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
                     var _this = _super.call(this) || this;
                     _this.lerpedLastMoveDir = new point_39.Point(1, 0); // used for crosshair
                     Player.instance = _this;
+                    window["player"] = _this;
                     return _this;
                 }
                 Object.defineProperty(Player.prototype, "dude", {

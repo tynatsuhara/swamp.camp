@@ -19,6 +19,7 @@ export class PointLightMaskRenderer {
 
     private lightTiles: Grid<number> = new Grid()
     private gridDirty = true
+    private darkness = 0.6
 
     private canvas: HTMLCanvasElement
     private context: CanvasRenderingContext2D
@@ -58,7 +59,7 @@ export class PointLightMaskRenderer {
     }
 
     renderToOffscreenCanvas() {
-        this.context.fillStyle = "rgba(0, 0, 0, 0.4)"
+        this.context.fillStyle = `rgba(0, 0, 0, ${this.darkness})`
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
 
@@ -67,11 +68,15 @@ export class PointLightMaskRenderer {
             const diameter = entry[1]
             const circleOffset = new Point(-.5, -.5).times(diameter)
             const adjustedPos = pos.times(TILE_SIZE).plus(this.shift).plus(circleOffset).plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
-            this.makeCircleAlpha(diameter, adjustedPos)
+            
+            this.makeCircle(diameter, adjustedPos, this.darkness/2)
+
+            const innerOffset = Math.floor(diameter/2 * 1/4)
+            this.makeCircle(diameter-innerOffset*2, adjustedPos.plus(new Point(innerOffset, innerOffset)), 0)
         })
     }
 
-    makeCircleAlpha(diameter: number, position: Point) {
+    makeCircle(diameter: number, position: Point, alpha: number) {
         const center = new Point(diameter/2, diameter/2).minus(new Point(.5, .5))
         const imageData = this.context.getImageData(position.x, position.y, diameter, diameter)
 
@@ -81,7 +86,8 @@ export class PointLightMaskRenderer {
                 const pt = new Point(x, y)
                 const withinCircle = pt.distanceTo(center) < diameter/2
                 if (withinCircle) {
-                    imageData.data[i+3] = 0  // set alpha to 0
+                    // imageData.data[i+3] -= Math.max(0, Math.ceil(255 * alphaSubtraction))
+                    imageData.data[i+3] = Math.min(imageData.data[i+3], Math.ceil(255 * alpha))
                 }
             }
         }

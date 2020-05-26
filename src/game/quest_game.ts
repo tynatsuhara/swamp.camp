@@ -21,6 +21,8 @@ import { BasicRenderComponent } from "../engine/renderer/BasicRenderComponent"
 import { Entity } from "../engine/Entity"
 import { TintRender } from "../engine/renderer/TintRender"
 import { PointLightMaskRenderer } from "./world/PointLightMaskRenderer"
+import { Player } from "./characters/Player"
+import { Item } from "./items/Items"
 
 
 const ZOOM = 3
