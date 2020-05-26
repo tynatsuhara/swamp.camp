@@ -4,6 +4,7 @@ import { Controls } from "../Controls"
 import { LocationManager } from "../world/LocationManager"
 import { ElementType } from "../world/elements/Elements"
 import { TILE_SIZE } from "../graphics/Tilesets"
+import { SaveManager } from "../SaveManager"
 
 export class DialogueInstance {
     readonly lines: string[]
@@ -82,6 +83,7 @@ const DIALOGUE_MAP: { [key: number]: () => DialogueInstance } = {
             return d(
                 [`It looks like you have enough rocks. Can I have ${ROCKS_NEEDED_FOR_CAMPFIRE} to make a campfire?`],
                 new DialogueOption("<Give rocks>", () => {
+                    setTimeout(() => SaveManager.instance.save(), 500)
                     Player.instance.dude.inventory.removeItem(Item.ROCK, ROCKS_NEEDED_FOR_CAMPFIRE)
                     Player.instance.dude.inventory.addItem(Item.CAMPFIRE)
                     return new NextDialogue(Dialogue.DIP_ROCKS_RECEIVED)

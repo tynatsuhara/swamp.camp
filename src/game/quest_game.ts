@@ -20,6 +20,7 @@ import { SaveManager } from "./SaveManager"
 import { BasicRenderComponent } from "../engine/renderer/BasicRenderComponent"
 import { Entity } from "../engine/Entity"
 import { TintRender } from "../engine/renderer/TintRender"
+import { PointLightMaskRenderer } from "./world/PointLightMaskRenderer"
 
 
 const ZOOM = 3
@@ -45,6 +46,7 @@ export class QuestGame extends Game {
         new Camera()
         new CutsceneManager()
         new LocationManager()
+        new PointLightMaskRenderer()
 
         const newGame = !SaveManager.instance.load()
 
@@ -93,13 +95,14 @@ export class QuestGame extends Game {
 
     updateViews(updateViewsContext: UpdateViewsContext) {
         const dimensions = updateViewsContext.dimensions.div(ZOOM)
+        const cameraOffset = Camera.instance.updatePosition(dimensions, updateViewsContext.elapsedTimeMillis)
 
         this.gameEntityView = { 
             zoom: ZOOM,
-            offset: Camera.instance.updatePosition(dimensions, updateViewsContext.elapsedTimeMillis),
+            offset: cameraOffset,
             entities: LocationManager.instance.currentLocation.getEntities()
                     .concat(CutsceneManager.instance.getEntities())
-                    .concat([new Entity([new BasicRenderComponent(new TintRender('rgba(0, 0, 0, 0.5)', Number.MAX_SAFE_INTEGER))])])
+                    .concat(PointLightMaskRenderer.instance.getEntities())
         }
 
         this.uiView = {

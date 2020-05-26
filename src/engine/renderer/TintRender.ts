@@ -4,15 +4,13 @@ import { Point } from "../point"
 
 export class TintRender extends RenderMethod {
 
-    private readonly pos: Point
     private readonly color: string
 
     constructor(
         color: string,
-        depth: number,
-        alternateCanvas: string = null
+        depth: number
     ) {
-        super(depth, alternateCanvas)
+        super(depth)
         this.color = color
     }
 

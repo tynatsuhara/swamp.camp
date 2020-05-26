@@ -10,6 +10,7 @@ import { ElementComponent } from "./ElementComponent"
 import { WorldLocation } from "../WorldLocation"
 import { Entity } from "../../../engine/Entity"
 import { ElementType } from "./Elements"
+import { PointLightMaskRenderer } from "../PointLightMaskRenderer"
 
 export const makeCampfire = (wl: WorldLocation, pos: Point, data: object): ElementComponent => {
     const e = new Entity()
@@ -36,12 +37,21 @@ export const makeCampfire = (wl: WorldLocation, pos: Point, data: object): Eleme
         new Point(TILE_SIZE, TILE_SIZE).minus(offset)
     ))
 
+    const set = (nowOn: boolean) => {
+        on = nowOn
+        campfireOff.enabled = !nowOn
+        campfireOn.enabled = nowOn
+        if (nowOn) {
+            PointLightMaskRenderer.instance.addLight(pos)
+        } else {
+            PointLightMaskRenderer.instance.removeLight(pos)
+        }
+    }
+
+    set(on)
+
     // Toggle between on/off when interacted with
-    e.addComponent(new Interactable(scaledPos.plus(new Point(TILE_SIZE/2, TILE_SIZE/2)), () => {
-        on = !on
-        campfireOff.enabled = !on
-        campfireOn.enabled = on
-    }))
+    e.addComponent(new Interactable(scaledPos.plus(new Point(TILE_SIZE/2, TILE_SIZE/2)), () => set(!on)))
 
     return e.addComponent(new ElementComponent(
         ElementType.CAMPFIRE, 

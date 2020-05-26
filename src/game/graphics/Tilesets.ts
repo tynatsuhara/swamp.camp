@@ -29,6 +29,7 @@ export class Tilesets {
     // loaded before the engine starts running the game
     static getFilesToLoad() {
         return [
+            "images/circles.png",
             "images/monochrome_transparent_1_bit.png",
             "images/dungeon_base.png",
             "images/env_dungeon.png",

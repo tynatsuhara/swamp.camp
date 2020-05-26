@@ -13,6 +13,8 @@ export class Camera {
     get position() { 
         return this._position.times(-1)  // multiply by -1 because views use "offset"
     }
+    private _dimensions: Point
+    get dimensions() { return this._dimensions }
     
     constructor() {
         Camera.instance = this
@@ -29,6 +31,7 @@ export class Camera {
     }
 
     updatePosition(dimensions: Point, elapsedTimeMillis: number): Point {
+        this._dimensions = dimensions
         const xLimit = MapGenerator.MAP_SIZE / 2 * TILE_SIZE - dimensions.x/2
         const yLimit = MapGenerator.MAP_SIZE / 2 * TILE_SIZE - dimensions.y/2
         const trackedPoint = this.dudeTarget?.position ?? this.pointTarget
