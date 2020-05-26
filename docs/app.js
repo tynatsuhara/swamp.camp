@@ -105,6 +105,8 @@ System.register("engine/renderer/RenderContext", ["engine/point"], function (exp
                     this.canvas = canvas;
                     this.context = context;
                     this.view = view;
+                    this.width = canvas.width;
+                    this.height = canvas.height;
                 }
                 Object.defineProperty(RenderContext.prototype, "lineWidth", {
                     set: function (value) { this.context.lineWidth = value; },
@@ -134,6 +136,9 @@ System.register("engine/renderer/RenderContext", ["engine/point"], function (exp
                     this.context.fillStyle = color;
                     point = point.plus(this.view.offset).times(this.view.zoom);
                     this.context.fillText(text, point.x, point.y + size * this.view.zoom);
+                };
+                RenderContext.prototype.fillRect = function (x, y, w, h) {
+                    this.context.fillRect(x, y, w, h);
                 };
                 /**
                  * @param source
@@ -383,8 +388,10 @@ System.register("engine/renderer/RenderMethod", [], function (exports_5, context
         setters: [],
         execute: function () {
             RenderMethod = /** @class */ (function () {
-                function RenderMethod(depth) {
+                function RenderMethod(depth, alternateCanvas) {
+                    if (alternateCanvas === void 0) { alternateCanvas = null; }
                     this.depth = depth;
+                    this.alternateCanvas = alternateCanvas;
                 }
                 return RenderMethod;
             }());
@@ -4157,7 +4164,7 @@ System.register("game/ui/OffScreenMarker", ["engine/point", "engine/util/utils",
                 __extends(OffScreenMarker, _super);
                 function OffScreenMarker() {
                     var _this = _super !== null && _super.apply(this, arguments) || this;
-                    _this.markerDistFromEdge = 12;
+                    _this.markerDistFromEdge = 12 + Tilesets_10.TILE_SIZE;
                     return _this;
                 }
                 OffScreenMarker.prototype.update = function (updateData) {
@@ -7128,10 +7135,39 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
         }
     };
 });
-System.register("game/quest_game", ["engine/point", "engine/game", "game/world/MapGenerator", "game/graphics/Tilesets", "game/characters/DudeFactory", "game/world/LocationManager", "game/characters/Dude", "engine/collision/CollisionEngine", "game/items/DroppedItem", "game/ui/UIStateManager", "game/world/elements/Elements", "game/world/ground/Ground", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/cutscenes/Camera", "game/SaveManager"], function (exports_94, context_94) {
+System.register("engine/renderer/TintRender", ["engine/renderer/RenderMethod"], function (exports_94, context_94) {
     "use strict";
-    var point_51, game_1, MapGenerator_2, Tilesets_23, DudeFactory_2, LocationManager_14, Dude_8, CollisionEngine_4, DroppedItem_2, UIStateManager_8, Elements_3, Ground_4, CutsceneManager_2, IntroCutscene_1, Camera_4, SaveManager_2, ZOOM, QuestGame;
+    var RenderMethod_4, TintRender;
     var __moduleName = context_94 && context_94.id;
+    return {
+        setters: [
+            function (RenderMethod_4_1) {
+                RenderMethod_4 = RenderMethod_4_1;
+            }
+        ],
+        execute: function () {
+            TintRender = /** @class */ (function (_super) {
+                __extends(TintRender, _super);
+                function TintRender(color, depth, alternateCanvas) {
+                    if (alternateCanvas === void 0) { alternateCanvas = null; }
+                    var _this = _super.call(this, depth, alternateCanvas) || this;
+                    _this.color = color;
+                    return _this;
+                }
+                TintRender.prototype.render = function (context) {
+                    context.fillStyle = this.color;
+                    context.fillRect(0, 0, context.width, context.height);
+                };
+                return TintRender;
+            }(RenderMethod_4.RenderMethod));
+            exports_94("TintRender", TintRender);
+        }
+    };
+});
+System.register("game/quest_game", ["engine/point", "engine/game", "game/world/MapGenerator", "game/graphics/Tilesets", "game/characters/DudeFactory", "game/world/LocationManager", "game/characters/Dude", "engine/collision/CollisionEngine", "game/items/DroppedItem", "game/ui/UIStateManager", "game/world/elements/Elements", "game/world/ground/Ground", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/cutscenes/Camera", "game/SaveManager", "engine/renderer/BasicRenderComponent", "engine/Entity", "engine/renderer/TintRender"], function (exports_95, context_95) {
+    "use strict";
+    var point_51, game_1, MapGenerator_2, Tilesets_23, DudeFactory_2, LocationManager_14, Dude_8, CollisionEngine_4, DroppedItem_2, UIStateManager_8, Elements_3, Ground_4, CutsceneManager_2, IntroCutscene_1, Camera_4, SaveManager_2, BasicRenderComponent_4, Entity_17, TintRender_1, ZOOM, QuestGame;
+    var __moduleName = context_95 && context_95.id;
     return {
         setters: [
             function (point_51_1) {
@@ -7181,6 +7217,15 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
             },
             function (SaveManager_2_1) {
                 SaveManager_2 = SaveManager_2_1;
+            },
+            function (BasicRenderComponent_4_1) {
+                BasicRenderComponent_4 = BasicRenderComponent_4_1;
+            },
+            function (Entity_17_1) {
+                Entity_17 = Entity_17_1;
+            },
+            function (TintRender_1_1) {
+                TintRender_1 = TintRender_1_1;
             }
         ],
         execute: function () {
@@ -7246,6 +7291,7 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
                         offset: Camera_4.Camera.instance.updatePosition(dimensions, updateViewsContext.elapsedTimeMillis),
                         entities: LocationManager_14.LocationManager.instance.currentLocation.getEntities()
                             .concat(CutsceneManager_2.CutsceneManager.instance.getEntities())
+                            .concat([new Entity_17.Entity([new BasicRenderComponent_4.BasicRenderComponent(new TintRender_1.TintRender('rgba(0, 0, 0, 0.5)', Number.MAX_SAFE_INTEGER))])])
                     };
                     this.uiView = {
                         zoom: ZOOM,
@@ -7255,14 +7301,14 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
                 };
                 return QuestGame;
             }(game_1.Game));
-            exports_94("QuestGame", QuestGame);
+            exports_95("QuestGame", QuestGame);
         }
     };
 });
-System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tilesets", "engine/Assets"], function (exports_95, context_95) {
+System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tilesets", "engine/Assets"], function (exports_96, context_96) {
     "use strict";
     var quest_game_1, engine_1, Tilesets_24, Assets_4;
-    var __moduleName = context_95 && context_95.id;
+    var __moduleName = context_96 && context_96.id;
     return {
         setters: [
             function (quest_game_1_1) {
@@ -7285,10 +7331,10 @@ System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tiles
         }
     };
 });
-System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"], function (exports_96, context_96) {
+System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"], function (exports_97, context_97) {
     "use strict";
     var component_25, utils_7, Clickable;
-    var __moduleName = context_96 && context_96.id;
+    var __moduleName = context_97 && context_97.id;
     return {
         setters: [
             function (component_25_1) {
@@ -7315,14 +7361,14 @@ System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"]
                 };
                 return Clickable;
             }(component_25.Component));
-            exports_96("Clickable", Clickable);
+            exports_97("Clickable", Clickable);
         }
     };
 });
-System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uuid"], function (exports_97, context_97) {
+System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uuid"], function (exports_98, context_98) {
     "use strict";
     var profiler_2, uuid_2, serialize, buildObject;
-    var __moduleName = context_97 && context_97.id;
+    var __moduleName = context_98 && context_98.id;
     return {
         setters: [
             function (profiler_2_1) {
@@ -7336,7 +7382,7 @@ System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uu
             /**
              * Serializes an object and removes all circular references
              */
-            exports_97("serialize", serialize = function (object) {
+            exports_98("serialize", serialize = function (object) {
                 var resultObject = {}; // maps string->object with subobjects as uuids
                 var topLevelUuidMap = {}; // maps string->object with subobjects as uuids
                 var objectUuidMap = new Map(); // maps unique object ref to uuid
@@ -7382,10 +7428,10 @@ System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uu
         }
     };
 });
-System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point"], function (exports_98, context_98) {
+System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point"], function (exports_99, context_99) {
     "use strict";
     var component_26, Tilesets_25, TileTransform_21, point_52, StringTiles;
-    var __moduleName = context_98 && context_98.id;
+    var __moduleName = context_99 && context_99.id;
     return {
         setters: [
             function (component_26_1) {
@@ -7428,14 +7474,14 @@ System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tiles
                 };
                 return StringTiles;
             }(component_26.Component));
-            exports_98("StringTiles", StringTiles);
+            exports_99("StringTiles", StringTiles);
         }
     };
 });
-System.register("game/world/interior/Tent", ["game/world/LocationManager"], function (exports_99, context_99) {
+System.register("game/world/interior/Tent", ["game/world/LocationManager"], function (exports_100, context_100) {
     "use strict";
     var LocationManager_15, makeTentInterior;
-    var __moduleName = context_99 && context_99.id;
+    var __moduleName = context_100 && context_100.id;
     return {
         setters: [
             function (LocationManager_15_1) {
@@ -7443,7 +7489,7 @@ System.register("game/world/interior/Tent", ["game/world/LocationManager"], func
             }
         ],
         execute: function () {
-            exports_99("makeTentInterior", makeTentInterior = function () {
+            exports_100("makeTentInterior", makeTentInterior = function () {
                 var l = LocationManager_15.LocationManager.instance.newLocation();
                 return l;
             });

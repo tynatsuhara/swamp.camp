@@ -17,6 +17,9 @@ import { CutsceneManager } from "./cutscenes/CutsceneManager"
 import { IntroCutscene } from "./cutscenes/IntroCutscene"
 import { Camera } from "./cutscenes/Camera"
 import { SaveManager } from "./SaveManager"
+import { BasicRenderComponent } from "../engine/renderer/BasicRenderComponent"
+import { Entity } from "../engine/Entity"
+import { TintRender } from "../engine/renderer/TintRender"
 
 
 const ZOOM = 3
@@ -96,6 +99,7 @@ export class QuestGame extends Game {
             offset: Camera.instance.updatePosition(dimensions, updateViewsContext.elapsedTimeMillis),
             entities: LocationManager.instance.currentLocation.getEntities()
                     .concat(CutsceneManager.instance.getEntities())
+                    .concat([new Entity([new BasicRenderComponent(new TintRender('rgba(0, 0, 0, 0.5)', Number.MAX_SAFE_INTEGER))])])
         }
 
         this.uiView = {

@@ -5,11 +5,17 @@ export class RenderContext {
     private readonly canvas: HTMLCanvasElement
     private readonly context: CanvasRenderingContext2D
     private readonly view: View
+    
+    readonly width: number
+    readonly height: number
 
     constructor(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, view: View) {
         this.canvas = canvas
         this.context = context
         this.view = view
+
+        this.width = canvas.width
+        this.height = canvas.height
     }
 
     set lineWidth(value: number) { this.context.lineWidth = value }
@@ -27,6 +33,10 @@ export class RenderContext {
         this.context.fillStyle = color
         point = point.plus(this.view.offset).times(this.view.zoom)
         this.context.fillText(text, point.x, point.y + size*this.view.zoom)
+    }
+
+    fillRect(x: number, y: number, w: number, h: number): void {
+        this.context.fillRect(x, y, w, h)
     }
 
     /**

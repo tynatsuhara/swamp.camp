@@ -13,7 +13,7 @@ import { Camera } from "../cutscenes/Camera"
 // TODO this currently isn't going to work because it is conflating UI space and game space
 export class OffScreenMarker extends Component {
 
-    private markerDistFromEdge = 12
+    private markerDistFromEdge = 12 + TILE_SIZE
     private tileSource: string
     private tilePoint: Point
 
