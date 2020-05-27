@@ -3,12 +3,11 @@ import { Item } from "../items/Items"
 import { Controls } from "../Controls"
 import { LocationManager } from "../world/LocationManager"
 import { ElementType } from "../world/elements/Elements"
-import { TILE_SIZE } from "../graphics/Tilesets"
 import { SaveManager } from "../SaveManager"
 
 export class DialogueInstance {
     readonly lines: string[]
-    readonly next: () => NextDialogue
+    readonly next: () => void|NextDialogue
     readonly options: DialogueOption[]
 
     /**
@@ -18,7 +17,7 @@ export class DialogueInstance {
      *                Clicking an option will execute the corresponding function.
      *                If the function returns a Dialogue, that will then be prompted.
      */
-    constructor(lines: string[], next: () => NextDialogue, options: DialogueOption[]) {
+    constructor(lines: string[], next: () => void|NextDialogue, options: DialogueOption[]) {
         this.lines = lines
         this.next = next
         this.options = options
@@ -26,8 +25,8 @@ export class DialogueInstance {
 }
 
 // Shorthand functions for creating dialogue
-const d = (lines: string[], ...options: DialogueOption[]): DialogueInstance => { return new DialogueInstance(lines, null, options) }
-const part = (lines: string[], nextPart: () => NextDialogue): DialogueInstance => { return new DialogueInstance(lines, nextPart, []) } 
+const d = (lines: string[], ...options: DialogueOption[]): DialogueInstance => { return new DialogueInstance(lines, () => {}, options) }
+const part = (lines: string[], next: () => void|NextDialogue): DialogueInstance => { return new DialogueInstance(lines, next, []) } 
 const option = (text: string, next: Dialogue, open: boolean = true): DialogueOption => {
     return new DialogueOption(text, () => new NextDialogue(next, open))
 }
@@ -104,7 +103,6 @@ const DIALOGUE_MAP: { [key: number]: () => DialogueInstance } = {
         const dipTent = LocationManager.instance.currentLocation.elements.values().filter(e => e.type === ElementType.TENT)[0]
         if (campfires.length > 0) {
             Player.instance.dude.inventory.addItem(Item.TENT)
-            console.log(dipTent.occupiedPoints[0].distanceTo(campfires[0].occupiedPoints[0]))
             const lines = [
                 dipTent.occupiedPoints[0].distanceTo(campfires[0].occupiedPoints[0]) < 5
                         ? "That should keep up warm tonight!"

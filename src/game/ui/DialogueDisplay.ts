@@ -60,7 +60,7 @@ export class DialogueDisplay extends Component {
         }
 
         if (this.lineIndex === this.dialogue.lines.length) {
-            this.completeDudeDialogue(!this.dialogue.next ? null : this.dialogue.next())
+            this.completeDudeDialogue(this.dialogue.next)
             return
         }
 
@@ -84,12 +84,19 @@ export class DialogueDisplay extends Component {
         }
     }
 
-    private completeDudeDialogue(next: NextDialogue) {
-        this.dude.dialogue = next?.dialogue ?? null
-        if (next?.open) {
-            this.startDialogue(this.dude)
-        } else {
+    private completeDudeDialogue(nextFn: () => void|NextDialogue) {
+        const next = nextFn()
+        
+        if (!next) {
+            this.dude.dialogue = null
             this.close()
+        } else {
+            this.dude.dialogue = next.dialogue
+            if (next.open) {
+                this.startDialogue(this.dude)
+            } else {
+                this.close()
+            }
         }
     }
 
@@ -192,12 +199,7 @@ export class DialogueDisplay extends Component {
                 topLeft.plus(new Point(marginSide, marginTop + i * (TILE_SIZE + buttonPadding))),
                 option.text,
                 () => {
-                    const buttonFnResult = option.next()
-                    if (!!buttonFnResult) {
-                        this.completeDudeDialogue(buttonFnResult)
-                    } else {
-                        this.completeDudeDialogue(null)
-                    }
+                    this.completeDudeDialogue(option.next)
                 }
             )
         ))
