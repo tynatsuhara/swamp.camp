@@ -19,7 +19,7 @@ export class PointLightMaskRenderer {
 
     private lightTiles: Grid<number> = new Grid()
     private gridDirty = true
-    private darkness = 0.6
+    private darkness = 0.4
 
     private canvas: HTMLCanvasElement
     private context: CanvasRenderingContext2D
@@ -59,7 +59,7 @@ export class PointLightMaskRenderer {
     }
 
     renderToOffscreenCanvas() {
-        this.context.fillStyle = `rgba(0, 0, 0, ${this.darkness})`
+        this.context.fillStyle = `rgba(34, 34, 34, ${this.darkness})`
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
 

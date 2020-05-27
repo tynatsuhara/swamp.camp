@@ -4868,7 +4868,7 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                     this.shift = new point_33.Point(this.size / 2, this.size / 2);
                     this.lightTiles = new Grid_1.Grid();
                     this.gridDirty = true;
-                    this.darkness = 0.6;
+                    this.darkness = 0.4;
                     PointLightMaskRenderer.instance = this;
                     this.canvas = document.createElement("canvas");
                     this.canvas.width = this.size;
@@ -4899,7 +4899,7 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                 };
                 PointLightMaskRenderer.prototype.renderToOffscreenCanvas = function () {
                     var _this = this;
-                    this.context.fillStyle = "rgba(0, 0, 0, " + this.darkness + ")";
+                    this.context.fillStyle = "rgba(34, 34, 34, " + this.darkness + ")";
                     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
                     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
                     this.lightTiles.entries().forEach(function (entry) {
