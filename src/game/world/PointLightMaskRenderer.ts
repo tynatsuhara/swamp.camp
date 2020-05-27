@@ -95,7 +95,7 @@ export class PointLightMaskRenderer {
         this.context.putImageData(imageData, position.x, position.y)
     }
 
-    getEntities() {
+    getEntity(): Entity {
         if (this.gridDirty) {
             this.renderToOffscreenCanvas()
             this.gridDirty = false
@@ -104,13 +104,13 @@ export class PointLightMaskRenderer {
         // prevent tint not extending to the edge
         const dimensions = Camera.instance.dimensions.plus(new Point(1, 1))
 
-        return [new Entity([new BasicRenderComponent(new ImageRender(
+        return new Entity([new BasicRenderComponent(new ImageRender(
             this.canvas,
             Camera.instance.position.plus(this.shift).apply(Math.floor),
             dimensions,
             Camera.instance.position.apply(Math.floor),
             dimensions,
             UIStateManager.UI_SPRITE_DEPTH - 100  // make sure all UI goes on top of light
-        ))])]
+        ))])
     }
 }

@@ -23,7 +23,7 @@ export class CutsceneManager {
         SaveManager.instance.save()
     }
 
-    getEntities(): Entity[] {
-        return !!this.entity ? [this.entity] : []
+    getEntity(): Entity {
+        return this.entity
     }
 }

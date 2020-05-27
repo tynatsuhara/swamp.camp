@@ -23,6 +23,8 @@ import { TintRender } from "../engine/renderer/TintRender"
 import { PointLightMaskRenderer } from "./world/PointLightMaskRenderer"
 import { Player } from "./characters/Player"
 import { Item } from "./items/Items"
+import { WorldTime } from "./world/WorldTime"
+import { EventQueue } from "./world/events/EventQueue"
 
 
 const ZOOM = 3
@@ -49,6 +51,8 @@ export class QuestGame extends Game {
         new CutsceneManager()
         new LocationManager()
         new PointLightMaskRenderer()
+        new WorldTime()
+        new EventQueue()
 
         const newGame = !SaveManager.instance.load()
 
@@ -64,9 +68,9 @@ export class QuestGame extends Game {
             Camera.instance.focusOnDude(playerDude)
 
             DudeFactory.instance.new(DudeType.DIP, Point.ZERO)
-            // DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(3, 1).times(TILE_SIZE))
-            // DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(-1, 3).times(TILE_SIZE))
-            // DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(-4, 0).times(TILE_SIZE))
+            DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(3, 1).times(TILE_SIZE))
+            DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(-1, 3).times(TILE_SIZE))
+            DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(-4, 0).times(TILE_SIZE))
 
             // TODO clean up obstacles (trees, rocks, etc) so intro goes smoothly
             CutsceneManager.instance.startCutscene(new IntroCutscene())
@@ -102,9 +106,11 @@ export class QuestGame extends Game {
         this.gameEntityView = { 
             zoom: ZOOM,
             offset: cameraOffset,
-            entities: LocationManager.instance.currentLocation.getEntities()
-                    .concat(CutsceneManager.instance.getEntities())
-                    .concat(PointLightMaskRenderer.instance.getEntities())
+            entities: LocationManager.instance.currentLocation.getEntities().concat([
+                CutsceneManager.instance.getEntity(), 
+                WorldTime.instance.getEntity(), 
+                PointLightMaskRenderer.instance.getEntity()
+            ])
         }
 
         this.uiView = {

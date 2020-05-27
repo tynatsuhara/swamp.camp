@@ -17,7 +17,7 @@ export class IntroCutscene extends Component {
     // durations in ms
     private readonly STOP_WALKING_IN = 2000
     private readonly PAN_TO_DIP = this.STOP_WALKING_IN + 1000
-    private readonly PAN_BACK = this.PAN_TO_DIP + 5000
+    private readonly PAN_BACK = this.PAN_TO_DIP + 3000
 
     private waitingForOrcsToDie = false
     private orcs: Dude[]
