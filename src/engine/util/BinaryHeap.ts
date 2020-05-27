@@ -4,9 +4,10 @@ export class BinaryHeap<T> {
     content: T[]
     scoreFunction: (x: T) => number
 
-    constructor(scoreFunction: (x: T) => number) {
+    constructor(scoreFunction: (x: T) => number, contents = []) {
         this.content = []
         this.scoreFunction = scoreFunction
+        contents.forEach(item => this.push(item))
     }
 
     push(element: T) {
@@ -24,20 +25,24 @@ export class BinaryHeap<T> {
         return result
     }
 
+    peek(): T {
+        if (this.content.length === 0) {
+            throw new Error("cannot call peek() on an empty heap")
+        }
+        return this.content[0]
+    }
+
     remove(node: T) {
         let length = this.content.length
-        // To remove a value, we must search through the array to find
-        // it.
+        // To remove a value, we must search through the array to find it.
         for (var i = 0; i < length; i++) {
             if (this.content[i] != node) continue
-            // When it is found, the process seen in 'pop' is repeated
-            // to fill up the hole.
+            // When it is found, the process seen in 'pop' is repeated to fill up the hole.
             let end = this.content.pop()
-            // If the element we popped was the one we needed to remove,
-            // we're done.
+            // If the element we popped was the one we needed to remove, we're done.
             if (i == length - 1) break
-            // Otherwise, we replace the removed element with the popped
-            // one, and allow it to float up or sink down as appropriate.
+            // Otherwise, we replace the removed element with the popped one, 
+            // and allow it to float up or sink down as appropriate.
             this.content[i] = end
             this.bubbleUp(i)
             this.sinkDown(i)
@@ -49,6 +54,14 @@ export class BinaryHeap<T> {
         return this.content.length
     }
 
+    getContents(sorted: boolean = false) {
+        const copy = [...this.content]
+        if (sorted) {
+            copy.sort(this.scoreFunction)
+        }
+        return copy
+    }
+
     private bubbleUp(n: number) {
         // Fetch the element that has to be moved.
         let element = this.content[n], score = this.scoreFunction(element)
@@ -57,13 +70,11 @@ export class BinaryHeap<T> {
             // Compute the parent element's index, and fetch it.
             let parentN = Math.floor((n + 1) / 2) - 1,
                 parent = this.content[parentN]
-            // If the parent has a lesser score, things are in order and we
-            // are done.
+            // If the parent has a lesser score, things are in order and we are done.
             if (score >= this.scoreFunction(parent))
                 break
 
-            // Otherwise, swap the parent with the current element and
-            // continue.
+            // Otherwise, swap the parent with the current element and continue.
             this.content[parentN] = element
             this.content[n] = parent
             n = parentN
@@ -79,8 +90,7 @@ export class BinaryHeap<T> {
         while (true) {
             // Compute the indices of the child elements.
             var child2N = (n + 1) * 2, child1N = child2N - 1
-            // This is used to store the new position of the element,
-            // if any.
+            // This is used to store the new position of the element, if any.
             var swap = null
             // If the first child exists (is inside the array)...
             if (child1N < length) {
