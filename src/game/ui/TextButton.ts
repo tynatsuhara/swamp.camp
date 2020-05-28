@@ -24,18 +24,29 @@ export class TextButton extends Component {
     private right: TileComponent
     private onClick: () => void
     private hovering: boolean
+    private textColor: string
+    private hoverColor: string
 
-    constructor(position: Point, text: string, onClick: () => void) {
+    constructor(
+        position: Point, 
+        text: string, 
+        onClick: () => void, 
+        buttonColor: 'red'|'white',
+        textColor: string,
+        hoverColor: string
+    ) {
         super()
         this.position = position
         this.text = text
         this.onClick = onClick
+        this.textColor = textColor
+        this.hoverColor = hoverColor
         this.width = this.text.length * TEXT_PIXEL_WIDTH + TextButton.margin * 2
 
         this.start = () => {
-            this.left = this.entity.addComponent(Tilesets.instance.oneBit.getTileSource("btnLeft").toComponent())
-            this.center = this.entity.addComponent(Tilesets.instance.oneBit.getTileSource("btnCenter").toComponent())
-            this.right = this.entity.addComponent(Tilesets.instance.oneBit.getTileSource("btnRight").toComponent())
+            this.left = this.entity.addComponent(Tilesets.instance.oneBit.getTileSource(`btnLeft_${buttonColor}`).toComponent())
+            this.center = this.entity.addComponent(Tilesets.instance.oneBit.getTileSource(`btnCenter_${buttonColor}`).toComponent())
+            this.right = this.entity.addComponent(Tilesets.instance.oneBit.getTileSource(`btnRight_${buttonColor}`).toComponent())
 
             const leftPos = this.position.apply(Math.floor)
             const centerPos = leftPos.plus(new Point(TILE_SIZE, 0))
@@ -67,7 +78,7 @@ export class TextButton extends Component {
             this.left.transform.position.plus(TextButton.textOffset),
             TEXT_SIZE,
             TEXT_FONT,
-            this.hovering ? Color.DARK_RED : Color.WHITE,
+            this.hovering ? this.hoverColor : this.textColor,
             UIStateManager.UI_SPRITE_DEPTH + 2
         )]
     }

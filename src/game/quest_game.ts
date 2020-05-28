@@ -47,12 +47,8 @@ export class QuestGame extends Game {
         new CutsceneManager()
         new PointLightMaskRenderer()
 
-        const saveData = SaveManager.instance.load()
-
-        if (!saveData) {
+        if (!SaveManager.instance.load()) {
             this.newGame()
-        } else {
-            this.loadSave(saveData)
         }
     }
 
@@ -81,14 +77,7 @@ export class QuestGame extends Game {
     }
 
     loadSave(save: Save) {
-        LocationManager.load(save.locations)
-        new WorldTime(save.worldTime)
-        new EventQueue(save.eventQueue)
 
-        Camera.instance.focusOnDude(Array.from(LocationManager.instance.currentLocation.dudes).filter(d => d.type === DudeType.PLAYER)[0])
-
-        // clear existing UI state by overwriting singleton
-        new UIStateManager()
     }
 
     // entities in the world space

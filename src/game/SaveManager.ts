@@ -36,11 +36,11 @@ export class SaveManager {
     /**
      * @return true if a save was loaded successfully
      */
-    load(): Save {
+    load() {
         const blob = localStorage.getItem("save")
         if (!blob) {
             console.log("no save found")
-            return null
+            return false
         }
         
         const save: Save = JSON.parse(blob)
@@ -48,6 +48,15 @@ export class SaveManager {
         prettyPrintTimestamp.setTime(save.timeSaved)
         console.log(`loaded save from ${prettyPrintTimestamp}`)
 
-        return save
+        LocationManager.load(save.locations)
+        new WorldTime(save.worldTime)
+        new EventQueue(save.eventQueue)
+
+        Camera.instance.focusOnDude(Array.from(LocationManager.instance.currentLocation.dudes).filter(d => d.type === DudeType.PLAYER)[0])
+
+        // clear existing UI state by overwriting singleton
+        new UIStateManager()
+
+        return true
     }
 }

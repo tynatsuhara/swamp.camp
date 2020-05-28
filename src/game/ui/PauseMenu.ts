@@ -4,6 +4,9 @@ import { UpdateData } from "../../engine/engine"
 import { InputKey } from "../../engine/input"
 import { UIStateManager } from "./UIStateManager"
 import { Point } from "../../engine/point"
+import { ButtonsMenu } from "./ButtonsMenu"
+import { Color } from "./Color"
+import { SaveManager } from "../SaveManager"
 
 export class PauseMenu extends Component {
 
@@ -24,14 +27,33 @@ export class PauseMenu extends Component {
     close() {
         this.isOpen = false
         console.log("closed pause menu")
+        this.displayEntity = null
     }
 
     show(dimensions: Point) {
         this.isOpen = true
         console.log("opened pause menu")
+        this.displayEntity = ButtonsMenu.render(
+            dimensions,
+            "red",
+            [{
+                text: "Save", 
+                fn: () => SaveManager.instance.save(),
+                buttonColor: "red",
+                textColor: Color.RED,
+                hoverColor: Color.WHITE
+            },
+            {
+                text: "Reload last save", 
+                fn: () => SaveManager.instance.load(),
+                buttonColor: "red",
+                textColor: Color.RED,
+                hoverColor: Color.WHITE
+            }]
+        )
     }
 
     getEntities(): Entity[] {
-        return [this.e]
+        return [this.e, this.displayEntity]
     }
 }

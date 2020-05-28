@@ -12,6 +12,7 @@ import { Controls } from "../Controls"
 import { UIStateManager } from "./UIStateManager"
 import { TextButton } from "./TextButton"
 import { Dude } from "../characters/Dude"
+import { ButtonsMenu } from "./ButtonsMenu"
 
 export class DialogueDisplay extends Component {
 
@@ -19,6 +20,7 @@ export class DialogueDisplay extends Component {
 
     private e: Entity = new Entity([this])
     private displayEntity: Entity
+    private optionsEntity: Entity
     private dude: Dude
     private dialogue: DialogueInstance
     private lineIndex: number
@@ -68,6 +70,7 @@ export class DialogueDisplay extends Component {
 
         // Overwrite previously displayed tiles each time
         this.displayEntity = new Entity()
+        this.optionsEntity = null
 
         this.renderNextLine(updateData.dimensions)
 
@@ -80,7 +83,7 @@ export class DialogueDisplay extends Component {
         if (!this.displayEntity) {
             return [this.e]
         } else {
-            return [this.e, this.displayEntity]
+            return [this.e, this.displayEntity, this.optionsEntity]
         }
     }
 
@@ -170,38 +173,18 @@ export class DialogueDisplay extends Component {
     }
 
     private renderOptions(screenDimensions: Point) {
-        const options = this.dialogue.options
-        const longestOption = Math.max(...options.map(o => o.text.length))
-
-        const marginTop = 13
-        const marginBottom = 12
-        const marginSide = 9
-        const buttonPadding = 3
-
-        const dimensions = new Point(
-            longestOption * TEXT_PIXEL_WIDTH + marginSide*2 + TextButton.margin*2, 
-            (options.length-1)*buttonPadding + options.length*TILE_SIZE + marginTop + marginBottom
-        )
-        
-        const topLeft = screenDimensions.div(2).minus(dimensions.div(2))
-
-        const backgroundTiles = makeStretchedNineSliceComponents(
-            Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"), 
-            topLeft,
-            dimensions
-        )
-        backgroundTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
-
-        backgroundTiles.forEach(tile => this.displayEntity.addComponent(tile))
-
-        options.forEach((option, i) => this.displayEntity.addComponent(
-            new TextButton(
-                topLeft.plus(new Point(marginSide, marginTop + i * (TILE_SIZE + buttonPadding))),
-                option.text,
-                () => {
-                    this.completeDudeDialogue(option.next)
+        this.optionsEntity = ButtonsMenu.render(
+            screenDimensions,
+            "white",
+            this.dialogue.options.map(o => { 
+                return {
+                    text: o.text, 
+                    fn: () => o.next(),
+                    buttonColor: 'white',
+                    textColor: Color.WHITE,
+                    hoverColor: Color.DARK_RED
                 }
-            )
-        ))
+            })
+        )
     }
 }
