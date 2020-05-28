@@ -5,6 +5,8 @@ import { UIStateManager } from "./ui/UIStateManager"
 import { Camera } from "./cutscenes/Camera"
 import { DudeType } from "./characters/DudeFactory"
 import { HUD } from "./ui/HUD"
+import { WorldTime } from "./world/WorldTime"
+import { EventQueue } from "./world/events/EventQueue"
 
 export class SaveManager {
 
@@ -21,36 +23,31 @@ export class SaveManager {
         }
         HUD.instance.showSaveIcon()
         const save: Save = {
-            // storyState: StoryState.INTRODUCTION,
+            timeSaved: new Date().getTime(),
+            saveVersion: 0,
             locations: LocationManager.instance.save(),
-            time: new Date().getTime()
+            worldTime: WorldTime.instance.time,
+            eventQueue: EventQueue.instance.save()
         }
         console.log("saved game")
-        localStorage.setItem("save", JSON.stringify(save))
+        localStorage.setItem("save", JSON.stringify(save))  // TODO support save slots
     }
 
     /**
      * @return true if a save was loaded successfully
      */
-    load(): boolean {
+    load(): Save {
         const blob = localStorage.getItem("save")
         if (!blob) {
             console.log("no save found")
-            return false
+            return null
         }
         
         const save: Save = JSON.parse(blob)
         const prettyPrintTimestamp = new Date()
-        prettyPrintTimestamp.setTime(save.time)
+        prettyPrintTimestamp.setTime(save.timeSaved)
         console.log(`loaded save from ${prettyPrintTimestamp}`)
 
-        LocationManager.load(save.locations)
-
-        Camera.instance.focusOnDude(Array.from(LocationManager.instance.currentLocation.dudes).filter(d => d.type === DudeType.PLAYER)[0])
-
-        // clear existing UI state by overwriting singleton
-        new UIStateManager()
-        
-        return true
+        return save
     }
 }

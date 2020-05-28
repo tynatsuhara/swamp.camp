@@ -2698,7 +2698,6 @@ System.register("game/world/LocationManager", ["game/world/WorldLocation", "game
                         result.locations.set(l.uuid, loadedLocation);
                     });
                     result.current = result.locations.get(saveState.currentLocationUUID);
-                    return result;
                 };
                 return LocationManager;
             }());
@@ -4316,10 +4315,29 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point",
         }
     };
 });
-System.register("game/saves/SaveGame", [], function (exports_61, context_61) {
+System.register("game/world/events/QueuedEvent", [], function (exports_61, context_61) {
+    "use strict";
+    var _a, QueuedEventType, EVENT_QUEUE_HANDLERS;
+    var __moduleName = context_61 && context_61.id;
+    return {
+        setters: [],
+        execute: function () {
+            (function (QueuedEventType) {
+                QueuedEventType[QueuedEventType["TRADER_ARRIVAL"] = 0] = "TRADER_ARRIVAL";
+            })(QueuedEventType || (QueuedEventType = {}));
+            exports_61("QueuedEventType", QueuedEventType);
+            exports_61("EVENT_QUEUE_HANDLERS", EVENT_QUEUE_HANDLERS = (_a = {},
+                _a[QueuedEventType.TRADER_ARRIVAL] = function () {
+                    console.log("the trader is here (ノ ″ロ″)ノ");
+                },
+                _a));
+        }
+    };
+});
+System.register("game/saves/SaveGame", [], function (exports_62, context_62) {
     "use strict";
     var Save;
-    var __moduleName = context_61 && context_61.id;
+    var __moduleName = context_62 && context_62.id;
     return {
         setters: [],
         execute: function () {
@@ -4328,99 +4346,14 @@ System.register("game/saves/SaveGame", [], function (exports_61, context_61) {
                 }
                 return Save;
             }());
-            exports_61("Save", Save);
+            exports_62("Save", Save);
         }
     };
 });
-System.register("game/SaveManager", ["game/characters/Player", "game/world/LocationManager", "game/ui/UIStateManager", "game/cutscenes/Camera", "game/ui/HUD"], function (exports_62, context_62) {
-    "use strict";
-    var Player_5, LocationManager_7, UIStateManager_4, Camera_2, HUD_1, SaveManager;
-    var __moduleName = context_62 && context_62.id;
-    return {
-        setters: [
-            function (Player_5_1) {
-                Player_5 = Player_5_1;
-            },
-            function (LocationManager_7_1) {
-                LocationManager_7 = LocationManager_7_1;
-            },
-            function (UIStateManager_4_1) {
-                UIStateManager_4 = UIStateManager_4_1;
-            },
-            function (Camera_2_1) {
-                Camera_2 = Camera_2_1;
-            },
-            function (HUD_1_1) {
-                HUD_1 = HUD_1_1;
-            }
-        ],
-        execute: function () {
-            SaveManager = /** @class */ (function () {
-                function SaveManager() {
-                    SaveManager.instance = this;
-                }
-                SaveManager.prototype.save = function () {
-                    if (!Player_5.Player.instance.dude.isAlive) {
-                        console.log("cannot save after death");
-                        return;
-                    }
-                    HUD_1.HUD.instance.showSaveIcon();
-                    var save = {
-                        // storyState: StoryState.INTRODUCTION,
-                        locations: LocationManager_7.LocationManager.instance.save(),
-                        time: new Date().getTime()
-                    };
-                    console.log("saved game");
-                    localStorage.setItem("save", JSON.stringify(save));
-                };
-                /**
-                 * @return true if a save was loaded successfully
-                 */
-                SaveManager.prototype.load = function () {
-                    var blob = localStorage.getItem("save");
-                    if (!blob) {
-                        console.log("no save found");
-                        return false;
-                    }
-                    var save = JSON.parse(blob);
-                    var prettyPrintTimestamp = new Date();
-                    prettyPrintTimestamp.setTime(save.time);
-                    console.log("loaded save from " + prettyPrintTimestamp);
-                    LocationManager_7.LocationManager.load(save.locations);
-                    Camera_2.Camera.instance.focusOnDude(Array.from(LocationManager_7.LocationManager.instance.currentLocation.dudes).filter(function (d) { return d.type === 0 /* PLAYER */; })[0]);
-                    // clear existing UI state by overwriting singleton
-                    new UIStateManager_4.UIStateManager();
-                    return true;
-                };
-                return SaveManager;
-            }());
-            exports_62("SaveManager", SaveManager);
-        }
-    };
-});
-System.register("game/world/events/QueuedEvent", [], function (exports_63, context_63) {
-    "use strict";
-    var _a, QueuedEventType, EVENT_QUEUE_HANDLERS;
-    var __moduleName = context_63 && context_63.id;
-    return {
-        setters: [],
-        execute: function () {
-            (function (QueuedEventType) {
-                QueuedEventType[QueuedEventType["TRADER_ARRIVAL"] = 0] = "TRADER_ARRIVAL";
-            })(QueuedEventType || (QueuedEventType = {}));
-            exports_63("QueuedEventType", QueuedEventType);
-            exports_63("EVENT_QUEUE_HANDLERS", EVENT_QUEUE_HANDLERS = (_a = {},
-                _a[QueuedEventType.TRADER_ARRIVAL] = function () {
-                    console.log("the trader is here (ノ ″ロ″)ノ");
-                },
-                _a));
-        }
-    };
-});
-System.register("game/world/events/EventQueue", ["engine/util/BinaryHeap", "game/world/events/QueuedEvent"], function (exports_64, context_64) {
+System.register("game/world/events/EventQueue", ["engine/util/BinaryHeap", "game/world/events/QueuedEvent"], function (exports_63, context_63) {
     "use strict";
     var BinaryHeap_2, QueuedEvent_1, EventQueue;
-    var __moduleName = context_64 && context_64.id;
+    var __moduleName = context_63 && context_63.id;
     return {
         setters: [
             function (BinaryHeap_2_1) {
@@ -4432,9 +4365,10 @@ System.register("game/world/events/EventQueue", ["engine/util/BinaryHeap", "game
         ],
         execute: function () {
             EventQueue = /** @class */ (function () {
-                function EventQueue() {
-                    this.heap = new BinaryHeap_2.BinaryHeap(function (e) { return e.time; });
+                function EventQueue(data) {
+                    if (data === void 0) { data = []; }
                     EventQueue.instance = this;
+                    this.heap = new BinaryHeap_2.BinaryHeap(function (e) { return e.time; }, data);
                 }
                 EventQueue.prototype.addEvent = function (event) {
                     this.heap.push(event);
@@ -4445,16 +4379,19 @@ System.register("game/world/events/EventQueue", ["engine/util/BinaryHeap", "game
                         QueuedEvent_1.EVENT_QUEUE_HANDLERS[event_1.type](event_1);
                     }
                 };
+                EventQueue.prototype.save = function () {
+                    return this.heap.getContents();
+                };
                 return EventQueue;
             }());
-            exports_64("EventQueue", EventQueue);
+            exports_63("EventQueue", EventQueue);
         }
     };
 });
-System.register("game/world/WorldTime", ["engine/Entity", "engine/component", "game/world/events/EventQueue"], function (exports_65, context_65) {
+System.register("game/world/WorldTime", ["engine/Entity", "engine/component", "game/world/events/EventQueue"], function (exports_64, context_64) {
     "use strict";
     var Entity_8, component_14, EventQueue_1, WorldTime;
-    var __moduleName = context_65 && context_65.id;
+    var __moduleName = context_64 && context_64.id;
     return {
         setters: [
             function (Entity_8_1) {
@@ -4470,10 +4407,12 @@ System.register("game/world/WorldTime", ["engine/Entity", "engine/component", "g
         execute: function () {
             WorldTime = /** @class */ (function (_super) {
                 __extends(WorldTime, _super);
-                function WorldTime() {
+                function WorldTime(time) {
+                    if (time === void 0) { time = 0; }
                     var _this = _super.call(this) || this;
                     _this._time = 0; // millis
                     WorldTime.instance = _this;
+                    _this._time = time;
                     return _this;
                 }
                 Object.defineProperty(WorldTime.prototype, "time", {
@@ -4502,13 +4441,77 @@ System.register("game/world/WorldTime", ["engine/Entity", "engine/component", "g
                 WorldTime.DAY = 24 * WorldTime.HOUR;
                 return WorldTime;
             }(component_14.Component));
-            exports_65("WorldTime", WorldTime);
+            exports_64("WorldTime", WorldTime);
+        }
+    };
+});
+System.register("game/SaveManager", ["game/characters/Player", "game/world/LocationManager", "game/ui/HUD", "game/world/WorldTime", "game/world/events/EventQueue"], function (exports_65, context_65) {
+    "use strict";
+    var Player_5, LocationManager_7, HUD_1, WorldTime_1, EventQueue_2, SaveManager;
+    var __moduleName = context_65 && context_65.id;
+    return {
+        setters: [
+            function (Player_5_1) {
+                Player_5 = Player_5_1;
+            },
+            function (LocationManager_7_1) {
+                LocationManager_7 = LocationManager_7_1;
+            },
+            function (HUD_1_1) {
+                HUD_1 = HUD_1_1;
+            },
+            function (WorldTime_1_1) {
+                WorldTime_1 = WorldTime_1_1;
+            },
+            function (EventQueue_2_1) {
+                EventQueue_2 = EventQueue_2_1;
+            }
+        ],
+        execute: function () {
+            SaveManager = /** @class */ (function () {
+                function SaveManager() {
+                    SaveManager.instance = this;
+                }
+                SaveManager.prototype.save = function () {
+                    if (!Player_5.Player.instance.dude.isAlive) {
+                        console.log("cannot save after death");
+                        return;
+                    }
+                    HUD_1.HUD.instance.showSaveIcon();
+                    var save = {
+                        timeSaved: new Date().getTime(),
+                        saveVersion: 0,
+                        locations: LocationManager_7.LocationManager.instance.save(),
+                        worldTime: WorldTime_1.WorldTime.instance.time,
+                        eventQueue: EventQueue_2.EventQueue.instance.save()
+                    };
+                    console.log("saved game");
+                    localStorage.setItem("save", JSON.stringify(save)); // TODO support save slots
+                };
+                /**
+                 * @return true if a save was loaded successfully
+                 */
+                SaveManager.prototype.load = function () {
+                    var blob = localStorage.getItem("save");
+                    if (!blob) {
+                        console.log("no save found");
+                        return null;
+                    }
+                    var save = JSON.parse(blob);
+                    var prettyPrintTimestamp = new Date();
+                    prettyPrintTimestamp.setTime(save.timeSaved);
+                    console.log("loaded save from " + prettyPrintTimestamp);
+                    return save;
+                };
+                return SaveManager;
+            }());
+            exports_65("SaveManager", SaveManager);
         }
     };
 });
 System.register("game/characters/Dialogue", ["game/characters/Player", "game/Controls", "game/world/LocationManager", "game/SaveManager", "game/world/events/EventQueue", "game/world/events/QueuedEvent", "game/world/WorldTime"], function (exports_66, context_66) {
     "use strict";
-    var _a, Player_6, Controls_3, LocationManager_8, SaveManager_1, EventQueue_2, QueuedEvent_2, WorldTime_1, DialogueInstance, dialogueWithOptions, dialogue, option, DialogueOption, NextDialogue, getDialogue, ROCKS_NEEDED_FOR_CAMPFIRE, DIALOGUE_MAP;
+    var _a, Player_6, Controls_3, LocationManager_8, SaveManager_1, EventQueue_3, QueuedEvent_2, WorldTime_2, DialogueInstance, dialogueWithOptions, dialogue, option, DialogueOption, NextDialogue, getDialogue, ROCKS_NEEDED_FOR_CAMPFIRE, DIALOGUE_MAP;
     var __moduleName = context_66 && context_66.id;
     return {
         setters: [
@@ -4524,14 +4527,14 @@ System.register("game/characters/Dialogue", ["game/characters/Player", "game/Con
             function (SaveManager_1_1) {
                 SaveManager_1 = SaveManager_1_1;
             },
-            function (EventQueue_2_1) {
-                EventQueue_2 = EventQueue_2_1;
+            function (EventQueue_3_1) {
+                EventQueue_3 = EventQueue_3_1;
             },
             function (QueuedEvent_2_1) {
                 QueuedEvent_2 = QueuedEvent_2_1;
             },
-            function (WorldTime_1_1) {
-                WorldTime_1 = WorldTime_1_1;
+            function (WorldTime_2_1) {
+                WorldTime_2 = WorldTime_2_1;
             }
         ],
         execute: function () {
@@ -4586,6 +4589,11 @@ System.register("game/characters/Dialogue", ["game/characters/Player", "game/Con
             exports_66("NextDialogue", NextDialogue);
             exports_66("getDialogue", getDialogue = function (d) { return DIALOGUE_MAP[d](); });
             ROCKS_NEEDED_FOR_CAMPFIRE = 10;
+            /**
+             * State should only be modified in the "next" functions. If state is changed
+             * in the top-level Dialogue functions, it can be triggered repeatedly if the
+             * dialogue is opened/closed or if the game is saved then loaded.
+             */
             DIALOGUE_MAP = (_a = {},
                 _a[1 /* DIP_0 */] = function () { return dialogueWithOptions(["Phew, thanks for your help! They almost had me. I thought for sure that those Orcs were gonna eat my butt."], option("Are you okay?", 2 /* DIP_1 */), option("I expect a reward.", 3 /* DIP_2 */), option("... Eat your butt?", 4 /* DIP_3 */)); },
                 _a[2 /* DIP_1 */] = function () { return dialogue(["I'm alright, just shaken up. You sure know how to handle that blade!"], function () { return new NextDialogue(5 /* DIP_BEFRIEND */); }); },
@@ -4627,10 +4635,11 @@ System.register("game/characters/Dialogue", ["game/characters/Player", "game/Con
                             lines.push("By the way, you can light the fire by standing close to it and pressing [" + Controls_3.Controls.keyString(Controls_3.Controls.interactButton) + "].");
                         }
                         return dialogue(lines, function () {
-                            EventQueue_2.EventQueue.instance.addEvent({
+                            EventQueue_3.EventQueue.instance.addEvent({
                                 type: QueuedEvent_2.QueuedEventType.TRADER_ARRIVAL,
-                                time: WorldTime_1.WorldTime.instance.future({ minutes: 10 })
+                                time: WorldTime_2.WorldTime.instance.future({ minutes: 10 })
                             });
+                            SaveManager_1.SaveManager.instance.save();
                         });
                     }
                     else {
@@ -4643,7 +4652,7 @@ System.register("game/characters/Dialogue", ["game/characters/Player", "game/Con
 });
 System.register("game/ui/TextButton", ["engine/component", "engine/point", "game/graphics/Tilesets", "game/ui/Text", "engine/renderer/TextRender", "game/ui/Color", "game/ui/UIStateManager", "engine/util/utils"], function (exports_67, context_67) {
     "use strict";
-    var component_15, point_31, Tilesets_12, Text_3, TextRender_5, Color_3, UIStateManager_5, utils_6, TextButton;
+    var component_15, point_31, Tilesets_12, Text_3, TextRender_5, Color_3, UIStateManager_4, utils_6, TextButton;
     var __moduleName = context_67 && context_67.id;
     return {
         setters: [
@@ -4665,8 +4674,8 @@ System.register("game/ui/TextButton", ["engine/component", "engine/point", "game
             function (Color_3_1) {
                 Color_3 = Color_3_1;
             },
-            function (UIStateManager_5_1) {
-                UIStateManager_5 = UIStateManager_5_1;
+            function (UIStateManager_4_1) {
+                UIStateManager_4 = UIStateManager_4_1;
             },
             function (utils_6_1) {
                 utils_6 = utils_6_1;
@@ -4692,7 +4701,7 @@ System.register("game/ui/TextButton", ["engine/component", "engine/point", "game
                         _this.center.transform.position = centerPos;
                         _this.right.transform.position = rightPos;
                         _this.center.transform.dimensions = new point_31.Point(_this.width + TextButton.margin * 2 - Tilesets_12.TILE_SIZE * 2, Tilesets_12.TILE_SIZE);
-                        Array.from([_this.left, _this.center, _this.right]).forEach(function (t) { return t.transform.depth = UIStateManager_5.UIStateManager.UI_SPRITE_DEPTH + 1; });
+                        Array.from([_this.left, _this.center, _this.right]).forEach(function (t) { return t.transform.depth = UIStateManager_4.UIStateManager.UI_SPRITE_DEPTH + 1; });
                     };
                     return _this;
                 }
@@ -4706,7 +4715,7 @@ System.register("game/ui/TextButton", ["engine/component", "engine/point", "game
                     if (this.text === null) {
                         return [];
                     }
-                    return [new TextRender_5.TextRender(this.text, this.left.transform.position.plus(TextButton.textOffset), Text_3.TEXT_SIZE, Text_3.TEXT_FONT, this.hovering ? Color_3.Color.DARK_RED : Color_3.Color.WHITE, UIStateManager_5.UIStateManager.UI_SPRITE_DEPTH + 2)];
+                    return [new TextRender_5.TextRender(this.text, this.left.transform.position.plus(TextButton.textOffset), Text_3.TEXT_SIZE, Text_3.TEXT_FONT, this.hovering ? Color_3.Color.DARK_RED : Color_3.Color.WHITE, UIStateManager_4.UIStateManager.UI_SPRITE_DEPTH + 2)];
                 };
                 TextButton.margin = 6;
                 TextButton.textOffset = new point_31.Point(TextButton.margin, TextButton.margin - 2);
@@ -4718,7 +4727,7 @@ System.register("game/ui/TextButton", ["engine/component", "engine/point", "game
 });
 System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/graphics/Tilesets", "engine/tiles/NineSlice", "engine/point", "engine/component", "engine/Entity", "engine/renderer/BasicRenderComponent", "game/ui/Text", "game/ui/Color", "game/Controls", "game/ui/UIStateManager", "game/ui/TextButton"], function (exports_68, context_68) {
     "use strict";
-    var Dialogue_1, Tilesets_13, NineSlice_3, point_32, component_16, Entity_9, BasicRenderComponent_3, Text_4, Color_4, Controls_4, UIStateManager_6, TextButton_1, DialogueDisplay;
+    var Dialogue_1, Tilesets_13, NineSlice_3, point_32, component_16, Entity_9, BasicRenderComponent_3, Text_4, Color_4, Controls_4, UIStateManager_5, TextButton_1, DialogueDisplay;
     var __moduleName = context_68 && context_68.id;
     return {
         setters: [
@@ -4752,8 +4761,8 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
             function (Controls_4_1) {
                 Controls_4 = Controls_4_1;
             },
-            function (UIStateManager_6_1) {
-                UIStateManager_6 = UIStateManager_6_1;
+            function (UIStateManager_5_1) {
+                UIStateManager_5 = UIStateManager_5_1;
             },
             function (TextButton_1_1) {
                 TextButton_1 = TextButton_1_1;
@@ -4849,12 +4858,12 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
                     var bottomBuffer = Tilesets_13.TILE_SIZE;
                     var topLeft = new point_32.Point(Math.floor(screenDimensions.x / 2 - dimensions.x / 2), Math.floor(screenDimensions.y - dimensions.y - bottomBuffer));
                     var backgroundTiles = NineSlice_3.makeStretchedNineSliceComponents(Tilesets_13.Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"), topLeft, dimensions);
-                    backgroundTiles[0].transform.depth = UIStateManager_6.UIStateManager.UI_SPRITE_DEPTH;
+                    backgroundTiles[0].transform.depth = UIStateManager_5.UIStateManager.UI_SPRITE_DEPTH;
                     var topOffset = 2;
                     var margin = 12;
                     var width = dimensions.x - margin * 2;
                     var formattedRenders = Text_4.formatText(this.dialogue.lines[this.lineIndex], Color_4.Color.DARK_RED, topLeft.plus(new point_32.Point(margin, topOffset + margin)), width, 1 /* CENTER */);
-                    formattedRenders.forEach(function (fr) { return fr.depth = UIStateManager_6.UIStateManager.UI_SPRITE_DEPTH + 1; });
+                    formattedRenders.forEach(function (fr) { return fr.depth = UIStateManager_5.UIStateManager.UI_SPRITE_DEPTH + 1; });
                     // "type" out the letters
                     if (!this.finishedPrinting) {
                         var millisPerCharacter = 35;
@@ -4891,7 +4900,7 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
                     var dimensions = new point_32.Point(longestOption * Text_4.TEXT_PIXEL_WIDTH + marginSide * 2 + TextButton_1.TextButton.margin * 2, (options.length - 1) * buttonPadding + options.length * Tilesets_13.TILE_SIZE + marginTop + marginBottom);
                     var topLeft = screenDimensions.div(2).minus(dimensions.div(2));
                     var backgroundTiles = NineSlice_3.makeStretchedNineSliceComponents(Tilesets_13.Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"), topLeft, dimensions);
-                    backgroundTiles[0].transform.depth = UIStateManager_6.UIStateManager.UI_SPRITE_DEPTH;
+                    backgroundTiles[0].transform.depth = UIStateManager_5.UIStateManager.UI_SPRITE_DEPTH;
                     backgroundTiles.forEach(function (tile) { return _this.displayEntity.addComponent(tile); });
                     options.forEach(function (option, i) { return _this.displayEntity.addComponent(new TextButton_1.TextButton(topLeft.plus(new point_32.Point(marginSide, marginTop + i * (Tilesets_13.TILE_SIZE + buttonPadding))), option.text, function () {
                         _this.completeDudeDialogue(option.next);
@@ -4964,7 +4973,7 @@ System.register("game/ui/UIStateManager", ["game/ui/HUD", "game/characters/Playe
 });
 System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/renderer/ImageRender", "engine/Entity", "engine/renderer/BasicRenderComponent", "game/cutscenes/Camera", "game/world/MapGenerator", "game/graphics/Tilesets", "engine/util/Grid", "game/ui/UIStateManager"], function (exports_70, context_70) {
     "use strict";
-    var point_33, ImageRender_2, Entity_10, BasicRenderComponent_4, Camera_3, MapGenerator_2, Tilesets_14, Grid_1, UIStateManager_7, PointLightMaskRenderer;
+    var point_33, ImageRender_2, Entity_10, BasicRenderComponent_4, Camera_2, MapGenerator_2, Tilesets_14, Grid_1, UIStateManager_6, PointLightMaskRenderer;
     var __moduleName = context_70 && context_70.id;
     return {
         setters: [
@@ -4980,8 +4989,8 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
             function (BasicRenderComponent_4_1) {
                 BasicRenderComponent_4 = BasicRenderComponent_4_1;
             },
-            function (Camera_3_1) {
-                Camera_3 = Camera_3_1;
+            function (Camera_2_1) {
+                Camera_2 = Camera_2_1;
             },
             function (MapGenerator_2_1) {
                 MapGenerator_2 = MapGenerator_2_1;
@@ -4992,8 +5001,8 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
             function (Grid_1_1) {
                 Grid_1 = Grid_1_1;
             },
-            function (UIStateManager_7_1) {
-                UIStateManager_7 = UIStateManager_7_1;
+            function (UIStateManager_6_1) {
+                UIStateManager_6 = UIStateManager_6_1;
             }
         ],
         execute: function () {
@@ -5069,8 +5078,8 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                         this.gridDirty = false;
                     }
                     // prevent tint not extending to the edge
-                    var dimensions = Camera_3.Camera.instance.dimensions.plus(new point_33.Point(1, 1));
-                    return new Entity_10.Entity([new BasicRenderComponent_4.BasicRenderComponent(new ImageRender_2.ImageRender(this.canvas, Camera_3.Camera.instance.position.plus(this.shift).apply(Math.floor), dimensions, Camera_3.Camera.instance.position.apply(Math.floor), dimensions, UIStateManager_7.UIStateManager.UI_SPRITE_DEPTH - 100 // make sure all UI goes on top of light
+                    var dimensions = Camera_2.Camera.instance.dimensions.plus(new point_33.Point(1, 1));
+                    return new Entity_10.Entity([new BasicRenderComponent_4.BasicRenderComponent(new ImageRender_2.ImageRender(this.canvas, Camera_2.Camera.instance.position.plus(this.shift).apply(Math.floor), dimensions, Camera_2.Camera.instance.position.apply(Math.floor), dimensions, UIStateManager_6.UIStateManager.UI_SPRITE_DEPTH - 100 // make sure all UI goes on top of light
                         ))]);
                 };
                 return PointLightMaskRenderer;
@@ -5749,7 +5758,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
 });
 System.register("game/characters/Player", ["engine/point", "engine/component", "game/characters/Dude", "game/world/elements/Interactable", "game/world/elements/Hittable", "game/ui/UIStateManager", "game/Controls", "engine/util/Lists"], function (exports_77, context_77) {
     "use strict";
-    var point_39, component_19, Dude_3, Interactable_3, Hittable_2, UIStateManager_8, Controls_5, Lists_2, Player;
+    var point_39, component_19, Dude_3, Interactable_3, Hittable_2, UIStateManager_7, Controls_5, Lists_2, Player;
     var __moduleName = context_77 && context_77.id;
     return {
         setters: [
@@ -5768,8 +5777,8 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
             function (Hittable_2_1) {
                 Hittable_2 = Hittable_2_1;
             },
-            function (UIStateManager_8_1) {
-                UIStateManager_8 = UIStateManager_8_1;
+            function (UIStateManager_7_1) {
+                UIStateManager_7 = UIStateManager_7_1;
             },
             function (Controls_5_1) {
                 Controls_5 = Controls_5_1;
@@ -5804,7 +5813,7 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
                     // const originalCrosshairPosRelative = this.crosshairs.transform.position.minus(this.position)
                     var dx = 0;
                     var dy = 0;
-                    if (!UIStateManager_8.UIStateManager.instance.isMenuOpen) {
+                    if (!UIStateManager_7.UIStateManager.instance.isMenuOpen) {
                         if (updateData.input.isKeyHeld(87 /* W */)) {
                             dy--;
                         }
@@ -5821,7 +5830,7 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
                     // PointLightMaskRenderer.instance.removeLight(this.dude.standingPosition)
                     this.dude.move(updateData, new point_39.Point(dx, dy), this.dude.weapon.isDrawn() ? updateData.input.mousePos.x - this.dude.standingPosition.x : 0);
                     // PointLightMaskRenderer.instance.addLight(this.dude.standingPosition, 100)
-                    if (UIStateManager_8.UIStateManager.instance.isMenuOpen) {
+                    if (UIStateManager_7.UIStateManager.instance.isMenuOpen) {
                         return;
                     }
                     if (updateData.input.isKeyDown(70 /* F */)) {
@@ -7310,6 +7319,7 @@ System.register("game/cutscenes/CutsceneManager", ["engine/Entity", "game/SaveMa
                 }
                 /**
                  * TODO: Handle the case where a cutscene starts, overlapping (this might not matter if we are careful with how we use them)
+                 * TODO: Handle saving during a cutscene. Most likely we should just block saving until after.
                  */
                 CutsceneManager.prototype.startCutscene = function (cutsceneComponent) {
                     this.entity = new Entity_18.Entity([cutsceneComponent]);
@@ -7329,7 +7339,7 @@ System.register("game/cutscenes/CutsceneManager", ["engine/Entity", "game/SaveMa
 });
 System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutscenes/CutscenePlayerController", "game/characters/Player", "engine/point", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/world/LocationManager"], function (exports_97, context_97) {
     "use strict";
-    var component_25, CutscenePlayerController_2, Player_11, point_51, Camera_4, CutsceneManager_1, LocationManager_13, IntroCutscene;
+    var component_25, CutscenePlayerController_2, Player_11, point_51, Camera_3, CutsceneManager_1, LocationManager_13, IntroCutscene;
     var __moduleName = context_97 && context_97.id;
     return {
         setters: [
@@ -7345,8 +7355,8 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
             function (point_51_1) {
                 point_51 = point_51_1;
             },
-            function (Camera_4_1) {
-                Camera_4 = Camera_4_1;
+            function (Camera_3_1) {
+                Camera_3 = Camera_3_1;
             },
             function (CutsceneManager_1_1) {
                 CutsceneManager_1 = CutsceneManager_1_1;
@@ -7386,10 +7396,10 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
                         CutscenePlayerController_2.CutscenePlayerController.instance.stopMoving();
                     }, this.STOP_WALKING_IN);
                     setTimeout(function () {
-                        Camera_4.Camera.instance.focusOnPoint(new point_51.Point(0, 0));
+                        Camera_3.Camera.instance.focusOnPoint(new point_51.Point(0, 0));
                     }, this.PAN_TO_DIP);
                     setTimeout(function () {
-                        Camera_4.Camera.instance.focusOnDude(Player_11.Player.instance.dude);
+                        Camera_3.Camera.instance.focusOnDude(Player_11.Player.instance.dude);
                         CutscenePlayerController_2.CutscenePlayerController.instance.disable();
                         _this.waitingForOrcsToDie = true;
                     }, this.PAN_BACK);
@@ -7411,38 +7421,10 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
         }
     };
 });
-System.register("engine/renderer/TintRender", ["engine/renderer/RenderMethod"], function (exports_98, context_98) {
+System.register("game/quest_game", ["engine/point", "engine/game", "game/world/MapGenerator", "game/graphics/Tilesets", "game/characters/DudeFactory", "game/world/LocationManager", "game/characters/Dude", "engine/collision/CollisionEngine", "game/items/DroppedItem", "game/ui/UIStateManager", "game/world/elements/Elements", "game/world/ground/Ground", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/cutscenes/Camera", "game/SaveManager", "game/world/PointLightMaskRenderer", "game/world/WorldTime", "game/world/events/EventQueue"], function (exports_98, context_98) {
     "use strict";
-    var RenderMethod_4, TintRender;
+    var point_52, game_1, MapGenerator_3, Tilesets_24, DudeFactory_2, LocationManager_14, Dude_8, CollisionEngine_4, DroppedItem_2, UIStateManager_8, Elements_3, Ground_4, CutsceneManager_2, IntroCutscene_1, Camera_4, SaveManager_3, PointLightMaskRenderer_2, WorldTime_3, EventQueue_4, ZOOM, QuestGame;
     var __moduleName = context_98 && context_98.id;
-    return {
-        setters: [
-            function (RenderMethod_4_1) {
-                RenderMethod_4 = RenderMethod_4_1;
-            }
-        ],
-        execute: function () {
-            TintRender = /** @class */ (function (_super) {
-                __extends(TintRender, _super);
-                function TintRender(color, depth) {
-                    var _this = _super.call(this, depth) || this;
-                    _this.color = color;
-                    return _this;
-                }
-                TintRender.prototype.render = function (context) {
-                    context.fillStyle = this.color;
-                    context.fillRect(0, 0, context.width, context.height);
-                };
-                return TintRender;
-            }(RenderMethod_4.RenderMethod));
-            exports_98("TintRender", TintRender);
-        }
-    };
-});
-System.register("game/quest_game", ["engine/point", "engine/game", "game/world/MapGenerator", "game/graphics/Tilesets", "game/characters/DudeFactory", "game/world/LocationManager", "game/characters/Dude", "engine/collision/CollisionEngine", "game/items/DroppedItem", "game/ui/UIStateManager", "game/world/elements/Elements", "game/world/ground/Ground", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/cutscenes/Camera", "game/SaveManager", "game/world/PointLightMaskRenderer", "game/world/WorldTime", "game/world/events/EventQueue"], function (exports_99, context_99) {
-    "use strict";
-    var point_52, game_1, MapGenerator_3, Tilesets_24, DudeFactory_2, LocationManager_14, Dude_8, CollisionEngine_4, DroppedItem_2, UIStateManager_9, Elements_3, Ground_4, CutsceneManager_2, IntroCutscene_1, Camera_5, SaveManager_3, PointLightMaskRenderer_2, WorldTime_2, EventQueue_3, ZOOM, QuestGame;
-    var __moduleName = context_99 && context_99.id;
     return {
         setters: [
             function (point_52_1) {
@@ -7472,8 +7454,8 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
             function (DroppedItem_2_1) {
                 DroppedItem_2 = DroppedItem_2_1;
             },
-            function (UIStateManager_9_1) {
-                UIStateManager_9 = UIStateManager_9_1;
+            function (UIStateManager_8_1) {
+                UIStateManager_8 = UIStateManager_8_1;
             },
             function (Elements_3_1) {
                 Elements_3 = Elements_3_1;
@@ -7487,8 +7469,8 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
             function (IntroCutscene_1_1) {
                 IntroCutscene_1 = IntroCutscene_1_1;
             },
-            function (Camera_5_1) {
-                Camera_5 = Camera_5_1;
+            function (Camera_4_1) {
+                Camera_4 = Camera_4_1;
             },
             function (SaveManager_3_1) {
                 SaveManager_3 = SaveManager_3_1;
@@ -7496,11 +7478,11 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
             function (PointLightMaskRenderer_2_1) {
                 PointLightMaskRenderer_2 = PointLightMaskRenderer_2_1;
             },
-            function (WorldTime_2_1) {
-                WorldTime_2 = WorldTime_2_1;
+            function (WorldTime_3_1) {
+                WorldTime_3 = WorldTime_3_1;
             },
-            function (EventQueue_3_1) {
-                EventQueue_3 = EventQueue_3_1;
+            function (EventQueue_4_1) {
+                EventQueue_4 = EventQueue_4_1;
             }
         ],
         execute: function () {
@@ -7517,42 +7499,51 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
                     ]));
                     // Initialize singletons
                     new Tilesets_24.Tilesets();
-                    new UIStateManager_9.UIStateManager();
+                    new UIStateManager_8.UIStateManager();
                     new SaveManager_3.SaveManager();
                     new DudeFactory_2.DudeFactory();
                     new Elements_3.Elements();
                     new Ground_4.Ground();
-                    new Camera_5.Camera();
+                    new Camera_4.Camera();
                     new CutsceneManager_2.CutsceneManager();
-                    new LocationManager_14.LocationManager();
                     new PointLightMaskRenderer_2.PointLightMaskRenderer();
-                    new WorldTime_2.WorldTime();
-                    new EventQueue_3.EventQueue();
-                    var newGame = !SaveManager_3.SaveManager.instance.load();
-                    if (newGame) {
-                        // World must be initialized before we do anything else
-                        new MapGenerator_3.MapGenerator().doIt();
-                        var playerStartPos = new point_52.Point(1, 1).times(MapGenerator_3.MapGenerator.MAP_SIZE / 2 * Tilesets_24.TILE_SIZE)
-                            .plusY(-Tilesets_24.TILE_SIZE * 10)
-                            .plusX(Tilesets_24.TILE_SIZE * 2);
-                        var playerDude = DudeFactory_2.DudeFactory.instance.new(0 /* PLAYER */, playerStartPos);
-                        Camera_5.Camera.instance.focusOnDude(playerDude);
-                        DudeFactory_2.DudeFactory.instance.new(1 /* DIP */, point_52.Point.ZERO);
-                        DudeFactory_2.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_52.Point(3, 1).times(Tilesets_24.TILE_SIZE));
-                        DudeFactory_2.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_52.Point(-1, 3).times(Tilesets_24.TILE_SIZE));
-                        DudeFactory_2.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_52.Point(-4, 0).times(Tilesets_24.TILE_SIZE));
-                        // TODO clean up obstacles (trees, rocks, etc) so intro goes smoothly
-                        CutsceneManager_2.CutsceneManager.instance.startCutscene(new IntroCutscene_1.IntroCutscene());
+                    var saveData = SaveManager_3.SaveManager.instance.load();
+                    if (!saveData) {
+                        this.newGame();
                     }
+                    else {
+                        this.loadSave(saveData);
+                    }
+                };
+                QuestGame.prototype.newGame = function () {
+                    new LocationManager_14.LocationManager();
+                    new WorldTime_3.WorldTime();
+                    new EventQueue_4.EventQueue();
+                    // World must be initialized before we do anything else
+                    new MapGenerator_3.MapGenerator().doIt();
+                    var playerStartPos = new point_52.Point(1, 1).times(MapGenerator_3.MapGenerator.MAP_SIZE / 2 * Tilesets_24.TILE_SIZE)
+                        .plusY(-Tilesets_24.TILE_SIZE * 10)
+                        .plusX(Tilesets_24.TILE_SIZE * 2);
+                    var playerDude = DudeFactory_2.DudeFactory.instance.new(0 /* PLAYER */, playerStartPos);
+                    Camera_4.Camera.instance.focusOnDude(playerDude);
+                    DudeFactory_2.DudeFactory.instance.new(1 /* DIP */, point_52.Point.ZERO);
+                    DudeFactory_2.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_52.Point(3, 1).times(Tilesets_24.TILE_SIZE));
+                    DudeFactory_2.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_52.Point(-1, 3).times(Tilesets_24.TILE_SIZE));
+                    DudeFactory_2.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_52.Point(-4, 0).times(Tilesets_24.TILE_SIZE));
+                    // TODO clean up obstacles (trees, rocks, etc) so intro goes smoothly
+                    CutsceneManager_2.CutsceneManager.instance.startCutscene(new IntroCutscene_1.IntroCutscene());
+                };
+                QuestGame.prototype.loadSave = function (save) {
+                    LocationManager_14.LocationManager.load(save.locations);
+                    new WorldTime_3.WorldTime(save.worldTime);
+                    new EventQueue_4.EventQueue(save.eventQueue);
+                    Camera_4.Camera.instance.focusOnDude(Array.from(LocationManager_14.LocationManager.instance.currentLocation.dudes).filter(function (d) { return d.type === 0 /* PLAYER */; })[0]);
+                    // clear existing UI state by overwriting singleton
+                    new UIStateManager_8.UIStateManager();
                 };
                 // entities in the world space
                 QuestGame.prototype.getViews = function (updateViewsContext) {
-                    // TEMPORARY TEST INPUTS
-                    // if (updateViewsContext.input.isKeyDown(InputKey.J)) {
-                    //     this.save()
-                    // } else if (updateViewsContext.input.isKeyDown(InputKey.K)) {
-                    //     this.load()
-                    // }
+                    // TODO: remove this
                     if (updateViewsContext.input.isKeyDown(76 /* L */)) {
                         DudeFactory_2.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_52.Point(40, 30));
                     }
@@ -7564,32 +7555,32 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
                 };
                 QuestGame.prototype.updateViews = function (updateViewsContext) {
                     var dimensions = updateViewsContext.dimensions.div(ZOOM);
-                    var cameraOffset = Camera_5.Camera.instance.updatePosition(dimensions, updateViewsContext.elapsedTimeMillis);
+                    var cameraOffset = Camera_4.Camera.instance.updatePosition(dimensions, updateViewsContext.elapsedTimeMillis);
                     this.gameEntityView = {
                         zoom: ZOOM,
                         offset: cameraOffset,
                         entities: LocationManager_14.LocationManager.instance.currentLocation.getEntities().concat([
                             CutsceneManager_2.CutsceneManager.instance.getEntity(),
-                            WorldTime_2.WorldTime.instance.getEntity(),
+                            WorldTime_3.WorldTime.instance.getEntity(),
                             PointLightMaskRenderer_2.PointLightMaskRenderer.instance.getEntity()
                         ])
                     };
                     this.uiView = {
                         zoom: ZOOM,
                         offset: point_52.Point.ZERO,
-                        entities: UIStateManager_9.UIStateManager.instance.get(dimensions, updateViewsContext.elapsedTimeMillis)
+                        entities: UIStateManager_8.UIStateManager.instance.get(dimensions, updateViewsContext.elapsedTimeMillis)
                     };
                 };
                 return QuestGame;
             }(game_1.Game));
-            exports_99("QuestGame", QuestGame);
+            exports_98("QuestGame", QuestGame);
         }
     };
 });
-System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tilesets", "engine/Assets"], function (exports_100, context_100) {
+System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tilesets", "engine/Assets"], function (exports_99, context_99) {
     "use strict";
     var quest_game_1, engine_1, Tilesets_25, Assets_4;
-    var __moduleName = context_100 && context_100.id;
+    var __moduleName = context_99 && context_99.id;
     return {
         setters: [
             function (quest_game_1_1) {
@@ -7609,6 +7600,34 @@ System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tiles
             Assets_4.assets.loadImageFiles(Tilesets_25.Tilesets.getFilesToLoad()).then(function () {
                 new engine_1.Engine(new quest_game_1.QuestGame(), document.getElementById('canvas'));
             });
+        }
+    };
+});
+System.register("engine/renderer/TintRender", ["engine/renderer/RenderMethod"], function (exports_100, context_100) {
+    "use strict";
+    var RenderMethod_4, TintRender;
+    var __moduleName = context_100 && context_100.id;
+    return {
+        setters: [
+            function (RenderMethod_4_1) {
+                RenderMethod_4 = RenderMethod_4_1;
+            }
+        ],
+        execute: function () {
+            TintRender = /** @class */ (function (_super) {
+                __extends(TintRender, _super);
+                function TintRender(color, depth) {
+                    var _this = _super.call(this, depth) || this;
+                    _this.color = color;
+                    return _this;
+                }
+                TintRender.prototype.render = function (context) {
+                    context.fillStyle = this.color;
+                    context.fillRect(0, 0, context.width, context.height);
+                };
+                return TintRender;
+            }(RenderMethod_4.RenderMethod));
+            exports_100("TintRender", TintRender);
         }
     };
 });

@@ -5,10 +5,11 @@ export class EventQueue {
 
     static instance: EventQueue
 
-    private heap: BinaryHeap<QueuedEventData> = new BinaryHeap(e => e.time)
+    private heap: BinaryHeap<QueuedEventData>
 
-    constructor() {
+    constructor(data: QueuedEventData[] = []) {
         EventQueue.instance = this
+        this.heap = new BinaryHeap(e => e.time, data)
     }
 
     addEvent(event: QueuedEventData) {
@@ -20,5 +21,9 @@ export class EventQueue {
             const event = this.heap.pop()
             EVENT_QUEUE_HANDLERS[event.type](event)
         }
+    }
+
+    save() {
+        return this.heap.getContents()
     }
 }

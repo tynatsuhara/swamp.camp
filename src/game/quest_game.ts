@@ -17,14 +17,10 @@ import { CutsceneManager } from "./cutscenes/CutsceneManager"
 import { IntroCutscene } from "./cutscenes/IntroCutscene"
 import { Camera } from "./cutscenes/Camera"
 import { SaveManager } from "./SaveManager"
-import { BasicRenderComponent } from "../engine/renderer/BasicRenderComponent"
-import { Entity } from "../engine/Entity"
-import { TintRender } from "../engine/renderer/TintRender"
 import { PointLightMaskRenderer } from "./world/PointLightMaskRenderer"
-import { Player } from "./characters/Player"
-import { Item } from "./items/Items"
 import { WorldTime } from "./world/WorldTime"
 import { EventQueue } from "./world/events/EventQueue"
+import { Save } from "./saves/SaveGame"
 
 
 const ZOOM = 3
@@ -49,48 +45,58 @@ export class QuestGame extends Game {
         new Ground()
         new Camera()
         new CutsceneManager()
-        new LocationManager()
         new PointLightMaskRenderer()
+
+        const saveData = SaveManager.instance.load()
+
+        if (!saveData) {
+            this.newGame()
+        } else {
+            this.loadSave(saveData)
+        }
+    }
+
+    newGame() {
+        new LocationManager()
         new WorldTime()
         new EventQueue()
+        
+        // World must be initialized before we do anything else
+        new MapGenerator().doIt()
 
-        const newGame = !SaveManager.instance.load()
+        const playerStartPos = new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE)
+                .plusY(-TILE_SIZE * 10)
+                .plusX(TILE_SIZE * 2)
+        const playerDude = DudeFactory.instance.new(DudeType.PLAYER, playerStartPos)
 
-        if (newGame) {
-            // World must be initialized before we do anything else
-            new MapGenerator().doIt()
+        Camera.instance.focusOnDude(playerDude)
 
-            const playerStartPos = new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE)
-                    .plusY(-TILE_SIZE * 10)
-                    .plusX(TILE_SIZE * 2)
-            const playerDude = DudeFactory.instance.new(DudeType.PLAYER, playerStartPos)
+        DudeFactory.instance.new(DudeType.DIP, Point.ZERO)
+        DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(3, 1).times(TILE_SIZE))
+        DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(-1, 3).times(TILE_SIZE))
+        DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(-4, 0).times(TILE_SIZE))
 
-            Camera.instance.focusOnDude(playerDude)
+        // TODO clean up obstacles (trees, rocks, etc) so intro goes smoothly
+        CutsceneManager.instance.startCutscene(new IntroCutscene())
+    }
 
-            DudeFactory.instance.new(DudeType.DIP, Point.ZERO)
-            DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(3, 1).times(TILE_SIZE))
-            DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(-1, 3).times(TILE_SIZE))
-            DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(-4, 0).times(TILE_SIZE))
+    loadSave(save: Save) {
+        LocationManager.load(save.locations)
+        new WorldTime(save.worldTime)
+        new EventQueue(save.eventQueue)
 
-            // TODO clean up obstacles (trees, rocks, etc) so intro goes smoothly
-            CutsceneManager.instance.startCutscene(new IntroCutscene())
-        }
+        Camera.instance.focusOnDude(Array.from(LocationManager.instance.currentLocation.dudes).filter(d => d.type === DudeType.PLAYER)[0])
+
+        // clear existing UI state by overwriting singleton
+        new UIStateManager()
     }
 
     // entities in the world space
     getViews(updateViewsContext: UpdateViewsContext): View[] {
-        // TEMPORARY TEST INPUTS
-        // if (updateViewsContext.input.isKeyDown(InputKey.J)) {
-        //     this.save()
-        // } else if (updateViewsContext.input.isKeyDown(InputKey.K)) {
-        //     this.load()
-        // }
+        // TODO: remove this
         if (updateViewsContext.input.isKeyDown(InputKey.L)) {
             DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(40, 30))
         }
-
-
-
 
         this.updateViews(updateViewsContext)
         return [

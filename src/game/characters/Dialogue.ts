@@ -7,6 +7,7 @@ import { SaveManager } from "../SaveManager"
 import { EventQueue } from "../world/events/EventQueue"
 import { QueuedEventType } from "../world/events/QueuedEvent"
 import { WorldTime } from "../world/WorldTime"
+import { Save } from "../saves/SaveGame"
 
 export class DialogueInstance {
     readonly lines: string[]
@@ -63,6 +64,11 @@ export const getDialogue = (d: Dialogue): DialogueInstance => DIALOGUE_MAP[d]()
 
 const ROCKS_NEEDED_FOR_CAMPFIRE = 10
 
+/**
+ * State should only be modified in the "next" functions. If state is changed 
+ * in the top-level Dialogue functions, it can be triggered repeatedly if the 
+ * dialogue is opened/closed or if the game is saved then loaded.
+ */
 const DIALOGUE_MAP: { [key: number]: () => DialogueInstance } = {
     [Dialogue.DIP_0]: () => dialogueWithOptions(
         ["Phew, thanks for your help! They almost had me. I thought for sure that those Orcs were gonna eat my butt."],
@@ -124,6 +130,7 @@ const DIALOGUE_MAP: { [key: number]: () => DialogueInstance } = {
                     type: QueuedEventType.TRADER_ARRIVAL,
                     time: WorldTime.instance.future({ minutes: 10 })
                 })
+                SaveManager.instance.save()
             })
         } else {
             return dialogue(["You should set up the campfire before it gets dark!"], () => new NextDialogue(Dialogue.DIP_CAMPFIRE_DONE, false))

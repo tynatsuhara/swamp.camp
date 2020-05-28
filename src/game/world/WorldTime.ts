@@ -13,9 +13,10 @@ export class WorldTime extends Component {
     private _time: number = 0  // millis
     get time() { return this._time }
 
-    constructor() {
+    constructor(time: number = 0) {
         super()
         WorldTime.instance = this
+        this._time = time
     }
 
     update(updateData: UpdateData) {

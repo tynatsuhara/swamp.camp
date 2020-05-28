@@ -1,6 +1,10 @@
 import { LocationManagerSaveState } from "./LocationManagerSaveState"
+import { QueuedEventData } from "../world/events/QueuedEvent"
 
 export class Save {
+    timeSaved: number
+    saveVersion: number
     locations: LocationManagerSaveState
-    time: number
+    worldTime: number
+    eventQueue: QueuedEventData[]
 }

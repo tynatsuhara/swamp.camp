@@ -1,8 +1,8 @@
 // Original JavaScript Code from  Marijn Haverbeke (http://eloquentjavascript.net/1st_edition/appendix2.html)
 
 export class BinaryHeap<T> {
-    content: T[]
-    scoreFunction: (x: T) => number
+    private content: T[]
+    private scoreFunction: (x: T) => number
 
     constructor(scoreFunction: (x: T) => number, contents = []) {
         this.content = []

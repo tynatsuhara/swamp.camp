@@ -13,6 +13,7 @@ export class CutsceneManager {
 
     /**
      * TODO: Handle the case where a cutscene starts, overlapping (this might not matter if we are careful with how we use them)
+     * TODO: Handle saving during a cutscene. Most likely we should just block saving until after.
      */
     startCutscene(cutsceneComponent: Component) {
         this.entity = new Entity([cutsceneComponent])
