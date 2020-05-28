@@ -4422,6 +4422,11 @@ System.register("game/world/WorldTime", ["engine/Entity", "engine/component", "g
                 });
                 WorldTime.prototype.update = function (updateData) {
                     this._time += updateData.elapsedTimeMillis;
+                    // TODO cleanup
+                    if (updateData.input.isKeyDown(78 /* N */) || updateData.input.isKeyDown(77 /* M */)) {
+                        this._time += updateData.input.isKeyDown(78 /* N */) ? WorldTime.HOUR : WorldTime.MINUTE;
+                        console.log("fast forwarding time to " + this.clockTime());
+                    }
                     EventQueue_1.EventQueue.instance.processEvents(this.time);
                 };
                 WorldTime.prototype.getEntity = function () {
@@ -4971,9 +4976,9 @@ System.register("game/ui/UIStateManager", ["game/ui/HUD", "game/characters/Playe
         }
     };
 });
-System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/renderer/ImageRender", "engine/Entity", "engine/renderer/BasicRenderComponent", "game/cutscenes/Camera", "game/world/MapGenerator", "game/graphics/Tilesets", "engine/util/Grid", "game/ui/UIStateManager"], function (exports_70, context_70) {
+System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/renderer/ImageRender", "engine/Entity", "engine/renderer/BasicRenderComponent", "game/cutscenes/Camera", "game/world/MapGenerator", "game/graphics/Tilesets", "engine/util/Grid", "game/ui/UIStateManager", "game/world/WorldTime", "game/ui/Color"], function (exports_70, context_70) {
     "use strict";
-    var point_33, ImageRender_2, Entity_10, BasicRenderComponent_4, Camera_2, MapGenerator_2, Tilesets_14, Grid_1, UIStateManager_6, PointLightMaskRenderer;
+    var point_33, ImageRender_2, Entity_10, BasicRenderComponent_4, Camera_2, MapGenerator_2, Tilesets_14, Grid_1, UIStateManager_6, WorldTime_3, Color_5, PointLightMaskRenderer;
     var __moduleName = context_70 && context_70.id;
     return {
         setters: [
@@ -5003,11 +5008,18 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
             },
             function (UIStateManager_6_1) {
                 UIStateManager_6 = UIStateManager_6_1;
+            },
+            function (WorldTime_3_1) {
+                WorldTime_3 = WorldTime_3_1;
+            },
+            function (Color_5_1) {
+                Color_5 = Color_5_1;
             }
         ],
         execute: function () {
             PointLightMaskRenderer = /** @class */ (function () {
                 function PointLightMaskRenderer() {
+                    var _this = this;
                     // no lights should live outside of this range
                     this.size = MapGenerator_2.MapGenerator.MAP_SIZE * Tilesets_14.TILE_SIZE * 2;
                     this.shift = new point_33.Point(this.size / 2, this.size / 2);
@@ -5019,7 +5031,8 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                     this.canvas.width = this.size;
                     this.canvas.height = this.size;
                     this.context = this.canvas.getContext("2d");
-                    this.renderToOffscreenCanvas();
+                    // refresh every so often to update transitioning color
+                    setInterval(function () { return _this.gridDirty = true; }, WorldTime_3.WorldTime.MINUTE);
                 }
                 PointLightMaskRenderer.prototype.addLight = function (position, diameter) {
                     if (diameter === void 0) { diameter = 16; }
@@ -5035,6 +5048,53 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                     this.lightTiles.remove(position);
                     this.gridDirty = true;
                 };
+                PointLightMaskRenderer.prototype.updateColorForTime = function () {
+                    var time = WorldTime_3.WorldTime.instance.time;
+                    var hour = (time % WorldTime_3.WorldTime.DAY) / WorldTime_3.WorldTime.HOUR;
+                    var timeSoFar = time % WorldTime_3.WorldTime.HOUR;
+                    var clamp01 = function (val) { return Math.min(Math.max(val, 0), 1); };
+                    var nightColor = this.colorFromString(Color_5.Color.BLACK, 0.8);
+                    var sunriseColor = this.colorFromString(Color_5.Color.PINK, 0.2);
+                    var dayColor = this.colorFromString(Color_5.Color.LIGHT_PINK, 0);
+                    var sunsetColor = this.colorFromString(Color_5.Color.DARK_PURPLE, 0.2);
+                    var transitionTime = WorldTime_3.WorldTime.HOUR;
+                    if (hour >= 5 && hour < 6) {
+                        var percentTransitioned = clamp01((timeSoFar + (hour - 5) * WorldTime_3.WorldTime.HOUR) / transitionTime);
+                        return this.lerpedColorString(nightColor, sunriseColor, percentTransitioned); // sunrise		
+                    }
+                    else if (hour >= 6 && hour < 20) {
+                        var percentTransitioned = clamp01((timeSoFar + (hour - 6) * WorldTime_3.WorldTime.HOUR) / transitionTime);
+                        return this.lerpedColorString(sunriseColor, dayColor, percentTransitioned); // day	
+                    }
+                    else if (hour >= 20 && hour < 21) {
+                        var percentTransitioned = clamp01((timeSoFar + (hour - 20) * WorldTime_3.WorldTime.HOUR) / transitionTime);
+                        return this.lerpedColorString(dayColor, sunsetColor, percentTransitioned); // sunset
+                    }
+                    else {
+                        var percentTransitioned = clamp01((timeSoFar + (24 + hour - 21) % 24 * WorldTime_3.WorldTime.HOUR) / transitionTime);
+                        return this.lerpedColorString(sunsetColor, nightColor, percentTransitioned); // night			
+                    }
+                };
+                /**
+                 * @param colorString A string from the Color object
+                 * @param a alpha double 0-1
+                 */
+                PointLightMaskRenderer.prototype.colorFromString = function (colorString, a) {
+                    var noHash = colorString.replace("#", "");
+                    var r = parseInt(noHash.substring(0, 2), 16);
+                    var g = parseInt(noHash.substring(2, 4), 16);
+                    var b = parseInt(noHash.substring(4, 6), 16);
+                    return { r: r, g: g, b: b, a: a };
+                };
+                PointLightMaskRenderer.prototype.lerpedColorString = function (color1, color2, percentTransitioned) {
+                    var lerp = function (a, b) { return a + (b - a) * percentTransitioned; };
+                    var r = lerp(color1.r, color2.r);
+                    var g = lerp(color1.g, color2.g);
+                    var b = lerp(color1.b, color2.b);
+                    var a = lerp(color1.a, color2.a);
+                    this.color = "rgba(" + r + ", " + g + ", " + b + ", " + a + ")";
+                    this.darkness = a;
+                };
                 PointLightMaskRenderer.prototype.checkPt = function (position) {
                     var lim = this.size / 2;
                     if (position.x < -lim || position.x > lim || position.y < -lim || position.y > lim) {
@@ -5043,7 +5103,8 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                 };
                 PointLightMaskRenderer.prototype.renderToOffscreenCanvas = function () {
                     var _this = this;
-                    this.context.fillStyle = "rgba(34, 34, 34, " + this.darkness + ")";
+                    this.updateColorForTime();
+                    this.context.fillStyle = this.color;
                     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
                     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
                     this.lightTiles.entries().forEach(function (entry) {
@@ -5051,12 +5112,12 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                         var diameter = entry[1];
                         var circleOffset = new point_33.Point(-.5, -.5).times(diameter);
                         var adjustedPos = pos.plus(_this.shift).plus(circleOffset); //.plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
-                        _this.makeCircle(diameter, adjustedPos, _this.darkness / 2);
+                        _this.makeLightCircle(diameter, adjustedPos, _this.darkness / 2);
                         var innerOffset = Math.floor(diameter / 2 * 1 / 4);
-                        _this.makeCircle(diameter - innerOffset * 2, adjustedPos.plus(new point_33.Point(innerOffset, innerOffset)), 0);
+                        _this.makeLightCircle(diameter - innerOffset * 2, adjustedPos.plus(new point_33.Point(innerOffset, innerOffset)), 0);
                     });
                 };
-                PointLightMaskRenderer.prototype.makeCircle = function (diameter, position, alpha) {
+                PointLightMaskRenderer.prototype.makeLightCircle = function (diameter, position, alpha) {
                     var center = new point_33.Point(diameter / 2, diameter / 2).minus(new point_33.Point(.5, .5));
                     var imageData = this.context.getImageData(position.x, position.y, diameter, diameter);
                     for (var x = 0; x < diameter; x++) {
@@ -7423,7 +7484,7 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
 });
 System.register("game/quest_game", ["engine/point", "engine/game", "game/world/MapGenerator", "game/graphics/Tilesets", "game/characters/DudeFactory", "game/world/LocationManager", "game/characters/Dude", "engine/collision/CollisionEngine", "game/items/DroppedItem", "game/ui/UIStateManager", "game/world/elements/Elements", "game/world/ground/Ground", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/cutscenes/Camera", "game/SaveManager", "game/world/PointLightMaskRenderer", "game/world/WorldTime", "game/world/events/EventQueue"], function (exports_98, context_98) {
     "use strict";
-    var point_52, game_1, MapGenerator_3, Tilesets_24, DudeFactory_2, LocationManager_14, Dude_8, CollisionEngine_4, DroppedItem_2, UIStateManager_8, Elements_3, Ground_4, CutsceneManager_2, IntroCutscene_1, Camera_4, SaveManager_3, PointLightMaskRenderer_2, WorldTime_3, EventQueue_4, ZOOM, QuestGame;
+    var point_52, game_1, MapGenerator_3, Tilesets_24, DudeFactory_2, LocationManager_14, Dude_8, CollisionEngine_4, DroppedItem_2, UIStateManager_8, Elements_3, Ground_4, CutsceneManager_2, IntroCutscene_1, Camera_4, SaveManager_3, PointLightMaskRenderer_2, WorldTime_4, EventQueue_4, ZOOM, QuestGame;
     var __moduleName = context_98 && context_98.id;
     return {
         setters: [
@@ -7478,8 +7539,8 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
             function (PointLightMaskRenderer_2_1) {
                 PointLightMaskRenderer_2 = PointLightMaskRenderer_2_1;
             },
-            function (WorldTime_3_1) {
-                WorldTime_3 = WorldTime_3_1;
+            function (WorldTime_4_1) {
+                WorldTime_4 = WorldTime_4_1;
             },
             function (EventQueue_4_1) {
                 EventQueue_4 = EventQueue_4_1;
@@ -7517,7 +7578,7 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
                 };
                 QuestGame.prototype.newGame = function () {
                     new LocationManager_14.LocationManager();
-                    new WorldTime_3.WorldTime();
+                    new WorldTime_4.WorldTime();
                     new EventQueue_4.EventQueue();
                     // World must be initialized before we do anything else
                     new MapGenerator_3.MapGenerator().doIt();
@@ -7535,7 +7596,7 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
                 };
                 QuestGame.prototype.loadSave = function (save) {
                     LocationManager_14.LocationManager.load(save.locations);
-                    new WorldTime_3.WorldTime(save.worldTime);
+                    new WorldTime_4.WorldTime(save.worldTime);
                     new EventQueue_4.EventQueue(save.eventQueue);
                     Camera_4.Camera.instance.focusOnDude(Array.from(LocationManager_14.LocationManager.instance.currentLocation.dudes).filter(function (d) { return d.type === 0 /* PLAYER */; })[0]);
                     // clear existing UI state by overwriting singleton
@@ -7561,7 +7622,7 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
                         offset: cameraOffset,
                         entities: LocationManager_14.LocationManager.instance.currentLocation.getEntities().concat([
                             CutsceneManager_2.CutsceneManager.instance.getEntity(),
-                            WorldTime_3.WorldTime.instance.getEntity(),
+                            WorldTime_4.WorldTime.instance.getEntity(),
                             PointLightMaskRenderer_2.PointLightMaskRenderer.instance.getEntity()
                         ])
                     };

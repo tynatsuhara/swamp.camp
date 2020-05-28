@@ -8,6 +8,8 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { assets } from "../../engine/Assets"
 import { Grid } from "../../engine/util/Grid"
 import { UIStateManager } from "../ui/UIStateManager"
+import { WorldTime } from "./WorldTime"
+import { Color } from "../ui/Color"
 
 export class PointLightMaskRenderer {
 
@@ -19,6 +21,7 @@ export class PointLightMaskRenderer {
 
     private lightTiles: Grid<number> = new Grid()
     private gridDirty = true
+    private color: string
     private darkness = 0.4
 
     private canvas: HTMLCanvasElement
@@ -32,7 +35,8 @@ export class PointLightMaskRenderer {
         this.canvas.height = this.size
         this.context = this.canvas.getContext("2d")
 
-        this.renderToOffscreenCanvas()
+        // refresh every so often to update transitioning color
+        setInterval(() => this.gridDirty = true, WorldTime.MINUTE)
     }
 
     addLight(position: Point, diameter: number = 16) {
@@ -50,6 +54,57 @@ export class PointLightMaskRenderer {
         this.gridDirty = true
     }
 
+    updateColorForTime() {
+        const time = WorldTime.instance.time
+        const hour = (time % WorldTime.DAY) / WorldTime.HOUR
+		const timeSoFar = time % WorldTime.HOUR
+		const clamp01 = (val) => Math.min(Math.max(val, 0), 1)
+
+        const nightColor = this.colorFromString(Color.BLACK, 0.8)
+        const sunriseColor = this.colorFromString(Color.PINK, 0.2)
+        const dayColor = this.colorFromString(Color.LIGHT_PINK, 0)
+        const sunsetColor = this.colorFromString(Color.DARK_PURPLE, 0.2)
+        const transitionTime = WorldTime.HOUR
+
+        if (hour >= 5 && hour < 6) {
+			const percentTransitioned = clamp01((timeSoFar + (hour - 5) * WorldTime.HOUR)/transitionTime)
+			return this.lerpedColorString(nightColor, sunriseColor, percentTransitioned) // sunrise		
+		} else if (hour >= 6 && hour < 20) {
+			const percentTransitioned = clamp01((timeSoFar + (hour - 6) * WorldTime.HOUR)/transitionTime)
+			return this.lerpedColorString(sunriseColor, dayColor, percentTransitioned)   // day	
+		} else if (hour >= 20 && hour < 21) {
+			const percentTransitioned = clamp01((timeSoFar + (hour - 20) * WorldTime.HOUR)/transitionTime)			
+			return this.lerpedColorString(dayColor, sunsetColor, percentTransitioned)    // sunset
+		} else {
+			const percentTransitioned = clamp01((timeSoFar + (24 + hour - 21) % 24 * WorldTime.HOUR)/transitionTime)			
+			return this.lerpedColorString(sunsetColor, nightColor, percentTransitioned)  // night			
+		}
+    }
+
+    /**
+     * @param colorString A string from the Color object
+     * @param a alpha double 0-1
+     */
+    private colorFromString(colorString: string, a: number): { r, g, b, a } {
+        const noHash = colorString.replace("#", "")
+        const r = parseInt(noHash.substring(0, 2), 16)
+        const g = parseInt(noHash.substring(2, 4), 16)
+        const b = parseInt(noHash.substring(4, 6), 16)
+        return { r, g, b, a }
+    }
+
+    lerpedColorString(color1: { r, g, b, a }, color2: { r, g, b, a }, percentTransitioned: number) {
+        const lerp = (a, b) => a + (b-a) * percentTransitioned
+
+        const r = lerp(color1.r, color2.r)
+        const g = lerp(color1.g, color2.g)
+        const b = lerp(color1.b, color2.b)
+        const a = lerp(color1.a, color2.a)
+
+        this.color = `rgba(${r}, ${g}, ${b}, ${a})`
+        this.darkness = a
+    }
+
     private checkPt(position) {
         const lim = this.size/2
         if (position.x < -lim || position.x > lim || position.y < -lim || position.y > lim) {
@@ -58,7 +113,9 @@ export class PointLightMaskRenderer {
     }
 
     renderToOffscreenCanvas() {
-        this.context.fillStyle = `rgba(34, 34, 34, ${this.darkness})`
+        this.updateColorForTime()
+        
+        this.context.fillStyle = this.color
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
 
@@ -68,14 +125,14 @@ export class PointLightMaskRenderer {
             const circleOffset = new Point(-.5, -.5).times(diameter)
             const adjustedPos = pos.plus(this.shift).plus(circleOffset)//.plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
             
-            this.makeCircle(diameter, adjustedPos, this.darkness/2)
+            this.makeLightCircle(diameter, adjustedPos, this.darkness/2)
 
             const innerOffset = Math.floor(diameter/2 * 1/4)
-            this.makeCircle(diameter-innerOffset*2, adjustedPos.plus(new Point(innerOffset, innerOffset)), 0)
+            this.makeLightCircle(diameter-innerOffset*2, adjustedPos.plus(new Point(innerOffset, innerOffset)), 0)
         })
     }
 
-    makeCircle(diameter: number, position: Point, alpha: number) {
+    makeLightCircle(diameter: number, position: Point, alpha: number) {
         const center = new Point(diameter/2, diameter/2).minus(new Point(.5, .5))
         const imageData = this.context.getImageData(position.x, position.y, diameter, diameter)
 

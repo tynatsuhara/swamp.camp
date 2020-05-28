@@ -2,6 +2,7 @@ import { Entity } from "../../engine/Entity"
 import { Component } from "../../engine/component"
 import { UpdateData } from "../../engine/engine"
 import { EventQueue } from "./events/EventQueue"
+import { InputKey } from "../../engine/input"
 
 export class WorldTime extends Component {
 
@@ -21,6 +22,12 @@ export class WorldTime extends Component {
 
     update(updateData: UpdateData) {
         this._time += updateData.elapsedTimeMillis
+
+        // TODO cleanup
+        if (updateData.input.isKeyDown(InputKey.N) || updateData.input.isKeyDown(InputKey.M)) {
+            this._time += updateData.input.isKeyDown(InputKey.N) ? WorldTime.HOUR : WorldTime.MINUTE
+            console.log(`fast forwarding time to ${this.clockTime()}`)
+        }
 
         EventQueue.instance.processEvents(this.time)
     }
