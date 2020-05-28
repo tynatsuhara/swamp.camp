@@ -179,7 +179,7 @@ export class DialogueDisplay extends Component {
             this.dialogue.options.map(o => { 
                 return {
                     text: o.text, 
-                    fn: () => o.next(),
+                    fn: () => this.completeDudeDialogue(o.next),
                     buttonColor: 'white',
                     textColor: Color.WHITE,
                     hoverColor: Color.DARK_RED

@@ -7,6 +7,7 @@ import { Point } from "../../engine/point"
 import { ButtonsMenu } from "./ButtonsMenu"
 import { Color } from "./Color"
 import { SaveManager } from "../SaveManager"
+import { CutsceneManager } from "../cutscenes/CutsceneManager"
 
 export class PauseMenu extends Component {
 
@@ -19,20 +20,18 @@ export class PauseMenu extends Component {
 
         if (pressEsc && this.isOpen) {
             this.close()
-        } else if (pressEsc && !UIStateManager.instance.isMenuOpen) {
+        } else if (pressEsc && !UIStateManager.instance.isMenuOpen && !CutsceneManager.instance.isMidCutscene) {
             this.show(updateData.dimensions)
         }
     }
 
     close() {
         this.isOpen = false
-        console.log("closed pause menu")
         this.displayEntity = null
     }
 
     show(dimensions: Point) {
         this.isOpen = true
-        console.log("opened pause menu")
         this.displayEntity = ButtonsMenu.render(
             dimensions,
             "red",

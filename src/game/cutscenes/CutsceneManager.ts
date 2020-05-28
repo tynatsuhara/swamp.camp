@@ -5,7 +5,8 @@ import { SaveManager } from "../SaveManager"
 export class CutsceneManager {
     static instance: CutsceneManager
 
-    private entity = new Entity()
+    private entity: Entity = null
+    get isMidCutscene() { return !!this.entity }
 
     constructor() {
         CutsceneManager.instance = this
