@@ -36,7 +36,7 @@ export class PointLightMaskRenderer {
         this.context = this.canvas.getContext("2d")
 
         // refresh every so often to update transitioning color
-        setInterval(() => this.gridDirty = true, WorldTime.MINUTE)
+        setInterval(() => this.gridDirty = true, WorldTime.MINUTE/10)
     }
 
     addLight(position: Point, diameter: number = 16) {
@@ -66,6 +66,7 @@ export class PointLightMaskRenderer {
         const sunsetColor = this.colorFromString(Color.DARK_PURPLE, 0.2)
         const transitionTime = WorldTime.HOUR
 
+        // TODO: make these transitions quicker
         if (hour >= 5 && hour < 6) {
 			const percentTransitioned = clamp01((timeSoFar + (hour - 5) * WorldTime.HOUR)/transitionTime)
 			return this.lerpedColorString(nightColor, sunriseColor, percentTransitioned) // sunrise		

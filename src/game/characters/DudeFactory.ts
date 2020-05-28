@@ -60,7 +60,7 @@ export class DudeFactory {
         let shield: string = null
         let maxHealth: number
         let speed: number = 0.085
-        let dialogue: Dialogue = null
+        let dialogue: Dialogue = Dialogue.NONE
         let additionalComponents: Component[] = []
 
         switch(type) {
@@ -110,7 +110,7 @@ export class DudeFactory {
             faction,
             animationName, 
             pos, 
-            saveState?.weapon ?? weapon, 
+            saveState?.weapon ?? weapon,  // TODO: update this logic when we make it so you can drop weapons/shields
             saveState?.shield ?? shield,
             saveState?.maxHealth ?? maxHealth,
             saveState?.health ?? health,

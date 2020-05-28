@@ -1,4 +1,4 @@
-import { DialogueInstance, getDialogue, NextDialogue } from "../characters/Dialogue"
+import { DialogueInstance, getDialogue, NextDialogue, Dialogue } from "../characters/Dialogue"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { makeStretchedNineSliceComponents } from "../../engine/tiles/NineSlice"
 import { Point } from "../../engine/point"
@@ -88,7 +88,7 @@ export class DialogueDisplay extends Component {
         const next = nextFn()
         
         if (!next) {
-            this.dude.dialogue = null
+            this.dude.dialogue = Dialogue.NONE
             this.close()
         } else {
             this.dude.dialogue = next.dialogue

@@ -116,7 +116,7 @@ export class Dude extends Component {
         this.animation.transform.depth = this.collider.position.y + this.collider.dimensions.y
 
         this.dialogueInteract.position = this.standingPosition.minus(new Point(0, 5))
-        this.dialogueInteract.enabled = !!this.dialogue
+        this.dialogueInteract.enabled = this.dialogue !== Dialogue.NONE
     }
 
     get isAlive() { return this._health > 0 }

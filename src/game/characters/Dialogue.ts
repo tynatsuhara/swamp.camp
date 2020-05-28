@@ -35,6 +35,10 @@ const dialogue = (lines: string[], next: () => void|NextDialogue = () => {}): Di
 const option = (text: string, next: Dialogue, open: boolean = true): DialogueOption => {
     return new DialogueOption(text, () => new NextDialogue(next, open))
 }
+const saveAfterDialogueStage = () => {
+    // save after a delay to account for the next dialogue stage being set
+    setTimeout(() => SaveManager.instance.save(), 500)
+}
 
 class DialogueOption {
     readonly text: string
@@ -57,7 +61,8 @@ export class NextDialogue {
 }
 
 export const enum Dialogue {
-    DIP_0 = 1, DIP_1, DIP_2, DIP_3, DIP_BEFRIEND, DIP_MAKE_CAMPFIRE, DIP_ROCKS_RECEIVED, DIP_CAMPFIRE_DONE
+    NONE = 0,
+    DIP_0, DIP_1, DIP_2, DIP_3, DIP_BEFRIEND, DIP_MAKE_CAMPFIRE, DIP_ROCKS_RECEIVED, DIP_CAMPFIRE_DONE
 }
 
 export const getDialogue = (d: Dialogue): DialogueInstance => DIALOGUE_MAP[d]()
@@ -103,7 +108,7 @@ const DIALOGUE_MAP: { [key: number]: () => DialogueInstance } = {
         return dialogue(
             [`Great! Try placing the campfire down near my tent. You can open your inventory by pressing [${String.fromCharCode(Controls.inventoryButton)}].`], 
             () => {
-                setTimeout(() => SaveManager.instance.save(), 500)
+                saveAfterDialogueStage()
                 Player.instance.dude.inventory.removeItem(Item.ROCK, ROCKS_NEEDED_FOR_CAMPFIRE)
                 Player.instance.dude.inventory.addItem(Item.CAMPFIRE)
                 return new NextDialogue(Dialogue.DIP_CAMPFIRE_DONE, false)
@@ -115,7 +120,6 @@ const DIALOGUE_MAP: { [key: number]: () => DialogueInstance } = {
         const campfires = LocationManager.instance.currentLocation.elements.values().filter(e => e.type === ElementType.CAMPFIRE)
         const dipTent = LocationManager.instance.currentLocation.elements.values().filter(e => e.type === ElementType.TENT)[0]
         if (campfires.length > 0) {
-            Player.instance.dude.inventory.addItem(Item.TENT)
             const lines = [
                 dipTent.occupiedPoints[0].distanceTo(campfires[0].occupiedPoints[0]) < 5
                         ? "That should keep up warm tonight!"
@@ -126,11 +130,12 @@ const DIALOGUE_MAP: { [key: number]: () => DialogueInstance } = {
                 lines.push(`By the way, you can light the fire by standing close to it and pressing [${Controls.keyString(Controls.interactButton)}].`)
             }
             return dialogue(lines, () => {  // TODO actually decide what should happen here
+                Player.instance.dude.inventory.addItem(Item.TENT)
                 EventQueue.instance.addEvent({
                     type: QueuedEventType.TRADER_ARRIVAL,
                     time: WorldTime.instance.future({ minutes: 10 })
                 })
-                SaveManager.instance.save()
+                saveAfterDialogueStage()
             })
         } else {
             return dialogue(["You should set up the campfire before it gets dark!"], () => new NextDialogue(Dialogue.DIP_CAMPFIRE_DONE, false))

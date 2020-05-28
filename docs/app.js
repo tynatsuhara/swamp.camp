@@ -4516,7 +4516,7 @@ System.register("game/SaveManager", ["game/characters/Player", "game/world/Locat
 });
 System.register("game/characters/Dialogue", ["game/characters/Player", "game/Controls", "game/world/LocationManager", "game/SaveManager", "game/world/events/EventQueue", "game/world/events/QueuedEvent", "game/world/WorldTime"], function (exports_66, context_66) {
     "use strict";
-    var _a, Player_6, Controls_3, LocationManager_8, SaveManager_1, EventQueue_3, QueuedEvent_2, WorldTime_2, DialogueInstance, dialogueWithOptions, dialogue, option, DialogueOption, NextDialogue, getDialogue, ROCKS_NEEDED_FOR_CAMPFIRE, DIALOGUE_MAP;
+    var _a, Player_6, Controls_3, LocationManager_8, SaveManager_1, EventQueue_3, QueuedEvent_2, WorldTime_2, DialogueInstance, dialogueWithOptions, dialogue, option, saveAfterDialogueStage, DialogueOption, NextDialogue, getDialogue, ROCKS_NEEDED_FOR_CAMPFIRE, DIALOGUE_MAP;
     var __moduleName = context_66 && context_66.id;
     return {
         setters: [
@@ -4576,6 +4576,10 @@ System.register("game/characters/Dialogue", ["game/characters/Player", "game/Con
                 if (open === void 0) { open = true; }
                 return new DialogueOption(text, function () { return new NextDialogue(next, open); });
             };
+            saveAfterDialogueStage = function () {
+                // save after a delay to account for the next dialogue stage being set
+                setTimeout(function () { return SaveManager_1.SaveManager.instance.save(); }, 500);
+            };
             DialogueOption = /** @class */ (function () {
                 function DialogueOption(text, next) {
                     this.text = text;
@@ -4619,7 +4623,7 @@ System.register("game/characters/Dialogue", ["game/characters/Player", "game/Con
                 },
                 _a[7 /* DIP_ROCKS_RECEIVED */] = function () {
                     return dialogue(["Great! Try placing the campfire down near my tent. You can open your inventory by pressing [" + String.fromCharCode(Controls_3.Controls.inventoryButton) + "]."], function () {
-                        setTimeout(function () { return SaveManager_1.SaveManager.instance.save(); }, 500);
+                        saveAfterDialogueStage();
                         Player_6.Player.instance.dude.inventory.removeItem(1 /* ROCK */, ROCKS_NEEDED_FOR_CAMPFIRE);
                         Player_6.Player.instance.dude.inventory.addItem(4 /* CAMPFIRE */);
                         return new NextDialogue(8 /* DIP_CAMPFIRE_DONE */, false);
@@ -4629,7 +4633,6 @@ System.register("game/characters/Dialogue", ["game/characters/Player", "game/Con
                     var campfires = LocationManager_8.LocationManager.instance.currentLocation.elements.values().filter(function (e) { return e.type === 3 /* CAMPFIRE */; });
                     var dipTent = LocationManager_8.LocationManager.instance.currentLocation.elements.values().filter(function (e) { return e.type === 2 /* TENT */; })[0];
                     if (campfires.length > 0) {
-                        Player_6.Player.instance.dude.inventory.addItem(3 /* TENT */);
                         var lines = [
                             dipTent.occupiedPoints[0].distanceTo(campfires[0].occupiedPoints[0]) < 5
                                 ? "That should keep up warm tonight!"
@@ -4640,11 +4643,12 @@ System.register("game/characters/Dialogue", ["game/characters/Player", "game/Con
                             lines.push("By the way, you can light the fire by standing close to it and pressing [" + Controls_3.Controls.keyString(Controls_3.Controls.interactButton) + "].");
                         }
                         return dialogue(lines, function () {
+                            Player_6.Player.instance.dude.inventory.addItem(3 /* TENT */);
                             EventQueue_3.EventQueue.instance.addEvent({
                                 type: QueuedEvent_2.QueuedEventType.TRADER_ARRIVAL,
                                 time: WorldTime_2.WorldTime.instance.future({ minutes: 10 })
                             });
-                            SaveManager_1.SaveManager.instance.save();
+                            saveAfterDialogueStage();
                         });
                     }
                     else {
@@ -4833,7 +4837,7 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
                 DialogueDisplay.prototype.completeDudeDialogue = function (nextFn) {
                     var next = nextFn();
                     if (!next) {
-                        this.dude.dialogue = null;
+                        this.dude.dialogue = 0 /* NONE */;
                         this.close();
                     }
                     else {
@@ -5032,7 +5036,7 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                     this.canvas.height = this.size;
                     this.context = this.canvas.getContext("2d");
                     // refresh every so often to update transitioning color
-                    setInterval(function () { return _this.gridDirty = true; }, WorldTime_3.WorldTime.MINUTE);
+                    setInterval(function () { return _this.gridDirty = true; }, WorldTime_3.WorldTime.MINUTE / 10);
                 }
                 PointLightMaskRenderer.prototype.addLight = function (position, diameter) {
                     if (diameter === void 0) { diameter = 16; }
@@ -5058,6 +5062,7 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                     var dayColor = this.colorFromString(Color_5.Color.LIGHT_PINK, 0);
                     var sunsetColor = this.colorFromString(Color_5.Color.DARK_PURPLE, 0.2);
                     var transitionTime = WorldTime_3.WorldTime.HOUR;
+                    // TODO: make these transitions quicker
                     if (hour >= 5 && hour < 6) {
                         var percentTransitioned = clamp01((timeSoFar + (hour - 5) * WorldTime_3.WorldTime.HOUR) / transitionTime);
                         return this.lerpedColorString(nightColor, sunriseColor, percentTransitioned); // sunrise		
@@ -5669,7 +5674,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     this.animation.transform.position = this.position.plus(this.isAlive ? new point_38.Point(0, 0) : this.deathOffset);
                     this.animation.transform.depth = this.collider.position.y + this.collider.dimensions.y;
                     this.dialogueInteract.position = this.standingPosition.minus(new point_38.Point(0, 5));
-                    this.dialogueInteract.enabled = !!this.dialogue;
+                    this.dialogueInteract.enabled = this.dialogue !== 0 /* NONE */;
                 };
                 Object.defineProperty(Dude.prototype, "isAlive", {
                     get: function () { return this._health > 0; },
@@ -6208,7 +6213,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                     var shield = null;
                     var maxHealth;
                     var speed = 0.085;
-                    var dialogue = null;
+                    var dialogue = 0 /* NONE */;
                     var additionalComponents = [];
                     switch (type) {
                         case 0 /* PLAYER */: {
