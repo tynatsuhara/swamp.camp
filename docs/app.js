@@ -5012,24 +5012,23 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                     this.context = this.canvas.getContext("2d");
                     this.renderToOffscreenCanvas();
                 }
-                PointLightMaskRenderer.prototype.addLight = function (tilePos, diameter) {
+                PointLightMaskRenderer.prototype.addLight = function (position, diameter) {
                     if (diameter === void 0) { diameter = 16; }
                     if (diameter % 2 !== 0) {
                         throw new Error("only even circle px diameters work right now");
                     }
-                    this.checkPt(tilePos);
-                    this.lightTiles.set(tilePos, diameter);
+                    this.checkPt(position);
+                    this.lightTiles.set(position, diameter);
                     this.gridDirty = true;
                 };
-                PointLightMaskRenderer.prototype.removeLight = function (tilePos) {
-                    this.checkPt(tilePos);
-                    this.lightTiles.remove(tilePos);
+                PointLightMaskRenderer.prototype.removeLight = function (position) {
+                    this.checkPt(position);
+                    this.lightTiles.remove(position);
                     this.gridDirty = true;
                 };
-                PointLightMaskRenderer.prototype.checkPt = function (tilePos) {
-                    var pxPt = tilePos.times(Tilesets_14.TILE_SIZE);
+                PointLightMaskRenderer.prototype.checkPt = function (position) {
                     var lim = this.size / 2;
-                    if (pxPt.x < -lim || pxPt.x > lim || pxPt.y < -lim || pxPt.y > lim) {
+                    if (position.x < -lim || position.x > lim || position.y < -lim || position.y > lim) {
                         throw new Error("light is outside of valid bounds");
                     }
                 };
@@ -5042,7 +5041,7 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                         var pos = entry[0];
                         var diameter = entry[1];
                         var circleOffset = new point_33.Point(-.5, -.5).times(diameter);
-                        var adjustedPos = pos.times(Tilesets_14.TILE_SIZE).plus(_this.shift).plus(circleOffset).plus(new point_33.Point(Tilesets_14.TILE_SIZE / 2, Tilesets_14.TILE_SIZE / 2));
+                        var adjustedPos = pos.plus(_this.shift).plus(circleOffset); //.plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
                         _this.makeCircle(diameter, adjustedPos, _this.darkness / 2);
                         var innerOffset = Math.floor(diameter / 2 * 1 / 4);
                         _this.makeCircle(diameter - innerOffset * 2, adjustedPos.plus(new point_33.Point(innerOffset, innerOffset)), 0);
@@ -5135,11 +5134,12 @@ System.register("game/world/elements/Campfire", ["engine/tiles/TileComponent", "
                     on = nowOn;
                     campfireOff.enabled = !nowOn;
                     campfireOn.enabled = nowOn;
+                    var lightCenterPos = pos.times(Tilesets_15.TILE_SIZE).plus(new point_34.Point(Tilesets_15.TILE_SIZE / 2, Tilesets_15.TILE_SIZE / 2));
                     if (nowOn) {
-                        PointLightMaskRenderer_1.PointLightMaskRenderer.instance.addLight(pos, Tilesets_15.TILE_SIZE * 8);
+                        PointLightMaskRenderer_1.PointLightMaskRenderer.instance.addLight(lightCenterPos, Tilesets_15.TILE_SIZE * 8);
                     }
                     else {
-                        PointLightMaskRenderer_1.PointLightMaskRenderer.instance.removeLight(pos);
+                        PointLightMaskRenderer_1.PointLightMaskRenderer.instance.removeLight(lightCenterPos);
                     }
                 };
                 set(on);
@@ -5818,7 +5818,9 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
                             dx++;
                         }
                     }
+                    // PointLightMaskRenderer.instance.removeLight(this.dude.standingPosition)
                     this.dude.move(updateData, new point_39.Point(dx, dy), this.dude.weapon.isDrawn() ? updateData.input.mousePos.x - this.dude.standingPosition.x : 0);
+                    // PointLightMaskRenderer.instance.addLight(this.dude.standingPosition, 100)
                     if (UIStateManager_8.UIStateManager.instance.isMenuOpen) {
                         return;
                     }

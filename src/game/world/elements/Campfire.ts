@@ -41,10 +41,11 @@ export const makeCampfire = (wl: WorldLocation, pos: Point, data: object): Eleme
         on = nowOn
         campfireOff.enabled = !nowOn
         campfireOn.enabled = nowOn
+        const lightCenterPos = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
         if (nowOn) {
-            PointLightMaskRenderer.instance.addLight(pos, TILE_SIZE*8)
+            PointLightMaskRenderer.instance.addLight(lightCenterPos, TILE_SIZE*8)
         } else {
-            PointLightMaskRenderer.instance.removeLight(pos)
+            PointLightMaskRenderer.instance.removeLight(lightCenterPos)
         }
     }
 

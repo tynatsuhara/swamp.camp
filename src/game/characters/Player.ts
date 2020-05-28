@@ -10,6 +10,8 @@ import { HUD } from "../ui/HUD"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Controls } from "../Controls"
 import { Lists } from "../../engine/util/Lists"
+import { PointLightMaskRenderer } from "../world/PointLightMaskRenderer"
+import { TILE_SIZE } from "../graphics/Tilesets"
 
 export class Player extends Component {
 
@@ -49,11 +51,15 @@ export class Player extends Component {
             if (updateData.input.isKeyHeld(InputKey.D)) { dx++ }
         }
 
+        // PointLightMaskRenderer.instance.removeLight(this.dude.standingPosition)
+
         this.dude.move(
             updateData, 
             new Point(dx, dy), 
             this.dude.weapon.isDrawn() ? updateData.input.mousePos.x - this.dude.standingPosition.x : 0
         )
+
+        // PointLightMaskRenderer.instance.addLight(this.dude.standingPosition, 100)
 
         if (UIStateManager.instance.isMenuOpen) {
             return

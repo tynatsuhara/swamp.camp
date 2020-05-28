@@ -35,25 +35,24 @@ export class PointLightMaskRenderer {
         this.renderToOffscreenCanvas()
     }
 
-    addLight(tilePos: Point, diameter: number = 16) {
+    addLight(position: Point, diameter: number = 16) {
         if (diameter % 2 !== 0) {
             throw new Error("only even circle px diameters work right now")
         }
-        this.checkPt(tilePos)
-        this.lightTiles.set(tilePos, diameter)
+        this.checkPt(position)
+        this.lightTiles.set(position, diameter)
         this.gridDirty = true
     }
 
-    removeLight(tilePos: Point) {
-        this.checkPt(tilePos)
-        this.lightTiles.remove(tilePos)
+    removeLight(position: Point) {
+        this.checkPt(position)
+        this.lightTiles.remove(position)
         this.gridDirty = true
     }
 
-    private checkPt(tilePos) {
-        const pxPt = tilePos.times(TILE_SIZE)
+    private checkPt(position) {
         const lim = this.size/2
-        if (pxPt.x < -lim || pxPt.x > lim || pxPt.y < -lim || pxPt.y > lim) {
+        if (position.x < -lim || position.x > lim || position.y < -lim || position.y > lim) {
             throw new Error("light is outside of valid bounds")
         }
     }
@@ -67,7 +66,7 @@ export class PointLightMaskRenderer {
             const pos = entry[0]
             const diameter = entry[1]
             const circleOffset = new Point(-.5, -.5).times(diameter)
-            const adjustedPos = pos.times(TILE_SIZE).plus(this.shift).plus(circleOffset).plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
+            const adjustedPos = pos.plus(this.shift).plus(circleOffset)//.plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
             
             this.makeCircle(diameter, adjustedPos, this.darkness/2)
 
