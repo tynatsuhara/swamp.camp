@@ -54,7 +54,7 @@ export class QuestGame extends Game {
 
     newGame() {
         new LocationManager()
-        new WorldTime()
+        new WorldTime(WorldTime.HOUR * 19.5)
         new EventQueue()
         
         // World must be initialized before we do anything else

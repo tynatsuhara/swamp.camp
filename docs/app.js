@@ -7791,7 +7791,7 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
                 };
                 QuestGame.prototype.newGame = function () {
                     new LocationManager_15.LocationManager();
-                    new WorldTime_4.WorldTime();
+                    new WorldTime_4.WorldTime(WorldTime_4.WorldTime.HOUR * 19.5);
                     new EventQueue_4.EventQueue();
                     // World must be initialized before we do anything else
                     new MapGenerator_3.MapGenerator().doIt();
