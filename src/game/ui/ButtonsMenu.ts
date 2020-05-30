@@ -47,7 +47,7 @@ export const ButtonsMenu = {
 
         options.forEach((option, i) => e.addComponent(
             new TextButton(
-                topLeft.plus(new Point(marginSide, marginTop + i * (TILE_SIZE + buttonPadding))),
+                topLeft.plus(new Point(dimensions.x/2-(TEXT_PIXEL_WIDTH*option.text.length/2)-TextButton.margin, marginTop + i * (TILE_SIZE + buttonPadding))),
                 option.text,
                 () => option.fn(),
                 option.buttonColor,

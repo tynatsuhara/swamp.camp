@@ -3613,7 +3613,7 @@ System.register("game/ui/HUD", ["game/graphics/Tilesets", "engine/tiles/TileTran
                 HUD.prototype.showSaveIcon = function () {
                     var _this = this;
                     this.isShowingAutosaveIcon = true;
-                    setTimeout(function () { _this.isShowingAutosaveIcon = false; }, 4000);
+                    setTimeout(function () { _this.isShowingAutosaveIcon = false; }, 3000);
                 };
                 HUD.prototype.updateAutosave = function (screenDimensions, elapsedMillis) {
                     var base = screenDimensions.minus(this.offset).minus(new point_25.Point(Tilesets_8.TILE_SIZE, Tilesets_8.TILE_SIZE));
@@ -4787,7 +4787,7 @@ System.register("game/ui/ButtonsMenu", ["engine/point", "game/ui/TextButton", "g
                     backgroundTiles[0].transform.depth = UIStateManager_6.UIStateManager.UI_SPRITE_DEPTH;
                     var e = new Entity_9.Entity();
                     backgroundTiles.forEach(function (tile) { return e.addComponent(tile); });
-                    options.forEach(function (option, i) { return e.addComponent(new TextButton_1.TextButton(topLeft.plus(new point_32.Point(marginSide, marginTop + i * (Tilesets_13.TILE_SIZE + buttonPadding))), option.text, function () { return option.fn(); }, option.buttonColor, option.textColor, option.hoverColor)); });
+                    options.forEach(function (option, i) { return e.addComponent(new TextButton_1.TextButton(topLeft.plus(new point_32.Point(dimensions.x / 2 - (Text_4.TEXT_PIXEL_WIDTH * option.text.length / 2) - TextButton_1.TextButton.margin, marginTop + i * (Tilesets_13.TILE_SIZE + buttonPadding))), option.text, function () { return option.fn(); }, option.buttonColor, option.textColor, option.hoverColor)); });
                     return e;
                 }
             });
@@ -5074,14 +5074,14 @@ System.register("game/ui/PauseMenu", ["engine/component", "engine/Entity", "game
                 PauseMenu.prototype.show = function (dimensions) {
                     this.isOpen = true;
                     this.displayEntity = ButtonsMenu_2.ButtonsMenu.render(dimensions, "red", [{
-                            text: "Save",
+                            text: "Save game".toUpperCase(),
                             fn: function () { return SaveManager_3.SaveManager.instance.save(); },
                             buttonColor: "red",
                             textColor: Color_4.Color.RED,
                             hoverColor: Color_4.Color.WHITE
                         },
                         {
-                            text: "Reload last save",
+                            text: "Load last save".toUpperCase(),
                             fn: function () { return SaveManager_3.SaveManager.instance.load(); },
                             buttonColor: "red",
                             textColor: Color_4.Color.RED,

@@ -36,14 +36,14 @@ export class PauseMenu extends Component {
             dimensions,
             "red",
             [{
-                text: "Save", 
+                text: "Save game".toUpperCase(), 
                 fn: () => SaveManager.instance.save(),
                 buttonColor: "red",
                 textColor: Color.RED,
                 hoverColor: Color.WHITE
             },
             {
-                text: "Reload last save", 
+                text: "Load last save".toUpperCase(), 
                 fn: () => SaveManager.instance.load(),
                 buttonColor: "red",
                 textColor: Color.RED,
