@@ -6,12 +6,10 @@ import { TileComponent } from "../../../engine/tiles/TileComponent"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
 import { Entity } from "../../../engine/Entity"
 import { Interactable } from "./Interactable"
-import { LocationManager } from "../LocationManager"
 import { ElementComponent } from "./ElementComponent"
 import { ElementType } from "./Elements"
 import { ElementUtils } from "./ElementUtils"
 import { makeTentInterior } from "../interior/Tent"
-import { newUUID } from "../../saves/uuid"
 
 export const enum TentColor {
     RED = "red",
@@ -31,7 +29,7 @@ export const makeTent = (wl: WorldLocation, pos: Point, data: object): ElementCo
     addTile(wl, e, `${color}tentSE`, pos.plus(new Point(2, 1)), depth)
     e.addComponent(new BoxCollider(pos.plus(new Point(1, 1)).times(TILE_SIZE), new Point(TILE_SIZE*2, TILE_SIZE)))
 
-    e.addComponent(new Interactable(pos.plus(new Point(2, 3)).times(TILE_SIZE), () => {
+    e.addComponent(new Interactable(pos.plus(new Point(2, 2)).times(TILE_SIZE), () => {
         wl.manager.transition(destinationUUID)
     }))
 

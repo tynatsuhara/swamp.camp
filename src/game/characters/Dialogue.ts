@@ -75,6 +75,10 @@ export const getDialogue = (d: Dialogue): DialogueInstance => DIALOGUE_MAP[d]()
 
 const ROCKS_NEEDED_FOR_CAMPFIRE = 10
 
+
+// TODO: make DIP introduce himself, have player input their name
+
+
 /**
  * State should only be modified in the "next" functions. If state is changed 
  * in the top-level Dialogue functions, it can be triggered repeatedly if the 
