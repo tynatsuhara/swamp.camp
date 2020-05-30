@@ -7,12 +7,13 @@ import { SaveManager } from "../SaveManager"
 import { EventQueue } from "../world/events/EventQueue"
 import { QueuedEventType } from "../world/events/QueuedEvent"
 import { WorldTime } from "../world/WorldTime"
-import { Save } from "../saves/SaveGame"
+import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
 
 export class DialogueInstance {
     readonly lines: string[]
     readonly next: () => void|NextDialogue
     readonly options: DialogueOption[]
+    readonly indicator: string
 
     /**
      * @param lines Will be said one-by-one. TODO: Size restrictions based on UI
@@ -22,16 +23,21 @@ export class DialogueInstance {
      *                Clicking an option will execute the corresponding function.
      *                If the function returns a Dialogue, that will then be prompted.
      */
-    constructor(lines: string[], next: () => void|NextDialogue, options: DialogueOption[]) {
+    constructor(lines: string[], next: () => void|NextDialogue, options: DialogueOption[], indicator: string = DudeInteractIndicator.NONE) {
         this.lines = lines
         this.next = next
         this.options = options
+        this.indicator = indicator
     }
 }
 
 // Shorthand functions for creating dialogue
-const dialogueWithOptions = (lines: string[], ...options: DialogueOption[]): DialogueInstance => { return new DialogueInstance(lines, () => {}, options) }
-const dialogue = (lines: string[], next: () => void|NextDialogue = () => {}): DialogueInstance => { return new DialogueInstance(lines, next, []) } 
+const dialogueWithOptions = (lines: string[], indicator: string = DudeInteractIndicator.NONE, ...options: DialogueOption[]): DialogueInstance => { 
+    return new DialogueInstance(lines, () => {}, options, indicator) 
+}
+const dialogue = (lines: string[], next: () => void|NextDialogue = () => {}, indicator: string = DudeInteractIndicator.NONE): DialogueInstance => { 
+    return new DialogueInstance(lines, next, [], indicator) 
+} 
 const option = (text: string, next: Dialogue, open: boolean = true): DialogueOption => {
     return new DialogueOption(text, () => new NextDialogue(next, open))
 }
@@ -77,6 +83,7 @@ const ROCKS_NEEDED_FOR_CAMPFIRE = 10
 const DIALOGUE_MAP: { [key: number]: () => DialogueInstance } = {
     [Dialogue.DIP_0]: () => dialogueWithOptions(
         ["Phew, thanks for your help! They almost had me. I thought for sure that those Orcs were gonna eat my butt."],
+        DudeInteractIndicator.IMPORTANT_DIALOGUE,
         option("Are you okay?", Dialogue.DIP_1),
         option("I expect a reward.", Dialogue.DIP_2),
         option("... Eat your butt?", Dialogue.DIP_3),
@@ -96,6 +103,7 @@ const DIALOGUE_MAP: { [key: number]: () => DialogueInstance } = {
         if (Player.instance.dude.inventory.getItemCount(Item.ROCK) >= ROCKS_NEEDED_FOR_CAMPFIRE) {
             return dialogueWithOptions(
                 [`It looks like you have enough rocks. Can I have ${ROCKS_NEEDED_FOR_CAMPFIRE} to make a campfire?`],
+                DudeInteractIndicator.IMPORTANT_DIALOGUE,
                 option("<Give rocks>", Dialogue.DIP_ROCKS_RECEIVED),
                 option("Not yet.", Dialogue.DIP_MAKE_CAMPFIRE, false)
             )
@@ -136,7 +144,7 @@ const DIALOGUE_MAP: { [key: number]: () => DialogueInstance } = {
                     time: WorldTime.instance.future({ minutes: 10 })
                 })
                 saveAfterDialogueStage()
-            })
+            }, DudeInteractIndicator.IMPORTANT_DIALOGUE)
         } else {
             return dialogue(["You should set up the campfire before it gets dark!"], () => new NextDialogue(Dialogue.DIP_CAMPFIRE_DONE, false))
         }

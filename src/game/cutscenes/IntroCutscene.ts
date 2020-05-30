@@ -9,15 +9,17 @@ import { Camera } from "./Camera"
 import { CutsceneManager } from "./CutsceneManager"
 import { Dude } from "../characters/Dude"
 import { LocationManager } from "../world/LocationManager"
-import { DudeFaction } from "../characters/DudeFactory"
+import { DudeFaction, DudeType } from "../characters/DudeFactory"
+import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
+import { Dialogue } from "../characters/Dialogue"
 
 // This is the cutscene that plays when the player arrives in the new land
 export class IntroCutscene extends Component {
 
     // durations in ms
     private readonly STOP_WALKING_IN = 2000
-    private readonly PAN_TO_DIP = this.STOP_WALKING_IN + 1000
-    private readonly PAN_BACK = this.PAN_TO_DIP + 3000
+    private readonly PAN_TO_DIP = this.STOP_WALKING_IN + 750
+    private readonly PAN_BACK = this.PAN_TO_DIP + 2000
 
     private waitingForOrcsToDie = false
     private orcs: Dude[]
@@ -61,7 +63,12 @@ export class IntroCutscene extends Component {
             this.orcs = Array.from(LocationManager.instance.currentLocation.dudes).filter(d => d.faction === DudeFaction.ORCS)
         }
 
+        // TODO prevent the player from going to a different location until this is over
+
         if (!this.orcs.some(o => o.isAlive)) {
+            const dip = Array.from(LocationManager.instance.currentLocation.dudes).filter(d => d.type === DudeType.DIP)[0]
+            dip.dialogue = Dialogue.DIP_0
+
             CutsceneManager.instance.finishCutscene()
         }
     }

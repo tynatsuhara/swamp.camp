@@ -78,7 +78,6 @@ export class DudeFactory {
                 animationName = "lizard_f"
                 maxHealth = Number.MAX_SAFE_INTEGER
                 additionalComponents = [new NPC()]
-                dialogue = Dialogue.DIP_0
                 break
             }
             case DudeType.ELF: {

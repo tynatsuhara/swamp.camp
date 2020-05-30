@@ -3,7 +3,7 @@ import { UpdateData } from "../../engine/engine"
 import { Point } from "../../engine/point"
 import { Component } from "../../engine/component"
 import { BoxCollider } from "../../engine/collision/BoxCollider"
-import { Tilesets } from "../graphics/Tilesets"
+import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Weapon } from "./Weapon"
 import { Inventory } from "../items/Inventory"
 import { spawnItem, Item } from "../items/Items"
@@ -12,8 +12,13 @@ import { Shield } from "./Shield"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Interactable } from "../world/elements/Interactable"
 import { DudeSaveState } from "../saves/DudeSaveState"
-import { Dialogue } from "./Dialogue"
+import { Dialogue, getDialogue } from "./Dialogue"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
+import { TileComponent } from "../../engine/tiles/TileComponent"
+import { RenderMethod } from "../../engine/renderer/RenderMethod"
+import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
+import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
+import { UIStateManager } from "../ui/UIStateManager"
 
 export class Dude extends Component {
 
@@ -268,7 +273,24 @@ export class Dude extends Component {
             weapon: this.weaponId,
             shield: this.shieldId,
             inventory: this.inventory.save(),
-            dialogue: this.dialogue
+            dialogue: this.dialogue,
+        }
+    }
+
+    // Currently just render the interact indicator
+    getRenderMethods(): RenderMethod[] {
+        let indicator = DudeInteractIndicator.NONE
+        if (this.dialogue) {
+            indicator = getDialogue(this.dialogue).indicator
+        }
+        let tile: StaticTileSource = DudeInteractIndicator.getTile(indicator)
+        if (!!tile) {
+            return [tile.toImageRender(new TileTransform(
+                this.standingPosition.plusY(-this.animation.transform.dimensions.y).plus(new Point(1, 1).times(-TILE_SIZE/2)).plus(this.getAnimationOffsetPosition()),
+                new Point(TILE_SIZE, TILE_SIZE), 0, false, false, UIStateManager.UI_SPRITE_DEPTH
+            ))]
+        } else {
+            return []
         }
     }
 }
