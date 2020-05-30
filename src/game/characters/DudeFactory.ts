@@ -22,7 +22,8 @@ export const enum DudeType {
     PLAYER,
     DIP,
     ELF,
-    ORC_WARRIOR
+    ORC_WARRIOR,
+    HERALD
 }
 
 export class DudeFactory {
@@ -76,6 +77,12 @@ export class DudeFactory {
             }
             case DudeType.DIP: {
                 animationName = "lizard_f"
+                maxHealth = Number.MAX_SAFE_INTEGER
+                additionalComponents = [new NPC()]
+                break
+            }
+            case DudeType.HERALD: {
+                animationName = "herald"
                 maxHealth = Number.MAX_SAFE_INTEGER
                 additionalComponents = [new NPC()]
                 break

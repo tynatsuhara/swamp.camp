@@ -236,6 +236,9 @@ export class DungeonTilesetII {
 
     getTileSource(key: string): StaticTileSource {
         const row = map.get(key)
+        if (!row) {
+            return null
+        }
         if (row?.length != 4) {
             throw Error("invalid tile spec")
         }
@@ -246,6 +249,9 @@ export class DungeonTilesetII {
 
     getTileSetAnimation(key: string, speed: number): TileSetAnimation {
         const row = map.get(key)
+        if (!row) {
+            return null
+        }
         if (row?.length != 5) {
             throw Error("invalid animation spec")
         }

@@ -19,6 +19,7 @@ import { RenderMethod } from "../../engine/renderer/RenderMethod"
 import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { UIStateManager } from "../ui/UIStateManager"
+import { AnimationUtils } from "./AnimationUtils"
 
 export class Dude extends Component {
 
@@ -87,8 +88,8 @@ export class Dude extends Component {
 
         this.start = (startData) => {
             // Set up animations
-            const idleAnim = Tilesets.instance.dungeonCharacters.getTileSetAnimation(`${characterAnimName}_idle_anim`, 150)
-            const runAnim = Tilesets.instance.dungeonCharacters.getTileSetAnimation(`${characterAnimName}_run_anim`, 80)
+            const idleAnim = AnimationUtils.getCharacterIdleAnimation(characterAnimName)
+            const runAnim = AnimationUtils.getCharacterWalkAnimation(characterAnimName)
             const height = idleAnim.getTile(0).dimensions.y
             this._animation = this.entity.addComponent(new AnimatedTileComponent([idleAnim, runAnim], new TileTransform(new Point(0, 28-height))))
     

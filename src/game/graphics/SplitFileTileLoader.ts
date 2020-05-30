@@ -24,6 +24,16 @@ export class SplitFileTileLoader {
     }
     
     getTileSetAnimation(key: string, speed: number): TileSetAnimation {
-        throw new Error("Method not implemented.")
+        let counter = 1
+        const frames = []
+        while (true) {
+            const frame = this.getTileSource(`${key}_${counter}`)
+            if (!frame) {
+                break
+            }
+            frames.push(frame)
+            counter++
+        }
+        return new TileSetAnimation(frames.map(f => [f, speed]))
     }
 }
