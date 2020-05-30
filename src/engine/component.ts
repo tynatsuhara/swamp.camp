@@ -8,6 +8,12 @@ export abstract class Component {
     enabled: boolean = true
 
     /**
+     * Called once, immediately after entity is defined and before start() is called.
+     * It is safe to add additional components to the entity in this function.
+     */
+    awake(awakeData: StartData) {}
+    
+    /**
      * Called once, after the component is added to a valid entity and before update() is called
      */
     start(startData: StartData) {}

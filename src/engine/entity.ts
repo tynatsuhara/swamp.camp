@@ -14,6 +14,7 @@ export class Entity {
     addComponent<T extends Component>(component: T): T {
         component.entity = this
         this.components.push(component)
+        component.awake({})
         return component
     }
 
