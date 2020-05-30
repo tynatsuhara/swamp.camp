@@ -22,7 +22,11 @@ export class OffScreenMarker extends Component {
         const cameraDimensions = updateData.dimensions
 
         // TODO make this configurable
-        const point = Array.from(LocationManager.instance.currentLocation.dudes).filter(d => d.type === DudeType.DIP).map(d => d.standingPosition)[0]
+        const dips = Array.from(LocationManager.instance.currentLocation.dudes).filter(d => d.type === DudeType.DIP).map(d => d.standingPosition)
+        if (dips.length === 0) {
+            return
+        }
+        const point = dips[0]
 
         if (rectContains(cameraPos, cameraDimensions, point)) {
             this.tileSource = null

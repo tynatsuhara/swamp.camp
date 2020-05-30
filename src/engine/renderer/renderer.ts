@@ -10,7 +10,7 @@ export class Renderer {
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas
-        this.context = canvas.getContext('2d', { alpha: false })
+        this.context = canvas.getContext('2d', { alpha: true })
         this.resizeCanvas()
     }
 
