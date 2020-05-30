@@ -81,13 +81,14 @@ export class HUD {
 
     private updateAutosave(screenDimensions: Point, elapsedMillis: number) {
         const base = screenDimensions.minus(this.offset).minus(new Point(TILE_SIZE, TILE_SIZE))
+        let lerpRate = 0.005 * elapsedMillis
         if (this.autosaveComponent.transform.position.equals(Point.ZERO)) {  // for initializing
-            this.autosaveComponent.transform.position = base
+            lerpRate = 1
         }
         const goal = this.isShowingAutosaveIcon ? Point.ZERO : new Point(0, 40)
         this.autosaveComponent.transform.position = this.autosaveComponent.transform.position
                 .minus(base)
-                .lerp(0.005 * elapsedMillis, goal)
+                .lerp(lerpRate, goal)
                 .plus(base)
     }
 }

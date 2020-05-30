@@ -3706,13 +3706,14 @@ System.register("game/ui/HUD", ["game/graphics/Tilesets", "engine/tiles/TileTran
                 };
                 HUD.prototype.updateAutosave = function (screenDimensions, elapsedMillis) {
                     var base = screenDimensions.minus(this.offset).minus(new point_26.Point(Tilesets_8.TILE_SIZE, Tilesets_8.TILE_SIZE));
+                    var lerpRate = 0.005 * elapsedMillis;
                     if (this.autosaveComponent.transform.position.equals(point_26.Point.ZERO)) { // for initializing
-                        this.autosaveComponent.transform.position = base;
+                        lerpRate = 1;
                     }
                     var goal = this.isShowingAutosaveIcon ? point_26.Point.ZERO : new point_26.Point(0, 40);
                     this.autosaveComponent.transform.position = this.autosaveComponent.transform.position
                         .minus(base)
-                        .lerp(0.005 * elapsedMillis, goal)
+                        .lerp(lerpRate, goal)
                         .plus(base);
                 };
                 return HUD;
