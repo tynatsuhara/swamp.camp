@@ -54,6 +54,7 @@ export class DudeFactory {
         pos: Point,
         saveState: DudeSaveState = null
     ): Dude {
+        // defaults
         let faction: DudeFaction = DudeFaction.VILLAGERS
         let animationName: string
         let weapon: string = null
@@ -63,6 +64,7 @@ export class DudeFactory {
         let dialogue: Dialogue = Dialogue.NONE
         let additionalComponents: Component[] = []
 
+        // type-specific defaults
         switch(type) {
             case DudeType.PLAYER: {
                 animationName = "knight_f"
@@ -105,6 +107,7 @@ export class DudeFactory {
         let health = maxHealth
         let inventory = !!saveState?.inventory ? Inventory.load(saveState.inventory) : new Inventory()
         
+        // use saved data instead of defaults
         const d = new Dude(
             type, 
             faction,
