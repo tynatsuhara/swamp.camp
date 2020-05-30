@@ -14,9 +14,8 @@ export class UpdateViewsContext {
     readonly dimensions: Point
 }
 
-export class StartData {
-    
-}
+export class StartData {}
+export class AwakeData {}
 
 export class UpdateData {
     readonly view: View
