@@ -32,22 +32,21 @@ export class PauseMenu extends Component {
 
     show(dimensions: Point) {
         this.isOpen = true
+        const buttonColor = "red"
+        const textColor = Color.PINK
+        const hoverColor = Color.WHITE
         this.displayEntity = ButtonsMenu.render(
             dimensions,
             "red",
             [{
                 text: "Save game".toUpperCase(), 
                 fn: () => SaveManager.instance.save(),
-                buttonColor: "red",
-                textColor: Color.RED,
-                hoverColor: Color.WHITE
+                buttonColor, textColor, hoverColor,
             },
             {
                 text: "Load last save".toUpperCase(), 
                 fn: () => SaveManager.instance.load(),
-                buttonColor: "red",
-                textColor: Color.RED,
-                hoverColor: Color.WHITE
+                buttonColor, textColor, hoverColor,
             }]
         )
     }

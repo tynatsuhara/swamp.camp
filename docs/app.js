@@ -5073,19 +5073,18 @@ System.register("game/ui/PauseMenu", ["engine/component", "engine/Entity", "game
                 };
                 PauseMenu.prototype.show = function (dimensions) {
                     this.isOpen = true;
+                    var buttonColor = "red";
+                    var textColor = Color_4.Color.PINK;
+                    var hoverColor = Color_4.Color.WHITE;
                     this.displayEntity = ButtonsMenu_2.ButtonsMenu.render(dimensions, "red", [{
                             text: "Save game".toUpperCase(),
                             fn: function () { return SaveManager_3.SaveManager.instance.save(); },
-                            buttonColor: "red",
-                            textColor: Color_4.Color.RED,
-                            hoverColor: Color_4.Color.WHITE
+                            buttonColor: buttonColor, textColor: textColor, hoverColor: hoverColor,
                         },
                         {
                             text: "Load last save".toUpperCase(),
                             fn: function () { return SaveManager_3.SaveManager.instance.load(); },
-                            buttonColor: "red",
-                            textColor: Color_4.Color.RED,
-                            hoverColor: Color_4.Color.WHITE
+                            buttonColor: buttonColor, textColor: textColor, hoverColor: hoverColor,
                         }]);
                 };
                 PauseMenu.prototype.getEntities = function () {
