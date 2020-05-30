@@ -12,7 +12,10 @@ export const makeTentInterior = (): WorldLocation => {
         "_____",
         "_____",
     ).map("_", pos => {
+        // TODO: make this the tent ground
         l.addGroundElement(GroundType.GRASS, pos)
+
+        // TODO: add exit teleporter
     })
 
     return l

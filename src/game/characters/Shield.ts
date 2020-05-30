@@ -15,7 +15,6 @@ import { Weapon } from "./Weapon"
 enum State {
     ON_BACK,
     DRAWN,
-    BLOCKING
 }
 
 /**
@@ -27,6 +26,10 @@ export class Shield extends Component {
     private state: State = State.DRAWN
     // private slashSprite: TileComponent  // TODO try adding particles when someone hits a blocking shield
     private dude: Dude
+
+    private blockingActive = false
+    private raisedPerc = 0 // for animation
+    private timeToRaiseMs = 100
 
     constructor(shieldId: string) {
         super()
@@ -42,37 +45,29 @@ export class Shield extends Component {
     }
 
     update(updateData: UpdateData) {
-        if (!!this.animator) {
-            this.animator.update(updateData.elapsedTimeMillis)
-        }
-
-        this.animate()
-    }
-
-    animate() {
-        // TODO: add shield animations
-
+        // default (drawn) position
         let pos = this.dude.animation.transform.dimensions.minus(new Point(12, 16))
 
         if (this.state === State.ON_BACK) {
             pos = pos.plus(new Point(-6, -1))
-        } else if (this.state === State.BLOCKING) {
-            pos = pos.plus(new Point(3, 3))
+        } else if (this.state === State.DRAWN) {
+            pos = pos.plus(new Point(3, 2).times(this.raisedPerc).apply(Math.floor))
+
+            if (this.blockingActive) {  // raising
+                this.raisedPerc = Math.min(this.raisedPerc + updateData.elapsedTimeMillis/this.timeToRaiseMs, 1)
+            } else {  // lowering
+                this.raisedPerc = Math.max(this.raisedPerc - updateData.elapsedTimeMillis/this.timeToRaiseMs, 0)
+            }
         }
 
         pos = pos.plus(this.dude.getAnimationOffsetPosition())
 
         this.blockingShieldSprite.transform.position = pos
-
-        this.blockingShieldSprite.transform.depth = this.state === State.BLOCKING ? .75 : -.75
+        this.blockingShieldSprite.transform.depth = this.raisedPerc === 1 ? .75 : -.75
     }
 
-    // isDrawn() {
-        // return this.state !== State.SHEATHED
-    // }
-
     toggleOnBack() {
-        if (this.state === State.DRAWN || this.state === State.BLOCKING) {
+        if (this.state === State.DRAWN) {
             this.state = State.ON_BACK
         } else {
             this.state = State.DRAWN
@@ -83,15 +78,18 @@ export class Shield extends Component {
         if (this.state === State.ON_BACK || !this.dude) {
             return
         }
-        if (blockingActive && (!this.dude.weapon || !this.dude.weapon.isAttacking())) {
-            this.state = State.BLOCKING
-        } else {
-            this.state = State.DRAWN
+        if (blockingActive && this.dude.weapon?.isAttacking()) {  // you can't start blocking when you're attacking
+            return
         }
+        this.blockingActive = blockingActive
     }
 
     isBlocking() {
-        return this.state === State.BLOCKING
+        return this.state === State.DRAWN && this.raisedPerc > .5
+    }
+
+    canAttack() {
+        return this.state === State.DRAWN && this.raisedPerc < .3
     }
 
     private animator: Animator

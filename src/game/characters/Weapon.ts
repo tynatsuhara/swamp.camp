@@ -114,7 +114,7 @@ export class Weapon extends Component {
     }
 
     attack() {
-        if (this.dude.shield?.isBlocking()) {
+        if (!this.dude.shield?.canAttack()) {
             return
         }
         if (this.state === State.DRAWN) {
