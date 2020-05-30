@@ -82,7 +82,7 @@ export class DudeFactory {
                 break
             }
             case DudeType.HERALD: {
-                animationName = "herald"
+                animationName = "Herald"
                 maxHealth = Number.MAX_SAFE_INTEGER
                 additionalComponents = [new NPC()]
                 break

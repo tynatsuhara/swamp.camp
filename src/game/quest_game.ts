@@ -20,7 +20,6 @@ import { SaveManager } from "./SaveManager"
 import { PointLightMaskRenderer } from "./world/PointLightMaskRenderer"
 import { WorldTime } from "./world/WorldTime"
 import { EventQueue } from "./world/events/EventQueue"
-import { Save } from "./saves/SaveGame"
 
 
 const ZOOM = 3
@@ -74,10 +73,6 @@ export class QuestGame extends Game {
 
         // TODO clean up obstacles (trees, rocks, etc) so intro goes smoothly
         CutsceneManager.instance.startCutscene(new IntroCutscene())
-    }
-
-    loadSave(save: Save) {
-
     }
 
     // entities in the world space

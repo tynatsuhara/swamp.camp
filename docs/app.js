@@ -978,7 +978,7 @@ System.register("engine/collision/CollisionEngine", ["engine/point", "engine/uti
 });
 System.register("engine/engine", ["engine/renderer/Renderer", "engine/input", "engine/profiler", "engine/debug", "engine/collision/CollisionEngine"], function (exports_15, context_15) {
     "use strict";
-    var Renderer_1, input_1, profiler_1, debug_2, CollisionEngine_2, UpdateViewsContext, StartData, UpdateData, Engine, ALREADY_STARTED_COMPONENT;
+    var Renderer_1, input_1, profiler_1, debug_2, CollisionEngine_2, UpdateViewsContext, StartData, AwakeData, UpdateData, Engine, ALREADY_STARTED_COMPONENT;
     var __moduleName = context_15 && context_15.id;
     return {
         setters: [
@@ -1011,6 +1011,12 @@ System.register("engine/engine", ["engine/renderer/Renderer", "engine/input", "e
                 return StartData;
             }());
             exports_15("StartData", StartData);
+            AwakeData = /** @class */ (function () {
+                function AwakeData() {
+                }
+                return AwakeData;
+            }());
+            exports_15("AwakeData", AwakeData);
             UpdateData = /** @class */ (function () {
                 function UpdateData() {
                 }
@@ -1099,6 +1105,11 @@ System.register("engine/component", [], function (exports_16, context_16) {
                     this.enabled = true;
                 }
                 /**
+                 * Called once, immediately after entity is defined and before start() is called.
+                 * It is safe to add additional components to the entity in this function.
+                 */
+                Component.prototype.awake = function (awakeData) { };
+                /**
                  * Called once, after the component is added to a valid entity and before update() is called
                  */
                 Component.prototype.start = function (startData) { };
@@ -1146,6 +1157,7 @@ System.register("engine/Entity", [], function (exports_17, context_17) {
                 Entity.prototype.addComponent = function (component) {
                     component.entity = this;
                     this.components.push(component);
+                    component.awake({});
                     return component;
                 };
                 Entity.prototype.addComponents = function (components) {
@@ -1830,6 +1842,9 @@ System.register("engine/tiles/AnimatedTileComponent", ["engine/tiles/TileCompone
                         this.animator.update(updateData.elapsedTimeMillis);
                     }
                 };
+                AnimatedTileComponent.prototype.fastForward = function (ms) {
+                    this.animator.update(Math.floor(ms));
+                };
                 return AnimatedTileComponent;
             }(TileComponent_2.TileComponent));
             exports_29("AnimatedTileComponent", AnimatedTileComponent);
@@ -2050,23 +2065,14 @@ System.register("game/graphics/SplitFileTileLoader", ["engine/tiles/StaticTileSo
                 }
                 SplitFileTileLoader.prototype.getTileSource = function (key) {
                     var image = Assets_3.assets.getImageByFileName(this.dirPath + "/" + key + ".png");
-                    if (!!image) {
-                        return null;
-                    }
-                    return new StaticTileSource_3.StaticTileSource(image, new point_13.Point(image.width, image.height), new point_13.Point(0, 0));
+                    return new StaticTileSource_3.StaticTileSource(image, new point_13.Point(0, 0), new point_13.Point(image.width, image.height));
                 };
-                SplitFileTileLoader.prototype.getTileSetAnimation = function (key, speed) {
-                    var counter = 1;
-                    var frames = [];
-                    while (true) {
-                        var frame = this.getTileSource(key + "_" + counter);
-                        if (!frame) {
-                            break;
-                        }
-                        frames.push(frame);
-                        counter++;
+                SplitFileTileLoader.prototype.getTileSetAnimation = function (key, frames, speed) {
+                    var framesArr = [];
+                    for (var i = 1; i <= frames; i++) {
+                        framesArr.push(this.getTileSource(key + "_" + i));
                     }
-                    return new TileSetAnimation_3.TileSetAnimation(frames.map(function (f) { return [f, speed]; }));
+                    return new TileSetAnimation_3.TileSetAnimation(framesArr.map(function (f) { return [f, speed]; }));
                 };
                 return SplitFileTileLoader;
             }());
@@ -5875,7 +5881,7 @@ System.register("game/characters/AnimationUtils", ["game/graphics/Tilesets"], fu
                     var animSpeed = 150;
                     var idleAnim = Tilesets_20.Tilesets.instance.dungeonCharacters.getTileSetAnimation(characterAnimName + "_idle_anim", animSpeed);
                     if (!idleAnim) {
-                        return Tilesets_20.Tilesets.instance.otherCharacters.getTileSetAnimation(characterAnimName + "_Idle", animSpeed);
+                        idleAnim = Tilesets_20.Tilesets.instance.otherCharacters.getTileSetAnimation(characterAnimName + "_Idle", 4, animSpeed);
                     }
                     return idleAnim;
                 },
@@ -5883,7 +5889,7 @@ System.register("game/characters/AnimationUtils", ["game/graphics/Tilesets"], fu
                     var animSpeed = 80;
                     var idleAnim = Tilesets_20.Tilesets.instance.dungeonCharacters.getTileSetAnimation(characterAnimName + "_run_anim", animSpeed);
                     if (!idleAnim) {
-                        return Tilesets_20.Tilesets.instance.otherCharacters.getTileSetAnimation(characterAnimName + "_Walk", animSpeed);
+                        idleAnim = Tilesets_20.Tilesets.instance.otherCharacters.getTileSetAnimation(characterAnimName + "_Walk", 4, animSpeed);
                     }
                     return idleAnim;
                 },
@@ -5960,12 +5966,13 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     _this.speed = speed;
                     _this.inventory = inventory;
                     _this.dialogue = dialogue;
-                    _this.start = function (startData) {
+                    _this.awake = function () {
                         // Set up animations
                         var idleAnim = AnimationUtils_1.AnimationUtils.getCharacterIdleAnimation(characterAnimName);
                         var runAnim = AnimationUtils_1.AnimationUtils.getCharacterWalkAnimation(characterAnimName);
                         var height = idleAnim.getTile(0).dimensions.y;
                         _this._animation = _this.entity.addComponent(new AnimatedTileComponent_4.AnimatedTileComponent([idleAnim, runAnim], new TileTransform_16.TileTransform(new point_41.Point(0, 28 - height))));
+                        _this._animation.fastForward(Math.random() * 1000); // so not all the animations sync up
                         if (!!weaponId) {
                             _this._weapon = _this.entity.addComponent(new Weapon_1.Weapon(weaponId));
                         }
@@ -6432,7 +6439,7 @@ System.register("game/characters/Enemy", ["engine/component", "game/characters/D
                     if (!this.dude.weapon || !this.dude.isAlive) {
                         return;
                     }
-                    if (!this.dudeTarget.isAlive) {
+                    if (!this.dudeTarget || !this.dudeTarget.isAlive) {
                         this.dude.move(updateData, new point_44.Point(0, 0));
                         return;
                     }
@@ -6604,7 +6611,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                             break;
                         }
                         case 4 /* HERALD */: {
-                            animationName = "herald";
+                            animationName = "Herald";
                             maxHealth = Number.MAX_SAFE_INTEGER;
                             additionalComponents = [new NPC_1.NPC()];
                             break;
@@ -7937,8 +7944,6 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
                     DudeFactory_2.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_55.Point(-4, 0).times(Tilesets_27.TILE_SIZE));
                     // TODO clean up obstacles (trees, rocks, etc) so intro goes smoothly
                     CutsceneManager_3.CutsceneManager.instance.startCutscene(new IntroCutscene_1.IntroCutscene());
-                };
-                QuestGame.prototype.loadSave = function (save) {
                 };
                 // entities in the world space
                 QuestGame.prototype.getViews = function (updateViewsContext) {

@@ -42,4 +42,8 @@ export class AnimatedTileComponent extends TileComponent {
             this.animator.update(updateData.elapsedTimeMillis)
         }
     }
+
+    fastForward(ms: number) {
+        this.animator.update(Math.floor(ms))
+    }
 }

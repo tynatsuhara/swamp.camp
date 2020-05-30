@@ -86,12 +86,13 @@ export class Dude extends Component {
         this.inventory = inventory
         this.dialogue = dialogue
 
-        this.start = (startData) => {
+        this.awake = () => {
             // Set up animations
             const idleAnim = AnimationUtils.getCharacterIdleAnimation(characterAnimName)
             const runAnim = AnimationUtils.getCharacterWalkAnimation(characterAnimName)
             const height = idleAnim.getTile(0).dimensions.y
             this._animation = this.entity.addComponent(new AnimatedTileComponent([idleAnim, runAnim], new TileTransform(new Point(0, 28-height))))
+            this._animation.fastForward(Math.random() * 1000)  // so not all the animations sync up
     
             if (!!weaponId) {
                 this._weapon = this.entity.addComponent(new Weapon(weaponId))

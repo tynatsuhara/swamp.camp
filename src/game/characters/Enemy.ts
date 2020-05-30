@@ -24,7 +24,7 @@ export class Enemy extends Component {
             return
         }
 
-        if (!this.dudeTarget.isAlive) {
+        if (!this.dudeTarget || !this.dudeTarget.isAlive) {
             this.dude.move(updateData, new Point(0, 0))
             return
         }

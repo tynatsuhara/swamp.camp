@@ -13,27 +13,18 @@ export class SplitFileTileLoader {
 
     getTileSource(key: string): StaticTileSource {
         const image = assets.getImageByFileName(`${this.dirPath}/${key}.png`)
-        if (!!image) {
-            return null
-        }
         return new StaticTileSource(
             image, 
+            new Point(0, 0),
             new Point(image.width, image.height), 
-            new Point(0, 0)
         )
     }
     
-    getTileSetAnimation(key: string, speed: number): TileSetAnimation {
-        let counter = 1
-        const frames = []
-        while (true) {
-            const frame = this.getTileSource(`${key}_${counter}`)
-            if (!frame) {
-                break
-            }
-            frames.push(frame)
-            counter++
+    getTileSetAnimation(key: string, frames: number, speed: number): TileSetAnimation {
+        const framesArr = []
+        for (let i = 1; i <= frames; i++) {
+            framesArr.push(this.getTileSource(`${key}_${i}`))
         }
-        return new TileSetAnimation(frames.map(f => [f, speed]))
+        return new TileSetAnimation(framesArr.map(f => [f, speed]))
     }
 }
