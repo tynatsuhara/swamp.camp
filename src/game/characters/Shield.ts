@@ -1,16 +1,11 @@
 import { Component } from "../../engine/component"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { Tilesets } from "../graphics/Tilesets"
-import { StartData, UpdateData } from "../../engine/engine"
+import { UpdateData } from "../../engine/engine"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Point } from "../../engine/point"
-import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
 import { Dude } from "./Dude"
 import { Animator } from "../../engine/util/Animator"
-import { BoxCollider } from "../../engine/collision/BoxCollider"
-import { Player } from "./Player"
-import { LocationManager } from "../world/LocationManager"
-import { Weapon } from "./Weapon"
 
 enum State {
     ON_BACK,
@@ -29,7 +24,7 @@ export class Shield extends Component {
 
     private blockingActive = false
     private raisedPerc = 0 // for animation
-    private timeToRaiseMs = 100
+    private timeToRaiseMs = 75
 
     constructor(shieldId: string) {
         super()
