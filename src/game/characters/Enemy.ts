@@ -16,7 +16,15 @@ export class Enemy extends Component {
     start(startData: StartData) {
         this.dude = this.entity.getComponent(Dude)
         this.dude.weapon.delay = 500
+
         this.obtainTarget()
+        const updateTargetInterval = setInterval(() => {
+            if (!this.dude.isAlive) {
+                clearInterval(updateTargetInterval)
+            } else {
+                this.obtainTarget()
+            }
+        }, 700 + 300 * Math.random())
     }
 
     update(updateData: UpdateData) {
