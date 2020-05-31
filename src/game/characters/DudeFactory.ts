@@ -81,6 +81,7 @@ export class DudeFactory {
                 animationName = "lizard_f"
                 maxHealth = Number.MAX_SAFE_INTEGER
                 blob = DipController.makeInitialState()
+                speed *= .7
                 additionalComponents = [new NPC()]
                 break
             }

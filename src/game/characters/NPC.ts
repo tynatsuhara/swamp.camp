@@ -5,7 +5,9 @@ import { Player } from "./Player"
 import { Point } from "../../engine/point"
 import { WorldLocation } from "../world/WorldLocation"
 import { LocationManager } from "../world/LocationManager"
-import { pixelPtToTilePt } from "../graphics/Tilesets"
+import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
+import { MapGenerator } from "../world/MapGenerator"
+import { Lists } from "../../engine/util/Lists"
 
 /**
  * Shared logic for different types of NPCs. These should be invoked by an NPC controller component.
@@ -36,8 +38,24 @@ export class NPC extends Component {
         //     this.doFollow(updateData)
         } else {
             // TODO: later add a standard routine (eg patrolling for guards, walking around for villagers)
-            // this.dude.move(updateData, Point.ZERO)
-            this.walkTo(Point.ZERO, updateData)
+            this.flee(updateData)
+        }
+    }
+
+    private fleePath: Point[] = null
+    private flee(updateData: UpdateData) {
+        if (!this.fleePath || this.fleePath.length === 0) {  // only try once per upate() to find a path
+            const l = LocationManager.instance.currentLocation
+            const openPoints = l.ground.keys().filter(pt => !l.elements.get(pt))
+            const pt = openPoints[Math.floor(Math.random() * openPoints.length)]
+            this.fleePath = this.findPath(pt)
+            if (!this.fleePath || this.fleePath.length === 0) {
+                this.dude.move(updateData, Point.ZERO)
+                return
+            }
+        }
+        if (this.walkTo(this.fleePath[0], updateData)) {
+            this.fleePath.shift()
         }
     }
 
@@ -50,9 +68,6 @@ export class NPC extends Component {
     attack(attackTarget: Dude) {
         this.attackTarget = attackTarget
     }
-
-    // TODO
-    // flee() {}
 
     private attackTarget: Dude
     private doAttack(updateData: UpdateData) {
@@ -97,17 +112,16 @@ export class NPC extends Component {
         }
     }
 
-    walkTo(pt: Point, updateData: UpdateData) {
-        if (this.dude.standingPosition.distanceTo(pt) > 10) {
-            this.dude.move(updateData, pt.minus(this.dude.standingPosition))
-        } else {
-            this.dude.move(updateData, Point.ZERO)
-        }
+    // returns true if they are pretty close (half a tile) away from the goal
+    private walkTo(pt: Point, updateData: UpdateData) {
+        const dist = this.dude.standingPosition.distanceTo(pt)
+        this.dude.move(updateData, pt.minus(this.dude.standingPosition))
+        return dist < 8
     }
 
-    private findPath(worldPoint: Point, h: (pt: Point) => number = (pt) => pt.distanceTo(end)) {
+    private findPath(tilePt: Point, h: (pt: Point) => number = (pt) => pt.distanceTo(end)) {
         const start = pixelPtToTilePt(this.dude.standingPosition)
-        const end = pixelPtToTilePt(worldPoint)
-        const path = LocationManager.instance.currentLocation.elements.findPath(start, end, h)
+        const end = tilePt
+        return LocationManager.instance.currentLocation.elements.findPath(start, end, h)?.map(pt => pt.plus(new Point(.5, .8)).times(TILE_SIZE))
     }
 }

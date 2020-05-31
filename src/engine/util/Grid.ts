@@ -28,6 +28,10 @@ export class Grid<T> {
         return Object.entries(this.map).map(tuple => [Point.fromString(tuple[0]), tuple[1]])
     }
 
+    keys(): Point[] {
+        return Object.keys(this.map).map(ptStr => Point.fromString(ptStr))
+    }
+
     values(): T[] {
         return Object.values(this.map)
     }

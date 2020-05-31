@@ -9,9 +9,7 @@ import { Point } from "../../engine/point"
 export const TILE_SIZE = 16
 
 export const pixelPtToTilePt = (pixelPt: Point) => {
-    return pixelPt.apply(n => 
-        Math.round(Math.abs(n)/TILE_SIZE) * Math.sign(n)
-    )
+    return pixelPt.apply(n => Math.floor(n/TILE_SIZE))
 }
 
 /**

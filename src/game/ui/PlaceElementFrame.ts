@@ -48,7 +48,7 @@ export class PlaceElementFrame extends Component {
 
     update(updateData: UpdateData) {
         const startPos = updateData.input.mousePos
-        const tilePt = pixelPtToTilePt(startPos.minus(new Point(this.dimensions.x/2, this.dimensions.y/2).times(TILE_SIZE)))
+        const tilePt = this.pixelPtToTilePt(startPos.minus(new Point(this.dimensions.x/2, this.dimensions.y/2).times(TILE_SIZE)))
 
         const canPlace = this.canPlace(tilePt)
         this.goodTiles.forEach(t => t.enabled = canPlace)
@@ -61,6 +61,13 @@ export class PlaceElementFrame extends Component {
             PlaceElementDisplay.instance.finishPlacing(tilePt)
         }
     }
+
+    private pixelPtToTilePt = (pixelPt: Point) => {
+        return pixelPt.apply(n => 
+            Math.round(Math.abs(n)/TILE_SIZE) * Math.sign(n)
+        )
+    }
+    
 
     delete() {
         this.goodTiles.forEach(t => t.delete())

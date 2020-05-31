@@ -1639,6 +1639,9 @@ System.register("engine/util/Grid", ["engine/point", "engine/util/BinaryHeap"], 
                 Grid.prototype.entries = function () {
                     return Object.entries(this.map).map(function (tuple) { return [point_9.Point.fromString(tuple[0]), tuple[1]]; });
                 };
+                Grid.prototype.keys = function () {
+                    return Object.keys(this.map).map(function (ptStr) { return point_9.Point.fromString(ptStr); });
+                };
                 Grid.prototype.values = function () {
                     return Object.values(this.map);
                 };
@@ -2257,9 +2260,7 @@ System.register("game/graphics/Tilesets", ["game/graphics/SingleFileTileLoader",
             // standard tile size
             exports_36("TILE_SIZE", TILE_SIZE = 16);
             exports_36("pixelPtToTilePt", pixelPtToTilePt = function (pixelPt) {
-                return pixelPt.apply(function (n) {
-                    return Math.round(Math.abs(n) / TILE_SIZE) * Math.sign(n);
-                });
+                return pixelPt.apply(function (n) { return Math.floor(n / TILE_SIZE); });
             });
             /**
              * Manages different tile sources
@@ -4073,6 +4074,11 @@ System.register("game/ui/PlaceElementFrame", ["engine/component", "game/graphics
                 __extends(PlaceElementFrame, _super);
                 function PlaceElementFrame(dimensions) {
                     var _this = _super.call(this) || this;
+                    _this.pixelPtToTilePt = function (pixelPt) {
+                        return pixelPt.apply(function (n) {
+                            return Math.round(Math.abs(n) / Tilesets_10.TILE_SIZE) * Math.sign(n);
+                        });
+                    };
                     _this.dimensions = dimensions;
                     if ((_this.dimensions.x === 1 && _this.dimensions.y !== 1) || (_this.dimensions.y === 1 && _this.dimensions.x !== 1)) {
                         throw new Error("haven't implemented small element placing yet :(");
@@ -4093,7 +4099,7 @@ System.register("game/ui/PlaceElementFrame", ["engine/component", "game/graphics
                 };
                 PlaceElementFrame.prototype.update = function (updateData) {
                     var startPos = updateData.input.mousePos;
-                    var tilePt = Tilesets_10.pixelPtToTilePt(startPos.minus(new point_30.Point(this.dimensions.x / 2, this.dimensions.y / 2).times(Tilesets_10.TILE_SIZE)));
+                    var tilePt = this.pixelPtToTilePt(startPos.minus(new point_30.Point(this.dimensions.x / 2, this.dimensions.y / 2).times(Tilesets_10.TILE_SIZE)));
                     var canPlace = this.canPlace(tilePt);
                     this.goodTiles.forEach(function (t) { return t.enabled = canPlace; });
                     this.badTiles.forEach(function (t) { return t.enabled = !canPlace; });
@@ -6379,7 +6385,9 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
             NPC = /** @class */ (function (_super) {
                 __extends(NPC, _super);
                 function NPC() {
-                    return _super !== null && _super.apply(this, arguments) || this;
+                    var _this = _super !== null && _super.apply(this, arguments) || this;
+                    _this.fleePath = null;
+                    return _this;
                 }
                 NPC.prototype.awake = function (startData) {
                     this.dude = this.entity.getComponent(Dude_4.Dude);
@@ -6401,8 +6409,22 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     }
                     else {
                         // TODO: later add a standard routine (eg patrolling for guards, walking around for villagers)
-                        // this.dude.move(updateData, Point.ZERO)
-                        this.walkTo(point_43.Point.ZERO, updateData);
+                        this.flee(updateData);
+                    }
+                };
+                NPC.prototype.flee = function (updateData) {
+                    if (!this.fleePath || this.fleePath.length === 0) { // only try once per upate() to find a path
+                        var l_1 = LocationManager_11.LocationManager.instance.currentLocation;
+                        var openPoints = l_1.ground.keys().filter(function (pt) { return !l_1.elements.get(pt); });
+                        var pt = openPoints[Math.floor(Math.random() * openPoints.length)];
+                        this.fleePath = this.findPath(pt);
+                        if (!this.fleePath || this.fleePath.length === 0) {
+                            this.dude.move(updateData, point_43.Point.ZERO);
+                            return;
+                        }
+                    }
+                    if (this.walkTo(this.fleePath[0], updateData)) {
+                        this.fleePath.shift();
                     }
                 };
                 // Can be called very update()
@@ -6448,19 +6470,18 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                         this.dude.move(updateData, new point_43.Point(0, 0));
                     }
                 };
+                // returns true if they are pretty close (half a tile) away from the goal
                 NPC.prototype.walkTo = function (pt, updateData) {
-                    if (this.dude.standingPosition.distanceTo(pt) > 10) {
-                        this.dude.move(updateData, pt.minus(this.dude.standingPosition));
-                    }
-                    else {
-                        this.dude.move(updateData, point_43.Point.ZERO);
-                    }
+                    var dist = this.dude.standingPosition.distanceTo(pt);
+                    this.dude.move(updateData, pt.minus(this.dude.standingPosition));
+                    return dist < 8;
                 };
-                NPC.prototype.findPath = function (worldPoint, h) {
+                NPC.prototype.findPath = function (tilePt, h) {
                     if (h === void 0) { h = function (pt) { return pt.distanceTo(end); }; }
+                    var _a;
                     var start = Tilesets_22.pixelPtToTilePt(this.dude.standingPosition);
-                    var end = Tilesets_22.pixelPtToTilePt(worldPoint);
-                    var path = LocationManager_11.LocationManager.instance.currentLocation.elements.findPath(start, end, h);
+                    var end = tilePt;
+                    return (_a = LocationManager_11.LocationManager.instance.currentLocation.elements.findPath(start, end, h)) === null || _a === void 0 ? void 0 : _a.map(function (pt) { return pt.plus(new point_43.Point(.5, .8)).times(Tilesets_22.TILE_SIZE); });
                 };
                 return NPC;
             }(component_21.Component));
@@ -6713,6 +6734,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                             animationName = "lizard_f";
                             maxHealth = Number.MAX_SAFE_INTEGER;
                             blob = DipController_1.DipController.makeInitialState();
+                            speed *= .7;
                             additionalComponents = [new NPC_2.NPC()];
                             break;
                         }
