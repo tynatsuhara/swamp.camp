@@ -61,9 +61,7 @@ export class QuestGame extends Game {
         // World must be initialized before we do anything else
         new MapGenerator().doIt()
 
-        const playerStartPos = new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE)
-                .plusY(-TILE_SIZE * 10)
-                .plusX(TILE_SIZE * 2)
+        const playerStartPos = MapGenerator.ENTER_LAND_POS
         const playerDude = DudeFactory.instance.new(DudeType.PLAYER, playerStartPos)
 
         Camera.instance.focusOnDude(playerDude)

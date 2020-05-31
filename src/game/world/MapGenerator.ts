@@ -8,11 +8,13 @@ import { LocationManager } from "./LocationManager"
 import { GroundType, Ground } from "./ground/Ground"
 import { Noise } from "../../engine/util/Noise"
 import { Grid } from "../../engine/util/Grid"
+import { TILE_SIZE } from "../graphics/Tilesets"
 
 
 export class MapGenerator {
 
     static readonly MAP_SIZE = 50
+    static readonly ENTER_LAND_POS = new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE).plusY(-TILE_SIZE * 10).plusX(TILE_SIZE * 2)
 
     private readonly location = LocationManager.instance.newLocation()
 
@@ -28,6 +30,7 @@ export class MapGenerator {
 
         this.spawnTrees()
         this.spawnRocks()
+        this.clearPathToCenter()
 
         // TODO short trees, bushes, fruit, tall grass, etc
 
@@ -38,7 +41,7 @@ export class MapGenerator {
     }
 
     spawnTrees() {
-        const trees = Math.random() * 150 + 50
+        const trees = Math.random() * 300 + 150
         for (let i = 0; i < trees; i++) {
             const pt = new Point(
                 Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_SIZE/2,
@@ -47,6 +50,18 @@ export class MapGenerator {
             const occupiedPoints = [pt, pt.plus(new Point(0, 1))]
             if (occupiedPoints.every(p => !this.location.ground.get(p))) {
                 this.location.addWorldElement(ElementType.TREE, pt)
+            }
+        }
+    }
+
+    clearPathToCenter() {
+        // these are magic numbers based on the intro cutscene 
+        for (let x = 14; x < MapGenerator.MAP_SIZE/2; x++) {
+            for (let y = 15; y < 17; y++) {
+                const element = this.location.elements.get(new Point(x, y))
+                if (!!element) {
+                    this.location.elements.removeAll(element)
+                }
             }
         }
     }

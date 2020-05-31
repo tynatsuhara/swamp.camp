@@ -4,7 +4,7 @@ import { CutscenePlayerController } from "./CutscenePlayerController"
 import { Player } from "../characters/Player"
 import { Point } from "../../engine/point"
 import { MapGenerator } from "../world/MapGenerator"
-import { TILE_SIZE } from "../graphics/Tilesets"
+import { TILE_SIZE, pixelPtToTilePt } from "../graphics/Tilesets"
 import { Camera } from "./Camera"
 import { CutsceneManager } from "./CutsceneManager"
 import { Dude } from "../characters/Dude"
@@ -23,6 +23,7 @@ export class IntroCutscene extends Component {
 
     private waitingForOrcsToDie = false
     private orcs: Dude[]
+    private dip: Dude
 
     /**
      * 1. position player in corner
@@ -37,14 +38,15 @@ export class IntroCutscene extends Component {
 
     start(startData: StartData) {
         CutscenePlayerController.instance.enable()
-        CutscenePlayerController.instance.startMoving(new Point(-1, 0))  // TODO: Make sure there are no trees in their way
+        CutscenePlayerController.instance.startMoving(new Point(-1, 0))
+        this.dip = Array.from(LocationManager.instance.currentLocation.dudes).filter(d => d.type === DudeType.DIP)[0]
 
         setTimeout(() => { 
             CutscenePlayerController.instance.stopMoving() 
         }, this.STOP_WALKING_IN)
 
         setTimeout(() => { 
-            Camera.instance.focusOnPoint(new Point(0, 0))
+            Camera.instance.focusOnPoint(this.dip.standingPosition)
             CutscenePlayerController.instance.disable()
         }, this.PAN_TO_DIP)
 
@@ -66,8 +68,7 @@ export class IntroCutscene extends Component {
         // TODO prevent the player from going to a different location until this is over
 
         if (!this.orcs.some(o => o.isAlive)) {
-            const dip = Array.from(LocationManager.instance.currentLocation.dudes).filter(d => d.type === DudeType.DIP)[0]
-            dip.dialogue = Dialogue.DIP_0
+            this.dip.dialogue = Dialogue.DIP_0
 
             CutsceneManager.instance.finishCutscene()
         }

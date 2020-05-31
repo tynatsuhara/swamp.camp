@@ -3,6 +3,9 @@ import { UpdateData, StartData } from "../../engine/engine"
 import { Dude } from "./Dude"
 import { Player } from "./Player"
 import { Point } from "../../engine/point"
+import { WorldLocation } from "../world/WorldLocation"
+import { LocationManager } from "../world/LocationManager"
+import { pixelPtToTilePt } from "../graphics/Tilesets"
 
 /**
  * Shared logic for different types of NPCs. These should be invoked by an NPC controller component.
@@ -29,18 +32,20 @@ export class NPC extends Component {
 
         if (!!this.attackTarget) {
             this.doAttack(updateData)
-        } else if (!!this.followTarget) {
-            this.doFollow(updateData)
+        // } else if (!!this.followTarget) {
+        //     this.doFollow(updateData)
         } else {
             // TODO: later add a standard routine (eg patrolling for guards, walking around for villagers)
-            this.dude.move(updateData, Point.ZERO)
+            // this.dude.move(updateData, Point.ZERO)
+            this.walkTo(Point.ZERO, updateData)
         }
     }
 
     // Can be called very update()
-    follow(followTarget: Dude) {
-        this.followTarget = followTarget
-    }
+    // follow(followTarget: Dude) {
+    //     // TODO we probably want to make this serializable (character uuid?) if we end up using it
+    //     this.followTarget = followTarget
+    // }
 
     attack(attackTarget: Dude) {
         this.attackTarget = attackTarget
@@ -90,5 +95,19 @@ export class NPC extends Component {
         } else {
             this.dude.move(updateData, new Point(0, 0))
         }
+    }
+
+    walkTo(pt: Point, updateData: UpdateData) {
+        if (this.dude.standingPosition.distanceTo(pt) > 10) {
+            this.dude.move(updateData, pt.minus(this.dude.standingPosition))
+        } else {
+            this.dude.move(updateData, Point.ZERO)
+        }
+    }
+
+    private findPath(worldPoint: Point, h: (pt: Point) => number = (pt) => pt.distanceTo(end)) {
+        const start = pixelPtToTilePt(this.dude.standingPosition)
+        const end = pixelPtToTilePt(worldPoint)
+        const path = LocationManager.instance.currentLocation.elements.findPath(start, end, h)
     }
 }

@@ -34,7 +34,7 @@ export class Enemy extends Component {
                 .filter(d => d.faction != this.dude.faction)
                 .filter(d => d.standingPosition.distanceTo(this.dude.standingPosition) < this.findTargetRange)
         
-        // attack enenmies 
+        // attack armed opponents first
         if (possibilities.some(d => !!d.weapon)) {
             possibilities = possibilities.filter(d => !!d.weapon)
         }
