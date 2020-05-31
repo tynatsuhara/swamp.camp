@@ -3,9 +3,16 @@ import { DungeonTilesetII } from "./DungeonTilesetII"
 import { SplitFileTileLoader } from "./SplitFileTileLoader"
 import { OneBitTileset } from "./OneBitTileset"
 import { OutdoorTileset } from "./OutdoorTileset"
+import { Point } from "../../engine/point"
 
 // standard tile size
 export const TILE_SIZE = 16
+
+export const pixelPtToTilePt = (pixelPt: Point) => {
+    return pixelPt.apply(n => 
+        Math.round(Math.abs(n)/TILE_SIZE) * Math.sign(n)
+    )
+}
 
 /**
  * Manages different tile sources

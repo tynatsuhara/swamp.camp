@@ -1,6 +1,6 @@
 import { Component } from "../../engine/component"
 import { TileComponent } from "../../engine/tiles/TileComponent"
-import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { Tilesets, TILE_SIZE, pixelPtToTilePt } from "../graphics/Tilesets"
 import { Point } from "../../engine/point"
 import { makeNineSliceComponents } from "../../engine/tiles/NineSlice"
 import { UIStateManager } from "./UIStateManager"
@@ -48,7 +48,7 @@ export class PlaceElementFrame extends Component {
 
     update(updateData: UpdateData) {
         const startPos = updateData.input.mousePos
-        const tilePt = this.pixelPtToTilePt(startPos.minus(new Point(this.dimensions.x/2, this.dimensions.y/2).times(TILE_SIZE)))
+        const tilePt = pixelPtToTilePt(startPos.minus(new Point(this.dimensions.x/2, this.dimensions.y/2).times(TILE_SIZE)))
 
         const canPlace = this.canPlace(tilePt)
         this.goodTiles.forEach(t => t.enabled = canPlace)
@@ -66,12 +66,6 @@ export class PlaceElementFrame extends Component {
         this.goodTiles.forEach(t => t.delete())
         this.badTiles.forEach(t => t.delete())
         super.delete()
-    }
-
-    private pixelPtToTilePt(pixelPt: Point) {
-        return pixelPt.apply(n => 
-            Math.round(Math.abs(n)/TILE_SIZE) * Math.sign(n)
-        )
     }
 
     private canPlace(pos: Point) {
