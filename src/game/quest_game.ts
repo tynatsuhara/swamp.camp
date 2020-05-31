@@ -20,6 +20,8 @@ import { SaveManager } from "./SaveManager"
 import { PointLightMaskRenderer } from "./world/PointLightMaskRenderer"
 import { WorldTime } from "./world/WorldTime"
 import { EventQueue } from "./world/events/EventQueue"
+import { Component } from "../engine/component"
+import { TileComponent } from "../engine/tiles/TileComponent"
 
 
 const ZOOM = 3

@@ -13,4 +13,5 @@ export class DudeSaveState {
     speed: number
     inventory: ItemStack[]
     dialogue: Dialogue
+    blob: object // This can be used for DudeType-specific data
 }

@@ -17,7 +17,6 @@ export class AsciiInteriorBuilder {
             for (let col = 0; col < this.ascii[row].length; col++) {
                 if (this.ascii[row][col] == char) {
                     fn(new Point(col, row))
-                    console.log("huh")
                 }
             }
         }

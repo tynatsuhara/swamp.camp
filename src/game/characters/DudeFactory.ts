@@ -10,6 +10,7 @@ import { DudeSaveState } from "../saves/DudeSaveState"
 import { Inventory } from "../items/Inventory"
 import { Dialogue } from "./Dialogue"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
+import { DipController } from "./DipController"
 
 export const enum DudeFaction {
     VILLAGERS,
@@ -64,6 +65,7 @@ export class DudeFactory {
         let speed: number = 0.085
         let dialogue: Dialogue = Dialogue.NONE
         let additionalComponents: Component[] = []
+        let blob = {}
 
         // type-specific defaults
         switch(type) {
@@ -78,6 +80,7 @@ export class DudeFactory {
             case DudeType.DIP: {
                 animationName = "lizard_f"
                 maxHealth = Number.MAX_SAFE_INTEGER
+                blob = DipController.makeInitialState()
                 additionalComponents = [new NPC()]
                 break
             }
@@ -100,7 +103,7 @@ export class DudeFactory {
                 faction = DudeFaction.ORCS
                 animationName = "orc_warrior"
                 weapon = "weapon_baton_with_spikes"
-                additionalComponents = [new Enemy()]
+                additionalComponents = [new NPC(), new Enemy()]
                 maxHealth = 2
                 speed *= (.3 + Math.random()/2)
                 break
@@ -125,7 +128,8 @@ export class DudeFactory {
             saveState?.health ?? health,
             saveState?.speed ?? speed,
             inventory,
-            saveState?.dialogue ?? dialogue
+            saveState?.dialogue ?? dialogue,
+            saveState?.blob ?? blob,
         )
 
         new Entity([d as Component].concat(additionalComponents))

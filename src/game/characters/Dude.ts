@@ -25,6 +25,7 @@ export class Dude extends Component {
 
     static readonly COLLISION_LAYER = "dube"
     
+    blob: object
     readonly type: DudeType
     readonly faction: DudeFaction
     readonly inventory: Inventory
@@ -72,7 +73,8 @@ export class Dude extends Component {
         health: number,
         speed: number,
         inventory: Inventory,
-        dialogue: Dialogue
+        dialogue: Dialogue,
+        blob: object,
     ) {
         super()
         this.type = type
@@ -85,6 +87,7 @@ export class Dude extends Component {
         this.speed = speed
         this.inventory = inventory
         this.dialogue = dialogue
+        this.blob = blob
 
         this.awake = () => {
             // Set up animations
@@ -276,6 +279,7 @@ export class Dude extends Component {
             shield: this.shieldId,
             inventory: this.inventory.save(),
             dialogue: this.dialogue,
+            blob: this.blob,
         }
     }
 
