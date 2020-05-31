@@ -45,11 +45,11 @@ export class IntroCutscene extends Component {
 
         setTimeout(() => { 
             Camera.instance.focusOnPoint(new Point(0, 0))
+            CutscenePlayerController.instance.disable()
         }, this.PAN_TO_DIP)
 
         setTimeout(() => { 
             Camera.instance.focusOnDude(Player.instance.dude)
-            CutscenePlayerController.instance.disable()
             this.waitingForOrcsToDie = true
         }, this.PAN_BACK)
     }
