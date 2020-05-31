@@ -7744,11 +7744,12 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/Connec
             MapGenerator = /** @class */ (function () {
                 function MapGenerator() {
                     this.location = LocationManager_14.LocationManager.instance.newLocation();
+                    this.tentPos = new point_52.Point(-3, -3);
                 }
                 MapGenerator.prototype.doIt = function () {
                     var tentLocation = LocationManager_14.LocationManager.instance.newLocation();
                     // spawn tent
-                    this.location.addWorldElement(2 /* TENT */, new point_52.Point(-3, -3), { destinationUUID: tentLocation.uuid, color: "red" /* RED */ });
+                    this.location.addWorldElement(2 /* TENT */, this.tentPos, { destinationUUID: tentLocation.uuid, color: "red" /* RED */ });
                     // make the ground
                     // this.renderPath(new Point(-10, -10), new Point(10, 10), 2)
                     // this.renderPath(new Point(10, -10), new Point(-10, 10), 5)
@@ -7772,11 +7773,21 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/Connec
                     }
                 };
                 MapGenerator.prototype.clearPathToCenter = function () {
+                    var typesToClear = [1 /* ROCK */, 0 /* TREE */];
                     // these are magic numbers based on the intro cutscene 
                     for (var x = 14; x < MapGenerator.MAP_SIZE / 2; x++) {
                         for (var y = 15; y < 17; y++) {
                             var element = this.location.elements.get(new point_52.Point(x, y));
-                            if (!!element) {
+                            if (!!element && typesToClear.indexOf(element.type) !== -1) {
+                                this.location.elements.removeAll(element);
+                            }
+                        }
+                    }
+                    var clearingCorner = this.tentPos.minus(new point_52.Point(1, 0));
+                    for (var x = 0; x < 6; x++) {
+                        for (var y = 0; y < 4; y++) {
+                            var element = this.location.elements.get(clearingCorner.plus(new point_52.Point(x, y)));
+                            if (!!element && typesToClear.indexOf(element.type) !== -1) {
                                 this.location.elements.removeAll(element);
                             }
                         }

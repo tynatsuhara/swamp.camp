@@ -17,12 +17,13 @@ export class MapGenerator {
     static readonly ENTER_LAND_POS = new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE).plusY(-TILE_SIZE * 10).plusX(TILE_SIZE * 2)
 
     private readonly location = LocationManager.instance.newLocation()
+    private readonly tentPos = new Point(-3, -3)
 
     doIt(): WorldLocation {
         const tentLocation = LocationManager.instance.newLocation()
         
         // spawn tent
-        this.location.addWorldElement(ElementType.TENT, new Point(-3, -3), { destinationUUID: tentLocation.uuid, color: TentColor.RED })
+        this.location.addWorldElement(ElementType.TENT, this.tentPos, { destinationUUID: tentLocation.uuid, color: TentColor.RED })
         
         // make the ground
         // this.renderPath(new Point(-10, -10), new Point(10, 10), 2)
@@ -55,11 +56,21 @@ export class MapGenerator {
     }
 
     clearPathToCenter() {
+        const typesToClear = [ElementType.ROCK, ElementType.TREE]
         // these are magic numbers based on the intro cutscene 
         for (let x = 14; x < MapGenerator.MAP_SIZE/2; x++) {
             for (let y = 15; y < 17; y++) {
                 const element = this.location.elements.get(new Point(x, y))
-                if (!!element) {
+                if (!!element && typesToClear.indexOf(element.type) !== -1) {
+                    this.location.elements.removeAll(element)
+                }
+            }
+        }
+        const clearingCorner = this.tentPos.minus(new Point(1, 0))
+        for (let x = 0; x < 6; x++) {
+            for (let y = 0; y < 4; y++) {
+                const element = this.location.elements.get(clearingCorner.plus(new Point(x, y)))
+                if (!!element && typesToClear.indexOf(element.type) !== -1) {
                     this.location.elements.removeAll(element)
                 }
             }
