@@ -10,6 +10,8 @@ import { ElementComponent } from "./ElementComponent"
 import { ElementType } from "./Elements"
 import { ElementUtils } from "./ElementUtils"
 import { makeTentInterior } from "../interior/Tent"
+import { Player } from "../../characters/Player"
+import { Teleporters } from "../Teleporter"
 
 export const enum TentColor {
     RED = "red",
@@ -19,9 +21,14 @@ export const enum TentColor {
 export const makeTent = (wl: WorldLocation, pos: Point, data: object): ElementComponent => {
     const e = new Entity()
 
-    const destinationUUID: string = data["destinationUUID"] ?? makeTentInterior().uuid
+    const destinationUUID: string = data["destinationUUID"] ?? makeTentInterior(wl).uuid
     const color: TentColor = data["color"] ?? TentColor.BLUE
+
+    const interactablePos = pos.plus(new Point(2, 2)).times(TILE_SIZE)
+    const sourceTeleporter = { to: destinationUUID, pos: interactablePos.plusY(12) }
+    wl.addTeleporter(sourceTeleporter)
     
+    // Set up tiles
     const depth = (pos.y + 1) * TILE_SIZE + /* prevent clipping */ 5
     addTile(wl, e, `${color}tentNW`, pos.plusX(1), depth)
     addTile(wl, e, `${color}tentNE`, pos.plus(new Point(2, 0)), depth)
@@ -29,9 +36,10 @@ export const makeTent = (wl: WorldLocation, pos: Point, data: object): ElementCo
     addTile(wl, e, `${color}tentSE`, pos.plus(new Point(2, 1)), depth)
     e.addComponent(new BoxCollider(pos.plus(new Point(1, 1)).times(TILE_SIZE), new Point(TILE_SIZE*2, TILE_SIZE)))
 
-    e.addComponent(new Interactable(pos.plus(new Point(2, 2)).times(TILE_SIZE), () => {
-        wl.manager.transition(destinationUUID)
-    }))
+
+    // Set up teleporter
+    e.addComponent(new Interactable(interactablePos, () => wl.useTeleporter(destinationUUID)))
+
 
     return e.addComponent(new ElementComponent(
         ElementType.TENT, 

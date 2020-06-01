@@ -6,35 +6,33 @@ export class LocationManager {
     
     static instance: LocationManager
 
-    private current: WorldLocation
-    get currentLocation() {
-        if (!this.current) {
-            throw new Error("no locations have been added")
-        }
-        return this.current
-    }
+    currentLocation: WorldLocation
     private locations: Map<string, WorldLocation> = new Map()  // uuid -> location
 
     constructor() {
         LocationManager.instance = this
     }
 
+    get(uuid: string) {
+        return this.locations.get(uuid)
+    }
+
     newLocation() {
         const l = new WorldLocation(this)
         this.locations.set(l.uuid, l)
-        if (!this.current) {
-            this.current = l
+        if (!this.currentLocation) {
+            this.currentLocation = l
         }
         return l
     }
 
-    transition(toUUID: string) {
-        const location = this.locations.get(toUUID)
-        this.currentLocation.dudes.delete(Player.instance.dude)
-        location.dudes.add(Player.instance.dude)
+    // transition(toUUID: string) {
+    //     const location = this.locations.get(toUUID)
+    //     this.currentLocation.dudes.delete(Player.instance.dude)
+    //     location.dudes.add(Player.instance.dude)
 
-        this.current = location
-    }
+    //     this.current = location
+    // }
 
     save(): LocationManagerSaveState {
         return {
@@ -50,6 +48,6 @@ export class LocationManager {
             const loadedLocation = WorldLocation.load(result, l)
             result.locations.set(l.uuid, loadedLocation)
         })
-        result.current = result.locations.get(saveState.currentLocationUUID)
+        result.currentLocation = result.locations.get(saveState.currentLocationUUID)
     }
 }

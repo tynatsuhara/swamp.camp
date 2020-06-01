@@ -10,6 +10,8 @@ import { GroundComponent } from "./ground/GroundComponent"
 import { GroundType, Ground, SavedGround } from "./ground/Ground"
 import { Dude } from "../characters/Dude"
 import { DudeFactory } from "../characters/DudeFactory"
+import { Teleporter, Teleporters } from "./Teleporter"
+import { Player } from "../characters/Player"
 
 export class WorldLocation {
 
@@ -29,6 +31,8 @@ export class WorldLocation {
 
     // TODO: Make dropped items saveable
     readonly droppedItems = new Set<Entity>()
+
+    private teleporters: { [key: string]: string } = {} 
 
     constructor(manager: LocationManager) {
         this.manager = manager
@@ -54,6 +58,34 @@ export class WorldLocation {
         return elementComponent
     }
 
+    addTeleporter(t: Teleporter) {
+        this.teleporters[Teleporters.teleporterId(t.to, t.id)] = t.pos.toString()
+    }
+
+    private getTeleporterLinkedPos(to: string, id: string): Point {
+        const dest = LocationManager.instance.get(to)
+        const link = dest.teleporters[Teleporters.teleporterId(this.uuid, id)]
+        if (!link) {
+            throw new Error("teleporter doesn't have a link on the other side")
+        }
+        return Point.fromString(link)
+    }
+
+    useTeleporter(to: string, id: string = null) {
+        const linkedLocation = LocationManager.instance.get(to)
+        const linkedPosition = this.getTeleporterLinkedPos(to, id)
+        
+        const p = Player.instance.dude
+        this.dudes.delete(p)
+        linkedLocation.dudes.add(p)
+
+        LocationManager.instance.currentLocation = linkedLocation
+
+        // TODO offset "standingPositon"
+        const offset = p.standingPosition.minus(p.position)
+        p.moveTo(linkedPosition.minus(offset))  // this might have a bug with colliders
+    }
+
     getEntities() {
         return Array.from(Array.from(this.dudes.values()).map(d => d.entity))
                 .concat(this.elements.values().map(c => c.entity))
@@ -67,6 +99,7 @@ export class WorldLocation {
             ground: this.saveGround(),
             elements: this.saveElements(),
             dudes: Array.from(this.dudes).filter(d => d.isAlive).map(d => d.save()),
+            teleporters: this.teleporters
         }
     }
 
@@ -108,6 +141,7 @@ export class WorldLocation {
         saveState.elements.forEach(el => n.addWorldElement(el.type, Point.fromString(el.pos), el.obj))
         saveState.ground.forEach(el => n.addGroundElement(el.type, Point.fromString(el.pos), el.obj))
         saveState.dudes.forEach(d => n.dudes.add(DudeFactory.instance.load(d)))
+        n.teleporters = saveState.teleporters
         return n
     }
 }

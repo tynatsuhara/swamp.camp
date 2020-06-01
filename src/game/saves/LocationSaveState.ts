@@ -7,4 +7,5 @@ export class LocationSaveState {
     ground: SavedGround[]
     elements: SavedElement[]
     dudes: DudeSaveState[]
+    teleporters: { [key: string]: string }
 }

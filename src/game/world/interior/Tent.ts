@@ -2,9 +2,17 @@ import { WorldLocation } from "../WorldLocation"
 import { LocationManager } from "../LocationManager"
 import { AsciiInteriorBuilder } from "./AsciiInteriorBuilder"
 import { GroundType } from "../ground/Ground"
+import { Point } from "../../../engine/point"
+import { Teleporter } from "../Teleporter"
+import { TILE_SIZE } from "../../graphics/Tilesets"
 
-export const makeTentInterior = (): WorldLocation => {
+export const makeTentInterior = (outside: WorldLocation): WorldLocation => {
     const l = LocationManager.instance.newLocation()
+
+    const interactablePos = new Point(2.5, 4).times(TILE_SIZE)
+    const teleporter: Teleporter = { to: outside.uuid, pos: interactablePos.plusY(-2) }
+    l.addTeleporter(teleporter)
+    console.log("add teleporter")
 
     new AsciiInteriorBuilder(
         "_____",
@@ -15,7 +23,7 @@ export const makeTentInterior = (): WorldLocation => {
         // TODO: make this the tent ground
         l.addGroundElement(GroundType.GRASS, pos)
 
-        // TODO: add exit teleporter
+        // TODO add an interior teleporter element
     })
 
     return l

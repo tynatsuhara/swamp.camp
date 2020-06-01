@@ -1,12 +1,10 @@
 import { Component } from "../../engine/component"
-import { UpdateData, StartData } from "../../engine/engine"
+import { UpdateData } from "../../engine/engine"
 import { Dude } from "./Dude"
 import { Player } from "./Player"
 import { Point } from "../../engine/point"
-import { WorldLocation } from "../world/WorldLocation"
 import { LocationManager } from "../world/LocationManager"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
-import { MapGenerator } from "../world/MapGenerator"
 import { Lists } from "../../engine/util/Lists"
 
 /**
@@ -104,10 +102,6 @@ export class NPC extends Component {
     //     this.followTarget = followTarget
     // }
 
-    attack(attackTarget: Dude) {
-        this.attackTarget = attackTarget
-    }
-
     private attackTarget: Dude
     private doAttack(updateData: UpdateData) {
         if (!this.dude.weapon || !this.dude.isAlive) {
@@ -186,7 +180,7 @@ export class NPC extends Component {
 
         const target = Lists.minBy(enemies, d => d.position.distanceTo(this.dude.position))
         if (!!target) {
-            this.attack(target)
+            this.attackTarget = target
         }
     }
 
