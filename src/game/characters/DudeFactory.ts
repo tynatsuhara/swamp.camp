@@ -10,7 +10,7 @@ import { DudeSaveState } from "../saves/DudeSaveState"
 import { Inventory } from "../items/Inventory"
 import { Dialogue } from "./Dialogue"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
-import { DipController } from "./DipController"
+import { Villager } from "./Villager"
 
 export const enum DudeFaction {
     VILLAGERS,
@@ -80,9 +80,8 @@ export class DudeFactory {
             case DudeType.DIP: {
                 animationName = "lizard_f"
                 maxHealth = Number.MAX_SAFE_INTEGER
-                blob = DipController.makeInitialState()
                 speed *= .7
-                additionalComponents = [new NPC()]
+                additionalComponents = [new NPC(), new Villager()]
                 break
             }
             case DudeType.HERALD: {

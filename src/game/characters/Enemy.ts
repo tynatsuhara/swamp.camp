@@ -12,36 +12,10 @@ export class Enemy extends Component {
     private dude: Dude
     private npc: NPC
 
-    private findTargetRange = TILE_SIZE * 10
-
-    start(startData: StartData) {
+    awake() {
         this.dude = this.entity.getComponent(Dude)
         this.dude.weapon.delay = 500
         this.npc = this.entity.getComponent(NPC)
-
-        this.obtainTarget()
-        const updateTargetInterval = setInterval(() => {
-            if (!this.dude.isAlive) {
-                clearInterval(updateTargetInterval)
-            } else {
-                this.obtainTarget()
-            }
-        }, 700 + 300 * Math.random())
-    }
-
-    obtainTarget() {
-        let possibilities = Array.from(LocationManager.instance.currentLocation.dudes)
-                .filter(d => d.faction != this.dude.faction)
-                .filter(d => d.standingPosition.distanceTo(this.dude.standingPosition) < this.findTargetRange)
-        
-        // attack armed opponents first
-        if (possibilities.some(d => !!d.weapon)) {
-            possibilities = possibilities.filter(d => !!d.weapon)
-        }
-
-        const target = Lists.minBy(possibilities, d => d.position.distanceTo(this.dude.position))
-        if (!!target) {
-            this.npc.attack(target)
-        }
+        this.npc.isEnemyFn = d => d.faction != this.dude.faction
     }
 }

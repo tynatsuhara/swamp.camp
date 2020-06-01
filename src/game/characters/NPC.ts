@@ -16,8 +16,16 @@ export class NPC extends Component {
 
     private dude: Dude
 
-    awake(startData: StartData) {
+    isEnemyFn: (dude: Dude) => boolean = () => false
+    private findTargetRange = TILE_SIZE * 10
+    private enemiesPresent = false
+
+    awake() {
         this.dude = this.entity.getComponent(Dude)
+    }
+
+    start() {
+        this.doWhileLiving(() => this.checkForEnemies(), 700 + 600 * Math.random())
     }
 
     update(updateData: UpdateData) {
@@ -32,14 +40,31 @@ export class NPC extends Component {
             this.attackTarget = null  // no need to attack a dead dude
         }
 
-        if (!!this.attackTarget) {
-            this.doAttack(updateData)
-        // } else if (!!this.followTarget) {
-        //     this.doFollow(updateData)
+        if (this.enemiesPresent) {
+            if (!!this.attackTarget) {
+                this.doAttack(updateData)
+            } else {
+                this.flee(updateData)
+            }
         } else {
             // TODO: later add a standard routine (eg patrolling for guards, walking around for villagers)
-            this.flee(updateData)
+            // TODO: use pathfinding here
+            this.walkTo(Point.ZERO, updateData, true)
         }
+    }
+
+    // fn will execute immediately and every intervalMillis milliseconds until the NPC is dead
+    doWhileLiving(fn: () => void, intervalMillis: number) {
+        if (this.dude.isAlive) {
+            fn()
+        }
+        const interval = setInterval(() => {
+            if (!this.dude.isAlive) {
+                clearInterval(interval)
+            } else {
+                fn()
+            }
+        }, intervalMillis)
     }
 
     private fleePath: Point[] = null
@@ -113,10 +138,37 @@ export class NPC extends Component {
     }
 
     // returns true if they are pretty close (half a tile) away from the goal
-    private walkTo(pt: Point, updateData: UpdateData) {
-        const dist = this.dude.standingPosition.distanceTo(pt)
-        this.dude.move(updateData, pt.minus(this.dude.standingPosition))
-        return dist < 8
+    private walkTo(pt: Point, updateData: UpdateData, stopWhenClose = false) {
+        const isCloseEnough = this.dude.standingPosition.distanceTo(pt) < 8
+        if (isCloseEnough && stopWhenClose) {
+            this.dude.move(updateData, Point.ZERO)
+        } else {
+            this.dude.move(updateData, pt.minus(this.dude.standingPosition))
+        }
+        return isCloseEnough
+    }
+
+    private checkForEnemies() {
+        let enemies = Array.from(LocationManager.instance.currentLocation.dudes)
+                .filter(d => d.isAlive)
+                .filter(this.isEnemyFn)
+                .filter(d => d.standingPosition.distanceTo(this.dude.standingPosition) < this.findTargetRange)
+
+        this.enemiesPresent = enemies.length > 0
+        if (!this.dude.weapon) {
+            // should flee instead
+            return
+        }
+        
+        // attack armed opponents first
+        if (enemies.some(d => !!d.weapon)) {
+            enemies = enemies.filter(d => !!d.weapon)
+        }
+
+        const target = Lists.minBy(enemies, d => d.position.distanceTo(this.dude.position))
+        if (!!target) {
+            this.attack(target)
+        }
     }
 
     private findPath(tilePt: Point, h: (pt: Point) => number = (pt) => pt.distanceTo(end)) {
