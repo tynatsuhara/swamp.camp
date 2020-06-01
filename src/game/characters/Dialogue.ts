@@ -134,7 +134,7 @@ const DIALOGUE_MAP: { [key: number]: () => DialogueInstance } = {
         if (campfires.length > 0) {
             const lines = [
                 dipTent.occupiedPoints[0].distanceTo(campfires[0].occupiedPoints[0]) < 5
-                        ? "That should keep up warm tonight!"
+                        ? "That should keep us warm tonight!"
                         : "Well, the fire is a bit far from my tent, but that's okay!",
                 "Here, I've finished putting together your tent. Find a nice spot and plop it down!"
             ]
