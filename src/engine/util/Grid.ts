@@ -36,6 +36,9 @@ export class Grid<T> {
         return Object.values(this.map)
     }
 
+    /**
+     * Returns a path inclusive of start and end
+     */
     findPath(
         start: Point, 
         end: Point, 
@@ -43,7 +46,7 @@ export class Grid<T> {
         isOccupied: (pt: Point) => boolean = pt => !!this.get(pt),
         getNeighbors: (pt: Point) => Point[] = pt => [new Point(pt.x, pt.y - 1), new Point(pt.x - 1, pt.y), new Point(pt.x + 1, pt.y), new Point(pt.x, pt.y + 1)]
     ): Point[] {
-        if (isOccupied(start) || isOccupied(end)) {
+        if (isOccupied(start) || isOccupied(end) || start.equals(end)) {
             return null
         }
 

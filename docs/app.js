@@ -1645,12 +1645,15 @@ System.register("engine/util/Grid", ["engine/point", "engine/util/BinaryHeap"], 
                 Grid.prototype.values = function () {
                     return Object.values(this.map);
                 };
+                /**
+                 * Returns a path inclusive of start and end
+                 */
                 Grid.prototype.findPath = function (start, end, heuristic, isOccupied, getNeighbors) {
                     var _this = this;
                     if (heuristic === void 0) { heuristic = function (pt) { return pt.distanceTo(end); }; }
                     if (isOccupied === void 0) { isOccupied = function (pt) { return !!_this.get(pt); }; }
                     if (getNeighbors === void 0) { getNeighbors = function (pt) { return [new point_9.Point(pt.x, pt.y - 1), new point_9.Point(pt.x - 1, pt.y), new point_9.Point(pt.x + 1, pt.y), new point_9.Point(pt.x, pt.y + 1)]; }; }
-                    if (isOccupied(start) || isOccupied(end)) {
+                    if (isOccupied(start) || isOccupied(end) || start.equals(end)) {
                         return null;
                     }
                     var gScore = new Map();
@@ -6125,8 +6128,9 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                  * @param direction the direction they are moving in, will be normalized by this code
                  * @param facingOverride if < 0, will face left, if > 0, will face right. if == 0, will face the direction they're moving
                  */
-                Dude.prototype.move = function (updateData, direction, facingOverride) {
+                Dude.prototype.move = function (updateData, direction, facingOverride, maxDistance) {
                     if (facingOverride === void 0) { facingOverride = 0; }
+                    if (maxDistance === void 0) { maxDistance = Number.MAX_SAFE_INTEGER; }
                     if (this._health <= 0) {
                         return;
                     }
@@ -6149,7 +6153,8 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                         }
                         var translation = direction.normalized();
                         // this.lerpedLastMoveDir = this.lerpedLastMoveDir.lerp(0.25, translation)
-                        var newPos = this._position.plus(translation.times(updateData.elapsedTimeMillis * this.speed));
+                        var distance = Math.min(updateData.elapsedTimeMillis * this.speed, maxDistance);
+                        var newPos = this._position.plus(translation.times(distance));
                         this.moveTo(newPos);
                     }
                     else if (wasMoving) {
@@ -6392,6 +6397,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     _this.isEnemyFn = function () { return false; };
                     _this.findTargetRange = Tilesets_22.TILE_SIZE * 10;
                     _this.enemiesPresent = false;
+                    _this.walkPath = null;
                     _this.fleePath = null;
                     return _this;
                 }
@@ -6422,8 +6428,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     }
                     else {
                         // TODO: later add a standard routine (eg patrolling for guards, walking around for villagers)
-                        // TODO: use pathfinding here
-                        this.walkTo(point_43.Point.ZERO, updateData, true);
+                        this.walkTo(point_43.Point.ZERO, updateData);
                     }
                 };
                 // fn will execute immediately and every intervalMillis milliseconds until the NPC is dead
@@ -6441,6 +6446,19 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                         }
                     }, intervalMillis);
                 };
+                NPC.prototype.walkTo = function (pt, updateData) {
+                    // TODO: make sure the existing path is to the same pt
+                    if (!this.walkPath || this.walkPath.length === 0) { // only try once per upate() to find a path
+                        this.walkPath = this.findPath(pt);
+                        if (!this.walkPath || this.walkPath.length === 0) {
+                            this.dude.move(updateData, point_43.Point.ZERO);
+                            return;
+                        }
+                    }
+                    if (this.walkDirectlyTo(this.walkPath[0], updateData, this.walkPath.length === 1)) {
+                        this.walkPath.shift();
+                    }
+                };
                 NPC.prototype.flee = function (updateData) {
                     if (!this.fleePath || this.fleePath.length === 0) { // only try once per upate() to find a path
                         var l_1 = LocationManager_11.LocationManager.instance.currentLocation;
@@ -6452,7 +6470,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                             return;
                         }
                     }
-                    if (this.walkTo(this.fleePath[0], updateData)) {
+                    if (this.walkDirectlyTo(this.fleePath[0], updateData)) {
                         this.fleePath.shift();
                     }
                 };
@@ -6500,16 +6518,20 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     }
                 };
                 // returns true if they are pretty close (half a tile) away from the goal
-                NPC.prototype.walkTo = function (pt, updateData, stopWhenClose) {
+                NPC.prototype.walkDirectlyTo = function (pt, updateData, stopWhenClose) {
                     if (stopWhenClose === void 0) { stopWhenClose = false; }
-                    var isCloseEnough = this.dude.standingPosition.distanceTo(pt) < 8;
+                    // const dist = this.dude.standingPosition.distanceTo(pt)
+                    var isCloseEnough = this.isCloseEnoughToStopWalking(pt);
                     if (isCloseEnough && stopWhenClose) {
                         this.dude.move(updateData, point_43.Point.ZERO);
                     }
                     else {
-                        this.dude.move(updateData, pt.minus(this.dude.standingPosition));
+                        this.dude.move(updateData, pt.minus(this.dude.standingPosition), 0);
                     }
                     return isCloseEnough;
+                };
+                NPC.prototype.isCloseEnoughToStopWalking = function (pt) {
+                    return this.dude.standingPosition.distanceTo(pt) < 8;
                 };
                 NPC.prototype.checkForEnemies = function () {
                     var _this = this;
@@ -6534,9 +6556,11 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                 NPC.prototype.findPath = function (tilePt, h) {
                     if (h === void 0) { h = function (pt) { return pt.distanceTo(end); }; }
                     var _a;
+                    var ptOffset = new point_43.Point(.5, .8);
                     var start = Tilesets_22.pixelPtToTilePt(this.dude.standingPosition);
                     var end = tilePt;
-                    return (_a = LocationManager_11.LocationManager.instance.currentLocation.elements.findPath(start, end, h)) === null || _a === void 0 ? void 0 : _a.map(function (pt) { return pt.plus(new point_43.Point(.5, .8)).times(Tilesets_22.TILE_SIZE); });
+                    return (_a = LocationManager_11.LocationManager.instance.currentLocation.elements.findPath(start, end, h, function (pt) { return (pt === start ? false : !!LocationManager_11.LocationManager.instance.currentLocation.elements.get(pt)); } // prevent getting stuck "inside" a square
+                    )) === null || _a === void 0 ? void 0 : _a.map(function (pt) { return pt.plus(ptOffset).times(Tilesets_22.TILE_SIZE); }).slice(1); // slice(1) because we don't need the start in the path
                 };
                 return NPC;
             }(component_21.Component));

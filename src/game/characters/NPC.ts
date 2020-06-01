@@ -48,8 +48,7 @@ export class NPC extends Component {
             }
         } else {
             // TODO: later add a standard routine (eg patrolling for guards, walking around for villagers)
-            // TODO: use pathfinding here
-            this.walkTo(Point.ZERO, updateData, true)
+            this.walkTo(Point.ZERO, updateData)
         }
     }
 
@@ -67,6 +66,21 @@ export class NPC extends Component {
         }, intervalMillis)
     }
 
+    private walkPath: Point[] = null
+    private walkTo(pt: Point, updateData: UpdateData) {
+        // TODO: make sure the existing path is to the same pt
+        if (!this.walkPath || this.walkPath.length === 0) {  // only try once per upate() to find a path
+            this.walkPath = this.findPath(pt)
+            if (!this.walkPath || this.walkPath.length === 0) {
+                this.dude.move(updateData, Point.ZERO)
+                return
+            }
+        }
+        if (this.walkDirectlyTo(this.walkPath[0], updateData, this.walkPath.length === 1)) {
+            this.walkPath.shift()
+        }
+    }
+
     private fleePath: Point[] = null
     private flee(updateData: UpdateData) {
         if (!this.fleePath || this.fleePath.length === 0) {  // only try once per upate() to find a path
@@ -79,7 +93,7 @@ export class NPC extends Component {
                 return
             }
         }
-        if (this.walkTo(this.fleePath[0], updateData)) {
+        if (this.walkDirectlyTo(this.fleePath[0], updateData)) {
             this.fleePath.shift()
         }
     }
@@ -138,14 +152,19 @@ export class NPC extends Component {
     }
 
     // returns true if they are pretty close (half a tile) away from the goal
-    private walkTo(pt: Point, updateData: UpdateData, stopWhenClose = false) {
-        const isCloseEnough = this.dude.standingPosition.distanceTo(pt) < 8
+    private walkDirectlyTo(pt: Point, updateData: UpdateData, stopWhenClose = false) {
+        // const dist = this.dude.standingPosition.distanceTo(pt)
+        const isCloseEnough = this.isCloseEnoughToStopWalking(pt)
         if (isCloseEnough && stopWhenClose) {
             this.dude.move(updateData, Point.ZERO)
         } else {
-            this.dude.move(updateData, pt.minus(this.dude.standingPosition))
+            this.dude.move(updateData, pt.minus(this.dude.standingPosition), 0)
         }
         return isCloseEnough
+    }
+
+    private isCloseEnoughToStopWalking(pt: Point) {
+        return this.dude.standingPosition.distanceTo(pt) < 8
     }
 
     private checkForEnemies() {
@@ -172,8 +191,14 @@ export class NPC extends Component {
     }
 
     private findPath(tilePt: Point, h: (pt: Point) => number = (pt) => pt.distanceTo(end)) {
+        const ptOffset = new Point(.5, .8)
         const start = pixelPtToTilePt(this.dude.standingPosition)
         const end = tilePt
-        return LocationManager.instance.currentLocation.elements.findPath(start, end, h)?.map(pt => pt.plus(new Point(.5, .8)).times(TILE_SIZE))
+        return LocationManager.instance.currentLocation.elements.findPath(
+            start, 
+            end, 
+            h,
+            (pt) => (pt === start ? false : !!LocationManager.instance.currentLocation.elements.get(pt))  // prevent getting stuck "inside" a square
+        )?.map(pt => pt.plus(ptOffset).times(TILE_SIZE)).slice(1)  // slice(1) because we don't need the start in the path
     }
 }
