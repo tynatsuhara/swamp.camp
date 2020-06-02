@@ -6,6 +6,8 @@ import { TileComponent } from "../../engine/tiles/TileComponent"
 import { Entity } from "../../engine/Entity"
 import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
 import { OffScreenMarker } from "./OffScreenMarker"
+import { KeyPressIndicator } from "./KeyPressIndicator"
+import { InputKey } from "../../engine/input"
 
 export class HUD {
 
@@ -24,9 +26,19 @@ export class HUD {
 
 
 
+    // TODO show this dynamically
     private offScreenMarker: OffScreenMarker = this.autosaveComponent.entity.addComponent(
         new OffScreenMarker()
     )
+
+    // TODO show this based on cutscene
+    private wasdPos = new Point(50, 50)  // top left corner of W
+    private wasdEntity = new Entity([
+        new KeyPressIndicator(this.wasdPos, InputKey.W),
+        new KeyPressIndicator(this.wasdPos.plus(new Point(-TILE_SIZE, TILE_SIZE)), InputKey.A),
+        new KeyPressIndicator(this.wasdPos.plusY(TILE_SIZE), InputKey.S),
+        new KeyPressIndicator(this.wasdPos.plus(new Point(TILE_SIZE, TILE_SIZE)), InputKey.D)
+    ])
 
 
 
@@ -38,7 +50,7 @@ export class HUD {
         this.updateHearts(player.health, player.maxHealth)
         this.updateAutosave(screenDimensions, elapsedMillis);
 
-        return [this.heartsEntity, this.autosaveComponent.entity]
+        return [this.heartsEntity, this.autosaveComponent.entity, this.wasdEntity]
     }
 
     private updateHearts(health: number, maxHealth: number) {

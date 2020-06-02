@@ -14,6 +14,7 @@ export class TileTransform {
     
     dimensions: Point  // currently, there is not a concept of relative scale
 
+    // TODO convert to unstructured object parameter
     constructor(    
         position: Point = new Point(0, 0),
         dimensions: Point = null,  // if null, match the dimensions of the source image
