@@ -3385,7 +3385,7 @@ System.register("game/world/Teleporter", ["game/world/elements/Interactable", "e
 });
 System.register("engine/tiles/NineSlice", ["engine/point", "engine/tiles/TileTransform"], function (exports_50, context_50) {
     "use strict";
-    var point_24, TileTransform_9, NineSlice, makeNineSliceComponents, makeStretchedNineSliceComponents;
+    var point_24, TileTransform_9, NineSlice;
     var __moduleName = context_50 && context_50.id;
     return {
         setters: [
@@ -3398,134 +3398,141 @@ System.register("engine/tiles/NineSlice", ["engine/point", "engine/tiles/TileTra
         ],
         execute: function () {
             exports_50("NineSlice", NineSlice = {
-                nineSlice: function (dimensions, fn) {
+                nineSliceForEach: function (dimensions, fn) {
                     if (dimensions.x < 2 || dimensions.y < 2) {
                         throw new Error("9 slice should be at least 2x2");
                     }
-                    for (var x = 0; x < dimensions.x; x++) {
+                    var _loop_1 = function (x) {
+                        var _loop_2 = function (y) {
+                            var getIndex = function () {
+                                var edgeTop = y === 0;
+                                var edgeBottom = y === dimensions.y - 1;
+                                var edgeLeft = x === 0;
+                                var edgeRight = x === dimensions.x - 1;
+                                if (edgeLeft && edgeTop) {
+                                    return 0;
+                                }
+                                else if (edgeTop && !edgeRight) {
+                                    return 1;
+                                }
+                                else if (edgeTop) {
+                                    return 2;
+                                }
+                                else if (edgeLeft && !edgeBottom) {
+                                    return 3;
+                                }
+                                else if (!edgeTop && !edgeBottom && !edgeLeft && !edgeRight) {
+                                    return 4;
+                                }
+                                else if (edgeRight && !edgeBottom) {
+                                    return 5;
+                                }
+                                else if (edgeLeft && edgeBottom) {
+                                    return 6;
+                                }
+                                else if (edgeBottom && !edgeRight) {
+                                    return 7;
+                                }
+                                else {
+                                    return 8;
+                                }
+                            };
+                            fn(new point_24.Point(x, y), getIndex());
+                        };
                         for (var y = 0; y < dimensions.y; y++) {
-                            var pt = new point_24.Point(x, y);
-                            var edgeTop = y === 0;
-                            var edgeBottom = y === dimensions.y - 1;
-                            var edgeLeft = x === 0;
-                            var edgeRight = x === dimensions.x - 1;
-                            if (edgeLeft && edgeTop) {
-                                fn(pt, 0);
-                            }
-                            else if (edgeTop && !edgeRight) {
-                                fn(pt, 1);
-                            }
-                            else if (edgeTop) {
-                                fn(pt, 2);
-                            }
-                            else if (edgeLeft && !edgeBottom) {
-                                fn(pt, 3);
-                            }
-                            else if (!edgeTop && !edgeBottom && !edgeLeft && !edgeRight) {
-                                fn(pt, 4);
-                            }
-                            else if (edgeRight && !edgeBottom) {
-                                fn(pt, 5);
-                            }
-                            else if (edgeLeft && edgeBottom) {
-                                fn(pt, 6);
-                            }
-                            else if (edgeBottom && !edgeRight) {
-                                fn(pt, 7);
-                            }
-                            else {
-                                fn(pt, 8);
-                            }
+                            _loop_2(y);
+                        }
+                    };
+                    for (var x = 0; x < dimensions.x; x++) {
+                        _loop_1(x);
+                    }
+                },
+                /**
+                 * @param slice the 9 parts to use to make a rectangle
+                 * @param pos top-left top-left position
+                 * @param dimensions dimensions of the desired rectangle in tile units
+                 * @return All the tiles instantiated. The first element in the list is the main transform, the rest are relative.
+                 */
+                makeNineSliceComponents: function (slice, pos, dimensions) {
+                    if (slice.length !== 9) {
+                        throw new Error("nine slice gotta have nine slices ya dip");
+                    }
+                    if (dimensions.x < 2 || dimensions.y < 2) {
+                        throw new Error("9 slice must be at least 2x2");
+                    }
+                    var tiles = [];
+                    tiles.push(slice[0].toComponent(new TileTransform_9.TileTransform(new point_24.Point(0, 0))));
+                    tiles.push(slice[2].toComponent(new TileTransform_9.TileTransform(new point_24.Point(dimensions.x - 1, 0))));
+                    tiles.push(slice[6].toComponent(new TileTransform_9.TileTransform(new point_24.Point(0, dimensions.y - 1))));
+                    tiles.push(slice[8].toComponent(new TileTransform_9.TileTransform(new point_24.Point(dimensions.x - 1, dimensions.y - 1))));
+                    // horizontal lines
+                    for (var i = 1; i < dimensions.x - 1; i++) {
+                        tiles.push(slice[1].toComponent(new TileTransform_9.TileTransform(new point_24.Point(i, 0))));
+                        tiles.push(slice[7].toComponent(new TileTransform_9.TileTransform(new point_24.Point(i, dimensions.y - 1))));
+                    }
+                    // vertical lines
+                    for (var j = 1; j < dimensions.y - 1; j++) {
+                        tiles.push(slice[3].toComponent(new TileTransform_9.TileTransform(new point_24.Point(0, j))));
+                        tiles.push(slice[5].toComponent(new TileTransform_9.TileTransform(new point_24.Point(dimensions.x - 1, j))));
+                    }
+                    // middle
+                    for (var x = 1; x < dimensions.x - 1; x++) {
+                        for (var y = 1; y < dimensions.y - 1; y++) {
+                            tiles.push(slice[4].toComponent(new TileTransform_9.TileTransform(new point_24.Point(x, y))));
                         }
                     }
-                }
-            });
-            // TODO move these funcs
-            /**
-             * @param slice the 9 parts to use to make a rectangle
-             * @param pos top-left top-left position
-             * @param dimensions dimensions of the desired rectangle in tile units
-             * @return All the tiles instantiated. The first element in the list is the main transform, the rest are relative.
-             */
-            exports_50("makeNineSliceComponents", makeNineSliceComponents = function (slice, pos, dimensions) {
-                if (slice.length !== 9) {
-                    throw new Error("nine slice gotta have nine slices ya dip");
-                }
-                if (dimensions.x < 2 || dimensions.y < 2) {
-                    throw new Error("9 slice must be at least 2x2");
-                }
-                var tiles = [];
-                tiles.push(slice[0].toComponent(new TileTransform_9.TileTransform(new point_24.Point(0, 0))));
-                tiles.push(slice[2].toComponent(new TileTransform_9.TileTransform(new point_24.Point(dimensions.x - 1, 0))));
-                tiles.push(slice[6].toComponent(new TileTransform_9.TileTransform(new point_24.Point(0, dimensions.y - 1))));
-                tiles.push(slice[8].toComponent(new TileTransform_9.TileTransform(new point_24.Point(dimensions.x - 1, dimensions.y - 1))));
-                // horizontal lines
-                for (var i = 1; i < dimensions.x - 1; i++) {
-                    tiles.push(slice[1].toComponent(new TileTransform_9.TileTransform(new point_24.Point(i, 0))));
-                    tiles.push(slice[7].toComponent(new TileTransform_9.TileTransform(new point_24.Point(i, dimensions.y - 1))));
-                }
-                // vertical lines
-                for (var j = 1; j < dimensions.y - 1; j++) {
-                    tiles.push(slice[3].toComponent(new TileTransform_9.TileTransform(new point_24.Point(0, j))));
-                    tiles.push(slice[5].toComponent(new TileTransform_9.TileTransform(new point_24.Point(dimensions.x - 1, j))));
-                }
-                // middle
-                for (var x = 1; x < dimensions.x - 1; x++) {
-                    for (var y = 1; y < dimensions.y - 1; y++) {
-                        tiles.push(slice[4].toComponent(new TileTransform_9.TileTransform(new point_24.Point(x, y))));
+                    var mainTransform = tiles[0].transform;
+                    tiles.forEach(function (c, i) {
+                        c.transform.position = c.transform.position.times(tiles[0].transform.dimensions.x);
+                        if (i > 0) {
+                            c.transform.relativeTo(mainTransform);
+                        }
+                    });
+                    mainTransform.position = mainTransform.position.plus(pos);
+                    return tiles;
+                },
+                /**
+                 * Same as makeNineSliceComponents, but will stretch the middle parts instead of tiling.
+                 * This lets you make nine-slices whose dimensions aren't a multiple of the tile size.
+                 * @param slice the 9 parts to use to make a rectangle
+                 * @param pos top-left top-left position
+                 * @param dimensions dimensions of the desired rectangle in pixels. Should be at least TILE_SIZExTILE_SIZE
+                 * @return All the tiles instantiated. The first element in the list is the main transform, the rest are relative.
+                 */
+                makeStretchedNineSliceComponents: function (slice, pos, dimensions) {
+                    if (slice.length !== 9) {
+                        throw new Error("nine slice gotta have nine slices ya dip");
                     }
-                }
-                var mainTransform = tiles[0].transform;
-                tiles.forEach(function (c, i) {
-                    c.transform.position = c.transform.position.times(tiles[0].transform.dimensions.x);
-                    if (i > 0) {
-                        c.transform.relativeTo(mainTransform);
-                    }
-                });
-                mainTransform.position = mainTransform.position.plus(pos);
-                return tiles;
-            });
-            /**
-             * Same as makeNineSliceComponents, but will stretch the middle parts instead of tiling.
-             * This lets you make nine-slices whose dimensions aren't a multiple of the tile size.
-             * @param slice the 9 parts to use to make a rectangle
-             * @param pos top-left top-left position
-             * @param dimensions dimensions of the desired rectangle in pixels. Should be at least TILE_SIZExTILE_SIZE
-             * @return All the tiles instantiated. The first element in the list is the main transform, the rest are relative.
-             */
-            exports_50("makeStretchedNineSliceComponents", makeStretchedNineSliceComponents = function (slice, pos, dimensions) {
-                if (slice.length !== 9) {
-                    throw new Error("nine slice gotta have nine slices ya dip");
-                }
-                // if (dimensions.x < 2 || dimensions.y < 2) {
-                // throw new Error("9 slice must be at least 2x2")
-                // }
-                var tiles = [];
-                var topLeft = slice[0].toComponent(new TileTransform_9.TileTransform(new point_24.Point(0, 0)));
-                var tileSize = topLeft.transform.dimensions.x;
-                // corners
-                tiles.push(topLeft);
-                tiles.push(slice[2].toComponent(new TileTransform_9.TileTransform(new point_24.Point(dimensions.x - tileSize, 0))));
-                tiles.push(slice[6].toComponent(new TileTransform_9.TileTransform(new point_24.Point(0, dimensions.y - tileSize))));
-                tiles.push(slice[8].toComponent(new TileTransform_9.TileTransform(new point_24.Point(dimensions.x - tileSize, dimensions.y - tileSize))));
-                // horizontal lines
-                var horizontalDimensions = new point_24.Point(dimensions.x - tileSize * 2, tileSize);
-                tiles.push(slice[1].toComponent(new TileTransform_9.TileTransform(new point_24.Point(tileSize, 0), horizontalDimensions)));
-                tiles.push(slice[7].toComponent(new TileTransform_9.TileTransform(new point_24.Point(tileSize, dimensions.y - tileSize), horizontalDimensions)));
-                // vertical lines
-                var verticalDimensions = new point_24.Point(tileSize, dimensions.y - tileSize * 2);
-                tiles.push(slice[3].toComponent(new TileTransform_9.TileTransform(new point_24.Point(0, tileSize), verticalDimensions)));
-                tiles.push(slice[5].toComponent(new TileTransform_9.TileTransform(new point_24.Point(dimensions.x - tileSize, tileSize), verticalDimensions)));
-                // middle
-                tiles.push(slice[4].toComponent(new TileTransform_9.TileTransform(new point_24.Point(tileSize, tileSize), new point_24.Point(dimensions.x - tileSize * 2, dimensions.y - tileSize * 2))));
-                var mainTransform = tiles[0].transform;
-                tiles.forEach(function (c, i) {
-                    if (i > 0) {
-                        c.transform.relativeTo(mainTransform);
-                    }
-                });
-                mainTransform.position = mainTransform.position.plus(pos);
-                return tiles;
+                    // if (dimensions.x < 2 || dimensions.y < 2) {
+                    // throw new Error("9 slice must be at least 2x2")
+                    // }
+                    var tiles = [];
+                    var topLeft = slice[0].toComponent(new TileTransform_9.TileTransform(new point_24.Point(0, 0)));
+                    var tileSize = topLeft.transform.dimensions.x;
+                    // corners
+                    tiles.push(topLeft);
+                    tiles.push(slice[2].toComponent(new TileTransform_9.TileTransform(new point_24.Point(dimensions.x - tileSize, 0))));
+                    tiles.push(slice[6].toComponent(new TileTransform_9.TileTransform(new point_24.Point(0, dimensions.y - tileSize))));
+                    tiles.push(slice[8].toComponent(new TileTransform_9.TileTransform(new point_24.Point(dimensions.x - tileSize, dimensions.y - tileSize))));
+                    // horizontal lines
+                    var horizontalDimensions = new point_24.Point(dimensions.x - tileSize * 2, tileSize);
+                    tiles.push(slice[1].toComponent(new TileTransform_9.TileTransform(new point_24.Point(tileSize, 0), horizontalDimensions)));
+                    tiles.push(slice[7].toComponent(new TileTransform_9.TileTransform(new point_24.Point(tileSize, dimensions.y - tileSize), horizontalDimensions)));
+                    // vertical lines
+                    var verticalDimensions = new point_24.Point(tileSize, dimensions.y - tileSize * 2);
+                    tiles.push(slice[3].toComponent(new TileTransform_9.TileTransform(new point_24.Point(0, tileSize), verticalDimensions)));
+                    tiles.push(slice[5].toComponent(new TileTransform_9.TileTransform(new point_24.Point(dimensions.x - tileSize, tileSize), verticalDimensions)));
+                    // middle
+                    tiles.push(slice[4].toComponent(new TileTransform_9.TileTransform(new point_24.Point(tileSize, tileSize), new point_24.Point(dimensions.x - tileSize * 2, dimensions.y - tileSize * 2))));
+                    var mainTransform = tiles[0].transform;
+                    tiles.forEach(function (c, i) {
+                        if (i > 0) {
+                            c.transform.relativeTo(mainTransform);
+                        }
+                    });
+                    mainTransform.position = mainTransform.position.plus(pos);
+                    return tiles;
+                },
             });
         }
     };
@@ -3560,7 +3567,7 @@ System.register("game/world/interior/Tent", ["game/world/LocationManager", "game
                 l.addTeleporter(teleporter);
                 l.addWorldElement(4 /* TELEPORTER */, new point_25.Point(2, 4), { to: outside.uuid, i: interactablePos.toString() });
                 var groundType = color === "red" /* RED */ ? 3 /* TENT_RED */ : 4 /* TENT_BLUE */;
-                NineSlice_1.NineSlice.nineSlice(new point_25.Point(5, 4), function (pt, index) { return l.addGroundElement(groundType, pt, { i: index }); });
+                NineSlice_1.NineSlice.nineSliceForEach(new point_25.Point(5, 4), function (pt, index) { return l.addGroundElement(groundType, pt, { i: index }); });
                 new AsciiInteriorBuilder_1.AsciiInteriorBuilder("_____", "_____", "_____", "_____").map("_", function (pos) {
                     // TODO: make this the tent ground
                     l.addGroundElement(0 /* GRASS */, pos);
@@ -4275,7 +4282,7 @@ System.register("game/ui/PlaceElementFrame", ["engine/component", "game/graphics
                     if (this.dimensions.x === 1 || this.dimensions.y === 1) {
                         return [Tilesets_13.Tilesets.instance.outdoorTiles.getTileSource("placingElementFrame_small_" + suffix).toComponent(new TileTransform_14.TileTransform())];
                     }
-                    return NineSlice_2.makeNineSliceComponents(Tilesets_13.Tilesets.instance.outdoorTiles.getNineSlice("placingElementFrame_" + suffix), new point_33.Point(0, 0), this.dimensions);
+                    return NineSlice_2.NineSlice.makeNineSliceComponents(Tilesets_13.Tilesets.instance.outdoorTiles.getNineSlice("placingElementFrame_" + suffix), new point_33.Point(0, 0), this.dimensions);
                 };
                 PlaceElementFrame.prototype.update = function (updateData) {
                     var startPos = updateData.input.mousePos;
@@ -4530,7 +4537,7 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point",
                 };
                 InventoryDisplay.prototype.spawnBG = function () {
                     var _this = this;
-                    this.bgTiles = NineSlice_3.makeNineSliceComponents(Tilesets_14.Tilesets.instance.oneBit.getNineSlice("invBoxNW"), this.offset.minus(new point_34.Point(Tilesets_14.TILE_SIZE / 2, Tilesets_14.TILE_SIZE / 2)), new point_34.Point(1 + InventoryDisplay.COLUMNS, 1 + this.inventory().inventory.length / InventoryDisplay.COLUMNS));
+                    this.bgTiles = NineSlice_3.NineSlice.makeNineSliceComponents(Tilesets_14.Tilesets.instance.oneBit.getNineSlice("invBoxNW"), this.offset.minus(new point_34.Point(Tilesets_14.TILE_SIZE / 2, Tilesets_14.TILE_SIZE / 2)), new point_34.Point(1 + InventoryDisplay.COLUMNS, 1 + this.inventory().inventory.length / InventoryDisplay.COLUMNS));
                     this.bgTiles.forEach(function (tile) {
                         _this.displayEntity.addComponent(tile);
                     });
@@ -5105,7 +5112,7 @@ System.register("game/ui/ButtonsMenu", ["engine/point", "game/ui/TextButton", "g
                     var buttonPadding = 3;
                     var dimensions = new point_37.Point(longestOption * Text_5.TEXT_PIXEL_WIDTH + marginSide * 2 + TextButton_1.TextButton.margin * 2, (options.length - 1) * buttonPadding + options.length * Tilesets_17.TILE_SIZE + marginTop + marginBottom);
                     var topLeft = screenDimensions.div(2).minus(dimensions.div(2));
-                    var backgroundTiles = NineSlice_4.makeStretchedNineSliceComponents(backgroundColor === "red" ? Tilesets_17.Tilesets.instance.oneBit.getNineSlice("invBoxNW") : Tilesets_17.Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"), topLeft, dimensions);
+                    var backgroundTiles = NineSlice_4.NineSlice.makeStretchedNineSliceComponents(backgroundColor === "red" ? Tilesets_17.Tilesets.instance.oneBit.getNineSlice("invBoxNW") : Tilesets_17.Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"), topLeft, dimensions);
                     backgroundTiles[0].transform.depth = UIStateManager_7.UIStateManager.UI_SPRITE_DEPTH;
                     var e = new Entity_10.Entity();
                     backgroundTiles.forEach(function (tile) { return e.addComponent(tile); });
@@ -5249,7 +5256,7 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
                     var dimensions = new point_38.Point(288, 83);
                     var bottomBuffer = Tilesets_18.TILE_SIZE;
                     var topLeft = new point_38.Point(Math.floor(screenDimensions.x / 2 - dimensions.x / 2), Math.floor(screenDimensions.y - dimensions.y - bottomBuffer));
-                    var backgroundTiles = NineSlice_5.makeStretchedNineSliceComponents(Tilesets_18.Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"), topLeft, dimensions);
+                    var backgroundTiles = NineSlice_5.NineSlice.makeStretchedNineSliceComponents(Tilesets_18.Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"), topLeft, dimensions);
                     backgroundTiles[0].transform.depth = UIStateManager_8.UIStateManager.UI_SPRITE_DEPTH;
                     var topOffset = 2;
                     var margin = 12;
@@ -7198,9 +7205,9 @@ System.register("game/world/WorldLocation", ["engine/util/Grid", "game/saves/uui
                     linkedLocation.dudes.add(p);
                     LocationManager_14.LocationManager.instance.currentLocation = linkedLocation;
                     PointLightMaskRenderer_2.PointLightMaskRenderer.instance.renderToOffscreenCanvas();
-                    // TODO offset "standingPositon"
                     var offset = p.standingPosition.minus(p.position);
-                    p.moveTo(linkedPosition.minus(offset)); // this might have a bug with colliders
+                    p.moveTo(linkedPosition.minus(offset));
+                    // TODO update camera position so we don't get a "jump"
                 };
                 WorldLocation.prototype.getEntities = function () {
                     return Array.from(Array.from(this.dudes.values()).map(function (d) { return d.entity; }))
@@ -8546,7 +8553,7 @@ System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uu
             buildObject = function (object, resultObject, topLevelUuidMap, objectUuidMap) {
                 var stack = [];
                 stack.push({ object: object, resultObject: resultObject });
-                var _loop_1 = function () {
+                var _loop_3 = function () {
                     var _a = stack.pop(), object_1 = _a.object, resultObject_1 = _a.resultObject;
                     Object.keys(object_1).forEach(function (k) {
                         if (object_1 instanceof Object) {
@@ -8572,7 +8579,7 @@ System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uu
                     });
                 };
                 while (stack.length > 0) {
-                    _loop_1();
+                    _loop_3();
                 }
             };
         }

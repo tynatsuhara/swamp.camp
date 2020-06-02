@@ -2,7 +2,7 @@ import { Point } from "../../engine/point"
 import { TextButton } from "./TextButton"
 import { UIStateManager } from "./UIStateManager"
 import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
-import { makeStretchedNineSliceComponents } from "../../engine/tiles/NineSlice"
+import { NineSlice } from "../../engine/tiles/NineSlice"
 import { TEXT_PIXEL_WIDTH } from "./Text"
 import { Entity } from "../../engine/Entity"
 
@@ -34,7 +34,7 @@ export const ButtonsMenu = {
         
         const topLeft = screenDimensions.div(2).minus(dimensions.div(2))
 
-        const backgroundTiles = makeStretchedNineSliceComponents(
+        const backgroundTiles = NineSlice.makeStretchedNineSliceComponents(
             backgroundColor === "red" ? Tilesets.instance.oneBit.getNineSlice("invBoxNW") : Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"), 
             topLeft,
             dimensions

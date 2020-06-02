@@ -1,16 +1,15 @@
 import { DialogueInstance, getDialogue, NextDialogue, Dialogue } from "../characters/Dialogue"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
-import { makeStretchedNineSliceComponents } from "../../engine/tiles/NineSlice"
+import { NineSlice } from "../../engine/tiles/NineSlice"
 import { Point } from "../../engine/point"
 import { Component } from "../../engine/component"
 import { UpdateData } from "../../engine/engine"
 import { Entity } from "../../engine/Entity"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
-import { TextAlign, formatText, TEXT_PIXEL_WIDTH } from "./Text"
+import { TextAlign, formatText } from "./Text"
 import { Color } from "./Color"
 import { Controls } from "../Controls"
 import { UIStateManager } from "./UIStateManager"
-import { TextButton } from "./TextButton"
 import { Dude } from "../characters/Dude"
 import { ButtonsMenu } from "./ButtonsMenu"
 
@@ -124,7 +123,7 @@ export class DialogueDisplay extends Component {
             Math.floor(screenDimensions.y - dimensions.y - bottomBuffer)
         )
 
-        const backgroundTiles = makeStretchedNineSliceComponents(
+        const backgroundTiles = NineSlice.makeStretchedNineSliceComponents(
             Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"), 
             topLeft,
             dimensions

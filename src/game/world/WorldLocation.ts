@@ -86,9 +86,10 @@ export class WorldLocation {
         LocationManager.instance.currentLocation = linkedLocation
         PointLightMaskRenderer.instance.renderToOffscreenCanvas()
 
-        // TODO offset "standingPositon"
         const offset = p.standingPosition.minus(p.position)
-        p.moveTo(linkedPosition.minus(offset))  // this might have a bug with colliders
+        p.moveTo(linkedPosition.minus(offset))
+
+        // TODO update camera position so we don't get a "jump"
     }
 
     getEntities() {

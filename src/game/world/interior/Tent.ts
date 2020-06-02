@@ -19,7 +19,7 @@ export const makeTentInterior = (outside: WorldLocation, color: TentColor): Worl
 
     const groundType = color === TentColor.RED ? GroundType.TENT_RED : GroundType.TENT_BLUE
     
-    NineSlice.nineSlice(
+    NineSlice.nineSliceForEach(
         new Point(5, 4), 
         (pt, index) => l.addGroundElement(groundType, pt, { i: index })
     )

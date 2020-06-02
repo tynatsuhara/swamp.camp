@@ -1,5 +1,5 @@
 import { Component } from "../../engine/component"
-import { UpdateData, StartData } from "../../engine/engine"
+import { UpdateData } from "../../engine/engine"
 import { Point } from "../../engine/point"
 import { rectContains } from "../../engine/util/utils"
 import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
@@ -8,7 +8,7 @@ import { Player } from "../characters/Player"
 import { Entity } from "../../engine/Entity"
 import { InputKey } from "../../engine/input"
 import { UIStateManager } from "./UIStateManager"
-import { makeNineSliceComponents } from "../../engine/tiles/NineSlice"
+import { NineSlice } from "../../engine/tiles/NineSlice"
 import { Tooltip } from "./Tooltip"
 import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
 import { TileTransform } from "../../engine/tiles/TileTransform"
@@ -19,7 +19,6 @@ import { TEXT_FONT, TEXT_SIZE } from "./Text"
 import { Color } from "./Color"
 import { Controls } from "../Controls"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
-import { LocationManager } from "../world/LocationManager"
 
 export class InventoryDisplay extends Component {
 
@@ -113,7 +112,7 @@ export class InventoryDisplay extends Component {
     }
 
     private spawnBG() {
-        this.bgTiles = makeNineSliceComponents(
+        this.bgTiles = NineSlice.makeNineSliceComponents(
             Tilesets.instance.oneBit.getNineSlice("invBoxNW"), 
             this.offset.minus(new Point(TILE_SIZE/2, TILE_SIZE/2)),
             new Point(

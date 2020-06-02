@@ -1,8 +1,8 @@
 import { Component } from "../../engine/component"
 import { TileComponent } from "../../engine/tiles/TileComponent"
-import { Tilesets, TILE_SIZE, pixelPtToTilePt } from "../graphics/Tilesets"
+import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Point } from "../../engine/point"
-import { makeNineSliceComponents } from "../../engine/tiles/NineSlice"
+import { NineSlice } from "../../engine/tiles/NineSlice"
 import { UIStateManager } from "./UIStateManager"
 import { LocationManager } from "../world/LocationManager"
 import { UpdateData } from "../../engine/engine"
@@ -39,7 +39,7 @@ export class PlaceElementFrame extends Component {
         if (this.dimensions.x === 1 || this.dimensions.y ===1) {
             return [Tilesets.instance.outdoorTiles.getTileSource(`placingElementFrame_small_${suffix}`).toComponent(new TileTransform())]
         }
-        return makeNineSliceComponents(
+        return NineSlice.makeNineSliceComponents(
             Tilesets.instance.outdoorTiles.getNineSlice(`placingElementFrame_${suffix}`), 
             new Point(0, 0),
             this.dimensions
