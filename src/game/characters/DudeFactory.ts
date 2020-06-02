@@ -11,6 +11,7 @@ import { Inventory } from "../items/Inventory"
 import { Dialogue } from "./Dialogue"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 import { Villager } from "./Villager"
+import { NPCSchedules } from "./NPCSchedule"
 
 export const enum DudeFaction {
     VILLAGERS,
@@ -81,13 +82,19 @@ export class DudeFactory {
                 animationName = "lizard_f"
                 maxHealth = Number.MAX_SAFE_INTEGER
                 speed *= .7
-                additionalComponents = [new NPC(), new Villager()]
+                additionalComponents = [
+                    new NPC(NPCSchedules.newGoToSchedule(new Point(0, 0))), 
+                    new Villager()
+                ]
                 break
             }
             case DudeType.HERALD: {
                 animationName = "Herald"
                 maxHealth = Number.MAX_SAFE_INTEGER
-                additionalComponents = [new NPC()]
+                additionalComponents = [
+                    new NPC(NPCSchedules.newGoToSchedule(new Point(-30, 15))),  // TODO
+                    new Villager()
+                ]
                 break
             }
             case DudeType.ELF: {
@@ -95,7 +102,7 @@ export class DudeFactory {
                 weapon = "weapon_katana"
                 shield = "shield_0"
                 maxHealth = 4
-                additionalComponents = [new NPC()]
+                additionalComponents = [new NPC(), new Villager()]
                 speed *= (.3 + Math.random()/2)
                 break
             }

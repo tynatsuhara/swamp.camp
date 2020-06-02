@@ -2,7 +2,6 @@ import { Point } from "../point"
 import { ImageRender } from "../renderer/ImageRender"
 import { TileTransform } from "./TileTransform"
 import { TileComponent } from "./TileComponent"
-import { Entity } from "../Entity"
 import { TileSource } from "./TileSource"
 
 export class StaticTileSource implements TileSource {

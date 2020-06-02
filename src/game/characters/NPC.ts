@@ -6,6 +6,7 @@ import { Point } from "../../engine/point"
 import { LocationManager } from "../world/LocationManager"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { Lists } from "../../engine/util/Lists"
+import { NPCSchedule, NPCScheduleType, NPCSchedules } from "./NPCSchedule"
 
 /**
  * Shared logic for different types of NPCs. These should be invoked by an NPC controller component.
@@ -18,8 +19,18 @@ export class NPC extends Component {
     private findTargetRange = TILE_SIZE * 10
     private enemiesPresent = false
 
+    constructor(defaultSchedule: NPCSchedule = NPCSchedules.newNoOpSchedule()) {
+        super()
+
+        this.awake = () => {
+            this.dude = this.entity.getComponent(Dude)
+            if (!this.dude.blob[NPCSchedules.SCHEDULE_KEY]) {
+                this.dude.blob[NPCSchedules.SCHEDULE_KEY] = defaultSchedule
+            }
+        }
+    }
+
     awake() {
-        this.dude = this.entity.getComponent(Dude)
     }
 
     start() {
@@ -42,11 +53,26 @@ export class NPC extends Component {
             if (!!this.attackTarget) {
                 this.doAttack(updateData)
             } else {
-                this.flee(updateData)
+                this.doFlee(updateData)
             }
         } else {
-            // TODO: later add a standard routine (eg patrolling for guards, walking around for villagers)
-            this.walkTo(Point.ZERO, updateData)
+            this.doNormalScheduledActivity(updateData)
+        }
+    }
+
+    private doNormalScheduledActivity(updateData: UpdateData) {
+        const schedule: NPCSchedule = this.dude.blob[NPCSchedules.SCHEDULE_KEY]
+        if (!schedule) {
+            throw new Error(`NPCs must have a "${NPCSchedules.SCHEDULE_KEY}" field in the blob. It's possible it got overwritten.`)
+        }
+        
+        if (schedule.type === NPCScheduleType.DO_NOTHING) {
+            this.dude.move(updateData, Point.ZERO)
+        } if (schedule.type === NPCScheduleType.GO_TO_SPOT) {
+            this.walkTo(
+                Point.fromString(schedule["p"]), 
+                updateData
+            )
         }
     }
 
@@ -80,7 +106,7 @@ export class NPC extends Component {
     }
 
     private fleePath: Point[] = null
-    private flee(updateData: UpdateData) {
+    private doFlee(updateData: UpdateData) {
         if (!this.fleePath || this.fleePath.length === 0) {  // only try once per upate() to find a path
             const l = LocationManager.instance.currentLocation
             const openPoints = l.ground.keys().filter(pt => !l.elements.get(pt))
@@ -102,6 +128,7 @@ export class NPC extends Component {
     //     this.followTarget = followTarget
     // }
 
+    // TODO support pathfinding for attacking
     private attackTarget: Dude
     private doAttack(updateData: UpdateData) {
         if (!this.dude.weapon || !this.dude.isAlive) {
