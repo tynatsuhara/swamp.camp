@@ -17,8 +17,8 @@ export class LocationManager {
         return this.locations.get(uuid)
     }
 
-    newLocation() {
-        const l = new WorldLocation(this)
+    newLocation(isInterior: boolean) {
+        const l = new WorldLocation(this, isInterior)
         this.locations.set(l.uuid, l)
         if (!this.currentLocation) {
             this.currentLocation = l

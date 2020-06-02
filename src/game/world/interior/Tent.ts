@@ -10,7 +10,7 @@ import { NineSlice } from "../../../engine/tiles/NineSlice"
 import { TentColor } from "../elements/Tent"
 
 export const makeTentInterior = (outside: WorldLocation, color: TentColor): WorldLocation => {
-    const l = LocationManager.instance.newLocation()
+    const l = LocationManager.instance.newLocation(true)
 
     const interactablePos = new Point(2.5, 4).times(TILE_SIZE)
     const teleporter: Teleporter = { to: outside.uuid, pos: interactablePos.plusY(-4) }

@@ -10,6 +10,8 @@ import { Grid } from "../../engine/util/Grid"
 import { UIStateManager } from "../ui/UIStateManager"
 import { WorldTime } from "./WorldTime"
 import { Color } from "../ui/Color"
+import { WorldLocation } from "./WorldLocation"
+import { LocationManager } from "./LocationManager"
 
 export class PointLightMaskRenderer {
 
@@ -19,7 +21,7 @@ export class PointLightMaskRenderer {
     private size = MapGenerator.MAP_SIZE * TILE_SIZE * 2
     private shift = new Point(this.size/2, this.size/2)
 
-    private lightTiles: Grid<number> = new Grid()
+    private lightTiles: Map<WorldLocation, Grid<number>> = new Map<WorldLocation, Grid<number>>()
     private gridDirty = true
     private color: string
     private darkness = 0.4
@@ -39,18 +41,24 @@ export class PointLightMaskRenderer {
         setInterval(() => this.gridDirty = true, WorldTime.MINUTE/10)
     }
 
-    addLight(position: Point, diameter: number = 16) {
+    addLight(wl: WorldLocation, position: Point, diameter: number = 16) {
         if (diameter % 2 !== 0) {
             throw new Error("only even circle px diameters work right now")
         }
         this.checkPt(position)
-        this.lightTiles.set(position, diameter)
+        const locationLightGrid = this.lightTiles.get(wl) ?? new Grid<number>()
+        locationLightGrid.set(position, diameter)
+        this.lightTiles.set(wl, locationLightGrid)
         this.gridDirty = true
     }
 
-    removeLight(position: Point) {
+    removeLight(wl: WorldLocation, position: Point) {
         this.checkPt(position)
-        this.lightTiles.remove(position)
+        const locationLightGrid = this.lightTiles.get(wl)
+        if (!locationLightGrid) {
+            return  // it is ok to fail silently here
+        }
+        locationLightGrid.remove(position)
         this.gridDirty = true
     }
 
@@ -115,12 +123,22 @@ export class PointLightMaskRenderer {
 
     renderToOffscreenCanvas() {
         this.updateColorForTime()
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
+
+        const location = LocationManager.instance.currentLocation
+        if (location.isInterior) {
+            return
+        }
         
         this.context.fillStyle = this.color
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
 
-        this.lightTiles.entries().forEach(entry => {
+        const locationLightGrid = this.lightTiles.get(location)
+        if (!locationLightGrid) {
+            return
+        }
+
+        locationLightGrid.entries().forEach(entry => {
             const pos = entry[0]
             const diameter = entry[1]
             const circleOffset = new Point(-.5, -.5).times(diameter)

@@ -16,7 +16,7 @@ export class MapGenerator {
     static readonly MAP_SIZE = 50
     static readonly ENTER_LAND_POS = new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE).plusY(-TILE_SIZE * 10).plusX(TILE_SIZE * 2)
 
-    private readonly location = LocationManager.instance.newLocation()
+    private readonly location = LocationManager.instance.newLocation(false)
     private readonly tentPos = new Point(-3, -3)
 
     doIt(): WorldLocation {

@@ -12,6 +12,7 @@ import { Dude } from "../characters/Dude"
 import { DudeFactory } from "../characters/DudeFactory"
 import { Teleporter, Teleporters } from "./Teleporter"
 import { Player } from "../characters/Player"
+import { PointLightMaskRenderer } from "./PointLightMaskRenderer"
 
 export class WorldLocation {
 
@@ -34,8 +35,11 @@ export class WorldLocation {
 
     private teleporters: { [key: string]: string } = {} 
 
-    constructor(manager: LocationManager) {
+    readonly isInterior: boolean;
+
+    constructor(manager: LocationManager, isInterior: boolean) {
         this.manager = manager
+        this.isInterior = isInterior
     }
 
     addGroundElement(type: GroundType, pos: Point, data: object = {}): GroundComponent {
@@ -80,6 +84,7 @@ export class WorldLocation {
         linkedLocation.dudes.add(p)
 
         LocationManager.instance.currentLocation = linkedLocation
+        PointLightMaskRenderer.instance.renderToOffscreenCanvas()
 
         // TODO offset "standingPositon"
         const offset = p.standingPosition.minus(p.position)
@@ -99,7 +104,8 @@ export class WorldLocation {
             ground: this.saveGround(),
             elements: this.saveElements(),
             dudes: Array.from(this.dudes).filter(d => d.isAlive).map(d => d.save()),
-            teleporters: this.teleporters
+            teleporters: this.teleporters,
+            isInterior: this.isInterior
         }
     }
 
@@ -136,7 +142,7 @@ export class WorldLocation {
 
     static load(locationManager: LocationManager, saveState: LocationSaveState): WorldLocation {
         // BUG: RELOADING RETURNS ELEMENTS THAT HAVE BEEN DESTROYED
-        const n = new WorldLocation(locationManager)
+        const n = new WorldLocation(locationManager, saveState.isInterior)
         n._uuid = saveState.uuid
         saveState.elements.forEach(el => n.addWorldElement(el.type, Point.fromString(el.pos), el.obj))
         saveState.ground.forEach(el => n.addGroundElement(el.type, Point.fromString(el.pos), el.obj))
