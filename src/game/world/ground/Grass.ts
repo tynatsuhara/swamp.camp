@@ -4,12 +4,12 @@ import { Point } from "../../../engine/point"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { GroundComponent } from "./GroundComponent"
 import { Entity } from "../../../engine/Entity"
-import { GroundType } from "./Ground"
+import { GroundType, MakeGroundFuncData } from "./Ground"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
 
-export const makeGrass = (wl: WorldLocation, pos: Point, data: object): GroundComponent => {
+export const makeGrass = (d: MakeGroundFuncData): GroundComponent => {
     let tile: TileSource
-    const index = data["index"] ?? (Math.random() < .65 ? Math.floor(Math.random() * 4) : 0)
+    const index = d.data["index"] ?? (Math.random() < .65 ? Math.floor(Math.random() * 4) : 0)
 
     if (index > 0) {
         tile = Tilesets.instance.tilemap.getTileAt(new Point(0, index))
@@ -17,7 +17,7 @@ export const makeGrass = (wl: WorldLocation, pos: Point, data: object): GroundCo
         tile = Tilesets.instance.tilemap.getTileAt(new Point(0, 7))
     }
 
-    const c = tile.toComponent(new TileTransform(pos.times(TILE_SIZE)))
+    const c = tile.toComponent(new TileTransform(d.pos.times(TILE_SIZE)))
     c.transform.depth = Number.MIN_SAFE_INTEGER
     return new Entity([c]).addComponent(new GroundComponent(GroundType.GRASS, () => { return { index } }))
 }

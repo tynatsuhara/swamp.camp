@@ -3,7 +3,7 @@ import { WorldLocation } from "../WorldLocation"
 import { Point } from "../../../engine/point"
 import { Entity } from "../../../engine/Entity"
 import { ConnectingTile } from "../../../engine/tiles/ConnectingTile"
-import { GroundType, Ground } from "./Ground"
+import { GroundType, Ground, MakeGroundFuncData } from "./Ground"
 
 // const oldPathSchema = new ConnectingTileSchema()
 //     .vertical(Tilesets.instance.outdoorTiles.getTileAt(new Point(9, 7)))
@@ -22,9 +22,9 @@ import { GroundType, Ground } from "./Ground"
 //         .cap(Tilesets.instance.tilemap.getTileAt(new Point(2, 6)))
 //         .single(Tilesets.instance.tilemap.getTileAt(new Point(7, 5)))
 
-export const makePath = (wl: WorldLocation, pos: Point): GroundComponent => {
+export const makePath = (d: MakeGroundFuncData): GroundComponent => {
     const e = new Entity()
-    const c = new ConnectingTile(Ground.instance.PATH_CONNECTING_SCHEMA, wl.ground, pos)
+    const c = new ConnectingTile(Ground.instance.PATH_CONNECTING_SCHEMA, d.wl.ground, d.pos)
     e.addComponent(c)
     return e.addComponent(new GroundComponent(GroundType.PATH))
 }

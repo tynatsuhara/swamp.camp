@@ -4,6 +4,49 @@ import { Point } from "../point"
 import { TileTransform } from "./TileTransform"
 import { TileComponent } from "./TileComponent"
 
+export const NineSlice = {
+    nineSlice: (
+        dimensions: Point, 
+        fn: (pt: Point, nineSliceIndex: number) => void
+    ) => {
+        if (dimensions.x < 2 || dimensions.y < 2) {
+            throw new Error("9 slice should be at least 2x2")
+        }
+
+        for (let x = 0; x < dimensions.x; x++) {
+            for (let y = 0; y < dimensions.y; y++) {
+                const pt = new Point(x, y)
+                const edgeTop = y === 0
+                const edgeBottom = y === dimensions.y-1
+                const edgeLeft = x === 0
+                const edgeRight = x === dimensions.x-1
+
+                if (edgeLeft && edgeTop) {
+                    fn(pt, 0)
+                } else if (edgeTop && !edgeRight) {
+                    fn(pt, 1)
+                } else if (edgeTop) {
+                    fn(pt, 2)
+                } else if (edgeLeft && !edgeBottom) {
+                    fn(pt, 3)
+                } else if (!edgeTop && !edgeBottom && !edgeLeft && !edgeRight) {
+                    fn(pt, 4)
+                } else if (edgeRight && !edgeBottom) {
+                    fn(pt, 5)
+                } else if (edgeLeft && edgeBottom) {
+                    fn(pt, 6)
+                } else if (edgeBottom && !edgeRight) {
+                    fn(pt, 7)
+                } else {
+                    fn(pt, 8)
+                }
+            }
+        }
+    }
+}
+
+// TODO move these funcs
+
 /**
  * @param slice the 9 parts to use to make a rectangle
  * @param pos top-left top-left position

@@ -21,8 +21,8 @@ export const enum TentColor {
 export const makeTent = (wl: WorldLocation, pos: Point, data: object): ElementComponent => {
     const e = new Entity()
 
-    const destinationUUID: string = data["destinationUUID"] ?? makeTentInterior(wl).uuid
     const color: TentColor = data["color"] ?? TentColor.BLUE
+    const destinationUUID: string = data["destinationUUID"] ?? makeTentInterior(wl, color).uuid
 
     const interactablePos = pos.plus(new Point(2, 2)).times(TILE_SIZE)
     const sourceTeleporter = { to: destinationUUID, pos: interactablePos.plusY(12) }

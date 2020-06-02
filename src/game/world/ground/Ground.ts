@@ -1,24 +1,27 @@
 import { Point } from "../../../engine/point"
 import { WorldLocation } from "../WorldLocation"
 import { GroundComponent } from "./GroundComponent"
-import { Entity } from "../../../engine/Entity"
 import { makeGrass } from "./Grass"
 import { makePath } from "./Path"
 import { ConnectingTileSchema } from "../../../engine/tiles/ConnectingTileSchema"
 import { Tilesets } from "../../graphics/Tilesets"
-import { makeBasicGround } from "./BasicGround"
+import { makeBasicNineSliceGround } from "./BasicGround"
 import { makeLedge } from "./Ledge"
 
 export const enum GroundType {
-    GRASS,
-    PATH,
-    LEDGE
+    GRASS, PATH, LEDGE, TENT_RED, TENT_BLUE
 }
 
 export class SavedGround {
     pos: string
     type: GroundType
     obj: object
+}
+
+export type MakeGroundFuncData = {
+    wl: WorldLocation,
+    pos: Point,
+    data: object,
 }
 
 /**
@@ -28,14 +31,20 @@ export class Ground {
 
     static instance: Ground
 
-    private readonly GROUND_FUNCTION_MAP: { [key: number]: (wl: WorldLocation, pos: Point, data: object) => GroundComponent } = {
+    private readonly GROUND_FUNCTION_MAP: { [key: number]: (data: MakeGroundFuncData) => GroundComponent } = {
         [GroundType.GRASS]: makeGrass,
         [GroundType.PATH]: makePath,
         [GroundType.LEDGE]: makeLedge,
+        [GroundType.TENT_RED]: (data) => { return makeBasicNineSliceGround(data, GroundType.TENT_RED, Tilesets.instance.outdoorTiles.getNineSlice("redtentInterior")) },
+        [GroundType.TENT_BLUE]: (data) => { return makeBasicNineSliceGround(data, GroundType.TENT_BLUE, Tilesets.instance.outdoorTiles.getNineSlice("bluetentInterior")) },
     }
 
     make(type: GroundType, wl: WorldLocation, pos: Point, data: object) {
-        return this.GROUND_FUNCTION_MAP[type](wl, pos, data)
+        const ground = this.GROUND_FUNCTION_MAP[type]({wl, pos, data})
+        if (ground.type !== type) {
+            throw new Error("constructed ground type doesn't match requested type")
+        }
+        return ground
     }
 
     constructor() {
