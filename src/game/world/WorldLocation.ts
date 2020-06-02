@@ -13,6 +13,8 @@ import { DudeFactory } from "../characters/DudeFactory"
 import { Teleporter, Teleporters } from "./Teleporter"
 import { Player } from "../characters/Player"
 import { PointLightMaskRenderer } from "./PointLightMaskRenderer"
+import { Camera } from "../cutscenes/Camera"
+import { TILE_SIZE } from "../graphics/Tilesets"
 
 export class WorldLocation {
 
@@ -80,6 +82,7 @@ export class WorldLocation {
         const linkedPosition = this.getTeleporterLinkedPos(to, id)
         
         const p = Player.instance.dude
+        const beforeTeleportPos = p.standingPosition
         this.dudes.delete(p)
         linkedLocation.dudes.add(p)
 
@@ -88,7 +91,11 @@ export class WorldLocation {
         const offset = p.standingPosition.minus(p.position)
         p.moveTo(linkedPosition.minus(offset))
 
-        // TODO update camera position so we don't get a "jump"
+        // makes the camera lerp a bit in the direction of the door
+        // TODO make this support non up/down doors
+        const niceTransition = TILE_SIZE * 2 * (linkedLocation.isInterior ? -1 : 1)
+        
+        Camera.instance.jump(beforeTeleportPos.minus(p.standingPosition).plusY(niceTransition))
     }
 
     getEntities() {

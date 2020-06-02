@@ -91,7 +91,7 @@ export class QuestGame extends Game {
 
     updateViews(updateViewsContext: UpdateViewsContext) {
         const dimensions = updateViewsContext.dimensions.div(ZOOM)
-        const cameraOffset = Camera.instance.updatePosition(dimensions, updateViewsContext.elapsedTimeMillis)
+        const cameraOffset = Camera.instance.getUpdatedPosition(dimensions, updateViewsContext.elapsedTimeMillis)
 
         this.gameEntityView = { 
             zoom: ZOOM,

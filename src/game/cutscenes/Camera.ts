@@ -30,16 +30,20 @@ export class Camera {
         this.dudeTarget = null
     }
 
-    updatePosition(dimensions: Point, elapsedTimeMillis: number): Point {
+    jump(translation: Point) {
+        this._position = this._position.plus(translation)
+    }
+
+    getUpdatedPosition(dimensions: Point, elapsedTimeMillis: number): Point {
         this._dimensions = dimensions
         const xLimit = MapGenerator.MAP_SIZE / 2 * TILE_SIZE - dimensions.x/2
         const yLimit = MapGenerator.MAP_SIZE / 2 * TILE_SIZE - dimensions.y/2
         const trackedPoint = this.dudeTarget?.position ?? this.pointTarget
-        const clampedPlayerPos = new Point(
+        const clampedTrackedPoint = new Point(
             this.clamp(trackedPoint.x, -xLimit, xLimit),
             this.clamp(trackedPoint.y, -yLimit, yLimit)
         )
-        const cameraGoal = dimensions.div(2).minus(clampedPlayerPos)
+        const cameraGoal = dimensions.div(2).minus(clampedTrackedPoint)
 
         if (!this._position) {
             this._position = cameraGoal
