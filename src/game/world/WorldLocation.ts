@@ -84,7 +84,6 @@ export class WorldLocation {
         linkedLocation.dudes.add(p)
 
         LocationManager.instance.currentLocation = linkedLocation
-        PointLightMaskRenderer.instance.renderToOffscreenCanvas()
 
         const offset = p.standingPosition.minus(p.position)
         p.moveTo(linkedPosition.minus(offset))

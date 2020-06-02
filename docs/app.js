@@ -5667,9 +5667,10 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                     this.context.putImageData(imageData, position.x, position.y);
                 };
                 PointLightMaskRenderer.prototype.getEntity = function () {
-                    if (this.gridDirty) {
+                    if (this.gridDirty || this.lastLocationRendered !== LocationManager_10.LocationManager.instance.currentLocation) {
                         this.renderToOffscreenCanvas();
                         this.gridDirty = false;
+                        this.lastLocationRendered = LocationManager_10.LocationManager.instance.currentLocation;
                     }
                     // prevent tint not extending to the edge
                     var dimensions = Camera_3.Camera.instance.dimensions.plus(new point_39.Point(1, 1));
@@ -7105,9 +7106,9 @@ System.register("game/world/ground/GroundComponent", ["engine/component"], funct
         }
     };
 });
-System.register("game/world/WorldLocation", ["engine/util/Grid", "game/saves/uuid", "game/world/elements/Elements", "engine/point", "game/world/LocationManager", "game/world/ground/Ground", "game/characters/DudeFactory", "game/world/Teleporter", "game/characters/Player", "game/world/PointLightMaskRenderer"], function (exports_96, context_96) {
+System.register("game/world/WorldLocation", ["engine/util/Grid", "game/saves/uuid", "game/world/elements/Elements", "engine/point", "game/world/LocationManager", "game/world/ground/Ground", "game/characters/DudeFactory", "game/world/Teleporter", "game/characters/Player"], function (exports_96, context_96) {
     "use strict";
-    var Grid_2, uuid_1, Elements_2, point_49, LocationManager_14, Ground_1, DudeFactory_1, Teleporter_2, Player_10, PointLightMaskRenderer_2, WorldLocation;
+    var Grid_2, uuid_1, Elements_2, point_49, LocationManager_14, Ground_1, DudeFactory_1, Teleporter_2, Player_10, WorldLocation;
     var __moduleName = context_96 && context_96.id;
     return {
         setters: [
@@ -7137,9 +7138,6 @@ System.register("game/world/WorldLocation", ["engine/util/Grid", "game/saves/uui
             },
             function (Player_10_1) {
                 Player_10 = Player_10_1;
-            },
-            function (PointLightMaskRenderer_2_1) {
-                PointLightMaskRenderer_2 = PointLightMaskRenderer_2_1;
             }
         ],
         execute: function () {
@@ -7204,7 +7202,6 @@ System.register("game/world/WorldLocation", ["engine/util/Grid", "game/saves/uui
                     this.dudes.delete(p);
                     linkedLocation.dudes.add(p);
                     LocationManager_14.LocationManager.instance.currentLocation = linkedLocation;
-                    PointLightMaskRenderer_2.PointLightMaskRenderer.instance.renderToOffscreenCanvas();
                     var offset = p.standingPosition.minus(p.position);
                     p.moveTo(linkedPosition.minus(offset));
                     // TODO update camera position so we don't get a "jump"
@@ -8294,7 +8291,7 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
 });
 System.register("game/quest_game", ["engine/point", "engine/game", "game/world/MapGenerator", "game/graphics/Tilesets", "game/characters/DudeFactory", "game/world/LocationManager", "game/characters/Dude", "engine/collision/CollisionEngine", "game/items/DroppedItem", "game/ui/UIStateManager", "game/world/elements/Elements", "game/world/ground/Ground", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/cutscenes/Camera", "game/SaveManager", "game/world/PointLightMaskRenderer", "game/world/WorldTime", "game/world/events/EventQueue"], function (exports_107, context_107) {
     "use strict";
-    var point_57, game_1, MapGenerator_3, Tilesets_31, DudeFactory_2, LocationManager_17, Dude_9, CollisionEngine_4, DroppedItem_2, UIStateManager_13, Elements_3, Ground_4, CutsceneManager_3, IntroCutscene_1, Camera_5, SaveManager_4, PointLightMaskRenderer_3, WorldTime_4, EventQueue_4, ZOOM, QuestGame;
+    var point_57, game_1, MapGenerator_3, Tilesets_31, DudeFactory_2, LocationManager_17, Dude_9, CollisionEngine_4, DroppedItem_2, UIStateManager_13, Elements_3, Ground_4, CutsceneManager_3, IntroCutscene_1, Camera_5, SaveManager_4, PointLightMaskRenderer_2, WorldTime_4, EventQueue_4, ZOOM, QuestGame;
     var __moduleName = context_107 && context_107.id;
     return {
         setters: [
@@ -8346,8 +8343,8 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
             function (SaveManager_4_1) {
                 SaveManager_4 = SaveManager_4_1;
             },
-            function (PointLightMaskRenderer_3_1) {
-                PointLightMaskRenderer_3 = PointLightMaskRenderer_3_1;
+            function (PointLightMaskRenderer_2_1) {
+                PointLightMaskRenderer_2 = PointLightMaskRenderer_2_1;
             },
             function (WorldTime_4_1) {
                 WorldTime_4 = WorldTime_4_1;
@@ -8377,7 +8374,7 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
                     new Ground_4.Ground();
                     new Camera_5.Camera();
                     new CutsceneManager_3.CutsceneManager();
-                    new PointLightMaskRenderer_3.PointLightMaskRenderer();
+                    new PointLightMaskRenderer_2.PointLightMaskRenderer();
                     if (!SaveManager_4.SaveManager.instance.load()) {
                         this.newGame();
                     }
@@ -8419,7 +8416,7 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
                         entities: LocationManager_17.LocationManager.instance.currentLocation.getEntities().concat([
                             CutsceneManager_3.CutsceneManager.instance.getEntity(),
                             WorldTime_4.WorldTime.instance.getEntity(),
-                            PointLightMaskRenderer_3.PointLightMaskRenderer.instance.getEntity()
+                            PointLightMaskRenderer_2.PointLightMaskRenderer.instance.getEntity()
                         ])
                     };
                     this.uiView = {

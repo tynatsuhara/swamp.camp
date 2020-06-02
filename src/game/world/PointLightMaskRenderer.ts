@@ -23,6 +23,7 @@ export class PointLightMaskRenderer {
 
     private lightTiles: Map<WorldLocation, Grid<number>> = new Map<WorldLocation, Grid<number>>()
     private gridDirty = true
+    private lastLocationRendered: WorldLocation
     private color: string
     private darkness = 0.4
 
@@ -121,7 +122,7 @@ export class PointLightMaskRenderer {
         }
     }
 
-    renderToOffscreenCanvas() {
+    private renderToOffscreenCanvas() {
         this.updateColorForTime()
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
@@ -171,9 +172,10 @@ export class PointLightMaskRenderer {
     }
 
     getEntity(): Entity {
-        if (this.gridDirty) {
+        if (this.gridDirty || this.lastLocationRendered !== LocationManager.instance.currentLocation) {
             this.renderToOffscreenCanvas()
             this.gridDirty = false
+            this.lastLocationRendered = LocationManager.instance.currentLocation
         }
 
         // prevent tint not extending to the edge
