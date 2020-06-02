@@ -11,7 +11,7 @@ export const makeTentInterior = (outside: WorldLocation): WorldLocation => {
     const l = LocationManager.instance.newLocation()
 
     const interactablePos = new Point(2.5, 4).times(TILE_SIZE)
-    const teleporter: Teleporter = { to: outside.uuid, pos: interactablePos.plusY(-2) }
+    const teleporter: Teleporter = { to: outside.uuid, pos: interactablePos.plusY(-4) }
     l.addTeleporter(teleporter)
     console.log("add teleporter")
 

@@ -256,6 +256,9 @@ export class Dude extends Component {
     }
 
     isFacing(pt: Point) {
+        if (pt.x === this.standingPosition.x) {
+            return true
+        }
         return this.animation.transform.mirrorX === (pt.x < this.standingPosition.x)
     }
 

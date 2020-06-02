@@ -3406,7 +3406,7 @@ System.register("game/world/interior/Tent", ["game/world/LocationManager", "game
             exports_50("makeTentInterior", makeTentInterior = function (outside) {
                 var l = LocationManager_4.LocationManager.instance.newLocation();
                 var interactablePos = new point_24.Point(2.5, 4).times(Tilesets_6.TILE_SIZE);
-                var teleporter = { to: outside.uuid, pos: interactablePos.plusY(-2) };
+                var teleporter = { to: outside.uuid, pos: interactablePos.plusY(-4) };
                 l.addTeleporter(teleporter);
                 console.log("add teleporter");
                 new AsciiInteriorBuilder_1.AsciiInteriorBuilder("_____", "_____", "_____", "_____").map("_", function (pos) {
@@ -6302,6 +6302,9 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     this._position = this.collider.moveTo(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos);
                 };
                 Dude.prototype.isFacing = function (pt) {
+                    if (pt.x === this.standingPosition.x) {
+                        return true;
+                    }
                     return this.animation.transform.mirrorX === (pt.x < this.standingPosition.x);
                 };
                 Dude.prototype.getAnimationOffsetPosition = function () {
