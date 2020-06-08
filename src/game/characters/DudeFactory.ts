@@ -94,7 +94,7 @@ export class DudeFactory {
                 animationName = "Herald"
                 maxHealth = Number.MAX_SAFE_INTEGER
                 speed *= .6
-                // dialogue = Dialogue.BERT_0
+                dialogue = Dialogue.BERT_0
                 additionalComponents = [
                     new NPC(NPCSchedules.newGoToSchedule(new Point(-2, 1))),  // TODO
                     new Villager()

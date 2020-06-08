@@ -1,6 +1,7 @@
 import { SaveManager } from "../SaveManager"
 import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
 import { DIP_INTRO_DIALOGUE } from "./dialogues/DipIntro"
+import { BERTO_INTRO_DIALOGUE } from "./dialogues/BertoIntro"
 
 export class DialogueInstance {
     readonly lines: string[]
@@ -65,12 +66,22 @@ export const enum Dialogue {
     BERT_0,
 }
 
-export const getDialogue = (d: Dialogue): DialogueInstance => DIALOGUE_MAP[d]()
+export const getDialogue = (d: Dialogue): DialogueInstance => {
+    const f = DIALOGUE_MAP[d]
+    if (!f) {
+        throw new Error("cannot find dialogue " + d)
+    }
+    return f()
+}
 
+const DIALOGUE_SOURCES: { [key: number]: () => DialogueInstance }[] = [
+    DIP_INTRO_DIALOGUE,
+    BERTO_INTRO_DIALOGUE,
+]
 
 /**
  * State should only be modified in the "next" functions. If state is changed 
  * in the top-level Dialogue functions, it can be triggered repeatedly if the 
  * dialogue is opened/closed or if the game is saved then loaded.
  */
-const DIALOGUE_MAP: { [key: number]: () => DialogueInstance } = Object.assign({}, DIP_INTRO_DIALOGUE)
+const DIALOGUE_MAP: { [key: number]: () => DialogueInstance } = Object.assign({}, ...DIALOGUE_SOURCES)
