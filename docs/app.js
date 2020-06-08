@@ -7096,6 +7096,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                         case 4 /* HERALD */: {
                             animationName = "Herald";
                             maxHealth = Number.MAX_SAFE_INTEGER;
+                            speed *= .6;
                             additionalComponents = [
                                 new NPC_3.NPC(NPCSchedule_2.NPCSchedules.newGoToSchedule(new point_49.Point(-2, 1))),
                                 new Villager_1.Villager()

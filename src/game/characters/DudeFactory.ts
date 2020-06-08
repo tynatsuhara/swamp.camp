@@ -91,6 +91,7 @@ export class DudeFactory {
             case DudeType.HERALD: {
                 animationName = "Herald"
                 maxHealth = Number.MAX_SAFE_INTEGER
+                speed *= .6
                 additionalComponents = [
                     new NPC(NPCSchedules.newGoToSchedule(new Point(-2, 1))),  // TODO
                     new Villager()
