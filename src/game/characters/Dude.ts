@@ -251,6 +251,9 @@ export class Dude extends Component {
         }
     }
 
+    /**
+     * @param point World point where the dude will be moved, unless they hit a collider
+     */
     moveTo(point: Point) {
         this._position = this.collider.moveTo(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos)
     }

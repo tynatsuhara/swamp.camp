@@ -76,13 +76,16 @@ export class NPC extends Component {
         }
     }
 
-    private simulateSchedule(updateData: UpdateData) {
+    simulate() {
+        this.clearExistingAIState()
         const schedule = this.getSchedule()
         
         if (schedule.type === NPCScheduleType.DO_NOTHING) {
             // do nothing
         } else if (schedule.type === NPCScheduleType.GO_TO_SPOT) {
-            this.dude.moveTo(Point.fromString(schedule["p"]))
+            console.log("before = " + this.dude.position)
+            this.forceMoveToTilePosition(Point.fromString(schedule["p"]))
+            console.log("after = " + this.dude.position)
         }
     }
 
@@ -92,6 +95,13 @@ export class NPC extends Component {
             throw new Error(`NPCs must have a "${NPCSchedules.SCHEDULE_KEY}" field in the blob. It's possible it got overwritten.`)
         }
         return schedule
+    }
+
+    private clearExistingAIState() {
+        this.walkPath = null
+        this.fleePath = null
+        this.attackTarget = null
+        this.followTarget = null
     }
 
     // fn will execute immediately and every intervalMillis milliseconds until the NPC is dead
@@ -229,8 +239,12 @@ export class NPC extends Component {
         }
     }
 
+    private forceMoveToTilePosition(pt: Point) {
+        const pos = this.tilePtToStandingPos(pt).minus(this.dude.standingPosition).plus(this.dude.position)
+        this.dude.moveTo(pos)
+    }
+
     private findPath(tilePt: Point, h: (pt: Point) => number = (pt) => pt.distanceTo(end)) {
-        const ptOffset = new Point(.5, .8)
         const start = pixelPtToTilePt(this.dude.standingPosition)
         const end = tilePt
         return LocationManager.instance.currentLocation.elements.findPath(
@@ -238,6 +252,11 @@ export class NPC extends Component {
             end, 
             h,
             (pt) => (pt === start ? false : !!LocationManager.instance.currentLocation.elements.get(pt))  // prevent getting stuck "inside" a square
-        )?.map(pt => pt.plus(ptOffset).times(TILE_SIZE)).slice(1)  // slice(1) because we don't need the start in the path
+        )?.map(pt => this.tilePtToStandingPos(pt)).slice(1)  // slice(1) because we don't need the start in the path
+    }
+
+    private tilePtToStandingPos(tilePt: Point) {
+        const ptOffset = new Point(.5, .8)
+        return tilePt.plus(ptOffset).times(TILE_SIZE)
     }
 }

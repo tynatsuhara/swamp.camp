@@ -86,7 +86,6 @@ export class Input {
     }
 }
 
-// TODO: Capture mouse input for clickable elements
 export class CapturedInput {
     private readonly keysDown: Set<number>
     private readonly keysHeld: Set<number>

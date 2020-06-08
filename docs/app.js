@@ -330,7 +330,6 @@ System.register("engine/input", ["engine/point"], function (exports_4, context_4
                 return Input;
             }());
             exports_4("Input", Input);
-            // TODO: Capture mouse input for clickable elements
             CapturedInput = /** @class */ (function () {
                 function CapturedInput(keysDown, keysHeld, keysUp, mousePos, isMouseDown, isMouseHeld, isMouseUp, isRightMouseDown, isRightMouseHeld, isRightMouseUp) {
                     if (keysDown === void 0) { keysDown = new Set(); }
@@ -3467,7 +3466,6 @@ System.register("game/ui/OffScreenMarker", ["engine/point", "engine/util/utils",
             }
         ],
         execute: function () {
-            // TODO this currently isn't going to work because it is conflating UI space and game space
             OffScreenMarker = /** @class */ (function (_super) {
                 __extends(OffScreenMarker, _super);
                 function OffScreenMarker() {
@@ -6449,6 +6447,9 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                         this.animation.play(0);
                     }
                 };
+                /**
+                 * @param point World point where the dude will be moved, unless they hit a collider
+                 */
                 Dude.prototype.moveTo = function (point) {
                     this._position = this.collider.moveTo(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos);
                 };
@@ -6770,13 +6771,16 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                         this.walkTo(point_47.Point.fromString(schedule["p"]), updateData);
                     }
                 };
-                NPC.prototype.simulateSchedule = function (updateData) {
+                NPC.prototype.simulate = function () {
+                    this.clearExistingAIState();
                     var schedule = this.getSchedule();
                     if (schedule.type === 0 /* DO_NOTHING */) {
                         // do nothing
                     }
                     else if (schedule.type === 1 /* GO_TO_SPOT */) {
-                        this.dude.moveTo(point_47.Point.fromString(schedule["p"]));
+                        console.log("before = " + this.dude.position);
+                        this.forceMoveToTilePosition(point_47.Point.fromString(schedule["p"]));
+                        console.log("after = " + this.dude.position);
                     }
                 };
                 NPC.prototype.getSchedule = function () {
@@ -6785,6 +6789,12 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                         throw new Error("NPCs must have a \"" + NPCSchedule_1.NPCSchedules.SCHEDULE_KEY + "\" field in the blob. It's possible it got overwritten.");
                     }
                     return schedule;
+                };
+                NPC.prototype.clearExistingAIState = function () {
+                    this.walkPath = null;
+                    this.fleePath = null;
+                    this.attackTarget = null;
+                    this.followTarget = null;
                 };
                 // fn will execute immediately and every intervalMillis milliseconds until the NPC is dead
                 NPC.prototype.doWhileLiving = function (fn, intervalMillis) {
@@ -6900,14 +6910,22 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                         this.attackTarget = target;
                     }
                 };
+                NPC.prototype.forceMoveToTilePosition = function (pt) {
+                    var pos = this.tilePtToStandingPos(pt).minus(this.dude.standingPosition).plus(this.dude.position);
+                    this.dude.moveTo(pos);
+                };
                 NPC.prototype.findPath = function (tilePt, h) {
+                    var _this = this;
                     if (h === void 0) { h = function (pt) { return pt.distanceTo(end); }; }
                     var _a;
-                    var ptOffset = new point_47.Point(.5, .8);
                     var start = Tilesets_26.pixelPtToTilePt(this.dude.standingPosition);
                     var end = tilePt;
                     return (_a = LocationManager_13.LocationManager.instance.currentLocation.elements.findPath(start, end, h, function (pt) { return (pt === start ? false : !!LocationManager_13.LocationManager.instance.currentLocation.elements.get(pt)); } // prevent getting stuck "inside" a square
-                    )) === null || _a === void 0 ? void 0 : _a.map(function (pt) { return pt.plus(ptOffset).times(Tilesets_26.TILE_SIZE); }).slice(1); // slice(1) because we don't need the start in the path
+                    )) === null || _a === void 0 ? void 0 : _a.map(function (pt) { return _this.tilePtToStandingPos(pt); }).slice(1); // slice(1) because we don't need the start in the path
+                };
+                NPC.prototype.tilePtToStandingPos = function (tilePt) {
+                    var ptOffset = new point_47.Point(.5, .8);
+                    return tilePt.plus(ptOffset).times(Tilesets_26.TILE_SIZE);
                 };
                 return NPC;
             }(component_23.Component));
@@ -7256,9 +7274,9 @@ System.register("game/world/ground/GroundComponent", ["engine/component"], funct
         }
     };
 });
-System.register("game/world/WorldLocation", ["engine/util/Grid", "game/saves/uuid", "game/world/elements/Elements", "engine/point", "game/world/LocationManager", "game/world/ground/Ground", "game/characters/DudeFactory", "game/world/Teleporter", "game/characters/Player", "game/cutscenes/Camera", "game/graphics/Tilesets"], function (exports_98, context_98) {
+System.register("game/world/WorldLocation", ["engine/util/Grid", "game/saves/uuid", "game/world/elements/Elements", "engine/point", "game/world/LocationManager", "game/world/ground/Ground", "game/characters/DudeFactory", "game/world/Teleporter", "game/characters/Player", "game/cutscenes/Camera", "game/graphics/Tilesets", "game/characters/NPC"], function (exports_98, context_98) {
     "use strict";
-    var Grid_2, uuid_1, Elements_2, point_50, LocationManager_15, Ground_1, DudeFactory_2, Teleporter_2, Player_10, Camera_4, Tilesets_27, WorldLocation;
+    var Grid_2, uuid_1, Elements_2, point_50, LocationManager_15, Ground_1, DudeFactory_2, Teleporter_2, Player_10, Camera_4, Tilesets_27, NPC_4, WorldLocation;
     var __moduleName = context_98 && context_98.id;
     return {
         setters: [
@@ -7294,6 +7312,9 @@ System.register("game/world/WorldLocation", ["engine/util/Grid", "game/saves/uui
             },
             function (Tilesets_27_1) {
                 Tilesets_27 = Tilesets_27_1;
+            },
+            function (NPC_4_1) {
+                NPC_4 = NPC_4_1;
             }
         ],
         execute: function () {
@@ -7359,6 +7380,8 @@ System.register("game/world/WorldLocation", ["engine/util/Grid", "game/saves/uui
                     this.dudes.delete(p);
                     linkedLocation.dudes.add(p);
                     LocationManager_15.LocationManager.instance.currentLocation = linkedLocation;
+                    linkedLocation.dudes.forEach(function (d) { var _a; return (_a = d.entity.getComponent(NPC_4.NPC)) === null || _a === void 0 ? void 0 : _a.simulate(); });
+                    // move player
                     var offset = p.standingPosition.minus(p.position);
                     p.moveTo(linkedPosition.minus(offset));
                     // makes the camera lerp a bit in the direction of the door

@@ -15,6 +15,7 @@ import { Player } from "../characters/Player"
 import { PointLightMaskRenderer } from "./PointLightMaskRenderer"
 import { Camera } from "../cutscenes/Camera"
 import { TILE_SIZE } from "../graphics/Tilesets"
+import { NPC } from "../characters/NPC"
 
 export class WorldLocation {
 
@@ -87,7 +88,9 @@ export class WorldLocation {
         linkedLocation.dudes.add(p)
 
         LocationManager.instance.currentLocation = linkedLocation
+        linkedLocation.dudes.forEach(d => d.entity.getComponent(NPC)?.simulate())
 
+        // move player
         const offset = p.standingPosition.minus(p.position)
         p.moveTo(linkedPosition.minus(offset))
 
