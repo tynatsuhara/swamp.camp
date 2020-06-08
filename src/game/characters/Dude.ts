@@ -125,7 +125,7 @@ export class Dude extends Component {
         this.animation.transform.depth = this.collider.position.y + this.collider.dimensions.y
 
         this.dialogueInteract.position = this.standingPosition.minus(new Point(0, 5))
-        this.dialogueInteract.uiOffset = new Point(this.animation.transform.mirrorX ? -1 : 1, -TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition())
+        this.dialogueInteract.uiOffset = new Point(0, -TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition())
         this.dialogueInteract.enabled = this.dialogue !== Dialogue.NONE && DialogueDisplay.instance.dude !== this
     }
 
@@ -306,7 +306,7 @@ export class Dude extends Component {
             return []
         } else {
             return [tile.toImageRender(new TileTransform(
-                this.standingPosition.plusY(-this.animation.transform.dimensions.y).plus(new Point(1, 1).times(-TILE_SIZE/2)).plus(this.getAnimationOffsetPosition()),
+                this.standingPosition.plusY(-28).plus(new Point(1, 1).times(-TILE_SIZE/2)).plus(this.getAnimationOffsetPosition()),
                 new Point(TILE_SIZE, TILE_SIZE), 0, false, false, UIStateManager.UI_SPRITE_DEPTH
             ))]
         }

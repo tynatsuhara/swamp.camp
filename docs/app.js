@@ -4671,7 +4671,7 @@ System.register("game/characters/dialogues/BertoIntro", ["game/characters/Dialog
         ],
         execute: function () {
             exports_65("BERTO_INTRO_DIALOGUE", BERTO_INTRO_DIALOGUE = (_a = {},
-                _a[9 /* BERT_0 */] = function () { return Dialogue_2.dialogue(["Good morrow! I, Sir Berto of Dube, present myself unto thee as an emissary of The Honourable King Winston XVIII."], function () { return new Dialogue_2.NextDialogue(9 /* BERT_0 */, false); }, DudeInteractIndicator_2.DudeInteractIndicator.IMPORTANT_DIALOGUE); },
+                _a[9 /* BERT_0 */] = function () { return Dialogue_2.dialogue(["Good morrow! I, Sir Berto of Dube, present myself unto thee as an emissary of The Honourable King Bob XVIII."], function () { return new Dialogue_2.NextDialogue(9 /* BERT_0 */, false); }, DudeInteractIndicator_2.DudeInteractIndicator.IMPORTANT_DIALOGUE); },
                 _a));
         }
     };
@@ -6365,7 +6365,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     this.animation.transform.position = this.position.plus(this.isAlive ? new point_45.Point(0, 0) : this.deathOffset);
                     this.animation.transform.depth = this.collider.position.y + this.collider.dimensions.y;
                     this.dialogueInteract.position = this.standingPosition.minus(new point_45.Point(0, 5));
-                    this.dialogueInteract.uiOffset = new point_45.Point(this.animation.transform.mirrorX ? -1 : 1, -Tilesets_25.TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition());
+                    this.dialogueInteract.uiOffset = new point_45.Point(0, -Tilesets_25.TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition());
                     this.dialogueInteract.enabled = this.dialogue !== 0 /* NONE */ && DialogueDisplay_2.DialogueDisplay.instance.dude !== this;
                 };
                 Object.defineProperty(Dude.prototype, "isAlive", {
@@ -6531,7 +6531,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                         return [];
                     }
                     else {
-                        return [tile.toImageRender(new TileTransform_18.TileTransform(this.standingPosition.plusY(-this.animation.transform.dimensions.y).plus(new point_45.Point(1, 1).times(-Tilesets_25.TILE_SIZE / 2)).plus(this.getAnimationOffsetPosition()), new point_45.Point(Tilesets_25.TILE_SIZE, Tilesets_25.TILE_SIZE), 0, false, false, UIStateManager_11.UIStateManager.UI_SPRITE_DEPTH))];
+                        return [tile.toImageRender(new TileTransform_18.TileTransform(this.standingPosition.plusY(-28).plus(new point_45.Point(1, 1).times(-Tilesets_25.TILE_SIZE / 2)).plus(this.getAnimationOffsetPosition()), new point_45.Point(Tilesets_25.TILE_SIZE, Tilesets_25.TILE_SIZE), 0, false, false, UIStateManager_11.UIStateManager.UI_SPRITE_DEPTH))];
                     }
                 };
                 Dude.COLLISION_LAYER = "dube";
