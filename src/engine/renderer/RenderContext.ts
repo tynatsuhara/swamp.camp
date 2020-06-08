@@ -29,9 +29,10 @@ export class RenderContext {
     }
 
     fillText(size: number, font: string, color: string, text: string, point: Point) {
+        const offset = this.view.offset.times(this.view.zoom).apply(Math.floor)
         this.context.font = `${size * this.view.zoom}px '${font}'`
         this.context.fillStyle = color
-        point = point.plus(this.view.offset).times(this.view.zoom)
+        point = point.times(this.view.zoom).plus(offset)
         this.context.fillText(text, point.x, point.y + size*this.view.zoom)
     }
 
