@@ -43,7 +43,8 @@ export class Point {
     }
 
     lerp(multiplier: number, goal: Point): Point {
-        return this.plus(goal.minus(this).times(multiplier))
+        const clampedMultiplier = Math.max(Math.min(multiplier, 1), 0)
+        return this.plus(goal.minus(this).times(clampedMultiplier))
     }
 
     distanceTo(pt: Point): number {

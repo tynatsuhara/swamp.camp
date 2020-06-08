@@ -52,7 +52,8 @@ System.register("engine/point", [], function (exports_1, context_1) {
                     return new Point(this.x - other.x, this.y - other.y);
                 };
                 Point.prototype.lerp = function (multiplier, goal) {
-                    return this.plus(goal.minus(this).times(multiplier));
+                    var clampedMultiplier = Math.max(Math.min(multiplier, 1), 0);
+                    return this.plus(goal.minus(this).times(clampedMultiplier));
                 };
                 Point.prototype.distanceTo = function (pt) {
                     var dx = pt.x - this.x;
