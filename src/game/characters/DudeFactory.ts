@@ -13,6 +13,7 @@ import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 import { Villager } from "./Villager"
 import { NPCSchedules } from "./NPCSchedule"
 import { WorldLocation } from "../world/WorldLocation"
+import { Lists } from "../../engine/util/Lists"
 
 export const enum DudeFaction {
     VILLAGERS,
@@ -41,7 +42,7 @@ export class DudeFactory {
      * Create a new Dude in the specified location, defaults to the exterior world location
      */
     new(type: DudeType, pos: Point, location: WorldLocation = LocationManager.instance.exterior()): Dude {
-        const d = this.make(type, pos)
+        const d = this.make(type, pos, null, location)
         location.dudes.add(d)
         return d
     }
@@ -50,14 +51,15 @@ export class DudeFactory {
      * Instantiates a Dude+Entity in the specified location
      */
     load(saveState: DudeSaveState, location: WorldLocation) {
-        const d = this.make(saveState.type, Point.fromString(saveState.pos), saveState)
+        const d = this.make(saveState.type, Point.fromString(saveState.pos), saveState, location)
         location.dudes.add(d)
     }
 
     private make(
         type: DudeType, 
         pos: Point,
-        saveState: DudeSaveState = null
+        saveState: DudeSaveState,
+        location: WorldLocation
     ): Dude {
         // defaults
         let faction: DudeFaction = DudeFaction.VILLAGERS
@@ -96,7 +98,9 @@ export class DudeFactory {
                 speed *= .6
                 dialogue = Dialogue.BERT_0
                 additionalComponents = [
-                    new NPC(NPCSchedules.newGoToSchedule(new Point(-2, 1))),  // TODO
+                    new NPC(NPCSchedules.newGoToSchedule(  // filter out occupied points to not get stuck in the campfire
+                        Lists.oneOf([new Point(-3, 0), new Point(-3, 1), new Point(-2, 0), new Point(-2, 1)].filter(pt => !location.elements.get(pt)))
+                    )),
                     new Villager()
                 ]
                 break

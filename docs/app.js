@@ -7085,9 +7085,9 @@ System.register("game/characters/Villager", ["engine/component", "game/character
         }
     };
 });
-System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point", "game/characters/Player", "game/characters/Dude", "game/characters/NPC", "game/world/LocationManager", "game/characters/Enemy", "game/items/Inventory", "game/cutscenes/CutscenePlayerController", "game/characters/Villager", "game/characters/NPCSchedule"], function (exports_94, context_94) {
+System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point", "game/characters/Player", "game/characters/Dude", "game/characters/NPC", "game/world/LocationManager", "game/characters/Enemy", "game/items/Inventory", "game/cutscenes/CutscenePlayerController", "game/characters/Villager", "game/characters/NPCSchedule", "engine/util/Lists"], function (exports_94, context_94) {
     "use strict";
-    var Entity_17, point_49, Player_9, Dude_7, NPC_3, LocationManager_14, Enemy_1, Inventory_1, CutscenePlayerController_1, Villager_1, NPCSchedule_2, DudeFactory;
+    var Entity_17, point_49, Player_9, Dude_7, NPC_3, LocationManager_14, Enemy_1, Inventory_1, CutscenePlayerController_1, Villager_1, NPCSchedule_2, Lists_4, DudeFactory;
     var __moduleName = context_94 && context_94.id;
     return {
         setters: [
@@ -7123,6 +7123,9 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
             },
             function (NPCSchedule_2_1) {
                 NPCSchedule_2 = NPCSchedule_2_1;
+            },
+            function (Lists_4_1) {
+                Lists_4 = Lists_4_1;
             }
         ],
         execute: function () {
@@ -7135,7 +7138,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                  */
                 DudeFactory.prototype.new = function (type, pos, location) {
                     if (location === void 0) { location = LocationManager_14.LocationManager.instance.exterior(); }
-                    var d = this.make(type, pos);
+                    var d = this.make(type, pos, null, location);
                     location.dudes.add(d);
                     return d;
                 };
@@ -7143,11 +7146,10 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                  * Instantiates a Dude+Entity in the specified location
                  */
                 DudeFactory.prototype.load = function (saveState, location) {
-                    var d = this.make(saveState.type, point_49.Point.fromString(saveState.pos), saveState);
+                    var d = this.make(saveState.type, point_49.Point.fromString(saveState.pos), saveState, location);
                     location.dudes.add(d);
                 };
-                DudeFactory.prototype.make = function (type, pos, saveState) {
-                    if (saveState === void 0) { saveState = null; }
+                DudeFactory.prototype.make = function (type, pos, saveState, location) {
                     var _a, _b, _c, _d, _e, _f, _g;
                     // defaults
                     var faction = 0 /* VILLAGERS */;
@@ -7185,7 +7187,8 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                             speed *= .6;
                             dialogue = 9 /* BERT_0 */;
                             additionalComponents = [
-                                new NPC_3.NPC(NPCSchedule_2.NPCSchedules.newGoToSchedule(new point_49.Point(-2, 1))),
+                                new NPC_3.NPC(NPCSchedule_2.NPCSchedules.newGoToSchedule(// filter out occupied points to not get stuck in the campfire
+                                Lists_4.Lists.oneOf([new point_49.Point(-3, 0), new point_49.Point(-3, 1), new point_49.Point(-2, 0), new point_49.Point(-2, 1)].filter(function (pt) { return !location.elements.get(pt); })))),
                                 new Villager_1.Villager()
                             ];
                             break;
