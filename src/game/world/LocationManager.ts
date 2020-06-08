@@ -26,6 +26,11 @@ export class LocationManager {
         return l
     }
 
+    exterior(): WorldLocation {
+        // TODO do this in a less hacky fashion
+        return Array.from(this.locations.values()).filter(l => !l.isInterior)[0]
+    }
+
     // transition(toUUID: string) {
     //     const location = this.locations.get(toUUID)
     //     this.currentLocation.dudes.delete(Player.instance.dude)

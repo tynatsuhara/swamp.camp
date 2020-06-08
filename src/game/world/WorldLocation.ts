@@ -153,7 +153,7 @@ export class WorldLocation {
         n._uuid = saveState.uuid
         saveState.elements.forEach(el => n.addWorldElement(el.type, Point.fromString(el.pos), el.obj))
         saveState.ground.forEach(el => n.addGroundElement(el.type, Point.fromString(el.pos), el.obj))
-        saveState.dudes.forEach(d => n.dudes.add(DudeFactory.instance.load(d)))
+        saveState.dudes.forEach(d => DudeFactory.instance.load(d, n))
         n.teleporters = saveState.teleporters
         return n
     }

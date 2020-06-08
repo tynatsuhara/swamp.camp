@@ -12,6 +12,7 @@ import { Dialogue } from "./Dialogue"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 import { Villager } from "./Villager"
 import { NPCSchedules } from "./NPCSchedule"
+import { WorldLocation } from "../world/WorldLocation"
 
 export const enum DudeFaction {
     VILLAGERS,
@@ -39,17 +40,18 @@ export class DudeFactory {
     /**
      * Create a new Dude in the current location
      */
-    new(type: DudeType, pos: Point): Dude {
+    new(type: DudeType, pos: Point, location: WorldLocation = LocationManager.instance.currentLocation): Dude {
         const d = this.make(type, pos)
-        LocationManager.instance.currentLocation.dudes.add(d)
+        location.dudes.add(d)
         return d
     }
 
     /**
      * Instantiates a Dude+Entity, which needs to be attached to a location
      */
-    load(saveState: DudeSaveState): Dude {
-        return this.make(saveState.type, Point.fromString(saveState.pos), saveState)
+    load(saveState: DudeSaveState, location: WorldLocation) {
+        const d = this.make(saveState.type, Point.fromString(saveState.pos), saveState)
+        location.dudes.add(d)
     }
 
     private make(
@@ -92,6 +94,7 @@ export class DudeFactory {
                 animationName = "Herald"
                 maxHealth = Number.MAX_SAFE_INTEGER
                 speed *= .6
+                // dialogue = Dialogue.BERT_0
                 additionalComponents = [
                     new NPC(NPCSchedules.newGoToSchedule(new Point(-2, 1))),  // TODO
                     new Villager()

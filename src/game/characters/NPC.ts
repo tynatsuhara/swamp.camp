@@ -64,19 +64,34 @@ export class NPC extends Component {
     }
 
     private doNormalScheduledActivity(updateData: UpdateData) {
-        const schedule: NPCSchedule = this.dude.blob[NPCSchedules.SCHEDULE_KEY]
-        if (!schedule) {
-            throw new Error(`NPCs must have a "${NPCSchedules.SCHEDULE_KEY}" field in the blob. It's possible it got overwritten.`)
-        }
+        const schedule = this.getSchedule()
         
         if (schedule.type === NPCScheduleType.DO_NOTHING) {
             this.dude.move(updateData, Point.ZERO)
-        } if (schedule.type === NPCScheduleType.GO_TO_SPOT) {
+        } else if (schedule.type === NPCScheduleType.GO_TO_SPOT) {
             this.walkTo(
                 Point.fromString(schedule["p"]), 
                 updateData
             )
         }
+    }
+
+    private simulateSchedule(updateData: UpdateData) {
+        const schedule = this.getSchedule()
+        
+        if (schedule.type === NPCScheduleType.DO_NOTHING) {
+            // do nothing
+        } else if (schedule.type === NPCScheduleType.GO_TO_SPOT) {
+            this.dude.moveTo(Point.fromString(schedule["p"]))
+        }
+    }
+
+    private getSchedule(): NPCSchedule {
+        const schedule: NPCSchedule = this.dude.blob[NPCSchedules.SCHEDULE_KEY]
+        if (!schedule) {
+            throw new Error(`NPCs must have a "${NPCSchedules.SCHEDULE_KEY}" field in the blob. It's possible it got overwritten.`)
+        }
+        return schedule
     }
 
     // fn will execute immediately and every intervalMillis milliseconds until the NPC is dead
