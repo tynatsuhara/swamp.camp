@@ -2,7 +2,7 @@ import { Point } from "../../engine/point"
 
 export const enum NPCScheduleType {
     DO_NOTHING,
-    GO_TO_SPOT,  // fields: p (stringified Point)
+    GO_TO_SPOT,  // fields: p (stringified tile Point)
 }
 
 export type NPCSchedule = {

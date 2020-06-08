@@ -94,10 +94,10 @@ export class NPC extends Component {
     }
 
     private walkPath: Point[] = null
-    private walkTo(pt: Point, updateData: UpdateData) {
+    private walkTo(tilePt: Point, updateData: UpdateData) {
         // TODO: make sure the existing path is to the same pt
         if (!this.walkPath || this.walkPath.length === 0) {  // only try once per upate() to find a path
-            this.walkPath = this.findPath(pt)
+            this.walkPath = this.findPath(tilePt)
             if (!this.walkPath || this.walkPath.length === 0) {
                 this.dude.move(updateData, Point.ZERO)
                 return

@@ -5,7 +5,6 @@ export class AsciiInteriorBuilder {
     private readonly ascii: String[]
 
     constructor(...ascii: String[]) {
-        console.log(ascii)
         this.ascii = ascii
     }
 

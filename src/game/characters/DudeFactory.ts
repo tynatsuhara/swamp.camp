@@ -92,7 +92,7 @@ export class DudeFactory {
                 animationName = "Herald"
                 maxHealth = Number.MAX_SAFE_INTEGER
                 additionalComponents = [
-                    new NPC(NPCSchedules.newGoToSchedule(new Point(-30, 15))),  // TODO
+                    new NPC(NPCSchedules.newGoToSchedule(new Point(-2, 1))),  // TODO
                     new Villager()
                 ]
                 break
