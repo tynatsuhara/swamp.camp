@@ -125,6 +125,7 @@ export class Dude extends Component {
         this.animation.transform.depth = this.collider.position.y + this.collider.dimensions.y
 
         this.dialogueInteract.position = this.standingPosition.minus(new Point(0, 5))
+        this.dialogueInteract.uiOffset = new Point(1, -TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition())
         this.dialogueInteract.enabled = this.dialogue !== Dialogue.NONE
     }
 
@@ -286,20 +287,23 @@ export class Dude extends Component {
         }
     }
 
-    // Currently just render the interact indicator
     getRenderMethods(): RenderMethod[] {
+        return this.getIndicator()
+    }
+
+    private getIndicator(): RenderMethod[] {
         let indicator = DudeInteractIndicator.NONE
         if (this.dialogue) {
             indicator = getDialogue(this.dialogue).indicator
         }
         let tile: StaticTileSource = DudeInteractIndicator.getTile(indicator)
-        if (!!tile) {
+        if (!tile || this.dialogueInteract.isShowingUI) {
+            return []
+        } else {
             return [tile.toImageRender(new TileTransform(
                 this.standingPosition.plusY(-this.animation.transform.dimensions.y).plus(new Point(1, 1).times(-TILE_SIZE/2)).plus(this.getAnimationOffsetPosition()),
                 new Point(TILE_SIZE, TILE_SIZE), 0, false, false, UIStateManager.UI_SPRITE_DEPTH
             ))]
-        } else {
-            return []
         }
     }
 }

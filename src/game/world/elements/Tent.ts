@@ -38,7 +38,7 @@ export const makeTent = (wl: WorldLocation, pos: Point, data: object): ElementCo
 
 
     // Set up teleporter
-    e.addComponent(new Interactable(interactablePos, () => wl.useTeleporter(destinationUUID)))
+    e.addComponent(new Interactable(interactablePos, () => wl.useTeleporter(destinationUUID), new Point(1, -TILE_SIZE*1.4)))
 
 
     return e.addComponent(new ElementComponent(

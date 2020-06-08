@@ -38,6 +38,7 @@ export class Player extends Component {
         }
 
         this.dude.heal(updateData.elapsedTimeMillis/6500)
+        const possibleInteractable = this.updateInteractables(updateData)
 
         // const originalCrosshairPosRelative = this.crosshairs.transform.position.minus(this.position)
 
@@ -79,10 +80,9 @@ export class Player extends Component {
             this.hitResource(updateData)  // TODO: restrict the speed at which you can do this (probably easiest once we introduce tools)
         }
 
-        if (updateData.input.isKeyDown(Controls.interactButton)) {
-            this.interact(updateData)
+        if (updateData.input.isKeyDown(Controls.interactButton) && !!possibleInteractable) {
+            possibleInteractable.interact()
         }
-
 
 
         // FOR TESTING
@@ -105,16 +105,23 @@ export class Player extends Component {
         // }
     }
 
-    private interact(updateData: UpdateData) {
+    private updateInteractables(updateData: UpdateData) {
         const interactDistance = 20
         const interactCenter = this.dude.standingPosition.minus(new Point(0, 7))
-        const possibilities = updateData.view.entities
+        const interactables = updateData.view.entities
                 .map(e => e.getComponent(Interactable))
                 .filter(e => e?.enabled)
+        interactables.forEach(i => i.updateIndicator(false))
+
+        const possibilities = interactables
                 .filter(e => this.dude.isFacing(e.position))  // interactables the dude is facing
                 .filter(e => e.position.distanceTo(interactCenter) < interactDistance)
 
-        Lists.minBy(possibilities, e => e.position.distanceTo(interactCenter))?.interact()
+        const i = Lists.minBy(possibilities, e => e.position.distanceTo(interactCenter))
+        if (!!i) {
+            i.updateIndicator(true)
+        }
+        return i
     }
 
     // for trees and rocks

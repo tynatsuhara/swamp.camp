@@ -23,8 +23,16 @@ export class KeyPressIndicator extends Component {
 
     getRenderMethods(): RenderMethod[] {
         return [
-            Tilesets.instance.oneBit.getTileSource("keycap").toImageRender(new TileTransform(this.pos, null, 0, false, false, UIStateManager.UI_SPRITE_DEPTH)),
-            new TextRender(Controls.keyString(this.key).toLowerCase(), this.pos.plus(new Point(4, 4)), TEXT_SIZE, TEXT_FONT, Color.BLACK, UIStateManager.UI_SPRITE_DEPTH)
+            Tilesets.instance.oneBit.getTileSource("keycap").toImageRender(
+                new TileTransform(this.pos, null, 0, false, false, UIStateManager.UI_SPRITE_DEPTH)
+            ),
+            new TextRender(
+                Controls.keyString(this.key).toLowerCase(), 
+                this.pos.plus(new Point(4, 4)), 
+                TEXT_SIZE, TEXT_FONT, 
+                Color.BLACK, 
+                UIStateManager.UI_SPRITE_DEPTH
+            )
         ]
     }
 }

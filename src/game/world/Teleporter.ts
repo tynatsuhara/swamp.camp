@@ -8,6 +8,8 @@ import { Entity } from "../../engine/Entity"
 import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { TileTransform } from "../../engine/tiles/TileTransform"
+import { Component } from "../../engine/component"
+import { RenderMethod } from "../../engine/renderer/RenderMethod"
 
 export type Teleporter = {
     to: string   // destination uuid
@@ -32,10 +34,21 @@ export const makeTeleporterElement = (wl: WorldLocation, pos: Point, data: objec
     const interactPos = Point.fromString(i)
     const id = data["id"]
 
-    e.addComponent(new Interactable(interactPos, () => wl.useTeleporter(destinationUUID, id)))
+    const interactComponent = e.addComponent(new Interactable(
+        interactPos, 
+        () => wl.useTeleporter(destinationUUID, id), 
+        new Point(0, TILE_SIZE/2)
+    ))
 
     // TODO have the arrow pointable in different directions
-    e.addComponent(new TileComponent(Tilesets.instance.oneBit.getTileSource("small_arrow_down"), new TileTransform(pos.times(TILE_SIZE))))
+    e.addComponent(new class extends Component {
+        getRenderMethods(): RenderMethod[] {
+            if (interactComponent.isShowingUI) {
+                return []
+            }
+            return [Tilesets.instance.oneBit.getTileSource("small_arrow_down").toImageRender(new TileTransform(pos.times(TILE_SIZE)))]
+        }
+    })
 
     return e.addComponent(new ElementComponent(
         ElementType.TELEPORTER, 

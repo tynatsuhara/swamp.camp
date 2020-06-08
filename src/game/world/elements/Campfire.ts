@@ -52,7 +52,7 @@ export const makeCampfire = (wl: WorldLocation, pos: Point, data: object): Eleme
     set(on)
 
     // Toggle between on/off when interacted with
-    e.addComponent(new Interactable(scaledPos.plus(new Point(TILE_SIZE/2, TILE_SIZE/2)), () => set(!on)))
+    e.addComponent(new Interactable(scaledPos.plus(new Point(TILE_SIZE/2, TILE_SIZE/2)), () => set(!on), new Point(1, -TILE_SIZE)))
 
     return e.addComponent(new ElementComponent(
         ElementType.CAMPFIRE, 
