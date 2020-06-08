@@ -126,7 +126,7 @@ export class Dude extends Component {
 
         this.dialogueInteract.position = this.standingPosition.minus(new Point(0, 5))
         this.dialogueInteract.uiOffset = new Point(1, -TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition())
-        this.dialogueInteract.enabled = this.dialogue !== Dialogue.NONE
+        this.dialogueInteract.enabled = this.dialogue !== Dialogue.NONE && DialogueDisplay.instance.dude !== this
     }
 
     get isAlive() { return this._health > 0 }
@@ -297,7 +297,7 @@ export class Dude extends Component {
             indicator = getDialogue(this.dialogue).indicator
         }
         let tile: StaticTileSource = DudeInteractIndicator.getTile(indicator)
-        if (!tile || this.dialogueInteract.isShowingUI) {
+        if (!tile || this.dialogueInteract.isShowingUI || DialogueDisplay.instance.dude === this) {
             return []
         } else {
             return [tile.toImageRender(new TileTransform(

@@ -17,10 +17,10 @@ export class DialogueDisplay extends Component {
 
     static instance: DialogueDisplay
 
+    dude: Dude
     private e: Entity = new Entity([this])
     private displayEntity: Entity
     private optionsEntity: Entity
-    private dude: Dude
     private dialogue: DialogueInstance
     private lineIndex: number
 
@@ -103,6 +103,7 @@ export class DialogueDisplay extends Component {
     }
 
     close() {
+        this.dude = null
         this.dialogue = null
         this.displayEntity = null
     }

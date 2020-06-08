@@ -4943,6 +4943,7 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
                     }
                 };
                 DialogueDisplay.prototype.close = function () {
+                    this.dude = null;
                     this.dialogue = null;
                     this.displayEntity = null;
                 };
@@ -6303,7 +6304,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     this.animation.transform.depth = this.collider.position.y + this.collider.dimensions.y;
                     this.dialogueInteract.position = this.standingPosition.minus(new point_45.Point(0, 5));
                     this.dialogueInteract.uiOffset = new point_45.Point(1, -Tilesets_25.TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition());
-                    this.dialogueInteract.enabled = this.dialogue !== 0 /* NONE */;
+                    this.dialogueInteract.enabled = this.dialogue !== 0 /* NONE */ && DialogueDisplay_2.DialogueDisplay.instance.dude !== this;
                 };
                 Object.defineProperty(Dude.prototype, "isAlive", {
                     get: function () { return this._health > 0; },
@@ -6459,7 +6460,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                         indicator = Dialogue_2.getDialogue(this.dialogue).indicator;
                     }
                     var tile = DudeInteractIndicator_2.DudeInteractIndicator.getTile(indicator);
-                    if (!tile || this.dialogueInteract.isShowingUI) {
+                    if (!tile || this.dialogueInteract.isShowingUI || DialogueDisplay_2.DialogueDisplay.instance.dude === this) {
                         return [];
                     }
                     else {
@@ -6640,9 +6641,9 @@ System.register("game/characters/NPCSchedule", [], function (exports_87, context
         }
     };
 });
-System.register("game/characters/NPC", ["engine/component", "game/characters/Dude", "game/characters/Player", "engine/point", "game/world/LocationManager", "game/graphics/Tilesets", "engine/util/Lists", "game/characters/NPCSchedule"], function (exports_88, context_88) {
+System.register("game/characters/NPC", ["engine/component", "game/characters/Dude", "game/characters/Player", "engine/point", "game/world/LocationManager", "game/graphics/Tilesets", "engine/util/Lists", "game/characters/NPCSchedule", "game/ui/DialogueDisplay"], function (exports_88, context_88) {
     "use strict";
-    var component_23, Dude_4, Player_7, point_47, LocationManager_12, Tilesets_26, Lists_3, NPCSchedule_1, NPC;
+    var component_23, Dude_4, Player_7, point_47, LocationManager_12, Tilesets_26, Lists_3, NPCSchedule_1, DialogueDisplay_3, NPC;
     var __moduleName = context_88 && context_88.id;
     return {
         setters: [
@@ -6669,6 +6670,9 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
             },
             function (NPCSchedule_1_1) {
                 NPCSchedule_1 = NPCSchedule_1_1;
+            },
+            function (DialogueDisplay_3_1) {
+                DialogueDisplay_3 = DialogueDisplay_3_1;
             }
         ],
         execute: function () {
@@ -6709,7 +6713,10 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     if (!!this.attackTarget && !this.attackTarget.isAlive) {
                         this.attackTarget = null; // no need to attack a dead dude
                     }
-                    if (this.enemiesPresent) {
+                    if (DialogueDisplay_3.DialogueDisplay.instance.dude === this.dude) {
+                        this.dude.move(updateData, point_47.Point.ZERO);
+                    }
+                    else if (this.enemiesPresent) {
                         if (!!this.attackTarget) {
                             this.doAttack(updateData);
                         }

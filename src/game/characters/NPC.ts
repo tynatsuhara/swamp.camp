@@ -7,6 +7,7 @@ import { LocationManager } from "../world/LocationManager"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { Lists } from "../../engine/util/Lists"
 import { NPCSchedule, NPCScheduleType, NPCSchedules } from "./NPCSchedule"
+import { DialogueDisplay } from "../ui/DialogueDisplay"
 
 /**
  * Shared logic for different types of NPCs. These should be invoked by an NPC controller component.
@@ -49,7 +50,9 @@ export class NPC extends Component {
             this.attackTarget = null  // no need to attack a dead dude
         }
 
-        if (this.enemiesPresent) {
+        if (DialogueDisplay.instance.dude === this.dude) {
+            this.dude.move(updateData, Point.ZERO)
+        } else if (this.enemiesPresent) {
             if (!!this.attackTarget) {
                 this.doAttack(updateData)
             } else {
