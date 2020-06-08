@@ -70,6 +70,9 @@ export class DroppedItem extends Component {
     }
 
     private collide(c: Collider) {
+        if (!c.entity) {
+            return
+        }
         const player = c.entity.getComponent(Player)
         if (!!player) {
             setTimeout(() => {

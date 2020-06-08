@@ -2983,6 +2983,9 @@ System.register("game/items/DroppedItem", ["engine/component", "engine/point", "
                 };
                 DroppedItem.prototype.collide = function (c) {
                     var _this = this;
+                    if (!c.entity) {
+                        return;
+                    }
                     var player = c.entity.getComponent(Player_1.Player);
                     if (!!player) {
                         setTimeout(function () {
