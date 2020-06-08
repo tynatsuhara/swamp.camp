@@ -265,11 +265,13 @@ export class Dude extends Component {
     getAnimationOffsetPosition(): Point {
         // magic based on the animations
         const f = this.animation.currentFrame()
+        let arr: number[]
         if (!this.isMoving) {
-            return new Point(0, [0, 1, 2, 1][f])
+            arr = [0, 1, 2, 1]
         } else {
-            return new Point(0, [-1, -2, -1, 0][f])
+            arr = [-1, -2, -1, 0]
         }
+        return new Point(0, arr[f])
     }
 
     save(): DudeSaveState {

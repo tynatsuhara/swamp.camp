@@ -57,7 +57,7 @@ export class Player extends Component {
         this.dude.move(
             updateData, 
             new Point(dx, dy), 
-            this.dude.weapon.isDrawn() ? updateData.input.mousePos.x - this.dude.standingPosition.x : 0
+            updateData.input.mousePos.x - this.dude.standingPosition.x
         )
 
         // PointLightMaskRenderer.instance.addLight(this.dude.standingPosition, 100)

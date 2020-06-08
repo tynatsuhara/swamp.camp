@@ -6440,12 +6440,14 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                 Dude.prototype.getAnimationOffsetPosition = function () {
                     // magic based on the animations
                     var f = this.animation.currentFrame();
+                    var arr;
                     if (!this.isMoving) {
-                        return new point_45.Point(0, [0, 1, 2, 1][f]);
+                        arr = [0, 1, 2, 1];
                     }
                     else {
-                        return new point_45.Point(0, [-1, -2, -1, 0][f]);
+                        arr = [-1, -2, -1, 0];
                     }
+                    return new point_45.Point(0, arr[f]);
                 };
                 Dude.prototype.save = function () {
                     return {
@@ -6557,7 +6559,7 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
                         }
                     }
                     // PointLightMaskRenderer.instance.removeLight(this.dude.standingPosition)
-                    this.dude.move(updateData, new point_46.Point(dx, dy), this.dude.weapon.isDrawn() ? updateData.input.mousePos.x - this.dude.standingPosition.x : 0);
+                    this.dude.move(updateData, new point_46.Point(dx, dy), updateData.input.mousePos.x - this.dude.standingPosition.x);
                     // PointLightMaskRenderer.instance.addLight(this.dude.standingPosition, 100)
                     if (UIStateManager_12.UIStateManager.instance.isMenuOpen) {
                         return;
