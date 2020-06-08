@@ -4671,7 +4671,7 @@ System.register("game/characters/dialogues/BertoIntro", ["game/characters/Dialog
         ],
         execute: function () {
             exports_65("BERTO_INTRO_DIALOGUE", BERTO_INTRO_DIALOGUE = (_a = {},
-                _a[9 /* BERT_0 */] = function () { return Dialogue_2.dialogue(["Good morrow! I, Sir Berto of Dube, present myself to thee as an emissary of The Honourable King Winston XVIII."], function () { return new Dialogue_2.NextDialogue(9 /* BERT_0 */, false); }, DudeInteractIndicator_2.DudeInteractIndicator.IMPORTANT_DIALOGUE); },
+                _a[9 /* BERT_0 */] = function () { return Dialogue_2.dialogue(["Good morrow! I, Sir Berto of Dube, present myself unto thee as an emissary of The Honourable King Winston XVIII."], function () { return new Dialogue_2.NextDialogue(9 /* BERT_0 */, false); }, DudeInteractIndicator_2.DudeInteractIndicator.IMPORTANT_DIALOGUE); },
                 _a));
         }
     };
@@ -7131,16 +7131,16 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                     DudeFactory.instance = this;
                 }
                 /**
-                 * Create a new Dude in the current location
+                 * Create a new Dude in the specified location, defaults to the exterior world location
                  */
                 DudeFactory.prototype.new = function (type, pos, location) {
-                    if (location === void 0) { location = LocationManager_14.LocationManager.instance.currentLocation; }
+                    if (location === void 0) { location = LocationManager_14.LocationManager.instance.exterior(); }
                     var d = this.make(type, pos);
                     location.dudes.add(d);
                     return d;
                 };
                 /**
-                 * Instantiates a Dude+Entity, which needs to be attached to a location
+                 * Instantiates a Dude+Entity in the specified location
                  */
                 DudeFactory.prototype.load = function (saveState, location) {
                     var d = this.make(saveState.type, point_49.Point.fromString(saveState.pos), saveState);

@@ -38,16 +38,16 @@ export class DudeFactory {
     }
 
     /**
-     * Create a new Dude in the current location
+     * Create a new Dude in the specified location, defaults to the exterior world location
      */
-    new(type: DudeType, pos: Point, location: WorldLocation = LocationManager.instance.currentLocation): Dude {
+    new(type: DudeType, pos: Point, location: WorldLocation = LocationManager.instance.exterior()): Dude {
         const d = this.make(type, pos)
         location.dudes.add(d)
         return d
     }
 
     /**
-     * Instantiates a Dude+Entity, which needs to be attached to a location
+     * Instantiates a Dude+Entity in the specified location
      */
     load(saveState: DudeSaveState, location: WorldLocation) {
         const d = this.make(saveState.type, Point.fromString(saveState.pos), saveState)
