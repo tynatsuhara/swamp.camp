@@ -125,7 +125,7 @@ export class Dude extends Component {
         this.animation.transform.depth = this.collider.position.y + this.collider.dimensions.y
 
         this.dialogueInteract.position = this.standingPosition.minus(new Point(0, 5))
-        this.dialogueInteract.uiOffset = new Point(1, -TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition())
+        this.dialogueInteract.uiOffset = new Point(this.animation.transform.mirrorX ? -1 : 1, -TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition())
         this.dialogueInteract.enabled = this.dialogue !== Dialogue.NONE && DialogueDisplay.instance.dude !== this
     }
 

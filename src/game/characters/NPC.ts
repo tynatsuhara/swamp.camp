@@ -51,7 +51,7 @@ export class NPC extends Component {
         }
 
         if (DialogueDisplay.instance.dude === this.dude) {
-            this.dude.move(updateData, Point.ZERO)
+            this.dude.move(updateData, Point.ZERO, Player.instance.dude.standingPosition.x - this.dude.standingPosition.x)
         } else if (this.enemiesPresent) {
             if (!!this.attackTarget) {
                 this.doAttack(updateData)

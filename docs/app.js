@@ -6332,7 +6332,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     this.animation.transform.position = this.position.plus(this.isAlive ? new point_45.Point(0, 0) : this.deathOffset);
                     this.animation.transform.depth = this.collider.position.y + this.collider.dimensions.y;
                     this.dialogueInteract.position = this.standingPosition.minus(new point_45.Point(0, 5));
-                    this.dialogueInteract.uiOffset = new point_45.Point(1, -Tilesets_25.TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition());
+                    this.dialogueInteract.uiOffset = new point_45.Point(this.animation.transform.mirrorX ? -1 : 1, -Tilesets_25.TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition());
                     this.dialogueInteract.enabled = this.dialogue !== 0 /* NONE */ && DialogueDisplay_2.DialogueDisplay.instance.dude !== this;
                 };
                 Object.defineProperty(Dude.prototype, "isAlive", {
@@ -6748,7 +6748,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                         this.attackTarget = null; // no need to attack a dead dude
                     }
                     if (DialogueDisplay_3.DialogueDisplay.instance.dude === this.dude) {
-                        this.dude.move(updateData, point_47.Point.ZERO);
+                        this.dude.move(updateData, point_47.Point.ZERO, Player_7.Player.instance.dude.standingPosition.x - this.dude.standingPosition.x);
                     }
                     else if (this.enemiesPresent) {
                         if (!!this.attackTarget) {
