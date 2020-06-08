@@ -24,17 +24,5 @@ export const makeTentInterior = (outside: WorldLocation, color: TentColor): Worl
         (pt, index) => l.addGroundElement(groundType, pt, { i: index })
     )
 
-    new AsciiInteriorBuilder(
-        "_____",
-        "_____",
-        "_____",
-        "_____",
-    ).map("_", pos => {
-        // TODO: make this the tent ground
-        l.addGroundElement(GroundType.GRASS, pos)
-
-        // TODO add an interior teleporter element
-    })
-
     return l
 }

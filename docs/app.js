@@ -5469,17 +5469,14 @@ System.register("game/world/Teleporter", ["game/world/elements/Interactable", "e
         }
     };
 });
-System.register("game/world/interior/Tent", ["game/world/LocationManager", "game/world/interior/AsciiInteriorBuilder", "engine/point", "game/graphics/Tilesets", "engine/tiles/NineSlice"], function (exports_77, context_77) {
+System.register("game/world/interior/Tent", ["game/world/LocationManager", "engine/point", "game/graphics/Tilesets", "engine/tiles/NineSlice"], function (exports_77, context_77) {
     "use strict";
-    var LocationManager_10, AsciiInteriorBuilder_1, point_38, Tilesets_18, NineSlice_5, makeTentInterior;
+    var LocationManager_10, point_38, Tilesets_18, NineSlice_5, makeTentInterior;
     var __moduleName = context_77 && context_77.id;
     return {
         setters: [
             function (LocationManager_10_1) {
                 LocationManager_10 = LocationManager_10_1;
-            },
-            function (AsciiInteriorBuilder_1_1) {
-                AsciiInteriorBuilder_1 = AsciiInteriorBuilder_1_1;
             },
             function (point_38_1) {
                 point_38 = point_38_1;
@@ -5500,11 +5497,6 @@ System.register("game/world/interior/Tent", ["game/world/LocationManager", "game
                 l.addWorldElement(4 /* TELEPORTER */, new point_38.Point(2, 4), { to: outside.uuid, i: interactablePos.toString() });
                 var groundType = color === "red" /* RED */ ? 3 /* TENT_RED */ : 4 /* TENT_BLUE */;
                 NineSlice_5.NineSlice.nineSliceForEach(new point_38.Point(5, 4), function (pt, index) { return l.addGroundElement(groundType, pt, { i: index }); });
-                new AsciiInteriorBuilder_1.AsciiInteriorBuilder("_____", "_____", "_____", "_____").map("_", function (pos) {
-                    // TODO: make this the tent ground
-                    l.addGroundElement(0 /* GRASS */, pos);
-                    // TODO add an interior teleporter element
-                });
                 return l;
             });
         }
