@@ -4,6 +4,8 @@ import { SplitFileTileLoader } from "./SplitFileTileLoader"
 import { OneBitTileset } from "./OneBitTileset"
 import { OutdoorTileset } from "./OutdoorTileset"
 import { Point } from "../../engine/point"
+import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
+import { TileSource } from "../../engine/tiles/TileSource"
 
 // standard tile size
 export const TILE_SIZE = 16
@@ -29,6 +31,24 @@ export class Tilesets {
 
     constructor() {
         Tilesets.instance = this
+    }
+
+    getBasicTileSource(key: string): StaticTileSource {
+        const sources = [this.outdoorTiles]
+        for (const src of sources) {
+            try {
+                return src.getTileSource(key)
+            } catch (e) {}
+        }
+    }
+
+    getBasicTileNineSlice(key: string): TileSource[] {
+        const sources = [this.outdoorTiles, this.tilemap]
+        for (const src of sources) {
+            try {
+                return src.getNineSlice(key)
+            } catch (e) {}
+        }
     }
 
     // loaded before the engine starts running the game

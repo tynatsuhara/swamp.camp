@@ -5,11 +5,11 @@ import { makeGrass } from "./Grass"
 import { makePath } from "./Path"
 import { ConnectingTileSchema } from "../../../engine/tiles/ConnectingTileSchema"
 import { Tilesets } from "../../graphics/Tilesets"
-import { makeBasicNineSliceGround } from "./BasicGround"
+import { makeBasicNineSliceGround, makeBasicGround } from "./BasicGround"
 import { makeLedge } from "./Ledge"
 
 export const enum GroundType {
-    GRASS, PATH, LEDGE, TENT_RED, TENT_BLUE
+    BASIC, BASIC_NINE_SLICE, GRASS, PATH, LEDGE
 }
 
 export class SavedGround {
@@ -32,11 +32,11 @@ export class Ground {
     static instance: Ground
 
     private readonly GROUND_FUNCTION_MAP: { [key: number]: (data: MakeGroundFuncData) => GroundComponent } = {
+        [GroundType.BASIC]: makeBasicGround,
+        [GroundType.BASIC_NINE_SLICE]: makeBasicNineSliceGround,
         [GroundType.GRASS]: makeGrass,
         [GroundType.PATH]: makePath,
         [GroundType.LEDGE]: makeLedge,
-        [GroundType.TENT_RED]: (data) => { return makeBasicNineSliceGround(data, GroundType.TENT_RED, Tilesets.instance.outdoorTiles.getNineSlice("redtentInterior")) },
-        [GroundType.TENT_BLUE]: (data) => { return makeBasicNineSliceGround(data, GroundType.TENT_BLUE, Tilesets.instance.outdoorTiles.getNineSlice("bluetentInterior")) },
     }
 
     make(type: GroundType, wl: WorldLocation, pos: Point, data: object) {

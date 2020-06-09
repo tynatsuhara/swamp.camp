@@ -88,6 +88,8 @@ export class WorldLocation {
         linkedLocation.dudes.add(p)
 
         LocationManager.instance.currentLocation = linkedLocation
+
+        // fast-forward NPCs along their schedule
         linkedLocation.dudes.forEach(d => d.entity.getComponent(NPC)?.simulate())
 
         // move player
