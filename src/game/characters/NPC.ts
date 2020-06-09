@@ -83,9 +83,7 @@ export class NPC extends Component {
         if (schedule.type === NPCScheduleType.DO_NOTHING) {
             // do nothing
         } else if (schedule.type === NPCScheduleType.GO_TO_SPOT) {
-            console.log("before = " + this.dude.position)
             this.forceMoveToTilePosition(Point.fromString(schedule["p"]))
-            console.log("after = " + this.dude.position)
         }
     }
 
