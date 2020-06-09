@@ -4241,30 +4241,14 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point",
                     if (!this.isOpen) {
                         return;
                     }
-                    var newIndex = this.getInventoryIndexForPosition(updateData.input.mousePos);
-                    if (newIndex !== -1 && !!inv[newIndex]) { // we're hovering over an item
-                        this.tooltip.position = updateData.input.mousePos;
-                        var stack = inv[newIndex];
-                        var name_1 = Items_3.ITEM_METADATA_MAP[stack.item].displayName;
-                        var count = stack.count > 1 ? ' x' + stack.count : '';
-                        var placeableElement = Items_3.ITEM_METADATA_MAP[stack.item].element;
-                        var placePrompt = !!placeableElement ? " [" + Controls_2.Controls.keyString(Controls_2.Controls.placeElementButton) + " to place]" : '';
-                        this.tooltip.say("" + name_1 + count + placePrompt);
-                        if (!!placeableElement && updateData.input.isKeyDown(Controls_2.Controls.placeElementButton)) {
-                            this.close();
-                            // TODO this won't work properly with items that stack
-                            PlaceElementDisplay_2.PlaceElementDisplay.instance.startPlacing(placeableElement, function () { return inv[newIndex] = null; });
-                        }
-                    }
-                    else {
+                    var hoverIndex = this.getInventoryIndexForPosition(updateData.input.mousePos);
+                    if (!!this.trackedTile) { // dragging
                         this.tooltip.clear();
-                    }
-                    if (!!this.trackedTile) {
                         if (updateData.input.isMouseUp) { // drop n swap
-                            if (newIndex !== -1) {
+                            if (hoverIndex !== -1) {
                                 var value = inv[this.trackedTileIndex];
-                                var currentlyOccupiedSpot = inv[newIndex];
-                                inv[newIndex] = value;
+                                var currentlyOccupiedSpot = inv[hoverIndex];
+                                inv[hoverIndex] = value;
                                 inv[this.trackedTileIndex] = currentlyOccupiedSpot;
                             }
                             this.trackedTile = null;
@@ -4274,6 +4258,23 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point",
                         else { // track
                             this.trackedTile.transform.position = this.trackedTile.transform.position.plus(updateData.input.mousePos.minus(this.lastMousPos));
                         }
+                    }
+                    else if (hoverIndex !== -1 && !!inv[hoverIndex]) { // we're hovering over an item
+                        this.tooltip.position = updateData.input.mousePos;
+                        var stack = inv[hoverIndex];
+                        var name_1 = Items_3.ITEM_METADATA_MAP[stack.item].displayName;
+                        var count = stack.count > 1 ? ' x' + stack.count : '';
+                        var placeableElement = Items_3.ITEM_METADATA_MAP[stack.item].element;
+                        var placePrompt = !!placeableElement ? " [" + Controls_2.Controls.keyString(Controls_2.Controls.placeElementButton) + " to place]" : '';
+                        this.tooltip.say("" + name_1 + count + placePrompt);
+                        if (!!placeableElement && updateData.input.isKeyDown(Controls_2.Controls.placeElementButton)) {
+                            this.close();
+                            // TODO this won't work properly with items that stack
+                            PlaceElementDisplay_2.PlaceElementDisplay.instance.startPlacing(placeableElement, function () { return inv[hoverIndex] = null; });
+                        }
+                    }
+                    else {
+                        this.tooltip.clear();
                     }
                     this.lastMousPos = updateData.input.mousePos;
                     if (updateData.input.isMouseDown) {

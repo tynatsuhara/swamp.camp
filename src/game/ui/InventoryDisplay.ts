@@ -64,10 +64,26 @@ export class InventoryDisplay extends Component {
             return
         }
 
-        const newIndex = this.getInventoryIndexForPosition(updateData.input.mousePos)
-        if (newIndex !== -1 && !!inv[newIndex]) {  // we're hovering over an item
+        const hoverIndex = this.getInventoryIndexForPosition(updateData.input.mousePos)
+
+        if (!!this.trackedTile) {  // dragging
+            this.tooltip.clear()
+            if (updateData.input.isMouseUp) {  // drop n swap
+                if (hoverIndex !== -1) {
+                    const value = inv[this.trackedTileIndex]
+                    const currentlyOccupiedSpot = inv[hoverIndex]
+                    inv[hoverIndex] = value
+                    inv[this.trackedTileIndex] = currentlyOccupiedSpot
+                }
+                this.trackedTile = null
+                // refresh view
+                this.show(updateData.dimensions)
+            } else {  // track
+                this.trackedTile.transform.position = this.trackedTile.transform.position.plus(updateData.input.mousePos.minus(this.lastMousPos))
+            }
+        } else if (hoverIndex !== -1 && !!inv[hoverIndex]) {  // we're hovering over an item
             this.tooltip.position = updateData.input.mousePos
-            const stack = inv[newIndex]
+            const stack = inv[hoverIndex]
             const name = ITEM_METADATA_MAP[stack.item].displayName
             const count = stack.count > 1 ? ' x' + stack.count : ''
             const placeableElement = ITEM_METADATA_MAP[stack.item].element
@@ -77,26 +93,10 @@ export class InventoryDisplay extends Component {
             if (!!placeableElement && updateData.input.isKeyDown(Controls.placeElementButton)) {
                 this.close()
                 // TODO this won't work properly with items that stack
-                PlaceElementDisplay.instance.startPlacing(placeableElement, () => inv[newIndex] = null)
+                PlaceElementDisplay.instance.startPlacing(placeableElement, () => inv[hoverIndex] = null)
             }
         } else {
             this.tooltip.clear()
-        }
-        
-        if (!!this.trackedTile) {
-            if (updateData.input.isMouseUp) {  // drop n swap
-                if (newIndex !== -1) {
-                    const value = inv[this.trackedTileIndex]
-                    const currentlyOccupiedSpot = inv[newIndex]
-                    inv[newIndex] = value
-                    inv[this.trackedTileIndex] = currentlyOccupiedSpot
-                }
-                this.trackedTile = null
-                // refresh view
-                this.show(updateData.dimensions)
-            } else {  // track
-                this.trackedTile.transform.position = this.trackedTile.transform.position.plus(updateData.input.mousePos.minus(this.lastMousPos))
-            }
         }
 
         this.lastMousPos = updateData.input.mousePos
