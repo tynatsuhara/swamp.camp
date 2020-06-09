@@ -13,7 +13,7 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 
 export class MapGenerator {
 
-    static readonly MAP_SIZE = 60
+    static readonly MAP_SIZE = 70
     static readonly ENTER_LAND_POS = new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE).plusY(-TILE_SIZE * 10).plusX(TILE_SIZE * 2)
 
     private readonly location = LocationManager.instance.newLocation(false)
@@ -55,15 +55,18 @@ export class MapGenerator {
 
     clearPathToCenter() {
         const typesToClear = [ElementType.ROCK, ElementType.TREE]
-        // these are magic numbers based on the intro cutscene 
-        for (let x = 14; x < MapGenerator.MAP_SIZE/2; x++) {
-            for (let y = 15; y < 17; y++) {
+
+        // clear in corner
+        for (let x = MapGenerator.MAP_SIZE/2-11; x < MapGenerator.MAP_SIZE/2; x++) {
+            for (let y = MapGenerator.MAP_SIZE/2-10; y < MapGenerator.MAP_SIZE/2-8; y++) {
                 const element = this.location.elements.get(new Point(x, y))
                 if (!!element && typesToClear.indexOf(element.type) !== -1) {
                     this.location.elements.removeAll(element)
                 }
             }
         }
+
+        // clear around tent
         const clearingCorner = this.tentPos.minus(new Point(1, 0))
         for (let x = 0; x < 6; x++) {
             for (let y = 0; y < 4; y++) {

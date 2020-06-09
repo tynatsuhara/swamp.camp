@@ -22,6 +22,7 @@ import { WorldTime } from "./world/WorldTime"
 import { EventQueue } from "./world/events/EventQueue"
 import { Component } from "../engine/component"
 import { TileComponent } from "../engine/tiles/TileComponent"
+import { GroundRenderer } from "./world/GroundRenderer"
 
 
 const ZOOM = 3
@@ -47,6 +48,7 @@ export class QuestGame extends Game {
         new Camera()
         new CutsceneManager()
         new PointLightMaskRenderer()
+        new GroundRenderer()
 
         if (!SaveManager.instance.load()) {
             this.newGame()
@@ -99,7 +101,8 @@ export class QuestGame extends Game {
             entities: LocationManager.instance.currentLocation.getEntities().concat([
                 CutsceneManager.instance.getEntity(), 
                 WorldTime.instance.getEntity(), 
-                PointLightMaskRenderer.instance.getEntity()
+                PointLightMaskRenderer.instance.getEntity(),
+                GroundRenderer.instance.getEntity(),
             ])
         }
 
