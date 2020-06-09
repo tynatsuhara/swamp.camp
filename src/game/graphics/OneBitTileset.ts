@@ -80,6 +80,8 @@ export class OneBitTileset extends SingleFileTileLoader {
             ["autosave", new Point(18, 8)],
             ["campfire", new Point(14, 10)],
             ["keycap", new Point(25, 15)],
+            ["leftClick", new Point(29, 15)],
+            ["rightClick", new Point(30, 15)],
         ]))
     }
 }

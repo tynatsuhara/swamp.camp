@@ -31,15 +31,6 @@ export class HUD {
         new OffScreenMarker()
     )
 
-    // TODO show this based on cutscene
-    private wasdPos = new Point(50, 50)  // top left corner of W
-    private wasdEntity = new Entity([
-        new KeyPressIndicator(this.wasdPos, InputKey.W),
-        new KeyPressIndicator(this.wasdPos.plus(new Point(-TILE_SIZE, TILE_SIZE)), InputKey.A),
-        new KeyPressIndicator(this.wasdPos.plusY(TILE_SIZE), InputKey.S),
-        new KeyPressIndicator(this.wasdPos.plus(new Point(TILE_SIZE, TILE_SIZE)), InputKey.D)
-    ])
-
 
 
     constructor() {
@@ -50,7 +41,7 @@ export class HUD {
         this.updateHearts(player.health, player.maxHealth)
         this.updateAutosave(screenDimensions, elapsedMillis);
 
-        return [this.heartsEntity, this.autosaveComponent.entity, this.wasdEntity]
+        return [this.heartsEntity, this.autosaveComponent.entity]
     }
 
     private updateHearts(health: number, maxHealth: number) {

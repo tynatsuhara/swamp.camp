@@ -14,9 +14,10 @@ export class UpdateViewsContext {
     readonly dimensions: Point
 }
 
-export class StartData {}
 export class AwakeData {}
-
+export class StartData {
+    readonly dimensions: Point
+}
 export class UpdateData {
     readonly view: View
     readonly elapsedTimeMillis: number
@@ -64,7 +65,9 @@ export class Engine {
             views.forEach(v => {
                 v.entities = v.entities.filter(e => !!e)
 
-                const startData: StartData = {}
+                const startData: StartData = {
+                    dimensions: updateViewsContext.dimensions.div(v.zoom)
+                }
                 const updateData: UpdateData = {
                     view: v,
                     elapsedTimeMillis: updateViewsContext.elapsedTimeMillis,

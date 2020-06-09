@@ -1,4 +1,4 @@
-import { UpdateData, StartData } from "./engine"
+import { UpdateData, StartData, AwakeData } from "./engine"
 import { Entity } from "./Entity"
 import { RenderMethod } from "./renderer/RenderMethod"
 
@@ -11,7 +11,7 @@ export abstract class Component {
      * Called once, immediately after entity is defined and before start() is called.
      * It is safe to add additional components to the entity in this function.
      */
-    awake(awakeData: StartData) {}
+    awake(awakeData: AwakeData) {}
     
     /**
      * Called once, after the component is added to a valid entity and before update() is called

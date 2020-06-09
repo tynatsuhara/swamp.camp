@@ -8,11 +8,14 @@ import { ButtonsMenu } from "./ButtonsMenu"
 import { Color } from "./Color"
 import { SaveManager } from "../SaveManager"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
+import { makeControlsUI } from "./ControlsUI"
+import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
 
 export class PauseMenu extends Component {
 
     private readonly e: Entity = new Entity([this])  // entity for this component
     private displayEntity: Entity
+    private controlsDisplay: Entity
     isOpen = false
 
     update(updateData: UpdateData) {
@@ -28,6 +31,7 @@ export class PauseMenu extends Component {
     close() {
         this.isOpen = false
         this.displayEntity = null
+        this.controlsDisplay = null
     }
 
     show(dimensions: Point) {
@@ -49,9 +53,14 @@ export class PauseMenu extends Component {
                 buttonColor, textColor, hoverColor,
             }]
         )
+        this.controlsDisplay = new Entity([new BasicRenderComponent(...makeControlsUI(dimensions, Point.ZERO))])
     }
 
     getEntities(): Entity[] {
-        return [this.e, this.displayEntity]
+        return [
+            this.e, 
+            this.displayEntity,
+            this.controlsDisplay
+        ]
     }
 }

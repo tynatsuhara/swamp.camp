@@ -9,6 +9,8 @@ import { Dude } from "../characters/Dude"
 import { LocationManager } from "../world/LocationManager"
 import { DudeFaction, DudeType } from "../characters/DudeFactory"
 import { Dialogue } from "../characters/Dialogue"
+import { makeControlsUI } from "../ui/ControlsUI"
+import { RenderMethod } from "../../engine/renderer/RenderMethod"
 
 // This is the cutscene that plays when the player arrives in the new land
 export class IntroCutscene extends Component {
@@ -17,10 +19,12 @@ export class IntroCutscene extends Component {
     private readonly STOP_WALKING_IN = 2000
     private readonly PAN_TO_DIP = this.STOP_WALKING_IN + 750
     private readonly PAN_BACK = this.PAN_TO_DIP + 2000
+    private readonly HIDE_CONTROLS = this.PAN_BACK + 7000
 
     private waitingForOrcsToDie = false
     private orcs: Dude[]
     private dip: Dude
+    private showControls = false
 
     /**
      * 1. position player in corner
@@ -48,9 +52,14 @@ export class IntroCutscene extends Component {
         }, this.PAN_TO_DIP)
 
         setTimeout(() => { 
+            this.showControls = true
             Camera.instance.focusOnDude(Player.instance.dude)
             this.waitingForOrcsToDie = true
         }, this.PAN_BACK)
+        
+        setTimeout(() => {
+            this.showControls = false
+        }, this.HIDE_CONTROLS);
     }
 
     update(updateData: UpdateData) {
@@ -69,5 +78,12 @@ export class IntroCutscene extends Component {
 
             CutsceneManager.instance.finishCutscene()
         }
+    }
+
+    getRenderMethods(): RenderMethod[] {
+        if (this.showControls) {
+            return makeControlsUI(Camera.instance.dimensions, Camera.instance.position)
+        }
+        return []
     }
 }
