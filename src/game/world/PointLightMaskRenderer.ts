@@ -18,7 +18,7 @@ export class PointLightMaskRenderer {
     static instance: PointLightMaskRenderer
 
     // no lights should live outside of this range
-    private size = MapGenerator.MAP_SIZE * TILE_SIZE * 2
+    private size = MapGenerator.MAP_SIZE * TILE_SIZE// * 2
     private shift = new Point(this.size/2, this.size/2)
 
     private lightTiles: Map<WorldLocation, Grid<number>> = new Map<WorldLocation, Grid<number>>()
@@ -127,7 +127,7 @@ export class PointLightMaskRenderer {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
         const location = LocationManager.instance.currentLocation
-        if (location.isInterior) {
+        if (location.isInterior || this.darkness === 0) {
             return
         }
         

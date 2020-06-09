@@ -5694,7 +5694,7 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                 function PointLightMaskRenderer() {
                     var _this = this;
                     // no lights should live outside of this range
-                    this.size = MapGenerator_3.MapGenerator.MAP_SIZE * Tilesets_20.TILE_SIZE * 2;
+                    this.size = MapGenerator_3.MapGenerator.MAP_SIZE * Tilesets_20.TILE_SIZE; // * 2
                     this.shift = new point_40.Point(this.size / 2, this.size / 2);
                     this.lightTiles = new Map();
                     this.gridDirty = true;
@@ -5787,7 +5787,7 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                     this.updateColorForTime();
                     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
                     var location = LocationManager_11.LocationManager.instance.currentLocation;
-                    if (location.isInterior) {
+                    if (location.isInterior || this.darkness === 0) {
                         return;
                     }
                     this.context.fillStyle = this.color;
