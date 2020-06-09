@@ -8463,7 +8463,7 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/Connec
                     console.log(str);
                     return grid;
                 };
-                MapGenerator.MAP_SIZE = 50; // TODO maybe increase this a lil
+                MapGenerator.MAP_SIZE = 60;
                 MapGenerator.ENTER_LAND_POS = new point_56.Point(1, 1).times(MapGenerator.MAP_SIZE / 2 * Tilesets_32.TILE_SIZE).plusY(-Tilesets_32.TILE_SIZE * 10).plusX(Tilesets_32.TILE_SIZE * 2);
                 return MapGenerator;
             }());

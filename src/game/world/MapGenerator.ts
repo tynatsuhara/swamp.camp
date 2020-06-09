@@ -13,7 +13,7 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 
 export class MapGenerator {
 
-    static readonly MAP_SIZE = 50  // TODO maybe increase this a lil
+    static readonly MAP_SIZE = 60
     static readonly ENTER_LAND_POS = new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE).plusY(-TILE_SIZE * 10).plusX(TILE_SIZE * 2)
 
     private readonly location = LocationManager.instance.newLocation(false)
