@@ -158,7 +158,7 @@ export class InventoryDisplay extends Component {
 
         this.offset = new Point(
             Math.floor(screenDimensions.x/2 - displayDimensions.x/2),
-            Math.floor(screenDimensions.y/6)
+            Math.floor(screenDimensions.y/5)
         )
 
         this.displayEntity = new Entity()
