@@ -30,5 +30,17 @@ export const Color = {
     LIGHT_BROWN: "#aa8d7a",
     BROWN: "#775c55",
     DARK_BROWN: "#483b3ai",
+
+    /**
+     * @param colorString A string from the Color object
+     * @param a alpha double 0-1
+     */
+    getRGB: (colorString: string): number[] => {
+        const noHash = colorString.replace("#", "")
+        const r = parseInt(noHash.substring(0, 2), 16)
+        const g = parseInt(noHash.substring(2, 4), 16)
+        const b = parseInt(noHash.substring(4, 6), 16)
+        return [r, g, b]
+    }
 }
 

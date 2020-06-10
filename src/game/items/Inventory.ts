@@ -46,6 +46,26 @@ export class Inventory {
         return false
     }
 
+    canAddItem(item: Item): boolean {
+        let firstEmptySlot = -1
+        for (let i = 0; i < this.inventory.length; i++) {
+            const slotValue = this.inventory[i]
+            if (!!slotValue) {
+                if (slotValue.item === item && slotValue.count < ITEM_METADATA_MAP[item].stackLimit) {
+                    return true
+                }
+            } else if (firstEmptySlot === -1) {
+                firstEmptySlot = i
+            }
+        }
+
+        if (firstEmptySlot !== -1) {
+            return true
+        }
+
+        return false
+    }
+
     removeItem(item: Item, count: number = 1) {
         const currentCount = this.getItemCount(item)
         if (currentCount < count) {

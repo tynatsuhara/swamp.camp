@@ -1,4 +1,4 @@
-import { DialogueInstance, dialogueWithOptions, Dialogue, dialogue, option, NextDialogue, saveAfterDialogueStage } from "../Dialogue"
+import { DialogueInstance, dialogueWithOptions, Dialogue, dialogue, option, NextDialogue, saveAfterDialogueStage, DialogueOption, inv } from "../Dialogue"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { Player } from "../Player"
 import { Item } from "../../items/Items"
@@ -8,8 +8,23 @@ import { ElementType } from "../../world/elements/Elements"
 import { EventQueue } from "../../world/events/EventQueue"
 import { QueuedEventType } from "../../world/events/QueuedEvent"
 import { WorldTime } from "../../world/WorldTime"
+import { CraftingMenu } from "../../ui/CraftingMenu"
+import { CraftingRecipeCategory } from "../../items/CraftingRecipe"
+import { ItemStack } from "../../items/Inventory"
+import { Tilesets } from "../../graphics/Tilesets"
+import { Point } from "../../../engine/point"
 
 const ROCKS_NEEDED_FOR_CAMPFIRE = 10
+const WOOD_NEEDED_FOR_CAMPFIRE = 5
+
+const getDipRecipes = (): CraftingRecipeCategory[] => [{ 
+    icon: Tilesets.instance.oneBit.getTileAt(new Point(0, 1)),
+    name: "Outdoor Furniture",
+    recipes: [{
+        output: Item.CAMPFIRE,
+        input: [new ItemStack(Item.ROCK, ROCKS_NEEDED_FOR_CAMPFIRE), new ItemStack(Item.WOOD, WOOD_NEEDED_FOR_CAMPFIRE)],
+    }],
+}]
 
 // TODO: make DIP introduce himself, have player input their name
 
@@ -29,32 +44,31 @@ export const DIP_INTRO_DIALOGUE: { [key: number]: () => DialogueInstance } = {
     [Dialogue.DIP_BEFRIEND]: () => dialogue([
         "You know, this is a very dangerous place. It's tough to survive without someone watching your back.",
         "How about I help you set up camp? I know these woods better than anyone.",
-        "I'll put together a tent for you, if you collect rocks for a campfire.",
+        "I'll put together a tent for you, if you collect rocks and wood for a campfire.",
     ], () => new NextDialogue(Dialogue.DIP_MAKE_CAMPFIRE, false)),
     
     [Dialogue.DIP_MAKE_CAMPFIRE]: () => {
-        if (Player.instance.dude.inventory.getItemCount(Item.ROCK) >= ROCKS_NEEDED_FOR_CAMPFIRE) {
+        if (inv().getItemCount(Item.CAMPFIRE) > 0) {
+            return dialogue(
+                [`Great! Try placing the campfire down near my tent. You can open your inventory by pressing [${String.fromCharCode(Controls.inventoryButton)}].`], 
+                () =>  new NextDialogue(Dialogue.DIP_CAMPFIRE_DONE, false)
+            )
+        } else if (inv().getItemCount(Item.ROCK) >= ROCKS_NEEDED_FOR_CAMPFIRE && inv().getItemCount(Item.WOOD) >= WOOD_NEEDED_FOR_CAMPFIRE) {
             return dialogueWithOptions(
-                [`It looks like you have enough rocks. Can I have ${ROCKS_NEEDED_FOR_CAMPFIRE} to make a campfire?`],
+                [`It looks like you have enough rocks and wood. Should we put together a campfire?`],
                 DudeInteractIndicator.IMPORTANT_DIALOGUE,
-                option("<Give rocks>", Dialogue.DIP_ROCKS_RECEIVED),
+                new DialogueOption("<Craft>", () => {
+                    CraftingMenu.instance.show(getDipRecipes())
+                    return new NextDialogue(Dialogue.DIP_MAKE_CAMPFIRE, false)
+                }),
                 option("Not yet.", Dialogue.DIP_MAKE_CAMPFIRE, false)
             )
         } else {
-            return dialogue([`We need ${ROCKS_NEEDED_FOR_CAMPFIRE} rocks to make a campfire. Try hitting big rocks with your sword!`], () => new NextDialogue(Dialogue.DIP_MAKE_CAMPFIRE, false))
+            return dialogue(
+                [`We need ${ROCKS_NEEDED_FOR_CAMPFIRE} rocks and ${WOOD_NEEDED_FOR_CAMPFIRE} wood to make a campfire. Try hitting big rocks and trees with your sword!`], 
+                () => new NextDialogue(Dialogue.DIP_MAKE_CAMPFIRE, false)
+            )
         }
-    },
-    
-    [Dialogue.DIP_ROCKS_RECEIVED]: () => {
-        return dialogue(
-            [`Great! Try placing the campfire down near my tent. You can open your inventory by pressing [${String.fromCharCode(Controls.inventoryButton)}].`], 
-            () => {
-                saveAfterDialogueStage()
-                Player.instance.dude.inventory.removeItem(Item.ROCK, ROCKS_NEEDED_FOR_CAMPFIRE)
-                Player.instance.dude.inventory.addItem(Item.CAMPFIRE)
-                return new NextDialogue(Dialogue.DIP_CAMPFIRE_DONE, false)
-            }
-        )
     },
 
     [Dialogue.DIP_CAMPFIRE_DONE]: () => {
@@ -71,7 +85,7 @@ export const DIP_INTRO_DIALOGUE: { [key: number]: () => DialogueInstance } = {
                 lines.push(`By the way, you can light the fire by standing close to it and pressing [${Controls.keyString(Controls.interactButton)}].`)
             }
             return dialogue(lines, () => {  // TODO actually decide what should happen here
-                Player.instance.dude.inventory.addItem(Item.TENT)
+                inv().addItem(Item.TENT)
                 EventQueue.instance.addEvent({
                     type: QueuedEventType.TRADER_ARRIVAL,
                     time: WorldTime.instance.future({ minutes: 10 })

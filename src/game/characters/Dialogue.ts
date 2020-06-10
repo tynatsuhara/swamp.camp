@@ -2,6 +2,7 @@ import { SaveManager } from "../SaveManager"
 import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
 import { DIP_INTRO_DIALOGUE } from "./dialogues/DipIntro"
 import { BERTO_INTRO_DIALOGUE } from "./dialogues/BertoIntro"
+import { Player } from "./Player"
 
 export class DialogueInstance {
     readonly lines: string[]
@@ -39,8 +40,9 @@ export const saveAfterDialogueStage = () => {
     // save after a delay to account for the next dialogue stage being set
     setTimeout(() => SaveManager.instance.save(), 500)
 }
+export const inv = () => Player.instance.dude.inventory
 
-class DialogueOption {
+export class DialogueOption {
     readonly text: string
     readonly next: () => void|NextDialogue
 
@@ -62,7 +64,7 @@ export class NextDialogue {
 
 export const enum Dialogue {
     NONE = 0,
-    DIP_0, DIP_1, DIP_2, DIP_3, DIP_BEFRIEND, DIP_MAKE_CAMPFIRE, DIP_ROCKS_RECEIVED, DIP_CAMPFIRE_DONE,
+    DIP_0, DIP_1, DIP_2, DIP_3, DIP_BEFRIEND, DIP_MAKE_CAMPFIRE, DIP_CAMPFIRE_DONE,
     BERT_0,
 }
 
