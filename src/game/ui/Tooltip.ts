@@ -20,7 +20,7 @@ export class Tooltip extends Component {
     private center: TileComponent
     private right: TileComponent
 
-    constructor(text: string) {
+    constructor(text: string = null) {
         super()
 
         this.text = text
@@ -62,6 +62,12 @@ export class Tooltip extends Component {
         this.right.transform.position = rightPos
 
         this.center.transform.dimensions = new Point(width + Tooltip.margin * 2 - TILE_SIZE*2, TILE_SIZE)
+
+        const totalWidth = width + Tooltip.margin * 2
+        if (this.position.x + totalWidth > updateData.dimensions.x) {
+            // shift left
+            tiles.forEach(t => t.transform.position = t.transform.position.plusX(-totalWidth - TILE_SIZE))
+        }
     }
 
     getRenderMethods() {
