@@ -5677,7 +5677,7 @@ System.register("game/world/elements/Tent", ["engine/point", "game/graphics/Tile
                 var sourceTeleporter = { to: destinationUUID, pos: interactablePos.plusY(12) };
                 wl.addTeleporter(sourceTeleporter);
                 // Set up tiles
-                var depth = (pos.y + 1) * Tilesets_20.TILE_SIZE + /* prevent clipping */ 5;
+                var depth = (pos.y + 1) * Tilesets_20.TILE_SIZE + /* prevent clipping */ 1;
                 addTile(wl, e, color + "tentNW", pos.plusX(1), depth);
                 addTile(wl, e, color + "tentNE", pos.plus(new point_41.Point(2, 0)), depth);
                 addTile(wl, e, color + "tentSW", pos.plus(new point_41.Point(1, 1)), depth);

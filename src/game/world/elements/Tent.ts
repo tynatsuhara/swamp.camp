@@ -29,7 +29,7 @@ export const makeTent = (wl: WorldLocation, pos: Point, data: object): ElementCo
     wl.addTeleporter(sourceTeleporter)
     
     // Set up tiles
-    const depth = (pos.y + 1) * TILE_SIZE + /* prevent clipping */ 5
+    const depth = (pos.y + 1) * TILE_SIZE + /* prevent clipping */ 1
     addTile(wl, e, `${color}tentNW`, pos.plusX(1), depth)
     addTile(wl, e, `${color}tentNE`, pos.plus(new Point(2, 0)), depth)
     addTile(wl, e, `${color}tentSW`, pos.plus(new Point(1, 1)), depth)
