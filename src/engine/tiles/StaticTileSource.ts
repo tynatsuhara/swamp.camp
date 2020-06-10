@@ -39,4 +39,19 @@ export class StaticTileSource implements TileSource {
     toComponent(transform: TileTransform = new TileTransform()): TileComponent {
         return new TileComponent(this, transform)
     }
+
+    filtered(filter: (img: ImageData) => void): StaticTileSource {
+        const canvas = document.createElement("canvas")
+        canvas.width = this.dimensions.x
+        canvas.height = this.dimensions.y
+        const context = canvas.getContext("2d")
+        context.imageSmoothingEnabled = false
+        
+        context.drawImage(this.image, this.position.x, this.position.y, this.dimensions.x, this.dimensions.y, 0, 0, this.dimensions.x, this.dimensions.y)
+        const imageData = context.getImageData(0, 0, this.dimensions.x, this.dimensions.y)
+        filter(imageData)
+        context.putImageData(imageData, 0, 0)
+
+        return new StaticTileSource(canvas, Point.ZERO, this.dimensions)
+    }
 }
