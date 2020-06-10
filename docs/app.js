@@ -5191,10 +5191,11 @@ System.register("game/ui/ControlsUI", ["game/ui/KeyPressIndicator", "engine/poin
         execute: function () {
             exports_71("makeControlsUI", makeControlsUI = function (dimensions, offset) {
                 var topLeft = new point_33.Point(dimensions.x / 2 - Tilesets_15.TILE_SIZE * 4, dimensions.y / 2 - Tilesets_15.TILE_SIZE * 5).plus(offset);
+                var mouseButtVertOffset = 5;
                 return __spreadArrays(new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusX(Tilesets_15.TILE_SIZE), 87 /* W */).getRenderMethods(), new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusY(Tilesets_15.TILE_SIZE), 65 /* A */).getRenderMethods(), new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusX(Tilesets_15.TILE_SIZE).plusY(Tilesets_15.TILE_SIZE), 83 /* S */).getRenderMethods(), new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusX(Tilesets_15.TILE_SIZE * 2).plusY(Tilesets_15.TILE_SIZE), 68 /* D */).getRenderMethods(), [
-                    Tilesets_15.Tilesets.instance.oneBit.getTileSource("leftClick").toImageRender(new TileTransform_13.TileTransform(topLeft.plusX(Tilesets_15.TILE_SIZE * 4))),
-                    Tilesets_15.Tilesets.instance.oneBit.getTileSource("rightClick").toImageRender(new TileTransform_13.TileTransform(topLeft.plusX(Tilesets_15.TILE_SIZE * 4).plusY(Tilesets_15.TILE_SIZE * 1)))
-                ], Text_6.formatText("MOVE", Color_4.Color.WHITE, topLeft.plusX(Tilesets_15.TILE_SIZE / 2).plusY(Tilesets_15.TILE_SIZE * 2 + 2), 100), Text_6.formatText("ATTACK", Color_4.Color.WHITE, topLeft.plusX(Tilesets_15.TILE_SIZE * 5).plusY(4), 100), Text_6.formatText("BLOCK", Color_4.Color.WHITE, topLeft.plusX(Tilesets_15.TILE_SIZE * 5).plusY(Tilesets_15.TILE_SIZE + 4), 100)).map(function (r) {
+                    Tilesets_15.Tilesets.instance.oneBit.getTileSource("leftClick").toImageRender(new TileTransform_13.TileTransform(topLeft.plusX(Tilesets_15.TILE_SIZE * 4).plusY(mouseButtVertOffset))),
+                    Tilesets_15.Tilesets.instance.oneBit.getTileSource("rightClick").toImageRender(new TileTransform_13.TileTransform(topLeft.plusX(Tilesets_15.TILE_SIZE * 4).plusY(Tilesets_15.TILE_SIZE * 1 + mouseButtVertOffset)))
+                ], Text_6.formatText("MOVE", Color_4.Color.WHITE, topLeft.plusX(Tilesets_15.TILE_SIZE / 2).plusY(Tilesets_15.TILE_SIZE * 2 + 2), 100), Text_6.formatText("ATTACK", Color_4.Color.WHITE, topLeft.plusX(Tilesets_15.TILE_SIZE * 5).plusY(4 + mouseButtVertOffset), 100), Text_6.formatText("BLOCK", Color_4.Color.WHITE, topLeft.plusX(Tilesets_15.TILE_SIZE * 5).plusY(Tilesets_15.TILE_SIZE + 4 + mouseButtVertOffset), 100)).map(function (r) {
                     r.depth = UIStateManager_8.UIStateManager.UI_SPRITE_DEPTH;
                     return r;
                 });
