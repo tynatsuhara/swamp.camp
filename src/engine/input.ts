@@ -81,6 +81,7 @@ export class Input {
         this.isMouseUp = false
         this.isRightMouseDown = false
         this.isRightMouseUp = false
+        this.mouseWheelDeltaY = 0
 
         return this.lastCapture
     }
