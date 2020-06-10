@@ -5,6 +5,7 @@ import { Point } from "../point"
 import { TileComponent } from "./TileComponent"
 import { AnimatedTileComponent } from "./AnimatedTileComponent"
 
+// TODO rename this to align with the interface
 export class TileSetAnimation implements TileSource {
     readonly frames: [StaticTileSource, number][]; // a list of (source, duration)
     
@@ -21,5 +22,9 @@ export class TileSetAnimation implements TileSource {
 
     toComponent(transform: TileTransform = new TileTransform()): TileComponent {
         return new AnimatedTileComponent([this])
+    }
+
+    filtered(filter: (img: ImageData) => void): TileSetAnimation {
+        return new TileSetAnimation(this.frames.map(f => [f[0].filtered(filter), f[1]]))
     }
 }
