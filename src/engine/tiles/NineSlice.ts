@@ -87,7 +87,7 @@ export const NineSlice = {
                 c.transform.relativeTo(mainTransform)
             }
         })
-        mainTransform.position = mainTransform.position.plus(pos)
+        mainTransform.position = mainTransform.position.plus(pos).apply(Math.floor)
 
         return tiles
     },
