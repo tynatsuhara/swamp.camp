@@ -6,11 +6,12 @@ import { Point } from "../../engine/point"
 import { TileSource } from "../../engine/tiles/TileSource"
 import { Collider } from "../../engine/collision/Collider"
 import { ElementType, Elements } from "../world/elements/Elements"
+import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 
 export class ItemMetadata {
     readonly displayName: string
     readonly droppedIconSupplier: () => TileSource
-    readonly inventoryIconSupplier: () => TileSource
+    readonly inventoryIconSupplier: () => StaticTileSource
     readonly stackLimit: number
     readonly element: ElementType
 
@@ -18,7 +19,7 @@ export class ItemMetadata {
     constructor(
         displayName: string,
         droppedIconSupplier: () => TileSource,
-        inventoryIconSupplier: () => TileSource,
+        inventoryIconSupplier: () => StaticTileSource,
         stackLimit: number = Number.MAX_SAFE_INTEGER,
         element: ElementType = null,  // for placing elements
     ) {

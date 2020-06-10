@@ -5,8 +5,8 @@ import { TileComponent } from "./TileComponent"
 import { TileSource } from "./TileSource"
 
 export class StaticTileSource implements TileSource {
-    private image: CanvasImageSource
-    private position: Point
+    readonly image: CanvasImageSource
+    readonly position: Point
     readonly dimensions: Point
 
     /**
