@@ -12,6 +12,7 @@ import { Controls } from "../Controls"
 import { Lists } from "../../engine/util/Lists"
 import { PointLightMaskRenderer } from "../world/PointLightMaskRenderer"
 import { TILE_SIZE } from "../graphics/Tilesets"
+import { LocationManager } from "../world/LocationManager"
 
 export class Player extends Component {
 
@@ -52,7 +53,10 @@ export class Player extends Component {
             if (updateData.input.isKeyHeld(InputKey.D)) { dx++ }
         }
 
-        // PointLightMaskRenderer.instance.removeLight(this.dude.standingPosition)
+        // TODO: - make this an unlockable feature
+        //       - instead of removing by position, map the light to a source object and remove based on that
+        // const lightPosOffset = -TILE_SIZE/2
+        // PointLightMaskRenderer.instance.removeLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset))
 
         this.dude.move(
             updateData, 
@@ -60,7 +64,7 @@ export class Player extends Component {
             updateData.input.mousePos.x - this.dude.standingPosition.x
         )
 
-        // PointLightMaskRenderer.instance.addLight(this.dude.standingPosition, 100)
+        // PointLightMaskRenderer.instance.addLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset), 100)
 
         if (UIStateManager.instance.isMenuOpen) {
             return

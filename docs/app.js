@@ -5751,6 +5751,7 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                     this.lightTiles = new Map();
                     this.gridDirty = true;
                     this.darkness = 0.4;
+                    this.circleCache = new Map();
                     PointLightMaskRenderer.instance = this;
                     this.canvas = document.createElement("canvas");
                     this.canvas.width = this.size;
@@ -5861,15 +5862,22 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                 PointLightMaskRenderer.prototype.makeLightCircle = function (diameter, position, alpha) {
                     var center = new point_42.Point(diameter / 2, diameter / 2).minus(new point_42.Point(.5, .5));
                     var imageData = this.context.getImageData(position.x, position.y, diameter, diameter);
-                    for (var x = 0; x < diameter; x++) {
-                        for (var y = 0; y < diameter; y++) {
-                            var i = (x + y * diameter) * 4;
-                            var pt = new point_42.Point(x, y);
-                            var withinCircle = pt.distanceTo(center) < diameter / 2;
-                            if (withinCircle) {
-                                // imageData.data[i+3] -= Math.max(0, Math.ceil(255 * alphaSubtraction))
-                                imageData.data[i + 3] = Math.min(imageData.data[i + 3], Math.ceil(255 * alpha));
+                    var cachedCircle = this.circleCache.get(diameter);
+                    if (!cachedCircle) {
+                        console.log("warming cache");
+                        cachedCircle = [];
+                        for (var x = 0; x < diameter; x++) {
+                            for (var y = 0; y < diameter; y++) {
+                                var i = (x + y * diameter) * 4;
+                                var pt = new point_42.Point(x, y);
+                                cachedCircle[i] = pt.distanceTo(center) < diameter / 2;
                             }
+                        }
+                        this.circleCache.set(diameter, cachedCircle);
+                    }
+                    for (var i = 0; i < cachedCircle.length; i += 4) {
+                        if (cachedCircle[i]) {
+                            imageData.data[i + 3] = Math.min(imageData.data[i + 3], Math.ceil(255 * alpha));
                         }
                     }
                     this.context.putImageData(imageData, position.x, position.y);
@@ -6714,9 +6722,12 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
                             dx++;
                         }
                     }
-                    // PointLightMaskRenderer.instance.removeLight(this.dude.standingPosition)
+                    // TODO: - make this an unlockable feature
+                    //       - instead of removing by position, map the light to a source object and remove based on that
+                    // const lightPosOffset = -TILE_SIZE/2
+                    // PointLightMaskRenderer.instance.removeLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset))
                     this.dude.move(updateData, new point_48.Point(dx, dy), updateData.input.mousePos.x - this.dude.standingPosition.x);
-                    // PointLightMaskRenderer.instance.addLight(this.dude.standingPosition, 100)
+                    // PointLightMaskRenderer.instance.addLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset), 100)
                     if (UIStateManager_13.UIStateManager.instance.isMenuOpen) {
                         return;
                     }

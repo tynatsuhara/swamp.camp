@@ -156,20 +156,30 @@ export class PointLightMaskRenderer {
         const center = new Point(diameter/2, diameter/2).minus(new Point(.5, .5))
         const imageData = this.context.getImageData(position.x, position.y, diameter, diameter)
 
-        for (let x = 0; x < diameter; x++) {
-            for (let y = 0; y < diameter; y++) {
-                const i = (x + y * diameter) * 4
-                const pt = new Point(x, y)
-                const withinCircle = pt.distanceTo(center) < diameter/2
-                if (withinCircle) {
-                    // imageData.data[i+3] -= Math.max(0, Math.ceil(255 * alphaSubtraction))
-                    imageData.data[i+3] = Math.min(imageData.data[i+3], Math.ceil(255 * alpha))
+        let cachedCircle = this.circleCache.get(diameter)
+        if (!cachedCircle) {
+            console.log("warming cache")
+            cachedCircle = []
+            for (let x = 0; x < diameter; x++) {
+                for (let y = 0; y < diameter; y++) {
+                    const i = (x + y * diameter) * 4
+                    const pt = new Point(x, y)
+                    cachedCircle[i] = pt.distanceTo(center) < diameter/2
                 }
+            }
+            this.circleCache.set(diameter, cachedCircle)
+        }
+
+        for (let i = 0; i < cachedCircle.length; i+=4) {
+            if (cachedCircle[i]) {
+                imageData.data[i+3] = Math.min(imageData.data[i+3], Math.ceil(255 * alpha))
             }
         }
 
         this.context.putImageData(imageData, position.x, position.y)
     }
+    
+    private readonly circleCache: Map<number, boolean[]> = new Map<number, boolean[]>()
 
     getEntity(): Entity {
         if (this.gridDirty || this.lastLocationRendered !== LocationManager.instance.currentLocation) {
