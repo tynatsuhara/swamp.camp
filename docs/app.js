@@ -5012,7 +5012,7 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
                             });
                             Player_5.Player.instance.dude.inventory.addItem(recipe.output);
                             this.justCraftedRow = r;
-                            setTimeout(function () { return _this.justCraftedRow = -1; }, 600);
+                            setTimeout(function () { return _this.justCraftedRow = -1; }, 900);
                         }
                         if (hovered && !this.canCraft(recipe)) {
                             if (!Player_5.Player.instance.dude.inventory.canAddItem(recipe.output)) {
@@ -5021,6 +5021,9 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
                             else if (recipe.input.some(function (input) { return Player_5.Player.instance.dude.inventory.getItemCount(input.item) < input.count; })) {
                                 this.tooltip.say("Need ingredients");
                             }
+                        }
+                        else if (hovered) {
+                            this.tooltip.say("Click to craft");
                         }
                         // craftable item
                         verticalOffset += margin;
@@ -5120,7 +5123,7 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
 });
 System.register("game/characters/dialogues/DipIntro", ["game/characters/Dialogue", "game/ui/DudeInteractIndicator", "game/Controls", "game/world/LocationManager", "game/world/events/EventQueue", "game/world/events/QueuedEvent", "game/world/WorldTime", "game/ui/CraftingMenu", "game/items/Inventory", "game/graphics/Tilesets", "engine/point"], function (exports_70, context_70) {
     "use strict";
-    var _a, Dialogue_1, DudeInteractIndicator_1, Controls_3, LocationManager_9, EventQueue_3, QueuedEvent_2, WorldTime_2, CraftingMenu_1, Inventory_1, Tilesets_16, point_35, ROCKS_NEEDED_FOR_CAMPFIRE, WOOD_NEEDED_FOR_CAMPFIRE, getDipRecipes, DIP_INTRO_DIALOGUE;
+    var _a, Dialogue_1, DudeInteractIndicator_1, Controls_3, LocationManager_9, EventQueue_3, QueuedEvent_2, WorldTime_2, CraftingMenu_1, Inventory_1, Tilesets_16, point_35, ROCKS_NEEDED_FOR_CAMPFIRE, WOOD_NEEDED_FOR_CAMPFIRE, CRAFT_OPTION, getDipRecipes, DIP_INTRO_DIALOGUE;
     var __moduleName = context_70 && context_70.id;
     return {
         setters: [
@@ -5161,6 +5164,7 @@ System.register("game/characters/dialogues/DipIntro", ["game/characters/Dialogue
         execute: function () {
             ROCKS_NEEDED_FOR_CAMPFIRE = 10;
             WOOD_NEEDED_FOR_CAMPFIRE = 5;
+            CRAFT_OPTION = "<Craft>";
             getDipRecipes = function () { return [{
                     icon: Tilesets_16.Tilesets.instance.oneBit.getTileAt(new point_35.Point(0, 1)),
                     name: "Outdoor Furniture",
@@ -5181,16 +5185,16 @@ System.register("game/characters/dialogues/DipIntro", ["game/characters/Dialogue
                     "I'll put together a tent for you, if you collect rocks and wood for a campfire.",
                 ], function () { return new Dialogue_1.NextDialogue(6 /* DIP_MAKE_CAMPFIRE */, false); }); },
                 _a[6 /* DIP_MAKE_CAMPFIRE */] = function () {
-                    if (Dialogue_1.inv().getItemCount(4 /* CAMPFIRE */) > 0) {
+                    if (Dialogue_1.inv().getItemCount(4 /* CAMPFIRE */) > 0) { // campfire has been crafted
                         return Dialogue_1.dialogue(["Great! Try placing the campfire down near my tent. You can open your inventory by pressing [" + String.fromCharCode(Controls_3.Controls.inventoryButton) + "]."], function () { return new Dialogue_1.NextDialogue(7 /* DIP_CAMPFIRE_DONE */, false); });
                     }
-                    else if (Dialogue_1.inv().getItemCount(1 /* ROCK */) >= ROCKS_NEEDED_FOR_CAMPFIRE && Dialogue_1.inv().getItemCount(2 /* WOOD */) >= WOOD_NEEDED_FOR_CAMPFIRE) {
-                        return Dialogue_1.dialogueWithOptions(["It looks like you have enough rocks and wood. Should we put together a campfire?"], DudeInteractIndicator_1.DudeInteractIndicator.IMPORTANT_DIALOGUE, new Dialogue_1.DialogueOption("<Craft>", function () {
+                    else if (Dialogue_1.inv().getItemCount(1 /* ROCK */) >= ROCKS_NEEDED_FOR_CAMPFIRE && Dialogue_1.inv().getItemCount(2 /* WOOD */) >= WOOD_NEEDED_FOR_CAMPFIRE) { // can craft
+                        return Dialogue_1.dialogueWithOptions(["It looks like you have enough rocks and wood. Should we put together a campfire?"], DudeInteractIndicator_1.DudeInteractIndicator.IMPORTANT_DIALOGUE, new Dialogue_1.DialogueOption(CRAFT_OPTION, function () {
                             CraftingMenu_1.CraftingMenu.instance.show(getDipRecipes());
                             return new Dialogue_1.NextDialogue(6 /* DIP_MAKE_CAMPFIRE */, false);
                         }), Dialogue_1.option("Not yet.", 6 /* DIP_MAKE_CAMPFIRE */, false));
                     }
-                    else {
+                    else { // do not have enough ingredients to craft
                         return Dialogue_1.dialogue(["We need " + ROCKS_NEEDED_FOR_CAMPFIRE + " rocks and " + WOOD_NEEDED_FOR_CAMPFIRE + " wood to make a campfire. Try hitting big rocks and trees with your sword!"], function () { return new Dialogue_1.NextDialogue(6 /* DIP_MAKE_CAMPFIRE */, false); });
                     }
                 },

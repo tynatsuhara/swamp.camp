@@ -16,6 +16,7 @@ import { Point } from "../../../engine/point"
 
 const ROCKS_NEEDED_FOR_CAMPFIRE = 10
 const WOOD_NEEDED_FOR_CAMPFIRE = 5
+const CRAFT_OPTION = "<Craft>"
 
 const getDipRecipes = (): CraftingRecipeCategory[] => [{ 
     icon: Tilesets.instance.oneBit.getTileAt(new Point(0, 1)),
@@ -48,22 +49,22 @@ export const DIP_INTRO_DIALOGUE: { [key: number]: () => DialogueInstance } = {
     ], () => new NextDialogue(Dialogue.DIP_MAKE_CAMPFIRE, false)),
     
     [Dialogue.DIP_MAKE_CAMPFIRE]: () => {
-        if (inv().getItemCount(Item.CAMPFIRE) > 0) {
+        if (inv().getItemCount(Item.CAMPFIRE) > 0) {  // campfire has been crafted
             return dialogue(
                 [`Great! Try placing the campfire down near my tent. You can open your inventory by pressing [${String.fromCharCode(Controls.inventoryButton)}].`], 
                 () =>  new NextDialogue(Dialogue.DIP_CAMPFIRE_DONE, false)
             )
-        } else if (inv().getItemCount(Item.ROCK) >= ROCKS_NEEDED_FOR_CAMPFIRE && inv().getItemCount(Item.WOOD) >= WOOD_NEEDED_FOR_CAMPFIRE) {
+        } else if (inv().getItemCount(Item.ROCK) >= ROCKS_NEEDED_FOR_CAMPFIRE && inv().getItemCount(Item.WOOD) >= WOOD_NEEDED_FOR_CAMPFIRE) {  // can craft
             return dialogueWithOptions(
                 [`It looks like you have enough rocks and wood. Should we put together a campfire?`],
                 DudeInteractIndicator.IMPORTANT_DIALOGUE,
-                new DialogueOption("<Craft>", () => {
+                new DialogueOption(CRAFT_OPTION, () => {
                     CraftingMenu.instance.show(getDipRecipes())
                     return new NextDialogue(Dialogue.DIP_MAKE_CAMPFIRE, false)
                 }),
                 option("Not yet.", Dialogue.DIP_MAKE_CAMPFIRE, false)
             )
-        } else {
+        } else {  // do not have enough ingredients to craft
             return dialogue(
                 [`We need ${ROCKS_NEEDED_FOR_CAMPFIRE} rocks and ${WOOD_NEEDED_FOR_CAMPFIRE} wood to make a campfire. Try hitting big rocks and trees with your sword!`], 
                 () => new NextDialogue(Dialogue.DIP_MAKE_CAMPFIRE, false)
