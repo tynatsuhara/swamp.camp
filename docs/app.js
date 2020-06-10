@@ -284,7 +284,7 @@ System.register("engine/input", ["engine/point"], function (exports_4, context_4
                     this.isRightMouseDown = false;
                     this.isRightMouseHeld = false;
                     this.isRightMouseUp = false;
-                    this.canvas = canvas;
+                    this.mouseWheelDeltaY = 0;
                     canvas.oncontextmenu = function () { return false; };
                     canvas.onmousedown = function (e) {
                         if (e.button === 0 /* LEFT */) {
@@ -310,16 +310,16 @@ System.register("engine/input", ["engine/point"], function (exports_4, context_4
                             _this.isRightMouseUp = true;
                         }
                     };
-                    canvas.onmousemove = function (e) {
-                        _this.mousePos = new point_3.Point(e.x - canvas.offsetLeft, e.y - canvas.offsetTop);
-                    };
+                    canvas.onmousemove = function (e) { return _this.mousePos = new point_3.Point(e.x - canvas.offsetLeft, e.y - canvas.offsetTop); };
+                    canvas.onwheel = function (e) { return _this.mouseWheelDeltaY = e.deltaY; };
                     window.onkeydown = function (e) { return _this.keys.add(e.keyCode); };
                     window.onkeyup = function (e) { return _this.keys.delete(e.keyCode); };
                 }
                 Input.prototype.captureInput = function () {
                     var _this = this;
+                    console.log();
                     var keys = Array.from(this.keys);
-                    this.lastCapture = new CapturedInput(new Set(keys.filter(function (key) { return !_this.lastCapture.isKeyHeld(key); })), new Set(keys.slice()), new Set(this.lastCapture.getKeysHeld().filter(function (key) { return !_this.keys.has(key); })), this.mousePos, this.isMouseDown, this.isMouseHeld, this.isMouseUp, this.isRightMouseDown, this.isRightMouseHeld, this.isRightMouseUp);
+                    this.lastCapture = new CapturedInput(new Set(keys.filter(function (key) { return !_this.lastCapture.isKeyHeld(key); })), new Set(keys.slice()), new Set(this.lastCapture.getKeysHeld().filter(function (key) { return !_this.keys.has(key); })), this.mousePos, this.isMouseDown, this.isMouseHeld, this.isMouseUp, this.isRightMouseDown, this.isRightMouseHeld, this.isRightMouseUp, this.mouseWheelDeltaY);
                     // reset since these should only be true for 1 tick
                     this.isMouseDown = false;
                     this.isMouseUp = false;
@@ -331,7 +331,7 @@ System.register("engine/input", ["engine/point"], function (exports_4, context_4
             }());
             exports_4("Input", Input);
             CapturedInput = /** @class */ (function () {
-                function CapturedInput(keysDown, keysHeld, keysUp, mousePos, isMouseDown, isMouseHeld, isMouseUp, isRightMouseDown, isRightMouseHeld, isRightMouseUp) {
+                function CapturedInput(keysDown, keysHeld, keysUp, mousePos, isMouseDown, isMouseHeld, isMouseUp, isRightMouseDown, isRightMouseHeld, isRightMouseUp, mouseWheelDeltaY) {
                     if (keysDown === void 0) { keysDown = new Set(); }
                     if (keysHeld === void 0) { keysHeld = new Set(); }
                     if (keysUp === void 0) { keysUp = new Set(); }
@@ -342,13 +342,8 @@ System.register("engine/input", ["engine/point"], function (exports_4, context_4
                     if (isRightMouseDown === void 0) { isRightMouseDown = false; }
                     if (isRightMouseHeld === void 0) { isRightMouseHeld = false; }
                     if (isRightMouseUp === void 0) { isRightMouseUp = false; }
+                    if (mouseWheelDeltaY === void 0) { mouseWheelDeltaY = 0; }
                     this.mousePos = new point_3.Point(0, 0);
-                    this.isMouseDown = false;
-                    this.isMouseHeld = false;
-                    this.isMouseUp = false;
-                    this.isRightMouseDown = false;
-                    this.isRightMouseHeld = false;
-                    this.isRightMouseUp = false;
                     this.keysDown = keysDown;
                     this.keysHeld = keysHeld;
                     this.keysUp = keysUp;
@@ -359,9 +354,10 @@ System.register("engine/input", ["engine/point"], function (exports_4, context_4
                     this.isRightMouseDown = isRightMouseDown;
                     this.isRightMouseHeld = isRightMouseHeld;
                     this.isRightMouseUp = isRightMouseUp;
+                    this.mouseWheelDeltaY = mouseWheelDeltaY;
                 }
                 CapturedInput.prototype.scaledForView = function (view) {
-                    return new CapturedInput(this.keysDown, this.keysHeld, this.keysUp, this.mousePos.div(view.zoom).minus(view.offset), this.isMouseDown, this.isMouseHeld, this.isMouseUp, this.isRightMouseDown, this.isRightMouseHeld, this.isRightMouseUp);
+                    return new CapturedInput(this.keysDown, this.keysHeld, this.keysUp, this.mousePos.div(view.zoom).minus(view.offset), this.isMouseDown, this.isMouseHeld, this.isMouseUp, this.isRightMouseDown, this.isRightMouseHeld, this.isRightMouseUp, this.mouseWheelDeltaY);
                 };
                 CapturedInput.prototype.getKeysHeld = function () {
                     return Array.from(this.keysUp);
@@ -5190,7 +5186,7 @@ System.register("game/ui/ControlsUI", ["game/ui/KeyPressIndicator", "engine/poin
         ],
         execute: function () {
             exports_71("makeControlsUI", makeControlsUI = function (dimensions, offset) {
-                var topLeft = new point_33.Point(dimensions.x / 2 - Tilesets_15.TILE_SIZE * 4, dimensions.y / 2 - Tilesets_15.TILE_SIZE * 5).plus(offset);
+                var topLeft = new point_33.Point(dimensions.x / 2 - Tilesets_15.TILE_SIZE * 4 + 1, dimensions.y / 2 - Tilesets_15.TILE_SIZE * 5).plus(offset);
                 var mouseButtVertOffset = 5;
                 return __spreadArrays(new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusX(Tilesets_15.TILE_SIZE), 87 /* W */).getRenderMethods(), new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusY(Tilesets_15.TILE_SIZE), 65 /* A */).getRenderMethods(), new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusX(Tilesets_15.TILE_SIZE).plusY(Tilesets_15.TILE_SIZE), 83 /* S */).getRenderMethods(), new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusX(Tilesets_15.TILE_SIZE * 2).plusY(Tilesets_15.TILE_SIZE), 68 /* D */).getRenderMethods(), [
                     Tilesets_15.Tilesets.instance.oneBit.getTileSource("leftClick").toImageRender(new TileTransform_13.TileTransform(topLeft.plusX(Tilesets_15.TILE_SIZE * 4).plusY(mouseButtVertOffset))),
@@ -5864,7 +5860,6 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                     var imageData = this.context.getImageData(position.x, position.y, diameter, diameter);
                     var cachedCircle = this.circleCache.get(diameter);
                     if (!cachedCircle) {
-                        console.log("warming cache");
                         cachedCircle = [];
                         for (var x = 0; x < diameter; x++) {
                             for (var y = 0; y < diameter; y++) {

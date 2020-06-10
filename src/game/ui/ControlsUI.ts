@@ -1,19 +1,15 @@
 import { KeyPressIndicator } from "./KeyPressIndicator"
-import { Entity } from "../../engine/Entity"
 import { Point } from "../../engine/point"
 import { InputKey } from "../../engine/input"
 import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
-import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
 import { TileTransform } from "../../engine/tiles/TileTransform"
-import { Tooltip } from "./Tooltip"
 import { formatText } from "./Text"
 import { Color } from "./Color"
-import { Component } from "../../engine/component"
 import { RenderMethod } from "../../engine/renderer/RenderMethod"
 import { UIStateManager } from "./UIStateManager"
 
 export const makeControlsUI = (dimensions: Point, offset: Point): RenderMethod[] => {
-    const topLeft = new Point(dimensions.x/2 - TILE_SIZE*4, dimensions.y/2 - TILE_SIZE*5).plus(offset)
+    const topLeft = new Point(dimensions.x/2 - TILE_SIZE*4 + 1, dimensions.y/2 - TILE_SIZE*5).plus(offset)
     const mouseButtVertOffset = 5
 
     return [

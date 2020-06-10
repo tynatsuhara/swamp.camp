@@ -158,7 +158,6 @@ export class PointLightMaskRenderer {
 
         let cachedCircle = this.circleCache.get(diameter)
         if (!cachedCircle) {
-            console.log("warming cache")
             cachedCircle = []
             for (let x = 0; x < diameter; x++) {
                 for (let y = 0; y < diameter; y++) {

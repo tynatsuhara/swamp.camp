@@ -16,7 +16,6 @@ const enum MouseButton {
 }
 
 export class Input {
-    private readonly canvas: HTMLCanvasElement
     private readonly keys: Set<number> = new Set()
     private lastCapture: CapturedInput = new CapturedInput()
     private mousePos: Point = new Point(0, 0)
@@ -26,10 +25,9 @@ export class Input {
     private isRightMouseDown: boolean = false
     private isRightMouseHeld: boolean = false
     private isRightMouseUp: boolean = false 
+    private mouseWheelDeltaY: number = 0
 
     constructor(canvas: HTMLCanvasElement) {
-        this.canvas = canvas
-
         canvas.oncontextmenu = () => false
 
         canvas.onmousedown = (e) => { 
@@ -54,14 +52,15 @@ export class Input {
                 this.isRightMouseUp = true
             }
         }        
-        canvas.onmousemove = (e) => {
-            this.mousePos = new Point(e.x - canvas.offsetLeft, e.y - canvas.offsetTop)
-        }
+        canvas.onmousemove = e => this.mousePos = new Point(e.x - canvas.offsetLeft, e.y - canvas.offsetTop)
+        canvas.onwheel = e => this.mouseWheelDeltaY = e.deltaY
         window.onkeydown = e => this.keys.add(e.keyCode)
         window.onkeyup = e => this.keys.delete(e.keyCode)
     }
 
     captureInput(): CapturedInput {
+        console.log()
+
         const keys = Array.from(this.keys)
         this.lastCapture = new CapturedInput(
             new Set(keys.filter(key => !this.lastCapture.isKeyHeld(key))),
@@ -73,7 +72,8 @@ export class Input {
             this.isMouseUp,
             this.isRightMouseDown,
             this.isRightMouseHeld,
-            this.isRightMouseUp
+            this.isRightMouseUp,
+            this.mouseWheelDeltaY,
         )
 
         // reset since these should only be true for 1 tick
@@ -91,12 +91,13 @@ export class CapturedInput {
     private readonly keysHeld: Set<number>
     private readonly keysUp: Set<number>
     readonly mousePos: Point = new Point(0, 0)
-    readonly isMouseDown: boolean = false
-    readonly isMouseHeld: boolean = false
-    readonly isMouseUp: boolean = false
-    readonly isRightMouseDown: boolean = false
-    readonly isRightMouseHeld: boolean = false
-    readonly isRightMouseUp: boolean = false 
+    readonly isMouseDown: boolean
+    readonly isMouseHeld: boolean
+    readonly isMouseUp: boolean
+    readonly isRightMouseDown: boolean
+    readonly isRightMouseHeld: boolean
+    readonly isRightMouseUp: boolean
+    readonly mouseWheelDeltaY: number
 
     constructor(
         keysDown: Set<number> = new Set(), 
@@ -108,7 +109,8 @@ export class CapturedInput {
         isMouseUp: boolean = false,
         isRightMouseDown: boolean = false,
         isRightMouseHeld: boolean = false,
-        isRightMouseUp: boolean = false 
+        isRightMouseUp: boolean = false,
+        mouseWheelDeltaY: number = 0,
     ) {
         this.keysDown = keysDown
         this.keysHeld = keysHeld
@@ -120,6 +122,7 @@ export class CapturedInput {
         this.isRightMouseDown = isRightMouseDown
         this.isRightMouseHeld = isRightMouseHeld
         this.isRightMouseUp = isRightMouseUp
+        this.mouseWheelDeltaY = mouseWheelDeltaY
     }
 
     scaledForView(view: View): CapturedInput {
@@ -133,7 +136,8 @@ export class CapturedInput {
             this.isMouseUp,
             this.isRightMouseDown,
             this.isRightMouseHeld,
-            this.isRightMouseUp
+            this.isRightMouseUp,
+            this.mouseWheelDeltaY
         )
     }
 
