@@ -29,7 +29,7 @@ export class Animator {
         })
         this.duration = durationSoFar
 
-        this.update(0)
+        this.onFrameChange(0)
     }
 
     update(elapsedTimeMillis: number) {
@@ -49,6 +49,13 @@ export class Animator {
 
     getCurrentFrame(): number {
         return this.index
+    }
+
+    setCurrentFrame(f: number) {
+        if (f < 0 || f >= this.frames.length) {
+            throw new Error("invalid frame")
+        }
+        this.index = f
     }
 
     static frames(count: number, msPerFrame: number) {
