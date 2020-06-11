@@ -53,7 +53,7 @@ export class NPC extends Component {
             this.attackTarget = null  // no need to attack a dead dude
         }
 
-        if (DialogueDisplay.instance.dude === this.dude) {
+        if (DialogueDisplay.instance.dialogueSource === this.dude) {
             this.dude.move(updateData, Point.ZERO, Player.instance.dude.standingPosition.x - this.dude.standingPosition.x)
         } else if (this.enemiesPresent) {
             if (!!this.attackTarget) {

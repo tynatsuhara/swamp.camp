@@ -12,7 +12,7 @@ import { Shield } from "./Shield"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Interactable } from "../world/elements/Interactable"
 import { DudeSaveState } from "../saves/DudeSaveState"
-import { Dialogue, getDialogue } from "./Dialogue"
+import { Dialogue, getDialogue, DialogueSource } from "./Dialogue"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { RenderMethod } from "../../engine/renderer/RenderMethod"
 import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
@@ -20,7 +20,7 @@ import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { UIStateManager } from "../ui/UIStateManager"
 import { AnimationUtils } from "./AnimationUtils"
 
-export class Dude extends Component {
+export class Dude extends Component implements DialogueSource {
 
     static readonly COLLISION_LAYER = "dube"
     
@@ -128,7 +128,7 @@ export class Dude extends Component {
 
         this.dialogueInteract.position = this.standingPosition.minus(new Point(0, 5))
         this.dialogueInteract.uiOffset = new Point(0, -TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition())
-        this.dialogueInteract.enabled = this.dialogue !== Dialogue.NONE && DialogueDisplay.instance.dude !== this
+        this.dialogueInteract.enabled = this.dialogue !== Dialogue.NONE && DialogueDisplay.instance.dialogueSource !== this
     }
 
     get isAlive() { return this._health > 0 }
@@ -310,7 +310,7 @@ export class Dude extends Component {
             indicator = getDialogue(this.dialogue).indicator
         }
         let tile: StaticTileSource = DudeInteractIndicator.getTile(indicator)
-        if (!tile || this.dialogueInteract.isShowingUI || DialogueDisplay.instance.dude === this) {
+        if (!tile || this.dialogueInteract.isShowingUI || DialogueDisplay.instance.dialogueSource === this) {
             return []
         } else {
             return [tile.toImageRender(new TileTransform(

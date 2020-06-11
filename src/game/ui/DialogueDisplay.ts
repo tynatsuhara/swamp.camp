@@ -1,4 +1,4 @@
-import { DialogueInstance, getDialogue, NextDialogue, Dialogue } from "../characters/Dialogue"
+import { DialogueInstance, getDialogue, NextDialogue, Dialogue, DialogueSource } from "../characters/Dialogue"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { NineSlice } from "../../engine/tiles/NineSlice"
 import { Point } from "../../engine/point"
@@ -10,14 +10,13 @@ import { TextAlign, formatText } from "./Text"
 import { Color } from "./Color"
 import { Controls } from "../Controls"
 import { UIStateManager } from "./UIStateManager"
-import { Dude } from "../characters/Dude"
 import { ButtonsMenu } from "./ButtonsMenu"
 
 export class DialogueDisplay extends Component {
 
     static instance: DialogueDisplay
 
-    dude: Dude
+    dialogueSource: DialogueSource
     private e: Entity = new Entity([this])
     private displayEntity: Entity
     private optionsEntity: Entity
@@ -61,7 +60,7 @@ export class DialogueDisplay extends Component {
         }
 
         if (this.lineIndex === this.dialogue.lines.length) {
-            this.completeDudeDialogue(this.dialogue.next)
+            this.completeSourceDialogue(this.dialogue.next)
             return
         }
 
@@ -86,16 +85,16 @@ export class DialogueDisplay extends Component {
         }
     }
 
-    private completeDudeDialogue(nextFn: () => void|NextDialogue) {
+    private completeSourceDialogue(nextFn: () => void|NextDialogue) {
         const next = nextFn()
         
         if (!next) {
-            this.dude.dialogue = Dialogue.NONE
+            this.dialogueSource.dialogue = Dialogue.NONE
             this.close()
         } else {
-            this.dude.dialogue = next.dialogue
+            this.dialogueSource.dialogue = next.dialogue
             if (next.open) {
-                this.startDialogue(this.dude)
+                this.startDialogue(this.dialogueSource)
             } else {
                 this.close()
             }
@@ -103,14 +102,14 @@ export class DialogueDisplay extends Component {
     }
 
     close() {
-        this.dude = null
+        this.dialogueSource = null
         this.dialogue = null
         this.displayEntity = null
     }
 
-    startDialogue(dude: Dude) {
-        this.dude = dude
-        this.dialogue = getDialogue(dude.dialogue)
+    startDialogue(dialogueSource: DialogueSource) {
+        this.dialogueSource = dialogueSource
+        this.dialogue = getDialogue(dialogueSource.dialogue)
         this.lineIndex = 0
         this.letterTicker = 0
         this.finishedPrinting = false
@@ -179,7 +178,7 @@ export class DialogueDisplay extends Component {
             this.dialogue.options.map(o => { 
                 return {
                     text: o.text, 
-                    fn: () => this.completeDudeDialogue(o.next),
+                    fn: () => this.completeSourceDialogue(o.next),
                     buttonColor: 'white',
                     textColor: Color.WHITE,
                     hoverColor: Color.DARK_RED

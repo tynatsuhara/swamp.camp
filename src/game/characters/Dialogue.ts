@@ -42,6 +42,10 @@ export const saveAfterDialogueStage = () => {
 }
 export const inv = () => Player.instance.dude.inventory
 
+export interface DialogueSource {
+    dialogue: Dialogue
+}
+
 export class DialogueOption {
     readonly text: string
     readonly next: () => void|NextDialogue

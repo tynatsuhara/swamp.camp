@@ -5541,7 +5541,7 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
                         }
                     }
                     if (this.lineIndex === this.dialogue.lines.length) {
-                        this.completeDudeDialogue(this.dialogue.next);
+                        this.completeSourceDialogue(this.dialogue.next);
                         return;
                     }
                     this.letterTicker += updateData.elapsedTimeMillis;
@@ -5561,16 +5561,16 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
                         return [this.e, this.displayEntity, this.optionsEntity];
                     }
                 };
-                DialogueDisplay.prototype.completeDudeDialogue = function (nextFn) {
+                DialogueDisplay.prototype.completeSourceDialogue = function (nextFn) {
                     var next = nextFn();
                     if (!next) {
-                        this.dude.dialogue = 0 /* NONE */;
+                        this.dialogueSource.dialogue = 0 /* NONE */;
                         this.close();
                     }
                     else {
-                        this.dude.dialogue = next.dialogue;
+                        this.dialogueSource.dialogue = next.dialogue;
                         if (next.open) {
-                            this.startDialogue(this.dude);
+                            this.startDialogue(this.dialogueSource);
                         }
                         else {
                             this.close();
@@ -5578,13 +5578,13 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
                     }
                 };
                 DialogueDisplay.prototype.close = function () {
-                    this.dude = null;
+                    this.dialogueSource = null;
                     this.dialogue = null;
                     this.displayEntity = null;
                 };
-                DialogueDisplay.prototype.startDialogue = function (dude) {
-                    this.dude = dude;
-                    this.dialogue = Dialogue_3.getDialogue(dude.dialogue);
+                DialogueDisplay.prototype.startDialogue = function (dialogueSource) {
+                    this.dialogueSource = dialogueSource;
+                    this.dialogue = Dialogue_3.getDialogue(dialogueSource.dialogue);
                     this.lineIndex = 0;
                     this.letterTicker = 0;
                     this.finishedPrinting = false;
@@ -5631,7 +5631,7 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
                     this.optionsEntity = ButtonsMenu_1.ButtonsMenu.render(screenDimensions, "white", this.dialogue.options.map(function (o) {
                         return {
                             text: o.text,
-                            fn: function () { return _this.completeDudeDialogue(o.next); },
+                            fn: function () { return _this.completeSourceDialogue(o.next); },
                             buttonColor: 'white',
                             textColor: Color_6.Color.WHITE,
                             hoverColor: Color_6.Color.DARK_RED
@@ -6992,7 +6992,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     this.animation.transform.depth = this.collider.position.y + this.collider.dimensions.y;
                     this.dialogueInteract.position = this.standingPosition.minus(new point_50.Point(0, 5));
                     this.dialogueInteract.uiOffset = new point_50.Point(0, -Tilesets_28.TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition());
-                    this.dialogueInteract.enabled = this.dialogue !== 0 /* NONE */ && DialogueDisplay_2.DialogueDisplay.instance.dude !== this;
+                    this.dialogueInteract.enabled = this.dialogue !== 0 /* NONE */ && DialogueDisplay_2.DialogueDisplay.instance.dialogueSource !== this;
                 };
                 Object.defineProperty(Dude.prototype, "isAlive", {
                     get: function () { return this._health > 0; },
@@ -7154,7 +7154,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                         indicator = Dialogue_4.getDialogue(this.dialogue).indicator;
                     }
                     var tile = DudeInteractIndicator_4.DudeInteractIndicator.getTile(indicator);
-                    if (!tile || this.dialogueInteract.isShowingUI || DialogueDisplay_2.DialogueDisplay.instance.dude === this) {
+                    if (!tile || this.dialogueInteract.isShowingUI || DialogueDisplay_2.DialogueDisplay.instance.dialogueSource === this) {
                         return [];
                     }
                     else {
@@ -7421,7 +7421,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     if (!!this.attackTarget && !this.attackTarget.isAlive) {
                         this.attackTarget = null; // no need to attack a dead dude
                     }
-                    if (DialogueDisplay_3.DialogueDisplay.instance.dude === this.dude) {
+                    if (DialogueDisplay_3.DialogueDisplay.instance.dialogueSource === this.dude) {
                         this.dude.move(updateData, point_52.Point.ZERO, Player_8.Player.instance.dude.standingPosition.x - this.dude.standingPosition.x);
                     }
                     else if (this.enemiesPresent) {
