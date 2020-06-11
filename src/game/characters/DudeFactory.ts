@@ -14,6 +14,7 @@ import { Villager } from "./Villager"
 import { NPCSchedules } from "./NPCSchedule"
 import { WorldLocation } from "../world/WorldLocation"
 import { Lists } from "../../engine/util/Lists"
+import { WeaponType } from "./Weapon"
 
 export const enum DudeFaction {
     VILLAGERS,
@@ -27,7 +28,8 @@ export const enum DudeType {
     DIP,
     ELF,
     ORC_WARRIOR,
-    HERALD
+    HERALD,
+    HORNED_DEMON
 }
 
 export class DudeFactory {
@@ -64,7 +66,7 @@ export class DudeFactory {
         // defaults
         let faction: DudeFaction = DudeFaction.VILLAGERS
         let animationName: string
-        let weapon: string = null
+        let weapon: WeaponType = WeaponType.NONE
         let shield: string = null
         let maxHealth: number
         let speed: number = 0.085
@@ -76,7 +78,7 @@ export class DudeFactory {
         switch(type) {
             case DudeType.PLAYER: {
                 animationName = "knight_f"
-                weapon = "weapon_regular_sword"
+                weapon = WeaponType.SWORD
                 shield = "shield_0"
                 maxHealth = 4
                 additionalComponents = [new Player(), new CutscenePlayerController()]
@@ -107,7 +109,7 @@ export class DudeFactory {
             }
             case DudeType.ELF: {
                 animationName = "elf_m"
-                weapon = "weapon_katana"
+                weapon = WeaponType.KATANA
                 shield = "shield_0"
                 maxHealth = 4
                 additionalComponents = [new NPC(), new Villager()]
@@ -117,7 +119,16 @@ export class DudeFactory {
             case DudeType.ORC_WARRIOR: {
                 faction = DudeFaction.ORCS
                 animationName = "orc_warrior"
-                weapon = "weapon_baton_with_spikes"
+                weapon = WeaponType.CLUB
+                additionalComponents = [new NPC(), new Enemy()]
+                maxHealth = 2
+                speed *= (.3 + Math.random()/2)
+                break
+            }
+            case DudeType.HORNED_DEMON: {
+                faction = DudeFaction.DEMONS
+                animationName = "chort" 
+                weapon = WeaponType.UNARMED
                 additionalComponents = [new NPC(), new Enemy()]
                 maxHealth = 2
                 speed *= (.3 + Math.random()/2)

@@ -4,7 +4,7 @@ import { Point } from "../../engine/point"
 import { Component } from "../../engine/component"
 import { BoxCollider } from "../../engine/collision/BoxCollider"
 import { TILE_SIZE } from "../graphics/Tilesets"
-import { Weapon } from "./Weapon"
+import { Weapon, WeaponType, getWeaponComponent } from "./Weapon"
 import { Inventory } from "../items/Inventory"
 import { spawnItem, Item } from "../items/Items"
 import { DudeType, DudeFaction } from "./DudeFactory"
@@ -35,8 +35,8 @@ export class Dude extends Component {
     private _animation: AnimatedTileComponent
     get animation() { return this._animation }
 
+    readonly weaponType: WeaponType
     private _weapon: Weapon
-    private weaponId: string
     get weapon() { return this._weapon }
     private _shield: Shield
     private shieldId: string
@@ -66,7 +66,7 @@ export class Dude extends Component {
         faction: DudeFaction,
         characterAnimName: string,
         position: Point,
-        weaponId: string,
+        weaponType: WeaponType,
         shieldId: string,
         maxHealth: number,
         health: number,
@@ -79,7 +79,7 @@ export class Dude extends Component {
         this.type = type
         this.faction = faction
         this._position = position
-        this.weaponId = weaponId
+        this.weaponType = weaponType
         this.shieldId = shieldId
         this.maxHealth = maxHealth
         this._health = health
@@ -96,9 +96,11 @@ export class Dude extends Component {
             this._animation = this.entity.addComponent(new AnimatedTileComponent([idleAnim, runAnim], new TileTransform(new Point(0, 28-height))))
             this._animation.fastForward(Math.random() * 1000)  // so not all the animations sync up
     
-            if (!!weaponId) {
-                this._weapon = this.entity.addComponent(new Weapon(weaponId))
+            this._weapon = getWeaponComponent(weaponType)
+            if (!!this._weapon) {
+                this.entity.addComponent(this._weapon)
             }
+
             if (!!shieldId) {
                 this._shield = this.entity.addComponent(new Shield(shieldId))
             }
@@ -284,7 +286,7 @@ export class Dude extends Component {
             maxHealth: this.maxHealth,
             health: this._health,
             speed: this.speed,
-            weapon: this.weaponId,
+            weapon: this.weaponType,
             shield: this.shieldId,
             inventory: this.inventory.save(),
             dialogue: this.dialogue,

@@ -6,13 +6,9 @@ import { Component } from "../../engine/component"
 import { Dude } from "./Dude"
 import { Interactable } from "../world/elements/Interactable"
 import { Hittable } from "../world/elements/Hittable"
-import { HUD } from "../ui/HUD"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Controls } from "../Controls"
 import { Lists } from "../../engine/util/Lists"
-import { PointLightMaskRenderer } from "../world/PointLightMaskRenderer"
-import { TILE_SIZE } from "../graphics/Tilesets"
-import { LocationManager } from "../world/LocationManager"
 
 export class Player extends Component {
 

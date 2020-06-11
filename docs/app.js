@@ -2809,7 +2809,7 @@ System.register("game/world/LocationManager", ["game/world/WorldLocation"], func
 });
 System.register("game/characters/Weapon", ["engine/component", "engine/tiles/TileComponent", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point", "game/characters/Dude", "engine/util/Animator", "game/world/LocationManager"], function (exports_39, context_39) {
     "use strict";
-    var component_4, TileComponent_3, Tilesets_1, TileTransform_5, point_17, Dude_1, Animator_2, LocationManager_1, State, Weapon;
+    var component_4, TileComponent_3, Tilesets_1, TileTransform_5, point_17, Dude_1, Animator_2, LocationManager_1, WeaponType, getWeaponComponent, State, Weapon;
     var __moduleName = context_39 && context_39.id;
     return {
         setters: [
@@ -2839,12 +2839,54 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
             }
         ],
         execute: function () {
+            (function (WeaponType) {
+                WeaponType[WeaponType["NONE"] = 0] = "NONE";
+                WeaponType[WeaponType["UNARMED"] = 1] = "UNARMED";
+                WeaponType[WeaponType["KNIFE"] = 2] = "KNIFE";
+                WeaponType[WeaponType["SHITTY_SWORD"] = 3] = "SHITTY_SWORD";
+                WeaponType[WeaponType["SWORD"] = 4] = "SWORD";
+                WeaponType[WeaponType["FANCY_SWORD"] = 5] = "FANCY_SWORD";
+                WeaponType[WeaponType["BIG_HAMMER"] = 6] = "BIG_HAMMER";
+                WeaponType[WeaponType["HAMMER"] = 7] = "HAMMER";
+                WeaponType[WeaponType["CLUB"] = 8] = "CLUB";
+                WeaponType[WeaponType["MACE"] = 9] = "MACE";
+                WeaponType[WeaponType["KATANA"] = 10] = "KATANA";
+                WeaponType[WeaponType["SERRATED_SWORD"] = 11] = "SERRATED_SWORD";
+                WeaponType[WeaponType["BIG_SWORD"] = 12] = "BIG_SWORD";
+                WeaponType[WeaponType["AXE"] = 13] = "AXE";
+                WeaponType[WeaponType["MACHETE"] = 14] = "MACHETE";
+                WeaponType[WeaponType["CLEAVER"] = 15] = "CLEAVER";
+                WeaponType[WeaponType["FENCING_SWORD"] = 16] = "FENCING_SWORD";
+                WeaponType[WeaponType["GREATSWORD"] = 17] = "GREATSWORD";
+                WeaponType[WeaponType["GOLD_SWORD"] = 18] = "GOLD_SWORD";
+                WeaponType[WeaponType["BIG_GOLD_SWORD"] = 19] = "BIG_GOLD_SWORD";
+                WeaponType[WeaponType["STAFF_1"] = 20] = "STAFF_1";
+                WeaponType[WeaponType["STAFF_2"] = 21] = "STAFF_2";
+                WeaponType[WeaponType["SPEAR"] = 22] = "SPEAR";
+                WeaponType[WeaponType["PICKAXE"] = 23] = "PICKAXE";
+            })(WeaponType || (WeaponType = {}));
+            exports_39("WeaponType", WeaponType);
+            exports_39("getWeaponComponent", getWeaponComponent = function (type) {
+                // TODO support additional weapons
+                switch (type) {
+                    case WeaponType.NONE:
+                    case WeaponType.UNARMED:
+                        return null;
+                    case WeaponType.SWORD:
+                        return new Weapon("weapon_regular_sword");
+                    case WeaponType.CLUB:
+                        return new Weapon("weapon_baton_with_spikes");
+                    default:
+                        throw new Error("weapon type " + type + " is not supported yet");
+                }
+            });
             (function (State) {
                 State[State["SHEATHED"] = 0] = "SHEATHED";
                 State[State["DRAWN"] = 1] = "DRAWN";
                 State[State["ATTACKING"] = 2] = "ATTACKING";
             })(State || (State = {}));
             /**
+             * TODO make this an abstract class, move melee-specific stuff to subclass
              * A weapon being wielded by a dude
              */
             Weapon = /** @class */ (function (_super) {
@@ -2852,7 +2894,7 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                 function Weapon(weaponId) {
                     var _this = _super.call(this) || this;
                     _this.state = State.DRAWN;
-                    _this.delay = 0; // delay after the animation ends before the weapon can attack again in millis
+                    _this.delayBetweenAttacks = 0; // delay after the animation ends before the weapon can attack again in millis
                     _this.currentAnimationFrame = 0;
                     _this.start = function (startData) {
                         _this.dude = _this.entity.getComponent(Dude_1.Dude);
@@ -2951,7 +2993,7 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                         _this.animator = null;
                         setTimeout(function () {
                             _this.state = State.DRAWN; // reset to DRAWN when animation finishes
-                        }, _this.delay);
+                        }, _this.delayBetweenAttacks);
                     });
                 };
                 /**
@@ -4513,6 +4555,7 @@ System.register("game/world/WorldTime", ["engine/Entity", "engine/component", "g
                         console.log("fast forwarding time to " + this.clockTime());
                     }
                     EventQueue_1.EventQueue.instance.processEvents(this.time);
+                    window.document.title = "wow a game | " + this.clockTime();
                 };
                 WorldTime.prototype.getEntity = function () {
                     return new Entity_7.Entity([this]);
@@ -5337,6 +5380,9 @@ System.register("game/characters/Dialogue", ["game/SaveManager", "game/ui/DudeIn
             NextDialogue = /** @class */ (function () {
                 function NextDialogue(dialogue, open) {
                     if (open === void 0) { open = true; }
+                    if (!dialogue) {
+                        throw new Error("dialogue can't be null");
+                    }
                     this.dialogue = dialogue;
                     this.open = open;
                 }
@@ -6175,6 +6221,13 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                     locationLightGrid.remove(position);
                     this.gridDirty = true;
                 };
+                /**
+                 * @return alpha 0-255 (total light to total darkness)
+                 */
+                PointLightMaskRenderer.prototype.getDarknessAtPosition = function (pixelPt) {
+                    var pt = pixelPt.plus(this.shift).apply(Math.floor);
+                    return this.context.getImageData(pt.x, pt.y, 1, 1).data[3];
+                };
                 PointLightMaskRenderer.prototype.updateColorForTime = function () {
                     var time = WorldTime_3.WorldTime.instance.time;
                     var hour = (time % WorldTime_3.WorldTime.DAY) / WorldTime_3.WorldTime.HOUR;
@@ -6704,7 +6757,7 @@ System.register("game/characters/Shield", ["engine/component", "engine/tiles/Til
                     return this.state === State.DRAWN && this.raisedPerc > .5;
                 };
                 Shield.prototype.canAttack = function () {
-                    return this.state === State.DRAWN && this.raisedPerc < .3;
+                    return this.state === State.DRAWN && this.raisedPerc < .5;
                 };
                 return Shield;
             }(component_21.Component));
@@ -6799,14 +6852,14 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
         execute: function () {
             Dude = /** @class */ (function (_super) {
                 __extends(Dude, _super);
-                function Dude(type, faction, characterAnimName, position, weaponId, shieldId, maxHealth, health, speed, inventory, dialogue, blob) {
+                function Dude(type, faction, characterAnimName, position, weaponType, shieldId, maxHealth, health, speed, inventory, dialogue, blob) {
                     var _this = _super.call(this) || this;
                     _this.relativeColliderPos = new point_50.Point(3, 15);
                     _this.beingKnockedBack = false;
                     _this.type = type;
                     _this.faction = faction;
                     _this._position = position;
-                    _this.weaponId = weaponId;
+                    _this.weaponType = weaponType;
                     _this.shieldId = shieldId;
                     _this.maxHealth = maxHealth;
                     _this._health = health;
@@ -6821,8 +6874,9 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                         var height = idleAnim.getTile(0).dimensions.y;
                         _this._animation = _this.entity.addComponent(new AnimatedTileComponent_4.AnimatedTileComponent([idleAnim, runAnim], new TileTransform_20.TileTransform(new point_50.Point(0, 28 - height))));
                         _this._animation.fastForward(Math.random() * 1000); // so not all the animations sync up
-                        if (!!weaponId) {
-                            _this._weapon = _this.entity.addComponent(new Weapon_1.Weapon(weaponId));
+                        _this._weapon = Weapon_1.getWeaponComponent(weaponType);
+                        if (!!_this._weapon) {
+                            _this.entity.addComponent(_this._weapon);
                         }
                         if (!!shieldId) {
                             _this._shield = _this.entity.addComponent(new Shield_1.Shield(shieldId));
@@ -7032,7 +7086,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                         maxHealth: this.maxHealth,
                         health: this._health,
                         speed: this.speed,
-                        weapon: this.weaponId,
+                        weapon: this.weaponType,
                         shield: this.shieldId,
                         inventory: this.inventory.save(),
                         dialogue: this.dialogue,
@@ -7276,6 +7330,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     if (defaultSchedule === void 0) { defaultSchedule = NPCSchedule_1.NPCSchedules.newNoOpSchedule(); }
                     var _this = _super.call(this) || this;
                     _this.isEnemyFn = function () { return false; };
+                    _this.pathFindingHeuristic = function (pt, goal) { return pt.distanceTo(goal); };
                     _this.findTargetRange = Tilesets_29.TILE_SIZE * 10;
                     _this.enemiesPresent = false;
                     _this.walkPath = null;
@@ -7469,13 +7524,12 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     var pos = this.tilePtToStandingPos(pt).minus(this.dude.standingPosition).plus(this.dude.position);
                     this.dude.moveTo(pos);
                 };
-                NPC.prototype.findPath = function (tilePt, h) {
+                NPC.prototype.findPath = function (tilePt) {
                     var _this = this;
-                    if (h === void 0) { h = function (pt) { return pt.distanceTo(end); }; }
                     var _a;
                     var start = Tilesets_29.pixelPtToTilePt(this.dude.standingPosition);
                     var end = tilePt;
-                    return (_a = LocationManager_13.LocationManager.instance.currentLocation.elements.findPath(start, end, h, function (pt) { return (pt === start ? false : !!LocationManager_13.LocationManager.instance.currentLocation.elements.get(pt)); } // prevent getting stuck "inside" a square
+                    return (_a = LocationManager_13.LocationManager.instance.currentLocation.elements.findPath(start, end, function (pt) { return _this.pathFindingHeuristic(pt, end); }, function (pt) { return (pt === start ? false : !!LocationManager_13.LocationManager.instance.currentLocation.elements.get(pt)); } // prevent getting stuck "inside" a square
                     )) === null || _a === void 0 ? void 0 : _a.map(function (pt) { return _this.tilePtToStandingPos(pt); }).slice(1); // slice(1) because we don't need the start in the path
                 };
                 NPC.prototype.tilePtToStandingPos = function (tilePt) {
@@ -7513,7 +7567,7 @@ System.register("game/characters/Enemy", ["engine/component", "game/characters/D
                 Enemy.prototype.awake = function () {
                     var _this = this;
                     this.dude = this.entity.getComponent(Dude_5.Dude);
-                    this.dude.weapon.delay = 500;
+                    this.dude.weapon.delayBetweenAttacks = 500;
                     this.npc = this.entity.getComponent(NPC_1.NPC);
                     this.npc.isEnemyFn = function (d) { return d.faction != _this.dude.faction; };
                 };
@@ -7607,9 +7661,9 @@ System.register("game/characters/Villager", ["engine/component", "game/character
         }
     };
 });
-System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point", "game/characters/Player", "game/characters/Dude", "game/characters/NPC", "game/world/LocationManager", "game/characters/Enemy", "game/items/Inventory", "game/cutscenes/CutscenePlayerController", "game/characters/Villager", "game/characters/NPCSchedule", "engine/util/Lists"], function (exports_98, context_98) {
+System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point", "game/characters/Player", "game/characters/Dude", "game/characters/NPC", "game/world/LocationManager", "game/characters/Enemy", "game/items/Inventory", "game/cutscenes/CutscenePlayerController", "game/characters/Villager", "game/characters/NPCSchedule", "engine/util/Lists", "game/characters/Weapon"], function (exports_98, context_98) {
     "use strict";
-    var Entity_18, point_54, Player_10, Dude_7, NPC_3, LocationManager_14, Enemy_1, Inventory_2, CutscenePlayerController_1, Villager_1, NPCSchedule_2, Lists_4, DudeFactory;
+    var Entity_18, point_54, Player_10, Dude_7, NPC_3, LocationManager_14, Enemy_1, Inventory_2, CutscenePlayerController_1, Villager_1, NPCSchedule_2, Lists_4, Weapon_2, DudeFactory;
     var __moduleName = context_98 && context_98.id;
     return {
         setters: [
@@ -7648,6 +7702,9 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
             },
             function (Lists_4_1) {
                 Lists_4 = Lists_4_1;
+            },
+            function (Weapon_2_1) {
+                Weapon_2 = Weapon_2_1;
             }
         ],
         execute: function () {
@@ -7676,7 +7733,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                     // defaults
                     var faction = 0 /* VILLAGERS */;
                     var animationName;
-                    var weapon = null;
+                    var weapon = Weapon_2.WeaponType.NONE;
                     var shield = null;
                     var maxHealth;
                     var speed = 0.085;
@@ -7687,7 +7744,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                     switch (type) {
                         case 0 /* PLAYER */: {
                             animationName = "knight_f";
-                            weapon = "weapon_regular_sword";
+                            weapon = Weapon_2.WeaponType.SWORD;
                             shield = "shield_0";
                             maxHealth = 4;
                             additionalComponents = [new Player_10.Player(), new CutscenePlayerController_1.CutscenePlayerController()];
@@ -7717,7 +7774,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                         }
                         case 2 /* ELF */: {
                             animationName = "elf_m";
-                            weapon = "weapon_katana";
+                            weapon = Weapon_2.WeaponType.KATANA;
                             shield = "shield_0";
                             maxHealth = 4;
                             additionalComponents = [new NPC_3.NPC(), new Villager_1.Villager()];
@@ -7727,7 +7784,16 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                         case 3 /* ORC_WARRIOR */: {
                             faction = 1 /* ORCS */;
                             animationName = "orc_warrior";
-                            weapon = "weapon_baton_with_spikes";
+                            weapon = Weapon_2.WeaponType.CLUB;
+                            additionalComponents = [new NPC_3.NPC(), new Enemy_1.Enemy()];
+                            maxHealth = 2;
+                            speed *= (.3 + Math.random() / 2);
+                            break;
+                        }
+                        case 5 /* HORNED_DEMON */: {
+                            faction = 3 /* DEMONS */;
+                            animationName = "chort";
+                            weapon = Weapon_2.WeaponType.UNARMED;
                             additionalComponents = [new NPC_3.NPC(), new Enemy_1.Enemy()];
                             maxHealth = 2;
                             speed *= (.3 + Math.random() / 2);
@@ -7757,6 +7823,7 @@ System.register("game/saves/DudeSaveState", [], function (exports_99, context_99
     return {
         setters: [],
         execute: function () {
+            // Nothing in here should be nullable, or the logic in DudeFactory could break
             DudeSaveState = /** @class */ (function () {
                 function DudeSaveState() {
                 }
@@ -9272,7 +9339,7 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
                 QuestGame.prototype.getViews = function (updateViewsContext) {
                     // TODO: remove this
                     if (updateViewsContext.input.isKeyDown(76 /* L */)) {
-                        DudeFactory_3.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_64.Point(40, 30));
+                        DudeFactory_3.DudeFactory.instance.new(5 /* HORNED_DEMON */, new point_64.Point(40, 30));
                     }
                     this.updateViews(updateViewsContext);
                     return [

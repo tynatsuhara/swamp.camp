@@ -81,7 +81,7 @@ export class QuestGame extends Game {
     getViews(updateViewsContext: UpdateViewsContext): View[] {
         // TODO: remove this
         if (updateViewsContext.input.isKeyDown(InputKey.L)) {
-            DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(40, 30))
+            DudeFactory.instance.new(DudeType.HORNED_DEMON, new Point(40, 30))
         }
 
         this.updateViews(updateViewsContext)

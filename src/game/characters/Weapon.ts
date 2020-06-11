@@ -8,6 +8,48 @@ import { Dude } from "./Dude"
 import { Animator } from "../../engine/util/Animator"
 import { LocationManager } from "../world/LocationManager"
 
+export enum WeaponType {
+    NONE,
+    UNARMED,
+    KNIFE,
+    SHITTY_SWORD,
+    SWORD,
+    FANCY_SWORD,
+    BIG_HAMMER,
+    HAMMER,
+    CLUB,
+    MACE,
+    KATANA,
+    SERRATED_SWORD,
+    BIG_SWORD,
+    AXE,
+    MACHETE,
+    CLEAVER,
+    FENCING_SWORD,
+    GREATSWORD,
+    GOLD_SWORD,
+    BIG_GOLD_SWORD,
+    STAFF_1,
+    STAFF_2,
+    SPEAR,
+    PICKAXE,
+}
+
+export const getWeaponComponent = (type: WeaponType) => {
+    // TODO support additional weapons
+    switch (type) {
+        case WeaponType.NONE:
+        case WeaponType.UNARMED:
+            return null
+        case WeaponType.SWORD:
+            return new Weapon("weapon_regular_sword")
+        case WeaponType.CLUB:
+            return new Weapon("weapon_baton_with_spikes")
+        default:
+            throw new Error(`weapon type ${type} is not supported yet`)
+    }
+}
+
 enum State {
     SHEATHED,
     DRAWN,
@@ -15,6 +57,7 @@ enum State {
 }
 
 /**
+ * TODO make this an abstract class, move melee-specific stuff to subclass
  * A weapon being wielded by a dude
  */
 export class Weapon extends Component {
@@ -25,7 +68,7 @@ export class Weapon extends Component {
     private dude: Dude
     private _range: number
     get range() { return this._range }
-    public delay = 0  // delay after the animation ends before the weapon can attack again in millis
+    public delayBetweenAttacks = 0  // delay after the animation ends before the weapon can attack again in millis
 
     constructor(weaponId: string) {
         super()
@@ -58,7 +101,7 @@ export class Weapon extends Component {
                 .forEach(d => d.damage(1, d.standingPosition.minus(dude.standingPosition), 30))
     }
 
-    animate() {
+    private animate() {
         const offsetFromEdge = this.dude.animation.transform.dimensions
                 .minus(new Point(9, 2))
                 .minus(this.weaponSprite.transform.dimensions)
@@ -140,7 +183,7 @@ export class Weapon extends Component {
                 this.animator = null
                 setTimeout(() => {
                     this.state = State.DRAWN  // reset to DRAWN when animation finishes
-                }, this.delay)
+                }, this.delayBetweenAttacks)
             }
         ) 
     }

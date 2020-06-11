@@ -17,6 +17,8 @@ export class NPC extends Component {
     private dude: Dude
 
     isEnemyFn: (dude: Dude) => boolean = () => false
+    pathFindingHeuristic: (pt: Point, goal: Point) => number = (pt, goal) => pt.distanceTo(goal)
+
     private findTargetRange = TILE_SIZE * 10
     private enemiesPresent = false
 
@@ -242,13 +244,13 @@ export class NPC extends Component {
         this.dude.moveTo(pos)
     }
 
-    private findPath(tilePt: Point, h: (pt: Point) => number = (pt) => pt.distanceTo(end)) {
+    private findPath(tilePt: Point) {
         const start = pixelPtToTilePt(this.dude.standingPosition)
         const end = tilePt
         return LocationManager.instance.currentLocation.elements.findPath(
             start, 
             end, 
-            h,
+            (pt) => this.pathFindingHeuristic(pt, end),
             (pt) => (pt === start ? false : !!LocationManager.instance.currentLocation.elements.get(pt))  // prevent getting stuck "inside" a square
         )?.map(pt => this.tilePtToStandingPos(pt)).slice(1)  // slice(1) because we don't need the start in the path
     }

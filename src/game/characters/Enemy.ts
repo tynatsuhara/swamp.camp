@@ -14,7 +14,7 @@ export class Enemy extends Component {
 
     awake() {
         this.dude = this.entity.getComponent(Dude)
-        this.dude.weapon.delay = 500
+        this.dude.weapon.delayBetweenAttacks = 500
         this.npc = this.entity.getComponent(NPC)
         this.npc.isEnemyFn = d => d.faction != this.dude.faction
     }
