@@ -57,6 +57,9 @@ export class NextDialogue {
     readonly open: boolean
 
     constructor(dialogue: Dialogue, open: boolean = true) {
+        if (!dialogue) {
+            throw new Error("dialogue can't be null")
+        }
         this.dialogue = dialogue
         this.open = open
     }
