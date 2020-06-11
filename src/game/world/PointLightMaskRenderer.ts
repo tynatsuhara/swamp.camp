@@ -5,7 +5,6 @@ import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent
 import { Camera } from "../cutscenes/Camera"
 import { MapGenerator } from "./MapGenerator"
 import { TILE_SIZE } from "../graphics/Tilesets"
-import { assets } from "../../engine/Assets"
 import { Grid } from "../../engine/util/Grid"
 import { UIStateManager } from "../ui/UIStateManager"
 import { WorldTime } from "./WorldTime"
@@ -63,7 +62,15 @@ export class PointLightMaskRenderer {
         this.gridDirty = true
     }
 
-    updateColorForTime() {
+    /**
+     * @return alpha 0-255 (total light to total darkness)
+     */
+    getDarknessAtPosition(pixelPt: Point) {
+        const pt = pixelPt.plus(this.shift).apply(Math.floor)
+        return this.context.getImageData(pt.x, pt.y, 1, 1).data[3]
+    }
+
+    private updateColorForTime() {
         const time = WorldTime.instance.time
         const hour = (time % WorldTime.DAY) / WorldTime.HOUR
 		const timeSoFar = time % WorldTime.HOUR
@@ -103,7 +110,7 @@ export class PointLightMaskRenderer {
         return { r, g, b, a }
     }
 
-    lerpedColorString(color1: { r, g, b, a }, color2: { r, g, b, a }, percentTransitioned: number) {
+    private lerpedColorString(color1: { r, g, b, a }, color2: { r, g, b, a }, percentTransitioned: number) {
         const lerp = (a, b) => a + (b-a) * percentTransitioned
 
         const r = lerp(color1.r, color2.r)
@@ -152,7 +159,7 @@ export class PointLightMaskRenderer {
         })
     }
 
-    makeLightCircle(diameter: number, position: Point, alpha: number) {
+    private makeLightCircle(diameter: number, position: Point, alpha: number) {
         const center = new Point(diameter/2, diameter/2).minus(new Point(.5, .5))
         const imageData = this.context.getImageData(position.x, position.y, diameter, diameter)
 
