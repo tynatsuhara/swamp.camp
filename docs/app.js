@@ -6665,7 +6665,7 @@ System.register("game/characters/Shield", ["engine/component", "engine/tiles/Til
                         pos = pos.plus(new point_49.Point(-6, -1));
                     }
                     else if (this.state === State.DRAWN) {
-                        pos = pos.plus(new point_49.Point(5, 5).times(this.raisedPerc < .7 ? this.raisedPerc : 1.4 - this.raisedPerc).apply(Math.floor));
+                        pos = pos.plus(new point_49.Point(5, 4).times(this.raisedPerc < .7 ? this.raisedPerc : 1.4 - this.raisedPerc).apply(Math.floor));
                         if (this.blockingActive) { // raising
                             this.raisedPerc = Math.min(this.raisedPerc + updateData.elapsedTimeMillis / this.timeToRaiseMs, 1);
                         }
@@ -6675,7 +6675,7 @@ System.register("game/characters/Shield", ["engine/component", "engine/tiles/Til
                     }
                     pos = pos.plus(this.dude.getAnimationOffsetPosition());
                     this.blockingShieldSprite.transform.position = pos;
-                    this.blockingShieldSprite.transform.depth = this.raisedPerc === 1 ? .75 : -.75;
+                    this.blockingShieldSprite.transform.depth = this.raisedPerc > .7 ? .75 : -.75;
                 };
                 Shield.prototype.toggleOnBack = function () {
                     if (this.state === State.DRAWN) {

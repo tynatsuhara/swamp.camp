@@ -46,7 +46,7 @@ export class Shield extends Component {
         if (this.state === State.ON_BACK) {
             pos = pos.plus(new Point(-6, -1))
         } else if (this.state === State.DRAWN) {
-            pos = pos.plus(new Point(5, 5).times(this.raisedPerc < .7 ? this.raisedPerc : 1.4-this.raisedPerc).apply(Math.floor))
+            pos = pos.plus(new Point(5, 4).times(this.raisedPerc < .7 ? this.raisedPerc : 1.4-this.raisedPerc).apply(Math.floor))
 
             if (this.blockingActive) {  // raising
                 this.raisedPerc = Math.min(this.raisedPerc + updateData.elapsedTimeMillis/this.timeToRaiseMs, 1)
@@ -58,7 +58,7 @@ export class Shield extends Component {
         pos = pos.plus(this.dude.getAnimationOffsetPosition())
 
         this.blockingShieldSprite.transform.position = pos
-        this.blockingShieldSprite.transform.depth = this.raisedPerc === 1 ? .75 : -.75
+        this.blockingShieldSprite.transform.depth = this.raisedPerc > .7 ? .75 : -.75
     }
 
     toggleOnBack() {
