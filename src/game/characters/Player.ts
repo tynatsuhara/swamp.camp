@@ -9,6 +9,7 @@ import { Hittable } from "../world/elements/Hittable"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Controls } from "../Controls"
 import { Lists } from "../../engine/util/Lists"
+import { DudeFactory, DudeType } from "./DudeFactory"
 
 export class Player extends Component {
 
@@ -89,6 +90,10 @@ export class Player extends Component {
         if (updateData.input.isKeyDown(InputKey.P)) {
             // this.dude.damage(.25, new Point(Math.random()-.5, Math.random()-.5), 30)
             this.dude.damage(.25, new Point(-1, Math.random()-.5), 30)
+        }
+
+        if (updateData.input.isKeyDown(InputKey.L)) {
+            DudeFactory.instance.new(DudeType.HORNED_DEMON, updateData.input.mousePos)
         }
 
         // update crosshair position

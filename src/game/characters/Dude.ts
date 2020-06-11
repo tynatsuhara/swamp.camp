@@ -218,7 +218,13 @@ export class Dude extends Component {
      * @param direction the direction they are moving in, will be normalized by this code
      * @param facingOverride if < 0, will face left, if > 0, will face right. if == 0, will face the direction they're moving
      */
-    move(updateData: UpdateData, direction: Point, facingOverride: number = 0, maxDistance: number = Number.MAX_SAFE_INTEGER) {
+    move(
+        updateData: UpdateData, 
+        direction: Point, 
+        facingOverride: number = 0, 
+        speedMultiplier: number = 1,
+        maxDistance: number = Number.MAX_SAFE_INTEGER, 
+    ) {
         if (this._health <= 0) {
             return
         }
@@ -245,7 +251,7 @@ export class Dude extends Component {
             }
             const translation = direction.normalized()
             // this.lerpedLastMoveDir = this.lerpedLastMoveDir.lerp(0.25, translation)
-            const distance = Math.min(updateData.elapsedTimeMillis * this.speed, maxDistance)
+            const distance = Math.min(updateData.elapsedTimeMillis * this.speed * speedMultiplier, maxDistance)
             const newPos = this._position.plus(translation.times(distance))
             this.moveTo(newPos)
         } else if (wasMoving) {

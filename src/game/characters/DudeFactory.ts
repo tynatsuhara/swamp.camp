@@ -129,9 +129,9 @@ export class DudeFactory {
                 faction = DudeFaction.DEMONS
                 animationName = "chort" 
                 weapon = WeaponType.UNARMED
-                additionalComponents = [new NPC(), new Enemy()]
+                additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new Enemy()]
                 maxHealth = 2
-                speed *= (.3 + Math.random()/2)
+                speed *= (.6 + Math.random()/5)
                 break
             }
             default: {

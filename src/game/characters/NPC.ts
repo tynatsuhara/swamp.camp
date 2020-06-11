@@ -8,6 +8,7 @@ import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { Lists } from "../../engine/util/Lists"
 import { NPCSchedule, NPCScheduleType, NPCSchedules } from "./NPCSchedule"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
+import { PointLightMaskRenderer } from "../world/PointLightMaskRenderer"
 
 /**
  * Shared logic for different types of NPCs. These should be invoked by an NPC controller component.
@@ -19,7 +20,7 @@ export class NPC extends Component {
     isEnemyFn: (dude: Dude) => boolean = () => false
     pathFindingHeuristic: (pt: Point, goal: Point) => number = (pt, goal) => pt.distanceTo(goal)
 
-    private findTargetRange = TILE_SIZE * 10
+    findTargetRange = TILE_SIZE * 10
     private enemiesPresent = false
 
     constructor(defaultSchedule: NPCSchedule = NPCSchedules.newNoOpSchedule()) {
@@ -75,6 +76,14 @@ export class NPC extends Component {
                 Point.fromString(schedule["p"]), 
                 updateData
             )
+        } else if (schedule.type === NPCScheduleType.ROAM_IN_DARKNESS) {
+            this.doFlee(
+                updateData, 
+                PointLightMaskRenderer.instance.getDarknessAtPosition(this.dude.standingPosition) > 150 ? 0.5 : 1,
+                (pt) => PointLightMaskRenderer.instance.getDarknessAtPosition(pt.times(TILE_SIZE)) > 150
+            )
+        } else {
+            throw new Error("unimplemented schedule type")
         }
     }
 
@@ -134,18 +143,21 @@ export class NPC extends Component {
     }
 
     private fleePath: Point[] = null
-    private doFlee(updateData: UpdateData) {
+    private doFlee(updateData: UpdateData, speedMultiplier: number = 1, ptSelectionFilter: (pt) => boolean = () => true) {
         if (!this.fleePath || this.fleePath.length === 0) {  // only try once per upate() to find a path
             const l = LocationManager.instance.currentLocation
-            const openPoints = l.ground.keys().filter(pt => !l.elements.get(pt))
-            const pt = openPoints[Math.floor(Math.random() * openPoints.length)]
+            const openPoints = l.ground.keys().filter(pt => !l.elements.get(pt)).filter(ptSelectionFilter)
+            let pt: Point
+            do {
+                pt = openPoints[Math.floor(Math.random() * openPoints.length)]
+            } while (!ptSelectionFilter(pt))
             this.fleePath = this.findPath(pt)
             if (!this.fleePath || this.fleePath.length === 0) {
                 this.dude.move(updateData, Point.ZERO)
                 return
             }
         }
-        if (this.walkDirectlyTo(this.fleePath[0], updateData)) {
+        if (this.walkDirectlyTo(this.fleePath[0], updateData, false, speedMultiplier)) {
             this.fleePath.shift()
         }
     }
@@ -186,28 +198,28 @@ export class NPC extends Component {
     }
 
     private followTarget: Dude
-    private doFollow(updateData: UpdateData) {
-        const followDistance = 75
-        const buffer = 40  // this basically determines how long they will stop for if they get too close
+    // private doFollow(updateData: UpdateData) {
+    //     const followDistance = 75
+    //     const buffer = 40  // this basically determines how long they will stop for if they get too close
 
-        const dist = Player.instance.dude.position.minus(this.dude.position)
-        const mag = dist.magnitude()
+    //     const dist = Player.instance.dude.position.minus(this.dude.position)
+    //     const mag = dist.magnitude()
 
-        if (mag > followDistance || ((followDistance-mag) < buffer && Player.instance.dude.isMoving) && this.dude.isMoving) {
-            this.dude.move(updateData, dist)
-        } else {
-            this.dude.move(updateData, new Point(0, 0))
-        }
-    }
+    //     if (mag > followDistance || ((followDistance-mag) < buffer && Player.instance.dude.isMoving) && this.dude.isMoving) {
+    //         this.dude.move(updateData, dist)
+    //     } else {
+    //         this.dude.move(updateData, new Point(0, 0))
+    //     }
+    // }
 
     // returns true if they are pretty close (half a tile) away from the goal
-    private walkDirectlyTo(pt: Point, updateData: UpdateData, stopWhenClose = false) {
+    private walkDirectlyTo(pt: Point, updateData: UpdateData, stopWhenClose = false, speedMultiplier: number = 1) {
         // const dist = this.dude.standingPosition.distanceTo(pt)
         const isCloseEnough = this.isCloseEnoughToStopWalking(pt)
         if (isCloseEnough && stopWhenClose) {
             this.dude.move(updateData, Point.ZERO)
         } else {
-            this.dude.move(updateData, pt.minus(this.dude.standingPosition), 0)
+            this.dude.move(updateData, pt.minus(this.dude.standingPosition), 0, speedMultiplier)
         }
         return isCloseEnough
     }

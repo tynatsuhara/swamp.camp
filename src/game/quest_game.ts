@@ -79,11 +79,6 @@ export class QuestGame extends Game {
 
     // entities in the world space
     getViews(updateViewsContext: UpdateViewsContext): View[] {
-        // TODO: remove this
-        if (updateViewsContext.input.isKeyDown(InputKey.L)) {
-            DudeFactory.instance.new(DudeType.HORNED_DEMON, new Point(40, 30))
-        }
-
         this.updateViews(updateViewsContext)
         return [
             this.gameEntityView, 
