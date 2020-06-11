@@ -1,6 +1,5 @@
 import { DialogueInstance, dialogueWithOptions, Dialogue, dialogue, option, NextDialogue, saveAfterDialogueStage, DialogueOption, inv } from "../Dialogue"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
-import { Player } from "../Player"
 import { Item } from "../../items/Items"
 import { Controls } from "../../Controls"
 import { LocationManager } from "../../world/LocationManager"
@@ -9,23 +8,11 @@ import { EventQueue } from "../../world/events/EventQueue"
 import { QueuedEventType } from "../../world/events/QueuedEvent"
 import { WorldTime } from "../../world/WorldTime"
 import { CraftingMenu } from "../../ui/CraftingMenu"
-import { CraftingRecipeCategory } from "../../items/CraftingRecipe"
-import { ItemStack } from "../../items/Inventory"
-import { Tilesets } from "../../graphics/Tilesets"
-import { Point } from "../../../engine/point"
+import { getDipRecipes } from "../../items/CraftingRecipe"
 
-const ROCKS_NEEDED_FOR_CAMPFIRE = 10
-const WOOD_NEEDED_FOR_CAMPFIRE = 5
+export const ROCKS_NEEDED_FOR_CAMPFIRE = 10
+export const WOOD_NEEDED_FOR_CAMPFIRE = 5
 const CRAFT_OPTION = "<Craft>"
-
-const getDipRecipes = (): CraftingRecipeCategory[] => [{ 
-    icon: Tilesets.instance.oneBit.getTileAt(new Point(0, 1)),
-    name: "Outdoor Furniture",
-    recipes: [{
-        output: Item.CAMPFIRE,
-        input: [new ItemStack(Item.ROCK, ROCKS_NEEDED_FOR_CAMPFIRE), new ItemStack(Item.WOOD, WOOD_NEEDED_FOR_CAMPFIRE)],
-    }],
-}]
 
 // TODO: make DIP introduce himself, have player input their name
 
