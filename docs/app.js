@@ -1805,7 +1805,7 @@ System.register("engine/util/Animator", [], function (exports_28, context_28) {
                         _this.frames.push(durationSoFar);
                     });
                     this.duration = durationSoFar;
-                    this.update(0);
+                    this.onFrameChange(0);
                 }
                 Animator.prototype.update = function (elapsedTimeMillis) {
                     this.time += elapsedTimeMillis;
@@ -1821,6 +1821,12 @@ System.register("engine/util/Animator", [], function (exports_28, context_28) {
                 };
                 Animator.prototype.getCurrentFrame = function () {
                     return this.index;
+                };
+                Animator.prototype.setCurrentFrame = function (f) {
+                    if (f < 0 || f >= this.frames.length) {
+                        throw new Error("invalid frame");
+                    }
+                    this.index = f;
                 };
                 Animator.frames = function (count, msPerFrame) {
                     var result = [];
@@ -2809,7 +2815,7 @@ System.register("game/world/LocationManager", ["game/world/WorldLocation"], func
 });
 System.register("game/characters/Weapon", ["engine/component", "engine/tiles/TileComponent", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point", "game/characters/Dude", "engine/util/Animator", "game/world/LocationManager"], function (exports_39, context_39) {
     "use strict";
-    var component_4, TileComponent_3, Tilesets_1, TileTransform_5, point_17, Dude_1, Animator_2, LocationManager_1, WeaponType, getWeaponComponent, State, Weapon, MeleeWeapon;
+    var component_4, TileComponent_3, Tilesets_1, TileTransform_5, point_17, Dude_1, Animator_2, LocationManager_1, WeaponType, getWeaponComponent, State, Weapon, MeleeWeapon, UnarmedWeapon;
     var __moduleName = context_39 && context_39.id;
     return {
         setters: [
@@ -2870,8 +2876,9 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                 // TODO support additional weapons
                 switch (type) {
                     case WeaponType.NONE:
-                    case WeaponType.UNARMED:
                         return null;
+                    case WeaponType.UNARMED:
+                        return new UnarmedWeapon();
                     case WeaponType.SWORD:
                         return new MeleeWeapon("weapon_regular_sword");
                     case WeaponType.CLUB:
@@ -2890,13 +2897,15 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                 function Weapon() {
                     return _super !== null && _super.apply(this, arguments) || this;
                 }
+                Weapon.prototype.awake = function () {
+                    this.dude = this.entity.getComponent(Dude_1.Dude);
+                };
                 // TODO find a better place for this?
-                Weapon.damageInFrontOfDude = function (dude, attackDistance) {
-                    Array.from(LocationManager_1.LocationManager.instance.currentLocation.dudes)
-                        .filter(function (d) { return !!d && d !== dude && d.faction !== dude.faction; })
-                        .filter(function (d) { return dude.isFacing(d.standingPosition); })
-                        .filter(function (d) { return d.standingPosition.distanceTo(dude.standingPosition) < attackDistance; })
-                        .forEach(function (d) { return d.damage(1, d.standingPosition.minus(dude.standingPosition), 30); });
+                Weapon.getEnemiesInRange = function (attacker, attackDistance) {
+                    return Array.from(LocationManager_1.LocationManager.instance.currentLocation.dudes)
+                        .filter(function (d) { return !!d && d !== attacker && d.faction !== attacker.faction; })
+                        .filter(function (d) { return attacker.isFacing(d.standingPosition); })
+                        .filter(function (d) { return d.standingPosition.distanceTo(attacker.standingPosition) < attackDistance; });
                 };
                 return Weapon;
             }(component_4.Component));
@@ -2913,7 +2922,6 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                     _this.delayBetweenAttacks = 0; // delay after the animation ends before the weapon can attack again in millis
                     _this.currentAnimationFrame = 0;
                     _this.start = function (startData) {
-                        _this.dude = _this.entity.getComponent(Dude_1.Dude);
                         _this.weaponSprite = _this.entity.addComponent(new TileComponent_3.TileComponent(Tilesets_1.Tilesets.instance.dungeonCharacters.getTileSource(weaponId), new TileTransform_5.TileTransform().relativeTo(_this.dude.animation.transform)));
                         _this._range = _this.weaponSprite.transform.dimensions.y;
                     };
@@ -2955,7 +2963,10 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                                 return;
                             }
                             var attackDistance = _this.getRange() + 4; // add a tiny buffer for small weapons like the dagger to still work
-                            Weapon.damageInFrontOfDude(_this.dude, attackDistance);
+                            // TODO maybe only allow big weapons to hit multiple targets
+                            Weapon.getEnemiesInRange(_this.dude, attackDistance).forEach(function (d) {
+                                d.damage(1, d.standingPosition.minus(_this.dude.standingPosition), 30);
+                            });
                         }, 100);
                         this.playAttackAnimation();
                     }
@@ -3022,6 +3033,41 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                     }
                 };
                 return MeleeWeapon;
+            }(Weapon));
+            UnarmedWeapon = /** @class */ (function (_super) {
+                __extends(UnarmedWeapon, _super);
+                function UnarmedWeapon() {
+                    var _this = _super !== null && _super.apply(this, arguments) || this;
+                    _this.state = State.DRAWN;
+                    return _this;
+                }
+                UnarmedWeapon.prototype.setDelayBetweenAttacks = function (delayMillis) {
+                    this.delay = delayMillis;
+                };
+                UnarmedWeapon.prototype.isAttacking = function () {
+                    return this.state === State.ATTACKING;
+                };
+                UnarmedWeapon.prototype.toggleSheathed = function () { };
+                UnarmedWeapon.prototype.getRange = function () {
+                    return 15;
+                };
+                UnarmedWeapon.prototype.attack = function () {
+                    var _this = this;
+                    if (this.state === State.ATTACKING) {
+                        return;
+                    }
+                    var enemies = Weapon.getEnemiesInRange(this.dude, this.getRange() * 1.5);
+                    if (enemies.length === 0) {
+                        return;
+                    }
+                    this.state = State.ATTACKING;
+                    var closestEnemy = enemies[0];
+                    var attackDir = closestEnemy.standingPosition.minus(this.dude.standingPosition);
+                    this.dude.knockback(attackDir, 30); // pounce
+                    closestEnemy.damage(1, closestEnemy.standingPosition.minus(this.dude.standingPosition), 50);
+                    setTimeout(function () { return _this.state = State.DRAWN; }, this.delay);
+                };
+                return UnarmedWeapon;
             }(Weapon));
         }
     };

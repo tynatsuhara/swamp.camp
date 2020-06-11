@@ -39,8 +39,9 @@ export const getWeaponComponent = (type: WeaponType): Weapon => {
     // TODO support additional weapons
     switch (type) {
         case WeaponType.NONE:
-        case WeaponType.UNARMED:
             return null
+        case WeaponType.UNARMED:
+            return new UnarmedWeapon()
         case WeaponType.SWORD:
             return new MeleeWeapon("weapon_regular_sword")
         case WeaponType.CLUB:
@@ -58,13 +59,18 @@ enum State {
 
 export abstract class Weapon extends Component {
 
+    protected dude: Dude
+
+    awake() {
+        this.dude = this.entity.getComponent(Dude)
+    }
+
     // TODO find a better place for this?
-    static damageInFrontOfDude(dude: Dude, attackDistance: number) {
-        Array.from(LocationManager.instance.currentLocation.dudes)
-                .filter(d => !!d && d !== dude && d.faction !== dude.faction)
-                .filter(d => dude.isFacing(d.standingPosition))
-                .filter(d => d.standingPosition.distanceTo(dude.standingPosition) < attackDistance)
-                .forEach(d => d.damage(1, d.standingPosition.minus(dude.standingPosition), 30))
+    static getEnemiesInRange(attacker: Dude, attackDistance: number) {
+        return Array.from(LocationManager.instance.currentLocation.dudes)
+                .filter(d => !!d && d !== attacker && d.faction !== attacker.faction)
+                .filter(d => attacker.isFacing(d.standingPosition))
+                .filter(d => d.standingPosition.distanceTo(attacker.standingPosition) < attackDistance)
     }
 
     abstract setDelayBetweenAttacks(delayMillis: number)
@@ -87,14 +93,12 @@ class MeleeWeapon extends Weapon {
     private weaponSprite: TileComponent
     private state: State = State.DRAWN
     // private slashSprite: TileComponent
-    private dude: Dude
     private _range: number
     private delayBetweenAttacks = 0  // delay after the animation ends before the weapon can attack again in millis
 
     constructor(weaponId: string) {
         super()
         this.start = (startData) => {
-            this.dude = this.entity.getComponent(Dude)
             this.weaponSprite = this.entity.addComponent(
                 new TileComponent(
                     Tilesets.instance.dungeonCharacters.getTileSource(weaponId),
@@ -144,7 +148,10 @@ class MeleeWeapon extends Weapon {
                     return
                 }
                 const attackDistance = this.getRange() + 4  // add a tiny buffer for small weapons like the dagger to still work
-                Weapon.damageInFrontOfDude(this.dude, attackDistance)
+                // TODO maybe only allow big weapons to hit multiple targets
+                Weapon.getEnemiesInRange(this.dude, attackDistance).forEach(d => {
+                    d.damage(1, d.standingPosition.minus(this.dude.standingPosition), 30)
+                })
             }, 100)
             this.playAttackAnimation()
         }
@@ -224,5 +231,43 @@ class MeleeWeapon extends Weapon {
         } else {
             return [new Point((1-this.currentAnimationFrame+resettingFrame) * 3, 2), 0]
         }
+    }
+}
+
+class UnarmedWeapon extends Weapon {
+
+    private state: State = State.DRAWN
+    private delay: number
+
+    setDelayBetweenAttacks(delayMillis: number) {
+        this.delay = delayMillis
+    }
+
+    isAttacking() {
+        return this.state === State.ATTACKING
+    }
+
+    toggleSheathed() { /* no-op */ }
+
+    getRange(): number {
+        return 15
+    }
+
+    attack() {
+        if (this.state === State.ATTACKING) {
+            return
+        }
+        const enemies = Weapon.getEnemiesInRange(this.dude, this.getRange() * 1.5)
+        if (enemies.length === 0) {
+            return
+        }
+        this.state = State.ATTACKING
+
+        const closestEnemy = enemies[0]
+        const attackDir = closestEnemy.standingPosition.minus(this.dude.standingPosition)
+        this.dude.knockback(attackDir, 30)  // pounce
+        closestEnemy.damage(1, closestEnemy.standingPosition.minus(this.dude.standingPosition), 50)
+
+        setTimeout(() => this.state = State.DRAWN, this.delay)
     }
 }

@@ -179,7 +179,7 @@ export class Dude extends Component {
 
     private beingKnockedBack = false
 
-    private knockback(direction: Point, knockback: number) {
+    knockback(direction: Point, knockback: number) {
         if (this.beingKnockedBack) {
             return
         }
