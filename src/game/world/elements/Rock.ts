@@ -31,7 +31,9 @@ export const makeRock = (wl: WorldLocation, pos: Point, data: object): ElementCo
         hitboxDims
     ))
 
-    makeHittable(e, pos.plus(new Point(.5, .5)).times(TILE_SIZE), [tile.transform], Item.ROCK)
+    makeHittable(e, pos.plus(new Point(.5, .5)).times(TILE_SIZE), [tile.transform], () => {
+        return Math.random() > .9 ? Item.IRON : Item.ROCK
+    })
 
     return e.addComponent(new ElementComponent(
         ElementType.ROCK, 

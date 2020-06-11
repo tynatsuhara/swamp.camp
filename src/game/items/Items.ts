@@ -37,6 +37,7 @@ export const enum Item {
     WOOD,
     TENT,
     CAMPFIRE,
+    IRON,
 }
 
 // Data that doesn't get serialized (TODO make builder pattern)
@@ -50,13 +51,13 @@ export const ITEM_METADATA_MAP = {
         "Rock",
         () => Tilesets.instance.outdoorTiles.getTileSource("rockItem"),
         () => Tilesets.instance.oneBit.getTileSource("rock"), 
-        100
+        99
     ),
     [Item.WOOD]: new ItemMetadata(
         "Wood",
         () => Tilesets.instance.outdoorTiles.getTileSource("woodItem"),
         () => Tilesets.instance.oneBit.getTileSource("wood"), 
-        100
+        99
     ),
     [Item.TENT]: new ItemMetadata(
         "Tent",
@@ -72,6 +73,12 @@ export const ITEM_METADATA_MAP = {
         1,
         ElementType.CAMPFIRE
     ),
+    [Item.IRON]: new ItemMetadata(
+        "Iron",
+        () => Tilesets.instance.outdoorTiles.getTileSource("ironItem"),
+        () => Tilesets.instance.oneBit.getTileSource("iron"), 
+        99,
+    )
 }
 
 /**

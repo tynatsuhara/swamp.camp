@@ -30,7 +30,7 @@ export const makeTree = (wl: WorldLocation, pos: Point, data: object): ElementCo
     ))
 
     const hittableCenter = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE/2, TILE_SIZE + TILE_SIZE/2))  // center of bottom tile
-    makeHittable(e, hittableCenter, [top.transform, bottom.transform], Item.WOOD)
+    makeHittable(e, hittableCenter, [top.transform, bottom.transform], () => Item.WOOD)
 
     return e.addComponent(new ElementComponent(
         ElementType.TREE, 

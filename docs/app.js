@@ -2142,6 +2142,7 @@ System.register("game/graphics/OneBitTileset", ["engine/point", "game/graphics/S
                         ["coin", new point_15.Point(22, 4)],
                         ["wood", new point_15.Point(18, 6)],
                         ["rock", new point_15.Point(5, 2)],
+                        ["iron", new point_15.Point(31, 0)],
                         ["invBoxNW", new point_15.Point(16, 19)],
                         ["textBoxNW", new point_15.Point(16, 16)],
                         ["tooltipLeft", new point_15.Point(16, 16)],
@@ -2273,6 +2274,7 @@ System.register("game/graphics/OutdoorTileset", ["engine/point", "game/graphics/
                         ["rock3mossy", new point_16.Point(56, 22)],
                         ["rockItem", new point_16.Point(33, 9)],
                         ["woodItem", new point_16.Point(34, 9)],
+                        ["ironItem", new point_16.Point(35, 9)],
                         ["dialogueBG", new point_16.Point(6, 28)],
                         ["invBoxFrame", new point_16.Point(9, 25)],
                         ["placingElementFrame_good", new point_16.Point(3, 28)],
@@ -3183,7 +3185,7 @@ System.register("game/world/elements/HittableResource", ["game/world/elements/Hi
             }
         ],
         execute: function () {
-            exports_43("makeHittable", makeHittable = function (e, pos, transforms, item) {
+            exports_43("makeHittable", makeHittable = function (e, pos, transforms, itemSupplier) {
                 var knockedItemCount = 5;
                 var h = new Hittable_1.Hittable(pos, // centered position
                 transforms, function (hitDir) {
@@ -3197,7 +3199,7 @@ System.register("game/world/elements/HittableResource", ["game/world/elements/Hi
                         var itemDirection = hitDir.plus(new point_19.Point(randomness - Math.random() * randomness * 2, randomness - Math.random() * randomness * 2)).normalized();
                         var velocity = itemDirection.times(1 + 3 * Math.random());
                         Items_2.spawnItem(pos.plus(new point_19.Point(0, Tilesets_2.TILE_SIZE / 2)).plus(itemDirection.times(placeDistance)), // bottom center, then randomly adjusted
-                        item, velocity.times(velocityMultiplier), e.getComponent(BoxCollider_2.BoxCollider));
+                        itemSupplier(), velocity.times(velocityMultiplier), e.getComponent(BoxCollider_2.BoxCollider));
                     }
                     if (finishingMove) {
                         LocationManager_3.LocationManager.instance.currentLocation.elements.removeAll(e.getComponent(ElementComponent_1.ElementComponent));
@@ -3251,7 +3253,7 @@ System.register("game/world/elements/Tree", ["engine/point", "game/graphics/Tile
                 var hitboxDims = new point_20.Point(8, 3);
                 e.addComponent(new BoxCollider_3.BoxCollider(pos.plus(new point_20.Point(.5, 2)).times(Tilesets_3.TILE_SIZE).minus(new point_20.Point(hitboxDims.x / 2, hitboxDims.y)), hitboxDims));
                 var hittableCenter = pos.times(Tilesets_3.TILE_SIZE).plus(new point_20.Point(Tilesets_3.TILE_SIZE / 2, Tilesets_3.TILE_SIZE + Tilesets_3.TILE_SIZE / 2)); // center of bottom tile
-                HittableResource_1.makeHittable(e, hittableCenter, [top.transform, bottom.transform], 2 /* WOOD */);
+                HittableResource_1.makeHittable(e, hittableCenter, [top.transform, bottom.transform], function () { return 2 /* WOOD */; });
                 return e.addComponent(new ElementComponent_2.ElementComponent(0 /* TREE */, [pos, pos.plusY(1)], function () { return { type: type }; }));
             });
             addTile = function (e, s, pos, depth) {
@@ -3306,7 +3308,9 @@ System.register("game/world/elements/Rock", ["engine/point", "game/graphics/Tile
                 // TODO
                 var hitboxDims = new point_21.Point(12, 4);
                 e.addComponent(new BoxCollider_4.BoxCollider(pos.plus(new point_21.Point(.5, 1)).times(Tilesets_4.TILE_SIZE).minus(new point_21.Point(hitboxDims.x / 2, hitboxDims.y + 2)), hitboxDims));
-                HittableResource_2.makeHittable(e, pos.plus(new point_21.Point(.5, .5)).times(Tilesets_4.TILE_SIZE), [tile.transform], 1 /* ROCK */);
+                HittableResource_2.makeHittable(e, pos.plus(new point_21.Point(.5, .5)).times(Tilesets_4.TILE_SIZE), [tile.transform], function () {
+                    return Math.random() > .9 ? 5 /* IRON */ : 1 /* ROCK */;
+                });
                 return e.addComponent(new ElementComponent_3.ElementComponent(1 /* ROCK */, [pos], function () { return { v: variation, m: mossy, f: flipped }; }));
             });
         }
@@ -6466,10 +6470,11 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
             // Data that doesn't get serialized (TODO make builder pattern)
             exports_87("ITEM_METADATA_MAP", ITEM_METADATA_MAP = (_a = {},
                 _a[0 /* COIN */] = new ItemMetadata("Coin", function () { return Tilesets_25.Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150); }, function () { return Tilesets_25.Tilesets.instance.oneBit.getTileSource("coin"); }),
-                _a[1 /* ROCK */] = new ItemMetadata("Rock", function () { return Tilesets_25.Tilesets.instance.outdoorTiles.getTileSource("rockItem"); }, function () { return Tilesets_25.Tilesets.instance.oneBit.getTileSource("rock"); }, 100),
-                _a[2 /* WOOD */] = new ItemMetadata("Wood", function () { return Tilesets_25.Tilesets.instance.outdoorTiles.getTileSource("woodItem"); }, function () { return Tilesets_25.Tilesets.instance.oneBit.getTileSource("wood"); }, 100),
+                _a[1 /* ROCK */] = new ItemMetadata("Rock", function () { return Tilesets_25.Tilesets.instance.outdoorTiles.getTileSource("rockItem"); }, function () { return Tilesets_25.Tilesets.instance.oneBit.getTileSource("rock"); }, 99),
+                _a[2 /* WOOD */] = new ItemMetadata("Wood", function () { return Tilesets_25.Tilesets.instance.outdoorTiles.getTileSource("woodItem"); }, function () { return Tilesets_25.Tilesets.instance.oneBit.getTileSource("wood"); }, 99),
                 _a[3 /* TENT */] = new ItemMetadata("Tent", function () { return null; }, function () { return Tilesets_25.Tilesets.instance.oneBit.getTileSource("tent"); }, 1, 2 /* TENT */),
                 _a[4 /* CAMPFIRE */] = new ItemMetadata("Campfire", function () { return null; }, function () { return Tilesets_25.Tilesets.instance.oneBit.getTileSource("campfire"); }, 1, 3 /* CAMPFIRE */),
+                _a[5 /* IRON */] = new ItemMetadata("Iron", function () { return Tilesets_25.Tilesets.instance.outdoorTiles.getTileSource("ironItem"); }, function () { return Tilesets_25.Tilesets.instance.oneBit.getTileSource("iron"); }, 99),
                 _a));
             /**
              * @param position The bottom center where the item should be placed
