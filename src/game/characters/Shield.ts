@@ -84,7 +84,7 @@ export class Shield extends Component {
     }
 
     canAttack() {
-        return this.state === State.DRAWN && this.raisedPerc < .3
+        return this.state === State.DRAWN && this.raisedPerc < .5
     }
 
     private animator: Animator
