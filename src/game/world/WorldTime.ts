@@ -30,6 +30,8 @@ export class WorldTime extends Component {
         }
 
         EventQueue.instance.processEvents(this.time)
+
+        window.document.title = `wow a game | ${this.clockTime()}`
     }
 
     getEntity(): Entity {
