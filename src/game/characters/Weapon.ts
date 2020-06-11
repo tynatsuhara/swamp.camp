@@ -35,16 +35,16 @@ export enum WeaponType {
     PICKAXE,
 }
 
-export const getWeaponComponent = (type: WeaponType) => {
+export const getWeaponComponent = (type: WeaponType): Weapon => {
     // TODO support additional weapons
     switch (type) {
         case WeaponType.NONE:
         case WeaponType.UNARMED:
             return null
         case WeaponType.SWORD:
-            return new Weapon("weapon_regular_sword")
+            return new MeleeWeapon("weapon_regular_sword")
         case WeaponType.CLUB:
-            return new Weapon("weapon_baton_with_spikes")
+            return new MeleeWeapon("weapon_baton_with_spikes")
         default:
             throw new Error(`weapon type ${type} is not supported yet`)
     }
@@ -56,19 +56,40 @@ enum State {
     ATTACKING
 }
 
+export abstract class Weapon extends Component {
+
+    // TODO find a better place for this?
+    static damageInFrontOfDude(dude: Dude, attackDistance: number) {
+        Array.from(LocationManager.instance.currentLocation.dudes)
+                .filter(d => !!d && d !== dude && d.faction !== dude.faction)
+                .filter(d => dude.isFacing(d.standingPosition))
+                .filter(d => d.standingPosition.distanceTo(dude.standingPosition) < attackDistance)
+                .forEach(d => d.damage(1, d.standingPosition.minus(dude.standingPosition), 30))
+    }
+
+    abstract setDelayBetweenAttacks(delayMillis: number)
+    abstract isAttacking()
+    abstract toggleSheathed()
+    abstract getRange(): number
+
+    /**
+     * This can be called every single frame and should handle that appropriately
+     */
+    abstract attack()
+}
+
 /**
  * TODO make this an abstract class, move melee-specific stuff to subclass
  * A weapon being wielded by a dude
  */
-export class Weapon extends Component {
+class MeleeWeapon extends Weapon {
 
     private weaponSprite: TileComponent
     private state: State = State.DRAWN
     // private slashSprite: TileComponent
     private dude: Dude
     private _range: number
-    get range() { return this._range }
-    public delayBetweenAttacks = 0  // delay after the animation ends before the weapon can attack again in millis
+    private delayBetweenAttacks = 0  // delay after the animation ends before the weapon can attack again in millis
 
     constructor(weaponId: string) {
         super()
@@ -92,13 +113,41 @@ export class Weapon extends Component {
         this.animate()
     }
 
-    // TODO find a better place for this?
-    static damageInFrontOfDude(dude: Dude, attackDistance: number) {
-        Array.from(LocationManager.instance.currentLocation.dudes)
-                .filter(d => !!d && d !== dude && d.faction !== dude.faction)
-                .filter(d => dude.isFacing(d.standingPosition))
-                .filter(d => d.standingPosition.distanceTo(dude.standingPosition) < attackDistance)
-                .forEach(d => d.damage(1, d.standingPosition.minus(dude.standingPosition), 30))
+    setDelayBetweenAttacks(delayMs: number) {
+        this.delayBetweenAttacks = delayMs
+    }
+
+    isAttacking() {
+        return this.state === State.ATTACKING
+    }
+
+    toggleSheathed() {
+        if (this.state === State.SHEATHED) {
+            this.state = State.DRAWN
+        } else if (this.state === State.DRAWN) {
+            this.state = State.SHEATHED
+        }
+    }
+
+    getRange() {
+        return this._range
+    }
+
+    attack() {
+        if (this.dude.shield && !this.dude.shield?.canAttack()) {
+            return
+        }
+        if (this.state === State.DRAWN) {
+            this.state = State.ATTACKING
+            setTimeout(() => {
+                if (!this.enabled) {
+                    return
+                }
+                const attackDistance = this.getRange() + 4  // add a tiny buffer for small weapons like the dagger to still work
+                Weapon.damageInFrontOfDude(this.dude, attackDistance)
+            }, 100)
+            this.playAttackAnimation()
+        }
     }
 
     private animate() {
@@ -138,39 +187,6 @@ export class Weapon extends Component {
         // this.slashSprite.transform.position = characterAnim.transform.position.plus(
         //     new Point((charMirror ? -1 : 1) * (this.weaponSprite.transform.dimensions.y - 8), 8)
         // )
-    }
-
-    isDrawn() {
-        return this.state !== State.SHEATHED
-    }
-
-    isAttacking() {
-        return this.state === State.ATTACKING
-    }
-
-    toggleSheathed() {
-        if (this.state === State.SHEATHED) {
-            this.state = State.DRAWN
-        } else if (this.state === State.DRAWN) {
-            this.state = State.SHEATHED
-        }
-    }
-
-    attack() {
-        if (this.dude.shield && !this.dude.shield?.canAttack()) {
-            return
-        }
-        if (this.state === State.DRAWN) {
-            this.state = State.ATTACKING
-            setTimeout(() => {
-                if (!this.enabled) {
-                    return
-                }
-                const attackDistance = this.range + 4  // add a tiny buffer for small weapons like the dagger to still work
-                Weapon.damageInFrontOfDude(this.dude, attackDistance)
-            }, 100)
-            this.playAttackAnimation()
-        }
     }
 
     private animator: Animator

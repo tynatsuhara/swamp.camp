@@ -168,7 +168,7 @@ export class NPC extends Component {
             return
         }
 
-        const followDistance = this.dude.weapon.range/2 ?? 20
+        const followDistance = this.dude.weapon.getRange()/2 ?? 20
         const buffer = 0  // this basically determines how long they will stop for if they get too close
 
         const dist = this.attackTarget.position.minus(this.dude.position)
@@ -180,7 +180,7 @@ export class NPC extends Component {
             this.dude.move(updateData, new Point(0, 0))
         }
 
-        if (mag < this.dude.weapon?.range) {
+        if (mag < this.dude.weapon?.getRange()) {
             this.dude.weapon.attack()
         }
     }

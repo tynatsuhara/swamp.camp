@@ -2809,7 +2809,7 @@ System.register("game/world/LocationManager", ["game/world/WorldLocation"], func
 });
 System.register("game/characters/Weapon", ["engine/component", "engine/tiles/TileComponent", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point", "game/characters/Dude", "engine/util/Animator", "game/world/LocationManager"], function (exports_39, context_39) {
     "use strict";
-    var component_4, TileComponent_3, Tilesets_1, TileTransform_5, point_17, Dude_1, Animator_2, LocationManager_1, WeaponType, getWeaponComponent, State, Weapon;
+    var component_4, TileComponent_3, Tilesets_1, TileTransform_5, point_17, Dude_1, Animator_2, LocationManager_1, WeaponType, getWeaponComponent, State, Weapon, MeleeWeapon;
     var __moduleName = context_39 && context_39.id;
     return {
         setters: [
@@ -2873,9 +2873,9 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                     case WeaponType.UNARMED:
                         return null;
                     case WeaponType.SWORD:
-                        return new Weapon("weapon_regular_sword");
+                        return new MeleeWeapon("weapon_regular_sword");
                     case WeaponType.CLUB:
-                        return new Weapon("weapon_baton_with_spikes");
+                        return new MeleeWeapon("weapon_baton_with_spikes");
                     default:
                         throw new Error("weapon type " + type + " is not supported yet");
                 }
@@ -2885,13 +2885,29 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                 State[State["DRAWN"] = 1] = "DRAWN";
                 State[State["ATTACKING"] = 2] = "ATTACKING";
             })(State || (State = {}));
+            Weapon = /** @class */ (function (_super) {
+                __extends(Weapon, _super);
+                function Weapon() {
+                    return _super !== null && _super.apply(this, arguments) || this;
+                }
+                // TODO find a better place for this?
+                Weapon.damageInFrontOfDude = function (dude, attackDistance) {
+                    Array.from(LocationManager_1.LocationManager.instance.currentLocation.dudes)
+                        .filter(function (d) { return !!d && d !== dude && d.faction !== dude.faction; })
+                        .filter(function (d) { return dude.isFacing(d.standingPosition); })
+                        .filter(function (d) { return d.standingPosition.distanceTo(dude.standingPosition) < attackDistance; })
+                        .forEach(function (d) { return d.damage(1, d.standingPosition.minus(dude.standingPosition), 30); });
+                };
+                return Weapon;
+            }(component_4.Component));
+            exports_39("Weapon", Weapon);
             /**
              * TODO make this an abstract class, move melee-specific stuff to subclass
              * A weapon being wielded by a dude
              */
-            Weapon = /** @class */ (function (_super) {
-                __extends(Weapon, _super);
-                function Weapon(weaponId) {
+            MeleeWeapon = /** @class */ (function (_super) {
+                __extends(MeleeWeapon, _super);
+                function MeleeWeapon(weaponId) {
                     var _this = _super.call(this) || this;
                     _this.state = State.DRAWN;
                     _this.delayBetweenAttacks = 0; // delay after the animation ends before the weapon can attack again in millis
@@ -2903,26 +2919,48 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                     };
                     return _this;
                 }
-                Object.defineProperty(Weapon.prototype, "range", {
-                    get: function () { return this._range; },
-                    enumerable: true,
-                    configurable: true
-                });
-                Weapon.prototype.update = function (updateData) {
+                MeleeWeapon.prototype.update = function (updateData) {
                     if (!!this.animator) {
                         this.animator.update(updateData.elapsedTimeMillis);
                     }
                     this.animate();
                 };
-                // TODO find a better place for this?
-                Weapon.damageInFrontOfDude = function (dude, attackDistance) {
-                    Array.from(LocationManager_1.LocationManager.instance.currentLocation.dudes)
-                        .filter(function (d) { return !!d && d !== dude && d.faction !== dude.faction; })
-                        .filter(function (d) { return dude.isFacing(d.standingPosition); })
-                        .filter(function (d) { return d.standingPosition.distanceTo(dude.standingPosition) < attackDistance; })
-                        .forEach(function (d) { return d.damage(1, d.standingPosition.minus(dude.standingPosition), 30); });
+                MeleeWeapon.prototype.setDelayBetweenAttacks = function (delayMs) {
+                    this.delayBetweenAttacks = delayMs;
                 };
-                Weapon.prototype.animate = function () {
+                MeleeWeapon.prototype.isAttacking = function () {
+                    return this.state === State.ATTACKING;
+                };
+                MeleeWeapon.prototype.toggleSheathed = function () {
+                    if (this.state === State.SHEATHED) {
+                        this.state = State.DRAWN;
+                    }
+                    else if (this.state === State.DRAWN) {
+                        this.state = State.SHEATHED;
+                    }
+                };
+                MeleeWeapon.prototype.getRange = function () {
+                    return this._range;
+                };
+                MeleeWeapon.prototype.attack = function () {
+                    var _this = this;
+                    var _a;
+                    if (this.dude.shield && !((_a = this.dude.shield) === null || _a === void 0 ? void 0 : _a.canAttack())) {
+                        return;
+                    }
+                    if (this.state === State.DRAWN) {
+                        this.state = State.ATTACKING;
+                        setTimeout(function () {
+                            if (!_this.enabled) {
+                                return;
+                            }
+                            var attackDistance = _this.getRange() + 4; // add a tiny buffer for small weapons like the dagger to still work
+                            Weapon.damageInFrontOfDude(_this.dude, attackDistance);
+                        }, 100);
+                        this.playAttackAnimation();
+                    }
+                };
+                MeleeWeapon.prototype.animate = function () {
                     var offsetFromEdge = this.dude.animation.transform.dimensions
                         .minus(new point_17.Point(9, 2))
                         .minus(this.weaponSprite.transform.dimensions);
@@ -2955,39 +2993,7 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                     //     new Point((charMirror ? -1 : 1) * (this.weaponSprite.transform.dimensions.y - 8), 8)
                     // )
                 };
-                Weapon.prototype.isDrawn = function () {
-                    return this.state !== State.SHEATHED;
-                };
-                Weapon.prototype.isAttacking = function () {
-                    return this.state === State.ATTACKING;
-                };
-                Weapon.prototype.toggleSheathed = function () {
-                    if (this.state === State.SHEATHED) {
-                        this.state = State.DRAWN;
-                    }
-                    else if (this.state === State.DRAWN) {
-                        this.state = State.SHEATHED;
-                    }
-                };
-                Weapon.prototype.attack = function () {
-                    var _this = this;
-                    var _a;
-                    if (this.dude.shield && !((_a = this.dude.shield) === null || _a === void 0 ? void 0 : _a.canAttack())) {
-                        return;
-                    }
-                    if (this.state === State.DRAWN) {
-                        this.state = State.ATTACKING;
-                        setTimeout(function () {
-                            if (!_this.enabled) {
-                                return;
-                            }
-                            var attackDistance = _this.range + 4; // add a tiny buffer for small weapons like the dagger to still work
-                            Weapon.damageInFrontOfDude(_this.dude, attackDistance);
-                        }, 100);
-                        this.playAttackAnimation();
-                    }
-                };
-                Weapon.prototype.playAttackAnimation = function () {
+                MeleeWeapon.prototype.playAttackAnimation = function () {
                     var _this = this;
                     this.animator = new Animator_2.Animator(Animator_2.Animator.frames(8, 40), function (index) { return _this.currentAnimationFrame = index; }, function () {
                         _this.animator = null;
@@ -2999,7 +3005,7 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                 /**
                  * Returns (position, rotation)
                  */
-                Weapon.prototype.getAttackAnimationPosition = function () {
+                MeleeWeapon.prototype.getAttackAnimationPosition = function () {
                     var swingStartFrame = 3;
                     var resettingFrame = 7;
                     if (this.currentAnimationFrame < swingStartFrame) {
@@ -3015,9 +3021,8 @@ System.register("game/characters/Weapon", ["engine/component", "engine/tiles/Til
                         return [new point_17.Point((1 - this.currentAnimationFrame + resettingFrame) * 3, 2), 0];
                     }
                 };
-                return Weapon;
-            }(component_4.Component));
-            exports_39("Weapon", Weapon);
+                return MeleeWeapon;
+            }(Weapon));
         }
     };
 });
@@ -7458,7 +7463,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                         this.dude.move(updateData, new point_52.Point(0, 0));
                         return;
                     }
-                    var followDistance = (_a = this.dude.weapon.range / 2) !== null && _a !== void 0 ? _a : 20;
+                    var followDistance = (_a = this.dude.weapon.getRange() / 2) !== null && _a !== void 0 ? _a : 20;
                     var buffer = 0; // this basically determines how long they will stop for if they get too close
                     var dist = this.attackTarget.position.minus(this.dude.position);
                     var mag = dist.magnitude();
@@ -7468,7 +7473,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     else {
                         this.dude.move(updateData, new point_52.Point(0, 0));
                     }
-                    if (mag < ((_b = this.dude.weapon) === null || _b === void 0 ? void 0 : _b.range)) {
+                    if (mag < ((_b = this.dude.weapon) === null || _b === void 0 ? void 0 : _b.getRange())) {
                         this.dude.weapon.attack();
                     }
                 };
@@ -7567,7 +7572,7 @@ System.register("game/characters/Enemy", ["engine/component", "game/characters/D
                 Enemy.prototype.awake = function () {
                     var _this = this;
                     this.dude = this.entity.getComponent(Dude_5.Dude);
-                    this.dude.weapon.delayBetweenAttacks = 500;
+                    this.dude.weapon.setDelayBetweenAttacks(500);
                     this.npc = this.entity.getComponent(NPC_1.NPC);
                     this.npc.isEnemyFn = function (d) { return d.faction != _this.dude.faction; };
                 };
