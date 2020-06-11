@@ -24,7 +24,7 @@ export class Shield extends Component {
 
     private blockingActive = false
     private raisedPerc = 0 // for animation
-    private timeToRaiseMs = 75
+    private timeToRaiseMs = 150
 
     constructor(shieldId: string) {
         super()
@@ -46,7 +46,7 @@ export class Shield extends Component {
         if (this.state === State.ON_BACK) {
             pos = pos.plus(new Point(-6, -1))
         } else if (this.state === State.DRAWN) {
-            pos = pos.plus(new Point(3, 2).times(this.raisedPerc).apply(Math.floor))
+            pos = pos.plus(new Point(5, 5).times(this.raisedPerc < .7 ? this.raisedPerc : 1.4-this.raisedPerc).apply(Math.floor))
 
             if (this.blockingActive) {  // raising
                 this.raisedPerc = Math.min(this.raisedPerc + updateData.elapsedTimeMillis/this.timeToRaiseMs, 1)

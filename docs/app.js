@@ -6650,7 +6650,7 @@ System.register("game/characters/Shield", ["engine/component", "engine/tiles/Til
                     _this.state = State.DRAWN;
                     _this.blockingActive = false;
                     _this.raisedPerc = 0; // for animation
-                    _this.timeToRaiseMs = 75;
+                    _this.timeToRaiseMs = 150;
                     _this.currentAnimationFrame = 0;
                     _this.start = function (startData) {
                         _this.dude = _this.entity.getComponent(Dude_2.Dude);
@@ -6665,7 +6665,7 @@ System.register("game/characters/Shield", ["engine/component", "engine/tiles/Til
                         pos = pos.plus(new point_49.Point(-6, -1));
                     }
                     else if (this.state === State.DRAWN) {
-                        pos = pos.plus(new point_49.Point(3, 2).times(this.raisedPerc).apply(Math.floor));
+                        pos = pos.plus(new point_49.Point(5, 5).times(this.raisedPerc < .7 ? this.raisedPerc : 1.4 - this.raisedPerc).apply(Math.floor));
                         if (this.blockingActive) { // raising
                             this.raisedPerc = Math.min(this.raisedPerc + updateData.elapsedTimeMillis / this.timeToRaiseMs, 1);
                         }
