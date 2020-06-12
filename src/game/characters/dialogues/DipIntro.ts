@@ -36,10 +36,30 @@ export const DIP_INTRO_DIALOGUE: { [key: number]: () => DialogueInstance } = {
     ], () => new NextDialogue(Dialogue.DIP_MAKE_CAMPFIRE, false)),
     
     [Dialogue.DIP_MAKE_CAMPFIRE]: () => {
-        if (inv().getItemCount(Item.CAMPFIRE) > 0) {  // campfire has been crafted
+        const campfires = LocationManager.instance.currentLocation.elements.values().filter(e => e.type === ElementType.CAMPFIRE)
+        const dipTent = LocationManager.instance.currentLocation.elements.values().filter(e => e.type === ElementType.TENT)[0]
+        if (campfires.length > 0) {
+            const lines = [
+                dipTent.occupiedPoints[0].distanceTo(campfires[0].occupiedPoints[0]) < 5
+                        ? "That should keep us warm tonight!"
+                        : "Well, the fire is a bit far from my tent, but that's okay!",
+                "Here, I've finished putting together your tent. Find a nice spot and plop it down!"
+            ]
+            if (campfires[0].save()["logs"] === 0) {
+                lines.push(`By the way, you can add logs to the fire by standing close to it and pressing [${Controls.keyString(Controls.interactButton)}].`)
+            }
+            return dialogue(lines, () => {  // TODO actually decide what should happen here
+                inv().addItem(Item.TENT)
+                EventQueue.instance.addEvent({
+                    type: QueuedEventType.TRADER_ARRIVAL,
+                    time: WorldTime.instance.future({ minutes: 10 })
+                })
+                saveAfterDialogueStage()
+            }, DudeInteractIndicator.IMPORTANT_DIALOGUE)
+        } else if (inv().getItemCount(Item.CAMPFIRE) > 0) {  // campfire has been crafted
             return dialogue(
-                [`Great! Try placing the campfire down near my tent. You can open your inventory by pressing [${String.fromCharCode(Controls.inventoryButton)}].`], 
-                () =>  new NextDialogue(Dialogue.DIP_CAMPFIRE_DONE, false)
+                [`Try placing the campfire down near my tent. You can open your inventory by pressing [${String.fromCharCode(Controls.inventoryButton)}].`], 
+                () =>  new NextDialogue(Dialogue.DIP_MAKE_CAMPFIRE, false)
             )
         } else if (inv().getItemCount(Item.ROCK) >= ROCKS_NEEDED_FOR_CAMPFIRE && inv().getItemCount(Item.WOOD) >= WOOD_NEEDED_FOR_CAMPFIRE) {  // can craft
             return dialogueWithOptions(
@@ -56,32 +76,6 @@ export const DIP_INTRO_DIALOGUE: { [key: number]: () => DialogueInstance } = {
                 [`We need ${ROCKS_NEEDED_FOR_CAMPFIRE} rocks and ${WOOD_NEEDED_FOR_CAMPFIRE} wood to make a campfire. Try hitting big rocks and trees with your sword!`], 
                 () => new NextDialogue(Dialogue.DIP_MAKE_CAMPFIRE, false)
             )
-        }
-    },
-
-    [Dialogue.DIP_CAMPFIRE_DONE]: () => {
-        const campfires = LocationManager.instance.currentLocation.elements.values().filter(e => e.type === ElementType.CAMPFIRE)
-        const dipTent = LocationManager.instance.currentLocation.elements.values().filter(e => e.type === ElementType.TENT)[0]
-        if (campfires.length > 0) {
-            const lines = [
-                dipTent.occupiedPoints[0].distanceTo(campfires[0].occupiedPoints[0]) < 5
-                        ? "That should keep us warm tonight!"
-                        : "Well, the fire is a bit far from my tent, but that's okay!",
-                "Here, I've finished putting together your tent. Find a nice spot and plop it down!"
-            ]
-            if (!campfires[0].save()["on"]) {
-                lines.push(`By the way, you can light the fire by standing close to it and pressing [${Controls.keyString(Controls.interactButton)}].`)
-            }
-            return dialogue(lines, () => {  // TODO actually decide what should happen here
-                inv().addItem(Item.TENT)
-                EventQueue.instance.addEvent({
-                    type: QueuedEventType.TRADER_ARRIVAL,
-                    time: WorldTime.instance.future({ minutes: 10 })
-                })
-                saveAfterDialogueStage()
-            }, DudeInteractIndicator.IMPORTANT_DIALOGUE)
-        } else {
-            return dialogue(["You should set up the campfire before it gets dark!"], () => new NextDialogue(Dialogue.DIP_CAMPFIRE_DONE, false))
         }
     },
 }

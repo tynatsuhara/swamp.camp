@@ -4,6 +4,7 @@ import { KeyPressIndicator } from "../../ui/KeyPressIndicator"
 import { RenderMethod } from "../../../engine/renderer/RenderMethod"
 import { Controls } from "../../Controls"
 import { TILE_SIZE } from "../../graphics/Tilesets"
+import { DialogueDisplay } from "../../ui/DialogueDisplay"
 
 export class Interactable extends Component {
 
@@ -17,7 +18,7 @@ export class Interactable extends Component {
         position: Point, 
         fn: () => void, 
         uiOffset: Point = Point.ZERO,
-        isInteractable: () => boolean = () => true
+        isInteractable: () => boolean = () => !DialogueDisplay.instance.isOpen
     ) {
         super()
         this.position = position

@@ -3204,7 +3204,7 @@ System.register("game/world/elements/Hittable", ["engine/component", "engine/uti
                         return;
                     }
                     dir = dir.normalized();
-                    var frames = [0, 0, 0, 3, 6, 3, 2, 1];
+                    var frames = [0, 0, 0, 0, 0, 0, 0, 3, 6, 3, 2, 1];
                     this.animator = new Animator_3.Animator(Animator_3.Animator.frames(frames.length, 40), function (index) {
                         _this.tileTransforms.forEach(function (pt, tr) { return tr.position = pt.plus(dir.times(frames[index])); });
                     }, function () { return _this.animator = null; });
@@ -5292,20 +5292,6 @@ System.register("game/characters/dialogues/DipIntro", ["game/characters/Dialogue
                     "I'll put together a tent for you, if you collect rocks and wood for a campfire.",
                 ], function () { return new Dialogue_1.NextDialogue(6 /* DIP_MAKE_CAMPFIRE */, false); }); },
                 _a[6 /* DIP_MAKE_CAMPFIRE */] = function () {
-                    if (Dialogue_1.inv().getItemCount(4 /* CAMPFIRE */) > 0) { // campfire has been crafted
-                        return Dialogue_1.dialogue(["Great! Try placing the campfire down near my tent. You can open your inventory by pressing [" + String.fromCharCode(Controls_3.Controls.inventoryButton) + "]."], function () { return new Dialogue_1.NextDialogue(7 /* DIP_CAMPFIRE_DONE */, false); });
-                    }
-                    else if (Dialogue_1.inv().getItemCount(1 /* ROCK */) >= ROCKS_NEEDED_FOR_CAMPFIRE && Dialogue_1.inv().getItemCount(2 /* WOOD */) >= WOOD_NEEDED_FOR_CAMPFIRE) { // can craft
-                        return Dialogue_1.dialogueWithOptions(["It looks like you have enough rocks and wood. Should we put together a campfire?"], DudeInteractIndicator_1.DudeInteractIndicator.IMPORTANT_DIALOGUE, new Dialogue_1.DialogueOption(CRAFT_OPTION, function () {
-                            CraftingMenu_1.CraftingMenu.instance.show(CraftingRecipe_1.getDipRecipes());
-                            return new Dialogue_1.NextDialogue(6 /* DIP_MAKE_CAMPFIRE */, false);
-                        }), Dialogue_1.option("Not yet.", 6 /* DIP_MAKE_CAMPFIRE */, false));
-                    }
-                    else { // do not have enough ingredients to craft
-                        return Dialogue_1.dialogue(["We need " + ROCKS_NEEDED_FOR_CAMPFIRE + " rocks and " + WOOD_NEEDED_FOR_CAMPFIRE + " wood to make a campfire. Try hitting big rocks and trees with your sword!"], function () { return new Dialogue_1.NextDialogue(6 /* DIP_MAKE_CAMPFIRE */, false); });
-                    }
-                },
-                _a[7 /* DIP_CAMPFIRE_DONE */] = function () {
                     var campfires = LocationManager_9.LocationManager.instance.currentLocation.elements.values().filter(function (e) { return e.type === 3 /* CAMPFIRE */; });
                     var dipTent = LocationManager_9.LocationManager.instance.currentLocation.elements.values().filter(function (e) { return e.type === 2 /* TENT */; })[0];
                     if (campfires.length > 0) {
@@ -5315,8 +5301,8 @@ System.register("game/characters/dialogues/DipIntro", ["game/characters/Dialogue
                                 : "Well, the fire is a bit far from my tent, but that's okay!",
                             "Here, I've finished putting together your tent. Find a nice spot and plop it down!"
                         ];
-                        if (!campfires[0].save()["on"]) {
-                            lines.push("By the way, you can light the fire by standing close to it and pressing [" + Controls_3.Controls.keyString(Controls_3.Controls.interactButton) + "].");
+                        if (campfires[0].save()["logs"] === 0) {
+                            lines.push("By the way, you can add logs to the fire by standing close to it and pressing [" + Controls_3.Controls.keyString(Controls_3.Controls.interactButton) + "].");
                         }
                         return Dialogue_1.dialogue(lines, function () {
                             Dialogue_1.inv().addItem(3 /* TENT */);
@@ -5327,8 +5313,17 @@ System.register("game/characters/dialogues/DipIntro", ["game/characters/Dialogue
                             Dialogue_1.saveAfterDialogueStage();
                         }, DudeInteractIndicator_1.DudeInteractIndicator.IMPORTANT_DIALOGUE);
                     }
-                    else {
-                        return Dialogue_1.dialogue(["You should set up the campfire before it gets dark!"], function () { return new Dialogue_1.NextDialogue(7 /* DIP_CAMPFIRE_DONE */, false); });
+                    else if (Dialogue_1.inv().getItemCount(4 /* CAMPFIRE */) > 0) { // campfire has been crafted
+                        return Dialogue_1.dialogue(["Try placing the campfire down near my tent. You can open your inventory by pressing [" + String.fromCharCode(Controls_3.Controls.inventoryButton) + "]."], function () { return new Dialogue_1.NextDialogue(6 /* DIP_MAKE_CAMPFIRE */, false); });
+                    }
+                    else if (Dialogue_1.inv().getItemCount(1 /* ROCK */) >= ROCKS_NEEDED_FOR_CAMPFIRE && Dialogue_1.inv().getItemCount(2 /* WOOD */) >= WOOD_NEEDED_FOR_CAMPFIRE) { // can craft
+                        return Dialogue_1.dialogueWithOptions(["It looks like you have enough rocks and wood. Should we put together a campfire?"], DudeInteractIndicator_1.DudeInteractIndicator.IMPORTANT_DIALOGUE, new Dialogue_1.DialogueOption(CRAFT_OPTION, function () {
+                            CraftingMenu_1.CraftingMenu.instance.show(CraftingRecipe_1.getDipRecipes());
+                            return new Dialogue_1.NextDialogue(6 /* DIP_MAKE_CAMPFIRE */, false);
+                        }), Dialogue_1.option("Not yet.", 6 /* DIP_MAKE_CAMPFIRE */, false));
+                    }
+                    else { // do not have enough ingredients to craft
+                        return Dialogue_1.dialogue(["We need " + ROCKS_NEEDED_FOR_CAMPFIRE + " rocks and " + WOOD_NEEDED_FOR_CAMPFIRE + " wood to make a campfire. Try hitting big rocks and trees with your sword!"], function () { return new Dialogue_1.NextDialogue(6 /* DIP_MAKE_CAMPFIRE */, false); });
                     }
                 },
                 _a));
@@ -5350,7 +5345,7 @@ System.register("game/characters/dialogues/BertoIntro", ["game/characters/Dialog
         ],
         execute: function () {
             exports_71("BERTO_INTRO_DIALOGUE", BERTO_INTRO_DIALOGUE = (_a = {},
-                _a[8 /* BERT_0 */] = function () { return Dialogue_2.dialogue(["Good morrow! I, Sir Berto of Dube, present myself unto thee as an emissary of The Honourable King Bob XVIII."], function () { return new Dialogue_2.NextDialogue(8 /* BERT_0 */, false); }, DudeInteractIndicator_2.DudeInteractIndicator.IMPORTANT_DIALOGUE); },
+                _a[7 /* BERT_0 */] = function () { return Dialogue_2.dialogue(["Good morrow! I, Sir Berto of Dube, present myself unto thee as an emissary of The Honourable King Bob XVIII."], function () { return new Dialogue_2.NextDialogue(7 /* BERT_0 */, false); }, DudeInteractIndicator_2.DudeInteractIndicator.IMPORTANT_DIALOGUE); },
                 _a));
         }
     };
@@ -5636,14 +5631,14 @@ System.register("game/world/elements/Campfire", ["engine/component", "engine/til
                 // Toggle between on/off when interacted with
                 e.addComponent(new Interactable_1.Interactable(scaledPos.plus(new point_37.Point(Tilesets_18.TILE_SIZE / 2, Tilesets_18.TILE_SIZE / 2)), function () {
                     DialogueDisplay_1.DialogueDisplay.instance.startDialogue(cf);
-                }, new point_37.Point(1, -Tilesets_18.TILE_SIZE), function () { return DialogueDisplay_1.DialogueDisplay.instance.dialogueSource !== cf; }));
+                }, new point_37.Point(1, -Tilesets_18.TILE_SIZE)));
                 return e.addComponent(new ElementComponent_4.ElementComponent(3 /* CAMPFIRE */, [pos], function () { return { logs: cf.logs, llct: cf.lastLogConsumedTime }; }));
             });
             Campfire = /** @class */ (function (_super) {
                 __extends(Campfire, _super);
                 function Campfire(logs, lastLogConsumedTime, updateFire) {
                     var _this = _super.call(this) || this;
-                    _this.dialogue = 9 /* CAMPFIRE */;
+                    _this.dialogue = 8 /* CAMPFIRE */;
                     _this.logs = logs;
                     _this.lastLogConsumedTime = lastLogConsumedTime;
                     _this.updateFire = updateFire;
@@ -5700,7 +5695,7 @@ System.register("game/characters/dialogues/ItemDialogues", ["game/characters/Dia
         ],
         execute: function () {
             exports_74("ITEM_DIALOGUES", ITEM_DIALOGUES = (_a = {},
-                _a[9 /* CAMPFIRE */] = function () {
+                _a[8 /* CAMPFIRE */] = function () {
                     // the fire can be dead, almost dead, partially full, almost entirely full, or totally full
                     var cf = DialogueDisplay_2.DialogueDisplay.instance.dialogueSource;
                     var logCount = cf.logs;
@@ -5710,7 +5705,7 @@ System.register("game/characters/dialogues/ItemDialogues", ["game/characters/Dia
                         return function () {
                             Player_6.Player.instance.dude.inventory.removeItem(2 /* WOOD */, logsTransferred);
                             cf.addLogs(logsTransferred);
-                            return new Dialogue_3.NextDialogue(9 /* CAMPFIRE */, false);
+                            return new Dialogue_3.NextDialogue(8 /* CAMPFIRE */, false);
                         };
                     };
                     var cancelText = "Leave";
@@ -6289,9 +6284,9 @@ System.register("game/ui/KeyPressIndicator", ["engine/component", "game/graphics
         }
     };
 });
-System.register("game/world/elements/Interactable", ["engine/component", "engine/point", "game/ui/KeyPressIndicator", "game/Controls", "game/graphics/Tilesets"], function (exports_81, context_81) {
+System.register("game/world/elements/Interactable", ["engine/component", "engine/point", "game/ui/KeyPressIndicator", "game/Controls", "game/graphics/Tilesets", "game/ui/DialogueDisplay"], function (exports_81, context_81) {
     "use strict";
-    var component_20, point_41, KeyPressIndicator_2, Controls_6, Tilesets_21, Interactable;
+    var component_20, point_41, KeyPressIndicator_2, Controls_6, Tilesets_21, DialogueDisplay_4, Interactable;
     var __moduleName = context_81 && context_81.id;
     return {
         setters: [
@@ -6309,6 +6304,9 @@ System.register("game/world/elements/Interactable", ["engine/component", "engine
             },
             function (Tilesets_21_1) {
                 Tilesets_21 = Tilesets_21_1;
+            },
+            function (DialogueDisplay_4_1) {
+                DialogueDisplay_4 = DialogueDisplay_4_1;
             }
         ],
         execute: function () {
@@ -6316,7 +6314,7 @@ System.register("game/world/elements/Interactable", ["engine/component", "engine
                 __extends(Interactable, _super);
                 function Interactable(position, fn, uiOffset, isInteractable) {
                     if (uiOffset === void 0) { uiOffset = point_41.Point.ZERO; }
-                    if (isInteractable === void 0) { isInteractable = function () { return true; }; }
+                    if (isInteractable === void 0) { isInteractable = function () { return !DialogueDisplay_4.DialogueDisplay.instance.isOpen; }; }
                     var _this = _super.call(this) || this;
                     _this.position = position;
                     _this.interact = fn;
@@ -6959,7 +6957,7 @@ System.register("game/characters/AnimationUtils", ["game/graphics/Tilesets"], fu
 });
 System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "engine/point", "engine/component", "engine/collision/BoxCollider", "game/graphics/Tilesets", "game/characters/Weapon", "game/items/Items", "game/characters/Shield", "engine/tiles/TileTransform", "game/world/elements/Interactable", "game/characters/Dialogue", "game/ui/DialogueDisplay", "game/ui/DudeInteractIndicator", "game/ui/UIStateManager", "game/characters/AnimationUtils"], function (exports_92, context_92) {
     "use strict";
-    var AnimatedTileComponent_4, point_50, component_23, BoxCollider_7, Tilesets_28, Weapon_1, Items_6, Shield_1, TileTransform_20, Interactable_4, Dialogue_5, DialogueDisplay_4, DudeInteractIndicator_5, UIStateManager_13, AnimationUtils_1, Dude;
+    var AnimatedTileComponent_4, point_50, component_23, BoxCollider_7, Tilesets_28, Weapon_1, Items_6, Shield_1, TileTransform_20, Interactable_4, Dialogue_5, DialogueDisplay_5, DudeInteractIndicator_5, UIStateManager_13, AnimationUtils_1, Dude;
     var __moduleName = context_92 && context_92.id;
     return {
         setters: [
@@ -6996,8 +6994,8 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
             function (Dialogue_5_1) {
                 Dialogue_5 = Dialogue_5_1;
             },
-            function (DialogueDisplay_4_1) {
-                DialogueDisplay_4 = DialogueDisplay_4_1;
+            function (DialogueDisplay_5_1) {
+                DialogueDisplay_5 = DialogueDisplay_5_1;
             },
             function (DudeInteractIndicator_5_1) {
                 DudeInteractIndicator_5 = DudeInteractIndicator_5_1;
@@ -7047,7 +7045,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                         _this.collider = _this.entity.addComponent(new BoxCollider_7.BoxCollider(_this.position.plus(_this.relativeColliderPos), colliderSize, Dude.COLLISION_LAYER));
                         _this.dialogueInteract = _this.entity.addComponent(new Interactable_4.Interactable(new point_50.Point(0, 0), function () {
                             if (!!_this.dialogue) {
-                                DialogueDisplay_4.DialogueDisplay.instance.startDialogue(_this);
+                                DialogueDisplay_5.DialogueDisplay.instance.startDialogue(_this);
                             }
                         }));
                     };
@@ -7101,7 +7099,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     this.animation.transform.depth = this.collider.position.y + this.collider.dimensions.y;
                     this.dialogueInteract.position = this.standingPosition.minus(new point_50.Point(0, 5));
                     this.dialogueInteract.uiOffset = new point_50.Point(0, -Tilesets_28.TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition());
-                    this.dialogueInteract.enabled = this.dialogue !== 0 /* NONE */ && DialogueDisplay_4.DialogueDisplay.instance.dialogueSource !== this;
+                    this.dialogueInteract.enabled = this.dialogue !== 0 /* NONE */ && DialogueDisplay_5.DialogueDisplay.instance.dialogueSource !== this;
                 };
                 Object.defineProperty(Dude.prototype, "isAlive", {
                     get: function () { return this._health > 0; },
@@ -7263,7 +7261,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                         indicator = Dialogue_5.getDialogue(this.dialogue).indicator;
                     }
                     var tile = DudeInteractIndicator_5.DudeInteractIndicator.getTile(indicator);
-                    if (!tile || this.dialogueInteract.isShowingUI || DialogueDisplay_4.DialogueDisplay.instance.dialogueSource === this) {
+                    if (!tile || this.dialogueInteract.isShowingUI || DialogueDisplay_5.DialogueDisplay.instance.dialogueSource === this) {
                         return [];
                     }
                     else {
@@ -7457,7 +7455,7 @@ System.register("game/characters/NPCSchedule", [], function (exports_94, context
 });
 System.register("game/characters/NPC", ["engine/component", "game/characters/Dude", "game/characters/Player", "engine/point", "game/world/LocationManager", "game/graphics/Tilesets", "engine/util/Lists", "game/characters/NPCSchedule", "game/ui/DialogueDisplay", "game/world/PointLightMaskRenderer"], function (exports_95, context_95) {
     "use strict";
-    var component_25, Dude_4, Player_9, point_52, LocationManager_13, Tilesets_29, Lists_3, NPCSchedule_1, DialogueDisplay_5, PointLightMaskRenderer_2, NPC;
+    var component_25, Dude_4, Player_9, point_52, LocationManager_13, Tilesets_29, Lists_3, NPCSchedule_1, DialogueDisplay_6, PointLightMaskRenderer_2, NPC;
     var __moduleName = context_95 && context_95.id;
     return {
         setters: [
@@ -7485,8 +7483,8 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
             function (NPCSchedule_1_1) {
                 NPCSchedule_1 = NPCSchedule_1_1;
             },
-            function (DialogueDisplay_5_1) {
-                DialogueDisplay_5 = DialogueDisplay_5_1;
+            function (DialogueDisplay_6_1) {
+                DialogueDisplay_6 = DialogueDisplay_6_1;
             },
             function (PointLightMaskRenderer_2_1) {
                 PointLightMaskRenderer_2 = PointLightMaskRenderer_2_1;
@@ -7531,7 +7529,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     if (!!this.attackTarget && !this.attackTarget.isAlive) {
                         this.attackTarget = null; // no need to attack a dead dude
                     }
-                    if (DialogueDisplay_5.DialogueDisplay.instance.dialogueSource === this.dude) {
+                    if (DialogueDisplay_6.DialogueDisplay.instance.dialogueSource === this.dude) {
                         this.dude.move(updateData, point_52.Point.ZERO, Player_9.Player.instance.dude.standingPosition.x - this.dude.standingPosition.x);
                     }
                     else if (this.enemiesPresent) {
@@ -7977,7 +7975,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                             animationName = "Herald";
                             maxHealth = Number.MAX_SAFE_INTEGER;
                             speed *= .6;
-                            dialogue = 8 /* BERT_0 */;
+                            dialogue = 7 /* BERT_0 */;
                             additionalComponents = [
                                 new NPC_3.NPC(NPCSchedule_2.NPCSchedules.newGoToSchedule(// filter out occupied points to not get stuck in the campfire
                                 Lists_4.Lists.oneOf([new point_54.Point(-3, 0), new point_54.Point(-3, 1), new point_54.Point(-2, 0), new point_54.Point(-2, 1)].filter(function (pt) { return !location.elements.get(pt); })))),

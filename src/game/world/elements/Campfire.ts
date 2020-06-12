@@ -60,7 +60,6 @@ export const makeCampfire = (wl: WorldLocation, pos: Point, data: object): Eleme
             DialogueDisplay.instance.startDialogue(cf)
         }, 
         new Point(1, -TILE_SIZE),
-        () => DialogueDisplay.instance.dialogueSource !== cf
     ))
 
     return e.addComponent(new ElementComponent(
