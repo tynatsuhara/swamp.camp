@@ -5714,7 +5714,7 @@ System.register("game/characters/dialogues/ItemDialogues", ["game/characters/Dia
                     };
                     var cancelText = "Leave";
                     if (logsYouCanAdd === 0) {
-                        return Dialogue_3.dialogue([playerLogCount === 0 ? "You don't have any logs to add to the fire." : "This fire already has the maximum amount of logs."], completeDialogue(0));
+                        return Dialogue_3.dialogue([playerLogCount === 0 ? "You don't have any logs to add to the fire." : "The fire already has the maximum amount of logs."], completeDialogue(0));
                     }
                     else if (logsYouCanAdd === 1) {
                         return Dialogue_3.dialogueWithOptions([playerLogCount === 1 ? "You only have one log to add to the fire." : "You can fit one more log in the fire."], DudeInteractIndicator_3.DudeInteractIndicator.NONE, new Dialogue_3.DialogueOption("Add log", completeDialogue(1)), new Dialogue_3.DialogueOption(cancelText, completeDialogue(0)));
@@ -7017,7 +7017,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                 function Dude(type, faction, characterAnimName, position, weaponType, shieldId, maxHealth, health, speed, inventory, dialogue, blob) {
                     var _this = _super.call(this) || this;
                     _this.relativeColliderPos = new point_50.Point(3, 15);
-                    _this.beingKnockedBack = false;
+                    _this.knockIntervalCallback = 0;
                     _this.type = type;
                     _this.faction = faction;
                     _this._position = position;
@@ -7148,10 +7148,9 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                 };
                 Dude.prototype.knockback = function (direction, knockback) {
                     var _this = this;
-                    if (this.beingKnockedBack) {
-                        return;
+                    if (this.knockIntervalCallback !== 0) {
+                        window.cancelAnimationFrame(this.knockIntervalCallback);
                     }
-                    this.beingKnockedBack = true;
                     var goal = this.position.plus(direction.normalized().times(knockback));
                     var distToStop = 2;
                     var intervalsRemaining = 50;
@@ -7164,14 +7163,14 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                         }
                         intervalsRemaining--;
                         if (intervalsRemaining === 0 || goal.minus(_this.position).magnitude() < distToStop) {
-                            _this.beingKnockedBack = false;
+                            _this.knockIntervalCallback = 0;
                         }
                         else {
-                            requestAnimationFrame(knock);
+                            _this.knockIntervalCallback = requestAnimationFrame(knock);
                         }
                         last = now;
                     };
-                    requestAnimationFrame(knock);
+                    this.knockIntervalCallback = requestAnimationFrame(knock);
                 };
                 Dude.prototype.heal = function (amount) {
                     if (this.isAlive) {
@@ -7191,7 +7190,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     if (this._health <= 0) {
                         return;
                     }
-                    if (this.beingKnockedBack) {
+                    if (this.knockIntervalCallback !== 0) { // being knocked back, don't let em walk
                         direction = direction.times(0);
                     }
                     var dx = direction.x;
@@ -7652,6 +7651,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                         this.dude.move(updateData, point_52.Point.ZERO);
                         return;
                     }
+                    // TODO maybe switch dynamically between A* and direct walking?
                     // const followDistance = this.dude.weapon.getRange()/2 ?? 20
                     // const buffer = 0  // this basically determines how long they will stop for if they get too close
                     var dist = this.attackTarget.position.minus(this.dude.position);
@@ -7782,6 +7782,7 @@ System.register("game/characters/Enemy", ["engine/component", "game/characters/D
                     this.dude.weapon.setDelayBetweenAttacks(500);
                     this.npc = this.entity.getComponent(NPC_1.NPC);
                     // DEMON enemies will avoid light
+                    // TODO make them burn in the light or something?
                     if (this.dude.faction === 3 /* DEMONS */) {
                         this.npc.isEnemyFn = function (d) { return d.faction != _this.dude.faction && PointLightMaskRenderer_3.PointLightMaskRenderer.instance.getDarknessAtPosition(d.standingPosition) > 150; };
                         this.npc.pathFindingHeuristic = function (pt, goal) {

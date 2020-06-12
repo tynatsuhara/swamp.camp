@@ -177,13 +177,12 @@ export class Dude extends Component implements DialogueSource {
         // TODO
     }
 
-    private beingKnockedBack = false
-
+    private knockIntervalCallback: number = 0
     knockback(direction: Point, knockback: number) {
-        if (this.beingKnockedBack) {
-            return
+        if (this.knockIntervalCallback !== 0) {
+            window.cancelAnimationFrame(this.knockIntervalCallback)
         }
-        this.beingKnockedBack = true
+
         const goal = this.position.plus(direction.normalized().times(knockback))
         const distToStop = 2
         let intervalsRemaining = 50
@@ -197,13 +196,13 @@ export class Dude extends Component implements DialogueSource {
             }
             intervalsRemaining--
             if (intervalsRemaining === 0 || goal.minus(this.position).magnitude() < distToStop) {
-                this.beingKnockedBack = false
+                this.knockIntervalCallback = 0
             } else {
-                requestAnimationFrame(knock)
+                this.knockIntervalCallback = requestAnimationFrame(knock)
             }
             last = now
         }
-        requestAnimationFrame(knock)
+        this.knockIntervalCallback = requestAnimationFrame(knock)
     }
 
     heal(amount: number) {
@@ -229,7 +228,7 @@ export class Dude extends Component implements DialogueSource {
             return
         }
 
-        if (this.beingKnockedBack) {
+        if (this.knockIntervalCallback !== 0) {  // being knocked back, don't let em walk
             direction = direction.times(0)
         }
 

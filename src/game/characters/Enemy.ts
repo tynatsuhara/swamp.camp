@@ -18,6 +18,7 @@ export class Enemy extends Component {
         this.npc = this.entity.getComponent(NPC)
 
         // DEMON enemies will avoid light
+        // TODO make them burn in the light or something?
         if (this.dude.faction === DudeFaction.DEMONS) {
             this.npc.isEnemyFn = d => d.faction != this.dude.faction && PointLightMaskRenderer.instance.getDarknessAtPosition(d.standingPosition) > 150
             this.npc.pathFindingHeuristic = (pt: Point, goal: Point) => {

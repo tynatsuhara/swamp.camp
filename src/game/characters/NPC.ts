@@ -188,6 +188,8 @@ export class NPC extends Component {
             return
         }
 
+        // TODO maybe switch dynamically between A* and direct walking?
+
         // const followDistance = this.dude.weapon.getRange()/2 ?? 20
         // const buffer = 0  // this basically determines how long they will stop for if they get too close
 

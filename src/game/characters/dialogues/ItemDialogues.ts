@@ -26,7 +26,7 @@ export const ITEM_DIALOGUES: { [key: number]: () => DialogueInstance } = {
 
         if (logsYouCanAdd === 0) {
             return dialogue(
-                [playerLogCount === 0 ? "You don't have any logs to add to the fire." : "This fire already has the maximum amount of logs."], 
+                [playerLogCount === 0 ? "You don't have any logs to add to the fire." : "The fire already has the maximum amount of logs."], 
                 completeDialogue(0)
             )
         } else if (logsYouCanAdd === 1) {
