@@ -121,6 +121,7 @@ export class Player extends Component {
         const possibilities = interactables
                 .filter(e => this.dude.isFacing(e.position))  // interactables the dude is facing
                 .filter(e => e.position.distanceTo(interactCenter) < interactDistance)
+                .filter(e => e.isInteractable())
 
         const i = Lists.minBy(possibilities, e => e.position.distanceTo(interactCenter))
         if (!!i) {

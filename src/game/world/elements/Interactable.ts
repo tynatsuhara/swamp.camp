@@ -9,24 +9,31 @@ export class Interactable extends Component {
 
     position: Point
     uiOffset: Point
-    private canInteract: boolean
-    get isShowingUI() { return this.canInteract }
+    private showUI: boolean
+    get isShowingUI() { return this.showUI }
+    readonly isInteractable: () => boolean
 
-    constructor(position: Point, fn: () => void, uiOffset: Point = Point.ZERO) {
+    constructor(
+        position: Point, 
+        fn: () => void, 
+        uiOffset: Point = Point.ZERO,
+        isInteractable: () => boolean = () => true
+    ) {
         super()
         this.position = position
         this.interact = fn
         this.uiOffset = uiOffset
+        this.isInteractable = isInteractable
     }
 
-    updateIndicator(canInteract: boolean) {
-        this.canInteract = canInteract
+    updateIndicator(showUI: boolean) {
+        this.showUI = showUI
     }
 
     interact() {}
 
     getRenderMethods(): RenderMethod[] {
-        if (!this.canInteract) {
+        if (!this.showUI) {
             return []
         }
         return new KeyPressIndicator(
