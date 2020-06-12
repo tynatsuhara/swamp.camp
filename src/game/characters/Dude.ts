@@ -19,6 +19,7 @@ import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { UIStateManager } from "../ui/UIStateManager"
 import { AnimationUtils } from "./AnimationUtils"
+import { ImageFilters } from "../graphics/ImageFilters"
 
 export class Dude extends Component implements DialogueSource {
 
@@ -162,10 +163,26 @@ export class Dude extends Component implements DialogueSource {
             this.standingPosition.minus(new Point(0, 5))
         )
         this.deathOffset = this.animation.transform.position.minus(prePos)
-        this.animation.play(0)
+        this.animation.goToAnimation(0)
         this.animation.paused = true
         setTimeout(() => this.spawnDrop(), 100)
         this.dropWeapon()
+        setTimeout(() => this.dissolve(), 500)
+    }
+
+    // TODO maybe use this for demons in sunlight
+    private dissolve() {
+        this.collider.enabled = false
+        let dissolveChance = .1
+        const interval = setInterval(() => {
+            this.animation.applyFilter(ImageFilters.dissolve(() => dissolveChance))
+            this.animation.goToAnimation(0)  // refresh even though it's paused
+            if (dissolveChance >= 1) {
+                this.entity.selfDestruct()
+                clearInterval(interval)
+            }
+            dissolveChance *= 2
+        }, 200)
     }
 
     private spawnDrop() {
@@ -246,7 +263,7 @@ export class Dude extends Component implements DialogueSource {
 
         if (this.isMoving) {
             if (!wasMoving) {
-                this.animation.play(1)  // TODO make the run animation backwards if they run backwards :)
+                this.animation.goToAnimation(1)  // TODO make the run animation backwards if they run backwards :)
             }
             const translation = direction.normalized()
             // this.lerpedLastMoveDir = this.lerpedLastMoveDir.lerp(0.25, translation)
@@ -254,7 +271,7 @@ export class Dude extends Component implements DialogueSource {
             const newPos = this._position.plus(translation.times(distance))
             this.moveTo(newPos)
         } else if (wasMoving) {
-            this.animation.play(0)
+            this.animation.goToAnimation(0)
         }
     }
 

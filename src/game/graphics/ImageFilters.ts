@@ -1,4 +1,5 @@
 import { Color } from "../ui/Color"
+import { Point } from "../../engine/point"
 
 export const ImageFilters = {
     tint: (color: string) => {
@@ -12,5 +13,18 @@ export const ImageFilters = {
                 }
             }
         }
-    }
+    },
+
+    dissolve: (dissolveProbabilityFn: (pt: Point) => number) => {
+        return (img: ImageData) => {
+            for (let x = 0; x < img.width; x++) {
+                for (let y = 0; y < img.height; y++) {
+                    if (Math.random() < dissolveProbabilityFn(new Point(x, y))) {
+                        const i = (x + y * img.width) * 4
+                        img.data[i+3] = 0
+                    }
+                }
+            }
+        }
+    },
 }

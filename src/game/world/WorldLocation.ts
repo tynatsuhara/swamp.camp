@@ -115,7 +115,7 @@ export class WorldLocation {
             uuid: this.uuid,
             ground: this.saveGround(),
             elements: this.saveElements(),
-            dudes: Array.from(this.dudes).filter(d => d.isAlive).map(d => d.save()),
+            dudes: Array.from(this.dudes).filter(d => d.isAlive && !!d.entity).map(d => d.save()),
             teleporters: this.teleporters,
             isInterior: this.isInterior
         }

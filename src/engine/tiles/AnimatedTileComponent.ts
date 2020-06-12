@@ -20,14 +20,14 @@ export class AnimatedTileComponent extends TileComponent {
         const defaultAnimation = animations[0]
         super(defaultAnimation.getTile(0), transform)
         this.animations = animations
-        this.play(0)
+        this.goToAnimation(0)
     }
 
     currentFrame() {
         return this.animator.getCurrentFrame()
     }
 
-    play(animation: number) {
+    goToAnimation(animation: number) {
         const anim = this.animations[animation]
         this.animator = new Animator(
             anim.frames.map(f => f[1]), 
@@ -45,5 +45,10 @@ export class AnimatedTileComponent extends TileComponent {
 
     fastForward(ms: number) {
         this.animator.update(Math.floor(ms))
+    }
+
+    // This won't currently refresh the animation
+    applyFilter(filter: (img: ImageData) => void) {
+        this.animations = this.animations.map(a => a.filtered(filter))
     }
 }
