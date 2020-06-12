@@ -80,7 +80,7 @@ export class Shield extends Component {
     }
 
     isBlocking() {
-        return this.state === State.DRAWN && this.raisedPerc > .5
+        return this.state === State.DRAWN && this.raisedPerc > .3
     }
 
     canAttack() {

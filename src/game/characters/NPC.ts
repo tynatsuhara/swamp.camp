@@ -110,7 +110,8 @@ export class NPC extends Component {
         this.walkPath = null
         this.fleePath = null
         this.attackTarget = null
-        this.followTarget = null
+        this.targetPath = null
+        // this.followTarget = null
     }
 
     // fn will execute immediately and every intervalMillis milliseconds until the NPC is dead
@@ -146,11 +147,18 @@ export class NPC extends Component {
     private doFlee(updateData: UpdateData, speedMultiplier: number = 1, ptSelectionFilter: (pt) => boolean = () => true) {
         if (!this.fleePath || this.fleePath.length === 0) {  // only try once per upate() to find a path
             const l = LocationManager.instance.currentLocation
-            const openPoints = l.ground.keys().filter(pt => !l.elements.get(pt)).filter(ptSelectionFilter)
+            const openPoints = l.ground.keys().filter(pt => !l.elements.get(pt))
             let pt: Point
-            do {
+            for (let i = 0; i < 5; i++) {
                 pt = openPoints[Math.floor(Math.random() * openPoints.length)]
-            } while (!ptSelectionFilter(pt))
+                if (ptSelectionFilter(pt)) {
+                    break
+                }
+            }
+            if (!pt) {
+                this.dude.move(updateData, Point.ZERO)
+                return
+            }
             this.fleePath = this.findPath(pt)
             if (!this.fleePath || this.fleePath.length === 0) {
                 this.dude.move(updateData, Point.ZERO)
@@ -168,28 +176,38 @@ export class NPC extends Component {
     //     this.followTarget = followTarget
     // }
 
-    // TODO support pathfinding for attacking
     private attackTarget: Dude
+    private targetPath: Point[] = null
     private doAttack(updateData: UpdateData) {
-        if (!this.dude.weapon || !this.dude.isAlive) {
+        if (!this.dude.isAlive) {
             return
         }
 
-        if (!this.attackTarget || !this.attackTarget.isAlive) {
-            this.dude.move(updateData, new Point(0, 0))
+        if (!this.dude.weapon || !this.attackTarget || !this.targetPath || this.targetPath.length === 0 || !this.attackTarget.isAlive) {
+            this.dude.move(updateData,Point.ZERO)
             return
         }
 
-        const followDistance = this.dude.weapon.getRange()/2 ?? 20
-        const buffer = 0  // this basically determines how long they will stop for if they get too close
+        // const followDistance = this.dude.weapon.getRange()/2 ?? 20
+        // const buffer = 0  // this basically determines how long they will stop for if they get too close
 
         const dist = this.attackTarget.position.minus(this.dude.position)
         const mag = dist.magnitude()
 
-        if (mag > followDistance || ((followDistance-mag) < buffer && this.attackTarget.isMoving) && this.dude.isMoving) {
-            this.dude.move(updateData, dist)
-        } else {
-            this.dude.move(updateData, new Point(0, 0))
+        // if (mag > followDistance || ((followDistance-mag) < buffer && this.attackTarget.isMoving) && this.dude.isMoving) {
+        //     this.dude.move(updateData, dist)
+        // } else {
+        //     this.dude.move(updateData, new Point(0, 0))
+        // }
+
+        if (this.walkDirectlyTo(
+            this.targetPath[0], 
+            updateData, 
+            this.targetPath.length === 1, 
+            1, 
+            this.targetPath.length < 2 ? (this.attackTarget.standingPosition.x - this.dude.standingPosition.x) : 0
+        )) {
+            this.targetPath.shift()
         }
 
         if (mag < this.dude.weapon?.getRange()) {
@@ -197,7 +215,7 @@ export class NPC extends Component {
         }
     }
 
-    private followTarget: Dude
+    // private followTarget: Dude
     // private doFollow(updateData: UpdateData) {
     //     const followDistance = 75
     //     const buffer = 40  // this basically determines how long they will stop for if they get too close
@@ -213,13 +231,13 @@ export class NPC extends Component {
     // }
 
     // returns true if they are pretty close (half a tile) away from the goal
-    private walkDirectlyTo(pt: Point, updateData: UpdateData, stopWhenClose = false, speedMultiplier: number = 1) {
+    private walkDirectlyTo(pt: Point, updateData: UpdateData, stopWhenClose = false, speedMultiplier: number = 1, facingOverride: number = 0) {
         // const dist = this.dude.standingPosition.distanceTo(pt)
         const isCloseEnough = this.isCloseEnoughToStopWalking(pt)
         if (isCloseEnough && stopWhenClose) {
-            this.dude.move(updateData, Point.ZERO)
+            this.dude.move(updateData, Point.ZERO, facingOverride)
         } else {
-            this.dude.move(updateData, pt.minus(this.dude.standingPosition), 0, speedMultiplier)
+            this.dude.move(updateData, pt.minus(this.dude.standingPosition), facingOverride, speedMultiplier)
         }
         return isCloseEnough
     }
@@ -247,6 +265,14 @@ export class NPC extends Component {
 
         const target = Lists.minBy(enemies, d => d.position.distanceTo(this.dude.position))
         if (!!target) {
+            // if (target === this.attackTarget) {
+            //     // we're already tracking this target, so update the path to extend to the new target position
+            //     const currentGoal = this.targetPath[this.targetPath.length-1]
+            //     this.targetPath = this.targetPath.concat(this.findPath(target.standingPosition, currentGoal))
+            // } else {
+                
+                this.targetPath = this.findPath(pixelPtToTilePt(target.standingPosition))
+            // }
             this.attackTarget = target
         }
     }
@@ -256,8 +282,8 @@ export class NPC extends Component {
         this.dude.moveTo(pos)
     }
 
-    private findPath(tilePt: Point) {
-        const start = pixelPtToTilePt(this.dude.standingPosition)
+    private findPath(tilePt: Point, pixelPtStart: Point = this.dude.standingPosition) {
+        const start = pixelPtToTilePt(pixelPtStart)
         const end = tilePt
         return LocationManager.instance.currentLocation.elements.findPath(
             start, 

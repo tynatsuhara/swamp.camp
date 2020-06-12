@@ -5294,7 +5294,7 @@ System.register("game/characters/dialogues/DipIntro", ["game/characters/Dialogue
                 _a[6 /* DIP_MAKE_CAMPFIRE */] = function () {
                     var campfires = LocationManager_9.LocationManager.instance.currentLocation.elements.values().filter(function (e) { return e.type === 3 /* CAMPFIRE */; });
                     var dipTent = LocationManager_9.LocationManager.instance.currentLocation.elements.values().filter(function (e) { return e.type === 2 /* TENT */; })[0];
-                    if (campfires.length > 0) {
+                    if (campfires.length > 0) { // campfire has been placed
                         var lines = [
                             dipTent.occupiedPoints[0].distanceTo(campfires[0].occupiedPoints[0]) < 5
                                 ? "That should keep us warm tonight!"
@@ -5437,6 +5437,10 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                  * @return alpha 0-255 (total light to total darkness)
                  */
                 PointLightMaskRenderer.prototype.getDarknessAtPosition = function (pixelPt) {
+                    var lim = this.size / 2;
+                    if (pixelPt.x < -lim || pixelPt.x > lim || pixelPt.y < -lim || pixelPt.y > lim) {
+                        return 255;
+                    }
                     var pt = pixelPt.plus(this.shift).apply(Math.floor);
                     return this.context.getImageData(pt.x, pt.y, 1, 1).data[3];
                 };
@@ -6912,7 +6916,7 @@ System.register("game/characters/Shield", ["engine/component", "engine/tiles/Til
                     this.blockingActive = blockingActive;
                 };
                 Shield.prototype.isBlocking = function () {
-                    return this.state === State.DRAWN && this.raisedPerc > .5;
+                    return this.state === State.DRAWN && this.raisedPerc > .3;
                 };
                 Shield.prototype.canAttack = function () {
                     return this.state === State.DRAWN && this.raisedPerc < .5;
@@ -7505,6 +7509,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     _this.enemiesPresent = false;
                     _this.walkPath = null;
                     _this.fleePath = null;
+                    _this.targetPath = null;
                     _this.awake = function () {
                         _this.dude = _this.entity.getComponent(Dude_4.Dude);
                         if (!_this.dude.blob[NPCSchedule_1.NPCSchedules.SCHEDULE_KEY]) {
@@ -7580,7 +7585,8 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     this.walkPath = null;
                     this.fleePath = null;
                     this.attackTarget = null;
-                    this.followTarget = null;
+                    this.targetPath = null;
+                    // this.followTarget = null
                 };
                 // fn will execute immediately and every intervalMillis milliseconds until the NPC is dead
                 NPC.prototype.doWhileLiving = function (fn, intervalMillis) {
@@ -7615,11 +7621,18 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     if (ptSelectionFilter === void 0) { ptSelectionFilter = function () { return true; }; }
                     if (!this.fleePath || this.fleePath.length === 0) { // only try once per upate() to find a path
                         var l_1 = LocationManager_13.LocationManager.instance.currentLocation;
-                        var openPoints = l_1.ground.keys().filter(function (pt) { return !l_1.elements.get(pt); }).filter(ptSelectionFilter);
+                        var openPoints = l_1.ground.keys().filter(function (pt) { return !l_1.elements.get(pt); });
                         var pt = void 0;
-                        do {
+                        for (var i = 0; i < 5; i++) {
                             pt = openPoints[Math.floor(Math.random() * openPoints.length)];
-                        } while (!ptSelectionFilter(pt));
+                            if (ptSelectionFilter(pt)) {
+                                break;
+                            }
+                        }
+                        if (!pt) {
+                            this.dude.move(updateData, point_52.Point.ZERO);
+                            return;
+                        }
                         this.fleePath = this.findPath(pt);
                         if (!this.fleePath || this.fleePath.length === 0) {
                             this.dude.move(updateData, point_52.Point.ZERO);
@@ -7631,28 +7644,31 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     }
                 };
                 NPC.prototype.doAttack = function (updateData) {
-                    var _a, _b;
-                    if (!this.dude.weapon || !this.dude.isAlive) {
+                    var _a;
+                    if (!this.dude.isAlive) {
                         return;
                     }
-                    if (!this.attackTarget || !this.attackTarget.isAlive) {
-                        this.dude.move(updateData, new point_52.Point(0, 0));
+                    if (!this.dude.weapon || !this.attackTarget || !this.targetPath || this.targetPath.length === 0 || !this.attackTarget.isAlive) {
+                        this.dude.move(updateData, point_52.Point.ZERO);
                         return;
                     }
-                    var followDistance = (_a = this.dude.weapon.getRange() / 2) !== null && _a !== void 0 ? _a : 20;
-                    var buffer = 0; // this basically determines how long they will stop for if they get too close
+                    // const followDistance = this.dude.weapon.getRange()/2 ?? 20
+                    // const buffer = 0  // this basically determines how long they will stop for if they get too close
                     var dist = this.attackTarget.position.minus(this.dude.position);
                     var mag = dist.magnitude();
-                    if (mag > followDistance || ((followDistance - mag) < buffer && this.attackTarget.isMoving) && this.dude.isMoving) {
-                        this.dude.move(updateData, dist);
+                    // if (mag > followDistance || ((followDistance-mag) < buffer && this.attackTarget.isMoving) && this.dude.isMoving) {
+                    //     this.dude.move(updateData, dist)
+                    // } else {
+                    //     this.dude.move(updateData, new Point(0, 0))
+                    // }
+                    if (this.walkDirectlyTo(this.targetPath[0], updateData, this.targetPath.length === 1, 1, this.targetPath.length < 2 ? (this.attackTarget.standingPosition.x - this.dude.standingPosition.x) : 0)) {
+                        this.targetPath.shift();
                     }
-                    else {
-                        this.dude.move(updateData, new point_52.Point(0, 0));
-                    }
-                    if (mag < ((_b = this.dude.weapon) === null || _b === void 0 ? void 0 : _b.getRange())) {
+                    if (mag < ((_a = this.dude.weapon) === null || _a === void 0 ? void 0 : _a.getRange())) {
                         this.dude.weapon.attack();
                     }
                 };
+                // private followTarget: Dude
                 // private doFollow(updateData: UpdateData) {
                 //     const followDistance = 75
                 //     const buffer = 40  // this basically determines how long they will stop for if they get too close
@@ -7665,16 +7681,17 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                 //     }
                 // }
                 // returns true if they are pretty close (half a tile) away from the goal
-                NPC.prototype.walkDirectlyTo = function (pt, updateData, stopWhenClose, speedMultiplier) {
+                NPC.prototype.walkDirectlyTo = function (pt, updateData, stopWhenClose, speedMultiplier, facingOverride) {
                     if (stopWhenClose === void 0) { stopWhenClose = false; }
                     if (speedMultiplier === void 0) { speedMultiplier = 1; }
+                    if (facingOverride === void 0) { facingOverride = 0; }
                     // const dist = this.dude.standingPosition.distanceTo(pt)
                     var isCloseEnough = this.isCloseEnoughToStopWalking(pt);
                     if (isCloseEnough && stopWhenClose) {
-                        this.dude.move(updateData, point_52.Point.ZERO);
+                        this.dude.move(updateData, point_52.Point.ZERO, facingOverride);
                     }
                     else {
-                        this.dude.move(updateData, pt.minus(this.dude.standingPosition), 0, speedMultiplier);
+                        this.dude.move(updateData, pt.minus(this.dude.standingPosition), facingOverride, speedMultiplier);
                     }
                     return isCloseEnough;
                 };
@@ -7698,6 +7715,13 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     }
                     var target = Lists_3.Lists.minBy(enemies, function (d) { return d.position.distanceTo(_this.dude.position); });
                     if (!!target) {
+                        // if (target === this.attackTarget) {
+                        //     // we're already tracking this target, so update the path to extend to the new target position
+                        //     const currentGoal = this.targetPath[this.targetPath.length-1]
+                        //     this.targetPath = this.targetPath.concat(this.findPath(target.standingPosition, currentGoal))
+                        // } else {
+                        this.targetPath = this.findPath(Tilesets_29.pixelPtToTilePt(target.standingPosition));
+                        // }
                         this.attackTarget = target;
                     }
                 };
@@ -7705,10 +7729,11 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     var pos = this.tilePtToStandingPos(pt).minus(this.dude.standingPosition).plus(this.dude.position);
                     this.dude.moveTo(pos);
                 };
-                NPC.prototype.findPath = function (tilePt) {
+                NPC.prototype.findPath = function (tilePt, pixelPtStart) {
                     var _this = this;
+                    if (pixelPtStart === void 0) { pixelPtStart = this.dude.standingPosition; }
                     var _a;
-                    var start = Tilesets_29.pixelPtToTilePt(this.dude.standingPosition);
+                    var start = Tilesets_29.pixelPtToTilePt(pixelPtStart);
                     var end = tilePt;
                     return (_a = LocationManager_13.LocationManager.instance.currentLocation.elements.findPath(start, end, function (pt) { return _this.pathFindingHeuristic(pt, end); }, function (pt) { return (pt === start ? false : !!LocationManager_13.LocationManager.instance.currentLocation.elements.get(pt)); } // prevent getting stuck "inside" a square
                     )) === null || _a === void 0 ? void 0 : _a.map(function (pt) { return _this.tilePtToStandingPos(pt); }).slice(1); // slice(1) because we don't need the start in the path
@@ -7859,9 +7884,10 @@ System.register("game/characters/Villager", ["engine/component", "game/character
                     this.npc = this.entity.getComponent(NPC_2.NPC);
                     this.dude = this.entity.getComponent(Dude_7.Dude);
                     this.npc.isEnemyFn = function (d) {
-                        // Villagers only consider demons enemies if the villager is out in the dark
+                        // Villagers will only flee from demons if the villager is in the dark or really close to the demon
                         if (d.faction === 3 /* DEMONS */) {
-                            return PointLightMaskRenderer_4.PointLightMaskRenderer.instance.getDarknessAtPosition(_this.dude.standingPosition) !== 0;
+                            return PointLightMaskRenderer_4.PointLightMaskRenderer.instance.getDarknessAtPosition(_this.dude.standingPosition) !== 0
+                                || d.standingPosition.distanceTo(_this.dude.standingPosition) < 30;
                         }
                         return d.faction !== 0 /* VILLAGERS */;
                     };

@@ -66,6 +66,10 @@ export class PointLightMaskRenderer {
      * @return alpha 0-255 (total light to total darkness)
      */
     getDarknessAtPosition(pixelPt: Point) {
+        const lim = this.size/2
+        if (pixelPt.x < -lim || pixelPt.x > lim || pixelPt.y < -lim || pixelPt.y > lim) {
+            return 255
+        }
         const pt = pixelPt.plus(this.shift).apply(Math.floor)
         return this.context.getImageData(pt.x, pt.y, 1, 1).data[3]
     }

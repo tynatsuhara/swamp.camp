@@ -14,9 +14,10 @@ export class Villager extends Component {
         this.dude = this.entity.getComponent(Dude)
 
         this.npc.isEnemyFn = d => {
-            // Villagers only consider demons enemies if the villager is out in the dark
+            // Villagers will only flee from demons if the villager is in the dark or really close to the demon
             if (d.faction === DudeFaction.DEMONS) {
-                return PointLightMaskRenderer.instance.getDarknessAtPosition(this.dude.standingPosition) !== 0
+                return PointLightMaskRenderer.instance.getDarknessAtPosition(this.dude.standingPosition) !== 0 
+                        || d.standingPosition.distanceTo(this.dude.standingPosition) < 30
             }
 
             return d.faction !== DudeFaction.VILLAGERS
