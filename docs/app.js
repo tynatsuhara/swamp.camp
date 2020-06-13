@@ -7560,7 +7560,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                 };
                 NPC.prototype.start = function () {
                     var _this = this;
-                    this.doWhileLiving(function () { return _this.checkForEnemies(); }, 700 + 600 * Math.random());
+                    this.doWhileLiving(function () { return _this.checkForEnemies(); }, 1000 + 1000 * Math.random());
                 };
                 NPC.prototype.update = function (updateData) {
                     /**
@@ -7571,6 +7571,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                      */
                     if (!!this.attackTarget && !this.attackTarget.isAlive) {
                         this.attackTarget = null; // no need to attack a dead dude
+                        this.targetPath = null;
                     }
                     if (DialogueDisplay_6.DialogueDisplay.instance.dialogueSource === this.dude) {
                         this.dude.move(updateData, point_53.Point.ZERO, Player_9.Player.instance.dude.standingPosition.x - this.dude.standingPosition.x);
@@ -7686,7 +7687,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     if (!this.dude.isAlive) {
                         return;
                     }
-                    if (!this.dude.weapon || !this.attackTarget || !this.targetPath || this.targetPath.length === 0 || !this.attackTarget.isAlive) {
+                    if (!this.dude.weapon || !this.attackTarget || !this.targetPath || !this.attackTarget.isAlive) {
                         this.dude.move(updateData, point_53.Point.ZERO);
                         return;
                     }
@@ -7700,11 +7701,18 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     // } else {
                     //     this.dude.move(updateData, new Point(0, 0))
                     // }
-                    if (this.walkDirectlyTo(this.targetPath[0], updateData, this.targetPath.length === 1, 1, this.targetPath.length < 2 ? (this.attackTarget.standingPosition.x - this.dude.standingPosition.x) : 0)) {
-                        this.targetPath.shift();
-                    }
                     if (mag < ((_a = this.dude.weapon) === null || _a === void 0 ? void 0 : _a.getRange())) {
                         this.dude.weapon.attack();
+                    }
+                    if (this.targetPath.length === 0) {
+                        this.targetPath = this.findPath(Tilesets_29.pixelPtToTilePt(this.attackTarget.standingPosition), this.dude.standingPosition);
+                    }
+                    if (!this.targetPath || this.targetPath.length === 0) {
+                        this.dude.move(updateData, point_53.Point.ZERO);
+                        return;
+                    }
+                    if (this.walkDirectlyTo(this.targetPath[0], updateData, false, 1, this.targetPath.length < 2 ? (this.attackTarget.standingPosition.x - this.dude.standingPosition.x) : 0)) {
+                        this.targetPath.shift();
                     }
                 };
                 // private followTarget: Dude
@@ -7724,16 +7732,20 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     if (stopWhenClose === void 0) { stopWhenClose = false; }
                     if (speedMultiplier === void 0) { speedMultiplier = 1; }
                     if (facingOverride === void 0) { facingOverride = 0; }
-                    // const dist = this.dude.standingPosition.distanceTo(pt)
                     var isCloseEnough = this.isCloseEnoughToStopWalking(pt);
                     if (isCloseEnough && stopWhenClose) {
                         this.dude.move(updateData, point_53.Point.ZERO, facingOverride);
                     }
                     else {
+                        var pos = this.dude.standingPosition;
                         this.dude.move(updateData, pt.minus(this.dude.standingPosition), facingOverride, speedMultiplier);
+                        if (!this.dude.standingPosition.equals(pos)) {
+                            this.lastMovePos = new Date().getMilliseconds();
+                        }
                     }
                     return isCloseEnough;
                 };
+                NPC.prototype.stuck = function () { return new Date().getMilliseconds() - this.lastMovePos > 1000; };
                 NPC.prototype.isCloseEnoughToStopWalking = function (pt) {
                     return this.dude.standingPosition.distanceTo(pt) < 8;
                 };
@@ -7754,13 +7766,23 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     }
                     var target = Lists_3.Lists.minBy(enemies, function (d) { return d.position.distanceTo(_this.dude.position); });
                     if (!!target) {
-                        // if (target === this.attackTarget) {
-                        //     // we're already tracking this target, so update the path to extend to the new target position
-                        //     const currentGoal = this.targetPath[this.targetPath.length-1]
-                        //     this.targetPath = this.targetPath.concat(this.findPath(target.standingPosition, currentGoal))
-                        // } else {
-                        this.targetPath = this.findPath(Tilesets_29.pixelPtToTilePt(target.standingPosition));
-                        // }
+                        var shouldComputePath = true;
+                        if (target === this.attackTarget && !!this.targetPath && this.targetPath.length > 0) {
+                            // We're already tracking this target. Only update the path if they have gotten closer, 
+                            // otherwise the attack() function will automatically extend the path.
+                            // const currentGoal = pixelPtToTilePt(this.targetPath[this.targetPath.length-1])
+                            var newGoal = Tilesets_29.pixelPtToTilePt(target.standingPosition);
+                            var currentPos = Tilesets_29.pixelPtToTilePt(this.dude.standingPosition);
+                            if (this.targetPath.length <= currentPos.manhattanDistanceTo(newGoal)) {
+                                shouldComputePath = false;
+                            }
+                        }
+                        if (this.stuck) {
+                            shouldComputePath = true;
+                        }
+                        if (shouldComputePath) {
+                            this.targetPath = this.findPath(Tilesets_29.pixelPtToTilePt(target.standingPosition));
+                        }
                         this.attackTarget = target;
                     }
                 };

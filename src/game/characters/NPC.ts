@@ -38,7 +38,7 @@ export class NPC extends Component {
     }
 
     start() {
-        this.doWhileLiving(() => this.checkForEnemies(), 700 + 600 * Math.random())
+        this.doWhileLiving(() => this.checkForEnemies(), 1000 + 1000 * Math.random())
     }
 
     update(updateData: UpdateData) {
@@ -51,6 +51,7 @@ export class NPC extends Component {
 
         if (!!this.attackTarget && !this.attackTarget.isAlive) {
             this.attackTarget = null  // no need to attack a dead dude
+            this.targetPath = null
         }
 
         if (DialogueDisplay.instance.dialogueSource === this.dude) {
@@ -183,8 +184,8 @@ export class NPC extends Component {
             return
         }
 
-        if (!this.dude.weapon || !this.attackTarget || !this.targetPath || this.targetPath.length === 0 || !this.attackTarget.isAlive) {
-            this.dude.move(updateData,Point.ZERO)
+        if (!this.dude.weapon || !this.attackTarget || !this.targetPath || !this.attackTarget.isAlive) {
+            this.dude.move(updateData, Point.ZERO)
             return
         }
 
@@ -202,18 +203,26 @@ export class NPC extends Component {
         //     this.dude.move(updateData, new Point(0, 0))
         // }
 
+        if (mag < this.dude.weapon?.getRange()) {
+            this.dude.weapon.attack()
+        }
+
+        if (this.targetPath.length === 0) {
+            this.targetPath = this.findPath(pixelPtToTilePt(this.attackTarget.standingPosition), this.dude.standingPosition)
+        }
+        if (!this.targetPath || this.targetPath.length === 0) {
+            this.dude.move(updateData, Point.ZERO)
+            return
+        }
+
         if (this.walkDirectlyTo(
             this.targetPath[0], 
             updateData, 
-            this.targetPath.length === 1, 
+            false, 
             1, 
             this.targetPath.length < 2 ? (this.attackTarget.standingPosition.x - this.dude.standingPosition.x) : 0
         )) {
             this.targetPath.shift()
-        }
-
-        if (mag < this.dude.weapon?.getRange()) {
-            this.dude.weapon.attack()
         }
     }
 
@@ -234,15 +243,21 @@ export class NPC extends Component {
 
     // returns true if they are pretty close (half a tile) away from the goal
     private walkDirectlyTo(pt: Point, updateData: UpdateData, stopWhenClose = false, speedMultiplier: number = 1, facingOverride: number = 0) {
-        // const dist = this.dude.standingPosition.distanceTo(pt)
         const isCloseEnough = this.isCloseEnoughToStopWalking(pt)
         if (isCloseEnough && stopWhenClose) {
             this.dude.move(updateData, Point.ZERO, facingOverride)
         } else {
+            const pos = this.dude.standingPosition
             this.dude.move(updateData, pt.minus(this.dude.standingPosition), facingOverride, speedMultiplier)
+            if (!this.dude.standingPosition.equals(pos)) {
+                this.lastMovePos = new Date().getMilliseconds()
+            }
         }
         return isCloseEnough
     }
+
+    private lastMovePos: number 
+    private stuck() { return new Date().getMilliseconds() - this.lastMovePos > 1000 }
 
     private isCloseEnoughToStopWalking(pt: Point) {
         return this.dude.standingPosition.distanceTo(pt) < 8
@@ -267,14 +282,27 @@ export class NPC extends Component {
 
         const target = Lists.minBy(enemies, d => d.position.distanceTo(this.dude.position))
         if (!!target) {
-            // if (target === this.attackTarget) {
-            //     // we're already tracking this target, so update the path to extend to the new target position
-            //     const currentGoal = this.targetPath[this.targetPath.length-1]
-            //     this.targetPath = this.targetPath.concat(this.findPath(target.standingPosition, currentGoal))
-            // } else {
-                
+            let shouldComputePath = true
+
+            if (target === this.attackTarget && !!this.targetPath && this.targetPath.length > 0) {
+                // We're already tracking this target. Only update the path if they have gotten closer, 
+                // otherwise the attack() function will automatically extend the path.
+                // const currentGoal = pixelPtToTilePt(this.targetPath[this.targetPath.length-1])
+                const newGoal = pixelPtToTilePt(target.standingPosition)
+                const currentPos = pixelPtToTilePt(this.dude.standingPosition)
+                if (this.targetPath.length <= currentPos.manhattanDistanceTo(newGoal)) {
+                    shouldComputePath = false
+                }
+            }
+
+            if (this.stuck) {
+                shouldComputePath = true
+            }
+
+            if (shouldComputePath) {
                 this.targetPath = this.findPath(pixelPtToTilePt(target.standingPosition))
-            // }
+            }
+
             this.attackTarget = target
         }
     }
