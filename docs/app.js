@@ -60,6 +60,9 @@ System.register("engine/point", [], function (exports_1, context_1) {
                     var dy = pt.y - this.y;
                     return Math.sqrt(dx * dx + dy * dy);
                 };
+                Point.prototype.manhattanDistanceTo = function (pt) {
+                    return Math.abs(pt.x - this.x) + Math.abs(pt.y - this.y);
+                };
                 Point.prototype.magnitude = function () {
                     return this.distanceTo(new Point(0, 0));
                 };
@@ -1678,11 +1681,9 @@ System.register("engine/util/Grid", ["engine/point", "engine/util/BinaryHeap"], 
                 /**
                  * Returns a path inclusive of start and end
                  */
-                Grid.prototype.findPath = function (start, end, heuristic, isOccupied, getNeighbors) {
+                Grid.prototype.findPath = function (start, end, _a) {
                     var _this = this;
-                    if (heuristic === void 0) { heuristic = function (pt) { return pt.distanceTo(end); }; }
-                    if (isOccupied === void 0) { isOccupied = function (pt) { return !!_this.get(pt); }; }
-                    if (getNeighbors === void 0) { getNeighbors = function (pt) { return [new point_10.Point(pt.x, pt.y - 1), new point_10.Point(pt.x - 1, pt.y), new point_10.Point(pt.x + 1, pt.y), new point_10.Point(pt.x, pt.y + 1)]; }; }
+                    var _b = _a === void 0 ? {} : _a, _c = _b.heuristic, heuristic = _c === void 0 ? function (pt) { return pt.manhattanDistanceTo(end); } : _c, _d = _b.distance, distance = _d === void 0 ? function (a, b) { return a.manhattanDistanceTo(b); } : _d, _e = _b.isOccupied, isOccupied = _e === void 0 ? function (pt) { return !!_this.get(pt); } : _e, _f = _b.getNeighbors, getNeighbors = _f === void 0 ? function (pt) { return [new point_10.Point(pt.x, pt.y - 1), new point_10.Point(pt.x - 1, pt.y), new point_10.Point(pt.x + 1, pt.y), new point_10.Point(pt.x, pt.y + 1)]; } : _f;
                     if (isOccupied(start) || isOccupied(end) || start.equals(end)) {
                         return null;
                     }
@@ -1711,7 +1712,7 @@ System.register("engine/util/Grid", ["engine/point", "engine/util/BinaryHeap"], 
                         for (var _i = 0, neighbors_1 = neighbors; _i < neighbors_1.length; _i++) {
                             var neighbor = neighbors_1[_i];
                             var n = neighbor.toString();
-                            var tentativeGScore = currentGScore + current.distanceTo(neighbor);
+                            var tentativeGScore = currentGScore + distance(current, neighbor);
                             var currentNeighborGScore = gScore.get(n);
                             if (!currentNeighborGScore || tentativeGScore < currentNeighborGScore) {
                                 cameFrom.set(n, current);
@@ -7541,7 +7542,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     if (defaultSchedule === void 0) { defaultSchedule = NPCSchedule_1.NPCSchedules.newNoOpSchedule(); }
                     var _this = _super.call(this) || this;
                     _this.isEnemyFn = function () { return false; };
-                    _this.pathFindingHeuristic = function (pt, goal) { return pt.distanceTo(goal); };
+                    _this.pathFindingHeuristic = function (pt, goal) { return pt.manhattanDistanceTo(goal); };
                     _this.findTargetRange = Tilesets_29.TILE_SIZE * 10;
                     _this.enemiesPresent = false;
                     _this.walkPath = null;
@@ -7773,8 +7774,10 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     var _a;
                     var start = Tilesets_29.pixelPtToTilePt(pixelPtStart);
                     var end = tilePt;
-                    return (_a = LocationManager_13.LocationManager.instance.currentLocation.elements.findPath(start, end, function (pt) { return _this.pathFindingHeuristic(pt, end); }, function (pt) { return (pt === start ? false : !!LocationManager_13.LocationManager.instance.currentLocation.elements.get(pt)); } // prevent getting stuck "inside" a square
-                    )) === null || _a === void 0 ? void 0 : _a.map(function (pt) { return _this.tilePtToStandingPos(pt); }).slice(1); // slice(1) because we don't need the start in the path
+                    return (_a = LocationManager_13.LocationManager.instance.currentLocation.elements.findPath(start, end, {
+                        heuristic: function (pt) { return _this.pathFindingHeuristic(pt, end); },
+                        isOccupied: function (pt) { return (pt === start ? false : !!LocationManager_13.LocationManager.instance.currentLocation.elements.get(pt)); },
+                    })) === null || _a === void 0 ? void 0 : _a.map(function (pt) { return _this.tilePtToStandingPos(pt); }).slice(1); // slice(1) because we don't need the start in the path
                 };
                 NPC.prototype.tilePtToStandingPos = function (tilePt) {
                     var ptOffset = new point_53.Point(.5, .8);
@@ -7824,7 +7827,7 @@ System.register("game/characters/Enemy", ["engine/component", "game/characters/D
                     if (this.dude.faction === 3 /* DEMONS */) {
                         this.npc.isEnemyFn = function (d) { return d.faction != _this.dude.faction && PointLightMaskRenderer_3.PointLightMaskRenderer.instance.getDarknessAtPosition(d.standingPosition) > 150; };
                         this.npc.pathFindingHeuristic = function (pt, goal) {
-                            return pt.distanceTo(goal) + (255 - PointLightMaskRenderer_3.PointLightMaskRenderer.instance.getDarknessAtPosition(pt.times(Tilesets_30.TILE_SIZE)));
+                            return pt.manhattanDistanceTo(goal) + (255 - PointLightMaskRenderer_3.PointLightMaskRenderer.instance.getDarknessAtPosition(pt.times(Tilesets_30.TILE_SIZE)));
                         };
                         this.npc.findTargetRange *= 3;
                     }
@@ -9323,7 +9326,7 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/Connec
                     var ground = this.location.ground;
                     var stuff = this.location.elements;
                     var heuristic = function (pt) {
-                        var v = pt.distanceTo(end) * Math.random() * randomness;
+                        var v = pt.manhattanDistanceTo(end) * Math.random() * randomness;
                         var el = ground.get(pt);
                         if (!el) {
                             return v;
@@ -9350,7 +9353,10 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/Connec
                         }
                         return !Ground_3.Ground.instance.PATH_CONNECTING_SCHEMA.canConnect(ct.schema);
                     };
-                    var path = ground.findPath(start, end, heuristic, isOccupiedFunc);
+                    var path = ground.findPath(start, end, {
+                        heuristic: heuristic,
+                        isOccupied: isOccupiedFunc
+                    });
                     if (!path) {
                         return;
                     }

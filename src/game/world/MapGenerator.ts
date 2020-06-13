@@ -100,7 +100,7 @@ export class MapGenerator {
         const stuff = this.location.elements
 
         const heuristic = (pt: Point): number => {
-            const v = pt.distanceTo(end) * Math.random() * randomness
+            const v = pt.manhattanDistanceTo(end) * Math.random() * randomness
             const el = ground.get(pt)
             if (!el) {
                 return v
@@ -131,8 +131,10 @@ export class MapGenerator {
         const path = ground.findPath(
             start, 
             end, 
-            heuristic, 
-            isOccupiedFunc
+            { 
+                heuristic: heuristic,  
+                isOccupied: isOccupiedFunc
+            }
         )
 
         if (!path) {

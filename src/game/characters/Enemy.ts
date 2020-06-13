@@ -22,7 +22,7 @@ export class Enemy extends Component {
         if (this.dude.faction === DudeFaction.DEMONS) {
             this.npc.isEnemyFn = d => d.faction != this.dude.faction && PointLightMaskRenderer.instance.getDarknessAtPosition(d.standingPosition) > 150
             this.npc.pathFindingHeuristic = (pt: Point, goal: Point) => {
-                return pt.distanceTo(goal) + (255 - PointLightMaskRenderer.instance.getDarknessAtPosition(pt.times(TILE_SIZE)))
+                return pt.manhattanDistanceTo(goal) + (255 - PointLightMaskRenderer.instance.getDarknessAtPosition(pt.times(TILE_SIZE)))
             }
             this.npc.findTargetRange *= 3
         } else {

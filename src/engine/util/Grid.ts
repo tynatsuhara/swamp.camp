@@ -42,9 +42,17 @@ export class Grid<T> {
     findPath(
         start: Point, 
         end: Point, 
-        heuristic: (pt: Point) => number = pt => pt.distanceTo(end),
-        isOccupied: (pt: Point) => boolean = pt => !!this.get(pt),
-        getNeighbors: (pt: Point) => Point[] = pt => [new Point(pt.x, pt.y - 1), new Point(pt.x - 1, pt.y), new Point(pt.x + 1, pt.y), new Point(pt.x, pt.y + 1)]
+        {
+            heuristic = pt => pt.manhattanDistanceTo(end),
+            distance = (a, b) => a.manhattanDistanceTo(b),
+            isOccupied = pt => !!this.get(pt),
+            getNeighbors = pt => [new Point(pt.x, pt.y - 1), new Point(pt.x - 1, pt.y), new Point(pt.x + 1, pt.y), new Point(pt.x, pt.y + 1)]
+        }: {
+            heuristic?: (pt: Point) => number,
+            distance?: (a: Point, b: Point) => number,
+            isOccupied?: (pt: Point) => boolean,
+            getNeighbors?: (pt: Point) => Point[]
+        } = {}
     ): Point[] {
         if (isOccupied(start) || isOccupied(end) || start.equals(end)) {
             return null
@@ -81,7 +89,7 @@ export class Grid<T> {
             
             for (let neighbor of neighbors) {
                 const n = neighbor.toString()
-                const tentativeGScore = currentGScore + current.distanceTo(neighbor)
+                const tentativeGScore = currentGScore + distance(current, neighbor)
                 const currentNeighborGScore = gScore.get(n)
                 if (!currentNeighborGScore || tentativeGScore < currentNeighborGScore) {
                     cameFrom.set(n, current)

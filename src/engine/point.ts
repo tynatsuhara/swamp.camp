@@ -53,6 +53,10 @@ export class Point {
         return Math.sqrt(dx * dx + dy * dy)
     }
 
+    manhattanDistanceTo(pt: Point): number {
+        return Math.abs(pt.x - this.x) + Math.abs(pt.y - this.y)
+    }
+
     magnitude(): number {
         return this.distanceTo(new Point(0, 0))
     }
