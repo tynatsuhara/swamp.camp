@@ -21,7 +21,6 @@ export class PointLightMaskRenderer {
     private shift = new Point(this.size/2, this.size/2)
 
     private lightTiles: Map<WorldLocation, Grid<number>> = new Map<WorldLocation, Grid<number>>()  // grid of light diameter
-    private litGrid: Grid<boolean> = new Grid<boolean>()  // used to precompute darkness lookups for the current location
     private gridDirty = true
     private lastLocationRendered: WorldLocation
     private color: string
@@ -39,7 +38,7 @@ export class PointLightMaskRenderer {
         this.context = this.canvas.getContext("2d")
 
         // refresh every so often to update transitioning color
-        setInterval(() => this.updateColorForTime())
+        setInterval(() => this.updateColorForTime(), 1000)
     }
 
     addLight(wl: WorldLocation, position: Point, diameter: number = 16) {
@@ -167,11 +166,6 @@ export class PointLightMaskRenderer {
         })
     }
 
-    private updateLitGrid() {
-        this.litGrid.clear()
-        this.lightTiles.entries()
-    }
-
     private makeLightCircle(diameter: number, position: Point, alpha: number) {
         const center = new Point(diameter/2, diameter/2).minus(new Point(.5, .5))
         const imageData = this.context.getImageData(position.x, position.y, diameter, diameter)
@@ -201,6 +195,10 @@ export class PointLightMaskRenderer {
     private readonly circleCache: Map<number, boolean[]> = new Map<number, boolean[]>()
 
     getEntity(): Entity {
+        if (!this.color) {
+            this.updateColorForTime()
+        }
+
         if (this.gridDirty || this.lastLocationRendered !== LocationManager.instance.currentLocation) {
             this.renderToOffscreenCanvas()
             // this.updateLitGrid()

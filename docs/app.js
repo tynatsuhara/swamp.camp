@@ -5407,7 +5407,6 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                     this.size = MapGenerator_3.MapGenerator.MAP_SIZE * Tilesets_17.TILE_SIZE;
                     this.shift = new point_37.Point(this.size / 2, this.size / 2);
                     this.lightTiles = new Map(); // grid of light diameter
-                    this.litGrid = new Grid_1.Grid(); // used to precompute darkness lookups for the current location
                     this.gridDirty = true;
                     this.darkness = 0.4;
                     this.circleCache = new Map();
@@ -5417,7 +5416,7 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                     this.canvas.height = this.size;
                     this.context = this.canvas.getContext("2d");
                     // refresh every so often to update transitioning color
-                    setInterval(function () { return _this.updateColorForTime(); });
+                    setInterval(function () { return _this.updateColorForTime(); }, 1000);
                 }
                 PointLightMaskRenderer.prototype.addLight = function (wl, position, diameter) {
                     if (diameter === void 0) { diameter = 16; }
@@ -5531,10 +5530,6 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                         _this.makeLightCircle(diameter - innerOffset * 2, adjustedPos.plus(new point_37.Point(innerOffset, innerOffset)), 0);
                     });
                 };
-                PointLightMaskRenderer.prototype.updateLitGrid = function () {
-                    this.litGrid.clear();
-                    this.lightTiles.entries();
-                };
                 PointLightMaskRenderer.prototype.makeLightCircle = function (diameter, position, alpha) {
                     var center = new point_37.Point(diameter / 2, diameter / 2).minus(new point_37.Point(.5, .5));
                     var imageData = this.context.getImageData(position.x, position.y, diameter, diameter);
@@ -5558,6 +5553,9 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                     this.context.putImageData(imageData, position.x, position.y);
                 };
                 PointLightMaskRenderer.prototype.getEntity = function () {
+                    if (!this.color) {
+                        this.updateColorForTime();
+                    }
                     if (this.gridDirty || this.lastLocationRendered !== LocationManager_10.LocationManager.instance.currentLocation) {
                         this.renderToOffscreenCanvas();
                         // this.updateLitGrid()
