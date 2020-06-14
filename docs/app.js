@@ -1641,6 +1641,10 @@ System.register("engine/util/Grid", ["engine/point", "engine/util/BinaryHeap", "
                         .filter(function (kv) { return kv[1] === element; })
                         .forEach(function (kv) { return delete _this.map[kv[0]]; });
                 };
+                Grid.prototype.clear = function () {
+                    this.map = {};
+                    this._valuesCache = null;
+                };
                 Grid.prototype.entries = function () {
                     return Object.entries(this.map).map(function (tuple) { return [point_10.Point.fromString(tuple[0]), tuple[1]]; });
                 };
@@ -5390,9 +5394,10 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                 function PointLightMaskRenderer() {
                     var _this = this;
                     // no lights should live outside of this range
-                    this.size = MapGenerator_3.MapGenerator.MAP_SIZE * Tilesets_17.TILE_SIZE; // * 2
+                    this.size = MapGenerator_3.MapGenerator.MAP_SIZE * Tilesets_17.TILE_SIZE;
                     this.shift = new point_37.Point(this.size / 2, this.size / 2);
-                    this.lightTiles = new Map();
+                    this.lightTiles = new Map(); // grid of light radiuses
+                    this.litGrid = new Grid_1.Grid(); // used to precompute darkness lookups for the current location
                     this.gridDirty = true;
                     this.darkness = 0.4;
                     this.circleCache = new Map();
@@ -5402,7 +5407,7 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                     this.canvas.height = this.size;
                     this.context = this.canvas.getContext("2d");
                     // refresh every so often to update transitioning color
-                    setInterval(function () { return _this.gridDirty = true; }, WorldTime_3.WorldTime.MINUTE / 10);
+                    setInterval(function () { return _this.updateColorForTime(); });
                 }
                 PointLightMaskRenderer.prototype.addLight = function (wl, position, diameter) {
                     if (diameter === void 0) { diameter = 16; }
@@ -5428,13 +5433,12 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                 /**
                  * @return alpha 0-255 (total light to total darkness)
                  */
-                PointLightMaskRenderer.prototype.getDarknessAtPosition = function (pixelPt) {
-                    var lim = this.size / 2;
-                    if (pixelPt.x < -lim || pixelPt.x > lim || pixelPt.y < -lim || pixelPt.y > lim) {
-                        return 255;
+                PointLightMaskRenderer.prototype.isDark = function (pixelPt) {
+                    if (this.darkness < .6) {
+                        return false;
                     }
-                    var pt = pixelPt.plus(this.shift).apply(Math.floor);
-                    return this.context.getImageData(pt.x, pt.y, 1, 1).data[3];
+                    var grid = this.lightTiles.get(LocationManager_10.LocationManager.instance.currentLocation);
+                    return !grid ? true : !grid.entries().some(function (entry) { return entry[0].distanceTo(pixelPt) < entry[1]; });
                 };
                 PointLightMaskRenderer.prototype.updateColorForTime = function () {
                     var time = WorldTime_3.WorldTime.instance.time;
@@ -5449,19 +5453,19 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                     // TODO: make these transitions quicker
                     if (hour >= 5 && hour < 6) {
                         var percentTransitioned = clamp01((timeSoFar + (hour - 5) * WorldTime_3.WorldTime.HOUR) / transitionTime);
-                        return this.lerpedColorString(nightColor, sunriseColor, percentTransitioned); // sunrise		
+                        this.lerpColorString(nightColor, sunriseColor, percentTransitioned); // sunrise		
                     }
                     else if (hour >= 6 && hour < 20) {
                         var percentTransitioned = clamp01((timeSoFar + (hour - 6) * WorldTime_3.WorldTime.HOUR) / transitionTime);
-                        return this.lerpedColorString(sunriseColor, dayColor, percentTransitioned); // day	
+                        this.lerpColorString(sunriseColor, dayColor, percentTransitioned); // day	
                     }
                     else if (hour >= 20 && hour < 21) {
                         var percentTransitioned = clamp01((timeSoFar + (hour - 20) * WorldTime_3.WorldTime.HOUR) / transitionTime);
-                        return this.lerpedColorString(dayColor, sunsetColor, percentTransitioned); // sunset
+                        this.lerpColorString(dayColor, sunsetColor, percentTransitioned); // sunset
                     }
                     else {
                         var percentTransitioned = clamp01((timeSoFar + (24 + hour - 21) % 24 * WorldTime_3.WorldTime.HOUR) / transitionTime);
-                        return this.lerpedColorString(sunsetColor, nightColor, percentTransitioned); // night			
+                        this.lerpColorString(sunsetColor, nightColor, percentTransitioned); // night			
                     }
                 };
                 /**
@@ -5475,14 +5479,18 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                     var b = parseInt(noHash.substring(4, 6), 16);
                     return { r: r, g: g, b: b, a: a };
                 };
-                PointLightMaskRenderer.prototype.lerpedColorString = function (color1, color2, percentTransitioned) {
+                PointLightMaskRenderer.prototype.lerpColorString = function (color1, color2, percentTransitioned) {
                     var lerp = function (a, b) { return a + (b - a) * percentTransitioned; };
+                    var oldColor = this.color;
                     var r = lerp(color1.r, color2.r);
                     var g = lerp(color1.g, color2.g);
                     var b = lerp(color1.b, color2.b);
                     var a = lerp(color1.a, color2.a);
                     this.color = "rgba(" + r + ", " + g + ", " + b + ", " + a + ")";
                     this.darkness = a;
+                    if (oldColor !== this.color) {
+                        this.gridDirty = true;
+                    }
                 };
                 PointLightMaskRenderer.prototype.checkPt = function (position) {
                     var lim = this.size / 2;
@@ -5492,7 +5500,6 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                 };
                 PointLightMaskRenderer.prototype.renderToOffscreenCanvas = function () {
                     var _this = this;
-                    this.updateColorForTime();
                     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
                     var location = LocationManager_10.LocationManager.instance.currentLocation;
                     if (location.isInterior || this.darkness === 0) {
@@ -5513,6 +5520,10 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                         var innerOffset = Math.floor(diameter / 2 * 1 / 4);
                         _this.makeLightCircle(diameter - innerOffset * 2, adjustedPos.plus(new point_37.Point(innerOffset, innerOffset)), 0);
                     });
+                };
+                PointLightMaskRenderer.prototype.updateLitGrid = function () {
+                    this.litGrid.clear();
+                    this.lightTiles.entries();
                 };
                 PointLightMaskRenderer.prototype.makeLightCircle = function (diameter, position, alpha) {
                     var center = new point_37.Point(diameter / 2, diameter / 2).minus(new point_37.Point(.5, .5));
@@ -5539,6 +5550,7 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                 PointLightMaskRenderer.prototype.getEntity = function () {
                     if (this.gridDirty || this.lastLocationRendered !== LocationManager_10.LocationManager.instance.currentLocation) {
                         this.renderToOffscreenCanvas();
+                        // this.updateLitGrid()
                         this.gridDirty = false;
                         this.lastLocationRendered = LocationManager_10.LocationManager.instance.currentLocation;
                     }
@@ -7569,7 +7581,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                         this.walkTo(point_53.Point.fromString(schedule["p"]), updateData);
                     }
                     else if (schedule.type === 2 /* ROAM_IN_DARKNESS */) {
-                        this.doFlee(updateData, PointLightMaskRenderer_2.PointLightMaskRenderer.instance.getDarknessAtPosition(this.dude.standingPosition) > 150 ? 0.5 : 1, function (pt) { return PointLightMaskRenderer_2.PointLightMaskRenderer.instance.getDarknessAtPosition(pt.times(Tilesets_29.TILE_SIZE)) > 150; });
+                        this.doFlee(updateData, PointLightMaskRenderer_2.PointLightMaskRenderer.instance.isDark(this.dude.standingPosition) ? 0.5 : 1, function (pt) { return PointLightMaskRenderer_2.PointLightMaskRenderer.instance.isDark(pt.times(Tilesets_29.TILE_SIZE)); });
                     }
                     else {
                         throw new Error("unimplemented schedule type");
@@ -7819,9 +7831,11 @@ System.register("game/characters/Enemy", ["engine/component", "game/characters/D
                     // DEMON enemies will avoid light
                     // TODO make them burn in the light or something?
                     if (this.dude.faction === 3 /* DEMONS */) {
-                        this.npc.isEnemyFn = function (d) { return d.faction != _this.dude.faction && PointLightMaskRenderer_3.PointLightMaskRenderer.instance.getDarknessAtPosition(d.standingPosition) > 150; };
+                        this.npc.isEnemyFn = function (d) {
+                            return d.faction != _this.dude.faction && PointLightMaskRenderer_3.PointLightMaskRenderer.instance.isDark(d.standingPosition);
+                        };
                         this.npc.pathFindingHeuristic = function (pt, goal) {
-                            return pt.distanceTo(goal) + (255 - PointLightMaskRenderer_3.PointLightMaskRenderer.instance.getDarknessAtPosition(pt.times(Tilesets_30.TILE_SIZE)));
+                            return pt.distanceTo(goal) + (PointLightMaskRenderer_3.PointLightMaskRenderer.instance.isDark(pt.times(Tilesets_30.TILE_SIZE)) ? 0 : 100);
                         };
                         this.npc.findTargetRange *= 3;
                     }
@@ -7922,7 +7936,7 @@ System.register("game/characters/Villager", ["engine/component", "game/character
                     this.npc.isEnemyFn = function (d) {
                         // Villagers will only flee from demons if the villager is in the dark or really close to the demon
                         if (d.faction === 3 /* DEMONS */) {
-                            return PointLightMaskRenderer_4.PointLightMaskRenderer.instance.getDarknessAtPosition(_this.dude.standingPosition) > 150
+                            return PointLightMaskRenderer_4.PointLightMaskRenderer.instance.isDark(_this.dude.standingPosition)
                                 || d.standingPosition.distanceTo(_this.dude.standingPosition) < 30;
                         }
                         return d.faction !== 0 /* VILLAGERS */;

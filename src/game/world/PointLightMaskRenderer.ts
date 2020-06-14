@@ -4,7 +4,7 @@ import { Entity } from "../../engine/Entity"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
 import { Camera } from "../cutscenes/Camera"
 import { MapGenerator } from "./MapGenerator"
-import { TILE_SIZE } from "../graphics/Tilesets"
+import { TILE_SIZE, pixelPtToTilePt } from "../graphics/Tilesets"
 import { Grid } from "../../engine/util/Grid"
 import { UIStateManager } from "../ui/UIStateManager"
 import { WorldTime } from "./WorldTime"
@@ -17,10 +17,11 @@ export class PointLightMaskRenderer {
     static instance: PointLightMaskRenderer
 
     // no lights should live outside of this range
-    private size = MapGenerator.MAP_SIZE * TILE_SIZE// * 2
+    private size = MapGenerator.MAP_SIZE * TILE_SIZE
     private shift = new Point(this.size/2, this.size/2)
 
-    private lightTiles: Map<WorldLocation, Grid<number>> = new Map<WorldLocation, Grid<number>>()
+    private lightTiles: Map<WorldLocation, Grid<number>> = new Map<WorldLocation, Grid<number>>()  // grid of light radiuses
+    private litGrid: Grid<boolean> = new Grid<boolean>()  // used to precompute darkness lookups for the current location
     private gridDirty = true
     private lastLocationRendered: WorldLocation
     private color: string
@@ -38,7 +39,7 @@ export class PointLightMaskRenderer {
         this.context = this.canvas.getContext("2d")
 
         // refresh every so often to update transitioning color
-        setInterval(() => this.gridDirty = true, WorldTime.MINUTE/10)
+        setInterval(() => this.updateColorForTime())
     }
 
     addLight(wl: WorldLocation, position: Point, diameter: number = 16) {
@@ -65,13 +66,12 @@ export class PointLightMaskRenderer {
     /**
      * @return alpha 0-255 (total light to total darkness)
      */
-    getDarknessAtPosition(pixelPt: Point) {
-        const lim = this.size/2
-        if (pixelPt.x < -lim || pixelPt.x > lim || pixelPt.y < -lim || pixelPt.y > lim) {
-            return 255
+    isDark(pixelPt: Point): boolean {
+        if (this.darkness < .6) {
+            return false
         }
-        const pt = pixelPt.plus(this.shift).apply(Math.floor)
-        return this.context.getImageData(pt.x, pt.y, 1, 1).data[3]
+        const grid = this.lightTiles.get(LocationManager.instance.currentLocation)
+        return !grid ? true : !grid.entries().some(entry => entry[0].distanceTo(pixelPt) < entry[1])
     }
 
     private updateColorForTime() {
@@ -89,16 +89,16 @@ export class PointLightMaskRenderer {
         // TODO: make these transitions quicker
         if (hour >= 5 && hour < 6) {
 			const percentTransitioned = clamp01((timeSoFar + (hour - 5) * WorldTime.HOUR)/transitionTime)
-			return this.lerpedColorString(nightColor, sunriseColor, percentTransitioned) // sunrise		
+			this.lerpColorString(nightColor, sunriseColor, percentTransitioned) // sunrise		
 		} else if (hour >= 6 && hour < 20) {
 			const percentTransitioned = clamp01((timeSoFar + (hour - 6) * WorldTime.HOUR)/transitionTime)
-			return this.lerpedColorString(sunriseColor, dayColor, percentTransitioned)   // day	
+			this.lerpColorString(sunriseColor, dayColor, percentTransitioned)   // day	
 		} else if (hour >= 20 && hour < 21) {
 			const percentTransitioned = clamp01((timeSoFar + (hour - 20) * WorldTime.HOUR)/transitionTime)			
-			return this.lerpedColorString(dayColor, sunsetColor, percentTransitioned)    // sunset
+			this.lerpColorString(dayColor, sunsetColor, percentTransitioned)    // sunset
 		} else {
 			const percentTransitioned = clamp01((timeSoFar + (24 + hour - 21) % 24 * WorldTime.HOUR)/transitionTime)			
-			return this.lerpedColorString(sunsetColor, nightColor, percentTransitioned)  // night			
+			this.lerpColorString(sunsetColor, nightColor, percentTransitioned)  // night			
 		}
     }
 
@@ -114,8 +114,9 @@ export class PointLightMaskRenderer {
         return { r, g, b, a }
     }
 
-    private lerpedColorString(color1: { r, g, b, a }, color2: { r, g, b, a }, percentTransitioned: number) {
+    private lerpColorString(color1: { r, g, b, a }, color2: { r, g, b, a }, percentTransitioned: number) {
         const lerp = (a, b) => a + (b-a) * percentTransitioned
+        const oldColor = this.color
 
         const r = lerp(color1.r, color2.r)
         const g = lerp(color1.g, color2.g)
@@ -124,6 +125,10 @@ export class PointLightMaskRenderer {
 
         this.color = `rgba(${r}, ${g}, ${b}, ${a})`
         this.darkness = a
+
+        if (oldColor !== this.color) {
+            this.gridDirty = true
+        }
     }
 
     private checkPt(position) {
@@ -134,7 +139,6 @@ export class PointLightMaskRenderer {
     }
 
     private renderToOffscreenCanvas() {
-        this.updateColorForTime()
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
         const location = LocationManager.instance.currentLocation
@@ -161,6 +165,11 @@ export class PointLightMaskRenderer {
             const innerOffset = Math.floor(diameter/2 * 1/4)
             this.makeLightCircle(diameter-innerOffset*2, adjustedPos.plus(new Point(innerOffset, innerOffset)), 0)
         })
+    }
+
+    private updateLitGrid() {
+        this.litGrid.clear()
+        this.lightTiles.entries()
     }
 
     private makeLightCircle(diameter: number, position: Point, alpha: number) {
@@ -194,6 +203,7 @@ export class PointLightMaskRenderer {
     getEntity(): Entity {
         if (this.gridDirty || this.lastLocationRendered !== LocationManager.instance.currentLocation) {
             this.renderToOffscreenCanvas()
+            // this.updateLitGrid()
             this.gridDirty = false
             this.lastLocationRendered = LocationManager.instance.currentLocation
         }

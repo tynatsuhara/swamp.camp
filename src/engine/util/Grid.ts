@@ -29,6 +29,11 @@ export class Grid<T> {
                 .forEach(kv => delete this.map[kv[0]])
     }
 
+    clear() {
+        this.map = {}
+        this._valuesCache = null
+    }
+
     entries(): [Point, T][] {
         return Object.entries(this.map).map(tuple => [Point.fromString(tuple[0]), tuple[1]])
     }
