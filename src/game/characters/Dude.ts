@@ -167,7 +167,7 @@ export class Dude extends Component implements DialogueSource {
         this.animation.paused = true
         setTimeout(() => this.spawnDrop(), 100)
         this.dropWeapon()
-        setTimeout(() => this.dissolve(), 500)
+        setTimeout(() => this.dissolve(), 1000)
     }
 
     // TODO maybe use this for demons in sunlight

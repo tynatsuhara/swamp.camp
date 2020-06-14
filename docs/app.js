@@ -7155,7 +7155,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     this.animation.paused = true;
                     setTimeout(function () { return _this.spawnDrop(); }, 100);
                     this.dropWeapon();
-                    setTimeout(function () { return _this.dissolve(); }, 500);
+                    setTimeout(function () { return _this.dissolve(); }, 1000);
                 };
                 // TODO maybe use this for demons in sunlight
                 Dude.prototype.dissolve = function () {
