@@ -7,6 +7,7 @@ import { profiler, measure } from "./profiler"
 import { debug } from "./debug"
 import { assets } from "./Assets"
 import { CollisionEngine } from "./collision/CollisionEngine"
+import { ALREADY_STARTED_COMPONENT } from "./component"
 
 export class UpdateViewsContext {
     readonly elapsedTimeMillis: number
@@ -79,7 +80,7 @@ export class Engine {
                     if (!c.enabled) {
                         return
                     }
-                    if (c.start !== ALREADY_STARTED_COMPONENT) {
+                    if (!c.isStarted) {
                         c.start(startData)
                         c.start = ALREADY_STARTED_COMPONENT
                     }
@@ -105,8 +106,4 @@ export class Engine {
     private getViews(context: UpdateViewsContext): View[] {
         return this.game.getViews(context).concat(debug.showProfiler ? [profiler.getView()] : [])
     }
-}
-
-const ALREADY_STARTED_COMPONENT = (startData: StartData) => {
-    throw new Error("start() has already been called on this component")
 }

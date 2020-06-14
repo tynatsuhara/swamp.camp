@@ -6,6 +6,7 @@ export abstract class Component {
 
     entity: Entity
     enabled: boolean = true
+    get isStarted() { return this.start === ALREADY_STARTED_COMPONENT }
 
     /**
      * Called once, immediately after entity is defined and before start() is called.
@@ -36,4 +37,8 @@ export abstract class Component {
     delete() {
         this.entity?.removeComponent(this)
     }
+}
+
+export const ALREADY_STARTED_COMPONENT = () => {
+    throw new Error("start() has already been called on this component")
 }
