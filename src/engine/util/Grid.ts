@@ -94,7 +94,6 @@ export class Grid<T> {
                     path.push(next)
                     next = cameFrom.get(next.toString())
                 }
-                profiler.customTrackMovingAverage("openSet size", new Date().getTime() - startTime, (v) => `pathfinding duration ms: ${v}`)
                 return path.reverse()
             }
 

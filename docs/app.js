@@ -1609,9 +1609,9 @@ System.register("engine/util/BinaryHeap", [], function (exports_25, context_25) 
         }
     };
 });
-System.register("engine/util/Grid", ["engine/point", "engine/util/BinaryHeap", "engine/profiler"], function (exports_26, context_26) {
+System.register("engine/util/Grid", ["engine/point", "engine/util/BinaryHeap"], function (exports_26, context_26) {
     "use strict";
-    var point_10, BinaryHeap_1, profiler_2, Grid;
+    var point_10, BinaryHeap_1, Grid;
     var __moduleName = context_26 && context_26.id;
     return {
         setters: [
@@ -1620,9 +1620,6 @@ System.register("engine/util/Grid", ["engine/point", "engine/util/BinaryHeap", "
             },
             function (BinaryHeap_1_1) {
                 BinaryHeap_1 = BinaryHeap_1_1;
-            },
-            function (profiler_2_1) {
-                profiler_2 = profiler_2_1;
             }
         ],
         execute: function () {
@@ -1694,7 +1691,6 @@ System.register("engine/util/Grid", ["engine/point", "engine/util/BinaryHeap", "
                                 path.push(next);
                                 next = cameFrom.get(next.toString());
                             }
-                            profiler_2.profiler.customTrackMovingAverage("openSet size", new Date().getTime() - startTime, function (v) { return "pathfinding duration ms: " + v; });
                             return path.reverse();
                         }
                         var currentGScore = gScore.get(current.toString());
@@ -6682,9 +6678,8 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
         execute: function () {
             ItemMetadata = /** @class */ (function () {
                 // TODO maybe make this a builder
-                function ItemMetadata(displayName, droppedIconSupplier, inventoryIconSupplier, stackLimit, element) {
-                    if (stackLimit === void 0) { stackLimit = Number.MAX_SAFE_INTEGER; }
-                    if (element === void 0) { element = null; }
+                function ItemMetadata(_a) {
+                    var displayName = _a.displayName, inventoryIconSupplier = _a.inventoryIconSupplier, _b = _a.droppedIconSupplier, droppedIconSupplier = _b === void 0 ? function () { return null; } : _b, _c = _a.stackLimit, stackLimit = _c === void 0 ? 99 : _c, _d = _a.element, element = _d === void 0 ? null : _d;
                     this.displayName = displayName;
                     this.droppedIconSupplier = droppedIconSupplier;
                     this.inventoryIconSupplier = inventoryIconSupplier;
@@ -6696,12 +6691,40 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
             exports_88("ItemMetadata", ItemMetadata);
             // Data that doesn't get serialized (TODO make builder pattern)
             exports_88("ITEM_METADATA_MAP", ITEM_METADATA_MAP = (_a = {},
-                _a[0 /* COIN */] = new ItemMetadata("Coin", function () { return Tilesets_25.Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150); }, function () { return Tilesets_25.Tilesets.instance.oneBit.getTileSource("coin"); }),
-                _a[1 /* ROCK */] = new ItemMetadata("Rock", function () { return Tilesets_25.Tilesets.instance.outdoorTiles.getTileSource("rockItem"); }, function () { return Tilesets_25.Tilesets.instance.oneBit.getTileSource("rock"); }, 99),
-                _a[2 /* WOOD */] = new ItemMetadata("Wood", function () { return Tilesets_25.Tilesets.instance.outdoorTiles.getTileSource("woodItem"); }, function () { return Tilesets_25.Tilesets.instance.oneBit.getTileSource("wood"); }, 99),
-                _a[3 /* TENT */] = new ItemMetadata("Tent", function () { return null; }, function () { return Tilesets_25.Tilesets.instance.oneBit.getTileSource("tent"); }, 1, 2 /* TENT */),
-                _a[4 /* CAMPFIRE */] = new ItemMetadata("Campfire", function () { return null; }, function () { return Tilesets_25.Tilesets.instance.oneBit.getTileSource("campfire"); }, 1, 3 /* CAMPFIRE */),
-                _a[5 /* IRON */] = new ItemMetadata("Iron", function () { return Tilesets_25.Tilesets.instance.outdoorTiles.getTileSource("ironItem"); }, function () { return Tilesets_25.Tilesets.instance.oneBit.getTileSource("iron"); }, 99),
+                _a[0 /* COIN */] = new ItemMetadata({
+                    displayName: "Coin",
+                    inventoryIconSupplier: function () { return Tilesets_25.Tilesets.instance.oneBit.getTileSource("coin"); },
+                    droppedIconSupplier: function () { return Tilesets_25.Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150); },
+                    stackLimit: Number.MAX_SAFE_INTEGER,
+                }),
+                _a[1 /* ROCK */] = new ItemMetadata({
+                    displayName: "Rock",
+                    inventoryIconSupplier: function () { return Tilesets_25.Tilesets.instance.oneBit.getTileSource("rock"); },
+                    droppedIconSupplier: function () { return Tilesets_25.Tilesets.instance.outdoorTiles.getTileSource("rockItem"); },
+                }),
+                _a[2 /* WOOD */] = new ItemMetadata({
+                    displayName: "Wood",
+                    inventoryIconSupplier: function () { return Tilesets_25.Tilesets.instance.oneBit.getTileSource("wood"); },
+                    droppedIconSupplier: function () { return Tilesets_25.Tilesets.instance.outdoorTiles.getTileSource("woodItem"); },
+                }),
+                _a[3 /* TENT */] = new ItemMetadata({
+                    displayName: "Tent",
+                    inventoryIconSupplier: function () { return Tilesets_25.Tilesets.instance.oneBit.getTileSource("tent"); },
+                    stackLimit: 1,
+                    element: 2 /* TENT */
+                }),
+                _a[4 /* CAMPFIRE */] = new ItemMetadata({
+                    displayName: "Campfire",
+                    inventoryIconSupplier: function () { return Tilesets_25.Tilesets.instance.oneBit.getTileSource("campfire"); },
+                    stackLimit: 1,
+                    element: 3 /* CAMPFIRE */
+                }),
+                _a[5 /* IRON */] = new ItemMetadata({
+                    displayName: "Iron",
+                    inventoryIconSupplier: function () { return Tilesets_25.Tilesets.instance.oneBit.getTileSource("iron"); },
+                    droppedIconSupplier: function () { return Tilesets_25.Tilesets.instance.outdoorTiles.getTileSource("ironItem"); },
+                    stackLimit: 99,
+                }),
                 _a));
             /**
              * @param position The bottom center where the item should be placed
@@ -9756,12 +9779,12 @@ System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"]
 });
 System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uuid"], function (exports_120, context_120) {
     "use strict";
-    var profiler_3, uuid_2, serialize, buildObject;
+    var profiler_2, uuid_2, serialize, buildObject;
     var __moduleName = context_120 && context_120.id;
     return {
         setters: [
-            function (profiler_3_1) {
-                profiler_3 = profiler_3_1;
+            function (profiler_2_1) {
+                profiler_2 = profiler_2_1;
             },
             function (uuid_2_1) {
                 uuid_2 = uuid_2_1;
@@ -9775,7 +9798,7 @@ System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uu
                 var resultObject = {}; // maps string->object with subobjects as uuids
                 var topLevelUuidMap = {}; // maps string->object with subobjects as uuids
                 var objectUuidMap = new Map(); // maps unique object ref to uuid
-                var buildDuration = profiler_3.measure(function () { return buildObject(object, resultObject, topLevelUuidMap, objectUuidMap); })[0];
+                var buildDuration = profiler_2.measure(function () { return buildObject(object, resultObject, topLevelUuidMap, objectUuidMap); })[0];
                 console.log("obj built in " + buildDuration);
                 return JSON.stringify({
                     uuids: topLevelUuidMap,

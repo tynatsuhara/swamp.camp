@@ -5,7 +5,7 @@ import { DroppedItem } from "./DroppedItem"
 import { Point } from "../../engine/point"
 import { TileSource } from "../../engine/tiles/TileSource"
 import { Collider } from "../../engine/collision/Collider"
-import { ElementType, Elements } from "../world/elements/Elements"
+import { ElementType } from "../world/elements/Elements"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 
 export class ItemMetadata {
@@ -16,13 +16,19 @@ export class ItemMetadata {
     readonly element: ElementType
 
     // TODO maybe make this a builder
-    constructor(
+    constructor({
+        displayName,
+        inventoryIconSupplier,
+        droppedIconSupplier = () => null,
+        stackLimit = 99,
+        element = null,  // for placing elements
+    }: {
         displayName: string,
-        droppedIconSupplier: () => TileSource,
         inventoryIconSupplier: () => StaticTileSource,
-        stackLimit: number = Number.MAX_SAFE_INTEGER,
-        element: ElementType = null,  // for placing elements
-    ) {
+        droppedIconSupplier?: () => TileSource,
+        stackLimit?: number,
+        element?: ElementType,
+    }) {
         this.displayName = displayName
         this.droppedIconSupplier = droppedIconSupplier
         this.inventoryIconSupplier = inventoryIconSupplier
@@ -32,53 +38,45 @@ export class ItemMetadata {
 }
 
 export const enum Item {
-    COIN,
-    ROCK,
-    WOOD,
-    TENT,
-    CAMPFIRE,
-    IRON,
+    COIN, ROCK, WOOD, TENT, CAMPFIRE, IRON, PICKAXE
 }
 
 // Data that doesn't get serialized (TODO make builder pattern)
 export const ITEM_METADATA_MAP = {
-    [Item.COIN]: new ItemMetadata(
-        "Coin",
-        () => Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150),
-        () => Tilesets.instance.oneBit.getTileSource("coin"),
-    ),
-    [Item.ROCK]: new ItemMetadata(
-        "Rock",
-        () => Tilesets.instance.outdoorTiles.getTileSource("rockItem"),
-        () => Tilesets.instance.oneBit.getTileSource("rock"), 
-        99
-    ),
-    [Item.WOOD]: new ItemMetadata(
-        "Wood",
-        () => Tilesets.instance.outdoorTiles.getTileSource("woodItem"),
-        () => Tilesets.instance.oneBit.getTileSource("wood"), 
-        99
-    ),
-    [Item.TENT]: new ItemMetadata(
-        "Tent",
-        () => null,
-        () => Tilesets.instance.oneBit.getTileSource("tent"), 
-        1,
-        ElementType.TENT
-    ),
-    [Item.CAMPFIRE]: new ItemMetadata(
-        "Campfire",
-        () => null,
-        () => Tilesets.instance.oneBit.getTileSource("campfire"), 
-        1,
-        ElementType.CAMPFIRE
-    ),
-    [Item.IRON]: new ItemMetadata(
-        "Iron",
-        () => Tilesets.instance.outdoorTiles.getTileSource("ironItem"),
-        () => Tilesets.instance.oneBit.getTileSource("iron"), 
-        99,
-    )
+    [Item.COIN]: new ItemMetadata({
+        displayName: "Coin",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("coin"),
+        droppedIconSupplier: () => Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150),
+        stackLimit: Number.MAX_SAFE_INTEGER,
+    }),
+    [Item.ROCK]: new ItemMetadata({
+        displayName: "Rock",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("rock"), 
+        droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("rockItem"),
+    }),
+    [Item.WOOD]: new ItemMetadata({
+        displayName: "Wood",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("wood"), 
+        droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("woodItem"),
+    }),
+    [Item.TENT]: new ItemMetadata({
+        displayName: "Tent",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("tent"), 
+        stackLimit: 1,
+        element: ElementType.TENT
+    }),
+    [Item.CAMPFIRE]: new ItemMetadata({
+        displayName: "Campfire",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("campfire"), 
+        stackLimit: 1,
+        element: ElementType.CAMPFIRE
+    }),
+    [Item.IRON]: new ItemMetadata({
+        displayName: "Iron",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("iron"), 
+        droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("ironItem"),
+        stackLimit: 99,
+    })
 }
 
 /**
