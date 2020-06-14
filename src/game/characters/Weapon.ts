@@ -7,6 +7,8 @@ import { Point } from "../../engine/point"
 import { Dude } from "./Dude"
 import { Animator } from "../../engine/util/Animator"
 import { LocationManager } from "../world/LocationManager"
+import { TileSource } from "../../engine/tiles/TileSource"
+import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 
 export enum WeaponType {
     NONE,
@@ -43,9 +45,9 @@ export const getWeaponComponent = (type: WeaponType): Weapon => {
         case WeaponType.UNARMED:
             return new UnarmedWeapon()
         case WeaponType.SWORD:
-            return new MeleeWeapon("weapon_regular_sword")
+            return new MeleeWeapon(WeaponType.SWORD, "weapon_regular_sword")
         case WeaponType.CLUB:
-            return new MeleeWeapon("weapon_baton_with_spikes")
+            return new MeleeWeapon(WeaponType.CLUB, "weapon_baton_with_spikes")
         default:
             throw new Error(`weapon type ${type} is not supported yet`)
     }
@@ -73,6 +75,7 @@ export abstract class Weapon extends Component {
                 .filter(d => d.standingPosition.distanceTo(attacker.standingPosition) < attackDistance)
     }
 
+    abstract getType(): WeaponType
     abstract setDelayBetweenAttacks(delayMillis: number)
     abstract isAttacking()
     abstract toggleSheathed()
@@ -90,23 +93,23 @@ export abstract class Weapon extends Component {
  */
 class MeleeWeapon extends Weapon {
 
-    private weaponSprite: TileComponent
+    private weaponType: WeaponType
+    private weaponSprite: StaticTileSource
+    private weaponTransform: TileTransform
     private state: State = State.DRAWN
     // private slashSprite: TileComponent
     private _range: number
     private delayBetweenAttacks = 0  // delay after the animation ends before the weapon can attack again in millis
 
-    constructor(weaponId: string) {
+    constructor(weaponType: WeaponType, weaponId: string) {
         super()
         this.start = (startData) => {
-            this.weaponSprite = this.entity.addComponent(
-                new TileComponent(
-                    Tilesets.instance.dungeonCharacters.getTileSource(weaponId),
-                    new TileTransform().relativeTo(this.dude.animation.transform)
-                )
-            )
-            this._range = this.weaponSprite.transform.dimensions.y
+            this.weaponSprite = Tilesets.instance.dungeonCharacters.getTileSource(weaponId),
+            this.weaponTransform = new TileTransform(Point.ZERO, this.weaponSprite.dimensions).relativeTo(this.dude.animation.transform),
+            this._range = this.weaponSprite.dimensions.y
+            console.log("started")
         }
+        this.weaponType = weaponType
     }
 
     update(updateData: UpdateData) {
@@ -115,6 +118,14 @@ class MeleeWeapon extends Weapon {
         }
 
         this.animate()
+    }
+    
+    getRenderMethods() {
+        return [this.weaponSprite.toImageRender(this.weaponTransform)]
+    }
+
+    getType() {
+        return this.weaponType
     }
 
     setDelayBetweenAttacks(delayMs: number) {
@@ -160,7 +171,7 @@ class MeleeWeapon extends Weapon {
     private animate() {
         const offsetFromEdge = this.dude.animation.transform.dimensions
                 .minus(new Point(9, 2))
-                .minus(this.weaponSprite.transform.dimensions)
+                .minus(this.weaponTransform.dimensions)
 
         let pos = new Point(0, 0)
         let rotation = 0
@@ -176,15 +187,15 @@ class MeleeWeapon extends Weapon {
             rotation = posWithRotation[1]
         }
 
-        this.weaponSprite.transform.rotation = rotation
-        this.weaponSprite.transform.mirrorY = this.state == State.SHEATHED
+        this.weaponTransform.rotation = rotation
+        this.weaponTransform.mirrorY = this.state == State.SHEATHED
 
         pos = pos.plus(this.dude.getAnimationOffsetPosition())
 
-        this.weaponSprite.transform.position = pos
+        this.weaponTransform.position = pos
 
         // show sword behind character if sheathed
-        this.weaponSprite.transform.depth = this.state == State.SHEATHED ? -.5 : .5
+        this.weaponTransform.depth = this.state == State.SHEATHED ? -.5 : .5
         // this.weaponSprite.transform.mirrorX = charMirror
 
         // TODO maybe keep the slash stuff later
@@ -223,8 +234,8 @@ class MeleeWeapon extends Weapon {
         } else if (this.currentAnimationFrame < resettingFrame) {
             return [
                 new Point(
-                    (6-this.currentAnimationFrame) + this.weaponSprite.transform.dimensions.y - swingStartFrame*3, 
-                    Math.floor(this.weaponSprite.transform.dimensions.y/2 - 1)
+                    (6-this.currentAnimationFrame) + this.weaponTransform.dimensions.y - swingStartFrame*3, 
+                    Math.floor(this.weaponTransform.dimensions.y/2 - 1)
                 ),
                 90
             ]
@@ -238,6 +249,10 @@ class UnarmedWeapon extends Weapon {
 
     private state: State = State.DRAWN
     private delay: number
+
+    getType() {
+        return WeaponType.UNARMED
+    }
 
     setDelayBetweenAttacks(delayMillis: number) {
         this.delay = delayMillis
