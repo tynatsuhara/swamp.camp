@@ -11,7 +11,9 @@ class Profiler {
     private renderTracker = new MovingAverage()
     private componentsUpdated: number
 
-    update(
+    private tracked = new Map<string, [MovingAverage, (number) => string]>()
+
+    updateEngineTickStats(
         msSinceLastUpdate: number, 
         msForUpdate: number,
         msForRender: number,
@@ -23,12 +25,22 @@ class Profiler {
         this.componentsUpdated = componentsUpdated
     }
 
+    customTrackMovingAverage(key: string, value: number, displayFn: (number) => string) {
+        let tracker = this.tracked.get(key)
+        if (!tracker) {
+            tracker = [new MovingAverage(), displayFn]
+            this.tracked.set(key, tracker)
+        }
+        tracker[0].record(value)
+    }
+
     getView(): View {
         const s = [
             `FPS: ${round(1000/this.fpsTracker.get())} (${round(this.fpsTracker.get())} ms per frame)`,
             `update() duration ms: ${round(this.updateTracker.get(), 2)}`,
             `render() duration ms: ${round(this.renderTracker.get(), 2)}`,
-            `components updated: ${this.componentsUpdated}`
+            `components updated: ${this.componentsUpdated}`,
+            ...Array.from(this.tracked.values()).map((v => v[1](v[0].get())))
         ]
         return new View([
             new Entity(s.map((str, i) => new BasicRenderComponent(new TextRender(str, new Point(60, 70 + 25 * i)))))

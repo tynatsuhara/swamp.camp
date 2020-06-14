@@ -94,7 +94,7 @@ export class Engine {
         })
 
         if (debug.showProfiler) {
-            profiler.update(elapsed, updateDuration, renderDuration, componentsUpdated)
+            profiler.updateEngineTickStats(elapsed, updateDuration, renderDuration, componentsUpdated)
         }
         
         this.lastUpdateMillis = time

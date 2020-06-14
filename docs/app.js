@@ -501,20 +501,29 @@ System.register("engine/profiler", ["engine/View", "engine/Entity", "engine/poin
                     this.fpsTracker = new MovingAverage();
                     this.updateTracker = new MovingAverage();
                     this.renderTracker = new MovingAverage();
+                    this.tracked = new Map();
                 }
-                Profiler.prototype.update = function (msSinceLastUpdate, msForUpdate, msForRender, componentsUpdated) {
+                Profiler.prototype.updateEngineTickStats = function (msSinceLastUpdate, msForUpdate, msForRender, componentsUpdated) {
                     this.fpsTracker.record(msSinceLastUpdate);
                     this.updateTracker.record(msForUpdate);
                     this.renderTracker.record(msForRender);
                     this.componentsUpdated = componentsUpdated;
                 };
+                Profiler.prototype.customTrackMovingAverage = function (key, value, displayFn) {
+                    var tracker = this.tracked.get(key);
+                    if (!tracker) {
+                        tracker = [new MovingAverage(), displayFn];
+                        this.tracked.set(key, tracker);
+                    }
+                    tracker[0].record(value);
+                };
                 Profiler.prototype.getView = function () {
-                    var s = [
+                    var s = __spreadArrays([
                         "FPS: " + round(1000 / this.fpsTracker.get()) + " (" + round(this.fpsTracker.get()) + " ms per frame)",
                         "update() duration ms: " + round(this.updateTracker.get(), 2),
                         "render() duration ms: " + round(this.renderTracker.get(), 2),
                         "components updated: " + this.componentsUpdated
-                    ];
+                    ], Array.from(this.tracked.values()).map((function (v) { return v[1](v[0].get()); })));
                     return new View_1.View([
                         new Entity_1.Entity(s.map(function (str, i) { return new BasicRenderComponent_1.BasicRenderComponent(new TextRender_1.TextRender(str, new point_4.Point(60, 70 + 25 * i))); }))
                     ]);
@@ -732,8 +741,6 @@ System.register("engine/collision/Collider", ["engine/component", "engine/point"
                     if (layer === void 0) { layer = CollisionEngine_1.CollisionEngine.DEFAULT_LAYER; }
                     if (ignoredColliders === void 0) { ignoredColliders = []; }
                     var _this = _super.call(this) || this;
-                    _this.collidingWith = new Set();
-                    _this.onColliderEnterCallback = function () { };
                     _this._position = position;
                     _this.layer = layer;
                     _this.ignoredColliders = ignoredColliders;
@@ -745,9 +752,6 @@ System.register("engine/collision/Collider", ["engine/component", "engine/point"
                     enumerable: true,
                     configurable: true
                 });
-                Collider.prototype.start = function (startData) {
-                    CollisionEngine_1.CollisionEngine.instance.checkAndUpdateCollisions(this);
-                };
                 Collider.prototype.update = function (updateData) {
                     CollisionEngine_1.CollisionEngine.instance.markCollider(this);
                 };
@@ -757,42 +761,20 @@ System.register("engine/collision/Collider", ["engine/component", "engine/point"
                     // TODO: Should these branches be handled by the caller?
                     if (CollisionEngine_1.CollisionEngine.instance.canTranslate(this, new point_5.Point(dx, dy))) {
                         this._position = point;
-                        CollisionEngine_1.CollisionEngine.instance.checkAndUpdateCollisions(this);
                     }
                     else if (CollisionEngine_1.CollisionEngine.instance.canTranslate(this, new point_5.Point(dx, 0))) {
                         this._position = this._position.plus(new point_5.Point(dx, 0));
-                        CollisionEngine_1.CollisionEngine.instance.checkAndUpdateCollisions(this);
                     }
                     else if (CollisionEngine_1.CollisionEngine.instance.canTranslate(this, new point_5.Point(0, dy))) {
                         this._position = this._position.plus(new point_5.Point(0, dy));
-                        CollisionEngine_1.CollisionEngine.instance.checkAndUpdateCollisions(this);
                     }
                     return this.position;
-                };
-                Collider.prototype.updateColliding = function (other, isColliding) {
-                    if (isColliding && !this.collidingWith.has(other)) {
-                        this.collidingWith.add(other);
-                        try {
-                            this.onColliderEnterCallback(other);
-                        }
-                        catch (error) {
-                            console.log("collider callback threw error: " + error);
-                        }
-                    }
-                    else if (!isColliding && this.collidingWith.has(other)) {
-                        // TODO call onExit
-                        this.collidingWith.delete(other);
-                    }
-                };
-                Collider.prototype.onColliderEnter = function (callback) {
-                    this.onColliderEnterCallback = callback;
-                    return this;
                 };
                 Collider.prototype.getRenderMethods = function () {
                     if (!debug_1.debug.showColliders) {
                         return [];
                     }
-                    var color = this.collidingWith.size > 0 ? "#00ff00" : "#ff0000";
+                    var color = "#ff0000";
                     var pts = this.getPoints();
                     var lines = [];
                     var lastPt = pts[pts.length - 1];
@@ -831,11 +813,6 @@ System.register("engine/collision/Collider", ["engine/component", "engine/point"
                     var result = other.getPoints().some(function (p) { return _this.isWithinBounds(p); });
                     this._position = this._position.minus(translation);
                     return result;
-                };
-                Collider.prototype.delete = function () {
-                    var _this = this;
-                    this.collidingWith.forEach(function (c) { return c.updateColliding(_this, false); });
-                    _super.prototype.delete.call(this);
                 };
                 Collider.prototype.lineIntersect = function (line1Start, line1End, line2Start, line2End) {
                     // https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_two_points_on_each_line
@@ -945,15 +922,6 @@ System.register("engine/collision/CollisionEngine", ["engine/point", "engine/uti
                         return to;
                     }
                 };
-                CollisionEngine.prototype.checkAndUpdateCollisions = function (collider) {
-                    this.removeDanglingColliders();
-                    this.colliders.filter(function (other) { return other !== collider; }).forEach(function (other) {
-                        var isColliding = other.enabled
-                            && (other.getPoints().some(function (pt) { return collider.isWithinBounds(pt); }) || collider.getPoints().some(function (pt) { return other.isWithinBounds(pt); }));
-                        collider.updateColliding(other, isColliding);
-                        other.updateColliding(collider, isColliding);
-                    });
-                };
                 // Returns true if the collider can be translated and will not intersect a non-trigger collider in the new position.
                 // This DOES NOT check for any possible colliders in the path of the collision and should only be used for small translations.
                 CollisionEngine.prototype.canTranslate = function (collider, translation) {
@@ -975,13 +943,11 @@ System.register("engine/collision/CollisionEngine", ["engine/point", "engine/uti
                 };
                 // unregisters any colliders without an entity
                 CollisionEngine.prototype.removeDanglingColliders = function () {
-                    var _this = this;
                     var removed = this.colliders.filter(function (other) { return !other.entity; });
                     if (removed.length === 0) {
                         return;
                     }
                     this.colliders = this.colliders.filter(function (other) { return !!other.entity; });
-                    removed.forEach(function (r) { return _this.colliders.forEach(function (c) { return c.updateColliding(r, false); }); });
                 };
                 CollisionEngine.DEFAULT_LAYER = "default";
                 return CollisionEngine;
@@ -1093,7 +1059,7 @@ System.register("engine/engine", ["engine/renderer/Renderer", "engine/input", "e
                         _this.renderer.render(views);
                     })[0];
                     if (debug_2.debug.showProfiler) {
-                        profiler_1.profiler.update(elapsed, updateDuration, renderDuration, componentsUpdated);
+                        profiler_1.profiler.updateEngineTickStats(elapsed, updateDuration, renderDuration, componentsUpdated);
                     }
                     this.lastUpdateMillis = time;
                     requestAnimationFrame(function () { return _this.tick(); });
@@ -1634,9 +1600,9 @@ System.register("engine/util/BinaryHeap", [], function (exports_25, context_25) 
         }
     };
 });
-System.register("engine/util/Grid", ["engine/point", "engine/util/BinaryHeap"], function (exports_26, context_26) {
+System.register("engine/util/Grid", ["engine/point", "engine/util/BinaryHeap", "engine/profiler"], function (exports_26, context_26) {
     "use strict";
-    var point_10, BinaryHeap_1, Grid;
+    var point_10, BinaryHeap_1, profiler_2, Grid;
     var __moduleName = context_26 && context_26.id;
     return {
         setters: [
@@ -1645,6 +1611,9 @@ System.register("engine/util/Grid", ["engine/point", "engine/util/BinaryHeap"], 
             },
             function (BinaryHeap_1_1) {
                 BinaryHeap_1 = BinaryHeap_1_1;
+            },
+            function (profiler_2_1) {
+                profiler_2 = profiler_2_1;
             }
         ],
         execute: function () {
@@ -1654,6 +1623,7 @@ System.register("engine/util/Grid", ["engine/point", "engine/util/BinaryHeap"], 
                     this.map = {};
                 }
                 Grid.prototype.set = function (pt, entry) {
+                    this._valuesCache = null;
                     this.map[pt.toString()] = entry;
                 };
                 // returns null if not present in the grid
@@ -1661,10 +1631,12 @@ System.register("engine/util/Grid", ["engine/point", "engine/util/BinaryHeap"], 
                     return this.map[pt.toString()];
                 };
                 Grid.prototype.remove = function (pt) {
+                    this._valuesCache = null;
                     delete this.map[pt.toString()];
                 };
                 Grid.prototype.removeAll = function (element) {
                     var _this = this;
+                    this._valuesCache = null;
                     Object.entries(this.map)
                         .filter(function (kv) { return kv[1] === element; })
                         .forEach(function (kv) { return delete _this.map[kv[0]]; });
@@ -1676,7 +1648,10 @@ System.register("engine/util/Grid", ["engine/point", "engine/util/BinaryHeap"], 
                     return Object.keys(this.map).map(function (ptStr) { return point_10.Point.fromString(ptStr); });
                 };
                 Grid.prototype.values = function () {
-                    return Object.values(this.map);
+                    if (!this._valuesCache) {
+                        this._valuesCache = Object.values(this.map);
+                    }
+                    return this._valuesCache;
                 };
                 /**
                  * Returns a path inclusive of start and end
@@ -1695,6 +1670,7 @@ System.register("engine/util/Grid", ["engine/point", "engine/util/BinaryHeap"], 
                     var openSetUnique = new Set();
                     var openSet = new BinaryHeap_1.BinaryHeap(function (p) { return fScore.get(p.toString()); });
                     openSet.push(start);
+                    var startTime = new Date().getTime();
                     while (openSet.size() > 0) {
                         var current = openSet.pop();
                         openSetUnique.delete(current.toString());
@@ -1705,6 +1681,7 @@ System.register("engine/util/Grid", ["engine/point", "engine/util/BinaryHeap"], 
                                 path.push(next);
                                 next = cameFrom.get(next.toString());
                             }
+                            profiler_2.profiler.customTrackMovingAverage("openSet size", new Date().getTime() - startTime, function (v) { return "pathfinding duration ms: " + v; });
                             return path.reverse();
                         }
                         var currentGScore = gScore.get(current.toString());
@@ -3120,7 +3097,7 @@ System.register("game/items/DroppedItem", ["engine/component", "engine/point", "
                         var pos = position.minus(new point_18.Point(_this.tile.transform.dimensions.x / 2, _this.tile.transform.dimensions.y));
                         _this.tile.transform.position = pos;
                         var colliderSize = new point_18.Point(8, 8);
-                        _this.collider = _this.entity.addComponent(new BoxCollider_1.BoxCollider(pos.plus(_this.tile.transform.dimensions.minus(colliderSize).div(2)), colliderSize, DroppedItem.COLLISION_LAYER, !!sourceCollider ? [sourceCollider] : []).onColliderEnter(function (c) { return _this.collide(c); }));
+                        _this.collider = _this.entity.addComponent(new BoxCollider_1.BoxCollider(pos.plus(_this.tile.transform.dimensions.minus(colliderSize).div(2)), colliderSize, DroppedItem.COLLISION_LAYER, !!sourceCollider ? [sourceCollider] : []));
                         _this.reposition();
                         var last = new Date().getTime();
                         var move = function () {
@@ -3140,6 +3117,18 @@ System.register("game/items/DroppedItem", ["engine/component", "engine/point", "
                         };
                         requestAnimationFrame(move);
                     };
+                    _this.update = function () {
+                        if (Player_1.Player.instance.dude.standingPosition.distanceTo(position) < 8) {
+                            _this.update = function () { };
+                            setTimeout(function () {
+                                if (Player_1.Player.instance.dude.isAlive && !!_this.entity) {
+                                    Player_1.Player.instance.dude.inventory.addItem(_this.itemType);
+                                    LocationManager_2.LocationManager.instance.currentLocation.droppedItems.delete(_this.entity);
+                                    _this.entity.selfDestruct();
+                                }
+                            }, 150);
+                        }
+                    };
                     return _this;
                 }
                 DroppedItem.prototype.reposition = function (delta) {
@@ -3147,23 +3136,6 @@ System.register("game/items/DroppedItem", ["engine/component", "engine/point", "
                     var colliderOffset = this.collider.position.minus(this.tile.transform.position);
                     this.tile.transform.position = this.collider.moveTo(this.collider.position.plus(delta)).minus(colliderOffset);
                     this.tile.transform.depth = this.tile.transform.position.y;
-                };
-                DroppedItem.prototype.collide = function (c) {
-                    var _this = this;
-                    if (!c.entity) {
-                        return;
-                    }
-                    var player = c.entity.getComponent(Player_1.Player);
-                    if (!!player) {
-                        setTimeout(function () {
-                            var d = player.dude;
-                            if (d.isAlive && !!_this.entity) {
-                                player.dude.inventory.addItem(_this.itemType);
-                                LocationManager_2.LocationManager.instance.currentLocation.droppedItems.delete(_this.entity);
-                                _this.entity.selfDestruct();
-                            }
-                        }, 150);
-                    }
                 };
                 DroppedItem.COLLISION_LAYER = "item";
                 return DroppedItem;
@@ -7849,7 +7821,7 @@ System.register("game/characters/Enemy", ["engine/component", "game/characters/D
                     if (this.dude.faction === 3 /* DEMONS */) {
                         this.npc.isEnemyFn = function (d) { return d.faction != _this.dude.faction && PointLightMaskRenderer_3.PointLightMaskRenderer.instance.getDarknessAtPosition(d.standingPosition) > 150; };
                         this.npc.pathFindingHeuristic = function (pt, goal) {
-                            return pt.manhattanDistanceTo(goal) + (255 - PointLightMaskRenderer_3.PointLightMaskRenderer.instance.getDarknessAtPosition(pt.times(Tilesets_30.TILE_SIZE)));
+                            return pt.distanceTo(goal) + (255 - PointLightMaskRenderer_3.PointLightMaskRenderer.instance.getDarknessAtPosition(pt.times(Tilesets_30.TILE_SIZE)));
                         };
                         this.npc.findTargetRange *= 3;
                     }
@@ -9762,12 +9734,12 @@ System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"]
 });
 System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uuid"], function (exports_120, context_120) {
     "use strict";
-    var profiler_2, uuid_2, serialize, buildObject;
+    var profiler_3, uuid_2, serialize, buildObject;
     var __moduleName = context_120 && context_120.id;
     return {
         setters: [
-            function (profiler_2_1) {
-                profiler_2 = profiler_2_1;
+            function (profiler_3_1) {
+                profiler_3 = profiler_3_1;
             },
             function (uuid_2_1) {
                 uuid_2 = uuid_2_1;
@@ -9781,7 +9753,7 @@ System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uu
                 var resultObject = {}; // maps string->object with subobjects as uuids
                 var topLevelUuidMap = {}; // maps string->object with subobjects as uuids
                 var objectUuidMap = new Map(); // maps unique object ref to uuid
-                var buildDuration = profiler_2.measure(function () { return buildObject(object, resultObject, topLevelUuidMap, objectUuidMap); })[0];
+                var buildDuration = profiler_3.measure(function () { return buildObject(object, resultObject, topLevelUuidMap, objectUuidMap); })[0];
                 console.log("obj built in " + buildDuration);
                 return JSON.stringify({
                     uuids: topLevelUuidMap,

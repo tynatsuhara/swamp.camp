@@ -15,10 +15,8 @@ export abstract class Collider extends Component {
 
     private _position: Point  // top-left
     get position() { return this._position }
-    readonly layer: string
-    
-    readonly collidingWith: Set<Collider> = new Set()
-    private onColliderEnterCallback: (collider: Collider) => void = () => {}
+
+    readonly layer: string    
     readonly ignoredColliders: Collider[]
 
     /**
@@ -33,10 +31,6 @@ export abstract class Collider extends Component {
         CollisionEngine.instance.markCollider(this)
     }
 
-    start(startData: StartData) {
-        CollisionEngine.instance.checkAndUpdateCollisions(this)
-    }
-    
     update(updateData: UpdateData) {
         CollisionEngine.instance.markCollider(this)
     }
@@ -47,34 +41,12 @@ export abstract class Collider extends Component {
         // TODO: Should these branches be handled by the caller?
         if (CollisionEngine.instance.canTranslate(this, new Point(dx, dy))) {
             this._position = point
-            CollisionEngine.instance.checkAndUpdateCollisions(this)
         } else if (CollisionEngine.instance.canTranslate(this, new Point(dx, 0))) {
             this._position = this._position.plus(new Point(dx, 0))
-            CollisionEngine.instance.checkAndUpdateCollisions(this)
         } else if (CollisionEngine.instance.canTranslate(this, new Point(0, dy))) {
             this._position = this._position.plus(new Point(0, dy))
-            CollisionEngine.instance.checkAndUpdateCollisions(this)
         }
         return this.position
-    }
-
-    updateColliding(other: Collider, isColliding: boolean) {
-        if (isColliding && !this.collidingWith.has(other)) {
-            this.collidingWith.add(other)
-            try {
-                this.onColliderEnterCallback(other)
-            } catch (error) {
-                console.log(`collider callback threw error: ${error}`)
-            }
-        } else if (!isColliding && this.collidingWith.has(other)) {
-            // TODO call onExit
-            this.collidingWith.delete(other)
-        }
-    }
-
-    onColliderEnter(callback: (collider: Collider) => void): Collider {
-        this.onColliderEnterCallback = callback
-        return this
     }
 
     getRenderMethods(): RenderMethod[] {
@@ -82,7 +54,7 @@ export abstract class Collider extends Component {
             return []
         }
         
-        const color = this.collidingWith.size > 0 ? "#00ff00" : "#ff0000"
+        const color = "#ff0000"
         const pts = this.getPoints()
         const lines = []
         let lastPt = pts[pts.length-1]
@@ -124,11 +96,6 @@ export abstract class Collider extends Component {
         const result = other.getPoints().some(p => this.isWithinBounds(p))
         this._position = this._position.minus(translation)
         return result
-    }
-
-    delete() {
-        this.collidingWith.forEach(c => c.updateColliding(this, false))
-        super.delete()
     }
 
     private lineIntersect(line1Start, line1End, line2Start, line2End): Point {

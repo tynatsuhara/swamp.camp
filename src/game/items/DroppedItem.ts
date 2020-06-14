@@ -39,7 +39,7 @@ export class DroppedItem extends Component {
                 colliderSize, 
                 DroppedItem.COLLISION_LAYER,
                 !!sourceCollider ? [sourceCollider] : []
-            ).onColliderEnter(c => this.collide(c)))
+            ))
 
             this.reposition()
 
@@ -61,28 +61,24 @@ export class DroppedItem extends Component {
             }
             requestAnimationFrame(move)
         }
+
+        this.update = () => {
+            if (Player.instance.dude.standingPosition.distanceTo(position) < 8) {
+                this.update = () => {}
+                setTimeout(() => {
+                    if (Player.instance.dude.isAlive && !!this.entity) {
+                        Player.instance.dude.inventory.addItem(this.itemType)
+                        LocationManager.instance.currentLocation.droppedItems.delete(this.entity)
+                        this.entity.selfDestruct()
+                    }
+                }, 150)
+            }
+        }
     }
 
     private reposition(delta = new Point(0, 0)) {
         const colliderOffset = this.collider.position.minus(this.tile.transform.position)
         this.tile.transform.position = this.collider.moveTo(this.collider.position.plus(delta)).minus(colliderOffset)
         this.tile.transform.depth = this.tile.transform.position.y
-    }
-
-    private collide(c: Collider) {
-        if (!c.entity) {
-            return
-        }
-        const player = c.entity.getComponent(Player)
-        if (!!player) {
-            setTimeout(() => {
-                const d = player.dude
-                if (d.isAlive && !!this.entity) {
-                    player.dude.inventory.addItem(this.itemType)
-                    LocationManager.instance.currentLocation.droppedItems.delete(this.entity)
-                    this.entity.selfDestruct()
-                }
-            }, 150)
-        }
     }
 }
