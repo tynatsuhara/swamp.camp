@@ -63,7 +63,9 @@ export class DroppedItem extends Component {
         }
 
         this.update = () => {
-            if (Player.instance.dude.standingPosition.distanceTo(position) < 8) {
+            const colliding = Player.instance.dude.standingPosition.plusY(-6).distanceTo(position) < 12
+
+            if (colliding) {
                 this.update = () => {}
                 setTimeout(() => {
                     if (Player.instance.dude.isAlive && !!this.entity) {
@@ -79,6 +81,6 @@ export class DroppedItem extends Component {
     private reposition(delta = new Point(0, 0)) {
         const colliderOffset = this.collider.position.minus(this.tile.transform.position)
         this.tile.transform.position = this.collider.moveTo(this.collider.position.plus(delta)).minus(colliderOffset)
-        this.tile.transform.depth = this.tile.transform.position.y
+        this.tile.transform.depth = this.tile.transform.position.y + this.tile.transform.dimensions.y
     }
 }

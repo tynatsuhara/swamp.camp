@@ -3122,7 +3122,8 @@ System.register("game/items/DroppedItem", ["engine/component", "engine/point", "
                         requestAnimationFrame(move);
                     };
                     _this.update = function () {
-                        if (Player_1.Player.instance.dude.standingPosition.distanceTo(position) < 8) {
+                        var colliding = Player_1.Player.instance.dude.standingPosition.plusY(-6).distanceTo(position) < 12;
+                        if (colliding) {
                             _this.update = function () { };
                             setTimeout(function () {
                                 if (Player_1.Player.instance.dude.isAlive && !!_this.entity) {
@@ -3139,7 +3140,7 @@ System.register("game/items/DroppedItem", ["engine/component", "engine/point", "
                     if (delta === void 0) { delta = new point_18.Point(0, 0); }
                     var colliderOffset = this.collider.position.minus(this.tile.transform.position);
                     this.tile.transform.position = this.collider.moveTo(this.collider.position.plus(delta)).minus(colliderOffset);
-                    this.tile.transform.depth = this.tile.transform.position.y;
+                    this.tile.transform.depth = this.tile.transform.position.y + this.tile.transform.dimensions.y;
                 };
                 DroppedItem.COLLISION_LAYER = "item";
                 return DroppedItem;
@@ -5396,7 +5397,7 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                     // no lights should live outside of this range
                     this.size = MapGenerator_3.MapGenerator.MAP_SIZE * Tilesets_17.TILE_SIZE;
                     this.shift = new point_37.Point(this.size / 2, this.size / 2);
-                    this.lightTiles = new Map(); // grid of light radiuses
+                    this.lightTiles = new Map(); // grid of light diameter
                     this.litGrid = new Grid_1.Grid(); // used to precompute darkness lookups for the current location
                     this.gridDirty = true;
                     this.darkness = 0.4;
@@ -5438,7 +5439,7 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                         return false;
                     }
                     var grid = this.lightTiles.get(LocationManager_10.LocationManager.instance.currentLocation);
-                    return !grid ? true : !grid.entries().some(function (entry) { return entry[0].distanceTo(pixelPt) < entry[1]; });
+                    return !grid ? true : !grid.entries().some(function (entry) { return entry[0].distanceTo(pixelPt) < entry[1] * .5; });
                 };
                 PointLightMaskRenderer.prototype.updateColorForTime = function () {
                     var time = WorldTime_3.WorldTime.instance.time;
