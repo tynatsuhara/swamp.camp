@@ -6,12 +6,16 @@ import { Component } from "./component"
  */
 export class Entity {
     components: Component[] = []
+    
+    private componentCache: Map<object, object> = new Map()
 
     constructor(components: Component[] = []) {
         components.forEach(c => this.addComponent(c))
     }
 
     addComponent<T extends Component>(component: T): T {
+        this.componentCache.clear()
+
         component.entity = this
         this.components.push(component)
         component.awake({})
@@ -23,15 +27,22 @@ export class Entity {
         return components
     }
 
-    getComponent<T extends Component>(componentType: { new(...args: any[]): T }): T {
-        return this.getComponents(componentType)[0]
+    getComponent<T extends Component>(componentType: ComponentType<T>): T {
+        let value = this.componentCache.get(componentType)
+        if (!value || value === NO_COMPONENT) {
+            value = this.getComponents(componentType)[0]
+            this.componentCache.set(componentType, value ?? NO_COMPONENT)
+        }
+        return value as T
     }
 
-    getComponents<T extends Component>(componentType: { new(...args: any[]): T }): T[] {
+    getComponents<T extends Component>(componentType: ComponentType<T>): T[] {
         return this.components.filter(c => c instanceof componentType).map(c => c as T)
     }
 
     removeComponent(component: Component) {
+        this.componentCache.clear()
+        
         this.components = this.components.filter(c => c !== component)
         component.entity = null
     }
@@ -44,3 +55,6 @@ export class Entity {
         this.components.forEach(c => c.delete())
     }
 }
+
+const NO_COMPONENT = {}
+interface ComponentType<T> { new(...args: any[]): T }

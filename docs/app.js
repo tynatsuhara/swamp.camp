@@ -1121,7 +1121,7 @@ System.register("engine/component", [], function (exports_16, context_16) {
 });
 System.register("engine/Entity", [], function (exports_17, context_17) {
     "use strict";
-    var Entity;
+    var Entity, NO_COMPONENT;
     var __moduleName = context_17 && context_17.id;
     return {
         setters: [],
@@ -1135,9 +1135,11 @@ System.register("engine/Entity", [], function (exports_17, context_17) {
                     var _this = this;
                     if (components === void 0) { components = []; }
                     this.components = [];
+                    this.componentCache = new Map();
                     components.forEach(function (c) { return _this.addComponent(c); });
                 }
                 Entity.prototype.addComponent = function (component) {
+                    this.componentCache.clear();
                     component.entity = this;
                     this.components.push(component);
                     component.awake({});
@@ -1149,12 +1151,18 @@ System.register("engine/Entity", [], function (exports_17, context_17) {
                     return components;
                 };
                 Entity.prototype.getComponent = function (componentType) {
-                    return this.getComponents(componentType)[0];
+                    var value = this.componentCache.get(componentType);
+                    if (!value || value === NO_COMPONENT) {
+                        value = this.getComponents(componentType)[0];
+                        this.componentCache.set(componentType, value !== null && value !== void 0 ? value : NO_COMPONENT);
+                    }
+                    return value;
                 };
                 Entity.prototype.getComponents = function (componentType) {
                     return this.components.filter(function (c) { return c instanceof componentType; }).map(function (c) { return c; });
                 };
                 Entity.prototype.removeComponent = function (component) {
+                    this.componentCache.clear();
                     this.components = this.components.filter(function (c) { return c !== component; });
                     component.entity = null;
                 };
@@ -1168,6 +1176,7 @@ System.register("engine/Entity", [], function (exports_17, context_17) {
                 return Entity;
             }());
             exports_17("Entity", Entity);
+            NO_COMPONENT = {};
         }
     };
 });
