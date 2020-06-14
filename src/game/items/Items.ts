@@ -7,6 +7,7 @@ import { TileSource } from "../../engine/tiles/TileSource"
 import { Collider } from "../../engine/collision/Collider"
 import { ElementType } from "../world/elements/Elements"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
+import { WeaponType } from "../characters/Weapon"
 
 export class ItemMetadata {
     readonly displayName: string
@@ -14,6 +15,7 @@ export class ItemMetadata {
     readonly inventoryIconSupplier: () => StaticTileSource
     readonly stackLimit: number
     readonly element: ElementType
+    readonly equippable: WeaponType
 
     // TODO maybe make this a builder
     constructor({
@@ -22,18 +24,21 @@ export class ItemMetadata {
         droppedIconSupplier = () => null,
         stackLimit = 99,
         element = null,  // for placing elements
+        equippable = null
     }: {
         displayName: string,
         inventoryIconSupplier: () => StaticTileSource,
         droppedIconSupplier?: () => TileSource,
         stackLimit?: number,
         element?: ElementType,
+        equippable?: WeaponType
     }) {
         this.displayName = displayName
         this.droppedIconSupplier = droppedIconSupplier
         this.inventoryIconSupplier = inventoryIconSupplier
         this.stackLimit = stackLimit
         this.element = element
+        this.equippable = equippable
     }
 }
 
@@ -75,7 +80,12 @@ export const ITEM_METADATA_MAP = {
         displayName: "Iron",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("iron"), 
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("ironItem"),
-        stackLimit: 99,
+    }),
+    [Item.PICKAXE]: new ItemMetadata({
+        displayName: "Pickaxe",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("pickaxe"), 
+        stackLimit: 1,
+        equippable: WeaponType.PICKAXE
     })
 }
 

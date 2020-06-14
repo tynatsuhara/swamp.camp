@@ -45,9 +45,11 @@ export const getWeaponComponent = (type: WeaponType): Weapon => {
         case WeaponType.UNARMED:
             return new UnarmedWeapon()
         case WeaponType.SWORD:
-            return new MeleeWeapon(WeaponType.SWORD, "weapon_regular_sword")
+            return new MeleeWeapon(WeaponType.SWORD, "weapon_regular_sword", new Point(-6, -2))
         case WeaponType.CLUB:
-            return new MeleeWeapon(WeaponType.CLUB, "weapon_baton_with_spikes")
+            return new MeleeWeapon(WeaponType.CLUB, "weapon_baton_with_spikes", new Point(-6, -2))
+        case WeaponType.PICKAXE:
+            return new MeleeWeapon(WeaponType.PICKAXE, "weapon_pickaxe", new Point(-6, -1))
         default:
             throw new Error(`weapon type ${type} is not supported yet`)
     }
@@ -96,18 +98,19 @@ class MeleeWeapon extends Weapon {
     private weaponType: WeaponType
     private weaponSprite: StaticTileSource
     private weaponTransform: TileTransform
+    private offsetFromCenter: Point
     private state: State = State.DRAWN
     // private slashSprite: TileComponent
     private _range: number
     private delayBetweenAttacks = 0  // delay after the animation ends before the weapon can attack again in millis
 
-    constructor(weaponType: WeaponType, weaponId: string) {
+    constructor(weaponType: WeaponType, weaponId: string, offsetFromCenter: Point) {
         super()
         this.start = (startData) => {
-            this.weaponSprite = Tilesets.instance.dungeonCharacters.getTileSource(weaponId),
-            this.weaponTransform = new TileTransform(Point.ZERO, this.weaponSprite.dimensions).relativeTo(this.dude.animation.transform),
+            this.weaponSprite = Tilesets.instance.dungeonCharacters.getTileSource(weaponId)
+            this.weaponTransform = new TileTransform(Point.ZERO, this.weaponSprite.dimensions).relativeTo(this.dude.animation.transform)
+            this.offsetFromCenter = offsetFromCenter
             this._range = this.weaponSprite.dimensions.y
-            console.log("started")
         }
         this.weaponType = weaponType
     }
@@ -169,9 +172,10 @@ class MeleeWeapon extends Weapon {
     }
 
     private animate() {
-        const offsetFromEdge = this.dude.animation.transform.dimensions
-                .minus(new Point(9, 2))
-                .minus(this.weaponTransform.dimensions)
+        const offsetFromEdge = new Point(
+            this.dude.animation.transform.dimensions.x/2 - this.weaponTransform.dimensions.x/2,
+            this.dude.animation.transform.dimensions.y - this.weaponTransform.dimensions.y
+        ).plus(this.offsetFromCenter)
 
         let pos = new Point(0, 0)
         let rotation = 0

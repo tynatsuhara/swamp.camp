@@ -84,16 +84,34 @@ export class InventoryDisplay extends Component {
         } else if (hoverIndex !== -1 && !!inv[hoverIndex]) {  // we're hovering over an item
             this.tooltip.position = updateData.input.mousePos
             const stack = inv[hoverIndex]
-            const name = ITEM_METADATA_MAP[stack.item].displayName
+            const item = ITEM_METADATA_MAP[stack.item]
             const count = stack.count > 1 ? ' x' + stack.count : ''
-            const placeableElement = ITEM_METADATA_MAP[stack.item].element
-            const placePrompt = !!placeableElement ? ` [${Controls.keyString(Controls.placeElementButton)} to place]` : ''
-            this.tooltip.say(`${name}${count}${placePrompt}`)
 
-            if (!!placeableElement && updateData.input.isKeyDown(Controls.placeElementButton)) {
-                this.close()
-                // TODO this won't work properly with items that stack
-                PlaceElementDisplay.instance.startPlacing(placeableElement, () => inv[hoverIndex] = null)
+            const placeableElement = ITEM_METADATA_MAP[stack.item].element
+            const equippable = ITEM_METADATA_MAP[stack.item].equippable
+            let actionString: string = null
+            let actionFn: () => void
+
+            if (!!placeableElement) {
+                actionString = 'place'
+                actionFn = () => {
+                    this.close()
+                    // TODO this won't work properly with items that stack
+                    PlaceElementDisplay.instance.startPlacing(placeableElement, () => inv[hoverIndex] = null)
+                }
+            } else if (!!equippable) {
+                actionString = 'equip'
+                actionFn = () => {
+                    this.close()
+                    Player.instance.dude.setWeapon(equippable)
+                }
+            }
+
+            const actionPrompt = !!actionString ? ` [${Controls.keyString(Controls.interactButton)} to ${actionString}]` : ''
+            this.tooltip.say(`${item.displayName}${count}${actionPrompt}`)
+
+            if (!!actionFn && updateData.input.isKeyDown(Controls.interactButton)) {
+                actionFn()
             }
         } else {
             this.tooltip.clear()

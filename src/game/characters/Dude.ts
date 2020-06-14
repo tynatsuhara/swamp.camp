@@ -36,7 +36,6 @@ export class Dude extends Component implements DialogueSource {
     private _animation: AnimatedTileComponent
     get animation() { return this._animation }
 
-    readonly weaponType: WeaponType
     private _weapon: Weapon
     get weapon() { return this._weapon }
     private _shield: Shield
@@ -80,7 +79,6 @@ export class Dude extends Component implements DialogueSource {
         this.type = type
         this.faction = faction
         this._position = position
-        this.weaponType = weaponType
         this.shieldId = shieldId
         this.maxHealth = maxHealth
         this._health = health
@@ -97,10 +95,7 @@ export class Dude extends Component implements DialogueSource {
             this._animation = this.entity.addComponent(new AnimatedTileComponent([idleAnim, runAnim], new TileTransform(new Point(0, 28-height))))
             this._animation.fastForward(Math.random() * 1000)  // so not all the animations sync up
     
-            this._weapon = getWeaponComponent(weaponType)
-            if (!!this._weapon) {
-                this.entity.addComponent(this._weapon)
-            }
+            this.setWeapon(weaponType)
 
             if (!!shieldId) {
                 this._shield = this.entity.addComponent(new Shield(shieldId))
@@ -130,6 +125,16 @@ export class Dude extends Component implements DialogueSource {
         this.dialogueInteract.position = this.standingPosition.minus(new Point(0, 5))
         this.dialogueInteract.uiOffset = new Point(0, -TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition())
         this.dialogueInteract.enabled = this.dialogue !== Dialogue.NONE && DialogueDisplay.instance.dialogueSource !== this
+    }
+
+    setWeapon(type: WeaponType) {
+        if (!!this.weapon) {
+            this.entity.removeComponent(this.weapon)
+        }
+        this._weapon = getWeaponComponent(type)
+        if (!!this._weapon) {
+            this.entity.addComponent(this._weapon)
+        }
     }
 
     get isAlive() { return this._health > 0 }
@@ -308,7 +313,7 @@ export class Dude extends Component implements DialogueSource {
             maxHealth: this.maxHealth,
             health: this._health,
             speed: this.speed,
-            weapon: this.weaponType,
+            weapon: this._weapon?.getType() ?? WeaponType.NONE,
             shield: this.shieldId,
             inventory: this.inventory.save(),
             dialogue: this.dialogue,
