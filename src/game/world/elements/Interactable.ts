@@ -5,6 +5,7 @@ import { RenderMethod } from "../../../engine/renderer/RenderMethod"
 import { Controls } from "../../Controls"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
+import { UIStateManager } from "../../ui/UIStateManager"
 
 export class Interactable extends Component {
 
@@ -18,7 +19,7 @@ export class Interactable extends Component {
         position: Point, 
         fn: () => void, 
         uiOffset: Point = Point.ZERO,
-        isInteractable: () => boolean = () => !DialogueDisplay.instance.isOpen
+        isInteractable: () => boolean = () => !UIStateManager.instance.isMenuOpen
     ) {
         super()
         this.position = position

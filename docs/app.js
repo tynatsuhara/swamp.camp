@@ -6280,9 +6280,9 @@ System.register("game/ui/KeyPressIndicator", ["engine/component", "game/graphics
         }
     };
 });
-System.register("game/world/elements/Interactable", ["engine/component", "engine/point", "game/ui/KeyPressIndicator", "game/Controls", "game/graphics/Tilesets", "game/ui/DialogueDisplay"], function (exports_81, context_81) {
+System.register("game/world/elements/Interactable", ["engine/component", "engine/point", "game/ui/KeyPressIndicator", "game/Controls", "game/graphics/Tilesets", "game/ui/UIStateManager"], function (exports_81, context_81) {
     "use strict";
-    var component_20, point_42, KeyPressIndicator_2, Controls_6, Tilesets_21, DialogueDisplay_4, Interactable;
+    var component_20, point_42, KeyPressIndicator_2, Controls_6, Tilesets_21, UIStateManager_13, Interactable;
     var __moduleName = context_81 && context_81.id;
     return {
         setters: [
@@ -6301,8 +6301,8 @@ System.register("game/world/elements/Interactable", ["engine/component", "engine
             function (Tilesets_21_1) {
                 Tilesets_21 = Tilesets_21_1;
             },
-            function (DialogueDisplay_4_1) {
-                DialogueDisplay_4 = DialogueDisplay_4_1;
+            function (UIStateManager_13_1) {
+                UIStateManager_13 = UIStateManager_13_1;
             }
         ],
         execute: function () {
@@ -6310,7 +6310,7 @@ System.register("game/world/elements/Interactable", ["engine/component", "engine
                 __extends(Interactable, _super);
                 function Interactable(position, fn, uiOffset, isInteractable) {
                     if (uiOffset === void 0) { uiOffset = point_42.Point.ZERO; }
-                    if (isInteractable === void 0) { isInteractable = function () { return !DialogueDisplay_4.DialogueDisplay.instance.isOpen; }; }
+                    if (isInteractable === void 0) { isInteractable = function () { return !UIStateManager_13.UIStateManager.instance.isMenuOpen; }; }
                     var _this = _super.call(this) || this;
                     _this.position = position;
                     _this.interact = fn;
@@ -6953,7 +6953,7 @@ System.register("game/characters/AnimationUtils", ["game/graphics/Tilesets"], fu
 });
 System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "engine/point", "engine/component", "engine/collision/BoxCollider", "game/graphics/Tilesets", "game/characters/Weapon", "game/items/Items", "game/characters/Shield", "engine/tiles/TileTransform", "game/world/elements/Interactable", "game/characters/Dialogue", "game/ui/DialogueDisplay", "game/ui/DudeInteractIndicator", "game/ui/UIStateManager", "game/characters/AnimationUtils", "game/graphics/ImageFilters"], function (exports_92, context_92) {
     "use strict";
-    var AnimatedTileComponent_4, point_51, component_23, BoxCollider_7, Tilesets_28, Weapon_1, Items_6, Shield_1, TileTransform_20, Interactable_4, Dialogue_5, DialogueDisplay_5, DudeInteractIndicator_5, UIStateManager_13, AnimationUtils_1, ImageFilters_2, Dude;
+    var AnimatedTileComponent_4, point_51, component_23, BoxCollider_7, Tilesets_28, Weapon_1, Items_6, Shield_1, TileTransform_20, Interactable_4, Dialogue_5, DialogueDisplay_4, DudeInteractIndicator_5, UIStateManager_14, AnimationUtils_1, ImageFilters_2, Dude;
     var __moduleName = context_92 && context_92.id;
     return {
         setters: [
@@ -6990,14 +6990,14 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
             function (Dialogue_5_1) {
                 Dialogue_5 = Dialogue_5_1;
             },
-            function (DialogueDisplay_5_1) {
-                DialogueDisplay_5 = DialogueDisplay_5_1;
+            function (DialogueDisplay_4_1) {
+                DialogueDisplay_4 = DialogueDisplay_4_1;
             },
             function (DudeInteractIndicator_5_1) {
                 DudeInteractIndicator_5 = DudeInteractIndicator_5_1;
             },
-            function (UIStateManager_13_1) {
-                UIStateManager_13 = UIStateManager_13_1;
+            function (UIStateManager_14_1) {
+                UIStateManager_14 = UIStateManager_14_1;
             },
             function (AnimationUtils_1_1) {
                 AnimationUtils_1 = AnimationUtils_1_1;
@@ -7044,7 +7044,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                         _this.collider = _this.entity.addComponent(new BoxCollider_7.BoxCollider(_this.position.plus(_this.relativeColliderPos), colliderSize, Dude.COLLISION_LAYER));
                         _this.dialogueInteract = _this.entity.addComponent(new Interactable_4.Interactable(new point_51.Point(0, 0), function () {
                             if (!!_this.dialogue) {
-                                DialogueDisplay_5.DialogueDisplay.instance.startDialogue(_this);
+                                DialogueDisplay_4.DialogueDisplay.instance.startDialogue(_this);
                             }
                         }));
                     };
@@ -7098,7 +7098,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     this.animation.transform.depth = this.collider.position.y + this.collider.dimensions.y;
                     this.dialogueInteract.position = this.standingPosition.minus(new point_51.Point(0, 5));
                     this.dialogueInteract.uiOffset = new point_51.Point(0, -Tilesets_28.TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition());
-                    this.dialogueInteract.enabled = this.dialogue !== 0 /* NONE */ && DialogueDisplay_5.DialogueDisplay.instance.dialogueSource !== this;
+                    this.dialogueInteract.enabled = this.dialogue !== 0 /* NONE */ && DialogueDisplay_4.DialogueDisplay.instance.dialogueSource !== this;
                 };
                 Object.defineProperty(Dude.prototype, "isAlive", {
                     get: function () { return this._health > 0; },
@@ -7275,11 +7275,11 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                         indicator = Dialogue_5.getDialogue(this.dialogue).indicator;
                     }
                     var tile = DudeInteractIndicator_5.DudeInteractIndicator.getTile(indicator);
-                    if (!tile || this.dialogueInteract.isShowingUI || DialogueDisplay_5.DialogueDisplay.instance.dialogueSource === this) {
+                    if (!tile || this.dialogueInteract.isShowingUI || DialogueDisplay_4.DialogueDisplay.instance.dialogueSource === this) {
                         return [];
                     }
                     else {
-                        return [tile.toImageRender(new TileTransform_20.TileTransform(this.standingPosition.plusY(-28).plus(new point_51.Point(1, 1).times(-Tilesets_28.TILE_SIZE / 2)).plus(this.getAnimationOffsetPosition()), new point_51.Point(Tilesets_28.TILE_SIZE, Tilesets_28.TILE_SIZE), 0, false, false, UIStateManager_13.UIStateManager.UI_SPRITE_DEPTH))];
+                        return [tile.toImageRender(new TileTransform_20.TileTransform(this.standingPosition.plusY(-28).plus(new point_51.Point(1, 1).times(-Tilesets_28.TILE_SIZE / 2)).plus(this.getAnimationOffsetPosition()), new point_51.Point(Tilesets_28.TILE_SIZE, Tilesets_28.TILE_SIZE), 0, false, false, UIStateManager_14.UIStateManager.UI_SPRITE_DEPTH))];
                     }
                 };
                 Dude.COLLISION_LAYER = "dube";
@@ -7291,7 +7291,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
 });
 System.register("game/characters/Player", ["engine/point", "engine/component", "game/characters/Dude", "game/world/elements/Interactable", "game/world/elements/Hittable", "game/ui/UIStateManager", "game/Controls", "engine/util/Lists", "game/characters/DudeFactory"], function (exports_93, context_93) {
     "use strict";
-    var point_52, component_24, Dude_3, Interactable_5, Hittable_2, UIStateManager_14, Controls_7, Lists_2, DudeFactory_2, Player;
+    var point_52, component_24, Dude_3, Interactable_5, Hittable_2, UIStateManager_15, Controls_7, Lists_2, DudeFactory_2, Player;
     var __moduleName = context_93 && context_93.id;
     return {
         setters: [
@@ -7310,8 +7310,8 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
             function (Hittable_2_1) {
                 Hittable_2 = Hittable_2_1;
             },
-            function (UIStateManager_14_1) {
-                UIStateManager_14 = UIStateManager_14_1;
+            function (UIStateManager_15_1) {
+                UIStateManager_15 = UIStateManager_15_1;
             },
             function (Controls_7_1) {
                 Controls_7 = Controls_7_1;
@@ -7350,7 +7350,7 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
                     // const originalCrosshairPosRelative = this.crosshairs.transform.position.minus(this.position)
                     var dx = 0;
                     var dy = 0;
-                    if (!UIStateManager_14.UIStateManager.instance.isMenuOpen) {
+                    if (!UIStateManager_15.UIStateManager.instance.isMenuOpen) {
                         if (updateData.input.isKeyHeld(87 /* W */)) {
                             dy--;
                         }
@@ -7370,7 +7370,7 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
                     // PointLightMaskRenderer.instance.removeLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset))
                     this.dude.move(updateData, new point_52.Point(dx, dy), updateData.input.mousePos.x - this.dude.standingPosition.x);
                     // PointLightMaskRenderer.instance.addLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset), 100)
-                    if (UIStateManager_14.UIStateManager.instance.isMenuOpen) {
+                    if (UIStateManager_15.UIStateManager.instance.isMenuOpen) {
                         return;
                     }
                     if (updateData.input.isKeyDown(70 /* F */)) {
@@ -7469,7 +7469,7 @@ System.register("game/characters/NPCSchedule", [], function (exports_94, context
 });
 System.register("game/characters/NPC", ["engine/component", "game/characters/Dude", "game/characters/Player", "engine/point", "game/world/LocationManager", "game/graphics/Tilesets", "engine/util/Lists", "game/characters/NPCSchedule", "game/ui/DialogueDisplay", "game/world/PointLightMaskRenderer"], function (exports_95, context_95) {
     "use strict";
-    var component_25, Dude_4, Player_9, point_53, LocationManager_13, Tilesets_29, Lists_3, NPCSchedule_1, DialogueDisplay_6, PointLightMaskRenderer_2, NPC;
+    var component_25, Dude_4, Player_9, point_53, LocationManager_13, Tilesets_29, Lists_3, NPCSchedule_1, DialogueDisplay_5, PointLightMaskRenderer_2, NPC;
     var __moduleName = context_95 && context_95.id;
     return {
         setters: [
@@ -7497,8 +7497,8 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
             function (NPCSchedule_1_1) {
                 NPCSchedule_1 = NPCSchedule_1_1;
             },
-            function (DialogueDisplay_6_1) {
-                DialogueDisplay_6 = DialogueDisplay_6_1;
+            function (DialogueDisplay_5_1) {
+                DialogueDisplay_5 = DialogueDisplay_5_1;
             },
             function (PointLightMaskRenderer_2_1) {
                 PointLightMaskRenderer_2 = PointLightMaskRenderer_2_1;
@@ -7545,7 +7545,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                         this.attackTarget = null; // no need to attack a dead dude
                         this.targetPath = null;
                     }
-                    if (DialogueDisplay_6.DialogueDisplay.instance.dialogueSource === this.dude) {
+                    if (DialogueDisplay_5.DialogueDisplay.instance.dialogueSource === this.dude) {
                         this.dude.move(updateData, point_53.Point.ZERO, Player_9.Player.instance.dude.standingPosition.x - this.dude.standingPosition.x);
                     }
                     else if (this.enemiesPresent) {
@@ -9503,7 +9503,7 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
 });
 System.register("game/quest_game", ["engine/point", "engine/game", "game/world/MapGenerator", "game/graphics/Tilesets", "game/characters/DudeFactory", "game/world/LocationManager", "game/characters/Dude", "engine/collision/CollisionEngine", "game/items/DroppedItem", "game/ui/UIStateManager", "game/world/elements/Elements", "game/world/ground/Ground", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/cutscenes/Camera", "game/SaveManager", "game/world/PointLightMaskRenderer", "game/world/WorldTime", "game/world/events/EventQueue", "game/world/GroundRenderer"], function (exports_116, context_116) {
     "use strict";
-    var point_65, game_1, MapGenerator_5, Tilesets_38, DudeFactory_4, LocationManager_19, Dude_9, CollisionEngine_4, DroppedItem_2, UIStateManager_15, Elements_3, Ground_4, CutsceneManager_3, IntroCutscene_1, Camera_8, SaveManager_4, PointLightMaskRenderer_5, WorldTime_5, EventQueue_4, GroundRenderer_2, ZOOM, QuestGame;
+    var point_65, game_1, MapGenerator_5, Tilesets_38, DudeFactory_4, LocationManager_19, Dude_9, CollisionEngine_4, DroppedItem_2, UIStateManager_16, Elements_3, Ground_4, CutsceneManager_3, IntroCutscene_1, Camera_8, SaveManager_4, PointLightMaskRenderer_5, WorldTime_5, EventQueue_4, GroundRenderer_2, ZOOM, QuestGame;
     var __moduleName = context_116 && context_116.id;
     return {
         setters: [
@@ -9534,8 +9534,8 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
             function (DroppedItem_2_1) {
                 DroppedItem_2 = DroppedItem_2_1;
             },
-            function (UIStateManager_15_1) {
-                UIStateManager_15 = UIStateManager_15_1;
+            function (UIStateManager_16_1) {
+                UIStateManager_16 = UIStateManager_16_1;
             },
             function (Elements_3_1) {
                 Elements_3 = Elements_3_1;
@@ -9582,7 +9582,7 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
                     ]));
                     // Initialize singletons
                     new Tilesets_38.Tilesets();
-                    new UIStateManager_15.UIStateManager();
+                    new UIStateManager_16.UIStateManager();
                     new SaveManager_4.SaveManager();
                     new DudeFactory_4.DudeFactory();
                     new Elements_3.Elements();
@@ -9635,7 +9635,7 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
                     this.uiView = {
                         zoom: ZOOM,
                         offset: point_65.Point.ZERO,
-                        entities: UIStateManager_15.UIStateManager.instance.get(dimensions, updateViewsContext.elapsedTimeMillis)
+                        entities: UIStateManager_16.UIStateManager.instance.get(dimensions, updateViewsContext.elapsedTimeMillis)
                     };
                 };
                 return QuestGame;
