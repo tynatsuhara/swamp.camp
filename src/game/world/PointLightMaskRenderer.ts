@@ -20,7 +20,7 @@ export class PointLightMaskRenderer {
     private size = MapGenerator.MAP_SIZE * TILE_SIZE
     private shift = new Point(this.size/2, this.size/2)
 
-    private lightTiles: Map<WorldLocation, Grid<number>> = new Map<WorldLocation, Grid<number>>()  // grid of light radiuses
+    private lightTiles: Map<WorldLocation, Grid<number>> = new Map<WorldLocation, Grid<number>>()  // grid of light diameter
     private litGrid: Grid<boolean> = new Grid<boolean>()  // used to precompute darkness lookups for the current location
     private gridDirty = true
     private lastLocationRendered: WorldLocation
@@ -71,7 +71,7 @@ export class PointLightMaskRenderer {
             return false
         }
         const grid = this.lightTiles.get(LocationManager.instance.currentLocation)
-        return !grid ? true : !grid.entries().some(entry => entry[0].distanceTo(pixelPt) < entry[1])
+        return !grid ? true : !grid.entries().some(entry => entry[0].distanceTo(pixelPt) < entry[1] * .5)
     }
 
     private updateColorForTime() {
