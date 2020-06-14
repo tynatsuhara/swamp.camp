@@ -1,11 +1,14 @@
 import { Point } from "../point"
 import { BinaryHeap } from "./BinaryHeap"
+import { profiler } from "../profiler"
 
 // an infinite grid using x/y coordinates (x increases to the right, y increases down)
 export class Grid<T> {
     private map: { [key: string]: T } = {}
+    private _valuesCache: T[]  // calling Object.values() repeatedly is expensive
     
     set(pt: Point, entry: T) {
+        this._valuesCache = null
         this.map[pt.toString()] = entry
     }
     
@@ -15,10 +18,12 @@ export class Grid<T> {
     }
 
     remove(pt: Point) {
+        this._valuesCache = null
         delete this.map[pt.toString()]
     }
 
     removeAll(element: T) {
+        this._valuesCache = null
         Object.entries(this.map)
                 .filter(kv => kv[1] === element)
                 .forEach(kv => delete this.map[kv[0]])
@@ -33,7 +38,10 @@ export class Grid<T> {
     }
 
     values(): T[] {
-        return Object.values(this.map)
+        if (!this._valuesCache) {
+            this._valuesCache = Object.values(this.map)
+        }
+        return this._valuesCache
     }
 
     /**
@@ -69,6 +77,7 @@ export class Grid<T> {
         const openSet = new BinaryHeap<Point>(p => fScore.get(p.toString()))
         openSet.push(start)
 
+        const startTime = new Date().getTime()
         while (openSet.size() > 0) {
             const current = openSet.pop()
             openSetUnique.delete(current.toString())
@@ -80,6 +89,7 @@ export class Grid<T> {
                     path.push(next)
                     next = cameFrom.get(next.toString())
                 }
+                profiler.customTrackMovingAverage("openSet size", new Date().getTime() - startTime, (v) => `pathfinding duration ms: ${v}`)
                 return path.reverse()
             }
 
