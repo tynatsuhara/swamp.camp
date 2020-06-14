@@ -24,7 +24,7 @@ export class Shield extends Component {
 
     private blockingActive = false
     private raisedPerc = 0 // for animation
-    private timeToRaiseMs = 150
+    private timeToRaiseMs = 120
 
     constructor(shieldId: string) {
         super()

@@ -6882,7 +6882,7 @@ System.register("game/characters/Shield", ["engine/component", "engine/tiles/Til
                     _this.state = State.DRAWN;
                     _this.blockingActive = false;
                     _this.raisedPerc = 0; // for animation
-                    _this.timeToRaiseMs = 150;
+                    _this.timeToRaiseMs = 120;
                     _this.currentAnimationFrame = 0;
                     _this.start = function (startData) {
                         _this.dude = _this.entity.getComponent(Dude_2.Dude);
