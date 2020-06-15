@@ -19,6 +19,7 @@ import { TEXT_FONT, TEXT_SIZE } from "./Text"
 import { Color } from "./Color"
 import { Controls } from "../Controls"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
+import { WeaponType } from "../characters/Weapon"
 
 export class InventoryDisplay extends Component {
 
@@ -99,7 +100,7 @@ export class InventoryDisplay extends Component {
                     // TODO this won't work properly with items that stack
                     PlaceElementDisplay.instance.startPlacing(placeableElement, () => inv[hoverIndex] = null)
                 }
-            } else if (!!equippable) {
+            } else if (!!equippable && Player.instance.dude.weaponType !== item.equippable) {
                 actionString = 'equip'
                 actionFn = () => {
                     this.close()
