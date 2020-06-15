@@ -2143,6 +2143,7 @@ System.register("game/graphics/OneBitTileset", ["engine/point", "game/graphics/S
                 __extends(OneBitTileset, _super);
                 function OneBitTileset() {
                     return _super.call(this, "images/monochrome_transparent_1_bit.png", new Map([
+                        ["axe", new point_15.Point(7, 29)],
                         ["pickaxe", new point_15.Point(11, 27)],
                         ["sword", new point_15.Point(2, 28)],
                         ["tent", new point_15.Point(6, 20)],
@@ -2883,6 +2884,8 @@ System.register("game/characters/Weapon", ["engine/component", "game/graphics/Ti
                         return new MeleeWeapon(WeaponType.CLUB, "weapon_baton_with_spikes", new point_17.Point(-6, -2));
                     case WeaponType.PICKAXE:
                         return new MeleeWeapon(WeaponType.PICKAXE, "weapon_pickaxe", new point_17.Point(-5, -2));
+                    case WeaponType.AXE:
+                        return new MeleeWeapon(WeaponType.AXE, "weapon_axe", new point_17.Point(-3, -2));
                     default:
                         throw new Error("weapon type " + type + " is not supported yet");
                 }
@@ -3210,7 +3213,7 @@ System.register("game/world/elements/Hittable", ["engine/component", "engine/uti
                         return;
                     }
                     dir = dir.normalized();
-                    var frames = [0, 0, 0, 0, 0, 0, 0, 3, 6, 3, 2, 1];
+                    var frames = [0, 0, 0, 0, 0, 3, 6, 3, 2, 1];
                     this.animator = new Animator_3.Animator(Animator_3.Animator.frames(frames.length, 40), function (index) {
                         _this.tileTransforms.forEach(function (pt, tr) { return tr.position = pt.plus(dir.times(frames[index])); });
                     }, function () { return _this.animator = null; });
@@ -4947,8 +4950,17 @@ System.register("game/items/CraftingRecipe", ["game/items/Inventory", "game/grap
                             output: 4 /* CAMPFIRE */,
                             input: [new Inventory_1.ItemStack(1 /* ROCK */, DipIntro_1.ROCKS_NEEDED_FOR_CAMPFIRE), new Inventory_1.ItemStack(2 /* WOOD */, DipIntro_1.WOOD_NEEDED_FOR_CAMPFIRE)],
                         }],
-                },
-            ]; });
+                }, {
+                    icon: Tilesets_15.Tilesets.instance.oneBit.getTileAt(new point_34.Point(10, 27)),
+                    name: "Equipment",
+                    recipes: [{
+                            output: 100022 /* PICKAXE */,
+                            input: [new Inventory_1.ItemStack(5 /* IRON */, 3), new Inventory_1.ItemStack(2 /* WOOD */, 5)],
+                        }, {
+                            output: 100012 /* AXE */,
+                            input: [new Inventory_1.ItemStack(5 /* IRON */, 3), new Inventory_1.ItemStack(2 /* WOOD */, 5)],
+                        }],
+                }]; });
         }
     };
 });
@@ -5346,6 +5358,7 @@ System.register("game/characters/dialogues/DipIntro", ["game/characters/Dialogue
                                 time: WorldTime_2.WorldTime.instance.future({ minutes: 10 })
                             });
                             Dialogue_1.saveAfterDialogueStage();
+                            return new Dialogue_1.NextDialogue(7 /* DIP_CRAFT */, false);
                         }, DudeInteractIndicator_1.DudeInteractIndicator.IMPORTANT_DIALOGUE);
                     }
                     else if (Dialogue_1.inv().getItemCount(4 /* CAMPFIRE */) > 0) { // campfire has been crafted
@@ -5360,6 +5373,12 @@ System.register("game/characters/dialogues/DipIntro", ["game/characters/Dialogue
                     else { // do not have enough ingredients to craft
                         return Dialogue_1.dialogue(["We need " + ROCKS_NEEDED_FOR_CAMPFIRE + " rocks and " + WOOD_NEEDED_FOR_CAMPFIRE + " wood to make a campfire. Try hitting big rocks and trees with your sword!"], function () { return new Dialogue_1.NextDialogue(6 /* DIP_MAKE_CAMPFIRE */, false); });
                     }
+                },
+                _a[7 /* DIP_CRAFT */] = function () {
+                    return Dialogue_1.dialogueWithOptions(["Can I help you make something?"], DudeInteractIndicator_1.DudeInteractIndicator.IMPORTANT_DIALOGUE, new Dialogue_1.DialogueOption(CRAFT_OPTION, function () {
+                        CraftingMenu_1.CraftingMenu.instance.show(CraftingRecipe_1.getDipRecipes());
+                        return new Dialogue_1.NextDialogue(7 /* DIP_CRAFT */, false);
+                    }), Dialogue_1.option("Nope", 7 /* DIP_CRAFT */, false));
                 },
                 _a));
         }
@@ -5380,7 +5399,7 @@ System.register("game/characters/dialogues/BertoIntro", ["game/characters/Dialog
         ],
         execute: function () {
             exports_71("BERTO_INTRO_DIALOGUE", BERTO_INTRO_DIALOGUE = (_a = {},
-                _a[7 /* BERT_0 */] = function () { return Dialogue_2.dialogue(["Good morrow! I, Sir Berto of Dube, present myself unto thee as an emissary of The Honourable King Bob XVIII."], function () { return new Dialogue_2.NextDialogue(7 /* BERT_0 */, false); }, DudeInteractIndicator_2.DudeInteractIndicator.IMPORTANT_DIALOGUE); },
+                _a[8 /* BERT_0 */] = function () { return Dialogue_2.dialogue(["Good morrow! I, Sir Berto of Dube, present myself unto thee as an emissary of The Honourable King Bob XVIII."], function () { return new Dialogue_2.NextDialogue(8 /* BERT_0 */, false); }, DudeInteractIndicator_2.DudeInteractIndicator.IMPORTANT_DIALOGUE); },
                 _a));
         }
     };
@@ -5683,7 +5702,7 @@ System.register("game/world/elements/Campfire", ["engine/component", "engine/til
                 __extends(Campfire, _super);
                 function Campfire(logs, lastLogConsumedTime, updateFire) {
                     var _this = _super.call(this) || this;
-                    _this.dialogue = 8 /* CAMPFIRE */;
+                    _this.dialogue = 9 /* CAMPFIRE */;
                     _this.logs = logs;
                     _this.lastLogConsumedTime = lastLogConsumedTime;
                     _this.updateFire = updateFire;
@@ -5740,7 +5759,7 @@ System.register("game/characters/dialogues/ItemDialogues", ["game/characters/Dia
         ],
         execute: function () {
             exports_74("ITEM_DIALOGUES", ITEM_DIALOGUES = (_a = {},
-                _a[8 /* CAMPFIRE */] = function () {
+                _a[9 /* CAMPFIRE */] = function () {
                     // the fire can be dead, almost dead, partially full, almost entirely full, or totally full
                     var cf = DialogueDisplay_2.DialogueDisplay.instance.dialogueSource;
                     var logCount = cf.logs;
@@ -5750,7 +5769,7 @@ System.register("game/characters/dialogues/ItemDialogues", ["game/characters/Dia
                         return function () {
                             Player_6.Player.instance.dude.inventory.removeItem(2 /* WOOD */, logsTransferred);
                             cf.addLogs(logsTransferred);
-                            return new Dialogue_3.NextDialogue(8 /* CAMPFIRE */, false);
+                            return new Dialogue_3.NextDialogue(9 /* CAMPFIRE */, false);
                         };
                     };
                     var cancelText = "Leave";
@@ -6603,16 +6622,16 @@ System.register("game/world/elements/Tent", ["engine/point", "game/graphics/Tile
                 wl.addTeleporter(sourceTeleporter);
                 // Set up tiles
                 var depth = (pos.y + 1) * Tilesets_24.TILE_SIZE + /* prevent clipping */ 1;
-                addTile(wl, e, color + "tentNW", pos.plusX(1), depth);
-                addTile(wl, e, color + "tentNE", pos.plus(new point_47.Point(2, 0)), depth);
-                addTile(wl, e, color + "tentSW", pos.plus(new point_47.Point(1, 1)), depth);
-                addTile(wl, e, color + "tentSE", pos.plus(new point_47.Point(2, 1)), depth);
+                addTile(e, color + "tentNW", pos.plusX(1), depth);
+                addTile(e, color + "tentNE", pos.plus(new point_47.Point(2, 0)), depth);
+                addTile(e, color + "tentSW", pos.plus(new point_47.Point(1, 1)), depth);
+                addTile(e, color + "tentSE", pos.plus(new point_47.Point(2, 1)), depth);
                 e.addComponent(new BoxCollider_6.BoxCollider(pos.plus(new point_47.Point(1, 1)).times(Tilesets_24.TILE_SIZE), new point_47.Point(Tilesets_24.TILE_SIZE * 2, Tilesets_24.TILE_SIZE)));
                 // Set up teleporter
                 e.addComponent(new Interactable_3.Interactable(interactablePos, function () { return wl.useTeleporter(destinationUUID); }, new point_47.Point(1, -Tilesets_24.TILE_SIZE * 1.4)));
                 return e.addComponent(new ElementComponent_6.ElementComponent(2 /* TENT */, ElementUtils_1.ElementUtils.rectPoints(pos, new point_47.Point(4, 3)), function () { return { destinationUUID: destinationUUID, color: color }; }));
             });
-            addTile = function (wl, e, s, pos, depth) {
+            addTile = function (e, s, pos, depth) {
                 var tile = e.addComponent(new TileComponent_7.TileComponent(Tilesets_24.Tilesets.instance.outdoorTiles.getTileSource(s), new TileTransform_19.TileTransform(pos.times(Tilesets_24.TILE_SIZE))));
                 tile.transform.depth = depth;
             };
@@ -6764,6 +6783,12 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
                     droppedIconSupplier: function () { return Tilesets_25.Tilesets.instance.outdoorTiles.getTileSource("ironItem"); },
                 }),
                 // TODO add other weapons
+                _a[100012 /* AXE */] = new ItemMetadata({
+                    displayName: "Axe",
+                    inventoryIconSupplier: function () { return Tilesets_25.Tilesets.instance.oneBit.getTileSource("axe"); },
+                    stackLimit: 1,
+                    equippable: Weapon_1.WeaponType.AXE
+                }),
                 _a[100022 /* PICKAXE */] = new ItemMetadata({
                     displayName: "Pickaxe",
                     inventoryIconSupplier: function () { return Tilesets_25.Tilesets.instance.oneBit.getTileSource("pickaxe"); },
@@ -8145,7 +8170,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                             animationName = "Herald";
                             maxHealth = Number.MAX_SAFE_INTEGER;
                             speed *= .6;
-                            dialogue = 7 /* BERT_0 */;
+                            dialogue = 8 /* BERT_0 */;
                             additionalComponents = [
                                 new NPC_3.NPC(NPCSchedule_2.NPCSchedules.newGoToSchedule(// filter out occupied points to not get stuck in the campfire
                                 Lists_4.Lists.oneOf([new point_55.Point(-3, 0), new point_55.Point(-3, 1), new point_55.Point(-2, 0), new point_55.Point(-2, 1)].filter(function (pt) { return !location.elements.get(pt); })))),

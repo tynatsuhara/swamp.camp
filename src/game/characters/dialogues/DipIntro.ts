@@ -55,6 +55,7 @@ export const DIP_INTRO_DIALOGUE: { [key: number]: () => DialogueInstance } = {
                     time: WorldTime.instance.future({ minutes: 10 })
                 })
                 saveAfterDialogueStage()
+                return new NextDialogue(Dialogue.DIP_CRAFT, false)
             }, DudeInteractIndicator.IMPORTANT_DIALOGUE)
         } else if (inv().getItemCount(Item.CAMPFIRE) > 0) {  // campfire has been crafted
             return dialogue(
@@ -77,5 +78,17 @@ export const DIP_INTRO_DIALOGUE: { [key: number]: () => DialogueInstance } = {
                 () => new NextDialogue(Dialogue.DIP_MAKE_CAMPFIRE, false)
             )
         }
+    },
+
+    [Dialogue.DIP_CRAFT]: () => {
+        return dialogueWithOptions(
+            ["Can I help you make something?"],
+            DudeInteractIndicator.IMPORTANT_DIALOGUE,
+            new DialogueOption(CRAFT_OPTION, () => {
+                CraftingMenu.instance.show(getDipRecipes())
+                return new NextDialogue(Dialogue.DIP_CRAFT, false)
+            }),
+            option("Nope", Dialogue.DIP_CRAFT, false)
+        )
     },
 }

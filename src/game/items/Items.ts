@@ -106,6 +106,12 @@ export const ITEM_METADATA_MAP = {
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("ironItem"),
     }),
     // TODO add other weapons
+    [Item.AXE]: new ItemMetadata({
+        displayName: "Axe",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("axe"), 
+        stackLimit: 1,
+        equippable: WeaponType.AXE
+    }),
     [Item.PICKAXE]: new ItemMetadata({
         displayName: "Pickaxe",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("pickaxe"), 

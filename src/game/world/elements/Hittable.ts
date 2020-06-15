@@ -33,7 +33,7 @@ export class Hittable extends Component {
         }
         
         dir = dir.normalized()
-        const frames = [0, 0, 0, 0, 0, 0, 0, 3, 6, 3, 2, 1]
+        const frames = [0, 0, 0, 0, 0, 3, 6, 3, 2, 1]
 
         this.animator = new Animator(
             Animator.frames(frames.length, 40), 

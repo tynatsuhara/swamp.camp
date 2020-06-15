@@ -23,11 +23,14 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => [{
         output: Item.CAMPFIRE,
         input: [new ItemStack(Item.ROCK, ROCKS_NEEDED_FOR_CAMPFIRE), new ItemStack(Item.WOOD, WOOD_NEEDED_FOR_CAMPFIRE)],
     }],
-},/*{ 
+},{ 
     icon: Tilesets.instance.oneBit.getTileAt(new Point(10, 27)),
     name: "Equipment",
     recipes: [{
-        output: Item.CAMPFIRE,
-        input: [new ItemStack(Item.ROCK, ROCKS_NEEDED_FOR_CAMPFIRE), new ItemStack(Item.WOOD, WOOD_NEEDED_FOR_CAMPFIRE)],
+        output: Item.PICKAXE,
+        input: [new ItemStack(Item.IRON, 3), new ItemStack(Item.WOOD, 5)],
+    },{
+        output: Item.AXE,
+        input: [new ItemStack(Item.IRON, 3), new ItemStack(Item.WOOD, 5)],
     }],
-}*/]
+}]

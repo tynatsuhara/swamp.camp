@@ -30,10 +30,10 @@ export const makeTent = (wl: WorldLocation, pos: Point, data: object): ElementCo
     
     // Set up tiles
     const depth = (pos.y + 1) * TILE_SIZE + /* prevent clipping */ 1
-    addTile(wl, e, `${color}tentNW`, pos.plusX(1), depth)
-    addTile(wl, e, `${color}tentNE`, pos.plus(new Point(2, 0)), depth)
-    addTile(wl, e, `${color}tentSW`, pos.plus(new Point(1, 1)), depth)
-    addTile(wl, e, `${color}tentSE`, pos.plus(new Point(2, 1)), depth)
+    addTile(e, `${color}tentNW`, pos.plusX(1), depth)
+    addTile(e, `${color}tentNE`, pos.plus(new Point(2, 0)), depth)
+    addTile(e, `${color}tentSW`, pos.plus(new Point(1, 1)), depth)
+    addTile(e, `${color}tentSE`, pos.plus(new Point(2, 1)), depth)
     e.addComponent(new BoxCollider(pos.plus(new Point(1, 1)).times(TILE_SIZE), new Point(TILE_SIZE*2, TILE_SIZE)))
 
 
@@ -48,7 +48,7 @@ export const makeTent = (wl: WorldLocation, pos: Point, data: object): ElementCo
     ))
 }
 
-const addTile = (wl: WorldLocation, e: Entity, s: string, pos: Point, depth: number) => {
+const addTile = (e: Entity, s: string, pos: Point, depth: number) => {
     const tile = e.addComponent(new TileComponent(Tilesets.instance.outdoorTiles.getTileSource(s), new TileTransform(pos.times(TILE_SIZE))))
     tile.transform.depth = depth
 }
