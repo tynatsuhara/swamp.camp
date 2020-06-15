@@ -43,6 +43,6 @@ export class Hittable extends Component {
             () => this.animator = null
         ) 
 
-        setTimeout(() => this.onHit(dir), 200)
+        setTimeout(() => this.onHit(dir), 150)
     }
 }
