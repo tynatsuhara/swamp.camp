@@ -14,6 +14,7 @@ export class Hittable extends Component {
 
     /**
      * @param position world pixel position (probably centered) referenced for finding hittables
+     * @param tileTransforms the tiles which will be moved
      */
     constructor(position: Point, tileTransforms: TileTransform[], onHit: (dir: Point) => void) {
         super()

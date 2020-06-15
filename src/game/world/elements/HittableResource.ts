@@ -9,37 +9,44 @@ import { BoxCollider } from "../../../engine/collision/BoxCollider"
 import { LocationManager } from "../LocationManager"
 import { ElementComponent } from "./ElementComponent"
 
-export const makeHittable = (e: Entity, pos: Point, transforms: TileTransform[], itemSupplier: () => Item) => {
-    let knockedItemCount = 5
+export class HittableResource extends Hittable {
 
-    const h = new Hittable(
-        pos,  // centered position
-        transforms, 
-        hitDir => {
-            knockedItemCount--
-            const finishingMove = knockedItemCount === 0
-            let velocityMultiplier = finishingMove ? .6 : 1
-            let placeDistance = finishingMove ? 2 : 8
-            let itemsOut = finishingMove ? 3 : 1
+    freeResources: number
+    private itemSupplier: () => Item
 
-            for (let i = 0; i < itemsOut; i++) {
-                const randomness = .5
-                const itemDirection = hitDir.plus(new Point(randomness - Math.random() * randomness * 2, randomness - Math.random() * randomness * 2)).normalized()
-                const velocity = itemDirection.times(1 + 3 * Math.random())
-                spawnItem(
-                    pos.plus(new Point(0, TILE_SIZE/2)).plus(itemDirection.times(placeDistance)),  // bottom center, then randomly adjusted
-                    itemSupplier(), 
-                    velocity.times(velocityMultiplier),
-                    e.getComponent(BoxCollider)
-                )
-            }
+    constructor(position: Point, tileTransforms: TileTransform[], itemSupplier: () => Item, freeResources: number) {
+        super(position, tileTransforms, hitDir => this.hitCallback(hitDir))
+        this.itemSupplier = itemSupplier
+        this.freeResources = freeResources
+    }
 
-            if (finishingMove) {
-                LocationManager.instance.currentLocation.elements.removeAll(e.getComponent(ElementComponent))
-                e.selfDestruct()
-            }
+    private hitCallback(hitDir: Point) {
+        this.freeResources--
+
+        if (this.freeResources < 0 && this.freeResources > -4) {
+            return
         }
-    )
 
-    e.addComponent(h)
+        const finishingMove = this.freeResources < 0
+        let velocityMultiplier = finishingMove ? .6 : 1
+        let placeDistance = finishingMove ? 2 : 8
+        let itemsOut = finishingMove ? 3 : 1
+
+        for (let i = 0; i < itemsOut; i++) {
+            const randomness = .5
+            const itemDirection = hitDir.plus(new Point(randomness - Math.random() * randomness * 2, randomness - Math.random() * randomness * 2)).normalized()
+            const velocity = itemDirection.times(1 + 3 * Math.random())
+            spawnItem(
+                this.position.plus(new Point(0, TILE_SIZE/2)).plus(itemDirection.times(placeDistance)),  // bottom center, then randomly adjusted
+                this.itemSupplier(), 
+                velocity.times(velocityMultiplier),
+                this.entity.getComponent(BoxCollider)
+            )
+        }
+
+        if (finishingMove) {
+            LocationManager.instance.currentLocation.elements.removeAll(this.entity.getComponent(ElementComponent))
+            this.entity.selfDestruct()
+        }
+    }
 }

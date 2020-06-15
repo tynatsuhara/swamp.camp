@@ -70,6 +70,7 @@ export class PointLightMaskRenderer {
             return false
         }
         const grid = this.lightTiles.get(LocationManager.instance.currentLocation)
+        // TODO optimize this pre-computing light values in a grid, this will get expensive as we add more lights
         return !grid ? true : !grid.entries().some(entry => entry[0].distanceTo(pixelPt) < entry[1] * .5)
     }
 
