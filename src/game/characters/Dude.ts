@@ -38,6 +38,7 @@ export class Dude extends Component implements DialogueSource {
 
     private _weapon: Weapon
     get weapon() { return this._weapon }
+    get weaponType() { return this.weapon?.getType() ?? WeaponType.NONE}
     private _shield: Shield
     private shieldId: string
     get shield() { return this._shield }
@@ -313,7 +314,7 @@ export class Dude extends Component implements DialogueSource {
             maxHealth: this.maxHealth,
             health: this._health,
             speed: this.speed,
-            weapon: this._weapon?.getType() ?? WeaponType.NONE,
+            weapon: this.weaponType,
             shield: this.shieldId,
             inventory: this.inventory.save(),
             dialogue: this.dialogue,

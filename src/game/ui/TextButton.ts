@@ -9,6 +9,9 @@ import { Color } from "./Color"
 import { UIStateManager } from "./UIStateManager"
 import { UpdateData } from "../../engine/engine"
 import { rectContains } from "../../engine/util/utils"
+import { TileTransform } from "../../engine/tiles/TileTransform"
+import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
+import { ImageRender } from "../../engine/renderer/ImageRender"
 
 export class TextButton extends Component {
 
@@ -19,9 +22,9 @@ export class TextButton extends Component {
     private readonly text: string
     readonly width: number
 
-    private left: TileComponent
-    private center: TileComponent
-    private right: TileComponent
+    private left: ImageRender
+    private center: ImageRender
+    private right: ImageRender
     private onClick: () => void
     private hovering: boolean
     private textColor: string
@@ -44,21 +47,17 @@ export class TextButton extends Component {
         this.width = this.text.length * TEXT_PIXEL_WIDTH + TextButton.margin * 2
 
         this.start = () => {
-            this.left = this.entity.addComponent(Tilesets.instance.oneBit.getTileSource(`btnLeft_${buttonColor}`).toComponent())
-            this.center = this.entity.addComponent(Tilesets.instance.oneBit.getTileSource(`btnCenter_${buttonColor}`).toComponent())
-            this.right = this.entity.addComponent(Tilesets.instance.oneBit.getTileSource(`btnRight_${buttonColor}`).toComponent())
-
             const leftPos = this.position.apply(Math.floor)
             const centerPos = leftPos.plus(new Point(TILE_SIZE, 0))
             const rightPos = leftPos.plus(new Point(this.width - TILE_SIZE, 0)).apply(Math.floor)
     
-            this.left.transform.position = leftPos
-            this.center.transform.position = centerPos
-            this.right.transform.position = rightPos
+            this.left = Tilesets.instance.oneBit.getTileSource(`btnLeft_${buttonColor}`).toImageRender(new TileTransform(leftPos))
+            this.center = Tilesets.instance.oneBit.getTileSource(`btnCenter_${buttonColor}`).toImageRender(
+                new TileTransform(centerPos, new Point(this.width + TextButton.margin * 2 - TILE_SIZE*2, TILE_SIZE))
+            )
+            this.right = Tilesets.instance.oneBit.getTileSource(`btnRight_${buttonColor}`).toImageRender(new TileTransform(rightPos))
     
-            this.center.transform.dimensions = new Point(this.width + TextButton.margin * 2 - TILE_SIZE*2, TILE_SIZE)
-
-            Array.from([this.left, this.center, this.right]).forEach(t => t.transform.depth = UIStateManager.UI_SPRITE_DEPTH + 1)
+            Array.from([this.left, this.center, this.right]).forEach(t => t.depth = UIStateManager.UI_SPRITE_DEPTH + 1)
         }
     }
 
@@ -75,11 +74,11 @@ export class TextButton extends Component {
         }
         return [new TextRender(
             this.text,
-            this.left.transform.position.plus(TextButton.textOffset),
+            this.left.position.plus(TextButton.textOffset),
             TEXT_SIZE,
             TEXT_FONT,
             this.hovering ? this.hoverColor : this.textColor,
             UIStateManager.UI_SPRITE_DEPTH + 2
-        )]
+        ), this.left, this.center, this.right]
     }
 }

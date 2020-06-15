@@ -11,7 +11,7 @@ import { TileSource } from "../../engine/tiles/TileSource"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 
 export enum WeaponType {
-    NONE,
+    NONE = 99999,
     UNARMED,
     KNIFE,
     SHITTY_SWORD,
@@ -49,7 +49,7 @@ export const getWeaponComponent = (type: WeaponType): Weapon => {
         case WeaponType.CLUB:
             return new MeleeWeapon(WeaponType.CLUB, "weapon_baton_with_spikes", new Point(-6, -2))
         case WeaponType.PICKAXE:
-            return new MeleeWeapon(WeaponType.PICKAXE, "weapon_pickaxe", new Point(-6, -1))
+            return new MeleeWeapon(WeaponType.PICKAXE, "weapon_pickaxe", new Point(-5, -2))
         default:
             throw new Error(`weapon type ${type} is not supported yet`)
     }

@@ -15,6 +15,7 @@ import { NPCSchedules } from "./NPCSchedule"
 import { WorldLocation } from "../world/WorldLocation"
 import { Lists } from "../../engine/util/Lists"
 import { WeaponType } from "./Weapon"
+import { Item } from "../items/Items"
 
 export const enum DudeFaction {
     VILLAGERS,
@@ -73,6 +74,7 @@ export class DudeFactory {
         let dialogue: Dialogue = Dialogue.NONE
         let additionalComponents: Component[] = []
         let blob = {}
+        const defaultInventory = new Inventory()
 
         // type-specific defaults
         switch(type) {
@@ -82,6 +84,7 @@ export class DudeFactory {
                 shield = "shield_0"
                 maxHealth = 4
                 additionalComponents = [new Player(), new CutscenePlayerController()]
+                defaultInventory.addItem(Item.SWORD)
                 break
             }
             case DudeType.DIP: {
@@ -139,9 +142,6 @@ export class DudeFactory {
             }
         }
 
-        let health = maxHealth
-        let inventory = !!saveState?.inventory ? Inventory.load(saveState.inventory) : new Inventory()
-        
         // use saved data instead of defaults
         const d = new Dude(
             type, 
@@ -151,9 +151,9 @@ export class DudeFactory {
             saveState?.weapon ?? weapon,  // TODO: update this logic when we make it so you can drop weapons/shields
             saveState?.shield ?? shield,
             saveState?.maxHealth ?? maxHealth,
-            saveState?.health ?? health,
+            saveState?.health ?? maxHealth,
             saveState?.speed ?? speed,
-            inventory,
+            !!saveState?.inventory ? Inventory.load(saveState.inventory) : defaultInventory,
             saveState?.dialogue ?? dialogue,
             saveState?.blob ?? blob,
         )

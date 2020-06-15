@@ -43,7 +43,31 @@ export class ItemMetadata {
 }
 
 export const enum Item {
-    COIN, ROCK, WOOD, TENT, CAMPFIRE, IRON, PICKAXE
+    COIN, ROCK, WOOD, TENT, CAMPFIRE, IRON, 
+
+    // weapon values should match the WeaponType enum so we can cast them
+    KNIFE = WeaponType.KNIFE, 
+    SHITTY_SWORD,
+    SWORD,
+    FANCY_SWORD,
+    BIG_HAMMER,
+    HAMMER,
+    CLUB,
+    MACE,
+    KATANA,
+    SERRATED_SWORD,
+    BIG_SWORD,
+    AXE,
+    MACHETE,
+    CLEAVER,
+    FENCING_SWORD,
+    GREATSWORD,
+    GOLD_SWORD,
+    BIG_GOLD_SWORD,
+    STAFF_1,
+    STAFF_2,
+    SPEAR,
+    PICKAXE,
 }
 
 // Data that doesn't get serialized (TODO make builder pattern)
@@ -81,11 +105,18 @@ export const ITEM_METADATA_MAP = {
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("iron"), 
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("ironItem"),
     }),
+    // TODO add other weapons
     [Item.PICKAXE]: new ItemMetadata({
         displayName: "Pickaxe",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("pickaxe"), 
         stackLimit: 1,
         equippable: WeaponType.PICKAXE
+    }),
+    [Item.SWORD]: new ItemMetadata({
+        displayName: "Sword",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("sword"), 
+        stackLimit: 1,
+        equippable: WeaponType.SWORD
     })
 }
 
