@@ -9,6 +9,8 @@ import { Item } from "../../items/Items"
 import { HittableResource } from "./HittableResource"
 import { ElementComponent } from "./ElementComponent"
 import { ElementType } from "./Elements"
+import { WeaponType } from "../../characters/Weapon"
+import { Player } from "../../characters/Player"
 
 export const enum TreeType {
     ROUND = 1,
@@ -17,7 +19,8 @@ export const enum TreeType {
 
 export const makeTree = (wl: WorldLocation, pos: Point, data: object): ElementComponent => {
     const type = data["type"] ?? (Math.random() < .7 ? TreeType.POINTY : TreeType.ROUND)
-    const availableResources = data["a"] ?? 4
+    const maxResourcesCount = 4
+    const availableResources = data["a"] ?? maxResourcesCount
 
     const e = new Entity()
     const depth = (pos.y + 2) * TILE_SIZE
@@ -32,8 +35,14 @@ export const makeTree = (wl: WorldLocation, pos: Point, data: object): ElementCo
 
     const hittableCenter = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE/2, TILE_SIZE + TILE_SIZE/2))  // center of bottom tile
     const hittableResource = e.addComponent(new HittableResource(
-        // TODO make it so using an axe has a benefit (double the resources?)
-        hittableCenter, [top.transform, bottom.transform], () => Item.WOOD, availableResources
+        hittableCenter, [top.transform, bottom.transform], availableResources, maxResourcesCount, 
+        () => {
+            if (Player.instance.dude.weaponType === WeaponType.AXE) {
+                return [Item.WOOD, Item.WOOD]
+            } else {
+                return [Item.WOOD]
+            }
+        }
     ))
 
     return e.addComponent(new ElementComponent(

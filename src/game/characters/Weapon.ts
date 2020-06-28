@@ -51,7 +51,7 @@ export const getWeaponComponent = (type: WeaponType): Weapon => {
         case WeaponType.PICKAXE:
             return new MeleeWeapon(WeaponType.PICKAXE, "weapon_pickaxe", new Point(-5, -2))
         case WeaponType.AXE:
-            return new MeleeWeapon(WeaponType.AXE, "weapon_axe", new Point(-3, -2))
+            return new MeleeWeapon(WeaponType.AXE, "weapon_axe", new Point(-3, -1))
         default:
             throw new Error(`weapon type ${type} is not supported yet`)
     }

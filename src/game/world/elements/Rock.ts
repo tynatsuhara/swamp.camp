@@ -17,7 +17,8 @@ export const makeRock = (wl: WorldLocation, pos: Point, data: object): ElementCo
     const variation = data["v"] ?? (Math.floor(Math.random() * 3) + 1)
     const mossy = data["m"] ?? (Math.random() > .7)
     const flipped = data["f"] ?? (Math.random() > .5)
-    const availableResources = data["a"] ?? 6
+    const maxResourcesCount = 6
+    const availableResources = data["a"] ?? maxResourcesCount
 
     const tile = e.addComponent(new TileComponent(
         Tilesets.instance.outdoorTiles.getTileSource(`rock${variation}${mossy ? 'mossy' : ''}`), 
@@ -26,20 +27,22 @@ export const makeRock = (wl: WorldLocation, pos: Point, data: object): ElementCo
     tile.transform.depth = (pos.y + 1) * TILE_SIZE - /* prevent weapon from clipping */ 5
     tile.transform.mirrorX = flipped
 
-    // TODO
     const hitboxDims = new Point(12, 4)
     e.addComponent(new BoxCollider(
         pos.plus(new Point(.5, 1)).times(TILE_SIZE).minus(new Point(hitboxDims.x/2, hitboxDims.y + 2)), 
         hitboxDims
     ))
 
-    const hittableResource = e.addComponent(new HittableResource(pos.plus(new Point(.5, .5)).times(TILE_SIZE), [tile.transform], () => {
-        if (Player.instance.dude.weaponType === WeaponType.PICKAXE) {
-            return Math.random() > .5 ? Item.IRON : Item.ROCK
-        } else {
-            return Math.random() > .9 ? Item.IRON : Item.ROCK
+    const hittableResource = e.addComponent(new HittableResource(
+        pos.plus(new Point(.5, .5)).times(TILE_SIZE), [tile.transform], availableResources, maxResourcesCount, 
+        () => {
+            if (Player.instance.dude.weaponType === WeaponType.PICKAXE) {
+                return Math.random() > .5 ? [Item.IRON] : [Item.ROCK]
+            } else {
+                return Math.random() > .9 ? [Item.IRON] : [Item.ROCK]
+            }
         }
-    }, availableResources))
+    ))
 
     return e.addComponent(new ElementComponent(
         ElementType.ROCK, 
