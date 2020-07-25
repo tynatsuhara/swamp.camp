@@ -14,9 +14,9 @@ html, body {
     height: 100%;
 
     /* Comment out the following lines to fill the whole window */
-    margin-top: 40px;
+    /* margin-top: 40px;
     width: 1000px;
-    height: 800px;
+    height: 800px; */
 }
 
 #canvas {
