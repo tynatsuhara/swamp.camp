@@ -18,6 +18,16 @@ export const enum TentColor {
     BLUE = "blue"
 }
 
+/**
+ * At runtime, a building exterior consists of several components:
+ *   1. Tiles, the visual component
+ *   2. A collider
+ *   3. A door teleporter
+ * Data that is saved:
+ *   1. Element type
+ *   2. "Occupied points" which determines occupied squares in the world grid
+ *   3. Misc metadata about the building
+ */
 export const makeTent = (wl: WorldLocation, pos: Point, data: object): ElementComponent => {
     const e = new Entity()
 
