@@ -5431,7 +5431,7 @@ System.register("game/characters/dialogues/DipIntro", ["game/characters/Dialogue
                     }
                 },
                 _a[7 /* DIP_CRAFT */] = function () {
-                    return Dialogue_1.dialogueWithOptions(["Can I help you make something?"], DudeInteractIndicator_1.DudeInteractIndicator.IMPORTANT_DIALOGUE, new Dialogue_1.DialogueOption(CRAFT_OPTION, function () {
+                    return Dialogue_1.dialogueWithOptions(["Can I help you make something?"], DudeInteractIndicator_1.DudeInteractIndicator.NONE, new Dialogue_1.DialogueOption(CRAFT_OPTION, function () {
                         CraftingMenu_1.CraftingMenu.instance.show(CraftingRecipe_1.getDipRecipes());
                         return new Dialogue_1.NextDialogue(7 /* DIP_CRAFT */, false);
                     }), Dialogue_1.option("Nope", 7 /* DIP_CRAFT */, false));

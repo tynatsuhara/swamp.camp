@@ -83,7 +83,7 @@ export const DIP_INTRO_DIALOGUE: { [key: number]: () => DialogueInstance } = {
     [Dialogue.DIP_CRAFT]: () => {
         return dialogueWithOptions(
             ["Can I help you make something?"],
-            DudeInteractIndicator.IMPORTANT_DIALOGUE,
+            DudeInteractIndicator.NONE,
             new DialogueOption(CRAFT_OPTION, () => {
                 CraftingMenu.instance.show(getDipRecipes())
                 return new NextDialogue(Dialogue.DIP_CRAFT, false)
