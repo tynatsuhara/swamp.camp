@@ -33,4 +33,11 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => [{
         output: Item.AXE,
         input: [new ItemStack(Item.IRON, 3), new ItemStack(Item.WOOD, 5)],
     }],
+},{ 
+    icon: Tilesets.instance.oneBit.getTileAt(new Point(0, 19)),
+    name: "Buildings",
+    recipes: [{
+        output: Item.TENT,
+        input: [new ItemStack(Item.WOOD, 5)],
+    }],
 }]

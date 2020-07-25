@@ -5009,6 +5009,13 @@ System.register("game/items/CraftingRecipe", ["game/items/Inventory", "game/grap
                             output: 100012 /* AXE */,
                             input: [new Inventory_1.ItemStack(5 /* IRON */, 3), new Inventory_1.ItemStack(2 /* WOOD */, 5)],
                         }],
+                }, {
+                    icon: Tilesets_15.Tilesets.instance.oneBit.getTileAt(new point_34.Point(0, 19)),
+                    name: "Buildings",
+                    recipes: [{
+                            output: 3 /* TENT */,
+                            input: [new Inventory_1.ItemStack(2 /* WOOD */, 5)],
+                        }],
                 }]; });
         }
     };
