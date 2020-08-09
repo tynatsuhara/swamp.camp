@@ -10213,6 +10213,180 @@ System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"]
         }
     };
 });
+var FACES = [0, 1, 2, 3, 4, 5];
+var SIDES = 6;
+var STARTING_DICE = 5;
+var factorial = function (num) {
+    var result = num;
+    if (num === 0 || num === 1)
+        return 1;
+    while (num > 1) {
+        num--;
+        result *= num;
+    }
+    return result;
+};
+var choose = function (n, k) {
+    return factorial(n) / (factorial(k) * factorial(n - k));
+};
+// const probabilityExactly = (faceCount: number, totalDice: number) => {
+//     faceCount = Math.max(faceCount, 0)
+//     return choose(totalDice, faceCount) * Math.pow(1/6, faceCount) * Math.pow(5/6, totalDice - faceCount)
+// }
+var probabilityAtLeast = function (faceCount, totalDice) {
+    faceCount = Math.max(faceCount, 0);
+    if (faceCount === 0)
+        return 1;
+    var n = totalDice;
+    var q = faceCount;
+    var result = 0;
+    for (var x = q; x <= n; x++) {
+        result += (choose(n, x) * Math.pow(1 / 6, x) * Math.pow(5 / 6, n - x));
+    }
+    return result;
+};
+var probabilityWithHand = function (hand, bid, totalDice) {
+    return probabilityAtLeast(bid.count - hand[bid.face], totalDice - hand[bid.face]);
+};
+var rollDice = function (diceInHand) {
+    var rolls = [0, 0, 0, 0, 0, 0];
+    for (var i = 0; i < diceInHand; i++) {
+        var r = Math.floor(Math.random() * SIDES);
+        rolls[r]++;
+    }
+    return rolls;
+};
+var DicePlayer = /** @class */ (function () {
+    function DicePlayer(name) {
+        this.diceCount = STARTING_DICE;
+        this.name = name;
+        this.roll();
+    }
+    DicePlayer.prototype.roll = function () {
+        this.hand = rollDice(this.diceCount);
+    };
+    DicePlayer.prototype.aiFirstBid = function () {
+        var possibleBids = [];
+        for (var i = 0; i < SIDES; i++) {
+            for (var j = 0; j < this.hand[i]; j++) {
+                possibleBids.push(i);
+            }
+        }
+        return {
+            face: possibleBids[Math.floor(Math.random() * possibleBids.length)],
+            count: 1
+        };
+    };
+    /**
+     * @return a new bid or null to call "liar"
+     */
+    DicePlayer.prototype.aiPlayRound = function (bid, totalDice) {
+        /**
+         * options:
+         *   increase bid: face, number, or both
+         *   call liar
+         *
+         * steps:
+         *   1. are they a liar or not? (considering your own dice + probability)
+         *   2. they're not lying.
+         */
+        var _this = this;
+        var probabilityOfPreviousBid = probabilityAtLeast(bid.count, totalDice);
+        // we KNOW it's true, increase face safely by 1
+        if (this.hand[bid.face] > bid.count) {
+            return {
+                face: bid.face,
+                count: bid.count + 1
+            };
+        }
+        console.log("probabilityOfPreviousBid=" + probabilityOfPreviousBid);
+        if (probabilityOfPreviousBid < .2) {
+            return null;
+        }
+        var possibleBids = [];
+        // increase count by 1
+        possibleBids.push({
+            face: bid.face,
+            count: bid.count + 1,
+        });
+        // increase face
+        for (var f = bid.face + 1; f < SIDES; f++) {
+            possibleBids.push({
+                face: f,
+                count: bid.count,
+            });
+        }
+        // increase bid
+        for (var f = 0; f < SIDES; f++) {
+            possibleBids.push({
+                face: f,
+                count: bid.count + 1,
+            });
+        }
+        // TODO add randomness and random bluffing
+        possibleBids.sort(function (a, b) { return probabilityWithHand(_this.hand, b, totalDice) - probabilityWithHand(_this.hand, a, totalDice); });
+        return possibleBids[0];
+    };
+    return DicePlayer;
+}());
+var doGame = function () {
+    var allPlayers = [
+        new DicePlayer("Tyler"),
+        new DicePlayer("Miya"),
+        new DicePlayer("Lane"),
+        new DicePlayer("Gumball"),
+    ];
+    console.log(allPlayers);
+    var s = function (bid) { return bid.count + "x" + (bid.face + 1); };
+    var playersInGame = __spreadArrays(allPlayers);
+    var previousPlayer = playersInGame.shift();
+    playersInGame.push(previousPlayer);
+    var _loop_3 = function () {
+        var bid = previousPlayer.aiFirstBid();
+        console.log(previousPlayer + ": starting bid " + s(bid));
+        while (!!bid) {
+            var p = playersInGame.shift();
+            playersInGame.push(p);
+            var totalDice = playersInGame.map(function (p) { return p.diceCount; }).reduce(function (a, b) { return a + b; });
+            var nextBid = p.aiPlayRound(bid, totalDice);
+            if (!nextBid) {
+                console.log(p.name + ": " + previousPlayer.name + " is a liar!");
+                var wasLie = playersInGame.map(function (p) { return p.hand[bid.face]; }).reduce(function (a, b) { return a + b; }) < bid.count;
+                // TODO make the loser start the next round
+                if (wasLie) {
+                    previousPlayer.diceCount--;
+                    console.log("it was a lie: " + previousPlayer.name + " loses a die");
+                }
+                else {
+                    p.diceCount--;
+                    console.log("it wasn't a lie: " + p.name + " loses a die");
+                }
+            }
+            else {
+                console.log(p.name + " bids " + s(nextBid));
+            }
+            previousPlayer = p;
+            bid = nextBid;
+            playersInGame.forEach(function (p) {
+                if (p.diceCount == 0) {
+                    console.log(p.name + " eliminated");
+                }
+            });
+            playersInGame = playersInGame.filter(function (p) { return p.diceCount > 0; });
+        }
+        if (playersInGame.length == 1) {
+            return "break";
+        }
+        playersInGame.forEach(function (p) { return p.roll(); });
+    };
+    while (true) {
+        var state_1 = _loop_3();
+        if (state_1 === "break")
+            break;
+    }
+    console.log(playersInGame[0].name + " wins!");
+};
+window['dice'] = doGame;
 System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uuid"], function (exports_121, context_121) {
     "use strict";
     var profiler_2, uuid_2, serialize, buildObject;
@@ -10244,7 +10418,7 @@ System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uu
             buildObject = function (object, resultObject, topLevelUuidMap, objectUuidMap) {
                 var stack = [];
                 stack.push({ object: object, resultObject: resultObject });
-                var _loop_3 = function () {
+                var _loop_4 = function () {
                     var _a = stack.pop(), object_1 = _a.object, resultObject_1 = _a.resultObject;
                     Object.keys(object_1).forEach(function (k) {
                         if (object_1 instanceof Object) {
@@ -10270,7 +10444,7 @@ System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uu
                     });
                 };
                 while (stack.length > 0) {
-                    _loop_3();
+                    _loop_4();
                 }
             };
         }
