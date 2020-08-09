@@ -88,7 +88,7 @@ export const DIP_INTRO_DIALOGUE: { [key: number]: () => DialogueInstance } = {
                 CraftingMenu.instance.show(getDipRecipes())
                 return new NextDialogue(Dialogue.DIP_CRAFT, false)
             }),
-            option("Nope", Dialogue.DIP_CRAFT, false)
+            option("Nope.", Dialogue.DIP_CRAFT, false)
         )
     },
 }

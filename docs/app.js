@@ -5434,7 +5434,7 @@ System.register("game/characters/dialogues/DipIntro", ["game/characters/Dialogue
                     return Dialogue_1.dialogueWithOptions(["Can I help you make something?"], DudeInteractIndicator_1.DudeInteractIndicator.NONE, new Dialogue_1.DialogueOption(CRAFT_OPTION, function () {
                         CraftingMenu_1.CraftingMenu.instance.show(CraftingRecipe_1.getDipRecipes());
                         return new Dialogue_1.NextDialogue(7 /* DIP_CRAFT */, false);
-                    }), Dialogue_1.option("Nope", 7 /* DIP_CRAFT */, false));
+                    }), Dialogue_1.option("Nope.", 7 /* DIP_CRAFT */, false));
                 },
                 _a));
         }
@@ -5455,7 +5455,16 @@ System.register("game/characters/dialogues/BertoIntro", ["game/characters/Dialog
         ],
         execute: function () {
             exports_71("BERTO_INTRO_DIALOGUE", BERTO_INTRO_DIALOGUE = (_a = {},
-                _a[8 /* BERT_0 */] = function () { return Dialogue_2.dialogue(["Good morrow! I, Sir Berto of Dube, present myself unto thee as an emissary of The Honourable King Bob XVIII."], function () { return new Dialogue_2.NextDialogue(8 /* BERT_0 */, false); }, DudeInteractIndicator_2.DudeInteractIndicator.IMPORTANT_DIALOGUE); },
+                _a[8 /* BERT_0 */] = function () { return Dialogue_2.dialogueWithOptions(["Good morrow! I, Sir Berto of Dube, present myself unto thee as an emissary of The Honourable King Bob XVIII.",
+                    "Should thy choose to collect raw materials, I will purchase them on behalf of the kingdom.",
+                    "Upon receipt of a fee and construction of an appropriate dwelling, I can also bring tax-paying subjects to populate thy settlement.",
+                    "Tradesmen! Knights! Worthless peons to scrub latrines and polish thy armor!",
+                    "Art thou interested in any of my services at the moment?"], DudeInteractIndicator_2.DudeInteractIndicator.IMPORTANT_DIALOGUE, Dialogue_2.option("Sure!", 9 /* BERT_MENU */, true), Dialogue_2.option("Maybe later.", 9 /* BERT_MENU */, false)); },
+                _a[9 /* BERT_MENU */] = function () { return Dialogue_2.dialogueWithOptions(["Tally-ho! How shall I assist thee?"], DudeInteractIndicator_2.DudeInteractIndicator.NONE, new Dialogue_2.DialogueOption("What are you buying?", function () {
+                    // CraftingMenu.instance.show(getDipRecipes())
+                    console.log("show menu");
+                    return new Dialogue_2.NextDialogue(9 /* BERT_MENU */, false);
+                }), Dialogue_2.option("Never mind.", 9 /* BERT_MENU */, false)); },
                 _a));
         }
     };
@@ -5759,7 +5768,7 @@ System.register("game/world/elements/Campfire", ["engine/component", "engine/til
                 __extends(Campfire, _super);
                 function Campfire(logs, lastLogConsumedTime, updateFire) {
                     var _this = _super.call(this) || this;
-                    _this.dialogue = 9 /* CAMPFIRE */;
+                    _this.dialogue = 10 /* CAMPFIRE */;
                     _this.logs = logs;
                     _this.lastLogConsumedTime = lastLogConsumedTime;
                     _this.updateFire = updateFire;
@@ -5816,7 +5825,7 @@ System.register("game/characters/dialogues/ItemDialogues", ["game/characters/Dia
         ],
         execute: function () {
             exports_74("ITEM_DIALOGUES", ITEM_DIALOGUES = (_a = {},
-                _a[9 /* CAMPFIRE */] = function () {
+                _a[10 /* CAMPFIRE */] = function () {
                     // the fire can be dead, almost dead, partially full, almost entirely full, or totally full
                     var cf = DialogueDisplay_2.DialogueDisplay.instance.dialogueSource;
                     var logCount = cf.logs;
@@ -5826,7 +5835,7 @@ System.register("game/characters/dialogues/ItemDialogues", ["game/characters/Dia
                         return function () {
                             Player_8.Player.instance.dude.inventory.removeItem(2 /* WOOD */, logsTransferred);
                             cf.addLogs(logsTransferred);
-                            return new Dialogue_3.NextDialogue(9 /* CAMPFIRE */, false);
+                            return new Dialogue_3.NextDialogue(10 /* CAMPFIRE */, false);
                         };
                     };
                     var cancelText = "Leave";
