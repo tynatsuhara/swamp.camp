@@ -1,6 +1,25 @@
 import { DialogueInstance, Dialogue, dialogue, NextDialogue, dialogueWithOptions, DialogueOption, option } from "../Dialogue"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
-import { CraftingMenu } from "../../ui/CraftingMenu"
+import { SellMenu, SalePackage } from "../../ui/SellMenu"
+import { Item } from "../../items/Items"
+
+const getItemsToSell = (): SalePackage[] => {
+    return [{
+        item: Item.WOOD,
+        count: 10,
+        price: 5,
+    },
+    {
+        item: Item.ROCK,
+        count: 10,
+        price: 5,
+    },
+    {
+        item: Item.IRON,
+        count: 10,
+        price: 20,
+    }]
+}
 
 export const BERTO_INTRO_DIALOGUE: { [key: number]: () => DialogueInstance } = {
     [Dialogue.BERT_0]: () => dialogueWithOptions(
@@ -17,7 +36,7 @@ export const BERTO_INTRO_DIALOGUE: { [key: number]: () => DialogueInstance } = {
         ["Tally-ho! How shall I assist thee?"],
         DudeInteractIndicator.NONE,
         new DialogueOption("What are you buying?", () => {
-            // CraftingMenu.instance.show(getDipRecipes())
+            SellMenu.instance.show(getItemsToSell())
             console.log("show menu")
             return new NextDialogue(Dialogue.BERT_MENU, false)
         }),

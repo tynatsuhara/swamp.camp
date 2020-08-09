@@ -7,6 +7,7 @@ import { PlaceElementDisplay } from "./PlaceElementDisplay"
 import { Point } from "../../engine/point"
 import { PauseMenu } from "./PauseMenu"
 import { CraftingMenu } from "./CraftingMenu"
+import { SellMenu } from "./SellMenu"
 
 export class UIStateManager {
     static instance: UIStateManager
@@ -18,6 +19,7 @@ export class UIStateManager {
     private readonly placeElementDisplay = new PlaceElementDisplay()
     private readonly pauseMenu = new PauseMenu()
     private readonly craftingMenu = new CraftingMenu()
+    private readonly sellMenu = new SellMenu()
 
     // if this is true, input observed by other components (like the player) 
     // should be skipped because a menu is open. Other menus should only open
@@ -39,6 +41,7 @@ export class UIStateManager {
                 || this.placeElementDisplay.isOpen
                 || this.pauseMenu.isOpen
                 || this.craftingMenu.isOpen
+                || this.sellMenu.isOpen
 
         return this.hud.getEntities(Player.instance.dude, dimensions, elapsedMillis)
                 .concat(this.inventory.getEntities())
@@ -46,5 +49,6 @@ export class UIStateManager {
                 .concat(this.placeElementDisplay.getEntities())
                 .concat(this.pauseMenu.getEntities())
                 .concat(this.craftingMenu.getEntities())
+                .concat(this.sellMenu.getEntities())
     }
 }

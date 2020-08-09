@@ -14,33 +14,44 @@ import { UIStateManager } from "./UIStateManager"
 import { ITEM_METADATA_MAP, Item } from "../items/Items"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { TEXT_SIZE, TEXT_FONT, TEXT_PIXEL_WIDTH } from "./Text"
-import { TileTransform } from "../../engine/tiles/TileTransform"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Player } from "../characters/Player"
 import { rectContains } from "../../engine/util/utils"
 import { Tooltip } from "./Tooltip"
+import { ItemStack } from "../items/Inventory"
+import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
+import { TileTransform } from "../../engine/tiles/TileTransform"
+import { TextRender } from "../../engine/renderer/TextRender"
 
-export class CraftingMenu extends Component {
+export type SalePackage = {
+    readonly item: Item,
+    readonly count: number,
+    readonly price: number,  // number of gold
+}
+
+// this is mostly copied from CraftingMenu and InventoryDisplay
+export class SellMenu extends Component {
     
-    static instance: CraftingMenu
+    static instance: SellMenu
 
     private readonly e: Entity = new Entity([this])  // entity for this component
     private displayEntity: Entity
+    private coinEntity: Entity  // for the spinny coin in the corner
+    private coinsOffset: Point = new Point(7, -11)  // for the spinny coin in the corner
     isOpen = false
-    private recipes: CraftingRecipeCategory[]
-    private recipeCategory: number
+    private items: SalePackage[]
     private canvas: HTMLCanvasElement
     private context: CanvasRenderingContext2D
     private dimensions = new Point(160, 158)
     private innerDimensions = this.dimensions.minus(new Point(10, 14))
     private scrollOffset = 0
-    private justCraftedRow = -1  // if this is non-negative, this row was just crafted and will be highlighted
+    private justSoldRow = -1  // if this is non-negative, this row was just sold and will be highlighted
     private justOpened = false  // prevent bug where the mouse is held down immediately
     private tooltip = this.e.addComponent(new Tooltip())
 
     constructor() {
         super()
-        CraftingMenu.instance = this
+        SellMenu.instance = this
 
         this.canvas = document.createElement("canvas")
         this.canvas.width = this.innerDimensions.x
@@ -57,19 +68,15 @@ export class CraftingMenu extends Component {
             this.tooltip.clear()
             this.tooltip.position = updateData.input.mousePos
             const rowsTall = 6  // will need to change this if dimensions are adjusted
-            const category = this.recipes[this.recipeCategory]
             this.scrollOffset -= updateData.input.mouseWheelDeltaY * updateData.elapsedTimeMillis * 0.01
-            this.scrollOffset = Math.floor(Math.max(Math.min(0, this.scrollOffset), -Math.max(category.recipes.length, rowsTall)*24 + this.innerDimensions.y))
-            const screenDimensions = Camera.instance.dimensions
-            const topLeft = screenDimensions.div(2).minus(this.dimensions.div(2)).plusY(-TILE_SIZE)
-            this.displayEntity = new Entity([
-                ...this.renderCategories(updateData, topLeft),
-                ...this.renderRecipes(updateData, topLeft, category.recipes),
-            ])
+            this.scrollOffset = Math.floor(Math.max(Math.min(0, this.scrollOffset), -Math.max(this.items.length, rowsTall)*24 + this.innerDimensions.y))
+            this.displayEntity = new Entity(
+                this.renderRecipes(updateData, this.getTopLeft(), this.items),
+            )
             this.justOpened = false
 
-            if (this.justCraftedRow !== -1) {
-                this.tooltip.say("Crafted!")
+            if (this.justSoldRow !== -1) {
+                this.tooltip.say("Sold!")
             }
         }
     }
@@ -77,54 +84,48 @@ export class CraftingMenu extends Component {
     close() {
         this.isOpen = false
         this.displayEntity = null
+        this.coinEntity = null
         this.tooltip.clear()
     }
 
-    show(recipes: CraftingRecipeCategory[]) {
+    show(items: SalePackage[]) {
         this.isOpen = true
-        this.recipes = recipes
+        this.items = items
         this.scrollOffset = 0
         this.justOpened = true
-        this.selectCategory(0)
+
+        this.coinEntity = new Entity([
+            new AnimatedTileComponent(
+                [Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)],
+                new TileTransform(this.getTopLeft().plus(this.coinsOffset))
+            )
+        ])
     }
 
-    private selectCategory(category: number) {
-        this.recipeCategory = category
-        this.justCraftedRow = -1
+    private getTopLeft() {
+        const screenDimensions = Camera.instance.dimensions
+        return screenDimensions.div(2).minus(this.dimensions.div(2))
     }
 
-    private renderCategories(updateData: UpdateData, topLeft: Point): Component[] {
-        const result: Component[] = []
-        for (let i = 0; i < this.recipes.length; i++) {
-            const category = this.recipes[i]
-            const pos = topLeft.plusX(i * TILE_SIZE * 2)
-            const dims = new Point(2, 2)
-            const hovered = rectContains(pos, dims.times(TILE_SIZE), updateData.input.mousePos)
-
-            result.push(...NineSlice.makeNineSliceComponents(Tilesets.instance.oneBit.getNineSlice("invBoxNW"), pos, dims))
-            const icon = i === this.recipeCategory || hovered ? category.icon : this.tintedIcon(category.icon, Color.PINK)
-            result.push(icon.toComponent(new TileTransform(topLeft.plusX(i * TILE_SIZE * 2 + TILE_SIZE/2).plusY(TILE_SIZE/2))))
-
-            if (!this.justOpened && hovered && updateData.input.isMouseDown) {
-                this.selectCategory(i)
-            }
-
-            if (hovered) {
-                this.tooltip.say(category.name)
-            }
-        }
-        return result
-    }
-
-    private canCraft(recipe: CraftingRecipe) {
-        return this.justCraftedRow === -1 
+    private canSell(sale: SalePackage) {
+        return this.justSoldRow === -1 
                 && !this.justOpened 
-                && Player.instance.dude.inventory.canAddItem(recipe.output)
-                && recipe.input.every(input => Player.instance.dude.inventory.getItemCount(input.item) >= input.count)
+                && Player.instance.dude.inventory.getItemCount(sale.item) >= sale.count
     }
 
-    private renderRecipes(updateData: UpdateData, topLeft: Point, recipes: CraftingRecipe[]): Component[] {
-        topLeft = topLeft.plusY(TILE_SIZE*2)
+    private renderRecipes(updateData: UpdateData, topLeft: Point, items: SalePackage[]): Component[] {
+        const inv = Player.instance.dude.inventory
+
+        const coinCountComponent = new BasicRenderComponent(
+            new TextRender(
+                `x${inv.getItemCount(Item.COIN)}`, 
+                new Point(9, 1).plus(topLeft).plus(this.coinsOffset), 
+                TEXT_SIZE, 
+                TEXT_FONT, 
+                Color.YELLOW,
+                UIStateManager.UI_SPRITE_DEPTH
+            )
+        )
 
         this.context.imageSmoothingEnabled = false  // TODO figure out why text is aliased
         this.context.font = `${TEXT_SIZE}px '${TEXT_FONT}'`
@@ -145,7 +146,7 @@ export class CraftingMenu extends Component {
 
         const shiftedMousePos = updateData.input.mousePos.plusY(-this.scrollOffset)
 
-        for (let r = 0; r < recipes.length; r++) {
+        for (let r = 0; r < items.length; r++) {
 
             const hovered = rectContains(
                 topLeft.plusX(margin).plusY(rowHeight * r + margin*2), 
@@ -157,77 +158,57 @@ export class CraftingMenu extends Component {
                 updateData.input.mousePos
             )
 
-            const recipe = recipes[r]
-            const craftedItem = ITEM_METADATA_MAP[recipe.output]
+            const sale = items[r]
+            const saleItem = ITEM_METADATA_MAP[sale.item]
+            const sellable = this.canSell(sale)
 
-            // craft the item
-            if (hovered && updateData.input.isMouseDown && this.canCraft(recipe)) {
+            // sell the item
+            if (hovered && updateData.input.isMouseDown && sellable) {
                 // TODO a sound effect
-                recipe.input.forEach(ingr => {
-                    Player.instance.dude.inventory.removeItem(ingr.item, ingr.count)
-                })
-                Player.instance.dude.inventory.addItem(recipe.output)
-                this.justCraftedRow = r
-                setTimeout(() => this.justCraftedRow = -1, 900)
+                inv.removeItem(sale.item, sale.count)
+                // TODO this loop is dumb, get rid of it when we make coins not take an inv slot
+                for (let i = 0; i < sale.price; i++) {
+                    inv.addItem(Item.COIN)
+                }
+                this.justSoldRow = r
+                setTimeout(() => this.justSoldRow = -1, 900)
             }
 
-            if (hovered && !this.canCraft(recipe)) {
-                if (!Player.instance.dude.inventory.canAddItem(recipe.output)) {
-                    this.tooltip.say("Inventory full")
-                } else if (recipe.input.some(input => Player.instance.dude.inventory.getItemCount(input.item) < input.count)) {
-                    this.tooltip.say("Need ingredients")
-                }
+            if (hovered && !sellable) {
+                this.tooltip.say("Not enough resources")
             } else if (hovered) {
-                this.tooltip.say("Click to craft")
+                this.tooltip.say(`Click to sell ${sale.count}/${inv.getItemCount(sale.item)}`)
             }
 
             // craftable item
             verticalOffset += margin
-            const plainIcon = this.getItemIcon(recipe.output)
-            let craftedItemColor: string
+            const plainIcon = this.getItemIcon(sale.item)
+            let itemColor: string = Color.PINK
             if (hovered) {
-                if (r === this.justCraftedRow) {
-                    craftedItemColor = Color.DARK_RED
-                } else {
-                    craftedItemColor = Color.WHITE
+                if (r === this.justSoldRow) {
+                    itemColor = Color.DARK_RED
+                } else if (sellable) {
+                    itemColor = Color.WHITE
                 }
-            } else {
-                craftedItemColor = Color.PINK
             }
-            this.context.fillStyle = craftedItemColor
-            const craftedItemIcon = this.tintedIcon(plainIcon, craftedItemColor)
+            if (!sellable) {
+                itemColor = Color.DARK_RED
+            }
+            this.context.fillStyle = itemColor
+            const craftedItemIcon = this.tintedIcon(plainIcon, itemColor)
             this.drawIconAt(craftedItemIcon, margin, verticalOffset)
-            this.context.fillText(craftedItem.displayName, TILE_SIZE + margin * 2, verticalTextOffset + verticalOffset)
+            this.context.fillText(`${sale.count}x ${saleItem.displayName}`, TILE_SIZE + margin * 2, verticalTextOffset + verticalOffset)
 
-            // ingredients
+            // coinage
             let offsetFromRight = 0
-            for (let i = 0; i < recipe.input.length; i++) {
-                const ingr = recipe.input[recipe.input.length-i-1]
-                const plainIngredientIcon = this.getItemIcon(ingr.item)
-                let ingredientIcon: StaticTileSource = plainIngredientIcon
-                if (Player.instance.dude.inventory.getItemCount(ingr.item) < ingr.count) {
-                    this.context.fillStyle = Color.DARK_RED
-                    ingredientIcon = this.tintedIcon(ingredientIcon, Color.DARK_RED)
-                } else {
-                    this.context.fillStyle = craftedItemColor
-                    ingredientIcon = this.tintedIcon(plainIngredientIcon, craftedItemColor)
-                }
-                // const requiredCount = ingr.count
-                // const countStr = `x${requiredCount}`
-                // offsetFromRight += (countStr.length * TEXT_PIXEL_WIDTH + margin)
-                // this.context.fillText(countStr, width - offsetFromRight, verticalTextOffset + verticalOffset)
-                offsetFromRight += TILE_SIZE + margin
-                this.drawIconAt(ingredientIcon, width - offsetFromRight, verticalOffset)
-                if (rectContains(
-                        // I have no idea why this math works :(
-                        new Point(width - offsetFromRight + margin, verticalOffset + margin * 1.5).plus(topLeft), 
-                        new Point(TILE_SIZE, TILE_SIZE), 
-                        updateData.input.mousePos
-                )) {
-                    const displayName = ITEM_METADATA_MAP[ingr.item].displayName
-                    this.tooltip.say(`${displayName} (${Player.instance.dude.inventory.getItemCount(ingr.item)}/${ingr.count})`)
-                }
-            }
+            const coinIcon = this.getItemIcon(Item.COIN)
+            let ingredientIcon: StaticTileSource = this.tintedIcon(coinIcon, itemColor === Color.WHITE ? Color.YELLOW : itemColor)  // make coin icon yellow on hover
+            this.context.fillStyle = itemColor
+            const countStr = `${sale.price}`
+            offsetFromRight += (countStr.length * TEXT_PIXEL_WIDTH + margin)
+            this.context.fillText(countStr, width - offsetFromRight, verticalTextOffset + verticalOffset)
+            offsetFromRight += TILE_SIZE
+            this.drawIconAt(ingredientIcon, width - offsetFromRight, verticalOffset)
 
             // draw line
             verticalOffset += (margin + TILE_SIZE)
@@ -244,7 +225,7 @@ export class CraftingMenu extends Component {
             UIStateManager.UI_SPRITE_DEPTH - 10,
         ))
 
-        return [...backgroundTiles, renderComp]
+        return [...backgroundTiles, renderComp, coinCountComponent]
     }
 
     // caching stuff
@@ -291,6 +272,7 @@ export class CraftingMenu extends Component {
         return [
             this.e, 
             this.displayEntity,
+            this.coinEntity
         ]
     }
 }
