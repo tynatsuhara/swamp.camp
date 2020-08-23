@@ -9895,7 +9895,8 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/tiles/Connec
                     for (var i = -MapGenerator.MAP_SIZE / 2; i < MapGenerator.MAP_SIZE / 2; i++) {
                         for (var j = -MapGenerator.MAP_SIZE / 2; j < MapGenerator.MAP_SIZE / 2; j++) {
                             var value = noise.simplex2(i / 100, j / 100);
-                            var v = (Math.floor(2 * (value + 1)));
+                            value = (value + 1) / 2; // scale to 0-1
+                            var v = (Math.floor(9 * value));
                             str += v;
                             grid.set(new point_64.Point(j, i), v);
                         }
