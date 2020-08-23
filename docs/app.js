@@ -7518,11 +7518,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                         var colliderSize = new point_52.Point(10, 8);
                         _this.relativeColliderPos = new point_52.Point(_this.animation.transform.dimensions.x / 2 - colliderSize.x / 2, _this.animation.transform.dimensions.y - colliderSize.y);
                         _this.collider = _this.entity.addComponent(new BoxCollider_7.BoxCollider(_this.position.plus(_this.relativeColliderPos), colliderSize, Dude.COLLISION_LAYER));
-                        _this.dialogueInteract = _this.entity.addComponent(new Interactable_4.Interactable(new point_52.Point(0, 0), function () {
-                            if (!!_this.dialogue) {
-                                DialogueDisplay_4.DialogueDisplay.instance.startDialogue(_this);
-                            }
-                        }));
+                        _this.dialogueInteract = _this.entity.addComponent(new Interactable_4.Interactable(new point_52.Point(0, 0), function () { return DialogueDisplay_4.DialogueDisplay.instance.startDialogue(_this); }, point_52.Point.ZERO, function () { return !UIStateManager_15.UIStateManager.instance.isMenuOpen && !_this.isMoving && !!_this.dialogue; }));
                     };
                     return _this;
                 }

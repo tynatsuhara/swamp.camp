@@ -110,11 +110,12 @@ export class Dude extends Component implements DialogueSource {
             )
             this.collider = this.entity.addComponent(new BoxCollider(this.position.plus(this.relativeColliderPos), colliderSize, Dude.COLLISION_LAYER))
 
-            this.dialogueInteract = this.entity.addComponent(new Interactable(new Point(0, 0), () => {
-                if (!!this.dialogue) {
-                    DialogueDisplay.instance.startDialogue(this)
-                }
-            }))
+            this.dialogueInteract = this.entity.addComponent(new Interactable(
+                new Point(0, 0), 
+                () => DialogueDisplay.instance.startDialogue(this),
+                Point.ZERO,
+                () => !UIStateManager.instance.isMenuOpen && !this.isMoving && !!this.dialogue
+            ))
         }
     }
 
