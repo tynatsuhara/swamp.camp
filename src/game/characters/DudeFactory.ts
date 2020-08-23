@@ -85,6 +85,7 @@ export class DudeFactory {
                 maxHealth = 4
                 additionalComponents = [new Player(), new CutscenePlayerController()]
                 defaultInventory.addItem(Item.SWORD)
+                window["player"] = additionalComponents[0]
                 break
             }
             case DudeType.DIP: {
@@ -95,6 +96,7 @@ export class DudeFactory {
                     new NPC(NPCSchedules.newGoToSchedule(new Point(0, 0))), 
                     new Villager()
                 ]
+                window["dip"] = additionalComponents[0]
                 break
             }
             case DudeType.HERALD: {
@@ -108,6 +110,7 @@ export class DudeFactory {
                     )),
                     new Villager()
                 ]
+                window["berto"] = additionalComponents[0]
                 break
             }
             case DudeType.ELF: {

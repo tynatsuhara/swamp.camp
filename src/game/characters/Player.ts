@@ -23,7 +23,6 @@ export class Player extends Component {
     constructor() {
         super()
         Player.instance = this
-        window["player"] = this
     }
 
     start(startData: StartData) {
