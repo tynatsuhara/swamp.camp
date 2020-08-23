@@ -20,6 +20,8 @@ import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { UIStateManager } from "../ui/UIStateManager"
 import { AnimationUtils } from "./AnimationUtils"
 import { ImageFilters } from "../graphics/ImageFilters"
+import { WorldLocation } from "../world/WorldLocation"
+import { LocationManager } from "../world/LocationManager"
 
 export class Dude extends Component implements DialogueSource {
 
@@ -333,6 +335,11 @@ export class Dude extends Component implements DialogueSource {
 
     getRenderMethods(): RenderMethod[] {
         return this.getIndicator()
+    }
+
+    delete() {
+        LocationManager.instance.getLocations().forEach(l => l.dudes.delete(this))
+        super.delete()
     }
 
     private getIndicator(): RenderMethod[] {
