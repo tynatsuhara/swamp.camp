@@ -7,6 +7,7 @@ import { WeaponType } from "../characters/Weapon"
 export class DudeSaveState {
     type: DudeType
     pos: string
+    anim: string
     weapon: WeaponType
     shield: string  // TODO add shieldType
     maxHealth: number

@@ -7906,6 +7906,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     _this.blob = blob;
                     _this.awake = function () {
                         // Set up animations
+                        _this.characterAnimName = characterAnimName;
                         var idleAnim = AnimationUtils_1.AnimationUtils.getCharacterIdleAnimation(characterAnimName);
                         var runAnim = AnimationUtils_1.AnimationUtils.getCharacterWalkAnimation(characterAnimName);
                         var height = idleAnim.getTile(0).dimensions.y;
@@ -8143,6 +8144,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                     return {
                         type: this.type,
                         pos: this.position.toString(),
+                        anim: this.characterAnimName,
                         maxHealth: this.maxHealth,
                         health: this._health,
                         speed: this.speed,
@@ -8559,7 +8561,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                     location.dudes.add(d);
                 };
                 DudeFactory.prototype.make = function (type, pos, saveState, location) {
-                    var _a, _b, _c, _d, _e, _f, _g;
+                    var _a, _b, _c, _d, _e, _f, _g, _h;
                     // defaults
                     var faction = 0 /* VILLAGERS */;
                     var animationName;
@@ -8639,7 +8641,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                         }
                     }
                     // use saved data instead of defaults
-                    var d = new Dude_8.Dude(type, faction, animationName, pos, (_a = saveState === null || saveState === void 0 ? void 0 : saveState.weapon) !== null && _a !== void 0 ? _a : weapon, (_b = saveState === null || saveState === void 0 ? void 0 : saveState.shield) !== null && _b !== void 0 ? _b : shield, (_c = saveState === null || saveState === void 0 ? void 0 : saveState.maxHealth) !== null && _c !== void 0 ? _c : maxHealth, (_d = saveState === null || saveState === void 0 ? void 0 : saveState.health) !== null && _d !== void 0 ? _d : maxHealth, (_e = saveState === null || saveState === void 0 ? void 0 : saveState.speed) !== null && _e !== void 0 ? _e : speed, !!(saveState === null || saveState === void 0 ? void 0 : saveState.inventory) ? Inventory_2.Inventory.load(saveState.inventory) : defaultInventory, (_f = saveState === null || saveState === void 0 ? void 0 : saveState.dialogue) !== null && _f !== void 0 ? _f : dialogue, (_g = saveState === null || saveState === void 0 ? void 0 : saveState.blob) !== null && _g !== void 0 ? _g : blob);
+                    var d = new Dude_8.Dude(type, faction, (_a = saveState === null || saveState === void 0 ? void 0 : saveState.anim) !== null && _a !== void 0 ? _a : animationName, pos, (_b = saveState === null || saveState === void 0 ? void 0 : saveState.weapon) !== null && _b !== void 0 ? _b : weapon, (_c = saveState === null || saveState === void 0 ? void 0 : saveState.shield) !== null && _c !== void 0 ? _c : shield, (_d = saveState === null || saveState === void 0 ? void 0 : saveState.maxHealth) !== null && _d !== void 0 ? _d : maxHealth, (_e = saveState === null || saveState === void 0 ? void 0 : saveState.health) !== null && _e !== void 0 ? _e : maxHealth, (_f = saveState === null || saveState === void 0 ? void 0 : saveState.speed) !== null && _f !== void 0 ? _f : speed, !!(saveState === null || saveState === void 0 ? void 0 : saveState.inventory) ? Inventory_2.Inventory.load(saveState.inventory) : defaultInventory, (_g = saveState === null || saveState === void 0 ? void 0 : saveState.dialogue) !== null && _g !== void 0 ? _g : dialogue, (_h = saveState === null || saveState === void 0 ? void 0 : saveState.blob) !== null && _h !== void 0 ? _h : blob);
                     new Entity_19.Entity([d].concat(additionalComponents));
                     return d;
                 };

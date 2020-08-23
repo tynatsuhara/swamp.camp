@@ -149,7 +149,7 @@ export class DudeFactory {
         const d = new Dude(
             type, 
             faction,
-            animationName, 
+            saveState?.anim ?? animationName, 
             pos, 
             saveState?.weapon ?? weapon,  // TODO: update this logic when we make it so you can drop weapons/shields
             saveState?.shield ?? shield,

@@ -34,6 +34,7 @@ export class Dude extends Component implements DialogueSource {
     private _health: number
     get health() { return this._health }
     speed: number
+    private characterAnimName: string
     private _animation: AnimatedTileComponent
     get animation() { return this._animation }
 
@@ -91,6 +92,7 @@ export class Dude extends Component implements DialogueSource {
 
         this.awake = () => {
             // Set up animations
+            this.characterAnimName = characterAnimName
             const idleAnim = AnimationUtils.getCharacterIdleAnimation(characterAnimName)
             const runAnim = AnimationUtils.getCharacterWalkAnimation(characterAnimName)
             const height = idleAnim.getTile(0).dimensions.y
@@ -317,6 +319,7 @@ export class Dude extends Component implements DialogueSource {
         return {
             type: this.type,
             pos: this.position.toString(),
+            anim: this.characterAnimName,
             maxHealth: this.maxHealth,
             health: this._health,
             speed: this.speed,
