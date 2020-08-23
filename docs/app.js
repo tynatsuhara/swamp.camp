@@ -7870,7 +7870,7 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                         // Set up collider
                         var colliderSize = new point_53.Point(10, 8);
                         _this.relativeColliderPos = new point_53.Point(_this.animation.transform.dimensions.x / 2 - colliderSize.x / 2, _this.animation.transform.dimensions.y - colliderSize.y);
-                        _this.collider = _this.entity.addComponent(new BoxCollider_7.BoxCollider(_this.position.plus(_this.relativeColliderPos), colliderSize, Dude.COLLISION_LAYER));
+                        _this.collider = _this.entity.addComponent(new BoxCollider_7.BoxCollider(_this.position.plus(_this.relativeColliderPos), colliderSize, _this.type === 0 /* PLAYER */ ? Dude.PLAYER_COLLISION_LAYER : Dude.NPC_COLLISION_LAYER));
                         _this.dialogueInteract = _this.entity.addComponent(new Interactable_4.Interactable(new point_53.Point(0, 0), function () { return DialogueDisplay_5.DialogueDisplay.instance.startDialogue(_this); }, point_53.Point.ZERO, function () { return !UIStateManager_15.UIStateManager.instance.isMenuOpen && !_this.isMoving && !!_this.dialogue; }));
                     };
                     return _this;
@@ -8121,7 +8121,8 @@ System.register("game/characters/Dude", ["engine/tiles/AnimatedTileComponent", "
                         return [tile.toImageRender(new TileTransform_22.TileTransform(this.standingPosition.plusY(-28).plus(new point_53.Point(1, 1).times(-Tilesets_30.TILE_SIZE / 2)).plus(this.getAnimationOffsetPosition()), new point_53.Point(Tilesets_30.TILE_SIZE, Tilesets_30.TILE_SIZE), 0, false, false, UIStateManager_15.UIStateManager.UI_SPRITE_DEPTH))];
                     }
                 };
-                Dude.COLLISION_LAYER = "dube";
+                Dude.PLAYER_COLLISION_LAYER = "playa";
+                Dude.NPC_COLLISION_LAYER = "npc";
                 return Dude;
             }(component_26.Component));
             exports_95("Dude", Dude);
@@ -10089,8 +10090,8 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
                 }
                 QuestGame.prototype.initialize = function () {
                     CollisionEngine_4.CollisionEngine.instance.setCollisionMatrix(new Map([
-                        [CollisionEngine_4.CollisionEngine.DEFAULT_LAYER, [DroppedItem_2.DroppedItem.COLLISION_LAYER, Dude_9.Dude.COLLISION_LAYER]],
-                        [Dude_9.Dude.COLLISION_LAYER, [Dude_9.Dude.COLLISION_LAYER]],
+                        [CollisionEngine_4.CollisionEngine.DEFAULT_LAYER, [DroppedItem_2.DroppedItem.COLLISION_LAYER, Dude_9.Dude.PLAYER_COLLISION_LAYER, Dude_9.Dude.NPC_COLLISION_LAYER]],
+                        [Dude_9.Dude.PLAYER_COLLISION_LAYER, [Dude_9.Dude.NPC_COLLISION_LAYER]],
                     ]));
                     // Initialize singletons
                     new Tilesets_39.Tilesets();

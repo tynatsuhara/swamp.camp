@@ -23,7 +23,8 @@ import { ImageFilters } from "../graphics/ImageFilters"
 
 export class Dude extends Component implements DialogueSource {
 
-    static readonly COLLISION_LAYER = "dube"
+    static readonly PLAYER_COLLISION_LAYER = "playa"
+    static readonly NPC_COLLISION_LAYER = "npc"
     
     blob: object
     readonly type: DudeType
@@ -108,7 +109,11 @@ export class Dude extends Component implements DialogueSource {
                 this.animation.transform.dimensions.x/2 - colliderSize.x/2, 
                 this.animation.transform.dimensions.y - colliderSize.y
             )
-            this.collider = this.entity.addComponent(new BoxCollider(this.position.plus(this.relativeColliderPos), colliderSize, Dude.COLLISION_LAYER))
+            this.collider = this.entity.addComponent(new BoxCollider(
+                this.position.plus(this.relativeColliderPos), 
+                colliderSize, 
+                this.type === DudeType.PLAYER ? Dude.PLAYER_COLLISION_LAYER : Dude.NPC_COLLISION_LAYER
+            ))
 
             this.dialogueInteract = this.entity.addComponent(new Interactable(
                 new Point(0, 0), 

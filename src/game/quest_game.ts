@@ -34,8 +34,8 @@ export class QuestGame extends Game {
 
     initialize() {
         CollisionEngine.instance.setCollisionMatrix(new Map([
-            [CollisionEngine.DEFAULT_LAYER, [DroppedItem.COLLISION_LAYER, Dude.COLLISION_LAYER]],
-            [Dude.COLLISION_LAYER, [Dude.COLLISION_LAYER]],
+            [CollisionEngine.DEFAULT_LAYER, [DroppedItem.COLLISION_LAYER, Dude.PLAYER_COLLISION_LAYER, Dude.NPC_COLLISION_LAYER]],
+            [Dude.PLAYER_COLLISION_LAYER, [Dude.NPC_COLLISION_LAYER]],
         ]))
 
         // Initialize singletons
