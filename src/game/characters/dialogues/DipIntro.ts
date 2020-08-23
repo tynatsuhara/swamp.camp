@@ -51,7 +51,7 @@ export const DIP_INTRO_DIALOGUE: { [key: number]: () => DialogueInstance } = {
             return dialogue(lines, () => {  // TODO actually decide what should happen here
                 inv().addItem(Item.TENT)
                 EventQueue.instance.addEvent({
-                    type: QueuedEventType.TRADER_ARRIVAL,
+                    type: QueuedEventType.HERALD_ARRIVAL,
                     time: WorldTime.instance.future({ minutes: 10 })
                 })
                 saveAfterDialogueStage()

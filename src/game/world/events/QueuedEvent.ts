@@ -3,7 +3,8 @@ import { MapGenerator } from "../MapGenerator"
 import { LocationManager } from "../LocationManager"
 
 export enum QueuedEventType {
-    TRADER_ARRIVAL
+    HERALD_ARRIVAL,
+    HERALD_RETURN_WITH_NPC
 }
 
 export type QueuedEventData = {
@@ -13,7 +14,7 @@ export type QueuedEventData = {
 }
 
 export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => void } = {
-    [QueuedEventType.TRADER_ARRIVAL]: () => {
+    [QueuedEventType.HERALD_ARRIVAL]: () => {
         DudeFactory.instance.new(DudeType.HERALD, MapGenerator.ENTER_LAND_POS, LocationManager.instance.exterior())
         console.log("the trader is here (ノ ″ロ″)ノ")
     }

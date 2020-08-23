@@ -9,7 +9,7 @@ import { LocationManager } from "./LocationManager"
 import { GroundComponent } from "./ground/GroundComponent"
 import { GroundType, Ground, SavedGround } from "./ground/Ground"
 import { Dude } from "../characters/Dude"
-import { DudeFactory } from "../characters/DudeFactory"
+import { DudeFactory, DudeType } from "../characters/DudeFactory"
 import { Teleporter, Teleporters } from "./Teleporter"
 import { Player } from "../characters/Player"
 import { PointLightMaskRenderer } from "./PointLightMaskRenderer"
@@ -108,6 +108,10 @@ export class WorldLocation {
                 .concat(this.elements.values().map(c => c.entity))
                 .concat(this.ground.values().map(c => c.entity))
                 .concat(Array.from(this.droppedItems))
+    }
+
+    getDude(dudeType: DudeType): Dude {
+        return Array.from(this.dudes.values()).filter(d => d.type === dudeType)[0]
     }
 
     save(): LocationSaveState {

@@ -2,6 +2,9 @@ import { DialogueInstance, Dialogue, dialogue, NextDialogue, dialogueWithOptions
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { SellMenu, SalePackage } from "../../ui/SellMenu"
 import { Item } from "../../items/Items"
+import { WorldLocation } from "../../world/WorldLocation"
+import { LocationManager } from "../../world/LocationManager"
+import { DudeType } from "../DudeFactory"
 
 const getItemsToSell = (): SalePackage[] => {
     return [{
@@ -23,6 +26,11 @@ const getItemsToSell = (): SalePackage[] => {
 
 const getGreeting = () => {
     return "Tally ho!"
+}
+
+const bertoDepart = () => {
+    const berto = LocationManager.instance.exterior().getDude(DudeType.HERALD)
+    berto.
 }
 
 export const BERTO_INTRO_DIALOGUE: { [key: number]: () => DialogueInstance } = {

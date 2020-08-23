@@ -4573,11 +4573,12 @@ System.register("game/world/events/QueuedEvent", ["game/characters/DudeFactory",
         ],
         execute: function () {
             (function (QueuedEventType) {
-                QueuedEventType[QueuedEventType["TRADER_ARRIVAL"] = 0] = "TRADER_ARRIVAL";
+                QueuedEventType[QueuedEventType["HERALD_ARRIVAL"] = 0] = "HERALD_ARRIVAL";
+                QueuedEventType[QueuedEventType["HERALD_RETURN_WITH_NPC"] = 1] = "HERALD_RETURN_WITH_NPC";
             })(QueuedEventType || (QueuedEventType = {}));
             exports_58("QueuedEventType", QueuedEventType);
             exports_58("EVENT_QUEUE_HANDLERS", EVENT_QUEUE_HANDLERS = (_a = {},
-                _a[QueuedEventType.TRADER_ARRIVAL] = function () {
+                _a[QueuedEventType.HERALD_ARRIVAL] = function () {
                     DudeFactory_1.DudeFactory.instance.new(4 /* HERALD */, MapGenerator_2.MapGenerator.ENTER_LAND_POS, LocationManager_7.LocationManager.instance.exterior());
                     console.log("the trader is here (ノ ″ロ″)ノ");
                 },
@@ -5243,7 +5244,7 @@ System.register("game/characters/dialogues/DipIntro", ["game/characters/Dialogue
                         return Dialogue_1.dialogue(lines, function () {
                             Dialogue_1.inv().addItem(3 /* TENT */);
                             EventQueue_3.EventQueue.instance.addEvent({
-                                type: QueuedEvent_2.QueuedEventType.TRADER_ARRIVAL,
+                                type: QueuedEvent_2.QueuedEventType.HERALD_ARRIVAL,
                                 time: WorldTime_2.WorldTime.instance.future({ minutes: 10 })
                             });
                             Dialogue_1.saveAfterDialogueStage();
@@ -8009,7 +8010,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     _this.awake = function () {
                         _this.dude = _this.entity.getComponent(Dude_4.Dude);
                         if (!_this.dude.blob[NPCSchedule_1.NPCSchedules.SCHEDULE_KEY]) {
-                            _this.dude.blob[NPCSchedule_1.NPCSchedules.SCHEDULE_KEY] = defaultSchedule;
+                            _this.setSchedule(defaultSchedule);
                         }
                     };
                     return _this;
@@ -8070,6 +8071,9 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     else if (schedule.type === 1 /* GO_TO_SPOT */) {
                         this.forceMoveToTilePosition(point_54.Point.fromString(schedule["p"]));
                     }
+                };
+                NPC.prototype.setSchedule = function (schedule) {
+                    this.dude.blob[NPCSchedule_1.NPCSchedules.SCHEDULE_KEY] = schedule;
                 };
                 NPC.prototype.getSchedule = function () {
                     var schedule = this.dude.blob[NPCSchedule_1.NPCSchedules.SCHEDULE_KEY];
@@ -8781,6 +8785,9 @@ System.register("game/world/WorldLocation", ["engine/util/Grid", "game/saves/uui
                         .concat(this.elements.values().map(function (c) { return c.entity; }))
                         .concat(this.ground.values().map(function (c) { return c.entity; }))
                         .concat(Array.from(this.droppedItems));
+                };
+                WorldLocation.prototype.getDude = function (dudeType) {
+                    return Array.from(this.dudes.values()).filter(function (d) { return d.type === dudeType; })[0];
                 };
                 WorldLocation.prototype.save = function () {
                     return {
