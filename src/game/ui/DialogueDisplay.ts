@@ -38,10 +38,11 @@ export class DialogueDisplay extends Component {
             return
         }
 
-        if (updateData.input.isKeyDown(Controls.closeButton)) {
-            this.close()
-            return
-        }
+        // We don't allow the user to close dialogue because it might end up in a weird state
+        // if (updateData.input.isKeyDown(Controls.closeButton)) {
+        //     this.close()
+        //     return
+        // }
 
         const showOptions = this.dialogue.options.length > 0 && this.lineIndex === this.dialogue.lines.length-1
 
