@@ -29,7 +29,7 @@ export class NPC extends Component {
         this.awake = () => {
             this.dude = this.entity.getComponent(Dude)
             if (!this.dude.blob[NPCSchedules.SCHEDULE_KEY]) {
-                this.dude.blob[NPCSchedules.SCHEDULE_KEY] = defaultSchedule
+                this.setSchedule(defaultSchedule)
             }
         }
     }
@@ -97,6 +97,10 @@ export class NPC extends Component {
         } else if (schedule.type === NPCScheduleType.GO_TO_SPOT) {
             this.forceMoveToTilePosition(Point.fromString(schedule["p"]))
         }
+    }
+
+    setSchedule(schedule) {
+        this.dude.blob[NPCSchedules.SCHEDULE_KEY] = schedule
     }
 
     private getSchedule(): NPCSchedule {
