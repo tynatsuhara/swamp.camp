@@ -8,6 +8,9 @@ import { DudeType } from "../DudeFactory"
 import { NPC } from "../NPC"
 import { NPCSchedules } from "../NPCSchedule"
 import { MapGenerator } from "../../world/MapGenerator"
+import { EventQueue } from "../../world/events/EventQueue"
+import { QueuedEventType } from "../../world/events/QueuedEvent"
+import { WorldTime } from "../../world/WorldTime"
 
 const getItemsToSell = (): SalePackage[] => {
     return [{
@@ -29,12 +32,6 @@ const getItemsToSell = (): SalePackage[] => {
 
 const getGreeting = () => {
     return "Tally ho!"
-}
-
-const bertoDepart = () => {
-    // TODO make this an event that keeps re-secheduling until he successfully departs
-    const berto = LocationManager.instance.exterior().getDude(DudeType.HERALD)
-    berto.entity.getComponent(NPC).setSchedule(NPCSchedules.newGoToSchedule(MapGenerator.ENTER_LAND_POS))
 }
 
 export const BERTO_INTRO_DIALOGUE: { [key: number]: () => DialogueInstance } = {
@@ -69,7 +66,10 @@ export const BERTO_INTRO_DIALOGUE: { [key: number]: () => DialogueInstance } = {
         "Shall I return to The Kingdom, bringing word that thou art requesting a settler?"],
         DudeInteractIndicator.NONE,
         new DialogueOption("Bring me a criminal.", () => {
-            bertoDepart()
+            EventQueue.instance.addEvent({
+                type: QueuedEventType.HERALD_DEPARTURE,
+                time: WorldTime.instance.time
+            })
             return new NextDialogue(Dialogue.BERT_MENU_INTRO, false)
         }),
         option("Never mind.", Dialogue.BERT_MENU_INTRO, false)

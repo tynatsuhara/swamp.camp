@@ -103,7 +103,7 @@ export class NPC extends Component {
         this.dude.blob[NPCSchedules.SCHEDULE_KEY] = schedule
     }
 
-    private getSchedule(): NPCSchedule {
+    getSchedule(): NPCSchedule {
         const schedule: NPCSchedule = this.dude.blob[NPCSchedules.SCHEDULE_KEY]
         if (!schedule) {
             throw new Error(`NPCs must have a "${NPCSchedules.SCHEDULE_KEY}" field in the blob. It's possible it got overwritten.`)
