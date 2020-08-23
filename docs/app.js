@@ -5525,7 +5525,7 @@ System.register("game/ui/SellMenu", ["engine/Entity", "engine/component", "engin
 });
 System.register("game/characters/dialogues/BertoIntro", ["game/characters/Dialogue", "game/ui/DudeInteractIndicator", "game/ui/SellMenu"], function (exports_69, context_69) {
     "use strict";
-    var _a, Dialogue_2, DudeInteractIndicator_2, SellMenu_1, getItemsToSell, BERTO_INTRO_DIALOGUE;
+    var _a, Dialogue_2, DudeInteractIndicator_2, SellMenu_1, getItemsToSell, getGreeting, BERTO_INTRO_DIALOGUE;
     var __moduleName = context_69 && context_69.id;
     return {
         setters: [
@@ -5557,17 +5557,27 @@ System.register("game/characters/dialogues/BertoIntro", ["game/characters/Dialog
                         price: 20,
                     }];
             };
+            getGreeting = function () {
+                return "Tally ho!";
+            };
             exports_69("BERTO_INTRO_DIALOGUE", BERTO_INTRO_DIALOGUE = (_a = {},
                 _a[8 /* BERT_0 */] = function () { return Dialogue_2.dialogueWithOptions(["Good morrow! I, Sir Berto of Dube, present myself unto thee as an emissary of The Honourable King Bob XVIII.",
-                    "Should thy choose to collect raw materials, I will purchase them on behalf of the kingdom.",
+                    "Should thy choose to collect raw materials, I will purchase them on behalf of The Kingdom.",
                     "Upon receipt of a fee and construction of an appropriate dwelling, I can also bring tax-paying subjects to populate thy settlement.",
                     "Tradesmen! Knights! Worthless peons to scrub latrines and polish thy armor!",
-                    "Art thou interested in any of my services at the moment?"], DudeInteractIndicator_2.DudeInteractIndicator.IMPORTANT_DIALOGUE, Dialogue_2.option("Sure!", 9 /* BERT_MENU */, true), Dialogue_2.option("Maybe later.", 9 /* BERT_MENU */, false)); },
-                _a[9 /* BERT_MENU */] = function () { return Dialogue_2.dialogueWithOptions(["Tally-ho! How shall I assist thee?"], DudeInteractIndicator_2.DudeInteractIndicator.NONE, new Dialogue_2.DialogueOption("What are you buying?", function () {
+                    "Art thou interested in any of my services at the moment?"], DudeInteractIndicator_2.DudeInteractIndicator.IMPORTANT_DIALOGUE, Dialogue_2.option("Sure!", 9 /* BERT_MENU */, true), Dialogue_2.option("Maybe later.", 10 /* BERT_MENU_INTRO */, false)); },
+                _a[10 /* BERT_MENU_INTRO */] = function () { return Dialogue_2.dialogue([getGreeting()], function () { return new Dialogue_2.NextDialogue(9 /* BERT_MENU */, true); }); },
+                _a[9 /* BERT_MENU */] = function () { return Dialogue_2.dialogueWithOptions(["How shall I assist thee?"], DudeInteractIndicator_2.DudeInteractIndicator.NONE, new Dialogue_2.DialogueOption("What are you buying?", function () {
                     SellMenu_1.SellMenu.instance.show(getItemsToSell());
-                    console.log("show menu");
-                    return new Dialogue_2.NextDialogue(9 /* BERT_MENU */, false);
-                }), Dialogue_2.option("Never mind.", 9 /* BERT_MENU */, false)); },
+                    return new Dialogue_2.NextDialogue(10 /* BERT_MENU_INTRO */, false);
+                }), new Dialogue_2.DialogueOption("We need a new settler.", function () {
+                    return new Dialogue_2.NextDialogue(11 /* BERT_VILLAGERS */, true);
+                }), Dialogue_2.option("Never mind.", 10 /* BERT_MENU_INTRO */, false)); },
+                _a[11 /* BERT_VILLAGERS */] = function () { return Dialogue_2.dialogueWithOptions(["At present, only felonious peons can be spared by The King.",
+                    "Shall I return to The Kingdom, bringing word that thou art requesting a settler?"], DudeInteractIndicator_2.DudeInteractIndicator.NONE, new Dialogue_2.DialogueOption("Bring me a criminal.", function () {
+                    console.log("TODO schedule arrival");
+                    return new Dialogue_2.NextDialogue(10 /* BERT_MENU_INTRO */, false);
+                }), Dialogue_2.option("Never mind.", 10 /* BERT_MENU_INTRO */, false)); },
                 _a));
         }
     };
@@ -5871,7 +5881,7 @@ System.register("game/world/elements/Campfire", ["engine/component", "engine/til
                 __extends(Campfire, _super);
                 function Campfire(logs, lastLogConsumedTime, updateFire) {
                     var _this = _super.call(this) || this;
-                    _this.dialogue = 10 /* CAMPFIRE */;
+                    _this.dialogue = 12 /* CAMPFIRE */;
                     _this.logs = logs;
                     _this.lastLogConsumedTime = lastLogConsumedTime;
                     _this.updateFire = updateFire;
@@ -5928,7 +5938,7 @@ System.register("game/characters/dialogues/ItemDialogues", ["game/characters/Dia
         ],
         execute: function () {
             exports_72("ITEM_DIALOGUES", ITEM_DIALOGUES = (_a = {},
-                _a[10 /* CAMPFIRE */] = function () {
+                _a[12 /* CAMPFIRE */] = function () {
                     // the fire can be dead, almost dead, partially full, almost entirely full, or totally full
                     var cf = DialogueDisplay_2.DialogueDisplay.instance.dialogueSource;
                     var logCount = cf.logs;
@@ -5938,7 +5948,7 @@ System.register("game/characters/dialogues/ItemDialogues", ["game/characters/Dia
                         return function () {
                             Player_9.Player.instance.dude.inventory.removeItem(2 /* WOOD */, logsTransferred);
                             cf.addLogs(logsTransferred);
-                            return new Dialogue_3.NextDialogue(10 /* CAMPFIRE */, false);
+                            return new Dialogue_3.NextDialogue(12 /* CAMPFIRE */, false);
                         };
                     };
                     var cancelText = "Leave";
@@ -6256,10 +6266,11 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
                     if (!this.dialogue) {
                         return;
                     }
-                    if (updateData.input.isKeyDown(Controls_4.Controls.closeButton)) {
-                        this.close();
-                        return;
-                    }
+                    // We don't allow the user to close dialogue because it might end up in a weird state
+                    // if (updateData.input.isKeyDown(Controls.closeButton)) {
+                    //     this.close()
+                    //     return
+                    // }
                     var showOptions = this.dialogue.options.length > 0 && this.lineIndex === this.dialogue.lines.length - 1;
                     if (this.letterTicker !== 0 && (updateData.input.isMouseDown || updateData.input.isKeyDown(Controls_4.Controls.interactButton))) {
                         if (this.finishedPrinting) {
@@ -10450,6 +10461,7 @@ System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uu
         }
     };
 });
+// TODO
 System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point"], function (exports_122, context_122) {
     "use strict";
     var component_35, Tilesets_41, TileTransform_27, point_67, StringTiles;
