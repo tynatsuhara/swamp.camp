@@ -33,7 +33,6 @@ export const Color = {
 
     /**
      * @param colorString A string from the Color object
-     * @param a alpha double 0-1
      */
     getRGB: (colorString: string): number[] => {
         const noHash = colorString.replace("#", "")
