@@ -10,10 +10,12 @@ html, body {
 
 #column {
     margin: auto;
+
+    /* full window size */
     width: 100%;
     height: 100%;
 
-    /* Comment out the following lines to fill the whole window */
+    /* small window */
     /* margin-top: 40px;
     width: 1000px;
     height: 800px; */

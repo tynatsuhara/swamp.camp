@@ -4,7 +4,7 @@ import { Point } from "../../../engine/point"
 
 /**
  * A component that all world space entities should have in order to be saveable.
- * Elements should no subclass this, 
+ * Elements should not subclass this.
  */
 export class ElementComponent extends Component {
 

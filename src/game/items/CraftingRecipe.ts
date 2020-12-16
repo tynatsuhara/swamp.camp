@@ -39,5 +39,8 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => [{
     recipes: [{
         output: Item.TENT,
         input: [new ItemStack(Item.WOOD, 5)],
+    }, {
+        output: Item.HOUSE,
+        input: [new ItemStack(Item.ROCK, 5), new ItemStack(Item.WOOD, 5)],
     }],
 }]

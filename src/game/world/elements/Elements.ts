@@ -6,6 +6,7 @@ import { ElementComponent } from "./ElementComponent"
 import { makeTent } from "./Tent"
 import { makeCampfire } from "./Campfire"
 import { makeTeleporterElement } from "../Teleporter"
+import { makeHouse } from "./House"
 
 // Elements are things which take up multiple squares in the non-ground ground
 export const enum ElementType {
@@ -13,7 +14,8 @@ export const enum ElementType {
     ROCK,
     TENT,
     CAMPFIRE,
-    TELEPORTER
+    TELEPORTER,
+    HOUSE
 }
 
 export class SavedElement {
@@ -25,7 +27,8 @@ export class SavedElement {
 export class Elements {
     static instance: Elements
 
-    /**
+    /*
+    * Tuples of [makeFunction, dimensionsForPlacing]
     * Each of these functions should return an ElementComponent with a nonnull entity
     * The functions should NOT explicitly add the entity to the given locations, the location should be read-only.
     * Instead, they should add the occupied points to the occupiedPoints array of the ElementComponent
@@ -38,6 +41,7 @@ export class Elements {
        [ElementType.TENT]: [makeTent, new Point(4, 3)],
        [ElementType.CAMPFIRE]: [makeCampfire, new Point(1, 1)],
        [ElementType.TELEPORTER]: [makeTeleporterElement, new Point(1, 1)],
+       [ElementType.HOUSE]: [makeHouse, new Point(5, 4)],
    }
 
     make(type: ElementType, wl: WorldLocation, pos: Point, data: object) {

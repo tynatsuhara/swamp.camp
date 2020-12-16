@@ -49,12 +49,14 @@ export class NPC extends Component {
          * otherwise execute a "standard routine" which can be defined by the controller (TODO)
          */
 
+        // clear their attack target if the target has died
         if (!!this.attackTarget && !this.attackTarget.isAlive) {
-            this.attackTarget = null  // no need to attack a dead dude
+            this.attackTarget = null
             this.targetPath = null
         }
 
         if (DialogueDisplay.instance.dialogueSource === this.dude) {
+            // don't move when talking
             this.dude.move(updateData, Point.ZERO, Player.instance.dude.standingPosition.x - this.dude.standingPosition.x)
         } else if (this.enemiesPresent) {
             if (!!this.attackTarget) {

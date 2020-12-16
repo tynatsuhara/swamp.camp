@@ -19,7 +19,6 @@ import { TEXT_FONT, TEXT_SIZE } from "./Text"
 import { Color } from "./Color"
 import { Controls } from "../Controls"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
-import { WeaponType } from "../characters/Weapon"
 
 export class InventoryDisplay extends Component {
 
