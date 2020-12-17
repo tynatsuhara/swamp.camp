@@ -56,6 +56,8 @@ export class QuestGame extends Game {
     }
 
     newGame() {
+        // TODO add main menu
+
         new LocationManager()
         new WorldTime(WorldTime.HOUR * 19.5)
         new EventQueue()

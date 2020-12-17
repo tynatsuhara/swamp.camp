@@ -7488,6 +7488,7 @@ System.register("game/world/elements/House", ["engine/point", "game/graphics/Til
                     var el = e.addComponent(new TileComponent_8.TileComponent(tile, new TileTransform_21.TileTransform(pos.times(Tilesets_28.TILE_SIZE))));
                     el.transform.depth = depth;
                 };
+                // flat roof
                 var flatRoofTopLeft = new point_50.Point(6, 0);
                 addTile(flatRoofTopLeft.plusX(1), pos);
                 addTile(flatRoofTopLeft.plusX(2), pos.plusX(1));
@@ -7495,9 +7496,14 @@ System.register("game/world/elements/House", ["engine/point", "game/graphics/Til
                 addTile(flatRoofTopLeft.plusY(2).plusX(1), pos.plusY(1));
                 addTile(flatRoofTopLeft.plusY(2).plusX(2), pos.plusY(1).plusX(1));
                 addTile(flatRoofTopLeft.plusY(2).plusX(3), pos.plusY(1).plusX(2));
-                addTile(new point_50.Point(7, 5), pos.plusY(2));
+                // door
                 addTile(new point_50.Point(7, 6), pos.plusY(2).plusX(1));
+                // no windows
+                addTile(new point_50.Point(7, 5), pos.plusY(2));
                 addTile(new point_50.Point(9, 5), pos.plusY(2).plusX(2));
+                // alternative with windows
+                // addTile(new Point(5, 6), pos.plusY(2))
+                // addTile(new Point(6, 6), pos.plusY(2).plusX(2))
                 e.addComponent(new BoxCollider_7.BoxCollider(pos.plus(new point_50.Point(0, 1)).times(Tilesets_28.TILE_SIZE), new point_50.Point(Tilesets_28.TILE_SIZE * 3, Tilesets_28.TILE_SIZE * 2)));
                 // Set up teleporter
                 // e.addComponent(new Interactable(interactablePos, () => wl.useTeleporter(destinationUUID), new Point(1, -TILE_SIZE*1.4)))
@@ -10327,6 +10333,7 @@ System.register("game/quest_game", ["engine/point", "engine/game", "game/world/M
                     }
                 };
                 QuestGame.prototype.newGame = function () {
+                    // TODO add main menu
                     new LocationManager_20.LocationManager();
                     new WorldTime_7.WorldTime(WorldTime_7.WorldTime.HOUR * 19.5);
                     new EventQueue_6.EventQueue();

@@ -39,17 +39,25 @@ export const makeHouse = (wl: WorldLocation, pos: Point, data: object): ElementC
         el.transform.depth = depth
     }
 
+    // flat roof
     const flatRoofTopLeft = new Point(6, 0)
-
     addTile(flatRoofTopLeft.plusX(1), pos)
     addTile(flatRoofTopLeft.plusX(2), pos.plusX(1))
     addTile(flatRoofTopLeft.plusX(3), pos.plusX(2))
     addTile(flatRoofTopLeft.plusY(2).plusX(1), pos.plusY(1))
     addTile(flatRoofTopLeft.plusY(2).plusX(2), pos.plusY(1).plusX(1))
     addTile(flatRoofTopLeft.plusY(2).plusX(3), pos.plusY(1).plusX(2))
-    addTile(new Point(7, 5), pos.plusY(2))
+
+    // door
     addTile(new Point(7, 6), pos.plusY(2).plusX(1))
+
+    // no windows
+    addTile(new Point(7, 5), pos.plusY(2))
     addTile(new Point(9, 5), pos.plusY(2).plusX(2))
+
+    // alternative with windows
+    // addTile(new Point(5, 6), pos.plusY(2))
+    // addTile(new Point(6, 6), pos.plusY(2).plusX(2))
 
     e.addComponent(new BoxCollider(pos.plus(new Point(0, 1)).times(TILE_SIZE), new Point(TILE_SIZE*3, TILE_SIZE*2)))
 
