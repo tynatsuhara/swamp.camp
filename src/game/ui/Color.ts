@@ -32,9 +32,6 @@ export const enum Color {
     DARK_BROWN = "#483b3ai",
 }
 
-/**
- * @param colorString A string from the Color object
- */
 export const getRGB = (color: Color): number[] => {
     const noHash = color.replace("#", "")
     const r = parseInt(noHash.substring(0, 2), 16)

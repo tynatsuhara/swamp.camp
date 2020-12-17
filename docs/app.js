@@ -4020,9 +4020,6 @@ System.register("game/ui/Color", [], function (exports_53, context_53) {
     return {
         setters: [],
         execute: function () {
-            /**
-             * @param colorString A string from the Color object
-             */
             exports_53("getRGB", getRGB = function (color) {
                 var noHash = color.replace("#", "");
                 var r = parseInt(noHash.substring(0, 2), 16);
