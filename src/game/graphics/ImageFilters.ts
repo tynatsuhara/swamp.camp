@@ -1,13 +1,13 @@
-import { Color } from "../ui/Color"
+import { Color, getRGB } from "../ui/Color"
 import { Point } from "../../engine/point"
 
 export const ImageFilters = {
     /**
      * any oldColor pixels will be set to newColor
      */
-    recolor: (oldColor: string, newColor: string) => {
-        const rgbOld = Color.getRGB(oldColor)
-        const rgbNew = Color.getRGB(newColor)
+    recolor: (oldColor: Color, newColor: Color) => {
+        const rgbOld = getRGB(oldColor)
+        const rgbNew = getRGB(newColor)
         return (img: ImageData) => {
             const d = img.data
             for (let i = 0; i < img.data.length; i+=4) {
@@ -23,8 +23,8 @@ export const ImageFilters = {
     /**
      * recolors all opaque pixels the given color
      */
-    tint: (color: string) => {
-        const rgb = Color.getRGB(color)
+    tint: (color: Color) => {
+        const rgb = getRGB(color)
         return (img: ImageData) => {
             for (let i = 0; i < img.data.length; i+=4) {
                 if (img.data[i+3] !== 0) {

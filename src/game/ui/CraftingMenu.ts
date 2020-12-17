@@ -184,7 +184,7 @@ export class CraftingMenu extends Component {
             // craftable item
             verticalOffset += margin
             const plainIcon = this.getItemIcon(recipe.output)
-            let craftedItemColor: string
+            let craftedItemColor: Color
             if (hovered) {
                 if (r === this.justCraftedRow) {
                     craftedItemColor = Color.DARK_RED
@@ -269,7 +269,7 @@ export class CraftingMenu extends Component {
         return icon
     }
 
-    private tintedIcon(icon: StaticTileSource, tint: string): StaticTileSource {
+    private tintedIcon(icon: StaticTileSource, tint: Color): StaticTileSource {
         if (tint === Color.WHITE) {
             return icon
         }

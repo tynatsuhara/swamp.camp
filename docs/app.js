@@ -4015,60 +4015,27 @@ System.register("engine/tiles/NineSlice", ["engine/point", "engine/tiles/TileTra
 });
 System.register("game/ui/Color", [], function (exports_53, context_53) {
     "use strict";
-    var Color;
+    var getRGB;
     var __moduleName = context_53 && context_53.id;
     return {
         setters: [],
         execute: function () {
-            exports_53("Color", Color = {
-                BLACK: "#222222",
-                DARK_DARK_PINK: "#5f2d56",
-                DARK_PINK: "#993970",
-                PINK: "#dc4a7b",
-                LIGHT_PINK: "#f78697",
-                RED: "#9f294e",
-                DARK_RED: "#62232f",
-                DARK_ORANGE: "#8f4029",
-                ORANGE: "#c56025",
-                LIGHT_ORANGE: "#ee8e2e",
-                FLESH: "#fccba3",
-                SUPER_ORANGE: "#da4e38",
-                YELLOW: "#facb3e",
-                LIME: "#97da3f",
-                GREEN: "#4ba747",
-                DARK_GREEN: "#3d734f",
-                DARK_DARK_BLUE: "#314152",
-                DARK_BLUE: "#417089",
-                TEAL: "#49a790",
-                BRIGHT_BLUE: "#72d6ce",
-                LIGHT_BLUE: "#5698cc",
-                PURPLE: "#5956bd",
-                DARK_PURPLE: "#473579",
-                DARK_PINKLE: "#8156aa",
-                PINKLE: "#c278d0",
-                LIGHT_PINKLE: "#f0b3dd",
-                WHITE: "#fdf7ed",
-                TAN: "#d3bfa9",
-                LIGHT_BROWN: "#aa8d7a",
-                BROWN: "#775c55",
-                DARK_BROWN: "#483b3ai",
-                /**
-                 * @param colorString A string from the Color object
-                 */
-                getRGB: function (colorString) {
-                    var noHash = colorString.replace("#", "");
-                    var r = parseInt(noHash.substring(0, 2), 16);
-                    var g = parseInt(noHash.substring(2, 4), 16);
-                    var b = parseInt(noHash.substring(4, 6), 16);
-                    return [r, g, b];
-                }
+            /**
+             * @param colorString A string from the Color object
+             */
+            exports_53("getRGB", getRGB = function (color) {
+                var noHash = color.replace("#", "");
+                var r = parseInt(noHash.substring(0, 2), 16);
+                var g = parseInt(noHash.substring(2, 4), 16);
+                var b = parseInt(noHash.substring(4, 6), 16);
+                return [r, g, b];
             });
         }
     };
 });
-System.register("game/ui/Tooltip", ["engine/component", "game/graphics/Tilesets", "engine/point", "engine/renderer/TextRender", "game/ui/Text", "game/ui/Color", "game/ui/UIStateManager"], function (exports_54, context_54) {
+System.register("game/ui/Tooltip", ["engine/component", "game/graphics/Tilesets", "engine/point", "engine/renderer/TextRender", "game/ui/Text", "game/ui/UIStateManager"], function (exports_54, context_54) {
     "use strict";
-    var component_10, Tilesets_8, point_27, TextRender_3, Text_1, Color_1, UIStateManager_1, Tooltip;
+    var component_10, Tilesets_8, point_27, TextRender_3, Text_1, UIStateManager_1, Tooltip;
     var __moduleName = context_54 && context_54.id;
     return {
         setters: [
@@ -4086,9 +4053,6 @@ System.register("game/ui/Tooltip", ["engine/component", "game/graphics/Tilesets"
             },
             function (Text_1_1) {
                 Text_1 = Text_1_1;
-            },
-            function (Color_1_1) {
-                Color_1 = Color_1_1;
             },
             function (UIStateManager_1_1) {
                 UIStateManager_1 = UIStateManager_1_1;
@@ -4143,7 +4107,7 @@ System.register("game/ui/Tooltip", ["engine/component", "game/graphics/Tilesets"
                     if (this.text === null) {
                         return [];
                     }
-                    return [new TextRender_3.TextRender(this.text, this.left.transform.position.plus(Tooltip.textOffset), Text_1.TEXT_SIZE, Text_1.TEXT_FONT, Color_1.Color.DARK_RED, UIStateManager_1.UIStateManager.UI_SPRITE_DEPTH + 2)];
+                    return [new TextRender_3.TextRender(this.text, this.left.transform.position.plus(Tooltip.textOffset), Text_1.TEXT_SIZE, Text_1.TEXT_FONT, "#62232f" /* DARK_RED */, UIStateManager_1.UIStateManager.UI_SPRITE_DEPTH + 2)];
                 };
                 Tooltip.margin = 6;
                 Tooltip.textOffset = new point_27.Point(Tooltip.margin, Tooltip.margin - 1);
@@ -4330,9 +4294,9 @@ System.register("game/ui/PlaceElementDisplay", ["engine/Entity", "engine/compone
         }
     };
 });
-System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point", "engine/util/utils", "game/graphics/Tilesets", "game/characters/Player", "engine/Entity", "game/ui/UIStateManager", "engine/tiles/NineSlice", "game/ui/Tooltip", "engine/tiles/AnimatedTileComponent", "engine/tiles/TileTransform", "engine/renderer/BasicRenderComponent", "engine/renderer/TextRender", "game/items/Items", "game/ui/Text", "game/ui/Color", "game/Controls", "game/ui/PlaceElementDisplay"], function (exports_57, context_57) {
+System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point", "engine/util/utils", "game/graphics/Tilesets", "game/characters/Player", "engine/Entity", "game/ui/UIStateManager", "engine/tiles/NineSlice", "game/ui/Tooltip", "engine/tiles/AnimatedTileComponent", "engine/tiles/TileTransform", "engine/renderer/BasicRenderComponent", "engine/renderer/TextRender", "game/items/Items", "game/ui/Text", "game/Controls", "game/ui/PlaceElementDisplay"], function (exports_57, context_57) {
     "use strict";
-    var component_13, point_29, utils_5, Tilesets_10, Player_5, Entity_6, UIStateManager_3, NineSlice_2, Tooltip_1, AnimatedTileComponent_2, TileTransform_12, BasicRenderComponent_2, TextRender_4, Items_3, Text_2, Color_2, Controls_2, PlaceElementDisplay_2, InventoryDisplay;
+    var component_13, point_29, utils_5, Tilesets_10, Player_5, Entity_6, UIStateManager_3, NineSlice_2, Tooltip_1, AnimatedTileComponent_2, TileTransform_12, BasicRenderComponent_2, TextRender_4, Items_3, Text_2, Controls_2, PlaceElementDisplay_2, InventoryDisplay;
     var __moduleName = context_57 && context_57.id;
     return {
         setters: [
@@ -4380,9 +4344,6 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point",
             },
             function (Text_2_1) {
                 Text_2 = Text_2_1;
-            },
-            function (Color_2_1) {
-                Color_2 = Color_2_1;
             },
             function (Controls_2_1) {
                 Controls_2 = Controls_2_1;
@@ -4522,7 +4483,7 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point",
                     this.displayEntity = new Entity_6.Entity();
                     // coins
                     this.displayEntity.addComponent(new AnimatedTileComponent_2.AnimatedTileComponent([Tilesets_10.Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)], new TileTransform_12.TileTransform(this.offset.plus(this.coinsOffset))));
-                    this.displayEntity.addComponent(new BasicRenderComponent_2.BasicRenderComponent(new TextRender_4.TextRender("x" + this.inventory().getItemCount(0 /* COIN */), new point_29.Point(9, 1).plus(this.offset).plus(this.coinsOffset), Text_2.TEXT_SIZE, Text_2.TEXT_FONT, Color_2.Color.YELLOW, UIStateManager_3.UIStateManager.UI_SPRITE_DEPTH)));
+                    this.displayEntity.addComponent(new BasicRenderComponent_2.BasicRenderComponent(new TextRender_4.TextRender("x" + this.inventory().getItemCount(0 /* COIN */), new point_29.Point(9, 1).plus(this.offset).plus(this.coinsOffset), Text_2.TEXT_SIZE, Text_2.TEXT_FONT, "#facb3e" /* YELLOW */, UIStateManager_3.UIStateManager.UI_SPRITE_DEPTH)));
                     // background
                     this.spawnBG();
                     // icons
@@ -4675,9 +4636,9 @@ System.register("game/world/WorldTime", ["engine/Entity", "engine/component", "g
         }
     };
 });
-System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/renderer/ImageRender", "engine/Entity", "engine/renderer/BasicRenderComponent", "game/cutscenes/Camera", "game/world/MapGenerator", "game/graphics/Tilesets", "engine/util/Grid", "game/ui/UIStateManager", "game/world/WorldTime", "game/ui/Color", "game/world/LocationManager"], function (exports_61, context_61) {
+System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/renderer/ImageRender", "engine/Entity", "engine/renderer/BasicRenderComponent", "game/cutscenes/Camera", "game/world/MapGenerator", "game/graphics/Tilesets", "engine/util/Grid", "game/ui/UIStateManager", "game/world/WorldTime", "game/world/LocationManager"], function (exports_61, context_61) {
     "use strict";
-    var point_30, ImageRender_2, Entity_8, BasicRenderComponent_3, Camera_2, MapGenerator_2, Tilesets_11, Grid_1, UIStateManager_4, WorldTime_1, Color_3, LocationManager_7, PointLightMaskRenderer;
+    var point_30, ImageRender_2, Entity_8, BasicRenderComponent_3, Camera_2, MapGenerator_2, Tilesets_11, Grid_1, UIStateManager_4, WorldTime_1, LocationManager_7, PointLightMaskRenderer;
     var __moduleName = context_61 && context_61.id;
     return {
         setters: [
@@ -4710,9 +4671,6 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
             },
             function (WorldTime_1_1) {
                 WorldTime_1 = WorldTime_1_1;
-            },
-            function (Color_3_1) {
-                Color_3 = Color_3_1;
             },
             function (LocationManager_7_1) {
                 LocationManager_7 = LocationManager_7_1;
@@ -4774,10 +4732,10 @@ System.register("game/world/PointLightMaskRenderer", ["engine/point", "engine/re
                     var hour = (time % WorldTime_1.WorldTime.DAY) / WorldTime_1.WorldTime.HOUR;
                     var timeSoFar = time % WorldTime_1.WorldTime.HOUR;
                     var clamp01 = function (val) { return Math.min(Math.max(val, 0), 1); };
-                    var nightColor = this.colorFromString(Color_3.Color.BLACK, 0.8);
-                    var sunriseColor = this.colorFromString(Color_3.Color.PINK, 0.2);
-                    var dayColor = this.colorFromString(Color_3.Color.LIGHT_PINK, 0);
-                    var sunsetColor = this.colorFromString(Color_3.Color.DARK_PURPLE, 0.2);
+                    var nightColor = this.colorFromString("#222222" /* BLACK */, 0.8);
+                    var sunriseColor = this.colorFromString("#dc4a7b" /* PINK */, 0.2);
+                    var dayColor = this.colorFromString("#f78697" /* LIGHT_PINK */, 0);
+                    var sunsetColor = this.colorFromString("#473579" /* DARK_PURPLE */, 0.2);
                     var transitionTime = WorldTime_1.WorldTime.HOUR;
                     // TODO: make these transitions quicker
                     if (hour >= 5 && hour < 6) {
@@ -5472,12 +5430,12 @@ System.register("game/items/CraftingRecipe", ["game/items/Inventory", "game/grap
 });
 System.register("game/graphics/ImageFilters", ["game/ui/Color", "engine/point"], function (exports_68, context_68) {
     "use strict";
-    var Color_4, point_34, ImageFilters;
+    var Color_1, point_34, ImageFilters;
     var __moduleName = context_68 && context_68.id;
     return {
         setters: [
-            function (Color_4_1) {
-                Color_4 = Color_4_1;
+            function (Color_1_1) {
+                Color_1 = Color_1_1;
             },
             function (point_34_1) {
                 point_34 = point_34_1;
@@ -5489,8 +5447,8 @@ System.register("game/graphics/ImageFilters", ["game/ui/Color", "engine/point"],
                  * any oldColor pixels will be set to newColor
                  */
                 recolor: function (oldColor, newColor) {
-                    var rgbOld = Color_4.Color.getRGB(oldColor);
-                    var rgbNew = Color_4.Color.getRGB(newColor);
+                    var rgbOld = Color_1.getRGB(oldColor);
+                    var rgbNew = Color_1.getRGB(newColor);
                     return function (img) {
                         var d = img.data;
                         for (var i = 0; i < img.data.length; i += 4) {
@@ -5506,7 +5464,7 @@ System.register("game/graphics/ImageFilters", ["game/ui/Color", "engine/point"],
                  * recolors all opaque pixels the given color
                  */
                 tint: function (color) {
-                    var rgb = Color_4.Color.getRGB(color);
+                    var rgb = Color_1.getRGB(color);
                     return function (img) {
                         for (var i = 0; i < img.data.length; i += 4) {
                             if (img.data[i + 3] !== 0) {
@@ -5536,9 +5494,9 @@ System.register("game/graphics/ImageFilters", ["game/ui/Color", "engine/point"],
         }
     };
 });
-System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "engine/point", "game/ui/Color", "engine/renderer/BasicRenderComponent", "game/cutscenes/Camera", "engine/tiles/NineSlice", "game/graphics/Tilesets", "engine/renderer/ImageRender", "game/ui/UIStateManager", "game/items/Items", "game/ui/Text", "engine/tiles/TileTransform", "game/graphics/ImageFilters", "game/characters/Player", "engine/util/utils", "game/ui/Tooltip"], function (exports_69, context_69) {
+System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "engine/point", "engine/renderer/BasicRenderComponent", "game/cutscenes/Camera", "engine/tiles/NineSlice", "game/graphics/Tilesets", "engine/renderer/ImageRender", "game/ui/UIStateManager", "game/items/Items", "game/ui/Text", "engine/tiles/TileTransform", "game/graphics/ImageFilters", "game/characters/Player", "engine/util/utils", "game/ui/Tooltip"], function (exports_69, context_69) {
     "use strict";
-    var Entity_9, component_16, point_35, Color_5, BasicRenderComponent_4, Camera_4, NineSlice_3, Tilesets_16, ImageRender_3, UIStateManager_6, Items_4, Text_3, TileTransform_13, ImageFilters_1, Player_8, utils_6, Tooltip_2, CraftingMenu;
+    var Entity_9, component_16, point_35, BasicRenderComponent_4, Camera_4, NineSlice_3, Tilesets_16, ImageRender_3, UIStateManager_6, Items_4, Text_3, TileTransform_13, ImageFilters_1, Player_8, utils_6, Tooltip_2, CraftingMenu;
     var __moduleName = context_69 && context_69.id;
     return {
         setters: [
@@ -5550,9 +5508,6 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
             },
             function (point_35_1) {
                 point_35 = point_35_1;
-            },
-            function (Color_5_1) {
-                Color_5 = Color_5_1;
             },
             function (BasicRenderComponent_4_1) {
                 BasicRenderComponent_4 = BasicRenderComponent_4_1;
@@ -5661,7 +5616,7 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
                         var dims = new point_35.Point(2, 2);
                         var hovered = utils_6.rectContains(pos, dims.times(Tilesets_16.TILE_SIZE), updateData.input.mousePos);
                         result.push.apply(result, NineSlice_3.NineSlice.makeNineSliceComponents(Tilesets_16.Tilesets.instance.oneBit.getNineSlice("invBoxNW"), pos, dims));
-                        var icon = i === this.recipeCategory || hovered ? category.icon : this.tintedIcon(category.icon, Color_5.Color.PINK);
+                        var icon = i === this.recipeCategory || hovered ? category.icon : this.tintedIcon(category.icon, "#dc4a7b" /* PINK */);
                         result.push(icon.toComponent(new TileTransform_13.TileTransform(topLeft.plusX(i * Tilesets_16.TILE_SIZE * 2 + Tilesets_16.TILE_SIZE / 2).plusY(Tilesets_16.TILE_SIZE / 2))));
                         if (!this.justOpened && hovered && updateData.input.isMouseDown) {
                             this.selectCategory(i);
@@ -5686,7 +5641,7 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
                     // draw background
                     var backgroundTiles = NineSlice_3.NineSlice.makeStretchedNineSliceComponents(Tilesets_16.Tilesets.instance.outdoorTiles.getNineSlice("invBoxFrame"), topLeft, this.dimensions);
                     backgroundTiles[0].transform.depth = UIStateManager_6.UIStateManager.UI_SPRITE_DEPTH;
-                    this.context.fillStyle = Color_5.Color.RED;
+                    this.context.fillStyle = "#9f294e" /* RED */;
                     this.context.fillRect(0, 0, this.innerDimensions.x, this.innerDimensions.y);
                     var width = this.innerDimensions.x;
                     var margin = 4;
@@ -5727,14 +5682,14 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
                         var craftedItemColor = void 0;
                         if (hovered) {
                             if (r === this.justCraftedRow) {
-                                craftedItemColor = Color_5.Color.DARK_RED;
+                                craftedItemColor = "#62232f" /* DARK_RED */;
                             }
                             else {
-                                craftedItemColor = Color_5.Color.WHITE;
+                                craftedItemColor = "#fdf7ed" /* WHITE */;
                             }
                         }
                         else {
-                            craftedItemColor = Color_5.Color.PINK;
+                            craftedItemColor = "#dc4a7b" /* PINK */;
                         }
                         this.context.fillStyle = craftedItemColor;
                         var craftedItemIcon = this.tintedIcon(plainIcon, craftedItemColor);
@@ -5747,8 +5702,8 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
                             var plainIngredientIcon = this.getItemIcon(ingr.item);
                             var ingredientIcon = plainIngredientIcon;
                             if (Player_8.Player.instance.dude.inventory.getItemCount(ingr.item) < ingr.count) {
-                                this.context.fillStyle = Color_5.Color.DARK_RED;
-                                ingredientIcon = this.tintedIcon(ingredientIcon, Color_5.Color.DARK_RED);
+                                this.context.fillStyle = "#62232f" /* DARK_RED */;
+                                ingredientIcon = this.tintedIcon(ingredientIcon, "#62232f" /* DARK_RED */);
                             }
                             else {
                                 this.context.fillStyle = craftedItemColor;
@@ -5769,7 +5724,7 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
                         }
                         // draw line
                         verticalOffset += (margin + Tilesets_16.TILE_SIZE);
-                        this.context.fillStyle = Color_5.Color.DARK_RED;
+                        this.context.fillStyle = "#62232f" /* DARK_RED */;
                         this.context.fillRect(margin, verticalOffset, this.innerDimensions.x - 2 * margin, 1);
                     }
                     var renderComp = new BasicRenderComponent_4.BasicRenderComponent(new ImageRender_3.ImageRender(this.canvas, point_35.Point.ZERO, this.innerDimensions, innerOffset.plus(topLeft).apply(Math.floor), this.innerDimensions, UIStateManager_6.UIStateManager.UI_SPRITE_DEPTH - 10));
@@ -5788,7 +5743,7 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
                     return icon;
                 };
                 CraftingMenu.prototype.tintedIcon = function (icon, tint) {
-                    if (tint === Color_5.Color.WHITE) {
+                    if (tint === "#fdf7ed" /* WHITE */) {
                         return icon;
                     }
                     var cache = this.tintedIcons.get(tint);
@@ -5911,9 +5866,9 @@ System.register("game/characters/dialogues/DipIntro", ["game/characters/Dialogue
         }
     };
 });
-System.register("game/ui/SellMenu", ["engine/Entity", "engine/component", "engine/point", "game/ui/Color", "engine/renderer/BasicRenderComponent", "game/cutscenes/Camera", "engine/tiles/NineSlice", "game/graphics/Tilesets", "engine/renderer/ImageRender", "game/ui/UIStateManager", "game/items/Items", "game/ui/Text", "game/graphics/ImageFilters", "game/characters/Player", "engine/util/utils", "game/ui/Tooltip", "engine/tiles/AnimatedTileComponent", "engine/tiles/TileTransform", "engine/renderer/TextRender"], function (exports_71, context_71) {
+System.register("game/ui/SellMenu", ["engine/Entity", "engine/component", "engine/point", "engine/renderer/BasicRenderComponent", "game/cutscenes/Camera", "engine/tiles/NineSlice", "game/graphics/Tilesets", "engine/renderer/ImageRender", "game/ui/UIStateManager", "game/items/Items", "game/ui/Text", "game/graphics/ImageFilters", "game/characters/Player", "engine/util/utils", "game/ui/Tooltip", "engine/tiles/AnimatedTileComponent", "engine/tiles/TileTransform", "engine/renderer/TextRender"], function (exports_71, context_71) {
     "use strict";
-    var Entity_10, component_17, point_36, Color_6, BasicRenderComponent_5, Camera_5, NineSlice_4, Tilesets_17, ImageRender_4, UIStateManager_7, Items_5, Text_4, ImageFilters_2, Player_9, utils_7, Tooltip_3, AnimatedTileComponent_3, TileTransform_14, TextRender_5, SellMenu;
+    var Entity_10, component_17, point_36, BasicRenderComponent_5, Camera_5, NineSlice_4, Tilesets_17, ImageRender_4, UIStateManager_7, Items_5, Text_4, ImageFilters_2, Player_9, utils_7, Tooltip_3, AnimatedTileComponent_3, TileTransform_14, TextRender_5, SellMenu;
     var __moduleName = context_71 && context_71.id;
     return {
         setters: [
@@ -5925,9 +5880,6 @@ System.register("game/ui/SellMenu", ["engine/Entity", "engine/component", "engin
             },
             function (point_36_1) {
                 point_36 = point_36_1;
-            },
-            function (Color_6_1) {
-                Color_6 = Color_6_1;
             },
             function (BasicRenderComponent_5_1) {
                 BasicRenderComponent_5 = BasicRenderComponent_5_1;
@@ -6044,13 +5996,13 @@ System.register("game/ui/SellMenu", ["engine/Entity", "engine/component", "engin
                 SellMenu.prototype.renderRecipes = function (updateData, topLeft, items) {
                     var _this = this;
                     var inv = Player_9.Player.instance.dude.inventory;
-                    var coinCountComponent = new BasicRenderComponent_5.BasicRenderComponent(new TextRender_5.TextRender("x" + inv.getItemCount(0 /* COIN */), new point_36.Point(9, 1).plus(topLeft).plus(this.coinsOffset), Text_4.TEXT_SIZE, Text_4.TEXT_FONT, Color_6.Color.YELLOW, UIStateManager_7.UIStateManager.UI_SPRITE_DEPTH));
+                    var coinCountComponent = new BasicRenderComponent_5.BasicRenderComponent(new TextRender_5.TextRender("x" + inv.getItemCount(0 /* COIN */), new point_36.Point(9, 1).plus(topLeft).plus(this.coinsOffset), Text_4.TEXT_SIZE, Text_4.TEXT_FONT, "#facb3e" /* YELLOW */, UIStateManager_7.UIStateManager.UI_SPRITE_DEPTH));
                     this.context.imageSmoothingEnabled = false; // TODO figure out why text is aliased
                     this.context.font = Text_4.TEXT_SIZE + "px '" + Text_4.TEXT_FONT + "'";
                     // draw background
                     var backgroundTiles = NineSlice_4.NineSlice.makeStretchedNineSliceComponents(Tilesets_17.Tilesets.instance.outdoorTiles.getNineSlice("invBoxFrame"), topLeft, this.dimensions);
                     backgroundTiles[0].transform.depth = UIStateManager_7.UIStateManager.UI_SPRITE_DEPTH;
-                    this.context.fillStyle = Color_6.Color.RED;
+                    this.context.fillStyle = "#9f294e" /* RED */;
                     this.context.fillRect(0, 0, this.innerDimensions.x, this.innerDimensions.y);
                     var width = this.innerDimensions.x;
                     var margin = 4;
@@ -6085,17 +6037,17 @@ System.register("game/ui/SellMenu", ["engine/Entity", "engine/component", "engin
                         // craftable item
                         verticalOffset += margin;
                         var plainIcon = this.getItemIcon(sale.item);
-                        var itemColor = Color_6.Color.PINK;
+                        var itemColor = "#dc4a7b" /* PINK */;
                         if (hovered) {
                             if (r === this.justSoldRow) {
-                                itemColor = Color_6.Color.DARK_RED;
+                                itemColor = "#62232f" /* DARK_RED */;
                             }
                             else if (sellable) {
-                                itemColor = Color_6.Color.WHITE;
+                                itemColor = "#fdf7ed" /* WHITE */;
                             }
                         }
                         if (!sellable) {
-                            itemColor = Color_6.Color.DARK_RED;
+                            itemColor = "#62232f" /* DARK_RED */;
                         }
                         this.context.fillStyle = itemColor;
                         var craftedItemIcon = this.tintedIcon(plainIcon, itemColor);
@@ -6104,7 +6056,7 @@ System.register("game/ui/SellMenu", ["engine/Entity", "engine/component", "engin
                         // coinage
                         var offsetFromRight = 0;
                         var coinIcon = this.getItemIcon(0 /* COIN */);
-                        var ingredientIcon = this.tintedIcon(coinIcon, itemColor === Color_6.Color.WHITE ? Color_6.Color.YELLOW : itemColor); // make coin icon yellow on hover
+                        var ingredientIcon = this.tintedIcon(coinIcon, itemColor === "#fdf7ed" /* WHITE */ ? "#facb3e" /* YELLOW */ : itemColor); // make coin icon yellow on hover
                         this.context.fillStyle = itemColor;
                         var countStr = "" + sale.price;
                         offsetFromRight += (countStr.length * Text_4.TEXT_PIXEL_WIDTH + margin);
@@ -6113,7 +6065,7 @@ System.register("game/ui/SellMenu", ["engine/Entity", "engine/component", "engin
                         this.drawIconAt(ingredientIcon, width - offsetFromRight, verticalOffset);
                         // draw line
                         verticalOffset += (margin + Tilesets_17.TILE_SIZE);
-                        this.context.fillStyle = Color_6.Color.DARK_RED;
+                        this.context.fillStyle = "#62232f" /* DARK_RED */;
                         this.context.fillRect(margin, verticalOffset, this.innerDimensions.x - 2 * margin, 1);
                     }
                     var renderComp = new BasicRenderComponent_5.BasicRenderComponent(new ImageRender_4.ImageRender(this.canvas, point_36.Point.ZERO, this.innerDimensions, innerOffset.plus(topLeft).apply(Math.floor), this.innerDimensions, UIStateManager_7.UIStateManager.UI_SPRITE_DEPTH - 10));
@@ -6132,7 +6084,7 @@ System.register("game/ui/SellMenu", ["engine/Entity", "engine/component", "engin
                     return icon;
                 };
                 SellMenu.prototype.tintedIcon = function (icon, tint) {
-                    if (tint === Color_6.Color.WHITE) {
+                    if (tint === "#fdf7ed" /* WHITE */) {
                         return icon;
                     }
                     var cache = this.tintedIcons.get(tint);
@@ -6637,9 +6589,9 @@ System.register("game/ui/ButtonsMenu", ["engine/point", "game/ui/TextButton", "g
         }
     };
 });
-System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/graphics/Tilesets", "engine/tiles/NineSlice", "engine/point", "engine/component", "engine/Entity", "engine/renderer/BasicRenderComponent", "game/ui/Text", "game/ui/Color", "game/Controls", "game/ui/UIStateManager", "game/ui/ButtonsMenu"], function (exports_78, context_78) {
+System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/graphics/Tilesets", "engine/tiles/NineSlice", "engine/point", "engine/component", "engine/Entity", "engine/renderer/BasicRenderComponent", "game/ui/Text", "game/Controls", "game/ui/UIStateManager", "game/ui/ButtonsMenu"], function (exports_78, context_78) {
     "use strict";
-    var Dialogue_4, Tilesets_21, NineSlice_6, point_40, component_20, Entity_13, BasicRenderComponent_6, Text_7, Color_7, Controls_4, UIStateManager_10, ButtonsMenu_1, DialogueDisplay;
+    var Dialogue_4, Tilesets_21, NineSlice_6, point_40, component_20, Entity_13, BasicRenderComponent_6, Text_7, Controls_4, UIStateManager_10, ButtonsMenu_1, DialogueDisplay;
     var __moduleName = context_78 && context_78.id;
     return {
         setters: [
@@ -6666,9 +6618,6 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
             },
             function (Text_7_1) {
                 Text_7 = Text_7_1;
-            },
-            function (Color_7_1) {
-                Color_7 = Color_7_1;
             },
             function (Controls_4_1) {
                 Controls_4 = Controls_4_1;
@@ -6777,7 +6726,7 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
                     var topOffset = 2;
                     var margin = 12;
                     var width = dimensions.x - margin * 2;
-                    var formattedRenders = Text_7.formatText(this.dialogue.lines[this.lineIndex], Color_7.Color.DARK_RED, topLeft.plus(new point_40.Point(margin, topOffset + margin)), width, 1 /* CENTER */);
+                    var formattedRenders = Text_7.formatText(this.dialogue.lines[this.lineIndex], "#62232f" /* DARK_RED */, topLeft.plus(new point_40.Point(margin, topOffset + margin)), width, 1 /* CENTER */);
                     formattedRenders.forEach(function (fr) { return fr.depth = UIStateManager_10.UIStateManager.UI_SPRITE_DEPTH + 1; });
                     // "type" out the letters
                     if (!this.finishedPrinting) {
@@ -6811,8 +6760,8 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
                             text: o.text,
                             fn: function () { return _this.completeSourceDialogue(o.next); },
                             buttonColor: 'white',
-                            textColor: Color_7.Color.WHITE,
-                            hoverColor: Color_7.Color.DARK_RED
+                            textColor: "#fdf7ed" /* WHITE */,
+                            hoverColor: "#62232f" /* DARK_RED */
                         };
                     }));
                 };
@@ -6866,9 +6815,9 @@ System.register("game/cutscenes/CutsceneManager", ["engine/Entity", "game/SaveMa
         }
     };
 });
-System.register("game/ui/ControlsUI", ["game/ui/KeyPressIndicator", "engine/point", "game/graphics/Tilesets", "engine/tiles/TileTransform", "game/ui/Text", "game/ui/Color", "game/ui/UIStateManager"], function (exports_80, context_80) {
+System.register("game/ui/ControlsUI", ["game/ui/KeyPressIndicator", "engine/point", "game/graphics/Tilesets", "engine/tiles/TileTransform", "game/ui/Text", "game/ui/UIStateManager"], function (exports_80, context_80) {
     "use strict";
-    var KeyPressIndicator_1, point_41, Tilesets_22, TileTransform_17, Text_8, Color_8, UIStateManager_11, makeControlsUI;
+    var KeyPressIndicator_1, point_41, Tilesets_22, TileTransform_17, Text_8, UIStateManager_11, makeControlsUI;
     var __moduleName = context_80 && context_80.id;
     return {
         setters: [
@@ -6887,9 +6836,6 @@ System.register("game/ui/ControlsUI", ["game/ui/KeyPressIndicator", "engine/poin
             function (Text_8_1) {
                 Text_8 = Text_8_1;
             },
-            function (Color_8_1) {
-                Color_8 = Color_8_1;
-            },
             function (UIStateManager_11_1) {
                 UIStateManager_11 = UIStateManager_11_1;
             }
@@ -6901,7 +6847,7 @@ System.register("game/ui/ControlsUI", ["game/ui/KeyPressIndicator", "engine/poin
                 return __spreadArrays(new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusX(Tilesets_22.TILE_SIZE), 87 /* W */).getRenderMethods(), new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusY(Tilesets_22.TILE_SIZE), 65 /* A */).getRenderMethods(), new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusX(Tilesets_22.TILE_SIZE).plusY(Tilesets_22.TILE_SIZE), 83 /* S */).getRenderMethods(), new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusX(Tilesets_22.TILE_SIZE * 2).plusY(Tilesets_22.TILE_SIZE), 68 /* D */).getRenderMethods(), [
                     Tilesets_22.Tilesets.instance.oneBit.getTileSource("leftClick").toImageRender(new TileTransform_17.TileTransform(topLeft.plusX(Tilesets_22.TILE_SIZE * 4).plusY(mouseButtVertOffset))),
                     Tilesets_22.Tilesets.instance.oneBit.getTileSource("rightClick").toImageRender(new TileTransform_17.TileTransform(topLeft.plusX(Tilesets_22.TILE_SIZE * 4).plusY(Tilesets_22.TILE_SIZE * 1 + mouseButtVertOffset)))
-                ], Text_8.formatText("MOVE", Color_8.Color.WHITE, topLeft.plusX(Tilesets_22.TILE_SIZE / 2).plusY(Tilesets_22.TILE_SIZE * 2 + 2), 100), Text_8.formatText("ATTACK", Color_8.Color.WHITE, topLeft.plusX(Tilesets_22.TILE_SIZE * 5).plusY(4 + mouseButtVertOffset), 100), Text_8.formatText("BLOCK", Color_8.Color.WHITE, topLeft.plusX(Tilesets_22.TILE_SIZE * 5).plusY(Tilesets_22.TILE_SIZE + 4 + mouseButtVertOffset), 100)).map(function (r) {
+                ], Text_8.formatText("MOVE", "#fdf7ed" /* WHITE */, topLeft.plusX(Tilesets_22.TILE_SIZE / 2).plusY(Tilesets_22.TILE_SIZE * 2 + 2), 100), Text_8.formatText("ATTACK", "#fdf7ed" /* WHITE */, topLeft.plusX(Tilesets_22.TILE_SIZE * 5).plusY(4 + mouseButtVertOffset), 100), Text_8.formatText("BLOCK", "#fdf7ed" /* WHITE */, topLeft.plusX(Tilesets_22.TILE_SIZE * 5).plusY(Tilesets_22.TILE_SIZE + 4 + mouseButtVertOffset), 100)).map(function (r) {
                     r.depth = UIStateManager_11.UIStateManager.UI_SPRITE_DEPTH;
                     return r;
                 });
@@ -6909,9 +6855,9 @@ System.register("game/ui/ControlsUI", ["game/ui/KeyPressIndicator", "engine/poin
         }
     };
 });
-System.register("game/ui/PauseMenu", ["engine/component", "engine/Entity", "game/ui/UIStateManager", "engine/point", "game/ui/ButtonsMenu", "game/ui/Color", "game/SaveManager", "game/cutscenes/CutsceneManager", "game/ui/ControlsUI", "engine/renderer/BasicRenderComponent"], function (exports_81, context_81) {
+System.register("game/ui/PauseMenu", ["engine/component", "engine/Entity", "game/ui/UIStateManager", "engine/point", "game/ui/ButtonsMenu", "game/SaveManager", "game/cutscenes/CutsceneManager", "game/ui/ControlsUI", "engine/renderer/BasicRenderComponent"], function (exports_81, context_81) {
     "use strict";
-    var component_21, Entity_15, UIStateManager_12, point_42, ButtonsMenu_2, Color_9, SaveManager_3, CutsceneManager_1, ControlsUI_1, BasicRenderComponent_7, PauseMenu;
+    var component_21, Entity_15, UIStateManager_12, point_42, ButtonsMenu_2, SaveManager_3, CutsceneManager_1, ControlsUI_1, BasicRenderComponent_7, PauseMenu;
     var __moduleName = context_81 && context_81.id;
     return {
         setters: [
@@ -6929,9 +6875,6 @@ System.register("game/ui/PauseMenu", ["engine/component", "engine/Entity", "game
             },
             function (ButtonsMenu_2_1) {
                 ButtonsMenu_2 = ButtonsMenu_2_1;
-            },
-            function (Color_9_1) {
-                Color_9 = Color_9_1;
             },
             function (SaveManager_3_1) {
                 SaveManager_3 = SaveManager_3_1;
@@ -6972,8 +6915,8 @@ System.register("game/ui/PauseMenu", ["engine/component", "engine/Entity", "game
                 PauseMenu.prototype.show = function (dimensions) {
                     this.isOpen = true;
                     var buttonColor = "red";
-                    var textColor = Color_9.Color.PINK;
-                    var hoverColor = Color_9.Color.WHITE;
+                    var textColor = "#dc4a7b" /* PINK */;
+                    var hoverColor = "#fdf7ed" /* WHITE */;
                     this.displayEntity = ButtonsMenu_2.ButtonsMenu.render(dimensions, "red", [{
                             text: "Save game".toUpperCase(),
                             fn: function () { return SaveManager_3.SaveManager.instance.save(); },
@@ -7076,9 +7019,9 @@ System.register("game/ui/UIStateManager", ["game/ui/HUD", "game/characters/Playe
         }
     };
 });
-System.register("game/ui/KeyPressIndicator", ["engine/component", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point", "engine/renderer/TextRender", "game/Controls", "game/ui/Text", "game/ui/UIStateManager", "game/ui/Color"], function (exports_83, context_83) {
+System.register("game/ui/KeyPressIndicator", ["engine/component", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point", "engine/renderer/TextRender", "game/Controls", "game/ui/Text", "game/ui/UIStateManager"], function (exports_83, context_83) {
     "use strict";
-    var component_22, Tilesets_23, TileTransform_18, point_43, TextRender_7, Controls_5, Text_9, UIStateManager_13, Color_10, KeyPressIndicator;
+    var component_22, Tilesets_23, TileTransform_18, point_43, TextRender_7, Controls_5, Text_9, UIStateManager_13, KeyPressIndicator;
     var __moduleName = context_83 && context_83.id;
     return {
         setters: [
@@ -7105,9 +7048,6 @@ System.register("game/ui/KeyPressIndicator", ["engine/component", "game/graphics
             },
             function (UIStateManager_13_1) {
                 UIStateManager_13 = UIStateManager_13_1;
-            },
-            function (Color_10_1) {
-                Color_10 = Color_10_1;
             }
         ],
         execute: function () {
@@ -7122,7 +7062,7 @@ System.register("game/ui/KeyPressIndicator", ["engine/component", "game/graphics
                 KeyPressIndicator.prototype.getRenderMethods = function () {
                     return [
                         Tilesets_23.Tilesets.instance.oneBit.getTileSource("keycap").toImageRender(new TileTransform_18.TileTransform(this.pos, null, 0, false, false, UIStateManager_13.UIStateManager.UI_SPRITE_DEPTH)),
-                        new TextRender_7.TextRender(Controls_5.Controls.keyString(this.key).toLowerCase(), this.pos.plus(new point_43.Point(4, 4)), Text_9.TEXT_SIZE, Text_9.TEXT_FONT, Color_10.Color.BLACK, UIStateManager_13.UIStateManager.UI_SPRITE_DEPTH)
+                        new TextRender_7.TextRender(Controls_5.Controls.keyString(this.key).toLowerCase(), this.pos.plus(new point_43.Point(4, 4)), Text_9.TEXT_SIZE, Text_9.TEXT_FONT, "#222222" /* BLACK */, UIStateManager_13.UIStateManager.UI_SPRITE_DEPTH)
                     ];
                 };
                 return KeyPressIndicator;
@@ -7923,9 +7863,9 @@ System.register("game/characters/Shield", ["engine/component", "engine/tiles/Til
         }
     };
 });
-System.register("game/characters/AnimationUtils", ["game/graphics/Tilesets", "game/graphics/ImageFilters", "game/ui/Color", "engine/util/Lists"], function (exports_95, context_95) {
+System.register("game/characters/AnimationUtils", ["game/graphics/Tilesets", "game/graphics/ImageFilters", "engine/util/Lists"], function (exports_95, context_95) {
     "use strict";
-    var Tilesets_31, ImageFilters_3, Color_11, Lists_3, CUSTOMIZATION_OPTIONS, SELECTED_USER_COLOR, maybeFilter, AnimationUtils;
+    var Tilesets_31, ImageFilters_3, Lists_3, CUSTOMIZATION_OPTIONS, SELECTED_USER_COLOR, maybeFilter, AnimationUtils;
     var __moduleName = context_95 && context_95.id;
     return {
         setters: [
@@ -7935,9 +7875,6 @@ System.register("game/characters/AnimationUtils", ["game/graphics/Tilesets", "ga
             function (ImageFilters_3_1) {
                 ImageFilters_3 = ImageFilters_3_1;
             },
-            function (Color_11_1) {
-                Color_11 = Color_11_1;
-            },
             function (Lists_3_1) {
                 Lists_3 = Lists_3_1;
             }
@@ -7945,32 +7882,32 @@ System.register("game/characters/AnimationUtils", ["game/graphics/Tilesets", "ga
         execute: function () {
             // array of [dark, light] pairs
             CUSTOMIZATION_OPTIONS = [
-                [Color_11.Color.DARK_DARK_PINK, Color_11.Color.DARK_PINK],
-                [Color_11.Color.DARK_PINK, Color_11.Color.PINK],
-                [Color_11.Color.PINK, Color_11.Color.LIGHT_PINK],
-                [Color_11.Color.DARK_RED, Color_11.Color.RED],
-                [Color_11.Color.DARK_ORANGE, Color_11.Color.ORANGE],
-                [Color_11.Color.ORANGE, Color_11.Color.LIGHT_ORANGE],
-                [Color_11.Color.GREEN, Color_11.Color.LIME],
-                [Color_11.Color.DARK_GREEN, Color_11.Color.GREEN],
-                [Color_11.Color.DARK_DARK_BLUE, Color_11.Color.DARK_BLUE],
-                [Color_11.Color.DARK_BLUE, Color_11.Color.LIGHT_BLUE],
-                [Color_11.Color.DARK_BLUE, Color_11.Color.LIGHT_BLUE],
-                [Color_11.Color.TEAL, Color_11.Color.BRIGHT_BLUE],
-                [Color_11.Color.DARK_PURPLE, Color_11.Color.PURPLE],
-                [Color_11.Color.DARK_PINKLE, Color_11.Color.PINKLE],
-                [Color_11.Color.PINKLE, Color_11.Color.LIGHT_PINKLE],
-                [Color_11.Color.LIGHT_BROWN, Color_11.Color.TAN],
-                [Color_11.Color.BROWN, Color_11.Color.LIGHT_BROWN],
-                [Color_11.Color.DARK_BROWN, Color_11.Color.BROWN],
+                ["#5f2d56" /* DARK_DARK_PINK */, "#993970" /* DARK_PINK */],
+                ["#993970" /* DARK_PINK */, "#dc4a7b" /* PINK */],
+                ["#dc4a7b" /* PINK */, "#f78697" /* LIGHT_PINK */],
+                ["#62232f" /* DARK_RED */, "#9f294e" /* RED */],
+                ["#8f4029" /* DARK_ORANGE */, "#c56025" /* ORANGE */],
+                ["#c56025" /* ORANGE */, "#ee8e2e" /* LIGHT_ORANGE */],
+                ["#4ba747" /* GREEN */, "#97da3f" /* LIME */],
+                ["#3d734f" /* DARK_GREEN */, "#4ba747" /* GREEN */],
+                ["#314152" /* DARK_DARK_BLUE */, "#417089" /* DARK_BLUE */],
+                ["#417089" /* DARK_BLUE */, "#5698cc" /* LIGHT_BLUE */],
+                ["#417089" /* DARK_BLUE */, "#5698cc" /* LIGHT_BLUE */],
+                ["#49a790" /* TEAL */, "#72d6ce" /* BRIGHT_BLUE */],
+                ["#473579" /* DARK_PURPLE */, "#5956bd" /* PURPLE */],
+                ["#8156aa" /* DARK_PINKLE */, "#c278d0" /* PINKLE */],
+                ["#c278d0" /* PINKLE */, "#f0b3dd" /* LIGHT_PINKLE */],
+                ["#aa8d7a" /* LIGHT_BROWN */, "#d3bfa9" /* TAN */],
+                ["#775c55" /* BROWN */, "#aa8d7a" /* LIGHT_BROWN */],
+                ["#483b3ai" /* DARK_BROWN */, "#775c55" /* BROWN */],
             ];
             // TODO make configurable
             SELECTED_USER_COLOR = Lists_3.Lists.oneOf(CUSTOMIZATION_OPTIONS);
             maybeFilter = function (characterAnimName, anim) {
                 if (characterAnimName === "knight_f") {
                     return anim
-                        .filtered(ImageFilters_3.ImageFilters.recolor(Color_11.Color.PINK, SELECTED_USER_COLOR[0]))
-                        .filtered(ImageFilters_3.ImageFilters.recolor(Color_11.Color.LIGHT_PINK, SELECTED_USER_COLOR[1]));
+                        .filtered(ImageFilters_3.ImageFilters.recolor("#dc4a7b" /* PINK */, SELECTED_USER_COLOR[0]))
+                        .filtered(ImageFilters_3.ImageFilters.recolor("#f78697" /* LIGHT_PINK */, SELECTED_USER_COLOR[1]));
                 }
                 return anim;
             };
