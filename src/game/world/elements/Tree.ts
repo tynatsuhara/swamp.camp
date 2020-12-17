@@ -9,7 +9,7 @@ import { Item } from "../../items/Items"
 import { HittableResource } from "./HittableResource"
 import { ElementComponent } from "./ElementComponent"
 import { ElementType } from "./Elements"
-import { WeaponType } from "../../characters/Weapon"
+import { WeaponType } from "../../characters/WeaponType"
 import { Player } from "../../characters/Player"
 
 export const enum TreeType {

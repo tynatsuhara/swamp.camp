@@ -10,7 +10,7 @@ import { ElementComponent } from "./ElementComponent"
 import { ElementType } from "./Elements"
 import { HittableResource } from "./HittableResource"
 import { Player } from "../../characters/Player"
-import { WeaponType } from "../../characters/Weapon"
+import { WeaponType } from "../../characters/WeaponType"
 
 export const makeRock = (wl: WorldLocation, pos: Point, data: object): ElementComponent => {
     const e = new Entity()

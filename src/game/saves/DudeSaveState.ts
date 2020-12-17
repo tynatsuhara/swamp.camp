@@ -1,7 +1,7 @@
 import { DudeType } from "../characters/DudeFactory"
 import { ItemStack } from "../items/Inventory"
 import { Dialogue } from "../characters/Dialogue"
-import { WeaponType } from "../characters/Weapon"
+import { WeaponType } from "../characters/WeaponType"
 
 // Nothing in here should be nullable, or the logic in DudeFactory could break
 export class DudeSaveState {

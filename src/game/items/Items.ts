@@ -7,7 +7,7 @@ import { TileSource } from "../../engine/tiles/TileSource"
 import { Collider } from "../../engine/collision/Collider"
 import { ElementType } from "../world/elements/Elements"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
-import { WeaponType } from "../characters/Weapon"
+import { WeaponType } from "../characters/WeaponType"
 
 export class ItemMetadata {
     readonly displayName: string
