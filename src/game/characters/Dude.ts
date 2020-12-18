@@ -95,8 +95,8 @@ export class Dude extends Component implements DialogueSource {
         this.awake = () => {
             // Set up animations
             this.characterAnimName = characterAnimName
-            const idleAnim = DudeAnimationUtils.getCharacterIdleAnimation(characterAnimName)
-            const runAnim = DudeAnimationUtils.getCharacterWalkAnimation(characterAnimName)
+            const idleAnim = DudeAnimationUtils.getCharacterIdleAnimation(characterAnimName, blob)
+            const runAnim = DudeAnimationUtils.getCharacterWalkAnimation(characterAnimName, blob)
             const height = idleAnim.getTile(0).dimensions.y
             this._animation = this.entity.addComponent(new AnimatedTileComponent([idleAnim, runAnim], new TileTransform(new Point(0, 28-height))))
             this._animation.fastForward(Math.random() * 1000)  // so not all the animations sync up

@@ -19,7 +19,13 @@ export const pixelPtToTilePt = (pixelPt: Point) => {
  */
 export class Tilesets {
 
-    static instance: Tilesets
+    private static _instance: Tilesets
+    static get instance(): Tilesets {
+        if (!this._instance) {
+            this._instance = new Tilesets()
+        }
+        return this._instance
+    }
 
     readonly dungeonCharacters = new DungeonTilesetII()
     readonly tilemap = new SingleFileTileLoader("images/tilemap.png")
@@ -29,8 +35,8 @@ export class Tilesets {
     readonly oneBit = new OneBitTileset()
     readonly otherCharacters = new SplitFileTileLoader("images/individual_characters")
 
-    constructor() {
-        Tilesets.instance = this
+    private constructor() {
+        // not allowed
     }
 
     getBasicTileSource(key: string): StaticTileSource {

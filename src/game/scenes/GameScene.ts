@@ -1,24 +1,24 @@
-import { UpdateViewsContext } from "../../engine/engine"
-import { View } from "../../engine/View"
-import { Camera } from "../cutscenes/Camera"
-import { LocationManager } from "../world/LocationManager"
-import { CutsceneManager } from "../cutscenes/CutsceneManager"
-import { WorldTime } from "../world/WorldTime"
-import { GroundRenderer } from "../world/GroundRenderer"
-import { PointLightMaskRenderer } from "../world/PointLightMaskRenderer"
-import { Point } from "../../engine/point"
-import { UIStateManager } from "../ui/UIStateManager"
-import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
-import { DudeFactory, DudeType } from "../characters/DudeFactory"
-import { EventQueue } from "../world/events/EventQueue"
-import { MapGenerator } from "../world/MapGenerator"
-import { IntroCutscene } from "../cutscenes/IntroCutscene"
 import { CollisionEngine } from "../../engine/collision/CollisionEngine"
-import { DroppedItem } from "../items/DroppedItem"
+import { UpdateViewsContext } from "../../engine/engine"
+import { Point } from "../../engine/point"
+import { View } from "../../engine/View"
 import { Dude } from "../characters/Dude"
-import { Elements } from "../world/elements/Elements"
-import { Ground } from "../world/ground/Ground"
+import { DudeFactory, DudeType } from "../characters/DudeFactory"
+import { Camera } from "../cutscenes/Camera"
+import { CutsceneManager } from "../cutscenes/CutsceneManager"
+import { IntroCutscene } from "../cutscenes/IntroCutscene"
+import { TILE_SIZE } from "../graphics/Tilesets"
+import { DroppedItem } from "../items/DroppedItem"
 import { saveManager } from "../SaveManager"
+import { UIStateManager } from "../ui/UIStateManager"
+import { Elements } from "../world/elements/Elements"
+import { EventQueue } from "../world/events/EventQueue"
+import { Ground } from "../world/ground/Ground"
+import { GroundRenderer } from "../world/GroundRenderer"
+import { LocationManager } from "../world/LocationManager"
+import { MapGenerator } from "../world/MapGenerator"
+import { PointLightMaskRenderer } from "../world/PointLightMaskRenderer"
+import { WorldTime } from "../world/WorldTime"
 
 const ZOOM = 3
 
@@ -34,7 +34,7 @@ export class GameScene {
         ]))
 
         // Initialize singletons
-        new Tilesets()
+        // TODO: Change these to initialize when the "instance" property is read
         new UIStateManager()
         new DudeFactory()
         new Elements()

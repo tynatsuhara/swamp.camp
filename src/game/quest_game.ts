@@ -1,9 +1,8 @@
-import { Game } from "../engine/game"
 import { UpdateViewsContext } from "../engine/engine"
+import { Game } from "../engine/game"
 import { View } from "../engine/View"
-import { saveManager } from "./SaveManager"
-import { MainMenuScene } from "./scenes/MainMenuScene"
 import { GameScene } from "./scenes/GameScene"
+import { MainMenuScene } from "./scenes/MainMenuScene"
 
 export const enum Scene {
     MAIN_MENU, GAME

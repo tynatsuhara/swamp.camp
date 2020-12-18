@@ -5,7 +5,8 @@ import { Color } from "../ui/Color"
 import { Lists } from "../../engine/util/Lists"
 
 // array of [dark, light] pairs
-const CUSTOMIZATION_OPTIONS = [
+// TODO move this
+export const CUSTOMIZATION_OPTIONS = [
     [Color.DARK_DARK_PINK, Color.DARK_PINK],
     [Color.DARK_PINK, Color.PINK],
     [Color.PINK, Color.LIGHT_PINK],
@@ -26,35 +27,35 @@ const CUSTOMIZATION_OPTIONS = [
     [Color.DARK_BROWN, Color.BROWN],
 ]
 
-// TODO make configurable
-const SELECTED_USER_COLOR = Lists.oneOf(CUSTOMIZATION_OPTIONS);
-
-const maybeFilter = (characterAnimName: string, anim: TileSetAnimation) => {
+const maybeFilter = (characterAnimName: string, blob: object, anim: TileSetAnimation) => {
     if (characterAnimName === "knight_f") {
-        return anim
-                .filtered(ImageFilters.recolor(Color.PINK, SELECTED_USER_COLOR[0]))
-                .filtered(ImageFilters.recolor(Color.LIGHT_PINK, SELECTED_USER_COLOR[1]))
+        const color = blob["color"]
+        if (!!color) {
+            return anim
+                .filtered(ImageFilters.recolor(Color.PINK, color[0]))
+                .filtered(ImageFilters.recolor(Color.LIGHT_PINK, color[1]))
+        }
     }
 
     return anim
 }
 
 export const DudeAnimationUtils = {
-    getCharacterIdleAnimation: (characterAnimName: string) => {
+    getCharacterIdleAnimation: (characterAnimName: string, blob: object): TileSetAnimation => {
         const animSpeed = 150
         let anim = Tilesets.instance.dungeonCharacters.getTileSetAnimation(`${characterAnimName}_idle_anim`, animSpeed)
         if (!anim) {
             anim = Tilesets.instance.otherCharacters.getTileSetAnimation(`${characterAnimName}_Idle`, 4, animSpeed)
         }
-        return maybeFilter(characterAnimName, anim)
+        return maybeFilter(characterAnimName, blob, anim)
     },
 
-    getCharacterWalkAnimation: (characterAnimName: string) => {
+    getCharacterWalkAnimation: (characterAnimName: string, blob: object): TileSetAnimation => {
         const animSpeed = 80
         let anim = Tilesets.instance.dungeonCharacters.getTileSetAnimation(`${characterAnimName}_run_anim`, animSpeed)
         if (!anim) {
             anim = Tilesets.instance.otherCharacters.getTileSetAnimation(`${characterAnimName}_Walk`, 4, animSpeed)
         }
-        return maybeFilter(characterAnimName, anim)
+        return maybeFilter(characterAnimName, blob, anim)
     },
 }

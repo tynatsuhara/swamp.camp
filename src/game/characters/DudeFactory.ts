@@ -16,6 +16,7 @@ import { WorldLocation } from "../world/WorldLocation"
 import { Lists } from "../../engine/util/Lists"
 import { WeaponType } from "./WeaponType"
 import { Item } from "../items/Items"
+import { CUSTOMIZATION_OPTIONS } from "./DudeAnimationUtils"
 
 export const enum DudeFaction {
     VILLAGERS,
@@ -86,6 +87,9 @@ export class DudeFactory {
                 additionalComponents = [new Player(), new CutscenePlayerController()]
                 window["player"] = additionalComponents[0]
                 defaultInventory.addItem(Item.SWORD)
+                blob = {
+                    color: Lists.oneOf(CUSTOMIZATION_OPTIONS)
+                }
                 break
             }
             case DudeType.DIP: {
