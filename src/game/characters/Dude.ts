@@ -1,28 +1,27 @@
-import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
+import { BoxCollider } from "../../engine/collision/BoxCollider"
+import { Component } from "../../engine/component"
 import { UpdateData } from "../../engine/engine"
 import { Point } from "../../engine/point"
-import { Component } from "../../engine/component"
-import { BoxCollider } from "../../engine/collision/BoxCollider"
-import { TILE_SIZE } from "../graphics/Tilesets"
-import { Weapon, getWeaponComponent } from "./Weapon"
-import { WeaponType } from "./WeaponType"
-import { Inventory } from "../items/Inventory"
-import { spawnItem, Item } from "../items/Items"
-import { DudeType, DudeFaction } from "./DudeFactory"
-import { Shield } from "./Shield"
-import { TileTransform } from "../../engine/tiles/TileTransform"
-import { Interactable } from "../world/elements/Interactable"
-import { DudeSaveState } from "../saves/DudeSaveState"
-import { Dialogue, getDialogue, DialogueSource } from "./Dialogue"
-import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { RenderMethod } from "../../engine/renderer/RenderMethod"
-import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
+import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
-import { UIStateManager } from "../ui/UIStateManager"
-import { AnimationUtils } from "./AnimationUtils"
+import { TileTransform } from "../../engine/tiles/TileTransform"
 import { ImageFilters } from "../graphics/ImageFilters"
-import { WorldLocation } from "../world/WorldLocation"
+import { TILE_SIZE } from "../graphics/Tilesets"
+import { Inventory } from "../items/Inventory"
+import { Item, spawnItem } from "../items/Items"
+import { DudeSaveState } from "../saves/DudeSaveState"
+import { DialogueDisplay } from "../ui/DialogueDisplay"
+import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
+import { UIStateManager } from "../ui/UIStateManager"
+import { Interactable } from "../world/elements/Interactable"
 import { LocationManager } from "../world/LocationManager"
+import { DudeAnimationUtils } from "./DudeAnimationUtils"
+import { Dialogue, DialogueSource, getDialogue } from "./Dialogue"
+import { DudeFaction, DudeType } from "./DudeFactory"
+import { Shield } from "./Shield"
+import { getWeaponComponent, Weapon } from "./Weapon"
+import { WeaponType } from "./WeaponType"
 
 export class Dude extends Component implements DialogueSource {
 
@@ -96,8 +95,8 @@ export class Dude extends Component implements DialogueSource {
         this.awake = () => {
             // Set up animations
             this.characterAnimName = characterAnimName
-            const idleAnim = AnimationUtils.getCharacterIdleAnimation(characterAnimName)
-            const runAnim = AnimationUtils.getCharacterWalkAnimation(characterAnimName)
+            const idleAnim = DudeAnimationUtils.getCharacterIdleAnimation(characterAnimName)
+            const runAnim = DudeAnimationUtils.getCharacterWalkAnimation(characterAnimName)
             const height = idleAnim.getTile(0).dimensions.y
             this._animation = this.entity.addComponent(new AnimatedTileComponent([idleAnim, runAnim], new TileTransform(new Point(0, 28-height))))
             this._animation.fastForward(Math.random() * 1000)  // so not all the animations sync up

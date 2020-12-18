@@ -39,7 +39,7 @@ const maybeFilter = (characterAnimName: string, anim: TileSetAnimation) => {
     return anim
 }
 
-export const AnimationUtils = {
+export const DudeAnimationUtils = {
     getCharacterIdleAnimation: (characterAnimName: string) => {
         const animSpeed = 150
         let anim = Tilesets.instance.dungeonCharacters.getTileSetAnimation(`${characterAnimName}_idle_anim`, animSpeed)
