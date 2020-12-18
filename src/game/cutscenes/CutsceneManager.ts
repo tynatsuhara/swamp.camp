@@ -1,6 +1,6 @@
 import { Component } from "../../engine/component"
 import { Entity } from "../../engine/Entity"
-import { SaveManager } from "../SaveManager"
+import { saveManager } from "../SaveManager"
 
 export class CutsceneManager {
     static instance: CutsceneManager
@@ -22,7 +22,7 @@ export class CutsceneManager {
 
     finishCutscene() {
         this.entity = null
-        SaveManager.instance.save()
+        saveManager.save()
     }
 
     getEntity(): Entity {

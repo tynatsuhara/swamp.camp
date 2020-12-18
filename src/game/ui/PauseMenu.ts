@@ -6,7 +6,7 @@ import { UIStateManager } from "./UIStateManager"
 import { Point } from "../../engine/point"
 import { ButtonsMenu } from "./ButtonsMenu"
 import { Color } from "./Color"
-import { SaveManager } from "../SaveManager"
+import { saveManager } from "../SaveManager"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { makeControlsUI } from "./ControlsUI"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
@@ -44,12 +44,12 @@ export class PauseMenu extends Component {
             "red",
             [{
                 text: "Save game".toUpperCase(), 
-                fn: () => SaveManager.instance.save(),
+                fn: () => saveManager.save(),
                 buttonColor, textColor, hoverColor,
             },
             {
                 text: "Load last save".toUpperCase(), 
-                fn: () => SaveManager.instance.load(),
+                fn: () => saveManager.load(),
                 buttonColor, textColor, hoverColor,
             }]
         )

@@ -18,6 +18,7 @@ import { DroppedItem } from "../items/DroppedItem"
 import { Dude } from "../characters/Dude"
 import { Elements } from "../world/elements/Elements"
 import { Ground } from "../world/ground/Ground"
+import { saveManager } from "../SaveManager"
 
 const ZOOM = 3
 
@@ -40,11 +41,21 @@ export class GameScene {
         new Ground()
         new Camera()
         new CutsceneManager()
-        new PointLightMaskRenderer()
         new GroundRenderer()
     }
 
+    continueGame() {
+        // Wait to initialize since it will begin a coroutine
+        new PointLightMaskRenderer()
+
+        saveManager.load()
+    }
+
     newGame() {
+        saveManager.load()
+
+        // Wait to initialize since it will begin a coroutine
+        new PointLightMaskRenderer()
         new LocationManager()
         new WorldTime(WorldTime.HOUR * 19.5)
         new EventQueue()

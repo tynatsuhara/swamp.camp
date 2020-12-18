@@ -8,13 +8,9 @@ import { HUD } from "./ui/HUD"
 import { WorldTime } from "./world/WorldTime"
 import { EventQueue } from "./world/events/EventQueue"
 
-export class SaveManager {
+const SAVE_KEY = "save"
 
-    static instance: SaveManager
-
-    constructor() {
-        SaveManager.instance = this
-    }
+class SaveManager {
 
     save() {
         if (!Player.instance.dude.isAlive) {
@@ -30,14 +26,22 @@ export class SaveManager {
             eventQueue: EventQueue.instance.save()
         }
         console.log("saved game")
-        localStorage.setItem("save", JSON.stringify(save))  // TODO support save slots
+        localStorage.setItem(SAVE_KEY, JSON.stringify(save))  // TODO support save slots
+    }
+
+    saveFileExists() {
+        return !!localStorage.getItem(SAVE_KEY)
+    }
+
+    deleteSave() {
+        localStorage.removeItem(SAVE_KEY)
     }
 
     /**
      * @return true if a save was loaded successfully
      */
     load() {
-        const blob = localStorage.getItem("save")
+        const blob = localStorage.getItem(SAVE_KEY)
         if (!blob) {
             console.log("no save found")
             return false
@@ -60,3 +64,5 @@ export class SaveManager {
         return true
     }
 }
+
+export const saveManager = new SaveManager()

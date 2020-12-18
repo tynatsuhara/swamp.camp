@@ -14,6 +14,7 @@ export type OptionButton = {
     hoverColor: string
 }
 
+// TODO: Update this to use the color replace filter instead of different sprites
 export const ButtonsMenu = {
     render: (
         screenDimensions: Point, 

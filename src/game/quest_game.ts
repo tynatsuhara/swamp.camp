@@ -1,7 +1,7 @@
 import { Game } from "../engine/game"
 import { UpdateViewsContext } from "../engine/engine"
 import { View } from "../engine/View"
-import { SaveManager } from "./SaveManager"
+import { saveManager } from "./SaveManager"
 import { MainMenuScene } from "./scenes/MainMenuScene"
 import { GameScene } from "./scenes/GameScene"
 
@@ -13,24 +13,18 @@ export class QuestGame extends Game {
 
     private scene = Scene.MAIN_MENU
     private readonly game = new GameScene()
-    private readonly mainMenu = new MainMenuScene()
+    private readonly mainMenu = new MainMenuScene(() => this.continueGame(), () => this.startNewGame())
 
     initialize() {
-        new SaveManager()
-        
         this.game.initialize()
-
-        this.continueGame()
     }
 
     continueGame() {
-        console.log("continue game")
         this.scene = Scene.GAME
-        SaveManager.instance.load()
+        this.game.continueGame()
     }
 
     startNewGame() {
-        console.log("new game")
         this.scene = Scene.GAME
         this.game.newGame()
     }

@@ -1,4 +1,4 @@
-import { SaveManager } from "../SaveManager"
+import { saveManager } from "../SaveManager"
 import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
 import { DIP_INTRO_DIALOGUE } from "./dialogues/DipIntro"
 import { BERTO_INTRO_DIALOGUE } from "./dialogues/BertoIntro"
@@ -39,7 +39,7 @@ export const option = (text: string, next: Dialogue, open: boolean = true): Dial
 }
 export const saveAfterDialogueStage = () => {
     // save after a delay to account for the next dialogue stage being set
-    setTimeout(() => SaveManager.instance.save(), 500)
+    setTimeout(() => saveManager.save(), 500)
 }
 export const inv = () => Player.instance.dude.inventory
 

@@ -5414,6 +5414,7 @@ System.register("game/ui/ButtonsMenu", ["engine/point", "game/ui/TextButton", "g
             }
         ],
         execute: function () {
+            // TODO: Update this to use the color replace filter instead of different sprites
             exports_70("ButtonsMenu", ButtonsMenu = {
                 render: function (screenDimensions, backgroundColor, options) {
                     var longestOption = Math.max.apply(Math, options.map(function (o) { return o.text.length; }));
@@ -5467,7 +5468,7 @@ System.register("game/cutscenes/CutsceneManager", ["engine/Entity", "game/SaveMa
                 };
                 CutsceneManager.prototype.finishCutscene = function () {
                     this.entity = null;
-                    SaveManager_1.SaveManager.instance.save();
+                    SaveManager_1.saveManager.save();
                 };
                 CutsceneManager.prototype.getEntity = function () {
                     return this.entity;
@@ -5582,12 +5583,12 @@ System.register("game/ui/PauseMenu", ["engine/component", "engine/Entity", "game
                     var hoverColor = "#fdf7ed" /* WHITE */;
                     this.displayEntity = ButtonsMenu_1.ButtonsMenu.render(dimensions, "red", [{
                             text: "Save game".toUpperCase(),
-                            fn: function () { return SaveManager_2.SaveManager.instance.save(); },
+                            fn: function () { return SaveManager_2.saveManager.save(); },
                             buttonColor: buttonColor, textColor: textColor, hoverColor: hoverColor,
                         },
                         {
                             text: "Load last save".toUpperCase(),
-                            fn: function () { return SaveManager_2.SaveManager.instance.load(); },
+                            fn: function () { return SaveManager_2.saveManager.load(); },
                             buttonColor: buttonColor, textColor: textColor, hoverColor: hoverColor,
                         }]);
                     this.controlsDisplay = new Entity_14.Entity([new (BasicRenderComponent_4.BasicRenderComponent.bind.apply(BasicRenderComponent_4.BasicRenderComponent, __spreadArrays([void 0], ControlsUI_1.makeControlsUI(dimensions, point_40.Point.ZERO))))()]);
@@ -7567,7 +7568,7 @@ System.register("game/characters/Dialogue", ["game/SaveManager", "game/ui/DudeIn
             });
             exports_95("saveAfterDialogueStage", saveAfterDialogueStage = function () {
                 // save after a delay to account for the next dialogue stage being set
-                setTimeout(function () { return SaveManager_3.SaveManager.instance.save(); }, 500);
+                setTimeout(function () { return SaveManager_3.saveManager.save(); }, 500);
             });
             exports_95("inv", inv = function () { return Player_9.Player.instance.dude.inventory; });
             DialogueOption = /** @class */ (function () {
@@ -10012,7 +10013,7 @@ System.register("game/saves/SaveGame", [], function (exports_116, context_116) {
 });
 System.register("game/SaveManager", ["game/characters/Player", "game/world/LocationManager", "game/ui/UIStateManager", "game/cutscenes/Camera", "game/ui/HUD", "game/world/WorldTime", "game/world/events/EventQueue"], function (exports_117, context_117) {
     "use strict";
-    var Player_15, LocationManager_18, UIStateManager_16, Camera_7, HUD_2, WorldTime_6, EventQueue_5, SaveManager;
+    var Player_15, LocationManager_18, UIStateManager_16, Camera_7, HUD_2, WorldTime_6, EventQueue_5, SAVE_KEY, SaveManager, saveManager;
     var __moduleName = context_117 && context_117.id;
     return {
         setters: [
@@ -10039,9 +10040,9 @@ System.register("game/SaveManager", ["game/characters/Player", "game/world/Locat
             }
         ],
         execute: function () {
+            SAVE_KEY = "save";
             SaveManager = /** @class */ (function () {
                 function SaveManager() {
-                    SaveManager.instance = this;
                 }
                 SaveManager.prototype.save = function () {
                     if (!Player_15.Player.instance.dude.isAlive) {
@@ -10057,13 +10058,19 @@ System.register("game/SaveManager", ["game/characters/Player", "game/world/Locat
                         eventQueue: EventQueue_5.EventQueue.instance.save()
                     };
                     console.log("saved game");
-                    localStorage.setItem("save", JSON.stringify(save)); // TODO support save slots
+                    localStorage.setItem(SAVE_KEY, JSON.stringify(save)); // TODO support save slots
+                };
+                SaveManager.prototype.saveFileExists = function () {
+                    return !!localStorage.getItem(SAVE_KEY);
+                };
+                SaveManager.prototype.deleteSave = function () {
+                    localStorage.removeItem(SAVE_KEY);
                 };
                 /**
                  * @return true if a save was loaded successfully
                  */
                 SaveManager.prototype.load = function () {
-                    var blob = localStorage.getItem("save");
+                    var blob = localStorage.getItem(SAVE_KEY);
                     if (!blob) {
                         console.log("no save found");
                         return false;
@@ -10082,23 +10089,61 @@ System.register("game/SaveManager", ["game/characters/Player", "game/world/Locat
                 };
                 return SaveManager;
             }());
-            exports_117("SaveManager", SaveManager);
+            exports_117("saveManager", saveManager = new SaveManager());
         }
     };
 });
-System.register("game/scenes/MainMenuScene", [], function (exports_118, context_118) {
+System.register("game/scenes/MainMenuScene", ["engine/point", "game/ui/ButtonsMenu", "game/SaveManager"], function (exports_118, context_118) {
     "use strict";
-    var MainMenuScene;
+    var point_66, ButtonsMenu_3, SaveManager_4, ZOOM, MainMenuScene;
     var __moduleName = context_118 && context_118.id;
     return {
-        setters: [],
+        setters: [
+            function (point_66_1) {
+                point_66 = point_66_1;
+            },
+            function (ButtonsMenu_3_1) {
+                ButtonsMenu_3 = ButtonsMenu_3_1;
+            },
+            function (SaveManager_4_1) {
+                SaveManager_4 = SaveManager_4_1;
+            }
+        ],
         execute: function () {
+            ZOOM = 3;
             MainMenuScene = /** @class */ (function () {
-                function MainMenuScene() {
+                function MainMenuScene(continueFn, newGameFn) {
+                    this.continueFn = continueFn;
+                    this.newGameFn = newGameFn;
                 }
                 MainMenuScene.prototype.getViews = function (updateViewsContext) {
-                    // QuestGame.instance.startNewGame()
-                    return [];
+                    var dimensions = updateViewsContext.dimensions.div(ZOOM);
+                    var buttonColor = "red";
+                    var textColor = "#dc4a7b" /* PINK */;
+                    var hoverColor = "#fdf7ed" /* WHITE */;
+                    var buttons = SaveManager_4.saveManager.saveFileExists()
+                        ?
+                            [{
+                                    text: "Load last save".toUpperCase(),
+                                    fn: this.continueFn,
+                                    buttonColor: buttonColor, textColor: textColor, hoverColor: hoverColor,
+                                },
+                                {
+                                    text: "New game (destroy existing save)".toUpperCase(),
+                                    fn: this.newGameFn,
+                                    buttonColor: buttonColor, textColor: textColor, hoverColor: hoverColor,
+                                }]
+                        :
+                            [{
+                                    text: "New game".toUpperCase(),
+                                    fn: this.newGameFn,
+                                    buttonColor: buttonColor, textColor: textColor, hoverColor: hoverColor,
+                                }];
+                    return [{
+                            zoom: ZOOM,
+                            offset: point_66.Point.ZERO,
+                            entities: [ButtonsMenu_3.ButtonsMenu.render(dimensions, "red", buttons)]
+                        }];
                 };
                 return MainMenuScene;
             }());
@@ -10108,7 +10153,7 @@ System.register("game/scenes/MainMenuScene", [], function (exports_118, context_
 });
 System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutscenes/CutscenePlayerController", "game/characters/Player", "engine/point", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/world/LocationManager", "game/ui/ControlsUI"], function (exports_119, context_119) {
     "use strict";
-    var component_33, CutscenePlayerController_2, Player_16, point_66, Camera_8, CutsceneManager_2, LocationManager_19, ControlsUI_2, IntroCutscene;
+    var component_33, CutscenePlayerController_2, Player_16, point_67, Camera_8, CutsceneManager_2, LocationManager_19, ControlsUI_2, IntroCutscene;
     var __moduleName = context_119 && context_119.id;
     return {
         setters: [
@@ -10121,8 +10166,8 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
             function (Player_16_1) {
                 Player_16 = Player_16_1;
             },
-            function (point_66_1) {
-                point_66 = point_66_1;
+            function (point_67_1) {
+                point_67 = point_67_1;
             },
             function (Camera_8_1) {
                 Camera_8 = Camera_8_1;
@@ -10165,7 +10210,7 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
                 IntroCutscene.prototype.start = function (startData) {
                     var _this = this;
                     CutscenePlayerController_2.CutscenePlayerController.instance.enable();
-                    CutscenePlayerController_2.CutscenePlayerController.instance.startMoving(new point_66.Point(-1, 0));
+                    CutscenePlayerController_2.CutscenePlayerController.instance.startMoving(new point_67.Point(-1, 0));
                     this.dip = Array.from(LocationManager_19.LocationManager.instance.currentLocation.dudes).filter(function (d) { return d.type === 1 /* DIP */; })[0];
                     setTimeout(function () {
                         CutscenePlayerController_2.CutscenePlayerController.instance.stopMoving();
@@ -10208,9 +10253,9 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
         }
     };
 });
-System.register("game/scenes/GameScene", ["game/cutscenes/Camera", "game/world/LocationManager", "game/cutscenes/CutsceneManager", "game/world/WorldTime", "game/world/GroundRenderer", "game/world/PointLightMaskRenderer", "engine/point", "game/ui/UIStateManager", "game/graphics/Tilesets", "game/characters/DudeFactory", "game/world/events/EventQueue", "game/world/MapGenerator", "game/cutscenes/IntroCutscene", "engine/collision/CollisionEngine", "game/items/DroppedItem", "game/characters/Dude", "game/world/elements/Elements", "game/world/ground/Ground"], function (exports_120, context_120) {
+System.register("game/scenes/GameScene", ["game/cutscenes/Camera", "game/world/LocationManager", "game/cutscenes/CutsceneManager", "game/world/WorldTime", "game/world/GroundRenderer", "game/world/PointLightMaskRenderer", "engine/point", "game/ui/UIStateManager", "game/graphics/Tilesets", "game/characters/DudeFactory", "game/world/events/EventQueue", "game/world/MapGenerator", "game/cutscenes/IntroCutscene", "engine/collision/CollisionEngine", "game/items/DroppedItem", "game/characters/Dude", "game/world/elements/Elements", "game/world/ground/Ground", "game/SaveManager"], function (exports_120, context_120) {
     "use strict";
-    var Camera_9, LocationManager_20, CutsceneManager_3, WorldTime_7, GroundRenderer_2, PointLightMaskRenderer_5, point_67, UIStateManager_17, Tilesets_41, DudeFactory_4, EventQueue_6, MapGenerator_5, IntroCutscene_1, CollisionEngine_4, DroppedItem_2, Dude_9, Elements_3, Ground_4, ZOOM, GameScene;
+    var Camera_9, LocationManager_20, CutsceneManager_3, WorldTime_7, GroundRenderer_2, PointLightMaskRenderer_5, point_68, UIStateManager_17, Tilesets_41, DudeFactory_4, EventQueue_6, MapGenerator_5, IntroCutscene_1, CollisionEngine_4, DroppedItem_2, Dude_9, Elements_3, Ground_4, SaveManager_5, ZOOM, GameScene;
     var __moduleName = context_120 && context_120.id;
     return {
         setters: [
@@ -10232,8 +10277,8 @@ System.register("game/scenes/GameScene", ["game/cutscenes/Camera", "game/world/L
             function (PointLightMaskRenderer_5_1) {
                 PointLightMaskRenderer_5 = PointLightMaskRenderer_5_1;
             },
-            function (point_67_1) {
-                point_67 = point_67_1;
+            function (point_68_1) {
+                point_68 = point_68_1;
             },
             function (UIStateManager_17_1) {
                 UIStateManager_17 = UIStateManager_17_1;
@@ -10267,6 +10312,9 @@ System.register("game/scenes/GameScene", ["game/cutscenes/Camera", "game/world/L
             },
             function (Ground_4_1) {
                 Ground_4 = Ground_4_1;
+            },
+            function (SaveManager_5_1) {
+                SaveManager_5 = SaveManager_5_1;
             }
         ],
         execute: function () {
@@ -10287,10 +10335,17 @@ System.register("game/scenes/GameScene", ["game/cutscenes/Camera", "game/world/L
                     new Ground_4.Ground();
                     new Camera_9.Camera();
                     new CutsceneManager_3.CutsceneManager();
-                    new PointLightMaskRenderer_5.PointLightMaskRenderer();
                     new GroundRenderer_2.GroundRenderer();
                 };
+                GameScene.prototype.continueGame = function () {
+                    // Wait to initialize since it will begin a coroutine
+                    new PointLightMaskRenderer_5.PointLightMaskRenderer();
+                    SaveManager_5.saveManager.load();
+                };
                 GameScene.prototype.newGame = function () {
+                    SaveManager_5.saveManager.load();
+                    // Wait to initialize since it will begin a coroutine
+                    new PointLightMaskRenderer_5.PointLightMaskRenderer();
                     new LocationManager_20.LocationManager();
                     new WorldTime_7.WorldTime(WorldTime_7.WorldTime.HOUR * 19.5);
                     new EventQueue_6.EventQueue();
@@ -10299,10 +10354,10 @@ System.register("game/scenes/GameScene", ["game/cutscenes/Camera", "game/world/L
                     var playerStartPos = MapGenerator_5.MapGenerator.ENTER_LAND_POS;
                     var playerDude = DudeFactory_4.DudeFactory.instance.new(0 /* PLAYER */, playerStartPos);
                     Camera_9.Camera.instance.focusOnDude(playerDude);
-                    DudeFactory_4.DudeFactory.instance.new(1 /* DIP */, point_67.Point.ZERO);
-                    DudeFactory_4.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_67.Point(3, 1).times(Tilesets_41.TILE_SIZE));
-                    DudeFactory_4.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_67.Point(-1, 3).times(Tilesets_41.TILE_SIZE));
-                    DudeFactory_4.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_67.Point(-4, 0).times(Tilesets_41.TILE_SIZE));
+                    DudeFactory_4.DudeFactory.instance.new(1 /* DIP */, point_68.Point.ZERO);
+                    DudeFactory_4.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_68.Point(3, 1).times(Tilesets_41.TILE_SIZE));
+                    DudeFactory_4.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_68.Point(-1, 3).times(Tilesets_41.TILE_SIZE));
+                    DudeFactory_4.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_68.Point(-4, 0).times(Tilesets_41.TILE_SIZE));
                     // TODO clean up obstacles (trees, rocks, etc) so intro goes smoothly
                     CutsceneManager_3.CutsceneManager.instance.startCutscene(new IntroCutscene_1.IntroCutscene());
                 };
@@ -10328,7 +10383,7 @@ System.register("game/scenes/GameScene", ["game/cutscenes/Camera", "game/world/L
                     };
                     this.uiView = {
                         zoom: ZOOM,
-                        offset: point_67.Point.ZERO,
+                        offset: point_68.Point.ZERO,
                         entities: UIStateManager_17.UIStateManager.instance.get(dimensions, updateViewsContext.elapsedTimeMillis)
                     };
                 };
@@ -10338,17 +10393,14 @@ System.register("game/scenes/GameScene", ["game/cutscenes/Camera", "game/world/L
         }
     };
 });
-System.register("game/quest_game", ["engine/game", "game/SaveManager", "game/scenes/MainMenuScene", "game/scenes/GameScene"], function (exports_121, context_121) {
+System.register("game/quest_game", ["engine/game", "game/scenes/MainMenuScene", "game/scenes/GameScene"], function (exports_121, context_121) {
     "use strict";
-    var game_1, SaveManager_4, MainMenuScene_1, GameScene_1, QuestGame;
+    var game_1, MainMenuScene_1, GameScene_1, QuestGame;
     var __moduleName = context_121 && context_121.id;
     return {
         setters: [
             function (game_1_1) {
                 game_1 = game_1_1;
-            },
-            function (SaveManager_4_1) {
-                SaveManager_4 = SaveManager_4_1;
             },
             function (MainMenuScene_1_1) {
                 MainMenuScene_1 = MainMenuScene_1_1;
@@ -10364,21 +10416,17 @@ System.register("game/quest_game", ["engine/game", "game/SaveManager", "game/sce
                     var _this = _super !== null && _super.apply(this, arguments) || this;
                     _this.scene = 0 /* MAIN_MENU */;
                     _this.game = new GameScene_1.GameScene();
-                    _this.mainMenu = new MainMenuScene_1.MainMenuScene();
+                    _this.mainMenu = new MainMenuScene_1.MainMenuScene(function () { return _this.continueGame(); }, function () { return _this.startNewGame(); });
                     return _this;
                 }
                 QuestGame.prototype.initialize = function () {
-                    new SaveManager_4.SaveManager();
                     this.game.initialize();
-                    this.continueGame();
                 };
                 QuestGame.prototype.continueGame = function () {
-                    console.log("continue game");
                     this.scene = 1 /* GAME */;
-                    SaveManager_4.SaveManager.instance.load();
+                    this.game.continueGame();
                 };
                 QuestGame.prototype.startNewGame = function () {
-                    console.log("new game");
                     this.scene = 1 /* GAME */;
                     this.game.newGame();
                 };
@@ -10725,7 +10773,7 @@ System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uu
 // TODO
 System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point"], function (exports_126, context_126) {
     "use strict";
-    var component_35, Tilesets_43, TileTransform_28, point_68, StringTiles;
+    var component_35, Tilesets_43, TileTransform_28, point_69, StringTiles;
     var __moduleName = context_126 && context_126.id;
     return {
         setters: [
@@ -10738,8 +10786,8 @@ System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tiles
             function (TileTransform_28_1) {
                 TileTransform_28 = TileTransform_28_1;
             },
-            function (point_68_1) {
-                point_68 = point_68_1;
+            function (point_69_1) {
+                point_69 = point_69_1;
             }
         ],
         execute: function () {
@@ -10758,7 +10806,7 @@ System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tiles
                         return;
                     }
                     this.tiles = Array.from(s).map(function (c, i) {
-                        return Tilesets_43.Tilesets.instance.oneBit.getTileSource(c).toImageRender(new TileTransform_28.TileTransform(_this.topLeftPos.plus(new point_68.Point(10 * i, 0))));
+                        return Tilesets_43.Tilesets.instance.oneBit.getTileSource(c).toImageRender(new TileTransform_28.TileTransform(_this.topLeftPos.plus(new point_69.Point(10 * i, 0))));
                     });
                 };
                 StringTiles.prototype.clear = function () {
