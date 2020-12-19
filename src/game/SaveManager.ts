@@ -12,6 +12,36 @@ const SAVE_KEY = "save"
 
 class SaveManager {
 
+    private blob: object
+
+    /**
+     * Adds all key/values in newBlob to blob data storage.
+     * This DOES NOT flush the data, and save() should be
+     * called after if you want to immediately persist the
+     * blob data.
+     */
+    setBlobData(newBlob: object) {
+        if (!this.blob) {
+            this.getBlobData()    
+        }
+        this.blob = {
+            ...this.blob,
+            ...newBlob
+        }
+    }
+
+    getBlobData() {
+        if (!this.blob) {
+            if (this.saveFileExists()) {
+                // pre-load this before "load" is called to display data on the main menu
+                this.blob = this.getSavedData().blob
+            } else {
+                this.blob = {}
+            }
+        }
+        return this.blob
+    }
+
     save() {
         if (!Player.instance.dude.isAlive) {
             console.log("cannot save after death")
@@ -23,7 +53,8 @@ class SaveManager {
             saveVersion: 0,
             locations: LocationManager.instance.save(),
             worldTime: WorldTime.instance.time,
-            eventQueue: EventQueue.instance.save()
+            eventQueue: EventQueue.instance.save(),
+            blob: this.blob,
         }
         console.log("saved game")
         localStorage.setItem(SAVE_KEY, JSON.stringify(save))  // TODO support save slots
@@ -41,13 +72,7 @@ class SaveManager {
      * @return true if a save was loaded successfully
      */
     load() {
-        const blob = localStorage.getItem(SAVE_KEY)
-        if (!blob) {
-            console.log("no save found")
-            return false
-        }
-        
-        const save: Save = JSON.parse(blob)
+        const save = this.getSavedData()
         const prettyPrintTimestamp = new Date()
         prettyPrintTimestamp.setTime(save.timeSaved)
         console.log(`loaded save from ${prettyPrintTimestamp}`)
@@ -60,8 +85,16 @@ class SaveManager {
 
         // clear existing UI state by overwriting singleton
         new UIStateManager()
+    }
 
-        return true
+    private getSavedData(): Save {
+        const saveJson = localStorage.getItem(SAVE_KEY)
+        if (!saveJson) {
+            console.log("no save found")
+            return
+        }
+        
+        return JSON.parse(saveJson)
     }
 }
 

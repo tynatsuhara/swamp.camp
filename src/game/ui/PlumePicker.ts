@@ -8,6 +8,7 @@ import { Lists } from "../../engine/util/Lists"
 import { rectContains } from "../../engine/util/utils"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "./Color"
+import { saveManager } from "../SaveManager"
 
 // array of [dark, light] pairs
 const CUSTOMIZATION_OPTIONS = [
@@ -35,7 +36,8 @@ export class PlumePicker extends Component {
 
     position: Point = Point.ZERO  // top-center position
     entity = new Entity([this])
-    selected = Lists.oneOf(CUSTOMIZATION_OPTIONS)
+    originalSavedColor: Color[]
+    selected: Color[]
 
     private renders: RenderMethod[]
     private readonly callback: (color: Color[]) => void
@@ -43,7 +45,28 @@ export class PlumePicker extends Component {
     constructor(callback: (color: Color[]) => void) {
         super()
         this.callback = callback
-        this.callback(this.selected)
+        
+        this.originalSavedColor = saveManager.getBlobData()["plume"]
+        if (!!this.originalSavedColor) {
+            this.select(this.originalSavedColor)
+        } else {
+            this.select(Lists.oneOf(CUSTOMIZATION_OPTIONS))
+        }
+    }
+
+    /**
+     * Called when the user "cancels", to prevent overwriting the plume data
+     */
+    reset() {
+        if (!!this.originalSavedColor) {
+            this.select(this.originalSavedColor)
+        }
+    }
+
+    private select(colors: Color[]) {
+        this.selected = colors
+        saveManager.setBlobData({ plume: colors })
+        this.callback(colors)
     }
 
     update(updateData: UpdateData) {
@@ -57,12 +80,11 @@ export class PlumePicker extends Component {
             const dimensions = new Point(TILE_SIZE, TILE_SIZE)
 
             const hovered = rectContains(position, dimensions, updateData.input.mousePos)
-            const big = hovered || colors == this.selected
+            const big = hovered || JSON.stringify(colors) == JSON.stringify(this.selected)
             const bigBuffer = 2
 
             if (hovered && updateData.input.isMouseDown) {
-                this.selected = colors
-                this.callback(colors)
+                this.select(colors)
             }
             
             return new RectRender({

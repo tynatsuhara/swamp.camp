@@ -36,10 +36,9 @@ export class MainMenuScene {
         const center = dimensions.floorDiv(2)
         const lineSpacing = 16
 
-        this.knight.transform.position = center.minus(this.knight.transform.dimensions.floorDiv(2).plusY(41))
-        
-        const menuTop = center.plusY(-17)
+        const menuTop = center.plusY(-20)
         this.plumes.position = menuTop
+        this.knight.transform.position = menuTop.minus(this.knight.transform.dimensions.floorDiv(2).plusY(24))
 
         const buttons: MainMenuButton[] = []
 
@@ -47,7 +46,10 @@ export class MainMenuScene {
             const top = menuTop.plusY(42)
             buttons.push(new MainMenuButton(top, `start${saveFileExists ? " (delete old save)" : ""}`, this.newGameFn))
             if (saveFileExists) {
-                buttons.push(new MainMenuButton(top.plusY(lineSpacing), "cancel", () => { this.newGame = false }))
+                buttons.push(new MainMenuButton(top.plusY(lineSpacing), "cancel", () => { 
+                    this.newGame = false 
+                    this.plumes.reset()
+                }))
             }
         } else {
             if (saveFileExists) {

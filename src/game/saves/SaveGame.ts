@@ -7,4 +7,5 @@ export class Save {
     locations: LocationManagerSaveState
     worldTime: number
     eventQueue: QueuedEventData[]
+    blob: object
 }

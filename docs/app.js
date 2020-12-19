@@ -18,6 +18,17 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
             r[k] = a[j];
     return r;
 };
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 System.register("engine/point", [], function (exports_1, context_1) {
     "use strict";
     var Point;
@@ -3914,6 +3925,30 @@ System.register("game/SaveManager", ["game/characters/Player", "game/world/Locat
             SaveManager = /** @class */ (function () {
                 function SaveManager() {
                 }
+                /**
+                 * Adds all key/values in newBlob to blob data storage.
+                 * This DOES NOT flush the data, and save() should be
+                 * called after if you want to immediately persist the
+                 * blob data.
+                 */
+                SaveManager.prototype.setBlobData = function (newBlob) {
+                    if (!this.blob) {
+                        this.getBlobData();
+                    }
+                    this.blob = __assign(__assign({}, this.blob), newBlob);
+                };
+                SaveManager.prototype.getBlobData = function () {
+                    if (!this.blob) {
+                        if (this.saveFileExists()) {
+                            // pre-load this before "load" is called to display data on the main menu
+                            this.blob = this.getSavedData().blob;
+                        }
+                        else {
+                            this.blob = {};
+                        }
+                    }
+                    return this.blob;
+                };
                 SaveManager.prototype.save = function () {
                     if (!Player_3.Player.instance.dude.isAlive) {
                         console.log("cannot save after death");
@@ -3925,7 +3960,8 @@ System.register("game/SaveManager", ["game/characters/Player", "game/world/Locat
                         saveVersion: 0,
                         locations: LocationManager_3.LocationManager.instance.save(),
                         worldTime: WorldTime_1.WorldTime.instance.time,
-                        eventQueue: EventQueue_1.EventQueue.instance.save()
+                        eventQueue: EventQueue_1.EventQueue.instance.save(),
+                        blob: this.blob,
                     };
                     console.log("saved game");
                     localStorage.setItem(SAVE_KEY, JSON.stringify(save)); // TODO support save slots
@@ -3940,12 +3976,7 @@ System.register("game/SaveManager", ["game/characters/Player", "game/world/Locat
                  * @return true if a save was loaded successfully
                  */
                 SaveManager.prototype.load = function () {
-                    var blob = localStorage.getItem(SAVE_KEY);
-                    if (!blob) {
-                        console.log("no save found");
-                        return false;
-                    }
-                    var save = JSON.parse(blob);
+                    var save = this.getSavedData();
                     var prettyPrintTimestamp = new Date();
                     prettyPrintTimestamp.setTime(save.timeSaved);
                     console.log("loaded save from " + prettyPrintTimestamp);
@@ -3955,7 +3986,14 @@ System.register("game/SaveManager", ["game/characters/Player", "game/world/Locat
                     Camera_2.Camera.instance.focusOnDude(Array.from(LocationManager_3.LocationManager.instance.currentLocation.dudes).filter(function (d) { return d.type === 0 /* PLAYER */; })[0]);
                     // clear existing UI state by overwriting singleton
                     new UIStateManager_1.UIStateManager();
-                    return true;
+                };
+                SaveManager.prototype.getSavedData = function () {
+                    var saveJson = localStorage.getItem(SAVE_KEY);
+                    if (!saveJson) {
+                        console.log("no save found");
+                        return;
+                    }
+                    return JSON.parse(saveJson);
                 };
                 return SaveManager;
             }());
@@ -9370,9 +9408,9 @@ System.register("game/items/Inventory", ["game/items/Items"], function (exports_
         }
     };
 });
-System.register("game/characters/DudeAnimationUtils", ["game/graphics/ImageFilters", "game/graphics/Tilesets"], function (exports_114, context_114) {
+System.register("game/characters/DudeAnimationUtils", ["game/graphics/ImageFilters", "game/graphics/Tilesets", "game/SaveManager"], function (exports_114, context_114) {
     "use strict";
-    var ImageFilters_3, Tilesets_37, maybeFilter, DudeAnimationUtils;
+    var ImageFilters_3, Tilesets_37, SaveManager_4, maybeFilter, DudeAnimationUtils;
     var __moduleName = context_114 && context_114.id;
     return {
         setters: [
@@ -9381,12 +9419,15 @@ System.register("game/characters/DudeAnimationUtils", ["game/graphics/ImageFilte
             },
             function (Tilesets_37_1) {
                 Tilesets_37 = Tilesets_37_1;
+            },
+            function (SaveManager_4_1) {
+                SaveManager_4 = SaveManager_4_1;
             }
         ],
         execute: function () {
             maybeFilter = function (characterAnimName, blob, anim) {
                 if (characterAnimName === "knight_f") {
-                    var color = blob["color"];
+                    var color = SaveManager_4.saveManager.getBlobData()["plume"];
                     if (!!color) {
                         return anim
                             .filtered(ImageFilters_3.ImageFilters.recolor("#dc4a7b" /* PINK */, color[0]))
@@ -10221,7 +10262,7 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
 });
 System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "engine/point", "game/characters/Dude", "game/characters/DudeFactory", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/graphics/Tilesets", "game/items/DroppedItem", "game/SaveManager", "game/ui/UIStateManager", "game/world/elements/Elements", "game/world/events/EventQueue", "game/world/ground/Ground", "game/world/GroundRenderer", "game/world/LocationManager", "game/world/MapGenerator", "game/world/PointLightMaskRenderer", "game/world/WorldTime"], function (exports_119, context_119) {
     "use strict";
-    var CollisionEngine_4, point_67, Dude_9, DudeFactory_4, Camera_9, CutsceneManager_3, IntroCutscene_1, Tilesets_41, DroppedItem_2, SaveManager_4, UIStateManager_17, Elements_3, EventQueue_6, Ground_4, GroundRenderer_2, LocationManager_20, MapGenerator_5, PointLightMaskRenderer_5, WorldTime_7, ZOOM, GameScene;
+    var CollisionEngine_4, point_67, Dude_9, DudeFactory_4, Camera_9, CutsceneManager_3, IntroCutscene_1, Tilesets_41, DroppedItem_2, SaveManager_5, UIStateManager_17, Elements_3, EventQueue_6, Ground_4, GroundRenderer_2, LocationManager_20, MapGenerator_5, PointLightMaskRenderer_5, WorldTime_7, ZOOM, GameScene;
     var __moduleName = context_119 && context_119.id;
     return {
         setters: [
@@ -10252,8 +10293,8 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
             function (DroppedItem_2_1) {
                 DroppedItem_2 = DroppedItem_2_1;
             },
-            function (SaveManager_4_1) {
-                SaveManager_4 = SaveManager_4_1;
+            function (SaveManager_5_1) {
+                SaveManager_5 = SaveManager_5_1;
             },
             function (UIStateManager_17_1) {
                 UIStateManager_17 = UIStateManager_17_1;
@@ -10306,10 +10347,10 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
                 GameScene.prototype.continueGame = function () {
                     // Wait to initialize since it will begin a coroutine
                     new PointLightMaskRenderer_5.PointLightMaskRenderer();
-                    SaveManager_4.saveManager.load();
+                    SaveManager_5.saveManager.load();
                 };
                 GameScene.prototype.newGame = function () {
-                    SaveManager_4.saveManager.deleteSave();
+                    SaveManager_5.saveManager.deleteSave();
                     // Wait to initialize since it will begin a coroutine
                     new PointLightMaskRenderer_5.PointLightMaskRenderer();
                     new LocationManager_20.LocationManager();
@@ -10393,9 +10434,9 @@ System.register("engine/renderer/RectRender", ["engine/point", "engine/renderer/
         }
     };
 });
-System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "engine/point", "engine/renderer/RectRender", "engine/util/Lists", "engine/util/utils", "game/graphics/Tilesets"], function (exports_121, context_121) {
+System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "engine/point", "engine/renderer/RectRender", "engine/util/Lists", "engine/util/utils", "game/graphics/Tilesets", "game/SaveManager"], function (exports_121, context_121) {
     "use strict";
-    var component_34, Entity_26, point_69, RectRender_1, Lists_5, utils_9, Tilesets_42, CUSTOMIZATION_OPTIONS, PlumePicker;
+    var component_34, Entity_26, point_69, RectRender_1, Lists_5, utils_9, Tilesets_42, SaveManager_6, CUSTOMIZATION_OPTIONS, PlumePicker;
     var __moduleName = context_121 && context_121.id;
     return {
         setters: [
@@ -10419,6 +10460,9 @@ System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "en
             },
             function (Tilesets_42_1) {
                 Tilesets_42 = Tilesets_42_1;
+            },
+            function (SaveManager_6_1) {
+                SaveManager_6 = SaveManager_6_1;
             }
         ],
         execute: function () {
@@ -10449,11 +10493,29 @@ System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "en
                     var _this = _super.call(this) || this;
                     _this.position = point_69.Point.ZERO; // top-center position
                     _this.entity = new Entity_26.Entity([_this]);
-                    _this.selected = Lists_5.Lists.oneOf(CUSTOMIZATION_OPTIONS);
                     _this.callback = callback;
-                    _this.callback(_this.selected);
+                    _this.originalSavedColor = SaveManager_6.saveManager.getBlobData()["plume"];
+                    if (!!_this.originalSavedColor) {
+                        _this.select(_this.originalSavedColor);
+                    }
+                    else {
+                        _this.select(Lists_5.Lists.oneOf(CUSTOMIZATION_OPTIONS));
+                    }
                     return _this;
                 }
+                /**
+                 * Called when the user "cancels", to prevent overwriting the plume data
+                 */
+                PlumePicker.prototype.reset = function () {
+                    if (!!this.originalSavedColor) {
+                        this.select(this.originalSavedColor);
+                    }
+                };
+                PlumePicker.prototype.select = function (colors) {
+                    this.selected = colors;
+                    SaveManager_6.saveManager.setBlobData({ plume: colors });
+                    this.callback(colors);
+                };
                 PlumePicker.prototype.update = function (updateData) {
                     var _this = this;
                     var sqSize = Tilesets_42.TILE_SIZE;
@@ -10464,11 +10526,10 @@ System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "en
                             .plusY(Math.floor(index / rowLen) * Tilesets_42.TILE_SIZE);
                         var dimensions = new point_69.Point(Tilesets_42.TILE_SIZE, Tilesets_42.TILE_SIZE);
                         var hovered = utils_9.rectContains(position, dimensions, updateData.input.mousePos);
-                        var big = hovered || colors == _this.selected;
+                        var big = hovered || JSON.stringify(colors) == JSON.stringify(_this.selected);
                         var bigBuffer = 2;
                         if (hovered && updateData.input.isMouseDown) {
-                            _this.selected = colors;
-                            _this.callback(colors);
+                            _this.select(colors);
                         }
                         return new RectRender_1.RectRender({
                             position: position.plus(big ? new point_69.Point(-bigBuffer, -bigBuffer) : point_69.Point.ZERO),
@@ -10550,7 +10611,7 @@ System.register("game/ui/MainMenuButton", ["engine/component", "engine/point", "
 });
 System.register("game/scenes/MainMenuScene", ["engine/Entity", "engine/point", "game/characters/DudeAnimationUtils", "game/SaveManager", "game/ui/PlumePicker", "game/ui/MainMenuButton"], function (exports_123, context_123) {
     "use strict";
-    var Entity_27, point_71, DudeAnimationUtils_2, SaveManager_5, PlumePicker_1, MainMenuButton_1, ZOOM, MainMenuScene;
+    var Entity_27, point_71, DudeAnimationUtils_2, SaveManager_7, PlumePicker_1, MainMenuButton_1, ZOOM, MainMenuScene;
     var __moduleName = context_123 && context_123.id;
     return {
         setters: [
@@ -10563,8 +10624,8 @@ System.register("game/scenes/MainMenuScene", ["engine/Entity", "engine/point", "
             function (DudeAnimationUtils_2_1) {
                 DudeAnimationUtils_2 = DudeAnimationUtils_2_1;
             },
-            function (SaveManager_5_1) {
-                SaveManager_5 = SaveManager_5_1;
+            function (SaveManager_7_1) {
+                SaveManager_7 = SaveManager_7_1;
             },
             function (PlumePicker_1_1) {
                 PlumePicker_1 = PlumePicker_1_1;
@@ -10587,18 +10648,21 @@ System.register("game/scenes/MainMenuScene", ["engine/Entity", "engine/point", "
                 MainMenuScene.prototype.getViews = function (updateViewsContext) {
                     var _this = this;
                     var dimensions = updateViewsContext.dimensions.div(ZOOM);
-                    var saveFileExists = SaveManager_5.saveManager.saveFileExists();
+                    var saveFileExists = SaveManager_7.saveManager.saveFileExists();
                     var center = dimensions.floorDiv(2);
                     var lineSpacing = 16;
-                    this.knight.transform.position = center.minus(this.knight.transform.dimensions.floorDiv(2).plusY(41));
-                    var menuTop = center.plusY(-17);
+                    var menuTop = center.plusY(-20);
                     this.plumes.position = menuTop;
+                    this.knight.transform.position = menuTop.minus(this.knight.transform.dimensions.floorDiv(2).plusY(24));
                     var buttons = [];
                     if (this.newGame) {
                         var top_1 = menuTop.plusY(42);
                         buttons.push(new MainMenuButton_1.MainMenuButton(top_1, "start" + (saveFileExists ? " (delete old save)" : ""), this.newGameFn));
                         if (saveFileExists) {
-                            buttons.push(new MainMenuButton_1.MainMenuButton(top_1.plusY(lineSpacing), "cancel", function () { _this.newGame = false; }));
+                            buttons.push(new MainMenuButton_1.MainMenuButton(top_1.plusY(lineSpacing), "cancel", function () {
+                                _this.newGame = false;
+                                _this.plumes.reset();
+                            }));
                         }
                     }
                     else {

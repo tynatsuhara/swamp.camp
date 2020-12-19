@@ -2,10 +2,11 @@ import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets } from "../graphics/Tilesets"
 import { Color } from "../ui/Color"
+import { saveManager } from "../SaveManager"
 
 const maybeFilter = (characterAnimName: string, blob: object, anim: TileSetAnimation) => {
     if (characterAnimName === "knight_f") {
-        const color = blob["color"]
+        const color = saveManager.getBlobData()["plume"]
         if (!!color) {
             return anim
                 .filtered(ImageFilters.recolor(Color.PINK, color[0]))
