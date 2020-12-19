@@ -1,7 +1,6 @@
-import { View } from "../View"
-import { RenderMethod } from "./RenderMethod"
 import { Point } from "../point"
 import { RenderContext } from "./RenderContext"
+import { RenderMethod } from "./RenderMethod"
 
 export class LineRender extends RenderMethod {
     start: Point

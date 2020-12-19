@@ -1,8 +1,6 @@
-import { View } from "../View"
-import { RenderMethod } from "./RenderMethod"
 import { Point } from "../point"
 import { RenderContext } from "./RenderContext"
-import { Component } from "../component"
+import { RenderMethod } from "./RenderMethod"
 
 export class TextRender extends RenderMethod {
     text: string

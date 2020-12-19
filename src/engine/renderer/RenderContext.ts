@@ -36,8 +36,11 @@ export class RenderContext {
         this.context.fillText(text, point.x, point.y + size*this.view.zoom)
     }
 
-    fillRect(x: number, y: number, w: number, h: number): void {
-        this.context.fillRect(x, y, w, h)
+    fillRect(pos: Point, dimensions: Point): void {
+        pos = pos.plus(this.view.offset).times(this.view.zoom)
+        dimensions = dimensions.times(this.view.zoom)
+
+        this.context.fillRect(pos.x, pos.y, dimensions.x, dimensions.y)
     }
 
     /**

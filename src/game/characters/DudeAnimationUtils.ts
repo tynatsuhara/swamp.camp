@@ -1,31 +1,7 @@
-import { Tilesets } from "../graphics/Tilesets"
 import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
 import { ImageFilters } from "../graphics/ImageFilters"
+import { Tilesets } from "../graphics/Tilesets"
 import { Color } from "../ui/Color"
-import { Lists } from "../../engine/util/Lists"
-
-// array of [dark, light] pairs
-// TODO move this
-export const CUSTOMIZATION_OPTIONS = [
-    [Color.DARK_DARK_PINK, Color.DARK_PINK],
-    [Color.DARK_PINK, Color.PINK],
-    [Color.PINK, Color.LIGHT_PINK],
-    [Color.DARK_RED, Color.RED],
-    [Color.DARK_ORANGE, Color.ORANGE],
-    [Color.ORANGE, Color.LIGHT_ORANGE],
-    [Color.GREEN, Color.LIME],
-    [Color.DARK_GREEN, Color.GREEN],
-    [Color.DARK_DARK_BLUE, Color.DARK_BLUE],
-    [Color.DARK_BLUE, Color.LIGHT_BLUE],
-    [Color.DARK_BLUE, Color.LIGHT_BLUE],
-    [Color.TEAL, Color.BRIGHT_BLUE],
-    [Color.DARK_PURPLE, Color.PURPLE],
-    [Color.DARK_PINKLE, Color.PINKLE],
-    [Color.PINKLE, Color.LIGHT_PINKLE],
-    [Color.LIGHT_BROWN, Color.TAN],
-    [Color.BROWN, Color.LIGHT_BROWN],
-    [Color.DARK_BROWN, Color.BROWN],
-]
 
 const maybeFilter = (characterAnimName: string, blob: object, anim: TileSetAnimation) => {
     if (characterAnimName === "knight_f") {
