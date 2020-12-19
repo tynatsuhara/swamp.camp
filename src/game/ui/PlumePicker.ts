@@ -50,7 +50,7 @@ export class PlumePicker extends Component {
         if (!!this.originalSavedColor) {
             this.select(this.originalSavedColor)
         } else {
-            this.select(Lists.oneOf(CUSTOMIZATION_OPTIONS))
+            this.select([Color.PINK, Color.LIGHT_PINK])
         }
     }
 

@@ -4,10 +4,8 @@ import { Point } from "../../engine/point"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
 import { saveManager } from "../SaveManager"
-import { OptionButton, ButtonsMenu } from "../ui/ButtonsMenu"
-import { Color } from "../ui/Color"
-import { PlumePicker } from "../ui/PlumePicker"
 import { MainMenuButton } from "../ui/MainMenuButton"
+import { PlumePicker } from "../ui/PlumePicker"
 
 const ZOOM = 3
 

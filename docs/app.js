@@ -10400,14 +10400,75 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
         }
     };
 });
-System.register("engine/renderer/RectRender", ["engine/point", "engine/renderer/RenderMethod"], function (exports_120, context_120) {
+System.register("game/ui/MainMenuButton", ["engine/component", "engine/point", "engine/renderer/TextRender", "engine/util/utils", "game/graphics/Tilesets", "game/ui/Text", "game/ui/UIStateManager"], function (exports_120, context_120) {
     "use strict";
-    var point_68, RenderMethod_4, RectRender;
+    var component_34, point_68, TextRender_8, utils_9, Tilesets_42, Text_10, UIStateManager_18, MainMenuButton;
     var __moduleName = context_120 && context_120.id;
     return {
         setters: [
+            function (component_34_1) {
+                component_34 = component_34_1;
+            },
             function (point_68_1) {
                 point_68 = point_68_1;
+            },
+            function (TextRender_8_1) {
+                TextRender_8 = TextRender_8_1;
+            },
+            function (utils_9_1) {
+                utils_9 = utils_9_1;
+            },
+            function (Tilesets_42_1) {
+                Tilesets_42 = Tilesets_42_1;
+            },
+            function (Text_10_1) {
+                Text_10 = Text_10_1;
+            },
+            function (UIStateManager_18_1) {
+                UIStateManager_18 = UIStateManager_18_1;
+            }
+        ],
+        execute: function () {
+            MainMenuButton = /** @class */ (function (_super) {
+                __extends(MainMenuButton, _super);
+                function MainMenuButton(position, text, onClick) {
+                    var _this = _super.call(this) || this;
+                    _this.width = 500;
+                    _this.position = position.apply(Math.floor);
+                    _this.text = text;
+                    _this.onClick = onClick;
+                    return _this;
+                }
+                MainMenuButton.prototype.update = function (updateData) {
+                    this.hovering = utils_9.rectContains(this.position.plusX(-this.width / 2).plusY(-4), new point_68.Point(this.width, Tilesets_42.TILE_SIZE), updateData.input.mousePos);
+                    if (this.hovering && updateData.input.isMouseDown) {
+                        this.onClick();
+                    }
+                };
+                MainMenuButton.prototype.getRenderMethods = function () {
+                    if (this.text === null) {
+                        return [];
+                    }
+                    var text = this.hovering
+                        ? "> " + this.text + "  "
+                        : "  " + this.text + "  ";
+                    var offset = Math.floor((this.width - text.length * Text_10.TEXT_PIXEL_WIDTH) / 2);
+                    return [new TextRender_8.TextRender(text.toUpperCase(), this.position.plusX(-this.width / 2).plusX(offset), Text_10.TEXT_SIZE, Text_10.TEXT_FONT, this.hovering ? "#fdf7ed" /* WHITE */ : "#417089" /* DARK_BLUE */, UIStateManager_18.UIStateManager.UI_SPRITE_DEPTH)];
+                };
+                return MainMenuButton;
+            }(component_34.Component));
+            exports_120("MainMenuButton", MainMenuButton);
+        }
+    };
+});
+System.register("engine/renderer/RectRender", ["engine/point", "engine/renderer/RenderMethod"], function (exports_121, context_121) {
+    "use strict";
+    var point_69, RenderMethod_4, RectRender;
+    var __moduleName = context_121 && context_121.id;
+    return {
+        setters: [
+            function (point_69_1) {
+                point_69 = point_69_1;
             },
             function (RenderMethod_4_1) {
                 RenderMethod_4 = RenderMethod_4_1;
@@ -10417,7 +10478,7 @@ System.register("engine/renderer/RectRender", ["engine/point", "engine/renderer/
             RectRender = /** @class */ (function (_super) {
                 __extends(RectRender, _super);
                 function RectRender(_a) {
-                    var _b = _a === void 0 ? {} : _a, _c = _b.depth, depth = _c === void 0 ? 0 : _c, _d = _b.position, position = _d === void 0 ? point_68.Point.ZERO : _d, _e = _b.dimensions, dimensions = _e === void 0 ? point_68.Point.ZERO : _e, _f = _b.color, color = _f === void 0 ? "#ff0000" : _f;
+                    var _b = _a === void 0 ? {} : _a, _c = _b.depth, depth = _c === void 0 ? 0 : _c, _d = _b.position, position = _d === void 0 ? point_69.Point.ZERO : _d, _e = _b.dimensions, dimensions = _e === void 0 ? point_69.Point.ZERO : _e, _f = _b.color, color = _f === void 0 ? "#ff0000" : _f;
                     var _this = _super.call(this, depth) || this;
                     _this.position = position;
                     _this.dimensions = dimensions;
@@ -10430,36 +10491,33 @@ System.register("engine/renderer/RectRender", ["engine/point", "engine/renderer/
                 };
                 return RectRender;
             }(RenderMethod_4.RenderMethod));
-            exports_120("RectRender", RectRender);
+            exports_121("RectRender", RectRender);
         }
     };
 });
-System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "engine/point", "engine/renderer/RectRender", "engine/util/Lists", "engine/util/utils", "game/graphics/Tilesets", "game/SaveManager"], function (exports_121, context_121) {
+System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "engine/point", "engine/renderer/RectRender", "engine/util/utils", "game/graphics/Tilesets", "game/SaveManager"], function (exports_122, context_122) {
     "use strict";
-    var component_34, Entity_26, point_69, RectRender_1, Lists_5, utils_9, Tilesets_42, SaveManager_6, CUSTOMIZATION_OPTIONS, PlumePicker;
-    var __moduleName = context_121 && context_121.id;
+    var component_35, Entity_26, point_70, RectRender_1, utils_10, Tilesets_43, SaveManager_6, CUSTOMIZATION_OPTIONS, PlumePicker;
+    var __moduleName = context_122 && context_122.id;
     return {
         setters: [
-            function (component_34_1) {
-                component_34 = component_34_1;
+            function (component_35_1) {
+                component_35 = component_35_1;
             },
             function (Entity_26_1) {
                 Entity_26 = Entity_26_1;
             },
-            function (point_69_1) {
-                point_69 = point_69_1;
+            function (point_70_1) {
+                point_70 = point_70_1;
             },
             function (RectRender_1_1) {
                 RectRender_1 = RectRender_1_1;
             },
-            function (Lists_5_1) {
-                Lists_5 = Lists_5_1;
+            function (utils_10_1) {
+                utils_10 = utils_10_1;
             },
-            function (utils_9_1) {
-                utils_9 = utils_9_1;
-            },
-            function (Tilesets_42_1) {
-                Tilesets_42 = Tilesets_42_1;
+            function (Tilesets_43_1) {
+                Tilesets_43 = Tilesets_43_1;
             },
             function (SaveManager_6_1) {
                 SaveManager_6 = SaveManager_6_1;
@@ -10491,7 +10549,7 @@ System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "en
                 __extends(PlumePicker, _super);
                 function PlumePicker(callback) {
                     var _this = _super.call(this) || this;
-                    _this.position = point_69.Point.ZERO; // top-center position
+                    _this.position = point_70.Point.ZERO; // top-center position
                     _this.entity = new Entity_26.Entity([_this]);
                     _this.callback = callback;
                     _this.originalSavedColor = SaveManager_6.saveManager.getBlobData()["plume"];
@@ -10499,7 +10557,7 @@ System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "en
                         _this.select(_this.originalSavedColor);
                     }
                     else {
-                        _this.select(Lists_5.Lists.oneOf(CUSTOMIZATION_OPTIONS));
+                        _this.select(["#dc4a7b" /* PINK */, "#f78697" /* LIGHT_PINK */]);
                     }
                     return _this;
                 }
@@ -10518,22 +10576,22 @@ System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "en
                 };
                 PlumePicker.prototype.update = function (updateData) {
                     var _this = this;
-                    var sqSize = Tilesets_42.TILE_SIZE;
+                    var sqSize = Tilesets_43.TILE_SIZE;
                     var rowLen = 9;
                     var topLeftPos = this.position.plusX(-rowLen * sqSize / 2);
                     this.renders = CUSTOMIZATION_OPTIONS.map(function (colors, index) {
-                        var position = topLeftPos.plusX((index % rowLen) * Tilesets_42.TILE_SIZE)
-                            .plusY(Math.floor(index / rowLen) * Tilesets_42.TILE_SIZE);
-                        var dimensions = new point_69.Point(Tilesets_42.TILE_SIZE, Tilesets_42.TILE_SIZE);
-                        var hovered = utils_9.rectContains(position, dimensions, updateData.input.mousePos);
+                        var position = topLeftPos.plusX((index % rowLen) * Tilesets_43.TILE_SIZE)
+                            .plusY(Math.floor(index / rowLen) * Tilesets_43.TILE_SIZE);
+                        var dimensions = new point_70.Point(Tilesets_43.TILE_SIZE, Tilesets_43.TILE_SIZE);
+                        var hovered = utils_10.rectContains(position, dimensions, updateData.input.mousePos);
                         var big = hovered || JSON.stringify(colors) == JSON.stringify(_this.selected);
                         var bigBuffer = 2;
                         if (hovered && updateData.input.isMouseDown) {
                             _this.select(colors);
                         }
                         return new RectRender_1.RectRender({
-                            position: position.plus(big ? new point_69.Point(-bigBuffer, -bigBuffer) : point_69.Point.ZERO),
-                            dimensions: dimensions.plus(big ? new point_69.Point(bigBuffer, bigBuffer).times(2) : point_69.Point.ZERO),
+                            position: position.plus(big ? new point_70.Point(-bigBuffer, -bigBuffer) : point_70.Point.ZERO),
+                            dimensions: dimensions.plus(big ? new point_70.Point(bigBuffer, bigBuffer).times(2) : point_70.Point.ZERO),
                             color: colors[1],
                             depth: big && !hovered ? 2 : hovered ? 1 : 0
                         });
@@ -10543,75 +10601,14 @@ System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "en
                     return this.renders;
                 };
                 return PlumePicker;
-            }(component_34.Component));
-            exports_121("PlumePicker", PlumePicker);
-        }
-    };
-});
-System.register("game/ui/MainMenuButton", ["engine/component", "engine/point", "engine/renderer/TextRender", "engine/util/utils", "game/graphics/Tilesets", "game/ui/Text", "game/ui/UIStateManager"], function (exports_122, context_122) {
-    "use strict";
-    var component_35, point_70, TextRender_8, utils_10, Tilesets_43, Text_10, UIStateManager_18, MainMenuButton;
-    var __moduleName = context_122 && context_122.id;
-    return {
-        setters: [
-            function (component_35_1) {
-                component_35 = component_35_1;
-            },
-            function (point_70_1) {
-                point_70 = point_70_1;
-            },
-            function (TextRender_8_1) {
-                TextRender_8 = TextRender_8_1;
-            },
-            function (utils_10_1) {
-                utils_10 = utils_10_1;
-            },
-            function (Tilesets_43_1) {
-                Tilesets_43 = Tilesets_43_1;
-            },
-            function (Text_10_1) {
-                Text_10 = Text_10_1;
-            },
-            function (UIStateManager_18_1) {
-                UIStateManager_18 = UIStateManager_18_1;
-            }
-        ],
-        execute: function () {
-            MainMenuButton = /** @class */ (function (_super) {
-                __extends(MainMenuButton, _super);
-                function MainMenuButton(position, text, onClick) {
-                    var _this = _super.call(this) || this;
-                    _this.width = 500;
-                    _this.position = position.apply(Math.floor);
-                    _this.text = text;
-                    _this.onClick = onClick;
-                    return _this;
-                }
-                MainMenuButton.prototype.update = function (updateData) {
-                    this.hovering = utils_10.rectContains(this.position.plusX(-this.width / 2).plusY(-4), new point_70.Point(this.width, Tilesets_43.TILE_SIZE), updateData.input.mousePos);
-                    if (this.hovering && updateData.input.isMouseDown) {
-                        this.onClick();
-                    }
-                };
-                MainMenuButton.prototype.getRenderMethods = function () {
-                    if (this.text === null) {
-                        return [];
-                    }
-                    var text = this.hovering
-                        ? "> " + this.text + "  "
-                        : "  " + this.text + "  ";
-                    var offset = Math.floor((this.width - text.length * Text_10.TEXT_PIXEL_WIDTH) / 2);
-                    return [new TextRender_8.TextRender(text.toUpperCase(), this.position.plusX(-this.width / 2).plusX(offset), Text_10.TEXT_SIZE, Text_10.TEXT_FONT, this.hovering ? "#fdf7ed" /* WHITE */ : "#417089" /* DARK_BLUE */, UIStateManager_18.UIStateManager.UI_SPRITE_DEPTH)];
-                };
-                return MainMenuButton;
             }(component_35.Component));
-            exports_122("MainMenuButton", MainMenuButton);
+            exports_122("PlumePicker", PlumePicker);
         }
     };
 });
-System.register("game/scenes/MainMenuScene", ["engine/Entity", "engine/point", "game/characters/DudeAnimationUtils", "game/SaveManager", "game/ui/PlumePicker", "game/ui/MainMenuButton"], function (exports_123, context_123) {
+System.register("game/scenes/MainMenuScene", ["engine/Entity", "engine/point", "game/characters/DudeAnimationUtils", "game/SaveManager", "game/ui/MainMenuButton", "game/ui/PlumePicker"], function (exports_123, context_123) {
     "use strict";
-    var Entity_27, point_71, DudeAnimationUtils_2, SaveManager_7, PlumePicker_1, MainMenuButton_1, ZOOM, MainMenuScene;
+    var Entity_27, point_71, DudeAnimationUtils_2, SaveManager_7, MainMenuButton_1, PlumePicker_1, ZOOM, MainMenuScene;
     var __moduleName = context_123 && context_123.id;
     return {
         setters: [
@@ -10627,11 +10624,11 @@ System.register("game/scenes/MainMenuScene", ["engine/Entity", "engine/point", "
             function (SaveManager_7_1) {
                 SaveManager_7 = SaveManager_7_1;
             },
-            function (PlumePicker_1_1) {
-                PlumePicker_1 = PlumePicker_1_1;
-            },
             function (MainMenuButton_1_1) {
                 MainMenuButton_1 = MainMenuButton_1_1;
+            },
+            function (PlumePicker_1_1) {
+                PlumePicker_1 = PlumePicker_1_1;
             }
         ],
         execute: function () {
