@@ -52,7 +52,7 @@ export class GameScene {
     }
 
     newGame() {
-        saveManager.load()
+        saveManager.deleteSave()
 
         // Wait to initialize since it will begin a coroutine
         new PointLightMaskRenderer()
