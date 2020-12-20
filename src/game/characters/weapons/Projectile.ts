@@ -90,21 +90,6 @@ class Projectile extends Component {
             }
             requestAnimationFrame(move)
         }
-
-        this.update = () => {
-            // const colliding = Player.instance.dude.standingPosition.plusY(-6).distanceTo(position) < 12
-
-            // if (colliding) {
-            //     this.update = () => {}
-            //     setTimeout(() => {
-            //         if (Player.instance.dude.isAlive && !!this.entity) {
-            //             Player.instance.dude.inventory.addItem(this.itemType)
-            //             LocationManager.instance.currentLocation.droppedItems.delete(this.entity)
-            //             this.entity.selfDestruct()
-            //         }
-            //     }, 150)
-            // }
-        }
     }
 
     getEnemy(attacker: Dude, projectilePos: Point, velocity: Point, attackDistance: number): Dude {

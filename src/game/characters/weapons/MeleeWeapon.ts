@@ -6,6 +6,7 @@ import { Point } from "../../../engine/point"
 import { Tilesets } from "../../graphics/Tilesets"
 import { UpdateData } from "../../../engine/engine"
 import { Animator } from "../../../engine/util/Animator"
+import { DudeType } from "../DudeFactory"
 
 enum State {
     SHEATHED,
@@ -87,10 +88,17 @@ export class MeleeWeapon extends Weapon {
             return
         }
         const attackDistance = this.getRange() + 4  // add a tiny buffer for small weapons like the dagger to still work
+        
         // TODO maybe only allow big weapons to hit multiple targets
-        Weapon.getEnemiesInRange(this.dude, attackDistance).forEach(d => {
+        const enemies = Weapon.getEnemiesInRange(this.dude, attackDistance)
+        
+        enemies.forEach(d => {
             d.damage(1, d.standingPosition.minus(this.dude.standingPosition), 30)
         })
+
+        if (this.dude.type === DudeType.PLAYER && enemies.length === 0) {
+            Weapon.hitResources(this.dude)
+        }
     }
 
     private animate() {

@@ -1,15 +1,16 @@
-import { TileComponent } from "../../engine/tiles/TileComponent"
-import { UpdateData, StartData } from "../../engine/engine"
+import { Component } from "../../engine/component"
+import { StartData, UpdateData } from "../../engine/engine"
 import { InputKey } from "../../engine/input"
 import { Point } from "../../engine/point"
-import { Component } from "../../engine/component"
-import { Dude } from "./Dude"
-import { Interactable } from "../world/elements/Interactable"
-import { Hittable } from "../world/elements/Hittable"
-import { UIStateManager } from "../ui/UIStateManager"
-import { Controls } from "../Controls"
+import { TileComponent } from "../../engine/tiles/TileComponent"
 import { Lists } from "../../engine/util/Lists"
+import { Controls } from "../Controls"
+import { UIStateManager } from "../ui/UIStateManager"
+import { Hittable } from "../world/elements/Hittable"
+import { Interactable } from "../world/elements/Interactable"
+import { Dude } from "./Dude"
 import { DudeFactory, DudeType } from "./DudeFactory"
+import { Weapon } from "./weapons/Weapon"
 
 export class Player extends Component {
 
@@ -77,7 +78,6 @@ export class Player extends Component {
 
         if (updateData.input.isMouseHeld) {
             this.dude.weapon.attack()
-            this.hitResource(updateData)  // TODO: restrict the speed at which you can do this (probably easiest once we introduce tools)
         } else {
             this.dude.weapon.cancelAttack()
         }
@@ -129,27 +129,5 @@ export class Player extends Component {
             i.updateIndicator(true)
         }
         return i
-    }
-
-    // for trees and rocks
-    private hitResource(updateData: UpdateData) {
-        const interactDistance = 20
-        const interactCenter = this.dude.standingPosition.minus(new Point(0, 7))
-        const possibilities = updateData.view.entities
-                .map(e => e.getComponent(Hittable))
-                .filter(e => !!e)
-                .filter(e => this.dude.isFacing(e.position))
-        
-        let closestDist = Number.MAX_SAFE_INTEGER
-        let closest: Hittable
-        for (const i of possibilities) {
-            const dist = i.position.distanceTo(interactCenter)
-            if (dist < interactDistance && dist < closestDist) {
-                closestDist = dist
-                closest = i
-            }
-        }
-
-        closest?.hit(closest.position.minus(interactCenter))
     }
 }
