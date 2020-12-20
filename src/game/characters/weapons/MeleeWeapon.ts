@@ -77,18 +77,20 @@ export class MeleeWeapon extends Weapon {
         }
         if (this.state === State.DRAWN) {
             this.state = State.ATTACKING
-            setTimeout(() => {
-                if (!this.enabled) {
-                    return
-                }
-                const attackDistance = this.getRange() + 4  // add a tiny buffer for small weapons like the dagger to still work
-                // TODO maybe only allow big weapons to hit multiple targets
-                Weapon.getEnemiesInRange(this.dude, attackDistance).forEach(d => {
-                    d.damage(1, d.standingPosition.minus(this.dude.standingPosition), 30)
-                })
-            }, 100)
+            setTimeout(() => this.damageEnemies(), 100)
             this.playAttackAnimation()
         }
+    }
+
+    private damageEnemies() {
+        if (!this.enabled) {
+            return
+        }
+        const attackDistance = this.getRange() + 4  // add a tiny buffer for small weapons like the dagger to still work
+        // TODO maybe only allow big weapons to hit multiple targets
+        Weapon.getEnemiesInRange(this.dude, attackDistance).forEach(d => {
+            d.damage(1, d.standingPosition.minus(this.dude.standingPosition), 30)
+        })
     }
 
     private animate() {
@@ -120,7 +122,6 @@ export class MeleeWeapon extends Weapon {
 
         // show sword behind character if sheathed
         this.weaponTransform.depth = this.state == State.SHEATHED ? -.5 : .5
-        // this.weaponSprite.transform.mirrorX = charMirror
 
         // TODO maybe keep the slash stuff later
         // this.slashSprite.enabled = this.animator?.getCurrentFrame() === 3

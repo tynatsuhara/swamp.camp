@@ -19,8 +19,6 @@ export class DroppedItem extends Component {
     /**
      * @param position The bottom center where the item should be placed
      * @param sourceCollider will be ignored to prevent physics issues
-     * 
-     * TODO: Add initial velocity
      */
     constructor(position: Point, item: Item, velocity: Point, sourceCollider: Collider = null) {
         super()

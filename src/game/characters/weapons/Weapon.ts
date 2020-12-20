@@ -21,6 +21,10 @@ export abstract class Weapon extends Component {
 
     abstract getType(): WeaponType
     abstract setDelayBetweenAttacks(delayMillis: number)
+
+    /**
+     * Used to determine if a shield can block
+     */
     abstract isAttacking()
     abstract toggleSheathed()
     abstract getRange(): number

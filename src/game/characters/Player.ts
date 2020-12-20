@@ -75,7 +75,7 @@ export class Player extends Component {
             this.dude.shield.block(updateData.input.isRightMouseHeld)
         }
 
-        if (updateData.input.isMouseDown) {
+        if (updateData.input.isMouseHeld) {
             this.dude.weapon.attack()
             this.hitResource(updateData)  // TODO: restrict the speed at which you can do this (probably easiest once we introduce tools)
         } else {

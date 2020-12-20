@@ -140,8 +140,6 @@ export const ITEM_METADATA_MAP = {
 
 /**
  * @param position The bottom center where the item should be placed
- * 
- * TODO: Add initial velocity
  */
 export const spawnItem = (pos: Point, item: Item, velocity: Point = new Point(0, 0), sourceCollider: Collider = null) => {
     LocationManager.instance.currentLocation.droppedItems.add(new Entity([

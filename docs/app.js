@@ -8408,7 +8408,7 @@ System.register("game/characters/Player", ["engine/point", "engine/component", "
                     if (!!this.dude.shield) {
                         this.dude.shield.block(updateData.input.isRightMouseHeld);
                     }
-                    if (updateData.input.isMouseDown) {
+                    if (updateData.input.isMouseHeld) {
                         this.dude.weapon.attack();
                         this.hitResource(updateData); // TODO: restrict the speed at which you can do this (probably easiest once we introduce tools)
                     }
@@ -9116,8 +9116,6 @@ System.register("game/items/DroppedItem", ["engine/component", "engine/point", "
                 /**
                  * @param position The bottom center where the item should be placed
                  * @param sourceCollider will be ignored to prevent physics issues
-                 *
-                 * TODO: Add initial velocity
                  */
                 function DroppedItem(position, item, velocity, sourceCollider) {
                     if (sourceCollider === void 0) { sourceCollider = null; }
@@ -9287,8 +9285,6 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
                 _a));
             /**
              * @param position The bottom center where the item should be placed
-             *
-             * TODO: Add initial velocity
              */
             exports_112("spawnItem", spawnItem = function (pos, item, velocity, sourceCollider) {
                 if (velocity === void 0) { velocity = new point_62.Point(0, 0); }
@@ -9753,18 +9749,20 @@ System.register("game/characters/weapons/MeleeWeapon", ["game/characters/weapons
                     }
                     if (this.state === State.DRAWN) {
                         this.state = State.ATTACKING;
-                        setTimeout(function () {
-                            if (!_this.enabled) {
-                                return;
-                            }
-                            var attackDistance = _this.getRange() + 4; // add a tiny buffer for small weapons like the dagger to still work
-                            // TODO maybe only allow big weapons to hit multiple targets
-                            Weapon_2.Weapon.getEnemiesInRange(_this.dude, attackDistance).forEach(function (d) {
-                                d.damage(1, d.standingPosition.minus(_this.dude.standingPosition), 30);
-                            });
-                        }, 100);
+                        setTimeout(function () { return _this.damageEnemies(); }, 100);
                         this.playAttackAnimation();
                     }
+                };
+                MeleeWeapon.prototype.damageEnemies = function () {
+                    var _this = this;
+                    if (!this.enabled) {
+                        return;
+                    }
+                    var attackDistance = this.getRange() + 4; // add a tiny buffer for small weapons like the dagger to still work
+                    // TODO maybe only allow big weapons to hit multiple targets
+                    Weapon_2.Weapon.getEnemiesInRange(this.dude, attackDistance).forEach(function (d) {
+                        d.damage(1, d.standingPosition.minus(_this.dude.standingPosition), 30);
+                    });
                 };
                 MeleeWeapon.prototype.animate = function () {
                     var offsetFromEdge = new point_64.Point(this.dude.animation.transform.dimensions.x / 2 - this.weaponTransform.dimensions.x / 2, this.dude.animation.transform.dimensions.y - this.weaponTransform.dimensions.y).plus(this.offsetFromCenter);
@@ -9788,7 +9786,6 @@ System.register("game/characters/weapons/MeleeWeapon", ["game/characters/weapons
                     this.weaponTransform.position = pos;
                     // show sword behind character if sheathed
                     this.weaponTransform.depth = this.state == State.SHEATHED ? -.5 : .5;
-                    // this.weaponSprite.transform.mirrorX = charMirror
                     // TODO maybe keep the slash stuff later
                     // this.slashSprite.enabled = this.animator?.getCurrentFrame() === 3
                     // this.slashSprite.transform.depth = characterAnim.transform.depth + 2
@@ -9860,7 +9857,8 @@ System.register("game/characters/weapons/SpearWeapon", ["game/characters/weapons
             (function (State) {
                 State[State["SHEATHED"] = 0] = "SHEATHED";
                 State[State["DRAWN"] = 1] = "DRAWN";
-                State[State["ATTACKING"] = 2] = "ATTACKING";
+                State[State["DRAWING"] = 2] = "DRAWING";
+                State[State["ATTACKING"] = 3] = "ATTACKING";
             })(State || (State = {}));
             SpearWeapon = /** @class */ (function (_super) {
                 __extends(SpearWeapon, _super);
@@ -9868,6 +9866,8 @@ System.register("game/characters/weapons/SpearWeapon", ["game/characters/weapons
                     var _this = _super.call(this) || this;
                     _this.state = State.DRAWN;
                     _this.delayBetweenAttacks = 0; // delay after the animation ends before the weapon can attack again in millis
+                    _this.timeDrawn = 0;
+                    _this.frameCount = 6;
                     _this.currentAnimationFrame = 0;
                     _this.start = function (startData) {
                         _this.weaponSprite = Tilesets_40.Tilesets.instance.dungeonCharacters.getTileSource("weapon_spear");
@@ -9878,6 +9878,9 @@ System.register("game/characters/weapons/SpearWeapon", ["game/characters/weapons
                     return _this;
                 }
                 SpearWeapon.prototype.update = function (updateData) {
+                    if (this.state === State.DRAWING) {
+                        this.timeDrawn += updateData.elapsedTimeMillis;
+                    }
                     if (!!this.animator) {
                         this.animator.update(updateData.elapsedTimeMillis);
                     }
@@ -9893,7 +9896,7 @@ System.register("game/characters/weapons/SpearWeapon", ["game/characters/weapons
                     this.delayBetweenAttacks = delayMs;
                 };
                 SpearWeapon.prototype.isAttacking = function () {
-                    return this.state === State.ATTACKING;
+                    return this.state === State.DRAWING || this.state === State.ATTACKING;
                 };
                 SpearWeapon.prototype.toggleSheathed = function () {
                     if (this.state === State.SHEATHED) {
@@ -9907,76 +9910,95 @@ System.register("game/characters/weapons/SpearWeapon", ["game/characters/weapons
                     return this._range;
                 };
                 SpearWeapon.prototype.attack = function () {
-                    var _this = this;
                     var _a;
                     if (this.dude.shield && !((_a = this.dude.shield) === null || _a === void 0 ? void 0 : _a.canAttack())) {
                         return;
                     }
                     if (this.state === State.DRAWN) {
+                        this.state = State.DRAWING;
+                    }
+                };
+                SpearWeapon.prototype.cancelAttack = function () {
+                    var _this = this;
+                    if (this.state !== State.DRAWING) {
+                        return;
+                    }
+                    var timeToThrow = 500;
+                    if (this.timeDrawn > timeToThrow) {
+                        console.log("throw");
+                    }
+                    else {
+                        console.log("stab");
                         this.state = State.ATTACKING;
-                        setTimeout(function () {
-                            if (!_this.enabled) {
-                                return;
-                            }
-                            var attackDistance = _this.getRange() + 4; // add a tiny buffer for small weapons like the dagger to still work
-                            // TODO maybe only allow big weapons to hit multiple targets
-                            Weapon_3.Weapon.getEnemiesInRange(_this.dude, attackDistance).forEach(function (d) {
-                                d.damage(1, d.standingPosition.minus(_this.dude.standingPosition), 30);
-                            });
-                        }, 100);
+                        setTimeout(function () { return _this.damageEnemies(); }, 100);
                         this.playAttackAnimation();
                     }
+                    this.timeDrawn = 0;
+                };
+                SpearWeapon.prototype.damageEnemies = function () {
+                    var _this = this;
+                    if (!this.enabled) {
+                        return;
+                    }
+                    var attackDistance = this.getRange() + 4; // add a tiny buffer for small weapons like the dagger to still work
+                    // TODO maybe only allow big weapons to hit multiple targets
+                    Weapon_3.Weapon.getEnemiesInRange(this.dude, attackDistance).forEach(function (d) {
+                        d.damage(1, d.standingPosition.minus(_this.dude.standingPosition), 30);
+                    });
                 };
                 SpearWeapon.prototype.animate = function () {
                     var offsetFromEdge = new point_65.Point(this.dude.animation.transform.dimensions.x / 2 - this.weaponTransform.dimensions.x / 2, this.dude.animation.transform.dimensions.y - this.weaponTransform.dimensions.y).plus(this.offsetFromCenter);
+                    var drawSpeed = 100;
+                    var rotatedOffset = new point_65.Point(10, 10);
                     var pos = new point_65.Point(0, 0);
                     var rotation = 0;
                     if (this.state === State.DRAWN) {
                         pos = offsetFromEdge;
+                        if (!this.dude.shield || this.dude.shield.canAttack()) {
+                            rotation = 90;
+                        }
                     }
-                    else if (this.state === State.SHEATHED) { // TODO add side sheath for swords
+                    else if (this.state === State.SHEATHED) {
                         // center on back
-                        pos = offsetFromEdge.plus(new point_65.Point(3, -1));
+                        pos = offsetFromEdge.plus(new point_65.Point(3, -2));
+                    }
+                    else if (this.state === State.DRAWING) {
+                        var drawn = Math.floor(this.timeDrawn / -drawSpeed);
+                        pos = offsetFromEdge.plusX(Math.max(drawn, -4));
+                        rotation = 90;
                     }
                     else if (this.state === State.ATTACKING) {
                         var posWithRotation = this.getAttackAnimationPosition();
                         pos = posWithRotation[0].plus(offsetFromEdge);
                         rotation = posWithRotation[1];
                     }
-                    this.weaponTransform.rotation = rotation;
-                    this.weaponTransform.mirrorY = this.state == State.SHEATHED;
+                    if (rotation === 90) {
+                        pos = pos.plus(rotatedOffset);
+                    }
                     pos = pos.plus(this.dude.getAnimationOffsetPosition());
+                    this.weaponTransform.rotation = rotation;
                     this.weaponTransform.position = pos;
                     // show sword behind character if sheathed
                     this.weaponTransform.depth = this.state == State.SHEATHED ? -.5 : .5;
-                    // this.weaponSprite.transform.mirrorX = charMirror
                 };
                 SpearWeapon.prototype.playAttackAnimation = function () {
                     var _this = this;
-                    this.animator = new Animator_4.Animator(Animator_4.Animator.frames(8, 40), function (index) { return _this.currentAnimationFrame = index; }, function () {
+                    this.animator = new Animator_4.Animator(Animator_4.Animator.frames(this.frameCount, 40), function (index) { return _this.currentAnimationFrame = index; }, function () {
                         _this.animator = null;
-                        setTimeout(function () {
-                            _this.state = State.DRAWN; // reset to DRAWN when animation finishes
-                        }, _this.delayBetweenAttacks);
+                        // TODO: use delayBetweenAttacks to allow NPCs to use spears
+                        _this.state = State.DRAWN; // reset to DRAWN when animation finishes
                     });
                 };
                 /**
                  * Returns (position, rotation)
                  */
                 SpearWeapon.prototype.getAttackAnimationPosition = function () {
-                    var swingStartFrame = 3;
-                    var resettingFrame = 7;
-                    if (this.currentAnimationFrame < swingStartFrame) {
-                        return [new point_65.Point(this.currentAnimationFrame * 3, 0), 0];
-                    }
-                    else if (this.currentAnimationFrame < resettingFrame) {
-                        return [
-                            new point_65.Point((6 - this.currentAnimationFrame) + this.weaponTransform.dimensions.y - swingStartFrame * 3, Math.floor(this.weaponTransform.dimensions.y / 2 - 1)),
-                            90
-                        ];
+                    if (this.currentAnimationFrame >= this.frameCount - 1) {
+                        return [new point_65.Point(2, 0), 90];
                     }
                     else {
-                        return [new point_65.Point((1 - this.currentAnimationFrame + resettingFrame) * 3, 2), 0];
+                        var x = [8, 14, 16, 12, 8][this.currentAnimationFrame];
+                        return [new point_65.Point(x, 0), 90];
                     }
                 };
                 return SpearWeapon;
@@ -11048,6 +11070,32 @@ System.register("engine/util/Comparators", [], function (exports_131, context_13
         }
     };
 });
+System.register("game/characters/weapons/Projectile", ["engine/component"], function (exports_132, context_132) {
+    "use strict";
+    var component_37, Projectile;
+    var __moduleName = context_132 && context_132.id;
+    return {
+        setters: [
+            function (component_37_1) {
+                component_37 = component_37_1;
+            }
+        ],
+        execute: function () {
+            Projectile = /** @class */ (function (_super) {
+                __extends(Projectile, _super);
+                function Projectile() {
+                    return _super !== null && _super.apply(this, arguments) || this;
+                }
+                return Projectile;
+            }(component_37.Component));
+            // export const spawnProjectile = (pos: Point, item: Item, velocity: Point = new Point(0, 0), sourceCollider: Collider = null) => {
+            //     LocationManager.instance.currentLocation.droppedItems.add(new Entity([
+            //         new Projectile(pos, item, velocity, sourceCollider)
+            //     ]))
+            // }
+        }
+    };
+});
 var FACES = [0, 1, 2, 3, 4, 5];
 var SIDES = 6;
 var STARTING_DICE = 5;
@@ -11222,10 +11270,10 @@ var doGame = function () {
     console.log(playersInGame[0].name + " wins!");
 };
 window['dice'] = doGame;
-System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uuid"], function (exports_132, context_132) {
+System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uuid"], function (exports_133, context_133) {
     "use strict";
     var profiler_2, uuid_2, serialize, buildObject;
-    var __moduleName = context_132 && context_132.id;
+    var __moduleName = context_133 && context_133.id;
     return {
         setters: [
             function (profiler_2_1) {
@@ -11239,7 +11287,7 @@ System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uu
             /**
              * Serializes an object and removes all circular references
              */
-            exports_132("serialize", serialize = function (object) {
+            exports_133("serialize", serialize = function (object) {
                 var resultObject = {}; // maps string->object with subobjects as uuids
                 var topLevelUuidMap = {}; // maps string->object with subobjects as uuids
                 var objectUuidMap = new Map(); // maps unique object ref to uuid
@@ -11286,14 +11334,14 @@ System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uu
     };
 });
 // TODO
-System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point"], function (exports_133, context_133) {
+System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point"], function (exports_134, context_134) {
     "use strict";
-    var component_37, Tilesets_46, TileTransform_29, point_74, StringTiles;
-    var __moduleName = context_133 && context_133.id;
+    var component_38, Tilesets_46, TileTransform_29, point_74, StringTiles;
+    var __moduleName = context_134 && context_134.id;
     return {
         setters: [
-            function (component_37_1) {
-                component_37 = component_37_1;
+            function (component_38_1) {
+                component_38 = component_38_1;
             },
             function (Tilesets_46_1) {
                 Tilesets_46 = Tilesets_46_1;
@@ -11331,8 +11379,8 @@ System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tiles
                     return this.tiles;
                 };
                 return StringTiles;
-            }(component_37.Component));
-            exports_133("StringTiles", StringTiles);
+            }(component_38.Component));
+            exports_134("StringTiles", StringTiles);
         }
     };
 });
