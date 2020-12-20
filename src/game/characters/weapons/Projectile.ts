@@ -110,8 +110,8 @@ class Projectile extends Component {
         const colliderOffset = this.collider.position.minus(this.tile.transform.position)
         const beforePos = this.tile.transform.position
 
-        this.tile.transform.position = this.collider.moveTo(this.collider.position.plus(delta)).minus(colliderOffset)
-        this.tile.transform.depth = this.tile.transform.position.y + this.tile.transform.dimensions.y
+        this.tile.transform.position = this.collider.moveTo(this.collider.position.plus(delta).apply(Math.floor)).minus(colliderOffset)
+        this.tile.transform.depth = this.tile.transform.position.y + this.tile.transform.dimensions.y - 14
 
         const afterPos = this.tile.transform.position
         return beforePos.distanceTo(afterPos) >= 0.05

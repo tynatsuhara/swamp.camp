@@ -9974,8 +9974,8 @@ System.register("game/characters/weapons/Projectile", ["engine/collision/BoxColl
                     if (delta === void 0) { delta = new point_66.Point(0, 0); }
                     var colliderOffset = this.collider.position.minus(this.tile.transform.position);
                     var beforePos = this.tile.transform.position;
-                    this.tile.transform.position = this.collider.moveTo(this.collider.position.plus(delta)).minus(colliderOffset);
-                    this.tile.transform.depth = this.tile.transform.position.y + this.tile.transform.dimensions.y;
+                    this.tile.transform.position = this.collider.moveTo(this.collider.position.plus(delta).apply(Math.floor)).minus(colliderOffset);
+                    this.tile.transform.depth = this.tile.transform.position.y + this.tile.transform.dimensions.y - 14;
                     var afterPos = this.tile.transform.position;
                     return beforePos.distanceTo(afterPos) >= 0.05;
                 };
