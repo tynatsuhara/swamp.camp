@@ -11,6 +11,7 @@ import { WorldTime } from "./WorldTime"
 import { Color } from "../ui/Color"
 import { WorldLocation } from "./WorldLocation"
 import { LocationManager } from "./LocationManager"
+import { TimeUnit } from "./TimeUnit"
 
 export class PointLightMaskRenderer {
 
@@ -76,28 +77,28 @@ export class PointLightMaskRenderer {
 
     private updateColorForTime() {
         const time = WorldTime.instance.time
-        const hour = (time % WorldTime.DAY) / WorldTime.HOUR
-		const timeSoFar = time % WorldTime.HOUR
+        const hour = (time % TimeUnit.DAY) / TimeUnit.HOUR
+		const timeSoFar = time % TimeUnit.HOUR
 		const clamp01 = (val) => Math.min(Math.max(val, 0), 1)
 
         const nightColor = this.colorFromString(Color.BLACK, 0.8)
         const sunriseColor = this.colorFromString(Color.PINK, 0.2)
         const dayColor = this.colorFromString(Color.LIGHT_PINK, 0)
         const sunsetColor = this.colorFromString(Color.DARK_PURPLE, 0.2)
-        const transitionTime = WorldTime.HOUR
+        const transitionTime = TimeUnit.HOUR
 
         // TODO: make these transitions quicker
         if (hour >= 5 && hour < 6) {
-			const percentTransitioned = clamp01((timeSoFar + (hour - 5) * WorldTime.HOUR)/transitionTime)
+			const percentTransitioned = clamp01((timeSoFar + (hour - 5) * TimeUnit.HOUR)/transitionTime)
 			this.lerpColorString(nightColor, sunriseColor, percentTransitioned) // sunrise		
 		} else if (hour >= 6 && hour < 20) {
-			const percentTransitioned = clamp01((timeSoFar + (hour - 6) * WorldTime.HOUR)/transitionTime)
+			const percentTransitioned = clamp01((timeSoFar + (hour - 6) * TimeUnit.HOUR)/transitionTime)
 			this.lerpColorString(sunriseColor, dayColor, percentTransitioned)   // day	
 		} else if (hour >= 20 && hour < 21) {
-			const percentTransitioned = clamp01((timeSoFar + (hour - 20) * WorldTime.HOUR)/transitionTime)			
+			const percentTransitioned = clamp01((timeSoFar + (hour - 20) * TimeUnit.HOUR)/transitionTime)			
 			this.lerpColorString(dayColor, sunsetColor, percentTransitioned)    // sunset
 		} else {
-			const percentTransitioned = clamp01((timeSoFar + (24 + hour - 21) % 24 * WorldTime.HOUR)/transitionTime)			
+			const percentTransitioned = clamp01((timeSoFar + (24 + hour - 21) % 24 * TimeUnit.HOUR)/transitionTime)			
 			this.lerpColorString(sunsetColor, nightColor, percentTransitioned)  // night			
 		}
     }

@@ -19,6 +19,7 @@ import { LocationManager } from "../world/LocationManager"
 import { MapGenerator } from "../world/MapGenerator"
 import { PointLightMaskRenderer } from "../world/PointLightMaskRenderer"
 import { WorldTime } from "../world/WorldTime"
+import { TimeUnit } from "../world/TimeUnit"
 
 const ZOOM = 3
 
@@ -57,7 +58,7 @@ export class GameScene {
         // Wait to initialize since it will begin a coroutine
         new PointLightMaskRenderer()
         new LocationManager()
-        new WorldTime(WorldTime.HOUR * 19.5)
+        new WorldTime(TimeUnit.HOUR * 19.5)
         new EventQueue()
         
         // World must be initialized before we do anything else

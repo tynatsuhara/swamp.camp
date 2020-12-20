@@ -3,13 +3,11 @@ import { Component } from "../../engine/component"
 import { UpdateData } from "../../engine/engine"
 import { EventQueue } from "./events/EventQueue"
 import { InputKey } from "../../engine/input"
+import { TimeUnit } from "./TimeUnit"
 
 export class WorldTime extends Component {
 
     static instance: WorldTime
-    static readonly MINUTE = 1500  // millis in an in-game minute
-    static readonly HOUR = 60 * WorldTime.MINUTE
-    static readonly DAY = 24 * WorldTime.HOUR
 
     private _time: number = 0  // millis
     get time() { return this._time }
@@ -25,7 +23,7 @@ export class WorldTime extends Component {
 
         // TODO cleanup
         if (updateData.input.isKeyDown(InputKey.N) || updateData.input.isKeyDown(InputKey.M)) {
-            this._time += updateData.input.isKeyDown(InputKey.N) ? WorldTime.HOUR : WorldTime.MINUTE
+            this._time += updateData.input.isKeyDown(InputKey.N) ? TimeUnit.HOUR : TimeUnit.MINUTE
             console.log(`fast forwarding time to ${this.clockTime()}`)
         }
 
@@ -39,12 +37,12 @@ export class WorldTime extends Component {
     }
 
     future({ minutes = 0, hours = 0, days = 0 }) {
-        return this.time + (minutes * WorldTime.MINUTE) + (hours * WorldTime.HOUR) + (days * WorldTime.DAY)
+        return this.time + (minutes * TimeUnit.MINUTE) + (hours * TimeUnit.HOUR) + (days * TimeUnit.DAY)
     }
 
     private clockTime() {
-        const hour = Math.floor(this.time % WorldTime.DAY/WorldTime.HOUR)
-        const minute = Math.floor(this.time % WorldTime.HOUR/WorldTime.MINUTE)
+        const hour = Math.floor(this.time % TimeUnit.DAY/TimeUnit.HOUR)
+        const minute = Math.floor(this.time % TimeUnit.HOUR/TimeUnit.MINUTE)
         return `${hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour)}:${(minute < 10 ? "0" : "")}${minute} ${hour < 12 ? "AM" : "PM"}`
     }
 }

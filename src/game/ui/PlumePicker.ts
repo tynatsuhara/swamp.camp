@@ -46,7 +46,7 @@ export class PlumePicker extends Component {
         super()
         this.callback = callback
         
-        this.originalSavedColor = saveManager.getBlobData()["plume"]
+        this.originalSavedColor = saveManager.getState().plume
         if (!!this.originalSavedColor) {
             this.select(this.originalSavedColor)
         } else {
@@ -65,7 +65,7 @@ export class PlumePicker extends Component {
 
     private select(colors: Color[]) {
         this.selected = colors
-        saveManager.setBlobData({ plume: colors })
+        saveManager.setState({ plume: colors })
         this.callback(colors)
     }
 

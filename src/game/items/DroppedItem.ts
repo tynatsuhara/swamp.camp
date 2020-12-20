@@ -6,6 +6,7 @@ import { TileComponent } from "../../engine/tiles/TileComponent"
 import { Player } from "../characters/Player"
 import { LocationManager } from "../world/LocationManager"
 import { Item, ITEM_METADATA_MAP } from "./Items"
+import { saveManager } from "../SaveManager"
 
 export class DroppedItem extends Component {
 
@@ -66,9 +67,16 @@ export class DroppedItem extends Component {
                 this.update = () => {}
                 setTimeout(() => {
                     if (Player.instance.dude.isAlive && !!this.entity) {
-                        Player.instance.dude.inventory.addItem(this.itemType)
-                        LocationManager.instance.currentLocation.droppedItems.delete(this.entity)
-                        this.entity.selfDestruct()
+                        if (this.itemType === Item.COIN) {
+                            saveManager.setState({ 
+                                coins: saveManager.getState().coins + 1 
+                            })
+                        }
+
+                        if (this.itemType === Item.COIN || Player.instance.dude.inventory.addItem(this.itemType)) {
+                            LocationManager.instance.currentLocation.droppedItems.delete(this.entity)
+                            this.entity.selfDestruct()
+                        }
                     }
                 }, 150)
             }

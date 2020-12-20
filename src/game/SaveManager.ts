@@ -1,5 +1,5 @@
 import { Player } from "./characters/Player"
-import { Save } from "./saves/SaveGame"
+import { Save, SaveState } from "./saves/SaveGame"
 import { LocationManager } from "./world/LocationManager"
 import { UIStateManager } from "./ui/UIStateManager"
 import { Camera } from "./cutscenes/Camera"
@@ -12,34 +12,33 @@ const SAVE_KEY = "save"
 
 class SaveManager {
 
-    private blob: object
+    private state: SaveState
 
     /**
-     * Adds all key/values in newBlob to blob data storage.
+     * Adds all key/values in newState to the save state.
      * This DOES NOT flush the data, and save() should be
-     * called after if you want to immediately persist the
-     * blob data.
+     * called after if you want to immediately persist it.
      */
-    setBlobData(newBlob: object) {
-        if (!this.blob) {
-            this.getBlobData()    
+    setState(newState: SaveState) {
+        if (!this.state) {
+            this.getState()    
         }
-        this.blob = {
-            ...this.blob,
-            ...newBlob
+        this.state = {
+            ...this.state,
+            ...newState
         }
     }
 
-    getBlobData() {
-        if (!this.blob) {
+    getState(): SaveState {
+        if (!this.state) {
             if (this.saveFileExists()) {
                 // pre-load this before "load" is called to display data on the main menu
-                this.blob = this.getSavedData().blob
+                this.state = this.getSavedData().state
             } else {
-                this.blob = {}
+                this.state = {}
             }
         }
-        return this.blob
+        return this.state
     }
 
     save() {
@@ -54,7 +53,7 @@ class SaveManager {
             locations: LocationManager.instance.save(),
             worldTime: WorldTime.instance.time,
             eventQueue: EventQueue.instance.save(),
-            blob: this.blob,
+            state: this.state,
         }
         console.log("saved game")
         localStorage.setItem(SAVE_KEY, JSON.stringify(save))  // TODO support save slots

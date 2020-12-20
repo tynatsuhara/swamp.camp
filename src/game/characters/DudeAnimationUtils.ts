@@ -6,7 +6,7 @@ import { saveManager } from "../SaveManager"
 
 const maybeFilter = (characterAnimName: string, blob: object, anim: TileSetAnimation) => {
     if (characterAnimName === "knight_f") {
-        const color = saveManager.getBlobData()["plume"]
+        const color = saveManager.getState().plume
         if (!!color) {
             return anim
                 .filtered(ImageFilters.recolor(Color.PINK, color[0]))

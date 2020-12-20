@@ -19,6 +19,7 @@ import { TEXT_FONT, TEXT_SIZE } from "./Text"
 import { Color } from "./Color"
 import { Controls } from "../Controls"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
+import { saveManager } from "../SaveManager"
 
 export class InventoryDisplay extends Component {
 
@@ -189,7 +190,7 @@ export class InventoryDisplay extends Component {
         this.displayEntity.addComponent(
             new BasicRenderComponent(
                 new TextRender(
-                    `x${this.inventory().getItemCount(Item.COIN)}`, 
+                    `x${saveManager.getState().coins}`, 
                     new Point(9, 1).plus(this.offset).plus(this.coinsOffset), 
                     TEXT_SIZE, 
                     TEXT_FONT, 

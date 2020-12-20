@@ -74,7 +74,7 @@ export const enum Item {
 export const ITEM_METADATA_MAP = {
     [Item.COIN]: new ItemMetadata({
         displayName: "Coin",
-        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("coin"),
+        inventoryIconSupplier: () => null,  // coins don't take an inventory slot
         droppedIconSupplier: () => Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150),
         stackLimit: Number.MAX_SAFE_INTEGER,
     }),
