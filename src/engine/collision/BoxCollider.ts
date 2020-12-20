@@ -1,9 +1,6 @@
-import { Collider } from "./Collider"
-import { RenderMethod } from "../renderer/RenderMethod"
-import { debug } from "../debug"
-import { LineRender } from "../renderer/LineRender"
 import { Point } from "../point"
 import { rectContains } from "../util/utils"
+import { Collider } from "./Collider"
 import { CollisionEngine } from "./CollisionEngine"
 
 export class BoxCollider extends Collider {

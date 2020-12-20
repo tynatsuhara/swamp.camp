@@ -1,9 +1,8 @@
-import { Component } from "../../../engine/component";
-import { Point } from "../../../engine/point"
-import { Animator } from "../../../engine/util/Animator"
-import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { Component } from "../../../engine/component"
 import { UpdateData } from "../../../engine/engine"
-import { spawnItem } from "../../items/Items"
+import { Point } from "../../../engine/point"
+import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { Animator } from "../../../engine/util/Animator"
 
 export class Hittable extends Component {
 

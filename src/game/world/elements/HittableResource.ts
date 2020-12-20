@@ -1,13 +1,11 @@
-import { Hittable } from "./Hittable"
+import { BoxCollider } from "../../../engine/collision/BoxCollider"
 import { Point } from "../../../engine/point"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
-import { spawnItem, ItemMetadata, Item } from "../../items/Items"
 import { TILE_SIZE } from "../../graphics/Tilesets"
-import { Entity } from "../../../engine/Entity"
-import { Collider } from "../../../engine/collision/Collider"
-import { BoxCollider } from "../../../engine/collision/BoxCollider"
+import { Item, spawnItem } from "../../items/Items"
 import { LocationManager } from "../LocationManager"
 import { ElementComponent } from "./ElementComponent"
+import { Hittable } from "./Hittable"
 
 export class HittableResource extends Hittable {
 

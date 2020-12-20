@@ -1,9 +1,9 @@
 import { Component } from "../component"
-import { StartData, UpdateData } from "../engine"
-import { Point } from "../point"
-import { RenderMethod } from "../renderer/RenderMethod"
-import { LineRender } from "../renderer/LineRender"
 import { debug } from "../debug"
+import { UpdateData } from "../engine"
+import { Point } from "../point"
+import { LineRender } from "../renderer/LineRender"
+import { RenderMethod } from "../renderer/RenderMethod"
 import { CollisionEngine } from "./CollisionEngine"
 
 /**

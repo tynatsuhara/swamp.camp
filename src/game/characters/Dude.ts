@@ -306,6 +306,10 @@ export class Dude extends Component implements DialogueSource {
         return this.animation.transform.mirrorX === (pt.x < this.standingPosition.x)
     }
 
+    facingMultipler() {
+        return this.animation.transform.mirrorX ? -1 : 1
+    }
+
     getAnimationOffsetPosition(): Point {
         // magic based on the animations
         const f = this.animation.currentFrame()

@@ -1,12 +1,11 @@
+import { BoxCollider } from "../../engine/collision/BoxCollider"
+import { Collider } from "../../engine/collision/Collider"
 import { Component } from "../../engine/component"
 import { Point } from "../../engine/point"
-import { Collider } from "../../engine/collision/Collider"
-import { BoxCollider } from "../../engine/collision/BoxCollider"
-import { Player } from "../characters/Player"
-import { Dude } from "../characters/Dude"
-import { LocationManager } from "../world/LocationManager"
-import { ItemMetadata, Item, ITEM_METADATA_MAP } from "./Items"
 import { TileComponent } from "../../engine/tiles/TileComponent"
+import { Player } from "../characters/Player"
+import { LocationManager } from "../world/LocationManager"
+import { Item, ITEM_METADATA_MAP } from "./Items"
 
 export class DroppedItem extends Component {
 
