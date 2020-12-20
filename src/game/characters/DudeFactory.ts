@@ -30,7 +30,7 @@ export const enum DudeType {
     ELF,
     ORC_WARRIOR,
     HERALD,
-    HORNED_DEMON
+    HORNED_DEMON,
 }
 
 export class DudeFactory {
