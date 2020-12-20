@@ -129,7 +129,13 @@ export const ITEM_METADATA_MAP = {
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("sword"), 
         stackLimit: 1,
         equippable: WeaponType.SWORD
-    })
+    }),
+    [Item.SPEAR]: new ItemMetadata({
+        displayName: "Spear",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("spear"), 
+        stackLimit: 1,
+        equippable: WeaponType.SPEAR
+    }),
 }
 
 /**

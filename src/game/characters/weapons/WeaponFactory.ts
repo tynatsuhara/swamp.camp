@@ -3,6 +3,7 @@ import { Weapon } from "./Weapon"
 import { UnarmedWeapon } from "./UnarmedWeapon"
 import { MeleeWeapon } from "./MeleeWeapon"
 import { Point } from "../../../engine/point"
+import { SpearWeapon } from "./SpearWeapon"
 
 export const WeaponFactory = {
 
@@ -21,6 +22,8 @@ export const WeaponFactory = {
                 return new MeleeWeapon(WeaponType.PICKAXE, "weapon_pickaxe", new Point(-5, -2))
             case WeaponType.AXE:
                 return new MeleeWeapon(WeaponType.AXE, "weapon_axe", new Point(-3, -1))
+            case WeaponType.SPEAR:
+                return new SpearWeapon()
             default:
                 throw new Error(`weapon type ${type} is not supported yet`)
         }

@@ -78,6 +78,8 @@ export class Player extends Component {
         if (updateData.input.isMouseDown) {
             this.dude.weapon.attack()
             this.hitResource(updateData)  // TODO: restrict the speed at which you can do this (probably easiest once we introduce tools)
+        } else {
+            this.dude.weapon.cancelAttack()
         }
 
         if (updateData.input.isKeyDown(Controls.interactButton) && !!possibleInteractable) {

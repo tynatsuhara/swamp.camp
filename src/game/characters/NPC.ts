@@ -211,6 +211,8 @@ export class NPC extends Component {
 
         if (mag < this.dude.weapon?.getRange()) {
             this.dude.weapon.attack()
+        } else {
+            this.dude.weapon.cancelAttack()
         }
 
         if (this.targetPath.length === 0) {

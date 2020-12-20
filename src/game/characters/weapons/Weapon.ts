@@ -1,9 +1,6 @@
 import { Component } from "../../../engine/component"
-import { Point } from "../../../engine/point"
 import { LocationManager } from "../../world/LocationManager"
 import { Dude } from "../Dude"
-import { MeleeWeapon } from "./MeleeWeapon"
-import { UnarmedWeapon } from "./UnarmedWeapon"
 import { WeaponType } from "./WeaponType"
 
 export abstract class Weapon extends Component {
@@ -32,4 +29,9 @@ export abstract class Weapon extends Component {
      * This can be called every single frame and should handle that appropriately
      */
     abstract attack()
+
+    /**
+     * This will be called on any frame that attack() is not called
+     */
+    cancelAttack() {}
 }
