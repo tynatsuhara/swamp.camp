@@ -9942,18 +9942,21 @@ System.register("game/characters/weapons/Projectile", ["engine/collision/BoxColl
                                         velocity = point_66.Point.ZERO;
                                         // make the projectile stick to the enemy
                                         var relativeOffset = _this.tile.transform.position.minus(enemy.animation.transform.position);
+                                        var relativeDepth = _this.tile.transform.depth - enemy.animation.transform.depth;
                                         _this.tile.transform.relativeTo(enemy.animation.transform);
                                         _this.tile.transform.position = relativeOffset;
+                                        _this.tile.transform.depth = relativeDepth;
                                         _this.tile.transform.position = new point_66.Point(_this.tile.transform.dimensions.y - 10, relativeOffset.y);
                                         enemy.damage(1, enemy.standingPosition.minus(attacker.standingPosition), 30);
-                                        // TODO despawn after a while
-                                        return;
                                     }
                                 }
                                 velocity = velocity.times(.6);
                             }
                             if (velocity.magnitude() >= .1) {
                                 requestAnimationFrame(move);
+                            }
+                            else {
+                                setTimeout(function () { return _this.entity.selfDestruct(); }, 5000);
                             }
                             last = now;
                         };
@@ -10092,7 +10095,7 @@ System.register("game/characters/weapons/SpearWeapon", ["game/characters/weapons
                         this.dude.inventory.removeItem(100021 /* SPEAR */, 1);
                         this.dude.setWeapon(WeaponType_6.WeaponType.UNARMED);
                         var newTransform = new TileTransform_27.TileTransform(this.weaponTransform.position, this.weaponTransform.dimensions, this.weaponTransform.rotation, this.weaponTransform.mirrorX, this.weaponTransform.mirrorY, this.weaponTransform.depth);
-                        Projectile_1.spawnProjectile(newTransform.position.plusY(27), this.weaponSprite, 100021 /* SPEAR */, new point_67.Point(40 * this.dude.facingMultipler(), 2.5), this.dude);
+                        Projectile_1.spawnProjectile(newTransform.position.plusY(24), this.weaponSprite, 100021 /* SPEAR */, new point_67.Point(40 * this.dude.facingMultipler(), 4.5), this.dude);
                     }
                     else {
                         this.state = State.ATTACKING;

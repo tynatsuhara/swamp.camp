@@ -64,27 +64,29 @@ class Projectile extends Component {
                             velocity,
                             20
                         )
+
                         if (!!enemy) {
                             this.collider.delete()
                             velocity = Point.ZERO
                             
                             // make the projectile stick to the enemy
                             const relativeOffset = this.tile.transform.position.minus(enemy.animation.transform.position)
+                            const relativeDepth = this.tile.transform.depth - enemy.animation.transform.depth
                             this.tile.transform.relativeTo(enemy.animation.transform)
                             this.tile.transform.position = relativeOffset
+                            this.tile.transform.depth = relativeDepth
 
                             this.tile.transform.position = new Point(this.tile.transform.dimensions.y - 10, relativeOffset.y)
 
                             enemy.damage(1, enemy.standingPosition.minus(attacker.standingPosition), 30)
-
-                            // TODO despawn after a while
-                            return
                         }
                     }
                     velocity = velocity.times(.6)
                 }
                 if (velocity.magnitude() >= .1) {
                     requestAnimationFrame(move)
+                } else {
+                    setTimeout(() => this.entity.selfDestruct(), 5000)
                 }
                 last = now
             }

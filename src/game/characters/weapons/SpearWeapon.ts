@@ -107,10 +107,10 @@ export class SpearWeapon extends Weapon {
             )
 
             spawnProjectile(
-                newTransform.position.plusY(27),
+                newTransform.position.plusY(24),
                 this.weaponSprite,
                 Item.SPEAR,
-                new Point(40 * this.dude.facingMultipler(), 2.5),
+                new Point(40 * this.dude.facingMultipler(), 4.5),
                 this.dude
             )
         } else {
