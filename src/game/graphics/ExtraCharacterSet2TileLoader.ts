@@ -3,14 +3,15 @@ import { Point } from "../../engine/point"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
 
-const ROW_WIDTH = 161
+const ROW_WIDTH = 160
 const ROW_START = 32
 const TILE_HEIGHT = 32
 const TILE_WIDTH = 16
 
 // maps to [column, row]
 const CHARACTERS = new Map([
-    ["prisoner1", [1, 1]]
+    ["prisoner1", [1, 1]],
+    ["prisoner2", [1, 3]],
 ])
 
 export class ExtraCharacterSet2TileLoader {

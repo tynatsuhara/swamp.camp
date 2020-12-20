@@ -2218,13 +2218,14 @@ System.register("game/graphics/ExtraCharacterSet2TileLoader", ["engine/Assets", 
             }
         ],
         execute: function () {
-            ROW_WIDTH = 161;
+            ROW_WIDTH = 160;
             ROW_START = 32;
             TILE_HEIGHT = 32;
             TILE_WIDTH = 16;
             // maps to [column, row]
             CHARACTERS = new Map([
-                ["prisoner1", [1, 1]]
+                ["prisoner1", [1, 1]],
+                ["prisoner2", [1, 3]],
             ]);
             ExtraCharacterSet2TileLoader = /** @class */ (function () {
                 function ExtraCharacterSet2TileLoader() {
