@@ -8,10 +8,10 @@ export class SingleFileTileLoader {
 
     private readonly filename: string
     private readonly map: Map<string, Point>
-    private readonly tileSize: number
+    private readonly tileSize: Point
     private readonly padding: number
 
-    constructor(filename: string, map: Map<string, Point> = new Map(), tileSize: number = 16, padding = 1) {
+    constructor(filename: string, map: Map<string, Point> = new Map(), tileSize: Point = new Point(16, 16), padding = 1) {
         this.filename = filename
         this.map = map
         this.tileSize = tileSize
@@ -43,8 +43,8 @@ export class SingleFileTileLoader {
     getTileAt(pos: Point) {
         return new StaticTileSource(
             this.image(), 
-            pos.times(this.tileSize + this.padding), 
-            new Point(this.tileSize, this.tileSize)
+            new Point(pos.x * (this.tileSize.x + this.padding), pos.y * (this.tileSize.y + this.padding)),
+            this.tileSize
         )
     }
 

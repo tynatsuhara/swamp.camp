@@ -1,5 +1,3 @@
-import { Engine } from "./engine"
-
 class Assets {
 
     private readonly map = new Map<string, HTMLImageElement>()
@@ -20,7 +18,7 @@ class Assets {
     getImageByFileName(fileName: string): HTMLImageElement {
         const result = this.map.get(fileName)
         if (!result) {
-            throw new Error(`file ${fileName} does not exist`)
+            console.log(`file ${fileName} does not exist`)
         }
         return result
     }

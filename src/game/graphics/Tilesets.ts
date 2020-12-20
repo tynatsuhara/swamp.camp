@@ -6,6 +6,7 @@ import { OutdoorTileset } from "./OutdoorTileset"
 import { Point } from "../../engine/point"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { TileSource } from "../../engine/tiles/TileSource"
+import { ExtraCharacterSet2TileLoader } from "./ExtraCharacterSet2TileLoader"
 
 // standard tile size
 export const TILE_SIZE = 16
@@ -33,7 +34,8 @@ export class Tilesets {
     readonly indoorTiles = new SingleFileTileLoader("images/env_indoor.png")
     readonly outdoorTiles = new OutdoorTileset()
     readonly oneBit = new OneBitTileset()
-    readonly otherCharacters = new SplitFileTileLoader("images/individual_characters")
+    readonly extraCharacterSet1 = new SplitFileTileLoader("images/individual_characters")
+    readonly extraCharacterSet2 = new ExtraCharacterSet2TileLoader()
 
     private constructor() {
         // not allowed
@@ -67,6 +69,7 @@ export class Tilesets {
             "images/env_outdoor.png",
             "images/env_outdoor_recolor.png",
             "images/tilemap.png",
+            "images/extra_characters.png",
             "images/individual_characters/Alchemist_Idle_1.png",
             "images/individual_characters/Alchemist_Idle_2.png",
             "images/individual_characters/Alchemist_Idle_3.png",
