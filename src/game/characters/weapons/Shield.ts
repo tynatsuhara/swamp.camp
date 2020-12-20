@@ -1,11 +1,11 @@
-import { Component } from "../../engine/component"
-import { TileComponent } from "../../engine/tiles/TileComponent"
-import { Tilesets } from "../graphics/Tilesets"
-import { UpdateData } from "../../engine/engine"
-import { TileTransform } from "../../engine/tiles/TileTransform"
-import { Point } from "../../engine/point"
-import { Dude } from "./Dude"
-import { Animator } from "../../engine/util/Animator"
+import { Component } from "../../../engine/component"
+import { TileComponent } from "../../../engine/tiles/TileComponent"
+import { Tilesets } from "../../graphics/Tilesets"
+import { UpdateData } from "../../../engine/engine"
+import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { Point } from "../../../engine/point"
+import { Dude } from "../Dude"
+import { Animator } from "../../../engine/util/Animator"
 
 enum State {
     ON_BACK,

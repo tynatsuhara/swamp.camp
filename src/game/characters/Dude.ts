@@ -19,9 +19,10 @@ import { LocationManager } from "../world/LocationManager"
 import { DudeAnimationUtils } from "./DudeAnimationUtils"
 import { Dialogue, DialogueSource, getDialogue } from "./Dialogue"
 import { DudeFaction, DudeType } from "./DudeFactory"
-import { Shield } from "./Shield"
-import { getWeaponComponent, Weapon } from "./Weapon"
-import { WeaponType } from "./WeaponType"
+import { Shield } from "./weapons/Shield"
+import { Weapon } from "./weapons/Weapon"
+import { WeaponType } from "./weapons/WeaponType"
+import { WeaponFactory } from "./weapons/WeaponFactory"
 
 export class Dude extends Component implements DialogueSource {
 
@@ -142,7 +143,7 @@ export class Dude extends Component implements DialogueSource {
         if (!!this.weapon) {
             this.entity.removeComponent(this.weapon)
         }
-        this._weapon = getWeaponComponent(type)
+        this._weapon = WeaponFactory.make(type)
         if (!!this._weapon) {
             this.entity.addComponent(this._weapon)
         }

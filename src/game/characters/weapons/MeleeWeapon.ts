@@ -1,33 +1,11 @@
-import { Component } from "../../engine/component"
-import { UpdateData } from "../../engine/engine"
-import { Point } from "../../engine/point"
-import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
-import { TileTransform } from "../../engine/tiles/TileTransform"
-import { Animator } from "../../engine/util/Animator"
-import { Tilesets } from "../graphics/Tilesets"
-import { LocationManager } from "../world/LocationManager"
-import { Dude } from "./Dude"
+import { Weapon } from "./Weapon"
 import { WeaponType } from "./WeaponType"
-
-export const getWeaponComponent = (type: WeaponType): Weapon => {
-    // TODO support additional weapons
-    switch (type) {
-        case WeaponType.NONE:
-            return null
-        case WeaponType.UNARMED:
-            return new UnarmedWeapon()
-        case WeaponType.SWORD:
-            return new MeleeWeapon(WeaponType.SWORD, "weapon_regular_sword", new Point(-6, -2))
-        case WeaponType.CLUB:
-            return new MeleeWeapon(WeaponType.CLUB, "weapon_baton_with_spikes", new Point(-6, -2))
-        case WeaponType.PICKAXE:
-            return new MeleeWeapon(WeaponType.PICKAXE, "weapon_pickaxe", new Point(-5, -2))
-        case WeaponType.AXE:
-            return new MeleeWeapon(WeaponType.AXE, "weapon_axe", new Point(-3, -1))
-        default:
-            throw new Error(`weapon type ${type} is not supported yet`)
-    }
-}
+import { StaticTileSource } from "../../../engine/tiles/StaticTileSource"
+import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { Point } from "../../../engine/point"
+import { Tilesets } from "../../graphics/Tilesets"
+import { UpdateData } from "../../../engine/engine"
+import { Animator } from "../../../engine/util/Animator"
 
 enum State {
     SHEATHED,
@@ -35,39 +13,7 @@ enum State {
     ATTACKING
 }
 
-export abstract class Weapon extends Component {
-
-    protected dude: Dude
-
-    awake() {
-        this.dude = this.entity.getComponent(Dude)
-    }
-
-    // TODO find a better place for this?
-    static getEnemiesInRange(attacker: Dude, attackDistance: number) {
-        return Array.from(LocationManager.instance.currentLocation.dudes)
-                .filter(d => !!d && d !== attacker && d.faction !== attacker.faction)
-                .filter(d => attacker.isFacing(d.standingPosition))
-                .filter(d => d.standingPosition.distanceTo(attacker.standingPosition) < attackDistance)
-    }
-
-    abstract getType(): WeaponType
-    abstract setDelayBetweenAttacks(delayMillis: number)
-    abstract isAttacking()
-    abstract toggleSheathed()
-    abstract getRange(): number
-
-    /**
-     * This can be called every single frame and should handle that appropriately
-     */
-    abstract attack()
-}
-
-/**
- * TODO make this an abstract class, move melee-specific stuff to subclass
- * A weapon being wielded by a dude
- */
-class MeleeWeapon extends Weapon {
+export class MeleeWeapon extends Weapon {
 
     private weaponType: WeaponType
     private weaponSprite: StaticTileSource
@@ -220,47 +166,5 @@ class MeleeWeapon extends Weapon {
         } else {
             return [new Point((1-this.currentAnimationFrame+resettingFrame) * 3, 2), 0]
         }
-    }
-}
-
-class UnarmedWeapon extends Weapon {
-
-    private state: State = State.DRAWN
-    private delay: number
-
-    getType() {
-        return WeaponType.UNARMED
-    }
-
-    setDelayBetweenAttacks(delayMillis: number) {
-        this.delay = delayMillis
-    }
-
-    isAttacking() {
-        return this.state === State.ATTACKING
-    }
-
-    toggleSheathed() { /* no-op */ }
-
-    getRange(): number {
-        return 15
-    }
-
-    attack() {
-        if (this.state === State.ATTACKING) {
-            return
-        }
-        const enemies = Weapon.getEnemiesInRange(this.dude, this.getRange() * 1.5)
-        if (enemies.length === 0) {
-            return
-        }
-        this.state = State.ATTACKING
-
-        const closestEnemy = enemies[0]
-        const attackDir = closestEnemy.standingPosition.minus(this.dude.standingPosition)
-        this.dude.knockback(attackDir, 30)  // pounce
-        closestEnemy.damage(1, closestEnemy.standingPosition.minus(this.dude.standingPosition), 50)
-
-        setTimeout(() => this.state = State.DRAWN, this.delay)
     }
 }

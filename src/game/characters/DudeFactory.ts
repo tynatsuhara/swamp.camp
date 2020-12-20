@@ -14,7 +14,7 @@ import { Villager } from "./Villager"
 import { NPCSchedules } from "./NPCSchedule"
 import { WorldLocation } from "../world/WorldLocation"
 import { Lists } from "../../engine/util/Lists"
-import { WeaponType } from "./WeaponType"
+import { WeaponType } from "./weapons/WeaponType"
 import { Item } from "../items/Items"
 
 export const enum DudeFaction {
