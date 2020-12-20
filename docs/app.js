@@ -9308,7 +9308,7 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
             exports_114("ITEM_METADATA_MAP", ITEM_METADATA_MAP = (_a = {},
                 _a[0 /* COIN */] = new ItemMetadata({
                     displayName: "Coin",
-                    inventoryIconSupplier: function () { return null; },
+                    inventoryIconSupplier: function () { return Tilesets_36.Tilesets.instance.oneBit.getTileSource("coin"); },
                     droppedIconSupplier: function () { return Tilesets_36.Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150); },
                     stackLimit: Number.MAX_SAFE_INTEGER,
                 }),
