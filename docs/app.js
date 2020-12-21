@@ -3036,7 +3036,8 @@ System.register("game/characters/NPCSchedule", [], function (exports_42, context
                 SCHEDULE_KEY: "sch",
                 newNoOpSchedule: function () { return { type: 0 /* DO_NOTHING */ }; },
                 newGoToSchedule: function (tilePoint) { return { type: 1 /* GO_TO_SPOT */, p: tilePoint.toString() }; },
-                newFreeRoamSchedule: function () { return { type: 2 /* ROAM_IN_DARKNESS */ }; },
+                newFreeRoamInDarkSchedule: function () { return { type: 2 /* ROAM_IN_DARKNESS */ }; },
+                newFreeRoamSchedule: function () { return { type: 3 /* ROAM */ }; },
             });
         }
     };
@@ -6306,6 +6307,9 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     else if (schedule.type === 1 /* GO_TO_SPOT */) {
                         this.walkTo(point_43.Point.fromString(schedule["p"]), updateData);
                     }
+                    else if (schedule.type === 3 /* ROAM */) {
+                        this.doFlee(updateData, 0.5);
+                    }
                     else if (schedule.type === 2 /* ROAM_IN_DARKNESS */) {
                         this.doFlee(updateData, PointLightMaskRenderer_2.PointLightMaskRenderer.instance.isDark(this.dude.standingPosition) ? 0.5 : 1, function (pt) { return PointLightMaskRenderer_2.PointLightMaskRenderer.instance.isDark(pt.times(Tilesets_21.TILE_SIZE)); });
                     }
@@ -6407,7 +6411,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     // TODO maybe switch dynamically between A* and direct walking?
                     // const followDistance = this.dude.weapon.getRange()/2 ?? 20
                     // const buffer = 0  // this basically determines how long they will stop for if they get too close
-                    var dist = this.attackTarget.position.minus(this.dude.position);
+                    var dist = this.attackTarget.standingPosition.minus(this.dude.standingPosition);
                     var mag = dist.magnitude();
                     // if (mag > followDistance || ((followDistance-mag) < buffer && this.attackTarget.isMoving) && this.dude.isMoving) {
                     //     this.dude.move(updateData, dist)
@@ -6435,7 +6439,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                 // private doFollow(updateData: UpdateData) {
                 //     const followDistance = 75
                 //     const buffer = 40  // this basically determines how long they will stop for if they get too close
-                //     const dist = Player.instance.dude.position.minus(this.dude.position)
+                //     const dist = Player.instance.dude.standingPosition.minus(this.dude.standingPosition)
                 //     const mag = dist.magnitude()
                 //     if (mag > followDistance || ((followDistance-mag) < buffer && Player.instance.dude.isMoving) && this.dude.isMoving) {
                 //         this.dude.move(updateData, dist)
@@ -6480,7 +6484,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     if (enemies.some(function (d) { return !!d.weapon; })) {
                         enemies = enemies.filter(function (d) { return !!d.weapon; });
                     }
-                    var target = Lists_1.Lists.minBy(enemies, function (d) { return d.position.distanceTo(_this.dude.position); });
+                    var target = Lists_1.Lists.minBy(enemies, function (d) { return d.standingPosition.distanceTo(_this.dude.standingPosition); });
                     if (!!target) {
                         var shouldComputePath = true;
                         if (target === this.attackTarget && !!this.targetPath && this.targetPath.length > 0) {
@@ -9389,7 +9393,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                             factions = [3 /* DEMONS */];
                             animationName = "chort";
                             weapon = WeaponType_3.WeaponType.UNARMED;
-                            additionalComponents = [new NPC_5.NPC(NPCSchedule_3.NPCSchedules.newFreeRoamSchedule()), new Enemy_2.Enemy()];
+                            additionalComponents = [new NPC_5.NPC(NPCSchedule_3.NPCSchedules.newFreeRoamInDarkSchedule()), new Enemy_2.Enemy()];
                             maxHealth = 2;
                             speed *= (.6 + Math.random() / 5);
                             break;
@@ -10695,6 +10699,7 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                             _this._shield = _this.entity.addComponent(new Shield_1.Shield(shieldId));
                         }
                         // Set up collider
+                        // TODO: Add collider size options for tiny and large enemies
                         var colliderSize = new point_70.Point(10, 8);
                         _this.relativeColliderPos = new point_70.Point(_this.animation.transform.dimensions.x / 2 - colliderSize.x / 2, _this.animation.transform.dimensions.y - colliderSize.y);
                         _this.collider = _this.entity.addComponent(new BoxCollider_10.BoxCollider(_this.position.plus(_this.relativeColliderPos), colliderSize, _this.type === 0 /* PLAYER */ ? Dude.PLAYER_COLLISION_LAYER : Dude.NPC_COLLISION_LAYER));

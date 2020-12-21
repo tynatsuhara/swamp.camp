@@ -109,6 +109,7 @@ export class Dude extends Component implements DialogueSource {
             }
 
             // Set up collider
+            // TODO: Add collider size options for tiny and large enemies
             const colliderSize = new Point(10, 8)
             this.relativeColliderPos = new Point(
                 this.animation.transform.dimensions.x/2 - colliderSize.x/2, 

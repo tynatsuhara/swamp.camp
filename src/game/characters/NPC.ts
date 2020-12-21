@@ -79,6 +79,11 @@ export class NPC extends Component {
                 Point.fromString(schedule["p"]), 
                 updateData
             )
+        } else if (schedule.type === NPCScheduleType.ROAM) {
+            this.doFlee(
+                updateData, 
+                0.5
+            )
         } else if (schedule.type === NPCScheduleType.ROAM_IN_DARKNESS) {
             this.doFlee(
                 updateData, 
@@ -200,7 +205,7 @@ export class NPC extends Component {
         // const followDistance = this.dude.weapon.getRange()/2 ?? 20
         // const buffer = 0  // this basically determines how long they will stop for if they get too close
 
-        const dist = this.attackTarget.position.minus(this.dude.position)
+        const dist = this.attackTarget.standingPosition.minus(this.dude.standingPosition)
         const mag = dist.magnitude()
 
         // if (mag > followDistance || ((followDistance-mag) < buffer && this.attackTarget.isMoving) && this.dude.isMoving) {
@@ -239,7 +244,7 @@ export class NPC extends Component {
     //     const followDistance = 75
     //     const buffer = 40  // this basically determines how long they will stop for if they get too close
 
-    //     const dist = Player.instance.dude.position.minus(this.dude.position)
+    //     const dist = Player.instance.dude.standingPosition.minus(this.dude.standingPosition)
     //     const mag = dist.magnitude()
 
     //     if (mag > followDistance || ((followDistance-mag) < buffer && Player.instance.dude.isMoving) && this.dude.isMoving) {
@@ -288,7 +293,7 @@ export class NPC extends Component {
             enemies = enemies.filter(d => !!d.weapon)
         }
 
-        const target = Lists.minBy(enemies, d => d.position.distanceTo(this.dude.position))
+        const target = Lists.minBy(enemies, d => d.standingPosition.distanceTo(this.dude.standingPosition))
         if (!!target) {
             let shouldComputePath = true
 

@@ -4,6 +4,7 @@ export const enum NPCScheduleType {
     DO_NOTHING,
     GO_TO_SPOT,  // fields: p (stringified tile Point)
     ROAM_IN_DARKNESS,
+    ROAM,
 }
 
 export type NPCSchedule = {
@@ -18,5 +19,7 @@ export const NPCSchedules = {
 
     newGoToSchedule: (tilePoint: Point): NPCSchedule => { return { type: NPCScheduleType.GO_TO_SPOT, p: tilePoint.toString() } },
 
-    newFreeRoamSchedule: (): NPCSchedule => { return { type: NPCScheduleType.ROAM_IN_DARKNESS } },
+    newFreeRoamInDarkSchedule: (): NPCSchedule => { return { type: NPCScheduleType.ROAM_IN_DARKNESS } },
+
+    newFreeRoamSchedule: (): NPCSchedule => { return { type: NPCScheduleType.ROAM } },
 }
