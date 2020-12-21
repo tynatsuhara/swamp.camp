@@ -22,7 +22,6 @@ import { Component } from "../../../engine/component"
  */
 export const makeHouse = (wl: WorldLocation, pos: Point, data: object): ElementComponent => {    
     const e = new Entity()
-    pos = pos.plusX(1)
 
     // TODO: replace with house interior
     // const destinationUUID: string = data["destinationUUID"] ?? makeTentInterior(wl, TentColor.RED).uuid
@@ -32,7 +31,7 @@ export const makeHouse = (wl: WorldLocation, pos: Point, data: object): ElementC
     // wl.addTeleporter(sourceTeleporter)
     
     // Set up tiles
-    const depth = (pos.y + 3) * TILE_SIZE /* prevent clipping */
+    const depth = (pos.y + 3) * TILE_SIZE
 
     const addTile = (tileSheetPos: Point, pos: Point) => {
         const tile = Tilesets.instance.tilemap.getTileAt(tileSheetPos)
@@ -42,25 +41,26 @@ export const makeHouse = (wl: WorldLocation, pos: Point, data: object): ElementC
 
     // flat roof
     const flatRoofTopLeft = new Point(6, 0)
-    addTile(flatRoofTopLeft.plusX(1), pos)
-    addTile(flatRoofTopLeft.plusX(2), pos.plusX(1))
-    addTile(flatRoofTopLeft.plusX(3), pos.plusX(2))
-    addTile(flatRoofTopLeft.plusY(2).plusX(1), pos.plusY(1))
-    addTile(flatRoofTopLeft.plusY(2).plusX(2), pos.plusY(1).plusX(1))
-    addTile(flatRoofTopLeft.plusY(2).plusX(3), pos.plusY(1).plusX(2))
+    const basePos = pos.plusX(1)
+    addTile(flatRoofTopLeft.plusX(1), basePos)
+    addTile(flatRoofTopLeft.plusX(2), basePos.plusX(1))
+    addTile(flatRoofTopLeft.plusX(3), basePos.plusX(2))
+    addTile(flatRoofTopLeft.plusY(2).plusX(1), basePos.plusY(1))
+    addTile(flatRoofTopLeft.plusY(2).plusX(2), basePos.plusY(1).plusX(1))
+    addTile(flatRoofTopLeft.plusY(2).plusX(3), basePos.plusY(1).plusX(2))
 
     // door
-    addTile(new Point(7, 6), pos.plusY(2).plusX(1))
+    addTile(new Point(7, 6), basePos.plusY(2).plusX(1))
 
     // no windows
-    addTile(new Point(7, 5), pos.plusY(2))
-    addTile(new Point(9, 5), pos.plusY(2).plusX(2))
+    addTile(new Point(7, 5), basePos.plusY(2))
+    addTile(new Point(9, 5), basePos.plusY(2).plusX(2))
 
     // alternative with windows
-    // addTile(new Point(5, 6), pos.plusY(2))
-    // addTile(new Point(6, 6), pos.plusY(2).plusX(2))
+    // addTile(new Point(5, 6), basePos.plusY(2))
+    // addTile(new Point(6, 6), basePos.plusY(2).plusX(2))
 
-    e.addComponent(new BoxCollider(pos.plus(new Point(0, 1)).times(TILE_SIZE), new Point(TILE_SIZE*3, TILE_SIZE*2)))
+    e.addComponent(new BoxCollider(basePos.plus(new Point(0, 1)).times(TILE_SIZE), new Point(TILE_SIZE*3, TILE_SIZE*2)))
 
 
     // Set up teleporter
