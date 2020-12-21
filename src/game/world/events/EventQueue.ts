@@ -3,13 +3,23 @@ import { QueuedEventData, EVENT_QUEUE_HANDLERS } from "./QueuedEvent"
 
 export class EventQueue {
 
-    static instance: EventQueue
+    private static _instance: EventQueue
+    static get instance(): EventQueue {
+        if (!this._instance) {
+            this._instance = new EventQueue()
+        }
+        return this._instance
+    }
 
-    private heap: BinaryHeap<QueuedEventData>
+    private constructor() {
+        EventQueue._instance = this
+    }
 
-    constructor(data: QueuedEventData[] = []) {
-        EventQueue.instance = this
-        this.heap = new BinaryHeap(e => e.time, data)
+    private heap: BinaryHeap<QueuedEventData> = new BinaryHeap(e => e.time)
+
+    initialize(data: QueuedEventData[] = []) {
+        this.heap.clear()
+        this.heap.pushAll(data)
     }
 
     addEvent(event: QueuedEventData) {

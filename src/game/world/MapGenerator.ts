@@ -13,13 +13,25 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 
 export class MapGenerator {
 
+    private static _instance: MapGenerator
+    static get instance(): MapGenerator {
+        if (!this._instance) {
+            this._instance = new MapGenerator()
+        }
+        return this._instance
+    }
+
+    private constructor() {
+        MapGenerator._instance = this
+    }
+
     static readonly MAP_SIZE = 70
     static readonly ENTER_LAND_POS = new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE).plusY(-TILE_SIZE * 10).plusX(TILE_SIZE * 2)
 
     private readonly location = LocationManager.instance.newLocation(false)
     private readonly tentPos = new Point(-3, -3)
 
-    doIt(): WorldLocation {
+    generateExterior(): WorldLocation {
         // spawn tent
         this.location.addWorldElement(ElementType.TENT, this.tentPos, { color: TentColor.RED })
         

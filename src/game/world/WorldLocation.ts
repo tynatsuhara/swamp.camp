@@ -19,8 +19,6 @@ import { NPC } from "../characters/NPC"
 
 export class WorldLocation {
 
-    readonly manager: LocationManager
-
     private _uuid: string = newUUID()
     get uuid() { return this._uuid }
 
@@ -40,8 +38,7 @@ export class WorldLocation {
 
     readonly isInterior: boolean;
 
-    constructor(manager: LocationManager, isInterior: boolean) {
-        this.manager = manager
+    constructor(isInterior: boolean) {
         this.isInterior = isInterior
     }
 
@@ -156,9 +153,9 @@ export class WorldLocation {
         })
     }
 
-    static load(locationManager: LocationManager, saveState: LocationSaveState): WorldLocation {
-        // BUG: RELOADING RETURNS ELEMENTS THAT HAVE BEEN DESTROYED
-        const n = new WorldLocation(locationManager, saveState.isInterior)
+    static load(saveState: LocationSaveState): WorldLocation {
+        // TODO: BUG: RELOADING RETURNS ELEMENTS THAT HAVE BEEN DESTROYED
+        const n = new WorldLocation(saveState.isInterior)
         n._uuid = saveState.uuid
         saveState.elements.forEach(el => n.addWorldElement(el.type, Point.fromString(el.pos), el.obj))
         saveState.ground.forEach(el => n.addGroundElement(el.type, Point.fromString(el.pos), el.obj))

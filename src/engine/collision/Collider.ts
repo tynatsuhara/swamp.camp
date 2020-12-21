@@ -4,7 +4,7 @@ import { UpdateData } from "../engine"
 import { Point } from "../point"
 import { LineRender } from "../renderer/LineRender"
 import { RenderMethod } from "../renderer/RenderMethod"
-import { CollisionEngine } from "./CollisionEngine"
+import { CollisionEngine, collisionEngine } from "./CollisionEngine"
 
 /**
  * A collider detects intersections with other colliders. If isTrigger=true, a collider
@@ -28,22 +28,22 @@ export abstract class Collider extends Component {
         this._position = position
         this.layer = layer
         this.ignoredColliders = ignoredColliders
-        CollisionEngine.instance.markCollider(this)
+        collisionEngine.markCollider(this)
     }
 
     update(updateData: UpdateData) {
-        CollisionEngine.instance.markCollider(this)
+        collisionEngine.markCollider(this)
     }
 
     moveTo(point: Point): Point {
         const dx = point.x - this.position.x
         const dy = point.y - this.position.y
         // TODO: Should these branches be handled by the caller?
-        if (CollisionEngine.instance.canTranslate(this, new Point(dx, dy))) {
+        if (collisionEngine.canTranslate(this, new Point(dx, dy))) {
             this._position = point
-        } else if (CollisionEngine.instance.canTranslate(this, new Point(dx, 0))) {
+        } else if (collisionEngine.canTranslate(this, new Point(dx, 0))) {
             this._position = this._position.plus(new Point(dx, 0))
-        } else if (CollisionEngine.instance.canTranslate(this, new Point(0, dy))) {
+        } else if (collisionEngine.canTranslate(this, new Point(0, dy))) {
             this._position = this._position.plus(new Point(0, dy))
         }
         return this.position

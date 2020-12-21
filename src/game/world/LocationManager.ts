@@ -1,24 +1,29 @@
-import { WorldLocation } from "./WorldLocation"
-import { Player } from "../characters/Player"
 import { LocationManagerSaveState } from "../saves/LocationManagerSaveState"
+import { WorldLocation } from "./WorldLocation"
 
 export class LocationManager {
     
-    static instance: LocationManager
+    private static _instance: LocationManager
+    static get instance(): LocationManager {
+        if (!this._instance) {
+            this._instance = new LocationManager()
+        }
+        return this._instance
+    }
+
+    private constructor() {
+        LocationManager._instance = this
+    }
 
     currentLocation: WorldLocation
     private locations: Map<string, WorldLocation> = new Map()  // uuid -> location
-
-    constructor() {
-        LocationManager.instance = this
-    }
 
     get(uuid: string) {
         return this.locations.get(uuid)
     }
 
     newLocation(isInterior: boolean) {
-        const l = new WorldLocation(this, isInterior)
+        const l = new WorldLocation(isInterior)
         this.locations.set(l.uuid, l)
         if (!this.currentLocation) {
             this.currentLocation = l
@@ -50,13 +55,12 @@ export class LocationManager {
         }
     }
 
-    static load(saveState: LocationManagerSaveState) {
-        const result = new LocationManager()
-        result.locations = new Map()
+    initialize(saveState: LocationManagerSaveState) {
+        this.locations = new Map()
         saveState.locations.forEach(l => {
-            const loadedLocation = WorldLocation.load(result, l)
-            result.locations.set(l.uuid, loadedLocation)
+            const loadedLocation = WorldLocation.load(l)
+            this.locations.set(l.uuid, loadedLocation)
         })
-        result.currentLocation = result.locations.get(saveState.currentLocationUUID)
+        this.currentLocation = this.locations.get(saveState.currentLocationUUID)
     }
 }

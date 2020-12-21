@@ -1,13 +1,12 @@
-import { Renderer } from "./renderer/Renderer"
-import { Input, CapturedInput } from "./input"
-import { Game } from "./game"
-import { Point } from "./point"
-import { View } from "./View"
-import { profiler, measure } from "./profiler"
-import { debug } from "./debug"
-import { assets } from "./Assets"
-import { CollisionEngine } from "./collision/CollisionEngine"
+import { collisionEngine } from "./collision/CollisionEngine"
 import { ALREADY_STARTED_COMPONENT } from "./component"
+import { debug } from "./debug"
+import { Game } from "./game"
+import { CapturedInput, Input } from "./input"
+import { Point } from "./point"
+import { measure, profiler } from "./profiler"
+import { Renderer } from "./renderer/Renderer"
+import { View } from "./View"
 
 export class UpdateViewsContext {
     readonly elapsedTimeMillis: number
@@ -50,7 +49,7 @@ export class Engine {
             return
         }
 
-        CollisionEngine.instance.nextUpdate()
+        collisionEngine.nextUpdate()
     
         const updateViewsContext: UpdateViewsContext = {
             elapsedTimeMillis: elapsed,

@@ -1,4 +1,4 @@
-import { CollisionEngine } from "../../engine/collision/CollisionEngine"
+import { CollisionEngine, collisionEngine } from "../../engine/collision/CollisionEngine"
 import { UpdateViewsContext } from "../../engine/engine"
 import { Point } from "../../engine/point"
 import { View } from "../../engine/View"
@@ -11,15 +11,12 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { DroppedItem } from "../items/DroppedItem"
 import { saveManager } from "../SaveManager"
 import { UIStateManager } from "../ui/UIStateManager"
-import { Elements } from "../world/elements/Elements"
-import { EventQueue } from "../world/events/EventQueue"
-import { Ground } from "../world/ground/Ground"
 import { GroundRenderer } from "../world/GroundRenderer"
 import { LocationManager } from "../world/LocationManager"
 import { MapGenerator } from "../world/MapGenerator"
 import { PointLightMaskRenderer } from "../world/PointLightMaskRenderer"
-import { WorldTime } from "../world/WorldTime"
 import { TimeUnit } from "../world/TimeUnit"
+import { WorldTime } from "../world/WorldTime"
 
 const ZOOM = 3
 
@@ -29,7 +26,7 @@ export class GameScene {
     private uiView: View
 
     initialize() {
-        CollisionEngine.instance.setCollisionMatrix(new Map([
+        collisionEngine.setCollisionMatrix(new Map([
             [CollisionEngine.DEFAULT_LAYER, [DroppedItem.COLLISION_LAYER, Dude.PLAYER_COLLISION_LAYER, Dude.NPC_COLLISION_LAYER]],
             [Dude.PLAYER_COLLISION_LAYER, [Dude.NPC_COLLISION_LAYER]],
         ]))
@@ -37,7 +34,7 @@ export class GameScene {
 
     continueGame() {
         // Wait to initialize since it will begin a coroutine
-        new PointLightMaskRenderer()
+        PointLightMaskRenderer.instance.start()
 
         saveManager.load()
     }
@@ -46,13 +43,11 @@ export class GameScene {
         saveManager.deleteSave()
 
         // Wait to initialize since it will begin a coroutine
-        new PointLightMaskRenderer()
-        new LocationManager()
-        new WorldTime(TimeUnit.HOUR * 19.5)
-        new EventQueue()
+        PointLightMaskRenderer.instance.start()
+        WorldTime.instance.initialize(TimeUnit.HOUR * 19.5)
         
         // World must be initialized before we do anything else
-        new MapGenerator().doIt()
+        MapGenerator.instance.generateExterior()
 
         const playerStartPos = MapGenerator.ENTER_LAND_POS
         const playerDude = DudeFactory.instance.new(DudeType.PLAYER, playerStartPos)

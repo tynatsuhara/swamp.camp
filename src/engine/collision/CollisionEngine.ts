@@ -11,7 +11,6 @@ import { Collider } from "./Collider"
  */
 export class CollisionEngine {
 
-    static instance: CollisionEngine
     static readonly DEFAULT_LAYER = "default"
 
     private colliders: Collider[] = []
@@ -20,7 +19,6 @@ export class CollisionEngine {
     private matrix: Map<string, Set<string>>
 
     constructor() {
-        CollisionEngine.instance = this
         this.setCollisionMatrix(new Map())
     }
 
@@ -115,4 +113,4 @@ export class CollisionEngine {
     }
 }
 
-const engine = new CollisionEngine()
+export const collisionEngine = new CollisionEngine()

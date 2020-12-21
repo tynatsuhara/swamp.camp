@@ -1,13 +1,19 @@
 // Original JavaScript Code from  Marijn Haverbeke (http://eloquentjavascript.net/1st_edition/appendix2.html)
 
 export class BinaryHeap<T> {
-    private content: T[]
+    private content: T[] = []
     private scoreFunction: (x: T) => number
 
-    constructor(scoreFunction: (x: T) => number, contents = []) {
-        this.content = []
+    constructor(scoreFunction: (x: T) => number) {
         this.scoreFunction = scoreFunction
-        contents.forEach(item => this.push(item))
+    }
+
+    clear() {
+        this.content = []
+    }
+
+    pushAll(elements: T[]) {
+        elements.forEach(item => this.push(item))
     }
 
     push(element: T) {

@@ -1,21 +1,31 @@
-import { Point } from "../../engine/point"
-import { ImageRender } from "../../engine/renderer/ImageRender"
 import { Entity } from "../../engine/Entity"
+import { Point } from "../../engine/point"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
-import { Camera } from "../cutscenes/Camera"
-import { MapGenerator } from "./MapGenerator"
-import { TILE_SIZE, pixelPtToTilePt } from "../graphics/Tilesets"
+import { ImageRender } from "../../engine/renderer/ImageRender"
 import { Grid } from "../../engine/util/Grid"
-import { UIStateManager } from "../ui/UIStateManager"
-import { WorldTime } from "./WorldTime"
+import { Camera } from "../cutscenes/Camera"
+import { TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "../ui/Color"
-import { WorldLocation } from "./WorldLocation"
+import { UIStateManager } from "../ui/UIStateManager"
 import { LocationManager } from "./LocationManager"
+import { MapGenerator } from "./MapGenerator"
 import { TimeUnit } from "./TimeUnit"
+import { WorldLocation } from "./WorldLocation"
+import { WorldTime } from "./WorldTime"
 
 export class PointLightMaskRenderer {
 
-    static instance: PointLightMaskRenderer
+    private static _instance: PointLightMaskRenderer
+    static get instance(): PointLightMaskRenderer {
+        if (!this._instance) {
+            this._instance = new PointLightMaskRenderer()
+        }
+        return this._instance
+    }
+
+    private constructor() {
+        PointLightMaskRenderer._instance = this
+    }
 
     // no lights should live outside of this range
     private size = MapGenerator.MAP_SIZE * TILE_SIZE
@@ -30,9 +40,7 @@ export class PointLightMaskRenderer {
     private canvas: HTMLCanvasElement
     private context: CanvasRenderingContext2D
 
-    constructor() {
-        PointLightMaskRenderer.instance = this
-
+    start() {
         this.canvas = document.createElement("canvas")
         this.canvas.width = this.size
         this.canvas.height = this.size

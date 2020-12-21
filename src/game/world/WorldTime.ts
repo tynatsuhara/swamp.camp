@@ -7,14 +7,23 @@ import { TimeUnit } from "./TimeUnit"
 
 export class WorldTime extends Component {
 
-    static instance: WorldTime
+    private static _instance: WorldTime
+    static get instance(): WorldTime {
+        if (!this._instance) {
+            this._instance = new WorldTime()
+        }
+        return this._instance
+    }
 
     private _time: number = 0  // millis
     get time() { return this._time }
 
-    constructor(time: number = 0) {
+    private constructor() {
         super()
-        WorldTime.instance = this
+        WorldTime._instance = this
+    }
+
+    initialize(time: number) {
         this._time = time
     }
 
