@@ -77,7 +77,7 @@ export class Player extends Component {
         }
 
         if (updateData.input.isMouseHeld) {
-            this.dude.weapon.attack()
+            this.dude.weapon.attack(updateData.input.isMouseDown)
         } else {
             this.dude.weapon.cancelAttack()
         }

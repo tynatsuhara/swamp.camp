@@ -6415,7 +6415,7 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     //     this.dude.move(updateData, new Point(0, 0))
                     // }
                     if (mag < ((_a = this.dude.weapon) === null || _a === void 0 ? void 0 : _a.getRange())) {
-                        this.dude.weapon.attack();
+                        this.dude.weapon.attack(true);
                     }
                     else {
                         this.dude.weapon.cancelAttack();
@@ -8953,7 +8953,7 @@ System.register("game/characters/Player", ["engine/component", "engine/point", "
                         this.dude.shield.block(updateData.input.isRightMouseHeld);
                     }
                     if (updateData.input.isMouseHeld) {
-                        this.dude.weapon.attack();
+                        this.dude.weapon.attack(updateData.input.isMouseDown);
                     }
                     else {
                         this.dude.weapon.cancelAttack();
@@ -9980,9 +9980,12 @@ System.register("game/characters/weapons/UnarmedWeapon", ["game/characters/weapo
                 UnarmedWeapon.prototype.getRange = function () {
                     return 15;
                 };
-                UnarmedWeapon.prototype.attack = function () {
+                UnarmedWeapon.prototype.attack = function (newAttack) {
                     var _this = this;
                     if (this.state === State.ATTACKING) {
+                        return;
+                    }
+                    if (!newAttack) {
                         return;
                     }
                     var enemies = Weapon_1.Weapon.getEnemiesInRange(this.dude, this.getRange() * 1.5);
@@ -10075,13 +10078,13 @@ System.register("game/characters/weapons/MeleeWeapon", ["game/characters/weapons
                 MeleeWeapon.prototype.getRange = function () {
                     return this._range;
                 };
-                MeleeWeapon.prototype.attack = function () {
+                MeleeWeapon.prototype.attack = function (newAttack) {
                     var _this = this;
                     var _a;
                     if (this.dude.shield && !((_a = this.dude.shield) === null || _a === void 0 ? void 0 : _a.canAttack())) {
                         return;
                     }
-                    if (this.state === State.DRAWN) {
+                    if (newAttack && this.state === State.DRAWN) {
                         this.state = State.ATTACKING;
                         setTimeout(function () { return _this.damageEnemies(); }, 100);
                         this.playAttackAnimation();
@@ -10364,12 +10367,15 @@ System.register("game/characters/weapons/SpearWeapon", ["game/characters/weapons
                 SpearWeapon.prototype.getRange = function () {
                     return this._range;
                 };
-                SpearWeapon.prototype.attack = function () {
+                /**
+                 * @param newAttack
+                 */
+                SpearWeapon.prototype.attack = function (newAttack) {
                     var _a;
                     if (this.dude.shield && !((_a = this.dude.shield) === null || _a === void 0 ? void 0 : _a.canAttack())) {
                         return;
                     }
-                    if (this.state === State.DRAWN) {
+                    if (newAttack && this.state === State.DRAWN) {
                         this.state = State.DRAWING;
                     }
                 };

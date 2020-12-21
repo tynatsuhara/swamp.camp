@@ -210,7 +210,7 @@ export class NPC extends Component {
         // }
 
         if (mag < this.dude.weapon?.getRange()) {
-            this.dude.weapon.attack()
+            this.dude.weapon.attack(true)
         } else {
             this.dude.weapon.cancelAttack()
         }

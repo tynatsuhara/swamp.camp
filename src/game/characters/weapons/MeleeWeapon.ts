@@ -72,11 +72,11 @@ export class MeleeWeapon extends Weapon {
         return this._range
     }
 
-    attack() {
+    attack(newAttack: boolean) {
         if (this.dude.shield && !this.dude.shield?.canAttack()) {
             return
         }
-        if (this.state === State.DRAWN) {
+        if (newAttack && this.state === State.DRAWN) {
             this.state = State.ATTACKING
             setTimeout(() => this.damageEnemies(), 100)
             this.playAttackAnimation()

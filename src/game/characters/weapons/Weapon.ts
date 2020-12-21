@@ -54,8 +54,10 @@ export abstract class Weapon extends Component {
 
     /**
      * This can be called every single frame and should handle that appropriately
+     * @param newAttack should be true if this is a new attack, false otherwise 
+     * (this is useful for weapons that involve charging up, such as the spear)
      */
-    abstract attack()
+    abstract attack(newAttack: boolean)
 
     /**
      * This will be called on any frame that attack() is not called

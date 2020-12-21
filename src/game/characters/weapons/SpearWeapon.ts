@@ -78,11 +78,14 @@ export class SpearWeapon extends Weapon {
         return this._range
     }
 
-    attack() {
+    /**
+     * @param newAttack 
+     */
+    attack(newAttack: boolean) {
         if (this.dude.shield && !this.dude.shield?.canAttack()) {
             return
         }
-        if (this.state === State.DRAWN) {
+        if (newAttack && this.state === State.DRAWN) {
             this.state = State.DRAWING
         }
     }

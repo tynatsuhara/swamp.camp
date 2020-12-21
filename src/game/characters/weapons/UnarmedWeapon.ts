@@ -29,8 +29,11 @@ export class UnarmedWeapon extends Weapon {
         return 15
     }
 
-    attack() {
+    attack(newAttack: boolean) {
         if (this.state === State.ATTACKING) {
+            return
+        }
+        if (!newAttack) {
             return
         }
         const enemies = Weapon.getEnemiesInRange(this.dude, this.getRange() * 1.5)
