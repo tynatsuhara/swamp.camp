@@ -10,7 +10,15 @@ import { CraftingMenu } from "./CraftingMenu"
 import { SellMenu } from "./SellMenu"
 
 export class UIStateManager {
-    static instance: UIStateManager
+
+    private static _instance: UIStateManager
+    static get instance(): UIStateManager {
+        if (!this._instance) {
+            this._instance = new UIStateManager()
+        }
+        return this._instance
+    }
+    
     static UI_SPRITE_DEPTH = Number.MAX_SAFE_INTEGER/2
 
     private readonly hud = new HUD()
@@ -27,8 +35,13 @@ export class UIStateManager {
     private captureInput = false
     get isMenuOpen() { return this.captureInput }
 
-    constructor() {
-        UIStateManager.instance = this
+    private constructor() {
+        UIStateManager._instance = this
+    }
+
+    // Resets the singleton UIStateManager
+    destroy() {
+        UIStateManager._instance = new UIStateManager()
     }
 
     get(dimensions: Point, elapsedMillis: number): Entity[] {

@@ -29,7 +29,17 @@ export type MakeGroundFuncData = {
  */
 export class Ground {
 
-    static instance: Ground
+    private static _instance: Ground
+    static get instance(): Ground {
+        if (!this._instance) {
+            this._instance = new Ground()
+        }
+        return this._instance
+    }
+
+    private constructor() {
+        Ground._instance = this
+    }
 
     private readonly GROUND_FUNCTION_MAP: { [key: number]: (data: MakeGroundFuncData) => GroundComponent } = {
         [GroundType.BASIC]: makeBasicGround,
@@ -45,10 +55,6 @@ export class Ground {
             throw new Error("constructed ground type doesn't match requested type")
         }
         return ground
-    }
-
-    constructor() {
-        Ground.instance = this
     }
 
     readonly PATH_CONNECTING_SCHEMA = new ConnectingTileSchema()

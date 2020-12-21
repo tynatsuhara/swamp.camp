@@ -16,8 +16,14 @@ import { TileTransform } from "../../engine/tiles/TileTransform"
  */
 export class GroundRenderer {
 
-    static instance: GroundRenderer
-
+    private static _instance: GroundRenderer
+    static get instance(): GroundRenderer {
+        if (!this._instance) {
+            this._instance = new GroundRenderer()
+        }
+        return this._instance
+    }
+    
     // no lights should live outside of this range
     private size = MapGenerator.MAP_SIZE * TILE_SIZE * 2
     private shift = new Point(this.size/2, this.size/2)
@@ -29,8 +35,8 @@ export class GroundRenderer {
     private canvas: HTMLCanvasElement
     private context: CanvasRenderingContext2D
 
-    constructor() {
-        GroundRenderer.instance = this
+    private constructor() {
+        GroundRenderer._instance = this
 
         this.canvas = document.createElement("canvas")
         this.canvas.width = this.size

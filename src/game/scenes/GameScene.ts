@@ -33,16 +33,6 @@ export class GameScene {
             [CollisionEngine.DEFAULT_LAYER, [DroppedItem.COLLISION_LAYER, Dude.PLAYER_COLLISION_LAYER, Dude.NPC_COLLISION_LAYER]],
             [Dude.PLAYER_COLLISION_LAYER, [Dude.NPC_COLLISION_LAYER]],
         ]))
-
-        // Initialize singletons
-        // TODO: Change these to initialize when the "instance" property is read
-        new UIStateManager()
-        new DudeFactory()
-        new Elements()
-        new Ground()
-        new Camera()
-        new CutsceneManager()
-        new GroundRenderer()
     }
 
     continueGame() {

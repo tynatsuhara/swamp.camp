@@ -3103,12 +3103,22 @@ System.register("game/world/GroundRenderer", ["engine/point", "engine/renderer/I
                     this.shift = new point_19.Point(this.size / 2, this.size / 2);
                     this.tiles = new Map();
                     this.gridDirty = true;
-                    GroundRenderer.instance = this;
+                    GroundRenderer._instance = this;
                     this.canvas = document.createElement("canvas");
                     this.canvas.width = this.size;
                     this.canvas.height = this.size;
                     this.context = this.canvas.getContext("2d");
                 }
+                Object.defineProperty(GroundRenderer, "instance", {
+                    get: function () {
+                        if (!this._instance) {
+                            this._instance = new GroundRenderer();
+                        }
+                        return this._instance;
+                    },
+                    enumerable: false,
+                    configurable: true
+                });
                 GroundRenderer.prototype.addTile = function (wl, position, tile) {
                     var _a;
                     this.checkPt(position);
@@ -3374,8 +3384,18 @@ System.register("game/world/ground/Ground", ["engine/point", "game/world/ground/
                         .plusShape(Tilesets_5.Tilesets.instance.tilemap.getTileAt(new point_22.Point(5, 5)))
                         .cap(Tilesets_5.Tilesets.instance.tilemap.getTileAt(new point_22.Point(2, 6)))
                         .single(Tilesets_5.Tilesets.instance.tilemap.getTileAt(new point_22.Point(7, 5)));
-                    Ground.instance = this;
+                    Ground._instance = this;
                 }
+                Object.defineProperty(Ground, "instance", {
+                    get: function () {
+                        if (!this._instance) {
+                            this._instance = new Ground();
+                        }
+                        return this._instance;
+                    },
+                    enumerable: false,
+                    configurable: true
+                });
                 Ground.prototype.make = function (type, wl, pos, data) {
                     var ground = this.GROUND_FUNCTION_MAP[type]({ wl: wl, pos: pos, data: data });
                     if (ground.type !== type) {
@@ -4572,8 +4592,8 @@ System.register("game/SaveManager", ["game/characters/Player", "game/world/Locat
                     new WorldTime_3.WorldTime(save.worldTime);
                     new EventQueue_3.EventQueue(save.eventQueue);
                     Camera_3.Camera.instance.focusOnDude(Array.from(LocationManager_5.LocationManager.instance.currentLocation.dudes).filter(function (d) { return d.type === 0 /* PLAYER */; })[0]);
-                    // clear existing UI state by overwriting singleton
-                    new UIStateManager_3.UIStateManager();
+                    // clear existing UI state
+                    UIStateManager_3.UIStateManager.instance.destroy();
                 };
                 SaveManager.prototype.getSavedData = function () {
                     var saveJson = localStorage.getItem(SAVE_KEY);
@@ -5287,8 +5307,18 @@ System.register("game/world/elements/Elements", ["game/world/elements/Tree", "ga
                         _a[4 /* TELEPORTER */] = [Teleporter_1.makeTeleporterElement, new point_37.Point(1, 1)],
                         _a[5 /* HOUSE */] = [House_1.makeHouse, new point_37.Point(5, 4)],
                         _a);
-                    Elements.instance = this;
+                    Elements._instance = this;
                 }
+                Object.defineProperty(Elements, "instance", {
+                    get: function () {
+                        if (!this._instance) {
+                            this._instance = new Elements();
+                        }
+                        return this._instance;
+                    },
+                    enumerable: false,
+                    configurable: true
+                });
                 Elements.prototype.make = function (type, wl, pos, data) {
                     var el = this.ELEMENT_FUNCTION_MAP[type][0](wl, pos, data);
                     if (el.type !== type) {
@@ -7523,8 +7553,18 @@ System.register("game/cutscenes/Camera", ["engine/point", "game/world/MapGenerat
         execute: function () {
             Camera = /** @class */ (function () {
                 function Camera() {
-                    Camera.instance = this;
+                    Camera._instance = this;
                 }
+                Object.defineProperty(Camera, "instance", {
+                    get: function () {
+                        if (!this._instance) {
+                            this._instance = new Camera();
+                        }
+                        return this._instance;
+                    },
+                    enumerable: false,
+                    configurable: true
+                });
                 Object.defineProperty(Camera.prototype, "position", {
                     get: function () {
                         return this._position.times(-1); // multiply by -1 because views use "offset"
@@ -8199,8 +8239,18 @@ System.register("game/cutscenes/CutsceneManager", ["engine/Entity", "game/SaveMa
             CutsceneManager = /** @class */ (function () {
                 function CutsceneManager() {
                     this.entity = null;
-                    CutsceneManager.instance = this;
+                    CutsceneManager._instance = this;
                 }
+                Object.defineProperty(CutsceneManager, "instance", {
+                    get: function () {
+                        if (!this._instance) {
+                            this._instance = new CutsceneManager();
+                        }
+                        return this._instance;
+                    },
+                    enumerable: false,
+                    configurable: true
+                });
                 Object.defineProperty(CutsceneManager.prototype, "isMidCutscene", {
                     get: function () { return !!this.entity; },
                     enumerable: false,
@@ -8398,13 +8448,27 @@ System.register("game/ui/UIStateManager", ["game/ui/HUD", "game/characters/Playe
                     // should be skipped because a menu is open. Other menus should only open
                     // if this is false
                     this.captureInput = false;
-                    UIStateManager.instance = this;
+                    UIStateManager._instance = this;
                 }
+                Object.defineProperty(UIStateManager, "instance", {
+                    get: function () {
+                        if (!this._instance) {
+                            this._instance = new UIStateManager();
+                        }
+                        return this._instance;
+                    },
+                    enumerable: false,
+                    configurable: true
+                });
                 Object.defineProperty(UIStateManager.prototype, "isMenuOpen", {
                     get: function () { return this.captureInput; },
                     enumerable: false,
                     configurable: true
                 });
+                // Resets the singleton UIStateManager
+                UIStateManager.prototype.destroy = function () {
+                    UIStateManager._instance = new UIStateManager();
+                };
                 UIStateManager.prototype.get = function (dimensions, elapsedMillis) {
                     if (!Player_11.Player.instance.dude) {
                         return [];
@@ -8838,8 +8902,18 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
         execute: function () {
             DudeFactory = /** @class */ (function () {
                 function DudeFactory() {
-                    DudeFactory.instance = this;
+                    DudeFactory._instance = this;
                 }
+                Object.defineProperty(DudeFactory, "instance", {
+                    get: function () {
+                        if (!this._instance) {
+                            this._instance = new DudeFactory();
+                        }
+                        return this._instance;
+                    },
+                    enumerable: false,
+                    configurable: true
+                });
                 /**
                  * Create a new Dude in the specified location, defaults to the exterior world location
                  */
@@ -10763,9 +10837,9 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
         }
     };
 });
-System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "engine/point", "game/characters/Dude", "game/characters/DudeFactory", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/graphics/Tilesets", "game/items/DroppedItem", "game/SaveManager", "game/ui/UIStateManager", "game/world/elements/Elements", "game/world/events/EventQueue", "game/world/ground/Ground", "game/world/GroundRenderer", "game/world/LocationManager", "game/world/MapGenerator", "game/world/PointLightMaskRenderer", "game/world/WorldTime", "game/world/TimeUnit"], function (exports_126, context_126) {
+System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "engine/point", "game/characters/Dude", "game/characters/DudeFactory", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/graphics/Tilesets", "game/items/DroppedItem", "game/SaveManager", "game/ui/UIStateManager", "game/world/events/EventQueue", "game/world/GroundRenderer", "game/world/LocationManager", "game/world/MapGenerator", "game/world/PointLightMaskRenderer", "game/world/WorldTime", "game/world/TimeUnit"], function (exports_126, context_126) {
     "use strict";
-    var CollisionEngine_4, point_72, Dude_9, DudeFactory_4, Camera_9, CutsceneManager_3, IntroCutscene_1, Tilesets_42, DroppedItem_3, SaveManager_7, UIStateManager_17, Elements_3, EventQueue_6, Ground_4, GroundRenderer_2, LocationManager_21, MapGenerator_5, PointLightMaskRenderer_5, WorldTime_7, TimeUnit_4, ZOOM, GameScene;
+    var CollisionEngine_4, point_72, Dude_9, DudeFactory_4, Camera_9, CutsceneManager_3, IntroCutscene_1, Tilesets_42, DroppedItem_3, SaveManager_7, UIStateManager_17, EventQueue_6, GroundRenderer_2, LocationManager_21, MapGenerator_5, PointLightMaskRenderer_5, WorldTime_7, TimeUnit_4, ZOOM, GameScene;
     var __moduleName = context_126 && context_126.id;
     return {
         setters: [
@@ -10802,14 +10876,8 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
             function (UIStateManager_17_1) {
                 UIStateManager_17 = UIStateManager_17_1;
             },
-            function (Elements_3_1) {
-                Elements_3 = Elements_3_1;
-            },
             function (EventQueue_6_1) {
                 EventQueue_6 = EventQueue_6_1;
-            },
-            function (Ground_4_1) {
-                Ground_4 = Ground_4_1;
             },
             function (GroundRenderer_2_1) {
                 GroundRenderer_2 = GroundRenderer_2_1;
@@ -10840,15 +10908,6 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
                         [CollisionEngine_4.CollisionEngine.DEFAULT_LAYER, [DroppedItem_3.DroppedItem.COLLISION_LAYER, Dude_9.Dude.PLAYER_COLLISION_LAYER, Dude_9.Dude.NPC_COLLISION_LAYER]],
                         [Dude_9.Dude.PLAYER_COLLISION_LAYER, [Dude_9.Dude.NPC_COLLISION_LAYER]],
                     ]));
-                    // Initialize singletons
-                    // TODO: Change these to initialize when the "instance" property is read
-                    new UIStateManager_17.UIStateManager();
-                    new DudeFactory_4.DudeFactory();
-                    new Elements_3.Elements();
-                    new Ground_4.Ground();
-                    new Camera_9.Camera();
-                    new CutsceneManager_3.CutsceneManager();
-                    new GroundRenderer_2.GroundRenderer();
                 };
                 GameScene.prototype.continueGame = function () {
                     // Wait to initialize since it will begin a coroutine

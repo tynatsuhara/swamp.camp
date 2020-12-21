@@ -3,14 +3,21 @@ import { Entity } from "../../engine/Entity"
 import { saveManager } from "../SaveManager"
 
 export class CutsceneManager {
-    static instance: CutsceneManager
 
+    private static _instance: CutsceneManager
+    static get instance(): CutsceneManager {
+        if (!this._instance) {
+            this._instance = new CutsceneManager()
+        }
+        return this._instance
+    }
+
+    private constructor() {
+        CutsceneManager._instance = this
+    }
+    
     private entity: Entity = null
     get isMidCutscene() { return !!this.entity }
-
-    constructor() {
-        CutsceneManager.instance = this
-    }
 
     /**
      * TODO: Handle the case where a cutscene starts, overlapping (this might not matter if we are careful with how we use them)

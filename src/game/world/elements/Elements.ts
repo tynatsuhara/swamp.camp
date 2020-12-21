@@ -25,7 +25,18 @@ export class SavedElement {
 }
 
 export class Elements {
-    static instance: Elements
+
+    private static _instance: Elements
+    static get instance(): Elements {
+        if (!this._instance) {
+            this._instance = new Elements()
+        }
+        return this._instance
+    }
+
+    private constructor() {
+        Elements._instance = this
+    }
 
     /*
     * Tuples of [makeFunction, dimensionsForPlacing]
@@ -54,9 +65,5 @@ export class Elements {
 
     dimensionsForPlacing(type: ElementType) {
         return this.ELEMENT_FUNCTION_MAP[type][1]
-    }
-
-    constructor() {
-        Elements.instance = this
     }
 }

@@ -82,8 +82,8 @@ class SaveManager {
 
         Camera.instance.focusOnDude(Array.from(LocationManager.instance.currentLocation.dudes).filter(d => d.type === DudeType.PLAYER)[0])
 
-        // clear existing UI state by overwriting singleton
-        new UIStateManager()
+        // clear existing UI state
+        UIStateManager.instance.destroy()
     }
 
     private getSavedData(): Save {

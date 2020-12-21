@@ -4,7 +4,18 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { Dude } from "../characters/Dude"
 
 export class Camera {
-    static instance: Camera
+
+    private static _instance: Camera
+    static get instance(): Camera {
+        if (!this._instance) {
+            this._instance = new Camera()
+        }
+        return this._instance
+    }
+
+    private constructor() {
+        Camera._instance = this
+    }
 
     private dudeTarget: Dude
     private pointTarget: Point
@@ -15,10 +26,6 @@ export class Camera {
     }
     private _dimensions: Point
     get dimensions() { return this._dimensions }
-    
-    constructor() {
-        Camera.instance = this
-    }
 
     focusOnDude(dude: Dude) {
         this.dudeTarget = dude

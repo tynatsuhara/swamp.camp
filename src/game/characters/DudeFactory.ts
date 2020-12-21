@@ -35,10 +35,16 @@ export const enum DudeType {
 
 export class DudeFactory {
 
-    static instance: DudeFactory
+    private static _instance: DudeFactory
+    static get instance(): DudeFactory {
+        if (!this._instance) {
+            this._instance = new DudeFactory()
+        }
+        return this._instance
+    }
 
-    constructor() {
-        DudeFactory.instance = this
+    private constructor() {
+        DudeFactory._instance = this
     }
 
     /**
