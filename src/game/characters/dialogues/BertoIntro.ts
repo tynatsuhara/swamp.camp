@@ -11,6 +11,8 @@ import { MapGenerator } from "../../world/MapGenerator"
 import { EventQueue } from "../../world/events/EventQueue"
 import { QueuedEventType } from "../../world/events/QueuedEvent"
 import { WorldTime } from "../../world/WorldTime"
+import { ElementType } from "../../world/elements/Elements"
+import { House } from "../../world/elements/House"
 
 const getItemsToSell = (): SalePackage[] => {
     return [{
@@ -66,6 +68,17 @@ export const BERTO_INTRO_DIALOGUE: { [key: number]: () => DialogueInstance } = {
         "Shall I return to The Kingdom, bringing word that thou art requesting a settler?"],
         DudeInteractIndicator.NONE,
         new DialogueOption("Bring me a criminal.", () => {
+            const openHouses = LocationManager.instance.currentLocation.elements.values()
+                    .filter(e => e.type === ElementType.HOUSE)
+                    .map(e => e.entity.getComponent(House))
+                    .filter(house => !house.hasResident())
+
+            if (openHouses.length === 0) {
+                // TODO: explain that a house is needed
+                return new NextDialogue(Dialogue.BERT_MENU_INTRO, false)
+            }
+            
+            openHouses[0].setResidentPending() 
             EventQueue.instance.addEvent({
                 type: QueuedEventType.HERALD_DEPARTURE,
                 time: WorldTime.instance.time

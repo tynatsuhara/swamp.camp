@@ -8,6 +8,7 @@ import { Entity } from "../../../engine/Entity"
 import { ElementComponent } from "./ElementComponent"
 import { ElementType } from "./Elements"
 import { ElementUtils } from "./ElementUtils"
+import { Component } from "../../../engine/component"
 
 /**
  * At runtime, a building exterior consists of several components:
@@ -19,7 +20,7 @@ import { ElementUtils } from "./ElementUtils"
  *   2. "Occupied points" which determines occupied squares in the world grid
  *   3. Misc metadata about the building
  */
-export const makeHouse = (wl: WorldLocation, pos: Point, data: object): ElementComponent => {
+export const makeHouse = (wl: WorldLocation, pos: Point, data: object): ElementComponent => {    
     const e = new Entity()
     pos = pos.plusX(1)
 
@@ -65,10 +66,38 @@ export const makeHouse = (wl: WorldLocation, pos: Point, data: object): ElementC
     // Set up teleporter
     // e.addComponent(new Interactable(interactablePos, () => wl.useTeleporter(destinationUUID), new Point(1, -TILE_SIZE*1.4)))
 
+    const resident = data[House.RESIDENT_ATTRIBUTE]
+    const house = e.addComponent(new House())
+    house.setResident(resident)
 
     return e.addComponent(new ElementComponent(
         ElementType.HOUSE, 
         ElementUtils.rectPoints(pos, new Point(5, 4)),
-        () => { return {} }
+        () => ({
+            RESIDENT_ATTRIBUTE: house.getResident()
+        })
     ))
+}
+
+export class House extends Component {
+    static readonly RESIDENT_ATTRIBUTE = "rez"
+    private static readonly PENDING_RESIDENT = "pending"
+
+    private resident: string;
+
+    hasResident() {
+        return !!this.resident
+    }
+
+    setResidentPending() {
+        this.resident = House.PENDING_RESIDENT
+    }
+
+    setResident(uuid: string) {
+        this.resident = uuid
+    }
+
+    getResident() {
+        return this.resident
+    }
 }
