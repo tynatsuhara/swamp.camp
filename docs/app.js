@@ -4777,14 +4777,13 @@ System.register("game/world/elements/House", ["engine/point", "game/graphics/Til
              */
             exports_68("makeHouse", makeHouse = function (wl, pos, data) {
                 var e = new Entity_9.Entity();
-                pos = pos.plusX(1);
                 // TODO: replace with house interior
                 // const destinationUUID: string = data["destinationUUID"] ?? makeTentInterior(wl, TentColor.RED).uuid
                 // const interactablePos = pos.plus(new Point(2, 2)).times(TILE_SIZE)
                 // const sourceTeleporter = { to: destinationUUID, pos: interactablePos.plusY(12) }
                 // wl.addTeleporter(sourceTeleporter)
                 // Set up tiles
-                var depth = (pos.y + 3) * Tilesets_13.TILE_SIZE; /* prevent clipping */
+                var depth = (pos.y + 3) * Tilesets_13.TILE_SIZE;
                 var addTile = function (tileSheetPos, pos) {
                     var tile = Tilesets_13.Tilesets.instance.tilemap.getTileAt(tileSheetPos);
                     var el = e.addComponent(new TileComponent_7.TileComponent(tile, new TileTransform_12.TileTransform(pos.times(Tilesets_13.TILE_SIZE))));
@@ -4792,21 +4791,22 @@ System.register("game/world/elements/House", ["engine/point", "game/graphics/Til
                 };
                 // flat roof
                 var flatRoofTopLeft = new point_34.Point(6, 0);
-                addTile(flatRoofTopLeft.plusX(1), pos);
-                addTile(flatRoofTopLeft.plusX(2), pos.plusX(1));
-                addTile(flatRoofTopLeft.plusX(3), pos.plusX(2));
-                addTile(flatRoofTopLeft.plusY(2).plusX(1), pos.plusY(1));
-                addTile(flatRoofTopLeft.plusY(2).plusX(2), pos.plusY(1).plusX(1));
-                addTile(flatRoofTopLeft.plusY(2).plusX(3), pos.plusY(1).plusX(2));
+                var basePos = pos.plusX(1);
+                addTile(flatRoofTopLeft.plusX(1), basePos);
+                addTile(flatRoofTopLeft.plusX(2), basePos.plusX(1));
+                addTile(flatRoofTopLeft.plusX(3), basePos.plusX(2));
+                addTile(flatRoofTopLeft.plusY(2).plusX(1), basePos.plusY(1));
+                addTile(flatRoofTopLeft.plusY(2).plusX(2), basePos.plusY(1).plusX(1));
+                addTile(flatRoofTopLeft.plusY(2).plusX(3), basePos.plusY(1).plusX(2));
                 // door
-                addTile(new point_34.Point(7, 6), pos.plusY(2).plusX(1));
+                addTile(new point_34.Point(7, 6), basePos.plusY(2).plusX(1));
                 // no windows
-                addTile(new point_34.Point(7, 5), pos.plusY(2));
-                addTile(new point_34.Point(9, 5), pos.plusY(2).plusX(2));
+                addTile(new point_34.Point(7, 5), basePos.plusY(2));
+                addTile(new point_34.Point(9, 5), basePos.plusY(2).plusX(2));
                 // alternative with windows
-                // addTile(new Point(5, 6), pos.plusY(2))
-                // addTile(new Point(6, 6), pos.plusY(2).plusX(2))
-                e.addComponent(new BoxCollider_6.BoxCollider(pos.plus(new point_34.Point(0, 1)).times(Tilesets_13.TILE_SIZE), new point_34.Point(Tilesets_13.TILE_SIZE * 3, Tilesets_13.TILE_SIZE * 2)));
+                // addTile(new Point(5, 6), basePos.plusY(2))
+                // addTile(new Point(6, 6), basePos.plusY(2).plusX(2))
+                e.addComponent(new BoxCollider_6.BoxCollider(basePos.plus(new point_34.Point(0, 1)).times(Tilesets_13.TILE_SIZE), new point_34.Point(Tilesets_13.TILE_SIZE * 3, Tilesets_13.TILE_SIZE * 2)));
                 // Set up teleporter
                 // e.addComponent(new Interactable(interactablePos, () => wl.useTeleporter(destinationUUID), new Point(1, -TILE_SIZE*1.4)))
                 var resident = data[House.RESIDENT_ATTRIBUTE];
@@ -5684,7 +5684,7 @@ System.register("game/ui/SellMenu", ["engine/Entity", "engine/component", "engin
 });
 System.register("game/characters/dialogues/BertoIntro", ["game/ui/DudeInteractIndicator", "game/ui/SellMenu", "game/world/elements/House", "game/world/events/EventQueue", "game/world/events/QueuedEvent", "game/world/LocationManager", "game/world/WorldTime", "game/characters/Dialogue"], function (exports_75, context_75) {
     "use strict";
-    var _a, DudeInteractIndicator_3, SellMenu_1, House_2, EventQueue_5, QueuedEvent_3, LocationManager_7, WorldTime_6, Dialogue_3, BERTO_STARTING_DIALOGUE, BERT_MENU, BERT_MENU_INTRO, BERT_VILLAGERS, getItemsToSell, getGreeting, BERTO_INTRO_DIALOGUE;
+    var _a, DudeInteractIndicator_3, SellMenu_1, House_2, EventQueue_5, QueuedEvent_3, LocationManager_7, WorldTime_6, Dialogue_3, BERTO_STARTING_DIALOGUE, BERT_MENU, BERT_MENU_INTRO, BERT_VILLAGERS, BERT_VILLAGER_NEEDS_HOUSE, BERT_LEAVING, getItemsToSell, getGreeting, BERTO_INTRO_DIALOGUE;
     var __moduleName = context_75 && context_75.id;
     return {
         setters: [
@@ -5715,7 +5715,7 @@ System.register("game/characters/dialogues/BertoIntro", ["game/ui/DudeInteractIn
         ],
         execute: function () {
             exports_75("BERTO_STARTING_DIALOGUE", BERTO_STARTING_DIALOGUE = "bert-start");
-            BERT_MENU = "bert-menu", BERT_MENU_INTRO = "bert-menu-intro", BERT_VILLAGERS = "bert-villagers";
+            BERT_MENU = "bert-menu", BERT_MENU_INTRO = "bert-menu-intro", BERT_VILLAGERS = "bert-villagers", BERT_VILLAGER_NEEDS_HOUSE = "bert-vil-house", BERT_LEAVING = "bert-leaving";
             getItemsToSell = function () {
                 return [{
                         item: 2 /* WOOD */,
@@ -5756,16 +5756,18 @@ System.register("game/characters/dialogues/BertoIntro", ["game/ui/DudeInteractIn
                         .map(function (e) { return e.entity.getComponent(House_2.House); })
                         .filter(function (house) { return !house.hasResident(); });
                     if (openHouses.length === 0) {
-                        // TODO: explain that a house is needed
-                        return new Dialogue_3.NextDialogue(BERT_MENU_INTRO, false);
+                        return new Dialogue_3.NextDialogue(BERT_VILLAGER_NEEDS_HOUSE, true);
                     }
                     openHouses[0].setResidentPending();
                     EventQueue_5.EventQueue.instance.addEvent({
                         type: QueuedEvent_3.QueuedEventType.HERALD_DEPARTURE,
                         time: WorldTime_6.WorldTime.instance.time
                     });
-                    return new Dialogue_3.NextDialogue(BERT_MENU_INTRO, false);
+                    return new Dialogue_3.NextDialogue(BERT_LEAVING, true);
                 }), Dialogue_3.option("Never mind.", BERT_MENU_INTRO, false)); },
+                _a[BERT_VILLAGER_NEEDS_HOUSE] = function () { return Dialogue_3.dialogue(["Alas, thy settlement does not have appropriate lodging for a new settler.",
+                    "Return to me once thou hast constructed a home."], function () { return new Dialogue_3.NextDialogue(BERT_MENU_INTRO, false); }); },
+                _a[BERT_LEAVING] = function () { return Dialogue_3.dialogue(["I shall return posthaste!"], function () { return new Dialogue_3.NextDialogue(BERT_MENU_INTRO, false); }); },
                 _a));
         }
     };

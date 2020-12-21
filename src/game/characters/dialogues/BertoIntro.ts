@@ -12,7 +12,9 @@ import { dialogue, DialogueInstance, DialogueOption, dialogueWithOptions, NextDi
 export const BERTO_STARTING_DIALOGUE = "bert-start"
 const BERT_MENU = "bert-menu", 
       BERT_MENU_INTRO = "bert-menu-intro", 
-      BERT_VILLAGERS = "bert-villagers"
+      BERT_VILLAGERS = "bert-villagers",
+      BERT_VILLAGER_NEEDS_HOUSE = "bert-vil-house",
+      BERT_LEAVING = "bert-leaving"
 
 const getItemsToSell = (): SalePackage[] => {
     return [{
@@ -74,8 +76,7 @@ export const BERTO_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
                     .filter(house => !house.hasResident())
 
             if (openHouses.length === 0) {
-                // TODO: explain that a house is needed
-                return new NextDialogue(BERT_MENU_INTRO, false)
+                return new NextDialogue(BERT_VILLAGER_NEEDS_HOUSE, true)
             }
             
             openHouses[0].setResidentPending() 
@@ -83,8 +84,17 @@ export const BERTO_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
                 type: QueuedEventType.HERALD_DEPARTURE,
                 time: WorldTime.instance.time
             })
-            return new NextDialogue(BERT_MENU_INTRO, false)
+            return new NextDialogue(BERT_LEAVING, true)
         }),
         option("Never mind.", BERT_MENU_INTRO, false)
+    ),
+    [BERT_VILLAGER_NEEDS_HOUSE]: () => dialogue(
+        ["Alas, thy settlement does not have appropriate lodging for a new settler.",
+        "Return to me once thou hast constructed a home."],
+        () => new NextDialogue(BERT_MENU_INTRO, false)
+    ),
+    [BERT_LEAVING]: () => dialogue(
+        ["I shall return posthaste!"],
+        () => new NextDialogue(BERT_MENU_INTRO, false)
     )
 }
