@@ -17,7 +17,7 @@ import { UIStateManager } from "../ui/UIStateManager"
 import { Interactable } from "../world/elements/Interactable"
 import { LocationManager } from "../world/LocationManager"
 import { DudeAnimationUtils } from "./DudeAnimationUtils"
-import { Dialogue, DialogueSource, getDialogue } from "./Dialogue"
+import { DialogueSource, getDialogue, EMPTY_DIALOGUE } from "./Dialogue"
 import { DudeFaction, DudeType } from "./DudeFactory"
 import { Shield } from "./weapons/Shield"
 import { Weapon } from "./weapons/Weapon"
@@ -65,7 +65,7 @@ export class Dude extends Component implements DialogueSource {
     }
 
     private dialogueInteract: Interactable
-    dialogue: Dialogue
+    dialogue: string
 
     constructor(
         type: DudeType,
@@ -78,7 +78,7 @@ export class Dude extends Component implements DialogueSource {
         health: number,
         speed: number,
         inventory: Inventory,
-        dialogue: Dialogue,
+        dialogue: string,
         blob: object,
     ) {
         super()
@@ -136,7 +136,7 @@ export class Dude extends Component implements DialogueSource {
 
         this.dialogueInteract.position = this.standingPosition.minus(new Point(0, 5))
         this.dialogueInteract.uiOffset = new Point(0, -TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition())
-        this.dialogueInteract.enabled = this.dialogue !== Dialogue.NONE && DialogueDisplay.instance.dialogueSource !== this
+        this.dialogueInteract.enabled = this.dialogue !== EMPTY_DIALOGUE && DialogueDisplay.instance.dialogueSource !== this
     }
 
     setWeapon(type: WeaponType) {
@@ -349,7 +349,7 @@ export class Dude extends Component implements DialogueSource {
 
     private getIndicator(): RenderMethod[] {
         let indicator = DudeInteractIndicator.NONE
-        if (this.dialogue) {
+        if (!!this.dialogue && this.dialogue != EMPTY_DIALOGUE) {
             indicator = getDialogue(this.dialogue).indicator
         }
         let tile: StaticTileSource = DudeInteractIndicator.getTile(indicator)

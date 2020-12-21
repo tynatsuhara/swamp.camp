@@ -1,9 +1,11 @@
 import { saveManager } from "../SaveManager"
 import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
-import { DIP_INTRO_DIALOGUE } from "./dialogues/DipIntro"
 import { BERTO_INTRO_DIALOGUE } from "./dialogues/BertoIntro"
-import { Player } from "./Player"
+import { DIP_INTRO_DIALOGUE } from "./dialogues/DipIntro"
 import { ITEM_DIALOGUES } from "./dialogues/ItemDialogues"
+import { Player } from "./Player"
+
+export const EMPTY_DIALOGUE = "-"
 
 export class DialogueInstance {
     readonly lines: string[]
@@ -34,8 +36,8 @@ export const dialogueWithOptions = (lines: string[], indicator: string = DudeInt
 export const dialogue = (lines: string[], next: () => void|NextDialogue = () => {}, indicator: string = DudeInteractIndicator.NONE): DialogueInstance => { 
     return new DialogueInstance(lines, next, [], indicator) 
 } 
-export const option = (text: string, next: Dialogue, open: boolean = true): DialogueOption => {
-    return new DialogueOption(text, () => new NextDialogue(next, open))
+export const option = (text: string, nextDialogue: string, open: boolean = true): DialogueOption => {
+    return new DialogueOption(text, () => new NextDialogue(nextDialogue, open))
 }
 export const saveAfterDialogueStage = () => {
     // save after a delay to account for the next dialogue stage being set
@@ -44,7 +46,10 @@ export const saveAfterDialogueStage = () => {
 export const inv = () => Player.instance.dude.inventory
 
 export interface DialogueSource {
-    dialogue: Dialogue
+    /**
+     * the unique dialogue key
+     */
+    dialogue: string
 }
 
 export class DialogueOption {
@@ -58,10 +63,14 @@ export class DialogueOption {
 }
 
 export class NextDialogue {
-    readonly dialogue: Dialogue
+    readonly dialogue: string
     readonly open: boolean
 
-    constructor(dialogue: Dialogue, open: boolean = true) {
+    /**
+     * @param dialogue the unique dialogue key 
+     * @param open true if the dialogue should be shown immediately
+     */
+    constructor(dialogue: string, open: boolean = true) {
         if (!dialogue) {
             throw new Error("dialogue can't be null")
         }
@@ -70,22 +79,28 @@ export class NextDialogue {
     }
 }
 
-export const enum Dialogue {
-    NONE = 0,
-    DIP_0, DIP_1, DIP_2, DIP_3, DIP_BEFRIEND, DIP_MAKE_CAMPFIRE, DIP_CRAFT,
-    BERT_0, BERT_MENU, BERT_MENU_INTRO, BERT_VILLAGERS,
-    CAMPFIRE
-}
+// export const enum Dialogue {
+//     NONE = 0,
+//     DIP_0, DIP_1, DIP_2, DIP_3, DIP_BEFRIEND, DIP_MAKE_CAMPFIRE, DIP_CRAFT,
+//     BERT_0, BERT_MENU, BERT_MENU_INTRO, BERT_VILLAGERS,
+//     CAMPFIRE
+// }
 
-export const getDialogue = (d: Dialogue): DialogueInstance => {
-    const f = DIALOGUE_MAP[d]
+/**
+ * @param dialogue the unique dialogue key
+ */
+export const getDialogue = (dialogue: string): DialogueInstance => {
+    if (dialogue === EMPTY_DIALOGUE) {
+        return
+    }
+    const f = DIALOGUE_MAP[dialogue]
     if (!f) {
-        throw new Error("cannot find dialogue " + d)
+        throw new Error("cannot find dialogue " + dialogue)
     }
     return f()
 }
 
-const DIALOGUE_SOURCES: { [key: number]: () => DialogueInstance }[] = [
+const DIALOGUE_SOURCES: { [key: string]: () => DialogueInstance }[] = [
     DIP_INTRO_DIALOGUE,
     BERTO_INTRO_DIALOGUE,
     ITEM_DIALOGUES,

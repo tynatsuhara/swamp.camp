@@ -1,4 +1,4 @@
-import { DialogueInstance, dialogueWithOptions, Dialogue, dialogue, option, NextDialogue, saveAfterDialogueStage, DialogueOption, inv } from "../Dialogue"
+import { DialogueInstance, dialogueWithOptions, dialogue, option, NextDialogue, saveAfterDialogueStage, DialogueOption, inv } from "../Dialogue"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { Item } from "../../items/Items"
 import { Controls } from "../../Controls"
@@ -14,28 +14,36 @@ export const ROCKS_NEEDED_FOR_CAMPFIRE = 10
 export const WOOD_NEEDED_FOR_CAMPFIRE = 5
 const CRAFT_OPTION = "<Craft>"
 
+export const DIP_STARTING_DIALOGUE = "dip-0"
+const DIP_1 = "dip-1", 
+      DIP_2 = "dip-2", 
+      DIP_3 = "dip-3", 
+      DIP_BEFRIEND = "dip-4", 
+      DIP_MAKE_CAMPFIRE = "dip-5", 
+      DIP_CRAFT = "dip-6"
+
 // TODO: make DIP introduce himself, have player input their name
 
-export const DIP_INTRO_DIALOGUE: { [key: number]: () => DialogueInstance } = {
-    [Dialogue.DIP_0]: () => dialogueWithOptions(
+export const DIP_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
+    [DIP_STARTING_DIALOGUE]: () => dialogueWithOptions(
         ["Phew, thanks for your help! They almost had me. I thought for sure that those Orcs were gonna eat my butt."],
         DudeInteractIndicator.IMPORTANT_DIALOGUE,
-        option("Are you okay?", Dialogue.DIP_1),
-        option("I expect a reward.", Dialogue.DIP_2),
-        option("... Eat your butt?", Dialogue.DIP_3),
+        option("Are you okay?", DIP_1),
+        option("I expect a reward.", DIP_2),
+        option("... Eat your butt?", DIP_3),
     ),
 
-    [Dialogue.DIP_1]: () => dialogue(["I'm alright, just shaken up. You sure know how to handle that blade!"], () => new NextDialogue(Dialogue.DIP_BEFRIEND)),
-    [Dialogue.DIP_2]: () => dialogue(["I'm grateful, but I don't have much..."], () => new NextDialogue(Dialogue.DIP_BEFRIEND)),
-    [Dialogue.DIP_3]: () => dialogue(["Swamp Lizard butt is an Orcish delicacy. My species has been hunted to extinction by those savages. I'm the only one left."], () => new NextDialogue(Dialogue.DIP_BEFRIEND)),
+    [DIP_1]: () => dialogue(["I'm alright, just shaken up. You sure know how to handle that blade!"], () => new NextDialogue(DIP_BEFRIEND)),
+    [DIP_2]: () => dialogue(["I'm grateful, but I don't have much..."], () => new NextDialogue(DIP_BEFRIEND)),
+    [DIP_3]: () => dialogue(["Swamp Lizard butt is an Orcish delicacy. My species has been hunted to extinction by those savages. I'm the only one left."], () => new NextDialogue(DIP_BEFRIEND)),
     
-    [Dialogue.DIP_BEFRIEND]: () => dialogue([
+    [DIP_BEFRIEND]: () => dialogue([
         "You know, this is a very dangerous place. It's tough to survive without someone watching your back.",
         "How about I help you set up camp? I know these woods better than anyone.",
         "I'll put together a tent for you, if you collect rocks and wood for a campfire.",
-    ], () => new NextDialogue(Dialogue.DIP_MAKE_CAMPFIRE, false)),
+    ], () => new NextDialogue(DIP_MAKE_CAMPFIRE, false)),
     
-    [Dialogue.DIP_MAKE_CAMPFIRE]: () => {
+    [DIP_MAKE_CAMPFIRE]: () => {
         const campfires = LocationManager.instance.currentLocation.elements.values().filter(e => e.type === ElementType.CAMPFIRE)
         const dipTent = LocationManager.instance.currentLocation.elements.values().filter(e => e.type === ElementType.TENT)[0]
         if (campfires.length > 0) {  // campfire has been placed
@@ -55,12 +63,12 @@ export const DIP_INTRO_DIALOGUE: { [key: number]: () => DialogueInstance } = {
                     time: WorldTime.instance.future({ minutes: 10 })
                 })
                 saveAfterDialogueStage()
-                return new NextDialogue(Dialogue.DIP_CRAFT, false)
+                return new NextDialogue(DIP_CRAFT, false)
             }, DudeInteractIndicator.IMPORTANT_DIALOGUE)
         } else if (inv().getItemCount(Item.CAMPFIRE) > 0) {  // campfire has been crafted
             return dialogue(
                 [`Try placing the campfire down near my tent. You can open your inventory by pressing [${String.fromCharCode(Controls.inventoryButton)}].`], 
-                () =>  new NextDialogue(Dialogue.DIP_MAKE_CAMPFIRE, false)
+                () =>  new NextDialogue(DIP_MAKE_CAMPFIRE, false)
             )
         } else if (inv().getItemCount(Item.ROCK) >= ROCKS_NEEDED_FOR_CAMPFIRE && inv().getItemCount(Item.WOOD) >= WOOD_NEEDED_FOR_CAMPFIRE) {  // can craft
             return dialogueWithOptions(
@@ -68,27 +76,27 @@ export const DIP_INTRO_DIALOGUE: { [key: number]: () => DialogueInstance } = {
                 DudeInteractIndicator.IMPORTANT_DIALOGUE,
                 new DialogueOption(CRAFT_OPTION, () => {
                     CraftingMenu.instance.show(getDipRecipes())
-                    return new NextDialogue(Dialogue.DIP_MAKE_CAMPFIRE, false)
+                    return new NextDialogue(DIP_MAKE_CAMPFIRE, false)
                 }),
-                option("Not yet.", Dialogue.DIP_MAKE_CAMPFIRE, false)
+                option("Not yet.", DIP_MAKE_CAMPFIRE, false)
             )
         } else {  // do not have enough ingredients to craft
             return dialogue(
                 [`We need ${ROCKS_NEEDED_FOR_CAMPFIRE} rocks and ${WOOD_NEEDED_FOR_CAMPFIRE} wood to make a campfire. Try hitting big rocks and trees with your sword!`], 
-                () => new NextDialogue(Dialogue.DIP_MAKE_CAMPFIRE, false)
+                () => new NextDialogue(DIP_MAKE_CAMPFIRE, false)
             )
         }
     },
 
-    [Dialogue.DIP_CRAFT]: () => {
+    [DIP_CRAFT]: () => {
         return dialogueWithOptions(
             ["Can I help you make something?"],
             DudeInteractIndicator.NONE,
             new DialogueOption(CRAFT_OPTION, () => {
                 CraftingMenu.instance.show(getDipRecipes())
-                return new NextDialogue(Dialogue.DIP_CRAFT, false)
+                return new NextDialogue(DIP_CRAFT, false)
             }),
-            option("Nope.", Dialogue.DIP_CRAFT, false)
+            option("Nope.", DIP_CRAFT, false)
         )
     },
 }

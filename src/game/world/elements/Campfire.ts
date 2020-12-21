@@ -11,10 +11,11 @@ import { WorldLocation } from "../WorldLocation"
 import { Entity } from "../../../engine/Entity"
 import { ElementType } from "./Elements"
 import { PointLightMaskRenderer } from "../PointLightMaskRenderer"
-import { DialogueSource, Dialogue, DialogueInstance } from "../../characters/Dialogue"
+import { DialogueSource } from "../../characters/Dialogue"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { WorldTime } from "../WorldTime"
 import { TimeUnit } from "../TimeUnit"
+import { CAMPFIRE_DIALOGUE } from "../../characters/dialogues/ItemDialogues"
 
 export const makeCampfire = (wl: WorldLocation, pos: Point, data: object): ElementComponent => {
     const e = new Entity()
@@ -76,7 +77,7 @@ export class Campfire extends Component implements DialogueSource {
     static LOG_DURATION_HOURS = 2
     private static LOG_DURATION = Campfire.LOG_DURATION_HOURS * TimeUnit.HOUR
 
-    dialogue: Dialogue = Dialogue.CAMPFIRE
+    dialogue: string = CAMPFIRE_DIALOGUE
     logs: number
     lastLogConsumedTime: number
     private updateFire: (logs: number) => void

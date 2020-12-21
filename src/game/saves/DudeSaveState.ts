@@ -1,6 +1,5 @@
 import { DudeType } from "../characters/DudeFactory"
 import { ItemStack } from "../items/Inventory"
-import { Dialogue } from "../characters/Dialogue"
 import { WeaponType } from "../characters/weapons/WeaponType"
 
 // Nothing in here should be nullable, or the logic in DudeFactory could break
@@ -14,6 +13,6 @@ export class DudeSaveState {
     health: number
     speed: number
     inventory: ItemStack[]
-    dialogue: Dialogue
+    dialogue: string
     blob: object // This can be used for DudeType-specific data
 }

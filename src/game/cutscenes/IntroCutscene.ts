@@ -8,9 +8,9 @@ import { CutsceneManager } from "./CutsceneManager"
 import { Dude } from "../characters/Dude"
 import { LocationManager } from "../world/LocationManager"
 import { DudeFaction, DudeType } from "../characters/DudeFactory"
-import { Dialogue } from "../characters/Dialogue"
 import { makeControlsUI } from "../ui/ControlsUI"
 import { RenderMethod } from "../../engine/renderer/RenderMethod"
+import { DIP_STARTING_DIALOGUE } from "../characters/dialogues/DipIntro"
 
 // This is the cutscene that plays when the player arrives in the new land
 export class IntroCutscene extends Component {
@@ -74,7 +74,7 @@ export class IntroCutscene extends Component {
         // TODO prevent the player from going to a different location until this is over
 
         if (!this.orcs.some(o => o.isAlive)) {
-            this.dip.dialogue = Dialogue.DIP_0
+            this.dip.dialogue = DIP_STARTING_DIALOGUE
 
             CutsceneManager.instance.finishCutscene()
         }

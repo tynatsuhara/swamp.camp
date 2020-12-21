@@ -1,12 +1,14 @@
-import { DialogueInstance, Dialogue, dialogue, NextDialogue, dialogueWithOptions, option, DialogueOption } from "../Dialogue"
+import { DialogueInstance, dialogue, NextDialogue, dialogueWithOptions, option, DialogueOption } from "../Dialogue"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { Campfire } from "../../world/elements/Campfire"
 import { Player } from "../Player"
 import { Item } from "../../items/Items"
 
-export const ITEM_DIALOGUES: { [key: number]: () => DialogueInstance } = {
-    [Dialogue.CAMPFIRE]: () => {
+export const CAMPFIRE_DIALOGUE = "campfire"
+
+export const ITEM_DIALOGUES: { [key: string]: () => DialogueInstance } = {
+    [CAMPFIRE_DIALOGUE]: () => {
         // the fire can be dead, almost dead, partially full, almost entirely full, or totally full
 
         const cf: Campfire = DialogueDisplay.instance.dialogueSource as Campfire
@@ -18,7 +20,7 @@ export const ITEM_DIALOGUES: { [key: number]: () => DialogueInstance } = {
             return () => {
                 Player.instance.dude.inventory.removeItem(Item.WOOD, logsTransferred)
                 cf.addLogs(logsTransferred)
-                return new NextDialogue(Dialogue.CAMPFIRE, false)
+                return new NextDialogue(CAMPFIRE_DIALOGUE, false)
             }
         }
 

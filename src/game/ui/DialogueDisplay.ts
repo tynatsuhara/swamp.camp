@@ -1,4 +1,4 @@
-import { DialogueInstance, getDialogue, NextDialogue, Dialogue, DialogueSource } from "../characters/Dialogue"
+import { DialogueInstance, getDialogue, NextDialogue, DialogueSource, EMPTY_DIALOGUE } from "../characters/Dialogue"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { NineSlice } from "../../engine/tiles/NineSlice"
 import { Point } from "../../engine/point"
@@ -90,7 +90,7 @@ export class DialogueDisplay extends Component {
         const next = nextFn()
         
         if (!next) {
-            this.dialogueSource.dialogue = Dialogue.NONE
+            this.dialogueSource.dialogue = EMPTY_DIALOGUE
             this.close()
         } else {
             this.dialogueSource.dialogue = next.dialogue

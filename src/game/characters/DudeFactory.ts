@@ -8,7 +8,7 @@ import { LocationManager } from "../world/LocationManager"
 import { Enemy } from "./Enemy"
 import { DudeSaveState } from "../saves/DudeSaveState"
 import { Inventory } from "../items/Inventory"
-import { Dialogue } from "./Dialogue"
+import { EMPTY_DIALOGUE } from "./Dialogue"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 import { Villager } from "./Villager"
 import { NPCSchedules } from "./NPCSchedule"
@@ -16,6 +16,7 @@ import { WorldLocation } from "../world/WorldLocation"
 import { Lists } from "../../engine/util/Lists"
 import { WeaponType } from "./weapons/WeaponType"
 import { Item } from "../items/Items"
+import { BERTO_STARTING_DIALOGUE } from "./dialogues/BertoIntro"
 
 export const enum DudeFaction {
     VILLAGERS,
@@ -77,7 +78,7 @@ export class DudeFactory {
         let shield: string = null
         let maxHealth: number
         let speed: number = 0.085
-        let dialogue: Dialogue = Dialogue.NONE
+        let dialogue: string = EMPTY_DIALOGUE
         let additionalComponents: Component[] = []
         let blob = {}
         const defaultInventory = new Inventory()
@@ -112,7 +113,7 @@ export class DudeFactory {
                 animationName = "Herald"
                 maxHealth = Number.MAX_SAFE_INTEGER
                 speed *= .6
-                dialogue = Dialogue.BERT_0
+                dialogue = BERTO_STARTING_DIALOGUE
                 additionalComponents = [
                     new NPC(NPCSchedules.newGoToSchedule(  // filter out occupied points to not get stuck in the campfire
                         Lists.oneOf([new Point(-3, 0), new Point(-3, 1), new Point(-2, 0), new Point(-2, 1)].filter(pt => !location.elements.get(pt)))

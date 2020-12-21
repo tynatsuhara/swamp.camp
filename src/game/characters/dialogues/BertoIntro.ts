@@ -1,18 +1,18 @@
-import { DialogueInstance, Dialogue, dialogue, NextDialogue, dialogueWithOptions, DialogueOption, option } from "../Dialogue"
-import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
-import { SellMenu, SalePackage } from "../../ui/SellMenu"
 import { Item } from "../../items/Items"
-import { WorldLocation } from "../../world/WorldLocation"
-import { LocationManager } from "../../world/LocationManager"
-import { DudeType } from "../DudeFactory"
-import { NPC } from "../NPC"
-import { NPCSchedules } from "../NPCSchedule"
-import { MapGenerator } from "../../world/MapGenerator"
-import { EventQueue } from "../../world/events/EventQueue"
-import { QueuedEventType } from "../../world/events/QueuedEvent"
-import { WorldTime } from "../../world/WorldTime"
+import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
+import { SalePackage, SellMenu } from "../../ui/SellMenu"
 import { ElementType } from "../../world/elements/Elements"
 import { House } from "../../world/elements/House"
+import { EventQueue } from "../../world/events/EventQueue"
+import { QueuedEventType } from "../../world/events/QueuedEvent"
+import { LocationManager } from "../../world/LocationManager"
+import { WorldTime } from "../../world/WorldTime"
+import { dialogue, DialogueInstance, DialogueOption, dialogueWithOptions, NextDialogue, option } from "../Dialogue"
+
+export const BERTO_STARTING_DIALOGUE = "bert-start"
+const BERT_MENU = "bert-menu", 
+      BERT_MENU_INTRO = "bert-menu-intro", 
+      BERT_VILLAGERS = "bert-villagers"
 
 const getItemsToSell = (): SalePackage[] => {
     return [{
@@ -36,34 +36,34 @@ const getGreeting = () => {
     return "Tally ho!"
 }
 
-export const BERTO_INTRO_DIALOGUE: { [key: number]: () => DialogueInstance } = {
-    [Dialogue.BERT_0]: () => dialogueWithOptions(
+export const BERTO_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
+    [BERTO_STARTING_DIALOGUE]: () => dialogueWithOptions(
         ["Good morrow! I, Sir Berto of Dube, present myself unto thee as an emissary of The Honourable King Bob XVIII.",
         "Should thy choose to collect raw materials, I will purchase them on behalf of The Kingdom.",
         "Upon receipt of a fee and construction of an appropriate dwelling, I can also bring tax-paying subjects to populate thy settlement.",
         "Tradesmen! Knights! Worthless peons to scrub latrines and polish thy armor!",
         "Art thou interested in any of my services at the moment?"],
         DudeInteractIndicator.IMPORTANT_DIALOGUE,
-        option("Sure!", Dialogue.BERT_MENU, true),
-        option("Maybe later.", Dialogue.BERT_MENU_INTRO, false),
+        option("Sure!", BERT_MENU, true),
+        option("Maybe later.", BERT_MENU_INTRO, false),
     ),
-    [Dialogue.BERT_MENU_INTRO]: () => dialogue(
+    [BERT_MENU_INTRO]: () => dialogue(
         [getGreeting()],
-        () => new NextDialogue(Dialogue.BERT_MENU, true)
+        () => new NextDialogue(BERT_MENU, true)
     ),
-    [Dialogue.BERT_MENU]: () => dialogueWithOptions(
+    [BERT_MENU]: () => dialogueWithOptions(
         ["How shall I assist thee?"],
         DudeInteractIndicator.NONE,
         new DialogueOption("What are you buying?", () => {
             SellMenu.instance.show(getItemsToSell())
-            return new NextDialogue(Dialogue.BERT_MENU_INTRO, false)
+            return new NextDialogue(BERT_MENU_INTRO, false)
         }),
         new DialogueOption("We need a new settler.", () => {
-            return new NextDialogue(Dialogue.BERT_VILLAGERS, true)
+            return new NextDialogue(BERT_VILLAGERS, true)
         }),
-        option("Never mind.", Dialogue.BERT_MENU_INTRO, false)
+        option("Never mind.", BERT_MENU_INTRO, false)
     ),
-    [Dialogue.BERT_VILLAGERS]: () => dialogueWithOptions(
+    [BERT_VILLAGERS]: () => dialogueWithOptions(
         ["At present, only felonious peons can be spared by The King.",
         "Shall I return to The Kingdom, bringing word that thou art requesting a settler?"],
         DudeInteractIndicator.NONE,
@@ -75,7 +75,7 @@ export const BERTO_INTRO_DIALOGUE: { [key: number]: () => DialogueInstance } = {
 
             if (openHouses.length === 0) {
                 // TODO: explain that a house is needed
-                return new NextDialogue(Dialogue.BERT_MENU_INTRO, false)
+                return new NextDialogue(BERT_MENU_INTRO, false)
             }
             
             openHouses[0].setResidentPending() 
@@ -83,8 +83,8 @@ export const BERTO_INTRO_DIALOGUE: { [key: number]: () => DialogueInstance } = {
                 type: QueuedEventType.HERALD_DEPARTURE,
                 time: WorldTime.instance.time
             })
-            return new NextDialogue(Dialogue.BERT_MENU_INTRO, false)
+            return new NextDialogue(BERT_MENU_INTRO, false)
         }),
-        option("Never mind.", Dialogue.BERT_MENU_INTRO, false)
+        option("Never mind.", BERT_MENU_INTRO, false)
     )
 }
