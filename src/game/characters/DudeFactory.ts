@@ -23,6 +23,7 @@ export const enum DudeFaction {
     ORCS,
     UNDEAD,
     DEMONS,
+    SHROOMS
 }
 
 export const enum DudeType {
@@ -32,6 +33,7 @@ export const enum DudeType {
     ORC_WARRIOR,
     HERALD,
     HORNED_DEMON,
+    SHROOM,
 }
 
 export class DudeFactory {
@@ -72,7 +74,7 @@ export class DudeFactory {
         location: WorldLocation
     ): Dude {
         // defaults
-        let faction: DudeFaction = DudeFaction.VILLAGERS
+        let factions: DudeFaction[] = [DudeFaction.VILLAGERS]
         let animationName: string
         let weapon: WeaponType = WeaponType.NONE
         let shield: string = null
@@ -93,9 +95,6 @@ export class DudeFactory {
                 additionalComponents = [new Player(), new CutscenePlayerController()]
                 window["player"] = additionalComponents[0]
                 defaultInventory.addItem(Item.SWORD)
-                blob = {
-                    // color: Lists.oneOf(CUSTOMIZATION_OPTIONS)
-                }
                 break
             }
             case DudeType.DIP: {
@@ -133,7 +132,7 @@ export class DudeFactory {
                 break
             }
             case DudeType.ORC_WARRIOR: {
-                faction = DudeFaction.ORCS
+                factions = [DudeFaction.ORCS]
                 animationName = "orc_warrior"
                 weapon = WeaponType.CLUB
                 additionalComponents = [new NPC(), new Enemy()]
@@ -142,7 +141,7 @@ export class DudeFactory {
                 break
             }
             case DudeType.HORNED_DEMON: {
-                faction = DudeFaction.DEMONS
+                factions = [DudeFaction.DEMONS]
                 animationName = "chort" 
                 weapon = WeaponType.UNARMED
                 additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new Enemy()]
@@ -150,6 +149,15 @@ export class DudeFactory {
                 speed *= (.6 + Math.random()/5)
                 break
             }
+            case DudeType.SHROOM:
+                factions = [DudeFaction.SHROOMS, DudeFaction.VILLAGERS]
+                animationName = "chort" 
+                weapon = WeaponType.UNARMED
+                additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new Enemy()]
+                maxHealth = 2
+                speed *= (.6 + Math.random()/5)
+                blob = { size: 's' }
+                break
             default: {
                 throw new Error(`DudeType ${type} can't be instantiated`)
             }
@@ -158,7 +166,7 @@ export class DudeFactory {
         // use saved data instead of defaults
         const d = new Dude(
             type, 
-            faction,
+            factions,  // TODO: Save factions? Only if this becomes non-deterministic
             saveState?.anim ?? animationName, 
             pos, 
             saveState?.weapon ?? weapon,  // TODO: update this logic when we make it so you can drop weapons/shields

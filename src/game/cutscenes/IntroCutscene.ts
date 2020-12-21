@@ -68,7 +68,7 @@ export class IntroCutscene extends Component {
         }
         
         if (!this.orcs) {
-            this.orcs = Array.from(LocationManager.instance.currentLocation.dudes).filter(d => d.faction === DudeFaction.ORCS)
+            this.orcs = Array.from(LocationManager.instance.currentLocation.dudes).filter(d => d.factions.includes(DudeFaction.ORCS))
         }
 
         // TODO prevent the player from going to a different location until this is over

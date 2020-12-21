@@ -31,7 +31,7 @@ export class Dude extends Component implements DialogueSource {
     
     blob: object
     readonly type: DudeType
-    readonly faction: DudeFaction
+    readonly factions: DudeFaction[]
     readonly inventory: Inventory
     readonly maxHealth: number
     private _health: number
@@ -69,7 +69,7 @@ export class Dude extends Component implements DialogueSource {
 
     constructor(
         type: DudeType,
-        faction: DudeFaction,
+        factions: DudeFaction[],
         characterAnimName: string,
         position: Point,
         weaponType: WeaponType,
@@ -83,7 +83,7 @@ export class Dude extends Component implements DialogueSource {
     ) {
         super()
         this.type = type
-        this.faction = faction
+        this.factions = factions
         this._position = position
         this.shieldId = shieldId
         this.maxHealth = maxHealth
@@ -297,6 +297,13 @@ export class Dude extends Component implements DialogueSource {
      */
     moveTo(point: Point) {
         this._position = this.collider.moveTo(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos)
+    }
+
+    /**
+     * Returns true if these dudes have no factions in common
+     */
+    isEnemy(d: Dude) {
+        return !d.factions.some(fac => this.factions.includes(fac))
     }
 
     isFacing(pt: Point) {
