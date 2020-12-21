@@ -96,7 +96,10 @@ export class Player extends Component {
         if (updateData.input.isKeyDown(InputKey.L)) {
             DudeFactory.instance.new(DudeType.HORNED_DEMON, updateData.input.mousePos)
         }
-
+        if (updateData.input.isKeyDown(InputKey.K)) {
+            DudeFactory.instance.new(DudeType.SHROOM, updateData.input.mousePos)
+        }
+        
         // update crosshair position
         // const relativeLerpedPos = originalCrosshairPosRelative.lerp(0.16, this.lerpedLastMoveDir.normalized().times(TILE_SIZE))
         // this.crosshairs.transform.position = this.position.plus(relativeLerpedPos)

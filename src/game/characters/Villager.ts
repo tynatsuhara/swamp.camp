@@ -3,6 +3,7 @@ import { Dude } from "./Dude"
 import { NPC } from "./NPC"
 import { DudeFaction } from "./DudeFactory"
 import { PointLightMaskRenderer } from "../world/PointLightMaskRenderer"
+import { ShroomNPC } from "./ShroomNPC"
 
 export class Villager extends Component {
     
@@ -18,6 +19,11 @@ export class Villager extends Component {
             if (d.factions.includes(DudeFaction.DEMONS)) {
                 return PointLightMaskRenderer.instance.isDark(this.dude.standingPosition)
                         || d.standingPosition.distanceTo(this.dude.standingPosition) < 30
+            }
+
+            // Villagers only flee from shrooms if the shroom is big (and therefore aggro)
+            if (d.factions.includes(DudeFaction.SHROOMS)) {
+                return ShroomNPC.isAggro(d)
             }
 
             return !d.factions.includes(DudeFaction.VILLAGERS)

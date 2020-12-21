@@ -17,6 +17,7 @@ import { Lists } from "../../engine/util/Lists"
 import { WeaponType } from "./weapons/WeaponType"
 import { Item } from "../items/Items"
 import { BERTO_STARTING_DIALOGUE } from "./dialogues/BertoIntro"
+import { ShroomNPC } from "./ShroomNPC"
 
 export const enum DudeFaction {
     VILLAGERS,
@@ -150,13 +151,12 @@ export class DudeFactory {
                 break
             }
             case DudeType.SHROOM:
-                factions = [DudeFaction.SHROOMS, DudeFaction.VILLAGERS]
-                animationName = "chort" 
+                factions = [DudeFaction.SHROOMS]
+                animationName = "SmallMushroom" 
                 weapon = WeaponType.UNARMED
-                additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new Enemy()]
+                additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new ShroomNPC()]
                 maxHealth = 2
                 speed *= (.6 + Math.random()/5)
-                blob = { size: 's' }
                 break
             default: {
                 throw new Error(`DudeType ${type} can't be instantiated`)
