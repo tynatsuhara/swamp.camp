@@ -35,7 +35,7 @@ class SaveManager {
                 // pre-load this before "load" is called to display data on the main menu
                 this.state = this.getSavedData().state
             } else {
-                this.state = {}
+                this.state = new SaveState()
             }
         }
         return this.state
