@@ -153,7 +153,6 @@ export class DudeFactory {
             case DudeType.SHROOM:
                 factions = [DudeFaction.SHROOMS]
                 animationName = "SmallMushroom" 
-                weapon = WeaponType.UNARMED
                 additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new ShroomNPC()]
                 maxHealth = 2
                 speed *= (.6 + Math.random()/5)

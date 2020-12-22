@@ -23,7 +23,7 @@ export class Villager extends Component {
 
             // Villagers only flee from shrooms if the shroom is big (and therefore aggro)
             if (d.factions.includes(DudeFaction.SHROOMS)) {
-                return ShroomNPC.isAggro(d)
+                return d.entity.getComponent(ShroomNPC).isAggro()
             }
 
             return !d.factions.includes(DudeFaction.VILLAGERS)

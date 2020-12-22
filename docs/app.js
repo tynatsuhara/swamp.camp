@@ -3034,10 +3034,10 @@ System.register("game/characters/NPCSchedule", [], function (exports_42, context
         execute: function () {
             exports_42("NPCSchedules", NPCSchedules = {
                 SCHEDULE_KEY: "sch",
-                newNoOpSchedule: function () { return { type: 0 /* DO_NOTHING */ }; },
-                newGoToSchedule: function (tilePoint) { return { type: 1 /* GO_TO_SPOT */, p: tilePoint.toString() }; },
-                newFreeRoamInDarkSchedule: function () { return { type: 2 /* ROAM_IN_DARKNESS */ }; },
-                newFreeRoamSchedule: function () { return { type: 3 /* ROAM */ }; },
+                newNoOpSchedule: function () { return ({ type: 0 /* DO_NOTHING */ }); },
+                newGoToSchedule: function (tilePoint) { return ({ type: 1 /* GO_TO_SPOT */, p: tilePoint.toString() }); },
+                newFreeRoamInDarkSchedule: function () { return ({ type: 2 /* ROAM_IN_DARKNESS */ }); },
+                newFreeRoamSchedule: function () { return ({ type: 3 /* ROAM */ }); },
             });
         }
     };
@@ -9042,7 +9042,6 @@ System.register("game/characters/Enemy", ["engine/component", "game/graphics/Til
                 Enemy.prototype.awake = function () {
                     var _this = this;
                     this.dude = this.entity.getComponent(Dude_4.Dude);
-                    this.dude.weapon.setDelayBetweenAttacks(500);
                     this.npc = this.entity.getComponent(NPC_3.NPC);
                     // DEMON enemies will avoid light
                     // TODO make them burn in the light or something?
@@ -9057,6 +9056,11 @@ System.register("game/characters/Enemy", ["engine/component", "game/graphics/Til
                     }
                     else {
                         this.npc.isEnemyFn = function (d) { return d.isEnemy(_this.dude); };
+                    }
+                };
+                Enemy.prototype.update = function () {
+                    if (this.dude.weapon) {
+                        this.dude.weapon.setDelayBetweenAttacks(500);
                     }
                 };
                 return Enemy;
@@ -9120,9 +9124,9 @@ System.register("game/cutscenes/CutscenePlayerController", ["engine/component", 
         }
     };
 });
-System.register("game/characters/ShroomNPC", ["engine/component", "game/characters/Dude", "game/characters/Enemy", "game/characters/DudeFactory", "game/world/LocationManager"], function (exports_108, context_108) {
+System.register("game/characters/ShroomNPC", ["engine/component", "game/characters/Dude", "game/characters/Enemy", "game/characters/DudeFactory", "game/world/LocationManager", "game/characters/weapons/WeaponType"], function (exports_108, context_108) {
     "use strict";
-    var component_30, Dude_6, Enemy_1, DudeFactory_4, LocationManager_16, SIZE, ShroomNPC;
+    var component_30, Dude_6, Enemy_1, DudeFactory_4, LocationManager_16, WeaponType_3, SIZE, ShroomNPC;
     var __moduleName = context_108 && context_108.id;
     return {
         setters: [
@@ -9140,6 +9144,9 @@ System.register("game/characters/ShroomNPC", ["engine/component", "game/characte
             },
             function (LocationManager_16_1) {
                 LocationManager_16 = LocationManager_16_1;
+            },
+            function (WeaponType_3_1) {
+                WeaponType_3 = WeaponType_3_1;
             }
         ],
         execute: function () {
@@ -9150,14 +9157,25 @@ System.register("game/characters/ShroomNPC", ["engine/component", "game/characte
                     return _super !== null && _super.apply(this, arguments) || this;
                 }
                 ShroomNPC.prototype.awake = function () {
+                    var _this = this;
                     this.dude = this.entity.getComponent(Dude_6.Dude);
-                    this.dude.weapon.setDelayBetweenAttacks(500);
                     this.dude.blob[SIZE] = this.dude.blob[SIZE] || 1;
-                    if (ShroomNPC.isAggro(this.dude)) {
-                        this.entity.addComponent(new Enemy_1.Enemy());
+                    if (this.dude.blob[SIZE] == 3) {
+                        this.dude.setWeapon(WeaponType_3.WeaponType.UNARMED);
+                        this.enemy = this.entity.addComponent(new Enemy_1.Enemy());
                     }
+                    // medium shrooms go aggro if hit, lil guys flee
+                    this.dude.setOnDamageCallback(function () {
+                        if (_this.dude.blob[SIZE] == 2 && !_this.dude.weapon) {
+                            _this.dude.setWeapon(WeaponType_3.WeaponType.UNARMED);
+                        }
+                        if (!_this.enemy) {
+                            _this.enemy = _this.entity.addComponent(new Enemy_1.Enemy());
+                        }
+                    });
                 };
                 ShroomNPC.prototype.update = function (data) {
+                    // TODO: grow over time
                     if (data.input.isKeyDown(74 /* J */)) {
                         this.dude.blob[SIZE] = Math.min(this.dude.blob[SIZE] + 1, 3);
                         // overwrite the animation
@@ -9168,8 +9186,8 @@ System.register("game/characters/ShroomNPC", ["engine/component", "game/characte
                         DudeFactory_4.DudeFactory.instance.load(data_1, LocationManager_16.LocationManager.instance.exterior());
                     }
                 };
-                ShroomNPC.isAggro = function (shroom) {
-                    return shroom.blob[SIZE] === 3;
+                ShroomNPC.prototype.isAggro = function () {
+                    return !!this.enemy;
                 };
                 ShroomNPC.getAnimationName = function (blob) {
                     var size = blob[SIZE] || 1;
@@ -9225,7 +9243,7 @@ System.register("game/characters/Villager", ["engine/component", "game/character
                         }
                         // Villagers only flee from shrooms if the shroom is big (and therefore aggro)
                         if (d.factions.includes(4 /* SHROOMS */)) {
-                            return ShroomNPC_1.ShroomNPC.isAggro(d);
+                            return d.entity.getComponent(ShroomNPC_1.ShroomNPC).isAggro();
                         }
                         return !d.factions.includes(0 /* VILLAGERS */);
                     };
@@ -9238,7 +9256,7 @@ System.register("game/characters/Villager", ["engine/component", "game/character
 });
 System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point", "game/characters/Player", "game/characters/Dude", "game/characters/NPC", "game/world/LocationManager", "game/characters/Enemy", "game/items/Inventory", "game/characters/Dialogue", "game/cutscenes/CutscenePlayerController", "game/characters/Villager", "game/characters/NPCSchedule", "engine/util/Lists", "game/characters/weapons/WeaponType", "game/characters/dialogues/BertoIntro", "game/characters/ShroomNPC"], function (exports_110, context_110) {
     "use strict";
-    var Entity_24, point_62, Player_14, Dude_8, NPC_5, LocationManager_17, Enemy_2, Inventory_2, Dialogue_5, CutscenePlayerController_1, Villager_1, NPCSchedule_3, Lists_4, WeaponType_3, BertoIntro_2, ShroomNPC_2, DudeFactory;
+    var Entity_24, point_62, Player_14, Dude_8, NPC_5, LocationManager_17, Enemy_2, Inventory_2, Dialogue_5, CutscenePlayerController_1, Villager_1, NPCSchedule_3, Lists_4, WeaponType_4, BertoIntro_2, ShroomNPC_2, DudeFactory;
     var __moduleName = context_110 && context_110.id;
     return {
         setters: [
@@ -9281,8 +9299,8 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
             function (Lists_4_1) {
                 Lists_4 = Lists_4_1;
             },
-            function (WeaponType_3_1) {
-                WeaponType_3 = WeaponType_3_1;
+            function (WeaponType_4_1) {
+                WeaponType_4 = WeaponType_4_1;
             },
             function (BertoIntro_2_1) {
                 BertoIntro_2 = BertoIntro_2_1;
@@ -9327,7 +9345,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                     // defaults
                     var factions = [0 /* VILLAGERS */];
                     var animationName;
-                    var weapon = WeaponType_3.WeaponType.NONE;
+                    var weapon = WeaponType_4.WeaponType.NONE;
                     var shield = null;
                     var maxHealth;
                     var speed = 0.085;
@@ -9339,7 +9357,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                     switch (type) {
                         case 0 /* PLAYER */: {
                             animationName = "knight_f";
-                            weapon = WeaponType_3.WeaponType.SWORD;
+                            weapon = WeaponType_4.WeaponType.SWORD;
                             shield = "shield_0";
                             maxHealth = 4;
                             additionalComponents = [new Player_14.Player(), new CutscenePlayerController_1.CutscenePlayerController()];
@@ -9373,7 +9391,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                         }
                         case 2 /* ELF */: {
                             animationName = "elf_m";
-                            weapon = WeaponType_3.WeaponType.KATANA;
+                            weapon = WeaponType_4.WeaponType.KATANA;
                             shield = "shield_0";
                             maxHealth = 4;
                             additionalComponents = [new NPC_5.NPC(), new Villager_1.Villager()];
@@ -9383,7 +9401,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                         case 3 /* ORC_WARRIOR */: {
                             factions = [1 /* ORCS */];
                             animationName = "orc_warrior";
-                            weapon = WeaponType_3.WeaponType.CLUB;
+                            weapon = WeaponType_4.WeaponType.CLUB;
                             additionalComponents = [new NPC_5.NPC(), new Enemy_2.Enemy()];
                             maxHealth = 2;
                             speed *= (.3 + Math.random() / 2);
@@ -9392,7 +9410,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                         case 5 /* HORNED_DEMON */: {
                             factions = [3 /* DEMONS */];
                             animationName = "chort";
-                            weapon = WeaponType_3.WeaponType.UNARMED;
+                            weapon = WeaponType_4.WeaponType.UNARMED;
                             additionalComponents = [new NPC_5.NPC(NPCSchedule_3.NPCSchedules.newFreeRoamInDarkSchedule()), new Enemy_2.Enemy()];
                             maxHealth = 2;
                             speed *= (.6 + Math.random() / 5);
@@ -9401,7 +9419,6 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                         case 6 /* SHROOM */:
                             factions = [4 /* SHROOMS */];
                             animationName = "SmallMushroom";
-                            weapon = WeaponType_3.WeaponType.UNARMED;
                             additionalComponents = [new NPC_5.NPC(NPCSchedule_3.NPCSchedules.newFreeRoamSchedule()), new ShroomNPC_2.ShroomNPC()];
                             maxHealth = 2;
                             speed *= (.6 + Math.random() / 5);
@@ -9641,7 +9658,7 @@ System.register("game/items/DroppedItem", ["engine/collision/BoxCollider", "engi
 });
 System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", "game/world/LocationManager", "game/items/DroppedItem", "engine/point", "game/characters/weapons/WeaponType"], function (exports_116, context_116) {
     "use strict";
-    var _a, Tilesets_36, Entity_25, LocationManager_19, DroppedItem_1, point_64, WeaponType_4, ItemMetadata, ITEM_METADATA_MAP, spawnItem;
+    var _a, Tilesets_36, Entity_25, LocationManager_19, DroppedItem_1, point_64, WeaponType_5, ItemMetadata, ITEM_METADATA_MAP, spawnItem;
     var __moduleName = context_116 && context_116.id;
     return {
         setters: [
@@ -9660,8 +9677,8 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
             function (point_64_1) {
                 point_64 = point_64_1;
             },
-            function (WeaponType_4_1) {
-                WeaponType_4 = WeaponType_4_1;
+            function (WeaponType_5_1) {
+                WeaponType_5 = WeaponType_5_1;
             }
         ],
         execute: function () {
@@ -9727,25 +9744,25 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
                     displayName: "Axe",
                     inventoryIconSupplier: function () { return Tilesets_36.Tilesets.instance.oneBit.getTileSource("axe"); },
                     stackLimit: 1,
-                    equippable: WeaponType_4.WeaponType.AXE
+                    equippable: WeaponType_5.WeaponType.AXE
                 }),
                 _a[100022 /* PICKAXE */] = new ItemMetadata({
                     displayName: "Pickaxe",
                     inventoryIconSupplier: function () { return Tilesets_36.Tilesets.instance.oneBit.getTileSource("pickaxe"); },
                     stackLimit: 1,
-                    equippable: WeaponType_4.WeaponType.PICKAXE
+                    equippable: WeaponType_5.WeaponType.PICKAXE
                 }),
                 _a[100003 /* SWORD */] = new ItemMetadata({
                     displayName: "Sword",
                     inventoryIconSupplier: function () { return Tilesets_36.Tilesets.instance.oneBit.getTileSource("sword"); },
                     stackLimit: 1,
-                    equippable: WeaponType_4.WeaponType.SWORD
+                    equippable: WeaponType_5.WeaponType.SWORD
                 }),
                 _a[100021 /* SPEAR */] = new ItemMetadata({
                     displayName: "Spear",
                     inventoryIconSupplier: function () { return Tilesets_36.Tilesets.instance.oneBit.getTileSource("spear"); },
                     stackLimit: 1,
-                    equippable: WeaponType_4.WeaponType.SPEAR
+                    equippable: WeaponType_5.WeaponType.SPEAR
                 }),
                 _a));
             /**
@@ -10031,15 +10048,15 @@ System.register("game/characters/weapons/Shield", ["engine/component", "engine/t
 });
 System.register("game/characters/weapons/UnarmedWeapon", ["game/characters/weapons/Weapon", "game/characters/weapons/WeaponType"], function (exports_120, context_120) {
     "use strict";
-    var Weapon_1, WeaponType_5, State, UnarmedWeapon;
+    var Weapon_1, WeaponType_6, State, UnarmedWeapon;
     var __moduleName = context_120 && context_120.id;
     return {
         setters: [
             function (Weapon_1_1) {
                 Weapon_1 = Weapon_1_1;
             },
-            function (WeaponType_5_1) {
-                WeaponType_5 = WeaponType_5_1;
+            function (WeaponType_6_1) {
+                WeaponType_6 = WeaponType_6_1;
             }
         ],
         execute: function () {
@@ -10055,7 +10072,7 @@ System.register("game/characters/weapons/UnarmedWeapon", ["game/characters/weapo
                     return _this;
                 }
                 UnarmedWeapon.prototype.getType = function () {
-                    return WeaponType_5.WeaponType.UNARMED;
+                    return WeaponType_6.WeaponType.UNARMED;
                 };
                 UnarmedWeapon.prototype.setDelayBetweenAttacks = function (delayMillis) {
                     this.delay = delayMillis;
@@ -10372,15 +10389,15 @@ System.register("game/characters/weapons/Projectile", ["engine/collision/BoxColl
 });
 System.register("game/characters/weapons/SpearWeapon", ["game/characters/weapons/Weapon", "game/characters/weapons/WeaponType", "engine/tiles/TileTransform", "engine/point", "game/graphics/Tilesets", "engine/util/Animator", "game/characters/weapons/Projectile"], function (exports_123, context_123) {
     "use strict";
-    var Weapon_3, WeaponType_6, TileTransform_27, point_68, Tilesets_40, Animator_4, Projectile_1, State, SpearWeapon;
+    var Weapon_3, WeaponType_7, TileTransform_27, point_68, Tilesets_40, Animator_4, Projectile_1, State, SpearWeapon;
     var __moduleName = context_123 && context_123.id;
     return {
         setters: [
             function (Weapon_3_1) {
                 Weapon_3 = Weapon_3_1;
             },
-            function (WeaponType_6_1) {
-                WeaponType_6 = WeaponType_6_1;
+            function (WeaponType_7_1) {
+                WeaponType_7 = WeaponType_7_1;
             },
             function (TileTransform_27_1) {
                 TileTransform_27 = TileTransform_27_1;
@@ -10435,7 +10452,7 @@ System.register("game/characters/weapons/SpearWeapon", ["game/characters/weapons
                     return [this.weaponSprite.toImageRender(this.weaponTransform)];
                 };
                 SpearWeapon.prototype.getType = function () {
-                    return WeaponType_6.WeaponType.SPEAR;
+                    return WeaponType_7.WeaponType.SPEAR;
                 };
                 SpearWeapon.prototype.setDelayBetweenAttacks = function (delayMs) {
                     this.delayBetweenAttacks = delayMs;
@@ -10474,7 +10491,7 @@ System.register("game/characters/weapons/SpearWeapon", ["game/characters/weapons
                     var timeToThrow = 500;
                     if (this.timeDrawn > timeToThrow) {
                         this.dude.inventory.removeItem(100021 /* SPEAR */, 1);
-                        this.dude.setWeapon(WeaponType_6.WeaponType.UNARMED);
+                        this.dude.setWeapon(WeaponType_7.WeaponType.UNARMED);
                         var newTransform = new TileTransform_27.TileTransform(this.weaponTransform.position, this.weaponTransform.dimensions, this.weaponTransform.rotation, this.weaponTransform.mirrorX, this.weaponTransform.mirrorY, this.weaponTransform.depth);
                         Projectile_1.spawnProjectile(newTransform.position.plusY(24), this.weaponSprite, 100021 /* SPEAR */, new point_68.Point(40 * this.dude.facingMultipler(), 4.5), this.dude);
                     }
@@ -10561,12 +10578,12 @@ System.register("game/characters/weapons/SpearWeapon", ["game/characters/weapons
 });
 System.register("game/characters/weapons/WeaponFactory", ["game/characters/weapons/WeaponType", "game/characters/weapons/UnarmedWeapon", "game/characters/weapons/MeleeWeapon", "engine/point", "game/characters/weapons/SpearWeapon"], function (exports_124, context_124) {
     "use strict";
-    var WeaponType_7, UnarmedWeapon_1, MeleeWeapon_1, point_69, SpearWeapon_1, WeaponFactory;
+    var WeaponType_8, UnarmedWeapon_1, MeleeWeapon_1, point_69, SpearWeapon_1, WeaponFactory;
     var __moduleName = context_124 && context_124.id;
     return {
         setters: [
-            function (WeaponType_7_1) {
-                WeaponType_7 = WeaponType_7_1;
+            function (WeaponType_8_1) {
+                WeaponType_8 = WeaponType_8_1;
             },
             function (UnarmedWeapon_1_1) {
                 UnarmedWeapon_1 = UnarmedWeapon_1_1;
@@ -10586,19 +10603,19 @@ System.register("game/characters/weapons/WeaponFactory", ["game/characters/weapo
                 // TODO support additional weapons
                 make: function (type) {
                     switch (type) {
-                        case WeaponType_7.WeaponType.NONE:
+                        case WeaponType_8.WeaponType.NONE:
                             return null;
-                        case WeaponType_7.WeaponType.UNARMED:
+                        case WeaponType_8.WeaponType.UNARMED:
                             return new UnarmedWeapon_1.UnarmedWeapon();
-                        case WeaponType_7.WeaponType.SWORD:
-                            return new MeleeWeapon_1.MeleeWeapon(WeaponType_7.WeaponType.SWORD, "weapon_regular_sword", new point_69.Point(-6, -2));
-                        case WeaponType_7.WeaponType.CLUB:
-                            return new MeleeWeapon_1.MeleeWeapon(WeaponType_7.WeaponType.CLUB, "weapon_baton_with_spikes", new point_69.Point(-6, -2));
-                        case WeaponType_7.WeaponType.PICKAXE:
-                            return new MeleeWeapon_1.MeleeWeapon(WeaponType_7.WeaponType.PICKAXE, "weapon_pickaxe", new point_69.Point(-5, -2));
-                        case WeaponType_7.WeaponType.AXE:
-                            return new MeleeWeapon_1.MeleeWeapon(WeaponType_7.WeaponType.AXE, "weapon_axe", new point_69.Point(-3, -1));
-                        case WeaponType_7.WeaponType.SPEAR:
+                        case WeaponType_8.WeaponType.SWORD:
+                            return new MeleeWeapon_1.MeleeWeapon(WeaponType_8.WeaponType.SWORD, "weapon_regular_sword", new point_69.Point(-6, -2));
+                        case WeaponType_8.WeaponType.CLUB:
+                            return new MeleeWeapon_1.MeleeWeapon(WeaponType_8.WeaponType.CLUB, "weapon_baton_with_spikes", new point_69.Point(-6, -2));
+                        case WeaponType_8.WeaponType.PICKAXE:
+                            return new MeleeWeapon_1.MeleeWeapon(WeaponType_8.WeaponType.PICKAXE, "weapon_pickaxe", new point_69.Point(-5, -2));
+                        case WeaponType_8.WeaponType.AXE:
+                            return new MeleeWeapon_1.MeleeWeapon(WeaponType_8.WeaponType.AXE, "weapon_axe", new point_69.Point(-3, -1));
+                        case WeaponType_8.WeaponType.SPEAR:
                             return new SpearWeapon_1.SpearWeapon();
                         default:
                             throw new Error("weapon type " + type + " is not supported yet");
@@ -10610,7 +10627,7 @@ System.register("game/characters/weapons/WeaponFactory", ["game/characters/weapo
 });
 System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine/component", "engine/point", "engine/tiles/AnimatedTileComponent", "engine/tiles/TileTransform", "game/graphics/ImageFilters", "game/graphics/Tilesets", "game/items/Items", "game/ui/DialogueDisplay", "game/ui/DudeInteractIndicator", "game/ui/UIStateManager", "game/world/elements/Interactable", "game/world/LocationManager", "game/characters/DudeAnimationUtils", "game/characters/Dialogue", "game/characters/weapons/Shield", "game/characters/weapons/WeaponType", "game/characters/weapons/WeaponFactory"], function (exports_125, context_125) {
     "use strict";
-    var BoxCollider_10, component_35, point_70, AnimatedTileComponent_5, TileTransform_28, ImageFilters_4, Tilesets_41, Items_7, DialogueDisplay_5, DudeInteractIndicator_5, UIStateManager_16, Interactable_5, LocationManager_21, DudeAnimationUtils_1, Dialogue_6, Shield_1, WeaponType_8, WeaponFactory_1, Dude;
+    var BoxCollider_10, component_35, point_70, AnimatedTileComponent_5, TileTransform_28, ImageFilters_4, Tilesets_41, Items_7, DialogueDisplay_5, DudeInteractIndicator_5, UIStateManager_16, Interactable_5, LocationManager_21, DudeAnimationUtils_1, Dialogue_6, Shield_1, WeaponType_9, WeaponFactory_1, Dude;
     var __moduleName = context_125 && context_125.id;
     return {
         setters: [
@@ -10662,8 +10679,8 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
             function (Shield_1_1) {
                 Shield_1 = Shield_1_1;
             },
-            function (WeaponType_8_1) {
-                WeaponType_8 = WeaponType_8_1;
+            function (WeaponType_9_1) {
+                WeaponType_9 = WeaponType_9_1;
             },
             function (WeaponFactory_1_1) {
                 WeaponFactory_1 = WeaponFactory_1_1;
@@ -10723,7 +10740,7 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                     configurable: true
                 });
                 Object.defineProperty(Dude.prototype, "weaponType", {
-                    get: function () { var _a, _b; return (_b = (_a = this.weapon) === null || _a === void 0 ? void 0 : _a.getType()) !== null && _b !== void 0 ? _b : WeaponType_8.WeaponType.NONE; },
+                    get: function () { var _a, _b; return (_b = (_a = this.weapon) === null || _a === void 0 ? void 0 : _a.getType()) !== null && _b !== void 0 ? _b : WeaponType_9.WeaponType.NONE; },
                     enumerable: false,
                     configurable: true
                 });
@@ -10777,7 +10794,6 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                     configurable: true
                 });
                 Dude.prototype.damage = function (damage, direction, knockback) {
-                    // TODO: disable friendly fire
                     var _a;
                     // absorb damage if facing the direction of the enemy
                     if (((_a = this.shield) === null || _a === void 0 ? void 0 : _a.isBlocking()) && !this.isFacing(this.standingPosition.plus(direction))) {
@@ -10792,6 +10808,12 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                         }
                     }
                     this.knockback(direction, knockback);
+                    if (!!this.onDamageCallback) {
+                        this.onDamageCallback();
+                    }
+                };
+                Dude.prototype.setOnDamageCallback = function (fn) {
+                    this.onDamageCallback = fn;
                 };
                 Dude.prototype.die = function (direction) {
                     var _this = this;

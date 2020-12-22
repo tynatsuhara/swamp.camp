@@ -13,8 +13,6 @@ export class Enemy extends Component {
 
     awake() {
         this.dude = this.entity.getComponent(Dude)
-        this.dude.weapon.setDelayBetweenAttacks(500)
-
         this.npc = this.entity.getComponent(NPC)
 
         // DEMON enemies will avoid light
@@ -29,6 +27,12 @@ export class Enemy extends Component {
             this.npc.findTargetRange *= 3
         } else {
             this.npc.isEnemyFn = d => d.isEnemy(this.dude)
+        }
+    }
+
+    update() {
+        if (this.dude.weapon) {
+            this.dude.weapon.setDelayBetweenAttacks(500)
         }
     }
 }

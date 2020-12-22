@@ -153,8 +153,6 @@ export class Dude extends Component implements DialogueSource {
     get isAlive() { return this._health > 0 }
 
     damage(damage: number, direction: Point, knockback: number) {
-        // TODO: disable friendly fire
-
         // absorb damage if facing the direction of the enemy
         if (this.shield?.isBlocking() && !this.isFacing(this.standingPosition.plus(direction))) {
             damage *= .25
@@ -170,6 +168,15 @@ export class Dude extends Component implements DialogueSource {
         }
 
         this.knockback(direction, knockback)
+
+        if (!!this.onDamageCallback) {
+            this.onDamageCallback()
+        }
+    }
+
+    private onDamageCallback: () => void
+    setOnDamageCallback(fn: () => void) {
+        this.onDamageCallback = fn
     }
 
     private deathOffset: Point
