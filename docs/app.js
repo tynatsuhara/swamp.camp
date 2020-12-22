@@ -9124,33 +9124,40 @@ System.register("game/cutscenes/CutscenePlayerController", ["engine/component", 
         }
     };
 });
-System.register("game/characters/ShroomNPC", ["engine/component", "game/characters/Dude", "game/characters/Enemy", "game/characters/DudeFactory", "game/world/LocationManager", "game/characters/weapons/WeaponType"], function (exports_108, context_108) {
+System.register("game/characters/ShroomNPC", ["engine/component", "game/world/LocationManager", "game/characters/Dude", "game/characters/DudeFactory", "game/characters/Enemy", "game/characters/weapons/WeaponType", "game/world/WorldTime", "game/world/TimeUnit"], function (exports_108, context_108) {
     "use strict";
-    var component_30, Dude_6, Enemy_1, DudeFactory_4, LocationManager_16, WeaponType_3, SIZE, ShroomNPC;
+    var component_30, LocationManager_16, Dude_6, DudeFactory_4, Enemy_1, WeaponType_3, WorldTime_7, TimeUnit_4, SIZE, NEXT_GROWTH_TIME, ShroomNPC;
     var __moduleName = context_108 && context_108.id;
     return {
         setters: [
             function (component_30_1) {
                 component_30 = component_30_1;
             },
+            function (LocationManager_16_1) {
+                LocationManager_16 = LocationManager_16_1;
+            },
             function (Dude_6_1) {
                 Dude_6 = Dude_6_1;
-            },
-            function (Enemy_1_1) {
-                Enemy_1 = Enemy_1_1;
             },
             function (DudeFactory_4_1) {
                 DudeFactory_4 = DudeFactory_4_1;
             },
-            function (LocationManager_16_1) {
-                LocationManager_16 = LocationManager_16_1;
+            function (Enemy_1_1) {
+                Enemy_1 = Enemy_1_1;
             },
             function (WeaponType_3_1) {
                 WeaponType_3 = WeaponType_3_1;
+            },
+            function (WorldTime_7_1) {
+                WorldTime_7 = WorldTime_7_1;
+            },
+            function (TimeUnit_4_1) {
+                TimeUnit_4 = TimeUnit_4_1;
             }
         ],
         execute: function () {
             SIZE = "s"; // one of [1, 2, 3]
+            NEXT_GROWTH_TIME = "ngt";
             ShroomNPC = /** @class */ (function (_super) {
                 __extends(ShroomNPC, _super);
                 function ShroomNPC() {
@@ -9160,6 +9167,7 @@ System.register("game/characters/ShroomNPC", ["engine/component", "game/characte
                     var _this = this;
                     this.dude = this.entity.getComponent(Dude_6.Dude);
                     this.dude.blob[SIZE] = this.dude.blob[SIZE] || 1;
+                    this.dude.blob[NEXT_GROWTH_TIME] = this.dude.blob[NEXT_GROWTH_TIME] || this.nextGrowthTime();
                     if (this.dude.blob[SIZE] == 3) {
                         this.dude.setWeapon(WeaponType_3.WeaponType.UNARMED);
                         this.enemy = this.entity.addComponent(new Enemy_1.Enemy());
@@ -9175,27 +9183,36 @@ System.register("game/characters/ShroomNPC", ["engine/component", "game/characte
                     });
                 };
                 ShroomNPC.prototype.update = function (data) {
-                    // TODO: grow over time
-                    if (data.input.isKeyDown(74 /* J */)) {
-                        this.dude.blob[SIZE] = Math.min(this.dude.blob[SIZE] + 1, 3);
+                    if (WorldTime_7.WorldTime.instance.time < this.dude.blob[NEXT_GROWTH_TIME]) {
+                        return;
+                    }
+                    if (Math.random() > 0.5) {
+                        // grow
+                        var size = Math.min(this.dude.blob[SIZE] + 1, 3);
+                        this.dude.blob[SIZE] = size;
+                        this.dude.blob[NEXT_GROWTH_TIME] = this.nextGrowthTime();
                         // overwrite the animation
                         var data_1 = this.dude.save();
-                        data_1.anim = ShroomNPC.getAnimationName(this.dude.blob);
+                        data_1.anim = [
+                            "SmallMushroom",
+                            "NormalMushroom",
+                            "LargeMushroom",
+                        ][size - 1];
                         // delete and respawn the shroom dude
                         this.entity.selfDestruct();
                         DudeFactory_4.DudeFactory.instance.load(data_1, LocationManager_16.LocationManager.instance.exterior());
+                    }
+                    else {
+                        // split
+                        DudeFactory_4.DudeFactory.instance.new(6 /* SHROOM */, this.dude.position, LocationManager_16.LocationManager.instance.exterior());
                     }
                 };
                 ShroomNPC.prototype.isAggro = function () {
                     return !!this.enemy;
                 };
-                ShroomNPC.getAnimationName = function (blob) {
-                    var size = blob[SIZE] || 1;
-                    return [
-                        "SmallMushroom",
-                        "NormalMushroom",
-                        "LargeMushroom",
-                    ][size - 1];
+                ShroomNPC.prototype.nextGrowthTime = function () {
+                    // grow every 12-24 hours
+                    return WorldTime_7.WorldTime.instance.time + TimeUnit_4.TimeUnit.DAY * (0.5 + Math.random() / 2);
                 };
                 return ShroomNPC;
             }(component_30.Component));
@@ -11106,7 +11123,7 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
 });
 System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "engine/point", "game/characters/Dude", "game/characters/DudeFactory", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/graphics/Tilesets", "game/items/DroppedItem", "game/SaveManager", "game/ui/UIStateManager", "game/world/GroundRenderer", "game/world/LocationManager", "game/world/MapGenerator", "game/world/PointLightMaskRenderer", "game/world/TimeUnit", "game/world/WorldTime"], function (exports_127, context_127) {
     "use strict";
-    var CollisionEngine_4, point_72, Dude_10, DudeFactory_5, Camera_9, CutsceneManager_3, IntroCutscene_1, Tilesets_42, DroppedItem_3, SaveManager_7, UIStateManager_17, GroundRenderer_2, LocationManager_23, MapGenerator_5, PointLightMaskRenderer_5, TimeUnit_4, WorldTime_7, ZOOM, GameScene;
+    var CollisionEngine_4, point_72, Dude_10, DudeFactory_5, Camera_9, CutsceneManager_3, IntroCutscene_1, Tilesets_42, DroppedItem_3, SaveManager_7, UIStateManager_17, GroundRenderer_2, LocationManager_23, MapGenerator_5, PointLightMaskRenderer_5, TimeUnit_5, WorldTime_8, ZOOM, GameScene;
     var __moduleName = context_127 && context_127.id;
     return {
         setters: [
@@ -11155,11 +11172,11 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
             function (PointLightMaskRenderer_5_1) {
                 PointLightMaskRenderer_5 = PointLightMaskRenderer_5_1;
             },
-            function (TimeUnit_4_1) {
-                TimeUnit_4 = TimeUnit_4_1;
+            function (TimeUnit_5_1) {
+                TimeUnit_5 = TimeUnit_5_1;
             },
-            function (WorldTime_7_1) {
-                WorldTime_7 = WorldTime_7_1;
+            function (WorldTime_8_1) {
+                WorldTime_8 = WorldTime_8_1;
             }
         ],
         execute: function () {
@@ -11182,7 +11199,7 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
                     SaveManager_7.saveManager.deleteSave();
                     // Wait to initialize since it will begin a coroutine
                     PointLightMaskRenderer_5.PointLightMaskRenderer.instance.start();
-                    WorldTime_7.WorldTime.instance.initialize(TimeUnit_4.TimeUnit.HOUR * 19.5);
+                    WorldTime_8.WorldTime.instance.initialize(TimeUnit_5.TimeUnit.HOUR * 19.5);
                     // World must be initialized before we do anything else
                     MapGenerator_5.MapGenerator.instance.generateExterior();
                     var playerStartPos = MapGenerator_5.MapGenerator.ENTER_LAND_POS;
@@ -11210,7 +11227,7 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
                         offset: cameraOffset,
                         entities: LocationManager_23.LocationManager.instance.currentLocation.getEntities().concat([
                             CutsceneManager_3.CutsceneManager.instance.getEntity(),
-                            WorldTime_7.WorldTime.instance.getEntity(),
+                            WorldTime_8.WorldTime.instance.getEntity(),
                             PointLightMaskRenderer_5.PointLightMaskRenderer.instance.getEntity(),
                             GroundRenderer_2.GroundRenderer.instance.getEntity(),
                         ])
