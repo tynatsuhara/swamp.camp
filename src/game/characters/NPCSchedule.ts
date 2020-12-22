@@ -15,11 +15,11 @@ export type NPCSchedule = {
 export const NPCSchedules = {
     SCHEDULE_KEY: "sch",
 
-    newNoOpSchedule: (): NPCSchedule => { return { type: NPCScheduleType.DO_NOTHING } },
+    newNoOpSchedule: (): NPCSchedule => ({ type: NPCScheduleType.DO_NOTHING }),
 
-    newGoToSchedule: (tilePoint: Point): NPCSchedule => { return { type: NPCScheduleType.GO_TO_SPOT, p: tilePoint.toString() } },
+    newGoToSchedule: (tilePoint: Point): NPCSchedule => ({ type: NPCScheduleType.GO_TO_SPOT, p: tilePoint.toString() }),
 
-    newFreeRoamInDarkSchedule: (): NPCSchedule => { return { type: NPCScheduleType.ROAM_IN_DARKNESS } },
+    newFreeRoamInDarkSchedule: (): NPCSchedule => ({ type: NPCScheduleType.ROAM_IN_DARKNESS }),
 
-    newFreeRoamSchedule: (): NPCSchedule => { return { type: NPCScheduleType.ROAM } },
+    newFreeRoamSchedule: (): NPCSchedule => ({ type: NPCScheduleType.ROAM }),
 }
