@@ -1,13 +1,14 @@
-import { Point } from "../../../engine/point"
-import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
-import { GroundComponent } from "./GroundComponent"
-import { Entity } from "../../../engine/Entity"
-import { GroundType, MakeGroundFuncData } from "./Ground"
-import { GroundRenderer } from "../GroundRenderer"
-import { StaticTileSource } from "../../../engine/tiles/StaticTileSource"
 import { Component } from "../../../engine/component"
-import { ImageRender } from "../../../engine/renderer/ImageRender"
+import { Entity } from "../../../engine/Entity"
+import { Point } from "../../../engine/point"
+import { RenderMethod } from "../../../engine/renderer/RenderMethod"
+import { StaticTileSource } from "../../../engine/tiles/StaticTileSource"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
+import { GroundRenderer } from "../GroundRenderer"
+import { LocationManager } from "../LocationManager"
+import { GroundType, MakeGroundFuncData } from "./Ground"
+import { GroundComponent } from "./GroundComponent"
 
 const INDEX = "i"
 const TALL_GRASS_COUNT = "t"
@@ -28,17 +29,7 @@ export const makeGrass = (d: MakeGroundFuncData): GroundComponent => {
     const e = new Entity()
 
     for (let i = 0; i < tallGrass; i++) {
-        const offset = new Point(
-            -6 + Math.round(Math.random() * 11), 
-            -TILE_SIZE + 1 + Math.round(Math.random() * (TILE_SIZE - 1))
-        )
-        const grassPos = d.pos.times(TILE_SIZE).plus(offset)
-
-        const component = Tilesets.instance.outdoorTiles
-                .getTileSource(`grass${Math.ceil(Math.random() * 2)}`)
-                .toComponent(new TileTransform(grassPos))
-        component.transform.depth = grassPos.y + TILE_SIZE
-        e.addComponent(component)
+        e.addComponent(new TallGrass(d.pos))
     }
 
     return e.addComponent(new GroundComponent(
@@ -48,4 +39,32 @@ export const makeGrass = (d: MakeGroundFuncData): GroundComponent => {
             [TALL_GRASS_COUNT]: tallGrass
         })
     ))
+}
+
+class TallGrass extends Component {
+
+    private tilePos: Point
+
+    constructor(tilePos: Point) {
+        super()
+        this.tilePos = tilePos
+
+        const offset = new Point(
+            -6 + Math.round(Math.random() * 11), 
+            -TILE_SIZE + 2 + Math.round(Math.random() * (TILE_SIZE - 2))
+        )
+        const grassPos = tilePos.times(TILE_SIZE).plus(offset)
+
+        const render = Tilesets.instance.outdoorTiles
+                .getTileSource(`grass${Math.ceil(Math.random() * 2)}`)
+                .toImageRender(new TileTransform(grassPos, null, 0, false, false, grassPos.y + TILE_SIZE))
+
+        this.getRenderMethods = () => [render]
+    }
+
+    update() {
+        if (LocationManager.instance.currentLocation.isOccupied(this.tilePos)) {
+            this.delete()
+        }
+    }
 }
