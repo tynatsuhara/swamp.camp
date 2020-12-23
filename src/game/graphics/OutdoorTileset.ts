@@ -29,6 +29,8 @@ export class OutdoorTileset extends SingleFileTileLoader {
             ["bluetentr", new Point(2, 27)],
             ["campfireOff", new Point(13, 8)],
             ["campfireOn", new Point(14, 8)],
+            ["grass1", new Point(22, 10)],
+            ["grass2", new Point(22, 11)],
             ["rock1", new Point(54, 21)],
             ["rock2", new Point(55, 21)],
             ["rock3", new Point(56, 21)],
