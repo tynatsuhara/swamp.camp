@@ -58,7 +58,7 @@ export class TentFactory extends ElementFactory {
         return e.addComponent(new ElementComponent(
             ElementType.TENT, 
             pos,
-            ElementUtils.rectPoints(pos.plus(new Point(1, 1)), new Point(2, 2)),
+            ElementUtils.rectPoints(pos.plus(new Point(1, 1)), new Point(2, 1)),
             () => { return { destinationUUID, color } }
         ))
     }
