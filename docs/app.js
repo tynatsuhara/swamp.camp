@@ -9208,7 +9208,7 @@ System.register("game/characters/ShroomNPC", ["engine/component", "game/world/Lo
                     }
                 };
                 ShroomNPC.prototype.isAggro = function () {
-                    return !!this.enemy;
+                    return !!this.enemy && this.dude.blob[SIZE] > 1;
                 };
                 ShroomNPC.prototype.nextGrowthTime = function () {
                     // grow every 12-24 hours

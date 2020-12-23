@@ -67,7 +67,7 @@ export class ShroomNPC extends Component {
     }
 
     isAggro() {
-        return !!this.enemy
+        return !!this.enemy && this.dude.blob[SIZE] > 1
     }
 
     private nextGrowthTime() {
