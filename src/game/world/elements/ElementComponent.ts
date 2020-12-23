@@ -9,11 +9,13 @@ import { Point } from "../../../engine/point"
 export class ElementComponent extends Component {
 
     readonly type: ElementType
-    readonly occupiedPoints: Point[]
+    readonly pos: Point  // TODO: do we need to add this?
+    readonly occupiedPoints: Point[]  // these are the points that are non-walkable
 
-    constructor(type: ElementType, occupiedPoints: Point[], saveFn: () => object) {
+    constructor(type: ElementType, pos: Point, occupiedPoints: Point[], saveFn: () => object) {
         super()
         this.type = type
+        this.pos = pos
         this.occupiedPoints = occupiedPoints
         this.save = saveFn
     }

@@ -116,7 +116,7 @@ export class DudeFactory {
                 dialogue = BERTO_STARTING_DIALOGUE
                 additionalComponents = [
                     new NPC(NPCSchedules.newGoToSchedule(  // filter out occupied points to not get stuck in the campfire
-                        Lists.oneOf([new Point(-3, 0), new Point(-3, 1), new Point(-2, 0), new Point(-2, 1)].filter(pt => !location.elements.get(pt)))
+                        Lists.oneOf([new Point(-3, 0), new Point(-3, 1), new Point(-2, 0), new Point(-2, 1)].filter(pt => !location.isOccupied(pt)))
                     )),
                     new Villager()
                 ]

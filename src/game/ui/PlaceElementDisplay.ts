@@ -44,14 +44,14 @@ export class PlaceElementDisplay extends Component {
     startPlacing(element: ElementType, successFn: () => void) {
         this.element = element
         this.successFn = successFn
-        this.dimensions = Elements.instance.dimensionsForPlacing(element)
+        this.dimensions = Elements.instance.getElementFactory(element).dimensions
         this.placingFrame = Player.instance.entity.addComponent(new PlaceElementFrame(this.dimensions))
     }
 
     // Should only be called by PlaceElementFrame
     finishPlacing(elementPos: Point) {
         this.successFn()  // remove from inv
-        LocationManager.instance.currentLocation.addWorldElement(this.element, elementPos)
+        LocationManager.instance.currentLocation.addElement(this.element, elementPos)
         this.close()
     }
 

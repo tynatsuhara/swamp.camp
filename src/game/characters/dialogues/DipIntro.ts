@@ -44,8 +44,8 @@ export const DIP_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
     ], () => new NextDialogue(DIP_MAKE_CAMPFIRE, false)),
     
     [DIP_MAKE_CAMPFIRE]: () => {
-        const campfires = LocationManager.instance.currentLocation.elements.values().filter(e => e.type === ElementType.CAMPFIRE)
-        const dipTent = LocationManager.instance.currentLocation.elements.values().filter(e => e.type === ElementType.TENT)[0]
+        const campfires = LocationManager.instance.currentLocation.getElementsOfType(ElementType.CAMPFIRE)
+        const dipTent = LocationManager.instance.currentLocation.getElementsOfType(ElementType.TENT)[0]
         if (campfires.length > 0) {  // campfire has been placed
             const lines = [
                 dipTent.occupiedPoints[0].distanceTo(campfires[0].occupiedPoints[0]) < 5

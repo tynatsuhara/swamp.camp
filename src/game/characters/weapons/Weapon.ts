@@ -24,7 +24,7 @@ export abstract class Weapon extends Component {
     static hitResources(dude: Dude) {
         const interactDistance = 20
         const interactCenter = dude.standingPosition.minus(new Point(0, 7))
-        const possibilities = LocationManager.instance.currentLocation.elements.values()
+        const possibilities = LocationManager.instance.currentLocation.getElements()
                 .map(e => e.entity.getComponent(Hittable))
                 .filter(e => !!e)
                 .filter(e => dude.isFacing(e.position))

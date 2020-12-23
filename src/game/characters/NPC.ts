@@ -159,7 +159,7 @@ export class NPC extends Component {
     private doFlee(updateData: UpdateData, speedMultiplier: number = 1, ptSelectionFilter: (pt) => boolean = () => true) {
         if (!this.fleePath || this.fleePath.length === 0) {  // only try once per upate() to find a path
             const l = LocationManager.instance.currentLocation
-            const openPoints = l.ground.keys().filter(pt => !l.elements.get(pt))
+            const openPoints = l.ground.keys().filter(pt => !l.isOccupied(pt))
             let pt: Point
             for (let i = 0; i < 5; i++) {
                 pt = openPoints[Math.floor(Math.random() * openPoints.length)]
@@ -328,13 +328,10 @@ export class NPC extends Component {
     private findPath(tilePt: Point, pixelPtStart: Point = this.dude.standingPosition) {
         const start = pixelPtToTilePt(pixelPtStart)
         const end = tilePt
-        return LocationManager.instance.currentLocation.elements.findPath(
+        return LocationManager.instance.currentLocation.findPath(
             start, 
             end, 
-            { 
-                heuristic: (pt) => this.pathFindingHeuristic(pt, end),
-                isOccupied: (pt) => (pt === start ? false : !!LocationManager.instance.currentLocation.elements.get(pt)),  // prevent getting stuck "inside" a square
-            }
+            this.pathFindingHeuristic
         )?.map(pt => this.tilePtToStandingPos(pt)).slice(1)  // slice(1) because we don't need the start in the path
     }
 

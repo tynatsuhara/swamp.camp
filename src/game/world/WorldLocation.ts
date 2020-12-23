@@ -15,6 +15,7 @@ import { Ground, GroundType, SavedGround } from "./ground/Ground"
 import { GroundComponent } from "./ground/GroundComponent"
 import { LocationManager } from "./LocationManager"
 import { Teleporter, Teleporters } from "./Teleporter"
+import { ElementUtils } from "./elements/ElementUtils"
 
 export class WorldLocation {
 
@@ -27,7 +28,9 @@ export class WorldLocation {
     // Entities may be duplicated in multiple spots 
     // (entities spawning multiple tiles eg a tent)
     // BUT an entity should only be in one of these data structures
-    readonly elements = new Grid<ElementComponent>()
+    private readonly elements = new Grid<ElementComponent>()
+    private readonly occupied = new Grid<ElementComponent>()
+
     readonly ground = new Grid<GroundComponent>()
 
     // TODO: Make dropped items saveable
@@ -42,23 +45,79 @@ export class WorldLocation {
     }
 
     addGroundElement(type: GroundType, pos: Point, data: object = {}): GroundComponent {
-        const groundComponent = Ground.instance.make(type, this, pos, data)
         if (!!this.ground.get(pos)) {
-            groundComponent.entity.selfDestruct()
             return null
         }
+        const groundComponent = Ground.instance.make(type, this, pos, data)
         this.ground.set(pos, groundComponent)
         return groundComponent
     }
 
-    addWorldElement(type: ElementType, pos: Point, data: object = {}): ElementComponent {
-        const elementComponent = Elements.instance.make(type, this, pos, data)
-        if (elementComponent.occupiedPoints.some(pos => !!this.elements.get(pos))) {
-            elementComponent.entity.selfDestruct()
+    addElement(type: ElementType, pos: Point, data: object = {}): ElementComponent {
+        const factory = Elements.instance.getElementFactory(type)
+        const elementPts = ElementUtils.rectPoints(pos, factory.dimensions)
+        if (elementPts.some(pt => !!this.elements.get(pt))) {
             return null
         }
-        elementComponent.occupiedPoints.forEach(pos => this.elements.set(pos, elementComponent))
-        return elementComponent
+        
+        const el = factory.make(this, pos, data)
+        if (el.type !== type) {
+            throw new Error("constructed element type doesn't match requested type")
+        } else if (el.pos !== pos) {
+            throw new Error("constructed element position doesn't match requested position")
+        } else if (!el.entity) {
+            throw new Error("constructed element has a null entity")
+        }
+
+        elementPts.forEach(pt => this.elements.set(pt, el))
+        el.occupiedPoints.forEach(pt => this.occupied.set(pt, el))
+        
+        return el
+    }
+
+    getElementsOfType(type: ElementType): ElementComponent[] {
+        return this.elements.values().filter(el => el.type === type)
+    }
+
+    getElements() {
+        return this.elements.values()
+    }
+
+    /**
+     * @returns the element at the position. NOTE this can return an
+     *          element even if this is an "empty" square
+     */
+    getElement(pos: Point) {
+        return this.elements.get(pos)
+    }
+
+    /**
+     * @returns true if this position in the grid has a solid item
+     *          (aka it cannot be walked through)
+     */
+    isOccupied(pos: Point) {
+        return !!this.occupied.get(pos)
+    }
+
+    removeElement(el: ElementComponent) {
+        this.elements.removeAll(el)
+        this.occupied.removeAll(el)
+    }
+
+    findPath(tileStart: Point, tileEnd: Point, heuristic: (pt: Point, goal: Point) => number) {
+        return this.occupied.findPath(tileStart, tileEnd, {
+            heuristic: (pt) => heuristic(pt, tileEnd),
+            isOccupied: (pt) => {
+                // Assuming this is used for character-to-character pathfinding, the start
+                // and end points in the grid should be assumed to the open. For instance,
+                // the character might be slightly in an "occupied" square, EG if they
+                // are standing directly adjacent to the trunk of a tree.
+                if (pt.equals(tileStart) || pt.equals(tileEnd)) {
+                    return false
+                }
+                return !!this.occupied.get(pt)
+            }
+        })
     }
 
     addTeleporter(t: Teleporter) {
@@ -122,22 +181,11 @@ export class WorldLocation {
     }
 
     private saveElements(): SavedElement[] {
-        const topLeftCornerMap = new Map<ElementComponent, Point>()
-
-        this.elements.entries().forEach(tuple => {
-            const elementComponent = tuple[1]
-            const point = tuple[0]
-            const existingPoint = topLeftCornerMap.get(elementComponent)
-            if (!existingPoint || point.x < existingPoint.x || point.y < existingPoint.y) {
-                topLeftCornerMap.set(elementComponent, point)
-            }
-        })
-
-        return Array.from(topLeftCornerMap.entries()).map(kv => {
+        return this.elements.values().map(entity => {
             const el = new SavedElement()
-            el.pos = kv[1].toString()
-            el.type = kv[0].type
-            el.obj = kv[0].save()
+            el.pos = entity.pos.toString()
+            el.type = entity.type
+            el.obj = entity.save()
             return el
         })
     }
@@ -156,7 +204,7 @@ export class WorldLocation {
         // TODO: BUG: RELOADING RETURNS ELEMENTS THAT HAVE BEEN DESTROYED
         const n = new WorldLocation(saveState.isInterior)
         n._uuid = saveState.uuid
-        saveState.elements.forEach(el => n.addWorldElement(el.type, Point.fromString(el.pos), el.obj))
+        saveState.elements.forEach(el => n.addElement(el.type, Point.fromString(el.pos), el.obj))
         saveState.ground.forEach(el => n.addGroundElement(el.type, Point.fromString(el.pos), el.obj))
         saveState.dudes.forEach(d => DudeFactory.instance.load(d, n))
         n.teleporters = saveState.teleporters

@@ -15,7 +15,7 @@ export const makeTentInterior = (outside: WorldLocation, color: TentColor): Worl
     const interactablePos = new Point(2.5, 4).times(TILE_SIZE)
     const teleporter: Teleporter = { to: outside.uuid, pos: interactablePos.plusY(-4) }
     l.addTeleporter(teleporter)
-    l.addWorldElement(ElementType.TELEPORTER, new Point(2, 4), { to: outside.uuid, i: interactablePos.toString() })
+    l.addElement(ElementType.TELEPORTER, new Point(2, 4), { to: outside.uuid, i: interactablePos.toString() })
 
     const groundType = `${color}tentInterior`
     

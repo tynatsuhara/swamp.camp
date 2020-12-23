@@ -78,7 +78,7 @@ export class PlaceElementFrame extends Component {
     private canPlace(pos: Point) {
         for (let x = pos.x; x < pos.x + this.dimensions.x; x++) {
             for (let y = pos.y; y < pos.y + this.dimensions.y; y++) {
-                if (!!LocationManager.instance.currentLocation.elements.get(new Point(x, y))) {
+                if (!!LocationManager.instance.currentLocation.getElement(new Point(x, y))) {
                     return false
                 }
             }

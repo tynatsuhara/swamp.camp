@@ -1,12 +1,10 @@
-import { WorldLocation } from "../WorldLocation"
-import { makeTree } from "./Tree"
-import { makeRock } from "./Rock"
-import { Point } from "../../../engine/point"
-import { ElementComponent } from "./ElementComponent"
-import { makeTent } from "./Tent"
-import { makeCampfire } from "./Campfire"
-import { makeTeleporterElement } from "../Teleporter"
-import { makeHouse } from "./House"
+import { TeleporterFactory } from "../Teleporter"
+import { CampfireFactory } from "./Campfire"
+import { ElementFactory } from "./ElementFactory"
+import { HouseFactory } from "./House"
+import { RockFactory } from "./Rock"
+import { TentFactory } from "./Tent"
+import { TreeFactory } from "./Tree"
 
 // Elements are things which take up multiple squares in the non-ground ground
 export const enum ElementType {
@@ -46,24 +44,16 @@ export class Elements {
     * @param pos the top-left corner of the element
     * @param args the element's metadata
     */
-    private readonly ELEMENT_FUNCTION_MAP: { [key: number]: [(wl: WorldLocation, pos: Point, data: object) => ElementComponent , Point] } = {
-       [ElementType.TREE]: [makeTree, new Point(1, 2)],
-       [ElementType.ROCK]: [makeRock, new Point(1, 1)],
-       [ElementType.TENT]: [makeTent, new Point(4, 3)],
-       [ElementType.CAMPFIRE]: [makeCampfire, new Point(1, 1)],
-       [ElementType.TELEPORTER]: [makeTeleporterElement, new Point(1, 1)],
-       [ElementType.HOUSE]: [makeHouse, new Point(5, 4)],
+    private readonly ELEMENT_FACTORIES: { [key: number]: ElementFactory } = {
+       [ElementType.TREE]: new TreeFactory(),
+       [ElementType.ROCK]: new RockFactory(),
+       [ElementType.TENT]: new TentFactory(),
+       [ElementType.CAMPFIRE]: new CampfireFactory(),
+       [ElementType.TELEPORTER]: new TeleporterFactory(),
+       [ElementType.HOUSE]: new HouseFactory(),
    }
 
-    make(type: ElementType, wl: WorldLocation, pos: Point, data: object) {
-        const el = this.ELEMENT_FUNCTION_MAP[type][0](wl, pos, data)
-        if (el.type !== type) {
-            throw new Error("constructed element type doesn't match requested type")
-        }
-        return el
-    }
-
-    dimensionsForPlacing(type: ElementType) {
-        return this.ELEMENT_FUNCTION_MAP[type][1]
-    }
+   getElementFactory(type: ElementType) {
+       return this.ELEMENT_FACTORIES[type]
+   }
 }

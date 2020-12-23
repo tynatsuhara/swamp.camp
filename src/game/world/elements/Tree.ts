@@ -11,45 +11,53 @@ import { ElementComponent } from "./ElementComponent"
 import { ElementType } from "./Elements"
 import { WeaponType } from "../../characters/weapons/WeaponType"
 import { Player } from "../../characters/Player"
+import { ElementFactory } from "./ElementFactory"
 
 export const enum TreeType {
     ROUND = 1,
     POINTY = 2,
 }
 
-export const makeTree = (wl: WorldLocation, pos: Point, data: object): ElementComponent => {
-    const type = data["type"] ?? (Math.random() < .7 ? TreeType.POINTY : TreeType.ROUND)
-    const maxResourcesCount = 4
-    const availableResources = data["a"] ?? maxResourcesCount
+export class TreeFactory extends ElementFactory {
 
-    const e = new Entity()
-    const depth = (pos.y + 2) * TILE_SIZE
-    const top = addTile(e, `tree${type}top`, pos, depth)
-    const bottom = addTile(e, `tree${type}base`, pos.plus(new Point(0, 1)), depth)
-    const hitboxDims = new Point(8, 3)
-    
-    e.addComponent(new BoxCollider(
-        pos.plus(new Point(.5, 2)).times(TILE_SIZE).minus(new Point(hitboxDims.x/2, hitboxDims.y)), 
-        hitboxDims
-    ))
+    readonly type = ElementType.TREE
+    readonly dimensions = new Point(1, 2)
 
-    const hittableCenter = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE/2, TILE_SIZE + TILE_SIZE/2))  // center of bottom tile
-    const hittableResource = e.addComponent(new HittableResource(
-        hittableCenter, [top.transform, bottom.transform], availableResources, maxResourcesCount, 
-        () => {
-            if (Player.instance.dude.weaponType === WeaponType.AXE) {
-                return [Item.WOOD, Item.WOOD]
-            } else {
-                return [Item.WOOD]
+    make(wl: WorldLocation, pos: Point, data: object): ElementComponent {
+        const type = data["type"] ?? (Math.random() < .7 ? TreeType.POINTY : TreeType.ROUND)
+        const maxResourcesCount = 4
+        const availableResources = data["a"] ?? maxResourcesCount
+
+        const e = new Entity()
+        const depth = (pos.y + 2) * TILE_SIZE
+        const top = addTile(e, `tree${type}top`, pos, depth)
+        const bottom = addTile(e, `tree${type}base`, pos.plus(new Point(0, 1)), depth)
+        const hitboxDims = new Point(8, 3)
+        
+        e.addComponent(new BoxCollider(
+            pos.plus(new Point(.5, 2)).times(TILE_SIZE).minus(new Point(hitboxDims.x/2, hitboxDims.y)), 
+            hitboxDims
+        ))
+
+        const hittableCenter = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE/2, TILE_SIZE + TILE_SIZE/2))  // center of bottom tile
+        const hittableResource = e.addComponent(new HittableResource(
+            hittableCenter, [top.transform, bottom.transform], availableResources, maxResourcesCount, 
+            () => {
+                if (Player.instance.dude.weaponType === WeaponType.AXE) {
+                    return [Item.WOOD, Item.WOOD]
+                } else {
+                    return [Item.WOOD]
+                }
             }
-        }
-    ))
+        ))
 
-    return e.addComponent(new ElementComponent(
-        ElementType.TREE, 
-        [pos, pos.plusY(1)], 
-        () => { return { type, a: hittableResource.freeResources } }
-    ))
+        return e.addComponent(new ElementComponent(
+            ElementType.TREE, 
+            pos,
+            [pos.plusY(1)], 
+            () => { return { type, a: hittableResource.freeResources } }
+        ))
+    }
 }
 
 const addTile = (e: Entity, s: string, pos: Point, depth: number) => {

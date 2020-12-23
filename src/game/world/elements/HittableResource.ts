@@ -50,7 +50,7 @@ export class HittableResource extends Hittable {
         }
 
         if (finishingMove) {
-            LocationManager.instance.currentLocation.elements.removeAll(this.entity.getComponent(ElementComponent))
+            LocationManager.instance.currentLocation.removeElement(this.entity.getComponent(ElementComponent))
             this.entity.selfDestruct()
         }
     }

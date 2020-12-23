@@ -33,7 +33,7 @@ export class MapGenerator {
 
     generateExterior(): WorldLocation {
         // spawn tent
-        this.location.addWorldElement(ElementType.TENT, this.tentPos, { color: TentColor.RED })
+        this.location.addElement(ElementType.TENT, this.tentPos, { color: TentColor.RED })
         
         // make the ground
         // this.renderPath(new Point(-10, -10), new Point(10, 10), 2)
@@ -60,7 +60,7 @@ export class MapGenerator {
             )
             const occupiedPoints = [pt, pt.plus(new Point(0, 1))]
             if (occupiedPoints.every(p => !this.location.ground.get(p))) {
-                this.location.addWorldElement(ElementType.TREE, pt)
+                this.location.addElement(ElementType.TREE, pt)
             }
         }
     }
@@ -71,9 +71,9 @@ export class MapGenerator {
         // clear in corner
         for (let x = MapGenerator.MAP_SIZE/2-11; x < MapGenerator.MAP_SIZE/2; x++) {
             for (let y = MapGenerator.MAP_SIZE/2-10; y < MapGenerator.MAP_SIZE/2-8; y++) {
-                const element = this.location.elements.get(new Point(x, y))
+                const element = this.location.getElement(new Point(x, y))
                 if (!!element && typesToClear.indexOf(element.type) !== -1) {
-                    this.location.elements.removeAll(element)
+                    this.location.removeElement(element)
                 }
             }
         }
@@ -82,9 +82,9 @@ export class MapGenerator {
         const clearingCorner = this.tentPos.minus(new Point(1, 0))
         for (let x = 0; x < 6; x++) {
             for (let y = 0; y < 4; y++) {
-                const element = this.location.elements.get(clearingCorner.plus(new Point(x, y)))
+                const element = this.location.getElement(clearingCorner.plus(new Point(x, y)))
                 if (!!element && typesToClear.indexOf(element.type) !== -1) {
-                    this.location.elements.removeAll(element)
+                    this.location.removeElement(element)
                 }
             }
         }
@@ -97,64 +97,64 @@ export class MapGenerator {
                 Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_SIZE/2,
                 Math.floor(Math.random() * (MapGenerator.MAP_SIZE)) - MapGenerator.MAP_SIZE/2,
             )
-            if (!this.location.ground.get(p) && this.location.addWorldElement(ElementType.ROCK, p)) {
+            if (!this.location.ground.get(p) && this.location.addElement(ElementType.ROCK, p)) {
                 placedRocks++
             }
         }
     }
 
-    renderPath(
-        start: Point, 
-        end: Point, 
-        randomness: number
-    ) {
-        const ground = this.location.ground
-        const stuff = this.location.elements
+    // renderPath(
+    //     start: Point, 
+    //     end: Point, 
+    //     randomness: number
+    // ) {
+    //     const ground = this.location.ground
+    //     const stuff = this.location.elements
 
-        const heuristic = (pt: Point): number => {
-            const v = pt.manhattanDistanceTo(end) * Math.random() * randomness
-            const el = ground.get(pt)
-            if (!el) {
-                return v
-            }
-            const ct = el.entity.getComponent(ConnectingTile)
-            if (!ct || !ct.schema.canConnect(Ground.instance.PATH_CONNECTING_SCHEMA)) {
-                return v
-            }
-            const reuseCostMultiplier = 1/10
-            return v * reuseCostMultiplier
-        }
+    //     const heuristic = (pt: Point): number => {
+    //         const v = pt.manhattanDistanceTo(end) * Math.random() * randomness
+    //         const el = ground.get(pt)
+    //         if (!el) {
+    //             return v
+    //         }
+    //         const ct = el.entity.getComponent(ConnectingTile)
+    //         if (!ct || !ct.schema.canConnect(Ground.instance.PATH_CONNECTING_SCHEMA)) {
+    //             return v
+    //         }
+    //         const reuseCostMultiplier = 1/10
+    //         return v * reuseCostMultiplier
+    //     }
 
-        const isOccupiedFunc = (pt: Point) => {
-            if (!!stuff.get(pt)?.entity.getComponent(BoxCollider)) {
-                return true
-            }
-            const el = ground.get(pt)
-            if (!el) {
-                return false  // definitely not occupied
-            }
-            const ct = el.entity.getComponent(ConnectingTile)
-            if (!ct) {
-                return true  // can't connect, therefore occupied
-            }
-            return !Ground.instance.PATH_CONNECTING_SCHEMA.canConnect(ct.schema)
-        }
+    //     const isOccupiedFunc = (pt: Point) => {
+    //         if (!!stuff.get(pt)?.entity.getComponent(BoxCollider)) {
+    //             return true
+    //         }
+    //         const el = ground.get(pt)
+    //         if (!el) {
+    //             return false  // definitely not occupied
+    //         }
+    //         const ct = el.entity.getComponent(ConnectingTile)
+    //         if (!ct) {
+    //             return true  // can't connect, therefore occupied
+    //         }
+    //         return !Ground.instance.PATH_CONNECTING_SCHEMA.canConnect(ct.schema)
+    //     }
 
-        const path = ground.findPath(
-            start, 
-            end, 
-            { 
-                heuristic: heuristic,  
-                isOccupied: isOccupiedFunc
-            }
-        )
+    //     const path = ground.findPath(
+    //         start, 
+    //         end, 
+    //         { 
+    //             heuristic: heuristic,  
+    //             isOccupied: isOccupiedFunc
+    //         }
+    //     )
 
-        if (!path) {
-            return
-        }
+    //     if (!path) {
+    //         return
+    //     }
 
-        path.forEach(pt => this.location.addGroundElement(GroundType.PATH, pt))
-    }
+    //     path.forEach(pt => this.location.addGroundElement(GroundType.PATH, pt))
+    // }
 
     placeGrass() {
         // const levels = this.noise()

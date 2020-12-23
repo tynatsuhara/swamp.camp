@@ -70,8 +70,7 @@ export const BERTO_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
         "Shall I return to The Kingdom, bringing word that thou art requesting a settler?"],
         DudeInteractIndicator.NONE,
         new DialogueOption("Bring me a criminal.", () => {
-            const openHouses = LocationManager.instance.currentLocation.elements.values()
-                    .filter(e => e.type === ElementType.HOUSE)
+            const openHouses = LocationManager.instance.currentLocation.getElementsOfType(ElementType.HOUSE)
                     .map(e => e.entity.getComponent(House))
                     .filter(house => !house.hasResident())
 

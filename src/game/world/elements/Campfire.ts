@@ -16,59 +16,67 @@ import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { WorldTime } from "../WorldTime"
 import { TimeUnit } from "../TimeUnit"
 import { CAMPFIRE_DIALOGUE } from "../../characters/dialogues/ItemDialogues"
+import { ElementFactory } from "./ElementFactory"
 
-export const makeCampfire = (wl: WorldLocation, pos: Point, data: object): ElementComponent => {
-    const e = new Entity()
-    const scaledPos = pos.times(TILE_SIZE)
-    
-    const campfireOff = e.addComponent(new TileComponent(
-        Tilesets.instance.outdoorTiles.getTileSource("campfireOff"), 
-        new TileTransform(scaledPos)
-    ))
-    campfireOff.transform.depth = scaledPos.y + TILE_SIZE
+export class CampfireFactory extends ElementFactory {
 
-    const campfireOn = e.addComponent(new AnimatedTileComponent(
-        [Tilesets.instance.outdoorTiles.getTileSetAnimation("campfireOn", 2, 200)],
-        new TileTransform(scaledPos)
-    ))
-    campfireOn.transform.depth = scaledPos.y + TILE_SIZE
+    readonly type = ElementType.CAMPFIRE
+    readonly dimensions = new Point(1, 1)
 
-    const offset = new Point(0, 5)
-    e.addComponent(new BoxCollider(
-        scaledPos.plus(offset), 
-        new Point(TILE_SIZE, TILE_SIZE).minus(offset)
-    ))
+    make(wl: WorldLocation, pos: Point, data: object): ElementComponent{
+        const e = new Entity()
+        const scaledPos = pos.times(TILE_SIZE)
+        
+        const campfireOff = e.addComponent(new TileComponent(
+            Tilesets.instance.outdoorTiles.getTileSource("campfireOff"), 
+            new TileTransform(scaledPos)
+        ))
+        campfireOff.transform.depth = scaledPos.y + TILE_SIZE
 
-    const logsOnFire = data["logs"] ?? 0
-    const lastLogConsumedTime = data["llct"] ?? 0
+        const campfireOn = e.addComponent(new AnimatedTileComponent(
+            [Tilesets.instance.outdoorTiles.getTileSetAnimation("campfireOn", 2, 200)],
+            new TileTransform(scaledPos)
+        ))
+        campfireOn.transform.depth = scaledPos.y + TILE_SIZE
 
-    const updateFire = (logCount: number) => {
-        campfireOff.enabled = logCount === 0
-        campfireOn.enabled = !campfireOff.enabled
-        const lightCenterPos = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
-        if (campfireOn.enabled) {
-            PointLightMaskRenderer.instance.addLight(wl, lightCenterPos, TILE_SIZE * (5 + logCount/2))
-        } else {
-            PointLightMaskRenderer.instance.removeLight(wl, lightCenterPos)
+        const offset = new Point(0, 5)
+        e.addComponent(new BoxCollider(
+            scaledPos.plus(offset), 
+            new Point(TILE_SIZE, TILE_SIZE).minus(offset)
+        ))
+
+        const logsOnFire = data["logs"] ?? 0
+        const lastLogConsumedTime = data["llct"] ?? 0
+
+        const updateFire = (logCount: number) => {
+            campfireOff.enabled = logCount === 0
+            campfireOn.enabled = !campfireOff.enabled
+            const lightCenterPos = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
+            if (campfireOn.enabled) {
+                PointLightMaskRenderer.instance.addLight(wl, lightCenterPos, TILE_SIZE * (5 + logCount/2))
+            } else {
+                PointLightMaskRenderer.instance.removeLight(wl, lightCenterPos)
+            }
         }
+
+        const cf = e.addComponent(new Campfire(logsOnFire, lastLogConsumedTime, updateFire))
+
+        // Toggle between on/off when interacted with
+        e.addComponent(new Interactable(
+            scaledPos.plus(new Point(TILE_SIZE/2, TILE_SIZE/2)), 
+            () => {
+                DialogueDisplay.instance.startDialogue(cf)
+            }, 
+            new Point(1, -TILE_SIZE),
+        ))
+
+        return e.addComponent(new ElementComponent(
+            ElementType.CAMPFIRE, 
+            pos,
+            [pos], 
+            () => { return { logs: cf.logs, llct: cf.lastLogConsumedTime } }
+        ))
     }
-
-    const cf = e.addComponent(new Campfire(logsOnFire, lastLogConsumedTime, updateFire))
-
-    // Toggle between on/off when interacted with
-    e.addComponent(new Interactable(
-        scaledPos.plus(new Point(TILE_SIZE/2, TILE_SIZE/2)), 
-        () => {
-            DialogueDisplay.instance.startDialogue(cf)
-        }, 
-        new Point(1, -TILE_SIZE),
-    ))
-
-    return e.addComponent(new ElementComponent(
-        ElementType.CAMPFIRE, 
-        [pos], 
-        () => { return { logs: cf.logs, llct: cf.lastLogConsumedTime } }
-    ))
 }
 
 export class Campfire extends Component implements DialogueSource {
