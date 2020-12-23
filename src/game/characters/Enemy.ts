@@ -16,7 +16,8 @@ export class Enemy extends Component {
         this.npc = this.entity.getComponent(NPC)
 
         // DEMON enemies will avoid light
-        // TODO make them burn in the light or something?
+        // TODO: make them burn in the light or something?
+        // TODO: Consider splitting this class up 
         if (this.dude.factions.includes(DudeFaction.DEMONS)) {
             this.npc.isEnemyFn = d => {
                 return !d.factions.includes(DudeFaction.DEMONS) && PointLightMaskRenderer.instance.isDark(d.standingPosition)

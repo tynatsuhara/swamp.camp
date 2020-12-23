@@ -9044,7 +9044,8 @@ System.register("game/characters/Enemy", ["engine/component", "game/graphics/Til
                     this.dude = this.entity.getComponent(Dude_4.Dude);
                     this.npc = this.entity.getComponent(NPC_3.NPC);
                     // DEMON enemies will avoid light
-                    // TODO make them burn in the light or something?
+                    // TODO: make them burn in the light or something?
+                    // TODO: Consider splitting this class up 
                     if (this.dude.factions.includes(3 /* DEMONS */)) {
                         this.npc.isEnemyFn = function (d) {
                             return !d.factions.includes(3 /* DEMONS */) && PointLightMaskRenderer_3.PointLightMaskRenderer.instance.isDark(d.standingPosition);
@@ -9174,9 +9175,11 @@ System.register("game/characters/ShroomNPC", ["engine/component", "game/world/Lo
                     }
                     // medium shrooms go aggro if hit, lil guys flee
                     this.dude.setOnDamageCallback(function () {
+                        // NPC will flee until it has a non-NONE weapon
                         if (_this.dude.blob[SIZE] == 2 && !_this.dude.weapon) {
                             _this.dude.setWeapon(WeaponType_3.WeaponType.UNARMED);
                         }
+                        // Adding enemy component will cause them to flee or engage in combat
                         if (!_this.enemy) {
                             _this.enemy = _this.entity.addComponent(new Enemy_1.Enemy());
                         }
@@ -9186,25 +9189,22 @@ System.register("game/characters/ShroomNPC", ["engine/component", "game/world/Lo
                     if (WorldTime_7.WorldTime.instance.time < this.dude.blob[NEXT_GROWTH_TIME]) {
                         return;
                     }
-                    if (Math.random() > 0.5) {
+                    var ogSize = this.dude.blob[SIZE];
+                    this.dude.blob[NEXT_GROWTH_TIME] = this.nextGrowthTime();
+                    if (ogSize === 3 || Math.random() > 0.5) {
+                        // split
+                        DudeFactory_4.DudeFactory.instance.new(6 /* SHROOM */, this.dude.position, LocationManager_16.LocationManager.instance.exterior());
+                    }
+                    else {
                         // grow
-                        var size = Math.min(this.dude.blob[SIZE] + 1, 3);
-                        this.dude.blob[SIZE] = size;
-                        this.dude.blob[NEXT_GROWTH_TIME] = this.nextGrowthTime();
+                        var newSize = ogSize + 1;
+                        this.dude.blob[SIZE] = newSize;
                         // overwrite the animation
                         var data_1 = this.dude.save();
-                        data_1.anim = [
-                            "SmallMushroom",
-                            "NormalMushroom",
-                            "LargeMushroom",
-                        ][size - 1];
+                        data_1.anim = ["SmallMushroom", "NormalMushroom", "LargeMushroom",][newSize - 1];
                         // delete and respawn the shroom dude
                         this.entity.selfDestruct();
                         DudeFactory_4.DudeFactory.instance.load(data_1, LocationManager_16.LocationManager.instance.exterior());
-                    }
-                    else {
-                        // split
-                        DudeFactory_4.DudeFactory.instance.new(6 /* SHROOM */, this.dude.position, LocationManager_16.LocationManager.instance.exterior());
                     }
                 };
                 ShroomNPC.prototype.isAggro = function () {
@@ -9258,7 +9258,7 @@ System.register("game/characters/Villager", ["engine/component", "game/character
                             return PointLightMaskRenderer_4.PointLightMaskRenderer.instance.isDark(_this.dude.standingPosition)
                                 || d.standingPosition.distanceTo(_this.dude.standingPosition) < 30;
                         }
-                        // Villagers only flee from shrooms if the shroom is big (and therefore aggro)
+                        // Villagers only flee from shrooms if the shroom is aggro
                         if (d.factions.includes(4 /* SHROOMS */)) {
                             return d.entity.getComponent(ShroomNPC_1.ShroomNPC).isAggro();
                         }

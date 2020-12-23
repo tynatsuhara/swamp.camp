@@ -29,9 +29,11 @@ export class ShroomNPC extends Component {
 
         // medium shrooms go aggro if hit, lil guys flee
         this.dude.setOnDamageCallback(() => {
+            // NPC will flee until it has a non-NONE weapon
             if (this.dude.blob[SIZE] == 2 && !this.dude.weapon) {
                 this.dude.setWeapon(WeaponType.UNARMED)
             }
+            // Adding enemy component will cause them to flee or engage in combat
             if (!this.enemy) {
                 this.enemy = this.entity.addComponent(new Enemy())
             }
@@ -43,26 +45,24 @@ export class ShroomNPC extends Component {
             return
         }
 
-        if (Math.random() > 0.5) {
+        const ogSize = this.dude.blob[SIZE]
+        this.dude.blob[NEXT_GROWTH_TIME] = this.nextGrowthTime()
+
+        if (ogSize === 3 || Math.random() > 0.5) {
+            // split
+            DudeFactory.instance.new(DudeType.SHROOM, this.dude.position, LocationManager.instance.exterior())
+        } else {
             // grow
-            const size = Math.min(this.dude.blob[SIZE] + 1, 3)
-            this.dude.blob[SIZE] = size
-            this.dude.blob[NEXT_GROWTH_TIME] = this.nextGrowthTime()
+            const newSize = ogSize + 1
+            this.dude.blob[SIZE] = newSize
 
             // overwrite the animation
             const data = this.dude.save()
-            data.anim = [
-                "SmallMushroom",
-                "NormalMushroom",
-                "LargeMushroom",
-            ][size-1]
+            data.anim = ["SmallMushroom", "NormalMushroom", "LargeMushroom",][newSize-1]
 
             // delete and respawn the shroom dude
             this.entity.selfDestruct()
             DudeFactory.instance.load(data, LocationManager.instance.exterior())
-        } else {
-            // split
-            DudeFactory.instance.new(DudeType.SHROOM, this.dude.position, LocationManager.instance.exterior())
         }
     }
 

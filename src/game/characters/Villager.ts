@@ -21,7 +21,7 @@ export class Villager extends Component {
                         || d.standingPosition.distanceTo(this.dude.standingPosition) < 30
             }
 
-            // Villagers only flee from shrooms if the shroom is big (and therefore aggro)
+            // Villagers only flee from shrooms if the shroom is aggro
             if (d.factions.includes(DudeFaction.SHROOMS)) {
                 return d.entity.getComponent(ShroomNPC).isAggro()
             }
