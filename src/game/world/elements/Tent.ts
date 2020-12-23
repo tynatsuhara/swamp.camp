@@ -52,15 +52,13 @@ export class TentFactory extends ElementFactory {
         addTile(e, `${color}tentSE`, pos.plus(new Point(2, 1)), depth)
         e.addComponent(new BoxCollider(pos.plus(new Point(1, 1)).times(TILE_SIZE), new Point(TILE_SIZE*2, TILE_SIZE)))
 
-
         // Set up teleporter
         e.addComponent(new Interactable(interactablePos, () => wl.useTeleporter(destinationUUID), new Point(1, -TILE_SIZE*1.4)))
-
 
         return e.addComponent(new ElementComponent(
             ElementType.TENT, 
             pos,
-            ElementUtils.rectPoints(pos, new Point(4, 3)),
+            ElementUtils.rectPoints(pos.plus(new Point(1, 1)), new Point(2, 2)),
             () => { return { destinationUUID, color } }
         ))
     }

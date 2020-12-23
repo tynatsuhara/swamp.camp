@@ -4270,7 +4270,7 @@ System.register("game/world/elements/House", ["engine/point", "game/graphics/Til
                     var resident = data[House.RESIDENT_ATTRIBUTE];
                     var house = e.addComponent(new House());
                     house.setResident(resident);
-                    return e.addComponent(new ElementComponent_3.ElementComponent(5 /* HOUSE */, pos, ElementUtils_1.ElementUtils.rectPoints(pos, new point_27.Point(5, 4)), function () { return ({
+                    return e.addComponent(new ElementComponent_3.ElementComponent(5 /* HOUSE */, pos, ElementUtils_1.ElementUtils.rectPoints(pos.plus(new point_27.Point(1, 1)), new point_27.Point(3, 3)), function () { return ({
                         RESIDENT_ATTRIBUTE: house.getResident()
                     }); }));
                 };
@@ -4851,7 +4851,7 @@ System.register("game/world/elements/Tent", ["engine/point", "game/graphics/Tile
                     e.addComponent(new BoxCollider_5.BoxCollider(pos.plus(new point_33.Point(1, 1)).times(Tilesets_12.TILE_SIZE), new point_33.Point(Tilesets_12.TILE_SIZE * 2, Tilesets_12.TILE_SIZE)));
                     // Set up teleporter
                     e.addComponent(new Interactable_3.Interactable(interactablePos, function () { return wl.useTeleporter(destinationUUID); }, new point_33.Point(1, -Tilesets_12.TILE_SIZE * 1.4)));
-                    return e.addComponent(new ElementComponent_6.ElementComponent(2 /* TENT */, pos, ElementUtils_2.ElementUtils.rectPoints(pos, new point_33.Point(4, 3)), function () { return { destinationUUID: destinationUUID, color: color }; }));
+                    return e.addComponent(new ElementComponent_6.ElementComponent(2 /* TENT */, pos, ElementUtils_2.ElementUtils.rectPoints(pos.plus(new point_33.Point(1, 1)), new point_33.Point(2, 2)), function () { return { destinationUUID: destinationUUID, color: color }; }));
                 };
                 return TentFactory;
             }(ElementFactory_5.ElementFactory));
@@ -6608,7 +6608,9 @@ System.register("game/characters/NPC", ["engine/component", "game/characters/Dud
                     if (pixelPtStart === void 0) { pixelPtStart = this.dude.standingPosition; }
                     var start = Tilesets_21.pixelPtToTilePt(pixelPtStart);
                     var end = tilePt;
-                    return (_a = LocationManager_8.LocationManager.instance.currentLocation.findPath(start, end, this.pathFindingHeuristic)) === null || _a === void 0 ? void 0 : _a.map(function (pt) { return _this.tilePtToStandingPos(pt); }).slice(1); // slice(1) because we don't need the start in the path
+                    // TODO: NPCs can sometimes get stuck if their starting square is "occupied"
+                    return (_a = LocationManager_8.LocationManager.instance.currentLocation
+                        .findPath(start, end, this.pathFindingHeuristic)) === null || _a === void 0 ? void 0 : _a.map(function (pt) { return _this.tilePtToStandingPos(pt); }).slice(1); // slice(1) because we don't need the start in the path
                 };
                 NPC.prototype.tilePtToStandingPos = function (tilePt) {
                     var ptOffset = new point_42.Point(.5, .8);

@@ -79,7 +79,7 @@ export class HouseFactory extends ElementFactory {
         return e.addComponent(new ElementComponent(
             ElementType.HOUSE, 
             pos,
-            ElementUtils.rectPoints(pos, new Point(5, 4)),
+            ElementUtils.rectPoints(pos.plus(new Point(1, 1)), new Point(3, 3)),
             () => ({
                 RESIDENT_ATTRIBUTE: house.getResident()
             })
