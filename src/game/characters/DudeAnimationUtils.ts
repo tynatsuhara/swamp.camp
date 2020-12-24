@@ -5,6 +5,10 @@ import { Color } from "../ui/Color"
 import { saveManager } from "../SaveManager"
 
 const maybeFilter = (characterAnimName: string, blob: object, anim: TileSetAnimation) => {
+    if (!anim) {
+        throw new Error(`no animation found for "${characterAnimName}"`)
+    }
+
     if (characterAnimName === "knight_f") {
         const color = saveManager.getState().plume
         if (!!color) {

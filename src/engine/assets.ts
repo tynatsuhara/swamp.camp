@@ -16,11 +16,7 @@ class Assets {
     }
 
     getImageByFileName(fileName: string): HTMLImageElement {
-        const result = this.map.get(fileName)
-        if (!result) {
-            console.log(`file ${fileName} does not exist`)
-        }
-        return result
+        return this.map.get(fileName)
     }
 }
 
