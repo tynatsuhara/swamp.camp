@@ -121,14 +121,16 @@ export class WorldLocation {
     }
 
     addTeleporter(t: Teleporter) {
-        this.teleporters[Teleporters.teleporterId(t.to, t.id)] = t.pos.toString()
+        const teleporterId = Teleporters.teleporterId(t.to, t.id)
+        this.teleporters[teleporterId] = t.pos.toString()
     }
 
     private getTeleporterLinkedPos(to: string, id: string): Point {
         const dest = LocationManager.instance.get(to)
-        const link = dest.teleporters[Teleporters.teleporterId(this.uuid, id)]
+        const teleporterId = Teleporters.teleporterId(this.uuid, id)
+        const link = dest.teleporters[teleporterId]
         if (!link) {
-            throw new Error("teleporter doesn't have a link on the other side")
+            throw new Error(`teleporter ${teleporterId} not found`)
         }
         return Point.fromString(link)
     }
@@ -204,10 +206,10 @@ export class WorldLocation {
         // TODO: BUG: RELOADING RETURNS ELEMENTS THAT HAVE BEEN DESTROYED
         const n = new WorldLocation(saveState.isInterior)
         n._uuid = saveState.uuid
+        n.teleporters = saveState.teleporters
         saveState.elements.forEach(el => n.addElement(el.type, Point.fromString(el.pos), el.obj))
         saveState.ground.forEach(el => n.addGroundElement(el.type, Point.fromString(el.pos), el.obj))
         saveState.dudes.forEach(d => DudeFactory.instance.load(d, n))
-        n.teleporters = saveState.teleporters
         return n
     }
 }
