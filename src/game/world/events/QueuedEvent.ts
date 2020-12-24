@@ -6,6 +6,8 @@ import { NPC } from "../../characters/NPC"
 import { TILE_SIZE, pixelPtToTilePt } from "../../graphics/Tilesets"
 import { EventQueue } from "./EventQueue"
 import { WorldTime } from "../WorldTime"
+import { ElementType } from "../elements/Elements"
+import { House } from "../elements/House"
 
 export enum QueuedEventType {
     HERALD_ARRIVAL,
@@ -62,9 +64,12 @@ export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => 
             return
         }
 
-        const npc = berto.entity.getComponent(NPC)
-        npc.setSchedule(data.normalSchedule)
+        berto.entity.getComponent(NPC).setSchedule(data.normalSchedule)
 
-        // DudeFactory.instance.new(DudeType.HERALD, MapGenerator.ENTER_LAND_POS, LocationManager.instance.exterior())
+        const villager = DudeFactory.instance.new(DudeType.VILLAGER, MapGenerator.ENTER_LAND_POS, LocationManager.instance.exterior())
+        const house = LocationManager.instance.currentLocation.getElementsOfType(ElementType.HOUSE)
+                .map(e => e.entity.getComponent(House))
+                .filter(house => house.isResidentPending())[0]
+        house.setResident(villager.uuid)
     },
 }

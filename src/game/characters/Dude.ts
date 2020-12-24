@@ -30,6 +30,7 @@ export class Dude extends Component implements DialogueSource {
     static readonly NPC_COLLISION_LAYER = "npc"
     
     blob: object
+    readonly uuid: string
     readonly type: DudeType
     readonly factions: DudeFaction[]
     readonly inventory: Inventory
@@ -68,6 +69,7 @@ export class Dude extends Component implements DialogueSource {
     dialogue: string
 
     constructor(
+        uuid: string,
         type: DudeType,
         factions: DudeFaction[],
         characterAnimName: string,
@@ -82,6 +84,7 @@ export class Dude extends Component implements DialogueSource {
         blob: object,
     ) {
         super()
+        this.uuid = uuid
         this.type = type
         this.factions = factions
         this._position = position
@@ -339,6 +342,7 @@ export class Dude extends Component implements DialogueSource {
 
     save(): DudeSaveState {
         return {
+            uuid: this.uuid,
             type: this.type,
             pos: this.position.toString(),
             anim: this.characterAnimName,

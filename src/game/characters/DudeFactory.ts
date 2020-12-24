@@ -18,13 +18,14 @@ import { WeaponType } from "./weapons/WeaponType"
 import { Item } from "../items/Items"
 import { BERTO_STARTING_DIALOGUE } from "./dialogues/BertoIntro"
 import { ShroomNPC } from "./ShroomNPC"
+import { newUUID } from "../saves/uuid"
 
 export const enum DudeFaction {
     VILLAGERS,
     ORCS,
     UNDEAD,
     DEMONS,
-    SHROOMS
+    SHROOMS,
 }
 
 export const enum DudeType {
@@ -35,6 +36,7 @@ export const enum DudeType {
     HERALD,
     HORNED_DEMON,
     SHROOM,
+    VILLAGER,
 }
 
 export class DudeFactory {
@@ -157,6 +159,13 @@ export class DudeFactory {
                 maxHealth = 2
                 speed *= (.6 + Math.random()/5)
                 break
+            case DudeType.VILLAGER:
+                animationName = `prisoner${Math.ceil(Math.random() * 2)}`
+                maxHealth = 4
+                // TODO: add a new type of schedule for a villager with a home
+                additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new Villager()]
+                speed *= (.3 + Math.random()/2)
+                break
             default: {
                 throw new Error(`DudeType ${type} can't be instantiated`)
             }
@@ -164,6 +173,7 @@ export class DudeFactory {
 
         // use saved data instead of defaults
         const d = new Dude(
+            saveState?.uuid ?? newUUID(),
             type, 
             factions,  // TODO: Save factions? Only if this becomes non-deterministic
             saveState?.anim ?? animationName, 

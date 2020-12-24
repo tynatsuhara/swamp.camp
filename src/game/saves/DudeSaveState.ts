@@ -4,6 +4,7 @@ import { WeaponType } from "../characters/weapons/WeaponType"
 
 // Nothing in here should be nullable, or the logic in DudeFactory could break
 export class DudeSaveState {
+    uuid: string
     type: DudeType
     pos: string
     anim: string
