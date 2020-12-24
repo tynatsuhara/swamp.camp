@@ -11,6 +11,8 @@ import { ElementUtils } from "./ElementUtils"
 import { Component } from "../../../engine/component"
 import { ElementFactory } from "./ElementFactory"
 
+const RESIDENT_ATTRIBUTE = "rez"
+
 /**
  * At runtime, a building exterior consists of several components:
  *   1. Tiles, the visual component
@@ -72,7 +74,7 @@ export class HouseFactory extends ElementFactory {
         // Set up teleporter
         // e.addComponent(new Interactable(interactablePos, () => wl.useTeleporter(destinationUUID), new Point(1, -TILE_SIZE*1.4)))
 
-        const resident = data[House.RESIDENT_ATTRIBUTE]
+        const resident = data[RESIDENT_ATTRIBUTE]
         const house = e.addComponent(new House())
         house.setResident(resident)
 
@@ -81,20 +83,23 @@ export class HouseFactory extends ElementFactory {
             pos,
             ElementUtils.rectPoints(pos.plus(new Point(1, 1)), new Point(3, 2)),
             () => ({
-                RESIDENT_ATTRIBUTE: house.getResident()
+                [RESIDENT_ATTRIBUTE]: house.getResident()
             })
         ))
     }
 }
 
 export class House extends Component {
-    static readonly RESIDENT_ATTRIBUTE = "rez"
     private static readonly PENDING_RESIDENT = "pending"
 
     private resident: string;
 
     hasResident() {
         return !!this.resident
+    }
+
+    isResidentPending() {
+        return this.resident === House.PENDING_RESIDENT
     }
 
     setResidentPending() {
