@@ -12,7 +12,9 @@ export class Grid<T> {
         this.map[pt.toString()] = entry
     }
     
-    // returns null if not present in the grid
+    /**
+     * @returns the element at the point or null if not present in the grid
+     */
     get(pt: Point): T {
         return this.map[pt.toString()]
     }
@@ -41,10 +43,13 @@ export class Grid<T> {
     keys(): Point[] {
         return Object.keys(this.map).map(ptStr => Point.fromString(ptStr))
     }
-
+    
+    /**
+     * @returns a set of all unique values in the grid
+     */
     values(): T[] {
         if (!this._valuesCache) {
-            this._valuesCache = Object.values(this.map)
+            this._valuesCache = Array.from(new Set(Object.values(this.map)))
         }
         return this._valuesCache
     }
