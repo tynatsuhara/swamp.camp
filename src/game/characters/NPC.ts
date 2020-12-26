@@ -80,16 +80,15 @@ export class NPC extends Component {
                 updateData
             )
         } else if (schedule.type === NPCScheduleType.ROAM) {
-            this.doFlee(
-                updateData, 
-                0.5
-            )
+            this.doFlee(updateData, 0.5)
         } else if (schedule.type === NPCScheduleType.ROAM_IN_DARKNESS) {
             this.doFlee(
                 updateData, 
                 PointLightMaskRenderer.instance.isDark(this.dude.standingPosition) ? 0.5 : 1,
                 (pt) => PointLightMaskRenderer.instance.isDark(pt.times(TILE_SIZE))
             )
+        } else if (schedule.type === NPCScheduleType.DEFAULT_VILLAGER) {
+            this.doFlee(updateData, 0.5)
         } else {
             throw new Error("unimplemented schedule type")
         }
