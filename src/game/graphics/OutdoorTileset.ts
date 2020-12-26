@@ -46,6 +46,10 @@ export class OutdoorTileset extends SingleFileTileLoader {
             ["placingElementFrame_bad", new Point(0, 28)],
             ["placingElementFrame_small_good", new Point(0, 25)],
             ["placingElementFrame_small_bad", new Point(1, 25)],
+            ["hardwood1", new Point(8, 2)],
+            ["hardwood2", new Point(9, 2)],
+            ["hardwood3", new Point(8, 3)],
+            ["hardwood4", new Point(9, 3)],
         ]))
     }
 }

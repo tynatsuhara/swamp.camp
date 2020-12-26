@@ -7,6 +7,7 @@ import { Point } from "../../engine/point"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { TileSource } from "../../engine/tiles/TileSource"
 import { ExtraCharacterSet2TileLoader } from "./ExtraCharacterSet2TileLoader"
+import { OGTileset } from "./OGTileset"
 
 // standard tile size
 export const TILE_SIZE = 16
@@ -29,7 +30,7 @@ export class Tilesets {
     }
 
     readonly dungeonCharacters = new DungeonTilesetII()
-    readonly tilemap = new SingleFileTileLoader("images/tilemap.png")
+    readonly tilemap = new OGTileset()
     readonly dungeonTiles = new SingleFileTileLoader("images/env_dungeon.png")
     readonly indoorTiles = new SingleFileTileLoader("images/env_indoor.png")
     readonly outdoorTiles = new OutdoorTileset()
@@ -42,7 +43,7 @@ export class Tilesets {
     }
 
     getBasicTileSource(key: string): StaticTileSource {
-        const sources = [this.outdoorTiles]
+        const sources = [this.outdoorTiles, this.tilemap]
         for (const src of sources) {
             try {
                 return src.getTileSource(key)

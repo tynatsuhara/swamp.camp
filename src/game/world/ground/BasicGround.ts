@@ -5,12 +5,13 @@ import { GroundType, MakeGroundFuncData } from "./Ground"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
 
 // Function that takes a tileSource and returns a ground generation function for it
-export const makeBasicGround = (d: MakeGroundFuncData) => {
+export const makeBasicGround = (g: GroundType, d: MakeGroundFuncData, rotation: number) => {
     const key = d.data["k"]
     const tile = Tilesets.instance.getBasicTileSource(key)
     const c = tile.toComponent(new TileTransform(d.pos.times(TILE_SIZE)))
     c.transform.depth = Number.MIN_SAFE_INTEGER
-    return new Entity([c]).addComponent(new GroundComponent(GroundType.BASIC, () => d.data))
+    c.transform.rotation = rotation
+    return new Entity([c]).addComponent(new GroundComponent(g, () => d.data))
 }
 
 export const makeBasicNineSliceGround = (d: MakeGroundFuncData) => {
