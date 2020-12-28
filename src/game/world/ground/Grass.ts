@@ -57,7 +57,7 @@ class TallGrass extends Component {
 
         const render = Tilesets.instance.outdoorTiles
                 .getTileSource(`grass${Math.ceil(Math.random() * 2)}`)
-                .toImageRender(new TileTransform(grassPos, null, 0, false, false, grassPos.y + TILE_SIZE))
+                .toImageRender(new TileTransform(grassPos, null, 0, Math.random() > .5, false, grassPos.y + TILE_SIZE))
 
         this.getRenderMethods = () => [render]
     }

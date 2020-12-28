@@ -7281,7 +7281,7 @@ System.register("game/world/ground/Grass", ["engine/component", "engine/Entity",
                     var grassPos = tilePos.times(Tilesets_25.TILE_SIZE).plus(offset);
                     var render = Tilesets_25.Tilesets.instance.outdoorTiles
                         .getTileSource("grass" + Math.ceil(Math.random() * 2))
-                        .toImageRender(new TileTransform_17.TileTransform(grassPos, null, 0, false, false, grassPos.y + Tilesets_25.TILE_SIZE));
+                        .toImageRender(new TileTransform_17.TileTransform(grassPos, null, 0, Math.random() > .5, false, grassPos.y + Tilesets_25.TILE_SIZE));
                     _this.getRenderMethods = function () { return [render]; };
                     return _this;
                 }
