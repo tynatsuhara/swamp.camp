@@ -37,14 +37,6 @@ export class Elements {
         Elements._instance = this
     }
 
-    /*
-    * Tuples of [makeFunction, dimensionsForPlacing]
-    * Each of these functions should return an ElementComponent with a nonnull entity
-    * The functions should NOT explicitly add the entity to the given locations, the location should be read-only.
-    * Instead, they should add the occupied points to the occupiedPoints array of the ElementComponent
-    * @param pos the top-left corner of the element
-    * @param args the element's metadata
-    */
     private readonly ELEMENT_FACTORIES: { [key: number]: ElementFactory } = {
        [ElementType.TREE_ROUND]: new TreeFactory(ElementType.TREE_ROUND),
        [ElementType.TREE_POINTY]: new TreeFactory(ElementType.TREE_POINTY),
