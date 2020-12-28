@@ -28,6 +28,7 @@ export class TreeFactory extends ElementFactory {
         this.type = type
     }
 
+    // TODO: Make growable
     make(wl: WorldLocation, pos: Point, data: object): ElementComponent {
         const maxResourcesCount = 4
         const availableResources = data["a"] ?? maxResourcesCount

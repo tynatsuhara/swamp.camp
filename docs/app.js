@@ -2191,6 +2191,10 @@ System.register("game/graphics/OutdoorTileset", ["engine/point", "game/graphics/
                         ["placingElementFrame_bad", new point_16.Point(0, 28)],
                         ["placingElementFrame_small_good", new point_16.Point(0, 25)],
                         ["placingElementFrame_small_bad", new point_16.Point(1, 25)],
+                        ["placingElementFrame_1x2_good_top", new point_16.Point(0, 23)],
+                        ["placingElementFrame_1x2_good_bottom", new point_16.Point(0, 24)],
+                        ["placingElementFrame_1x2_bad_top", new point_16.Point(1, 23)],
+                        ["placingElementFrame_1x2_bad_bottom", new point_16.Point(1, 24)],
                         ["hardwood1", new point_16.Point(8, 2)],
                         ["hardwood2", new point_16.Point(9, 2)],
                         ["hardwood3", new point_16.Point(8, 3)],
@@ -4791,6 +4795,7 @@ System.register("game/world/elements/Tree", ["engine/point", "game/graphics/Tile
                     _this.type = type;
                     return _this;
                 }
+                // TODO: Make growable
                 TreeFactory.prototype.make = function (wl, pos, data) {
                     var _a;
                     var maxResourcesCount = 4;
@@ -4861,14 +4866,6 @@ System.register("game/world/elements/Elements", ["game/world/Teleporter", "game/
             Elements = /** @class */ (function () {
                 function Elements() {
                     var _a;
-                    /*
-                    * Tuples of [makeFunction, dimensionsForPlacing]
-                    * Each of these functions should return an ElementComponent with a nonnull entity
-                    * The functions should NOT explicitly add the entity to the given locations, the location should be read-only.
-                    * Instead, they should add the occupied points to the occupiedPoints array of the ElementComponent
-                    * @param pos the top-left corner of the element
-                    * @param args the element's metadata
-                    */
                     this.ELEMENT_FACTORIES = (_a = {},
                         _a[0 /* TREE_ROUND */] = new Tree_1.TreeFactory(0 /* TREE_ROUND */),
                         _a[1 /* TREE_POINTY */] = new Tree_1.TreeFactory(1 /* TREE_POINTY */),
@@ -8470,7 +8467,7 @@ System.register("game/ui/PlaceElementFrame", ["engine/component", "game/graphics
                         });
                     };
                     _this.dimensions = dimensions;
-                    if ((_this.dimensions.x === 1 && _this.dimensions.y !== 1) || (_this.dimensions.y === 1 && _this.dimensions.x !== 1)) {
+                    if ((_this.dimensions.x === 1 && _this.dimensions.y > 2) || (_this.dimensions.y === 1 && _this.dimensions.x !== 1)) {
                         throw new Error("haven't implemented small element placing yet :(");
                     }
                     return _this;
@@ -8482,6 +8479,13 @@ System.register("game/ui/PlaceElementFrame", ["engine/component", "game/graphics
                     this.badTiles[0].transform.depth = UIStateManager_11.UIStateManager.UI_SPRITE_DEPTH;
                 };
                 PlaceElementFrame.prototype.getTiles = function (suffix) {
+                    if (this.dimensions.equals(new point_56.Point(1, 2))) {
+                        var top_1 = Tilesets_33.Tilesets.instance.outdoorTiles.getTileSource("placingElementFrame_1x2_" + suffix + "_top")
+                            .toComponent(new TileTransform_23.TileTransform());
+                        var bottom = Tilesets_33.Tilesets.instance.outdoorTiles.getTileSource("placingElementFrame_1x2_" + suffix + "_bottom")
+                            .toComponent(new TileTransform_23.TileTransform(new point_56.Point(0, Tilesets_33.TILE_SIZE)).relativeTo(top_1.transform));
+                        return [top_1, bottom];
+                    }
                     if (this.dimensions.x === 1 || this.dimensions.y === 1) {
                         return [Tilesets_33.Tilesets.instance.outdoorTiles.getTileSource("placingElementFrame_small_" + suffix).toComponent(new TileTransform_23.TileTransform())];
                     }
@@ -8562,7 +8566,7 @@ System.register("game/ui/PlaceElementDisplay", ["engine/Entity", "engine/compone
                     return _this;
                 }
                 Object.defineProperty(PlaceElementDisplay.prototype, "isOpen", {
-                    get: function () { return !!this.element; },
+                    get: function () { return this.element !== null && this.element !== undefined; },
                     enumerable: false,
                     configurable: true
                 });
@@ -8714,30 +8718,34 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point",
                     }
                     else if (hoverIndex !== -1 && !!inv[hoverIndex]) { // we're hovering over an item
                         this.tooltip.position = updateData.input.mousePos;
-                        var stack = inv[hoverIndex];
-                        var item = Items_4.ITEM_METADATA_MAP[stack.item];
-                        var count = stack.count > 1 ? ' x' + stack.count : '';
-                        var placeableElement_1 = Items_4.ITEM_METADATA_MAP[stack.item].element;
-                        var equippable_1 = Items_4.ITEM_METADATA_MAP[stack.item].equippable;
+                        var stack_1 = inv[hoverIndex];
+                        var item_1 = Items_4.ITEM_METADATA_MAP[stack_1.item];
+                        var count = stack_1.count > 1 ? ' x' + stack_1.count : '';
                         var actionString = null;
                         var actionFn = void 0;
-                        if (!!placeableElement_1) {
+                        if (item_1.element !== null) {
                             actionString = 'place';
                             actionFn = function () {
                                 _this.close();
-                                // TODO this won't work properly with items that stack
-                                PlaceElementDisplay_2.PlaceElementDisplay.instance.startPlacing(placeableElement_1, function () { return inv[hoverIndex] = null; });
+                                PlaceElementDisplay_2.PlaceElementDisplay.instance.startPlacing(item_1.element, function () {
+                                    if (stack_1.count === 1) {
+                                        inv[hoverIndex] = null;
+                                    }
+                                    else {
+                                        stack_1.count--;
+                                    }
+                                });
                             };
                         }
-                        else if (!!equippable_1 && Player_11.Player.instance.dude.weaponType !== item.equippable) {
+                        else if (!!item_1.equippable && Player_11.Player.instance.dude.weaponType !== item_1.equippable) {
                             actionString = 'equip';
                             actionFn = function () {
                                 _this.close();
-                                Player_11.Player.instance.dude.setWeapon(equippable_1);
+                                Player_11.Player.instance.dude.setWeapon(item_1.equippable);
                             };
                         }
                         var actionPrompt = !!actionString ? " [" + Controls_6.Controls.keyString(Controls_6.Controls.interactButton) + " to " + actionString + "]" : '';
-                        this.tooltip.say("" + item.displayName + count + actionPrompt);
+                        this.tooltip.say("" + item_1.displayName + count + actionPrompt);
                         if (!!actionFn && updateData.input.isKeyDown(Controls_6.Controls.interactButton)) {
                             actionFn();
                         }
@@ -10001,11 +10009,13 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
                     displayName: "Sapling",
                     inventoryIconSupplier: function () { return Tilesets_37.Tilesets.instance.oneBit.getTileSource("treeRound"); },
                     droppedIconSupplier: function () { return Tilesets_37.Tilesets.instance.outdoorTiles.getTileSource("treeRoundSapling"); },
+                    element: 0 /* TREE_ROUND */
                 }),
                 _a[8 /* POINTY_SAPLING */] = new ItemMetadata({
                     displayName: "Sapling",
                     inventoryIconSupplier: function () { return Tilesets_37.Tilesets.instance.oneBit.getTileSource("treePointy"); },
                     droppedIconSupplier: function () { return Tilesets_37.Tilesets.instance.outdoorTiles.getTileSource("treePointySapling"); },
+                    element: 1 /* TREE_POINTY */
                 }),
                 // TODO add other weapons
                 _a[100012 /* AXE */] = new ItemMetadata({
@@ -11820,10 +11830,10 @@ System.register("game/scenes/MainMenuScene", ["engine/Entity", "engine/point", "
                     this.knight.transform.position = menuTop.minus(this.knight.transform.dimensions.floorDiv(2).plusY(24));
                     var buttons = [];
                     if (this.newGame) {
-                        var top_1 = menuTop.plusY(42);
-                        buttons.push(new MainMenuButton_1.MainMenuButton(top_1, "start" + (saveFileExists ? " (delete old save)" : ""), this.newGameFn));
+                        var top_2 = menuTop.plusY(42);
+                        buttons.push(new MainMenuButton_1.MainMenuButton(top_2, "start" + (saveFileExists ? " (delete old save)" : ""), this.newGameFn));
                         if (saveFileExists) {
-                            buttons.push(new MainMenuButton_1.MainMenuButton(top_1.plusY(lineSpacing), "cancel", function () {
+                            buttons.push(new MainMenuButton_1.MainMenuButton(top_2.plusY(lineSpacing), "cancel", function () {
                                 _this.newGame = false;
                                 _this.plumes.reset();
                             }));

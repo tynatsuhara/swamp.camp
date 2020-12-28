@@ -88,23 +88,29 @@ export class InventoryDisplay extends Component {
             const item = ITEM_METADATA_MAP[stack.item]
             const count = stack.count > 1 ? ' x' + stack.count : ''
 
-            const placeableElement = ITEM_METADATA_MAP[stack.item].element
-            const equippable = ITEM_METADATA_MAP[stack.item].equippable
             let actionString: string = null
             let actionFn: () => void
 
-            if (!!placeableElement) {
+            if (item.element !== null) {
                 actionString = 'place'
                 actionFn = () => {
                     this.close()
-                    // TODO this won't work properly with items that stack
-                    PlaceElementDisplay.instance.startPlacing(placeableElement, () => inv[hoverIndex] = null)
+                    PlaceElementDisplay.instance.startPlacing(
+                        item.element, 
+                        () => {
+                            if (stack.count === 1) {
+                                inv[hoverIndex] = null
+                            } else {
+                                stack.count--
+                            }
+                        }
+                    )
                 }
-            } else if (!!equippable && Player.instance.dude.weaponType !== item.equippable) {
+            } else if (!!item.equippable && Player.instance.dude.weaponType !== item.equippable) {
                 actionString = 'equip'
                 actionFn = () => {
                     this.close()
-                    Player.instance.dude.setWeapon(equippable)
+                    Player.instance.dude.setWeapon(item.equippable)
                 }
             }
 

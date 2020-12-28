@@ -115,13 +115,13 @@ export const ITEM_METADATA_MAP = {
         displayName: "Sapling",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("treeRound"), 
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("treeRoundSapling"),
-        // element: ElementType.TREE_ROUND
+        element: ElementType.TREE_ROUND
     }),
     [Item.POINTY_SAPLING]: new ItemMetadata({
         displayName: "Sapling",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("treePointy"), 
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("treePointySapling"),
-        // element: ElementType.TREE_POINTY
+        element: ElementType.TREE_POINTY
     }),
     // TODO add other weapons
     [Item.AXE]: new ItemMetadata({

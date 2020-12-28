@@ -22,7 +22,7 @@ export class PlaceElementFrame extends Component {
     constructor(dimensions: Point) {
         super()
         this.dimensions = dimensions
-        if ((this.dimensions.x === 1 && this.dimensions.y !== 1) || (this.dimensions.y === 1 && this.dimensions.x !== 1)) {
+        if ((this.dimensions.x === 1 && this.dimensions.y > 2) || (this.dimensions.y === 1 && this.dimensions.x !== 1)) {
             throw new Error("haven't implemented small element placing yet :(")
         }
     }
@@ -36,6 +36,13 @@ export class PlaceElementFrame extends Component {
     }
 
     private getTiles(suffix: string): TileComponent[] {
+        if (this.dimensions.equals(new Point(1, 2))) {
+            const top = Tilesets.instance.outdoorTiles.getTileSource(`placingElementFrame_1x2_${suffix}_top`)
+                    .toComponent(new TileTransform())
+            const bottom = Tilesets.instance.outdoorTiles.getTileSource(`placingElementFrame_1x2_${suffix}_bottom`)
+                    .toComponent(new TileTransform(new Point(0, TILE_SIZE)).relativeTo(top.transform))
+            return [top, bottom]
+        }
         if (this.dimensions.x === 1 || this.dimensions.y ===1) {
             return [Tilesets.instance.outdoorTiles.getTileSource(`placingElementFrame_small_${suffix}`).toComponent(new TileTransform())]
         }
@@ -68,7 +75,6 @@ export class PlaceElementFrame extends Component {
         )
     }
     
-
     delete() {
         this.goodTiles.forEach(t => t.delete())
         this.badTiles.forEach(t => t.delete())

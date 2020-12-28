@@ -19,7 +19,7 @@ export class PlaceElementDisplay extends Component {
     private placingFrame: PlaceElementFrame
     private successFn: () => void
 
-    get isOpen() { return !!this.element }
+    get isOpen() { return this.element !== null && this.element !== undefined }
 
     constructor() {
         super()
