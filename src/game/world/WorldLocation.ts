@@ -11,11 +11,11 @@ import { LocationSaveState } from "../saves/LocationSaveState"
 import { newUUID } from "../saves/uuid"
 import { ElementComponent } from "./elements/ElementComponent"
 import { Elements, ElementType, SavedElement } from "./elements/Elements"
+import { ElementUtils } from "./elements/ElementUtils"
 import { Ground, GroundType, SavedGround } from "./ground/Ground"
 import { GroundComponent } from "./ground/GroundComponent"
 import { LocationManager } from "./LocationManager"
 import { Teleporter, Teleporters } from "./Teleporter"
-import { ElementUtils } from "./elements/ElementUtils"
 
 export class WorldLocation {
 

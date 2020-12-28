@@ -6,11 +6,9 @@ import { TileComponent } from "../../engine/tiles/TileComponent"
 import { Lists } from "../../engine/util/Lists"
 import { Controls } from "../Controls"
 import { UIStateManager } from "../ui/UIStateManager"
-import { Hittable } from "../world/elements/Hittable"
 import { Interactable } from "../world/elements/Interactable"
 import { Dude } from "./Dude"
 import { DudeFactory, DudeType } from "./DudeFactory"
-import { Weapon } from "./weapons/Weapon"
 
 export class Player extends Component {
 

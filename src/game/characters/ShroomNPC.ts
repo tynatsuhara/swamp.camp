@@ -1,13 +1,12 @@
 import { Component } from "../../engine/component"
 import { UpdateData } from "../../engine/engine"
-import { InputKey } from "../../engine/input"
 import { LocationManager } from "../world/LocationManager"
+import { TimeUnit } from "../world/TimeUnit"
+import { WorldTime } from "../world/WorldTime"
 import { Dude } from "./Dude"
 import { DudeFactory, DudeType } from "./DudeFactory"
 import { Enemy } from "./Enemy"
 import { WeaponType } from "./weapons/WeaponType"
-import { WorldTime } from "../world/WorldTime"
-import { TimeUnit } from "../world/TimeUnit"
 
 const SIZE = "s"  // one of [1, 2, 3]
 const NEXT_GROWTH_TIME = "ngt"

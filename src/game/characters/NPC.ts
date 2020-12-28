@@ -1,14 +1,14 @@
 import { Component } from "../../engine/component"
 import { UpdateData } from "../../engine/engine"
-import { Dude } from "./Dude"
-import { Player } from "./Player"
 import { Point } from "../../engine/point"
-import { LocationManager } from "../world/LocationManager"
-import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { Lists } from "../../engine/util/Lists"
-import { NPCSchedule, NPCScheduleType, NPCSchedules } from "./NPCSchedule"
+import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
+import { LocationManager } from "../world/LocationManager"
 import { PointLightMaskRenderer } from "../world/PointLightMaskRenderer"
+import { Dude } from "./Dude"
+import { NPCSchedule, NPCSchedules, NPCScheduleType } from "./NPCSchedule"
+import { Player } from "./Player"
 
 /**
  * Shared logic for different types of NPCs. These should be invoked by an NPC controller component.
@@ -88,20 +88,26 @@ export class NPC extends Component {
                 (pt) => PointLightMaskRenderer.instance.isDark(pt.times(TILE_SIZE))
             )
         } else if (schedule.type === NPCScheduleType.DEFAULT_VILLAGER) {
+            const location = LocationManager.instance.currentLocation
             this.doFlee(updateData, 0.5)
         } else {
             throw new Error("unimplemented schedule type")
         }
     }
 
+    /**
+     * TODO: Support simulation for NPCs which are not in the current location?
+     * Example: You're in an NPC's house, they should come inside when it's time. 
+     * Alternatively, this could be done using the EventQueue.
+     */
     simulate() {
         this.clearExistingAIState()
         const schedule = this.getSchedule()
         
-        if (schedule.type === NPCScheduleType.DO_NOTHING) {
-            // do nothing
-        } else if (schedule.type === NPCScheduleType.GO_TO_SPOT) {
+        if (schedule.type === NPCScheduleType.GO_TO_SPOT) {
             this.forceMoveToTilePosition(Point.fromString(schedule["p"]))
+        } else if (schedule.type === NPCScheduleType.DEFAULT_VILLAGER) {
+            // TODO
         }
     }
 
