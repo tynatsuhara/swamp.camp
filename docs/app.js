@@ -9541,7 +9541,7 @@ System.register("game/characters/ShroomNPC", ["engine/component", "game/world/Lo
                         }
                     });
                 };
-                ShroomNPC.prototype.update = function (data) {
+                ShroomNPC.prototype.lateUpdate = function (data) {
                     if (WorldTime_8.WorldTime.instance.time < this.dude.blob[NEXT_GROWTH_TIME]) {
                         return;
                     }

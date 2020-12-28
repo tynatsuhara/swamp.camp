@@ -39,7 +39,7 @@ export class ShroomNPC extends Component {
         })
     }
 
-    update(data: UpdateData) {
+    lateUpdate(data: UpdateData) {
         if (WorldTime.instance.time < this.dude.blob[NEXT_GROWTH_TIME]) {
             return
         }
