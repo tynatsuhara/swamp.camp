@@ -93,8 +93,22 @@ export class Engine {
             this.renderer.render(views)
         })
 
+        const [lateUpdateDuration] = measure(() => {
+            views.forEach(v => {
+                const updateData: UpdateData = {
+                    view: v,
+                    elapsedTimeMillis: updateViewsContext.elapsedTimeMillis,
+                    input: updateViewsContext.input.scaledForView(v),
+                    dimensions: updateViewsContext.dimensions.div(v.zoom)
+                }
+                v.entities.forEach(e => e.components.forEach(c => {
+                    c.lateUpdate(updateData)
+                }))
+            })
+        })
+
         if (debug.showProfiler) {
-            profiler.updateEngineTickStats(elapsed, updateDuration, renderDuration, componentsUpdated)
+            profiler.updateEngineTickStats(elapsed, updateDuration, renderDuration, lateUpdateDuration, componentsUpdated)
         }
         
         this.lastUpdateMillis = time

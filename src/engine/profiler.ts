@@ -9,6 +9,7 @@ class Profiler {
     private fpsTracker = new MovingAverage()
     private updateTracker = new MovingAverage()
     private renderTracker = new MovingAverage()
+    private lateUpdateTracker = new MovingAverage()
     private componentsUpdated: number
 
     private tracked = new Map<string, [MovingAverage, (number) => string]>()
@@ -17,11 +18,13 @@ class Profiler {
         msSinceLastUpdate: number, 
         msForUpdate: number,
         msForRender: number,
+        msForLateUpdate: number,
         componentsUpdated: number
     ) {
         this.fpsTracker.record(msSinceLastUpdate)
         this.updateTracker.record(msForUpdate)
         this.renderTracker.record(msForRender)
+        this.lateUpdateTracker.record(msForLateUpdate)
         this.componentsUpdated = componentsUpdated
     }
 
@@ -39,6 +42,7 @@ class Profiler {
             `FPS: ${round(1000/this.fpsTracker.get())} (${round(this.fpsTracker.get())} ms per frame)`,
             `update() duration ms: ${round(this.updateTracker.get(), 2)}`,
             `render() duration ms: ${round(this.renderTracker.get(), 2)}`,
+            `lateUpdate() duration ms: ${round(this.lateUpdateTracker.get(), 2)}`,
             `components updated: ${this.componentsUpdated}`,
             ...Array.from(this.tracked.values()).map((v => v[1](v[0].get())))
         ]

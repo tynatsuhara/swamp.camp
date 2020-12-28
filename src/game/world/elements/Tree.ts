@@ -85,7 +85,6 @@ export class TreeFactory extends ElementFactory {
 
         if (size < 3) {
             e.addComponent(new GrowableTree(nextGrowthTime, () => {
-                // grow (TODO: consider implementing lateUpdate() to prevent the sprite flashing)
                 e.selfDestruct()
                 wl.addElement(this.type, pos, {
                     [NEXT_GROWTH_TIME]: this.nextGrowthTime(),
@@ -127,7 +126,7 @@ class GrowableTree extends Component {
         this.growFn = growFn
     }
 
-    update() {
+    lateUpdate() {
         if (WorldTime.instance.time < this.nextGrowthTime) {
             return
         }

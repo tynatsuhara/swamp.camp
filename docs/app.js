@@ -385,9 +385,13 @@ System.register("engine/component", [], function (exports_7, context_7) {
                  */
                 Component.prototype.start = function (startData) { };
                 /**
-                 * Called on each update step
+                 * Called on each update step, before rendering
                  */
                 Component.prototype.update = function (updateData) { };
+                /**
+                 * Called on each update step, after rendering
+                 */
+                Component.prototype.lateUpdate = function (updateData) { };
                 /**
                  * Should be overridden by renderable components
                  */
@@ -979,12 +983,14 @@ System.register("engine/profiler", ["engine/View", "engine/Entity", "engine/poin
                     this.fpsTracker = new MovingAverage();
                     this.updateTracker = new MovingAverage();
                     this.renderTracker = new MovingAverage();
+                    this.lateUpdateTracker = new MovingAverage();
                     this.tracked = new Map();
                 }
-                Profiler.prototype.updateEngineTickStats = function (msSinceLastUpdate, msForUpdate, msForRender, componentsUpdated) {
+                Profiler.prototype.updateEngineTickStats = function (msSinceLastUpdate, msForUpdate, msForRender, msForLateUpdate, componentsUpdated) {
                     this.fpsTracker.record(msSinceLastUpdate);
                     this.updateTracker.record(msForUpdate);
                     this.renderTracker.record(msForRender);
+                    this.lateUpdateTracker.record(msForLateUpdate);
                     this.componentsUpdated = componentsUpdated;
                 };
                 Profiler.prototype.customTrackMovingAverage = function (key, value, displayFn) {
@@ -1000,6 +1006,7 @@ System.register("engine/profiler", ["engine/View", "engine/Entity", "engine/poin
                         "FPS: " + round(1000 / this.fpsTracker.get()) + " (" + round(this.fpsTracker.get()) + " ms per frame)",
                         "update() duration ms: " + round(this.updateTracker.get(), 2),
                         "render() duration ms: " + round(this.renderTracker.get(), 2),
+                        "lateUpdate() duration ms: " + round(this.lateUpdateTracker.get(), 2),
                         "components updated: " + this.componentsUpdated
                     ], Array.from(this.tracked.values()).map((function (v) { return v[1](v[0].get()); })));
                     return new View_1.View([
@@ -1195,8 +1202,21 @@ System.register("engine/engine", ["engine/collision/CollisionEngine", "engine/co
                     var renderDuration = profiler_1.measure(function () {
                         _this.renderer.render(views);
                     })[0];
+                    var lateUpdateDuration = profiler_1.measure(function () {
+                        views.forEach(function (v) {
+                            var updateData = {
+                                view: v,
+                                elapsedTimeMillis: updateViewsContext.elapsedTimeMillis,
+                                input: updateViewsContext.input.scaledForView(v),
+                                dimensions: updateViewsContext.dimensions.div(v.zoom)
+                            };
+                            v.entities.forEach(function (e) { return e.components.forEach(function (c) {
+                                c.lateUpdate(updateData);
+                            }); });
+                        });
+                    })[0];
                     if (debug_2.debug.showProfiler) {
-                        profiler_1.profiler.updateEngineTickStats(elapsed, updateDuration, renderDuration, componentsUpdated);
+                        profiler_1.profiler.updateEngineTickStats(elapsed, updateDuration, renderDuration, lateUpdateDuration, componentsUpdated);
                     }
                     this.lastUpdateMillis = time;
                     requestAnimationFrame(function () { return _this.tick(); });
@@ -4867,7 +4887,6 @@ System.register("game/world/elements/Tree", ["engine/point", "game/graphics/Tile
                     if (size < 3) {
                         e.addComponent(new GrowableTree(nextGrowthTime, function () {
                             var _a;
-                            // grow (TODO: consider implementing lateUpdate() to prevent the sprite flashing)
                             e.selfDestruct();
                             wl.addElement(_this.type, pos, (_a = {},
                                 _a[NEXT_GROWTH_TIME] = _this.nextGrowthTime(),
@@ -4903,7 +4922,7 @@ System.register("game/world/elements/Tree", ["engine/point", "game/graphics/Tile
                     _this.growFn = growFn;
                     return _this;
                 }
-                GrowableTree.prototype.update = function () {
+                GrowableTree.prototype.lateUpdate = function () {
                     if (WorldTime_3.WorldTime.instance.time < this.nextGrowthTime) {
                         return;
                     }

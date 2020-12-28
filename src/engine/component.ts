@@ -20,9 +20,14 @@ export abstract class Component {
     start(startData: StartData) {}
 
     /**
-     * Called on each update step
+     * Called on each update step, before rendering
      */
     update(updateData: UpdateData) {}
+
+    /**
+     * Called on each update step, after rendering
+     */
+    lateUpdate(updateData: UpdateData) {}
 
     /**
      * Should be overridden by renderable components
