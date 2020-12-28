@@ -43,7 +43,7 @@ export class ItemMetadata {
 }
 
 export const enum Item {
-    COIN, ROCK, WOOD, TENT, CAMPFIRE, IRON, HOUSE,
+    COIN, ROCK, WOOD, TENT, CAMPFIRE, IRON, HOUSE, ROUND_SAPLING, POINTY_SAPLING,
 
     // weapon values should match the WeaponType enum so we can cast them
     KNIFE = WeaponType.KNIFE, 
@@ -110,6 +110,18 @@ export const ITEM_METADATA_MAP = {
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("house"),
         stackLimit: 1,
         element: ElementType.HOUSE
+    }),
+    [Item.ROUND_SAPLING]: new ItemMetadata({
+        displayName: "Sapling",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("treeRound"), 
+        droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("treeRoundSapling"),
+        // element: ElementType.TREE_ROUND
+    }),
+    [Item.POINTY_SAPLING]: new ItemMetadata({
+        displayName: "Sapling",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("treePointy"), 
+        droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("treePointySapling"),
+        // element: ElementType.TREE_POINTY
     }),
     // TODO add other weapons
     [Item.AXE]: new ItemMetadata({

@@ -20,18 +20,23 @@ export const enum TreeType {
 
 export class TreeFactory extends ElementFactory {
 
-    readonly type = ElementType.TREE
+    readonly type: ElementType.TREE_ROUND|ElementType.TREE_POINTY
     readonly dimensions = new Point(1, 2)
 
+    constructor(type: ElementType.TREE_ROUND|ElementType.TREE_POINTY) {
+        super()
+        this.type = type
+    }
+
     make(wl: WorldLocation, pos: Point, data: object): ElementComponent {
-        const type = data["type"] ?? (Math.random() < .7 ? TreeType.POINTY : TreeType.ROUND)
         const maxResourcesCount = 4
         const availableResources = data["a"] ?? maxResourcesCount
 
         const e = new Entity()
         const depth = (pos.y + 2) * TILE_SIZE
-        const top = addTile(e, `tree${type}top`, pos, depth)
-        const bottom = addTile(e, `tree${type}base`, pos.plus(new Point(0, 1)), depth)
+        const prefix = this.type === ElementType.TREE_ROUND ? "treeRound" : "treePointy"
+        const top = addTile(e, `${prefix}Top`, pos, depth)
+        const bottom = addTile(e, `${prefix}Base`, pos.plus(new Point(0, 1)), depth)
         const hitboxDims = new Point(8, 3)
         
         e.addComponent(new BoxCollider(
@@ -39,23 +44,26 @@ export class TreeFactory extends ElementFactory {
             hitboxDims
         ))
 
+        const saplingType = this.type === ElementType.TREE_ROUND ? Item.ROUND_SAPLING : Item.POINTY_SAPLING
+
         const hittableCenter = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE/2, TILE_SIZE + TILE_SIZE/2))  // center of bottom tile
         const hittableResource = e.addComponent(new HittableResource(
             hittableCenter, [top.transform, bottom.transform], availableResources, maxResourcesCount, 
             () => {
+                const getItem = () => Math.random() < .2 ? saplingType : Item.WOOD
                 if (Player.instance.dude.weaponType === WeaponType.AXE) {
-                    return [Item.WOOD, Item.WOOD]
+                    return [getItem(), getItem()]
                 } else {
-                    return [Item.WOOD]
+                    return [getItem()]
                 }
             }
         ))
 
         return e.addComponent(new ElementComponent(
-            ElementType.TREE, 
+            this.type, 
             pos,
             [pos.plusY(1)], 
-            () => { return { type, a: hittableResource.freeResources } }
+            () => { return { a: hittableResource.freeResources } }
         ))
     }
 }

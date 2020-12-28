@@ -60,13 +60,16 @@ export class MapGenerator {
             )
             const occupiedPoints = [pt, pt.plus(new Point(0, 1))]
             if (occupiedPoints.every(p => !this.location.ground.get(p))) {
-                this.location.addElement(ElementType.TREE, pt)
+                this.location.addElement(
+                    Math.random() < .7 ? ElementType.TREE_POINTY : ElementType.TREE_ROUND,
+                    pt
+                )
             }
         }
     }
 
     clearPathToCenter() {
-        const typesToClear = [ElementType.ROCK, ElementType.TREE]
+        const typesToClear = [ElementType.ROCK, ElementType.TREE_POINTY, ElementType.TREE_ROUND]
 
         // clear in corner
         for (let x = MapGenerator.MAP_SIZE/2-11; x < MapGenerator.MAP_SIZE/2; x++) {

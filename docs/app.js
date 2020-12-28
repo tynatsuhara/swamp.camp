@@ -2037,6 +2037,8 @@ System.register("game/graphics/OneBitTileset", ["engine/point", "game/graphics/S
                 __extends(OneBitTileset, _super);
                 function OneBitTileset() {
                     return _super.call(this, "images/monochrome_transparent_1_bit.png", new Map([
+                        ["treePointy", new point_15.Point(0, 1)],
+                        ["treeRound", new point_15.Point(4, 1)],
                         ["axe", new point_15.Point(7, 29)],
                         ["pickaxe", new point_15.Point(11, 27)],
                         ["sword", new point_15.Point(2, 28)],
@@ -2146,10 +2148,12 @@ System.register("game/graphics/OutdoorTileset", ["engine/point", "game/graphics/
                 __extends(OutdoorTileset, _super);
                 function OutdoorTileset() {
                     return _super.call(this, "images/env_outdoor_recolor.png", new Map([
-                        ["tree1base", new point_16.Point(15, 11)],
-                        ["tree1top", new point_16.Point(15, 10)],
-                        ["tree2base", new point_16.Point(18, 11)],
-                        ["tree2top", new point_16.Point(18, 10)],
+                        ["treeRoundSapling", new point_16.Point(27, 8)],
+                        ["treeRoundBase", new point_16.Point(15, 11)],
+                        ["treeRoundTop", new point_16.Point(15, 10)],
+                        ["treePointySapling", new point_16.Point(27, 7)],
+                        ["treePointyBase", new point_16.Point(18, 11)],
+                        ["treePointyTop", new point_16.Point(18, 10)],
                         ["redtentNW", new point_16.Point(46, 10)],
                         ["redtentNE", new point_16.Point(47, 10)],
                         ["redtentSW", new point_16.Point(46, 11)],
@@ -3479,7 +3483,7 @@ System.register("game/world/Teleporter", ["engine/component", "engine/Entity", "
                 __extends(TeleporterFactory, _super);
                 function TeleporterFactory() {
                     var _this = _super !== null && _super.apply(this, arguments) || this;
-                    _this.type = 4 /* TELEPORTER */;
+                    _this.type = 5 /* TELEPORTER */;
                     _this.dimensions = new point_23.Point(1, 1);
                     return _this;
                 }
@@ -3507,7 +3511,7 @@ System.register("game/world/Teleporter", ["engine/component", "engine/Entity", "
                         };
                         return class_1;
                     }(component_9.Component)));
-                    return e.addComponent(new ElementComponent_1.ElementComponent(4 /* TELEPORTER */, pos, [pos], function () { return data; }));
+                    return e.addComponent(new ElementComponent_1.ElementComponent(5 /* TELEPORTER */, pos, [pos], function () { return data; }));
                 };
                 return TeleporterFactory;
             }(ElementFactory_1.ElementFactory));
@@ -3895,7 +3899,7 @@ System.register("game/world/elements/Campfire", ["engine/component", "engine/til
                 __extends(CampfireFactory, _super);
                 function CampfireFactory() {
                     var _this = _super !== null && _super.apply(this, arguments) || this;
-                    _this.type = 3 /* CAMPFIRE */;
+                    _this.type = 4 /* CAMPFIRE */;
                     _this.dimensions = new point_26.Point(1, 1);
                     return _this;
                 }
@@ -3927,7 +3931,7 @@ System.register("game/world/elements/Campfire", ["engine/component", "engine/til
                     e.addComponent(new Interactable_2.Interactable(scaledPos.plus(new point_26.Point(Tilesets_6.TILE_SIZE / 2, Tilesets_6.TILE_SIZE / 2)), function () {
                         DialogueDisplay_2.DialogueDisplay.instance.startDialogue(cf);
                     }, new point_26.Point(1, -Tilesets_6.TILE_SIZE)));
-                    return e.addComponent(new ElementComponent_2.ElementComponent(3 /* CAMPFIRE */, pos, [pos], function () { return { logs: cf.logs, llct: cf.lastLogConsumedTime }; }));
+                    return e.addComponent(new ElementComponent_2.ElementComponent(4 /* CAMPFIRE */, pos, [pos], function () { return { logs: cf.logs, llct: cf.lastLogConsumedTime }; }));
                 };
                 return CampfireFactory;
             }(ElementFactory_2.ElementFactory));
@@ -3992,7 +3996,7 @@ System.register("game/world/interior/House", ["engine/point", "game/graphics/Til
                 var interactablePos = new point_27.Point(dimensions.x / 2, dimensions.y).times(Tilesets_7.TILE_SIZE);
                 var teleporter = { to: outside.uuid, pos: interactablePos.plusY(-4) };
                 l.addTeleporter(teleporter);
-                l.addElement(4 /* TELEPORTER */, new point_27.Point(3, 5), { to: outside.uuid, i: interactablePos.toString() });
+                l.addElement(5 /* TELEPORTER */, new point_27.Point(3, 5), { to: outside.uuid, i: interactablePos.toString() });
                 var woodType = Math.ceil(Math.random() * 2);
                 for (var x = 0; x < dimensions.x; x++) {
                     for (var y = 0; y < dimensions.y; y++) {
@@ -4097,7 +4101,7 @@ System.register("game/world/elements/House", ["engine/collision/BoxCollider", "e
                 __extends(HouseFactory, _super);
                 function HouseFactory() {
                     var _this = _super !== null && _super.apply(this, arguments) || this;
-                    _this.type = 5 /* HOUSE */;
+                    _this.type = 6 /* HOUSE */;
                     _this.dimensions = new point_29.Point(5, 4);
                     return _this;
                 }
@@ -4138,7 +4142,7 @@ System.register("game/world/elements/House", ["engine/collision/BoxCollider", "e
                     var resident = data[RESIDENT_ATTRIBUTE];
                     var house = e.addComponent(new House());
                     house.setResident(resident);
-                    return e.addComponent(new ElementComponent_3.ElementComponent(5 /* HOUSE */, pos, ElementUtils_1.ElementUtils.rectPoints(pos.plus(new point_29.Point(1, 1)), new point_29.Point(3, 2)), function () {
+                    return e.addComponent(new ElementComponent_3.ElementComponent(6 /* HOUSE */, pos, ElementUtils_1.ElementUtils.rectPoints(pos.plus(new point_29.Point(1, 1)), new point_29.Point(3, 2)), function () {
                         var _a;
                         return (_a = {
                                 destinationUUID: destinationUUID
@@ -4385,7 +4389,7 @@ System.register("game/world/elements/Rock", ["engine/point", "game/graphics/Tile
                 __extends(RockFactory, _super);
                 function RockFactory() {
                     var _this = _super !== null && _super.apply(this, arguments) || this;
-                    _this.type = 1 /* ROCK */;
+                    _this.type = 2 /* ROCK */;
                     _this.dimensions = new point_31.Point(1, 1);
                     return _this;
                 }
@@ -4410,7 +4414,7 @@ System.register("game/world/elements/Rock", ["engine/point", "game/graphics/Tile
                             return Math.random() > .9 ? [5 /* IRON */] : [1 /* ROCK */];
                         }
                     }));
-                    return e.addComponent(new ElementComponent_5.ElementComponent(1 /* ROCK */, pos, [pos], function () { return { v: variation, m: mossy, f: flipped, a: hittableResource.freeResources }; }));
+                    return e.addComponent(new ElementComponent_5.ElementComponent(2 /* ROCK */, pos, [pos], function () { return { v: variation, m: mossy, f: flipped, a: hittableResource.freeResources }; }));
                 };
                 return RockFactory;
             }(ElementFactory_4.ElementFactory));
@@ -4638,7 +4642,7 @@ System.register("game/world/interior/Tent", ["game/world/LocationManager", "engi
                 var interactablePos = new point_34.Point(2.5, 4).times(Tilesets_11.TILE_SIZE);
                 var teleporter = { to: outside.uuid, pos: interactablePos.plusY(-4) };
                 l.addTeleporter(teleporter);
-                l.addElement(4 /* TELEPORTER */, new point_34.Point(2, 4), { to: outside.uuid, i: interactablePos.toString() });
+                l.addElement(5 /* TELEPORTER */, new point_34.Point(2, 4), { to: outside.uuid, i: interactablePos.toString() });
                 var groundType = color + "tentInterior";
                 NineSlice_1.NineSlice.nineSliceForEach(new point_34.Point(5, 4), function (pt, index) { return l.addGroundElement(1 /* BASIC_NINE_SLICE */, pt, { k: groundType, i: index }); });
                 new AsciiInteriorBuilder_1.AsciiInteriorBuilder("  ^  ", " /xl ", "/xxxl").map("/", function (pt) { l.addGroundElement(0 /* BASIC */, pt.plusY(-3), { k: color + "tentl" }); })
@@ -4705,7 +4709,7 @@ System.register("game/world/elements/Tent", ["engine/point", "game/graphics/Tile
                 __extends(TentFactory, _super);
                 function TentFactory() {
                     var _this = _super !== null && _super.apply(this, arguments) || this;
-                    _this.type = 2 /* TENT */;
+                    _this.type = 3 /* TENT */;
                     _this.dimensions = new point_35.Point(4, 3);
                     return _this;
                 }
@@ -4726,7 +4730,7 @@ System.register("game/world/elements/Tent", ["engine/point", "game/graphics/Tile
                     e.addComponent(new BoxCollider_5.BoxCollider(pos.plus(new point_35.Point(1, 1)).times(Tilesets_12.TILE_SIZE), new point_35.Point(Tilesets_12.TILE_SIZE * 2, Tilesets_12.TILE_SIZE)));
                     // Set up teleporter
                     e.addComponent(new Interactable_4.Interactable(interactablePos, function () { return wl.useTeleporter(destinationUUID); }, new point_35.Point(1, -Tilesets_12.TILE_SIZE * 1.4)));
-                    return e.addComponent(new ElementComponent_6.ElementComponent(2 /* TENT */, pos, ElementUtils_2.ElementUtils.rectPoints(pos.plus(new point_35.Point(1, 1)), new point_35.Point(2, 1)), function () { return { destinationUUID: destinationUUID, color: color }; }));
+                    return e.addComponent(new ElementComponent_6.ElementComponent(3 /* TENT */, pos, ElementUtils_2.ElementUtils.rectPoints(pos.plus(new point_35.Point(1, 1)), new point_35.Point(2, 1)), function () { return { destinationUUID: destinationUUID, color: color }; }));
                 };
                 return TentFactory;
             }(ElementFactory_5.ElementFactory));
@@ -4781,33 +4785,35 @@ System.register("game/world/elements/Tree", ["engine/point", "game/graphics/Tile
         execute: function () {
             TreeFactory = /** @class */ (function (_super) {
                 __extends(TreeFactory, _super);
-                function TreeFactory() {
-                    var _this = _super !== null && _super.apply(this, arguments) || this;
-                    _this.type = 0 /* TREE */;
+                function TreeFactory(type) {
+                    var _this = _super.call(this) || this;
                     _this.dimensions = new point_36.Point(1, 2);
+                    _this.type = type;
                     return _this;
                 }
                 TreeFactory.prototype.make = function (wl, pos, data) {
-                    var _a, _b;
-                    var type = (_a = data["type"]) !== null && _a !== void 0 ? _a : (Math.random() < .7 ? 2 /* POINTY */ : 1 /* ROUND */);
+                    var _a;
                     var maxResourcesCount = 4;
-                    var availableResources = (_b = data["a"]) !== null && _b !== void 0 ? _b : maxResourcesCount;
+                    var availableResources = (_a = data["a"]) !== null && _a !== void 0 ? _a : maxResourcesCount;
                     var e = new Entity_9.Entity();
                     var depth = (pos.y + 2) * Tilesets_13.TILE_SIZE;
-                    var top = addTile(e, "tree" + type + "top", pos, depth);
-                    var bottom = addTile(e, "tree" + type + "base", pos.plus(new point_36.Point(0, 1)), depth);
+                    var prefix = this.type === 0 /* TREE_ROUND */ ? "treeRound" : "treePointy";
+                    var top = addTile(e, prefix + "Top", pos, depth);
+                    var bottom = addTile(e, prefix + "Base", pos.plus(new point_36.Point(0, 1)), depth);
                     var hitboxDims = new point_36.Point(8, 3);
                     e.addComponent(new BoxCollider_6.BoxCollider(pos.plus(new point_36.Point(.5, 2)).times(Tilesets_13.TILE_SIZE).minus(new point_36.Point(hitboxDims.x / 2, hitboxDims.y)), hitboxDims));
+                    var saplingType = this.type === 0 /* TREE_ROUND */ ? 7 /* ROUND_SAPLING */ : 8 /* POINTY_SAPLING */;
                     var hittableCenter = pos.times(Tilesets_13.TILE_SIZE).plus(new point_36.Point(Tilesets_13.TILE_SIZE / 2, Tilesets_13.TILE_SIZE + Tilesets_13.TILE_SIZE / 2)); // center of bottom tile
                     var hittableResource = e.addComponent(new HittableResource_2.HittableResource(hittableCenter, [top.transform, bottom.transform], availableResources, maxResourcesCount, function () {
+                        var getItem = function () { return Math.random() < .2 ? saplingType : 2 /* WOOD */; };
                         if (Player_3.Player.instance.dude.weaponType === WeaponType_2.WeaponType.AXE) {
-                            return [2 /* WOOD */, 2 /* WOOD */];
+                            return [getItem(), getItem()];
                         }
                         else {
-                            return [2 /* WOOD */];
+                            return [getItem()];
                         }
                     }));
-                    return e.addComponent(new ElementComponent_7.ElementComponent(0 /* TREE */, pos, [pos.plusY(1)], function () { return { type: type, a: hittableResource.freeResources }; }));
+                    return e.addComponent(new ElementComponent_7.ElementComponent(this.type, pos, [pos.plusY(1)], function () { return { a: hittableResource.freeResources }; }));
                 };
                 return TreeFactory;
             }(ElementFactory_6.ElementFactory));
@@ -4864,12 +4870,13 @@ System.register("game/world/elements/Elements", ["game/world/Teleporter", "game/
                     * @param args the element's metadata
                     */
                     this.ELEMENT_FACTORIES = (_a = {},
-                        _a[0 /* TREE */] = new Tree_1.TreeFactory(),
-                        _a[1 /* ROCK */] = new Rock_1.RockFactory(),
-                        _a[2 /* TENT */] = new Tent_2.TentFactory(),
-                        _a[3 /* CAMPFIRE */] = new Campfire_2.CampfireFactory(),
-                        _a[4 /* TELEPORTER */] = new Teleporter_1.TeleporterFactory(),
-                        _a[5 /* HOUSE */] = new House_2.HouseFactory(),
+                        _a[0 /* TREE_ROUND */] = new Tree_1.TreeFactory(0 /* TREE_ROUND */),
+                        _a[1 /* TREE_POINTY */] = new Tree_1.TreeFactory(1 /* TREE_POINTY */),
+                        _a[2 /* ROCK */] = new Rock_1.RockFactory(),
+                        _a[3 /* TENT */] = new Tent_2.TentFactory(),
+                        _a[4 /* CAMPFIRE */] = new Campfire_2.CampfireFactory(),
+                        _a[5 /* TELEPORTER */] = new Teleporter_1.TeleporterFactory(),
+                        _a[6 /* HOUSE */] = new House_2.HouseFactory(),
                         _a);
                     Elements._instance = this;
                 }
@@ -4973,7 +4980,7 @@ System.register("game/world/events/QueuedEvent", ["game/characters/DudeFactory",
                     }
                     berto.entity.getComponent(NPC_1.NPC).setSchedule(data.normalSchedule);
                     var villager = DudeFactory_1.DudeFactory.instance.new(7 /* VILLAGER */, MapGenerator_2.MapGenerator.ENTER_LAND_POS, LocationManager_5.LocationManager.instance.exterior());
-                    var house = LocationManager_5.LocationManager.instance.currentLocation.getElementsOfType(5 /* HOUSE */)
+                    var house = LocationManager_5.LocationManager.instance.currentLocation.getElementsOfType(6 /* HOUSE */)
                         .map(function (e) { return e.entity.getComponent(House_3.House); })
                         .filter(function (house) { return house.isResidentPending(); })[0];
                     house.setResident(villager.uuid);
@@ -5532,8 +5539,8 @@ System.register("game/characters/dialogues/DipIntro", ["game/characters/Dialogue
                     "I'll put together a tent for you, if you collect rocks and wood for a campfire.",
                 ], function () { return new Dialogue_2.NextDialogue(DIP_MAKE_CAMPFIRE, false); }); },
                 _a[DIP_MAKE_CAMPFIRE] = function () {
-                    var campfires = LocationManager_7.LocationManager.instance.currentLocation.getElementsOfType(3 /* CAMPFIRE */);
-                    var dipTent = LocationManager_7.LocationManager.instance.currentLocation.getElementsOfType(2 /* TENT */)[0];
+                    var campfires = LocationManager_7.LocationManager.instance.currentLocation.getElementsOfType(4 /* CAMPFIRE */);
+                    var dipTent = LocationManager_7.LocationManager.instance.currentLocation.getElementsOfType(3 /* TENT */)[0];
                     if (campfires.length > 0) { // campfire has been placed
                         var lines = [
                             dipTent.occupiedPoints[0].distanceTo(campfires[0].occupiedPoints[0]) < 5
@@ -5947,7 +5954,7 @@ System.register("game/characters/dialogues/BertoIntro", ["game/ui/DudeInteractIn
                 }), Dialogue_3.option("Never mind.", BERT_MENU_INTRO, false)); },
                 _a[BERT_VILLAGERS] = function () { return Dialogue_3.dialogueWithOptions(["At present, only felonious peons can be spared by The King.",
                     "Shall I return to The Kingdom, bringing word that thou art requesting a settler?"], DudeInteractIndicator_3.DudeInteractIndicator.NONE, new Dialogue_3.DialogueOption("Bring me a criminal.", function () {
-                    var openHouses = LocationManager_8.LocationManager.instance.currentLocation.getElementsOfType(5 /* HOUSE */)
+                    var openHouses = LocationManager_8.LocationManager.instance.currentLocation.getElementsOfType(6 /* HOUSE */)
                         .map(function (e) { return e.entity.getComponent(House_4.House); })
                         .filter(function (house) { return !house.hasResident(); });
                     if (openHouses.length === 0) {
@@ -7987,7 +7994,7 @@ System.register("game/world/MapGenerator", ["engine/point", "game/world/Location
                 });
                 MapGenerator.prototype.generateExterior = function () {
                     // spawn tent
-                    this.location.addElement(2 /* TENT */, this.tentPos, { color: "red" /* RED */ });
+                    this.location.addElement(3 /* TENT */, this.tentPos, { color: "red" /* RED */ });
                     // make the ground
                     // this.renderPath(new Point(-10, -10), new Point(10, 10), 2)
                     // this.renderPath(new Point(10, -10), new Point(-10, 10), 5)
@@ -8006,12 +8013,12 @@ System.register("game/world/MapGenerator", ["engine/point", "game/world/Location
                         var pt = new point_52.Point(Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_SIZE / 2, Math.floor(Math.random() * (MapGenerator.MAP_SIZE - 1)) - MapGenerator.MAP_SIZE / 2);
                         var occupiedPoints = [pt, pt.plus(new point_52.Point(0, 1))];
                         if (occupiedPoints.every(function (p) { return !_this.location.ground.get(p); })) {
-                            this.location.addElement(0 /* TREE */, pt);
+                            this.location.addElement(Math.random() < .7 ? 1 /* TREE_POINTY */ : 0 /* TREE_ROUND */, pt);
                         }
                     }
                 };
                 MapGenerator.prototype.clearPathToCenter = function () {
-                    var typesToClear = [1 /* ROCK */, 0 /* TREE */];
+                    var typesToClear = [2 /* ROCK */, 1 /* TREE_POINTY */, 0 /* TREE_ROUND */];
                     // clear in corner
                     for (var x = MapGenerator.MAP_SIZE / 2 - 11; x < MapGenerator.MAP_SIZE / 2; x++) {
                         for (var y = MapGenerator.MAP_SIZE / 2 - 10; y < MapGenerator.MAP_SIZE / 2 - 8; y++) {
@@ -8036,7 +8043,7 @@ System.register("game/world/MapGenerator", ["engine/point", "game/world/Location
                     var placedRocks = 0;
                     while (placedRocks < 20) {
                         var p = new point_52.Point(Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_SIZE / 2, Math.floor(Math.random() * (MapGenerator.MAP_SIZE)) - MapGenerator.MAP_SIZE / 2);
-                        if (!this.location.ground.get(p) && this.location.addElement(1 /* ROCK */, p)) {
+                        if (!this.location.ground.get(p) && this.location.addElement(2 /* ROCK */, p)) {
                             placedRocks++;
                         }
                     }
@@ -9971,13 +9978,13 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
                     displayName: "Tent",
                     inventoryIconSupplier: function () { return Tilesets_37.Tilesets.instance.oneBit.getTileSource("tent"); },
                     stackLimit: 1,
-                    element: 2 /* TENT */
+                    element: 3 /* TENT */
                 }),
                 _a[4 /* CAMPFIRE */] = new ItemMetadata({
                     displayName: "Campfire",
                     inventoryIconSupplier: function () { return Tilesets_37.Tilesets.instance.oneBit.getTileSource("campfire"); },
                     stackLimit: 1,
-                    element: 3 /* CAMPFIRE */
+                    element: 4 /* CAMPFIRE */
                 }),
                 _a[5 /* IRON */] = new ItemMetadata({
                     displayName: "Iron",
@@ -9988,7 +9995,17 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
                     displayName: "House",
                     inventoryIconSupplier: function () { return Tilesets_37.Tilesets.instance.oneBit.getTileSource("house"); },
                     stackLimit: 1,
-                    element: 5 /* HOUSE */
+                    element: 6 /* HOUSE */
+                }),
+                _a[7 /* ROUND_SAPLING */] = new ItemMetadata({
+                    displayName: "Sapling",
+                    inventoryIconSupplier: function () { return Tilesets_37.Tilesets.instance.oneBit.getTileSource("treeRound"); },
+                    droppedIconSupplier: function () { return Tilesets_37.Tilesets.instance.outdoorTiles.getTileSource("treeRoundSapling"); },
+                }),
+                _a[8 /* POINTY_SAPLING */] = new ItemMetadata({
+                    displayName: "Sapling",
+                    inventoryIconSupplier: function () { return Tilesets_37.Tilesets.instance.oneBit.getTileSource("treePointy"); },
+                    droppedIconSupplier: function () { return Tilesets_37.Tilesets.instance.outdoorTiles.getTileSource("treePointySapling"); },
                 }),
                 // TODO add other weapons
                 _a[100012 /* AXE */] = new ItemMetadata({

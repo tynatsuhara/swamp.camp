@@ -8,7 +8,8 @@ import { TreeFactory } from "./Tree"
 
 // Elements are things which take up multiple squares in the non-ground ground
 export const enum ElementType {
-    TREE,
+    TREE_ROUND,
+    TREE_POINTY,
     ROCK,
     TENT,
     CAMPFIRE,
@@ -45,7 +46,8 @@ export class Elements {
     * @param args the element's metadata
     */
     private readonly ELEMENT_FACTORIES: { [key: number]: ElementFactory } = {
-       [ElementType.TREE]: new TreeFactory(),
+       [ElementType.TREE_ROUND]: new TreeFactory(ElementType.TREE_ROUND),
+       [ElementType.TREE_POINTY]: new TreeFactory(ElementType.TREE_POINTY),
        [ElementType.ROCK]: new RockFactory(),
        [ElementType.TENT]: new TentFactory(),
        [ElementType.CAMPFIRE]: new CampfireFactory(),
