@@ -7,6 +7,7 @@ import { Tilesets } from "../../graphics/Tilesets"
 import { UpdateData } from "../../../engine/engine"
 import { Animator } from "../../../engine/util/Animator"
 import { DudeType } from "../DudeFactory"
+import { TileComponent } from "../../../engine/tiles/TileComponent"
 
 enum State {
     SHEATHED,
@@ -21,7 +22,7 @@ export class MeleeWeapon extends Weapon {
     private weaponTransform: TileTransform
     private offsetFromCenter: Point
     private state: State = State.DRAWN
-    // private slashSprite: TileComponent
+    private slashSprite: TileComponent
     private _range: number
     private delayBetweenAttacks = 0  // delay after the animation ends before the weapon can attack again in millis
 
@@ -32,6 +33,7 @@ export class MeleeWeapon extends Weapon {
             this.weaponTransform = new TileTransform(Point.ZERO, this.weaponSprite.dimensions).relativeTo(this.dude.animation.transform)
             this.offsetFromCenter = offsetFromCenter
             this._range = this.weaponSprite.dimensions.y
+            this.slashSprite = this.entity.addComponent(Tilesets.instance.oneBit.getTileSource("slash").toComponent())
         }
         this.weaponType = weaponType
     }
@@ -131,13 +133,13 @@ export class MeleeWeapon extends Weapon {
         // show sword behind character if sheathed
         this.weaponTransform.depth = this.state == State.SHEATHED ? -.5 : .5
 
-        // TODO maybe keep the slash stuff later
-        // this.slashSprite.enabled = this.animator?.getCurrentFrame() === 3
-        // this.slashSprite.transform.depth = characterAnim.transform.depth + 2
-        // this.slashSprite.transform.mirrorX = charMirror
-        // this.slashSprite.transform.position = characterAnim.transform.position.plus(
-        //     new Point((charMirror ? -1 : 1) * (this.weaponSprite.transform.dimensions.y - 8), 8)
-        // )
+        const frame = this.animator?.getCurrentFrame()
+        this.slashSprite.enabled = frame === 3
+        this.slashSprite.transform.depth = this.dude.animation.transform.depth + 2
+        this.slashSprite.transform.mirrorX = this.weaponTransform.mirrorX
+        this.slashSprite.transform.position = this.dude.animation.transform.position.plus(
+            new Point((this.weaponTransform.mirrorX ? -1 : 1) * (this.weaponTransform.dimensions.y - 10), 8)
+        )
     }
 
     private animator: Animator

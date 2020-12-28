@@ -10596,6 +10596,7 @@ System.register("game/characters/weapons/MeleeWeapon", ["game/characters/weapons
                         _this.weaponTransform = new TileTransform_27.TileTransform(point_67.Point.ZERO, _this.weaponSprite.dimensions).relativeTo(_this.dude.animation.transform);
                         _this.offsetFromCenter = offsetFromCenter;
                         _this._range = _this.weaponSprite.dimensions.y;
+                        _this.slashSprite = _this.entity.addComponent(Tilesets_40.Tilesets.instance.oneBit.getTileSource("slash").toComponent());
                     };
                     _this.weaponType = weaponType;
                     return _this;
@@ -10657,6 +10658,7 @@ System.register("game/characters/weapons/MeleeWeapon", ["game/characters/weapons
                     }
                 };
                 MeleeWeapon.prototype.animate = function () {
+                    var _a;
                     var offsetFromEdge = new point_67.Point(this.dude.animation.transform.dimensions.x / 2 - this.weaponTransform.dimensions.x / 2, this.dude.animation.transform.dimensions.y - this.weaponTransform.dimensions.y).plus(this.offsetFromCenter);
                     var pos = new point_67.Point(0, 0);
                     var rotation = 0;
@@ -10678,13 +10680,11 @@ System.register("game/characters/weapons/MeleeWeapon", ["game/characters/weapons
                     this.weaponTransform.position = pos;
                     // show sword behind character if sheathed
                     this.weaponTransform.depth = this.state == State.SHEATHED ? -.5 : .5;
-                    // TODO maybe keep the slash stuff later
-                    // this.slashSprite.enabled = this.animator?.getCurrentFrame() === 3
-                    // this.slashSprite.transform.depth = characterAnim.transform.depth + 2
-                    // this.slashSprite.transform.mirrorX = charMirror
-                    // this.slashSprite.transform.position = characterAnim.transform.position.plus(
-                    //     new Point((charMirror ? -1 : 1) * (this.weaponSprite.transform.dimensions.y - 8), 8)
-                    // )
+                    var frame = (_a = this.animator) === null || _a === void 0 ? void 0 : _a.getCurrentFrame();
+                    this.slashSprite.enabled = frame === 3;
+                    this.slashSprite.transform.depth = this.dude.animation.transform.depth + 2;
+                    this.slashSprite.transform.mirrorX = this.weaponTransform.mirrorX;
+                    this.slashSprite.transform.position = this.dude.animation.transform.position.plus(new point_67.Point((this.weaponTransform.mirrorX ? -1 : 1) * (this.weaponTransform.dimensions.y - 10), 8));
                 };
                 MeleeWeapon.prototype.playAttackAnimation = function () {
                     var _this = this;
