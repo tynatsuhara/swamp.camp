@@ -58,4 +58,8 @@ export class PlaceElementDisplay extends Component {
     getEntities(): Entity[] {
         return [this.e]
     }
+
+    getElementType() {
+        return this.element
+    }
 }

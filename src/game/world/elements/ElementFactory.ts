@@ -21,4 +21,11 @@ export abstract class ElementFactory {
      * @returns An ElementComponent with the factory's type, which MUST have a nonnull entity
      */
     abstract make(wl: WorldLocation, pos: Point, data: object): ElementComponent
+
+    /**
+     * @param pos The position of the element in tile coordinates (not pixel coordinates!)
+     */
+    canPlace(pos: Point) {
+        return true
+    }
 }

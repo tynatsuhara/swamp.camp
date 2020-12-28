@@ -9,6 +9,7 @@ import { UpdateData } from "../../engine/engine"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
 import { rectContains } from "../../engine/util/utils"
 import { TileTransform } from "../../engine/tiles/TileTransform"
+import { Elements } from "../world/elements/Elements"
 
 /**
  * This is a separate component which exists in the game view instead of the UI view, since it aligns with world tile coordinates
@@ -84,16 +85,27 @@ export class PlaceElementFrame extends Component {
     private canPlace(pos: Point) {
         for (let x = pos.x; x < pos.x + this.dimensions.x; x++) {
             for (let y = pos.y; y < pos.y + this.dimensions.y; y++) {
-                if (!!LocationManager.instance.currentLocation.getElement(new Point(x, y))) {
+                const pt = new Point(x, y)
+                // there's already an element here
+                if (!!LocationManager.instance.currentLocation.getElement(pt)) {
+                    return false
+                }
+                // there's no ground here
+                if (!LocationManager.instance.currentLocation.ground.get(pt)) {
                     return false
                 }
             }
         }
+
         const p = pos.times(TILE_SIZE)
         const d = this.dimensions.times(TILE_SIZE)
-        return !Array.from(LocationManager.instance.currentLocation.dudes).some(dude => 
+        const intersectingDudes = Array.from(LocationManager.instance.currentLocation.dudes).some(dude => 
             rectContains(p, d, dude.standingPosition) || rectContains(p, d, dude.standingPosition.plusY(-TILE_SIZE))
         )
-        // TODO: Element-specific restrictions (trees can only go on grass)
+        if (intersectingDudes) {
+            return false
+        }
+
+        return Elements.instance.getElementFactory(PlaceElementDisplay.instance.getElementType()).canPlace(pos)
     }
 }

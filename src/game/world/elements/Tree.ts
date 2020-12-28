@@ -16,6 +16,7 @@ import { Component } from "../../../engine/component"
 import { WorldTime } from "../WorldTime"
 import { TimeUnit } from "../TimeUnit"
 import { LocationManager } from "../LocationManager"
+import { GroundType } from "../ground/Ground"
 
 const NEXT_GROWTH_TIME = "ngt"
 const SIZE = "s"  // one of [1, 2, 3]
@@ -31,7 +32,6 @@ export class TreeFactory extends ElementFactory {
         this.type = type
     }
 
-    // TODO: Make growable
     make(wl: WorldLocation, pos: Point, data: object): ElementComponent {
         const maxResourcesCount = 4
 
@@ -105,6 +105,10 @@ export class TreeFactory extends ElementFactory {
                 [AVAILABLE_RESOURCES]: hittableResource.freeResources,
             } }
         ))
+    }
+
+    canPlace(pos: Point) {
+        return LocationManager.instance.currentLocation.ground.get(pos.plusY(1)).type === GroundType.GRASS
     }
 
     private nextGrowthTime() {
