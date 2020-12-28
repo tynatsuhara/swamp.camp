@@ -6,9 +6,11 @@ export class OutdoorTileset extends SingleFileTileLoader {
     constructor() {
         super("images/env_outdoor_recolor.png", new Map([
             ["treeRoundSapling", new Point(27, 8)],
+            ["treeRoundSmall", new Point(15, 9)],
             ["treeRoundBase", new Point(15, 11)],
             ["treeRoundTop", new Point(15, 10)],
             ["treePointySapling", new Point(27, 7)],
+            ["treePointySmall", new Point(18, 9)],
             ["treePointyBase", new Point(18, 11)],
             ["treePointyTop", new Point(18, 10)],
             ["redtentNW", new Point(46, 10)],

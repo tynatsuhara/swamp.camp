@@ -94,5 +94,6 @@ export class PlaceElementFrame extends Component {
         return !Array.from(LocationManager.instance.currentLocation.dudes).some(dude => 
             rectContains(p, d, dude.standingPosition) || rectContains(p, d, dude.standingPosition.plusY(-TILE_SIZE))
         )
+        // TODO: Element-specific restrictions (trees can only go on grass)
     }
 }

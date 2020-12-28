@@ -1,6 +1,7 @@
 import { Component } from "../../../engine/component"
 import { ElementType } from "./Elements"
 import { Point } from "../../../engine/point"
+import { LocationManager } from "../LocationManager"
 
 /**
  * A component that all world space entities should have in order to be saveable.
@@ -22,5 +23,10 @@ export class ElementComponent extends Component {
 
     save(): object {
         throw new Error("aaaaahhh!")
+    }
+
+    delete() {
+        super.delete()
+        LocationManager.instance.getLocations().forEach(l => l.removeElement(this))
     }
 }
