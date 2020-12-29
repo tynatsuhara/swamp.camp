@@ -17,6 +17,9 @@ import { MapGenerator } from "../world/MapGenerator"
 import { PointLightMaskRenderer } from "../world/PointLightMaskRenderer"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
+import { EventQueue } from "../world/events/EventQueue"
+import { QueuedEventType } from "../world/events/QueuedEvent"
+import { NPC } from "../characters/NPC"
 
 const ZOOM = 3
 
@@ -61,6 +64,11 @@ export class GameScene {
 
         // TODO clean up obstacles (trees, rocks, etc) so intro goes smoothly
         CutsceneManager.instance.startCutscene(new IntroCutscene())
+
+        EventQueue.instance.addEvent({
+            type: QueuedEventType.SIMULATE_NPCS,
+            time: WorldTime.instance.time + NPC.SCHEDULE_FREQUENCY
+        })
     }
     
     getViews(updateViewsContext: UpdateViewsContext) {

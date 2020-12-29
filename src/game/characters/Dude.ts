@@ -304,10 +304,14 @@ export class Dude extends Component implements DialogueSource {
     }
 
     /**
-     * @param point World point where the dude will be moved, unless they hit a collider
+     * @param point World point where the dude will be moved, unless they hit a collider (with skipColliderCheck = false)
      */
-    moveTo(point: Point) {
-        this._position = this.collider.moveTo(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos)
+    moveTo(point: Point, skipColliderCheck = false) {
+        if (skipColliderCheck) {
+            this._position = point
+        } else {
+            this._position = this.collider.moveTo(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos)
+        }
     }
 
     /**

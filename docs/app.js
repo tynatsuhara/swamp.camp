@@ -5034,12 +5034,24 @@ System.register("game/world/events/QueuedEvent", ["game/characters/DudeFactory",
         ],
         execute: function () {
             (function (QueuedEventType) {
-                QueuedEventType[QueuedEventType["HERALD_ARRIVAL"] = 0] = "HERALD_ARRIVAL";
-                QueuedEventType[QueuedEventType["HERALD_DEPARTURE"] = 1] = "HERALD_DEPARTURE";
-                QueuedEventType[QueuedEventType["HERALD_RETURN_WITH_NPC"] = 2] = "HERALD_RETURN_WITH_NPC";
+                QueuedEventType[QueuedEventType["SIMULATE_NPCS"] = 0] = "SIMULATE_NPCS";
+                QueuedEventType[QueuedEventType["HERALD_ARRIVAL"] = 1] = "HERALD_ARRIVAL";
+                QueuedEventType[QueuedEventType["HERALD_DEPARTURE"] = 2] = "HERALD_DEPARTURE";
+                QueuedEventType[QueuedEventType["HERALD_RETURN_WITH_NPC"] = 3] = "HERALD_RETURN_WITH_NPC";
             })(QueuedEventType || (QueuedEventType = {}));
             exports_70("QueuedEventType", QueuedEventType);
             exports_70("EVENT_QUEUE_HANDLERS", EVENT_QUEUE_HANDLERS = (_a = {},
+                _a[QueuedEventType.SIMULATE_NPCS] = function () {
+                    console.log("simulating NPCs");
+                    LocationManager_7.LocationManager.instance.getLocations()
+                        .filter(function (l) { return l !== LocationManager_7.LocationManager.instance.currentLocation; })
+                        .flatMap(function (l) { return Array.from(l.dudes); })
+                        .forEach(function (d) { return d.entity.getComponent(NPC_1.NPC).simulate(); });
+                    EventQueue_2.EventQueue.instance.addEvent({
+                        type: QueuedEventType.SIMULATE_NPCS,
+                        time: WorldTime_4.WorldTime.instance.time + NPC_1.NPC.SCHEDULE_FREQUENCY
+                    });
+                },
                 _a[QueuedEventType.HERALD_ARRIVAL] = function () {
                     DudeFactory_1.DudeFactory.instance.new(4 /* HERALD */, MapGenerator_2.MapGenerator.ENTER_LAND_POS, LocationManager_7.LocationManager.instance.exterior());
                     console.log("the trader is here (ノ ″ロ″)ノ");
@@ -6504,9 +6516,9 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
         }
     };
 });
-System.register("game/characters/NPC", ["engine/component", "engine/point", "engine/util/Lists", "game/graphics/Tilesets", "game/ui/DialogueDisplay", "game/world/LocationManager", "game/world/PointLightMaskRenderer", "game/characters/Dude", "game/characters/NPCSchedule", "game/characters/Player"], function (exports_83, context_83) {
+System.register("game/characters/NPC", ["engine/component", "engine/point", "engine/util/Lists", "game/graphics/Tilesets", "game/ui/DialogueDisplay", "game/world/LocationManager", "game/world/PointLightMaskRenderer", "game/characters/Dude", "game/characters/NPCSchedule", "game/characters/Player", "game/world/TimeUnit"], function (exports_83, context_83) {
     "use strict";
-    var component_19, point_44, Lists_1, Tilesets_22, DialogueDisplay_3, LocationManager_11, PointLightMaskRenderer_2, Dude_1, NPCSchedule_2, Player_8, NPC;
+    var component_19, point_44, Lists_1, Tilesets_22, DialogueDisplay_3, LocationManager_11, PointLightMaskRenderer_2, Dude_1, NPCSchedule_2, Player_8, TimeUnit_5, NPC;
     var __moduleName = context_83 && context_83.id;
     return {
         setters: [
@@ -6539,12 +6551,12 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
             },
             function (Player_8_1) {
                 Player_8 = Player_8_1;
+            },
+            function (TimeUnit_5_1) {
+                TimeUnit_5 = TimeUnit_5_1;
             }
         ],
         execute: function () {
-            /**
-             * Shared logic for different types of NPCs. These should be invoked by an NPC controller component.
-             */
             NPC = /** @class */ (function (_super) {
                 __extends(NPC, _super);
                 function NPC(defaultSchedule) {
@@ -6621,11 +6633,6 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
                         throw new Error("unimplemented schedule type");
                     }
                 };
-                /**
-                 * TODO: Support simulation for NPCs which are not in the current location?
-                 * Example: You're in an NPC's house, they should come inside when it's time.
-                 * Alternatively, this could be done using the EventQueue.
-                 */
                 NPC.prototype.simulate = function () {
                     this.clearExistingAIState();
                     var schedule = this.getSchedule();
@@ -6833,6 +6840,12 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
                     var ptOffset = new point_44.Point(.5, .8);
                     return tilePt.plus(ptOffset).times(Tilesets_22.TILE_SIZE);
                 };
+                /**
+                 * TODO: Support simulation for NPCs which are not in the current location?
+                 * Example: You're in an NPC's house, they should come inside when it's time.
+                 * Alternatively, this could be done using the EventQueue.
+                 */
+                NPC.SCHEDULE_FREQUENCY = 10 * TimeUnit_5.TimeUnit.MINUTE;
                 return NPC;
             }(component_19.Component));
             exports_83("NPC", NPC);
@@ -9483,7 +9496,7 @@ System.register("game/cutscenes/CutscenePlayerController", ["engine/component", 
 });
 System.register("game/characters/ShroomNPC", ["engine/component", "game/world/LocationManager", "game/world/TimeUnit", "game/world/WorldTime", "game/characters/Dude", "game/characters/DudeFactory", "game/characters/Enemy", "game/characters/weapons/WeaponType"], function (exports_110, context_110) {
     "use strict";
-    var component_31, LocationManager_19, TimeUnit_5, WorldTime_8, Dude_5, DudeFactory_4, Enemy_1, WeaponType_3, SIZE, NEXT_GROWTH_TIME, ShroomNPC;
+    var component_31, LocationManager_19, TimeUnit_6, WorldTime_8, Dude_5, DudeFactory_4, Enemy_1, WeaponType_3, SIZE, NEXT_GROWTH_TIME, ShroomNPC;
     var __moduleName = context_110 && context_110.id;
     return {
         setters: [
@@ -9493,8 +9506,8 @@ System.register("game/characters/ShroomNPC", ["engine/component", "game/world/Lo
             function (LocationManager_19_1) {
                 LocationManager_19 = LocationManager_19_1;
             },
-            function (TimeUnit_5_1) {
-                TimeUnit_5 = TimeUnit_5_1;
+            function (TimeUnit_6_1) {
+                TimeUnit_6 = TimeUnit_6_1;
             },
             function (WorldTime_8_1) {
                 WorldTime_8 = WorldTime_8_1;
@@ -9568,7 +9581,7 @@ System.register("game/characters/ShroomNPC", ["engine/component", "game/world/Lo
                 };
                 ShroomNPC.prototype.nextGrowthTime = function () {
                     // grow every 12-24 hours
-                    return WorldTime_8.WorldTime.instance.time + TimeUnit_5.TimeUnit.DAY * (0.5 + Math.random() / 2);
+                    return WorldTime_8.WorldTime.instance.time + TimeUnit_6.TimeUnit.DAY * (0.5 + Math.random() / 2);
                 };
                 return ShroomNPC;
             }(component_31.Component));
@@ -11389,10 +11402,16 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                     }
                 };
                 /**
-                 * @param point World point where the dude will be moved, unless they hit a collider
+                 * @param point World point where the dude will be moved, unless they hit a collider (with skipColliderCheck = false)
                  */
-                Dude.prototype.moveTo = function (point) {
-                    this._position = this.collider.moveTo(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos);
+                Dude.prototype.moveTo = function (point, skipColliderCheck) {
+                    if (skipColliderCheck === void 0) { skipColliderCheck = false; }
+                    if (skipColliderCheck) {
+                        this._position = point;
+                    }
+                    else {
+                        this._position = this.collider.moveTo(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos);
+                    }
                 };
                 /**
                  * Returns true if these dudes have no factions in common
@@ -11572,9 +11591,9 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
         }
     };
 });
-System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "engine/point", "game/characters/Dude", "game/characters/DudeFactory", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/graphics/Tilesets", "game/items/DroppedItem", "game/SaveManager", "game/ui/UIStateManager", "game/world/GroundRenderer", "game/world/LocationManager", "game/world/MapGenerator", "game/world/PointLightMaskRenderer", "game/world/TimeUnit", "game/world/WorldTime"], function (exports_130, context_130) {
+System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "engine/point", "game/characters/Dude", "game/characters/DudeFactory", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/graphics/Tilesets", "game/items/DroppedItem", "game/SaveManager", "game/ui/UIStateManager", "game/world/GroundRenderer", "game/world/LocationManager", "game/world/MapGenerator", "game/world/PointLightMaskRenderer", "game/world/TimeUnit", "game/world/WorldTime", "game/world/events/EventQueue", "game/world/events/QueuedEvent", "game/characters/NPC"], function (exports_130, context_130) {
     "use strict";
-    var CollisionEngine_4, point_73, Dude_10, DudeFactory_5, Camera_9, CutsceneManager_3, IntroCutscene_1, Tilesets_43, DroppedItem_3, SaveManager_7, UIStateManager_17, GroundRenderer_2, LocationManager_27, MapGenerator_5, PointLightMaskRenderer_5, TimeUnit_6, WorldTime_9, ZOOM, GameScene;
+    var CollisionEngine_4, point_73, Dude_10, DudeFactory_5, Camera_9, CutsceneManager_3, IntroCutscene_1, Tilesets_43, DroppedItem_3, SaveManager_7, UIStateManager_17, GroundRenderer_2, LocationManager_27, MapGenerator_5, PointLightMaskRenderer_5, TimeUnit_7, WorldTime_9, EventQueue_6, QueuedEvent_4, NPC_6, ZOOM, GameScene;
     var __moduleName = context_130 && context_130.id;
     return {
         setters: [
@@ -11623,11 +11642,20 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
             function (PointLightMaskRenderer_5_1) {
                 PointLightMaskRenderer_5 = PointLightMaskRenderer_5_1;
             },
-            function (TimeUnit_6_1) {
-                TimeUnit_6 = TimeUnit_6_1;
+            function (TimeUnit_7_1) {
+                TimeUnit_7 = TimeUnit_7_1;
             },
             function (WorldTime_9_1) {
                 WorldTime_9 = WorldTime_9_1;
+            },
+            function (EventQueue_6_1) {
+                EventQueue_6 = EventQueue_6_1;
+            },
+            function (QueuedEvent_4_1) {
+                QueuedEvent_4 = QueuedEvent_4_1;
+            },
+            function (NPC_6_1) {
+                NPC_6 = NPC_6_1;
             }
         ],
         execute: function () {
@@ -11650,7 +11678,7 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
                     SaveManager_7.saveManager.deleteSave();
                     // Wait to initialize since it will begin a coroutine
                     PointLightMaskRenderer_5.PointLightMaskRenderer.instance.start();
-                    WorldTime_9.WorldTime.instance.initialize(TimeUnit_6.TimeUnit.HOUR * 19.5);
+                    WorldTime_9.WorldTime.instance.initialize(TimeUnit_7.TimeUnit.HOUR * 19.5);
                     // World must be initialized before we do anything else
                     MapGenerator_5.MapGenerator.instance.generateExterior();
                     var playerStartPos = MapGenerator_5.MapGenerator.ENTER_LAND_POS;
@@ -11662,6 +11690,10 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
                     DudeFactory_5.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_73.Point(-4, 0).times(Tilesets_43.TILE_SIZE));
                     // TODO clean up obstacles (trees, rocks, etc) so intro goes smoothly
                     CutsceneManager_3.CutsceneManager.instance.startCutscene(new IntroCutscene_1.IntroCutscene());
+                    EventQueue_6.EventQueue.instance.addEvent({
+                        type: QueuedEvent_4.QueuedEventType.SIMULATE_NPCS,
+                        time: WorldTime_9.WorldTime.instance.time + NPC_6.NPC.SCHEDULE_FREQUENCY
+                    });
                 };
                 GameScene.prototype.getViews = function (updateViewsContext) {
                     this.updateViews(updateViewsContext);

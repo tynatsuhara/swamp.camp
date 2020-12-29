@@ -9,6 +9,7 @@ import { PointLightMaskRenderer } from "../world/PointLightMaskRenderer"
 import { Dude } from "./Dude"
 import { NPCSchedule, NPCSchedules, NPCScheduleType } from "./NPCSchedule"
 import { Player } from "./Player"
+import { TimeUnit } from "../world/TimeUnit"
 
 /**
  * Shared logic for different types of NPCs. These should be invoked by an NPC controller component.
@@ -100,6 +101,8 @@ export class NPC extends Component {
      * Example: You're in an NPC's house, they should come inside when it's time. 
      * Alternatively, this could be done using the EventQueue.
      */
+    static SCHEDULE_FREQUENCY = 10 * TimeUnit.MINUTE
+    
     simulate() {
         this.clearExistingAIState()
         const schedule = this.getSchedule()

@@ -10,9 +10,10 @@ import { ElementType } from "../elements/Elements"
 import { House } from "../elements/House"
 
 export enum QueuedEventType {
+    SIMULATE_NPCS,
     HERALD_ARRIVAL,
     HERALD_DEPARTURE,
-    HERALD_RETURN_WITH_NPC
+    HERALD_RETURN_WITH_NPC,
 }
 
 export type QueuedEventData = {
@@ -22,6 +23,20 @@ export type QueuedEventData = {
 }
 
 export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => void } = {
+    [QueuedEventType.SIMULATE_NPCS]: () => {
+        console.log("simulating NPCs")
+
+        LocationManager.instance.getLocations()
+                .filter(l => l !== LocationManager.instance.currentLocation)
+                .flatMap(l => Array.from(l.dudes))
+                .forEach(d => d.entity.getComponent(NPC).simulate())
+
+        EventQueue.instance.addEvent({
+            type: QueuedEventType.SIMULATE_NPCS,
+            time: WorldTime.instance.time + NPC.SCHEDULE_FREQUENCY
+        })
+    },
+
     [QueuedEventType.HERALD_ARRIVAL]: () => {
         DudeFactory.instance.new(DudeType.HERALD, MapGenerator.ENTER_LAND_POS, LocationManager.instance.exterior())
         console.log("the trader is here (ノ ″ロ″)ノ")
