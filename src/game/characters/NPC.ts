@@ -343,7 +343,7 @@ export class NPC extends Component {
 
     private forceMoveToTilePosition(pt: Point) {
         const pos = this.tilePtToStandingPos(pt).minus(this.dude.standingPosition).plus(this.dude.position)
-        this.dude.moveTo(pos)
+        this.dude.moveTo(pos, true)
     }
 
     private findPath(tilePt: Point, pixelPtStart: Point = this.dude.standingPosition) {
@@ -371,7 +371,7 @@ export class NPC extends Component {
         const tilePt = pixelPtToTilePt(this.teleporterTarget.pos)
         this.walkTo(tilePt, updateData)
         if (this.dude.standingPosition.distanceTo(this.teleporterTarget.pos) < 20) {
-            console.log("found teleporter")
+            this.dude.location.npcUseTeleporter(this.dude, this.teleporterTarget)
         }
     }
 

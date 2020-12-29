@@ -20,6 +20,11 @@ export const Teleporters = {
     teleporterId: (toUUID: string, id: string = null) => {
         return `${toUUID}${!!id ? `$${id}` : ''}`
     },
+
+    getId: (teleporterId: string) => {
+        const dollarIndex = teleporterId.indexOf("$")
+        return dollarIndex === -1 ? undefined : teleporterId.substring(teleporterId.indexOf("$") + 1)
+    }
 }
 
 export class TeleporterFactory extends ElementFactory {

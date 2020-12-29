@@ -131,6 +131,7 @@ export class WorldLocation {
                 .map(kv => ({
                     to: toUUID,
                     pos: Point.fromString(kv[1]),
+                    id: Teleporters.getId(kv[0])
                 }))[0]
     }
 
@@ -142,6 +143,16 @@ export class WorldLocation {
             throw new Error(`teleporter ${teleporterId} not found`)
         }
         return Point.fromString(link)
+    }
+
+    npcUseTeleporter(dude: Dude, teleporter: Teleporter) {
+        const linkedLocation = LocationManager.instance.get(teleporter.to)
+        const linkedPosition = this.getTeleporterLinkedPos(teleporter.to, teleporter.id)
+
+        this.dudes.delete(dude)
+        linkedLocation.dudes.add(dude)
+        dude.location = linkedLocation
+        dude.moveTo(teleporter.pos, true)
     }
 
     useTeleporter(to: string, id: string = null) {

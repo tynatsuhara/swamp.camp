@@ -3518,6 +3518,10 @@ System.register("game/world/Teleporter", ["engine/component", "engine/Entity", "
                     if (id === void 0) { id = null; }
                     return "" + toUUID + (!!id ? "$" + id : '');
                 },
+                getId: function (teleporterId) {
+                    var dollarIndex = teleporterId.indexOf("$");
+                    return dollarIndex === -1 ? undefined : teleporterId.substring(teleporterId.indexOf("$") + 1);
+                }
             });
             TeleporterFactory = /** @class */ (function (_super) {
                 __extends(TeleporterFactory, _super);
@@ -6840,7 +6844,7 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
                 };
                 NPC.prototype.forceMoveToTilePosition = function (pt) {
                     var pos = this.tilePtToStandingPos(pt).minus(this.dude.standingPosition).plus(this.dude.position);
-                    this.dude.moveTo(pos);
+                    this.dude.moveTo(pos, true);
                 };
                 NPC.prototype.findPath = function (tilePt, pixelPtStart) {
                     var _this = this;
@@ -6868,7 +6872,7 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
                     var tilePt = Tilesets_22.pixelPtToTilePt(this.teleporterTarget.pos);
                     this.walkTo(tilePt, updateData);
                     if (this.dude.standingPosition.distanceTo(this.teleporterTarget.pos) < 20) {
-                        console.log("found teleporter");
+                        this.dude.location.npcUseTeleporter(this.dude, this.teleporterTarget);
                     }
                 };
                 NPC.prototype.findHomeLocation = function () {
@@ -7096,6 +7100,7 @@ System.register("game/world/WorldLocation", ["engine/point", "engine/util/Grid",
                         .map(function (kv) { return ({
                         to: toUUID,
                         pos: point_45.Point.fromString(kv[1]),
+                        id: Teleporter_2.Teleporters.getId(kv[0])
                     }); })[0];
                 };
                 WorldLocation.prototype.getTeleporterLinkedPos = function (to, id) {
@@ -7106,6 +7111,14 @@ System.register("game/world/WorldLocation", ["engine/point", "engine/util/Grid",
                         throw new Error("teleporter " + teleporterId + " not found");
                     }
                     return point_45.Point.fromString(link);
+                };
+                WorldLocation.prototype.npcUseTeleporter = function (dude, teleporter) {
+                    var linkedLocation = LocationManager_12.LocationManager.instance.get(teleporter.to);
+                    var linkedPosition = this.getTeleporterLinkedPos(teleporter.to, teleporter.id);
+                    this.dudes.delete(dude);
+                    linkedLocation.dudes.add(dude);
+                    dude.location = linkedLocation;
+                    dude.moveTo(teleporter.pos, true);
                 };
                 WorldLocation.prototype.useTeleporter = function (to, id) {
                     if (id === void 0) { id = null; }
