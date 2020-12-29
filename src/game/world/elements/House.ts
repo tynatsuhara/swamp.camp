@@ -33,7 +33,6 @@ export class HouseFactory extends ElementFactory {
     make(wl: WorldLocation, pos: Point, data: object): ElementComponent {    
         const e = new Entity()
 
-        // TODO: replace with house interior
         const destinationUUID: string = data["destinationUUID"] ?? makeHouseInterior(wl).uuid
 
         const interactablePos = pos.plus(new Point(2.5, 3)).times(TILE_SIZE)
@@ -75,7 +74,7 @@ export class HouseFactory extends ElementFactory {
         e.addComponent(new Interactable(interactablePos, () => wl.useTeleporter(destinationUUID), new Point(0, -TILE_SIZE*1.4)))
 
         const resident = data[RESIDENT_ATTRIBUTE]
-        const house = e.addComponent(new House())
+        const house = e.addComponent(new House(destinationUUID))
         house.setResident(resident)
 
         return e.addComponent(new ElementComponent(
@@ -93,7 +92,13 @@ export class HouseFactory extends ElementFactory {
 export class House extends Component {
     private static readonly PENDING_RESIDENT = "pending"
 
-    private resident: string;
+    readonly locationUUID: string
+    private resident: string
+
+    constructor(locationUUID: string) {
+        super()
+        this.locationUUID = locationUUID
+    }
 
     hasResident() {
         return !!this.resident

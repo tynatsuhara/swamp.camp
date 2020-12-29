@@ -125,6 +125,15 @@ export class WorldLocation {
         this.teleporters[teleporterId] = t.pos.toString()
     }
 
+    getTeleporter(toUUID: string) {
+        return Object.entries(this.teleporters)
+                .filter(kv => kv[0].startsWith(toUUID))
+                .map(kv => ({
+                    to: toUUID,
+                    pos: Point.fromString(kv[1]),
+                }))[0]
+    }
+
     private getTeleporterLinkedPos(to: string, id: string): Point {
         const dest = LocationManager.instance.get(to)
         const teleporterId = Teleporters.teleporterId(this.uuid, id)
@@ -143,6 +152,7 @@ export class WorldLocation {
         const beforeTeleportPos = p.standingPosition
         this.dudes.delete(p)
         linkedLocation.dudes.add(p)
+        p.location = linkedLocation
 
         LocationManager.instance.currentLocation = linkedLocation
 

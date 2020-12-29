@@ -40,15 +40,7 @@ export class LocationManager {
     getLocations(): WorldLocation[] {
         return Array.from(this.locations.values())
     }
-
-    // transition(toUUID: string) {
-    //     const location = this.locations.get(toUUID)
-    //     this.currentLocation.dudes.delete(Player.instance.dude)
-    //     location.dudes.add(Player.instance.dude)
-
-    //     this.current = location
-    // }
-
+    
     save(): LocationManagerSaveState {
         return {
             locations: Array.from(this.locations.values()).map(l => l.save()),

@@ -57,17 +57,14 @@ export class DudeFactory {
      * Create a new Dude in the specified location, defaults to the exterior world location
      */
     new(type: DudeType, pos: Point, location: WorldLocation = LocationManager.instance.exterior()): Dude {
-        const d = this.make(type, pos, null, location)
-        location.dudes.add(d)
-        return d
+        return this.make(type, pos, null, location)
     }
 
     /**
      * Instantiates a Dude+Entity in the specified location
      */
     load(saveState: DudeSaveState, location: WorldLocation) {
-        const d = this.make(saveState.type, Point.fromString(saveState.pos), saveState, location)
-        location.dudes.add(d)
+        this.make(saveState.type, Point.fromString(saveState.pos), saveState, location)
     }
 
     private make(
@@ -164,7 +161,6 @@ export class DudeFactory {
                 maxHealth = 4
                 // TODO: add a new type of schedule for a villager with a home
                 additionalComponents = [new NPC(NPCSchedules.newDefaultVillagerSchedule()), new Villager()]
-                speed *= (.3 + Math.random()/2)
                 break
             default: {
                 throw new Error(`DudeType ${type} can't be instantiated`)
@@ -189,6 +185,10 @@ export class DudeFactory {
         )
 
         new Entity([d as Component].concat(additionalComponents))
+
+        location.dudes.add(d)
+        d.location = location
+
         return d
     }
 }

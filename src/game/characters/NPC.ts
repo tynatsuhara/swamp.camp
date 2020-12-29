@@ -10,6 +10,9 @@ import { Dude } from "./Dude"
 import { NPCSchedule, NPCSchedules, NPCScheduleType } from "./NPCSchedule"
 import { Player } from "./Player"
 import { TimeUnit } from "../world/TimeUnit"
+import { House } from "../world/elements/House"
+import { ElementType } from "../world/elements/Elements"
+import { Teleporter } from "../world/Teleporter"
 
 /**
  * Shared logic for different types of NPCs. These should be invoked by an NPC controller component.
@@ -89,8 +92,17 @@ export class NPC extends Component {
                 (pt) => PointLightMaskRenderer.instance.isDark(pt.times(TILE_SIZE))
             )
         } else if (schedule.type === NPCScheduleType.DEFAULT_VILLAGER) {
-            const location = LocationManager.instance.currentLocation
-            this.doFlee(updateData, 0.5)
+            const home = this.findHomeLocation()
+            if (this.dude.location === home) {
+                // roam around inside
+                this.doFlee(updateData, 0.5)
+            } else if (!home) {
+                // TODO: homeless behavior
+                this.doFlee(updateData, 0.5)
+            } else {
+                this.findTeleporter(home.uuid)
+                this.goToTeleporter(updateData)
+            }
         } else {
             throw new Error("unimplemented schedule type")
         }
@@ -102,7 +114,7 @@ export class NPC extends Component {
      * Alternatively, this could be done using the EventQueue.
      */
     static SCHEDULE_FREQUENCY = 10 * TimeUnit.MINUTE
-    
+
     simulate() {
         this.clearExistingAIState()
         const schedule = this.getSchedule()
@@ -131,6 +143,7 @@ export class NPC extends Component {
         this.fleePath = null
         this.attackTarget = null
         this.targetPath = null
+        this.teleporterTarget = null
         // this.followTarget = null
     }
 
@@ -340,6 +353,38 @@ export class NPC extends Component {
         return LocationManager.instance.currentLocation
                 .findPath(start, end, this.pathFindingHeuristic)
                 ?.map(pt => this.tilePtToStandingPos(pt)).slice(1)  // slice(1) because we don't need the start in the path
+    }
+
+    private teleporterTarget: Teleporter
+    private findTeleporter(uuid: string) {
+        if (this.teleporterTarget?.to !== uuid) {
+            console.log(uuid)
+            this.teleporterTarget = this.dude.location.getTeleporter(uuid)
+            // console.log(this.teleporterTarget)
+        }
+    }
+    private goToTeleporter(updateData: UpdateData) {
+        if (!this.teleporterTarget) {
+            // console.log("didn't find teleporter")
+            return
+        }
+        const tilePt = pixelPtToTilePt(this.teleporterTarget.pos)
+        this.walkTo(tilePt, updateData)
+        if (this.dude.standingPosition.distanceTo(this.teleporterTarget.pos) < 20) {
+            console.log("found teleporter")
+        }
+    }
+
+    private findHomeLocation() {
+        const houses = LocationManager.instance.currentLocation.getElementsOfType(ElementType.HOUSE)
+                .map(el => el.entity.getComponent(House))
+                .filter(house => house.getResident() === this.dude.uuid)
+
+        // console.log(houses)
+
+        if (houses.length > 0) {
+            return LocationManager.instance.get(houses[0].locationUUID)
+        }
     }
 
     private tilePtToStandingPos(tilePt: Point) {

@@ -23,11 +23,15 @@ import { Shield } from "./weapons/Shield"
 import { Weapon } from "./weapons/Weapon"
 import { WeaponType } from "./weapons/WeaponType"
 import { WeaponFactory } from "./weapons/WeaponFactory"
+import { WorldLocation } from "../world/WorldLocation"
 
 export class Dude extends Component implements DialogueSource {
 
     static readonly PLAYER_COLLISION_LAYER = "playa"
     static readonly NPC_COLLISION_LAYER = "npc"
+
+    // managed by WorldLocation/LocationManager classes
+    location: WorldLocation
     
     blob: object
     readonly uuid: string
@@ -366,7 +370,7 @@ export class Dude extends Component implements DialogueSource {
     }
 
     delete() {
-        LocationManager.instance.getLocations().forEach(l => l.dudes.delete(this))
+        this.location.dudes.delete(this)
         super.delete()
     }
 
