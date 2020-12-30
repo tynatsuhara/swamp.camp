@@ -4,15 +4,15 @@ import { Point } from "../../engine/point"
 import { Lists } from "../../engine/util/Lists"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
+import { ElementType } from "../world/elements/Elements"
+import { House } from "../world/elements/House"
 import { LocationManager } from "../world/LocationManager"
 import { PointLightMaskRenderer } from "../world/PointLightMaskRenderer"
+import { Teleporter } from "../world/Teleporter"
+import { TimeUnit } from "../world/TimeUnit"
 import { Dude } from "./Dude"
 import { NPCSchedule, NPCSchedules, NPCScheduleType } from "./NPCSchedule"
 import { Player } from "./Player"
-import { TimeUnit } from "../world/TimeUnit"
-import { House } from "../world/elements/House"
-import { ElementType } from "../world/elements/Elements"
-import { Teleporter } from "../world/Teleporter"
 
 /**
  * Shared logic for different types of NPCs. These should be invoked by an NPC controller component.
@@ -93,6 +93,7 @@ export class NPC extends Component {
             )
         } else if (schedule.type === NPCScheduleType.DEFAULT_VILLAGER) {
             const home = this.findHomeLocation()
+            // TODO: decide what default villager behavior should be
             if (this.dude.location === home) {
                 // roam around inside
                 this.doFlee(updateData, 0.5)
@@ -122,11 +123,15 @@ export class NPC extends Component {
         if (schedule.type === NPCScheduleType.GO_TO_SPOT) {
             this.forceMoveToTilePosition(Point.fromString(schedule["p"]))
         } else if (schedule.type === NPCScheduleType.DEFAULT_VILLAGER) {
-            // TODO
+            // TODO 
+            const home = this.findHomeLocation()
+            if (this.dude.location !== home) {
+                this.useTeleporter(LocationManager.instance.exterior().getTeleporter(home.uuid))
+            }
         }
     }
 
-    setSchedule(schedule) {
+    setSchedule(schedule: NPCSchedule) {
         this.dude.blob[NPCSchedules.SCHEDULE_KEY] = schedule
     }
 
@@ -358,29 +363,28 @@ export class NPC extends Component {
     private teleporterTarget: Teleporter
     private findTeleporter(uuid: string) {
         if (this.teleporterTarget?.to !== uuid) {
-            console.log(uuid)
             this.teleporterTarget = this.dude.location.getTeleporter(uuid)
-            // console.log(this.teleporterTarget)
         }
     }
     private goToTeleporter(updateData: UpdateData) {
         if (!this.teleporterTarget) {
-            // console.log("didn't find teleporter")
             return
         }
         const tilePt = pixelPtToTilePt(this.teleporterTarget.pos)
         this.walkTo(tilePt, updateData)
         if (this.dude.standingPosition.distanceTo(this.teleporterTarget.pos) < 20) {
-            this.dude.location.npcUseTeleporter(this.dude, this.teleporterTarget)
+            this.useTeleporter(this.teleporterTarget)
         }
+    }
+    private useTeleporter(teleporter: Teleporter) {
+        this.dude.location.npcUseTeleporter(this.dude, teleporter)
+        this.clearExistingAIState()
     }
 
     private findHomeLocation() {
-        const houses = LocationManager.instance.currentLocation.getElementsOfType(ElementType.HOUSE)
+        const houses = LocationManager.instance.exterior().getElementsOfType(ElementType.HOUSE)
                 .map(el => el.entity.getComponent(House))
                 .filter(house => house.getResident() === this.dude.uuid)
-
-        // console.log(houses)
 
         if (houses.length > 0) {
             return LocationManager.instance.get(houses[0].locationUUID)

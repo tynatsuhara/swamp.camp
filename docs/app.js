@@ -5047,7 +5047,6 @@ System.register("game/world/events/QueuedEvent", ["game/characters/DudeFactory",
             exports_70("QueuedEventType", QueuedEventType);
             exports_70("EVENT_QUEUE_HANDLERS", EVENT_QUEUE_HANDLERS = (_a = {},
                 _a[QueuedEventType.SIMULATE_NPCS] = function () {
-                    console.log("simulating NPCs");
                     LocationManager_7.LocationManager.instance.getLocations()
                         .filter(function (l) { return l !== LocationManager_7.LocationManager.instance.currentLocation; })
                         .flatMap(function (l) { return Array.from(l.dudes); })
@@ -6521,9 +6520,9 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
         }
     };
 });
-System.register("game/characters/NPC", ["engine/component", "engine/point", "engine/util/Lists", "game/graphics/Tilesets", "game/ui/DialogueDisplay", "game/world/LocationManager", "game/world/PointLightMaskRenderer", "game/characters/Dude", "game/characters/NPCSchedule", "game/characters/Player", "game/world/TimeUnit", "game/world/elements/House"], function (exports_83, context_83) {
+System.register("game/characters/NPC", ["engine/component", "engine/point", "engine/util/Lists", "game/graphics/Tilesets", "game/ui/DialogueDisplay", "game/world/elements/House", "game/world/LocationManager", "game/world/PointLightMaskRenderer", "game/world/TimeUnit", "game/characters/Dude", "game/characters/NPCSchedule", "game/characters/Player"], function (exports_83, context_83) {
     "use strict";
-    var component_19, point_44, Lists_1, Tilesets_22, DialogueDisplay_3, LocationManager_11, PointLightMaskRenderer_2, Dude_1, NPCSchedule_2, Player_8, TimeUnit_5, House_5, NPC;
+    var component_19, point_44, Lists_1, Tilesets_22, DialogueDisplay_3, House_5, LocationManager_11, PointLightMaskRenderer_2, TimeUnit_5, Dude_1, NPCSchedule_2, Player_8, NPC;
     var __moduleName = context_83 && context_83.id;
     return {
         setters: [
@@ -6542,11 +6541,17 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
             function (DialogueDisplay_3_1) {
                 DialogueDisplay_3 = DialogueDisplay_3_1;
             },
+            function (House_5_1) {
+                House_5 = House_5_1;
+            },
             function (LocationManager_11_1) {
                 LocationManager_11 = LocationManager_11_1;
             },
             function (PointLightMaskRenderer_2_1) {
                 PointLightMaskRenderer_2 = PointLightMaskRenderer_2_1;
+            },
+            function (TimeUnit_5_1) {
+                TimeUnit_5 = TimeUnit_5_1;
             },
             function (Dude_1_1) {
                 Dude_1 = Dude_1_1;
@@ -6556,12 +6561,6 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
             },
             function (Player_8_1) {
                 Player_8 = Player_8_1;
-            },
-            function (TimeUnit_5_1) {
-                TimeUnit_5 = TimeUnit_5_1;
-            },
-            function (House_5_1) {
-                House_5 = House_5_1;
             }
         ],
         execute: function () {
@@ -6635,6 +6634,7 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
                     }
                     else if (schedule.type === 4 /* DEFAULT_VILLAGER */) {
                         var home = this.findHomeLocation();
+                        // TODO: decide what default villager behavior should be
                         if (this.dude.location === home) {
                             // roam around inside
                             this.doFlee(updateData, 0.5);
@@ -6659,7 +6659,11 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
                         this.forceMoveToTilePosition(point_44.Point.fromString(schedule["p"]));
                     }
                     else if (schedule.type === 4 /* DEFAULT_VILLAGER */) {
-                        // TODO
+                        // TODO 
+                        var home = this.findHomeLocation();
+                        if (this.dude.location !== home) {
+                            this.useTeleporter(LocationManager_11.LocationManager.instance.exterior().getTeleporter(home.uuid));
+                        }
                     }
                 };
                 NPC.prototype.setSchedule = function (schedule) {
@@ -6859,28 +6863,28 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
                 NPC.prototype.findTeleporter = function (uuid) {
                     var _a;
                     if (((_a = this.teleporterTarget) === null || _a === void 0 ? void 0 : _a.to) !== uuid) {
-                        console.log(uuid);
                         this.teleporterTarget = this.dude.location.getTeleporter(uuid);
-                        // console.log(this.teleporterTarget)
                     }
                 };
                 NPC.prototype.goToTeleporter = function (updateData) {
                     if (!this.teleporterTarget) {
-                        // console.log("didn't find teleporter")
                         return;
                     }
                     var tilePt = Tilesets_22.pixelPtToTilePt(this.teleporterTarget.pos);
                     this.walkTo(tilePt, updateData);
                     if (this.dude.standingPosition.distanceTo(this.teleporterTarget.pos) < 20) {
-                        this.dude.location.npcUseTeleporter(this.dude, this.teleporterTarget);
+                        this.useTeleporter(this.teleporterTarget);
                     }
+                };
+                NPC.prototype.useTeleporter = function (teleporter) {
+                    this.dude.location.npcUseTeleporter(this.dude, teleporter);
+                    this.clearExistingAIState();
                 };
                 NPC.prototype.findHomeLocation = function () {
                     var _this = this;
-                    var houses = LocationManager_11.LocationManager.instance.currentLocation.getElementsOfType(6 /* HOUSE */)
+                    var houses = LocationManager_11.LocationManager.instance.exterior().getElementsOfType(6 /* HOUSE */)
                         .map(function (el) { return el.entity.getComponent(House_5.House); })
                         .filter(function (house) { return house.getResident() === _this.dude.uuid; });
-                    // console.log(houses)
                     if (houses.length > 0) {
                         return LocationManager_11.LocationManager.instance.get(houses[0].locationUUID);
                     }
@@ -7118,7 +7122,8 @@ System.register("game/world/WorldLocation", ["engine/point", "engine/util/Grid",
                     this.dudes.delete(dude);
                     linkedLocation.dudes.add(dude);
                     dude.location = linkedLocation;
-                    dude.moveTo(teleporter.pos, true);
+                    var offset = dude.standingPosition.minus(dude.position);
+                    dude.moveTo(linkedPosition.minus(offset), true);
                 };
                 WorldLocation.prototype.useTeleporter = function (to, id) {
                     if (id === void 0) { id = null; }

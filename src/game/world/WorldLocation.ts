@@ -152,7 +152,9 @@ export class WorldLocation {
         this.dudes.delete(dude)
         linkedLocation.dudes.add(dude)
         dude.location = linkedLocation
-        dude.moveTo(teleporter.pos, true)
+
+        const offset = dude.standingPosition.minus(dude.position)
+        dude.moveTo(linkedPosition.minus(offset), true)
     }
 
     useTeleporter(to: string, id: string = null) {
