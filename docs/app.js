@@ -5096,10 +5096,10 @@ System.register("game/world/events/QueuedEvent", ["game/characters/DudeFactory",
                     }
                     berto.entity.getComponent(NPC_1.NPC).setSchedule(data.normalSchedule);
                     var villager = DudeFactory_1.DudeFactory.instance.new(7 /* VILLAGER */, MapGenerator_2.MapGenerator.ENTER_LAND_POS, LocationManager_7.LocationManager.instance.exterior());
-                    var house = LocationManager_7.LocationManager.instance.currentLocation.getElementsOfType(6 /* HOUSE */)
+                    var house = LocationManager_7.LocationManager.instance.exterior().getElementsOfType(6 /* HOUSE */)
                         .map(function (e) { return e.entity.getComponent(House_3.House); })
                         .filter(function (house) { return house.isResidentPending(); })[0];
-                    house.setResident(villager.uuid);
+                    house === null || house === void 0 ? void 0 : house.setResident(villager.uuid);
                 },
                 _a));
         }

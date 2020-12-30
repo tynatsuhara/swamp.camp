@@ -82,9 +82,9 @@ export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => 
         berto.entity.getComponent(NPC).setSchedule(data.normalSchedule)
 
         const villager = DudeFactory.instance.new(DudeType.VILLAGER, MapGenerator.ENTER_LAND_POS, LocationManager.instance.exterior())
-        const house = LocationManager.instance.currentLocation.getElementsOfType(ElementType.HOUSE)
+        const house = LocationManager.instance.exterior().getElementsOfType(ElementType.HOUSE)
                 .map(e => e.entity.getComponent(House))
                 .filter(house => house.isResidentPending())[0]
-        house.setResident(villager.uuid)
+        house?.setResident(villager.uuid)
     },
 }
