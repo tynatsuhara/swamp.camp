@@ -20,6 +20,7 @@ import { Color } from "./Color"
 import { Controls } from "../Controls"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
 import { saveManager } from "../SaveManager"
+import { LocationManager } from "../world/LocationManager"
 
 export class InventoryDisplay extends Component {
 
@@ -91,7 +92,7 @@ export class InventoryDisplay extends Component {
             let actionString: string = null
             let actionFn: () => void
 
-            if (item.element !== null) {
+            if (item.element !== null && LocationManager.instance.currentLocation.allowPlacing) {
                 actionString = 'place'
                 actionFn = () => {
                     this.close()
