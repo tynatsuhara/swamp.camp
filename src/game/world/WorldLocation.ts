@@ -39,9 +39,11 @@ export class WorldLocation {
     private teleporters: { [key: string]: string } = {} 
 
     readonly isInterior: boolean;
+    readonly allowPlacing: boolean
 
-    constructor(isInterior: boolean) {
+    constructor(isInterior: boolean, allowPlacing: boolean) {
         this.isInterior = isInterior
+        this.allowPlacing = allowPlacing
     }
 
     addGroundElement(type: GroundType, pos: Point, data: object = {}): GroundComponent {
@@ -201,7 +203,8 @@ export class WorldLocation {
             elements: this.saveElements(),
             dudes: Array.from(this.dudes).filter(d => d.isAlive && !!d.entity).map(d => d.save()),
             teleporters: this.teleporters,
-            isInterior: this.isInterior
+            isInterior: this.isInterior,
+            allowPlacing: this.allowPlacing,
         }
     }
 
@@ -227,7 +230,7 @@ export class WorldLocation {
 
     static load(saveState: LocationSaveState): WorldLocation {
         // TODO: BUG: RELOADING RETURNS ELEMENTS THAT HAVE BEEN DESTROYED
-        const n = new WorldLocation(saveState.isInterior)
+        const n = new WorldLocation(saveState.isInterior, saveState.allowPlacing)
         n._uuid = saveState.uuid
         n.teleporters = saveState.teleporters
         saveState.elements.forEach(el => n.addElement(el.type, Point.fromString(el.pos), el.obj))

@@ -23,13 +23,12 @@ export class LocationManager {
         return this.locations.get(uuid)
     }
 
-    newLocation(isInterior: boolean) {
-        const l = new WorldLocation(isInterior)
-        this.locations.set(l.uuid, l)
+    add(location: WorldLocation) {
+        this.locations.set(location.uuid, location)
         if (!this.currentLocation) {
-            this.currentLocation = l
+            this.currentLocation = location
         }
-        return l
+        return location
     }
 
     exterior(): WorldLocation {
@@ -43,14 +42,14 @@ export class LocationManager {
     
     save(): LocationManagerSaveState {
         return {
-            locations: Array.from(this.locations.values()).map(l => l.save()),
+            values: Array.from(this.locations.values()).map(l => l.save()),
             currentLocationUUID: this.currentLocation.uuid
         }
     }
 
     initialize(saveState: LocationManagerSaveState) {
         this.locations = new Map()
-        saveState.locations.forEach(l => {
+        saveState.values.forEach(l => {
             const loadedLocation = WorldLocation.load(l)
             this.locations.set(l.uuid, loadedLocation)
         })

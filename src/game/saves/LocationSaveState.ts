@@ -9,4 +9,5 @@ export class LocationSaveState {
     dudes: DudeSaveState[]
     teleporters: { [key: string]: string }
     isInterior: boolean
+    allowPlacing: boolean
 }

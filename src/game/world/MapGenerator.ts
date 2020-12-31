@@ -1,14 +1,12 @@
 import { Point } from "../../engine/point"
-import { ConnectingTile } from "../../engine/tiles/ConnectingTile"
-import { BoxCollider } from "../../engine/collision/BoxCollider"
-import { WorldLocation } from "./WorldLocation"
-import { TentColor } from "./elements/Tent"
-import { ElementType } from "./elements/Elements"
-import { LocationManager } from "./LocationManager"
-import { GroundType, Ground } from "./ground/Ground"
-import { Noise } from "../../engine/util/Noise"
 import { Grid } from "../../engine/util/Grid"
+import { Noise } from "../../engine/util/Noise"
 import { TILE_SIZE } from "../graphics/Tilesets"
+import { ElementType } from "./elements/Elements"
+import { TentColor } from "./elements/Tent"
+import { GroundType } from "./ground/Ground"
+import { LocationManager } from "./LocationManager"
+import { WorldLocation } from "./WorldLocation"
 
 
 export class MapGenerator {
@@ -28,7 +26,7 @@ export class MapGenerator {
     static readonly MAP_SIZE = 70
     static readonly ENTER_LAND_POS = new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE).plusY(-TILE_SIZE * 10).plusX(TILE_SIZE * 2)
 
-    private readonly location = LocationManager.instance.newLocation(false)
+    private readonly location = LocationManager.instance.add(new WorldLocation(false, true))
     private readonly tentPos = new Point(-3, -3)
 
     generateExterior(): WorldLocation {

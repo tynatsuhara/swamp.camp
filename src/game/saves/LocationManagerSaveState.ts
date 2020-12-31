@@ -1,5 +1,5 @@
 import { LocationSaveState } from "./LocationSaveState"
 export class LocationManagerSaveState {
-    locations: LocationSaveState[]
+    values: LocationSaveState[]
     currentLocationUUID: string
 }

@@ -7,7 +7,8 @@ import { Teleporter } from "../Teleporter"
 import { WorldLocation } from "../WorldLocation"
 
 export const makeHouseInterior = (outside: WorldLocation): WorldLocation => {
-    const l = LocationManager.instance.newLocation(true)
+    const l = new WorldLocation(true, true)
+    LocationManager.instance.add(l)
     const dimensions = new Point(7, 5)
     const interactablePos = new Point(dimensions.x/2, dimensions.y).times(TILE_SIZE)
     const teleporter: Teleporter = { to: outside.uuid, pos: interactablePos.plusY(-4) }

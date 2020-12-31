@@ -10,7 +10,9 @@ import { TentColor } from "../elements/Tent"
 import { AsciiInteriorBuilder } from "./AsciiInteriorBuilder"
 
 export const makeTentInterior = (outside: WorldLocation, color: TentColor): WorldLocation => {
-    const l = LocationManager.instance.newLocation(true)
+    const isPlayerTent = color === TentColor.BLUE
+    const l = new WorldLocation(true, isPlayerTent)
+    LocationManager.instance.add(l)
 
     const interactablePos = new Point(2.5, 4).times(TILE_SIZE)
     const teleporter: Teleporter = { to: outside.uuid, pos: interactablePos.plusY(-4) }
