@@ -56,13 +56,23 @@ export class Player extends Component {
         this.dude.move(
             updateData, 
             new Point(dx, dy), 
-            updateData.input.mousePos.x - this.dude.standingPosition.x
+            this.dude.rolling() ? 0 : updateData.input.mousePos.x - this.dude.standingPosition.x,
+            this.dude.rolling() ? 2 : 1
         )
 
         // PointLightMaskRenderer.instance.addLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset), 100)
 
         if (UIStateManager.instance.isMenuOpen) {
             return
+        }
+
+        const rollingBackwards = (dx > 0 && updateData.input.mousePos.x < this.dude.standingPosition.x)
+                || (dx < 0 && updateData.input.mousePos.x > this.dude.standingPosition.x)
+
+        if (updateData.input.isKeyDown(InputKey.SPACE) 
+                && (dx !== 0 || dy !== 0)
+                && !rollingBackwards) {
+            this.dude.roll()
         }
 
         if (updateData.input.isKeyDown(InputKey.F)) {

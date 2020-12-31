@@ -9403,10 +9403,17 @@ System.register("game/characters/Player", ["engine/component", "engine/point", "
                     //       - instead of removing by position, map the light to a source object and remove based on that
                     // const lightPosOffset = -TILE_SIZE/2
                     // PointLightMaskRenderer.instance.removeLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset))
-                    this.dude.move(updateData, new point_60.Point(dx, dy), updateData.input.mousePos.x - this.dude.standingPosition.x);
+                    this.dude.move(updateData, new point_60.Point(dx, dy), this.dude.rolling() ? 0 : updateData.input.mousePos.x - this.dude.standingPosition.x, this.dude.rolling() ? 2 : 1);
                     // PointLightMaskRenderer.instance.addLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset), 100)
                     if (UIStateManager_15.UIStateManager.instance.isMenuOpen) {
                         return;
+                    }
+                    var rollingBackwards = (dx > 0 && updateData.input.mousePos.x < this.dude.standingPosition.x)
+                        || (dx < 0 && updateData.input.mousePos.x > this.dude.standingPosition.x);
+                    if (updateData.input.isKeyDown(32 /* SPACE */)
+                        && (dx !== 0 || dy !== 0)
+                        && !rollingBackwards) {
+                        this.dude.roll();
                     }
                     if (updateData.input.isKeyDown(70 /* F */)) {
                         this.dude.weapon.toggleSheathed();
@@ -11185,9 +11192,9 @@ System.register("game/characters/weapons/WeaponFactory", ["game/characters/weapo
         }
     };
 });
-System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine/component", "engine/point", "engine/tiles/AnimatedTileComponent", "engine/tiles/TileTransform", "game/graphics/ImageFilters", "game/graphics/Tilesets", "game/items/Items", "game/ui/DialogueDisplay", "game/ui/DudeInteractIndicator", "game/ui/UIStateManager", "game/world/elements/Interactable", "game/characters/DudeAnimationUtils", "game/characters/Dialogue", "game/characters/weapons/Shield", "game/characters/weapons/WeaponType", "game/characters/weapons/WeaponFactory"], function (exports_128, context_128) {
+System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine/component", "engine/point", "engine/tiles/AnimatedTileComponent", "engine/tiles/TileTransform", "game/graphics/ImageFilters", "game/graphics/Tilesets", "game/items/Items", "game/ui/DialogueDisplay", "game/ui/DudeInteractIndicator", "game/ui/UIStateManager", "game/world/elements/Interactable", "game/characters/Dialogue", "game/characters/DudeAnimationUtils", "game/characters/weapons/Shield", "game/characters/weapons/WeaponFactory", "game/characters/weapons/WeaponType"], function (exports_128, context_128) {
     "use strict";
-    var BoxCollider_9, component_37, point_71, AnimatedTileComponent_5, TileTransform_29, ImageFilters_4, Tilesets_42, Items_7, DialogueDisplay_5, DudeInteractIndicator_5, UIStateManager_16, Interactable_6, DudeAnimationUtils_1, Dialogue_6, Shield_1, WeaponType_9, WeaponFactory_1, Dude;
+    var BoxCollider_9, component_37, point_71, AnimatedTileComponent_5, TileTransform_29, ImageFilters_4, Tilesets_42, Items_7, DialogueDisplay_5, DudeInteractIndicator_5, UIStateManager_16, Interactable_6, Dialogue_6, DudeAnimationUtils_1, Shield_1, WeaponFactory_1, WeaponType_9, Dude;
     var __moduleName = context_128 && context_128.id;
     return {
         setters: [
@@ -11227,20 +11234,20 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
             function (Interactable_6_1) {
                 Interactable_6 = Interactable_6_1;
             },
-            function (DudeAnimationUtils_1_1) {
-                DudeAnimationUtils_1 = DudeAnimationUtils_1_1;
-            },
             function (Dialogue_6_1) {
                 Dialogue_6 = Dialogue_6_1;
+            },
+            function (DudeAnimationUtils_1_1) {
+                DudeAnimationUtils_1 = DudeAnimationUtils_1_1;
             },
             function (Shield_1_1) {
                 Shield_1 = Shield_1_1;
             },
-            function (WeaponType_9_1) {
-                WeaponType_9 = WeaponType_9_1;
-            },
             function (WeaponFactory_1_1) {
                 WeaponFactory_1 = WeaponFactory_1_1;
+            },
+            function (WeaponType_9_1) {
+                WeaponType_9 = WeaponType_9_1;
             }
         ],
         execute: function () {
@@ -11250,6 +11257,8 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                     var _this = _super.call(this) || this;
                     _this.relativeColliderPos = new point_71.Point(3, 15);
                     _this.knockIntervalCallback = 0;
+                    _this.isRolling = false;
+                    _this.canRoll = true;
                     _this.uuid = uuid;
                     _this.type = type;
                     _this.factions = factions;
@@ -11330,9 +11339,15 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                     configurable: true
                 });
                 Dude.prototype.update = function (updateData) {
-                    // All other transforms (eg the weapon) are positioned relative to the animation
-                    this.animation.transform.position = this.position.plus(this.isAlive ? new point_71.Point(0, 0) : this.deathOffset);
                     this.animation.transform.depth = this.collider.position.y + this.collider.dimensions.y;
+                    // All other transforms (eg the weapon) are positioned relative to the animation
+                    this.animation.transform.position = this.position;
+                    if (!this.isAlive) {
+                        this.animation.transform.position = this.animation.transform.position.plus(this.deathOffset);
+                    }
+                    else if (this.isRolling && this.animation.transform.rotation !== 0) {
+                        this.animation.transform.position = this.animation.transform.position.plus(this.rollingOffset);
+                    }
                     this.dialogueInteract.position = this.standingPosition.minus(new point_71.Point(0, 5));
                     this.dialogueInteract.uiOffset = new point_71.Point(0, -Tilesets_42.TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition());
                     this.dialogueInteract.enabled = this.dialogue !== Dialogue_6.EMPTY_DIALOGUE && DialogueDisplay_5.DialogueDisplay.instance.dialogueSource !== this;
@@ -11353,6 +11368,9 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                 });
                 Dude.prototype.damage = function (damage, direction, knockback) {
                     var _a;
+                    if (this.rolling()) {
+                        return;
+                    }
                     // absorb damage if facing the direction of the enemy
                     if (((_a = this.shield) === null || _a === void 0 ? void 0 : _a.isBlocking()) && !this.isFacing(this.standingPosition.plus(direction))) {
                         damage *= .25;
@@ -11490,6 +11508,36 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                     else {
                         this._position = this.collider.moveTo(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos);
                     }
+                };
+                Dude.prototype.roll = function () {
+                    var _this = this;
+                    if (!this.canRoll) {
+                        return;
+                    }
+                    var setRotation = function (rot, offset) {
+                        if (_this.animation.transform.mirrorX) {
+                            _this.animation.transform.rotation = -rot;
+                            _this.rollingOffset = new point_71.Point(-offset.x, offset.y);
+                        }
+                        else {
+                            _this.animation.transform.rotation = rot;
+                            _this.rollingOffset = offset;
+                        }
+                    };
+                    var speed = 80;
+                    this.isRolling = true;
+                    this.canRoll = false;
+                    setRotation(90, new point_71.Point(6, 8));
+                    setTimeout(function () { return setRotation(180, new point_71.Point(0, 14)); }, speed);
+                    setTimeout(function () { return setRotation(270, new point_71.Point(-6, 8)); }, speed * 2);
+                    setTimeout(function () {
+                        setRotation(0, point_71.Point.ZERO);
+                        _this.isRolling = false;
+                    }, speed * 3);
+                    setTimeout(function () { return _this.canRoll = true; }, 750);
+                };
+                Dude.prototype.rolling = function () {
+                    return this.isRolling;
                 };
                 /**
                  * Returns true if these dudes have no factions in common

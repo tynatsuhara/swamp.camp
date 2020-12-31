@@ -15,15 +15,14 @@ import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Interactable } from "../world/elements/Interactable"
-import { LocationManager } from "../world/LocationManager"
+import { WorldLocation } from "../world/WorldLocation"
+import { DialogueSource, EMPTY_DIALOGUE, getDialogue } from "./Dialogue"
 import { DudeAnimationUtils } from "./DudeAnimationUtils"
-import { DialogueSource, getDialogue, EMPTY_DIALOGUE } from "./Dialogue"
 import { DudeFaction, DudeType } from "./DudeFactory"
 import { Shield } from "./weapons/Shield"
 import { Weapon } from "./weapons/Weapon"
-import { WeaponType } from "./weapons/WeaponType"
 import { WeaponFactory } from "./weapons/WeaponFactory"
-import { WorldLocation } from "../world/WorldLocation"
+import { WeaponType } from "./weapons/WeaponType"
 
 export class Dude extends Component implements DialogueSource {
 
@@ -138,9 +137,15 @@ export class Dude extends Component implements DialogueSource {
     }
 
     update(updateData: UpdateData) {
-        // All other transforms (eg the weapon) are positioned relative to the animation
-        this.animation.transform.position = this.position.plus(this.isAlive ? new Point(0, 0) : this.deathOffset)
         this.animation.transform.depth = this.collider.position.y + this.collider.dimensions.y
+
+        // All other transforms (eg the weapon) are positioned relative to the animation
+        this.animation.transform.position = this.position
+        if (!this.isAlive) {
+            this.animation.transform.position = this.animation.transform.position.plus(this.deathOffset)
+        } else if (this.isRolling && this.animation.transform.rotation !== 0) {
+            this.animation.transform.position = this.animation.transform.position.plus(this.rollingOffset)
+        }
 
         this.dialogueInteract.position = this.standingPosition.minus(new Point(0, 5))
         this.dialogueInteract.uiOffset = new Point(0, -TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition())
@@ -160,6 +165,10 @@ export class Dude extends Component implements DialogueSource {
     get isAlive() { return this._health > 0 }
 
     damage(damage: number, direction: Point, knockback: number) {
+        if (this.rolling()) {
+            return
+        }
+
         // absorb damage if facing the direction of the enemy
         if (this.shield?.isBlocking() && !this.isFacing(this.standingPosition.plus(direction))) {
             damage *= .25
@@ -316,6 +325,42 @@ export class Dude extends Component implements DialogueSource {
         } else {
             this._position = this.collider.moveTo(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos)
         }
+    }
+
+    private isRolling = false
+    private canRoll = true
+    private rollingOffset: Point
+    roll() {
+        if (!this.canRoll) {
+            return
+        }
+
+        const setRotation = (rot: number, offset: Point) => {
+            if (this.animation.transform.mirrorX) {
+                this.animation.transform.rotation = -rot
+                this.rollingOffset = new Point(-offset.x, offset.y)
+            } else {
+                this.animation.transform.rotation = rot
+                this.rollingOffset = offset
+            }
+        }
+
+        const speed = 80
+        this.isRolling = true
+        this.canRoll = false
+
+        setRotation(90, new Point(6, 8))
+        setTimeout(() => setRotation(180, new Point(0, 14)), speed)
+        setTimeout(() => setRotation(270, new Point(-6, 8)), speed * 2)
+        setTimeout(() => {
+            setRotation(0, Point.ZERO)
+            this.isRolling = false
+        }, speed * 3)
+
+        setTimeout(() => this.canRoll = true, 750)
+    }
+    rolling() {
+        return this.isRolling
     }
 
     /**
