@@ -8211,7 +8211,8 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/util/Grid", 
                         var pt = new point_52.Point(Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_SIZE / 2, Math.floor(Math.random() * (MapGenerator.MAP_SIZE - 1)) - MapGenerator.MAP_SIZE / 2);
                         var occupiedPoints = [pt, pt.plus(new point_52.Point(0, 1))];
                         if (occupiedPoints.every(function (p) { return !_this.location.ground.get(p); })) {
-                            this.location.addElement(Math.random() < .7 ? 1 /* TREE_POINTY */ : 0 /* TREE_ROUND */, pt);
+                            this.location.addElement(Math.random() < .7 ? 1 /* TREE_POINTY */ : 0 /* TREE_ROUND */, pt, { s: 3 } // make adult trees
+                            );
                         }
                     }
                 };

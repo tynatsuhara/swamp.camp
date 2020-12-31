@@ -60,7 +60,8 @@ export class MapGenerator {
             if (occupiedPoints.every(p => !this.location.ground.get(p))) {
                 this.location.addElement(
                     Math.random() < .7 ? ElementType.TREE_POINTY : ElementType.TREE_ROUND,
-                    pt
+                    pt,
+                    { s: 3 }  // make adult trees
                 )
             }
         }
