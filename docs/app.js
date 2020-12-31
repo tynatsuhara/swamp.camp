@@ -9403,7 +9403,7 @@ System.register("game/characters/Player", ["engine/component", "engine/point", "
                     //       - instead of removing by position, map the light to a source object and remove based on that
                     // const lightPosOffset = -TILE_SIZE/2
                     // PointLightMaskRenderer.instance.removeLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset))
-                    this.dude.move(updateData, new point_60.Point(dx, dy), this.dude.rolling() ? 0 : updateData.input.mousePos.x - this.dude.standingPosition.x, this.dude.rolling() ? 2 : 1);
+                    this.dude.move(updateData, new point_60.Point(dx, dy), this.dude.rolling() ? 0 : updateData.input.mousePos.x - this.dude.standingPosition.x, 1 + (this.dude.rolling() ? 1.2 : 0));
                     // PointLightMaskRenderer.instance.addLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset), 100)
                     if (UIStateManager_15.UIStateManager.instance.isMenuOpen) {
                         return;

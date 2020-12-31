@@ -57,7 +57,7 @@ export class Player extends Component {
             updateData, 
             new Point(dx, dy), 
             this.dude.rolling() ? 0 : updateData.input.mousePos.x - this.dude.standingPosition.x,
-            this.dude.rolling() ? 2 : 1
+            1 + (this.dude.rolling() ? 1.2 : 0)
         )
 
         // PointLightMaskRenderer.instance.addLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset), 100)
