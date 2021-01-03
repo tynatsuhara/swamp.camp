@@ -560,6 +560,10 @@ System.register("engine/collision/Collider", ["engine/component", "engine/debug"
                     }
                     return this.position;
                 };
+                Collider.prototype.forceSetPosition = function (point) {
+                    this._position = point;
+                    return this.position;
+                };
                 Collider.prototype.getRenderMethods = function () {
                     if (!debug_1.debug.showColliders) {
                         return [];
@@ -11501,13 +11505,12 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                  * @param point World point where the dude will be moved, unless they hit a collider (with skipColliderCheck = false)
                  */
                 Dude.prototype.moveTo = function (point, skipColliderCheck) {
+                    var _this = this;
                     if (skipColliderCheck === void 0) { skipColliderCheck = false; }
-                    if (skipColliderCheck) {
-                        this._position = point;
-                    }
-                    else {
-                        this._position = this.collider.moveTo(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos);
-                    }
+                    var moveFn = skipColliderCheck
+                        ? function (pos) { return _this.collider.forceSetPosition(pos); }
+                        : function (pos) { return _this.collider.moveTo(pos); };
+                    this._position = moveFn(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos);
                 };
                 Dude.prototype.roll = function () {
                     var _this = this;

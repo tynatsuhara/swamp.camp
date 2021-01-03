@@ -320,11 +320,10 @@ export class Dude extends Component implements DialogueSource {
      * @param point World point where the dude will be moved, unless they hit a collider (with skipColliderCheck = false)
      */
     moveTo(point: Point, skipColliderCheck = false) {
-        if (skipColliderCheck) {
-            this._position = point
-        } else {
-            this._position = this.collider.moveTo(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos)
-        }
+        const moveFn = skipColliderCheck 
+            ? (pos: Point) => this.collider.forceSetPosition(pos)
+            : (pos: Point) => this.collider.moveTo(pos)
+        this._position = moveFn(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos)
     }
 
     private isRolling = false

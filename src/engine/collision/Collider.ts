@@ -49,6 +49,11 @@ export abstract class Collider extends Component {
         return this.position
     }
 
+    forceSetPosition(point: Point): Point {
+        this._position = point
+        return this.position
+    }
+
     getRenderMethods(): RenderMethod[] {
         if (!debug.showColliders) {
             return []
