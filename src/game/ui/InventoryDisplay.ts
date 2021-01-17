@@ -92,19 +92,21 @@ export class InventoryDisplay extends Component {
             let actionString: string = null
             let actionFn: () => void
 
+            const decrementStack = () => {
+                if (stack.count === 1) {
+                    inv[hoverIndex] = null
+                } else {
+                    stack.count--
+                }
+            }
+
             if (item.element !== null && LocationManager.instance.currentLocation.allowPlacing) {
                 actionString = 'place'
                 actionFn = () => {
                     this.close()
                     PlaceElementDisplay.instance.startPlacing(
                         item.element, 
-                        () => {
-                            if (stack.count === 1) {
-                                inv[hoverIndex] = null
-                            } else {
-                                stack.count--
-                            }
-                        }
+                        decrementStack
                     )
                 }
             } else if (!!item.equippable && Player.instance.dude.weaponType !== item.equippable) {
@@ -112,6 +114,12 @@ export class InventoryDisplay extends Component {
                 actionFn = () => {
                     this.close()
                     Player.instance.dude.setWeapon(item.equippable)
+                }
+            } else if (!!item.consumable) {
+                actionString = 'eat'
+                actionFn = () => {
+                    item.consumable()
+                    decrementStack()
                 }
             }
 

@@ -85,4 +85,14 @@ export class Point {
     apply(fn: (n: number) => number) {
         return new Point(fn(this.x), fn(this.y))
     }
+
+    /**
+     * Returns a new point which has been slightly shifted a random amount
+     * @param xRandom The new x will be shifted a relative distance of [-xRandom, xRandom]
+     * @param yRandom The new y will be shifted a relative distance of [-yRandom, yRandom]
+     *                If omitted, this will be the same as xRandom
+     */
+    randomlyShifted(xRandom: number, yRandom: number = xRandom) {
+        return this.plus(new Point(xRandom - Math.random() * xRandom * 2, yRandom - Math.random() * yRandom * 2))
+    }
 }

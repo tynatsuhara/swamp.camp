@@ -132,7 +132,7 @@ export const ITEM_METADATA_MAP = {
         displayName: "Mushroom",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("mushroom"), 
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("mushroom"),
-        // element: ElementType.TREE_POINTY  // TODO make placeable
+        element: ElementType.MUSHROOM,
         consumable: () => Player.instance.dude.heal(1)
     }),
     // TODO add other weapons

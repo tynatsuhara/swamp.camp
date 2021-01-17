@@ -15,7 +15,13 @@ export class HittableResource extends Hittable {
     readonly maxResources: number
     private itemSupplier: () => Item[]    
 
-    constructor(position: Point, tileTransforms: TileTransform[], freeResources: number, maxResources: number, itemSupplier: () => Item[]) {
+    constructor(
+        position: Point, 
+        tileTransforms: TileTransform[], 
+        freeResources: number, 
+        maxResources: number, 
+        itemSupplier: () => Item[]
+    ) {
         super(position, tileTransforms, hitDir => this.hitCallback(hitDir))
         this.freeResources = freeResources
         this.maxResources = maxResources
@@ -37,8 +43,7 @@ export class HittableResource extends Hittable {
         for (let i = 0; i < itemsOut; i++) {
             const items = this.itemSupplier()
             for (const item of items) {
-                const randomness = .5
-                const itemDirection = hitDir.plus(new Point(randomness - Math.random() * randomness * 2, randomness - Math.random() * randomness * 2)).normalized()
+                const itemDirection = hitDir.randomlyShifted(.5).normalized()
                 const velocity = itemDirection.times(1 + 3 * Math.random())
                 spawnItem(
                     this.position.plus(new Point(0, TILE_SIZE/2)).plus(itemDirection.times(placeDistance)),  // bottom center, then randomly adjusted
