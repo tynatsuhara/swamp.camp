@@ -49,7 +49,7 @@ export class MushroomFactory extends ElementFactory {
             new Hittable(hittableCenter, [tile.transform], (dir) => {
                 e.selfDestruct()
                 const itemDirection = dir.randomlyShifted(.2).normalized()
-                spawnItem(pos.times(TILE_SIZE).plusY(TILE_SIZE), Item.MUSHROOM, itemDirection.times(3))
+                spawnItem(pos.times(TILE_SIZE).plusY(TILE_SIZE).plusX(TILE_SIZE/2), Item.MUSHROOM, itemDirection.times(5))
             })
         )
 

@@ -7773,7 +7773,7 @@ System.register("game/world/elements/Mushroom", ["engine/point", "game/graphics/
                     e.addComponent(new Hittable_2.Hittable(hittableCenter, [tile.transform], function (dir) {
                         e.selfDestruct();
                         var itemDirection = dir.randomlyShifted(.2).normalized();
-                        Items_4.spawnItem(pos.times(Tilesets_25.TILE_SIZE).plusY(Tilesets_25.TILE_SIZE), 9 /* MUSHROOM */, itemDirection.times(3));
+                        Items_4.spawnItem(pos.times(Tilesets_25.TILE_SIZE).plusY(Tilesets_25.TILE_SIZE).plusX(Tilesets_25.TILE_SIZE / 2), 9 /* MUSHROOM */, itemDirection.times(5));
                     }));
                     e.addComponent(new GrowableShroom(nextGrowthTime, function () {
                         e.selfDestruct();
