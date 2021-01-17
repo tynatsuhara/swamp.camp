@@ -1,5 +1,6 @@
 import { Component } from "../../engine/component"
 import { UpdateData } from "../../engine/engine"
+import { Item } from "../items/Items"
 import { LocationManager } from "../world/LocationManager"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
@@ -18,6 +19,7 @@ export class ShroomNPC extends Component {
 
     awake() {
         this.dude = this.entity.getComponent(Dude)
+        this.dude.droppedItemSupplier = () => Item.MUSHROOM
         this.dude.blob[SIZE] = this.dude.blob[SIZE] || 1
         this.dude.blob[NEXT_GROWTH_TIME] = this.dude.blob[NEXT_GROWTH_TIME] || this.nextGrowthTime()
 

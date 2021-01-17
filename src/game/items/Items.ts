@@ -8,6 +8,7 @@ import { Collider } from "../../engine/collision/Collider"
 import { ElementType } from "../world/elements/Elements"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { WeaponType } from "../characters/weapons/WeaponType"
+import { Player } from "../characters/Player"
 
 export class ItemMetadata {
     readonly displayName: string
@@ -16,6 +17,7 @@ export class ItemMetadata {
     readonly stackLimit: number
     readonly element: ElementType
     readonly equippable: WeaponType
+    readonly consumable: () => void
 
     // TODO maybe make this a builder
     constructor({
@@ -24,14 +26,16 @@ export class ItemMetadata {
         droppedIconSupplier = () => null,
         stackLimit = 99,
         element = null,  // for placing elements
-        equippable = null
+        equippable = null,
+        consumable = null,
     }: {
         displayName: string,
         inventoryIconSupplier: () => StaticTileSource,
         droppedIconSupplier?: () => TileSource,
         stackLimit?: number,
         element?: ElementType,
-        equippable?: WeaponType
+        equippable?: WeaponType,
+        consumable?: () => void,
     }) {
         this.displayName = displayName
         this.droppedIconSupplier = droppedIconSupplier
@@ -39,11 +43,12 @@ export class ItemMetadata {
         this.stackLimit = stackLimit
         this.element = element
         this.equippable = equippable
+        this.consumable = consumable
     }
 }
 
 export const enum Item {
-    COIN, ROCK, WOOD, TENT, CAMPFIRE, IRON, HOUSE, ROUND_SAPLING, POINTY_SAPLING,
+    COIN, ROCK, WOOD, TENT, CAMPFIRE, IRON, HOUSE, ROUND_SAPLING, POINTY_SAPLING, MUSHROOM,
 
     // weapon values should match the WeaponType enum so we can cast them
     KNIFE = WeaponType.KNIFE, 
@@ -122,6 +127,13 @@ export const ITEM_METADATA_MAP = {
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("treePointy"), 
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("treePointySapling"),
         element: ElementType.TREE_POINTY
+    }),
+    [Item.MUSHROOM]: new ItemMetadata({
+        displayName: "Mushroom",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("mushroom"), 
+        droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("mushroom"),
+        // element: ElementType.TREE_POINTY  // TODO make placeable
+        consumable: () => Player.instance.dude.heal(1)
     }),
     // TODO add other weapons
     [Item.AXE]: new ItemMetadata({

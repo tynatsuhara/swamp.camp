@@ -2072,6 +2072,7 @@ System.register("game/graphics/OneBitTileset", ["engine/point", "game/graphics/S
                         ["wood", new point_15.Point(18, 6)],
                         ["rock", new point_15.Point(5, 2)],
                         ["iron", new point_15.Point(31, 0)],
+                        ["mushroom", new point_15.Point(31, 1)],
                         ["house", new point_15.Point(8, 19)],
                         ["invBoxNW", new point_15.Point(16, 19)],
                         ["textBoxNW", new point_15.Point(16, 16)],
@@ -2172,6 +2173,7 @@ System.register("game/graphics/OutdoorTileset", ["engine/point", "game/graphics/
                 __extends(OutdoorTileset, _super);
                 function OutdoorTileset() {
                     return _super.call(this, "images/env_outdoor_recolor.png", new Map([
+                        ["mushroom", new point_16.Point(29, 9)],
                         ["treeRoundSapling", new point_16.Point(27, 8)],
                         ["treeRoundSmall", new point_16.Point(15, 9)],
                         ["treeRoundBase", new point_16.Point(15, 11)],
@@ -9637,6 +9639,7 @@ System.register("game/characters/ShroomNPC", ["engine/component", "game/world/Lo
                 ShroomNPC.prototype.awake = function () {
                     var _this = this;
                     this.dude = this.entity.getComponent(Dude_5.Dude);
+                    this.dude.droppedItemSupplier = function () { return 9 /* MUSHROOM */; };
                     this.dude.blob[SIZE] = this.dude.blob[SIZE] || 1;
                     this.dude.blob[NEXT_GROWTH_TIME] = this.dude.blob[NEXT_GROWTH_TIME] || this.nextGrowthTime();
                     if (this.dude.blob[SIZE] == 3) {
@@ -10145,9 +10148,9 @@ System.register("game/items/DroppedItem", ["engine/collision/BoxCollider", "engi
         }
     };
 });
-System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", "game/world/LocationManager", "game/items/DroppedItem", "engine/point", "game/characters/weapons/WeaponType"], function (exports_118, context_118) {
+System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", "game/world/LocationManager", "game/items/DroppedItem", "engine/point", "game/characters/weapons/WeaponType", "game/characters/Player"], function (exports_118, context_118) {
     "use strict";
-    var _a, Tilesets_37, Entity_25, LocationManager_23, DroppedItem_1, point_64, WeaponType_5, ItemMetadata, ITEM_METADATA_MAP, spawnItem;
+    var _a, Tilesets_37, Entity_25, LocationManager_23, DroppedItem_1, point_64, WeaponType_5, Player_16, ItemMetadata, ITEM_METADATA_MAP, spawnItem;
     var __moduleName = context_118 && context_118.id;
     return {
         setters: [
@@ -10168,6 +10171,9 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
             },
             function (WeaponType_5_1) {
                 WeaponType_5 = WeaponType_5_1;
+            },
+            function (Player_16_1) {
+                Player_16 = Player_16_1;
             }
         ],
         execute: function () {
@@ -10176,13 +10182,14 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
                 function ItemMetadata(_a) {
                     var displayName = _a.displayName, inventoryIconSupplier = _a.inventoryIconSupplier, _b = _a.droppedIconSupplier, droppedIconSupplier = _b === void 0 ? function () { return null; } : _b, _c = _a.stackLimit, stackLimit = _c === void 0 ? 99 : _c, _d = _a.element, element = _d === void 0 ? null : _d, // for placing elements
                     _e = _a.equippable, // for placing elements
-                    equippable = _e === void 0 ? null : _e;
+                    equippable = _e === void 0 ? null : _e, _f = _a.consumable, consumable = _f === void 0 ? null : _f;
                     this.displayName = displayName;
                     this.droppedIconSupplier = droppedIconSupplier;
                     this.inventoryIconSupplier = inventoryIconSupplier;
                     this.stackLimit = stackLimit;
                     this.element = element;
                     this.equippable = equippable;
+                    this.consumable = consumable;
                 }
                 return ItemMetadata;
             }());
@@ -10239,6 +10246,13 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
                     inventoryIconSupplier: function () { return Tilesets_37.Tilesets.instance.oneBit.getTileSource("treePointy"); },
                     droppedIconSupplier: function () { return Tilesets_37.Tilesets.instance.outdoorTiles.getTileSource("treePointySapling"); },
                     element: 1 /* TREE_POINTY */
+                }),
+                _a[9 /* MUSHROOM */] = new ItemMetadata({
+                    displayName: "Mushroom",
+                    inventoryIconSupplier: function () { return Tilesets_37.Tilesets.instance.oneBit.getTileSource("mushroom"); },
+                    droppedIconSupplier: function () { return Tilesets_37.Tilesets.instance.outdoorTiles.getTileSource("mushroom"); },
+                    // element: ElementType.TREE_POINTY  // TODO make placeable
+                    consumable: function () { return Player_16.Player.instance.dude.heal(1); }
                 }),
                 // TODO add other weapons
                 _a[100012 /* AXE */] = new ItemMetadata({
@@ -11260,6 +11274,7 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                 function Dude(uuid, type, factions, characterAnimName, position, weaponType, shieldId, maxHealth, health, speed, inventory, dialogue, blob) {
                     var _this = _super.call(this) || this;
                     _this.relativeColliderPos = new point_71.Point(3, 15);
+                    _this.droppedItemSupplier = function () { return 0 /* COIN */; };
                     _this.knockIntervalCallback = 0;
                     _this.isRolling = false;
                     _this.canRoll = true;
@@ -11404,7 +11419,7 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                     this.deathOffset = this.animation.transform.position.minus(prePos);
                     this.animation.goToAnimation(0);
                     this.animation.paused = true;
-                    setTimeout(function () { return _this.spawnDrop(); }, 100);
+                    setTimeout(function () { return Items_7.spawnItem(_this.standingPosition.minus(new point_71.Point(0, 2)), _this.droppedItemSupplier()); }, 100);
                     this.dropWeapon();
                     setTimeout(function () { return _this.dissolve(); }, 1000);
                 };
@@ -11422,10 +11437,6 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                         }
                         dissolveChance *= 2;
                     }, 200);
-                };
-                Dude.prototype.spawnDrop = function () {
-                    // TODO add velocity
-                    Items_7.spawnItem(this.standingPosition.minus(new point_71.Point(0, 2)), 0 /* COIN */);
                 };
                 Dude.prototype.dropWeapon = function () {
                     // TODO
@@ -11616,7 +11627,7 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
 });
 System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutscenes/CutscenePlayerController", "game/characters/Player", "engine/point", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/world/LocationManager", "game/ui/ControlsUI", "game/characters/dialogues/DipIntro"], function (exports_129, context_129) {
     "use strict";
-    var component_38, CutscenePlayerController_2, Player_16, point_72, Camera_8, CutsceneManager_2, LocationManager_26, ControlsUI_2, DipIntro_3, IntroCutscene;
+    var component_38, CutscenePlayerController_2, Player_17, point_72, Camera_8, CutsceneManager_2, LocationManager_26, ControlsUI_2, DipIntro_3, IntroCutscene;
     var __moduleName = context_129 && context_129.id;
     return {
         setters: [
@@ -11626,8 +11637,8 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
             function (CutscenePlayerController_2_1) {
                 CutscenePlayerController_2 = CutscenePlayerController_2_1;
             },
-            function (Player_16_1) {
-                Player_16 = Player_16_1;
+            function (Player_17_1) {
+                Player_17 = Player_17_1;
             },
             function (point_72_1) {
                 point_72 = point_72_1;
@@ -11687,7 +11698,7 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
                     }, this.PAN_TO_DIP);
                     setTimeout(function () {
                         _this.showControls = true;
-                        Camera_8.Camera.instance.focusOnDude(Player_16.Player.instance.dude);
+                        Camera_8.Camera.instance.focusOnDude(Player_17.Player.instance.dude);
                         _this.waitingForOrcsToDie = true;
                     }, this.PAN_BACK);
                     setTimeout(function () {
