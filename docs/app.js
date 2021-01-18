@@ -8527,6 +8527,8 @@ System.register("game/cutscenes/Camera", ["engine/point", "game/world/MapGenerat
                     enumerable: false,
                     configurable: true
                 });
+                Camera.prototype.shake = function () {
+                };
                 Camera.prototype.focusOnDude = function (dude) {
                     this.dudeTarget = dude;
                     this.pointTarget = null;
