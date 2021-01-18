@@ -2829,17 +2829,17 @@ System.register("engine/util/Lists", [], function (exports_39, context_39) {
                     if (list.length == 0) {
                         return null;
                     }
-                    var smallestAmount = Number.MAX_SAFE_INTEGER;
-                    var smallest;
+                    var biggestAmount = Number.MIN_SAFE_INTEGER;
+                    var biggest;
                     for (var _i = 0, list_2 = list; _i < list_2.length; _i++) {
                         var i = list_2[_i];
                         var amount = fn(i);
-                        if (amount < smallestAmount) {
-                            smallestAmount = amount;
-                            smallest = i;
+                        if (amount > biggestAmount) {
+                            biggestAmount = amount;
+                            biggest = i;
                         }
                     }
-                    return smallest;
+                    return biggest;
                 },
                 oneOf: function (list) {
                     return list[Math.floor(Math.random() * list.length)];
@@ -5927,9 +5927,9 @@ System.register("engine/tiles/NineSlice", ["engine/point", "engine/tiles/TileTra
         }
     };
 });
-System.register("game/ui/Tooltip", ["engine/component", "game/graphics/Tilesets", "engine/point", "engine/renderer/TextRender", "game/ui/Text", "game/ui/UIStateManager"], function (exports_73, context_73) {
+System.register("game/ui/Tooltip", ["engine/component", "game/graphics/Tilesets", "engine/point", "engine/renderer/TextRender", "game/ui/Text", "game/ui/UIStateManager", "engine/util/Lists"], function (exports_73, context_73) {
     "use strict";
-    var component_13, Tilesets_14, point_36, TextRender_4, Text_2, UIStateManager_4, Tooltip;
+    var component_13, Tilesets_14, point_36, TextRender_4, Text_2, UIStateManager_4, Lists_2, Tooltip;
     var __moduleName = context_73 && context_73.id;
     return {
         setters: [
@@ -5950,58 +5950,74 @@ System.register("game/ui/Tooltip", ["engine/component", "game/graphics/Tilesets"
             },
             function (UIStateManager_4_1) {
                 UIStateManager_4 = UIStateManager_4_1;
+            },
+            function (Lists_2_1) {
+                Lists_2 = Lists_2_1;
             }
         ],
         execute: function () {
             Tooltip = /** @class */ (function (_super) {
                 __extends(Tooltip, _super);
-                function Tooltip(text) {
-                    if (text === void 0) { text = null; }
-                    var _this = _super.call(this) || this;
+                function Tooltip() {
+                    var _this = _super !== null && _super.apply(this, arguments) || this;
                     _this.position = new point_36.Point(0, 0);
-                    _this.text = text;
-                    _this.start = function () {
-                        _this.left = _this.entity.addComponent(Tilesets_14.Tilesets.instance.oneBit.getTileSource("tooltipLeft").toComponent());
-                        _this.center = _this.entity.addComponent(Tilesets_14.Tilesets.instance.oneBit.getTileSource("tooltipCenter").toComponent());
-                        _this.right = _this.entity.addComponent(Tilesets_14.Tilesets.instance.oneBit.getTileSource("tooltipRight").toComponent());
-                    };
+                    _this.tiles = [];
                     return _this;
                 }
                 Tooltip.prototype.say = function (text) {
-                    this.text = text;
+                    if (this.rawText === text) {
+                        return;
+                    }
+                    this.clear();
+                    this.rawText = text;
+                    this.text = text.split("\n");
+                    for (var i = 0; i < (this.text.length - 1) * 2 + 1; i++) {
+                        this.left.push(this.entity.addComponent(Tilesets_14.Tilesets.instance.oneBit.getTileSource("tooltipLeft").toComponent()));
+                        this.center.push(this.entity.addComponent(Tilesets_14.Tilesets.instance.oneBit.getTileSource("tooltipCenter").toComponent()));
+                        this.right.push(this.entity.addComponent(Tilesets_14.Tilesets.instance.oneBit.getTileSource("tooltipRight").toComponent()));
+                    }
+                    this.tiles = this.left.concat(this.center, this.right);
                 };
                 Tooltip.prototype.clear = function () {
+                    this.rawText = null;
                     this.text = null;
+                    this.tiles.forEach(function (t) { return t.delete(); });
+                    this.tiles = [];
+                    this.left = [];
+                    this.center = [];
+                    this.right = [];
                 };
                 Tooltip.prototype.update = function (updateData) {
                     var _this = this;
-                    var tiles = [this.left, this.center, this.right];
-                    tiles.forEach(function (t) {
-                        t.enabled = _this.text !== null;
+                    this.tiles.forEach(function (t) {
+                        t.enabled = !!_this.text;
                         t.transform.depth = UIStateManager_4.UIStateManager.UI_SPRITE_DEPTH + 1;
                     });
-                    if (this.text === null) {
+                    if (!this.text) {
                         return;
                     }
-                    var width = this.text.length * Text_2.TEXT_PIXEL_WIDTH;
+                    var longestLineLength = Lists_2.Lists.maxBy(this.text, function (line) { return line.length; }).length;
+                    var width = longestLineLength * Text_2.TEXT_PIXEL_WIDTH;
                     var leftPos = this.position.plus(new point_36.Point(Tilesets_14.TILE_SIZE / 2, -Tilesets_14.TILE_SIZE)).apply(Math.floor);
                     var centerPos = leftPos.plus(new point_36.Point(Tilesets_14.TILE_SIZE, 0));
                     var rightPos = leftPos.plus(new point_36.Point(width - Tilesets_14.TILE_SIZE + Tooltip.margin * 2, 0)).apply(Math.floor);
-                    this.left.transform.position = leftPos;
-                    this.center.transform.position = centerPos;
-                    this.right.transform.position = rightPos;
-                    this.center.transform.dimensions = new point_36.Point(width + Tooltip.margin * 2 - Tilesets_14.TILE_SIZE * 2, Tilesets_14.TILE_SIZE);
+                    var spacing = 6;
+                    this.left.forEach(function (t, i) { return t.transform.position = leftPos.plusY(-i * spacing); });
+                    this.center.forEach(function (t, i) { return t.transform.position = centerPos.plusY(-i * spacing); });
+                    this.right.forEach(function (t, i) { return t.transform.position = rightPos.plusY(-i * spacing); });
+                    this.center.forEach(function (t) { return t.transform.dimensions = new point_36.Point(width + Tooltip.margin * 2 - Tilesets_14.TILE_SIZE * 2, Tilesets_14.TILE_SIZE); });
                     var totalWidth = width + Tooltip.margin * 2;
                     if (this.position.x + totalWidth > updateData.dimensions.x) {
                         // shift left
-                        tiles.forEach(function (t) { return t.transform.position = t.transform.position.plusX(-totalWidth - Tilesets_14.TILE_SIZE); });
+                        this.tiles.forEach(function (t) { return t.transform.position = t.transform.position.plusX(-totalWidth - Tilesets_14.TILE_SIZE); });
                     }
                 };
                 Tooltip.prototype.getRenderMethods = function () {
-                    if (this.text === null) {
+                    var _this = this;
+                    if (!this.text) {
                         return [];
                     }
-                    return [new TextRender_4.TextRender(this.text, this.left.transform.position.plus(Tooltip.textOffset), Text_2.TEXT_SIZE, Text_2.TEXT_FONT, "#62232f" /* DARK_RED */, UIStateManager_4.UIStateManager.UI_SPRITE_DEPTH + 2)];
+                    return this.text.map(function (line, index) { return new TextRender_4.TextRender(line, _this.left[0].transform.position.plus(Tooltip.textOffset).plusY((_this.text.length - index - 1) * -(Text_2.TEXT_SIZE + 4)), Text_2.TEXT_SIZE, Text_2.TEXT_FONT, "#62232f" /* DARK_RED */, UIStateManager_4.UIStateManager.UI_SPRITE_DEPTH + 2); });
                 };
                 Tooltip.margin = 6;
                 Tooltip.textOffset = new point_36.Point(Tooltip.margin, Tooltip.margin - 1);
@@ -8555,7 +8571,7 @@ System.register("game/cutscenes/Camera", ["engine/point", "game/world/MapGenerat
 });
 System.register("game/ui/OffScreenMarker", ["engine/point", "engine/util/utils", "engine/util/Lists", "engine/component", "game/graphics/Tilesets", "engine/tiles/TileTransform", "game/world/LocationManager", "game/cutscenes/Camera"], function (exports_99, context_99) {
     "use strict";
-    var point_55, utils_6, Lists_2, component_24, Tilesets_32, TileTransform_22, LocationManager_17, Camera_7, OffScreenMarker;
+    var point_55, utils_6, Lists_3, component_24, Tilesets_32, TileTransform_22, LocationManager_17, Camera_7, OffScreenMarker;
     var __moduleName = context_99 && context_99.id;
     return {
         setters: [
@@ -8565,8 +8581,8 @@ System.register("game/ui/OffScreenMarker", ["engine/point", "engine/util/utils",
             function (utils_6_1) {
                 utils_6 = utils_6_1;
             },
-            function (Lists_2_1) {
-                Lists_2 = Lists_2_1;
+            function (Lists_3_1) {
+                Lists_3 = Lists_3_1;
             },
             function (component_24_1) {
                 component_24 = component_24_1;
@@ -8633,7 +8649,7 @@ System.register("game/ui/OffScreenMarker", ["engine/point", "engine/util/utils",
                     else if (outsidePoint.x > cameraPos.x + cameraDimensions.x) { // right
                         pts.push(["right", this.lineIntersectPoint(midpoint, outsidePoint, cameraPos.plusX(cameraDimensions.x), cameraPos.plus(cameraDimensions))]);
                     }
-                    return Lists_2.Lists.minBy(pts, function (pt) { return pt[1].distanceTo(midpoint); });
+                    return Lists_3.Lists.minBy(pts, function (pt) { return pt[1].distanceTo(midpoint); });
                 };
                 // taken from https://gamedev.stackexchange.com/questions/111100/intersection-of-a-line-and-a-rectangle
                 OffScreenMarker.prototype.lineIntersectPoint = function (ps1, pe1, ps2, pe2) {
@@ -9030,7 +9046,7 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point",
                     _this.showingInv = false;
                     _this.coinsOffset = new point_58.Point(0, -18);
                     _this.e.addComponent(_this);
-                    _this.tooltip = _this.e.addComponent(new Tooltip_3.Tooltip("wood x2"));
+                    _this.tooltip = _this.e.addComponent(new Tooltip_3.Tooltip());
                     return _this;
                 }
                 Object.defineProperty(InventoryDisplay.prototype, "isOpen", {
@@ -9109,7 +9125,7 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point",
                                 decrementStack_1();
                             };
                         }
-                        var actionPrompt = !!actionString ? " [" + Controls_6.Controls.keyString(Controls_6.Controls.interactButton) + " to " + actionString + "]" : '';
+                        var actionPrompt = !!actionString ? "\n[" + Controls_6.Controls.keyString(Controls_6.Controls.interactButton) + " to " + actionString + "]" : '';
                         this.tooltip.say("" + item_1.displayName + count + actionPrompt);
                         if (!!actionFn && updateData.input.isKeyDown(Controls_6.Controls.interactButton)) {
                             actionFn();
@@ -9474,7 +9490,7 @@ System.register("game/ui/UIStateManager", ["game/ui/HUD", "game/characters/Playe
 });
 System.register("game/characters/Player", ["engine/component", "engine/point", "engine/util/Lists", "game/Controls", "game/ui/UIStateManager", "game/world/elements/Interactable", "game/characters/Dude", "game/characters/DudeFactory"], function (exports_108, context_108) {
     "use strict";
-    var component_29, point_61, Lists_3, Controls_7, UIStateManager_15, Interactable_5, Dude_2, DudeFactory_4, Player;
+    var component_29, point_61, Lists_4, Controls_7, UIStateManager_15, Interactable_5, Dude_2, DudeFactory_4, Player;
     var __moduleName = context_108 && context_108.id;
     return {
         setters: [
@@ -9484,8 +9500,8 @@ System.register("game/characters/Player", ["engine/component", "engine/point", "
             function (point_61_1) {
                 point_61 = point_61_1;
             },
-            function (Lists_3_1) {
-                Lists_3 = Lists_3_1;
+            function (Lists_4_1) {
+                Lists_4 = Lists_4_1;
             },
             function (Controls_7_1) {
                 Controls_7 = Controls_7_1;
@@ -9609,7 +9625,7 @@ System.register("game/characters/Player", ["engine/component", "engine/point", "
                         .filter(function (e) { return _this.dude.isFacing(e.position); }) // interactables the dude is facing
                         .filter(function (e) { return e.position.distanceTo(interactCenter) < interactDistance; })
                         .filter(function (e) { return e.isInteractable(); });
-                    var i = Lists_3.Lists.minBy(possibilities, function (e) { return e.position.distanceTo(interactCenter); });
+                    var i = Lists_4.Lists.minBy(possibilities, function (e) { return e.position.distanceTo(interactCenter); });
                     if (!!i) {
                         i.updateIndicator(true);
                     }
@@ -9890,7 +9906,7 @@ System.register("game/characters/Villager", ["engine/component", "game/character
 });
 System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point", "game/characters/Player", "game/characters/Dude", "game/characters/NPC", "game/world/LocationManager", "game/characters/Enemy", "game/items/Inventory", "game/characters/Dialogue", "game/cutscenes/CutscenePlayerController", "game/characters/Villager", "game/characters/NPCSchedule", "engine/util/Lists", "game/characters/weapons/WeaponType", "game/characters/dialogues/BertoIntro", "game/characters/ShroomNPC", "game/saves/uuid"], function (exports_113, context_113) {
     "use strict";
-    var Entity_25, point_63, Player_14, Dude_7, NPC_5, LocationManager_22, Enemy_2, Inventory_2, Dialogue_5, CutscenePlayerController_1, Villager_1, NPCSchedule_3, Lists_4, WeaponType_4, BertoIntro_2, ShroomNPC_2, uuid_2, DudeFactory;
+    var Entity_25, point_63, Player_14, Dude_7, NPC_5, LocationManager_22, Enemy_2, Inventory_2, Dialogue_5, CutscenePlayerController_1, Villager_1, NPCSchedule_3, Lists_5, WeaponType_4, BertoIntro_2, ShroomNPC_2, uuid_2, DudeFactory;
     var __moduleName = context_113 && context_113.id;
     return {
         setters: [
@@ -9930,8 +9946,8 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
             function (NPCSchedule_3_1) {
                 NPCSchedule_3 = NPCSchedule_3_1;
             },
-            function (Lists_4_1) {
-                Lists_4 = Lists_4_1;
+            function (Lists_5_1) {
+                Lists_5 = Lists_5_1;
             },
             function (WeaponType_4_1) {
                 WeaponType_4 = WeaponType_4_1;
@@ -10017,7 +10033,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                             dialogue = BertoIntro_2.BERTO_STARTING_DIALOGUE;
                             additionalComponents = [
                                 new NPC_5.NPC(NPCSchedule_3.NPCSchedules.newGoToSchedule(// filter out occupied points to not get stuck in the campfire
-                                Lists_4.Lists.oneOf([new point_63.Point(-3, 0), new point_63.Point(-3, 1), new point_63.Point(-2, 0), new point_63.Point(-2, 1)].filter(function (pt) { return !location.isOccupied(pt); })))),
+                                Lists_5.Lists.oneOf([new point_63.Point(-3, 0), new point_63.Point(-3, 1), new point_63.Point(-2, 0), new point_63.Point(-2, 1)].filter(function (pt) { return !location.isOccupied(pt); })))),
                                 new Villager_1.Villager()
                             ];
                             window["berto"] = additionalComponents[0];
@@ -11004,7 +11020,7 @@ System.register("game/characters/weapons/MeleeWeapon", ["game/characters/weapons
 });
 System.register("game/characters/weapons/Projectile", ["engine/collision/BoxCollider", "engine/component", "engine/Entity", "engine/point", "game/world/LocationManager", "game/items/DroppedItem", "engine/util/Lists"], function (exports_126, context_126) {
     "use strict";
-    var BoxCollider_8, component_37, Entity_27, point_69, LocationManager_26, DroppedItem_2, Lists_5, Projectile, spawnProjectile;
+    var BoxCollider_8, component_37, Entity_27, point_69, LocationManager_26, DroppedItem_2, Lists_6, Projectile, spawnProjectile;
     var __moduleName = context_126 && context_126.id;
     return {
         setters: [
@@ -11026,8 +11042,8 @@ System.register("game/characters/weapons/Projectile", ["engine/collision/BoxColl
             function (DroppedItem_2_1) {
                 DroppedItem_2 = DroppedItem_2_1;
             },
-            function (Lists_5_1) {
-                Lists_5 = Lists_5_1;
+            function (Lists_6_1) {
+                Lists_6 = Lists_6_1;
             }
         ],
         execute: function () {
@@ -11092,7 +11108,7 @@ System.register("game/characters/weapons/Projectile", ["engine/collision/BoxColl
                     var allEnemies = Array.from(LocationManager_26.LocationManager.instance.currentLocation.dudes)
                         .filter(function (d) { return !!d && d !== attacker && d.isEnemy(attacker); })
                         .filter(function (d) { return d.standingPosition.distanceTo(projectilePos) < attackDistance; });
-                    return Lists_5.Lists.minBy(allEnemies, function (d) { return d.standingPosition.manhattanDistanceTo(projectilePos); });
+                    return Lists_6.Lists.minBy(allEnemies, function (d) { return d.standingPosition.manhattanDistanceTo(projectilePos); });
                 };
                 /**
                  * returns true if it successfully moved

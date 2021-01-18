@@ -43,7 +43,7 @@ export class InventoryDisplay extends Component {
     constructor() {
         super()
         this.e.addComponent(this)
-        this.tooltip = this.e.addComponent(new Tooltip("wood x2"))
+        this.tooltip = this.e.addComponent(new Tooltip())
     }
 
     inventory() {
@@ -123,7 +123,7 @@ export class InventoryDisplay extends Component {
                 }
             }
 
-            const actionPrompt = !!actionString ? ` [${Controls.keyString(Controls.interactButton)} to ${actionString}]` : ''
+            const actionPrompt = !!actionString ? `\n[${Controls.keyString(Controls.interactButton)} to ${actionString}]` : ''
             this.tooltip.say(`${item.displayName}${count}${actionPrompt}`)
 
             if (!!actionFn && updateData.input.isKeyDown(Controls.interactButton)) {
