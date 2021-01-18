@@ -24,17 +24,17 @@ export const Lists = {
             return null
         }
         
-        let smallestAmount = Number.MAX_SAFE_INTEGER
-        let smallest: T
+        let biggestAmount = Number.MIN_SAFE_INTEGER
+        let biggest: T
         for (const i of list) {
             const amount = fn(i)
-            if (amount < smallestAmount) {
-                smallestAmount = amount
-                smallest = i
+            if (amount > biggestAmount) {
+                biggestAmount = amount
+                biggest = i
             }
         }
 
-        return smallest
+        return biggest
     },
 
     oneOf<T>(list: T[]): T {
