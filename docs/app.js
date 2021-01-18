@@ -5973,19 +5973,11 @@ System.register("game/ui/Tooltip", ["engine/component", "game/graphics/Tilesets"
                     return _this;
                 }
                 Tooltip.prototype.say = function (text) {
-                    if (this.rawText === text) {
-                        return;
-                    }
-                    this.rawText = text;
                     this.text = text.split("\n");
                 };
                 Tooltip.prototype.clear = function () {
-                    this.rawText = null;
                     this.text = null;
                     this.tiles = [];
-                    this.left = [];
-                    this.center = [];
-                    this.right = [];
                 };
                 Tooltip.prototype.update = function (updateData) {
                     if (!this.text) {

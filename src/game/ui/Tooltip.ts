@@ -18,30 +18,17 @@ export class Tooltip extends Component {
 
     private static readonly margin = 6
     private static readonly textOffset = new Point(Tooltip.margin, Tooltip.margin-1)
-    private rawText: string
     private text: string[]
 
     private tiles: ImageRender[] = []
-    private left: ImageRender[]
-    private center: ImageRender[]
-    private right: ImageRender[]
 
     say(text: string) {
-        if (this.rawText === text) {
-            return
-        }
-
-        this.rawText = text
         this.text = text.split("\n")
     }
 
     clear() {
-        this.rawText = null
         this.text = null
         this.tiles = []
-        this.left = []
-        this.center = []
-        this.right = []
     }
 
     update(updateData: UpdateData) {
