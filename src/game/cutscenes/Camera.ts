@@ -27,7 +27,7 @@ export class Camera {
     private _dimensions: Point
     get dimensions() { return this._dimensions }
 
-    shake() {
+    shake(power: number, duration: number) {
         
     }
 
