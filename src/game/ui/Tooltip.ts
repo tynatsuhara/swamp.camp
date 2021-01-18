@@ -39,6 +39,10 @@ export class Tooltip extends Component {
         }
 
         this.tiles = this.left.concat(this.center, this.right)
+
+        this.tiles.forEach(t => {
+            t.transform.depth = UIStateManager.UI_SPRITE_DEPTH + 1
+        })
     }
 
     clear() {
@@ -52,11 +56,6 @@ export class Tooltip extends Component {
     }
 
     update(updateData: UpdateData) {
-        this.tiles.forEach(t => {
-            t.enabled = !!this.text
-            t.transform.depth = UIStateManager.UI_SPRITE_DEPTH + 1
-        })
-
         if (!this.text) {
             return
         }

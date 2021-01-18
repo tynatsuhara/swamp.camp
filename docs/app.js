@@ -2857,6 +2857,7 @@ System.register("game/Controls", [], function (exports_40, context_40) {
         execute: function () {
             exports_40("Controls", Controls = {
                 interactButton: 69 /* E */,
+                interactButtonSecondary: 70 /* F */,
                 closeButton: 27 /* ESC */,
                 inventoryButton: 73 /* I */,
                 keyString: function (inputKey) {
@@ -5977,6 +5978,9 @@ System.register("game/ui/Tooltip", ["engine/component", "game/graphics/Tilesets"
                         this.right.push(this.entity.addComponent(Tilesets_14.Tilesets.instance.oneBit.getTileSource("tooltipRight").toComponent()));
                     }
                     this.tiles = this.left.concat(this.center, this.right);
+                    this.tiles.forEach(function (t) {
+                        t.transform.depth = UIStateManager_4.UIStateManager.UI_SPRITE_DEPTH + 1;
+                    });
                 };
                 Tooltip.prototype.clear = function () {
                     this.rawText = null;
@@ -5988,11 +5992,6 @@ System.register("game/ui/Tooltip", ["engine/component", "game/graphics/Tilesets"
                     this.right = [];
                 };
                 Tooltip.prototype.update = function (updateData) {
-                    var _this = this;
-                    this.tiles.forEach(function (t) {
-                        t.enabled = !!_this.text;
-                        t.transform.depth = UIStateManager_4.UIStateManager.UI_SPRITE_DEPTH + 1;
-                    });
                     if (!this.text) {
                         return;
                     }
@@ -9057,7 +9056,7 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point",
                 InventoryDisplay.prototype.inventory = function () {
                     return Player_11.Player.instance.dude.inventory;
                 };
-                InventoryDisplay.prototype.update = function (updateData) {
+                InventoryDisplay.prototype.lateUpdate = function (updateData) {
                     var _this = this;
                     var inv = this.inventory().inventory;
                     var pressI = updateData.input.isKeyDown(Controls_6.Controls.inventoryButton);
@@ -9094,8 +9093,7 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point",
                         var stack_1 = inv[hoverIndex];
                         var item_1 = Items_5.ITEM_METADATA_MAP[stack_1.item];
                         var count = stack_1.count > 1 ? ' x' + stack_1.count : '';
-                        var actionString = null;
-                        var actionFn = void 0;
+                        var actions = [];
                         var decrementStack_1 = function () {
                             if (stack_1.count === 1) {
                                 inv[hoverIndex] = null;
@@ -9105,31 +9103,44 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point",
                             }
                         };
                         if (item_1.element !== null && LocationManager_20.LocationManager.instance.currentLocation.allowPlacing) {
-                            actionString = 'place';
-                            actionFn = function () {
-                                _this.close();
-                                PlaceElementDisplay_2.PlaceElementDisplay.instance.startPlacing(item_1.element, decrementStack_1);
-                            };
+                            actions.push({
+                                verb: 'place',
+                                actionFn: function () {
+                                    _this.close();
+                                    PlaceElementDisplay_2.PlaceElementDisplay.instance.startPlacing(item_1.element, decrementStack_1);
+                                }
+                            });
                         }
-                        else if (!!item_1.equippable && Player_11.Player.instance.dude.weaponType !== item_1.equippable) {
-                            actionString = 'equip';
-                            actionFn = function () {
-                                _this.close();
-                                Player_11.Player.instance.dude.setWeapon(item_1.equippable);
-                            };
+                        if (!!item_1.equippable && Player_11.Player.instance.dude.weaponType !== item_1.equippable) {
+                            actions.push({
+                                verb: 'equip',
+                                actionFn: function () {
+                                    _this.close();
+                                    Player_11.Player.instance.dude.setWeapon(item_1.equippable);
+                                }
+                            });
                         }
-                        else if (!!item_1.consumable) {
-                            actionString = 'eat';
-                            actionFn = function () {
-                                item_1.consumable();
-                                decrementStack_1();
-                            };
+                        if (!!item_1.consumable) {
+                            actions.push({
+                                verb: 'eat',
+                                actionFn: function () {
+                                    item_1.consumable();
+                                    decrementStack_1();
+                                }
+                            });
                         }
-                        var actionPrompt = !!actionString ? "\n[" + Controls_6.Controls.keyString(Controls_6.Controls.interactButton) + " to " + actionString + "]" : '';
-                        this.tooltip.say("" + item_1.displayName + count + actionPrompt);
-                        if (!!actionFn && updateData.input.isKeyDown(Controls_6.Controls.interactButton)) {
-                            actionFn();
-                        }
+                        // We currently only support up to 2 interaction types per item
+                        var interactButtonOrder_1 = [Controls_6.Controls.interactButton, Controls_6.Controls.interactButtonSecondary];
+                        var tooltipString_1 = "" + item_1.displayName + count;
+                        actions.forEach(function (action, i) {
+                            tooltipString_1 += "\n[" + Controls_6.Controls.keyString(interactButtonOrder_1[i]) + " to " + action.verb + "]";
+                        });
+                        this.tooltip.say(tooltipString_1);
+                        actions.forEach(function (action, i) {
+                            if (updateData.input.isKeyDown(interactButtonOrder_1[i])) {
+                                action.actionFn();
+                            }
+                        });
                     }
                     else {
                         this.tooltip.clear();

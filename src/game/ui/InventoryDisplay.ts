@@ -50,7 +50,7 @@ export class InventoryDisplay extends Component {
         return Player.instance.dude.inventory
     }
 
-    update(updateData: UpdateData) {
+    lateUpdate(updateData: UpdateData) {
         const inv = this.inventory().inventory
 
         const pressI = updateData.input.isKeyDown(Controls.inventoryButton)
@@ -89,8 +89,7 @@ export class InventoryDisplay extends Component {
             const item = ITEM_METADATA_MAP[stack.item]
             const count = stack.count > 1 ? ' x' + stack.count : ''
 
-            let actionString: string = null
-            let actionFn: () => void
+            const actions: { verb: string, actionFn: () => void }[] = []
 
             const decrementStack = () => {
                 if (stack.count === 1) {
@@ -101,34 +100,52 @@ export class InventoryDisplay extends Component {
             }
 
             if (item.element !== null && LocationManager.instance.currentLocation.allowPlacing) {
-                actionString = 'place'
-                actionFn = () => {
-                    this.close()
-                    PlaceElementDisplay.instance.startPlacing(
-                        item.element, 
-                        decrementStack
-                    )
-                }
-            } else if (!!item.equippable && Player.instance.dude.weaponType !== item.equippable) {
-                actionString = 'equip'
-                actionFn = () => {
-                    this.close()
-                    Player.instance.dude.setWeapon(item.equippable)
-                }
-            } else if (!!item.consumable) {
-                actionString = 'eat'
-                actionFn = () => {
-                    item.consumable()
-                    decrementStack()
-                }
+                actions.push({
+                    verb: 'place',
+                    actionFn: () => {
+                        this.close()
+                        PlaceElementDisplay.instance.startPlacing(
+                            item.element, 
+                            decrementStack
+                        )
+                    }
+                })
+            }
+            if (!!item.equippable && Player.instance.dude.weaponType !== item.equippable) {
+                actions.push({
+                    verb: 'equip',
+                    actionFn: () => {
+                        this.close()
+                        Player.instance.dude.setWeapon(item.equippable)
+                    }
+                })
+            }
+            if (!!item.consumable) {
+                actions.push({
+                    verb: 'eat',
+                    actionFn: () => {
+                        item.consumable()
+                        decrementStack()
+                    }
+                })
             }
 
-            const actionPrompt = !!actionString ? `\n[${Controls.keyString(Controls.interactButton)} to ${actionString}]` : ''
-            this.tooltip.say(`${item.displayName}${count}${actionPrompt}`)
+            // We currently only support up to 2 interaction types per item
+            const interactButtonOrder = [Controls.interactButton, Controls.interactButtonSecondary]
 
-            if (!!actionFn && updateData.input.isKeyDown(Controls.interactButton)) {
-                actionFn()
-            }
+            let tooltipString = `${item.displayName}${count}` 
+
+            actions.forEach((action, i) => {
+                tooltipString += `\n[${Controls.keyString(interactButtonOrder[i])} to ${action.verb}]`
+            })
+
+            this.tooltip.say(tooltipString)
+
+            actions.forEach((action, i) => {
+                if (updateData.input.isKeyDown(interactButtonOrder[i])) {
+                    action.actionFn()
+                }
+            })
         } else {
             this.tooltip.clear()
         }
