@@ -11,6 +11,7 @@ import { OGTileset } from "./OGTileset"
 
 // standard tile size
 export const TILE_SIZE = 16
+export const TILE_DIMENSIONS = new Point(TILE_SIZE, TILE_SIZE)
 
 export const pixelPtToTilePt = (pixelPt: Point) => {
     return pixelPt.apply(n => Math.floor(n/TILE_SIZE))

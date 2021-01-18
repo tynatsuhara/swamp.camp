@@ -1,6 +1,6 @@
 import { Component } from "../../engine/component"
 import { TileComponent } from "../../engine/tiles/TileComponent"
-import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { Tilesets, TILE_DIMENSIONS, TILE_SIZE } from "../graphics/Tilesets"
 import { Point } from "../../engine/point"
 import { TextRender } from "../../engine/renderer/TextRender"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
@@ -8,6 +8,9 @@ import { UpdateData } from "../../engine/engine"
 import { Color } from "./Color"
 import { UIStateManager } from "./UIStateManager"
 import { Lists } from "../../engine/util/Lists"
+import { ImageRender } from "../../engine/renderer/ImageRender"
+import { TileTransform } from "../../engine/tiles/TileTransform"
+import { RenderMethod } from "../../engine/renderer/RenderMethod"
 
 export class Tooltip extends Component {
     
@@ -18,37 +21,23 @@ export class Tooltip extends Component {
     private rawText: string
     private text: string[]
 
-    private tiles: TileComponent[] = []
-    private left: TileComponent[]
-    private center: TileComponent[]
-    private right: TileComponent[]
+    private tiles: ImageRender[] = []
+    private left: ImageRender[]
+    private center: ImageRender[]
+    private right: ImageRender[]
 
     say(text: string) {
         if (this.rawText === text) {
             return
         }
 
-        this.clear()
         this.rawText = text
         this.text = text.split("\n")
-
-        for (let i = 0; i < (this.text.length-1) * 2 + 1; i++ ){
-            this.left.push(this.entity.addComponent(Tilesets.instance.oneBit.getTileSource("tooltipLeft").toComponent()))
-            this.center.push(this.entity.addComponent(Tilesets.instance.oneBit.getTileSource("tooltipCenter").toComponent()))
-            this.right.push(this.entity.addComponent(Tilesets.instance.oneBit.getTileSource("tooltipRight").toComponent()))
-        }
-
-        this.tiles = this.left.concat(this.center, this.right)
-
-        this.tiles.forEach(t => {
-            t.transform.depth = UIStateManager.UI_SPRITE_DEPTH + 1
-        })
     }
 
     clear() {
         this.rawText = null
         this.text = null
-        this.tiles.forEach(t => t.delete())
         this.tiles = []
         this.left = []
         this.center = []
@@ -68,16 +57,30 @@ export class Tooltip extends Component {
         const rightPos = leftPos.plus(new Point(width - TILE_SIZE + Tooltip.margin * 2, 0)).apply(Math.floor)
 
         const spacing = 6
-        this.left.forEach((t, i) => t.transform.position = leftPos.plusY(-i * spacing))
-        this.center.forEach((t, i) => t.transform.position = centerPos.plusY(-i * spacing))
-        this.right.forEach((t, i) => t.transform.position = rightPos.plusY(-i * spacing))
+        const centerWidth = new Point(width + Tooltip.margin * 2 - TILE_SIZE*2, TILE_SIZE)
 
-        this.center.forEach(t => t.transform.dimensions = new Point(width + Tooltip.margin * 2 - TILE_SIZE*2, TILE_SIZE))
+        const tiles: ImageRender[] = []
+        for (let i = 0; i < (this.text.length-1) * 2 + 1; i++) {
+            // left
+            tiles.push(Tilesets.instance.oneBit.getTileSource("tooltipLeft").toImageRender(
+                new TileTransform(leftPos.plusY(-i * spacing), TILE_DIMENSIONS, 0, false, false, UIStateManager.UI_SPRITE_DEPTH + 1)
+            ))
+            // center
+            tiles.push(Tilesets.instance.oneBit.getTileSource("tooltipCenter").toImageRender(
+                new TileTransform(centerPos.plusY(-i * spacing), centerWidth, 0, false, false, UIStateManager.UI_SPRITE_DEPTH + 1)
+            ))
+            // right
+            tiles.push(Tilesets.instance.oneBit.getTileSource("tooltipRight").toImageRender(
+                new TileTransform(rightPos.plusY(-i * spacing), TILE_DIMENSIONS, 0, false, false, UIStateManager.UI_SPRITE_DEPTH + 1)
+            ))
+        }
+
+        this.tiles = tiles
 
         const totalWidth = width + Tooltip.margin * 2
         if (this.position.x + totalWidth > updateData.dimensions.x) {
             // shift left
-            this.tiles.forEach(t => t.transform.position = t.transform.position.plusX(-totalWidth - TILE_SIZE))
+            this.tiles.forEach(t => t.position = t.position.plusX(-totalWidth - TILE_SIZE))
         }
     }
 
@@ -87,11 +90,11 @@ export class Tooltip extends Component {
         }
         return this.text.map((line, index) => new TextRender(
             line,
-            this.left[0].transform.position.plus(Tooltip.textOffset).plusY((this.text.length-index-1) * -(TEXT_SIZE+4)),
+            this.tiles[0].position.plus(Tooltip.textOffset).plusY((this.text.length-index-1) * -(TEXT_SIZE+4)),
             TEXT_SIZE,
             TEXT_FONT,
             Color.DARK_RED,
             UIStateManager.UI_SPRITE_DEPTH + 2
-        ))
+        ) as RenderMethod).concat(this.tiles)
     }
 }
