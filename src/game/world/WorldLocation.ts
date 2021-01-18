@@ -55,6 +55,11 @@ export class WorldLocation {
         return groundComponent
     }
 
+    /**
+     * @param type 
+     * @param pos tile point
+     * @param data 
+     */
     addElement(type: ElementType, pos: Point, data: object = {}): ElementComponent {
         const factory = Elements.instance.getElementFactory(type)
         const elementPts = ElementUtils.rectPoints(pos, factory.dimensions)

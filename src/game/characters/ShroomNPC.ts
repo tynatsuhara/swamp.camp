@@ -1,6 +1,8 @@
 import { Component } from "../../engine/component"
 import { UpdateData } from "../../engine/engine"
+import { pixelPtToTilePt } from "../graphics/Tilesets"
 import { Item } from "../items/Items"
+import { ElementType } from "../world/elements/Elements"
 import { LocationManager } from "../world/LocationManager"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
@@ -50,21 +52,26 @@ export class ShroomNPC extends Component {
         this.dude.blob[NEXT_GROWTH_TIME] = this.nextGrowthTime()
 
         if (ogSize === 3 || Math.random() > 0.5) {
-            // split
-            DudeFactory.instance.new(DudeType.SHROOM, this.dude.position, LocationManager.instance.exterior())
-        } else {
-            // grow
-            const newSize = ogSize + 1
-            this.dude.blob[SIZE] = newSize
-
-            // overwrite the animation
-            const data = this.dude.save()
-            data.anim = ["SmallMushroom", "NormalMushroom", "LargeMushroom",][newSize-1]
-
-            // delete and respawn the shroom dude
-            this.entity.selfDestruct()
-            DudeFactory.instance.load(data, LocationManager.instance.exterior())
+            // spread more shrooms
+            const tilePos = pixelPtToTilePt(this.dude.standingPosition)
+            const plantedShroom = LocationManager.instance.exterior().addElement(ElementType.MUSHROOM, tilePos)
+            if (!!plantedShroom) {
+                // successfully planted
+                return
+            }
         }
+        
+        // grow
+        const newSize = ogSize + 1
+        this.dude.blob[SIZE] = newSize
+
+        // overwrite the animation
+        const newData = this.dude.save()
+        newData.anim = ["SmallMushroom", "NormalMushroom", "LargeMushroom",][newSize-1]
+
+        // delete and respawn the shroom dude
+        this.entity.selfDestruct()
+        DudeFactory.instance.load(newData, LocationManager.instance.exterior())
     }
 
     isAggro() {

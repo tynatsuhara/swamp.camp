@@ -3779,6 +3779,11 @@ System.register("game/world/WorldLocation", ["engine/point", "engine/util/Grid",
                     this.ground.set(pos, groundComponent);
                     return groundComponent;
                 };
+                /**
+                 * @param type
+                 * @param pos tile point
+                 * @param data
+                 */
                 WorldLocation.prototype.addElement = function (type, pos, data) {
                     var _this = this;
                     if (data === void 0) { data = {}; }
@@ -9730,14 +9735,17 @@ System.register("game/cutscenes/CutscenePlayerController", ["engine/component", 
         }
     };
 });
-System.register("game/characters/ShroomNPC", ["engine/component", "game/world/LocationManager", "game/world/TimeUnit", "game/world/WorldTime", "game/characters/Dude", "game/characters/DudeFactory", "game/characters/Enemy", "game/characters/weapons/WeaponType"], function (exports_111, context_111) {
+System.register("game/characters/ShroomNPC", ["engine/component", "game/graphics/Tilesets", "game/world/LocationManager", "game/world/TimeUnit", "game/world/WorldTime", "game/characters/Dude", "game/characters/DudeFactory", "game/characters/Enemy", "game/characters/weapons/WeaponType"], function (exports_111, context_111) {
     "use strict";
-    var component_32, LocationManager_21, TimeUnit_7, WorldTime_9, Dude_5, DudeFactory_5, Enemy_1, WeaponType_3, SIZE, NEXT_GROWTH_TIME, ShroomNPC;
+    var component_32, Tilesets_38, LocationManager_21, TimeUnit_7, WorldTime_9, Dude_5, DudeFactory_5, Enemy_1, WeaponType_3, SIZE, NEXT_GROWTH_TIME, ShroomNPC;
     var __moduleName = context_111 && context_111.id;
     return {
         setters: [
             function (component_32_1) {
                 component_32 = component_32_1;
+            },
+            function (Tilesets_38_1) {
+                Tilesets_38 = Tilesets_38_1;
             },
             function (LocationManager_21_1) {
                 LocationManager_21 = LocationManager_21_1;
@@ -9798,20 +9806,23 @@ System.register("game/characters/ShroomNPC", ["engine/component", "game/world/Lo
                     var ogSize = this.dude.blob[SIZE];
                     this.dude.blob[NEXT_GROWTH_TIME] = this.nextGrowthTime();
                     if (ogSize === 3 || Math.random() > 0.5) {
-                        // split
-                        DudeFactory_5.DudeFactory.instance.new(6 /* SHROOM */, this.dude.position, LocationManager_21.LocationManager.instance.exterior());
+                        // spread more shrooms
+                        var tilePos = Tilesets_38.pixelPtToTilePt(this.dude.standingPosition);
+                        var plantedShroom = LocationManager_21.LocationManager.instance.exterior().addElement(7 /* MUSHROOM */, tilePos);
+                        if (!!plantedShroom) {
+                            // successfully planted
+                            return;
+                        }
                     }
-                    else {
-                        // grow
-                        var newSize = ogSize + 1;
-                        this.dude.blob[SIZE] = newSize;
-                        // overwrite the animation
-                        var data_1 = this.dude.save();
-                        data_1.anim = ["SmallMushroom", "NormalMushroom", "LargeMushroom",][newSize - 1];
-                        // delete and respawn the shroom dude
-                        this.entity.selfDestruct();
-                        DudeFactory_5.DudeFactory.instance.load(data_1, LocationManager_21.LocationManager.instance.exterior());
-                    }
+                    // grow
+                    var newSize = ogSize + 1;
+                    this.dude.blob[SIZE] = newSize;
+                    // overwrite the animation
+                    var newData = this.dude.save();
+                    newData.anim = ["SmallMushroom", "NormalMushroom", "LargeMushroom",][newSize - 1];
+                    // delete and respawn the shroom dude
+                    this.entity.selfDestruct();
+                    DudeFactory_5.DudeFactory.instance.load(newData, LocationManager_21.LocationManager.instance.exterior());
                 };
                 ShroomNPC.prototype.isAggro = function () {
                     return !!this.enemy && this.dude.blob[SIZE] > 1;
@@ -10283,12 +10294,12 @@ System.register("game/items/DroppedItem", ["engine/collision/BoxCollider", "engi
 });
 System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", "game/world/LocationManager", "game/items/DroppedItem", "engine/point", "game/characters/weapons/WeaponType", "game/characters/Player"], function (exports_119, context_119) {
     "use strict";
-    var _a, Tilesets_38, Entity_26, LocationManager_24, DroppedItem_1, point_65, WeaponType_5, Player_16, ItemMetadata, ITEM_METADATA_MAP, spawnItem;
+    var _a, Tilesets_39, Entity_26, LocationManager_24, DroppedItem_1, point_65, WeaponType_5, Player_16, ItemMetadata, ITEM_METADATA_MAP, spawnItem;
     var __moduleName = context_119 && context_119.id;
     return {
         setters: [
-            function (Tilesets_38_1) {
-                Tilesets_38 = Tilesets_38_1;
+            function (Tilesets_39_1) {
+                Tilesets_39 = Tilesets_39_1;
             },
             function (Entity_26_1) {
                 Entity_26 = Entity_26_1;
@@ -10331,84 +10342,84 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
             exports_119("ITEM_METADATA_MAP", ITEM_METADATA_MAP = (_a = {},
                 _a[0 /* COIN */] = new ItemMetadata({
                     displayName: "Coin",
-                    inventoryIconSupplier: function () { return Tilesets_38.Tilesets.instance.oneBit.getTileSource("coin"); },
-                    droppedIconSupplier: function () { return Tilesets_38.Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150); },
+                    inventoryIconSupplier: function () { return Tilesets_39.Tilesets.instance.oneBit.getTileSource("coin"); },
+                    droppedIconSupplier: function () { return Tilesets_39.Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150); },
                     stackLimit: Number.MAX_SAFE_INTEGER,
                 }),
                 _a[1 /* ROCK */] = new ItemMetadata({
                     displayName: "Rock",
-                    inventoryIconSupplier: function () { return Tilesets_38.Tilesets.instance.oneBit.getTileSource("rock"); },
-                    droppedIconSupplier: function () { return Tilesets_38.Tilesets.instance.outdoorTiles.getTileSource("rockItem"); },
+                    inventoryIconSupplier: function () { return Tilesets_39.Tilesets.instance.oneBit.getTileSource("rock"); },
+                    droppedIconSupplier: function () { return Tilesets_39.Tilesets.instance.outdoorTiles.getTileSource("rockItem"); },
                 }),
                 _a[2 /* WOOD */] = new ItemMetadata({
                     displayName: "Wood",
-                    inventoryIconSupplier: function () { return Tilesets_38.Tilesets.instance.oneBit.getTileSource("wood"); },
-                    droppedIconSupplier: function () { return Tilesets_38.Tilesets.instance.outdoorTiles.getTileSource("woodItem"); },
+                    inventoryIconSupplier: function () { return Tilesets_39.Tilesets.instance.oneBit.getTileSource("wood"); },
+                    droppedIconSupplier: function () { return Tilesets_39.Tilesets.instance.outdoorTiles.getTileSource("woodItem"); },
                 }),
                 _a[3 /* TENT */] = new ItemMetadata({
                     displayName: "Tent",
-                    inventoryIconSupplier: function () { return Tilesets_38.Tilesets.instance.oneBit.getTileSource("tent"); },
+                    inventoryIconSupplier: function () { return Tilesets_39.Tilesets.instance.oneBit.getTileSource("tent"); },
                     stackLimit: 1,
                     element: 3 /* TENT */
                 }),
                 _a[4 /* CAMPFIRE */] = new ItemMetadata({
                     displayName: "Campfire",
-                    inventoryIconSupplier: function () { return Tilesets_38.Tilesets.instance.oneBit.getTileSource("campfire"); },
+                    inventoryIconSupplier: function () { return Tilesets_39.Tilesets.instance.oneBit.getTileSource("campfire"); },
                     stackLimit: 1,
                     element: 4 /* CAMPFIRE */
                 }),
                 _a[5 /* IRON */] = new ItemMetadata({
                     displayName: "Iron",
-                    inventoryIconSupplier: function () { return Tilesets_38.Tilesets.instance.oneBit.getTileSource("iron"); },
-                    droppedIconSupplier: function () { return Tilesets_38.Tilesets.instance.outdoorTiles.getTileSource("ironItem"); },
+                    inventoryIconSupplier: function () { return Tilesets_39.Tilesets.instance.oneBit.getTileSource("iron"); },
+                    droppedIconSupplier: function () { return Tilesets_39.Tilesets.instance.outdoorTiles.getTileSource("ironItem"); },
                 }),
                 _a[6 /* HOUSE */] = new ItemMetadata({
                     displayName: "House",
-                    inventoryIconSupplier: function () { return Tilesets_38.Tilesets.instance.oneBit.getTileSource("house"); },
+                    inventoryIconSupplier: function () { return Tilesets_39.Tilesets.instance.oneBit.getTileSource("house"); },
                     stackLimit: 1,
                     element: 6 /* HOUSE */
                 }),
                 _a[7 /* ROUND_SAPLING */] = new ItemMetadata({
                     displayName: "Sapling",
-                    inventoryIconSupplier: function () { return Tilesets_38.Tilesets.instance.oneBit.getTileSource("treeRound"); },
-                    droppedIconSupplier: function () { return Tilesets_38.Tilesets.instance.outdoorTiles.getTileSource("treeRoundSapling"); },
+                    inventoryIconSupplier: function () { return Tilesets_39.Tilesets.instance.oneBit.getTileSource("treeRound"); },
+                    droppedIconSupplier: function () { return Tilesets_39.Tilesets.instance.outdoorTiles.getTileSource("treeRoundSapling"); },
                     element: 0 /* TREE_ROUND */
                 }),
                 _a[8 /* POINTY_SAPLING */] = new ItemMetadata({
                     displayName: "Sapling",
-                    inventoryIconSupplier: function () { return Tilesets_38.Tilesets.instance.oneBit.getTileSource("treePointy"); },
-                    droppedIconSupplier: function () { return Tilesets_38.Tilesets.instance.outdoorTiles.getTileSource("treePointySapling"); },
+                    inventoryIconSupplier: function () { return Tilesets_39.Tilesets.instance.oneBit.getTileSource("treePointy"); },
+                    droppedIconSupplier: function () { return Tilesets_39.Tilesets.instance.outdoorTiles.getTileSource("treePointySapling"); },
                     element: 1 /* TREE_POINTY */
                 }),
                 _a[9 /* MUSHROOM */] = new ItemMetadata({
                     displayName: "Mushroom",
-                    inventoryIconSupplier: function () { return Tilesets_38.Tilesets.instance.oneBit.getTileSource("mushroom"); },
-                    droppedIconSupplier: function () { return Tilesets_38.Tilesets.instance.outdoorTiles.getTileSource("mushroom"); },
+                    inventoryIconSupplier: function () { return Tilesets_39.Tilesets.instance.oneBit.getTileSource("mushroom"); },
+                    droppedIconSupplier: function () { return Tilesets_39.Tilesets.instance.outdoorTiles.getTileSource("mushroom"); },
                     element: 7 /* MUSHROOM */,
                     consumable: function () { return Player_16.Player.instance.dude.heal(1); }
                 }),
                 // TODO add other weapons
                 _a[100012 /* AXE */] = new ItemMetadata({
                     displayName: "Axe",
-                    inventoryIconSupplier: function () { return Tilesets_38.Tilesets.instance.oneBit.getTileSource("axe"); },
+                    inventoryIconSupplier: function () { return Tilesets_39.Tilesets.instance.oneBit.getTileSource("axe"); },
                     stackLimit: 1,
                     equippable: WeaponType_5.WeaponType.AXE
                 }),
                 _a[100022 /* PICKAXE */] = new ItemMetadata({
                     displayName: "Pickaxe",
-                    inventoryIconSupplier: function () { return Tilesets_38.Tilesets.instance.oneBit.getTileSource("pickaxe"); },
+                    inventoryIconSupplier: function () { return Tilesets_39.Tilesets.instance.oneBit.getTileSource("pickaxe"); },
                     stackLimit: 1,
                     equippable: WeaponType_5.WeaponType.PICKAXE
                 }),
                 _a[100003 /* SWORD */] = new ItemMetadata({
                     displayName: "Sword",
-                    inventoryIconSupplier: function () { return Tilesets_38.Tilesets.instance.oneBit.getTileSource("sword"); },
+                    inventoryIconSupplier: function () { return Tilesets_39.Tilesets.instance.oneBit.getTileSource("sword"); },
                     stackLimit: 1,
                     equippable: WeaponType_5.WeaponType.SWORD
                 }),
                 _a[100021 /* SPEAR */] = new ItemMetadata({
                     displayName: "Spear",
-                    inventoryIconSupplier: function () { return Tilesets_38.Tilesets.instance.oneBit.getTileSource("spear"); },
+                    inventoryIconSupplier: function () { return Tilesets_39.Tilesets.instance.oneBit.getTileSource("spear"); },
                     stackLimit: 1,
                     equippable: WeaponType_5.WeaponType.SPEAR
                 }),
@@ -10552,15 +10563,15 @@ System.register("game/items/Inventory", ["game/items/Items"], function (exports_
 });
 System.register("game/characters/DudeAnimationUtils", ["game/graphics/ImageFilters", "game/graphics/Tilesets", "game/SaveManager"], function (exports_121, context_121) {
     "use strict";
-    var ImageFilters_3, Tilesets_39, SaveManager_6, maybeFilter, DudeAnimationUtils;
+    var ImageFilters_3, Tilesets_40, SaveManager_6, maybeFilter, DudeAnimationUtils;
     var __moduleName = context_121 && context_121.id;
     return {
         setters: [
             function (ImageFilters_3_1) {
                 ImageFilters_3 = ImageFilters_3_1;
             },
-            function (Tilesets_39_1) {
-                Tilesets_39 = Tilesets_39_1;
+            function (Tilesets_40_1) {
+                Tilesets_40 = Tilesets_40_1;
             },
             function (SaveManager_6_1) {
                 SaveManager_6 = SaveManager_6_1;
@@ -10584,16 +10595,16 @@ System.register("game/characters/DudeAnimationUtils", ["game/graphics/ImageFilte
             exports_121("DudeAnimationUtils", DudeAnimationUtils = {
                 getCharacterIdleAnimation: function (characterAnimName, blob) {
                     var animSpeed = 150;
-                    var anim = Tilesets_39.Tilesets.instance.dungeonCharacters.getTileSetAnimation(characterAnimName + "_idle_anim", animSpeed)
-                        || Tilesets_39.Tilesets.instance.extraCharacterSet1.getTileSetAnimation(characterAnimName + "_Idle", 4, animSpeed)
-                        || Tilesets_39.Tilesets.instance.extraCharacterSet2.getIdleAnimation(characterAnimName, animSpeed);
+                    var anim = Tilesets_40.Tilesets.instance.dungeonCharacters.getTileSetAnimation(characterAnimName + "_idle_anim", animSpeed)
+                        || Tilesets_40.Tilesets.instance.extraCharacterSet1.getTileSetAnimation(characterAnimName + "_Idle", 4, animSpeed)
+                        || Tilesets_40.Tilesets.instance.extraCharacterSet2.getIdleAnimation(characterAnimName, animSpeed);
                     return maybeFilter(characterAnimName, blob, anim);
                 },
                 getCharacterWalkAnimation: function (characterAnimName, blob) {
                     var animSpeed = 80;
-                    var anim = Tilesets_39.Tilesets.instance.dungeonCharacters.getTileSetAnimation(characterAnimName + "_run_anim", animSpeed)
-                        || Tilesets_39.Tilesets.instance.extraCharacterSet1.getTileSetAnimation(characterAnimName + "_Walk", 4, animSpeed)
-                        || Tilesets_39.Tilesets.instance.extraCharacterSet2.getWalkAnimation(characterAnimName, animSpeed);
+                    var anim = Tilesets_40.Tilesets.instance.dungeonCharacters.getTileSetAnimation(characterAnimName + "_run_anim", animSpeed)
+                        || Tilesets_40.Tilesets.instance.extraCharacterSet1.getTileSetAnimation(characterAnimName + "_Walk", 4, animSpeed)
+                        || Tilesets_40.Tilesets.instance.extraCharacterSet2.getWalkAnimation(characterAnimName, animSpeed);
                     return maybeFilter(characterAnimName, blob, anim);
                 },
             });
@@ -10602,7 +10613,7 @@ System.register("game/characters/DudeAnimationUtils", ["game/graphics/ImageFilte
 });
 System.register("game/characters/weapons/Shield", ["engine/component", "engine/tiles/TileComponent", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point", "game/characters/Dude"], function (exports_122, context_122) {
     "use strict";
-    var component_35, TileComponent_10, Tilesets_40, TileTransform_27, point_66, Dude_8, State, Shield;
+    var component_35, TileComponent_10, Tilesets_41, TileTransform_27, point_66, Dude_8, State, Shield;
     var __moduleName = context_122 && context_122.id;
     return {
         setters: [
@@ -10612,8 +10623,8 @@ System.register("game/characters/weapons/Shield", ["engine/component", "engine/t
             function (TileComponent_10_1) {
                 TileComponent_10 = TileComponent_10_1;
             },
-            function (Tilesets_40_1) {
-                Tilesets_40 = Tilesets_40_1;
+            function (Tilesets_41_1) {
+                Tilesets_41 = Tilesets_41_1;
             },
             function (TileTransform_27_1) {
                 TileTransform_27 = TileTransform_27_1;
@@ -10644,7 +10655,7 @@ System.register("game/characters/weapons/Shield", ["engine/component", "engine/t
                     _this.currentAnimationFrame = 0;
                     _this.start = function (startData) {
                         _this.dude = _this.entity.getComponent(Dude_8.Dude);
-                        _this.blockingShieldSprite = _this.entity.addComponent(new TileComponent_10.TileComponent(Tilesets_40.Tilesets.instance.dungeonCharacters.getTileSource(shieldId), new TileTransform_27.TileTransform().relativeTo(_this.dude.animation.transform)));
+                        _this.blockingShieldSprite = _this.entity.addComponent(new TileComponent_10.TileComponent(Tilesets_41.Tilesets.instance.dungeonCharacters.getTileSource(shieldId), new TileTransform_27.TileTransform().relativeTo(_this.dude.animation.transform)));
                     };
                     return _this;
                 }
@@ -10829,7 +10840,7 @@ System.register("game/characters/weapons/UnarmedWeapon", ["game/characters/weapo
 });
 System.register("game/characters/weapons/MeleeWeapon", ["game/characters/weapons/Weapon", "engine/tiles/TileTransform", "engine/point", "game/graphics/Tilesets", "engine/util/Animator"], function (exports_125, context_125) {
     "use strict";
-    var Weapon_2, TileTransform_28, point_68, Tilesets_41, Animator_3, State, MeleeWeapon;
+    var Weapon_2, TileTransform_28, point_68, Tilesets_42, Animator_3, State, MeleeWeapon;
     var __moduleName = context_125 && context_125.id;
     return {
         setters: [
@@ -10842,8 +10853,8 @@ System.register("game/characters/weapons/MeleeWeapon", ["game/characters/weapons
             function (point_68_1) {
                 point_68 = point_68_1;
             },
-            function (Tilesets_41_1) {
-                Tilesets_41 = Tilesets_41_1;
+            function (Tilesets_42_1) {
+                Tilesets_42 = Tilesets_42_1;
             },
             function (Animator_3_1) {
                 Animator_3 = Animator_3_1;
@@ -10863,11 +10874,11 @@ System.register("game/characters/weapons/MeleeWeapon", ["game/characters/weapons
                     _this.delayBetweenAttacks = 0; // delay after the animation ends before the weapon can attack again in millis
                     _this.currentAnimationFrame = 0;
                     _this.start = function (startData) {
-                        _this.weaponSprite = Tilesets_41.Tilesets.instance.dungeonCharacters.getTileSource(weaponId);
+                        _this.weaponSprite = Tilesets_42.Tilesets.instance.dungeonCharacters.getTileSource(weaponId);
                         _this.weaponTransform = new TileTransform_28.TileTransform(point_68.Point.ZERO, _this.weaponSprite.dimensions).relativeTo(_this.dude.animation.transform);
                         _this.offsetFromCenter = offsetFromCenter;
                         _this._range = _this.weaponSprite.dimensions.y;
-                        _this.slashSprite = _this.entity.addComponent(Tilesets_41.Tilesets.instance.oneBit.getTileSource("slash").toComponent());
+                        _this.slashSprite = _this.entity.addComponent(Tilesets_42.Tilesets.instance.oneBit.getTileSource("slash").toComponent());
                     };
                     _this.weaponType = weaponType;
                     return _this;
@@ -11107,7 +11118,7 @@ System.register("game/characters/weapons/Projectile", ["engine/collision/BoxColl
 });
 System.register("game/characters/weapons/SpearWeapon", ["game/characters/weapons/Weapon", "game/characters/weapons/WeaponType", "engine/tiles/TileTransform", "engine/point", "game/graphics/Tilesets", "engine/util/Animator", "game/characters/weapons/Projectile"], function (exports_127, context_127) {
     "use strict";
-    var Weapon_3, WeaponType_7, TileTransform_29, point_70, Tilesets_42, Animator_4, Projectile_1, State, SpearWeapon;
+    var Weapon_3, WeaponType_7, TileTransform_29, point_70, Tilesets_43, Animator_4, Projectile_1, State, SpearWeapon;
     var __moduleName = context_127 && context_127.id;
     return {
         setters: [
@@ -11123,8 +11134,8 @@ System.register("game/characters/weapons/SpearWeapon", ["game/characters/weapons
             function (point_70_1) {
                 point_70 = point_70_1;
             },
-            function (Tilesets_42_1) {
-                Tilesets_42 = Tilesets_42_1;
+            function (Tilesets_43_1) {
+                Tilesets_43 = Tilesets_43_1;
             },
             function (Animator_4_1) {
                 Animator_4 = Animator_4_1;
@@ -11150,7 +11161,7 @@ System.register("game/characters/weapons/SpearWeapon", ["game/characters/weapons
                     _this.frameCount = 6;
                     _this.currentAnimationFrame = 0;
                     _this.start = function (startData) {
-                        _this.weaponSprite = Tilesets_42.Tilesets.instance.dungeonCharacters.getTileSource("weapon_spear");
+                        _this.weaponSprite = Tilesets_43.Tilesets.instance.dungeonCharacters.getTileSource("weapon_spear");
                         _this.weaponTransform = new TileTransform_29.TileTransform(point_70.Point.ZERO, _this.weaponSprite.dimensions).relativeTo(_this.dude.animation.transform);
                         _this.offsetFromCenter = new point_70.Point(-5, 0);
                         _this._range = _this.weaponSprite.dimensions.y;
@@ -11345,7 +11356,7 @@ System.register("game/characters/weapons/WeaponFactory", ["game/characters/weapo
 });
 System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine/component", "engine/point", "engine/tiles/AnimatedTileComponent", "engine/tiles/TileTransform", "game/graphics/ImageFilters", "game/graphics/Tilesets", "game/items/Items", "game/ui/DialogueDisplay", "game/ui/DudeInteractIndicator", "game/ui/UIStateManager", "game/world/elements/Interactable", "game/characters/Dialogue", "game/characters/DudeAnimationUtils", "game/characters/weapons/Shield", "game/characters/weapons/WeaponFactory", "game/characters/weapons/WeaponType"], function (exports_129, context_129) {
     "use strict";
-    var BoxCollider_9, component_38, point_72, AnimatedTileComponent_5, TileTransform_30, ImageFilters_4, Tilesets_43, Items_8, DialogueDisplay_5, DudeInteractIndicator_5, UIStateManager_16, Interactable_6, Dialogue_6, DudeAnimationUtils_1, Shield_1, WeaponFactory_1, WeaponType_9, Dude;
+    var BoxCollider_9, component_38, point_72, AnimatedTileComponent_5, TileTransform_30, ImageFilters_4, Tilesets_44, Items_8, DialogueDisplay_5, DudeInteractIndicator_5, UIStateManager_16, Interactable_6, Dialogue_6, DudeAnimationUtils_1, Shield_1, WeaponFactory_1, WeaponType_9, Dude;
     var __moduleName = context_129 && context_129.id;
     return {
         setters: [
@@ -11367,8 +11378,8 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
             function (ImageFilters_4_1) {
                 ImageFilters_4 = ImageFilters_4_1;
             },
-            function (Tilesets_43_1) {
-                Tilesets_43 = Tilesets_43_1;
+            function (Tilesets_44_1) {
+                Tilesets_44 = Tilesets_44_1;
             },
             function (Items_8_1) {
                 Items_8 = Items_8_1;
@@ -11501,7 +11512,7 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                         this.animation.transform.position = this.animation.transform.position.plus(this.rollingOffset);
                     }
                     this.dialogueInteract.position = this.standingPosition.minus(new point_72.Point(0, 5));
-                    this.dialogueInteract.uiOffset = new point_72.Point(0, -Tilesets_43.TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition());
+                    this.dialogueInteract.uiOffset = new point_72.Point(0, -Tilesets_44.TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition());
                     this.dialogueInteract.enabled = this.dialogue !== Dialogue_6.EMPTY_DIALOGUE && DialogueDisplay_5.DialogueDisplay.instance.dialogueSource !== this;
                 };
                 Dude.prototype.setWeapon = function (type) {
@@ -11747,7 +11758,7 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                         return [];
                     }
                     else {
-                        return [tile.toImageRender(new TileTransform_30.TileTransform(this.standingPosition.plusY(-28).plus(new point_72.Point(1, 1).times(-Tilesets_43.TILE_SIZE / 2)).plus(this.getAnimationOffsetPosition()), new point_72.Point(Tilesets_43.TILE_SIZE, Tilesets_43.TILE_SIZE), 0, false, false, UIStateManager_16.UIStateManager.UI_SPRITE_DEPTH))];
+                        return [tile.toImageRender(new TileTransform_30.TileTransform(this.standingPosition.plusY(-28).plus(new point_72.Point(1, 1).times(-Tilesets_44.TILE_SIZE / 2)).plus(this.getAnimationOffsetPosition()), new point_72.Point(Tilesets_44.TILE_SIZE, Tilesets_44.TILE_SIZE), 0, false, false, UIStateManager_16.UIStateManager.UI_SPRITE_DEPTH))];
                     }
                 };
                 Dude.PLAYER_COLLISION_LAYER = "playa";
@@ -11865,7 +11876,7 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
 });
 System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "engine/point", "game/characters/Dude", "game/characters/DudeFactory", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/graphics/Tilesets", "game/items/DroppedItem", "game/SaveManager", "game/ui/UIStateManager", "game/world/GroundRenderer", "game/world/LocationManager", "game/world/MapGenerator", "game/world/PointLightMaskRenderer", "game/world/TimeUnit", "game/world/WorldTime", "game/world/events/EventQueue", "game/world/events/QueuedEvent", "game/characters/NPC"], function (exports_131, context_131) {
     "use strict";
-    var CollisionEngine_4, point_74, Dude_10, DudeFactory_6, Camera_9, CutsceneManager_3, IntroCutscene_1, Tilesets_44, DroppedItem_3, SaveManager_7, UIStateManager_17, GroundRenderer_2, LocationManager_28, MapGenerator_5, PointLightMaskRenderer_5, TimeUnit_8, WorldTime_10, EventQueue_6, QueuedEvent_4, NPC_6, ZOOM, GameScene;
+    var CollisionEngine_4, point_74, Dude_10, DudeFactory_6, Camera_9, CutsceneManager_3, IntroCutscene_1, Tilesets_45, DroppedItem_3, SaveManager_7, UIStateManager_17, GroundRenderer_2, LocationManager_28, MapGenerator_5, PointLightMaskRenderer_5, TimeUnit_8, WorldTime_10, EventQueue_6, QueuedEvent_4, NPC_6, ZOOM, GameScene;
     var __moduleName = context_131 && context_131.id;
     return {
         setters: [
@@ -11890,8 +11901,8 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
             function (IntroCutscene_1_1) {
                 IntroCutscene_1 = IntroCutscene_1_1;
             },
-            function (Tilesets_44_1) {
-                Tilesets_44 = Tilesets_44_1;
+            function (Tilesets_45_1) {
+                Tilesets_45 = Tilesets_45_1;
             },
             function (DroppedItem_3_1) {
                 DroppedItem_3 = DroppedItem_3_1;
@@ -11957,9 +11968,9 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
                     var playerDude = DudeFactory_6.DudeFactory.instance.new(0 /* PLAYER */, playerStartPos);
                     Camera_9.Camera.instance.focusOnDude(playerDude);
                     DudeFactory_6.DudeFactory.instance.new(1 /* DIP */, point_74.Point.ZERO);
-                    DudeFactory_6.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_74.Point(3, 1).times(Tilesets_44.TILE_SIZE));
-                    DudeFactory_6.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_74.Point(-1, 3).times(Tilesets_44.TILE_SIZE));
-                    DudeFactory_6.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_74.Point(-4, 0).times(Tilesets_44.TILE_SIZE));
+                    DudeFactory_6.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_74.Point(3, 1).times(Tilesets_45.TILE_SIZE));
+                    DudeFactory_6.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_74.Point(-1, 3).times(Tilesets_45.TILE_SIZE));
+                    DudeFactory_6.DudeFactory.instance.new(3 /* ORC_WARRIOR */, new point_74.Point(-4, 0).times(Tilesets_45.TILE_SIZE));
                     // TODO clean up obstacles (trees, rocks, etc) so intro goes smoothly
                     CutsceneManager_3.CutsceneManager.instance.startCutscene(new IntroCutscene_1.IntroCutscene());
                     EventQueue_6.EventQueue.instance.addEvent({
@@ -12001,7 +12012,7 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
 });
 System.register("game/ui/MainMenuButton", ["engine/component", "engine/point", "engine/renderer/TextRender", "engine/util/utils", "game/graphics/Tilesets", "game/ui/Text", "game/ui/UIStateManager"], function (exports_132, context_132) {
     "use strict";
-    var component_40, point_75, TextRender_8, utils_9, Tilesets_45, Text_10, UIStateManager_18, MainMenuButton;
+    var component_40, point_75, TextRender_8, utils_9, Tilesets_46, Text_10, UIStateManager_18, MainMenuButton;
     var __moduleName = context_132 && context_132.id;
     return {
         setters: [
@@ -12017,8 +12028,8 @@ System.register("game/ui/MainMenuButton", ["engine/component", "engine/point", "
             function (utils_9_1) {
                 utils_9 = utils_9_1;
             },
-            function (Tilesets_45_1) {
-                Tilesets_45 = Tilesets_45_1;
+            function (Tilesets_46_1) {
+                Tilesets_46 = Tilesets_46_1;
             },
             function (Text_10_1) {
                 Text_10 = Text_10_1;
@@ -12039,7 +12050,7 @@ System.register("game/ui/MainMenuButton", ["engine/component", "engine/point", "
                     return _this;
                 }
                 MainMenuButton.prototype.update = function (updateData) {
-                    this.hovering = utils_9.rectContains(this.position.plusX(-this.width / 2).plusY(-4), new point_75.Point(this.width, Tilesets_45.TILE_SIZE), updateData.input.mousePos);
+                    this.hovering = utils_9.rectContains(this.position.plusX(-this.width / 2).plusY(-4), new point_75.Point(this.width, Tilesets_46.TILE_SIZE), updateData.input.mousePos);
                     if (this.hovering && updateData.input.isMouseDown) {
                         this.onClick();
                     }
@@ -12096,7 +12107,7 @@ System.register("engine/renderer/RectRender", ["engine/point", "engine/renderer/
 });
 System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "engine/point", "engine/renderer/RectRender", "engine/util/utils", "game/graphics/Tilesets", "game/SaveManager"], function (exports_134, context_134) {
     "use strict";
-    var component_41, Entity_28, point_77, RectRender_1, utils_10, Tilesets_46, SaveManager_8, CUSTOMIZATION_OPTIONS, PlumePicker;
+    var component_41, Entity_28, point_77, RectRender_1, utils_10, Tilesets_47, SaveManager_8, CUSTOMIZATION_OPTIONS, PlumePicker;
     var __moduleName = context_134 && context_134.id;
     return {
         setters: [
@@ -12115,8 +12126,8 @@ System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "en
             function (utils_10_1) {
                 utils_10 = utils_10_1;
             },
-            function (Tilesets_46_1) {
-                Tilesets_46 = Tilesets_46_1;
+            function (Tilesets_47_1) {
+                Tilesets_47 = Tilesets_47_1;
             },
             function (SaveManager_8_1) {
                 SaveManager_8 = SaveManager_8_1;
@@ -12175,13 +12186,13 @@ System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "en
                 };
                 PlumePicker.prototype.update = function (updateData) {
                     var _this = this;
-                    var sqSize = Tilesets_46.TILE_SIZE;
+                    var sqSize = Tilesets_47.TILE_SIZE;
                     var rowLen = 9;
                     var topLeftPos = this.position.plusX(-rowLen * sqSize / 2);
                     this.renders = CUSTOMIZATION_OPTIONS.map(function (colors, index) {
-                        var position = topLeftPos.plusX((index % rowLen) * Tilesets_46.TILE_SIZE)
-                            .plusY(Math.floor(index / rowLen) * Tilesets_46.TILE_SIZE);
-                        var dimensions = new point_77.Point(Tilesets_46.TILE_SIZE, Tilesets_46.TILE_SIZE);
+                        var position = topLeftPos.plusX((index % rowLen) * Tilesets_47.TILE_SIZE)
+                            .plusY(Math.floor(index / rowLen) * Tilesets_47.TILE_SIZE);
+                        var dimensions = new point_77.Point(Tilesets_47.TILE_SIZE, Tilesets_47.TILE_SIZE);
                         var hovered = utils_10.rectContains(position, dimensions, updateData.input.mousePos);
                         var big = hovered || JSON.stringify(colors) == JSON.stringify(_this.selected);
                         var bigBuffer = 2;
@@ -12340,7 +12351,7 @@ System.register("game/quest_game", ["engine/game", "game/scenes/GameScene", "gam
 });
 System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tilesets", "engine/Assets"], function (exports_137, context_137) {
     "use strict";
-    var quest_game_1, engine_1, Tilesets_47, Assets_5;
+    var quest_game_1, engine_1, Tilesets_48, Assets_5;
     var __moduleName = context_137 && context_137.id;
     return {
         setters: [
@@ -12350,15 +12361,15 @@ System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tiles
             function (engine_1_1) {
                 engine_1 = engine_1_1;
             },
-            function (Tilesets_47_1) {
-                Tilesets_47 = Tilesets_47_1;
+            function (Tilesets_48_1) {
+                Tilesets_48 = Tilesets_48_1;
             },
             function (Assets_5_1) {
                 Assets_5 = Assets_5_1;
             }
         ],
         execute: function () {
-            Assets_5.assets.loadImageFiles(Tilesets_47.Tilesets.getFilesToLoad()).then(function () {
+            Assets_5.assets.loadImageFiles(Tilesets_48.Tilesets.getFilesToLoad()).then(function () {
                 new engine_1.Engine(new quest_game_1.QuestGame(), document.getElementById('canvas'));
             });
         }
@@ -12653,15 +12664,15 @@ System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uu
 // TODO
 System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point"], function (exports_141, context_141) {
     "use strict";
-    var component_43, Tilesets_48, TileTransform_31, point_79, StringTiles;
+    var component_43, Tilesets_49, TileTransform_31, point_79, StringTiles;
     var __moduleName = context_141 && context_141.id;
     return {
         setters: [
             function (component_43_1) {
                 component_43 = component_43_1;
             },
-            function (Tilesets_48_1) {
-                Tilesets_48 = Tilesets_48_1;
+            function (Tilesets_49_1) {
+                Tilesets_49 = Tilesets_49_1;
             },
             function (TileTransform_31_1) {
                 TileTransform_31 = TileTransform_31_1;
@@ -12686,7 +12697,7 @@ System.register("game/ui/StringTiles", ["engine/component", "game/graphics/Tiles
                         return;
                     }
                     this.tiles = Array.from(s).map(function (c, i) {
-                        return Tilesets_48.Tilesets.instance.oneBit.getTileSource(c).toImageRender(new TileTransform_31.TileTransform(_this.topLeftPos.plus(new point_79.Point(10 * i, 0))));
+                        return Tilesets_49.Tilesets.instance.oneBit.getTileSource(c).toImageRender(new TileTransform_31.TileTransform(_this.topLeftPos.plus(new point_79.Point(10 * i, 0))));
                     });
                 };
                 StringTiles.prototype.clear = function () {
