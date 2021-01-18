@@ -6449,9 +6449,9 @@ System.register("game/items/CraftingRecipe", ["game/items/Inventory", "game/grap
         }
     };
 });
-System.register("game/ui/SellMenu", ["engine/Entity", "engine/component", "engine/point", "engine/renderer/BasicRenderComponent", "game/cutscenes/Camera", "engine/tiles/NineSlice", "game/graphics/Tilesets", "engine/renderer/ImageRender", "game/ui/UIStateManager", "game/items/Items", "game/ui/Text", "game/graphics/ImageFilters", "game/characters/Player", "engine/util/utils", "game/ui/Tooltip", "engine/tiles/AnimatedTileComponent", "engine/tiles/TileTransform", "engine/renderer/TextRender"], function (exports_77, context_77) {
+System.register("game/ui/SellMenu", ["engine/Entity", "engine/component", "engine/point", "engine/renderer/BasicRenderComponent", "game/cutscenes/Camera", "engine/tiles/NineSlice", "game/graphics/Tilesets", "engine/renderer/ImageRender", "game/ui/UIStateManager", "game/items/Items", "game/ui/Text", "game/graphics/ImageFilters", "game/characters/Player", "engine/util/utils", "game/ui/Tooltip", "engine/tiles/AnimatedTileComponent", "engine/tiles/TileTransform", "engine/renderer/TextRender", "game/SaveManager"], function (exports_77, context_77) {
     "use strict";
-    var Entity_11, component_15, point_40, BasicRenderComponent_5, Camera_6, NineSlice_2, Tilesets_17, ImageRender_5, UIStateManager_6, Items_2, Text_4, ImageFilters_2, Player_5, utils_4, Tooltip_2, AnimatedTileComponent_2, TileTransform_15, TextRender_5, SellMenu;
+    var Entity_11, component_15, point_40, BasicRenderComponent_5, Camera_6, NineSlice_2, Tilesets_17, ImageRender_5, UIStateManager_6, Items_2, Text_4, ImageFilters_2, Player_5, utils_4, Tooltip_2, AnimatedTileComponent_2, TileTransform_15, TextRender_5, SaveManager_1, SellMenu;
     var __moduleName = context_77 && context_77.id;
     return {
         setters: [
@@ -6508,6 +6508,9 @@ System.register("game/ui/SellMenu", ["engine/Entity", "engine/component", "engin
             },
             function (TextRender_5_1) {
                 TextRender_5 = TextRender_5_1;
+            },
+            function (SaveManager_1_1) {
+                SaveManager_1 = SaveManager_1_1;
             }
         ],
         execute: function () {
@@ -6604,10 +6607,9 @@ System.register("game/ui/SellMenu", ["engine/Entity", "engine/component", "engin
                         if (hovered && updateData.input.isMouseDown && sellable) {
                             // TODO a sound effect
                             inv.removeItem(sale.item, sale.count);
-                            // TODO this loop is dumb, get rid of it when we make coins not take an inv slot
-                            for (var i = 0; i < sale.price; i++) {
-                                inv.addItem(0 /* COIN */);
-                            }
+                            SaveManager_1.saveManager.setState({
+                                coins: SaveManager_1.saveManager.getState().coins + sale.price
+                            });
                             this.justSoldRow = r;
                             setTimeout(function () { return _this.justSoldRow = -1; }, 900);
                         }
@@ -6982,12 +6984,12 @@ System.register("game/characters/dialogues/ItemDialogues", ["game/characters/Dia
 });
 System.register("game/characters/Dialogue", ["game/SaveManager", "game/ui/DudeInteractIndicator", "game/characters/dialogues/BertoIntro", "game/characters/dialogues/DipIntro", "game/characters/dialogues/ItemDialogues", "game/characters/Player"], function (exports_81, context_81) {
     "use strict";
-    var SaveManager_1, DudeInteractIndicator_4, BertoIntro_1, DipIntro_2, ItemDialogues_2, Player_7, EMPTY_DIALOGUE, DialogueInstance, dialogueWithOptions, dialogue, option, saveAfterDialogueStage, inv, DialogueOption, NextDialogue, getDialogue, DIALOGUE_SOURCES, DIALOGUE_MAP;
+    var SaveManager_2, DudeInteractIndicator_4, BertoIntro_1, DipIntro_2, ItemDialogues_2, Player_7, EMPTY_DIALOGUE, DialogueInstance, dialogueWithOptions, dialogue, option, saveAfterDialogueStage, inv, DialogueOption, NextDialogue, getDialogue, DIALOGUE_SOURCES, DIALOGUE_MAP;
     var __moduleName = context_81 && context_81.id;
     return {
         setters: [
-            function (SaveManager_1_1) {
-                SaveManager_1 = SaveManager_1_1;
+            function (SaveManager_2_1) {
+                SaveManager_2 = SaveManager_2_1;
             },
             function (DudeInteractIndicator_4_1) {
                 DudeInteractIndicator_4 = DudeInteractIndicator_4_1;
@@ -7046,7 +7048,7 @@ System.register("game/characters/Dialogue", ["game/SaveManager", "game/ui/DudeIn
             });
             exports_81("saveAfterDialogueStage", saveAfterDialogueStage = function () {
                 // save after a delay to account for the next dialogue stage being set
-                setTimeout(function () { return SaveManager_1.saveManager.save(); }, 500);
+                setTimeout(function () { return SaveManager_2.saveManager.save(); }, 500);
             });
             exports_81("inv", inv = function () { return Player_7.Player.instance.dude.inventory; });
             DialogueOption = /** @class */ (function () {
@@ -8971,7 +8973,7 @@ System.register("game/ui/PlaceElementDisplay", ["engine/Entity", "engine/compone
 });
 System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point", "engine/util/utils", "game/graphics/Tilesets", "game/characters/Player", "engine/Entity", "game/ui/UIStateManager", "engine/tiles/NineSlice", "game/ui/Tooltip", "engine/tiles/AnimatedTileComponent", "engine/tiles/TileTransform", "engine/renderer/BasicRenderComponent", "engine/renderer/TextRender", "game/items/Items", "game/ui/Text", "game/Controls", "game/ui/PlaceElementDisplay", "game/SaveManager", "game/world/LocationManager"], function (exports_103, context_103) {
     "use strict";
-    var component_27, point_59, utils_8, Tilesets_35, Player_11, Entity_22, UIStateManager_12, NineSlice_7, Tooltip_3, AnimatedTileComponent_4, TileTransform_26, BasicRenderComponent_7, TextRender_7, Items_5, Text_8, Controls_6, PlaceElementDisplay_2, SaveManager_2, LocationManager_20, InventoryDisplay;
+    var component_27, point_59, utils_8, Tilesets_35, Player_11, Entity_22, UIStateManager_12, NineSlice_7, Tooltip_3, AnimatedTileComponent_4, TileTransform_26, BasicRenderComponent_7, TextRender_7, Items_5, Text_8, Controls_6, PlaceElementDisplay_2, SaveManager_3, LocationManager_20, InventoryDisplay;
     var __moduleName = context_103 && context_103.id;
     return {
         setters: [
@@ -9026,8 +9028,8 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point",
             function (PlaceElementDisplay_2_1) {
                 PlaceElementDisplay_2 = PlaceElementDisplay_2_1;
             },
-            function (SaveManager_2_1) {
-                SaveManager_2 = SaveManager_2_1;
+            function (SaveManager_3_1) {
+                SaveManager_3 = SaveManager_3_1;
             },
             function (LocationManager_20_1) {
                 LocationManager_20 = LocationManager_20_1;
@@ -9188,7 +9190,7 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point",
                     this.displayEntity = new Entity_22.Entity();
                     // coins
                     this.displayEntity.addComponent(new AnimatedTileComponent_4.AnimatedTileComponent([Tilesets_35.Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)], new TileTransform_26.TileTransform(this.offset.plus(this.coinsOffset))));
-                    this.displayEntity.addComponent(new BasicRenderComponent_7.BasicRenderComponent(new TextRender_7.TextRender("x" + SaveManager_2.saveManager.getState().coins, new point_59.Point(9, 1).plus(this.offset).plus(this.coinsOffset), Text_8.TEXT_SIZE, Text_8.TEXT_FONT, "#facb3e" /* YELLOW */, UIStateManager_12.UIStateManager.UI_SPRITE_DEPTH)));
+                    this.displayEntity.addComponent(new BasicRenderComponent_7.BasicRenderComponent(new TextRender_7.TextRender("x" + SaveManager_3.saveManager.getState().coins, new point_59.Point(9, 1).plus(this.offset).plus(this.coinsOffset), Text_8.TEXT_SIZE, Text_8.TEXT_FONT, "#facb3e" /* YELLOW */, UIStateManager_12.UIStateManager.UI_SPRITE_DEPTH)));
                     // background
                     this.spawnBG();
                     // icons
@@ -9226,15 +9228,15 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/point",
 });
 System.register("game/cutscenes/CutsceneManager", ["engine/Entity", "game/SaveManager"], function (exports_104, context_104) {
     "use strict";
-    var Entity_23, SaveManager_3, CutsceneManager;
+    var Entity_23, SaveManager_4, CutsceneManager;
     var __moduleName = context_104 && context_104.id;
     return {
         setters: [
             function (Entity_23_1) {
                 Entity_23 = Entity_23_1;
             },
-            function (SaveManager_3_1) {
-                SaveManager_3 = SaveManager_3_1;
+            function (SaveManager_4_1) {
+                SaveManager_4 = SaveManager_4_1;
             }
         ],
         execute: function () {
@@ -9267,7 +9269,7 @@ System.register("game/cutscenes/CutsceneManager", ["engine/Entity", "game/SaveMa
                 };
                 CutsceneManager.prototype.finishCutscene = function () {
                     this.entity = null;
-                    SaveManager_3.saveManager.save();
+                    SaveManager_4.saveManager.save();
                 };
                 CutsceneManager.prototype.getEntity = function () {
                     return this.entity;
@@ -9320,7 +9322,7 @@ System.register("game/ui/ControlsUI", ["game/ui/KeyPressIndicator", "engine/poin
 });
 System.register("game/ui/PauseMenu", ["engine/component", "engine/Entity", "game/ui/UIStateManager", "engine/point", "game/ui/ButtonsMenu", "game/SaveManager", "game/cutscenes/CutsceneManager", "game/ui/ControlsUI", "engine/renderer/BasicRenderComponent"], function (exports_106, context_106) {
     "use strict";
-    var component_28, Entity_24, UIStateManager_14, point_61, ButtonsMenu_2, SaveManager_4, CutsceneManager_1, ControlsUI_1, BasicRenderComponent_8, PauseMenu;
+    var component_28, Entity_24, UIStateManager_14, point_61, ButtonsMenu_2, SaveManager_5, CutsceneManager_1, ControlsUI_1, BasicRenderComponent_8, PauseMenu;
     var __moduleName = context_106 && context_106.id;
     return {
         setters: [
@@ -9339,8 +9341,8 @@ System.register("game/ui/PauseMenu", ["engine/component", "engine/Entity", "game
             function (ButtonsMenu_2_1) {
                 ButtonsMenu_2 = ButtonsMenu_2_1;
             },
-            function (SaveManager_4_1) {
-                SaveManager_4 = SaveManager_4_1;
+            function (SaveManager_5_1) {
+                SaveManager_5 = SaveManager_5_1;
             },
             function (CutsceneManager_1_1) {
                 CutsceneManager_1 = CutsceneManager_1_1;
@@ -9382,12 +9384,12 @@ System.register("game/ui/PauseMenu", ["engine/component", "engine/Entity", "game
                     var hoverColor = "#fdf7ed" /* WHITE */;
                     this.displayEntity = ButtonsMenu_2.ButtonsMenu.render(dimensions, "red", [{
                             text: "Save game".toUpperCase(),
-                            fn: function () { return SaveManager_4.saveManager.save(); },
+                            fn: function () { return SaveManager_5.saveManager.save(); },
                             buttonColor: buttonColor, textColor: textColor, hoverColor: hoverColor,
                         },
                         {
                             text: "Load last save".toUpperCase(),
-                            fn: function () { return SaveManager_4.saveManager.load(); },
+                            fn: function () { return SaveManager_5.saveManager.load(); },
                             buttonColor: buttonColor, textColor: textColor, hoverColor: hoverColor,
                         }]);
                     this.controlsDisplay = new Entity_24.Entity([new (BasicRenderComponent_8.BasicRenderComponent.bind.apply(BasicRenderComponent_8.BasicRenderComponent, __spreadArrays([void 0], ControlsUI_1.makeControlsUI(dimensions, point_61.Point.ZERO))))()]);
@@ -10220,7 +10222,7 @@ System.register("game/world/LocationManager", ["game/world/WorldLocation"], func
 });
 System.register("game/items/DroppedItem", ["engine/collision/BoxCollider", "engine/component", "engine/point", "game/characters/Player", "game/world/LocationManager", "game/items/Items", "game/SaveManager"], function (exports_118, context_118) {
     "use strict";
-    var BoxCollider_7, component_34, point_65, Player_15, LocationManager_23, Items_6, SaveManager_5, DroppedItem;
+    var BoxCollider_7, component_34, point_65, Player_15, LocationManager_23, Items_6, SaveManager_6, DroppedItem;
     var __moduleName = context_118 && context_118.id;
     return {
         setters: [
@@ -10242,8 +10244,8 @@ System.register("game/items/DroppedItem", ["engine/collision/BoxCollider", "engi
             function (Items_6_1) {
                 Items_6 = Items_6_1;
             },
-            function (SaveManager_5_1) {
-                SaveManager_5 = SaveManager_5_1;
+            function (SaveManager_6_1) {
+                SaveManager_6 = SaveManager_6_1;
             }
         ],
         execute: function () {
@@ -10289,8 +10291,8 @@ System.register("game/items/DroppedItem", ["engine/collision/BoxCollider", "engi
                             setTimeout(function () {
                                 if (Player_15.Player.instance.dude.isAlive && !!_this.entity) {
                                     if (_this.itemType === 0 /* COIN */) {
-                                        SaveManager_5.saveManager.setState({
-                                            coins: SaveManager_5.saveManager.getState().coins + 1
+                                        SaveManager_6.saveManager.setState({
+                                            coins: SaveManager_6.saveManager.getState().coins + 1
                                         });
                                     }
                                     if (_this.itemType === 0 /* COIN */ || Player_15.Player.instance.dude.inventory.addItem(_this.itemType)) {
@@ -10587,7 +10589,7 @@ System.register("game/items/Inventory", ["game/items/Items"], function (exports_
 });
 System.register("game/characters/DudeAnimationUtils", ["game/graphics/ImageFilters", "game/graphics/Tilesets", "game/SaveManager"], function (exports_121, context_121) {
     "use strict";
-    var ImageFilters_3, Tilesets_40, SaveManager_6, maybeFilter, DudeAnimationUtils;
+    var ImageFilters_3, Tilesets_40, SaveManager_7, maybeFilter, DudeAnimationUtils;
     var __moduleName = context_121 && context_121.id;
     return {
         setters: [
@@ -10597,8 +10599,8 @@ System.register("game/characters/DudeAnimationUtils", ["game/graphics/ImageFilte
             function (Tilesets_40_1) {
                 Tilesets_40 = Tilesets_40_1;
             },
-            function (SaveManager_6_1) {
-                SaveManager_6 = SaveManager_6_1;
+            function (SaveManager_7_1) {
+                SaveManager_7 = SaveManager_7_1;
             }
         ],
         execute: function () {
@@ -10607,7 +10609,7 @@ System.register("game/characters/DudeAnimationUtils", ["game/graphics/ImageFilte
                     throw new Error("no animation found for \"" + characterAnimName + "\"");
                 }
                 if (characterAnimName === "knight_f") {
-                    var color = SaveManager_6.saveManager.getState().plume;
+                    var color = SaveManager_7.saveManager.getState().plume;
                     if (!!color) {
                         return anim
                             .filtered(ImageFilters_3.ImageFilters.recolor("#dc4a7b" /* PINK */, color[0]))
@@ -11900,7 +11902,7 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
 });
 System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "engine/point", "game/characters/Dude", "game/characters/DudeFactory", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/graphics/Tilesets", "game/items/DroppedItem", "game/SaveManager", "game/ui/UIStateManager", "game/world/GroundRenderer", "game/world/LocationManager", "game/world/MapGenerator", "game/world/PointLightMaskRenderer", "game/world/TimeUnit", "game/world/WorldTime", "game/world/events/EventQueue", "game/world/events/QueuedEvent", "game/characters/NPC"], function (exports_131, context_131) {
     "use strict";
-    var CollisionEngine_4, point_75, Dude_10, DudeFactory_6, Camera_9, CutsceneManager_3, IntroCutscene_1, Tilesets_45, DroppedItem_3, SaveManager_7, UIStateManager_17, GroundRenderer_2, LocationManager_28, MapGenerator_5, PointLightMaskRenderer_5, TimeUnit_8, WorldTime_10, EventQueue_6, QueuedEvent_4, NPC_6, ZOOM, GameScene;
+    var CollisionEngine_4, point_75, Dude_10, DudeFactory_6, Camera_9, CutsceneManager_3, IntroCutscene_1, Tilesets_45, DroppedItem_3, SaveManager_8, UIStateManager_17, GroundRenderer_2, LocationManager_28, MapGenerator_5, PointLightMaskRenderer_5, TimeUnit_8, WorldTime_10, EventQueue_6, QueuedEvent_4, NPC_6, ZOOM, GameScene;
     var __moduleName = context_131 && context_131.id;
     return {
         setters: [
@@ -11931,8 +11933,8 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
             function (DroppedItem_3_1) {
                 DroppedItem_3 = DroppedItem_3_1;
             },
-            function (SaveManager_7_1) {
-                SaveManager_7 = SaveManager_7_1;
+            function (SaveManager_8_1) {
+                SaveManager_8 = SaveManager_8_1;
             },
             function (UIStateManager_17_1) {
                 UIStateManager_17 = UIStateManager_17_1;
@@ -11979,10 +11981,10 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
                 GameScene.prototype.continueGame = function () {
                     // Wait to initialize since it will begin a coroutine
                     PointLightMaskRenderer_5.PointLightMaskRenderer.instance.start();
-                    SaveManager_7.saveManager.load();
+                    SaveManager_8.saveManager.load();
                 };
                 GameScene.prototype.newGame = function () {
-                    SaveManager_7.saveManager.deleteSave();
+                    SaveManager_8.saveManager.deleteSave();
                     // Wait to initialize since it will begin a coroutine
                     PointLightMaskRenderer_5.PointLightMaskRenderer.instance.start();
                     WorldTime_10.WorldTime.instance.initialize(TimeUnit_8.TimeUnit.HOUR * 19.5);
@@ -12131,7 +12133,7 @@ System.register("engine/renderer/RectRender", ["engine/point", "engine/renderer/
 });
 System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "engine/point", "engine/renderer/RectRender", "engine/util/utils", "game/graphics/Tilesets", "game/SaveManager"], function (exports_134, context_134) {
     "use strict";
-    var component_41, Entity_28, point_78, RectRender_1, utils_10, Tilesets_47, SaveManager_8, CUSTOMIZATION_OPTIONS, PlumePicker;
+    var component_41, Entity_28, point_78, RectRender_1, utils_10, Tilesets_47, SaveManager_9, CUSTOMIZATION_OPTIONS, PlumePicker;
     var __moduleName = context_134 && context_134.id;
     return {
         setters: [
@@ -12153,8 +12155,8 @@ System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "en
             function (Tilesets_47_1) {
                 Tilesets_47 = Tilesets_47_1;
             },
-            function (SaveManager_8_1) {
-                SaveManager_8 = SaveManager_8_1;
+            function (SaveManager_9_1) {
+                SaveManager_9 = SaveManager_9_1;
             }
         ],
         execute: function () {
@@ -12186,7 +12188,7 @@ System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "en
                     _this.position = point_78.Point.ZERO; // top-center position
                     _this.entity = new Entity_28.Entity([_this]);
                     _this.callback = callback;
-                    _this.originalSavedColor = SaveManager_8.saveManager.getState().plume;
+                    _this.originalSavedColor = SaveManager_9.saveManager.getState().plume;
                     if (!!_this.originalSavedColor) {
                         _this.select(_this.originalSavedColor);
                     }
@@ -12205,7 +12207,7 @@ System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "en
                 };
                 PlumePicker.prototype.select = function (colors) {
                     this.selected = colors;
-                    SaveManager_8.saveManager.setState({ plume: colors });
+                    SaveManager_9.saveManager.setState({ plume: colors });
                     this.callback(colors);
                 };
                 PlumePicker.prototype.update = function (updateData) {
@@ -12242,7 +12244,7 @@ System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "en
 });
 System.register("game/scenes/MainMenuScene", ["engine/Entity", "engine/point", "game/characters/DudeAnimationUtils", "game/SaveManager", "game/ui/MainMenuButton", "game/ui/PlumePicker"], function (exports_135, context_135) {
     "use strict";
-    var Entity_29, point_79, DudeAnimationUtils_2, SaveManager_9, MainMenuButton_1, PlumePicker_1, ZOOM, MainMenuScene;
+    var Entity_29, point_79, DudeAnimationUtils_2, SaveManager_10, MainMenuButton_1, PlumePicker_1, ZOOM, MainMenuScene;
     var __moduleName = context_135 && context_135.id;
     return {
         setters: [
@@ -12255,8 +12257,8 @@ System.register("game/scenes/MainMenuScene", ["engine/Entity", "engine/point", "
             function (DudeAnimationUtils_2_1) {
                 DudeAnimationUtils_2 = DudeAnimationUtils_2_1;
             },
-            function (SaveManager_9_1) {
-                SaveManager_9 = SaveManager_9_1;
+            function (SaveManager_10_1) {
+                SaveManager_10 = SaveManager_10_1;
             },
             function (MainMenuButton_1_1) {
                 MainMenuButton_1 = MainMenuButton_1_1;
@@ -12279,7 +12281,7 @@ System.register("game/scenes/MainMenuScene", ["engine/Entity", "engine/point", "
                 MainMenuScene.prototype.getViews = function (updateViewsContext) {
                     var _this = this;
                     var dimensions = updateViewsContext.dimensions.div(ZOOM);
-                    var saveFileExists = SaveManager_9.saveManager.saveFileExists();
+                    var saveFileExists = SaveManager_10.saveManager.saveFileExists();
                     var center = dimensions.floorDiv(2);
                     var lineSpacing = 16;
                     var menuTop = center.plusY(-20);

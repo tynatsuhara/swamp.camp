@@ -22,6 +22,7 @@ import { ItemStack } from "../items/Inventory"
 import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { TextRender } from "../../engine/renderer/TextRender"
+import { saveManager } from "../SaveManager"
 
 export type SalePackage = {
     readonly item: Item,
@@ -166,10 +167,9 @@ export class SellMenu extends Component {
             if (hovered && updateData.input.isMouseDown && sellable) {
                 // TODO a sound effect
                 inv.removeItem(sale.item, sale.count)
-                // TODO this loop is dumb, get rid of it when we make coins not take an inv slot
-                for (let i = 0; i < sale.price; i++) {
-                    inv.addItem(Item.COIN)
-                }
+                saveManager.setState({ 
+                    coins: saveManager.getState().coins + sale.price
+                })
                 this.justSoldRow = r
                 setTimeout(() => this.justSoldRow = -1, 900)
             }
