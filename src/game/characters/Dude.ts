@@ -170,7 +170,8 @@ export class Dude extends Component implements DialogueSource {
         }
 
         // absorb damage if facing the direction of the enemy
-        if (this.shield?.isBlocking() && !this.isFacing(this.standingPosition.plus(direction))) {
+        let blocked = this.shield?.isBlocking() && !this.isFacing(this.standingPosition.plus(direction))
+        if (blocked) {
             damage *= .25
             knockback *= .3
         }
@@ -186,12 +187,12 @@ export class Dude extends Component implements DialogueSource {
         this.knockback(direction, knockback)
 
         if (!!this.onDamageCallback) {
-            this.onDamageCallback()
+            this.onDamageCallback(blocked)
         }
     }
 
-    private onDamageCallback: () => void
-    setOnDamageCallback(fn: () => void) {
+    private onDamageCallback: (blocked: boolean) => void
+    setOnDamageCallback(fn: (blocked: boolean) => void) {
         this.onDamageCallback = fn
     }
 

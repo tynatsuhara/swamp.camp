@@ -27,6 +27,15 @@ export class Player extends Component {
 
     start(startData: StartData) {
         this._dude = this.entity.getComponent(Dude)
+        this.dude.setOnDamageCallback((blocked) => {
+            if (!this.dude.isAlive) {
+                Camera.instance.shake(6, 600) 
+            } else if (blocked) {
+                Camera.instance.shake(2.5, 400) 
+            } else {
+                Camera.instance.shake(3.5, 400) 
+            }
+        })
     }
 
     update(updateData: UpdateData) {

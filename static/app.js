@@ -9556,7 +9556,19 @@ System.register("game/characters/Player", ["engine/component", "engine/point", "
                     configurable: true
                 });
                 Player.prototype.start = function (startData) {
+                    var _this = this;
                     this._dude = this.entity.getComponent(Dude_2.Dude);
+                    this.dude.setOnDamageCallback(function (blocked) {
+                        if (!_this.dude.isAlive) {
+                            Camera_8.Camera.instance.shake(6, 600);
+                        }
+                        else if (blocked) {
+                            Camera_8.Camera.instance.shake(2.5, 400);
+                        }
+                        else {
+                            Camera_8.Camera.instance.shake(3.5, 400);
+                        }
+                    });
                 };
                 Player.prototype.update = function (updateData) {
                     if (!this.dude.isAlive) {
@@ -11576,7 +11588,8 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                         return;
                     }
                     // absorb damage if facing the direction of the enemy
-                    if (((_a = this.shield) === null || _a === void 0 ? void 0 : _a.isBlocking()) && !this.isFacing(this.standingPosition.plus(direction))) {
+                    var blocked = ((_a = this.shield) === null || _a === void 0 ? void 0 : _a.isBlocking()) && !this.isFacing(this.standingPosition.plus(direction));
+                    if (blocked) {
                         damage *= .25;
                         knockback *= .3;
                     }
@@ -11589,7 +11602,7 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                     }
                     this.knockback(direction, knockback);
                     if (!!this.onDamageCallback) {
-                        this.onDamageCallback();
+                        this.onDamageCallback(blocked);
                     }
                 };
                 Dude.prototype.setOnDamageCallback = function (fn) {
