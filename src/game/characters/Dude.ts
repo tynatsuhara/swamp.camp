@@ -173,7 +173,7 @@ export class Dude extends Component implements DialogueSource {
         let blocked = this.shield?.isBlocking() && !this.isFacing(this.standingPosition.plus(direction))
         if (blocked) {
             damage *= .25
-            knockback *= .3
+            knockback *= .4
         }
         
         if (this.isAlive) {

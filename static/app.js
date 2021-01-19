@@ -9626,18 +9626,14 @@ System.register("game/characters/Player", ["engine/component", "engine/point", "
                         possibleInteractable.interact();
                     }
                     // FOR TESTING
-                    if (updateData.input.isKeyDown(80 /* P */)) {
-                        // this.dude.damage(.25, new Point(Math.random()-.5, Math.random()-.5), 30)
-                        this.dude.damage(.25, new point_62.Point(-1, Math.random() - .5), 30);
+                    if (updateData.input.isKeyDown(75 /* K */)) {
+                        DudeFactory_4.DudeFactory.instance.new(6 /* SHROOM */, updateData.input.mousePos);
                     }
                     if (updateData.input.isKeyDown(76 /* L */)) {
                         DudeFactory_4.DudeFactory.instance.new(5 /* HORNED_DEMON */, updateData.input.mousePos);
                     }
-                    if (updateData.input.isKeyDown(75 /* K */)) {
-                        DudeFactory_4.DudeFactory.instance.new(6 /* SHROOM */, updateData.input.mousePos);
-                    }
-                    if (updateData.input.isKeyDown(49 /* ONE */)) {
-                        Camera_8.Camera.instance.shake(10, 1000);
+                    if (updateData.input.isKeyDown(186 /* SEMICOLON */)) {
+                        DudeFactory_4.DudeFactory.instance.new(3 /* ORC_WARRIOR */, updateData.input.mousePos);
                     }
                     // update crosshair position
                     // const relativeLerpedPos = originalCrosshairPosRelative.lerp(0.16, this.lerpedLastMoveDir.normalized().times(TILE_SIZE))
@@ -11591,7 +11587,7 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                     var blocked = ((_a = this.shield) === null || _a === void 0 ? void 0 : _a.isBlocking()) && !this.isFacing(this.standingPosition.plus(direction));
                     if (blocked) {
                         damage *= .25;
-                        knockback *= .3;
+                        knockback *= .4;
                     }
                     if (this.isAlive) {
                         this._health -= damage;

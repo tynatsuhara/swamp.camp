@@ -27,7 +27,7 @@ export class Player extends Component {
 
     start(startData: StartData) {
         this._dude = this.entity.getComponent(Dude)
-        this.dude.setOnDamageCallback((blocked) => {
+        this.dude.setOnDamageCallback(blocked => {
             if (!this.dude.isAlive) {
                 Camera.instance.shake(6, 600) 
             } else if (blocked) {
@@ -106,18 +106,14 @@ export class Player extends Component {
 
 
         // FOR TESTING
-        if (updateData.input.isKeyDown(InputKey.P)) {
-            // this.dude.damage(.25, new Point(Math.random()-.5, Math.random()-.5), 30)
-            this.dude.damage(.25, new Point(-1, Math.random()-.5), 30)
+        if (updateData.input.isKeyDown(InputKey.K)) {
+            DudeFactory.instance.new(DudeType.SHROOM, updateData.input.mousePos)
         }
         if (updateData.input.isKeyDown(InputKey.L)) {
             DudeFactory.instance.new(DudeType.HORNED_DEMON, updateData.input.mousePos)
         }
-        if (updateData.input.isKeyDown(InputKey.K)) {
-            DudeFactory.instance.new(DudeType.SHROOM, updateData.input.mousePos)
-        }
-        if (updateData.input.isKeyDown(InputKey.ONE)) {
-            Camera.instance.shake(10, 1000)
+        if (updateData.input.isKeyDown(InputKey.SEMICOLON)) {
+            DudeFactory.instance.new(DudeType.ORC_WARRIOR, updateData.input.mousePos)
         }
         
         // update crosshair position
