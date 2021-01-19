@@ -10206,8 +10206,11 @@ System.register("game/world/LocationManager", ["game/world/WorldLocation"], func
                     return location;
                 };
                 LocationManager.prototype.exterior = function () {
-                    // TODO do this in a less hacky fashion
-                    return Array.from(this.locations.values()).filter(function (l) { return !l.isInterior; })[0];
+                    if (!this.ext) {
+                        // TODO do this in a less hacky fashion
+                        this.ext = Array.from(this.locations.values()).filter(function (l) { return !l.isInterior; })[0];
+                    }
+                    return this.ext;
                 };
                 LocationManager.prototype.getLocations = function () {
                     return Array.from(this.locations.values());

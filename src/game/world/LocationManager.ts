@@ -32,9 +32,13 @@ export class LocationManager {
     }
 
     exterior(): WorldLocation {
-        // TODO do this in a less hacky fashion
-        return Array.from(this.locations.values()).filter(l => !l.isInterior)[0]
+        if (!this.ext) {
+            // TODO do this in a less hacky fashion
+            this.ext = Array.from(this.locations.values()).filter(l => !l.isInterior)[0]
+        }
+        return this.ext
     }
+    private ext: WorldLocation
 
     getLocations(): WorldLocation[] {
         return Array.from(this.locations.values())
