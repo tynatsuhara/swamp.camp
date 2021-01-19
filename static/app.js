@@ -8606,7 +8606,12 @@ System.register("game/world/elements/Mushroom", ["engine/component", "engine/Ent
                         e.selfDestruct();
                         DudeFactory_3.DudeFactory.instance.new(6 /* SHROOM */, pos.times(Tilesets_29.TILE_SIZE).plusY(-Tilesets_29.TILE_SIZE).plusX(-Tilesets_29.TILE_SIZE / 2), LocationManager_16.LocationManager.instance.exterior());
                     }));
-                    return e.addComponent(new ElementComponent_4.ElementComponent(this.type, pos, [pos], function () { return data; }));
+                    return e.addComponent(new ElementComponent_4.ElementComponent(this.type, pos, [pos], function () {
+                        var _a;
+                        return (_a = {},
+                            _a[NEXT_GROWTH_TIME] = nextGrowthTime,
+                            _a);
+                    }));
                 };
                 MushroomFactory.prototype.canPlace = function (pos) {
                     return LocationManager_16.LocationManager.instance.currentLocation.ground.get(pos.plusY(1)).type === 2 /* GRASS */;

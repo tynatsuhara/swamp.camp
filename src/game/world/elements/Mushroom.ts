@@ -65,7 +65,9 @@ export class MushroomFactory extends ElementFactory {
             this.type, 
             pos,
             [pos], 
-            () => data
+            () => ({
+                [NEXT_GROWTH_TIME]: nextGrowthTime
+            })
         ))
     }
 
