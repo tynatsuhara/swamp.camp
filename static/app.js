@@ -11917,9 +11917,9 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
         }
     };
 });
-System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "engine/point", "game/characters/Dude", "game/characters/DudeFactory", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/graphics/Tilesets", "game/items/DroppedItem", "game/SaveManager", "game/ui/UIStateManager", "game/world/GroundRenderer", "game/world/LocationManager", "game/world/MapGenerator", "game/world/PointLightMaskRenderer", "game/world/TimeUnit", "game/world/WorldTime", "game/world/events/EventQueue", "game/world/events/QueuedEvent", "game/characters/NPC"], function (exports_131, context_131) {
+System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "engine/point", "game/characters/Dude", "game/characters/DudeFactory", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/graphics/Tilesets", "game/items/DroppedItem", "game/SaveManager", "game/ui/UIStateManager", "game/world/GroundRenderer", "game/world/LocationManager", "game/world/MapGenerator", "game/world/PointLightMaskRenderer", "game/world/TimeUnit", "game/world/WorldTime", "game/world/events/EventQueue", "game/world/events/QueuedEvent", "game/characters/NPC", "engine/renderer/BasicRenderComponent", "game/characters/Player", "engine/renderer/LineRender", "engine/Entity", "engine/debug"], function (exports_131, context_131) {
     "use strict";
-    var CollisionEngine_4, point_75, Dude_10, DudeFactory_6, Camera_10, CutsceneManager_3, IntroCutscene_1, Tilesets_45, DroppedItem_3, SaveManager_8, UIStateManager_17, GroundRenderer_2, LocationManager_28, MapGenerator_5, PointLightMaskRenderer_5, TimeUnit_8, WorldTime_10, EventQueue_6, QueuedEvent_4, NPC_6, ZOOM, GameScene;
+    var CollisionEngine_4, point_75, Dude_10, DudeFactory_6, Camera_10, CutsceneManager_3, IntroCutscene_1, Tilesets_45, DroppedItem_3, SaveManager_8, UIStateManager_17, GroundRenderer_2, LocationManager_28, MapGenerator_5, PointLightMaskRenderer_5, TimeUnit_8, WorldTime_10, EventQueue_6, QueuedEvent_4, NPC_6, BasicRenderComponent_9, Player_18, LineRender_2, Entity_28, debug_3, ZOOM, GameScene;
     var __moduleName = context_131 && context_131.id;
     return {
         setters: [
@@ -11982,6 +11982,21 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
             },
             function (NPC_6_1) {
                 NPC_6 = NPC_6_1;
+            },
+            function (BasicRenderComponent_9_1) {
+                BasicRenderComponent_9 = BasicRenderComponent_9_1;
+            },
+            function (Player_18_1) {
+                Player_18 = Player_18_1;
+            },
+            function (LineRender_2_1) {
+                LineRender_2 = LineRender_2_1;
+            },
+            function (Entity_28_1) {
+                Entity_28 = Entity_28_1;
+            },
+            function (debug_3_1) {
+                debug_3 = debug_3_1;
             }
         ],
         execute: function () {
@@ -12039,6 +12054,7 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
                             WorldTime_10.WorldTime.instance.getEntity(),
                             PointLightMaskRenderer_5.PointLightMaskRenderer.instance.getEntity(),
                             GroundRenderer_2.GroundRenderer.instance.getEntity(),
+                            this.getDebugEntity()
                         ])
                     };
                     this.uiView = {
@@ -12046,6 +12062,26 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
                         offset: point_75.Point.ZERO,
                         entities: UIStateManager_17.UIStateManager.instance.get(dimensions, updateViewsContext.elapsedTimeMillis)
                     };
+                };
+                GameScene.prototype.getDebugEntity = function () {
+                    var _a;
+                    if (!((_a = Player_18.Player.instance) === null || _a === void 0 ? void 0 : _a.dude) || !debug_3.debug.showGrid) {
+                        return;
+                    }
+                    var base = Tilesets_45.pixelPtToTilePt(Player_18.Player.instance.dude.standingPosition);
+                    var lines = [];
+                    var gridRange = 50;
+                    // vertical lines
+                    for (var i = -gridRange; i < gridRange; i++) {
+                        var top_2 = base.times(Tilesets_45.TILE_SIZE).plusX(i * Tilesets_45.TILE_SIZE).plusY(-gridRange * Tilesets_45.TILE_SIZE);
+                        lines.push(new LineRender_2.LineRender(top_2, top_2.plusY(2 * gridRange * Tilesets_45.TILE_SIZE)));
+                    }
+                    // horizontal lines
+                    for (var i = -gridRange; i < gridRange; i++) {
+                        var left = base.times(Tilesets_45.TILE_SIZE).plusX(-gridRange * Tilesets_45.TILE_SIZE).plusY(i * Tilesets_45.TILE_SIZE);
+                        lines.push(new LineRender_2.LineRender(left, left.plusX(2 * gridRange * Tilesets_45.TILE_SIZE)));
+                    }
+                    return new Entity_28.Entity([new (BasicRenderComponent_9.BasicRenderComponent.bind.apply(BasicRenderComponent_9.BasicRenderComponent, __spreadArrays([void 0], lines)))()]);
                 };
                 return GameScene;
             }());
@@ -12150,15 +12186,15 @@ System.register("engine/renderer/RectRender", ["engine/point", "engine/renderer/
 });
 System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "engine/point", "engine/renderer/RectRender", "engine/util/utils", "game/graphics/Tilesets", "game/SaveManager"], function (exports_134, context_134) {
     "use strict";
-    var component_41, Entity_28, point_78, RectRender_1, utils_10, Tilesets_47, SaveManager_9, CUSTOMIZATION_OPTIONS, PlumePicker;
+    var component_41, Entity_29, point_78, RectRender_1, utils_10, Tilesets_47, SaveManager_9, CUSTOMIZATION_OPTIONS, PlumePicker;
     var __moduleName = context_134 && context_134.id;
     return {
         setters: [
             function (component_41_1) {
                 component_41 = component_41_1;
             },
-            function (Entity_28_1) {
-                Entity_28 = Entity_28_1;
+            function (Entity_29_1) {
+                Entity_29 = Entity_29_1;
             },
             function (point_78_1) {
                 point_78 = point_78_1;
@@ -12203,7 +12239,7 @@ System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "en
                 function PlumePicker(callback) {
                     var _this = _super.call(this) || this;
                     _this.position = point_78.Point.ZERO; // top-center position
-                    _this.entity = new Entity_28.Entity([_this]);
+                    _this.entity = new Entity_29.Entity([_this]);
                     _this.callback = callback;
                     _this.originalSavedColor = SaveManager_9.saveManager.getState().plume;
                     if (!!_this.originalSavedColor) {
@@ -12261,12 +12297,12 @@ System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "en
 });
 System.register("game/scenes/MainMenuScene", ["engine/Entity", "engine/point", "game/characters/DudeAnimationUtils", "game/SaveManager", "game/ui/MainMenuButton", "game/ui/PlumePicker"], function (exports_135, context_135) {
     "use strict";
-    var Entity_29, point_79, DudeAnimationUtils_2, SaveManager_10, MainMenuButton_1, PlumePicker_1, ZOOM, MainMenuScene;
+    var Entity_30, point_79, DudeAnimationUtils_2, SaveManager_10, MainMenuButton_1, PlumePicker_1, ZOOM, MainMenuScene;
     var __moduleName = context_135 && context_135.id;
     return {
         setters: [
-            function (Entity_29_1) {
-                Entity_29 = Entity_29_1;
+            function (Entity_30_1) {
+                Entity_30 = Entity_30_1;
             },
             function (point_79_1) {
                 point_79 = point_79_1;
@@ -12290,7 +12326,7 @@ System.register("game/scenes/MainMenuScene", ["engine/Entity", "engine/point", "
                 function MainMenuScene(continueFn, newGameFn) {
                     var _this = this;
                     this.plumes = new PlumePicker_1.PlumePicker(function (color) {
-                        _this.knight = new Entity_29.Entity().addComponent(DudeAnimationUtils_2.DudeAnimationUtils.getCharacterIdleAnimation("knight_f", { color: color }).toComponent());
+                        _this.knight = new Entity_30.Entity().addComponent(DudeAnimationUtils_2.DudeAnimationUtils.getCharacterIdleAnimation("knight_f", { color: color }).toComponent());
                     });
                     this.continueFn = continueFn;
                     this.newGameFn = newGameFn;
@@ -12306,10 +12342,10 @@ System.register("game/scenes/MainMenuScene", ["engine/Entity", "engine/point", "
                     this.knight.transform.position = menuTop.minus(this.knight.transform.dimensions.floorDiv(2).plusY(24));
                     var buttons = [];
                     if (this.newGame) {
-                        var top_2 = menuTop.plusY(42);
-                        buttons.push(new MainMenuButton_1.MainMenuButton(top_2, "start" + (saveFileExists ? " (delete old save)" : ""), this.newGameFn));
+                        var top_3 = menuTop.plusY(42);
+                        buttons.push(new MainMenuButton_1.MainMenuButton(top_3, "start" + (saveFileExists ? " (delete old save)" : ""), this.newGameFn));
                         if (saveFileExists) {
-                            buttons.push(new MainMenuButton_1.MainMenuButton(top_2.plusY(lineSpacing), "cancel", function () {
+                            buttons.push(new MainMenuButton_1.MainMenuButton(top_3.plusY(lineSpacing), "cancel", function () {
                                 _this.newGame = false;
                                 _this.plumes.reset();
                             }));
@@ -12323,7 +12359,7 @@ System.register("game/scenes/MainMenuScene", ["engine/Entity", "engine/point", "
                     }
                     var entities = [
                         this.knight.entity,
-                        new Entity_29.Entity(buttons)
+                        new Entity_30.Entity(buttons)
                     ];
                     if (this.newGame) {
                         entities.push(this.plumes.entity);
