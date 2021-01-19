@@ -40,8 +40,8 @@ export class TreeFactory extends ElementFactory {
         const availableResources = data[AVAILABLE_RESOURCES] ?? maxResourcesCount
 
         const e = new Entity()
-        const depth = (pos.y + 2) * TILE_SIZE
         const randomOffset = new Point(0, -4).randomlyShifted(2, 4)
+        const depth = (pos.y + 2) * TILE_SIZE + randomOffset.y
 
         const addTile = (s: string, pos: Point) => {
             const tile = e.addComponent(new TileComponent(

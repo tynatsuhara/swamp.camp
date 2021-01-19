@@ -1,24 +1,20 @@
+import { Component } from "../../../engine/component"
+import { Entity } from "../../../engine/Entity"
 import { Point } from "../../../engine/point"
-import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
-import { BoxCollider } from "../../../engine/collision/BoxCollider"
-import { WorldLocation } from "../WorldLocation"
 import { TileComponent } from "../../../engine/tiles/TileComponent"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
-import { Entity } from "../../../engine/Entity"
-import { Item, spawnItem } from "../../items/Items"
-import { HittableResource } from "./HittableResource"
-import { ElementComponent } from "./ElementComponent"
-import { ElementType } from "./Elements"
-import { WeaponType } from "../../characters/weapons/WeaponType"
-import { Player } from "../../characters/Player"
-import { ElementFactory } from "./ElementFactory"
-import { Component } from "../../../engine/component"
-import { WorldTime } from "../WorldTime"
-import { TimeUnit } from "../TimeUnit"
-import { LocationManager } from "../LocationManager"
-import { GroundType } from "../ground/Ground"
-import { Hittable } from "./Hittable"
 import { DudeFactory, DudeType } from "../../characters/DudeFactory"
+import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
+import { Item, spawnItem } from "../../items/Items"
+import { GroundType } from "../ground/Ground"
+import { LocationManager } from "../LocationManager"
+import { TimeUnit } from "../TimeUnit"
+import { WorldLocation } from "../WorldLocation"
+import { WorldTime } from "../WorldTime"
+import { ElementComponent } from "./ElementComponent"
+import { ElementFactory } from "./ElementFactory"
+import { ElementType } from "./Elements"
+import { Hittable } from "./Hittable"
 
 const NEXT_GROWTH_TIME = "ngt"
 
@@ -31,8 +27,8 @@ export class MushroomFactory extends ElementFactory {
         const nextGrowthTime = data[NEXT_GROWTH_TIME] ?? this.nextGrowthTime()
 
         const e = new Entity()
-        const depth = (pos.y + 1) * TILE_SIZE
         const randomOffset = new Point(0, -4).randomlyShifted(3, 3)
+        const depth = (pos.y + 1) * TILE_SIZE + randomOffset.y
 
         const addTile = (s: string, pos: Point) => {
             const tile = e.addComponent(new TileComponent(

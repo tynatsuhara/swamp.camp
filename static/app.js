@@ -8525,17 +8525,29 @@ System.register("game/world/elements/Hittable", ["engine/component", "engine/uti
         }
     };
 });
-System.register("game/world/elements/HittableResource", ["engine/collision/BoxCollider", "engine/point", "game/graphics/Tilesets", "game/items/Items", "game/world/LocationManager", "game/world/elements/ElementComponent", "game/world/elements/Hittable"], function (exports_97, context_97) {
+System.register("game/world/elements/Mushroom", ["engine/component", "engine/Entity", "engine/point", "engine/tiles/TileComponent", "engine/tiles/TileTransform", "game/characters/DudeFactory", "game/graphics/Tilesets", "game/items/Items", "game/world/LocationManager", "game/world/TimeUnit", "game/world/WorldTime", "game/world/elements/ElementComponent", "game/world/elements/ElementFactory", "game/world/elements/Hittable"], function (exports_97, context_97) {
     "use strict";
-    var BoxCollider_3, point_53, Tilesets_29, Items_4, LocationManager_16, ElementComponent_4, Hittable_1, HittableResource;
+    var component_27, Entity_21, point_53, TileComponent_6, TileTransform_24, DudeFactory_3, Tilesets_29, Items_4, LocationManager_16, TimeUnit_5, WorldTime_7, ElementComponent_4, ElementFactory_4, Hittable_1, NEXT_GROWTH_TIME, MushroomFactory, GrowableShroom;
     var __moduleName = context_97 && context_97.id;
     return {
         setters: [
-            function (BoxCollider_3_1) {
-                BoxCollider_3 = BoxCollider_3_1;
+            function (component_27_1) {
+                component_27 = component_27_1;
+            },
+            function (Entity_21_1) {
+                Entity_21 = Entity_21_1;
             },
             function (point_53_1) {
                 point_53 = point_53_1;
+            },
+            function (TileComponent_6_1) {
+                TileComponent_6 = TileComponent_6_1;
+            },
+            function (TileTransform_24_1) {
+                TileTransform_24 = TileTransform_24_1;
+            },
+            function (DudeFactory_3_1) {
+                DudeFactory_3 = DudeFactory_3_1;
             },
             function (Tilesets_29_1) {
                 Tilesets_29 = Tilesets_29_1;
@@ -8546,11 +8558,111 @@ System.register("game/world/elements/HittableResource", ["engine/collision/BoxCo
             function (LocationManager_16_1) {
                 LocationManager_16 = LocationManager_16_1;
             },
+            function (TimeUnit_5_1) {
+                TimeUnit_5 = TimeUnit_5_1;
+            },
+            function (WorldTime_7_1) {
+                WorldTime_7 = WorldTime_7_1;
+            },
             function (ElementComponent_4_1) {
                 ElementComponent_4 = ElementComponent_4_1;
             },
+            function (ElementFactory_4_1) {
+                ElementFactory_4 = ElementFactory_4_1;
+            },
             function (Hittable_1_1) {
                 Hittable_1 = Hittable_1_1;
+            }
+        ],
+        execute: function () {
+            NEXT_GROWTH_TIME = "ngt";
+            MushroomFactory = /** @class */ (function (_super) {
+                __extends(MushroomFactory, _super);
+                function MushroomFactory() {
+                    var _this = _super !== null && _super.apply(this, arguments) || this;
+                    _this.type = 7 /* MUSHROOM */;
+                    _this.dimensions = new point_53.Point(1, 1);
+                    return _this;
+                }
+                MushroomFactory.prototype.make = function (wl, pos, data) {
+                    var _a;
+                    var nextGrowthTime = (_a = data[NEXT_GROWTH_TIME]) !== null && _a !== void 0 ? _a : this.nextGrowthTime();
+                    var e = new Entity_21.Entity();
+                    var randomOffset = new point_53.Point(0, -4).randomlyShifted(3, 3);
+                    var depth = (pos.y + 1) * Tilesets_29.TILE_SIZE + randomOffset.y;
+                    var addTile = function (s, pos) {
+                        var tile = e.addComponent(new TileComponent_6.TileComponent(Tilesets_29.Tilesets.instance.outdoorTiles.getTileSource(s), new TileTransform_24.TileTransform(pos.times(Tilesets_29.TILE_SIZE).plus(randomOffset))));
+                        tile.transform.depth = depth;
+                        return tile;
+                    };
+                    var tile = addTile("mushroomPlaced", pos);
+                    var hittableCenter = pos.times(Tilesets_29.TILE_SIZE).plus(new point_53.Point(Tilesets_29.TILE_SIZE / 2, Tilesets_29.TILE_SIZE / 2));
+                    e.addComponent(new Hittable_1.Hittable(hittableCenter, [tile.transform], function (dir) {
+                        e.selfDestruct();
+                        var itemDirection = dir.randomlyShifted(.2).normalized();
+                        Items_4.spawnItem(pos.times(Tilesets_29.TILE_SIZE).plusY(Tilesets_29.TILE_SIZE).plusX(Tilesets_29.TILE_SIZE / 2), 9 /* MUSHROOM */, itemDirection.times(5));
+                    }));
+                    e.addComponent(new GrowableShroom(nextGrowthTime, function () {
+                        e.selfDestruct();
+                        DudeFactory_3.DudeFactory.instance.new(6 /* SHROOM */, pos.times(Tilesets_29.TILE_SIZE).plusY(-Tilesets_29.TILE_SIZE).plusX(-Tilesets_29.TILE_SIZE / 2), LocationManager_16.LocationManager.instance.exterior());
+                    }));
+                    return e.addComponent(new ElementComponent_4.ElementComponent(this.type, pos, [pos], function () { return data; }));
+                };
+                MushroomFactory.prototype.canPlace = function (pos) {
+                    return LocationManager_16.LocationManager.instance.currentLocation.ground.get(pos.plusY(1)).type === 2 /* GRASS */;
+                };
+                MushroomFactory.prototype.nextGrowthTime = function () {
+                    // grow every 12-24 hours
+                    return WorldTime_7.WorldTime.instance.time + TimeUnit_5.TimeUnit.DAY * (0.5 + Math.random() / 2);
+                };
+                return MushroomFactory;
+            }(ElementFactory_4.ElementFactory));
+            exports_97("MushroomFactory", MushroomFactory);
+            GrowableShroom = /** @class */ (function (_super) {
+                __extends(GrowableShroom, _super);
+                function GrowableShroom(nextGrowthTime, growFn) {
+                    var _this = _super.call(this) || this;
+                    _this.nextGrowthTime = nextGrowthTime;
+                    _this.growFn = growFn;
+                    return _this;
+                }
+                GrowableShroom.prototype.lateUpdate = function () {
+                    if (WorldTime_7.WorldTime.instance.time < this.nextGrowthTime) {
+                        return;
+                    }
+                    this.growFn();
+                };
+                return GrowableShroom;
+            }(component_27.Component));
+        }
+    };
+});
+System.register("game/world/elements/HittableResource", ["engine/collision/BoxCollider", "engine/point", "game/graphics/Tilesets", "game/items/Items", "game/world/LocationManager", "game/world/elements/ElementComponent", "game/world/elements/Hittable"], function (exports_98, context_98) {
+    "use strict";
+    var BoxCollider_3, point_54, Tilesets_30, Items_5, LocationManager_17, ElementComponent_5, Hittable_2, HittableResource;
+    var __moduleName = context_98 && context_98.id;
+    return {
+        setters: [
+            function (BoxCollider_3_1) {
+                BoxCollider_3 = BoxCollider_3_1;
+            },
+            function (point_54_1) {
+                point_54 = point_54_1;
+            },
+            function (Tilesets_30_1) {
+                Tilesets_30 = Tilesets_30_1;
+            },
+            function (Items_5_1) {
+                Items_5 = Items_5_1;
+            },
+            function (LocationManager_17_1) {
+                LocationManager_17 = LocationManager_17_1;
+            },
+            function (ElementComponent_5_1) {
+                ElementComponent_5 = ElementComponent_5_1;
+            },
+            function (Hittable_2_1) {
+                Hittable_2 = Hittable_2_1;
             }
         ],
         execute: function () {
@@ -8578,12 +8690,12 @@ System.register("game/world/elements/HittableResource", ["engine/collision/BoxCo
                             var item = items_1[_i];
                             var itemDirection = hitDir.randomlyShifted(.5).normalized();
                             var velocity = itemDirection.times(1 + 3 * Math.random());
-                            Items_4.spawnItem(this.position.plus(new point_53.Point(0, Tilesets_29.TILE_SIZE / 2)).plus(itemDirection.times(placeDistance)), // bottom center, then randomly adjusted
+                            Items_5.spawnItem(this.position.plus(new point_54.Point(0, Tilesets_30.TILE_SIZE / 2)).plus(itemDirection.times(placeDistance)), // bottom center, then randomly adjusted
                             item, velocity.times(velocityMultiplier), this.entity.getComponent(BoxCollider_3.BoxCollider));
                         }
                     }
                     if (finishingMove) {
-                        LocationManager_16.LocationManager.instance.currentLocation.removeElement(this.entity.getComponent(ElementComponent_4.ElementComponent));
+                        LocationManager_17.LocationManager.instance.currentLocation.removeElement(this.entity.getComponent(ElementComponent_5.ElementComponent));
                         this.entity.selfDestruct();
                     }
                 };
@@ -8595,15 +8707,15 @@ System.register("game/world/elements/HittableResource", ["engine/collision/BoxCo
                 };
                 HittableResource.negativeThreshold = -4;
                 return HittableResource;
-            }(Hittable_1.Hittable));
-            exports_97("HittableResource", HittableResource);
+            }(Hittable_2.Hittable));
+            exports_98("HittableResource", HittableResource);
         }
     };
 });
-System.register("game/characters/weapons/WeaponType", [], function (exports_98, context_98) {
+System.register("game/characters/weapons/WeaponType", [], function (exports_99, context_99) {
     "use strict";
     var WeaponType;
-    var __moduleName = context_98 && context_98.id;
+    var __moduleName = context_99 && context_99.id;
     return {
         setters: [],
         execute: function () {
@@ -8633,119 +8745,7 @@ System.register("game/characters/weapons/WeaponType", [], function (exports_98, 
                 WeaponType[WeaponType["SPEAR"] = 100021] = "SPEAR";
                 WeaponType[WeaponType["PICKAXE"] = 100022] = "PICKAXE";
             })(WeaponType || (WeaponType = {}));
-            exports_98("WeaponType", WeaponType);
-        }
-    };
-});
-System.register("game/world/elements/Mushroom", ["engine/point", "game/graphics/Tilesets", "engine/tiles/TileComponent", "engine/tiles/TileTransform", "engine/Entity", "game/items/Items", "game/world/elements/ElementComponent", "game/world/elements/ElementFactory", "engine/component", "game/world/WorldTime", "game/world/TimeUnit", "game/world/LocationManager", "game/world/elements/Hittable", "game/characters/DudeFactory"], function (exports_99, context_99) {
-    "use strict";
-    var point_54, Tilesets_30, TileComponent_6, TileTransform_24, Entity_21, Items_5, ElementComponent_5, ElementFactory_4, component_27, WorldTime_7, TimeUnit_5, LocationManager_17, Hittable_2, DudeFactory_3, NEXT_GROWTH_TIME, MushroomFactory, GrowableShroom;
-    var __moduleName = context_99 && context_99.id;
-    return {
-        setters: [
-            function (point_54_1) {
-                point_54 = point_54_1;
-            },
-            function (Tilesets_30_1) {
-                Tilesets_30 = Tilesets_30_1;
-            },
-            function (TileComponent_6_1) {
-                TileComponent_6 = TileComponent_6_1;
-            },
-            function (TileTransform_24_1) {
-                TileTransform_24 = TileTransform_24_1;
-            },
-            function (Entity_21_1) {
-                Entity_21 = Entity_21_1;
-            },
-            function (Items_5_1) {
-                Items_5 = Items_5_1;
-            },
-            function (ElementComponent_5_1) {
-                ElementComponent_5 = ElementComponent_5_1;
-            },
-            function (ElementFactory_4_1) {
-                ElementFactory_4 = ElementFactory_4_1;
-            },
-            function (component_27_1) {
-                component_27 = component_27_1;
-            },
-            function (WorldTime_7_1) {
-                WorldTime_7 = WorldTime_7_1;
-            },
-            function (TimeUnit_5_1) {
-                TimeUnit_5 = TimeUnit_5_1;
-            },
-            function (LocationManager_17_1) {
-                LocationManager_17 = LocationManager_17_1;
-            },
-            function (Hittable_2_1) {
-                Hittable_2 = Hittable_2_1;
-            },
-            function (DudeFactory_3_1) {
-                DudeFactory_3 = DudeFactory_3_1;
-            }
-        ],
-        execute: function () {
-            NEXT_GROWTH_TIME = "ngt";
-            MushroomFactory = /** @class */ (function (_super) {
-                __extends(MushroomFactory, _super);
-                function MushroomFactory() {
-                    var _this = _super !== null && _super.apply(this, arguments) || this;
-                    _this.type = 7 /* MUSHROOM */;
-                    _this.dimensions = new point_54.Point(1, 1);
-                    return _this;
-                }
-                MushroomFactory.prototype.make = function (wl, pos, data) {
-                    var _a;
-                    var nextGrowthTime = (_a = data[NEXT_GROWTH_TIME]) !== null && _a !== void 0 ? _a : this.nextGrowthTime();
-                    var e = new Entity_21.Entity();
-                    var depth = (pos.y + 1) * Tilesets_30.TILE_SIZE;
-                    var randomOffset = new point_54.Point(0, -4).randomlyShifted(3, 3);
-                    var addTile = function (s, pos) {
-                        var tile = e.addComponent(new TileComponent_6.TileComponent(Tilesets_30.Tilesets.instance.outdoorTiles.getTileSource(s), new TileTransform_24.TileTransform(pos.times(Tilesets_30.TILE_SIZE).plus(randomOffset))));
-                        tile.transform.depth = depth;
-                        return tile;
-                    };
-                    var tile = addTile("mushroomPlaced", pos);
-                    var hittableCenter = pos.times(Tilesets_30.TILE_SIZE).plus(new point_54.Point(Tilesets_30.TILE_SIZE / 2, Tilesets_30.TILE_SIZE / 2));
-                    e.addComponent(new Hittable_2.Hittable(hittableCenter, [tile.transform], function (dir) {
-                        e.selfDestruct();
-                        var itemDirection = dir.randomlyShifted(.2).normalized();
-                        Items_5.spawnItem(pos.times(Tilesets_30.TILE_SIZE).plusY(Tilesets_30.TILE_SIZE).plusX(Tilesets_30.TILE_SIZE / 2), 9 /* MUSHROOM */, itemDirection.times(5));
-                    }));
-                    e.addComponent(new GrowableShroom(nextGrowthTime, function () {
-                        e.selfDestruct();
-                        DudeFactory_3.DudeFactory.instance.new(6 /* SHROOM */, pos.times(Tilesets_30.TILE_SIZE).plusY(-Tilesets_30.TILE_SIZE).plusX(-Tilesets_30.TILE_SIZE / 2), LocationManager_17.LocationManager.instance.exterior());
-                    }));
-                    return e.addComponent(new ElementComponent_5.ElementComponent(this.type, pos, [pos], function () { return data; }));
-                };
-                MushroomFactory.prototype.canPlace = function (pos) {
-                    return LocationManager_17.LocationManager.instance.currentLocation.ground.get(pos.plusY(1)).type === 2 /* GRASS */;
-                };
-                MushroomFactory.prototype.nextGrowthTime = function () {
-                    // grow every 12-24 hours
-                    return WorldTime_7.WorldTime.instance.time + TimeUnit_5.TimeUnit.DAY * (0.5 + Math.random() / 2);
-                };
-                return MushroomFactory;
-            }(ElementFactory_4.ElementFactory));
-            exports_99("MushroomFactory", MushroomFactory);
-            GrowableShroom = /** @class */ (function (_super) {
-                __extends(GrowableShroom, _super);
-                function GrowableShroom(nextGrowthTime, growFn) {
-                    var _this = _super.call(this) || this;
-                    _this.nextGrowthTime = nextGrowthTime;
-                    _this.growFn = growFn;
-                    return _this;
-                }
-                GrowableShroom.prototype.lateUpdate = function () {
-                    if (WorldTime_7.WorldTime.instance.time < this.nextGrowthTime) {
-                        return;
-                    }
-                    this.growFn();
-                };
-                return GrowableShroom;
-            }(component_27.Component));
+            exports_99("WeaponType", WeaponType);
         }
     };
 });
@@ -9070,8 +9070,8 @@ System.register("game/world/elements/Tree", ["engine/point", "game/graphics/Tile
                     var size = (_b = data[SIZE]) !== null && _b !== void 0 ? _b : 1;
                     var availableResources = (_c = data[AVAILABLE_RESOURCES]) !== null && _c !== void 0 ? _c : maxResourcesCount;
                     var e = new Entity_24.Entity();
-                    var depth = (pos.y + 2) * Tilesets_34.TILE_SIZE;
                     var randomOffset = new point_59.Point(0, -4).randomlyShifted(2, 4);
+                    var depth = (pos.y + 2) * Tilesets_34.TILE_SIZE + randomOffset.y;
                     var addTile = function (s, pos) {
                         var tile = e.addComponent(new TileComponent_9.TileComponent(Tilesets_34.Tilesets.instance.outdoorTiles.getTileSource(s), new TileTransform_27.TileTransform(pos.times(Tilesets_34.TILE_SIZE).plus(randomOffset))));
                         tile.transform.depth = depth;
