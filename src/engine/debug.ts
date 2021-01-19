@@ -1,4 +1,4 @@
-export const debug = Object.assign({}, {
+const _debug = Object.assign({}, {
     showColliders: false,
     showProfiler: false
 }, loadDebug())
@@ -12,23 +12,14 @@ function loadDebug(): any {
     return {}
 }
 
-// wrap the DEBUG state so that property changes are observed and saved in local storage
-function observe(obj) {
-    const result = {}
-    Object.entries(obj).forEach(([key, val]) => {
-        Object.defineProperty(result, key, {
-            get: function () {
-                return val
-            },
-            set: function (value) {
-                debug[key] = value
-                localStorage.setItem("debug_state", JSON.stringify(debug))
-            },
-            enumerable: true,
-            configurable: true
-        })
-    })
-    return result
-}
+export const debug = new Proxy(_debug, {
+    set(target, property, value, receiver) {
+        let success = Reflect.set(target, property, value, receiver);
+        if (success) {
+            localStorage.setItem("debug_state", JSON.stringify(_debug))
+        }
+        return success;
+    }
+});
 
-window['debug'] = observe(debug)
+window['debug'] = debug

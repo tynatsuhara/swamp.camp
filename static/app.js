@@ -426,7 +426,7 @@ System.register("engine/component", [], function (exports_7, context_7) {
 });
 System.register("engine/debug", [], function (exports_8, context_8) {
     "use strict";
-    var debug;
+    var _debug, debug;
     var __moduleName = context_8 && context_8.id;
     function loadDebug() {
         var stored = localStorage.getItem("debug_state");
@@ -436,33 +436,23 @@ System.register("engine/debug", [], function (exports_8, context_8) {
         }
         return {};
     }
-    // wrap the DEBUG state so that property changes are observed and saved in local storage
-    function observe(obj) {
-        var result = {};
-        Object.entries(obj).forEach(function (_a) {
-            var key = _a[0], val = _a[1];
-            Object.defineProperty(result, key, {
-                get: function () {
-                    return val;
-                },
-                set: function (value) {
-                    debug[key] = value;
-                    localStorage.setItem("debug_state", JSON.stringify(debug));
-                },
-                enumerable: true,
-                configurable: true
-            });
-        });
-        return result;
-    }
     return {
         setters: [],
         execute: function () {
-            exports_8("debug", debug = Object.assign({}, {
+            _debug = Object.assign({}, {
                 showColliders: false,
                 showProfiler: false
-            }, loadDebug()));
-            window['debug'] = observe(debug);
+            }, loadDebug());
+            exports_8("debug", debug = new Proxy(_debug, {
+                set: function (target, property, value, receiver) {
+                    var success = Reflect.set(target, property, value, receiver);
+                    if (success) {
+                        localStorage.setItem("debug_state", JSON.stringify(_debug));
+                    }
+                    return success;
+                }
+            }));
+            window['debug'] = debug;
         }
     };
 });
