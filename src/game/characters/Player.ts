@@ -5,6 +5,7 @@ import { Point } from "../../engine/point"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { Lists } from "../../engine/util/Lists"
 import { Controls } from "../Controls"
+import { Camera } from "../cutscenes/Camera"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Interactable } from "../world/elements/Interactable"
 import { Dude } from "./Dude"
@@ -100,12 +101,14 @@ export class Player extends Component {
             // this.dude.damage(.25, new Point(Math.random()-.5, Math.random()-.5), 30)
             this.dude.damage(.25, new Point(-1, Math.random()-.5), 30)
         }
-
         if (updateData.input.isKeyDown(InputKey.L)) {
             DudeFactory.instance.new(DudeType.HORNED_DEMON, updateData.input.mousePos)
         }
         if (updateData.input.isKeyDown(InputKey.K)) {
             DudeFactory.instance.new(DudeType.SHROOM, updateData.input.mousePos)
+        }
+        if (updateData.input.isKeyDown(InputKey.ONE)) {
+            Camera.instance.shake(10, 1000)
         }
         
         // update crosshair position

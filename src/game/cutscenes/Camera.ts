@@ -17,18 +17,24 @@ export class Camera {
         Camera._instance = this
     }
 
+    private shakePower: number
+    private shakeDuration: number
+
     private dudeTarget: Dude
     private pointTarget: Point
 
     private _position: Point
+    private shakeOffset = Point.ZERO
     get position() { 
-        return this._position.times(-1)  // multiply by -1 because views use "offset"
+        // multiply by -1 because views use "offset"
+        return this._position.times(-1).minus(this.shakeOffset)
     }
     private _dimensions: Point
     get dimensions() { return this._dimensions }
 
     shake(power: number, duration: number) {
-        
+        this.shakePower = power
+        this.shakeDuration = duration
     }
 
     focusOnDude(dude: Dude) {
@@ -62,7 +68,13 @@ export class Camera {
             this._position = this._position.lerp(.0018 * elapsedTimeMillis, cameraGoal)
         }
 
-        return this._position
+        if (this.shakeDuration > 0) {
+            this.shakePower *= (1-elapsedTimeMillis/this.shakeDuration)
+            this.shakeDuration -= elapsedTimeMillis
+            this.shakeOffset = new Point(Math.random() - .5, Math.random() - .5).times(this.shakePower)
+        }
+
+        return this._position.plus(this.shakeOffset)
     }
 
     private clamp(val: number, min: number, max: number) {
