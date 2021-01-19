@@ -76,8 +76,8 @@ class SaveManager {
         prettyPrintTimestamp.setTime(save.timeSaved)
         console.log(`loaded save from ${prettyPrintTimestamp}`)
 
-        LocationManager.instance.initialize(save.locations)
         WorldTime.instance.initialize(save.worldTime)
+        LocationManager.instance.initialize(save.locations)
         EventQueue.instance.initialize(save.eventQueue)
 
         Camera.instance.focusOnDude(Array.from(LocationManager.instance.currentLocation.dudes).filter(d => d.type === DudeType.PLAYER)[0])
