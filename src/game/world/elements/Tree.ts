@@ -41,11 +41,12 @@ export class TreeFactory extends ElementFactory {
 
         const e = new Entity()
         const depth = (pos.y + 2) * TILE_SIZE
+        const randomOffset = new Point(0, -4).randomlyShifted(2, 4)
 
         const addTile = (s: string, pos: Point) => {
             const tile = e.addComponent(new TileComponent(
                 Tilesets.instance.outdoorTiles.getTileSource(s), 
-                new TileTransform(pos.times(TILE_SIZE))
+                new TileTransform(pos.times(TILE_SIZE).plus(randomOffset))
             ))
             tile.transform.depth = depth
             return tile
@@ -61,13 +62,13 @@ export class TreeFactory extends ElementFactory {
         
         const hitboxDims = new Point(8, 3)
         e.addComponent(new BoxCollider(
-            pos.plus(new Point(.5, 2)).times(TILE_SIZE).minus(new Point(hitboxDims.x/2, hitboxDims.y)), 
+            pos.plus(new Point(.5, 2)).times(TILE_SIZE).minus(new Point(hitboxDims.x/2, hitboxDims.y)).plus(randomOffset), 
             hitboxDims
         ))
 
         const saplingType = this.type === ElementType.TREE_ROUND ? Item.ROUND_SAPLING : Item.POINTY_SAPLING
 
-        const hittableCenter = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE/2, TILE_SIZE + TILE_SIZE/2))  // center of bottom tile
+        const hittableCenter = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE/2, TILE_SIZE + TILE_SIZE/2)).plus(randomOffset)  // center of bottom tile
         const hittableResource = e.addComponent(new HittableResource(
             hittableCenter, tiles.map(t => t.transform), availableResources, maxResourcesCount, 
             () => {

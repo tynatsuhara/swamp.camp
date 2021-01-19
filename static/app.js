@@ -7734,8 +7734,8 @@ System.register("game/SaveManager", ["game/characters/Player", "game/saves/SaveG
                     var prettyPrintTimestamp = new Date();
                     prettyPrintTimestamp.setTime(save.timeSaved);
                     console.log("loaded save from " + prettyPrintTimestamp);
-                    LocationManager_14.LocationManager.instance.initialize(save.locations);
                     WorldTime_6.WorldTime.instance.initialize(save.worldTime);
+                    LocationManager_14.LocationManager.instance.initialize(save.locations);
                     EventQueue_5.EventQueue.instance.initialize(save.eventQueue);
                     Camera_7.Camera.instance.focusOnDude(Array.from(LocationManager_14.LocationManager.instance.currentLocation.dudes).filter(function (d) { return d.type === 0 /* PLAYER */; })[0]);
                     // clear existing UI state
@@ -8701,8 +8701,9 @@ System.register("game/world/elements/Mushroom", ["engine/point", "game/graphics/
                     var nextGrowthTime = (_a = data[NEXT_GROWTH_TIME]) !== null && _a !== void 0 ? _a : this.nextGrowthTime();
                     var e = new Entity_21.Entity();
                     var depth = (pos.y + 1) * Tilesets_30.TILE_SIZE;
+                    var randomOffset = new point_54.Point(0, -4).randomlyShifted(3, 3);
                     var addTile = function (s, pos) {
-                        var tile = e.addComponent(new TileComponent_6.TileComponent(Tilesets_30.Tilesets.instance.outdoorTiles.getTileSource(s), new TileTransform_24.TileTransform(pos.times(Tilesets_30.TILE_SIZE))));
+                        var tile = e.addComponent(new TileComponent_6.TileComponent(Tilesets_30.Tilesets.instance.outdoorTiles.getTileSource(s), new TileTransform_24.TileTransform(pos.times(Tilesets_30.TILE_SIZE).plus(randomOffset))));
                         tile.transform.depth = depth;
                         return tile;
                     };
@@ -9070,8 +9071,9 @@ System.register("game/world/elements/Tree", ["engine/point", "game/graphics/Tile
                     var availableResources = (_c = data[AVAILABLE_RESOURCES]) !== null && _c !== void 0 ? _c : maxResourcesCount;
                     var e = new Entity_24.Entity();
                     var depth = (pos.y + 2) * Tilesets_34.TILE_SIZE;
+                    var randomOffset = new point_59.Point(0, -4).randomlyShifted(2, 4);
                     var addTile = function (s, pos) {
-                        var tile = e.addComponent(new TileComponent_9.TileComponent(Tilesets_34.Tilesets.instance.outdoorTiles.getTileSource(s), new TileTransform_27.TileTransform(pos.times(Tilesets_34.TILE_SIZE))));
+                        var tile = e.addComponent(new TileComponent_9.TileComponent(Tilesets_34.Tilesets.instance.outdoorTiles.getTileSource(s), new TileTransform_27.TileTransform(pos.times(Tilesets_34.TILE_SIZE).plus(randomOffset))));
                         tile.transform.depth = depth;
                         return tile;
                     };
@@ -9084,9 +9086,9 @@ System.register("game/world/elements/Tree", ["engine/point", "game/graphics/Tile
                         tiles = [addTile("" + prefix + ["Sapling", "Small"][size - 1], pos.plus(new point_59.Point(0, 1)))];
                     }
                     var hitboxDims = new point_59.Point(8, 3);
-                    e.addComponent(new BoxCollider_6.BoxCollider(pos.plus(new point_59.Point(.5, 2)).times(Tilesets_34.TILE_SIZE).minus(new point_59.Point(hitboxDims.x / 2, hitboxDims.y)), hitboxDims));
+                    e.addComponent(new BoxCollider_6.BoxCollider(pos.plus(new point_59.Point(.5, 2)).times(Tilesets_34.TILE_SIZE).minus(new point_59.Point(hitboxDims.x / 2, hitboxDims.y)).plus(randomOffset), hitboxDims));
                     var saplingType = this.type === 0 /* TREE_ROUND */ ? 7 /* ROUND_SAPLING */ : 8 /* POINTY_SAPLING */;
-                    var hittableCenter = pos.times(Tilesets_34.TILE_SIZE).plus(new point_59.Point(Tilesets_34.TILE_SIZE / 2, Tilesets_34.TILE_SIZE + Tilesets_34.TILE_SIZE / 2)); // center of bottom tile
+                    var hittableCenter = pos.times(Tilesets_34.TILE_SIZE).plus(new point_59.Point(Tilesets_34.TILE_SIZE / 2, Tilesets_34.TILE_SIZE + Tilesets_34.TILE_SIZE / 2)).plus(randomOffset); // center of bottom tile
                     var hittableResource = e.addComponent(new HittableResource_2.HittableResource(hittableCenter, tiles.map(function (t) { return t.transform; }), availableResources, maxResourcesCount, function () {
                         if (size === 1 || (size === 2 && Math.random() > .5)) {
                             return [];

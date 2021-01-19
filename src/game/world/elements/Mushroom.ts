@@ -32,11 +32,12 @@ export class MushroomFactory extends ElementFactory {
 
         const e = new Entity()
         const depth = (pos.y + 1) * TILE_SIZE
+        const randomOffset = new Point(0, -4).randomlyShifted(3, 3)
 
         const addTile = (s: string, pos: Point) => {
             const tile = e.addComponent(new TileComponent(
                 Tilesets.instance.outdoorTiles.getTileSource(s), 
-                new TileTransform(pos.times(TILE_SIZE))
+                new TileTransform(pos.times(TILE_SIZE).plus(randomOffset))
             ))
             tile.transform.depth = depth
             return tile
