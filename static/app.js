@@ -4341,6 +4341,7 @@ System.register("game/world/WorldTime", ["engine/Entity", "engine/component", "g
                 function WorldTime() {
                     var _this = _super.call(this) || this;
                     _this._time = 0; // millis
+                    _this.title = window.document.title;
                     WorldTime._instance = _this;
                     return _this;
                 }
@@ -4370,7 +4371,7 @@ System.register("game/world/WorldTime", ["engine/Entity", "engine/component", "g
                         console.log("fast forwarding time to " + this.clockTime());
                     }
                     EventQueue_1.EventQueue.instance.processEvents(this.time);
-                    window.document.title = "wow a game | " + this.clockTime();
+                    window.document.title = this.title + " | " + this.clockTime();
                 };
                 WorldTime.prototype.getEntity = function () {
                     return new Entity_4.Entity([this]);

@@ -18,6 +18,8 @@ export class WorldTime extends Component {
     private _time: number = 0  // millis
     get time() { return this._time }
 
+    private title = window.document.title
+
     private constructor() {
         super()
         WorldTime._instance = this
@@ -38,7 +40,7 @@ export class WorldTime extends Component {
 
         EventQueue.instance.processEvents(this.time)
 
-        window.document.title = `wow a game | ${this.clockTime()}`
+        window.document.title = `${this.title} | ${this.clockTime()}`
     }
 
     getEntity(): Entity {
