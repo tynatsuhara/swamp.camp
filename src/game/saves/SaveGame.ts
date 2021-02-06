@@ -17,4 +17,5 @@ export class Save {
 export class SaveState {
     coins?: number = 0
     plume?: Color[]
+    townStats?: { [key: string]: number }
 }

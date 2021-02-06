@@ -8,6 +8,7 @@ import { Controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Interactable } from "../world/elements/Interactable"
+import { TownStats } from "../world/TownStats"
 import { Dude } from "./Dude"
 import { DudeFactory, DudeType } from "./DudeFactory"
 
@@ -114,6 +115,9 @@ export class Player extends Component {
         }
         if (updateData.input.isKeyDown(InputKey.SEMICOLON)) {
             DudeFactory.instance.new(DudeType.ORC_WARRIOR, updateData.input.mousePos)
+        }
+        if (updateData.input.isKeyDown(InputKey.COMMA)) {
+            TownStats.instance.happiness.adjust(Math.random() * 10 - 5)
         }
         
         // update crosshair position
