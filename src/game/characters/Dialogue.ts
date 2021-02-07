@@ -2,6 +2,7 @@ import { saveManager } from "../SaveManager"
 import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
 import { BERTO_INTRO_DIALOGUE } from "./dialogues/BertoIntro"
 import { DIP_INTRO_DIALOGUE } from "./dialogues/DipIntro"
+import { GENERIC_DIALOGUE } from "./dialogues/GenericDialogue"
 import { ITEM_DIALOGUES } from "./dialogues/ItemDialogues"
 import { Player } from "./Player"
 
@@ -104,6 +105,7 @@ const DIALOGUE_SOURCES: { [key: string]: () => DialogueInstance }[] = [
     DIP_INTRO_DIALOGUE,
     BERTO_INTRO_DIALOGUE,
     ITEM_DIALOGUES,
+    GENERIC_DIALOGUE,
 ]
 
 /**
