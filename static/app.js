@@ -10272,9 +10272,9 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                         case 8 /* CENTAUR */:
                             factions = [5 /* CENTAURS */];
                             animationName = "Centaur_M";
-                            additionalComponents = [new NPC_6.NPC(NPCSchedule_3.NPCSchedules.newNoOpSchedule()), new Centaur_2.Centaur()];
+                            additionalComponents = [new NPC_6.NPC(NPCSchedule_3.NPCSchedules.newFreeRoamSchedule()), new Centaur_2.Centaur()];
                             maxHealth = 2;
-                            speed *= 1;
+                            speed *= .5;
                             break;
                         default: {
                             throw new Error("DudeType " + type + " can't be instantiated");

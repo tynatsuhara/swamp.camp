@@ -169,9 +169,9 @@ export class DudeFactory {
             case DudeType.CENTAUR:
                 factions = [DudeFaction.CENTAURS]
                 animationName = "Centaur_M" 
-                additionalComponents = [new NPC(NPCSchedules.newNoOpSchedule()), new Centaur()]
+                additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new Centaur()]
                 maxHealth = 2
-                speed *= 1
+                speed *= .5
                 break
             default: {
                 throw new Error(`DudeType ${type} can't be instantiated`)
