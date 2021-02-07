@@ -1,7 +1,7 @@
 # development
 this project uses the typescript compiler [to bundle](https://mattallan.me/posts/modern-javascript-without-a-bundler/) the output. run `tsc --watch` when developing to compile on any changes.
 
-run `cd static && python3 -m http.server` to spin up a local HTTP server for development
+run `./run-local-server` to spin up a local HTTP server for development
 
 # release
 run `tsc` then commit the compiled statics, this will trigger a [Vercel deployment](https://vercel.com/tylerbonnell/quest/deployments)
