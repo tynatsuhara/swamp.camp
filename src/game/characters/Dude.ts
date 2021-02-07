@@ -19,6 +19,7 @@ import { WorldLocation } from "../world/WorldLocation"
 import { DialogueSource, EMPTY_DIALOGUE, getDialogue } from "./Dialogue"
 import { DudeAnimationUtils } from "./DudeAnimationUtils"
 import { DudeFaction, DudeType } from "./DudeFactory"
+import { NPC } from "./NPC"
 import { Shield } from "./weapons/Shield"
 import { Weapon } from "./weapons/Weapon"
 import { WeaponFactory } from "./weapons/WeaponFactory"
@@ -131,7 +132,7 @@ export class Dude extends Component implements DialogueSource {
                 new Point(0, 0), 
                 () => DialogueDisplay.instance.startDialogue(this),
                 Point.ZERO,
-                () => !UIStateManager.instance.isMenuOpen && !this.isMoving && !!this.dialogue
+                () => !UIStateManager.instance.isMenuOpen && !!this.dialogue && this.entity.getComponent(NPC)?.canTalk()
             ))
         }
     }
@@ -147,9 +148,11 @@ export class Dude extends Component implements DialogueSource {
             this.animation.transform.position = this.animation.transform.position.plus(this.rollingOffset)
         }
 
-        this.dialogueInteract.position = this.standingPosition.minus(new Point(0, 5))
-        this.dialogueInteract.uiOffset = new Point(0, -TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition())
-        this.dialogueInteract.enabled = this.dialogue !== EMPTY_DIALOGUE && DialogueDisplay.instance.dialogueSource !== this
+        if (!!this.dialogueInteract) {
+            this.dialogueInteract.position = this.standingPosition.minus(new Point(0, 5))
+            this.dialogueInteract.uiOffset = new Point(0, -TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition())
+            this.dialogueInteract.enabled = this.dialogue !== EMPTY_DIALOGUE && DialogueDisplay.instance.dialogueSource !== this
+        }
     }
 
     setWeapon(type: WeaponType) {
@@ -421,7 +424,7 @@ export class Dude extends Component implements DialogueSource {
             indicator = getDialogue(this.dialogue).indicator
         }
         let tile: StaticTileSource = DudeInteractIndicator.getTile(indicator)
-        if (!tile || this.dialogueInteract.isShowingUI || DialogueDisplay.instance.dialogueSource === this) {
+        if (!tile || this.dialogueInteract?.isShowingUI || DialogueDisplay.instance.dialogueSource === this) {
             return []
         } else {
             return [tile.toImageRender(new TileTransform(

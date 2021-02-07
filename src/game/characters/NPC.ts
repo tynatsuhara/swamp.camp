@@ -73,6 +73,10 @@ export class NPC extends Component {
         }
     }
 
+    canTalk = () => {
+        return !this.enemiesPresent
+    }
+
     private doNormalScheduledActivity(updateData: UpdateData) {
         const schedule = this.getSchedule()
         

@@ -19,6 +19,7 @@ import { Item } from "../items/Items"
 import { BERTO_STARTING_DIALOGUE } from "./dialogues/BertoIntro"
 import { ShroomNPC } from "./ShroomNPC"
 import { newUUID } from "../saves/uuid"
+import { Centaur } from "./Centaur"
 
 export const enum DudeFaction {
     VILLAGERS,
@@ -26,6 +27,8 @@ export const enum DudeFaction {
     UNDEAD,
     DEMONS,
     SHROOMS,
+    CENTAURS,
+    GNOLLS,
 }
 
 export const enum DudeType {
@@ -37,6 +40,7 @@ export const enum DudeType {
     HORNED_DEMON,
     SHROOM,
     VILLAGER,
+    CENTAUR
 }
 
 export class DudeFactory {
@@ -161,6 +165,13 @@ export class DudeFactory {
                 maxHealth = 4
                 // TODO: add a new type of schedule for a villager with a home
                 additionalComponents = [new NPC(NPCSchedules.newDefaultVillagerSchedule()), new Villager()]
+                break
+            case DudeType.CENTAUR:
+                factions = [DudeFaction.CENTAURS]
+                animationName = "Centaur_M" 
+                additionalComponents = [new NPC(NPCSchedules.newNoOpSchedule()), new Centaur()]
+                maxHealth = 2
+                speed *= 1
                 break
             default: {
                 throw new Error(`DudeType ${type} can't be instantiated`)

@@ -108,7 +108,7 @@ export class Player extends Component {
 
         // FOR TESTING
         if (updateData.input.isKeyDown(InputKey.K)) {
-            DudeFactory.instance.new(DudeType.SHROOM, updateData.input.mousePos)
+            DudeFactory.instance.new(DudeType.CENTAUR, updateData.input.mousePos)
         }
         if (updateData.input.isKeyDown(InputKey.L)) {
             DudeFactory.instance.new(DudeType.HORNED_DEMON, updateData.input.mousePos)

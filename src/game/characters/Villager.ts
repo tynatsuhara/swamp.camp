@@ -4,6 +4,7 @@ import { NPC } from "./NPC"
 import { DudeFaction } from "./DudeFactory"
 import { PointLightMaskRenderer } from "../world/PointLightMaskRenderer"
 import { ShroomNPC } from "./ShroomNPC"
+import { Centaur } from "./Centaur"
 
 export class Villager extends Component {
     
@@ -24,6 +25,11 @@ export class Villager extends Component {
             // Villagers only flee from shrooms if the shroom is aggro
             if (d.factions.includes(DudeFaction.SHROOMS)) {
                 return d.entity.getComponent(ShroomNPC).isAggro()
+            }
+
+            // Villagers only flee from centaurs if the centaur is aggro
+            if (d.factions.includes(DudeFaction.CENTAURS)) {
+                return d.entity.getComponent(Centaur).isAggro()
             }
 
             return !d.factions.includes(DudeFaction.VILLAGERS)
