@@ -41,7 +41,7 @@ export const Lists = {
         return list[Math.floor(Math.random() * list.length)]
     },
 
-    shuffle(list) {
+    shuffle<T>(list: T[]) {
         var currentIndex = list.length, temporaryValue, randomIndex;
         
         // While there remain elements to shuffle...
