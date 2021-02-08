@@ -10,7 +10,7 @@ import { ElementComponent } from "./ElementComponent"
 import { WorldLocation } from "../WorldLocation"
 import { Entity } from "../../../engine/Entity"
 import { ElementType } from "./Elements"
-import { PointLightMaskRenderer } from "../PointLightMaskRenderer"
+import { OutdoorDarknessMask } from "../OutdoorDarknessMask"
 import { DialogueSource } from "../../characters/Dialogue"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { WorldTime } from "../WorldTime"
@@ -53,9 +53,9 @@ export class CampfireFactory extends ElementFactory {
             campfireOn.enabled = !campfireOff.enabled
             const lightCenterPos = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
             if (campfireOn.enabled) {
-                PointLightMaskRenderer.instance.addLight(wl, lightCenterPos, TILE_SIZE * (5 + logCount/2))
+                OutdoorDarknessMask.instance.addLight(wl, lightCenterPos, TILE_SIZE * (5 + logCount/2))
             } else {
-                PointLightMaskRenderer.instance.removeLight(wl, lightCenterPos)
+                OutdoorDarknessMask.instance.removeLight(wl, lightCenterPos)
             }
         }
 

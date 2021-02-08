@@ -2,7 +2,7 @@ import { Component } from "../../engine/component"
 import { Dude } from "./Dude"
 import { NPC } from "./NPC"
 import { DudeFaction } from "./DudeFactory"
-import { PointLightMaskRenderer } from "../world/PointLightMaskRenderer"
+import { OutdoorDarknessMask } from "../world/OutdoorDarknessMask"
 import { ShroomNPC } from "./ShroomNPC"
 import { Centaur } from "./Centaur"
 
@@ -18,7 +18,7 @@ export class Villager extends Component {
         this.npc.isEnemyFn = d => {
             // Villagers will only flee from demons if the villager is in the dark or really close to the demon
             if (d.factions.includes(DudeFaction.DEMONS)) {
-                return PointLightMaskRenderer.instance.isDark(this.dude.standingPosition)
+                return OutdoorDarknessMask.instance.isDark(this.dude.standingPosition)
                         || d.standingPosition.distanceTo(this.dude.standingPosition) < 30
             }
 

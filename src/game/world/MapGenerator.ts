@@ -49,6 +49,25 @@ export class MapGenerator {
         return this.location
     }
 
+    // TODO
+    spawnTreesAtEdge() {
+        const trees = Math.random() * 300 + 150
+        for (let i = 0; i < trees; i++) {
+            const pt = new Point(
+                Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_SIZE/2,
+                Math.floor(Math.random() * (MapGenerator.MAP_SIZE-1)) - MapGenerator.MAP_SIZE/2,
+            )
+            const occupiedPoints = [pt, pt.plus(new Point(0, 1))]
+            if (occupiedPoints.every(p => !this.location.ground.get(p))) {
+                this.location.addElement(
+                    Math.random() < .7 ? ElementType.TREE_POINTY : ElementType.TREE_ROUND,
+                    pt,
+                    { s: 3 }  // make adult trees
+                )
+            }
+        }
+    }
+
     spawnTrees() {
         const trees = Math.random() * 300 + 150
         for (let i = 0; i < trees; i++) {

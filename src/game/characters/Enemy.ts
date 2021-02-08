@@ -1,7 +1,7 @@
 import { Component } from "../../engine/component"
 import { Point } from "../../engine/point"
 import { TILE_SIZE } from "../graphics/Tilesets"
-import { PointLightMaskRenderer } from "../world/PointLightMaskRenderer"
+import { OutdoorDarknessMask } from "../world/OutdoorDarknessMask"
 import { Dude } from "./Dude"
 import { DudeFaction } from "./DudeFactory"
 import { NPC } from "./NPC"
@@ -20,10 +20,10 @@ export class Enemy extends Component {
         // TODO: Consider splitting this class up 
         if (this.dude.factions.includes(DudeFaction.DEMONS)) {
             this.npc.isEnemyFn = d => {
-                return !d.factions.includes(DudeFaction.DEMONS) && PointLightMaskRenderer.instance.isDark(d.standingPosition)
+                return !d.factions.includes(DudeFaction.DEMONS) && OutdoorDarknessMask.instance.isDark(d.standingPosition)
             }
             this.npc.pathFindingHeuristic = (pt: Point, goal: Point) => {
-                return pt.distanceTo(goal) + (PointLightMaskRenderer.instance.isDark(pt.times(TILE_SIZE)) ? 0 : 100)
+                return pt.distanceTo(goal) + (OutdoorDarknessMask.instance.isDark(pt.times(TILE_SIZE)) ? 0 : 100)
             }
             this.npc.findTargetRange *= 3
         } else {

@@ -10,21 +10,22 @@ import { UIStateManager } from "../ui/UIStateManager"
 import { LocationManager } from "./LocationManager"
 import { MapGenerator } from "./MapGenerator"
 import { TimeUnit } from "./TimeUnit"
+import { Vignette } from "./Vignette"
 import { WorldLocation } from "./WorldLocation"
 import { WorldTime } from "./WorldTime"
 
-export class PointLightMaskRenderer {
+export class OutdoorDarknessMask {
 
-    private static _instance: PointLightMaskRenderer
-    static get instance(): PointLightMaskRenderer {
+    private static _instance: OutdoorDarknessMask
+    static get instance(): OutdoorDarknessMask {
         if (!this._instance) {
-            this._instance = new PointLightMaskRenderer()
+            this._instance = new OutdoorDarknessMask()
         }
         return this._instance
     }
 
     private constructor() {
-        PointLightMaskRenderer._instance = this
+        OutdoorDarknessMask._instance = this
     }
 
     // no lights should live outside of this range
@@ -204,7 +205,9 @@ export class PointLightMaskRenderer {
     
     private readonly circleCache: Map<number, boolean[]> = new Map<number, boolean[]>()
 
-    getEntity(): Entity {
+    private vignetteEntity = new Entity([new Vignette(new Point(1, 1).times(-this.size/2), this.size)])
+
+    getEntities(): Entity[] {
         if (!this.color) {
             this.updateColorForTime()
         }
@@ -219,7 +222,7 @@ export class PointLightMaskRenderer {
         // prevent tint not extending to the edge
         const dimensions = Camera.instance.dimensions.plus(new Point(1, 1))
 
-        return new Entity([new BasicRenderComponent(new ImageRender(
+        const dynamicDarknessEntity = new Entity([new BasicRenderComponent(new ImageRender(
             this.canvas,
             Camera.instance.position.plus(this.shift).apply(Math.floor),
             dimensions,
@@ -227,5 +230,14 @@ export class PointLightMaskRenderer {
             dimensions,
             UIStateManager.UI_SPRITE_DEPTH - 100  // make sure all UI goes on top of light
         ))])
+
+        const result = [dynamicDarknessEntity]
+
+        const location = LocationManager.instance.currentLocation
+        if (!location.isInterior) {
+            result.push(this.vignetteEntity)
+        }
+        
+        return result
     }
 }

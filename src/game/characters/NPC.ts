@@ -7,7 +7,7 @@ import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { ElementType } from "../world/elements/Elements"
 import { House } from "../world/elements/House"
 import { LocationManager } from "../world/LocationManager"
-import { PointLightMaskRenderer } from "../world/PointLightMaskRenderer"
+import { OutdoorDarknessMask } from "../world/OutdoorDarknessMask"
 import { Teleporter } from "../world/Teleporter"
 import { TimeUnit } from "../world/TimeUnit"
 import { Dude } from "./Dude"
@@ -92,8 +92,8 @@ export class NPC extends Component {
         } else if (schedule.type === NPCScheduleType.ROAM_IN_DARKNESS) {
             this.doFlee(
                 updateData, 
-                PointLightMaskRenderer.instance.isDark(this.dude.standingPosition) ? 0.5 : 1,
-                (pt) => PointLightMaskRenderer.instance.isDark(pt.times(TILE_SIZE))
+                OutdoorDarknessMask.instance.isDark(this.dude.standingPosition) ? 0.5 : 1,
+                (pt) => OutdoorDarknessMask.instance.isDark(pt.times(TILE_SIZE))
             )
         } else if (schedule.type === NPCScheduleType.DEFAULT_VILLAGER) {
             const home = this.findHomeLocation()

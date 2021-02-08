@@ -14,7 +14,7 @@ import { UIStateManager } from "../ui/UIStateManager"
 import { GroundRenderer } from "../world/GroundRenderer"
 import { LocationManager } from "../world/LocationManager"
 import { MapGenerator } from "../world/MapGenerator"
-import { PointLightMaskRenderer } from "../world/PointLightMaskRenderer"
+import { OutdoorDarknessMask } from "../world/OutdoorDarknessMask"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
 import { EventQueue } from "../world/events/EventQueue"
@@ -43,7 +43,7 @@ export class GameScene {
 
     continueGame() {
         // Wait to initialize since it will begin a coroutine
-        PointLightMaskRenderer.instance.start()
+        OutdoorDarknessMask.instance.start()
 
         saveManager.load()
     }
@@ -52,7 +52,7 @@ export class GameScene {
         saveManager.deleteSave()
 
         // Wait to initialize since it will begin a coroutine
-        PointLightMaskRenderer.instance.start()
+        OutdoorDarknessMask.instance.start()
         WorldTime.instance.initialize(TimeUnit.HOUR * 19.5)
         
         // World must be initialized before we do anything else
@@ -92,13 +92,14 @@ export class GameScene {
         this.gameEntityView = { 
             zoom: ZOOM,
             offset: cameraOffset,
-            entities: LocationManager.instance.currentLocation.getEntities().concat([
-                CutsceneManager.instance.getEntity(), 
-                WorldTime.instance.getEntity(), 
-                PointLightMaskRenderer.instance.getEntity(),
-                GroundRenderer.instance.getEntity(),
-                this.getDebugEntity()
-            ])
+            entities: LocationManager.instance.currentLocation.getEntities()
+                .concat(OutdoorDarknessMask.instance.getEntities())
+                .concat([
+                    CutsceneManager.instance.getEntity(), 
+                    WorldTime.instance.getEntity(),
+                    GroundRenderer.instance.getEntity(),
+                    this.getDebugEntity()
+                ])
         }
 
         this.uiView = {
