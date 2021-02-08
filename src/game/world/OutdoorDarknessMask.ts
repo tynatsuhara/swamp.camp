@@ -152,7 +152,7 @@ export class OutdoorDarknessMask {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
         const location = LocationManager.instance.currentLocation
-        if (location.isInterior || this.darkness === 0) {
+        if (this.darkness === 0) {
             return
         }
         

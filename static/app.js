@@ -6565,7 +6565,7 @@ System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/poin
                     var _this = this;
                     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
                     var location = LocationManager_11.LocationManager.instance.currentLocation;
-                    if (location.isInterior || this.darkness === 0) {
+                    if (this.darkness === 0) {
                         return;
                     }
                     this.context.fillStyle = this.color;
