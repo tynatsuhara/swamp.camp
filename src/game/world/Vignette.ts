@@ -1,22 +1,12 @@
 import { Component } from "../../engine/component"
-import { Entity } from "../../engine/Entity"
 import { Point } from "../../engine/point"
-import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
 import { ImageRender } from "../../engine/renderer/ImageRender"
-import { Grid } from "../../engine/util/Grid"
-import { Camera } from "../cutscenes/Camera"
-import { TILE_SIZE } from "../graphics/Tilesets"
 import { Color, getRGB } from "../ui/Color"
 import { UIStateManager } from "../ui/UIStateManager"
-import { LocationManager } from "./LocationManager"
-import { MapGenerator } from "./MapGenerator"
-import { TimeUnit } from "./TimeUnit"
-import { WorldLocation } from "./WorldLocation"
-import { WorldTime } from "./WorldTime"
 
 export class Vignette extends Component {
 
-    private padding = 40
+    private padding = 60
     private rings = 4
     private ringWidth = this.padding/this.rings
 

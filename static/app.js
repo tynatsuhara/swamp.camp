@@ -2838,6 +2838,19 @@ System.register("engine/util/Lists", [], function (exports_39, context_39) {
                 oneOf: function (list) {
                     return list[Math.floor(Math.random() * list.length)];
                 },
+                shuffle: function (list) {
+                    var currentIndex = list.length, temporaryValue, randomIndex;
+                    // While there remain elements to shuffle...
+                    while (0 !== currentIndex) {
+                        // Pick a remaining element...
+                        randomIndex = Math.floor(Math.random() * currentIndex);
+                        currentIndex -= 1;
+                        // And swap it with the current element.
+                        temporaryValue = list[currentIndex];
+                        list[currentIndex] = list[randomIndex];
+                        list[randomIndex] = temporaryValue;
+                    }
+                }
             });
         }
     };
@@ -6342,7 +6355,7 @@ System.register("game/world/Vignette", ["engine/component", "engine/point", "eng
                 __extends(Vignette, _super);
                 function Vignette(topLeftPosition, diameter) {
                     var _this = _super.call(this) || this;
-                    _this.padding = 40;
+                    _this.padding = 60;
                     _this.rings = 4;
                     _this.ringWidth = _this.padding / _this.rings;
                     _this.getRenderMethods = function () { return [_this.render]; };
@@ -9345,9 +9358,9 @@ System.register("game/world/elements/Elements", ["game/world/Teleporter", "game/
         }
     };
 });
-System.register("game/world/MapGenerator", ["engine/point", "engine/util/Grid", "engine/util/Noise", "game/graphics/Tilesets", "game/world/LocationManager", "game/world/WorldLocation"], function (exports_108, context_108) {
+System.register("game/world/MapGenerator", ["engine/point", "engine/util/Grid", "engine/util/Lists", "engine/util/Noise", "game/graphics/Tilesets", "game/world/LocationManager", "game/world/WorldLocation"], function (exports_108, context_108) {
     "use strict";
-    var point_61, Grid_4, Noise_1, Tilesets_35, LocationManager_20, WorldLocation_3, MapGenerator;
+    var point_61, Grid_4, Lists_5, Noise_1, Tilesets_35, LocationManager_20, WorldLocation_3, MapGenerator;
     var __moduleName = context_108 && context_108.id;
     return {
         setters: [
@@ -9356,6 +9369,9 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/util/Grid", 
             },
             function (Grid_4_1) {
                 Grid_4 = Grid_4_1;
+            },
+            function (Lists_5_1) {
+                Lists_5 = Lists_5_1;
             },
             function (Noise_1_1) {
                 Noise_1 = Noise_1_1;
@@ -9393,6 +9409,7 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/util/Grid", 
                     // make the ground
                     // this.renderPath(new Point(-10, -10), new Point(10, 10), 2)
                     // this.renderPath(new Point(10, -10), new Point(-10, 10), 5)
+                    this.spawnTreesAtEdge();
                     this.spawnTrees();
                     this.spawnRocks();
                     this.clearPathToCenter();
@@ -9401,36 +9418,49 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/util/Grid", 
                     this.placeGrass();
                     return this.location;
                 };
-                // TODO
                 MapGenerator.prototype.spawnTreesAtEdge = function () {
                     var _this = this;
-                    var trees = Math.random() * 300 + 150;
-                    for (var i = 0; i < trees; i++) {
-                        var pt = new point_61.Point(Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_SIZE / 2, Math.floor(Math.random() * (MapGenerator.MAP_SIZE - 1)) - MapGenerator.MAP_SIZE / 2);
-                        var occupiedPoints = [pt, pt.plus(new point_61.Point(0, 1))];
-                        if (occupiedPoints.every(function (p) { return !_this.location.ground.get(p); })) {
-                            this.location.addElement(Math.random() < .7 ? 1 /* TREE_POINTY */ : 0 /* TREE_ROUND */, pt, { s: 3 } // make adult trees
-                            );
+                    var treeStopEdge = MapGenerator.MAP_SIZE / 2;
+                    var vignetteEdge = MapGenerator.MAP_SIZE / 2 - 4;
+                    var denseStartEdge = vignetteEdge - 8;
+                    var possibilities = [];
+                    for (var x = -MapGenerator.MAP_SIZE / 2; x < MapGenerator.MAP_SIZE; x++) {
+                        for (var y = -MapGenerator.MAP_SIZE / 2; y < MapGenerator.MAP_SIZE; y++) {
+                            var distToCenter = new point_61.Point(x, y).distanceTo(point_61.Point.ZERO);
+                            var pt = new point_61.Point(x, y);
+                            if (distToCenter > treeStopEdge) {
+                                // do nothing -- behind the vignette
+                            }
+                            else if (distToCenter > vignetteEdge) {
+                                possibilities.push(pt);
+                            }
+                            else if (distToCenter > denseStartEdge) {
+                                var chance = (distToCenter - denseStartEdge) / (vignetteEdge - denseStartEdge);
+                                if (Math.random() < chance) {
+                                    possibilities.push(pt);
+                                }
+                            }
                         }
                     }
+                    Lists_5.Lists.shuffle(possibilities);
+                    possibilities.forEach(function (pt) { return _this.spawnTree(pt); });
                 };
                 MapGenerator.prototype.spawnTrees = function () {
-                    var _this = this;
                     var trees = Math.random() * 300 + 150;
                     for (var i = 0; i < trees; i++) {
                         var pt = new point_61.Point(Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_SIZE / 2, Math.floor(Math.random() * (MapGenerator.MAP_SIZE - 1)) - MapGenerator.MAP_SIZE / 2);
-                        var occupiedPoints = [pt, pt.plus(new point_61.Point(0, 1))];
-                        if (occupiedPoints.every(function (p) { return !_this.location.ground.get(p); })) {
-                            this.location.addElement(Math.random() < .7 ? 1 /* TREE_POINTY */ : 0 /* TREE_ROUND */, pt, { s: 3 } // make adult trees
-                            );
-                        }
+                        this.spawnTree(pt);
                     }
+                };
+                MapGenerator.prototype.spawnTree = function (pt) {
+                    this.location.addElement(Math.random() < .7 ? 1 /* TREE_POINTY */ : 0 /* TREE_ROUND */, pt, { s: 3 } // make adult trees
+                    );
                 };
                 MapGenerator.prototype.clearPathToCenter = function () {
                     var typesToClear = [2 /* ROCK */, 1 /* TREE_POINTY */, 0 /* TREE_ROUND */];
                     // clear in corner
                     for (var x = MapGenerator.MAP_SIZE / 2 - 11; x < MapGenerator.MAP_SIZE / 2; x++) {
-                        for (var y = MapGenerator.MAP_SIZE / 2 - 10; y < MapGenerator.MAP_SIZE / 2 - 8; y++) {
+                        for (var y = MapGenerator.MAP_SIZE / 2 - 25; y < MapGenerator.MAP_SIZE / 2 - 23; y++) {
                             var element = this.location.getElement(new point_61.Point(x, y));
                             if (!!element && typesToClear.indexOf(element.type) !== -1) {
                                 this.location.removeElement(element);
@@ -9541,7 +9571,7 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/util/Grid", 
                     return grid;
                 };
                 MapGenerator.MAP_SIZE = 70;
-                MapGenerator.ENTER_LAND_POS = new point_61.Point(1, 1).times(MapGenerator.MAP_SIZE / 2 * Tilesets_35.TILE_SIZE).plusY(-Tilesets_35.TILE_SIZE * 10).plusX(Tilesets_35.TILE_SIZE * 2);
+                MapGenerator.ENTER_LAND_POS = new point_61.Point(1, 1).times(MapGenerator.MAP_SIZE / 2 * Tilesets_35.TILE_SIZE).plusY(-Tilesets_35.TILE_SIZE * 25).plusX(Tilesets_35.TILE_SIZE * 2);
                 return MapGenerator;
             }());
             exports_108("MapGenerator", MapGenerator);
@@ -9693,7 +9723,7 @@ System.register("game/world/TownStats", ["game/SaveManager"], function (exports_
 });
 System.register("game/characters/Player", ["engine/component", "engine/point", "engine/util/Lists", "game/Controls", "game/cutscenes/Camera", "game/ui/UIStateManager", "game/world/elements/Interactable", "game/world/TownStats", "game/characters/Dude", "game/characters/DudeFactory"], function (exports_111, context_111) {
     "use strict";
-    var component_30, point_63, Lists_5, Controls_7, Camera_8, UIStateManager_16, Interactable_5, TownStats_1, Dude_2, DudeFactory_4, Player;
+    var component_30, point_63, Lists_6, Controls_7, Camera_8, UIStateManager_16, Interactable_5, TownStats_1, Dude_2, DudeFactory_4, Player;
     var __moduleName = context_111 && context_111.id;
     return {
         setters: [
@@ -9703,8 +9733,8 @@ System.register("game/characters/Player", ["engine/component", "engine/point", "
             function (point_63_1) {
                 point_63 = point_63_1;
             },
-            function (Lists_5_1) {
-                Lists_5 = Lists_5_1;
+            function (Lists_6_1) {
+                Lists_6 = Lists_6_1;
             },
             function (Controls_7_1) {
                 Controls_7 = Controls_7_1;
@@ -9848,7 +9878,7 @@ System.register("game/characters/Player", ["engine/component", "engine/point", "
                         .filter(function (e) { return _this.dude.isFacing(e.position); }) // interactables the dude is facing
                         .filter(function (e) { return e.position.distanceTo(interactCenter) < interactDistance; })
                         .filter(function (e) { return e.isInteractable(); });
-                    var i = Lists_5.Lists.minBy(possibilities, function (e) { return e.position.distanceTo(interactCenter); });
+                    var i = Lists_6.Lists.minBy(possibilities, function (e) { return e.position.distanceTo(interactCenter); });
                     if (!!i) {
                         i.updateIndicator(true);
                     }
@@ -10181,7 +10211,7 @@ System.register("game/characters/Villager", ["engine/component", "game/character
 });
 System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point", "game/characters/Player", "game/characters/Dude", "game/characters/NPC", "game/world/LocationManager", "game/characters/Enemy", "game/items/Inventory", "game/characters/Dialogue", "game/cutscenes/CutscenePlayerController", "game/characters/Villager", "game/characters/NPCSchedule", "engine/util/Lists", "game/characters/weapons/WeaponType", "game/characters/dialogues/BertoIntro", "game/characters/ShroomNPC", "game/saves/uuid", "game/characters/Centaur"], function (exports_117, context_117) {
     "use strict";
-    var Entity_25, point_65, Player_14, Dude_8, NPC_6, LocationManager_22, Enemy_2, Inventory_2, Dialogue_6, CutscenePlayerController_1, Villager_1, NPCSchedule_3, Lists_6, WeaponType_4, BertoIntro_2, ShroomNPC_2, uuid_2, Centaur_2, DudeFactory;
+    var Entity_25, point_65, Player_14, Dude_8, NPC_6, LocationManager_22, Enemy_2, Inventory_2, Dialogue_6, CutscenePlayerController_1, Villager_1, NPCSchedule_3, Lists_7, WeaponType_4, BertoIntro_2, ShroomNPC_2, uuid_2, Centaur_2, DudeFactory;
     var __moduleName = context_117 && context_117.id;
     return {
         setters: [
@@ -10221,8 +10251,8 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
             function (NPCSchedule_3_1) {
                 NPCSchedule_3 = NPCSchedule_3_1;
             },
-            function (Lists_6_1) {
-                Lists_6 = Lists_6_1;
+            function (Lists_7_1) {
+                Lists_7 = Lists_7_1;
             },
             function (WeaponType_4_1) {
                 WeaponType_4 = WeaponType_4_1;
@@ -10311,7 +10341,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                             dialogue = BertoIntro_2.BERTO_STARTING_DIALOGUE;
                             additionalComponents = [
                                 new NPC_6.NPC(NPCSchedule_3.NPCSchedules.newGoToSchedule(// filter out occupied points to not get stuck in the campfire
-                                Lists_6.Lists.oneOf([new point_65.Point(-3, 0), new point_65.Point(-3, 1), new point_65.Point(-2, 0), new point_65.Point(-2, 1)].filter(function (pt) { return !location.isOccupied(pt); })))),
+                                Lists_7.Lists.oneOf([new point_65.Point(-3, 0), new point_65.Point(-3, 1), new point_65.Point(-2, 0), new point_65.Point(-2, 1)].filter(function (pt) { return !location.isOccupied(pt); })))),
                                 new Villager_1.Villager()
                             ];
                             window["berto"] = additionalComponents[0];
@@ -11308,7 +11338,7 @@ System.register("game/characters/weapons/MeleeWeapon", ["game/characters/weapons
 });
 System.register("game/characters/weapons/Projectile", ["engine/collision/BoxCollider", "engine/component", "engine/Entity", "engine/point", "game/world/LocationManager", "game/items/DroppedItem", "engine/util/Lists"], function (exports_130, context_130) {
     "use strict";
-    var BoxCollider_8, component_39, Entity_27, point_71, LocationManager_26, DroppedItem_2, Lists_7, Projectile, spawnProjectile;
+    var BoxCollider_8, component_39, Entity_27, point_71, LocationManager_26, DroppedItem_2, Lists_8, Projectile, spawnProjectile;
     var __moduleName = context_130 && context_130.id;
     return {
         setters: [
@@ -11330,8 +11360,8 @@ System.register("game/characters/weapons/Projectile", ["engine/collision/BoxColl
             function (DroppedItem_2_1) {
                 DroppedItem_2 = DroppedItem_2_1;
             },
-            function (Lists_7_1) {
-                Lists_7 = Lists_7_1;
+            function (Lists_8_1) {
+                Lists_8 = Lists_8_1;
             }
         ],
         execute: function () {
@@ -11396,7 +11426,7 @@ System.register("game/characters/weapons/Projectile", ["engine/collision/BoxColl
                     var allEnemies = Array.from(LocationManager_26.LocationManager.instance.currentLocation.dudes)
                         .filter(function (d) { return !!d && d !== attacker && d.isEnemy(attacker); })
                         .filter(function (d) { return d.standingPosition.distanceTo(projectilePos) < attackDistance; });
-                    return Lists_7.Lists.minBy(allEnemies, function (d) { return d.standingPosition.manhattanDistanceTo(projectilePos); });
+                    return Lists_8.Lists.minBy(allEnemies, function (d) { return d.standingPosition.manhattanDistanceTo(projectilePos); });
                 };
                 /**
                  * returns true if it successfully moved

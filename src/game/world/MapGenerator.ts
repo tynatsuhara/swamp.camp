@@ -1,5 +1,6 @@
 import { Point } from "../../engine/point"
 import { Grid } from "../../engine/util/Grid"
+import { Lists } from "../../engine/util/Lists"
 import { Noise } from "../../engine/util/Noise"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { ElementType } from "./elements/Elements"
@@ -24,7 +25,7 @@ export class MapGenerator {
     }
 
     static readonly MAP_SIZE = 70
-    static readonly ENTER_LAND_POS = new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE).plusY(-TILE_SIZE * 10).plusX(TILE_SIZE * 2)
+    static readonly ENTER_LAND_POS = new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE).plusY(-TILE_SIZE * 25).plusX(TILE_SIZE * 2)
 
     private readonly location = LocationManager.instance.add(new WorldLocation(false, true))
     private readonly tentPos = new Point(-3, -3)
@@ -37,6 +38,7 @@ export class MapGenerator {
         // this.renderPath(new Point(-10, -10), new Point(10, 10), 2)
         // this.renderPath(new Point(10, -10), new Point(-10, 10), 5)
 
+        this.spawnTreesAtEdge()
         this.spawnTrees()
         this.spawnRocks()
         this.clearPathToCenter()
@@ -49,23 +51,29 @@ export class MapGenerator {
         return this.location
     }
 
-    // TODO
     spawnTreesAtEdge() {
-        const trees = Math.random() * 300 + 150
-        for (let i = 0; i < trees; i++) {
-            const pt = new Point(
-                Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_SIZE/2,
-                Math.floor(Math.random() * (MapGenerator.MAP_SIZE-1)) - MapGenerator.MAP_SIZE/2,
-            )
-            const occupiedPoints = [pt, pt.plus(new Point(0, 1))]
-            if (occupiedPoints.every(p => !this.location.ground.get(p))) {
-                this.location.addElement(
-                    Math.random() < .7 ? ElementType.TREE_POINTY : ElementType.TREE_ROUND,
-                    pt,
-                    { s: 3 }  // make adult trees
-                )
+        const treeStopEdge = MapGenerator.MAP_SIZE/2
+        const vignetteEdge = MapGenerator.MAP_SIZE/2 - 4
+        const denseStartEdge = vignetteEdge - 8
+        const possibilities = []
+        for (let x = -MapGenerator.MAP_SIZE/2; x < MapGenerator.MAP_SIZE; x++) {
+            for (let y = -MapGenerator.MAP_SIZE/2; y < MapGenerator.MAP_SIZE; y++) {
+                const distToCenter = new Point(x, y).distanceTo(Point.ZERO)
+                const pt = new Point(x, y)
+                if (distToCenter > treeStopEdge ) {
+                    // do nothing -- behind the vignette
+                } else if (distToCenter > vignetteEdge) {
+                    possibilities.push(pt)
+                } else if (distToCenter > denseStartEdge) {
+                    const chance = (distToCenter - denseStartEdge) / (vignetteEdge - denseStartEdge)
+                    if (Math.random() < chance) {
+                        possibilities.push(pt)
+                    }
+                }
             }
         }
+        Lists.shuffle(possibilities)
+        possibilities.forEach(pt => this.spawnTree(pt))
     }
 
     spawnTrees() {
@@ -75,15 +83,16 @@ export class MapGenerator {
                 Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_SIZE/2,
                 Math.floor(Math.random() * (MapGenerator.MAP_SIZE-1)) - MapGenerator.MAP_SIZE/2,
             )
-            const occupiedPoints = [pt, pt.plus(new Point(0, 1))]
-            if (occupiedPoints.every(p => !this.location.ground.get(p))) {
-                this.location.addElement(
-                    Math.random() < .7 ? ElementType.TREE_POINTY : ElementType.TREE_ROUND,
-                    pt,
-                    { s: 3 }  // make adult trees
-                )
-            }
+            this.spawnTree(pt)
         }
+    }
+
+    private spawnTree(pt: Point) {
+        this.location.addElement(
+            Math.random() < .7 ? ElementType.TREE_POINTY : ElementType.TREE_ROUND,
+            pt,
+            { s: 3 }  // make adult trees
+        )
     }
 
     clearPathToCenter() {
@@ -91,7 +100,7 @@ export class MapGenerator {
 
         // clear in corner
         for (let x = MapGenerator.MAP_SIZE/2-11; x < MapGenerator.MAP_SIZE/2; x++) {
-            for (let y = MapGenerator.MAP_SIZE/2-10; y < MapGenerator.MAP_SIZE/2-8; y++) {
+            for (let y = MapGenerator.MAP_SIZE/2-25; y < MapGenerator.MAP_SIZE/2-23; y++) {
                 const element = this.location.getElement(new Point(x, y))
                 if (!!element && typesToClear.indexOf(element.type) !== -1) {
                     this.location.removeElement(element)
