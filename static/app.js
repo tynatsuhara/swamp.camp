@@ -6355,8 +6355,8 @@ System.register("game/world/Vignette", ["engine/component", "engine/point", "eng
                 __extends(Vignette, _super);
                 function Vignette(topLeftPosition, diameter) {
                     var _this = _super.call(this) || this;
-                    _this.padding = 60;
-                    _this.rings = 4;
+                    _this.padding = 128;
+                    _this.rings = 8;
                     _this.ringWidth = _this.padding / _this.rings;
                     _this.getRenderMethods = function () { return [_this.render]; };
                     _this.start = function () {
@@ -6373,11 +6373,11 @@ System.register("game/world/Vignette", ["engine/component", "engine/point", "eng
                                 var dist = pt.distanceTo(center);
                                 var distFromLightEdge = dist - (diameter / 2 - _this.padding);
                                 if (distFromLightEdge > 0) {
-                                    var ring = Math.floor(distFromLightEdge / _this.ringWidth);
+                                    var ring = Math.min(Math.floor(distFromLightEdge / _this.ringWidth), _this.rings);
                                     imageData.data[i + 0] = rgb[0];
                                     imageData.data[i + 1] = rgb[1];
                                     imageData.data[i + 2] = rgb[2];
-                                    imageData.data[i + 3] = 255 * ring / _this.rings;
+                                    imageData.data[i + 3] = 255 * ring / _this.rings * .95;
                                 }
                             }
                         }
@@ -9420,8 +9420,8 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/util/Grid", 
                 };
                 MapGenerator.prototype.spawnTreesAtEdge = function () {
                     var _this = this;
-                    var treeStopEdge = MapGenerator.MAP_SIZE / 2;
-                    var vignetteEdge = MapGenerator.MAP_SIZE / 2 - 4;
+                    var treeStopEdge = MapGenerator.MAP_SIZE;
+                    var vignetteEdge = MapGenerator.MAP_SIZE / 2 - 1;
                     var denseStartEdge = vignetteEdge - 8;
                     var possibilities = [];
                     for (var x = -MapGenerator.MAP_SIZE / 2; x < MapGenerator.MAP_SIZE; x++) {

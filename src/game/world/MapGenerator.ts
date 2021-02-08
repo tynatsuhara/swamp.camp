@@ -52,8 +52,8 @@ export class MapGenerator {
     }
 
     spawnTreesAtEdge() {
-        const treeStopEdge = MapGenerator.MAP_SIZE/2
-        const vignetteEdge = MapGenerator.MAP_SIZE/2 - 4
+        const treeStopEdge = MapGenerator.MAP_SIZE
+        const vignetteEdge = MapGenerator.MAP_SIZE/2 - 1
         const denseStartEdge = vignetteEdge - 8
         const possibilities = []
         for (let x = -MapGenerator.MAP_SIZE/2; x < MapGenerator.MAP_SIZE; x++) {

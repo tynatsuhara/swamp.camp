@@ -6,8 +6,8 @@ import { UIStateManager } from "../ui/UIStateManager"
 
 export class Vignette extends Component {
 
-    private padding = 60
-    private rings = 4
+    private padding = 128
+    private rings = 8
     private ringWidth = this.padding/this.rings
 
     private render: ImageRender
@@ -29,11 +29,11 @@ export class Vignette extends Component {
                     const dist = pt.distanceTo(center)
                     const distFromLightEdge = dist - (diameter/2 - this.padding)
                     if (distFromLightEdge > 0) {
-                        const ring = Math.floor(distFromLightEdge/this.ringWidth)
+                        const ring = Math.min(Math.floor(distFromLightEdge/this.ringWidth), this.rings)
                         imageData.data[i+0] = rgb[0]
                         imageData.data[i+1] = rgb[1]
                         imageData.data[i+2] = rgb[2]
-                        imageData.data[i+3] = 255 * ring/this.rings
+                        imageData.data[i+3] = 255 * ring/this.rings * .95
                     }
                 }
             }
