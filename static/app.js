@@ -5170,9 +5170,9 @@ System.register("game/world/ground/GroundComponent", ["engine/component"], funct
         }
     };
 });
-System.register("game/world/WorldLocation", ["engine/point", "engine/util/Grid", "game/characters/DudeFactory", "game/characters/NPC", "game/characters/Player", "game/cutscenes/Camera", "game/graphics/Tilesets", "game/saves/uuid", "game/world/elements/Elements", "game/world/elements/ElementUtils", "game/world/ground/Ground", "game/world/LocationManager", "game/world/Teleporter"], function (exports_64, context_64) {
+System.register("game/world/WorldLocation", ["engine/point", "engine/util/Grid", "game/characters/DudeFactory", "game/characters/NPC", "game/characters/Player", "game/cutscenes/Camera", "game/graphics/Tilesets", "game/saves/uuid", "game/world/elements/Elements", "game/world/elements/ElementUtils", "game/world/ground/Ground", "game/world/LocationManager", "game/world/MapGenerator", "game/world/Teleporter"], function (exports_64, context_64) {
     "use strict";
-    var point_32, Grid_1, DudeFactory_1, NPC_1, Player_4, Camera_4, Tilesets_9, uuid_1, Elements_3, ElementUtils_1, Ground_1, LocationManager_6, Teleporter_1, WorldLocation;
+    var point_32, Grid_1, DudeFactory_1, NPC_1, Player_4, Camera_4, Tilesets_9, uuid_1, Elements_3, ElementUtils_1, Ground_1, LocationManager_6, MapGenerator_1, Teleporter_1, WorldLocation;
     var __moduleName = context_64 && context_64.id;
     return {
         setters: [
@@ -5211,6 +5211,9 @@ System.register("game/world/WorldLocation", ["engine/point", "engine/util/Grid",
             },
             function (LocationManager_6_1) {
                 LocationManager_6 = LocationManager_6_1;
+            },
+            function (MapGenerator_1_1) {
+                MapGenerator_1 = MapGenerator_1_1;
             },
             function (Teleporter_1_1) {
                 Teleporter_1 = Teleporter_1_1;
@@ -5305,11 +5308,15 @@ System.register("game/world/WorldLocation", ["engine/point", "engine/util/Grid",
                         heuristic: function (pt) { return heuristic(pt, tileEnd); },
                         isOccupied: function (pt) {
                             // Assuming this is used for character-to-character pathfinding, the start
-                            // and end points in the grid should be assumed to the open. For instance,
+                            // and end points in the grid should be assumed to be open. For instance,
                             // the character might be slightly in an "occupied" square, EG if they
                             // are standing directly adjacent to the trunk of a tree.
                             if (pt.equals(tileStart) || pt.equals(tileEnd)) {
                                 return false;
+                            }
+                            if (pt.x < -MapGenerator_1.MapGenerator.MAP_SIZE / 2 || pt.x > MapGenerator_1.MapGenerator.MAP_SIZE / 2
+                                || pt.y < -MapGenerator_1.MapGenerator.MAP_SIZE / 2 || pt.y > MapGenerator_1.MapGenerator.MAP_SIZE / 2) {
+                                return true;
                             }
                             return !!_this.occupied.get(pt);
                         }
@@ -5422,7 +5429,7 @@ System.register("game/world/WorldLocation", ["engine/point", "engine/util/Grid",
 });
 System.register("game/world/GroundRenderer", ["engine/point", "engine/renderer/ImageRender", "engine/Entity", "engine/renderer/BasicRenderComponent", "game/cutscenes/Camera", "game/world/MapGenerator", "game/graphics/Tilesets", "engine/util/Grid", "game/world/LocationManager", "engine/tiles/TileTransform"], function (exports_65, context_65) {
     "use strict";
-    var point_33, ImageRender_4, Entity_7, BasicRenderComponent_4, Camera_5, MapGenerator_1, Tilesets_10, Grid_2, LocationManager_7, TileTransform_12, GroundRenderer;
+    var point_33, ImageRender_4, Entity_7, BasicRenderComponent_4, Camera_5, MapGenerator_2, Tilesets_10, Grid_2, LocationManager_7, TileTransform_12, GroundRenderer;
     var __moduleName = context_65 && context_65.id;
     return {
         setters: [
@@ -5441,8 +5448,8 @@ System.register("game/world/GroundRenderer", ["engine/point", "engine/renderer/I
             function (Camera_5_1) {
                 Camera_5 = Camera_5_1;
             },
-            function (MapGenerator_1_1) {
-                MapGenerator_1 = MapGenerator_1_1;
+            function (MapGenerator_2_1) {
+                MapGenerator_2 = MapGenerator_2_1;
             },
             function (Tilesets_10_1) {
                 Tilesets_10 = Tilesets_10_1;
@@ -5464,7 +5471,7 @@ System.register("game/world/GroundRenderer", ["engine/point", "engine/renderer/I
             GroundRenderer = /** @class */ (function () {
                 function GroundRenderer() {
                     // no lights should live outside of this range
-                    this.size = MapGenerator_1.MapGenerator.MAP_SIZE * Tilesets_10.TILE_SIZE * 2;
+                    this.size = MapGenerator_2.MapGenerator.MAP_SIZE * Tilesets_10.TILE_SIZE * 2;
                     this.shift = new point_33.Point(this.size / 2, this.size / 2);
                     this.tiles = new Map();
                     this.gridDirty = true;
@@ -6395,7 +6402,7 @@ System.register("game/world/Vignette", ["engine/component", "engine/point", "eng
 });
 System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/point", "engine/renderer/BasicRenderComponent", "engine/renderer/ImageRender", "engine/util/Grid", "game/cutscenes/Camera", "game/graphics/Tilesets", "game/ui/UIStateManager", "game/world/LocationManager", "game/world/MapGenerator", "game/world/TimeUnit", "game/world/Vignette", "game/world/WorldTime"], function (exports_79, context_79) {
     "use strict";
-    var Entity_13, point_42, BasicRenderComponent_5, ImageRender_6, Grid_3, Camera_6, Tilesets_17, UIStateManager_6, LocationManager_11, MapGenerator_2, TimeUnit_2, Vignette_1, WorldTime_3, OutdoorDarknessMask;
+    var Entity_13, point_42, BasicRenderComponent_5, ImageRender_6, Grid_3, Camera_6, Tilesets_17, UIStateManager_6, LocationManager_11, MapGenerator_3, TimeUnit_2, Vignette_1, WorldTime_3, OutdoorDarknessMask;
     var __moduleName = context_79 && context_79.id;
     return {
         setters: [
@@ -6426,8 +6433,8 @@ System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/poin
             function (LocationManager_11_1) {
                 LocationManager_11 = LocationManager_11_1;
             },
-            function (MapGenerator_2_1) {
-                MapGenerator_2 = MapGenerator_2_1;
+            function (MapGenerator_3_1) {
+                MapGenerator_3 = MapGenerator_3_1;
             },
             function (TimeUnit_2_1) {
                 TimeUnit_2 = TimeUnit_2_1;
@@ -6443,7 +6450,7 @@ System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/poin
             OutdoorDarknessMask = /** @class */ (function () {
                 function OutdoorDarknessMask() {
                     // no lights should live outside of this range
-                    this.size = MapGenerator_2.MapGenerator.MAP_SIZE * Tilesets_17.TILE_SIZE;
+                    this.size = MapGenerator_3.MapGenerator.MAP_SIZE * Tilesets_17.TILE_SIZE;
                     this.shift = new point_42.Point(this.size / 2, this.size / 2);
                     this.lightTiles = new Map(); // grid of light diameter
                     this.gridDirty = true;
@@ -7653,15 +7660,15 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
 });
 System.register("game/world/events/QueuedEvent", ["game/characters/DudeFactory", "game/world/MapGenerator", "game/world/LocationManager", "game/characters/NPCSchedule", "game/characters/NPC", "game/graphics/Tilesets", "game/world/events/EventQueue", "game/world/WorldTime", "game/world/elements/House"], function (exports_87, context_87) {
     "use strict";
-    var _a, DudeFactory_2, MapGenerator_3, LocationManager_13, NPCSchedule_2, NPC_2, Tilesets_23, EventQueue_4, WorldTime_5, House_4, QueuedEventType, EVENT_QUEUE_HANDLERS;
+    var _a, DudeFactory_2, MapGenerator_4, LocationManager_13, NPCSchedule_2, NPC_2, Tilesets_23, EventQueue_4, WorldTime_5, House_4, QueuedEventType, EVENT_QUEUE_HANDLERS;
     var __moduleName = context_87 && context_87.id;
     return {
         setters: [
             function (DudeFactory_2_1) {
                 DudeFactory_2 = DudeFactory_2_1;
             },
-            function (MapGenerator_3_1) {
-                MapGenerator_3 = MapGenerator_3_1;
+            function (MapGenerator_4_1) {
+                MapGenerator_4 = MapGenerator_4_1;
             },
             function (LocationManager_13_1) {
                 LocationManager_13 = LocationManager_13_1;
@@ -7705,11 +7712,11 @@ System.register("game/world/events/QueuedEvent", ["game/characters/DudeFactory",
                     });
                 },
                 _a[QueuedEventType.HERALD_ARRIVAL] = function () {
-                    DudeFactory_2.DudeFactory.instance.new(4 /* HERALD */, MapGenerator_3.MapGenerator.ENTER_LAND_POS, LocationManager_13.LocationManager.instance.exterior());
+                    DudeFactory_2.DudeFactory.instance.new(4 /* HERALD */, MapGenerator_4.MapGenerator.ENTER_LAND_POS, LocationManager_13.LocationManager.instance.exterior());
                     console.log("the trader is here (ノ ″ロ″)ノ");
                 },
                 _a[QueuedEventType.HERALD_DEPARTURE] = function (data) {
-                    var goalPosition = MapGenerator_3.MapGenerator.ENTER_LAND_POS;
+                    var goalPosition = MapGenerator_4.MapGenerator.ENTER_LAND_POS;
                     var berto = LocationManager_13.LocationManager.instance.exterior().getDude(4 /* HERALD */);
                     if (!berto) {
                         return;
@@ -7742,7 +7749,7 @@ System.register("game/world/events/QueuedEvent", ["game/characters/DudeFactory",
                         return;
                     }
                     berto.entity.getComponent(NPC_2.NPC).setSchedule(data.normalSchedule);
-                    var villager = DudeFactory_2.DudeFactory.instance.new(7 /* VILLAGER */, MapGenerator_3.MapGenerator.ENTER_LAND_POS, LocationManager_13.LocationManager.instance.exterior());
+                    var villager = DudeFactory_2.DudeFactory.instance.new(7 /* VILLAGER */, MapGenerator_4.MapGenerator.ENTER_LAND_POS, LocationManager_13.LocationManager.instance.exterior());
                     var house = LocationManager_13.LocationManager.instance.exterior().getElementsOfType(6 /* HOUSE */)
                         .map(function (e) { return e.entity.getComponent(House_4.House); })
                         .filter(function (house) { return house.isResidentPending(); })[0];
@@ -9580,15 +9587,15 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/util/Grid", 
 });
 System.register("game/cutscenes/Camera", ["engine/point", "game/world/MapGenerator", "game/graphics/Tilesets"], function (exports_109, context_109) {
     "use strict";
-    var point_62, MapGenerator_4, Tilesets_36, Camera;
+    var point_62, MapGenerator_5, Tilesets_36, Camera;
     var __moduleName = context_109 && context_109.id;
     return {
         setters: [
             function (point_62_1) {
                 point_62 = point_62_1;
             },
-            function (MapGenerator_4_1) {
-                MapGenerator_4 = MapGenerator_4_1;
+            function (MapGenerator_5_1) {
+                MapGenerator_5 = MapGenerator_5_1;
             },
             function (Tilesets_36_1) {
                 Tilesets_36 = Tilesets_36_1;
@@ -9641,8 +9648,8 @@ System.register("game/cutscenes/Camera", ["engine/point", "game/world/MapGenerat
                 Camera.prototype.getUpdatedPosition = function (dimensions, elapsedTimeMillis) {
                     var _a, _b;
                     this._dimensions = dimensions;
-                    var xLimit = MapGenerator_4.MapGenerator.MAP_SIZE / 2 * Tilesets_36.TILE_SIZE - dimensions.x / 2;
-                    var yLimit = MapGenerator_4.MapGenerator.MAP_SIZE / 2 * Tilesets_36.TILE_SIZE - dimensions.y / 2;
+                    var xLimit = MapGenerator_5.MapGenerator.MAP_SIZE / 2 * Tilesets_36.TILE_SIZE - dimensions.x / 2;
+                    var yLimit = MapGenerator_5.MapGenerator.MAP_SIZE / 2 * Tilesets_36.TILE_SIZE - dimensions.y / 2;
                     var trackedPoint = (_b = (_a = this.dudeTarget) === null || _a === void 0 ? void 0 : _a.position) !== null && _b !== void 0 ? _b : this.pointTarget;
                     var clampedTrackedPoint = new point_62.Point(this.clamp(trackedPoint.x, -xLimit, xLimit), this.clamp(trackedPoint.y, -yLimit, yLimit));
                     var cameraGoal = dimensions.div(2).minus(clampedTrackedPoint);
@@ -12217,7 +12224,7 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
 });
 System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "engine/point", "game/characters/Dude", "game/characters/DudeFactory", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/graphics/Tilesets", "game/items/DroppedItem", "game/SaveManager", "game/ui/UIStateManager", "game/world/GroundRenderer", "game/world/LocationManager", "game/world/MapGenerator", "game/world/OutdoorDarknessMask", "game/world/TimeUnit", "game/world/WorldTime", "game/world/events/EventQueue", "game/world/events/QueuedEvent", "game/characters/NPC", "engine/renderer/BasicRenderComponent", "game/characters/Player", "engine/renderer/LineRender", "engine/Entity", "engine/debug"], function (exports_135, context_135) {
     "use strict";
-    var CollisionEngine_4, point_76, Dude_11, DudeFactory_6, Camera_10, CutsceneManager_3, IntroCutscene_1, Tilesets_45, DroppedItem_3, SaveManager_9, UIStateManager_18, GroundRenderer_2, LocationManager_28, MapGenerator_5, OutdoorDarknessMask_5, TimeUnit_8, WorldTime_10, EventQueue_6, QueuedEvent_4, NPC_8, BasicRenderComponent_9, Player_18, LineRender_2, Entity_28, debug_3, ZOOM, GameScene;
+    var CollisionEngine_4, point_76, Dude_11, DudeFactory_6, Camera_10, CutsceneManager_3, IntroCutscene_1, Tilesets_45, DroppedItem_3, SaveManager_9, UIStateManager_18, GroundRenderer_2, LocationManager_28, MapGenerator_6, OutdoorDarknessMask_5, TimeUnit_8, WorldTime_10, EventQueue_6, QueuedEvent_4, NPC_8, BasicRenderComponent_9, Player_18, LineRender_2, Entity_28, debug_3, ZOOM, GameScene;
     var __moduleName = context_135 && context_135.id;
     return {
         setters: [
@@ -12260,8 +12267,8 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
             function (LocationManager_28_1) {
                 LocationManager_28 = LocationManager_28_1;
             },
-            function (MapGenerator_5_1) {
-                MapGenerator_5 = MapGenerator_5_1;
+            function (MapGenerator_6_1) {
+                MapGenerator_6 = MapGenerator_6_1;
             },
             function (OutdoorDarknessMask_5_1) {
                 OutdoorDarknessMask_5 = OutdoorDarknessMask_5_1;
@@ -12319,8 +12326,8 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
                     OutdoorDarknessMask_5.OutdoorDarknessMask.instance.start();
                     WorldTime_10.WorldTime.instance.initialize(TimeUnit_8.TimeUnit.HOUR * 19.5);
                     // World must be initialized before we do anything else
-                    MapGenerator_5.MapGenerator.instance.generateExterior();
-                    var playerStartPos = MapGenerator_5.MapGenerator.ENTER_LAND_POS;
+                    MapGenerator_6.MapGenerator.instance.generateExterior();
+                    var playerStartPos = MapGenerator_6.MapGenerator.ENTER_LAND_POS;
                     var playerDude = DudeFactory_6.DudeFactory.instance.new(0 /* PLAYER */, playerStartPos);
                     Camera_10.Camera.instance.focusOnDude(playerDude);
                     DudeFactory_6.DudeFactory.instance.new(1 /* DIP */, point_76.Point.ZERO);

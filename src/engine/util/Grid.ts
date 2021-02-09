@@ -1,6 +1,5 @@
 import { Point } from "../point"
 import { BinaryHeap } from "./BinaryHeap"
-import { profiler } from "../profiler"
 
 // an infinite grid using x/y coordinates (x increases to the right, y increases down)
 export class Grid<T> {

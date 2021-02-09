@@ -15,6 +15,7 @@ import { ElementUtils } from "./elements/ElementUtils"
 import { Ground, GroundType, SavedGround } from "./ground/Ground"
 import { GroundComponent } from "./ground/GroundComponent"
 import { LocationManager } from "./LocationManager"
+import { MapGenerator } from "./MapGenerator"
 import { Teleporter, Teleporters } from "./Teleporter"
 
 export class WorldLocation {
@@ -116,11 +117,15 @@ export class WorldLocation {
             heuristic: (pt) => heuristic(pt, tileEnd),
             isOccupied: (pt) => {
                 // Assuming this is used for character-to-character pathfinding, the start
-                // and end points in the grid should be assumed to the open. For instance,
+                // and end points in the grid should be assumed to be open. For instance,
                 // the character might be slightly in an "occupied" square, EG if they
                 // are standing directly adjacent to the trunk of a tree.
                 if (pt.equals(tileStart) || pt.equals(tileEnd)) {
                     return false
+                }
+                if (pt.x < -MapGenerator.MAP_SIZE/2 || pt.x > MapGenerator.MAP_SIZE/2 
+                        || pt.y < -MapGenerator.MAP_SIZE/2 || pt.y > MapGenerator.MAP_SIZE/2) {
+                    return true
                 }
                 return !!this.occupied.get(pt)
             }
