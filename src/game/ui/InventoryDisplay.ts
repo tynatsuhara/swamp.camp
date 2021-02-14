@@ -45,6 +45,7 @@ export class InventoryDisplay extends Component {
     private onClose: () => void
     private tradingInv: Inventory
     private tradingInvOffset: Point
+    private canUseItems = false
 
     constructor() {
         super()
@@ -163,24 +164,29 @@ export class InventoryDisplay extends Component {
 
             this.tooltip.say(tooltipString)
 
-            // TODO (BUG): Clicking E to interact with a chest can trigger the E function
-            actions.forEach((action, i) => {
-                if (updateData.input.isKeyDown(interactButtonOrder[i])) {
-                    action.actionFn()
-                }
-            })
+            if (this.canUseItems) {
+                actions.forEach((action, i) => {
+                    if (updateData.input.isKeyDown(interactButtonOrder[i])) {
+                        action.actionFn()
+                    }
+                })
+            }
         } else {
             this.tooltip.clear()
         }
 
-        this.lastMousPos = updateData.input.mousePos
+        // Re-check isOpen because actions could have closed the menu
+        if (this.isOpen) {
+            this.canUseItems = true
+            this.lastMousPos = updateData.input.mousePos
 
-        if (updateData.input.isMouseDown) {
-            if (!!hoverInv && !!hoverInv.getStack(hoverIndex)) {
-                this.trackedTileInventory = hoverInv
-                // some stupid math to account for the fact that this.tiles contains tiles from potentially two inventories
-                this.trackedTile = this.tiles[hoverIndex + (hoverInv === this.playerInv ? 0 : this.playerInv.size)]
-                this.trackedTileIndex = hoverIndex
+            if (updateData.input.isMouseDown) {
+                if (!!hoverInv && !!hoverInv.getStack(hoverIndex)) {
+                    this.trackedTileInventory = hoverInv
+                    // some stupid math to account for the fact that this.tiles contains tiles from potentially two inventories
+                    this.trackedTile = this.tiles[hoverIndex + (hoverInv === this.playerInv ? 0 : this.playerInv.size)]
+                    this.trackedTileIndex = hoverIndex
+                }
             }
         }
     }
@@ -221,6 +227,7 @@ export class InventoryDisplay extends Component {
         this.tooltip.clear()
         this.displayEntity = null
         this.tradingInv = null
+        this.canUseItems = false
 
         if (this.onClose) {
             this.onClose()

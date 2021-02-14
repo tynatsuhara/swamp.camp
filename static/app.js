@@ -8048,6 +8048,7 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                     _this.tiles = [];
                     _this.showingInv = false;
                     _this.coinsOffset = new point_48.Point(0, -18);
+                    _this.canUseItems = false;
                     _this.e.addComponent(_this);
                     _this.tooltip = _this.e.addComponent(new Tooltip_3.Tooltip());
                     InventoryDisplay.instance = _this;
@@ -8157,23 +8158,28 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                             tooltipString_1 += "\n[" + Controls_4.Controls.keyString(interactButtonOrder_1[i]) + " to " + action.verb + "]";
                         });
                         this.tooltip.say(tooltipString_1);
-                        // TODO (BUG): Clicking E to interact with a chest can trigger the E function
-                        actions.forEach(function (action, i) {
-                            if (updateData.input.isKeyDown(interactButtonOrder_1[i])) {
-                                action.actionFn();
-                            }
-                        });
+                        if (this.canUseItems) {
+                            actions.forEach(function (action, i) {
+                                if (updateData.input.isKeyDown(interactButtonOrder_1[i])) {
+                                    action.actionFn();
+                                }
+                            });
+                        }
                     }
                     else {
                         this.tooltip.clear();
                     }
-                    this.lastMousPos = updateData.input.mousePos;
-                    if (updateData.input.isMouseDown) {
-                        if (!!hoverInv && !!hoverInv.getStack(hoverIndex)) {
-                            this.trackedTileInventory = hoverInv;
-                            // some stupid math to account for the fact that this.tiles contains tiles from potentially two inventories
-                            this.trackedTile = this.tiles[hoverIndex + (hoverInv === this.playerInv ? 0 : this.playerInv.size)];
-                            this.trackedTileIndex = hoverIndex;
+                    // Re-check isOpen because actions could have closed the menu
+                    if (this.isOpen) {
+                        this.canUseItems = true;
+                        this.lastMousPos = updateData.input.mousePos;
+                        if (updateData.input.isMouseDown) {
+                            if (!!hoverInv && !!hoverInv.getStack(hoverIndex)) {
+                                this.trackedTileInventory = hoverInv;
+                                // some stupid math to account for the fact that this.tiles contains tiles from potentially two inventories
+                                this.trackedTile = this.tiles[hoverIndex + (hoverInv === this.playerInv ? 0 : this.playerInv.size)];
+                                this.trackedTileIndex = hoverIndex;
+                            }
                         }
                     }
                 };
@@ -8204,6 +8210,7 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                     this.tooltip.clear();
                     this.displayEntity = null;
                     this.tradingInv = null;
+                    this.canUseItems = false;
                     if (this.onClose) {
                         this.onClose();
                         this.onClose = null;
