@@ -8037,7 +8037,7 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                             }
                             this.trackedTile = null;
                             // refresh view
-                            this.show();
+                            this.show(this.onClose);
                         }
                         else { // track
                             this.trackedTile.transform.position = this.trackedTile.transform.position.plus(updateData.input.mousePos.minus(this.lastMousPos));
@@ -8136,10 +8136,16 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                     this.bgTiles = [];
                     this.tooltip.clear();
                     this.displayEntity = null;
+                    if (this.onClose) {
+                        this.onClose();
+                        this.onClose = null;
+                    }
                 };
-                InventoryDisplay.prototype.show = function () {
+                InventoryDisplay.prototype.show = function (onClose) {
                     var _this = this;
                     var _a;
+                    if (onClose === void 0) { onClose = null; }
+                    this.onClose = onClose;
                     var screenDimensions = Camera_8.Camera.instance.dimensions;
                     this.showingInv = true;
                     var displayDimensions = new point_48.Point(InventoryDisplay.COLUMNS, this.inventory().inventory.length / InventoryDisplay.COLUMNS).times(Tilesets_24.TILE_SIZE);
@@ -8701,8 +8707,8 @@ System.register("game/world/elements/Chest", ["engine/Entity", "engine/point", "
                 ChestFactory.prototype.make = function (wl, pos, data) {
                     var inventory = Inventory_2.Inventory.load(data[INVENTORY] || []);
                     var tiles = Tilesets_29.Tilesets.instance.dungeonCharacters.getTileSetAnimationFrames("chest_empty_open_anim");
-                    var openSpeed = 100;
-                    var closeSpeed = 50;
+                    var openSpeed = 80;
+                    var closeSpeed = 20;
                     var animations = new AnimatedTileComponent_5.AnimatedTileComponent([
                         // opening
                         new TileSetAnimation_5.TileSetAnimation([[tiles[0], openSpeed], [tiles[1], openSpeed], [tiles[2], openSpeed]], function () { return animations.pause(); }),
@@ -8710,10 +8716,10 @@ System.register("game/world/elements/Chest", ["engine/Entity", "engine/point", "
                         new TileSetAnimation_5.TileSetAnimation([[tiles[2], closeSpeed], [tiles[1], closeSpeed], [tiles[0], closeSpeed]], function () { return animations.pause(); }),
                     ], TileTransform_24.TileTransform.new({ position: pos.times(Tilesets_29.TILE_SIZE), depth: pos.y * Tilesets_29.TILE_SIZE + Tilesets_29.TILE_SIZE }));
                     animations.pause();
-                    var interactable = new Interactable_4.Interactable(pos.times(Tilesets_29.TILE_SIZE).plusX(Tilesets_29.TILE_SIZE / 2).plusY(Tilesets_29.TILE_SIZE / 2), function () {
-                        InventoryDisplay_2.InventoryDisplay.instance.show();
+                    var interactable = new Interactable_4.Interactable(pos.times(Tilesets_29.TILE_SIZE).plusX(Tilesets_29.TILE_SIZE / 2).plusY(10), function () {
+                        InventoryDisplay_2.InventoryDisplay.instance.show(function () { return animations.goToAnimation(1).play(); });
                         animations.goToAnimation(0).play();
-                    }, new point_54.Point(0, -16));
+                    }, new point_54.Point(0, -17));
                     var e = new Entity_21.Entity([animations, interactable]);
                     return e.addComponent(new ElementComponent_4.ElementComponent(this.type, pos, [pos], function () {
                         var _a;

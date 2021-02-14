@@ -24,8 +24,8 @@ export class ChestFactory extends ElementFactory {
         const inventory = Inventory.load(data[INVENTORY] || [])
 
         const tiles = Tilesets.instance.dungeonCharacters.getTileSetAnimationFrames("chest_empty_open_anim")
-        const openSpeed = 100
-        const closeSpeed = 50
+        const openSpeed = 80
+        const closeSpeed = 20
         const animations: AnimatedTileComponent = new AnimatedTileComponent([
             // opening
             new TileSetAnimation(
@@ -42,12 +42,12 @@ export class ChestFactory extends ElementFactory {
         animations.pause()
         
         const interactable = new Interactable(
-            pos.times(TILE_SIZE).plusX(TILE_SIZE/2).plusY(TILE_SIZE/2),
+            pos.times(TILE_SIZE).plusX(TILE_SIZE/2).plusY(10),
             () => {
-                InventoryDisplay.instance.show()
+                InventoryDisplay.instance.show(() => animations.goToAnimation(1).play())
                 animations.goToAnimation(0).play()
             },
-            new Point(0, -16)
+            new Point(0, -17)
         )
 
         const e = new Entity([animations, interactable])

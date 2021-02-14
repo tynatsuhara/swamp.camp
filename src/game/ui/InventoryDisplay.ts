@@ -41,6 +41,7 @@ export class InventoryDisplay extends Component {
     private offset: Point
     private tooltip: Tooltip
     private readonly coinsOffset = new Point(0, -18)
+    private onClose: () => void
 
     constructor() {
         super()
@@ -82,7 +83,7 @@ export class InventoryDisplay extends Component {
                 }
                 this.trackedTile = null
                 // refresh view
-                this.show()
+                this.show(this.onClose)
             } else {  // track
                 this.trackedTile.transform.position = this.trackedTile.transform.position.plus(updateData.input.mousePos.minus(this.lastMousPos))
             }
@@ -200,9 +201,15 @@ export class InventoryDisplay extends Component {
         this.bgTiles = []
         this.tooltip.clear()
         this.displayEntity = null
+
+        if (this.onClose) {
+            this.onClose()
+            this.onClose = null
+        }
     }
 
-    show() {
+    show(onClose: () => void = null) {
+        this.onClose = onClose
         const screenDimensions = Camera.instance.dimensions
         this.showingInv = true
 
