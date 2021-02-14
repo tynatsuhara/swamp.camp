@@ -8012,8 +8012,8 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                     return Player_9.Player.instance.dude.inventory;
                 };
                 InventoryDisplay.prototype.lateUpdate = function (updateData) {
+                    // const inv = this.inventory().inventory
                     var _this = this;
-                    var inv = this.inventory().inventory;
                     var pressI = updateData.input.isKeyDown(Controls_4.Controls.inventoryButton);
                     var pressEsc = updateData.input.isKeyDown(27 /* ESC */);
                     if (this.isOpen && (pressI || pressEsc)) {
@@ -8025,16 +8025,19 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                     if (!this.isOpen) {
                         return;
                     }
-                    var hoverIndex = this.getInventoryIndexForPosition(updateData.input.mousePos);
+                    var hoverResult = this.getInventoryIndexPosition(updateData.input.mousePos);
+                    var hoverInv = hoverResult[0];
+                    var hoverIndex = hoverResult[1];
                     if (!!this.trackedTile) { // dragging
                         this.tooltip.clear();
                         if (updateData.input.isMouseUp) { // drop n swap
                             if (hoverIndex !== -1) {
-                                var value = inv[this.trackedTileIndex];
-                                var currentlyOccupiedSpot = inv[hoverIndex];
-                                inv[hoverIndex] = value;
-                                inv[this.trackedTileIndex] = currentlyOccupiedSpot;
+                                var value = hoverInv.inventory[this.trackedTileIndex];
+                                var currentlyOccupiedSpot = hoverInv.inventory[hoverIndex];
+                                hoverInv.inventory[hoverIndex] = value;
+                                this.trackedTileInventory.inventory[this.trackedTileIndex] = currentlyOccupiedSpot;
                             }
+                            this.trackedTileInventory = null;
                             this.trackedTile = null;
                             // refresh view
                             this.show(this.onClose);
@@ -8043,15 +8046,15 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                             this.trackedTile.transform.position = this.trackedTile.transform.position.plus(updateData.input.mousePos.minus(this.lastMousPos));
                         }
                     }
-                    else if (hoverIndex !== -1 && !!inv[hoverIndex]) { // we're hovering over an item
+                    else if (hoverIndex !== -1 && !!hoverInv.inventory[hoverIndex]) { // we're hovering over an item
                         this.tooltip.position = updateData.input.mousePos;
-                        var stack_1 = inv[hoverIndex];
+                        var stack_1 = hoverInv.inventory[hoverIndex];
                         var item_1 = Items_3.ITEM_METADATA_MAP[stack_1.item];
                         var count = stack_1.count > 1 ? ' x' + stack_1.count : '';
                         var actions = [];
                         var decrementStack_1 = function () {
                             if (stack_1.count === 1) {
-                                inv[hoverIndex] = null;
+                                hoverInv.inventory[hoverIndex] = null;
                             }
                             else {
                                 stack_1.count--;
@@ -8101,9 +8104,11 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                         this.tooltip.clear();
                     }
                     this.lastMousPos = updateData.input.mousePos;
-                    if (updateData.input.isMouseDown) {
-                        inv.forEach(function (stack, index) {
-                            if (utils_8.rectContains(_this.getPositionForInventoryIndex(index), new point_48.Point(Tilesets_24.TILE_SIZE, Tilesets_24.TILE_SIZE), updateData.input.mousePos)) {
+                    if (updateData.input.isMouseDown && !!hoverInv) {
+                        hoverInv.inventory.forEach(function (stack, index) {
+                            var isClickingTile = utils_8.rectContains(_this.getPositionForInventoryIndex(index, _this.offset), Tilesets_24.TILE_DIMENSIONS, updateData.input.mousePos);
+                            if (isClickingTile) {
+                                _this.trackedTileInventory = hoverInv;
                                 _this.trackedTile = _this.tiles[index];
                                 _this.trackedTileIndex = index;
                             }
@@ -8166,21 +8171,29 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                     });
                     (_a = this.tiles) === null || _a === void 0 ? void 0 : _a.forEach(function (tile, index) {
                         if (!!tile) {
-                            tile.transform.position = _this.getPositionForInventoryIndex(index);
+                            tile.transform.position = _this.getPositionForInventoryIndex(index, _this.offset);
                         }
                     });
                 };
-                InventoryDisplay.prototype.getPositionForInventoryIndex = function (i) {
-                    return new point_48.Point(i % InventoryDisplay.COLUMNS, Math.floor(i / InventoryDisplay.COLUMNS)).times(Tilesets_24.TILE_SIZE).plus(this.offset);
+                InventoryDisplay.prototype.getPositionForInventoryIndex = function (i, inventoryOffset) {
+                    return new point_48.Point(i % InventoryDisplay.COLUMNS, Math.floor(i / InventoryDisplay.COLUMNS)).times(Tilesets_24.TILE_SIZE).plus(inventoryOffset);
                 };
-                InventoryDisplay.prototype.getInventoryIndexForPosition = function (pos) {
-                    var p = pos.minus(this.offset);
-                    var x = Math.floor(p.x / Tilesets_24.TILE_SIZE);
-                    var y = Math.floor(p.y / Tilesets_24.TILE_SIZE);
-                    if (x < 0 || x >= InventoryDisplay.COLUMNS || y < 0 || y >= Math.floor(this.inventory().inventory.length / InventoryDisplay.COLUMNS)) {
-                        return -1;
+                InventoryDisplay.prototype.getInventoryIndexPosition = function (pos) {
+                    var _this = this;
+                    var getIndexForOffset = function (offset) {
+                        var p = pos.minus(offset);
+                        var x = Math.floor(p.x / Tilesets_24.TILE_SIZE);
+                        var y = Math.floor(p.y / Tilesets_24.TILE_SIZE);
+                        if (x < 0 || x >= InventoryDisplay.COLUMNS || y < 0 || y >= Math.floor(_this.inventory().inventory.length / InventoryDisplay.COLUMNS)) {
+                            return -1;
+                        }
+                        return y * InventoryDisplay.COLUMNS + x;
+                    };
+                    var index = getIndexForOffset(this.offset);
+                    if (index > -1) {
+                        return [this.inventory(), index];
                     }
-                    return y * InventoryDisplay.COLUMNS + x;
+                    return [null, -1];
                 };
                 InventoryDisplay.COLUMNS = 10;
                 return InventoryDisplay;
@@ -10930,9 +10943,10 @@ System.register("game/items/Inventory", ["game/items/Items"], function (exports_
             exports_125("ItemStack", ItemStack);
             // TODO flesh this out more when we have more items
             Inventory = /** @class */ (function () {
-                function Inventory() {
-                    this._inventory = Array.from({ length: 20 }); // TODO make length configurable
+                function Inventory(size) {
+                    if (size === void 0) { size = 20; }
                     this.countMap = new Map();
+                    this._inventory = Array.from({ length: size });
                 }
                 Object.defineProperty(Inventory.prototype, "inventory", {
                     get: function () { return this._inventory; },

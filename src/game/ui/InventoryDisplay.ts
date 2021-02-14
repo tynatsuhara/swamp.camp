@@ -13,7 +13,8 @@ import { rectContains } from "../../engine/util/utils"
 import { Player } from "../characters/Player"
 import { Controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
-import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { Tilesets, TILE_DIMENSIONS, TILE_SIZE } from "../graphics/Tilesets"
+import { Inventory } from "../items/Inventory"
 import { ITEM_METADATA_MAP } from "../items/Items"
 import { saveManager } from "../SaveManager"
 import { LocationManager } from "../world/LocationManager"
@@ -31,6 +32,7 @@ export class InventoryDisplay extends Component {
 
     private readonly e: Entity = new Entity()  // entity for this component
     private displayEntity: Entity
+    private trackedTileInventory: Inventory
     private trackedTileIndex: number
     private trackedTile: TileComponent  // non-null when being dragged
     private lastMousPos: Point  
@@ -55,7 +57,7 @@ export class InventoryDisplay extends Component {
     }
 
     lateUpdate(updateData: UpdateData) {
-        const inv = this.inventory().inventory
+        // const inv = this.inventory().inventory
 
         const pressI = updateData.input.isKeyDown(Controls.inventoryButton)
         const pressEsc = updateData.input.isKeyDown(InputKey.ESC)
@@ -70,26 +72,29 @@ export class InventoryDisplay extends Component {
             return
         }
 
-        const hoverIndex = this.getInventoryIndexForPosition(updateData.input.mousePos)
+        const hoverResult = this.getInventoryIndexPosition(updateData.input.mousePos)
+        const hoverInv = hoverResult[0]
+        const hoverIndex = hoverResult[1]
 
         if (!!this.trackedTile) {  // dragging
             this.tooltip.clear()
             if (updateData.input.isMouseUp) {  // drop n swap
                 if (hoverIndex !== -1) {
-                    const value = inv[this.trackedTileIndex]
-                    const currentlyOccupiedSpot = inv[hoverIndex]
-                    inv[hoverIndex] = value
-                    inv[this.trackedTileIndex] = currentlyOccupiedSpot
+                    const value = hoverInv.inventory[this.trackedTileIndex]
+                    const currentlyOccupiedSpot = hoverInv.inventory[hoverIndex]
+                    hoverInv.inventory[hoverIndex] = value
+                    this.trackedTileInventory.inventory[this.trackedTileIndex] = currentlyOccupiedSpot
                 }
+                this.trackedTileInventory = null
                 this.trackedTile = null
                 // refresh view
                 this.show(this.onClose)
             } else {  // track
                 this.trackedTile.transform.position = this.trackedTile.transform.position.plus(updateData.input.mousePos.minus(this.lastMousPos))
             }
-        } else if (hoverIndex !== -1 && !!inv[hoverIndex]) {  // we're hovering over an item
+        } else if (hoverIndex !== -1 && !!hoverInv.inventory[hoverIndex]) {  // we're hovering over an item
             this.tooltip.position = updateData.input.mousePos
-            const stack = inv[hoverIndex]
+            const stack = hoverInv.inventory[hoverIndex]
             const item = ITEM_METADATA_MAP[stack.item]
             const count = stack.count > 1 ? ' x' + stack.count : ''
 
@@ -97,7 +102,7 @@ export class InventoryDisplay extends Component {
 
             const decrementStack = () => {
                 if (stack.count === 1) {
-                    inv[hoverIndex] = null
+                    hoverInv.inventory[hoverIndex] = null
                 } else {
                     stack.count--
                 }
@@ -156,9 +161,15 @@ export class InventoryDisplay extends Component {
 
         this.lastMousPos = updateData.input.mousePos
 
-        if (updateData.input.isMouseDown) {
-            inv.forEach((stack, index) => {
-                if (rectContains(this.getPositionForInventoryIndex(index), new Point(TILE_SIZE, TILE_SIZE), updateData.input.mousePos)) {
+        if (updateData.input.isMouseDown && !!hoverInv) {
+            hoverInv.inventory.forEach((stack, index) => {
+                const isClickingTile = rectContains(
+                    this.getPositionForInventoryIndex(index, this.offset), 
+                    TILE_DIMENSIONS, 
+                    updateData.input.mousePos
+                )
+                if (isClickingTile) {
+                    this.trackedTileInventory = hoverInv
                     this.trackedTile = this.tiles[index]
                     this.trackedTileIndex = index
                 }
@@ -257,22 +268,31 @@ export class InventoryDisplay extends Component {
 
         this.tiles?.forEach((tile, index) => {
             if (!!tile) {
-                tile.transform.position = this.getPositionForInventoryIndex(index)
+                tile.transform.position = this.getPositionForInventoryIndex(index, this.offset)
             }
         })
     }
 
-    private getPositionForInventoryIndex(i: number) {
-        return new Point(i % InventoryDisplay.COLUMNS, Math.floor(i/InventoryDisplay.COLUMNS)).times(TILE_SIZE).plus(this.offset)
+    private getPositionForInventoryIndex(i: number, inventoryOffset: Point) {
+        return new Point(i % InventoryDisplay.COLUMNS, Math.floor(i/InventoryDisplay.COLUMNS)).times(TILE_SIZE).plus(inventoryOffset)
     }
 
-    private getInventoryIndexForPosition(pos: Point) {
-        const p = pos.minus(this.offset)
-        const x = Math.floor(p.x/TILE_SIZE)
-        const y = Math.floor(p.y/TILE_SIZE)
-        if (x < 0 || x >= InventoryDisplay.COLUMNS || y < 0 || y >= Math.floor(this.inventory().inventory.length/InventoryDisplay.COLUMNS)) {
-            return -1
+    private getInventoryIndexPosition(pos: Point): [Inventory, number] {
+        const getIndexForOffset = (offset) => {
+            const p = pos.minus(offset)
+            const x = Math.floor(p.x/TILE_SIZE)
+            const y = Math.floor(p.y/TILE_SIZE)
+            if (x < 0 || x >= InventoryDisplay.COLUMNS || y < 0 || y >= Math.floor(this.inventory().inventory.length/InventoryDisplay.COLUMNS)) {
+                return -1
+            }
+            return y * InventoryDisplay.COLUMNS + x
         }
-        return y * InventoryDisplay.COLUMNS + x
+
+        const index = getIndexForOffset(this.offset)
+        if (index > -1) {
+            return [this.inventory(), index]
+        }
+
+        return [null, -1]
     }
 }
