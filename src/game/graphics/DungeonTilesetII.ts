@@ -248,7 +248,7 @@ export class DungeonTilesetII {
         return new StaticTileSource(this.getFile(), pos, dim)
     }
 
-    getTileSetAnimation(key: string, speed: number): TileSetAnimation {
+    getTileSetAnimationFrames(key: string): StaticTileSource[] {
         const row = map.get(key)
         if (!row) {
             return null
@@ -257,15 +257,21 @@ export class DungeonTilesetII {
             throw Error("invalid animation spec")
         }
     
-        const frames: [StaticTileSource, number][] = Array.from({length: +row[4]}, (value, key) => key)
+        return Array.from({length: +row[4]}, (value, key) => key)
                 .map(frameIndex => {
                     const pos = new Point(+row[0] + frameIndex * +row[2], +row[1])
                     const dim = new Point(+row[2], +row[3])
                     return new StaticTileSource(this.getFile(), pos, dim)
                 })
-                .map(tileSource => [tileSource, speed])
+    }
+
+    getTileSetAnimation(key: string, speed: number): TileSetAnimation {
+        const frames = this.getTileSetAnimationFrames(key)
+        if (!frames) {
+            return null
+        }
         
-        return new TileSetAnimation(frames)
+        return new TileSetAnimation(frames.map(tileSource => [tileSource, speed]))
     }
 
     private getFile(): HTMLImageElement {

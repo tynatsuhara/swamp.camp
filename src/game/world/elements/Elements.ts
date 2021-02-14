@@ -1,5 +1,6 @@
 import { TeleporterFactory } from "../Teleporter"
 import { CampfireFactory } from "./Campfire"
+import { ChestFactory } from "./Chest"
 import { ElementFactory } from "./ElementFactory"
 import { HouseFactory } from "./House"
 import { MushroomFactory } from "./Mushroom"
@@ -16,7 +17,8 @@ export const enum ElementType {
     CAMPFIRE,
     TELEPORTER,
     HOUSE,
-    MUSHROOM
+    MUSHROOM,
+    CHEST,
 }
 
 export class SavedElement {
@@ -48,6 +50,7 @@ export class Elements {
        [ElementType.TELEPORTER]: new TeleporterFactory(),
        [ElementType.HOUSE]: new HouseFactory(),
        [ElementType.MUSHROOM]: new MushroomFactory(),
+       [ElementType.CHEST]: new ChestFactory(),
    }
 
    getElementFactory(type: ElementType) {

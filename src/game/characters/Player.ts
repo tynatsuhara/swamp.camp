@@ -6,8 +6,11 @@ import { TileComponent } from "../../engine/tiles/TileComponent"
 import { Lists } from "../../engine/util/Lists"
 import { Controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
+import { pixelPtToTilePt } from "../graphics/Tilesets"
 import { UIStateManager } from "../ui/UIStateManager"
+import { ElementType } from "../world/elements/Elements"
 import { Interactable } from "../world/elements/Interactable"
+import { LocationManager } from "../world/LocationManager"
 import { TownStats } from "../world/TownStats"
 import { Dude } from "./Dude"
 import { DudeFactory, DudeType } from "./DudeFactory"
@@ -118,6 +121,9 @@ export class Player extends Component {
         }
         if (updateData.input.isKeyDown(InputKey.QUOTE)) {
             TownStats.instance.happiness.adjust(Math.random() * 10 - 5)
+        }
+        if (updateData.input.isKeyDown(InputKey.COMMA)) {
+            LocationManager.instance.currentLocation.addElement(ElementType.CHEST, pixelPtToTilePt(updateData.input.mousePos))
         }
         
         // update crosshair position
