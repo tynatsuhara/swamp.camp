@@ -1,4 +1,5 @@
 import { Component } from "../../engine/component"
+import { debug } from "../../engine/debug"
 import { StartData, UpdateData } from "../../engine/engine"
 import { InputKey } from "../../engine/input"
 import { Point } from "../../engine/point"
@@ -108,26 +109,27 @@ export class Player extends Component {
             possibleInteractable.interact()
         }
 
-
-        // FOR TESTING
-        const mouseTilePos = pixelPtToTilePt(updateData.input.mousePos)
-        if (updateData.input.isKeyDown(InputKey.K)) {
-            DudeFactory.instance.new(DudeType.CENTAUR, updateData.input.mousePos)
-        }
-        if (updateData.input.isKeyDown(InputKey.L)) {
-            DudeFactory.instance.new(DudeType.HORNED_DEMON, updateData.input.mousePos)
-        }
-        if (updateData.input.isKeyDown(InputKey.SEMICOLON)) {
-            DudeFactory.instance.new(DudeType.ORC_WARRIOR, updateData.input.mousePos)
-        }
-        if (updateData.input.isKeyDown(InputKey.QUOTE)) {
-            TownStats.instance.happiness.adjust(Math.random() * 10 - 5)
-        }
-        if (updateData.input.isKeyDown(InputKey.COMMA)) {
-            LocationManager.instance.currentLocation.addElement(ElementType.CHEST, mouseTilePos)
-        }
-        if (updateData.input.isKeyDown(InputKey.PERIOD)) {
-            LocationManager.instance.currentLocation.removeElementAt(mouseTilePos)
+        // Commands which are used for testing and development
+        if (debug.enableDevControls) {
+            const mouseTilePos = pixelPtToTilePt(updateData.input.mousePos)
+            if (updateData.input.isKeyDown(InputKey.K)) {
+                DudeFactory.instance.new(DudeType.CENTAUR, updateData.input.mousePos)
+            }
+            if (updateData.input.isKeyDown(InputKey.L)) {
+                DudeFactory.instance.new(DudeType.HORNED_DEMON, updateData.input.mousePos)
+            }
+            if (updateData.input.isKeyDown(InputKey.SEMICOLON)) {
+                DudeFactory.instance.new(DudeType.ORC_WARRIOR, updateData.input.mousePos)
+            }
+            if (updateData.input.isKeyDown(InputKey.QUOTE)) {
+                TownStats.instance.happiness.adjust(Math.random() * 10 - 5)
+            }
+            if (updateData.input.isKeyDown(InputKey.COMMA)) {
+                LocationManager.instance.currentLocation.addElement(ElementType.CHEST, mouseTilePos)
+            }
+            if (updateData.input.isKeyDown(InputKey.PERIOD)) {
+                LocationManager.instance.currentLocation.removeElementAt(mouseTilePos)
+            }
         }
         
         // update crosshair position

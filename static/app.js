@@ -9921,14 +9921,17 @@ System.register("game/world/TownStats", ["game/SaveManager"], function (exports_
         }
     };
 });
-System.register("game/characters/Player", ["engine/component", "engine/point", "engine/util/Lists", "game/Controls", "game/cutscenes/Camera", "game/graphics/Tilesets", "game/ui/UIStateManager", "game/world/elements/Interactable", "game/world/LocationManager", "game/world/TownStats", "game/characters/Dude", "game/characters/DudeFactory"], function (exports_112, context_112) {
+System.register("game/characters/Player", ["engine/component", "engine/debug", "engine/point", "engine/util/Lists", "game/Controls", "game/cutscenes/Camera", "game/graphics/Tilesets", "game/ui/UIStateManager", "game/world/elements/Interactable", "game/world/LocationManager", "game/world/TownStats", "game/characters/Dude", "game/characters/DudeFactory"], function (exports_112, context_112) {
     "use strict";
-    var component_30, point_64, Lists_6, Controls_7, Camera_9, Tilesets_38, UIStateManager_16, Interactable_6, LocationManager_21, TownStats_1, Dude_2, DudeFactory_4, Player;
+    var component_30, debug_3, point_64, Lists_6, Controls_7, Camera_9, Tilesets_38, UIStateManager_16, Interactable_6, LocationManager_21, TownStats_1, Dude_2, DudeFactory_4, Player;
     var __moduleName = context_112 && context_112.id;
     return {
         setters: [
             function (component_30_1) {
                 component_30 = component_30_1;
+            },
+            function (debug_3_1) {
+                debug_3 = debug_3_1;
             },
             function (point_64_1) {
                 point_64 = point_64_1;
@@ -10048,25 +10051,27 @@ System.register("game/characters/Player", ["engine/component", "engine/point", "
                     if (updateData.input.isKeyDown(Controls_7.Controls.interactButton) && !!possibleInteractable) {
                         possibleInteractable.interact();
                     }
-                    // FOR TESTING
-                    var mouseTilePos = Tilesets_38.pixelPtToTilePt(updateData.input.mousePos);
-                    if (updateData.input.isKeyDown(75 /* K */)) {
-                        DudeFactory_4.DudeFactory.instance.new(8 /* CENTAUR */, updateData.input.mousePos);
-                    }
-                    if (updateData.input.isKeyDown(76 /* L */)) {
-                        DudeFactory_4.DudeFactory.instance.new(5 /* HORNED_DEMON */, updateData.input.mousePos);
-                    }
-                    if (updateData.input.isKeyDown(186 /* SEMICOLON */)) {
-                        DudeFactory_4.DudeFactory.instance.new(3 /* ORC_WARRIOR */, updateData.input.mousePos);
-                    }
-                    if (updateData.input.isKeyDown(222 /* QUOTE */)) {
-                        TownStats_1.TownStats.instance.happiness.adjust(Math.random() * 10 - 5);
-                    }
-                    if (updateData.input.isKeyDown(188 /* COMMA */)) {
-                        LocationManager_21.LocationManager.instance.currentLocation.addElement(8 /* CHEST */, mouseTilePos);
-                    }
-                    if (updateData.input.isKeyDown(190 /* PERIOD */)) {
-                        LocationManager_21.LocationManager.instance.currentLocation.removeElementAt(mouseTilePos);
+                    // Commands which are used for testing and development
+                    if (debug_3.debug.enableDevControls) {
+                        var mouseTilePos = Tilesets_38.pixelPtToTilePt(updateData.input.mousePos);
+                        if (updateData.input.isKeyDown(75 /* K */)) {
+                            DudeFactory_4.DudeFactory.instance.new(8 /* CENTAUR */, updateData.input.mousePos);
+                        }
+                        if (updateData.input.isKeyDown(76 /* L */)) {
+                            DudeFactory_4.DudeFactory.instance.new(5 /* HORNED_DEMON */, updateData.input.mousePos);
+                        }
+                        if (updateData.input.isKeyDown(186 /* SEMICOLON */)) {
+                            DudeFactory_4.DudeFactory.instance.new(3 /* ORC_WARRIOR */, updateData.input.mousePos);
+                        }
+                        if (updateData.input.isKeyDown(222 /* QUOTE */)) {
+                            TownStats_1.TownStats.instance.happiness.adjust(Math.random() * 10 - 5);
+                        }
+                        if (updateData.input.isKeyDown(188 /* COMMA */)) {
+                            LocationManager_21.LocationManager.instance.currentLocation.addElement(8 /* CHEST */, mouseTilePos);
+                        }
+                        if (updateData.input.isKeyDown(190 /* PERIOD */)) {
+                            LocationManager_21.LocationManager.instance.currentLocation.removeElementAt(mouseTilePos);
+                        }
                     }
                     // update crosshair position
                     // const relativeLerpedPos = originalCrosshairPosRelative.lerp(0.16, this.lerpedLastMoveDir.normalized().times(TILE_SIZE))
@@ -12449,7 +12454,7 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
 });
 System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "engine/point", "game/characters/Dude", "game/characters/DudeFactory", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/graphics/Tilesets", "game/items/DroppedItem", "game/SaveManager", "game/ui/UIStateManager", "game/world/GroundRenderer", "game/world/LocationManager", "game/world/MapGenerator", "game/world/OutdoorDarknessMask", "game/world/TimeUnit", "game/world/WorldTime", "game/world/events/EventQueue", "game/world/events/QueuedEvent", "game/characters/NPC", "engine/renderer/BasicRenderComponent", "game/characters/Player", "engine/renderer/LineRender", "engine/Entity", "engine/debug"], function (exports_136, context_136) {
     "use strict";
-    var CollisionEngine_4, point_77, Dude_11, DudeFactory_6, Camera_11, CutsceneManager_3, IntroCutscene_1, Tilesets_47, DroppedItem_3, SaveManager_9, UIStateManager_18, GroundRenderer_2, LocationManager_29, MapGenerator_6, OutdoorDarknessMask_5, TimeUnit_8, WorldTime_10, EventQueue_6, QueuedEvent_4, NPC_8, BasicRenderComponent_9, Player_18, LineRender_2, Entity_29, debug_3, ZOOM, GameScene;
+    var CollisionEngine_4, point_77, Dude_11, DudeFactory_6, Camera_11, CutsceneManager_3, IntroCutscene_1, Tilesets_47, DroppedItem_3, SaveManager_9, UIStateManager_18, GroundRenderer_2, LocationManager_29, MapGenerator_6, OutdoorDarknessMask_5, TimeUnit_8, WorldTime_10, EventQueue_6, QueuedEvent_4, NPC_8, BasicRenderComponent_9, Player_18, LineRender_2, Entity_29, debug_4, ZOOM, GameScene;
     var __moduleName = context_136 && context_136.id;
     return {
         setters: [
@@ -12525,8 +12530,8 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
             function (Entity_29_1) {
                 Entity_29 = Entity_29_1;
             },
-            function (debug_3_1) {
-                debug_3 = debug_3_1;
+            function (debug_4_1) {
+                debug_4 = debug_4_1;
             }
         ],
         execute: function () {
@@ -12596,7 +12601,7 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
                 };
                 GameScene.prototype.getDebugEntity = function () {
                     var _a;
-                    if (!((_a = Player_18.Player.instance) === null || _a === void 0 ? void 0 : _a.dude) || !debug_3.debug.showGrid) {
+                    if (!((_a = Player_18.Player.instance) === null || _a === void 0 ? void 0 : _a.dude) || !debug_4.debug.showGrid) {
                         return;
                     }
                     var base = Tilesets_47.pixelPtToTilePt(Player_18.Player.instance.dude.standingPosition);
@@ -12828,12 +12833,12 @@ System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "en
 });
 System.register("game/scenes/MainMenuScene", ["engine/debug", "engine/Entity", "engine/point", "game/characters/DudeAnimationUtils", "game/SaveManager", "game/ui/MainMenuButton", "game/ui/PlumePicker"], function (exports_140, context_140) {
     "use strict";
-    var debug_4, Entity_31, point_81, DudeAnimationUtils_2, SaveManager_11, MainMenuButton_1, PlumePicker_1, ZOOM, MainMenuScene;
+    var debug_5, Entity_31, point_81, DudeAnimationUtils_2, SaveManager_11, MainMenuButton_1, PlumePicker_1, ZOOM, MainMenuScene;
     var __moduleName = context_140 && context_140.id;
     return {
         setters: [
-            function (debug_4_1) {
-                debug_4 = debug_4_1;
+            function (debug_5_1) {
+                debug_5 = debug_5_1;
             },
             function (Entity_31_1) {
                 Entity_31 = Entity_31_1;
@@ -12864,7 +12869,7 @@ System.register("game/scenes/MainMenuScene", ["engine/debug", "engine/Entity", "
                     });
                     this.continueFn = continueFn;
                     this.newGameFn = newGameFn;
-                    if (SaveManager_11.saveManager.saveFileExists() && debug_4.debug.autoPlay) {
+                    if (SaveManager_11.saveManager.saveFileExists() && debug_5.debug.autoPlay) {
                         this.continueFn();
                     }
                 }
