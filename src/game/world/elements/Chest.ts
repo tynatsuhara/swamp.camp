@@ -6,6 +6,7 @@ import { TileSetAnimation } from "../../../engine/tiles/TileSetAnimation"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
 import { Tilesets, TILE_DIMENSIONS, TILE_SIZE } from "../../graphics/Tilesets"
 import { Inventory } from "../../items/Inventory"
+import { Item } from "../../items/Items"
 import { InventoryDisplay } from "../../ui/InventoryDisplay"
 import { UIStateManager } from "../../ui/UIStateManager"
 import { WorldLocation } from "../WorldLocation"
@@ -22,7 +23,9 @@ export class ChestFactory extends ElementFactory {
     dimensions = new Point(1, 1)
 
     make(wl: WorldLocation, pos: Point, data: object): ElementComponent {
-        const inventory = Inventory.load(data[INVENTORY] || [])
+        const defaultInv = new Inventory(10)
+        defaultInv.addItem(Item.MUSHROOM)
+        const inventory = !!data[INVENTORY] ? Inventory.load(data[INVENTORY]) : defaultInv
 
         const tiles = Tilesets.instance.dungeonCharacters.getTileSetAnimationFrames("chest_empty_open_anim")
         const openSpeed = 80
@@ -45,15 +48,18 @@ export class ChestFactory extends ElementFactory {
         const interactable = new Interactable(
             pos.times(TILE_SIZE).plusX(TILE_SIZE/2).plusY(10),
             () => {
-                InventoryDisplay.instance.show(() => animator.goToAnimation(1).play())
+                InventoryDisplay.instance.show(
+                    () => animator.goToAnimation(1).play(),
+                    inventory
+                )
                 animator.goToAnimation(0).play()
             },
             new Point(0, -17)
         )
 
         const collider = new BoxCollider(
-            pos.times(TILE_SIZE).plusY(8),
-            new Point(TILE_SIZE, 5)
+            pos.times(TILE_SIZE).plusY(9),
+            new Point(TILE_SIZE, 7)
         )
 
         const e = new Entity([animator, interactable, collider])

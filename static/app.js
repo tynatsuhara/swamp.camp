@@ -5134,6 +5134,9 @@ System.register("game/world/WorldLocation", ["engine/point", "engine/util/Grid",
                 WorldLocation.prototype.isOccupied = function (pos) {
                     return !!this.occupied.get(pos);
                 };
+                WorldLocation.prototype.removeElementAt = function (pos) {
+                    this.removeElement(this.getElement(pos));
+                };
                 WorldLocation.prototype.removeElement = function (el) {
                     this.elements.removeAll(el);
                     this.occupied.removeAll(el);
@@ -7932,9 +7935,9 @@ System.register("game/ui/PlaceElementDisplay", ["engine/Entity", "engine/compone
         }
     };
 });
-System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity", "engine/point", "engine/renderer/BasicRenderComponent", "engine/renderer/TextRender", "engine/tiles/AnimatedTileComponent", "engine/tiles/NineSlice", "engine/tiles/TileTransform", "engine/util/utils", "game/characters/Player", "game/Controls", "game/cutscenes/Camera", "game/graphics/Tilesets", "game/items/Items", "game/SaveManager", "game/world/LocationManager", "game/ui/PlaceElementDisplay", "game/ui/Text", "game/ui/Tooltip", "game/ui/UIStateManager"], function (exports_90, context_90) {
+System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity", "engine/point", "engine/renderer/BasicRenderComponent", "engine/renderer/TextRender", "engine/tiles/AnimatedTileComponent", "engine/tiles/NineSlice", "engine/tiles/TileTransform", "game/characters/Player", "game/Controls", "game/cutscenes/Camera", "game/graphics/Tilesets", "game/items/Items", "game/SaveManager", "game/world/LocationManager", "game/ui/PlaceElementDisplay", "game/ui/Text", "game/ui/Tooltip", "game/ui/UIStateManager"], function (exports_90, context_90) {
     "use strict";
-    var component_22, Entity_17, point_48, BasicRenderComponent_7, TextRender_6, AnimatedTileComponent_4, NineSlice_6, TileTransform_20, utils_8, Player_9, Controls_4, Camera_8, Tilesets_24, Items_3, SaveManager_3, LocationManager_15, PlaceElementDisplay_2, Text_7, Tooltip_3, UIStateManager_11, InventoryDisplay;
+    var component_22, Entity_17, point_48, BasicRenderComponent_7, TextRender_6, AnimatedTileComponent_4, NineSlice_6, TileTransform_20, Player_9, Controls_4, Camera_8, Tilesets_24, Items_3, SaveManager_3, LocationManager_15, PlaceElementDisplay_2, Text_7, Tooltip_3, UIStateManager_11, InventoryDisplay;
     var __moduleName = context_90 && context_90.id;
     return {
         setters: [
@@ -7961,9 +7964,6 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
             },
             function (TileTransform_20_1) {
                 TileTransform_20 = TileTransform_20_1;
-            },
-            function (utils_8_1) {
-                utils_8 = utils_8_1;
             },
             function (Player_9_1) {
                 Player_9 = Player_9_1;
@@ -8005,6 +8005,7 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                 function InventoryDisplay() {
                     var _this = _super.call(this) || this;
                     _this.e = new Entity_17.Entity(); // entity for this component
+                    _this.tiles = [];
                     _this.showingInv = false;
                     _this.coinsOffset = new point_48.Point(0, -18);
                     _this.e.addComponent(_this);
@@ -8025,7 +8026,6 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                     configurable: true
                 });
                 InventoryDisplay.prototype.lateUpdate = function (updateData) {
-                    // const inv = this.inventory().inventory
                     var _this = this;
                     var pressI = updateData.input.isKeyDown(Controls_4.Controls.inventoryButton);
                     var pressEsc = updateData.input.isKeyDown(27 /* ESC */);
@@ -8038,28 +8038,29 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                     if (!this.isOpen) {
                         return;
                     }
-                    var hoverResult = this.getInventoryIndexPosition(updateData.input.mousePos);
+                    var hoverResult = this.getHoveredInventoryIndex(updateData.input.mousePos);
                     var hoverInv = hoverResult[0];
                     var hoverIndex = hoverResult[1];
                     if (!!this.trackedTile) { // dragging
                         this.tooltip.clear();
                         if (updateData.input.isMouseUp) { // drop n swap
                             if (hoverIndex !== -1) {
-                                var value = hoverInv.inventory[this.trackedTileIndex];
+                                var value = this.trackedTileInventory.inventory[this.trackedTileIndex];
                                 var currentlyOccupiedSpot = hoverInv.inventory[hoverIndex];
                                 hoverInv.inventory[hoverIndex] = value;
                                 this.trackedTileInventory.inventory[this.trackedTileIndex] = currentlyOccupiedSpot;
                             }
                             this.trackedTileInventory = null;
                             this.trackedTile = null;
+                            // TODO: When putting an equipped item into a chest, unequip it from the player
                             // refresh view
-                            this.show(this.onClose);
+                            this.show(this.onClose, this.tradingInv);
                         }
                         else { // track
                             this.trackedTile.transform.position = this.trackedTile.transform.position.plus(updateData.input.mousePos.minus(this.lastMousPos));
                         }
                     }
-                    else if (hoverIndex !== -1 && !!hoverInv.inventory[hoverIndex]) { // we're hovering over an item
+                    else if (hoverIndex > -1 && !!hoverInv.inventory[hoverIndex]) { // we're hovering over an item
                         this.tooltip.position = updateData.input.mousePos;
                         var stack_1 = hoverInv.inventory[hoverIndex];
                         var item_1 = Items_3.ITEM_METADATA_MAP[stack_1.item];
@@ -8117,41 +8118,39 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                         this.tooltip.clear();
                     }
                     this.lastMousPos = updateData.input.mousePos;
-                    if (updateData.input.isMouseDown && !!hoverInv) {
-                        hoverInv.inventory.forEach(function (stack, index) {
-                            var isClickingTile = utils_8.rectContains(_this.getPositionForInventoryIndex(index, _this.offset), Tilesets_24.TILE_DIMENSIONS, updateData.input.mousePos);
-                            if (isClickingTile) {
-                                _this.trackedTileInventory = hoverInv;
-                                _this.trackedTile = _this.tiles[index];
-                                _this.trackedTileIndex = index;
-                            }
-                        });
+                    if (updateData.input.isMouseDown) {
+                        if (!!hoverInv && !!hoverInv.inventory[hoverIndex]) {
+                            this.trackedTileInventory = hoverInv;
+                            // some stupid math to account for the fact that this.tiles contains tiles from potentially two inventories
+                            this.trackedTile = this.tiles[hoverIndex + (hoverInv === this.playerInv ? 0 : this.playerInv.inventory.length)];
+                            this.trackedTileIndex = hoverIndex;
+                        }
                     }
                 };
-                InventoryDisplay.prototype.spawnBG = function () {
+                InventoryDisplay.prototype.getOffsetForInv = function (inv) {
+                    if (inv === this.tradingInv) {
+                        return this.tradingInvOffset;
+                    }
+                    else {
+                        return this.offset;
+                    }
+                };
+                InventoryDisplay.prototype.spawnBG = function (inv) {
                     var _this = this;
-                    this.bgTiles = NineSlice_6.NineSlice.makeNineSliceComponents(Tilesets_24.Tilesets.instance.oneBit.getNineSlice("invBoxNW"), this.offset.minus(new point_48.Point(Tilesets_24.TILE_SIZE / 2, Tilesets_24.TILE_SIZE / 2)), new point_48.Point(1 + InventoryDisplay.COLUMNS, 1 + this.playerInv.inventory.length / InventoryDisplay.COLUMNS));
-                    this.bgTiles.forEach(function (tile) {
-                        _this.displayEntity.addComponent(tile);
-                    });
-                    this.bgTiles[0].transform.depth = UIStateManager_11.UIStateManager.UI_SPRITE_DEPTH;
+                    var offset = this.getOffsetForInv(inv);
+                    var bgTiles = NineSlice_6.NineSlice.makeNineSliceComponents(Tilesets_24.Tilesets.instance.oneBit.getNineSlice("invBoxNW"), offset.minus(new point_48.Point(Tilesets_24.TILE_SIZE / 2, Tilesets_24.TILE_SIZE / 2)), new point_48.Point(1 + InventoryDisplay.COLUMNS, 1 + inv.inventory.length / InventoryDisplay.COLUMNS));
+                    bgTiles.forEach(function (tile) { return _this.displayEntity.addComponent(tile); });
+                    bgTiles[0].transform.depth = UIStateManager_11.UIStateManager.UI_SPRITE_DEPTH;
                 };
                 InventoryDisplay.prototype.getEntities = function () {
                     return [this.e, this.displayEntity];
                 };
                 InventoryDisplay.prototype.close = function () {
-                    var _this = this;
                     if (!!this.trackedTile) {
                         return;
                     }
                     this.showingInv = false;
-                    this.tiles.forEach(function (c, index) {
-                        _this.tiles[index] = null;
-                    });
-                    this.bgTiles.forEach(function (c) {
-                        c.delete();
-                    });
-                    this.bgTiles = [];
+                    this.tiles = [];
                     this.tooltip.clear();
                     this.displayEntity = null;
                     this.tradingInv = null;
@@ -8167,54 +8166,67 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                     this.tradingInv = tradingInv;
                     var screenDimensions = Camera_8.Camera.instance.dimensions;
                     this.showingInv = true;
+                    this.tiles = [];
                     var displayDimensions = new point_48.Point(InventoryDisplay.COLUMNS, this.playerInv.inventory.length / InventoryDisplay.COLUMNS).times(Tilesets_24.TILE_SIZE);
                     this.offset = new point_48.Point(Math.floor(screenDimensions.x / 2 - displayDimensions.x / 2), Math.floor(screenDimensions.y / 5));
-                    this.displayEntity = new Entity_17.Entity();
-                    this.renderInv(this.playerInv, this.offset);
+                    this.tradingInvOffset = this.offset.plusY(Tilesets_24.TILE_SIZE * 4);
+                    this.displayEntity = new Entity_17.Entity([
+                        // coins
+                        new AnimatedTileComponent_4.AnimatedTileComponent([Tilesets_24.Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)], new TileTransform_20.TileTransform(this.offset.plus(this.coinsOffset))),
+                        new BasicRenderComponent_7.BasicRenderComponent(new TextRender_6.TextRender("x" + SaveManager_3.saveManager.getState().coins, new point_48.Point(9, 1).plus(this.offset).plus(this.coinsOffset), Text_7.TEXT_SIZE, Text_7.TEXT_FONT, "#facb3e" /* YELLOW */, UIStateManager_11.UIStateManager.UI_SPRITE_DEPTH))
+                    ]);
+                    this.renderInv(this.playerInv);
+                    if (!!this.tradingInv) {
+                        this.renderInv(this.tradingInv);
+                    }
                 };
-                InventoryDisplay.prototype.renderInv = function (inv, offset) {
+                InventoryDisplay.prototype.renderInv = function (inv) {
                     var _this = this;
-                    var _a;
-                    // coins
-                    this.displayEntity.addComponent(new AnimatedTileComponent_4.AnimatedTileComponent([Tilesets_24.Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)], new TileTransform_20.TileTransform(offset.plus(this.coinsOffset))));
-                    this.displayEntity.addComponent(new BasicRenderComponent_7.BasicRenderComponent(new TextRender_6.TextRender("x" + SaveManager_3.saveManager.getState().coins, new point_48.Point(9, 1).plus(offset).plus(this.coinsOffset), Text_7.TEXT_SIZE, Text_7.TEXT_FONT, "#facb3e" /* YELLOW */, UIStateManager_11.UIStateManager.UI_SPRITE_DEPTH)));
                     // background
-                    this.spawnBG();
+                    this.spawnBG(inv);
                     // icons
-                    this.tiles = inv.inventory.map(function (stack, index) {
+                    var tiles = inv.inventory.map(function (stack, index) {
                         if (!!stack) {
                             var c = Items_3.ITEM_METADATA_MAP[stack.item].inventoryIconSupplier().toComponent();
                             c.transform.depth = UIStateManager_11.UIStateManager.UI_SPRITE_DEPTH + 1;
                             return _this.displayEntity.addComponent(c);
                         }
                     });
-                    (_a = this.tiles) === null || _a === void 0 ? void 0 : _a.forEach(function (tile, index) {
+                    tiles.forEach(function (tile, index) {
                         if (!!tile) {
-                            tile.transform.position = _this.getPositionForInventoryIndex(index, offset);
+                            tile.transform.position = _this.getPositionForInventoryIndex(index, inv);
                         }
+                        _this.tiles.push(tile);
                     });
                 };
-                InventoryDisplay.prototype.getPositionForInventoryIndex = function (i, inventoryOffset) {
-                    return new point_48.Point(i % InventoryDisplay.COLUMNS, Math.floor(i / InventoryDisplay.COLUMNS)).times(Tilesets_24.TILE_SIZE).plus(inventoryOffset);
+                InventoryDisplay.prototype.getPositionForInventoryIndex = function (i, inv) {
+                    return new point_48.Point(i % InventoryDisplay.COLUMNS, Math.floor(i / InventoryDisplay.COLUMNS)).times(Tilesets_24.TILE_SIZE)
+                        .plus(this.getOffsetForInv(inv));
                 };
                 /**
                  * @return a tuple of [inventory, index of that inventory which is hovered]
                  *         the result is non-null but inventory can be null
                  */
-                InventoryDisplay.prototype.getInventoryIndexPosition = function (pos) {
+                InventoryDisplay.prototype.getHoveredInventoryIndex = function (pos) {
                     var _this = this;
-                    var getIndexForOffset = function (offset) {
-                        var p = pos.minus(offset);
+                    var getIndexForOffset = function (inv) {
+                        var p = pos.minus(_this.getOffsetForInv(inv));
                         var x = Math.floor(p.x / Tilesets_24.TILE_SIZE);
                         var y = Math.floor(p.y / Tilesets_24.TILE_SIZE);
-                        if (x < 0 || x >= InventoryDisplay.COLUMNS || y < 0 || y >= Math.floor(_this.playerInv.inventory.length / InventoryDisplay.COLUMNS)) {
+                        if (x < 0 || x >= InventoryDisplay.COLUMNS || y < 0 || y >= Math.floor(inv.inventory.length / InventoryDisplay.COLUMNS)) {
                             return -1;
                         }
                         return y * InventoryDisplay.COLUMNS + x;
                     };
-                    var index = getIndexForOffset(this.offset);
+                    var index = getIndexForOffset(this.playerInv);
                     if (index > -1) {
                         return [this.playerInv, index];
+                    }
+                    if (!!this.tradingInv) {
+                        var tradingIndex = getIndexForOffset(this.tradingInv);
+                        if (tradingIndex > -1) {
+                            return [this.tradingInv, tradingIndex];
+                        }
                     }
                     return [null, -1];
                 };
@@ -8744,7 +8756,9 @@ System.register("game/world/elements/Chest", ["engine/collision/BoxCollider", "e
                     return _this;
                 }
                 ChestFactory.prototype.make = function (wl, pos, data) {
-                    var inventory = Inventory_2.Inventory.load(data[INVENTORY] || []);
+                    var defaultInv = new Inventory_2.Inventory(10);
+                    defaultInv.addItem(9 /* MUSHROOM */);
+                    var inventory = !!data[INVENTORY] ? Inventory_2.Inventory.load(data[INVENTORY]) : defaultInv;
                     var tiles = Tilesets_29.Tilesets.instance.dungeonCharacters.getTileSetAnimationFrames("chest_empty_open_anim");
                     var openSpeed = 80;
                     var closeSpeed = 20;
@@ -8756,10 +8770,10 @@ System.register("game/world/elements/Chest", ["engine/collision/BoxCollider", "e
                     ], TileTransform_24.TileTransform.new({ position: pos.times(Tilesets_29.TILE_SIZE), depth: pos.y * Tilesets_29.TILE_SIZE + Tilesets_29.TILE_SIZE }));
                     animator.pause();
                     var interactable = new Interactable_4.Interactable(pos.times(Tilesets_29.TILE_SIZE).plusX(Tilesets_29.TILE_SIZE / 2).plusY(10), function () {
-                        InventoryDisplay_2.InventoryDisplay.instance.show(function () { return animator.goToAnimation(1).play(); });
+                        InventoryDisplay_2.InventoryDisplay.instance.show(function () { return animator.goToAnimation(1).play(); }, inventory);
                         animator.goToAnimation(0).play();
                     }, new point_54.Point(0, -17));
-                    var collider = new BoxCollider_3.BoxCollider(pos.times(Tilesets_29.TILE_SIZE).plusY(8), new point_54.Point(Tilesets_29.TILE_SIZE, 5));
+                    var collider = new BoxCollider_3.BoxCollider(pos.times(Tilesets_29.TILE_SIZE).plusY(9), new point_54.Point(Tilesets_29.TILE_SIZE, 7));
                     var e = new Entity_21.Entity([animator, interactable, collider]);
                     return e.addComponent(new ElementComponent_4.ElementComponent(this.type, pos, [pos], function () {
                         var _a;
@@ -10018,6 +10032,7 @@ System.register("game/characters/Player", ["engine/component", "engine/point", "
                         possibleInteractable.interact();
                     }
                     // FOR TESTING
+                    var mouseTilePos = Tilesets_38.pixelPtToTilePt(updateData.input.mousePos);
                     if (updateData.input.isKeyDown(75 /* K */)) {
                         DudeFactory_4.DudeFactory.instance.new(8 /* CENTAUR */, updateData.input.mousePos);
                     }
@@ -10031,7 +10046,10 @@ System.register("game/characters/Player", ["engine/component", "engine/point", "
                         TownStats_1.TownStats.instance.happiness.adjust(Math.random() * 10 - 5);
                     }
                     if (updateData.input.isKeyDown(188 /* COMMA */)) {
-                        LocationManager_21.LocationManager.instance.currentLocation.addElement(8 /* CHEST */, Tilesets_38.pixelPtToTilePt(updateData.input.mousePos));
+                        LocationManager_21.LocationManager.instance.currentLocation.addElement(8 /* CHEST */, mouseTilePos);
+                    }
+                    if (updateData.input.isKeyDown(190 /* PERIOD */)) {
+                        LocationManager_21.LocationManager.instance.currentLocation.removeElementAt(mouseTilePos);
                     }
                     // update crosshair position
                     // const relativeLerpedPos = originalCrosshairPosRelative.lerp(0.16, this.lerpedLastMoveDir.normalized().times(TILE_SIZE))
@@ -12569,7 +12587,7 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
 });
 System.register("game/ui/MainMenuButton", ["engine/component", "engine/point", "engine/renderer/TextRender", "engine/util/utils", "game/graphics/Tilesets", "game/ui/Text", "game/ui/UIStateManager"], function (exports_137, context_137) {
     "use strict";
-    var component_42, point_78, TextRender_8, utils_9, Tilesets_48, Text_10, UIStateManager_19, MainMenuButton;
+    var component_42, point_78, TextRender_8, utils_8, Tilesets_48, Text_10, UIStateManager_19, MainMenuButton;
     var __moduleName = context_137 && context_137.id;
     return {
         setters: [
@@ -12582,8 +12600,8 @@ System.register("game/ui/MainMenuButton", ["engine/component", "engine/point", "
             function (TextRender_8_1) {
                 TextRender_8 = TextRender_8_1;
             },
-            function (utils_9_1) {
-                utils_9 = utils_9_1;
+            function (utils_8_1) {
+                utils_8 = utils_8_1;
             },
             function (Tilesets_48_1) {
                 Tilesets_48 = Tilesets_48_1;
@@ -12607,7 +12625,7 @@ System.register("game/ui/MainMenuButton", ["engine/component", "engine/point", "
                     return _this;
                 }
                 MainMenuButton.prototype.update = function (updateData) {
-                    this.hovering = utils_9.rectContains(this.position.plusX(-this.width / 2).plusY(-4), new point_78.Point(this.width, Tilesets_48.TILE_SIZE), updateData.input.mousePos);
+                    this.hovering = utils_8.rectContains(this.position.plusX(-this.width / 2).plusY(-4), new point_78.Point(this.width, Tilesets_48.TILE_SIZE), updateData.input.mousePos);
                     if (this.hovering && updateData.input.isMouseDown) {
                         this.onClick();
                     }
@@ -12664,7 +12682,7 @@ System.register("engine/renderer/RectRender", ["engine/point", "engine/renderer/
 });
 System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "engine/point", "engine/renderer/RectRender", "engine/util/utils", "game/graphics/Tilesets", "game/SaveManager"], function (exports_139, context_139) {
     "use strict";
-    var component_43, Entity_30, point_80, RectRender_1, utils_10, Tilesets_49, SaveManager_10, CUSTOMIZATION_OPTIONS, PlumePicker;
+    var component_43, Entity_30, point_80, RectRender_1, utils_9, Tilesets_49, SaveManager_10, CUSTOMIZATION_OPTIONS, PlumePicker;
     var __moduleName = context_139 && context_139.id;
     return {
         setters: [
@@ -12680,8 +12698,8 @@ System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "en
             function (RectRender_1_1) {
                 RectRender_1 = RectRender_1_1;
             },
-            function (utils_10_1) {
-                utils_10 = utils_10_1;
+            function (utils_9_1) {
+                utils_9 = utils_9_1;
             },
             function (Tilesets_49_1) {
                 Tilesets_49 = Tilesets_49_1;
@@ -12750,7 +12768,7 @@ System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "en
                         var position = topLeftPos.plusX((index % rowLen) * Tilesets_49.TILE_SIZE)
                             .plusY(Math.floor(index / rowLen) * Tilesets_49.TILE_SIZE);
                         var dimensions = new point_80.Point(Tilesets_49.TILE_SIZE, Tilesets_49.TILE_SIZE);
-                        var hovered = utils_10.rectContains(position, dimensions, updateData.input.mousePos);
+                        var hovered = utils_9.rectContains(position, dimensions, updateData.input.mousePos);
                         var big = hovered || JSON.stringify(colors) == JSON.stringify(_this.selected);
                         var bigBuffer = 2;
                         if (hovered && updateData.input.isMouseDown) {
@@ -12934,15 +12952,15 @@ System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tiles
 });
 System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"], function (exports_143, context_143) {
     "use strict";
-    var component_44, utils_11, Clickable;
+    var component_44, utils_10, Clickable;
     var __moduleName = context_143 && context_143.id;
     return {
         setters: [
             function (component_44_1) {
                 component_44 = component_44_1;
             },
-            function (utils_11_1) {
-                utils_11 = utils_11_1;
+            function (utils_10_1) {
+                utils_10 = utils_10_1;
             }
         ],
         execute: function () {
@@ -12956,7 +12974,7 @@ System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"]
                     return _this;
                 }
                 Clickable.prototype.update = function (updateData) {
-                    if (updateData.input.isMouseDown && utils_11.rectContains(this.position, this.dimensions, updateData.input.mousePos)) {
+                    if (updateData.input.isMouseDown && utils_10.rectContains(this.position, this.dimensions, updateData.input.mousePos)) {
                         this.onClick();
                     }
                 };

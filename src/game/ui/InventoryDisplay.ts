@@ -9,11 +9,10 @@ import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
 import { NineSlice } from "../../engine/tiles/NineSlice"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { TileTransform } from "../../engine/tiles/TileTransform"
-import { rectContains } from "../../engine/util/utils"
 import { Player } from "../characters/Player"
 import { Controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
-import { Tilesets, TILE_DIMENSIONS, TILE_SIZE } from "../graphics/Tilesets"
+import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Inventory } from "../items/Inventory"
 import { ITEM_METADATA_MAP } from "../items/Items"
 import { saveManager } from "../SaveManager"
@@ -36,8 +35,7 @@ export class InventoryDisplay extends Component {
     private trackedTileIndex: number
     private trackedTile: TileComponent  // non-null when being dragged
     private lastMousPos: Point  
-    private tiles: TileComponent[]
-    private bgTiles: TileComponent[]
+    private tiles: TileComponent[] = []
     private showingInv = false
     get isOpen() { return this.showingInv }
     private offset: Point
@@ -45,6 +43,7 @@ export class InventoryDisplay extends Component {
     private readonly coinsOffset = new Point(0, -18)
     private onClose: () => void
     private tradingInv: Inventory
+    private tradingInvOffset: Point
 
     constructor() {
         super()
@@ -58,8 +57,6 @@ export class InventoryDisplay extends Component {
     }
 
     lateUpdate(updateData: UpdateData) {
-        // const inv = this.inventory().inventory
-
         const pressI = updateData.input.isKeyDown(Controls.inventoryButton)
         const pressEsc = updateData.input.isKeyDown(InputKey.ESC)
 
@@ -73,7 +70,7 @@ export class InventoryDisplay extends Component {
             return
         }
 
-        const hoverResult = this.getInventoryIndexPosition(updateData.input.mousePos)
+        const hoverResult = this.getHoveredInventoryIndex(updateData.input.mousePos)
         const hoverInv = hoverResult[0]
         const hoverIndex = hoverResult[1]
 
@@ -81,19 +78,22 @@ export class InventoryDisplay extends Component {
             this.tooltip.clear()
             if (updateData.input.isMouseUp) {  // drop n swap
                 if (hoverIndex !== -1) {
-                    const value = hoverInv.inventory[this.trackedTileIndex]
+                    const value = this.trackedTileInventory.inventory[this.trackedTileIndex]
                     const currentlyOccupiedSpot = hoverInv.inventory[hoverIndex]
                     hoverInv.inventory[hoverIndex] = value
                     this.trackedTileInventory.inventory[this.trackedTileIndex] = currentlyOccupiedSpot
                 }
                 this.trackedTileInventory = null
                 this.trackedTile = null
+
+                // TODO: When putting an equipped item into a chest, unequip it from the player
+
                 // refresh view
-                this.show(this.onClose)
+                this.show(this.onClose, this.tradingInv)
             } else {  // track
                 this.trackedTile.transform.position = this.trackedTile.transform.position.plus(updateData.input.mousePos.minus(this.lastMousPos))
             }
-        } else if (hoverIndex !== -1 && !!hoverInv.inventory[hoverIndex]) {  // we're hovering over an item
+        } else if (hoverIndex > -1 && !!hoverInv.inventory[hoverIndex]) {  // we're hovering over an item
             this.tooltip.position = updateData.input.mousePos
             const stack = hoverInv.inventory[hoverIndex]
             const item = ITEM_METADATA_MAP[stack.item]
@@ -162,37 +162,37 @@ export class InventoryDisplay extends Component {
 
         this.lastMousPos = updateData.input.mousePos
 
-        if (updateData.input.isMouseDown && !!hoverInv) {
-            hoverInv.inventory.forEach((stack, index) => {
-                const isClickingTile = rectContains(
-                    this.getPositionForInventoryIndex(index, this.offset), 
-                    TILE_DIMENSIONS, 
-                    updateData.input.mousePos
-                )
-                if (isClickingTile) {
-                    this.trackedTileInventory = hoverInv
-                    this.trackedTile = this.tiles[index]
-                    this.trackedTileIndex = index
-                }
-            })
+        if (updateData.input.isMouseDown) {
+            if (!!hoverInv && !!hoverInv.inventory[hoverIndex]) {
+                this.trackedTileInventory = hoverInv
+                // some stupid math to account for the fact that this.tiles contains tiles from potentially two inventories
+                this.trackedTile = this.tiles[hoverIndex + (hoverInv === this.playerInv ? 0 : this.playerInv.inventory.length)]
+                this.trackedTileIndex = hoverIndex
+            }
         }
     }
 
-    private spawnBG() {
-        this.bgTiles = NineSlice.makeNineSliceComponents(
+    private getOffsetForInv(inv: Inventory) {
+        if (inv === this.tradingInv) {
+            return this.tradingInvOffset
+        } else {
+            return this.offset
+        }
+    }
+
+    private spawnBG(inv: Inventory) {
+        const offset = this.getOffsetForInv(inv)
+        const bgTiles = NineSlice.makeNineSliceComponents(
             Tilesets.instance.oneBit.getNineSlice("invBoxNW"), 
-            this.offset.minus(new Point(TILE_SIZE/2, TILE_SIZE/2)),
+            offset.minus(new Point(TILE_SIZE/2, TILE_SIZE/2)),
             new Point(
                 1 + InventoryDisplay.COLUMNS, 
-                1 + this.playerInv.inventory.length/InventoryDisplay.COLUMNS
+                1 + inv.inventory.length/InventoryDisplay.COLUMNS
             )
         )
 
-        this.bgTiles.forEach(tile => {
-            this.displayEntity.addComponent(tile)
-        })
-
-        this.bgTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
+        bgTiles.forEach(tile => this.displayEntity.addComponent(tile))
+        bgTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
     }
 
     getEntities(): Entity[] {
@@ -204,13 +204,7 @@ export class InventoryDisplay extends Component {
             return 
         }
         this.showingInv = false
-        this.tiles.forEach((c, index) => {
-            this.tiles[index] = null
-        })
-        this.bgTiles.forEach(c => {
-            c.delete()
-        })
-        this.bgTiles = []
+        this.tiles = []
         this.tooltip.clear()
         this.displayEntity = null
         this.tradingInv = null
@@ -227,6 +221,8 @@ export class InventoryDisplay extends Component {
         const screenDimensions = Camera.instance.dimensions
         this.showingInv = true
 
+        this.tiles = []
+
         const displayDimensions = new Point(
             InventoryDisplay.COLUMNS, 
             this.playerInv.inventory.length/InventoryDisplay.COLUMNS
@@ -237,35 +233,39 @@ export class InventoryDisplay extends Component {
             Math.floor(screenDimensions.y/5)
         )
 
-        this.displayEntity = new Entity()
+        this.tradingInvOffset = this.offset.plusY(TILE_SIZE * 4)
 
-        this.renderInv(this.playerInv, this.offset)
-    }
-
-    private renderInv(inv: Inventory, offset: Point) {
-        // coins
-        this.displayEntity.addComponent(new AnimatedTileComponent(
-            [Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)],
-            new TileTransform(offset.plus(this.coinsOffset))
-        ))
-        this.displayEntity.addComponent(
+        this.displayEntity = new Entity([
+            // coins
+            new AnimatedTileComponent(
+                [Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)],
+                new TileTransform(this.offset.plus(this.coinsOffset))
+            ),
             new BasicRenderComponent(
                 new TextRender(
                     `x${saveManager.getState().coins}`, 
-                    new Point(9, 1).plus(offset).plus(this.coinsOffset), 
+                    new Point(9, 1).plus(this.offset).plus(this.coinsOffset), 
                     TEXT_SIZE, 
                     TEXT_FONT, 
                     Color.YELLOW,
                     UIStateManager.UI_SPRITE_DEPTH
                 )
             )
-        )
+        ])
 
+        this.renderInv(this.playerInv)
+
+        if (!!this.tradingInv) {
+            this.renderInv(this.tradingInv)
+        }
+    }
+
+    private renderInv(inv: Inventory) {
         // background
-        this.spawnBG()
+        this.spawnBG(inv)
 
         // icons
-        this.tiles = inv.inventory.map((stack, index) => {
+        const tiles = inv.inventory.map((stack, index) => {
             if (!!stack) {
                 const c = ITEM_METADATA_MAP[stack.item].inventoryIconSupplier().toComponent()
                 c.transform.depth = UIStateManager.UI_SPRITE_DEPTH + 1
@@ -273,35 +273,44 @@ export class InventoryDisplay extends Component {
             }
         })
 
-        this.tiles?.forEach((tile, index) => {
+        tiles.forEach((tile, index) => {
             if (!!tile) {
-                tile.transform.position = this.getPositionForInventoryIndex(index, offset)
+                tile.transform.position = this.getPositionForInventoryIndex(index, inv)
             }
+            this.tiles.push(tile)
         })
     }
 
-    private getPositionForInventoryIndex(i: number, inventoryOffset: Point) {
-        return new Point(i % InventoryDisplay.COLUMNS, Math.floor(i/InventoryDisplay.COLUMNS)).times(TILE_SIZE).plus(inventoryOffset)
+    private getPositionForInventoryIndex(i: number, inv: Inventory) {
+        return new Point(i % InventoryDisplay.COLUMNS, Math.floor(i/InventoryDisplay.COLUMNS)).times(TILE_SIZE)
+                .plus(this.getOffsetForInv(inv))
     }
 
     /**
      * @return a tuple of [inventory, index of that inventory which is hovered]
      *         the result is non-null but inventory can be null
      */
-    private getInventoryIndexPosition(pos: Point): [Inventory, number] {
-        const getIndexForOffset = (offset) => {
-            const p = pos.minus(offset)
+    private getHoveredInventoryIndex(pos: Point): [Inventory, number] {
+        const getIndexForOffset = (inv: Inventory) => {
+            const p = pos.minus(this.getOffsetForInv(inv))
             const x = Math.floor(p.x/TILE_SIZE)
             const y = Math.floor(p.y/TILE_SIZE)
-            if (x < 0 || x >= InventoryDisplay.COLUMNS || y < 0 || y >= Math.floor(this.playerInv.inventory.length/InventoryDisplay.COLUMNS)) {
+            if (x < 0 || x >= InventoryDisplay.COLUMNS || y < 0 || y >= Math.floor(inv.inventory.length/InventoryDisplay.COLUMNS)) {
                 return -1
             }
             return y * InventoryDisplay.COLUMNS + x
         }
 
-        const index = getIndexForOffset(this.offset)
+        const index = getIndexForOffset(this.playerInv)
         if (index > -1) {
             return [this.playerInv, index]
+        }
+
+        if (!!this.tradingInv) {
+            const tradingIndex = getIndexForOffset(this.tradingInv)
+            if (tradingIndex > -1) {
+                return [this.tradingInv, tradingIndex]
+            }
         }
 
         return [null, -1]
