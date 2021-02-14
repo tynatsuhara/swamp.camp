@@ -8226,7 +8226,7 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                     this.tiles = [];
                     var displayDimensions = new point_48.Point(InventoryDisplay.COLUMNS, this.playerInv.size / InventoryDisplay.COLUMNS).times(Tilesets_24.TILE_SIZE);
                     this.offset = new point_48.Point(Math.floor(screenDimensions.x / 2 - displayDimensions.x / 2), Math.floor(screenDimensions.y / 5));
-                    this.tradingInvOffset = this.offset.plusY(Tilesets_24.TILE_SIZE * 4);
+                    this.tradingInvOffset = this.offset.plusY(Tilesets_24.TILE_SIZE * 3.5);
                     this.displayEntity = new Entity_17.Entity([
                         // coins
                         new AnimatedTileComponent_4.AnimatedTileComponent([Tilesets_24.Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)], new TileTransform_20.TileTransform(this.offset.plus(this.coinsOffset))),
@@ -8810,9 +8810,7 @@ System.register("game/world/elements/Chest", ["engine/collision/BoxCollider", "e
                     return _this;
                 }
                 ChestFactory.prototype.make = function (wl, pos, data) {
-                    var defaultInv = new Inventory_2.Inventory(10);
-                    defaultInv.addItem(9 /* MUSHROOM */);
-                    var inventory = !!data[INVENTORY] ? Inventory_2.Inventory.load(data[INVENTORY]) : defaultInv;
+                    var inventory = !!data[INVENTORY] ? Inventory_2.Inventory.load(data[INVENTORY]) : new Inventory_2.Inventory(20);
                     var tiles = Tilesets_29.Tilesets.instance.dungeonCharacters.getTileSetAnimationFrames("chest_empty_open_anim");
                     var openSpeed = 80;
                     var closeSpeed = 20;

@@ -23,9 +23,7 @@ export class ChestFactory extends ElementFactory {
     dimensions = new Point(1, 1)
 
     make(wl: WorldLocation, pos: Point, data: object): ElementComponent {
-        const defaultInv = new Inventory(10)
-        defaultInv.addItem(Item.MUSHROOM)
-        const inventory = !!data[INVENTORY] ? Inventory.load(data[INVENTORY]) : defaultInv
+        const inventory = !!data[INVENTORY] ? Inventory.load(data[INVENTORY]) : new Inventory(20)
 
         const tiles = Tilesets.instance.dungeonCharacters.getTileSetAnimationFrames("chest_empty_open_anim")
         const openSpeed = 80
