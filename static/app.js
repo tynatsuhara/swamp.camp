@@ -8084,17 +8084,20 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                     if (!!this.trackedTile) { // dragging
                         this.tooltip.clear();
                         if (updateData.input.isMouseUp) { // drop n swap
+                            var canDeposit = true;
                             if (hoverIndex !== -1) {
                                 var draggedValue = this.trackedTileInventory.getStack(this.trackedTileIndex);
-                                var currentlyOccupiedSpotValue = hoverInv.getStack(hoverIndex);
-                                hoverInv.setStack(hoverIndex, draggedValue);
-                                this.trackedTileInventory.setStack(this.trackedTileIndex, currentlyOccupiedSpotValue);
-                                // TODO: When putting an equipped item into a chest, unequip it from the player
+                                // Don't let players store their currently equipped gear
                                 if (this.trackedTileInventory === this.playerInv && hoverInv === this.tradingInv) {
-                                    console.log(WeaponType_1.WeaponType[draggedValue.item]);
-                                    if (!!WeaponType_1.WeaponType[draggedValue.item] && this.playerInv.getItemCount(draggedValue.item) === 0) {
-                                        console.log("no longer has this weapon");
+                                    if (!!WeaponType_1.WeaponType[draggedValue.item] && this.playerInv.getItemCount(draggedValue.item) === draggedValue.count) {
+                                        canDeposit = false;
                                     }
+                                }
+                                // Swap the stacks
+                                if (canDeposit) {
+                                    var currentlyOccupiedSpotValue = hoverInv.getStack(hoverIndex);
+                                    hoverInv.setStack(hoverIndex, draggedValue);
+                                    this.trackedTileInventory.setStack(this.trackedTileIndex, currentlyOccupiedSpotValue);
                                 }
                             }
                             this.trackedTileInventory = null;
@@ -8154,6 +8157,7 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                             tooltipString_1 += "\n[" + Controls_4.Controls.keyString(interactButtonOrder_1[i]) + " to " + action.verb + "]";
                         });
                         this.tooltip.say(tooltipString_1);
+                        // TODO (BUG): Clicking E to interact with a chest can trigger the E function
                         actions.forEach(function (action, i) {
                             if (updateData.input.isKeyDown(interactButtonOrder_1[i])) {
                                 action.actionFn();

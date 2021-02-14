@@ -78,20 +78,25 @@ export class InventoryDisplay extends Component {
         if (!!this.trackedTile) {  // dragging
             this.tooltip.clear()
             if (updateData.input.isMouseUp) {  // drop n swap
+                let canDeposit = true
                 if (hoverIndex !== -1) {
                     const draggedValue = this.trackedTileInventory.getStack(this.trackedTileIndex)
-                    const currentlyOccupiedSpotValue = hoverInv.getStack(hoverIndex)
-                    hoverInv.setStack(hoverIndex, draggedValue)
-                    this.trackedTileInventory.setStack(this.trackedTileIndex, currentlyOccupiedSpotValue)
 
-                    // TODO: When putting an equipped item into a chest, unequip it from the player
+                    // Don't let players store their currently equipped gear
                     if (this.trackedTileInventory === this.playerInv && hoverInv === this.tradingInv) {
-                        console.log(WeaponType[draggedValue.item])
-                        if (!!WeaponType[draggedValue.item] && this.playerInv.getItemCount(draggedValue.item) === 0) {
-                            console.log("no longer has this weapon")
+                        if (!!WeaponType[draggedValue.item] && this.playerInv.getItemCount(draggedValue.item) === draggedValue.count) {
+                            canDeposit = false
                         }
                     }
+
+                    // Swap the stacks
+                    if (canDeposit) {
+                        const currentlyOccupiedSpotValue = hoverInv.getStack(hoverIndex)
+                        hoverInv.setStack(hoverIndex, draggedValue)
+                        this.trackedTileInventory.setStack(this.trackedTileIndex, currentlyOccupiedSpotValue)
+                    }
                 }
+                
                 this.trackedTileInventory = null
                 this.trackedTile = null
 
@@ -158,6 +163,7 @@ export class InventoryDisplay extends Component {
 
             this.tooltip.say(tooltipString)
 
+            // TODO (BUG): Clicking E to interact with a chest can trigger the E function
             actions.forEach((action, i) => {
                 if (updateData.input.isKeyDown(interactButtonOrder[i])) {
                     action.actionFn()
