@@ -1,4 +1,4 @@
-import { ItemMetadata, Item, ITEM_METADATA_MAP } from "./Items"
+import { Item, ITEM_METADATA_MAP } from "./Items"
 
 export class ItemStack {
     readonly item: Item
@@ -15,7 +15,7 @@ export class ItemStack {
 
 // TODO flesh this out more when we have more items
 export class Inventory {
-    private _inventory: ItemStack[] = Array.from({ length: 20 })
+    private _inventory: ItemStack[] = Array.from({ length: 20 })  // TODO make length configurable
     get inventory() { return this._inventory }
     private countMap = new Map<Item, number>()
 
