@@ -1425,6 +1425,12 @@ System.register("engine/tiles/TileTransform", ["engine/point"], function (export
                     this._mirrorY = mirrorY;
                     this._depth = depth;
                 }
+                TileTransform.new = function (_a) {
+                    var _b = _a.position, position = _b === void 0 ? new point_9.Point(0, 0) : _b, _c = _a.dimensions, dimensions = _c === void 0 ? null : _c, // if null, match the dimensions of the source image
+                    _d = _a.rotation, // if null, match the dimensions of the source image
+                    rotation = _d === void 0 ? 0 : _d, _e = _a.mirrorX, mirrorX = _e === void 0 ? false : _e, _f = _a.mirrorY, mirrorY = _f === void 0 ? false : _f, _g = _a.depth, depth = _g === void 0 ? 0 : _g;
+                    return new TileTransform(position, dimensions, rotation, mirrorX, mirrorY, depth);
+                };
                 Object.defineProperty(TileTransform.prototype, "position", {
                     get: function () {
                         if (!this.parentTransform)
@@ -8694,7 +8700,7 @@ System.register("game/world/elements/Chest", ["engine/Entity", "engine/point", "
                         new TileSetAnimation_5.TileSetAnimation([[tiles[0], openSpeed], [tiles[1], openSpeed], [tiles[2], openSpeed]], function () { return animations.pause(); }),
                         // closing
                         new TileSetAnimation_5.TileSetAnimation([[tiles[2], closeSpeed], [tiles[1], closeSpeed], [tiles[0], closeSpeed]], function () { return animations.pause(); }),
-                    ], new TileTransform_24.TileTransform(pos.times(Tilesets_29.TILE_SIZE), Tilesets_29.TILE_DIMENSIONS, 0, false, false, pos.y * Tilesets_29.TILE_SIZE + Tilesets_29.TILE_SIZE));
+                    ], TileTransform_24.TileTransform.new({ position: pos.times(Tilesets_29.TILE_SIZE), depth: pos.y * Tilesets_29.TILE_SIZE + Tilesets_29.TILE_SIZE }));
                     animations.pause();
                     var interactable = new Interactable_4.Interactable(pos.times(Tilesets_29.TILE_SIZE).plusX(Tilesets_29.TILE_SIZE / 2).plusY(Tilesets_29.TILE_SIZE / 2), function () {
                         console.log("open chest!");

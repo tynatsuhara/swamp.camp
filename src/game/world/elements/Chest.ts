@@ -35,7 +35,7 @@ export class ChestFactory extends ElementFactory {
                 [[tiles[2], closeSpeed], [tiles[1], closeSpeed], [tiles[0], closeSpeed]], 
                 () => animations.pause()
             ),
-        ], new TileTransform(pos.times(TILE_SIZE), TILE_DIMENSIONS, 0, false, false, pos.y * TILE_SIZE + TILE_SIZE))
+        ], TileTransform.new({ position: pos.times(TILE_SIZE), depth: pos.y * TILE_SIZE + TILE_SIZE }))
 
         animations.pause()
         
