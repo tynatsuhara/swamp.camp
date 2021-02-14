@@ -91,6 +91,7 @@ export abstract class Collider extends Component {
                     resultDist = dist
                 }
             }
+            lastPt = pt
         }
 
         return result

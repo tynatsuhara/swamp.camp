@@ -598,6 +598,7 @@ System.register("engine/collision/Collider", ["engine/component", "engine/debug"
                                 resultDist = dist;
                             }
                         }
+                        lastPt = pt;
                     }
                     return result;
                 };
@@ -637,9 +638,9 @@ System.register("engine/collision/Collider", ["engine/component", "engine/debug"
         }
     };
 });
-System.register("engine/collision/CollisionEngine", ["engine/point", "engine/util/utils"], function (exports_11, context_11) {
+System.register("engine/collision/BoxCollider", ["engine/point", "engine/util/utils", "engine/collision/Collider", "engine/collision/CollisionEngine"], function (exports_11, context_11) {
     "use strict";
-    var point_4, utils_1, CollisionEngine, collisionEngine;
+    var point_4, utils_1, Collider_1, CollisionEngine_2, BoxCollider;
     var __moduleName = context_11 && context_11.id;
     return {
         setters: [
@@ -648,6 +649,52 @@ System.register("engine/collision/CollisionEngine", ["engine/point", "engine/uti
             },
             function (utils_1_1) {
                 utils_1 = utils_1_1;
+            },
+            function (Collider_1_1) {
+                Collider_1 = Collider_1_1;
+            },
+            function (CollisionEngine_2_1) {
+                CollisionEngine_2 = CollisionEngine_2_1;
+            }
+        ],
+        execute: function () {
+            BoxCollider = /** @class */ (function (_super) {
+                __extends(BoxCollider, _super);
+                function BoxCollider(position, dimensions, layer, ignoredColliders) {
+                    if (layer === void 0) { layer = CollisionEngine_2.CollisionEngine.DEFAULT_LAYER; }
+                    if (ignoredColliders === void 0) { ignoredColliders = []; }
+                    var _this = _super.call(this, position, layer, ignoredColliders) || this;
+                    _this.dimensions = dimensions;
+                    return _this;
+                }
+                BoxCollider.prototype.getPoints = function () {
+                    return [
+                        new point_4.Point(this.position.x, this.position.y),
+                        new point_4.Point(this.position.x + this.dimensions.x, this.position.y),
+                        new point_4.Point(this.position.x + this.dimensions.x, this.position.y + this.dimensions.y),
+                        new point_4.Point(this.position.x, this.position.y + this.dimensions.y)
+                    ];
+                };
+                BoxCollider.prototype.isWithinBounds = function (pt) {
+                    return utils_1.rectContains(this.position, this.dimensions, pt);
+                };
+                return BoxCollider;
+            }(Collider_1.Collider));
+            exports_11("BoxCollider", BoxCollider);
+        }
+    };
+});
+System.register("engine/collision/CollisionEngine", ["engine/point", "engine/util/utils"], function (exports_12, context_12) {
+    "use strict";
+    var point_5, utils_2, CollisionEngine, collisionEngine;
+    var __moduleName = context_12 && context_12.id;
+    return {
+        setters: [
+            function (point_5_1) {
+                point_5 = point_5_1;
+            },
+            function (utils_2_1) {
+                utils_2 = utils_2_1;
             }
         ],
         execute: function () {
@@ -699,7 +746,7 @@ System.register("engine/collision/CollisionEngine", ["engine/point", "engine/uti
                     var yMin = Math.min.apply(Math, pts.map(function (pt) { return pt.y + Math.min(translation.y, 0); }));
                     var yMax = Math.max.apply(Math, pts.map(function (pt) { return pt.y + Math.max(translation.y, 0); }));
                     var potentialCollisions = this.colliders.filter(function (other) { return other !== collider && other.getPoints().some(function (pt) {
-                        return utils_1.rectContains(new point_4.Point(xMax, yMin), new point_4.Point(xMax - xMin, yMax - yMin), pt);
+                        return utils_2.rectContains(new point_5.Point(xMax, yMin), new point_5.Point(xMax - xMin, yMax - yMin), pt);
                     }); });
                     // for all pts and all those colliders, find the closest intersection
                     var collisions = pts.flatMap(function (pt) { return potentialCollisions
@@ -723,15 +770,23 @@ System.register("engine/collision/CollisionEngine", ["engine/point", "engine/uti
                         return true;
                     }
                     this.removeDanglingColliders();
-                    var translatedPoints = collider.getPoints().map(function (pt) { return pt.plus(translation); });
+                    // const translatedPoints = collider.getPoints().map(pt => pt.plus(translation))
+                    var bc = collider;
+                    var newTranslatedPos = bc.position.plus(translation);
                     return !this.colliders
                         .filter(function (other) {
                         return other !== collider && other.enabled && collidingLayers.has(other.layer)
                             && collider.ignoredColliders.indexOf(other) === -1 && other.ignoredColliders.indexOf(collider) === -1;
                     }) // potential collisions
                         .some(function (other) {
-                        return translatedPoints.some(function (pt) { return other.isWithinBounds(pt); }) // TODO 
-                            || collider.checkWithinBoundsAfterTranslation(translation, other);
+                        // TODO: Support nob-box-colliders
+                        var obc = other;
+                        return !(newTranslatedPos.x > obc.position.x + obc.dimensions.x ||
+                            newTranslatedPos.y > obc.position.y + obc.dimensions.y ||
+                            newTranslatedPos.x + bc.dimensions.x < obc.position.x ||
+                            newTranslatedPos.y + bc.dimensions.y < obc.position.y);
+                        // return translatedPoints.some(pt => other.isWithinBounds(pt))  // TODO 
+                        //         || collider.checkWithinBoundsAfterTranslation(translation, other)
                     });
                 };
                 // unregisters any colliders without an entity
@@ -745,15 +800,15 @@ System.register("engine/collision/CollisionEngine", ["engine/point", "engine/uti
                 CollisionEngine.DEFAULT_LAYER = "default";
                 return CollisionEngine;
             }());
-            exports_11("CollisionEngine", CollisionEngine);
-            exports_11("collisionEngine", collisionEngine = new CollisionEngine());
+            exports_12("CollisionEngine", CollisionEngine);
+            exports_12("collisionEngine", collisionEngine = new CollisionEngine());
         }
     };
 });
-System.register("engine/game", [], function (exports_12, context_12) {
+System.register("engine/game", [], function (exports_13, context_13) {
     "use strict";
     var Game;
-    var __moduleName = context_12 && context_12.id;
+    var __moduleName = context_13 && context_13.id;
     return {
         setters: [],
         execute: function () {
@@ -763,18 +818,18 @@ System.register("engine/game", [], function (exports_12, context_12) {
                 Game.prototype.initialize = function () { };
                 return Game;
             }());
-            exports_12("Game", Game);
+            exports_13("Game", Game);
         }
     };
 });
-System.register("engine/input", ["engine/point"], function (exports_13, context_13) {
+System.register("engine/input", ["engine/point"], function (exports_14, context_14) {
     "use strict";
-    var point_5, Input, CapturedInput;
-    var __moduleName = context_13 && context_13.id;
+    var point_6, Input, CapturedInput;
+    var __moduleName = context_14 && context_14.id;
     return {
         setters: [
-            function (point_5_1) {
-                point_5 = point_5_1;
+            function (point_6_1) {
+                point_6 = point_6_1;
             }
         ],
         execute: function () {
@@ -783,7 +838,7 @@ System.register("engine/input", ["engine/point"], function (exports_13, context_
                     var _this = this;
                     this.keys = new Set();
                     this.lastCapture = new CapturedInput();
-                    this.mousePos = new point_5.Point(0, 0);
+                    this.mousePos = new point_6.Point(0, 0);
                     this.isMouseDown = false;
                     this.isMouseHeld = false;
                     this.isMouseUp = false;
@@ -816,7 +871,7 @@ System.register("engine/input", ["engine/point"], function (exports_13, context_
                             _this.isRightMouseUp = true;
                         }
                     };
-                    canvas.onmousemove = function (e) { return _this.mousePos = new point_5.Point(e.x - canvas.offsetLeft, e.y - canvas.offsetTop); };
+                    canvas.onmousemove = function (e) { return _this.mousePos = new point_6.Point(e.x - canvas.offsetLeft, e.y - canvas.offsetTop); };
                     canvas.onwheel = function (e) { return _this.mouseWheelDeltaY = e.deltaY; };
                     window.onkeydown = function (e) { return _this.keys.add(e.keyCode); };
                     window.onkeyup = function (e) { return _this.keys.delete(e.keyCode); };
@@ -836,13 +891,13 @@ System.register("engine/input", ["engine/point"], function (exports_13, context_
                 };
                 return Input;
             }());
-            exports_13("Input", Input);
+            exports_14("Input", Input);
             CapturedInput = /** @class */ (function () {
                 function CapturedInput(keysDown, keysHeld, keysUp, mousePos, isMouseDown, isMouseHeld, isMouseUp, isRightMouseDown, isRightMouseHeld, isRightMouseUp, mouseWheelDeltaY) {
                     if (keysDown === void 0) { keysDown = new Set(); }
                     if (keysHeld === void 0) { keysHeld = new Set(); }
                     if (keysUp === void 0) { keysUp = new Set(); }
-                    if (mousePos === void 0) { mousePos = new point_5.Point(0, 0); }
+                    if (mousePos === void 0) { mousePos = new point_6.Point(0, 0); }
                     if (isMouseDown === void 0) { isMouseDown = false; }
                     if (isMouseHeld === void 0) { isMouseHeld = false; }
                     if (isMouseUp === void 0) { isMouseUp = false; }
@@ -850,7 +905,7 @@ System.register("engine/input", ["engine/point"], function (exports_13, context_
                     if (isRightMouseHeld === void 0) { isRightMouseHeld = false; }
                     if (isRightMouseUp === void 0) { isRightMouseUp = false; }
                     if (mouseWheelDeltaY === void 0) { mouseWheelDeltaY = 0; }
-                    this.mousePos = new point_5.Point(0, 0);
+                    this.mousePos = new point_6.Point(0, 0);
                     this.keysDown = keysDown;
                     this.keysHeld = keysHeld;
                     this.keysUp = keysUp;
@@ -880,14 +935,14 @@ System.register("engine/input", ["engine/point"], function (exports_13, context_
                 };
                 return CapturedInput;
             }());
-            exports_13("CapturedInput", CapturedInput);
+            exports_14("CapturedInput", CapturedInput);
         }
     };
 });
-System.register("engine/renderer/TextRender", ["engine/renderer/RenderMethod"], function (exports_14, context_14) {
+System.register("engine/renderer/TextRender", ["engine/renderer/RenderMethod"], function (exports_15, context_15) {
     "use strict";
     var RenderMethod_2, TextRender;
-    var __moduleName = context_14 && context_14.id;
+    var __moduleName = context_15 && context_15.id;
     return {
         setters: [
             function (RenderMethod_2_1) {
@@ -915,14 +970,14 @@ System.register("engine/renderer/TextRender", ["engine/renderer/RenderMethod"], 
                 };
                 return TextRender;
             }(RenderMethod_2.RenderMethod));
-            exports_14("TextRender", TextRender);
+            exports_15("TextRender", TextRender);
         }
     };
 });
-System.register("engine/renderer/BasicRenderComponent", ["engine/component"], function (exports_15, context_15) {
+System.register("engine/renderer/BasicRenderComponent", ["engine/component"], function (exports_16, context_16) {
     "use strict";
     var component_2, BasicRenderComponent;
-    var __moduleName = context_15 && context_15.id;
+    var __moduleName = context_16 && context_16.id;
     return {
         setters: [
             function (component_2_1) {
@@ -946,14 +1001,14 @@ System.register("engine/renderer/BasicRenderComponent", ["engine/component"], fu
                 };
                 return BasicRenderComponent;
             }(component_2.Component));
-            exports_15("BasicRenderComponent", BasicRenderComponent);
+            exports_16("BasicRenderComponent", BasicRenderComponent);
         }
     };
 });
-System.register("engine/profiler", ["engine/View", "engine/Entity", "engine/point", "engine/renderer/TextRender", "engine/renderer/BasicRenderComponent"], function (exports_16, context_16) {
+System.register("engine/profiler", ["engine/View", "engine/Entity", "engine/point", "engine/renderer/TextRender", "engine/renderer/BasicRenderComponent"], function (exports_17, context_17) {
     "use strict";
-    var View_1, Entity_1, point_6, TextRender_1, BasicRenderComponent_1, Profiler, round, MovingAverage, profiler;
-    var __moduleName = context_16 && context_16.id;
+    var View_1, Entity_1, point_7, TextRender_1, BasicRenderComponent_1, Profiler, round, MovingAverage, profiler;
+    var __moduleName = context_17 && context_17.id;
     /**
      * Executes the given function and returns the duration it took to execute as well as the result
      */
@@ -962,7 +1017,7 @@ System.register("engine/profiler", ["engine/View", "engine/Entity", "engine/poin
         var result = fn();
         return [new Date().getTime() - start, result];
     }
-    exports_16("measure", measure);
+    exports_17("measure", measure);
     return {
         setters: [
             function (View_1_1) {
@@ -971,8 +1026,8 @@ System.register("engine/profiler", ["engine/View", "engine/Entity", "engine/poin
             function (Entity_1_1) {
                 Entity_1 = Entity_1_1;
             },
-            function (point_6_1) {
-                point_6 = point_6_1;
+            function (point_7_1) {
+                point_7 = point_7_1;
             },
             function (TextRender_1_1) {
                 TextRender_1 = TextRender_1_1;
@@ -1014,7 +1069,7 @@ System.register("engine/profiler", ["engine/View", "engine/Entity", "engine/poin
                         "components updated: " + this.componentsUpdated
                     ], Array.from(this.tracked.values()).map((function (v) { return v[1](v[0].get()); })));
                     return new View_1.View([
-                        new Entity_1.Entity(s.map(function (str, i) { return new BasicRenderComponent_1.BasicRenderComponent(new TextRender_1.TextRender(str, new point_6.Point(60, 70 + 25 * i))); }))
+                        new Entity_1.Entity(s.map(function (str, i) { return new BasicRenderComponent_1.BasicRenderComponent(new TextRender_1.TextRender(str, new point_7.Point(60, 70 + 25 * i))); }))
                     ]);
                 };
                 return Profiler;
@@ -1045,18 +1100,18 @@ System.register("engine/profiler", ["engine/View", "engine/Entity", "engine/poin
                 };
                 return MovingAverage;
             }());
-            exports_16("profiler", profiler = new Profiler());
+            exports_17("profiler", profiler = new Profiler());
         }
     };
 });
-System.register("engine/renderer/Renderer", ["engine/point", "engine/renderer/RenderContext"], function (exports_17, context_17) {
+System.register("engine/renderer/Renderer", ["engine/point", "engine/renderer/RenderContext"], function (exports_18, context_18) {
     "use strict";
-    var point_7, RenderContext_1, Renderer;
-    var __moduleName = context_17 && context_17.id;
+    var point_8, RenderContext_1, Renderer;
+    var __moduleName = context_18 && context_18.id;
     return {
         setters: [
-            function (point_7_1) {
-                point_7 = point_7_1;
+            function (point_8_1) {
+                point_8 = point_8_1;
             },
             function (RenderContext_1_1) {
                 RenderContext_1 = RenderContext_1_1;
@@ -1084,7 +1139,7 @@ System.register("engine/renderer/Renderer", ["engine/point", "engine/renderer/Re
                     views.forEach(function (v) { return _this.renderView(v); });
                 };
                 Renderer.prototype.getDimensions = function () {
-                    return new point_7.Point(this.canvas.width, this.canvas.height);
+                    return new point_8.Point(this.canvas.width, this.canvas.height);
                 };
                 Renderer.prototype.renderView = function (view) {
                     var viewRenderContext = new RenderContext_1.RenderContext(this.canvas, this.context, view);
@@ -1098,18 +1153,18 @@ System.register("engine/renderer/Renderer", ["engine/point", "engine/renderer/Re
                 };
                 return Renderer;
             }());
-            exports_17("Renderer", Renderer);
+            exports_18("Renderer", Renderer);
         }
     };
 });
-System.register("engine/engine", ["engine/collision/CollisionEngine", "engine/component", "engine/debug", "engine/input", "engine/profiler", "engine/renderer/Renderer"], function (exports_18, context_18) {
+System.register("engine/engine", ["engine/collision/CollisionEngine", "engine/component", "engine/debug", "engine/input", "engine/profiler", "engine/renderer/Renderer"], function (exports_19, context_19) {
     "use strict";
-    var CollisionEngine_2, component_3, debug_2, input_1, profiler_1, Renderer_1, UpdateViewsContext, AwakeData, StartData, UpdateData, Engine;
-    var __moduleName = context_18 && context_18.id;
+    var CollisionEngine_3, component_3, debug_2, input_1, profiler_1, Renderer_1, UpdateViewsContext, AwakeData, StartData, UpdateData, Engine;
+    var __moduleName = context_19 && context_19.id;
     return {
         setters: [
-            function (CollisionEngine_2_1) {
-                CollisionEngine_2 = CollisionEngine_2_1;
+            function (CollisionEngine_3_1) {
+                CollisionEngine_3 = CollisionEngine_3_1;
             },
             function (component_3_1) {
                 component_3 = component_3_1;
@@ -1133,25 +1188,25 @@ System.register("engine/engine", ["engine/collision/CollisionEngine", "engine/co
                 }
                 return UpdateViewsContext;
             }());
-            exports_18("UpdateViewsContext", UpdateViewsContext);
+            exports_19("UpdateViewsContext", UpdateViewsContext);
             AwakeData = /** @class */ (function () {
                 function AwakeData() {
                 }
                 return AwakeData;
             }());
-            exports_18("AwakeData", AwakeData);
+            exports_19("AwakeData", AwakeData);
             StartData = /** @class */ (function () {
                 function StartData() {
                 }
                 return StartData;
             }());
-            exports_18("StartData", StartData);
+            exports_19("StartData", StartData);
             UpdateData = /** @class */ (function () {
                 function UpdateData() {
                 }
                 return UpdateData;
             }());
-            exports_18("UpdateData", UpdateData);
+            exports_19("UpdateData", UpdateData);
             Engine = /** @class */ (function () {
                 function Engine(game, canvas) {
                     var _this = this;
@@ -1169,7 +1224,7 @@ System.register("engine/engine", ["engine/collision/CollisionEngine", "engine/co
                     if (elapsed == 0) {
                         return;
                     }
-                    CollisionEngine_2.collisionEngine.nextUpdate();
+                    CollisionEngine_3.collisionEngine.nextUpdate();
                     var updateViewsContext = {
                         elapsedTimeMillis: elapsed,
                         input: this.input.captureInput(),
@@ -1230,53 +1285,7 @@ System.register("engine/engine", ["engine/collision/CollisionEngine", "engine/co
                 };
                 return Engine;
             }());
-            exports_18("Engine", Engine);
-        }
-    };
-});
-System.register("engine/collision/BoxCollider", ["engine/point", "engine/util/utils", "engine/collision/Collider", "engine/collision/CollisionEngine"], function (exports_19, context_19) {
-    "use strict";
-    var point_8, utils_2, Collider_1, CollisionEngine_3, BoxCollider;
-    var __moduleName = context_19 && context_19.id;
-    return {
-        setters: [
-            function (point_8_1) {
-                point_8 = point_8_1;
-            },
-            function (utils_2_1) {
-                utils_2 = utils_2_1;
-            },
-            function (Collider_1_1) {
-                Collider_1 = Collider_1_1;
-            },
-            function (CollisionEngine_3_1) {
-                CollisionEngine_3 = CollisionEngine_3_1;
-            }
-        ],
-        execute: function () {
-            BoxCollider = /** @class */ (function (_super) {
-                __extends(BoxCollider, _super);
-                function BoxCollider(position, dimensions, layer, ignoredColliders) {
-                    if (layer === void 0) { layer = CollisionEngine_3.CollisionEngine.DEFAULT_LAYER; }
-                    if (ignoredColliders === void 0) { ignoredColliders = []; }
-                    var _this = _super.call(this, position, layer, ignoredColliders) || this;
-                    _this.dimensions = dimensions;
-                    return _this;
-                }
-                BoxCollider.prototype.getPoints = function () {
-                    return [
-                        new point_8.Point(this.position.x, this.position.y),
-                        new point_8.Point(this.position.x + this.dimensions.x, this.position.y),
-                        new point_8.Point(this.position.x + this.dimensions.x, this.position.y + this.dimensions.y),
-                        new point_8.Point(this.position.x, this.position.y + this.dimensions.y)
-                    ];
-                };
-                BoxCollider.prototype.isWithinBounds = function (pt) {
-                    return utils_2.rectContains(this.position, this.dimensions, pt);
-                };
-                return BoxCollider;
-            }(Collider_1.Collider));
-            exports_19("BoxCollider", BoxCollider);
+            exports_19("Engine", Engine);
         }
     };
 });

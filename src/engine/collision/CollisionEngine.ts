@@ -1,5 +1,6 @@
 import { Point } from "../point"
 import { rectContains } from "../util/utils"
+import { BoxCollider } from "./BoxCollider"
 import { Collider } from "./Collider"
 
 // TODO: This probably all breaks if there are colliders on multiple views
@@ -92,14 +93,24 @@ export class CollisionEngine {
             return true
         }
         this.removeDanglingColliders()
-        const translatedPoints = collider.getPoints().map(pt => pt.plus(translation))
+        // const translatedPoints = collider.getPoints().map(pt => pt.plus(translation))
+        const bc = collider as BoxCollider
+        const newTranslatedPos = bc.position.plus(translation)
         return !this.colliders
                 .filter(other => 
                     other !== collider && other.enabled && collidingLayers.has(other.layer) 
                             && collider.ignoredColliders.indexOf(other) === -1 && other.ignoredColliders.indexOf(collider) === -1)  // potential collisions
                 .some(other => {
-                    return translatedPoints.some(pt => other.isWithinBounds(pt))  // TODO 
-                            || collider.checkWithinBoundsAfterTranslation(translation, other)
+                    // TODO: Support nob-box-colliders
+                    const obc = other as BoxCollider
+                    return !(
+                        newTranslatedPos.x > obc.position.x + obc.dimensions.x ||
+                        newTranslatedPos.y > obc.position.y + obc.dimensions.y ||
+                        newTranslatedPos.x + bc.dimensions.x < obc.position.x ||
+                        newTranslatedPos.y + bc.dimensions.y < obc.position.y
+                    )
+                    // return translatedPoints.some(pt => other.isWithinBounds(pt))  // TODO 
+                    //         || collider.checkWithinBoundsAfterTranslation(translation, other)
                 }) 
     }
 
