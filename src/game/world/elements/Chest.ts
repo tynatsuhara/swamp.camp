@@ -1,3 +1,4 @@
+import { BoxCollider } from "../../../engine/collision/BoxCollider"
 import { Entity } from "../../../engine/Entity"
 import { Point } from "../../../engine/point"
 import { AnimatedTileComponent } from "../../../engine/tiles/AnimatedTileComponent"
@@ -50,7 +51,12 @@ export class ChestFactory extends ElementFactory {
             new Point(0, -17)
         )
 
-        const e = new Entity([animator, interactable])
+        const collider = new BoxCollider(
+            pos.times(TILE_SIZE).plusY(8),
+            new Point(TILE_SIZE, 5)
+        )
+
+        const e = new Entity([animator, interactable, collider])
         
         return e.addComponent(new ElementComponent(
             this.type,

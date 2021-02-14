@@ -44,6 +44,7 @@ export class InventoryDisplay extends Component {
     private tooltip: Tooltip
     private readonly coinsOffset = new Point(0, -18)
     private onClose: () => void
+    private tradingInv: Inventory
 
     constructor() {
         super()
@@ -52,7 +53,7 @@ export class InventoryDisplay extends Component {
         InventoryDisplay.instance = this
     }
 
-    inventory() {
+    get playerInv() {
         return Player.instance.dude.inventory
     }
 
@@ -183,7 +184,7 @@ export class InventoryDisplay extends Component {
             this.offset.minus(new Point(TILE_SIZE/2, TILE_SIZE/2)),
             new Point(
                 1 + InventoryDisplay.COLUMNS, 
-                1 + this.inventory().inventory.length/InventoryDisplay.COLUMNS
+                1 + this.playerInv.inventory.length/InventoryDisplay.COLUMNS
             )
         )
 
@@ -212,6 +213,7 @@ export class InventoryDisplay extends Component {
         this.bgTiles = []
         this.tooltip.clear()
         this.displayEntity = null
+        this.tradingInv = null
 
         if (this.onClose) {
             this.onClose()
@@ -219,14 +221,15 @@ export class InventoryDisplay extends Component {
         }
     }
 
-    show(onClose: () => void = null) {
+    show(onClose: () => void = null, tradingInv: Inventory = null) {
         this.onClose = onClose
+        this.tradingInv = tradingInv
         const screenDimensions = Camera.instance.dimensions
         this.showingInv = true
 
         const displayDimensions = new Point(
             InventoryDisplay.COLUMNS, 
-            this.inventory().inventory.length/InventoryDisplay.COLUMNS
+            this.playerInv.inventory.length/InventoryDisplay.COLUMNS
         ).times(TILE_SIZE)
 
         this.offset = new Point(
@@ -236,16 +239,20 @@ export class InventoryDisplay extends Component {
 
         this.displayEntity = new Entity()
 
+        this.renderInv(this.playerInv, this.offset)
+    }
+
+    private renderInv(inv: Inventory, offset: Point) {
         // coins
         this.displayEntity.addComponent(new AnimatedTileComponent(
             [Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)],
-            new TileTransform(this.offset.plus(this.coinsOffset))
+            new TileTransform(offset.plus(this.coinsOffset))
         ))
         this.displayEntity.addComponent(
             new BasicRenderComponent(
                 new TextRender(
                     `x${saveManager.getState().coins}`, 
-                    new Point(9, 1).plus(this.offset).plus(this.coinsOffset), 
+                    new Point(9, 1).plus(offset).plus(this.coinsOffset), 
                     TEXT_SIZE, 
                     TEXT_FONT, 
                     Color.YELLOW,
@@ -258,7 +265,7 @@ export class InventoryDisplay extends Component {
         this.spawnBG()
 
         // icons
-        this.tiles = this.inventory().inventory.map((stack, index) => {
+        this.tiles = inv.inventory.map((stack, index) => {
             if (!!stack) {
                 const c = ITEM_METADATA_MAP[stack.item].inventoryIconSupplier().toComponent()
                 c.transform.depth = UIStateManager.UI_SPRITE_DEPTH + 1
@@ -268,7 +275,7 @@ export class InventoryDisplay extends Component {
 
         this.tiles?.forEach((tile, index) => {
             if (!!tile) {
-                tile.transform.position = this.getPositionForInventoryIndex(index, this.offset)
+                tile.transform.position = this.getPositionForInventoryIndex(index, offset)
             }
         })
     }
@@ -277,12 +284,16 @@ export class InventoryDisplay extends Component {
         return new Point(i % InventoryDisplay.COLUMNS, Math.floor(i/InventoryDisplay.COLUMNS)).times(TILE_SIZE).plus(inventoryOffset)
     }
 
+    /**
+     * @return a tuple of [inventory, index of that inventory which is hovered]
+     *         the result is non-null but inventory can be null
+     */
     private getInventoryIndexPosition(pos: Point): [Inventory, number] {
         const getIndexForOffset = (offset) => {
             const p = pos.minus(offset)
             const x = Math.floor(p.x/TILE_SIZE)
             const y = Math.floor(p.y/TILE_SIZE)
-            if (x < 0 || x >= InventoryDisplay.COLUMNS || y < 0 || y >= Math.floor(this.inventory().inventory.length/InventoryDisplay.COLUMNS)) {
+            if (x < 0 || x >= InventoryDisplay.COLUMNS || y < 0 || y >= Math.floor(this.playerInv.inventory.length/InventoryDisplay.COLUMNS)) {
                 return -1
             }
             return y * InventoryDisplay.COLUMNS + x
@@ -290,7 +301,7 @@ export class InventoryDisplay extends Component {
 
         const index = getIndexForOffset(this.offset)
         if (index > -1) {
-            return [this.inventory(), index]
+            return [this.playerInv, index]
         }
 
         return [null, -1]
