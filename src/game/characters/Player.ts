@@ -110,6 +110,7 @@ export class Player extends Component {
 
 
         // FOR TESTING
+        const mouseTilePos = pixelPtToTilePt(updateData.input.mousePos)
         if (updateData.input.isKeyDown(InputKey.K)) {
             DudeFactory.instance.new(DudeType.CENTAUR, updateData.input.mousePos)
         }
@@ -123,7 +124,10 @@ export class Player extends Component {
             TownStats.instance.happiness.adjust(Math.random() * 10 - 5)
         }
         if (updateData.input.isKeyDown(InputKey.COMMA)) {
-            LocationManager.instance.currentLocation.addElement(ElementType.CHEST, pixelPtToTilePt(updateData.input.mousePos))
+            LocationManager.instance.currentLocation.addElement(ElementType.CHEST, mouseTilePos)
+        }
+        if (updateData.input.isKeyDown(InputKey.PERIOD)) {
+            LocationManager.instance.currentLocation.removeElementAt(mouseTilePos)
         }
         
         // update crosshair position

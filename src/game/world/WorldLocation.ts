@@ -107,6 +107,10 @@ export class WorldLocation {
         return !!this.occupied.get(pos)
     }
 
+    removeElementAt(pos: Point) {
+        this.removeElement(this.getElement(pos))
+    }
+
     removeElement(el: ElementComponent) {
         this.elements.removeAll(el)
         this.occupied.removeAll(el)
