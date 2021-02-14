@@ -10,6 +10,7 @@ import { NineSlice } from "../../engine/tiles/NineSlice"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Player } from "../characters/Player"
+import { WeaponType } from "../characters/weapons/WeaponType"
 import { Controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
@@ -78,24 +79,30 @@ export class InventoryDisplay extends Component {
             this.tooltip.clear()
             if (updateData.input.isMouseUp) {  // drop n swap
                 if (hoverIndex !== -1) {
-                    const value = this.trackedTileInventory.inventory[this.trackedTileIndex]
-                    const currentlyOccupiedSpot = hoverInv.inventory[hoverIndex]
-                    hoverInv.inventory[hoverIndex] = value
-                    this.trackedTileInventory.inventory[this.trackedTileIndex] = currentlyOccupiedSpot
+                    const draggedValue = this.trackedTileInventory.getStack(this.trackedTileIndex)
+                    const currentlyOccupiedSpotValue = hoverInv.getStack(hoverIndex)
+                    hoverInv.setStack(hoverIndex, draggedValue)
+                    this.trackedTileInventory.setStack(this.trackedTileIndex, currentlyOccupiedSpotValue)
+
+                    // TODO: When putting an equipped item into a chest, unequip it from the player
+                    if (this.trackedTileInventory === this.playerInv && hoverInv === this.tradingInv) {
+                        console.log(WeaponType[draggedValue.item])
+                        if (!!WeaponType[draggedValue.item] && this.playerInv.getItemCount(draggedValue.item) === 0) {
+                            console.log("no longer has this weapon")
+                        }
+                    }
                 }
                 this.trackedTileInventory = null
                 this.trackedTile = null
-
-                // TODO: When putting an equipped item into a chest, unequip it from the player
 
                 // refresh view
                 this.show(this.onClose, this.tradingInv)
             } else {  // track
                 this.trackedTile.transform.position = this.trackedTile.transform.position.plus(updateData.input.mousePos.minus(this.lastMousPos))
             }
-        } else if (hoverIndex > -1 && !!hoverInv.inventory[hoverIndex]) {  // we're hovering over an item
+        } else if (hoverIndex > -1 && !!hoverInv.getStack(hoverIndex)) {  // we're hovering over an item
             this.tooltip.position = updateData.input.mousePos
-            const stack = hoverInv.inventory[hoverIndex]
+            const stack = hoverInv.getStack(hoverIndex)
             const item = ITEM_METADATA_MAP[stack.item]
             const count = stack.count > 1 ? ' x' + stack.count : ''
 
@@ -103,7 +110,7 @@ export class InventoryDisplay extends Component {
 
             const decrementStack = () => {
                 if (stack.count === 1) {
-                    hoverInv.inventory[hoverIndex] = null
+                    hoverInv.setStack(hoverIndex, null)
                 } else {
                     stack.count--
                 }
@@ -163,10 +170,10 @@ export class InventoryDisplay extends Component {
         this.lastMousPos = updateData.input.mousePos
 
         if (updateData.input.isMouseDown) {
-            if (!!hoverInv && !!hoverInv.inventory[hoverIndex]) {
+            if (!!hoverInv && !!hoverInv.getStack(hoverIndex)) {
                 this.trackedTileInventory = hoverInv
                 // some stupid math to account for the fact that this.tiles contains tiles from potentially two inventories
-                this.trackedTile = this.tiles[hoverIndex + (hoverInv === this.playerInv ? 0 : this.playerInv.inventory.length)]
+                this.trackedTile = this.tiles[hoverIndex + (hoverInv === this.playerInv ? 0 : this.playerInv.size)]
                 this.trackedTileIndex = hoverIndex
             }
         }
@@ -187,7 +194,7 @@ export class InventoryDisplay extends Component {
             offset.minus(new Point(TILE_SIZE/2, TILE_SIZE/2)),
             new Point(
                 1 + InventoryDisplay.COLUMNS, 
-                1 + inv.inventory.length/InventoryDisplay.COLUMNS
+                1 + inv.size/InventoryDisplay.COLUMNS
             )
         )
 
@@ -225,7 +232,7 @@ export class InventoryDisplay extends Component {
 
         const displayDimensions = new Point(
             InventoryDisplay.COLUMNS, 
-            this.playerInv.inventory.length/InventoryDisplay.COLUMNS
+            this.playerInv.size/InventoryDisplay.COLUMNS
         ).times(TILE_SIZE)
 
         this.offset = new Point(
@@ -265,20 +272,17 @@ export class InventoryDisplay extends Component {
         this.spawnBG(inv)
 
         // icons
-        const tiles = inv.inventory.map((stack, index) => {
+        for (let i = 0; i < inv.size; i++) {
+            const stack = inv.getStack(i)
+            let tile = null
             if (!!stack) {
                 const c = ITEM_METADATA_MAP[stack.item].inventoryIconSupplier().toComponent()
                 c.transform.depth = UIStateManager.UI_SPRITE_DEPTH + 1
-                return this.displayEntity.addComponent(c)
-            }
-        })
-
-        tiles.forEach((tile, index) => {
-            if (!!tile) {
-                tile.transform.position = this.getPositionForInventoryIndex(index, inv)
+                tile = this.displayEntity.addComponent(c)
+                tile.transform.position = this.getPositionForInventoryIndex(i, inv)
             }
             this.tiles.push(tile)
-        })
+        }
     }
 
     private getPositionForInventoryIndex(i: number, inv: Inventory) {
@@ -295,7 +299,7 @@ export class InventoryDisplay extends Component {
             const p = pos.minus(this.getOffsetForInv(inv))
             const x = Math.floor(p.x/TILE_SIZE)
             const y = Math.floor(p.y/TILE_SIZE)
-            if (x < 0 || x >= InventoryDisplay.COLUMNS || y < 0 || y >= Math.floor(inv.inventory.length/InventoryDisplay.COLUMNS)) {
+            if (x < 0 || x >= InventoryDisplay.COLUMNS || y < 0 || y >= Math.floor(inv.size/InventoryDisplay.COLUMNS)) {
                 return -1
             }
             return y * InventoryDisplay.COLUMNS + x
