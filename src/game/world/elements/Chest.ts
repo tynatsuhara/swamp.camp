@@ -5,6 +5,8 @@ import { TileSetAnimation } from "../../../engine/tiles/TileSetAnimation"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
 import { Tilesets, TILE_DIMENSIONS, TILE_SIZE } from "../../graphics/Tilesets"
 import { Inventory } from "../../items/Inventory"
+import { InventoryDisplay } from "../../ui/InventoryDisplay"
+import { UIStateManager } from "../../ui/UIStateManager"
 import { WorldLocation } from "../WorldLocation"
 import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
@@ -42,7 +44,7 @@ export class ChestFactory extends ElementFactory {
         const interactable = new Interactable(
             pos.times(TILE_SIZE).plusX(TILE_SIZE/2).plusY(TILE_SIZE/2),
             () => {
-                console.log("open chest!")
+                InventoryDisplay.instance.show()
                 animations.goToAnimation(0).play()
             },
             new Point(0, -16)

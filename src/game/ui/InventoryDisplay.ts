@@ -12,6 +12,7 @@ import { TileTransform } from "../../engine/tiles/TileTransform"
 import { rectContains } from "../../engine/util/utils"
 import { Player } from "../characters/Player"
 import { Controls } from "../Controls"
+import { Camera } from "../cutscenes/Camera"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { ITEM_METADATA_MAP } from "../items/Items"
 import { saveManager } from "../SaveManager"
@@ -23,6 +24,8 @@ import { Tooltip } from "./Tooltip"
 import { UIStateManager } from "./UIStateManager"
 
 export class InventoryDisplay extends Component {
+
+    static instance: InventoryDisplay
 
     private static COLUMNS = 10
 
@@ -37,13 +40,13 @@ export class InventoryDisplay extends Component {
     get isOpen() { return this.showingInv }
     private offset: Point
     private tooltip: Tooltip
-    private readonly coinAnimation: TileComponent
     private readonly coinsOffset = new Point(0, -18)
 
     constructor() {
         super()
         this.e.addComponent(this)
         this.tooltip = this.e.addComponent(new Tooltip())
+        InventoryDisplay.instance = this
     }
 
     inventory() {
@@ -59,7 +62,7 @@ export class InventoryDisplay extends Component {
         if (this.isOpen && (pressI || pressEsc)) {
             this.close()
         } else if (pressI && !UIStateManager.instance.isMenuOpen) {
-            this.show(updateData.dimensions)
+            this.show()
         }
 
         if (!this.isOpen) {
@@ -79,7 +82,7 @@ export class InventoryDisplay extends Component {
                 }
                 this.trackedTile = null
                 // refresh view
-                this.show(updateData.dimensions)
+                this.show()
             } else {  // track
                 this.trackedTile.transform.position = this.trackedTile.transform.position.plus(updateData.input.mousePos.minus(this.lastMousPos))
             }
@@ -199,7 +202,8 @@ export class InventoryDisplay extends Component {
         this.displayEntity = null
     }
 
-    show(screenDimensions: Point) {
+    show() {
+        const screenDimensions = Camera.instance.dimensions
         this.showingInv = true
 
         const displayDimensions = new Point(
