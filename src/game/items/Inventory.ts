@@ -15,9 +15,13 @@ export class ItemStack {
 
 // TODO flesh this out more when we have more items
 export class Inventory {
-    private _inventory: ItemStack[] = Array.from({ length: 20 })  // TODO make length configurable
+    private _inventory: ItemStack[]
     get inventory() { return this._inventory }
     private countMap = new Map<Item, number>()
+
+    constructor(size: number = 20) {
+        this._inventory = Array.from({ length: size })
+    }
 
     /**
      * returns true if the item can fit in the inventory
