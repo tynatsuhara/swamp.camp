@@ -253,7 +253,7 @@ export class InventoryDisplay extends Component {
             Math.floor(screenDimensions.y/5)
         )
 
-        this.tradingInvOffset = this.offset.plusY(TILE_SIZE * 4)
+        this.tradingInvOffset = this.offset.plusY(TILE_SIZE * 3.5)
 
         this.displayEntity = new Entity([
             // coins
