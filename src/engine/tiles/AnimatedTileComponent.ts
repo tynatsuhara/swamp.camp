@@ -1,13 +1,10 @@
-import { Point } from "../point"
 import { UpdateData } from "../engine"
+import { Animator } from "../util/Animator"
 import { TileComponent } from "./TileComponent"
 import { TileSetAnimation } from "./TileSetAnimation"
-import { StaticTileSource } from "./StaticTileSource"
-import { Animator } from "../util/Animator"
 import { TileTransform } from "./TileTransform"
 
 export class AnimatedTileComponent extends TileComponent {
-    private paused: boolean 
     private animator: Animator
     private animations: TileSetAnimation[]
 
@@ -30,7 +27,7 @@ export class AnimatedTileComponent extends TileComponent {
         const anim = this.animations[animation]
         this.animator = new Animator(
             anim.frames.map(f => f[1]), 
-            (index) => {
+            index => {
                 this.tileSource = anim.getTile(index)
             },
             anim.onFinish
@@ -39,15 +36,15 @@ export class AnimatedTileComponent extends TileComponent {
     }
 
     pause() {
-        this.paused = true
+        this.animator.paused = true
     }
 
     play() {
-        this.paused = false
+        this.animator.paused = false
     }
     
     update(updateData: UpdateData) {
-        if (!this.paused) {
+        if (!this.animator.paused) {
             this.animator.update(updateData.elapsedTimeMillis)
         }
     }

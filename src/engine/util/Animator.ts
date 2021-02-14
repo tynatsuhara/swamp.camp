@@ -1,4 +1,5 @@
 export class Animator {    
+    paused: boolean 
     private readonly frames: number[]  // a list of end-of-frame timestamps
     private readonly duration: number  // total duration
 
@@ -33,12 +34,19 @@ export class Animator {
     }
 
     update(elapsedTimeMillis: number) {
+        if (this.paused) {
+            return
+        }
         this.time += elapsedTimeMillis
         while (this.time > this.frames[this.index]) {
             this.index++
 
             if (this.index === this.frames.length) {
                 this.onFinish()
+                // the onFinish callback might pause the animator, so check again
+                if (this.paused) {
+                    return
+                }
             }
 
             this.index %= this.frames.length
