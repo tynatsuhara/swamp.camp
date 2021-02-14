@@ -7,8 +7,7 @@ import { Animator } from "../util/Animator"
 import { TileTransform } from "./TileTransform"
 
 export class AnimatedTileComponent extends TileComponent {
-    paused: boolean 
-
+    private paused: boolean 
     private animator: Animator
     private animations: TileSetAnimation[]
 
@@ -33,8 +32,18 @@ export class AnimatedTileComponent extends TileComponent {
             anim.frames.map(f => f[1]), 
             (index) => {
                 this.tileSource = anim.getTile(index)
-            }
+            },
+            anim.onFinish
         )
+        return this
+    }
+
+    pause() {
+        this.paused = true
+    }
+
+    play() {
+        this.paused = false
     }
     
     update(updateData: UpdateData) {

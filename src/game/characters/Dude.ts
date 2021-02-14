@@ -210,7 +210,7 @@ export class Dude extends Component implements DialogueSource {
         )
         this.deathOffset = this.animation.transform.position.minus(prePos)
         this.animation.goToAnimation(0)
-        this.animation.paused = true
+        this.animation.pause()
         setTimeout(() => spawnItem(this.standingPosition.minus(new Point(0, 2)), this.droppedItemSupplier()), 100)
         this.dropWeapon()
         setTimeout(() => this.dissolve(), 1000)
