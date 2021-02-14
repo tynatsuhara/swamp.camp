@@ -116,7 +116,7 @@ export class Player extends Component {
         if (updateData.input.isKeyDown(InputKey.SEMICOLON)) {
             DudeFactory.instance.new(DudeType.ORC_WARRIOR, updateData.input.mousePos)
         }
-        if (updateData.input.isKeyDown(InputKey.COMMA)) {
+        if (updateData.input.isKeyDown(InputKey.QUOTE)) {
             TownStats.instance.happiness.adjust(Math.random() * 10 - 5)
         }
         

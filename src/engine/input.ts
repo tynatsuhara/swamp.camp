@@ -5,8 +5,8 @@ import { View } from "./View"
 export const enum InputKey {
     ZERO = 48, ONE = 49, TWO = 50, THREE = 51, FOUR = 52, FIVE = 53, SIX = 54, SEVEN = 55, EIGHT = 56, NINE = 57,
     Q = 81, W = 87, E = 69, R = 82, T = 84, Y = 89, U = 85, I = 73, O = 79, P = 80,
-    A = 65, S = 83, D = 68, F = 70, G = 71, H = 72, J = 74, K = 75, L = 76, SEMICOLON = 186, COMMA = 222,
-    Z = 90, X = 88, C = 67, V = 86, B = 66, N = 78, M = 77,
+    A = 65, S = 83, D = 68, F = 70, G = 71, H = 72, J = 74, K = 75, L = 76, SEMICOLON = 186, QUOTE = 222,
+    Z = 90, X = 88, C = 67, V = 86, B = 66, N = 78, M = 77, COMMA = 188,
     SHIFT = 16, SPACE = 32, ESC = 27
 }
 
