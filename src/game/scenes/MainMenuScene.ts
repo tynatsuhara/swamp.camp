@@ -1,3 +1,4 @@
+import { debug } from "../../engine/debug"
 import { UpdateViewsContext } from "../../engine/engine"
 import { Entity } from "../../engine/Entity"
 import { Point } from "../../engine/point"
@@ -26,6 +27,10 @@ export class MainMenuScene {
     constructor(continueFn: () => void, newGameFn: () => void) {
         this.continueFn = continueFn
         this.newGameFn = newGameFn
+
+        if (saveManager.saveFileExists() && debug.autoPlay) {
+            this.continueFn()
+        }
     }
     
     getViews(updateViewsContext: UpdateViewsContext) {

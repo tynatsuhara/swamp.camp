@@ -12826,12 +12826,15 @@ System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "en
         }
     };
 });
-System.register("game/scenes/MainMenuScene", ["engine/Entity", "engine/point", "game/characters/DudeAnimationUtils", "game/SaveManager", "game/ui/MainMenuButton", "game/ui/PlumePicker"], function (exports_140, context_140) {
+System.register("game/scenes/MainMenuScene", ["engine/debug", "engine/Entity", "engine/point", "game/characters/DudeAnimationUtils", "game/SaveManager", "game/ui/MainMenuButton", "game/ui/PlumePicker"], function (exports_140, context_140) {
     "use strict";
-    var Entity_31, point_81, DudeAnimationUtils_2, SaveManager_11, MainMenuButton_1, PlumePicker_1, ZOOM, MainMenuScene;
+    var debug_4, Entity_31, point_81, DudeAnimationUtils_2, SaveManager_11, MainMenuButton_1, PlumePicker_1, ZOOM, MainMenuScene;
     var __moduleName = context_140 && context_140.id;
     return {
         setters: [
+            function (debug_4_1) {
+                debug_4 = debug_4_1;
+            },
             function (Entity_31_1) {
                 Entity_31 = Entity_31_1;
             },
@@ -12861,6 +12864,9 @@ System.register("game/scenes/MainMenuScene", ["engine/Entity", "engine/point", "
                     });
                     this.continueFn = continueFn;
                     this.newGameFn = newGameFn;
+                    if (SaveManager_11.saveManager.saveFileExists() && debug_4.debug.autoPlay) {
+                        this.continueFn();
+                    }
                 }
                 MainMenuScene.prototype.getViews = function (updateViewsContext) {
                     var _this = this;
