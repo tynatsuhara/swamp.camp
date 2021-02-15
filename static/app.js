@@ -7586,6 +7586,10 @@ System.register("game/ui/NotificationDisplay", ["engine/component", "engine/Enti
                 __extends(NotificationComponent, _super);
                 function NotificationComponent(n) {
                     var _this = _super.call(this) || this;
+                    if (!n.isExpired) {
+                        var expirationTime_1 = Date.now() + 5000;
+                        n.isExpired = function () { return Date.now() > expirationTime_1; };
+                    }
                     _this.n = n;
                     _this.awake = function () {
                         var textPixelWidth = n.text.length * Text_7.TEXT_PIXEL_WIDTH;
@@ -7624,18 +7628,18 @@ System.register("game/ui/NotificationDisplay", ["engine/component", "engine/Enti
                     var index = NotificationDisplay.instance.getNotifications().indexOf(this.n);
                     var yOffset = 32 * index + OFFSET.y;
                     var offScreenPos = new point_47.Point(Camera_7.Camera.instance.dimensions.x + 10, yOffset);
-                    var onScreenPos = new point_47.Point(Camera_7.Camera.instance.dimensions.x - this.width + OFFSET.x, yOffset);
-                    var goalPosition = this.n.isExpired() ? offScreenPos : onScreenPos;
                     if (!this.t) {
                         return offScreenPos;
                     }
-                    var speed = .5 * elapsedMillis;
+                    var onScreenPos = new point_47.Point(Camera_7.Camera.instance.dimensions.x - this.width + OFFSET.x, yOffset);
+                    var goalPosition = this.n.isExpired() ? offScreenPos : onScreenPos;
                     var diff = goalPosition.minus(this.t.position);
-                    if (diff.magnitude() < speed) {
+                    var lerpRate = 0.22;
+                    if (diff.magnitude() < 1) {
                         return goalPosition;
                     }
                     else {
-                        return this.t.position.plus(diff.normalized().times(speed));
+                        return this.t.position.plus(diff.times(lerpRate)).apply(Math.floor);
                     }
                 };
                 return NotificationComponent;
@@ -7650,10 +7654,6 @@ System.register("game/ui/NotificationDisplay", ["engine/component", "engine/Enti
                     return _this;
                 }
                 NotificationDisplay.prototype.push = function (notification) {
-                    if (!notification.isExpired) {
-                        var expirationTime_1 = Date.now() + 7000;
-                        notification.isExpired = function () { return Date.now() > expirationTime_1; };
-                    }
                     var component = new NotificationComponent(notification);
                     this.nComponents.push(component);
                     new Entity_16.Entity([component]);

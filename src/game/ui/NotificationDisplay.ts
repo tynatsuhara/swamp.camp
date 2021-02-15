@@ -30,6 +30,10 @@ class NotificationComponent extends Component {
 
     constructor(n: Notification) {
         super()
+        if (!n.isExpired) {
+            const expirationTime = Date.now() + 5_000
+            n.isExpired = () => Date.now() > expirationTime
+        }
         this.n = n
 
         this.awake = () => {
@@ -77,19 +81,20 @@ class NotificationComponent extends Component {
         const index = NotificationDisplay.instance.getNotifications().indexOf(this.n)
         const yOffset = 32 * index + OFFSET.y
         const offScreenPos = new Point(Camera.instance.dimensions.x + 10, yOffset)
-        const onScreenPos = new Point(Camera.instance.dimensions.x - this.width + OFFSET.x, yOffset)
-        const goalPosition = this.n.isExpired() ? offScreenPos : onScreenPos
 
         if (!this.t) {
             return offScreenPos
         }
 
-        const speed = .5 * elapsedMillis
+        const onScreenPos = new Point(Camera.instance.dimensions.x - this.width + OFFSET.x, yOffset)
+        const goalPosition = this.n.isExpired() ? offScreenPos : onScreenPos
         const diff = goalPosition.minus(this.t.position)
-        if (diff.magnitude() < speed) {
+        const lerpRate = 0.22
+
+        if (diff.magnitude() < 1) {
             return goalPosition
         } else {
-            return this.t.position.plus(diff.normalized().times(speed))
+            return this.t.position.plus(diff.times(lerpRate)).apply(Math.floor)
         }
     }
 }
@@ -108,10 +113,6 @@ export class NotificationDisplay extends Component {
     }
 
     push(notification: Notification) {
-        if (!notification.isExpired) {
-            const expirationTime = Date.now() + 7_000
-            notification.isExpired = () => Date.now() > expirationTime
-        }
         const component = new NotificationComponent(notification)
         this.nComponents.push(component)
         new Entity([component])
