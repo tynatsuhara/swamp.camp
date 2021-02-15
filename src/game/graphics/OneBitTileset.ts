@@ -7,6 +7,7 @@ export class OneBitTileset extends SingleFileTileLoader {
         super("images/monochrome_transparent_1_bit.png", new Map([
             ["treePointy", new Point(0, 1)],
             ["treeRound", new Point(4, 1)],
+            ["spike_club", new Point(1, 24)],
             ["axe", new Point(7, 29)],
             ["pickaxe", new Point(11, 27)],
             ["sword", new Point(2, 28)],

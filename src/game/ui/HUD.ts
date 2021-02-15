@@ -1,13 +1,10 @@
-import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
-import { TileTransform } from "../../engine/tiles/TileTransform"
-import { Point } from "../../engine/point"
-import { Dude } from "../characters/Dude"
-import { TileComponent } from "../../engine/tiles/TileComponent"
 import { Entity } from "../../engine/Entity"
-import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
+import { Point } from "../../engine/point"
+import { TileComponent } from "../../engine/tiles/TileComponent"
+import { TileTransform } from "../../engine/tiles/TileTransform"
+import { Dude } from "../characters/Dude"
+import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { OffScreenMarker } from "./OffScreenMarker"
-import { KeyPressIndicator } from "./KeyPressIndicator"
-import { InputKey } from "../../engine/input"
 
 export class HUD {
 

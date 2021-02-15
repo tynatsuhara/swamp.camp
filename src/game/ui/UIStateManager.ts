@@ -8,6 +8,7 @@ import { Point } from "../../engine/point"
 import { PauseMenu } from "./PauseMenu"
 import { CraftingMenu } from "./CraftingMenu"
 import { SellMenu } from "./SellMenu"
+import { NotificationDisplay } from "./NotificationDisplay"
 
 export class UIStateManager {
 
@@ -28,6 +29,7 @@ export class UIStateManager {
     private readonly pauseMenu = new PauseMenu()
     private readonly craftingMenu = new CraftingMenu()
     private readonly sellMenu = new SellMenu()
+    private readonly notificationDisplay = new NotificationDisplay()
 
     // if this is true, input observed by other components (like the player) 
     // should be skipped because a menu is open. Other menus should only open
@@ -63,5 +65,6 @@ export class UIStateManager {
                 .concat(this.pauseMenu.getEntities())
                 .concat(this.craftingMenu.getEntities())
                 .concat(this.sellMenu.getEntities())
+                .concat(this.notificationDisplay.getEntities())
     }
 }

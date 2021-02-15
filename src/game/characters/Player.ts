@@ -8,6 +8,7 @@ import { Lists } from "../../engine/util/Lists"
 import { Controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { pixelPtToTilePt } from "../graphics/Tilesets"
+import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { UIStateManager } from "../ui/UIStateManager"
 import { ElementType } from "../world/elements/Elements"
 import { Interactable } from "../world/elements/Interactable"
@@ -113,7 +114,7 @@ export class Player extends Component {
         if (debug.enableDevControls) {
             const mouseTilePos = pixelPtToTilePt(updateData.input.mousePos)
             if (updateData.input.isKeyDown(InputKey.K)) {
-                DudeFactory.instance.new(DudeType.CENTAUR, updateData.input.mousePos)
+                DudeFactory.instance.new(DudeType.ORC_WARRIOR, updateData.input.mousePos)
             }
             if (updateData.input.isKeyDown(InputKey.L)) {
                 DudeFactory.instance.new(DudeType.HORNED_DEMON, updateData.input.mousePos)
@@ -122,7 +123,12 @@ export class Player extends Component {
                 DudeFactory.instance.new(DudeType.ORC_WARRIOR, updateData.input.mousePos)
             }
             if (updateData.input.isKeyDown(InputKey.QUOTE)) {
-                TownStats.instance.happiness.adjust(Math.random() * 10 - 5)
+                const expirationTime = Date.now() + 5000
+                NotificationDisplay.instance.push({
+                    text: "ORC ATTACK!",
+                    icon: "sword",
+                    isExpired: () => Date.now() > expirationTime
+                })
             }
             if (updateData.input.isKeyDown(InputKey.COMMA)) {
                 LocationManager.instance.currentLocation.addElement(ElementType.CHEST, mouseTilePos)
