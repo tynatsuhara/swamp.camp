@@ -6,6 +6,7 @@ import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent
 import { TextRender } from "../../engine/renderer/TextRender"
 import { NineSlice } from "../../engine/tiles/NineSlice"
 import { TileTransform } from "../../engine/tiles/TileTransform"
+import { Camera } from "../cutscenes/Camera"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "./Color"
@@ -26,7 +27,7 @@ export class NotificationDisplay extends Component {
     private nEntities: Entity[] = []
     private notifications: Notification[] = []
     private renderDirty = true
-    private offset = new Point(4, 22)
+    private offset = new Point(-4, 4)
 
     constructor() {
         super()
@@ -55,27 +56,26 @@ export class NotificationDisplay extends Component {
     }
 
     private renderNotification(n: Notification, index: number) {
-        const pos = this.offset.plusY(32 * index)
-        let textPixelWidth = n.text.length * TEXT_PIXEL_WIDTH
-        let icon = null
+        const textPixelWidth = n.text.length * TEXT_PIXEL_WIDTH
+        const iconWidth = 20
+        const width = textPixelWidth + TILE_SIZE + (!!n.icon ? iconWidth : 0)
         const height = TILE_SIZE * 2 - 2
-        let textPos = pos.plusX(TILE_SIZE/2).plusY(height/2 - TEXT_SIZE/2 + .5)
+        const pos = this.offset.plusX(Camera.instance.dimensions.x - width).plusY(32 * index)
+        const textPos = pos.plusX(TILE_SIZE/2 + (!!n.icon ? iconWidth : 0)).plusY(height/2 - TEXT_SIZE/2 + .5)
+        let icon = null
         if (!!n.icon) {
-            const width = 20
-            textPixelWidth += width
             icon = Tilesets.instance.oneBit.getTileSource(n.icon)
                     .filtered(ImageFilters.tint(Color.DARK_RED))
                     .toComponent(TileTransform.new({ 
-                        position: textPos.plusY(-4), 
+                        position: textPos.plusY(-4).plusX(-iconWidth), 
                         depth: UIStateManager.UI_SPRITE_DEPTH + 1 
                     }))
-            textPos = textPos.plusX(width)
         }
 
         const backgroundTiles = NineSlice.makeStretchedNineSliceComponents(
             Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"), 
             pos,
-            new Point(textPixelWidth + TILE_SIZE, height)
+            new Point(width, height)
         )
         
         return new Entity([

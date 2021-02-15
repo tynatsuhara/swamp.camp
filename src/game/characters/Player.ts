@@ -123,11 +123,9 @@ export class Player extends Component {
                 DudeFactory.instance.new(DudeType.ORC_WARRIOR, updateData.input.mousePos)
             }
             if (updateData.input.isKeyDown(InputKey.QUOTE)) {
-                const expirationTime = Date.now() + 5000
                 NotificationDisplay.instance.push({
                     text: "ORC ATTACK!",
                     icon: "sword",
-                    isExpired: () => Date.now() > expirationTime
                 })
             }
             if (updateData.input.isKeyDown(InputKey.COMMA)) {
