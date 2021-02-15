@@ -52,17 +52,14 @@ export class MapGenerator {
     }
 
     spawnTreesAtEdge() {
-        const treeStopEdge = MapGenerator.MAP_SIZE
         const vignetteEdge = MapGenerator.MAP_SIZE/2 - 1
         const denseStartEdge = vignetteEdge - 8
         const possibilities = []
-        for (let x = -MapGenerator.MAP_SIZE/2; x < MapGenerator.MAP_SIZE; x++) {
-            for (let y = -MapGenerator.MAP_SIZE/2; y < MapGenerator.MAP_SIZE; y++) {
+        for (let x = -MapGenerator.MAP_SIZE/2; x < MapGenerator.MAP_SIZE/2; x++) {
+            for (let y = -MapGenerator.MAP_SIZE/2; y < MapGenerator.MAP_SIZE/2; y++) {
                 const distToCenter = new Point(x, y).distanceTo(Point.ZERO)
                 const pt = new Point(x, y)
-                if (distToCenter > treeStopEdge ) {
-                    // do nothing -- behind the vignette
-                } else if (distToCenter > vignetteEdge) {
+                if (distToCenter > vignetteEdge) {
                     possibilities.push(pt)
                 } else if (distToCenter > denseStartEdge) {
                     const chance = (distToCenter - denseStartEdge) / (vignetteEdge - denseStartEdge)
@@ -99,7 +96,7 @@ export class MapGenerator {
         const typesToClear = [ElementType.ROCK, ElementType.TREE_POINTY, ElementType.TREE_ROUND]
 
         // clear in corner
-        for (let x = MapGenerator.MAP_SIZE/2-11; x < MapGenerator.MAP_SIZE/2; x++) {
+        for (let x = MapGenerator.MAP_SIZE/2-11; x < MapGenerator.MAP_SIZE/2 + 10; x++) {
             for (let y = MapGenerator.MAP_SIZE/2-25; y < MapGenerator.MAP_SIZE/2-23; y++) {
                 const element = this.location.getElement(new Point(x, y))
                 if (!!element && typesToClear.indexOf(element.type) !== -1) {

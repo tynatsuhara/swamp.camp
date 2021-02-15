@@ -127,8 +127,9 @@ export class WorldLocation {
                 if (pt.equals(tileStart) || pt.equals(tileEnd)) {
                     return false
                 }
-                if (pt.x < -MapGenerator.MAP_SIZE/2 || pt.x > MapGenerator.MAP_SIZE/2 
-                        || pt.y < -MapGenerator.MAP_SIZE/2 || pt.y > MapGenerator.MAP_SIZE/2) {
+                const buffer = 5
+                if (pt.x < -MapGenerator.MAP_SIZE/2 - buffer || pt.x > MapGenerator.MAP_SIZE/2 + buffer
+                        || pt.y < -MapGenerator.MAP_SIZE/2 - buffer || pt.y > MapGenerator.MAP_SIZE/2 + buffer) {
                     return true
                 }
                 return !!this.occupied.get(pt)
