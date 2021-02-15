@@ -14,6 +14,10 @@ export class Entity {
     }
 
     addComponent<T extends Component>(component: T): T {
+        if (!component) {
+            return
+        }
+        
         this.componentCache.clear()
 
         component.entity = this
