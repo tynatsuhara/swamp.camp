@@ -45,7 +45,7 @@ export class CraftingMenu extends Component {
         this.canvas = document.createElement("canvas")
         this.canvas.width = this.innerDimensions.x
         this.canvas.height = this.innerDimensions.y
-        this.context = this.canvas.getContext("2d", {alpha: false})
+        this.context = this.canvas.getContext("2d", { alpha: false })
     }
 
     update(updateData: UpdateData) {

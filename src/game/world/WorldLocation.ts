@@ -9,6 +9,7 @@ import { Camera } from "../cutscenes/Camera"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { LocationSaveState } from "../saves/LocationSaveState"
 import { newUUID } from "../saves/uuid"
+import { HUD } from "../ui/HUD"
 import { ElementComponent } from "./elements/ElementComponent"
 import { Elements, ElementType, SavedElement } from "./elements/Elements"
 import { ElementUtils } from "./elements/ElementUtils"
@@ -175,29 +176,31 @@ export class WorldLocation {
     }
 
     useTeleporter(to: string, id: string = null) {
-        const linkedLocation = LocationManager.instance.get(to)
-        const linkedPosition = this.getTeleporterLinkedPos(to, id)
-        
-        const p = Player.instance.dude
-        const beforeTeleportPos = p.standingPosition
-        this.dudes.delete(p)
-        linkedLocation.dudes.add(p)
-        p.location = linkedLocation
-
-        LocationManager.instance.currentLocation = linkedLocation
-
-        // fast-forward NPCs along their schedule
-        linkedLocation.dudes.forEach(d => d.entity.getComponent(NPC)?.simulate())
-
-        // move player
-        const offset = p.standingPosition.minus(p.position)
-        p.moveTo(linkedPosition.minus(offset))
-
-        // makes the camera lerp a bit in the direction of the door
-        // TODO make this support non up/down doors
-        const niceTransition = TILE_SIZE * 2 * (linkedLocation.isInterior ? -1 : 1)
-        
-        Camera.instance.jump(beforeTeleportPos.minus(p.standingPosition).plusY(niceTransition))
+        HUD.instance.locationTransition.transition(() => {
+            const linkedLocation = LocationManager.instance.get(to)
+            const linkedPosition = this.getTeleporterLinkedPos(to, id)
+            
+            const p = Player.instance.dude
+            const beforeTeleportPos = p.standingPosition
+            this.dudes.delete(p)
+            linkedLocation.dudes.add(p)
+            p.location = linkedLocation
+    
+            LocationManager.instance.currentLocation = linkedLocation
+    
+            // fast-forward NPCs along their schedule
+            linkedLocation.dudes.forEach(d => d.entity.getComponent(NPC)?.simulate())
+    
+            // move player
+            const offset = p.standingPosition.minus(p.position)
+            p.moveTo(linkedPosition.minus(offset))
+    
+            // makes the camera lerp a bit in the direction of the door
+            // TODO make this support non up/down doors
+            const niceTransition = 0//TILE_SIZE * 2 * (linkedLocation.isInterior ? -1 : 1)
+            
+            Camera.instance.jump(beforeTeleportPos.minus(p.standingPosition).plusY(niceTransition))
+        })
     }
 
     getEntities() {
