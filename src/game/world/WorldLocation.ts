@@ -39,7 +39,7 @@ export class WorldLocation {
 
     private teleporters: { [key: string]: string } = {} 
 
-    readonly isInterior: boolean;
+    readonly isInterior: boolean
     readonly allowPlacing: boolean
 
     constructor(isInterior: boolean, allowPlacing: boolean) {
@@ -244,7 +244,6 @@ export class WorldLocation {
     }
 
     static load(saveState: LocationSaveState): WorldLocation {
-        // TODO: BUG: RELOADING RETURNS ELEMENTS THAT HAVE BEEN DESTROYED
         const n = new WorldLocation(saveState.isInterior, saveState.allowPlacing)
         n._uuid = saveState.uuid
         n.teleporters = saveState.teleporters

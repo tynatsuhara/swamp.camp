@@ -5293,7 +5293,6 @@ System.register("game/world/WorldLocation", ["engine/point", "engine/util/Grid",
                     });
                 };
                 WorldLocation.load = function (saveState) {
-                    // TODO: BUG: RELOADING RETURNS ELEMENTS THAT HAVE BEEN DESTROYED
                     var n = new WorldLocation(saveState.isInterior, saveState.allowPlacing);
                     n._uuid = saveState.uuid;
                     n.teleporters = saveState.teleporters;
