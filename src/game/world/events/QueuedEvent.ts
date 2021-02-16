@@ -8,7 +8,7 @@ import { EventQueue } from "./EventQueue"
 import { WorldTime } from "../WorldTime"
 import { ElementType } from "../elements/Elements"
 import { House } from "../elements/House"
-import { NotificationDisplay } from "../../ui/NotificationDisplay"
+import { NotificationDisplay, Notifications } from "../../ui/NotificationDisplay"
 
 export enum QueuedEventType {
     SIMULATE_NPCS,
@@ -38,10 +38,7 @@ export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => 
 
     [QueuedEventType.HERALD_ARRIVAL]: () => {
         DudeFactory.instance.new(DudeType.HERALD, MapGenerator.ENTER_LAND_POS, LocationManager.instance.exterior())
-        console.log("the trader is here (ノ ″ロ″)ノ")
-        NotificationDisplay.instance.push({
-            text: "Someone has arrived!"
-        })
+        NotificationDisplay.instance.push(Notifications.NEW_VILLAGER)
     },
 
     [QueuedEventType.HERALD_DEPARTURE]: (data) => {
@@ -74,7 +71,7 @@ export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => 
     },
 
     [QueuedEventType.HERALD_RETURN_WITH_NPC]: (data) => {
-        console.log("we're back, baby!")
+        NotificationDisplay.instance.push(Notifications.NEW_VILLAGER)
 
         const berto = LocationManager.instance.exterior().getDude(DudeType.HERALD)
         if (!berto) {

@@ -12,6 +12,10 @@ import { Color } from "./Color"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
 import { UIStateManager } from "./UIStateManager"
 
+export const Notifications = {
+    NEW_VILLAGER: { text: "Someone has arrived!" }
+}
+
 const OFFSET = new Point(-4, 4)
 const ICON_WIDTH = 20
 

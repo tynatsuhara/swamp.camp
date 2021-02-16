@@ -7541,7 +7541,7 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
 });
 System.register("game/ui/NotificationDisplay", ["engine/component", "engine/Entity", "engine/point", "engine/renderer/TextRender", "engine/tiles/NineSlice", "engine/tiles/TileTransform", "game/cutscenes/Camera", "game/graphics/ImageFilters", "game/graphics/Tilesets", "game/ui/Text", "game/ui/UIStateManager"], function (exports_86, context_86) {
     "use strict";
-    var component_20, Entity_16, point_47, TextRender_6, NineSlice_5, TileTransform_19, Camera_7, ImageFilters_3, Tilesets_22, Text_7, UIStateManager_9, OFFSET, ICON_WIDTH, NotificationComponent, NotificationDisplay;
+    var component_20, Entity_16, point_47, TextRender_6, NineSlice_5, TileTransform_19, Camera_7, ImageFilters_3, Tilesets_22, Text_7, UIStateManager_9, Notifications, OFFSET, ICON_WIDTH, NotificationComponent, NotificationDisplay;
     var __moduleName = context_86 && context_86.id;
     return {
         setters: [
@@ -7580,6 +7580,9 @@ System.register("game/ui/NotificationDisplay", ["engine/component", "engine/Enti
             }
         ],
         execute: function () {
+            exports_86("Notifications", Notifications = {
+                NEW_VILLAGER: { text: "Someone has arrived!" }
+            });
             OFFSET = new point_47.Point(-4, 4);
             ICON_WIDTH = 20;
             NotificationComponent = /** @class */ (function (_super) {
@@ -7731,10 +7734,7 @@ System.register("game/world/events/QueuedEvent", ["game/characters/DudeFactory",
                 },
                 _a[QueuedEventType.HERALD_ARRIVAL] = function () {
                     DudeFactory_2.DudeFactory.instance.new(4 /* HERALD */, MapGenerator_4.MapGenerator.ENTER_LAND_POS, LocationManager_11.LocationManager.instance.exterior());
-                    console.log("the trader is here (ノ ″ロ″)ノ");
-                    NotificationDisplay_1.NotificationDisplay.instance.push({
-                        text: "Someone has arrived!"
-                    });
+                    NotificationDisplay_1.NotificationDisplay.instance.push(NotificationDisplay_1.Notifications.NEW_VILLAGER);
                 },
                 _a[QueuedEventType.HERALD_DEPARTURE] = function (data) {
                     var goalPosition = MapGenerator_4.MapGenerator.ENTER_LAND_POS;
@@ -7764,7 +7764,7 @@ System.register("game/world/events/QueuedEvent", ["game/characters/DudeFactory",
                     }
                 },
                 _a[QueuedEventType.HERALD_RETURN_WITH_NPC] = function (data) {
-                    console.log("we're back, baby!");
+                    NotificationDisplay_1.NotificationDisplay.instance.push(NotificationDisplay_1.Notifications.NEW_VILLAGER);
                     var berto = LocationManager_11.LocationManager.instance.exterior().getDude(4 /* HERALD */);
                     if (!berto) {
                         return;
