@@ -374,9 +374,10 @@ export class NPC extends Component {
         if (!this.teleporterTarget) {
             return
         }
+        const standingTile = pixelPtToTilePt(this.dude.standingPosition)
         const tilePt = pixelPtToTilePt(this.teleporterTarget.pos)
         this.walkTo(tilePt, updateData)
-        if (this.dude.standingPosition.distanceTo(this.teleporterTarget.pos) < 20) {
+        if (standingTile.manhattanDistanceTo(tilePt) <= 1) {
             this.useTeleporter(this.teleporterTarget)
         }
     }

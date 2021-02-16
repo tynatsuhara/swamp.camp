@@ -7504,9 +7504,10 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
                     if (!this.teleporterTarget) {
                         return;
                     }
+                    var standingTile = Tilesets_21.pixelPtToTilePt(this.dude.standingPosition);
                     var tilePt = Tilesets_21.pixelPtToTilePt(this.teleporterTarget.pos);
                     this.walkTo(tilePt, updateData);
-                    if (this.dude.standingPosition.distanceTo(this.teleporterTarget.pos) < 20) {
+                    if (standingTile.manhattanDistanceTo(tilePt) <= 1) {
                         this.useTeleporter(this.teleporterTarget);
                     }
                 };
