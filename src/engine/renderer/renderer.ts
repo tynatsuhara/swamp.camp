@@ -35,10 +35,10 @@ export class Renderer {
     renderView(view: View) {
         const viewRenderContext = new RenderContext(this.canvas, this.context, view)
         view.entities
-                .filter(entity => !!entity)
-                .flatMap(entity => entity.components)
+                .flatMap(entity => entity?.components)
                 .filter(component => !!component && component.enabled && component.isStarted)
                 .flatMap(component => component.getRenderMethods())
+                .filter(render => !!render)
                 .sort((a, b) => a.depth - b.depth)  // TODO possibly improve this
                 .forEach(renderMethod => renderMethod.render(viewRenderContext))
     }
