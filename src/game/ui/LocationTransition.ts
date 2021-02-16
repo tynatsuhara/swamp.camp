@@ -3,17 +3,18 @@ import { UpdateData } from "../../engine/engine"
 import { Point } from "../../engine/point"
 import { ImageRender } from "../../engine/renderer/ImageRender"
 import { Animator } from "../../engine/util/Animator"
+import { Player } from "../characters/Player"
 import { Camera } from "../cutscenes/Camera"
 import { Color } from "./Color"
 import { UIStateManager } from "./UIStateManager"
 
-const makeCircle = (context: CanvasRenderingContext2D, dims: Point, radius: number) => {
+const makeCircle = (context: CanvasRenderingContext2D, radius: number, centerPos: Point) => {
     if (radius === 0) {
         return
     }
 
-    const center = new Point(radius, radius).minus(new Point(.5, .5))
-    const imageDataOffset = dims.div(2).plusX(-radius).plusY(-radius)
+    const relativeCenter = new Point(radius, radius).minus(new Point(.5, .5))
+    const imageDataOffset = centerPos.plusX(-radius).plusY(-radius)
     const diameter = 2 * radius
     const imageData = context.getImageData(imageDataOffset.x, imageDataOffset.y, diameter, diameter)
 
@@ -21,7 +22,7 @@ const makeCircle = (context: CanvasRenderingContext2D, dims: Point, radius: numb
         for (let y = 0; y < diameter; y++) {
             const i = (x + y * diameter) * 4
             const pt = new Point(x, y)
-            if (center.distanceTo(pt) < diameter/2) {
+            if (relativeCenter.distanceTo(pt) < diameter/2) {
                 imageData.data[i+3] = 0
             }
         }
@@ -39,6 +40,10 @@ export class LocationTransition extends Component {
     private render: ImageRender
 
     transition(callback: () => void) {
+        const centerPos = Player.instance.dude.standingPosition.plusY(-12)
+                .minus(Camera.instance.position)
+                .apply(Math.floor)
+        
         const dims = Camera.instance.dimensions.plusX(1).plusY(1)
         const maxRadius = dims.div(2).magnitude()
 
@@ -55,7 +60,7 @@ export class LocationTransition extends Component {
             context.fillStyle = Color.BLACK
             context.fillRect(0, 0, canvas.width, canvas.height)
 
-            makeCircle(context, dims, radius)
+            makeCircle(context, radius, centerPos)
 
             const render = new ImageRender(
                 canvas,
@@ -73,7 +78,7 @@ export class LocationTransition extends Component {
         }
 
         const transitionFrame = FRAMES-1
-        const blackScreenSpeed = 10 * SPEED
+        const blackScreenSpeed = 12 * SPEED
 
         this.animator = new Animator(
             Array.from({length: FRAMES * 2 - 1}, (v, k) => k === transitionFrame ? blackScreenSpeed : SPEED),
