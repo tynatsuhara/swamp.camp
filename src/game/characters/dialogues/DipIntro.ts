@@ -10,8 +10,8 @@ import { WorldTime } from "../../world/WorldTime"
 import { CraftingMenu } from "../../ui/CraftingMenu"
 import { getDipRecipes } from "../../items/CraftingRecipe"
 
-export const ROCKS_NEEDED_FOR_CAMPFIRE = 10
-export const WOOD_NEEDED_FOR_CAMPFIRE = 5
+export const ROCKS_NEEDED_FOR_CAMPFIRE = 8
+export const WOOD_NEEDED_FOR_CAMPFIRE = 4
 const CRAFT_OPTION = "<Craft>"
 
 export const DIP_STARTING_DIALOGUE = "dip-0"
@@ -51,11 +51,12 @@ export const DIP_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
                 dipTent.occupiedPoints[0].distanceTo(campfires[0].occupiedPoints[0]) < 5
                         ? "That should keep us warm tonight!"
                         : "Well, the fire is a bit far from my tent, but that's okay!",
-                "Here, I've finished putting together your tent. Find a nice spot and plop it down!"
+                "It's important to keep your camp well-lit out here. There's no telling what danger lurks in the darkness..."
             ]
             if (campfires[0].save()["logs"] === 0) {
-                lines.push(`By the way, you can add logs to the fire by standing close to it and pressing [${Controls.keyString(Controls.interactButton)}].`)
+                lines.push(`You can add logs to the fire by standing close to it and pressing [${Controls.keyString(Controls.interactButton)}].`)
             }
+            lines.push("Here, I've finished putting together your tent. Find a nice spot and plop it down!")
             return dialogue(lines, () => {  // TODO actually decide what should happen here
                 inv().addItem(Item.TENT)
                 EventQueue.instance.addEvent({

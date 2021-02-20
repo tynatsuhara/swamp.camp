@@ -4721,8 +4721,8 @@ System.register("game/characters/dialogues/DipIntro", ["game/characters/Dialogue
             }
         ],
         execute: function () {
-            exports_58("ROCKS_NEEDED_FOR_CAMPFIRE", ROCKS_NEEDED_FOR_CAMPFIRE = 10);
-            exports_58("WOOD_NEEDED_FOR_CAMPFIRE", WOOD_NEEDED_FOR_CAMPFIRE = 5);
+            exports_58("ROCKS_NEEDED_FOR_CAMPFIRE", ROCKS_NEEDED_FOR_CAMPFIRE = 8);
+            exports_58("WOOD_NEEDED_FOR_CAMPFIRE", WOOD_NEEDED_FOR_CAMPFIRE = 4);
             CRAFT_OPTION = "<Craft>";
             exports_58("DIP_STARTING_DIALOGUE", DIP_STARTING_DIALOGUE = "dip-0");
             DIP_1 = "dip-1", DIP_2 = "dip-2", DIP_3 = "dip-3", DIP_BEFRIEND = "dip-4", DIP_MAKE_CAMPFIRE = "dip-5", DIP_CRAFT = "dip-6";
@@ -4745,11 +4745,12 @@ System.register("game/characters/dialogues/DipIntro", ["game/characters/Dialogue
                             dipTent.occupiedPoints[0].distanceTo(campfires[0].occupiedPoints[0]) < 5
                                 ? "That should keep us warm tonight!"
                                 : "Well, the fire is a bit far from my tent, but that's okay!",
-                            "Here, I've finished putting together your tent. Find a nice spot and plop it down!"
+                            "It's important to keep your camp well-lit out here. There's no telling what danger lurks in the darkness..."
                         ];
                         if (campfires[0].save()["logs"] === 0) {
-                            lines.push("By the way, you can add logs to the fire by standing close to it and pressing [" + Controls_1.Controls.keyString(Controls_1.Controls.interactButton) + "].");
+                            lines.push("You can add logs to the fire by standing close to it and pressing [" + Controls_1.Controls.keyString(Controls_1.Controls.interactButton) + "].");
                         }
+                        lines.push("Here, I've finished putting together your tent. Find a nice spot and plop it down!");
                         return Dialogue_1.dialogue(lines, function () {
                             Dialogue_1.inv().addItem(3 /* TENT */);
                             EventQueue_2.EventQueue.instance.addEvent({
