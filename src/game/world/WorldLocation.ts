@@ -196,11 +196,7 @@ export class WorldLocation {
             const offset = p.standingPosition.minus(p.position)
             p.moveTo(linkedPosition.minus(offset), true)
     
-            // makes the camera lerp a bit in the direction of the door
-            // TODO make this support non up/down doors
-            const niceTransition = 0//TILE_SIZE * 2 * (linkedLocation.isInterior ? -1 : 1)
-            
-            Camera.instance.jump(beforeTeleportPos.minus(p.standingPosition).plusY(niceTransition))
+            Camera.instance.jump(beforeTeleportPos.minus(p.standingPosition))
         })
     }
 
