@@ -9535,7 +9535,7 @@ System.register("game/world/interior/AsciiInteriorBuilder", ["engine/point"], fu
 });
 System.register("game/world/interior/InteriorUtils", ["engine/point", "game/graphics/Tilesets", "game/world/Barrier"], function (exports_108, context_108) {
     "use strict";
-    var point_62, Tilesets_33, Barrier_2, BARRIER_WIDTH, PADDING, InteriorUtils;
+    var point_62, Tilesets_33, Barrier_2, BARRIER_WIDTH, SIDE_PADDING, TOP_BOT_PADDING, InteriorUtils;
     var __moduleName = context_108 && context_108.id;
     return {
         setters: [
@@ -9551,18 +9551,19 @@ System.register("game/world/interior/InteriorUtils", ["engine/point", "game/grap
         ],
         execute: function () {
             BARRIER_WIDTH = 30;
-            PADDING = 2;
+            SIDE_PADDING = 7;
+            TOP_BOT_PADDING = 3;
             exports_108("InteriorUtils", InteriorUtils = {
                 makeBarriers: function (tileDimensions) {
                     return [
                         // left
-                        new Barrier_2.Barrier(new point_62.Point(-BARRIER_WIDTH + PADDING, -BARRIER_WIDTH), new point_62.Point(BARRIER_WIDTH, tileDimensions.y * Tilesets_33.TILE_SIZE + 2 * BARRIER_WIDTH)),
+                        new Barrier_2.Barrier(new point_62.Point(-BARRIER_WIDTH + SIDE_PADDING, -BARRIER_WIDTH), new point_62.Point(BARRIER_WIDTH, tileDimensions.y * Tilesets_33.TILE_SIZE + 2 * BARRIER_WIDTH)),
                         // right
-                        new Barrier_2.Barrier(new point_62.Point(tileDimensions.x * Tilesets_33.TILE_SIZE - PADDING, -BARRIER_WIDTH), new point_62.Point(BARRIER_WIDTH, tileDimensions.y * Tilesets_33.TILE_SIZE + 2 * BARRIER_WIDTH)),
+                        new Barrier_2.Barrier(new point_62.Point(tileDimensions.x * Tilesets_33.TILE_SIZE - SIDE_PADDING, -BARRIER_WIDTH), new point_62.Point(BARRIER_WIDTH, tileDimensions.y * Tilesets_33.TILE_SIZE + 2 * BARRIER_WIDTH)),
                         // top
-                        new Barrier_2.Barrier(new point_62.Point(-BARRIER_WIDTH, -BARRIER_WIDTH + PADDING), new point_62.Point(tileDimensions.x * Tilesets_33.TILE_SIZE + 2 * BARRIER_WIDTH, BARRIER_WIDTH)),
+                        new Barrier_2.Barrier(new point_62.Point(-BARRIER_WIDTH, -BARRIER_WIDTH + TOP_BOT_PADDING), new point_62.Point(tileDimensions.x * Tilesets_33.TILE_SIZE + 2 * BARRIER_WIDTH, BARRIER_WIDTH)),
                         // bottom
-                        new Barrier_2.Barrier(new point_62.Point(-BARRIER_WIDTH, tileDimensions.y * Tilesets_33.TILE_SIZE - PADDING), new point_62.Point(tileDimensions.x * Tilesets_33.TILE_SIZE + 2 * BARRIER_WIDTH, BARRIER_WIDTH)),
+                        new Barrier_2.Barrier(new point_62.Point(-BARRIER_WIDTH, tileDimensions.y * Tilesets_33.TILE_SIZE - TOP_BOT_PADDING), new point_62.Point(tileDimensions.x * Tilesets_33.TILE_SIZE + 2 * BARRIER_WIDTH, BARRIER_WIDTH)),
                     ];
                 }
             });

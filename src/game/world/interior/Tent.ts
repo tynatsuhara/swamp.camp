@@ -8,7 +8,6 @@ import { ElementType } from "../elements/Elements"
 import { NineSlice } from "../../../engine/tiles/NineSlice"
 import { TentColor } from "../elements/Tent"
 import { AsciiInteriorBuilder } from "./AsciiInteriorBuilder"
-import { Barrier } from "../Barrier"
 import { InteriorUtils } from "./InteriorUtils"
 
 export const makeTentInterior = (outside: WorldLocation, color: TentColor): WorldLocation => {
