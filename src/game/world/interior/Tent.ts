@@ -17,9 +17,7 @@ export const makeTentInterior = (outside: WorldLocation, color: TentColor): Worl
 
     const floorDimensions = new Point(5, 4)
     
-    l.setBarriers(
-        InteriorUtils.makeBarriers(floorDimensions)
-    )
+    l.setBarriers(InteriorUtils.makeBarriers(floorDimensions))
 
     const interactablePos = new Point(2.5, 4).times(TILE_SIZE)
     const teleporter: Teleporter = { to: outside.uuid, pos: interactablePos.plusY(-4) }

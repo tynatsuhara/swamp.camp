@@ -5,6 +5,7 @@ import { GroundType } from "../ground/Ground"
 import { LocationManager } from "../LocationManager"
 import { Teleporter } from "../Teleporter"
 import { WorldLocation } from "../WorldLocation"
+import { InteriorUtils } from "./InteriorUtils"
 
 export const makeHouseInterior = (outside: WorldLocation): WorldLocation => {
     const l = new WorldLocation(true, true)
@@ -13,6 +14,7 @@ export const makeHouseInterior = (outside: WorldLocation): WorldLocation => {
     const interactablePos = new Point(dimensions.x/2, dimensions.y).times(TILE_SIZE)
     const teleporter: Teleporter = { to: outside.uuid, pos: interactablePos.plusY(-4) }
 
+    l.setBarriers(InteriorUtils.makeBarriers(dimensions))
     l.addTeleporter(teleporter)
     l.addElement(ElementType.TELEPORTER, new Point(3, 5), { to: outside.uuid, i: interactablePos.toString() })
 
