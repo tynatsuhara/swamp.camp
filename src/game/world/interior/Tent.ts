@@ -8,11 +8,19 @@ import { ElementType } from "../elements/Elements"
 import { NineSlice } from "../../../engine/tiles/NineSlice"
 import { TentColor } from "../elements/Tent"
 import { AsciiInteriorBuilder } from "./AsciiInteriorBuilder"
+import { Barrier } from "../Barrier"
+import { InteriorUtils } from "./InteriorUtils"
 
 export const makeTentInterior = (outside: WorldLocation, color: TentColor): WorldLocation => {
     const isPlayerTent = color === TentColor.BLUE
     const l = new WorldLocation(true, isPlayerTent)
     LocationManager.instance.add(l)
+
+    const floorDimensions = new Point(5, 4)
+    
+    l.setBarriers(
+        InteriorUtils.makeBarriers(floorDimensions)
+    )
 
     const interactablePos = new Point(2.5, 4).times(TILE_SIZE)
     const teleporter: Teleporter = { to: outside.uuid, pos: interactablePos.plusY(-4) }
@@ -22,7 +30,7 @@ export const makeTentInterior = (outside: WorldLocation, color: TentColor): Worl
     const groundType = `${color}tentInterior`
     
     NineSlice.nineSliceForEach(
-        new Point(5, 4), 
+        floorDimensions, 
         (pt, index) => l.addGroundElement(GroundType.BASIC_NINE_SLICE, pt, { k: groundType, i: index })
     )
 

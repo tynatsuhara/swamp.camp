@@ -26,6 +26,7 @@ import { RenderMethod } from "../../engine/renderer/RenderMethod"
 import { LineRender } from "../../engine/renderer/LineRender"
 import { Entity } from "../../engine/Entity"
 import { debug } from "../../engine/debug"
+import { Barrier } from "../world/Barrier"
 
 const ZOOM = 3
 
@@ -38,6 +39,7 @@ export class GameScene {
         collisionEngine.setCollisionMatrix(new Map([
             [CollisionEngine.DEFAULT_LAYER, [DroppedItem.COLLISION_LAYER, Dude.PLAYER_COLLISION_LAYER, Dude.NPC_COLLISION_LAYER]],
             [Dude.PLAYER_COLLISION_LAYER, [Dude.NPC_COLLISION_LAYER]],
+            [Barrier.PLAYER_ONLY, [Dude.PLAYER_COLLISION_LAYER]]
         ]))
     }
 

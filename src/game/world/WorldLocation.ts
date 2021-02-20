@@ -10,6 +10,7 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { LocationSaveState } from "../saves/LocationSaveState"
 import { newUUID } from "../saves/uuid"
 import { HUD } from "../ui/HUD"
+import { Barrier } from "./Barrier"
 import { ElementComponent } from "./elements/ElementComponent"
 import { Elements, ElementType, SavedElement } from "./elements/Elements"
 import { ElementUtils } from "./elements/ElementUtils"
@@ -32,13 +33,13 @@ export class WorldLocation {
     // BUT an entity should only be in one of these data structures
     private readonly elements = new Grid<ElementComponent>()
     private readonly occupied = new Grid<ElementComponent>()
-
     readonly ground = new Grid<GroundComponent>()
 
     // TODO: Make dropped items saveable
     readonly droppedItems = new Set<Entity>()
 
     private teleporters: { [key: string]: string } = {} 
+    private barriers: Entity[] = []
 
     readonly isInterior: boolean
     readonly allowPlacing: boolean
@@ -193,7 +194,7 @@ export class WorldLocation {
     
             // move player
             const offset = p.standingPosition.minus(p.position)
-            p.moveTo(linkedPosition.minus(offset))
+            p.moveTo(linkedPosition.minus(offset), true)
     
             // makes the camera lerp a bit in the direction of the door
             // TODO make this support non up/down doors
@@ -203,11 +204,16 @@ export class WorldLocation {
         })
     }
 
+    setBarriers(barriers: Barrier[]) {
+        this.barriers = barriers.map(b => b.entity || new Entity([b]))
+    }
+
     getEntities() {
         return Array.from(Array.from(this.dudes.values()).map(d => d.entity))
                 .concat(this.elements.values().map(c => c.entity))
                 .concat(this.ground.values().map(c => c.entity))
                 .concat(Array.from(this.droppedItems))
+                .concat(this.barriers)
     }
 
     getDude(dudeType: DudeType): Dude {
@@ -221,6 +227,7 @@ export class WorldLocation {
             elements: this.saveElements(),
             dudes: Array.from(this.dudes).filter(d => d.isAlive && !!d.entity).map(d => d.save()),
             teleporters: this.teleporters,
+            barriers: this.barriers.map(b => b.getComponent(Barrier).toJson()),
             isInterior: this.isInterior,
             allowPlacing: this.allowPlacing,
         }
@@ -250,6 +257,7 @@ export class WorldLocation {
         const n = new WorldLocation(saveState.isInterior, saveState.allowPlacing)
         n._uuid = saveState.uuid
         n.teleporters = saveState.teleporters
+        n.barriers = saveState.barriers.map(b => Barrier.fromJson(b))
         saveState.elements.forEach(el => n.addElement(el.type, Point.fromString(el.pos), el.obj))
         saveState.ground.forEach(el => n.addGroundElement(el.type, Point.fromString(el.pos), el.obj))
         saveState.dudes.forEach(d => DudeFactory.instance.load(d, n))
