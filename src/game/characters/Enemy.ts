@@ -15,6 +15,11 @@ export class Enemy extends Component {
         this.dude = this.entity.getComponent(Dude)
         this.npc = this.entity.getComponent(NPC)
 
+        if (this.dude.factions.includes(DudeFaction.ORCS)) {
+            // Orcs only show up to siege, so they will find you wherever you're hiding
+            this.npc.findTargetRange = Number.MAX_SAFE_INTEGER
+        }
+
         // DEMON enemies will avoid light
         // TODO: make them burn in the light or something?
         // TODO: Consider splitting this class up 

@@ -10515,6 +10515,10 @@ System.register("game/characters/Enemy", ["engine/component", "game/graphics/Til
                     var _this = this;
                     this.dude = this.entity.getComponent(Dude_3.Dude);
                     this.npc = this.entity.getComponent(NPC_3.NPC);
+                    if (this.dude.factions.includes(1 /* ORCS */)) {
+                        // Orcs only show up to siege, so they will find you wherever you're hiding
+                        this.npc.findTargetRange = Number.MAX_SAFE_INTEGER;
+                    }
                     // DEMON enemies will avoid light
                     // TODO: make them burn in the light or something?
                     // TODO: Consider splitting this class up 
