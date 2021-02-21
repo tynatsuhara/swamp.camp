@@ -17,6 +17,7 @@ import { WorldTime } from "../WorldTime"
 import { TimeUnit } from "../TimeUnit"
 import { CAMPFIRE_DIALOGUE } from "../../characters/dialogues/ItemDialogues"
 import { ElementFactory } from "./ElementFactory"
+import { LocationManager } from "../LocationManager"
 
 export class CampfireFactory extends ElementFactory {
 
@@ -76,6 +77,10 @@ export class CampfireFactory extends ElementFactory {
             [pos], 
             () => { return { logs: cf.logs, llct: cf.lastLogConsumedTime } }
         ))
+    }
+
+    canPlace(pos: Point) {
+        return LocationManager.instance.currentLocation == LocationManager.instance.exterior()
     }
 }
 

@@ -6750,9 +6750,9 @@ System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/poin
         }
     };
 });
-System.register("game/world/elements/Campfire", ["engine/component", "engine/tiles/TileComponent", "engine/tiles/AnimatedTileComponent", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point", "game/world/elements/Interactable", "engine/collision/BoxCollider", "game/world/elements/ElementComponent", "engine/Entity", "game/world/OutdoorDarknessMask", "game/ui/DialogueDisplay", "game/world/WorldTime", "game/world/TimeUnit", "game/characters/dialogues/ItemDialogues", "game/world/elements/ElementFactory"], function (exports_82, context_82) {
+System.register("game/world/elements/Campfire", ["engine/component", "engine/tiles/TileComponent", "engine/tiles/AnimatedTileComponent", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point", "game/world/elements/Interactable", "engine/collision/BoxCollider", "game/world/elements/ElementComponent", "engine/Entity", "game/world/OutdoorDarknessMask", "game/ui/DialogueDisplay", "game/world/WorldTime", "game/world/TimeUnit", "game/characters/dialogues/ItemDialogues", "game/world/elements/ElementFactory", "game/world/LocationManager"], function (exports_82, context_82) {
     "use strict";
-    var component_18, TileComponent_5, AnimatedTileComponent_3, Tilesets_17, TileTransform_17, point_45, Interactable_2, BoxCollider_3, ElementComponent_2, Entity_15, OutdoorDarknessMask_1, DialogueDisplay_1, WorldTime_4, TimeUnit_3, ItemDialogues_1, ElementFactory_2, CampfireFactory, Campfire;
+    var component_18, TileComponent_5, AnimatedTileComponent_3, Tilesets_17, TileTransform_17, point_45, Interactable_2, BoxCollider_3, ElementComponent_2, Entity_15, OutdoorDarknessMask_1, DialogueDisplay_1, WorldTime_4, TimeUnit_3, ItemDialogues_1, ElementFactory_2, LocationManager_10, CampfireFactory, Campfire;
     var __moduleName = context_82 && context_82.id;
     return {
         setters: [
@@ -6803,6 +6803,9 @@ System.register("game/world/elements/Campfire", ["engine/component", "engine/til
             },
             function (ElementFactory_2_1) {
                 ElementFactory_2 = ElementFactory_2_1;
+            },
+            function (LocationManager_10_1) {
+                LocationManager_10 = LocationManager_10_1;
             }
         ],
         execute: function () {
@@ -6843,6 +6846,9 @@ System.register("game/world/elements/Campfire", ["engine/component", "engine/til
                         DialogueDisplay_1.DialogueDisplay.instance.startDialogue(cf);
                     }, new point_45.Point(1, -Tilesets_17.TILE_SIZE)));
                     return e.addComponent(new ElementComponent_2.ElementComponent(4 /* CAMPFIRE */, pos, [pos], function () { return { logs: cf.logs, llct: cf.lastLogConsumedTime }; }));
+                };
+                CampfireFactory.prototype.canPlace = function (pos) {
+                    return LocationManager_10.LocationManager.instance.currentLocation == LocationManager_10.LocationManager.instance.exterior();
                 };
                 return CampfireFactory;
             }(ElementFactory_2.ElementFactory));
@@ -7382,7 +7388,7 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
 });
 System.register("game/characters/NPC", ["engine/component", "engine/point", "engine/util/Lists", "game/graphics/Tilesets", "game/ui/DialogueDisplay", "game/world/elements/House", "game/world/LocationManager", "game/world/OutdoorDarknessMask", "game/world/TimeUnit", "game/characters/Dude", "game/characters/NPCSchedule", "game/characters/Player"], function (exports_88, context_88) {
     "use strict";
-    var component_21, point_49, Lists_4, Tilesets_21, DialogueDisplay_3, House_3, LocationManager_10, OutdoorDarknessMask_2, TimeUnit_4, Dude_1, NPCSchedule_1, Player_7, NPC;
+    var component_21, point_49, Lists_4, Tilesets_21, DialogueDisplay_3, House_3, LocationManager_11, OutdoorDarknessMask_2, TimeUnit_4, Dude_1, NPCSchedule_1, Player_7, NPC;
     var __moduleName = context_88 && context_88.id;
     return {
         setters: [
@@ -7404,8 +7410,8 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
             function (House_3_1) {
                 House_3 = House_3_1;
             },
-            function (LocationManager_10_1) {
-                LocationManager_10 = LocationManager_10_1;
+            function (LocationManager_11_1) {
+                LocationManager_11 = LocationManager_11_1;
             },
             function (OutdoorDarknessMask_2_1) {
                 OutdoorDarknessMask_2 = OutdoorDarknessMask_2_1;
@@ -7530,7 +7536,7 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
                         // TODO 
                         var home = this.findHomeLocation();
                         if (this.dude.location !== home) {
-                            this.useTeleporter(LocationManager_10.LocationManager.instance.exterior().getTeleporter(home.uuid));
+                            this.useTeleporter(LocationManager_11.LocationManager.instance.exterior().getTeleporter(home.uuid));
                         }
                     }
                 };
@@ -7584,7 +7590,7 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
                     if (speedMultiplier === void 0) { speedMultiplier = 1; }
                     if (ptSelectionFilter === void 0) { ptSelectionFilter = function () { return true; }; }
                     if (!this.fleePath || this.fleePath.length === 0) { // only try once per upate() to find a path
-                        var l_1 = LocationManager_10.LocationManager.instance.currentLocation;
+                        var l_1 = LocationManager_11.LocationManager.instance.currentLocation;
                         var openPoints = l_1.ground.keys().filter(function (pt) { return !l_1.isOccupied(pt); });
                         var pt = void 0;
                         for (var i = 0; i < 5; i++) {
@@ -7679,7 +7685,7 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
                 };
                 NPC.prototype.checkForEnemies = function () {
                     var _this = this;
-                    var enemies = Array.from(LocationManager_10.LocationManager.instance.currentLocation.dudes)
+                    var enemies = Array.from(LocationManager_11.LocationManager.instance.currentLocation.dudes)
                         .filter(function (d) { return d.isAlive; })
                         .filter(this.isEnemyFn)
                         .filter(function (d) { return d.standingPosition.distanceTo(_this.dude.standingPosition) < _this.findTargetRange; });
@@ -7723,7 +7729,7 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
                     var start = Tilesets_21.pixelPtToTilePt(pixelPtStart);
                     var end = tilePt;
                     // TODO: NPCs can sometimes get stuck if their starting square is "occupied"
-                    return (_a = LocationManager_10.LocationManager.instance.currentLocation
+                    return (_a = LocationManager_11.LocationManager.instance.currentLocation
                         .findPath(start, end, this.pathFindingHeuristic)) === null || _a === void 0 ? void 0 : _a.map(function (pt) { return _this.tilePtToStandingPos(pt); }).slice(1); // slice(1) because we don't need the start in the path
                 };
                 NPC.prototype.findTeleporter = function (uuid) {
@@ -7749,11 +7755,11 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
                 };
                 NPC.prototype.findHomeLocation = function () {
                     var _this = this;
-                    var houses = LocationManager_10.LocationManager.instance.exterior().getElementsOfType(6 /* HOUSE */)
+                    var houses = LocationManager_11.LocationManager.instance.exterior().getElementsOfType(6 /* HOUSE */)
                         .map(function (el) { return el.entity.getComponent(House_3.House); })
                         .filter(function (house) { return house.getResident() === _this.dude.uuid; });
                     if (houses.length > 0) {
-                        return LocationManager_10.LocationManager.instance.get(houses[0].locationUUID);
+                        return LocationManager_11.LocationManager.instance.get(houses[0].locationUUID);
                     }
                 };
                 NPC.prototype.tilePtToStandingPos = function (tilePt) {
@@ -7911,7 +7917,7 @@ System.register("game/ui/NotificationDisplay", ["engine/component", "engine/Enti
 });
 System.register("game/world/events/QueuedEvent", ["game/characters/DudeFactory", "game/world/MapGenerator", "game/world/LocationManager", "game/characters/NPCSchedule", "game/characters/NPC", "game/graphics/Tilesets", "game/world/events/EventQueue", "game/world/WorldTime", "game/world/elements/House", "game/ui/NotificationDisplay"], function (exports_90, context_90) {
     "use strict";
-    var _a, DudeFactory_2, MapGenerator_4, LocationManager_11, NPCSchedule_2, NPC_2, Tilesets_23, EventQueue_4, WorldTime_5, House_4, NotificationDisplay_1, QueuedEventType, EVENT_QUEUE_HANDLERS;
+    var _a, DudeFactory_2, MapGenerator_4, LocationManager_12, NPCSchedule_2, NPC_2, Tilesets_23, EventQueue_4, WorldTime_5, House_4, NotificationDisplay_1, QueuedEventType, EVENT_QUEUE_HANDLERS;
     var __moduleName = context_90 && context_90.id;
     return {
         setters: [
@@ -7921,8 +7927,8 @@ System.register("game/world/events/QueuedEvent", ["game/characters/DudeFactory",
             function (MapGenerator_4_1) {
                 MapGenerator_4 = MapGenerator_4_1;
             },
-            function (LocationManager_11_1) {
-                LocationManager_11 = LocationManager_11_1;
+            function (LocationManager_12_1) {
+                LocationManager_12 = LocationManager_12_1;
             },
             function (NPCSchedule_2_1) {
                 NPCSchedule_2 = NPCSchedule_2_1;
@@ -7956,8 +7962,8 @@ System.register("game/world/events/QueuedEvent", ["game/characters/DudeFactory",
             exports_90("QueuedEventType", QueuedEventType);
             exports_90("EVENT_QUEUE_HANDLERS", EVENT_QUEUE_HANDLERS = (_a = {},
                 _a[QueuedEventType.SIMULATE_NPCS] = function () {
-                    LocationManager_11.LocationManager.instance.getLocations()
-                        .filter(function (l) { return l !== LocationManager_11.LocationManager.instance.currentLocation; })
+                    LocationManager_12.LocationManager.instance.getLocations()
+                        .filter(function (l) { return l !== LocationManager_12.LocationManager.instance.currentLocation; })
                         .flatMap(function (l) { return Array.from(l.dudes); })
                         .forEach(function (d) { return d.entity.getComponent(NPC_2.NPC).simulate(); });
                     EventQueue_4.EventQueue.instance.addEvent({
@@ -7966,12 +7972,12 @@ System.register("game/world/events/QueuedEvent", ["game/characters/DudeFactory",
                     });
                 },
                 _a[QueuedEventType.HERALD_ARRIVAL] = function () {
-                    DudeFactory_2.DudeFactory.instance.new(4 /* HERALD */, MapGenerator_4.MapGenerator.ENTER_LAND_POS, LocationManager_11.LocationManager.instance.exterior());
+                    DudeFactory_2.DudeFactory.instance.new(4 /* HERALD */, MapGenerator_4.MapGenerator.ENTER_LAND_POS, LocationManager_12.LocationManager.instance.exterior());
                     NotificationDisplay_1.NotificationDisplay.instance.push(NotificationDisplay_1.Notifications.NEW_VILLAGER);
                 },
                 _a[QueuedEventType.HERALD_DEPARTURE] = function (data) {
                     var goalPosition = MapGenerator_4.MapGenerator.ENTER_LAND_POS;
-                    var berto = LocationManager_11.LocationManager.instance.exterior().getDude(4 /* HERALD */);
+                    var berto = LocationManager_12.LocationManager.instance.exterior().getDude(4 /* HERALD */);
                     if (!berto) {
                         return;
                     }
@@ -7998,13 +8004,13 @@ System.register("game/world/events/QueuedEvent", ["game/characters/DudeFactory",
                 },
                 _a[QueuedEventType.HERALD_RETURN_WITH_NPC] = function (data) {
                     NotificationDisplay_1.NotificationDisplay.instance.push(NotificationDisplay_1.Notifications.NEW_VILLAGER);
-                    var berto = LocationManager_11.LocationManager.instance.exterior().getDude(4 /* HERALD */);
+                    var berto = LocationManager_12.LocationManager.instance.exterior().getDude(4 /* HERALD */);
                     if (!berto) {
                         return;
                     }
                     berto.entity.getComponent(NPC_2.NPC).setSchedule(data.normalSchedule);
-                    var villager = DudeFactory_2.DudeFactory.instance.new(7 /* VILLAGER */, MapGenerator_4.MapGenerator.ENTER_LAND_POS, LocationManager_11.LocationManager.instance.exterior());
-                    var house = LocationManager_11.LocationManager.instance.exterior().getElementsOfType(6 /* HOUSE */)
+                    var villager = DudeFactory_2.DudeFactory.instance.new(7 /* VILLAGER */, MapGenerator_4.MapGenerator.ENTER_LAND_POS, LocationManager_12.LocationManager.instance.exterior());
+                    var house = LocationManager_12.LocationManager.instance.exterior().getElementsOfType(6 /* HOUSE */)
                         .map(function (e) { return e.entity.getComponent(House_4.House); })
                         .filter(function (house) { return house.isResidentPending(); })[0];
                     house === null || house === void 0 ? void 0 : house.setResident(villager.uuid);
@@ -8041,7 +8047,7 @@ System.register("game/saves/SaveGame", [], function (exports_91, context_91) {
 });
 System.register("game/SaveManager", ["game/characters/Player", "game/saves/SaveGame", "game/world/LocationManager", "game/ui/UIStateManager", "game/cutscenes/Camera", "game/ui/HUD", "game/world/WorldTime", "game/world/events/EventQueue"], function (exports_92, context_92) {
     "use strict";
-    var Player_8, SaveGame_1, LocationManager_12, UIStateManager_11, Camera_9, HUD_2, WorldTime_6, EventQueue_5, SAVE_KEY, SaveManager, saveManager;
+    var Player_8, SaveGame_1, LocationManager_13, UIStateManager_11, Camera_9, HUD_2, WorldTime_6, EventQueue_5, SAVE_KEY, SaveManager, saveManager;
     var __moduleName = context_92 && context_92.id;
     return {
         setters: [
@@ -8051,8 +8057,8 @@ System.register("game/SaveManager", ["game/characters/Player", "game/saves/SaveG
             function (SaveGame_1_1) {
                 SaveGame_1 = SaveGame_1_1;
             },
-            function (LocationManager_12_1) {
-                LocationManager_12 = LocationManager_12_1;
+            function (LocationManager_13_1) {
+                LocationManager_13 = LocationManager_13_1;
             },
             function (UIStateManager_11_1) {
                 UIStateManager_11 = UIStateManager_11_1;
@@ -8107,7 +8113,7 @@ System.register("game/SaveManager", ["game/characters/Player", "game/saves/SaveG
                     var save = {
                         timeSaved: new Date().getTime(),
                         saveVersion: 0,
-                        locations: LocationManager_12.LocationManager.instance.save(),
+                        locations: LocationManager_13.LocationManager.instance.save(),
                         worldTime: WorldTime_6.WorldTime.instance.time,
                         eventQueue: EventQueue_5.EventQueue.instance.save(),
                         state: this.state,
@@ -8130,9 +8136,9 @@ System.register("game/SaveManager", ["game/characters/Player", "game/saves/SaveG
                     prettyPrintTimestamp.setTime(save.timeSaved);
                     console.log("loaded save from " + prettyPrintTimestamp);
                     WorldTime_6.WorldTime.instance.initialize(save.worldTime);
-                    LocationManager_12.LocationManager.instance.initialize(save.locations);
+                    LocationManager_13.LocationManager.instance.initialize(save.locations);
                     EventQueue_5.EventQueue.instance.initialize(save.eventQueue);
-                    Camera_9.Camera.instance.focusOnDude(Array.from(LocationManager_12.LocationManager.instance.currentLocation.dudes).filter(function (d) { return d.type === 0 /* PLAYER */; })[0]);
+                    Camera_9.Camera.instance.focusOnDude(Array.from(LocationManager_13.LocationManager.instance.currentLocation.dudes).filter(function (d) { return d.type === 0 /* PLAYER */; })[0]);
                     // clear existing UI state
                     UIStateManager_11.UIStateManager.instance.destroy();
                 };
@@ -8152,7 +8158,7 @@ System.register("game/SaveManager", ["game/characters/Player", "game/saves/SaveG
 });
 System.register("game/ui/PlaceElementFrame", ["engine/component", "game/graphics/Tilesets", "engine/point", "engine/tiles/NineSlice", "game/ui/UIStateManager", "game/world/LocationManager", "game/ui/PlaceElementDisplay", "engine/util/utils", "engine/tiles/TileTransform", "game/world/elements/Elements"], function (exports_93, context_93) {
     "use strict";
-    var component_23, Tilesets_24, point_51, NineSlice_6, UIStateManager_12, LocationManager_13, PlaceElementDisplay_1, utils_7, TileTransform_20, Elements_2, PlaceElementFrame;
+    var component_23, Tilesets_24, point_51, NineSlice_6, UIStateManager_12, LocationManager_14, PlaceElementDisplay_1, utils_7, TileTransform_20, Elements_2, PlaceElementFrame;
     var __moduleName = context_93 && context_93.id;
     return {
         setters: [
@@ -8171,8 +8177,8 @@ System.register("game/ui/PlaceElementFrame", ["engine/component", "game/graphics
             function (UIStateManager_12_1) {
                 UIStateManager_12 = UIStateManager_12_1;
             },
-            function (LocationManager_13_1) {
-                LocationManager_13 = LocationManager_13_1;
+            function (LocationManager_14_1) {
+                LocationManager_14 = LocationManager_14_1;
             },
             function (PlaceElementDisplay_1_1) {
                 PlaceElementDisplay_1 = PlaceElementDisplay_1_1;
@@ -8247,18 +8253,18 @@ System.register("game/ui/PlaceElementFrame", ["engine/component", "game/graphics
                         for (var y = pos.y; y < pos.y + this.dimensions.y; y++) {
                             var pt = new point_51.Point(x, y);
                             // there's already an element here
-                            if (!!LocationManager_13.LocationManager.instance.currentLocation.getElement(pt)) {
+                            if (!!LocationManager_14.LocationManager.instance.currentLocation.getElement(pt)) {
                                 return false;
                             }
                             // there's no ground here
-                            if (!LocationManager_13.LocationManager.instance.currentLocation.ground.get(pt)) {
+                            if (!LocationManager_14.LocationManager.instance.currentLocation.ground.get(pt)) {
                                 return false;
                             }
                         }
                     }
                     var p = pos.times(Tilesets_24.TILE_SIZE);
                     var d = this.dimensions.times(Tilesets_24.TILE_SIZE);
-                    var intersectingDudes = Array.from(LocationManager_13.LocationManager.instance.currentLocation.dudes).some(function (dude) {
+                    var intersectingDudes = Array.from(LocationManager_14.LocationManager.instance.currentLocation.dudes).some(function (dude) {
                         return utils_7.rectContains(p, d, dude.standingPosition) || utils_7.rectContains(p, d, dude.standingPosition.plusY(-Tilesets_24.TILE_SIZE));
                     });
                     if (intersectingDudes) {
@@ -8274,7 +8280,7 @@ System.register("game/ui/PlaceElementFrame", ["engine/component", "game/graphics
 });
 System.register("game/ui/PlaceElementDisplay", ["engine/Entity", "engine/component", "game/world/elements/Elements", "game/Controls", "game/world/LocationManager", "game/characters/Player", "game/ui/PlaceElementFrame"], function (exports_94, context_94) {
     "use strict";
-    var Entity_19, component_24, Elements_3, Controls_3, LocationManager_14, Player_9, PlaceElementFrame_1, PlaceElementDisplay;
+    var Entity_19, component_24, Elements_3, Controls_3, LocationManager_15, Player_9, PlaceElementFrame_1, PlaceElementDisplay;
     var __moduleName = context_94 && context_94.id;
     return {
         setters: [
@@ -8290,8 +8296,8 @@ System.register("game/ui/PlaceElementDisplay", ["engine/Entity", "engine/compone
             function (Controls_3_1) {
                 Controls_3 = Controls_3_1;
             },
-            function (LocationManager_14_1) {
-                LocationManager_14 = LocationManager_14_1;
+            function (LocationManager_15_1) {
+                LocationManager_15 = LocationManager_15_1;
             },
             function (Player_9_1) {
                 Player_9 = Player_9_1;
@@ -8335,7 +8341,7 @@ System.register("game/ui/PlaceElementDisplay", ["engine/Entity", "engine/compone
                 // Should only be called by PlaceElementFrame
                 PlaceElementDisplay.prototype.finishPlacing = function (elementPos) {
                     this.successFn(); // remove from inv
-                    LocationManager_14.LocationManager.instance.currentLocation.addElement(this.element, elementPos);
+                    LocationManager_15.LocationManager.instance.currentLocation.addElement(this.element, elementPos);
                     this.close();
                 };
                 PlaceElementDisplay.prototype.getEntities = function () {
@@ -8352,7 +8358,7 @@ System.register("game/ui/PlaceElementDisplay", ["engine/Entity", "engine/compone
 });
 System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity", "engine/point", "engine/renderer/BasicRenderComponent", "engine/renderer/TextRender", "engine/tiles/AnimatedTileComponent", "engine/tiles/NineSlice", "engine/tiles/TileTransform", "game/characters/Player", "game/characters/weapons/WeaponType", "game/Controls", "game/cutscenes/Camera", "game/graphics/Tilesets", "game/items/Items", "game/SaveManager", "game/world/LocationManager", "game/ui/PlaceElementDisplay", "game/ui/Text", "game/ui/Tooltip", "game/ui/UIStateManager"], function (exports_95, context_95) {
     "use strict";
-    var component_25, Entity_20, point_52, BasicRenderComponent_7, TextRender_7, AnimatedTileComponent_4, NineSlice_7, TileTransform_21, Player_10, WeaponType_1, Controls_4, Camera_10, Tilesets_25, Items_3, SaveManager_3, LocationManager_15, PlaceElementDisplay_2, Text_8, Tooltip_3, UIStateManager_13, InventoryDisplay;
+    var component_25, Entity_20, point_52, BasicRenderComponent_7, TextRender_7, AnimatedTileComponent_4, NineSlice_7, TileTransform_21, Player_10, WeaponType_1, Controls_4, Camera_10, Tilesets_25, Items_3, SaveManager_3, LocationManager_16, PlaceElementDisplay_2, Text_8, Tooltip_3, UIStateManager_13, InventoryDisplay;
     var __moduleName = context_95 && context_95.id;
     return {
         setters: [
@@ -8401,8 +8407,8 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
             function (SaveManager_3_1) {
                 SaveManager_3 = SaveManager_3_1;
             },
-            function (LocationManager_15_1) {
-                LocationManager_15 = LocationManager_15_1;
+            function (LocationManager_16_1) {
+                LocationManager_16 = LocationManager_16_1;
             },
             function (PlaceElementDisplay_2_1) {
                 PlaceElementDisplay_2 = PlaceElementDisplay_2_1;
@@ -8502,7 +8508,7 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                                 stack_1.count--;
                             }
                         };
-                        if (item_1.element !== null && LocationManager_15.LocationManager.instance.currentLocation.allowPlacing) {
+                        if (item_1.element !== null && LocationManager_16.LocationManager.instance.currentLocation.allowPlacing) {
                             actions.push({
                                 verb: 'place',
                                 actionFn: function () {
@@ -9275,7 +9281,7 @@ System.register("game/world/elements/Hittable", ["engine/component", "engine/uti
 });
 System.register("game/world/elements/Mushroom", ["engine/component", "engine/Entity", "engine/point", "engine/tiles/TileComponent", "engine/tiles/TileTransform", "game/characters/DudeFactory", "game/graphics/Tilesets", "game/items/Items", "game/world/LocationManager", "game/world/TimeUnit", "game/world/WorldTime", "game/world/elements/ElementComponent", "game/world/elements/ElementFactory", "game/world/elements/Hittable"], function (exports_105, context_105) {
     "use strict";
-    var component_31, Entity_25, point_59, TileComponent_6, TileTransform_26, DudeFactory_3, Tilesets_31, Items_4, LocationManager_16, TimeUnit_5, WorldTime_7, ElementComponent_5, ElementFactory_5, Hittable_1, NEXT_GROWTH_TIME, MushroomFactory, GrowableShroom;
+    var component_31, Entity_25, point_59, TileComponent_6, TileTransform_26, DudeFactory_3, Tilesets_31, Items_4, LocationManager_17, TimeUnit_5, WorldTime_7, ElementComponent_5, ElementFactory_5, Hittable_1, NEXT_GROWTH_TIME, MushroomFactory, GrowableShroom;
     var __moduleName = context_105 && context_105.id;
     return {
         setters: [
@@ -9303,8 +9309,8 @@ System.register("game/world/elements/Mushroom", ["engine/component", "engine/Ent
             function (Items_4_1) {
                 Items_4 = Items_4_1;
             },
-            function (LocationManager_16_1) {
-                LocationManager_16 = LocationManager_16_1;
+            function (LocationManager_17_1) {
+                LocationManager_17 = LocationManager_17_1;
             },
             function (TimeUnit_5_1) {
                 TimeUnit_5 = TimeUnit_5_1;
@@ -9352,7 +9358,7 @@ System.register("game/world/elements/Mushroom", ["engine/component", "engine/Ent
                     }));
                     e.addComponent(new GrowableShroom(nextGrowthTime, function () {
                         e.selfDestruct();
-                        DudeFactory_3.DudeFactory.instance.new(6 /* SHROOM */, pos.times(Tilesets_31.TILE_SIZE).plusY(-Tilesets_31.TILE_SIZE).plusX(-Tilesets_31.TILE_SIZE / 2), LocationManager_16.LocationManager.instance.exterior());
+                        DudeFactory_3.DudeFactory.instance.new(6 /* SHROOM */, pos.times(Tilesets_31.TILE_SIZE).plusY(-Tilesets_31.TILE_SIZE).plusX(-Tilesets_31.TILE_SIZE / 2), LocationManager_17.LocationManager.instance.exterior());
                     }));
                     return e.addComponent(new ElementComponent_5.ElementComponent(this.type, pos, [pos], function () {
                         var _a;
@@ -9362,7 +9368,7 @@ System.register("game/world/elements/Mushroom", ["engine/component", "engine/Ent
                     }));
                 };
                 MushroomFactory.prototype.canPlace = function (pos) {
-                    return LocationManager_16.LocationManager.instance.currentLocation.ground.get(pos.plusY(1)).type === 2 /* GRASS */;
+                    return LocationManager_17.LocationManager.instance.currentLocation.ground.get(pos.plusY(1)).type === 2 /* GRASS */;
                 };
                 MushroomFactory.prototype.nextGrowthTime = function () {
                     // grow every 12-24 hours
@@ -9392,7 +9398,7 @@ System.register("game/world/elements/Mushroom", ["engine/component", "engine/Ent
 });
 System.register("game/world/elements/HittableResource", ["engine/collision/BoxCollider", "engine/point", "game/graphics/Tilesets", "game/items/Items", "game/world/LocationManager", "game/world/elements/ElementComponent", "game/world/elements/Hittable"], function (exports_106, context_106) {
     "use strict";
-    var BoxCollider_5, point_60, Tilesets_32, Items_5, LocationManager_17, ElementComponent_6, Hittable_2, HittableResource;
+    var BoxCollider_5, point_60, Tilesets_32, Items_5, LocationManager_18, ElementComponent_6, Hittable_2, HittableResource;
     var __moduleName = context_106 && context_106.id;
     return {
         setters: [
@@ -9408,8 +9414,8 @@ System.register("game/world/elements/HittableResource", ["engine/collision/BoxCo
             function (Items_5_1) {
                 Items_5 = Items_5_1;
             },
-            function (LocationManager_17_1) {
-                LocationManager_17 = LocationManager_17_1;
+            function (LocationManager_18_1) {
+                LocationManager_18 = LocationManager_18_1;
             },
             function (ElementComponent_6_1) {
                 ElementComponent_6 = ElementComponent_6_1;
@@ -9448,7 +9454,7 @@ System.register("game/world/elements/HittableResource", ["engine/collision/BoxCo
                         }
                     }
                     if (finishingMove) {
-                        LocationManager_17.LocationManager.instance.currentLocation.removeElement(this.entity.getComponent(ElementComponent_6.ElementComponent));
+                        LocationManager_18.LocationManager.instance.currentLocation.removeElement(this.entity.getComponent(ElementComponent_6.ElementComponent));
                         this.entity.selfDestruct();
                     }
                 };
@@ -9583,15 +9589,15 @@ System.register("game/world/interior/AsciiInteriorBuilder", ["engine/point"], fu
 });
 System.register("game/world/interior/Tent", ["game/world/WorldLocation", "game/world/LocationManager", "engine/point", "game/graphics/Tilesets", "engine/tiles/NineSlice", "game/world/interior/AsciiInteriorBuilder", "game/world/interior/InteriorUtils"], function (exports_109, context_109) {
     "use strict";
-    var WorldLocation_2, LocationManager_18, point_63, Tilesets_34, NineSlice_8, AsciiInteriorBuilder_1, InteriorUtils_2, makeTentInterior;
+    var WorldLocation_2, LocationManager_19, point_63, Tilesets_34, NineSlice_8, AsciiInteriorBuilder_1, InteriorUtils_2, makeTentInterior;
     var __moduleName = context_109 && context_109.id;
     return {
         setters: [
             function (WorldLocation_2_1) {
                 WorldLocation_2 = WorldLocation_2_1;
             },
-            function (LocationManager_18_1) {
-                LocationManager_18 = LocationManager_18_1;
+            function (LocationManager_19_1) {
+                LocationManager_19 = LocationManager_19_1;
             },
             function (point_63_1) {
                 point_63 = point_63_1;
@@ -9613,7 +9619,7 @@ System.register("game/world/interior/Tent", ["game/world/WorldLocation", "game/w
             exports_109("makeTentInterior", makeTentInterior = function (outside, color) {
                 var isPlayerTent = color === "blue" /* BLUE */;
                 var l = new WorldLocation_2.WorldLocation(true, isPlayerTent);
-                LocationManager_18.LocationManager.instance.add(l);
+                LocationManager_19.LocationManager.instance.add(l);
                 var floorDimensions = new point_63.Point(5, 4);
                 l.setBarriers(InteriorUtils_2.InteriorUtils.makeBarriers(floorDimensions));
                 var interactablePos = new point_63.Point(2.5, 4).times(Tilesets_34.TILE_SIZE);
@@ -9721,7 +9727,7 @@ System.register("game/world/elements/Tent", ["engine/collision/BoxCollider", "en
 });
 System.register("game/world/elements/Tree", ["engine/point", "game/graphics/Tilesets", "engine/collision/BoxCollider", "engine/tiles/TileComponent", "engine/tiles/TileTransform", "engine/Entity", "game/world/elements/HittableResource", "game/world/elements/ElementComponent", "game/characters/weapons/WeaponType", "game/characters/Player", "game/world/elements/ElementFactory", "engine/component", "game/world/WorldTime", "game/world/TimeUnit", "game/world/LocationManager"], function (exports_111, context_111) {
     "use strict";
-    var point_65, Tilesets_36, BoxCollider_8, TileComponent_9, TileTransform_29, Entity_28, HittableResource_2, ElementComponent_9, WeaponType_3, Player_13, ElementFactory_8, component_32, WorldTime_8, TimeUnit_6, LocationManager_19, NEXT_GROWTH_TIME, SIZE, AVAILABLE_RESOURCES, TreeFactory, GrowableTree;
+    var point_65, Tilesets_36, BoxCollider_8, TileComponent_9, TileTransform_29, Entity_28, HittableResource_2, ElementComponent_9, WeaponType_3, Player_13, ElementFactory_8, component_32, WorldTime_8, TimeUnit_6, LocationManager_20, NEXT_GROWTH_TIME, SIZE, AVAILABLE_RESOURCES, TreeFactory, GrowableTree;
     var __moduleName = context_111 && context_111.id;
     return {
         setters: [
@@ -9767,8 +9773,8 @@ System.register("game/world/elements/Tree", ["engine/point", "game/graphics/Tile
             function (TimeUnit_6_1) {
                 TimeUnit_6 = TimeUnit_6_1;
             },
-            function (LocationManager_19_1) {
-                LocationManager_19 = LocationManager_19_1;
+            function (LocationManager_20_1) {
+                LocationManager_20 = LocationManager_20_1;
             }
         ],
         execute: function () {
@@ -9843,7 +9849,7 @@ System.register("game/world/elements/Tree", ["engine/point", "game/graphics/Tile
                     }));
                 };
                 TreeFactory.prototype.canPlace = function (pos) {
-                    return LocationManager_19.LocationManager.instance.currentLocation.ground.get(pos.plusY(1)).type === 2 /* GRASS */;
+                    return LocationManager_20.LocationManager.instance.currentLocation.ground.get(pos.plusY(1)).type === 2 /* GRASS */;
                 };
                 TreeFactory.prototype.nextGrowthTime = function () {
                     // grow every 24-48 hours
@@ -9946,7 +9952,7 @@ System.register("game/world/elements/Elements", ["game/world/Teleporter", "game/
 });
 System.register("game/world/MapGenerator", ["engine/point", "engine/util/Grid", "engine/util/Lists", "engine/util/Noise", "game/graphics/Tilesets", "game/world/LocationManager", "game/world/WorldLocation"], function (exports_113, context_113) {
     "use strict";
-    var point_66, Grid_4, Lists_5, Noise_1, Tilesets_37, LocationManager_20, WorldLocation_3, MapGenerator;
+    var point_66, Grid_4, Lists_5, Noise_1, Tilesets_37, LocationManager_21, WorldLocation_3, MapGenerator;
     var __moduleName = context_113 && context_113.id;
     return {
         setters: [
@@ -9965,8 +9971,8 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/util/Grid", 
             function (Tilesets_37_1) {
                 Tilesets_37 = Tilesets_37_1;
             },
-            function (LocationManager_20_1) {
-                LocationManager_20 = LocationManager_20_1;
+            function (LocationManager_21_1) {
+                LocationManager_21 = LocationManager_21_1;
             },
             function (WorldLocation_3_1) {
                 WorldLocation_3 = WorldLocation_3_1;
@@ -9975,7 +9981,7 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/util/Grid", 
         execute: function () {
             MapGenerator = /** @class */ (function () {
                 function MapGenerator() {
-                    this.location = LocationManager_20.LocationManager.instance.add(new WorldLocation_3.WorldLocation(false, true));
+                    this.location = LocationManager_21.LocationManager.instance.add(new WorldLocation_3.WorldLocation(false, true));
                     this.tentPos = new point_66.Point(-3, -3);
                     MapGenerator._instance = this;
                 }
@@ -10305,7 +10311,7 @@ System.register("game/world/TownStats", ["game/SaveManager"], function (exports_
 });
 System.register("game/characters/Player", ["engine/component", "engine/debug", "engine/point", "engine/util/Lists", "game/Controls", "game/cutscenes/Camera", "game/graphics/Tilesets", "game/ui/NotificationDisplay", "game/ui/UIStateManager", "game/world/elements/Interactable", "game/world/LocationManager", "game/characters/Dude", "game/characters/DudeFactory"], function (exports_116, context_116) {
     "use strict";
-    var component_33, debug_3, point_68, Lists_6, Controls_7, Camera_11, Tilesets_39, NotificationDisplay_3, UIStateManager_18, Interactable_6, LocationManager_21, Dude_2, DudeFactory_4, Player;
+    var component_33, debug_3, point_68, Lists_6, Controls_7, Camera_11, Tilesets_39, NotificationDisplay_3, UIStateManager_18, Interactable_6, LocationManager_22, Dude_2, DudeFactory_4, Player;
     var __moduleName = context_116 && context_116.id;
     return {
         setters: [
@@ -10339,8 +10345,8 @@ System.register("game/characters/Player", ["engine/component", "engine/debug", "
             function (Interactable_6_1) {
                 Interactable_6 = Interactable_6_1;
             },
-            function (LocationManager_21_1) {
-                LocationManager_21 = LocationManager_21_1;
+            function (LocationManager_22_1) {
+                LocationManager_22 = LocationManager_22_1;
             },
             function (Dude_2_1) {
                 Dude_2 = Dude_2_1;
@@ -10452,10 +10458,10 @@ System.register("game/characters/Player", ["engine/component", "engine/debug", "
                             });
                         }
                         if (updateData.input.isKeyDown(188 /* COMMA */)) {
-                            LocationManager_21.LocationManager.instance.currentLocation.addElement(8 /* CHEST */, mouseTilePos);
+                            LocationManager_22.LocationManager.instance.currentLocation.addElement(8 /* CHEST */, mouseTilePos);
                         }
                         if (updateData.input.isKeyDown(190 /* PERIOD */)) {
-                            LocationManager_21.LocationManager.instance.currentLocation.removeElementAt(mouseTilePos);
+                            LocationManager_22.LocationManager.instance.currentLocation.removeElementAt(mouseTilePos);
                         }
                     }
                     // update crosshair position
@@ -10618,7 +10624,7 @@ System.register("game/cutscenes/CutscenePlayerController", ["engine/component", 
 });
 System.register("game/characters/ShroomNPC", ["engine/component", "game/graphics/Tilesets", "game/world/LocationManager", "game/world/TimeUnit", "game/world/WorldTime", "game/characters/Dude", "game/characters/DudeFactory", "game/characters/Enemy", "game/characters/weapons/WeaponType"], function (exports_119, context_119) {
     "use strict";
-    var component_36, Tilesets_41, LocationManager_22, TimeUnit_7, WorldTime_9, Dude_5, DudeFactory_5, Enemy_1, WeaponType_4, SIZE, NEXT_GROWTH_TIME, ShroomNPC;
+    var component_36, Tilesets_41, LocationManager_23, TimeUnit_7, WorldTime_9, Dude_5, DudeFactory_5, Enemy_1, WeaponType_4, SIZE, NEXT_GROWTH_TIME, ShroomNPC;
     var __moduleName = context_119 && context_119.id;
     return {
         setters: [
@@ -10628,8 +10634,8 @@ System.register("game/characters/ShroomNPC", ["engine/component", "game/graphics
             function (Tilesets_41_1) {
                 Tilesets_41 = Tilesets_41_1;
             },
-            function (LocationManager_22_1) {
-                LocationManager_22 = LocationManager_22_1;
+            function (LocationManager_23_1) {
+                LocationManager_23 = LocationManager_23_1;
             },
             function (TimeUnit_7_1) {
                 TimeUnit_7 = TimeUnit_7_1;
@@ -10689,7 +10695,7 @@ System.register("game/characters/ShroomNPC", ["engine/component", "game/graphics
                     if (ogSize === 3 || Math.random() > 0.5) {
                         // spread more shrooms
                         var tilePos = Tilesets_41.pixelPtToTilePt(this.dude.standingPosition);
-                        var plantedShroom = LocationManager_22.LocationManager.instance.exterior().addElement(7 /* MUSHROOM */, tilePos);
+                        var plantedShroom = LocationManager_23.LocationManager.instance.exterior().addElement(7 /* MUSHROOM */, tilePos);
                         if (!!plantedShroom) {
                             // successfully planted
                             return;
@@ -10703,7 +10709,7 @@ System.register("game/characters/ShroomNPC", ["engine/component", "game/graphics
                     newData.anim = ["SmallMushroom", "NormalMushroom", "LargeMushroom",][newSize - 1];
                     // delete and respawn the shroom dude
                     this.entity.selfDestruct();
-                    DudeFactory_5.DudeFactory.instance.load(newData, LocationManager_22.LocationManager.instance.exterior());
+                    DudeFactory_5.DudeFactory.instance.load(newData, LocationManager_23.LocationManager.instance.exterior());
                 };
                 ShroomNPC.prototype.isAggro = function () {
                     return !!this.enemy && this.dude.blob[SIZE] > 1;
@@ -10823,7 +10829,7 @@ System.register("game/characters/Villager", ["engine/component", "game/character
 });
 System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point", "game/characters/Player", "game/characters/Dude", "game/characters/NPC", "game/world/LocationManager", "game/characters/Enemy", "game/items/Inventory", "game/characters/Dialogue", "game/cutscenes/CutscenePlayerController", "game/characters/Villager", "game/characters/NPCSchedule", "engine/util/Lists", "game/characters/weapons/WeaponType", "game/characters/dialogues/BertoIntro", "game/characters/ShroomNPC", "game/saves/uuid", "game/characters/Centaur"], function (exports_122, context_122) {
     "use strict";
-    var Entity_29, point_70, Player_15, Dude_8, NPC_6, LocationManager_23, Enemy_2, Inventory_3, Dialogue_6, CutscenePlayerController_1, Villager_1, NPCSchedule_3, Lists_7, WeaponType_5, BertoIntro_2, ShroomNPC_2, uuid_2, Centaur_2, DudeFactory;
+    var Entity_29, point_70, Player_15, Dude_8, NPC_6, LocationManager_24, Enemy_2, Inventory_3, Dialogue_6, CutscenePlayerController_1, Villager_1, NPCSchedule_3, Lists_7, WeaponType_5, BertoIntro_2, ShroomNPC_2, uuid_2, Centaur_2, DudeFactory;
     var __moduleName = context_122 && context_122.id;
     return {
         setters: [
@@ -10842,8 +10848,8 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
             function (NPC_6_1) {
                 NPC_6 = NPC_6_1;
             },
-            function (LocationManager_23_1) {
-                LocationManager_23 = LocationManager_23_1;
+            function (LocationManager_24_1) {
+                LocationManager_24 = LocationManager_24_1;
             },
             function (Enemy_2_1) {
                 Enemy_2 = Enemy_2_1;
@@ -10901,7 +10907,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                  * Create a new Dude in the specified location, defaults to the exterior world location
                  */
                 DudeFactory.prototype.new = function (type, pos, location) {
-                    if (location === void 0) { location = LocationManager_23.LocationManager.instance.exterior(); }
+                    if (location === void 0) { location = LocationManager_24.LocationManager.instance.exterior(); }
                     return this.make(type, pos, null, location);
                 };
                 /**
@@ -11142,7 +11148,7 @@ System.register("game/world/LocationManager", ["game/world/WorldLocation"], func
 });
 System.register("game/items/DroppedItem", ["engine/collision/BoxCollider", "engine/component", "engine/point", "game/characters/Player", "game/world/LocationManager", "game/items/Items", "game/SaveManager"], function (exports_127, context_127) {
     "use strict";
-    var BoxCollider_9, component_39, point_71, Player_16, LocationManager_24, Items_6, SaveManager_7, DroppedItem;
+    var BoxCollider_9, component_39, point_71, Player_16, LocationManager_25, Items_6, SaveManager_7, DroppedItem;
     var __moduleName = context_127 && context_127.id;
     return {
         setters: [
@@ -11158,8 +11164,8 @@ System.register("game/items/DroppedItem", ["engine/collision/BoxCollider", "engi
             function (Player_16_1) {
                 Player_16 = Player_16_1;
             },
-            function (LocationManager_24_1) {
-                LocationManager_24 = LocationManager_24_1;
+            function (LocationManager_25_1) {
+                LocationManager_25 = LocationManager_25_1;
             },
             function (Items_6_1) {
                 Items_6 = Items_6_1;
@@ -11216,7 +11222,7 @@ System.register("game/items/DroppedItem", ["engine/collision/BoxCollider", "engi
                                         });
                                     }
                                     if (_this.itemType === 0 /* COIN */ || Player_16.Player.instance.dude.inventory.addItem(_this.itemType)) {
-                                        LocationManager_24.LocationManager.instance.currentLocation.droppedItems.delete(_this.entity);
+                                        LocationManager_25.LocationManager.instance.currentLocation.droppedItems.delete(_this.entity);
                                         _this.entity.selfDestruct();
                                     }
                                 }
@@ -11240,7 +11246,7 @@ System.register("game/items/DroppedItem", ["engine/collision/BoxCollider", "engi
 });
 System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", "game/world/LocationManager", "game/items/DroppedItem", "engine/point", "game/characters/weapons/WeaponType", "game/characters/Player"], function (exports_128, context_128) {
     "use strict";
-    var _a, Tilesets_42, Entity_30, LocationManager_25, DroppedItem_1, point_72, WeaponType_6, Player_17, ItemMetadata, ITEM_METADATA_MAP, spawnItem;
+    var _a, Tilesets_42, Entity_30, LocationManager_26, DroppedItem_1, point_72, WeaponType_6, Player_17, ItemMetadata, ITEM_METADATA_MAP, spawnItem;
     var __moduleName = context_128 && context_128.id;
     return {
         setters: [
@@ -11250,8 +11256,8 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
             function (Entity_30_1) {
                 Entity_30 = Entity_30_1;
             },
-            function (LocationManager_25_1) {
-                LocationManager_25 = LocationManager_25_1;
+            function (LocationManager_26_1) {
+                LocationManager_26 = LocationManager_26_1;
             },
             function (DroppedItem_1_1) {
                 DroppedItem_1 = DroppedItem_1_1;
@@ -11376,7 +11382,7 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
             exports_128("spawnItem", spawnItem = function (pos, item, velocity, sourceCollider) {
                 if (velocity === void 0) { velocity = new point_72.Point(0, 0); }
                 if (sourceCollider === void 0) { sourceCollider = null; }
-                LocationManager_25.LocationManager.instance.currentLocation.droppedItems.add(new Entity_30.Entity([
+                LocationManager_26.LocationManager.instance.currentLocation.droppedItems.add(new Entity_30.Entity([
                     new DroppedItem_1.DroppedItem(pos, item, velocity, sourceCollider)
                 ]));
             });
@@ -11675,15 +11681,15 @@ System.register("game/characters/weapons/Shield", ["engine/component", "engine/t
 });
 System.register("game/characters/weapons/Weapon", ["engine/component", "game/world/LocationManager", "game/characters/Dude", "game/world/elements/Hittable", "engine/point"], function (exports_132, context_132) {
     "use strict";
-    var component_41, LocationManager_26, Dude_10, Hittable_3, point_74, Weapon;
+    var component_41, LocationManager_27, Dude_10, Hittable_3, point_74, Weapon;
     var __moduleName = context_132 && context_132.id;
     return {
         setters: [
             function (component_41_1) {
                 component_41 = component_41_1;
             },
-            function (LocationManager_26_1) {
-                LocationManager_26 = LocationManager_26_1;
+            function (LocationManager_27_1) {
+                LocationManager_27 = LocationManager_27_1;
             },
             function (Dude_10_1) {
                 Dude_10 = Dude_10_1;
@@ -11706,7 +11712,7 @@ System.register("game/characters/weapons/Weapon", ["engine/component", "game/wor
                 };
                 // TODO find a better place for these static functions?
                 Weapon.getEnemiesInRange = function (attacker, attackDistance) {
-                    return Array.from(LocationManager_26.LocationManager.instance.currentLocation.dudes)
+                    return Array.from(LocationManager_27.LocationManager.instance.currentLocation.dudes)
                         .filter(function (d) { return !!d && d !== attacker && d.isEnemy(attacker); })
                         .filter(function (d) { return attacker.isFacing(d.standingPosition); })
                         .filter(function (d) { return d.standingPosition.distanceTo(attacker.standingPosition) < attackDistance; });
@@ -11714,7 +11720,7 @@ System.register("game/characters/weapons/Weapon", ["engine/component", "game/wor
                 Weapon.hitResources = function (dude) {
                     var interactDistance = 20;
                     var interactCenter = dude.standingPosition.minus(new point_74.Point(0, 7));
-                    var possibilities = LocationManager_26.LocationManager.instance.currentLocation.getElements()
+                    var possibilities = LocationManager_27.LocationManager.instance.currentLocation.getElements()
                         .map(function (e) { return e.entity.getComponent(Hittable_3.Hittable); })
                         .filter(function (e) { return !!e; })
                         .filter(function (e) { return dude.isFacing(e.position); });
@@ -11969,7 +11975,7 @@ System.register("game/characters/weapons/MeleeWeapon", ["game/characters/weapons
 });
 System.register("game/characters/weapons/Projectile", ["engine/collision/BoxCollider", "engine/component", "engine/Entity", "engine/point", "game/world/LocationManager", "game/items/DroppedItem", "engine/util/Lists"], function (exports_135, context_135) {
     "use strict";
-    var BoxCollider_10, component_42, Entity_31, point_76, LocationManager_27, DroppedItem_2, Lists_8, Projectile, spawnProjectile;
+    var BoxCollider_10, component_42, Entity_31, point_76, LocationManager_28, DroppedItem_2, Lists_8, Projectile, spawnProjectile;
     var __moduleName = context_135 && context_135.id;
     return {
         setters: [
@@ -11985,8 +11991,8 @@ System.register("game/characters/weapons/Projectile", ["engine/collision/BoxColl
             function (point_76_1) {
                 point_76 = point_76_1;
             },
-            function (LocationManager_27_1) {
-                LocationManager_27 = LocationManager_27_1;
+            function (LocationManager_28_1) {
+                LocationManager_28 = LocationManager_28_1;
             },
             function (DroppedItem_2_1) {
                 DroppedItem_2 = DroppedItem_2_1;
@@ -12054,7 +12060,7 @@ System.register("game/characters/weapons/Projectile", ["engine/collision/BoxColl
                     return _this;
                 }
                 Projectile.prototype.getEnemy = function (attacker, projectilePos, velocity, attackDistance) {
-                    var allEnemies = Array.from(LocationManager_27.LocationManager.instance.currentLocation.dudes)
+                    var allEnemies = Array.from(LocationManager_28.LocationManager.instance.currentLocation.dudes)
                         .filter(function (d) { return !!d && d !== attacker && d.isEnemy(attacker); })
                         .filter(function (d) { return d.standingPosition.distanceTo(projectilePos) < attackDistance; });
                     return Lists_8.Lists.minBy(allEnemies, function (d) { return d.standingPosition.manhattanDistanceTo(projectilePos); });
@@ -12074,7 +12080,7 @@ System.register("game/characters/weapons/Projectile", ["engine/collision/BoxColl
                 return Projectile;
             }(component_42.Component));
             exports_135("spawnProjectile", spawnProjectile = function (pos, sprite, item, velocity, attacker) {
-                LocationManager_27.LocationManager.instance.currentLocation.droppedItems.add(new Entity_31.Entity([
+                LocationManager_28.LocationManager.instance.currentLocation.droppedItems.add(new Entity_31.Entity([
                     new Projectile(pos, sprite, item, velocity, attacker)
                 ]));
             });
@@ -12743,7 +12749,7 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
 });
 System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutscenes/CutscenePlayerController", "game/characters/Player", "engine/point", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/world/LocationManager", "game/ui/ControlsUI", "game/characters/dialogues/DipIntro"], function (exports_139, context_139) {
     "use strict";
-    var component_44, CutscenePlayerController_2, Player_18, point_80, Camera_12, CutsceneManager_2, LocationManager_28, ControlsUI_2, DipIntro_3, IntroCutscene;
+    var component_44, CutscenePlayerController_2, Player_18, point_80, Camera_12, CutsceneManager_2, LocationManager_29, ControlsUI_2, DipIntro_3, IntroCutscene;
     var __moduleName = context_139 && context_139.id;
     return {
         setters: [
@@ -12765,8 +12771,8 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
             function (CutsceneManager_2_1) {
                 CutsceneManager_2 = CutsceneManager_2_1;
             },
-            function (LocationManager_28_1) {
-                LocationManager_28 = LocationManager_28_1;
+            function (LocationManager_29_1) {
+                LocationManager_29 = LocationManager_29_1;
             },
             function (ControlsUI_2_1) {
                 ControlsUI_2 = ControlsUI_2_1;
@@ -12804,7 +12810,7 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
                     var _this = this;
                     CutscenePlayerController_2.CutscenePlayerController.instance.enable();
                     CutscenePlayerController_2.CutscenePlayerController.instance.startMoving(new point_80.Point(-1, 0));
-                    this.dip = Array.from(LocationManager_28.LocationManager.instance.currentLocation.dudes).filter(function (d) { return d.type === 1 /* DIP */; })[0];
+                    this.dip = Array.from(LocationManager_29.LocationManager.instance.currentLocation.dudes).filter(function (d) { return d.type === 1 /* DIP */; })[0];
                     setTimeout(function () {
                         CutscenePlayerController_2.CutscenePlayerController.instance.stopMoving();
                     }, this.STOP_WALKING_IN);
@@ -12826,7 +12832,7 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
                         return;
                     }
                     if (!this.orcs) {
-                        this.orcs = Array.from(LocationManager_28.LocationManager.instance.currentLocation.dudes).filter(function (d) { return d.factions.includes(1 /* ORCS */); });
+                        this.orcs = Array.from(LocationManager_29.LocationManager.instance.currentLocation.dudes).filter(function (d) { return d.factions.includes(1 /* ORCS */); });
                     }
                     // TODO prevent the player from going to a different location until this is over
                     if (!this.orcs.some(function (o) { return o.isAlive; })) {
@@ -12848,7 +12854,7 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
 });
 System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "engine/point", "game/characters/Dude", "game/characters/DudeFactory", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/graphics/Tilesets", "game/items/DroppedItem", "game/SaveManager", "game/ui/UIStateManager", "game/world/GroundRenderer", "game/world/LocationManager", "game/world/MapGenerator", "game/world/OutdoorDarknessMask", "game/world/TimeUnit", "game/world/WorldTime", "game/world/events/EventQueue", "game/world/events/QueuedEvent", "game/characters/NPC", "engine/renderer/BasicRenderComponent", "game/characters/Player", "engine/renderer/LineRender", "engine/Entity", "engine/debug"], function (exports_140, context_140) {
     "use strict";
-    var CollisionEngine_5, point_81, Dude_11, DudeFactory_6, Camera_13, CutsceneManager_3, IntroCutscene_1, Tilesets_48, DroppedItem_3, SaveManager_9, UIStateManager_20, GroundRenderer_2, LocationManager_29, MapGenerator_6, OutdoorDarknessMask_5, TimeUnit_8, WorldTime_10, EventQueue_6, QueuedEvent_4, NPC_8, BasicRenderComponent_9, Player_19, LineRender_2, Entity_32, debug_4, ZOOM, GameScene;
+    var CollisionEngine_5, point_81, Dude_11, DudeFactory_6, Camera_13, CutsceneManager_3, IntroCutscene_1, Tilesets_48, DroppedItem_3, SaveManager_9, UIStateManager_20, GroundRenderer_2, LocationManager_30, MapGenerator_6, OutdoorDarknessMask_5, TimeUnit_8, WorldTime_10, EventQueue_6, QueuedEvent_4, NPC_8, BasicRenderComponent_9, Player_19, LineRender_2, Entity_32, debug_4, ZOOM, GameScene;
     var __moduleName = context_140 && context_140.id;
     return {
         setters: [
@@ -12888,8 +12894,8 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
             function (GroundRenderer_2_1) {
                 GroundRenderer_2 = GroundRenderer_2_1;
             },
-            function (LocationManager_29_1) {
-                LocationManager_29 = LocationManager_29_1;
+            function (LocationManager_30_1) {
+                LocationManager_30 = LocationManager_30_1;
             },
             function (MapGenerator_6_1) {
                 MapGenerator_6 = MapGenerator_6_1;
@@ -12978,7 +12984,7 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
                     this.gameEntityView = {
                         zoom: ZOOM,
                         offset: cameraOffset,
-                        entities: LocationManager_29.LocationManager.instance.currentLocation.getEntities()
+                        entities: LocationManager_30.LocationManager.instance.currentLocation.getEntities()
                             .concat(OutdoorDarknessMask_5.OutdoorDarknessMask.instance.getEntities())
                             .concat([
                             CutsceneManager_3.CutsceneManager.instance.getEntity(),
