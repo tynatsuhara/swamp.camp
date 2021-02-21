@@ -7423,6 +7423,11 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
                     if (defaultSchedule === void 0) { defaultSchedule = NPCSchedule_1.NPCSchedules.newNoOpSchedule(); }
                     var _this = _super.call(this) || this;
                     _this.isEnemyFn = function () { return false; };
+                    _this.enemyFilterFn = function (enemies) {
+                        // default behavior is to fight armed enemies first
+                        var armedEnemies = enemies.filter(function (d) { return !!d.weapon; });
+                        return armedEnemies.length > 0 ? armedEnemies : enemies;
+                    };
                     _this.pathFindingHeuristic = function (pt, goal) { return pt.manhattanDistanceTo(goal); };
                     _this.findTargetRange = Tilesets_21.TILE_SIZE * 10;
                     _this.enemiesPresent = false;
@@ -7676,10 +7681,8 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
                         // should flee instead
                         return;
                     }
-                    // attack armed opponents first
-                    if (enemies.some(function (d) { return !!d.weapon; })) {
-                        enemies = enemies.filter(function (d) { return !!d.weapon; });
-                    }
+                    enemies = this.enemyFilterFn(enemies);
+                    // attack the closest enemy
                     var target = Lists_4.Lists.minBy(enemies, function (d) { return d.standingPosition.distanceTo(_this.dude.standingPosition); });
                     if (!!target) {
                         var shouldComputePath = true;
@@ -10518,6 +10521,11 @@ System.register("game/characters/Enemy", ["engine/component", "game/graphics/Til
                     if (this.dude.factions.includes(1 /* ORCS */)) {
                         // Orcs only show up to siege, so they will find you wherever you're hiding
                         this.npc.findTargetRange = Number.MAX_SAFE_INTEGER;
+                        this.npc.enemyFilterFn = function (enemies) {
+                            // Only attack armed enemies if they are close enough to be dangerous, otherwise target the weak
+                            var nearbyArmedEnemies = enemies.filter(function (d) { return !!d.weapon && d.standingPosition.manhattanDistanceTo(_this.dude.standingPosition) < 100; });
+                            return nearbyArmedEnemies.length > 0 ? nearbyArmedEnemies : enemies;
+                        };
                     }
                     // DEMON enemies will avoid light
                     // TODO: make them burn in the light or something?

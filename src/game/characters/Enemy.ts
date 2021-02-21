@@ -18,6 +18,11 @@ export class Enemy extends Component {
         if (this.dude.factions.includes(DudeFaction.ORCS)) {
             // Orcs only show up to siege, so they will find you wherever you're hiding
             this.npc.findTargetRange = Number.MAX_SAFE_INTEGER
+            this.npc.enemyFilterFn = (enemies) => {
+                // Only attack armed enemies if they are close enough to be dangerous, otherwise target the weak
+                const nearbyArmedEnemies = enemies.filter(d => !!d.weapon && d.standingPosition.manhattanDistanceTo(this.dude.standingPosition) < 100)
+                return nearbyArmedEnemies.length > 0 ? nearbyArmedEnemies : enemies
+            }
         }
 
         // DEMON enemies will avoid light

@@ -22,6 +22,11 @@ export class NPC extends Component {
     private dude: Dude
 
     isEnemyFn: (dude: Dude) => boolean = () => false
+    enemyFilterFn: (enemies: Dude[]) => Dude[] = (enemies) => {
+        // default behavior is to fight armed enemies first
+        const armedEnemies = enemies.filter(d => !!d.weapon)
+        return armedEnemies.length > 0 ? armedEnemies : enemies
+    }
     pathFindingHeuristic: (pt: Point, goal: Point) => number = (pt, goal) => pt.manhattanDistanceTo(goal)
 
     findTargetRange = TILE_SIZE * 10
@@ -318,11 +323,9 @@ export class NPC extends Component {
             return
         }
         
-        // attack armed opponents first
-        if (enemies.some(d => !!d.weapon)) {
-            enemies = enemies.filter(d => !!d.weapon)
-        }
+        enemies = this.enemyFilterFn(enemies)
 
+        // attack the closest enemy
         const target = Lists.minBy(enemies, d => d.standingPosition.distanceTo(this.dude.standingPosition))
         if (!!target) {
             let shouldComputePath = true
