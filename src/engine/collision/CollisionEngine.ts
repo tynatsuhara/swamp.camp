@@ -103,14 +103,19 @@ export class CollisionEngine {
                 .some(other => {
                     // TODO: Support nob-box-colliders
                     const obc = other as BoxCollider
-                    return !(
+                    const willCollide = !(
                         newTranslatedPos.x > obc.position.x + obc.dimensions.x ||
                         newTranslatedPos.y > obc.position.y + obc.dimensions.y ||
                         newTranslatedPos.x + bc.dimensions.x < obc.position.x ||
                         newTranslatedPos.y + bc.dimensions.y < obc.position.y
                     )
-                    // return translatedPoints.some(pt => other.isWithinBounds(pt))  // TODO 
-                    //         || collider.checkWithinBoundsAfterTranslation(translation, other)
+                    // && !isAlreadyColliding
+                    return willCollide && (
+                        bc.position.x > obc.position.x + obc.dimensions.x ||
+                        bc.position.y > obc.position.y + obc.dimensions.y ||
+                        bc.position.x + bc.dimensions.x < obc.position.x ||
+                        bc.position.y + bc.dimensions.y < obc.position.y
+                    )
                 }) 
     }
 
