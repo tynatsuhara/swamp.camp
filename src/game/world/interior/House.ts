@@ -19,6 +19,11 @@ export const makeHouseInterior = (outside: WorldLocation): WorldLocation => {
     l.addElement(ElementType.TELEPORTER, new Point(3, 5), { to: outside.uuid, i: interactablePos.toString() })
 
     const woodType = Math.ceil(Math.random() * 2)
+
+    const addWallSprite = (key: string, pt: Point, rotation: number) => {
+        l.sprites.addSprite(key, pt.times(TILE_SIZE), rotation, -100000)
+    }
+
     for (let x = 0; x < dimensions.x; x++) {
         for (let y = 0; y < dimensions.y; y++) {
             l.addGroundElement(GroundType.BASIC, new Point(x, y), { k: `hardwood${woodType}` })
@@ -29,8 +34,8 @@ export const makeHouseInterior = (outside: WorldLocation): WorldLocation => {
         } else if (x === dimensions.x-1) {
             topAndBottomTiles = ["wallRight", "wallLeft"]
         }
-        l.addGroundElement(GroundType.BASIC, new Point(x, -1), { k: topAndBottomTiles[0] })
-        l.addGroundElement(GroundType.BASIC_ROTATED_180, new Point(x, -2), { k: topAndBottomTiles[1] })
+        addWallSprite(topAndBottomTiles[0], new Point(x, -1), 0)
+        addWallSprite(topAndBottomTiles[0], new Point(x, -2), 180)
     }
 
     return l

@@ -1,5 +1,6 @@
 import { Entity } from "../../engine/Entity"
 import { Point } from "../../engine/point"
+import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { Grid } from "../../engine/util/Grid"
 import { Dude } from "../characters/Dude"
 import { DudeFactory, DudeType } from "../characters/DudeFactory"
@@ -18,6 +19,7 @@ import { Ground, GroundType, SavedGround } from "./ground/Ground"
 import { GroundComponent } from "./ground/GroundComponent"
 import { LocationManager } from "./LocationManager"
 import { MapGenerator } from "./MapGenerator"
+import { StaticSprites } from "./StaticSprites"
 import { Teleporter, Teleporters } from "./Teleporter"
 
 export class WorldLocation {
@@ -40,6 +42,7 @@ export class WorldLocation {
 
     private teleporters: { [key: string]: string } = {} 
     private barriers: Entity[] = []
+    readonly sprites = new Entity().addComponent(new StaticSprites())
 
     readonly isInterior: boolean
     readonly allowPlacing: boolean
@@ -210,6 +213,7 @@ export class WorldLocation {
                 .concat(this.ground.values().map(c => c.entity))
                 .concat(Array.from(this.droppedItems))
                 .concat(this.barriers)
+                .concat([this.sprites.entity])
     }
 
     getDude(dudeType: DudeType): Dude {
@@ -224,6 +228,7 @@ export class WorldLocation {
             dudes: Array.from(this.dudes).filter(d => d.isAlive && !!d.entity).map(d => d.save()),
             teleporters: this.teleporters,
             barriers: this.barriers.map(b => b.getComponent(Barrier).toJson()),
+            staticSprites: this.sprites.toJson(),
             isInterior: this.isInterior,
             allowPlacing: this.allowPlacing,
         }
@@ -254,6 +259,7 @@ export class WorldLocation {
         n._uuid = saveState.uuid
         n.teleporters = saveState.teleporters
         n.barriers = saveState.barriers.map(b => Barrier.fromJson(b))
+        n.sprites.fromJson(saveState.staticSprites)
         saveState.elements.forEach(el => n.addElement(el.type, Point.fromString(el.pos), el.obj))
         saveState.ground.forEach(el => n.addGroundElement(el.type, Point.fromString(el.pos), el.obj))
         saveState.dudes.forEach(d => DudeFactory.instance.load(d, n))

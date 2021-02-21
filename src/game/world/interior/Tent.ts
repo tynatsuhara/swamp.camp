@@ -31,14 +31,18 @@ export const makeTentInterior = (outside: WorldLocation, color: TentColor): Worl
         (pt, index) => l.addGroundElement(GroundType.BASIC_NINE_SLICE, pt, { k: groundType, i: index })
     )
 
+    const addWallSprite = (key: string, pt: Point) => {
+        l.sprites.addSprite(key, pt.plusY(-3).times(TILE_SIZE), 0, -100000)
+    }
+
     new AsciiInteriorBuilder(
         "  ^  ",
         " /xl ",
         "/xxxl",
-    ).map("/", pt => { l.addGroundElement(GroundType.BASIC, pt.plusY(-3), { k: `${color}tentl` })})
-    .map("^", pt => { l.addGroundElement(GroundType.BASIC, pt.plusY(-3), { k: `${color}tenttip` })})
-    .map("l", pt => { l.addGroundElement(GroundType.BASIC, pt.plusY(-3), { k: `${color}tentr` })})
-    .map("x", pt => { l.addGroundElement(GroundType.BASIC, pt.plusY(-3), { k: `${color}tentCenter` })})
+    ).map("/", pt => addWallSprite(`${color}tentl`, pt))
+    .map("^", pt => addWallSprite(`${color}tenttip`, pt))
+    .map("l", pt => addWallSprite(`${color}tentr`, pt))
+    .map("x", pt => addWallSprite(`${color}tentCenter`, pt))
 
     return l
 }
