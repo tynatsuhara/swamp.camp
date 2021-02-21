@@ -35,7 +35,7 @@ export const makeHouseInterior = (outside: WorldLocation): WorldLocation => {
             topAndBottomTiles = ["wallRight", "wallLeft"]
         }
         addWallSprite(topAndBottomTiles[0], new Point(x, -1), 0)
-        addWallSprite(topAndBottomTiles[0], new Point(x, -2), 180)
+        addWallSprite(topAndBottomTiles[1], new Point(x, -2), 180)
     }
 
     return l

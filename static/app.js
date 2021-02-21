@@ -6243,7 +6243,7 @@ System.register("game/world/interior/House", ["engine/point", "game/graphics/Til
                         topAndBottomTiles = ["wallRight", "wallLeft"];
                     }
                     addWallSprite(topAndBottomTiles[0], new point_42.Point(x, -1), 0);
-                    addWallSprite(topAndBottomTiles[0], new point_42.Point(x, -2), 180);
+                    addWallSprite(topAndBottomTiles[1], new point_42.Point(x, -2), 180);
                 }
                 return l;
             });
@@ -7689,7 +7689,6 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
                             return;
                         }
                     }
-                    console.log(this.fleePath[this.fleePath.length - 1]);
                     if (this.walkDirectlyTo(this.fleePath[0], updateData, false, speedMultiplier)) {
                         this.fleePath.shift();
                     }
