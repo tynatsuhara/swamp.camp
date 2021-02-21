@@ -4580,16 +4580,17 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
                             this.justCraftedRow = r;
                             setTimeout(function () { return _this.justCraftedRow = -1; }, 900);
                         }
+                        var prefix = recipe.desc + "\n";
                         if (hovered && !this.canCraft(recipe)) {
                             if (!Player_2.Player.instance.dude.inventory.canAddItem(recipe.output)) {
-                                this.tooltip.say("Inventory full");
+                                this.tooltip.say(prefix + "[Inventory full]");
                             }
                             else if (recipe.input.some(function (input) { return Player_2.Player.instance.dude.inventory.getItemCount(input.item) < input.count; })) {
-                                this.tooltip.say("Need ingredients");
+                                this.tooltip.say(prefix + "[Need ingredients]");
                             }
                         }
                         else if (hovered) {
-                            this.tooltip.say("Click to craft");
+                            this.tooltip.say(prefix + "[Click to craft]");
                         }
                         // craftable item
                         verticalOffset += margin;
@@ -4808,6 +4809,7 @@ System.register("game/items/CraftingRecipe", ["game/items/Inventory", "game/grap
                     icon: Tilesets_6.Tilesets.instance.oneBit.getTileAt(new point_29.Point(0, 7)),
                     name: "Outdoor Furniture",
                     recipes: [{
+                            desc: "Illuminate the area",
                             output: 4 /* CAMPFIRE */,
                             input: [new Inventory_1.ItemStack(1 /* ROCK */, DipIntro_1.ROCKS_NEEDED_FOR_CAMPFIRE), new Inventory_1.ItemStack(2 /* WOOD */, DipIntro_1.WOOD_NEEDED_FOR_CAMPFIRE)],
                         }],
@@ -4815,12 +4817,15 @@ System.register("game/items/CraftingRecipe", ["game/items/Inventory", "game/grap
                     icon: Tilesets_6.Tilesets.instance.oneBit.getTileAt(new point_29.Point(10, 27)),
                     name: "Equipment",
                     recipes: [{
+                            desc: "Collect more rocks",
                             output: 100022 /* PICKAXE */,
                             input: [new Inventory_1.ItemStack(5 /* IRON */, 3), new Inventory_1.ItemStack(2 /* WOOD */, 5)],
                         }, {
+                            desc: "Collect more wood",
                             output: 100012 /* AXE */,
                             input: [new Inventory_1.ItemStack(5 /* IRON */, 3), new Inventory_1.ItemStack(2 /* WOOD */, 5)],
                         }, {
+                            desc: "Fight from a distance",
                             output: 100021 /* SPEAR */,
                             input: [new Inventory_1.ItemStack(1 /* ROCK */, 1), new Inventory_1.ItemStack(2 /* WOOD */, 3)],
                         }],
@@ -4828,9 +4833,11 @@ System.register("game/items/CraftingRecipe", ["game/items/Inventory", "game/grap
                     icon: Tilesets_6.Tilesets.instance.oneBit.getTileAt(new point_29.Point(0, 19)),
                     name: "Buildings",
                     recipes: [{
+                            desc: "House one settler",
                             output: 3 /* TENT */,
                             input: [new Inventory_1.ItemStack(2 /* WOOD */, 5)],
                         }, {
+                            desc: "House four settlers",
                             output: 6 /* HOUSE */,
                             input: [new Inventory_1.ItemStack(1 /* ROCK */, 5), new Inventory_1.ItemStack(2 /* WOOD */, 5)],
                         }],

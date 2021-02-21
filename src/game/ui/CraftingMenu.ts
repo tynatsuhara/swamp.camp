@@ -171,14 +171,15 @@ export class CraftingMenu extends Component {
                 setTimeout(() => this.justCraftedRow = -1, 900)
             }
 
+            const prefix = recipe.desc + "\n"
             if (hovered && !this.canCraft(recipe)) {
                 if (!Player.instance.dude.inventory.canAddItem(recipe.output)) {
-                    this.tooltip.say("Inventory full")
+                    this.tooltip.say(prefix + "[Inventory full]")
                 } else if (recipe.input.some(input => Player.instance.dude.inventory.getItemCount(input.item) < input.count)) {
-                    this.tooltip.say("Need ingredients")
+                    this.tooltip.say(prefix + "[Need ingredients]")
                 }
             } else if (hovered) {
-                this.tooltip.say("Click to craft")
+                this.tooltip.say(prefix + "[Click to craft]")
             }
 
             // craftable item
