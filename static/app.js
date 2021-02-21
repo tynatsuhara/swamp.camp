@@ -5152,7 +5152,6 @@ System.register("game/world/Barrier", ["engine/collision/BoxCollider", "engine/c
                         a: this.allow
                     };
                 };
-                Barrier.PLAYER_ONLY = "player-only";
                 return Barrier;
             }(component_12.Component));
             exports_62("Barrier", Barrier);
@@ -12832,9 +12831,9 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
         }
     };
 });
-System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "engine/point", "game/characters/Dude", "game/characters/DudeFactory", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/graphics/Tilesets", "game/items/DroppedItem", "game/SaveManager", "game/ui/UIStateManager", "game/world/GroundRenderer", "game/world/LocationManager", "game/world/MapGenerator", "game/world/OutdoorDarknessMask", "game/world/TimeUnit", "game/world/WorldTime", "game/world/events/EventQueue", "game/world/events/QueuedEvent", "game/characters/NPC", "engine/renderer/BasicRenderComponent", "game/characters/Player", "engine/renderer/LineRender", "engine/Entity", "engine/debug", "game/world/Barrier"], function (exports_140, context_140) {
+System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "engine/point", "game/characters/Dude", "game/characters/DudeFactory", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/graphics/Tilesets", "game/items/DroppedItem", "game/SaveManager", "game/ui/UIStateManager", "game/world/GroundRenderer", "game/world/LocationManager", "game/world/MapGenerator", "game/world/OutdoorDarknessMask", "game/world/TimeUnit", "game/world/WorldTime", "game/world/events/EventQueue", "game/world/events/QueuedEvent", "game/characters/NPC", "engine/renderer/BasicRenderComponent", "game/characters/Player", "engine/renderer/LineRender", "engine/Entity", "engine/debug"], function (exports_140, context_140) {
     "use strict";
-    var CollisionEngine_5, point_81, Dude_11, DudeFactory_6, Camera_13, CutsceneManager_3, IntroCutscene_1, Tilesets_48, DroppedItem_3, SaveManager_9, UIStateManager_20, GroundRenderer_2, LocationManager_29, MapGenerator_6, OutdoorDarknessMask_5, TimeUnit_8, WorldTime_10, EventQueue_6, QueuedEvent_4, NPC_8, BasicRenderComponent_9, Player_19, LineRender_2, Entity_32, debug_4, Barrier_3, ZOOM, GameScene;
+    var CollisionEngine_5, point_81, Dude_11, DudeFactory_6, Camera_13, CutsceneManager_3, IntroCutscene_1, Tilesets_48, DroppedItem_3, SaveManager_9, UIStateManager_20, GroundRenderer_2, LocationManager_29, MapGenerator_6, OutdoorDarknessMask_5, TimeUnit_8, WorldTime_10, EventQueue_6, QueuedEvent_4, NPC_8, BasicRenderComponent_9, Player_19, LineRender_2, Entity_32, debug_4, ZOOM, GameScene;
     var __moduleName = context_140 && context_140.id;
     return {
         setters: [
@@ -12912,9 +12911,6 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
             },
             function (debug_4_1) {
                 debug_4 = debug_4_1;
-            },
-            function (Barrier_3_1) {
-                Barrier_3 = Barrier_3_1;
             }
         ],
         execute: function () {
@@ -12926,7 +12922,6 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
                     CollisionEngine_5.collisionEngine.setCollisionMatrix(new Map([
                         [CollisionEngine_5.CollisionEngine.DEFAULT_LAYER, [DroppedItem_3.DroppedItem.COLLISION_LAYER, Dude_11.Dude.PLAYER_COLLISION_LAYER, Dude_11.Dude.NPC_COLLISION_LAYER]],
                         [Dude_11.Dude.PLAYER_COLLISION_LAYER, [Dude_11.Dude.NPC_COLLISION_LAYER]],
-                        [Barrier_3.Barrier.PLAYER_ONLY, [Dude_11.Dude.PLAYER_COLLISION_LAYER]]
                     ]));
                 };
                 GameScene.prototype.continueGame = function () {

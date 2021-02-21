@@ -39,7 +39,7 @@ export class GameScene {
         collisionEngine.setCollisionMatrix(new Map([
             [CollisionEngine.DEFAULT_LAYER, [DroppedItem.COLLISION_LAYER, Dude.PLAYER_COLLISION_LAYER, Dude.NPC_COLLISION_LAYER]],
             [Dude.PLAYER_COLLISION_LAYER, [Dude.NPC_COLLISION_LAYER]],
-            [Barrier.PLAYER_ONLY, [Dude.PLAYER_COLLISION_LAYER]]
+            // [Barrier.PLAYER_ONLY, [Dude.PLAYER_COLLISION_LAYER]]
         ]))
     }
 

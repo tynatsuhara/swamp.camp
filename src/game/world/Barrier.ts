@@ -5,7 +5,7 @@ import { Entity } from "../../engine/Entity"
 import { Point } from "../../engine/point"
 
 export class Barrier extends Component {
-    static PLAYER_ONLY = "player-only"
+    // static PLAYER_ONLY = "player-only"
 
     private readonly position: Point
     private readonly dimensions: Point
