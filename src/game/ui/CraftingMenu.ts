@@ -222,7 +222,7 @@ export class CraftingMenu extends Component {
                 if (rectContains(
                         // I have no idea why this math works :(
                         new Point(width - offsetFromRight + margin, verticalOffset + margin * 1.5).plus(topLeft), 
-                        new Point(TILE_SIZE, TILE_SIZE), 
+                        new Point(TILE_SIZE + margin, TILE_SIZE + margin), 
                         updateData.input.mousePos
                 )) {
                     const displayName = ITEM_METADATA_MAP[ingr.item].displayName

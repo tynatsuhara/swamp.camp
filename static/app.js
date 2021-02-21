@@ -4633,7 +4633,7 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
                             this.drawIconAt(ingredientIcon, width - offsetFromRight, verticalOffset);
                             if (utils_4.rectContains(
                             // I have no idea why this math works :(
-                            new point_28.Point(width - offsetFromRight + margin, verticalOffset + margin * 1.5).plus(topLeft), new point_28.Point(Tilesets_5.TILE_SIZE, Tilesets_5.TILE_SIZE), updateData.input.mousePos)) {
+                            new point_28.Point(width - offsetFromRight + margin, verticalOffset + margin * 1.5).plus(topLeft), new point_28.Point(Tilesets_5.TILE_SIZE + margin, Tilesets_5.TILE_SIZE + margin), updateData.input.mousePos)) {
                                 var displayName = Items_1.ITEM_METADATA_MAP[ingr.item].displayName;
                                 this.tooltip.say(displayName + " (" + Player_2.Player.instance.dude.inventory.getItemCount(ingr.item) + "/" + ingr.count + ")");
                             }
