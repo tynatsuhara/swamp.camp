@@ -1165,7 +1165,7 @@ System.register("engine/renderer/Renderer", ["engine/point", "engine/renderer/Re
 });
 System.register("engine/engine", ["engine/collision/CollisionEngine", "engine/component", "engine/debug", "engine/input", "engine/profiler", "engine/renderer/Renderer"], function (exports_19, context_19) {
     "use strict";
-    var CollisionEngine_3, component_3, debug_2, input_1, profiler_1, Renderer_1, UpdateViewsContext, AwakeData, StartData, UpdateData, Engine;
+    var CollisionEngine_3, component_3, debug_2, input_1, profiler_1, Renderer_1, MINIMUM_ALLOWED_FPS, MAX_ELAPSED_MILLIS, UpdateViewsContext, AwakeData, StartData, UpdateData, Engine;
     var __moduleName = context_19 && context_19.id;
     return {
         setters: [
@@ -1189,6 +1189,8 @@ System.register("engine/engine", ["engine/collision/CollisionEngine", "engine/co
             }
         ],
         execute: function () {
+            MINIMUM_ALLOWED_FPS = 15;
+            MAX_ELAPSED_MILLIS = 1000 / MINIMUM_ALLOWED_FPS;
             UpdateViewsContext = /** @class */ (function () {
                 function UpdateViewsContext() {
                 }
@@ -1226,7 +1228,10 @@ System.register("engine/engine", ["engine/collision/CollisionEngine", "engine/co
                 Engine.prototype.tick = function () {
                     var _this = this;
                     var time = new Date().getTime();
-                    var elapsed = time - this.lastUpdateMillis;
+                    // Because of JS being suspended in the background, elapsed may become 
+                    // really high, so we need to limit it with MAX_ELAPSED_MILLIS.
+                    // This means that visual lag can happen if fps < MINIMUM_ALLOWED_FPS
+                    var elapsed = Math.min(time - this.lastUpdateMillis, MAX_ELAPSED_MILLIS);
                     if (elapsed == 0) {
                         return;
                     }

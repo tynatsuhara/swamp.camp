@@ -8,6 +8,9 @@ import { measure, profiler } from "./profiler"
 import { Renderer } from "./renderer/Renderer"
 import { View } from "./View"
 
+const MINIMUM_ALLOWED_FPS = 15
+const MAX_ELAPSED_MILLIS = 1000/MINIMUM_ALLOWED_FPS
+
 export class UpdateViewsContext {
     readonly elapsedTimeMillis: number
     readonly input: CapturedInput
@@ -43,7 +46,11 @@ export class Engine {
 
     tick() {
         const time = new Date().getTime()
-        const elapsed = time - this.lastUpdateMillis
+
+        // Because of JS being suspended in the background, elapsed may become 
+        // really high, so we need to limit it with MAX_ELAPSED_MILLIS.
+        // This means that visual lag can happen if fps < MINIMUM_ALLOWED_FPS
+        const elapsed = Math.min(time - this.lastUpdateMillis, MAX_ELAPSED_MILLIS)
 
         if (elapsed == 0) {
             return
