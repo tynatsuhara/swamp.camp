@@ -34,7 +34,6 @@ export class StaticSprites extends Component {
     }
 
     fromJson(sprites: object[]) {
-        console.log(sprites)
         this.json = []
         this.renders = []
         sprites.forEach(s => this.addSpriteInternal(s))

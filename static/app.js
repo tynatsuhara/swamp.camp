@@ -5279,7 +5279,6 @@ System.register("game/world/StaticSprites", ["engine/component", "engine/point",
                 };
                 StaticSprites.prototype.fromJson = function (sprites) {
                     var _this = this;
-                    console.log(sprites);
                     this.json = [];
                     this.renders = [];
                     sprites.forEach(function (s) { return _this.addSpriteInternal(s); });
