@@ -782,7 +782,7 @@ System.register("engine/collision/CollisionEngine", ["engine/point", "engine/uti
                             && collider.ignoredColliders.indexOf(other) === -1 && other.ignoredColliders.indexOf(collider) === -1;
                     }) // potential collisions
                         .some(function (other) {
-                        // TODO: Support nob-box-colliders
+                        // TODO: Support non-box-colliders
                         var obc = other;
                         var willCollide = !(newTranslatedPos.x > obc.position.x + obc.dimensions.x ||
                             newTranslatedPos.y > obc.position.y + obc.dimensions.y ||

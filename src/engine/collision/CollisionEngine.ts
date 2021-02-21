@@ -101,7 +101,7 @@ export class CollisionEngine {
                     other !== collider && other.enabled && collidingLayers.has(other.layer) 
                             && collider.ignoredColliders.indexOf(other) === -1 && other.ignoredColliders.indexOf(collider) === -1)  // potential collisions
                 .some(other => {
-                    // TODO: Support nob-box-colliders
+                    // TODO: Support non-box-colliders
                     const obc = other as BoxCollider
                     const willCollide = !(
                         newTranslatedPos.x > obc.position.x + obc.dimensions.x ||
