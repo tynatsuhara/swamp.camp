@@ -29,7 +29,7 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => [{
     icon: Tilesets.instance.oneBit.getTileAt(new Point(10, 27)),
     name: "Equipment",
     recipes: [{
-        desc: "Collects extra rocks",
+        desc: "Collects extra iron",
         output: Item.PICKAXE,
         input: [new ItemStack(Item.IRON, 3), new ItemStack(Item.WOOD, 5)],
     },{

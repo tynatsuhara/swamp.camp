@@ -4817,7 +4817,7 @@ System.register("game/items/CraftingRecipe", ["game/items/Inventory", "game/grap
                     icon: Tilesets_6.Tilesets.instance.oneBit.getTileAt(new point_29.Point(10, 27)),
                     name: "Equipment",
                     recipes: [{
-                            desc: "Collects extra rocks",
+                            desc: "Collects extra iron",
                             output: 100022 /* PICKAXE */,
                             input: [new Inventory_1.ItemStack(5 /* IRON */, 3), new Inventory_1.ItemStack(2 /* WOOD */, 5)],
                         }, {
