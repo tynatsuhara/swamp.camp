@@ -4809,7 +4809,7 @@ System.register("game/items/CraftingRecipe", ["game/items/Inventory", "game/grap
                     icon: Tilesets_6.Tilesets.instance.oneBit.getTileAt(new point_29.Point(0, 7)),
                     name: "Outdoor Furniture",
                     recipes: [{
-                            desc: "Illuminate the area",
+                            desc: "Illuminates an area",
                             output: 4 /* CAMPFIRE */,
                             input: [new Inventory_1.ItemStack(1 /* ROCK */, DipIntro_1.ROCKS_NEEDED_FOR_CAMPFIRE), new Inventory_1.ItemStack(2 /* WOOD */, DipIntro_1.WOOD_NEEDED_FOR_CAMPFIRE)],
                         }],
@@ -4817,15 +4817,15 @@ System.register("game/items/CraftingRecipe", ["game/items/Inventory", "game/grap
                     icon: Tilesets_6.Tilesets.instance.oneBit.getTileAt(new point_29.Point(10, 27)),
                     name: "Equipment",
                     recipes: [{
-                            desc: "Collect more rocks",
+                            desc: "Collects extra rocks",
                             output: 100022 /* PICKAXE */,
                             input: [new Inventory_1.ItemStack(5 /* IRON */, 3), new Inventory_1.ItemStack(2 /* WOOD */, 5)],
                         }, {
-                            desc: "Collect more wood",
+                            desc: "Collects extra wood",
                             output: 100012 /* AXE */,
                             input: [new Inventory_1.ItemStack(5 /* IRON */, 3), new Inventory_1.ItemStack(2 /* WOOD */, 5)],
                         }, {
-                            desc: "Fight from a distance",
+                            desc: "Ranged or melee weapon",
                             output: 100021 /* SPEAR */,
                             input: [new Inventory_1.ItemStack(1 /* ROCK */, 1), new Inventory_1.ItemStack(2 /* WOOD */, 3)],
                         }],
@@ -4833,11 +4833,11 @@ System.register("game/items/CraftingRecipe", ["game/items/Inventory", "game/grap
                     icon: Tilesets_6.Tilesets.instance.oneBit.getTileAt(new point_29.Point(0, 19)),
                     name: "Buildings",
                     recipes: [{
-                            desc: "House one settler",
+                            desc: "Houses one settler",
                             output: 3 /* TENT */,
                             input: [new Inventory_1.ItemStack(2 /* WOOD */, 5)],
                         }, {
-                            desc: "House four settlers",
+                            desc: "Houses four settlers",
                             output: 6 /* HOUSE */,
                             input: [new Inventory_1.ItemStack(1 /* ROCK */, 5), new Inventory_1.ItemStack(2 /* WOOD */, 5)],
                         }],

@@ -21,7 +21,7 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => [{
     icon: Tilesets.instance.oneBit.getTileAt(new Point(0, 7)),
     name: "Outdoor Furniture",
     recipes: [{
-        desc: "Illuminate the area",
+        desc: "Illuminates an area",
         output: Item.CAMPFIRE,
         input: [new ItemStack(Item.ROCK, ROCKS_NEEDED_FOR_CAMPFIRE), new ItemStack(Item.WOOD, WOOD_NEEDED_FOR_CAMPFIRE)],
     }],
@@ -29,15 +29,15 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => [{
     icon: Tilesets.instance.oneBit.getTileAt(new Point(10, 27)),
     name: "Equipment",
     recipes: [{
-        desc: "Collect more rocks",
+        desc: "Collects extra rocks",
         output: Item.PICKAXE,
         input: [new ItemStack(Item.IRON, 3), new ItemStack(Item.WOOD, 5)],
     },{
-        desc: "Collect more wood",
+        desc: "Collects extra wood",
         output: Item.AXE,
         input: [new ItemStack(Item.IRON, 3), new ItemStack(Item.WOOD, 5)],
     },{
-        desc: "Fight from a distance",
+        desc: "Ranged or melee weapon",
         output: Item.SPEAR,
         input: [new ItemStack(Item.ROCK, 1), new ItemStack(Item.WOOD, 3)],
     }],
@@ -45,11 +45,11 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => [{
     icon: Tilesets.instance.oneBit.getTileAt(new Point(0, 19)),
     name: "Buildings",
     recipes: [{
-        desc: "House one settler",
+        desc: "Houses one settler",
         output: Item.TENT,
         input: [new ItemStack(Item.WOOD, 5)],
     }, {
-        desc: "House four settlers",
+        desc: "Houses four settlers",
         output: Item.HOUSE,
         input: [new ItemStack(Item.ROCK, 5), new ItemStack(Item.WOOD, 5)],
     }],
