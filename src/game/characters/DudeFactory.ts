@@ -163,6 +163,7 @@ export class DudeFactory {
             case DudeType.VILLAGER:
                 animationName = `prisoner${Math.ceil(Math.random() * 2)}`
                 maxHealth = 4
+                speed *= .6
                 // TODO: add a new type of schedule for a villager with a home
                 additionalComponents = [new NPC(NPCSchedules.newDefaultVillagerSchedule()), new Villager()]
                 break

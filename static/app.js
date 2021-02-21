@@ -11002,6 +11002,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                         case 7 /* VILLAGER */:
                             animationName = "prisoner" + Math.ceil(Math.random() * 2);
                             maxHealth = 4;
+                            speed *= .6;
                             // TODO: add a new type of schedule for a villager with a home
                             additionalComponents = [new NPC_6.NPC(NPCSchedule_3.NPCSchedules.newDefaultVillagerSchedule()), new Villager_1.Villager()];
                             break;
