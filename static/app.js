@@ -10553,6 +10553,9 @@ System.register("game/characters/Player", ["engine/component", "engine/debug", "
                     }
                     // Commands which are used for testing and development
                     if (debug_4.debug.enableDevControls) {
+                        if (updateData.input.isKeyDown(80 /* P */)) {
+                            debug_4.debug.alwaysShowMouse = !debug_4.debug.alwaysShowMouse;
+                        }
                         var mouseTilePos = Tilesets_40.pixelPtToTilePt(updateData.input.mousePos);
                         if (updateData.input.isKeyDown(75 /* K */)) {
                             DudeFactory_4.DudeFactory.instance.new(3 /* ORC_WARRIOR */, updateData.input.mousePos);

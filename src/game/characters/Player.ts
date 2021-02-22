@@ -111,6 +111,9 @@ export class Player extends Component {
 
         // Commands which are used for testing and development
         if (debug.enableDevControls) {
+            if (updateData.input.isKeyDown(InputKey.P)) {
+                debug.alwaysShowMouse = !debug.alwaysShowMouse
+            }
             const mouseTilePos = pixelPtToTilePt(updateData.input.mousePos)
             if (updateData.input.isKeyDown(InputKey.K)) {
                 DudeFactory.instance.new(DudeType.ORC_WARRIOR, updateData.input.mousePos)
