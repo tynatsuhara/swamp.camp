@@ -4828,10 +4828,6 @@ System.register("game/items/CraftingRecipe", ["game/items/Inventory", "game/grap
                     name: "Buildings",
                     recipes: [{
                             desc: "Houses one settler",
-                            output: 3 /* TENT */,
-                            input: [new Inventory_1.ItemStack(2 /* WOOD */, 5)],
-                        }, {
-                            desc: "Houses four settlers",
                             output: 6 /* HOUSE */,
                             input: [new Inventory_1.ItemStack(1 /* ROCK */, 5), new Inventory_1.ItemStack(2 /* WOOD */, 5)],
                         }],
