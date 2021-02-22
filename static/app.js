@@ -4133,21 +4133,7 @@ System.register("game/characters/NPCSchedule", [], function (exports_51, context
                 newNoOpSchedule: function () { return ({ type: 0 /* DO_NOTHING */ }); },
                 newGoToSchedule: function (tilePoint) { return ({ type: 1 /* GO_TO_SPOT */, p: tilePoint.toString() }); },
                 newFreeRoamInDarkSchedule: function () { return ({ type: 2 /* ROAM_IN_DARKNESS */ }); },
-                newFreeRoamSchedule: function (
-                // TODO: new params
-                pauseFrequencyMin, pauseFrequencyMax, pauseDurationMin, pauseDurationMax) {
-                    if (pauseFrequencyMin === void 0) { pauseFrequencyMin = 0; }
-                    if (pauseFrequencyMax === void 0) { pauseFrequencyMax = 0; }
-                    if (pauseDurationMin === void 0) { pauseDurationMin = 0; }
-                    if (pauseDurationMax === void 0) { pauseDurationMax = 0; }
-                    return ({
-                        type: 3 /* ROAM */,
-                        fl: pauseFrequencyMin,
-                        fh: pauseFrequencyMax,
-                        dl: pauseDurationMin,
-                        dh: pauseDurationMax,
-                    });
-                },
+                newFreeRoamSchedule: function () { return ({ type: 3 /* ROAM */ }); },
                 newDefaultVillagerSchedule: function () { return ({ type: 4 /* DEFAULT_VILLAGER */ }); }
             });
         }
@@ -7578,6 +7564,7 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
                 };
                 NPC.prototype.doNormalScheduledActivity = function (updateData) {
                     var schedule = this.getSchedule();
+                    // TODO: add support for "pausing" during roaming
                     if (schedule.type === 0 /* DO_NOTHING */) {
                         this.dude.move(updateData, point_50.Point.ZERO);
                     }
@@ -7626,6 +7613,7 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
                 };
                 NPC.prototype.setSchedule = function (schedule) {
                     this.dude.blob[NPCSchedule_1.NPCSchedules.SCHEDULE_KEY] = schedule;
+                    this.clearExistingAIState();
                 };
                 NPC.prototype.getSchedule = function () {
                     var schedule = this.dude.blob[NPCSchedule_1.NPCSchedules.SCHEDULE_KEY];
@@ -10498,16 +10486,16 @@ System.register("game/characters/Player", ["engine/component", "engine/debug", "
                     //       - instead of removing by position, map the light to a source object and remove based on that
                     // const lightPosOffset = -TILE_SIZE/2
                     // PointLightMaskRenderer.instance.removeLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset))
-                    this.dude.move(updateData, new point_69.Point(dx, dy), this.dude.rolling() ? 0 : updateData.input.mousePos.x - this.dude.standingPosition.x, 1 + (this.dude.rolling() ? 1.2 : 0));
+                    this.dude.move(updateData, new point_69.Point(dx, dy), 0, // this.dude.rolling() ? 0 : updateData.input.mousePos.x - this.dude.standingPosition.x,
+                    1 + (this.dude.rolling() ? 1.2 : 0));
                     // PointLightMaskRenderer.instance.addLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset), 100)
                     if (UIStateManager_18.UIStateManager.instance.isMenuOpen) {
                         return;
                     }
-                    var rollingBackwards = (dx > 0 && updateData.input.mousePos.x < this.dude.standingPosition.x)
-                        || (dx < 0 && updateData.input.mousePos.x > this.dude.standingPosition.x);
-                    if (updateData.input.isKeyDown(32 /* SPACE */)
-                        && (dx !== 0 || dy !== 0)
-                        && !rollingBackwards) {
+                    // const rollingBackwards = (dx > 0 && updateData.input.mousePos.x < this.dude.standingPosition.x)
+                    // || (dx < 0 && updateData.input.mousePos.x > this.dude.standingPosition.x)
+                    if (updateData.input.isKeyDown(32 /* SPACE */) && (dx !== 0 || dy !== 0)) {
+                        // && !rollingBackwards) {
                         this.dude.roll();
                     }
                     if (updateData.input.isKeyDown(70 /* F */)) {
@@ -12695,7 +12683,7 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                         return;
                     }
                     if (this.knockIntervalCallback !== 0) { // being knocked back, don't let em walk
-                        direction = direction.times(0);
+                        direction = point_80.Point.ZERO;
                     }
                     var dx = direction.x;
                     var dy = direction.y;

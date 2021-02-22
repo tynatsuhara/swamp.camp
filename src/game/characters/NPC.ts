@@ -84,6 +84,8 @@ export class NPC extends Component {
 
     private doNormalScheduledActivity(updateData: UpdateData) {
         const schedule = this.getSchedule()
+
+        // TODO: add support for "pausing" during roaming
         
         if (schedule.type === NPCScheduleType.DO_NOTHING) {
             this.dude.move(updateData, Point.ZERO)
@@ -142,6 +144,7 @@ export class NPC extends Component {
 
     setSchedule(schedule: NPCSchedule) {
         this.dude.blob[NPCSchedules.SCHEDULE_KEY] = schedule
+        this.clearExistingAIState()
     }
 
     getSchedule(): NPCSchedule {

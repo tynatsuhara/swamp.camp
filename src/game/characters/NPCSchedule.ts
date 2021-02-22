@@ -22,19 +22,7 @@ export const NPCSchedules = {
 
     newFreeRoamInDarkSchedule: () => ({ type: NPCScheduleType.ROAM_IN_DARKNESS }),
 
-    newFreeRoamSchedule: (
-        // TODO: new params
-        pauseFrequencyMin: number = 0, 
-        pauseFrequencyMax: number = 0, 
-        pauseDurationMin: number = 0,
-        pauseDurationMax: number = 0,
-    ) => ({ 
-        type: NPCScheduleType.ROAM,
-        fl: pauseFrequencyMin,
-        fh: pauseFrequencyMax,
-        dl: pauseDurationMin,
-        dh: pauseDurationMax,
-    }),
+    newFreeRoamSchedule: () => ({ type: NPCScheduleType.ROAM }),
 
     newDefaultVillagerSchedule: () => ({ type: NPCScheduleType.DEFAULT_VILLAGER })
 }

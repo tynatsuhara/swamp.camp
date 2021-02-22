@@ -72,7 +72,7 @@ export class Player extends Component {
         this.dude.move(
             updateData, 
             new Point(dx, dy), 
-            this.dude.rolling() ? 0 : updateData.input.mousePos.x - this.dude.standingPosition.x,
+            0, // this.dude.rolling() ? 0 : updateData.input.mousePos.x - this.dude.standingPosition.x,
             1 + (this.dude.rolling() ? 1.2 : 0)
         )
 
@@ -82,12 +82,11 @@ export class Player extends Component {
             return
         }
 
-        const rollingBackwards = (dx > 0 && updateData.input.mousePos.x < this.dude.standingPosition.x)
-                || (dx < 0 && updateData.input.mousePos.x > this.dude.standingPosition.x)
+        // const rollingBackwards = (dx > 0 && updateData.input.mousePos.x < this.dude.standingPosition.x)
+                // || (dx < 0 && updateData.input.mousePos.x > this.dude.standingPosition.x)
 
-        if (updateData.input.isKeyDown(InputKey.SPACE) 
-                && (dx !== 0 || dy !== 0)
-                && !rollingBackwards) {
+        if (updateData.input.isKeyDown(InputKey.SPACE) && (dx !== 0 || dy !== 0)) {
+                // && !rollingBackwards) {
             this.dude.roll()
         }
 

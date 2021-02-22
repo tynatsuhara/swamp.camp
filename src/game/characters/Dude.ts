@@ -287,7 +287,7 @@ export class Dude extends Component implements DialogueSource {
         }
 
         if (this.knockIntervalCallback !== 0) {  // being knocked back, don't let em walk
-            direction = direction.times(0)
+            direction = Point.ZERO
         }
 
         const dx = direction.x
