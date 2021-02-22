@@ -9,6 +9,8 @@ import { PauseMenu } from "./PauseMenu"
 import { CraftingMenu } from "./CraftingMenu"
 import { SellMenu } from "./SellMenu"
 import { NotificationDisplay } from "./NotificationDisplay"
+import { Mouse } from "./Mouse"
+import { debug } from "../../engine/debug"
 
 export class UIStateManager {
 
@@ -57,6 +59,12 @@ export class UIStateManager {
                 || this.pauseMenu.isOpen
                 || this.craftingMenu.isOpen
                 || this.sellMenu.isOpen
+                
+        if (this.captureInput || debug.alwaysShowMouse) {
+            Mouse.show()
+        } else {
+            Mouse.hide()
+        }
 
         return this.hud.getEntities(Player.instance.dude, dimensions, elapsedMillis)
                 .concat(this.inventory.getEntities())
