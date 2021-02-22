@@ -23,6 +23,7 @@ export class Player extends Component {
     
     private crosshairs: TileComponent
     private lerpedLastMoveDir: Point = new Point(1, 0)  // used for crosshair
+    private rollingMomentum: Point
     private _dude: Dude
     get dude() { return this._dude }
 
@@ -57,7 +58,11 @@ export class Player extends Component {
         let dx = 0
         let dy = 0
 
-        if (!UIStateManager.instance.isMenuOpen) {
+        if (this.dude.rolling()) {
+            // TODO: change how momentum works if we implement slippery ice
+            dx = this.rollingMomentum.x
+            dy = this.rollingMomentum.y
+        } if (!UIStateManager.instance.isMenuOpen) {
             if (updateData.input.isKeyHeld(InputKey.W)) { dy-- }
             if (updateData.input.isKeyHeld(InputKey.S)) { dy++ }
             if (updateData.input.isKeyHeld(InputKey.A)) { dx-- }
@@ -85,9 +90,10 @@ export class Player extends Component {
         // const rollingBackwards = (dx > 0 && updateData.input.mousePos.x < this.dude.standingPosition.x)
                 // || (dx < 0 && updateData.input.mousePos.x > this.dude.standingPosition.x)
 
-        if (updateData.input.isKeyDown(InputKey.SPACE) && (dx !== 0 || dy !== 0)) {
+        if (!this.dude.rolling() && updateData.input.isKeyDown(InputKey.SPACE) && (dx !== 0 || dy !== 0)) {
                 // && !rollingBackwards) {
             this.dude.roll()
+            this.rollingMomentum = new Point(dx, dy)
         }
 
         if (updateData.input.isKeyDown(InputKey.F)) {

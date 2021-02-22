@@ -10505,6 +10505,11 @@ System.register("game/characters/Player", ["engine/component", "engine/debug", "
                     // const originalCrosshairPosRelative = this.crosshairs.transform.position.minus(this.position)
                     var dx = 0;
                     var dy = 0;
+                    if (this.dude.rolling()) {
+                        // TODO: change how momentum works if we implement slippery ice
+                        dx = this.rollingMomentum.x;
+                        dy = this.rollingMomentum.y;
+                    }
                     if (!UIStateManager_18.UIStateManager.instance.isMenuOpen) {
                         if (updateData.input.isKeyHeld(87 /* W */)) {
                             dy--;
@@ -10531,9 +10536,10 @@ System.register("game/characters/Player", ["engine/component", "engine/debug", "
                     }
                     // const rollingBackwards = (dx > 0 && updateData.input.mousePos.x < this.dude.standingPosition.x)
                     // || (dx < 0 && updateData.input.mousePos.x > this.dude.standingPosition.x)
-                    if (updateData.input.isKeyDown(32 /* SPACE */) && (dx !== 0 || dy !== 0)) {
+                    if (!this.dude.rolling() && updateData.input.isKeyDown(32 /* SPACE */) && (dx !== 0 || dy !== 0)) {
                         // && !rollingBackwards) {
                         this.dude.roll();
+                        this.rollingMomentum = new point_69.Point(dx, dy);
                     }
                     if (updateData.input.isKeyDown(70 /* F */)) {
                         this.dude.weapon.toggleSheathed();
