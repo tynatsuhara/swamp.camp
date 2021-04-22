@@ -39,4 +39,13 @@ export const DudeAnimationUtils = {
 
         return maybeFilter(characterAnimName, blob, anim)
     },
+
+    getCharacterJumpAnimation: (characterAnimName: string, blob: object): TileSetAnimation => {
+        const animSpeed = 80
+        const anim = Tilesets.instance.dungeonCharacters.getTileSetAnimation(`${characterAnimName}_hit_anim`, animSpeed)
+        // We only have/need this animation for the player
+        if (!!anim) {
+            return maybeFilter(characterAnimName, blob, anim)
+        }
+    },
 }

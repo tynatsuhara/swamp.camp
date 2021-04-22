@@ -74,11 +74,13 @@ export class Player extends Component {
         // const lightPosOffset = -TILE_SIZE/2
         // PointLightMaskRenderer.instance.removeLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset))
 
+        const rollSpeedIncrease = 1.5
+
         this.dude.move(
             updateData, 
             new Point(dx, dy), 
             0, // this.dude.rolling() ? 0 : updateData.input.mousePos.x - this.dude.standingPosition.x,
-            1 + (this.dude.rolling() ? 1.2 : 0)
+            1 + (this.dude.rolling() ? rollSpeedIncrease : 0)
         )
 
         // PointLightMaskRenderer.instance.addLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset), 100)

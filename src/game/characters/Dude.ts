@@ -105,8 +105,11 @@ export class Dude extends Component implements DialogueSource {
             this.characterAnimName = characterAnimName
             const idleAnim = DudeAnimationUtils.getCharacterIdleAnimation(characterAnimName, blob)
             const runAnim = DudeAnimationUtils.getCharacterWalkAnimation(characterAnimName, blob)
+            const jumpAnim = DudeAnimationUtils.getCharacterJumpAnimation(characterAnimName, blob)
             const height = idleAnim.getTile(0).dimensions.y
-            this._animation = this.entity.addComponent(new AnimatedTileComponent([idleAnim, runAnim], new TileTransform(new Point(0, 28-height))))
+            this._animation = this.entity.addComponent(
+                new AnimatedTileComponent([idleAnim, runAnim, jumpAnim], new TileTransform(new Point(0, 28-height)))
+            )
             this._animation.fastForward(Math.random() * 1000)  // so not all the animations sync up
     
             this.setWeapon(weaponType)
@@ -303,7 +306,7 @@ export class Dude extends Component implements DialogueSource {
         this._isMoving = dx != 0 || dy != 0
 
         if (this.isMoving) {
-            if (!wasMoving) {
+            if (!wasMoving || this.animationDirty) {
                 this.animation.goToAnimation(1)  // TODO make the run animation backwards if they run backwards :)
             }
             const translation = direction.normalized()
@@ -311,9 +314,11 @@ export class Dude extends Component implements DialogueSource {
             const distance = Math.min(updateData.elapsedTimeMillis * this.speed * speedMultiplier, maxDistance)
             const newPos = this._position.plus(translation.times(distance))
             this.moveTo(newPos)
-        } else if (wasMoving) {
+        } else if (wasMoving || this.animationDirty) {
             this.animation.goToAnimation(0)
         }
+
+        this.animationDirty = false
     }
 
     /**
@@ -329,11 +334,26 @@ export class Dude extends Component implements DialogueSource {
     private isRolling = false
     private canRoll = true
     private rollingOffset: Point
+    private animationDirty: boolean
     roll() {
         if (!this.canRoll) {
             return
         }
-
+        this.rollFunction()
+        setTimeout(() => this.canRoll = true, 750)
+    }
+    private rollFunction = this.dashRoll
+    // just a stepping dodge instead of a roll
+    private dashRoll() {
+        this.isRolling = true;
+        this.animation.goToAnimation(2)  
+        setTimeout(() => {
+            this.isRolling = false
+            this.animationDirty = true
+        }, 175)
+    }
+    // has a rolling animation, however janky
+    private legacyRoll() {
         const setRotation = (rot: number, offset: Point) => {
             if (this.animation.transform.mirrorX) {
                 this.animation.transform.rotation = -rot
@@ -344,19 +364,17 @@ export class Dude extends Component implements DialogueSource {
             }
         }
 
-        const speed = 80
+        const animationSpeed = 80
         this.isRolling = true
         this.canRoll = false
 
         setRotation(90, new Point(6, 8))
-        setTimeout(() => setRotation(180, new Point(0, 14)), speed)
-        setTimeout(() => setRotation(270, new Point(-6, 8)), speed * 2)
+        setTimeout(() => setRotation(180, new Point(0, 14)), animationSpeed)
+        setTimeout(() => setRotation(270, new Point(-6, 8)), animationSpeed * 2)
         setTimeout(() => {
             setRotation(0, Point.ZERO)
             this.isRolling = false
-        }, speed * 3)
-
-        setTimeout(() => this.canRoll = true, 750)
+        }, animationSpeed * 3)
     }
     rolling() {
         return this.isRolling
@@ -381,6 +399,10 @@ export class Dude extends Component implements DialogueSource {
     }
 
     getAnimationOffsetPosition(): Point {
+        if (this.isRolling && this.rollFunction === this.dashRoll) {
+            return new Point(0, -5)
+        }
+
         // magic based on the animations
         const f = this.animation.currentFrame()
         let arr: number[]

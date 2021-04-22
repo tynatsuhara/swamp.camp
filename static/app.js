@@ -1740,7 +1740,7 @@ System.register("engine/tiles/AnimatedTileComponent", ["engine/util/Animator", "
                 };
                 // This won't currently refresh the animation
                 AnimatedTileComponent.prototype.applyFilter = function (filter) {
-                    this.animations = this.animations.map(function (a) { return a.filtered(filter); });
+                    this.animations = this.animations.map(function (a) { return a === null || a === void 0 ? void 0 : a.filtered(filter); });
                 };
                 return AnimatedTileComponent;
             }(TileComponent_2.TileComponent));
@@ -10527,8 +10527,9 @@ System.register("game/characters/Player", ["engine/component", "engine/debug", "
                     //       - instead of removing by position, map the light to a source object and remove based on that
                     // const lightPosOffset = -TILE_SIZE/2
                     // PointLightMaskRenderer.instance.removeLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset))
+                    var rollSpeedIncrease = 1.5;
                     this.dude.move(updateData, new point_69.Point(dx, dy), 0, // this.dude.rolling() ? 0 : updateData.input.mousePos.x - this.dude.standingPosition.x,
-                    1 + (this.dude.rolling() ? 1.2 : 0));
+                    1 + (this.dude.rolling() ? rollSpeedIncrease : 0));
                     // PointLightMaskRenderer.instance.addLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset), 100)
                     if (UIStateManager_18.UIStateManager.instance.isMenuOpen) {
                         return;
@@ -11699,6 +11700,14 @@ System.register("game/characters/DudeAnimationUtils", ["game/graphics/ImageFilte
                         || Tilesets_44.Tilesets.instance.extraCharacterSet2.getWalkAnimation(characterAnimName, animSpeed);
                     return maybeFilter(characterAnimName, blob, anim);
                 },
+                getCharacterJumpAnimation: function (characterAnimName, blob) {
+                    var animSpeed = 80;
+                    var anim = Tilesets_44.Tilesets.instance.dungeonCharacters.getTileSetAnimation(characterAnimName + "_hit_anim", animSpeed);
+                    // We only have/need this animation for the player
+                    if (!!anim) {
+                        return maybeFilter(characterAnimName, blob, anim);
+                    }
+                },
             });
         }
     };
@@ -12517,6 +12526,7 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                     _this.knockIntervalCallback = 0;
                     _this.isRolling = false;
                     _this.canRoll = true;
+                    _this.rollFunction = _this.dashRoll;
                     _this.uuid = uuid;
                     _this.type = type;
                     _this.factions = factions;
@@ -12533,8 +12543,9 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                         _this.characterAnimName = characterAnimName;
                         var idleAnim = DudeAnimationUtils_1.DudeAnimationUtils.getCharacterIdleAnimation(characterAnimName, blob);
                         var runAnim = DudeAnimationUtils_1.DudeAnimationUtils.getCharacterWalkAnimation(characterAnimName, blob);
+                        var jumpAnim = DudeAnimationUtils_1.DudeAnimationUtils.getCharacterJumpAnimation(characterAnimName, blob);
                         var height = idleAnim.getTile(0).dimensions.y;
-                        _this._animation = _this.entity.addComponent(new AnimatedTileComponent_6.AnimatedTileComponent([idleAnim, runAnim], new TileTransform_33.TileTransform(new point_80.Point(0, 28 - height))));
+                        _this._animation = _this.entity.addComponent(new AnimatedTileComponent_6.AnimatedTileComponent([idleAnim, runAnim, jumpAnim], new TileTransform_33.TileTransform(new point_80.Point(0, 28 - height))));
                         _this._animation.fastForward(Math.random() * 1000); // so not all the animations sync up
                         _this.setWeapon(weaponType);
                         if (!!shieldId) {
@@ -12741,7 +12752,7 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                     var wasMoving = this.isMoving;
                     this._isMoving = dx != 0 || dy != 0;
                     if (this.isMoving) {
-                        if (!wasMoving) {
+                        if (!wasMoving || this.animationDirty) {
                             this.animation.goToAnimation(1); // TODO make the run animation backwards if they run backwards :)
                         }
                         var translation = direction.normalized();
@@ -12750,9 +12761,10 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                         var newPos = this._position.plus(translation.times(distance));
                         this.moveTo(newPos);
                     }
-                    else if (wasMoving) {
+                    else if (wasMoving || this.animationDirty) {
                         this.animation.goToAnimation(0);
                     }
+                    this.animationDirty = false;
                 };
                 /**
                  * @param point World point where the dude will be moved, unless they hit a collider (with skipColliderCheck = false)
@@ -12770,6 +12782,22 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                     if (!this.canRoll) {
                         return;
                     }
+                    this.rollFunction();
+                    setTimeout(function () { return _this.canRoll = true; }, 750);
+                };
+                // just a stepping dodge instead of a roll
+                Dude.prototype.dashRoll = function () {
+                    var _this = this;
+                    this.isRolling = true;
+                    this.animation.goToAnimation(2);
+                    setTimeout(function () {
+                        _this.isRolling = false;
+                        _this.animationDirty = true;
+                    }, 175);
+                };
+                // has a rolling animation, however janky
+                Dude.prototype.legacyRoll = function () {
+                    var _this = this;
                     var setRotation = function (rot, offset) {
                         if (_this.animation.transform.mirrorX) {
                             _this.animation.transform.rotation = -rot;
@@ -12780,17 +12808,16 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                             _this.rollingOffset = offset;
                         }
                     };
-                    var speed = 80;
+                    var animationSpeed = 80;
                     this.isRolling = true;
                     this.canRoll = false;
                     setRotation(90, new point_80.Point(6, 8));
-                    setTimeout(function () { return setRotation(180, new point_80.Point(0, 14)); }, speed);
-                    setTimeout(function () { return setRotation(270, new point_80.Point(-6, 8)); }, speed * 2);
+                    setTimeout(function () { return setRotation(180, new point_80.Point(0, 14)); }, animationSpeed);
+                    setTimeout(function () { return setRotation(270, new point_80.Point(-6, 8)); }, animationSpeed * 2);
                     setTimeout(function () {
                         setRotation(0, point_80.Point.ZERO);
                         _this.isRolling = false;
-                    }, speed * 3);
-                    setTimeout(function () { return _this.canRoll = true; }, 750);
+                    }, animationSpeed * 3);
                 };
                 Dude.prototype.rolling = function () {
                     return this.isRolling;
@@ -12812,6 +12839,9 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                     return this.animation.transform.mirrorX ? -1 : 1;
                 };
                 Dude.prototype.getAnimationOffsetPosition = function () {
+                    if (this.isRolling && this.rollFunction === this.dashRoll) {
+                        return new point_80.Point(0, -5);
+                    }
                     // magic based on the animations
                     var f = this.animation.currentFrame();
                     var arr;
