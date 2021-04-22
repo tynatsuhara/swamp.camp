@@ -74,13 +74,19 @@ export class Player extends Component {
         // const lightPosOffset = -TILE_SIZE/2
         // PointLightMaskRenderer.instance.removeLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset))
 
-        const rollSpeedIncrease = 0.75
+        let speed = 1
+        if (this.dude.rolling()) {
+            speed += 0.75
+        }
+        if (this.dude.shield?.isBlocking()) {
+            speed -= 0.3
+        }
 
         this.dude.move(
             updateData, 
             new Point(dx, dy), 
             0, // this.dude.rolling() ? 0 : updateData.input.mousePos.x - this.dude.standingPosition.x,
-            1 + (this.dude.rolling() ? rollSpeedIncrease : 0)
+            speed
         )
 
         // PointLightMaskRenderer.instance.addLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset), 100)
