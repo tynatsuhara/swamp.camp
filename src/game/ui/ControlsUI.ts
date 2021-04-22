@@ -7,21 +7,24 @@ import { formatText } from "./Text"
 import { Color } from "./Color"
 import { RenderMethod } from "../../engine/renderer/RenderMethod"
 import { UIStateManager } from "./UIStateManager"
+import { Controls } from "../Controls"
 
 export const makeControlsUI = (dimensions: Point, offset: Point): RenderMethod[] => {
     const topLeft = new Point(dimensions.x/2 - TILE_SIZE*4 + 1, dimensions.y/2 - TILE_SIZE*5).plus(offset)
-    const mouseButtVertOffset = 5
+    const controlsOffset = 5
 
     return [
-        ...new KeyPressIndicator(topLeft.plusX(TILE_SIZE), InputKey.W).getRenderMethods(),
-        ...new KeyPressIndicator(topLeft.plusY(TILE_SIZE), InputKey.A).getRenderMethods(),
-        ...new KeyPressIndicator(topLeft.plusX(TILE_SIZE).plusY(TILE_SIZE), InputKey.S).getRenderMethods(),
-        ...new KeyPressIndicator(topLeft.plusX(TILE_SIZE * 2).plusY(TILE_SIZE), InputKey.D).getRenderMethods(),
-        Tilesets.instance.oneBit.getTileSource("leftClick").toImageRender(new TileTransform(topLeft.plusX(TILE_SIZE*4).plusY(mouseButtVertOffset))),
-        Tilesets.instance.oneBit.getTileSource("rightClick").toImageRender(new TileTransform(topLeft.plusX(TILE_SIZE*4).plusY(TILE_SIZE * 1 + mouseButtVertOffset))),
+        ...new KeyPressIndicator(topLeft.plusX(TILE_SIZE), Controls.walkUp).getRenderMethods(),
+        ...new KeyPressIndicator(topLeft.plusY(TILE_SIZE), Controls.walkLeft).getRenderMethods(),
+        ...new KeyPressIndicator(topLeft.plusX(TILE_SIZE).plusY(TILE_SIZE), Controls.walkDown).getRenderMethods(),
+        ...new KeyPressIndicator(topLeft.plusX(TILE_SIZE * 2).plusY(TILE_SIZE), Controls.walkRight).getRenderMethods(),
+        ...new KeyPressIndicator(topLeft.plusX(TILE_SIZE * 4 - 2).plusY(controlsOffset), Controls.attackKey).getRenderMethods(),
+        ...new KeyPressIndicator(topLeft.plusX(TILE_SIZE * 4 - 2).plusY(controlsOffset + TILE_SIZE), Controls.blockKey).getRenderMethods(),
+        // Tilesets.instance.oneBit.getTileSource("leftClick").toImageRender(new TileTransform(topLeft.plusX(TILE_SIZE*4).plusY(mouseButtVertOffset))),
+        // Tilesets.instance.oneBit.getTileSource("rightClick").toImageRender(new TileTransform(topLeft.plusX(TILE_SIZE*4).plusY(TILE_SIZE * 1 + mouseButtVertOffset))),
         ...formatText("MOVE", Color.WHITE, topLeft.plusX(TILE_SIZE/2).plusY(TILE_SIZE*2+2), 100),
-        ...formatText("ATTACK", Color.WHITE, topLeft.plusX(TILE_SIZE*5).plusY(4 + mouseButtVertOffset), 100),
-        ...formatText("BLOCK", Color.WHITE, topLeft.plusX(TILE_SIZE*5).plusY(TILE_SIZE + 4 + mouseButtVertOffset), 100),
+        ...formatText("ATTACK", Color.WHITE, topLeft.plusX(TILE_SIZE*5).plusY(4 + controlsOffset), 100),
+        ...formatText("BLOCK", Color.WHITE, topLeft.plusX(TILE_SIZE*5).plusY(TILE_SIZE + 4 + controlsOffset), 100),
     ].map(r => {
         r.depth = UIStateManager.UI_SPRITE_DEPTH
         return r

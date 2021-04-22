@@ -63,10 +63,10 @@ export class Player extends Component {
             dx = this.rollingMomentum.x
             dy = this.rollingMomentum.y
         } if (!UIStateManager.instance.isMenuOpen) {
-            if (updateData.input.isKeyHeld(InputKey.W)) { dy-- }
-            if (updateData.input.isKeyHeld(InputKey.S)) { dy++ }
-            if (updateData.input.isKeyHeld(InputKey.A)) { dx-- }
-            if (updateData.input.isKeyHeld(InputKey.D)) { dx++ }
+            if (updateData.input.isKeyHeld(Controls.walkUp)) { dy-- }
+            if (updateData.input.isKeyHeld(Controls.walkDown)) { dy++ }
+            if (updateData.input.isKeyHeld(Controls.walkLeft)) { dx-- }
+            if (updateData.input.isKeyHeld(Controls.walkRight)) { dx++ }
         }
 
         // TODO: - make this an unlockable feature
@@ -102,11 +102,11 @@ export class Player extends Component {
         }
 
         if (!!this.dude.shield) {
-            this.dude.shield.block(updateData.input.isRightMouseHeld)
+            this.dude.shield.block(updateData.input.isKeyHeld(Controls.blockKey))
         }
 
-        if (updateData.input.isMouseHeld) {
-            this.dude.weapon.attack(updateData.input.isMouseDown)
+        if (updateData.input.isKeyHeld(Controls.attackKey)) {
+            this.dude.weapon.attack(updateData.input.isKeyDown(Controls.attackKey))
         } else {
             this.dude.weapon.cancelAttack()
         }
@@ -121,12 +121,12 @@ export class Player extends Component {
                 debug.alwaysShowMouse = !debug.alwaysShowMouse
             }
             const mouseTilePos = pixelPtToTilePt(updateData.input.mousePos)
-            if (updateData.input.isKeyDown(InputKey.K)) {
-                DudeFactory.instance.new(DudeType.ORC_WARRIOR, updateData.input.mousePos)
-            }
-            if (updateData.input.isKeyDown(InputKey.L)) {
-                DudeFactory.instance.new(DudeType.HORNED_DEMON, updateData.input.mousePos)
-            }
+            // if (updateData.input.isKeyDown(InputKey.K)) {
+            //     DudeFactory.instance.new(DudeType.ORC_WARRIOR, updateData.input.mousePos)
+            // }
+            // if (updateData.input.isKeyDown(InputKey.L)) {
+            //     DudeFactory.instance.new(DudeType.HORNED_DEMON, updateData.input.mousePos)
+            // }
             if (updateData.input.isKeyDown(InputKey.SEMICOLON)) {
                 DudeFactory.instance.new(DudeType.ORC_WARRIOR, updateData.input.mousePos)
             }
