@@ -335,6 +335,8 @@ export class Dude extends Component implements DialogueSource {
     private canRoll = true
     private rollingOffset: Point
     private animationDirty: boolean
+    private rollFunction = this.dashRoll
+
     roll() {
         if (!this.canRoll) {
             return
@@ -342,7 +344,7 @@ export class Dude extends Component implements DialogueSource {
         this.rollFunction()
         setTimeout(() => this.canRoll = true, 750)
     }
-    private rollFunction = this.dashRoll
+
     // just a stepping dodge instead of a roll
     private dashRoll() {
         this.isRolling = true;
@@ -350,8 +352,9 @@ export class Dude extends Component implements DialogueSource {
         setTimeout(() => {
             this.isRolling = false
             this.animationDirty = true
-        }, 175)
+        }, 200)
     }
+
     // has a rolling animation, however janky
     private legacyRoll() {
         const setRotation = (rot: number, offset: Point) => {
@@ -376,6 +379,7 @@ export class Dude extends Component implements DialogueSource {
             this.isRolling = false
         }, animationSpeed * 3)
     }
+
     rolling() {
         return this.isRolling
     }

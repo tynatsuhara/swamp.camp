@@ -74,7 +74,7 @@ export class Player extends Component {
         // const lightPosOffset = -TILE_SIZE/2
         // PointLightMaskRenderer.instance.removeLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset))
 
-        const rollSpeedIncrease = 1.5
+        const rollSpeedIncrease = 0.75
 
         this.dude.move(
             updateData, 

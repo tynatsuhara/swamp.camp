@@ -10527,7 +10527,7 @@ System.register("game/characters/Player", ["engine/component", "engine/debug", "
                     //       - instead of removing by position, map the light to a source object and remove based on that
                     // const lightPosOffset = -TILE_SIZE/2
                     // PointLightMaskRenderer.instance.removeLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset))
-                    var rollSpeedIncrease = 1.5;
+                    var rollSpeedIncrease = 0.75;
                     this.dude.move(updateData, new point_69.Point(dx, dy), 0, // this.dude.rolling() ? 0 : updateData.input.mousePos.x - this.dude.standingPosition.x,
                     1 + (this.dude.rolling() ? rollSpeedIncrease : 0));
                     // PointLightMaskRenderer.instance.addLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset), 100)
@@ -12793,7 +12793,7 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                     setTimeout(function () {
                         _this.isRolling = false;
                         _this.animationDirty = true;
-                    }, 175);
+                    }, 200);
                 };
                 // has a rolling animation, however janky
                 Dude.prototype.legacyRoll = function () {
