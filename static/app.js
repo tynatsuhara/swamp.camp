@@ -10510,7 +10510,7 @@ System.register("game/characters/Player", ["engine/component", "engine/debug", "
                         dx = this.rollingMomentum.x;
                         dy = this.rollingMomentum.y;
                     }
-                    if (!UIStateManager_18.UIStateManager.instance.isMenuOpen) {
+                    else if (!UIStateManager_18.UIStateManager.instance.isMenuOpen) {
                         if (updateData.input.isKeyHeld(Controls_8.Controls.walkUp)) {
                             dy--;
                         }

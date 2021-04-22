@@ -62,7 +62,7 @@ export class Player extends Component {
             // TODO: change how momentum works if we implement slippery ice
             dx = this.rollingMomentum.x
             dy = this.rollingMomentum.y
-        } if (!UIStateManager.instance.isMenuOpen) {
+        } else if (!UIStateManager.instance.isMenuOpen) {
             if (updateData.input.isKeyHeld(Controls.walkUp)) { dy-- }
             if (updateData.input.isKeyHeld(Controls.walkDown)) { dy++ }
             if (updateData.input.isKeyHeld(Controls.walkLeft)) { dx-- }
