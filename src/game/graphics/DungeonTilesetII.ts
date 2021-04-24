@@ -140,6 +140,8 @@ const map = new Map(`
     weapon_spear 293 177 6 30
     weapon_pickaxe 303 187 20 20
 
+    lantern 336 192 16 16
+
     tiny_zombie_idle_anim 368 16 16 16 4
     tiny_zombie_run_anim 432 16 16 16 4
 
