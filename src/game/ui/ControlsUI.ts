@@ -10,8 +10,9 @@ import { UIStateManager } from "./UIStateManager"
 import { Controls } from "../Controls"
 
 export const makeControlsUI = (dimensions: Point, offset: Point): RenderMethod[] => {
-    const topLeft = new Point(dimensions.x/2 - TILE_SIZE*4 + 1, dimensions.y/2 - TILE_SIZE*5).plus(offset)
+    const topLeft = new Point(dimensions.x/2 - TILE_SIZE*6 + 1, dimensions.y/2 - TILE_SIZE*5).plus(offset)
     const controlsOffset = 5
+    const dashOffset = TILE_SIZE * 5-4
 
     return [
         ...new KeyPressIndicator(topLeft.plusX(TILE_SIZE), Controls.walkUp).getRenderMethods(),
@@ -25,6 +26,8 @@ export const makeControlsUI = (dimensions: Point, offset: Point): RenderMethod[]
         ...formatText("MOVE", Color.WHITE, topLeft.plusX(TILE_SIZE/2).plusY(TILE_SIZE*2+2), 100),
         ...formatText("ATTACK", Color.WHITE, topLeft.plusX(TILE_SIZE*5).plusY(4 + controlsOffset), 100),
         ...formatText("BLOCK", Color.WHITE, topLeft.plusX(TILE_SIZE*5).plusY(TILE_SIZE + 4 + controlsOffset), 100),
+        ...formatText("[SPACE]", Color.WHITE, topLeft.plusX(TILE_SIZE*4 + dashOffset).plusY(4 + controlsOffset + 3), 100),
+        ...formatText("DASH", Color.WHITE, topLeft.plusX(TILE_SIZE*4.75 + dashOffset).plusY(TILE_SIZE + 4 + controlsOffset - 3), 100),
     ].map(r => {
         r.depth = UIStateManager.UI_SPRITE_DEPTH
         return r
