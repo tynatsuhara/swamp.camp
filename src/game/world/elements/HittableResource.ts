@@ -14,22 +14,26 @@ export class HittableResource extends Hittable {
     freeResources: number
     readonly maxResources: number
     private itemSupplier: () => Item[]    
+    private audioCallback: () => void
 
     constructor(
         position: Point, 
         tileTransforms: TileTransform[], 
         freeResources: number, 
         maxResources: number, 
-        itemSupplier: () => Item[]
+        itemSupplier: () => Item[],
+        audioCallback: () => void = () => {}
     ) {
         super(position, tileTransforms, hitDir => this.hitCallback(hitDir))
         this.freeResources = freeResources
         this.maxResources = maxResources
         this.itemSupplier = itemSupplier
+        this.audioCallback = audioCallback
     }
 
     private hitCallback(hitDir: Point) {
         this.freeResources--
+        this.audioCallback()
 
         if (this.freeResources < 0 && this.freeResources > HittableResource.negativeThreshold) {
             return

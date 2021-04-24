@@ -12,11 +12,26 @@ import { HittableResource } from "./HittableResource"
 import { Player } from "../../characters/Player"
 import { WeaponType } from "../../characters/weapons/WeaponType"
 import { ElementFactory } from "./ElementFactory"
+import { assets } from "../../../engine/Assets"
+import { Lists } from "../../../engine/util/Lists"
+
+const MINING_AUDIO = [
+    "audio/impact/impactMining_000.ogg",
+    "audio/impact/impactMining_001.ogg",
+    "audio/impact/impactMining_002.ogg",
+    "audio/impact/impactMining_003.ogg",
+    "audio/impact/impactMining_004.ogg",
+]
 
 export class RockFactory extends ElementFactory {
 
     readonly type = ElementType.ROCK
     readonly dimensions = new Point(1, 1)
+
+    constructor() {
+        super()
+        assets.loadAudioFiles(MINING_AUDIO)
+    }
 
     make(wl: WorldLocation, pos: Point, data: object): ElementComponent {
         const e = new Entity()
@@ -47,7 +62,8 @@ export class RockFactory extends ElementFactory {
                 } else {
                     return Math.random() > .9 ? [Item.IRON] : [Item.ROCK]
                 }
-            }
+            },
+            () => assets.getAudioByFileName(Lists.oneOf(MINING_AUDIO)).play()
         ))
 
         return e.addComponent(new ElementComponent(

@@ -81,7 +81,7 @@ class MovingAverage {
 export const profiler = new Profiler()
 
 /**
- * Executes the given function and returns the duration it took to execute as well as the result
+ * Executes the given function and returns the milliseconds it took to execute as well as the result
  */
 export function measure<T>(fn: () => T): [number, T] {
     const start = new Date().getTime()
