@@ -20,6 +20,7 @@ export const ButtonsMenu = {
         screenDimensions: Point, 
         backgroundColor: "red"|"white",
         options: OptionButton[],
+        offset: Point = Point.ZERO
     ): Entity => {
         const longestOption = Math.max(...options.map(o => o.text.length))
 
@@ -33,7 +34,7 @@ export const ButtonsMenu = {
             (options.length-1)*buttonPadding + options.length*TILE_SIZE + marginTop + marginBottom
         )
         
-        const topLeft = screenDimensions.div(2).minus(dimensions.div(2))
+        const topLeft = screenDimensions.div(2).minus(dimensions.div(2)).plus(offset)
 
         const backgroundTiles = NineSlice.makeStretchedNineSliceComponents(
             backgroundColor === "red" ? Tilesets.instance.oneBit.getNineSlice("invBoxNW") : Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"), 

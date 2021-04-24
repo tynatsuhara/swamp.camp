@@ -14,6 +14,7 @@ import { WeaponType } from "../../characters/weapons/WeaponType"
 import { ElementFactory } from "./ElementFactory"
 import { assets } from "../../../engine/Assets"
 import { Lists } from "../../../engine/util/Lists"
+import { Sounds } from "../../audio/Sounds"
 
 const MINING_AUDIO = [
     "audio/impact/impactMining_000.ogg",
@@ -63,7 +64,7 @@ export class RockFactory extends ElementFactory {
                     return Math.random() > .9 ? [Item.IRON] : [Item.ROCK]
                 }
             },
-            () => assets.getAudioByFileName(Lists.oneOf(MINING_AUDIO)).play()
+            () => Sounds.play(Lists.oneOf(MINING_AUDIO))
         ))
 
         return e.addComponent(new ElementComponent(

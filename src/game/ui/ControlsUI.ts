@@ -10,7 +10,7 @@ import { UIStateManager } from "./UIStateManager"
 import { Controls } from "../Controls"
 
 export const makeControlsUI = (dimensions: Point, offset: Point): RenderMethod[] => {
-    const topLeft = new Point(dimensions.x/2 - TILE_SIZE*6 + 1, dimensions.y/2 - TILE_SIZE*5).plus(offset)
+    const topLeft = new Point(dimensions.x/2 - TILE_SIZE*6 - 1, dimensions.y/2 - TILE_SIZE*5).plus(offset)
     const controlsOffset = 5
     const dashOffset = TILE_SIZE * 5-4
 

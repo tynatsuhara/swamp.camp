@@ -10,6 +10,8 @@ import { saveManager } from "../SaveManager"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { makeControlsUI } from "./ControlsUI"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
+import { Settings } from "../Settings"
+import { TILE_SIZE } from "../graphics/Tilesets"
 
 export class PauseMenu extends Component {
 
@@ -43,17 +45,31 @@ export class PauseMenu extends Component {
             dimensions,
             "red",
             [{
-                text: "Save game".toUpperCase(), 
+                text: "SAVE GAME", 
                 fn: () => saveManager.save(),
                 buttonColor, textColor, hoverColor,
-            },
-            {
-                text: "Load last save".toUpperCase(), 
+            }, {
+                text: "LOAD LAST SAVE", 
                 fn: () => saveManager.load(),
                 buttonColor, textColor, hoverColor,
-            }]
+            }, {
+                text: `MUSIC (${Settings.getMusicVolume() * 100}%)`, 
+                fn: () => {
+                    Settings.bumpMusicVolume()
+                    this.show(dimensions)  // refresh
+                },
+                buttonColor, textColor, hoverColor,
+            }, {
+                text: `SOUNDS (${Settings.getSoundVolume() * 100}%)`, 
+                fn: () => {
+                    Settings.bumpSoundVolume()
+                    this.show(dimensions)  // refresh
+                },
+                buttonColor, textColor, hoverColor,
+            }],
+            new Point(0, TILE_SIZE/2)
         )
-        this.controlsDisplay = new Entity([new BasicRenderComponent(...makeControlsUI(dimensions, Point.ZERO))])
+        this.controlsDisplay = new Entity([new BasicRenderComponent(...makeControlsUI(dimensions, new Point(0, -TILE_SIZE/2)))])
     }
 
     getEntities(): Entity[] {
