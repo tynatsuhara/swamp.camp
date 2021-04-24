@@ -8406,17 +8406,21 @@ System.register("game/ui/PlaceElementDisplay", ["engine/Entity", "engine/compone
                     this.element = null;
                     this.placingFrame.delete();
                 };
-                PlaceElementDisplay.prototype.startPlacing = function (element, successFn) {
+                PlaceElementDisplay.prototype.startPlacing = function (element, successFn, count) {
                     this.element = element;
                     this.successFn = successFn;
+                    this.count = count;
                     this.dimensions = Elements_3.Elements.instance.getElementFactory(element).dimensions;
                     this.placingFrame = Player_9.Player.instance.entity.addComponent(new PlaceElementFrame_1.PlaceElementFrame(this.dimensions));
                 };
                 // Should only be called by PlaceElementFrame
                 PlaceElementDisplay.prototype.finishPlacing = function (elementPos) {
+                    this.count--;
                     this.successFn(); // remove from inv
                     LocationManager_15.LocationManager.instance.currentLocation.addElement(this.element, elementPos);
-                    this.close();
+                    if (this.count === 0) {
+                        this.close();
+                    }
                 };
                 PlaceElementDisplay.prototype.getEntities = function () {
                     return [this.e];
@@ -8587,7 +8591,7 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                                 verb: 'place',
                                 actionFn: function () {
                                     _this.close();
-                                    PlaceElementDisplay_2.PlaceElementDisplay.instance.startPlacing(item_1.element, decrementStack_1);
+                                    PlaceElementDisplay_2.PlaceElementDisplay.instance.startPlacing(item_1.element, decrementStack_1, stack_1.count);
                                 }
                             });
                         }

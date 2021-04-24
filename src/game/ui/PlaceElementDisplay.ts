@@ -18,6 +18,7 @@ export class PlaceElementDisplay extends Component {
     private dimensions: Point
     private placingFrame: PlaceElementFrame
     private successFn: () => void
+    private count: number
 
     get isOpen() { return this.element !== null && this.element !== undefined }
 
@@ -41,18 +42,22 @@ export class PlaceElementDisplay extends Component {
         this.placingFrame.delete()
     }
 
-    startPlacing(element: ElementType, successFn: () => void) {
+    startPlacing(element: ElementType, successFn: () => void, count: number) {
         this.element = element
         this.successFn = successFn
+        this.count = count
         this.dimensions = Elements.instance.getElementFactory(element).dimensions
         this.placingFrame = Player.instance.entity.addComponent(new PlaceElementFrame(this.dimensions))
     }
 
     // Should only be called by PlaceElementFrame
     finishPlacing(elementPos: Point) {
+        this.count--
         this.successFn()  // remove from inv
         LocationManager.instance.currentLocation.addElement(this.element, elementPos)
-        this.close()
+        if (this.count === 0) {
+            this.close()
+        }
     }
 
     getEntities(): Entity[] {

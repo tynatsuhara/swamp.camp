@@ -129,7 +129,8 @@ export class InventoryDisplay extends Component {
                         this.close()
                         PlaceElementDisplay.instance.startPlacing(
                             item.element, 
-                            decrementStack
+                            decrementStack,
+                            stack.count
                         )
                     }
                 })
