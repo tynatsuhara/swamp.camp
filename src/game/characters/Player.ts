@@ -113,7 +113,7 @@ export class Player extends Component {
             this.dude.shield.block(updateData.input.isKeyHeld(Controls.blockKey))
         }
 
-        if (updateData.input.isKeyHeld(Controls.attackKey)) {
+        if (updateData.input.isKeyHeld(Controls.attackKey) && !updateData.input.isKeyHeld(Controls.blockKey)) {
             this.dude.weapon.attack(updateData.input.isKeyDown(Controls.attackKey))
         } else {
             this.dude.weapon.cancelAttack()

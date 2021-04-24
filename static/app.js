@@ -10555,7 +10555,7 @@ System.register("game/characters/Player", ["engine/component", "engine/debug", "
                     if (!!this.dude.shield) {
                         this.dude.shield.block(updateData.input.isKeyHeld(Controls_8.Controls.blockKey));
                     }
-                    if (updateData.input.isKeyHeld(Controls_8.Controls.attackKey)) {
+                    if (updateData.input.isKeyHeld(Controls_8.Controls.attackKey) && !updateData.input.isKeyHeld(Controls_8.Controls.blockKey)) {
                         this.dude.weapon.attack(updateData.input.isKeyDown(Controls_8.Controls.attackKey));
                     }
                     else {
@@ -11808,7 +11808,7 @@ System.register("game/characters/weapons/Shield", ["engine/component", "engine/t
                     return this.state === State.DRAWN && this.raisedPerc > .3;
                 };
                 Shield.prototype.canAttack = function () {
-                    return this.state === State.DRAWN && this.raisedPerc < .5;
+                    return this.state === State.DRAWN && this.raisedPerc < 1;
                 };
                 return Shield;
             }(component_41.Component));
