@@ -7,6 +7,8 @@ import { Point } from "../../../engine/point"
 import { Dude } from "../Dude"
 import { Animator } from "../../../engine/util/Animator"
 import { ShieldType } from "./ShieldType"
+import { RenderMethod } from "../../../engine/renderer/RenderMethod"
+import { StaticTileSource } from "../../../engine/tiles/StaticTileSource"
 
 enum State {
     ON_BACK,
@@ -19,7 +21,8 @@ enum State {
 export class Shield extends Component {
 
     dude: Dude
-    sprite: TileComponent
+    sprite: StaticTileSource
+    transform: TileTransform
 
     private state: State = State.DRAWN
     // private slashSprite: TileComponent  // TODO try adding particles when someone hits a blocking shield
@@ -31,15 +34,15 @@ export class Shield extends Component {
     constructor(type: ShieldType, spriteId: string) {
         super()
         this.type = type
-        this.start = (startData) => {
+        this.start = () => {
             this.dude = this.entity.getComponent(Dude)
-            this.sprite = this.entity.addComponent(
-                new TileComponent(
-                    Tilesets.instance.dungeonCharacters.getTileSource(spriteId),
-                    new TileTransform().relativeTo(this.dude.animation.transform)
-                )
-            )
+            this.sprite = Tilesets.instance.dungeonCharacters.getTileSource(spriteId)
+            this.transform = TileTransform.new({dimensions: this.sprite.dimensions}).relativeTo(this.dude.animation.transform)
         }
+    }
+
+    getRenderMethods(): RenderMethod[] {
+        return [this.sprite.toImageRender(this.transform)]
     }
 
     update(updateData: UpdateData) {
@@ -60,8 +63,8 @@ export class Shield extends Component {
 
         pos = pos.plus(this.dude.getAnimationOffsetPosition())
 
-        this.sprite.transform.position = pos
-        this.sprite.transform.depth = this.raisedPerc > .7 ? .75 : -.75
+        this.transform.position = pos
+        this.transform.depth = this.raisedPerc > .7 ? .75 : -.75
     }
 
     toggleOnBack() {

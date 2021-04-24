@@ -15,11 +15,11 @@ export class Lantern extends Shield {
     }
 
     update() {
-        this.sprite.transform.position = this.dude.animation.transform.dimensions
+        this.transform.position = this.dude.animation.transform.dimensions
                 .plus(this.dude.getAnimationOffsetPosition())
                 .minus(new Point(8, 16))
 
-        this.sprite.transform.depth = -.5
+        this.transform.depth = -.5
 
         OutdoorDarknessMask.instance.addLight(
             LocationManager.instance.currentLocation, 

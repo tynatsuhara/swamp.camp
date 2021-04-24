@@ -12,6 +12,7 @@ export class OneBitTileset extends SingleFileTileLoader {
             ["pickaxe", new Point(11, 27)],
             ["sword", new Point(2, 28)],
             ["spear", new Point(8, 27)],
+            ["lantern", new Point(12, 23)],
             ["tent", new Point(6, 20)],
             ["coin", new Point(22, 4)],
             ["wood", new Point(18, 6)],

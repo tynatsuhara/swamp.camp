@@ -40,6 +40,10 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => [{
         desc: "Ranged or melee weapon",
         output: Item.SPEAR,
         input: [new ItemStack(Item.ROCK, 1), new ItemStack(Item.WOOD, 3)],
+    },{
+        desc: "Portable light source",
+        output: Item.LANTERN,
+        input: [new ItemStack(Item.IRON, 2)],
     }],
 },{ 
     icon: Tilesets.instance.oneBit.getTileAt(new Point(0, 19)),

@@ -99,7 +99,7 @@ export class DudeFactory {
                 maxHealth = 4
                 additionalComponents = [new Player(), new CutscenePlayerController()]
                 window["player"] = additionalComponents[0]
-                defaultInventory.addItem(Item.SWORD)
+                defaultInventory.addItem(Item.SWORD)  // TODO add shield
                 break
             }
             case DudeType.DIP: {

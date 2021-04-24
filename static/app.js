@@ -2115,6 +2115,7 @@ System.register("game/graphics/OneBitTileset", ["engine/point", "game/graphics/S
                         ["pickaxe", new point_15.Point(11, 27)],
                         ["sword", new point_15.Point(2, 28)],
                         ["spear", new point_15.Point(8, 27)],
+                        ["lantern", new point_15.Point(12, 23)],
                         ["tent", new point_15.Point(6, 20)],
                         ["coin", new point_15.Point(22, 4)],
                         ["wood", new point_15.Point(18, 6)],
@@ -4834,6 +4835,10 @@ System.register("game/items/CraftingRecipe", ["game/items/Inventory", "game/grap
                             desc: "Ranged or melee weapon",
                             output: 100021 /* SPEAR */,
                             input: [new Inventory_1.ItemStack(1 /* ROCK */, 1), new Inventory_1.ItemStack(2 /* WOOD */, 3)],
+                        }, {
+                            desc: "Portable light source",
+                            output: 100023 /* LANTERN */,
+                            input: [new Inventory_1.ItemStack(5 /* IRON */, 2)],
                         }],
                 }, {
                     icon: Tilesets_6.Tilesets.instance.oneBit.getTileAt(new point_29.Point(0, 19)),
@@ -8605,12 +8610,21 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                                 }
                             });
                         }
-                        if (!!item_1.equippable && Player_10.Player.instance.dude.weaponType !== item_1.equippable) {
+                        if (!!item_1.equippableWeapon && Player_10.Player.instance.dude.weaponType !== item_1.equippableWeapon) {
                             actions.push({
                                 verb: 'equip',
                                 actionFn: function () {
                                     _this.close();
-                                    Player_10.Player.instance.dude.setWeapon(item_1.equippable);
+                                    Player_10.Player.instance.dude.setWeapon(item_1.equippableWeapon);
+                                }
+                            });
+                        }
+                        if (!!item_1.equippableShield && Player_10.Player.instance.dude.shieldType !== item_1.equippableShield) {
+                            actions.push({
+                                verb: 'equip (off-hand)',
+                                actionFn: function () {
+                                    _this.close();
+                                    Player_10.Player.instance.dude.setShield(item_1.equippableShield);
                                 }
                             });
                         }
@@ -11091,7 +11105,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                             maxHealth = 4;
                             additionalComponents = [new Player_15.Player(), new CutscenePlayerController_1.CutscenePlayerController()];
                             window["player"] = additionalComponents[0];
-                            defaultInventory.addItem(100003 /* SWORD */);
+                            defaultInventory.addItem(100003 /* SWORD */); // TODO add shield
                             break;
                         }
                         case 1 /* DIP */: {
@@ -11398,9 +11412,9 @@ System.register("game/items/DroppedItem", ["engine/collision/BoxCollider", "engi
         }
     };
 });
-System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", "game/world/LocationManager", "game/items/DroppedItem", "engine/point", "game/characters/weapons/WeaponType", "game/characters/Player"], function (exports_131, context_131) {
+System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", "game/world/LocationManager", "game/items/DroppedItem", "engine/point", "game/characters/weapons/WeaponType", "game/characters/Player", "game/characters/weapons/ShieldType"], function (exports_131, context_131) {
     "use strict";
-    var _a, Tilesets_43, Entity_30, LocationManager_26, DroppedItem_1, point_73, WeaponType_6, Player_17, ItemMetadata, ITEM_METADATA_MAP, spawnItem;
+    var _a, Tilesets_43, Entity_30, LocationManager_26, DroppedItem_1, point_73, WeaponType_6, Player_17, ShieldType_2, ItemMetadata, ITEM_METADATA_MAP, spawnItem;
     var __moduleName = context_131 && context_131.id;
     return {
         setters: [
@@ -11424,6 +11438,9 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
             },
             function (Player_17_1) {
                 Player_17 = Player_17_1;
+            },
+            function (ShieldType_2_1) {
+                ShieldType_2 = ShieldType_2_1;
             }
         ],
         execute: function () {
@@ -11431,14 +11448,15 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
                 // TODO maybe make this a builder
                 function ItemMetadata(_a) {
                     var displayName = _a.displayName, inventoryIconSupplier = _a.inventoryIconSupplier, _b = _a.droppedIconSupplier, droppedIconSupplier = _b === void 0 ? function () { return null; } : _b, _c = _a.stackLimit, stackLimit = _c === void 0 ? 99 : _c, _d = _a.element, element = _d === void 0 ? null : _d, // for placing elements
-                    _e = _a.equippable, // for placing elements
-                    equippable = _e === void 0 ? null : _e, _f = _a.consumable, consumable = _f === void 0 ? null : _f;
+                    _e = _a.equippableWeapon, // for placing elements
+                    equippableWeapon = _e === void 0 ? null : _e, _f = _a.equippableShield, equippableShield = _f === void 0 ? null : _f, _g = _a.consumable, consumable = _g === void 0 ? null : _g;
                     this.displayName = displayName;
                     this.droppedIconSupplier = droppedIconSupplier;
                     this.inventoryIconSupplier = inventoryIconSupplier;
                     this.stackLimit = stackLimit;
                     this.element = element;
-                    this.equippable = equippable;
+                    this.equippableWeapon = equippableWeapon;
+                    this.equippableShield = equippableShield;
                     this.consumable = consumable;
                 }
                 return ItemMetadata;
@@ -11509,25 +11527,31 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
                     displayName: "Axe",
                     inventoryIconSupplier: function () { return Tilesets_43.Tilesets.instance.oneBit.getTileSource("axe"); },
                     stackLimit: 1,
-                    equippable: WeaponType_6.WeaponType.AXE
+                    equippableWeapon: WeaponType_6.WeaponType.AXE
                 }),
                 _a[100022 /* PICKAXE */] = new ItemMetadata({
                     displayName: "Pickaxe",
                     inventoryIconSupplier: function () { return Tilesets_43.Tilesets.instance.oneBit.getTileSource("pickaxe"); },
                     stackLimit: 1,
-                    equippable: WeaponType_6.WeaponType.PICKAXE
+                    equippableWeapon: WeaponType_6.WeaponType.PICKAXE
                 }),
                 _a[100003 /* SWORD */] = new ItemMetadata({
                     displayName: "Sword",
                     inventoryIconSupplier: function () { return Tilesets_43.Tilesets.instance.oneBit.getTileSource("sword"); },
                     stackLimit: 1,
-                    equippable: WeaponType_6.WeaponType.SWORD
+                    equippableWeapon: WeaponType_6.WeaponType.SWORD
                 }),
                 _a[100021 /* SPEAR */] = new ItemMetadata({
                     displayName: "Spear",
                     inventoryIconSupplier: function () { return Tilesets_43.Tilesets.instance.oneBit.getTileSource("spear"); },
                     stackLimit: 1,
-                    equippable: WeaponType_6.WeaponType.SPEAR
+                    equippableWeapon: WeaponType_6.WeaponType.SPEAR
+                }),
+                _a[100023 /* LANTERN */] = new ItemMetadata({
+                    displayName: "Lantern",
+                    inventoryIconSupplier: function () { return Tilesets_43.Tilesets.instance.oneBit.getTileSource("lantern"); },
+                    stackLimit: 1,
+                    equippableShield: ShieldType_2.ShieldType.LANTERN
                 }),
                 _a));
             /**
@@ -11744,17 +11768,14 @@ System.register("game/characters/DudeAnimationUtils", ["game/graphics/ImageFilte
         }
     };
 });
-System.register("game/characters/weapons/Shield", ["engine/component", "engine/tiles/TileComponent", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point", "game/characters/Dude"], function (exports_134, context_134) {
+System.register("game/characters/weapons/Shield", ["engine/component", "game/graphics/Tilesets", "engine/tiles/TileTransform", "engine/point", "game/characters/Dude"], function (exports_134, context_134) {
     "use strict";
-    var component_41, TileComponent_10, Tilesets_45, TileTransform_30, point_74, Dude_9, State, Shield;
+    var component_41, Tilesets_45, TileTransform_30, point_74, Dude_9, State, Shield;
     var __moduleName = context_134 && context_134.id;
     return {
         setters: [
             function (component_41_1) {
                 component_41 = component_41_1;
-            },
-            function (TileComponent_10_1) {
-                TileComponent_10 = TileComponent_10_1;
             },
             function (Tilesets_45_1) {
                 Tilesets_45 = Tilesets_45_1;
@@ -11787,12 +11808,16 @@ System.register("game/characters/weapons/Shield", ["engine/component", "engine/t
                     _this.raisedPerc = 0; // for animation
                     _this.timeToRaiseMs = 120;
                     _this.type = type;
-                    _this.start = function (startData) {
+                    _this.start = function () {
                         _this.dude = _this.entity.getComponent(Dude_9.Dude);
-                        _this.sprite = _this.entity.addComponent(new TileComponent_10.TileComponent(Tilesets_45.Tilesets.instance.dungeonCharacters.getTileSource(spriteId), new TileTransform_30.TileTransform().relativeTo(_this.dude.animation.transform)));
+                        _this.sprite = Tilesets_45.Tilesets.instance.dungeonCharacters.getTileSource(spriteId);
+                        _this.transform = TileTransform_30.TileTransform.new({ dimensions: _this.sprite.dimensions }).relativeTo(_this.dude.animation.transform);
                     };
                     return _this;
                 }
+                Shield.prototype.getRenderMethods = function () {
+                    return [this.sprite.toImageRender(this.transform)];
+                };
                 Shield.prototype.update = function (updateData) {
                     // default (drawn) position
                     var pos = this.dude.animation.transform.dimensions.minus(new point_74.Point(12, 16));
@@ -11809,8 +11834,8 @@ System.register("game/characters/weapons/Shield", ["engine/component", "engine/t
                         }
                     }
                     pos = pos.plus(this.dude.getAnimationOffsetPosition());
-                    this.sprite.transform.position = pos;
-                    this.sprite.transform.depth = this.raisedPerc > .7 ? .75 : -.75;
+                    this.transform.position = pos;
+                    this.transform.depth = this.raisedPerc > .7 ? .75 : -.75;
                 };
                 Shield.prototype.toggleOnBack = function () {
                     if (this.state === State.DRAWN) {
@@ -11844,7 +11869,7 @@ System.register("game/characters/weapons/Shield", ["engine/component", "engine/t
 });
 System.register("game/characters/weapons/Lantern", ["engine/point", "game/graphics/Tilesets", "game/world/LocationManager", "game/world/OutdoorDarknessMask", "game/characters/weapons/Shield", "game/characters/weapons/ShieldType"], function (exports_135, context_135) {
     "use strict";
-    var point_75, Tilesets_46, LocationManager_27, OutdoorDarknessMask_5, Shield_1, ShieldType_2, Lantern;
+    var point_75, Tilesets_46, LocationManager_27, OutdoorDarknessMask_5, Shield_1, ShieldType_3, Lantern;
     var __moduleName = context_135 && context_135.id;
     return {
         setters: [
@@ -11863,8 +11888,8 @@ System.register("game/characters/weapons/Lantern", ["engine/point", "game/graphi
             function (Shield_1_1) {
                 Shield_1 = Shield_1_1;
             },
-            function (ShieldType_2_1) {
-                ShieldType_2 = ShieldType_2_1;
+            function (ShieldType_3_1) {
+                ShieldType_3 = ShieldType_3_1;
             }
         ],
         execute: function () {
@@ -11874,13 +11899,13 @@ System.register("game/characters/weapons/Lantern", ["engine/point", "game/graphi
             Lantern = /** @class */ (function (_super) {
                 __extends(Lantern, _super);
                 function Lantern() {
-                    return _super.call(this, ShieldType_2.ShieldType.LANTERN, "tool_lantern") || this;
+                    return _super.call(this, ShieldType_3.ShieldType.LANTERN, "tool_lantern") || this;
                 }
                 Lantern.prototype.update = function () {
-                    this.sprite.transform.position = this.dude.animation.transform.dimensions
+                    this.transform.position = this.dude.animation.transform.dimensions
                         .plus(this.dude.getAnimationOffsetPosition())
                         .minus(new point_75.Point(8, 16));
-                    this.sprite.transform.depth = -.5;
+                    this.transform.depth = -.5;
                     OutdoorDarknessMask_5.OutdoorDarknessMask.instance.addLight(LocationManager_27.LocationManager.instance.currentLocation, this, this.dude.standingPosition.plusY(-Tilesets_46.TILE_SIZE / 2).plus(this.dude.getAnimationOffsetPosition()), 100);
                 };
                 Lantern.prototype.toggleOnBack = function () { };
@@ -11899,12 +11924,12 @@ System.register("game/characters/weapons/Lantern", ["engine/point", "game/graphi
 });
 System.register("game/characters/weapons/ShieldFactory", ["game/characters/weapons/ShieldType", "game/characters/weapons/Shield", "game/characters/weapons/Lantern"], function (exports_136, context_136) {
     "use strict";
-    var ShieldType_3, Shield_2, Lantern_1, ShieldFactory;
+    var ShieldType_4, Shield_2, Lantern_1, ShieldFactory;
     var __moduleName = context_136 && context_136.id;
     return {
         setters: [
-            function (ShieldType_3_1) {
-                ShieldType_3 = ShieldType_3_1;
+            function (ShieldType_4_1) {
+                ShieldType_4 = ShieldType_4_1;
             },
             function (Shield_2_1) {
                 Shield_2 = Shield_2_1;
@@ -11918,11 +11943,11 @@ System.register("game/characters/weapons/ShieldFactory", ["game/characters/weapo
                 // TODO support additional weapons
                 make: function (type) {
                     switch (type) {
-                        case ShieldType_3.ShieldType.NONE:
+                        case ShieldType_4.ShieldType.NONE:
                             return null;
-                        case ShieldType_3.ShieldType.BASIC:
+                        case ShieldType_4.ShieldType.BASIC:
                             return new Shield_2.Shield(type, "shield_0");
-                        case ShieldType_3.ShieldType.LANTERN:
+                        case ShieldType_4.ShieldType.LANTERN:
                             return new Lantern_1.Lantern();
                         default:
                             throw new Error("weapon type " + type + " is not supported yet");
@@ -12580,7 +12605,7 @@ System.register("game/characters/weapons/WeaponFactory", ["game/characters/weapo
 });
 System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine/component", "engine/point", "engine/tiles/AnimatedTileComponent", "engine/tiles/TileTransform", "game/graphics/ImageFilters", "game/graphics/Tilesets", "game/items/Items", "game/ui/DialogueDisplay", "game/ui/DudeInteractIndicator", "game/ui/UIStateManager", "game/world/elements/Interactable", "game/characters/Dialogue", "game/characters/DudeAnimationUtils", "game/characters/NPC", "game/characters/weapons/ShieldFactory", "game/characters/weapons/ShieldType", "game/characters/weapons/WeaponFactory", "game/characters/weapons/WeaponType"], function (exports_143, context_143) {
     "use strict";
-    var BoxCollider_11, component_44, point_81, AnimatedTileComponent_6, TileTransform_33, ImageFilters_5, Tilesets_49, Items_8, DialogueDisplay_5, DudeInteractIndicator_5, UIStateManager_19, Interactable_7, Dialogue_7, DudeAnimationUtils_1, NPC_7, ShieldFactory_1, ShieldType_4, WeaponFactory_1, WeaponType_10, Dude;
+    var BoxCollider_11, component_44, point_81, AnimatedTileComponent_6, TileTransform_33, ImageFilters_5, Tilesets_49, Items_8, DialogueDisplay_5, DudeInteractIndicator_5, UIStateManager_19, Interactable_7, Dialogue_7, DudeAnimationUtils_1, NPC_7, ShieldFactory_1, ShieldType_5, WeaponFactory_1, WeaponType_10, Dude;
     var __moduleName = context_143 && context_143.id;
     return {
         setters: [
@@ -12632,8 +12657,8 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
             function (ShieldFactory_1_1) {
                 ShieldFactory_1 = ShieldFactory_1_1;
             },
-            function (ShieldType_4_1) {
-                ShieldType_4 = ShieldType_4_1;
+            function (ShieldType_5_1) {
+                ShieldType_5 = ShieldType_5_1;
             },
             function (WeaponFactory_1_1) {
                 WeaponFactory_1 = WeaponFactory_1_1;
@@ -12709,7 +12734,7 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                     configurable: true
                 });
                 Object.defineProperty(Dude.prototype, "shieldType", {
-                    get: function () { var _a, _b; return (_b = (_a = this.shield) === null || _a === void 0 ? void 0 : _a.type) !== null && _b !== void 0 ? _b : ShieldType_4.ShieldType.NONE; },
+                    get: function () { var _a, _b; return (_b = (_a = this.shield) === null || _a === void 0 ? void 0 : _a.type) !== null && _b !== void 0 ? _b : ShieldType_5.ShieldType.NONE; },
                     enumerable: false,
                     configurable: true
                 });

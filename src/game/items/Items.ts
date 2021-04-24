@@ -9,6 +9,7 @@ import { ElementType } from "../world/elements/Elements"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { WeaponType } from "../characters/weapons/WeaponType"
 import { Player } from "../characters/Player"
+import { ShieldType } from "../characters/weapons/ShieldType"
 
 export class ItemMetadata {
     readonly displayName: string
@@ -16,7 +17,8 @@ export class ItemMetadata {
     readonly inventoryIconSupplier: () => StaticTileSource
     readonly stackLimit: number
     readonly element: ElementType
-    readonly equippable: WeaponType
+    readonly equippableWeapon: WeaponType
+    readonly equippableShield: ShieldType
     readonly consumable: () => void
 
     // TODO maybe make this a builder
@@ -26,7 +28,8 @@ export class ItemMetadata {
         droppedIconSupplier = () => null,
         stackLimit = 99,
         element = null,  // for placing elements
-        equippable = null,
+        equippableWeapon = null,
+        equippableShield = null,
         consumable = null,
     }: {
         displayName: string,
@@ -34,7 +37,8 @@ export class ItemMetadata {
         droppedIconSupplier?: () => TileSource,
         stackLimit?: number,
         element?: ElementType,
-        equippable?: WeaponType,
+        equippableWeapon?: WeaponType,
+        equippableShield?: ShieldType
         consumable?: () => void,
     }) {
         this.displayName = displayName
@@ -42,7 +46,8 @@ export class ItemMetadata {
         this.inventoryIconSupplier = inventoryIconSupplier
         this.stackLimit = stackLimit
         this.element = element
-        this.equippable = equippable
+        this.equippableWeapon = equippableWeapon
+        this.equippableShield = equippableShield
         this.consumable = consumable
     }
 }
@@ -73,6 +78,7 @@ export const enum Item {
     STAFF_2,
     SPEAR,
     PICKAXE,
+    LANTERN
 }
 
 // Data that doesn't get serialized (TODO make builder pattern)
@@ -140,25 +146,31 @@ export const ITEM_METADATA_MAP = {
         displayName: "Axe",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("axe"), 
         stackLimit: 1,
-        equippable: WeaponType.AXE
+        equippableWeapon: WeaponType.AXE
     }),
     [Item.PICKAXE]: new ItemMetadata({
         displayName: "Pickaxe",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("pickaxe"), 
         stackLimit: 1,
-        equippable: WeaponType.PICKAXE
+        equippableWeapon: WeaponType.PICKAXE
     }),
     [Item.SWORD]: new ItemMetadata({
         displayName: "Sword",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("sword"), 
         stackLimit: 1,
-        equippable: WeaponType.SWORD
+        equippableWeapon: WeaponType.SWORD
     }),
     [Item.SPEAR]: new ItemMetadata({
         displayName: "Spear",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("spear"), 
         stackLimit: 1,
-        equippable: WeaponType.SPEAR
+        equippableWeapon: WeaponType.SPEAR
+    }),
+    [Item.LANTERN]: new ItemMetadata({
+        displayName: "Lantern",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("lantern"), 
+        stackLimit: 1,
+        equippableShield: ShieldType.LANTERN
     }),
 }
 

@@ -135,12 +135,21 @@ export class InventoryDisplay extends Component {
                     }
                 })
             }
-            if (!!item.equippable && Player.instance.dude.weaponType !== item.equippable) {
+            if (!!item.equippableWeapon && Player.instance.dude.weaponType !== item.equippableWeapon) {
                 actions.push({
                     verb: 'equip',
                     actionFn: () => {
                         this.close()
-                        Player.instance.dude.setWeapon(item.equippable)
+                        Player.instance.dude.setWeapon(item.equippableWeapon)
+                    }
+                })
+            }
+            if (!!item.equippableShield && Player.instance.dude.shieldType !== item.equippableShield) {
+                actions.push({
+                    verb: 'equip (off-hand)',
+                    actionFn: () => {
+                        this.close()
+                        Player.instance.dude.setShield(item.equippableShield)
                     }
                 })
             }
