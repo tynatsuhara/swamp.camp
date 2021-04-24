@@ -146,7 +146,7 @@ export class InventoryDisplay extends Component {
             }
             if (!!item.equippableShield && Player.instance.dude.shieldType !== item.equippableShield) {
                 actions.push({
-                    verb: 'equip (off-hand)',
+                    verb: 'equip off-hand',
                     actionFn: () => {
                         this.close()
                         Player.instance.dude.setShield(item.equippableShield)

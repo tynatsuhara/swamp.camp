@@ -2116,6 +2116,7 @@ System.register("game/graphics/OneBitTileset", ["engine/point", "game/graphics/S
                         ["sword", new point_15.Point(2, 28)],
                         ["spear", new point_15.Point(8, 27)],
                         ["lantern", new point_15.Point(12, 23)],
+                        ["shield0", new point_15.Point(5, 24)],
                         ["tent", new point_15.Point(6, 20)],
                         ["coin", new point_15.Point(22, 4)],
                         ["wood", new point_15.Point(18, 6)],
@@ -4837,7 +4838,7 @@ System.register("game/items/CraftingRecipe", ["game/items/Inventory", "game/grap
                             input: [new Inventory_1.ItemStack(1 /* ROCK */, 1), new Inventory_1.ItemStack(2 /* WOOD */, 3)],
                         }, {
                             desc: "Portable light source",
-                            output: 100023 /* LANTERN */,
+                            output: 100024 /* LANTERN */,
                             input: [new Inventory_1.ItemStack(5 /* IRON */, 2)],
                         }],
                 }, {
@@ -8401,6 +8402,7 @@ System.register("game/ui/PlaceElementDisplay", ["engine/Entity", "engine/compone
                 function PlaceElementDisplay() {
                     var _this = _super.call(this) || this;
                     _this.e = new Entity_19.Entity([_this]);
+                    _this.count = 0;
                     PlaceElementDisplay.instance = _this;
                     return _this;
                 }
@@ -8410,7 +8412,7 @@ System.register("game/ui/PlaceElementDisplay", ["engine/Entity", "engine/compone
                     configurable: true
                 });
                 PlaceElementDisplay.prototype.update = function (updateData) {
-                    if (!this.element) {
+                    if (this.count === 0) {
                         return;
                     }
                     if (updateData.input.isKeyDown(Controls_3.Controls.closeButton)) {
@@ -8419,6 +8421,7 @@ System.register("game/ui/PlaceElementDisplay", ["engine/Entity", "engine/compone
                 };
                 PlaceElementDisplay.prototype.close = function () {
                     this.element = null;
+                    this.count = 0;
                     this.placingFrame.delete();
                 };
                 PlaceElementDisplay.prototype.startPlacing = function (element, successFn, count) {
@@ -8621,7 +8624,7 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                         }
                         if (!!item_1.equippableShield && Player_10.Player.instance.dude.shieldType !== item_1.equippableShield) {
                             actions.push({
-                                verb: 'equip (off-hand)',
+                                verb: 'equip off-hand',
                                 actionFn: function () {
                                     _this.close();
                                     Player_10.Player.instance.dude.setShield(item_1.equippableShield);
@@ -11105,7 +11108,8 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                             maxHealth = 4;
                             additionalComponents = [new Player_15.Player(), new CutscenePlayerController_1.CutscenePlayerController()];
                             window["player"] = additionalComponents[0];
-                            defaultInventory.addItem(100003 /* SWORD */); // TODO add shield
+                            defaultInventory.addItem(100003 /* SWORD */);
+                            defaultInventory.addItem(100023 /* BASIC_SHIELD */);
                             break;
                         }
                         case 1 /* DIP */: {
@@ -11547,7 +11551,13 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
                     stackLimit: 1,
                     equippableWeapon: WeaponType_6.WeaponType.SPEAR
                 }),
-                _a[100023 /* LANTERN */] = new ItemMetadata({
+                _a[100023 /* BASIC_SHIELD */] = new ItemMetadata({
+                    displayName: "Shield",
+                    inventoryIconSupplier: function () { return Tilesets_43.Tilesets.instance.oneBit.getTileSource("shield0"); },
+                    stackLimit: 1,
+                    equippableShield: ShieldType_2.ShieldType.BASIC
+                }),
+                _a[100024 /* LANTERN */] = new ItemMetadata({
                     displayName: "Lantern",
                     inventoryIconSupplier: function () { return Tilesets_43.Tilesets.instance.oneBit.getTileSource("lantern"); },
                     stackLimit: 1,

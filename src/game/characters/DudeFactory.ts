@@ -99,7 +99,8 @@ export class DudeFactory {
                 maxHealth = 4
                 additionalComponents = [new Player(), new CutscenePlayerController()]
                 window["player"] = additionalComponents[0]
-                defaultInventory.addItem(Item.SWORD)  // TODO add shield
+                defaultInventory.addItem(Item.SWORD)
+                defaultInventory.addItem(Item.BASIC_SHIELD)
                 break
             }
             case DudeType.DIP: {
@@ -184,10 +185,10 @@ export class DudeFactory {
         const d = new Dude(
             saveState?.uuid ?? newUUID(),
             type, 
-            factions,  // TODO: Save factions? Only if this becomes non-deterministic
+            factions,  // TODO: Save factions? Only if they become mutable
             saveState?.anim ?? animationName, 
             pos, 
-            saveState?.weapon ?? weapon,  // TODO: update this logic when we make it so you can drop weapons/shields
+            saveState?.weapon ?? weapon,
             saveState?.shield ?? shield,
             saveState?.maxHealth ?? maxHealth,
             saveState?.health ?? maxHealth,

@@ -78,7 +78,8 @@ export const enum Item {
     STAFF_2,
     SPEAR,
     PICKAXE,
-    LANTERN
+    BASIC_SHIELD,
+    LANTERN,
 }
 
 // Data that doesn't get serialized (TODO make builder pattern)
@@ -165,6 +166,12 @@ export const ITEM_METADATA_MAP = {
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("spear"), 
         stackLimit: 1,
         equippableWeapon: WeaponType.SPEAR
+    }),
+    [Item.BASIC_SHIELD]: new ItemMetadata({
+        displayName: "Shield",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("shield0"), 
+        stackLimit: 1,
+        equippableShield: ShieldType.BASIC
     }),
     [Item.LANTERN]: new ItemMetadata({
         displayName: "Lantern",
