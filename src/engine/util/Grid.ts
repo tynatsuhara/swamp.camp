@@ -35,10 +35,16 @@ export class Grid<T> {
         this._valuesCache = null
     }
 
+    /**
+     * This requires parsing all keys and can be expensive if done frequently
+     */
     entries(): [Point, T][] {
         return Object.entries(this.map).map(tuple => [Point.fromString(tuple[0]), tuple[1]])
     }
 
+    /**
+     * This requires parsing all keys and can be expensive if done frequently
+     */
     keys(): Point[] {
         return Object.keys(this.map).map(ptStr => Point.fromString(ptStr))
     }

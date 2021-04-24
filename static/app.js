@@ -3094,9 +3094,15 @@ System.register("engine/util/Grid", ["engine/point", "engine/util/BinaryHeap"], 
                     this.map = {};
                     this._valuesCache = null;
                 };
+                /**
+                 * This requires parsing all keys and can be expensive if done frequently
+                 */
                 Grid.prototype.entries = function () {
                     return Object.entries(this.map).map(function (tuple) { return [point_20.Point.fromString(tuple[0]), tuple[1]]; });
                 };
+                /**
+                 * This requires parsing all keys and can be expensive if done frequently
+                 */
                 Grid.prototype.keys = function () {
                     return Object.keys(this.map).map(function (ptStr) { return point_20.Point.fromString(ptStr); });
                 };
