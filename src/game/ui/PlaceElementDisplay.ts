@@ -18,7 +18,7 @@ export class PlaceElementDisplay extends Component {
     private dimensions: Point
     private placingFrame: PlaceElementFrame
     private successFn: () => void
-    private count: number
+    private count: number = 0
 
     get isOpen() { return this.element !== null && this.element !== undefined }
 
@@ -28,7 +28,7 @@ export class PlaceElementDisplay extends Component {
     }
 
     update(updateData: UpdateData) {
-        if (!this.element) {
+        if (this.count === 0) {
             return
         }
 
@@ -39,6 +39,7 @@ export class PlaceElementDisplay extends Component {
 
     close() {
         this.element = null
+        this.count = 0
         this.placingFrame.delete()
     }
 
