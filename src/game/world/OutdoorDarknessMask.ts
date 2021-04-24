@@ -32,7 +32,8 @@ export class OutdoorDarknessMask {
     private size = MapGenerator.MAP_SIZE * TILE_SIZE
     private shift = new Point(this.size/2, this.size/2)
 
-    private lightTiles: Map<WorldLocation, Grid<number>> = new Map<WorldLocation, Grid<number>>()  // grid of light diameter
+    // for each location, map key to (position, diameter)
+    private lightTiles: Map<WorldLocation, Map<any, [Point, number]>> = new Map<WorldLocation, Map<any, [Point, number]>>()
     private gridDirty = true
     private lastLocationRendered: WorldLocation
     private color: string
@@ -51,24 +52,23 @@ export class OutdoorDarknessMask {
         setInterval(() => this.updateColorForTime(), 1000)
     }
 
-    addLight(wl: WorldLocation, position: Point, diameter: number = 16) {
+    addLight(wl: WorldLocation, key: any, position: Point, diameter: number = 16) {
         if (diameter % 2 !== 0) {
             throw new Error("only even circle px diameters work right now")
         }
         this.checkPt(position)
-        const locationLightGrid = this.lightTiles.get(wl) ?? new Grid<number>()
-        locationLightGrid.set(position, diameter)
-        this.lightTiles.set(wl, locationLightGrid)
+        const locationLightMap = this.lightTiles.get(wl) ?? new Map()
+        locationLightMap.set(key, [position, diameter])
+        this.lightTiles.set(wl, locationLightMap)
         this.gridDirty = true
     }
 
-    removeLight(wl: WorldLocation, position: Point) {
-        this.checkPt(position)
-        const locationLightGrid = this.lightTiles.get(wl)
-        if (!locationLightGrid) {
+    removeLight(wl: WorldLocation, key: any) {
+        const locationLightMap = this.lightTiles.get(wl)
+        if (!locationLightMap) {
             return  // it is ok to fail silently here
         }
-        locationLightGrid.remove(position)
+        locationLightMap.delete(key)
         this.gridDirty = true
     }
 
@@ -79,9 +79,12 @@ export class OutdoorDarknessMask {
         if (this.darkness < .6) {
             return false
         }
-        const grid = this.lightTiles.get(LocationManager.instance.currentLocation)
+        const locationLightMap = this.lightTiles.get(LocationManager.instance.currentLocation)
+        if (!locationLightMap) {
+            return true
+        }
         // TODO optimize this pre-computing light values in a grid, this will get expensive as we add more lights
-        return !grid ? true : !grid.entries().some(entry => entry[0].distanceTo(pixelPt) < entry[1] * .5)
+        return !Array.from(locationLightMap.values()).some(entry => entry[0].distanceTo(pixelPt) < entry[1] * .5)
     }
 
     private updateColorForTime() {
@@ -164,7 +167,7 @@ export class OutdoorDarknessMask {
             return
         }
 
-        locationLightGrid.entries().forEach(entry => {
+        Array.from(locationLightGrid.values()).forEach(entry => {
             const pos = entry[0]
             const diameter = entry[1]
             const circleOffset = new Point(-.5, -.5).times(diameter)

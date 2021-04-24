@@ -6582,9 +6582,9 @@ System.register("game/world/Vignette", ["engine/component", "engine/point", "eng
         }
     };
 });
-System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/point", "engine/renderer/BasicRenderComponent", "engine/renderer/ImageRender", "engine/util/Grid", "game/cutscenes/Camera", "game/graphics/Tilesets", "game/ui/UIStateManager", "game/world/LocationManager", "game/world/MapGenerator", "game/world/TimeUnit", "game/world/Vignette", "game/world/WorldTime"], function (exports_82, context_82) {
+System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/point", "engine/renderer/BasicRenderComponent", "engine/renderer/ImageRender", "game/cutscenes/Camera", "game/graphics/Tilesets", "game/ui/UIStateManager", "game/world/LocationManager", "game/world/MapGenerator", "game/world/TimeUnit", "game/world/Vignette", "game/world/WorldTime"], function (exports_82, context_82) {
     "use strict";
-    var Entity_14, point_45, BasicRenderComponent_5, ImageRender_7, Grid_3, Camera_7, Tilesets_17, UIStateManager_6, LocationManager_9, MapGenerator_3, TimeUnit_2, Vignette_1, WorldTime_3, OutdoorDarknessMask;
+    var Entity_14, point_45, BasicRenderComponent_5, ImageRender_7, Camera_7, Tilesets_17, UIStateManager_6, LocationManager_9, MapGenerator_3, TimeUnit_2, Vignette_1, WorldTime_3, OutdoorDarknessMask;
     var __moduleName = context_82 && context_82.id;
     return {
         setters: [
@@ -6599,9 +6599,6 @@ System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/poin
             },
             function (ImageRender_7_1) {
                 ImageRender_7 = ImageRender_7_1;
-            },
-            function (Grid_3_1) {
-                Grid_3 = Grid_3_1;
             },
             function (Camera_7_1) {
                 Camera_7 = Camera_7_1;
@@ -6634,7 +6631,8 @@ System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/poin
                     // no lights should live outside of this range
                     this.size = MapGenerator_3.MapGenerator.MAP_SIZE * Tilesets_17.TILE_SIZE;
                     this.shift = new point_45.Point(this.size / 2, this.size / 2);
-                    this.lightTiles = new Map(); // grid of light diameter
+                    // for each location, map key to (position, diameter)
+                    this.lightTiles = new Map();
                     this.gridDirty = true;
                     this.darkness = 0.4;
                     this.circleCache = new Map();
@@ -6660,25 +6658,24 @@ System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/poin
                     // refresh every so often to update transitioning color
                     setInterval(function () { return _this.updateColorForTime(); }, 1000);
                 };
-                OutdoorDarknessMask.prototype.addLight = function (wl, position, diameter) {
+                OutdoorDarknessMask.prototype.addLight = function (wl, key, position, diameter) {
                     var _a;
                     if (diameter === void 0) { diameter = 16; }
                     if (diameter % 2 !== 0) {
                         throw new Error("only even circle px diameters work right now");
                     }
                     this.checkPt(position);
-                    var locationLightGrid = (_a = this.lightTiles.get(wl)) !== null && _a !== void 0 ? _a : new Grid_3.Grid();
-                    locationLightGrid.set(position, diameter);
-                    this.lightTiles.set(wl, locationLightGrid);
+                    var locationLightMap = (_a = this.lightTiles.get(wl)) !== null && _a !== void 0 ? _a : new Map();
+                    locationLightMap.set(key, [position, diameter]);
+                    this.lightTiles.set(wl, locationLightMap);
                     this.gridDirty = true;
                 };
-                OutdoorDarknessMask.prototype.removeLight = function (wl, position) {
-                    this.checkPt(position);
-                    var locationLightGrid = this.lightTiles.get(wl);
-                    if (!locationLightGrid) {
+                OutdoorDarknessMask.prototype.removeLight = function (wl, key) {
+                    var locationLightMap = this.lightTiles.get(wl);
+                    if (!locationLightMap) {
                         return; // it is ok to fail silently here
                     }
-                    locationLightGrid.remove(position);
+                    locationLightMap.delete(key);
                     this.gridDirty = true;
                 };
                 /**
@@ -6688,9 +6685,12 @@ System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/poin
                     if (this.darkness < .6) {
                         return false;
                     }
-                    var grid = this.lightTiles.get(LocationManager_9.LocationManager.instance.currentLocation);
+                    var locationLightMap = this.lightTiles.get(LocationManager_9.LocationManager.instance.currentLocation);
+                    if (!locationLightMap) {
+                        return true;
+                    }
                     // TODO optimize this pre-computing light values in a grid, this will get expensive as we add more lights
-                    return !grid ? true : !grid.entries().some(function (entry) { return entry[0].distanceTo(pixelPt) < entry[1] * .5; });
+                    return !Array.from(locationLightMap.values()).some(function (entry) { return entry[0].distanceTo(pixelPt) < entry[1] * .5; });
                 };
                 OutdoorDarknessMask.prototype.updateColorForTime = function () {
                     var time = WorldTime_3.WorldTime.instance.time;
@@ -6763,7 +6763,7 @@ System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/poin
                     if (!locationLightGrid) {
                         return;
                     }
-                    locationLightGrid.entries().forEach(function (entry) {
+                    Array.from(locationLightGrid.values()).forEach(function (entry) {
                         var pos = entry[0];
                         var diameter = entry[1];
                         var circleOffset = new point_45.Point(-.5, -.5).times(diameter);
@@ -6890,6 +6890,7 @@ System.register("game/world/elements/Campfire", ["engine/component", "engine/til
                     return _this;
                 }
                 CampfireFactory.prototype.make = function (wl, pos, data) {
+                    var _this = this;
                     var _a, _b;
                     var e = new Entity_15.Entity();
                     var scaledPos = pos.times(Tilesets_18.TILE_SIZE);
@@ -6906,7 +6907,7 @@ System.register("game/world/elements/Campfire", ["engine/component", "engine/til
                         campfireOn.enabled = !campfireOff.enabled;
                         var lightCenterPos = pos.times(Tilesets_18.TILE_SIZE).plus(new point_46.Point(Tilesets_18.TILE_SIZE / 2, Tilesets_18.TILE_SIZE / 2));
                         if (campfireOn.enabled) {
-                            OutdoorDarknessMask_1.OutdoorDarknessMask.instance.addLight(wl, lightCenterPos, Tilesets_18.TILE_SIZE * (5 + logCount / 2));
+                            OutdoorDarknessMask_1.OutdoorDarknessMask.instance.addLight(wl, _this, lightCenterPos, Tilesets_18.TILE_SIZE * (5 + logCount / 2));
                         }
                         else {
                             OutdoorDarknessMask_1.OutdoorDarknessMask.instance.removeLight(wl, lightCenterPos);
@@ -10067,15 +10068,15 @@ System.register("game/world/elements/Elements", ["game/world/Teleporter", "game/
 });
 System.register("game/world/MapGenerator", ["engine/point", "engine/util/Grid", "engine/util/Lists", "engine/util/Noise", "game/graphics/Tilesets", "game/world/LocationManager", "game/world/WorldLocation"], function (exports_115, context_115) {
     "use strict";
-    var point_67, Grid_4, Lists_5, Noise_1, Tilesets_38, LocationManager_21, WorldLocation_3, MapGenerator;
+    var point_67, Grid_3, Lists_5, Noise_1, Tilesets_38, LocationManager_21, WorldLocation_3, MapGenerator;
     var __moduleName = context_115 && context_115.id;
     return {
         setters: [
             function (point_67_1) {
                 point_67 = point_67_1;
             },
-            function (Grid_4_1) {
-                Grid_4 = Grid_4_1;
+            function (Grid_3_1) {
+                Grid_3 = Grid_3_1;
             },
             function (Lists_5_1) {
                 Lists_5 = Lists_5_1;
@@ -10258,7 +10259,7 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/util/Grid", 
                 };
                 MapGenerator.prototype.noise = function () {
                     var noise = new Noise_1.Noise(Math.random());
-                    var grid = new Grid_4.Grid();
+                    var grid = new Grid_3.Grid();
                     var str = "";
                     for (var i = -MapGenerator.MAP_SIZE / 2; i < MapGenerator.MAP_SIZE / 2; i++) {
                         for (var j = -MapGenerator.MAP_SIZE / 2; j < MapGenerator.MAP_SIZE / 2; j++) {
