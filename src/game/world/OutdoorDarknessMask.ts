@@ -52,6 +52,9 @@ export class OutdoorDarknessMask {
         setInterval(() => this.updateColorForTime(), 1000)
     }
 
+    /**
+     * @param key the unique key for location, will overwrite that light source if it already exists
+     */
     addLight(wl: WorldLocation, key: any, position: Point, diameter: number = 16) {
         if (diameter % 2 !== 0) {
             throw new Error("only even circle px diameters work right now")

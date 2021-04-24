@@ -6658,6 +6658,9 @@ System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/poin
                     // refresh every so often to update transitioning color
                     setInterval(function () { return _this.updateColorForTime(); }, 1000);
                 };
+                /**
+                 * @param key the unique key for location, will overwrite that light source if it already exists
+                 */
                 OutdoorDarknessMask.prototype.addLight = function (wl, key, position, diameter) {
                     var _a;
                     if (diameter === void 0) { diameter = 16; }
@@ -10425,9 +10428,9 @@ System.register("game/world/TownStats", ["game/SaveManager"], function (exports_
         }
     };
 });
-System.register("game/characters/Player", ["engine/component", "engine/debug", "engine/point", "engine/util/Lists", "game/Controls", "game/cutscenes/Camera", "game/graphics/Tilesets", "game/ui/NotificationDisplay", "game/ui/UIStateManager", "game/world/elements/Interactable", "game/world/LocationManager", "game/characters/Dude", "game/characters/DudeFactory"], function (exports_118, context_118) {
+System.register("game/characters/Player", ["engine/component", "engine/debug", "engine/point", "engine/util/Lists", "game/Controls", "game/cutscenes/Camera", "game/graphics/Tilesets", "game/ui/NotificationDisplay", "game/ui/UIStateManager", "game/world/elements/Interactable", "game/world/LocationManager", "game/world/OutdoorDarknessMask", "game/characters/Dude", "game/characters/DudeFactory"], function (exports_118, context_118) {
     "use strict";
-    var component_34, debug_4, point_69, Lists_6, Controls_8, Camera_11, Tilesets_40, NotificationDisplay_3, UIStateManager_18, Interactable_6, LocationManager_22, Dude_2, DudeFactory_4, Player;
+    var component_34, debug_4, point_69, Lists_6, Controls_8, Camera_11, Tilesets_40, NotificationDisplay_3, UIStateManager_18, Interactable_6, LocationManager_22, OutdoorDarknessMask_3, Dude_2, DudeFactory_4, Player;
     var __moduleName = context_118 && context_118.id;
     return {
         setters: [
@@ -10463,6 +10466,9 @@ System.register("game/characters/Player", ["engine/component", "engine/debug", "
             },
             function (LocationManager_22_1) {
                 LocationManager_22 = LocationManager_22_1;
+            },
+            function (OutdoorDarknessMask_3_1) {
+                OutdoorDarknessMask_3 = OutdoorDarknessMask_3_1;
             },
             function (Dude_2_1) {
                 Dude_2 = Dude_2_1;
@@ -10529,10 +10535,6 @@ System.register("game/characters/Player", ["engine/component", "engine/debug", "
                             dx++;
                         }
                     }
-                    // TODO: - make this an unlockable feature
-                    //       - instead of removing by position, map the light to a source object and remove based on that
-                    // const lightPosOffset = -TILE_SIZE/2
-                    // PointLightMaskRenderer.instance.removeLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset))
                     var speed = 1;
                     if (this.dude.rolling()) {
                         speed += 1.5;
@@ -10542,7 +10544,10 @@ System.register("game/characters/Player", ["engine/component", "engine/debug", "
                     }
                     this.dude.move(updateData, new point_69.Point(dx, dy), 0, // this.dude.rolling() ? 0 : updateData.input.mousePos.x - this.dude.standingPosition.x,
                     speed);
-                    // PointLightMaskRenderer.instance.addLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset), 100)
+                    // update lantern position
+                    if (debug_4.debug.enableLantern) {
+                        OutdoorDarknessMask_3.OutdoorDarknessMask.instance.addLight(LocationManager_22.LocationManager.instance.currentLocation, this, this.dude.standingPosition.plusY(-Tilesets_40.TILE_SIZE / 2).plus(this.dude.getAnimationOffsetPosition()), 100);
+                    }
                     if (UIStateManager_18.UIStateManager.instance.isMenuOpen) {
                         return;
                     }
@@ -10631,7 +10636,7 @@ System.register("game/characters/Player", ["engine/component", "engine/debug", "
 });
 System.register("game/characters/Enemy", ["engine/component", "game/graphics/Tilesets", "game/world/OutdoorDarknessMask", "game/characters/Dude", "game/characters/NPC"], function (exports_119, context_119) {
     "use strict";
-    var component_35, Tilesets_41, OutdoorDarknessMask_3, Dude_3, NPC_3, Enemy;
+    var component_35, Tilesets_41, OutdoorDarknessMask_4, Dude_3, NPC_3, Enemy;
     var __moduleName = context_119 && context_119.id;
     return {
         setters: [
@@ -10641,8 +10646,8 @@ System.register("game/characters/Enemy", ["engine/component", "game/graphics/Til
             function (Tilesets_41_1) {
                 Tilesets_41 = Tilesets_41_1;
             },
-            function (OutdoorDarknessMask_3_1) {
-                OutdoorDarknessMask_3 = OutdoorDarknessMask_3_1;
+            function (OutdoorDarknessMask_4_1) {
+                OutdoorDarknessMask_4 = OutdoorDarknessMask_4_1;
             },
             function (Dude_3_1) {
                 Dude_3 = Dude_3_1;
@@ -10675,10 +10680,10 @@ System.register("game/characters/Enemy", ["engine/component", "game/graphics/Til
                     // TODO: Consider splitting this class up 
                     if (this.dude.factions.includes(3 /* DEMONS */)) {
                         this.npc.isEnemyFn = function (d) {
-                            return !d.factions.includes(3 /* DEMONS */) && OutdoorDarknessMask_3.OutdoorDarknessMask.instance.isDark(d.standingPosition);
+                            return !d.factions.includes(3 /* DEMONS */) && OutdoorDarknessMask_4.OutdoorDarknessMask.instance.isDark(d.standingPosition);
                         };
                         this.npc.pathFindingHeuristic = function (pt, goal) {
-                            return pt.distanceTo(goal) + (OutdoorDarknessMask_3.OutdoorDarknessMask.instance.isDark(pt.times(Tilesets_41.TILE_SIZE)) ? 0 : 100);
+                            return pt.distanceTo(goal) + (OutdoorDarknessMask_4.OutdoorDarknessMask.instance.isDark(pt.times(Tilesets_41.TILE_SIZE)) ? 0 : 100);
                         };
                         this.npc.findTargetRange *= 3;
                     }
@@ -10901,7 +10906,7 @@ System.register("game/characters/Centaur", ["engine/component", "game/characters
 });
 System.register("game/characters/Villager", ["engine/component", "game/characters/Dude", "game/characters/NPC", "game/world/OutdoorDarknessMask", "game/characters/ShroomNPC", "game/characters/Centaur"], function (exports_123, context_123) {
     "use strict";
-    var component_39, Dude_7, NPC_5, OutdoorDarknessMask_4, ShroomNPC_1, Centaur_1, Villager;
+    var component_39, Dude_7, NPC_5, OutdoorDarknessMask_5, ShroomNPC_1, Centaur_1, Villager;
     var __moduleName = context_123 && context_123.id;
     return {
         setters: [
@@ -10914,8 +10919,8 @@ System.register("game/characters/Villager", ["engine/component", "game/character
             function (NPC_5_1) {
                 NPC_5 = NPC_5_1;
             },
-            function (OutdoorDarknessMask_4_1) {
-                OutdoorDarknessMask_4 = OutdoorDarknessMask_4_1;
+            function (OutdoorDarknessMask_5_1) {
+                OutdoorDarknessMask_5 = OutdoorDarknessMask_5_1;
             },
             function (ShroomNPC_1_1) {
                 ShroomNPC_1 = ShroomNPC_1_1;
@@ -10937,7 +10942,7 @@ System.register("game/characters/Villager", ["engine/component", "game/character
                     this.npc.isEnemyFn = function (d) {
                         // Villagers will only flee from demons if the villager is in the dark or really close to the demon
                         if (d.factions.includes(3 /* DEMONS */)) {
-                            return OutdoorDarknessMask_4.OutdoorDarknessMask.instance.isDark(_this.dude.standingPosition)
+                            return OutdoorDarknessMask_5.OutdoorDarknessMask.instance.isDark(_this.dude.standingPosition)
                                 || d.standingPosition.distanceTo(_this.dude.standingPosition) < 30;
                         }
                         // Villagers only flee from shrooms if the shroom is aggro
@@ -13015,7 +13020,7 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
 });
 System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "engine/point", "game/characters/Dude", "game/characters/DudeFactory", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/graphics/Tilesets", "game/items/DroppedItem", "game/SaveManager", "game/ui/UIStateManager", "game/world/GroundRenderer", "game/world/LocationManager", "game/world/MapGenerator", "game/world/OutdoorDarknessMask", "game/world/TimeUnit", "game/world/WorldTime", "game/world/events/EventQueue", "game/world/events/QueuedEvent", "game/characters/NPC", "engine/renderer/BasicRenderComponent", "game/characters/Player", "engine/renderer/LineRender", "engine/Entity", "engine/debug"], function (exports_142, context_142) {
     "use strict";
-    var CollisionEngine_5, point_82, Dude_11, DudeFactory_6, Camera_13, CutsceneManager_3, IntroCutscene_1, Tilesets_49, DroppedItem_3, SaveManager_9, UIStateManager_20, GroundRenderer_2, LocationManager_30, MapGenerator_6, OutdoorDarknessMask_5, TimeUnit_8, WorldTime_10, EventQueue_6, QueuedEvent_4, NPC_8, BasicRenderComponent_9, Player_19, LineRender_2, Entity_32, debug_5, ZOOM, GameScene;
+    var CollisionEngine_5, point_82, Dude_11, DudeFactory_6, Camera_13, CutsceneManager_3, IntroCutscene_1, Tilesets_49, DroppedItem_3, SaveManager_9, UIStateManager_20, GroundRenderer_2, LocationManager_30, MapGenerator_6, OutdoorDarknessMask_6, TimeUnit_8, WorldTime_10, EventQueue_6, QueuedEvent_4, NPC_8, BasicRenderComponent_9, Player_19, LineRender_2, Entity_32, debug_5, ZOOM, GameScene;
     var __moduleName = context_142 && context_142.id;
     return {
         setters: [
@@ -13061,8 +13066,8 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
             function (MapGenerator_6_1) {
                 MapGenerator_6 = MapGenerator_6_1;
             },
-            function (OutdoorDarknessMask_5_1) {
-                OutdoorDarknessMask_5 = OutdoorDarknessMask_5_1;
+            function (OutdoorDarknessMask_6_1) {
+                OutdoorDarknessMask_6 = OutdoorDarknessMask_6_1;
             },
             function (TimeUnit_8_1) {
                 TimeUnit_8 = TimeUnit_8_1;
@@ -13108,13 +13113,13 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
                 };
                 GameScene.prototype.continueGame = function () {
                     // Wait to initialize since it will begin a coroutine
-                    OutdoorDarknessMask_5.OutdoorDarknessMask.instance.start();
+                    OutdoorDarknessMask_6.OutdoorDarknessMask.instance.start();
                     SaveManager_9.saveManager.load();
                 };
                 GameScene.prototype.newGame = function () {
                     SaveManager_9.saveManager.deleteSave();
                     // Wait to initialize since it will begin a coroutine
-                    OutdoorDarknessMask_5.OutdoorDarknessMask.instance.start();
+                    OutdoorDarknessMask_6.OutdoorDarknessMask.instance.start();
                     WorldTime_10.WorldTime.instance.initialize(TimeUnit_8.TimeUnit.HOUR * 19.5);
                     // World must be initialized before we do anything else
                     MapGenerator_6.MapGenerator.instance.generateExterior();
@@ -13146,7 +13151,7 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
                         zoom: ZOOM,
                         offset: cameraOffset,
                         entities: LocationManager_30.LocationManager.instance.currentLocation.getEntities()
-                            .concat(OutdoorDarknessMask_5.OutdoorDarknessMask.instance.getEntities())
+                            .concat(OutdoorDarknessMask_6.OutdoorDarknessMask.instance.getEntities())
                             .concat([
                             CutsceneManager_3.CutsceneManager.instance.getEntity(),
                             WorldTime_10.WorldTime.instance.getEntity(),

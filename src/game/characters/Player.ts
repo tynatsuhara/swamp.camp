@@ -7,12 +7,13 @@ import { TileComponent } from "../../engine/tiles/TileComponent"
 import { Lists } from "../../engine/util/Lists"
 import { Controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
-import { pixelPtToTilePt } from "../graphics/Tilesets"
+import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { UIStateManager } from "../ui/UIStateManager"
 import { ElementType } from "../world/elements/Elements"
 import { Interactable } from "../world/elements/Interactable"
 import { LocationManager } from "../world/LocationManager"
+import { OutdoorDarknessMask } from "../world/OutdoorDarknessMask"
 import { TownStats } from "../world/TownStats"
 import { Dude } from "./Dude"
 import { DudeFactory, DudeType } from "./DudeFactory"
@@ -69,11 +70,6 @@ export class Player extends Component {
             if (updateData.input.isKeyHeld(Controls.walkRight)) { dx++ }
         }
 
-        // TODO: - make this an unlockable feature
-        //       - instead of removing by position, map the light to a source object and remove based on that
-        // const lightPosOffset = -TILE_SIZE/2
-        // PointLightMaskRenderer.instance.removeLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset))
-
         let speed = 1
         if (this.dude.rolling()) {
             speed += 1.5
@@ -89,7 +85,15 @@ export class Player extends Component {
             speed
         )
 
-        // PointLightMaskRenderer.instance.addLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset), 100)
+        // update lantern position
+        if (debug.enableLantern) {
+            OutdoorDarknessMask.instance.addLight(
+                LocationManager.instance.currentLocation, 
+                this, 
+                this.dude.standingPosition.plusY(-TILE_SIZE/2).plus(this.dude.getAnimationOffsetPosition()), 
+                100
+            )
+        }
 
         if (UIStateManager.instance.isMenuOpen) {
             return
