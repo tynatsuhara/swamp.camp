@@ -9042,7 +9042,7 @@ System.register("game/ui/UIStateManager", ["game/ui/HUD", "game/characters/Playe
                         || this.pauseMenu.isOpen
                         || this.craftingMenu.isOpen
                         || this.sellMenu.isOpen;
-                    if (this.captureInput || debug_3.debug.alwaysShowMouse) {
+                    if (this.captureInput || debug_3.debug.enableDevControls) {
                         Mouse_1.Mouse.show();
                     }
                     else {
@@ -10570,16 +10570,13 @@ System.register("game/characters/Player", ["engine/component", "engine/debug", "
                     }
                     // Commands which are used for testing and development
                     if (debug_4.debug.enableDevControls) {
-                        if (updateData.input.isKeyDown(80 /* P */)) {
-                            debug_4.debug.alwaysShowMouse = !debug_4.debug.alwaysShowMouse;
-                        }
                         var mouseTilePos = Tilesets_40.pixelPtToTilePt(updateData.input.mousePos);
-                        // if (updateData.input.isKeyDown(InputKey.K)) {
-                        //     DudeFactory.instance.new(DudeType.ORC_WARRIOR, updateData.input.mousePos)
-                        // }
-                        // if (updateData.input.isKeyDown(InputKey.L)) {
-                        //     DudeFactory.instance.new(DudeType.HORNED_DEMON, updateData.input.mousePos)
-                        // }
+                        if (updateData.input.isKeyDown(79 /* O */)) {
+                            DudeFactory_4.DudeFactory.instance.new(3 /* ORC_WARRIOR */, updateData.input.mousePos);
+                        }
+                        if (updateData.input.isKeyDown(80 /* P */)) {
+                            DudeFactory_4.DudeFactory.instance.new(5 /* HORNED_DEMON */, updateData.input.mousePos);
+                        }
                         if (updateData.input.isKeyDown(186 /* SEMICOLON */)) {
                             DudeFactory_4.DudeFactory.instance.new(3 /* ORC_WARRIOR */, updateData.input.mousePos);
                         }

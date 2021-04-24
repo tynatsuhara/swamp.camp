@@ -60,7 +60,7 @@ export class UIStateManager {
                 || this.craftingMenu.isOpen
                 || this.sellMenu.isOpen
                 
-        if (this.captureInput || debug.alwaysShowMouse) {
+        if (this.captureInput || debug.enableDevControls) {
             Mouse.show()
         } else {
             Mouse.hide()
