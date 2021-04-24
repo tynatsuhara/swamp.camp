@@ -26,14 +26,8 @@ class Assets {
 
     loadAudioFiles(relativePaths: string[]): Promise<void[]> {
         const promises = relativePaths.map(path => new Promise<void>(resolve => {
-            const start = new Date().getTime()
-
             fetch(path).then(response => response.blob()).then(blob => {
                 const audioBlob = URL.createObjectURL(blob)
-
-                const loadedTime = new Date().getTime()
-                console.log("audio [" + path +  "] loaded in " + (loadedTime-start) + " ms")
-
                 this.audioMap.set(path, audioBlob)
                 resolve()
             })
