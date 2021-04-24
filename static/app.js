@@ -1316,7 +1316,6 @@ System.register("game/audio/Music", [], function (exports_20, context_20) {
                     var newMusic = new Audio(path);
                     newMusic.oncanplaythrough = function () {
                         newMusic.play();
-                        console.log("should be playing!");
                     };
                     this.currentMusic = newMusic;
                 };
@@ -11989,6 +11988,10 @@ System.register("game/characters/weapons/Lantern", ["engine/point", "game/graphi
                     this.transform.depth = -.5;
                     OutdoorDarknessMask_5.OutdoorDarknessMask.instance.addLight(LocationManager_27.LocationManager.instance.currentLocation, this, this.dude.standingPosition.plusY(-Tilesets_46.TILE_SIZE / 2).plus(this.dude.getAnimationOffsetPosition()), 100);
                 };
+                Lantern.prototype.delete = function () {
+                    OutdoorDarknessMask_5.OutdoorDarknessMask.instance.removeLight(LocationManager_27.LocationManager.instance.currentLocation, this);
+                    _super.prototype.delete.call(this);
+                };
                 Lantern.prototype.toggleOnBack = function () { };
                 Lantern.prototype.block = function (blockingActive) { };
                 Lantern.prototype.isBlocking = function () {
@@ -12858,15 +12861,13 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                     }
                 };
                 Dude.prototype.setWeapon = function (type) {
-                    if (!!this.weapon) {
-                        this.entity.removeComponent(this.weapon);
-                    }
+                    var _a;
+                    (_a = this.weapon) === null || _a === void 0 ? void 0 : _a.delete();
                     this._weapon = this.entity.addComponent(WeaponFactory_1.WeaponFactory.make(type));
                 };
                 Dude.prototype.setShield = function (type) {
-                    if (!!this.shield) {
-                        this.entity.removeComponent(this.shield);
-                    }
+                    var _a;
+                    (_a = this.shield) === null || _a === void 0 ? void 0 : _a.delete();
                     this._shield = this.entity.addComponent(ShieldFactory_1.ShieldFactory.make(type));
                 };
                 Object.defineProperty(Dude.prototype, "isAlive", {

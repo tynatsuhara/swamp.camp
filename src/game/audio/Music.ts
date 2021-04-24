@@ -9,8 +9,7 @@ export class Music {
         const newMusic = new Audio(path)
 
         newMusic.oncanplaythrough = () => {
-            newMusic.play()     
-            console.log("should be playing!")       
+            newMusic.play()
         }
 
         this.currentMusic = newMusic

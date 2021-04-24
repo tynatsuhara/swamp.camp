@@ -29,6 +29,11 @@ export class Lantern extends Shield {
         )
     }
 
+    delete() {
+        OutdoorDarknessMask.instance.removeLight(LocationManager.instance.currentLocation, this)
+        super.delete()
+    }
+
     toggleOnBack() {}
 
     block(blockingActive: boolean) {}
