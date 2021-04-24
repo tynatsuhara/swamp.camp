@@ -341,6 +341,7 @@ export class Dude extends Component implements DialogueSource {
         if (!this.canRoll) {
             return
         }
+        this.canRoll = false
         this.rollFunction()
         setTimeout(() => this.canRoll = true, 750)
     }

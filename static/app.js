@@ -10530,10 +10530,10 @@ System.register("game/characters/Player", ["engine/component", "engine/debug", "
                     // PointLightMaskRenderer.instance.removeLight(LocationManager.instance.currentLocation, this.dude.standingPosition.plusY(lightPosOffset))
                     var speed = 1;
                     if (this.dude.rolling()) {
-                        speed += 0.75;
+                        speed += 1.5;
                     }
                     if ((_a = this.dude.shield) === null || _a === void 0 ? void 0 : _a.isBlocking()) {
-                        speed -= 0.3;
+                        speed -= 0.4;
                     }
                     this.dude.move(updateData, new point_69.Point(dx, dy), 0, // this.dude.rolling() ? 0 : updateData.input.mousePos.x - this.dude.standingPosition.x,
                     speed);
@@ -12789,6 +12789,7 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
                     if (!this.canRoll) {
                         return;
                     }
+                    this.canRoll = false;
                     this.rollFunction();
                     setTimeout(function () { return _this.canRoll = true; }, 750);
                 };

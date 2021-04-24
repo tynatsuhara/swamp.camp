@@ -76,10 +76,10 @@ export class Player extends Component {
 
         let speed = 1
         if (this.dude.rolling()) {
-            speed += 0.75
+            speed += 1.5
         }
         if (this.dude.shield?.isBlocking()) {
-            speed -= 0.3
+            speed -= 0.4
         }
 
         this.dude.move(
