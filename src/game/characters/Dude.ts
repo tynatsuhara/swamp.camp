@@ -21,6 +21,8 @@ import { DudeAnimationUtils } from "./DudeAnimationUtils"
 import { DudeFaction, DudeType } from "./DudeFactory"
 import { NPC } from "./NPC"
 import { Shield } from "./weapons/Shield"
+import { ShieldFactory } from "./weapons/ShieldFactory"
+import { ShieldType } from "./weapons/ShieldType"
 import { Weapon } from "./weapons/Weapon"
 import { WeaponFactory } from "./weapons/WeaponFactory"
 import { WeaponType } from "./weapons/WeaponType"
@@ -50,8 +52,8 @@ export class Dude extends Component implements DialogueSource {
     get weapon() { return this._weapon }
     get weaponType() { return this.weapon?.getType() ?? WeaponType.NONE}
     private _shield: Shield
-    private shieldId: string
     get shield() { return this._shield }
+    get shieldType() { return this.shield?.type ?? ShieldType.NONE}
 
     private collider: BoxCollider
     private relativeColliderPos: Point = new Point(3, 15)
@@ -79,7 +81,7 @@ export class Dude extends Component implements DialogueSource {
         characterAnimName: string,
         position: Point,
         weaponType: WeaponType,
-        shieldId: string,
+        shieldType: ShieldType,
         maxHealth: number,
         health: number,
         speed: number,
@@ -92,7 +94,6 @@ export class Dude extends Component implements DialogueSource {
         this.type = type
         this.factions = factions
         this._position = position
-        this.shieldId = shieldId
         this.maxHealth = maxHealth
         this._health = health
         this.speed = speed
@@ -113,10 +114,7 @@ export class Dude extends Component implements DialogueSource {
             this._animation.fastForward(Math.random() * 1000)  // so not all the animations sync up
     
             this.setWeapon(weaponType)
-
-            if (!!shieldId) {
-                this._shield = this.entity.addComponent(new Shield(shieldId))
-            }
+            this.setShield(shieldType)
 
             // Set up collider
             // TODO: Add collider size options for tiny and large enemies
@@ -162,10 +160,14 @@ export class Dude extends Component implements DialogueSource {
         if (!!this.weapon) {
             this.entity.removeComponent(this.weapon)
         }
-        this._weapon = WeaponFactory.make(type)
-        if (!!this._weapon) {
-            this.entity.addComponent(this._weapon)
+        this._weapon = this.entity.addComponent(WeaponFactory.make(type))
+    }
+
+    setShield(type: ShieldType) {
+        if (!!this.shield) {
+            this.entity.removeComponent(this.shield)
         }
+        this._shield = this.entity.addComponent(ShieldFactory.make(type))
     }
 
     get isAlive() { return this._health > 0 }
@@ -429,7 +431,7 @@ export class Dude extends Component implements DialogueSource {
             health: this._health,
             speed: this.speed,
             weapon: this.weaponType,
-            shield: this.shieldId,
+            shield: this.shieldType,
             inventory: this.inventory.save(),
             dialogue: this.dialogue,
             blob: this.blob,

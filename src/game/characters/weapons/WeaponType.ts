@@ -1,5 +1,5 @@
 export enum WeaponType {
-    NONE = 99999,
+    NONE = 0_99999,
     UNARMED,
     KNIFE,
     SHITTY_SWORD,

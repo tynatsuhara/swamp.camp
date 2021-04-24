@@ -85,16 +85,6 @@ export class Player extends Component {
             speed
         )
 
-        // update lantern position
-        if (debug.enableLantern) {
-            OutdoorDarknessMask.instance.addLight(
-                LocationManager.instance.currentLocation, 
-                this, 
-                this.dude.standingPosition.plusY(-TILE_SIZE/2).plus(this.dude.getAnimationOffsetPosition()), 
-                100
-            )
-        }
-
         if (UIStateManager.instance.isMenuOpen) {
             return
         }

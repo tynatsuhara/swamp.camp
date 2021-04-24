@@ -6,6 +6,7 @@ import { TileTransform } from "../../../engine/tiles/TileTransform"
 import { Point } from "../../../engine/point"
 import { Dude } from "../Dude"
 import { Animator } from "../../../engine/util/Animator"
+import { ShieldType } from "./ShieldType"
 
 enum State {
     ON_BACK,
@@ -13,26 +14,28 @@ enum State {
 }
 
 /**
- * A weapon being wielded by a dude
+ * A shield being wielded by a dude
  */
 export class Shield extends Component {
 
-    private blockingShieldSprite: TileComponent
+    dude: Dude
+    sprite: TileComponent
+
     private state: State = State.DRAWN
     // private slashSprite: TileComponent  // TODO try adding particles when someone hits a blocking shield
-    private dude: Dude
-
     private blockingActive = false
     private raisedPerc = 0 // for animation
     private timeToRaiseMs = 120
+    readonly type: ShieldType
 
-    constructor(shieldId: string) {
+    constructor(type: ShieldType, spriteId: string) {
         super()
+        this.type = type
         this.start = (startData) => {
             this.dude = this.entity.getComponent(Dude)
-            this.blockingShieldSprite = this.entity.addComponent(
+            this.sprite = this.entity.addComponent(
                 new TileComponent(
-                    Tilesets.instance.dungeonCharacters.getTileSource(shieldId),
+                    Tilesets.instance.dungeonCharacters.getTileSource(spriteId),
                     new TileTransform().relativeTo(this.dude.animation.transform)
                 )
             )
@@ -57,8 +60,8 @@ export class Shield extends Component {
 
         pos = pos.plus(this.dude.getAnimationOffsetPosition())
 
-        this.blockingShieldSprite.transform.position = pos
-        this.blockingShieldSprite.transform.depth = this.raisedPerc > .7 ? .75 : -.75
+        this.sprite.transform.position = pos
+        this.sprite.transform.depth = this.raisedPerc > .7 ? .75 : -.75
     }
 
     toggleOnBack() {
@@ -86,40 +89,4 @@ export class Shield extends Component {
     canAttack() {
         return this.state === State.DRAWN && this.raisedPerc < 1
     }
-
-    private animator: Animator
-    private currentAnimationFrame: number = 0
-    // private playAttackAnimation() {
-    //     this.state = State.ATTACKING
-    //     this.animator = new Animator(
-    //         Animator.frames(8, 40), 
-    //         (index) => this.currentAnimationFrame = index, 
-    //         () => {
-    //             this.state = State.DRAWN  // reset to DRAWN when animation finishes
-    //             this.animator = null
-    //         }
-    //     ) 
-    // }
-
-    /**
-     * Returns (position, rotation)
-     */
-    // private getAttackAnimationPosition(): [Point, number] {
-    //     const swingStartFrame = 3
-    //     const resettingFrame = 7
-
-    //     if (this.currentAnimationFrame < swingStartFrame) {
-    //         return [new Point(this.currentAnimationFrame * 3, 0), 0]
-    //     } else if (this.currentAnimationFrame < resettingFrame) {
-    //         return [
-    //             new Point(
-    //                 (6-this.currentAnimationFrame) + this.weaponSprite.transform.dimensions.y - swingStartFrame*3, 
-    //                 Math.floor(this.weaponSprite.transform.dimensions.y/2 - 1)
-    //             ),
-    //             90
-    //         ]
-    //     } else {
-    //         return [new Point((1-this.currentAnimationFrame+resettingFrame) * 3, 2), 0]
-    //     }
-    // }
 }

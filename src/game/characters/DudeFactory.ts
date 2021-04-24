@@ -20,6 +20,7 @@ import { BERTO_STARTING_DIALOGUE } from "./dialogues/BertoIntro"
 import { ShroomNPC } from "./ShroomNPC"
 import { newUUID } from "../saves/uuid"
 import { Centaur } from "./Centaur"
+import { ShieldType } from "./weapons/ShieldType"
 
 export const enum DudeFaction {
     VILLAGERS,
@@ -81,7 +82,7 @@ export class DudeFactory {
         let factions: DudeFaction[] = [DudeFaction.VILLAGERS]
         let animationName: string
         let weapon: WeaponType = WeaponType.NONE
-        let shield: string = null
+        let shield: ShieldType = ShieldType.NONE
         let maxHealth: number
         let speed: number = 0.085
         let dialogue: string = EMPTY_DIALOGUE
@@ -94,7 +95,7 @@ export class DudeFactory {
             case DudeType.PLAYER: {
                 animationName = "knight_f"
                 weapon = WeaponType.SWORD
-                shield = "shield_0"
+                shield = ShieldType.BASIC
                 maxHealth = 4
                 additionalComponents = [new Player(), new CutscenePlayerController()]
                 window["player"] = additionalComponents[0]
@@ -129,7 +130,7 @@ export class DudeFactory {
             case DudeType.ELF: {
                 animationName = "elf_m"
                 weapon = WeaponType.KATANA
-                shield = "shield_0"
+                shield = ShieldType.BASIC
                 maxHealth = 4
                 additionalComponents = [new NPC(), new Villager()]
                 speed *= (.3 + Math.random()/2)
