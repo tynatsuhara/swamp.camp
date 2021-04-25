@@ -11542,7 +11542,6 @@ System.register("game/audio/Ambiance", ["game/Settings", "game/world/TimeUnit"],
                 Ambiance.play = function (path) {
                     var _a, _b;
                     if ((_a = this.currentAmbiance) === null || _a === void 0 ? void 0 : _a.src.endsWith(path)) {
-                        console.log("don't restart");
                         return;
                     }
                     (_b = this.currentAmbiance) === null || _b === void 0 ? void 0 : _b.pause();

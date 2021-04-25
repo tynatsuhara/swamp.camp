@@ -30,7 +30,6 @@ export class Ambiance {
      */
     private static play(path: string) {
         if (this.currentAmbiance?.src.endsWith(path)) {
-            console.log("don't restart")
             return
         }
 
