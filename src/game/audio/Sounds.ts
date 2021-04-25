@@ -1,8 +1,12 @@
 import { assets } from "../../engine/Assets"
 import { Settings } from "../Settings"
 
+/**
+ * Used for general purpose one-off sound effects
+ */
 export class Sounds {
-    static play(path: string) {
+
+    static play(path: string, volume: number = 1) {
         const audio = assets.getAudioByFileName(path)
         
         if (!audio) {
@@ -10,7 +14,7 @@ export class Sounds {
             return
         }
         
-        audio.volume = Settings.getSoundVolume()
+        audio.volume = Settings.getSoundVolume() * volume
         audio.play()
     }
 }

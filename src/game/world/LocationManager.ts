@@ -1,3 +1,4 @@
+import { Ambiance } from "../audio/Ambiance"
 import { LocationManagerSaveState } from "../saves/LocationManagerSaveState"
 import { WorldLocation } from "./WorldLocation"
 
@@ -16,7 +17,12 @@ export class LocationManager {
         window["locationManager"] = this
     }
 
-    currentLocation: WorldLocation
+    private _currentLocation: WorldLocation
+    get currentLocation() { return this._currentLocation }
+    set currentLocation(value) {
+        Ambiance.setIsInterior(value.isInterior)
+        this._currentLocation = value
+    }
     private locations: Map<string, WorldLocation> = new Map()  // uuid -> location
 
     get(uuid: string) {

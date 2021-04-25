@@ -1,6 +1,10 @@
 import { Settings } from "../Settings"
 
+/**
+ * Used for background soundtrack and even-based music
+ */
 export class Music {
+    private static readonly VOLUME_MULTIPLER = 0.1
     private static currentMusic: HTMLAudioElement
     private static volume: number = Settings.getMusicVolume()
 
@@ -10,7 +14,7 @@ export class Music {
         this.currentMusic?.pause()
 
         const newMusic = new Audio(path)
-        newMusic.volume = this.volume
+        newMusic.volume = this.volume * this.VOLUME_MULTIPLER
 
         newMusic.oncanplaythrough = () => {
             newMusic.play()
@@ -20,10 +24,9 @@ export class Music {
     }
 
     static setVolume(volume: number) {
-        console.log("volume: " + volume)
         this.volume = volume
         if (!!this.currentMusic) {
-            this.currentMusic.volume = volume
+            this.currentMusic.volume = volume * this.VOLUME_MULTIPLER
         }
     }
 }

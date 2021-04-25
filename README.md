@@ -16,3 +16,6 @@ additional art by:
 
 music by:
 * https://www.newgrounds.com/audio/listen/1017053
+
+sound effects by:
+* https://www.edinburghrecords.com/

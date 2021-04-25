@@ -4,6 +4,8 @@ import { UpdateData } from "../../engine/engine"
 import { EventQueue } from "./events/EventQueue"
 import { InputKey } from "../../engine/input"
 import { TimeUnit } from "./TimeUnit"
+import { debug } from "../../engine/debug"
+import { Ambiance } from "../audio/Ambiance"
 
 export class WorldTime extends Component {
 
@@ -32,13 +34,15 @@ export class WorldTime extends Component {
     update(updateData: UpdateData) {
         this._time += updateData.elapsedTimeMillis
 
-        // TODO cleanup
-        if (updateData.input.isKeyDown(InputKey.N) || updateData.input.isKeyDown(InputKey.M)) {
-            this._time += updateData.input.isKeyDown(InputKey.N) ? TimeUnit.HOUR : TimeUnit.MINUTE
-            console.log(`fast forwarding time to ${this.clockTime()}`)
+        if (debug.enableDevControls) {
+            if (updateData.input.isKeyDown(InputKey.N) || updateData.input.isKeyDown(InputKey.M)) {
+                this._time += updateData.input.isKeyDown(InputKey.N) ? TimeUnit.HOUR : TimeUnit.MINUTE
+                console.log(`fast forwarding time to ${this.clockTime()}`)
+            }
         }
 
         EventQueue.instance.processEvents(this.time)
+        Ambiance.setTime(this.time)
 
         window.document.title = `${this.title} | ${this.clockTime()}`
     }
