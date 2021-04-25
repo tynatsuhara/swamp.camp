@@ -7027,7 +7027,7 @@ System.register("game/world/elements/Campfire", ["engine/component", "engine/til
                             OutdoorDarknessMask_1.OutdoorDarknessMask.instance.addLight(wl, _this, lightCenterPos, Tilesets_18.TILE_SIZE * (5 + logCount / 2));
                         }
                         else {
-                            OutdoorDarknessMask_1.OutdoorDarknessMask.instance.removeLight(wl, lightCenterPos);
+                            OutdoorDarknessMask_1.OutdoorDarknessMask.instance.removeLight(wl, _this);
                         }
                     };
                     var cf = e.addComponent(new Campfire(logsOnFire, lastLogConsumedTime, updateFire));

@@ -56,7 +56,7 @@ export class CampfireFactory extends ElementFactory {
             if (campfireOn.enabled) {
                 OutdoorDarknessMask.instance.addLight(wl, this, lightCenterPos, TILE_SIZE * (5 + logCount/2))
             } else {
-                OutdoorDarknessMask.instance.removeLight(wl, lightCenterPos)
+                OutdoorDarknessMask.instance.removeLight(wl, this)
             }
         }
 
