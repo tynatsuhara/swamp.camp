@@ -8,11 +8,11 @@ run `tsc` then commit the compiled statics, this will trigger a [Vercel deployme
 
 # links
 additional art by:
-https://0x72.itch.io/dungeontileset-ii
-https://superdark.itch.io/enchanted-forest-characters 
-https://superdark.itch.io/16x16-free-npc-pack
-https://anritool.itch.io/cr-tileset
-https://kenney.nl/
+* https://0x72.itch.io/dungeontileset-ii
+* https://superdark.itch.io/enchanted-forest-characters 
+* https://superdark.itch.io/16x16-free-npc-pack
+* https://anritool.itch.io/cr-tileset
+* https://kenney.nl/
 
 music by:
-https://www.newgrounds.com/audio/listen/1017053
+* https://www.newgrounds.com/audio/listen/1017053
