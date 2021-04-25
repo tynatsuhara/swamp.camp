@@ -4,7 +4,7 @@ this project uses the typescript compiler [to bundle](https://mattallan.me/posts
 run `./run-local-server` to spin up a local HTTP server for development
 
 # release
-run `tsc` then commit the compiled statics, this will trigger a [Vercel deployment](https://vercel.com/tylerbonnell/quest/deployments)
+run `tsc` then commit the compiled statics, this will trigger a [Netlify deployment](https://app.netlify.com/sites/wow-a-game/deploys). It will be deployed to https://wow-a-game.netlify.app 
 
 # links
 additional art by:
