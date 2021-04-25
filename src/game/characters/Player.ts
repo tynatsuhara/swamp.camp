@@ -127,7 +127,7 @@ export class Player extends Component {
                 DudeFactory.instance.new(DudeType.HORNED_DEMON, updateData.input.mousePos)
             }
             if (updateData.input.isKeyDown(InputKey.SEMICOLON)) {
-                DudeFactory.instance.new(DudeType.ORC_WARRIOR, updateData.input.mousePos)
+                DudeFactory.instance.new(DudeType.SHROOM, updateData.input.mousePos)
             }
             if (updateData.input.isKeyDown(InputKey.QUOTE)) {
                 NotificationDisplay.instance.push({

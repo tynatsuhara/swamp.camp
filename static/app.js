@@ -10776,7 +10776,7 @@ System.register("game/characters/Player", ["engine/component", "engine/debug", "
                             DudeFactory_4.DudeFactory.instance.new(5 /* HORNED_DEMON */, updateData.input.mousePos);
                         }
                         if (updateData.input.isKeyDown(186 /* SEMICOLON */)) {
-                            DudeFactory_4.DudeFactory.instance.new(3 /* ORC_WARRIOR */, updateData.input.mousePos);
+                            DudeFactory_4.DudeFactory.instance.new(6 /* SHROOM */, updateData.input.mousePos);
                         }
                         if (updateData.input.isKeyDown(222 /* QUOTE */)) {
                             NotificationDisplay_3.NotificationDisplay.instance.push({
