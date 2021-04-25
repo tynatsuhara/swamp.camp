@@ -18,6 +18,10 @@ import { TimeUnit } from "../TimeUnit"
 import { CAMPFIRE_DIALOGUE } from "../../characters/dialogues/ItemDialogues"
 import { ElementFactory } from "./ElementFactory"
 import { LocationManager } from "../LocationManager"
+import { assets } from "../../../engine/Assets"
+import { Player } from "../../characters/Player"
+import { Settings } from "../../Settings"
+import { PointAudio } from "../../audio/PointAudio"
 
 export class CampfireFactory extends ElementFactory {
 
@@ -49,9 +53,19 @@ export class CampfireFactory extends ElementFactory {
         const logsOnFire = data["logs"] ?? 0
         const lastLogConsumedTime = data["llct"] ?? 0
 
+        const pixelCenterPos = scaledPos.plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
+
+        const audio = e.addComponent(new PointAudio(
+            "audio/ambiance/campfire.wav",
+            pixelCenterPos,
+            TILE_SIZE * 6,
+            true
+        ))
+
         const updateFire = (logCount: number) => {
             campfireOff.enabled = logCount === 0
             campfireOn.enabled = !campfireOff.enabled
+            audio.setMultiplier(logCount === 0 ? 0 : 1)
             const lightCenterPos = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
             if (campfireOn.enabled) {
                 OutdoorDarknessMask.instance.addLight(wl, this, lightCenterPos, TILE_SIZE * (5 + logCount/2))
@@ -64,7 +78,7 @@ export class CampfireFactory extends ElementFactory {
 
         // Toggle between on/off when interacted with
         e.addComponent(new Interactable(
-            scaledPos.plus(new Point(TILE_SIZE/2, TILE_SIZE/2)), 
+            pixelCenterPos, 
             () => {
                 DialogueDisplay.instance.startDialogue(cf)
             }, 

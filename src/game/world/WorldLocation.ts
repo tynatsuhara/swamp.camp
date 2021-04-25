@@ -2,6 +2,7 @@ import { Entity } from "../../engine/Entity"
 import { Point } from "../../engine/point"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { Grid } from "../../engine/util/Grid"
+import { PointAudio } from "../audio/PointAudio"
 import { Dude } from "../characters/Dude"
 import { DudeFactory, DudeType } from "../characters/DudeFactory"
 import { NPC } from "../characters/NPC"
@@ -232,6 +233,10 @@ export class WorldLocation {
             isInterior: this.isInterior,
             allowPlacing: this.allowPlacing,
         }
+    }
+
+    toggleAudio(active: boolean) {
+        this.getEntities().flatMap(e => e.getComponents(PointAudio)).forEach(aud => aud.setActive(active))
     }
 
     private saveElements(): SavedElement[] {

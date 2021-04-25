@@ -19,9 +19,11 @@ export class LocationManager {
 
     private _currentLocation: WorldLocation
     get currentLocation() { return this._currentLocation }
-    set currentLocation(value) {
-        Ambiance.setIsInterior(value.isInterior)
-        this._currentLocation = value
+    set currentLocation(newLocation) {
+        Ambiance.setIsInterior(newLocation.isInterior)
+        this.currentLocation?.toggleAudio(false)
+        newLocation.toggleAudio(true)
+        this._currentLocation = newLocation
     }
     private locations: Map<string, WorldLocation> = new Map()  // uuid -> location
 
