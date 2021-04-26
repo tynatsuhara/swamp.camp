@@ -2,6 +2,9 @@ import { Entity } from "../../engine/Entity"
 import { Point } from "../../engine/point"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
 import { ImageRender } from "../../engine/renderer/ImageRender"
+import { Player } from "../characters/Player"
+import { Lantern } from "../characters/weapons/Lantern"
+import { ShieldType } from "../characters/weapons/ShieldType"
 import { Camera } from "../cutscenes/Camera"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "../ui/Color"
@@ -75,7 +78,7 @@ export class OutdoorDarknessMask {
     }
 
     /**
-     * @return alpha 0-255 (total light to total darkness)
+     * returns true if it is dark enough for a demon to tolerate
      */
     isDark(pixelPt: Point): boolean {
         if (this.darkness < .6) {
@@ -95,7 +98,7 @@ export class OutdoorDarknessMask {
 		const timeSoFar = time % TimeUnit.HOUR
 		const clamp01 = (val) => Math.min(Math.max(val, 0), 1)
 
-        const nightColor = this.colorFromString(Color.BLACK, 0.8)
+        const nightColor = this.colorFromString(Color.BLACK, 1)
         const sunriseColor = this.colorFromString(Color.PINK, 0.2)
         const dayColor = this.colorFromString(Color.LIGHT_PINK, 0)
         const sunsetColor = this.colorFromString(Color.DARK_PURPLE, 0.2)
@@ -153,6 +156,11 @@ export class OutdoorDarknessMask {
         }
     }
 
+    private static readonly PLAYER_VISIBLE_SURROUNDINGS_DIAMETER = 150
+    private static readonly VISIBILE_LIGHT = .95
+    private static readonly VISIBILE_LIGHT_EDGE = .975
+    private static readonly VISIBILITY_MULTIPLIER = 2.25
+
     private renderToOffscreenCanvas() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
@@ -170,19 +178,41 @@ export class OutdoorDarknessMask {
         }
 
         Array.from(locationLightGrid.values()).forEach(entry => {
-            const pos = entry[0]
-            const diameter = entry[1]
-            const circleOffset = new Point(-.5, -.5).times(diameter)
-            const adjustedPos = pos.plus(this.shift).plus(circleOffset)//.plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
-            
-            this.makeLightCircle(diameter, adjustedPos, this.darkness/2)
-
-            const innerOffset = Math.floor(diameter/2 * 1/4)
-            this.makeLightCircle(diameter-innerOffset*2, adjustedPos.plus(new Point(innerOffset, innerOffset)), 0)
+            this.makeLightCircle(entry[0], entry[1], 0, this.darkness/2)
+            this.makeLightCircle(
+                entry[0], 
+                entry[1] * OutdoorDarknessMask.VISIBILITY_MULTIPLIER, 
+                this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT, 
+                this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT_EDGE
+            )
         })
+
+        // Always provide slight visibility around the player
+        const player = Player.instance?.dude
+        if (!!player) {
+            const diameter = player.shieldType === ShieldType.LANTERN 
+                    ? Lantern.DIAMETER * OutdoorDarknessMask.VISIBILITY_MULTIPLIER 
+                    : OutdoorDarknessMask.PLAYER_VISIBLE_SURROUNDINGS_DIAMETER
+            this.makeLightCircle(
+                player.standingPosition.plusY(-TILE_SIZE/2).plus(player.getAnimationOffsetPosition()), 
+                diameter, 
+                this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT, 
+                this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT_EDGE
+            )
+        }
     }
 
-    private makeLightCircle(diameter: number, position: Point, alpha: number) {
+    private makeLightCircle(centerPos: Point, diameter: number, innerAlpha: number, outerAlpha: number) {
+        const circleOffset = new Point(-.5, -.5).times(diameter)
+        const adjustedPos = centerPos.plus(this.shift).plus(circleOffset)
+        
+        this.makeLightCircleHelper(diameter, adjustedPos, outerAlpha)
+
+        const innerOffset = Math.floor(diameter/2 * 1/4)
+        this.makeLightCircleHelper(diameter-innerOffset*2, adjustedPos.plus(new Point(innerOffset, innerOffset)), innerAlpha)
+    }
+
+    private makeLightCircleHelper(diameter: number, position: Point, alpha: number) {
         const center = new Point(diameter/2, diameter/2).minus(new Point(.5, .5))
         const imageData = this.context.getImageData(position.x, position.y, diameter, diameter)
 
@@ -217,12 +247,12 @@ export class OutdoorDarknessMask {
             this.updateColorForTime()
         }
 
-        if (this.gridDirty || this.lastLocationRendered !== LocationManager.instance.currentLocation) {
+        // if (this.gridDirty || this.lastLocationRendered !== LocationManager.instance.currentLocation) {
             this.renderToOffscreenCanvas()
             // this.updateLitGrid()
             this.gridDirty = false
             this.lastLocationRendered = LocationManager.instance.currentLocation
-        }
+        // }
 
         // prevent tint not extending to the edge
         const dimensions = Camera.instance.dimensions.plus(new Point(1, 1))
