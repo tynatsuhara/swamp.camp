@@ -8,6 +8,8 @@ import { Dude } from "../characters/Dude"
 import { DudeFactory, DudeType } from "../characters/DudeFactory"
 import { NPC } from "../characters/NPC"
 import { Player } from "../characters/Player"
+import { Lantern } from "../characters/weapons/Lantern"
+import { ShieldType } from "../characters/weapons/ShieldType"
 import { Camera } from "../cutscenes/Camera"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { LocationSaveState } from "../saves/LocationSaveState"
@@ -200,6 +202,9 @@ export class WorldLocation {
             this.dudes.delete(p)
             linkedLocation.dudes.add(p)
             p.location = linkedLocation
+            if (p.shieldType === ShieldType.LANTERN) {
+                (p.shield as Lantern).removeLight()
+            }
     
             LocationManager.instance.currentLocation = linkedLocation
     

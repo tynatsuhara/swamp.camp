@@ -10,6 +10,8 @@ import { ShieldType } from "./ShieldType"
  */
 export class Lantern extends Shield {
 
+    static readonly DIAMETER = 100
+
     constructor() {
         super(ShieldType.LANTERN, "tool_lantern")
     }
@@ -25,13 +27,17 @@ export class Lantern extends Shield {
             LocationManager.instance.currentLocation, 
             this, 
             this.dude.standingPosition.plusY(-TILE_SIZE/2).plus(this.dude.getAnimationOffsetPosition()), 
-            100
+            Lantern.DIAMETER
         )
     }
 
     delete() {
-        OutdoorDarknessMask.instance.removeLight(LocationManager.instance.currentLocation, this)
+        this.removeLight()
         super.delete()
+    }
+
+    removeLight() {
+        OutdoorDarknessMask.instance.removeLight(LocationManager.instance.currentLocation, this)
     }
 
     toggleOnBack() {}
