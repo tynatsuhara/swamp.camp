@@ -6,6 +6,7 @@ import { RenderMethod } from "../../engine/renderer/RenderMethod"
 import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { TileTransform } from "../../engine/tiles/TileTransform"
+import { StepSounds } from "../audio/StepSounds"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Inventory } from "../items/Inventory"
@@ -346,9 +347,11 @@ export class Dude extends Component implements DialogueSource {
 
     // just a stepping dodge instead of a roll
     private dashRoll() {
+        StepSounds.singleFootstepSound(2)
         this.isRolling = true;
         this.animation.goToAnimation(2)  
         setTimeout(() => {
+            StepSounds.singleFootstepSound(3)
             this.isRolling = false
             this.animationDirty = true
         }, 200)

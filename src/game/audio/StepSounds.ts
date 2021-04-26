@@ -31,16 +31,22 @@ export class StepSounds {
             StepSounds.WOOD_3 
         ]).then(() => StepSounds.doFootstep())
     }
+    
+    static singleFootstepSound(volumeMultiplier: number) {
+        const [sound, volume] = StepSounds.getSound()
+        if (!!sound) {
+            StepSounds.footstep = assets.getAudioByFileName(sound)
+            StepSounds.footstep.oncanplay = () => {
+                StepSounds.footstep.play()
+                StepSounds.footstep.volume = Math.min(1, volume * volumeMultiplier)
+            }
+        }
+    }
 
     private static doFootstep = () => {
         setTimeout(() => {
-            const [sound, volume] = StepSounds.getSound()
-            if (!!sound) {
-                StepSounds.footstep = assets.getAudioByFileName(sound)
-                StepSounds.footstep.oncanplay = () => {
-                    StepSounds.footstep.play()
-                    StepSounds.footstep.volume = (Player.instance.dude.isMoving && !Player.instance.dude.rolling() ? 1 : 0) * volume
-                }
+            if (Player.instance.dude.isMoving && !Player.instance.dude.rolling()) {
+                StepSounds.singleFootstepSound(1)
             }
             StepSounds.doFootstep()
         }, StepSounds.SPEED);
