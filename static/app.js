@@ -11669,17 +11669,30 @@ System.register("game/audio/Ambiance", ["game/Settings", "game/world/TimeUnit"],
                 function Ambiance() {
                 }
                 Ambiance.setTime = function (time) {
-                    var timeOfDay = time % TimeUnit_8.TimeUnit.DAY;
+                    this.time = time;
+                    this.determineAmbiance();
                 };
                 Ambiance.setIsInterior = function (isInterior) {
-                    this.play(this.DAYTIME);
-                    this.setVolume(isInterior ? .1 : 1);
+                    this.isInterior = isInterior;
+                    this.determineAmbiance();
                 };
-                /**
-                 * @param path the audio file to load
-                 * @param volume
-                 * @returns
-                 */
+                Ambiance.determineAmbiance = function () {
+                    // TODO: add other ambiance tracks
+                    this.play(this.DAYTIME);
+                    // fade out at night
+                    var fadeTime = TimeUnit_8.TimeUnit.MINUTE * 15;
+                    var timeOfDay = this.time % TimeUnit_8.TimeUnit.DAY;
+                    var daytimeFadeInTime = TimeUnit_8.TimeUnit.HOUR * 5;
+                    var daytimeFadeOutTime = TimeUnit_8.TimeUnit.HOUR * 20;
+                    var fadeMultiplier = 0;
+                    if (timeOfDay > daytimeFadeOutTime) {
+                        fadeMultiplier = 1 - Math.min(1, (timeOfDay - daytimeFadeOutTime) / fadeTime);
+                    }
+                    else if (timeOfDay > daytimeFadeInTime) {
+                        fadeMultiplier = Math.min(1, (timeOfDay - daytimeFadeInTime) / fadeTime);
+                    }
+                    this.setVolume(fadeMultiplier * (this.isInterior ? .1 : 1));
+                };
                 Ambiance.play = function (path) {
                     var _a, _b;
                     if ((_a = this.currentAmbiance) === null || _a === void 0 ? void 0 : _a.src.endsWith(path)) {

@@ -15,19 +15,34 @@ export class Ambiance {
     private static isInterior: boolean
 
     static setTime(time: number) {
-        const timeOfDay = time % TimeUnit.DAY
+        this.time = time
+        this.determineAmbiance()
     }
 
     static setIsInterior(isInterior: boolean) {
-        this.play(this.DAYTIME)
-        this.setVolume(isInterior ? .1 : 1)
+        this.isInterior = isInterior
+        this.determineAmbiance()
     }
 
-    /**
-     * @param path the audio file to load
-     * @param volume 
-     * @returns 
-     */
+    private static determineAmbiance() {
+        // TODO: add other ambiance tracks
+        this.play(this.DAYTIME)
+
+        // fade out at night
+        const fadeTime = TimeUnit.MINUTE * 15
+        const timeOfDay = this.time % TimeUnit.DAY
+        const daytimeFadeInTime = TimeUnit.HOUR * 5
+        const daytimeFadeOutTime = TimeUnit.HOUR * 20
+        let fadeMultiplier = 0
+        if (timeOfDay > daytimeFadeOutTime) {
+            fadeMultiplier = 1 - Math.min(1, (timeOfDay - daytimeFadeOutTime)/fadeTime)
+        } else if (timeOfDay > daytimeFadeInTime) {
+            fadeMultiplier = Math.min(1, (timeOfDay - daytimeFadeInTime)/fadeTime)
+        }
+
+        this.setVolume(fadeMultiplier * (this.isInterior ? .1 : 1))
+    }
+
     private static play(path: string) {
         if (this.currentAmbiance?.src.endsWith(path)) {
             return
