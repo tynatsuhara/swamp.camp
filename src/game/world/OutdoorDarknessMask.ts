@@ -172,6 +172,19 @@ export class OutdoorDarknessMask {
         this.context.fillStyle = this.color
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
 
+        // Always provide slight visibility around the player
+        const player = Player.instance?.dude
+        if (!!player) {
+            if (player.shieldType !== ShieldType.LANTERN) {
+                this.makeLightCircle(
+                    player.standingPosition.plusY(-TILE_SIZE/2).plus(player.getAnimationOffsetPosition()), 
+                    OutdoorDarknessMask.PLAYER_VISIBLE_SURROUNDINGS_DIAMETER, 
+                    this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT, 
+                    this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT_EDGE
+                )
+            }
+        }
+
         const locationLightGrid = this.lightTiles.get(location)
         if (!locationLightGrid) {
             return
@@ -186,20 +199,6 @@ export class OutdoorDarknessMask {
                 this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT_EDGE
             )
         })
-
-        // Always provide slight visibility around the player
-        const player = Player.instance?.dude
-        if (!!player) {
-            const diameter = player.shieldType === ShieldType.LANTERN 
-                    ? Lantern.DIAMETER * OutdoorDarknessMask.VISIBILITY_MULTIPLIER 
-                    : OutdoorDarknessMask.PLAYER_VISIBLE_SURROUNDINGS_DIAMETER
-            this.makeLightCircle(
-                player.standingPosition.plusY(-TILE_SIZE/2).plus(player.getAnimationOffsetPosition()), 
-                diameter, 
-                this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT, 
-                this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT_EDGE
-            )
-        }
     }
 
     private makeLightCircle(centerPos: Point, diameter: number, innerAlpha: number, outerAlpha: number) {

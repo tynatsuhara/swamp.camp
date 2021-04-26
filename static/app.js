@@ -6812,9 +6812,9 @@ System.register("game/world/Vignette", ["engine/component", "engine/point", "eng
         }
     };
 });
-System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/point", "engine/renderer/BasicRenderComponent", "engine/renderer/ImageRender", "game/characters/Player", "game/characters/weapons/Lantern", "game/characters/weapons/ShieldType", "game/cutscenes/Camera", "game/graphics/Tilesets", "game/ui/UIStateManager", "game/world/LocationManager", "game/world/MapGenerator", "game/world/TimeUnit", "game/world/Vignette", "game/world/WorldTime"], function (exports_79, context_79) {
+System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/point", "engine/renderer/BasicRenderComponent", "engine/renderer/ImageRender", "game/characters/Player", "game/characters/weapons/ShieldType", "game/cutscenes/Camera", "game/graphics/Tilesets", "game/ui/UIStateManager", "game/world/LocationManager", "game/world/MapGenerator", "game/world/TimeUnit", "game/world/Vignette", "game/world/WorldTime"], function (exports_79, context_79) {
     "use strict";
-    var Entity_12, point_42, BasicRenderComponent_6, ImageRender_6, Player_10, Lantern_1, ShieldType_2, Camera_7, Tilesets_17, UIStateManager_14, LocationManager_8, MapGenerator_1, TimeUnit_1, Vignette_1, WorldTime_2, OutdoorDarknessMask;
+    var Entity_12, point_42, BasicRenderComponent_6, ImageRender_6, Player_10, ShieldType_2, Camera_7, Tilesets_17, UIStateManager_14, LocationManager_8, MapGenerator_1, TimeUnit_1, Vignette_1, WorldTime_2, OutdoorDarknessMask;
     var __moduleName = context_79 && context_79.id;
     return {
         setters: [
@@ -6832,9 +6832,6 @@ System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/poin
             },
             function (Player_10_1) {
                 Player_10 = Player_10_1;
-            },
-            function (Lantern_1_1) {
-                Lantern_1 = Lantern_1_1;
             },
             function (ShieldType_2_1) {
                 ShieldType_2 = ShieldType_2_1;
@@ -7002,6 +6999,13 @@ System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/poin
                     }
                     this.context.fillStyle = this.color;
                     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                    // Always provide slight visibility around the player
+                    var player = (_a = Player_10.Player.instance) === null || _a === void 0 ? void 0 : _a.dude;
+                    if (!!player) {
+                        if (player.shieldType !== ShieldType_2.ShieldType.LANTERN) {
+                            this.makeLightCircle(player.standingPosition.plusY(-Tilesets_17.TILE_SIZE / 2).plus(player.getAnimationOffsetPosition()), OutdoorDarknessMask.PLAYER_VISIBLE_SURROUNDINGS_DIAMETER, this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT, this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT_EDGE);
+                        }
+                    }
                     var locationLightGrid = this.lightTiles.get(location);
                     if (!locationLightGrid) {
                         return;
@@ -7010,14 +7014,6 @@ System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/poin
                         _this.makeLightCircle(entry[0], entry[1], 0, _this.darkness / 2);
                         _this.makeLightCircle(entry[0], entry[1] * OutdoorDarknessMask.VISIBILITY_MULTIPLIER, _this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT, _this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT_EDGE);
                     });
-                    // Always provide slight visibility around the player
-                    var player = (_a = Player_10.Player.instance) === null || _a === void 0 ? void 0 : _a.dude;
-                    if (!!player) {
-                        var diameter = player.shieldType === ShieldType_2.ShieldType.LANTERN
-                            ? Lantern_1.Lantern.DIAMETER * OutdoorDarknessMask.VISIBILITY_MULTIPLIER
-                            : OutdoorDarknessMask.PLAYER_VISIBLE_SURROUNDINGS_DIAMETER;
-                        this.makeLightCircle(player.standingPosition.plusY(-Tilesets_17.TILE_SIZE / 2).plus(player.getAnimationOffsetPosition()), diameter, this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT, this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT_EDGE);
-                    }
                 };
                 OutdoorDarknessMask.prototype.makeLightCircle = function (centerPos, diameter, innerAlpha, outerAlpha) {
                     var circleOffset = new point_42.Point(-.5, -.5).times(diameter);
@@ -12457,7 +12453,7 @@ System.register("game/characters/DudeAnimationUtils", ["game/graphics/ImageFilte
 });
 System.register("game/characters/weapons/ShieldFactory", ["game/characters/weapons/ShieldType", "game/characters/weapons/Shield", "game/characters/weapons/Lantern"], function (exports_141, context_141) {
     "use strict";
-    var ShieldType_6, Shield_2, Lantern_2, ShieldFactory;
+    var ShieldType_6, Shield_2, Lantern_1, ShieldFactory;
     var __moduleName = context_141 && context_141.id;
     return {
         setters: [
@@ -12467,8 +12463,8 @@ System.register("game/characters/weapons/ShieldFactory", ["game/characters/weapo
             function (Shield_2_1) {
                 Shield_2 = Shield_2_1;
             },
-            function (Lantern_2_1) {
-                Lantern_2 = Lantern_2_1;
+            function (Lantern_1_1) {
+                Lantern_1 = Lantern_1_1;
             }
         ],
         execute: function () {
@@ -12481,7 +12477,7 @@ System.register("game/characters/weapons/ShieldFactory", ["game/characters/weapo
                         case ShieldType_6.ShieldType.BASIC:
                             return new Shield_2.Shield(type, "shield_0");
                         case ShieldType_6.ShieldType.LANTERN:
-                            return new Lantern_2.Lantern();
+                            return new Lantern_1.Lantern();
                         default:
                             throw new Error("weapon type " + type + " is not supported yet");
                     }
