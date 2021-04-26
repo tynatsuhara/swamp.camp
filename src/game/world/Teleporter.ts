@@ -9,12 +9,26 @@ import { ElementType } from "./elements/Elements"
 import { Interactable } from "./elements/Interactable"
 import { WorldLocation } from "./WorldLocation"
 import { ElementFactory } from "./elements/ElementFactory"
+import { Sounds } from "../audio/Sounds"
+import { assets } from "../../engine/Assets"
 
 export type Teleporter = {
     to: string   // destination uuid
     pos: Point   // point representing where a dude will be STANDING after traveling to this teleporter 
-    id?: string  // to distinguish multiple teleporters between the same destinations
+    id: string  // to distinguish multiple teleporters between the same destinations. prefixes can be used to trigger sound effects
 }
+
+export const TeleporterPrefix = {
+    TENT: "tent",
+    DOOR: "door"
+}
+
+export class TeleporterSound {
+    static readonly TENT: [string, number] = ["audio/rpg/world/tent.wav", .05]
+    static readonly DOOR: [string, number] = ["audio/rpg/world/door.wav", .05]
+}
+
+assets.loadAudioFiles([TeleporterSound.TENT, TeleporterSound.DOOR].map(ts => ts[0]))
 
 export const Teleporters = {
     teleporterId: (toUUID: string, id: string = null) => {

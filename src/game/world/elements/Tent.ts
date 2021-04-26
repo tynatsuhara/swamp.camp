@@ -5,6 +5,7 @@ import { TileComponent } from "../../../engine/tiles/TileComponent"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { makeTentInterior } from "../interior/Tent"
+import { TeleporterPrefix, TeleporterSound } from "../Teleporter"
 import { WorldLocation } from "../WorldLocation"
 import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
@@ -39,7 +40,12 @@ export class TentFactory extends ElementFactory {
         const destinationUUID: string = data["destinationUUID"] ?? makeTentInterior(wl, color).uuid
 
         const interactablePos = pos.plus(new Point(2, 2)).times(TILE_SIZE)
-        const sourceTeleporter = { to: destinationUUID, pos: interactablePos.plusY(12) }
+        const doorId = TeleporterPrefix.TENT
+        const sourceTeleporter = { 
+            to: destinationUUID, 
+            pos: interactablePos.plusY(12),
+            id: doorId
+        }
         wl.addTeleporter(sourceTeleporter)
         
         // Set up tiles
@@ -51,7 +57,11 @@ export class TentFactory extends ElementFactory {
         e.addComponent(new BoxCollider(pos.plus(new Point(1, 1)).times(TILE_SIZE), new Point(TILE_SIZE*2, TILE_SIZE)))
 
         // Set up teleporter
-        e.addComponent(new Interactable(interactablePos, () => wl.useTeleporter(destinationUUID), new Point(1, -TILE_SIZE*1.4)))
+        e.addComponent(new Interactable(
+            interactablePos, 
+            () => wl.useTeleporter(destinationUUID, doorId), 
+            new Point(1, -TILE_SIZE*1.4)
+        ))
 
         return e.addComponent(new ElementComponent(
             ElementType.TENT, 

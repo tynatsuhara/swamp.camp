@@ -3,6 +3,7 @@ import { Point } from "../../engine/point"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { Grid } from "../../engine/util/Grid"
 import { PointAudio } from "../audio/PointAudio"
+import { Sounds } from "../audio/Sounds"
 import { Dude } from "../characters/Dude"
 import { DudeFactory, DudeType } from "../characters/DudeFactory"
 import { NPC } from "../characters/NPC"
@@ -21,7 +22,7 @@ import { GroundComponent } from "./ground/GroundComponent"
 import { LocationManager } from "./LocationManager"
 import { MapGenerator } from "./MapGenerator"
 import { StaticSprites } from "./StaticSprites"
-import { Teleporter, Teleporters } from "./Teleporter"
+import { Teleporter, TeleporterPrefix, Teleporters, TeleporterSound } from "./Teleporter"
 
 export class WorldLocation {
 
@@ -180,7 +181,16 @@ export class WorldLocation {
         dude.moveTo(linkedPosition.minus(offset), true)
     }
 
-    useTeleporter(to: string, id: string = null) {
+    useTeleporter(to: string, id: string) {
+        setTimeout(() => {
+            // play a sound, if applicable
+            if (id.startsWith(TeleporterPrefix.DOOR)) {
+                Sounds.play(...TeleporterSound.DOOR)
+            } else if (id.startsWith(TeleporterPrefix.TENT)) {
+                Sounds.play(...TeleporterSound.TENT)
+            } 
+        }, 200);
+
         HUD.instance.locationTransition.transition(() => {
             const linkedLocation = LocationManager.instance.get(to)
             const linkedPosition = this.getTeleporterLinkedPos(to, id)

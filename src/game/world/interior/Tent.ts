@@ -2,7 +2,7 @@ import { WorldLocation } from "../WorldLocation"
 import { LocationManager } from "../LocationManager"
 import { GroundType } from "../ground/Ground"
 import { Point } from "../../../engine/point"
-import { Teleporter } from "../Teleporter"
+import { Teleporter, TeleporterPrefix } from "../Teleporter"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { ElementType } from "../elements/Elements"
 import { NineSlice } from "../../../engine/tiles/NineSlice"
@@ -20,9 +20,21 @@ export const makeTentInterior = (outside: WorldLocation, color: TentColor): Worl
     l.setBarriers(InteriorUtils.makeBarriers(floorDimensions))
 
     const interactablePos = new Point(2.5, 4).times(TILE_SIZE)
-    const teleporter: Teleporter = { to: outside.uuid, pos: interactablePos.plusY(-4) }
+    const teleporter: Teleporter = { 
+        to: outside.uuid, 
+        pos: interactablePos.plusY(-4), 
+        id: TeleporterPrefix.TENT 
+    }
     l.addTeleporter(teleporter)
-    l.addElement(ElementType.TELEPORTER, new Point(2, 4), { to: outside.uuid, i: interactablePos.toString() })
+    l.addElement(
+        ElementType.TELEPORTER, 
+        new Point(2, 4), 
+        { 
+            to: outside.uuid, 
+            i: interactablePos.toString(), 
+            id: TeleporterPrefix.TENT 
+        }
+    )
 
     const groundType = `${color}tentInterior`
     
