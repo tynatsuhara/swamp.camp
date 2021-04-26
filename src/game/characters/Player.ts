@@ -1,3 +1,4 @@
+import { assets } from "../../engine/Assets"
 import { Component } from "../../engine/component"
 import { debug } from "../../engine/debug"
 import { StartData, UpdateData } from "../../engine/engine"
@@ -5,16 +6,15 @@ import { InputKey } from "../../engine/input"
 import { Point } from "../../engine/point"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { Lists } from "../../engine/util/Lists"
+import { StepSounds } from "../audio/StepSounds"
 import { Controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
-import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
+import { pixelPtToTilePt } from "../graphics/Tilesets"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { UIStateManager } from "../ui/UIStateManager"
 import { ElementType } from "../world/elements/Elements"
 import { Interactable } from "../world/elements/Interactable"
 import { LocationManager } from "../world/LocationManager"
-import { OutdoorDarknessMask } from "../world/OutdoorDarknessMask"
-import { TownStats } from "../world/TownStats"
 import { Dude } from "./Dude"
 import { DudeFactory, DudeType } from "./DudeFactory"
 
@@ -28,10 +28,15 @@ export class Player extends Component {
     private _dude: Dude
     get dude() { return this._dude }
 
+    private footstep: HTMLAudioElement
+
     constructor() {
         super()
         Player.instance = this
+
+        StepSounds.startFootstepSoundLoop()
     }
+
 
     start(startData: StartData) {
         this._dude = this.entity.getComponent(Dude)
