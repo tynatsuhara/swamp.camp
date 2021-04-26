@@ -22,6 +22,7 @@ import { assets } from "../../../engine/Assets"
 import { Player } from "../../characters/Player"
 import { Settings } from "../../Settings"
 import { PointAudio } from "../../audio/PointAudio"
+import { newUUID } from "../../saves/uuid"
 
 export class CampfireFactory extends ElementFactory {
 
@@ -68,9 +69,9 @@ export class CampfireFactory extends ElementFactory {
             audio.setMultiplier(logCount === 0 ? 0 : 1)
             const lightCenterPos = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
             if (campfireOn.enabled) {
-                OutdoorDarknessMask.instance.addLight(wl, this, lightCenterPos, TILE_SIZE * (5 + logCount/2))
+                OutdoorDarknessMask.instance.addLight(wl, e, lightCenterPos, TILE_SIZE * (5 + logCount/2))
             } else {
-                OutdoorDarknessMask.instance.removeLight(wl, this)
+                OutdoorDarknessMask.instance.removeLight(wl, e)
             }
         }
 
