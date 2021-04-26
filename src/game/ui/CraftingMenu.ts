@@ -19,6 +19,8 @@ import { ImageFilters } from "../graphics/ImageFilters"
 import { Player } from "../characters/Player"
 import { rectContains } from "../../engine/util/utils"
 import { Tooltip } from "./Tooltip"
+import { Sounds } from "../audio/Sounds"
+import { assets } from "../../engine/Assets"
 
 export class CraftingMenu extends Component {
     
@@ -37,6 +39,7 @@ export class CraftingMenu extends Component {
     private justCraftedRow = -1  // if this is non-negative, this row was just crafted and will be highlighted
     private justOpened = false  // prevent bug where the mouse is held down immediately
     private tooltip = this.e.addComponent(new Tooltip())
+    private readonly craftNoise = "audio/rpg/misc/hammering.wav"
 
     constructor() {
         super()
@@ -46,6 +49,8 @@ export class CraftingMenu extends Component {
         this.canvas.width = this.innerDimensions.x
         this.canvas.height = this.innerDimensions.y
         this.context = this.canvas.getContext("2d", { alpha: false })
+
+        assets.loadAudioFiles([this.craftNoise])
     }
 
     update(updateData: UpdateData) {
@@ -162,7 +167,7 @@ export class CraftingMenu extends Component {
 
             // craft the item
             if (hovered && updateData.input.isMouseDown && this.canCraft(recipe)) {
-                // TODO a sound effect
+                Sounds.play(this.craftNoise)
                 recipe.input.forEach(ingr => {
                     Player.instance.dude.inventory.removeItem(ingr.item, ingr.count)
                 })

@@ -6157,9 +6157,9 @@ System.register("game/items/CraftingRecipe", ["game/items/Inventory", "game/grap
         }
     };
 });
-System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "engine/point", "engine/renderer/BasicRenderComponent", "game/cutscenes/Camera", "engine/tiles/NineSlice", "game/graphics/Tilesets", "engine/renderer/ImageRender", "game/ui/UIStateManager", "game/items/Items", "game/ui/Text", "engine/tiles/TileTransform", "game/graphics/ImageFilters", "game/characters/Player", "engine/util/utils", "game/ui/Tooltip"], function (exports_79, context_79) {
+System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "engine/point", "engine/renderer/BasicRenderComponent", "game/cutscenes/Camera", "engine/tiles/NineSlice", "game/graphics/Tilesets", "engine/renderer/ImageRender", "game/ui/UIStateManager", "game/items/Items", "game/ui/Text", "engine/tiles/TileTransform", "game/graphics/ImageFilters", "game/characters/Player", "engine/util/utils", "game/ui/Tooltip", "game/audio/Sounds", "engine/Assets"], function (exports_79, context_79) {
     "use strict";
-    var Entity_10, component_16, point_43, BasicRenderComponent_4, Camera_4, NineSlice_5, Tilesets_17, ImageRender_3, UIStateManager_9, Items_2, Text_6, TileTransform_13, ImageFilters_1, Player_5, utils_6, Tooltip_2, CraftingMenu;
+    var Entity_10, component_16, point_43, BasicRenderComponent_4, Camera_4, NineSlice_5, Tilesets_17, ImageRender_3, UIStateManager_9, Items_2, Text_6, TileTransform_13, ImageFilters_1, Player_5, utils_6, Tooltip_2, Sounds_1, Assets_6, CraftingMenu;
     var __moduleName = context_79 && context_79.id;
     return {
         setters: [
@@ -6210,6 +6210,12 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
             },
             function (Tooltip_2_1) {
                 Tooltip_2 = Tooltip_2_1;
+            },
+            function (Sounds_1_1) {
+                Sounds_1 = Sounds_1_1;
+            },
+            function (Assets_6_1) {
+                Assets_6 = Assets_6_1;
             }
         ],
         execute: function () {
@@ -6225,6 +6231,7 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
                     _this.justCraftedRow = -1; // if this is non-negative, this row was just crafted and will be highlighted
                     _this.justOpened = false; // prevent bug where the mouse is held down immediately
                     _this.tooltip = _this.e.addComponent(new Tooltip_2.Tooltip());
+                    _this.craftNoise = "audio/rpg/misc/hammering.wav";
                     // caching stuff
                     _this.itemIcons = new Map();
                     _this.tintedIcons = new Map();
@@ -6233,6 +6240,7 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
                     _this.canvas.width = _this.innerDimensions.x;
                     _this.canvas.height = _this.innerDimensions.y;
                     _this.context = _this.canvas.getContext("2d", { alpha: false });
+                    Assets_6.assets.loadAudioFiles([_this.craftNoise]);
                     return _this;
                 }
                 CraftingMenu.prototype.update = function (updateData) {
@@ -6320,7 +6328,7 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
                         var craftedItem = Items_2.ITEM_METADATA_MAP[recipe.output];
                         // craft the item
                         if (hovered && updateData.input.isMouseDown && this.canCraft(recipe)) {
-                            // TODO a sound effect
+                            Sounds_1.Sounds.play(this.craftNoise);
                             recipe.input.forEach(function (ingr) {
                                 Player_5.Player.instance.dude.inventory.removeItem(ingr.item, ingr.count);
                             });
@@ -6437,7 +6445,7 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
 });
 System.register("game/ui/SellMenu", ["engine/Entity", "engine/component", "engine/point", "engine/renderer/BasicRenderComponent", "game/cutscenes/Camera", "engine/tiles/NineSlice", "game/graphics/Tilesets", "engine/renderer/ImageRender", "game/ui/UIStateManager", "game/items/Items", "game/ui/Text", "game/graphics/ImageFilters", "game/characters/Player", "engine/util/utils", "game/ui/Tooltip", "engine/tiles/AnimatedTileComponent", "engine/tiles/TileTransform", "engine/renderer/TextRender", "game/SaveManager", "engine/Assets", "game/audio/Sounds", "engine/util/Lists"], function (exports_80, context_80) {
     "use strict";
-    var Entity_11, component_17, point_44, BasicRenderComponent_5, Camera_5, NineSlice_6, Tilesets_18, ImageRender_4, UIStateManager_10, Items_3, Text_7, ImageFilters_2, Player_6, utils_7, Tooltip_3, AnimatedTileComponent_3, TileTransform_14, TextRender_6, SaveManager_4, Assets_6, Sounds_1, Lists_4, CLINK_NOISES, SellMenu;
+    var Entity_11, component_17, point_44, BasicRenderComponent_5, Camera_5, NineSlice_6, Tilesets_18, ImageRender_4, UIStateManager_10, Items_3, Text_7, ImageFilters_2, Player_6, utils_7, Tooltip_3, AnimatedTileComponent_3, TileTransform_14, TextRender_6, SaveManager_4, Assets_7, Sounds_2, Lists_4, CLINK_NOISES, SellMenu;
     var __moduleName = context_80 && context_80.id;
     return {
         setters: [
@@ -6498,11 +6506,11 @@ System.register("game/ui/SellMenu", ["engine/Entity", "engine/component", "engin
             function (SaveManager_4_1) {
                 SaveManager_4 = SaveManager_4_1;
             },
-            function (Assets_6_1) {
-                Assets_6 = Assets_6_1;
+            function (Assets_7_1) {
+                Assets_7 = Assets_7_1;
             },
-            function (Sounds_1_1) {
-                Sounds_1 = Sounds_1_1;
+            function (Sounds_2_1) {
+                Sounds_2 = Sounds_2_1;
             },
             function (Lists_4_1) {
                 Lists_4 = Lists_4_1;
@@ -6536,7 +6544,7 @@ System.register("game/ui/SellMenu", ["engine/Entity", "engine/component", "engin
                     _this.canvas.width = _this.innerDimensions.x;
                     _this.canvas.height = _this.innerDimensions.y;
                     _this.context = _this.canvas.getContext("2d", { alpha: false });
-                    Assets_6.assets.loadAudioFiles(CLINK_NOISES);
+                    Assets_7.assets.loadAudioFiles(CLINK_NOISES);
                     return _this;
                 }
                 SellMenu.prototype.update = function (updateData) {
@@ -6606,7 +6614,7 @@ System.register("game/ui/SellMenu", ["engine/Entity", "engine/component", "engin
                         var sellable = this.canSell(sale);
                         // sell the item
                         if (hovered && updateData.input.isMouseDown && sellable) {
-                            Sounds_1.Sounds.play(Lists_4.Lists.oneOf(CLINK_NOISES), .4);
+                            Sounds_2.Sounds.play(Lists_4.Lists.oneOf(CLINK_NOISES), .4);
                             inv.removeItem(sale.item, sale.count);
                             SaveManager_4.saveManager.setState({
                                 coins: SaveManager_4.saveManager.getState().coins + sale.price
@@ -7082,7 +7090,7 @@ System.register("game/world/elements/Interactable", ["engine/component", "engine
 });
 System.register("game/world/Teleporter", ["engine/component", "engine/Entity", "engine/point", "engine/tiles/TileTransform", "game/graphics/Tilesets", "game/world/elements/ElementComponent", "game/world/elements/Interactable", "game/world/elements/ElementFactory", "engine/Assets"], function (exports_86, context_86) {
     "use strict";
-    var component_21, Entity_13, point_48, TileTransform_17, Tilesets_22, ElementComponent_2, Interactable_2, ElementFactory_2, Assets_7, TeleporterPrefix, TeleporterSound, Teleporters, TeleporterFactory;
+    var component_21, Entity_13, point_48, TileTransform_17, Tilesets_22, ElementComponent_2, Interactable_2, ElementFactory_2, Assets_8, TeleporterPrefix, TeleporterSound, Teleporters, TeleporterFactory;
     var __moduleName = context_86 && context_86.id;
     return {
         setters: [
@@ -7110,8 +7118,8 @@ System.register("game/world/Teleporter", ["engine/component", "engine/Entity", "
             function (ElementFactory_2_1) {
                 ElementFactory_2 = ElementFactory_2_1;
             },
-            function (Assets_7_1) {
-                Assets_7 = Assets_7_1;
+            function (Assets_8_1) {
+                Assets_8 = Assets_8_1;
             }
         ],
         execute: function () {
@@ -7127,7 +7135,7 @@ System.register("game/world/Teleporter", ["engine/component", "engine/Entity", "
                 return TeleporterSound;
             }());
             exports_86("TeleporterSound", TeleporterSound);
-            Assets_7.assets.loadAudioFiles([TeleporterSound.TENT, TeleporterSound.DOOR].map(function (ts) { return ts[0]; }));
+            Assets_8.assets.loadAudioFiles([TeleporterSound.TENT, TeleporterSound.DOOR].map(function (ts) { return ts[0]; }));
             exports_86("Teleporters", Teleporters = {
                 teleporterId: function (toUUID, id) {
                     if (id === void 0) { id = null; }
@@ -8255,7 +8263,7 @@ System.register("game/world/elements/HittableResource", ["engine/collision/BoxCo
 });
 System.register("game/world/elements/Rock", ["engine/point", "game/graphics/Tilesets", "engine/collision/BoxCollider", "engine/tiles/TileComponent", "engine/tiles/TileTransform", "engine/Entity", "game/world/elements/ElementComponent", "game/world/elements/HittableResource", "game/characters/Player", "game/characters/weapons/WeaponType", "game/world/elements/ElementFactory", "engine/Assets", "engine/util/Lists", "game/audio/Sounds"], function (exports_98, context_98) {
     "use strict";
-    var point_57, Tilesets_30, BoxCollider_7, TileComponent_8, TileTransform_22, Entity_19, ElementComponent_8, HittableResource_1, Player_9, WeaponType_2, ElementFactory_7, Assets_8, Lists_5, Sounds_2, MINING_AUDIO, RockFactory;
+    var point_57, Tilesets_30, BoxCollider_7, TileComponent_8, TileTransform_22, Entity_19, ElementComponent_8, HittableResource_1, Player_9, WeaponType_2, ElementFactory_7, Assets_9, Lists_5, Sounds_3, MINING_AUDIO, RockFactory;
     var __moduleName = context_98 && context_98.id;
     return {
         setters: [
@@ -8292,14 +8300,14 @@ System.register("game/world/elements/Rock", ["engine/point", "game/graphics/Tile
             function (ElementFactory_7_1) {
                 ElementFactory_7 = ElementFactory_7_1;
             },
-            function (Assets_8_1) {
-                Assets_8 = Assets_8_1;
+            function (Assets_9_1) {
+                Assets_9 = Assets_9_1;
             },
             function (Lists_5_1) {
                 Lists_5 = Lists_5_1;
             },
-            function (Sounds_2_1) {
-                Sounds_2 = Sounds_2_1;
+            function (Sounds_3_1) {
+                Sounds_3 = Sounds_3_1;
             }
         ],
         execute: function () {
@@ -8316,7 +8324,7 @@ System.register("game/world/elements/Rock", ["engine/point", "game/graphics/Tile
                     var _this = _super.call(this) || this;
                     _this.type = 2 /* ROCK */;
                     _this.dimensions = new point_57.Point(1, 1);
-                    Assets_8.assets.loadAudioFiles(MINING_AUDIO);
+                    Assets_9.assets.loadAudioFiles(MINING_AUDIO);
                     return _this;
                 }
                 RockFactory.prototype.make = function (wl, pos, data) {
@@ -8339,7 +8347,7 @@ System.register("game/world/elements/Rock", ["engine/point", "game/graphics/Tile
                         else {
                             return Math.random() > .9 ? [5 /* IRON */] : [1 /* ROCK */];
                         }
-                    }, function () { return Sounds_2.Sounds.play(Lists_5.Lists.oneOf(MINING_AUDIO)); }));
+                    }, function () { return Sounds_3.Sounds.play(Lists_5.Lists.oneOf(MINING_AUDIO)); }));
                     return e.addComponent(new ElementComponent_8.ElementComponent(2 /* ROCK */, pos, [pos], function () { return { v: variation, m: mossy, f: flipped, a: hittableResource.freeResources }; }));
                 };
                 return RockFactory;
@@ -9680,7 +9688,7 @@ System.register("game/world/StaticSprites", ["engine/component", "engine/point",
 });
 System.register("game/world/WorldLocation", ["engine/Entity", "engine/point", "engine/util/Grid", "game/audio/PointAudio", "game/audio/Sounds", "game/characters/DudeFactory", "game/characters/NPC", "game/characters/Player", "game/cutscenes/Camera", "game/saves/uuid", "game/ui/HUD", "game/world/Barrier", "game/world/elements/Elements", "game/world/elements/ElementUtils", "game/world/ground/Ground", "game/world/LocationManager", "game/world/MapGenerator", "game/world/StaticSprites", "game/world/Teleporter"], function (exports_113, context_113) {
     "use strict";
-    var Entity_22, point_62, Grid_2, PointAudio_2, Sounds_3, DudeFactory_2, NPC_1, Player_14, Camera_9, uuid_1, HUD_3, Barrier_2, Elements_3, ElementUtils_3, Ground_1, LocationManager_18, MapGenerator_3, StaticSprites_1, Teleporter_6, WorldLocation;
+    var Entity_22, point_62, Grid_2, PointAudio_2, Sounds_4, DudeFactory_2, NPC_1, Player_14, Camera_9, uuid_1, HUD_3, Barrier_2, Elements_3, ElementUtils_3, Ground_1, LocationManager_18, MapGenerator_3, StaticSprites_1, Teleporter_6, WorldLocation;
     var __moduleName = context_113 && context_113.id;
     return {
         setters: [
@@ -9696,8 +9704,8 @@ System.register("game/world/WorldLocation", ["engine/Entity", "engine/point", "e
             function (PointAudio_2_1) {
                 PointAudio_2 = PointAudio_2_1;
             },
-            function (Sounds_3_1) {
-                Sounds_3 = Sounds_3_1;
+            function (Sounds_4_1) {
+                Sounds_4 = Sounds_4_1;
             },
             function (DudeFactory_2_1) {
                 DudeFactory_2 = DudeFactory_2_1;
@@ -9887,10 +9895,10 @@ System.register("game/world/WorldLocation", ["engine/Entity", "engine/point", "e
                     setTimeout(function () {
                         // play a sound, if applicable
                         if (id.startsWith(Teleporter_6.TeleporterPrefix.DOOR)) {
-                            Sounds_3.Sounds.play.apply(Sounds_3.Sounds, Teleporter_6.TeleporterSound.DOOR);
+                            Sounds_4.Sounds.play.apply(Sounds_4.Sounds, Teleporter_6.TeleporterSound.DOOR);
                         }
                         else if (id.startsWith(Teleporter_6.TeleporterPrefix.TENT)) {
-                            Sounds_3.Sounds.play.apply(Sounds_3.Sounds, Teleporter_6.TeleporterSound.TENT);
+                            Sounds_4.Sounds.play.apply(Sounds_4.Sounds, Teleporter_6.TeleporterSound.TENT);
                         }
                     }, 200);
                     HUD_3.HUD.instance.locationTransition.transition(function () {
@@ -10561,12 +10569,12 @@ System.register("game/world/ground/Ground", ["engine/point", "game/world/ground/
 });
 System.register("game/audio/StepSounds", ["engine/Assets", "engine/util/Lists", "game/characters/Player", "game/graphics/Tilesets", "game/world/LocationManager"], function (exports_122, context_122) {
     "use strict";
-    var Assets_9, Lists_8, Player_15, Tilesets_40, LocationManager_21, StepSounds;
+    var Assets_10, Lists_8, Player_15, Tilesets_40, LocationManager_21, StepSounds;
     var __moduleName = context_122 && context_122.id;
     return {
         setters: [
-            function (Assets_9_1) {
-                Assets_9 = Assets_9_1;
+            function (Assets_10_1) {
+                Assets_10 = Assets_10_1;
             },
             function (Lists_8_1) {
                 Lists_8 = Lists_8_1;
@@ -10595,7 +10603,7 @@ System.register("game/audio/StepSounds", ["engine/Assets", "engine/util/Lists", 
                 StepSounds.WOOD_2 = "audio/steps/wood02.ogg";
                 StepSounds.WOOD_3 = "audio/steps/wood03.ogg";
                 StepSounds.startFootstepSoundLoop = function () {
-                    Assets_9.assets.loadAudioFiles([
+                    Assets_10.assets.loadAudioFiles([
                         StepSounds.GRAVEL,
                         StepSounds.LEAVES_1,
                         StepSounds.LEAVES_2,
@@ -10610,7 +10618,7 @@ System.register("game/audio/StepSounds", ["engine/Assets", "engine/util/Lists", 
                     setTimeout(function () {
                         var _a = StepSounds.getSound(), sound = _a[0], volume = _a[1];
                         if (!!sound) {
-                            StepSounds.footstep = Assets_9.assets.getAudioByFileName(sound);
+                            StepSounds.footstep = Assets_10.assets.getAudioByFileName(sound);
                             StepSounds.footstep.oncanplay = function () {
                                 StepSounds.footstep.play();
                                 StepSounds.footstep.volume = (Player_15.Player.instance.dude.isMoving && !Player_15.Player.instance.dude.rolling() ? 1 : 0) * volume;
@@ -14140,7 +14148,7 @@ System.register("game/quest_game", ["engine/game", "game/audio/Music", "game/sce
 });
 System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tilesets", "engine/Assets"], function (exports_156, context_156) {
     "use strict";
-    var quest_game_1, engine_1, Tilesets_55, Assets_10;
+    var quest_game_1, engine_1, Tilesets_55, Assets_11;
     var __moduleName = context_156 && context_156.id;
     return {
         setters: [
@@ -14153,14 +14161,14 @@ System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tiles
             function (Tilesets_55_1) {
                 Tilesets_55 = Tilesets_55_1;
             },
-            function (Assets_10_1) {
-                Assets_10 = Assets_10_1;
+            function (Assets_11_1) {
+                Assets_11 = Assets_11_1;
             }
         ],
         execute: function () {
             Promise.all([
                 // load all required assets
-                Assets_10.assets.loadImageFiles(Tilesets_55.Tilesets.getFilesToLoad()),
+                Assets_11.assets.loadImageFiles(Tilesets_55.Tilesets.getFilesToLoad()),
             ]).then(function () {
                 // start the engine (vroom vroom)
                 new engine_1.Engine(new quest_game_1.QuestGame(), document.getElementById('canvas'));
