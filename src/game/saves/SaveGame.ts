@@ -3,6 +3,7 @@ import { QueuedEventData } from "../world/events/QueuedEvent"
 import { Color } from "../ui/Color"
 
 export class Save {
+    version: number
     timeSaved: number
     saveVersion: number
     locations: LocationManagerSaveState

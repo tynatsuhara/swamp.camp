@@ -28,6 +28,13 @@ export class MainMenuScene {
         this.continueFn = continueFn
         this.newGameFn = newGameFn
 
+        // Verify that the existing save is compatible
+        if (saveManager.saveFileExists() && !saveManager.isSaveFormatVersionCompatible()) {
+            // TODO: add a mechanism for upgrading saves when it's worth the effort
+            console.log("archiving incompatible save file")
+            saveManager.archiveSave()
+        }
+
         if (saveManager.saveFileExists() && debug.autoPlay) {
             this.continueFn()
         }

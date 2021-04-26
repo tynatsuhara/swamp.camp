@@ -7,8 +7,10 @@ import { DudeType } from "./characters/DudeFactory"
 import { HUD } from "./ui/HUD"
 import { WorldTime } from "./world/WorldTime"
 import { EventQueue } from "./world/events/EventQueue"
+import { newUUID } from "./saves/uuid"
 
 const SAVE_KEY = "save"
+const CURRENT_SAVE_FORMAT_VERSION = 1
 
 class SaveManager {
 
@@ -48,6 +50,7 @@ class SaveManager {
         }
         HUD.instance.showSaveIcon()
         const save: Save = {
+            version: CURRENT_SAVE_FORMAT_VERSION,
             timeSaved: new Date().getTime(),
             saveVersion: 0,
             locations: LocationManager.instance.save(),
@@ -64,6 +67,21 @@ class SaveManager {
     }
 
     deleteSave() {
+        localStorage.removeItem(SAVE_KEY)
+    }
+
+    isSaveFormatVersionCompatible() {
+        const save = localStorage.getItem(SAVE_KEY)
+        try {
+            return JSON.parse(save)["version"] === CURRENT_SAVE_FORMAT_VERSION
+        } catch (e) {
+            return false
+        }
+    }
+
+    archiveSave() {
+        const save = localStorage.getItem(SAVE_KEY)
+        localStorage.setItem(`save-archived-${newUUID()}`, save)
         localStorage.removeItem(SAVE_KEY)
     }
 

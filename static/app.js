@@ -8639,9 +8639,9 @@ System.register("game/saves/SaveGame", [], function (exports_103, context_103) {
         }
     };
 });
-System.register("game/SaveManager", ["game/characters/Player", "game/saves/SaveGame", "game/world/LocationManager", "game/ui/UIStateManager", "game/cutscenes/Camera", "game/ui/HUD", "game/world/WorldTime", "game/world/events/EventQueue"], function (exports_104, context_104) {
+System.register("game/SaveManager", ["game/characters/Player", "game/saves/SaveGame", "game/world/LocationManager", "game/ui/UIStateManager", "game/cutscenes/Camera", "game/ui/HUD", "game/world/WorldTime", "game/world/events/EventQueue", "game/saves/uuid"], function (exports_104, context_104) {
     "use strict";
-    var Player_11, SaveGame_1, LocationManager_15, UIStateManager_16, Camera_8, HUD_2, WorldTime_6, EventQueue_2, SAVE_KEY, SaveManager, saveManager;
+    var Player_11, SaveGame_1, LocationManager_15, UIStateManager_16, Camera_8, HUD_2, WorldTime_6, EventQueue_2, uuid_1, SAVE_KEY, CURRENT_SAVE_FORMAT_VERSION, SaveManager, saveManager;
     var __moduleName = context_104 && context_104.id;
     return {
         setters: [
@@ -8668,10 +8668,14 @@ System.register("game/SaveManager", ["game/characters/Player", "game/saves/SaveG
             },
             function (EventQueue_2_1) {
                 EventQueue_2 = EventQueue_2_1;
+            },
+            function (uuid_1_1) {
+                uuid_1 = uuid_1_1;
             }
         ],
         execute: function () {
             SAVE_KEY = "save";
+            CURRENT_SAVE_FORMAT_VERSION = 1;
             SaveManager = /** @class */ (function () {
                 function SaveManager() {
                 }
@@ -8705,6 +8709,7 @@ System.register("game/SaveManager", ["game/characters/Player", "game/saves/SaveG
                     }
                     HUD_2.HUD.instance.showSaveIcon();
                     var save = {
+                        version: CURRENT_SAVE_FORMAT_VERSION,
                         timeSaved: new Date().getTime(),
                         saveVersion: 0,
                         locations: LocationManager_15.LocationManager.instance.save(),
@@ -8719,6 +8724,20 @@ System.register("game/SaveManager", ["game/characters/Player", "game/saves/SaveG
                     return !!localStorage.getItem(SAVE_KEY);
                 };
                 SaveManager.prototype.deleteSave = function () {
+                    localStorage.removeItem(SAVE_KEY);
+                };
+                SaveManager.prototype.isSaveFormatVersionCompatible = function () {
+                    var save = localStorage.getItem(SAVE_KEY);
+                    try {
+                        return JSON.parse(save)["version"] === CURRENT_SAVE_FORMAT_VERSION;
+                    }
+                    catch (e) {
+                        return false;
+                    }
+                };
+                SaveManager.prototype.archiveSave = function () {
+                    var save = localStorage.getItem(SAVE_KEY);
+                    localStorage.setItem("save-archived-" + uuid_1.newUUID(), save);
                     localStorage.removeItem(SAVE_KEY);
                 };
                 /**
@@ -9688,7 +9707,7 @@ System.register("game/world/StaticSprites", ["engine/component", "engine/point",
 });
 System.register("game/world/WorldLocation", ["engine/Entity", "engine/point", "engine/util/Grid", "game/audio/PointAudio", "game/audio/Sounds", "game/characters/DudeFactory", "game/characters/NPC", "game/characters/Player", "game/cutscenes/Camera", "game/saves/uuid", "game/ui/HUD", "game/world/Barrier", "game/world/elements/Elements", "game/world/elements/ElementUtils", "game/world/ground/Ground", "game/world/LocationManager", "game/world/MapGenerator", "game/world/StaticSprites", "game/world/Teleporter"], function (exports_113, context_113) {
     "use strict";
-    var Entity_22, point_62, Grid_2, PointAudio_2, Sounds_4, DudeFactory_2, NPC_1, Player_14, Camera_9, uuid_1, HUD_3, Barrier_2, Elements_3, ElementUtils_3, Ground_1, LocationManager_18, MapGenerator_3, StaticSprites_1, Teleporter_6, WorldLocation;
+    var Entity_22, point_62, Grid_2, PointAudio_2, Sounds_4, DudeFactory_2, NPC_1, Player_14, Camera_9, uuid_2, HUD_3, Barrier_2, Elements_3, ElementUtils_3, Ground_1, LocationManager_18, MapGenerator_3, StaticSprites_1, Teleporter_6, WorldLocation;
     var __moduleName = context_113 && context_113.id;
     return {
         setters: [
@@ -9719,8 +9738,8 @@ System.register("game/world/WorldLocation", ["engine/Entity", "engine/point", "e
             function (Camera_9_1) {
                 Camera_9 = Camera_9_1;
             },
-            function (uuid_1_1) {
-                uuid_1 = uuid_1_1;
+            function (uuid_2_1) {
+                uuid_2 = uuid_2_1;
             },
             function (HUD_3_1) {
                 HUD_3 = HUD_3_1;
@@ -9753,7 +9772,7 @@ System.register("game/world/WorldLocation", ["engine/Entity", "engine/point", "e
         execute: function () {
             WorldLocation = /** @class */ (function () {
                 function WorldLocation(isInterior, allowPlacing) {
-                    this._uuid = uuid_1.newUUID();
+                    this._uuid = uuid_2.newUUID();
                     this.dudes = new Set();
                     // Non-moving entities with tile coords (not pixel coords)
                     // Entities may be duplicated in multiple spots 
@@ -11185,7 +11204,7 @@ System.register("game/characters/Villager", ["engine/component", "game/character
 });
 System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point", "game/characters/Player", "game/characters/Dude", "game/characters/NPC", "game/world/LocationManager", "game/characters/Enemy", "game/items/Inventory", "game/characters/Dialogue", "game/cutscenes/CutscenePlayerController", "game/characters/Villager", "game/characters/NPCSchedule", "engine/util/Lists", "game/characters/weapons/WeaponType", "game/characters/dialogues/BertoIntro", "game/characters/ShroomNPC", "game/saves/uuid", "game/characters/Centaur", "game/characters/weapons/ShieldType"], function (exports_129, context_129) {
     "use strict";
-    var Entity_28, point_71, Player_17, Dude_8, NPC_5, LocationManager_24, Enemy_2, Inventory_3, Dialogue_6, CutscenePlayerController_1, Villager_1, NPCSchedule_2, Lists_10, WeaponType_5, BertoIntro_2, ShroomNPC_2, uuid_2, Centaur_2, ShieldType_1, DudeFactory;
+    var Entity_28, point_71, Player_17, Dude_8, NPC_5, LocationManager_24, Enemy_2, Inventory_3, Dialogue_6, CutscenePlayerController_1, Villager_1, NPCSchedule_2, Lists_10, WeaponType_5, BertoIntro_2, ShroomNPC_2, uuid_3, Centaur_2, ShieldType_1, DudeFactory;
     var __moduleName = context_129 && context_129.id;
     return {
         setters: [
@@ -11237,8 +11256,8 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
             function (ShroomNPC_2_1) {
                 ShroomNPC_2 = ShroomNPC_2_1;
             },
-            function (uuid_2_1) {
-                uuid_2 = uuid_2_1;
+            function (uuid_3_1) {
+                uuid_3 = uuid_3_1;
             },
             function (Centaur_2_1) {
                 Centaur_2 = Centaur_2_1;
@@ -11378,7 +11397,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                         }
                     }
                     // use saved data instead of defaults
-                    var d = new Dude_8.Dude((_a = saveState === null || saveState === void 0 ? void 0 : saveState.uuid) !== null && _a !== void 0 ? _a : uuid_2.newUUID(), type, factions, (_b = saveState === null || saveState === void 0 ? void 0 : saveState.anim) !== null && _b !== void 0 ? _b : animationName, pos, (_c = saveState === null || saveState === void 0 ? void 0 : saveState.weapon) !== null && _c !== void 0 ? _c : weapon, (_d = saveState === null || saveState === void 0 ? void 0 : saveState.shield) !== null && _d !== void 0 ? _d : shield, (_e = saveState === null || saveState === void 0 ? void 0 : saveState.maxHealth) !== null && _e !== void 0 ? _e : maxHealth, (_f = saveState === null || saveState === void 0 ? void 0 : saveState.health) !== null && _f !== void 0 ? _f : maxHealth, (_g = saveState === null || saveState === void 0 ? void 0 : saveState.speed) !== null && _g !== void 0 ? _g : speed, !!(saveState === null || saveState === void 0 ? void 0 : saveState.inventory) ? Inventory_3.Inventory.load(saveState.inventory) : defaultInventory, (_h = saveState === null || saveState === void 0 ? void 0 : saveState.dialogue) !== null && _h !== void 0 ? _h : dialogue, (_j = saveState === null || saveState === void 0 ? void 0 : saveState.blob) !== null && _j !== void 0 ? _j : blob);
+                    var d = new Dude_8.Dude((_a = saveState === null || saveState === void 0 ? void 0 : saveState.uuid) !== null && _a !== void 0 ? _a : uuid_3.newUUID(), type, factions, (_b = saveState === null || saveState === void 0 ? void 0 : saveState.anim) !== null && _b !== void 0 ? _b : animationName, pos, (_c = saveState === null || saveState === void 0 ? void 0 : saveState.weapon) !== null && _c !== void 0 ? _c : weapon, (_d = saveState === null || saveState === void 0 ? void 0 : saveState.shield) !== null && _d !== void 0 ? _d : shield, (_e = saveState === null || saveState === void 0 ? void 0 : saveState.maxHealth) !== null && _e !== void 0 ? _e : maxHealth, (_f = saveState === null || saveState === void 0 ? void 0 : saveState.health) !== null && _f !== void 0 ? _f : maxHealth, (_g = saveState === null || saveState === void 0 ? void 0 : saveState.speed) !== null && _g !== void 0 ? _g : speed, !!(saveState === null || saveState === void 0 ? void 0 : saveState.inventory) ? Inventory_3.Inventory.load(saveState.inventory) : defaultInventory, (_h = saveState === null || saveState === void 0 ? void 0 : saveState.dialogue) !== null && _h !== void 0 ? _h : dialogue, (_j = saveState === null || saveState === void 0 ? void 0 : saveState.blob) !== null && _j !== void 0 ? _j : blob);
                     new Entity_28.Entity([d].concat(additionalComponents));
                     location.dudes.add(d);
                     d.location = location;
@@ -14040,6 +14059,12 @@ System.register("game/scenes/MainMenuScene", ["engine/debug", "engine/Entity", "
                     });
                     this.continueFn = continueFn;
                     this.newGameFn = newGameFn;
+                    // Verify that the existing save is compatible
+                    if (SaveManager_10.saveManager.saveFileExists() && !SaveManager_10.saveManager.isSaveFormatVersionCompatible()) {
+                        // TODO: add a mechanism for upgrading saves when it's worth the effort
+                        console.log("archiving incompatible save file");
+                        SaveManager_10.saveManager.archiveSave();
+                    }
                     if (SaveManager_10.saveManager.saveFileExists() && debug_7.debug.autoPlay) {
                         this.continueFn();
                     }
@@ -14401,15 +14426,15 @@ var doGame = function () {
 window['dice'] = doGame;
 System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uuid"], function (exports_159, context_159) {
     "use strict";
-    var profiler_2, uuid_3, serialize, buildObject;
+    var profiler_2, uuid_4, serialize, buildObject;
     var __moduleName = context_159 && context_159.id;
     return {
         setters: [
             function (profiler_2_1) {
                 profiler_2 = profiler_2_1;
             },
-            function (uuid_3_1) {
-                uuid_3 = uuid_3_1;
+            function (uuid_4_1) {
+                uuid_4 = uuid_4_1;
             }
         ],
         execute: function () {
@@ -14440,7 +14465,7 @@ System.register("game/saves/SerializeObject", ["engine/profiler", "game/saves/uu
                                 resultObject_1[k] = uuid;
                             }
                             else {
-                                uuid = uuid_3.newUUID();
+                                uuid = uuid_4.newUUID();
                                 resultObject_1[k] = uuid;
                                 objectUuidMap.set(object_1, uuid);
                                 topLevelUuidMap[uuid] = {};
