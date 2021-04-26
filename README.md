@@ -19,3 +19,5 @@ music by:
 
 sound effects by:
 * https://www.edinburghrecords.com/
+* https://opengameart.org/content/rpg-sound-pack
+* https://opengameart.org/content/different-steps-on-wood-stone-leaves-gravel-and-mud

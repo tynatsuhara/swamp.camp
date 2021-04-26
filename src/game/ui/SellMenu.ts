@@ -5,7 +5,6 @@ import { InputKey } from "../../engine/input"
 import { Point } from "../../engine/point"
 import { Color } from "./Color"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
-import { CraftingRecipe, CraftingRecipeCategory } from "../items/CraftingRecipe"
 import { Camera } from "../cutscenes/Camera"
 import { NineSlice } from "../../engine/tiles/NineSlice"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
@@ -18,17 +17,25 @@ import { ImageFilters } from "../graphics/ImageFilters"
 import { Player } from "../characters/Player"
 import { rectContains } from "../../engine/util/utils"
 import { Tooltip } from "./Tooltip"
-import { ItemStack } from "../items/Inventory"
 import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { TextRender } from "../../engine/renderer/TextRender"
 import { saveManager } from "../SaveManager"
+import { assets } from "../../engine/Assets"
+import { Sounds } from "../audio/Sounds"
+import { Lists } from "../../engine/util/Lists"
 
 export type SalePackage = {
     readonly item: Item,
     readonly count: number,
     readonly price: number,  // number of gold
 }
+
+const CLINK_NOISES = [
+    "audio/rpg/inventory/coin.wav",
+    "audio/rpg/inventory/coin2.wav",
+    "audio/rpg/inventory/coin3.wav",
+]
 
 // this is mostly copied from CraftingMenu and InventoryDisplay
 export class SellMenu extends Component {
@@ -58,6 +65,8 @@ export class SellMenu extends Component {
         this.canvas.width = this.innerDimensions.x
         this.canvas.height = this.innerDimensions.y
         this.context = this.canvas.getContext("2d", {alpha: false})
+
+        assets.loadAudioFiles(CLINK_NOISES)
     }
 
     update(updateData: UpdateData) {
@@ -165,7 +174,7 @@ export class SellMenu extends Component {
 
             // sell the item
             if (hovered && updateData.input.isMouseDown && sellable) {
-                // TODO a sound effect
+                Sounds.play(Lists.oneOf(CLINK_NOISES), .4)
                 inv.removeItem(sale.item, sale.count)
                 saveManager.setState({ 
                     coins: saveManager.getState().coins + sale.price
