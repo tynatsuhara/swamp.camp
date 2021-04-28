@@ -55,5 +55,13 @@ export const Lists = {
             list[currentIndex] = list[randomIndex];
             list[randomIndex] = temporaryValue;
         }
+    },
+
+    /**
+     * @param start inclusive
+     * @param end exclusive
+     */
+    range(start: number, end: number): number[] {
+        return Array.from({length: (end - start)}, (v, k) => k + start);
     }
 }

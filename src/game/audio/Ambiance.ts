@@ -1,15 +1,16 @@
-import { assets } from "../../engine/Assets"
+import { Lists } from "../../engine/util/Lists"
 import { Settings } from "../Settings"
 import { TimeUnit } from "../world/TimeUnit"
-import { WorldTime } from "../world/WorldTime"
+import { AudioQueue } from "./AudioQueue"
 
 /**
  * Used for long-running background sounds based on environmental factors
  */
 export class Ambiance {
-    private static currentAmbiance: HTMLAudioElement
+    private static currentAmbiance: AudioQueue
 
-    private static readonly DAYTIME = "audio/ambiance/daytime.wav"
+    private static readonly DAY = new AudioQueue(["audio/ambiance/daytime.wav"])
+    private static readonly NIGHT = new AudioQueue([]) // Lists.range(1, 9).map(i => `audio/ambiance/yewbic__ambience0${i}.wav`))
 
     private static time: number
     private static isInterior: boolean
@@ -25,44 +26,44 @@ export class Ambiance {
     }
 
     private static determineAmbiance() {
-        // TODO: add other ambiance tracks
-        this.play(this.DAYTIME)
+        const volume = Settings.getSoundVolume() * (this.isInterior ? .1 : 1)
+        this.DAY.setVolume(volume)
+        this.NIGHT.setVolume(volume)
 
         // fade out at night
-        const fadeTime = TimeUnit.MINUTE * 15
         const timeOfDay = this.time % TimeUnit.DAY
         const daytimeFadeInTime = TimeUnit.HOUR * 5
         const daytimeFadeOutTime = TimeUnit.HOUR * 20
-        let fadeMultiplier = 0
-        if (timeOfDay > daytimeFadeOutTime) {
-            fadeMultiplier = 1 - Math.min(1, (timeOfDay - daytimeFadeOutTime)/fadeTime)
+
+        if (timeOfDay > daytimeFadeOutTime || timeOfDay < daytimeFadeInTime) {
+            this.play(this.NIGHT)
         } else if (timeOfDay > daytimeFadeInTime) {
-            fadeMultiplier = Math.min(1, (timeOfDay - daytimeFadeInTime)/fadeTime)
+            this.play(this.DAY)
         }
 
-        this.setVolume(fadeMultiplier * (this.isInterior ? .1 : 1))
+        window['currentAmbiance'] = this.currentAmbiance
     }
 
-    private static play(path: string) {
-        if (this.currentAmbiance?.src.endsWith(path)) {
+    private static play(newAmbiance: AudioQueue) {
+        if (this.currentAmbiance === newAmbiance) {
             return
         }
 
-        this.currentAmbiance?.pause()
-
-        const newAmbiance = new Audio(path)
-
-        newAmbiance.oncanplaythrough = () => {
-            newAmbiance.loop = true
+        const startNewAmbiance = () => {
+            newAmbiance.fadeIn()
             newAmbiance.play()
         }
 
-        this.currentAmbiance = newAmbiance
-    }
-
-    private static setVolume(volume: number) {
         if (!!this.currentAmbiance) {
-            this.currentAmbiance.volume = volume * Settings.getSoundVolume()
+            const curr = this.currentAmbiance
+            curr.fadeOut().then(() => {
+                curr.pause()
+                startNewAmbiance()
+            })
+        } else {
+            startNewAmbiance()
         }
+
+        this.currentAmbiance = newAmbiance
     }
 }

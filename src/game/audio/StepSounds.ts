@@ -35,8 +35,9 @@ export class StepSounds {
     static singleFootstepSound(volumeMultiplier: number) {
         const [sound, volume] = StepSounds.getSound()
         if (!!sound) {
+            // TODO: We could probably make this a bit less laggy by pre-loading
             StepSounds.footstep = assets.getAudioByFileName(sound)
-            StepSounds.footstep.oncanplay = () => {
+            StepSounds.footstep.oncanplaythrough = () => {
                 StepSounds.footstep.play()
                 StepSounds.footstep.volume = Math.min(1, volume * volumeMultiplier)
             }
