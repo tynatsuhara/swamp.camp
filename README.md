@@ -17,7 +17,15 @@ additional art by:
 music by:
 * https://www.newgrounds.com/audio/listen/1017053
 
-sound effects by:
+sound effects & music by:
 * https://www.edinburghrecords.com/
 * https://opengameart.org/content/rpg-sound-pack
 * https://opengameart.org/content/different-steps-on-wood-stone-leaves-gravel-and-mud
+* https://opengameart.org/content/dark-ambience-soundscapes
+* https://opengameart.org/content/battle-march-epic-orchestral-music-loop
+* https://opengameart.org/content/gt-rpg-soundtrack
+
+tentative sound effects & music:
+* https://opengameart.org/content/talking-synthesizer
+* https://opengameart.org/content/swishes-sound-pack
+* https://opengameart.org/content/voices-sound-effects-library
