@@ -6001,7 +6001,7 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
                     _this.justCraftedRow = -1; // if this is non-negative, this row was just crafted and will be highlighted
                     _this.justOpened = false; // prevent bug where the mouse is held down immediately
                     _this.tooltip = _this.e.addComponent(new Tooltip_2.Tooltip());
-                    _this.craftNoise = "audio/rpg/misc/hammering.wav";
+                    _this.craftNoise = "audio/rpg/inventory/metal-small3.wav";
                     // caching stuff
                     _this.itemIcons = new Map();
                     _this.tintedIcons = new Map();
@@ -6098,7 +6098,7 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
                         var craftedItem = Items_4.ITEM_METADATA_MAP[recipe.output];
                         // craft the item
                         if (hovered && updateData.input.isMouseDown && this.canCraft(recipe)) {
-                            Sounds_1.Sounds.play(this.craftNoise);
+                            Sounds_1.Sounds.play(this.craftNoise, .6);
                             recipe.input.forEach(function (ingr) {
                                 Player_7.Player.instance.dude.inventory.removeItem(ingr.item, ingr.count);
                             });

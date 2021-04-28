@@ -39,7 +39,7 @@ export class CraftingMenu extends Component {
     private justCraftedRow = -1  // if this is non-negative, this row was just crafted and will be highlighted
     private justOpened = false  // prevent bug where the mouse is held down immediately
     private tooltip = this.e.addComponent(new Tooltip())
-    private readonly craftNoise = "audio/rpg/misc/hammering.wav"
+    private readonly craftNoise = "audio/rpg/inventory/metal-small3.wav"
 
     constructor() {
         super()
@@ -167,7 +167,7 @@ export class CraftingMenu extends Component {
 
             // craft the item
             if (hovered && updateData.input.isMouseDown && this.canCraft(recipe)) {
-                Sounds.play(this.craftNoise)
+                Sounds.play(this.craftNoise, .6)
                 recipe.input.forEach(ingr => {
                     Player.instance.dude.inventory.removeItem(ingr.item, ingr.count)
                 })
