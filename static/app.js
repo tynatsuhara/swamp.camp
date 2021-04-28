@@ -1323,15 +1323,26 @@ System.register("game/Settings", ["game/audio/Music"], function (exports_20, con
             saveSettings = function () { return localStorage.setItem("settings", JSON.stringify(settings)); };
             exports_20("Settings", Settings = {
                 getMusicVolume: function () { return settings.musicVolume; },
-                bumpMusicVolume: function () {
+                increaseMusicVolume: function () {
                     var volume = settings.musicVolume === 1 ? 0 : Math.floor(settings.musicVolume * 100 + 10) / 100;
                     settings.musicVolume = volume;
                     Music_1.Music.setVolume(settings.musicVolume);
                     saveSettings();
                 },
+                decreaseMusicVolume: function () {
+                    var volume = settings.musicVolume === 0 ? 1 : Math.floor(settings.musicVolume * 100 - 10) / 100;
+                    settings.musicVolume = volume;
+                    Music_1.Music.setVolume(settings.musicVolume);
+                    saveSettings();
+                },
                 getSoundVolume: function () { return settings.soundVolume; },
-                bumpSoundVolume: function () {
+                increaseSoundVolume: function () {
                     var volume = settings.soundVolume === 1 ? 0 : Math.floor(settings.soundVolume * 100 + 10) / 100;
+                    settings.soundVolume = volume;
+                    saveSettings();
+                },
+                decreaseSoundVolume: function () {
+                    var volume = settings.soundVolume === 0 ? 1 : Math.floor(settings.soundVolume * 100 - 10) / 100;
                     settings.soundVolume = volume;
                     saveSettings();
                 },
@@ -5618,6 +5629,7 @@ System.register("game/ui/PauseMenu", ["engine/component", "engine/Entity", "game
                 }
                 PauseMenu.prototype.update = function (updateData) {
                     var pressEsc = updateData.input.isKeyDown(27 /* ESC */);
+                    this.isShiftDown = updateData.input.isKeyHeld(16 /* SHIFT */);
                     if (pressEsc && this.isOpen) {
                         this.close();
                     }
@@ -5647,14 +5659,24 @@ System.register("game/ui/PauseMenu", ["engine/component", "engine/Entity", "game
                         }, {
                             text: "MUSIC (" + Settings_4.Settings.getMusicVolume() * 100 + "%)",
                             fn: function () {
-                                Settings_4.Settings.bumpMusicVolume();
+                                if (_this.isShiftDown) {
+                                    Settings_4.Settings.decreaseMusicVolume();
+                                }
+                                else {
+                                    Settings_4.Settings.increaseMusicVolume();
+                                }
                                 _this.show(dimensions); // refresh
                             },
                             buttonColor: buttonColor, textColor: textColor, hoverColor: hoverColor,
                         }, {
                             text: "SOUNDS (" + Settings_4.Settings.getSoundVolume() * 100 + "%)",
                             fn: function () {
-                                Settings_4.Settings.bumpSoundVolume();
+                                if (_this.isShiftDown) {
+                                    Settings_4.Settings.decreaseSoundVolume();
+                                }
+                                else {
+                                    Settings_4.Settings.increaseSoundVolume();
+                                }
                                 _this.show(dimensions); // refresh
                             },
                             buttonColor: buttonColor, textColor: textColor, hoverColor: hoverColor,

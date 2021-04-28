@@ -18,10 +18,12 @@ export class PauseMenu extends Component {
     private readonly e: Entity = new Entity([this])  // entity for this component
     private displayEntity: Entity
     private controlsDisplay: Entity
+    private isShiftDown: boolean
     isOpen = false
 
     update(updateData: UpdateData) {
         const pressEsc = updateData.input.isKeyDown(InputKey.ESC)
+        this.isShiftDown = updateData.input.isKeyHeld(InputKey.SHIFT)
 
         if (pressEsc && this.isOpen) {
             this.close()
@@ -55,14 +57,22 @@ export class PauseMenu extends Component {
             }, {
                 text: `MUSIC (${Settings.getMusicVolume() * 100}%)`, 
                 fn: () => {
-                    Settings.bumpMusicVolume()
+                    if (this.isShiftDown) {
+                        Settings.decreaseMusicVolume()
+                    } else {
+                        Settings.increaseMusicVolume()
+                    }
                     this.show(dimensions)  // refresh
                 },
                 buttonColor, textColor, hoverColor,
             }, {
                 text: `SOUNDS (${Settings.getSoundVolume() * 100}%)`, 
                 fn: () => {
-                    Settings.bumpSoundVolume()
+                    if (this.isShiftDown) {
+                        Settings.decreaseSoundVolume()
+                    } else {
+                        Settings.increaseSoundVolume()
+                    }
                     this.show(dimensions)  // refresh
                 },
                 buttonColor, textColor, hoverColor,

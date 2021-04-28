@@ -21,16 +21,27 @@ const saveSettings = () => localStorage.setItem("settings", JSON.stringify(setti
 
 export const Settings = {
     getMusicVolume: () => settings.musicVolume,
-    bumpMusicVolume: () => {
+    increaseMusicVolume: () => {
         const volume = settings.musicVolume === 1 ? 0 : Math.floor(settings.musicVolume * 100 + 10)/100
+        settings.musicVolume = volume
+        Music.setVolume(settings.musicVolume)
+        saveSettings()
+    },
+    decreaseMusicVolume: () => {
+        const volume = settings.musicVolume === 0 ? 1 : Math.floor(settings.musicVolume * 100 - 10)/100
         settings.musicVolume = volume
         Music.setVolume(settings.musicVolume)
         saveSettings()
     },
 
     getSoundVolume: () => settings.soundVolume,
-    bumpSoundVolume: () => {
+    increaseSoundVolume: () => {
         const volume = settings.soundVolume === 1 ? 0 : Math.floor(settings.soundVolume * 100 + 10)/100
+        settings.soundVolume = volume
+        saveSettings()
+    },
+    decreaseSoundVolume: () => {
+        const volume = settings.soundVolume === 0 ? 1 : Math.floor(settings.soundVolume * 100 - 10)/100
         settings.soundVolume = volume
         saveSettings()
     },
