@@ -1372,7 +1372,7 @@ System.register("game/audio/Music", ["game/Settings"], function (exports_21, con
                         this.currentMusic.volume = volume * this.VOLUME_MULTIPLER;
                     }
                 };
-                Music.VOLUME_MULTIPLER = 0.1;
+                Music.VOLUME_MULTIPLER = 0.05;
                 Music.volume = Settings_1.Settings.getMusicVolume();
                 Music.MAIN_MENU_THEME = "audio/music/hemlok.mp3";
                 return Music;
@@ -12379,7 +12379,7 @@ System.register("game/audio/StepSounds", ["engine/Assets", "engine/util/Lists", 
                             ]);
                         case 0 /* BASIC */:
                         case 1 /* BASIC_NINE_SLICE */:
-                            return [StepSounds.WOOD_1, .1];
+                            return [StepSounds.WOOD_1, .15];
                         case 3 /* PATH */:
                             return [StepSounds.GRAVEL, .2];
                         default:

@@ -4,7 +4,7 @@ import { Settings } from "../Settings"
  * Used for background soundtrack and even-based music
  */
 export class Music {
-    private static readonly VOLUME_MULTIPLER = 0.1
+    private static readonly VOLUME_MULTIPLER = 0.05
     private static currentMusic: HTMLAudioElement
     private static volume: number = Settings.getMusicVolume()
 

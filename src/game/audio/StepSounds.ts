@@ -63,7 +63,7 @@ export class StepSounds {
                 ])
             case GroundType.BASIC:
             case GroundType.BASIC_NINE_SLICE:
-                return [StepSounds.WOOD_1, .1]
+                return [StepSounds.WOOD_1, .15]
             case GroundType.PATH:
                 return [StepSounds.GRAVEL, .2]
             default:
