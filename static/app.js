@@ -2,21 +2,21 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var __spreadArrays = (this && this.__spreadArrays) || function () {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
+var __spreadArray = (this && this.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
 };
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
@@ -1067,7 +1067,7 @@ System.register("engine/profiler", ["engine/View", "engine/Entity", "engine/poin
                     tracker[0].record(value);
                 };
                 Profiler.prototype.getView = function () {
-                    var s = __spreadArrays([
+                    var s = __spreadArray([
                         "FPS: " + round(1000 / this.fpsTracker.get()) + " (" + round(this.fpsTracker.get()) + " ms per frame)",
                         "update() duration ms: " + round(this.updateTracker.get(), 2),
                         "render() duration ms: " + round(this.renderTracker.get(), 2),
@@ -1960,7 +1960,7 @@ System.register("engine/util/BinaryHeap", [], function (exports_31, context_31) 
                 };
                 BinaryHeap.prototype.getContents = function (sorted) {
                     if (sorted === void 0) { sorted = false; }
-                    var copy = __spreadArrays(this.content);
+                    var copy = __spreadArray([], this.content);
                     if (sorted) {
                         copy.sort(this.scoreFunction);
                     }
@@ -5937,7 +5937,7 @@ System.register("game/ui/ControlsUI", ["game/ui/KeyPressIndicator", "engine/poin
                 var topLeft = new point_33.Point(dimensions.x / 2 - Tilesets_10.TILE_SIZE * 6 - 1, dimensions.y / 2 - Tilesets_10.TILE_SIZE * 5).plus(offset);
                 var controlsOffset = 5;
                 var dashOffset = Tilesets_10.TILE_SIZE * 5 - 4;
-                return __spreadArrays(new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusX(Tilesets_10.TILE_SIZE), Controls_4.Controls.walkUp).getRenderMethods(), new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusY(Tilesets_10.TILE_SIZE), Controls_4.Controls.walkLeft).getRenderMethods(), new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusX(Tilesets_10.TILE_SIZE).plusY(Tilesets_10.TILE_SIZE), Controls_4.Controls.walkDown).getRenderMethods(), new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusX(Tilesets_10.TILE_SIZE * 2).plusY(Tilesets_10.TILE_SIZE), Controls_4.Controls.walkRight).getRenderMethods(), new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusX(Tilesets_10.TILE_SIZE * 4 - 2).plusY(controlsOffset), Controls_4.Controls.attackKey).getRenderMethods(), new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusX(Tilesets_10.TILE_SIZE * 4 - 2).plusY(controlsOffset + Tilesets_10.TILE_SIZE), Controls_4.Controls.blockKey).getRenderMethods(), Text_6.formatText("MOVE", "#fdf7ed" /* WHITE */, topLeft.plusX(Tilesets_10.TILE_SIZE / 2).plusY(Tilesets_10.TILE_SIZE * 2 + 2), 100), Text_6.formatText("ATTACK", "#fdf7ed" /* WHITE */, topLeft.plusX(Tilesets_10.TILE_SIZE * 5).plusY(4 + controlsOffset), 100), Text_6.formatText("BLOCK", "#fdf7ed" /* WHITE */, topLeft.plusX(Tilesets_10.TILE_SIZE * 5).plusY(Tilesets_10.TILE_SIZE + 4 + controlsOffset), 100), Text_6.formatText("[SPACE]", "#fdf7ed" /* WHITE */, topLeft.plusX(Tilesets_10.TILE_SIZE * 4 + dashOffset).plusY(4 + controlsOffset + 3), 100), Text_6.formatText("DASH", "#fdf7ed" /* WHITE */, topLeft.plusX(Tilesets_10.TILE_SIZE * 4.75 + dashOffset).plusY(Tilesets_10.TILE_SIZE + 4 + controlsOffset - 3), 100)).map(function (r) {
+                return __spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray([], new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusX(Tilesets_10.TILE_SIZE), Controls_4.Controls.walkUp).getRenderMethods()), new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusY(Tilesets_10.TILE_SIZE), Controls_4.Controls.walkLeft).getRenderMethods()), new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusX(Tilesets_10.TILE_SIZE).plusY(Tilesets_10.TILE_SIZE), Controls_4.Controls.walkDown).getRenderMethods()), new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusX(Tilesets_10.TILE_SIZE * 2).plusY(Tilesets_10.TILE_SIZE), Controls_4.Controls.walkRight).getRenderMethods()), new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusX(Tilesets_10.TILE_SIZE * 4 - 2).plusY(controlsOffset), Controls_4.Controls.attackKey).getRenderMethods()), new KeyPressIndicator_1.KeyPressIndicator(topLeft.plusX(Tilesets_10.TILE_SIZE * 4 - 2).plusY(controlsOffset + Tilesets_10.TILE_SIZE), Controls_4.Controls.blockKey).getRenderMethods()), Text_6.formatText("MOVE", "#fdf7ed" /* WHITE */, topLeft.plusX(Tilesets_10.TILE_SIZE / 2).plusY(Tilesets_10.TILE_SIZE * 2 + 2), 100)), Text_6.formatText("ATTACK", "#fdf7ed" /* WHITE */, topLeft.plusX(Tilesets_10.TILE_SIZE * 5).plusY(4 + controlsOffset), 100)), Text_6.formatText("BLOCK", "#fdf7ed" /* WHITE */, topLeft.plusX(Tilesets_10.TILE_SIZE * 5).plusY(Tilesets_10.TILE_SIZE + 4 + controlsOffset), 100)), Text_6.formatText("[SPACE]", "#fdf7ed" /* WHITE */, topLeft.plusX(Tilesets_10.TILE_SIZE * 4 + dashOffset).plusY(4 + controlsOffset + 3), 100)), Text_6.formatText("DASH", "#fdf7ed" /* WHITE */, topLeft.plusX(Tilesets_10.TILE_SIZE * 4.75 + dashOffset).plusY(Tilesets_10.TILE_SIZE + 4 + controlsOffset - 3), 100)).map(function (r) {
                     r.depth = UIStateManager_8.UIStateManager.UI_SPRITE_DEPTH;
                     return r;
                 });
@@ -6048,7 +6048,7 @@ System.register("game/ui/PauseMenu", ["engine/component", "engine/Entity", "game
                             },
                             buttonColor: buttonColor, textColor: textColor, hoverColor: hoverColor,
                         }], new point_34.Point(0, Tilesets_11.TILE_SIZE / 2));
-                    this.controlsDisplay = new Entity_9.Entity([new (BasicRenderComponent_3.BasicRenderComponent.bind.apply(BasicRenderComponent_3.BasicRenderComponent, __spreadArrays([void 0], ControlsUI_1.makeControlsUI(dimensions, new point_34.Point(0, -Tilesets_11.TILE_SIZE / 2)))))()]);
+                    this.controlsDisplay = new Entity_9.Entity([new (BasicRenderComponent_3.BasicRenderComponent.bind.apply(BasicRenderComponent_3.BasicRenderComponent, __spreadArray([void 0], ControlsUI_1.makeControlsUI(dimensions, new point_34.Point(0, -Tilesets_11.TILE_SIZE / 2)))))()]);
                 };
                 PauseMenu.prototype.getEntities = function () {
                     return [
@@ -6415,7 +6415,7 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
                         this.scrollOffset = Math.floor(Math.max(Math.min(0, this.scrollOffset), -Math.max(category.recipes.length, rowsTall) * 24 + this.innerDimensions.y));
                         var screenDimensions = Camera_4.Camera.instance.dimensions;
                         var topLeft = screenDimensions.div(2).minus(this.dimensions.div(2)).plusY(-Tilesets_14.TILE_SIZE);
-                        this.displayEntity = new Entity_10.Entity(__spreadArrays(this.renderCategories(updateData, topLeft), this.renderRecipes(updateData, topLeft, category.recipes)));
+                        this.displayEntity = new Entity_10.Entity(__spreadArray(__spreadArray([], this.renderCategories(updateData, topLeft)), this.renderRecipes(updateData, topLeft, category.recipes)));
                         this.justOpened = false;
                         if (this.justCraftedRow !== -1) {
                             this.tooltip.say("Crafted!");
@@ -6559,7 +6559,7 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
                         this.context.fillRect(margin, verticalOffset, this.innerDimensions.x - 2 * margin, 1);
                     }
                     var renderComp = new BasicRenderComponent_4.BasicRenderComponent(new ImageRender_3.ImageRender(this.canvas, point_38.Point.ZERO, this.innerDimensions, innerOffset.plus(topLeft).apply(Math.floor), this.innerDimensions, UIStateManager_10.UIStateManager.UI_SPRITE_DEPTH - 10));
-                    return __spreadArrays(backgroundTiles, [renderComp]);
+                    return __spreadArray(__spreadArray([], backgroundTiles), [renderComp]);
                 };
                 CraftingMenu.prototype.drawIconAt = function (icon, x, y) {
                     this.context.drawImage(icon.image, icon.position.x, icon.position.y, icon.dimensions.x, icon.dimensions.y, x, y, icon.dimensions.x, icon.dimensions.y);
@@ -6822,7 +6822,7 @@ System.register("game/ui/SellMenu", ["engine/Entity", "engine/component", "engin
                         this.context.fillRect(margin, verticalOffset, this.innerDimensions.x - 2 * margin, 1);
                     }
                     var renderComp = new BasicRenderComponent_5.BasicRenderComponent(new ImageRender_4.ImageRender(this.canvas, point_39.Point.ZERO, this.innerDimensions, innerOffset.plus(topLeft).apply(Math.floor), this.innerDimensions, UIStateManager_11.UIStateManager.UI_SPRITE_DEPTH - 10));
-                    return __spreadArrays(backgroundTiles, [renderComp, coinCountComponent]);
+                    return __spreadArray(__spreadArray([], backgroundTiles), [renderComp, coinCountComponent]);
                 };
                 SellMenu.prototype.drawIconAt = function (icon, x, y) {
                     this.context.drawImage(icon.image, icon.position.x, icon.position.y, icon.dimensions.x, icon.dimensions.y, x, y, icon.dimensions.x, icon.dimensions.y);
@@ -9743,7 +9743,7 @@ System.register("game/characters/Dialogue", ["game/SaveManager", "game/ui/DudeIn
              * in the top-level Dialogue functions, it can be triggered repeatedly if the
              * dialogue is opened/closed or if the game is saved then loaded.
              */
-            DIALOGUE_MAP = Object.assign.apply(Object, __spreadArrays([{}], DIALOGUE_SOURCES));
+            DIALOGUE_MAP = Object.assign.apply(Object, __spreadArray([{}], DIALOGUE_SOURCES));
         }
     };
 });
@@ -9909,7 +9909,7 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
                         }
                     }
                     backgroundTiles.forEach(function (tile) { return _this.displayEntity.addComponent(tile); });
-                    this.displayEntity.addComponent(new (BasicRenderComponent_8.BasicRenderComponent.bind.apply(BasicRenderComponent_8.BasicRenderComponent, __spreadArrays([void 0], formattedRenders)))());
+                    this.displayEntity.addComponent(new (BasicRenderComponent_8.BasicRenderComponent.bind.apply(BasicRenderComponent_8.BasicRenderComponent, __spreadArray([void 0], formattedRenders)))());
                 };
                 DialogueDisplay.prototype.renderOptions = function (screenDimensions) {
                     var _this = this;
@@ -10846,7 +10846,8 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                         }
                     }
                     // use saved data instead of defaults
-                    var d = new Dude_8.Dude((_a = saveState === null || saveState === void 0 ? void 0 : saveState.uuid) !== null && _a !== void 0 ? _a : uuid_3.newUUID(), type, factions, (_b = saveState === null || saveState === void 0 ? void 0 : saveState.anim) !== null && _b !== void 0 ? _b : animationName, pos, (_c = saveState === null || saveState === void 0 ? void 0 : saveState.weapon) !== null && _c !== void 0 ? _c : weapon, (_d = saveState === null || saveState === void 0 ? void 0 : saveState.shield) !== null && _d !== void 0 ? _d : shield, (_e = saveState === null || saveState === void 0 ? void 0 : saveState.maxHealth) !== null && _e !== void 0 ? _e : maxHealth, (_f = saveState === null || saveState === void 0 ? void 0 : saveState.health) !== null && _f !== void 0 ? _f : maxHealth, (_g = saveState === null || saveState === void 0 ? void 0 : saveState.speed) !== null && _g !== void 0 ? _g : speed, !!(saveState === null || saveState === void 0 ? void 0 : saveState.inventory) ? Inventory_2.Inventory.load(saveState.inventory) : defaultInventory, (_h = saveState === null || saveState === void 0 ? void 0 : saveState.dialogue) !== null && _h !== void 0 ? _h : dialogue, (_j = saveState === null || saveState === void 0 ? void 0 : saveState.blob) !== null && _j !== void 0 ? _j : blob);
+                    var d = new Dude_8.Dude((_a = saveState === null || saveState === void 0 ? void 0 : saveState.uuid) !== null && _a !== void 0 ? _a : uuid_3.newUUID(), type, factions, // TODO: Save factions? Only if they become mutable
+                    (_b = saveState === null || saveState === void 0 ? void 0 : saveState.anim) !== null && _b !== void 0 ? _b : animationName, pos, (_c = saveState === null || saveState === void 0 ? void 0 : saveState.weapon) !== null && _c !== void 0 ? _c : weapon, (_d = saveState === null || saveState === void 0 ? void 0 : saveState.shield) !== null && _d !== void 0 ? _d : shield, (_e = saveState === null || saveState === void 0 ? void 0 : saveState.maxHealth) !== null && _e !== void 0 ? _e : maxHealth, (_f = saveState === null || saveState === void 0 ? void 0 : saveState.health) !== null && _f !== void 0 ? _f : maxHealth, (_g = saveState === null || saveState === void 0 ? void 0 : saveState.speed) !== null && _g !== void 0 ? _g : speed, !!(saveState === null || saveState === void 0 ? void 0 : saveState.inventory) ? Inventory_2.Inventory.load(saveState.inventory) : defaultInventory, (_h = saveState === null || saveState === void 0 ? void 0 : saveState.dialogue) !== null && _h !== void 0 ? _h : dialogue, (_j = saveState === null || saveState === void 0 ? void 0 : saveState.blob) !== null && _j !== void 0 ? _j : blob);
                     new Entity_24.Entity([d].concat(additionalComponents));
                     location.dudes.add(d);
                     d.location = location;
@@ -12554,6 +12555,9 @@ System.register("game/audio/StepSounds", ["engine/Assets", "engine/util/Lists", 
                 };
                 StepSounds.getSound = function () {
                     var ground = LocationManager_28.LocationManager.instance.currentLocation.ground.get(Tilesets_47.pixelPtToTilePt(Player_20.Player.instance.dude.standingPosition));
+                    if (!ground) {
+                        return [undefined, 0];
+                    }
                     switch (ground.type) {
                         case 2 /* GRASS */:
                         case 4 /* LEDGE */:
@@ -13967,6 +13971,7 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
                     CollisionEngine_5.collisionEngine.setCollisionMatrix(new Map([
                         [CollisionEngine_5.CollisionEngine.DEFAULT_LAYER, [DroppedItem_3.DroppedItem.COLLISION_LAYER, Dude_11.Dude.PLAYER_COLLISION_LAYER, Dude_11.Dude.NPC_COLLISION_LAYER]],
                         [Dude_11.Dude.PLAYER_COLLISION_LAYER, [Dude_11.Dude.NPC_COLLISION_LAYER]],
+                        // [Barrier.PLAYER_ONLY, [Dude.PLAYER_COLLISION_LAYER]]
                     ]));
                 };
                 GameScene.prototype.continueGame = function () {
@@ -14041,7 +14046,7 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
                         var left = base.times(Tilesets_52.TILE_SIZE).plusX(-gridRange * Tilesets_52.TILE_SIZE).plusY(i * Tilesets_52.TILE_SIZE);
                         lines.push(new LineRender_2.LineRender(left, left.plusX(2 * gridRange * Tilesets_52.TILE_SIZE)));
                     }
-                    return new Entity_32.Entity([new (BasicRenderComponent_9.BasicRenderComponent.bind.apply(BasicRenderComponent_9.BasicRenderComponent, __spreadArrays([void 0], lines)))()]);
+                    return new Entity_32.Entity([new (BasicRenderComponent_9.BasicRenderComponent.bind.apply(BasicRenderComponent_9.BasicRenderComponent, __spreadArray([void 0], lines)))()]);
                 };
                 return GameScene;
             }());
@@ -14604,7 +14609,7 @@ var doGame = function () {
     ];
     console.log(allPlayers);
     var s = function (bid) { return bid.count + "x" + (bid.face + 1); };
-    var playersInGame = __spreadArrays(allPlayers);
+    var playersInGame = __spreadArray([], allPlayers);
     var previousPlayer = playersInGame.shift();
     playersInGame.push(previousPlayer);
     var _loop_3 = function () {

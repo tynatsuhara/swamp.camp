@@ -55,6 +55,9 @@ export class StepSounds {
 
     private static getSound = (): [string, number] => {
         const ground = LocationManager.instance.currentLocation.ground.get(pixelPtToTilePt(Player.instance.dude.standingPosition))
+        if (!ground) {
+            return [undefined, 0]
+        }
         switch(ground.type) {
             case GroundType.GRASS:
             case GroundType.LEDGE:
