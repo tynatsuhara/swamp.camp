@@ -1,2 +1,2 @@
 #!/bin/bash
-cd static && python3 -m http.server
+cd static && python -m http.server
