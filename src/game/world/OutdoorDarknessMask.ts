@@ -160,11 +160,6 @@ export class OutdoorDarknessMask {
         this.context.fillStyle = this.color
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
 
-        const truncate = (x: number) => {
-            const precision = 100
-            return Math.round(x * precision)/precision
-        }
-
         // Always provide slight visibility around the player
         const player = Player.instance?.dude
         if (!!player) {
