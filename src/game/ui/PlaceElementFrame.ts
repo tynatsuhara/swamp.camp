@@ -7,9 +7,10 @@ import { UIStateManager } from "./UIStateManager"
 import { LocationManager } from "../world/LocationManager"
 import { UpdateData } from "../../engine/engine"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
-import { rectContains } from "../../engine/util/utils"
+import { clamp, rectContains } from "../../engine/util/utils"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Elements } from "../world/elements/Elements"
+import { Player } from "../characters/Player"
 
 /**
  * This is a separate component which exists in the game view instead of the UI view, since it aligns with world tile coordinates
@@ -55,8 +56,19 @@ export class PlaceElementFrame extends Component {
     }
 
     update(updateData: UpdateData) {
-        const startPos = updateData.input.mousePos
-        const tilePt = this.pixelPtToTilePt(startPos.minus(new Point(this.dimensions.x/2, this.dimensions.y/2).times(TILE_SIZE)))
+        const mousePos = updateData.input.mousePos
+        const baseDist = 1.5
+        const maxDistX = TILE_SIZE * (baseDist + this.dimensions.x/2)
+        const maxDistY = TILE_SIZE * (baseDist + this.dimensions.y/2)
+        const playerPos = Player.instance.dude.standingPosition.plusY(-TILE_SIZE/2)
+
+        // only allow placing near the player
+        const centerPos = new Point(
+            clamp(mousePos.x, playerPos.x - maxDistX, playerPos.x + maxDistX),
+            clamp(mousePos.y, playerPos.y - maxDistY, playerPos.y + maxDistY)
+        )
+
+        const tilePt = this.pixelPtToTilePt(centerPos.minus(new Point(this.dimensions.x/2, this.dimensions.y/2).times(TILE_SIZE)))
 
         const canPlace = this.canPlace(tilePt)
         this.goodTiles.forEach(t => t.enabled = canPlace)
@@ -70,6 +82,7 @@ export class PlaceElementFrame extends Component {
         }
     }
 
+    // it's a mystery why this implementation is different than the standard one
     private pixelPtToTilePt = (pixelPt: Point) => {
         return pixelPt.apply(n => 
             Math.round(Math.abs(n)/TILE_SIZE) * Math.sign(n)

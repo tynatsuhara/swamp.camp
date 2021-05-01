@@ -5,6 +5,10 @@ export function rectContains(rectPosition: Point, rectDimensions: Point, pt: Poi
                 && pt.y >= rectPosition.y && pt.y < rectPosition.y + rectDimensions.y
 }
 
+export function clamp(val: number, min: number, max: number) {
+    return Math.min(Math.max(val, min), max)
+}
+
 // from https://stackoverflow.com/questions/4391575/how-to-find-the-size-of-localstorage
 window["localStorageUsage"] = () => {
     var _lsTotal = 0, _xLen, _x;

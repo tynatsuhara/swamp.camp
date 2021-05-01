@@ -2,6 +2,7 @@ import { Point } from "../../engine/point"
 import { MapGenerator } from "../world/MapGenerator"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Dude } from "../characters/Dude"
+import { clamp } from "../../engine/util/utils"
 
 export class Camera {
 
@@ -57,8 +58,8 @@ export class Camera {
         const yLimit = MapGenerator.MAP_SIZE / 2 * TILE_SIZE - dimensions.y/2
         const trackedPoint = this.dudeTarget?.position ?? this.pointTarget
         const clampedTrackedPoint = new Point(
-            this.clamp(trackedPoint.x, -xLimit, xLimit),
-            this.clamp(trackedPoint.y, -yLimit, yLimit)
+            clamp(trackedPoint.x, -xLimit, xLimit),
+            clamp(trackedPoint.y, -yLimit, yLimit)
         )
         const cameraGoal = dimensions.div(2).minus(clampedTrackedPoint)
 
@@ -75,9 +76,5 @@ export class Camera {
         }
 
         return this._position.plus(this.shakeOffset)
-    }
-
-    private clamp(val: number, min: number, max: number) {
-        return Math.min(Math.max(val, min), max)
     }
 }

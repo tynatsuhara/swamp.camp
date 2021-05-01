@@ -1,4 +1,3 @@
-import { assets } from "../../engine/Assets"
 import { Component } from "../../engine/component"
 import { debug } from "../../engine/debug"
 import { StartData, UpdateData } from "../../engine/engine"
@@ -11,6 +10,7 @@ import { Controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { pixelPtToTilePt } from "../graphics/Tilesets"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
+import { PlaceElementDisplay } from "../ui/PlaceElementDisplay"
 import { UIStateManager } from "../ui/UIStateManager"
 import { ElementType } from "../world/elements/Elements"
 import { Interactable } from "../world/elements/Interactable"
@@ -68,7 +68,7 @@ export class Player extends Component {
             // TODO: change how momentum works if we implement slippery ice
             dx = this.rollingMomentum.x
             dy = this.rollingMomentum.y
-        } else if (!UIStateManager.instance.isMenuOpen) {
+        } else if (!UIStateManager.instance.isMenuOpen || PlaceElementDisplay.instance.isOpen) {
             if (updateData.input.isKeyHeld(Controls.walkUp)) { dy-- }
             if (updateData.input.isKeyHeld(Controls.walkDown)) { dy++ }
             if (updateData.input.isKeyHeld(Controls.walkLeft)) { dx-- }

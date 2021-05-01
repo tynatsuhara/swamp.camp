@@ -122,6 +122,10 @@ System.register("engine/util/utils", [], function (exports_2, context_2) {
             && pt.y >= rectPosition.y && pt.y < rectPosition.y + rectDimensions.y;
     }
     exports_2("rectContains", rectContains);
+    function clamp(val, min, max) {
+        return Math.min(Math.max(val, min), max);
+    }
+    exports_2("clamp", clamp);
     return {
         setters: [],
         execute: function () {
@@ -5005,9 +5009,9 @@ System.register("game/items/Inventory", ["game/items/Items"], function (exports_
         }
     };
 });
-System.register("game/ui/PlaceElementFrame", ["engine/component", "game/graphics/Tilesets", "engine/point", "engine/tiles/NineSlice", "game/ui/UIStateManager", "game/world/LocationManager", "game/ui/PlaceElementDisplay", "engine/util/utils", "engine/tiles/TileTransform", "game/world/elements/Elements"], function (exports_63, context_63) {
+System.register("game/ui/PlaceElementFrame", ["engine/component", "game/graphics/Tilesets", "engine/point", "engine/tiles/NineSlice", "game/ui/UIStateManager", "game/world/LocationManager", "game/ui/PlaceElementDisplay", "engine/util/utils", "engine/tiles/TileTransform", "game/world/elements/Elements", "game/characters/Player"], function (exports_63, context_63) {
     "use strict";
-    var component_10, Tilesets_4, point_26, NineSlice_1, UIStateManager_2, LocationManager_4, PlaceElementDisplay_1, utils_4, TileTransform_8, Elements_1, PlaceElementFrame;
+    var component_10, Tilesets_4, point_26, NineSlice_1, UIStateManager_2, LocationManager_4, PlaceElementDisplay_1, utils_4, TileTransform_8, Elements_1, Player_5, PlaceElementFrame;
     var __moduleName = context_63 && context_63.id;
     return {
         setters: [
@@ -5040,6 +5044,9 @@ System.register("game/ui/PlaceElementFrame", ["engine/component", "game/graphics
             },
             function (Elements_1_1) {
                 Elements_1 = Elements_1_1;
+            },
+            function (Player_5_1) {
+                Player_5 = Player_5_1;
             }
         ],
         execute: function () {
@@ -5050,6 +5057,7 @@ System.register("game/ui/PlaceElementFrame", ["engine/component", "game/graphics
                 __extends(PlaceElementFrame, _super);
                 function PlaceElementFrame(dimensions) {
                     var _this = _super.call(this) || this;
+                    // it's a mystery why this implementation is different than the standard one
                     _this.pixelPtToTilePt = function (pixelPt) {
                         return pixelPt.apply(function (n) {
                             return Math.round(Math.abs(n) / Tilesets_4.TILE_SIZE) * Math.sign(n);
@@ -5081,8 +5089,14 @@ System.register("game/ui/PlaceElementFrame", ["engine/component", "game/graphics
                     return NineSlice_1.NineSlice.makeNineSliceComponents(Tilesets_4.Tilesets.instance.outdoorTiles.getNineSlice("placingElementFrame_" + suffix), new point_26.Point(0, 0), this.dimensions);
                 };
                 PlaceElementFrame.prototype.update = function (updateData) {
-                    var startPos = updateData.input.mousePos;
-                    var tilePt = this.pixelPtToTilePt(startPos.minus(new point_26.Point(this.dimensions.x / 2, this.dimensions.y / 2).times(Tilesets_4.TILE_SIZE)));
+                    var mousePos = updateData.input.mousePos;
+                    var baseDist = 1.5;
+                    var maxDistX = Tilesets_4.TILE_SIZE * (baseDist + this.dimensions.x / 2);
+                    var maxDistY = Tilesets_4.TILE_SIZE * (baseDist + this.dimensions.y / 2);
+                    var playerPos = Player_5.Player.instance.dude.standingPosition.plusY(-Tilesets_4.TILE_SIZE / 2);
+                    // only allow placing near the player
+                    var centerPos = new point_26.Point(utils_4.clamp(mousePos.x, playerPos.x - maxDistX, playerPos.x + maxDistX), utils_4.clamp(mousePos.y, playerPos.y - maxDistY, playerPos.y + maxDistY));
+                    var tilePt = this.pixelPtToTilePt(centerPos.minus(new point_26.Point(this.dimensions.x / 2, this.dimensions.y / 2).times(Tilesets_4.TILE_SIZE)));
                     var canPlace = this.canPlace(tilePt);
                     this.goodTiles.forEach(function (t) { return t.enabled = canPlace; });
                     this.badTiles.forEach(function (t) { return t.enabled = !canPlace; });
@@ -5129,7 +5143,7 @@ System.register("game/ui/PlaceElementFrame", ["engine/component", "game/graphics
 });
 System.register("game/ui/PlaceElementDisplay", ["engine/Entity", "engine/component", "game/world/elements/Elements", "game/Controls", "game/world/LocationManager", "game/characters/Player", "game/ui/PlaceElementFrame"], function (exports_64, context_64) {
     "use strict";
-    var Entity_5, component_11, Elements_2, Controls_1, LocationManager_5, Player_5, PlaceElementFrame_1, PlaceElementDisplay;
+    var Entity_5, component_11, Elements_2, Controls_1, LocationManager_5, Player_6, PlaceElementFrame_1, PlaceElementDisplay;
     var __moduleName = context_64 && context_64.id;
     return {
         setters: [
@@ -5148,8 +5162,8 @@ System.register("game/ui/PlaceElementDisplay", ["engine/Entity", "engine/compone
             function (LocationManager_5_1) {
                 LocationManager_5 = LocationManager_5_1;
             },
-            function (Player_5_1) {
-                Player_5 = Player_5_1;
+            function (Player_6_1) {
+                Player_6 = Player_6_1;
             },
             function (PlaceElementFrame_1_1) {
                 PlaceElementFrame_1 = PlaceElementFrame_1_1;
@@ -5188,7 +5202,7 @@ System.register("game/ui/PlaceElementDisplay", ["engine/Entity", "engine/compone
                     this.successFn = successFn;
                     this.count = count;
                     this.dimensions = Elements_2.Elements.instance.getElementFactory(element).dimensions;
-                    this.placingFrame = Player_5.Player.instance.entity.addComponent(new PlaceElementFrame_1.PlaceElementFrame(this.dimensions));
+                    this.placingFrame = Player_6.Player.instance.entity.addComponent(new PlaceElementFrame_1.PlaceElementFrame(this.dimensions));
                 };
                 // Should only be called by PlaceElementFrame
                 PlaceElementDisplay.prototype.finishPlacing = function (elementPos) {
@@ -5351,7 +5365,7 @@ System.register("game/ui/Tooltip", ["engine/component", "game/graphics/Tilesets"
 });
 System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity", "engine/point", "engine/renderer/BasicRenderComponent", "engine/renderer/TextRender", "engine/tiles/AnimatedTileComponent", "engine/tiles/NineSlice", "engine/tiles/TileTransform", "game/characters/Player", "game/characters/weapons/WeaponType", "game/Controls", "game/cutscenes/Camera", "game/graphics/Tilesets", "game/items/Items", "game/SaveManager", "game/world/LocationManager", "game/ui/PlaceElementDisplay", "game/ui/Text", "game/ui/Tooltip", "game/ui/UIStateManager"], function (exports_67, context_67) {
     "use strict";
-    var component_13, Entity_6, point_29, BasicRenderComponent_2, TextRender_4, AnimatedTileComponent_2, NineSlice_2, TileTransform_10, Player_6, WeaponType_2, Controls_2, Camera_3, Tilesets_6, Items_3, SaveManager_2, LocationManager_6, PlaceElementDisplay_2, Text_2, Tooltip_1, UIStateManager_4, InventoryDisplay;
+    var component_13, Entity_6, point_29, BasicRenderComponent_2, TextRender_4, AnimatedTileComponent_2, NineSlice_2, TileTransform_10, Player_7, WeaponType_2, Controls_2, Camera_3, Tilesets_6, Items_3, SaveManager_2, LocationManager_6, PlaceElementDisplay_2, Text_2, Tooltip_1, UIStateManager_4, InventoryDisplay;
     var __moduleName = context_67 && context_67.id;
     return {
         setters: [
@@ -5379,8 +5393,8 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
             function (TileTransform_10_1) {
                 TileTransform_10 = TileTransform_10_1;
             },
-            function (Player_6_1) {
-                Player_6 = Player_6_1;
+            function (Player_7_1) {
+                Player_7 = Player_7_1;
             },
             function (WeaponType_2_1) {
                 WeaponType_2 = WeaponType_2_1;
@@ -5438,7 +5452,7 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                 });
                 Object.defineProperty(InventoryDisplay.prototype, "playerInv", {
                     get: function () {
-                        return Player_6.Player.instance.dude.inventory;
+                        return Player_7.Player.instance.dude.inventory;
                     },
                     enumerable: false,
                     configurable: true
@@ -5510,21 +5524,21 @@ System.register("game/ui/InventoryDisplay", ["engine/component", "engine/Entity"
                                 }
                             });
                         }
-                        if (!!item_1.equippableWeapon && Player_6.Player.instance.dude.weaponType !== item_1.equippableWeapon) {
+                        if (!!item_1.equippableWeapon && Player_7.Player.instance.dude.weaponType !== item_1.equippableWeapon) {
                             actions.push({
                                 verb: 'equip',
                                 actionFn: function () {
                                     _this.close();
-                                    Player_6.Player.instance.dude.setWeapon(item_1.equippableWeapon);
+                                    Player_7.Player.instance.dude.setWeapon(item_1.equippableWeapon);
                                 }
                             });
                         }
-                        if (!!item_1.equippableShield && Player_6.Player.instance.dude.shieldType !== item_1.equippableShield) {
+                        if (!!item_1.equippableShield && Player_7.Player.instance.dude.shieldType !== item_1.equippableShield) {
                             actions.push({
                                 verb: 'equip off-hand',
                                 actionFn: function () {
                                     _this.close();
-                                    Player_6.Player.instance.dude.setShield(item_1.equippableShield);
+                                    Player_7.Player.instance.dude.setShield(item_1.equippableShield);
                                 }
                             });
                         }
@@ -6318,7 +6332,7 @@ System.register("game/graphics/ImageFilters", ["game/ui/Color", "engine/point"],
 });
 System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "engine/point", "engine/renderer/BasicRenderComponent", "game/cutscenes/Camera", "engine/tiles/NineSlice", "game/graphics/Tilesets", "engine/renderer/ImageRender", "game/ui/UIStateManager", "game/items/Items", "game/ui/Text", "engine/tiles/TileTransform", "game/graphics/ImageFilters", "game/characters/Player", "engine/util/utils", "game/ui/Tooltip", "game/audio/Sounds", "engine/Assets"], function (exports_78, context_78) {
     "use strict";
-    var Entity_10, component_17, point_38, BasicRenderComponent_4, Camera_4, NineSlice_4, Tilesets_14, ImageRender_3, UIStateManager_10, Items_4, Text_7, TileTransform_13, ImageFilters_1, Player_7, utils_6, Tooltip_2, Sounds_1, Assets_6, CraftingMenu;
+    var Entity_10, component_17, point_38, BasicRenderComponent_4, Camera_4, NineSlice_4, Tilesets_14, ImageRender_3, UIStateManager_10, Items_4, Text_7, TileTransform_13, ImageFilters_1, Player_8, utils_6, Tooltip_2, Sounds_1, Assets_6, CraftingMenu;
     var __moduleName = context_78 && context_78.id;
     return {
         setters: [
@@ -6361,8 +6375,8 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
             function (ImageFilters_1_1) {
                 ImageFilters_1 = ImageFilters_1_1;
             },
-            function (Player_7_1) {
-                Player_7 = Player_7_1;
+            function (Player_8_1) {
+                Player_8 = Player_8_1;
             },
             function (utils_6_1) {
                 utils_6 = utils_6_1;
@@ -6460,8 +6474,8 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
                 CraftingMenu.prototype.canCraft = function (recipe) {
                     return this.justCraftedRow === -1
                         && !this.justOpened
-                        && Player_7.Player.instance.dude.inventory.canAddItem(recipe.output)
-                        && recipe.input.every(function (input) { return Player_7.Player.instance.dude.inventory.getItemCount(input.item) >= input.count; });
+                        && Player_8.Player.instance.dude.inventory.canAddItem(recipe.output)
+                        && recipe.input.every(function (input) { return Player_8.Player.instance.dude.inventory.getItemCount(input.item) >= input.count; });
                 };
                 CraftingMenu.prototype.renderRecipes = function (updateData, topLeft, recipes) {
                     var _this = this;
@@ -6489,18 +6503,18 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
                         if (hovered && updateData.input.isMouseDown && this.canCraft(recipe)) {
                             Sounds_1.Sounds.play(this.craftNoise, .6);
                             recipe.input.forEach(function (ingr) {
-                                Player_7.Player.instance.dude.inventory.removeItem(ingr.item, ingr.count);
+                                Player_8.Player.instance.dude.inventory.removeItem(ingr.item, ingr.count);
                             });
-                            Player_7.Player.instance.dude.inventory.addItem(recipe.output);
+                            Player_8.Player.instance.dude.inventory.addItem(recipe.output);
                             this.justCraftedRow = r;
                             setTimeout(function () { return _this.justCraftedRow = -1; }, 900);
                         }
                         var prefix = recipe.desc + "\n";
                         if (hovered && !this.canCraft(recipe)) {
-                            if (!Player_7.Player.instance.dude.inventory.canAddItem(recipe.output)) {
+                            if (!Player_8.Player.instance.dude.inventory.canAddItem(recipe.output)) {
                                 this.tooltip.say(prefix + "[Inventory full]");
                             }
-                            else if (recipe.input.some(function (input) { return Player_7.Player.instance.dude.inventory.getItemCount(input.item) < input.count; })) {
+                            else if (recipe.input.some(function (input) { return Player_8.Player.instance.dude.inventory.getItemCount(input.item) < input.count; })) {
                                 this.tooltip.say(prefix + "[Need ingredients]");
                             }
                         }
@@ -6532,7 +6546,7 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
                             var ingr = recipe.input[recipe.input.length - i - 1];
                             var plainIngredientIcon = this.getItemIcon(ingr.item);
                             var ingredientIcon = plainIngredientIcon;
-                            if (Player_7.Player.instance.dude.inventory.getItemCount(ingr.item) < ingr.count) {
+                            if (Player_8.Player.instance.dude.inventory.getItemCount(ingr.item) < ingr.count) {
                                 this.context.fillStyle = "#62232f" /* DARK_RED */;
                                 ingredientIcon = this.tintedIcon(ingredientIcon, "#62232f" /* DARK_RED */);
                             }
@@ -6550,7 +6564,7 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
                             // I have no idea why this math works :(
                             new point_38.Point(width - offsetFromRight + margin, verticalOffset + margin * 1.5).plus(topLeft), new point_38.Point(Tilesets_14.TILE_SIZE + margin, Tilesets_14.TILE_SIZE + margin), updateData.input.mousePos)) {
                                 var displayName = Items_4.ITEM_METADATA_MAP[ingr.item].displayName;
-                                this.tooltip.say(displayName + " (" + Player_7.Player.instance.dude.inventory.getItemCount(ingr.item) + "/" + ingr.count + ")");
+                                this.tooltip.say(displayName + " (" + Player_8.Player.instance.dude.inventory.getItemCount(ingr.item) + "/" + ingr.count + ")");
                             }
                         }
                         // draw line
@@ -6604,7 +6618,7 @@ System.register("game/ui/CraftingMenu", ["engine/Entity", "engine/component", "e
 });
 System.register("game/ui/SellMenu", ["engine/Entity", "engine/component", "engine/point", "engine/renderer/BasicRenderComponent", "game/cutscenes/Camera", "engine/tiles/NineSlice", "game/graphics/Tilesets", "engine/renderer/ImageRender", "game/ui/UIStateManager", "game/items/Items", "game/ui/Text", "game/graphics/ImageFilters", "game/characters/Player", "engine/util/utils", "game/ui/Tooltip", "engine/tiles/AnimatedTileComponent", "engine/tiles/TileTransform", "engine/renderer/TextRender", "game/SaveManager", "engine/Assets", "game/audio/Sounds", "engine/util/Lists"], function (exports_79, context_79) {
     "use strict";
-    var Entity_11, component_18, point_39, BasicRenderComponent_5, Camera_5, NineSlice_5, Tilesets_15, ImageRender_4, UIStateManager_11, Items_5, Text_8, ImageFilters_2, Player_8, utils_7, Tooltip_3, AnimatedTileComponent_3, TileTransform_14, TextRender_7, SaveManager_5, Assets_7, Sounds_2, Lists_4, CLINK_NOISES, SellMenu;
+    var Entity_11, component_18, point_39, BasicRenderComponent_5, Camera_5, NineSlice_5, Tilesets_15, ImageRender_4, UIStateManager_11, Items_5, Text_8, ImageFilters_2, Player_9, utils_7, Tooltip_3, AnimatedTileComponent_3, TileTransform_14, TextRender_7, SaveManager_5, Assets_7, Sounds_2, Lists_4, CLINK_NOISES, SellMenu;
     var __moduleName = context_79 && context_79.id;
     return {
         setters: [
@@ -6644,8 +6658,8 @@ System.register("game/ui/SellMenu", ["engine/Entity", "engine/component", "engin
             function (ImageFilters_2_1) {
                 ImageFilters_2 = ImageFilters_2_1;
             },
-            function (Player_8_1) {
-                Player_8 = Player_8_1;
+            function (Player_9_1) {
+                Player_9 = Player_9_1;
             },
             function (utils_7_1) {
                 utils_7 = utils_7_1;
@@ -6745,11 +6759,11 @@ System.register("game/ui/SellMenu", ["engine/Entity", "engine/component", "engin
                 SellMenu.prototype.canSell = function (sale) {
                     return this.justSoldRow === -1
                         && !this.justOpened
-                        && Player_8.Player.instance.dude.inventory.getItemCount(sale.item) >= sale.count;
+                        && Player_9.Player.instance.dude.inventory.getItemCount(sale.item) >= sale.count;
                 };
                 SellMenu.prototype.renderRecipes = function (updateData, topLeft, items) {
                     var _this = this;
-                    var inv = Player_8.Player.instance.dude.inventory;
+                    var inv = Player_9.Player.instance.dude.inventory;
                     var coinCountComponent = new BasicRenderComponent_5.BasicRenderComponent(new TextRender_7.TextRender("x" + inv.getItemCount(0 /* COIN */), new point_39.Point(9, 1).plus(topLeft).plus(this.coinsOffset), Text_8.TEXT_SIZE, Text_8.TEXT_FONT, "#facb3e" /* YELLOW */, UIStateManager_11.UIStateManager.UI_SPRITE_DEPTH));
                     this.context.imageSmoothingEnabled = false; // TODO figure out why text is aliased
                     this.context.font = Text_8.TEXT_SIZE + "px '" + Text_8.TEXT_FONT + "'";
@@ -7030,15 +7044,15 @@ System.register("game/ui/Mouse", [], function (exports_81, context_81) {
 });
 System.register("game/ui/UIStateManager", ["game/ui/HUD", "game/characters/Player", "game/ui/InventoryDisplay", "game/ui/DialogueDisplay", "game/ui/PlaceElementDisplay", "game/ui/PauseMenu", "game/ui/CraftingMenu", "game/ui/SellMenu", "game/ui/NotificationDisplay", "game/ui/Mouse", "engine/debug"], function (exports_82, context_82) {
     "use strict";
-    var HUD_1, Player_9, InventoryDisplay_1, DialogueDisplay_1, PlaceElementDisplay_3, PauseMenu_1, CraftingMenu_2, SellMenu_1, NotificationDisplay_1, Mouse_1, debug_4, UIStateManager;
+    var HUD_1, Player_10, InventoryDisplay_1, DialogueDisplay_1, PlaceElementDisplay_3, PauseMenu_1, CraftingMenu_2, SellMenu_1, NotificationDisplay_1, Mouse_1, debug_4, UIStateManager;
     var __moduleName = context_82 && context_82.id;
     return {
         setters: [
             function (HUD_1_1) {
                 HUD_1 = HUD_1_1;
             },
-            function (Player_9_1) {
-                Player_9 = Player_9_1;
+            function (Player_10_1) {
+                Player_10 = Player_10_1;
             },
             function (InventoryDisplay_1_1) {
                 InventoryDisplay_1 = InventoryDisplay_1_1;
@@ -7105,7 +7119,7 @@ System.register("game/ui/UIStateManager", ["game/ui/HUD", "game/characters/Playe
                     UIStateManager._instance = new UIStateManager();
                 };
                 UIStateManager.prototype.get = function (dimensions, elapsedMillis) {
-                    if (!Player_9.Player.instance.dude) {
+                    if (!Player_10.Player.instance.dude) {
                         return [];
                     }
                     this.captureInput = this.inventory.isOpen
@@ -7120,7 +7134,7 @@ System.register("game/ui/UIStateManager", ["game/ui/HUD", "game/characters/Playe
                     else {
                         Mouse_1.Mouse.hide();
                     }
-                    return this.hud.getEntities(Player_9.Player.instance.dude, dimensions, elapsedMillis)
+                    return this.hud.getEntities(Player_10.Player.instance.dude, dimensions, elapsedMillis)
                         .concat(this.inventory.getEntities())
                         .concat(this.dialogueDisplay.getEntities())
                         .concat(this.placeElementDisplay.getEntities())
@@ -7203,7 +7217,7 @@ System.register("game/world/Vignette", ["engine/component", "engine/point", "eng
 });
 System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/point", "engine/renderer/BasicRenderComponent", "engine/renderer/ImageRender", "game/characters/Player", "game/characters/weapons/ShieldType", "game/cutscenes/Camera", "game/graphics/Tilesets", "game/ui/UIStateManager", "game/world/LocationManager", "game/world/MapGenerator", "game/world/TimeUnit", "game/world/Vignette", "game/world/WorldTime"], function (exports_84, context_84) {
     "use strict";
-    var Entity_13, point_42, BasicRenderComponent_6, ImageRender_6, Player_10, ShieldType_2, Camera_7, Tilesets_17, UIStateManager_14, LocationManager_8, MapGenerator_1, TimeUnit_3, Vignette_1, WorldTime_2, OutdoorDarknessMask;
+    var Entity_13, point_42, BasicRenderComponent_6, ImageRender_6, Player_11, ShieldType_2, Camera_7, Tilesets_17, UIStateManager_14, LocationManager_8, MapGenerator_1, TimeUnit_3, Vignette_1, WorldTime_2, OutdoorDarknessMask;
     var __moduleName = context_84 && context_84.id;
     return {
         setters: [
@@ -7219,8 +7233,8 @@ System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/poin
             function (ImageRender_6_1) {
                 ImageRender_6 = ImageRender_6_1;
             },
-            function (Player_10_1) {
-                Player_10 = Player_10_1;
+            function (Player_11_1) {
+                Player_11 = Player_11_1;
             },
             function (ShieldType_2_1) {
                 ShieldType_2 = ShieldType_2_1;
@@ -7389,7 +7403,7 @@ System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/poin
                     this.context.fillStyle = this.color;
                     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
                     // Always provide slight visibility around the player
-                    var player = (_a = Player_10.Player.instance) === null || _a === void 0 ? void 0 : _a.dude;
+                    var player = (_a = Player_11.Player.instance) === null || _a === void 0 ? void 0 : _a.dude;
                     if (!!player) {
                         if (player.shieldType !== ShieldType_2.ShieldType.LANTERN) {
                             this.makeLightCircle(player.standingPosition.plusY(-Tilesets_17.TILE_SIZE / 2).plus(player.getAnimationOffsetPosition()), OutdoorDarknessMask.PLAYER_VISIBLE_SURROUNDINGS_DIAMETER, this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT, this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT_EDGE);
@@ -7820,7 +7834,7 @@ System.register("game/world/StaticSprites", ["engine/component", "engine/point",
 });
 System.register("game/world/WorldLocation", ["engine/Entity", "engine/point", "engine/util/Grid", "game/audio/PointAudio", "game/audio/Sounds", "game/characters/DudeFactory", "game/characters/NPC", "game/characters/Player", "game/characters/weapons/ShieldType", "game/cutscenes/Camera", "game/saves/uuid", "game/ui/HUD", "game/world/Barrier", "game/world/elements/Elements", "game/world/elements/ElementUtils", "game/world/ground/Ground", "game/world/LocationManager", "game/world/MapGenerator", "game/world/StaticSprites", "game/world/Teleporter"], function (exports_92, context_92) {
     "use strict";
-    var Entity_15, point_48, Grid_1, PointAudio_1, Sounds_3, DudeFactory_1, NPC_1, Player_11, ShieldType_4, Camera_8, uuid_1, HUD_2, Barrier_1, Elements_3, ElementUtils_1, Ground_1, LocationManager_10, MapGenerator_2, StaticSprites_1, Teleporter_1, WorldLocation;
+    var Entity_15, point_48, Grid_1, PointAudio_1, Sounds_3, DudeFactory_1, NPC_1, Player_12, ShieldType_4, Camera_8, uuid_1, HUD_2, Barrier_1, Elements_3, ElementUtils_1, Ground_1, LocationManager_10, MapGenerator_2, StaticSprites_1, Teleporter_1, WorldLocation;
     var __moduleName = context_92 && context_92.id;
     return {
         setters: [
@@ -7845,8 +7859,8 @@ System.register("game/world/WorldLocation", ["engine/Entity", "engine/point", "e
             function (NPC_1_1) {
                 NPC_1 = NPC_1_1;
             },
-            function (Player_11_1) {
-                Player_11 = Player_11_1;
+            function (Player_12_1) {
+                Player_12 = Player_12_1;
             },
             function (ShieldType_4_1) {
                 ShieldType_4 = ShieldType_4_1;
@@ -8039,7 +8053,7 @@ System.register("game/world/WorldLocation", ["engine/Entity", "engine/point", "e
                     HUD_2.HUD.instance.locationTransition.transition(function () {
                         var linkedLocation = LocationManager_10.LocationManager.instance.get(to);
                         var linkedPosition = _this.getTeleporterLinkedPos(to, id);
-                        var p = Player_11.Player.instance.dude;
+                        var p = Player_12.Player.instance.dude;
                         var beforeTeleportPos = p.standingPosition;
                         _this.dudes.delete(p);
                         linkedLocation.dudes.add(p);
@@ -9169,12 +9183,12 @@ System.register("game/saves/SaveGame", [], function (exports_107, context_107) {
 });
 System.register("game/SaveManager", ["game/characters/Player", "game/saves/SaveGame", "game/world/LocationManager", "game/ui/UIStateManager", "game/cutscenes/Camera", "game/ui/HUD", "game/world/WorldTime", "game/world/events/EventQueue", "game/saves/uuid"], function (exports_108, context_108) {
     "use strict";
-    var Player_12, SaveGame_1, LocationManager_15, UIStateManager_16, Camera_10, HUD_3, WorldTime_4, EventQueue_4, uuid_2, SAVE_KEY, CURRENT_SAVE_FORMAT_VERSION, SaveManager, saveManager;
+    var Player_13, SaveGame_1, LocationManager_15, UIStateManager_16, Camera_10, HUD_3, WorldTime_4, EventQueue_4, uuid_2, SAVE_KEY, CURRENT_SAVE_FORMAT_VERSION, SaveManager, saveManager;
     var __moduleName = context_108 && context_108.id;
     return {
         setters: [
-            function (Player_12_1) {
-                Player_12 = Player_12_1;
+            function (Player_13_1) {
+                Player_13 = Player_13_1;
             },
             function (SaveGame_1_1) {
                 SaveGame_1 = SaveGame_1_1;
@@ -9231,7 +9245,7 @@ System.register("game/SaveManager", ["game/characters/Player", "game/saves/SaveG
                     return this.state;
                 };
                 SaveManager.prototype.save = function () {
-                    if (!Player_12.Player.instance.dude.isAlive) {
+                    if (!Player_13.Player.instance.dude.isAlive) {
                         console.log("cannot save after death");
                         return;
                     }
@@ -9558,7 +9572,7 @@ System.register("game/world/elements/Campfire", ["engine/component", "engine/til
 });
 System.register("game/characters/dialogues/ItemDialogues", ["game/characters/Dialogue", "game/ui/DudeInteractIndicator", "game/ui/DialogueDisplay", "game/world/elements/Campfire", "game/characters/Player"], function (exports_112, context_112) {
     "use strict";
-    var _a, Dialogue_4, DudeInteractIndicator_3, DialogueDisplay_3, Campfire_1, Player_13, CAMPFIRE_DIALOGUE, ITEM_DIALOGUES;
+    var _a, Dialogue_4, DudeInteractIndicator_3, DialogueDisplay_3, Campfire_1, Player_14, CAMPFIRE_DIALOGUE, ITEM_DIALOGUES;
     var __moduleName = context_112 && context_112.id;
     return {
         setters: [
@@ -9574,8 +9588,8 @@ System.register("game/characters/dialogues/ItemDialogues", ["game/characters/Dia
             function (Campfire_1_1) {
                 Campfire_1 = Campfire_1_1;
             },
-            function (Player_13_1) {
-                Player_13 = Player_13_1;
+            function (Player_14_1) {
+                Player_14 = Player_14_1;
             }
         ],
         execute: function () {
@@ -9585,11 +9599,11 @@ System.register("game/characters/dialogues/ItemDialogues", ["game/characters/Dia
                     // the fire can be dead, almost dead, partially full, almost entirely full, or totally full
                     var cf = DialogueDisplay_3.DialogueDisplay.instance.dialogueSource;
                     var logCount = cf.logs;
-                    var playerLogCount = Player_13.Player.instance.dude.inventory.getItemCount(2 /* WOOD */);
+                    var playerLogCount = Player_14.Player.instance.dude.inventory.getItemCount(2 /* WOOD */);
                     var logsYouCanAdd = Math.min(Campfire_1.Campfire.LOG_CAPACITY - logCount, playerLogCount);
                     var completeDialogue = function (logsTransferred) {
                         return function () {
-                            Player_13.Player.instance.dude.inventory.removeItem(2 /* WOOD */, logsTransferred);
+                            Player_14.Player.instance.dude.inventory.removeItem(2 /* WOOD */, logsTransferred);
                             cf.addLogs(logsTransferred);
                             return new Dialogue_4.NextDialogue(CAMPFIRE_DIALOGUE, false);
                         };
@@ -9619,7 +9633,7 @@ System.register("game/characters/dialogues/ItemDialogues", ["game/characters/Dia
 });
 System.register("game/characters/Dialogue", ["game/SaveManager", "game/ui/DudeInteractIndicator", "game/characters/dialogues/BertoIntro", "game/characters/dialogues/DipIntro", "game/characters/dialogues/GenericDialogue", "game/characters/dialogues/ItemDialogues", "game/characters/Player"], function (exports_113, context_113) {
     "use strict";
-    var SaveManager_6, DudeInteractIndicator_4, BertoIntro_1, DipIntro_2, GenericDialogue_1, ItemDialogues_2, Player_14, EMPTY_DIALOGUE, DialogueInstance, dialogueWithOptions, dialogue, option, saveAfterDialogueStage, inv, DialogueOption, NextDialogue, getDialogue, DIALOGUE_SOURCES, DIALOGUE_MAP;
+    var SaveManager_6, DudeInteractIndicator_4, BertoIntro_1, DipIntro_2, GenericDialogue_1, ItemDialogues_2, Player_15, EMPTY_DIALOGUE, DialogueInstance, dialogueWithOptions, dialogue, option, saveAfterDialogueStage, inv, DialogueOption, NextDialogue, getDialogue, DIALOGUE_SOURCES, DIALOGUE_MAP;
     var __moduleName = context_113 && context_113.id;
     return {
         setters: [
@@ -9641,8 +9655,8 @@ System.register("game/characters/Dialogue", ["game/SaveManager", "game/ui/DudeIn
             function (ItemDialogues_2_1) {
                 ItemDialogues_2 = ItemDialogues_2_1;
             },
-            function (Player_14_1) {
-                Player_14 = Player_14_1;
+            function (Player_15_1) {
+                Player_15 = Player_15_1;
             }
         ],
         execute: function () {
@@ -9688,7 +9702,7 @@ System.register("game/characters/Dialogue", ["game/SaveManager", "game/ui/DudeIn
                 // save after a delay to account for the next dialogue stage being set
                 setTimeout(function () { return SaveManager_6.saveManager.save(); }, 500);
             });
-            exports_113("inv", inv = function () { return Player_14.Player.instance.dude.inventory; });
+            exports_113("inv", inv = function () { return Player_15.Player.instance.dude.inventory; });
             DialogueOption = /** @class */ (function () {
                 function DialogueOption(text, next) {
                     this.text = text;
@@ -9931,7 +9945,7 @@ System.register("game/ui/DialogueDisplay", ["game/characters/Dialogue", "game/gr
 });
 System.register("game/characters/NPC", ["engine/component", "engine/point", "engine/util/Lists", "game/graphics/Tilesets", "game/ui/DialogueDisplay", "game/world/elements/House", "game/world/LocationManager", "game/world/OutdoorDarknessMask", "game/world/TimeUnit", "game/characters/Dude", "game/characters/NPCSchedule", "game/characters/Player"], function (exports_115, context_115) {
     "use strict";
-    var component_31, point_61, Lists_6, Tilesets_33, DialogueDisplay_4, House_4, LocationManager_18, OutdoorDarknessMask_3, TimeUnit_5, Dude_2, NPCSchedule_2, Player_15, NPC;
+    var component_31, point_61, Lists_6, Tilesets_33, DialogueDisplay_4, House_4, LocationManager_18, OutdoorDarknessMask_3, TimeUnit_5, Dude_2, NPCSchedule_2, Player_16, NPC;
     var __moduleName = context_115 && context_115.id;
     return {
         setters: [
@@ -9968,8 +9982,8 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
             function (NPCSchedule_2_1) {
                 NPCSchedule_2 = NPCSchedule_2_1;
             },
-            function (Player_15_1) {
-                Player_15 = Player_15_1;
+            function (Player_16_1) {
+                Player_16 = Player_16_1;
             }
         ],
         execute: function () {
@@ -10021,7 +10035,7 @@ System.register("game/characters/NPC", ["engine/component", "engine/point", "eng
                     }
                     if (DialogueDisplay_4.DialogueDisplay.instance.dialogueSource === this.dude) {
                         // don't move when talking
-                        this.dude.move(updateData, point_61.Point.ZERO, Player_15.Player.instance.dude.standingPosition.x - this.dude.standingPosition.x);
+                        this.dude.move(updateData, point_61.Point.ZERO, Player_16.Player.instance.dude.standingPosition.x - this.dude.standingPosition.x);
                     }
                     else if (this.enemiesPresent) {
                         if (!!this.attackTarget) {
@@ -10393,15 +10407,15 @@ System.register("game/characters/Enemy", ["engine/component", "game/graphics/Til
 });
 System.register("game/cutscenes/CutscenePlayerController", ["engine/component", "game/characters/Player", "game/characters/Dude", "engine/point"], function (exports_117, context_117) {
     "use strict";
-    var component_33, Player_16, Dude_4, point_62, CutscenePlayerController;
+    var component_33, Player_17, Dude_4, point_62, CutscenePlayerController;
     var __moduleName = context_117 && context_117.id;
     return {
         setters: [
             function (component_33_1) {
                 component_33 = component_33_1;
             },
-            function (Player_16_1) {
-                Player_16 = Player_16_1;
+            function (Player_17_1) {
+                Player_17 = Player_17_1;
             },
             function (Dude_4_1) {
                 Dude_4 = Dude_4_1;
@@ -10434,11 +10448,11 @@ System.register("game/cutscenes/CutscenePlayerController", ["engine/component", 
                 };
                 CutscenePlayerController.prototype.enable = function () {
                     this.enabled = true;
-                    Player_16.Player.instance.enabled = false;
+                    Player_17.Player.instance.enabled = false;
                 };
                 CutscenePlayerController.prototype.disable = function () {
                     this.enabled = false;
-                    Player_16.Player.instance.enabled = true;
+                    Player_17.Player.instance.enabled = true;
                 };
                 return CutscenePlayerController;
             }(component_33.Component));
@@ -10653,7 +10667,7 @@ System.register("game/characters/Villager", ["engine/component", "game/character
 });
 System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point", "game/characters/Player", "game/characters/Dude", "game/characters/NPC", "game/world/LocationManager", "game/characters/Enemy", "game/items/Inventory", "game/characters/Dialogue", "game/cutscenes/CutscenePlayerController", "game/characters/Villager", "game/characters/NPCSchedule", "engine/util/Lists", "game/characters/weapons/WeaponType", "game/characters/dialogues/BertoIntro", "game/characters/ShroomNPC", "game/saves/uuid", "game/characters/Centaur", "game/characters/weapons/ShieldType"], function (exports_121, context_121) {
     "use strict";
-    var Entity_24, point_63, Player_17, Dude_8, NPC_6, LocationManager_20, Enemy_2, Inventory_2, Dialogue_6, CutscenePlayerController_1, Villager_1, NPCSchedule_3, Lists_7, WeaponType_4, BertoIntro_2, ShroomNPC_2, uuid_3, Centaur_2, ShieldType_5, DudeFactory;
+    var Entity_24, point_63, Player_18, Dude_8, NPC_6, LocationManager_20, Enemy_2, Inventory_2, Dialogue_6, CutscenePlayerController_1, Villager_1, NPCSchedule_3, Lists_7, WeaponType_4, BertoIntro_2, ShroomNPC_2, uuid_3, Centaur_2, ShieldType_5, DudeFactory;
     var __moduleName = context_121 && context_121.id;
     return {
         setters: [
@@ -10663,8 +10677,8 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
             function (point_63_1) {
                 point_63 = point_63_1;
             },
-            function (Player_17_1) {
-                Player_17 = Player_17_1;
+            function (Player_18_1) {
+                Player_18 = Player_18_1;
             },
             function (Dude_8_1) {
                 Dude_8 = Dude_8_1;
@@ -10763,7 +10777,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                             weapon = WeaponType_4.WeaponType.SWORD;
                             shield = ShieldType_5.ShieldType.BASIC;
                             maxHealth = 4;
-                            additionalComponents = [new Player_17.Player(), new CutscenePlayerController_1.CutscenePlayerController()];
+                            additionalComponents = [new Player_18.Player(), new CutscenePlayerController_1.CutscenePlayerController()];
                             window["player"] = additionalComponents[0];
                             defaultInventory.addItem(100003 /* SWORD */);
                             defaultInventory.addItem(100023 /* BASIC_SHIELD */);
@@ -11462,7 +11476,7 @@ System.register("game/world/elements/HittableResource", ["engine/collision/BoxCo
 });
 System.register("game/world/elements/Rock", ["engine/point", "game/graphics/Tilesets", "engine/collision/BoxCollider", "engine/tiles/TileComponent", "engine/tiles/TileTransform", "engine/Entity", "game/world/elements/ElementComponent", "game/world/elements/HittableResource", "game/characters/Player", "game/characters/weapons/WeaponType", "game/world/elements/ElementFactory", "engine/Assets", "engine/util/Lists", "game/audio/Sounds"], function (exports_132, context_132) {
     "use strict";
-    var point_68, Tilesets_40, BoxCollider_7, TileComponent_7, TileTransform_28, Entity_28, ElementComponent_7, HittableResource_1, Player_18, WeaponType_5, ElementFactory_6, Assets_9, Lists_8, Sounds_4, MINING_AUDIO, RockFactory;
+    var point_68, Tilesets_40, BoxCollider_7, TileComponent_7, TileTransform_28, Entity_28, ElementComponent_7, HittableResource_1, Player_19, WeaponType_5, ElementFactory_6, Assets_9, Lists_8, Sounds_4, MINING_AUDIO, RockFactory;
     var __moduleName = context_132 && context_132.id;
     return {
         setters: [
@@ -11490,8 +11504,8 @@ System.register("game/world/elements/Rock", ["engine/point", "game/graphics/Tile
             function (HittableResource_1_1) {
                 HittableResource_1 = HittableResource_1_1;
             },
-            function (Player_18_1) {
-                Player_18 = Player_18_1;
+            function (Player_19_1) {
+                Player_19 = Player_19_1;
             },
             function (WeaponType_5_1) {
                 WeaponType_5 = WeaponType_5_1;
@@ -11540,7 +11554,7 @@ System.register("game/world/elements/Rock", ["engine/point", "game/graphics/Tile
                     var hitboxDims = new point_68.Point(12, 4);
                     e.addComponent(new BoxCollider_7.BoxCollider(pos.plus(new point_68.Point(.5, 1)).times(Tilesets_40.TILE_SIZE).minus(new point_68.Point(hitboxDims.x / 2, hitboxDims.y + 2)), hitboxDims));
                     var hittableResource = e.addComponent(new HittableResource_1.HittableResource(pos.plus(new point_68.Point(.5, .5)).times(Tilesets_40.TILE_SIZE), [tile.transform], availableResources, maxResourcesCount, function () {
-                        if (Player_18.Player.instance.dude.weaponType === WeaponType_5.WeaponType.PICKAXE) {
+                        if (Player_19.Player.instance.dude.weaponType === WeaponType_5.WeaponType.PICKAXE) {
                             return Math.random() > .5 ? [5 /* IRON */] : [1 /* ROCK */];
                         }
                         else {
@@ -11755,7 +11769,7 @@ System.register("game/world/elements/Tent", ["engine/collision/BoxCollider", "en
 });
 System.register("game/world/elements/Tree", ["engine/point", "game/graphics/Tilesets", "engine/collision/BoxCollider", "engine/tiles/TileComponent", "engine/tiles/TileTransform", "engine/Entity", "game/world/elements/HittableResource", "game/world/elements/ElementComponent", "game/characters/weapons/WeaponType", "game/characters/Player", "game/world/elements/ElementFactory", "engine/component", "game/world/WorldTime", "game/world/TimeUnit", "game/world/LocationManager"], function (exports_136, context_136) {
     "use strict";
-    var point_72, Tilesets_43, BoxCollider_9, TileComponent_9, TileTransform_30, Entity_30, HittableResource_2, ElementComponent_9, WeaponType_6, Player_19, ElementFactory_8, component_41, WorldTime_9, TimeUnit_8, LocationManager_25, NEXT_GROWTH_TIME, SIZE, AVAILABLE_RESOURCES, TreeFactory, GrowableTree;
+    var point_72, Tilesets_43, BoxCollider_9, TileComponent_9, TileTransform_30, Entity_30, HittableResource_2, ElementComponent_9, WeaponType_6, Player_20, ElementFactory_8, component_41, WorldTime_9, TimeUnit_8, LocationManager_25, NEXT_GROWTH_TIME, SIZE, AVAILABLE_RESOURCES, TreeFactory, GrowableTree;
     var __moduleName = context_136 && context_136.id;
     return {
         setters: [
@@ -11786,8 +11800,8 @@ System.register("game/world/elements/Tree", ["engine/point", "game/graphics/Tile
             function (WeaponType_6_1) {
                 WeaponType_6 = WeaponType_6_1;
             },
-            function (Player_19_1) {
-                Player_19 = Player_19_1;
+            function (Player_20_1) {
+                Player_20 = Player_20_1;
             },
             function (ElementFactory_8_1) {
                 ElementFactory_8 = ElementFactory_8_1;
@@ -11849,7 +11863,7 @@ System.register("game/world/elements/Tree", ["engine/point", "game/graphics/Tile
                             return [];
                         }
                         var getItem = function () { return Math.random() < .2 ? saplingType : 2 /* WOOD */; };
-                        if (Player_19.Player.instance.dude.weaponType === WeaponType_6.WeaponType.AXE) {
+                        if (Player_20.Player.instance.dude.weaponType === WeaponType_6.WeaponType.AXE) {
                             return [getItem(), getItem()];
                         }
                         else {
@@ -12194,9 +12208,9 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/util/Grid", 
         }
     };
 });
-System.register("game/cutscenes/Camera", ["engine/point", "game/world/MapGenerator", "game/graphics/Tilesets"], function (exports_139, context_139) {
+System.register("game/cutscenes/Camera", ["engine/point", "game/world/MapGenerator", "game/graphics/Tilesets", "engine/util/utils"], function (exports_139, context_139) {
     "use strict";
-    var point_74, MapGenerator_5, Tilesets_45, Camera;
+    var point_74, MapGenerator_5, Tilesets_45, utils_8, Camera;
     var __moduleName = context_139 && context_139.id;
     return {
         setters: [
@@ -12208,6 +12222,9 @@ System.register("game/cutscenes/Camera", ["engine/point", "game/world/MapGenerat
             },
             function (Tilesets_45_1) {
                 Tilesets_45 = Tilesets_45_1;
+            },
+            function (utils_8_1) {
+                utils_8 = utils_8_1;
             }
         ],
         execute: function () {
@@ -12260,7 +12277,7 @@ System.register("game/cutscenes/Camera", ["engine/point", "game/world/MapGenerat
                     var xLimit = MapGenerator_5.MapGenerator.MAP_SIZE / 2 * Tilesets_45.TILE_SIZE - dimensions.x / 2;
                     var yLimit = MapGenerator_5.MapGenerator.MAP_SIZE / 2 * Tilesets_45.TILE_SIZE - dimensions.y / 2;
                     var trackedPoint = (_b = (_a = this.dudeTarget) === null || _a === void 0 ? void 0 : _a.position) !== null && _b !== void 0 ? _b : this.pointTarget;
-                    var clampedTrackedPoint = new point_74.Point(this.clamp(trackedPoint.x, -xLimit, xLimit), this.clamp(trackedPoint.y, -yLimit, yLimit));
+                    var clampedTrackedPoint = new point_74.Point(utils_8.clamp(trackedPoint.x, -xLimit, xLimit), utils_8.clamp(trackedPoint.y, -yLimit, yLimit));
                     var cameraGoal = dimensions.div(2).minus(clampedTrackedPoint);
                     if (!this._position) {
                         this._position = cameraGoal;
@@ -12275,18 +12292,15 @@ System.register("game/cutscenes/Camera", ["engine/point", "game/world/MapGenerat
                     }
                     return this._position.plus(this.shakeOffset);
                 };
-                Camera.prototype.clamp = function (val, min, max) {
-                    return Math.min(Math.max(val, min), max);
-                };
                 return Camera;
             }());
             exports_139("Camera", Camera);
         }
     };
 });
-System.register("game/characters/Player", ["engine/component", "engine/debug", "engine/point", "engine/util/Lists", "game/audio/StepSounds", "game/Controls", "game/cutscenes/Camera", "game/graphics/Tilesets", "game/ui/NotificationDisplay", "game/ui/UIStateManager", "game/world/elements/Interactable", "game/world/LocationManager", "game/characters/Dude", "game/characters/DudeFactory"], function (exports_140, context_140) {
+System.register("game/characters/Player", ["engine/component", "engine/debug", "engine/point", "engine/util/Lists", "game/audio/StepSounds", "game/Controls", "game/cutscenes/Camera", "game/graphics/Tilesets", "game/ui/NotificationDisplay", "game/ui/PlaceElementDisplay", "game/ui/UIStateManager", "game/world/elements/Interactable", "game/world/LocationManager", "game/characters/Dude", "game/characters/DudeFactory"], function (exports_140, context_140) {
     "use strict";
-    var component_42, debug_5, point_75, Lists_10, StepSounds_1, Controls_8, Camera_11, Tilesets_46, NotificationDisplay_3, UIStateManager_18, Interactable_6, LocationManager_27, Dude_9, DudeFactory_5, Player;
+    var component_42, debug_5, point_75, Lists_10, StepSounds_1, Controls_8, Camera_11, Tilesets_46, NotificationDisplay_3, PlaceElementDisplay_4, UIStateManager_18, Interactable_6, LocationManager_27, Dude_9, DudeFactory_5, Player;
     var __moduleName = context_140 && context_140.id;
     return {
         setters: [
@@ -12316,6 +12330,9 @@ System.register("game/characters/Player", ["engine/component", "engine/debug", "
             },
             function (NotificationDisplay_3_1) {
                 NotificationDisplay_3 = NotificationDisplay_3_1;
+            },
+            function (PlaceElementDisplay_4_1) {
+                PlaceElementDisplay_4 = PlaceElementDisplay_4_1;
             },
             function (UIStateManager_18_1) {
                 UIStateManager_18 = UIStateManager_18_1;
@@ -12378,7 +12395,7 @@ System.register("game/characters/Player", ["engine/component", "engine/debug", "
                         dx = this.rollingMomentum.x;
                         dy = this.rollingMomentum.y;
                     }
-                    else if (!UIStateManager_18.UIStateManager.instance.isMenuOpen) {
+                    else if (!UIStateManager_18.UIStateManager.instance.isMenuOpen || PlaceElementDisplay_4.PlaceElementDisplay.instance.isOpen) {
                         if (updateData.input.isKeyHeld(Controls_8.Controls.walkUp)) {
                             dy--;
                         }
@@ -12489,7 +12506,7 @@ System.register("game/characters/Player", ["engine/component", "engine/debug", "
 });
 System.register("game/audio/StepSounds", ["engine/Assets", "engine/util/Lists", "game/characters/Player", "game/graphics/Tilesets", "game/world/LocationManager"], function (exports_141, context_141) {
     "use strict";
-    var Assets_10, Lists_11, Player_20, Tilesets_47, LocationManager_28, StepSounds;
+    var Assets_10, Lists_11, Player_21, Tilesets_47, LocationManager_28, StepSounds;
     var __moduleName = context_141 && context_141.id;
     return {
         setters: [
@@ -12499,8 +12516,8 @@ System.register("game/audio/StepSounds", ["engine/Assets", "engine/util/Lists", 
             function (Lists_11_1) {
                 Lists_11 = Lists_11_1;
             },
-            function (Player_20_1) {
-                Player_20 = Player_20_1;
+            function (Player_21_1) {
+                Player_21 = Player_21_1;
             },
             function (Tilesets_47_1) {
                 Tilesets_47 = Tilesets_47_1;
@@ -12547,14 +12564,14 @@ System.register("game/audio/StepSounds", ["engine/Assets", "engine/util/Lists", 
                 };
                 StepSounds.doFootstep = function () {
                     setTimeout(function () {
-                        if (Player_20.Player.instance.dude.isMoving && !Player_20.Player.instance.dude.rolling()) {
+                        if (Player_21.Player.instance.dude.isMoving && !Player_21.Player.instance.dude.rolling()) {
                             StepSounds.singleFootstepSound(1);
                         }
                         StepSounds.doFootstep();
                     }, StepSounds.SPEED);
                 };
                 StepSounds.getSound = function () {
-                    var ground = LocationManager_28.LocationManager.instance.currentLocation.ground.get(Tilesets_47.pixelPtToTilePt(Player_20.Player.instance.dude.standingPosition));
+                    var ground = LocationManager_28.LocationManager.instance.currentLocation.ground.get(Tilesets_47.pixelPtToTilePt(Player_21.Player.instance.dude.standingPosition));
                     if (!ground) {
                         return [undefined, 0];
                     }
@@ -13777,7 +13794,7 @@ System.register("game/characters/Dude", ["engine/collision/BoxCollider", "engine
 });
 System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutscenes/CutscenePlayerController", "game/characters/Player", "engine/point", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/world/LocationManager", "game/ui/ControlsUI", "game/characters/dialogues/DipIntro"], function (exports_151, context_151) {
     "use strict";
-    var component_46, CutscenePlayerController_2, Player_21, point_82, Camera_12, CutsceneManager_2, LocationManager_31, ControlsUI_2, DipIntro_3, IntroCutscene;
+    var component_46, CutscenePlayerController_2, Player_22, point_82, Camera_12, CutsceneManager_2, LocationManager_31, ControlsUI_2, DipIntro_3, IntroCutscene;
     var __moduleName = context_151 && context_151.id;
     return {
         setters: [
@@ -13787,8 +13804,8 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
             function (CutscenePlayerController_2_1) {
                 CutscenePlayerController_2 = CutscenePlayerController_2_1;
             },
-            function (Player_21_1) {
-                Player_21 = Player_21_1;
+            function (Player_22_1) {
+                Player_22 = Player_22_1;
             },
             function (point_82_1) {
                 point_82 = point_82_1;
@@ -13848,7 +13865,7 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
                     }, this.PAN_TO_DIP);
                     setTimeout(function () {
                         _this.showControls = true;
-                        Camera_12.Camera.instance.focusOnDude(Player_21.Player.instance.dude);
+                        Camera_12.Camera.instance.focusOnDude(Player_22.Player.instance.dude);
                         _this.waitingForOrcsToDie = true;
                     }, this.PAN_BACK);
                     setTimeout(function () {
@@ -13882,7 +13899,7 @@ System.register("game/cutscenes/IntroCutscene", ["engine/component", "game/cutsc
 });
 System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "engine/point", "game/characters/Dude", "game/characters/DudeFactory", "game/cutscenes/Camera", "game/cutscenes/CutsceneManager", "game/cutscenes/IntroCutscene", "game/graphics/Tilesets", "game/items/DroppedItem", "game/SaveManager", "game/ui/UIStateManager", "game/world/GroundRenderer", "game/world/LocationManager", "game/world/MapGenerator", "game/world/OutdoorDarknessMask", "game/world/TimeUnit", "game/world/WorldTime", "game/world/events/EventQueue", "game/world/events/QueuedEvent", "game/characters/NPC", "engine/renderer/BasicRenderComponent", "game/characters/Player", "engine/renderer/LineRender", "engine/Entity", "engine/debug"], function (exports_152, context_152) {
     "use strict";
-    var CollisionEngine_5, point_83, Dude_11, DudeFactory_6, Camera_13, CutsceneManager_3, IntroCutscene_1, Tilesets_52, DroppedItem_3, SaveManager_8, UIStateManager_20, GroundRenderer_2, LocationManager_32, MapGenerator_6, OutdoorDarknessMask_6, TimeUnit_9, WorldTime_10, EventQueue_6, QueuedEvent_4, NPC_8, BasicRenderComponent_9, Player_22, LineRender_2, Entity_32, debug_6, ZOOM, GameScene;
+    var CollisionEngine_5, point_83, Dude_11, DudeFactory_6, Camera_13, CutsceneManager_3, IntroCutscene_1, Tilesets_52, DroppedItem_3, SaveManager_8, UIStateManager_20, GroundRenderer_2, LocationManager_32, MapGenerator_6, OutdoorDarknessMask_6, TimeUnit_9, WorldTime_10, EventQueue_6, QueuedEvent_4, NPC_8, BasicRenderComponent_9, Player_23, LineRender_2, Entity_32, debug_6, ZOOM, GameScene;
     var __moduleName = context_152 && context_152.id;
     return {
         setters: [
@@ -13949,8 +13966,8 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
             function (BasicRenderComponent_9_1) {
                 BasicRenderComponent_9 = BasicRenderComponent_9_1;
             },
-            function (Player_22_1) {
-                Player_22 = Player_22_1;
+            function (Player_23_1) {
+                Player_23 = Player_23_1;
             },
             function (LineRender_2_1) {
                 LineRender_2 = LineRender_2_1;
@@ -14030,10 +14047,10 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
                 };
                 GameScene.prototype.getDebugEntity = function () {
                     var _a;
-                    if (!((_a = Player_22.Player.instance) === null || _a === void 0 ? void 0 : _a.dude) || !debug_6.debug.showGrid) {
+                    if (!((_a = Player_23.Player.instance) === null || _a === void 0 ? void 0 : _a.dude) || !debug_6.debug.showGrid) {
                         return;
                     }
-                    var base = Tilesets_52.pixelPtToTilePt(Player_22.Player.instance.dude.standingPosition);
+                    var base = Tilesets_52.pixelPtToTilePt(Player_23.Player.instance.dude.standingPosition);
                     var lines = [];
                     var gridRange = 50;
                     // vertical lines
@@ -14056,7 +14073,7 @@ System.register("game/scenes/GameScene", ["engine/collision/CollisionEngine", "e
 });
 System.register("game/ui/MainMenuButton", ["engine/component", "engine/point", "engine/renderer/TextRender", "engine/util/utils", "game/graphics/Tilesets", "game/ui/Text", "game/ui/UIStateManager"], function (exports_153, context_153) {
     "use strict";
-    var component_47, point_84, TextRender_9, utils_8, Tilesets_53, Text_11, UIStateManager_21, MainMenuButton;
+    var component_47, point_84, TextRender_9, utils_9, Tilesets_53, Text_11, UIStateManager_21, MainMenuButton;
     var __moduleName = context_153 && context_153.id;
     return {
         setters: [
@@ -14069,8 +14086,8 @@ System.register("game/ui/MainMenuButton", ["engine/component", "engine/point", "
             function (TextRender_9_1) {
                 TextRender_9 = TextRender_9_1;
             },
-            function (utils_8_1) {
-                utils_8 = utils_8_1;
+            function (utils_9_1) {
+                utils_9 = utils_9_1;
             },
             function (Tilesets_53_1) {
                 Tilesets_53 = Tilesets_53_1;
@@ -14094,7 +14111,7 @@ System.register("game/ui/MainMenuButton", ["engine/component", "engine/point", "
                     return _this;
                 }
                 MainMenuButton.prototype.update = function (updateData) {
-                    this.hovering = utils_8.rectContains(this.position.plusX(-this.width / 2).plusY(-4), new point_84.Point(this.width, Tilesets_53.TILE_SIZE), updateData.input.mousePos);
+                    this.hovering = utils_9.rectContains(this.position.plusX(-this.width / 2).plusY(-4), new point_84.Point(this.width, Tilesets_53.TILE_SIZE), updateData.input.mousePos);
                     if (this.hovering && updateData.input.isMouseDown) {
                         this.onClick();
                     }
@@ -14151,7 +14168,7 @@ System.register("engine/renderer/RectRender", ["engine/point", "engine/renderer/
 });
 System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "engine/point", "engine/renderer/RectRender", "engine/util/utils", "game/graphics/Tilesets", "game/SaveManager"], function (exports_155, context_155) {
     "use strict";
-    var component_48, Entity_33, point_86, RectRender_1, utils_9, Tilesets_54, SaveManager_9, CUSTOMIZATION_OPTIONS, PlumePicker;
+    var component_48, Entity_33, point_86, RectRender_1, utils_10, Tilesets_54, SaveManager_9, CUSTOMIZATION_OPTIONS, PlumePicker;
     var __moduleName = context_155 && context_155.id;
     return {
         setters: [
@@ -14167,8 +14184,8 @@ System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "en
             function (RectRender_1_1) {
                 RectRender_1 = RectRender_1_1;
             },
-            function (utils_9_1) {
-                utils_9 = utils_9_1;
+            function (utils_10_1) {
+                utils_10 = utils_10_1;
             },
             function (Tilesets_54_1) {
                 Tilesets_54 = Tilesets_54_1;
@@ -14237,7 +14254,7 @@ System.register("game/ui/PlumePicker", ["engine/component", "engine/Entity", "en
                         var position = topLeftPos.plusX((index % rowLen) * Tilesets_54.TILE_SIZE)
                             .plusY(Math.floor(index / rowLen) * Tilesets_54.TILE_SIZE);
                         var dimensions = new point_86.Point(Tilesets_54.TILE_SIZE, Tilesets_54.TILE_SIZE);
-                        var hovered = utils_9.rectContains(position, dimensions, updateData.input.mousePos);
+                        var hovered = utils_10.rectContains(position, dimensions, updateData.input.mousePos);
                         var big = hovered || JSON.stringify(colors) == JSON.stringify(_this.selected);
                         var bigBuffer = 2;
                         if (hovered && updateData.input.isMouseDown) {
@@ -14437,15 +14454,15 @@ System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tiles
 });
 System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"], function (exports_159, context_159) {
     "use strict";
-    var component_49, utils_10, Clickable;
+    var component_49, utils_11, Clickable;
     var __moduleName = context_159 && context_159.id;
     return {
         setters: [
             function (component_49_1) {
                 component_49 = component_49_1;
             },
-            function (utils_10_1) {
-                utils_10 = utils_10_1;
+            function (utils_11_1) {
+                utils_11 = utils_11_1;
             }
         ],
         execute: function () {
@@ -14459,7 +14476,7 @@ System.register("engine/ui/Clickable", ["engine/component", "engine/util/utils"]
                     return _this;
                 }
                 Clickable.prototype.update = function (updateData) {
-                    if (updateData.input.isMouseDown && utils_10.rectContains(this.position, this.dimensions, updateData.input.mousePos)) {
+                    if (updateData.input.isMouseDown && utils_11.rectContains(this.position, this.dimensions, updateData.input.mousePos)) {
                         this.onClick();
                     }
                 };
