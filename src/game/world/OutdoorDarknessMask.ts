@@ -3,7 +3,6 @@ import { Point } from "../../engine/point"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
 import { ImageRender } from "../../engine/renderer/ImageRender"
 import { Player } from "../characters/Player"
-import { Lantern } from "../characters/weapons/Lantern"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { Camera } from "../cutscenes/Camera"
 import { TILE_SIZE } from "../graphics/Tilesets"
@@ -36,8 +35,6 @@ export class OutdoorDarknessMask {
 
     // for each location, map key to (position, diameter)
     private lightTiles: Map<WorldLocation, Map<any, [Point, number]>> = new Map<WorldLocation, Map<any, [Point, number]>>()
-    private gridDirty = true
-    private lastLocationRendered: WorldLocation
     private color: string
     private darkness = 0.4
 
@@ -49,9 +46,6 @@ export class OutdoorDarknessMask {
         this.canvas.width = this.size
         this.canvas.height = this.size
         this.context = this.canvas.getContext("2d")
-
-        // refresh every so often to update transitioning color
-        setInterval(() => this.updateColorForTime(), 1000)
     }
 
     /**
@@ -65,7 +59,6 @@ export class OutdoorDarknessMask {
         const locationLightMap = this.lightTiles.get(wl) ?? new Map()
         locationLightMap.set(key, [position, diameter])
         this.lightTiles.set(wl, locationLightMap)
-        this.gridDirty = true
     }
 
     removeLight(wl: WorldLocation, key: any) {
@@ -74,7 +67,6 @@ export class OutdoorDarknessMask {
             return  // it is ok to fail silently here
         }
         locationLightMap.delete(key)
-        this.gridDirty = true
     }
 
     /**
@@ -134,7 +126,6 @@ export class OutdoorDarknessMask {
 
     private lerpColorString(color1: { r, g, b, a }, color2: { r, g, b, a }, percentTransitioned: number) {
         const lerp = (a, b) => a + (b-a) * percentTransitioned
-        const oldColor = this.color
 
         const r = lerp(color1.r, color2.r)
         const g = lerp(color1.g, color2.g)
@@ -143,10 +134,6 @@ export class OutdoorDarknessMask {
 
         this.color = `rgba(${r}, ${g}, ${b}, ${a})`
         this.darkness = a
-
-        if (oldColor !== this.color) {
-            this.gridDirty = true
-        }
     }
 
     private checkPt(position) {
@@ -169,8 +156,14 @@ export class OutdoorDarknessMask {
             return
         }
         
+        this.updateColorForTime()
         this.context.fillStyle = this.color
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
+
+        const truncate = (x: number) => {
+            const precision = 100
+            return Math.round(x * precision)/precision
+        }
 
         // Always provide slight visibility around the player
         const player = Player.instance?.dude
@@ -179,8 +172,8 @@ export class OutdoorDarknessMask {
                 this.makeLightCircle(
                     player.standingPosition.plusY(-TILE_SIZE/2).plus(player.getAnimationOffsetPosition()), 
                     OutdoorDarknessMask.PLAYER_VISIBLE_SURROUNDINGS_DIAMETER, 
-                    this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT, 
-                    this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT_EDGE
+                    OutdoorDarknessMask.VISIBILE_LIGHT, 
+                    OutdoorDarknessMask.VISIBILE_LIGHT_EDGE
                 )
             }
         }
@@ -191,12 +184,14 @@ export class OutdoorDarknessMask {
         }
 
         Array.from(locationLightGrid.values()).forEach(entry => {
+            // actual light
             this.makeLightCircle(entry[0], entry[1], 0, this.darkness/2)
+            // barely-visible region
             this.makeLightCircle(
                 entry[0], 
                 entry[1] * OutdoorDarknessMask.VISIBILITY_MULTIPLIER, 
-                this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT, 
-                this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT_EDGE
+                OutdoorDarknessMask.VISIBILE_LIGHT, 
+                OutdoorDarknessMask.VISIBILE_LIGHT_EDGE
             )
         })
     }
@@ -242,16 +237,7 @@ export class OutdoorDarknessMask {
     private vignetteEntity = new Entity([new Vignette(new Point(1, 1).times(-this.size/2), this.size)])
 
     getEntities(): Entity[] {
-        if (!this.color) {
-            this.updateColorForTime()
-        }
-
-        // if (this.gridDirty || this.lastLocationRendered !== LocationManager.instance.currentLocation) {
-            this.renderToOffscreenCanvas()
-            // this.updateLitGrid()
-            this.gridDirty = false
-            this.lastLocationRendered = LocationManager.instance.currentLocation
-        // }
+        this.renderToOffscreenCanvas()
 
         // prevent tint not extending to the edge
         const dimensions = Camera.instance.dimensions.plus(new Point(1, 1))

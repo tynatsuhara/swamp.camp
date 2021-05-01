@@ -7284,7 +7284,6 @@ System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/poin
                     this.shift = new point_42.Point(this.size / 2, this.size / 2);
                     // for each location, map key to (position, diameter)
                     this.lightTiles = new Map();
-                    this.gridDirty = true;
                     this.darkness = 0.4;
                     this.circleCache = new Map();
                     this.vignetteEntity = new Entity_13.Entity([new Vignette_1.Vignette(new point_42.Point(1, 1).times(-this.size / 2), this.size)]);
@@ -7301,13 +7300,10 @@ System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/poin
                     configurable: true
                 });
                 OutdoorDarknessMask.prototype.start = function () {
-                    var _this = this;
                     this.canvas = document.createElement("canvas");
                     this.canvas.width = this.size;
                     this.canvas.height = this.size;
                     this.context = this.canvas.getContext("2d");
-                    // refresh every so often to update transitioning color
-                    setInterval(function () { return _this.updateColorForTime(); }, 1000);
                 };
                 /**
                  * @param key the unique key for location, will overwrite that light source if it already exists
@@ -7322,7 +7318,6 @@ System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/poin
                     var locationLightMap = (_a = this.lightTiles.get(wl)) !== null && _a !== void 0 ? _a : new Map();
                     locationLightMap.set(key, [position, diameter]);
                     this.lightTiles.set(wl, locationLightMap);
-                    this.gridDirty = true;
                 };
                 OutdoorDarknessMask.prototype.removeLight = function (wl, key) {
                     var locationLightMap = this.lightTiles.get(wl);
@@ -7330,7 +7325,6 @@ System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/poin
                         return; // it is ok to fail silently here
                     }
                     locationLightMap.delete(key);
-                    this.gridDirty = true;
                 };
                 /**
                  * returns true if it is dark enough for a demon to tolerate
@@ -7387,16 +7381,12 @@ System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/poin
                 };
                 OutdoorDarknessMask.prototype.lerpColorString = function (color1, color2, percentTransitioned) {
                     var lerp = function (a, b) { return a + (b - a) * percentTransitioned; };
-                    var oldColor = this.color;
                     var r = lerp(color1.r, color2.r);
                     var g = lerp(color1.g, color2.g);
                     var b = lerp(color1.b, color2.b);
                     var a = lerp(color1.a, color2.a);
                     this.color = "rgba(" + r + ", " + g + ", " + b + ", " + a + ")";
                     this.darkness = a;
-                    if (oldColor !== this.color) {
-                        this.gridDirty = true;
-                    }
                 };
                 OutdoorDarknessMask.prototype.checkPt = function (position) {
                     var lim = this.size / 2;
@@ -7412,13 +7402,18 @@ System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/poin
                     if (this.darkness === 0) {
                         return;
                     }
+                    this.updateColorForTime();
                     this.context.fillStyle = this.color;
                     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                    var truncate = function (x) {
+                        var precision = 100;
+                        return Math.round(x * precision) / precision;
+                    };
                     // Always provide slight visibility around the player
                     var player = (_a = Player_11.Player.instance) === null || _a === void 0 ? void 0 : _a.dude;
                     if (!!player) {
                         if (player.shieldType !== ShieldType_2.ShieldType.LANTERN) {
-                            this.makeLightCircle(player.standingPosition.plusY(-Tilesets_17.TILE_SIZE / 2).plus(player.getAnimationOffsetPosition()), OutdoorDarknessMask.PLAYER_VISIBLE_SURROUNDINGS_DIAMETER, this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT, this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT_EDGE);
+                            this.makeLightCircle(player.standingPosition.plusY(-Tilesets_17.TILE_SIZE / 2).plus(player.getAnimationOffsetPosition()), OutdoorDarknessMask.PLAYER_VISIBLE_SURROUNDINGS_DIAMETER, OutdoorDarknessMask.VISIBILE_LIGHT, OutdoorDarknessMask.VISIBILE_LIGHT_EDGE);
                         }
                     }
                     var locationLightGrid = this.lightTiles.get(location);
@@ -7426,8 +7421,10 @@ System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/poin
                         return;
                     }
                     Array.from(locationLightGrid.values()).forEach(function (entry) {
+                        // actual light
                         _this.makeLightCircle(entry[0], entry[1], 0, _this.darkness / 2);
-                        _this.makeLightCircle(entry[0], entry[1] * OutdoorDarknessMask.VISIBILITY_MULTIPLIER, _this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT, _this.darkness * OutdoorDarknessMask.VISIBILE_LIGHT_EDGE);
+                        // barely-visible region
+                        _this.makeLightCircle(entry[0], entry[1] * OutdoorDarknessMask.VISIBILITY_MULTIPLIER, OutdoorDarknessMask.VISIBILE_LIGHT, OutdoorDarknessMask.VISIBILE_LIGHT_EDGE);
                     });
                 };
                 OutdoorDarknessMask.prototype.makeLightCircle = function (centerPos, diameter, innerAlpha, outerAlpha) {
@@ -7460,15 +7457,7 @@ System.register("game/world/OutdoorDarknessMask", ["engine/Entity", "engine/poin
                     this.context.putImageData(imageData, position.x, position.y);
                 };
                 OutdoorDarknessMask.prototype.getEntities = function () {
-                    if (!this.color) {
-                        this.updateColorForTime();
-                    }
-                    // if (this.gridDirty || this.lastLocationRendered !== LocationManager.instance.currentLocation) {
                     this.renderToOffscreenCanvas();
-                    // this.updateLitGrid()
-                    this.gridDirty = false;
-                    this.lastLocationRendered = LocationManager_8.LocationManager.instance.currentLocation;
-                    // }
                     // prevent tint not extending to the edge
                     var dimensions = Camera_7.Camera.instance.dimensions.plus(new point_42.Point(1, 1));
                     var dynamicDarknessEntity = new Entity_13.Entity([new BasicRenderComponent_6.BasicRenderComponent(new ImageRender_6.ImageRender(this.canvas, Camera_7.Camera.instance.position.plus(this.shift).apply(Math.floor), dimensions, Camera_7.Camera.instance.position.apply(Math.floor), dimensions, UIStateManager_14.UIStateManager.UI_SPRITE_DEPTH - 100 // make sure all UI goes on top of light
