@@ -51,18 +51,28 @@ export class MapGenerator {
         return this.location
     }
 
+    private static VIGNETTE_EDGE = MapGenerator.MAP_SIZE/2 - 1
+    private static TREELINE = MapGenerator.VIGNETTE_EDGE - 8
+    static GOOD_FLEEING_SPOTS: Point[] = (() => {
+        const possibilities = []
+        for (let x = -MapGenerator.MAP_SIZE/2 + MapGenerator.TREELINE; x < MapGenerator.MAP_SIZE/2 - MapGenerator.TREELINE; x++) {
+            for (let y = -MapGenerator.MAP_SIZE/2 + MapGenerator.TREELINE; y < MapGenerator.MAP_SIZE/2 - MapGenerator.TREELINE; y++) {
+                possibilities.push(new Point(x, y))
+            }
+        }
+        return possibilities
+    })()
+
     spawnTreesAtEdge() {
-        const vignetteEdge = MapGenerator.MAP_SIZE/2 - 1
-        const denseStartEdge = vignetteEdge - 8
         const possibilities = []
         for (let x = -MapGenerator.MAP_SIZE/2; x < MapGenerator.MAP_SIZE/2; x++) {
             for (let y = -MapGenerator.MAP_SIZE/2; y < MapGenerator.MAP_SIZE/2; y++) {
                 const distToCenter = new Point(x, y).distanceTo(Point.ZERO)
                 const pt = new Point(x, y)
-                if (distToCenter > vignetteEdge) {
+                if (distToCenter > MapGenerator.VIGNETTE_EDGE) {
                     possibilities.push(pt)
-                } else if (distToCenter > denseStartEdge) {
-                    const chance = (distToCenter - denseStartEdge) / (vignetteEdge - denseStartEdge)
+                } else if (distToCenter > MapGenerator.TREELINE) {
+                    const chance = (distToCenter - MapGenerator.TREELINE) / (MapGenerator.VIGNETTE_EDGE - MapGenerator.TREELINE)
                     if (Math.random() < chance) {
                         possibilities.push(pt)
                     }

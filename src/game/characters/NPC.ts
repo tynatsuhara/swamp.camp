@@ -7,6 +7,7 @@ import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { ElementType } from "../world/elements/Elements"
 import { House } from "../world/elements/House"
 import { LocationManager } from "../world/LocationManager"
+import { MapGenerator } from "../world/MapGenerator"
 import { OutdoorDarknessMask } from "../world/OutdoorDarknessMask"
 import { Teleporter } from "../world/Teleporter"
 import { TimeUnit } from "../world/TimeUnit"
@@ -197,7 +198,7 @@ export class NPC extends Component {
     private doFlee(updateData: UpdateData, speedMultiplier: number = 1, ptSelectionFilter: (pt) => boolean = () => true) {
         if (!this.fleePath || this.fleePath.length === 0) {  // only try once per upate() to find a path
             const l = LocationManager.instance.currentLocation
-            const openPoints = l.ground.keys().filter(pt => !l.isOccupied(pt))
+            const openPoints = MapGenerator.GOOD_FLEEING_SPOTS.filter(pt => !l.isOccupied(pt))
             let pt: Point
             for (let i = 0; i < 5; i++) {
                 pt = openPoints[Math.floor(Math.random() * openPoints.length)]
