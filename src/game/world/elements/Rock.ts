@@ -1,4 +1,4 @@
-import { Point } from "../../../engine/point"
+import { Point } from "../../../engine/Point"
 import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
 import { BoxCollider } from "../../../engine/collision/BoxCollider"
 import { WorldLocation } from "../WorldLocation"

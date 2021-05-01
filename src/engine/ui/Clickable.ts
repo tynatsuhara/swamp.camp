@@ -1,7 +1,7 @@
-import { Component } from "../component";
-import { UpdateData } from "../engine";
-import { Point } from "../point";
-import { rectContains } from "../util/utils";
+import { Component } from "../Component";
+import { UpdateData } from "../Engine";
+import { Point } from "../Point";
+import { rectContains } from "../util/Utils";
 
 export class Clickable extends Component {
     private readonly position: Point

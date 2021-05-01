@@ -1,5 +1,5 @@
-import { Component } from "../../engine/component"
-import { Point } from "../../engine/point"
+import { Component } from "../../engine/Component"
+import { Point } from "../../engine/Point"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { OutdoorDarknessMask } from "../world/OutdoorDarknessMask"
 import { Dude } from "./Dude"

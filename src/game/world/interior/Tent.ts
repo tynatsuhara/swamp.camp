@@ -1,7 +1,7 @@
 import { WorldLocation } from "../WorldLocation"
 import { LocationManager } from "../LocationManager"
 import { GroundType } from "../ground/Ground"
-import { Point } from "../../../engine/point"
+import { Point } from "../../../engine/Point"
 import { Teleporter, TeleporterPrefix } from "../Teleporter"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { ElementType } from "../elements/Elements"

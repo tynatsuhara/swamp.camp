@@ -1,6 +1,6 @@
-import { Component } from "../../../engine/component"
-import { UpdateData } from "../../../engine/engine"
-import { Point } from "../../../engine/point"
+import { Component } from "../../../engine/Component"
+import { UpdateData } from "../../../engine/Engine"
+import { Point } from "../../../engine/Point"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
 import { Animator } from "../../../engine/util/Animator"
 

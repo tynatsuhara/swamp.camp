@@ -2,7 +2,7 @@ import { Item } from "./Items"
 import { ItemStack } from "./Inventory"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { Tilesets } from "../graphics/Tilesets"
-import { Point } from "../../engine/point"
+import { Point } from "../../engine/Point"
 import { ROCKS_NEEDED_FOR_CAMPFIRE, WOOD_NEEDED_FOR_CAMPFIRE } from "../characters/dialogues/DipIntro"
 
 export type CraftingRecipe = {

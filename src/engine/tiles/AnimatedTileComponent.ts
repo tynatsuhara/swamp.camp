@@ -1,4 +1,4 @@
-import { UpdateData } from "../engine"
+import { UpdateData } from "../Engine"
 import { Animator } from "../util/Animator"
 import { TileComponent } from "./TileComponent"
 import { TileSetAnimation } from "./TileSetAnimation"

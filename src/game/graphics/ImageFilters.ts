@@ -1,5 +1,5 @@
 import { Color, getRGB } from "../ui/Color"
-import { Point } from "../../engine/point"
+import { Point } from "../../engine/Point"
 
 export const ImageFilters = {
     /**

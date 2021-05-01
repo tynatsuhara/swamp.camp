@@ -1,8 +1,8 @@
 import { BoxCollider } from "../../engine/collision/BoxCollider"
 import { CollisionEngine } from "../../engine/collision/CollisionEngine"
-import { Component } from "../../engine/component"
+import { Component } from "../../engine/Component"
 import { Entity } from "../../engine/Entity"
-import { Point } from "../../engine/point"
+import { Point } from "../../engine/Point"
 
 export class Barrier extends Component {
     // static PLAYER_ONLY = "player-only"

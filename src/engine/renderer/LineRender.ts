@@ -1,4 +1,4 @@
-import { Point } from "../point"
+import { Point } from "../Point"
 import { RenderContext } from "./RenderContext"
 import { RenderMethod } from "./RenderMethod"
 

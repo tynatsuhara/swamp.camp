@@ -1,4 +1,4 @@
-import { Point } from "../../../engine/point"
+import { Point } from "../../../engine/Point"
 
 export const ElementUtils = {
     rectPoints: (position: Point, dimensions: Point): Point[] => {

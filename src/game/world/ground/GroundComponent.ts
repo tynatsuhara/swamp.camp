@@ -1,4 +1,4 @@
-import { Component } from "../../../engine/component"
+import { Component } from "../../../engine/Component"
 import { GroundType } from "./Ground"
 
 /**

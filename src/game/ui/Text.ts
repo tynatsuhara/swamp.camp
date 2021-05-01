@@ -1,4 +1,4 @@
-import { Point } from "../../engine/point"
+import { Point } from "../../engine/Point"
 import { TextRender } from "../../engine/renderer/TextRender"
 
 export const TEXT_PIXEL_WIDTH = 8

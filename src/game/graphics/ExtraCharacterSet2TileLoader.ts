@@ -1,5 +1,5 @@
 import { assets } from "../../engine/Assets"
-import { Point } from "../../engine/point"
+import { Point } from "../../engine/Point"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
 

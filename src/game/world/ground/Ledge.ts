@@ -1,6 +1,6 @@
 import { TileSource } from "../../../engine/tiles/TileSource"
 import { WorldLocation } from "../WorldLocation"
-import { Point } from "../../../engine/point"
+import { Point } from "../../../engine/Point"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { GroundComponent } from "./GroundComponent"
 import { Entity } from "../../../engine/Entity"

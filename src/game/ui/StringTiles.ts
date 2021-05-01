@@ -1,8 +1,8 @@
-import { Component } from "../../engine/component"
+import { Component } from "../../engine/Component"
 import { RenderMethod } from "../../engine/renderer/RenderMethod"
 import { Tilesets } from "../graphics/Tilesets"
 import { TileTransform } from "../../engine/tiles/TileTransform"
-import { Point } from "../../engine/point"
+import { Point } from "../../engine/Point"
 import { TextRender } from "../../engine/renderer/TextRender"
 
 export class StringTiles extends Component {

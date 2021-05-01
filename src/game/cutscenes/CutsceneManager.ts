@@ -1,4 +1,4 @@
-import { Component } from "../../engine/component"
+import { Component } from "../../engine/Component"
 import { Entity } from "../../engine/Entity"
 import { saveManager } from "../SaveManager"
 

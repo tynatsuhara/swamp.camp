@@ -1,5 +1,5 @@
 import { Entity } from "../../engine/Entity"
-import { Point } from "../../engine/point"
+import { Point } from "../../engine/Point"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { Grid } from "../../engine/util/Grid"
 import { PointAudio } from "../audio/PointAudio"

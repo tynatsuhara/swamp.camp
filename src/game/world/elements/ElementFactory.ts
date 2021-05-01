@@ -1,5 +1,5 @@
 import { ElementType } from "./Elements"
-import { Point } from "../../../engine/point"
+import { Point } from "../../../engine/Point"
 import { ElementComponent } from "./ElementComponent"
 import { WorldLocation } from "../WorldLocation"
 

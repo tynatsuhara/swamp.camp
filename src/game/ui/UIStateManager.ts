@@ -4,13 +4,13 @@ import { Player } from "../characters/Player"
 import { InventoryDisplay } from "./InventoryDisplay"
 import { DialogueDisplay } from "./DialogueDisplay"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
-import { Point } from "../../engine/point"
+import { Point } from "../../engine/Point"
 import { PauseMenu } from "./PauseMenu"
 import { CraftingMenu } from "./CraftingMenu"
 import { SellMenu } from "./SellMenu"
 import { NotificationDisplay } from "./NotificationDisplay"
 import { Mouse } from "./Mouse"
-import { debug } from "../../engine/debug"
+import { debug } from "../../engine/Debug"
 
 export class UIStateManager {
 

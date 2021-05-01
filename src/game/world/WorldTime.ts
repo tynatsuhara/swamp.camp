@@ -1,10 +1,10 @@
 import { Entity } from "../../engine/Entity"
-import { Component } from "../../engine/component"
-import { UpdateData } from "../../engine/engine"
+import { Component } from "../../engine/Component"
+import { UpdateData } from "../../engine/Engine"
 import { EventQueue } from "./events/EventQueue"
-import { InputKey } from "../../engine/input"
+import { InputKey } from "../../engine/Input"
 import { TimeUnit } from "./TimeUnit"
-import { debug } from "../../engine/debug"
+import { debug } from "../../engine/Debug"
 import { Ambiance } from "../audio/Ambiance"
 
 export class WorldTime extends Component {

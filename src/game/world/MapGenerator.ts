@@ -1,4 +1,4 @@
-import { Point } from "../../engine/point"
+import { Point } from "../../engine/Point"
 import { Grid } from "../../engine/util/Grid"
 import { Lists } from "../../engine/util/Lists"
 import { Noise } from "../../engine/util/Noise"

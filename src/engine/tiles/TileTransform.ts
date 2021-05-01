@@ -1,4 +1,4 @@
-import { Point } from "../point"
+import { Point } from "../Point"
 
 /**
  * A representation of a rectangular's transform in a world space, 

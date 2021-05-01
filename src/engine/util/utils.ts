@@ -1,4 +1,4 @@
-import { Point } from "../point"
+import { Point } from "../Point"
 
 export function rectContains(rectPosition: Point, rectDimensions: Point, pt: Point): boolean {
     return pt.x >= rectPosition.x && pt.x < rectPosition.x + rectDimensions.x

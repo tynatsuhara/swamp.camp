@@ -1,4 +1,4 @@
-import { Point } from "../point"
+import { Point } from "../Point"
 import { ImageRender } from "../renderer/ImageRender"
 import { TileTransform } from "./TileTransform"
 import { TileComponent } from "./TileComponent"

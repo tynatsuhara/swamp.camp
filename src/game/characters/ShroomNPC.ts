@@ -1,5 +1,5 @@
-import { Component } from "../../engine/component"
-import { UpdateData } from "../../engine/engine"
+import { Component } from "../../engine/Component"
+import { UpdateData } from "../../engine/Engine"
 import { pixelPtToTilePt } from "../graphics/Tilesets"
 import { Item } from "../items/Items"
 import { ElementType } from "../world/elements/Elements"

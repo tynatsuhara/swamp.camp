@@ -1,6 +1,6 @@
 import { GroundComponent } from "./GroundComponent"
 import { WorldLocation } from "../WorldLocation"
-import { Point } from "../../../engine/point"
+import { Point } from "../../../engine/Point"
 import { Entity } from "../../../engine/Entity"
 import { ConnectingTile } from "../../../engine/tiles/ConnectingTile"
 import { GroundType, Ground, MakeGroundFuncData } from "./Ground"

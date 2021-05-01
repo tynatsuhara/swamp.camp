@@ -1,6 +1,6 @@
 import { CollisionEngine, collisionEngine } from "../../engine/collision/CollisionEngine"
-import { UpdateViewsContext } from "../../engine/engine"
-import { Point } from "../../engine/point"
+import { UpdateViewsContext } from "../../engine/Engine"
+import { Point } from "../../engine/Point"
 import { View } from "../../engine/View"
 import { Dude } from "../characters/Dude"
 import { DudeFactory, DudeType } from "../characters/DudeFactory"
@@ -25,7 +25,7 @@ import { Player } from "../characters/Player"
 import { RenderMethod } from "../../engine/renderer/RenderMethod"
 import { LineRender } from "../../engine/renderer/LineRender"
 import { Entity } from "../../engine/Entity"
-import { debug } from "../../engine/debug"
+import { debug } from "../../engine/Debug"
 import { Barrier } from "../world/Barrier"
 
 const ZOOM = 3

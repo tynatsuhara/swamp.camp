@@ -1,5 +1,5 @@
 import { Entity } from "../../engine/Entity"
-import { Point } from "../../engine/point"
+import { Point } from "../../engine/Point"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Dude } from "../characters/Dude"

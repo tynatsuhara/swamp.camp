@@ -1,6 +1,6 @@
-import { Component } from "../../engine/component"
+import { Component } from "../../engine/Component"
 import { Entity } from "../../engine/Entity"
-import { Point } from "../../engine/point"
+import { Point } from "../../engine/Point"
 import { RenderMethod } from "../../engine/renderer/RenderMethod"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"

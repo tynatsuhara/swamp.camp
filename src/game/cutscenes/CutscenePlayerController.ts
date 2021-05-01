@@ -1,8 +1,8 @@
-import { Component } from "../../engine/component"
+import { Component } from "../../engine/Component"
 import { Player } from "../characters/Player"
 import { Dude } from "../characters/Dude"
-import { StartData, UpdateData } from "../../engine/engine"
-import { Point } from "../../engine/point"
+import { StartData, UpdateData } from "../../engine/Engine"
+import { Point } from "../../engine/Point"
 
 export class CutscenePlayerController extends Component {
 

@@ -1,4 +1,4 @@
-import { Point } from "../point"
+import { Point } from "../Point"
 import { BinaryHeap } from "./BinaryHeap"
 
 // an infinite grid using x/y coordinates (x increases to the right, y increases down)

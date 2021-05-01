@@ -1,6 +1,6 @@
-import { Component } from "../../../engine/component"
+import { Component } from "../../../engine/Component"
 import { ElementType } from "./Elements"
-import { Point } from "../../../engine/point"
+import { Point } from "../../../engine/Point"
 import { LocationManager } from "../LocationManager"
 
 /**

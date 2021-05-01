@@ -1,5 +1,5 @@
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
-import { Point } from "../../engine/point"
+import { Point } from "../../engine/Point"
 import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
 import { assets } from "../../engine/Assets"
 

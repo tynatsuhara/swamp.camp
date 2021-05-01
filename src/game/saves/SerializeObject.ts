@@ -1,4 +1,4 @@
-import { measure } from "../../engine/profiler"
+import { measure } from "../../engine/Profiler"
 import { newUUID } from "./uuid"
 
 /**

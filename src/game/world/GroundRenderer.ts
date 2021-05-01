@@ -1,4 +1,4 @@
-import { Point } from "../../engine/point"
+import { Point } from "../../engine/Point"
 import { ImageRender } from "../../engine/renderer/ImageRender"
 import { Entity } from "../../engine/Entity"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"

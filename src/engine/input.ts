@@ -1,4 +1,4 @@
-import { Point } from "./point"
+import { Point } from "./Point"
 import { View } from "./View"
 
 // TODO: Consider switching to using event.code string instead of keycode

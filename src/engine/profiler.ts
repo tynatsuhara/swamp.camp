@@ -1,8 +1,8 @@
 import { View } from "./View"
 import { Entity } from "./Entity"
-import { Point } from "./point"
+import { Point } from "./Point"
 import { TextRender } from "./renderer/TextRender"
-import { Component } from "./component"
+import { Component } from "./Component"
 import { BasicRenderComponent } from "./renderer/BasicRenderComponent"
 
 class Profiler {

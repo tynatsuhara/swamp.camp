@@ -1,4 +1,4 @@
-import { Point } from "../../engine/point"
+import { Point } from "../../engine/Point"
 
 export const enum NPCScheduleType {
     DO_NOTHING,

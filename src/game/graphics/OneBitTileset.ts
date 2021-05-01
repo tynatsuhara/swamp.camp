@@ -1,4 +1,4 @@
-import { Point } from "../../engine/point"
+import { Point } from "../../engine/Point"
 import { SingleFileTileLoader } from "./SingleFileTileLoader"
 
 export class OneBitTileset extends SingleFileTileLoader {

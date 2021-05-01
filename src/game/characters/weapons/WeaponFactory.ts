@@ -2,7 +2,7 @@ import { WeaponType } from "./WeaponType"
 import { Weapon } from "./Weapon"
 import { UnarmedWeapon } from "./UnarmedWeapon"
 import { MeleeWeapon } from "./MeleeWeapon"
-import { Point } from "../../../engine/point"
+import { Point } from "../../../engine/Point"
 import { SpearWeapon } from "./SpearWeapon"
 
 export const WeaponFactory = {

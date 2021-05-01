@@ -1,5 +1,5 @@
-import { Point } from "../point"
-import { rectContains } from "../util/utils"
+import { Point } from "../Point"
+import { rectContains } from "../util/Utils"
 import { BoxCollider } from "./BoxCollider"
 import { Collider } from "./Collider"
 

@@ -1,6 +1,6 @@
 import { BoxCollider } from "../../../engine/collision/BoxCollider"
 import { Entity } from "../../../engine/Entity"
-import { Point } from "../../../engine/point"
+import { Point } from "../../../engine/Point"
 import { AnimatedTileComponent } from "../../../engine/tiles/AnimatedTileComponent"
 import { TileSetAnimation } from "../../../engine/tiles/TileSetAnimation"
 import { TileTransform } from "../../../engine/tiles/TileTransform"

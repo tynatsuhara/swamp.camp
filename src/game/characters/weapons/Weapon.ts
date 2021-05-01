@@ -1,9 +1,9 @@
-import { Component } from "../../../engine/component"
+import { Component } from "../../../engine/Component"
 import { LocationManager } from "../../world/LocationManager"
 import { Dude } from "../Dude"
 import { WeaponType } from "./WeaponType"
 import { Hittable } from "../../world/elements/Hittable"
-import { Point } from "../../../engine/point"
+import { Point } from "../../../engine/Point"
 
 export abstract class Weapon extends Component {
 

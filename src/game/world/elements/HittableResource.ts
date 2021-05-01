@@ -1,5 +1,5 @@
 import { BoxCollider } from "../../../engine/collision/BoxCollider"
-import { Point } from "../../../engine/point"
+import { Point } from "../../../engine/Point"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Item, spawnItem } from "../../items/Items"

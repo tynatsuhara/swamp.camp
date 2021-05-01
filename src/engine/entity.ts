@@ -1,4 +1,4 @@
-import { Component } from "./component"
+import { Component } from "./Component"
 
 /**
  * An object which is updated by the engine. Should be attached to a game view.

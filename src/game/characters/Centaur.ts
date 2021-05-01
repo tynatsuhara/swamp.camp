@@ -1,4 +1,4 @@
-import { Component } from "../../engine/component"
+import { Component } from "../../engine/Component"
 import { GenericDialogue } from "./dialogues/GenericDialogue"
 import { Dude } from "./Dude"
 import { DudeFaction } from "./DudeFactory"

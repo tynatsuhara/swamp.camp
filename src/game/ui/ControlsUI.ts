@@ -1,6 +1,6 @@
 import { KeyPressIndicator } from "./KeyPressIndicator"
-import { Point } from "../../engine/point"
-import { InputKey } from "../../engine/input"
+import { Point } from "../../engine/Point"
+import { InputKey } from "../../engine/Input"
 import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { formatText } from "./Text"

@@ -1,5 +1,5 @@
-import { Component } from "../../engine/component"
-import { Point } from "../../engine/point"
+import { Component } from "../../engine/Component"
+import { Point } from "../../engine/Point"
 import { ImageRender } from "../../engine/renderer/ImageRender"
 import { Color, getRGB } from "../ui/Color"
 import { UIStateManager } from "../ui/UIStateManager"

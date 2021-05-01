@@ -1,4 +1,4 @@
-import { Point } from "../../engine/point"
+import { Point } from "../../engine/Point"
 import { TextButton } from "./TextButton"
 import { UIStateManager } from "./UIStateManager"
 import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"

@@ -1,6 +1,6 @@
-import { Point } from "../point"
+import { Point } from "../Point"
 import { ImageRender } from "../renderer/ImageRender"
-import { Component } from "../component"
+import { Component } from "../Component"
 import { ConnectingTileSchema } from "./ConnectingTileSchema"
 import { Grid } from "../util/Grid"
 import { GroundComponent } from "../../game/world/ground/GroundComponent"

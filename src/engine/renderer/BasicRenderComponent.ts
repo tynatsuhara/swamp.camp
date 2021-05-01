@@ -1,4 +1,4 @@
-import { Component } from "../component"
+import { Component } from "../Component"
 import { RenderMethod } from "./RenderMethod"
 
 export class BasicRenderComponent extends Component {

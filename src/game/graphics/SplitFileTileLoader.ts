@@ -1,6 +1,6 @@
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { assets } from "../../engine/Assets"
-import { Point } from "../../engine/point"
+import { Point } from "../../engine/Point"
 import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
 
 export class SplitFileTileLoader {

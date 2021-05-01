@@ -1,5 +1,5 @@
 import { Entity } from "../../engine/Entity"
-import { Point } from "../../engine/point"
+import { Point } from "../../engine/Point"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
 import { ImageRender } from "../../engine/renderer/ImageRender"
 import { Player } from "../characters/Player"

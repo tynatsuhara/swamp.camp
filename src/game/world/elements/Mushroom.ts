@@ -1,6 +1,6 @@
-import { Component } from "../../../engine/component"
+import { Component } from "../../../engine/Component"
 import { Entity } from "../../../engine/Entity"
-import { Point } from "../../../engine/point"
+import { Point } from "../../../engine/Point"
 import { TileComponent } from "../../../engine/tiles/TileComponent"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
 import { DudeFactory, DudeType } from "../../characters/DudeFactory"

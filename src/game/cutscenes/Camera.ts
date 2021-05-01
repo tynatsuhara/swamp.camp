@@ -1,8 +1,8 @@
-import { Point } from "../../engine/point"
+import { Point } from "../../engine/Point"
 import { MapGenerator } from "../world/MapGenerator"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Dude } from "../characters/Dude"
-import { clamp } from "../../engine/util/utils"
+import { clamp } from "../../engine/util/Utils"
 
 export class Camera {
 

@@ -1,5 +1,5 @@
 import { TileSource } from "./TileSource"
-import { Point } from "../point"
+import { Point } from "../Point"
 import { TileTransform } from "./TileTransform"
 import { TileComponent } from "./TileComponent"
 

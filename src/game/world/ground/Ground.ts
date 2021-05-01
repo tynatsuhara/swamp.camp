@@ -1,4 +1,4 @@
-import { Point } from "../../../engine/point"
+import { Point } from "../../../engine/Point"
 import { WorldLocation } from "../WorldLocation"
 import { GroundComponent } from "./GroundComponent"
 import { makeGrass } from "./Grass"

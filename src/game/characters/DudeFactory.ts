@@ -1,6 +1,6 @@
 import { Entity } from "../../engine/Entity"
-import { Point } from "../../engine/point"
-import { Component } from "../../engine/component"
+import { Point } from "../../engine/Point"
+import { Component } from "../../engine/Component"
 import { Player } from "./Player"
 import { Dude } from "./Dude"
 import { NPC } from "./NPC"

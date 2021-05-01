@@ -1,5 +1,5 @@
 import { Tilesets } from "../graphics/Tilesets"
-import { Point } from "../../engine/point"
+import { Point } from "../../engine/Point"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 
 export const DudeInteractIndicator = {

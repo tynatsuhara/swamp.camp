@@ -1,5 +1,5 @@
 import { Entity } from "./Entity"
-import { Point } from "./point"
+import { Point } from "./Point"
 
 export class View {
     entities: Entity[] = []          // entities ordered by depth (back to front)

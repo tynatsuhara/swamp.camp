@@ -1,4 +1,4 @@
-import { Point } from "../../../engine/point"
+import { Point } from "../../../engine/Point"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Barrier } from "../Barrier"
 

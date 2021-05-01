@@ -1,5 +1,5 @@
-import { UpdateViewsContext } from "../engine/engine"
-import { Game } from "../engine/game"
+import { UpdateViewsContext } from "../engine/Engine"
+import { Game } from "../engine/Game"
 import { View } from "../engine/View"
 import { GameScene } from "./scenes/GameScene"
 import { MainMenuScene } from "./scenes/MainMenuScene"

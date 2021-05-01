@@ -1,4 +1,4 @@
-import { InputKey } from "../engine/input"
+import { InputKey } from "../engine/Input"
 
 export const Controls = {
     interactButton: InputKey.E,

@@ -1,5 +1,5 @@
 import { QuestGame } from "./game/quest_game"
-import { Engine } from "./engine/engine"
+import { Engine } from "./engine/Engine"
 import { Tilesets } from "./game/graphics/Tilesets"
 import { assets } from "./engine/Assets"
 

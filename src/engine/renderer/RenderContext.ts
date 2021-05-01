@@ -1,5 +1,5 @@
 import { View } from "../View"
-import { Point } from "../point"
+import { Point } from "../Point"
 
 export class RenderContext {
     private readonly canvas: HTMLCanvasElement

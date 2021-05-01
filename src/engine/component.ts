@@ -1,4 +1,4 @@
-import { UpdateData, StartData, AwakeData } from "./engine"
+import { UpdateData, StartData, AwakeData } from "./Engine"
 import { Entity } from "./Entity"
 import { RenderMethod } from "./renderer/RenderMethod"
 
