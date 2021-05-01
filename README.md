@@ -1,10 +1,10 @@
 # development
 this project uses the typescript compiler [to bundle](https://mattallan.me/posts/modern-javascript-without-a-bundler/) the output. run `tsc --watch` when developing to compile on any changes.
 
-run `./run-local-server` to spin up a local HTTP server for development
+run `./run-local-server` to spin up a local HTTP server for development (using Python 3)
 
 # release
-run `tsc` then commit the compiled statics, this will trigger a [Netlify deployment](https://app.netlify.com/sites/wow-a-game/deploys). It will be deployed to https://wow-a-game.netlify.app 
+commit and push to `master`, this will trigger a [Netlify deployment](https://app.netlify.com/sites/wow-a-game/deploys). It will be deployed to https://wow-a-game.netlify.app 
 
 # links
 additional art by:
