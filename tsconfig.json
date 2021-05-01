@@ -1,9 +1,8 @@
 {
     "compilerOptions": {
-        "module": "system",
-        "moduleResolution": "node",
-        "target": "es5",
-        "lib": ["es5", "es6", "dom", "es2019"],
+        "module": "System",
+        "target": "ES5",
+        "lib": ["ES5", "ES6", "DOM", "ES2019"],
         "rootDir": "./src/",
         "outFile": "./static/app.js"
     }
