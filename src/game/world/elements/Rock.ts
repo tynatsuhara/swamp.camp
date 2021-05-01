@@ -16,13 +16,8 @@ import { assets } from "../../../engine/Assets"
 import { Lists } from "../../../engine/util/Lists"
 import { Sounds } from "../../audio/Sounds"
 
-const MINING_AUDIO = [
-    "audio/impact/impactMining_000.ogg",
-    "audio/impact/impactMining_001.ogg",
-    "audio/impact/impactMining_002.ogg",
-    "audio/impact/impactMining_003.ogg",
-    "audio/impact/impactMining_004.ogg",
-]
+const MINING_AUDIO = Lists.range(0, 5).map(n => `audio/impact/impactMining_00${n}.ogg`)
+const MINING_AUDIO_VOLUME = .4
 
 export class RockFactory extends ElementFactory {
 
@@ -64,7 +59,7 @@ export class RockFactory extends ElementFactory {
                     return Math.random() > .9 ? [Item.IRON] : [Item.ROCK]
                 }
             },
-            () => Sounds.play(Lists.oneOf(MINING_AUDIO))
+            () => Sounds.play(Lists.oneOf(MINING_AUDIO), MINING_AUDIO_VOLUME)
         ))
 
         return e.addComponent(new ElementComponent(

@@ -17,10 +17,15 @@ import { WorldTime } from "../WorldTime"
 import { TimeUnit } from "../TimeUnit"
 import { LocationManager } from "../LocationManager"
 import { GroundType } from "../ground/Ground"
+import { Sounds } from "../../audio/Sounds"
+import { Lists } from "../../../engine/util/Lists"
+import { assets } from "../../../engine/Assets"
 
 const NEXT_GROWTH_TIME = "ngt"
 const SIZE = "s"  // one of [1, 2, 3]
 const AVAILABLE_RESOURCES = "a"
+const CHOPPING_AUDIO = Lists.range(0, 5).map(n => `audio/impact/impactPlank_medium_00${n}.ogg`)
+const CHOPPING_AUDIO_VOLUME = .3
 
 export class TreeFactory extends ElementFactory {
 
@@ -30,6 +35,7 @@ export class TreeFactory extends ElementFactory {
     constructor(type: ElementType.TREE_ROUND|ElementType.TREE_POINTY) {
         super()
         this.type = type
+        assets.loadAudioFiles(CHOPPING_AUDIO)
     }
 
     make(wl: WorldLocation, pos: Point, data: object): ElementComponent {
@@ -81,7 +87,8 @@ export class TreeFactory extends ElementFactory {
                 } else {
                     return [getItem()]
                 }
-            }
+            },
+            () => Sounds.play(Lists.oneOf(CHOPPING_AUDIO), CHOPPING_AUDIO_VOLUME)
         ))
 
         if (size < 3) {

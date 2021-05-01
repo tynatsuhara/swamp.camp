@@ -11479,7 +11479,7 @@ System.register("game/world/elements/HittableResource", ["engine/collision/BoxCo
 });
 System.register("game/world/elements/Rock", ["engine/point", "game/graphics/Tilesets", "engine/collision/BoxCollider", "engine/tiles/TileComponent", "engine/tiles/TileTransform", "engine/Entity", "game/world/elements/ElementComponent", "game/world/elements/HittableResource", "game/characters/Player", "game/characters/weapons/WeaponType", "game/world/elements/ElementFactory", "engine/Assets", "engine/util/Lists", "game/audio/Sounds"], function (exports_132, context_132) {
     "use strict";
-    var point_68, Tilesets_40, BoxCollider_7, TileComponent_7, TileTransform_28, Entity_28, ElementComponent_7, HittableResource_1, Player_19, WeaponType_5, ElementFactory_6, Assets_9, Lists_8, Sounds_4, MINING_AUDIO, RockFactory;
+    var point_68, Tilesets_40, BoxCollider_7, TileComponent_7, TileTransform_28, Entity_28, ElementComponent_7, HittableResource_1, Player_19, WeaponType_5, ElementFactory_6, Assets_9, Lists_8, Sounds_4, MINING_AUDIO, MINING_AUDIO_VOLUME, RockFactory;
     var __moduleName = context_132 && context_132.id;
     return {
         setters: [
@@ -11527,13 +11527,8 @@ System.register("game/world/elements/Rock", ["engine/point", "game/graphics/Tile
             }
         ],
         execute: function () {
-            MINING_AUDIO = [
-                "audio/impact/impactMining_000.ogg",
-                "audio/impact/impactMining_001.ogg",
-                "audio/impact/impactMining_002.ogg",
-                "audio/impact/impactMining_003.ogg",
-                "audio/impact/impactMining_004.ogg",
-            ];
+            MINING_AUDIO = Lists_8.Lists.range(0, 5).map(function (n) { return "audio/impact/impactMining_00" + n + ".ogg"; });
+            MINING_AUDIO_VOLUME = .4;
             RockFactory = /** @class */ (function (_super) {
                 __extends(RockFactory, _super);
                 function RockFactory() {
@@ -11563,7 +11558,7 @@ System.register("game/world/elements/Rock", ["engine/point", "game/graphics/Tile
                         else {
                             return Math.random() > .9 ? [5 /* IRON */] : [1 /* ROCK */];
                         }
-                    }, function () { return Sounds_4.Sounds.play(Lists_8.Lists.oneOf(MINING_AUDIO)); }));
+                    }, function () { return Sounds_4.Sounds.play(Lists_8.Lists.oneOf(MINING_AUDIO), MINING_AUDIO_VOLUME); }));
                     return e.addComponent(new ElementComponent_7.ElementComponent(2 /* ROCK */, pos, [pos], function () { return { v: variation, m: mossy, f: flipped, a: hittableResource.freeResources }; }));
                 };
                 return RockFactory;
@@ -11770,9 +11765,9 @@ System.register("game/world/elements/Tent", ["engine/collision/BoxCollider", "en
         }
     };
 });
-System.register("game/world/elements/Tree", ["engine/point", "game/graphics/Tilesets", "engine/collision/BoxCollider", "engine/tiles/TileComponent", "engine/tiles/TileTransform", "engine/Entity", "game/world/elements/HittableResource", "game/world/elements/ElementComponent", "game/characters/weapons/WeaponType", "game/characters/Player", "game/world/elements/ElementFactory", "engine/component", "game/world/WorldTime", "game/world/TimeUnit", "game/world/LocationManager"], function (exports_136, context_136) {
+System.register("game/world/elements/Tree", ["engine/point", "game/graphics/Tilesets", "engine/collision/BoxCollider", "engine/tiles/TileComponent", "engine/tiles/TileTransform", "engine/Entity", "game/world/elements/HittableResource", "game/world/elements/ElementComponent", "game/characters/weapons/WeaponType", "game/characters/Player", "game/world/elements/ElementFactory", "engine/component", "game/world/WorldTime", "game/world/TimeUnit", "game/world/LocationManager", "game/audio/Sounds", "engine/util/Lists", "engine/Assets"], function (exports_136, context_136) {
     "use strict";
-    var point_72, Tilesets_43, BoxCollider_9, TileComponent_9, TileTransform_30, Entity_30, HittableResource_2, ElementComponent_9, WeaponType_6, Player_20, ElementFactory_8, component_41, WorldTime_9, TimeUnit_8, LocationManager_25, NEXT_GROWTH_TIME, SIZE, AVAILABLE_RESOURCES, TreeFactory, GrowableTree;
+    var point_72, Tilesets_43, BoxCollider_9, TileComponent_9, TileTransform_30, Entity_30, HittableResource_2, ElementComponent_9, WeaponType_6, Player_20, ElementFactory_8, component_41, WorldTime_9, TimeUnit_8, LocationManager_25, Sounds_5, Lists_9, Assets_10, NEXT_GROWTH_TIME, SIZE, AVAILABLE_RESOURCES, CHOPPING_AUDIO, CHOPPING_AUDIO_VOLUME, TreeFactory, GrowableTree;
     var __moduleName = context_136 && context_136.id;
     return {
         setters: [
@@ -11820,18 +11815,30 @@ System.register("game/world/elements/Tree", ["engine/point", "game/graphics/Tile
             },
             function (LocationManager_25_1) {
                 LocationManager_25 = LocationManager_25_1;
+            },
+            function (Sounds_5_1) {
+                Sounds_5 = Sounds_5_1;
+            },
+            function (Lists_9_1) {
+                Lists_9 = Lists_9_1;
+            },
+            function (Assets_10_1) {
+                Assets_10 = Assets_10_1;
             }
         ],
         execute: function () {
             NEXT_GROWTH_TIME = "ngt";
             SIZE = "s"; // one of [1, 2, 3]
             AVAILABLE_RESOURCES = "a";
+            CHOPPING_AUDIO = Lists_9.Lists.range(0, 5).map(function (n) { return "audio/impact/impactPlank_medium_00" + n + ".ogg"; });
+            CHOPPING_AUDIO_VOLUME = .3;
             TreeFactory = /** @class */ (function (_super) {
                 __extends(TreeFactory, _super);
                 function TreeFactory(type) {
                     var _this = _super.call(this) || this;
                     _this.dimensions = new point_72.Point(1, 2);
                     _this.type = type;
+                    Assets_10.assets.loadAudioFiles(CHOPPING_AUDIO);
                     return _this;
                 }
                 TreeFactory.prototype.make = function (wl, pos, data) {
@@ -11872,7 +11879,7 @@ System.register("game/world/elements/Tree", ["engine/point", "game/graphics/Tile
                         else {
                             return [getItem()];
                         }
-                    }));
+                    }, function () { return Sounds_5.Sounds.play(Lists_9.Lists.oneOf(CHOPPING_AUDIO), CHOPPING_AUDIO_VOLUME); }));
                     if (size < 3) {
                         e.addComponent(new GrowableTree(nextGrowthTime, function () {
                             var _a;
@@ -11997,7 +12004,7 @@ System.register("game/world/elements/Elements", ["game/world/Teleporter", "game/
 });
 System.register("game/world/MapGenerator", ["engine/point", "engine/util/Grid", "engine/util/Lists", "engine/util/Noise", "game/graphics/Tilesets", "game/world/LocationManager", "game/world/WorldLocation"], function (exports_138, context_138) {
     "use strict";
-    var point_73, Grid_3, Lists_9, Noise_1, Tilesets_44, LocationManager_26, WorldLocation_4, MapGenerator;
+    var point_73, Grid_3, Lists_10, Noise_1, Tilesets_44, LocationManager_26, WorldLocation_4, MapGenerator;
     var __moduleName = context_138 && context_138.id;
     return {
         setters: [
@@ -12007,8 +12014,8 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/util/Grid", 
             function (Grid_3_1) {
                 Grid_3 = Grid_3_1;
             },
-            function (Lists_9_1) {
-                Lists_9 = Lists_9_1;
+            function (Lists_10_1) {
+                Lists_10 = Lists_10_1;
             },
             function (Noise_1_1) {
                 Noise_1 = Noise_1_1;
@@ -12073,7 +12080,7 @@ System.register("game/world/MapGenerator", ["engine/point", "engine/util/Grid", 
                             }
                         }
                     }
-                    Lists_9.Lists.shuffle(possibilities);
+                    Lists_10.Lists.shuffle(possibilities);
                     possibilities.forEach(function (pt) { return _this.spawnTree(pt); });
                 };
                 MapGenerator.prototype.spawnTrees = function () {
@@ -12312,7 +12319,7 @@ System.register("game/cutscenes/Camera", ["engine/point", "game/world/MapGenerat
 });
 System.register("game/characters/Player", ["engine/component", "engine/debug", "engine/point", "engine/util/Lists", "game/audio/StepSounds", "game/Controls", "game/cutscenes/Camera", "game/graphics/Tilesets", "game/ui/NotificationDisplay", "game/ui/PlaceElementDisplay", "game/ui/UIStateManager", "game/world/elements/Interactable", "game/world/LocationManager", "game/characters/Dude", "game/characters/DudeFactory"], function (exports_140, context_140) {
     "use strict";
-    var component_42, debug_5, point_75, Lists_10, StepSounds_1, Controls_8, Camera_11, Tilesets_46, NotificationDisplay_3, PlaceElementDisplay_4, UIStateManager_18, Interactable_6, LocationManager_27, Dude_9, DudeFactory_5, Player;
+    var component_42, debug_5, point_75, Lists_11, StepSounds_1, Controls_8, Camera_11, Tilesets_46, NotificationDisplay_3, PlaceElementDisplay_4, UIStateManager_18, Interactable_6, LocationManager_27, Dude_9, DudeFactory_5, Player;
     var __moduleName = context_140 && context_140.id;
     return {
         setters: [
@@ -12325,8 +12332,8 @@ System.register("game/characters/Player", ["engine/component", "engine/debug", "
             function (point_75_1) {
                 point_75 = point_75_1;
             },
-            function (Lists_10_1) {
-                Lists_10 = Lists_10_1;
+            function (Lists_11_1) {
+                Lists_11 = Lists_11_1;
             },
             function (StepSounds_1_1) {
                 StepSounds_1 = StepSounds_1_1;
@@ -12504,7 +12511,7 @@ System.register("game/characters/Player", ["engine/component", "engine/debug", "
                         .filter(function (e) { return _this.dude.isFacing(e.position); }) // interactables the dude is facing
                         .filter(function (e) { return e.position.distanceTo(interactCenter) < interactDistance; })
                         .filter(function (e) { return e.isInteractable(); });
-                    var i = Lists_10.Lists.minBy(possibilities, function (e) { return e.position.distanceTo(interactCenter); });
+                    var i = Lists_11.Lists.minBy(possibilities, function (e) { return e.position.distanceTo(interactCenter); });
                     if (!!i) {
                         i.updateIndicator(true);
                     }
@@ -12518,15 +12525,15 @@ System.register("game/characters/Player", ["engine/component", "engine/debug", "
 });
 System.register("game/audio/StepSounds", ["engine/Assets", "engine/util/Lists", "game/characters/Player", "game/graphics/Tilesets", "game/world/LocationManager"], function (exports_141, context_141) {
     "use strict";
-    var Assets_10, Lists_11, Player_21, Tilesets_47, LocationManager_28, StepSounds;
+    var Assets_11, Lists_12, Player_21, Tilesets_47, LocationManager_28, StepSounds;
     var __moduleName = context_141 && context_141.id;
     return {
         setters: [
-            function (Assets_10_1) {
-                Assets_10 = Assets_10_1;
+            function (Assets_11_1) {
+                Assets_11 = Assets_11_1;
             },
-            function (Lists_11_1) {
-                Lists_11 = Lists_11_1;
+            function (Lists_12_1) {
+                Lists_12 = Lists_12_1;
             },
             function (Player_21_1) {
                 Player_21 = Player_21_1;
@@ -12546,7 +12553,7 @@ System.register("game/audio/StepSounds", ["engine/Assets", "engine/util/Lists", 
                     var _a = StepSounds.getSound(), sound = _a[0], volume = _a[1];
                     if (!!sound) {
                         // TODO: We could probably make this a bit less laggy by pre-loading
-                        StepSounds.footstep = Assets_10.assets.getAudioByFileName(sound);
+                        StepSounds.footstep = Assets_11.assets.getAudioByFileName(sound);
                         StepSounds.footstep.oncanplaythrough = function () {
                             StepSounds.footstep.play();
                             StepSounds.footstep.volume = Math.min(1, volume * volumeMultiplier);
@@ -12563,7 +12570,7 @@ System.register("game/audio/StepSounds", ["engine/Assets", "engine/util/Lists", 
                 StepSounds.WOOD_2 = "audio/steps/wood02.ogg";
                 StepSounds.WOOD_3 = "audio/steps/wood03.ogg";
                 StepSounds.startFootstepSoundLoop = function () {
-                    Assets_10.assets.loadAudioFiles([
+                    Assets_11.assets.loadAudioFiles([
                         StepSounds.GRAVEL,
                         StepSounds.LEAVES_1,
                         StepSounds.LEAVES_2,
@@ -12590,7 +12597,7 @@ System.register("game/audio/StepSounds", ["engine/Assets", "engine/util/Lists", 
                     switch (ground.type) {
                         case 2 /* GRASS */:
                         case 4 /* LEDGE */:
-                            return Lists_11.Lists.oneOf([
+                            return Lists_12.Lists.oneOf([
                                 [StepSounds.LEAVES_1, .2],
                                 [StepSounds.LEAVES_2, .2],
                             ]);
@@ -12999,7 +13006,7 @@ System.register("game/characters/weapons/MeleeWeapon", ["game/characters/weapons
 });
 System.register("game/characters/weapons/Projectile", ["engine/collision/BoxCollider", "engine/component", "engine/Entity", "engine/point", "game/world/LocationManager", "game/items/DroppedItem", "engine/util/Lists"], function (exports_147, context_147) {
     "use strict";
-    var BoxCollider_10, component_44, Entity_31, point_78, LocationManager_30, DroppedItem_2, Lists_12, Projectile, spawnProjectile;
+    var BoxCollider_10, component_44, Entity_31, point_78, LocationManager_30, DroppedItem_2, Lists_13, Projectile, spawnProjectile;
     var __moduleName = context_147 && context_147.id;
     return {
         setters: [
@@ -13021,8 +13028,8 @@ System.register("game/characters/weapons/Projectile", ["engine/collision/BoxColl
             function (DroppedItem_2_1) {
                 DroppedItem_2 = DroppedItem_2_1;
             },
-            function (Lists_12_1) {
-                Lists_12 = Lists_12_1;
+            function (Lists_13_1) {
+                Lists_13 = Lists_13_1;
             }
         ],
         execute: function () {
@@ -13087,7 +13094,7 @@ System.register("game/characters/weapons/Projectile", ["engine/collision/BoxColl
                     var allEnemies = Array.from(LocationManager_30.LocationManager.instance.currentLocation.dudes)
                         .filter(function (d) { return !!d && d !== attacker && d.isEnemy(attacker); })
                         .filter(function (d) { return d.standingPosition.distanceTo(projectilePos) < attackDistance; });
-                    return Lists_12.Lists.minBy(allEnemies, function (d) { return d.standingPosition.manhattanDistanceTo(projectilePos); });
+                    return Lists_13.Lists.minBy(allEnemies, function (d) { return d.standingPosition.manhattanDistanceTo(projectilePos); });
                 };
                 /**
                  * returns true if it successfully moved
@@ -14436,7 +14443,7 @@ System.register("game/quest_game", ["engine/game", "game/scenes/GameScene", "gam
 });
 System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tilesets", "engine/Assets"], function (exports_158, context_158) {
     "use strict";
-    var quest_game_1, engine_1, Tilesets_55, Assets_11;
+    var quest_game_1, engine_1, Tilesets_55, Assets_12;
     var __moduleName = context_158 && context_158.id;
     return {
         setters: [
@@ -14449,14 +14456,14 @@ System.register("app", ["game/quest_game", "engine/engine", "game/graphics/Tiles
             function (Tilesets_55_1) {
                 Tilesets_55 = Tilesets_55_1;
             },
-            function (Assets_11_1) {
-                Assets_11 = Assets_11_1;
+            function (Assets_12_1) {
+                Assets_12 = Assets_12_1;
             }
         ],
         execute: function () {
             Promise.all([
                 // load all required assets
-                Assets_11.assets.loadImageFiles(Tilesets_55.Tilesets.getFilesToLoad()),
+                Assets_12.assets.loadImageFiles(Tilesets_55.Tilesets.getFilesToLoad()),
             ]).then(function () {
                 // start the engine (vroom vroom)
                 new engine_1.Engine(new quest_game_1.QuestGame(), document.getElementById('canvas'));
