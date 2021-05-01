@@ -2735,6 +2735,7 @@ System.register("game/graphics/OneBitTileset", ["engine/point", "game/graphics/S
                         ["iron", new point_15.Point(31, 0)],
                         ["mushroom", new point_15.Point(31, 1)],
                         ["house", new point_15.Point(8, 19)],
+                        ["chest", new point_15.Point(8, 6)],
                         ["invBoxNW", new point_15.Point(16, 19)],
                         ["textBoxNW", new point_15.Point(16, 16)],
                         ["tooltipLeft", new point_15.Point(16, 16)],
@@ -4815,7 +4816,12 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
                     element: 7 /* MUSHROOM */,
                     consumable: function () { return Player_4.Player.instance.dude.heal(1); }
                 }),
-                // TODO add other weapons
+                _a[10 /* CHEST */] = new ItemMetadata({
+                    displayName: "Chest",
+                    inventoryIconSupplier: function () { return Tilesets_3.Tilesets.instance.oneBit.getTileSource("chest"); },
+                    element: 8 /* CHEST */
+                }),
+                // Weapons
                 _a[100012 /* AXE */] = new ItemMetadata({
                     displayName: "Axe",
                     inventoryIconSupplier: function () { return Tilesets_3.Tilesets.instance.oneBit.getTileSource("axe"); },
@@ -4840,13 +4846,14 @@ System.register("game/items/Items", ["game/graphics/Tilesets", "engine/Entity", 
                     stackLimit: 1,
                     equippableWeapon: WeaponType_1.WeaponType.SPEAR
                 }),
-                _a[100023 /* BASIC_SHIELD */] = new ItemMetadata({
+                // Shields
+                _a[200000 /* BASIC_SHIELD */] = new ItemMetadata({
                     displayName: "Shield",
                     inventoryIconSupplier: function () { return Tilesets_3.Tilesets.instance.oneBit.getTileSource("shield0"); },
                     stackLimit: 1,
                     equippableShield: ShieldType_1.ShieldType.BASIC
                 }),
-                _a[100024 /* LANTERN */] = new ItemMetadata({
+                _a[200001 /* LANTERN */] = new ItemMetadata({
                     displayName: "Lantern",
                     inventoryIconSupplier: function () { return Tilesets_3.Tilesets.instance.oneBit.getTileSource("lantern"); },
                     stackLimit: 1,
@@ -6224,13 +6231,18 @@ System.register("game/items/CraftingRecipe", ["game/items/Inventory", "game/grap
             }
         ],
         execute: function () {
+            // TODO: Make it so recipes are unlocked over time
             exports_76("getDipRecipes", getDipRecipes = function () { return [{
                     icon: Tilesets_13.Tilesets.instance.oneBit.getTileAt(new point_36.Point(0, 7)),
-                    name: "Outdoor Furniture",
+                    name: "Utilities",
                     recipes: [{
                             desc: "Illuminates an area",
                             output: 4 /* CAMPFIRE */,
                             input: [new Inventory_1.ItemStack(1 /* ROCK */, DipIntro_1.ROCKS_NEEDED_FOR_CAMPFIRE), new Inventory_1.ItemStack(2 /* WOOD */, DipIntro_1.WOOD_NEEDED_FOR_CAMPFIRE)],
+                        }, {
+                            desc: "Stores junk",
+                            output: 10 /* CHEST */,
+                            input: [new Inventory_1.ItemStack(2 /* WOOD */, 10)],
                         }],
                 }, {
                     icon: Tilesets_13.Tilesets.instance.oneBit.getTileAt(new point_36.Point(10, 27)),
@@ -6249,7 +6261,7 @@ System.register("game/items/CraftingRecipe", ["game/items/Inventory", "game/grap
                             input: [new Inventory_1.ItemStack(1 /* ROCK */, 1), new Inventory_1.ItemStack(2 /* WOOD */, 3)],
                         }, {
                             desc: "Portable light source",
-                            output: 100024 /* LANTERN */,
+                            output: 200001 /* LANTERN */,
                             input: [new Inventory_1.ItemStack(5 /* IRON */, 2)],
                         }],
                 }, {
@@ -10783,7 +10795,7 @@ System.register("game/characters/DudeFactory", ["engine/Entity", "engine/point",
                             additionalComponents = [new Player_18.Player(), new CutscenePlayerController_1.CutscenePlayerController()];
                             window["player"] = additionalComponents[0];
                             defaultInventory.addItem(100003 /* SWORD */);
-                            defaultInventory.addItem(100023 /* BASIC_SHIELD */);
+                            defaultInventory.addItem(200000 /* BASIC_SHIELD */);
                             break;
                         }
                         case 1 /* DIP */: {

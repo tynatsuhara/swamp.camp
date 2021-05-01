@@ -17,13 +17,18 @@ export type CraftingRecipeCategory = {
     recipes: CraftingRecipe[],
 }
 
+// TODO: Make it so recipes are unlocked over time
 export const getDipRecipes = (): CraftingRecipeCategory[] => [{ 
     icon: Tilesets.instance.oneBit.getTileAt(new Point(0, 7)),
-    name: "Outdoor Furniture",
+    name: "Utilities",
     recipes: [{
         desc: "Illuminates an area",
         output: Item.CAMPFIRE,
         input: [new ItemStack(Item.ROCK, ROCKS_NEEDED_FOR_CAMPFIRE), new ItemStack(Item.WOOD, WOOD_NEEDED_FOR_CAMPFIRE)],
+    },{
+        desc: "Stores junk",
+        output: Item.CHEST,
+        input: [new ItemStack(Item.WOOD, 10)],
     }],
 },{ 
     icon: Tilesets.instance.oneBit.getTileAt(new Point(10, 27)),

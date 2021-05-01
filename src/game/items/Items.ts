@@ -53,7 +53,7 @@ export class ItemMetadata {
 }
 
 export const enum Item {
-    COIN, ROCK, WOOD, TENT, CAMPFIRE, IRON, HOUSE, ROUND_SAPLING, POINTY_SAPLING, MUSHROOM,
+    COIN, ROCK, WOOD, TENT, CAMPFIRE, IRON, HOUSE, ROUND_SAPLING, POINTY_SAPLING, MUSHROOM, CHEST,
 
     // weapon values should match the WeaponType enum so we can cast them
     KNIFE = WeaponType.KNIFE, 
@@ -78,7 +78,9 @@ export const enum Item {
     STAFF_2,
     SPEAR,
     PICKAXE,
-    BASIC_SHIELD,
+
+    // shield values should match the ShieldType enum so we can cast them
+    BASIC_SHIELD = ShieldType.BASIC,
     LANTERN,
 }
 
@@ -142,7 +144,13 @@ export const ITEM_METADATA_MAP = {
         element: ElementType.MUSHROOM,
         consumable: () => Player.instance.dude.heal(1)
     }),
-    // TODO add other weapons
+    [Item.CHEST]: new ItemMetadata({
+        displayName: "Chest",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("chest"), 
+        element: ElementType.CHEST
+    }),
+
+    // Weapons
     [Item.AXE]: new ItemMetadata({
         displayName: "Axe",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("axe"), 
@@ -167,6 +175,8 @@ export const ITEM_METADATA_MAP = {
         stackLimit: 1,
         equippableWeapon: WeaponType.SPEAR
     }),
+
+    // Shields
     [Item.BASIC_SHIELD]: new ItemMetadata({
         displayName: "Shield",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("shield0"), 
