@@ -5097,7 +5097,7 @@ System.register("game/ui/PlaceElementFrame", ["engine/component", "game/graphics
                 };
                 PlaceElementFrame.prototype.update = function (updateData) {
                     var mousePos = updateData.input.mousePos;
-                    var baseDist = 1.5;
+                    var baseDist = 2;
                     var maxDistX = Tilesets_4.TILE_SIZE * (baseDist + this.dimensions.x / 2);
                     var maxDistY = Tilesets_4.TILE_SIZE * (baseDist + this.dimensions.y / 2);
                     var playerPos = Player_5.Player.instance.dude.standingPosition.plusY(-Tilesets_4.TILE_SIZE / 2);

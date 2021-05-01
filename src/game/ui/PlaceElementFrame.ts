@@ -57,7 +57,7 @@ export class PlaceElementFrame extends Component {
 
     update(updateData: UpdateData) {
         const mousePos = updateData.input.mousePos
-        const baseDist = 1.5
+        const baseDist = 2
         const maxDistX = TILE_SIZE * (baseDist + this.dimensions.x/2)
         const maxDistY = TILE_SIZE * (baseDist + this.dimensions.y/2)
         const playerPos = Player.instance.dude.standingPosition.plusY(-TILE_SIZE/2)
