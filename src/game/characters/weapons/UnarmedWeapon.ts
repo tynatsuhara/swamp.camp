@@ -16,10 +16,6 @@ export class UnarmedWeapon extends Weapon {
         return WeaponType.UNARMED
     }
 
-    setDelayBetweenAttacks(delayMillis: number) {
-        this.delay = delayMillis
-    }
-
     isAttacking() {
         return this.state === State.ATTACKING
     }

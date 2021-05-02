@@ -1,9 +1,13 @@
 import { Component } from "../../engine/Component"
 import { UpdateData } from "../../engine/Engine"
 import { Point } from "../../engine/Point"
+import { RenderMethod } from "../../engine/renderer/RenderMethod"
+import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { Lists } from "../../engine/util/Lists"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
+import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
+import { HUD } from "../ui/HUD"
 import { ElementType } from "../world/elements/Elements"
 import { House } from "../world/elements/House"
 import { LocationManager } from "../world/LocationManager"
@@ -11,6 +15,8 @@ import { MapGenerator } from "../world/MapGenerator"
 import { OutdoorDarknessMask } from "../world/OutdoorDarknessMask"
 import { Teleporter } from "../world/Teleporter"
 import { TimeUnit } from "../world/TimeUnit"
+import { WorldTime } from "../world/WorldTime"
+import { EMPTY_DIALOGUE, getDialogue } from "./Dialogue"
 import { Dude } from "./Dude"
 import { NPCSchedule, NPCSchedules, NPCScheduleType } from "./NPCSchedule"
 import { Player } from "./Player"
@@ -229,12 +235,20 @@ export class NPC extends Component {
 
     private attackTarget: Dude
     private targetPath: Point[] = null
+    private aboutToAttack: boolean = false
+    get shouldShowAttackIndicator() {
+        return this.aboutToAttack
+    }
+    private static readonly PARRY_TIME = 400
+    private static readonly TIME_BETWEEN_ATTACKS = 1200
+    private nextAttackTime = WorldTime.instance.time + NPC.TIME_BETWEEN_ATTACKS * Math.random()
+
     private doAttack(updateData: UpdateData) {
         if (!this.dude.isAlive) {
             return
         }
 
-        if (!this.dude.weapon || !this.attackTarget || !this.targetPath || !this.attackTarget.isAlive) {
+        if (!this.dude.weapon || !this.attackTarget || !this.attackTarget.isAlive) {
             this.dude.move(updateData, Point.ZERO)
             return
         }
@@ -253,13 +267,24 @@ export class NPC extends Component {
         //     this.dude.move(updateData, new Point(0, 0))
         // }
 
-        if (!!this.dude.weapon && mag < this.dude.weapon.getRange() - 5 + this.dude.colliderSize.x/2) {
-            this.dude.weapon?.attack(true)
+        const inRangeAndArmed = mag < this.dude.weapon.getRange() + this.dude.colliderSize.x/2 - 5
+        const timeLeftUntilCanAttack = this.nextAttackTime - WorldTime.instance.time
+        this.aboutToAttack = inRangeAndArmed && this.attackTarget === Player.instance.dude && timeLeftUntilCanAttack < NPC.PARRY_TIME
+
+        // in range and armed
+        if (inRangeAndArmed && timeLeftUntilCanAttack <= 0) {
+            this.dude.weapon.attack(true)
+            this.nextAttackTime = Math.max(this.nextAttackTime, WorldTime.instance.time + NPC.TIME_BETWEEN_ATTACKS)
         } else {
-            this.dude.weapon?.cancelAttack()
+            this.dude.weapon.cancelAttack()
         }
 
-        if (this.targetPath.length === 0) {
+        // make sure they always wait at least PARRY_TIME once getting into range
+        if (!inRangeAndArmed && timeLeftUntilCanAttack > 0) {
+            this.nextAttackTime = Math.max(this.nextAttackTime, WorldTime.instance.time + NPC.PARRY_TIME)
+        }
+
+        if (!this.targetPath || this.targetPath.length === 0) {
             this.targetPath = this.findPath(pixelPtToTilePt(this.attackTarget.standingPosition), this.dude.standingPosition)
         }
         if (!this.targetPath || this.targetPath.length === 0) {

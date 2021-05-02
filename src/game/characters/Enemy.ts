@@ -40,10 +40,4 @@ export class Enemy extends Component {
             this.npc.isEnemyFn = d => d.isEnemy(this.dude)
         }
     }
-
-    update() {
-        if (this.dude.weapon) {
-            this.dude.weapon.setDelayBetweenAttacks(500)
-        }
-    }
 }

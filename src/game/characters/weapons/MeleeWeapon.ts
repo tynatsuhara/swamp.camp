@@ -24,7 +24,6 @@ export class MeleeWeapon extends Weapon {
     private state: State = State.DRAWN
     private slashSprite: TileComponent
     private _range: number
-    private delayBetweenAttacks = 0  // delay after the animation ends before the weapon can attack again in millis
 
     constructor(weaponType: WeaponType, weaponId: string, offsetFromCenter: Point) {
         super()
@@ -52,10 +51,6 @@ export class MeleeWeapon extends Weapon {
 
     getType() {
         return this.weaponType
-    }
-
-    setDelayBetweenAttacks(delayMs: number) {
-        this.delayBetweenAttacks = delayMs
     }
 
     isAttacking() {
@@ -150,9 +145,7 @@ export class MeleeWeapon extends Weapon {
             (index) => this.currentAnimationFrame = index, 
             () => {
                 this.animator = null
-                setTimeout(() => {
-                    this.state = State.DRAWN  // reset to DRAWN when animation finishes
-                }, this.delayBetweenAttacks)
+                this.state = State.DRAWN  // reset to DRAWN when animation finishes
             }
         ) 
     }

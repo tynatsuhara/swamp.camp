@@ -451,7 +451,13 @@ export class Dude extends Component implements DialogueSource {
 
     private getIndicator(): RenderMethod[] {
         let indicator = DudeInteractIndicator.NONE
-        if (!!this.dialogue && this.dialogue != EMPTY_DIALOGUE) {
+        if (!this.isAlive) {
+            return []
+        }
+        
+        if (this.entity.getComponent(NPC)?.shouldShowAttackIndicator) {
+            indicator = DudeInteractIndicator.ATTACKING
+        } else if (!!this.dialogue && this.dialogue != EMPTY_DIALOGUE) {
             indicator = getDialogue(this.dialogue).indicator
         }
 

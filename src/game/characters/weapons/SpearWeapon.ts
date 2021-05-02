@@ -24,7 +24,6 @@ export class SpearWeapon extends Weapon {
     private offsetFromCenter: Point
     private state: State = State.DRAWN
     private _range: number
-    private delayBetweenAttacks = 0  // delay after the animation ends before the weapon can attack again in millis
 
     private timeDrawn = 0;
 
@@ -56,10 +55,6 @@ export class SpearWeapon extends Weapon {
 
     getType() {
         return WeaponType.SPEAR
-    }
-
-    setDelayBetweenAttacks(delayMs: number) {
-        this.delayBetweenAttacks = delayMs
     }
 
     isAttacking() {
