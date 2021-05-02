@@ -150,13 +150,14 @@ export class OutdoorDarknessMask {
 
     private renderToOffscreenCanvas() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
+        this.updateColorForTime()
 
         const location = LocationManager.instance.currentLocation
+        
         if (this.darkness === 0) {
             return
         }
         
-        this.updateColorForTime()
         this.context.fillStyle = this.color
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
 
