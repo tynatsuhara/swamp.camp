@@ -187,7 +187,7 @@ const map = new Map(`
     big_zombie_idle_anim 16 270 32 34 4
     big_zombie_run_anim 144 270 32 34 4
 
-    ogre_idle_anim  16 320 32 32 4
+    ogre_idle_anim 16 320 32 32 4
     ogre_run_anim 144 320 32 32 4
     
     big_demon_idle_anim  16 364 32 36 4
