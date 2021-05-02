@@ -54,7 +54,7 @@ export class AnimatedTileComponent extends TileComponent {
     }
 
     // This won't currently refresh the animation
-    applyFilter(filter: (img: ImageData) => void) {
+    applyFilter(filter: (img: ImageData) => ImageData) {
         this.animations = this.animations.map(a => a?.filtered(filter))
     }
 }

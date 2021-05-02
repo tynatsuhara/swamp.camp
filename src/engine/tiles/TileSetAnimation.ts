@@ -25,7 +25,7 @@ export class TileSetAnimation implements TileSource {
         return new AnimatedTileComponent([this])
     }
 
-    filtered(filter: (img: ImageData) => void): TileSetAnimation {
+    filtered(filter: (img: ImageData) => ImageData): TileSetAnimation {
         return new TileSetAnimation(this.frames.map(f => [f[0].filtered(filter), f[1]]))
     }
 }
