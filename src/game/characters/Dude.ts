@@ -162,7 +162,7 @@ export class Dude extends Component implements DialogueSource {
 
     setWeapon(type: WeaponType) {
         this.weapon?.delete()
-        this._weapon = this.entity.addComponent(WeaponFactory.make(type))
+        this._weapon = this.entity.addComponent(WeaponFactory.make(type, this.type))
     }
 
     setShield(type: ShieldType) {

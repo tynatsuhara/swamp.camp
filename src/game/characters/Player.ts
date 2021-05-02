@@ -8,13 +8,14 @@ import { Lists } from "../../engine/util/Lists"
 import { StepSounds } from "../audio/StepSounds"
 import { Controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
-import { pixelPtToTilePt } from "../graphics/Tilesets"
+import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { PlaceElementDisplay } from "../ui/PlaceElementDisplay"
 import { UIStateManager } from "../ui/UIStateManager"
 import { ElementType } from "../world/elements/Elements"
 import { Interactable } from "../world/elements/Interactable"
 import { LocationManager } from "../world/LocationManager"
+import { MapGenerator } from "../world/MapGenerator"
 import { Dude } from "./Dude"
 import { DudeFactory, DudeType } from "./DudeFactory"
 
@@ -125,7 +126,7 @@ export class Player extends Component {
         if (debug.enableDevControls) {
             const mouseTilePos = pixelPtToTilePt(updateData.input.mousePos)
             if (updateData.input.isKeyDown(InputKey.O)) {
-                DudeFactory.instance.new(DudeType.ORC_WARRIOR, updateData.input.mousePos)
+                DudeFactory.instance.new(DudeType.ORC_BRUTE, updateData.input.mousePos)
             }
             if (updateData.input.isKeyDown(InputKey.P)) {
                 DudeFactory.instance.new(DudeType.HORNED_DEMON, updateData.input.mousePos)
@@ -141,6 +142,12 @@ export class Player extends Component {
                     text: "ORC ATTACK!",
                     icon: "sword",
                 })
+                Lists.range(0, 5 + Math.random() * 15).forEach(() => 
+                    DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE))
+                )
+                Lists.range(0, 1 + Math.random() * 4).forEach(() => 
+                    DudeFactory.instance.new(DudeType.ORC_BRUTE, new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE))
+                )
             }
             if (updateData.input.isKeyDown(InputKey.COMMA)) {
                 LocationManager.instance.currentLocation.addElement(ElementType.CHEST, mouseTilePos)
