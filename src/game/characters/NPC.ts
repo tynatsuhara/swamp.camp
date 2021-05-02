@@ -239,9 +239,9 @@ export class NPC extends Component {
     get attackIndicator() {
         return this._attackIndicator
     }
-    private static readonly PARRY_TIME = 400
-    private static readonly TIME_BETWEEN_ATTACKS = 1200
-    private nextAttackTime = WorldTime.instance.time + NPC.TIME_BETWEEN_ATTACKS * Math.random()
+    private readonly PARRY_TIME = 300 + Math.random() * 200
+    private readonly TIME_BETWEEN_ATTACKS = 1000 + Math.random() * 400
+    private nextAttackTime = WorldTime.instance.time + this.TIME_BETWEEN_ATTACKS * Math.random()
 
     private doAttack(updateData: UpdateData) {
         if (!this.dude.isAlive) {
@@ -270,8 +270,8 @@ export class NPC extends Component {
         const inRangeAndArmed = mag < this.dude.weapon.getRange() + this.dude.colliderSize.x/2 - 5
         const timeLeftUntilCanAttack = this.nextAttackTime - WorldTime.instance.time
         
-        if (inRangeAndArmed && this.attackTarget === Player.instance.dude && timeLeftUntilCanAttack < NPC.PARRY_TIME) {
-            this._attackIndicator = timeLeftUntilCanAttack < NPC.PARRY_TIME/2 
+        if (inRangeAndArmed && this.attackTarget === Player.instance.dude && timeLeftUntilCanAttack < this.PARRY_TIME) {
+            this._attackIndicator = timeLeftUntilCanAttack < this.PARRY_TIME/2 
                     ? DudeInteractIndicator.ATTACKING_NOW 
                     : DudeInteractIndicator.ATTACKING_SOON
         } else {
@@ -281,14 +281,14 @@ export class NPC extends Component {
         // in range and armed
         if (inRangeAndArmed && timeLeftUntilCanAttack <= 0) {
             this.dude.weapon.attack(true)
-            this.nextAttackTime = Math.max(this.nextAttackTime, WorldTime.instance.time + NPC.TIME_BETWEEN_ATTACKS)
+            this.nextAttackTime = Math.max(this.nextAttackTime, WorldTime.instance.time + this.TIME_BETWEEN_ATTACKS)
         } else {
             this.dude.weapon.cancelAttack()
         }
 
         // make sure they always wait at least PARRY_TIME once getting into range
         if (!inRangeAndArmed && timeLeftUntilCanAttack > 0) {
-            this.nextAttackTime = Math.max(this.nextAttackTime, WorldTime.instance.time + NPC.PARRY_TIME)
+            this.nextAttackTime = Math.max(this.nextAttackTime, WorldTime.instance.time + this.PARRY_TIME)
         }
 
         if (!this.targetPath || this.targetPath.length === 0) {

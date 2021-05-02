@@ -22,13 +22,11 @@ export class Player extends Component {
 
     static instance: Player
     
-    private crosshairs: TileComponent
-    private lerpedLastMoveDir: Point = new Point(1, 0)  // used for crosshair
+    // private crosshairs: TileComponent
+    // private lerpedLastMoveDir: Point = new Point(1, 0)  // used for crosshair
     private rollingMomentum: Point
     private _dude: Dude
     get dude() { return this._dude }
-
-    private footstep: HTMLAudioElement
 
     constructor() {
         super()
