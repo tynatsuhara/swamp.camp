@@ -132,6 +132,9 @@ export class Player extends Component {
             if (updateData.input.isKeyDown(InputKey.P)) {
                 DudeFactory.instance.new(DudeType.HORNED_DEMON, updateData.input.mousePos)
             }
+            if (updateData.input.isKeyDown(InputKey.B)) {
+                DudeFactory.instance.new(DudeType.BEAR, updateData.input.mousePos)
+            }
             if (updateData.input.isKeyDown(InputKey.SEMICOLON)) {
                 DudeFactory.instance.new(DudeType.SHROOM, updateData.input.mousePos)
             }

@@ -21,9 +21,27 @@ const maybeFilter = (characterAnimName: string, blob: object, anim: TileSetAnima
     return anim
 }
 
+const getIdleAnimationSpeed = (characterAnimName: string) => {
+    switch (characterAnimName) {
+        case "Bear":
+            return 180
+        default:
+            return 150
+    }
+}
+
+const getWalkAnimationSpeed = (characterAnimName: string) => {
+    switch (characterAnimName) {
+        case "Bear":
+            return 110
+        default:
+            return 80
+    }
+}
+
 export const DudeAnimationUtils = {
     getCharacterIdleAnimation: (characterAnimName: string, blob: object): TileSetAnimation => {
-        const animSpeed = 150
+        const animSpeed = getIdleAnimationSpeed(characterAnimName)
         const anim = Tilesets.instance.dungeonCharacters.getTileSetAnimation(`${characterAnimName}_idle_anim`, animSpeed) 
                   || Tilesets.instance.extraCharacterSet1.getTileSetAnimation(`${characterAnimName}_Idle`, 4, animSpeed)
                   || Tilesets.instance.extraCharacterSet2.getIdleAnimation(characterAnimName, animSpeed)
@@ -32,7 +50,7 @@ export const DudeAnimationUtils = {
     },
 
     getCharacterWalkAnimation: (characterAnimName: string, blob: object): TileSetAnimation => {
-        const animSpeed = 80
+        const animSpeed = getWalkAnimationSpeed(characterAnimName)
         const anim = Tilesets.instance.dungeonCharacters.getTileSetAnimation(`${characterAnimName}_run_anim`, animSpeed) 
                   || Tilesets.instance.extraCharacterSet1.getTileSetAnimation(`${characterAnimName}_Walk`, 4, animSpeed)
                   || Tilesets.instance.extraCharacterSet2.getWalkAnimation(characterAnimName, animSpeed)

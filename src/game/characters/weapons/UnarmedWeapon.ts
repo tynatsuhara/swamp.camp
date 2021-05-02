@@ -1,3 +1,4 @@
+import { DudeType } from "../DudeFactory"
 import { Weapon } from "./Weapon"
 import { WeaponType } from "./WeaponType"
 
@@ -45,8 +46,21 @@ export class UnarmedWeapon extends Weapon {
         const closestEnemy = enemies[0]
         const attackDir = closestEnemy.standingPosition.minus(this.dude.standingPosition)
         this.dude.knockback(attackDir, 30)  // pounce
-        closestEnemy.damage(1, closestEnemy.standingPosition.minus(this.dude.standingPosition), 50)
+        closestEnemy.damage(
+            this.getDamageAmount(), 
+            closestEnemy.standingPosition.minus(this.dude.standingPosition), 
+            50
+        )
 
         setTimeout(() => this.state = State.DRAWN, this.delay)
+    }
+
+    private getDamageAmount() {
+        switch (this.dude.type) {
+            case DudeType.BEAR:
+                return 3
+            default:
+                return 1
+        }
     }
 }

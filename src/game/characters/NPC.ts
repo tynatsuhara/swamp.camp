@@ -253,7 +253,7 @@ export class NPC extends Component {
         //     this.dude.move(updateData, new Point(0, 0))
         // }
 
-        if (mag < this.dude.weapon?.getRange()) {
+        if (!!this.dude.weapon && mag < this.dude.weapon.getRange() - 5 + this.dude.colliderSize.x/2) {
             this.dude.weapon?.attack(true)
         } else {
             this.dude.weapon?.cancelAttack()

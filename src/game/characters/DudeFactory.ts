@@ -30,6 +30,7 @@ export const enum DudeFaction {
     SHROOMS,
     CENTAURS,
     GNOLLS,
+    BEARS,
 }
 
 export const enum DudeType {
@@ -41,7 +42,8 @@ export const enum DudeType {
     HORNED_DEMON,
     SHROOM,
     VILLAGER,
-    CENTAUR
+    CENTAUR,
+    BEAR,
 }
 
 export class DudeFactory {
@@ -89,6 +91,7 @@ export class DudeFactory {
         let additionalComponents: Component[] = []
         let blob = {}
         const defaultInventory = new Inventory()
+        let colliderSize = new Point(10, 8)
 
         // type-specific defaults
         switch(type) {
@@ -176,6 +179,15 @@ export class DudeFactory {
                 maxHealth = 2
                 speed *= .5
                 break
+            case DudeType.BEAR:
+                factions = [DudeFaction.BEARS]
+                animationName = "Bear"
+                weapon = WeaponType.UNARMED
+                additionalComponents = [new NPC(), new Enemy()]
+                maxHealth = 5
+                speed *= .5
+                colliderSize = colliderSize.times(1.5)
+                break
             default: {
                 throw new Error(`DudeType ${type} can't be instantiated`)
             }
@@ -196,6 +208,7 @@ export class DudeFactory {
             !!saveState?.inventory ? Inventory.load(saveState.inventory) : defaultInventory,
             saveState?.dialogue ?? dialogue,
             saveState?.blob ?? blob,
+            colliderSize,
         )
 
         new Entity([d as Component].concat(additionalComponents))

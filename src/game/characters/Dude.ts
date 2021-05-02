@@ -59,6 +59,9 @@ export class Dude extends Component implements DialogueSource {
 
     private collider: BoxCollider
     private relativeColliderPos: Point = new Point(3, 15)
+    get colliderSize() { 
+        return this.collider.dimensions
+     }
     
     private _position: Point
     get position(): Point {
@@ -90,6 +93,7 @@ export class Dude extends Component implements DialogueSource {
         inventory: Inventory,
         dialogue: string,
         blob: object,
+        colliderSize: Point,
     ) {
         super()
         this.uuid = uuid
@@ -119,8 +123,6 @@ export class Dude extends Component implements DialogueSource {
             this.setShield(shieldType)
 
             // Set up collider
-            // TODO: Add collider size options for tiny and large enemies
-            const colliderSize = new Point(10, 8)
             this.relativeColliderPos = new Point(
                 this.animation.transform.dimensions.x/2 - colliderSize.x/2, 
                 this.animation.transform.dimensions.y - colliderSize.y
