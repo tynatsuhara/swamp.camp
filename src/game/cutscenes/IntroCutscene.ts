@@ -31,10 +31,7 @@ export class IntroCutscene extends Component {
      * 2. player walks in
      * 3. camera pan to DIP
      * 4. camera pan back to player
-     * TODO later (maybe in a separate mechanism?):
-     * 5. combat tutorial
-     * ...
-     * N. Once enemies are dead, progress StoryState and autosave
+     * 5. show combat UI
      */
 
     start(startData: StartData) {

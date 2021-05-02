@@ -10,22 +10,23 @@ import { LocationManager } from "../world/LocationManager"
 import { DudeType } from "../characters/DudeFactory"
 import { Camera } from "../cutscenes/Camera"
 
-export class OffScreenMarker extends Component {
+export class OffScreenIndicator extends Component {
 
     private markerDistFromEdge = 12 + TILE_SIZE
     private tileSource: string
     private tilePoint: Point
+    private positionSupplier: () => Point
+
+    constructor(positionSupplier: () => Point) {
+        super()
+        this.positionSupplier = positionSupplier
+    }
 
     update(updateData: UpdateData) {
         const cameraPos = Camera.instance.position
         const cameraDimensions = updateData.dimensions
 
-        // TODO make this configurable
-        const dips = Array.from(LocationManager.instance.currentLocation.dudes).filter(d => d.type === DudeType.DIP).map(d => d.standingPosition)
-        if (dips.length === 0) {
-            return
-        }
-        const point = dips[0]
+        const point = this.positionSupplier()
 
         if (rectContains(cameraPos, cameraDimensions, point)) {
             this.tileSource = null

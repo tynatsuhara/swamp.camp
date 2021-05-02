@@ -193,28 +193,35 @@ export class WorldLocation {
             } 
         }, 200);
 
+        // load a new location
         HUD.instance.locationTransition.transition(() => {
             const linkedLocation = LocationManager.instance.get(to)
             const linkedPosition = this.getTeleporterLinkedPos(to, id)
             
+            // move the player to the new location's dude store
             const p = Player.instance.dude
             const beforeTeleportPos = p.standingPosition
             this.dudes.delete(p)
             linkedLocation.dudes.add(p)
             p.location = linkedLocation
+
+            // update carried light sources
             if (p.shieldType === ShieldType.LANTERN) {
                 (p.shield as Lantern).removeLight()
             }
+
+            // refresh the HUD hide stale data
+            HUD.instance.refresh()
     
+            // actually set the location
             LocationManager.instance.currentLocation = linkedLocation
     
             // fast-forward NPCs along their schedule
             linkedLocation.dudes.forEach(d => d.entity.getComponent(NPC)?.simulate())
     
-            // move player
+            // position the player and camera
             const offset = p.standingPosition.minus(p.position)
             p.moveTo(linkedPosition.minus(offset), true)
-    
             Camera.instance.jump(beforeTeleportPos.minus(p.standingPosition))
         })
     }

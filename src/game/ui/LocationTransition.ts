@@ -34,6 +34,9 @@ const makeCircle = (context: CanvasRenderingContext2D, radius: number, centerPos
 const FRAMES = 12
 const SPEED = 30
 
+/**
+ * Animation that plays when going through a doorway
+ */
 export class LocationTransition extends Component {
 
     private animator: Animator

@@ -14,6 +14,7 @@ import { Item, spawnItem } from "../items/Items"
 import { DudeSaveState } from "../saves/DudeSaveState"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
+import { HUD } from "../ui/HUD"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Interactable } from "../world/elements/Interactable"
 import { WorldLocation } from "../world/WorldLocation"
@@ -451,6 +452,15 @@ export class Dude extends Component implements DialogueSource {
         if (!!this.dialogue && this.dialogue != EMPTY_DIALOGUE) {
             indicator = getDialogue(this.dialogue).indicator
         }
+
+        // Update off screen indicator
+        if (indicator === DudeInteractIndicator.IMPORTANT_DIALOGUE) {
+            HUD.instance.addIndicator(this, () => this.standingPosition)
+        } else {
+            HUD.instance.removeIndicator(this)
+        }
+
+        // render indicator icon overhead
         let tile: StaticTileSource = DudeInteractIndicator.getTile(indicator)
         if (!tile || this.dialogueInteract?.isShowingUI || DialogueDisplay.instance.dialogueSource === this) {
             return []

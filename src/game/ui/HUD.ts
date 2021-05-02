@@ -5,7 +5,7 @@ import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Dude } from "../characters/Dude"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { LocationTransition } from "./LocationTransition"
-import { OffScreenMarker } from "./OffScreenMarker"
+import { OffScreenIndicatorManager } from "./OffScreenIndicatorManager"
 
 export class HUD {
 
@@ -17,6 +17,7 @@ export class HUD {
     )
     private isShowingAutosaveIcon = false
     private readonly offset = new Point(4, 4)
+    private readonly offScreenIndicatorManager = new OffScreenIndicatorManager()
 
     // used for determining what should be updated
     private lastHealthCount = 0
@@ -24,15 +25,20 @@ export class HUD {
 
     readonly locationTransition = new Entity().addComponent(new LocationTransition())
 
-    // TODO show this dynamically
-    private offScreenMarker: OffScreenMarker = this.autosaveComponent.entity.addComponent(
-        new OffScreenMarker()
-    )
-
-
-
     constructor() {
         HUD.instance = this
+    }
+
+    addIndicator(key: any, positionSupplier: () => Point) {
+        this.offScreenIndicatorManager.addIndicator(key, positionSupplier)
+    }
+
+    removeIndicator(key: any) {
+        this.offScreenIndicatorManager.removeIndicator(key)
+    }
+
+    refresh() {
+        this.offScreenIndicatorManager.clear()
     }
 
     getEntities(player: Dude, screenDimensions: Point, elapsedMillis: number): Entity[] {
@@ -42,7 +48,8 @@ export class HUD {
         return [
             this.heartsEntity, 
             this.autosaveComponent.entity, 
-            this.locationTransition.entity
+            this.locationTransition.entity,
+            this.offScreenIndicatorManager.getEntity(),
         ]
     }
 
