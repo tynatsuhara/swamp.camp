@@ -47,15 +47,12 @@ export class Inventory {
         const stackLimit = ITEM_METADATA_MAP[item].stackLimit
 
         let leftToAdd = count
-        console.log(leftToAdd)
 
         // First, add to existing stacks to preserve space
         for (let i = 0; i < this.stacks.length && leftToAdd > 0; i++) {
-            console.log(i)
             const slotValue = this.stacks[i]
             if (slotValue?.item === item) {
                 const addedHere = Math.min(stackLimit - slotValue.count, leftToAdd)
-                console.log(`add ${addedHere} to stack`)
                 slotValue.count += addedHere
                 leftToAdd -= addedHere
             }
@@ -63,11 +60,9 @@ export class Inventory {
 
         // Then add to empty slots
         for (let i = 0; i < this.stacks.length && leftToAdd > 0; i++) {
-            console.log(i)
             const slotValue = this.stacks[i]
             if (!slotValue) {
                 const addedHere = Math.min(stackLimit, leftToAdd)
-                console.log(`new stack of ${addedHere}`)
                 leftToAdd -= addedHere
                 this.stacks[i] = new ItemStack(item, addedHere)
             }
