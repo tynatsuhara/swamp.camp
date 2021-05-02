@@ -235,9 +235,9 @@ export class NPC extends Component {
 
     private attackTarget: Dude
     private targetPath: Point[] = null
-    private aboutToAttack: boolean = false
-    get shouldShowAttackIndicator() {
-        return this.aboutToAttack
+    private _attackIndicator
+    get attackIndicator() {
+        return this._attackIndicator
     }
     private static readonly PARRY_TIME = 400
     private static readonly TIME_BETWEEN_ATTACKS = 1200
@@ -269,7 +269,14 @@ export class NPC extends Component {
 
         const inRangeAndArmed = mag < this.dude.weapon.getRange() + this.dude.colliderSize.x/2 - 5
         const timeLeftUntilCanAttack = this.nextAttackTime - WorldTime.instance.time
-        this.aboutToAttack = inRangeAndArmed && this.attackTarget === Player.instance.dude && timeLeftUntilCanAttack < NPC.PARRY_TIME
+        
+        if (inRangeAndArmed && this.attackTarget === Player.instance.dude && timeLeftUntilCanAttack < NPC.PARRY_TIME) {
+            this._attackIndicator = timeLeftUntilCanAttack < NPC.PARRY_TIME/2 
+                    ? DudeInteractIndicator.ATTACKING_NOW 
+                    : DudeInteractIndicator.ATTACKING_SOON
+        } else {
+            this._attackIndicator = DudeInteractIndicator.NONE
+        }
 
         // in range and armed
         if (inRangeAndArmed && timeLeftUntilCanAttack <= 0) {
