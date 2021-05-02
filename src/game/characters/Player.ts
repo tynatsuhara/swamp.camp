@@ -104,6 +104,7 @@ export class Player extends Component {
         }
 
         if (updateData.input.isKeyDown(InputKey.F)) {
+            // todo: these could get out of sync if one is null
             this.dude.weapon.toggleSheathed()
             this.dude.shield.toggleOnBack()
         }
@@ -113,9 +114,9 @@ export class Player extends Component {
         }
 
         if (updateData.input.isKeyHeld(Controls.attackKey) && !updateData.input.isKeyHeld(Controls.blockKey)) {
-            this.dude.weapon.attack(updateData.input.isKeyDown(Controls.attackKey))
+            this.dude.weapon?.attack(updateData.input.isKeyDown(Controls.attackKey))
         } else {
-            this.dude.weapon.cancelAttack()
+            this.dude.weapon?.cancelAttack()
         }
 
         if (updateData.input.isKeyDown(Controls.interactButton) && !!possibleInteractable) {

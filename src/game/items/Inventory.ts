@@ -38,48 +38,61 @@ export class Inventory {
     /**
      * returns true if the item can fit in the inventory
      */
-    addItem(item: Item): boolean {
-        let firstEmptySlot = -1
-        for (let i = 0; i < this.stacks.length; i++) {
+    addItem(item: Item, count: number = 1): boolean {
+        const canAdd = this.canAddItem(item, count)
+        if (!canAdd) {
+            return false
+        }
+
+        const stackLimit = ITEM_METADATA_MAP[item].stackLimit
+
+        let leftToAdd = count
+        console.log(leftToAdd)
+
+        // First, add to existing stacks to preserve space
+        for (let i = 0; i < this.stacks.length && leftToAdd > 0; i++) {
+            console.log(i)
             const slotValue = this.stacks[i]
-            if (!!slotValue) {
-                if (slotValue.item === item && slotValue.count < ITEM_METADATA_MAP[item].stackLimit) {
-                    slotValue.count++
-                    this.countMap.set(item, 1 + (this.countMap.get(item) ?? 0))
-                    return true
-                }
-            } else if (firstEmptySlot === -1) {
-                firstEmptySlot = i
+            if (slotValue?.item === item) {
+                const addedHere = Math.min(stackLimit - slotValue.count, leftToAdd)
+                console.log(`add ${addedHere} to stack`)
+                slotValue.count += addedHere
+                leftToAdd -= addedHere
             }
         }
 
-        if (firstEmptySlot !== -1) {
-            this.stacks[firstEmptySlot] = new ItemStack(item, 1)
-            this.countMap.set(item, 1 + (this.countMap.get(item) ?? 0))
-            return true
+        // Then add to empty slots
+        for (let i = 0; i < this.stacks.length && leftToAdd > 0; i++) {
+            console.log(i)
+            const slotValue = this.stacks[i]
+            if (!slotValue) {
+                const addedHere = Math.min(stackLimit, leftToAdd)
+                console.log(`new stack of ${addedHere}`)
+                leftToAdd -= addedHere
+                this.stacks[i] = new ItemStack(item, addedHere)
+            }
         }
 
-        return false
+        this.recomputeCountsMap()
+
+        return true
     }
 
-    canAddItem(item: Item): boolean {
-        let firstEmptySlot = -1
-        for (let i = 0; i < this.stacks.length; i++) {
+    canAddItem(item: Item, count: number = 1): boolean {
+        const stackLimit = ITEM_METADATA_MAP[item].stackLimit
+
+        let availableRoom = 0
+
+        for (let i = 0; i < this.stacks.length && availableRoom < count; i++) {
             const slotValue = this.stacks[i]
-            if (!!slotValue) {
-                if (slotValue.item === item && slotValue.count < ITEM_METADATA_MAP[item].stackLimit) {
-                    return true
-                }
-            } else if (firstEmptySlot === -1) {
-                firstEmptySlot = i
+            if (!slotValue) {
+                availableRoom += stackLimit
+            } else if (slotValue.item === item) {
+                availableRoom += (stackLimit - slotValue.count)
             }
         }
 
-        if (firstEmptySlot !== -1) {
-            return true
-        }
-
-        return false
+        return availableRoom >= count
     }
 
     removeItem(item: Item, count: number = 1) {

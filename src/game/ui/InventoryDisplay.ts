@@ -10,12 +10,13 @@ import { NineSlice } from "../../engine/tiles/NineSlice"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Player } from "../characters/Player"
+import { ShieldType } from "../characters/weapons/ShieldType"
 import { WeaponType } from "../characters/weapons/WeaponType"
 import { Controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Inventory } from "../items/Inventory"
-import { ITEM_METADATA_MAP } from "../items/Items"
+import { Item, ITEM_METADATA_MAP } from "../items/Items"
 import { saveManager } from "../SaveManager"
 import { LocationManager } from "../world/LocationManager"
 import { Color } from "./Color"
@@ -72,6 +73,24 @@ export class InventoryDisplay extends Component {
             return
         }
 
+        const refreshView = () => this.show(this.onClose, this.tradingInv)
+        const canRemoveFromPlayerInv = (item: Item) => {
+            if (this.playerInv.getItemCount(item) === 1) {
+                // unequip equipped weapons
+                const weapon: WeaponType = WeaponType[WeaponType[item]]
+                if (!!weapon && Player.instance.dude.weaponType === weapon) {
+                    return false
+                }
+
+                // unequip equipped shields
+                const shield: ShieldType = ShieldType[ShieldType[item]]
+                if (!!shield && Player.instance.dude.shieldType === shield) {
+                    return false
+                }
+            }
+            return true
+        }
+
         const hoverResult = this.getHoveredInventoryIndex(updateData.input.mousePos)
         const hoverInv = hoverResult[0]
         const hoverIndex = hoverResult[1]
@@ -79,19 +98,12 @@ export class InventoryDisplay extends Component {
         if (!!this.trackedTile) {  // dragging
             this.tooltip.clear()
             if (updateData.input.isMouseUp) {  // drop n swap
-                let canDeposit = true
                 if (hoverIndex !== -1) {
+                    // Swap the stacks
                     const draggedValue = this.trackedTileInventory.getStack(this.trackedTileIndex)
 
-                    // Don't let players store their currently equipped gear
-                    if (this.trackedTileInventory === this.playerInv && hoverInv === this.tradingInv) {
-                        if (!!WeaponType[draggedValue.item] && this.playerInv.getItemCount(draggedValue.item) === draggedValue.count) {
-                            canDeposit = false
-                        }
-                    }
-
                     // Swap the stacks
-                    if (canDeposit) {
+                    if (hoverInv === this.playerInv || canRemoveFromPlayerInv(draggedValue.item)) {
                         const currentlyOccupiedSpotValue = hoverInv.getStack(hoverIndex)
                         hoverInv.setStack(hoverIndex, draggedValue)
                         this.trackedTileInventory.setStack(this.trackedTileIndex, currentlyOccupiedSpotValue)
@@ -101,8 +113,7 @@ export class InventoryDisplay extends Component {
                 this.trackedTileInventory = null
                 this.trackedTile = null
 
-                // refresh view
-                this.show(this.onClose, this.tradingInv)
+                refreshView()
             } else {  // track
                 this.trackedTile.transform.position = this.trackedTile.transform.position.plus(updateData.input.mousePos.minus(this.lastMousPos))
             }
@@ -122,45 +133,48 @@ export class InventoryDisplay extends Component {
                 }
             }
 
-            if (item.element !== null && LocationManager.instance.currentLocation.allowPlacing) {
-                actions.push({
-                    verb: 'place',
-                    actionFn: () => {
-                        this.close()
-                        PlaceElementDisplay.instance.startPlacing(
-                            item.element, 
-                            decrementStack,
-                            stack.count
-                        )
-                    }
-                })
-            }
-            if (!!item.equippableWeapon && Player.instance.dude.weaponType !== item.equippableWeapon) {
-                actions.push({
-                    verb: 'equip',
-                    actionFn: () => {
-                        this.close()
-                        Player.instance.dude.setWeapon(item.equippableWeapon)
-                    }
-                })
-            }
-            if (!!item.equippableShield && Player.instance.dude.shieldType !== item.equippableShield) {
-                actions.push({
-                    verb: 'equip off-hand',
-                    actionFn: () => {
-                        this.close()
-                        Player.instance.dude.setShield(item.equippableShield)
-                    }
-                })
-            }
-            if (!!item.consumable) {
-                actions.push({
-                    verb: 'eat',
-                    actionFn: () => {
-                        item.consumable()
-                        decrementStack()
-                    }
-                })
+            // Only allow actions when in the inventory menu
+            if (!this.tradingInv) {
+                if (item.element !== null && LocationManager.instance.currentLocation.allowPlacing) {
+                    actions.push({
+                        verb: 'place',
+                        actionFn: () => {
+                            this.close()
+                            PlaceElementDisplay.instance.startPlacing(
+                                item.element, 
+                                decrementStack,
+                                stack.count
+                            )
+                        }
+                    })
+                }
+                if (!!item.equippableWeapon && Player.instance.dude.weaponType !== item.equippableWeapon) {
+                    actions.push({
+                        verb: 'equip',
+                        actionFn: () => {
+                            this.close()
+                            Player.instance.dude.setWeapon(item.equippableWeapon)
+                        }
+                    })
+                }
+                if (!!item.equippableShield && Player.instance.dude.shieldType !== item.equippableShield) {
+                    actions.push({
+                        verb: 'equip off-hand',
+                        actionFn: () => {
+                            this.close()
+                            Player.instance.dude.setShield(item.equippableShield)
+                        }
+                    })
+                }
+                if (!!item.consumable) {
+                    actions.push({
+                        verb: 'eat',
+                        actionFn: () => {
+                            item.consumable()
+                            decrementStack()
+                        }
+                    })
+                }
             }
 
             // We currently only support up to 2 interaction types per item
@@ -191,11 +205,23 @@ export class InventoryDisplay extends Component {
             this.lastMousPos = updateData.input.mousePos
 
             if (updateData.input.isMouseDown) {
-                if (!!hoverInv && !!hoverInv.getStack(hoverIndex)) {
-                    this.trackedTileInventory = hoverInv
-                    // some stupid math to account for the fact that this.tiles contains tiles from potentially two inventories
-                    this.trackedTile = this.tiles[hoverIndex + (hoverInv === this.playerInv ? 0 : this.playerInv.size)]
-                    this.trackedTileIndex = hoverIndex
+                const hoveredItemStack = hoverInv?.getStack(hoverIndex)
+                if (!!hoveredItemStack) {
+                    const { item, count } = hoveredItemStack
+                    const otherInv = hoverInv === this.playerInv ? this.tradingInv : this.playerInv
+                    if (!!otherInv 
+                            && updateData.input.isKeyHeld(InputKey.SHIFT) 
+                            && otherInv.canAddItem(item, count)
+                            && canRemoveFromPlayerInv(item)) {
+                        hoverInv.removeItem(item, count)
+                        otherInv.addItem(item, count)
+                        refreshView()
+                    } else {
+                        this.trackedTileInventory = hoverInv
+                        // some stupid math to account for the fact that this.tiles contains tiles from potentially two inventories
+                        this.trackedTile = this.tiles[hoverIndex + (hoverInv === this.playerInv ? 0 : this.playerInv.size)]
+                        this.trackedTileIndex = hoverIndex
+                    }
                 }
             }
         }
