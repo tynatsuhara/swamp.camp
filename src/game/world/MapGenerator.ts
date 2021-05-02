@@ -40,10 +40,11 @@ export class MapGenerator {
 
         this.spawnTreesAtEdge()
         this.spawnTrees()
-        this.spawnRocks()
+        this.spawn(ElementType.ROCK, 15 + Math.random() * 10)
         this.clearPathToCenter()
 
         // TODO short trees, bushes, fruit, tall grass, etc
+        this.spawn(ElementType.MUSHROOM, 5 + Math.random() * 10)
 
         // spawn grass last, stuff checks for existing paths prior to this by the lack of ground items
         this.placeGrass()
@@ -127,15 +128,15 @@ export class MapGenerator {
         }
     }
 
-    spawnRocks() {
-        let placedRocks = 0
-        while (placedRocks < 20) {
+    private spawn(element: ElementType, count: number) {
+        let placed = 0
+        while (placed < count) {
             const p = new Point(
                 Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_SIZE/2,
                 Math.floor(Math.random() * (MapGenerator.MAP_SIZE)) - MapGenerator.MAP_SIZE/2,
             )
-            if (!this.location.ground.get(p) && this.location.addElement(ElementType.ROCK, p)) {
-                placedRocks++
+            if (!this.location.ground.get(p) && this.location.addElement(element, p)) {
+                placed++
             }
         }
     }
