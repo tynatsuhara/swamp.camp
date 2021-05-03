@@ -43,7 +43,7 @@ export const BERTO_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
         ["Good morrow! I, Sir Berto of Dube, present myself unto thee as an emissary of The Honourable King Bob XVIII.",
         "Should thy choose to collect raw materials, I will purchase them on behalf of The Kingdom.",
         "Upon receipt of a fee and construction of an appropriate dwelling, I can also bring tax-paying subjects to populate thy settlement.",
-        "Tradesmen! Knights! Worthless peons to scrub latrines and polish thy armor!",
+        "Tradesmen! Knights! Worthless peons to scrub latrines and polish thine armor!",
         "Art thou interested in any of my services at the moment?"],
         DudeInteractIndicator.IMPORTANT_DIALOGUE,
         option("Sure!", BERT_MENU, true),
