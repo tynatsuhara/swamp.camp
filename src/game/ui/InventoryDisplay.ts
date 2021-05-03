@@ -152,8 +152,8 @@ export class InventoryDisplay extends Component {
                     actions.push({
                         verb: 'equip',
                         actionFn: () => {
-                            this.close()
                             Player.instance.dude.setWeapon(item.equippableWeapon)
+                            refreshView()
                         }
                     })
                 }
@@ -161,8 +161,8 @@ export class InventoryDisplay extends Component {
                     actions.push({
                         verb: 'equip off-hand',
                         actionFn: () => {
-                            this.close()
                             Player.instance.dude.setShield(item.equippableShield)
+                            refreshView()
                         }
                     })
                 }
@@ -172,6 +172,7 @@ export class InventoryDisplay extends Component {
                         actionFn: () => {
                             item.consumable()
                             decrementStack()
+                            refreshView()
                         }
                     })
                 }
