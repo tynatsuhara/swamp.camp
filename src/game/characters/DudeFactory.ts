@@ -167,7 +167,7 @@ export class DudeFactory {
                 weapon = WeaponType.STAFF_1
                 additionalComponents = [new NPC(), new Enemy()]
                 maxHealth = 2
-                speed *= (.3 + Math.random()/2)
+                speed *= (.4 + Math.random()/4)
                 break
             }
             case DudeType.HORNED_DEMON: {

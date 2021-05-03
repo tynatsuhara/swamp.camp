@@ -58,7 +58,7 @@ export class StaffWeapon extends Weapon {
     }
 
     getStoppingDistance() {
-        return TILE_SIZE * 6
+        return TILE_SIZE * 8
     }
 
     getMillisBetweenAttacks() {

@@ -285,6 +285,11 @@ export class NPC extends Component {
             this.nextAttackTime = Math.max(this.nextAttackTime, WorldTime.instance.time + weapon.getMillisBetweenAttacks())
         } else {
             weapon.cancelAttack()
+
+            if (stoppingDist > 0 && mag < (stoppingDist * .75)) {  // TODO make this more configurable?
+                this.doFlee(updateData)
+                return
+            }
         }
 
         // make sure they always wait at least PARRY_TIME once getting into range
