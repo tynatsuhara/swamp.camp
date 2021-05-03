@@ -5,6 +5,7 @@ import { MeleeWeapon } from "./MeleeWeapon"
 import { Point } from "../../../engine/Point"
 import { SpearWeapon } from "./SpearWeapon"
 import { DudeType } from "../DudeFactory"
+import { StaffWeapon } from "./StaffWeapon"
 
 const offsetForDudeType = (type: DudeType) => {
     switch (type) {
@@ -35,6 +36,8 @@ export const WeaponFactory = {
                 return new MeleeWeapon(WeaponType.AXE, "weapon_axe", new Point(-3, -1).plus(offset))
             case WeaponType.SPEAR:
                 return new SpearWeapon()  // NPCs can't currently use ranged weapons
+            case WeaponType.STAFF_1:
+                return new StaffWeapon()
             default:
                 throw new Error(`weapon type ${type} is not supported yet`)
         }

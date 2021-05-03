@@ -21,8 +21,8 @@ export class TileSetAnimation implements TileSource {
         return this.frames[index][0]
     }
 
-    toComponent(transform: TileTransform = new TileTransform()): TileComponent {
-        return new AnimatedTileComponent([this])
+    toComponent(transform: TileTransform = new TileTransform()): AnimatedTileComponent {
+        return new AnimatedTileComponent([this], transform)
     }
 
     filtered(filter: (img: ImageData) => ImageData): TileSetAnimation {

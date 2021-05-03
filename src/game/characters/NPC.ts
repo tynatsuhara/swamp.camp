@@ -1,13 +1,10 @@
 import { Component } from "../../engine/Component"
 import { UpdateData } from "../../engine/Engine"
 import { Point } from "../../engine/Point"
-import { RenderMethod } from "../../engine/renderer/RenderMethod"
-import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { Lists } from "../../engine/util/Lists"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
-import { HUD } from "../ui/HUD"
 import { ElementType } from "../world/elements/Elements"
 import { House } from "../world/elements/House"
 import { LocationManager } from "../world/LocationManager"
@@ -16,7 +13,6 @@ import { OutdoorDarknessMask } from "../world/OutdoorDarknessMask"
 import { Teleporter } from "../world/Teleporter"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
-import { EMPTY_DIALOGUE, getDialogue } from "./Dialogue"
 import { Dude } from "./Dude"
 import { NPCSchedule, NPCSchedules, NPCScheduleType } from "./NPCSchedule"
 import { Player } from "./Player"
@@ -240,15 +236,16 @@ export class NPC extends Component {
         return this._attackIndicator
     }
     private readonly PARRY_TIME = 300 + Math.random() * 200
-    private readonly TIME_BETWEEN_ATTACKS = 1000 + Math.random() * 400
-    private nextAttackTime = WorldTime.instance.time + this.TIME_BETWEEN_ATTACKS * Math.random()
+    private nextAttackTime = WorldTime.instance.time + Math.random() * 2000
 
     private doAttack(updateData: UpdateData) {
         if (!this.dude.isAlive) {
             return
         }
 
-        if (!this.dude.weapon || !this.attackTarget || !this.attackTarget.isAlive) {
+        const weapon = this.dude.weapon
+
+        if (!weapon || !this.attackTarget || !this.attackTarget.isAlive) {
             this.dude.move(updateData, Point.ZERO)
             return
         }
@@ -267,10 +264,14 @@ export class NPC extends Component {
         //     this.dude.move(updateData, new Point(0, 0))
         // }
 
-        const inRangeAndArmed = mag < this.dude.weapon.getRange() + this.dude.colliderSize.x/2 - 5
+        const stoppingDist = weapon.getStoppingDistance()
+        const inRangeAndArmed = mag < weapon.getRange() + this.dude.colliderSize.x/2 - 5
         const timeLeftUntilCanAttack = this.nextAttackTime - WorldTime.instance.time
         
-        if (inRangeAndArmed && this.attackTarget === Player.instance.dude && timeLeftUntilCanAttack < this.PARRY_TIME) {
+        if (stoppingDist === 0 
+                && inRangeAndArmed 
+                && this.attackTarget === Player.instance.dude 
+                && timeLeftUntilCanAttack < this.PARRY_TIME) {
             this._attackIndicator = timeLeftUntilCanAttack < this.PARRY_TIME/2 
                     ? DudeInteractIndicator.ATTACKING_NOW 
                     : DudeInteractIndicator.ATTACKING_SOON
@@ -280,10 +281,10 @@ export class NPC extends Component {
 
         // in range and armed
         if (inRangeAndArmed && timeLeftUntilCanAttack <= 0) {
-            this.dude.weapon.attack(true)
-            this.nextAttackTime = Math.max(this.nextAttackTime, WorldTime.instance.time + this.TIME_BETWEEN_ATTACKS)
+            weapon.attack(true)
+            this.nextAttackTime = Math.max(this.nextAttackTime, WorldTime.instance.time + weapon.getMillisBetweenAttacks())
         } else {
-            this.dude.weapon.cancelAttack()
+            weapon.cancelAttack()
         }
 
         // make sure they always wait at least PARRY_TIME once getting into range
@@ -294,7 +295,8 @@ export class NPC extends Component {
         if (!this.targetPath || this.targetPath.length === 0) {
             this.targetPath = this.findPath(pixelPtToTilePt(this.attackTarget.standingPosition), this.dude.standingPosition)
         }
-        if (!this.targetPath || this.targetPath.length === 0) {
+        if (!this.targetPath || this.targetPath.length === 0 || mag < stoppingDist) {
+            // TODO: If using a ranged weapon, keep distance from enemies
             this.dude.move(updateData, Point.ZERO)
             return
         }

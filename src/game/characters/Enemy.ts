@@ -3,7 +3,7 @@ import { Point } from "../../engine/Point"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { OutdoorDarknessMask } from "../world/OutdoorDarknessMask"
 import { Dude } from "./Dude"
-import { DudeFaction } from "./DudeFactory"
+import { DudeFaction, DudeType } from "./DudeFactory"
 import { NPC } from "./NPC"
 
 export class Enemy extends Component {
@@ -18,10 +18,17 @@ export class Enemy extends Component {
         if (this.dude.factions.includes(DudeFaction.ORCS)) {
             // Orcs only show up to siege, so they will find you wherever you're hiding
             this.npc.findTargetRange = Number.MAX_SAFE_INTEGER
-            this.npc.enemyFilterFn = (enemies) => {
-                // Only attack armed enemies if they are close enough to be dangerous, otherwise target the weak
-                const nearbyArmedEnemies = enemies.filter(d => !!d.weapon && d.standingPosition.manhattanDistanceTo(this.dude.standingPosition) < 100)
-                return nearbyArmedEnemies.length > 0 ? nearbyArmedEnemies : enemies
+            if (this.dude.type === DudeType.ORC_SHAMAN) {
+                this.npc.enemyFilterFn = (enemies) => {
+                    // Shamans use AOE attacks and will only target the player
+                    return enemies.filter(e => e.type === DudeType.PLAYER)
+                }
+            } else {
+                this.npc.enemyFilterFn = (enemies) => {
+                    // Only attack armed enemies if they are close enough to be dangerous, otherwise target the weak
+                    const nearbyArmedEnemies = enemies.filter(d => !!d.weapon && d.standingPosition.manhattanDistanceTo(this.dude.standingPosition) < 100)
+                    return nearbyArmedEnemies.length > 0 ? nearbyArmedEnemies : enemies
+                }
             }
         }
 

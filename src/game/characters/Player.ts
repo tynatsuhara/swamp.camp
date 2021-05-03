@@ -26,6 +26,8 @@ export class Player extends Component {
     // private crosshairs: TileComponent
     // private lerpedLastMoveDir: Point = new Point(1, 0)  // used for crosshair
     private rollingMomentum: Point
+    private _velocity: Point = Point.ZERO
+    get velocity() { return this._velocity }
     private _dude: Dude
     get dude() { return this._dude }
 
@@ -82,9 +84,11 @@ export class Player extends Component {
             speed -= 0.4
         }
 
+        this._velocity = new Point(dx, dy)
+
         this.dude.move(
             updateData, 
-            new Point(dx, dy), 
+            this.velocity, 
             0, // this.dude.rolling() ? 0 : updateData.input.mousePos.x - this.dude.standingPosition.x,
             speed
         )
@@ -130,6 +134,9 @@ export class Player extends Component {
             }
             if (updateData.input.isKeyDown(InputKey.P)) {
                 DudeFactory.instance.new(DudeType.HORNED_DEMON, updateData.input.mousePos)
+            }
+            if (updateData.input.isKeyDown(InputKey.U)) {
+                DudeFactory.instance.new(DudeType.ORC_SHAMAN, updateData.input.mousePos)
             }
             if (updateData.input.isKeyDown(InputKey.B)) {
                 DudeFactory.instance.new(DudeType.BEAR, updateData.input.mousePos)

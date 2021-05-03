@@ -13,6 +13,7 @@ additional art by:
 * https://superdark.itch.io/16x16-free-npc-pack
 * https://anritool.itch.io/cr-tileset
 * https://kenney.nl/
+* https://opengameart.org/content/explosion-set-1-m484-games
 
 music by:
 * https://www.newgrounds.com/audio/listen/1017053

@@ -44,7 +44,8 @@ export const enum DudeType {
     VILLAGER,
     CENTAUR,
     BEAR,
-    ORC_BRUTE
+    ORC_BRUTE,
+    ORC_SHAMAN,
 }
 
 export class DudeFactory {
@@ -143,7 +144,7 @@ export class DudeFactory {
             }
             case DudeType.ORC_WARRIOR: {
                 factions = [DudeFaction.ORCS]
-                animationName = "orc_warrior"
+                animationName = Math.random() < .5 ? "orc_warrior" : "masked_orc"
                 weapon = WeaponType.CLUB
                 additionalComponents = [new NPC(), new Enemy()]
                 maxHealth = 2
@@ -158,6 +159,15 @@ export class DudeFactory {
                 maxHealth = 4
                 speed *= .5
                 colliderSize = colliderSize.times(1.5)
+                break
+            }
+            case DudeType.ORC_SHAMAN: {
+                factions = [DudeFaction.ORCS]
+                animationName = "orc_shaman"
+                weapon = WeaponType.STAFF_1
+                additionalComponents = [new NPC(), new Enemy()]
+                maxHealth = 2
+                speed *= (.3 + Math.random()/2)
                 break
             }
             case DudeType.HORNED_DEMON: {

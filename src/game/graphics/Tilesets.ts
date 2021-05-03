@@ -8,6 +8,7 @@ import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { TileSource } from "../../engine/tiles/TileSource"
 import { ExtraCharacterSet2TileLoader } from "./ExtraCharacterSet2TileLoader"
 import { OGTileset } from "./OGTileset"
+import { ExplosionTileset } from "./ExplosionTileset"
 
 // standard tile size
 export const TILE_SIZE = 16
@@ -38,6 +39,7 @@ export class Tilesets {
     readonly oneBit = new OneBitTileset()
     readonly extraCharacterSet1 = new SplitFileTileLoader("images/individual_characters")
     readonly extraCharacterSet2 = new ExtraCharacterSet2TileLoader()
+    readonly explosions = new ExplosionTileset()
 
     private constructor() {
         // not allowed
@@ -64,6 +66,7 @@ export class Tilesets {
     // loaded before the engine starts running the game
     static getFilesToLoad() {
         return [
+            "images/explosions.png",
             "images/monochrome_transparent_1_bit.png",
             "images/dungeon_base.png",
             "images/env_dungeon.png",

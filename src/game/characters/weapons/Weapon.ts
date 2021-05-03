@@ -52,6 +52,17 @@ export abstract class Weapon extends Component {
     abstract getRange(): number
 
     /**
+     * Melee weapons will return 0
+     */
+    getStoppingDistance() {
+        return 0
+    }
+
+    getMillisBetweenAttacks() {
+        return 1000
+    }
+
+    /**
      * This can be called every single frame and should handle that appropriately
      * @param newAttack should be true if this is a new attack, false otherwise 
      * (this is useful for weapons that involve charging up, such as the spear)
