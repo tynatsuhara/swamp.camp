@@ -218,7 +218,14 @@ export class Dude extends Component implements DialogueSource {
         this.animation.pause()
         setTimeout(() => spawnItem(this.standingPosition.minus(new Point(0, 2)), this.droppedItemSupplier()), 100)
         this.dropWeapon()
-        setTimeout(() => this.dissolve(), 1000)
+
+        setTimeout(() => {
+            if (!this.factions.includes(DudeFaction.VILLAGERS)) {
+                this.dissolve()
+            }
+            this.collider.enabled = false
+        }, 1000)
+
     }
 
     // TODO maybe use this for demons in sunlight
