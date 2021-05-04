@@ -6,7 +6,6 @@ import { TileTransform } from "../../../engine/tiles/TileTransform"
 import { Animator } from "../../../engine/util/Animator"
 import { Lists } from "../../../engine/util/Lists"
 import { Camera } from "../../cutscenes/Camera"
-import { ExplosionSize } from "../../graphics/ExplosionTileset"
 import { ImageFilters } from "../../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Color } from "../../ui/Color"
@@ -23,9 +22,16 @@ export class StaffWeapon extends Weapon {
     private weaponSprite: StaticTileSource
     private weaponTransform: TileTransform
     private offsetFromCenter: Point
+
     private targetSprite: StaticTileSource
+    private targetSprite1: StaticTileSource
+    private targetSprite2: StaticTileSource
+    private targetAnimator: Animator
+
     private attackPosition: Point
     private explosion: AnimatedTileComponent
+
+    private static readonly TARGET_ANIMATION_SPEED = 80
     
     constructor() {
         super()
@@ -33,7 +39,11 @@ export class StaffWeapon extends Weapon {
             this.weaponSprite = Tilesets.instance.dungeonCharacters.getTileSource("weapon_red_magic_staff")
             this.weaponTransform = new TileTransform(Point.ZERO, this.weaponSprite.dimensions).relativeTo(this.dude.animation.transform)
             this.offsetFromCenter = new Point(-5, 0)
-            this.targetSprite = Tilesets.instance.oneBit.getTileSource("aoe_target").filtered(ImageFilters.tint(Color.SUPER_ORANGE))
+            this.targetSprite1 = Tilesets.instance.oneBit.getTileSource("aoe_target").filtered(ImageFilters.tint(Color.SUPER_ORANGE))
+            this.targetSprite2 = Tilesets.instance.oneBit.getTileSource("aoe_target").filtered(ImageFilters.tint(Color.WHITE))
+            this.targetAnimator = new Animator([StaffWeapon.TARGET_ANIMATION_SPEED, StaffWeapon.TARGET_ANIMATION_SPEED], i => {
+                this.targetSprite = i % 2 === 0 ? this.targetSprite1 : this.targetSprite2
+            })
         }
     }
 
@@ -44,6 +54,7 @@ export class StaffWeapon extends Weapon {
         ).plus(this.offsetFromCenter)
 
         this.animator?.update(updateData.elapsedTimeMillis)
+        this.targetAnimator.update(updateData.elapsedTimeMillis)
         
         this.weaponTransform.position = offset
                 .plus(this.dude.getAnimationOffsetPosition())
@@ -76,7 +87,6 @@ export class StaffWeapon extends Weapon {
 
     attack(newAttack: boolean) {
         if (newAttack) {
-            this.attackPosition = this.guessAttackPos()
             this.playAttackAnimation()
             setTimeout(() => this.doAttack(), 750);
         }
@@ -99,35 +109,31 @@ export class StaffWeapon extends Weapon {
             () => {
                 this.animator = null
                 this.currentAnimationFrame = 0
+                this.attackPosition = this.guessAttackPos()
             }
         )
     }
 
     private doAttack() {
-        // TODO: add animation
+        this.entity.addComponent(
+            Tilesets.instance.explosions.getMeteorAnimation(this.attackPosition, () => {
+                const attackDistance = TILE_SIZE * 1.5
 
-        const attackDistance = TILE_SIZE * 1.5
+                Array.from(LocationManager.instance.currentLocation.dudes)
+                        .filter(d => !!d && d !== this.dude && d.isEnemy(this.dude))
+                        .filter(d => d.standingPosition.distanceTo(this.attackPosition) < attackDistance)
+                        .forEach(d => d.damage(2, d.position.minus(this.attackPosition), 50))
 
-        Array.from(LocationManager.instance.currentLocation.dudes)
-                .filter(d => !!d && d !== this.dude && d.isEnemy(this.dude))
-                .filter(d => d.standingPosition.distanceTo(this.attackPosition) < attackDistance)
-                .forEach(d => d.damage(2, d.position.minus(this.attackPosition), 50))
+                Camera.instance.shake(5, 500)
 
-        const clearExplosion = () => {
-            this.explosion?.delete()
-        }
+                this.entity.addComponent(
+                    Tilesets.instance.explosions.getExplosionAnimation(this.attackPosition)
+                )
 
-        Camera.instance.shake(5, 500)
-
-        this.explosion = this.entity.addComponent(
-            Tilesets.instance.explosions.getAnimation(ExplosionSize.MEDIUM_2, clearExplosion)
-                    .toComponent(TileTransform.new({ 
-                        position: this.attackPosition.plus(new Point(ExplosionSize.MEDIUM_2, ExplosionSize.MEDIUM_2).div(-2)), 
-                        depth: Number.MAX_SAFE_INTEGER
-                    }))
+                this.attackPosition = null
+            })
         )
 
-        this.attackPosition = null
     }
 
     private guessAttackPos() {
