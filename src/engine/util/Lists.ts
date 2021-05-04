@@ -63,5 +63,11 @@ export const Lists = {
      */
     range(start: number, end: number): number[] {
         return Array.from({length: (end - start)}, (v, k) => k + start);
-    }
+    },
+
+    repeat<T>(times: number, list: T[]): T[] {
+        const result = []
+        Lists.range(0, times).forEach(() => result.push(...list))
+        return result
+    },
 }

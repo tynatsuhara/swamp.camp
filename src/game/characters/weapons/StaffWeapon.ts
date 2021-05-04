@@ -3,6 +3,8 @@ import { Point } from "../../../engine/Point"
 import { AnimatedTileComponent } from "../../../engine/tiles/AnimatedTileComponent"
 import { StaticTileSource } from "../../../engine/tiles/StaticTileSource"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { Animator } from "../../../engine/util/Animator"
+import { Lists } from "../../../engine/util/Lists"
 import { Camera } from "../../cutscenes/Camera"
 import { ExplosionSize } from "../../graphics/ExplosionTileset"
 import { ImageFilters } from "../../graphics/ImageFilters"
@@ -13,6 +15,9 @@ import { Player } from "../Player"
 import { Weapon } from "./Weapon"
 import { WeaponType } from "./WeaponType"
 
+/**
+ * AOE weapon
+ */
 export class StaffWeapon extends Weapon {
 
     private weaponSprite: StaticTileSource
@@ -37,8 +42,12 @@ export class StaffWeapon extends Weapon {
             this.dude.animation.transform.dimensions.x/2 - this.weaponTransform.dimensions.x/2,
             this.dude.animation.transform.dimensions.y - this.weaponTransform.dimensions.y
         ).plus(this.offsetFromCenter)
+
+        this.animator?.update(updateData.elapsedTimeMillis)
         
-        this.weaponTransform.position = offset.plus(this.dude.getAnimationOffsetPosition())
+        this.weaponTransform.position = offset
+                .plus(this.dude.getAnimationOffsetPosition())
+                .plus(StaffWeapon.STAFF_ANIMATION[this.currentAnimationFrame])
     }
 
     getType(): WeaponType {
@@ -68,10 +77,30 @@ export class StaffWeapon extends Weapon {
     attack(newAttack: boolean) {
         if (newAttack) {
             this.attackPosition = this.guessAttackPos()
-            setTimeout(() => {
-                this.doAttack()
-            }, 750);
+            this.playAttackAnimation()
+            setTimeout(() => this.doAttack(), 750);
         }
+    }
+
+    private static STAFF_ANIMATION = Lists.repeat(2, [
+        new Point(0, 0),
+        new Point(-1, -1),
+        new Point(-1, -2),
+        new Point(0, -3),
+        new Point(1, -2),
+        new Point(1, -1),
+    ])
+    private animator: Animator
+    private currentAnimationFrame: number = 0
+    private playAttackAnimation() {
+        this.animator = new Animator(
+            Animator.frames(StaffWeapon.STAFF_ANIMATION.length, 40), 
+            (index) => this.currentAnimationFrame = index, 
+            () => {
+                this.animator = null
+                this.currentAnimationFrame = 0
+            }
+        )
     }
 
     private doAttack() {
