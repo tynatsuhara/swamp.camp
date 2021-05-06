@@ -72,7 +72,10 @@ export class OutdoorDarknessMask {
     /**
      * returns true if it is dark enough for a demon to tolerate
      */
-    isDark(pixelPt: Point): boolean {
+    isDark = (pixelPt: Point) => this.testDarkness(pixelPt, 1)
+    isTotalDarkness = (pixelPt: Point) => this.testDarkness(pixelPt, OutdoorDarknessMask.VISIBILITY_MULTIPLIER)
+
+    private testDarkness(pixelPt: Point, tolerableDistanceFromLightMultiplier: number): boolean {
         if (this.darkness < .6) {
             return false
         }
@@ -80,9 +83,13 @@ export class OutdoorDarknessMask {
         if (!locationLightMap) {
             return true
         }
-        // TODO optimize this pre-computing light values in a grid, this will get expensive as we add more lights
-        return !Array.from(locationLightMap.values()).some(entry => entry[0].distanceTo(pixelPt) < entry[1] * .5)
+        return !Array.from(locationLightMap.values()).some(entry => entry[0].distanceTo(pixelPt) < entry[1] * .5 * tolerableDistanceFromLightMultiplier)
     }
+
+    static readonly DAYBREAK_HOUR = 5
+    static readonly SUNRISE_HOUR = 6
+    static readonly SUNSET_HOUR = 20
+    static readonly DUSK_HOUR = 21
 
     private updateColorForTime() {
         const time = WorldTime.instance.time
@@ -96,18 +103,23 @@ export class OutdoorDarknessMask {
         const sunsetColor = this.colorFromString(Color.DARK_PURPLE, 0.2)
         const transitionTime = TimeUnit.HOUR
 
+        const daybreak = OutdoorDarknessMask.DAYBREAK_HOUR
+        const sunrise = OutdoorDarknessMask.SUNRISE_HOUR
+        const sunset = OutdoorDarknessMask.SUNSET_HOUR
+        const dusk = OutdoorDarknessMask.DUSK_HOUR
+
         // TODO: make these transitions quicker
-        if (hour >= 5 && hour < 6) {
-			const percentTransitioned = clamp01((timeSoFar + (hour - 5) * TimeUnit.HOUR)/transitionTime)
+        if (hour >= daybreak && hour < sunrise) {
+			const percentTransitioned = clamp01((timeSoFar + (hour - daybreak) * TimeUnit.HOUR)/transitionTime)
 			this.lerpColorString(nightColor, sunriseColor, percentTransitioned) // sunrise		
-		} else if (hour >= 6 && hour < 20) {
-			const percentTransitioned = clamp01((timeSoFar + (hour - 6) * TimeUnit.HOUR)/transitionTime)
+		} else if (hour >= sunrise && hour < sunset) {
+			const percentTransitioned = clamp01((timeSoFar + (hour - sunrise) * TimeUnit.HOUR)/transitionTime)
 			this.lerpColorString(sunriseColor, dayColor, percentTransitioned)   // day	
-		} else if (hour >= 20 && hour < 21) {
-			const percentTransitioned = clamp01((timeSoFar + (hour - 20) * TimeUnit.HOUR)/transitionTime)			
+		} else if (hour >= sunset && hour < dusk) {
+			const percentTransitioned = clamp01((timeSoFar + (hour - sunset) * TimeUnit.HOUR)/transitionTime)			
 			this.lerpColorString(dayColor, sunsetColor, percentTransitioned)    // sunset
 		} else {
-			const percentTransitioned = clamp01((timeSoFar + (24 + hour - 21) % 24 * TimeUnit.HOUR)/transitionTime)			
+			const percentTransitioned = clamp01((timeSoFar + (24 + hour - dusk) % 24 * TimeUnit.HOUR)/transitionTime)			
 			this.lerpColorString(sunsetColor, nightColor, percentTransitioned)  // night			
 		}
     }
