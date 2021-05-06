@@ -44,7 +44,7 @@ export class MapGenerator {
         this.clearPathToCenter()
 
         // TODO short trees, bushes, fruit, tall grass, etc
-        this.spawn(ElementType.MUSHROOM, 5 + Math.random() * 10)
+        this.spawn(ElementType.MUSHROOM, 3 + Math.random() * 5)
 
         // spawn grass last, stuff checks for existing paths prior to this by the lack of ground items
         this.placeGrass()
