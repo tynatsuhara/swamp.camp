@@ -92,7 +92,6 @@ export class Grid<T> {
         const openSet = new BinaryHeap<Point>(p => fScore.get(p.toString()))
         openSet.push(start)
 
-        const startTime = new Date().getTime()
         while (openSet.size() > 0) {
             const current = openSet.pop()
             openSetUnique.delete(current.toString())
