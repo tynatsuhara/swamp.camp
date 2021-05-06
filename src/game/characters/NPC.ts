@@ -172,6 +172,7 @@ export class NPC extends Component {
         if (this.dude.isAlive) {
             fn()
         }
+        // TODO: Shouldn't we cancel this as soon as the NPC isn't in the current location?
         const interval = setInterval(() => {
             if (!this.dude.isAlive) {
                 clearInterval(interval)

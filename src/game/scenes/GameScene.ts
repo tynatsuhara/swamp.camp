@@ -27,6 +27,7 @@ import { LineRender } from "../../engine/renderer/LineRender"
 import { Entity } from "../../engine/Entity"
 import { debug } from "../../engine/Debug"
 import { Barrier } from "../world/Barrier"
+import { DudeSpawner } from "../characters/DudeSpawner"
 
 const ZOOM = 3
 
@@ -100,6 +101,7 @@ export class GameScene {
                     CutsceneManager.instance.getEntity(), 
                     WorldTime.instance.getEntity(),
                     GroundRenderer.instance.getEntity(),
+                    DudeSpawner.instance.getEntity(),
                     this.getDebugEntity()
                 ])
         }
