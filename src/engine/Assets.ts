@@ -6,6 +6,15 @@ class Assets {
     private readonly imageMap = new Map<string, HTMLImageElement>()
     private readonly audioMap = new Map<string, string>()
 
+    /**
+     * returns a promise to load a font already added to the default set of the page 
+     * (eg via a stylesheet or <link> tag)
+     * @param font a font specification using CSS value syntax, eg "italic bold 16px Roboto"
+     */
+    loadFont(font: string, src: string): Promise<void> {
+        return new window["FontFace"](font, src).load().then(ff => document["fonts"].add(ff))
+    }
+
     loadImageFiles(relativePaths: string[]): Promise<void[]> {
         const promises = relativePaths.map(path => new Promise<void>(resolve => {
             const loadingImage = new Image()
