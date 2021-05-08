@@ -1,5 +1,7 @@
 import { Lists } from "../../engine/util/Lists"
+import { Player } from "../characters/Player"
 import { Settings } from "../Settings"
+import { OutdoorDarknessMask } from "../world/OutdoorDarknessMask"
 import { TimeUnit } from "../world/TimeUnit"
 import { AudioQueue } from "./AudioQueue"
 
@@ -10,7 +12,10 @@ export class Ambiance {
     private static currentAmbiance: AudioQueue
 
     private static readonly DAY = new AudioQueue(["audio/ambiance/daytime.wav"])
-    private static readonly NIGHT = new AudioQueue([]) // Lists.range(1, 9).map(i => `audio/ambiance/yewbic__ambience0${i}.wav`))
+    private static readonly NIGHT = new AudioQueue(
+        Lists.shuffled(Lists.range(1, 9).map(i => `audio/ambiance/yewbic__ambience0${i}.wav`)),
+        .025
+    )
 
     private static time: number
     private static isInterior: boolean
@@ -28,7 +33,9 @@ export class Ambiance {
     private static determineAmbiance() {
         const volume = Settings.getSoundVolume() * (this.isInterior ? .1 : 1)
         this.DAY.setVolume(volume)
-        this.NIGHT.setVolume(volume)
+
+        const inDarkness = OutdoorDarknessMask.instance.isDark(Player.instance.dude.standingPosition)
+        this.NIGHT.setVolume(volume * (inDarkness ? 1 : .5))
 
         // fade out at night
         const timeOfDay = this.time % TimeUnit.DAY
