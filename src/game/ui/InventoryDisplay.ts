@@ -326,7 +326,11 @@ export class InventoryDisplay extends Component {
             const stack = inv.getStack(i)
             let tile = null
             if (!!stack) {
-                const c = ITEM_METADATA_MAP[stack.item].inventoryIconSupplier().toComponent()
+                const itemMeta = ITEM_METADATA_MAP[stack.item]
+                if (!itemMeta) {
+                    console.log(`missing item metadata for ${stack.item}`)
+                }
+                const c = itemMeta.inventoryIconSupplier().toComponent()
                 c.transform.depth = UIStateManager.UI_SPRITE_DEPTH + 1
                 tile = this.displayEntity.addComponent(c)
                 tile.transform.position = this.getPositionForInventoryIndex(i, inv)
