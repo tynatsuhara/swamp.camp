@@ -18,11 +18,7 @@ import { TimeUnit } from "../TimeUnit"
 import { CAMPFIRE_DIALOGUE } from "../../characters/dialogues/ItemDialogues"
 import { ElementFactory } from "./ElementFactory"
 import { LocationManager } from "../LocationManager"
-import { assets } from "../../../engine/Assets"
-import { Player } from "../../characters/Player"
-import { Settings } from "../../Settings"
 import { PointAudio } from "../../audio/PointAudio"
-import { newUUID } from "../../saves/uuid"
 
 export class CampfireFactory extends ElementFactory {
 
@@ -32,18 +28,19 @@ export class CampfireFactory extends ElementFactory {
     make(wl: WorldLocation, pos: Point, data: object): ElementComponent{
         const e = new Entity()
         const scaledPos = pos.times(TILE_SIZE)
+        const depth = scaledPos.y + TILE_SIZE - 10
         
         const campfireOff = e.addComponent(new TileComponent(
             Tilesets.instance.outdoorTiles.getTileSource("campfireOff"), 
             new TileTransform(scaledPos)
         ))
-        campfireOff.transform.depth = scaledPos.y + TILE_SIZE
+        campfireOff.transform.depth = depth
 
         const campfireOn = e.addComponent(new AnimatedTileComponent(
             [Tilesets.instance.outdoorTiles.getTileSetAnimation("campfireOn", 2, 200)],
             new TileTransform(scaledPos)
         ))
-        campfireOn.transform.depth = scaledPos.y + TILE_SIZE
+        campfireOn.transform.depth = depth
 
         const offset = new Point(0, 5)
         e.addComponent(new BoxCollider(
