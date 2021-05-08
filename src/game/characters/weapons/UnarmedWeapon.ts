@@ -54,6 +54,7 @@ export class UnarmedWeapon extends Weapon {
     private getDamageAmount() {
         switch (this.dude.type) {
             case DudeType.BEAR:
+            case DudeType.DEMON_BRUTE:
                 return 3
             default:
                 return 1

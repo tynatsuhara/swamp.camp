@@ -46,6 +46,7 @@ export const enum DudeType {
     BEAR,
     ORC_BRUTE,
     ORC_SHAMAN,
+    DEMON_BRUTE,
 }
 
 export class DudeFactory {
@@ -93,7 +94,9 @@ export class DudeFactory {
         let additionalComponents: Component[] = []
         let blob = {}
         const defaultInventory = new Inventory()
-        let colliderSize = new Point(10, 8)
+        const defaultColliderSize = new Point(10, 8)
+        const bigColliderSize = defaultColliderSize.times(1.5)
+        let colliderSize = defaultColliderSize
 
         // type-specific defaults
         switch(type) {
@@ -158,7 +161,7 @@ export class DudeFactory {
                 additionalComponents = [new NPC(), new Enemy()]
                 maxHealth = 4
                 speed *= .5
-                colliderSize = colliderSize.times(1.5)
+                colliderSize = bigColliderSize
                 break
             }
             case DudeType.ORC_SHAMAN: {
@@ -177,6 +180,16 @@ export class DudeFactory {
                 additionalComponents = [new NPC(NPCSchedules.newFreeRoamInDarkSchedule()), new Enemy()]
                 maxHealth = 2
                 speed *= (.6 + Math.random()/5)
+                break
+            }
+            case DudeType.DEMON_BRUTE: {
+                factions = [DudeFaction.DEMONS]
+                animationName = "big_demon" 
+                weapon = WeaponType.UNARMED
+                additionalComponents = [new NPC(NPCSchedules.newFreeRoamInDarkSchedule()), new Enemy()]
+                maxHealth = 8
+                speed *= (1 + .3 * Math.random())
+                colliderSize = bigColliderSize
                 break
             }
             case DudeType.SHROOM:
@@ -207,7 +220,7 @@ export class DudeFactory {
                 additionalComponents = [new NPC(), new Enemy()]
                 maxHealth = 5
                 speed *= .5
-                colliderSize = colliderSize.times(1.5)
+                colliderSize = bigColliderSize
                 break
             default: {
                 throw new Error(`DudeType ${type} can't be instantiated`)

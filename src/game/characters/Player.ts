@@ -130,7 +130,7 @@ export class Player extends Component {
         if (debug.enableDevControls) {
             const mouseTilePos = pixelPtToTilePt(updateData.input.mousePos)
             if (updateData.input.isKeyDown(InputKey.O)) {
-                DudeFactory.instance.new(DudeType.ORC_BRUTE, updateData.input.mousePos)
+                DudeFactory.instance.new(DudeType.DEMON_BRUTE, updateData.input.mousePos)
             }
             if (updateData.input.isKeyDown(InputKey.P)) {
                 DudeFactory.instance.new(DudeType.HORNED_DEMON, updateData.input.mousePos)

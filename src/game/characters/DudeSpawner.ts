@@ -45,7 +45,10 @@ export class DudeSpawner extends Component {
             return  // don't spawn demons inside
         }
         const demons = Array.from(l.dudes.values()).filter(d => d.factions.includes(DudeFaction.DEMONS))
-        const goalDemonCount = 3
+        if (demons.length > 0) {
+            return  // just wait to spawn until all the demons have been killed
+        }
+        const goalDemonCount = Math.random() * 5
 
         if (demons.length < goalDemonCount) {
             const openPoints = MapGenerator.GOOD_FLEEING_SPOTS.filter(pt => 
@@ -53,7 +56,8 @@ export class DudeSpawner extends Component {
 
             for (let i = 0; i < Math.min(openPoints.length, goalDemonCount - demons.length); i++) {
                 const pt = Lists.oneOf(openPoints)
-                DudeFactory.instance.new(DudeType.HORNED_DEMON, pt.times(TILE_SIZE), l)
+                const type = Math.random() > .95 ? DudeType.DEMON_BRUTE : DudeType.HORNED_DEMON
+                DudeFactory.instance.new(type, pt.times(TILE_SIZE), l)
             }
         }
     }
