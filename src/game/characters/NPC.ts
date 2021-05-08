@@ -167,17 +167,18 @@ export class NPC extends Component {
         // this.followTarget = null
     }
 
-    // fn will execute immediately and every intervalMillis milliseconds until the NPC is dead
-    doWhileLiving(fn: () => void, intervalMillis: number) {
+    // fn will execute immediately and every intervalMillis milliseconds
+    // until the NPC is dead or the function returns true
+    doWhileLiving(fn: () => boolean|void, intervalMillis: number) {
         if (this.dude.isAlive) {
-            fn()
+            if (fn()) {
+                return
+            }
         }
         // TODO: Shouldn't we cancel this as soon as the NPC isn't in the current location?
         const interval = setInterval(() => {
-            if (!this.dude.isAlive) {
+            if (!this.dude.isAlive || fn()) {
                 clearInterval(interval)
-            } else {
-                fn()
             }
         }, intervalMillis)
     }

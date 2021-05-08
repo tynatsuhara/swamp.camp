@@ -228,9 +228,7 @@ export class Dude extends Component implements DialogueSource {
 
     }
 
-    // TODO maybe use this for demons in sunlight
-    private dissolve() {
-        this.collider.enabled = false
+    dissolve() {
         let dissolveChance = .1
         const interval = setInterval(() => {
             this.animation.applyFilter(ImageFilters.dissolve(() => dissolveChance))

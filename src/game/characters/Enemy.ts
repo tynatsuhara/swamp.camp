@@ -32,10 +32,9 @@ export class Enemy extends Component {
             }
         }
 
-        // DEMON enemies will avoid light
-        // TODO: make them burn in the light or something?
         // TODO: Consider splitting this class up 
         if (this.dude.factions.includes(DudeFaction.DEMONS)) {
+            // DEMON enemies will avoid light
             this.npc.isEnemyFn = d => {
                 return !d.factions.includes(DudeFaction.DEMONS) && OutdoorDarknessMask.instance.isDark(d.standingPosition)
             }
@@ -43,6 +42,19 @@ export class Enemy extends Component {
                 return pt.distanceTo(goal) + (OutdoorDarknessMask.instance.isDark(pt.times(TILE_SIZE)) ? 0 : 100)
             }
             this.npc.findTargetRange *= 3
+            // dissolve if they end up in the light for too long
+            let lastSunlightCheck = false
+            this.npc.doWhileLiving(() => {
+                if (!OutdoorDarknessMask.instance.isDark(this.dude.standingPosition)) {
+                    if (lastSunlightCheck) {  // they've been in sunlight for a while, time to die
+                        this.dude.dissolve()
+                        return true // end the loop
+                    }
+                    lastSunlightCheck = true
+                } else {
+                    lastSunlightCheck = false
+                }
+            }, 500 + 1000 * Math.random())
         } else {
             this.npc.isEnemyFn = d => d.isEnemy(this.dude)
         }
