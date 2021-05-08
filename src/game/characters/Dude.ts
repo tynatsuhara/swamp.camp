@@ -22,6 +22,7 @@ import { DialogueSource, EMPTY_DIALOGUE, getDialogue } from "./Dialogue"
 import { DudeAnimationUtils } from "./DudeAnimationUtils"
 import { DudeFaction, DudeType } from "./DudeFactory"
 import { NPC } from "./NPC"
+import { Player } from "./Player"
 import { Shield } from "./weapons/Shield"
 import { ShieldFactory } from "./weapons/ShieldFactory"
 import { ShieldType } from "./weapons/ShieldType"
@@ -185,7 +186,12 @@ export class Dude extends Component implements DialogueSource {
         }
         
         if (this.isAlive) {
-            this._health -= damage
+            // essential NPCs can die if the player is dead
+            if (this.maxHealth === Number.MAX_SAFE_INTEGER && !Player.instance.dude.isAlive) {
+                this._health = Math.min(this._health - damage, 5)
+            } else {
+                this._health -= damage
+            }
             if (!this.isAlive) {
                 this.die(direction)
                 knockback *= (1 + Math.random())
