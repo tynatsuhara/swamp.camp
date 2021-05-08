@@ -19,7 +19,7 @@ export class DudeSpawner extends Component {
         return this._instance
     }
 
-    private static readonly INTERVAL_MILLIS = 10_000
+    private static readonly INTERVAL_MILLIS = 30_000
     private nextUpdate = WorldTime.instance.time
 
     update() {
