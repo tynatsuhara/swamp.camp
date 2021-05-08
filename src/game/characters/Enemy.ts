@@ -54,7 +54,7 @@ export class Enemy extends Component {
                 } else {
                     lastSunlightCheck = false
                 }
-            }, 500 + 1000 * Math.random())
+            }, 1000 + 1000 * Math.random())
         } else {
             this.npc.isEnemyFn = d => d.isEnemy(this.dude)
         }
