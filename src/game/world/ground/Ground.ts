@@ -63,5 +63,5 @@ export class Ground {
         .tShape(Tilesets.instance.tilemap.getTileAt(new Point(3, 5)))
         .plusShape(Tilesets.instance.tilemap.getTileAt(new Point(5, 5)))
         .cap(Tilesets.instance.tilemap.getTileAt(new Point(2, 6)))
-        .single(Tilesets.instance.tilemap.getTileAt(new Point(7, 5)))
+        .single(Tilesets.instance.tilemap.getTileAt(new Point(6, 5)))
 } 

@@ -14,6 +14,8 @@ import { PlaceElementDisplay } from "../ui/PlaceElementDisplay"
 import { UIStateManager } from "../ui/UIStateManager"
 import { ElementType } from "../world/elements/Elements"
 import { Interactable } from "../world/elements/Interactable"
+import { GroundType } from "../world/ground/Ground"
+import { GroundComponent } from "../world/ground/GroundComponent"
 import { LocationManager } from "../world/LocationManager"
 import { MapGenerator } from "../world/MapGenerator"
 import { Dude } from "./Dude"
@@ -157,7 +159,11 @@ export class Player extends Component {
                 )
             }
             if (updateData.input.isKeyDown(InputKey.COMMA)) {
-                LocationManager.instance.currentLocation.addElement(ElementType.CHEST, mouseTilePos)
+                if (LocationManager.instance.currentLocation.ground.get(mouseTilePos)?.type === GroundType.PATH) {
+                    LocationManager.instance.currentLocation.addGroundElement(GroundType.GRASS, mouseTilePos)
+                } else {
+                    LocationManager.instance.currentLocation.addGroundElement(GroundType.PATH, mouseTilePos)
+                }
             }
             if (updateData.input.isKeyDown(InputKey.PERIOD)) {
                 LocationManager.instance.currentLocation.removeElementAt(mouseTilePos)

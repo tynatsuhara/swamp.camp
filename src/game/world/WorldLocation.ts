@@ -57,9 +57,6 @@ export class WorldLocation {
     }
 
     addGroundElement(type: GroundType, pos: Point, data: object = {}): GroundComponent {
-        if (!!this.ground.get(pos)) {
-            return null
-        }
         const groundComponent = Ground.instance.make(type, this, pos, data)
         this.ground.set(pos, groundComponent)
         return groundComponent

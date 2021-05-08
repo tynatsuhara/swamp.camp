@@ -134,7 +134,7 @@ export class ConnectingTileSchema {
         }
 
         // TODO trigger adjacent to update?
-        return result.toImageRender(new TileTransform(position.times(result.dimensions.x), null, rotation, false, false, Number.MIN_SAFE_INTEGER))
+        return result.toImageRender(new TileTransform(position.times(result.dimensions.x), null, rotation, false, false, Number.MIN_SAFE_INTEGER + 1))
     }
 
     private get(grid: Grid<GroundComponent>, pt: Point): ConnectingTile {
