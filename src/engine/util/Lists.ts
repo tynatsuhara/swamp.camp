@@ -41,6 +41,12 @@ export const Lists = {
         return list[Math.floor(Math.random() * list.length)]
     },
 
+    shuffled<T>(list: T[]): T[] {
+        const copy = [...list]
+        Lists.shuffle(copy)
+        return copy
+    },
+
     shuffle<T>(list: T[]) {
         var currentIndex = list.length, temporaryValue, randomIndex;
         
