@@ -1,6 +1,7 @@
 import { UpdateViewsContext } from "../engine/Engine"
 import { Game } from "../engine/Game"
 import { View } from "../engine/View"
+import { Music } from "./audio/Music"
 import { GameScene } from "./scenes/GameScene"
 import { MainMenuScene } from "./scenes/MainMenuScene"
 
@@ -19,11 +20,13 @@ export class QuestGame extends Game {
     }
 
     continueGame() {
+        Music.play(Music.DAY_MUSIC)
         this.scene = Scene.GAME
         this.game.continueGame()
     }
 
     startNewGame() {
+        Music.play(Music.DAY_MUSIC)
         this.scene = Scene.GAME
         this.game.newGame()
     }

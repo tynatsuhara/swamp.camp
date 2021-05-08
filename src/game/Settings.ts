@@ -46,3 +46,5 @@ export const Settings = {
         saveSettings()
     },
 }
+
+Music.setVolume(Settings.getMusicVolume())

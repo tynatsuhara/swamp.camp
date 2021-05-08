@@ -3,7 +3,7 @@ import { AudioUtils } from "./AudioUtils"
 export class AudioQueue {
     private currentAudio: HTMLAudioElement
     private volume: number = 1
-    private fadeVolume: number = 0
+    private fadeVolume: number = 1
 
     // the first track is always the current one
     private files: string[]
