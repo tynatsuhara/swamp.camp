@@ -70,7 +70,7 @@ export class StepSounds {
             case GroundType.BASIC_NINE_SLICE:
                 return [StepSounds.WOOD_1, .15]
             case GroundType.PATH:
-                return [StepSounds.GRAVEL, .2]
+                return [StepSounds.GRAVEL, .13]
             default:
                 console.log("no mapped sound for ground type")
                 return [undefined, 0]
