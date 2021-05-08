@@ -19,13 +19,23 @@ export class AudioQueue {
     }
 
     fadeOut(): Promise<void> {
-        console.log("fading out")
-        return AudioUtils.adjustVolume(this.fadeVolume, 0, v => this.setFadeVolume(v))
+        console.log(`fading out ${this.currentAudio?.src}`)
+        return AudioUtils.adjustVolume(this.fadeVolume, 0, v => {
+            this.setFadeVolume(v)
+            if (v === 0) {
+                console.log(`faded out ${this.currentAudio?.src}`)
+            }
+        })
     }
 
     fadeIn(): Promise<void> {
-        console.log("fading in")
-        return AudioUtils.adjustVolume(this.fadeVolume, 1, v => this.setFadeVolume(v))
+        console.log(`fading in ${this.currentAudio?.src}`)
+        return AudioUtils.adjustVolume(this.fadeVolume, 1, v => {
+            this.setFadeVolume(v)
+            if (v === 1) {
+                console.log(`faded in ${this.currentAudio?.src}`)
+            }
+        })
     }
 
     play() {
@@ -47,7 +57,7 @@ export class AudioQueue {
             this.play()
         }
 
-        this.currentAudio
+        this.currentAudio = track
     }
 
     pause() {

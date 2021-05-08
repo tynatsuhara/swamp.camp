@@ -50,8 +50,8 @@ export class Ambiance {
         }
 
         const startNewAmbiance = () => {
-            newAmbiance.fadeIn()
             newAmbiance.play()
+            newAmbiance.fadeIn()
         }
 
         if (!!this.currentAmbiance) {
