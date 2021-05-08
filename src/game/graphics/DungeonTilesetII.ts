@@ -72,7 +72,7 @@ const map = new Map(`
     wall_inner_corner_t_top_rigth 64 160 16 16
 
     edge 96 128 16 16
-    hole  96 144 16 16
+    hole 96 144 16 16
 
     doors_all 16 221 64 35
     doors_frame_left 16 224 16 32
@@ -190,7 +190,7 @@ const map = new Map(`
     ogre_idle_anim 16 320 32 32 4
     ogre_run_anim 144 320 32 32 4
     
-    big_demon_idle_anim  16 364 32 36 4
+    big_demon_idle_anim 16 364 32 36 4
     big_demon_run_anim 144 364 32 36 4
 
     elf_f_idle_anim 128 4 16 28 4
