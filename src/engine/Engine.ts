@@ -6,9 +6,11 @@ import { CapturedInput, Input } from "./Input"
 import { Point } from "./Point"
 import { measure, profiler } from "./Profiler"
 import { Renderer } from "./renderer/Renderer"
+import { clamp } from "./util/Utils"
 import { View } from "./View"
 
 const MINIMUM_ALLOWED_FPS = 15
+const MIN_ELAPSED_MILLIS = 1
 const MAX_ELAPSED_MILLIS = 1000/MINIMUM_ALLOWED_FPS
 
 export class UpdateViewsContext {
@@ -49,12 +51,10 @@ export class Engine {
 
         // Because of JS being suspended in the background, elapsed may become 
         // really high, so we need to limit it with MAX_ELAPSED_MILLIS.
-        // This means that visual lag can happen if fps < MINIMUM_ALLOWED_FPS
-        const elapsed = Math.min(time - this.lastUpdateMillis, MAX_ELAPSED_MILLIS)
-
-        if (elapsed == 0) {
-            return
-        }
+        // This means that visual lag can happen if fps < MINIMUM_ALLOWED_FPS.
+        // We also want elapsed to always be > 0, which will occasionally not
+        // be true, especially on the first update of a game.
+        const elapsed = clamp(time - this.lastUpdateMillis, MIN_ELAPSED_MILLIS, MAX_ELAPSED_MILLIS)
 
         collisionEngine.nextUpdate()
     
