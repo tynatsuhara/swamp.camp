@@ -34,7 +34,7 @@ export class Ambiance {
         const volume = Settings.getSoundVolume() * (this.isInterior ? .1 : 1)
         this.DAY.setVolume(volume)
 
-        const inDarkness = OutdoorDarknessMask.instance.isDark(Player.instance.dude.standingPosition)
+        const inDarkness = Player.instance.dude && OutdoorDarknessMask.instance.isDark(Player.instance.dude.standingPosition)
         this.NIGHT.setVolume(volume * (inDarkness ? 1 : .5))
 
         // fade out at night
