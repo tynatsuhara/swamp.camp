@@ -41,6 +41,9 @@ export class DudeSpawner extends Component {
         }
 
         const l = LocationManager.instance.currentLocation
+        if (l.isInterior) {
+            return  // don't spawn demons inside
+        }
         const demons = Array.from(l.dudes.values()).filter(d => d.factions.includes(DudeFaction.DEMONS))
         const goalDemonCount = 3
 
@@ -50,7 +53,7 @@ export class DudeSpawner extends Component {
 
             for (let i = 0; i < Math.min(openPoints.length, goalDemonCount - demons.length); i++) {
                 const pt = Lists.oneOf(openPoints)
-                DudeFactory.instance.new(DudeType.HORNED_DEMON, pt.times(TILE_SIZE))
+                DudeFactory.instance.new(DudeType.HORNED_DEMON, pt.times(TILE_SIZE), l)
             }
         }
     }
