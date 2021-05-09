@@ -22,7 +22,7 @@ export class Ambiance {
         const volume = Settings.getSoundVolume() * (ctx.isInterior ? .1 : 1)
         Ambiance.DAY.setVolume(volume)
 
-        const inDarkness = Player.instance.dude && OutdoorDarknessMask.instance.isDark(Player.instance.dude.standingPosition)
+        const inDarkness = OutdoorDarknessMask.instance.isDark(Player.instance.dude.standingPosition)
         Ambiance.NIGHT.setVolume(volume * (inDarkness ? 1 : .5))
 
         // fade out at night

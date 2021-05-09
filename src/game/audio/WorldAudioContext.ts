@@ -1,3 +1,4 @@
+import { Player } from "../characters/Player"
 import { Ambiance } from "./Ambiance"
 import { Music } from "./Music"
 
@@ -30,12 +31,10 @@ export class WorldAudioContext {
         }
     }
 
-    listen(listener: (ctx: WorldAudioContext) => void) {
-        this.listeners.push(listener)
-        return listener
-    }
-
     private notifyListeners() {
+        if (!Player.instance?.dude) {
+            return
+        }
         this.listeners.forEach(l => l(this))
     }
 }
