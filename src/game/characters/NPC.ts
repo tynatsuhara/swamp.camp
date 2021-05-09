@@ -175,8 +175,11 @@ export class NPC extends Component {
                 return
             }
         }
-        // TODO: Shouldn't we cancel this as soon as the NPC isn't in the current location?
         const interval = setInterval(() => {
+            // TODO: Permanently cancel this if the location is deleted
+            if (this.dude.location !== LocationManager.instance.currentLocation) {
+                return
+            }
             if (!this.dude.isAlive || fn()) {
                 clearInterval(interval)
             }
