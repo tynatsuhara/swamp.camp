@@ -4,6 +4,7 @@ import { Settings } from "../Settings"
 import { OutdoorDarknessMask } from "../world/OutdoorDarknessMask"
 import { TimeUnit } from "../world/TimeUnit"
 import { AudioQueue } from "./AudioQueue"
+import { WorldAudioContext } from "./WorldAudioContext"
 
 /**
  * Used for long-running background sounds based on environmental factors
@@ -17,38 +18,25 @@ export class Ambiance {
         .025
     )
 
-    private static time: number
-    private static isInterior: boolean
-
-    static setTime(time: number) {
-        this.time = time
-        this.determineAmbiance()
-    }
-
-    static setIsInterior(isInterior: boolean) {
-        this.isInterior = isInterior
-        this.determineAmbiance()
-    }
-
-    private static determineAmbiance() {
-        const volume = Settings.getSoundVolume() * (this.isInterior ? .1 : 1)
-        this.DAY.setVolume(volume)
+    static determineAmbiance(ctx: WorldAudioContext) {
+        const volume = Settings.getSoundVolume() * (ctx.isInterior ? .1 : 1)
+        Ambiance.DAY.setVolume(volume)
 
         const inDarkness = Player.instance.dude && OutdoorDarknessMask.instance.isDark(Player.instance.dude.standingPosition)
-        this.NIGHT.setVolume(volume * (inDarkness ? 1 : .5))
+        Ambiance.NIGHT.setVolume(volume * (inDarkness ? 1 : .5))
 
         // fade out at night
-        const timeOfDay = this.time % TimeUnit.DAY
+        const timeOfDay = ctx.time % TimeUnit.DAY
         const daytimeFadeInTime = TimeUnit.HOUR * 5
         const daytimeFadeOutTime = TimeUnit.HOUR * 20
 
         if (timeOfDay > daytimeFadeOutTime || timeOfDay < daytimeFadeInTime) {
-            this.play(this.NIGHT)
+            Ambiance.play(Ambiance.NIGHT)
         } else if (timeOfDay > daytimeFadeInTime) {
-            this.play(this.DAY)
+            Ambiance.play(Ambiance.DAY)
         }
 
-        window['currentAmbiance'] = this.currentAmbiance
+        window['currentAmbiance'] = Ambiance.currentAmbiance
     }
 
     private static play(newAmbiance: AudioQueue) {

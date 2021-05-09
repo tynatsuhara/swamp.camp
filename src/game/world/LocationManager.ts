@@ -1,4 +1,4 @@
-import { Ambiance } from "../audio/Ambiance"
+import { WorldAudioContext } from "../audio/WorldAudioContext"
 import { LocationManagerSaveState } from "../saves/LocationManagerSaveState"
 import { WorldLocation } from "./WorldLocation"
 
@@ -20,7 +20,7 @@ export class LocationManager {
     private _currentLocation: WorldLocation
     get currentLocation() { return this._currentLocation }
     set currentLocation(newLocation) {
-        Ambiance.setIsInterior(newLocation.isInterior)
+        WorldAudioContext.instance.isInterior = newLocation.isInterior
         this.currentLocation?.toggleAudio(false)
         newLocation.toggleAudio(true)
         this._currentLocation = newLocation

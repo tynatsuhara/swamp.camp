@@ -5,7 +5,7 @@ import { EventQueue } from "./events/EventQueue"
 import { InputKey } from "../../engine/Input"
 import { TimeUnit } from "./TimeUnit"
 import { debug } from "../../engine/Debug"
-import { Ambiance } from "../audio/Ambiance"
+import { WorldAudioContext } from "../audio/WorldAudioContext"
 
 export class WorldTime extends Component {
 
@@ -42,7 +42,7 @@ export class WorldTime extends Component {
         }
 
         EventQueue.instance.processEvents(this.time)
-        Ambiance.setTime(this.time)
+        WorldAudioContext.instance.time = this.time
 
         window.document.title = `${this.title} | ${this.clockTime()}`
     }
