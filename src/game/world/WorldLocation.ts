@@ -287,6 +287,7 @@ export class WorldLocation {
         saveState.elements.forEach(el => n.addElement(el.type, Point.fromString(el.pos), el.obj))
         saveState.ground.forEach(el => n.addGroundElement(el.type, Point.fromString(el.pos), el.obj))
         saveState.dudes.forEach(d => DudeFactory.instance.load(d, n))
+        n.toggleAudio(false)
         return n
     }
 }
