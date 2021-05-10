@@ -4,7 +4,7 @@ export const Controls = {
     interactButton: InputKey.E,
     interactButtonSecondary: InputKey.F,
     closeButton: InputKey.ESC,
-    inventoryButton: InputKey.I,
+    inventoryButton: InputKey.TAB,
     walkUp: InputKey.W,
     walkDown: InputKey.S,
     walkLeft: InputKey.A,
