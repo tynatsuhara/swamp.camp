@@ -9,8 +9,8 @@ export const Controls = {
     walkDown: InputKey.S,
     walkLeft: InputKey.A,
     walkRight: InputKey.D,
-    attackKey: InputKey.K,
-    blockKey: InputKey.L,
+    // attackKey: InputKey.K,
+    // blockKey: InputKey.L,
 
     keyString: (inputKey: InputKey) => {
         return String.fromCharCode(inputKey)

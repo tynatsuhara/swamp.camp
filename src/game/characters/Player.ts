@@ -91,7 +91,7 @@ export class Player extends Component {
         this.dude.move(
             updateData, 
             this.velocity, 
-            0, // this.dude.rolling() ? 0 : updateData.input.mousePos.x - this.dude.standingPosition.x,
+            this.dude.rolling() ? 0 : updateData.input.mousePos.x - this.dude.standingPosition.x,
             speed
         )
 
@@ -115,11 +115,14 @@ export class Player extends Component {
         }
 
         if (!!this.dude.shield) {
-            this.dude.shield.block(updateData.input.isKeyHeld(Controls.blockKey))
+            // this.dude.shield.block(updateData.input.isKeyHeld(Controls.blockKey))
+            this.dude.shield.block(updateData.input.isRightMouseHeld)
         }
 
-        if (updateData.input.isKeyHeld(Controls.attackKey) && !updateData.input.isKeyHeld(Controls.blockKey)) {
-            this.dude.weapon?.attack(updateData.input.isKeyDown(Controls.attackKey))
+        // if (updateData.input.isKeyHeld(Controls.attackKey) && !updateData.input.isKeyHeld(Controls.blockKey)) {
+        if (updateData.input.isMouseHeld && !updateData.input.isRightMouseHeld) {
+            // this.dude.weapon?.attack(updateData.input.isKeyDown(Controls.attackKey))
+            this.dude.weapon?.attack(updateData.input.isMouseDown)
         } else {
             this.dude.weapon?.cancelAttack()
         }

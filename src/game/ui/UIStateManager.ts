@@ -60,11 +60,11 @@ export class UIStateManager {
                 || this.craftingMenu.isOpen
                 || this.sellMenu.isOpen
                 
-        if (this.captureInput || debug.enableDevControls) {
-            Mouse.show()
-        } else {
-            Mouse.hide()
-        }
+        // if (this.captureInput || debug.enableDevControls) {
+        //     Mouse.show()
+        // } else {
+        //     Mouse.hide()
+        // }
 
         return this.hud.getEntities(Player.instance.dude, dimensions, elapsedMillis)
                 .concat(this.inventory.getEntities())
