@@ -116,7 +116,7 @@ export class Player extends Component {
 
         if (!!this.dude.shield) {
             // this.dude.shield.block(updateData.input.isKeyHeld(Controls.blockKey))
-            this.dude.shield.block(updateData.input.isRightMouseHeld)
+            this.dude.shield.block(updateData.input.isRightMouseHeld || updateData.input.isKeyHeld(Controls.blockKey))
         }
 
         // if (updateData.input.isKeyHeld(Controls.attackKey) && !updateData.input.isKeyHeld(Controls.blockKey)) {
