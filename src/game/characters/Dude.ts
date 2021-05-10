@@ -240,7 +240,7 @@ export class Dude extends Component implements DialogueSource {
             this.animation.applyFilter(ImageFilters.dissolve(() => dissolveChance))
             this.animation.goToAnimation(0)  // refresh even though it's paused
             if (dissolveChance >= 1) {
-                this.entity.selfDestruct()
+                this.entity?.selfDestruct()
                 clearInterval(interval)
             }
             dissolveChance *= 2
