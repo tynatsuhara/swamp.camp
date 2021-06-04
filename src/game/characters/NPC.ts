@@ -241,7 +241,7 @@ export class NPC extends Component {
             const openPoints = l.getGroundSpots().filter(pt => !l.isOccupied(pt))
             let pt: Point
             for (let i = 0; i < 5; i++) {
-                pt = openPoints[Math.floor(Math.random() * openPoints.length)]
+                pt = Lists.oneOf(openPoints)
                 if (ptSelectionFilter(pt)) {
                     break
                 }
