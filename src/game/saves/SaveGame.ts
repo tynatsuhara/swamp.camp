@@ -19,4 +19,5 @@ export class SaveState {
     coins?: number = 0
     plume?: Color[]
     townStats?: { [key: string]: number }
+    timePlayed?: number = 0
 }

@@ -6,6 +6,7 @@ import { InputKey } from "../../engine/Input"
 import { TimeUnit } from "./TimeUnit"
 import { debug } from "../../engine/Debug"
 import { WorldAudioContext } from "../audio/WorldAudioContext"
+import { saveManager } from "../SaveManager"
 
 export class WorldTime extends Component {
 
@@ -33,6 +34,9 @@ export class WorldTime extends Component {
 
     update(updateData: UpdateData) {
         this._time += updateData.elapsedTimeMillis
+        saveManager.setState({ 
+            timePlayed: (saveManager.getState().timePlayed || 0) + updateData.elapsedTimeMillis
+        })
 
         if (debug.enableDevControls) {
             if (updateData.input.isKeyDown(InputKey.N) || updateData.input.isKeyDown(InputKey.M)) {

@@ -90,9 +90,10 @@ class SaveManager {
      */
     load() {
         const save = this.getSavedData()
-        const prettyPrintTimestamp = new Date()
-        prettyPrintTimestamp.setTime(save.timeSaved)
-        console.log(`loaded save from ${prettyPrintTimestamp}`)
+        const saveDate = new Date()
+        saveDate.setTime(save.timeSaved)
+        const timePlayed = new Date(save.state.timePlayed).toISOString().substr(11, 8)
+        console.log(`loaded save from ${saveDate} with ${timePlayed} played`)
 
         WorldTime.instance.initialize(save.worldTime)
         LocationManager.instance.initialize(save.locations)
