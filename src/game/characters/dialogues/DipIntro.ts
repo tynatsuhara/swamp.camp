@@ -9,6 +9,7 @@ import { QueuedEventType } from "../../world/events/QueuedEvent"
 import { WorldTime } from "../../world/WorldTime"
 import { CraftingMenu } from "../../ui/CraftingMenu"
 import { getDipRecipes } from "../../items/CraftingRecipe"
+import { InputKeyString } from "../../../engine/Input"
 
 export const ROCKS_NEEDED_FOR_CAMPFIRE = 8
 export const WOOD_NEEDED_FOR_CAMPFIRE = 4
@@ -54,7 +55,7 @@ export const DIP_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
                 "It's important to keep your camp well-lit out here. There's no telling what danger lurks in the darkness..."
             ]
             if (campfires[0].save()["logs"] === 0) {
-                lines.push(`You can add logs to the fire by standing close to it and pressing [${Controls.keyString(Controls.interactButton)}].`)
+                lines.push(`You can add logs to the fire by standing close to it and pressing [${InputKeyString.for(Controls.interactButton)}].`)
             }
             lines.push("Here, I've finished putting together your tent. Find a nice spot and plop it down!")
             return dialogue(lines, () => {  // TODO actually decide what should happen here
@@ -68,7 +69,7 @@ export const DIP_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
             }, DudeInteractIndicator.IMPORTANT_DIALOGUE)
         } else if (inv().getItemCount(Item.CAMPFIRE) > 0) {  // campfire has been crafted
             return dialogue(
-                [`Try placing the campfire down near my tent. You can open your inventory by pressing [${String.fromCharCode(Controls.inventoryButton)}].`], 
+                [`Try placing the campfire down near my tent. You can open your inventory by pressing [${InputKeyString.for(Controls.inventoryButton)}].`], 
                 () =>  new NextDialogue(DIP_MAKE_CAMPFIRE, false)
             )
         } else if (inv().getItemCount(Item.ROCK) >= ROCKS_NEEDED_FOR_CAMPFIRE && inv().getItemCount(Item.WOOD) >= WOOD_NEEDED_FOR_CAMPFIRE) {  // can craft

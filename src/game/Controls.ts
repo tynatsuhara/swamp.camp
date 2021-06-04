@@ -10,8 +10,4 @@ export const Controls = {
     walkLeft: InputKey.A,
     walkRight: InputKey.D,
     blockKey: InputKey.SHIFT,
-
-    keyString: (inputKey: InputKey) => {
-        return String.fromCharCode(inputKey)
-    }
 }

@@ -130,48 +130,6 @@ export class Player extends Component {
         if (updateData.input.isKeyDown(Controls.interactButton) && !!possibleInteractable) {
             possibleInteractable.interact()
         }
-
-        // Commands which are used for testing and development
-        if (debug.enableDevControls) {
-            const mouseTilePos = pixelPtToTilePt(updateData.input.mousePos)
-            if (updateData.input.isKeyDown(InputKey.O)) {
-                DudeFactory.instance.new(DudeType.DEMON_BRUTE, updateData.input.mousePos)
-            }
-            if (updateData.input.isKeyDown(InputKey.P)) {
-                DudeFactory.instance.new(DudeType.HORNED_DEMON, updateData.input.mousePos)
-            }
-            if (updateData.input.isKeyDown(InputKey.U)) {
-                DudeFactory.instance.new(DudeType.ORC_SHAMAN, updateData.input.mousePos)
-            }
-            if (updateData.input.isKeyDown(InputKey.B)) {
-                DudeFactory.instance.new(DudeType.BEAR, updateData.input.mousePos)
-            }
-            if (updateData.input.isKeyDown(InputKey.SEMICOLON)) {
-                DudeFactory.instance.new(DudeType.SHROOM, updateData.input.mousePos)
-            }
-            if (updateData.input.isKeyDown(InputKey.QUOTE)) {
-                NotificationDisplay.instance.push({
-                    text: "ORC ATTACK!",
-                    icon: "sword",
-                })
-                Lists.range(0, 5 + Math.random() * 15).forEach(() => 
-                    DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE))
-                )
-                Lists.range(0, 1 + Math.random() * 4).forEach(() => 
-                    DudeFactory.instance.new(DudeType.ORC_BRUTE, new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE))
-                )
-            }
-            if (updateData.input.isKeyDown(InputKey.COMMA)) {
-                if (LocationManager.instance.currentLocation.ground.get(mouseTilePos)?.type === GroundType.PATH) {
-                    LocationManager.instance.currentLocation.addGroundElement(GroundType.GRASS, mouseTilePos)
-                } else {
-                    LocationManager.instance.currentLocation.addGroundElement(GroundType.PATH, mouseTilePos)
-                }
-            }
-            if (updateData.input.isKeyDown(InputKey.PERIOD)) {
-                LocationManager.instance.currentLocation.removeElementAt(mouseTilePos)
-            }
-        }
         
         // update crosshair position
         // const relativeLerpedPos = originalCrosshairPosRelative.lerp(0.16, this.lerpedLastMoveDir.normalized().times(TILE_SIZE))

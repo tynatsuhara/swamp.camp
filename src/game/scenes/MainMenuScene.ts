@@ -4,6 +4,7 @@ import { Entity } from "../../engine/Entity"
 import { Point } from "../../engine/Point"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
+import { DevControls } from "../DevControls"
 import { saveManager } from "../SaveManager"
 import { MainMenuButton } from "../ui/MainMenuButton"
 import { PlumePicker } from "../ui/PlumePicker"
@@ -41,6 +42,8 @@ export class MainMenuScene {
     }
     
     getViews(updateViewsContext: UpdateViewsContext) {
+        DevControls.checkDevControls(updateViewsContext.input)
+
         const dimensions = updateViewsContext.dimensions.div(ZOOM)
         const saveFileExists = saveManager.saveFileExists()
         const center = dimensions.floorDiv(2)

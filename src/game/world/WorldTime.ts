@@ -2,9 +2,7 @@ import { Entity } from "../../engine/Entity"
 import { Component } from "../../engine/Component"
 import { UpdateData } from "../../engine/Engine"
 import { EventQueue } from "./events/EventQueue"
-import { InputKey } from "../../engine/Input"
 import { TimeUnit } from "./TimeUnit"
-import { debug } from "../../engine/Debug"
 import { WorldAudioContext } from "../audio/WorldAudioContext"
 import { saveManager } from "../SaveManager"
 
@@ -38,17 +36,15 @@ export class WorldTime extends Component {
             timePlayed: (saveManager.getState().timePlayed || 0) + updateData.elapsedTimeMillis
         })
 
-        if (debug.enableDevControls) {
-            if (updateData.input.isKeyDown(InputKey.N) || updateData.input.isKeyDown(InputKey.M)) {
-                this._time += updateData.input.isKeyDown(InputKey.N) ? TimeUnit.HOUR : TimeUnit.MINUTE
-                console.log(`fast forwarding time to ${this.clockTime()}`)
-            }
-        }
-
         EventQueue.instance.processEvents(this.time)
         WorldAudioContext.instance.time = this.time
 
         window.document.title = `${this.title} | ${this.clockTime()}`
+    }
+
+    fastForward(duration: number) {
+        this._time += duration
+        console.log(`fast forwarding time to ${this.clockTime()}`)
     }
 
     getEntity(): Entity {

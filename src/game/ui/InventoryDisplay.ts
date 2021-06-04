@@ -1,7 +1,7 @@
 import { Component } from "../../engine/Component"
 import { UpdateData } from "../../engine/Engine"
 import { Entity } from "../../engine/Entity"
-import { InputKey } from "../../engine/Input"
+import { InputKey, InputKeyString } from "../../engine/Input"
 import { Point } from "../../engine/Point"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
 import { TextRender } from "../../engine/renderer/TextRender"
@@ -184,7 +184,7 @@ export class InventoryDisplay extends Component {
             let tooltipString = `${item.displayName}${count}` 
 
             actions.forEach((action, i) => {
-                tooltipString += `\n[${Controls.keyString(interactButtonOrder[i])} to ${action.verb}]`
+                tooltipString += `\n[${InputKeyString.for(interactButtonOrder[i])} to ${action.verb}]`
             })
 
             this.tooltip.say(tooltipString)

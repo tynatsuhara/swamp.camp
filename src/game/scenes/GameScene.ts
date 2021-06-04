@@ -28,6 +28,7 @@ import { Entity } from "../../engine/Entity"
 import { debug } from "../../engine/Debug"
 import { Barrier } from "../world/Barrier"
 import { DudeSpawner } from "../characters/DudeSpawner"
+import { DevControls } from "../DevControls"
 
 const ZOOM = 3
 
@@ -81,6 +82,8 @@ export class GameScene {
     }
     
     getViews(updateViewsContext: UpdateViewsContext) {
+        DevControls.checkDevControls(updateViewsContext.input)
+
         this.updateViews(updateViewsContext)
         return [
             this.gameEntityView, 
