@@ -12,7 +12,7 @@ import { WorldAudioContext } from "./WorldAudioContext"
 export class Ambiance {
     private static currentAmbiance: AudioQueue
 
-    private static readonly DAY = new AudioQueue(["audio/ambiance/daytime.wav"])
+    private static readonly DAY = new AudioQueue(["audio/ambiance/daytime.ogg"])
     private static readonly NIGHT = new AudioQueue(
         Lists.shuffled(Lists.range(1, 9).map(i => `audio/ambiance/yewbic__ambience0${i}.wav`)),
         .025
