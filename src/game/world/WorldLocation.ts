@@ -122,6 +122,13 @@ export class WorldLocation {
         this.occupied.removeAll(el)
     }
 
+    getGroundSpots() {
+        if (this.isInterior) {
+            return this.ground.keys()
+        }
+        return MapGenerator.GOOD_FLEEING_SPOTS
+    }
+
     findPath(tileStart: Point, tileEnd: Point, heuristic: (pt: Point, goal: Point) => number) {
         return this.occupied.findPath(tileStart, tileEnd, {
             heuristic: (pt) => heuristic(pt, tileEnd),

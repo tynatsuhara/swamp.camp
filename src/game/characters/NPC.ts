@@ -205,7 +205,7 @@ export class NPC extends Component {
     private doFlee(updateData: UpdateData, speedMultiplier: number = 1, ptSelectionFilter: (pt) => boolean = () => true) {
         if (!this.fleePath || this.fleePath.length === 0) {  // only try once per upate() to find a path
             const l = LocationManager.instance.currentLocation
-            const openPoints = MapGenerator.GOOD_FLEEING_SPOTS.filter(pt => !l.isOccupied(pt))
+            const openPoints = l.getGroundSpots().filter(pt => !l.isOccupied(pt))
             let pt: Point
             for (let i = 0; i < 5; i++) {
                 pt = openPoints[Math.floor(Math.random() * openPoints.length)]
