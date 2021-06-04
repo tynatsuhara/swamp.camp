@@ -12,6 +12,7 @@ import { MapGenerator } from "../world/MapGenerator"
 import { OutdoorDarknessMask } from "../world/OutdoorDarknessMask"
 import { Teleporter } from "../world/Teleporter"
 import { TimeUnit } from "../world/TimeUnit"
+import { WorldLocation } from "../world/WorldLocation"
 import { WorldTime } from "../world/WorldTime"
 import { Dude } from "./Dude"
 import { NPCSchedule, NPCSchedules, NPCScheduleType } from "./NPCSchedule"
@@ -34,6 +35,10 @@ export class NPC extends Component {
 
     findTargetRange = TILE_SIZE * 10
     private enemiesPresent = false
+    get timeOfDay() {
+        return WorldTime.instance.time % TimeUnit.DAY
+    }
+
 
     constructor(defaultSchedule: NPCSchedule = NPCSchedules.newNoOpSchedule()) {
         super()
@@ -108,31 +113,36 @@ export class NPC extends Component {
                 }
             )
         } else if (schedule.type === NPCScheduleType.DEFAULT_VILLAGER) {
-            const home = this.findHomeLocation()
-            // TODO: decide what default villager behavior should be
-            if (this.dude.location === home) {
-                // roam around inside
+            let goalLocation: WorldLocation
+            if (this.timeOfDay > NPCSchedules.VILLAGER_WAKE_UP_TIME 
+                && this.timeOfDay < NPCSchedules.VILLAGER_GO_HOME_TIME) {
+                // Are you feeling zen? If not, a staycation is what I recommend. 
+                // Or better yet, don't be a jerk. Unwind by being a man... and goin' to work.
+                goalLocation = LocationManager.instance.exterior()
+            } else {
+                // Go home!
+                const home = this.findHomeLocation()
+                if (!home) {
+                    // homeless behavior
+                    this.doRoam(updateData, 0.5)
+                    return
+                }
+                goalLocation = home
+            }
+            if (this.dude.location === goalLocation) {
                 this.doRoam(updateData, 0.5, { 
                     pauseEveryMillis: 2500 + 2500 * Math.random(),
                     pauseForMillis: 2500 + 5000 * Math.random(),
                 })
-            } else if (!home) {
-                // TODO: homeless behavior
-                this.doRoam(updateData, 0.5)
             } else {
-                this.findTeleporter(home.uuid)
-                this.goToTeleporter(updateData)
+                this.findTeleporter(goalLocation.uuid)
+                this.goToTeleporter(updateData, 0.5)
             }
         } else {
             throw new Error("unimplemented schedule type")
         }
     }
 
-    /**
-     * TODO: Support simulation for NPCs which are not in the current location?
-     * Example: You're in an NPC's house, they should come inside when it's time. 
-     * Alternatively, this could be done using the EventQueue.
-     */
     static SCHEDULE_FREQUENCY = 10 * TimeUnit.MINUTE
 
     simulate() {
@@ -142,9 +152,13 @@ export class NPC extends Component {
         if (schedule.type === NPCScheduleType.GO_TO_SPOT) {
             this.forceMoveToTilePosition(Point.fromString(schedule["p"]))
         } else if (schedule.type === NPCScheduleType.DEFAULT_VILLAGER) {
-            // TODO 
             const home = this.findHomeLocation()
-            if (this.dude.location !== home) {
+            if (this.timeOfDay > NPCSchedules.VILLAGER_WAKE_UP_TIME 
+                && this.timeOfDay < NPCSchedules.VILLAGER_GO_HOME_TIME) {
+                if (this.dude.location !== LocationManager.instance.exterior()) {
+                    this.useTeleporter(home.getTeleporter(LocationManager.instance.exterior().uuid))
+                }
+            } else if (home && this.dude.location !== home) {
                 this.useTeleporter(LocationManager.instance.exterior().getTeleporter(home.uuid))
             }
         }
@@ -192,7 +206,7 @@ export class NPC extends Component {
     }
 
     private walkPath: Point[] = null
-    private walkTo(tilePt: Point, updateData: UpdateData) {
+    private walkTo(tilePt: Point, updateData: UpdateData, speedMultiplier: number = 1) {
         // TODO: make sure the existing path is to the same pt
         if (!this.walkPath || this.walkPath.length === 0) {  // only try once per upate() to find a path
             this.walkPath = this.findPath(tilePt)
@@ -201,7 +215,7 @@ export class NPC extends Component {
                 return
             }
         }
-        if (this.walkDirectlyTo(this.walkPath[0], updateData, this.walkPath.length === 1)) {
+        if (this.walkDirectlyTo(this.walkPath[0], updateData, this.walkPath.length === 1, speedMultiplier)) {
             this.walkPath.shift()
         }
     }
@@ -243,6 +257,7 @@ export class NPC extends Component {
             }
         }
 
+        // previous pausing parameters will only be cleared if pauseEveryMillis is falsey
         if (pauseEveryMillis) {
             const time = WorldTime.instance.time
             if (time > this.roamNextUnpauseTime) {
@@ -252,6 +267,9 @@ export class NPC extends Component {
                 this.dude.move(updateData, Point.ZERO)
                 return
             }
+        } else {
+            this.roamNextPauseTime = -1
+            this.roamNextUnpauseTime = -1
         }
 
         if (this.walkDirectlyTo(this.roamPath[0], updateData, false, speedMultiplier)) {
@@ -452,13 +470,13 @@ export class NPC extends Component {
             this.teleporterTarget = this.dude.location.getTeleporter(uuid)
         }
     }
-    private goToTeleporter(updateData: UpdateData) {
+    private goToTeleporter(updateData: UpdateData, speedMultiplier: number = 1) {
         if (!this.teleporterTarget) {
             return
         }
         const standingTile = pixelPtToTilePt(this.dude.standingPosition)
         const tilePt = pixelPtToTilePt(this.teleporterTarget.pos)
-        this.walkTo(tilePt, updateData)
+        this.walkTo(tilePt, updateData, speedMultiplier)
         if (standingTile.manhattanDistanceTo(tilePt) <= 1) {
             this.useTeleporter(this.teleporterTarget)
         }

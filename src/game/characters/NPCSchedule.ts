@@ -1,4 +1,6 @@
 import { Point } from "../../engine/Point"
+import { TimeUnit } from "../world/TimeUnit"
+import { WorldTime } from "../world/WorldTime"
 
 export const enum NPCScheduleType {
     DO_NOTHING,
@@ -24,5 +26,8 @@ export const NPCSchedules = {
 
     newFreeRoamSchedule: () => ({ type: NPCScheduleType.ROAM }),
 
-    newDefaultVillagerSchedule: () => ({ type: NPCScheduleType.DEFAULT_VILLAGER })
+    newDefaultVillagerSchedule: () => ({ type: NPCScheduleType.DEFAULT_VILLAGER }),
+
+    VILLAGER_WAKE_UP_TIME: TimeUnit.HOUR * 8,
+    VILLAGER_GO_HOME_TIME: TimeUnit.HOUR * 18,
 }
