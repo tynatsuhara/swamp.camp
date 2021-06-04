@@ -74,7 +74,7 @@ export class NPC extends Component {
             if (!!this.attackTarget) {
                 this.doAttack(updateData)
             } else {
-                this.doFlee(updateData)
+                this.doRoam(updateData)
             }
         } else {
             this.doNormalScheduledActivity(updateData)
@@ -98,22 +98,27 @@ export class NPC extends Component {
                 updateData
             )
         } else if (schedule.type === NPCScheduleType.ROAM) {
-            this.doFlee(updateData, 0.5)
+            this.doRoam(updateData, 0.5)
         } else if (schedule.type === NPCScheduleType.ROAM_IN_DARKNESS) {
-            this.doFlee(
+            this.doRoam(
                 updateData, 
                 OutdoorDarknessMask.instance.isDark(this.dude.standingPosition) ? 0.5 : 1,
-                (pt) => OutdoorDarknessMask.instance.isDark(pt.times(TILE_SIZE))
+                {
+                    ptSelectionFilter: (pt) => OutdoorDarknessMask.instance.isDark(pt.times(TILE_SIZE))
+                }
             )
         } else if (schedule.type === NPCScheduleType.DEFAULT_VILLAGER) {
             const home = this.findHomeLocation()
             // TODO: decide what default villager behavior should be
             if (this.dude.location === home) {
                 // roam around inside
-                this.doFlee(updateData, 0.5)
+                this.doRoam(updateData, 0.5, { 
+                    pauseEveryMillis: 2500 + 2500 * Math.random(),
+                    pauseForMillis: 2500 + 5000 * Math.random(),
+                })
             } else if (!home) {
                 // TODO: homeless behavior
-                this.doFlee(updateData, 0.5)
+                this.doRoam(updateData, 0.5)
             } else {
                 this.findTeleporter(home.uuid)
                 this.goToTeleporter(updateData)
@@ -160,7 +165,7 @@ export class NPC extends Component {
 
     private clearExistingAIState() {
         this.walkPath = null
-        this.fleePath = null
+        this.roamPath = null
         this.attackTarget = null
         this.targetPath = null
         this.teleporterTarget = null
@@ -201,9 +206,23 @@ export class NPC extends Component {
         }
     }
 
-    private fleePath: Point[] = null
-    private doFlee(updateData: UpdateData, speedMultiplier: number = 1, ptSelectionFilter: (pt) => boolean = () => true) {
-        if (!this.fleePath || this.fleePath.length === 0) {  // only try once per upate() to find a path
+    private roamPath: Point[] = null
+    private roamNextPauseTime: number = -1
+    private roamNextUnpauseTime: number = -1
+    private doRoam(
+        updateData: UpdateData, 
+        speedMultiplier: number = 1, 
+        {
+            ptSelectionFilter = () => true,
+            pauseEveryMillis,
+            pauseForMillis,
+        }: {
+            ptSelectionFilter?: (pt) => boolean,
+            pauseEveryMillis?: number,
+            pauseForMillis?: number,
+        } = {}
+    ) {
+        if (!this.roamPath || this.roamPath.length === 0) {  // only try once per upate() to find a path
             const l = LocationManager.instance.currentLocation
             const openPoints = l.getGroundSpots().filter(pt => !l.isOccupied(pt))
             let pt: Point
@@ -217,14 +236,26 @@ export class NPC extends Component {
                 this.dude.move(updateData, Point.ZERO)
                 return
             }
-            this.fleePath = this.findPath(pt)
-            if (!this.fleePath || this.fleePath.length === 0) {
+            this.roamPath = this.findPath(pt)
+            if (!this.roamPath || this.roamPath.length === 0) {
                 this.dude.move(updateData, Point.ZERO)
                 return
             }
         }
-        if (this.walkDirectlyTo(this.fleePath[0], updateData, false, speedMultiplier)) {
-            this.fleePath.shift()
+
+        if (pauseEveryMillis) {
+            const time = WorldTime.instance.time
+            if (time > this.roamNextUnpauseTime) {
+                this.roamNextPauseTime = WorldTime.instance.time + pauseEveryMillis
+                this.roamNextUnpauseTime = this.roamNextPauseTime + pauseForMillis
+            } else if (time > this.roamNextPauseTime) {
+                this.dude.move(updateData, Point.ZERO)
+                return
+            }
+        }
+
+        if (this.walkDirectlyTo(this.roamPath[0], updateData, false, speedMultiplier)) {
+            this.roamPath.shift()
         }
     }
 
@@ -292,7 +323,7 @@ export class NPC extends Component {
             weapon.cancelAttack()
 
             if (stoppingDist > 0 && mag < (stoppingDist * .75)) {  // TODO make this more configurable?
-                this.doFlee(updateData)
+                this.doRoam(updateData)
                 return
             }
         }
