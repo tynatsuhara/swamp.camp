@@ -15,11 +15,18 @@ import { DevControls } from "../DevControls"
 import { pixelPtToTilePt, Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { saveManager } from "../SaveManager"
 import { MainMenuButton } from "../ui/MainMenuButton"
+import { MainMenuButtonSection } from "../ui/MainMenuButtonSection"
 import { PlumePicker } from "../ui/PlumePicker"
 import { UIStateManager } from "../ui/UIStateManager"
 import { DarknessMask } from "../world/DarknessMask"
 
 const ZOOM = 3
+
+enum Menu {
+    ROOT,
+    NEW_GAME,
+    CREDITS,
+}
 
 export class MainMenuScene {
 
@@ -34,7 +41,7 @@ export class MainMenuScene {
     private knight: TileComponent
     private title = assets.getImageByFileName("images/title.png")
 
-    private newGame: boolean
+    private menu = Menu.ROOT
 
     constructor(continueFn: () => void, newGameFn: () => void) {
         this.continueFn = continueFn
@@ -53,7 +60,7 @@ export class MainMenuScene {
     }
 
     private lastDimensions: Point
-    private renderEntities: Entity[]
+    private sceneEntities: Entity[]
     
     getViews(updateViewsContext: UpdateViewsContext) {
         DevControls.checkDevControls(updateViewsContext.input)
@@ -61,7 +68,6 @@ export class MainMenuScene {
         const dimensions = updateViewsContext.dimensions.div(ZOOM)
         const saveFileExists = saveManager.saveFileExists()
         const center = dimensions.floorDiv(2)
-        const lineSpacing = 16
 
         const menuTop = center.plusY(31)
         this.plumes.position = menuTop
@@ -71,29 +77,13 @@ export class MainMenuScene {
                 .plusY(-6)
         this.knight.transform.position = knightPos
 
+        // resize window
         if (!updateViewsContext.dimensions.equals(this.lastDimensions)) {
-            this.renderEntities = this.backgroundEntities(knightPos, dimensions)
+            this.sceneEntities = this.getSceneEntities(knightPos, dimensions)
             this.lastDimensions = updateViewsContext.dimensions
         }
 
-        const buttons: MainMenuButton[] = []
-
-        if (this.newGame) {
-            const top = menuTop.plusY(42)
-            buttons.push(new MainMenuButton(top, `start${saveFileExists ? " (delete old save)" : ""}`, this.newGameFn))
-            if (saveFileExists) {
-                buttons.push(new MainMenuButton(top.plusY(lineSpacing), "cancel", () => { 
-                    this.newGame = false 
-                    this.plumes.reset()
-                }))
-            }
-        } else {
-            if (saveFileExists) {
-                buttons.push(new MainMenuButton(menuTop, "load last save", this.continueFn))
-            }
-            buttons.push(new MainMenuButton(menuTop.plusY(lineSpacing * buttons.length), "New game", () => { this.newGame = true }))
-        }
-
+        // by default, render the title and the scene with the knight
         const titleDimensions = new Point(200, 50)
         const entities = [
             this.knight.entity, 
@@ -105,12 +95,49 @@ export class MainMenuScene {
                 titleDimensions,
                 UIStateManager.UI_SPRITE_DEPTH
             ))]),
-            new Entity(buttons),
-            ...this.renderEntities
+            ...this.sceneEntities
         ]
 
-        if (this.newGame) {
+        if (this.menu === Menu.ROOT) {
+            entities.push(
+                new MainMenuButtonSection(menuTop)
+                    .add("load last save", this.continueFn, saveFileExists)
+                    .add("New game", () => { this.menu = Menu.NEW_GAME })
+                    .add("Credits", () => { this.menu = Menu.CREDITS })
+                    .getEntity()
+            )
+        } else if (this.menu === Menu.NEW_GAME) {
             entities.push(this.plumes.entity)
+            entities.push(
+                new MainMenuButtonSection(menuTop.plusY(42))
+                    .add(`start${saveFileExists ? " (delete old save)" : ""}`, this.newGameFn)
+                    .add("cancel", () => { 
+                        this.menu = Menu.ROOT
+                        this.plumes.reset()
+                    })
+                    .getEntity()
+            )
+        } else if (this.menu === Menu.CREDITS) {
+            entities.splice(0)  // don't show title and scene
+            const link = (url: string) => () => window.open(url, '_blank')
+            const top = new Point(dimensions.x/2, 50)
+            entities.push(
+                new MainMenuButtonSection(top)
+                    .add("developer: Tyler Bonnell   ", link("https://ty.pizza/"))
+                    .addLineBreak()
+                    .add("      art: Robert Norenberg", link("http://0x72.pl/"))
+                    .add("           Cael Johnson    ", link("https://caeljohnson.artstation.com/"))
+                    .add("           Kenney          ", link("https://kenney.nl/"))
+                    .addLineBreak()
+                    .add("    music: Juhani Junkala  ", link("https://juhanijunkala.com/"))
+                    .add("           Brent Bunn      ", link("https://bertn1991.newgrounds.com/"))
+                    .add("           Playonloop.com  ", link("https://playonloop.com/"))
+                    .addLineBreak()
+                    .add("    sound: BurghRecords    ", link("https://www.edinburghrecords.com/"))
+                    .addLineBreak()
+                    .add("back", () => this.menu = Menu.ROOT)
+                    .getEntity()
+            )
         }
 
         return [{ 
@@ -120,13 +147,14 @@ export class MainMenuScene {
         }];
     }
 
+    // scene constants
     private static readonly SIZE = 10
     private static readonly GRASS = Array.from(
         { length: MainMenuScene.SIZE * 2 * MainMenuScene.SIZE * 2 }, 
         () => Math.random() < .65 ? Math.floor(Math.random() * 4) : 0
     )
 
-    private backgroundEntities(offset: Point, dimensions: Point) {
+    private getSceneEntities(offset: Point, dimensions: Point) {
         const components: Component[] = []
 
         // grass

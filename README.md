@@ -8,23 +8,22 @@ commit and push to `master`, this will trigger a [Netlify deployment](https://ap
 
 # links
 additional art by:
-* https://0x72.itch.io/dungeontileset-ii
-* https://superdark.itch.io/enchanted-forest-characters 
-* https://superdark.itch.io/16x16-free-npc-pack
-* https://anritool.itch.io/cr-tileset
-* https://kenney.nl/
-* https://opengameart.org/content/explosion-set-1-m484-games
-
-music by:
-* https://www.newgrounds.com/audio/listen/1017053
+* https://0x72.itch.io/dungeontileset-ii (robert norenberg)
+* https://superdark.itch.io/enchanted-forest-characters (cael johnson)
+* https://superdark.itch.io/16x16-free-npc-pack 
+* https://anritool.itch.io/cr-tileset (cc0)
+* https://kenney.nl/ (cc0)
+* https://opengameart.org/content/explosion-set-1-m484-games (cc0)
 
 sound effects & music by:
+* https://www.newgrounds.com/audio/listen/1017053 (brent bunn)
+* https://opengameart.org/content/gt-rpg-soundtrack (juhani junkala)
 * https://www.edinburghrecords.com/
-* https://opengameart.org/content/rpg-sound-pack
-* https://opengameart.org/content/different-steps-on-wood-stone-leaves-gravel-and-mud
-* https://opengameart.org/content/dark-ambience-soundscapes
+* https://opengameart.org/content/rpg-sound-pack (cc0)
+* https://opengameart.org/content/different-steps-on-wood-stone-leaves-gravel-and-mud (cc0)
+* https://freesound.org/people/yewbic/packs/2122/ (cc0)
 * https://opengameart.org/content/battle-march-epic-orchestral-music-loop
-* https://opengameart.org/content/gt-rpg-soundtrack
+
 
 tentative sound effects & music:
 * https://opengameart.org/content/talking-synthesizer
