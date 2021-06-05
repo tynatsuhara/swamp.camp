@@ -44,9 +44,18 @@ export class MainMenuButton extends Component {
         if (this.text === null) {
             return []
         }
-        const text = this.hovering 
-            ? `> ${this.text}  ` 
-            : `  ${this.text}  ` 
+        
+        let text = this.text
+        
+        // if manually aligning whitespace, put "> " after leading spaces
+        if (this.text.startsWith("  ")) {
+            if(this.hovering) {
+                const startSpaces = text.length - text.trimStart().length
+                text = " ".repeat(startSpaces - 2) + "> " + text.trimStart()
+            }
+        } else {
+            text = this.hovering ? `> ${this.text}  ` : `  ${this.text}  ` 
+        }
 
         const offset = Math.floor((this.width - text.length*TEXT_PIXEL_WIDTH)/2)
 
