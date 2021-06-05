@@ -1,4 +1,6 @@
+import { Component } from "../engine/Component"
 import { debug } from "../engine/Debug"
+import { UpdateData } from "../engine/Engine"
 import { CapturedInput, InputKey, InputKeyString } from "../engine/Input"
 import { Point } from "../engine/Point"
 import { Lists } from "../engine/util/Lists"
@@ -42,12 +44,13 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     [InputKey.M, "fast forward 1 minute", (input) => WorldTime.instance.fastForward(TimeUnit.MINUTE)],
 ]
 
-export const DevControls = {
-    checkDevControls: (input: CapturedInput) => {
+export class DevControls extends Component {
+    update(updateData: UpdateData) {
         if (debug.enableDevControls) {
             devCommands.forEach(cmd => {
-                if (input.isKeyDown(cmd[0])) {
-                    cmd[2](input)
+                if (updateData.input.isKeyDown(cmd[0])) {
+                    console.log(cmd[1])
+                    cmd[2](updateData.input)
                 }
             })
         }

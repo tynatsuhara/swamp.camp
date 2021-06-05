@@ -11,10 +11,8 @@ import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
-import { DevControls } from "../DevControls"
-import { pixelPtToTilePt, Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { saveManager } from "../SaveManager"
-import { MainMenuButton } from "../ui/MainMenuButton"
 import { MainMenuButtonSection } from "../ui/MainMenuButtonSection"
 import { PlumePicker } from "../ui/PlumePicker"
 import { UIStateManager } from "../ui/UIStateManager"
@@ -63,8 +61,6 @@ export class MainMenuScene {
     private sceneEntities: Entity[]
     
     getViews(updateViewsContext: UpdateViewsContext) {
-        DevControls.checkDevControls(updateViewsContext.input)
-
         const dimensions = updateViewsContext.dimensions.div(ZOOM)
         const saveFileExists = saveManager.saveFileExists()
         const center = dimensions.floorDiv(2)

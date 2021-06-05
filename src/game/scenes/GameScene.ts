@@ -82,8 +82,6 @@ export class GameScene {
     }
     
     getViews(updateViewsContext: UpdateViewsContext) {
-        DevControls.checkDevControls(updateViewsContext.input)
-
         this.updateViews(updateViewsContext)
         return [
             this.gameEntityView, 
@@ -105,7 +103,8 @@ export class GameScene {
                     WorldTime.instance.getEntity(),
                     GroundRenderer.instance.getEntity(),
                     DudeSpawner.instance.getEntity(),
-                    this.getDebugEntity()
+                    this.getDebugEntity(),
+                    new Entity([new DevControls()]),
                 ])
         }
 
