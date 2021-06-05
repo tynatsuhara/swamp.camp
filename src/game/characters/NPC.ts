@@ -7,9 +7,8 @@ import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
 import { ElementType } from "../world/elements/Elements"
 import { House } from "../world/elements/House"
+import { LightManager } from "../world/LightManager"
 import { LocationManager } from "../world/LocationManager"
-import { MapGenerator } from "../world/MapGenerator"
-import { OutdoorDarknessMask } from "../world/OutdoorDarknessMask"
 import { Teleporter } from "../world/Teleporter"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldLocation } from "../world/WorldLocation"
@@ -107,9 +106,9 @@ export class NPC extends Component {
         } else if (schedule.type === NPCScheduleType.ROAM_IN_DARKNESS) {
             this.doRoam(
                 updateData, 
-                OutdoorDarknessMask.instance.isDark(this.dude.standingPosition) ? 0.5 : 1,
+                LightManager.instance.isDark(this.dude.standingPosition) ? 0.5 : 1,
                 {
-                    ptSelectionFilter: (pt) => OutdoorDarknessMask.instance.isDark(pt.times(TILE_SIZE))
+                    ptSelectionFilter: (pt) => LightManager.instance.isDark(pt.times(TILE_SIZE))
                 }
             )
         } else if (schedule.type === NPCScheduleType.DEFAULT_VILLAGER) {

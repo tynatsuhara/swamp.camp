@@ -2,9 +2,10 @@ import { Component } from "../../engine/Component"
 import { Entity } from "../../engine/Entity"
 import { Lists } from "../../engine/util/Lists"
 import { TILE_SIZE } from "../graphics/Tilesets"
+import { DarknessMask } from "../world/DarknessMask"
+import { LightManager } from "../world/LightManager"
 import { LocationManager } from "../world/LocationManager"
 import { MapGenerator } from "../world/MapGenerator"
-import { OutdoorDarknessMask } from "../world/OutdoorDarknessMask"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
 import { DudeFaction, DudeFactory, DudeType } from "./DudeFactory"
@@ -36,7 +37,7 @@ export class DudeSpawner extends Component {
 
     private spawnDemons() {
         const hour = (WorldTime.instance.time % TimeUnit.DAY) / TimeUnit.HOUR
-        if (hour > OutdoorDarknessMask.SUNRISE_HOUR && hour < OutdoorDarknessMask.DUSK_HOUR) {
+        if (hour > DarknessMask.SUNRISE_HOUR && hour < DarknessMask.DUSK_HOUR) {
             return
         }
 
@@ -52,7 +53,7 @@ export class DudeSpawner extends Component {
 
         if (demons.length < goalDemonCount) {
             const openPoints = MapGenerator.GOOD_FLEEING_SPOTS.filter(pt => 
-                !l.isOccupied(pt) && OutdoorDarknessMask.instance.isTotalDarkness(pt.times(TILE_SIZE)))
+                !l.isOccupied(pt) && LightManager.instance.isTotalDarkness(pt.times(TILE_SIZE)))
 
             for (let i = 0; i < Math.min(openPoints.length, goalDemonCount - demons.length); i++) {
                 const pt = Lists.oneOf(openPoints)

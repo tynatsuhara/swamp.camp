@@ -14,7 +14,6 @@ import { UIStateManager } from "../ui/UIStateManager"
 import { GroundRenderer } from "../world/GroundRenderer"
 import { LocationManager } from "../world/LocationManager"
 import { MapGenerator } from "../world/MapGenerator"
-import { OutdoorDarknessMask } from "../world/OutdoorDarknessMask"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
 import { EventQueue } from "../world/events/EventQueue"
@@ -29,6 +28,7 @@ import { debug } from "../../engine/Debug"
 import { Barrier } from "../world/Barrier"
 import { DudeSpawner } from "../characters/DudeSpawner"
 import { DevControls } from "../DevControls"
+import { LightManager } from "../world/LightManager"
 
 const ZOOM = 3
 
@@ -47,7 +47,7 @@ export class GameScene {
 
     continueGame() {
         // Wait to initialize since it will begin a coroutine
-        OutdoorDarknessMask.instance.start()
+        // LightManager.instance.start()
 
         saveManager.load()
     }
@@ -56,7 +56,7 @@ export class GameScene {
         saveManager.deleteSave()
 
         // Wait to initialize since it will begin a coroutine
-        OutdoorDarknessMask.instance.start()
+        // OutdoorDarknessMask.instance.start()
         WorldTime.instance.initialize(TimeUnit.HOUR * 19.5)
         
         // World must be initialized before we do anything else
@@ -99,7 +99,7 @@ export class GameScene {
             zoom: ZOOM,
             offset: cameraOffset,
             entities: LocationManager.instance.currentLocation.getEntities()
-                .concat(OutdoorDarknessMask.instance.getEntities())
+                .concat(LightManager.instance.getEntities())
                 .concat([
                     CutsceneManager.instance.getEntity(), 
                     WorldTime.instance.getEntity(),

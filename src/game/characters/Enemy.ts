@@ -1,7 +1,7 @@
 import { Component } from "../../engine/Component"
 import { Point } from "../../engine/Point"
 import { TILE_SIZE } from "../graphics/Tilesets"
-import { OutdoorDarknessMask } from "../world/OutdoorDarknessMask"
+import { LightManager } from "../world/LightManager"
 import { Dude } from "./Dude"
 import { DudeFaction, DudeType } from "./DudeFactory"
 import { NPC } from "./NPC"
@@ -36,16 +36,16 @@ export class Enemy extends Component {
         if (this.dude.factions.includes(DudeFaction.DEMONS)) {
             // DEMON enemies will avoid light
             this.npc.isEnemyFn = d => {
-                return !d.factions.includes(DudeFaction.DEMONS) && OutdoorDarknessMask.instance.isDark(d.standingPosition)
+                return !d.factions.includes(DudeFaction.DEMONS) && LightManager.instance.isDark(d.standingPosition)
             }
             this.npc.pathFindingHeuristic = (pt: Point, goal: Point) => {
-                return pt.distanceTo(goal) + (OutdoorDarknessMask.instance.isDark(pt.times(TILE_SIZE)) ? 0 : 100)
+                return pt.distanceTo(goal) + (LightManager.instance.isDark(pt.times(TILE_SIZE)) ? 0 : 100)
             }
             this.npc.findTargetRange *= 3
             // dissolve if they end up in the light for too long
             let lastSunlightCheck = false
             this.npc.doWhileLiving(() => {
-                if (!OutdoorDarknessMask.instance.isDark(this.dude.standingPosition)) {
+                if (!LightManager.instance.isDark(this.dude.standingPosition)) {
                     if (lastSunlightCheck) {  // they've been in sunlight for a while, time to die
                         this.dude.dissolve()
                         return true // end the loop

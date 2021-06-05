@@ -10,7 +10,6 @@ import { ElementComponent } from "./ElementComponent"
 import { WorldLocation } from "../WorldLocation"
 import { Entity } from "../../../engine/Entity"
 import { ElementType } from "./Elements"
-import { OutdoorDarknessMask } from "../OutdoorDarknessMask"
 import { DialogueSource } from "../../characters/Dialogue"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { WorldTime } from "../WorldTime"
@@ -19,6 +18,7 @@ import { CAMPFIRE_DIALOGUE } from "../../characters/dialogues/ItemDialogues"
 import { ElementFactory } from "./ElementFactory"
 import { LocationManager } from "../LocationManager"
 import { PointAudio } from "../../audio/PointAudio"
+import { LightManager } from "../LightManager"
 
 export class CampfireFactory extends ElementFactory {
 
@@ -66,9 +66,9 @@ export class CampfireFactory extends ElementFactory {
             audio.setMultiplier(logCount === 0 ? 0 : 1)
             const lightCenterPos = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
             if (campfireOn.enabled) {
-                OutdoorDarknessMask.instance.addLight(wl, e, lightCenterPos, TILE_SIZE * (5 + logCount/2))
+                LightManager.instance.addLight(wl, e, lightCenterPos, TILE_SIZE * (5 + logCount/2))
             } else {
-                OutdoorDarknessMask.instance.removeLight(wl, e)
+                LightManager.instance.removeLight(wl, e)
             }
         }
 

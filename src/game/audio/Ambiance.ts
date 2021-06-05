@@ -1,7 +1,7 @@
 import { Lists } from "../../engine/util/Lists"
 import { Player } from "../characters/Player"
 import { Settings } from "../Settings"
-import { OutdoorDarknessMask } from "../world/OutdoorDarknessMask"
+import { LightManager } from "../world/LightManager"
 import { TimeUnit } from "../world/TimeUnit"
 import { AudioQueue } from "./AudioQueue"
 import { WorldAudioContext } from "./WorldAudioContext"
@@ -22,7 +22,7 @@ export class Ambiance {
         const volume = Settings.getSoundVolume() * (ctx.isInterior ? .1 : 1)
         Ambiance.DAY.setVolume(volume)
 
-        const inDarkness = OutdoorDarknessMask.instance.isDark(Player.instance.dude.standingPosition)
+        const inDarkness = LightManager.instance.isDark(Player.instance.dude.standingPosition)
         Ambiance.NIGHT.setVolume(volume * (inDarkness ? 1 : .5))
 
         // fade out at night

@@ -1,7 +1,7 @@
 import { Point } from "../../../engine/Point"
 import { TILE_SIZE } from "../../graphics/Tilesets"
+import { LightManager } from "../../world/LightManager"
 import { LocationManager } from "../../world/LocationManager"
-import { OutdoorDarknessMask } from "../../world/OutdoorDarknessMask"
 import { Shield } from "./Shield"
 import { ShieldType } from "./ShieldType"
 
@@ -23,7 +23,7 @@ export class Lantern extends Shield {
 
         this.transform.depth = -.5
 
-        OutdoorDarknessMask.instance.addLight(
+        LightManager.instance.addLight(
             LocationManager.instance.currentLocation, 
             this, 
             this.dude.standingPosition.plusY(-TILE_SIZE/2).plus(this.dude.getAnimationOffsetPosition()), 
@@ -37,7 +37,7 @@ export class Lantern extends Shield {
     }
 
     removeLight() {
-        OutdoorDarknessMask.instance.removeLight(LocationManager.instance.currentLocation, this)
+        LightManager.instance.removeLight(LocationManager.instance.currentLocation, this)
     }
 
     toggleOnBack() {}
