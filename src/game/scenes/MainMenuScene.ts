@@ -94,14 +94,14 @@ export class MainMenuScene {
             buttons.push(new MainMenuButton(menuTop.plusY(lineSpacing * buttons.length), "New game", () => { this.newGame = true }))
         }
 
-        const titleDimensions = new Point(100, 18)
+        const titleDimensions = new Point(200, 50)
         const entities = [
             this.knight.entity, 
             new Entity([new BasicRenderComponent(new ImageRender(
                 this.title,
                 Point.ZERO,
                 titleDimensions,
-                menuTop.plusX(-titleDimensions.x/2).plusY(-110),
+                menuTop.plusX(-titleDimensions.x/2).plusY(-100 - titleDimensions.y/2),
                 titleDimensions,
                 UIStateManager.UI_SPRITE_DEPTH
             ))]),
@@ -162,6 +162,7 @@ export class MainMenuScene {
             new TileTransform(campfirePos)
         ))
 
+        // darkness
         const darkness = new DarknessMask()
         darkness.addLightCircle(campfirePos.plusX(TILE_SIZE/2).plusY(TILE_SIZE/2), 72)
 
