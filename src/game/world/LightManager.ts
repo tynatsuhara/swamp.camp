@@ -21,7 +21,7 @@ export class LightManager {
     }
 
     private lightTiles: Map<WorldLocation, Map<any, [Point, number]>> = new Map<WorldLocation, Map<any, [Point, number]>>()
-    private mask = new DarknessMask(document.createElement("canvas"))
+    private mask = new DarknessMask()
 
     private vignetteEntity = new Entity([new Vignette(new Point(1, 1).times(-DarknessMask.size/2), DarknessMask.size)])
 

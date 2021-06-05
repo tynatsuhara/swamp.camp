@@ -24,11 +24,13 @@ export class DarknessMask {
     private context: CanvasRenderingContext2D
     private canvas: HTMLCanvasElement
 
-    constructor(canvas: HTMLCanvasElement) {
-        canvas.width = DarknessMask.size
-        canvas.height = DarknessMask.size
-        this.context = canvas.getContext("2d")
-        this.canvas = canvas
+    constructor() {
+        this.canvas = document.createElement("canvas")
+        this.canvas.width = DarknessMask.size
+        this.canvas.height = DarknessMask.size
+        this.context = this.canvas.getContext("2d")
+        
+        this.reset(0)
     }
 
     // constants for time of day color

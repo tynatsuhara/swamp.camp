@@ -9,6 +9,7 @@ import { rectContains } from "../../engine/util/Utils"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "./Color"
 import { saveManager } from "../SaveManager"
+import { UIStateManager } from "./UIStateManager"
 
 // array of [dark, light] pairs
 const CUSTOMIZATION_OPTIONS = [
@@ -91,7 +92,7 @@ export class PlumePicker extends Component {
                 position: position.plus(big ? new Point(-bigBuffer, -bigBuffer) : Point.ZERO),
                 dimensions: dimensions.plus(big ? new Point(bigBuffer, bigBuffer).times(2) : Point.ZERO),
                 color: colors[1],
-                depth: big && !hovered ? 2 : hovered ? 1 : 0
+                depth: UIStateManager.UI_SPRITE_DEPTH + (big && !hovered ? 2 : hovered ? 1 : 0)
             })
         })
     }
