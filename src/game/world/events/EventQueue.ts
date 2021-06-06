@@ -11,10 +11,6 @@ export class EventQueue {
         return this._instance
     }
 
-    private constructor() {
-        EventQueue._instance = this
-    }
-
     private heap: BinaryHeap<QueuedEventData> = new BinaryHeap(e => e.time)
 
     initialize(data: QueuedEventData[] = []) {

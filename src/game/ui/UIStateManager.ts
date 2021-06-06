@@ -39,10 +39,6 @@ export class UIStateManager {
     private captureInput = false
     get isMenuOpen() { return this.captureInput }
 
-    private constructor() {
-        UIStateManager._instance = this
-    }
-
     // Resets the singleton UIStateManager
     destroy() {
         UIStateManager._instance = new UIStateManager()

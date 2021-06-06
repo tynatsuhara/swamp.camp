@@ -36,8 +36,6 @@ export class GroundRenderer {
     private context: CanvasRenderingContext2D
 
     private constructor() {
-        GroundRenderer._instance = this
-
         this.canvas = document.createElement("canvas")
         this.canvas.width = this.size
         this.canvas.height = this.size

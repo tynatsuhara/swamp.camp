@@ -21,11 +21,6 @@ export class WorldTime extends Component {
 
     private title = window.document.title
 
-    private constructor() {
-        super()
-        WorldTime._instance = this
-    }
-
     initialize(time: number) {
         this._time = time
     }

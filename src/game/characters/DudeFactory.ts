@@ -58,11 +58,7 @@ export class DudeFactory {
         }
         return this._instance
     }
-
-    private constructor() {
-        DudeFactory._instance = this
-    }
-
+    
     /**
      * Create a new Dude in the specified location, defaults to the exterior world location
      */

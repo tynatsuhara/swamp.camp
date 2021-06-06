@@ -14,10 +14,6 @@ export class Camera {
         return this._instance
     }
 
-    private constructor() {
-        Camera._instance = this
-    }
-
     private shakePower: number
     private shakeDuration: number
 

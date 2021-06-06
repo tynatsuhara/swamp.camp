@@ -11,10 +11,6 @@ export class CutsceneManager {
         }
         return this._instance
     }
-
-    private constructor() {
-        CutsceneManager._instance = this
-    }
     
     private entity: Entity = null
     get isMidCutscene() { return !!this.entity }

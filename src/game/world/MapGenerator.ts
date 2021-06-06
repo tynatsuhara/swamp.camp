@@ -20,10 +20,6 @@ export class MapGenerator {
         return this._instance
     }
 
-    private constructor() {
-        MapGenerator._instance = this
-    }
-
     static readonly MAP_SIZE = 70
     static readonly ENTER_LAND_POS = new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE).plusY(-TILE_SIZE * 25).plusX(TILE_SIZE * 2)
 

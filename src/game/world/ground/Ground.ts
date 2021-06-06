@@ -37,10 +37,6 @@ export class Ground {
         return this._instance
     }
 
-    private constructor() {
-        Ground._instance = this
-    }
-
     private readonly GROUND_FUNCTION_MAP: { [key: number]: (data: MakeGroundFuncData) => GroundComponent } = {
         [GroundType.BASIC]: d => makeBasicGround(GroundType.BASIC, d, 0),
         [GroundType.BASIC_NINE_SLICE]: makeBasicNineSliceGround,

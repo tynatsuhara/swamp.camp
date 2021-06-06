@@ -37,10 +37,6 @@ export class Elements {
         return this._instance
     }
 
-    private constructor() {
-        Elements._instance = this
-    }
-
     private readonly ELEMENT_FACTORIES: { [key: number]: ElementFactory } = {
        [ElementType.TREE_ROUND]: new TreeFactory(ElementType.TREE_ROUND),
        [ElementType.TREE_POINTY]: new TreeFactory(ElementType.TREE_POINTY),

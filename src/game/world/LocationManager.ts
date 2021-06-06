@@ -13,7 +13,6 @@ export class LocationManager {
     }
 
     private constructor() {
-        LocationManager._instance = this
         window["locationManager"] = this
     }
 
