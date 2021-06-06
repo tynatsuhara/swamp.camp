@@ -19,20 +19,24 @@ export const formatText = (
     alignment: TextAlign = TextAlign.LEFT,
     lineSpacing: number = 4
 ): TextRender[] => {
-    const words = s.split(" ")
+    const rawRows = s.split("\n")
+    
     const rows: string[] = []
-    let row = ""
 
-    for (const word of words) {
-        const newRow = (row + " " + word).trim()
-        if (newRow.length * TEXT_PIXEL_WIDTH < width) {
-            row = newRow
-        } else {
-            rows.push(row)
-            row = word
+    for (const rawRow of rawRows) {
+        let row = ""
+        const words = rawRow.split(" ")
+        for (const word of words) {
+            const newRow = (row + " " + word).trim()
+            if (newRow.length * TEXT_PIXEL_WIDTH < width) {
+                row = newRow
+            } else {
+                rows.push(row)
+                row = word
+            }
         }
+        rows.push(row)
     }
-    rows.push(row)
 
     return rows.map((r, i) => {
         let offset = 0
