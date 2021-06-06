@@ -1,25 +1,15 @@
 import { Component } from "../../engine/Component"
-import { debug } from "../../engine/Debug"
 import { StartData, UpdateData } from "../../engine/Engine"
 import { InputKey } from "../../engine/Input"
 import { Point } from "../../engine/Point"
-import { TileComponent } from "../../engine/tiles/TileComponent"
 import { Lists } from "../../engine/util/Lists"
 import { StepSounds } from "../audio/StepSounds"
 import { Controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
-import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
-import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { PlaceElementDisplay } from "../ui/PlaceElementDisplay"
 import { UIStateManager } from "../ui/UIStateManager"
-import { ElementType } from "../world/elements/Elements"
 import { Interactable } from "../world/elements/Interactable"
-import { GroundType } from "../world/ground/Ground"
-import { GroundComponent } from "../world/ground/GroundComponent"
-import { LocationManager } from "../world/LocationManager"
-import { MapGenerator } from "../world/MapGenerator"
 import { Dude } from "./Dude"
-import { DudeFactory, DudeType } from "./DudeFactory"
 
 export class Player extends Component {
 
@@ -40,8 +30,7 @@ export class Player extends Component {
         StepSounds.startFootstepSoundLoop()
     }
 
-
-    start(startData: StartData) {
+    awake(startData: StartData) {
         this._dude = this.entity.getComponent(Dude)
         this.dude.setOnDamageCallback(blocked => {
             if (!this.dude.isAlive) {
