@@ -31,11 +31,11 @@ export class MainMenuScene {
     private readonly continueFn: () => void
     private readonly newGameFn: () => void
 
-    private readonly plumes: PlumePicker = new PlumePicker(color => {
+    private readonly plumes: PlumePicker = new PlumePicker(color =>
         this.knight = new Entity().addComponent(
             DudeAnimationUtils.getCharacterIdleAnimation("knight_f", { color }).toComponent()
         )
-    })
+    )
     private knight: TileComponent
     private title = assets.getImageByFileName("images/title.png")
 
@@ -98,8 +98,8 @@ export class MainMenuScene {
             entities.push(
                 new MainMenuButtonSection(menuTop)
                     .add("load last save", this.continueFn, saveFileExists)
-                    .add("New game", () => { this.menu = Menu.NEW_GAME })
-                    .add("Credits", () => { this.menu = Menu.CREDITS })
+                    .add("New game", () => this.menu = Menu.NEW_GAME)
+                    .add("Credits", () => this.menu = Menu.CREDITS)
                     .getEntity()
             )
         } else if (this.menu === Menu.NEW_GAME) {
