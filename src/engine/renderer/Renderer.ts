@@ -3,12 +3,19 @@ import { View } from "../View"
 import { RenderContext } from "./RenderContext"
 
 export class Renderer {
+
+    private static _instance: Renderer
+    static get instance() {
+        return this._instance
+    }
+
     readonly canvas: HTMLCanvasElement
     readonly context: CanvasRenderingContext2D
     cameraOffsetX: number = 0
     cameraOffsetY: number = 0
 
     constructor(canvas: HTMLCanvasElement) {
+        Renderer._instance = this
         this.canvas = canvas
         this.context = canvas.getContext('2d', { alpha: true })
         this.resizeCanvas()
