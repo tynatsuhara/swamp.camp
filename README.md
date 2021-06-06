@@ -1,12 +1,17 @@
-# development
+# SWAMP CAMP — https://swamp.camp
+
+## roadmap
+https://trello.com/b/uqYKRQlp/kingdom
+
+## development
 this project uses the typescript compiler [to bundle](https://mattallan.me/posts/modern-javascript-without-a-bundler/) the output. run `tsc --watch` when developing to compile on any changes.
 
 run `./run-local-server` to spin up a local HTTP server for development (using Python 3)
 
-# release
-commit and push to `master`, this will trigger a [Netlify deployment](https://app.netlify.com/sites/wow-a-game/deploys). It will be deployed to https://wow-a-game.netlify.app 
+## release
+commit and push to `master`, this will trigger a [Cloudflare pages deployment](https://dash.cloudflare.com/1f52f961eb89afcf0499eba5f54090d5/pages/view/quest).
 
-# links
+## credits & links
 additional art by:
 * https://0x72.itch.io/dungeontileset-ii (robert norenberg)
 * https://superdark.itch.io/enchanted-forest-characters (cael johnson)
@@ -22,8 +27,7 @@ sound effects & music by:
 * https://opengameart.org/content/rpg-sound-pack (cc0)
 * https://opengameart.org/content/different-steps-on-wood-stone-leaves-gravel-and-mud (cc0)
 * https://freesound.org/people/yewbic/packs/2122/ (cc0)
-* https://opengameart.org/content/battle-march-epic-orchestral-music-loop
-
+* https://opengameart.org/content/battle-march-epic-orchestral-music-loop (playonloop.com)
 
 tentative sound effects & music:
 * https://opengameart.org/content/talking-synthesizer
