@@ -15,6 +15,7 @@ export class DroppedItem extends Component {
     private tile: TileComponent
     private collider: Collider
     private itemType: Item
+    private canPickUp = true
 
     /**
      * @param position The bottom center where the item should be placed
@@ -63,8 +64,8 @@ export class DroppedItem extends Component {
         this.update = () => {
             const colliding = Player.instance.dude.standingPosition.plusY(-6).distanceTo(position) < 12
 
-            if (colliding) {
-                this.update = () => {}
+            if (colliding && this.canPickUp) {
+                this.canPickUp = false
                 setTimeout(() => {
                     if (Player.instance.dude.isAlive && !!this.entity) {
                         if (this.itemType === Item.COIN) {
@@ -76,7 +77,11 @@ export class DroppedItem extends Component {
                         if (this.itemType === Item.COIN || Player.instance.dude.inventory.addItem(this.itemType)) {
                             LocationManager.instance.currentLocation.droppedItems.delete(this.entity)
                             this.entity.selfDestruct()
+                            return
                         }
+                        
+                        // inventory is full
+                        this.canPickUp = true
                     }
                 }, 150)
             }
