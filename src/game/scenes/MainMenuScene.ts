@@ -116,20 +116,18 @@ export class MainMenuScene {
         } else if (this.menu === Menu.CREDITS) {
             entities.splice(0)  // don't show title and scene
             const link = (url: string) => () => window.open(url, '_blank')
-            const top = new Point(dimensions.x/2, 50)
+            const top = new Point(dimensions.x/2, 64)
             entities.push(
                 new MainMenuButtonSection(top)
                     .add("developer: Tyler Bonnell   ", link("https://ty.pizza/"))
-                    .addLineBreak()
                     .add("      art: Robert Norenberg", link("http://0x72.pl/"))
                     .add("           Cael Johnson    ", link("https://caeljohnson.artstation.com/"))
                     .add("           Kenney          ", link("https://kenney.nl/"))
-                    .addLineBreak()
                     .add("    music: Juhani Junkala  ", link("https://juhanijunkala.com/"))
                     .add("           Brent Bunn      ", link("https://bertn1991.newgrounds.com/"))
                     .add("           Playonloop.com  ", link("https://playonloop.com/"))
-                    .addLineBreak()
                     .add("    sound: BurghRecords    ", link("https://www.edinburghrecords.com/"))
+                    .add("       qa: Lane Van Elderen", link("https://lane.computer/"))
                     .addLineBreak()
                     .add("back", () => this.menu = Menu.ROOT)
                     .getEntity()
