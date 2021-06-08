@@ -241,6 +241,7 @@ export class DudeFactory {
             colliderSize,
         )
 
+        // Always add dude component first to make sure additional components can access it
         new Entity([d as Component].concat(additionalComponents))
 
         location.dudes.add(d)

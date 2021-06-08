@@ -25,17 +25,12 @@ import { RenderMethod } from "../../engine/renderer/RenderMethod"
 import { LineRender } from "../../engine/renderer/LineRender"
 import { Entity } from "../../engine/Entity"
 import { debug } from "../../engine/Debug"
-import { Barrier } from "../world/Barrier"
 import { DudeSpawner } from "../characters/DudeSpawner"
 import { DevControls } from "../DevControls"
 import { LightManager } from "../world/LightManager"
-
-const ZOOM = 3
+import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
 
 export class GameScene {
-
-    private gameEntityView: View
-    private uiView: View
 
     initialize() {
         collisionEngine.setCollisionMatrix(new Map([
@@ -46,17 +41,12 @@ export class GameScene {
     }
 
     continueGame() {
-        // Wait to initialize since it will begin a coroutine
-        // LightManager.instance.start()
-
         saveManager.load()
     }
 
     newGame() {
         saveManager.deleteSave()
 
-        // Wait to initialize since it will begin a coroutine
-        // OutdoorDarknessMask.instance.start()
         WorldTime.instance.initialize(TimeUnit.HOUR * 19.5)
         
         // World must be initialized before we do anything else
@@ -67,12 +57,6 @@ export class GameScene {
 
         Camera.instance.focusOnDude(playerDude)
 
-        DudeFactory.instance.new(DudeType.DIP, Point.ZERO)
-        DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(3, 1).times(TILE_SIZE))
-        DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(-1, 3).times(TILE_SIZE))
-        DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(-4, 0).times(TILE_SIZE))
-
-        // TODO clean up obstacles (trees, rocks, etc) so intro goes smoothly
         CutsceneManager.instance.startCutscene(new IntroCutscene())
 
         EventQueue.instance.addEvent({
@@ -82,37 +66,40 @@ export class GameScene {
     }
     
     getViews(updateViewsContext: UpdateViewsContext) {
-        this.updateViews(updateViewsContext)
-        return [
-            this.gameEntityView, 
-            this.uiView
+        const cameraOffset = Camera.instance.getUpdatedPosition(updateViewsContext.elapsedTimeMillis)
+
+        // full-screen text overlay that pauses gameplay
+        const isTextOverlayActive = TextOverlayManager.instance.isActive
+
+        const uiEntities = isTextOverlayActive 
+            ? [TextOverlayManager.instance.getEntity()] 
+            : UIStateManager.instance.get(updateViewsContext.elapsedTimeMillis)
+
+        const gameEntities: Entity[] = [
+            CutsceneManager.instance.getEntity(),
+            this.getDebugEntity(),
+            new Entity([new DevControls()]),
         ]
-    }
 
-    updateViews(updateViewsContext: UpdateViewsContext) {
-        const dimensions = updateViewsContext.dimensions.div(ZOOM)
-        const cameraOffset = Camera.instance.getUpdatedPosition(dimensions, updateViewsContext.elapsedTimeMillis)
+        if (!isTextOverlayActive) {
+            gameEntities.push(
+                ...LocationManager.instance.currentLocation.getEntities(),
+                ...LightManager.instance.getEntities(),
+                WorldTime.instance.getEntity(),
+                GroundRenderer.instance.getEntity(),
+                DudeSpawner.instance.getEntity(),
+            )
+        }
 
-        this.gameEntityView = { 
-            zoom: ZOOM,
+        return [{
+            zoom: Camera.ZOOM,
             offset: cameraOffset,
-            entities: LocationManager.instance.currentLocation.getEntities()
-                .concat(LightManager.instance.getEntities())
-                .concat([
-                    CutsceneManager.instance.getEntity(), 
-                    WorldTime.instance.getEntity(),
-                    GroundRenderer.instance.getEntity(),
-                    DudeSpawner.instance.getEntity(),
-                    this.getDebugEntity(),
-                    new Entity([new DevControls()]),
-                ])
-        }
-
-        this.uiView = {
-            zoom: ZOOM,
+            entities: gameEntities
+        }, {
+            zoom: Camera.ZOOM,
             offset: Point.ZERO,
-            entities: UIStateManager.instance.get(dimensions, updateViewsContext.elapsedTimeMillis)
-        }
+            entities: uiEntities
+        }]
     }
 
     private getDebugEntity() {

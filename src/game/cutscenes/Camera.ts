@@ -3,8 +3,11 @@ import { MapGenerator } from "../world/MapGenerator"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Dude } from "../characters/Dude"
 import { clamp } from "../../engine/util/Utils"
+import { Renderer } from "../../engine/renderer/Renderer"
 
 export class Camera {
+
+    static readonly ZOOM = 3
 
     private static _instance: Camera
     static get instance(): Camera {
@@ -26,8 +29,7 @@ export class Camera {
         // multiply by -1 because views use "offset"
         return this._position.times(-1).minus(this.shakeOffset)
     }
-    private _dimensions: Point
-    get dimensions() { return this._dimensions }
+    get dimensions() { return Renderer.instance.getDimensions().div(Camera.ZOOM) }
 
     shake(power: number, duration: number) {
         this.shakePower = power
@@ -48,16 +50,15 @@ export class Camera {
         this._position = this._position.plus(translation)
     }
 
-    getUpdatedPosition(dimensions: Point, elapsedTimeMillis: number): Point {
-        this._dimensions = dimensions
-        const xLimit = MapGenerator.MAP_SIZE / 2 * TILE_SIZE - dimensions.x/2
-        const yLimit = MapGenerator.MAP_SIZE / 2 * TILE_SIZE - dimensions.y/2
+    getUpdatedPosition(elapsedTimeMillis: number): Point {
+        const xLimit = MapGenerator.MAP_SIZE / 2 * TILE_SIZE - this.dimensions.x/2
+        const yLimit = MapGenerator.MAP_SIZE / 2 * TILE_SIZE - this.dimensions.y/2
         const trackedPoint = this.dudeTarget?.position ?? this.pointTarget
         const clampedTrackedPoint = new Point(
             clamp(trackedPoint.x, -xLimit, xLimit),
             clamp(trackedPoint.y, -yLimit, yLimit)
         )
-        const cameraGoal = dimensions.div(2).minus(clampedTrackedPoint)
+        const cameraGoal = this.dimensions.div(2).minus(clampedTrackedPoint)
 
         if (!this._position) {
             this._position = cameraGoal

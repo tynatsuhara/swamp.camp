@@ -135,22 +135,21 @@ export class DialogueDisplay extends Component {
         const margin = 12
         const width = dimensions.x - margin*2
 
-
-        const formattedRenders = formatText(
+        const lines = formatText(
             this.dialogue.lines[this.lineIndex], 
             Color.DARK_RED,
             topLeft.plus(new Point(margin, topOffset + margin)),
             width, 
             TextAlign.CENTER
         )
-        formattedRenders.forEach(fr => fr.depth = UIStateManager.UI_SPRITE_DEPTH + 1)
+        lines.forEach(fr => fr.depth = UIStateManager.UI_SPRITE_DEPTH + 1)
 
         // "type" out the letters
         if (!this.finishedPrinting) {
             const millisPerCharacter = 35
             let charactersToShow = Math.floor(this.letterTicker/millisPerCharacter)
-            for (let i = 0; i < formattedRenders.length; i++) {
-                const fr = formattedRenders[i]
+            for (let i = 0; i < lines.length; i++) {
+                const fr = lines[i]
                 let newStr = ""
                 for (let j = 0; j < fr.text.length; j++) {
                     if (charactersToShow === 0) {
@@ -160,7 +159,7 @@ export class DialogueDisplay extends Component {
                     if (fr.text.charAt(j) !== ' ') {
                         charactersToShow--
                     }
-                    if (j === fr.text.length-1 && i === formattedRenders.length-1) {
+                    if (j === fr.text.length-1 && i === lines.length-1) {
                         this.finishedPrinting = true
                     }
                 }
@@ -169,7 +168,7 @@ export class DialogueDisplay extends Component {
         }
 
         backgroundTiles.forEach(tile => this.displayEntity.addComponent(tile))
-        this.displayEntity.addComponent(new BasicRenderComponent(...formattedRenders))
+        this.displayEntity.addComponent(new BasicRenderComponent(...lines))
     }
 
     private renderOptions(screenDimensions: Point) {

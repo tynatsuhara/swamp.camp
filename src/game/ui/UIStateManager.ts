@@ -11,6 +11,7 @@ import { SellMenu } from "./SellMenu"
 import { NotificationDisplay } from "./NotificationDisplay"
 import { Mouse } from "./Mouse"
 import { debug } from "../../engine/Debug"
+import { Camera } from "../cutscenes/Camera"
 
 export class UIStateManager {
 
@@ -44,7 +45,7 @@ export class UIStateManager {
         UIStateManager._instance = new UIStateManager()
     }
 
-    get(dimensions: Point, elapsedMillis: number): Entity[] {
+    get(elapsedMillis: number): Entity[] {
         if (!Player.instance.dude) {
             return []
         }
@@ -56,7 +57,7 @@ export class UIStateManager {
                 || this.craftingMenu.isOpen
                 || this.sellMenu.isOpen
 
-        return this.hud.getEntities(Player.instance.dude, dimensions, elapsedMillis)
+        return this.hud.getEntities(Player.instance.dude, Camera.instance.dimensions, elapsedMillis)
                 .concat(this.inventory.getEntities())
                 .concat(this.dialogueDisplay.getEntities())
                 .concat(this.placeElementDisplay.getEntities())
