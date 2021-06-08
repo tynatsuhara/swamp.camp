@@ -6,6 +6,7 @@ import { Camera } from "../cutscenes/Camera"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { DarknessMask } from "./DarknessMask"
 import { LocationManager } from "./LocationManager"
+import { MapGenerator } from "./MapGenerator"
 import { Vignette } from "./Vignette"
 import { WorldLocation } from "./WorldLocation"
 import { WorldTime } from "./WorldTime"
@@ -23,7 +24,10 @@ export class LightManager {
     private lightTiles: Map<WorldLocation, Map<any, [Point, number]>> = new Map<WorldLocation, Map<any, [Point, number]>>()
     private mask = new DarknessMask()
 
-    private vignetteEntity = new Entity([new Vignette(new Point(1, 1).times(-DarknessMask.size/2), DarknessMask.size)])
+    private vignetteEntity = new Entity([new Vignette(
+        new Point(1, 1).times(-MapGenerator.MAP_SIZE/2 * TILE_SIZE), 
+        MapGenerator.MAP_SIZE * TILE_SIZE
+    )])
 
     /**
     * @param key the unique key for location, will overwrite that light source if it already exists

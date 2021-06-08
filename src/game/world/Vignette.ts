@@ -10,8 +10,6 @@ export class Vignette extends Component {
     private rings = 8
     private ringWidth = this.padding/this.rings
 
-    private render: ImageRender
-
     constructor(topLeftPosition: Point, diameter: number) {
         super()
         this.start = () => {
@@ -40,16 +38,16 @@ export class Vignette extends Component {
 
             context.putImageData(imageData, 0, 0)
 
-            this.render = new ImageRender(
-                canvas,
-                new Point(0, 0),
-                new Point(diameter, diameter),
-                topLeftPosition,
-                new Point(diameter, diameter),
-                UIStateManager.UI_SPRITE_DEPTH - 100  // make sure all UI goes on top of light
-            )
+            this.getRenderMethods = () => [
+                new ImageRender(
+                    canvas,
+                    new Point(0, 0),
+                    new Point(diameter, diameter),
+                    topLeftPosition,
+                    new Point(diameter, diameter),
+                    UIStateManager.UI_SPRITE_DEPTH - 100  // make sure all UI goes on top of light
+                )
+            ]
         }
     }
-
-    getRenderMethods = () => [this.render]
 }
