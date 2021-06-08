@@ -45,6 +45,10 @@ export const formatText = (
         } else if (alignment === TextAlign.RIGHT) {
             offset = Math.floor(width - r.length*TEXT_PIXEL_WIDTH)
         }
+
+        // replace placeholder space character (TODO: is it needed?)
+        r.replaceAll("∆", " ")
+
         return new TextRender(r, position.plus(new Point(offset, i * (TEXT_SIZE+lineSpacing))), TEXT_SIZE, TEXT_FONT, color)
     })
 }

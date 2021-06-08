@@ -7,6 +7,7 @@ import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "../ui/Color"
 import { formatText } from "../ui/Text"
+import { TextTyper } from "../ui/TextTyper"
 
 export class TextOverlayManager extends Component {
 
@@ -22,10 +23,10 @@ export class TextOverlayManager extends Component {
     static readonly VERTICAL_MARGIN = 96
 
     private index = 0
-    private text: string[]
+    private text: TextTyper[]
     private onFinish: () => void
     private additionalComponents: Component[] = []
-    private clicking = false
+    private firstFrame = false  // prevent clicking "next" immediately
 
     get isActive() {
         return !!this.onFinish
@@ -38,47 +39,48 @@ export class TextOverlayManager extends Component {
      */
     enable(text: string[], onFinish: () => void, additionalComponents: Component[] = []) {
         this.index = 0
-        this.text = text
+        this.text = text.map(t => new TextTyper(t, () => this.nextLine()))
         this.onFinish = onFinish
         this.additionalComponents = additionalComponents
+        this.firstFrame = true
     }
 
-    disable() {
-        this.onFinish = null
+    nextLine() {
+        this.index++
+        if (this.index === this.text.length) {
+            // disable
+            this.onFinish()
+            this.onFinish = null
+        }
     }
 
     update(updateData: UpdateData) {
         if (!this.isActive) {
             return
         }
-        
-        if (updateData.input.isMouseUp && this.clicking) {
-            if (this.index+1 === this.text.length) {
-                this.clicking = false
-                this.onFinish()
-                this.disable()
-                return
-            }
-            this.clicking = false
-            this.index++
-        } else if (updateData.input.isMouseDown) {
-            this.clicking = true
-        }        
 
+        const text = this.text[this.index]
+        const typedText = text.update(
+            !this.firstFrame && updateData.input.isMouseDown,
+            updateData.elapsedTimeMillis
+        )
+
+        this.firstFrame = false
+        
         const topLeft = new Point(
             updateData.dimensions.x/2 - TextOverlayManager.WIDTH/2, 
             TextOverlayManager.VERTICAL_MARGIN
         )
 
         this.getRenderMethods = () => {
-            const clickColor = this.clicking ? Color.TAN : Color.WHITE
+            const clickColor = updateData.input.isMouseHeld ? Color.TAN : Color.WHITE
             const mouseIconPos = new Point(
                 updateData.dimensions.x - (updateData.dimensions.x - TextOverlayManager.WIDTH)/2 - TILE_SIZE,
                 updateData.dimensions.y - TextOverlayManager.VERTICAL_MARGIN
             )
             return [
                 ...formatText(
-                    this.text[this.index], 
+                    typedText, 
                     Color.WHITE, 
                     topLeft, 
                     TextOverlayManager.WIDTH
