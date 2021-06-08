@@ -11,6 +11,8 @@ import { Color } from "./Color"
 import { Controls } from "../Controls"
 import { UIStateManager } from "./UIStateManager"
 import { ButtonsMenu } from "./ButtonsMenu"
+import { TextTyper } from "./TextTyper"
+import { Camera } from "../cutscenes/Camera"
 
 export class DialogueDisplay extends Component {
 
@@ -22,9 +24,7 @@ export class DialogueDisplay extends Component {
     private optionsEntity: Entity
     private dialogue: DialogueInstance
     private lineIndex: number
-
-    private letterTicker: number
-    private finishedPrinting: boolean
+    private lines: TextTyper[]
 
     get isOpen() { return !!this.dialogue }
 
@@ -43,38 +43,26 @@ export class DialogueDisplay extends Component {
         //     this.close()
         //     return
         // }
+        
+        const typer = this.lines[Math.min(this.lineIndex, this.lines.length-1)]
+        const showOptions = typer.isFinished && this.dialogue.options.length > 0 && this.lineIndex >= this.lines.length-1
+        const shouldProceed = updateData.input.isMouseDown || updateData.input.isKeyDown(Controls.interactButton)
+                        
+        const line = typer.update(shouldProceed, updateData.elapsedTimeMillis)
 
-        const showOptions = this.dialogue.options.length > 0 && this.lineIndex === this.dialogue.lines.length-1
-
-        if (this.letterTicker !== 0 && (updateData.input.isMouseDown || updateData.input.isKeyDown(Controls.interactButton))) {
-            if (this.finishedPrinting) {
-                // go to the next dialogue line
-                if (!showOptions) {
-                    this.lineIndex++
-                    this.letterTicker = 0
-                    this.finishedPrinting = false
-                }
-            } else {
-                // fast-forward the letter printing
-                this.letterTicker += 3.6e+6  // hack to finish printing, presumably there won't be an hour of text
-            }
-        }
-
-        if (this.lineIndex === this.dialogue.lines.length) {
+        if (!showOptions && this.lineIndex === this.dialogue.lines.length) {
             this.completeSourceDialogue(this.dialogue.next)
             return
         }
-
-        this.letterTicker += updateData.elapsedTimeMillis
 
         // Overwrite previously displayed tiles each time
         this.displayEntity = new Entity()
         this.optionsEntity = null
 
-        this.renderNextLine(updateData.dimensions)
+        this.renderNextLine(line)
 
-        if (showOptions && this.finishedPrinting) {
-            this.renderOptions(updateData.dimensions)
+        if (showOptions) {
+            this.renderOptions()
         }
     }
 
@@ -112,13 +100,15 @@ export class DialogueDisplay extends Component {
         this.dialogueSource = dialogueSource
         this.dialogue = getDialogue(dialogueSource.dialogue)
         this.lineIndex = 0
-        this.letterTicker = 0
-        this.finishedPrinting = false
+        this.lines = this.dialogue.lines.map((l, i) => new TextTyper(l, () => {
+            this.lineIndex = Math.min(this.lineIndex + 1, this.lines.length)
+        }))
     }
 
-    private renderNextLine(screenDimensions: Point) {
+    private renderNextLine(line: string) {
         const dimensions = new Point(288, 83)
         const bottomBuffer = TILE_SIZE
+        const screenDimensions = Camera.instance.dimensions
         const topLeft = new Point(
             Math.floor(screenDimensions.x/2 - dimensions.x/2),
             Math.floor(screenDimensions.y - dimensions.y - bottomBuffer)
@@ -136,7 +126,7 @@ export class DialogueDisplay extends Component {
         const width = dimensions.x - margin*2
 
         const lines = formatText(
-            this.dialogue.lines[this.lineIndex], 
+            line, 
             Color.DARK_RED,
             topLeft.plus(new Point(margin, topOffset + margin)),
             width, 
@@ -144,36 +134,13 @@ export class DialogueDisplay extends Component {
         )
         lines.forEach(fr => fr.depth = UIStateManager.UI_SPRITE_DEPTH + 1)
 
-        // "type" out the letters
-        if (!this.finishedPrinting) {
-            const millisPerCharacter = 35
-            let charactersToShow = Math.floor(this.letterTicker/millisPerCharacter)
-            for (let i = 0; i < lines.length; i++) {
-                const fr = lines[i]
-                let newStr = ""
-                for (let j = 0; j < fr.text.length; j++) {
-                    if (charactersToShow === 0) {
-                        break
-                    }
-                    newStr += fr.text.charAt(j)
-                    if (fr.text.charAt(j) !== ' ') {
-                        charactersToShow--
-                    }
-                    if (j === fr.text.length-1 && i === lines.length-1) {
-                        this.finishedPrinting = true
-                    }
-                }
-                fr.text = newStr
-            }
-        }
-
         backgroundTiles.forEach(tile => this.displayEntity.addComponent(tile))
         this.displayEntity.addComponent(new BasicRenderComponent(...lines))
     }
 
-    private renderOptions(screenDimensions: Point) {
+    private renderOptions() {
         this.optionsEntity = ButtonsMenu.render(
-            screenDimensions,
+            Camera.instance.dimensions,
             "white",
             this.dialogue.options.map(o => { 
                 return {
