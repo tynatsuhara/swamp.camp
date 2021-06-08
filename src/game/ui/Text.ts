@@ -11,6 +11,8 @@ export const enum TextAlign {
     RIGHT
 }
 
+export const NO_BREAK_SPACE_CHAR = "∆"
+
 export const formatText = (
     s: string, 
     color: string,
@@ -27,7 +29,7 @@ export const formatText = (
         let row = ""
         const words = rawRow.split(" ")
         for (const word of words) {
-            const newRow = (row + " " + word).trim()
+            const newRow = row === "" ? word : (row + " " + word)
             if (newRow.length * TEXT_PIXEL_WIDTH < width) {
                 row = newRow
             } else {
@@ -46,9 +48,13 @@ export const formatText = (
             offset = Math.floor(width - r.length*TEXT_PIXEL_WIDTH)
         }
 
-        // replace placeholder space character (TODO: is it needed?)
-        r.replaceAll("∆", " ")
-
-        return new TextRender(r, position.plus(new Point(offset, i * (TEXT_SIZE+lineSpacing))), TEXT_SIZE, TEXT_FONT, color)
+        return new TextRender(
+            // replace placeholder space character
+            r.replaceAll(NO_BREAK_SPACE_CHAR, " "),
+            position.plus(new Point(offset, i * (TEXT_SIZE+lineSpacing))), 
+            TEXT_SIZE, 
+            TEXT_FONT, 
+            color
+        )
     })
 }

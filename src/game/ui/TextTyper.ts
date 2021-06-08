@@ -1,4 +1,5 @@
 import { UpdateData } from "../../engine/Engine"
+import { NO_BREAK_SPACE_CHAR } from "./Text"
 
 export class TextTyper {
 
@@ -21,6 +22,7 @@ export class TextTyper {
         if (this.letterTicker !== 0 && shouldProceed) {
             if (this.finishedPrinting) {
                 this.onFinish()
+                this.onFinish = () => {}
             }
             this.finishedPrinting = true
         }
@@ -37,6 +39,15 @@ export class TextTyper {
             return this.text
         }
 
-        return this.text.substring(0, charsToShow) + (" ".repeat(this.text.length - charsToShow))
+        let str = this.text.substring(0, charsToShow)
+        for (let i = charsToShow; i < this.text.length; i++) {
+            if (this.text[i] === " ") {
+                str += " "
+            } else {
+                str += NO_BREAK_SPACE_CHAR
+            }
+        }
+
+        return str
     }
 }
