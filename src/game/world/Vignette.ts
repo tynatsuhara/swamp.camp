@@ -1,14 +1,17 @@
 import { Component } from "../../engine/Component"
 import { Point } from "../../engine/Point"
 import { ImageRender } from "../../engine/renderer/ImageRender"
+import { TILE_SIZE } from "../graphics/Tilesets"
 import { Color, getRGB } from "../ui/Color"
 import { UIStateManager } from "../ui/UIStateManager"
+import { MapGenerator } from "./MapGenerator"
 
 export class Vignette extends Component {
 
     private padding = 128
     private rings = 8
     private ringWidth = this.padding/this.rings
+    private readonly R4 = Math.pow(MapGenerator.MAP_SIZE/2 * TILE_SIZE, 4)
 
     constructor(topLeftPosition: Point, diameter: number) {
         super()
@@ -25,8 +28,14 @@ export class Vignette extends Component {
                     const i = (x + y * diameter) * 4
                     const pt = new Point(x, y)
                     const dist = pt.distanceTo(center)
+                    // how far into the darkness is it?
                     const distFromLightEdge = dist - (diameter/2 - this.padding)
                     if (distFromLightEdge > 0) {
+                        // TODO: support squircle vignette
+                        // if (xa + yb > this.R4) {
+                        // const xa = Math.pow(x - diameter/2, 4)
+                        // const yb = Math.pow(y - diameter/2, 4)
+                        // const ring = 8
                         const ring = Math.min(Math.floor(distFromLightEdge/this.ringWidth), this.rings)
                         imageData.data[i+0] = rgb[0]
                         imageData.data[i+1] = rgb[1]
