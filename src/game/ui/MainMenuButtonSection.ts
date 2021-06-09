@@ -4,7 +4,7 @@ import { MainMenuButton } from "./MainMenuButton"
 
 export class MainMenuButtonSection {
     
-    private static readonly LINE_SPACING = 16
+    static readonly LINE_SPACING = 16
 
     private readonly buttons: MainMenuButton[] = []
     private readonly topCenter: Point
