@@ -59,20 +59,22 @@ export class IntroCutscene extends Component {
 
         const centerPos = new Point(Camera.instance.dimensions.x/2, TextOverlayManager.VERTICAL_MARGIN).plusY(-48)
         
+        this.cutscene()
+        
         // TODO text overlay lore
-        TextOverlayManager.instance.enable(
-            [
-                `this is a line of text
+//         TextOverlayManager.instance.enable(
+//             [
+//                 `this is a line of text
 
-with a double line break and these words keep going for a while so it should probably wrap`,
-                "this is another line of text",
-            ], 
-            () => this.cutscene(),
-            [
-                characterAnimation("MountainKing", TileTransform.new({ position: centerPos.plusX(-35) })),
-                characterAnimation("knight_f", TileTransform.new({ position: centerPos.plus(new Point(9, 4)), mirrorX: true })),
-            ]
-        )
+// with a double line break and these words keep going for a while so it should probably wrap`,
+//                 "this is another line of text",
+//             ], 
+//             () => this.cutscene(),
+//             [
+//                 characterAnimation("MountainKing", TileTransform.new({ position: centerPos.plusX(-35) })),
+//                 characterAnimation("knight_f", TileTransform.new({ position: centerPos.plus(new Point(9, 4)), mirrorX: true })),
+//             ]
+//         )
     }
 
     cutscene() {
