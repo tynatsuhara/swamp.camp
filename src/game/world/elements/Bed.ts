@@ -38,7 +38,7 @@ export class BedFactory extends ElementFactory {
         const bed = e.addComponent(new Bed())        
 
         e.addComponent(new Interactable(
-            scaledPos.plus(new Point(TILE_SIZE/2, TILE_SIZE/2)), 
+            scaledPos.plus(new Point(TILE_SIZE/2-1, TILE_SIZE/2-1)), 
             () => {
                 DialogueDisplay.instance.startDialogue(bed)
             }, 
