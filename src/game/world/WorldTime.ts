@@ -50,6 +50,10 @@ export class WorldTime extends Component {
         return this.time + (minutes * TimeUnit.MINUTE) + (hours * TimeUnit.HOUR) + (days * TimeUnit.DAY)
     }
 
+    tomorrow(timeOfDay: number) {
+        return Math.floor(this.time/TimeUnit.DAY) * TimeUnit.DAY + TimeUnit.DAY + timeOfDay
+    }
+
     private clockTime() {
         const hour = Math.floor(this.time % TimeUnit.DAY/TimeUnit.HOUR)
         const minute = Math.floor(this.time % TimeUnit.HOUR/TimeUnit.MINUTE)

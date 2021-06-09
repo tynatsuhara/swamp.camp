@@ -10,6 +10,7 @@ import { WorldTime } from "../../world/WorldTime"
 import { CraftingMenu } from "../../ui/CraftingMenu"
 import { getDipRecipes } from "../../items/CraftingRecipe"
 import { InputKeyString } from "../../../engine/Input"
+import { TimeUnit } from "../../world/TimeUnit"
 
 export const ROCKS_NEEDED_FOR_CAMPFIRE = 8
 export const WOOD_NEEDED_FOR_CAMPFIRE = 4
@@ -62,7 +63,7 @@ export const DIP_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
                 inv().addItem(Item.TENT)
                 EventQueue.instance.addEvent({
                     type: QueuedEventType.HERALD_ARRIVAL,
-                    time: WorldTime.instance.future({ minutes: 10 })
+                    time: WorldTime.instance.tomorrow(TimeUnit.HOUR * 7)
                 })
                 saveAfterDialogueStage()
                 return new NextDialogue(DIP_CRAFT, false)
