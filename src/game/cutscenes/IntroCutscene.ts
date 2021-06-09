@@ -1,5 +1,5 @@
 import { Component } from "../../engine/Component"
-import { StartData, UpdateData } from "../../engine/Engine"
+import { UpdateData } from "../../engine/Engine"
 import { CutscenePlayerController } from "./CutscenePlayerController"
 import { Player } from "../characters/Player"
 import { Point } from "../../engine/Point"

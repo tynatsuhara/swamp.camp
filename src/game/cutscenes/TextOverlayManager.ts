@@ -3,7 +3,7 @@ import { UpdateData } from "../../engine/Engine"
 import { Entity } from "../../engine/Entity"
 import { Point } from "../../engine/Point"
 import { TileTransform } from "../../engine/tiles/TileTransform"
-import { ImageFilters } from "../graphics/ImageFilters"
+import { Lists } from "../../engine/util/Lists"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "../ui/Color"
 import { formatText, TEXT_PIXEL_WIDTH } from "../ui/Text"
@@ -80,7 +80,7 @@ export class TextOverlayManager extends Component {
                 updateData.dimensions.y - TextOverlayManager.VERTICAL_MARGIN
             )
             const action = this.index >= this.text.length-1 
-                    && this.text[Math.min(this.index, this.text.length-1)].isFinished 
+                    && Lists.last(this.text).isFinished 
                             ? this.finishAction 
                             : "NEXT"
             return [

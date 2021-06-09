@@ -76,4 +76,8 @@ export const Lists = {
         Lists.range(0, times).forEach(() => result.push(...list))
         return result
     },
+
+    last<T>(list: T[]): T {
+        return list.length > 0 ? list[list.length-1] : undefined
+    },
 }
