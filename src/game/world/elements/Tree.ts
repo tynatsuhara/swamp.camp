@@ -65,6 +65,9 @@ export class TreeFactory extends ElementFactory {
         } else {
             tiles = [addTile(`${prefix}${["Sapling", "Small"][size-1]}`, pos.plus(new Point(0, 1)))]
         }
+
+        const mirrored = Math.random() > .5
+        tiles.forEach(t => t.transform.mirrorX = mirrored)
         
         const hitboxDims = new Point(8, 3)
         e.addComponent(new BoxCollider(
