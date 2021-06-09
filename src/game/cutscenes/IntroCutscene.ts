@@ -78,7 +78,7 @@ One other thing - We believe that several other factions may be vying for contro
 
 ANOTHER thing - Only one of the explorers returned, and she reported that her colleagues were devoured by demons in the night.`,
 `...`,
-`Good luck, have fun, and make the Kingdom proud!`
+`Good luck. Go now, venture into the swamp, and bring glory to the Kingdom!`
             ], 
             "START",
             () => this.cutscene(),
