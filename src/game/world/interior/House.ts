@@ -8,7 +8,7 @@ import { WorldLocation } from "../WorldLocation"
 import { InteriorUtils } from "./InteriorUtils"
 
 export const makeHouseInterior = (outside: WorldLocation): WorldLocation => {
-    const l = new WorldLocation(true, true)
+    const l = new WorldLocation(true, false)
     LocationManager.instance.add(l)
     const dimensions = new Point(7, 5)
     const interactablePos = new Point(dimensions.x/2, dimensions.y).times(TILE_SIZE)
