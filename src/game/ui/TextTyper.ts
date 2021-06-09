@@ -43,6 +43,8 @@ export class TextTyper {
         for (let i = charsToShow; i < this.text.length; i++) {
             if (this.text[i] === " ") {
                 str += " "
+            } else if (this.text[i] === "\n") {
+                str += "\n"
             } else {
                 str += NO_BREAK_SPACE_CHAR
             }

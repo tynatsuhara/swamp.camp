@@ -6,7 +6,7 @@ import { TileTransform } from "../../engine/tiles/TileTransform"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "../ui/Color"
-import { formatText } from "../ui/Text"
+import { formatText, TEXT_PIXEL_WIDTH } from "../ui/Text"
 import { TextTyper } from "../ui/TextTyper"
 
 export class TextOverlayManager extends Component {
@@ -20,10 +20,11 @@ export class TextOverlayManager extends Component {
     }
 
     private static readonly WIDTH = 240
-    static readonly VERTICAL_MARGIN = 96
+    static readonly VERTICAL_MARGIN = 88
 
     private index = 0
     private text: TextTyper[]
+    private finishAction: string
     private onFinish: () => void
     private additionalComponents: Component[] = []
     private firstFrame = false  // prevent clicking "next" immediately
@@ -37,9 +38,10 @@ export class TextOverlayManager extends Component {
      * @param onFinish called after the clicking through the last string in the text array
      * @param additionalComponents 
      */
-    enable(text: string[], onFinish: () => void, additionalComponents: Component[] = []) {
+    enable(text: string[], finishAction: string, onFinish: () => void, additionalComponents: Component[] = []) {
         this.index = 0
         this.text = text.map(t => new TextTyper(t, () => this.nextLine()))
+        this.finishAction = finishAction
         this.onFinish = onFinish
         this.additionalComponents = additionalComponents
         this.firstFrame = true
@@ -73,11 +75,11 @@ export class TextOverlayManager extends Component {
         )
 
         this.getRenderMethods = () => {
-            const clickColor = updateData.input.isMouseHeld ? Color.TAN : Color.WHITE
             const mouseIconPos = new Point(
                 updateData.dimensions.x - (updateData.dimensions.x - TextOverlayManager.WIDTH)/2 - TILE_SIZE,
                 updateData.dimensions.y - TextOverlayManager.VERTICAL_MARGIN
             )
+            const action = this.index === this.text.length-1 && text.isFinished ? this.finishAction : "NEXT"
             return [
                 ...formatText(
                     typedText, 
@@ -86,14 +88,12 @@ export class TextOverlayManager extends Component {
                     TextOverlayManager.WIDTH
                 ),
                 ...formatText(
-                    "NEXT", 
-                    clickColor, 
-                    mouseIconPos.plus(new Point(-33, 4)), 
+                    action, 
+                    Color.WHITE, 
+                    mouseIconPos.plus(new Point(-TEXT_PIXEL_WIDTH * action.length, 4)), 
                     TextOverlayManager.WIDTH, 
                 ),
-                Tilesets.instance.oneBit.getTileSource("leftClick")
-                    .filtered(ImageFilters.tint(clickColor))
-                    .toImageRender(new TileTransform(mouseIconPos))
+                Tilesets.instance.oneBit.getTileSource("leftClick").toImageRender(new TileTransform(mouseIconPos))
             ]
         }
     }

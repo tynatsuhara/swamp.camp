@@ -59,22 +59,34 @@ export class IntroCutscene extends Component {
 
         const centerPos = new Point(Camera.instance.dimensions.x/2, TextOverlayManager.VERTICAL_MARGIN).plusY(-48)
         
-        this.cutscene()
-        
         // TODO text overlay lore
-//         TextOverlayManager.instance.enable(
-//             [
-//                 `this is a line of text
+        TextOverlayManager.instance.enable([
+`Champion, your time has come!
 
-// with a double line break and these words keep going for a while so it should probably wrap`,
-//                 "this is another line of text",
-//             ], 
-//             () => this.cutscene(),
-//             [
-//                 characterAnimation("MountainKing", TileTransform.new({ position: centerPos.plusX(-35) })),
-//                 characterAnimation("knight_f", TileTransform.new({ position: centerPos.plus(new Point(9, 4)), mirrorX: true })),
-//             ]
-//         )
+Our explorers have discovered a vast swampland, untamed and full of precious resources.
+
+We believe that the Kingdom could benefit greatly from establishing a settlement in these uncharted lands.`,
+`... 
+
+However, due to budgetary constraints, you'll be going alone. 
+
+Once you establish a camp and begin demonstrating value, we shall send more settlers and grow the camp into a colony!`,
+`...
+
+One other thing - We believe that several other factions may be vying for control of these lands. Form alliances or engage them in battle as you deem necessary.`,
+`...
+
+ANOTHER thing - Only one of the explorers returned, and she reported that her colleagues were devoured by demons in the night.`,
+`...`,
+`Good luck, have fun, and make the Kingdom proud!`
+            ], 
+            "START",
+            () => this.cutscene(),
+            [
+                characterAnimation("MountainKing", TileTransform.new({ position: centerPos.plusX(-35) })),
+                characterAnimation("knight_f", TileTransform.new({ position: centerPos.plus(new Point(9, 4)), mirrorX: true })),
+            ]
+        )
     }
 
     cutscene() {
