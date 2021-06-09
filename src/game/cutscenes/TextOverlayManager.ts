@@ -79,7 +79,10 @@ export class TextOverlayManager extends Component {
                 updateData.dimensions.x - (updateData.dimensions.x - TextOverlayManager.WIDTH)/2 - TILE_SIZE,
                 updateData.dimensions.y - TextOverlayManager.VERTICAL_MARGIN
             )
-            const action = this.index === this.text.length-1 && text.isFinished ? this.finishAction : "NEXT"
+            const action = this.index >= this.text.length-1 
+                    && this.text[Math.min(this.index, this.text.length-1)].isFinished 
+                            ? this.finishAction 
+                            : "NEXT"
             return [
                 ...formatText(
                     typedText, 
