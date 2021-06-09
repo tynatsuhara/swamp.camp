@@ -25,7 +25,7 @@ export class CampfireFactory extends ElementFactory {
     readonly type = ElementType.CAMPFIRE
     readonly dimensions = new Point(1, 1)
 
-    make(wl: WorldLocation, pos: Point, data: object): ElementComponent{
+    make(wl: WorldLocation, pos: Point, data: object): ElementComponent {
         const e = new Entity()
         const scaledPos = pos.times(TILE_SIZE)
         const depth = scaledPos.y + TILE_SIZE - 10
@@ -92,7 +92,7 @@ export class CampfireFactory extends ElementFactory {
     }
 
     canPlace(pos: Point) {
-        return LocationManager.instance.currentLocation == LocationManager.instance.exterior()
+        return LocationManager.instance.currentLocation === LocationManager.instance.exterior()
     }
 }
 

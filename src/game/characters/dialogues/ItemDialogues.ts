@@ -4,8 +4,13 @@ import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { Campfire } from "../../world/elements/Campfire"
 import { Player } from "../Player"
 import { Item } from "../../items/Items"
+import { WorldTime } from "../../world/WorldTime"
+import { TimeUnit } from "../../world/TimeUnit"
 
 export const CAMPFIRE_DIALOGUE = "campfire"
+export const BED_DIALOGUE = "bed"
+
+const CANCEL_TEXT = "Leave"
 
 export const ITEM_DIALOGUES: { [key: string]: () => DialogueInstance } = {
     [CAMPFIRE_DIALOGUE]: () => {
@@ -24,8 +29,6 @@ export const ITEM_DIALOGUES: { [key: string]: () => DialogueInstance } = {
             }
         }
 
-        const cancelText = "Leave"
-
         if (logsYouCanAdd === 0) {
             return dialogue(
                 [playerLogCount === 0 ? "You don't have any logs to add to the fire." : "The fire already has the maximum amount of logs."], 
@@ -36,7 +39,7 @@ export const ITEM_DIALOGUES: { [key: string]: () => DialogueInstance } = {
                 [playerLogCount === 1 ? "You only have one log to add to the fire." : "You can fit one more log in the fire."],
                 DudeInteractIndicator.NONE,
                 new DialogueOption("Add log", completeDialogue(1)),
-                new DialogueOption(cancelText, completeDialogue(0)),
+                new DialogueOption(CANCEL_TEXT, completeDialogue(0)),
             )
         }
 
@@ -54,7 +57,26 @@ export const ITEM_DIALOGUES: { [key: string]: () => DialogueInstance } = {
             DudeInteractIndicator.NONE,
             new DialogueOption(`Add ${logsYouCanAdd} logs`, completeDialogue(logsYouCanAdd)),
             new DialogueOption("Add one log", completeDialogue(1)),
-            new DialogueOption(cancelText, completeDialogue(0)),
+            new DialogueOption(CANCEL_TEXT, completeDialogue(0)),
         )
     },
+
+    [BED_DIALOGUE]: () => {
+        const completeDialogue = new NextDialogue(BED_DIALOGUE, false)
+        // TODO: Make it so you can't sleep unless there's a campfire
+        // TODO: Add a nice transition
+        return dialogueWithOptions(
+            ["The comfy bed beckons to you. Do you give in?"],
+            DudeInteractIndicator.NONE,
+            new DialogueOption("Nap (1 hour)", () => {
+                WorldTime.instance.fastForward(TimeUnit.HOUR)
+                return completeDialogue
+            }),
+            new DialogueOption("Sleep (8 hours)", () => {
+                WorldTime.instance.fastForward(TimeUnit.HOUR * 8)
+                return completeDialogue
+            }),
+            new DialogueOption(CANCEL_TEXT, () => completeDialogue),
+        )
+    }
 }

@@ -29,6 +29,10 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => [{
         desc: "Stores junk",
         output: Item.CHEST,
         input: [new ItemStack(Item.WOOD, 10)],
+    },{
+        desc: "Snooze to pass time",
+        output: Item.BED,
+        input: [new ItemStack(Item.WOOD, 10)],
     }],
 },{ 
     icon: Tilesets.instance.oneBit.getTileAt(new Point(10, 27)),
