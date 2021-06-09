@@ -14,7 +14,9 @@ import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { BED_DIALOGUE } from "../../characters/dialogues/ItemDialogues"
 import { ElementFactory } from "./ElementFactory"
 import { LocationManager } from "../LocationManager"
-import { LocationTransition } from "../../ui/LocationTransition"
+import { WorldTime } from "../WorldTime"
+import { HUD } from "../../ui/HUD"
+import { saveManager } from "../../SaveManager"
 
 export class BedFactory extends ElementFactory {
 
@@ -33,9 +35,7 @@ export class BedFactory extends ElementFactory {
 
         e.addComponent(new BoxCollider(scaledPos, new Point(TILE_SIZE, TILE_SIZE)))
 
-        const bed = e.addComponent(new Bed())
-        
-        const transition = e.addComponent(new LocationTransition())
+        const bed = e.addComponent(new Bed())        
 
         e.addComponent(new Interactable(
             scaledPos.plus(new Point(TILE_SIZE/2, TILE_SIZE/2)), 
@@ -62,7 +62,11 @@ export class Bed extends Component implements DialogueSource {
 
     dialogue: string = BED_DIALOGUE
 
-    constructor() {
-        super()
+    sleep(duration: number) {
+        const pause = 1200
+        HUD.instance.locationTransition.transition(() => {
+            WorldTime.instance.fastForward(duration)
+            setTimeout(() => saveManager.save(), pause + 500)
+        }, pause)
     }
 }

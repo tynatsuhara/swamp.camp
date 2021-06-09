@@ -4,8 +4,8 @@ import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { Campfire } from "../../world/elements/Campfire"
 import { Player } from "../Player"
 import { Item } from "../../items/Items"
-import { WorldTime } from "../../world/WorldTime"
 import { TimeUnit } from "../../world/TimeUnit"
+import { Bed } from "../../world/elements/Bed"
 
 export const CAMPFIRE_DIALOGUE = "campfire"
 export const BED_DIALOGUE = "bed"
@@ -62,18 +62,18 @@ export const ITEM_DIALOGUES: { [key: string]: () => DialogueInstance } = {
     },
 
     [BED_DIALOGUE]: () => {
+        const bed: Bed = DialogueDisplay.instance.dialogueSource as Bed
         const completeDialogue = new NextDialogue(BED_DIALOGUE, false)
         // TODO: Make it so you can't sleep unless there's a campfire
-        // TODO: Add a nice transition
         return dialogueWithOptions(
             ["The comfy bed beckons to you. Do you give in?"],
             DudeInteractIndicator.NONE,
             new DialogueOption("Nap (1 hour)", () => {
-                WorldTime.instance.fastForward(TimeUnit.HOUR)
+                bed.sleep(TimeUnit.HOUR)
                 return completeDialogue
             }),
             new DialogueOption("Sleep (8 hours)", () => {
-                WorldTime.instance.fastForward(TimeUnit.HOUR * 8)
+                bed.sleep(TimeUnit.HOUR * 8)
                 return completeDialogue
             }),
             new DialogueOption(CANCEL_TEXT, () => completeDialogue),

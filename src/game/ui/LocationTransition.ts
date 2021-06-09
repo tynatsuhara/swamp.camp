@@ -42,7 +42,7 @@ export class LocationTransition extends Component {
     private animator: Animator
     private render: ImageRender
 
-    transition(callback: () => void) {
+    transition(callback: () => void, pauseMillis: number = 12 * SPEED) {
         const centerPos = Player.instance.dude.standingPosition.plusY(-12)
                 .minus(Camera.instance.position)
                 .apply(Math.floor)
@@ -81,7 +81,7 @@ export class LocationTransition extends Component {
         }
 
         const transitionFrame = FRAMES-1
-        const blackScreenSpeed = 12 * SPEED
+        const blackScreenSpeed = pauseMillis
 
         this.animator = new Animator(
             Array.from({length: FRAMES * 2 - 1}, (v, k) => k === transitionFrame ? blackScreenSpeed : SPEED),
