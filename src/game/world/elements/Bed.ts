@@ -53,8 +53,8 @@ export class BedFactory extends ElementFactory {
         ))
     }
 
-    canPlace(pos: Point) {
-        return LocationManager.instance.currentLocation !== LocationManager.instance.exterior()
+    canPlaceInLocation(wl: WorldLocation) {
+        return wl !== LocationManager.instance.exterior()
     }
 }
 

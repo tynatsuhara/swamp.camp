@@ -119,6 +119,6 @@ export class PlaceElementFrame extends Component {
             return false
         }
 
-        return Elements.instance.getElementFactory(PlaceElementDisplay.instance.getElementType()).canPlace(pos)
+        return Elements.instance.getElementFactory(PlaceElementDisplay.instance.getElementType()).canPlaceAtPos(pos)
     }
 }

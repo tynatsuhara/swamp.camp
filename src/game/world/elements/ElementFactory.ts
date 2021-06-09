@@ -23,9 +23,16 @@ export abstract class ElementFactory {
     abstract make(wl: WorldLocation, pos: Point, data: object): ElementComponent
 
     /**
+     * @param wl The location in which the user is trying to place an element
+     */
+    canPlaceInLocation(wl: WorldLocation) {
+        return true
+    }
+
+    /**
      * @param pos The position of the element in tile coordinates (not pixel coordinates!)
      */
-    canPlace(pos: Point) {
+    canPlaceAtPos(pos: Point) {
         return true
     }
 }

@@ -18,6 +18,7 @@ import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Inventory } from "../items/Inventory"
 import { Item, ITEM_METADATA_MAP } from "../items/Items"
 import { saveManager } from "../SaveManager"
+import { Elements } from "../world/elements/Elements"
 import { LocationManager } from "../world/LocationManager"
 import { Color } from "./Color"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
@@ -135,7 +136,9 @@ export class InventoryDisplay extends Component {
 
             // Only allow actions when in the inventory menu
             if (!this.tradingInv) {
-                if (item.element !== null && LocationManager.instance.currentLocation.allowPlacing) {
+                const wl = LocationManager.instance.currentLocation
+                if (item.element !== null  && wl.allowPlacing 
+                        && Elements.instance.getElementFactory(item.element).canPlaceInLocation(wl)) {
                     actions.push({
                         verb: 'place',
                         actionFn: () => {
