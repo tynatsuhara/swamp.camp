@@ -47,7 +47,7 @@ export class GameScene {
     newGame() {
         saveManager.deleteSave()
 
-        WorldTime.instance.initialize(TimeUnit.HOUR * 19.5)
+        WorldTime.instance.initialize(TimeUnit.HOUR * 18.5)
         
         // World must be initialized before we do anything else
         MapGenerator.instance.generateExterior()
