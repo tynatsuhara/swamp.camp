@@ -81,7 +81,7 @@ export class MapGenerator {
     }
 
     spawnTrees() {
-        const trees = Math.random() * 300 + 150
+        const trees = Math.random() * 500 + 500
         for (let i = 0; i < trees; i++) {
             const pt = new Point(
                 Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_SIZE/2,
