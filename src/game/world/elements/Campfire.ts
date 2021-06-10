@@ -133,4 +133,12 @@ export class Campfire extends Component implements DialogueSource {
         this.logs += count
         this.updateFire(this.logs)
     }
+
+    willBurnFor(duration: number) {
+        if (this.logs === 0) {
+            return false
+        }
+        const currentLogTimeLeft = Campfire.LOG_DURATION - (WorldTime.instance.time - this.lastLogConsumedTime)/Campfire.LOG_DURATION
+        return duration < (this.logs-1) * Campfire.LOG_DURATION + currentLogTimeLeft
+    }
 }

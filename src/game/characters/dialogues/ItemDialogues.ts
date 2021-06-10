@@ -64,19 +64,37 @@ export const ITEM_DIALOGUES: { [key: string]: () => DialogueInstance } = {
     [BED_DIALOGUE]: () => {
         const bed: Bed = DialogueDisplay.instance.dialogueSource as Bed
         const completeDialogue = new NextDialogue(BED_DIALOGUE, false)
-        // TODO: Make it so you can't sleep unless there's a campfire
-        return dialogueWithOptions(
-            ["The comfy bed beckons to you. Do you give in?"],
-            DudeInteractIndicator.NONE,
-            new DialogueOption("Nap (1 hour)", () => {
-                bed.sleep(TimeUnit.HOUR)
-                return completeDialogue
-            }),
+
+        let text: string
+        let options = [
             new DialogueOption("Sleep (8 hours)", () => {
                 bed.sleep(TimeUnit.HOUR * 8)
                 return completeDialogue
             }),
+            new DialogueOption("Nap (1 hour)", () => {
+                bed.sleep(TimeUnit.HOUR)
+                return completeDialogue
+            }),
             new DialogueOption(CANCEL_TEXT, () => completeDialogue),
+        ]
+
+        if (bed.canSleepFor(8 * TimeUnit.HOUR)) {
+            text = "The comfy bed beckons to you. Do you give in?"
+        } else if (bed.canSleepFor(1 * TimeUnit.HOUR)) {
+            text = "Your campfire will not burn long enough for a full rest, but you have time for a nap."
+            options.splice(0, 1)
+        } else {
+            return dialogue(
+                ["You cannot sleep if your campfire is out."], 
+                () => completeDialogue, 
+                DudeInteractIndicator.NONE
+            )
+        }
+
+        return dialogueWithOptions(
+            [text],
+            DudeInteractIndicator.NONE,
+            ...options
         )
     }
 }

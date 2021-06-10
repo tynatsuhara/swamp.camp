@@ -17,6 +17,8 @@ import { LocationManager } from "../LocationManager"
 import { WorldTime } from "../WorldTime"
 import { HUD } from "../../ui/HUD"
 import { saveManager } from "../../SaveManager"
+import { Campfire } from "./Campfire"
+import { UIStateManager } from "../../ui/UIStateManager"
 
 export class BedFactory extends ElementFactory {
 
@@ -43,6 +45,12 @@ export class BedFactory extends ElementFactory {
                 DialogueDisplay.instance.startDialogue(bed)
             }, 
             new Point(1, -TILE_SIZE),
+            () => {
+                // Proxy for determining that this bed belongs to the player
+                return LocationManager.instance.currentLocation.allowPlacing 
+                        && !UIStateManager.instance.isMenuOpen
+                    
+            }
         ))
 
         return e.addComponent(new ElementComponent(
@@ -68,5 +76,12 @@ export class Bed extends Component implements DialogueSource {
             WorldTime.instance.fastForward(duration)
             setTimeout(() => saveManager.save(), pause + 500)
         }, pause)
+    }
+
+    canSleepFor(duration: number) {
+        return LocationManager.instance.exterior()
+                .getElementsOfType(ElementType.CAMPFIRE)
+                .map(el => el.entity.getComponent(Campfire))
+                .some(campfire => campfire.willBurnFor(duration))
     }
 }
