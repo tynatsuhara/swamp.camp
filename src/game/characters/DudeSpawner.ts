@@ -37,7 +37,7 @@ export class DudeSpawner extends Component {
 
     private spawnDemons() {
         const hour = (WorldTime.instance.time % TimeUnit.DAY) / TimeUnit.HOUR
-        if (hour > DarknessMask.DAYBREAK_HOUR && hour < DarknessMask.DUSK_HOUR) {
+        if (hour >= DarknessMask.DAYBREAK_HOUR && hour < DarknessMask.DUSK_HOUR) {
             return
         }
 
