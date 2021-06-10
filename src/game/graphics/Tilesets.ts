@@ -9,6 +9,7 @@ import { TileSource } from "../../engine/tiles/TileSource"
 import { ExtraCharacterSet2TileLoader } from "./ExtraCharacterSet2TileLoader"
 import { OGTileset } from "./OGTileset"
 import { ExplosionTileset } from "./ExplosionTileset"
+import { Singletons } from "../Singletons"
 
 // standard tile size
 export const TILE_SIZE = 16
@@ -23,12 +24,8 @@ export const pixelPtToTilePt = (pixelPt: Point) => {
  */
 export class Tilesets {
 
-    private static _instance: Tilesets
-    static get instance(): Tilesets {
-        if (!this._instance) {
-            this._instance = new Tilesets()
-        }
-        return this._instance
+    static get instance() {
+        return Singletons.getOrCreate(Tilesets)
     }
 
     readonly dungeonCharacters = new DungeonTilesetII()
@@ -40,10 +37,6 @@ export class Tilesets {
     readonly extraCharacterSet1 = new SplitFileTileLoader("images/individual_characters")
     readonly extraCharacterSet2 = new ExtraCharacterSet2TileLoader()
     readonly explosions = new ExplosionTileset()
-
-    private constructor() {
-        // not allowed
-    }
 
     getBasicTileSource(key: string): StaticTileSource {
         const sources = [this.outdoorTiles, this.tilemap]

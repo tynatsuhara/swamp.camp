@@ -7,6 +7,7 @@ import { ConnectingTileSchema } from "../../../engine/tiles/ConnectingTileSchema
 import { Tilesets } from "../../graphics/Tilesets"
 import { makeBasicNineSliceGround, makeBasicGround } from "./BasicGround"
 import { makeLedge } from "./Ledge"
+import { Singletons } from "../../Singletons"
 
 export const enum GroundType {
     BASIC, BASIC_NINE_SLICE, GRASS, PATH, LEDGE
@@ -29,12 +30,8 @@ export type MakeGroundFuncData = {
  */
 export class Ground {
 
-    private static _instance: Ground
-    static get instance(): Ground {
-        if (!this._instance) {
-            this._instance = new Ground()
-        }
-        return this._instance
+    static get instance() {
+        return Singletons.getOrCreate(Ground)
     }
 
     private readonly GROUND_FUNCTION_MAP: { [key: number]: (data: MakeGroundFuncData) => GroundComponent } = {

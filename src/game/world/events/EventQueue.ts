@@ -1,14 +1,11 @@
 import { BinaryHeap } from "../../../engine/util/BinaryHeap"
+import { Singletons } from "../../Singletons"
 import { QueuedEventData, EVENT_QUEUE_HANDLERS } from "./QueuedEvent"
 
 export class EventQueue {
 
-    private static _instance: EventQueue
-    static get instance(): EventQueue {
-        if (!this._instance) {
-            this._instance = new EventQueue()
-        }
-        return this._instance
+    static get instance() {
+        return Singletons.getOrCreate(EventQueue)
     }
 
     private heap: BinaryHeap<QueuedEventData> = new BinaryHeap(e => e.time)

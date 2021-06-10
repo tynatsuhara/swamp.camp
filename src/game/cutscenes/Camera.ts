@@ -4,17 +4,14 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { Dude } from "../characters/Dude"
 import { clamp } from "../../engine/util/Utils"
 import { Renderer } from "../../engine/renderer/Renderer"
+import { Singletons } from "../Singletons"
 
 export class Camera {
 
     static readonly ZOOM = 3
 
-    private static _instance: Camera
-    static get instance(): Camera {
-        if (!this._instance) {
-            this._instance = new Camera()
-        }
-        return this._instance
+    static get instance() {
+        return Singletons.getOrCreate(Camera)
     }
 
     private shakePower: number

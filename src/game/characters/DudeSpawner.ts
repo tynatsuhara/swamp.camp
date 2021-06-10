@@ -2,6 +2,7 @@ import { Component } from "../../engine/Component"
 import { Entity } from "../../engine/Entity"
 import { Lists } from "../../engine/util/Lists"
 import { TILE_SIZE } from "../graphics/Tilesets"
+import { Singletons } from "../Singletons"
 import { DarknessMask } from "../world/DarknessMask"
 import { LightManager } from "../world/LightManager"
 import { LocationManager } from "../world/LocationManager"
@@ -12,12 +13,8 @@ import { DudeFaction, DudeFactory, DudeType } from "./DudeFactory"
 
 export class DudeSpawner extends Component {
 
-    private static _instance: DudeSpawner
-    static get instance(): DudeSpawner {
-        if (!this._instance) {
-            this._instance = new DudeSpawner()
-        }
-        return this._instance
+    static get instance() {
+        return Singletons.getOrCreate(DudeSpawner)
     }
 
     private static readonly INTERVAL_MILLIS = 30_000

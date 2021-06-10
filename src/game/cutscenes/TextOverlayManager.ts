@@ -5,18 +5,15 @@ import { Point } from "../../engine/Point"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Lists } from "../../engine/util/Lists"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { Singletons } from "../Singletons"
 import { Color } from "../ui/Color"
 import { formatText, TEXT_PIXEL_WIDTH } from "../ui/Text"
 import { TextTyper } from "../ui/TextTyper"
 
 export class TextOverlayManager extends Component {
 
-    private static _instance: TextOverlayManager
-    static get instance(): TextOverlayManager {
-        if (!this._instance) {
-            this._instance = new TextOverlayManager()
-        }
-        return this._instance
+    static get instance() {
+        return Singletons.getOrCreate(TextOverlayManager)
     }
 
     private static readonly WIDTH = 240

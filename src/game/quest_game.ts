@@ -11,9 +11,19 @@ export const enum Scene {
 
 export class QuestGame extends Game {
 
+    private static _instance: QuestGame
+    static get instance() {
+        return this._instance
+    }
+
     private scene = Scene.MAIN_MENU
     private readonly game = new GameScene()
     private readonly mainMenu = new MainMenuScene(() => this.continueGame(), () => this.startNewGame())
+
+    constructor() {
+        super()
+        QuestGame._instance = this
+    }
 
     initialize() {
         this.game.initialize()
@@ -29,6 +39,10 @@ export class QuestGame extends Game {
         Music.play(Music.DAY_MUSIC)
         this.scene = Scene.GAME
         this.game.newGame()
+    }
+
+    quitToMainMenu() {
+        this.scene = Scene.MAIN_MENU
     }
 
     // entities in the world space

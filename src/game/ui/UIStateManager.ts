@@ -4,23 +4,17 @@ import { Player } from "../characters/Player"
 import { InventoryDisplay } from "./InventoryDisplay"
 import { DialogueDisplay } from "./DialogueDisplay"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
-import { Point } from "../../engine/Point"
 import { PauseMenu } from "./PauseMenu"
 import { CraftingMenu } from "./CraftingMenu"
 import { SellMenu } from "./SellMenu"
 import { NotificationDisplay } from "./NotificationDisplay"
-import { Mouse } from "./Mouse"
-import { debug } from "../../engine/Debug"
 import { Camera } from "../cutscenes/Camera"
+import { Singletons } from "../Singletons"
 
 export class UIStateManager {
 
-    private static _instance: UIStateManager
-    static get instance(): UIStateManager {
-        if (!this._instance) {
-            this._instance = new UIStateManager()
-        }
-        return this._instance
+    static get instance() {
+        return Singletons.getOrCreate(UIStateManager)
     }
     
     static UI_SPRITE_DEPTH = Number.MAX_SAFE_INTEGER/2
@@ -39,11 +33,6 @@ export class UIStateManager {
     // if this is false
     private captureInput = false
     get isMenuOpen() { return this.captureInput }
-
-    // Resets the singleton UIStateManager
-    destroy() {
-        UIStateManager._instance = new UIStateManager()
-    }
 
     get(elapsedMillis: number): Entity[] {
         if (!Player.instance.dude) {

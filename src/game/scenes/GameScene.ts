@@ -29,6 +29,7 @@ import { DudeSpawner } from "../characters/DudeSpawner"
 import { DevControls } from "../DevControls"
 import { LightManager } from "../world/LightManager"
 import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
+import { Singletons } from "../Singletons"
 
 export class GameScene {
 
@@ -45,6 +46,8 @@ export class GameScene {
     }
 
     newGame() {
+        Singletons.destroy()
+
         saveManager.deleteSave()
 
         WorldTime.instance.initialize(TimeUnit.HOUR * 18.5)
@@ -55,6 +58,7 @@ export class GameScene {
         const playerStartPos = MapGenerator.ENTER_LAND_POS
         const playerDude = DudeFactory.instance.new(DudeType.PLAYER, playerStartPos)
 
+        // Camera.instance.clearPosition()
         Camera.instance.focusOnDude(playerDude)
 
         CutsceneManager.instance.startCutscene(new IntroCutscene())
@@ -64,7 +68,7 @@ export class GameScene {
             time: WorldTime.instance.time + NPC.SCHEDULE_FREQUENCY
         })
     }
-    
+
     getViews(updateViewsContext: UpdateViewsContext) {
         const cameraOffset = Camera.instance.getUpdatedPosition(updateViewsContext.elapsedTimeMillis)
 

@@ -3,6 +3,7 @@ import { Grid } from "../../engine/util/Grid"
 import { Lists } from "../../engine/util/Lists"
 import { Noise } from "../../engine/util/Noise"
 import { TILE_SIZE } from "../graphics/Tilesets"
+import { Singletons } from "../Singletons"
 import { ElementType } from "./elements/Elements"
 import { TentColor } from "./elements/Tent"
 import { GroundType } from "./ground/Ground"
@@ -12,12 +13,8 @@ import { WorldLocation } from "./WorldLocation"
 
 export class MapGenerator {
 
-    private static _instance: MapGenerator
-    static get instance(): MapGenerator {
-        if (!this._instance) {
-            this._instance = new MapGenerator()
-        }
-        return this._instance
+    static get instance() {
+        return Singletons.getOrCreate(MapGenerator)
     }
 
     static readonly MAP_SIZE = 70

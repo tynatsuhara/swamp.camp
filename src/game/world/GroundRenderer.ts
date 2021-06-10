@@ -10,18 +10,15 @@ import { WorldLocation } from "./WorldLocation"
 import { LocationManager } from "./LocationManager"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { TileTransform } from "../../engine/tiles/TileTransform"
+import { Singletons } from "../Singletons"
 
 /**
  * This is an optimization that pre-renders ground on an offscreen canvas
  */
 export class GroundRenderer {
 
-    private static _instance: GroundRenderer
-    static get instance(): GroundRenderer {
-        if (!this._instance) {
-            this._instance = new GroundRenderer()
-        }
-        return this._instance
+    static get instance() {
+        return Singletons.getOrCreate(GroundRenderer)
     }
     
     // no lights should live outside of this range
@@ -35,7 +32,7 @@ export class GroundRenderer {
     private canvas: HTMLCanvasElement
     private context: CanvasRenderingContext2D
 
-    private constructor() {
+    constructor() {
         this.canvas = document.createElement("canvas")
         this.canvas.width = this.size
         this.canvas.height = this.size

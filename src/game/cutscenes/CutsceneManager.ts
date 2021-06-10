@@ -1,17 +1,14 @@
 import { Component } from "../../engine/Component"
 import { Entity } from "../../engine/Entity"
 import { saveManager } from "../SaveManager"
+import { Singletons } from "../Singletons"
 
 export class CutsceneManager {
 
-    private static _instance: CutsceneManager
-    static get instance(): CutsceneManager {
-        if (!this._instance) {
-            this._instance = new CutsceneManager()
-        }
-        return this._instance
+    static get instance() {
+        return Singletons.getOrCreate(CutsceneManager)
     }
-    
+
     private entity: Entity = null
     get isMidCutscene() { return !!this.entity }
 

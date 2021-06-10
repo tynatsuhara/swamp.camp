@@ -8,6 +8,7 @@ import { HUD } from "./ui/HUD"
 import { WorldTime } from "./world/WorldTime"
 import { EventQueue } from "./world/events/EventQueue"
 import { newUUID } from "./saves/uuid"
+import { Singletons } from "./Singletons"
 
 const SAVE_KEY = "save"
 const CURRENT_SAVE_FORMAT_VERSION = 1
@@ -90,19 +91,24 @@ class SaveManager {
      */
     load() {
         const save = this.getSavedData()
+
+        // Logging
         const saveDate = new Date()
         saveDate.setTime(save.timeSaved)
         const timePlayed = new Date(save.state.timePlayed).toISOString().substr(11, 8)
         console.log(`loaded save from ${saveDate} with ${timePlayed} played`)
 
+        Singletons.destroy()
+        
         WorldTime.instance.initialize(save.worldTime)
         LocationManager.instance.initialize(save.locations)
         EventQueue.instance.initialize(save.eventQueue)
 
+        // Camera.instance.destroy()
         Camera.instance.focusOnDude(Array.from(LocationManager.instance.currentLocation.dudes).filter(d => d.type === DudeType.PLAYER)[0])
 
         // clear existing UI state
-        UIStateManager.instance.destroy()
+        // UIStateManager.instance.destroy()
     }
 
     private getSavedData(): Save {

@@ -4,6 +4,7 @@ import { Player } from "../characters/Player"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { Camera } from "../cutscenes/Camera"
 import { TILE_SIZE } from "../graphics/Tilesets"
+import { Singletons } from "../Singletons"
 import { DarknessMask } from "./DarknessMask"
 import { LocationManager } from "./LocationManager"
 import { MapGenerator } from "./MapGenerator"
@@ -13,12 +14,8 @@ import { WorldTime } from "./WorldTime"
 
 export class LightManager {
 
-    private static _instance: LightManager
-    static get instance(): LightManager {
-        if (!this._instance) {
-            this._instance = new LightManager()
-        }
-        return this._instance
+    static get instance() {
+        return Singletons.getOrCreate(LightManager)
     }
 
     private lightTiles: Map<WorldLocation, Map<any, [Point, number]>> = new Map<WorldLocation, Map<any, [Point, number]>>()

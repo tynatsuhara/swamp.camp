@@ -1,18 +1,15 @@
 import { WorldAudioContext } from "../audio/WorldAudioContext"
 import { LocationManagerSaveState } from "../saves/LocationManagerSaveState"
+import { Singletons } from "../Singletons"
 import { WorldLocation } from "./WorldLocation"
 
 export class LocationManager {
     
-    private static _instance: LocationManager
-    static get instance(): LocationManager {
-        if (!this._instance) {
-            this._instance = new LocationManager()
-        }
-        return this._instance
+    static get instance() {
+        return Singletons.getOrCreate(LocationManager)
     }
 
-    private constructor() {
+    constructor() {
         window["locationManager"] = this
     }
 

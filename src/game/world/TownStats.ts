@@ -1,4 +1,5 @@
 import { saveManager } from "../SaveManager"
+import { Singletons } from "../Singletons"
 
 class TownStat {
     readonly id: string
@@ -21,12 +22,9 @@ class TownStat {
 }
 
 export class TownStats {
-    private static _instance: TownStats
-    static get instance(): TownStats {
-        if (!this._instance) {
-            this._instance = new TownStats()
-        }
-        return this._instance
+
+    static get instance() {
+        return Singletons.getOrCreate(TownStats)
     }
 
     /**

@@ -5,15 +5,12 @@ import { EventQueue } from "./events/EventQueue"
 import { TimeUnit } from "./TimeUnit"
 import { WorldAudioContext } from "../audio/WorldAudioContext"
 import { saveManager } from "../SaveManager"
+import { Singletons } from "../Singletons"
 
 export class WorldTime extends Component {
 
-    private static _instance: WorldTime
-    static get instance(): WorldTime {
-        if (!this._instance) {
-            this._instance = new WorldTime()
-        }
-        return this._instance
+    static get instance() {
+        return Singletons.getOrCreate(WorldTime)
     }
 
     private _time: number = 0  // millis

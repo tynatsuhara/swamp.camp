@@ -1,3 +1,4 @@
+import { Singletons } from "../../Singletons"
 import { TeleporterFactory } from "../Teleporter"
 import { BedFactory } from "./Bed"
 import { CampfireFactory } from "./Campfire"
@@ -31,12 +32,8 @@ export class SavedElement {
 
 export class Elements {
 
-    private static _instance: Elements
-    static get instance(): Elements {
-        if (!this._instance) {
-            this._instance = new Elements()
-        }
-        return this._instance
+    static get instance() {
+        return Singletons.getOrCreate(Elements)
     }
 
     private readonly ELEMENT_FACTORIES: { [key: number]: ElementFactory } = {

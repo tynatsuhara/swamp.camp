@@ -21,6 +21,7 @@ import { ShroomNPC } from "./ShroomNPC"
 import { newUUID } from "../saves/uuid"
 import { Centaur } from "./Centaur"
 import { ShieldType } from "./weapons/ShieldType"
+import { Singletons } from "../Singletons"
 
 export const enum DudeFaction {
     VILLAGERS,
@@ -51,12 +52,8 @@ export const enum DudeType {
 
 export class DudeFactory {
 
-    private static _instance: DudeFactory
-    static get instance(): DudeFactory {
-        if (!this._instance) {
-            this._instance = new DudeFactory()
-        }
-        return this._instance
+    static get instance() {
+        return Singletons.getOrCreate(DudeFactory)
     }
     
     /**
