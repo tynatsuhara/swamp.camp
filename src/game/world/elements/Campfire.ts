@@ -135,8 +135,11 @@ export class Campfire extends Component implements DialogueSource {
     }
 
     willBurnFor(duration: number) {
+        // this gets called when the campfire is not loaded, so we need for force an update
+        this.update()
+
         if (this.logs === 0) {
-            return false
+            return duration === 0
         }
         const currentLogTimeLeft = Campfire.LOG_DURATION - (WorldTime.instance.time - this.lastLogConsumedTime)/Campfire.LOG_DURATION
         return duration < (this.logs-1) * Campfire.LOG_DURATION + currentLogTimeLeft

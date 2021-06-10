@@ -19,6 +19,8 @@ import { HUD } from "../../ui/HUD"
 import { saveManager } from "../../SaveManager"
 import { Campfire } from "./Campfire"
 import { UIStateManager } from "../../ui/UIStateManager"
+import { TimeUnit } from "../TimeUnit"
+import { DarknessMask } from "../DarknessMask"
 
 export class BedFactory extends ElementFactory {
 
@@ -78,10 +80,20 @@ export class Bed extends Component implements DialogueSource {
         }, pause)
     }
 
-    canSleepFor(duration: number) {
+    canSleepFor(hours: number) {
+        const hourOfDay = (WorldTime.instance.time % TimeUnit.DAY) / TimeUnit.HOUR
+
+        let hoursNeeded = 0
+        for (let i = 0; i < hours; i++) {
+            const hour = (hourOfDay + i) % TimeUnit.DAY
+            if (hour < DarknessMask.DAYBREAK_HOUR || hour >= DarknessMask.DUSK_HOUR) {
+                hoursNeeded = i
+            }
+        }
+
         return LocationManager.instance.exterior()
                 .getElementsOfType(ElementType.CAMPFIRE)
                 .map(el => el.entity.getComponent(Campfire))
-                .some(campfire => campfire.willBurnFor(duration))
+                .some(campfire => campfire.willBurnFor(hoursNeeded * TimeUnit.HOUR))
     }
 }

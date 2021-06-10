@@ -78,9 +78,9 @@ export const ITEM_DIALOGUES: { [key: string]: () => DialogueInstance } = {
             new DialogueOption(CANCEL_TEXT, () => completeDialogue),
         ]
 
-        if (bed.canSleepFor(8 * TimeUnit.HOUR)) {
+        if (bed.canSleepFor(8)) {
             text = "The comfy bed beckons to you. Do you give in?"
-        } else if (bed.canSleepFor(1 * TimeUnit.HOUR)) {
+        } else if (bed.canSleepFor(1)) {
             text = "Your campfire will not burn long enough for a full rest, but you have time for a nap."
             options.splice(0, 1)
         } else {
