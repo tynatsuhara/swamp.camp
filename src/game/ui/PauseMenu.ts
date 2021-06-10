@@ -12,6 +12,7 @@ import { makeControlsUI } from "./ControlsUI"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
 import { Settings } from "../Settings"
 import { TILE_SIZE } from "../graphics/Tilesets"
+import { QuestGame } from "../quest_game"
 
 export class PauseMenu extends Component {
 
@@ -39,22 +40,16 @@ export class PauseMenu extends Component {
     }
 
     show(dimensions: Point) {
-        this.isOpen = true
-        const buttonColor = "red"
-        const textColor = Color.PINK
-        const hoverColor = Color.WHITE
-        this.displayEntity = ButtonsMenu.render(
-            dimensions,
-            "red",
-            [{
+        const buttons = [
+            {
                 text: "SAVE GAME", 
                 fn: () => saveManager.save(),
-                buttonColor, textColor, hoverColor,
-            }, {
+            }, 
+            {
                 text: "LOAD LAST SAVE", 
                 fn: () => saveManager.load(),
-                buttonColor, textColor, hoverColor,
-            }, {
+            }, 
+            {
                 text: `MUSIC (${Settings.getMusicVolume() * 100}%)`, 
                 fn: () => {
                     if (this.isShiftDown) {
@@ -64,8 +59,8 @@ export class PauseMenu extends Component {
                     }
                     this.show(dimensions)  // refresh
                 },
-                buttonColor, textColor, hoverColor,
-            }, {
+            }, 
+            {
                 text: `SOUNDS (${Settings.getSoundVolume() * 100}%)`, 
                 fn: () => {
                     if (this.isShiftDown) {
@@ -75,10 +70,26 @@ export class PauseMenu extends Component {
                     }
                     this.show(dimensions)  // refresh
                 },
-                buttonColor, textColor, hoverColor,
-            }],
-            new Point(0, TILE_SIZE/2)
+            }, 
+            {
+                text: `MAIN MENU`, 
+                fn: () => QuestGame.instance.quitToMainMenu(),
+            }
+        ]
+
+        this.isOpen = true
+
+        const buttonColor = "red"
+        const textColor = Color.PINK
+        const hoverColor = Color.WHITE
+
+        this.displayEntity = ButtonsMenu.render(
+            dimensions,
+            "red",
+            buttons.map(obj => ({ ...obj, buttonColor, textColor, hoverColor })),
+            new Point(0, 20)
         )
+
         this.controlsDisplay = new Entity([new BasicRenderComponent(...makeControlsUI(dimensions, new Point(0, -TILE_SIZE/2)))])
     }
 
