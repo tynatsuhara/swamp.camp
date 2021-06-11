@@ -73,7 +73,7 @@ export const Lists = {
 
     repeat<T>(times: number, list: T[]): T[] {
         const result = []
-        Lists.range(0, times).forEach(() => result.push(...list))
+        Lists.range(0, Math.floor(times)).forEach(() => result.push(...list))
         return result
     },
 

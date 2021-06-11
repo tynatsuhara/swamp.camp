@@ -1,5 +1,5 @@
 import { Component } from "../../engine/Component"
-import { StartData, UpdateData } from "../../engine/Engine"
+import { UpdateData } from "../../engine/Engine"
 import { InputKey } from "../../engine/Input"
 import { Point } from "../../engine/Point"
 import { Lists } from "../../engine/util/Lists"

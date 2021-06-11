@@ -19,6 +19,10 @@ import { ElementFactory } from "./ElementFactory"
 import { LocationManager } from "../LocationManager"
 import { PointAudio } from "../../audio/PointAudio"
 import { LightManager } from "../LightManager"
+import { Breakable } from "./Breakable"
+import { Item } from "../../items/Items"
+import { Lists } from "../../../engine/util/Lists"
+import { ROCKS_NEEDED_FOR_CAMPFIRE, WOOD_NEEDED_FOR_CAMPFIRE } from "../../characters/dialogues/DipIntro"
 
 export class CampfireFactory extends ElementFactory {
 
@@ -52,6 +56,12 @@ export class CampfireFactory extends ElementFactory {
         const lastLogConsumedTime = data["llct"] ?? 0
 
         const pixelCenterPos = scaledPos.plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
+
+        e.addComponent(new Breakable(
+            pixelCenterPos, 
+            [campfireOff.transform, campfireOn.transform], 
+            () => Lists.repeat(WOOD_NEEDED_FOR_CAMPFIRE/2, [Item.WOOD]).concat(Lists.repeat(ROCKS_NEEDED_FOR_CAMPFIRE/2, [Item.ROCK]))
+        ))
 
         const audio = e.addComponent(new PointAudio(
             "audio/ambiance/campfire.ogg",
