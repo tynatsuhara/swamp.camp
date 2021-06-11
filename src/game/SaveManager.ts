@@ -121,6 +121,9 @@ class SaveManager {
 
     private isSaveFormatVersionCompatible(slot: number) {
         const save = localStorage.getItem(this.saveKeyForSlot(slot))
+        if (!save) {
+            return true
+        }
         try {
             return JSON.parse(save)["version"] === CURRENT_SAVE_FORMAT_VERSION
         } catch (e) {
