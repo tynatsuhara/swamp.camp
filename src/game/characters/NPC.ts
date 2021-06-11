@@ -318,7 +318,10 @@ export class NPC extends Component {
         // }
 
         const stoppingDist = weapon.getStoppingDistance()
-        const inRangeAndArmed = mag < weapon.getRange() + this.dude.colliderSize.x/2 - 5
+        const inRangeAndArmed = mag < weapon.getRange() 
+                // the default collider has a width of 10
+                // big entities have a collider width of 15
+                + (this.dude.colliderSize.x - 10) * 3
         const timeLeftUntilCanAttack = this.nextAttackTime - WorldTime.instance.time
         
         if (stoppingDist === 0 
