@@ -11,6 +11,7 @@ import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Lists } from "../../engine/util/Lists"
+import { View } from "../../engine/View"
 import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { QuestGame } from "../quest_game"
@@ -37,6 +38,7 @@ export class MainMenuScene {
     private plumes: PlumePicker
     private knight: TileComponent
     private title = assets.getImageByFileName("images/title.png")
+    private view: View
 
     private menu = Menu.ROOT
 
@@ -47,12 +49,15 @@ export class MainMenuScene {
     }
 
     reset() {
-        this.menu = Menu.ROOT
+        this.render(Menu.ROOT)
         this.plumes = new PlumePicker(
             saveManager.getState().plume,
-            color => this.knight = new Entity().addComponent(
-                DudeAnimationUtils.getCharacterIdleAnimation("knight_f", { color }).toComponent()
-            )
+            color => {
+                this.knight = new Entity().addComponent(
+                    DudeAnimationUtils.getCharacterIdleAnimation("knight_f", { color }).toComponent()
+                )
+                this.view = null  // force re-render
+            }
         )
     }
 
@@ -76,13 +81,22 @@ export class MainMenuScene {
     }
 
     private lastDimensions: Point
-    private sceneEntities: Entity[]
+
+    private render(menu: Menu) {
+        this.menu = menu
+        this.view = null  // force re-render
+    }
     
     getViews(updateViewsContext: UpdateViewsContext) {
         const dimensions = updateViewsContext.dimensions.div(ZOOM)
-        const saveCount = saveManager.getSaveCount()
-        const center = dimensions.floorDiv(2)
 
+        // Don't re-render if nothing has changed, since a lot of  
+        // these functions involve parsing all of our save slots
+        if (this.view && updateViewsContext.dimensions.equals(this.lastDimensions)) {
+            return [this.view]
+        }
+
+        const center = dimensions.floorDiv(2)
         const menuTop = center.plusY(31)
         this.plumes.position = menuTop
         const knightPos = menuTop
@@ -101,26 +115,24 @@ export class MainMenuScene {
             UIStateManager.UI_SPRITE_DEPTH
         ))])
 
-        // resize window
-        if (!updateViewsContext.dimensions.equals(this.lastDimensions)) {
-            this.sceneEntities = this.getSceneEntities(knightPos, dimensions)
-            this.lastDimensions = updateViewsContext.dimensions
-        }
+        const sceneEntities = this.getSceneEntities(knightPos, dimensions)
+        this.lastDimensions = updateViewsContext.dimensions
 
         // by default, render the title and the scene with the knight
         const entities = [
             title,
             this.knight.entity, 
-            ...this.sceneEntities
+            ...sceneEntities
         ]
 
         if (this.menu === Menu.ROOT) {
+            const saveCount = saveManager.getSaveCount()
             entities.push(
                 new MainMenuButtonSection(menuTop)
                     .add("continue", () => this.loadLastSave(), saveCount > 0)
-                    .add("load save", () => this.menu = Menu.LOAD_GAME, saveCount > 1)
-                    .add("New game", () => this.menu = Menu.NEW_GAME)
-                    .add("Credits", () => this.menu = Menu.CREDITS)
+                    .add("load save", () => this.render(Menu.LOAD_GAME), saveCount > 1)
+                    .add("New game", () => this.render(Menu.NEW_GAME))
+                    .add("Credits", () => this.render(Menu.CREDITS))
                     .getEntity()
             )
         } else if(this.menu === Menu.LOAD_GAME) {
@@ -136,7 +148,7 @@ export class MainMenuScene {
                 }
             })
             menu.add("cancel", () => {
-                this.menu = Menu.ROOT
+                this.render(Menu.ROOT)
                 this.resetPlume()
             })
             entities.push(menu.getEntity())
@@ -148,14 +160,14 @@ export class MainMenuScene {
                     () => {
                         this.overwritingSave = save
                         this.selectedNewGameSlot = i
-                        this.menu = Menu.PICK_COLOR
+                        this.render(Menu.PICK_COLOR)
                     },
                     true,
                     () => this.showPlumeForSave(i)
                 )
             })
             menu.add("cancel", () => { 
-                this.menu = Menu.ROOT
+                this.render(Menu.ROOT)
                 this.resetPlume()
             })
             entities.push(menu.getEntity())
@@ -165,7 +177,7 @@ export class MainMenuScene {
                 new MainMenuButtonSection(menuTop.plusY(42))
                         .add(`${this.overwritingSave ? "destroy save & " : ""}start`, () => this.newGame())
                         .add("cancel", () => {
-                            this.menu = Menu.NEW_GAME
+                            this.render(Menu.NEW_GAME)
                             this.resetPlume()
                         })
                         .getEntity()
@@ -187,16 +199,18 @@ export class MainMenuScene {
                     .add("sound: BurghRecords    ", link("https://www.edinburghrecords.com/"))
                     .add("   qa: Lane Van Elderen", link("https://lane.computer/"))
                     .addLineBreak()
-                    .add("back", () => this.menu = Menu.ROOT)
+                    .add("back", () => this.render(Menu.ROOT))
                     .getEntity()
             )
         }
 
-        return [{ 
+        this.view = { 
             zoom: ZOOM,
             offset: Point.ZERO,
             entities
-        }];
+        };
+
+        return [this.view]
     }
 
     // scene constants
