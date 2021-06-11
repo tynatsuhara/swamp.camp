@@ -26,6 +26,7 @@ enum Menu {
     ROOT,
     LOAD_GAME,
     NEW_GAME,
+    PICK_COLOR,
     CREDITS,
 }
 
@@ -38,17 +39,9 @@ export class MainMenuScene {
     private menu = Menu.ROOT
 
     constructor() {
-        // Verify that the existing save is compatible
-        // TODO update these
-        // if (saveManager.getSaveCount() && !saveManager.isSaveFormatVersionCompatible()) {
-        //     // TODO: add a mechanism for upgrading saves when it's worth the effort
-        //     console.log("archiving incompatible save file")
-        //     saveManager.archiveSave()
-        // }
-
-        // if (saveManager.saveFileExists() && debug.autoPlay) {
-        //     this.continueFn()
-        // }
+        if (saveManager.getSaveCount() > 0 && debug.autoPlay) {
+            this.loadLastSave()
+        }
     }
 
     reset() {
@@ -71,8 +64,10 @@ export class MainMenuScene {
         QuestGame.instance.loadGameScene()
     }
 
-    newGame(slot: number) {
-        saveManager.new(slot, this.plumes)
+    private selectedNewGameSlot: number
+
+    newGame() {
+        saveManager.new(this.selectedNewGameSlot, this.plumes)
         QuestGame.instance.loadGameScene()
         QuestGame.instance.game.newGame()
     }
@@ -87,11 +82,21 @@ export class MainMenuScene {
 
         const menuTop = center.plusY(31)
         this.plumes.position = menuTop
-        const knightPos = center
+        const knightPos = menuTop
                 .minus(this.knight.transform.dimensions.floorDiv(2).plusY(24))
                 .plusX(-15)
-                .plusY(-6)
+                .plusY(-37)
         this.knight.transform.position = knightPos
+
+        const titleDimensions = new Point(200, 50)
+        const title = new Entity([new BasicRenderComponent(new ImageRender(
+            this.title,
+            Point.ZERO,
+            titleDimensions,
+            menuTop.plusX(-titleDimensions.x/2).plusY(-100 - titleDimensions.y/2),
+            titleDimensions,
+            UIStateManager.UI_SPRITE_DEPTH
+        ))])
 
         // resize window
         if (!updateViewsContext.dimensions.equals(this.lastDimensions)) {
@@ -100,17 +105,9 @@ export class MainMenuScene {
         }
 
         // by default, render the title and the scene with the knight
-        const titleDimensions = new Point(200, 50)
         const entities = [
+            title,
             this.knight.entity, 
-            new Entity([new BasicRenderComponent(new ImageRender(
-                this.title,
-                Point.ZERO,
-                titleDimensions,
-                menuTop.plusX(-titleDimensions.x/2).plusY(-100 - titleDimensions.y/2),
-                titleDimensions,
-                UIStateManager.UI_SPRITE_DEPTH
-            ))]),
             ...this.sceneEntities
         ]
 
@@ -137,15 +134,26 @@ export class MainMenuScene {
             })
             entities.push(menu.getEntity())
         } else if (this.menu === Menu.NEW_GAME) {
-            const menu = new MainMenuButtonSection(menuTop.plusY(42))
+            const menu = new MainMenuButtonSection(menuTop)
             saveManager.getSaves().forEach((save, i) => {
-                menu.add(`slot ${i+1}: ${!save ? "new game" : "delete old save"}`, () => this.newGame(i))
+                menu.add(`slot ${i+1}: ${!save ? "new game" : "delete old save"}`, () => {
+                    this.selectedNewGameSlot = i
+                    this.menu = Menu.PICK_COLOR
+                })
             })
             menu.add("cancel", () => { 
                 this.menu = Menu.ROOT
                 this.plumes.reset()
             })
-            entities.push(menu.getEntity(), this.plumes.entity)
+            entities.push(menu.getEntity())
+        } else if (this.menu === Menu.PICK_COLOR) {
+            entities.push(
+                this.plumes.entity,
+                new MainMenuButtonSection(menuTop.plusY(42))
+                        .add("start", () => this.newGame())
+                        .add("cancel", () => this.menu = Menu.NEW_GAME)
+                        .getEntity()
+            )
         } else if (this.menu === Menu.CREDITS) {
             entities.splice(0)  // don't show title and scene
             const link = (url: string) => () => window.open(url, '_blank')

@@ -8,16 +8,27 @@ import { WorldTime } from "./world/WorldTime"
 import { EventQueue } from "./world/events/EventQueue"
 import { newUUID } from "./saves/uuid"
 import { Singletons } from "./Singletons"
-import { Lists } from "../engine/util/Lists"
 import { PlumePicker } from "./ui/PlumePicker"
 
 const CURRENT_SAVE_FORMAT_VERSION = 1
 
 class SaveManager {
 
+    static readonly SLOTS = 3
+
     // Fields for the currently loaded save
     private saveKey: string
     private state: SaveState
+
+    constructor() {
+        for (let slot = 0; slot < SaveManager.SLOTS; slot++) {
+            if (!this.isSaveFormatVersionCompatible(slot)) {
+                // TODO: add a mechanism for upgrading saves when it's worth the effort
+                console.log("archiving incompatible save file")
+                this.archiveSave(slot)
+            }
+        }
+    }
 
     // Current save functions
 
@@ -73,7 +84,7 @@ class SaveManager {
     // Save managment functions
 
     private saveKeyForSlot(slot: number) {
-        return ["save", "save2", "save3"][slot]
+        return Array.from({ length: SaveManager.SLOTS }, (v, k) => `save${k > 0 ? k+1 : ''}`)[slot]
     }
 
     getLastSaveSlot() {
@@ -108,7 +119,7 @@ class SaveManager {
         localStorage.removeItem(this.saveKeyForSlot(slot))
     }
 
-    isSaveFormatVersionCompatible(slot: number) {
+    private isSaveFormatVersionCompatible(slot: number) {
         const save = localStorage.getItem(this.saveKeyForSlot(slot))
         try {
             return JSON.parse(save)["version"] === CURRENT_SAVE_FORMAT_VERSION
@@ -117,7 +128,7 @@ class SaveManager {
         }
     }
 
-    archiveSave(slot: number) {
+    private archiveSave(slot: number) {
         const key = this.saveKeyForSlot(slot)
         const save = localStorage.getItem(key)
         localStorage.setItem(`save-archived-${newUUID()}`, save)
