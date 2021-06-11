@@ -10,22 +10,26 @@ import { UIStateManager } from "./UIStateManager"
 
 export class MainMenuButton extends Component {
 
+    private readonly width: number = 500
+
     private readonly position: Point
     private readonly text: string
-    readonly width: number = 500
+    private readonly onClick: () => void
+    private readonly onHover: () => void
 
-    private onClick: () => void
-    private hovering: boolean
+    private hovering: boolean = false
 
     constructor(
         position: Point, 
         text: string, 
         onClick: () => void, 
+        onHover: () => void,
     ) {
         super()
         this.position = position.apply(Math.floor)
         this.text = text
         this.onClick = onClick
+        this.onHover = onHover
     }
 
     update(updateData: UpdateData) {
@@ -34,6 +38,10 @@ export class MainMenuButton extends Component {
             new Point(this.width, TILE_SIZE), 
             updateData.input.mousePos
         )
+
+        if (this.hovering) {
+            this.onHover()
+        }
 
         if (this.hovering && updateData.input.isMouseDown) {
             this.onClick()

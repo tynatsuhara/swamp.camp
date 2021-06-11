@@ -10,7 +10,7 @@ import { Color } from "./Color"
 import { UIStateManager } from "./UIStateManager"
 
 // array of [dark, light] pairs
-const CUSTOMIZATION_OPTIONS = [
+export const CUSTOMIZATION_OPTIONS = [
     [Color.DARK_DARK_PINK, Color.DARK_PINK],
     [Color.DARK_PINK, Color.PINK],
     [Color.PINK, Color.LIGHT_PINK],
@@ -43,13 +43,10 @@ export class PlumePicker extends Component {
 
     constructor(initialColor: Color[], callback: (color: Color[]) => void) {
         super()
+        this.initialColor = initialColor || [Color.PINK, Color.LIGHT_PINK]
         this.callback = callback
         
-        if (initialColor) {
-            this.select(this.initialColor)
-        } else {
-            this.select([Color.PINK, Color.LIGHT_PINK])
-        }
+        this.select(this.initialColor)
     }
 
     /**
@@ -65,7 +62,7 @@ export class PlumePicker extends Component {
         return this.selected
     }
 
-    private select(colors: Color[]) {
+    select(colors: Color[]) {
         this.selected = colors
         this.callback(colors)
     }

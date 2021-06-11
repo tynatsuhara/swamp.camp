@@ -13,13 +13,19 @@ export class MainMenuButtonSection {
         this.topCenter = topCenter
     }
 
-    add(text: string, onClick: () => void, condition = true) {
+    add(
+        text: string, 
+        onClick: () => void, 
+        condition = true, 
+        onHover: () => void = () => {}
+    ) {
         if (condition) {
             this.buttons.push(
                 new MainMenuButton(
                     this.topCenter.plusY(MainMenuButtonSection.LINE_SPACING * this.buttons.length), 
                     text, 
-                    onClick
+                    onClick,
+                    onHover
                 )
             )
         }

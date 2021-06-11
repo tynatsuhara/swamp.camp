@@ -10,13 +10,15 @@ import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { TileComponent } from "../../engine/tiles/TileComponent"
 import { TileTransform } from "../../engine/tiles/TileTransform"
+import { Lists } from "../../engine/util/Lists"
 import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { QuestGame } from "../quest_game"
 import { saveManager } from "../SaveManager"
 import { Save } from "../saves/SaveGame"
+import { Color } from "../ui/Color"
 import { MainMenuButtonSection } from "../ui/MainMenuButtonSection"
-import { PlumePicker } from "../ui/PlumePicker"
+import { CUSTOMIZATION_OPTIONS, PlumePicker } from "../ui/PlumePicker"
 import { UIStateManager } from "../ui/UIStateManager"
 import { DarknessMask } from "../world/DarknessMask"
 
@@ -124,26 +126,35 @@ export class MainMenuScene {
             const menu = new MainMenuButtonSection(menuTop)
             saveManager.getSaves().forEach((save, i) => {
                 if (save) {
-                    menu.add(`slot ${i+1} (${this.getSaveMetadataString(save)})`, () => this.loadGame(i))
+                    menu.add(
+                        `slot ${i+1} (${this.getSaveMetadataString(save)})`, 
+                        () => this.loadGame(i),
+                        true,
+                        () => this.showPlumeForSave(i)
+                    )
                 }
             })
-            // TODO: add callbacks for hovering to show the plume :)
             menu.add("cancel", () => {
                 this.menu = Menu.ROOT
-                this.plumes.reset()
+                this.resetPlume()
             })
             entities.push(menu.getEntity())
         } else if (this.menu === Menu.NEW_GAME) {
             const menu = new MainMenuButtonSection(menuTop)
             saveManager.getSaves().forEach((save, i) => {
-                menu.add(`slot ${i+1}: ${!save ? "new game" : "delete old save"}`, () => {
-                    this.selectedNewGameSlot = i
-                    this.menu = Menu.PICK_COLOR
-                })
+                menu.add(
+                    `slot ${i+1}: ${!save ? "new game" : "delete old save"}`, 
+                    () => {
+                        this.selectedNewGameSlot = i
+                        this.menu = Menu.PICK_COLOR
+                    },
+                    true,
+                    () => this.showPlumeForSave(i)
+                )
             })
             menu.add("cancel", () => { 
                 this.menu = Menu.ROOT
-                this.plumes.reset()
+                this.resetPlume()
             })
             entities.push(menu.getEntity())
         } else if (this.menu === Menu.PICK_COLOR) {
@@ -151,7 +162,10 @@ export class MainMenuScene {
                 this.plumes.entity,
                 new MainMenuButtonSection(menuTop.plusY(42))
                         .add("start", () => this.newGame())
-                        .add("cancel", () => this.menu = Menu.NEW_GAME)
+                        .add("cancel", () => {
+                            this.menu = Menu.NEW_GAME
+                            this.resetPlume()
+                        })
                         .getEntity()
             )
         } else if (this.menu === Menu.CREDITS) {
@@ -234,6 +248,29 @@ export class MainMenuScene {
             new Entity(components), 
             darkness.getEntity(dimensions, Point.ZERO)
         ]
+    }
+
+    private previewingSlotPlume: number
+    private slotColors: Color[][]
+    private unusedColors: Color[][]
+
+    private showPlumeForSave(slot: number) {
+        if (!this.slotColors) {
+            const saves = saveManager.getSaves()
+            const saveColors = saves.filter(save => !!save).map(save => save.state.plume[0])
+            this.slotColors = saves.map(save => save?.state?.plume)
+            this.unusedColors = CUSTOMIZATION_OPTIONS.filter(colorArray => !saveColors.includes(colorArray[0]))
+        }
+        if (slot === this.previewingSlotPlume) {
+            return
+        }
+        this.previewingSlotPlume = slot
+        this.plumes.select(this.slotColors[slot] || Lists.oneOf(this.unusedColors))
+    }
+
+    private resetPlume() {
+        this.previewingSlotPlume = -1
+        this.plumes.reset()
     }
 
     private getSaveMetadataString(save: Save) {
