@@ -15,8 +15,6 @@ export class Player extends Component {
 
     static instance: Player
     
-    // private crosshairs: TileComponent
-    // private lerpedLastMoveDir: Point = new Point(1, 0)  // used for crosshair
     private rollingMomentum: Point
     private _velocity: Point = Point.ZERO
     get velocity() { return this._velocity }
@@ -30,7 +28,7 @@ export class Player extends Component {
         StepSounds.startFootstepSoundLoop()
     }
 
-    awake(startData: StartData) {
+    awake() {
         this._dude = this.entity.getComponent(Dude)
         this.dude.setOnDamageCallback(blocked => {
             if (!this.dude.isAlive) {
@@ -51,8 +49,6 @@ export class Player extends Component {
 
         this.dude.heal(updateData.elapsedTimeMillis/6500)
         const possibleInteractable = this.updateInteractables(updateData)
-
-        // const originalCrosshairPosRelative = this.crosshairs.transform.position.minus(this.position)
 
         let dx = 0
         let dy = 0
@@ -89,9 +85,6 @@ export class Player extends Component {
             return
         }
 
-        // const rollingBackwards = (dx > 0 && updateData.input.mousePos.x < this.dude.standingPosition.x)
-                // || (dx < 0 && updateData.input.mousePos.x > this.dude.standingPosition.x)
-
         if (!this.dude.rolling() && updateData.input.isKeyDown(InputKey.SPACE) && (dx !== 0 || dy !== 0)) {
                 // && !rollingBackwards) {
             this.dude.roll()
@@ -104,14 +97,13 @@ export class Player extends Component {
             this.dude.shield.toggleOnBack()
         }
 
+        let blocking = false
         if (!!this.dude.shield) {
-            // this.dude.shield.block(updateData.input.isKeyHeld(Controls.blockKey))
-            this.dude.shield.block(updateData.input.isRightMouseHeld || updateData.input.isKeyHeld(Controls.blockKey))
+            blocking = updateData.input.isRightMouseHeld || updateData.input.isKeyHeld(Controls.blockKey)
+            this.dude.shield.block(blocking)
         }
 
-        // if (updateData.input.isKeyHeld(Controls.attackKey) && !updateData.input.isKeyHeld(Controls.blockKey)) {
-        if (updateData.input.isMouseHeld && !updateData.input.isRightMouseHeld) {
-            // this.dude.weapon?.attack(updateData.input.isKeyDown(Controls.attackKey))
+        if (updateData.input.isMouseHeld && !blocking) {
             this.dude.weapon?.attack(updateData.input.isMouseDown)
         } else {
             this.dude.weapon?.cancelAttack()
@@ -120,19 +112,6 @@ export class Player extends Component {
         if (updateData.input.isKeyDown(Controls.interactButton) && !!possibleInteractable) {
             possibleInteractable.interact()
         }
-        
-        // update crosshair position
-        // const relativeLerpedPos = originalCrosshairPosRelative.lerp(0.16, this.lerpedLastMoveDir.normalized().times(TILE_SIZE))
-        // this.crosshairs.transform.position = this.position.plus(relativeLerpedPos)
-        // const crosshairTilePosition = this.crosshairs.transform.position.plus(new Point(TILE_SIZE, TILE_SIZE).div(2)).floorDiv(TILE_SIZE)
-
-        // if (updateData.input.isKeyDown(InputKey.F)) {
-        //     game.tiles.remove(crosshairTilePosition)
-        // }
-
-        // if (updateData.input.isKeyDown(InputKey.E)) {
-        //     game.tiles.get(crosshairTilePosition)?.getComponent(Interactable)?.interact()
-        // }
     }
 
     private updateInteractables(updateData: UpdateData) {
