@@ -34,23 +34,9 @@ export class DarknessMask {
         this.reset(0)
     }
 
-    // constants for time of day color
-    // TODO: Rename these for clarity and adjust dependent code as necessary
-
-    // When the sun start to come up (starting at blackness)
-    static readonly DAYBREAK_HOUR = 5
-    // This is when the 
-    static readonly SUNRISE_HOUR = 6
-    // When sunset starts
-    static readonly SUNSET_HOUR = 20
-    // When sunrise ends (blackness)
-    static readonly DUSK_HOUR = 21
-    static readonly NIGHT_HOUR = 22
-
-
+    // constants for time of day
     static readonly SUNRISE_START = 5 * TimeUnit.HOUR
     static readonly SUNRISE_END = 5.5 * TimeUnit.HOUR
-
     static readonly SUNSET_START = 20.5 * TimeUnit.HOUR
     static readonly SUNSET_END = 21 * TimeUnit.HOUR
 

@@ -81,13 +81,13 @@ export class Bed extends Component implements DialogueSource {
     }
 
     canSleepFor(hours: number) {
-        const currentHourOfDay = (WorldTime.instance.time % TimeUnit.DAY) / TimeUnit.HOUR
+        const timeOfDay = WorldTime.instance.time % TimeUnit.DAY
 
         let hoursNeeded = 0
-        for (let i = 0; i < hours; i++) {
-            const hour = (currentHourOfDay + i + 1) % TimeUnit.DAY
+        for (let i = 1; i <= hours; i++) {
+            const time = (timeOfDay + i * TimeUnit.HOUR) % TimeUnit.DAY
             // if it'll be dark in that hour, we need the campfire to burn until then
-            if (hour < DarknessMask.DAYBREAK_HOUR || hour >= DarknessMask.DUSK_HOUR) {
+            if (time < DarknessMask.SUNRISE_START || time >= DarknessMask.SUNSET_END) {
                 hoursNeeded = i
             }
         }
