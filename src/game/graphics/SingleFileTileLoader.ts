@@ -54,7 +54,7 @@ export class SingleFileTileLoader {
             return null
         }
         return new TileSetAnimation(
-            Array.from({length: frames}, (k, v) => v)
+            Array.from({length: frames}, (v, k) => k)
                     .map((index) => this.getTileAt(result.plus(new Point(index, 0))))
                     .map(tileSource => [tileSource, speed])
         )

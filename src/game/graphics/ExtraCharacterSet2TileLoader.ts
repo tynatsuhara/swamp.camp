@@ -33,7 +33,7 @@ export class ExtraCharacterSet2TileLoader {
         const row = result[1]
         const pos = new Point(col * ROW_WIDTH, ROW_START + TILE_HEIGHT * row)
         return new TileSetAnimation(
-            Array.from({length: 4}, (k, v) => v)
+            Array.from({length: 4}, (v, k) => k)
                     .map((index) => this.getTileAt(pos.plusX(TILE_WIDTH * (index + offset))))
                     .map(tileSource => [tileSource, speed])
         )
