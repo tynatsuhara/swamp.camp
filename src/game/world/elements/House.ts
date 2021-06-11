@@ -6,6 +6,7 @@ import { TileComponent } from "../../../engine/tiles/TileComponent"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { makeHouseInterior } from "../interior/House"
+import { LocationManager } from "../LocationManager"
 import { TeleporterPrefix } from "../Teleporter"
 import { WorldLocation } from "../WorldLocation"
 import { ElementComponent } from "./ElementComponent"
@@ -34,6 +35,7 @@ export class HouseFactory extends ElementFactory {
     make(wl: WorldLocation, pos: Point, data: object): ElementComponent {    
         const e = new Entity()
 
+        // the interior location UUID
         const destinationUUID: string = data["destinationUUID"] ?? makeHouseInterior(wl).uuid
 
         const interactablePos = pos.plus(new Point(2.5, 3)).times(TILE_SIZE)

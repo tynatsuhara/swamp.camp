@@ -80,6 +80,7 @@ export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => 
 
         berto.entity.getComponent(NPC).setSchedule(data.normalSchedule)
 
+        // spawn villager and assign him a home
         const villager = DudeFactory.instance.new(DudeType.VILLAGER, MapGenerator.ENTER_LAND_POS, LocationManager.instance.exterior())
         const house = LocationManager.instance.exterior().getElementsOfType(ElementType.HOUSE)
                 .map(e => e.entity.getComponent(House))
