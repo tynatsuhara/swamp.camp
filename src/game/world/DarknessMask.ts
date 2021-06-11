@@ -6,6 +6,7 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "../ui/Color"
 import { UIStateManager } from "../ui/UIStateManager"
 import { TimeUnit } from "./TimeUnit"
+import { WorldTime } from "./WorldTime"
 
 /**
  * Renders a mask of darkness with light sources. This is a pure view 
@@ -34,10 +35,24 @@ export class DarknessMask {
     }
 
     // constants for time of day color
+    // TODO: Rename these for clarity and adjust dependent code as necessary
+
+    // When the sun start to come up (starting at blackness)
     static readonly DAYBREAK_HOUR = 5
+    // This is when the 
     static readonly SUNRISE_HOUR = 6
+    // When sunset starts
     static readonly SUNSET_HOUR = 20
+    // When sunrise ends (blackness)
     static readonly DUSK_HOUR = 21
+    static readonly NIGHT_HOUR = 22
+
+
+    static readonly SUNRISE_START = 5 * TimeUnit.HOUR
+    static readonly SUNRISE_END = 5.5 * TimeUnit.HOUR
+
+    static readonly SUNSET_START = 20.5 * TimeUnit.HOUR
+    static readonly SUNSET_END = 21 * TimeUnit.HOUR
 
     // constants for light rendering
     static readonly VISIBILITY_MULTIPLIER = 2.25
@@ -76,43 +91,43 @@ export class DarknessMask {
         )
     }
 
+    private getPercentTransitioned = (current: number, start: number, end: number) => {
+        const val = (current - start)/(end - start)
+        return Math.min(Math.max(val, 0), 1)
+    }
+
+    private readonly NIGHT_COLOR = this.colorFromString(Color.BLACK, 1)
+    private readonly SUNRISE_COLOR = this.colorFromString(Color.PINK, 0.5)
+    private readonly DAY_COLOR = this.colorFromString(Color.LIGHT_PINK, 0)
+    private readonly SUNSET_COLOR = this.colorFromString(Color.PURPLE, 0.3)
+
     private updateColorForTime(time: number) {
-        const hour = (time % TimeUnit.DAY) / TimeUnit.HOUR
-		const timeSoFar = time % TimeUnit.HOUR
-		const clamp01 = (val) => Math.min(Math.max(val, 0), 1)
+        const timeOfDay = time % TimeUnit.DAY
 
-        const nightColor = this.colorFromString(Color.BLACK, 1)
-        const sunriseColor = this.colorFromString(Color.PINK, 0.2)
-        const dayColor = this.colorFromString(Color.LIGHT_PINK, 0)
-        const sunsetColor = this.colorFromString(Color.DARK_PURPLE, 0.2)
-        const transitionTime = TimeUnit.HOUR
+        let rgba: RGBA
 
-        const daybreak = DarknessMask.DAYBREAK_HOUR
-        const sunrise = DarknessMask.SUNRISE_HOUR
-        const sunset = DarknessMask.SUNSET_HOUR
-        const dusk = DarknessMask.DUSK_HOUR
-
-        // TODO: make these transitions quicker
-        if (hour >= daybreak && hour < sunrise) {
-			const percentTransitioned = clamp01((timeSoFar + (hour - daybreak) * TimeUnit.HOUR)/transitionTime)
-			this.lerpColorString(nightColor, sunriseColor, percentTransitioned) // sunrise		
-		} else if (hour >= sunrise && hour < sunset) {
-			const percentTransitioned = clamp01((timeSoFar + (hour - sunrise) * TimeUnit.HOUR)/transitionTime)
-			this.lerpColorString(sunriseColor, dayColor, percentTransitioned)   // day	
-		} else if (hour >= sunset && hour < dusk) {
-			const percentTransitioned = clamp01((timeSoFar + (hour - sunset) * TimeUnit.HOUR)/transitionTime)			
-			this.lerpColorString(dayColor, sunsetColor, percentTransitioned)    // sunset
+        if (timeOfDay >= DarknessMask.SUNRISE_START && timeOfDay < DarknessMask.SUNRISE_END) {
+            const pct = this.getPercentTransitioned(timeOfDay, DarknessMask.SUNRISE_START, DarknessMask.SUNRISE_END)
+			rgba = this.lerpColorStrings(this.NIGHT_COLOR, this.SUNRISE_COLOR, this.DAY_COLOR, pct)	
+		} else if (timeOfDay >= DarknessMask.SUNRISE_END && timeOfDay < DarknessMask.SUNSET_START) {
+            rgba = this.DAY_COLOR
+		} else if (timeOfDay >= DarknessMask.SUNSET_START && timeOfDay < DarknessMask.SUNSET_END) {
+            const pct = this.getPercentTransitioned(timeOfDay, DarknessMask.SUNSET_START, DarknessMask.SUNSET_END)
+			rgba = this.lerpColorStrings(this.DAY_COLOR, this.SUNSET_COLOR, this.NIGHT_COLOR, pct)	
 		} else {
-			const percentTransitioned = clamp01((timeSoFar + (24 + hour - dusk) % 24 * TimeUnit.HOUR)/transitionTime)			
-			this.lerpColorString(sunsetColor, nightColor, percentTransitioned)  // night			
+			rgba = this.NIGHT_COLOR
 		}
+
+        const { r, g, b, a } = rgba
+        this.color = `rgba(${r}, ${g}, ${b}, ${a})`
+        this.darkness = a
     }
 
     /**
      * @param colorString A string from the Color object
      * @param a alpha double 0-1
      */
-    private colorFromString(colorString: string, a: number): { r, g, b, a } {
+    private colorFromString(colorString: string, a: number): RGBA {
         const noHash = colorString.replace("#", "")
         const r = parseInt(noHash.substring(0, 2), 16)
         const g = parseInt(noHash.substring(2, 4), 16)
@@ -120,7 +135,15 @@ export class DarknessMask {
         return { r, g, b, a }
     }
 
-    private lerpColorString(color1: { r, g, b, a }, color2: { r, g, b, a }, percentTransitioned: number) {
+    private lerpColorStrings(start: RGBA, midpoint: RGBA, end: RGBA, percentTransitioned: number): RGBA {
+        if (percentTransitioned < .5) {
+            return this.lerpColorString(start, midpoint, percentTransitioned * 2)
+        } else {
+            return this.lerpColorString(midpoint, end, percentTransitioned * 2 - 1)
+        }
+    }
+
+    private lerpColorString(color1: RGBA, color2: RGBA, percentTransitioned: number): RGBA {
         const lerp = (a, b) => a + (b-a) * percentTransitioned
 
         const r = lerp(color1.r, color2.r)
@@ -128,8 +151,7 @@ export class DarknessMask {
         const b = lerp(color1.b, color2.b)
         const a = lerp(color1.a, color2.a)
 
-        this.color = `rgba(${r}, ${g}, ${b}, ${a})`
-        this.darkness = a
+        return { r, g, b, a }
     }
 
     private makeLightCircle(centerPos: Point, diameter: number, innerAlpha: number, outerAlpha: number) {
@@ -187,4 +209,11 @@ export class DarknessMask {
             UIStateManager.UI_SPRITE_DEPTH - 100  // make sure all UI goes on top of light
         ))])
     }
+}
+
+type RGBA = { 
+    r: number,
+    g: number,
+    b: number,
+    a: number,
 }
