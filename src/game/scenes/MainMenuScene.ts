@@ -66,6 +66,7 @@ export class MainMenuScene {
         QuestGame.instance.loadGameScene()
     }
 
+    private overwritingSave: Save
     private selectedNewGameSlot: number
 
     newGame() {
@@ -143,8 +144,9 @@ export class MainMenuScene {
             const menu = new MainMenuButtonSection(menuTop)
             saveManager.getSaves().forEach((save, i) => {
                 menu.add(
-                    `slot ${i+1}: ${!save ? "new game" : "delete old save"}`, 
+                    `slot ${i+1}: ${!save ? "new game" : `overwrite (${this.getSaveMetadataString(save)})`}`, 
                     () => {
+                        this.overwritingSave = save
                         this.selectedNewGameSlot = i
                         this.menu = Menu.PICK_COLOR
                     },
@@ -161,7 +163,7 @@ export class MainMenuScene {
             entities.push(
                 this.plumes.entity,
                 new MainMenuButtonSection(menuTop.plusY(42))
-                        .add("start", () => this.newGame())
+                        .add(`${this.overwritingSave ? "destroy save & " : ""}start`, () => this.newGame())
                         .add("cancel", () => {
                             this.menu = Menu.NEW_GAME
                             this.resetPlume()
