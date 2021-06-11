@@ -1,8 +1,10 @@
 import { Component } from "../../engine/Component"
 import { Entity } from "../../engine/Entity"
+import { Point } from "../../engine/Point"
 import { Lists } from "../../engine/util/Lists"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
+import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { DarknessMask } from "../world/DarknessMask"
 import { LightManager } from "../world/LightManager"
 import { LocationManager } from "../world/LocationManager"
@@ -58,6 +60,17 @@ export class DudeSpawner extends Component {
                 DudeFactory.instance.new(type, pt.times(TILE_SIZE), l)
             }
         }
+    }
+
+    spawnOrcs() {
+        NotificationDisplay.instance.push({
+            text: "ORC ATTACK!",
+            icon: "sword",
+        })
+        const spawnPos = new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE)
+        Lists.range(0, 5 + Math.random() * 15).forEach(() => DudeFactory.instance.new(DudeType.ORC_WARRIOR, spawnPos))
+        Lists.range(0, 1 + Math.random() * 4).forEach(() => DudeFactory.instance.new(DudeType.ORC_BRUTE, spawnPos))
+        Lists.range(0, 1 + Math.random() * 4).forEach(() => DudeFactory.instance.new(DudeType.ORC_SHAMAN, spawnPos))
     }
 
     getEntity() {

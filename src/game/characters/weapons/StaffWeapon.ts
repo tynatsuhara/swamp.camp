@@ -115,6 +115,9 @@ export class StaffWeapon extends Weapon {
     }
 
     private doAttack() {
+        if (!this.attackPosition) {
+            return
+        }
         this.entity.addComponent(
             Tilesets.instance.explosions.getMeteorAnimation(this.attackPosition, () => {
                 const attackDistance = TILE_SIZE * 1.5

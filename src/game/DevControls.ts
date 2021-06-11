@@ -2,14 +2,11 @@ import { Component } from "../engine/Component"
 import { debug } from "../engine/Debug"
 import { UpdateData } from "../engine/Engine"
 import { CapturedInput, InputKey, InputKeyString } from "../engine/Input"
-import { Point } from "../engine/Point"
-import { Lists } from "../engine/util/Lists"
 import { DudeFactory, DudeType } from "./characters/DudeFactory"
-import { pixelPtToTilePt, TILE_SIZE } from "./graphics/Tilesets"
-import { NotificationDisplay } from "./ui/NotificationDisplay"
+import { DudeSpawner } from "./characters/DudeSpawner"
+import { pixelPtToTilePt } from "./graphics/Tilesets"
 import { GroundType } from "./world/ground/Ground"
 import { LocationManager } from "./world/LocationManager"
-import { MapGenerator } from "./world/MapGenerator"
 import { TimeUnit } from "./world/TimeUnit"
 import { WorldTime } from "./world/WorldTime"
 
@@ -19,18 +16,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     [InputKey.U, "spawn orc shaman", (input) => DudeFactory.instance.new(DudeType.ORC_SHAMAN, input.mousePos)],
     [InputKey.B, "spawn bear", (input) => DudeFactory.instance.new(DudeType.BEAR, input.mousePos)],
     [InputKey.SEMICOLON, "spawn shroom", (input) => DudeFactory.instance.new(DudeType.SHROOM, input.mousePos)],
-    [InputKey.QUOTE, "trigger orc raid", (input) => {
-        NotificationDisplay.instance.push({
-            text: "ORC ATTACK!",
-            icon: "sword",
-        })
-        Lists.range(0, 5 + Math.random() * 15).forEach(() => 
-            DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE))
-        )
-        Lists.range(0, 1 + Math.random() * 4).forEach(() => 
-            DudeFactory.instance.new(DudeType.ORC_BRUTE, new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE))
-        )
-    }],
+    [InputKey.QUOTE, "trigger orc raid", () => DudeSpawner.instance.spawnOrcs()],
     [InputKey.COMMA, "toggle ground path", (input) => {
         const mouseTilePos = pixelPtToTilePt(input.mousePos)
         if (LocationManager.instance.currentLocation.ground.get(mouseTilePos)?.type === GroundType.PATH) {
