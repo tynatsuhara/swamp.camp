@@ -73,7 +73,7 @@ export class PauseMenu extends Component {
             }, 
             {
                 text: `MAIN MENU`, 
-                fn: () => QuestGame.instance.quitToMainMenu(),
+                fn: () => QuestGame.instance.loadMainMenu(),
             }
         ]
 

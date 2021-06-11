@@ -1,7 +1,6 @@
 import { CollisionEngine, collisionEngine } from "../../engine/collision/CollisionEngine"
 import { UpdateViewsContext } from "../../engine/Engine"
 import { Point } from "../../engine/Point"
-import { View } from "../../engine/View"
 import { Dude } from "../characters/Dude"
 import { DudeFactory, DudeType } from "../characters/DudeFactory"
 import { Camera } from "../cutscenes/Camera"
@@ -9,7 +8,6 @@ import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { IntroCutscene } from "../cutscenes/IntroCutscene"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { DroppedItem } from "../items/DroppedItem"
-import { saveManager } from "../SaveManager"
 import { UIStateManager } from "../ui/UIStateManager"
 import { GroundRenderer } from "../world/GroundRenderer"
 import { LocationManager } from "../world/LocationManager"
@@ -41,14 +39,8 @@ export class GameScene {
         ]))
     }
 
-    continueGame() {
-        saveManager.load()
-    }
-
     newGame() {
         Singletons.destroy()
-
-        saveManager.deleteSave()
 
         WorldTime.instance.initialize(TimeUnit.HOUR * 18.5)
         

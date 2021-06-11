@@ -2,6 +2,7 @@ import { UpdateViewsContext } from "../engine/Engine"
 import { Game } from "../engine/Game"
 import { View } from "../engine/View"
 import { Music } from "./audio/Music"
+import { Save } from "./saves/SaveGame"
 import { GameScene } from "./scenes/GameScene"
 import { MainMenuScene } from "./scenes/MainMenuScene"
 
@@ -17,8 +18,8 @@ export class QuestGame extends Game {
     }
 
     private scene = Scene.MAIN_MENU
-    private readonly game = new GameScene()
-    private readonly mainMenu = new MainMenuScene(() => this.continueGame(), () => this.startNewGame())
+    readonly game = new GameScene()
+    readonly mainMenu = new MainMenuScene()
 
     constructor() {
         super()
@@ -27,22 +28,16 @@ export class QuestGame extends Game {
 
     initialize() {
         this.game.initialize()
+        this.loadMainMenu()
     }
 
-    continueGame() {
-        Music.play(Music.DAY_MUSIC)
+    loadGameScene() {
         this.scene = Scene.GAME
-        this.game.continueGame()
     }
 
-    startNewGame() {
-        Music.play(Music.DAY_MUSIC)
-        this.scene = Scene.GAME
-        this.game.newGame()
-    }
-
-    quitToMainMenu() {
+    loadMainMenu() {
         this.scene = Scene.MAIN_MENU
+        this.mainMenu.reset()
     }
 
     // entities in the world space

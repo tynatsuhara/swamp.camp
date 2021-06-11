@@ -12,7 +12,9 @@ import { TileComponent } from "../../engine/tiles/TileComponent"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { QuestGame } from "../quest_game"
 import { saveManager } from "../SaveManager"
+import { Save } from "../saves/SaveGame"
 import { MainMenuButtonSection } from "../ui/MainMenuButtonSection"
 import { PlumePicker } from "../ui/PlumePicker"
 import { UIStateManager } from "../ui/UIStateManager"
@@ -22,39 +24,57 @@ const ZOOM = 3
 
 enum Menu {
     ROOT,
+    LOAD_GAME,
     NEW_GAME,
     CREDITS,
 }
 
 export class MainMenuScene {
 
-    private readonly continueFn: () => void
-    private readonly newGameFn: () => void
-
-    private readonly plumes: PlumePicker = new PlumePicker(color =>
-        this.knight = new Entity().addComponent(
-            DudeAnimationUtils.getCharacterIdleAnimation("knight_f", { color }).toComponent()
-        )
-    )
+    private plumes: PlumePicker
     private knight: TileComponent
     private title = assets.getImageByFileName("images/title.png")
 
     private menu = Menu.ROOT
 
-    constructor(continueFn: () => void, newGameFn: () => void) {
-        this.continueFn = continueFn
-        this.newGameFn = newGameFn
-
+    constructor() {
         // Verify that the existing save is compatible
-        if (saveManager.saveFileExists() && !saveManager.isSaveFormatVersionCompatible()) {
-            // TODO: add a mechanism for upgrading saves when it's worth the effort
-            console.log("archiving incompatible save file")
-            saveManager.archiveSave()
-        }
+        // TODO update these
+        // if (saveManager.getSaveCount() && !saveManager.isSaveFormatVersionCompatible()) {
+        //     // TODO: add a mechanism for upgrading saves when it's worth the effort
+        //     console.log("archiving incompatible save file")
+        //     saveManager.archiveSave()
+        // }
 
-        if (saveManager.saveFileExists() && debug.autoPlay) {
-            this.continueFn()
-        }
+        // if (saveManager.saveFileExists() && debug.autoPlay) {
+        //     this.continueFn()
+        // }
+    }
+
+    reset() {
+        this.menu = Menu.ROOT
+        this.plumes = new PlumePicker(
+            saveManager.getState().plume,
+            color => this.knight = new Entity().addComponent(
+                DudeAnimationUtils.getCharacterIdleAnimation("knight_f", { color }).toComponent()
+            )
+        )
+    }
+
+    loadLastSave() {
+        const slot = saveManager.getLastSaveSlot()
+        this.loadGame(slot)
+    }
+
+    loadGame(slot: number) {
+        saveManager.load(slot)
+        QuestGame.instance.loadGameScene()
+    }
+
+    newGame(slot: number) {
+        saveManager.new(slot, this.plumes)
+        QuestGame.instance.loadGameScene()
+        QuestGame.instance.game.newGame()
     }
 
     private lastDimensions: Point
@@ -62,7 +82,7 @@ export class MainMenuScene {
     
     getViews(updateViewsContext: UpdateViewsContext) {
         const dimensions = updateViewsContext.dimensions.div(ZOOM)
-        const saveFileExists = saveManager.saveFileExists()
+        const saveCount = saveManager.getSaveCount()
         const center = dimensions.floorDiv(2)
 
         const menuTop = center.plusY(31)
@@ -97,22 +117,35 @@ export class MainMenuScene {
         if (this.menu === Menu.ROOT) {
             entities.push(
                 new MainMenuButtonSection(menuTop)
-                    .add("load last save", this.continueFn, saveFileExists)
+                    .add("continue", () => this.loadLastSave(), saveCount > 0)
+                    .add("load save", () => this.menu = Menu.LOAD_GAME, saveCount > 1)
                     .add("New game", () => this.menu = Menu.NEW_GAME)
                     .add("Credits", () => this.menu = Menu.CREDITS)
                     .getEntity()
             )
+        } else if(this.menu === Menu.LOAD_GAME) {
+            const menu = new MainMenuButtonSection(menuTop)
+            saveManager.getSaves().forEach((save, i) => {
+                if (save) {
+                    menu.add(`slot ${i+1} (${this.getSaveMetadataString(save)})`, () => this.loadGame(i))
+                }
+            })
+            // TODO: add callbacks for hovering to show the plume :)
+            menu.add("cancel", () => {
+                this.menu = Menu.ROOT
+                this.plumes.reset()
+            })
+            entities.push(menu.getEntity())
         } else if (this.menu === Menu.NEW_GAME) {
-            entities.push(this.plumes.entity)
-            entities.push(
-                new MainMenuButtonSection(menuTop.plusY(42))
-                    .add(`start${saveFileExists ? " (delete old save)" : ""}`, this.newGameFn)
-                    .add("cancel", () => { 
-                        this.menu = Menu.ROOT
-                        this.plumes.reset()
-                    })
-                    .getEntity()
-            )
+            const menu = new MainMenuButtonSection(menuTop.plusY(42))
+            saveManager.getSaves().forEach((save, i) => {
+                menu.add(`slot ${i+1}: ${!save ? "new game" : "delete old save"}`, () => this.newGame(i))
+            })
+            menu.add("cancel", () => { 
+                this.menu = Menu.ROOT
+                this.plumes.reset()
+            })
+            entities.push(menu.getEntity(), this.plumes.entity)
         } else if (this.menu === Menu.CREDITS) {
             entities.splice(0)  // don't show title and scene
             const link = (url: string) => () => window.open(url, '_blank')
@@ -193,5 +226,20 @@ export class MainMenuScene {
             new Entity(components), 
             darkness.getEntity(dimensions, Point.ZERO)
         ]
+    }
+
+    private getSaveMetadataString(save: Save) {
+        const saveDate = new Date()
+        saveDate.setTime(save.timeSaved)
+
+        let timePlayed: string
+        const minutesPlayed = Math.floor((save.state.timePlayed || 0)/(60_000))
+        if (minutesPlayed > 60) {
+            timePlayed = `${Math.floor(minutesPlayed/60)} hour${minutesPlayed > 120 ? 's' : ''}`
+        } else {
+            timePlayed = `${minutesPlayed} minute${minutesPlayed !== 1 ? 's' : ''}`
+        }
+
+        return `${timePlayed} played`
     }
 }

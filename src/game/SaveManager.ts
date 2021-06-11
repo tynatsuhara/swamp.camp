@@ -1,7 +1,6 @@
 import { Player } from "./characters/Player"
 import { Save, SaveState } from "./saves/SaveGame"
 import { LocationManager } from "./world/LocationManager"
-import { UIStateManager } from "./ui/UIStateManager"
 import { Camera } from "./cutscenes/Camera"
 import { DudeType } from "./characters/DudeFactory"
 import { HUD } from "./ui/HUD"
@@ -9,13 +8,18 @@ import { WorldTime } from "./world/WorldTime"
 import { EventQueue } from "./world/events/EventQueue"
 import { newUUID } from "./saves/uuid"
 import { Singletons } from "./Singletons"
+import { Lists } from "../engine/util/Lists"
+import { PlumePicker } from "./ui/PlumePicker"
 
-const SAVE_KEY = "save"
 const CURRENT_SAVE_FORMAT_VERSION = 1
 
 class SaveManager {
 
+    // Fields for the currently loaded save
+    private saveKey: string
     private state: SaveState
+
+    // Current save functions
 
     /**
      * Adds all key/values in newState to the save state.
@@ -32,11 +36,14 @@ class SaveManager {
         }
     }
 
+    /**
+     * Returns the current game's save state.
+     */
     getState(): SaveState {
         if (!this.state) {
-            if (this.saveFileExists()) {
+            if (this.getSaveCount() > 0) {
                 // pre-load this before "load" is called to display data on the main menu
-                this.state = this.getSavedData().state
+                this.state = this.getLastSave().state
             } else {
                 this.state = new SaveState()
             }
@@ -60,19 +67,49 @@ class SaveManager {
             state: this.state,
         }
         console.log("saved game")
-        localStorage.setItem(SAVE_KEY, JSON.stringify(save))  // TODO support save slots
+        localStorage.setItem(this.saveKey, JSON.stringify(save))
     }
 
-    saveFileExists() {
-        return !!localStorage.getItem(SAVE_KEY)
+    // Save managment functions
+
+    private saveKeyForSlot(slot: number) {
+        return ["save", "save2", "save3"][slot]
     }
 
-    deleteSave() {
-        localStorage.removeItem(SAVE_KEY)
+    getLastSaveSlot() {
+        let index = -1
+        let timestamp = 0
+        const saves = this.getSaves()
+        for (let i = 0; i < saves.length; i++) {
+            if (saves[i] && saves[i].timeSaved > timestamp) {
+                timestamp = saves[i].timeSaved
+                index = i
+            }
+        }
+        return index
     }
 
-    isSaveFormatVersionCompatible() {
-        const save = localStorage.getItem(SAVE_KEY)
+    getLastSave() {
+        return this.getSaves()[this.getLastSaveSlot()]
+    }
+
+    getSaveCount() {
+        return this.getSaves().filter(save => !!save).length
+    }
+
+    getSaves() {
+        return Array.from(
+            { length: 3 }, 
+            (v, k) => this.getSave(this.saveKeyForSlot(k))
+        )
+    }
+
+    private deleteSave(slot: number) {
+        localStorage.removeItem(this.saveKeyForSlot(slot))
+    }
+
+    isSaveFormatVersionCompatible(slot: number) {
+        const save = localStorage.getItem(this.saveKeyForSlot(slot))
         try {
             return JSON.parse(save)["version"] === CURRENT_SAVE_FORMAT_VERSION
         } catch (e) {
@@ -80,17 +117,31 @@ class SaveManager {
         }
     }
 
-    archiveSave() {
-        const save = localStorage.getItem(SAVE_KEY)
+    archiveSave(slot: number) {
+        const key = this.saveKeyForSlot(slot)
+        const save = localStorage.getItem(key)
         localStorage.setItem(`save-archived-${newUUID()}`, save)
-        localStorage.removeItem(SAVE_KEY)
+        localStorage.removeItem(key)
+    }
+
+    new(slot: number, plumePicker: PlumePicker) {
+        // overwrite the save if it already exists
+        this.deleteSave(slot)
+        this.saveKey = this.saveKeyForSlot(slot)
+        this.state = new SaveState()
+        this.state.plume = plumePicker.getSelection()
     }
 
     /**
      * @return true if a save was loaded successfully
      */
-    load() {
-        const save = this.getSavedData()
+    load(slot: number = -1) {        
+        const saveKey = slot === -1 ? this.saveKey : this.saveKeyForSlot(slot)
+
+        // ensures that the file exists
+        const save = this.getSave(saveKey)
+        this.state = save.state
+        this.saveKey = saveKey
 
         // Logging
         const saveDate = new Date()
@@ -111,11 +162,10 @@ class SaveManager {
         // UIStateManager.instance.destroy()
     }
 
-    private getSavedData(): Save {
-        const saveJson = localStorage.getItem(SAVE_KEY)
+    private getSave(saveKey: string): Save {
+        const saveJson = localStorage.getItem(saveKey)
         if (!saveJson) {
-            console.log("no save found")
-            return
+            return null
         }
         
         return JSON.parse(saveJson)

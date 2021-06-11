@@ -4,11 +4,9 @@ import { Entity } from "../../engine/Entity"
 import { Point } from "../../engine/Point"
 import { RectRender } from "../../engine/renderer/RectRender"
 import { RenderMethod } from "../../engine/renderer/RenderMethod"
-import { Lists } from "../../engine/util/Lists"
 import { rectContains } from "../../engine/util/Utils"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "./Color"
-import { saveManager } from "../SaveManager"
 import { UIStateManager } from "./UIStateManager"
 
 // array of [dark, light] pairs
@@ -37,19 +35,18 @@ export class PlumePicker extends Component {
 
     position: Point = Point.ZERO  // top-center position
     entity = new Entity([this])
-    originalSavedColor: Color[]
+    initialColor: Color[]
     selected: Color[]
 
     private renders: RenderMethod[]
     private readonly callback: (color: Color[]) => void
 
-    constructor(callback: (color: Color[]) => void) {
+    constructor(initialColor: Color[], callback: (color: Color[]) => void) {
         super()
         this.callback = callback
         
-        this.originalSavedColor = saveManager.getState().plume
-        if (!!this.originalSavedColor) {
-            this.select(this.originalSavedColor)
+        if (initialColor) {
+            this.select(this.initialColor)
         } else {
             this.select([Color.PINK, Color.LIGHT_PINK])
         }
@@ -59,14 +56,17 @@ export class PlumePicker extends Component {
      * Called when the user "cancels", to prevent overwriting the plume data
      */
     reset() {
-        if (!!this.originalSavedColor) {
-            this.select(this.originalSavedColor)
+        if (this.initialColor) {
+            this.select(this.initialColor)
         }
+    }
+
+    getSelection() {
+        return this.selected
     }
 
     private select(colors: Color[]) {
         this.selected = colors
-        saveManager.setState({ plume: colors })
         this.callback(colors)
     }
 

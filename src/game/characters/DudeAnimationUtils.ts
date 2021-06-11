@@ -10,7 +10,7 @@ const maybeFilter = (characterAnimName: string, blob: object, anim: TileSetAnima
     }
 
     if (characterAnimName === "knight_f") {
-        const color = saveManager.getState().plume
+        const color = blob["color"] || saveManager.getState().plume
         if (!!color) {
             return anim
                 .filtered(ImageFilters.recolor(Color.PINK, color[0]))
