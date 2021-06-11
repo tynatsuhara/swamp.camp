@@ -3,7 +3,7 @@ import { Point } from "../../engine/Point"
 import { ImageRender } from "../../engine/renderer/ImageRender"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Color, getRGB } from "../ui/Color"
-import { UIStateManager } from "../ui/UIStateManager"
+import { DarknessMask } from "./DarknessMask"
 import { MapGenerator } from "./MapGenerator"
 
 export class Vignette extends Component {
@@ -51,7 +51,7 @@ export class Vignette extends Component {
                     new Point(diameter, diameter),
                     topLeftPosition,
                     new Point(diameter, diameter),
-                    UIStateManager.UI_SPRITE_DEPTH - 100  // make sure all UI goes on top of light
+                    DarknessMask.DEPTH - 1  // make sure this goes below the darkness mask
                 )
             ]
         }

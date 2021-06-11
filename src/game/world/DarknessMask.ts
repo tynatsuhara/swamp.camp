@@ -14,6 +14,8 @@ import { WorldTime } from "./WorldTime"
  */
 export class DarknessMask {
 
+    static readonly DEPTH = UIStateManager.UI_SPRITE_DEPTH - 100  // make sure all UI goes on top of light
+
     // no lights should live outside of this range
     static readonly size = 100 * TILE_SIZE
     static readonly shift = new Point(DarknessMask.size/2, DarknessMask.size/2)
@@ -46,6 +48,9 @@ export class DarknessMask {
     private static readonly VISIBILE_LIGHT = .95
     private static readonly VISIBILE_LIGHT_EDGE = .975
     
+    /**
+     * @returns a range from 0 (complete light) to 1 (complete darkness)
+     */
     getDarkness = () => this.darkness
 
     reset(time: number) {
@@ -192,7 +197,7 @@ export class DarknessMask {
             _dimensions,
             offset.apply(Math.floor),
             _dimensions,
-            UIStateManager.UI_SPRITE_DEPTH - 100  // make sure all UI goes on top of light
+            DarknessMask.DEPTH
         ))])
     }
 }
