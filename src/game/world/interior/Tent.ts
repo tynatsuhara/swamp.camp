@@ -36,6 +36,10 @@ export const makeTentInterior = (outside: WorldLocation, color: TentColor): Worl
         }
     )
 
+    if (!isPlayerTent) {
+        l.addElement(ElementType.BED, new Point(3, 0))
+    }
+
     const groundType = `${color}tentInterior`
     
     NineSlice.nineSliceForEach(
