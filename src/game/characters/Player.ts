@@ -41,6 +41,7 @@ export class Player extends Component {
                 Camera.instance.shake(3.5, 400) 
             }
         })
+        this.dude.droppedItemSupplier = () => []
     }
 
     update(updateData: UpdateData) {

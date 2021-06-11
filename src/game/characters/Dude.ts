@@ -210,7 +210,7 @@ export class Dude extends Component implements DialogueSource {
         this.onDamageCallback = fn
     }
 
-    droppedItemSupplier: () => Item = () => Item.COIN
+    droppedItemSupplier: () => Item[] = () => [Item.COIN]
     private deathOffset: Point
     die(direction: Point = new Point(-1, 0)) {
         this._health = 0
@@ -222,7 +222,15 @@ export class Dude extends Component implements DialogueSource {
         this.deathOffset = this.animation.transform.position.minus(prePos)
         this.animation.goToAnimation(0)
         this.animation.pause()
-        setTimeout(() => spawnItem(this.standingPosition.minus(new Point(0, 2)), this.droppedItemSupplier()), 100)
+        const items = this.droppedItemSupplier()
+        items.forEach(item => {
+            const randomness = 8
+            const velocity = direction.normalized().plus(new Point(Math.random()-.5, Math.random()-.5).times(randomness))
+            setTimeout(
+                () => spawnItem(this.standingPosition.minus(new Point(0, 2)), item, velocity, this.collider), 
+                100
+            )
+        })
         this.dropWeapon()
 
         setTimeout(() => {

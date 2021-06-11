@@ -1,5 +1,6 @@
 import { Component } from "../../engine/Component"
 import { UpdateData } from "../../engine/Engine"
+import { Lists } from "../../engine/util/Lists"
 import { pixelPtToTilePt } from "../graphics/Tilesets"
 import { Item } from "../items/Items"
 import { ElementType } from "../world/elements/Elements"
@@ -21,8 +22,8 @@ export class ShroomNPC extends Component {
 
     awake() {
         this.dude = this.entity.getComponent(Dude)
-        this.dude.droppedItemSupplier = () => Item.MUSHROOM
         this.dude.blob[SIZE] = this.dude.blob[SIZE] || 1
+        this.dude.droppedItemSupplier = () => Lists.repeat(this.dude.blob[SIZE], [Item.MUSHROOM])
         this.dude.blob[NEXT_GROWTH_TIME] = this.dude.blob[NEXT_GROWTH_TIME] || this.nextGrowthTime()
 
         if (this.dude.blob[SIZE] == 3) {
