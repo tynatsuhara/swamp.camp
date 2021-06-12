@@ -28,6 +28,7 @@ import { DevControls } from "../DevControls"
 import { LightManager } from "../world/LightManager"
 import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
 import { Singletons } from "../Singletons"
+import { Particles } from "../graphics/Particles"
 
 export class GameScene {
 
@@ -84,6 +85,7 @@ export class GameScene {
                 WorldTime.instance.getEntity(),
                 GroundRenderer.instance.getEntity(),
                 DudeSpawner.instance.getEntity(),
+                Particles.instance.getEntity(),
             )
         }
 
