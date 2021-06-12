@@ -9,6 +9,7 @@ import { TileTransform } from "../../engine/tiles/TileTransform"
 import { StepSounds } from "../audio/StepSounds"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { TILE_SIZE } from "../graphics/Tilesets"
+import { WalkingParticles } from "../graphics/WalkingParticles"
 import { Inventory } from "../items/Inventory"
 import { Item, spawnItem } from "../items/Items"
 import { DudeSaveState } from "../saves/DudeSaveState"
@@ -122,6 +123,8 @@ export class Dude extends Component implements DialogueSource {
     
             this.setWeapon(weaponType)
             this.setShield(shieldType)
+
+            this.entity.addComponent(new WalkingParticles())
 
             // Set up collider
             this.relativeColliderPos = new Point(

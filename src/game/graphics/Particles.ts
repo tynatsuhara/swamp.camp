@@ -15,7 +15,7 @@ export class Particles {
     private prefabs = new Map<Color, ImageBitmap>()
     private entity = new Entity()
 
-    createParticle(color: Color, position: Point, lifetime: number) {
+    emitParticle(color: Color, position: Point, depth: number, lifetime: number) {
         const prefabBitmap = this.prefabs.get(color)
         if (!prefabBitmap) {
             // Generate and cache a bitmap. ImageBitmap is usable by 
@@ -24,15 +24,17 @@ export class Particles {
             const imageData = new ImageData(new Uint8ClampedArray(rgba), 1, 1)
             createImageBitmap(imageData).then(bitmap => {
                 this.prefabs.set(color, bitmap)
-                this.create(bitmap, position, lifetime)
+                this.create(bitmap, position, depth, lifetime)
             })
         } else {
-            this.create(prefabBitmap, position, lifetime)
+            this.create(prefabBitmap, position, depth, lifetime)
         }
     }
 
-    private create(image: ImageBitmap, position: Point, lifetime: number) {
-        this.entity.addComponent(new Particle(image, position, WorldTime.instance.time + lifetime))
+    private create(image: ImageBitmap, position: Point, depth: number, lifetime: number) {
+        this.entity.addComponent(
+            new Particle(image, position, depth, WorldTime.instance.time + lifetime)
+        )
     }
 
     getEntity() {
@@ -41,18 +43,19 @@ export class Particles {
 }
 
 const SIZE = new Point(1, 1)
-const DEPTH = UIStateManager.UI_SPRITE_DEPTH/2
 
 class Particle extends Component {
 
     private readonly image: ImageBitmap
     private readonly position: Point
+    private readonly depth: number
     private readonly expiration: number
 
-    constructor(image: ImageBitmap, position: Point, expiration: number) {
+    constructor(image: ImageBitmap, position: Point, depth: number, expiration: number) {
         super()
         this.image = image
         this.position = position
+        this.depth = depth
         this.expiration = expiration
     }
 
@@ -64,7 +67,7 @@ class Particle extends Component {
 
     getRenderMethods() {
         return [
-            new ImageRender(this.image, Point.ZERO, SIZE, this.position, SIZE, DEPTH)
+            new ImageRender(this.image, Point.ZERO, SIZE, this.position, SIZE, this.depth)
         ]
     }
 }

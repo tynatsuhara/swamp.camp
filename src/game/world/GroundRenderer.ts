@@ -17,6 +17,8 @@ import { Singletons } from "../Singletons"
  */
 export class GroundRenderer {
 
+    static readonly DEPTH = Number.MIN_SAFE_INTEGER
+
     static get instance() {
         return Singletons.getOrCreate(GroundRenderer)
     }
@@ -104,7 +106,7 @@ export class GroundRenderer {
             dimensions,
             Camera.instance.position.apply(Math.floor),
             dimensions,
-            Number.MIN_SAFE_INTEGER
+            GroundRenderer.DEPTH
         ))])
     }
 }
