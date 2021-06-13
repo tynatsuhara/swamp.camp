@@ -10,6 +10,7 @@ import { ImageFilters } from "../../graphics/ImageFilters"
 import { Particles } from "../../graphics/Particles"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Color } from "../../ui/Color"
+import { GroundRenderer } from "../../world/GroundRenderer"
 import { LocationManager } from "../../world/LocationManager"
 import { Player } from "../Player"
 import { Weapon } from "./Weapon"
@@ -147,6 +148,7 @@ export class StaffWeapon extends Weapon {
                     Tilesets.instance.explosions.getExplosionAnimation(this.attackPosition)
                 )
 
+                // smoke
                 for (let i = 0; i < 50; i++) {
                     Particles.instance.emitParticle(
                         Lists.oneOf([Color.BROWN, Color.DARK_BROWN, Color.BLACK]),
@@ -154,6 +156,33 @@ export class StaffWeapon extends Weapon {
                         this.attackPosition.y, 
                         1000 + Math.random() * 1000,
                         t => new Point(0, t * -.01),
+                        Math.random() > .5 ? new Point(2, 2) : new Point(1, 1),
+                    )
+                }
+
+                // impact crater
+                for (let i = 0; i < 30; i++) {
+                    Particles.instance.emitParticle(
+                        Math.random() > .5 ? Color.BROWN : Color.DARK_BROWN,
+                        this.attackPosition.randomCircularShift(8),
+                        this.attackPosition.y, 
+                        10_000 + Math.random() * 5_000,
+                        t => Point.ZERO,
+                        Math.random() > .5 ? new Point(2, 2) : new Point(1, 1),
+                    )
+                }
+
+                // flying debris
+                for (let i = 0; i < 25; i++) {
+                    const random = Point.ZERO.randomCircularShift(1)
+                    const x = random.x
+                    const y = -Math.abs(random.y)
+                    Particles.instance.emitParticle(
+                        Math.random() > .5 ? Color.BROWN : Color.LIGHT_BROWN,
+                        this.attackPosition.plus(random.times(10)),
+                        this.attackPosition.y, 
+                        200 + Math.random() * 100,
+                        t => new Point(x, y).times(t * .35),
                         Math.random() > .5 ? new Point(2, 2) : new Point(1, 1),
                     )
                 }
