@@ -356,6 +356,9 @@ export class Dude extends Component implements DialogueSource {
     }
 
     private isRolling = false
+    get isJumping() {
+        return this.isRolling
+    }
     private canRoll = true
     private rollingOffset: Point
     private animationDirty: boolean
