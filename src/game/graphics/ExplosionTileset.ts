@@ -32,7 +32,7 @@ export class ExplosionTileset {
             () => component.delete()
         ).toComponent(TileTransform.new({ 
             position: center.plus(new Point(size, size).div(-2)), 
-            depth: Number.MAX_SAFE_INTEGER
+            depth: center.y + size/2
         }))
 
         return component
