@@ -30,14 +30,14 @@ export class StaffWeapon extends Weapon {
     private targetSprite2: StaticTileSource
     private targetAnimator: Animator
 
+    // if non-null, a target will be shown here
     private attackPosition: Point
-    private explosion: AnimatedTileComponent
 
     private static readonly TARGET_ANIMATION_SPEED = 80
     
     constructor() {
         super()
-        this.start = (startData) => {
+        this.start = () => {
             this.weaponSprite = Tilesets.instance.dungeonCharacters.getTileSource("weapon_red_magic_staff")
             this.weaponTransform = new TileTransform(Point.ZERO, this.weaponSprite.dimensions).relativeTo(this.dude.animation.transform)
             this.offsetFromCenter = new Point(-5, 0)
@@ -68,7 +68,7 @@ export class StaffWeapon extends Weapon {
     }
 
     isAttacking() {
-        throw new Error("isAttacking not implemented.")
+        return !!this.animator || !!this.attackPosition
     }
 
     toggleSheathed() {
@@ -88,7 +88,7 @@ export class StaffWeapon extends Weapon {
     }
 
     attack(newAttack: boolean) {
-        if (newAttack && !this.attackPosition) {
+        if (newAttack && !this.isAttacking()) {
             this.playAttackAnimation()
             setTimeout(() => this.doAttack(), 750);
         }
@@ -123,15 +123,15 @@ export class StaffWeapon extends Weapon {
                 )
             }, 
             () => {
+                this.attackPosition = this.guessAttackPos()
                 this.animator = null
                 this.currentAnimationFrame = 0
-                this.attackPosition = this.guessAttackPos()
             }
         )
     }
 
     private doAttack() {
-        if (!this.attackPosition) {
+        if (!this.isAttacking()) {
             return
         }
         this.entity.addComponent(
@@ -173,18 +173,18 @@ export class StaffWeapon extends Weapon {
                 Lists.oneOf([Color.BROWN, Color.DARK_BROWN, Color.BLACK]),
                 this.attackPosition.randomCircularShift(12),
                 this.attackPosition.y, 
-                1000 + Math.random() * 1000,
+                500 + Math.random() * 1500,
                 t => new Point(0, t * -.01),
                 Math.random() > .5 ? new Point(2, 2) : new Point(1, 1),
             )
         }
 
         // impact crater
-        for (let i = 0; i < 30; i++) {
+        for (let i = 0; i < 25; i++) {
             Particles.instance.emitParticle(
                 Math.random() > .5 ? Color.BROWN : Color.DARK_BROWN,
-                this.attackPosition.randomCircularShift(8),
-                this.attackPosition.y, 
+                this.attackPosition.randomCircularShift(6),
+                GroundRenderer.DEPTH + 1, 
                 10_000 + Math.random() * 5_000,
                 t => Point.ZERO,
                 Math.random() > .5 ? new Point(2, 2) : new Point(1, 1),
