@@ -68,7 +68,7 @@ export class DudeSpawner extends Component {
             icon: "sword",
         }), 6500)
         const spawnPos = new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE)
-        Lists.range(0, 5 + Math.random() * 15).forEach(() => DudeFactory.instance.new(DudeType.ORC_WARRIOR, spawnPos))
+        Lists.range(0, 5 + Math.random() * 10).forEach(() => DudeFactory.instance.new(DudeType.ORC_WARRIOR, spawnPos))
         Lists.range(0, 1 + Math.random() * 4).forEach(() => DudeFactory.instance.new(DudeType.ORC_BRUTE, spawnPos))
         Lists.range(0, 1 + Math.random() * 4).forEach(() => DudeFactory.instance.new(DudeType.ORC_SHAMAN, spawnPos))
     }
