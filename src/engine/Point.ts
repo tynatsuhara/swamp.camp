@@ -95,4 +95,13 @@ export class Point {
     randomlyShifted(xRandom: number, yRandom: number = xRandom) {
         return this.plus(new Point(xRandom - Math.random() * xRandom * 2, yRandom - Math.random() * yRandom * 2))
     }
+
+    /**
+     * Returns this point shifted by a random value inside a circle with the given radius
+     */
+    randomCircularShift(radius: number) {
+        const a = Math.random() * 2 * Math.PI
+        const r = radius * Math.sqrt(Math.random())
+        return this.plus(new Point(r * Math.cos(a), r * Math.sin(a)))
+    }
 }

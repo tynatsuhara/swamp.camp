@@ -147,6 +147,17 @@ export class StaffWeapon extends Weapon {
                     Tilesets.instance.explosions.getExplosionAnimation(this.attackPosition)
                 )
 
+                for (let i = 0; i < 50; i++) {
+                    Particles.instance.emitParticle(
+                        Lists.oneOf([Color.BROWN, Color.DARK_BROWN, Color.BLACK]),
+                        this.attackPosition.randomCircularShift(12),
+                        this.attackPosition.y, 
+                        1000 + Math.random() * 1000,
+                        t => new Point(0, t * -.01),
+                        Math.random() > .5 ? new Point(2, 2) : new Point(1, 1),
+                    )
+                }
+
                 this.attackPosition = null
             })
         )
