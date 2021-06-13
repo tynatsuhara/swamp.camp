@@ -90,7 +90,6 @@ export class StaffWeapon extends Weapon {
     attack(newAttack: boolean) {
         if (newAttack && !this.isAttacking()) {
             this.playAttackAnimation()
-            setTimeout(() => this.doAttack(), 750);
         }
     }
 
@@ -126,14 +125,12 @@ export class StaffWeapon extends Weapon {
                 this.attackPosition = this.guessAttackPos()
                 this.animator = null
                 this.currentAnimationFrame = 0
+                this.doAttack();
             }
         )
     }
 
     private doAttack() {
-        if (!this.isAttacking()) {
-            return
-        }
         this.entity.addComponent(
             Tilesets.instance.explosions.getMeteorAnimation(this.attackPosition, () => {
                 const attackDistance = TILE_SIZE * 1.5
@@ -155,7 +152,6 @@ export class StaffWeapon extends Weapon {
                 this.attackPosition = null
             })
         )
-
     }
 
     private guessAttackPos() {
