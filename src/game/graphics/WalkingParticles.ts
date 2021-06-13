@@ -1,12 +1,13 @@
 import { Component } from "../../engine/Component"
 import { UpdateData } from "../../engine/Engine"
+import { Point } from "../../engine/Point"
 import { Dude } from "../characters/Dude"
 import { Color } from "../ui/Color"
 import { GroundRenderer } from "../world/GroundRenderer"
 import { Particles } from "./Particles"
 
 const MILLIS_BETWEEN_EMISSIONS = 50
-const LIFESPAN_MILLIS = 250
+const LIFESPAN_MILLIS = 300
 
 export class WalkingParticles extends Component {
 
@@ -18,7 +19,7 @@ export class WalkingParticles extends Component {
     }
 
     update(updateData: UpdateData) {
-        if (!this.dude.isMoving) {
+        if (!this.dude.isMoving || this.dude.isJumping) {
             this.timeUntilNextEmission = 0
             return
         }
@@ -36,7 +37,9 @@ export class WalkingParticles extends Component {
                     .plusX(Math.random() * xRange * 2 - xRange)
                     .plusY(Math.random() * -5), 
             GroundRenderer.DEPTH + 1, 
-            LIFESPAN_MILLIS
+            LIFESPAN_MILLIS,
+            () => Point.ZERO,
+            Math.random() > .5 ? new Point(2, 2) : new Point(1, 1),
         )
 
         this.timeUntilNextEmission = MILLIS_BETWEEN_EMISSIONS
