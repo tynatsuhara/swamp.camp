@@ -1,5 +1,6 @@
 import { BoxCollider } from "../../engine/collision/BoxCollider"
 import { Component } from "../../engine/Component"
+import { debug } from "../../engine/Debug"
 import { UpdateData } from "../../engine/Engine"
 import { Point } from "../../engine/Point"
 import { RenderMethod } from "../../engine/renderer/RenderMethod"
@@ -189,6 +190,9 @@ export class Dude extends Component implements DialogueSource {
         }
         
         if (this.isAlive) {
+            if (this.type === DudeType.PLAYER && debug.godMode) {
+                damage = 0
+            }
             // essential NPCs can die if the player is dead
             if (this.maxHealth === Number.MAX_SAFE_INTEGER && !Player.instance.dude.isAlive) {
                 this._health = Math.min(this._health - damage, 5)
