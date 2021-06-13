@@ -197,7 +197,7 @@ export class StaffWeapon extends Weapon {
                 Math.random() > .5 ? Color.BROWN : Color.LIGHT_BROWN,
                 this.attackPosition.plus(random.times(10)),
                 this.attackPosition.y, 
-                200 + Math.random() * 100,
+                100 + Math.random() * 250,
                 t => new Point(x, y).times(t * .35),
                 Math.random() > .5 ? new Point(2, 2) : new Point(1, 1),
             )

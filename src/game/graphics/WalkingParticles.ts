@@ -19,6 +19,20 @@ export class WalkingParticles extends Component {
     }
 
     update(updateData: UpdateData) {
+        // TODO blood
+        /*
+        if (this.dude.isAlive && this.dude.health < this.dude.maxHealth) {
+            Particles.instance.emitParticle(
+                Math.random() > .5 ? Color.RED : Color.DARK_RED, 
+                this.dude.standingPosition.randomCircularShift(4),
+                GroundRenderer.DEPTH + 1,
+                10_000 + Math.random() * 5_000,
+                () => Point.ZERO,
+                Math.random() > .5 ? new Point(2, 2) : new Point(1, 1),
+            )
+        }
+        */
+
         if (!this.dude.isMoving || this.dude.isJumping) {
             this.timeUntilNextEmission = 0
             return
