@@ -88,7 +88,7 @@ export class StaffWeapon extends Weapon {
     }
 
     attack(newAttack: boolean) {
-        if (newAttack) {
+        if (newAttack && !this.attackPosition) {
             this.playAttackAnimation()
             setTimeout(() => this.doAttack(), 750);
         }
@@ -110,6 +110,7 @@ export class StaffWeapon extends Weapon {
             (index) => {
                 this.currentAnimationFrame = index
 
+                // magic-y particles
                 Particles.instance.emitParticle(
                     Math.random() > .5 ? Color.SUPER_ORANGE : Color.RED, 
                     this.dude.standingPosition
@@ -137,8 +138,9 @@ export class StaffWeapon extends Weapon {
             Tilesets.instance.explosions.getMeteorAnimation(this.attackPosition, () => {
                 const attackDistance = TILE_SIZE * 1.5
 
+                // everyone can get damaged by explosions, friend or foe
                 Array.from(LocationManager.instance.currentLocation.dudes)
-                        .filter(d => !!d && d !== this.dude && d.isEnemy(this.dude))
+                        .filter(d => !!d)
                         .filter(d => d.standingPosition.distanceTo(this.attackPosition) < attackDistance)
                         .forEach(d => d.damage(2, d.position.minus(this.attackPosition), 50))
 
@@ -148,44 +150,7 @@ export class StaffWeapon extends Weapon {
                     Tilesets.instance.explosions.getExplosionAnimation(this.attackPosition)
                 )
 
-                // smoke
-                for (let i = 0; i < 50; i++) {
-                    Particles.instance.emitParticle(
-                        Lists.oneOf([Color.BROWN, Color.DARK_BROWN, Color.BLACK]),
-                        this.attackPosition.randomCircularShift(12),
-                        this.attackPosition.y, 
-                        1000 + Math.random() * 1000,
-                        t => new Point(0, t * -.01),
-                        Math.random() > .5 ? new Point(2, 2) : new Point(1, 1),
-                    )
-                }
-
-                // impact crater
-                for (let i = 0; i < 30; i++) {
-                    Particles.instance.emitParticle(
-                        Math.random() > .5 ? Color.BROWN : Color.DARK_BROWN,
-                        this.attackPosition.randomCircularShift(8),
-                        this.attackPosition.y, 
-                        10_000 + Math.random() * 5_000,
-                        t => Point.ZERO,
-                        Math.random() > .5 ? new Point(2, 2) : new Point(1, 1),
-                    )
-                }
-
-                // flying debris
-                for (let i = 0; i < 25; i++) {
-                    const random = Point.ZERO.randomCircularShift(1)
-                    const x = random.x
-                    const y = -Math.abs(random.y)
-                    Particles.instance.emitParticle(
-                        Math.random() > .5 ? Color.BROWN : Color.LIGHT_BROWN,
-                        this.attackPosition.plus(random.times(10)),
-                        this.attackPosition.y, 
-                        200 + Math.random() * 100,
-                        t => new Point(x, y).times(t * .35),
-                        Math.random() > .5 ? new Point(2, 2) : new Point(1, 1),
-                    )
-                }
+                this.explosionParticleEffects()
 
                 this.attackPosition = null
             })
@@ -199,6 +164,47 @@ export class StaffWeapon extends Weapon {
             return
         }
         return Player.instance.dude.standingPosition.plus(Player.instance.velocity.times(60))
+    }
+
+    private explosionParticleEffects() {
+        // smoke
+        for (let i = 0; i < 50; i++) {
+            Particles.instance.emitParticle(
+                Lists.oneOf([Color.BROWN, Color.DARK_BROWN, Color.BLACK]),
+                this.attackPosition.randomCircularShift(12),
+                this.attackPosition.y, 
+                1000 + Math.random() * 1000,
+                t => new Point(0, t * -.01),
+                Math.random() > .5 ? new Point(2, 2) : new Point(1, 1),
+            )
+        }
+
+        // impact crater
+        for (let i = 0; i < 30; i++) {
+            Particles.instance.emitParticle(
+                Math.random() > .5 ? Color.BROWN : Color.DARK_BROWN,
+                this.attackPosition.randomCircularShift(8),
+                this.attackPosition.y, 
+                10_000 + Math.random() * 5_000,
+                t => Point.ZERO,
+                Math.random() > .5 ? new Point(2, 2) : new Point(1, 1),
+            )
+        }
+
+        // flying debris
+        for (let i = 0; i < 25; i++) {
+            const random = Point.ZERO.randomCircularShift(1)
+            const x = random.x
+            const y = -Math.abs(random.y)
+            Particles.instance.emitParticle(
+                Math.random() > .5 ? Color.BROWN : Color.LIGHT_BROWN,
+                this.attackPosition.plus(random.times(10)),
+                this.attackPosition.y, 
+                200 + Math.random() * 100,
+                t => new Point(x, y).times(t * .35),
+                Math.random() > .5 ? new Point(2, 2) : new Point(1, 1),
+            )
+        }
     }
 
     getRenderMethods() {
