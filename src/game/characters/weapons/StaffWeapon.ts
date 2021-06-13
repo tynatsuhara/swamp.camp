@@ -7,6 +7,7 @@ import { Animator } from "../../../engine/util/Animator"
 import { Lists } from "../../../engine/util/Lists"
 import { Camera } from "../../cutscenes/Camera"
 import { ImageFilters } from "../../graphics/ImageFilters"
+import { Particles } from "../../graphics/Particles"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Color } from "../../ui/Color"
 import { LocationManager } from "../../world/LocationManager"
@@ -105,7 +106,20 @@ export class StaffWeapon extends Weapon {
     private playAttackAnimation() {
         this.animator = new Animator(
             Animator.frames(StaffWeapon.STAFF_ANIMATION.length, 40), 
-            (index) => this.currentAnimationFrame = index, 
+            (index) => {
+                this.currentAnimationFrame = index
+
+                Particles.instance.emitParticle(
+                    Math.random() > .5 ? Color.SUPER_ORANGE : Color.RED, 
+                    this.dude.standingPosition
+                            .plusY(-26)
+                            .randomlyShifted(6),
+                    this.dude.standingPosition.y, 
+                    500,
+                    t => new Point(0, t * -.03),
+                    Math.random() > .5 ? new Point(2, 2) : new Point(1, 1),
+                )
+            }, 
             () => {
                 this.animator = null
                 this.currentAnimationFrame = 0

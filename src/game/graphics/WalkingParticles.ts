@@ -29,12 +29,10 @@ export class WalkingParticles extends Component {
             return
         }
 
-        const xRange = 4
-
         Particles.instance.emitParticle(
             Color.LIGHT_BROWN, 
             this.dude.standingPosition
-                    .plusX(Math.random() * xRange * 2 - xRange)
+                    .randomlyShifted(4, 0)
                     .plusY(Math.random() * -5), 
             GroundRenderer.DEPTH + 1, 
             LIFESPAN_MILLIS,
