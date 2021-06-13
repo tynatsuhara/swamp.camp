@@ -165,12 +165,13 @@ export class StaffWeapon extends Weapon {
     private explosionParticleEffects() {
         // smoke
         for (let i = 0; i < 50; i++) {
+            const speed = Math.random() > .5 ? -.01 : -.007
             Particles.instance.emitParticle(
-                Lists.oneOf([Color.BROWN, Color.DARK_BROWN, Color.BLACK]),
-                this.attackPosition.randomCircularShift(12),
+                Lists.oneOf([Color.BROWN, Color.DARK_BROWN, Color.BLACK, Color.BLACK]),
+                this.attackPosition.randomCircularShift(12).plusY(-4),
                 this.attackPosition.y, 
                 500 + Math.random() * 1500,
-                t => new Point(0, t * -.01),
+                t => new Point(0, t * speed),
                 Math.random() > .5 ? new Point(2, 2) : new Point(1, 1),
             )
         }
@@ -178,7 +179,7 @@ export class StaffWeapon extends Weapon {
         // impact crater
         for (let i = 0; i < 25; i++) {
             Particles.instance.emitParticle(
-                Math.random() > .5 ? Color.BROWN : Color.DARK_BROWN,
+                Math.random() > .7 ? Color.BROWN : Color.DARK_BROWN,
                 this.attackPosition.randomCircularShift(6),
                 GroundRenderer.DEPTH + 1, 
                 10_000 + Math.random() * 5_000,
