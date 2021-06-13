@@ -246,7 +246,6 @@ export class Dude extends Component implements DialogueSource {
             }
             this.collider.enabled = false
         }, 1000)
-
     }
 
     dissolve() {
@@ -315,6 +314,11 @@ export class Dude extends Component implements DialogueSource {
     ) {
         if (this._health <= 0) {
             return
+        }
+
+        // Heal essential characters just in case they somehow take damage
+        if (this.maxHealth === Number.MAX_SAFE_INTEGER && Player.instance.dude.isAlive) {
+            this._health = Number.MAX_SAFE_INTEGER
         }
 
         if (this.knockIntervalCallback !== 0) {  // being knocked back, don't let em walk
