@@ -98,7 +98,6 @@ export class DarknessMask {
     }
 
     addLightCircle(centerPos: Point, diameter: number) {
-        centerPos = centerPos.apply(Math.floor)
         this.makeLightCircle(centerPos, diameter, 0, this.darkness/2)
         this.makeLightCircle(
             centerPos, 
@@ -238,15 +237,15 @@ export class DarknessMask {
             return
         }
 
+        // Erase the circle
         this.context.globalAlpha = 1
-        if (alpha === 0) {
-            this.context.globalCompositeOperation = "destination-out"
-            this.context.drawImage(circleBitmap, position.x, position.y)
-        } else {
-            this.context.globalCompositeOperation = "destination-out"
-            this.context.drawImage(circleBitmap, position.x, position.y)
-            this.context.globalCompositeOperation = "source-over"
+        this.context.globalCompositeOperation = "destination-out"
+        this.context.drawImage(circleBitmap, position.x, position.y)
+
+        // Draw the circle with the correct alpha
+        if (alpha > 0) {
             this.context.globalAlpha = alpha
+            this.context.globalCompositeOperation = "source-over"
             this.context.drawImage(circleBitmap, position.x, position.y)
         }
     }
