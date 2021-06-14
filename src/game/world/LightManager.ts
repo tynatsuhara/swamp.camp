@@ -92,7 +92,7 @@ export class LightManager {
     getEntities(): Entity[] {
         this.render()
 
-        const result = [this.mask.getEntity(Camera.instance.dimensions, Camera.instance.position)]
+        const result = [this.mask.render(Camera.instance.dimensions, Camera.instance.position)]
 
         const location = LocationManager.instance.currentLocation
         if (!location.isInterior) {

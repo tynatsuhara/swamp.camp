@@ -38,6 +38,7 @@ export class MainMenuScene {
     private plumes: PlumePicker
     private knight: TileComponent
     private title = assets.getImageByFileName("images/title.png")
+    private darkness: DarknessMask
     private view: View
 
     private menu = Menu.ROOT
@@ -89,6 +90,9 @@ export class MainMenuScene {
     
     getViews(updateViewsContext: UpdateViewsContext) {
         const dimensions = updateViewsContext.dimensions.div(ZOOM)
+        
+        // we need to re-render this each time since image bitmaps are async
+        this.darkness?.render(dimensions, Point.ZERO)
 
         // Don't re-render if nothing has changed, since a lot of  
         // these functions involve parsing all of our save slots
@@ -122,6 +126,7 @@ export class MainMenuScene {
         const entities = [
             title,
             this.knight.entity, 
+            this.darkness.render(dimensions, Point.ZERO),
             ...sceneEntities
         ]
 
@@ -214,7 +219,7 @@ export class MainMenuScene {
     }
 
     // scene constants
-    private static readonly SIZE = 10
+    private static readonly SIZE = 7
     private static readonly GRASS = Array.from(
         { length: MainMenuScene.SIZE * 2 * MainMenuScene.SIZE * 2 }, 
         () => Math.random() < .65 ? Math.floor(Math.random() * 4) : 0
@@ -257,13 +262,10 @@ export class MainMenuScene {
         ))
 
         // darkness
-        const darkness = new DarknessMask()
-        darkness.addLightCircle(campfirePos.plusX(TILE_SIZE/2).plusY(TILE_SIZE/2), 72)
+        this.darkness = new DarknessMask()
+        this.darkness.addLightCircle(campfirePos.plusX(TILE_SIZE/2).plusY(TILE_SIZE/2), 72)
 
-        return [
-            new Entity(components), 
-            darkness.getEntity(dimensions, Point.ZERO)
-        ]
+        return [new Entity(components)]
     }
 
     private previewingSlotPlume: number

@@ -2,8 +2,9 @@ import { Entity } from "../../engine/Entity"
 import { Point } from "../../engine/Point"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
 import { ImageRender } from "../../engine/renderer/ImageRender"
+import { Lists } from "../../engine/util/Lists"
 import { TILE_SIZE } from "../graphics/Tilesets"
-import { Color } from "../ui/Color"
+import { Color, getRGB } from "../ui/Color"
 import { UIStateManager } from "../ui/UIStateManager"
 import { TimeUnit } from "./TimeUnit"
 import { WorldTime } from "./WorldTime"
@@ -54,18 +55,24 @@ export class DarknessMask {
     getDarkness = () => this.darkness
 
     reset(time: number) {
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
+        this.circleQueue = []
         this.updateColorForTime(time)
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
-        if (this.darkness > 0) {
-            this.context.fillStyle = this.color
-            this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
+        if (this.darkness === 0) {
+            return
         }
+
+        // start with a full black darkness overlay
+        this.context.globalCompositeOperation = "source-over"
+        this.context.fillStyle = Color.BLACK
+        this.context.globalAlpha = 1
+        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
     }
 
     addFaintLightCircle(position: Point) {
         this.makeLightCircle(
-            position, 
+            position.apply(Math.floor), 
             DarknessMask.PLAYER_VISIBLE_SURROUNDINGS_DIAMETER, 
             DarknessMask.VISIBILE_LIGHT, 
             DarknessMask.VISIBILE_LIGHT_EDGE
@@ -73,6 +80,7 @@ export class DarknessMask {
     }
 
     addLightCircle(centerPos: Point, diameter: number) {
+        centerPos = centerPos.apply(Math.floor)
         this.makeLightCircle(centerPos, diameter, 0, this.darkness/2)
         this.makeLightCircle(
             centerPos, 
@@ -135,7 +143,7 @@ export class DarknessMask {
     }
 
     private lerpColorString(color1: RGBA, color2: RGBA, percentTransitioned: number): RGBA {
-        const lerp = (a, b) => a + (b-a) * percentTransitioned
+        const lerp = (a: number, b: number) => a + (b-a) * percentTransitioned
 
         const r = lerp(color1.r, color2.r)
         const g = lerp(color1.g, color2.g)
@@ -153,44 +161,43 @@ export class DarknessMask {
         const circleOffset = new Point(-.5, -.5).times(diameter)
         const adjustedPos = centerPos.plus(DarknessMask.shift).plus(circleOffset)
         
-        this.makeLightCircleHelper(diameter, adjustedPos, outerAlpha)
+        this.addCircleToQueue(diameter, adjustedPos, outerAlpha)
 
         const innerOffset = Math.floor(diameter/2 * 1/4)
-        this.makeLightCircleHelper(diameter-innerOffset*2, adjustedPos.plus(new Point(innerOffset, innerOffset)), innerAlpha)
+        this.addCircleToQueue(diameter-innerOffset*2, adjustedPos.plus(new Point(innerOffset, innerOffset)), innerAlpha)
     }
 
-    private makeLightCircleHelper(diameter: number, position: Point, alpha: number) {
-        const center = new Point(diameter/2, diameter/2).minus(new Point(.5, .5))
-        const imageData = this.context.getImageData(position.x, position.y, diameter, diameter)
+    // array of (diameter, topLeftPos, alpha)
+    private circleQueue: [number, Point, number][] = []
 
-        let cachedCircle = DarknessMask.circleCache.get(diameter)
-        if (!cachedCircle) {
-            cachedCircle = []
-            for (let x = 0; x < diameter; x++) {
-                for (let y = 0; y < diameter; y++) {
-                    const i = (x + y * diameter) * 4
-                    const pt = new Point(x, y)
-                    cachedCircle[i] = pt.distanceTo(center) < diameter/2
-                }
-            }
-            DarknessMask.circleCache.set(diameter, cachedCircle)
-        }
-
-        for (let i = 0; i < cachedCircle.length; i+=4) {
-            if (cachedCircle[i]) {
-                imageData.data[i+3] = Math.min(imageData.data[i+3], Math.ceil(255 * alpha))
-            }
-        }
-
-        this.context.putImageData(imageData, position.x, position.y)
+    /**
+     * Queues a light to be rendered
+     */
+    private addCircleToQueue(diameter: number, position: Point, alpha: number) {
+        this.circleQueue.push([diameter, position, alpha])
+        // sort in decreasing order of alpha (most opaque => most transparent)
+        this.circleQueue.sort((a, b) => b[2] - a[2])
     }
     
-    private static readonly circleCache: Map<number, boolean[]> = new Map<number, boolean[]>()
+    private static readonly circleCache: Map<number, ImageBitmap> = new Map<number, ImageBitmap>()
 
-    getEntity(dimensions: Point, offset: Point): Entity {
+    /**
+     * Renders the darkness mask. This can't be called as a one-off 
+     * because circle image bitmaps render asyncronously.
+     */
+    render(dimensions: Point, offset: Point): Entity {
         // prevent tint not extending to the edge
         const _dimensions = dimensions.plus(new Point(1, 1))
 
+        if (this.darkness > 0) {
+            this.circleQueue.forEach(circle => this.drawCircleToCanvas(...circle))
+            // overlay the time-specific color
+            this.context.globalCompositeOperation = "source-in"
+            this.context.fillStyle = this.color
+            this.context.globalAlpha = this.darkness
+            this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
+        }
+        
         return new Entity([new BasicRenderComponent(new ImageRender(
             this.canvas,
             offset.plus(DarknessMask.shift).apply(Math.floor),
@@ -199,6 +206,43 @@ export class DarknessMask {
             _dimensions,
             DarknessMask.DEPTH
         ))])
+    }
+
+    private drawCircleToCanvas(diameter: number, position: Point, alpha: number) {
+        const circleBitmap = DarknessMask.circleCache.get(diameter)
+        if (!circleBitmap) {
+            this.createImageBitmap(diameter)
+            return
+        }
+
+        this.context.globalAlpha = 1
+        if (alpha === 0) {
+            this.context.globalCompositeOperation = "destination-out"
+            this.context.drawImage(circleBitmap, position.x, position.y)
+        } else {
+            this.context.globalCompositeOperation = "destination-out"
+            this.context.drawImage(circleBitmap, position.x, position.y)
+            this.context.globalCompositeOperation = "source-over"
+            this.context.globalAlpha = alpha
+            this.context.drawImage(circleBitmap, position.x, position.y)
+        }
+    }
+
+    private createImageBitmap(diameter: number) {
+        console.log("caching " + diameter)
+        const center = new Point(diameter/2, diameter/2).minus(new Point(.5, .5))
+        const imageBuffer: number[] = Lists.repeat(diameter * diameter, [...getRGB(Color.BLACK), 0])
+        for (let x = 0; x < diameter; x++) {
+            for (let y = 0; y < diameter; y++) {
+                const alphaIndex = (x + y * diameter) * 4 + 3
+                const pt = new Point(x, y)
+                imageBuffer[alphaIndex] = (pt.distanceTo(center) < diameter/2) ? 255 : 0
+            }
+        }
+        const imageData = new ImageData(new Uint8ClampedArray(imageBuffer), diameter, diameter)
+        createImageBitmap(imageData).then(bitmap => {
+            DarknessMask.circleCache.set(diameter, bitmap)
+        })
     }
 }
 
