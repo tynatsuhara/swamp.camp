@@ -3,9 +3,11 @@ import { Point } from "../../engine/Point"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
 import { ImageRender } from "../../engine/renderer/ImageRender"
 import { Lists } from "../../engine/util/Lists"
+import { Lantern } from "../characters/weapons/Lantern"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Color, getRGB } from "../ui/Color"
 import { UIStateManager } from "../ui/UIStateManager"
+import { Campfire } from "./elements/Campfire"
 import { TimeUnit } from "./TimeUnit"
 import { WorldTime } from "./WorldTime"
 
@@ -35,6 +37,22 @@ export class DarknessMask {
         this.context = this.canvas.getContext("2d")
         
         this.reset(0)
+
+        // pre-populate the cache with expected light sizes
+        for (let i = 1; i <= Campfire.LOG_CAPACITY; i++) {
+            this.populateBitmapCache(Campfire.getLightSizeForLogCount(i))
+        }
+        this.populateBitmapCache(Lantern.DIAMETER)
+    }
+
+    private populateBitmapCache(diameter: number) {
+        const diameters = [
+            diameter,
+            this.getInnerCircleDiameter(diameter),
+            diameter * DarknessMask.VISIBILITY_MULTIPLIER,
+            this.getInnerCircleDiameter(diameter * DarknessMask.VISIBILITY_MULTIPLIER)
+        ]
+        diameters.forEach(this.createImageBitmap)
     }
 
     // constants for time of day
@@ -72,7 +90,7 @@ export class DarknessMask {
 
     addFaintLightCircle(position: Point) {
         this.makeLightCircle(
-            position.apply(Math.floor), 
+            position, 
             DarknessMask.PLAYER_VISIBLE_SURROUNDINGS_DIAMETER, 
             DarknessMask.VISIBILE_LIGHT, 
             DarknessMask.VISIBILE_LIGHT_EDGE
@@ -159,12 +177,17 @@ export class DarknessMask {
         }
         
         const circleOffset = new Point(-.5, -.5).times(diameter)
-        const adjustedPos = centerPos.plus(DarknessMask.shift).plus(circleOffset)
+        const adjustedPos = centerPos.plus(DarknessMask.shift).plus(circleOffset).apply(Math.floor)
         
         this.addCircleToQueue(diameter, adjustedPos, outerAlpha)
 
+        const innerDiameter = this.getInnerCircleDiameter(diameter)
+        this.addCircleToQueue(innerDiameter, adjustedPos.plus(new Point(1, 1).times((diameter - innerDiameter)/2)), innerAlpha)
+    }
+
+    private getInnerCircleDiameter(diameter: number) {
         const innerOffset = Math.floor(diameter/2 * 1/4)
-        this.addCircleToQueue(diameter-innerOffset*2, adjustedPos.plus(new Point(innerOffset, innerOffset)), innerAlpha)
+        return diameter - innerOffset * 2
     }
 
     // array of (diameter, topLeftPos, alpha)
@@ -229,7 +252,9 @@ export class DarknessMask {
     }
 
     private createImageBitmap(diameter: number) {
-        console.log("caching " + diameter)
+        if (DarknessMask.circleCache.get(diameter)) {
+            return
+        }
         const center = new Point(diameter/2, diameter/2).minus(new Point(.5, .5))
         const imageBuffer: number[] = Lists.repeat(diameter * diameter, [...getRGB(Color.BLACK), 0])
         for (let x = 0; x < diameter; x++) {

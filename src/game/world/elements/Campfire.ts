@@ -76,7 +76,7 @@ export class CampfireFactory extends ElementFactory {
             audio.setMultiplier(logCount === 0 ? 0 : 1)
             const lightCenterPos = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
             if (campfireOn.enabled) {
-                LightManager.instance.addLight(wl, e, lightCenterPos, TILE_SIZE * (5 + logCount/2))
+                LightManager.instance.addLight(wl, e, lightCenterPos, Campfire.getLightSizeForLogCount(logCount))
             } else {
                 LightManager.instance.removeLight(wl, e)
             }
@@ -108,9 +108,9 @@ export class CampfireFactory extends ElementFactory {
 
 export class Campfire extends Component implements DialogueSource {
 
-    static LOG_CAPACITY = 12
-    static LOG_DURATION_HOURS = 2
-    private static LOG_DURATION = Campfire.LOG_DURATION_HOURS * TimeUnit.HOUR
+    static readonly LOG_CAPACITY = 12
+    static readonly LOG_DURATION_HOURS = 2
+    private static readonly LOG_DURATION = Campfire.LOG_DURATION_HOURS * TimeUnit.HOUR
 
     dialogue: string = CAMPFIRE_DIALOGUE
     logs: number
@@ -123,6 +123,10 @@ export class Campfire extends Component implements DialogueSource {
         this.lastLogConsumedTime = lastLogConsumedTime
         this.updateFire = updateFire
         updateFire(this.logs)
+    }
+
+    static getLightSizeForLogCount(logs: number) {
+        return TILE_SIZE * (5 + logs/2)
     }
 
     update() {
