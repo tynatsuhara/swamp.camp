@@ -4,6 +4,7 @@ import { Point } from "../../engine/Point"
 import { Dude } from "../characters/Dude"
 import { Color } from "../ui/Color"
 import { GroundRenderer } from "../world/GroundRenderer"
+import { LocationManager } from "../world/LocationManager"
 import { Particles } from "./Particles"
 
 const MILLIS_BETWEEN_EMISSIONS = 50
@@ -33,7 +34,9 @@ export class WalkingParticles extends Component {
         }
         */
 
-        if (!this.dude.isMoving || this.dude.isJumping) {
+        // Conditions for not showing walking particles
+        if (!this.dude.isMoving || this.dude.isJumping || LocationManager.instance.currentLocation.isInterior) {
+            // set to 0 so that particles will be emitted immediately once it makes sense
             this.timeUntilNextEmission = 0
             return
         }
