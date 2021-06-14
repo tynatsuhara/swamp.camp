@@ -11,6 +11,7 @@ import { WorldLocation } from "./WorldLocation"
 import { ElementFactory } from "./elements/ElementFactory"
 import { Sounds } from "../audio/Sounds"
 import { assets } from "../../engine/Assets"
+import { UIStateManager } from "../ui/UIStateManager"
 
 export type Teleporter = {
     to: string   // destination uuid
@@ -69,7 +70,11 @@ export class TeleporterFactory extends ElementFactory {
                 if (interactComponent.isShowingUI) {
                     return []
                 }
-                return [Tilesets.instance.oneBit.getTileSource("small_arrow_down").toImageRender(new TileTransform(pos.times(TILE_SIZE)))]
+                return [
+                    Tilesets.instance.oneBit.getTileSource("small_arrow_down").toImageRender(
+                        TileTransform.new({ position: pos.times(TILE_SIZE), depth: UIStateManager.UI_SPRITE_DEPTH })
+                    )
+                ]
             }
         })
 
