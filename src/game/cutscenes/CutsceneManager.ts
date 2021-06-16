@@ -1,5 +1,6 @@
 import { Component } from "../../engine/Component"
 import { Entity } from "../../engine/Entity"
+import { Type } from "../../engine/Type"
 import { saveManager } from "../SaveManager"
 import { Singletons } from "../Singletons"
 
@@ -27,5 +28,9 @@ export class CutsceneManager {
 
     getEntity(): Entity {
         return this.entity
+    }
+
+    isCutsceneActive<T extends Component>(type: Type<T>) {
+        return !!this.entity?.getComponent(type)
     }
 }

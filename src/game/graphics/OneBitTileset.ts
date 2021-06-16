@@ -97,6 +97,11 @@ export class OneBitTileset extends SingleFileTileLoader {
             ["keycap", new Point(25, 15)],
             ["leftClick", new Point(29, 15)],
             ["rightClick", new Point(30, 15)],
+            ["tombstone1", new Point(0, 14)],
+            ["tombstone2", new Point(1, 14)],
+            ["skull-n-bones", new Point(0, 15)],
+            ["skull1", new Point(18, 24)],
+            ["skull2", new Point(22, 23)],
         ]))
     }
 }

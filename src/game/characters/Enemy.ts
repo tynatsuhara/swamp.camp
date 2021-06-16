@@ -6,6 +6,9 @@ import { Dude } from "./Dude"
 import { DudeFaction, DudeType } from "./DudeFactory"
 import { NPC } from "./NPC"
 
+/**
+ * Something that probably wants to eat the player
+ */
 export class Enemy extends Component {
 
     private dude: Dude

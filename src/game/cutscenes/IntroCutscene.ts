@@ -53,13 +53,13 @@ export class IntroCutscene extends Component {
 
         const characterAnimation = (key: string, transform: TileTransform) => {
             const anim = DudeAnimationUtils.getCharacterIdleAnimation(key).toComponent(transform)
+            anim.transform.position = new Point(transform.position.x, transform.position.y - transform.dimensions.y)
             anim.fastForward(Math.random() * 1000)  // don't have the animations in sync
             return anim
         }
 
-        const centerPos = new Point(Camera.instance.dimensions.x/2, TextOverlayManager.VERTICAL_MARGIN).plusY(-48)
+        const centerPos = new Point(Camera.instance.dimensions.x/2, TextOverlayManager.TOP_BORDER)
         
-        // TODO text overlay lore
         TextOverlayManager.instance.enable([
 `Champion, your time has come!
 
@@ -84,7 +84,7 @@ ANOTHER thing - Only one of the explorers returned, and she reported that her co
             () => this.cutscene(),
             [
                 characterAnimation("MountainKing", TileTransform.new({ position: centerPos.plusX(-35) })),
-                characterAnimation("knight_f", TileTransform.new({ position: centerPos.plus(new Point(9, 4)), mirrorX: true })),
+                characterAnimation("knight_f", TileTransform.new({ position: centerPos.plusX(9), mirrorX: true })),
             ]
         )
     }

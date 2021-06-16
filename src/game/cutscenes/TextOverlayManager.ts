@@ -7,7 +7,7 @@ import { Lists } from "../../engine/util/Lists"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { Color } from "../ui/Color"
-import { formatText, TEXT_PIXEL_WIDTH } from "../ui/Text"
+import { formatText, TextAlign, TEXT_PIXEL_WIDTH } from "../ui/Text"
 import { TextTyper } from "../ui/TextTyper"
 
 export class TextOverlayManager extends Component {
@@ -17,13 +17,17 @@ export class TextOverlayManager extends Component {
     }
 
     private static readonly WIDTH = 240
-    static readonly VERTICAL_MARGIN = 88
+    private static readonly VERTICAL_MARGIN = 88
+    // the bottom of any icons should line up with this Y coordinate
+    static readonly TOP_BORDER = TextOverlayManager.VERTICAL_MARGIN - TILE_SIZE
 
-    private index = 0
     private text: TextTyper[]
     private finishAction: string
     private onFinish: () => void
     private additionalComponents: Component[] = []
+    private textAlign: TextAlign
+
+    private index = 0
     private firstFrame = false  // prevent clicking "next" immediately
 
     get isActive() {
@@ -35,12 +39,20 @@ export class TextOverlayManager extends Component {
      * @param onFinish called after the clicking through the last string in the text array
      * @param additionalComponents 
      */
-    enable(text: string[], finishAction: string, onFinish: () => void, additionalComponents: Component[] = []) {
+    enable(
+        text: string[], 
+        finishAction: string, 
+        onFinish: () => void, 
+        additionalComponents: Component[] = [],
+        textAlign: TextAlign = TextAlign.LEFT,
+    ) {
         this.index = 0
         this.text = text.map(t => new TextTyper(t, () => this.nextLine()))
         this.finishAction = finishAction
         this.onFinish = onFinish
         this.additionalComponents = additionalComponents
+        this.textAlign = textAlign
+
         this.firstFrame = true
     }
 
@@ -85,7 +97,8 @@ export class TextOverlayManager extends Component {
                     typedText, 
                     Color.WHITE, 
                     topLeft, 
-                    TextOverlayManager.WIDTH
+                    TextOverlayManager.WIDTH,
+                    this.textAlign,
                 ),
                 ...formatText(
                     action, 

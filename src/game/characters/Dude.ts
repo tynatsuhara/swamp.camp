@@ -8,6 +8,9 @@ import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { StepSounds } from "../audio/StepSounds"
+import { CutsceneManager } from "../cutscenes/CutsceneManager"
+import { DeathCutscene } from "../cutscenes/DeathCutscene"
+import { IntroCutscene } from "../cutscenes/IntroCutscene"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { WalkingParticles } from "../graphics/WalkingParticles"
@@ -152,8 +155,8 @@ export class Dude extends Component implements DialogueSource {
 
         // All other transforms (eg the weapon) are positioned relative to the animation
         this.animation.transform.position = this.position
-        if (!this.isAlive) {
-            this.animation.transform.position = this.animation.transform.position.plus(this.deathOffset)
+        if (this.layingDownOffset) {
+            this.animation.transform.position = this.animation.transform.position.plus(this.layingDownOffset)
         } else if (this.isRolling && this.animation.transform.rotation !== 0) {
             this.animation.transform.position = this.animation.transform.position.plus(this.rollingOffset)
         }
@@ -213,17 +216,22 @@ export class Dude extends Component implements DialogueSource {
     }
 
     droppedItemSupplier: () => Item[] = () => [Item.COIN]
-    private deathOffset: Point
+    private layingDownOffset: Point
+    
     die(direction: Point = new Point(-1, 0)) {
         this._health = 0
+
+        // position the body
         const prePos = this.animation.transform.position
         this.animation.transform.rotate(
             90 * (direction.x >= 0 ? 1 : -1), 
-            this.standingPosition.minus(new Point(0, 5))
+            this.standingPosition.plusY(-5)
         )
-        this.deathOffset = this.animation.transform.position.minus(prePos)
+        this.layingDownOffset = this.animation.transform.position.minus(prePos)
         this.animation.goToAnimation(0)
         this.animation.pause()
+
+        // spawn items
         const items = this.droppedItemSupplier()
         items.forEach(item => {
             const randomness = 8
@@ -235,12 +243,32 @@ export class Dude extends Component implements DialogueSource {
         })
         this.dropWeapon()
 
+        // remove the body
         setTimeout(() => {
             if (!this.factions.includes(DudeFaction.VILLAGERS)) {
                 this.dissolve()
             }
-            this.collider.enabled = false
+            if (this.type !== DudeType.PLAYER) {
+                this.collider.enabled = false
+            }
         }, 1000)
+
+        // play death cutscene if applicable
+        if (this.type === DudeType.PLAYER) {
+            if (CutsceneManager.instance.isCutsceneActive(IntroCutscene)) {
+                setTimeout(() => this.revive(), 1000 + Math.random() * 1000);
+            } else {
+                CutsceneManager.instance.startCutscene(new DeathCutscene())
+            }
+        }
+    }
+
+    revive() {
+        this._health = this.maxHealth * .25
+
+        // stand up
+        this.animation.transform.rotation = 0
+        this.layingDownOffset = null
     }
 
     dissolve() {
