@@ -262,7 +262,7 @@ export class MainMenuScene {
         ))
 
         // darkness
-        this.darkness = new DarknessMask()
+        this.darkness = new DarknessMask(false)
         this.darkness.addLightCircle(campfirePos.plusX(TILE_SIZE/2).plusY(TILE_SIZE/2), 72)
 
         return [new Entity(components)]

@@ -28,14 +28,16 @@ export class DarknessMask {
     private color: string
     private darkness = 0.4
 
-    private context: CanvasRenderingContext2D
-    private canvas: HTMLCanvasElement
+    private readonly context: CanvasRenderingContext2D
+    private readonly canvas: HTMLCanvasElement
+    private readonly allowNightVision: boolean
 
-    constructor() {
+    constructor(allowNightVision: boolean) {
         this.canvas = document.createElement("canvas")
         this.canvas.width = DarknessMask.size
         this.canvas.height = DarknessMask.size
         this.context = this.canvas.getContext("2d")
+        this.allowNightVision = allowNightVision
         
         this.reset(0)
 
@@ -135,8 +137,8 @@ export class DarknessMask {
 			rgba = this.NIGHT_COLOR
 		}
 
-        if (debug.nightVision) {
-            rgba = this.colorFromString(Color.PURPLE, .7)
+        if (debug.nightVision && this.allowNightVision) {
+            rgba = this.colorFromString(Color.PURPLE, .85)
         }
 
         const { r, g, b, a } = rgba

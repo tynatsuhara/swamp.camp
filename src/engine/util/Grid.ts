@@ -72,11 +72,11 @@ export class Grid<T> {
             getNeighbors = pt => [new Point(pt.x, pt.y - 1), new Point(pt.x - 1, pt.y), new Point(pt.x + 1, pt.y), new Point(pt.x, pt.y + 1)],
             shortCircuit = Number.MAX_SAFE_INTEGER,
         }: {
-            heuristic?: (pt: Point) => number,
-            distance?: (a: Point, b: Point) => number,
-            isOccupied?: (pt: Point) => boolean,
+            heuristic?: (pt: Point) => number
+            distance?: (a: Point, b: Point) => number
+            isOccupied?: (pt: Point) => boolean
             getNeighbors?: (pt: Point) => Point[]
-            shortCircuit?: number,
+            shortCircuit?: number
         } = {}
     ): Point[] {
         // TODO: Support bidirectional pathfinding
@@ -85,6 +85,18 @@ export class Grid<T> {
             return null
         }
 
+        return this.findPathInternal(start, end, heuristic, distance, isOccupied, getNeighbors, shortCircuit)
+    }
+
+    private findPathInternal(
+        start: Point, 
+        end: Point, 
+        heuristic: (pt: Point) => number,
+        distance: (a: Point, b: Point) => number,
+        isOccupied: (pt: Point) => boolean,
+        getNeighbors: (pt: Point) => Point[],
+        shortCircuit: number,
+    ): Point[] {
         const gScore = new Map<string, number>()
         gScore.set(start.toString(), 0)
 
