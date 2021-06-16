@@ -69,14 +69,18 @@ export class Grid<T> {
             heuristic = pt => pt.manhattanDistanceTo(end),
             distance = (a, b) => a.manhattanDistanceTo(b),
             isOccupied = pt => !!this.get(pt),
-            getNeighbors = pt => [new Point(pt.x, pt.y - 1), new Point(pt.x - 1, pt.y), new Point(pt.x + 1, pt.y), new Point(pt.x, pt.y + 1)]
+            getNeighbors = pt => [new Point(pt.x, pt.y - 1), new Point(pt.x - 1, pt.y), new Point(pt.x + 1, pt.y), new Point(pt.x, pt.y + 1)],
+            shortCircuit = Number.MAX_SAFE_INTEGER,
         }: {
             heuristic?: (pt: Point) => number,
             distance?: (a: Point, b: Point) => number,
             isOccupied?: (pt: Point) => boolean,
             getNeighbors?: (pt: Point) => Point[]
+            shortCircuit?: number,
         } = {}
     ): Point[] {
+        // TODO: Support bidirectional pathfinding
+
         if (isOccupied(start) || isOccupied(end) || start.equals(end)) {
             return null
         }
@@ -123,6 +127,10 @@ export class Grid<T> {
                         openSetUnique.add(n)
                     }
                 }
+            }
+
+            if (cameFrom.size > shortCircuit) {
+                return null
             }
         }
 

@@ -66,7 +66,7 @@ export class NPC extends Component {
          */
 
         // clear their attack target if the target has died
-        if (!!this.attackTarget && !this.attackTarget.isAlive) {
+        if (!this.attackTarget || !this.attackTarget.isAlive || !this.isEnemyFn(this.attackTarget)) {
             this.attackTarget = null
             this.targetPath = null
         }
@@ -77,7 +77,7 @@ export class NPC extends Component {
         } else if (this.enemiesPresent) {
             // re-check the enemy function for dynamic enemy status 
             // (such as demons only targeting people in the dark)
-            if (this.attackTarget && this.isEnemyFn(this.attackTarget)) {
+            if (this.attackTarget) {
                 this.doAttack(updateData)
             } else {
                 this.doRoam(updateData)
@@ -356,7 +356,7 @@ export class NPC extends Component {
         }
 
         if (!this.targetPath || this.targetPath.length === 0) {
-            this.targetPath = this.findPath(pixelPtToTilePt(this.attackTarget.standingPosition), this.dude.standingPosition)
+            this.targetPath = this.findPath(pixelPtToTilePt(this.attackTarget.standingPosition))
         }
         if (!this.targetPath || this.targetPath.length === 0 || mag < stoppingDist) {
             // TODO: If using a ranged weapon, keep distance from enemies
@@ -419,7 +419,7 @@ export class NPC extends Component {
                 .filter(d => d.standingPosition.distanceTo(this.dude.standingPosition) < this.findTargetRange)
 
         this.enemiesPresent = enemies.length > 0
-        if (!this.dude.weapon) {
+        if (!this.dude.weapon || !this.enemiesPresent) {
             // should flee instead
             return
         }
@@ -428,6 +428,7 @@ export class NPC extends Component {
 
         // attack the closest enemy
         const target = Lists.minBy(enemies, d => d.standingPosition.distanceTo(this.dude.standingPosition))
+
         if (!!target) {
             let shouldComputePath = true
 
@@ -442,7 +443,8 @@ export class NPC extends Component {
                 }
             }
 
-            if (this.stuck) {
+            if (this.stuck()) {
+                console.log("stuck")
                 shouldComputePath = true
             }
 
@@ -459,13 +461,13 @@ export class NPC extends Component {
         this.dude.moveTo(pos, true)
     }
 
-    private findPath(tilePt: Point, pixelPtStart: Point = this.dude.standingPosition) {
-        const start = pixelPtToTilePt(pixelPtStart)
-        const end = tilePt
+    private findPath(targetTilePoint: Point) {
+        const start = pixelPtToTilePt(this.dude.standingPosition)
         // TODO: NPCs can sometimes get stuck if their starting square is "occupied"
         return LocationManager.instance.currentLocation
-                .findPath(start, end, this.pathFindingHeuristic)
-                ?.map(pt => this.tilePtToStandingPos(pt)).slice(1)  // slice(1) because we don't need the start in the path
+                .findPath(start, targetTilePoint, this.pathFindingHeuristic, 300)
+                ?.map(pt => this.tilePtToStandingPos(pt))
+                .slice(1)  // slice(1) because we don't need the start in the path
     }
 
     private teleporterTarget: Teleporter

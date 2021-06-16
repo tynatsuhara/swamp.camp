@@ -129,7 +129,7 @@ export class WorldLocation {
         return MapGenerator.GOOD_FLEEING_SPOTS
     }
 
-    findPath(tileStart: Point, tileEnd: Point, heuristic: (pt: Point, goal: Point) => number) {
+    findPath(tileStart: Point, tileEnd: Point, heuristic: (pt: Point, goal: Point) => number, shortCircuit: number) {
         return this.occupied.findPath(tileStart, tileEnd, {
             heuristic: (pt) => heuristic(pt, tileEnd),
             isOccupied: (pt) => {
@@ -146,7 +146,8 @@ export class WorldLocation {
                     return true
                 }
                 return !!this.occupied.get(pt)
-            }
+            },
+            shortCircuit
         })
     }
 
