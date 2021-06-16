@@ -70,11 +70,6 @@ export class DarknessMask {
     private static readonly VISIBILE_LIGHT = .95
     private static readonly VISIBILE_LIGHT_EDGE = .975
     
-    /**
-     * @returns a range from 0 (complete light) to 1 (complete darkness)
-     */
-    getDarkness = () => this.darkness
-
     reset(time: number) {
         this.circleQueue = []
         this.updateColorForTime(time)

@@ -8,6 +8,7 @@ import { Singletons } from "../Singletons"
 import { DarknessMask } from "./DarknessMask"
 import { LocationManager } from "./LocationManager"
 import { MapGenerator } from "./MapGenerator"
+import { TimeUnit } from "./TimeUnit"
 import { Vignette } from "./Vignette"
 import { WorldLocation } from "./WorldLocation"
 import { WorldTime } from "./WorldTime"
@@ -53,12 +54,13 @@ export class LightManager {
     isTotalDarkness = (pixelPt: Point) => this.isDarkHelper(pixelPt, DarknessMask.VISIBILITY_MULTIPLIER)
  
     private isDarkHelper(pixelPt: Point, tolerableDistanceFromLightMultiplier: number): boolean {
-        if (this.mask.getDarkness() < .6) {
-            return false
+        const time = WorldTime.instance.time % TimeUnit.DAY
+        if (time >= DarknessMask.SUNRISE_START && time < DarknessMask.SUNSET_END) {
+            return false  // daytime
         }
         const locationLightMap = this.lightTiles.get(LocationManager.instance.currentLocation)
         if (!locationLightMap) {
-            return true
+            return true  // nighttime with no lights
         }
         return !Array.from(locationLightMap.values()).some(entry => 
             entry[0].distanceTo(pixelPt) < entry[1] * .5 * tolerableDistanceFromLightMultiplier
