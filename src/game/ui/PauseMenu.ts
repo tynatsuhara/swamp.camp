@@ -26,9 +26,9 @@ export class PauseMenu extends Component {
         const pressEsc = updateData.input.isKeyDown(InputKey.ESC)
         this.isShiftDown = updateData.input.isKeyHeld(InputKey.SHIFT)
 
-        if (pressEsc && this.isOpen) {
+        if ((pressEsc && this.isOpen) || CutsceneManager.instance.isMidCutscene) {
             this.close()
-        } else if (pressEsc && !UIStateManager.instance.isMenuOpen && !CutsceneManager.instance.isMidCutscene) {
+        } else if (pressEsc && !UIStateManager.instance.isMenuOpen) {
             this.show(updateData.dimensions)
         }
     }
