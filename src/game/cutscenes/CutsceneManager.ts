@@ -1,7 +1,6 @@
 import { Component } from "../../engine/Component"
 import { Entity } from "../../engine/Entity"
 import { Type } from "../../engine/Type"
-import { saveManager } from "../SaveManager"
 import { Singletons } from "../Singletons"
 
 export class CutsceneManager {
@@ -23,7 +22,6 @@ export class CutsceneManager {
 
     finishCutscene() {
         this.entity = null
-        saveManager.save()
     }
 
     getEntity(): Entity {

@@ -15,6 +15,7 @@ import { TextOverlayManager } from "./TextOverlayManager"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
 import { TileTransform } from "../../engine/tiles/TileTransform"
+import { saveManager } from "../SaveManager"
 
 // This is the cutscene that plays when the player arrives in the new land
 export class IntroCutscene extends Component {
@@ -130,8 +131,8 @@ ANOTHER thing - Only one of the explorers returned, and she reported that her co
 
         if (!this.orcs.some(o => o.isAlive)) {
             this.dip.dialogue = DIP_STARTING_DIALOGUE
-
             CutsceneManager.instance.finishCutscene()
+            saveManager.save()
         }
     }
 

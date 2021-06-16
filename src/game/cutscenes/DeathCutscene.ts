@@ -14,6 +14,7 @@ import { LocationManager } from "../world/LocationManager"
 import { Enemy } from "../characters/Enemy"
 import { TextAlign } from "../ui/Text"
 import { CutsceneManager } from "./CutsceneManager"
+import { saveManager } from "../SaveManager"
 
 // This is the cutscene that plays when the player dies
 export class DeathCutscene extends Component {
@@ -71,5 +72,7 @@ export class DeathCutscene extends Component {
         // TODO take away resources, impact town stats, etc
 
         CutsceneManager.instance.finishCutscene()
+
+        setTimeout(() => saveManager.save(), 1500);
     }
 }
