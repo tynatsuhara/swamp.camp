@@ -1,4 +1,5 @@
 import { Component } from "./Component"
+import { Type } from "./Type"
 
 /**
  * An object which is updated by the engine. Should be attached to a game view.
@@ -31,7 +32,7 @@ export class Entity {
         return components
     }
 
-    getComponent<T extends Component>(componentType: ComponentType<T>): T {
+    getComponent<T extends Component>(componentType: Type<T>): T {
         let value = this.componentCache.get(componentType)
         if (!value || value === NO_COMPONENT) {
             value = this.getComponents(componentType)[0]
@@ -40,7 +41,7 @@ export class Entity {
         return value as T
     }
 
-    getComponents<T extends Component>(componentType: ComponentType<T>): T[] {
+    getComponents<T extends Component>(componentType: Type<T>): T[] {
         return this.components.filter(c => c instanceof componentType).map(c => c as T)
     }
 
@@ -61,4 +62,3 @@ export class Entity {
 }
 
 const NO_COMPONENT = {}
-interface ComponentType<T> { new(...args: any[]): T }
