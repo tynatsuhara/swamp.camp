@@ -51,10 +51,17 @@ export class LocationTransition extends Component {
         const maxRadius = dims.div(2).magnitude()
 
         // circles big->small->big
-        const renders = []
-
+        const radiuses = []
         for (let i = 0; i < FRAMES; i++) {
             const radius = Math.floor(maxRadius/FRAMES * i)
+            radiuses.push(radius)
+            if (radiuses.length > 1) {
+                radiuses.unshift(radius)
+            }
+        }
+
+        const getRender = (frame: number) => {
+            const radius = radiuses[frame]
             const canvas = document.createElement("canvas")
             canvas.width = dims.x
             canvas.height = dims.y
@@ -65,7 +72,7 @@ export class LocationTransition extends Component {
 
             makeCircle(context, radius, centerPos)
 
-            const render = new ImageRender(
+            return new ImageRender(
                 canvas,
                 Point.ZERO,
                 dims,
@@ -73,11 +80,6 @@ export class LocationTransition extends Component {
                 dims,
                 UIStateManager.UI_SPRITE_DEPTH + 10_000
             )
-
-            renders.push(render)
-            if (renders.length > 1) {
-                renders.unshift(render)
-            }
         }
 
         const transitionFrame = FRAMES-1
@@ -87,7 +89,7 @@ export class LocationTransition extends Component {
             Array.from({length: FRAMES * 2 - 1}, (v, k) => k === transitionFrame ? blackScreenSpeed : SPEED),
             (frame) => {
                 if (!!this.animator) {
-                    this.render = renders[frame]
+                    this.render = getRender(frame)
                 }
                 if (frame === transitionFrame) {
                     callback()
