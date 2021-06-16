@@ -36,6 +36,10 @@ export abstract class Collider extends Component {
     }
 
     moveTo(point: Point): Point {
+        if (!this.enabled) {
+            this._position = point
+            return this.position
+        }
         const dx = point.x - this.position.x
         const dy = point.y - this.position.y
         // TODO: Should these branches be handled by the caller?
