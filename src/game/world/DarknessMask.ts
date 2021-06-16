@@ -1,3 +1,4 @@
+import { debug } from "../../engine/Debug"
 import { Entity } from "../../engine/Entity"
 import { Point } from "../../engine/Point"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
@@ -133,6 +134,10 @@ export class DarknessMask {
 		} else {
 			rgba = this.NIGHT_COLOR
 		}
+
+        if (debug.nightVision) {
+            rgba = this.colorFromString(Color.PURPLE, .7)
+        }
 
         const { r, g, b, a } = rgba
         this.color = `rgba(${r}, ${g}, ${b}, ${a})`

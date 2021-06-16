@@ -49,10 +49,10 @@ export class LightManager {
     /**
     * returns true if it is dark enough for a demon to tolerate
     */
-    isDark = (pixelPt: Point) => this.testDarkness(pixelPt, 1)
-    isTotalDarkness = (pixelPt: Point) => this.testDarkness(pixelPt, DarknessMask.VISIBILITY_MULTIPLIER)
+    isDark = (pixelPt: Point) => this.isDarkHelper(pixelPt, 1)
+    isTotalDarkness = (pixelPt: Point) => this.isDarkHelper(pixelPt, DarknessMask.VISIBILITY_MULTIPLIER)
  
-    private testDarkness(pixelPt: Point, tolerableDistanceFromLightMultiplier: number): boolean {
+    private isDarkHelper(pixelPt: Point, tolerableDistanceFromLightMultiplier: number): boolean {
         if (this.mask.getDarkness() < .6) {
             return false
         }
