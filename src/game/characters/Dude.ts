@@ -104,7 +104,7 @@ export class Dude extends Component implements DialogueSource {
         this.factions = factions
         this._position = position
         this.maxHealth = maxHealth
-        this._health = health
+        this._health = maxHealth === Number.MAX_SAFE_INTEGER ? Number.MAX_SAFE_INTEGER : health
         this.speed = speed
         this.inventory = inventory
         this.dialogue = dialogue
@@ -190,15 +190,10 @@ export class Dude extends Component implements DialogueSource {
         }
         
         if (this.isAlive) {
-            if (this.type === DudeType.PLAYER && debug.godMode) {
+            if ((this.type === DudeType.PLAYER && debug.godMode) || this.maxHealth === Number.MAX_SAFE_INTEGER) {
                 damage = 0
             }
-            // essential NPCs can die if the player is dead
-            if (this.maxHealth === Number.MAX_SAFE_INTEGER && !Player.instance.dude.isAlive) {
-                this._health = Math.min(this._health - damage, 5)
-            } else {
-                this._health -= damage
-            }
+            this._health -= damage
             if (!this.isAlive) {
                 this.die(direction)
                 knockback *= (1 + Math.random())
@@ -314,11 +309,6 @@ export class Dude extends Component implements DialogueSource {
     ) {
         if (this._health <= 0) {
             return
-        }
-
-        // Heal essential characters just in case they somehow take damage
-        if (this.maxHealth === Number.MAX_SAFE_INTEGER && Player.instance.dude.isAlive) {
-            this._health = Number.MAX_SAFE_INTEGER
         }
 
         if (this.knockIntervalCallback !== 0) {  // being knocked back, don't let em walk
