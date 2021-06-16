@@ -75,7 +75,9 @@ export class NPC extends Component {
             // don't move when talking
             this.dude.move(updateData, Point.ZERO, Player.instance.dude.standingPosition.x - this.dude.standingPosition.x)
         } else if (this.enemiesPresent) {
-            if (!!this.attackTarget) {
+            // re-check the enemy function for dynamic enemy status 
+            // (such as demons only targeting people in the dark)
+            if (this.attackTarget && this.isEnemyFn(this.attackTarget)) {
                 this.doAttack(updateData)
             } else {
                 this.doRoam(updateData)
