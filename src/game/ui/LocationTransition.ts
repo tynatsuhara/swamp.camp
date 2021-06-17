@@ -1,6 +1,7 @@
 import { Component } from "../../engine/Component"
 import { UpdateData } from "../../engine/Engine"
 import { Point } from "../../engine/Point"
+import { measure } from "../../engine/Profiler"
 import { ImageRender } from "../../engine/renderer/ImageRender"
 import { Animator } from "../../engine/util/Animator"
 import { Player } from "../characters/Player"
@@ -34,8 +35,8 @@ const makeCircle = (context: CanvasRenderingContext2D, radius: number, centerPos
     }
 }
 
-const FRAMES = 12
-const SPEED = 30
+const FRAMES = 60
+const TRANSITION_SPEED = 1500
 
 /**
  * Animation that plays when going through a doorway
@@ -44,15 +45,22 @@ export class LocationTransition extends Component {
 
     private animator: Animator
     private render: ImageRender
+    private canvas: HTMLCanvasElement
+    private context: CanvasRenderingContext2D
 
-    transition(callback: () => void, pauseMillis: number = 12 * SPEED, openOnly = false) {
-        const centerPos = Player.instance.dude.standingPosition.plusY(-12)
-                .minus(Camera.instance.position)
-                .apply(Math.floor)
+    constructor() {
+        super()
+        this.canvas = document.createElement("canvas")
+        this.context = this.canvas.getContext("2d", { alpha: true })
+    }
 
+    transition(callback: () => void, pauseMillis: number = 360, openOnly = false) {
+        // make sure it extends to the edge of the screen
         const dims = Camera.instance.dimensions.plusX(1).plusY(1)
-        // The radius should extend to the edge of the screen even if the player is near the edge of the map
-        const maxRadius = Math.max(centerPos.x, Camera.instance.dimensions.x - centerPos.x)
+        this.canvas.width = dims.x
+        this.canvas.height = dims.y
+
+        const maxRadius = dims.magnitude()
 
         // circles big->small->big
         const radiuses = []
@@ -64,21 +72,20 @@ export class LocationTransition extends Component {
             }
         }
 
-        const canvas = document.createElement("canvas")
-        canvas.width = dims.x
-        canvas.height = dims.y
-        const context = canvas.getContext("2d", { alpha: true })
-
         const getRender = (frame: number) => {
+            const circleCenter = Player.instance.dude.standingPosition.plusY(-12)
+                .minus(Camera.instance.position)
+                .apply(Math.floor)
+                
             const radius = radiuses[frame]
             
-            context.fillStyle = Color.BLACK
-            context.fillRect(0, 0, canvas.width, canvas.height)
+            this.context.fillStyle = Color.BLACK
+            this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
 
-            makeCircle(context, radius, centerPos)
+            makeCircle(this.context, radius, circleCenter)
 
             return new ImageRender(
-                canvas,
+                this.canvas,
                 Point.ZERO,
                 dims,
                 Point.ZERO,
@@ -91,11 +98,12 @@ export class LocationTransition extends Component {
 
         const transitionFrame = openOnly ? 0 : FRAMES-1
         const blackScreenSpeed = pauseMillis
+        const speed = TRANSITION_SPEED/(2*FRAMES-1)
 
         this.animator = new Animator(
-            Array.from({length: radiuses.length}, (v, k) => k === transitionFrame ? blackScreenSpeed : SPEED),
+            Array.from({length: radiuses.length}, (v, k) => k === transitionFrame ? blackScreenSpeed : speed),
             (frame) => {
-                if (!!this.animator) {
+                if (!!this.animator && frame !== 0) {
                     this.render = getRender(frame)
                 }
                 if (frame === transitionFrame) {
@@ -105,6 +113,7 @@ export class LocationTransition extends Component {
             () => {
                 this.animator = null
                 this.render = null
+                console.log("done")
             }
         )
     }
