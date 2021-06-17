@@ -14,21 +14,24 @@ const makeCircle = (context: CanvasRenderingContext2D, radius: number, centerPos
     }
 
     const relativeCenter = new Point(radius, radius).minus(new Point(.5, .5))
-    const imageDataOffset = centerPos.plusX(-radius).plusY(-radius)
+    const absoluteTopLeft = centerPos.plusX(-radius).plusY(-radius)
     const diameter = 2 * radius
-    const imageData = context.getImageData(imageDataOffset.x, imageDataOffset.y, diameter, diameter)
 
     for (let x = 0; x < diameter; x++) {
-        for (let y = 0; y < diameter; y++) {
-            const i = (x + y * diameter) * 4
-            const pt = new Point(x, y)
-            if (relativeCenter.distanceTo(pt) < diameter/2) {
-                imageData.data[i+3] = 0
+        // Go down in y coords until we find the top circle radius.
+        // From there, clear a rect (essentially drawing vertical strips).
+        for (let y = 0; y < radius; y++) {
+            if (relativeCenter.distanceTo(new Point(x, y)) < radius) {
+                context.clearRect(
+                    absoluteTopLeft.x + x,
+                    absoluteTopLeft.y + y,
+                    1,
+                    (radius - y) * 2
+                )
+                break
             }
         }
     }
-
-    context.putImageData(imageData, imageDataOffset.x, imageDataOffset.y)
 }
 
 const FRAMES = 12
@@ -61,13 +64,14 @@ export class LocationTransition extends Component {
             }
         }
 
+        const canvas = document.createElement("canvas")
+        canvas.width = dims.x
+        canvas.height = dims.y
+        const context = canvas.getContext("2d", { alpha: true })
+
         const getRender = (frame: number) => {
             const radius = radiuses[frame]
-            const canvas = document.createElement("canvas")
-            canvas.width = dims.x
-            canvas.height = dims.y
-
-            const context = canvas.getContext("2d", { alpha: true })
+            
             context.fillStyle = Color.BLACK
             context.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -82,6 +86,8 @@ export class LocationTransition extends Component {
                 UIStateManager.UI_SPRITE_DEPTH + 10_000
             )
         }
+
+        this.render = getRender(0)
 
         const transitionFrame = openOnly ? 0 : FRAMES-1
         const blackScreenSpeed = pauseMillis
