@@ -1,6 +1,5 @@
 import { Entity } from "../../engine/Entity"
 import { Point } from "../../engine/Point"
-import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { Grid } from "../../engine/util/Grid"
 import { PointAudio } from "../audio/PointAudio"
 import { Sounds } from "../audio/Sounds"
@@ -11,7 +10,6 @@ import { Player } from "../characters/Player"
 import { Lantern } from "../characters/weapons/Lantern"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { Camera } from "../cutscenes/Camera"
-import { TILE_SIZE } from "../graphics/Tilesets"
 import { LocationSaveState } from "../saves/LocationSaveState"
 import { newUUID } from "../saves/uuid"
 import { HUD } from "../ui/HUD"
@@ -238,7 +236,7 @@ export class WorldLocation {
     getEntities() {
         return Array.from(Array.from(this.dudes.values()).map(d => d.entity))
                 .concat(this.elements.values().map(c => c.entity))
-                .concat(this.ground.values().map(c => c.entity))
+                .concat(this.ground.values().filter(c => !c.tickExclude).map(c => c.entity))
                 .concat(Array.from(this.droppedItems))
                 .concat(this.barriers)
                 .concat([this.sprites.entity])

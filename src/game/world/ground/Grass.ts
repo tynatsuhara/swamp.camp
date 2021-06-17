@@ -36,7 +36,8 @@ export const makeGrass = (d: MakeGroundFuncData): GroundComponent => {
         () => ({ 
             [INDEX]: index,
             [TALL_GRASS_COUNT]: tallGrass
-        })
+        }),
+        tallGrass === 0  // don't call update() or getRenderMethods() unless we have tall grass
     ))
 }
 

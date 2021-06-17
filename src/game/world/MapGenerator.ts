@@ -17,7 +17,7 @@ export class MapGenerator {
         return Singletons.getOrCreate(MapGenerator)
     }
 
-    static readonly MAP_SIZE = 70
+    static readonly MAP_SIZE = 70  // TODO increase + maybe tie to save
     static readonly ENTER_LAND_POS = new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE).plusY(-TILE_SIZE * 25).plusX(TILE_SIZE * 2)
 
     private readonly location = LocationManager.instance.add(new WorldLocation(false, true))
