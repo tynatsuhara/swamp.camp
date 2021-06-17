@@ -16,6 +16,7 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { saveManager } from "../SaveManager"
+import { HUD } from "../ui/HUD"
 
 // This is the cutscene that plays when the player arrives in the new land
 export class IntroCutscene extends Component {
@@ -82,7 +83,7 @@ ANOTHER thing - Only one of the explorers returned, and she reported that her co
 `Good luck. Go now, venture into the swamp, and bring glory to the Kingdom!`
             ], 
             "START",
-            () => this.cutscene(),
+            () => HUD.instance.locationTransition.transition(() => this.cutscene(), 100, true),
             [
                 characterAnimation("MountainKing", TileTransform.new({ position: centerPos.plusX(-35) })),
                 characterAnimation("knight_f", TileTransform.new({ position: centerPos.plusX(9), mirrorX: true })),

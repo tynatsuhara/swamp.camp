@@ -42,20 +42,21 @@ export class LocationTransition extends Component {
     private animator: Animator
     private render: ImageRender
 
-    transition(callback: () => void, pauseMillis: number = 12 * SPEED) {
+    transition(callback: () => void, pauseMillis: number = 12 * SPEED, openOnly = false) {
         const centerPos = Player.instance.dude.standingPosition.plusY(-12)
                 .minus(Camera.instance.position)
                 .apply(Math.floor)
-        
+
         const dims = Camera.instance.dimensions.plusX(1).plusY(1)
-        const maxRadius = dims.div(2).magnitude()
+        // The radius should extend to the edge of the screen even if the player is near the edge of the map
+        const maxRadius = Math.max(centerPos.x, Camera.instance.dimensions.x - centerPos.x)
 
         // circles big->small->big
         const radiuses = []
         for (let i = 0; i < FRAMES; i++) {
             const radius = Math.floor(maxRadius/FRAMES * i)
             radiuses.push(radius)
-            if (radiuses.length > 1) {
+            if (radiuses.length > 1 && !openOnly) {
                 radiuses.unshift(radius)
             }
         }
@@ -82,11 +83,11 @@ export class LocationTransition extends Component {
             )
         }
 
-        const transitionFrame = FRAMES-1
+        const transitionFrame = openOnly ? 0 : FRAMES-1
         const blackScreenSpeed = pauseMillis
 
         this.animator = new Animator(
-            Array.from({length: FRAMES * 2 - 1}, (v, k) => k === transitionFrame ? blackScreenSpeed : SPEED),
+            Array.from({length: radiuses.length}, (v, k) => k === transitionFrame ? blackScreenSpeed : SPEED),
             (frame) => {
                 if (!!this.animator) {
                     this.render = getRender(frame)

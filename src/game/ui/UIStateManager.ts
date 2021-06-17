@@ -19,7 +19,6 @@ export class UIStateManager {
     
     static UI_SPRITE_DEPTH = Number.MAX_SAFE_INTEGER/2
 
-    private readonly hud = new HUD()
     private readonly inventory = new InventoryDisplay()
     private readonly dialogueDisplay = new DialogueDisplay()
     private readonly placeElementDisplay = new PlaceElementDisplay()
@@ -46,7 +45,7 @@ export class UIStateManager {
                 || this.craftingMenu.isOpen
                 || this.sellMenu.isOpen
 
-        return this.hud.getEntities(Player.instance.dude, Camera.instance.dimensions, elapsedMillis)
+        return HUD.instance.getEntities(Player.instance.dude, Camera.instance.dimensions, elapsedMillis)
                 .concat(this.inventory.getEntities())
                 .concat(this.dialogueDisplay.getEntities())
                 .concat(this.placeElementDisplay.getEntities())

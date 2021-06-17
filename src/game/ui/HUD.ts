@@ -4,12 +4,15 @@ import { TileComponent } from "../../engine/tiles/TileComponent"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Dude } from "../characters/Dude"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { Singletons } from "../Singletons"
 import { LocationTransition } from "./LocationTransition"
 import { OffScreenIndicatorManager } from "./OffScreenIndicatorManager"
 
 export class HUD {
 
-    static instance: HUD
+    static get instance() {
+        return Singletons.getOrCreate(HUD)
+    }
 
     private heartsEntity: Entity = new Entity()
     private autosaveComponent: TileComponent = new Entity().addComponent(
@@ -24,10 +27,6 @@ export class HUD {
     private lastMaxHealthCount = 0
 
     readonly locationTransition = new Entity().addComponent(new LocationTransition())
-
-    constructor() {
-        HUD.instance = this
-    }
 
     addIndicator(key: any, positionSupplier: () => Point) {
         this.offScreenIndicatorManager.addIndicator(key, positionSupplier)
