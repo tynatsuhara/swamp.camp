@@ -48,8 +48,16 @@ export class Camera {
     }
 
     getUpdatedPosition(elapsedTimeMillis: number): Point {
-        const xLimit = MapGenerator.MAP_SIZE / 2 * TILE_SIZE - this.dimensions.x/2
-        const yLimit = MapGenerator.MAP_SIZE / 2 * TILE_SIZE - this.dimensions.y/2
+        let xLimit = MapGenerator.MAP_SIZE / 2 * TILE_SIZE - this.dimensions.x/2
+        let yLimit = MapGenerator.MAP_SIZE / 2 * TILE_SIZE - this.dimensions.y/2
+        
+        if (this.dimensions.x > MapGenerator.MAP_SIZE * TILE_SIZE) {
+            xLimit = Number.MAX_SAFE_INTEGER
+        }
+        if (this.dimensions.y > MapGenerator.MAP_SIZE * TILE_SIZE) {
+            yLimit = Number.MAX_SAFE_INTEGER
+        }
+
         const trackedPoint = this.dudeTarget?.position ?? this.pointTarget
         const clampedTrackedPoint = new Point(
             clamp(trackedPoint.x, -xLimit, xLimit),

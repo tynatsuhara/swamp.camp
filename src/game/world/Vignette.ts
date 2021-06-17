@@ -8,6 +8,7 @@ import { MapGenerator } from "./MapGenerator"
 
 export class Vignette extends Component {
 
+    private buffer = 50 // pixels from beyond the edge of the map (useful for covering clipping things)
     private padding = 128  // distance from start of shadows to the edge of the screen
     private rings = 8
     private ringWidth = this.padding/this.rings
@@ -16,12 +17,14 @@ export class Vignette extends Component {
         super()
         this.start = () => {
             const canvas = document.createElement("canvas")
-            canvas.width = canvas.height = diameter
+            canvas.width = canvas.height = diameter + this.buffer * 2
             const context = canvas.getContext("2d")
+            context.fillStyle = Color.BLACK
+            context.fillRect(0, 0, canvas.width, canvas.height)
+            context.clearRect(this.buffer, this.buffer, diameter, diameter)
             const imageData = context.getImageData(0, 0, diameter, diameter)
             const rgb = getRGB(Color.BLACK)
             
-            const center = new Point(diameter/2, diameter/2).apply(Math.floor)
             for (let ring = 0; ring < this.rings; ring++) {
                 const n = 4  // superellipse n parameter
                 const radius = MapGenerator.MAP_SIZE/2 * TILE_SIZE - ((this.rings - ring - 1) * this.ringWidth)
@@ -42,15 +45,15 @@ export class Vignette extends Component {
                 }
             }
 
-            context.putImageData(imageData, 0, 0)
+            context.putImageData(imageData, this.buffer, this.buffer)
 
             this.getRenderMethods = () => [
                 new ImageRender(
                     canvas,
                     new Point(0, 0),
-                    new Point(diameter, diameter),
-                    topLeftPosition,
-                    new Point(diameter, diameter),
+                    new Point(canvas.width, canvas.height),
+                    topLeftPosition.plus(new Point(-this.buffer, -this.buffer)),
+                    new Point(canvas.width, canvas.height),
                     DarknessMask.DEPTH - 1  // make sure this goes below the darkness mask
                 )
             ]
