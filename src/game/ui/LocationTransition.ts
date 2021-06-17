@@ -1,7 +1,6 @@
 import { Component } from "../../engine/Component"
 import { UpdateData } from "../../engine/Engine"
 import { Point } from "../../engine/Point"
-import { measure } from "../../engine/Profiler"
 import { ImageRender } from "../../engine/renderer/ImageRender"
 import { Animator } from "../../engine/util/Animator"
 import { Player } from "../characters/Player"
@@ -111,9 +110,9 @@ export class LocationTransition extends Component {
                 }
             },
             () => {
+                this.animator.paused = true
                 this.animator = null
                 this.render = null
-                console.log("done")
             }
         )
     }
