@@ -1,10 +1,10 @@
 import { Point } from "../../engine/Point"
-import { MapGenerator } from "../world/MapGenerator"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Dude } from "../characters/Dude"
 import { clamp } from "../../engine/util/Utils"
 import { Renderer } from "../../engine/renderer/Renderer"
 import { Singletons } from "../Singletons"
+import { LocationManager } from "../world/LocationManager"
 
 export class Camera {
 
@@ -48,13 +48,15 @@ export class Camera {
     }
 
     getUpdatedPosition(elapsedTimeMillis: number): Point {
-        let xLimit = MapGenerator.MAP_SIZE / 2 * TILE_SIZE - this.dimensions.x/2
-        let yLimit = MapGenerator.MAP_SIZE / 2 * TILE_SIZE - this.dimensions.y/2
+        const mapSize = LocationManager.instance.currentLocation.size
+        let xLimit = mapSize / 2 * TILE_SIZE - this.dimensions.x/2
+        let yLimit = mapSize / 2 * TILE_SIZE - this.dimensions.y/2
         
-        if (this.dimensions.x > MapGenerator.MAP_SIZE * TILE_SIZE) {
+        // TODO: in this case, keep the full map on screen
+        if (this.dimensions.x > mapSize * TILE_SIZE) {
             xLimit = Number.MAX_SAFE_INTEGER
         }
-        if (this.dimensions.y > MapGenerator.MAP_SIZE * TILE_SIZE) {
+        if (this.dimensions.y > mapSize * TILE_SIZE) {
             yLimit = Number.MAX_SAFE_INTEGER
         }
 

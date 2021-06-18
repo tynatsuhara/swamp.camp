@@ -134,7 +134,7 @@ export class StaffWeapon extends Weapon {
 
     private doAttack() {
         this.entity.addComponent(
-            Tilesets.instance.explosions.getMeteorAnimation(this.attackPosition, () => {
+            Tilesets.instance.explosions.getMeteorAnimation(this.attackPosition, 70 * TILE_SIZE, () => {
                 const attackDistance = TILE_SIZE * 1.5
 
                 // everyone can get damaged by explosions, friend or foe

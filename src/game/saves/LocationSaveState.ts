@@ -12,4 +12,5 @@ export class LocationSaveState {
     staticSprites: object[]
     isInterior: boolean
     allowPlacing: boolean
+    size?: number
 }

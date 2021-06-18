@@ -1,10 +1,8 @@
 import { Component } from "../../engine/Component"
 import { Point } from "../../engine/Point"
 import { ImageRender } from "../../engine/renderer/ImageRender"
-import { TILE_SIZE } from "../graphics/Tilesets"
 import { Color, getRGB } from "../ui/Color"
 import { DarknessMask } from "./DarknessMask"
-import { MapGenerator } from "./MapGenerator"
 
 export class Vignette extends Component {
 
@@ -29,7 +27,7 @@ export class Vignette extends Component {
             
             for (let ring = 0; ring < this.rings; ring++) {
                 const n = 4  // superellipse n parameter
-                const radius = MapGenerator.MAP_SIZE/2 * TILE_SIZE - ((this.rings - ring - 1) * this.ringWidth)
+                const radius = diameter/2 - ((this.rings - ring - 1) * this.ringWidth)
                 const r = Math.pow(radius, n)
 
                 const colorPx = (x: number, y: number) => {

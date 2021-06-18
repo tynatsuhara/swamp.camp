@@ -1,4 +1,6 @@
+import { Point } from "../../engine/Point"
 import { WorldAudioContext } from "../audio/WorldAudioContext"
+import { TILE_SIZE } from "../graphics/Tilesets"
 import { LocationManagerSaveState } from "../saves/LocationManagerSaveState"
 import { Singletons } from "../Singletons"
 import { WorldLocation } from "./WorldLocation"
@@ -62,5 +64,11 @@ export class LocationManager {
             this.locations.set(l.uuid, loadedLocation)
         })
         this.currentLocation = this.locations.get(saveState.currentLocationUUID)
+    }
+
+    exteriorEntrancePosition() {
+        return new Point(1, 1).times(this.exterior().size/2 * TILE_SIZE)
+                .plusX(TILE_SIZE * 2)
+                .plusY(-TILE_SIZE * 25)
     }
 }

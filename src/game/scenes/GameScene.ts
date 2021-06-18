@@ -48,7 +48,7 @@ export class GameScene {
         // World must be initialized before we do anything else
         MapGenerator.instance.generateExterior()
 
-        const playerStartPos = MapGenerator.ENTER_LAND_POS
+        const playerStartPos = LocationManager.instance.exteriorEntrancePosition()
         const playerDude = DudeFactory.instance.new(DudeType.PLAYER, playerStartPos)
 
         // Camera.instance.clearPosition()

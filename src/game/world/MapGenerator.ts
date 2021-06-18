@@ -17,10 +17,9 @@ export class MapGenerator {
         return Singletons.getOrCreate(MapGenerator)
     }
 
-    static readonly MAP_SIZE = 70  // TODO increase + maybe tie to save
-    static readonly ENTER_LAND_POS = new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE).plusY(-TILE_SIZE * 25).plusX(TILE_SIZE * 2)
+    private static readonly MAP_SIZE = 70
 
-    private readonly location = LocationManager.instance.add(new WorldLocation(false, true))
+    private readonly location = LocationManager.instance.add(new WorldLocation(false, true, MapGenerator.MAP_SIZE))
     private readonly tentPos = new Point(-3, -3)
 
     generateExterior(): WorldLocation {
@@ -47,17 +46,8 @@ export class MapGenerator {
 
     private static VIGNETTE_EDGE = MapGenerator.MAP_SIZE/2 - 1
     private static TREELINE = MapGenerator.VIGNETTE_EDGE - 8
-    static GOOD_FLEEING_SPOTS: Point[] = (() => {
-        const possibilities = []
-        for (let x = -MapGenerator.MAP_SIZE/2 + MapGenerator.TREELINE; x < MapGenerator.MAP_SIZE/2 - MapGenerator.TREELINE; x++) {
-            for (let y = -MapGenerator.MAP_SIZE/2 + MapGenerator.TREELINE; y < MapGenerator.MAP_SIZE/2 - MapGenerator.TREELINE; y++) {
-                possibilities.push(new Point(x, y))
-            }
-        }
-        return possibilities
-    })()
 
-    spawnTreesAtEdge() {
+    private spawnTreesAtEdge() {
         const possibilities = []
         for (let x = -MapGenerator.MAP_SIZE/2; x < MapGenerator.MAP_SIZE/2; x++) {
             for (let y = -MapGenerator.MAP_SIZE/2; y < MapGenerator.MAP_SIZE/2; y++) {
@@ -77,7 +67,7 @@ export class MapGenerator {
         possibilities.forEach(pt => this.spawnTree(pt))
     }
 
-    spawnTrees() {
+    private spawnTrees() {
         const trees = Math.random() * 500 + 500
         for (let i = 0; i < trees; i++) {
             const pt = new Point(
@@ -96,7 +86,7 @@ export class MapGenerator {
         )
     }
 
-    clearPathToCenter() {
+    private clearPathToCenter() {
         const typesToClear = [ElementType.ROCK, ElementType.TREE_POINTY, ElementType.TREE_ROUND]
 
         // clear in corner
@@ -187,7 +177,7 @@ export class MapGenerator {
     //     path.forEach(pt => this.location.addGroundElement(GroundType.PATH, pt))
     // }
 
-    placeGrass() {
+    private placeGrass() {
         // const levels = this.noise()
 
         for (let i = -MapGenerator.MAP_SIZE/2; i < MapGenerator.MAP_SIZE/2; i++) {

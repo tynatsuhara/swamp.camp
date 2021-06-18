@@ -20,7 +20,6 @@ import { ElementUtils } from "./elements/ElementUtils"
 import { Ground, GroundType, SavedGround } from "./ground/Ground"
 import { GroundComponent } from "./ground/GroundComponent"
 import { LocationManager } from "./LocationManager"
-import { MapGenerator } from "./MapGenerator"
 import { StaticSprites } from "./StaticSprites"
 import { Teleporter, TeleporterPrefix, Teleporters, TeleporterSound } from "./Teleporter"
 
@@ -46,10 +45,17 @@ export class WorldLocation {
     private barriers: Entity[] = []
     readonly sprites = new Entity().addComponent(new StaticSprites())
 
+    readonly size: number  // tile dimensions (square)
     readonly isInterior: boolean
     readonly allowPlacing: boolean
 
-    constructor(isInterior: boolean, allowPlacing: boolean) {
+    /**
+     * @param isInterior if it's an inside location
+     * @param allowPlacing if the user can place elements here
+     * @param size the size of the location in tiles (square), can be omitted for interiors
+     */
+    constructor(isInterior: boolean, allowPlacing: boolean, size?: number) {
+        this.size = size
         this.isInterior = isInterior
         this.allowPlacing = allowPlacing
     }
@@ -125,10 +131,29 @@ export class WorldLocation {
         if (this.isInterior) {
             return this.ground.keys()
         }
-        return MapGenerator.GOOD_FLEEING_SPOTS
+        return this.exteriorFleeingSpots()
+    }
+
+    private exteriorFleeingSpotsCache: Point[]
+    private exteriorFleeingSpots() {
+        if (this.exteriorFleeingSpotsCache) {
+            return this.exteriorFleeingSpotsCache
+        }
+        const range = this.size/2 - 8  // don't run right to the edge of the map
+        const possibilities = []
+        for (let x = -range; x < range; x++) {
+            for (let y = -range; y < range; y++) {
+                possibilities.push(new Point(x, y))
+            }
+        }
+        this.exteriorFleeingSpotsCache = possibilities
+        return possibilities
     }
 
     findPath(tileStart: Point, tileEnd: Point, heuristic: (pt: Point, goal: Point) => number, shortCircuit: number) {
+        const buffer = 5
+        const range = this.size/2 + buffer
+        
         return this.occupied.findPath(tileStart, tileEnd, {
             heuristic: (pt) => heuristic(pt, tileEnd),
             isOccupied: (pt) => {
@@ -139,9 +164,7 @@ export class WorldLocation {
                 if (pt.equals(tileStart) || pt.equals(tileEnd)) {
                     return false
                 }
-                const buffer = 5
-                if (pt.x < -MapGenerator.MAP_SIZE/2 - buffer || pt.x > MapGenerator.MAP_SIZE/2 + buffer
-                        || pt.y < -MapGenerator.MAP_SIZE/2 - buffer || pt.y > MapGenerator.MAP_SIZE/2 + buffer) {
+                if (pt.x < -range || pt.x > range || pt.y < -range || pt.y > range) {
                     return true
                 }
                 return !!this.occupied.get(pt)
@@ -258,6 +281,7 @@ export class WorldLocation {
             staticSprites: this.sprites.toJson(),
             isInterior: this.isInterior,
             allowPlacing: this.allowPlacing,
+            size: this.size,
         }
     }
 
@@ -286,7 +310,15 @@ export class WorldLocation {
     }
 
     static load(saveState: LocationSaveState): WorldLocation {
-        const n = new WorldLocation(saveState.isInterior, saveState.allowPlacing)
+        // previously we did not save location size
+        const size = saveState.size || (saveState.isInterior ? null : 70)
+
+        const n = new WorldLocation(
+            saveState.isInterior, 
+            saveState.allowPlacing, 
+            size
+        )
+
         n._uuid = saveState.uuid
         n.teleporters = saveState.teleporters
         n.barriers = saveState.barriers.map(b => Barrier.fromJson(b))
@@ -295,6 +327,7 @@ export class WorldLocation {
         saveState.ground.forEach(el => n.setGroundElement(el.type, Point.fromString(el.pos), el.obj))
         saveState.dudes.forEach(d => DudeFactory.instance.load(d, n))
         n.toggleAudio(false)
+        
         return n
     }
 }

@@ -5,10 +5,7 @@ import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
 import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
 import { TileTransform } from "../../engine/tiles/TileTransform"
-import { Animator } from "../../engine/util/Animator"
 import { Lists } from "../../engine/util/Lists"
-import { MapGenerator } from "../world/MapGenerator"
-import { TILE_SIZE } from "./Tilesets"
 
 export class ExplosionTileset {
     /**
@@ -38,13 +35,16 @@ export class ExplosionTileset {
         return component
     }
 
-    getMeteorAnimation(goal: Point, onFinish: () => void): Component {
+    getMeteorAnimation(goal: Point, startDistance: number, onFinish: () => void): Component {
         const size = 15
         const col = 641
         const row = 79
         const speed = 1.2
-        const startingPos = goal.plus(new Point(size, size).div(-2)).plusY(-TILE_SIZE * MapGenerator.MAP_SIZE)
-
+        const startingPos = new Point(
+            goal.x - size/2,  // center the sprite over the goal
+            goal.y - startDistance
+        )
+        
         const component = this.getTileAt(new Point(col, row), size)
                 .toComponent(TileTransform.new({ 
                     position: startingPos, 

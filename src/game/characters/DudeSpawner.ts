@@ -8,7 +8,6 @@ import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { DarknessMask } from "../world/DarknessMask"
 import { LightManager } from "../world/LightManager"
 import { LocationManager } from "../world/LocationManager"
-import { MapGenerator } from "../world/MapGenerator"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
 import { DudeFaction, DudeFactory, DudeType } from "./DudeFactory"
@@ -51,7 +50,7 @@ export class DudeSpawner extends Component {
         const goalDemonCount = Math.random() * 5
 
         if (demons.length < goalDemonCount) {
-            const openPoints = MapGenerator.GOOD_FLEEING_SPOTS.filter(pt => 
+            const openPoints = l.getGroundSpots().filter(pt => 
                 !l.isOccupied(pt) && LightManager.instance.isTotalDarkness(pt.times(TILE_SIZE)))
 
             for (let i = 0; i < Math.min(openPoints.length, goalDemonCount - demons.length); i++) {
@@ -67,7 +66,7 @@ export class DudeSpawner extends Component {
             text: "ORC ATTACK!",
             icon: "sword",
         }), 6500)
-        const spawnPos = new Point(1, 1).times(MapGenerator.MAP_SIZE/2 * TILE_SIZE)
+        const spawnPos = new Point(1, 1).times(LocationManager.instance.currentLocation.size * TILE_SIZE)
         Lists.range(0, 5 + Math.random() * 10).forEach(() => DudeFactory.instance.new(DudeType.ORC_WARRIOR, spawnPos))
         Lists.range(0, 1 + Math.random() * 4).forEach(() => DudeFactory.instance.new(DudeType.ORC_BRUTE, spawnPos))
         Lists.range(0, 1 + Math.random() * 4).forEach(() => DudeFactory.instance.new(DudeType.ORC_SHAMAN, spawnPos))

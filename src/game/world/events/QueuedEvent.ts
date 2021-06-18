@@ -1,5 +1,4 @@
 import { DudeFactory, DudeType } from "../../characters/DudeFactory"
-import { MapGenerator } from "../MapGenerator"
 import { LocationManager } from "../LocationManager"
 import { NPCSchedules } from "../../characters/NPCSchedule"
 import { NPC } from "../../characters/NPC"
@@ -37,12 +36,16 @@ export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => 
     },
 
     [QueuedEventType.HERALD_ARRIVAL]: () => {
-        DudeFactory.instance.new(DudeType.HERALD, MapGenerator.ENTER_LAND_POS, LocationManager.instance.exterior())
+        DudeFactory.instance.new(
+            DudeType.HERALD, 
+            LocationManager.instance.exteriorEntrancePosition(), 
+            LocationManager.instance.exterior()
+        )
         NotificationDisplay.instance.push(Notifications.NEW_VILLAGER)
     },
 
     [QueuedEventType.HERALD_DEPARTURE]: (data) => {
-        const goalPosition = MapGenerator.ENTER_LAND_POS
+        const goalPosition = LocationManager.instance.exteriorEntrancePosition()
         const berto = LocationManager.instance.exterior().getDude(DudeType.HERALD)
         if (!berto) {
             return
@@ -81,7 +84,11 @@ export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => 
         berto.entity.getComponent(NPC).setSchedule(data.normalSchedule)
 
         // spawn villager and assign him a home
-        const villager = DudeFactory.instance.new(DudeType.VILLAGER, MapGenerator.ENTER_LAND_POS, LocationManager.instance.exterior())
+        const villager = DudeFactory.instance.new(
+            DudeType.VILLAGER, 
+            LocationManager.instance.exteriorEntrancePosition(), 
+            LocationManager.instance.exterior()
+        )
         const house = LocationManager.instance.exterior().getElementsOfType(ElementType.HOUSE)
                 .map(e => e.entity.getComponent(House))
                 .filter(house => house.isResidentPending())[0]

@@ -7,7 +7,6 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { DarknessMask } from "./DarknessMask"
 import { LocationManager } from "./LocationManager"
-import { MapGenerator } from "./MapGenerator"
 import { TimeUnit } from "./TimeUnit"
 import { Vignette } from "./Vignette"
 import { WorldLocation } from "./WorldLocation"
@@ -22,10 +21,7 @@ export class LightManager {
     private lightTiles: Map<WorldLocation, Map<any, [Point, number]>> = new Map<WorldLocation, Map<any, [Point, number]>>()
     private mask = new DarknessMask(true)
 
-    private vignetteEntity = new Entity([new Vignette(
-        new Point(1, 1).times(-MapGenerator.MAP_SIZE/2 * TILE_SIZE), 
-        MapGenerator.MAP_SIZE * TILE_SIZE
-    )])
+    private vignette: Vignette
 
     /**
     * @param key the unique key for location, will overwrite that light source if it already exists
@@ -81,6 +77,16 @@ export class LightManager {
             }
         }
 
+        // lazy load the vignette
+        if (!this.vignette) {
+            this.vignette = new Entity().addComponent(
+                new Vignette(
+                    new Point(1, 1).times(-LocationManager.instance.exterior().size/2 * TILE_SIZE), 
+                    LocationManager.instance.exterior().size * TILE_SIZE
+                )
+            )
+        }
+
         const locationLightGrid = this.lightTiles.get(location)
         if (!locationLightGrid) {
             return
@@ -98,7 +104,7 @@ export class LightManager {
 
         const location = LocationManager.instance.currentLocation
         if (!location.isInterior) {
-            result.push(this.vignetteEntity)
+            result.push(this.vignette?.entity)
         }
         
         return result
