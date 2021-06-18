@@ -56,7 +56,7 @@ export class DeathCutscene extends Component {
     }
 
     respawn() {
-        const respawnTime = DarknessMask.SUNRISE_START + TimeUnit.MINUTE * 5
+        const respawnTime = DarknessMask.SUNRISE_START + TimeUnit.MINUTE * 10
         const timeUntilRespawn = WorldTime.instance.tomorrow(respawnTime) - WorldTime.instance.time
         WorldTime.instance.fastForward(timeUntilRespawn)
 
