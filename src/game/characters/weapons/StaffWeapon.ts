@@ -122,10 +122,12 @@ export class StaffWeapon extends Weapon {
                 )
             }, 
             () => {
-                this.attackPosition = this.guessAttackPos()
                 this.animator = null
                 this.currentAnimationFrame = 0
-                this.doAttack();
+                this.attackPosition = this.guessAttackPos()
+                if (this.attackPosition) {
+                    this.doAttack();
+                }
             }
         )
     }
