@@ -19,10 +19,11 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     [InputKey.QUOTE, "trigger orc raid", () => DudeSpawner.instance.spawnOrcs()],
     [InputKey.COMMA, "toggle ground path", (input) => {
         const mouseTilePos = pixelPtToTilePt(input.mousePos)
-        if (LocationManager.instance.currentLocation.ground.get(mouseTilePos)?.type === GroundType.PATH) {
-            LocationManager.instance.currentLocation.addGroundElement(GroundType.GRASS, mouseTilePos)
-        } else {
-            LocationManager.instance.currentLocation.addGroundElement(GroundType.PATH, mouseTilePos)
+        const currentType = LocationManager.instance.currentLocation.ground.get(mouseTilePos)?.type
+        if (currentType === GroundType.PATH) {
+            LocationManager.instance.currentLocation.setGroundElement(GroundType.GRASS, mouseTilePos)
+        } else if (currentType === GroundType.GRASS) {
+            LocationManager.instance.currentLocation.setGroundElement(GroundType.PATH, mouseTilePos)
         }
     }],
     [InputKey.PERIOD, "delete hovered element", (input) => LocationManager.instance.currentLocation.removeElementAt(pixelPtToTilePt(input.mousePos))],

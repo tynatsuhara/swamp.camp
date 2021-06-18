@@ -44,7 +44,7 @@ export const makeTentInterior = (outside: WorldLocation, color: TentColor): Worl
     
     NineSlice.nineSliceForEach(
         floorDimensions, 
-        (pt, index) => l.addGroundElement(GroundType.BASIC_NINE_SLICE, pt, { k: groundType, i: index })
+        (pt, index) => l.setGroundElement(GroundType.BASIC_NINE_SLICE, pt, { k: groundType, i: index })
     )
 
     const addWallSprite = (key: string, pt: Point) => {

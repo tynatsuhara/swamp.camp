@@ -43,11 +43,8 @@ export const makeGrass = (d: MakeGroundFuncData): GroundComponent => {
 
 class TallGrass extends Component {
 
-    private tilePos: Point
-
     constructor(tilePos: Point) {
         super()
-        this.tilePos = tilePos
 
         const offset = new Point(
             -6 + Math.round(Math.random() * 11), 
@@ -60,11 +57,5 @@ class TallGrass extends Component {
                 .toImageRender(new TileTransform(grassPos, null, 0, Math.random() > .5, false, grassPos.y + TILE_SIZE))
 
         this.getRenderMethods = () => [render]
-    }
-
-    update() {
-        if (LocationManager.instance.currentLocation.isOccupied(this.tilePos)) {
-            this.delete()
-        }
     }
 }

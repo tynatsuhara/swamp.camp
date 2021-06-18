@@ -37,7 +37,7 @@ export const makeHouseInterior = (outside: WorldLocation): WorldLocation => {
 
     for (let x = 0; x < dimensions.x; x++) {
         for (let y = 0; y < dimensions.y; y++) {
-            l.addGroundElement(GroundType.BASIC, new Point(x, y), { k: `hardwood${woodType}` })
+            l.setGroundElement(GroundType.BASIC, new Point(x, y), { k: `hardwood${woodType}` })
         }
         let topAndBottomTiles = ["wallCenter", "wallCenter"]
         if (x === 0) {

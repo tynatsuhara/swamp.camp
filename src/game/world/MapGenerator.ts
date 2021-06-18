@@ -199,9 +199,9 @@ export class MapGenerator {
                         // .map(pt => levels.get(pt))
                         // .some(level => level < thisLevel)
                 if (isLedge) {
-                    this.location.addGroundElement(GroundType.LEDGE, pt)
+                    this.location.setGroundElement(GroundType.LEDGE, pt)
                 } else {
-                    this.location.addGroundElement(GroundType.GRASS, pt)
+                    this.location.setGroundElement(GroundType.GRASS, pt)
                 }
             }
         }

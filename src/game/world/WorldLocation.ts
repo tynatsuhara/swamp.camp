@@ -54,7 +54,8 @@ export class WorldLocation {
         this.allowPlacing = allowPlacing
     }
 
-    addGroundElement(type: GroundType, pos: Point, data: object = {}): GroundComponent {
+    setGroundElement(type: GroundType, pos: Point, data: object = {}): GroundComponent {
+        this.ground.get(pos)?.entity.selfDestruct()
         const groundComponent = Ground.instance.make(type, this, pos, data)
         this.ground.set(pos, groundComponent)
         return groundComponent
@@ -291,7 +292,7 @@ export class WorldLocation {
         n.barriers = saveState.barriers.map(b => Barrier.fromJson(b))
         n.sprites.fromJson(saveState.staticSprites)
         saveState.elements.forEach(el => n.addElement(el.type, Point.fromString(el.pos), el.obj))
-        saveState.ground.forEach(el => n.addGroundElement(el.type, Point.fromString(el.pos), el.obj))
+        saveState.ground.forEach(el => n.setGroundElement(el.type, Point.fromString(el.pos), el.obj))
         saveState.dudes.forEach(d => DudeFactory.instance.load(d, n))
         n.toggleAudio(false)
         return n
