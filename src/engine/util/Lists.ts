@@ -78,6 +78,6 @@ export const Lists = {
     },
 
     last<T>(list: T[]): T {
-        return list.length > 0 ? list[list.length-1] : undefined
+        return list?.length > 0 ? list[list.length-1] : undefined
     },
 }
