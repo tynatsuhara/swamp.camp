@@ -1,3 +1,4 @@
+import { Lists } from "../../engine/util/Lists"
 import { AudioUtils } from "./AudioUtils"
 
 export class AudioQueue {
@@ -9,6 +10,10 @@ export class AudioQueue {
     private files: string[]
     private multiplier: number
 
+    private get fileName() {
+        return Lists.last(this.currentAudio?.src.split("/"))
+    }
+
     constructor(
         files: string[], 
         multiplier: number = 1,
@@ -19,21 +24,21 @@ export class AudioQueue {
     }
 
     fadeOut(): Promise<void> {
-        console.log(`fading out ${this.currentAudio?.src}`)
+        console.log(`fading out ${this.fileName}`)
         return AudioUtils.adjustVolume(this.fadeVolume, 0, v => {
             this.setFadeVolume(v)
             if (v === 0) {
-                console.log(`faded out ${this.currentAudio?.src}`)
+                console.log(`faded out ${this.fileName}`)
             }
         })
     }
 
     fadeIn(): Promise<void> {
-        console.log(`fading in ${this.currentAudio?.src}`)
+        console.log(`fading in ${this.fileName}`)
         return AudioUtils.adjustVolume(this.fadeVolume, 1, v => {
             this.setFadeVolume(v)
             if (v === 1) {
-                console.log(`faded in ${this.currentAudio?.src}`)
+                console.log(`faded in ${this.fileName}`)
             }
         })
     }
