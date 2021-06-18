@@ -24,23 +24,40 @@ export class Vignette extends Component {
             context.clearRect(this.buffer, this.buffer, diameter, diameter)
             const imageData = context.getImageData(0, 0, diameter, diameter)
             const rgb = getRGB(Color.BLACK)
+
+            const edge = this.rings * (this.ringWidth * 1.5)
             
             for (let ring = 0; ring < this.rings; ring++) {
                 const n = 4  // superellipse n parameter
                 const radius = MapGenerator.MAP_SIZE/2 * TILE_SIZE - ((this.rings - ring - 1) * this.ringWidth)
                 const r = Math.pow(radius, n)
 
+                const colorPx = (x: number, y: number) => {
+                    const i = (x + y * diameter) * 4
+                    const xa = Math.pow(x - diameter/2, n)
+                    const yb = Math.pow(y - diameter/2, n)
+                    if (xa + yb > r) {
+                        imageData.data[i+0] = rgb[0]
+                        imageData.data[i+1] = rgb[1]
+                        imageData.data[i+2] = rgb[2]
+                        imageData.data[i+3] = 255 * (ring+1)/this.rings * .95
+                    }
+                }
+
                 for (let x = 0; x < diameter; x++) {
-                    for (let y = 0; y < diameter; y++) {
-                        const i = (x + y * diameter) * 4
-                        const xa = Math.pow(x - diameter/2, n)
-                        const yb = Math.pow(y - diameter/2, n)
-                        if (xa + yb > r) {
-                            imageData.data[i+0] = rgb[0]
-                            imageData.data[i+1] = rgb[1]
-                            imageData.data[i+2] = rgb[2]
-                            imageData.data[i+3] = 255 * (ring+1)/this.rings * .95
-                        }
+                    for (let y = 0; y < edge; y++) {
+                        colorPx(x, y)
+                    }
+                    for (let y = diameter-edge; y < diameter; y++) {
+                        colorPx(x, y)
+                    }
+                }
+                for (let y = 0; y < diameter; y++) {
+                    for (let x = 0; x < edge; x++) {
+                        colorPx(x, y)
+                    }
+                    for (let x = diameter-edge; x < diameter; x++) {
+                        colorPx(x, y)
                     }
                 }
             }
