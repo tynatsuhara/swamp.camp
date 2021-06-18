@@ -1,3 +1,4 @@
+import { Component } from "../../engine/Component"
 import { Entity } from "../../engine/Entity"
 import { Point } from "../../engine/Point"
 import { Player } from "../characters/Player"
@@ -12,7 +13,7 @@ import { Vignette } from "./Vignette"
 import { WorldLocation } from "./WorldLocation"
 import { WorldTime } from "./WorldTime"
 
-export class LightManager {
+export class LightManager extends Component {
 
     static get instance() {
         return Singletons.getOrCreate(LightManager)
@@ -64,6 +65,16 @@ export class LightManager {
     }
 
     private render() {
+        // lazy load the vignette
+        if (!this.vignette) {
+            this.vignette = new Entity().addComponent(
+                new Vignette(
+                    new Point(1, 1).times(-LocationManager.instance.exterior().size/2 * TILE_SIZE), 
+                    LocationManager.instance.exterior().size * TILE_SIZE
+                )
+            )
+        }
+
         const location = LocationManager.instance.currentLocation
         this.mask.reset(WorldTime.instance.time)
         
@@ -77,18 +88,9 @@ export class LightManager {
             }
         }
 
-        // lazy load the vignette
-        if (!this.vignette) {
-            this.vignette = new Entity().addComponent(
-                new Vignette(
-                    new Point(1, 1).times(-LocationManager.instance.exterior().size/2 * TILE_SIZE), 
-                    LocationManager.instance.exterior().size * TILE_SIZE
-                )
-            )
-        }
-
         const locationLightGrid = this.lightTiles.get(location)
         if (!locationLightGrid) {
+            console.log("skip")
             return
         }
 
@@ -97,10 +99,22 @@ export class LightManager {
         })
     }
 
-    getEntities(): Entity[] {
-        this.render()
+    awake() {
+        this.update()
+    }
 
-        const result = [this.mask.render(Camera.instance.dimensions, Camera.instance.position)]
+    update() {
+        this.render()
+        this.renderedEntity = this.mask.render(Camera.instance.dimensions, Camera.instance.position)
+    }
+
+    private renderedEntity: Entity
+
+    getEntities(): Entity[] {
+        const result = [
+            new Entity([this]),
+            this.renderedEntity
+        ]
 
         const location = LocationManager.instance.currentLocation
         if (!location.isInterior) {

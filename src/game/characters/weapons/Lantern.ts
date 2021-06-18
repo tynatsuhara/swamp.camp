@@ -1,3 +1,4 @@
+import { AwakeData } from "../../../engine/Engine"
 import { Point } from "../../../engine/Point"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { LightManager } from "../../world/LightManager"
@@ -14,6 +15,11 @@ export class Lantern extends Shield {
 
     constructor() {
         super(ShieldType.LANTERN, "tool_lantern")
+    }
+
+    awake(awakeData: AwakeData) {
+        super.awake(awakeData)
+        this.update()  // set up the light
     }
 
     update() {
@@ -42,7 +48,7 @@ export class Lantern extends Shield {
 
     toggleOnBack() {}
 
-    block(blockingActive: boolean) {}
+    block() {}
 
     isBlocking() {
         return false

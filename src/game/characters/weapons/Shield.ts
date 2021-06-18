@@ -34,7 +34,7 @@ export class Shield extends Component {
     constructor(type: ShieldType, spriteId: string) {
         super()
         this.type = type
-        this.start = () => {
+        this.awake = () => {
             this.dude = this.entity.getComponent(Dude)
             this.sprite = Tilesets.instance.dungeonCharacters.getTileSource(spriteId)
             this.transform = TileTransform.new({dimensions: this.sprite.dimensions}).relativeTo(this.dude.animation.transform)
