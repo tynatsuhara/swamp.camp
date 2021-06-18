@@ -52,12 +52,11 @@ export class Camera {
         let xLimit = mapSize / 2 * TILE_SIZE - this.dimensions.x/2
         let yLimit = mapSize / 2 * TILE_SIZE - this.dimensions.y/2
         
-        // TODO: in this case, keep the full map on screen
         if (this.dimensions.x > mapSize * TILE_SIZE) {
-            xLimit = Number.MAX_SAFE_INTEGER
+            xLimit = mapSize
         }
         if (this.dimensions.y > mapSize * TILE_SIZE) {
-            yLimit = Number.MAX_SAFE_INTEGER
+            yLimit = mapSize
         }
 
         const trackedPoint = this.dudeTarget?.position ?? this.pointTarget
