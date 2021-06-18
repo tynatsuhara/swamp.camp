@@ -2,6 +2,7 @@ import { assets } from "../../engine/Assets"
 import { Lists } from "../../engine/util/Lists"
 import { Player } from "../characters/Player"
 import { pixelPtToTilePt } from "../graphics/Tilesets"
+import { Settings } from "../Settings"
 import { GroundType } from "../world/ground/Ground"
 import { LocationManager } from "../world/LocationManager"
 
@@ -39,7 +40,7 @@ export class StepSounds {
             StepSounds.footstep = assets.getAudioByFileName(sound)
             StepSounds.footstep.oncanplaythrough = () => {
                 StepSounds.footstep.play()
-                StepSounds.footstep.volume = Math.min(1, volume * volumeMultiplier)
+                StepSounds.footstep.volume = Math.min(1, volume * volumeMultiplier * Settings.getSoundVolume())
             }
         }
     }
