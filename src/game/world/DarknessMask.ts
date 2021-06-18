@@ -208,13 +208,19 @@ export class DarknessMask {
     /**
      * Renders the darkness mask. This can't be called as a one-off 
      * because circle image bitmaps render asyncronously.
+     * @returns null if the darkness mask wasn't drawn yet
      */
     render(dimensions: Point, offset: Point): Entity {
         // prevent tint not extending to the edge
         const _dimensions = dimensions.plus(new Point(1, 1))
 
         if (this.darkness > 0) {
-            this.circleQueue.forEach(circle => this.drawCircleToCanvas(...circle))
+            const drawn = this.circleQueue
+                    .map(circle => this.drawCircleToCanvas(...circle))
+                    .every(result => !!result)
+            if (!drawn) {
+                return null
+            }
             // overlay the time-specific color
             this.context.globalCompositeOperation = "source-in"
             this.context.fillStyle = this.color
@@ -236,7 +242,7 @@ export class DarknessMask {
         const circleBitmap = DarknessMask.circleCache.get(diameter)
         if (!circleBitmap) {
             this.createImageBitmap(diameter)
-            return
+            return false
         }
 
         // Erase the circle
@@ -250,6 +256,8 @@ export class DarknessMask {
             this.context.globalCompositeOperation = "source-over"
             this.context.drawImage(circleBitmap, position.x, position.y)
         }
+        
+        return true
     }
 
     private createImageBitmap(diameter: number) {

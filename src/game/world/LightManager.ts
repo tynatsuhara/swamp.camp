@@ -90,7 +90,6 @@ export class LightManager extends Component {
 
         const locationLightGrid = this.lightTiles.get(location)
         if (!locationLightGrid) {
-            console.log("skip")
             return
         }
 

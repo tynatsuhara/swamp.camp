@@ -119,14 +119,21 @@ export class MainMenuScene {
             UIStateManager.UI_SPRITE_DEPTH
         ))])
 
-        const sceneEntities = this.getSceneEntities(knightPos, dimensions)
+        // This will set up the darkness mask
+        const sceneEntities = this.getSceneEntities(knightPos)
         this.lastDimensions = updateViewsContext.dimensions
+
+        const darknessEntity = this.darkness.render(dimensions, Point.ZERO)
+        if (!darknessEntity) {
+            // darkness bitmaps haven't processed yet, wait to draw
+            return []
+        }
 
         // by default, render the title and the scene with the knight
         const entities = [
             title,
             this.knight.entity, 
-            this.darkness.render(dimensions, Point.ZERO),
+            darknessEntity,
             ...sceneEntities
         ]
 
@@ -225,7 +232,7 @@ export class MainMenuScene {
         () => Math.random() < .65 ? Math.floor(Math.random() * 4) : 0
     )
 
-    private getSceneEntities(offset: Point, dimensions: Point) {
+    private getSceneEntities(offset: Point) {
         const components: Component[] = []
 
         // grass
