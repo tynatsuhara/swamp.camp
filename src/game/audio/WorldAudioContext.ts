@@ -6,7 +6,7 @@ export class WorldAudioContext {
     static readonly instance = new WorldAudioContext()
     private readonly listeners: ((ctx: WorldAudioContext) => void)[] = [
         Ambiance.determineAmbiance,
-        // Music.determineMusic,
+        Music.determineMusic,
     ]
 
     private _time: number

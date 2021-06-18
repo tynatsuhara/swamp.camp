@@ -1,5 +1,7 @@
 import { Lists } from "../../engine/util/Lists"
+import { TimeUnit } from "../world/TimeUnit"
 import { AudioQueue } from "./AudioQueue"
+import { WorldAudioContext } from "./WorldAudioContext"
 
 /**
  * Used for background soundtrack and even-based music
@@ -41,22 +43,39 @@ export class Music {
         "POL-battle-march-short.wav",
     )
 
-    static play(music: AudioQueue) {
-        this.currentMusic?.pause()
-        this.currentMusic = music
-        this.currentMusic.setVolume(this.getVolume())
-        this.currentMusic.play()
+    static determineMusic(ctx: WorldAudioContext) {
+        // fade out at night
+        const timeOfDay = ctx.time % TimeUnit.DAY
+        const daytimeFadeInTime = TimeUnit.HOUR * 5
+        const daytimeFadeOutTime = TimeUnit.HOUR * 20
 
-        window['currentMusic'] = this.currentMusic
+        if (timeOfDay > daytimeFadeOutTime || timeOfDay < daytimeFadeInTime) {
+            Music.play(Music.NIGHT_MUSIC)
+        } else if (timeOfDay > daytimeFadeInTime) {
+            Music.play(Music.DAY_MUSIC)
+        }
+    }
+
+    static play(music: AudioQueue) {
+        if (Music.currentMusic === music) {
+            return
+        }
+
+        Music.currentMusic?.pause()
+        Music.currentMusic = music
+        Music.currentMusic.setVolume(Music.getVolume())
+        Music.currentMusic.play()
+
+        window['currentMusic'] = Music.currentMusic
     }
 
     static setVolume(volume: number) {
-        this.volume = volume
-        this.currentMusic?.setVolume(this.getVolume())
+        Music.volume = volume
+        Music.currentMusic?.setVolume(Music.getVolume())
     }
 
     private static getVolume() {
-        return this.volume * this.VOLUME_MULTIPLER
+        return Music.volume * Music.VOLUME_MULTIPLER
     }
 
     private static queue(...files: string[]) {
