@@ -10,7 +10,6 @@ import { Color, getRGB } from "../ui/Color"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Campfire } from "./elements/Campfire"
 import { TimeUnit } from "./TimeUnit"
-import { WorldTime } from "./WorldTime"
 
 /**
  * Renders a mask of darkness with light sources. This is a pure view 
@@ -21,7 +20,8 @@ export class DarknessMask {
     static readonly DEPTH = UIStateManager.UI_SPRITE_DEPTH - 100  // make sure all UI goes on top of light
 
     // no lights should live outside of this range
-    static readonly size = 100 * TILE_SIZE
+    // TODO: max this size dynamic
+    static readonly size = 110 * TILE_SIZE
     static readonly shift = new Point(DarknessMask.size/2, DarknessMask.size/2)
 
     // maps light source key to [position, diameter]
