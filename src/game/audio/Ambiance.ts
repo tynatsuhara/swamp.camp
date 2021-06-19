@@ -3,22 +3,35 @@ import { Player } from "../characters/Player"
 import { Settings } from "../Settings"
 import { LightManager } from "../world/LightManager"
 import { TimeUnit } from "../world/TimeUnit"
-import { AudioQueue } from "./AudioQueue"
+import { AudioPlayer } from "./AudioPlayer"
+import { QueueAudioPlayer } from "./QueueAudioPlayer"
 import { WorldAudioContext } from "./WorldAudioContext"
 
 /**
  * Used for long-running background sounds based on environmental factors
  */
 export class Ambiance {
-    private static currentAmbiance: AudioQueue
+    private static currentAmbiance: AudioPlayer
 
-    private static readonly DAY = new AudioQueue(["audio/ambiance/daytime.ogg"])
-    private static readonly NIGHT = new AudioQueue(
+    private static readonly DAY = new QueueAudioPlayer(
+        "chirpy daytime ambiance",
+        1,
+        ["audio/ambiance/daytime.ogg"],
+        0,  // don't crossfade
+        0,  // no time between end/start
+    )
+    private static readonly NIGHT = new QueueAudioPlayer(
+        "spoopy nighttime ambiance", 
+        .025, 
         Lists.shuffled(Lists.range(1, 9).map(i => `audio/ambiance/yewbic__ambience0${i}.wav`)),
-        .025
+        0,  // don't crossfade
+        30_000
     )
 
     static determineAmbiance(ctx: WorldAudioContext) {
+        // Ambiance volume is closely tied to the world context so we don't update 
+        // the volume from the settings until determineAmbiance is called
+
         const volume = Settings.getSoundVolume() * (ctx.isInterior ? .1 : 1)
         Ambiance.DAY.setVolume(volume)
 
@@ -39,20 +52,20 @@ export class Ambiance {
         window['currentAmbiance'] = Ambiance.currentAmbiance
     }
 
-    private static play(newAmbiance: AudioQueue) {
+    private static play(newAmbiance: AudioPlayer) {
         if (this.currentAmbiance === newAmbiance) {
             return
         }
 
         const startNewAmbiance = () => {
-            newAmbiance.play()
+            newAmbiance.playFromStart()
             newAmbiance.fadeIn()
         }
 
         if (!!this.currentAmbiance) {
             const curr = this.currentAmbiance
             curr.fadeOut().then(() => {
-                curr.pause()
+                curr.stop()
                 startNewAmbiance()
             })
         } else {

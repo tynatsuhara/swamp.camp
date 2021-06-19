@@ -1,6 +1,7 @@
 import { Lists } from "../../engine/util/Lists"
 import { TimeUnit } from "../world/TimeUnit"
-import { AudioQueue } from "./AudioQueue"
+import { AudioPlayer } from "./AudioPlayer"
+import { QueueAudioPlayer } from "./QueueAudioPlayer"
 import { WorldAudioContext } from "./WorldAudioContext"
 
 /**
@@ -8,10 +9,11 @@ import { WorldAudioContext } from "./WorldAudioContext"
  */
 export class Music {
     private static readonly VOLUME_MULTIPLER = 0.1
-    private static currentMusic: AudioQueue
+    private static currentMusic: AudioPlayer
     private static volume = 0
 
     static readonly DAY_MUSIC = Music.queue(
+        "daytime jams",
         "hemlok.mp3",
         "01_ice_hearts_frozen_fire.mp3",
         "02_anthem.mp3",
@@ -25,6 +27,7 @@ export class Music {
     )
 
     static readonly NIGHT_MUSIC = Music.queue(
+        "nighttime tunes",
         "08_hymn_mysterious_caves.mp3",
         "10_sinister_theme.mp3",
         "12_ambient_evil.mp3",
@@ -35,6 +38,7 @@ export class Music {
     )
 
     static readonly BATTLE_MUSIC_LOOPS = Music.queue(
+        "battle bops",
         "09_knights_theme.mp3",
         "14_battle_victory.mp3",
         "19_paladins_theme.mp3",
@@ -54,23 +58,38 @@ export class Music {
         } else if (timeOfDay > daytimeFadeInTime) {
             Music.play(Music.DAY_MUSIC)
         }
-    }
 
-    static play(music: AudioQueue) {
-        if (Music.currentMusic === music) {
-            return
-        }
-
-        Music.currentMusic?.pause()
-        Music.currentMusic = music
-        Music.currentMusic.setVolume(Music.getVolume())
-        Music.currentMusic.play()
+        // TODO: Battle music loops
 
         window['currentMusic'] = Music.currentMusic
     }
 
-    static setVolume(volume: number) {
-        Music.volume = volume
+    static play(music: AudioPlayer) {
+        if (Music.currentMusic === music) {
+            return
+        }
+
+        const startNewMusic = () => {
+            music.setVolume(Music.getVolume())
+            music.playFromStart()
+            music.fadeIn()
+        }
+
+        if (!!this.currentMusic) {
+            const curr = this.currentMusic
+            curr.fadeOut().then(() => {
+                curr.stop()
+                startNewMusic()
+            })
+        } else {
+            startNewMusic()
+        }
+
+        this.currentMusic = music
+    }
+
+    static setVolume(settingsVolumeLevel: number) {
+        Music.volume = settingsVolumeLevel
         Music.currentMusic?.setVolume(Music.getVolume())
     }
 
@@ -78,7 +97,13 @@ export class Music {
         return Music.volume * Music.VOLUME_MULTIPLER
     }
 
-    private static queue(...files: string[]) {
-        return new AudioQueue(Lists.shuffled(files.map(f => `audio/music/${f}`)))
+    private static queue(queueId: string, ...files: string[]) {
+        return new QueueAudioPlayer(
+            queueId,
+            1,
+            Lists.shuffled(files.map(f => `audio/music/${f}`)),
+            10_000,
+            10_000,
+        )
     }
 }

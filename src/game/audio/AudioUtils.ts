@@ -12,6 +12,8 @@ const adjustVolume = (
         return Promise.resolve();
     }
 
+    setVolume(initialVolume)
+
     const ticks = Math.floor(duration / interval);
     let tick = 1;
 
