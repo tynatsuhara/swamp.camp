@@ -1,4 +1,4 @@
-export const enum Color {
+export enum Color {
     BLACK = "#222222",
     DARK_DARK_PINK = "#5f2d56",
     DARK_PINK = "#993970",
@@ -30,6 +30,15 @@ export const enum Color {
     LIGHT_BROWN = "#aa8d7a",
     BROWN = "#775c55",
     DARK_BROWN = "#483b3ai",
+}
+
+const toHex = (c: number) => {
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+}
+
+export const getHex = (r: number, g: number, b: number): String => {
+    return "#" + toHex(r) + toHex(g) + toHex(b);
 }
 
 export const getRGB = (color: Color): number[] => {

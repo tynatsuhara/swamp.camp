@@ -80,4 +80,17 @@ export const Lists = {
     last<T>(list: T[]): T {
         return list?.length > 0 ? list[list.length-1] : undefined
     },
+
+    mode<T>(list: T[]): T {
+        if (!list?.length) {
+            return undefined
+        }
+
+        const freq = new Map<T, number>()
+        for (let item of list) {
+            freq.set(item, 1 + (freq.get(item) || 0))
+        }  
+        
+        return Lists.maxBy(Array.from(freq.entries()), kv => kv[1])[0]
+    }
 }

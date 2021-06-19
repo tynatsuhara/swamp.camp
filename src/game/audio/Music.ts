@@ -60,6 +60,7 @@ export class Music {
         }
 
         // TODO: Battle music loops
+        // TODO: Main menu music
 
         window['currentMusic'] = Music.currentMusic
     }

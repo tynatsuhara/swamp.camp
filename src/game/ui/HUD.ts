@@ -6,6 +6,7 @@ import { Dude } from "../characters/Dude"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { LocationTransition } from "./LocationTransition"
+import { MiniMap } from "./MiniMap"
 import { OffScreenIndicatorManager } from "./OffScreenIndicatorManager"
 
 export class HUD {
@@ -21,6 +22,7 @@ export class HUD {
     private isShowingAutosaveIcon = false
     private readonly offset = new Point(4, 4)
     private readonly offScreenIndicatorManager = new OffScreenIndicatorManager()
+    // private readonly miniMap = new Entity().addComponent(new MiniMap())
 
     // used for determining what should be updated
     private lastHealthCount = 0
@@ -49,6 +51,7 @@ export class HUD {
             this.autosaveComponent.entity, 
             this.locationTransition.entity,
             this.offScreenIndicatorManager.getEntity(),
+            // this.miniMap.entity,
         ]
     }
 

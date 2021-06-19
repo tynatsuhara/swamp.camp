@@ -49,6 +49,10 @@ export class GroundRenderer {
         )
     }
 
+    getCanvas(wl: WorldLocation) {
+        return this.locations.get(LocationManager.instance.currentLocation)
+    }
+
     getEntity(): Entity {
         const wl = LocationManager.instance.currentLocation
         const canvas = this.locations.get(LocationManager.instance.currentLocation)
