@@ -15,7 +15,10 @@ const TALL_GRASS_COUNT = "t"
 export const makeGrass = (d: MakeGroundFuncData): GroundComponent => {
     let tile: StaticTileSource
     const index = d.data[INDEX] ?? (Math.random() < .65 ? Math.floor(Math.random() * 4) : 0)
-    const tallGrass = d.data[TALL_GRASS_COUNT] ?? (Math.random() < 0.05 ? 1 : 0)
+    let tallGrass = d.data[TALL_GRASS_COUNT] ?? (Math.random() < 0.05 ? 1 : 0)
+    if (d.wl.isOccupied(d.pos)) {
+        tallGrass = 0
+    }
 
     if (index > 0) {
         tile = Tilesets.instance.tilemap.getTileAt(new Point(0, index))

@@ -88,8 +88,18 @@ export class WorldLocation {
             throw new Error("constructed element has a null entity")
         }
 
+        // stake the element's claim for the land
         elementPts.forEach(pt => this.elements.set(pt, el))
-        el.occupiedPoints.forEach(pt => this.occupied.set(pt, el))
+
+        // mark points as occupied for pathfinding, etc
+        el.occupiedPoints.forEach(pt => {
+            this.occupied.set(pt, el)
+            // reset the ground in order to handle things like flattening tall grass
+            const groundData = this.ground.get(pt)
+            if (groundData) {
+                this.setGroundElement(groundData.type, pt, groundData.save())
+            }
+        })
         
         return el
     }
