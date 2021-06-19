@@ -10,4 +10,5 @@ export const Controls = {
     walkLeft: InputKey.A,
     walkRight: InputKey.D,
     blockKey: InputKey.SHIFT,
+    mapKey: InputKey.CONTROL,
 }

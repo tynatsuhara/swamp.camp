@@ -22,7 +22,7 @@ export class HUD {
     private isShowingAutosaveIcon = false
     private readonly offset = new Point(4, 4)
     private readonly offScreenIndicatorManager = new OffScreenIndicatorManager()
-    // private readonly miniMap = new Entity().addComponent(new MiniMap())
+    readonly miniMap = new Entity().addComponent(new MiniMap())
 
     // used for determining what should be updated
     private lastHealthCount = 0
@@ -51,7 +51,7 @@ export class HUD {
             this.autosaveComponent.entity, 
             this.locationTransition.entity,
             this.offScreenIndicatorManager.getEntity(),
-            // this.miniMap.entity,
+            this.miniMap.entity,
         ]
     }
 

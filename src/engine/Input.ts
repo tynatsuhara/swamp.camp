@@ -1,13 +1,14 @@
 import { Point } from "./Point"
 import { View } from "./View"
 
+// enum referencing event.code
 export const enum InputKey {
     ZERO = 'Digit0', ONE = 'Digit1', TWO = 'Digit2', THREE = 'Digit3', FOUR = 'Digit4', 
     FIVE = 'Digit5', SIX = 'Digit6', SEVEN = 'Digit7', EIGHT = 'Digit8', NINE = 'Digit9',
     Q = 'KeyQ', W = 'KeyW', E = 'KeyE', R = 'KeyR', T = 'KeyT', Y = 'KeyT', U = 'KeyU', I = 'KeyI', O = 'KeyO', P = 'KeyP',
     A = 'KeyA', S = 'KeyS', D = 'KeyD', F = 'KeyF', G = 'KeyG', H = 'KeyH', J = 'KeyJ', K = 'KeyK', L = 'KeyL', 
     Z = 'KeyZ', X = 'KeyX', C = 'KeyC', V = 'KeyV', B = 'KeyB', N = 'KeyN', M = 'KeyM', 
-    COMMA = 'Comma', PERIOD = 'Period', TAB = 'Tab', SHIFT = 'ShiftLeft', 
+    COMMA = 'Comma', PERIOD = 'Period', TAB = 'Tab', SHIFT = 'ShiftLeft', CONTROL = 'ControlLeft',
     SPACE = 'Space', ESC = 'Escape', SEMICOLON = 'Semicolon', QUOTE = 'Quote',
     UP = 'ArrowUp', DOWN = 'ArrowDown', LEFT = 'ArrowLeft', RIGHT = 'ArrowRight',
 }

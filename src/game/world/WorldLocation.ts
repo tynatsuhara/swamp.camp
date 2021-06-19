@@ -64,6 +64,11 @@ export class WorldLocation {
         this.ground.get(pos)?.entity.selfDestruct()
         const groundComponent = Ground.instance.make(type, this, pos, data)
         this.ground.set(pos, groundComponent)
+
+        if (!this.isInterior) {
+            HUD.instance.miniMap.refresh()
+        }
+
         return groundComponent
     }
 
@@ -100,6 +105,10 @@ export class WorldLocation {
                 this.setGroundElement(groundData.type, pt, groundData.save())
             }
         })
+
+        if (!this.isInterior) {
+            HUD.instance.miniMap.refresh()
+        }
         
         return el
     }
@@ -135,6 +144,10 @@ export class WorldLocation {
     removeElement(el: ElementComponent) {
         this.elements.removeAll(el)
         this.occupied.removeAll(el)
+
+        if (!this.isInterior) {
+            HUD.instance.miniMap.refresh()
+        }
     }
 
     getGroundSpots() {
