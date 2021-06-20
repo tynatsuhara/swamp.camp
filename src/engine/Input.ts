@@ -111,6 +111,10 @@ export class Input {
         if (e.code === InputKey.TAB) {
             e.preventDefault()
         }
+        // The only shortcut using ctrl that we allow is ctrl+R
+        if (e.ctrlKey && e.code !== InputKey.R) {
+            e.preventDefault()
+        }
         return e
     }
 }
