@@ -11,7 +11,7 @@ import { TentFactory } from "./Tent"
 import { TreeFactory } from "./Tree"
 
 // Elements are things which take up multiple squares in the non-ground ground
-export const enum ElementType {
+export enum ElementType {
     TREE_ROUND,
     TREE_POINTY,
     ROCK,

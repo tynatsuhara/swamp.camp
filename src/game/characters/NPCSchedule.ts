@@ -1,8 +1,7 @@
 import { Point } from "../../engine/Point"
 import { TimeUnit } from "../world/TimeUnit"
-import { WorldTime } from "../world/WorldTime"
 
-export const enum NPCScheduleType {
+export enum NPCScheduleType {
     DO_NOTHING,
     GO_TO_SPOT,  // fields: p (stringified tile Point)
     ROAM_IN_DARKNESS,

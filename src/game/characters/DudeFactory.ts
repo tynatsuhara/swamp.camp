@@ -23,7 +23,7 @@ import { Centaur } from "./Centaur"
 import { ShieldType } from "./weapons/ShieldType"
 import { Singletons } from "../Singletons"
 
-export const enum DudeFaction {
+export enum DudeFaction {
     VILLAGERS,
     ORCS,
     UNDEAD,
@@ -34,7 +34,7 @@ export const enum DudeFaction {
     BEARS,
 }
 
-export const enum DudeType {
+export enum DudeType {
     PLAYER,
     DIP,
     ELF,

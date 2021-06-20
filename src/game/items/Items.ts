@@ -52,7 +52,7 @@ export class ItemMetadata {
     }
 }
 
-export const enum Item {
+export enum Item {
     COIN, ROCK, WOOD, TENT, CAMPFIRE, IRON, HOUSE, ROUND_SAPLING, POINTY_SAPLING, MUSHROOM, CHEST, BED,
 
     // weapon values should match the WeaponType enum so we can cast them
@@ -83,6 +83,8 @@ export const enum Item {
     BASIC_SHIELD = ShieldType.BASIC,
     LANTERN,
 }
+
+window["Item"] = Item
 
 // Data that doesn't get serialized (TODO make builder pattern)
 export const ITEM_METADATA_MAP = {

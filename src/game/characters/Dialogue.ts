@@ -80,13 +80,6 @@ export class NextDialogue {
     }
 }
 
-// export const enum Dialogue {
-//     NONE = 0,
-//     DIP_0, DIP_1, DIP_2, DIP_3, DIP_BEFRIEND, DIP_MAKE_CAMPFIRE, DIP_CRAFT,
-//     BERT_0, BERT_MENU, BERT_MENU_INTRO, BERT_VILLAGERS,
-//     CAMPFIRE
-// }
-
 /**
  * @param dialogue the unique dialogue key
  */

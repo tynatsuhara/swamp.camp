@@ -9,7 +9,7 @@ import { makeBasicNineSliceGround, makeBasicGround } from "./BasicGround"
 import { makeLedge } from "./Ledge"
 import { Singletons } from "../../Singletons"
 
-export const enum GroundType {
+export enum GroundType {
     BASIC, BASIC_NINE_SLICE, GRASS, PATH, LEDGE
 }
 

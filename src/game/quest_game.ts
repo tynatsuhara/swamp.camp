@@ -4,7 +4,7 @@ import { View } from "../engine/View"
 import { GameScene } from "./scenes/GameScene"
 import { MainMenuScene } from "./scenes/MainMenuScene"
 
-export const enum Scene {
+const enum Scene {
     MAIN_MENU, GAME
 }
 
