@@ -108,7 +108,7 @@ export class TreeFactory extends ElementFactory {
         return e.addComponent(new ElementComponent(
             this.type, 
             pos,
-            [pos.plusY(1)], 
+            [], 
             () => { return { 
                 [NEXT_GROWTH_TIME]: nextGrowthTime,
                 [SIZE]: size,
