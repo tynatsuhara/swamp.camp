@@ -48,7 +48,7 @@ export class Camera {
     }
 
     getUpdatedPosition(elapsedTimeMillis: number): Point {
-        const mapSize = LocationManager.instance.currentLocation.size
+        const mapSize = LocationManager.instance.currentLocation.size || 0
         let xLimit = mapSize / 2 * TILE_SIZE - this.dimensions.x/2
         let yLimit = mapSize / 2 * TILE_SIZE - this.dimensions.y/2
         
