@@ -241,7 +241,7 @@ export class WorldLocation {
             } else if (id.startsWith(TeleporterPrefix.TENT)) {
                 Sounds.play(...TeleporterSound.TENT)
             } 
-        }, 200);
+        }, 500);
 
         // load a new location
         HUD.instance.locationTransition.transition(() => {
