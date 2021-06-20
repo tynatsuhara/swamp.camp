@@ -2,7 +2,7 @@ import { Point } from "./Point"
 import { View } from "./View"
 
 // enum referencing event.code
-export const enum InputKey {
+export enum InputKey {
     ZERO = 'Digit0', ONE = 'Digit1', TWO = 'Digit2', THREE = 'Digit3', FOUR = 'Digit4', 
     FIVE = 'Digit5', SIX = 'Digit6', SEVEN = 'Digit7', EIGHT = 'Digit8', NINE = 'Digit9',
     Q = 'KeyQ', W = 'KeyW', E = 'KeyE', R = 'KeyR', T = 'KeyT', Y = 'KeyT', U = 'KeyU', I = 'KeyI', O = 'KeyO', P = 'KeyP',
@@ -109,10 +109,6 @@ export class Input {
     private captureKey(e: KeyboardEvent) {
         // TODO: Make captured keyset configurable for different games
         if (e.code === InputKey.TAB) {
-            e.preventDefault()
-        }
-        // The only shortcut using ctrl that we allow is ctrl+R
-        if (e.ctrlKey && e.code !== InputKey.R) {
             e.preventDefault()
         }
         return e

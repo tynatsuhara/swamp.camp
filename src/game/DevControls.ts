@@ -27,8 +27,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
         }
     }],
     [InputKey.PERIOD, "delete hovered element", (input) => LocationManager.instance.currentLocation.removeElementAt(pixelPtToTilePt(input.mousePos))],
-    [InputKey.N, "fast forward 1 hour", (input) => WorldTime.instance.fastForward(TimeUnit.HOUR)],
-    [InputKey.M, "fast forward 1 minute", (input) => WorldTime.instance.fastForward(TimeUnit.MINUTE)],
+    [InputKey.N, "fast forward", (input) => WorldTime.instance.fastForward(input.isKeyHeld(InputKey.SHIFT) ? TimeUnit.MINUTE : TimeUnit.HOUR)],
 ]
 
 export class DevControls extends Component {
