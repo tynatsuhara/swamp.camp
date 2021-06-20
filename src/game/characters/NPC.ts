@@ -465,7 +465,7 @@ export class NPC extends Component {
         const start = pixelPtToTilePt(this.dude.standingPosition)
         // TODO: NPCs can sometimes get stuck if their starting square is "occupied"
         return LocationManager.instance.currentLocation
-                .findPath(start, targetTilePoint, this.pathFindingHeuristic, 500)
+                .findPath(start, targetTilePoint, this.pathFindingHeuristic)
                 ?.map(pt => this.tilePtToStandingPos(pt))
                 .slice(1)  // slice(1) because we don't need the start in the path
     }

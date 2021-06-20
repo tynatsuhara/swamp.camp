@@ -66,7 +66,11 @@ export class DudeSpawner extends Component {
             text: "ORC ATTACK!",
             icon: "sword",
         }), 6500)
-        const spawnPos = new Point(1, 1).times(LocationManager.instance.currentLocation.size * TILE_SIZE)
+        const extSize = LocationManager.instance.exterior().size
+        const spawnSide = (Math.random() > .5 ? 1 : -1) * extSize/2 * TILE_SIZE
+        const spawnMiddle = Math.random() * extSize * TILE_SIZE - extSize/2
+        const spawnPos = Math.random() > .5 ? new Point(spawnSide, spawnMiddle) : new Point(spawnMiddle, spawnSide)
+        console.log(spawnPos)
         Lists.range(0, 5 + Math.random() * 10).forEach(() => DudeFactory.instance.new(DudeType.ORC_WARRIOR, spawnPos))
         Lists.range(0, 1 + Math.random() * 4).forEach(() => DudeFactory.instance.new(DudeType.ORC_BRUTE, spawnPos))
         Lists.range(0, 1 + Math.random() * 4).forEach(() => DudeFactory.instance.new(DudeType.ORC_SHAMAN, spawnPos))

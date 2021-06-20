@@ -173,9 +173,20 @@ export class WorldLocation {
         return possibilities
     }
 
-    findPath(tileStart: Point, tileEnd: Point, heuristic: (pt: Point, goal: Point) => number, shortCircuit: number) {
+    findPath(
+        tileStart: Point, 
+        tileEnd: Point, heuristic: 
+        (pt: Point, goal: Point) => number, 
+        shortCircuit: number = Number.MAX_SAFE_INTEGER
+    ) {
         const buffer = 5
         const range = this.size/2 + buffer
+
+        const isOutsideRange = (pt: Point) => {
+            return pt.x < -range || pt.x > range || pt.y < -range || pt.y > range
+        }
+
+        const shouldCheckRange = !(isOutsideRange(tileStart) || isOutsideRange(tileEnd))
         
         return this.occupied.findPath(tileStart, tileEnd, {
             heuristic: (pt) => heuristic(pt, tileEnd),
@@ -187,7 +198,7 @@ export class WorldLocation {
                 if (pt.equals(tileStart) || pt.equals(tileEnd)) {
                     return false
                 }
-                if (pt.x < -range || pt.x > range || pt.y < -range || pt.y > range) {
+                if (shouldCheckRange && isOutsideRange(pt)) {
                     return true
                 }
                 return !!this.occupied.get(pt)
