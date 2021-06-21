@@ -31,6 +31,17 @@ export class WorldAudioContext {
         }
     }
 
+    private _isInBattle: boolean
+    get isInBattle() {
+        return this._isInBattle
+    }
+    set isInBattle(value: boolean) {
+        if (this._isInBattle != value) {
+            this._isInBattle = value
+            this.notifyListeners()
+        }
+    }
+
     private notifyListeners() {
         if (!Player.instance?.dude) {
             return

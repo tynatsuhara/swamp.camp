@@ -2,6 +2,7 @@ import { Component } from "../../engine/Component"
 import { Entity } from "../../engine/Entity"
 import { Point } from "../../engine/Point"
 import { Lists } from "../../engine/util/Lists"
+import { WorldAudioContext } from "../audio/WorldAudioContext"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
@@ -27,6 +28,11 @@ export class DudeSpawner extends Component {
             this.spawn()
             this.nextUpdate = now + DudeSpawner.INTERVAL_MILLIS
         }
+
+        // Maybe consider moving this code elsewhere later
+        WorldAudioContext.instance.isInBattle = 
+                Array.from(LocationManager.instance.exterior().dudes.values())
+                        .some(d => d.isAlive && d.factions.includes(DudeFaction.ORCS))
     }
 
     private spawn() {

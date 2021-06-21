@@ -2,6 +2,7 @@ import { Lists } from "../../engine/util/Lists"
 import { DarknessMask } from "../world/DarknessMask"
 import { TimeUnit } from "../world/TimeUnit"
 import { AudioPlayer } from "./AudioPlayer"
+import { LoopingAudioPlayer } from "./LoopingAudioPlayer"
 import { QueueAudioPlayer } from "./QueueAudioPlayer"
 import { WorldAudioContext } from "./WorldAudioContext"
 
@@ -38,15 +39,16 @@ export class Music {
         "35_ambient_evil_2.mp3",
     )
 
-    static readonly BATTLE_MUSIC_LOOPS = Music.queue(
-        "battle bops",
-        "09_knights_theme.mp3",
-        "14_battle_victory.mp3",
-        "19_paladins_theme.mp3",
-        "27_castle_himmendal.mp3",
-        "28_knights_theme_b.mp3",
-        "POL-battle-march-short.wav",
-    )
+    static readonly BATTLE_MUSIC_LOOPS: AudioPlayer[] = [
+        new LoopingAudioPlayer("battle bop 1", 1, "audio/music/09_knights_theme.mp3"),
+        new LoopingAudioPlayer("battle bop 2", 1, "audio/music/14_battle_victory.mp3"),
+        new LoopingAudioPlayer("battle bop 3", 1, "audio/music/19_paladins_theme.mp3"),
+        new LoopingAudioPlayer("battle bop 4", 1, "audio/music/27_castle_himmendal.mp3"),
+        new LoopingAudioPlayer("battle bop 5", 1, "audio/music/28_knights_theme_b.mp3"),
+        new LoopingAudioPlayer("battle bop 6", 1, "audio/music/POL-battle-march-short.wav"),
+    ]
+
+    static currentBattleMusic: LoopingAudioPlayer
 
     static determineMusic(ctx: WorldAudioContext) {
         // fade out at night
@@ -54,18 +56,31 @@ export class Music {
         const daytimeFadeInTime = DarknessMask.SUNRISE_START
         const daytimeFadeOutTime = DarknessMask.SUNSET_START
 
-        if (timeOfDay > daytimeFadeOutTime || timeOfDay < daytimeFadeInTime) {
-            Music.play(Music.NIGHT_MUSIC)
+        let music: AudioPlayer
+
+        if (ctx.isInBattle) {
+            // only play if we don't already have a battle loop going
+            if (!Music.BATTLE_MUSIC_LOOPS.includes(Music.currentMusic)) {
+                music = Lists.oneOf(Music.BATTLE_MUSIC_LOOPS)
+            }
+        } else if (timeOfDay > daytimeFadeOutTime || timeOfDay < daytimeFadeInTime) {
+            music = Music.NIGHT_MUSIC
         } else if (timeOfDay > daytimeFadeInTime) {
-            Music.play(Music.DAY_MUSIC)
+            music = Music.DAY_MUSIC
         }
 
-        // TODO: Battle music loops
+        if (music) {
+            Music.play(music)
+        }
+
         // TODO: Main menu music
 
         window['currentMusic'] = Music.currentMusic
     }
 
+    /**
+     * currentMusic will always be updated after calling
+     */
     static play(music: AudioPlayer) {
         if (Music.currentMusic === music) {
             return
@@ -77,8 +92,8 @@ export class Music {
             music.fadeIn()
         }
 
-        if (!!this.currentMusic) {
-            const curr = this.currentMusic
+        if (!!Music.currentMusic) {
+            const curr = Music.currentMusic
             curr.fadeOut().then(() => {
                 curr.stop()
                 startNewMusic()
@@ -87,7 +102,8 @@ export class Music {
             startNewMusic()
         }
 
-        this.currentMusic = music
+        Music.currentMusic = music
+        console.log(`set currentMusic to ${Music.currentMusic.fileName}`)
     }
 
     static setVolume(settingsVolumeLevel: number) {
