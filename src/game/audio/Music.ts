@@ -1,4 +1,5 @@
 import { Lists } from "../../engine/util/Lists"
+import { DarknessMask } from "../world/DarknessMask"
 import { TimeUnit } from "../world/TimeUnit"
 import { AudioPlayer } from "./AudioPlayer"
 import { QueueAudioPlayer } from "./QueueAudioPlayer"
@@ -8,7 +9,7 @@ import { WorldAudioContext } from "./WorldAudioContext"
  * Used for background soundtrack and even-based music
  */
 export class Music {
-    private static readonly VOLUME_MULTIPLER = 0.1
+    private static readonly VOLUME_MULTIPLER = 0.05
     private static currentMusic: AudioPlayer
     private static volume = 0
 
@@ -50,8 +51,8 @@ export class Music {
     static determineMusic(ctx: WorldAudioContext) {
         // fade out at night
         const timeOfDay = ctx.time % TimeUnit.DAY
-        const daytimeFadeInTime = TimeUnit.HOUR * 5
-        const daytimeFadeOutTime = TimeUnit.HOUR * 20
+        const daytimeFadeInTime = DarknessMask.SUNRISE_START
+        const daytimeFadeOutTime = DarknessMask.SUNSET_START
 
         if (timeOfDay > daytimeFadeOutTime || timeOfDay < daytimeFadeInTime) {
             Music.play(Music.NIGHT_MUSIC)

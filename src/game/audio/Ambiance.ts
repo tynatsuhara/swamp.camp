@@ -1,6 +1,7 @@
 import { Lists } from "../../engine/util/Lists"
 import { Player } from "../characters/Player"
 import { Settings } from "../Settings"
+import { DarknessMask } from "../world/DarknessMask"
 import { LightManager } from "../world/LightManager"
 import { TimeUnit } from "../world/TimeUnit"
 import { AudioPlayer } from "./AudioPlayer"
@@ -40,8 +41,8 @@ export class Ambiance {
 
         // fade out at night
         const timeOfDay = ctx.time % TimeUnit.DAY
-        const daytimeFadeInTime = TimeUnit.HOUR * 5
-        const daytimeFadeOutTime = TimeUnit.HOUR * 20
+        const daytimeFadeInTime = DarknessMask.SUNRISE_START
+        const daytimeFadeOutTime = DarknessMask.SUNSET_END
 
         if (timeOfDay > daytimeFadeOutTime || timeOfDay < daytimeFadeInTime) {
             Ambiance.play(Ambiance.NIGHT)
