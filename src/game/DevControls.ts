@@ -15,6 +15,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     [InputKey.P, "spawn small demon", (input) => DudeFactory.instance.new(DudeType.HORNED_DEMON, input.mousePos)],
     [InputKey.U, "spawn orc shaman", (input) => DudeFactory.instance.new(DudeType.ORC_SHAMAN, input.mousePos)],
     [InputKey.B, "spawn bear", (input) => DudeFactory.instance.new(DudeType.BEAR, input.mousePos)],
+    [InputKey.V, "spawn wolf", (input) => DudeFactory.instance.new(DudeType.WOLF, input.mousePos)],
     [InputKey.SEMICOLON, "spawn shroom", (input) => DudeFactory.instance.new(DudeType.SHROOM, input.mousePos)],
     [InputKey.QUOTE, "trigger orc raid", () => DudeSpawner.instance.spawnOrcs()],
     [InputKey.COMMA, "toggle ground path", (input) => {

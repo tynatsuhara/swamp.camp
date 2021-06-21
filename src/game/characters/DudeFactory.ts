@@ -32,6 +32,7 @@ export enum DudeFaction {
     CENTAURS,
     GNOLLS,
     BEARS,
+    WOLVES,
 }
 
 export enum DudeType {
@@ -48,6 +49,7 @@ export enum DudeType {
     ORC_BRUTE,
     ORC_SHAMAN,
     DEMON_BRUTE,
+    WOLF,
 }
 
 export class DudeFactory {
@@ -214,6 +216,14 @@ export class DudeFactory {
                 maxHealth = 5
                 speed *= .5
                 colliderSize = bigColliderSize
+                break
+            case DudeType.WOLF:
+                factions = [DudeFaction.WOLVES]
+                animationName = "Wolf"
+                weapon = WeaponType.UNARMED
+                additionalComponents = [new NPC(), new Enemy()]
+                maxHealth = 2
+                speed *= 1
                 break
             default: {
                 throw new Error(`DudeType ${type} can't be instantiated`)
