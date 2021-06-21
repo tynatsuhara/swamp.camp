@@ -12,6 +12,8 @@ import { TileComponent } from "../../engine/tiles/TileComponent"
 import { TileTransform } from "../../engine/tiles/TileTransform"
 import { Lists } from "../../engine/util/Lists"
 import { View } from "../../engine/View"
+import { Ambiance } from "../audio/Ambiance"
+import { Music } from "../audio/Music"
 import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { QuestGame } from "../quest_game"
@@ -50,6 +52,9 @@ export class MainMenuScene {
     }
 
     reset() {
+        Music.stop()
+        Ambiance.stop()
+
         this.render(Menu.ROOT)
         this.plumes = new PlumePicker(
             saveManager.getState().plume,

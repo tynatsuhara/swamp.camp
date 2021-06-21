@@ -75,4 +75,11 @@ export class Ambiance {
 
         this.currentAmbiance = newAmbiance
     }
+
+    static stop() {
+        Ambiance.currentAmbiance?.fadeOut().then(() => {
+            Ambiance.currentAmbiance.stop()
+            Ambiance.currentAmbiance = null
+        })
+    }
 }

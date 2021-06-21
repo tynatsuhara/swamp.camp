@@ -72,10 +72,6 @@ export class Music {
         if (music) {
             Music.play(music)
         }
-
-        // TODO: Main menu music
-
-        window['currentMusic'] = Music.currentMusic
     }
 
     /**
@@ -104,6 +100,13 @@ export class Music {
 
         Music.currentMusic = music
         console.log(`set currentMusic to ${Music.currentMusic.fileName}`)
+    }
+
+    static stop() {
+        Music.currentMusic?.fadeOut().then(() => {
+            Music.currentMusic.stop()
+            Music.currentMusic = null
+        })
     }
 
     static setVolume(settingsVolumeLevel: number) {
