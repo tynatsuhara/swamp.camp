@@ -40,6 +40,9 @@ export class MiniMap extends Component {
     private renderFullSizeMap() {
         const wl = LocationManager.instance.exterior()
         const ground = GroundRenderer.instance.getCanvas(wl)
+        if (!ground) {
+            return
+        }
 
         // first, draw everything onto a full-size canvas
         if (!this.bigCanvas) {
@@ -77,6 +80,10 @@ export class MiniMap extends Component {
     }
 
     partiallyRenderDownsampledMap() {
+        if (!this.bigCanvas) {
+            return
+        }
+
         if (this.lastPixelDrawn.x === this.smallCanvas.width-1 
                 && this.lastPixelDrawn.y === this.smallCanvas.height-1) {
             return

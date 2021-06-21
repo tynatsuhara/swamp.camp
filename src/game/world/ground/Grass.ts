@@ -5,7 +5,6 @@ import { StaticTileSource } from "../../../engine/tiles/StaticTileSource"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { GroundRenderer } from "../GroundRenderer"
-import { LocationManager } from "../LocationManager"
 import { GroundType, MakeGroundFuncData } from "./Ground"
 import { GroundComponent } from "./GroundComponent"
 
