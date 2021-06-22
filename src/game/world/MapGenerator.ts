@@ -178,21 +178,21 @@ export class MapGenerator {
     // }
 
     private placeGrass() {
-        // const levels = this.noise()
+        const levels = this.noise()
 
         for (let i = -MapGenerator.MAP_SIZE/2; i < MapGenerator.MAP_SIZE/2; i++) {
             for (let j = -MapGenerator.MAP_SIZE/2; j < MapGenerator.MAP_SIZE/2; j++) {
                 const pt = new Point(i, j)
                 // TODO revisit levels
                 // const thisLevel = levels.get(pt)
-                const isLedge = false //[pt.plusY(1), pt.plusY(-1), pt.plusX(1), pt.plusX(-1)]
-                        // .map(pt => levels.get(pt))
-                        // .some(level => level < thisLevel)
-                if (isLedge) {
-                    this.location.setGroundElement(GroundType.LEDGE, pt)
-                } else {
+                // const isLedge = [pt.plusY(1), pt.plusY(-1), pt.plusX(1), pt.plusX(-1)]
+                //         .map(pt => levels.get(pt))
+                //         .some(level => level < thisLevel)
+                // if (isLedge) {
+                //     this.location.setGroundElement(GroundType.LEDGE, pt)
+                // } else {
                     this.location.setGroundElement(GroundType.GRASS, pt)
-                }
+                // }
             }
         }
     }
