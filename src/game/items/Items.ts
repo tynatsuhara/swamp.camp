@@ -149,11 +149,13 @@ export const ITEM_METADATA_MAP = {
     [Item.CHEST]: new ItemMetadata({
         displayName: "Chest",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("chest"), 
+        stackLimit: 1,
         element: ElementType.CHEST
     }),
     [Item.BED]: new ItemMetadata({
         displayName: "Bed",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("bed"), 
+        stackLimit: 1,
         element: ElementType.BED
     }),
 
