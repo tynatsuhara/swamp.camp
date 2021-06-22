@@ -4,13 +4,13 @@ import { Point } from "../../../engine/Point"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Item, spawnItem } from "../../items/Items"
-import { LocationManager } from "../LocationManager"
-import { ElementComponent } from "./ElementComponent"
 import { Hittable } from "./Hittable"
 
 /**
  * Very similar to HittableResource, but more for the purpose
  * of picking up furniture than for collecting resources.
+ * 
+ * TODO: Make this use the item recipe instead of manually specifying what drops.
  */
 export class Breakable extends Hittable {
 
@@ -46,14 +46,12 @@ export class Breakable extends Hittable {
             return
         }
 
-        let placeDistance = 8
-
         const items = this.itemSupplier()
         for (const item of items) {
             const itemDirection = hitDir.randomlyShifted(.5).normalized()
             const velocity = itemDirection.times(1 + 3 * Math.random())
             spawnItem(
-                this.position.plus(new Point(0, TILE_SIZE/2)).plus(itemDirection.times(placeDistance)),  // bottom center, then randomly adjusted
+                this.position.plus(new Point(0, TILE_SIZE/2)),
                 item, 
                 velocity,
                 this.entity.getComponent(BoxCollider)
