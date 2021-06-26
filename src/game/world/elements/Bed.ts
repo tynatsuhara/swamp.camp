@@ -21,6 +21,9 @@ import { Campfire } from "./Campfire"
 import { UIStateManager } from "../../ui/UIStateManager"
 import { TimeUnit } from "../TimeUnit"
 import { DarknessMask } from "../DarknessMask"
+import { Breakable } from "./Breakable"
+import { Lists } from "../../../engine/util/Lists"
+import { Item } from "../../items/Items"
 
 export class BedFactory extends ElementFactory {
 
@@ -31,18 +34,25 @@ export class BedFactory extends ElementFactory {
         const e = new Entity()
         const scaledPos = pos.times(TILE_SIZE)
         const depth = scaledPos.y + TILE_SIZE - 10
-        
-        e.addComponent(new TileComponent(
+        const pixelCenterPos = scaledPos.plus(new Point(TILE_SIZE/2-1, TILE_SIZE/2-1))
+
+        const tile = e.addComponent(new TileComponent(
             Tilesets.instance.outdoorTiles.getTileSource("bed"), 
             TileTransform.new({ position: scaledPos, depth })
         ))
 
         e.addComponent(new BoxCollider(scaledPos, new Point(TILE_SIZE, TILE_SIZE)))
 
-        const bed = e.addComponent(new Bed())        
+        const bed = e.addComponent(new Bed())  
+
+        e.addComponent(new Breakable(
+            pixelCenterPos, 
+            [tile.transform], 
+            () => Lists.repeat(Math.random() * 4 + 4, [Item.WOOD])
+        ))
 
         e.addComponent(new Interactable(
-            scaledPos.plus(new Point(TILE_SIZE/2-1, TILE_SIZE/2-1)), 
+            pixelCenterPos, 
             () => {
                 DialogueDisplay.instance.startDialogue(bed)
             }, 
