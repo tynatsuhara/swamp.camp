@@ -13,4 +13,5 @@ export class LocationSaveState {
     isInterior: boolean
     allowPlacing: boolean
     size?: number
+    levels?: { [key: string]: number }
 }

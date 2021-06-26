@@ -8,6 +8,7 @@ import { GroundComponent } from "./GroundComponent"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { ConnectingTileSchema } from "./ConnectingTileSchema"
 import { GroundType } from "./Ground"
+import { WorldLocation } from "../WorldLocation"
 
 const CORNER_SIZE = TILE_SIZE/2
 const CORNER_DIMS = new Point(CORNER_SIZE, CORNER_SIZE)
@@ -54,7 +55,8 @@ export class ConnectingTilePathSchema extends ConnectingTileSchema {
     /**
      * Renders the tile source based on the given grid and position
      */
-    render(grid: Grid<GroundComponent>, position: Point): ImageRender[] {
+    render(location: WorldLocation, position: Point): ImageRender[] {
+        const grid = location.ground
         const x = position.x
         const y = position.y
 
@@ -123,60 +125,6 @@ export class ConnectingTilePathSchema extends ConnectingTileSchema {
             }
         }
 
-        // if (count == 4) {
-        //     result = this._plusShape
-        // } else if (count == 3) {
-        //     result = this._tShape
-        //     if (!n) {
-        //         rotation = 90
-        //     } else if (!e) {
-        //         rotation = 180
-        //     } else if (!s) {
-        //         rotation = 270
-        //     }
-        // } else if ((n && s) || (e && w)) {
-        //     result = this._vertical
-        //     if (!n) {
-        //         rotation = 90
-        //     }
-        // } else if (count == 2) {
-        //     result = this._angle
-        //     if (n && e) {
-        //         rotation = 270
-        //     } else if (s && w) {
-        //         rotation = 90
-        //     } else if (w && n) {
-        //         rotation = 180
-        //     }
-        // } else if (count == 1) {
-        //     result = this._cap
-        //     if (n) {
-        //         rotation = 180
-        //     } else if (e) {
-        //         rotation = 270
-        //     } else if (w) {
-        //         rotation = 90
-        //     }
-        // } else {
-        //     result = this._single
-        // }
-
-        // if (!result) {
-        //     result = this._fallback
-        //     rotation = 0
-        // }
-
-        // TODO trigger adjacent to update?
         return results
-    }
-
-    private get(grid: Grid<GroundComponent>, pt: Point): ConnectingTile {
-        const el = grid.get(pt)
-        if (el) {
-            const ct = el.entity.getComponent(ConnectingTile)
-            if (ct && ct.schema.canConnect(this)) {
-                return ct
-            }
-        }
-    }
+}
 }

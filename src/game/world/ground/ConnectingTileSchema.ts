@@ -1,6 +1,8 @@
 import { Point } from "../../../engine/Point"
 import { ImageRender } from "../../../engine/renderer/ImageRender"
 import { Grid } from "../../../engine/util/Grid"
+import { WorldLocation } from "../WorldLocation"
+import { ConnectingTile } from "./ConnectingTile"
 import { GroundComponent } from "./GroundComponent"
 
 
@@ -17,5 +19,15 @@ export abstract class ConnectingTileSchema {
     /**
      * Renders the tile source based on the given grid and position
      */
-    abstract render(grid: Grid<GroundComponent>, position: Point): ImageRender[] 
+    abstract render(location: WorldLocation, position: Point): ImageRender[] 
+
+    protected get(grid: Grid<GroundComponent>, pt: Point): ConnectingTile {
+        const el = grid.get(pt)
+        if (el) {
+            const ct = el.entity.getComponent(ConnectingTile)
+            if (ct && ct.schema.canConnect(this)) {
+                return ct
+            }
+        }
+    }
 }

@@ -19,7 +19,9 @@ export class MapGenerator {
 
     private static readonly MAP_SIZE = 70
 
-    private readonly location = LocationManager.instance.add(new WorldLocation(false, true, MapGenerator.MAP_SIZE))
+    private readonly location = LocationManager.instance.add(
+        new WorldLocation(false, true, MapGenerator.MAP_SIZE, MapGenerator.noise(4))
+    )
     private readonly tentPos = new Point(-3, -3)
 
     generateExterior(): WorldLocation {
@@ -29,6 +31,7 @@ export class MapGenerator {
         // make the ground
         // this.renderPath(new Point(-10, -10), new Point(10, 10), 2)
         // this.renderPath(new Point(10, -10), new Point(-10, 10), 5)
+        this.placeGrass()
 
         this.spawnTreesAtEdge()
         this.spawnTrees()
@@ -37,9 +40,6 @@ export class MapGenerator {
 
         // TODO short trees, bushes, fruit, tall grass, etc
         this.spawn(ElementType.MUSHROOM, 3 + Math.random() * 5)
-
-        // spawn grass last, stuff checks for existing paths prior to this by the lack of ground items
-        this.placeGrass()
 
         return this.location
     }
@@ -79,6 +79,10 @@ export class MapGenerator {
     }
 
     private spawnTree(pt: Point) {
+        const treeBase = pt.plusY(1)
+        if (this.location.ground.get(treeBase)?.type !== GroundType.GRASS) {
+            return
+        }
         this.location.addElement(
             Math.random() < .7 ? ElementType.TREE_POINTY : ElementType.TREE_ROUND,
             pt,
@@ -118,77 +122,33 @@ export class MapGenerator {
                 Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_SIZE/2,
                 Math.floor(Math.random() * (MapGenerator.MAP_SIZE)) - MapGenerator.MAP_SIZE/2,
             )
-            if (!this.location.ground.get(p) && this.location.addElement(element, p)) {
+            if (this.location.ground.get(p)?.type === GroundType.GRASS && this.location.addElement(element, p)) {
                 placed++
             }
         }
     }
 
-    // renderPath(
-    //     start: Point, 
-    //     end: Point, 
-    //     randomness: number
-    // ) {
-    //     const ground = this.location.ground
-    //     const stuff = this.location.elements
-
-    //     const heuristic = (pt: Point): number => {
-    //         const v = pt.manhattanDistanceTo(end) * Math.random() * randomness
-    //         const el = ground.get(pt)
-    //         if (!el) {
-    //             return v
-    //         }
-    //         const ct = el.entity.getComponent(ConnectingTile)
-    //         if (!ct || !ct.schema.canConnect(Ground.instance.PATH_CONNECTING_SCHEMA)) {
-    //             return v
-    //         }
-    //         const reuseCostMultiplier = 1/10
-    //         return v * reuseCostMultiplier
-    //     }
-
-    //     const isOccupiedFunc = (pt: Point) => {
-    //         if (!!stuff.get(pt)?.entity.getComponent(BoxCollider)) {
-    //             return true
-    //         }
-    //         const el = ground.get(pt)
-    //         if (!el) {
-    //             return false  // definitely not occupied
-    //         }
-    //         const ct = el.entity.getComponent(ConnectingTile)
-    //         if (!ct) {
-    //             return true  // can't connect, therefore occupied
-    //         }
-    //         return !Ground.instance.PATH_CONNECTING_SCHEMA.canConnect(ct.schema)
-    //     }
-
-    //     const path = ground.findPath(
-    //         start, 
-    //         end, 
-    //         { 
-    //             heuristic: heuristic,  
-    //             isOccupied: isOccupiedFunc
-    //         }
-    //     )
-
-    //     if (!path) {
-    //         return
-    //     }
-
-    //     path.forEach(pt => this.location.addGroundElement(GroundType.PATH, pt))
-    // }
-
     private placeGrass() {
-        // const levels = this.noise()
-
         for (let i = -MapGenerator.MAP_SIZE/2; i < MapGenerator.MAP_SIZE/2; i++) {
             for (let j = -MapGenerator.MAP_SIZE/2; j < MapGenerator.MAP_SIZE/2; j++) {
                 const pt = new Point(i, j)
                 // TODO revisit levels
-                // const thisLevel = levels.get(pt)
-                const isLedge = false //[pt.plusY(1), pt.plusY(-1), pt.plusX(1), pt.plusX(-1)]
-                        // .map(pt => levels.get(pt))
-                        // .some(level => level < thisLevel)
-                if (isLedge) {
+                const edgesEnabled = false
+                const thisLevel = this.location.levels.get(pt)
+                const adjacent = [
+                    pt.plus(new Point(0, -1)), 
+                    pt.plus(new Point(1, -1)), 
+                    pt.plus(new Point(1, 0)), 
+                    pt.plus(new Point(1, 1)), 
+                    pt.plus(new Point(0, 1)), 
+                    pt.plus(new Point(-1, 1)), 
+                    pt.plus(new Point(-1, 0)), 
+                    pt.plus(new Point(-1, -1)), 
+                ]
+                const isLedge = adjacent
+                        .map(pt => this.location.levels.get(pt))
+                        .some(level => level < thisLevel)
+                if (isLedge && edgesEnabled) {
                     this.location.setGroundElement(GroundType.LEDGE, pt)
                 } else {
                     this.location.setGroundElement(GroundType.GRASS, pt)
@@ -197,19 +157,30 @@ export class MapGenerator {
         }
     }
 
-    private noise(): Grid<number> {
+    /**
+     * @param levels the number of levels
+     * @returns a grid of numbers the size of the map
+     */
+    static noise(levels: number): Grid<number> {
         const noise = new Noise(Math.random())
 
         const grid = new Grid<number>()
         let str = ""
 
-        for (let i = -MapGenerator.MAP_SIZE/2; i < MapGenerator.MAP_SIZE/2; i++) {
-            for (let j = -MapGenerator.MAP_SIZE/2; j < MapGenerator.MAP_SIZE/2; j++) {
+        // Each entry will occupy a 2x2 tile section to prevent 
+        // 1-wide entries that are hard to make work art-wise
+
+        for (let i = -MapGenerator.MAP_SIZE/2; i < MapGenerator.MAP_SIZE/2; i += 2) {
+            for (let j = -MapGenerator.MAP_SIZE/2; j < MapGenerator.MAP_SIZE/2; j += 2) {
                 var value = noise.simplex2(i / 100, j / 100);
                 value = (value + 1)/2  // scale to 0-1
-                const v = (Math.floor(9 * value))
+                const v = Math.floor(levels * value)
                 str += v
+
                 grid.set(new Point(j, i), v)
+                grid.set(new Point(j+1, i+1), v)
+                grid.set(new Point(j+1, i), v)
+                grid.set(new Point(j, i+1), v)
             }
             str += "\n"
         }
@@ -218,3 +189,5 @@ export class MapGenerator {
         return grid
     }
 }
+
+window["noise"] = MapGenerator.noise

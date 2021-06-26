@@ -19,7 +19,7 @@ export const makePath = (d: MakeGroundFuncData): GroundComponent => {
         ))
 
     const e = new Entity([
-        new ConnectingTile(schema, d.wl.ground, d.pos)
+        new ConnectingTile(schema, d.wl, d.pos)
     ])
 
     return e.addComponent(new GroundComponent(GroundType.PATH))
