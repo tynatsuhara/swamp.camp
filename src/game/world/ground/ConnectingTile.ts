@@ -1,9 +1,9 @@
-import { Point } from "../Point"
-import { ImageRender } from "../renderer/ImageRender"
-import { Component } from "../Component"
+import { Point } from "../../../engine/Point"
+import { ImageRender } from "../../../engine/renderer/ImageRender"
+import { Component } from "../../../engine/Component"
 import { ConnectingTileSchema } from "./ConnectingTileSchema"
-import { Grid } from "../util/Grid"
-import { GroundComponent } from "../../game/world/ground/GroundComponent"
+import { Grid } from "../../../engine/util/Grid"
+import { GroundComponent } from "./GroundComponent"
 
 export class ConnectingTile extends Component {
     readonly schema: ConnectingTileSchema
@@ -21,6 +21,6 @@ export class ConnectingTile extends Component {
     }
 
     getRenderMethods(): ImageRender[] {
-        return [this.schema.render(this.grid, this.position)]
+        return this.schema.render(this.grid, this.position)
     }
 }

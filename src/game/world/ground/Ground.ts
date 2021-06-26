@@ -3,8 +3,6 @@ import { WorldLocation } from "../WorldLocation"
 import { GroundComponent } from "./GroundComponent"
 import { makeGrass } from "./Grass"
 import { makePath } from "./Path"
-import { ConnectingTileSchema } from "../../../engine/tiles/ConnectingTileSchema"
-import { Tilesets } from "../../graphics/Tilesets"
 import { makeBasicNineSliceGround, makeBasicGround } from "./BasicGround"
 import { makeLedge } from "./Ledge"
 import { Singletons } from "../../Singletons"
@@ -49,12 +47,4 @@ export class Ground {
         }
         return ground
     }
-
-    readonly PATH_CONNECTING_SCHEMA = new ConnectingTileSchema()
-        .vertical(Tilesets.instance.tilemap.getTileAt(new Point(2, 6)))
-        .angle(Tilesets.instance.tilemap.getTileAt(new Point(0, 5)))
-        .tShape(Tilesets.instance.tilemap.getTileAt(new Point(3, 5)))
-        .plusShape(Tilesets.instance.tilemap.getTileAt(new Point(5, 5)))
-        .cap(Tilesets.instance.tilemap.getTileAt(new Point(2, 6)))
-        .single(Tilesets.instance.tilemap.getTileAt(new Point(6, 5)))
 } 
