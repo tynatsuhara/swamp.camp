@@ -133,7 +133,7 @@ export class MapGenerator {
             for (let j = -MapGenerator.MAP_SIZE/2; j < MapGenerator.MAP_SIZE/2; j++) {
                 const pt = new Point(i, j)
                 // TODO revisit levels
-                const edgesEnabled = false
+                const levelsEnabled = false
                 const thisLevel = this.location.levels.get(pt)
                 const adjacent = [
                     pt.plus(new Point(0, -1)), 
@@ -148,7 +148,7 @@ export class MapGenerator {
                 const isLedge = adjacent
                         .map(pt => this.location.levels.get(pt))
                         .some(level => level < thisLevel)
-                if (isLedge && edgesEnabled) {
+                if (isLedge && levelsEnabled) {
                     this.location.setGroundElement(GroundType.LEDGE, pt)
                 } else {
                     this.location.setGroundElement(GroundType.GRASS, pt)

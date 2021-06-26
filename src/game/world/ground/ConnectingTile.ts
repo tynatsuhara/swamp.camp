@@ -2,8 +2,6 @@ import { Point } from "../../../engine/Point"
 import { ImageRender } from "../../../engine/renderer/ImageRender"
 import { Component } from "../../../engine/Component"
 import { ConnectingTileSchema } from "./ConnectingTileSchema"
-import { Grid } from "../../../engine/util/Grid"
-import { GroundComponent } from "./GroundComponent"
 import { WorldLocation } from "../WorldLocation"
 
 export class ConnectingTile extends Component {
