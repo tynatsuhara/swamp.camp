@@ -71,6 +71,8 @@ export class NPC extends Component {
             this.targetPath = null
         }
 
+        this._attackIndicator = DudeInteractIndicator.NONE
+
         if (DialogueDisplay.instance.dialogueSource === this.dude) {
             // don't move when talking
             this.dude.move(updateData, Point.ZERO, Player.instance.dude.standingPosition.x - this.dude.standingPosition.x)
@@ -333,8 +335,6 @@ export class NPC extends Component {
             this._attackIndicator = timeLeftUntilCanAttack < this.PARRY_TIME/2 
                     ? DudeInteractIndicator.ATTACKING_NOW 
                     : DudeInteractIndicator.ATTACKING_SOON
-        } else {
-            this._attackIndicator = DudeInteractIndicator.NONE
         }
 
         // in range and armed
