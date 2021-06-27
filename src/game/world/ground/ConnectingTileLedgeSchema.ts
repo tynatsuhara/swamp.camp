@@ -56,10 +56,18 @@ export class ConnectingTileLedgeSchema extends ConnectingTileSchema {
             result = render(Tilesets.instance.tilemap.getTileAt(new Point(5, 7)))
         } else if (n === level && s === level && e < level) {
             // this is a right ledge
-            result = render(Tilesets.instance.tilemap.getTileAt(new Point(5, 9)), true)
+            if (ne === level) {
+                result = render(Tilesets.instance.tilemap.getTileAt(new Point(6, 9)), true)
+            } else {
+                result = render(Tilesets.instance.tilemap.getTileAt(new Point(5, 9)), true)
+            }
         } else if (n === level && s === level && w < level) {
             // this is a left ledge
-            result = render(Tilesets.instance.tilemap.getTileAt(new Point(5, 9)))
+            if (nw === level) {
+                result = render(Tilesets.instance.tilemap.getTileAt(new Point(6, 9)))
+            } else {
+                result = render(Tilesets.instance.tilemap.getTileAt(new Point(5, 9)))
+            }
         } else if (s < level && w < level) {
             // bottom left corner
             result = render(Tilesets.instance.tilemap.getTileAt(new Point(5, 8)))

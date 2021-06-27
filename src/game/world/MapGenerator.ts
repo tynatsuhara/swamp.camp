@@ -169,6 +169,7 @@ export class MapGenerator {
 
         // Each entry will occupy a 2x2 tile section to prevent 
         // 1-wide entries that are hard to make work art-wise
+        // TODO: Smooth out edges to prevent stair-step pattern
 
         for (let i = -MapGenerator.MAP_SIZE/2; i < MapGenerator.MAP_SIZE/2; i += 2) {
             for (let j = -MapGenerator.MAP_SIZE/2; j < MapGenerator.MAP_SIZE/2; j += 2) {
