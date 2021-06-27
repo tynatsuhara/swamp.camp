@@ -103,9 +103,10 @@ export class Music {
     }
 
     static stop() {
-        Music.currentMusic?.fadeOut().then(() => {
-            Music.currentMusic.stop()
-            Music.currentMusic = null
+        const current = Music.currentMusic
+        Music.currentMusic = null
+        current?.fadeOut().then(() => {
+            current.stop()
         })
     }
 

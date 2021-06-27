@@ -12,7 +12,7 @@ import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { DeathCutscene } from "../cutscenes/DeathCutscene"
 import { IntroCutscene } from "../cutscenes/IntroCutscene"
 import { ImageFilters } from "../graphics/ImageFilters"
-import { TILE_SIZE } from "../graphics/Tilesets"
+import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { WalkingParticles } from "../graphics/WalkingParticles"
 import { Inventory } from "../items/Inventory"
 import { Item, spawnItem } from "../items/Items"
@@ -22,6 +22,8 @@ import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
 import { HUD } from "../ui/HUD"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Interactable } from "../world/elements/Interactable"
+import { GroundType } from "../world/ground/Ground"
+import { LocationManager } from "../world/LocationManager"
 import { WorldLocation } from "../world/WorldLocation"
 import { DialogueSource, EMPTY_DIALOGUE, getDialogue } from "./Dialogue"
 import { DudeAnimationUtils } from "./DudeAnimationUtils"
@@ -342,6 +344,20 @@ export class Dude extends Component implements DialogueSource {
         if (this.knockIntervalCallback !== 0) {  // being knocked back, don't let em walk
             direction = Point.ZERO
         }
+
+        // const ground = LocationManager.instance.exterior().ground.get(pixelPtToTilePt(this.standingPosition))
+        // if (ground?.type === GroundType.LEDGE) {
+        //     if (direction.y < 0) {
+        //         // climbing uphill
+        //         speedMultiplier *= .5
+        //     } else if (direction.y > 0) {
+        //         // sliding downhill
+        //         speedMultiplier *= 2
+        //     } else {
+        //         // sliding downhill slightly
+        //         direction = new Point(direction.x, direction.y + .5)
+        //     }
+        // }
 
         const dx = direction.x
         const dy = direction.y

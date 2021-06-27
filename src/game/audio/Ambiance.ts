@@ -77,9 +77,10 @@ export class Ambiance {
     }
 
     static stop() {
-        Ambiance.currentAmbiance?.fadeOut().then(() => {
-            Ambiance.currentAmbiance.stop()
-            Ambiance.currentAmbiance = null
+        const current = Ambiance.currentAmbiance
+        Ambiance.currentAmbiance = null
+        current?.fadeOut().then(() => {
+            current.stop()
         })
     }
 }
