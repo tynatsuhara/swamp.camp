@@ -37,6 +37,7 @@ export class WorldLocation {
     private readonly elements = new Grid<ElementComponent>()
     private readonly occupied = new Grid<ElementComponent>()
     readonly ground = new Grid<GroundComponent>()
+    readonly levels = new Grid<number>()
 
     // TODO: Make dropped items saveable
     readonly droppedItems = new Set<Entity>()
@@ -54,10 +55,11 @@ export class WorldLocation {
      * @param allowPlacing if the user can place elements here
      * @param size the size of the location in tiles (square), can be omitted for interiors
      */
-    constructor(isInterior: boolean, allowPlacing: boolean, size?: number) {
+    constructor(isInterior: boolean, allowPlacing: boolean, size?: number, levels?: Grid<number>) {
         this.size = size
         this.isInterior = isInterior
         this.allowPlacing = allowPlacing
+        this.levels = levels
     }
 
     setGroundElement(type: GroundType, pos: Point, data: object = {}): GroundComponent {
@@ -316,6 +318,7 @@ export class WorldLocation {
             isInterior: this.isInterior,
             allowPlacing: this.allowPlacing,
             size: this.size,
+            levels: this.levels?.save(),
         }
     }
 
@@ -346,11 +349,13 @@ export class WorldLocation {
     static load(saveState: LocationSaveState): WorldLocation {
         // previously we did not save location size
         const size = saveState.size || (saveState.isInterior ? null : 70)
+        const levels = saveState.levels ? Grid.load(saveState.levels) : null
 
         const n = new WorldLocation(
             saveState.isInterior, 
             saveState.allowPlacing, 
-            size
+            size,
+            levels
         )
 
         n._uuid = saveState.uuid
