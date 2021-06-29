@@ -169,7 +169,7 @@ export class MapGenerator {
 
         let result: [Grid<number>, number] = [null, 1]
         while (result[1] > threshold) {
-            result = this.noise(3)
+            result = this.noise()
         }
 
         return result[0]
@@ -199,6 +199,7 @@ export class MapGenerator {
                 const v = Math.floor(levels * value)
                 str += v
 
+                // Compare top/bottom ratio
                 const above = grid.get(new Point(j, i-1))
                 if (above != null) {
                     if (above < v) {

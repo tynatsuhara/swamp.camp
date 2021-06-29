@@ -32,12 +32,13 @@ export class ConnectingTileLedgeSchema extends ConnectingTileSchema {
         const w = location.levels.get(new Point(x - 1, y))
         const nw = location.levels.get(new Point(x - 1, y - 1))
         
-        const render = (source: StaticTileSource, mirrorX = false) => {
-            return source.toImageRender(TileTransform.new({ 
-                position: position.times(TILE_SIZE), 
-                depth: Number.MIN_SAFE_INTEGER + 1,
-                mirrorX
-            }))
+        const render = (source: Point, mirrorX = false) => {
+            return Tilesets.instance.tilemap.getTileAt(source)
+                    .toImageRender(TileTransform.new({ 
+                        position: position.times(TILE_SIZE), 
+                        depth: Number.MIN_SAFE_INTEGER + 1,
+                        mirrorX
+                    }))
         }
 
         /**
@@ -50,52 +51,52 @@ export class ConnectingTileLedgeSchema extends ConnectingTileSchema {
 
         if (w === level && e === level && n < level) {
             // this is a top ledge
-            result = render(Tilesets.instance.tilemap.getTileAt(new Point(2, 0)))
+            result = render(new Point(2, 0))
         } else if (w === level && e === level && s < level) {
             // this is a bottom ledge
-            result = render(Tilesets.instance.tilemap.getTileAt(new Point(5, 7)))
+            result = render(new Point(5, 7))
         } else if (n === level && s === level && e < level) {
             // this is a right ledge
             if (ne === level) {
-                result = render(Tilesets.instance.tilemap.getTileAt(new Point(6, 9)), true)
+                result = render(new Point(6, 9), true)
             } else if (se === level) {
-                result = render(Tilesets.instance.tilemap.getTileAt(new Point(4, 9)), true)
+                result = render(new Point(4, 9), true)
             } else {
-                result = render(Tilesets.instance.tilemap.getTileAt(new Point(5, 9)), true)
+                result = render(new Point(5, 9), true)
             }
         } else if (n === level && s === level && w < level) {
             // this is a left ledge
             if (nw === level) {
-                result = render(Tilesets.instance.tilemap.getTileAt(new Point(6, 9)))
+                result = render(new Point(6, 9))
             } else if (sw === level) {
-                result = render(Tilesets.instance.tilemap.getTileAt(new Point(4, 9)))
+                result = render(new Point(4, 9))
             } else {
-                result = render(Tilesets.instance.tilemap.getTileAt(new Point(5, 9)))
+                result = render(new Point(5, 9))
             }
         } else if (s < level && w < level) {
             // bottom left corner
-            result = render(Tilesets.instance.tilemap.getTileAt(new Point(5, 8)))
+            result = render(new Point(5, 8))
         } else if (s < level && e < level) {
             // bottom right corner
-            result = render(Tilesets.instance.tilemap.getTileAt(new Point(5, 8)), true)
+            result = render(new Point(5, 8), true)
         } else if (n < level && w < level) {
             // top left corner
-            result = render(Tilesets.instance.tilemap.getTileAt(new Point(5, 10)))
+            result = render(new Point(5, 10))
         } else if (n < level && e < level) {
             // top right corner
-            result = render(Tilesets.instance.tilemap.getTileAt(new Point(5, 10)), true)
+            result = render(new Point(5, 10), true)
         } else if (se < level) {
             // top left inside corner 
-            result = render(Tilesets.instance.tilemap.getTileAt(new Point(7, 7)), true)
+            result = render(new Point(7, 7), true)
         } else if (sw < level) {
             // top right inside corner 
-            result = render(Tilesets.instance.tilemap.getTileAt(new Point(7, 7)))
+            result = render(new Point(7, 7))
         } else if (ne < level) {
             // bottom left inside corner 
-            result = render(Tilesets.instance.tilemap.getTileAt(new Point(4, 8)), true)
+            result = render(new Point(4, 8), true)
         } else if (nw < level) {
             // bottom right inside corner 
-            result = render(Tilesets.instance.tilemap.getTileAt(new Point(4, 8)))
+            result = render(new Point(4, 8))
         }
 
         if (!result) {
