@@ -18,7 +18,8 @@ export class MapGenerator {
         return Singletons.getOrCreate(MapGenerator)
     }
 
-    private static readonly MAP_SIZE = 70
+    private static readonly MAP_RANGE = 35
+    private static readonly MAP_SIZE = MapGenerator.MAP_RANGE * 2  // map goes from [-MAP_RANGE, MAP_RANGE]
 
     private readonly location = LocationManager.instance.add(
         new WorldLocation(false, true, MapGenerator.MAP_SIZE, MapGenerator.levels())
@@ -45,13 +46,13 @@ export class MapGenerator {
         return this.location
     }
 
-    private static VIGNETTE_EDGE = MapGenerator.MAP_SIZE/2 - 1
+    private static VIGNETTE_EDGE = MapGenerator.MAP_RANGE - 1
     private static TREELINE = MapGenerator.VIGNETTE_EDGE - 8
 
     private spawnTreesAtEdge() {
         const possibilities = []
-        for (let x = -MapGenerator.MAP_SIZE/2; x < MapGenerator.MAP_SIZE/2; x++) {
-            for (let y = -MapGenerator.MAP_SIZE/2; y < MapGenerator.MAP_SIZE/2; y++) {
+        for (let x = -MapGenerator.MAP_RANGE; x < MapGenerator.MAP_RANGE; x++) {
+            for (let y = -MapGenerator.MAP_RANGE; y < MapGenerator.MAP_RANGE; y++) {
                 const distToCenter = new Point(x, y).distanceTo(Point.ZERO)
                 const pt = new Point(x, y)
                 if (distToCenter > MapGenerator.VIGNETTE_EDGE) {
@@ -72,8 +73,8 @@ export class MapGenerator {
         const trees = Math.random() * 500 + 500
         for (let i = 0; i < trees; i++) {
             const pt = new Point(
-                Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_SIZE/2,
-                Math.floor(Math.random() * (MapGenerator.MAP_SIZE-1)) - MapGenerator.MAP_SIZE/2,
+                Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_RANGE,
+                Math.floor(Math.random() * (MapGenerator.MAP_SIZE-1)) - MapGenerator.MAP_RANGE,
             )
             this.spawnTree(pt)
         }
@@ -95,8 +96,8 @@ export class MapGenerator {
         const typesToClear = [ElementType.ROCK, ElementType.TREE_POINTY, ElementType.TREE_ROUND]
 
         // clear in corner
-        for (let x = MapGenerator.MAP_SIZE/2-11; x < MapGenerator.MAP_SIZE/2 + 10; x++) {
-            for (let y = MapGenerator.MAP_SIZE/2-25; y < MapGenerator.MAP_SIZE/2-23; y++) {
+        for (let x = MapGenerator.MAP_RANGE-11; x < MapGenerator.MAP_RANGE + 10; x++) {
+            for (let y = MapGenerator.MAP_RANGE-25; y < MapGenerator.MAP_RANGE-23; y++) {
                 const element = this.location.getElement(new Point(x, y))
                 if (!!element && typesToClear.indexOf(element.type) !== -1) {
                     this.location.removeElement(element)
@@ -120,8 +121,8 @@ export class MapGenerator {
         let placed = 0
         while (placed < count) {
             const p = new Point(
-                Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_SIZE/2,
-                Math.floor(Math.random() * (MapGenerator.MAP_SIZE)) - MapGenerator.MAP_SIZE/2,
+                Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_RANGE,
+                Math.floor(Math.random() * (MapGenerator.MAP_SIZE)) - MapGenerator.MAP_RANGE,
             )
             if (this.location.ground.get(p)?.type === GroundType.GRASS && this.location.addElement(element, p)) {
                 placed++
@@ -130,8 +131,8 @@ export class MapGenerator {
     }
 
     private placeGrass() {
-        for (let i = -MapGenerator.MAP_SIZE/2; i < MapGenerator.MAP_SIZE/2; i++) {
-            for (let j = -MapGenerator.MAP_SIZE/2; j < MapGenerator.MAP_SIZE/2; j++) {
+        for (let i = -MapGenerator.MAP_RANGE; i < MapGenerator.MAP_RANGE; i++) {
+            for (let j = -MapGenerator.MAP_RANGE; j < MapGenerator.MAP_RANGE; j++) {
                 const pt = new Point(i, j)
                 // TODO revisit levels
                 const levelsEnabled = debug.enableVerticality
@@ -191,8 +192,8 @@ export class MapGenerator {
         let bottomLedges = 0
         let topLedges = 0
 
-        for (let i = -MapGenerator.MAP_SIZE/2; i < MapGenerator.MAP_SIZE/2; i += 2) {
-            for (let j = -MapGenerator.MAP_SIZE/2; j < MapGenerator.MAP_SIZE/2; j += 2) {
+        for (let i = -MapGenerator.MAP_RANGE; i < MapGenerator.MAP_RANGE; i += 2) {
+            for (let j = -MapGenerator.MAP_RANGE; j < MapGenerator.MAP_RANGE; j += 2) {
                 var value = noise.simplex2(i / 100, j / 100);
                 value = (value + 1)/2  // scale to 0-1
                 const v = Math.floor(levels * value)
