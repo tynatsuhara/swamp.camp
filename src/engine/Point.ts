@@ -62,7 +62,11 @@ export class Point {
     }
 
     normalized(): Point {
-        return this.div(this.magnitude())
+        const mag = this.magnitude()
+        if (mag === 0) {
+            throw new Error("cannot normalize a vector with magnitude 0")
+        }
+        return this.div(mag)
     }
 
     toString(): string {
