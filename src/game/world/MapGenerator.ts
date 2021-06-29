@@ -161,7 +161,7 @@ export class MapGenerator {
      * @param levels the number of levels
      * @returns a grid of numbers the size of the map
      */
-    static noise(levels: number): Grid<number> {
+    static noise(levels: number = 3): Grid<number> {
         const noise = new Noise(Math.random())
 
         const grid = new Grid<number>()
