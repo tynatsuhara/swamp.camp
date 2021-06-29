@@ -150,6 +150,10 @@ export class Dude extends Component implements DialogueSource {
                 () => !UIStateManager.instance.isMenuOpen && !!this.dialogue && this.entity.getComponent(NPC)?.canTalk()
             ))
         }
+
+        this.start = () => {
+            this.seaLevel = LocationManager.instance.currentLocation.levels?.get(pixelPtToTilePt(this.standingPosition)) ?? 0
+        }
     }
 
     update(updateData: UpdateData) {
@@ -335,7 +339,6 @@ export class Dude extends Component implements DialogueSource {
         direction: Point, 
         facingOverride: number = 0, 
         speedMultiplier: number = 1,
-        maxDistance: number = Number.MAX_SAFE_INTEGER, 
     ) {
         if (this._health <= 0) {
             return
@@ -345,46 +348,100 @@ export class Dude extends Component implements DialogueSource {
             direction = Point.ZERO
         }
 
-        // const ground = LocationManager.instance.exterior().ground.get(pixelPtToTilePt(this.standingPosition))
-        // if (ground?.type === GroundType.LEDGE) {
-        //     if (direction.y < 0) {
-        //         // climbing uphill
-        //         speedMultiplier *= .5
-        //     } else if (direction.y > 0) {
-        //         // sliding downhill
-        //         speedMultiplier *= 2
-        //     } else {
-        //         // sliding downhill slightly
-        //         direction = new Point(direction.x, direction.y + .5)
-        //     }
-        // }
-
-        const dx = direction.x
-        const dy = direction.y
-
-        if ((dx < 0 && facingOverride === 0) || facingOverride < 0) {
+        if ((direction.x < 0 && facingOverride === 0) || facingOverride < 0) {
             this.animation.transform.mirrorX = true
-        } else if ((dx > 0 && facingOverride === 0) || facingOverride > 0) {
+        } else if ((direction.y > 0 && facingOverride === 0) || facingOverride > 0) {
             this.animation.transform.mirrorX = false
         }
         
         const wasMoving = this.isMoving
-        this._isMoving = dx != 0 || dy != 0
+        this._isMoving = direction.x !== 0 || direction.y !== 0
 
+        // Update animations
         if (this.isMoving) {
+            // start walking animation
+            // TODO make the run animation backwards if they run backwards :)
             if (!wasMoving || this.animationDirty) {
-                this.animation.goToAnimation(1)  // TODO make the run animation backwards if they run backwards :)
+                this.animation.goToAnimation(1)
             }
-            const translation = direction.normalized()
-            // this.lerpedLastMoveDir = this.lerpedLastMoveDir.lerp(0.25, translation)
-            const distance = Math.min(updateData.elapsedTimeMillis * this.speed * speedMultiplier, maxDistance)
-            const newPos = this._position.plus(translation.times(distance))
-            this.moveTo(newPos)
         } else if (wasMoving || this.animationDirty) {
+            // start idle animation
             this.animation.goToAnimation(0)
+        }
+        
+        const verticalMovement = this.getVerticalMovement(direction, updateData)
+        if (verticalMovement.y < 0) {
+            // climbing uphill takes effort
+            speedMultiplier *= .5
+        }
+
+        const walkDistance = updateData.elapsedTimeMillis * this.speed * speedMultiplier
+        const walkMovement = this.isMoving ? direction.normalized().times(walkDistance) : Point.ZERO
+
+        const totalMovement = walkMovement.plus(verticalMovement)
+
+        if (totalMovement.x !== 0 || totalMovement.y !== 0) {
+            const newPos = this._position.plus(totalMovement)
+            this.moveTo(newPos)
         }
 
         this.animationDirty = false
+    }
+
+    private seaLevel: number  // matches the scale of WorldLocation.levels
+
+    private getVerticalMovement(moveDirection: Point, updateData: UpdateData) {
+        const standingTilePos = pixelPtToTilePt(this.standingPosition)
+        const ground = LocationManager.instance.currentLocation.ground.get(standingTilePos)
+
+        let dx = 0
+        let dy = 0
+        if (dx == NaN || dy == NaN) {
+            this.log("what the fuck")
+        }
+
+        const fallSpeedY = .3
+        const fallSpeedX = .5
+        const climbSpeed = .4
+        const pixelHeightBetweenLevels = 10  // the distance between levels
+
+        const levels = LocationManager.instance.currentLocation.levels
+        if (!levels) {
+            return Point.ZERO
+        }
+        const currentLevel = levels.get(standingTilePos)
+
+        // default, if not on a ledge: fall to the current level
+        let speed: number
+        let goalLevel = currentLevel
+
+        // if (ground?.type === GroundType.LEDGE) {
+        //     if (levels.get(standingTilePos.plusY(1)) < currentLevel && moveDirection.y >= 0) {
+        //         // falling downhill
+        //         speed = fallSpeedY
+        //         goalLevel = currentLevel - 1
+        //     } else if (levels.get(standingTilePos.plusY(-1)) < currentLevel && moveDirection.y < 0) {
+        //         // climbing uphill
+        //         speed = climbSpeed
+        //         goalLevel = currentLevel + 1
+        //     }
+        // }
+
+        if (goalLevel < this.seaLevel) {
+            speed = fallSpeedY
+            const levelDiff = this.seaLevel - goalLevel
+            const distanceWillMove = Math.min(speed, levelDiff)
+            this.seaLevel = this.seaLevel - distanceWillMove
+            dy = distanceWillMove * pixelHeightBetweenLevels
+        } else if (goalLevel > this.seaLevel) {
+            speed = climbSpeed
+            const levelDiff = goalLevel - this.seaLevel
+            const distanceWillMove = Math.min(speed, levelDiff)
+            this.seaLevel = this.seaLevel + distanceWillMove
+            dy = -distanceWillMove * pixelHeightBetweenLevels
+        }
+
+        return new Point(dx, dy)
     }
 
     /**
@@ -395,6 +452,9 @@ export class Dude extends Component implements DialogueSource {
             ? (pos: Point) => this.collider.forceSetPosition(pos)
             : (pos: Point) => this.collider.moveTo(pos)
         this._position = moveFn(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos)
+        if (skipColliderCheck) {
+            this.seaLevel = LocationManager.instance.currentLocation.levels?.get(pixelPtToTilePt(this.standingPosition)) ?? 0
+        }
     }
 
     private isRolling = false
@@ -546,5 +606,9 @@ export class Dude extends Component implements DialogueSource {
                 new Point(TILE_SIZE, TILE_SIZE), 0, false, false, UIStateManager.UI_SPRITE_DEPTH
             ))]
         }
+    }
+
+    private log(message: any) {
+        console.log(`${DudeType[this.type]}: ${message}`)
     }
 }
