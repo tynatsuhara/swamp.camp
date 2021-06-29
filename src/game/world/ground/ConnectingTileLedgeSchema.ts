@@ -58,6 +58,8 @@ export class ConnectingTileLedgeSchema extends ConnectingTileSchema {
             // this is a right ledge
             if (ne === level) {
                 result = render(Tilesets.instance.tilemap.getTileAt(new Point(6, 9)), true)
+            } else if (se === level) {
+                result = render(Tilesets.instance.tilemap.getTileAt(new Point(4, 9)), true)
             } else {
                 result = render(Tilesets.instance.tilemap.getTileAt(new Point(5, 9)), true)
             }
@@ -65,6 +67,8 @@ export class ConnectingTileLedgeSchema extends ConnectingTileSchema {
             // this is a left ledge
             if (nw === level) {
                 result = render(Tilesets.instance.tilemap.getTileAt(new Point(6, 9)))
+            } else if (sw === level) {
+                result = render(Tilesets.instance.tilemap.getTileAt(new Point(4, 9)))
             } else {
                 result = render(Tilesets.instance.tilemap.getTileAt(new Point(5, 9)))
             }
@@ -88,10 +92,10 @@ export class ConnectingTileLedgeSchema extends ConnectingTileSchema {
             result = render(Tilesets.instance.tilemap.getTileAt(new Point(7, 7)))
         } else if (ne < level) {
             // bottom left inside corner 
-            result = render(Tilesets.instance.tilemap.getTileAt(new Point(4, 8)))
+            result = render(Tilesets.instance.tilemap.getTileAt(new Point(4, 8)), true)
         } else if (nw < level) {
             // bottom right inside corner 
-            result = render(Tilesets.instance.tilemap.getTileAt(new Point(4, 8)), true)
+            result = render(Tilesets.instance.tilemap.getTileAt(new Point(4, 8)))
         }
 
         if (!result) {
