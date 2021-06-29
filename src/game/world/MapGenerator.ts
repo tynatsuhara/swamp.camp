@@ -1,3 +1,4 @@
+import { debug } from "../../engine/Debug"
 import { Point } from "../../engine/Point"
 import { Grid } from "../../engine/util/Grid"
 import { Lists } from "../../engine/util/Lists"
@@ -20,7 +21,7 @@ export class MapGenerator {
     private static readonly MAP_SIZE = 70
 
     private readonly location = LocationManager.instance.add(
-        new WorldLocation(false, true, MapGenerator.MAP_SIZE, MapGenerator.noise(4))
+        new WorldLocation(false, true, MapGenerator.MAP_SIZE, MapGenerator.levels())
     )
     private readonly tentPos = new Point(-3, -3)
 
@@ -133,8 +134,8 @@ export class MapGenerator {
             for (let j = -MapGenerator.MAP_SIZE/2; j < MapGenerator.MAP_SIZE/2; j++) {
                 const pt = new Point(i, j)
                 // TODO revisit levels
-                const levelsEnabled = false
-                const thisLevel = this.location.levels.get(pt)
+                const levelsEnabled = debug.enableVerticality
+                const thisLevel = this.location.levels?.get(pt)
                 const adjacent = [
                     pt.plus(new Point(0, -1)), 
                     pt.plus(new Point(1, -1)), 
@@ -145,10 +146,10 @@ export class MapGenerator {
                     pt.plus(new Point(-1, 0)), 
                     pt.plus(new Point(-1, -1)), 
                 ]
-                const isLedge = adjacent
+                const isLedge = levelsEnabled && adjacent
                         .map(pt => this.location.levels.get(pt))
                         .some(level => level < thisLevel)
-                if (isLedge && levelsEnabled) {
+                if (isLedge) {
                     this.location.setGroundElement(GroundType.LEDGE, pt)
                 } else {
                     this.location.setGroundElement(GroundType.GRASS, pt)
@@ -157,19 +158,38 @@ export class MapGenerator {
         }
     }
 
+    static levels() {
+        if (!debug.enableVerticality) {
+            return null
+        }
+
+        // We want more bottom ledges than top because it looks nicer with the camera "angle"
+        const threshold = .3
+
+        let result: [Grid<number>, number] = [null, 1]
+        while (result[1] > threshold) {
+            result = this.noise(3)
+        }
+
+        return result[0]
+    }
+
     /**
      * @param levels the number of levels
-     * @returns a grid of numbers the size of the map
+     * @returns a grid of numbers the size of the map and the ratio of top/bottom ledges
      */
-    static noise(levels: number = 3): Grid<number> {
-        const noise = new Noise(Math.random())
+    static noise(levels: number = 3, seed = Math.random()): [Grid<number>, number] {
+        const noise = new Noise(seed)
 
         const grid = new Grid<number>()
-        let str = ""
+        let str = `seed: ${seed} \n`
 
         // Each entry will occupy a 2x2 tile section to prevent 
         // 1-wide entries that are hard to make work art-wise
         // TODO: Smooth out edges to prevent stair-step pattern
+
+        let bottomLedges = 0
+        let topLedges = 0
 
         for (let i = -MapGenerator.MAP_SIZE/2; i < MapGenerator.MAP_SIZE/2; i += 2) {
             for (let j = -MapGenerator.MAP_SIZE/2; j < MapGenerator.MAP_SIZE/2; j += 2) {
@@ -177,6 +197,15 @@ export class MapGenerator {
                 value = (value + 1)/2  // scale to 0-1
                 const v = Math.floor(levels * value)
                 str += v
+
+                const above = grid.get(new Point(j, i-1))
+                if (above != null) {
+                    if (above < v) {
+                        topLedges++
+                    } else if (above > v) {
+                        bottomLedges++
+                    }
+                }
 
                 grid.set(new Point(j, i), v)
                 grid.set(new Point(j+1, i+1), v)
@@ -186,8 +215,10 @@ export class MapGenerator {
             str += "\n"
         }
 
+        str += `top ledges = ${topLedges}\nbottom ledges = ${bottomLedges}\nratio top/bottom = ${topLedges/bottomLedges}`
+
         console.log(str)
-        return grid
+        return [grid, topLedges/bottomLedges]
     }
 }
 
