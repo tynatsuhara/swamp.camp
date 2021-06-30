@@ -23,6 +23,7 @@ import { HUD } from "../ui/HUD"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Interactable } from "../world/elements/Interactable"
 import { GroundType } from "../world/ground/Ground"
+import { GroundComponent } from "../world/ground/GroundComponent"
 import { LocationManager } from "../world/LocationManager"
 import { WorldLocation } from "../world/WorldLocation"
 import { DialogueSource, EMPTY_DIALOGUE, getDialogue } from "./Dialogue"
@@ -368,8 +369,14 @@ export class Dude extends Component implements DialogueSource {
             // start idle animation
             this.animation.goToAnimation(0)
         }
+
+        const standingTilePos = pixelPtToTilePt(this.standingPosition)
+        const ground = LocationManager.instance.currentLocation.ground.get(standingTilePos)
+        if (ground?.type === GroundType.WATER) {
+            speedMultiplier *= .4
+        }
         
-        const verticalMovement = this.getVerticalMovement(direction, updateData)
+        const verticalMovement = this.getVerticalMovement(standingTilePos, ground, direction, updateData)
         if (verticalMovement.y < 0) {
             // climbing uphill takes effort
             speedMultiplier *= .5
@@ -390,10 +397,7 @@ export class Dude extends Component implements DialogueSource {
 
     private seaLevel: number  // matches the scale of WorldLocation.levels
 
-    private getVerticalMovement(moveDirection: Point, updateData: UpdateData) {
-        const standingTilePos = pixelPtToTilePt(this.standingPosition)
-        const ground = LocationManager.instance.currentLocation.ground.get(standingTilePos)
-
+    private getVerticalMovement(standingTilePos: Point, ground: GroundComponent, moveDirection: Point, updateData: UpdateData) {
         let dx = 0
         let dy = 0
         if (dx == NaN || dy == NaN) {
@@ -414,6 +418,10 @@ export class Dude extends Component implements DialogueSource {
         // default, if not on a ledge: fall to the current level
         let speed: number
         let goalLevel = currentLevel
+
+        if (ground?.type === GroundType.WATER && !this.isJumping) {
+            goalLevel = currentLevel - 1
+        }
 
         // if (ground?.type === GroundType.LEDGE) {
         //     if (levels.get(standingTilePos.plusY(1)) < currentLevel && moveDirection.y >= 0) {
