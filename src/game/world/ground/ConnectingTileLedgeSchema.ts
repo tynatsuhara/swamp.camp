@@ -54,7 +54,7 @@ export class ConnectingTileLedgeSchema extends ConnectingTileSchema {
             result = render(new Point(2, 0))
         } else if (w === level && e === level && s < level) {
             // this is a bottom ledge
-            result = render(new Point(5, 7))
+            result = this.getBottomLedge(render)
         } else if (n === level && s === level && e < level) {
             // this is a right ledge
             if (ne === level) {
@@ -104,5 +104,18 @@ export class ConnectingTileLedgeSchema extends ConnectingTileSchema {
         }
 
         return [result]
+    }
+
+    private bottomLedge: ImageRender
+    private getBottomLedge(render: (source: Point, mirrorX: boolean) => ImageRender) {
+        if (!this.bottomLedge) {
+            if (Math.random() < .3) {
+                this.bottomLedge = render(new Point(6, 7), Math.random() > .5)
+            } else {
+                const choices = 5
+                this.bottomLedge = render(new Point(1 + Math.floor(Math.random() * choices), 7), Math.random() > .5)
+            }
+        }
+        return this.bottomLedge
     }
 }

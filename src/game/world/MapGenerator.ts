@@ -18,7 +18,7 @@ export class MapGenerator {
         return Singletons.getOrCreate(MapGenerator)
     }
 
-    private static readonly MAP_RANGE = 35
+    private static readonly MAP_RANGE = 40
     private static readonly MAP_SIZE = MapGenerator.MAP_RANGE * 2  // map goes from [-MAP_RANGE, MAP_RANGE]
 
     private readonly location = LocationManager.instance.add(
@@ -167,10 +167,12 @@ export class MapGenerator {
         // We want more bottom ledges than top because it looks nicer with the camera "angle"
         const threshold = .3
 
-        let result: [Grid<number>, number] = [null, 1]
+        let result: [Grid<number>, number, string] = [null, 1, null]
         while (result[1] > threshold) {
             result = this.noise()
         }
+
+        console.log(result[2])
 
         return result[0]
     }
@@ -179,21 +181,24 @@ export class MapGenerator {
      * @param levels the number of levels
      * @returns a grid of numbers the size of the map and the ratio of top/bottom ledges
      */
-    static noise(levels: number = 3, seed = Math.random()): [Grid<number>, number] {
+    static noise(levels: number = 3, seed = Math.random()): [Grid<number>, number, string] {
         const noise = new Noise(seed)
 
         const grid = new Grid<number>()
         let str = `seed: ${seed} \n`
 
-        // Each entry will occupy a 2x2 tile section to prevent 
+        // Should be divisible by 2 and a divisor of MAP_SIZE
+        const sq = 2
+
+        // Each entry will occupy a sq x sq tile section to prevent 
         // 1-wide entries that are hard to make work art-wise
-        // TODO: Smooth out edges to prevent stair-step pattern
+        // TODO: Smooth out edges to prevent stair-step pattern?
 
         let bottomLedges = 0
         let topLedges = 0
 
-        for (let i = -MapGenerator.MAP_RANGE; i < MapGenerator.MAP_RANGE; i += 2) {
-            for (let j = -MapGenerator.MAP_RANGE; j < MapGenerator.MAP_RANGE; j += 2) {
+        for (let i = -MapGenerator.MAP_RANGE; i < MapGenerator.MAP_RANGE; i += sq) {
+            for (let j = -MapGenerator.MAP_RANGE; j < MapGenerator.MAP_RANGE; j += sq) {
                 var value = noise.simplex2(i / 100, j / 100);
                 value = (value + 1)/2  // scale to 0-1
                 const v = Math.floor(levels * value)
@@ -209,19 +214,22 @@ export class MapGenerator {
                     }
                 }
 
-                grid.set(new Point(j, i), v)
-                grid.set(new Point(j+1, i+1), v)
-                grid.set(new Point(j+1, i), v)
-                grid.set(new Point(j, i+1), v)
+                for (let m = 0; m < sq; m++) {
+                    for (let n = 0; n < sq; n++) {
+                        grid.set(new Point(j+m, i+n), v)
+                    }
+                }
             }
             str += "\n"
         }
 
         str += `top ledges = ${topLedges}\nbottom ledges = ${bottomLedges}\nratio top/bottom = ${topLedges/bottomLedges}`
 
-        console.log(str)
-        return [grid, topLedges/bottomLedges]
+        return [grid, topLedges/bottomLedges, str]
     }
 }
 
-window["noise"] = MapGenerator.noise
+window["noise"] = (...args: any) => {
+    const result = MapGenerator.noise(args)
+    console.log(result[2])
+}
