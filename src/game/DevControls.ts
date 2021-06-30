@@ -27,6 +27,15 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
             LocationManager.instance.currentLocation.setGroundElement(GroundType.PATH, mouseTilePos)
         }
     }],
+    [InputKey.L, "place water", (input) => {
+        const mouseTilePos = pixelPtToTilePt(input.mousePos)
+        const currentType = LocationManager.instance.currentLocation.ground.get(mouseTilePos)?.type
+        if (currentType === GroundType.WATER) {
+            LocationManager.instance.currentLocation.setGroundElement(GroundType.GRASS, mouseTilePos)
+        } else if (currentType === GroundType.GRASS) {
+            LocationManager.instance.currentLocation.setGroundElement(GroundType.WATER, mouseTilePos)
+        }
+    }],
     [InputKey.PERIOD, "delete hovered element", (input) => LocationManager.instance.currentLocation.removeElementAt(pixelPtToTilePt(input.mousePos))],
     [InputKey.N, "fast forward", (input) => WorldTime.instance.fastForward(input.isKeyHeld(InputKey.SHIFT) ? TimeUnit.MINUTE : TimeUnit.HOUR)],
 ]

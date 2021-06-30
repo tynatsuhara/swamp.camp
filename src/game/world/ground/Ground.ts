@@ -6,9 +6,10 @@ import { makePath } from "./Path"
 import { makeBasicNineSliceGround, makeBasicGround } from "./BasicGround"
 import { makeLedge } from "./Ledge"
 import { Singletons } from "../../Singletons"
+import { makeWater } from "./Water"
 
 export enum GroundType {
-    BASIC, BASIC_NINE_SLICE, GRASS, PATH, LEDGE
+    BASIC, BASIC_NINE_SLICE, GRASS, PATH, LEDGE, WATER
 }
 
 export class SavedGround {
@@ -38,6 +39,7 @@ export class Ground {
         [GroundType.GRASS]: makeGrass,
         [GroundType.PATH]: makePath,
         [GroundType.LEDGE]: makeLedge,
+        [GroundType.WATER]: makeWater,
     }
 
     make(type: GroundType, wl: WorldLocation, pos: Point, data: object) {
