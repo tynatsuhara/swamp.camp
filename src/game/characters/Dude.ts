@@ -379,8 +379,9 @@ export class Dude extends Component implements DialogueSource {
         const verticalMovement = this.getVerticalMovement(standingTilePos, ground, direction, updateData)
         if (verticalMovement.y < 0) {
             // climbing uphill takes effort
-            speedMultiplier *= .5
+            speedMultiplier *= 0
         }
+        // TODO: fix buggy positioning on the edge of a ledge
 
         const walkDistance = updateData.elapsedTimeMillis * this.speed * speedMultiplier
         const walkMovement = this.isMoving ? direction.normalized().times(walkDistance) : Point.ZERO
@@ -405,15 +406,11 @@ export class Dude extends Component implements DialogueSource {
         }
 
         const fallSpeedY = .3
-        const fallSpeedX = .5
-        const climbSpeed = .4
+        const climbSpeed = .2
         const pixelHeightBetweenLevels = 10  // the distance between levels
 
         const levels = LocationManager.instance.currentLocation.levels
-        if (!levels) {
-            return Point.ZERO
-        }
-        const currentLevel = levels.get(standingTilePos)
+        const currentLevel = levels?.get(standingTilePos) ?? 0
 
         // default, if not on a ledge: fall to the current level
         let speed: number
