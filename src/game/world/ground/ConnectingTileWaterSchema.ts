@@ -18,6 +18,8 @@ const CORNER_DIMS = new Point(CORNER_SIZE, CORNER_SIZE)
  */
 export class ConnectingTileWaterSchema extends ConnectingTileSchema {
 
+    static readonly DEPTH = Number.MIN_SAFE_INTEGER + 2
+
     canConnect(schema: ConnectingTileSchema) {
         return schema instanceof ConnectingTileWaterSchema
     }
@@ -45,7 +47,7 @@ export class ConnectingTileWaterSchema extends ConnectingTileSchema {
             results.push(source.toImageRender(TileTransform.new({ 
                 position: position.times(TILE_SIZE).plus(offset), 
                 mirrorX, 
-                depth: Number.MIN_SAFE_INTEGER + 1
+                depth: ConnectingTileWaterSchema.DEPTH
             })))
         }
 
@@ -61,9 +63,6 @@ export class ConnectingTileWaterSchema extends ConnectingTileSchema {
             )
             render(tile, false, offset)
         }
-
-        // water
-        render(tilemap.getTileAt(new Point(6, 0)))
 
         // top
         if (!n) {

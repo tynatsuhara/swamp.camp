@@ -64,9 +64,9 @@ export class WalkingParticles extends Component {
                     () => Point.ZERO,
                     new Point(3, 3),
                 )
-            }  
+            }
             Particles.instance.emitParticle(
-                Math.random() > .5 ? Color.LIGHT_BLUE : Color.WHITE, 
+                Math.random() < .7 ? Color.LIGHT_BLUE : Color.WHITE, 
                 this.dude.standingPosition.randomlyShifted(xRange, 3).plusY(-2),
                 depth + 1, 
                 LIFESPAN_MILLIS,
