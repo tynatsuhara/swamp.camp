@@ -372,7 +372,7 @@ export class Dude extends Component implements DialogueSource {
 
         const standingTilePos = pixelPtToTilePt(this.standingPosition)
         const ground = LocationManager.instance.currentLocation.ground.get(standingTilePos)
-        if (ground?.type === GroundType.WATER) {
+        if (ground?.type === GroundType.WATER && !this.isJumping) {
             speedMultiplier *= .4
         }
         
@@ -481,7 +481,8 @@ export class Dude extends Component implements DialogueSource {
     private rollFunction = this.dashRoll
 
     roll() {
-        if (!this.canRoll) {
+        const ground = LocationManager.instance.currentLocation.ground.get(pixelPtToTilePt(this.standingPosition))
+        if (!this.canRoll || ground?.type === GroundType.WATER) {
             return
         }
         this.canRoll = false
