@@ -376,17 +376,25 @@ export class Dude extends Component implements DialogueSource {
             speedMultiplier *= .4
         }
         
-        const verticalMovement = this.getVerticalMovement(standingTilePos, ground, direction, updateData)
+        const verticalMovement = this.getVerticalMovement(updateData)
         if (verticalMovement.y < 0) {
             // climbing uphill takes effort
-            speedMultiplier *= 0
+            speedMultiplier = 0
         }
-        // TODO: fix buggy positioning on the edge of a ledge
 
         const walkDistance = updateData.elapsedTimeMillis * this.speed * speedMultiplier
         const walkMovement = this.isMoving ? direction.normalized().times(walkDistance) : Point.ZERO
+        const standingPosAfterWalk = this.standingPosition.plus(walkMovement)
 
-        const totalMovement = walkMovement.plus(verticalMovement)
+        // Prevent buggy positioning near a ledge
+        const depthAfterWalk = this.getLevelAt(standingPosAfterWalk)
+        const depthAfterVerticalMove = this.getLevelAt(standingPosAfterWalk.plus(verticalMovement))
+        let totalMovement: Point
+        if (depthAfterWalk === depthAfterVerticalMove){
+            totalMovement = walkMovement.plus(verticalMovement)
+        } else {
+            totalMovement = walkMovement
+        }
 
         if (totalMovement.x !== 0 || totalMovement.y !== 0) {
             const newPos = this._position.plus(totalMovement)
@@ -398,27 +406,28 @@ export class Dude extends Component implements DialogueSource {
 
     private seaLevel: number  // matches the scale of WorldLocation.levels
 
-    private getVerticalMovement(standingTilePos: Point, ground: GroundComponent, moveDirection: Point, updateData: UpdateData) {
+    private getLevelAt(pos: Point) {
+        const tilePos = pixelPtToTilePt(pos)
+        const currentLevel = LocationManager.instance.currentLocation.levels?.get(tilePos) ?? 0
+        const ground = LocationManager.instance.currentLocation.ground.get(tilePos)
+        if (ground?.type === GroundType.WATER) {
+            return currentLevel - 1
+        }
+        return currentLevel
+    }
+
+    private getVerticalMovement(updateData: UpdateData) {
         let dx = 0
         let dy = 0
         if (dx == NaN || dy == NaN) {
             this.log("what the fuck")
         }
 
-        const fallSpeedY = .3
-        const climbSpeed = .2
+        const fallSpeedY = .0075
+        const climbSpeed = .0050
         const pixelHeightBetweenLevels = 10  // the distance between levels
 
-        const levels = LocationManager.instance.currentLocation.levels
-        const currentLevel = levels?.get(standingTilePos) ?? 0
-
-        // default, if not on a ledge: fall to the current level
-        let speed: number
-        let goalLevel = currentLevel
-
-        if (ground?.type === GroundType.WATER && !this.isJumping) {
-            goalLevel = currentLevel - 1
-        }
+        const goalLevel = this.getLevelAt(this.standingPosition)
 
         // if (ground?.type === GroundType.LEDGE) {
         //     if (levels.get(standingTilePos.plusY(1)) < currentLevel && moveDirection.y >= 0) {
@@ -433,13 +442,13 @@ export class Dude extends Component implements DialogueSource {
         // }
 
         if (goalLevel < this.seaLevel) {
-            speed = fallSpeedY
+            const speed = fallSpeedY * updateData.elapsedTimeMillis
             const levelDiff = this.seaLevel - goalLevel
             const distanceWillMove = Math.min(speed, levelDiff)
             this.seaLevel = this.seaLevel - distanceWillMove
             dy = distanceWillMove * pixelHeightBetweenLevels
         } else if (goalLevel > this.seaLevel) {
-            speed = climbSpeed
+            const speed = climbSpeed * updateData.elapsedTimeMillis
             const levelDiff = goalLevel - this.seaLevel
             const distanceWillMove = Math.min(speed, levelDiff)
             this.seaLevel = this.seaLevel + distanceWillMove
