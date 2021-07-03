@@ -10,6 +10,7 @@ import { ConnectingTileSchema } from "./ConnectingTileSchema"
 import { Ground, GroundType } from "./Ground"
 import { WorldLocation } from "../WorldLocation"
 import { ConnectingTileWaterfallSchema } from "./ConnectingTileWaterfallSchema"
+import { GroundRenderer } from "../GroundRenderer"
 
 const CORNER_SIZE = TILE_SIZE/2
 const CORNER_DIMS = new Point(CORNER_SIZE, CORNER_SIZE)
@@ -19,7 +20,7 @@ const CORNER_DIMS = new Point(CORNER_SIZE, CORNER_SIZE)
  */
 export class ConnectingTileWaterSchema extends ConnectingTileSchema {
 
-    static readonly DEPTH = Number.MIN_SAFE_INTEGER + 2
+    static readonly DEPTH = GroundRenderer.DEPTH + 2
 
     canConnect(schema: ConnectingTileSchema) {
         return schema instanceof ConnectingTileWaterSchema

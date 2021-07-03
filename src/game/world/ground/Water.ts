@@ -7,6 +7,7 @@ import { TileSetAnimation } from "../../../engine/tiles/TileSetAnimation"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Point } from "../../../engine/Point"
 import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { GroundRenderer } from "../GroundRenderer"
 
 export const makeWater = (d: MakeGroundFuncData): GroundComponent => {
     
@@ -17,7 +18,7 @@ export const makeWater = (d: MakeGroundFuncData): GroundComponent => {
         // [Tilesets.instance.tilemap.getTileAt(new Point(6, 2)), animationSpeed],
     ]).toComponent(TileTransform.new({ 
         position: d.pos.times(TILE_SIZE),
-        depth: Number.MIN_SAFE_INTEGER,
+        depth: GroundRenderer.DEPTH - 5,
         rotation: Math.floor(Math.random() * 4) * 90
     }))
 

@@ -6,6 +6,7 @@ import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { ConnectingTileSchema } from "./ConnectingTileSchema"
 import { GroundType } from "./Ground"
 import { WorldLocation } from "../WorldLocation"
+import { GroundRenderer } from "../GroundRenderer"
 
 const CORNER_SIZE = TILE_SIZE/2
 const CORNER_DIMS = new Point(CORNER_SIZE, CORNER_SIZE)
@@ -72,7 +73,7 @@ export class ConnectingTilePathSchema extends ConnectingTileSchema {
             return source.toImageRender(TileTransform.new({ 
                 position: position.times(TILE_SIZE).plus(offset), 
                 rotation, 
-                depth: Number.MIN_SAFE_INTEGER + 1
+                depth: GroundRenderer.DEPTH + 1
             }))
         }
 

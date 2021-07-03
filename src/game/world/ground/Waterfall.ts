@@ -11,6 +11,7 @@ import { RepeatedInvoker } from "../../../engine/util/RepeatedInvoker"
 import { Particles } from "../../graphics/Particles"
 import { Color } from "../../ui/Color"
 import { ConnectingTileWaterSchema } from "./ConnectingTileWaterSchema"
+import { GroundRenderer } from "../GroundRenderer"
 
 export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
     const schema = new ConnectingTileWaterfallSchema()
@@ -28,7 +29,7 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
             [Tilesets.instance.tilemap.getTileAt(new Point(1, 2)), waterfallSpeed],
         ]).toComponent(TileTransform.new({
             position: d.pos.times(TILE_SIZE),
-            depth: ConnectingTileWaterfallSchema.DEPTH - 1,
+            depth: GroundRenderer.DEPTH - 5,
         }))
     )
 
@@ -42,7 +43,7 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
                         Math.floor(Math.random() * TILE_SIZE-size),
                         13 + Math.random() * 2
                     )),
-                    Number.MIN_SAFE_INTEGER + .5, 
+                    GroundRenderer.DEPTH - 1, 
                     1000,
                     (t) => new Point(0, t * .005),
                     new Point(size, size),

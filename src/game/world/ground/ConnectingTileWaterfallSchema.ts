@@ -6,10 +6,11 @@ import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { ConnectingTileSchema } from "./ConnectingTileSchema"
 import { WorldLocation } from "../WorldLocation"
 import { ConnectingTileWaterSchema } from "./ConnectingTileWaterSchema"
+import { GroundRenderer } from "../GroundRenderer"
 
 export class ConnectingTileWaterfallSchema extends ConnectingTileSchema {
 
-    static readonly DEPTH = Number.MIN_SAFE_INTEGER + 2
+    static readonly DEPTH = GroundRenderer.DEPTH + 1
 
     canConnect(schema: ConnectingTileSchema) {
         return schema instanceof ConnectingTileWaterSchema

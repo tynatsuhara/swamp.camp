@@ -5,6 +5,7 @@ import { TileTransform } from "../../../engine/tiles/TileTransform"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { ConnectingTileSchema } from "./ConnectingTileSchema"
 import { WorldLocation } from "../WorldLocation"
+import { GroundRenderer } from "../GroundRenderer"
 
 /**
  * Defines how a type of connecting tiles interacts with other types of connecting tiles.
@@ -36,7 +37,7 @@ export class ConnectingTileLedgeSchema extends ConnectingTileSchema {
             return Tilesets.instance.tilemap.getTileAt(source)
                     .toImageRender(TileTransform.new({ 
                         position: position.times(TILE_SIZE), 
-                        depth: Number.MIN_SAFE_INTEGER + 1,
+                        depth: GroundRenderer.DEPTH + 1,
                         mirrorX
                     }))
         }

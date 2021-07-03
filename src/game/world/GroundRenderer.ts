@@ -14,7 +14,7 @@ import { Singletons } from "../Singletons"
  */
 export class GroundRenderer {
 
-    static readonly DEPTH = Number.MIN_SAFE_INTEGER
+    static readonly DEPTH = Number.MIN_SAFE_INTEGER + 10
 
     static get instance() {
         return Singletons.getOrCreate(GroundRenderer)
