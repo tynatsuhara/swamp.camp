@@ -16,7 +16,7 @@ export class Ambiance {
 
     private static readonly DAY = new QueueAudioPlayer(
         "chirpy daytime ambiance",
-        1,
+        .75,
         ["audio/ambiance/daytime.ogg"],
         0,  // don't crossfade
         0,  // no time between end/start
