@@ -8,10 +8,10 @@ export class PointAudio extends Component {
     private readonly audio: HTMLAudioElement
     private readonly pos: Point
     private readonly distance: number
-    private multiplier: number = 1
+    private multiplier: number
     private active: boolean = true
 
-    constructor(filePath: string, pos: Point, distance: number, loop: boolean) {
+    constructor(filePath: string, pos: Point, distance: number, loop: boolean, multiplier: number = 1) {
         super()
 
         this.audio = new Audio(filePath)
@@ -22,6 +22,7 @@ export class PointAudio extends Component {
 
         this.pos = pos
         this.distance = distance
+        this.multiplier = multiplier
     }
 
     update() {

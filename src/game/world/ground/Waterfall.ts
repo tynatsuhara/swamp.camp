@@ -10,8 +10,8 @@ import { ConnectingTileWaterfallSchema } from "./ConnectingTileWaterfallSchema"
 import { RepeatedInvoker } from "../../../engine/util/RepeatedInvoker"
 import { Particles } from "../../graphics/Particles"
 import { Color } from "../../ui/Color"
-import { ConnectingTileWaterSchema } from "./ConnectingTileWaterSchema"
 import { GroundRenderer } from "../GroundRenderer"
+import { PointAudio } from "../../audio/PointAudio"
 
 export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
     const schema = new ConnectingTileWaterfallSchema()
@@ -31,6 +31,16 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
             position: d.pos.times(TILE_SIZE),
             depth: GroundRenderer.DEPTH - 5,
         }))
+    )
+
+    e.addComponent(
+        new PointAudio(
+            "/audio/ambiance/waterfall.wav",
+            d.pos.plus(new Point(.5, .5)).times(TILE_SIZE),
+            TILE_SIZE * 8,
+            true,
+            .2
+        )
     )
 
     e.addComponent(new RepeatedInvoker(
