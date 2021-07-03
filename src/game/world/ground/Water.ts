@@ -17,7 +17,7 @@ export const makeWater = (d: MakeGroundFuncData): GroundComponent => {
         // [Tilesets.instance.tilemap.getTileAt(new Point(6, 2)), animationSpeed],
     ]).toComponent(TileTransform.new({ 
         position: d.pos.times(TILE_SIZE),
-        depth: ConnectingTileWaterSchema.DEPTH,
+        depth: Number.MIN_SAFE_INTEGER,
         rotation: Math.floor(Math.random() * 4) * 90
     }))
 

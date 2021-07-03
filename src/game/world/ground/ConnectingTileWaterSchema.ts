@@ -7,8 +7,9 @@ import { Grid } from "../../../engine/util/Grid"
 import { GroundComponent } from "./GroundComponent"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { ConnectingTileSchema } from "./ConnectingTileSchema"
-import { GroundType } from "./Ground"
+import { Ground, GroundType } from "./Ground"
 import { WorldLocation } from "../WorldLocation"
+import { ConnectingTileWaterfallSchema } from "./ConnectingTileWaterfallSchema"
 
 const CORNER_SIZE = TILE_SIZE/2
 const CORNER_DIMS = new Point(CORNER_SIZE, CORNER_SIZE)
@@ -22,6 +23,7 @@ export class ConnectingTileWaterSchema extends ConnectingTileSchema {
 
     canConnect(schema: ConnectingTileSchema) {
         return schema instanceof ConnectingTileWaterSchema
+            || schema instanceof ConnectingTileWaterfallSchema
     }
    
     /**
@@ -67,6 +69,8 @@ export class ConnectingTileWaterSchema extends ConnectingTileSchema {
         // top
         if (!n) {
             render(tilemap.getTileAt(new Point(5, 0)))
+        } else if (n?.entity.getComponent(GroundComponent).type === GroundType.WATERFALL) {
+            // TODO splash
         }
         // bottom
         if (!s) {

@@ -4,7 +4,7 @@ import { UpdateData } from "../../engine/Engine"
 import { Point } from "../../engine/Point"
 import { Dude } from "../characters/Dude"
 import { Color } from "../ui/Color"
-import { GroundType } from "../world/ground/Ground"
+import { Ground, GroundType } from "../world/ground/Ground"
 import { GroundRenderer } from "../world/GroundRenderer"
 import { LocationManager } from "../world/LocationManager"
 import { Particles } from "./Particles"
@@ -52,7 +52,7 @@ export class WalkingParticles extends Component {
         const groud = LocationManager.instance.currentLocation.ground
                 .get(pixelPtToTilePt(this.dude.standingPosition))
 
-        if (groud?.type === GroundType.WATER) {
+        if (Ground.isWater(groud?.type)) {
             const depth = this.dude.standingPosition.y + 6
             const xRange = this.dude.colliderSize.x - 1
             for (let i = 0; i < 15; i++) {

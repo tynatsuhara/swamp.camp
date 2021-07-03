@@ -25,7 +25,7 @@ export abstract class ConnectingTileSchema {
         const el = grid.get(pt)
         if (el) {
             const ct = el.entity.getComponent(ConnectingTile)
-            if (ct && ct.schema.canConnect(this)) {
+            if (ct && this.canConnect(ct.schema)) {
                 return ct
             }
         }

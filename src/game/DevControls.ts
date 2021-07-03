@@ -34,6 +34,10 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
             LocationManager.instance.currentLocation.setGroundElement(GroundType.GRASS, mouseTilePos)
         } else if (currentType === GroundType.GRASS) {
             LocationManager.instance.currentLocation.setGroundElement(GroundType.WATER, mouseTilePos)
+        } else if (currentType === GroundType.WATERFALL) {
+            LocationManager.instance.currentLocation.setGroundElement(GroundType.LEDGE, mouseTilePos)
+        } else if (currentType === GroundType.LEDGE) {
+            LocationManager.instance.currentLocation.setGroundElement(GroundType.WATERFALL, mouseTilePos)
         }
     }],
     [InputKey.PERIOD, "delete hovered element", (input) => LocationManager.instance.currentLocation.removeElementAt(pixelPtToTilePt(input.mousePos))],

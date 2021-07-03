@@ -7,9 +7,10 @@ import { makeBasicNineSliceGround, makeBasicGround } from "./BasicGround"
 import { makeLedge } from "./Ledge"
 import { Singletons } from "../../Singletons"
 import { makeWater } from "./Water"
+import { makeWaterfall } from "./Waterfall"
 
 export enum GroundType {
-    BASIC, BASIC_NINE_SLICE, GRASS, PATH, LEDGE, WATER
+    BASIC, BASIC_NINE_SLICE, GRASS, PATH, LEDGE, WATER, WATERFALL
 }
 
 export class SavedGround {
@@ -40,6 +41,7 @@ export class Ground {
         [GroundType.PATH]: makePath,
         [GroundType.LEDGE]: makeLedge,
         [GroundType.WATER]: makeWater,
+        [GroundType.WATERFALL]: makeWaterfall,
     }
 
     make(type: GroundType, wl: WorldLocation, pos: Point, data: object) {
@@ -48,5 +50,9 @@ export class Ground {
             throw new Error("constructed ground type doesn't match requested type")
         }
         return ground
+    }
+
+    static isWater(type: GroundType) {
+        return type === GroundType.WATER || type === GroundType.WATERFALL
     }
 } 

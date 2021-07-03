@@ -81,6 +81,7 @@ export class StepSounds {
             case GroundType.PATH:
                 return [StepSounds.MUD, .3]
             case GroundType.WATER:
+            case GroundType.WATERFALL:
                 const waterVolume = .035
                 return Lists.oneOf([
                     [StepSounds.WATER_1, waterVolume],

@@ -22,7 +22,7 @@ import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
 import { HUD } from "../ui/HUD"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Interactable } from "../world/elements/Interactable"
-import { GroundType } from "../world/ground/Ground"
+import { Ground, GroundType } from "../world/ground/Ground"
 import { GroundComponent } from "../world/ground/GroundComponent"
 import { LocationManager } from "../world/LocationManager"
 import { WorldLocation } from "../world/WorldLocation"
@@ -372,7 +372,7 @@ export class Dude extends Component implements DialogueSource {
 
         const standingTilePos = pixelPtToTilePt(this.standingPosition)
         const ground = LocationManager.instance.currentLocation.ground.get(standingTilePos)
-        if (ground?.type === GroundType.WATER && !this.isJumping) {
+        if (Ground.isWater(ground?.type) && !this.isJumping) {
             speedMultiplier *= .4
         }
         
@@ -482,7 +482,7 @@ export class Dude extends Component implements DialogueSource {
 
     roll() {
         const ground = LocationManager.instance.currentLocation.ground.get(pixelPtToTilePt(this.standingPosition))
-        if (!this.canRoll || ground?.type === GroundType.WATER) {
+        if (!this.canRoll || Ground.isWater(ground?.type)) {
             return
         }
         this.canRoll = false
