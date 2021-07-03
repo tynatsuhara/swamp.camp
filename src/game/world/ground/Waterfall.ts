@@ -13,6 +13,7 @@ import { Color } from "../../ui/Color"
 import { GroundRenderer } from "../GroundRenderer"
 import { PointAudio } from "../../audio/PointAudio"
 import { getAnimatedWaterTileComponent } from "./Water"
+import { ImageFilters } from "../../graphics/ImageFilters"
 
 const SPLASH_PARTICLE_LIFETIME = 1000
 const SPLASH_PARTICLE_FREQUENCY = 100
@@ -30,6 +31,7 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
     const sideParticleOffset = 5
     const sideWaterfallOffset = 3
 
+    let spriteFilter = (img: ImageData) => img
     let waterfallOffset = Point.ZERO
     let waterSpriteDepth = GroundRenderer.DEPTH - 4
     let rotation: number
@@ -59,11 +61,13 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
         rotation = 180
         particlePosSupplier = (size) => pixelPos.plus(new Point(
             Math.floor(Math.random() * TILE_SIZE-size),
-            2 + Math.random() * 2
+            1 + Math.random() * 2
         ))
         particleDirection = (t) => new Point(0, -t * flowSpeed)
         waterSpriteDepth = ConnectingTileWaterfallSchema.DEPTH - 1
-        // waterfallOffset = new Point(0, -5)
+        const yOffset = 5
+        waterfallOffset = new Point(0, -yOffset+1)
+        spriteFilter = ImageFilters.segment((x, y) => y > TILE_SIZE-yOffset)
     } else {
         // flowing down
         rotation = 0
@@ -76,12 +80,12 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
 
     const waterfallSpeed = 150
     e.addComponent(
-        new TileSetAnimation([
-            [Tilesets.instance.tilemap.getTileAt(new Point(1, 1)), waterfallSpeed],
-            [Tilesets.instance.tilemap.getTileAt(new Point(2, 1)), waterfallSpeed],
-            [Tilesets.instance.tilemap.getTileAt(new Point(1, 2)), waterfallSpeed],
-            [Tilesets.instance.tilemap.getTileAt(new Point(2, 2)), waterfallSpeed],
-        ]).toComponent(TileTransform.new({
+        new TileSetAnimation(
+            [new Point(1, 1), new Point(2, 1), new Point(1, 2), new Point(2, 2)]
+                    .map(pt => Tilesets.instance.tilemap.getTileAt(pt))
+                    .map(tile => tile.filtered(spriteFilter))
+                    .map(tile => [tile, waterfallSpeed])
+        ).toComponent(TileTransform.new({
             position: pixelPos.plus(waterfallOffset),
             depth: waterSpriteDepth,
             rotation,
