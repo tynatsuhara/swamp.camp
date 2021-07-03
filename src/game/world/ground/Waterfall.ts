@@ -39,7 +39,7 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
             d.pos.plus(new Point(.5, .5)).times(TILE_SIZE),
             TILE_SIZE * 8,
             true,
-            .2
+            .1
         )
     )
 
