@@ -11,6 +11,8 @@ run `./run-local-server` to spin up a local HTTP server for development (using P
 ## release
 commit and push to `master`, this will trigger a [Cloudflare pages deployment](https://dash.cloudflare.com/1f52f961eb89afcf0499eba5f54090d5/pages/view/quest).
 
+NOTE: Cloudflare pages has a limit of 25MB per file.
+
 ## credits & links
 additional art by:
 * https://0x72.itch.io/dungeontileset-ii (robert norenberg)
