@@ -25,7 +25,9 @@ export class ConnectingTileWaterfallSchema extends ConnectingTileSchema {
         const x = position.x
         const y = position.y
 
+        const n = this.get(grid, new Point(x, y - 1))
         const e = this.get(grid, new Point(x + 1, y))
+        const s = this.get(grid, new Point(x, y + 1))
         const w = this.get(grid, new Point(x - 1, y))
         
         let results: ImageRender[] = []
@@ -39,13 +41,29 @@ export class ConnectingTileWaterfallSchema extends ConnectingTileSchema {
         }
 
         const tilemap = Tilesets.instance.tilemap
+        const level = location.levels.get(position)
+        const flowingSouth = location.levels.get(position.plusY(1)) < level
 
-        // top
+        // waterflow flowing south
         if (!w) {
-            render(tilemap.getTileAt(new Point(1, 0)))
+            render(tilemap.getTileAt(
+                flowingSouth ? new Point(1, 0) : new Point(3, 2)
+            ))
         }
         if (!e) {
-            render(tilemap.getTileAt(new Point(1, 0)), true)
+            render(tilemap.getTileAt(
+                flowingSouth ? new Point(1, 0) : new Point(3, 2),
+            ), true)
+        }
+
+        // waterfall flowing east/west
+        const flowingEast = location.levels.get(position.plusX(1)) < level
+
+        if (!n) {
+            render(tilemap.getTileAt(new Point(3, 0)), flowingEast)
+        }
+        if (!s) {
+            render(tilemap.getTileAt(new Point(3, 1)), flowingEast)
         }
 
         return results

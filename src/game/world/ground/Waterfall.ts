@@ -13,6 +13,9 @@ import { Color } from "../../ui/Color"
 import { GroundRenderer } from "../GroundRenderer"
 import { PointAudio } from "../../audio/PointAudio"
 
+const SPLASH_PARTICLE_LIFETIME = 1000
+const SPLASH_PARTICLE_FREQUENCY = 100
+
 export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
     const schema = new ConnectingTileWaterfallSchema()
 
@@ -20,16 +23,29 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
         new ConnectingTile(schema, d.wl, d.pos)
     ])
 
+    const level = d.wl.levels.get(d.pos)
+    let rotation: number
+    if (d.wl.levels.get(d.pos.plusX(-1)) < level) {
+        rotation = 90
+    } else if (d.wl.levels.get(d.pos.plusY(-1)) < level) {
+        rotation = 180
+    } else if (d.wl.levels.get(d.pos.plusX(1)) < level) {
+        rotation = 270
+    } else {
+        rotation = 0
+    }
+
     const waterfallSpeed = 150
     e.addComponent(
         new TileSetAnimation([
             [Tilesets.instance.tilemap.getTileAt(new Point(1, 1)), waterfallSpeed],
             [Tilesets.instance.tilemap.getTileAt(new Point(2, 1)), waterfallSpeed],
-            [Tilesets.instance.tilemap.getTileAt(new Point(3, 1)), waterfallSpeed],
             [Tilesets.instance.tilemap.getTileAt(new Point(1, 2)), waterfallSpeed],
+            [Tilesets.instance.tilemap.getTileAt(new Point(2, 2)), waterfallSpeed],
         ]).toComponent(TileTransform.new({
             position: d.pos.times(TILE_SIZE),
             depth: GroundRenderer.DEPTH - 5,
+            rotation,
         }))
     )
 
@@ -44,6 +60,7 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
         )
     )
 
+    // TODO particles for different angle waterfalls
     e.addComponent(new RepeatedInvoker(
         () => {
             for (let i = 0; i < 5; i++) {
@@ -55,12 +72,12 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
                         12 + Math.random() * 2
                     )),
                     GroundRenderer.DEPTH - 1, 
-                    1000,
+                    SPLASH_PARTICLE_LIFETIME,
                     (t) => new Point(0, t * .005),
                     new Point(size, size),
                 )
             }
-            return 100
+            return SPLASH_PARTICLE_FREQUENCY
         }
     ))
 
