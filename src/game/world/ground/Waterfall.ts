@@ -15,7 +15,7 @@ import { PointAudio } from "../../audio/PointAudio"
 import { getAnimatedWaterTileComponent } from "./Water"
 import { ImageFilters } from "../../graphics/ImageFilters"
 
-const SPLASH_PARTICLE_LIFETIME = 1000
+const SPLASH_PARTICLE_LIFETIME = 1200
 const SPLASH_PARTICLE_FREQUENCY = 100
 
 export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
@@ -27,8 +27,8 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
     ])
 
     const level = d.wl.levels.get(d.pos)
-    const flowSpeed = .005
-    const sideParticleOffset = 5
+    const flowSpeed = .004
+    const sideParticleOffset = 5.5
     const sideWaterfallOffset = 3
 
     let spriteFilter = (img: ImageData) => img
