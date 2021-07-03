@@ -17,6 +17,7 @@ const SPLASH_PARTICLE_LIFETIME = 1000
 const SPLASH_PARTICLE_FREQUENCY = 100
 
 export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
+    const pixelPos = d.pos.times(TILE_SIZE)
     const schema = new ConnectingTileWaterfallSchema()
 
     const e = new Entity([
@@ -24,15 +25,47 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
     ])
 
     const level = d.wl.levels.get(d.pos)
+    const flowSpeed = .005
+    const sideOffset = 3
+
+    let waterSpriteDepth = GroundRenderer.DEPTH - 5
     let rotation: number
+    let particlePosSupplier: (size: number) => Point
+    let particleDirection: (t: number) => Point
+    
     if (d.wl.levels.get(d.pos.plusX(-1)) < level) {
+        // flowing left
         rotation = 90
-    } else if (d.wl.levels.get(d.pos.plusY(-1)) < level) {
-        rotation = 180
+        particlePosSupplier = (size) => pixelPos.plus(new Point(
+            sideOffset + Math.random() * 2,
+            Math.floor(Math.random() * TILE_SIZE-size)
+        ))
+        particleDirection = (t) => new Point(-t * flowSpeed, 0)
     } else if (d.wl.levels.get(d.pos.plusX(1)) < level) {
+        // flowing right
         rotation = 270
+        particlePosSupplier = (size) => pixelPos.plus(new Point(
+            TILE_SIZE - sideOffset - Math.random() * 2,
+            Math.floor(Math.random() * TILE_SIZE-size)
+        ))
+        particleDirection = (t) => new Point(t * flowSpeed, 0)
+    } else if (d.wl.levels.get(d.pos.plusY(-1)) < level) {
+        // flowing up
+        rotation = 180
+        particlePosSupplier = (size) => pixelPos.plus(new Point(
+            Math.floor(Math.random() * TILE_SIZE-size),
+            2 + Math.random() * 2
+        ))
+        particleDirection = (t) => new Point(0, -t * flowSpeed)
+        waterSpriteDepth = ConnectingTileWaterfallSchema.DEPTH - 1
     } else {
+        // flowing down
         rotation = 0
+        particlePosSupplier = (size) => pixelPos.plus(new Point(
+            Math.floor(Math.random() * TILE_SIZE-size),
+            12 + Math.random() * 2
+        ))
+        particleDirection = (t) => new Point(0, t * flowSpeed)
     }
 
     const waterfallSpeed = 150
@@ -43,8 +76,8 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
             [Tilesets.instance.tilemap.getTileAt(new Point(1, 2)), waterfallSpeed],
             [Tilesets.instance.tilemap.getTileAt(new Point(2, 2)), waterfallSpeed],
         ]).toComponent(TileTransform.new({
-            position: d.pos.times(TILE_SIZE),
-            depth: GroundRenderer.DEPTH - 5,
+            position: pixelPos,
+            depth: waterSpriteDepth,
             rotation,
         }))
     )
@@ -53,27 +86,23 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
     e.addComponent(
         new PointAudio(
             "/audio/ambiance/waterfall.wav",
-            d.pos.plus(new Point(.5, .5)).times(TILE_SIZE),
+            pixelPos.plus(new Point(TILE_SIZE/2, TILE_SIZE/2)),
             TILE_SIZE * 8,
             true,
             .1
         )
     )
 
-    // TODO particles for different angle waterfalls
     e.addComponent(new RepeatedInvoker(
         () => {
             for (let i = 0; i < 5; i++) {
                 const size = Math.floor(Math.random() * 3)
                 Particles.instance.emitParticle(
                     Color.WHITE, 
-                    d.pos.times(TILE_SIZE).plus(new Point(
-                        Math.floor(Math.random() * TILE_SIZE-size),
-                        12 + Math.random() * 2
-                    )),
+                    particlePosSupplier(size),
                     GroundRenderer.DEPTH - 1, 
                     SPLASH_PARTICLE_LIFETIME,
-                    (t) => new Point(0, t * .005),
+                    particleDirection,
                     new Point(size, size),
                 )
             }

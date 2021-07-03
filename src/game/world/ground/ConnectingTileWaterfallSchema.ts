@@ -10,7 +10,7 @@ import { GroundRenderer } from "../GroundRenderer"
 
 export class ConnectingTileWaterfallSchema extends ConnectingTileSchema {
 
-    static readonly DEPTH = GroundRenderer.DEPTH + 1
+    static readonly DEPTH = GroundRenderer.DEPTH + 10
 
     canConnect(schema: ConnectingTileSchema) {
         return schema instanceof ConnectingTileWaterSchema
