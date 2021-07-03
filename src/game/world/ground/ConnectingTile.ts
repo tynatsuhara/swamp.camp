@@ -3,6 +3,8 @@ import { ImageRender } from "../../../engine/renderer/ImageRender"
 import { Component } from "../../../engine/Component"
 import { ConnectingTileSchema } from "./ConnectingTileSchema"
 import { WorldLocation } from "../WorldLocation"
+import { GroundRenderer } from "../GroundRenderer"
+import { LocationManager } from "../LocationManager"
 
 export class ConnectingTile extends Component {
     readonly schema: ConnectingTileSchema
@@ -17,6 +19,10 @@ export class ConnectingTile extends Component {
         this.schema = schema
         this.location = location
         this.position = position
+    }
+
+    start() {
+        GroundRenderer.instance.clearTile(LocationManager.instance.currentLocation, this.position)
     }
 
     getRenderMethods(): ImageRender[] {

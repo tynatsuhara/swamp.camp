@@ -93,7 +93,7 @@ export class ConnectingTilePathSchema extends ConnectingTileSchema {
         ]
 
         if (!n && !e && !s && !w) {
-            results = [render(this._single)]
+            results.push(render(this._single))
         } else if (count === 8) {
             results = [render(this._corners)]
         } else {

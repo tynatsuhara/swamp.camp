@@ -33,6 +33,7 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
         }))
     )
 
+    // TODO: Multiple waterfalls can create a weird robotic sound when audio overlaps
     e.addComponent(
         new PointAudio(
             "/audio/ambiance/waterfall.wav",
@@ -51,7 +52,7 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
                     Color.WHITE, 
                     d.pos.times(TILE_SIZE).plus(new Point(
                         Math.floor(Math.random() * TILE_SIZE-size),
-                        13 + Math.random() * 2
+                        12 + Math.random() * 2
                     )),
                     GroundRenderer.DEPTH - 1, 
                     1000,

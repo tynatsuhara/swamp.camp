@@ -10,7 +10,8 @@ import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
 import { Singletons } from "../Singletons"
 
 /**
- * This is an optimization that pre-renders ground on an offscreen canvas
+ * This is an optimization that pre-renders ground on an offscreen canvas. 
+ * Not used by all ground types.
  */
 export class GroundRenderer {
 
@@ -21,6 +22,17 @@ export class GroundRenderer {
     }
     
     private locations: Map<WorldLocation, HTMLCanvasElement> = new Map<WorldLocation, HTMLCanvasElement>()
+
+    clearTile(wl: WorldLocation, position: Point) {
+        let canvas = this.locations.get(wl)
+        if (!canvas) {
+            return
+        }
+        const context = canvas.getContext("2d")
+        const shift = new Point(wl.size/2, wl.size/2)
+        const pos = position.plus(shift).times(TILE_SIZE)
+        context.clearRect(pos.x, pos.y, TILE_SIZE, TILE_SIZE)
+    }
 
     addTile(wl: WorldLocation, position: Point, tile: StaticTileSource) {
         if (wl.isInterior || !wl.size) {
