@@ -76,5 +76,26 @@ export const ImageFilters = {
             }
             return result
         }
-    }
+    },
+
+    /**
+     * filters to only include the pixels for which the include function returns true
+     */
+    segment: (include: (x: number, y: number) => boolean) => {
+        return (img: ImageData) => {
+            const result = new ImageData(new Uint8ClampedArray(img.data), img.width, img.height)
+            for (let x = 0; x < result.width; x++) {
+                for (let y = 0; y < result.height; y++) {
+                    if (include(x, y)) {
+                        const i = (x + y * result.width) * 4
+                        result.data[i] = img.data[0]
+                        result.data[i+1] = img.data[1]
+                        result.data[i+2] = img.data[2]
+                        result.data[i+3] = img.data[3]
+                    }
+                }
+            }
+            return result
+        }
+    },
 }
