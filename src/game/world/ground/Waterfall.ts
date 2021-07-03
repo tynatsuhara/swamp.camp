@@ -12,6 +12,7 @@ import { Particles } from "../../graphics/Particles"
 import { Color } from "../../ui/Color"
 import { GroundRenderer } from "../GroundRenderer"
 import { PointAudio } from "../../audio/PointAudio"
+import { getAnimatedWaterTileComponent } from "./Water"
 
 const SPLASH_PARTICLE_LIFETIME = 1000
 const SPLASH_PARTICLE_FREQUENCY = 100
@@ -26,9 +27,11 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
 
     const level = d.wl.levels.get(d.pos)
     const flowSpeed = .005
-    const sideOffset = 3
+    const sideParticleOffset = 5
+    const sideWaterfallOffset = 3
 
-    let waterSpriteDepth = GroundRenderer.DEPTH - 5
+    let waterfallOffset = Point.ZERO
+    let waterSpriteDepth = GroundRenderer.DEPTH - 4
     let rotation: number
     let particlePosSupplier: (size: number) => Point
     let particleDirection: (t: number) => Point
@@ -37,18 +40,20 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
         // flowing left
         rotation = 90
         particlePosSupplier = (size) => pixelPos.plus(new Point(
-            sideOffset + Math.random() * 2,
+            sideParticleOffset + Math.random() * 2,
             Math.floor(Math.random() * TILE_SIZE-size)
         ))
         particleDirection = (t) => new Point(-t * flowSpeed, 0)
+        waterfallOffset = new Point(sideWaterfallOffset, 0)
     } else if (d.wl.levels.get(d.pos.plusX(1)) < level) {
         // flowing right
         rotation = 270
         particlePosSupplier = (size) => pixelPos.plus(new Point(
-            TILE_SIZE - sideOffset - Math.random() * 2,
+            TILE_SIZE - sideParticleOffset - Math.random() * 2,
             Math.floor(Math.random() * TILE_SIZE-size)
         ))
         particleDirection = (t) => new Point(t * flowSpeed, 0)
+        waterfallOffset = new Point(-sideWaterfallOffset, 0)
     } else if (d.wl.levels.get(d.pos.plusY(-1)) < level) {
         // flowing up
         rotation = 180
@@ -58,6 +63,7 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
         ))
         particleDirection = (t) => new Point(0, -t * flowSpeed)
         waterSpriteDepth = ConnectingTileWaterfallSchema.DEPTH - 1
+        // waterfallOffset = new Point(0, -5)
     } else {
         // flowing down
         rotation = 0
@@ -76,11 +82,13 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
             [Tilesets.instance.tilemap.getTileAt(new Point(1, 2)), waterfallSpeed],
             [Tilesets.instance.tilemap.getTileAt(new Point(2, 2)), waterfallSpeed],
         ]).toComponent(TileTransform.new({
-            position: pixelPos,
+            position: pixelPos.plus(waterfallOffset),
             depth: waterSpriteDepth,
             rotation,
         }))
     )
+
+    e.addComponent(getAnimatedWaterTileComponent(d.pos))
 
     // TODO: Multiple waterfalls can create a weird robotic sound when audio overlaps
     e.addComponent(
