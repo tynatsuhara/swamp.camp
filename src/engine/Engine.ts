@@ -5,7 +5,7 @@ import { Game } from "./Game"
 import { CapturedInput, Input } from "./Input"
 import { Point } from "./Point"
 import { measure, profiler } from "./Profiler"
-import { renderer, Renderer } from "./renderer/Renderer"
+import { renderer } from "./renderer/Renderer"
 import { Maths } from "./util/Maths"
 import { View } from "./View"
 
