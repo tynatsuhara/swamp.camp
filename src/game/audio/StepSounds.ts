@@ -55,6 +55,7 @@ export class StepSounds {
 
     private static doFootstep = () => {
         const dude = Player.instance.dude
+        // TODO: Move to RepeatedInvoker
         setTimeout(() => {
             if (dude?.isAlive && dude.isMoving && !dude.rolling()) {
                 StepSounds.singleFootstepSound(1)
