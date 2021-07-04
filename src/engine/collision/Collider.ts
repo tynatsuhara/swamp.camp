@@ -36,11 +36,11 @@ export abstract class Collider extends Component {
         const dx = point.x - this.position.x
         const dy = point.y - this.position.y
         // TODO: Should these branches be handled by the caller?
-        if (collisionEngine.canTranslate(this, new Point(dx, dy))) {
+        if (collisionEngine._canTranslate(this, new Point(dx, dy))) {
             this._position = point
-        } else if (collisionEngine.canTranslate(this, new Point(dx, 0))) {
+        } else if (collisionEngine._canTranslate(this, new Point(dx, 0))) {
             this._position = this._position.plus(new Point(dx, 0))
-        } else if (collisionEngine.canTranslate(this, new Point(0, dy))) {
+        } else if (collisionEngine._canTranslate(this, new Point(0, dy))) {
             this._position = this._position.plus(new Point(0, dy))
         }
         return this.position

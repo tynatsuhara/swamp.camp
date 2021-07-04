@@ -20,16 +20,6 @@ export class CollisionEngine {
     }
 
     /**
-     * This should probably only ever be called by the engine
-     * @param view The view whose contained colliders will be used for collision detection in the current update() step
-     */
-    setViewContext(view: View) {
-        this.colliders = view.entities
-                .filter(e => !!e)
-                .flatMap(e => e.getComponents(BoxCollider))
-    }
-
-    /**
      * @param matrix Each layer key in the matrix will trigger collisions with all of the layer values in the corresponding list (and vice-versa)
      *               DEFAULT_LAYER will always collide with DEFAULT_LAYER
      */
@@ -49,8 +39,17 @@ export class CollisionEngine {
         this.matrix = bidirectional
     }
 
+    /**
+     * @param view The view whose contained colliders will be used for collision detection in the current update() step
+     */
+    _setViewContext(view: View) {
+        this.colliders = view.entities
+                .filter(e => !!e)
+                .flatMap(e => e.getComponents(BoxCollider))
+    }
+
     // Needs further testing. No active use case right now.
-    tryMove(collider: Collider, to: Point): Point {
+    _tryMove(collider: Collider, to: Point): Point {
         const translation = to.minus(collider.position)
         const pts = collider.getPoints()
 
@@ -80,7 +79,7 @@ export class CollisionEngine {
 
     // Returns true if the collider can be translated and will not intersect another collider in the new position.
     // This DOES NOT check for any possible colliders in the path of the collision and should only be used for small translations.
-    canTranslate(collider: Collider, translation: Point): boolean {
+    _canTranslate(collider: Collider, translation: Point): boolean {
         const collidingLayers = this.matrix.get(collider.layer)
         if (!collidingLayers || collidingLayers.size === 0) {  // nothing will ever block this collider
             return true

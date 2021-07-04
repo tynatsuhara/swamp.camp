@@ -46,9 +46,11 @@ class Profiler {
             `components updated: ${this.componentsUpdated}`,
             ...Array.from(this.tracked.values()).map((v => v[1](v[0].get())))
         ]
-        return new View([
-            new Entity(s.map((str, i) => new BasicRenderComponent(new TextRender(str, new Point(60, 70 + 25 * i)))))
-        ])
+        return {
+            entities: [new Entity(s.map((str, i) => new BasicRenderComponent(new TextRender(str, new Point(60, 70 + 25 * i)))))],
+            zoom: 1,
+            offset: Point.ZERO
+        }
     }
 }
 

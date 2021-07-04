@@ -37,7 +37,11 @@ export class Engine {
 
     private lastUpdateMillis = new Date().getTime()
 
-    constructor(game: Game, canvas: HTMLCanvasElement) {
+    static start(game: Game, canvas: HTMLCanvasElement) {
+        new Engine(game, canvas)
+    }
+
+    private constructor(game: Game, canvas: HTMLCanvasElement) {
         this.game = game
         this.renderer = new Renderer(canvas)
         this.input = new Input(canvas)
@@ -46,7 +50,7 @@ export class Engine {
         requestAnimationFrame(() => this.tick())
     }
 
-    tick() {
+    private tick() {
         const time = new Date().getTime()
 
         // Because of JS being suspended in the background, elapsed may become 
@@ -70,7 +74,7 @@ export class Engine {
             views.forEach(v => {
                 v.entities = v.entities.filter(e => !!e)
                 
-                collisionEngine.setViewContext(v)
+                collisionEngine._setViewContext(v)
 
                 const startData: StartData = {
                     dimensions: updateViewsContext.dimensions.div(v.zoom)
