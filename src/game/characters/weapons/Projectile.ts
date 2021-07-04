@@ -1,6 +1,4 @@
 import { BoxCollider } from "../../../engine/collision/BoxCollider"
-import { Collider } from "../../../engine/collision/Collider"
-import { CollisionEngine } from "../../../engine/collision/CollisionEngine"
 import { Component } from "../../../engine/Component"
 import { Entity } from "../../../engine/Entity"
 import { Point } from "../../../engine/Point"
@@ -8,14 +6,13 @@ import { StaticSpriteSource } from "../../../engine/sprites/StaticSpriteSource"
 import { SpriteComponent } from "../../../engine/sprites/SpriteComponent"
 import { Item } from "../../items/Items"
 import { LocationManager } from "../../world/LocationManager"
-import { Weapon } from "./Weapon"
 import { Dude } from "../Dude"
 import { DroppedItem } from "../../items/DroppedItem"
 import { Lists } from "../../../engine/util/Lists"
 
 class Projectile extends Component {
 
-    private tile: SpriteComponent
+    private sprite: SpriteComponent
     private collider: BoxCollider
     private itemType: Item
 
@@ -27,14 +24,14 @@ class Projectile extends Component {
         super()
         this.itemType = item
         this.start = () => {
-            this.tile = this.entity.addComponent(sprite.toComponent())
+            this.sprite = this.entity.addComponent(sprite.toComponent())
             const pos = position.minus(new Point(
-                this.tile.transform.dimensions.x/2,
-                this.tile.transform.dimensions.y
+                this.sprite.transform.dimensions.x/2,
+                this.sprite.transform.dimensions.y
             ))
-            this.tile.transform.position = pos
-            this.tile.transform.rotation = velocity.x > 0 ? 90 : -90
-            this.tile.transform.mirrorX = velocity.x > 0
+            this.sprite.transform.position = pos
+            this.sprite.transform.rotation = velocity.x > 0 ? 90 : -90
+            this.sprite.transform.mirrorX = velocity.x > 0
 
             const colliderSize = new Point(8, 8)
             const sourceCollider = attacker.entity.getComponent(BoxCollider)
@@ -70,13 +67,13 @@ class Projectile extends Component {
                             velocity = Point.ZERO
                             
                             // make the projectile stick to the enemy
-                            const relativeOffset = this.tile.transform.position.minus(enemy.animation.transform.position)
-                            const relativeDepth = this.tile.transform.depth - enemy.animation.transform.depth
-                            this.tile.transform.relativeTo(enemy.animation.transform)
-                            this.tile.transform.position = relativeOffset
-                            this.tile.transform.depth = relativeDepth
+                            const relativeOffset = this.sprite.transform.position.minus(enemy.animation.transform.position)
+                            const relativeDepth = this.sprite.transform.depth - enemy.animation.transform.depth
+                            this.sprite.transform.relativeTo(enemy.animation.transform)
+                            this.sprite.transform.position = relativeOffset
+                            this.sprite.transform.depth = relativeDepth
 
-                            this.tile.transform.position = new Point(this.tile.transform.dimensions.y - 10, relativeOffset.y)
+                            this.sprite.transform.position = new Point(this.sprite.transform.dimensions.y - 10, relativeOffset.y)
 
                             enemy.damage(1, enemy.standingPosition.minus(attacker.standingPosition), 30)
                         }
@@ -109,13 +106,13 @@ class Projectile extends Component {
      * returns true if it successfully moved
      */
     private reposition(delta = new Point(0, 0)): boolean {
-        const colliderOffset = this.collider.position.minus(this.tile.transform.position)
-        const beforePos = this.tile.transform.position
+        const colliderOffset = this.collider.position.minus(this.sprite.transform.position)
+        const beforePos = this.sprite.transform.position
 
-        this.tile.transform.position = this.collider.moveTo(this.collider.position.plus(delta).apply(Math.floor)).minus(colliderOffset)
-        this.tile.transform.depth = this.tile.transform.position.y + this.tile.transform.dimensions.y - 14
+        this.sprite.transform.position = this.collider.moveTo(this.collider.position.plus(delta).apply(Math.floor)).minus(colliderOffset)
+        this.sprite.transform.depth = this.sprite.transform.position.y + this.sprite.transform.dimensions.y - 14
 
-        const afterPos = this.tile.transform.position
+        const afterPos = this.sprite.transform.position
         return beforePos.distanceTo(afterPos) >= 0.05
     }
 }

@@ -122,7 +122,7 @@ export class Dude extends Component implements DialogueSource {
             const idleAnim = DudeAnimationUtils.getCharacterIdleAnimation(characterAnimName, blob)
             const runAnim = DudeAnimationUtils.getCharacterWalkAnimation(characterAnimName, blob)
             const jumpAnim = DudeAnimationUtils.getCharacterJumpAnimation(characterAnimName, blob)
-            const height = idleAnim.getTile(0).dimensions.y
+            const height = idleAnim.getSprite(0).dimensions.y
             this._animation = this.entity.addComponent(
                 new AnimatedSpriteComponent([idleAnim, runAnim, jumpAnim], new SpriteTransform(new Point(0, 28-height)))
             )

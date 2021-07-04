@@ -10,7 +10,7 @@ export class StaticSpriteSource implements SpriteSource {
     readonly dimensions: Point
 
     /**
-     * Constructs a static (non-animated) tile source
+     * Constructs a static (non-animated) sprite source
      */
     constructor(
         image: CanvasImageSource, 

@@ -12,7 +12,7 @@ export class DroppedItem extends Component {
 
     static readonly COLLISION_LAYER = "item"
 
-    private tile: SpriteComponent
+    private sprite: SpriteComponent
     private collider: Collider
     private itemType: Item
     private canPickUp = true
@@ -25,16 +25,16 @@ export class DroppedItem extends Component {
         super()
         this.itemType = item
         this.start = () => {
-            this.tile = this.entity.addComponent(ITEM_METADATA_MAP[item].droppedIconSupplier().toComponent())
+            this.sprite = this.entity.addComponent(ITEM_METADATA_MAP[item].droppedIconSupplier().toComponent())
             const pos = position.minus(new Point(
-                this.tile.transform.dimensions.x/2,
-                this.tile.transform.dimensions.y
+                this.sprite.transform.dimensions.x/2,
+                this.sprite.transform.dimensions.y
             ))
-            this.tile.transform.position = pos
+            this.sprite.transform.position = pos
 
             const colliderSize = new Point(8, 8)
             this.collider = this.entity.addComponent(new BoxCollider(
-                pos.plus(this.tile.transform.dimensions.minus(colliderSize).div(2)), 
+                pos.plus(this.sprite.transform.dimensions.minus(colliderSize).div(2)), 
                 colliderSize, 
                 DroppedItem.COLLISION_LAYER,
                 !!sourceCollider ? [sourceCollider] : []
@@ -89,8 +89,8 @@ export class DroppedItem extends Component {
     }
 
     private reposition(delta = new Point(0, 0)) {
-        const colliderOffset = this.collider.position.minus(this.tile.transform.position)
-        this.tile.transform.position = this.collider.moveTo(this.collider.position.plus(delta)).minus(colliderOffset)
-        this.tile.transform.depth = this.tile.transform.position.y + this.tile.transform.dimensions.y
+        const colliderOffset = this.collider.position.minus(this.sprite.transform.position)
+        this.sprite.transform.position = this.collider.moveTo(this.collider.position.plus(delta)).minus(colliderOffset)
+        this.sprite.transform.depth = this.sprite.transform.position.y + this.sprite.transform.dimensions.y
     }
 }

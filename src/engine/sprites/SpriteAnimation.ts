@@ -8,14 +8,14 @@ export class SpriteAnimation implements SpriteSource {
     readonly onFinish: () => void
     
     /**
-     * @param frames A list of tile sources and a duration in milliseconds that each one will last
+     * @param frames A list of sprite sources and a duration in milliseconds that each one will last
      */
     constructor(frames: [StaticSpriteSource, number][], onFinish: () => void = () => {}) {
         this.frames = frames
         this.onFinish = onFinish
     }
 
-    getTile(index: number) {
+    getSprite(index: number) {
         return this.frames[index][0]
     }
 

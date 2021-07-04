@@ -4,23 +4,23 @@ import { SpriteTransform } from "./SpriteTransform"
 import { StaticSpriteSource } from "./StaticSpriteSource"
 
 /**
- * Represents a static (non-animated) tile entity
+ * Represents a static (non-animated) sprite entity
  */
 export class SpriteComponent extends Component {
-    tileSource: StaticSpriteSource
+    sprite: StaticSpriteSource
     readonly transform: SpriteTransform
 
-    constructor(tileSource: StaticSpriteSource, transform: SpriteTransform = new SpriteTransform()) {
+    constructor(sprite: StaticSpriteSource, transform: SpriteTransform = new SpriteTransform()) {
         super()
-        this.tileSource = tileSource
+        this.sprite = sprite
         this.transform = transform
 
         if (!transform.dimensions) {
-            transform.dimensions = tileSource.dimensions
+            transform.dimensions = sprite.dimensions
         }
     }
     
     getRenderMethods(): ImageRender[] {
-        return [this.tileSource.toImageRender(this.transform)]
+        return [this.sprite.toImageRender(this.transform)]
     }
 }

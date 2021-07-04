@@ -13,7 +13,7 @@ export class AnimatedSpriteComponent extends SpriteComponent {
             throw new Error("needs at least one animation!")
         }
         const defaultAnimation = animations[0]
-        super(defaultAnimation.getTile(0), transform)
+        super(defaultAnimation.getSprite(0), transform)
         this.animations = animations
         this.goToAnimation(0)
     }
@@ -30,7 +30,7 @@ export class AnimatedSpriteComponent extends SpriteComponent {
         this.animator = new Animator(
             anim.frames.map(f => f[1]), 
             index => {
-                this.tileSource = anim.getTile(index)
+                this.sprite = anim.getSprite(index)
             },
             anim.onFinish
         )
