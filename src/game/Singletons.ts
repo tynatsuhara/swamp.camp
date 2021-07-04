@@ -1,4 +1,4 @@
-import { Type } from "../engine/Type"
+import { ConcreteType } from "../engine/Types"
 
 const singletons = new Map<any, any>()
 
@@ -6,7 +6,7 @@ const singletons = new Map<any, any>()
  * A static cache for managing stateful singletons.
  */
 export const Singletons = {
-    getOrCreate: <T>(type: Type<T>, supplier: () => T = () => new type()): T => {
+    getOrCreate: <T>(type: ConcreteType<T>, supplier: () => T = () => new type()): T => {
         const s = singletons.get(type)
         if (!!s) {
             return s

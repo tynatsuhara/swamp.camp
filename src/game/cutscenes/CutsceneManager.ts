@@ -1,6 +1,6 @@
 import { Component } from "../../engine/Component"
 import { Entity } from "../../engine/Entity"
-import { Type } from "../../engine/Type"
+import { AbstractType } from "../../engine/Types"
 import { Singletons } from "../Singletons"
 
 export class CutsceneManager {
@@ -28,7 +28,7 @@ export class CutsceneManager {
         return this.entity
     }
 
-    isCutsceneActive<T extends Component>(type: Type<T>) {
+    isCutsceneActive<T extends Component>(type: AbstractType<T>) {
         return !!this.entity?.getComponent(type)
     }
 }

@@ -45,7 +45,7 @@ export class CollisionEngine {
     _setViewContext(view: View) {
         this.colliders = view.entities
                 .filter(e => !!e)
-                .flatMap(e => e.getComponents(BoxCollider))
+                .flatMap(e => e.getComponents(Collider))
     }
 
     // Needs further testing. No active use case right now.

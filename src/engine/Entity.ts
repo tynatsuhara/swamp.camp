@@ -1,5 +1,5 @@
 import { Component } from "./Component"
-import { Type } from "./Type"
+import { AbstractType } from "./Types"
 
 /**
  * An object which is updated by the engine. Should be attached to a game view.
@@ -32,7 +32,7 @@ export class Entity {
         return components
     }
 
-    getComponent<T extends Component>(componentType: Type<T>): T {
+    getComponent<T extends Component>(componentType: AbstractType<T>): T {
         let value = this.componentCache.get(componentType)
         if (!value || value === NO_COMPONENT) {
             value = this.getComponents(componentType)[0]
@@ -41,7 +41,7 @@ export class Entity {
         return value as T
     }
 
-    getComponents<T extends Component>(componentType: Type<T>): T[] {
+    getComponents<T extends Component>(componentType: AbstractType<T>): T[] {
         return this.components.filter(c => c instanceof componentType).map(c => c as T)
     }
 
