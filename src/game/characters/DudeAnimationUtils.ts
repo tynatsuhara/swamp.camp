@@ -1,10 +1,10 @@
-import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
+import { SpriteAnimation } from "../../engine/sprites/SpriteAnimation"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets } from "../graphics/Tilesets"
 import { Color } from "../ui/Color"
 import { saveManager } from "../SaveManager"
 
-const maybeFilter = (characterAnimName: string, blob: object, anim: TileSetAnimation) => {
+const maybeFilter = (characterAnimName: string, blob: object, anim: SpriteAnimation) => {
     if (!anim) {
         throw new Error(`no animation found for "${characterAnimName}"`)
     }
@@ -40,7 +40,7 @@ const getWalkAnimationSpeed = (characterAnimName: string) => {
 }
 
 export const DudeAnimationUtils = {
-    getCharacterIdleAnimation: (characterAnimName: string, blob: object = {}): TileSetAnimation => {
+    getCharacterIdleAnimation: (characterAnimName: string, blob: object = {}): SpriteAnimation => {
         const animSpeed = getIdleAnimationSpeed(characterAnimName)
         const anim = Tilesets.instance.dungeonCharacters.getTileSetAnimation(`${characterAnimName}_idle_anim`, animSpeed) 
                   || Tilesets.instance.extraCharacterSet1.getTileSetAnimation(`${characterAnimName}_Idle`, 4, animSpeed)
@@ -50,7 +50,7 @@ export const DudeAnimationUtils = {
         return maybeFilter(characterAnimName, blob, anim)
     },
 
-    getCharacterWalkAnimation: (characterAnimName: string, blob: object = {}): TileSetAnimation => {
+    getCharacterWalkAnimation: (characterAnimName: string, blob: object = {}): SpriteAnimation => {
         const animSpeed = getWalkAnimationSpeed(characterAnimName)
         const anim = Tilesets.instance.dungeonCharacters.getTileSetAnimation(`${characterAnimName}_run_anim`, animSpeed) 
                   || Tilesets.instance.extraCharacterSet1.getTileSetAnimation(`${characterAnimName}_Walk`, 4, animSpeed)
@@ -60,7 +60,7 @@ export const DudeAnimationUtils = {
         return maybeFilter(characterAnimName, blob, anim)
     },
 
-    getCharacterJumpAnimation: (characterAnimName: string, blob: object = {}): TileSetAnimation => {
+    getCharacterJumpAnimation: (characterAnimName: string, blob: object = {}): SpriteAnimation => {
         const animSpeed = 80
         const anim = Tilesets.instance.dungeonCharacters.getTileSetAnimation(`${characterAnimName}_hit_anim`, animSpeed)
         // We only have/need this animation for the player

@@ -1,10 +1,10 @@
 import { Point } from "../Point"
 import { ImageRender } from "../renderer/ImageRender"
-import { TileTransform } from "./TileTransform"
-import { TileComponent } from "./TileComponent"
-import { TileSource } from "./TileSource"
+import { SpriteTransform } from "./SpriteTransform"
+import { SpriteComponent } from "./SpriteComponent"
+import { SpriteSource } from "./SpriteSource"
 
-export class StaticTileSource implements TileSource {
+export class StaticSpriteSource implements SpriteSource {
     readonly image: CanvasImageSource
     readonly position: Point
     readonly dimensions: Point
@@ -22,7 +22,7 @@ export class StaticTileSource implements TileSource {
         this.dimensions = dimensions
     }
 
-    toImageRender(transform: TileTransform) {
+    toImageRender(transform: SpriteTransform) {
         return new ImageRender(
             this.image, 
             this.position,
@@ -36,11 +36,11 @@ export class StaticTileSource implements TileSource {
         )
     }
 
-    toComponent(transform: TileTransform = new TileTransform()): TileComponent {
-        return new TileComponent(this, transform)
+    toComponent(transform: SpriteTransform = new SpriteTransform()): SpriteComponent {
+        return new SpriteComponent(this, transform)
     }
 
-    filtered(filter: (img: ImageData) => ImageData): StaticTileSource {
+    filtered(filter: (img: ImageData) => ImageData): StaticSpriteSource {
         const canvas = document.createElement("canvas")
         canvas.width = this.dimensions.x
         canvas.height = this.dimensions.y
@@ -52,6 +52,6 @@ export class StaticTileSource implements TileSource {
         const filtered = filter(imageData)
         context.putImageData(filtered, 0, 0)
 
-        return new StaticTileSource(canvas, Point.ZERO, new Point(filtered.width, filtered.height))
+        return new StaticSpriteSource(canvas, Point.ZERO, new Point(filtered.width, filtered.height))
     }
 }

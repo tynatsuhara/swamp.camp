@@ -1,13 +1,13 @@
 import { Weapon } from "./Weapon"
 import { WeaponType } from "./WeaponType"
-import { StaticTileSource } from "../../../engine/tiles/StaticTileSource"
-import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { StaticSpriteSource } from "../../../engine/sprites/StaticSpriteSource"
+import { SpriteTransform } from "../../../engine/sprites/SpriteTransform"
 import { Point } from "../../../engine/Point"
 import { Tilesets } from "../../graphics/Tilesets"
 import { UpdateData } from "../../../engine/Engine"
 import { Animator } from "../../../engine/util/Animator"
 import { DudeType } from "../DudeFactory"
-import { TileComponent } from "../../../engine/tiles/TileComponent"
+import { SpriteComponent } from "../../../engine/sprites/SpriteComponent"
 
 enum State {
     SHEATHED,
@@ -18,18 +18,18 @@ enum State {
 export class MeleeWeapon extends Weapon {
 
     private weaponType: WeaponType
-    private weaponSprite: StaticTileSource
-    private weaponTransform: TileTransform
+    private weaponSprite: StaticSpriteSource
+    private weaponTransform: SpriteTransform
     private offsetFromCenter: Point
     private state: State = State.DRAWN
-    private slashSprite: TileComponent
+    private slashSprite: SpriteComponent
     private _range: number
 
     constructor(weaponType: WeaponType, weaponId: string, offsetFromCenter: Point) {
         super()
         this.start = (startData) => {
             this.weaponSprite = Tilesets.instance.dungeonCharacters.getTileSource(weaponId)
-            this.weaponTransform = new TileTransform(Point.ZERO, this.weaponSprite.dimensions).relativeTo(this.dude.animation.transform)
+            this.weaponTransform = new SpriteTransform(Point.ZERO, this.weaponSprite.dimensions).relativeTo(this.dude.animation.transform)
             this.offsetFromCenter = offsetFromCenter
             this._range = this.weaponSprite.dimensions.y
             this.slashSprite = this.entity.addComponent(Tilesets.instance.oneBit.getTileSource("slash").toComponent())

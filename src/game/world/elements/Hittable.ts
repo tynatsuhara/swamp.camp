@@ -1,13 +1,13 @@
 import { Component } from "../../../engine/Component"
 import { UpdateData } from "../../../engine/Engine"
 import { Point } from "../../../engine/Point"
-import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../../engine/sprites/SpriteTransform"
 import { Animator } from "../../../engine/util/Animator"
 
 export class Hittable extends Component {
 
     readonly position: Point
-    private tileTransforms: Map<TileTransform, Point>
+    private tileTransforms: Map<SpriteTransform, Point>
     private animator: Animator
     private readonly onHit: (dir: Point) => void
 
@@ -15,7 +15,7 @@ export class Hittable extends Component {
      * @param position world pixel position (probably centered) referenced for finding hittables
      * @param tileTransforms the tiles which will be moved
      */
-    constructor(position: Point, tileTransforms: TileTransform[], onHit: (dir: Point) => void) {
+    constructor(position: Point, tileTransforms: SpriteTransform[], onHit: (dir: Point) => void) {
         super()
         this.position = position
         this.tileTransforms = new Map(tileTransforms.map(t => [t, t.position]))

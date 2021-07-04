@@ -6,7 +6,7 @@ import { Camera } from "../cutscenes/Camera"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { WorldLocation } from "./WorldLocation"
 import { LocationManager } from "./LocationManager"
-import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
+import { StaticSpriteSource } from "../../engine/sprites/StaticSpriteSource"
 import { Singletons } from "../Singletons"
 
 /**
@@ -34,7 +34,7 @@ export class GroundRenderer {
         context.clearRect(pos.x, pos.y, TILE_SIZE, TILE_SIZE)
     }
 
-    addTile(wl: WorldLocation, position: Point, tile: StaticTileSource) {
+    addTile(wl: WorldLocation, position: Point, tile: StaticSpriteSource) {
         if (wl.isInterior || !wl.size) {
             throw new Error("location cannot use GroundRenderer")
         }

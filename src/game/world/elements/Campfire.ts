@@ -1,8 +1,8 @@
 import { Component } from "../../../engine/Component"
-import { TileComponent } from "../../../engine/tiles/TileComponent"
-import { AnimatedTileComponent } from "../../../engine/tiles/AnimatedTileComponent"
+import { SpriteComponent } from "../../../engine/sprites/SpriteComponent"
+import { AnimatedSpriteComponent } from "../../../engine/sprites/AnimatedSpriteComponent"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
-import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../../engine/sprites/SpriteTransform"
 import { Point } from "../../../engine/Point"
 import { Interactable } from "./Interactable"
 import { BoxCollider } from "../../../engine/collision/BoxCollider"
@@ -34,15 +34,15 @@ export class CampfireFactory extends ElementFactory {
         const scaledPos = pos.times(TILE_SIZE)
         const depth = scaledPos.y + TILE_SIZE - 10
         
-        const campfireOff = e.addComponent(new TileComponent(
+        const campfireOff = e.addComponent(new SpriteComponent(
             Tilesets.instance.outdoorTiles.getTileSource("campfireOff"), 
-            new TileTransform(scaledPos)
+            new SpriteTransform(scaledPos)
         ))
         campfireOff.transform.depth = depth
 
-        const campfireOn = e.addComponent(new AnimatedTileComponent(
+        const campfireOn = e.addComponent(new AnimatedSpriteComponent(
             [Tilesets.instance.outdoorTiles.getTileSetAnimation("campfireOn", 2, 200)],
-            new TileTransform(scaledPos)
+            new SpriteTransform(scaledPos)
         ))
         campfireOn.transform.depth = depth
 

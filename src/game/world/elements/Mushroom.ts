@@ -1,8 +1,8 @@
 import { Component } from "../../../engine/Component"
 import { Entity } from "../../../engine/Entity"
 import { Point } from "../../../engine/Point"
-import { TileComponent } from "../../../engine/tiles/TileComponent"
-import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { SpriteComponent } from "../../../engine/sprites/SpriteComponent"
+import { SpriteTransform } from "../../../engine/sprites/SpriteTransform"
 import { DudeFactory, DudeType } from "../../characters/DudeFactory"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item, spawnItem } from "../../items/Items"
@@ -31,15 +31,15 @@ export class MushroomFactory extends ElementFactory {
         const depth = (pos.y + 1) * TILE_SIZE + randomOffset.y
 
         const addTile = (s: string, pos: Point) => {
-            const tile = e.addComponent(new TileComponent(
+            const tile = e.addComponent(new SpriteComponent(
                 Tilesets.instance.outdoorTiles.getTileSource(s), 
-                new TileTransform(pos.times(TILE_SIZE).plus(randomOffset))
+                new SpriteTransform(pos.times(TILE_SIZE).plus(randomOffset))
             ))
             tile.transform.depth = depth
             return tile
         }
 
-        let tile: TileComponent = addTile("mushroomPlaced", pos)
+        let tile: SpriteComponent = addTile("mushroomPlaced", pos)
         
         const hittableCenter = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
         e.addComponent(

@@ -1,8 +1,8 @@
 import { Component } from "../../../engine/Component"
 import { Entity } from "../../../engine/Entity"
 import { Point } from "../../../engine/Point"
-import { StaticTileSource } from "../../../engine/tiles/StaticTileSource"
-import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { StaticSpriteSource } from "../../../engine/sprites/StaticSpriteSource"
+import { SpriteTransform } from "../../../engine/sprites/SpriteTransform"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { GroundRenderer } from "../GroundRenderer"
 import { GroundType, MakeGroundFuncData } from "./Ground"
@@ -12,7 +12,7 @@ const INDEX = "i"
 const TALL_GRASS_COUNT = "t"
 
 export const makeGrass = (d: MakeGroundFuncData): GroundComponent => {
-    let tile: StaticTileSource
+    let tile: StaticSpriteSource
     const index = d.data[INDEX] ?? (Math.random() < .65 ? Math.floor(Math.random() * 4) : 0)
     let tallGrass = d.data[TALL_GRASS_COUNT] ?? (Math.random() < 0.05 ? 1 : 0)
     if (d.wl.isOccupied(d.pos)) {
@@ -56,7 +56,7 @@ class TallGrass extends Component {
 
         const render = Tilesets.instance.outdoorTiles
                 .getTileSource(`grass${Math.ceil(Math.random() * 2)}`)
-                .toImageRender(new TileTransform(grassPos, null, 0, Math.random() > .5, false, grassPos.y + TILE_SIZE))
+                .toImageRender(new SpriteTransform(grassPos, null, 0, Math.random() > .5, false, grassPos.y + TILE_SIZE))
 
         this.getRenderMethods = () => [render]
     }

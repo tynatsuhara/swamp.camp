@@ -2,7 +2,7 @@ import { Point } from "../../engine/Point"
 import { TextButton } from "./TextButton"
 import { UIStateManager } from "./UIStateManager"
 import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
-import { NineSlice } from "../../engine/tiles/NineSlice"
+import { NineSlice } from "../../engine/sprites/NineSlice"
 import { TEXT_PIXEL_WIDTH } from "./Text"
 import { Entity } from "../../engine/Entity"
 

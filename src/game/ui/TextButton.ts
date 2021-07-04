@@ -3,7 +3,7 @@ import { UpdateData } from "../../engine/Engine"
 import { Point } from "../../engine/Point"
 import { ImageRender } from "../../engine/renderer/ImageRender"
 import { TextRender } from "../../engine/renderer/TextRender"
-import { TileTransform } from "../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../engine/sprites/SpriteTransform"
 import { rectContains } from "../../engine/util/Utils"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
@@ -47,11 +47,11 @@ export class TextButton extends Component {
             const centerPos = leftPos.plus(new Point(TILE_SIZE, 0))
             const rightPos = leftPos.plus(new Point(this.width - TILE_SIZE, 0)).apply(Math.floor)
     
-            this.left = Tilesets.instance.oneBit.getTileSource(`btnLeft_${buttonColor}`).toImageRender(new TileTransform(leftPos))
+            this.left = Tilesets.instance.oneBit.getTileSource(`btnLeft_${buttonColor}`).toImageRender(new SpriteTransform(leftPos))
             this.center = Tilesets.instance.oneBit.getTileSource(`btnCenter_${buttonColor}`).toImageRender(
-                new TileTransform(centerPos, new Point(this.width + TextButton.margin * 2 - TILE_SIZE*2, TILE_SIZE))
+                new SpriteTransform(centerPos, new Point(this.width + TextButton.margin * 2 - TILE_SIZE*2, TILE_SIZE))
             )
-            this.right = Tilesets.instance.oneBit.getTileSource(`btnRight_${buttonColor}`).toImageRender(new TileTransform(rightPos))
+            this.right = Tilesets.instance.oneBit.getTileSource(`btnRight_${buttonColor}`).toImageRender(new SpriteTransform(rightPos))
     
             Array.from([this.left, this.center, this.right]).forEach(t => t.depth = UIStateManager.UI_SPRITE_DEPTH + 1)
         }

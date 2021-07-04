@@ -1,6 +1,6 @@
 import { Tilesets } from "../graphics/Tilesets"
 import { Point } from "../../engine/Point"
-import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
+import { StaticSpriteSource } from "../../engine/sprites/StaticSpriteSource"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Color } from "./Color"
 
@@ -25,7 +25,7 @@ export const DudeInteractIndicator = {
     ATTACKING_SOON: "o",
     ATTACKING_NOW: "O",
 
-    getTile: (indicator: string): StaticTileSource => {
+    getTile: (indicator: string): StaticSpriteSource => {
         const result = cache[indicator] || getIcon(indicator)
         cache[indicator] = result
         return result

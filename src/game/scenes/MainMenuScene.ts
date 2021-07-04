@@ -6,10 +6,10 @@ import { Entity } from "../../engine/Entity"
 import { Point } from "../../engine/Point"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
 import { ImageRender } from "../../engine/renderer/ImageRender"
-import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
-import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
-import { TileComponent } from "../../engine/tiles/TileComponent"
-import { TileTransform } from "../../engine/tiles/TileTransform"
+import { AnimatedSpriteComponent } from "../../engine/sprites/AnimatedSpriteComponent"
+import { StaticSpriteSource } from "../../engine/sprites/StaticSpriteSource"
+import { SpriteComponent } from "../../engine/sprites/SpriteComponent"
+import { SpriteTransform } from "../../engine/sprites/SpriteTransform"
 import { Lists } from "../../engine/util/Lists"
 import { View } from "../../engine/View"
 import { Ambiance } from "../audio/Ambiance"
@@ -38,7 +38,7 @@ enum Menu {
 export class MainMenuScene {
 
     private plumes: PlumePicker
-    private knight: TileComponent
+    private knight: SpriteComponent
     private title = assets.getImageByFileName("images/title.png")
     private darkness: DarknessMask
     private view: View
@@ -244,7 +244,7 @@ export class MainMenuScene {
         for (let x = -MainMenuScene.SIZE; x < MainMenuScene.SIZE; x++) {
             for (let y = -MainMenuScene.SIZE; y < MainMenuScene.SIZE; y++) {
                 // copied from grass component
-                let tile: StaticTileSource
+                let tile: StaticSpriteSource
                 const index = (y + MainMenuScene.SIZE) + (MainMenuScene.SIZE * 2 * (x + MainMenuScene.SIZE))
                 const grassType = MainMenuScene.GRASS[index]
                 if (grassType > 0) {
@@ -253,7 +253,7 @@ export class MainMenuScene {
                     tile = Tilesets.instance.tilemap.getTileAt(new Point(0, 7))
                 }
                 const render = tile.toImageRender(
-                    TileTransform.new({ 
+                    SpriteTransform.new({ 
                         position: new Point(x, y).times(TILE_SIZE).plus(offset),
                         depth: Number.MIN_SAFE_INTEGER,
                     })
@@ -268,9 +268,9 @@ export class MainMenuScene {
                 .plusX(6)
                 .plusY(20)
                 .apply(Math.floor)
-        components.push(new AnimatedTileComponent(
+        components.push(new AnimatedSpriteComponent(
             [Tilesets.instance.outdoorTiles.getTileSetAnimation("campfireOn", 2, 200)],
-            new TileTransform(campfirePos)
+            new SpriteTransform(campfirePos)
         ))
 
         // darkness

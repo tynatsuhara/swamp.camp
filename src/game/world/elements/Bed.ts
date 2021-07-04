@@ -1,7 +1,7 @@
 import { Component } from "../../../engine/Component"
-import { TileComponent } from "../../../engine/tiles/TileComponent"
+import { SpriteComponent } from "../../../engine/sprites/SpriteComponent"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
-import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../../engine/sprites/SpriteTransform"
 import { Point } from "../../../engine/Point"
 import { Interactable } from "./Interactable"
 import { BoxCollider } from "../../../engine/collision/BoxCollider"
@@ -36,9 +36,9 @@ export class BedFactory extends ElementFactory {
         const depth = scaledPos.y + TILE_SIZE - 10
         const pixelCenterPos = scaledPos.plus(new Point(TILE_SIZE/2-1, TILE_SIZE/2-1))
 
-        const tile = e.addComponent(new TileComponent(
+        const tile = e.addComponent(new SpriteComponent(
             Tilesets.instance.outdoorTiles.getTileSource("bed"), 
-            TileTransform.new({ position: scaledPos, depth })
+            SpriteTransform.new({ position: scaledPos, depth })
         ))
 
         e.addComponent(new BoxCollider(scaledPos, new Point(TILE_SIZE, TILE_SIZE)))

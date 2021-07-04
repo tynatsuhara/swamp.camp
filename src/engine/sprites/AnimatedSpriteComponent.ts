@@ -1,15 +1,14 @@
 import { UpdateData } from "../Engine"
 import { Animator } from "../util/Animator"
-import { TileComponent } from "./TileComponent"
-import { TileSetAnimation } from "./TileSetAnimation"
-import { TileTransform } from "./TileTransform"
+import { SpriteComponent } from "./SpriteComponent"
+import { SpriteAnimation } from "./SpriteAnimation"
+import { SpriteTransform } from "./SpriteTransform"
 
-export class AnimatedTileComponent extends TileComponent {
+export class AnimatedSpriteComponent extends SpriteComponent {
     private animator: Animator
-    private animations: TileSetAnimation[]
+    private animations: SpriteAnimation[]
 
-    // defaultAnimation has a key of 0, the following is 1, etc
-    constructor(animations: TileSetAnimation[], transform: TileTransform = new TileTransform()) {
+    constructor(animations: SpriteAnimation[], transform: SpriteTransform = new SpriteTransform()) {
         if (animations.length < 1) {
             throw new Error("needs at least one animation!")
         }
@@ -23,8 +22,11 @@ export class AnimatedTileComponent extends TileComponent {
         return this.animator.getCurrentFrame()
     }
 
-    goToAnimation(animation: number) {
-        const anim = this.animations[animation]
+    /**
+     * @param animationIndex the index in the array passed to the constructor
+     */
+    goToAnimation(animationIndex: number) {
+        const anim = this.animations[animationIndex]
         this.animator = new Animator(
             anim.frames.map(f => f[1]), 
             index => {

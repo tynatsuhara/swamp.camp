@@ -1,7 +1,7 @@
 import { Component } from "../../engine/Component"
 import { RenderMethod } from "../../engine/renderer/RenderMethod"
 import { Tilesets } from "../graphics/Tilesets"
-import { TileTransform } from "../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../engine/sprites/SpriteTransform"
 import { Point } from "../../engine/Point"
 import { TextRender } from "../../engine/renderer/TextRender"
 import { InputKey, InputKeyString } from "../../engine/Input"
@@ -24,7 +24,7 @@ export class KeyPressIndicator extends Component {
     getRenderMethods(): RenderMethod[] {
         return [
             Tilesets.instance.oneBit.getTileSource("keycap").toImageRender(
-                new TileTransform(this.pos, null, 0, false, false, UIStateManager.UI_SPRITE_DEPTH)
+                new SpriteTransform(this.pos, null, 0, false, false, UIStateManager.UI_SPRITE_DEPTH)
             ),
             new TextRender(
                 InputKeyString.for(this.key).toLowerCase(), 

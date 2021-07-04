@@ -6,19 +6,19 @@ import { Point } from "../../engine/Point"
 import { Color } from "./Color"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
 import { Camera } from "../cutscenes/Camera"
-import { NineSlice } from "../../engine/tiles/NineSlice"
+import { NineSlice } from "../../engine/sprites/NineSlice"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { ImageRender } from "../../engine/renderer/ImageRender"
 import { UIStateManager } from "./UIStateManager"
 import { ITEM_METADATA_MAP, Item } from "../items/Items"
-import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
+import { StaticSpriteSource } from "../../engine/sprites/StaticSpriteSource"
 import { TEXT_SIZE, TEXT_FONT, TEXT_PIXEL_WIDTH } from "./Text"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Player } from "../characters/Player"
 import { rectContains } from "../../engine/util/Utils"
 import { Tooltip } from "./Tooltip"
-import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
-import { TileTransform } from "../../engine/tiles/TileTransform"
+import { AnimatedSpriteComponent } from "../../engine/sprites/AnimatedSpriteComponent"
+import { SpriteTransform } from "../../engine/sprites/SpriteTransform"
 import { TextRender } from "../../engine/renderer/TextRender"
 import { saveManager } from "../SaveManager"
 import { assets } from "../../engine/Assets"
@@ -105,9 +105,9 @@ export class SellMenu extends Component {
         this.justOpened = true
 
         this.coinEntity = new Entity([
-            new AnimatedTileComponent(
+            new AnimatedSpriteComponent(
                 [Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)],
-                new TileTransform(this.getTopLeft().plus(this.coinsOffset))
+                new SpriteTransform(this.getTopLeft().plus(this.coinsOffset))
             )
         ])
     }
@@ -211,7 +211,7 @@ export class SellMenu extends Component {
             // coinage
             let offsetFromRight = 0
             const coinIcon = this.getItemIcon(Item.COIN)
-            let ingredientIcon: StaticTileSource = this.tintedIcon(coinIcon, itemColor === Color.WHITE ? Color.YELLOW : itemColor)  // make coin icon yellow on hover
+            let ingredientIcon: StaticSpriteSource = this.tintedIcon(coinIcon, itemColor === Color.WHITE ? Color.YELLOW : itemColor)  // make coin icon yellow on hover
             this.context.fillStyle = itemColor
             const countStr = `${sale.price}`
             offsetFromRight += (countStr.length * TEXT_PIXEL_WIDTH + margin)
@@ -238,10 +238,10 @@ export class SellMenu extends Component {
     }
 
     // caching stuff
-    private itemIcons = new Map<Item, StaticTileSource>()
-    private tintedIcons = new Map<string, Map<StaticTileSource, StaticTileSource>>()
+    private itemIcons = new Map<Item, StaticSpriteSource>()
+    private tintedIcons = new Map<string, Map<StaticSpriteSource, StaticSpriteSource>>()
 
-    private drawIconAt(icon: StaticTileSource, x: number, y: number) {
+    private drawIconAt(icon: StaticSpriteSource, x: number, y: number) {
         this.context.drawImage(
             icon.image, 
             icon.position.x, icon.position.y, icon.dimensions.x, icon.dimensions.y, 
@@ -249,7 +249,7 @@ export class SellMenu extends Component {
         )
     }
 
-    private getItemIcon(item: Item): StaticTileSource {
+    private getItemIcon(item: Item): StaticSpriteSource {
         const cached = this.itemIcons.get(item)
         if (!!cached) {
             return cached
@@ -259,13 +259,13 @@ export class SellMenu extends Component {
         return icon
     }
 
-    private tintedIcon(icon: StaticTileSource, tint: Color): StaticTileSource {
+    private tintedIcon(icon: StaticSpriteSource, tint: Color): StaticSpriteSource {
         if (tint === Color.WHITE) {
             return icon
         }
         let cache = this.tintedIcons.get(tint)
         if (!cache) {
-            cache = new Map<StaticTileSource, StaticTileSource>()
+            cache = new Map<StaticSpriteSource, StaticSpriteSource>()
             this.tintedIcons.set(tint, cache)
         }
         const cached = cache.get(icon)

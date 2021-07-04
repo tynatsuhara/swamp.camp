@@ -1,18 +1,18 @@
 import { assets } from "../../engine/Assets"
 import { Component } from "../../engine/Component"
 import { Point } from "../../engine/Point"
-import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
-import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
-import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
-import { TileTransform } from "../../engine/tiles/TileTransform"
+import { AnimatedSpriteComponent } from "../../engine/sprites/AnimatedSpriteComponent"
+import { StaticSpriteSource } from "../../engine/sprites/StaticSpriteSource"
+import { SpriteAnimation } from "../../engine/sprites/SpriteAnimation"
+import { SpriteTransform } from "../../engine/sprites/SpriteTransform"
 import { Lists } from "../../engine/util/Lists"
 
 export class ExplosionTileset {
     /**
      * returns an AnimatedTileComponent which will self-destruct once the animation completes
      */
-    getExplosionAnimation(center: Point): AnimatedTileComponent {
-        let component: AnimatedTileComponent
+    getExplosionAnimation(center: Point): AnimatedSpriteComponent {
+        let component: AnimatedSpriteComponent
         
         // TODO: don't hardcode these when we need to support other sizes
         const size = 30
@@ -22,12 +22,12 @@ export class ExplosionTileset {
         const speed = 65
 
         const pos = new Point(col, row)
-        component = new TileSetAnimation(
+        component = new SpriteAnimation(
             Lists.range(0, 4)
                     .map((index) => this.getTileAt(pos.plusX((size + space) * (index)), size))
                     .map(tileSource => [tileSource, speed]),
             () => component.delete()
-        ).toComponent(TileTransform.new({ 
+        ).toComponent(SpriteTransform.new({ 
             position: center.plus(new Point(size, size).div(-2)), 
             depth: center.y + size/2
         }))
@@ -46,7 +46,7 @@ export class ExplosionTileset {
         )
         
         const component = this.getTileAt(new Point(col, row), size)
-                .toComponent(TileTransform.new({ 
+                .toComponent(SpriteTransform.new({ 
                     position: startingPos, 
                     depth: Number.MAX_SAFE_INTEGER
                 }))
@@ -64,7 +64,7 @@ export class ExplosionTileset {
     }
 
     private getTileAt(pos: Point, size: number) {
-        return new StaticTileSource(
+        return new StaticSpriteSource(
             this.image(), 
             pos,
             new Point(size, size)

@@ -2,8 +2,8 @@ import { Point } from "../../../engine/Point"
 import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
 import { BoxCollider } from "../../../engine/collision/BoxCollider"
 import { WorldLocation } from "../WorldLocation"
-import { TileComponent } from "../../../engine/tiles/TileComponent"
-import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { SpriteComponent } from "../../../engine/sprites/SpriteComponent"
+import { SpriteTransform } from "../../../engine/sprites/SpriteTransform"
 import { Entity } from "../../../engine/Entity"
 import { Item } from "../../items/Items"
 import { HittableResource } from "./HittableResource"
@@ -50,16 +50,16 @@ export class TreeFactory extends ElementFactory {
         const depth = (pos.y + 2) * TILE_SIZE + randomOffset.y
 
         const addTile = (s: string, pos: Point) => {
-            const tile = e.addComponent(new TileComponent(
+            const tile = e.addComponent(new SpriteComponent(
                 Tilesets.instance.outdoorTiles.getTileSource(s), 
-                new TileTransform(pos.times(TILE_SIZE).plus(randomOffset))
+                new SpriteTransform(pos.times(TILE_SIZE).plus(randomOffset))
             ))
             tile.transform.depth = depth
             return tile
         }
 
         const prefix = this.type === ElementType.TREE_ROUND ? "treeRound" : "treePointy"
-        let tiles: TileComponent[]
+        let tiles: SpriteComponent[]
         if (size === 3) {
             tiles = [addTile(`${prefix}Top`, pos), addTile(`${prefix}Base`, pos.plus(new Point(0, 1)))]
         } else {

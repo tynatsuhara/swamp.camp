@@ -2,8 +2,8 @@ import { BoxCollider } from "../../../engine/collision/BoxCollider"
 import { Component } from "../../../engine/Component"
 import { Entity } from "../../../engine/Entity"
 import { Point } from "../../../engine/Point"
-import { TileComponent } from "../../../engine/tiles/TileComponent"
-import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { SpriteComponent } from "../../../engine/sprites/SpriteComponent"
+import { SpriteTransform } from "../../../engine/sprites/SpriteTransform"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { makeHouseInterior } from "../interior/House"
 import { LocationManager } from "../LocationManager"
@@ -51,7 +51,7 @@ export class HouseFactory extends ElementFactory {
 
         const addTile = (tileSheetPos: Point, pos: Point) => {
             const tile = Tilesets.instance.tilemap.getTileAt(tileSheetPos)
-            const el = e.addComponent(new TileComponent(tile, new TileTransform(pos.times(TILE_SIZE))))
+            const el = e.addComponent(new SpriteComponent(tile, new SpriteTransform(pos.times(TILE_SIZE))))
             el.transform.depth = depth
         }
 

@@ -2,7 +2,7 @@ import { Component } from "../../engine/Component"
 import { Point } from "../../engine/Point"
 import { Camera } from "./Camera"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
-import { TileTransform } from "../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../engine/sprites/SpriteTransform"
 import { Lists } from "../../engine/util/Lists"
 import { HUD } from "../ui/HUD"
 import { TextOverlayManager } from "./TextOverlayManager"
@@ -30,7 +30,7 @@ export class DeathCutscene extends Component {
         
         const deathIcon = Tilesets.instance.oneBit
                 .getTileSource(Lists.oneOf(["tombstone1", "tombstone2", "skull-n-bones", "skull1", "skull2"]))
-                .toComponent(TileTransform.new({ position: centerPos }))
+                .toComponent(SpriteTransform.new({ position: centerPos }))
 
         const text = Lists.oneOf([
             "You died. How unfortunate.",

@@ -2,7 +2,7 @@ import { Component } from "../../engine/Component"
 import { UpdateData } from "../../engine/Engine"
 import { Entity } from "../../engine/Entity"
 import { Point } from "../../engine/Point"
-import { TileTransform } from "../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../engine/sprites/SpriteTransform"
 import { Lists } from "../../engine/util/Lists"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
@@ -106,7 +106,7 @@ export class TextOverlayManager extends Component {
                     mouseIconPos.plus(new Point(-TEXT_PIXEL_WIDTH * action.length, 4)), 
                     TextOverlayManager.WIDTH, 
                 ),
-                Tilesets.instance.oneBit.getTileSource("leftClick").toImageRender(new TileTransform(mouseIconPos))
+                Tilesets.instance.oneBit.getTileSource("leftClick").toImageRender(new SpriteTransform(mouseIconPos))
             ]
         }
     }

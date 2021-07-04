@@ -1,7 +1,7 @@
-import { StaticTileSource } from "../../../engine/tiles/StaticTileSource"
+import { StaticSpriteSource } from "../../../engine/sprites/StaticSpriteSource"
 import { Point } from "../../../engine/Point"
 import { ImageRender } from "../../../engine/renderer/ImageRender"
-import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../../engine/sprites/SpriteTransform"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { ConnectingTileSchema } from "./ConnectingTileSchema"
 import { GroundType } from "./Ground"
@@ -17,9 +17,9 @@ const CORNER_DIMS = new Point(CORNER_SIZE, CORNER_SIZE)
 export class ConnectingTilePathSchema extends ConnectingTileSchema {
 
     private readonly type: GroundType
-    private _cap: StaticTileSource
-    private _single: StaticTileSource
-    private _corners: StaticTileSource
+    private _cap: StaticSpriteSource
+    private _single: StaticSpriteSource
+    private _corners: StaticSpriteSource
 
     constructor(type: GroundType) {
         super()
@@ -27,18 +27,18 @@ export class ConnectingTilePathSchema extends ConnectingTileSchema {
     }
 
     // a tile with one connection (on the bottom)
-    cap(source: StaticTileSource) {
+    cap(source: StaticSpriteSource) {
         this._cap = source
         return this
     }
    
     // a tile with no connections
-    single(source: StaticTileSource) {
+    single(source: StaticSpriteSource) {
         this._single = source
         return this
     }
 
-    corners(source: StaticTileSource) {
+    corners(source: StaticSpriteSource) {
         this._corners = source
         return this
     }
@@ -69,8 +69,8 @@ export class ConnectingTilePathSchema extends ConnectingTileSchema {
         
         const count = [n, ne, e, se, s, sw, w, nw].filter(dir => !!dir).length
 
-        const render = (source: StaticTileSource, rotation: number = 0, offset = Point.ZERO) => {
-            return source.toImageRender(TileTransform.new({ 
+        const render = (source: StaticSpriteSource, rotation: number = 0, offset = Point.ZERO) => {
+            return source.toImageRender(SpriteTransform.new({ 
                 position: position.times(TILE_SIZE).plus(offset), 
                 rotation, 
                 depth: GroundRenderer.DEPTH + 1
@@ -79,7 +79,7 @@ export class ConnectingTilePathSchema extends ConnectingTileSchema {
 
         const corner = (x: number, y: number) => {
             const offset = new Point(x, y).times(CORNER_SIZE)
-            const tile = new StaticTileSource(
+            const tile = new StaticSpriteSource(
                 this._corners.image, 
                 this._corners.position.plus(offset), 
                 CORNER_DIMS

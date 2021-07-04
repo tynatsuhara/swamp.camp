@@ -7,14 +7,14 @@ import { Color } from "./Color"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
 import { CraftingRecipe, CraftingRecipeCategory } from "../items/CraftingRecipe"
 import { Camera } from "../cutscenes/Camera"
-import { NineSlice } from "../../engine/tiles/NineSlice"
+import { NineSlice } from "../../engine/sprites/NineSlice"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { ImageRender } from "../../engine/renderer/ImageRender"
 import { UIStateManager } from "./UIStateManager"
 import { ITEM_METADATA_MAP, Item } from "../items/Items"
-import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
+import { StaticSpriteSource } from "../../engine/sprites/StaticSpriteSource"
 import { TEXT_SIZE, TEXT_FONT, TEXT_PIXEL_WIDTH } from "./Text"
-import { TileTransform } from "../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../engine/sprites/SpriteTransform"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Player } from "../characters/Player"
 import { rectContains } from "../../engine/util/Utils"
@@ -108,7 +108,7 @@ export class CraftingMenu extends Component {
 
             result.push(...NineSlice.makeNineSliceComponents(Tilesets.instance.oneBit.getNineSlice("invBoxNW"), pos, dims))
             const icon = i === this.recipeCategory || hovered ? category.icon : this.tintedIcon(category.icon, Color.PINK)
-            result.push(icon.toComponent(new TileTransform(topLeft.plusX(i * TILE_SIZE * 2 + TILE_SIZE/2).plusY(TILE_SIZE/2))))
+            result.push(icon.toComponent(new SpriteTransform(topLeft.plusX(i * TILE_SIZE * 2 + TILE_SIZE/2).plusY(TILE_SIZE/2))))
 
             if (!this.justOpened && hovered && updateData.input.isMouseDown) {
                 this.selectCategory(i)
@@ -210,7 +210,7 @@ export class CraftingMenu extends Component {
             for (let i = 0; i < recipe.input.length; i++) {
                 const ingr = recipe.input[recipe.input.length-i-1]
                 const plainIngredientIcon = this.getItemIcon(ingr.item)
-                let ingredientIcon: StaticTileSource = plainIngredientIcon
+                let ingredientIcon: StaticSpriteSource = plainIngredientIcon
                 if (Player.instance.dude.inventory.getItemCount(ingr.item) < ingr.count) {
                     this.context.fillStyle = Color.DARK_RED
                     ingredientIcon = this.tintedIcon(ingredientIcon, Color.DARK_RED)
@@ -254,10 +254,10 @@ export class CraftingMenu extends Component {
     }
 
     // caching stuff
-    private itemIcons = new Map<Item, StaticTileSource>()
-    private tintedIcons = new Map<string, Map<StaticTileSource, StaticTileSource>>()
+    private itemIcons = new Map<Item, StaticSpriteSource>()
+    private tintedIcons = new Map<string, Map<StaticSpriteSource, StaticSpriteSource>>()
 
-    private drawIconAt(icon: StaticTileSource, x: number, y: number) {
+    private drawIconAt(icon: StaticSpriteSource, x: number, y: number) {
         this.context.drawImage(
             icon.image, 
             icon.position.x, icon.position.y, icon.dimensions.x, icon.dimensions.y, 
@@ -265,7 +265,7 @@ export class CraftingMenu extends Component {
         )
     }
 
-    private getItemIcon(item: Item): StaticTileSource {
+    private getItemIcon(item: Item): StaticSpriteSource {
         const cached = this.itemIcons.get(item)
         if (!!cached) {
             return cached
@@ -275,13 +275,13 @@ export class CraftingMenu extends Component {
         return icon
     }
 
-    private tintedIcon(icon: StaticTileSource, tint: Color): StaticTileSource {
+    private tintedIcon(icon: StaticSpriteSource, tint: Color): StaticSpriteSource {
         if (tint === Color.WHITE) {
             return icon
         }
         let cache = this.tintedIcons.get(tint)
         if (!cache) {
-            cache = new Map<StaticTileSource, StaticTileSource>()
+            cache = new Map<StaticSpriteSource, StaticSpriteSource>()
             this.tintedIcons.set(tint, cache)
         }
         const cached = cache.get(icon)

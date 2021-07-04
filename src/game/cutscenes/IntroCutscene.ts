@@ -14,7 +14,7 @@ import { DIP_STARTING_DIALOGUE } from "../characters/dialogues/DipIntro"
 import { TextOverlayManager } from "./TextOverlayManager"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
-import { TileTransform } from "../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../engine/sprites/SpriteTransform"
 import { saveManager } from "../SaveManager"
 import { HUD } from "../ui/HUD"
 
@@ -53,7 +53,7 @@ export class IntroCutscene extends Component {
         DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(-1, 3).times(TILE_SIZE))
         DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(-4, 0).times(TILE_SIZE))
 
-        const characterAnimation = (key: string, transform: TileTransform) => {
+        const characterAnimation = (key: string, transform: SpriteTransform) => {
             const anim = DudeAnimationUtils.getCharacterIdleAnimation(key).toComponent(transform)
             anim.transform.position = new Point(transform.position.x, transform.position.y - transform.dimensions.y)
             anim.fastForward(Math.random() * 1000)  // don't have the animations in sync
@@ -85,8 +85,8 @@ ANOTHER thing - Only one of the explorers returned, and she reported that her co
             "START",
             () => HUD.instance.locationTransition.transition(() => this.cutscene(), 100, true),
             [
-                characterAnimation("MountainKing", TileTransform.new({ position: centerPos.plusX(-35) })),
-                characterAnimation("knight_f", TileTransform.new({ position: centerPos.plusX(9), mirrorX: true })),
+                characterAnimation("MountainKing", SpriteTransform.new({ position: centerPos.plusX(-35) })),
+                characterAnimation("knight_f", SpriteTransform.new({ position: centerPos.plusX(9), mirrorX: true })),
             ]
         )
     }

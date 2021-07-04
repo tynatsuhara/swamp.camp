@@ -1,7 +1,7 @@
 import { BoxCollider } from "../../../engine/collision/BoxCollider"
 import { UpdateData } from "../../../engine/Engine"
 import { Point } from "../../../engine/Point"
-import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../../engine/sprites/SpriteTransform"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Item, spawnItem } from "../../items/Items"
 import { Hittable } from "./Hittable"
@@ -23,7 +23,7 @@ export class Breakable extends Hittable {
 
     constructor(
         position: Point, 
-        tileTransforms: TileTransform[], 
+        tileTransforms: SpriteTransform[], 
         itemSupplier: () => Item[],
         audioCallback: () => void = () => {}
     ) {

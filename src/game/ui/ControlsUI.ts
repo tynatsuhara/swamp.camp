@@ -2,7 +2,7 @@ import { KeyPressIndicator } from "./KeyPressIndicator"
 import { Point } from "../../engine/Point"
 import { InputKey } from "../../engine/Input"
 import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
-import { TileTransform } from "../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../engine/sprites/SpriteTransform"
 import { formatText } from "./Text"
 import { Color } from "./Color"
 import { RenderMethod } from "../../engine/renderer/RenderMethod"
@@ -21,8 +21,8 @@ export const makeControlsUI = (dimensions: Point, offset: Point): RenderMethod[]
         ...new KeyPressIndicator(topLeft.plusX(TILE_SIZE * 2).plusY(TILE_SIZE), Controls.walkRight).getRenderMethods(),
         // ...new KeyPressIndicator(topLeft.plusX(TILE_SIZE * 4 - 2).plusY(controlsOffset), Controls.attackKey).getRenderMethods(),
         // ...new KeyPressIndicator(topLeft.plusX(TILE_SIZE * 4 - 2).plusY(controlsOffset + TILE_SIZE), Controls.blockKey).getRenderMethods(),
-        Tilesets.instance.oneBit.getTileSource("leftClick").toImageRender(new TileTransform(topLeft.plusX(TILE_SIZE*4).plusY(controlsOffset))),
-        Tilesets.instance.oneBit.getTileSource("rightClick").toImageRender(new TileTransform(topLeft.plusX(TILE_SIZE*4).plusY(TILE_SIZE * 1 + controlsOffset))),
+        Tilesets.instance.oneBit.getTileSource("leftClick").toImageRender(new SpriteTransform(topLeft.plusX(TILE_SIZE*4).plusY(controlsOffset))),
+        Tilesets.instance.oneBit.getTileSource("rightClick").toImageRender(new SpriteTransform(topLeft.plusX(TILE_SIZE*4).plusY(TILE_SIZE * 1 + controlsOffset))),
         ...formatText("MOVE", Color.WHITE, topLeft.plusX(TILE_SIZE/2).plusY(TILE_SIZE*2+2), 100),
         ...formatText("ATTACK", Color.WHITE, topLeft.plusX(TILE_SIZE*5).plusY(4 + controlsOffset), 100),
         ...formatText("BLOCK", Color.WHITE, topLeft.plusX(TILE_SIZE*5).plusY(TILE_SIZE + 4 + controlsOffset), 100),

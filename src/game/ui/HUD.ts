@@ -1,7 +1,7 @@
 import { Entity } from "../../engine/Entity"
 import { Point } from "../../engine/Point"
-import { TileComponent } from "../../engine/tiles/TileComponent"
-import { TileTransform } from "../../engine/tiles/TileTransform"
+import { SpriteComponent } from "../../engine/sprites/SpriteComponent"
+import { SpriteTransform } from "../../engine/sprites/SpriteTransform"
 import { Dude } from "../characters/Dude"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
@@ -16,7 +16,7 @@ export class HUD {
     }
 
     private heartsEntity: Entity = new Entity()
-    private autosaveComponent: TileComponent = new Entity().addComponent(
+    private autosaveComponent: SpriteComponent = new Entity().addComponent(
         Tilesets.instance.oneBit.getTileSource("floppy_drive").toComponent()
     )
     private isShowingAutosaveIcon = false
@@ -72,17 +72,17 @@ export class HUD {
 
         const fullHearts = Math.floor(health)
         for (let i = 0; i < fullHearts; i++) {
-            result.push(new TileComponent(full, new TileTransform(this.offset.plus(heartOffset.times(i)))))
+            result.push(new SpriteComponent(full, new SpriteTransform(this.offset.plus(heartOffset.times(i)))))
         }
 
         if (health % 1 > .5) {
-            result.push(new TileComponent(full, new TileTransform(this.offset.plus(heartOffset.times(result.length)))))
+            result.push(new SpriteComponent(full, new SpriteTransform(this.offset.plus(heartOffset.times(result.length)))))
         } else if (health % 1 > 0) {
-            result.push(new TileComponent(half, new TileTransform(this.offset.plus(heartOffset.times(result.length)))))
+            result.push(new SpriteComponent(half, new SpriteTransform(this.offset.plus(heartOffset.times(result.length)))))
         }
 
         while (result.length < maxHealth) {
-            result.push(new TileComponent(empty, new TileTransform(this.offset.plus(heartOffset.times(result.length)))))
+            result.push(new SpriteComponent(empty, new SpriteTransform(this.offset.plus(heartOffset.times(result.length)))))
         }
 
         result.forEach(c => this.heartsEntity.addComponent(c))

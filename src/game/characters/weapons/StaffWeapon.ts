@@ -1,8 +1,8 @@
 import { UpdateData } from "../../../engine/Engine"
 import { Point } from "../../../engine/Point"
-import { AnimatedTileComponent } from "../../../engine/tiles/AnimatedTileComponent"
-import { StaticTileSource } from "../../../engine/tiles/StaticTileSource"
-import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { AnimatedSpriteComponent } from "../../../engine/sprites/AnimatedSpriteComponent"
+import { StaticSpriteSource } from "../../../engine/sprites/StaticSpriteSource"
+import { SpriteTransform } from "../../../engine/sprites/SpriteTransform"
 import { Animator } from "../../../engine/util/Animator"
 import { Lists } from "../../../engine/util/Lists"
 import { Camera } from "../../cutscenes/Camera"
@@ -21,13 +21,13 @@ import { WeaponType } from "./WeaponType"
  */
 export class StaffWeapon extends Weapon {
 
-    private weaponSprite: StaticTileSource
-    private weaponTransform: TileTransform
+    private weaponSprite: StaticSpriteSource
+    private weaponTransform: SpriteTransform
     private offsetFromCenter: Point
 
-    private targetSprite: StaticTileSource
-    private targetSprite1: StaticTileSource
-    private targetSprite2: StaticTileSource
+    private targetSprite: StaticSpriteSource
+    private targetSprite1: StaticSpriteSource
+    private targetSprite2: StaticSpriteSource
     private targetAnimator: Animator
 
     // if non-null, a target will be shown here
@@ -39,7 +39,7 @@ export class StaffWeapon extends Weapon {
         super()
         this.start = () => {
             this.weaponSprite = Tilesets.instance.dungeonCharacters.getTileSource("weapon_red_magic_staff")
-            this.weaponTransform = new TileTransform(Point.ZERO, this.weaponSprite.dimensions).relativeTo(this.dude.animation.transform)
+            this.weaponTransform = new SpriteTransform(Point.ZERO, this.weaponSprite.dimensions).relativeTo(this.dude.animation.transform)
             this.offsetFromCenter = new Point(-5, 0)
             this.targetSprite1 = Tilesets.instance.oneBit.getTileSource("aoe_target").filtered(ImageFilters.tint(Color.SUPER_ORANGE))
             this.targetSprite2 = Tilesets.instance.oneBit.getTileSource("aoe_target").filtered(ImageFilters.tint(Color.WHITE))
@@ -211,7 +211,7 @@ export class StaffWeapon extends Weapon {
             this.weaponSprite.toImageRender(this.weaponTransform),
             !this.attackPosition 
                 ? null 
-                : this.targetSprite.toImageRender(TileTransform.new({ 
+                : this.targetSprite.toImageRender(SpriteTransform.new({ 
                     position: this.attackPosition.plus(new Point(1, 1).times(-TILE_SIZE/2)), 
                     depth: Number.MIN_SAFE_INTEGER + 50
                 }))

@@ -1,8 +1,8 @@
 import { Point } from "../../engine/Point"
-import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
+import { StaticSpriteSource } from "../../engine/sprites/StaticSpriteSource"
 import { assets } from "../../engine/Assets"
-import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
-import { TileSource } from "../../engine/tiles/TileSource"
+import { SpriteAnimation } from "../../engine/sprites/SpriteAnimation"
+import { SpriteSource } from "../../engine/sprites/SpriteSource"
 
 export class SingleFileTileLoader {
 
@@ -18,7 +18,7 @@ export class SingleFileTileLoader {
         this.padding = padding
     }
 
-    getNineSlice(key: string): TileSource[] {
+    getNineSlice(key: string): SpriteSource[] {
         const pt = this.map.get(key)
         if (!pt) {
             throw new Error(`${key} is not a valid tile`)
@@ -32,7 +32,7 @@ export class SingleFileTileLoader {
         return result
     }
 
-    getTileSource(key: string): StaticTileSource {
+    getTileSource(key: string): StaticSpriteSource {
         const result = this.map.get(key)
         if (!result) {
             throw new Error(`${key} is not a valid tile`)
@@ -41,19 +41,19 @@ export class SingleFileTileLoader {
     }
 
     getTileAt(pos: Point) {
-        return new StaticTileSource(
+        return new StaticSpriteSource(
             this.image(), 
             new Point(pos.x * (this.tileSize.x + this.padding), pos.y * (this.tileSize.y + this.padding)),
             this.tileSize
         )
     }
 
-    getTileSetAnimation(key: string, frames: number, speed: number): TileSetAnimation {
+    getTileSetAnimation(key: string, frames: number, speed: number): SpriteAnimation {
         const result = this.map.get(key)
         if (!result) {
             return null
         }
-        return new TileSetAnimation(
+        return new SpriteAnimation(
             Array.from({length: frames}, (v, k) => k)
                     .map((index) => this.getTileAt(result.plus(new Point(index, 0))))
                     .map(tileSource => [tileSource, speed])

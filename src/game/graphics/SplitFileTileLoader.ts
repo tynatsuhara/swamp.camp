@@ -1,7 +1,7 @@
-import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
+import { StaticSpriteSource } from "../../engine/sprites/StaticSpriteSource"
 import { assets } from "../../engine/Assets"
 import { Point } from "../../engine/Point"
-import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
+import { SpriteAnimation } from "../../engine/sprites/SpriteAnimation"
 
 export class SplitFileTileLoader {
 
@@ -11,19 +11,19 @@ export class SplitFileTileLoader {
         this.dirPath = dirPath
     }
 
-    getTileSource(key: string): StaticTileSource {
+    getTileSource(key: string): StaticSpriteSource {
         const image = assets.getImageByFileName(`${this.dirPath}/${key}.png`)
         if (!image) {
             return null
         }
-        return new StaticTileSource(
+        return new StaticSpriteSource(
             image, 
             new Point(0, 0),
             new Point(image.width, image.height), 
         )
     }
     
-    getTileSetAnimation(key: string, frames: number, speed: number): TileSetAnimation {
+    getTileSetAnimation(key: string, frames: number, speed: number): SpriteAnimation {
         const framesArr = []
         for (let i = 1; i <= frames; i++) {
             const image = this.getTileSource(`${key}_${i}`)
@@ -32,6 +32,6 @@ export class SplitFileTileLoader {
             }
             framesArr.push(image)
         }
-        return new TileSetAnimation(framesArr.map(f => [f, speed]))
+        return new SpriteAnimation(framesArr.map(f => [f, speed]))
     }
 }

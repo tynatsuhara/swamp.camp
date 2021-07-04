@@ -1,6 +1,6 @@
 import { DialogueInstance, getDialogue, NextDialogue, DialogueSource, EMPTY_DIALOGUE } from "../characters/Dialogue"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
-import { NineSlice } from "../../engine/tiles/NineSlice"
+import { NineSlice } from "../../engine/sprites/NineSlice"
 import { Point } from "../../engine/Point"
 import { Component } from "../../engine/Component"
 import { UpdateData } from "../../engine/Engine"

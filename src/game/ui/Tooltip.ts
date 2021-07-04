@@ -1,5 +1,5 @@
 import { Component } from "../../engine/Component"
-import { TileComponent } from "../../engine/tiles/TileComponent"
+import { SpriteComponent } from "../../engine/sprites/SpriteComponent"
 import { Tilesets, TILE_DIMENSIONS, TILE_SIZE } from "../graphics/Tilesets"
 import { Point } from "../../engine/Point"
 import { TextRender } from "../../engine/renderer/TextRender"
@@ -9,7 +9,7 @@ import { Color } from "./Color"
 import { UIStateManager } from "./UIStateManager"
 import { Lists } from "../../engine/util/Lists"
 import { ImageRender } from "../../engine/renderer/ImageRender"
-import { TileTransform } from "../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../engine/sprites/SpriteTransform"
 import { RenderMethod } from "../../engine/renderer/RenderMethod"
 
 export class Tooltip extends Component {
@@ -50,15 +50,15 @@ export class Tooltip extends Component {
         for (let i = 0; i < (this.text.length-1) * 2 + 1; i++) {
             // left
             tiles.push(Tilesets.instance.oneBit.getTileSource("tooltipLeft").toImageRender(
-                new TileTransform(leftPos.plusY(-i * spacing), TILE_DIMENSIONS, 0, false, false, UIStateManager.UI_SPRITE_DEPTH + 1)
+                new SpriteTransform(leftPos.plusY(-i * spacing), TILE_DIMENSIONS, 0, false, false, UIStateManager.UI_SPRITE_DEPTH + 1)
             ))
             // center
             tiles.push(Tilesets.instance.oneBit.getTileSource("tooltipCenter").toImageRender(
-                new TileTransform(centerPos.plusY(-i * spacing), centerWidth, 0, false, false, UIStateManager.UI_SPRITE_DEPTH + 1)
+                new SpriteTransform(centerPos.plusY(-i * spacing), centerWidth, 0, false, false, UIStateManager.UI_SPRITE_DEPTH + 1)
             ))
             // right
             tiles.push(Tilesets.instance.oneBit.getTileSource("tooltipRight").toImageRender(
-                new TileTransform(rightPos.plusY(-i * spacing), TILE_DIMENSIONS, 0, false, false, UIStateManager.UI_SPRITE_DEPTH + 1)
+                new SpriteTransform(rightPos.plusY(-i * spacing), TILE_DIMENSIONS, 0, false, false, UIStateManager.UI_SPRITE_DEPTH + 1)
             ))
         }
 

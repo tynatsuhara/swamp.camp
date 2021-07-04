@@ -3,18 +3,18 @@ import { Entity } from "../../engine/Entity"
 import { LocationManager } from "../world/LocationManager"
 import { DroppedItem } from "./DroppedItem"
 import { Point } from "../../engine/Point"
-import { TileSource } from "../../engine/tiles/TileSource"
+import { SpriteSource } from "../../engine/sprites/SpriteSource"
 import { Collider } from "../../engine/collision/Collider"
 import { ElementType } from "../world/elements/Elements"
-import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
+import { StaticSpriteSource } from "../../engine/sprites/StaticSpriteSource"
 import { WeaponType } from "../characters/weapons/WeaponType"
 import { Player } from "../characters/Player"
 import { ShieldType } from "../characters/weapons/ShieldType"
 
 export class ItemMetadata {
     readonly displayName: string
-    readonly droppedIconSupplier: () => TileSource
-    readonly inventoryIconSupplier: () => StaticTileSource
+    readonly droppedIconSupplier: () => SpriteSource
+    readonly inventoryIconSupplier: () => StaticSpriteSource
     readonly stackLimit: number
     readonly element: ElementType
     readonly equippableWeapon: WeaponType
@@ -33,8 +33,8 @@ export class ItemMetadata {
         consumable = null,
     }: {
         displayName: string,
-        inventoryIconSupplier: () => StaticTileSource,
-        droppedIconSupplier?: () => TileSource,
+        inventoryIconSupplier: () => StaticSpriteSource,
+        droppedIconSupplier?: () => SpriteSource,
         stackLimit?: number,
         element?: ElementType,
         equippableWeapon?: WeaponType,

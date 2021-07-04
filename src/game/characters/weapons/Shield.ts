@@ -1,14 +1,14 @@
 import { Component } from "../../../engine/Component"
-import { TileComponent } from "../../../engine/tiles/TileComponent"
+import { SpriteComponent } from "../../../engine/sprites/SpriteComponent"
 import { Tilesets } from "../../graphics/Tilesets"
 import { UpdateData } from "../../../engine/Engine"
-import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../../engine/sprites/SpriteTransform"
 import { Point } from "../../../engine/Point"
 import { Dude } from "../Dude"
 import { Animator } from "../../../engine/util/Animator"
 import { ShieldType } from "./ShieldType"
 import { RenderMethod } from "../../../engine/renderer/RenderMethod"
-import { StaticTileSource } from "../../../engine/tiles/StaticTileSource"
+import { StaticSpriteSource } from "../../../engine/sprites/StaticSpriteSource"
 
 enum State {
     ON_BACK,
@@ -21,8 +21,8 @@ enum State {
 export class Shield extends Component {
 
     dude: Dude
-    sprite: StaticTileSource
-    transform: TileTransform
+    sprite: StaticSpriteSource
+    transform: SpriteTransform
 
     private state: State = State.DRAWN
     // private slashSprite: TileComponent  // TODO try adding particles when someone hits a blocking shield
@@ -37,7 +37,7 @@ export class Shield extends Component {
         this.awake = () => {
             this.dude = this.entity.getComponent(Dude)
             this.sprite = Tilesets.instance.dungeonCharacters.getTileSource(spriteId)
-            this.transform = TileTransform.new({dimensions: this.sprite.dimensions}).relativeTo(this.dude.animation.transform)
+            this.transform = SpriteTransform.new({dimensions: this.sprite.dimensions}).relativeTo(this.dude.animation.transform)
         }
     }
 

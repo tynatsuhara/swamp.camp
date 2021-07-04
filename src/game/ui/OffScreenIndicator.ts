@@ -3,7 +3,7 @@ import { rectContains } from "../../engine/util/Utils"
 import { Lists } from "../../engine/util/Lists"
 import { Component } from "../../engine/Component"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
-import { TileTransform } from "../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../engine/sprites/SpriteTransform"
 import { UpdateData } from "../../engine/Engine"
 import { ImageRender } from "../../engine/renderer/ImageRender"
 import { LocationManager } from "../world/LocationManager"
@@ -42,7 +42,7 @@ export class OffScreenIndicator extends Component {
 
     getRenderMethods(): ImageRender[] {
         if (!this.tileSource) return []
-        return [Tilesets.instance.oneBit.getTileSource(this.tileSource).toImageRender(new TileTransform(this.tilePoint))]
+        return [Tilesets.instance.oneBit.getTileSource(this.tileSource).toImageRender(new SpriteTransform(this.tilePoint))]
     }
 
     private cameraEdgeIntersectPoint(outsidePoint: Point, cameraPos: Point, cameraDimensions: Point): [string, Point] {

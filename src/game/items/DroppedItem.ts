@@ -2,7 +2,7 @@ import { BoxCollider } from "../../engine/collision/BoxCollider"
 import { Collider } from "../../engine/collision/Collider"
 import { Component } from "../../engine/Component"
 import { Point } from "../../engine/Point"
-import { TileComponent } from "../../engine/tiles/TileComponent"
+import { SpriteComponent } from "../../engine/sprites/SpriteComponent"
 import { Player } from "../characters/Player"
 import { LocationManager } from "../world/LocationManager"
 import { Item, ITEM_METADATA_MAP } from "./Items"
@@ -12,7 +12,7 @@ export class DroppedItem extends Component {
 
     static readonly COLLISION_LAYER = "item"
 
-    private tile: TileComponent
+    private tile: SpriteComponent
     private collider: Collider
     private itemType: Item
     private canPickUp = true

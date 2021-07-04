@@ -4,9 +4,9 @@ import { debug } from "../../engine/Debug"
 import { UpdateData } from "../../engine/Engine"
 import { Point } from "../../engine/Point"
 import { RenderMethod } from "../../engine/renderer/RenderMethod"
-import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
-import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
-import { TileTransform } from "../../engine/tiles/TileTransform"
+import { AnimatedSpriteComponent } from "../../engine/sprites/AnimatedSpriteComponent"
+import { StaticSpriteSource } from "../../engine/sprites/StaticSpriteSource"
+import { SpriteTransform } from "../../engine/sprites/SpriteTransform"
 import { StepSounds } from "../audio/StepSounds"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { DeathCutscene } from "../cutscenes/DeathCutscene"
@@ -56,7 +56,7 @@ export class Dude extends Component implements DialogueSource {
     get health() { return this._health }
     speed: number
     private characterAnimName: string
-    private _animation: AnimatedTileComponent
+    private _animation: AnimatedSpriteComponent
     get animation() { return this._animation }
 
     private _weapon: Weapon
@@ -124,7 +124,7 @@ export class Dude extends Component implements DialogueSource {
             const jumpAnim = DudeAnimationUtils.getCharacterJumpAnimation(characterAnimName, blob)
             const height = idleAnim.getTile(0).dimensions.y
             this._animation = this.entity.addComponent(
-                new AnimatedTileComponent([idleAnim, runAnim, jumpAnim], new TileTransform(new Point(0, 28-height)))
+                new AnimatedSpriteComponent([idleAnim, runAnim, jumpAnim], new SpriteTransform(new Point(0, 28-height)))
             )
             this._animation.fastForward(Math.random() * 1000)  // so not all the animations sync up
     
@@ -612,11 +612,11 @@ export class Dude extends Component implements DialogueSource {
         }
 
         // render indicator icon overhead
-        let tile: StaticTileSource = DudeInteractIndicator.getTile(indicator)
+        let tile: StaticSpriteSource = DudeInteractIndicator.getTile(indicator)
         if (!tile || this.dialogueInteract?.isShowingUI || DialogueDisplay.instance.dialogueSource === this) {
             return []
         } else {
-            return [tile.toImageRender(new TileTransform(
+            return [tile.toImageRender(new SpriteTransform(
                 this.standingPosition.plusY(-28).plus(new Point(1, 1).times(-TILE_SIZE/2)).plus(this.getAnimationOffsetPosition()),
                 new Point(TILE_SIZE, TILE_SIZE), 0, false, false, UIStateManager.UI_SPRITE_DEPTH
             ))]

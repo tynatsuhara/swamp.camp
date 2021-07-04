@@ -2,7 +2,7 @@ import { Component } from "../../engine/Component"
 import { Entity } from "../../engine/Entity"
 import { Point } from "../../engine/Point"
 import { RenderMethod } from "../../engine/renderer/RenderMethod"
-import { TileTransform } from "../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../engine/sprites/SpriteTransform"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { ElementComponent } from "./elements/ElementComponent"
 import { ElementType } from "./elements/Elements"
@@ -72,7 +72,7 @@ export class TeleporterFactory extends ElementFactory {
                 }
                 return [
                     Tilesets.instance.oneBit.getTileSource("small_arrow_down").toImageRender(
-                        TileTransform.new({ position: pos.times(TILE_SIZE), depth: UIStateManager.UI_SPRITE_DEPTH })
+                        SpriteTransform.new({ position: pos.times(TILE_SIZE), depth: UIStateManager.UI_SPRITE_DEPTH })
                     )
                 ]
             }

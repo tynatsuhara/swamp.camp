@@ -3,10 +3,10 @@ import { Entity } from "../../../engine/Entity"
 import { GroundType, MakeGroundFuncData } from "./Ground"
 import { ConnectingTile } from "./ConnectingTile"
 import { ConnectingTileWaterSchema } from "./ConnectingTileWaterSchema"
-import { TileSetAnimation } from "../../../engine/tiles/TileSetAnimation"
+import { SpriteAnimation } from "../../../engine/sprites/SpriteAnimation"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Point } from "../../../engine/Point"
-import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../../engine/sprites/SpriteTransform"
 import { GroundRenderer } from "../GroundRenderer"
 
 export const makeWater = (d: MakeGroundFuncData): GroundComponent => {
@@ -23,11 +23,11 @@ export const makeWater = (d: MakeGroundFuncData): GroundComponent => {
 
 export const getAnimatedWaterTileComponent = (pos: Point) => {
     const animationSpeed = 750
-    return new TileSetAnimation([
+    return new SpriteAnimation([
         [Tilesets.instance.tilemap.getTileAt(new Point(6, 0)), animationSpeed],
         [Tilesets.instance.tilemap.getTileAt(new Point(6, 1)), animationSpeed],
         // [Tilesets.instance.tilemap.getTileAt(new Point(6, 2)), animationSpeed],
-    ]).toComponent(TileTransform.new({ 
+    ]).toComponent(SpriteTransform.new({ 
         position: pos.times(TILE_SIZE),
         depth: GroundRenderer.DEPTH - 5,
         rotation: Math.floor(Math.random() * 4) * 90

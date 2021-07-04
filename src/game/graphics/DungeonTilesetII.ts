@@ -1,6 +1,6 @@
-import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
+import { StaticSpriteSource } from "../../engine/sprites/StaticSpriteSource"
 import { Point } from "../../engine/Point"
-import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
+import { SpriteAnimation } from "../../engine/sprites/SpriteAnimation"
 import { assets } from "../../engine/Assets"
 
 const map = new Map(`
@@ -237,7 +237,7 @@ const map = new Map(`
  */
 export class DungeonTilesetII {
 
-    getTileSource(key: string): StaticTileSource {
+    getTileSource(key: string): StaticSpriteSource {
         const row = map.get(key)
         if (!row) {
             return null
@@ -247,10 +247,10 @@ export class DungeonTilesetII {
         }
         const pos = new Point(+row[0], +row[1])
         const dim = new Point(+row[2], +row[3])
-        return new StaticTileSource(this.getFile(), pos, dim)
+        return new StaticSpriteSource(this.getFile(), pos, dim)
     }
 
-    getTileSetAnimationFrames(key: string): StaticTileSource[] {
+    getTileSetAnimationFrames(key: string): StaticSpriteSource[] {
         const row = map.get(key)
         if (!row) {
             return null
@@ -263,17 +263,17 @@ export class DungeonTilesetII {
                 .map(frameIndex => {
                     const pos = new Point(+row[0] + frameIndex * +row[2], +row[1])
                     const dim = new Point(+row[2], +row[3])
-                    return new StaticTileSource(this.getFile(), pos, dim)
+                    return new StaticSpriteSource(this.getFile(), pos, dim)
                 })
     }
 
-    getTileSetAnimation(key: string, speed: number): TileSetAnimation {
+    getTileSetAnimation(key: string, speed: number): SpriteAnimation {
         const frames = this.getTileSetAnimationFrames(key)
         if (!frames) {
             return null
         }
         
-        return new TileSetAnimation(frames.map(tileSource => [tileSource, speed]))
+        return new SpriteAnimation(frames.map(tileSource => [tileSource, speed]))
     }
 
     private getFile(): HTMLImageElement {

@@ -2,10 +2,10 @@ import { GroundComponent } from "./GroundComponent"
 import { Entity } from "../../../engine/Entity"
 import { GroundType, MakeGroundFuncData } from "./Ground"
 import { ConnectingTile } from "./ConnectingTile"
-import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../../engine/sprites/SpriteTransform"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Point } from "../../../engine/Point"
-import { TileSetAnimation } from "../../../engine/tiles/TileSetAnimation"
+import { SpriteAnimation } from "../../../engine/sprites/SpriteAnimation"
 import { ConnectingTileWaterfallSchema } from "./ConnectingTileWaterfallSchema"
 import { RepeatedInvoker } from "../../../engine/util/RepeatedInvoker"
 import { Particles } from "../../graphics/Particles"
@@ -80,12 +80,12 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
 
     const waterfallSpeed = 150
     e.addComponent(
-        new TileSetAnimation(
+        new SpriteAnimation(
             [new Point(1, 1), new Point(2, 1), new Point(1, 2), new Point(2, 2)]
                     .map(pt => Tilesets.instance.tilemap.getTileAt(pt))
                     .map(tile => tile.filtered(spriteFilter))
                     .map(tile => [tile, waterfallSpeed])
-        ).toComponent(TileTransform.new({
+        ).toComponent(SpriteTransform.new({
             position: pixelPos.plus(waterfallOffset),
             depth: waterSpriteDepth,
             rotation,

@@ -1,6 +1,6 @@
 import { BoxCollider } from "../../../engine/collision/BoxCollider"
 import { Point } from "../../../engine/Point"
-import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../../engine/sprites/SpriteTransform"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Item, spawnItem } from "../../items/Items"
 import { LocationManager } from "../LocationManager"
@@ -18,7 +18,7 @@ export class HittableResource extends Hittable {
 
     constructor(
         position: Point, 
-        tileTransforms: TileTransform[], 
+        tileTransforms: SpriteTransform[], 
         freeResources: number, 
         maxResources: number, 
         itemSupplier: () => Item[],

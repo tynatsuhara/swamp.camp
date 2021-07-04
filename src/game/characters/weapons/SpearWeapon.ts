@@ -1,7 +1,7 @@
 import { Weapon } from "./Weapon"
 import { WeaponType } from "./WeaponType"
-import { StaticTileSource } from "../../../engine/tiles/StaticTileSource"
-import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { StaticSpriteSource } from "../../../engine/sprites/StaticSpriteSource"
+import { SpriteTransform } from "../../../engine/sprites/SpriteTransform"
 import { Point } from "../../../engine/Point"
 import { Tilesets } from "../../graphics/Tilesets"
 import { UpdateData } from "../../../engine/Engine"
@@ -19,8 +19,8 @@ enum State {
 
 export class SpearWeapon extends Weapon {
 
-    private weaponSprite: StaticTileSource
-    private weaponTransform: TileTransform
+    private weaponSprite: StaticSpriteSource
+    private weaponTransform: SpriteTransform
     private offsetFromCenter: Point
     private state: State = State.DRAWN
     private _range: number
@@ -31,7 +31,7 @@ export class SpearWeapon extends Weapon {
         super()
         this.start = (startData) => {
             this.weaponSprite = Tilesets.instance.dungeonCharacters.getTileSource("weapon_spear")
-            this.weaponTransform = new TileTransform(Point.ZERO, this.weaponSprite.dimensions).relativeTo(this.dude.animation.transform)
+            this.weaponTransform = new SpriteTransform(Point.ZERO, this.weaponSprite.dimensions).relativeTo(this.dude.animation.transform)
             this.offsetFromCenter = new Point(-5, 0)
             this._range = this.weaponSprite.dimensions.y
         }
@@ -95,7 +95,7 @@ export class SpearWeapon extends Weapon {
             this.dude.inventory.removeItem(Item.SPEAR, 1)
             this.dude.setWeapon(WeaponType.UNARMED)
             
-            const newTransform = new TileTransform(
+            const newTransform = new SpriteTransform(
                 this.weaponTransform.position,
                 this.weaponTransform.dimensions,
                 this.weaponTransform.rotation,

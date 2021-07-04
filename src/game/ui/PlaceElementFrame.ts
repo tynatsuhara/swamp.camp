@@ -1,14 +1,14 @@
 import { Component } from "../../engine/Component"
-import { TileComponent } from "../../engine/tiles/TileComponent"
+import { SpriteComponent } from "../../engine/sprites/SpriteComponent"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Point } from "../../engine/Point"
-import { NineSlice } from "../../engine/tiles/NineSlice"
+import { NineSlice } from "../../engine/sprites/NineSlice"
 import { UIStateManager } from "./UIStateManager"
 import { LocationManager } from "../world/LocationManager"
 import { UpdateData } from "../../engine/Engine"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
 import { clamp, rectContains } from "../../engine/util/Utils"
-import { TileTransform } from "../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../engine/sprites/SpriteTransform"
 import { Elements } from "../world/elements/Elements"
 import { Player } from "../characters/Player"
 
@@ -18,8 +18,8 @@ import { Player } from "../characters/Player"
 export class PlaceElementFrame extends Component {
 
     private readonly dimensions: Point
-    private goodTiles: TileComponent[]
-    private badTiles: TileComponent[]
+    private goodTiles: SpriteComponent[]
+    private badTiles: SpriteComponent[]
 
     constructor(dimensions: Point) {
         super()
@@ -37,16 +37,16 @@ export class PlaceElementFrame extends Component {
         this.badTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
     }
 
-    private getTiles(suffix: string): TileComponent[] {
+    private getTiles(suffix: string): SpriteComponent[] {
         if (this.dimensions.equals(new Point(1, 2))) {
             const top = Tilesets.instance.outdoorTiles.getTileSource(`placingElementFrame_1x2_${suffix}_top`)
-                    .toComponent(new TileTransform())
+                    .toComponent(new SpriteTransform())
             const bottom = Tilesets.instance.outdoorTiles.getTileSource(`placingElementFrame_1x2_${suffix}_bottom`)
-                    .toComponent(new TileTransform(new Point(0, TILE_SIZE)).relativeTo(top.transform))
+                    .toComponent(new SpriteTransform(new Point(0, TILE_SIZE)).relativeTo(top.transform))
             return [top, bottom]
         }
         if (this.dimensions.x === 1 || this.dimensions.y ===1) {
-            return [Tilesets.instance.outdoorTiles.getTileSource(`placingElementFrame_small_${suffix}`).toComponent(new TileTransform())]
+            return [Tilesets.instance.outdoorTiles.getTileSource(`placingElementFrame_small_${suffix}`).toComponent(new SpriteTransform())]
         }
         return NineSlice.makeNineSliceComponents(
             Tilesets.instance.outdoorTiles.getNineSlice(`placingElementFrame_${suffix}`), 

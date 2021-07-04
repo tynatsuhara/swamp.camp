@@ -1,7 +1,7 @@
 import { assets } from "../../engine/Assets"
 import { Point } from "../../engine/Point"
-import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
-import { TileSetAnimation } from "../../engine/tiles/TileSetAnimation"
+import { StaticSpriteSource } from "../../engine/sprites/StaticSpriteSource"
+import { SpriteAnimation } from "../../engine/sprites/SpriteAnimation"
 
 const ROW_WIDTH = 160
 const ROW_START = 32
@@ -16,15 +16,15 @@ const CHARACTERS = new Map([
 
 export class ExtraCharacterSet2TileLoader {
 
-    getIdleAnimation(key: string, speed: number): TileSetAnimation {
+    getIdleAnimation(key: string, speed: number): SpriteAnimation {
         return this.getAnimation(key, speed, 0)
     }
 
-    getWalkAnimation(key: string, speed: number): TileSetAnimation {
+    getWalkAnimation(key: string, speed: number): SpriteAnimation {
         return this.getAnimation(key, speed, 4)
     }
 
-    getAnimation(key: string, speed: number, offset: number): TileSetAnimation {
+    getAnimation(key: string, speed: number, offset: number): SpriteAnimation {
         const result = CHARACTERS.get(key)
         if (!result) {
             return null
@@ -32,7 +32,7 @@ export class ExtraCharacterSet2TileLoader {
         const col = result[0]
         const row = result[1]
         const pos = new Point(col * ROW_WIDTH, ROW_START + TILE_HEIGHT * row)
-        return new TileSetAnimation(
+        return new SpriteAnimation(
             Array.from({length: 4}, (v, k) => k)
                     .map((index) => this.getTileAt(pos.plusX(TILE_WIDTH * (index + offset))))
                     .map(tileSource => [tileSource, speed])
@@ -40,7 +40,7 @@ export class ExtraCharacterSet2TileLoader {
     }
 
     private getTileAt(pos: Point) {
-        return new StaticTileSource(
+        return new StaticSpriteSource(
             this.image(), 
             pos,
             new Point(TILE_WIDTH, TILE_HEIGHT)

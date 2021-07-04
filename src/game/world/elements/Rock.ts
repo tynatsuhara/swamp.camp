@@ -2,8 +2,8 @@ import { Point } from "../../../engine/Point"
 import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
 import { BoxCollider } from "../../../engine/collision/BoxCollider"
 import { WorldLocation } from "../WorldLocation"
-import { TileComponent } from "../../../engine/tiles/TileComponent"
-import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { SpriteComponent } from "../../../engine/sprites/SpriteComponent"
+import { SpriteTransform } from "../../../engine/sprites/SpriteTransform"
 import { Entity } from "../../../engine/Entity"
 import { Item } from "../../items/Items"
 import { ElementComponent } from "./ElementComponent"
@@ -37,9 +37,9 @@ export class RockFactory extends ElementFactory {
         const maxResourcesCount = 6
         const availableResources = data["a"] ?? maxResourcesCount
 
-        const tile = e.addComponent(new TileComponent(
+        const tile = e.addComponent(new SpriteComponent(
             Tilesets.instance.outdoorTiles.getTileSource(`rock${variation}${mossy ? 'mossy' : ''}`), 
-            new TileTransform(pos.times(TILE_SIZE))
+            new SpriteTransform(pos.times(TILE_SIZE))
         ))
         tile.transform.depth = (pos.y + 1) * TILE_SIZE - /* prevent weapon from clipping */ 5
         tile.transform.mirrorX = flipped

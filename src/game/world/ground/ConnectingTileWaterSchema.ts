@@ -1,7 +1,7 @@
-import { StaticTileSource } from "../../../engine/tiles/StaticTileSource"
+import { StaticSpriteSource } from "../../../engine/sprites/StaticSpriteSource"
 import { Point } from "../../../engine/Point"
 import { ImageRender } from "../../../engine/renderer/ImageRender"
-import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../../engine/sprites/SpriteTransform"
 import { ConnectingTile } from "./ConnectingTile"
 import { Grid } from "../../../engine/util/Grid"
 import { GroundComponent } from "./GroundComponent"
@@ -46,8 +46,8 @@ export class ConnectingTileWaterSchema extends ConnectingTileSchema {
         
         let results: ImageRender[] = []
 
-        const render = (source: StaticTileSource, mirrorX: boolean = false, offset = Point.ZERO) => {
-            results.push(source.toImageRender(TileTransform.new({ 
+        const render = (source: StaticSpriteSource, mirrorX: boolean = false, offset = Point.ZERO) => {
+            results.push(source.toImageRender(SpriteTransform.new({ 
                 position: position.times(TILE_SIZE).plus(offset), 
                 mirrorX, 
                 depth: ConnectingTileWaterSchema.DEPTH
@@ -59,7 +59,7 @@ export class ConnectingTileWaterSchema extends ConnectingTileSchema {
         const renderCorner = (x: number, y: number) => {
             const offset = new Point(x, y).times(CORNER_SIZE)
             const corners = tilemap.getTileAt(new Point(5, 1))
-            const tile = new StaticTileSource(
+            const tile = new StaticSpriteSource(
                 corners.image, 
                 corners.position.plus(offset), 
                 CORNER_DIMS

@@ -4,8 +4,8 @@ import { CollisionEngine } from "../../../engine/collision/CollisionEngine"
 import { Component } from "../../../engine/Component"
 import { Entity } from "../../../engine/Entity"
 import { Point } from "../../../engine/Point"
-import { StaticTileSource } from "../../../engine/tiles/StaticTileSource"
-import { TileComponent } from "../../../engine/tiles/TileComponent"
+import { StaticSpriteSource } from "../../../engine/sprites/StaticSpriteSource"
+import { SpriteComponent } from "../../../engine/sprites/SpriteComponent"
 import { Item } from "../../items/Items"
 import { LocationManager } from "../../world/LocationManager"
 import { Weapon } from "./Weapon"
@@ -15,7 +15,7 @@ import { Lists } from "../../../engine/util/Lists"
 
 class Projectile extends Component {
 
-    private tile: TileComponent
+    private tile: SpriteComponent
     private collider: BoxCollider
     private itemType: Item
 
@@ -23,7 +23,7 @@ class Projectile extends Component {
      * @param position The bottom center where the item should be placed
      * @param sourceCollider will be ignored to prevent physics issues
      */
-    constructor(position: Point, sprite: StaticTileSource, item: Item, velocity: Point, attacker: Dude) {
+    constructor(position: Point, sprite: StaticSpriteSource, item: Item, velocity: Point, attacker: Dude) {
         super()
         this.itemType = item
         this.start = () => {
@@ -122,7 +122,7 @@ class Projectile extends Component {
 
 export const spawnProjectile = (
     pos: Point, 
-    sprite: StaticTileSource, 
+    sprite: StaticSpriteSource, 
     item: Item, 
     velocity: Point, 
     attacker: Dude

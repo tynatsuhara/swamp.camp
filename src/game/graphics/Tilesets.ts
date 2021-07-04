@@ -4,8 +4,8 @@ import { SplitFileTileLoader } from "./SplitFileTileLoader"
 import { OneBitTileset } from "./OneBitTileset"
 import { OutdoorTileset } from "./OutdoorTileset"
 import { Point } from "../../engine/Point"
-import { StaticTileSource } from "../../engine/tiles/StaticTileSource"
-import { TileSource } from "../../engine/tiles/TileSource"
+import { StaticSpriteSource } from "../../engine/sprites/StaticSpriteSource"
+import { SpriteSource } from "../../engine/sprites/SpriteSource"
 import { ExtraCharacterSet2TileLoader } from "./ExtraCharacterSet2TileLoader"
 import { OGTileset } from "./OGTileset"
 import { ExplosionTileset } from "./ExplosionTileset"
@@ -38,7 +38,7 @@ export class Tilesets {
     readonly extraCharacterSet2 = new ExtraCharacterSet2TileLoader()
     readonly explosions = new ExplosionTileset()
 
-    getBasicTileSource(key: string): StaticTileSource {
+    getBasicTileSource(key: string): StaticSpriteSource {
         const sources = [this.outdoorTiles, this.tilemap]
         for (const src of sources) {
             try {
@@ -47,7 +47,7 @@ export class Tilesets {
         }
     }
 
-    getBasicTileNineSlice(key: string): TileSource[] {
+    getBasicTileNineSlice(key: string): SpriteSource[] {
         const sources = [this.outdoorTiles, this.tilemap]
         for (const src of sources) {
             try {

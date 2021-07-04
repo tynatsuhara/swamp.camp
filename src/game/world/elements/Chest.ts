@@ -1,9 +1,9 @@
 import { BoxCollider } from "../../../engine/collision/BoxCollider"
 import { Entity } from "../../../engine/Entity"
 import { Point } from "../../../engine/Point"
-import { AnimatedTileComponent } from "../../../engine/tiles/AnimatedTileComponent"
-import { TileSetAnimation } from "../../../engine/tiles/TileSetAnimation"
-import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { AnimatedSpriteComponent } from "../../../engine/sprites/AnimatedSpriteComponent"
+import { SpriteAnimation } from "../../../engine/sprites/SpriteAnimation"
+import { SpriteTransform } from "../../../engine/sprites/SpriteTransform"
 import { Tilesets, TILE_DIMENSIONS, TILE_SIZE } from "../../graphics/Tilesets"
 import { Inventory } from "../../items/Inventory"
 import { Item } from "../../items/Items"
@@ -28,18 +28,18 @@ export class ChestFactory extends ElementFactory {
         const tiles = Tilesets.instance.dungeonCharacters.getTileSetAnimationFrames("chest_empty_open_anim")
         const openSpeed = 80
         const closeSpeed = 20
-        const animator: AnimatedTileComponent = new AnimatedTileComponent([
+        const animator: AnimatedSpriteComponent = new AnimatedSpriteComponent([
             // opening
-            new TileSetAnimation(
+            new SpriteAnimation(
                 [[tiles[0], openSpeed], [tiles[1], openSpeed], [tiles[2], openSpeed]], 
                 () => animator.pause()
             ),
             // closing
-            new TileSetAnimation(
+            new SpriteAnimation(
                 [[tiles[2], closeSpeed], [tiles[1], closeSpeed], [tiles[0], closeSpeed]], 
                 () => animator.pause()
             ),
-        ], TileTransform.new({ position: pos.times(TILE_SIZE), depth: pos.y * TILE_SIZE + TILE_SIZE }))
+        ], SpriteTransform.new({ position: pos.times(TILE_SIZE), depth: pos.y * TILE_SIZE + TILE_SIZE }))
 
         animator.pause()
         

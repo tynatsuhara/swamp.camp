@@ -5,10 +5,10 @@ import { InputKey, InputKeyString } from "../../engine/Input"
 import { Point } from "../../engine/Point"
 import { BasicRenderComponent } from "../../engine/renderer/BasicRenderComponent"
 import { TextRender } from "../../engine/renderer/TextRender"
-import { AnimatedTileComponent } from "../../engine/tiles/AnimatedTileComponent"
-import { NineSlice } from "../../engine/tiles/NineSlice"
-import { TileComponent } from "../../engine/tiles/TileComponent"
-import { TileTransform } from "../../engine/tiles/TileTransform"
+import { AnimatedSpriteComponent } from "../../engine/sprites/AnimatedSpriteComponent"
+import { NineSlice } from "../../engine/sprites/NineSlice"
+import { SpriteComponent } from "../../engine/sprites/SpriteComponent"
+import { SpriteTransform } from "../../engine/sprites/SpriteTransform"
 import { Player } from "../characters/Player"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { WeaponType } from "../characters/weapons/WeaponType"
@@ -36,9 +36,9 @@ export class InventoryDisplay extends Component {
     private displayEntity: Entity
     private trackedTileInventory: Inventory
     private trackedTileIndex: number
-    private trackedTile: TileComponent  // non-null when being dragged
+    private trackedTile: SpriteComponent  // non-null when being dragged
     private lastMousPos: Point  
-    private tiles: TileComponent[] = []
+    private tiles: SpriteComponent[] = []
     private showingInv = false
     get isOpen() { return this.showingInv }
     private offset: Point
@@ -297,9 +297,9 @@ export class InventoryDisplay extends Component {
 
         this.displayEntity = new Entity([
             // coins
-            new AnimatedTileComponent(
+            new AnimatedSpriteComponent(
                 [Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)],
-                new TileTransform(this.offset.plus(this.coinsOffset))
+                new SpriteTransform(this.offset.plus(this.coinsOffset))
             ),
             new BasicRenderComponent(
                 new TextRender(

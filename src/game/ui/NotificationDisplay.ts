@@ -3,8 +3,8 @@ import { UpdateData } from "../../engine/Engine"
 import { Entity } from "../../engine/Entity"
 import { Point } from "../../engine/Point"
 import { TextRender } from "../../engine/renderer/TextRender"
-import { NineSlice } from "../../engine/tiles/NineSlice"
-import { TileTransform } from "../../engine/tiles/TileTransform"
+import { NineSlice } from "../../engine/sprites/NineSlice"
+import { SpriteTransform } from "../../engine/sprites/SpriteTransform"
 import { Camera } from "../cutscenes/Camera"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
@@ -28,7 +28,7 @@ type Notification = {
 class NotificationComponent extends Component {
 
     readonly n: Notification
-    private t: TileTransform
+    private t: SpriteTransform
     private width: number
     private height: number
 
@@ -57,7 +57,7 @@ class NotificationComponent extends Component {
             if (!!n.icon) {
                 const icon = Tilesets.instance.oneBit.getTileSource(n.icon)
                         .filtered(ImageFilters.tint(Color.DARK_RED))
-                        .toComponent(TileTransform.new({ 
+                        .toComponent(SpriteTransform.new({ 
                             position: new Point(TILE_SIZE/2, 7), 
                             depth: UIStateManager.UI_SPRITE_DEPTH + 1 
                         }).relativeTo(this.t))

@@ -1,7 +1,7 @@
-import { StaticTileSource } from "../../../engine/tiles/StaticTileSource"
+import { StaticSpriteSource } from "../../../engine/sprites/StaticSpriteSource"
 import { Point } from "../../../engine/Point"
 import { ImageRender } from "../../../engine/renderer/ImageRender"
-import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../../engine/sprites/SpriteTransform"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { ConnectingTileSchema } from "./ConnectingTileSchema"
 import { WorldLocation } from "../WorldLocation"
@@ -35,7 +35,7 @@ export class ConnectingTileLedgeSchema extends ConnectingTileSchema {
         
         const render = (source: Point, mirrorX = false) => {
             return Tilesets.instance.tilemap.getTileAt(source)
-                    .toImageRender(TileTransform.new({ 
+                    .toImageRender(SpriteTransform.new({ 
                         position: position.times(TILE_SIZE), 
                         depth: GroundRenderer.DEPTH + 1,
                         mirrorX

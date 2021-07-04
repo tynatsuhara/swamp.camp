@@ -1,16 +1,14 @@
 import { Point } from "../Point"
 
 /**
- * A representation of a rectangular's transform in a world space, 
- * either absolute or relative to another TileTransform. Used by
- * tiles (aka sprites). 
+ * A representation of a sprite's transform in a world space, 
+ * either absolute or relative to another SpriteTransform. 
  *   TODO: 
- *     - Maybe use for colliders?
  *     - Add ways to get the relative values (right now getters result translated global values)
  */
-export class TileTransform {
+export class SpriteTransform {
 
-    private parentTransform: TileTransform
+    private parentTransform: SpriteTransform
     
     dimensions: Point  // currently, there is not a concept of relative scale
 
@@ -29,7 +27,7 @@ export class TileTransform {
         mirrorY?: boolean,
         depth?: number
     }) {
-        return new TileTransform(
+        return new SpriteTransform(
             position,
             dimensions,
             rotation,
@@ -39,7 +37,6 @@ export class TileTransform {
         )
     }
 
-    // TODO convert to unstructured object parameter
     constructor(    
         position: Point = new Point(0, 0),
         dimensions: Point = null,  // if null, match the dimensions of the source image
@@ -114,7 +111,7 @@ export class TileTransform {
         this._position = this.rotatedAround(this.position, around, this._rotation)
     }
 
-    relativeTo(parentTransform: TileTransform) {
+    relativeTo(parentTransform: SpriteTransform) {
         this.parentTransform = parentTransform
         return this
     }

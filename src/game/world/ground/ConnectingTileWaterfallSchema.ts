@@ -1,7 +1,7 @@
-import { StaticTileSource } from "../../../engine/tiles/StaticTileSource"
+import { StaticSpriteSource } from "../../../engine/sprites/StaticSpriteSource"
 import { Point } from "../../../engine/Point"
 import { ImageRender } from "../../../engine/renderer/ImageRender"
-import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../../engine/sprites/SpriteTransform"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { ConnectingTileSchema } from "./ConnectingTileSchema"
 import { WorldLocation } from "../WorldLocation"
@@ -32,8 +32,8 @@ export class ConnectingTileWaterfallSchema extends ConnectingTileSchema {
         
         let results: ImageRender[] = []
 
-        const render = (source: StaticTileSource, mirrorX: boolean = false) => {
-            results.push(source.toImageRender(TileTransform.new({ 
+        const render = (source: StaticSpriteSource, mirrorX: boolean = false) => {
+            results.push(source.toImageRender(SpriteTransform.new({ 
                 position: position.times(TILE_SIZE), 
                 mirrorX, 
                 depth: ConnectingTileWaterfallSchema.DEPTH

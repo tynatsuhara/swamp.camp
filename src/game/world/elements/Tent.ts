@@ -1,8 +1,8 @@
 import { BoxCollider } from "../../../engine/collision/BoxCollider"
 import { Entity } from "../../../engine/Entity"
 import { Point } from "../../../engine/Point"
-import { TileComponent } from "../../../engine/tiles/TileComponent"
-import { TileTransform } from "../../../engine/tiles/TileTransform"
+import { SpriteComponent } from "../../../engine/sprites/SpriteComponent"
+import { SpriteTransform } from "../../../engine/sprites/SpriteTransform"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { makeTentInterior } from "../interior/Tent"
 import { TeleporterPrefix, TeleporterSound } from "../Teleporter"
@@ -73,6 +73,6 @@ export class TentFactory extends ElementFactory {
 }
 
 const addTile = (e: Entity, s: string, pos: Point, depth: number) => {
-    const tile = e.addComponent(new TileComponent(Tilesets.instance.outdoorTiles.getTileSource(s), new TileTransform(pos.times(TILE_SIZE))))
+    const tile = e.addComponent(new SpriteComponent(Tilesets.instance.outdoorTiles.getTileSource(s), new SpriteTransform(pos.times(TILE_SIZE))))
     tile.transform.depth = depth
 }

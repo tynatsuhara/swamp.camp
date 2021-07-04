@@ -1,7 +1,7 @@
 import { Component } from "../../engine/Component"
 import { Point } from "../../engine/Point"
 import { RenderMethod } from "../../engine/renderer/RenderMethod"
-import { TileTransform } from "../../engine/tiles/TileTransform"
+import { SpriteTransform } from "../../engine/sprites/SpriteTransform"
 import { Tilesets } from "../graphics/Tilesets"
 
 export class StaticSprites extends Component {
@@ -21,7 +21,7 @@ export class StaticSprites extends Component {
     private addSpriteInternal(sprite: object) {
         this.json.push(sprite)
         const tile = Tilesets.instance.getBasicTileSource(sprite['k'])
-        const render = tile.toImageRender(TileTransform.new({
+        const render = tile.toImageRender(SpriteTransform.new({
             position: Point.fromString(sprite['p']),
             rotation: sprite['r'] || 0,
             depth: sprite['d'] || 0,
