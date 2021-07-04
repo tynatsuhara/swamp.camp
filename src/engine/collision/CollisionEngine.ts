@@ -5,9 +5,7 @@ import { BoxCollider } from "./BoxCollider"
 import { Collider } from "./Collider"
 
 /**
- * This class manages two types of collisions:
- *   - BLOCKING collisons, where a collider will prevent another collider from moving through its space
- *   - OVERLAP collisions, which trigger callbacks when colliders intersect
+ * This class manages collisions between collider components
  */
 export class CollisionEngine {
 
@@ -32,8 +30,8 @@ export class CollisionEngine {
     }
 
     /**
-     * @param matrix Each layer key in the matrix will trigger BLOCKING collisions with all of the layer values in the corresponding list (and vice-versa)
-     *               DEFAULT_LAYER will always have BLOCKING collisions with DEFAULT_LAYER
+     * @param matrix Each layer key in the matrix will trigger collisions with all of the layer values in the corresponding list (and vice-versa)
+     *               DEFAULT_LAYER will always collide with DEFAULT_LAYER
      */
     setCollisionMatrix(matrix: Map<string, string[]>) {
         const bidirectional = new Map<string, Set<string>>()
@@ -80,7 +78,7 @@ export class CollisionEngine {
         }
     }
 
-    // Returns true if the collider can be translated and will not intersect a non-trigger collider in the new position.
+    // Returns true if the collider can be translated and will not intersect another collider in the new position.
     // This DOES NOT check for any possible colliders in the path of the collision and should only be used for small translations.
     canTranslate(collider: Collider, translation: Point): boolean {
         const collidingLayers = this.matrix.get(collider.layer)
