@@ -5,7 +5,7 @@ import { Game } from "./Game"
 import { CapturedInput, Input } from "./Input"
 import { Point } from "./Point"
 import { measure, profiler } from "./Profiler"
-import { Renderer } from "./renderer/Renderer"
+import { renderer, Renderer } from "./renderer/Renderer"
 import { clamp } from "./util/Utils"
 import { View } from "./View"
 
@@ -32,7 +32,6 @@ export class UpdateData {
 
 export class Engine {
     private readonly game: Game
-    private readonly renderer: Renderer
     private readonly input: Input
 
     private lastUpdateMillis = new Date().getTime()
@@ -43,10 +42,11 @@ export class Engine {
 
     private constructor(game: Game, canvas: HTMLCanvasElement) {
         this.game = game
-        this.renderer = new Renderer(canvas)
         this.input = new Input(canvas)
+        renderer._setCanvas(canvas)
         
         this.game.initialize()
+
         requestAnimationFrame(() => this.tick())
     }
 
@@ -63,7 +63,7 @@ export class Engine {
         const updateViewsContext: UpdateViewsContext = {
             elapsedTimeMillis: elapsed,
             input: this.input.captureInput(),
-            dimensions: this.renderer.getDimensions()
+            dimensions: renderer.getDimensions()
         }
 
         const views = this.getViews(updateViewsContext)
@@ -101,7 +101,7 @@ export class Engine {
         })
 
         const [renderDuration] = measure(() => {
-            this.renderer.render(views)
+            renderer._render(views)
         })
 
         const [lateUpdateDuration] = measure(() => {

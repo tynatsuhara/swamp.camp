@@ -4,21 +4,25 @@ import { RenderContext } from "./RenderContext"
 
 export class Renderer {
 
-    private static _instance: Renderer
-    static get instance() {
-        return this._instance
+    private canvas: HTMLCanvasElement
+    private context: CanvasRenderingContext2D
+
+    getDimensions(): Point {
+        return new Point(this.canvas.width, this.canvas.height)
     }
 
-    readonly canvas: HTMLCanvasElement
-    readonly context: CanvasRenderingContext2D
-    cameraOffsetX: number = 0
-    cameraOffsetY: number = 0
-
-    constructor(canvas: HTMLCanvasElement) {
-        Renderer._instance = this
+    _setCanvas(canvas: HTMLCanvasElement) {
         this.canvas = canvas
         this.context = canvas.getContext('2d', { alpha: true })
         this.resizeCanvas()
+    }
+
+    _render(views: View[]) {
+        this.resizeCanvas()
+        this.context.imageSmoothingEnabled = false
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
+        
+        views.forEach(v => this.renderView(v))
     }
 
     private resizeCanvas() {
@@ -27,19 +31,7 @@ export class Renderer {
         this.canvas.height = this.canvas.clientHeight
     }
 
-    render(views: View[]) {
-        this.resizeCanvas()
-        this.context.imageSmoothingEnabled = false
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
-        
-        views.forEach(v => this.renderView(v))
-    }
-
-    getDimensions(): Point {
-        return new Point(this.canvas.width, this.canvas.height)
-    }
-
-    renderView(view: View) {
+    private renderView(view: View) {
         const viewRenderContext = new RenderContext(this.canvas, this.context, view)
         view.entities
                 .flatMap(entity => entity?.components)
@@ -50,3 +42,5 @@ export class Renderer {
                 .forEach(renderMethod => renderMethod.render(viewRenderContext))
     }
 }
+
+export const renderer = new Renderer()

@@ -2,7 +2,7 @@ import { Point } from "../../engine/Point"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Dude } from "../characters/Dude"
 import { clamp } from "../../engine/util/Utils"
-import { Renderer } from "../../engine/renderer/Renderer"
+import { renderer, Renderer } from "../../engine/renderer/Renderer"
 import { Singletons } from "../Singletons"
 import { LocationManager } from "../world/LocationManager"
 
@@ -26,7 +26,7 @@ export class Camera {
         // multiply by -1 because views use "offset"
         return this._position.times(-1).minus(this.shakeOffset)
     }
-    get dimensions() { return Renderer.instance.getDimensions().div(Camera.ZOOM) }
+    get dimensions() { return renderer.getDimensions().div(Camera.ZOOM) }
 
     shake(power: number, duration: number) {
         this.shakePower = power
