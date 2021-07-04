@@ -10,6 +10,7 @@ import { Player } from "../characters/Player"
 import { Lantern } from "../characters/weapons/Lantern"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { Camera } from "../cutscenes/Camera"
+import { Particles } from "../graphics/Particles"
 import { LocationSaveState } from "../saves/LocationSaveState"
 import { newUUID } from "../saves/uuid"
 import { HUD } from "../ui/HUD"
@@ -281,6 +282,9 @@ export class WorldLocation {
     
             // fast-forward NPCs along their schedule
             linkedLocation.dudes.forEach(d => d.entity.getComponent(NPC)?.simulate())
+
+            // delete existing particles
+            Particles.instance.clear()
     
             // position the player and camera
             const offset = p.standingPosition.minus(p.position)

@@ -53,6 +53,9 @@ export class LocationTransition extends Component {
         this.context = this.canvas.getContext("2d", { alpha: true })
     }
 
+    /**
+     * @param callback is called on the frame where the screen is completely blacked out
+     */
     transition(callback: () => void, pauseMillis: number = 360, openOnly = false) {
         // make sure it extends to the edge of the screen
         const dims = Camera.instance.dimensions.plusX(1).plusY(1)

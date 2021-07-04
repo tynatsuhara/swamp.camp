@@ -5,8 +5,6 @@ import { Point } from "../../engine/Point"
 import { ImageRender } from "../../engine/renderer/ImageRender"
 import { Singletons } from "../Singletons"
 import { Color, getRGB } from "../ui/Color"
-import { UIStateManager } from "../ui/UIStateManager"
-import { WorldTime } from "../world/WorldTime"
 
 export class Particles {
     static get instance() {
@@ -15,6 +13,10 @@ export class Particles {
 
     private prefabs = new Map<Color, ImageBitmap>()
     private entity = new Entity()
+
+    clear() {
+        this.entity = new Entity()
+    }
 
     emitParticle(
         color: Color, 
