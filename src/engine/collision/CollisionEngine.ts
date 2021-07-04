@@ -4,8 +4,6 @@ import { View } from "../View"
 import { BoxCollider } from "./BoxCollider"
 import { Collider } from "./Collider"
 
-// TODO: This probably all breaks if there are colliders on multiple views
-
 /**
  * This class manages two types of collisions:
  *   - BLOCKING collisons, where a collider will prevent another collider from moving through its space
