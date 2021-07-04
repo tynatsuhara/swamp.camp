@@ -55,8 +55,6 @@ export class Engine {
         // We also want elapsed to always be > 0, which will occasionally not
         // be true, especially on the first update of a game.
         const elapsed = clamp(time - this.lastUpdateMillis, MIN_ELAPSED_MILLIS, MAX_ELAPSED_MILLIS)
-
-        collisionEngine.nextUpdate()
     
         const updateViewsContext: UpdateViewsContext = {
             elapsedTimeMillis: elapsed,
@@ -71,6 +69,8 @@ export class Engine {
         const [updateDuration] = measure(() => {            
             views.forEach(v => {
                 v.entities = v.entities.filter(e => !!e)
+                
+                collisionEngine.setViewContext(v)
 
                 const startData: StartData = {
                     dimensions: updateViewsContext.dimensions.div(v.zoom)

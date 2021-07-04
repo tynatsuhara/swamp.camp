@@ -1,5 +1,6 @@
 import { Point } from "../Point"
 import { rectContains } from "../util/Utils"
+import { View } from "../View"
 import { BoxCollider } from "./BoxCollider"
 import { Collider } from "./Collider"
 
@@ -15,12 +16,21 @@ export class CollisionEngine {
     static readonly DEFAULT_LAYER = "default"
 
     private colliders: Collider[] = []
-    private nextUpdateColliders: Collider[] = []
 
     private matrix: Map<string, Set<string>>
 
     constructor() {
         this.setCollisionMatrix(new Map())
+    }
+
+    /**
+     * This should probably only ever be called by the engine
+     * @param view The view whose contained colliders will be used for collision detection in the current update() step
+     */
+    setViewContext(view: View) {
+        this.colliders = view.entities
+                .filter(e => !!e)
+                .flatMap(e => e.getComponents(BoxCollider))
     }
 
     /**
@@ -41,19 +51,6 @@ export class CollisionEngine {
         }
 
         this.matrix = bidirectional
-    }
-
-    /**
-     * A collider must mark itself in order to be included in any collision calculations in the next update step.
-     * This allows us to keep track of any colliders that are "active"
-     */
-    markCollider(collider: Collider) {
-        this.nextUpdateColliders.push(collider)
-    }
-
-    nextUpdate() {
-        this.colliders = this.nextUpdateColliders
-        this.nextUpdateColliders = []
     }
 
     // Needs further testing. No active use case right now.
@@ -92,7 +89,6 @@ export class CollisionEngine {
         if (!collidingLayers || collidingLayers.size === 0) {  // nothing will ever block this collider
             return true
         }
-        this.removeDanglingColliders()
         // const translatedPoints = collider.getPoints().map(pt => pt.plus(translation))
         const bc = collider as BoxCollider
         const newTranslatedPos = bc.position.plus(translation)
@@ -117,15 +113,6 @@ export class CollisionEngine {
                         bc.position.y + bc.dimensions.y < obc.position.y
                     )
                 }) 
-    }
-
-    // unregisters any colliders without an entity
-    private removeDanglingColliders() {
-        const removed = this.colliders.filter(other => !other.entity)
-        if (removed.length === 0) {
-            return
-        }
-        this.colliders = this.colliders.filter(other => !!other.entity)
     }
 }
 

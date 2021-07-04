@@ -1,15 +1,13 @@
 import { Component } from "../Component"
 import { debug } from "../Debug"
-import { UpdateData } from "../Engine"
 import { Point } from "../Point"
 import { LineRender } from "../renderer/LineRender"
 import { RenderMethod } from "../renderer/RenderMethod"
 import { CollisionEngine, collisionEngine } from "./CollisionEngine"
 
 /**
- * A collider detects intersections with other colliders. If isTrigger=true, a collider
- * just calls the callback functions and does not block the other collider. If isTrigger=false,
- * other colliders will not be able to move in to this collider's space, and callbacks won't be triggered.
+ * A collider detects intersections with other colliders. Other 
+ * colliders will not be able to move in to this collider's space.
  */
 export abstract class Collider extends Component {
 
@@ -28,11 +26,6 @@ export abstract class Collider extends Component {
         this._position = position
         this.layer = layer
         this.ignoredColliders = ignoredColliders
-        collisionEngine.markCollider(this)
-    }
-
-    update(updateData: UpdateData) {
-        collisionEngine.markCollider(this)
     }
 
     moveTo(point: Point): Point {
