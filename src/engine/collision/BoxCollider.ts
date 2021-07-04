@@ -1,5 +1,5 @@
 import { Point } from "../Point"
-import { rectContains } from "../util/Utils"
+import { Maths } from "../util/Maths"
 import { Collider } from "./Collider"
 import { CollisionEngine } from "./CollisionEngine"
 
@@ -22,6 +22,6 @@ export class BoxCollider extends Collider {
     }
 
     isWithinBounds(pt: Point): boolean {
-        return rectContains(this.position, this.dimensions, pt)
+        return Maths.rectContains(this.position, this.dimensions, pt)
     }
 }

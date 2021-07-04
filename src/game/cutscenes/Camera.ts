@@ -1,8 +1,8 @@
 import { Point } from "../../engine/Point"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Dude } from "../characters/Dude"
-import { clamp } from "../../engine/util/Utils"
-import { renderer, Renderer } from "../../engine/renderer/Renderer"
+import { Maths } from "../../engine/util/Maths"
+import { renderer } from "../../engine/renderer/Renderer"
 import { Singletons } from "../Singletons"
 import { LocationManager } from "../world/LocationManager"
 
@@ -61,8 +61,8 @@ export class Camera {
 
         const trackedPoint = this.dudeTarget?.position ?? this.pointTarget
         const clampedTrackedPoint = new Point(
-            clamp(trackedPoint.x, -xLimit, xLimit),
-            clamp(trackedPoint.y, -yLimit, yLimit)
+            Maths.clamp(trackedPoint.x, -xLimit, xLimit),
+            Maths.clamp(trackedPoint.y, -yLimit, yLimit)
         )
         const cameraGoal = this.dimensions.div(2).minus(clampedTrackedPoint)
 

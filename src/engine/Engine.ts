@@ -6,7 +6,7 @@ import { CapturedInput, Input } from "./Input"
 import { Point } from "./Point"
 import { measure, profiler } from "./Profiler"
 import { renderer, Renderer } from "./renderer/Renderer"
-import { clamp } from "./util/Utils"
+import { Maths } from "./util/Maths"
 import { View } from "./View"
 
 const MINIMUM_ALLOWED_FPS = 15
@@ -58,7 +58,7 @@ export class Engine {
         // This means that visual lag can happen if fps < MINIMUM_ALLOWED_FPS.
         // We also want elapsed to always be > 0, which will occasionally not
         // be true, especially on the first update of a game.
-        const elapsed = clamp(time - this.lastUpdateMillis, MIN_ELAPSED_MILLIS, MAX_ELAPSED_MILLIS)
+        const elapsed = Maths.clamp(time - this.lastUpdateMillis, MIN_ELAPSED_MILLIS, MAX_ELAPSED_MILLIS)
     
         const updateViewsContext: UpdateViewsContext = {
             elapsedTimeMillis: elapsed,

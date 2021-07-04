@@ -2,7 +2,7 @@ import { Component } from "../../engine/Component"
 import { UpdateData } from "../../engine/Engine"
 import { Point } from "../../engine/Point"
 import { TextRender } from "../../engine/renderer/TextRender"
-import { rectContains } from "../../engine/util/Utils"
+import { Maths } from "../../engine/util/Maths"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "./Color"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
@@ -33,7 +33,7 @@ export class MainMenuButton extends Component {
     }
 
     update(updateData: UpdateData) {
-        this.hovering = rectContains(
+        this.hovering = Maths.rectContains(
             this.position.plusX(-this.width/2).plusY(-4), 
             new Point(this.width, TILE_SIZE), 
             updateData.input.mousePos

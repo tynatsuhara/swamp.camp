@@ -15,7 +15,7 @@ import { StaticSpriteSource } from "../../engine/sprites/StaticSpriteSource"
 import { TEXT_SIZE, TEXT_FONT, TEXT_PIXEL_WIDTH } from "./Text"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Player } from "../characters/Player"
-import { rectContains } from "../../engine/util/Utils"
+import { Maths } from "../../engine/util/Maths"
 import { Tooltip } from "./Tooltip"
 import { AnimatedSpriteComponent } from "../../engine/sprites/AnimatedSpriteComponent"
 import { SpriteTransform } from "../../engine/sprites/SpriteTransform"
@@ -158,11 +158,11 @@ export class SellMenu extends Component {
 
         for (let r = 0; r < items.length; r++) {
 
-            const hovered = rectContains(
+            const hovered = Maths.rectContains(
                 topLeft.plusX(margin).plusY(rowHeight * r + margin*2), 
                 new Point(this.innerDimensions.x, rowHeight), 
                 shiftedMousePos
-            ) && rectContains(  // within the frame itself
+            ) && Maths.rectContains(  // within the frame itself
                 topLeft.plus(innerOffset),
                 this.innerDimensions,
                 updateData.input.mousePos

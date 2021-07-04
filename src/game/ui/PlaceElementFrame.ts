@@ -7,7 +7,7 @@ import { UIStateManager } from "./UIStateManager"
 import { LocationManager } from "../world/LocationManager"
 import { UpdateData } from "../../engine/Engine"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
-import { clamp, rectContains } from "../../engine/util/Utils"
+import { Maths } from "../../engine/util/Maths"
 import { SpriteTransform } from "../../engine/sprites/SpriteTransform"
 import { Elements } from "../world/elements/Elements"
 import { Player } from "../characters/Player"
@@ -64,8 +64,8 @@ export class PlaceElementFrame extends Component {
 
         // only allow placing near the player
         const centerPos = new Point(
-            clamp(mousePos.x, playerPos.x - maxDistX, playerPos.x + maxDistX),
-            clamp(mousePos.y, playerPos.y - maxDistY, playerPos.y + maxDistY)
+            Maths.clamp(mousePos.x, playerPos.x - maxDistX, playerPos.x + maxDistX),
+            Maths.clamp(mousePos.y, playerPos.y - maxDistY, playerPos.y + maxDistY)
         )
 
         const tilePt = this.pixelPtToTilePt(centerPos.minus(new Point(this.dimensions.x/2, this.dimensions.y/2).times(TILE_SIZE)))
@@ -113,7 +113,7 @@ export class PlaceElementFrame extends Component {
         const p = pos.times(TILE_SIZE)
         const d = this.dimensions.times(TILE_SIZE)
         const intersectingDudes = Array.from(LocationManager.instance.currentLocation.dudes).some(dude => 
-            rectContains(p, d, dude.standingPosition) || rectContains(p, d, dude.standingPosition.plusY(-TILE_SIZE))
+            Maths.rectContains(p, d, dude.standingPosition) || Maths.rectContains(p, d, dude.standingPosition.plusY(-TILE_SIZE))
         )
         if (intersectingDudes) {
             return false

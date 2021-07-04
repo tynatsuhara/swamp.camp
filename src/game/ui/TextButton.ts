@@ -4,7 +4,7 @@ import { Point } from "../../engine/Point"
 import { ImageRender } from "../../engine/renderer/ImageRender"
 import { TextRender } from "../../engine/renderer/TextRender"
 import { SpriteTransform } from "../../engine/sprites/SpriteTransform"
-import { rectContains } from "../../engine/util/Utils"
+import { Maths } from "../../engine/util/Maths"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
 import { UIStateManager } from "./UIStateManager"
@@ -58,7 +58,7 @@ export class TextButton extends Component {
     }
 
     update(updateData: UpdateData) {
-        this.hovering = rectContains(this.position, new Point(this.width, TILE_SIZE), updateData.input.mousePos)
+        this.hovering = Maths.rectContains(this.position, new Point(this.width, TILE_SIZE), updateData.input.mousePos)
         if (this.hovering && updateData.input.isMouseDown) {
             this.onClick()
         }

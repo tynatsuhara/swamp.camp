@@ -1,13 +1,11 @@
 import { Point } from "../../engine/Point"
-import { rectContains } from "../../engine/util/Utils"
+import { Maths } from "../../engine/util/Maths"
 import { Lists } from "../../engine/util/Lists"
 import { Component } from "../../engine/Component"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { SpriteTransform } from "../../engine/sprites/SpriteTransform"
 import { UpdateData } from "../../engine/Engine"
 import { ImageRender } from "../../engine/renderer/ImageRender"
-import { LocationManager } from "../world/LocationManager"
-import { DudeType } from "../characters/DudeFactory"
 import { Camera } from "../cutscenes/Camera"
 
 export class OffScreenIndicator extends Component {
@@ -28,7 +26,7 @@ export class OffScreenIndicator extends Component {
 
         const point = this.positionSupplier()
 
-        if (rectContains(cameraPos, cameraDimensions, point)) {
+        if (Maths.rectContains(cameraPos, cameraDimensions, point)) {
             this.tileSource = null
             return
         }

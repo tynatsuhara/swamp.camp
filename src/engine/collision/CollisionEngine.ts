@@ -1,5 +1,5 @@
 import { Point } from "../Point"
-import { rectContains } from "../util/Utils"
+import { Maths } from "../util/Maths"
 import { View } from "../View"
 import { BoxCollider } from "./BoxCollider"
 import { Collider } from "./Collider"
@@ -59,7 +59,7 @@ export class CollisionEngine {
         const yMin = Math.min(...pts.map(pt => pt.y + Math.min(translation.y, 0)))
         const yMax = Math.max(...pts.map(pt => pt.y + Math.max(translation.y, 0)))
         const potentialCollisions = this.colliders.filter(other => other !== collider && other.getPoints().some(pt => {
-            return rectContains(new Point(xMax, yMin), new Point(xMax-xMin, yMax-yMin), pt)
+            return Maths.rectContains(new Point(xMax, yMin), new Point(xMax-xMin, yMax-yMin), pt)
         })) 
         
         // for all pts and all those colliders, find the closest intersection
