@@ -8,7 +8,7 @@
       "name": "swamp.camp",
       "version": "1.0.0",
       "dependencies": {
-        "brigsby": "^0.1.0"
+        "brigsby": "^0.1.1"
       },
       "devDependencies": {
         "ts-loader": "^9.2.3",
