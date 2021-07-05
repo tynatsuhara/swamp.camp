@@ -4,9 +4,7 @@
 https://trello.com/b/uqYKRQlp/kingdom
 
 ## development
-this project uses the typescript compiler [to bundle](https://mattallan.me/posts/modern-javascript-without-a-bundler/) the output. run `tsc --watch` when developing to compile on any changes.
-
-run `./run-local-server` to spin up a local HTTP server for development (using Python 3)
+`npm run start` to start the Webpack development server.
 
 ## release
 commit and push to `master`, this will trigger a [Cloudflare pages deployment](https://dash.cloudflare.com/1f52f961eb89afcf0499eba5f54090d5/pages/view/quest).
