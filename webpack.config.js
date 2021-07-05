@@ -25,6 +25,13 @@ module.exports = {
     liveReload: false,
     open: true,
     port: 8000,
+    staticOptions: {
+      setHeaders: function (res, path, stat) {
+        if (path.endsWith('.png')) {
+          res.set('Cache-Control', 'public, max-age=604800, immutable')
+        }
+      }
+    },
     stats: {
       assets: false,
       modules: false,
