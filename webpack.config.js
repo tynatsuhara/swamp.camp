@@ -18,4 +18,16 @@ module.exports = {
     filename: 'app.js',
     path: path.resolve(__dirname, 'static'),
   },
+  devServer: {
+    compress: true,
+    contentBase: path.join(__dirname, 'static'),
+    hot: false,
+    liveReload: false,
+    open: true,
+    port: 8000,
+    stats: {
+      assets: false,
+      modules: false,
+    },
+  }
 }

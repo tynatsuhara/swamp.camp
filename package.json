@@ -4,7 +4,7 @@
   "description": "SWAMP CAMP",
   "scripts": {
     "clean": "rm static/app.js",
-    "start": "webpack serve --content-base ./static --inline --port 8000 --open",
+    "start": "NODE_ENV=development webpack serve",
     "build": "NODE_ENV=development webpack",
     "build:prod": "NODE_ENV=production webpack"
   },
