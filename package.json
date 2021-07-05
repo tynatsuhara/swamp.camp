@@ -1,0 +1,29 @@
+{
+  "name": "swamp.camp",
+  "version": "1.0.0",
+  "description": "SWAMP CAMP",
+  "scripts": {
+    "clean": "rm static/app.js",
+    "build": "webpack",
+    "start": "webpack serve --content-base ./static --inline --port 8000 --open"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tylerbonnell/quest.git"
+  },
+  "author": "Tyler Bonnell",
+  "bugs": {
+    "url": "https://github.com/tylerbonnell/quest/issues"
+  },
+  "homepage": "https://swamp.camp",
+  "dependencies": {
+    "brigsby": "^0.1.0"
+  },
+  "devDependencies": {
+    "ts-loader": "^9.2.3",
+    "typescript": "^4.3.5",
+    "webpack": "^5.42.0",
+    "webpack-cli": "^4.7.2",
+    "webpack-dev-server": "^3.11.2"
+  }
+}

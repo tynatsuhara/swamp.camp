@@ -1,8 +1,8 @@
-import { QuestGame } from "./game/quest_game"
-import { Engine } from "./engine/Engine"
-import { Tilesets } from "./game/graphics/Tilesets"
-import { assets } from "./engine/Assets"
-import { TEXT_FONT } from "./game/ui/Text"
+import { QuestGame } from "./quest_game"
+import { Engine } from "brigsby/dist/Engine"
+import { Tilesets } from "./graphics/Tilesets"
+import { assets } from "brigsby/dist/Assets"
+import { TEXT_FONT } from "./ui/Text"
 
 Promise.all([
     // load all required assets
