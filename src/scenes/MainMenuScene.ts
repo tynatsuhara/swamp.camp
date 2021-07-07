@@ -24,6 +24,7 @@ import { MainMenuButtonSection } from "../ui/MainMenuButtonSection"
 import { CUSTOMIZATION_OPTIONS, PlumePicker } from "../ui/PlumePicker"
 import { UIStateManager } from "../ui/UIStateManager"
 import { DarknessMask } from "../world/DarknessMask"
+import { renderer } from "../../../brigsby/dist/renderer/Renderer"
 
 const ZOOM = 3
 
@@ -94,14 +95,14 @@ export class MainMenuScene {
     }
     
     getViews(updateViewsContext: UpdateViewsContext) {
-        const dimensions = updateViewsContext.dimensions.div(ZOOM)
+        const dimensions = renderer.getDimensions().div(ZOOM)
         
         // we need to re-render this each time since image bitmaps are async
         this.darkness?.render(dimensions, Point.ZERO)
 
         // Don't re-render if nothing has changed, since a lot of  
         // these functions involve parsing all of our save slots
-        if (this.view && updateViewsContext.dimensions.equals(this.lastDimensions)) {
+        if (this.view && renderer.getDimensions().equals(this.lastDimensions)) {
             return [this.view]
         }
 
@@ -126,7 +127,7 @@ export class MainMenuScene {
 
         // This will set up the darkness mask
         const sceneEntities = this.getSceneEntities(knightPos)
-        this.lastDimensions = updateViewsContext.dimensions
+        this.lastDimensions = renderer.getDimensions()
 
         const darknessEntity = this.darkness.render(dimensions, Point.ZERO)
         if (!darknessEntity) {
