@@ -24,7 +24,7 @@ import { MainMenuButtonSection } from "../ui/MainMenuButtonSection"
 import { CUSTOMIZATION_OPTIONS, PlumePicker } from "../ui/PlumePicker"
 import { UIStateManager } from "../ui/UIStateManager"
 import { DarknessMask } from "../world/DarknessMask"
-import { renderer } from "../../../brigsby/dist/renderer/Renderer"
+import { renderer } from "brigsby/dist/renderer/Renderer"
 
 const ZOOM = 3
 
