@@ -203,7 +203,7 @@ export class MainMenuScene {
         } else if (this.menu === Menu.CREDITS) {
             entities.splice(0)  // don't show title and scene
             const link = (url: string) => () => window.open(url, '_blank')
-            const entryCount = 11  // UPDATE THIS IF YOU ADD MORE CREDITS
+            const entryCount = 12  // UPDATE THIS IF YOU ADD MORE CREDITS
             const top = new Point(dimensions.x/2, dimensions.y/2 - entryCount * MainMenuButtonSection.LINE_SPACING/2)
             entities.push(
                 new MainMenuButtonSection(top)
@@ -216,6 +216,8 @@ export class MainMenuScene {
                     .add("       Playonloop.com  ", link("https://playonloop.com/"))
                     .add("sound: BurghRecords    ", link("https://www.edinburghrecords.com/"))
                     .add("   qa: Lane Van Elderen", link("https://lane.computer/"))
+                    .addLineBreak()
+                    .add("made with brigsby!", link("https://brigsby.js.org/"))
                     .addLineBreak()
                     .add("back", () => this.render(Menu.ROOT))
                     .getEntity()
