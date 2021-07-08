@@ -57,6 +57,16 @@ export class DevControls extends Component {
     }
 }
 
+// Set up autocomplete for non-engine debug flags
+debug.autoPlay = debug.autoPlay || false
+debug.enableBlood = debug.enableBlood || false
+debug.enableDevControls = debug.enableDevControls || false
+debug.enableVerticality = debug.enableVerticality || false
+debug.godMode = debug.godMode || false
+debug.nightVision = debug.nightVision || false
+debug.showAudioLogs = debug.showAudioLogs || false
+debug.showGrid = debug.showGrid || false
+
 window["help"] = () => {
     let help = `dev controls (enable with debug.enableDevControls=true)
 -------------------------------------------------------\n`
