@@ -32,7 +32,7 @@ export abstract class ElementFactory {
     /**
      * @param pos The position of the element in tile coordinates (not pixel coordinates!)
      */
-    canPlaceAtPos(pos: Point) {
+    canPlaceAtPos(wl: WorldLocation, pos: Point) {
         return true
     }
 }

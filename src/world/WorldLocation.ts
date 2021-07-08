@@ -86,6 +86,10 @@ export class WorldLocation {
         if (elementPts.some(pt => !!this.elements.get(pt))) {
             return null
         }
+
+        if (!factory.canPlaceAtPos(this, pos)) {
+            return null
+        }
         
         const el = factory.make(this, pos, data)
         if (el.type !== type) {
@@ -366,8 +370,8 @@ export class WorldLocation {
         n.teleporters = saveState.teleporters
         n.barriers = saveState.barriers.map(b => Barrier.fromJson(b))
         n.sprites.fromJson(saveState.staticSprites)
-        saveState.elements.forEach(el => n.addElement(el.type, Point.fromString(el.pos), el.obj))
         saveState.ground.forEach(el => n.setGroundElement(el.type, Point.fromString(el.pos), el.obj))
+        saveState.elements.forEach(el => n.addElement(el.type, Point.fromString(el.pos), el.obj))
         saveState.dudes.forEach(d => DudeFactory.instance.load(d, n))
         n.toggleAudio(false)
         

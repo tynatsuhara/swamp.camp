@@ -75,8 +75,8 @@ export class MushroomFactory extends ElementFactory {
         return wl === LocationManager.instance.exterior()
     }
 
-    canPlaceAtPos(pos: Point) {
-        return LocationManager.instance.currentLocation.ground.get(pos.plusY(1)).type === GroundType.GRASS
+    canPlaceAtPos(wl: WorldLocation, pos: Point) {
+        return wl.ground.get(pos)?.type === GroundType.GRASS
     }
 
     private nextGrowthTime() {
