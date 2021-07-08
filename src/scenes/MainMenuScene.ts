@@ -25,6 +25,7 @@ import { CUSTOMIZATION_OPTIONS, PlumePicker } from "../ui/PlumePicker"
 import { UIStateManager } from "../ui/UIStateManager"
 import { DarknessMask } from "../world/DarknessMask"
 import { renderer } from "brigsby/dist/renderer/Renderer"
+import { TEXT_SIZE } from "../ui/Text"
 
 const ZOOM = 3
 
@@ -203,8 +204,8 @@ export class MainMenuScene {
         } else if (this.menu === Menu.CREDITS) {
             entities.splice(0)  // don't show title and scene
             const link = (url: string) => () => window.open(url, '_blank')
-            const entryCount = 12  // UPDATE THIS IF YOU ADD MORE CREDITS
-            const top = new Point(dimensions.x/2, dimensions.y/2 - entryCount * MainMenuButtonSection.LINE_SPACING/2)
+            const entryCount = 13  // UPDATE THIS IF YOU ADD MORE CREDITS
+            const top = new Point(dimensions.x/2, dimensions.y/2 - entryCount * MainMenuButtonSection.LINE_SPACING/2 + TEXT_SIZE/2)
             entities.push(
                 new MainMenuButtonSection(top)
                     .add(" code: Tyler Bonnell   ", link("https://ty.pizza/"))
