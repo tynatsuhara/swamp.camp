@@ -5,10 +5,10 @@ import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { makeTentInterior } from "../interior/Tent"
-import { TeleporterPrefix, TeleporterSound } from "../Teleporter"
+import { TeleporterPrefix } from "../Teleporter"
 import { WorldLocation } from "../WorldLocation"
+import { BuildingFactory } from "./Building"
 import { ElementComponent } from "./ElementComponent"
-import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
 import { ElementUtils } from "./ElementUtils"
 import { Interactable } from "./Interactable"
@@ -18,17 +18,7 @@ export const enum TentColor {
     BLUE = "blue"
 }
 
-/**
- * At runtime, a building exterior consists of several components:
- *   1. Tiles, the visual component
- *   2. A collider
- *   3. A door teleporter
- * Data that is saved:
- *   1. Element type
- *   2. "Occupied points" which determines occupied squares in the world grid
- *   3. Misc metadata about the building
- */
-export class TentFactory extends ElementFactory {
+export class TentFactory extends BuildingFactory {
     
     readonly type = ElementType.TENT
     readonly dimensions = new Point(4, 3)
@@ -66,9 +56,13 @@ export class TentFactory extends ElementFactory {
         return e.addComponent(new ElementComponent(
             ElementType.TENT, 
             pos,
-            ElementUtils.rectPoints(pos.plus(new Point(1, 1)), new Point(2, 1)),
+            this.getOccupiedPoints(pos),
             () => { return { destinationUUID, color } }
         ))
+    }
+
+    getOccupiedPoints(pos: Point) {
+        return ElementUtils.rectPoints(pos.plus(new Point(1, 1)), new Point(2, 1))
     }
 }
 

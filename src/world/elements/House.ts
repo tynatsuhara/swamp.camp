@@ -6,28 +6,17 @@ import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { makeHouseInterior } from "../interior/House"
-import { LocationManager } from "../LocationManager"
 import { TeleporterPrefix } from "../Teleporter"
 import { WorldLocation } from "../WorldLocation"
+import { BuildingFactory } from "./Building"
 import { ElementComponent } from "./ElementComponent"
-import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
 import { ElementUtils } from "./ElementUtils"
 import { Interactable } from "./Interactable"
 
 const RESIDENT_ATTRIBUTE = "rez"
 
-/**
- * At runtime, a building exterior consists of several components:
- *   1. Tiles, the visual component
- *   2. A collider
- *   3. A door teleporter
- * Data that is saved:
- *   1. Element type
- *   2. "Occupied points" which determines occupied squares in the world grid
- *   3. Misc metadata about the building
- */
-export class HouseFactory extends ElementFactory {
+export class HouseFactory extends BuildingFactory {
 
     readonly type = ElementType.HOUSE
     readonly dimensions = new Point(5, 4)
@@ -92,12 +81,16 @@ export class HouseFactory extends ElementFactory {
         return e.addComponent(new ElementComponent(
             ElementType.HOUSE, 
             pos,
-            ElementUtils.rectPoints(pos.plus(new Point(1, 1)), new Point(3, 2)),
+            this.getOccupiedPoints(pos),
             () => ({
                 destinationUUID,
                 [RESIDENT_ATTRIBUTE]: house.getResident()
             })
         ))
+    }
+    
+    getOccupiedPoints(pos: Point) {
+        return ElementUtils.rectPoints(pos.plus(new Point(1, 1)), new Point(3, 2))
     }
 }
 

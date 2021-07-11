@@ -1,6 +1,5 @@
 import { Point } from "brigsby/dist/Point"
 import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
-import { BoxCollider } from "brigsby/dist/collision/BoxCollider"
 import { WorldLocation } from "../WorldLocation"
 import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
@@ -16,7 +15,7 @@ import { Component } from "brigsby/dist/Component"
 import { WorldTime } from "../WorldTime"
 import { TimeUnit } from "../TimeUnit"
 import { LocationManager } from "../LocationManager"
-import { GroundType } from "../ground/Ground"
+import { Ground } from "../ground/Ground"
 import { Sounds } from "../../audio/Sounds"
 import { Lists } from "brigsby/dist/util/Lists"
 import { assets } from "brigsby/dist/Assets"
@@ -122,7 +121,8 @@ export class TreeFactory extends ElementFactory {
     }
 
     canPlaceAtPos(wl: WorldLocation, pos: Point) {
-        return wl.ground.get(pos.plusY(1))?.type === GroundType.GRASS
+        const ground = wl.ground.get(pos.plusY(1))
+        return Ground.isNaturalGround(ground?.type)
     }
 
     private nextGrowthTime() {

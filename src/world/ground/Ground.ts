@@ -52,7 +52,17 @@ export class Ground {
         return ground
     }
 
+    /**
+     * used for particles and sinking effects
+     */
     static isWater(type: GroundType) {
         return type === GroundType.WATER || type === GroundType.WATERFALL
+    }
+
+    /**
+     * used for placing things
+     */
+    static isNaturalGround(type: GroundType) {
+        return type === GroundType.GRASS || type === GroundType.PATH
     }
 } 

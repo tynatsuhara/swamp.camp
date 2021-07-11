@@ -6,7 +6,7 @@ import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { DudeFactory, DudeType } from "../../characters/DudeFactory"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item, spawnItem } from "../../items/Items"
-import { GroundType } from "../ground/Ground"
+import { Ground } from "../ground/Ground"
 import { LocationManager } from "../LocationManager"
 import { TimeUnit } from "../TimeUnit"
 import { WorldLocation } from "../WorldLocation"
@@ -76,7 +76,8 @@ export class MushroomFactory extends ElementFactory {
     }
 
     canPlaceAtPos(wl: WorldLocation, pos: Point) {
-        return wl.ground.get(pos)?.type === GroundType.GRASS
+        const ground = wl.ground.get(pos)
+        return Ground.isNaturalGround(ground?.type)
     }
 
     private nextGrowthTime() {
