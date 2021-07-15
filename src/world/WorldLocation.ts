@@ -157,6 +157,10 @@ export class WorldLocation {
         }
     }
 
+    /**
+     * @returns All the reasonable ground spots in the location. 
+     *          For exterior locations, excludes the very edge of the map.
+     */
     getGroundSpots() {
         if (this.isInterior) {
             return this.ground.keys()
@@ -165,7 +169,7 @@ export class WorldLocation {
     }
 
     private exteriorFleeingSpotsCache: Point[]
-    private exteriorFleeingSpots() {
+    private exteriorFleeingSpots(): Point[] {
         if (this.exteriorFleeingSpotsCache) {
             return this.exteriorFleeingSpotsCache
         }

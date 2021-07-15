@@ -3,7 +3,6 @@ import { Point } from "brigsby/dist/Point"
 import { Grid } from "brigsby/dist/util/Grid"
 import { Lists } from "brigsby/dist/util/Lists"
 import { Noise } from "brigsby/dist/util/Noise"
-import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { ElementType } from "./elements/Elements"
 import { TentColor } from "./elements/Tent"
@@ -33,7 +32,11 @@ export class MapGenerator {
         // make the ground
         // this.renderPath(new Point(-10, -10), new Point(10, 10), 2)
         // this.renderPath(new Point(10, -10), new Point(-10, 10), 5)
-        this.placeGrass()
+        this.placeGround()
+
+        if (debug.enableWater) {
+            this.placeWater()
+        }
 
         this.spawnTreesAtEdge()
         this.spawnTrees()
@@ -130,7 +133,7 @@ export class MapGenerator {
         }
     }
 
-    private placeGrass() {
+    private placeGround() {
         for (let i = -MapGenerator.MAP_RANGE; i < MapGenerator.MAP_RANGE; i++) {
             for (let j = -MapGenerator.MAP_RANGE; j < MapGenerator.MAP_RANGE; j++) {
                 const pt = new Point(i, j)
@@ -169,7 +172,7 @@ export class MapGenerator {
 
         let result: [Grid<number>, number, string] = [null, 1, null]
         while (result[1] > threshold) {
-            result = this.noise()
+            result = this.levelNoise()
         }
 
         console.log(result[2])
@@ -181,7 +184,7 @@ export class MapGenerator {
      * @param levels the number of levels
      * @returns a grid of numbers the size of the map and the ratio of top/bottom ledges
      */
-    static noise(levels: number = 3, seed = Math.random()): [Grid<number>, number, string] {
+    static levelNoise(levels: number = 3, seed = Math.random()): [Grid<number>, number, string] {
         const noise = new Noise(seed)
 
         const grid = new Grid<number>()
@@ -189,6 +192,7 @@ export class MapGenerator {
 
         // Should be divisible by 2 and a divisor of MAP_SIZE
         const sq = 2
+        const noiseScale = 2.5
 
         // Each entry will occupy a sq x sq tile section to prevent 
         // 1-wide entries that are hard to make work art-wise
@@ -199,7 +203,7 @@ export class MapGenerator {
 
         for (let i = -MapGenerator.MAP_RANGE; i < MapGenerator.MAP_RANGE; i += sq) {
             for (let j = -MapGenerator.MAP_RANGE; j < MapGenerator.MAP_RANGE; j += sq) {
-                var value = noise.simplex2(i / 100, j / 100);
+                var value = noise.simplex2(i / (this.MAP_RANGE * noiseScale), j / (this.MAP_RANGE * noiseScale))
                 value = (value + 1)/2  // scale to 0-1
                 const v = Math.floor(levels * value)
                 str += v
@@ -227,9 +231,77 @@ export class MapGenerator {
 
         return [grid, topLedges/bottomLedges, str]
     }
+
+    placeWater() {
+        let waterVolume = (MapGenerator.MAP_SIZE * MapGenerator.MAP_SIZE) * .06
+        for (let i = 0; i < 50; i++) {
+            const tilesPlaced = this.tryPlaceWater()
+            waterVolume -= tilesPlaced
+            if (waterVolume < 0) {
+                console.log("short circuiting, there's enough water")
+                return
+            }
+        }
+        console.log("didn't meet water goal")
+    }
+
+    private static readonly MIN_WATER_SIZE = 50
+    private static readonly MAX_WATER_SIZE = 500
+
+    private tryPlaceWater() {
+        const [pts] = MapGenerator.waterNoise()
+        if (pts.length < MapGenerator.MIN_WATER_SIZE || pts.length > MapGenerator.MAX_WATER_SIZE) {
+            return 0
+        }
+        // Check the placement
+        for (const pt of pts) {
+            const type = this.location.ground.get(pt)?.type
+            if (type !== GroundType.GRASS) {
+                return 0
+            }
+        }
+        pts.forEach(pt => {
+            this.location.setGroundElement(GroundType.WATER, pt)
+        })
+        return pts.length
+    }
+
+    /**
+     * @returns null if nothing crosses the threshold
+     */
+    static waterNoise(threshold: number = .85, seed = Math.random()): [Point[], string] {
+        const noise = new Noise(seed)
+
+        const pts: Point[] = []
+        let str = `seed: ${seed} \n`
+        let validResult = false
+        const noiseScale = 1
+
+        for (let i = -MapGenerator.MAP_RANGE; i < MapGenerator.MAP_RANGE; i++) {
+            for (let j = -MapGenerator.MAP_RANGE; j < MapGenerator.MAP_RANGE; j++) {
+                var value = noise.simplex2(i / (this.MAP_RANGE * noiseScale), j / (this.MAP_RANGE * noiseScale));
+                value = (value + 1)/2  // scale to 0-1
+                if (value > threshold) {
+                    str += "W"
+                    validResult = true
+                    pts.push(new Point(j, i))
+                } else {
+                    str += " "
+                }
+            }
+            str += "\n"
+        }
+
+        return [pts, str]
+    }
 }
 
-window["noise"] = (...args: any) => {
-    const result = MapGenerator.noise(args)
+window["levelNoise"] = (...args: any) => {
+    const result = MapGenerator.levelNoise(...args)
     console.log(result[2])
+}
+
+window["waterNoise"] = (...args: any) => {
+    const result = MapGenerator.waterNoise(...args)
+    console.log(result[1])
 }
