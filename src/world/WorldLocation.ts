@@ -330,7 +330,7 @@ export class WorldLocation {
             isInterior: this.isInterior,
             allowPlacing: this.allowPlacing,
             size: this.size,
-            levels: this.levels?.save(),
+            levels: this.levels?.serialize(),
         }
     }
 
@@ -361,7 +361,7 @@ export class WorldLocation {
     static load(saveState: LocationSaveState): WorldLocation {
         // previously we did not save location size
         const size = saveState.size || (saveState.isInterior ? null : 70)
-        const levels = saveState.levels ? Grid.load(saveState.levels) : null
+        const levels = saveState.levels ? Grid.deserialize(saveState.levels) : null
 
         const n = new WorldLocation(
             saveState.isInterior, 
