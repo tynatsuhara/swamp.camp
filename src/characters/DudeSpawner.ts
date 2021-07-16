@@ -69,7 +69,7 @@ export class DudeSpawner extends Component {
 
     spawnOrcs() {
         setTimeout(() => NotificationDisplay.instance.push({
-            text: "ORC ATTACK!",
+            text: "Orc attack!",
             icon: "sword",
         }), 6500)
         const extSize = LocationManager.instance.exterior().size
