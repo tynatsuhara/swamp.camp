@@ -34,6 +34,7 @@ import { ShieldType } from "./weapons/ShieldType"
 import { Weapon } from "./weapons/Weapon"
 import { WeaponFactory } from "./weapons/WeaponFactory"
 import { WeaponType } from "./weapons/WeaponType"
+import { House } from "../world/elements/House"
 
 export class Dude extends Component implements DialogueSource {
 
@@ -265,8 +266,11 @@ export class Dude extends Component implements DialogueSource {
                 CutsceneManager.instance.startCutscene(new DeathCutscene())
             }
         } else if (this.factions.includes(DudeFaction.VILLAGERS)) {
-            // If they have a home, mark it as vacant (TODO)
-            // this.location.
+            // If they have a home, mark it as vacant
+            this.location.getElements()
+                    .map(e => e.entity.getComponent(House))
+                    .filter(c => c?.getResident() === this.uuid)
+                    .forEach(home => home.evictResident(this.uuid))
         }
     }
 

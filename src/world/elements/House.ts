@@ -98,6 +98,8 @@ export class House extends Component {
     private static readonly PENDING_RESIDENT = "pending"
 
     readonly locationUUID: string
+
+    // TODO: Probably support multiple residents
     private resident: string
 
     constructor(locationUUID: string) {
@@ -119,6 +121,10 @@ export class House extends Component {
 
     setResident(uuid: string) {
         this.resident = uuid
+    }
+
+    evictResident(uuid: string) {
+        this.resident = null
     }
 
     getResident() {
