@@ -16,7 +16,8 @@ import { UIStateManager } from "./UIStateManager"
 export class MiniMap extends Component {
 
     private static readonly SCALE = 12          // full-size pixels per map pixel
-    private static readonly PX_PER_UPDATE = 50  // how many pixels we draw each time
+    private static readonly PX_PER_HIDDEN_UPDATE = 50   // how many pixels we draw each update() when hidden
+    private static readonly PX_PER_SHOWN_UPDATE = 1000  // how many pixels we draw each update() when showing
     private lastPixelDrawn = Point.ZERO
     private fullyRenderedAtLeastOnce = false
     private isShowing = false
@@ -92,6 +93,9 @@ export class MiniMap extends Component {
         const bigContext = this.bigCanvas.getContext("2d")
         const smallContext = this.smallCanvas.getContext("2d")
         let drawn = 0
+        const pxToRender = (this.isShowing && !this.fullyRenderedAtLeastOnce) 
+                ? MiniMap.PX_PER_SHOWN_UPDATE 
+                : MiniMap.PX_PER_HIDDEN_UPDATE
 
         for (let y = this.lastPixelDrawn.y; y < this.smallCanvas.height; y++) {
             const start = y === this.lastPixelDrawn.y ? this.lastPixelDrawn.x : 0
@@ -120,7 +124,7 @@ export class MiniMap extends Component {
                 this.lastPixelDrawn = new Point(x, y)
 
                 drawn++
-                if (drawn === MiniMap.PX_PER_UPDATE) {
+                if (drawn === pxToRender) {
                     return
                 }
             }
