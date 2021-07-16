@@ -27,6 +27,7 @@ export class MapGenerator {
 
     generateExterior(): WorldLocation {
         // spawn tent
+        // TODO: handle this better with ledges and water
         this.location.addElement(ElementType.TENT, this.tentPos, { color: TentColor.RED })
         
         // make the ground

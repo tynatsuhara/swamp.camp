@@ -23,14 +23,11 @@ import { HUD } from "../ui/HUD"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Interactable } from "../world/elements/Interactable"
 import { Ground, GroundType } from "../world/ground/Ground"
-import { GroundComponent } from "../world/ground/GroundComponent"
-import { LocationManager } from "../world/LocationManager"
 import { WorldLocation } from "../world/WorldLocation"
 import { DialogueSource, EMPTY_DIALOGUE, getDialogue } from "./Dialogue"
 import { DudeAnimationUtils } from "./DudeAnimationUtils"
 import { DudeFaction, DudeType } from "./DudeFactory"
 import { NPC } from "./NPC"
-import { Player } from "./Player"
 import { Shield } from "./weapons/Shield"
 import { ShieldFactory } from "./weapons/ShieldFactory"
 import { ShieldType } from "./weapons/ShieldType"
@@ -153,7 +150,7 @@ export class Dude extends Component implements DialogueSource {
         }
 
         this.start = () => {
-            this.seaLevel = LocationManager.instance.currentLocation.levels?.get(pixelPtToTilePt(this.standingPosition)) ?? 0
+            this.seaLevel = this.location.levels?.get(pixelPtToTilePt(this.standingPosition)) ?? 0
         }
     }
 
@@ -267,6 +264,9 @@ export class Dude extends Component implements DialogueSource {
             } else {
                 CutsceneManager.instance.startCutscene(new DeathCutscene())
             }
+        } else if (this.factions.includes(DudeFaction.VILLAGERS)) {
+            // If they have a home, mark it as vacant (TODO)
+            // this.location.
         }
     }
 
@@ -371,7 +371,7 @@ export class Dude extends Component implements DialogueSource {
         }
 
         const standingTilePos = pixelPtToTilePt(this.standingPosition)
-        const ground = LocationManager.instance.currentLocation.ground.get(standingTilePos)
+        const ground = this.location.ground.get(standingTilePos)
         if (Ground.isWater(ground?.type) && !this.isJumping) {
             speedMultiplier *= .4
         }
@@ -408,8 +408,8 @@ export class Dude extends Component implements DialogueSource {
 
     private getLevelAt(pos: Point) {
         const tilePos = pixelPtToTilePt(pos)
-        const currentLevel = LocationManager.instance.currentLocation.levels?.get(tilePos) ?? 0
-        const ground = LocationManager.instance.currentLocation.ground.get(tilePos)
+        const currentLevel = this.location.levels?.get(tilePos) ?? 0
+        const ground = this.location.ground.get(tilePos)
         if (ground?.type === GroundType.WATER) {
             return currentLevel - 1
         }
@@ -467,7 +467,7 @@ export class Dude extends Component implements DialogueSource {
             : (pos: Point) => this.collider.moveTo(pos)
         this._position = moveFn(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos)
         if (skipColliderCheck) {
-            this.seaLevel = LocationManager.instance.currentLocation.levels?.get(pixelPtToTilePt(this.standingPosition)) ?? 0
+            this.seaLevel = this.location.levels?.get(pixelPtToTilePt(this.standingPosition)) ?? 0
         }
     }
 
@@ -481,7 +481,7 @@ export class Dude extends Component implements DialogueSource {
     private rollFunction = this.dashRoll
 
     roll() {
-        const ground = LocationManager.instance.currentLocation.ground.get(pixelPtToTilePt(this.standingPosition))
+        const ground = this.location.ground.get(pixelPtToTilePt(this.standingPosition))
         if (!this.canRoll || Ground.isWater(ground?.type)) {
             return
         }
