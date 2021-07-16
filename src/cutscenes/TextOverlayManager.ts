@@ -91,7 +91,7 @@ export class TextOverlayManager extends Component {
             const action = this.index >= this.text.length-1 
                     && Lists.last(this.text).isFinished 
                             ? this.finishAction 
-                            : "NEXT"
+                            : "..."
             return [
                 ...formatText(
                     typedText, 
