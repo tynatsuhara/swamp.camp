@@ -161,7 +161,7 @@ export class MiniMap extends Component {
 
     private getPlayerIndicator(topLeft: Point) {
         const wl = Player.instance.dude.location
-        if (Player.instance.dude.location !== LocationManager.instance.currentLocation) {
+        if (Player.instance.dude.location !== LocationManager.instance.exterior()) {
             return null
         }
         const indicatorSize = 4
