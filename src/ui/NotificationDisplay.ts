@@ -18,11 +18,12 @@ export const Notifications = {
 
 const OFFSET = new Point(-4, 4)
 const ICON_WIDTH = 20
+const DEFAULT_LIFESPAN_MILLIS = 5_000
 
-type Notification = {
+export type Notification = {
     text: string,
-    icon?: string,  // one-bit tile key
-    isExpired?: () => boolean,
+    icon?: string,              // one-bit tile key
+    isExpired?: () => boolean,  // default behavior is to expire after DEFAULT_LIFESPAN_MILLIS
 }
 
 class NotificationComponent extends Component {
@@ -35,7 +36,7 @@ class NotificationComponent extends Component {
     constructor(n: Notification) {
         super()
         if (!n.isExpired) {
-            const expirationTime = Date.now() + 5_000
+            const expirationTime = Date.now() + DEFAULT_LIFESPAN_MILLIS
             n.isExpired = () => Date.now() > expirationTime
         }
         this.n = n
@@ -73,7 +74,13 @@ class NotificationComponent extends Component {
     getRenderMethods() {
         const textPos = this.t.position.plusX(TILE_SIZE/2 + (!!this.n.icon ? ICON_WIDTH : 0)).plusY(this.height/2 - TEXT_SIZE/2 + .5)
         return [
-            new TextRender(this.n.text, textPos, TEXT_SIZE, TEXT_FONT, Color.DARK_RED, UIStateManager.UI_SPRITE_DEPTH + 1)
+            new TextRender(
+                this.n.text.toUpperCase(), 
+                textPos, 
+                TEXT_SIZE, 
+                TEXT_FONT, 
+                Color.DARK_RED, 
+                UIStateManager.UI_SPRITE_DEPTH + 1)
         ]
     }
 
