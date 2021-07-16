@@ -2,10 +2,13 @@ import { Component } from "brigsby/dist/Component"
 import { UpdateData } from "brigsby/dist/Engine"
 import { Point } from "brigsby/dist/Point"
 import { ImageRender } from "brigsby/dist/renderer/ImageRender"
+import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Lists } from "brigsby/dist/util/Lists"
+import { Maths } from "brigsby/dist/util/Maths"
+import { Player } from "../characters/Player"
 import { Controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
-import { TILE_SIZE } from "../graphics/Tilesets"
+import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { ElementComponent } from "../world/elements/ElementComponent"
 import { GroundComponent } from "../world/ground/GroundComponent"
 import { GroundRenderer } from "../world/GroundRenderer"
@@ -139,17 +142,47 @@ export class MiniMap extends Component {
         }
 
         const padding = 4
-         
-        return [new ImageRender(
+        const topLeft = new Point(
+            padding,
+            Camera.instance.dimensions.y - this.smallCanvas.height - padding
+        )
+
+        const mapRender = new ImageRender(
             this.smallCanvas,
             Point.ZERO,
             new Point(this.smallCanvas.width, this.smallCanvas.height),
-            new Point(
-                padding,
-                Camera.instance.dimensions.y - this.smallCanvas.height - padding
-            ),
+            topLeft,
             new Point(this.smallCanvas.width, this.smallCanvas.height),
             UIStateManager.UI_SPRITE_DEPTH,
-        )]
+        )
+         
+        return [mapRender, this.getPlayerIndicator(topLeft)]
     }
+
+    private getPlayerIndicator(topLeft: Point) {
+        const wl = Player.instance.dude.location
+        if (Player.instance.dude.location !== LocationManager.instance.currentLocation) {
+            return null
+        }
+        const indicatorSize = 4
+
+        const position = Player.instance.dude.standingPosition
+                .plus(new Point(1, 1).times(wl.size * TILE_SIZE/2))
+                .div(MiniMap.SCALE)
+                .minus(new Point(indicatorSize/2, indicatorSize/2))
+                .apply(n => Math.floor(n))
+                .apply(n => Maths.clamp(n, 0, wl.size * TILE_SIZE/MiniMap.SCALE - indicatorSize))
+                .plus(topLeft)
+
+        return Tilesets.instance.oneBit.getTileSource("miniMapPlayer").toImageRender(
+            SpriteTransform.new({ 
+                position,
+                depth: UIStateManager.UI_SPRITE_DEPTH
+            })
+        )
+    }
+
+    private renderPlayerIndicator
+
+    private playerIndicatorBitmap: ImageBitmap
 }
