@@ -25,15 +25,15 @@ export class MapGenerator {
     )
     private readonly tentPos = new Point(-3, -3)
 
-    generateExterior(): WorldLocation {
-        // spawn tent
-        // TODO: handle this better with ledges and water
-        this.location.addElement(ElementType.TENT, this.tentPos, { color: TentColor.RED })
-        
+    generateExterior(): WorldLocation {        
         // make the ground
         // this.renderPath(new Point(-10, -10), new Point(10, 10), 2)
         // this.renderPath(new Point(10, -10), new Point(-10, 10), 5)
         this.placeGround()
+
+        // spawn tent
+        // TODO: handle this better with ledges and water
+        this.location.addElement(ElementType.TENT, this.tentPos, { color: TentColor.RED })
 
         if (debug.enableWater) {
             this.placeWater()
