@@ -21,7 +21,8 @@ export type Teleporter = {
 
 export const TeleporterPrefix = {
     TENT: "tent",
-    DOOR: "door"
+    DOOR: "door",
+    MINE: "mine",
 }
 
 export class TeleporterSound {

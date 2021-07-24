@@ -5,6 +5,7 @@ import { CampfireFactory } from "./Campfire"
 import { ChestFactory } from "./Chest"
 import { ElementFactory } from "./ElementFactory"
 import { HouseFactory } from "./House"
+import { MineEntranceFactory } from "./MineEntrance"
 import { MushroomFactory } from "./Mushroom"
 import { RockFactory } from "./Rock"
 import { TentFactory } from "./Tent"
@@ -21,7 +22,8 @@ export enum ElementType {
     HOUSE,
     MUSHROOM,
     CHEST,
-    BED
+    BED,
+    MINE_ENTRANCE
 }
 
 export class SavedElement {
@@ -40,13 +42,14 @@ export class Elements {
        [ElementType.TREE_ROUND]: new TreeFactory(ElementType.TREE_ROUND),
        [ElementType.TREE_POINTY]: new TreeFactory(ElementType.TREE_POINTY),
        [ElementType.ROCK]: new RockFactory(),
-       [ElementType.TENT]: new TentFactory(),
        [ElementType.CAMPFIRE]: new CampfireFactory(),
        [ElementType.TELEPORTER]: new TeleporterFactory(),
-       [ElementType.HOUSE]: new HouseFactory(),
        [ElementType.MUSHROOM]: new MushroomFactory(),
        [ElementType.CHEST]: new ChestFactory(),
        [ElementType.BED]: new BedFactory(),
+       [ElementType.TENT]: new TentFactory(),
+       [ElementType.HOUSE]: new HouseFactory(),
+       [ElementType.MINE_ENTRANCE]: new MineEntranceFactory(),
    }
 
    getElementFactory(type: ElementType) {

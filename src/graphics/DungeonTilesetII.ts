@@ -139,6 +139,7 @@ const map = new Map(`
     weapon_green_magic_staff 340 145 8 30
     weapon_spear 293 177 6 30
     weapon_pickaxe 303 187 20 20
+    weapon_shovel 328 183 8 24
 
     tool_lantern 336 192 16 16
 

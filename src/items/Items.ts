@@ -53,7 +53,7 @@ export class ItemMetadata {
 }
 
 export enum Item {
-    COIN, ROCK, WOOD, TENT, CAMPFIRE, IRON, HOUSE, ROUND_SAPLING, POINTY_SAPLING, MUSHROOM, CHEST, BED,
+    COIN, ROCK, WOOD, TENT, CAMPFIRE, IRON, HOUSE, ROUND_SAPLING, POINTY_SAPLING, MUSHROOM, CHEST, BED, MINE_ENTRANCE,
 
     // weapon values should match the WeaponType enum so we can cast them
     KNIFE = WeaponType.KNIFE, 
@@ -104,12 +104,6 @@ export const ITEM_METADATA_MAP = {
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("wood"), 
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("woodItem"),
     }),
-    [Item.TENT]: new ItemMetadata({
-        displayName: "Tent",
-        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("tent"), 
-        stackLimit: 1,
-        element: ElementType.TENT
-    }),
     [Item.CAMPFIRE]: new ItemMetadata({
         displayName: "Campfire",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("campfire"), 
@@ -120,12 +114,6 @@ export const ITEM_METADATA_MAP = {
         displayName: "Iron",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("iron"), 
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("ironItem"),
-    }),
-    [Item.HOUSE]: new ItemMetadata({
-        displayName: "House",
-        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("house"),
-        stackLimit: 1,
-        element: ElementType.HOUSE
     }),
     [Item.ROUND_SAPLING]: new ItemMetadata({
         displayName: "Sapling",
@@ -157,6 +145,27 @@ export const ITEM_METADATA_MAP = {
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("bed"), 
         stackLimit: 1,
         element: ElementType.BED
+    }),
+
+    // Locations
+    [Item.TENT]: new ItemMetadata({
+        displayName: "Tent",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("tent"), 
+        stackLimit: 1,
+        element: ElementType.TENT
+    }),
+    [Item.HOUSE]: new ItemMetadata({
+        displayName: "House",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("house"),
+        stackLimit: 1,
+        element: ElementType.HOUSE
+    }),
+    // TODO
+    [Item.MINE_ENTRANCE]: new ItemMetadata({
+        displayName: "Mineshaft",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("house"),
+        stackLimit: 1,
+        element: ElementType.MINE_ENTRANCE
     }),
 
     // Weapons
