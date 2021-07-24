@@ -162,8 +162,8 @@ export const ITEM_METADATA_MAP = {
     }),
     // TODO
     [Item.MINE_ENTRANCE]: new ItemMetadata({
-        displayName: "Mineshaft",
-        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("house"),
+        displayName: "Mine Entrance",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("ladder"),
         stackLimit: 1,
         element: ElementType.MINE_ENTRANCE
     }),

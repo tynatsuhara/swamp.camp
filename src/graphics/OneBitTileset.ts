@@ -103,6 +103,7 @@ export class OneBitTileset extends SingleFileTileLoader {
             ["skull1", new Point(18, 24)],
             ["skull2", new Point(22, 23)],
             ["miniMapPlayer", new Point(11, 22)],
+            ["ladder", new Point(0, 6)],
         ]))
     }
 }

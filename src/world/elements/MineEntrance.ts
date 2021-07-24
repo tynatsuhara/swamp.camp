@@ -24,8 +24,26 @@ export class MineEntranceFactory extends BuildingFactory {
         const pixelPt = pos.times(TILE_SIZE)
 
         // the interior location UUID
+        // TODO add mine interior
         const destinationUUID: string = data["destinationUUID"] ?? makeHouseInterior(wl).uuid
+        
+        // Render hole
+        e.addComponent(new SpriteComponent(
+            Tilesets.instance.tilemap.getTileAt(new Point(0, 8)), 
+            SpriteTransform.new({ 
+                position: pixelPt, 
+                depth: pixelPt.y + 3 
+            })
+        ))
 
+        // Set up collider
+        const colliderSize = new Point(14, 12)
+        e.addComponent(new BoxCollider(
+            pixelPt.plus(new Point(TILE_SIZE/2, TILE_SIZE/2)).minus(colliderSize.div(2)), 
+            colliderSize
+        ))
+
+        // Set up teleporter
         const interactablePos = pixelPt.plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
         const doorId = TeleporterPrefix.DOOR 
         wl.addTeleporter({ 
@@ -33,15 +51,6 @@ export class MineEntranceFactory extends BuildingFactory {
             pos: interactablePos.plusY(16), 
             id: doorId
         })
-        
-        const tile = Tilesets.instance.tilemap.getTileAt(new Point(0, 8))
-        const el = e.addComponent(new SpriteComponent(tile, new SpriteTransform(pixelPt)))
-        el.transform.depth = pixelPt.y
-
-        const colliderSize = new Point(14, 12)
-        e.addComponent(new BoxCollider(pixelPt.plus(new Point(TILE_SIZE/2, TILE_SIZE/2)).minus(colliderSize.div(2)), colliderSize))
-
-        // Set up teleporter
         e.addComponent(new Interactable(
             interactablePos, 
             () => wl.useTeleporter(destinationUUID, doorId), 
