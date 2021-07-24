@@ -2,6 +2,7 @@ import { Component } from "brigsby/dist/Component"
 import { UpdateData } from "brigsby/dist/Engine"
 import { Point } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util/Lists"
+import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
@@ -192,20 +193,23 @@ export class NPC extends Component {
     // fn will execute immediately and every intervalMillis milliseconds
     // until the NPC is dead or the function returns true
     doWhileLiving(fn: () => boolean|void, intervalMillis: number) {
-        if (this.dude.isAlive) {
-            if (fn()) {
-                return
-            }
+        if (!this.dude.isAlive) {
+            return
         }
-        const interval = setInterval(() => {
-            // TODO: Permanently cancel this if the location is deleted
-            if (this.dude.location !== LocationManager.instance.currentLocation) {
-                return
-            }
-            if (!this.dude.isAlive || fn()) {
-                clearInterval(interval)
-            }
-        }, intervalMillis)
+
+        if (fn()) {
+            return
+        }
+
+        const invoker = this.entity.addComponent(new RepeatedInvoker(
+            () => {
+                if (!this.dude.isAlive || fn()) {
+                    invoker.delete()
+                }
+                return intervalMillis
+            }, 
+            intervalMillis
+        ))
     }
 
     private walkPath: Point[] = null
