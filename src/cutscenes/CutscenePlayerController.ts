@@ -1,7 +1,7 @@
 import { Component } from "brigsby/dist/Component"
 import { Player } from "../characters/Player"
 import { Dude } from "../characters/Dude"
-import { StartData, UpdateData } from "brigsby/dist/Engine"
+import { UpdateData } from "brigsby/dist/Engine"
 import { Point } from "brigsby/dist/Point"
 
 export class CutscenePlayerController extends Component {
@@ -37,10 +37,12 @@ export class CutscenePlayerController extends Component {
     enable() {
         this.enabled = true
         Player.instance.enabled = false
+        this.stopMoving()
     }
 
     disable() {
         this.enabled = false
         Player.instance.enabled = true
+        this.stopMoving()
     }
 }

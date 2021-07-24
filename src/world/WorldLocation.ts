@@ -10,6 +10,7 @@ import { Player } from "../characters/Player"
 import { Lantern } from "../characters/weapons/Lantern"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { Camera } from "../cutscenes/Camera"
+import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 import { Particles } from "../graphics/Particles"
 import { LocationSaveState } from "../saves/LocationSaveState"
 import { newUUID } from "../saves/uuid"
@@ -256,6 +257,8 @@ export class WorldLocation {
     }
 
     useTeleporter(to: string, id: string) {
+        CutscenePlayerController.instance.enable()
+
         setTimeout(() => {
             // play a sound, if applicable
             if (id.startsWith(TeleporterPrefix.DOOR)) {
@@ -298,6 +301,10 @@ export class WorldLocation {
             const offset = p.standingPosition.minus(p.position)
             p.moveTo(linkedPosition.minus(offset), true)
             Camera.instance.jump(beforeTeleportPos.minus(p.standingPosition))
+
+            setTimeout(() => {
+                CutscenePlayerController.instance.disable()
+            }, 400);
         })
     }
 
