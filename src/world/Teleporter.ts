@@ -43,6 +43,11 @@ export const Teleporters = {
     }
 }
 
+/**
+ * Not to be confused with the WorldLocation first-class citizen Teleporter.
+ * This is a component which can be used to teleport to a logical Teleporer destination.
+ * It has an arrow sprite and an Interactable which the player can use to teleport.
+ */
 export class TeleporterFactory extends ElementFactory {
 
     readonly type = ElementType.TELEPORTER
