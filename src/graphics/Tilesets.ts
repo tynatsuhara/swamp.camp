@@ -10,6 +10,7 @@ import { ExtraCharacterSet2TileLoader } from "./ExtraCharacterSet2TileLoader"
 import { OGTileset } from "./OGTileset"
 import { ExplosionTileset } from "./ExplosionTileset"
 import { Singletons } from "../Singletons"
+import { BackgroundsTileset } from "./BackgroundsTileset"
 
 // standard tile size
 export const TILE_SIZE = 16
@@ -37,9 +38,10 @@ export class Tilesets {
     readonly extraCharacterSet1 = new SplitFileTileLoader("images/individual_characters")
     readonly extraCharacterSet2 = new ExtraCharacterSet2TileLoader()
     readonly explosions = new ExplosionTileset()
+    readonly backgrounds = new BackgroundsTileset()
 
     getBasicTileSource(key: string): StaticSpriteSource {
-        const sources = [this.outdoorTiles, this.tilemap]
+        const sources = [this.outdoorTiles, this.tilemap, this.backgrounds]
         for (const src of sources) {
             try {
                 return src.getTileSource(key)
@@ -59,6 +61,7 @@ export class Tilesets {
     // loaded before the engine starts running the game
     static getFilesToLoad() {
         return [
+            "images/backgrounds.png",
             "images/title.png",
             "images/explosions.png",
             "images/monochrome_transparent_1_bit.png",
