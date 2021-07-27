@@ -38,7 +38,7 @@ export class WorldLocation {
     // BUT an entity should only be in one of these data structures
     private readonly elements = new Grid<ElementComponent>()
     private readonly occupied = new Grid<ElementComponent>()
-    readonly ground = new Grid<GroundComponent>()
+    private readonly ground = new Grid<GroundComponent>()
     readonly levels = new Grid<number>()
 
     // TODO: Make dropped items saveable
