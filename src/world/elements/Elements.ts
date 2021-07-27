@@ -6,6 +6,7 @@ import { ChestFactory } from "./Chest"
 import { ElementFactory } from "./ElementFactory"
 import { HouseFactory } from "./House"
 import { MineEntranceFactory } from "./MineEntrance"
+import { MineExitFactory } from "./MineExit"
 import { MushroomFactory } from "./Mushroom"
 import { RockFactory } from "./Rock"
 import { TentFactory } from "./Tent"
@@ -23,7 +24,8 @@ export enum ElementType {
     MUSHROOM,
     CHEST,
     BED,
-    MINE_ENTRANCE
+    MINE_ENTRANCE,
+    MINE_EXIT,
 }
 
 export class SavedElement {
@@ -50,6 +52,7 @@ export class Elements {
        [ElementType.TENT]: new TentFactory(),
        [ElementType.HOUSE]: new HouseFactory(),
        [ElementType.MINE_ENTRANCE]: new MineEntranceFactory(),
+       [ElementType.MINE_EXIT]: new MineExitFactory(),
    }
 
    getElementFactory(type: ElementType) {

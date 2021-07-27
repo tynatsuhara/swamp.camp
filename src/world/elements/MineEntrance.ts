@@ -5,7 +5,7 @@ import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { GroundType } from "../ground/Ground"
-import { makeHouseInterior } from "../interior/House"
+import { makeMineInterior } from "../interior/Mine"
 import { LocationManager } from "../LocationManager"
 import { TeleporterPrefix } from "../Teleporter"
 import { WorldLocation } from "../WorldLocation"
@@ -25,7 +25,7 @@ export class MineEntranceFactory extends BuildingFactory {
 
         // the interior location UUID
         // TODO add mine interior
-        const destinationUUID: string = data["destinationUUID"] ?? makeHouseInterior(wl).uuid
+        const destinationUUID: string = data["destinationUUID"] ?? makeMineInterior(wl).uuid
         
         // Render hole
         e.addComponent(new SpriteComponent(
@@ -45,7 +45,7 @@ export class MineEntranceFactory extends BuildingFactory {
 
         // Set up teleporter
         const interactablePos = pixelPt.plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
-        const doorId = TeleporterPrefix.DOOR 
+        const doorId = TeleporterPrefix.MINE 
         wl.addTeleporter({ 
             to: destinationUUID, 
             pos: interactablePos.plusY(16), 
@@ -74,6 +74,6 @@ export class MineEntranceFactory extends BuildingFactory {
     }
 
     canPlaceAtPos(wl: WorldLocation, pos: Point) {
-        return wl.ground.get(pos)?.type === GroundType.PATH
+        return wl.getGround(pos)?.type === GroundType.PATH
     }
 }
