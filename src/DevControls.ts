@@ -67,6 +67,7 @@ debug.godMode = debug.godMode || false
 debug.nightVision = debug.nightVision || false
 debug.showAudioLogs = debug.showAudioLogs || false
 debug.showGrid = debug.showGrid || false
+debug.showInteractables = debug.showInteractables || false
 
 window["help"] = () => {
     let help = `dev controls (enable with debug.enableDevControls=true)
