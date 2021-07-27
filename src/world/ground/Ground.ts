@@ -35,7 +35,7 @@ export class Ground {
     }
 
     private readonly GROUND_FUNCTION_MAP: { [key: number]: (data: MakeGroundFuncData) => GroundComponent } = {
-        [GroundType.BASIC]: d => makeBasicGround(GroundType.BASIC, d, 0),
+        [GroundType.BASIC]: makeBasicGround,
         [GroundType.BASIC_NINE_SLICE]: makeBasicNineSliceGround,
         [GroundType.GRASS]: makeGrass,
         [GroundType.PATH]: makePath,
