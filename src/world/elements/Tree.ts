@@ -121,7 +121,7 @@ export class TreeFactory extends ElementFactory {
     }
 
     canPlaceAtPos(wl: WorldLocation, pos: Point) {
-        const ground = wl.ground.get(pos.plusY(1))
+        const ground = wl.getGround(pos.plusY(1))
         return Ground.isNaturalGround(ground?.type)
     }
 

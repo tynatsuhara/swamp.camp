@@ -76,8 +76,7 @@ export class MushroomFactory extends ElementFactory {
     }
 
     canPlaceAtPos(wl: WorldLocation, pos: Point) {
-        const ground = wl.ground.get(pos)
-        return Ground.isNaturalGround(ground?.type)
+        return Ground.isNaturalGround(wl.getGround(pos)?.type)
     }
 
     private nextGrowthTime() {

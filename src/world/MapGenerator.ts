@@ -86,7 +86,7 @@ export class MapGenerator {
 
     private spawnTree(pt: Point) {
         const treeBase = pt.plusY(1)
-        if (this.location.ground.get(treeBase)?.type !== GroundType.GRASS) {
+        if (this.location.getGround(treeBase)?.type !== GroundType.GRASS) {
             return
         }
         this.location.addElement(
@@ -128,7 +128,7 @@ export class MapGenerator {
                 Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_RANGE,
                 Math.floor(Math.random() * (MapGenerator.MAP_SIZE)) - MapGenerator.MAP_RANGE,
             )
-            if (this.location.ground.get(p)?.type === GroundType.GRASS && this.location.addElement(element, p)) {
+            if (this.location.getGround(p)?.type === GroundType.GRASS && this.location.addElement(element, p)) {
                 placed++
             }
         }
@@ -256,7 +256,7 @@ export class MapGenerator {
         }
         // Check the placement
         for (const pt of pts) {
-            const type = this.location.ground.get(pt)?.type
+            const type = this.location.getGround(pt)?.type
             if (type !== GroundType.GRASS) {
                 return 0
             }

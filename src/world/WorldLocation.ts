@@ -130,11 +130,18 @@ export class WorldLocation {
     }
 
     /**
-     * @returns the element at the position. NOTE this can return an
+     * @returns the element component at the position. NOTE this can return an
      *          element even if this is an "empty" square
      */
     getElement(pos: Point) {
         return this.elements.get(pos)
+    }
+
+    /**
+     * @returns the ground component at the position
+     */
+    getGround(pos: Point) {
+        return this.ground.get(pos)
     }
 
     /**

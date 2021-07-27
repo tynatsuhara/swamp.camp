@@ -17,7 +17,7 @@ export abstract class BuildingFactory extends ElementFactory {
 
     canPlaceAtPos(wl: WorldLocation, pos: Point) {
         return this.getOccupiedPoints(pos)
-                .map(pt => wl.ground.get(pt)?.type)
+                .map(pt => wl.getGround(pt)?.type)
                 .every(type => Ground.isNaturalGround(type))
     }
 

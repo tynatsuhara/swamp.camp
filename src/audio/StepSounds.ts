@@ -65,7 +65,7 @@ export class StepSounds {
     }
 
     private static getSound = (): [string, number] => {
-        const ground = LocationManager.instance.currentLocation.ground.get(pixelPtToTilePt(Player.instance.dude.standingPosition))
+        const ground = LocationManager.instance.currentLocation.getGround(pixelPtToTilePt(Player.instance.dude.standingPosition))
         if (!ground) {
             return [undefined, 0]
         }

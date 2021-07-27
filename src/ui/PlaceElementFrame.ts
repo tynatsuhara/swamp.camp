@@ -104,7 +104,7 @@ export class PlaceElementFrame extends Component {
                     return false
                 }
                 // there's no ground here
-                if (!LocationManager.instance.currentLocation.ground.get(pt)) {
+                if (!LocationManager.instance.currentLocation.getGround(pt)) {
                     return false
                 }
             }

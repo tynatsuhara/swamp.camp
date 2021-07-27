@@ -385,7 +385,7 @@ export class Dude extends Component implements DialogueSource {
         }
 
         const standingTilePos = pixelPtToTilePt(this.standingPosition)
-        const ground = this.location.ground.get(standingTilePos)
+        const ground = this.location.getGround(standingTilePos)
         if (Ground.isWater(ground?.type) && !this.isJumping) {
             speedMultiplier *= .4
         }
@@ -423,7 +423,7 @@ export class Dude extends Component implements DialogueSource {
     private getLevelAt(pos: Point) {
         const tilePos = pixelPtToTilePt(pos)
         const currentLevel = this.location.levels?.get(tilePos) ?? 0
-        const ground = this.location.ground.get(tilePos)
+        const ground = this.location.getGround(tilePos)
         if (ground?.type === GroundType.WATER) {
             return currentLevel - 1
         }
@@ -495,7 +495,7 @@ export class Dude extends Component implements DialogueSource {
     private rollFunction = this.dashRoll
 
     roll() {
-        const ground = this.location.ground.get(pixelPtToTilePt(this.standingPosition))
+        const ground = this.location.getGround(pixelPtToTilePt(this.standingPosition))
         if (!this.canRoll || Ground.isWater(ground?.type)) {
             return
         }

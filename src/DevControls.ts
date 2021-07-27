@@ -20,7 +20,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     [InputKey.QUOTE, "trigger orc raid", () => DudeSpawner.instance.spawnOrcs()],
     [InputKey.COMMA, "toggle ground path", (input) => {
         const mouseTilePos = pixelPtToTilePt(input.mousePos)
-        const currentType = LocationManager.instance.currentLocation.ground.get(mouseTilePos)?.type
+        const currentType = LocationManager.instance.currentLocation.getGround(mouseTilePos)?.type
         if (currentType === GroundType.PATH) {
             LocationManager.instance.currentLocation.setGroundElement(GroundType.GRASS, mouseTilePos)
         } else if (currentType === GroundType.GRASS) {
@@ -29,7 +29,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     }],
     [InputKey.L, "place water", (input) => {
         const mouseTilePos = pixelPtToTilePt(input.mousePos)
-        const currentType = LocationManager.instance.currentLocation.ground.get(mouseTilePos)?.type
+        const currentType = LocationManager.instance.currentLocation.getGround(mouseTilePos)?.type
         if (currentType === GroundType.WATER) {
             LocationManager.instance.currentLocation.setGroundElement(GroundType.GRASS, mouseTilePos)
         } else if (currentType === GroundType.GRASS) {
