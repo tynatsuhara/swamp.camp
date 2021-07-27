@@ -21,14 +21,13 @@ export class ConnectingTileWaterfallSchema extends ConnectingTileSchema {
      * Renders the tile source based on the given grid and position
      */
     render(location: WorldLocation, position: Point): ImageRender[] {
-        const grid = location.ground
         const x = position.x
         const y = position.y
 
-        const n = this.get(grid, new Point(x, y - 1))
-        const e = this.get(grid, new Point(x + 1, y))
-        const s = this.get(grid, new Point(x, y + 1))
-        const w = this.get(grid, new Point(x - 1, y))
+        const n = this.get(location, new Point(x, y - 1))
+        const e = this.get(location, new Point(x + 1, y))
+        const s = this.get(location, new Point(x, y + 1))
+        const w = this.get(location, new Point(x - 1, y))
         
         let results: ImageRender[] = []
 

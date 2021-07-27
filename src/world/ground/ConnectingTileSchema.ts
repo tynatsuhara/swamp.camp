@@ -21,10 +21,10 @@ export abstract class ConnectingTileSchema {
      */
     abstract render(location: WorldLocation, position: Point): ImageRender[] 
 
-    protected get(grid: Grid<GroundComponent>, pt: Point): ConnectingTile {
-        const el = grid.get(pt)
-        if (el) {
-            const ct = el.entity.getComponent(ConnectingTile)
+    protected get(location: WorldLocation, pt: Point): ConnectingTile {
+        const ground = location.getGround(pt)
+        if (ground) {
+            const ct = ground.entity.getComponent(ConnectingTile)
             if (ct && this.canConnect(ct.schema)) {
                 return ct
             }
