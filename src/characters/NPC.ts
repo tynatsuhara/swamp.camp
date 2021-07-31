@@ -126,7 +126,9 @@ export class NPC extends Component {
         const context: NPCTaskContext = {
             dude: this.dude,
             walkTo: (pt) => this.forceMoveToTilePosition(pt),
-            roam: () => {},
+            roam: () => this.forceMoveToTilePosition(
+                Lists.oneOf(this.dude.location.getGroundSpots().filter(pt => !this.dude.location.isOccupied(pt)))
+            ),
             goToLocation: (location) => this.simulateGoToLocation(location),
         }
 

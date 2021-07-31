@@ -24,10 +24,7 @@ export type QueuedEventData = {
 
 export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => void } = {
     [QueuedEventType.SIMULATE_NPCS]: () => {
-        LocationManager.instance.getLocations()
-                .filter(l => l !== LocationManager.instance.currentLocation)
-                .flatMap(l => Array.from(l.dudes))
-                .forEach(d => d.entity.getComponent(NPC).simulate())
+        LocationManager.instance.simulateLocations(false)
 
         EventQueue.instance.addEvent({
             type: QueuedEventType.SIMULATE_NPCS,

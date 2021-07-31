@@ -1,5 +1,6 @@
 import { Point } from "brigsby/dist/Point"
 import { WorldAudioContext } from "../audio/WorldAudioContext"
+import { NPC } from "../characters/NPC"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { LocationManagerSaveState } from "../saves/LocationManagerSaveState"
 import { Singletons } from "../Singletons"
@@ -70,5 +71,12 @@ export class LocationManager {
         return new Point(1, 1).times(this.exterior().size/2 * TILE_SIZE)
                 .plusX(TILE_SIZE * 2)
                 .plusY(-TILE_SIZE * 25)
+    }
+
+    simulateLocations(simulateCurrentLocation: boolean) {
+        this.getLocations()
+            .filter(l => simulateCurrentLocation || l !== this.currentLocation)
+            .flatMap(l => Array.from(l.dudes))
+            .forEach(d => d.entity.getComponent(NPC)?.simulate())
     }
 }

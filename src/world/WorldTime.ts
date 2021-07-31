@@ -6,6 +6,7 @@ import { TimeUnit } from "./TimeUnit"
 import { WorldAudioContext } from "../audio/WorldAudioContext"
 import { saveManager } from "../SaveManager"
 import { Singletons } from "../Singletons"
+import { LocationManager } from "./LocationManager"
 
 export class WorldTime extends Component {
 
@@ -38,7 +39,7 @@ export class WorldTime extends Component {
         this._time += duration
         console.log(`fast forwarding time to ${this.clockTime()}`)
 
-        // TODO simulate world/NPCs?
+        LocationManager.instance.simulateLocations(true)
     }
 
     getEntity(): Entity {

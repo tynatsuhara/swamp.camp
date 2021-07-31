@@ -5,7 +5,6 @@ import { PointAudio } from "../audio/PointAudio"
 import { Sounds } from "../audio/Sounds"
 import { Dude } from "../characters/Dude"
 import { DudeFactory, DudeType } from "../characters/DudeFactory"
-import { NPC } from "../characters/NPC"
 import { Player } from "../characters/Player"
 import { Lantern } from "../characters/weapons/Lantern"
 import { ShieldType } from "../characters/weapons/ShieldType"
@@ -298,9 +297,6 @@ export class WorldLocation {
     
             // actually set the location
             LocationManager.instance.currentLocation = linkedLocation
-    
-            // fast-forward NPCs along their schedule
-            linkedLocation.dudes.forEach(d => d.entity.getComponent(NPC)?.simulate())
 
             // delete existing particles
             Particles.instance.clear()
