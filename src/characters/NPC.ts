@@ -403,14 +403,14 @@ export class NPC extends Component {
             const pos = this.dude.standingPosition
             this.dude.move(updateData, pt.minus(this.dude.standingPosition), facingOverride, speedMultiplier)
             if (!this.dude.standingPosition.equals(pos)) {
-                this.lastMovePos = new Date().getMilliseconds()
+                this.lastMoveTime = new Date().getMilliseconds()
             }
         }
         return isCloseEnough
     }
 
-    private lastMovePos: number 
-    private stuck() { return new Date().getMilliseconds() - this.lastMovePos > 1000 }
+    private lastMoveTime: number 
+    private stuck() { return new Date().getMilliseconds() - this.lastMoveTime > 1000 }
 
     private isCloseEnoughToStopWalking(pt: Point) {
         return this.dude.standingPosition.distanceTo(pt) < 8
