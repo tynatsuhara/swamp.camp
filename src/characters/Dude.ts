@@ -365,7 +365,7 @@ export class Dude extends Component implements DialogueSource {
 
         if ((direction.x < 0 && facingOverride === 0) || facingOverride < 0) {
             this.animation.transform.mirrorX = true
-        } else if ((direction.y > 0 && facingOverride === 0) || facingOverride > 0) {
+        } else if ((direction.x > 0 && facingOverride === 0) || facingOverride > 0) {
             this.animation.transform.mirrorX = false
         }
         
