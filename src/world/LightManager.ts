@@ -47,15 +47,26 @@ export class LightManager extends Component {
     /**
     * returns true if it is dark enough for a demon to tolerate
     */
-    isDark = (pixelPt: Point) => this.isDarkHelper(pixelPt, 1)
-    isTotalDarkness = (pixelPt: Point) => this.isDarkHelper(pixelPt, DarknessMask.VISIBILITY_MULTIPLIER)
+    isDark = (
+        pixelPt: Point, 
+        location: WorldLocation = LocationManager.instance.currentLocation
+    ) => this.isDarkHelper(pixelPt, location, 1)
+
+    isTotalDarkness = (
+        pixelPt: Point, 
+        location: WorldLocation = LocationManager.instance.currentLocation
+    ) => this.isDarkHelper(pixelPt, location, DarknessMask.VISIBILITY_MULTIPLIER)
  
-    private isDarkHelper(pixelPt: Point, tolerableDistanceFromLightMultiplier: number): boolean {
+    private isDarkHelper(
+        pixelPt: Point, 
+        location: WorldLocation, 
+        tolerableDistanceFromLightMultiplier: number)
+    : boolean {
         const time = WorldTime.instance.time % TimeUnit.DAY
         if (time >= DarknessMask.SUNRISE_START && time < DarknessMask.SUNSET_END) {
             return false  // daytime
         }
-        const locationLightMap = this.lightTiles.get(LocationManager.instance.currentLocation)
+        const locationLightMap = this.lightTiles.get(location)
         if (!locationLightMap) {
             return true  // nighttime with no lights
         }
