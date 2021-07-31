@@ -1,6 +1,6 @@
 import { DudeFactory, DudeType } from "../../characters/DudeFactory"
 import { LocationManager } from "../LocationManager"
-import { NPCSchedules } from "../../characters/NPCSchedule"
+import { NPCSchedules } from "../../characters/ai/NPCSchedule"
 import { NPC } from "../../characters/NPC"
 import { TILE_SIZE, pixelPtToTilePt } from "../../graphics/Tilesets"
 import { EventQueue } from "./EventQueue"
@@ -52,7 +52,7 @@ export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => 
         }
 
         const npc = berto.entity.getComponent(NPC)
-        const sched = data.oldSchedule || npc.getSchedule()
+        const sched = data.oldSchedule || npc.getScheduledTask()
         npc.setSchedule(NPCSchedules.newGoToSchedule(pixelPtToTilePt(goalPosition)))
 
         // check repeatedly until he's at the goal

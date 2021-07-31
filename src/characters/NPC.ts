@@ -15,8 +15,11 @@ import { TimeUnit } from "../world/TimeUnit"
 import { WorldLocation } from "../world/WorldLocation"
 import { WorldTime } from "../world/WorldTime"
 import { Dude } from "./Dude"
-import { NPCSchedule, NPCSchedules, NPCScheduleType } from "./NPCSchedule"
+import { NPCSchedule, NPCSchedules, NPCScheduleType } from "./ai/NPCSchedule"
 import { Player } from "./Player"
+import { NPCTaskContext } from "./ai/NPCTaskContext"
+import { NPCTaskFactory } from "./ai/NPCTaskFactory"
+import { NPCTask } from "./ai/NPCTask"
 
 /**
  * Shared logic for different types of NPCs. These should be invoked by an NPC controller component.
@@ -95,77 +98,53 @@ export class NPC extends Component {
     }
 
     private doNormalScheduledActivity(updateData: UpdateData) {
-        const schedule = this.getSchedule()
+        const task = this.getScheduledTask()
 
-        // TODO: add support for "pausing" during roaming
-        
-        if (schedule.type === NPCScheduleType.DO_NOTHING) {
-            this.dude.move(updateData, Point.ZERO)
-        } else if (schedule.type === NPCScheduleType.GO_TO_SPOT) {
-            this.walkTo(
-                Point.fromString(schedule["p"]), 
-                updateData
-            )
-        } else if (schedule.type === NPCScheduleType.ROAM) {
-            this.doRoam(updateData, 0.5)
-        } else if (schedule.type === NPCScheduleType.ROAM_IN_DARKNESS) {
-            this.doRoam(
-                updateData, 
-                LightManager.instance.isDark(this.dude.standingPosition) ? 0.5 : 1,
-                {
-                    ptSelectionFilter: (pt) => LightManager.instance.isDark(pt.times(TILE_SIZE))
-                }
-            )
-        } else if (schedule.type === NPCScheduleType.DEFAULT_VILLAGER) {
-            let goalLocation: WorldLocation
-            if (this.timeOfDay > NPCSchedules.VILLAGER_WAKE_UP_TIME 
-                && this.timeOfDay < NPCSchedules.VILLAGER_GO_HOME_TIME) {
-                // Are you feeling zen? If not, a staycation is what I recommend. 
-                // Or better yet, don't be a jerk. Unwind by being a man... and goin' to work.
-                goalLocation = LocationManager.instance.exterior()
-            } else {
-                // Go home!
-                const home = this.findHomeLocation()
-                if (!home) {
-                    // homeless behavior
-                    this.doRoam(updateData, 0.5)
-                    return
-                }
-                goalLocation = home
+        if (task) {
+            const context: NPCTaskContext = {
+                dude: this.dude,
+                walkTo: (pt) => this.walkTo(pt, updateData),
+                roam: (speed, options) => this.doRoam(updateData, speed, options),
+                goToLocation: (location) => this.goToLocation(updateData, location),  // TODO
             }
-            if (this.dude.location === goalLocation) {
-                this.doRoam(updateData, 0.5, { 
-                    pauseEveryMillis: 2500 + 2500 * Math.random(),
-                    pauseForMillis: 2500 + 5000 * Math.random(),
-                })
-            } else {
-                this.findTeleporter(goalLocation.uuid)
-                this.goToTeleporter(updateData, 0.5)
-            }
+            task.performTask(context)
         } else {
-            throw new Error("unimplemented schedule type")
+            // Stand still and do nothing by default
+            this.dude.move(updateData, Point.ZERO)
         }
     }
 
     static SCHEDULE_FREQUENCY = 10 * TimeUnit.MINUTE
 
+    // TODO: Should this take some time variable to determine how long the simulation is?
     simulate() {
         this.clearExistingAIState()
-        const schedule = this.getSchedule()
+
+        const task = this.getScheduledTask()
         
-        if (schedule.type === NPCScheduleType.GO_TO_SPOT) {
-            this.forceMoveToTilePosition(Point.fromString(schedule["p"]))
-        } else if (schedule.type === NPCScheduleType.DEFAULT_VILLAGER) {
-            const home = this.findHomeLocation()
-            if (this.timeOfDay > NPCSchedules.VILLAGER_WAKE_UP_TIME 
-                && this.timeOfDay < NPCSchedules.VILLAGER_GO_HOME_TIME) {
-                if (this.dude.location !== LocationManager.instance.exterior()) {
-                    this.useTeleporter(home.getTeleporter(LocationManager.instance.exterior().uuid))
-                }
-            } else if (home && this.dude.location !== home) {
-                this.useTeleporter(LocationManager.instance.exterior().getTeleporter(home.uuid))
-            }
+        // TODO improve simulation implementations
+        const context: NPCTaskContext = {
+            dude: this.dude,
+            walkTo: (pt) => this.forceMoveToTilePosition(pt),
+            roam: () => {},
+            goToLocation: (location) => this.simulateGoToLocation(location),
         }
+
+        task?.performTask(context)
+        
+        // if (schedule.type === NPCScheduleType.GO_TO_SPOT) {
+        //     this.forceMoveToTilePosition(Point.fromString(schedule["p"]))
+        // } else if (schedule.type === NPCScheduleType.DEFAULT_VILLAGER) {
+        //     const home = this.findHomeLocation()
+        //     if (this.timeOfDay > NPCSchedules.VILLAGER_WAKE_UP_TIME 
+        //         && this.timeOfDay < NPCSchedules.VILLAGER_GO_HOME_TIME) {
+        //         if (this.dude.location !== LocationManager.instance.exterior()) {
+        //             this.useTeleporter(home.getTeleporter(LocationManager.instance.exterior().uuid))
+        //         }
+        //     } else if (home && this.dude.location !== home) {
+        //         this.useTeleporter(LocationManager.instance.exterior().getTeleporter(home.uuid))
+        //     }
+        // }
     }
 
     setSchedule(schedule: NPCSchedule) {
@@ -173,12 +152,12 @@ export class NPC extends Component {
         this.clearExistingAIState()
     }
 
-    getSchedule(): NPCSchedule {
+    getScheduledTask(): NPCTask {
         const schedule: NPCSchedule = this.dude.blob[NPCSchedules.SCHEDULE_KEY]
         if (!schedule) {
             throw new Error(`NPCs must have a "${NPCSchedules.SCHEDULE_KEY}" field in the blob. It's possible it got overwritten.`)
         }
-        return schedule
+        return NPCTaskFactory.fromSchedule(schedule)
     }
 
     private clearExistingAIState() {
@@ -474,6 +453,27 @@ export class NPC extends Component {
                 .slice(1)  // slice(1) because we don't need the start in the path
     }
 
+    private goToLocation(updateData: UpdateData, goalLocation: WorldLocation) {
+        const nextLocation = this.getNextLocation(goalLocation)
+        this.findTeleporter(nextLocation.uuid)
+        this.goToTeleporter(updateData, 0.5)
+    }
+
+    private simulateGoToLocation(goalLocation: WorldLocation) {
+        const nextLocation = this.getNextLocation(goalLocation)
+        this.useTeleporter(this.dude.location.getTeleporter(nextLocation.uuid))
+    }
+
+    private getNextLocation(goalLocation: WorldLocation) {
+        // For now, we're lazy about this and assume every linked location is 
+        // at most 1 off from the exterior, so we can avoid doing pathfinding
+        if (this.dude.location === LocationManager.instance.exterior()) {
+            return goalLocation
+        } else {
+            return LocationManager.instance.exterior()
+        }
+    }
+
     private teleporterTarget: Teleporter
     private findTeleporter(uuid: string) {
         if (this.teleporterTarget?.to !== uuid) {
@@ -495,17 +495,6 @@ export class NPC extends Component {
         this.dude.location.npcUseTeleporter(this.dude, teleporter)
         this.clearExistingAIState()
     }
-
-    private findHomeLocation() {
-        const houses = LocationManager.instance.exterior().getElementsOfType(ElementType.HOUSE)
-                .map(el => el.entity.getComponent(House))
-                .filter(house => house.getResident() === this.dude.uuid)
-
-        if (houses.length > 0) {
-            return LocationManager.instance.get(houses[0].locationUUID)
-        }
-    }
-
     private tilePtToStandingPos(tilePt: Point) {
         const ptOffset = new Point(.5, .8)
         return tilePt.plus(ptOffset).times(TILE_SIZE)

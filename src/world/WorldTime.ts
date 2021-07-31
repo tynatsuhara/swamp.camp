@@ -37,6 +37,8 @@ export class WorldTime extends Component {
     fastForward(duration: number) {
         this._time += duration
         console.log(`fast forwarding time to ${this.clockTime()}`)
+
+        // TODO simulate world/NPCs?
     }
 
     getEntity(): Entity {

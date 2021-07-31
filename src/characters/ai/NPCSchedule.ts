@@ -1,5 +1,5 @@
 import { Point } from "brigsby/dist/Point"
-import { TimeUnit } from "../world/TimeUnit"
+import { TimeUnit } from "../../world/TimeUnit"
 
 export enum NPCScheduleType {
     DO_NOTHING,
