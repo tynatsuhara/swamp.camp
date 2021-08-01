@@ -86,7 +86,7 @@ export class DroppedItem extends Component {
                             LocationManager.instance.currentLocation.droppedItems.delete(this.entity)
                             this.entity.selfDestruct()
                             setTimeout(() => {
-                                Sounds.play(Lists.oneOf(PICK_UP_SOUNDS), .2)
+                                Sounds.play(Lists.oneOf(PICK_UP_SOUNDS), .15)
                             }, Math.random() * 350);
                             return
                         }
