@@ -4,9 +4,9 @@
   "description": "SWAMP CAMP",
   "scripts": {
     "clean": "rm static/app.js",
-    "start": "NODE_ENV=development webpack serve",
-    "build": "NODE_ENV=development webpack",
-    "build:prod": "NODE_ENV=production webpack"
+    "start": "webpack serve --mode=development",
+    "build": "webpack --mode=development",
+    "build:prod": "webpack --mode=production"
   },
   "repository": {
     "type": "git",
