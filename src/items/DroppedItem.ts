@@ -7,6 +7,11 @@ import { Player } from "../characters/Player"
 import { LocationManager } from "../world/LocationManager"
 import { Item, ITEM_METADATA_MAP } from "./Items"
 import { saveManager } from "../SaveManager"
+import { assets } from "brigsby/dist/Assets"
+import { Sounds } from "../audio/Sounds"
+import { Lists } from "brigsby/dist/util/Lists"
+
+const PICK_UP_SOUNDS = Lists.range(0, 4).map(i => `audio/impact/impactWood_medium_00${i}.ogg`)
 
 export class DroppedItem extends Component {
 
@@ -23,6 +28,9 @@ export class DroppedItem extends Component {
      */
     constructor(position: Point, item: Item, velocity: Point, sourceCollider: Collider = null) {
         super()
+
+        assets.loadAudioFiles(PICK_UP_SOUNDS)
+
         this.itemType = item
         this.start = () => {
             this.sprite = this.entity.addComponent(ITEM_METADATA_MAP[item].droppedIconSupplier().toComponent())
@@ -77,6 +85,9 @@ export class DroppedItem extends Component {
                         if (this.itemType === Item.COIN || Player.instance.dude.inventory.addItem(this.itemType)) {
                             LocationManager.instance.currentLocation.droppedItems.delete(this.entity)
                             this.entity.selfDestruct()
+                            setTimeout(() => {
+                                Sounds.play(Lists.oneOf(PICK_UP_SOUNDS), .2)
+                            }, Math.random() * 350);
                             return
                         }
                         
