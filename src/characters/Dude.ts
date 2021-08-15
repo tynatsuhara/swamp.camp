@@ -149,6 +149,8 @@ export class Dude extends Component implements DialogueSource {
                 Point.ZERO,
                 () => !UIStateManager.instance.isMenuOpen && !!this.dialogue && this.entity.getComponent(NPC)?.canTalk()
             ))
+
+            StepSounds.startFootstepSoundLoop(this)
         }
 
         this.start = () => {

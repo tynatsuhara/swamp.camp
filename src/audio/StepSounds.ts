@@ -1,10 +1,14 @@
 import { assets } from "brigsby/dist/Assets"
 import { Lists } from "brigsby/dist/util/Lists"
+import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
+import { Dude } from "../characters/Dude"
 import { Player } from "../characters/Player"
 import { pixelPtToTilePt } from "../graphics/Tilesets"
 import { Settings } from "../Settings"
 import { GroundType } from "../world/ground/Ground"
 import { LocationManager } from "../world/LocationManager"
+
+const FOOTSTEP_SOUND_DISTANCE = 160
 
 export class StepSounds {
 
@@ -24,7 +28,7 @@ export class StepSounds {
     private static readonly WATER_3 = "audio/steps/wave_03.flac"
     private static readonly WATER_4 = "audio/steps/wave_04.flac"
 
-    static startFootstepSoundLoop = () => {
+    static startFootstepSoundLoop = (dude: Dude) => {
         assets.loadAudioFiles([ 
             StepSounds.GRAVEL, 
             StepSounds.LEAVES_1, 
@@ -38,7 +42,17 @@ export class StepSounds {
             StepSounds.WATER_2,
             StepSounds.WATER_3,
             StepSounds.WATER_4,
-        ]).then(() => StepSounds.doFootstep())
+        ]).then(() => dude.entity.addComponent(new RepeatedInvoker(() => {
+            const player = Player.instance.dude
+            if (player) {
+                const distance = player.standingPosition.manhattanDistanceTo(dude.standingPosition)
+                if (dude?.isAlive && dude.isMoving && !dude.rolling() && distance <= FOOTSTEP_SOUND_DISTANCE) {
+                    const vol = distance === 1 ? 1 : FOOTSTEP_SOUND_DISTANCE/distance
+                    StepSounds.singleFootstepSound(vol)
+                }
+            }
+            return StepSounds.SPEED
+        })))
     }
     
     static singleFootstepSound(volumeMultiplier: number) {
@@ -51,17 +65,6 @@ export class StepSounds {
                 StepSounds.footstep.volume = Math.min(1, volume * volumeMultiplier * Settings.getSoundVolume())
             }
         }
-    }
-
-    private static doFootstep = () => {
-        const dude = Player.instance.dude
-        // TODO: Move to RepeatedInvoker
-        setTimeout(() => {
-            if (dude?.isAlive && dude.isMoving && !dude.rolling()) {
-                StepSounds.singleFootstepSound(1)
-            }
-            StepSounds.doFootstep()
-        }, StepSounds.SPEED);
     }
 
     private static getSound = (): [string, number] => {

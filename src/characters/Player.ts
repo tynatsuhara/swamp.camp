@@ -24,8 +24,6 @@ export class Player extends Component {
     constructor() {
         super()
         Player.instance = this
-
-        StepSounds.startFootstepSoundLoop()
     }
 
     awake() {
