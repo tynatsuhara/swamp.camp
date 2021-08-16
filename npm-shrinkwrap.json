@@ -8,7 +8,7 @@
       "name": "swamp.camp",
       "version": "1.0.0",
       "dependencies": {
-        "brigsby": "^0.3.0"
+        "brigsby": "^0.3.1"
       },
       "devDependencies": {
         "ts-loader": "^9.2.3",
@@ -779,9 +779,9 @@
       }
     },
     "node_modules/brigsby": {
-      "version": "0.3.0",
-      "resolved": "https://registry.npmjs.org/brigsby/-/brigsby-0.3.0.tgz",
-      "integrity": "sha512-r5cEMCww4hGjStyoyW6IKYGxzq9YLLKw5GQdHk+ElOWWglVSaTtezGHMT01ckbrB2CmUZyuSC89OKY5UN5U+dw=="
+      "version": "0.3.1",
+      "resolved": "https://registry.npmjs.org/brigsby/-/brigsby-0.3.1.tgz",
+      "integrity": "sha512-FcsmeX/WSoRaY+Ez7JzfbxDD4QAEIDnTlsGjBschkO3uZdZJDUMe0K0OQWgzVaVuk/C6mWJvF2GkRmvxjq7uPA=="
     },
     "node_modules/browserslist": {
       "version": "4.16.6",
@@ -905,6 +905,7 @@
         "anymatch": "^2.0.0",
         "async-each": "^1.0.1",
         "braces": "^2.3.2",
+        "fsevents": "^1.2.7",
         "glob-parent": "^3.1.0",
         "inherits": "^2.0.3",
         "is-binary-path": "^1.0.0",
@@ -6815,9 +6816,9 @@
       }
     },
     "brigsby": {
-      "version": "0.3.0",
-      "resolved": "https://registry.npmjs.org/brigsby/-/brigsby-0.3.0.tgz",
-      "integrity": "sha512-r5cEMCww4hGjStyoyW6IKYGxzq9YLLKw5GQdHk+ElOWWglVSaTtezGHMT01ckbrB2CmUZyuSC89OKY5UN5U+dw=="
+      "version": "0.3.1",
+      "resolved": "https://registry.npmjs.org/brigsby/-/brigsby-0.3.1.tgz",
+      "integrity": "sha512-FcsmeX/WSoRaY+Ez7JzfbxDD4QAEIDnTlsGjBschkO3uZdZJDUMe0K0OQWgzVaVuk/C6mWJvF2GkRmvxjq7uPA=="
     },
     "browserslist": {
       "version": "4.16.6",
