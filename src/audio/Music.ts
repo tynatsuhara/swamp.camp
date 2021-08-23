@@ -54,7 +54,7 @@ export class Music {
         // fade out at night
         const timeOfDay = ctx.time % TimeUnit.DAY
         const daytimeFadeInTime = DarknessMask.SUNRISE_START
-        const daytimeFadeOutTime = DarknessMask.SUNSET_START
+        const daytimeFadeOutTime = DarknessMask.SUNSET_END
 
         let music: AudioPlayer
 
