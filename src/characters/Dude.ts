@@ -508,11 +508,11 @@ export class Dude extends Component implements DialogueSource {
 
     // just a stepping dodge instead of a roll
     private dashRoll() {
-        StepSounds.singleFootstepSound(2)
+        StepSounds.singleFootstepSound(this, 2)
         this.isRolling = true;
         this.animation.goToAnimation(2)  
         setTimeout(() => {
-            StepSounds.singleFootstepSound(3)
+            StepSounds.singleFootstepSound(this, 3)
             this.isRolling = false
             this.animationDirty = true
         }, 200)

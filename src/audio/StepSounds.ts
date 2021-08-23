@@ -7,6 +7,7 @@ import { pixelPtToTilePt } from "../graphics/Tilesets"
 import { Settings } from "../Settings"
 import { GroundType } from "../world/ground/Ground"
 import { LocationManager } from "../world/LocationManager"
+import { Sounds } from "./Sounds"
 
 const FOOTSTEP_SOUND_DISTANCE = 160
 
@@ -47,28 +48,23 @@ export class StepSounds {
             if (player) {
                 const distance = player.standingPosition.manhattanDistanceTo(dude.standingPosition)
                 if (dude?.isAlive && dude.isMoving && !dude.rolling() && distance <= FOOTSTEP_SOUND_DISTANCE) {
-                    const vol = distance === 1 ? 1 : FOOTSTEP_SOUND_DISTANCE/distance
-                    StepSounds.singleFootstepSound(vol)
+                    const vol = Math.max(0, (FOOTSTEP_SOUND_DISTANCE-distance)/FOOTSTEP_SOUND_DISTANCE)
+                    StepSounds.singleFootstepSound(dude, vol)
                 }
             }
             return StepSounds.SPEED
         })))
     }
     
-    static singleFootstepSound(volumeMultiplier: number) {
-        const [sound, volume] = StepSounds.getSound()
+    static singleFootstepSound(dude: Dude, volumeMultiplier: number) {
+        const [sound, volume] = StepSounds.getSound(dude)
         if (!!sound) {
-            // TODO: We could probably make this a bit less laggy by pre-loading
-            StepSounds.footstep = assets.getAudioByFileName(sound)
-            StepSounds.footstep.oncanplaythrough = () => {
-                StepSounds.footstep.play()
-                StepSounds.footstep.volume = Math.min(1, volume * volumeMultiplier * Settings.getSoundVolume())
-            }
+            Sounds.play(sound, volume * volumeMultiplier)
         }
     }
 
-    private static getSound = (): [string, number] => {
-        const ground = LocationManager.instance.currentLocation.getGround(pixelPtToTilePt(Player.instance.dude.standingPosition))
+    private static getSound = (dude: Dude): [string, number] => {
+        const ground = LocationManager.instance.currentLocation.getGround(pixelPtToTilePt(dude.standingPosition))
         if (!ground) {
             return [undefined, 0]
         }

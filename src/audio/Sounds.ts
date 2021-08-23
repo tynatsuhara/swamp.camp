@@ -14,7 +14,7 @@ export class Sounds {
             return
         }
         
-        audio.volume = Settings.getSoundVolume() * volume
+        audio.volume = Math.min(1, Settings.getSoundVolume() * volume)
         audio.play()
     }
 }
