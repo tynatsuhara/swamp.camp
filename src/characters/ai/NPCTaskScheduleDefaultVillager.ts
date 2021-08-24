@@ -1,3 +1,4 @@
+import { Lists } from "brigsby/dist/util/Lists"
 import { ElementType } from "../../world/elements/Elements"
 import { House } from "../../world/elements/House"
 import { LocationManager } from "../../world/LocationManager"
@@ -23,19 +24,16 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             && timeOfDay < NPCSchedules.VILLAGER_GO_HOME_TIME) {
             // Are you feeling zen? If not, a staycation is what I recommend. 
             // Or better yet, don't be a jerk. Unwind by being a man... and goin' to work.
-            goalLocation = LocationManager.instance.exterior()
+            goalLocation = this.findWorkLocation()
+            if (!goalLocation) {
+                console.log("couldnt find work")
+            }
         } else {
             // Go home!
-            const home = this.findHomeLocation(context.dude)
-            if (!home) {
-                // homeless behavior
-                context.roam(0.5)
-                return
-            }
-            goalLocation = home
+            goalLocation = this.findHomeLocation(context.dude)
         }
 
-        if (context.dude.location === goalLocation) {
+        if (!goalLocation || context.dude.location === goalLocation) {
             context.roam(0.5, { 
                 pauseEveryMillis: 2500 + 2500 * Math.random(),
                 pauseForMillis: 2500 + 5000 * Math.random(),
@@ -53,5 +51,17 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         if (houses.length > 0) {
             return LocationManager.instance.get(houses[0].locationUUID)
         }
+    }
+
+    private findWorkLocation() {
+        const mines = LocationManager.instance.exterior()
+                .getElementsOfType(ElementType.MINE_ENTRANCE)
+                .map(el => el.save()['destinationUUID'])
+                
+        if (mines.length === 0) {
+            return null
+        }
+
+        return LocationManager.instance.get(mines[0])
     }
 }
