@@ -125,7 +125,7 @@ class SaveManager {
             return true
         }
         try {
-            return JSON.parse(save)["version"] === CURRENT_SAVE_FORMAT_VERSION
+            return JSON.parse(save).version === CURRENT_SAVE_FORMAT_VERSION
         } catch (e) {
             return false
         }

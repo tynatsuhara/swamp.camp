@@ -29,13 +29,13 @@ export class RockFactory extends ElementFactory {
         assets.loadAudioFiles(MINING_AUDIO)
     }
 
-    make(wl: WorldLocation, pos: Point, data: object): ElementComponent {
+    make(wl: WorldLocation, pos: Point, data: any): ElementComponent {
         const e = new Entity()
-        const variation = data["v"] ?? (Math.floor(Math.random() * 3) + 1)
-        const mossy = data["m"] ?? (Math.random() > .7)
-        const flipped = data["f"] ?? (Math.random() > .5)
+        const variation = data.v ?? (Math.floor(Math.random() * 3) + 1)
+        const mossy = data.m ?? (Math.random() > .7)
+        const flipped = data.f ?? (Math.random() > .5)
         const maxResourcesCount = 6
-        const availableResources = data["a"] ?? maxResourcesCount
+        const availableResources = data.a ?? maxResourcesCount
 
         const tile = e.addComponent(new SpriteComponent(
             Tilesets.instance.outdoorTiles.getTileSource(`rock${variation}${mossy ? 'mossy' : ''}`), 

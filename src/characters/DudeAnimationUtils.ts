@@ -4,13 +4,13 @@ import { Tilesets } from "../graphics/Tilesets"
 import { Color } from "../ui/Color"
 import { saveManager } from "../SaveManager"
 
-const maybeFilter = (characterAnimName: string, blob: object, anim: SpriteAnimation) => {
+const maybeFilter = (characterAnimName: string, blob: any, anim: SpriteAnimation) => {
     if (!anim) {
         throw new Error(`no animation found for "${characterAnimName}"`)
     }
 
     if (characterAnimName === "knight_f") {
-        const color = blob["color"] || saveManager.getState().plume
+        const color = blob.color || saveManager.getState().plume
         if (!!color) {
             return anim
                 .filtered(ImageFilters.recolor(Color.PINK, color[0]))

@@ -21,11 +21,11 @@ export class HouseFactory extends BuildingFactory {
     readonly type = ElementType.HOUSE
     readonly dimensions = new Point(5, 4)
 
-    make(wl: WorldLocation, pos: Point, data: object): ElementComponent {    
+    make(wl: WorldLocation, pos: Point, data: any): ElementComponent {    
         const e = new Entity()
 
         // the interior location UUID
-        const destinationUUID: string = data["destinationUUID"] ?? makeHouseInterior(wl).uuid
+        const destinationUUID: string = data.destinationUUID ?? makeHouseInterior(wl).uuid
 
         const interactablePos = pos.plus(new Point(2.5, 3)).times(TILE_SIZE)
         const doorId = TeleporterPrefix.DOOR 

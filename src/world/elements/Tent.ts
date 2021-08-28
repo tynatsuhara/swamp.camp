@@ -23,11 +23,11 @@ export class TentFactory extends BuildingFactory {
     readonly type = ElementType.TENT
     readonly dimensions = new Point(4, 3)
 
-    make(wl: WorldLocation, pos: Point, data: object): ElementComponent {
+    make(wl: WorldLocation, pos: Point, data: any): ElementComponent {
         const e = new Entity()
 
-        const color: TentColor = data["color"] ?? TentColor.BLUE
-        const destinationUUID: string = data["destinationUUID"] ?? makeTentInterior(wl, color).uuid
+        const color: TentColor = data.color ?? TentColor.BLUE
+        const destinationUUID: string = data.destinationUUID ?? makeTentInterior(wl, color).uuid
 
         const interactablePos = pos.plus(new Point(2, 2)).times(TILE_SIZE)
         const doorId = TeleporterPrefix.TENT

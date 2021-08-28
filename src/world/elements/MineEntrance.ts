@@ -19,13 +19,13 @@ export class MineEntranceFactory extends BuildingFactory {
     readonly type = ElementType.MINE_ENTRANCE
     readonly dimensions = new Point(1, 1)
 
-    make(wl: WorldLocation, pos: Point, data: object): ElementComponent {    
+    make(wl: WorldLocation, pos: Point, data: any): ElementComponent {    
         const e = new Entity()
         const pixelPt = pos.times(TILE_SIZE)
 
         // the interior location UUID
         // TODO add mine interior
-        const destinationUUID: string = data["destinationUUID"] ?? makeMineInterior(wl).uuid
+        const destinationUUID: string = data.destinationUUID ?? makeMineInterior(wl).uuid
         
         // Render hole
         e.addComponent(new SpriteComponent(

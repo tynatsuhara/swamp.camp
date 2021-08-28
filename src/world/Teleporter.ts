@@ -53,16 +53,16 @@ export class TeleporterFactory extends ElementFactory {
     readonly type = ElementType.TELEPORTER
     readonly dimensions = new Point(1, 1)
 
-    make(wl: WorldLocation, pos: Point, data: object): ElementComponent {
+    make(wl: WorldLocation, pos: Point, data: any): ElementComponent {
         const e = new Entity()
 
-        const destinationUUID = data["to"]
-        const i = data["i"]  // the position for the interactable
+        const destinationUUID = data.to
+        const i = data.i  // the position for the interactable
         if (!destinationUUID || !i) {
             throw new Error("teleporter element must have 'to' and 'i' parameters")
         }
         const interactPos = Point.fromString(i)
-        const id = data["id"]
+        const id = data.id
 
         const interactComponent = e.addComponent(new Interactable(
             interactPos, 

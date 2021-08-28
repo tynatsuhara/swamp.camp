@@ -22,7 +22,7 @@ export class SavedGround {
 export type MakeGroundFuncData = {
     wl: WorldLocation,
     pos: Point,
-    data: object,
+    data: any,
 }
 
 /**

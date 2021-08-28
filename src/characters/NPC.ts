@@ -133,20 +133,6 @@ export class NPC extends Component {
         }
 
         task?.performTask(context)
-        
-        // if (schedule.type === NPCScheduleType.GO_TO_SPOT) {
-        //     this.forceMoveToTilePosition(Point.fromString(schedule["p"]))
-        // } else if (schedule.type === NPCScheduleType.DEFAULT_VILLAGER) {
-        //     const home = this.findHomeLocation()
-        //     if (this.timeOfDay > NPCSchedules.VILLAGER_WAKE_UP_TIME 
-        //         && this.timeOfDay < NPCSchedules.VILLAGER_GO_HOME_TIME) {
-        //         if (this.dude.location !== LocationManager.instance.exterior()) {
-        //             this.useTeleporter(home.getTeleporter(LocationManager.instance.exterior().uuid))
-        //         }
-        //     } else if (home && this.dude.location !== home) {
-        //         this.useTeleporter(LocationManager.instance.exterior().getTeleporter(home.uuid))
-        //     }
-        // }
     }
 
     setSchedule(schedule: NPCSchedule) {

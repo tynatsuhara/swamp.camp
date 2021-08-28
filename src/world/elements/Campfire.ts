@@ -29,7 +29,7 @@ export class CampfireFactory extends ElementFactory {
     readonly type = ElementType.CAMPFIRE
     readonly dimensions = new Point(1, 1)
 
-    make(wl: WorldLocation, pos: Point, data: object): ElementComponent {
+    make(wl: WorldLocation, pos: Point, data: any): ElementComponent {
         const e = new Entity()
         const scaledPos = pos.times(TILE_SIZE)
         const depth = scaledPos.y + TILE_SIZE - 10
@@ -52,8 +52,8 @@ export class CampfireFactory extends ElementFactory {
             new Point(TILE_SIZE, TILE_SIZE).minus(offset)
         ))
 
-        const logsOnFire = data["logs"] ?? 0
-        const lastLogConsumedTime = data["llct"] ?? 0
+        const logsOnFire = data.logs ?? 0
+        const lastLogConsumedTime = data.llct ?? 0
 
         const pixelCenterPos = scaledPos.plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
 

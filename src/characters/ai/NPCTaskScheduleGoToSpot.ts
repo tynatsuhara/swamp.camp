@@ -9,7 +9,7 @@ export class NPCTaskScheduleGoToSpot extends NPCTask {
 
     constructor(schedule: NPCSchedule) {
         super()
-        this.pt = Point.fromString(schedule["p"])
+        this.pt = Point.fromString(schedule.p)
     }
 
     performTask(context: NPCTaskContext) {

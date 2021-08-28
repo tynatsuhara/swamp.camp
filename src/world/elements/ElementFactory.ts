@@ -20,7 +20,7 @@ export abstract class ElementFactory {
      * @param data Previous save data
      * @returns An ElementComponent with the factory's type, which MUST have a nonnull entity
      */
-    abstract make(wl: WorldLocation, pos: Point, data: object): ElementComponent
+    abstract make(wl: WorldLocation, pos: Point, data: any): ElementComponent
 
     /**
      * @param wl The location in which the user is trying to place an element
