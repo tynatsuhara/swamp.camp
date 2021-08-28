@@ -46,7 +46,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
     private findHomeLocation(dude: Dude) {
         const houses = LocationManager.instance.exterior().getElementsOfType(ElementType.HOUSE)
                 .map(el => el.entity.getComponent(House))
-                .filter(house => house.getResident() === dude.uuid)
+                .filter(house => house.isHomeOf(dude.uuid))
 
         if (houses.length > 0) {
             return LocationManager.instance.get(houses[0].locationUUID)

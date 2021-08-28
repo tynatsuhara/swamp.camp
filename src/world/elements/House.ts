@@ -74,9 +74,17 @@ export class HouseFactory extends BuildingFactory {
             new Point(0, -TILE_SIZE*1.4)
         ))
 
-        const resident = data[RESIDENT_ATTRIBUTE]
-        const house = e.addComponent(new House(destinationUUID))
-        house.setResident(resident)
+        // parse residents as string or array for backwards compatibility
+        let residents: string[]
+        if (!data[RESIDENT_ATTRIBUTE]) {
+            residents = []
+        } else if (typeof data[RESIDENT_ATTRIBUTE] === "string") {
+            residents = [data[RESIDENT_ATTRIBUTE]]
+        } else {
+            residents = data[RESIDENT_ATTRIBUTE]
+        }
+
+        const house = e.addComponent(new House(1, destinationUUID, residents))
 
         return e.addComponent(new ElementComponent(
             ElementType.HOUSE, 
@@ -84,7 +92,8 @@ export class HouseFactory extends BuildingFactory {
             this.getOccupiedPoints(pos),
             () => ({
                 destinationUUID,
-                [RESIDENT_ATTRIBUTE]: house.getResident()
+                // store rez as string for backwards compatibility
+                [RESIDENT_ATTRIBUTE]: house.getResidents()
             })
         ))
     }
@@ -97,37 +106,42 @@ export class HouseFactory extends BuildingFactory {
 export class House extends Component {
     private static readonly PENDING_RESIDENT = "pending"
 
+    readonly capacity: number
     readonly locationUUID: string
 
-    // TODO: Probably support multiple residents
-    private resident: string
+    private residents: string[]
 
-    constructor(locationUUID: string) {
+    constructor(capacity: number, locationUUID: string, residents: string[]) {
         super()
+        this.capacity = capacity
         this.locationUUID = locationUUID
+        this.residents = residents
     }
 
-    hasResident() {
-        return !!this.resident
-    }
+    getResidents = () => this.residents
 
-    isResidentPending() {
-        return this.resident === House.PENDING_RESIDENT
-    }
+    hasCapacity = () => this.residents.length < this.capacity
+
+    isResidentPending = () => this.residents.includes(House.PENDING_RESIDENT)
+
+    isHomeOf = (uuid: string) => this.residents.includes(uuid)
 
     setResidentPending() {
-        this.resident = House.PENDING_RESIDENT
+        if (!this.hasCapacity) {
+            throw new Error("can't set a pending resident if capacity is met")
+        }
+        this.residents.push(House.PENDING_RESIDENT)
     }
 
-    setResident(uuid: string) {
-        this.resident = uuid
+    claimPendingSlot(uuid: string) {
+        const i = this.residents.indexOf(House.PENDING_RESIDENT)
+        if (i < 0 && this.residents.length === this.capacity) {
+            throw new Error("no room! no room!")
+        }
+        this.residents[i] = uuid
     }
 
     evictResident(uuid: string) {
-        this.resident = null
-    }
-
-    getResident() {
-        return this.resident
+        this.residents = this.residents.filter(r => r !== uuid)
     }
 }

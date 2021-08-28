@@ -75,7 +75,7 @@ export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => 
 
         const berto = LocationManager.instance.exterior().getDude(DudeType.HERALD)
         if (!berto) {
-            return
+            throw new Error("berto should exist")
         }
 
         berto.entity.getComponent(NPC).setSchedule(data.normalSchedule)
@@ -89,6 +89,6 @@ export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => 
         const house = LocationManager.instance.exterior().getElementsOfType(ElementType.HOUSE)
                 .map(e => e.entity.getComponent(House))
                 .filter(house => house.isResidentPending())[0]
-        house?.setResident(villager.uuid)
+        house?.claimPendingSlot(villager.uuid)
     },
 }

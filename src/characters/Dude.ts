@@ -276,7 +276,7 @@ export class Dude extends Component implements DialogueSource {
             // If they have a home, mark it as vacant
             this.location.getElements()
                     .map(e => e.entity.getComponent(House))
-                    .filter(c => c?.getResident() === this.uuid)
+                    .filter(c => c?.isHomeOf(this.uuid))
                     .forEach(home => home.evictResident(this.uuid))
 
             NotificationDisplay.instance.push({ 

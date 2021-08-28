@@ -72,7 +72,7 @@ export const BERTO_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
         new DialogueOption("Bring me a criminal.", () => {
             const openHouses = LocationManager.instance.currentLocation.getElementsOfType(ElementType.HOUSE)
                     .map(e => e.entity.getComponent(House))
-                    .filter(house => !house.hasResident())
+                    .filter(house => house.hasCapacity())
 
             if (openHouses.length === 0) {
                 return new NextDialogue(BERT_VILLAGER_NEEDS_HOUSE, true)
