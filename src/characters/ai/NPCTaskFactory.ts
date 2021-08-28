@@ -18,7 +18,7 @@ export class NPCTaskFactory {
             case NPCScheduleType.DEFAULT_VILLAGER:
                 return new NPCTaskScheduleDefaultVillager(schedule)
             default:
-                throw new Error(`unimplemented schedule type ${schedule.type}`)
+                throw new Error(`invalid schedule: ${JSON.stringify(schedule)}`)
         }
     }
 }

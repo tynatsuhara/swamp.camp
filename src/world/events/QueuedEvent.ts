@@ -49,7 +49,8 @@ export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => 
         }
 
         const npc = berto.entity.getComponent(NPC)
-        const sched = data.oldSchedule || npc.getScheduledTask()
+        const normalSchedule = data.oldSchedule || npc.getSchedule()
+        console.log(JSON.stringify(normalSchedule))
         npc.setSchedule(NPCSchedules.newGoToSchedule(pixelPtToTilePt(goalPosition)))
 
         // check repeatedly until he's at the goal
@@ -58,14 +59,14 @@ export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => 
             EventQueue.instance.addEvent({
                 type: QueuedEventType.HERALD_DEPARTURE,
                 time: WorldTime.instance.future({ minutes: 2 }),
-                oldSchedule: sched
+                oldSchedule: normalSchedule
             })
         } else {
             console.log("we've arrived!")
             EventQueue.instance.addEvent({
                 type: QueuedEventType.HERALD_RETURN_WITH_NPC,
                 time: WorldTime.instance.future({ hours: 12 }),
-                normalSchedule: sched
+                normalSchedule
             })
         }
     },

@@ -42,7 +42,6 @@ export class NPC extends Component {
         return WorldTime.instance.time % TimeUnit.DAY
     }
 
-
     constructor(defaultSchedule: NPCSchedule = NPCSchedules.newNoOpSchedule()) {
         super()
 
@@ -140,12 +139,16 @@ export class NPC extends Component {
         this.clearExistingAIState()
     }
 
-    getScheduledTask(): NPCTask {
+    getSchedule(): NPCSchedule {
         const schedule: NPCSchedule = this.dude.blob[NPCSchedules.SCHEDULE_KEY]
         if (!schedule) {
             throw new Error(`NPCs must have a "${NPCSchedules.SCHEDULE_KEY}" field in the blob. It's possible it got overwritten.`)
         }
-        return NPCTaskFactory.fromSchedule(schedule)
+        return schedule
+    }
+
+    private getScheduledTask(): NPCTask {
+        return NPCTaskFactory.fromSchedule(this.getSchedule())
     }
 
     private clearExistingAIState() {
