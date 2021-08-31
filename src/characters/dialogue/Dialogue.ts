@@ -1,10 +1,10 @@
-import { saveManager } from "../SaveManager"
-import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
-import { BERTO_INTRO_DIALOGUE } from "./dialogues/BertoDialogue"
-import { DIP_INTRO_DIALOGUE } from "./dialogues/DipDialogue"
-import { GENERIC_DIALOGUE } from "./dialogues/GenericDialogue"
-import { ITEM_DIALOGUES } from "./dialogues/ItemDialogues"
-import { Player } from "./Player"
+import { saveManager } from "../../SaveManager"
+import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
+import { Player } from "../Player"
+import { BERTO_INTRO_DIALOGUE } from "./BertoDialogue"
+import { DIP_INTRO_DIALOGUE } from "./DipDialogue"
+import { GENERIC_DIALOGUE } from "./GenericDialogue"
+import { ITEM_DIALOGUES } from "./ItemDialogues"
 
 export const EMPTY_DIALOGUE = "-"
 

@@ -1,5 +1,5 @@
 import { Lists } from "brigsby/dist/util/Lists"
-import { dialogue, DialogueInstance, NextDialogue } from "../Dialogue"
+import { dialogue, DialogueInstance, NextDialogue } from "./Dialogue"
 
 export enum GenericDialogue {
     HELLO = "hello",

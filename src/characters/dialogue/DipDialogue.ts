@@ -1,4 +1,4 @@
-import { DialogueInstance, dialogueWithOptions, dialogue, option, NextDialogue, saveAfterDialogueStage, DialogueOption, inv } from "../Dialogue"
+import { DialogueInstance, dialogueWithOptions, dialogue, option, NextDialogue, saveAfterDialogueStage, DialogueOption, inv } from "./Dialogue"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { Item } from "../../items/Items"
 import { Controls } from "../../Controls"

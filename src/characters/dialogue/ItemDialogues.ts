@@ -1,4 +1,4 @@
-import { DialogueInstance, dialogue, NextDialogue, dialogueWithOptions, option, DialogueOption } from "../Dialogue"
+import { DialogueInstance, dialogue, NextDialogue, dialogueWithOptions, option, DialogueOption } from "./Dialogue"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { Campfire } from "../../world/elements/Campfire"

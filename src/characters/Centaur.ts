@@ -1,5 +1,5 @@
 import { Component } from "brigsby/dist/Component"
-import { GenericDialogue } from "./dialogues/GenericDialogue"
+import { GenericDialogue } from "./dialogue/GenericDialogue"
 import { Dude } from "./Dude"
 import { DudeFaction } from "./DudeFactory"
 import { NPC } from "./NPC"

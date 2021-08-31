@@ -7,7 +7,7 @@ import { EventQueue } from "../../world/events/EventQueue"
 import { QueuedEventType } from "../../world/events/QueuedEvent"
 import { LocationManager } from "../../world/LocationManager"
 import { WorldTime } from "../../world/WorldTime"
-import { dialogue, DialogueInstance, DialogueOption, dialogueWithOptions, NextDialogue, option } from "../Dialogue"
+import { dialogue, DialogueInstance, DialogueOption, dialogueWithOptions, NextDialogue, option } from "./Dialogue"
 
 export const BERTO_STARTING_DIALOGUE = "bert-start"
 const BERT_MENU = "bert-menu", 

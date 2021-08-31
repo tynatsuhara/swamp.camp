@@ -1,4 +1,4 @@
-import { DialogueInstance, getDialogue, NextDialogue, DialogueSource, EMPTY_DIALOGUE } from "../characters/Dialogue"
+import { DialogueInstance, getDialogue, NextDialogue, DialogueSource, EMPTY_DIALOGUE } from "../characters/dialogue/Dialogue"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { NineSlice } from "brigsby/dist/sprites/NineSlice"
 import { Point } from "brigsby/dist/Point"
