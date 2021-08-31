@@ -11,11 +11,11 @@ import { TimeUnit } from "../world/TimeUnit"
 import { DarknessMask } from "../world/DarknessMask"
 import { Player } from "../characters/Player"
 import { LocationManager } from "../world/LocationManager"
-import { Enemy } from "../characters/Enemy"
+import { Enemy } from "../characters/types/Enemy"
 import { TextAlign } from "../ui/Text"
 import { CutsceneManager } from "./CutsceneManager"
 import { saveManager } from "../SaveManager"
-import { ShroomNPC } from "../characters/ShroomNPC"
+import { ShroomNPC } from "../characters/types/ShroomNPC"
 
 // This is the cutscene that plays when the player dies
 export class DeathCutscene extends Component {

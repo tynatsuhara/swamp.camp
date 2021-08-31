@@ -1,10 +1,10 @@
 import { Component } from "brigsby/dist/Component"
-import { Dude } from "./Dude"
-import { NPC } from "./NPC"
-import { DudeFaction } from "./DudeFactory"
+import { Dude } from "../Dude"
+import { NPC } from "../NPC"
+import { DudeFaction } from "../DudeFactory"
 import { ShroomNPC } from "./ShroomNPC"
 import { Centaur } from "./Centaur"
-import { LightManager } from "../world/LightManager"
+import { LightManager } from "../../world/LightManager"
 
 export class Villager extends Component {
     

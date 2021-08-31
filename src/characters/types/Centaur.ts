@@ -1,8 +1,8 @@
 import { Component } from "brigsby/dist/Component"
-import { GenericDialogue } from "./dialogue/GenericDialogue"
-import { Dude } from "./Dude"
-import { DudeFaction } from "./DudeFactory"
-import { NPC } from "./NPC"
+import { GenericDialogue } from "../dialogue/GenericDialogue"
+import { Dude } from "../Dude"
+import { DudeFaction } from "../DudeFactory"
+import { NPC } from "../NPC"
 
 export class Centaur extends Component {
     

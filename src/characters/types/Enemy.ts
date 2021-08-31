@@ -1,10 +1,10 @@
 import { Component } from "brigsby/dist/Component"
 import { Point } from "brigsby/dist/Point"
-import { TILE_SIZE } from "../graphics/Tilesets"
-import { LightManager } from "../world/LightManager"
-import { Dude } from "./Dude"
-import { DudeFaction, DudeType } from "./DudeFactory"
-import { NPC } from "./NPC"
+import { TILE_SIZE } from "../../graphics/Tilesets"
+import { LightManager } from "../../world/LightManager"
+import { Dude } from "../Dude"
+import { DudeFaction, DudeType } from "../DudeFactory"
+import { NPC } from "../NPC"
 
 /**
  * Something that probably wants to eat the player
