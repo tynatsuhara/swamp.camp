@@ -25,6 +25,7 @@ export class DialogueDisplay extends Component {
     private dialogue: DialogueInstance
     private lineIndex: number
     private lines: TextTyper[]
+    private optionsPopupTime: number
 
     get isOpen() { return !!this.dialogue }
 
@@ -103,6 +104,7 @@ export class DialogueDisplay extends Component {
         this.lines = this.dialogue.lines.map((l, i) => new TextTyper(l, () => {
             this.lineIndex = Math.min(this.lineIndex + 1, this.lines.length)
         }))
+        this.optionsPopupTime = Number.MAX_SAFE_INTEGER
     }
 
     private renderNextLine(line: string) {
@@ -139,13 +141,22 @@ export class DialogueDisplay extends Component {
     }
 
     private renderOptions() {
+        const now = new Date().getTime()
+        this.optionsPopupTime = Math.min(this.optionsPopupTime, now)
+        // provide some buffer to prevent misclicks
+        const canClickTime = this.optionsPopupTime + 350
+
         this.optionsEntity = ButtonsMenu.render(
             Camera.instance.dimensions,
             "white",
             this.dialogue.options.map(o => { 
                 return {
                     text: o.text, 
-                    fn: () => this.completeSourceDialogue(o.next),
+                    fn: () => {
+                        if (now > canClickTime) {
+                            this.completeSourceDialogue(o.next)
+                        }
+                    },
                     buttonColor: 'white',
                     textColor: Color.WHITE,
                     hoverColor: Color.DARK_RED
