@@ -172,7 +172,7 @@ export class Dude extends Component implements DialogueSource {
         if (!!this.dialogueInteract) {
             this.dialogueInteract.position = this.standingPosition.minus(new Point(0, 5))
             this.dialogueInteract.uiOffset = new Point(0, -TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition())
-            this.dialogueInteract.enabled = this.dialogue !== EMPTY_DIALOGUE && DialogueDisplay.instance.dialogueSource !== this
+            this.dialogueInteract.enabled = this.dialogue !== EMPTY_DIALOGUE && DialogueDisplay.instance.source !== this
         }
     }
 
@@ -629,7 +629,7 @@ export class Dude extends Component implements DialogueSource {
 
         // render indicator icon overhead
         let tile: StaticSpriteSource = DudeInteractIndicator.getTile(indicator)
-        if (!tile || this.dialogueInteract?.isShowingUI || DialogueDisplay.instance.dialogueSource === this) {
+        if (!tile || this.dialogueInteract?.isShowingUI || DialogueDisplay.instance.source === this) {
             return []
         } else {
             return [tile.toImageRender(new SpriteTransform(

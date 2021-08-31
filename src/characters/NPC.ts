@@ -76,7 +76,7 @@ export class NPC extends Component {
 
         this._attackIndicator = DudeInteractIndicator.NONE
 
-        if (DialogueDisplay.instance.dialogueSource === this.dude) {
+        if (DialogueDisplay.instance.source === this.dude) {
             // don't move when talking
             this.dude.move(updateData, Point.ZERO, Player.instance.dude.standingPosition.x - this.dude.standingPosition.x)
         } else if (this.enemiesPresent) {

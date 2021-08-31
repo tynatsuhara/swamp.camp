@@ -18,7 +18,7 @@ export class DialogueDisplay extends Component {
 
     static instance: DialogueDisplay
 
-    dialogueSource: DialogueSource
+    private dialogueSource: DialogueSource
     private e: Entity = new Entity([this])
     private displayEntity: Entity
     private optionsEntity: Entity
@@ -28,6 +28,7 @@ export class DialogueDisplay extends Component {
     private optionsPopupTime: number
 
     get isOpen() { return !!this.dialogue }
+    get source() { return this.dialogueSource }
 
     constructor() {
         super()

@@ -16,7 +16,7 @@ export const ITEM_DIALOGUES: { [key: string]: () => DialogueInstance } = {
     [CAMPFIRE_DIALOGUE]: () => {
         // the fire can be dead, almost dead, partially full, almost entirely full, or totally full
 
-        const cf: Campfire = DialogueDisplay.instance.dialogueSource as Campfire
+        const cf: Campfire = DialogueDisplay.instance.source as Campfire
         const logCount = cf.logs
         const playerLogCount = Player.instance.dude.inventory.getItemCount(Item.WOOD)
         const logsYouCanAdd = Math.min(Campfire.LOG_CAPACITY - logCount, playerLogCount)
@@ -62,7 +62,7 @@ export const ITEM_DIALOGUES: { [key: string]: () => DialogueInstance } = {
     },
 
     [BED_DIALOGUE]: () => {
-        const bed: Bed = DialogueDisplay.instance.dialogueSource as Bed
+        const bed: Bed = DialogueDisplay.instance.source as Bed
         const completeDialogue = new NextDialogue(BED_DIALOGUE, false)
 
         let text: string
