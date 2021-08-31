@@ -13,7 +13,6 @@ export const BERTO_STARTING_DIALOGUE = "bert-start"
 const BERT_MENU = "bert-menu", 
       BERT_MENU_INTRO = "bert-menu-intro", 
       BERT_VILLAGERS = "bert-villagers",
-      BERT_VILLAGER_NEEDS_HOUSE = "bert-vil-house",
       BERT_LEAVING = "bert-leaving"
 
 const getItemsToSell = (): SalePackage[] => {
@@ -65,35 +64,44 @@ export const BERTO_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
         }),
         option("Never mind.", BERT_MENU_INTRO, false)
     ),
-    [BERT_VILLAGERS]: () => dialogueWithOptions(
-        ["At present, only felonious peons can be spared by The King.",
-        "Shall I return to The Kingdom, bringing word that thou art requesting a settler?"],
-        DudeInteractIndicator.NONE,
-        new DialogueOption("Bring me a criminal.", () => {
-            const openHouses = LocationManager.instance.currentLocation.getElementsOfType(ElementType.HOUSE)
-                    .map(e => e.entity.getComponent(House))
-                    .filter(house => house.hasCapacity())
-
-            if (openHouses.length === 0) {
-                return new NextDialogue(BERT_VILLAGER_NEEDS_HOUSE, true)
-            }
-            
-            openHouses[0].setResidentPending() 
-            EventQueue.instance.addEvent({
-                type: QueuedEventType.HERALD_DEPARTURE,
-                time: WorldTime.instance.time
-            })
-            return new NextDialogue(BERT_LEAVING, true)
-        }),
-        option("Never mind.", BERT_MENU_INTRO, false)
-    ),
-    [BERT_VILLAGER_NEEDS_HOUSE]: () => dialogue(
-        ["Alas, thy settlement does not have appropriate lodging for a new settler.",
-        "Return to me once thou hast constructed a home."],
-        () => new NextDialogue(BERT_MENU_INTRO, false)
-    ),
+    [BERT_VILLAGERS]: () => fetchNpcDialogue(),
     [BERT_LEAVING]: () => dialogue(
         ["I shall return posthaste!"],
         () => new NextDialogue(BERT_MENU_INTRO, false)
+    )
+}
+
+const fetchNpcDialogue = (): DialogueInstance => {
+    const openHouses = LocationManager.instance.currentLocation.getElementsOfType(ElementType.HOUSE)
+            .map(e => e.entity.getComponent(House))
+            .filter(house => house.hasCapacity())
+
+    if (openHouses.length === 0) {
+        return dialogue(
+            ["Alas, thy settlement does not have appropriate lodging for a new settler.",
+            "Return to me once thou hast constructed a dwelling."],
+            () => new NextDialogue(BERT_MENU_INTRO, false)
+        )
+    }
+
+    const criminalOption = new DialogueOption("Bring me a criminal.", () => {
+        openHouses[0].setResidentPending() 
+        EventQueue.instance.addEvent({
+            type: QueuedEventType.HERALD_DEPARTURE,
+            time: WorldTime.instance.time
+        })
+        return new NextDialogue(BERT_LEAVING, true)
+    })
+
+    const options = [
+        criminalOption,
+        option("Never mind.", BERT_MENU_INTRO, false)
+    ]
+
+    return dialogueWithOptions(
+        ["At present, only felonious peons can be spared by The King.",
+        "Shall I return to The Kingdom, bringing word that thou art requesting a settler?"],
+        DudeInteractIndicator.NONE,
+        ...options
     )
 }

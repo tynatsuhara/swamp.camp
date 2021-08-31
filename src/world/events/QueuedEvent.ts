@@ -50,23 +50,23 @@ export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => 
 
         const npc = berto.entity.getComponent(NPC)
         const normalSchedule = data.oldSchedule || npc.getSchedule()
-        console.log(JSON.stringify(normalSchedule))
         npc.setSchedule(NPCSchedules.newGoToSchedule(pixelPtToTilePt(goalPosition)))
 
         // check repeatedly until he's at the goal
         if (berto.standingPosition.distanceTo(goalPosition) > TILE_SIZE) {
-            console.log("still en route -- potentially stuck")
+            console.log("[Berto] en route -- potentially stuck")
             EventQueue.instance.addEvent({
                 type: QueuedEventType.HERALD_DEPARTURE,
                 time: WorldTime.instance.future({ minutes: 2 }),
                 oldSchedule: normalSchedule
             })
         } else {
-            console.log("we've arrived!")
+            console.log("[Berto] left the map")
             EventQueue.instance.addEvent({
                 type: QueuedEventType.HERALD_RETURN_WITH_NPC,
                 time: WorldTime.instance.future({ hours: 12 }),
-                normalSchedule
+                normalSchedule,
+                dudeTypes: data.dudeTypes,
             })
         }
     },
@@ -81,15 +81,19 @@ export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => 
 
         berto.entity.getComponent(NPC).setSchedule(data.normalSchedule)
 
-        // spawn villager and assign him a home
-        const villager = DudeFactory.instance.new(
-            DudeType.VILLAGER, 
-            LocationManager.instance.exteriorEntrancePosition(), 
-            LocationManager.instance.exterior()
-        )
-        const house = LocationManager.instance.exterior().getElementsOfType(ElementType.HOUSE)
-                .map(e => e.entity.getComponent(House))
-                .filter(house => house.isResidentPending())[0]
-        house?.claimPendingSlot(villager.uuid)
+        const typesToSpawn = (data.dudeTypes || [DudeType.VILLAGER]) as DudeType[]
+
+        typesToSpawn.forEach(type => {
+            const villager = DudeFactory.instance.new(
+                type, 
+                LocationManager.instance.exteriorEntrancePosition(), 
+                LocationManager.instance.exterior(),
+            )
+            // TODO support different types of housing for different NPC types
+            LocationManager.instance.exterior().getElementsOfType(ElementType.HOUSE)
+                    .map(e => e.entity.getComponent(House))
+                    .filter(house => house.isResidentPending())
+                    [0]?.claimPendingSlot(villager.uuid)
+        })
     },
 }
