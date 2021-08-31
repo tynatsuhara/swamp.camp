@@ -22,7 +22,7 @@ import { LightManager } from "../LightManager"
 import { Breakable } from "./Breakable"
 import { Item } from "../../items/Items"
 import { Lists } from "brigsby/dist/util/Lists"
-import { ROCKS_NEEDED_FOR_CAMPFIRE, WOOD_NEEDED_FOR_CAMPFIRE } from "../../characters/dialogues/DipIntro"
+import { ROCKS_NEEDED_FOR_CAMPFIRE, WOOD_NEEDED_FOR_CAMPFIRE } from "../../characters/dialogues/DipDialogue"
 
 export class CampfireFactory extends ElementFactory {
 

@@ -3,7 +3,7 @@ import { ItemStack } from "./Inventory"
 import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Tilesets } from "../graphics/Tilesets"
 import { Point } from "brigsby/dist/Point"
-import { ROCKS_NEEDED_FOR_CAMPFIRE, WOOD_NEEDED_FOR_CAMPFIRE } from "../characters/dialogues/DipIntro"
+import { ROCKS_NEEDED_FOR_CAMPFIRE, WOOD_NEEDED_FOR_CAMPFIRE } from "../characters/dialogues/DipDialogue"
 
 export type CraftingRecipe = {
     desc: String,
