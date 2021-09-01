@@ -6,7 +6,8 @@ export enum NPCScheduleType {
     GO_TO_SPOT,  // fields: p (stringified tile Point)
     ROAM_IN_DARKNESS,
     ROAM,
-    DEFAULT_VILLAGER
+    DEFAULT_VILLAGER,
+    GO_TO_LOCATION,
 }
 
 export type NPCSchedule = {
@@ -14,6 +15,9 @@ export type NPCSchedule = {
     [others: string]: any;
 }
 
+/**
+ * Creates simple schedule objects which can be directly serialized
+ */
 export const NPCSchedules = {
     SCHEDULE_KEY: "sch",
 
@@ -31,6 +35,13 @@ export const NPCSchedules = {
 
     // go home at night and roam around during the day
     newDefaultVillagerSchedule: () => ({ type: NPCScheduleType.DEFAULT_VILLAGER }),
+
+    // hang out in a specific location, either roaming or at a specific position
+    newGoToLocationSchedule: (locationUUID: string, tilePoint?: Point) => ({ 
+        type: NPCScheduleType.GO_TO_LOCATION, 
+        l: locationUUID,
+        p: tilePoint?.toString(),
+    }),
 
     VILLAGER_WAKE_UP_TIME: TimeUnit.HOUR * 8,
     VILLAGER_GO_HOME_TIME: TimeUnit.HOUR * 18,

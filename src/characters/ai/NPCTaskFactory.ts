@@ -3,6 +3,7 @@ import { NPCSchedule, NPCScheduleType } from "./NPCSchedule"
 import { NPCTask } from "./NPCTask"
 import { NPCTaskScheduleRoam } from "./NPCTaskScheduleRoam"
 import { NPCTaskScheduleDefaultVillager } from "./NPCTaskScheduleDefaultVillager"
+import { NPCTaskScheduleGoToLocation } from "./NPCTaskScheduleGoToLocation"
 
 export class NPCTaskFactory {
 
@@ -17,6 +18,8 @@ export class NPCTaskFactory {
                 return new NPCTaskScheduleRoam(schedule)
             case NPCScheduleType.DEFAULT_VILLAGER:
                 return new NPCTaskScheduleDefaultVillager(schedule)
+            case NPCScheduleType.GO_TO_LOCATION:
+                return new NPCTaskScheduleGoToLocation(schedule)
             default:
                 throw new Error(`invalid schedule: ${JSON.stringify(schedule)}`)
         }
