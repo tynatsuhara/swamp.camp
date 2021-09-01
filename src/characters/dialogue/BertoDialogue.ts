@@ -1,12 +1,12 @@
 import { Item } from "../../items/Items"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { SalePackage, SellMenu } from "../../ui/SellMenu"
-import { ElementType } from "../../world/elements/Elements"
-import { House } from "../../world/elements/House"
 import { EventQueue } from "../../world/events/EventQueue"
 import { QueuedEventType } from "../../world/events/QueuedEvent"
 import { LocationManager } from "../../world/LocationManager"
+import { Residence } from "../../world/residences/Residence"
 import { WorldTime } from "../../world/WorldTime"
+import { DudeType } from "../DudeFactory"
 import { dialogue, DialogueInstance, DialogueOption, dialogueWithOptions, NextDialogue, option } from "./Dialogue"
 
 export const BERTO_STARTING_DIALOGUE = "bert-start"
@@ -72,9 +72,9 @@ export const BERTO_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
 }
 
 const fetchNpcDialogue = (): DialogueInstance => {
-    const openHouses = LocationManager.instance.currentLocation.getElementsOfType(ElementType.HOUSE)
-            .map(e => e.entity.getComponent(House))
-            .filter(house => house.hasCapacity())
+    const openHouses = LocationManager.instance.currentLocation.getElements()
+            .map(e => e.entity.getComponent(Residence))
+            .filter(residence => residence?.hasCapacity(DudeType.VILLAGER))
 
     if (openHouses.length === 0) {
         return dialogue(

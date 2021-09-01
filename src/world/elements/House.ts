@@ -1,11 +1,12 @@
 import { BoxCollider } from "brigsby/dist/collision/BoxCollider"
-import { Component } from "brigsby/dist/Component"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { DudeType } from "../../characters/DudeFactory"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { makeHouseInterior } from "../interior/House"
+import { SingleTypeResidence } from "../residences/SingleTypeResidence"
 import { TeleporterPrefix } from "../Teleporter"
 import { WorldLocation } from "../WorldLocation"
 import { BuildingFactory } from "./Building"
@@ -84,7 +85,7 @@ export class HouseFactory extends BuildingFactory {
             residents = data[RESIDENT_ATTRIBUTE]
         }
 
-        const house = e.addComponent(new House(1, destinationUUID, residents))
+        const house = e.addComponent(new SingleTypeResidence(DudeType.VILLAGER, 1, destinationUUID, residents))
 
         return e.addComponent(new ElementComponent(
             ElementType.HOUSE, 
@@ -100,48 +101,5 @@ export class HouseFactory extends BuildingFactory {
     
     getOccupiedPoints(pos: Point) {
         return ElementUtils.rectPoints(pos.plus(new Point(1, 1)), new Point(3, 2))
-    }
-}
-
-export class House extends Component {
-    private static readonly PENDING_RESIDENT = "pending"
-
-    readonly capacity: number
-    readonly locationUUID: string
-
-    private residents: string[]
-
-    constructor(capacity: number, locationUUID: string, residents: string[]) {
-        super()
-        this.capacity = capacity
-        this.locationUUID = locationUUID
-        this.residents = residents
-    }
-
-    getResidents = () => this.residents
-
-    hasCapacity = () => this.residents.length < this.capacity
-
-    isResidentPending = () => this.residents.includes(House.PENDING_RESIDENT)
-
-    isHomeOf = (uuid: string) => this.residents.includes(uuid)
-
-    setResidentPending() {
-        if (!this.hasCapacity) {
-            throw new Error("can't set a pending resident if capacity is met")
-        }
-        this.residents.push(House.PENDING_RESIDENT)
-    }
-
-    claimPendingSlot(uuid: string) {
-        const i = this.residents.indexOf(House.PENDING_RESIDENT)
-        if (i < 0 && this.residents.length === this.capacity) {
-            throw new Error("no room! no room!")
-        }
-        this.residents[i] = uuid
-    }
-
-    evictResident(uuid: string) {
-        this.residents = this.residents.filter(r => r !== uuid)
     }
 }

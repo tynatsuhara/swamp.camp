@@ -1,7 +1,6 @@
-import { Lists } from "brigsby/dist/util/Lists"
 import { ElementType } from "../../world/elements/Elements"
-import { House } from "../../world/elements/House"
 import { LocationManager } from "../../world/LocationManager"
+import { Residence } from "../../world/residences/Residence"
 import { TimeUnit } from "../../world/TimeUnit"
 import { WorldLocation } from "../../world/WorldLocation"
 import { WorldTime } from "../../world/WorldTime"
@@ -44,9 +43,9 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
     }
 
     private findHomeLocation(dude: Dude) {
-        const houses = LocationManager.instance.exterior().getElementsOfType(ElementType.HOUSE)
-                .map(el => el.entity.getComponent(House))
-                .filter(house => house.isHomeOf(dude.uuid))
+        const houses = LocationManager.instance.exterior().getElements()
+                .map(el => el.entity.getComponent(Residence))
+                .filter(residence => residence?.isHomeOf(dude.uuid))
 
         if (houses.length > 0) {
             return LocationManager.instance.get(houses[0].locationUUID)

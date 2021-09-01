@@ -34,8 +34,8 @@ import { ShieldType } from "./weapons/ShieldType"
 import { Weapon } from "./weapons/Weapon"
 import { WeaponFactory } from "./weapons/WeaponFactory"
 import { WeaponType } from "./weapons/WeaponType"
-import { House } from "../world/elements/House"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
+import { Residence } from "../world/residences/Residence"
 
 export class Dude extends Component implements DialogueSource {
 
@@ -275,9 +275,9 @@ export class Dude extends Component implements DialogueSource {
         } else if (this.factions.includes(DudeFaction.VILLAGERS)) {
             // If they have a home, mark it as vacant
             this.location.getElements()
-                    .map(e => e.entity.getComponent(House))
-                    .filter(c => c?.isHomeOf(this.uuid))
-                    .forEach(home => home.evictResident(this.uuid))
+                    .map(e => e.entity.getComponent(Residence))
+                    .filter(residence => residence?.isHomeOf(this.uuid))
+                    .forEach(residence => residence.evictResident(this.uuid))
 
             NotificationDisplay.instance.push({ 
                 text: "Villager killed",

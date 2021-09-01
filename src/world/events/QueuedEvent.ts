@@ -5,9 +5,8 @@ import { NPC } from "../../characters/NPC"
 import { TILE_SIZE, pixelPtToTilePt } from "../../graphics/Tilesets"
 import { EventQueue } from "./EventQueue"
 import { WorldTime } from "../WorldTime"
-import { ElementType } from "../elements/Elements"
-import { House } from "../elements/House"
 import { NotificationDisplay, Notifications } from "../../ui/NotificationDisplay"
+import { Residence } from "../residences/Residence"
 
 export enum QueuedEventType {
     SIMULATE_NPCS,
@@ -90,9 +89,9 @@ export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => 
                 LocationManager.instance.exterior(),
             )
             // TODO support different types of housing for different NPC types
-            LocationManager.instance.exterior().getElementsOfType(ElementType.HOUSE)
-                    .map(e => e.entity.getComponent(House))
-                    .filter(house => house.isResidentPending())
+            LocationManager.instance.exterior().getElements()
+                    .map(e => e.entity.getComponent(Residence))
+                    .filter(residence => residence?.isResidentPending())
                     [0]?.claimPendingSlot(villager.uuid)
         })
     },
