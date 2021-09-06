@@ -22,9 +22,11 @@ import { newUUID } from "../saves/uuid"
 import { Centaur } from "./types/Centaur"
 import { ShieldType } from "./weapons/ShieldType"
 import { Singletons } from "../Singletons"
+import { Residence } from "../world/residences/Residence"
 
 export enum DudeFaction {
     VILLAGERS,
+    CLERGY,
     ORCS,
     UNDEAD,
     DEMONS,
@@ -50,6 +52,9 @@ export enum DudeType {
     ORC_SHAMAN,
     DEMON_BRUTE,
     WOLF,
+    CLERIC,
+    NUN,
+    BISHOP,
 }
 
 export class DudeFactory {
@@ -78,6 +83,8 @@ export class DudeFactory {
         saveState: DudeSaveState,
         location: WorldLocation
     ): Dude {
+        const uuid = saveState?.uuid ?? newUUID()
+
         // defaults
         let factions: DudeFaction[] = [DudeFaction.VILLAGERS]
         let animationName: string
@@ -142,7 +149,7 @@ export class DudeFactory {
             }
             case DudeType.ORC_WARRIOR: {
                 factions = [DudeFaction.ORCS]
-                animationName = Math.random() < .5 ? "orc_warrior" : "masked_orc"
+                animationName = Lists.oneOf(["orc_warrior", "masked_orc"])
                 weapon = WeaponType.CLUB
                 additionalComponents = [new NPC(), new Enemy()]
                 maxHealth = 2
@@ -187,28 +194,31 @@ export class DudeFactory {
                 colliderSize = bigColliderSize
                 break
             }
-            case DudeType.SHROOM:
+            case DudeType.SHROOM: {
                 factions = [DudeFaction.SHROOMS]
                 animationName = "SmallMushroom" 
                 additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new ShroomNPC()]
                 maxHealth = 2
                 speed *= (.6 + Math.random()/5)
                 break
-            case DudeType.VILLAGER:
+            }
+            case DudeType.VILLAGER: {
                 animationName = `prisoner${Math.ceil(Math.random() * 2)}`
                 maxHealth = 4
                 speed *= .6
                 // TODO: add a new type of schedule for a villager with a home
                 additionalComponents = [new NPC(NPCSchedules.newDefaultVillagerSchedule()), new Villager()]
                 break
-            case DudeType.CENTAUR:
+            }
+            case DudeType.CENTAUR: {
                 factions = [DudeFaction.CENTAURS]
                 animationName = "Centaur_M" 
                 additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new Centaur()]
                 maxHealth = 2
                 speed *= .5
                 break
-            case DudeType.BEAR:
+            }
+            case DudeType.BEAR: {
                 factions = [DudeFaction.BEARS]
                 animationName = "Bear"
                 weapon = WeaponType.UNARMED
@@ -217,7 +227,8 @@ export class DudeFactory {
                 speed *= .5
                 colliderSize = bigColliderSize
                 break
-            case DudeType.WOLF:
+            }
+            case DudeType.WOLF: {
                 factions = [DudeFaction.WOLVES]
                 animationName = "Wolf"
                 weapon = WeaponType.UNARMED
@@ -225,6 +236,26 @@ export class DudeFactory {
                 maxHealth = 2
                 speed *= 1
                 break
+            }
+            case DudeType.CLERIC:
+                animationName = Lists.oneOf(["FatCleric", "NormalCleric", "TallCleric"])
+                factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
+                additionalComponents = [new NPC()]
+                speed *= .3
+                break
+            case DudeType.NUN:
+                animationName = Lists.oneOf(["FatNun", "NormalNun", "TallNun"])
+                factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
+                additionalComponents = [new NPC()]
+                speed *= .3
+                break
+            case DudeType.BISHOP: {
+                animationName = "Bishop"
+                factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
+                additionalComponents = [new NPC()]
+                speed *= .2
+                break
+            }
             default: {
                 throw new Error(`DudeType ${type} can't be instantiated`)
             }
@@ -232,7 +263,7 @@ export class DudeFactory {
 
         // use saved data instead of defaults
         const d = new Dude(
-            saveState?.uuid ?? newUUID(),
+            uuid,
             type, 
             factions,  // TODO: Save factions? Only if they become mutable
             saveState?.anim ?? animationName, 
