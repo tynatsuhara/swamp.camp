@@ -61,8 +61,7 @@ export class NPC extends Component {
         /**
          * NPC behavior:
          * If threatened, fight or flee
-         * otherwise follow their followTarget (if present)
-         * otherwise execute a "standard routine" which can be defined by the controller (TODO)
+         * otherwise execute a "standard routine" which can be defined by the controller
          */
 
         // clear their attack target if the target has died
