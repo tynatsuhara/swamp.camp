@@ -85,6 +85,8 @@ export class DudeFactory {
     ): Dude {
         const uuid = saveState?.uuid ?? newUUID()
 
+        this.claimResidence(type, uuid)
+
         // defaults
         let factions: DudeFaction[] = [DudeFaction.VILLAGERS]
         let animationName: string
@@ -286,5 +288,31 @@ export class DudeFactory {
         d.location = location
 
         return d
+    }
+
+    private claimResidence(type: DudeType, uuid: string) {
+        if (!LocationManager.instance.exterior()) {
+            // Our locations aren't initialized yet, so this NPC is being spawned as a 
+            // save is loaded. We can assume that the residence is already configured.
+            return
+        }
+
+        const residences = LocationManager.instance.exterior()
+            .getElements()
+            .map(e => e.entity.getComponent(Residence))
+            .filter(e => !!e)
+
+        const hasResidence = residences.some(residence => residence.isHomeOf(uuid))
+
+        if (hasResidence) {
+            return
+        }
+    
+        const pending = residences.filter(res => res?.canClaimPendingSlot(type))
+        if (pending.length > 0) {
+            pending[0].claimPendingSlot(uuid)
+        }
+
+        // TODO: this might make someone homeless if you spawn an NPC with dev controls
     }
 }

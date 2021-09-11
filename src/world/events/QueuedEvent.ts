@@ -83,16 +83,11 @@ export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => 
         const typesToSpawn = (data.dudeTypes || [DudeType.VILLAGER]) as DudeType[]
 
         typesToSpawn.forEach(type => {
-            const villager = DudeFactory.instance.new(
+            DudeFactory.instance.new(
                 type, 
                 LocationManager.instance.exteriorEntrancePosition(), 
                 LocationManager.instance.exterior(),
             )
-            // TODO support different types of housing for different NPC types
-            LocationManager.instance.exterior().getElements()
-                    .map(e => e.entity.getComponent(Residence))
-                    .filter(residence => residence?.isResidentPending())
-                    [0]?.claimPendingSlot(villager.uuid)
         })
     },
 }

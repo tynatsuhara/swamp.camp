@@ -11,7 +11,7 @@ export abstract class Residence extends Component {
 
     abstract setResidentPending: () => void
     
-    abstract isResidentPending: () => boolean
+    abstract canClaimPendingSlot: (type: DudeType) => boolean
 
     abstract claimPendingSlot: (uuid: string) => void
 

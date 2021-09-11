@@ -22,7 +22,7 @@ export class SingleTypeResidence extends Residence {
 
     hasCapacity = (type: DudeType) => type === this.type && this.residents.length < this.capacity
 
-    isResidentPending = () => this.residents.includes(SingleTypeResidence.PENDING_RESIDENT)
+    canClaimPendingSlot = (type: DudeType) => type === this.type && this.residents.includes(SingleTypeResidence.PENDING_RESIDENT)
 
     isHomeOf = (uuid: string) => this.residents.includes(uuid)
 
