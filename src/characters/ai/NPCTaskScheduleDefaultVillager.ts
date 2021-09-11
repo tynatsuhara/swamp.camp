@@ -25,7 +25,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             // Or better yet, don't be a jerk. Unwind by being a man... and goin' to work.
             goalLocation = this.findWorkLocation()
             if (!goalLocation) {
-                console.log("couldnt find work")
+                goalLocation = LocationManager.instance.exterior()
             }
         } else {
             // Go home!
