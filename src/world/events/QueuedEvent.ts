@@ -6,13 +6,13 @@ import { TILE_SIZE, pixelPtToTilePt } from "../../graphics/Tilesets"
 import { EventQueue } from "./EventQueue"
 import { WorldTime } from "../WorldTime"
 import { NotificationDisplay, Notifications } from "../../ui/NotificationDisplay"
-import { Residence } from "../residences/Residence"
 
 export enum QueuedEventType {
     SIMULATE_NPCS,
     HERALD_ARRIVAL,
     HERALD_DEPARTURE,
     HERALD_RETURN_WITH_NPC,
+    DAILY_SCHEDULE,          // executes daily at midnight
 }
 
 export type QueuedEventData = {
@@ -88,6 +88,14 @@ export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => 
                 LocationManager.instance.exteriorEntrancePosition(), 
                 LocationManager.instance.exterior(),
             )
+        })
+    },
+
+    [QueuedEventType.DAILY_SCHEDULE]: (data) => {
+        console.log("daily schedule task executed")
+        EventQueue.instance.addEvent({
+            type: QueuedEventType.DAILY_SCHEDULE,
+            time: WorldTime.instance.tomorrow(),
         })
     },
 }

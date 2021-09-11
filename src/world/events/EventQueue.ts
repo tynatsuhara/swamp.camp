@@ -1,6 +1,7 @@
 import { BinaryHeap } from "brigsby/dist/util/BinaryHeap"
 import { Singletons } from "../../Singletons"
-import { QueuedEventData, EVENT_QUEUE_HANDLERS } from "./QueuedEvent"
+import { WorldTime } from "../WorldTime"
+import { QueuedEventData, EVENT_QUEUE_HANDLERS, QueuedEventType } from "./QueuedEvent"
 
 export class EventQueue {
 
@@ -13,6 +14,14 @@ export class EventQueue {
     initialize(data: QueuedEventData[] = []) {
         this.heap.clear()
         this.heap.pushAll(data)
+
+        // there are some event types that should always be in the queue
+        if (!this.containsEventType(QueuedEventType.DAILY_SCHEDULE)) {
+            this.heap.push({
+                type: QueuedEventType.DAILY_SCHEDULE,
+                time: WorldTime.instance.tomorrow(),
+            })
+        }
     }
 
     addEvent(event: QueuedEventData) {
@@ -28,5 +37,9 @@ export class EventQueue {
 
     save() {
         return this.heap.getContents()
+    }
+
+    private containsEventType(type: QueuedEventType) {
+        return this.heap.getContents().some(data => data.type === type)
     }
 }
