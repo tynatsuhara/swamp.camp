@@ -60,7 +60,7 @@ export class NPC extends Component {
     update(updateData: UpdateData) {
         /**
          * NPC behavior:
-         * If threated, fight or flee
+         * If threatened, fight or flee
          * otherwise follow their followTarget (if present)
          * otherwise execute a "standard routine" which can be defined by the controller (TODO)
          */
