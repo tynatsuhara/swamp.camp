@@ -179,11 +179,11 @@ export class DarknessMask {
         
         const circleOffset = new Point(-.5, -.5).times(diameter)
         const adjustedPos = centerPos.plus(DarknessMask.shift).plus(circleOffset).apply(Math.floor)
-        
         this.addCircleToQueue(diameter, adjustedPos, outerAlpha)
 
         const innerDiameter = this.getInnerCircleDiameter(diameter)
-        this.addCircleToQueue(innerDiameter, adjustedPos.plus(new Point(1, 1).times((diameter - innerDiameter)/2)), innerAlpha)
+        const innerPos = adjustedPos.plus(new Point(1, 1).times((diameter - innerDiameter)/2)).apply(Math.floor)
+        this.addCircleToQueue(innerDiameter, innerPos, innerAlpha)
     }
 
     private getInnerCircleDiameter(diameter: number) {
@@ -215,10 +215,8 @@ export class DarknessMask {
         const _dimensions = dimensions.plus(new Point(1, 1))
 
         if (this.darkness > 0) {
-            const drawn = this.circleQueue
-                    .map(circle => this.drawCircleToCanvas(...circle))
-                    .every(result => !!result)
-            if (!drawn) {
+            const allDrawn = this.circleQueue.every(circle => this.drawCircleToCanvas(...circle))
+            if (!allDrawn) {
                 return null
             }
             // overlay the time-specific color
