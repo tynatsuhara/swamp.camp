@@ -8,7 +8,7 @@
       "name": "swamp.camp",
       "version": "1.0.0",
       "dependencies": {
-        "brigsby": "^0.3.1"
+        "brigsby": "^0.3.3"
       },
       "devDependencies": {
         "ts-loader": "^9.2.3",
@@ -26,6 +26,11 @@
       "engines": {
         "node": ">=10.0.0"
       }
+    },
+    "node_modules/@types/css-font-loading-module": {
+      "version": "0.0.6",
+      "resolved": "https://registry.npmjs.org/@types/css-font-loading-module/-/css-font-loading-module-0.0.6.tgz",
+      "integrity": "sha512-MBvSMSxXFtIukyXRU3HhzL369rIWaqMVQD5kmDCYIFFD6Fe3lJ4c9UnLD02MLdTp7Z6ti7rO3SQtuDo7C80mmw=="
     },
     "node_modules/@types/eslint": {
       "version": "7.2.13",
@@ -779,9 +784,12 @@
       }
     },
     "node_modules/brigsby": {
-      "version": "0.3.1",
-      "resolved": "https://registry.npmjs.org/brigsby/-/brigsby-0.3.1.tgz",
-      "integrity": "sha512-FcsmeX/WSoRaY+Ez7JzfbxDD4QAEIDnTlsGjBschkO3uZdZJDUMe0K0OQWgzVaVuk/C6mWJvF2GkRmvxjq7uPA=="
+      "version": "0.3.3",
+      "resolved": "https://registry.npmjs.org/brigsby/-/brigsby-0.3.3.tgz",
+      "integrity": "sha512-GPW+6JyyTGE7C72nE1U4m6IJ7KFEGg4Sks9AFp/qUYskWwM7+RcbkbW4/aOQqfDyjDspZjBpCtWBz+mK0FTMBg==",
+      "dependencies": {
+        "@types/css-font-loading-module": "^0.0.6"
+      }
     },
     "node_modules/browserslist": {
       "version": "4.16.6",
@@ -6175,6 +6183,11 @@
       "integrity": "sha512-Fxt+AfXgjMoin2maPIYzFZnQjAXjAL0PHscM5pRTtatFqB+vZxAM9tLp2Optnuw3QOQC40jTNeGYFOMvyf7v9g==",
       "dev": true
     },
+    "@types/css-font-loading-module": {
+      "version": "0.0.6",
+      "resolved": "https://registry.npmjs.org/@types/css-font-loading-module/-/css-font-loading-module-0.0.6.tgz",
+      "integrity": "sha512-MBvSMSxXFtIukyXRU3HhzL369rIWaqMVQD5kmDCYIFFD6Fe3lJ4c9UnLD02MLdTp7Z6ti7rO3SQtuDo7C80mmw=="
+    },
     "@types/eslint": {
       "version": "7.2.13",
       "resolved": "https://registry.npmjs.org/@types/eslint/-/eslint-7.2.13.tgz",
@@ -6816,9 +6829,12 @@
       }
     },
     "brigsby": {
-      "version": "0.3.1",
-      "resolved": "https://registry.npmjs.org/brigsby/-/brigsby-0.3.1.tgz",
-      "integrity": "sha512-FcsmeX/WSoRaY+Ez7JzfbxDD4QAEIDnTlsGjBschkO3uZdZJDUMe0K0OQWgzVaVuk/C6mWJvF2GkRmvxjq7uPA=="
+      "version": "0.3.3",
+      "resolved": "https://registry.npmjs.org/brigsby/-/brigsby-0.3.3.tgz",
+      "integrity": "sha512-GPW+6JyyTGE7C72nE1U4m6IJ7KFEGg4Sks9AFp/qUYskWwM7+RcbkbW4/aOQqfDyjDspZjBpCtWBz+mK0FTMBg==",
+      "requires": {
+        "@types/css-font-loading-module": "^0.0.6"
+      }
     },
     "browserslist": {
       "version": "4.16.6",
