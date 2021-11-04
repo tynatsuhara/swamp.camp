@@ -4,6 +4,8 @@
 https://trello.com/b/uqYKRQlp/kingdom
 
 ## development
+SWAMP CAMP is currently built with Node 14.
+
 `npm run start` to start the Webpack development server.
 
 ## release
