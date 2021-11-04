@@ -6,6 +6,7 @@ import { TILE_SIZE, pixelPtToTilePt } from "../../graphics/Tilesets"
 import { EventQueue } from "./EventQueue"
 import { WorldTime } from "../WorldTime"
 import { NotificationDisplay, Notifications } from "../../ui/NotificationDisplay"
+import { DudeSpawner } from "../../characters/DudeSpawner"
 
 export enum QueuedEventType {
     SIMULATE_NPCS,
@@ -13,6 +14,7 @@ export enum QueuedEventType {
     HERALD_DEPARTURE,
     HERALD_RETURN_WITH_NPC,
     DAILY_SCHEDULE,          // executes daily at midnight
+    ORC_SEIGE,
 }
 
 export type QueuedEventData = {
@@ -91,11 +93,14 @@ export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => 
         })
     },
 
-    [QueuedEventType.DAILY_SCHEDULE]: (data) => {
+    [QueuedEventType.DAILY_SCHEDULE]: () => {
         console.log("daily schedule task executed")
         EventQueue.instance.addEvent({
             type: QueuedEventType.DAILY_SCHEDULE,
             time: WorldTime.instance.tomorrow(),
         })
     },
+
+    // TODO: This should wake up the player if they are sleeping
+    [QueuedEventType.ORC_SEIGE]: () => DudeSpawner.instance.spawnOrcs(),
 }
