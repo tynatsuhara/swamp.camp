@@ -1,7 +1,7 @@
 # SWAMP CAMP — https://swamp.camp
 
 ## roadmap
-https://trello.com/b/uqYKRQlp/kingdom
+https://trello.com/b/uqYKRQlp/swamp-camp
 
 ## development
 `npm run start` to start the Webpack development server.
