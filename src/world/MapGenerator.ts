@@ -1,10 +1,8 @@
-import { debug } from "brigsby/dist/Debug"
 import { Point } from "brigsby/dist/Point"
 import { Grid } from "brigsby/dist/util/Grid"
 import { Lists } from "brigsby/dist/util/Lists"
 import { Noise } from "brigsby/dist/util/Noise"
 import { Singletons } from "../Singletons"
-import { ElementComponent } from "./elements/ElementComponent"
 import { ElementType } from "./elements/Elements"
 import { TentColor } from "./elements/Tent"
 import { GroundType } from "./ground/Ground"
@@ -166,23 +164,33 @@ export class MapGenerator {
 
     static levels() {
         // We want more bottom ledges than top because it looks nicer with the camera "angle"
-        const threshold = .3
+        const topBottomThreshold = .3
+        const sideBottomThreshold = 1
 
-        let result: [Grid<number>, number, string] = [null, 1, null]
-        while (result[1] > threshold) {
-            result = this.levelNoise()
-        }
+        let levelGrid: Grid<number>
+        let levelString: string
+        let topBottomRatio: number
+        let sideBottomRatio: number
 
-        console.log(result[2])
+        do {
+            [levelGrid, levelString, topBottomRatio, sideBottomRatio] = this.levelNoise()
+        } while (topBottomRatio > topBottomThreshold || sideBottomRatio > sideBottomThreshold)
 
-        return result[0]
+        console.log(levelString)
+
+        return levelGrid
     }
 
     /**
      * @param levels the number of levels
-     * @returns a grid of numbers the size of the map and the ratio of top/bottom ledges
+     * @returns [
+     *      a grid of numbers the size of the map,
+     *      a printable string visualizing the levels,
+     *      the ratio of top/bottom ledges,
+     *      the ratio of side/bottom ledges
+     * ]
      */
-    static levelNoise(levels: number = 3, seed = Math.random()): [Grid<number>, number, string] {
+    static levelNoise(levels: number = 3, seed = Math.random()): [Grid<number>, string, number, number] {
         const noise = new Noise(seed)
 
         const grid = new Grid<number>()
@@ -198,36 +206,47 @@ export class MapGenerator {
 
         let bottomLedges = 0
         let topLedges = 0
+        let sideLedges = 0
 
         for (let i = -MapGenerator.MAP_RANGE; i < MapGenerator.MAP_RANGE; i += sq) {
             for (let j = -MapGenerator.MAP_RANGE; j < MapGenerator.MAP_RANGE; j += sq) {
                 var value = noise.simplex2(i / (this.MAP_RANGE * noiseScale), j / (this.MAP_RANGE * noiseScale))
                 value = (value + 1)/2  // scale to 0-1
-                const v = Math.floor(levels * value)
-                str += v
+                const level = Math.floor(levels * value)
+                str += level
 
                 // Compare top/bottom ratio
                 const above = grid.get(new Point(j, i-1))
                 if (above != null) {
-                    if (above < v) {
+                    if (above < level) {
                         topLedges++
-                    } else if (above > v) {
+                    } else if (above > level) {
                         bottomLedges++
                     }
                 }
 
+                const left = grid.get(new Point(j-1, i))
+                const right = grid.get(new Point(j+1, i))
+                if ((left != null && left !== level) || (right != null && right !== level)) {
+                    sideLedges++
+                }
+
                 for (let m = 0; m < sq; m++) {
                     for (let n = 0; n < sq; n++) {
-                        grid.set(new Point(j+m, i+n), v)
+                        grid.set(new Point(j+m, i+n), level)
                     }
                 }
             }
             str += "\n"
         }
 
-        str += `top ledges = ${topLedges}\nbottom ledges = ${bottomLedges}\nratio top/bottom = ${topLedges/bottomLedges}`
+        str += `top ledges = ${topLedges}\n`
+        str += `bottom ledges = ${bottomLedges}\n`
+        str += `ratio top/bottom = ${topLedges/bottomLedges}\n`
+        str += `side ledges = ${sideLedges}\n`
+        str += `ratio side/bottom = ${sideLedges/bottomLedges}\n`
 
-        return [grid, topLedges/bottomLedges, str]
+        return [grid, str, topLedges/bottomLedges, sideLedges/bottomLedges]
     }
 
     placeWater() {
