@@ -4,9 +4,15 @@
 https://trello.com/b/uqYKRQlp/swamp-camp
 
 ## development
-`npm run start` to start the Webpack development server.
+### acquire assets
+audio files are stored using [Git LFS](https://git-lfs.github.com/) and can be checked out with `git lfs pull` 
 
-## release
+### run locally
+`nvm use` to make sure you're using the right version of Node
+
+`npm run start` to spin up the Webpack development server
+
+### release
 commit and push to `master`, this will trigger a [Cloudflare pages deployment](https://dash.cloudflare.com/1f52f961eb89afcf0499eba5f54090d5/pages/view/quest).
 
 NOTE: Cloudflare pages has a limit of 25MB per file.
