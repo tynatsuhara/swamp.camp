@@ -4,6 +4,7 @@ import { Grid } from "brigsby/dist/util/Grid"
 import { Lists } from "brigsby/dist/util/Lists"
 import { Noise } from "brigsby/dist/util/Noise"
 import { Singletons } from "../Singletons"
+import { ElementComponent } from "./elements/ElementComponent"
 import { ElementType } from "./elements/Elements"
 import { TentColor } from "./elements/Tent"
 import { GroundType } from "./ground/Ground"
@@ -20,23 +21,24 @@ export class MapGenerator {
     private static readonly MAP_RANGE = 40
     private static readonly MAP_SIZE = MapGenerator.MAP_RANGE * 2  // map goes from [-MAP_RANGE, MAP_RANGE]
 
-    private readonly location = LocationManager.instance.add(
-        new WorldLocation(false, true, MapGenerator.MAP_SIZE, MapGenerator.levels())
-    )
+    private location: WorldLocation
     private readonly tentPos = new Point(-3, -3)
 
-    generateExterior(): WorldLocation {        
-        // make the ground
-        // this.renderPath(new Point(-10, -10), new Point(10, 10), 2)
-        // this.renderPath(new Point(10, -10), new Point(-10, 10), 5)
-        this.placeGround()
+    generateExterior(): WorldLocation {
+        for (let elementsPlaced = false, attempt = 1; !elementsPlaced; attempt++) {
+            console.log(`generation attept ${attempt}`)
 
-        // spawn tent
-        // TODO: handle this better with ledges and water
-        this.location.addElement(ElementType.TENT, this.tentPos, { color: TentColor.RED })
+            this.location = new WorldLocation(false, true, MapGenerator.MAP_SIZE, MapGenerator.levels())
 
-        if (debug.enableWater) {
+            // make the ground
+            this.placeGround()
             this.placeWater()
+
+            // spawn tent
+            const tent = this.location.addElement(ElementType.TENT, this.tentPos, { color: TentColor.RED })
+
+            // if the tent couldn't be placed, redo the map topography
+            elementsPlaced = !!tent
         }
 
         this.spawnTreesAtEdge()
@@ -46,6 +48,9 @@ export class MapGenerator {
 
         // TODO short trees, bushes, fruit, tall grass, etc
         this.spawn(ElementType.MUSHROOM, 3 + Math.random() * 5)
+
+        LocationManager.instance.add(this.location)
+        LocationManager.instance.currentLocation = this.location
 
         return this.location
     }
@@ -138,8 +143,6 @@ export class MapGenerator {
         for (let i = -MapGenerator.MAP_RANGE; i < MapGenerator.MAP_RANGE; i++) {
             for (let j = -MapGenerator.MAP_RANGE; j < MapGenerator.MAP_RANGE; j++) {
                 const pt = new Point(i, j)
-                // TODO revisit levels
-                const levelsEnabled = debug.enableVerticality
                 const thisLevel = this.location.levels?.get(pt)
                 const adjacent = [
                     pt.plus(new Point(0, -1)), 
@@ -151,9 +154,7 @@ export class MapGenerator {
                     pt.plus(new Point(-1, 0)), 
                     pt.plus(new Point(-1, -1)), 
                 ]
-                const isLedge = levelsEnabled && adjacent
-                        .map(pt => this.location.levels.get(pt))
-                        .some(level => level < thisLevel)
+                const isLedge = adjacent.map(pt => this.location.levels.get(pt)).some(level => level < thisLevel)
                 if (isLedge) {
                     this.location.setGroundElement(GroundType.LEDGE, pt)
                 } else {
@@ -164,10 +165,6 @@ export class MapGenerator {
     }
 
     static levels() {
-        if (!debug.enableVerticality) {
-            return null
-        }
-
         // We want more bottom ledges than top because it looks nicer with the camera "angle"
         const threshold = .3
 
