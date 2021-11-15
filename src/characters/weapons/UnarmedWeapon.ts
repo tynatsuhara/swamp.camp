@@ -56,6 +56,8 @@ export class UnarmedWeapon extends Weapon {
             case DudeType.BEAR:
             case DudeType.DEMON_BRUTE:
                 return 3
+            case DudeType.SWAMP_THING:
+                return 2
             default:
                 return 1
         }
