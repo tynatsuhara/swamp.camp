@@ -193,8 +193,8 @@ export class WorldLocation {
 
     findPath(
         tileStart: Point, 
-        tileEnd: Point, heuristic: 
-        (pt: Point, goal: Point) => number, 
+        tileEnd: Point, 
+        heuristic: (pt: Point, goal: Point) => number, 
         shortCircuit: number = Number.MAX_SAFE_INTEGER
     ) {
         const buffer = 5
