@@ -23,6 +23,7 @@ import { Centaur } from "./types/Centaur"
 import { ShieldType } from "./weapons/ShieldType"
 import { Singletons } from "../Singletons"
 import { Residence } from "../world/residences/Residence"
+import { AquaticNPC } from "./types/AquaticNPC"
 
 export enum DudeFaction {
     VILLAGERS,
@@ -242,20 +243,20 @@ export class DudeFactory {
                 break
             }
             case DudeType.CLERIC:
-                animationName = Lists.oneOf(["FatCleric", "NormalCleric", "TallCleric"])
                 factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
+                animationName = Lists.oneOf(["FatCleric", "NormalCleric", "TallCleric"])
                 additionalComponents = [new NPC()]
                 speed *= .3
                 break
             case DudeType.NUN:
-                animationName = Lists.oneOf(["FatNun", "NormalNun", "TallNun"])
                 factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
+                animationName = Lists.oneOf(["FatNun", "NormalNun", "TallNun"])
                 additionalComponents = [new NPC()]
                 speed *= .3
                 break
             case DudeType.BISHOP: {
-                animationName = "Bishop"
                 factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
+                animationName = "Bishop"
                 additionalComponents = [new NPC()]
                 speed *= .2
                 break
@@ -264,9 +265,9 @@ export class DudeFactory {
                 factions = [DudeFaction.AQUATIC]
                 animationName = "swampy" 
                 weapon = WeaponType.UNARMED
-                additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new Enemy()]
+                additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new Enemy(), new AquaticNPC()]
                 maxHealth = 2
-                speed *= (.6 + Math.random()/5)
+                speed *= 1.3
                 break
             default: {
                 throw new Error(`DudeType ${type} can't be instantiated`)

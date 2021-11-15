@@ -121,9 +121,11 @@ export class NPC extends Component {
         const context: NPCTaskContext = {
             dude: this.dude,
             walkTo: (pt) => this.forceMoveToTilePosition(pt),
-            roam: () => this.forceMoveToTilePosition(
-                Lists.oneOf(this.dude.location.getGroundSpots().filter(pt => !this.dude.location.isOccupied(pt)))
-            ),
+            roam: (_, options) => {
+                const goalOptions = options?.goalOptionsSupplier ? options.goalOptionsSupplier() : this.dude.location.getGroundSpots()
+                const pos = Lists.oneOf(goalOptions.filter(pt => !this.dude.location.isOccupied(pt)))
+                this.forceMoveToTilePosition(pos)
+            },
             goToLocation: (location) => this.simulateGoToLocation(location),
         }
 
@@ -201,22 +203,25 @@ export class NPC extends Component {
         speedMultiplier: number = 1, 
         {
             ptSelectionFilter = () => true,
+            goalOptionsSupplier,
             pauseEveryMillis,
             pauseForMillis,
         }: {
             ptSelectionFilter?: (pt) => boolean,
+            goalOptionsSupplier?: () => Point[],
             pauseEveryMillis?: number,
             pauseForMillis?: number,
         } = {}
     ) {
         if (!this.roamPath || this.roamPath.length === 0) {  // only try once per upate() to find a path
             const l = LocationManager.instance.currentLocation
-            const openPoints = l.getGroundSpots().filter(pt => !l.isOccupied(pt))
+            const goalOptions = goalOptionsSupplier ? goalOptionsSupplier() : l.getGroundSpots()
+            const openPoints = goalOptions.filter(pt => !l.isOccupied(pt))
             let pt: Point
-            for (let i = 0; i < 5; i++) {
-                pt = Lists.oneOf(openPoints)
-                if (ptSelectionFilter(pt)) {
-                    break
+            for (let i = 0; i < 5 && !pt; i++) {
+                const maybePt = Lists.oneOf(openPoints)
+                if (ptSelectionFilter(maybePt)) {
+                    pt = maybePt
                 }
             }
             if (!pt) {
@@ -257,6 +262,9 @@ export class NPC extends Component {
     // }
 
     private attackTarget: Dude
+    get targetedEnemy() {
+        return this.attackTarget
+    }
     private targetPath: Point[] = null
     private _attackIndicator
     get attackIndicator() {

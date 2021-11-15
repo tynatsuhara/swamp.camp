@@ -11,7 +11,7 @@ import { TimeUnit } from "./world/TimeUnit"
 import { WorldTime } from "./world/WorldTime"
 
 const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
-    [InputKey.O, "spawn demon brute", (input) => DudeFactory.instance.new(DudeType.DEMON_BRUTE, input.mousePos)],
+    [InputKey.O, "spawn swampy", (input) => DudeFactory.instance.new(DudeType.SWAMP_THING, input.mousePos)],
     [InputKey.P, "spawn small demon", (input) => DudeFactory.instance.new(DudeType.HORNED_DEMON, input.mousePos)],
     [InputKey.U, "spawn orc shaman", (input) => DudeFactory.instance.new(DudeType.ORC_SHAMAN, input.mousePos)],
     [InputKey.B, "spawn bear", (input) => DudeFactory.instance.new(DudeType.BEAR, input.mousePos)],

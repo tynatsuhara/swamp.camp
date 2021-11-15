@@ -1,6 +1,7 @@
 import { Component } from "brigsby/dist/Component"
 import { Point } from "brigsby/dist/Point"
-import { TILE_SIZE } from "../../graphics/Tilesets"
+import { pixelPtToTilePt, TILE_SIZE } from "../../graphics/Tilesets"
+import { Ground } from "../../world/ground/Ground"
 import { LightManager } from "../../world/LightManager"
 import { Dude } from "../Dude"
 import { DudeFaction, DudeType } from "../DudeFactory"
@@ -22,6 +23,8 @@ export class Enemy extends Component {
             this.orc(dude, npc)
         } else if (dude.factions.includes(DudeFaction.DEMONS)) {
             this.demon(dude, npc)
+        } else if (dude.factions.includes(DudeFaction.AQUATIC)) {
+            this.acquatic(dude, npc)
         }
     }
 
@@ -44,14 +47,18 @@ export class Enemy extends Component {
     }
 
     private demon(dude: Dude, npc: NPC) {
-        // DEMON enemies will avoid light
+        npc.findTargetRange *= 3
+
+        // demons only attack enemies in the dark
         npc.isEnemyFn = d => {
             return !d.factions.includes(DudeFaction.DEMONS) && LightManager.instance.isDark(d.standingPosition)
         }
+
+        // demons only attack roam in the dark
         npc.pathFindingHeuristic = (pt: Point, goal: Point) => {
             return pt.distanceTo(goal) + (LightManager.instance.isDark(pt.times(TILE_SIZE)) ? 0 : 100)
         }
-        npc.findTargetRange *= 3
+        
         // dissolve if they end up in the light for too long
         let lastSunlightCheck = false
         npc.doWhileLiving(() => {
@@ -65,5 +72,22 @@ export class Enemy extends Component {
                 lastSunlightCheck = false
             }
         }, 1000 + 1000 * Math.random())
+    }
+
+    private acquatic(dude: Dude, npc: NPC) {
+        // only attack enemies in the water
+        npc.isEnemyFn = d => {
+            return !d.factions.includes(DudeFaction.AQUATIC) 
+                && Ground.isWater(d.location.getGround(pixelPtToTilePt(d.standingPosition)).type)
+                && Ground.isWater(dude.location.getGround(pixelPtToTilePt(dude.standingPosition)).type)
+        }
+
+        // only traverse water
+        npc.pathFindingHeuristic = (pt: Point, goal: Point) => {
+            if (!Ground.isWater(dude.location.getGround(pt)?.type)) {
+                return 10_000
+            }
+            return pt.distanceTo(goal)
+        }
     }
 }

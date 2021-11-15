@@ -29,6 +29,7 @@ export interface NPCTaskContext {
         speedMultiplier: number, 
         options?: {
             ptSelectionFilter?: (pt: Point) => boolean,
+            goalOptionsSupplier?: () => Point[],
             pauseEveryMillis?: number,
             pauseForMillis?: number,
         }
