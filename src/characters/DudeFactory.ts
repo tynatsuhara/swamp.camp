@@ -267,7 +267,7 @@ export class DudeFactory {
                 weapon = WeaponType.UNARMED
                 additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new Enemy(), new AquaticNPC()]
                 maxHealth = 2
-                speed *= 1.3
+                speed *= .55
                 break
             default: {
                 throw new Error(`DudeType ${type} can't be instantiated`)

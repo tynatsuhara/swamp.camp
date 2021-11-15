@@ -388,8 +388,13 @@ export class Dude extends Component implements DialogueSource {
 
         const standingTilePos = pixelPtToTilePt(this.standingPosition)
         const ground = this.location.getGround(standingTilePos)
-        if (Ground.isWater(ground?.type) && !this.isJumping) {
-            speedMultiplier *= .4
+        
+        if (Ground.isWater(ground?.type)) {
+            if (this.factions.includes(DudeFaction.AQUATIC)) {
+                // don't affect speed
+            } else if (!this.isJumping) {
+                speedMultiplier *= .4
+            }
         }
         
         const verticalMovement = this.getVerticalMovement(updateData)
