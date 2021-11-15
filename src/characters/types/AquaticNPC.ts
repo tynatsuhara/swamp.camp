@@ -1,8 +1,10 @@
 import { Component } from "brigsby/dist/Component"
+import { Camera } from "../../cutscenes/Camera"
 import { pixelPtToTilePt } from "../../graphics/Tilesets"
 import { Ground } from "../../world/ground/Ground"
 import { WorldTime } from "../../world/WorldTime"
 import { Dude } from "../Dude"
+import { DudeType } from "../DudeFactory"
 import { NPC } from "../NPC"
 
 const VISIBLE_DISTANCE = 24
@@ -28,6 +30,13 @@ export class AquaticNPC extends Component {
         }
 
         anim.enabled = shouldBeVisible
+
+        // TODO: maybe shake when approaching?
+        // if (!anim.enabled 
+        //         && this.npc.targetedEnemy?.type === DudeType.PLAYER 
+        //         && this.npc.targetedEnemy.standingPosition.distanceTo(this.dude.standingPosition) < SHAKE_DISTANCE) {
+        //     Camera.instance.shake(1.5, 200)
+        // } 
     }
 
     private isVisible() {
