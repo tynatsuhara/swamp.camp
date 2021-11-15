@@ -1,10 +1,8 @@
 import { Component } from "brigsby/dist/Component"
-import { Camera } from "../../cutscenes/Camera"
 import { pixelPtToTilePt } from "../../graphics/Tilesets"
 import { Ground } from "../../world/ground/Ground"
 import { WorldTime } from "../../world/WorldTime"
 import { Dude } from "../Dude"
-import { DudeType } from "../DudeFactory"
 import { NPC } from "../NPC"
 
 const VISIBLE_DISTANCE = 24
