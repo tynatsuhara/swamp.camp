@@ -35,6 +35,7 @@ export enum DudeFaction {
     GNOLLS,
     BEARS,
     WOLVES,
+    AQUATIC,
 }
 
 export enum DudeType {
@@ -55,6 +56,7 @@ export enum DudeType {
     CLERIC,
     NUN,
     BISHOP,
+    SWAMP_THING,
 }
 
 export class DudeFactory {
@@ -181,7 +183,7 @@ export class DudeFactory {
                 factions = [DudeFaction.DEMONS]
                 animationName = "chort" 
                 weapon = WeaponType.UNARMED
-                additionalComponents = [new NPC(NPCSchedules.newFreeRoamInDarkSchedule()), new Enemy()]
+                additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new Enemy()]
                 maxHealth = 2
                 speed *= (.6 + Math.random()/5)
                 break
@@ -190,7 +192,7 @@ export class DudeFactory {
                 factions = [DudeFaction.DEMONS]
                 animationName = "big_demon" 
                 weapon = WeaponType.UNARMED
-                additionalComponents = [new NPC(NPCSchedules.newFreeRoamInDarkSchedule()), new Enemy()]
+                additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new Enemy()]
                 maxHealth = 8
                 speed *= (1 + .3 * Math.random())
                 colliderSize = bigColliderSize
@@ -258,6 +260,14 @@ export class DudeFactory {
                 speed *= .2
                 break
             }
+            case DudeType.SWAMP_THING:
+                factions = [DudeFaction.AQUATIC]
+                animationName = "swampy" 
+                weapon = WeaponType.UNARMED
+                additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new Enemy()]
+                maxHealth = 2
+                speed *= (.6 + Math.random()/5)
+                break
             default: {
                 throw new Error(`DudeType ${type} can't be instantiated`)
             }

@@ -4,7 +4,6 @@ import { TimeUnit } from "../../world/TimeUnit"
 export enum NPCScheduleType {
     DO_NOTHING,
     GO_TO_SPOT,  // fields: p (stringified tile Point)
-    ROAM_IN_DARKNESS,
     ROAM,
     DEFAULT_VILLAGER,
     GO_TO_LOCATION,
@@ -26,9 +25,6 @@ export const NPCSchedules = {
 
     // go to a specific spot and hang out there
     newGoToSchedule: (tilePoint: Point) => ({ type: NPCScheduleType.GO_TO_SPOT, p: tilePoint.toString() }),
-
-    // roam around, avoiding light (demons)
-    newFreeRoamInDarkSchedule: () => ({ type: NPCScheduleType.ROAM_IN_DARKNESS }),
 
     // just walk around aimlessly
     newFreeRoamSchedule: () => ({ type: NPCScheduleType.ROAM }),

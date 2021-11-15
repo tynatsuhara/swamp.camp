@@ -1,6 +1,7 @@
 import { Point } from "brigsby/dist/Point"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { LightManager } from "../../world/LightManager"
+import { DudeFaction, DudeType } from "../DudeFactory"
 import { NPCSchedule, NPCScheduleType } from "./NPCSchedule"
 import { NPCTask } from "./NPCTask"
 import { NPCTaskContext } from "./NPCTaskContext"
@@ -15,9 +16,7 @@ export class NPCTaskScheduleRoam extends NPCTask {
     }
 
     performTask(context: NPCTaskContext) {
-        if (this.schedule.type === NPCScheduleType.ROAM) {
-            context.roam(0.5)
-        } else if (this.schedule.type === NPCScheduleType.ROAM_IN_DARKNESS) {
+        if (context.dude.factions.includes(DudeFaction.DEMONS)) {
             context.roam(
                 LightManager.instance.isDark(context.dude.standingPosition, context.dude.location) ? 0.5 : 1,
                 {
@@ -25,7 +24,7 @@ export class NPCTaskScheduleRoam extends NPCTask {
                 }
             )
         } else {
-            throw new Error("invalid state")
+            context.roam(0.5)
         }
     }
 }

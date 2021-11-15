@@ -13,7 +13,6 @@ export class NPCTaskFactory {
                 return null
             case NPCScheduleType.GO_TO_SPOT:
                 return new NPCTaskScheduleGoToSpot(schedule)
-            case NPCScheduleType.ROAM_IN_DARKNESS:
             case NPCScheduleType.ROAM:
                 return new NPCTaskScheduleRoam(schedule)
             case NPCScheduleType.DEFAULT_VILLAGER:
