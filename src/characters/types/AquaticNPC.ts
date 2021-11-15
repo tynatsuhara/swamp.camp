@@ -6,6 +6,7 @@ import { Dude } from "../Dude"
 import { NPC } from "../NPC"
 
 const VISIBLE_DISTANCE = 24
+const SHAKE_DISTANCE = VISIBLE_DISTANCE * 2
 
 export class AquaticNPC extends Component {
     
@@ -16,8 +17,6 @@ export class AquaticNPC extends Component {
     awake() {
         this.npc = this.entity.getComponent(NPC)
         this.dude = this.entity.getComponent(Dude)
-
-        // TODO camera shake before appearing
     }
 
     update() {
@@ -39,10 +38,5 @@ export class AquaticNPC extends Component {
 
         const enemy = this.npc.targetedEnemy
         return enemy && enemy.standingPosition.distanceTo(this.dude.standingPosition) < VISIBLE_DISTANCE
-    }
-
-    isAggro(): boolean {
-        // TODO: Make centaurs potential enemies
-        return false
     }
 }

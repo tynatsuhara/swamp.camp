@@ -22,13 +22,14 @@ export class NPCTaskScheduleRoam extends NPCTask {
                 }
             )
         } else if (factions.includes(DudeFaction.AQUATIC)) {
+            const inWater = Ground.isWater(location.getGround(tilePos)?.type)
             context.roam(
-                Ground.isWater(location.getGround(tilePos)?.type) ? 0.3 : 0.1,
+                inWater ? 0.3 : 0.1,
                 {
                     ptSelectionFilter: (pt) => Ground.isWater(location.getGround(pt)?.type),
-                    goalOptionsSupplier: () => this.getTilesAround(tilePos, 5),
-                    pauseEveryMillis: 2500 + 2500 * Math.random(),
-                    pauseForMillis: 2500 + 5000 * Math.random(),
+                    goalOptionsSupplier: () => this.getTilesAround(tilePos, inWater ? 3 : 6),
+                    pauseEveryMillis: inWater ? (2500 + 2500 * Math.random()) : 0,
+                    pauseForMillis: inWater ? (2500 + 5000 * Math.random()) : 0,
                 }
             )
         } else {
