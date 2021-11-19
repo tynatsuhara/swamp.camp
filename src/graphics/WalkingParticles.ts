@@ -53,9 +53,7 @@ export class WalkingParticles extends Component {
             return
         }
 
-        const groud = LocationManager.instance.currentLocation.getGround(
-            pixelPtToTilePt(this.dude.standingPosition)
-        )
+        const groud = LocationManager.instance.currentLocation.getGround(this.dude.tile)
 
         if (Ground.isWater(groud?.type)) {
             const depth = this.dude.standingPosition.y + 6

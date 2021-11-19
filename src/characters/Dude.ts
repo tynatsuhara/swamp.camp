@@ -95,6 +95,9 @@ export class Dude extends Component implements DialogueSource {
             )
         )
     }
+    get tile(): Point {
+        return pixelPtToTilePt(this.standingPosition)
+    }
     private _isMoving: boolean
     get isMoving() {
         return this._isMoving
@@ -182,7 +185,7 @@ export class Dude extends Component implements DialogueSource {
         }
 
         this.start = () => {
-            this.seaLevel = this.location.levels?.get(pixelPtToTilePt(this.standingPosition)) ?? 0
+            this.seaLevel = this.location.levels?.get(this.tile) ?? 0
         }
     }
 
@@ -541,7 +544,7 @@ export class Dude extends Component implements DialogueSource {
             this.relativeColliderPos
         )
         if (skipColliderCheck) {
-            this.seaLevel = this.location.levels?.get(pixelPtToTilePt(this.standingPosition)) ?? 0
+            this.seaLevel = this.location.levels?.get(this.tile) ?? 0
         }
     }
 
@@ -555,7 +558,7 @@ export class Dude extends Component implements DialogueSource {
     private rollFunction = this.dashRoll
 
     roll() {
-        const ground = this.location.getGround(pixelPtToTilePt(this.standingPosition))
+        const ground = this.location.getGround(this.tile)
         if (!this.canRoll || Ground.isWater(ground?.type)) {
             return
         }

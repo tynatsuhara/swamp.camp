@@ -88,8 +88,8 @@ export class Enemy extends Component {
         npc.isEnemyFn = (d) => {
             return (
                 !d.factions.includes(DudeFaction.AQUATIC) &&
-                Ground.isWater(d.location.getGround(pixelPtToTilePt(d.standingPosition)).type) &&
-                Ground.isWater(dude.location.getGround(pixelPtToTilePt(dude.standingPosition)).type)
+                Ground.isWater(d.location.getGround(d.tile).type) &&
+                Ground.isWater(dude.location.getGround(dude.tile).type)
             )
         }
 

@@ -59,10 +59,9 @@ export class ShroomNPC extends Component {
 
         if (ogSize === 3 || Math.random() > 0.5) {
             // spread more shrooms
-            const tilePos = pixelPtToTilePt(this.dude.standingPosition)
             const plantedShroom = LocationManager.instance
                 .exterior()
-                .addElement(ElementType.MUSHROOM, tilePos)
+                .addElement(ElementType.MUSHROOM, this.dude.tile)
             if (!!plantedShroom) {
                 // successfully planted
                 return

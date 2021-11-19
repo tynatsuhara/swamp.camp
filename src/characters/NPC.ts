@@ -368,7 +368,7 @@ export class NPC extends Component {
         }
 
         if (!this.targetPath || this.targetPath.length === 0) {
-            this.targetPath = this.findPath(pixelPtToTilePt(this.attackTarget.standingPosition))
+            this.targetPath = this.findPath(this.attackTarget.tile)
         }
         if (!this.targetPath || this.targetPath.length === 0 || mag < stoppingDist) {
             // TODO: If using a ranged weapon, keep distance from enemies
@@ -469,10 +469,7 @@ export class NPC extends Component {
             if (target === this.attackTarget && !!this.targetPath && this.targetPath.length > 0) {
                 // We're already tracking this target. Only update the path if they have gotten closer,
                 // otherwise the attack() function will automatically extend the path.
-                // const currentGoal = pixelPtToTilePt(this.targetPath[this.targetPath.length-1])
-                const newGoal = pixelPtToTilePt(target.standingPosition)
-                const currentPos = pixelPtToTilePt(this.dude.standingPosition)
-                if (this.targetPath.length <= currentPos.manhattanDistanceTo(newGoal)) {
+                if (this.targetPath.length <= this.dude.tile.manhattanDistanceTo(target.tile)) {
                     shouldComputePath = false
                 }
             }
@@ -483,7 +480,7 @@ export class NPC extends Component {
             }
 
             if (shouldComputePath) {
-                this.targetPath = this.findPath(pixelPtToTilePt(target.standingPosition))
+                this.targetPath = this.findPath(target.tile)
             }
 
             this.attackTarget = target
@@ -498,10 +495,9 @@ export class NPC extends Component {
     }
 
     private findPath(targetTilePoint: Point) {
-        const start = pixelPtToTilePt(this.dude.standingPosition)
         // TODO: NPCs can sometimes get stuck if their starting square is "occupied"
         return LocationManager.instance.currentLocation
-            .findPath(start, targetTilePoint, this.pathFindingHeuristic)
+            .findPath(this.dude.tile, targetTilePoint, this.pathFindingHeuristic)
             ?.map((pt) => this.tilePtToStandingPos(pt))
             .slice(1) // slice(1) because we don't need the start in the path
     }
@@ -537,10 +533,9 @@ export class NPC extends Component {
         if (!this.teleporterTarget) {
             return
         }
-        const standingTile = pixelPtToTilePt(this.dude.standingPosition)
         const tilePt = pixelPtToTilePt(this.teleporterTarget.pos)
         this.walkTo(tilePt, updateData, speedMultiplier)
-        if (standingTile.manhattanDistanceTo(tilePt) <= 1) {
+        if (this.dude.tile.manhattanDistanceTo(tilePt) <= 1) {
             this.useTeleporter(this.teleporterTarget)
         }
     }

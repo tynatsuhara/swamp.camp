@@ -30,11 +30,7 @@ export class AquaticNPC extends Component {
 
     private isVisible() {
         // if not in the water, always visible
-        if (
-            !Ground.isWater(
-                this.dude.location.getGround(pixelPtToTilePt(this.dude.standingPosition))?.type
-            )
-        ) {
+        if (!Ground.isWater(this.dude.location.getGround(this.dude.tile)?.type)) {
             return true
         }
 

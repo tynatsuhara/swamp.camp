@@ -34,9 +34,7 @@ export class Villager extends Component {
 
             // Villagers only flee from acquatic creatures if they are in water
             if (d.factions.includes(DudeFaction.AQUATIC)) {
-                return Ground.isWater(
-                    dude.location.getGround(pixelPtToTilePt(dude.standingPosition))?.type
-                )
+                return Ground.isWater(dude.location.getGround(dude.tile)?.type)
             }
 
             return !d.factions.includes(DudeFaction.VILLAGERS)

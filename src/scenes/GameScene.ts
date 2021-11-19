@@ -118,7 +118,7 @@ export class GameScene {
             return
         }
 
-        const base = pixelPtToTilePt(Player.instance.dude.standingPosition)
+        const base = Player.instance.dude.tile
         const lines: RenderMethod[] = []
         const gridRange = 50
 
