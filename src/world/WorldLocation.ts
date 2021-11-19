@@ -200,7 +200,7 @@ export class WorldLocation {
         tileStart: Point,
         tileEnd: Point,
         heuristic: (pt: Point, goal: Point) => number,
-        isOccupied: (pt: Point) => boolean = () => false
+        isOccupied: (pt: Point) => boolean
     ) {
         const buffer = 5
         const range = this.size / 2 + buffer
