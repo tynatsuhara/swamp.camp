@@ -1,26 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="description" content="Journey to an unknown land! Establish a settlement! Fight some baddies! Play SWAMP CAMP pre-alpha today."/>
-    <meta name="keywords" content="brigsby, game engine, game dev, game development, town building game, town builder, animal crossing but with murder"/>
-    <title>SWAMP CAMP</title>
-    <script>
-        // redirect www
-        if (window.location.href.startsWith("https://www.")) {
-            const redirect = window.location.href.replace("https://www.", "https://")
-            window.location.replace(redirect)
-        }
-    </script>
-    <script src="app.js?q" type="text/javascript"></script>
-    <link rel="stylesheet" type="text/css" href="index.css">
-    <link rel="shortcut icon" href="favicon.ico" />
-</head>
-<body>
-    <div id="column">
-        <canvas id="canvas"></canvas>
-    </div>
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <meta
+            name="description"
+            content="Journey to an unknown land! Establish a settlement! Fight some baddies! Play SWAMP CAMP pre-alpha today."
+        />
+        <meta
+            name="keywords"
+            content="brigsby, game engine, game dev, game development, town building game, town builder, animal crossing but with murder"
+        />
+        <title>SWAMP CAMP</title>
+        <script>
+            // redirect www
+            if (window.location.href.startsWith("https://www.")) {
+                const redirect = window.location.href.replace("https://www.", "https://")
+                window.location.replace(redirect)
+            }
+        </script>
+        <script src="app.js?q" type="text/javascript"></script>
+        <link rel="stylesheet" type="text/css" href="index.css" />
+        <link rel="shortcut icon" href="favicon.ico" />
+    </head>
+    <body>
+        <div id="column">
+            <canvas id="canvas"></canvas>
+        </div>
+    </body>
 </html>

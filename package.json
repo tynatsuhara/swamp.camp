@@ -3,10 +3,9 @@
     "version": "1.0.0",
     "description": "SWAMP CAMP",
     "scripts": {
-        "clean": "rm static/app.js",
         "start": "webpack serve --mode=development",
-        "build": "webpack --mode=development",
-        "build:prod": "webpack --mode=production"
+        "build:prod": "webpack --mode=production",
+        "format": "npx prettier --write ."
     },
     "repository": {
         "type": "git",
