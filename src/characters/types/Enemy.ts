@@ -1,6 +1,6 @@
 import { Component } from "brigsby/dist/Component"
 import { Point } from "brigsby/dist/Point"
-import { pixelPtToTilePt, TILE_SIZE } from "../../graphics/Tilesets"
+import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Ground } from "../../world/ground/Ground"
 import { LightManager } from "../../world/LightManager"
 import { Dude } from "../Dude"

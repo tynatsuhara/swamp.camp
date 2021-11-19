@@ -1,7 +1,7 @@
 import { Component } from "brigsby/dist/Component"
-import { ElementType } from "./Elements"
 import { Point } from "brigsby/dist/Point"
 import { LocationManager } from "../LocationManager"
+import { ElementType } from "./Elements"
 
 /**
  * A component that all world space entities should have in order to be saveable.

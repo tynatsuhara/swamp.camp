@@ -1,5 +1,4 @@
 import { Component } from "brigsby/dist/Component"
-import { pixelPtToTilePt } from "../../graphics/Tilesets"
 import { Ground } from "../../world/ground/Ground"
 import { WorldTime } from "../../world/WorldTime"
 import { Dude } from "../Dude"

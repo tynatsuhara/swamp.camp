@@ -1,7 +1,7 @@
-import { ElementType } from "./Elements"
 import { Point } from "brigsby/dist/Point"
-import { ElementComponent } from "./ElementComponent"
 import { WorldLocation } from "../WorldLocation"
+import { ElementComponent } from "./ElementComponent"
+import { ElementType } from "./Elements"
 
 export abstract class ElementFactory {
     abstract readonly type: ElementType

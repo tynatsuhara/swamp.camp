@@ -1,24 +1,24 @@
-import {
-    DialogueInstance,
-    getDialogue,
-    NextDialogue,
-    DialogueSource,
-    EMPTY_DIALOGUE,
-} from "../characters/dialogue/Dialogue"
-import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
-import { NineSlice } from "brigsby/dist/sprites/NineSlice"
-import { Point } from "brigsby/dist/Point"
 import { Component } from "brigsby/dist/Component"
 import { UpdateData } from "brigsby/dist/Engine"
 import { Entity } from "brigsby/dist/Entity"
+import { Point } from "brigsby/dist/Point"
 import { BasicRenderComponent } from "brigsby/dist/renderer/BasicRenderComponent"
-import { TextAlign, formatText } from "./Text"
-import { Color } from "./Color"
+import { NineSlice } from "brigsby/dist/sprites/NineSlice"
+import {
+    DialogueInstance,
+    DialogueSource,
+    EMPTY_DIALOGUE,
+    getDialogue,
+    NextDialogue,
+} from "../characters/dialogue/Dialogue"
 import { Controls } from "../Controls"
-import { UIStateManager } from "./UIStateManager"
-import { ButtonsMenu } from "./ButtonsMenu"
-import { TextTyper } from "./TextTyper"
 import { Camera } from "../cutscenes/Camera"
+import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { ButtonsMenu } from "./ButtonsMenu"
+import { Color } from "./Color"
+import { formatText, TextAlign } from "./Text"
+import { TextTyper } from "./TextTyper"
+import { UIStateManager } from "./UIStateManager"
 
 export class DialogueDisplay extends Component {
     static instance: DialogueDisplay

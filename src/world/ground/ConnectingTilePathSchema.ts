@@ -1,12 +1,12 @@
-import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Point } from "brigsby/dist/Point"
 import { ImageRender } from "brigsby/dist/renderer/ImageRender"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
+import { GroundRenderer } from "../GroundRenderer"
+import { WorldLocation } from "../WorldLocation"
 import { ConnectingTileSchema } from "./ConnectingTileSchema"
 import { GroundType } from "./Ground"
-import { WorldLocation } from "../WorldLocation"
-import { GroundRenderer } from "../GroundRenderer"
 
 const CORNER_SIZE = TILE_SIZE / 2
 const CORNER_DIMS = new Point(CORNER_SIZE, CORNER_SIZE)

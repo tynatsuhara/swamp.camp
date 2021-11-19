@@ -11,12 +11,12 @@ import { Teleporter } from "../world/Teleporter"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldLocation } from "../world/WorldLocation"
 import { WorldTime } from "../world/WorldTime"
-import { Dude } from "./Dude"
 import { NPCSchedule, NPCSchedules } from "./ai/NPCSchedule"
-import { Player } from "./Player"
+import { NPCTask } from "./ai/NPCTask"
 import { NPCTaskContext } from "./ai/NPCTaskContext"
 import { NPCTaskFactory } from "./ai/NPCTaskFactory"
-import { NPCTask } from "./ai/NPCTask"
+import { Dude } from "./Dude"
+import { Player } from "./Player"
 
 /**
  * Shared logic for different types of NPCs. These should be invoked by an NPC controller component.

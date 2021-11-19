@@ -1,7 +1,7 @@
 import { BinaryHeap } from "brigsby/dist/util/BinaryHeap"
 import { Singletons } from "../../Singletons"
 import { WorldTime } from "../WorldTime"
-import { QueuedEventData, EVENT_QUEUE_HANDLERS, QueuedEventType } from "./QueuedEvent"
+import { EVENT_QUEUE_HANDLERS, QueuedEventData, QueuedEventType } from "./QueuedEvent"
 
 export class EventQueue {
     static get instance() {

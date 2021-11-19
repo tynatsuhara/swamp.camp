@@ -1,10 +1,10 @@
-import { GroundComponent } from "./GroundComponent"
-import { Point } from "brigsby/dist/Point"
 import { Entity } from "brigsby/dist/Entity"
-import { ConnectingTile } from "./ConnectingTile"
-import { GroundType, MakeGroundFuncData } from "./Ground"
+import { Point } from "brigsby/dist/Point"
 import { Tilesets } from "../../graphics/Tilesets"
+import { ConnectingTile } from "./ConnectingTile"
 import { ConnectingTilePathSchema } from "./ConnectingTilePathSchema"
+import { GroundType, MakeGroundFuncData } from "./Ground"
+import { GroundComponent } from "./GroundComponent"
 
 export const makePath = (d: MakeGroundFuncData): GroundComponent => {
     const schema = new ConnectingTilePathSchema(GroundType.PATH)

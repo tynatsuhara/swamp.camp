@@ -1,10 +1,10 @@
+import { Component } from "brigsby/dist/Component"
 import { Point } from "brigsby/dist/Point"
 import { ImageRender } from "brigsby/dist/renderer/ImageRender"
-import { Component } from "brigsby/dist/Component"
-import { ConnectingTileSchema } from "./ConnectingTileSchema"
-import { WorldLocation } from "../WorldLocation"
 import { GroundRenderer } from "../GroundRenderer"
 import { LocationManager } from "../LocationManager"
+import { WorldLocation } from "../WorldLocation"
+import { ConnectingTileSchema } from "./ConnectingTileSchema"
 
 export class ConnectingTile extends Component {
     readonly schema: ConnectingTileSchema

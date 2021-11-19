@@ -1,12 +1,12 @@
-import { Point } from "brigsby/dist/Point"
-import { Maths } from "brigsby/dist/util/Maths"
-import { Lists } from "brigsby/dist/util/Lists"
 import { Component } from "brigsby/dist/Component"
-import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
-import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { UpdateData } from "brigsby/dist/Engine"
+import { Point } from "brigsby/dist/Point"
 import { ImageRender } from "brigsby/dist/renderer/ImageRender"
+import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { Lists } from "brigsby/dist/util/Lists"
+import { Maths } from "brigsby/dist/util/Maths"
 import { Camera } from "../cutscenes/Camera"
+import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 
 export class OffScreenIndicator extends Component {
     private markerDistFromEdge = 12 + TILE_SIZE

@@ -1,12 +1,12 @@
 import { Component } from "brigsby/dist/Component"
+import { debug } from "brigsby/dist/Debug"
 import { Point } from "brigsby/dist/Point"
-import { KeyPressIndicator } from "../../ui/KeyPressIndicator"
+import { EllipseRender } from "brigsby/dist/renderer/EllipseRender"
 import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
 import { Controls } from "../../Controls"
 import { TILE_SIZE } from "../../graphics/Tilesets"
+import { KeyPressIndicator } from "../../ui/KeyPressIndicator"
 import { UIStateManager } from "../../ui/UIStateManager"
-import { debug } from "brigsby/dist/Debug"
-import { EllipseRender } from "brigsby/dist/renderer/EllipseRender"
 
 export class Interactable extends Component {
     position: Point

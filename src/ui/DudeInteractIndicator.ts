@@ -1,7 +1,7 @@
-import { Tilesets } from "../graphics/Tilesets"
 import { Point } from "brigsby/dist/Point"
 import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { ImageFilters } from "../graphics/ImageFilters"
+import { Tilesets } from "../graphics/Tilesets"
 import { Color } from "./Color"
 
 const getIcon = (indicator: string) => {

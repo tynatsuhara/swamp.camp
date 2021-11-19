@@ -1,11 +1,11 @@
-import { Entity } from "brigsby/dist/Entity"
 import { Component } from "brigsby/dist/Component"
 import { UpdateData } from "brigsby/dist/Engine"
-import { ElementType, Elements } from "../world/elements/Elements"
-import { Controls } from "../Controls"
+import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
-import { LocationManager } from "../world/LocationManager"
 import { Player } from "../characters/Player"
+import { Controls } from "../Controls"
+import { Elements, ElementType } from "../world/elements/Elements"
+import { LocationManager } from "../world/LocationManager"
 import { PlaceElementFrame } from "./PlaceElementFrame"
 
 export class PlaceElementDisplay extends Component {

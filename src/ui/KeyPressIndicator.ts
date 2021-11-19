@@ -1,14 +1,13 @@
 import { Component } from "brigsby/dist/Component"
-import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
-import { Tilesets } from "../graphics/Tilesets"
-import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
-import { Point } from "brigsby/dist/Point"
-import { TextRender } from "brigsby/dist/renderer/TextRender"
 import { InputKey, InputKeyString } from "brigsby/dist/Input"
-import { Controls } from "../Controls"
-import { TEXT_SIZE, TEXT_FONT } from "./Text"
-import { UIStateManager } from "./UIStateManager"
+import { Point } from "brigsby/dist/Point"
+import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
+import { TextRender } from "brigsby/dist/renderer/TextRender"
+import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { Tilesets } from "../graphics/Tilesets"
 import { Color } from "./Color"
+import { TEXT_FONT, TEXT_SIZE } from "./Text"
+import { UIStateManager } from "./UIStateManager"
 
 export class KeyPressIndicator extends Component {
     private readonly pos: Point

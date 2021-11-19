@@ -1,4 +1,3 @@
-import { UpdateData } from "brigsby/dist/Engine"
 import { NO_BREAK_SPACE_CHAR } from "./Text"
 
 export class TextTyper {

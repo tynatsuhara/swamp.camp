@@ -1,15 +1,15 @@
 import { Entity } from "brigsby/dist/Entity"
-import { HUD } from "./HUD"
 import { Player } from "../characters/Player"
-import { InventoryDisplay } from "./InventoryDisplay"
-import { DialogueDisplay } from "./DialogueDisplay"
-import { PlaceElementDisplay } from "./PlaceElementDisplay"
-import { PauseMenu } from "./PauseMenu"
-import { CraftingMenu } from "./CraftingMenu"
-import { SellMenu } from "./SellMenu"
-import { NotificationDisplay } from "./NotificationDisplay"
 import { Camera } from "../cutscenes/Camera"
 import { Singletons } from "../Singletons"
+import { CraftingMenu } from "./CraftingMenu"
+import { DialogueDisplay } from "./DialogueDisplay"
+import { HUD } from "./HUD"
+import { InventoryDisplay } from "./InventoryDisplay"
+import { NotificationDisplay } from "./NotificationDisplay"
+import { PauseMenu } from "./PauseMenu"
+import { PlaceElementDisplay } from "./PlaceElementDisplay"
+import { SellMenu } from "./SellMenu"
 
 export class UIStateManager {
     static get instance() {

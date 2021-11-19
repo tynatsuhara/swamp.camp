@@ -1,10 +1,10 @@
+import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
+import { NineSlice } from "brigsby/dist/sprites/NineSlice"
+import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { TEXT_PIXEL_WIDTH } from "./Text"
 import { TextButton } from "./TextButton"
 import { UIStateManager } from "./UIStateManager"
-import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
-import { NineSlice } from "brigsby/dist/sprites/NineSlice"
-import { TEXT_PIXEL_WIDTH } from "./Text"
-import { Entity } from "brigsby/dist/Entity"
 
 export type OptionButton = {
     text: string

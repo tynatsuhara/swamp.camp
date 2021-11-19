@@ -1,9 +1,8 @@
 import { Component } from "brigsby/dist/Component"
-import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
-import { Tilesets } from "../graphics/Tilesets"
-import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Point } from "brigsby/dist/Point"
-import { TextRender } from "brigsby/dist/renderer/TextRender"
+import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
+import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { Tilesets } from "../graphics/Tilesets"
 
 export class StringTiles extends Component {
     private topLeftPos: Point
