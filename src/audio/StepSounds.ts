@@ -3,8 +3,6 @@ import { Lists } from "brigsby/dist/util/Lists"
 import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
 import { Dude } from "../characters/Dude"
 import { Player } from "../characters/Player"
-import { pixelPtToTilePt } from "../graphics/Tilesets"
-import { Settings } from "../Settings"
 import { GroundType } from "../world/ground/Ground"
 import { LocationManager } from "../world/LocationManager"
 import { Sounds } from "./Sounds"
@@ -12,8 +10,6 @@ import { Sounds } from "./Sounds"
 const FOOTSTEP_SOUND_DISTANCE = 160
 
 export class StepSounds {
-    private static footstep: HTMLAudioElement
-
     private static readonly SPEED = 330
     private static readonly GRAVEL = "audio/steps/gravel.ogg"
     private static readonly LEAVES_1 = "audio/steps/leaves01.ogg"
@@ -79,9 +75,7 @@ export class StepSounds {
     }
 
     private static getSound = (dude: Dude): [string, number] => {
-        const ground = LocationManager.instance.currentLocation.getGround(
-            pixelPtToTilePt(dude.standingPosition)
-        )
+        const ground = LocationManager.instance.currentLocation.getGround(dude.tile)
         if (!ground) {
             return [undefined, 0]
         }
