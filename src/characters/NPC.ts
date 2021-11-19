@@ -32,6 +32,7 @@ export class NPC extends Component {
         return armedEnemies.length > 0 ? armedEnemies : enemies
     }
     pathFindingHeuristic: (pt: Point, goal: Point) => number = (pt, goal) => pt.manhattanDistanceTo(goal)
+    pathIsOccupied: (pt: Point) => boolean = () => false
 
     findTargetRange = TILE_SIZE * 10
     private enemiesPresent = false

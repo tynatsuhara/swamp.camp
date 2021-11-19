@@ -191,11 +191,15 @@ export class WorldLocation {
         return possibilities
     }
 
+    /**
+     * @param isOccupied a function which returns true if the pt cannot be included in a path
+     *                   (in addition to points which are globally occupied)
+     */
     findPath(
         tileStart: Point, 
         tileEnd: Point, 
-        heuristic: (pt: Point, goal: Point) => number, 
-        shortCircuit: number = Number.MAX_SAFE_INTEGER
+        heuristic: (pt: Point, goal: Point) => number,
+        isOccupied: (pt: Point) => boolean = () => false,
     ) {
         const buffer = 5
         const range = this.size/2 + buffer
@@ -220,9 +224,8 @@ export class WorldLocation {
                 if (shouldCheckRange && isOutsideRange(pt)) {
                     return true
                 }
-                return !!this.occupied.get(pt)
+                return !!this.occupied.get(pt) || isOccupied(pt)
             },
-            shortCircuit
         })
     }
 
