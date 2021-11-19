@@ -10,18 +10,20 @@ import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Singletons } from "../Singletons"
 
 /**
- * This is an optimization that pre-renders ground on an offscreen canvas. 
+ * This is an optimization that pre-renders ground on an offscreen canvas.
  * Not used by all ground types.
  */
 export class GroundRenderer {
-
     static readonly DEPTH = Number.MIN_SAFE_INTEGER + 10
 
     static get instance() {
         return Singletons.getOrCreate(GroundRenderer)
     }
-    
-    private locations: Map<WorldLocation, HTMLCanvasElement> = new Map<WorldLocation, HTMLCanvasElement>()
+
+    private locations: Map<WorldLocation, HTMLCanvasElement> = new Map<
+        WorldLocation,
+        HTMLCanvasElement
+    >()
 
     clearTile(wl: WorldLocation, position: Point) {
         let canvas = this.locations.get(wl)
@@ -29,7 +31,7 @@ export class GroundRenderer {
             return
         }
         const context = canvas.getContext("2d")
-        const shift = new Point(wl.size/2, wl.size/2)
+        const shift = new Point(wl.size / 2, wl.size / 2)
         const pos = position.plus(shift).times(TILE_SIZE)
         context.clearRect(pos.x, pos.y, TILE_SIZE, TILE_SIZE)
     }
@@ -38,7 +40,7 @@ export class GroundRenderer {
         if (wl.isInterior || !wl.size) {
             throw new Error("location cannot use GroundRenderer")
         }
-        const lim = wl.size/2
+        const lim = wl.size / 2
         if (position.x < -lim || position.x > lim || position.y < -lim || position.y > lim) {
             throw new Error("tile is outside of valid bounds")
         }
@@ -52,12 +54,18 @@ export class GroundRenderer {
         }
 
         const context = canvas.getContext("2d")
-        const shift = new Point(wl.size/2, wl.size/2)
+        const shift = new Point(wl.size / 2, wl.size / 2)
         const pos = position.plus(shift).times(TILE_SIZE)
         context.drawImage(
-            tile.image, 
-            tile.position.x, tile.position.y, TILE_SIZE, TILE_SIZE,
-            pos.x, pos.y, TILE_SIZE, TILE_SIZE, 
+            tile.image,
+            tile.position.x,
+            tile.position.y,
+            TILE_SIZE,
+            TILE_SIZE,
+            pos.x,
+            pos.y,
+            TILE_SIZE,
+            TILE_SIZE
         )
     }
 
@@ -73,15 +81,19 @@ export class GroundRenderer {
         }
 
         const dimensions = Camera.instance.dimensions.plus(new Point(1, 1))
-        const shift = new Point(1, 1).times(wl.size/2 * TILE_SIZE)
+        const shift = new Point(1, 1).times((wl.size / 2) * TILE_SIZE)
 
-        return new Entity([new BasicRenderComponent(new ImageRender(
-            canvas,
-            Camera.instance.position.plus(shift).apply(Math.floor),
-            dimensions,
-            Camera.instance.position.apply(Math.floor),
-            dimensions,
-            GroundRenderer.DEPTH
-        ))])
+        return new Entity([
+            new BasicRenderComponent(
+                new ImageRender(
+                    canvas,
+                    Camera.instance.position.plus(shift).apply(Math.floor),
+                    dimensions,
+                    Camera.instance.position.apply(Math.floor),
+                    dimensions,
+                    GroundRenderer.DEPTH
+                )
+            ),
+        ])
     }
 }

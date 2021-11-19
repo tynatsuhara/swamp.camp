@@ -6,7 +6,6 @@ import { NPCTaskScheduleDefaultVillager } from "./NPCTaskScheduleDefaultVillager
 import { NPCTaskScheduleGoToLocation } from "./NPCTaskScheduleGoToLocation"
 
 export class NPCTaskFactory {
-
     static fromSchedule(schedule: NPCSchedule): NPCTask {
         switch (schedule.type) {
             case NPCScheduleType.DO_NOTHING:

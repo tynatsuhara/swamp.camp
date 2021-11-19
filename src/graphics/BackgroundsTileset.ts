@@ -7,7 +7,7 @@ export class BackgroundsTileset {
     getTileSource(key: string): StaticSpriteSource {
         if (key === "mine-small") {
             return new StaticSpriteSource(
-                this.image(), 
+                this.image(),
                 Point.ZERO,
                 new Point(3, 4).times(TILE_SIZE)
             )

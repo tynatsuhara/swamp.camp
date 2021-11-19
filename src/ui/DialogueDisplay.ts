@@ -1,4 +1,10 @@
-import { DialogueInstance, getDialogue, NextDialogue, DialogueSource, EMPTY_DIALOGUE } from "../characters/dialogue/Dialogue"
+import {
+    DialogueInstance,
+    getDialogue,
+    NextDialogue,
+    DialogueSource,
+    EMPTY_DIALOGUE,
+} from "../characters/dialogue/Dialogue"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { NineSlice } from "brigsby/dist/sprites/NineSlice"
 import { Point } from "brigsby/dist/Point"
@@ -15,7 +21,6 @@ import { TextTyper } from "./TextTyper"
 import { Camera } from "../cutscenes/Camera"
 
 export class DialogueDisplay extends Component {
-
     static instance: DialogueDisplay
 
     private dialogueSource: DialogueSource
@@ -27,8 +32,12 @@ export class DialogueDisplay extends Component {
     private lines: TextTyper[]
     private optionsPopupTime: number
 
-    get isOpen() { return !!this.dialogue }
-    get source() { return this.dialogueSource }
+    get isOpen() {
+        return !!this.dialogue
+    }
+    get source() {
+        return this.dialogueSource
+    }
 
     constructor() {
         super()
@@ -45,11 +54,15 @@ export class DialogueDisplay extends Component {
         //     this.close()
         //     return
         // }
-        
-        const typer = this.lines[Math.min(this.lineIndex, this.lines.length-1)]
-        const showOptions = typer.isFinished && this.dialogue.options.length > 0 && this.lineIndex >= this.lines.length-1
-        const shouldProceed = updateData.input.isMouseDown || updateData.input.isKeyDown(Controls.interactButton)
-                        
+
+        const typer = this.lines[Math.min(this.lineIndex, this.lines.length - 1)]
+        const showOptions =
+            typer.isFinished &&
+            this.dialogue.options.length > 0 &&
+            this.lineIndex >= this.lines.length - 1
+        const shouldProceed =
+            updateData.input.isMouseDown || updateData.input.isKeyDown(Controls.interactButton)
+
         const line = typer.update(shouldProceed, updateData.elapsedTimeMillis)
 
         if (!showOptions && this.lineIndex === this.dialogue.lines.length) {
@@ -76,9 +89,9 @@ export class DialogueDisplay extends Component {
         }
     }
 
-    private completeSourceDialogue(nextFn: () => void|NextDialogue) {
+    private completeSourceDialogue(nextFn: () => void | NextDialogue) {
         const next = nextFn()
-        
+
         if (!next) {
             this.dialogueSource.dialogue = EMPTY_DIALOGUE
             this.close()
@@ -102,9 +115,12 @@ export class DialogueDisplay extends Component {
         this.dialogueSource = dialogueSource
         this.dialogue = getDialogue(dialogueSource.dialogue)
         this.lineIndex = 0
-        this.lines = this.dialogue.lines.map((l, i) => new TextTyper(l, () => {
-            this.lineIndex = Math.min(this.lineIndex + 1, this.lines.length)
-        }))
+        this.lines = this.dialogue.lines.map(
+            (l, i) =>
+                new TextTyper(l, () => {
+                    this.lineIndex = Math.min(this.lineIndex + 1, this.lines.length)
+                })
+        )
         this.optionsPopupTime = Number.MAX_SAFE_INTEGER
     }
 
@@ -113,12 +129,12 @@ export class DialogueDisplay extends Component {
         const bottomBuffer = TILE_SIZE
         const screenDimensions = Camera.instance.dimensions
         const topLeft = new Point(
-            Math.floor(screenDimensions.x/2 - dimensions.x/2),
+            Math.floor(screenDimensions.x / 2 - dimensions.x / 2),
             Math.floor(screenDimensions.y - dimensions.y - bottomBuffer)
         )
 
         const backgroundTiles = NineSlice.makeStretchedNineSliceComponents(
-            Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"), 
+            Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"),
             topLeft,
             dimensions
         )
@@ -126,18 +142,18 @@ export class DialogueDisplay extends Component {
 
         const topOffset = 2
         const margin = 12
-        const width = dimensions.x - margin*2
+        const width = dimensions.x - margin * 2
 
         const lines = formatText(
-            line, 
+            line,
             Color.DARK_RED,
             topLeft.plus(new Point(margin, topOffset + margin)),
-            width, 
+            width,
             TextAlign.CENTER
         )
-        lines.forEach(fr => fr.depth = UIStateManager.UI_SPRITE_DEPTH + 1)
+        lines.forEach((fr) => (fr.depth = UIStateManager.UI_SPRITE_DEPTH + 1))
 
-        backgroundTiles.forEach(tile => this.displayEntity.addComponent(tile))
+        backgroundTiles.forEach((tile) => this.displayEntity.addComponent(tile))
         this.displayEntity.addComponent(new BasicRenderComponent(...lines))
     }
 
@@ -150,17 +166,17 @@ export class DialogueDisplay extends Component {
         this.optionsEntity = ButtonsMenu.render(
             Camera.instance.dimensions,
             "white",
-            this.dialogue.options.map(o => { 
+            this.dialogue.options.map((o) => {
                 return {
-                    text: o.text, 
+                    text: o.text,
                     fn: () => {
                         if (now > canClickTime) {
                             this.completeSourceDialogue(o.next)
                         }
                     },
-                    buttonColor: 'white',
+                    buttonColor: "white",
                     textColor: Color.WHITE,
-                    hoverColor: Color.DARK_RED
+                    hoverColor: Color.DARK_RED,
                 }
             })
         )

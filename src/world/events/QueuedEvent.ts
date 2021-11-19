@@ -13,30 +13,32 @@ export enum QueuedEventType {
     HERALD_ARRIVAL,
     HERALD_DEPARTURE,
     HERALD_RETURN_WITH_NPC,
-    DAILY_SCHEDULE,          // executes daily at midnight
+    DAILY_SCHEDULE, // executes daily at midnight
     ORC_SEIGE,
 }
 
 export type QueuedEventData = {
-    type: QueuedEventType,
-    time: number,
-    [others: string]: any;
+    type: QueuedEventType
+    time: number
+    [others: string]: any
 }
 
-export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => void } = {
+export const EVENT_QUEUE_HANDLERS: {
+    [type: number]: (data: QueuedEventData) => void
+} = {
     [QueuedEventType.SIMULATE_NPCS]: () => {
         LocationManager.instance.simulateLocations(false)
 
         EventQueue.instance.addEvent({
             type: QueuedEventType.SIMULATE_NPCS,
-            time: WorldTime.instance.time + NPC.SCHEDULE_FREQUENCY
+            time: WorldTime.instance.time + NPC.SCHEDULE_FREQUENCY,
         })
     },
 
     [QueuedEventType.HERALD_ARRIVAL]: () => {
         DudeFactory.instance.new(
-            DudeType.HERALD, 
-            LocationManager.instance.exteriorEntrancePosition(), 
+            DudeType.HERALD,
+            LocationManager.instance.exteriorEntrancePosition(),
             LocationManager.instance.exterior()
         )
         NotificationDisplay.instance.push(Notifications.NEW_VILLAGER)
@@ -59,7 +61,7 @@ export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => 
             EventQueue.instance.addEvent({
                 type: QueuedEventType.HERALD_DEPARTURE,
                 time: WorldTime.instance.future({ minutes: 2 }),
-                oldSchedule: normalSchedule
+                oldSchedule: normalSchedule,
             })
         } else {
             console.log("[Berto] left the map")
@@ -84,11 +86,11 @@ export const EVENT_QUEUE_HANDLERS: { [type: number]: (data: QueuedEventData) => 
 
         const typesToSpawn = (data.dudeTypes || [DudeType.VILLAGER]) as DudeType[]
 
-        typesToSpawn.forEach(type => {
+        typesToSpawn.forEach((type) => {
             DudeFactory.instance.new(
-                type, 
-                LocationManager.instance.exteriorEntrancePosition(), 
-                LocationManager.instance.exterior(),
+                type,
+                LocationManager.instance.exteriorEntrancePosition(),
+                LocationManager.instance.exterior()
             )
         })
     },

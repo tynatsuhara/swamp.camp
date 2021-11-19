@@ -4,13 +4,14 @@ import { AbstractType } from "brigsby/dist/Types"
 import { Singletons } from "../Singletons"
 
 export class CutsceneManager {
-
     static get instance() {
         return Singletons.getOrCreate(CutsceneManager)
     }
 
     private entity: Entity = null
-    get isMidCutscene() { return !!this.entity }
+    get isMidCutscene() {
+        return !!this.entity
+    }
 
     /**
      * TODO: Handle the case where a cutscene starts, overlapping (this might not matter if we are careful with how we use them)

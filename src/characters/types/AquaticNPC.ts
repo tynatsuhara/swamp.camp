@@ -8,7 +8,6 @@ import { NPC } from "../NPC"
 const VISIBLE_DISTANCE = 24
 
 export class AquaticNPC extends Component {
-    
     private npc: NPC
     private dude: Dude
     private nextCanHideTime = 0
@@ -31,11 +30,18 @@ export class AquaticNPC extends Component {
 
     private isVisible() {
         // if not in the water, always visible
-        if (!Ground.isWater(this.dude.location.getGround(pixelPtToTilePt(this.dude.standingPosition))?.type)) {
+        if (
+            !Ground.isWater(
+                this.dude.location.getGround(pixelPtToTilePt(this.dude.standingPosition))?.type
+            )
+        ) {
             return true
         }
 
         const enemy = this.npc.targetedEnemy
-        return enemy && enemy.standingPosition.distanceTo(this.dude.standingPosition) < VISIBLE_DISTANCE
+        return (
+            enemy &&
+            enemy.standingPosition.distanceTo(this.dude.standingPosition) < VISIBLE_DISTANCE
+        )
     }
 }

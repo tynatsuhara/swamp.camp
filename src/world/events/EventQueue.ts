@@ -4,12 +4,11 @@ import { WorldTime } from "../WorldTime"
 import { QueuedEventData, EVENT_QUEUE_HANDLERS, QueuedEventType } from "./QueuedEvent"
 
 export class EventQueue {
-
     static get instance() {
         return Singletons.getOrCreate(EventQueue)
     }
 
-    private heap: BinaryHeap<QueuedEventData> = new BinaryHeap(e => e.time)
+    private heap: BinaryHeap<QueuedEventData> = new BinaryHeap((e) => e.time)
 
     initialize(data: QueuedEventData[] = []) {
         this.heap.clear()
@@ -40,6 +39,6 @@ export class EventQueue {
     }
 
     private containsEventType(type: QueuedEventType) {
-        return this.heap.getContents().some(data => data.type === type)
+        return this.heap.getContents().some((data) => data.type === type)
     }
 }

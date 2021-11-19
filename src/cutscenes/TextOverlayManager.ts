@@ -11,7 +11,6 @@ import { formatText, TextAlign, TEXT_PIXEL_WIDTH } from "../ui/Text"
 import { TextTyper } from "../ui/TextTyper"
 
 export class TextOverlayManager extends Component {
-
     static get instance() {
         return Singletons.getOrCreate(TextOverlayManager)
     }
@@ -28,7 +27,7 @@ export class TextOverlayManager extends Component {
     private textAlign: TextAlign
 
     private index = 0
-    private firstFrame = false  // prevent clicking "next" immediately
+    private firstFrame = false // prevent clicking "next" immediately
 
     get isActive() {
         return !!this.onFinish
@@ -37,17 +36,17 @@ export class TextOverlayManager extends Component {
     /**
      * @param text click-through displayed text, can include newlines
      * @param onFinish called after the clicking through the last string in the text array
-     * @param additionalComponents 
+     * @param additionalComponents
      */
     enable(
-        text: string[], 
-        finishAction: string, 
-        onFinish: () => void, 
+        text: string[],
+        finishAction: string,
+        onFinish: () => void,
         additionalComponents: Component[] = [],
-        textAlign: TextAlign = TextAlign.LEFT,
+        textAlign: TextAlign = TextAlign.LEFT
     ) {
         this.index = 0
-        this.text = text.map(t => new TextTyper(t, () => this.nextLine()))
+        this.text = text.map((t) => new TextTyper(t, () => this.nextLine()))
         this.finishAction = finishAction
         this.onFinish = onFinish
         this.additionalComponents = additionalComponents
@@ -77,36 +76,40 @@ export class TextOverlayManager extends Component {
         )
 
         this.firstFrame = false
-        
+
         const topLeft = new Point(
-            updateData.dimensions.x/2 - TextOverlayManager.WIDTH/2, 
+            updateData.dimensions.x / 2 - TextOverlayManager.WIDTH / 2,
             TextOverlayManager.VERTICAL_MARGIN
         )
 
         this.getRenderMethods = () => {
             const mouseIconPos = new Point(
-                updateData.dimensions.x - (updateData.dimensions.x - TextOverlayManager.WIDTH)/2 - TILE_SIZE,
+                updateData.dimensions.x -
+                    (updateData.dimensions.x - TextOverlayManager.WIDTH) / 2 -
+                    TILE_SIZE,
                 updateData.dimensions.y - TextOverlayManager.VERTICAL_MARGIN
             )
-            const action = this.index >= this.text.length-1 
-                    && Lists.last(this.text).isFinished 
-                            ? this.finishAction 
-                            : "..."
+            const action =
+                this.index >= this.text.length - 1 && Lists.last(this.text).isFinished
+                    ? this.finishAction
+                    : "..."
             return [
                 ...formatText(
-                    typedText, 
-                    Color.WHITE, 
-                    topLeft, 
+                    typedText,
+                    Color.WHITE,
+                    topLeft,
                     TextOverlayManager.WIDTH,
-                    this.textAlign,
+                    this.textAlign
                 ),
                 ...formatText(
-                    action, 
-                    Color.WHITE, 
-                    mouseIconPos.plus(new Point(-TEXT_PIXEL_WIDTH * action.length, 4)), 
-                    TextOverlayManager.WIDTH, 
+                    action,
+                    Color.WHITE,
+                    mouseIconPos.plus(new Point(-TEXT_PIXEL_WIDTH * action.length, 4)),
+                    TextOverlayManager.WIDTH
                 ),
-                Tilesets.instance.oneBit.getTileSource("leftClick").toImageRender(new SpriteTransform(mouseIconPos))
+                Tilesets.instance.oneBit
+                    .getTileSource("leftClick")
+                    .toImageRender(new SpriteTransform(mouseIconPos)),
             ]
         }
     }

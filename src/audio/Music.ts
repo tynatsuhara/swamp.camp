@@ -36,7 +36,7 @@ export class Music {
         "18_laugos_theme.mp3",
         "21_haunted_veranda.mp3",
         "22_flooded_cellars.mp3",
-        "35_ambient_evil_2.mp3",
+        "35_ambient_evil_2.mp3"
     )
 
     static readonly BATTLE_MUSIC_LOOPS: AudioPlayer[] = [
@@ -123,9 +123,9 @@ export class Music {
         return new QueueAudioPlayer(
             queueId,
             1,
-            Lists.shuffled(files.map(f => `audio/music/${f}`)),
+            Lists.shuffled(files.map((f) => `audio/music/${f}`)),
             10_000,
-            10_000,
+            10_000
         )
     }
 }

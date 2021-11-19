@@ -1,7 +1,6 @@
 import { Point } from "brigsby/dist/Point"
 
 export class AsciiInteriorBuilder {
-
     private readonly ascii: String[]
 
     constructor(...ascii: String[]) {

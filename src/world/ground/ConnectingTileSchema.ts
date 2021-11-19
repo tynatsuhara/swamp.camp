@@ -5,12 +5,10 @@ import { WorldLocation } from "../WorldLocation"
 import { ConnectingTile } from "./ConnectingTile"
 import { GroundComponent } from "./GroundComponent"
 
-
 /**
  * Defines how a type of connecting tiles interacts with other types of connecting tiles.
  */
 export abstract class ConnectingTileSchema {
-
     /**
      * Returns true if one schema can connect to another
      */
@@ -19,7 +17,7 @@ export abstract class ConnectingTileSchema {
     /**
      * Renders the tile source based on the given grid and position
      */
-    abstract render(location: WorldLocation, position: Point): ImageRender[] 
+    abstract render(location: WorldLocation, position: Point): ImageRender[]
 
     protected get(location: WorldLocation, pt: Point): ConnectingTile {
         const ground = location.getGround(pt)

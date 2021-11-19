@@ -10,7 +10,13 @@ import { makeWater } from "./Water"
 import { makeWaterfall } from "./Waterfall"
 
 export enum GroundType {
-    BASIC, BASIC_NINE_SLICE, GRASS, PATH, LEDGE, WATER, WATERFALL
+    BASIC,
+    BASIC_NINE_SLICE,
+    GRASS,
+    PATH,
+    LEDGE,
+    WATER,
+    WATERFALL,
 }
 
 export class SavedGround {
@@ -20,21 +26,22 @@ export class SavedGround {
 }
 
 export type MakeGroundFuncData = {
-    wl: WorldLocation,
-    pos: Point,
-    data: any,
+    wl: WorldLocation
+    pos: Point
+    data: any
 }
 
 /**
  * Ground and elements are very similar, except that ground components are always 1x1
  */
 export class Ground {
-
     static get instance() {
         return Singletons.getOrCreate(Ground)
     }
 
-    private readonly GROUND_FUNCTION_MAP: { [key: number]: (data: MakeGroundFuncData) => GroundComponent } = {
+    private readonly GROUND_FUNCTION_MAP: {
+        [key: number]: (data: MakeGroundFuncData) => GroundComponent
+    } = {
         [GroundType.BASIC]: makeBasicGround,
         [GroundType.BASIC_NINE_SLICE]: makeBasicNineSliceGround,
         [GroundType.GRASS]: makeGrass,
@@ -45,7 +52,7 @@ export class Ground {
     }
 
     make(type: GroundType, wl: WorldLocation, pos: Point, data: object) {
-        const ground = this.GROUND_FUNCTION_MAP[type]({wl, pos, data})
+        const ground = this.GROUND_FUNCTION_MAP[type]({ wl, pos, data })
         if (ground.type !== type) {
             throw new Error("constructed ground type doesn't match requested type")
         }
@@ -65,4 +72,4 @@ export class Ground {
     static isNaturalGround(type: GroundType) {
         return type === GroundType.GRASS || type === GroundType.PATH
     }
-} 
+}

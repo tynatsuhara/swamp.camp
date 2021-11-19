@@ -4,11 +4,10 @@ import { WeaponType } from "./WeaponType"
 
 enum State {
     DRAWN,
-    ATTACKING
+    ATTACKING,
 }
 
 export class UnarmedWeapon extends Weapon {
-
     private state: State = State.DRAWN
     private delay: number
 
@@ -20,7 +19,9 @@ export class UnarmedWeapon extends Weapon {
         return this.state === State.ATTACKING
     }
 
-    toggleSheathed() { /* no-op */ }
+    toggleSheathed() {
+        /* no-op */
+    }
 
     getRange(): number {
         return 15
@@ -41,14 +42,14 @@ export class UnarmedWeapon extends Weapon {
 
         const closestEnemy = enemies[0]
         const attackDir = closestEnemy.standingPosition.minus(this.dude.standingPosition)
-        this.dude.knockback(attackDir, 30)  // pounce
+        this.dude.knockback(attackDir, 30) // pounce
         closestEnemy.damage(
-            this.getDamageAmount(), 
-            closestEnemy.standingPosition.minus(this.dude.standingPosition), 
+            this.getDamageAmount(),
+            closestEnemy.standingPosition.minus(this.dude.standingPosition),
             50
         )
 
-        setTimeout(() => this.state = State.DRAWN, this.delay)
+        setTimeout(() => (this.state = State.DRAWN), this.delay)
     }
 
     private getDamageAmount() {

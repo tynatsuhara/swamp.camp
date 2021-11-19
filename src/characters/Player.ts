@@ -12,14 +12,17 @@ import { Interactable } from "../world/elements/Interactable"
 import { Dude } from "./Dude"
 
 export class Player extends Component {
-
     static instance: Player
-    
+
     private rollingMomentum: Point
     private _velocity: Point = Point.ZERO
-    get velocity() { return this._velocity }
+    get velocity() {
+        return this._velocity
+    }
     private _dude: Dude
-    get dude() { return this._dude }
+    get dude() {
+        return this._dude
+    }
 
     constructor() {
         super()
@@ -28,13 +31,13 @@ export class Player extends Component {
 
     awake() {
         this._dude = this.entity.getComponent(Dude)
-        this.dude.setOnDamageCallback(blocked => {
+        this.dude.setOnDamageCallback((blocked) => {
             if (!this.dude.isAlive) {
-                Camera.instance.shake(6, 600) 
+                Camera.instance.shake(6, 600)
             } else if (blocked) {
-                Camera.instance.shake(2.5, 400) 
+                Camera.instance.shake(2.5, 400)
             } else {
-                Camera.instance.shake(3.5, 400) 
+                Camera.instance.shake(3.5, 400)
             }
         })
         this.dude.droppedItemSupplier = () => []
@@ -45,7 +48,7 @@ export class Player extends Component {
             return
         }
 
-        this.dude.heal(updateData.elapsedTimeMillis/6500)
+        this.dude.heal(updateData.elapsedTimeMillis / 6500)
         const possibleInteractable = this.updateInteractables(updateData)
 
         let dx = 0
@@ -56,10 +59,18 @@ export class Player extends Component {
             dx = this.rollingMomentum.x
             dy = this.rollingMomentum.y
         } else if (!UIStateManager.instance.isMenuOpen || PlaceElementDisplay.instance.isOpen) {
-            if (updateData.input.isKeyHeld(Controls.walkUp)) { dy-- }
-            if (updateData.input.isKeyHeld(Controls.walkDown)) { dy++ }
-            if (updateData.input.isKeyHeld(Controls.walkLeft)) { dx-- }
-            if (updateData.input.isKeyHeld(Controls.walkRight)) { dx++ }
+            if (updateData.input.isKeyHeld(Controls.walkUp)) {
+                dy--
+            }
+            if (updateData.input.isKeyHeld(Controls.walkDown)) {
+                dy++
+            }
+            if (updateData.input.isKeyHeld(Controls.walkLeft)) {
+                dx--
+            }
+            if (updateData.input.isKeyHeld(Controls.walkRight)) {
+                dx++
+            }
         }
 
         let speed = 1
@@ -73,8 +84,8 @@ export class Player extends Component {
         this._velocity = new Point(dx, dy)
 
         this.dude.move(
-            updateData, 
-            this.velocity, 
+            updateData,
+            this.velocity,
             this.dude.rolling() ? 0 : updateData.input.mousePos.x - this.dude.standingPosition.x,
             speed
         )
@@ -83,8 +94,12 @@ export class Player extends Component {
             return
         }
 
-        if (!this.dude.rolling() && updateData.input.isKeyDown(InputKey.SPACE) && (dx !== 0 || dy !== 0)) {
-                // && !rollingBackwards) {
+        if (
+            !this.dude.rolling() &&
+            updateData.input.isKeyDown(InputKey.SPACE) &&
+            (dx !== 0 || dy !== 0)
+        ) {
+            // && !rollingBackwards) {
             this.dude.roll()
             this.rollingMomentum = new Point(dx, dy)
         }
@@ -97,7 +112,8 @@ export class Player extends Component {
 
         let blocking = false
         if (!!this.dude.shield) {
-            blocking = updateData.input.isRightMouseHeld || updateData.input.isKeyHeld(Controls.blockKey)
+            blocking =
+                updateData.input.isRightMouseHeld || updateData.input.isKeyHeld(Controls.blockKey)
             this.dude.shield.block(blocking)
         }
 
@@ -116,16 +132,16 @@ export class Player extends Component {
         const interactDistance = 20
         const interactCenter = this.dude.standingPosition.minus(new Point(0, 7))
         const interactables = updateData.view.entities
-                .map(e => e.getComponent(Interactable))
-                .filter(e => e?.enabled)
-        interactables.forEach(i => i.updateIndicator(false))
+            .map((e) => e.getComponent(Interactable))
+            .filter((e) => e?.enabled)
+        interactables.forEach((i) => i.updateIndicator(false))
 
         const possibilities = interactables
-                .filter(e => this.dude.isFacing(e.position))  // interactables the dude is facing
-                .filter(e => e.position.distanceTo(interactCenter) < interactDistance)
-                .filter(e => e.isInteractable())
+            .filter((e) => this.dude.isFacing(e.position)) // interactables the dude is facing
+            .filter((e) => e.position.distanceTo(interactCenter) < interactDistance)
+            .filter((e) => e.isInteractable())
 
-        const i = Lists.minBy(possibilities, e => e.position.distanceTo(interactCenter))
+        const i = Lists.minBy(possibilities, (e) => e.position.distanceTo(interactCenter))
         if (!!i) {
             i.updateIndicator(true)
         }

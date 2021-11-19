@@ -10,12 +10,11 @@ import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { GroundRenderer } from "../GroundRenderer"
 
 export const makeWater = (d: MakeGroundFuncData): GroundComponent => {
-    
     const schema = new ConnectingTileWaterSchema()
 
     const e = new Entity([
         getAnimatedWaterTileComponent(d.pos),
-        new ConnectingTile(schema, d.wl, d.pos)
+        new ConnectingTile(schema, d.wl, d.pos),
     ])
 
     return e.addComponent(new GroundComponent(GroundType.WATER))
@@ -27,9 +26,11 @@ export const getAnimatedWaterTileComponent = (pos: Point) => {
         [Tilesets.instance.tilemap.getTileAt(new Point(6, 0)), animationSpeed],
         [Tilesets.instance.tilemap.getTileAt(new Point(6, 1)), animationSpeed],
         // [Tilesets.instance.tilemap.getTileAt(new Point(6, 2)), animationSpeed],
-    ]).toComponent(SpriteTransform.new({ 
-        position: pos.times(TILE_SIZE),
-        depth: GroundRenderer.DEPTH - 5,
-        rotation: Math.floor(Math.random() * 4) * 90
-    }))
+    ]).toComponent(
+        SpriteTransform.new({
+            position: pos.times(TILE_SIZE),
+            depth: GroundRenderer.DEPTH - 5,
+            rotation: Math.floor(Math.random() * 4) * 90,
+        })
+    )
 }

@@ -24,5 +24,7 @@ export const makeBasicNineSliceGround = (d: MakeGroundFuncData) => {
     const nineSliceIndex = d.data.i
     const c = slice[nineSliceIndex].toComponent(new SpriteTransform(d.pos.times(TILE_SIZE)))
     c.transform.depth = GroundRenderer.DEPTH
-    return new Entity([c]).addComponent(new GroundComponent(GroundType.BASIC_NINE_SLICE, () => d.data))
+    return new Entity([c]).addComponent(
+        new GroundComponent(GroundType.BASIC_NINE_SLICE, () => d.data)
+    )
 }

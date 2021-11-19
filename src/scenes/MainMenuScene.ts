@@ -38,7 +38,6 @@ enum Menu {
 }
 
 export class MainMenuScene {
-
     private plumes: PlumePicker
     private knight: SpriteComponent
     private title = assets.getImageByFileName("images/title.png")
@@ -58,15 +57,14 @@ export class MainMenuScene {
         Ambiance.stop()
 
         this.render(Menu.ROOT)
-        this.plumes = new PlumePicker(
-            saveManager.getState().plume,
-            color => {
-                this.knight = new Entity().addComponent(
-                    DudeAnimationUtils.getCharacterIdleAnimation("knight_f", { color }).toComponent()
-                )
-                this.view = null  // force re-render
-            }
-        )
+        this.plumes = new PlumePicker(saveManager.getState().plume, (color) => {
+            this.knight = new Entity().addComponent(
+                DudeAnimationUtils.getCharacterIdleAnimation("knight_f", {
+                    color,
+                }).toComponent()
+            )
+            this.view = null // force re-render
+        })
     }
 
     loadLastSave() {
@@ -92,16 +90,16 @@ export class MainMenuScene {
 
     private render(menu: Menu) {
         this.menu = menu
-        this.view = null  // force re-render
+        this.view = null // force re-render
     }
-    
+
     getViews(updateViewsContext: UpdateViewsContext) {
         const dimensions = renderer.getDimensions().div(ZOOM)
-        
+
         // we need to re-render this each time since image bitmaps are async
         this.darkness?.render(dimensions, Point.ZERO)
 
-        // Don't re-render if nothing has changed, since a lot of  
+        // Don't re-render if nothing has changed, since a lot of
         // these functions involve parsing all of our save slots
         if (this.view && renderer.getDimensions().equals(this.lastDimensions)) {
             return [this.view]
@@ -111,20 +109,24 @@ export class MainMenuScene {
         const menuTop = center.plusY(31)
         this.plumes.position = menuTop
         const knightPos = menuTop
-                .minus(this.knight.transform.dimensions.floorDiv(2).plusY(24))
-                .plusX(-15)
-                .plusY(-37)
+            .minus(this.knight.transform.dimensions.floorDiv(2).plusY(24))
+            .plusX(-15)
+            .plusY(-37)
         this.knight.transform.position = knightPos
 
         const titleDimensions = new Point(200, 50)
-        const title = new Entity([new BasicRenderComponent(new ImageRender(
-            this.title,
-            Point.ZERO,
-            titleDimensions,
-            menuTop.plusX(-titleDimensions.x/2).plusY(-100 - titleDimensions.y/2),
-            titleDimensions,
-            UIStateManager.UI_SPRITE_DEPTH
-        ))])
+        const title = new Entity([
+            new BasicRenderComponent(
+                new ImageRender(
+                    this.title,
+                    Point.ZERO,
+                    titleDimensions,
+                    menuTop.plusX(-titleDimensions.x / 2).plusY(-100 - titleDimensions.y / 2),
+                    titleDimensions,
+                    UIStateManager.UI_SPRITE_DEPTH
+                )
+            ),
+        ])
 
         // This will set up the darkness mask
         const sceneEntities = this.getSceneEntities(knightPos)
@@ -137,12 +139,7 @@ export class MainMenuScene {
         }
 
         // by default, render the title and the scene with the knight
-        const entities = [
-            title,
-            this.knight.entity, 
-            darknessEntity,
-            ...sceneEntities
-        ]
+        const entities = [title, this.knight.entity, darknessEntity, ...sceneEntities]
 
         if (this.menu === Menu.ROOT) {
             const saveCount = saveManager.getSaveCount()
@@ -154,12 +151,12 @@ export class MainMenuScene {
                     .add("Credits", () => this.render(Menu.CREDITS))
                     .getEntity()
             )
-        } else if(this.menu === Menu.LOAD_GAME) {
+        } else if (this.menu === Menu.LOAD_GAME) {
             const menu = new MainMenuButtonSection(menuTop)
             saveManager.getSaves().forEach((save, i) => {
                 if (save) {
                     menu.add(
-                        `slot ${i+1} (${this.getSaveMetadataString(save)})`, 
+                        `slot ${i + 1} (${this.getSaveMetadataString(save)})`,
                         () => this.loadGame(i),
                         true,
                         () => this.showPlumeForSave(i)
@@ -175,7 +172,9 @@ export class MainMenuScene {
             const menu = new MainMenuButtonSection(menuTop)
             saveManager.getSaves().forEach((save, i) => {
                 menu.add(
-                    `slot ${i+1}: ${!save ? "new game" : `overwrite (${this.getSaveMetadataString(save)})`}`, 
+                    `slot ${i + 1}: ${
+                        !save ? "new game" : `overwrite (${this.getSaveMetadataString(save)})`
+                    }`,
                     () => {
                         this.overwritingSave = save
                         this.selectedNewGameSlot = i
@@ -185,7 +184,7 @@ export class MainMenuScene {
                     () => this.showPlumeForSave(i)
                 )
             })
-            menu.add("cancel", () => { 
+            menu.add("cancel", () => {
                 this.render(Menu.ROOT)
                 this.resetPlume()
             })
@@ -194,18 +193,25 @@ export class MainMenuScene {
             entities.push(
                 this.plumes.entity,
                 new MainMenuButtonSection(menuTop.plusY(42))
-                        .add(`${this.overwritingSave ? "destroy save & " : ""}start`, () => this.newGame())
-                        .add("cancel", () => {
-                            this.render(Menu.NEW_GAME)
-                            this.resetPlume()
-                        })
-                        .getEntity()
+                    .add(`${this.overwritingSave ? "destroy save & " : ""}start`, () =>
+                        this.newGame()
+                    )
+                    .add("cancel", () => {
+                        this.render(Menu.NEW_GAME)
+                        this.resetPlume()
+                    })
+                    .getEntity()
             )
         } else if (this.menu === Menu.CREDITS) {
-            entities.splice(0)  // don't show title and scene
-            const link = (url: string) => () => window.open(url, '_blank')
-            const entryCount = 13  // UPDATE THIS IF YOU ADD MORE CREDITS
-            const top = new Point(dimensions.x/2, dimensions.y/2 - entryCount * MainMenuButtonSection.LINE_SPACING/2 + TEXT_SIZE/2)
+            entities.splice(0) // don't show title and scene
+            const link = (url: string) => () => window.open(url, "_blank")
+            const entryCount = 13 // UPDATE THIS IF YOU ADD MORE CREDITS
+            const top = new Point(
+                dimensions.x / 2,
+                dimensions.y / 2 -
+                    (entryCount * MainMenuButtonSection.LINE_SPACING) / 2 +
+                    TEXT_SIZE / 2
+            )
             entities.push(
                 new MainMenuButtonSection(top)
                     .add(" code: Tyler Bonnell   ", link("https://ty.pizza/"))
@@ -225,11 +231,11 @@ export class MainMenuScene {
             )
         }
 
-        this.view = { 
+        this.view = {
             zoom: ZOOM,
             offset: Point.ZERO,
-            entities
-        };
+            entities,
+        }
 
         return [this.view]
     }
@@ -237,8 +243,8 @@ export class MainMenuScene {
     // scene constants
     private static readonly SIZE = 7
     private static readonly GRASS = Array.from(
-        { length: MainMenuScene.SIZE * 2 * MainMenuScene.SIZE * 2 }, 
-        () => Math.random() < .65 ? Math.floor(Math.random() * 4) : 0
+        { length: MainMenuScene.SIZE * 2 * MainMenuScene.SIZE * 2 },
+        () => (Math.random() < 0.65 ? Math.floor(Math.random() * 4) : 0)
     )
 
     private getSceneEntities(offset: Point) {
@@ -249,7 +255,8 @@ export class MainMenuScene {
             for (let y = -MainMenuScene.SIZE; y < MainMenuScene.SIZE; y++) {
                 // copied from grass component
                 let tile: StaticSpriteSource
-                const index = (y + MainMenuScene.SIZE) + (MainMenuScene.SIZE * 2 * (x + MainMenuScene.SIZE))
+                const index =
+                    y + MainMenuScene.SIZE + MainMenuScene.SIZE * 2 * (x + MainMenuScene.SIZE)
                 const grassType = MainMenuScene.GRASS[index]
                 if (grassType > 0) {
                     tile = Tilesets.instance.tilemap.getTileAt(new Point(0, grassType))
@@ -257,7 +264,7 @@ export class MainMenuScene {
                     tile = Tilesets.instance.tilemap.getTileAt(new Point(0, 7))
                 }
                 const render = tile.toImageRender(
-                    SpriteTransform.new({ 
+                    SpriteTransform.new({
                         position: new Point(x, y).times(TILE_SIZE).plus(offset),
                         depth: Number.MIN_SAFE_INTEGER,
                     })
@@ -267,19 +274,22 @@ export class MainMenuScene {
         }
 
         // campfire
-        const campfirePos = new Point(.5, 0).times(TILE_SIZE)
-                .plus(offset)
-                .plusX(6)
-                .plusY(20)
-                .apply(Math.floor)
-        components.push(new AnimatedSpriteComponent(
-            [Tilesets.instance.outdoorTiles.getTileSetAnimation("campfireOn", 2, 200)],
-            new SpriteTransform(campfirePos)
-        ))
+        const campfirePos = new Point(0.5, 0)
+            .times(TILE_SIZE)
+            .plus(offset)
+            .plusX(6)
+            .plusY(20)
+            .apply(Math.floor)
+        components.push(
+            new AnimatedSpriteComponent(
+                [Tilesets.instance.outdoorTiles.getTileSetAnimation("campfireOn", 2, 200)],
+                new SpriteTransform(campfirePos)
+            )
+        )
 
         // darkness
         this.darkness = new DarknessMask(false)
-        this.darkness.addLightCircle(campfirePos.plusX(TILE_SIZE/2).plusY(TILE_SIZE/2), 72)
+        this.darkness.addLightCircle(campfirePos.plusX(TILE_SIZE / 2).plusY(TILE_SIZE / 2), 72)
 
         return [new Entity(components)]
     }
@@ -291,9 +301,11 @@ export class MainMenuScene {
     private showPlumeForSave(slot: number) {
         if (!this.slotColors) {
             const saves = saveManager.getSaves()
-            const saveColors = saves.filter(save => !!save).map(save => save.state.plume[0])
-            this.slotColors = saves.map(save => save?.state?.plume)
-            this.unusedColors = CUSTOMIZATION_OPTIONS.filter(colorArray => !saveColors.includes(colorArray[0]))
+            const saveColors = saves.filter((save) => !!save).map((save) => save.state.plume[0])
+            this.slotColors = saves.map((save) => save?.state?.plume)
+            this.unusedColors = CUSTOMIZATION_OPTIONS.filter(
+                (colorArray) => !saveColors.includes(colorArray[0])
+            )
         }
         if (slot === this.previewingSlotPlume) {
             return
@@ -312,11 +324,11 @@ export class MainMenuScene {
         saveDate.setTime(save.timeSaved)
 
         let timePlayed: string
-        const minutesPlayed = Math.floor((save.state.timePlayed || 0)/(60_000))
+        const minutesPlayed = Math.floor((save.state.timePlayed || 0) / 60_000)
         if (minutesPlayed > 60) {
-            timePlayed = `${Math.floor(minutesPlayed/60)} hour${minutesPlayed > 120 ? 's' : ''}`
+            timePlayed = `${Math.floor(minutesPlayed / 60)} hour${minutesPlayed > 120 ? "s" : ""}`
         } else {
-            timePlayed = `${minutesPlayed} minute${minutesPlayed !== 1 ? 's' : ''}`
+            timePlayed = `${minutesPlayed} minute${minutesPlayed !== 1 ? "s" : ""}`
         }
 
         return `${timePlayed} played`

@@ -22,10 +22,12 @@ import { LightManager } from "../LightManager"
 import { Breakable } from "./Breakable"
 import { Item } from "../../items/Items"
 import { Lists } from "brigsby/dist/util/Lists"
-import { ROCKS_NEEDED_FOR_CAMPFIRE, WOOD_NEEDED_FOR_CAMPFIRE } from "../../characters/dialogue/DipDialogue"
+import {
+    ROCKS_NEEDED_FOR_CAMPFIRE,
+    WOOD_NEEDED_FOR_CAMPFIRE,
+} from "../../characters/dialogue/DipDialogue"
 
 export class CampfireFactory extends ElementFactory {
-
     readonly type = ElementType.CAMPFIRE
     readonly dimensions = new Point(1, 1)
 
@@ -33,50 +35,59 @@ export class CampfireFactory extends ElementFactory {
         const e = new Entity()
         const scaledPos = pos.times(TILE_SIZE)
         const depth = scaledPos.y + TILE_SIZE - 10
-        
-        const campfireOff = e.addComponent(new SpriteComponent(
-            Tilesets.instance.outdoorTiles.getTileSource("campfireOff"), 
-            new SpriteTransform(scaledPos)
-        ))
+
+        const campfireOff = e.addComponent(
+            new SpriteComponent(
+                Tilesets.instance.outdoorTiles.getTileSource("campfireOff"),
+                new SpriteTransform(scaledPos)
+            )
+        )
         campfireOff.transform.depth = depth
 
-        const campfireOn = e.addComponent(new AnimatedSpriteComponent(
-            [Tilesets.instance.outdoorTiles.getTileSetAnimation("campfireOn", 2, 200)],
-            new SpriteTransform(scaledPos)
-        ))
+        const campfireOn = e.addComponent(
+            new AnimatedSpriteComponent(
+                [Tilesets.instance.outdoorTiles.getTileSetAnimation("campfireOn", 2, 200)],
+                new SpriteTransform(scaledPos)
+            )
+        )
         campfireOn.transform.depth = depth
 
         const offset = new Point(0, 5)
-        e.addComponent(new BoxCollider(
-            scaledPos.plus(offset), 
-            new Point(TILE_SIZE, TILE_SIZE).minus(offset)
-        ))
+        e.addComponent(
+            new BoxCollider(scaledPos.plus(offset), new Point(TILE_SIZE, TILE_SIZE).minus(offset))
+        )
 
         const logsOnFire = data.logs ?? 0
         const lastLogConsumedTime = data.llct ?? 0
 
-        const pixelCenterPos = scaledPos.plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
+        const pixelCenterPos = scaledPos.plus(new Point(TILE_SIZE / 2, TILE_SIZE / 2))
 
-        e.addComponent(new Breakable(
-            pixelCenterPos, 
-            [campfireOff.transform, campfireOn.transform], 
-            () => Lists.repeat(WOOD_NEEDED_FOR_CAMPFIRE/2, [Item.WOOD]).concat(Lists.repeat(ROCKS_NEEDED_FOR_CAMPFIRE/2, [Item.ROCK]))
-        ))
+        e.addComponent(
+            new Breakable(pixelCenterPos, [campfireOff.transform, campfireOn.transform], () =>
+                Lists.repeat(WOOD_NEEDED_FOR_CAMPFIRE / 2, [Item.WOOD]).concat(
+                    Lists.repeat(ROCKS_NEEDED_FOR_CAMPFIRE / 2, [Item.ROCK])
+                )
+            )
+        )
 
-        const audio = e.addComponent(new PointAudio(
-            "audio/ambiance/campfire.ogg",
-            pixelCenterPos,
-            TILE_SIZE * 6,
-            true
-        ))
+        const audio = e.addComponent(
+            new PointAudio("audio/ambiance/campfire.ogg", pixelCenterPos, TILE_SIZE * 6, true)
+        )
 
         const updateFire = (logCount: number) => {
             campfireOff.enabled = logCount === 0
             campfireOn.enabled = !campfireOff.enabled
             audio.setMultiplier(logCount === 0 ? 0 : 1)
-            const lightCenterPos = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
+            const lightCenterPos = pos
+                .times(TILE_SIZE)
+                .plus(new Point(TILE_SIZE / 2, TILE_SIZE / 2))
             if (campfireOn.enabled) {
-                LightManager.instance.addLight(wl, e, lightCenterPos, Campfire.getLightSizeForLogCount(logCount))
+                LightManager.instance.addLight(
+                    wl,
+                    e,
+                    lightCenterPos,
+                    Campfire.getLightSizeForLogCount(logCount)
+                )
             } else {
                 LightManager.instance.removeLight(wl, e)
             }
@@ -85,20 +96,21 @@ export class CampfireFactory extends ElementFactory {
         const cf = e.addComponent(new Campfire(logsOnFire, lastLogConsumedTime, updateFire))
 
         // Toggle between on/off when interacted with
-        e.addComponent(new Interactable(
-            pixelCenterPos, 
-            () => {
-                DialogueDisplay.instance.startDialogue(cf)
-            }, 
-            new Point(1, -TILE_SIZE),
-        ))
+        e.addComponent(
+            new Interactable(
+                pixelCenterPos,
+                () => {
+                    DialogueDisplay.instance.startDialogue(cf)
+                },
+                new Point(1, -TILE_SIZE)
+            )
+        )
 
-        return e.addComponent(new ElementComponent(
-            ElementType.CAMPFIRE, 
-            pos,
-            [pos], 
-            () => { return { logs: cf.logs, llct: cf.lastLogConsumedTime } }
-        ))
+        return e.addComponent(
+            new ElementComponent(ElementType.CAMPFIRE, pos, [pos], () => {
+                return { logs: cf.logs, llct: cf.lastLogConsumedTime }
+            })
+        )
     }
 
     canPlaceInLocation(wl: WorldLocation) {
@@ -107,7 +119,6 @@ export class CampfireFactory extends ElementFactory {
 }
 
 export class Campfire extends Component implements DialogueSource {
-
     static readonly LOG_CAPACITY = 12
     static readonly LOG_DURATION_HOURS = 2
     private static readonly LOG_DURATION = Campfire.LOG_DURATION_HOURS * TimeUnit.HOUR
@@ -126,12 +137,15 @@ export class Campfire extends Component implements DialogueSource {
     }
 
     static getLightSizeForLogCount(logs: number) {
-        return TILE_SIZE * (5 + logs/2)
+        return TILE_SIZE * (5 + logs / 2)
     }
 
     update() {
         const logsBeforeUpdate = this.logs
-        while (this.logs > 0 && WorldTime.instance.time > this.lastLogConsumedTime + Campfire.LOG_DURATION) {
+        while (
+            this.logs > 0 &&
+            WorldTime.instance.time > this.lastLogConsumedTime + Campfire.LOG_DURATION
+        ) {
             this.lastLogConsumedTime += Campfire.LOG_DURATION
             this.logs--
         }
@@ -155,8 +169,10 @@ export class Campfire extends Component implements DialogueSource {
         if (this.logs === 0) {
             return duration === 0
         }
-        const currentLogTimeLeft = Campfire.LOG_DURATION - (WorldTime.instance.time - this.lastLogConsumedTime)/Campfire.LOG_DURATION
-        return duration < (this.logs-1) * Campfire.LOG_DURATION + currentLogTimeLeft
+        const currentLogTimeLeft =
+            Campfire.LOG_DURATION -
+            (WorldTime.instance.time - this.lastLogConsumedTime) / Campfire.LOG_DURATION
+        return duration < (this.logs - 1) * Campfire.LOG_DURATION + currentLogTimeLeft
     }
 
     delete() {

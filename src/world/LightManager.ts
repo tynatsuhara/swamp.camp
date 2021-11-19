@@ -14,19 +14,21 @@ import { WorldLocation } from "./WorldLocation"
 import { WorldTime } from "./WorldTime"
 
 export class LightManager extends Component {
-
     static get instance() {
         return Singletons.getOrCreate(LightManager)
     }
 
-    private lightTiles: Map<WorldLocation, Map<any, [Point, number]>> = new Map<WorldLocation, Map<any, [Point, number]>>()
+    private lightTiles: Map<WorldLocation, Map<any, [Point, number]>> = new Map<
+        WorldLocation,
+        Map<any, [Point, number]>
+    >()
     private mask = new DarknessMask(true)
 
     private vignette: Vignette
 
     /**
-    * @param key the unique key for location, will overwrite that light source if it already exists
-    */
+     * @param key the unique key for location, will overwrite that light source if it already exists
+     */
     addLight(wl: WorldLocation, key: any, pixelPosition: Point, diameter: number = 16) {
         if (diameter % 2 !== 0) {
             throw new Error("only even circle px diameters work right now")
@@ -39,39 +41,38 @@ export class LightManager extends Component {
     removeLight(wl: WorldLocation, key: any) {
         const locationLightMap = this.lightTiles.get(wl)
         if (!locationLightMap) {
-            return  // it is ok to fail silently here
+            return // it is ok to fail silently here
         }
         locationLightMap.delete(key)
     }
 
     /**
-    * returns true if it is dark enough for a demon to tolerate
-    */
-    isDark = (
-        pixelPt: Point, 
-        location: WorldLocation = LocationManager.instance.currentLocation
-    ) => this.isDarkHelper(pixelPt, location, 1)
+     * returns true if it is dark enough for a demon to tolerate
+     */
+    isDark = (pixelPt: Point, location: WorldLocation = LocationManager.instance.currentLocation) =>
+        this.isDarkHelper(pixelPt, location, 1)
 
     isTotalDarkness = (
-        pixelPt: Point, 
+        pixelPt: Point,
         location: WorldLocation = LocationManager.instance.currentLocation
     ) => this.isDarkHelper(pixelPt, location, DarknessMask.VISIBILITY_MULTIPLIER)
- 
+
     private isDarkHelper(
-        pixelPt: Point, 
-        location: WorldLocation, 
-        tolerableDistanceFromLightMultiplier: number)
-    : boolean {
+        pixelPt: Point,
+        location: WorldLocation,
+        tolerableDistanceFromLightMultiplier: number
+    ): boolean {
         const time = WorldTime.instance.time % TimeUnit.DAY
         if (time >= DarknessMask.SUNRISE_START && time < DarknessMask.SUNSET_END) {
-            return false  // daytime
+            return false // daytime
         }
         const locationLightMap = this.lightTiles.get(location)
         if (!locationLightMap) {
-            return true  // nighttime with no lights
+            return true // nighttime with no lights
         }
-        return !Array.from(locationLightMap.values()).some(entry => 
-            entry[0].distanceTo(pixelPt) < entry[1] * .5 * tolerableDistanceFromLightMultiplier
+        return !Array.from(locationLightMap.values()).some(
+            (entry) =>
+                entry[0].distanceTo(pixelPt) < entry[1] * 0.5 * tolerableDistanceFromLightMultiplier
         )
     }
 
@@ -80,7 +81,9 @@ export class LightManager extends Component {
         if (!this.vignette) {
             this.vignette = new Entity().addComponent(
                 new Vignette(
-                    new Point(1, 1).times(-LocationManager.instance.exterior().size/2 * TILE_SIZE), 
+                    new Point(1, 1).times(
+                        (-LocationManager.instance.exterior().size / 2) * TILE_SIZE
+                    ),
                     LocationManager.instance.exterior().size * TILE_SIZE
                 )
             )
@@ -88,13 +91,15 @@ export class LightManager extends Component {
 
         const location = LocationManager.instance.currentLocation
         this.mask.reset(WorldTime.instance.time)
-        
+
         // Always provide slight visibility around the player
         const player = Player.instance?.dude
         if (!!player) {
             if (player.shieldType !== ShieldType.LANTERN) {
                 this.mask.addFaintLightCircle(
-                    player.standingPosition.plusY(-TILE_SIZE/2).plus(player.getAnimationOffsetPosition())
+                    player.standingPosition
+                        .plusY(-TILE_SIZE / 2)
+                        .plus(player.getAnimationOffsetPosition())
                 )
             }
         }
@@ -104,7 +109,7 @@ export class LightManager extends Component {
             return
         }
 
-        Array.from(locationLightGrid.values()).forEach(entry => {
+        Array.from(locationLightGrid.values()).forEach((entry) => {
             this.mask.addLightCircle(entry[0], entry[1])
         })
     }
@@ -121,16 +126,13 @@ export class LightManager extends Component {
     private renderedEntity: Entity
 
     getEntities(): Entity[] {
-        const result = [
-            new Entity([this]),
-            this.renderedEntity
-        ]
+        const result = [new Entity([this]), this.renderedEntity]
 
         const location = LocationManager.instance.currentLocation
         if (!location.isInterior) {
             result.push(this.vignette?.entity)
         }
-        
+
         return result
     }
 }

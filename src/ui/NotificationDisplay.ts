@@ -13,7 +13,7 @@ import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
 import { UIStateManager } from "./UIStateManager"
 
 export const Notifications = {
-    NEW_VILLAGER: { text: "Someone has arrived!" }
+    NEW_VILLAGER: { text: "Someone has arrived!" },
 }
 
 const OFFSET = new Point(-4, 4)
@@ -21,13 +21,12 @@ const ICON_WIDTH = 20
 const DEFAULT_LIFESPAN_MILLIS = 5_000
 
 export type Notification = {
-    text: string,
-    icon?: string,              // one-bit tile key
-    isExpired?: () => boolean,  // default behavior is to expire after DEFAULT_LIFESPAN_MILLIS
+    text: string
+    icon?: string // one-bit tile key
+    isExpired?: () => boolean // default behavior is to expire after DEFAULT_LIFESPAN_MILLIS
 }
 
 class NotificationComponent extends Component {
-
     readonly n: Notification
     private t: SpriteTransform
     private width: number
@@ -46,22 +45,25 @@ class NotificationComponent extends Component {
             this.width = textPixelWidth + TILE_SIZE + (!!n.icon ? ICON_WIDTH : 0)
             this.height = TILE_SIZE * 2 - 2
             const pos = this.getPositon()
-    
+
             const backgroundTiles = NineSlice.makeStretchedNineSliceComponents(
-                Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"), 
+                Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"),
                 pos,
                 new Point(this.width, this.height)
             )
-            backgroundTiles.forEach(c => this.entity.addComponent(c))
+            backgroundTiles.forEach((c) => this.entity.addComponent(c))
             this.t = backgroundTiles[0].transform
-    
+
             if (!!n.icon) {
-                const icon = Tilesets.instance.oneBit.getTileSource(n.icon)
-                        .filtered(ImageFilters.tint(Color.DARK_RED))
-                        .toComponent(SpriteTransform.new({ 
-                            position: new Point(TILE_SIZE/2, 7), 
-                            depth: UIStateManager.UI_SPRITE_DEPTH + 1 
-                        }).relativeTo(this.t))
+                const icon = Tilesets.instance.oneBit
+                    .getTileSource(n.icon)
+                    .filtered(ImageFilters.tint(Color.DARK_RED))
+                    .toComponent(
+                        SpriteTransform.new({
+                            position: new Point(TILE_SIZE / 2, 7),
+                            depth: UIStateManager.UI_SPRITE_DEPTH + 1,
+                        }).relativeTo(this.t)
+                    )
                 this.entity.addComponent(icon)
             }
         }
@@ -72,15 +74,18 @@ class NotificationComponent extends Component {
     }
 
     getRenderMethods() {
-        const textPos = this.t.position.plusX(TILE_SIZE/2 + (!!this.n.icon ? ICON_WIDTH : 0)).plusY(this.height/2 - TEXT_SIZE/2 + .5)
+        const textPos = this.t.position
+            .plusX(TILE_SIZE / 2 + (!!this.n.icon ? ICON_WIDTH : 0))
+            .plusY(this.height / 2 - TEXT_SIZE / 2 + 0.5)
         return [
             new TextRender(
-                this.n.text.toUpperCase(), 
-                textPos, 
-                TEXT_SIZE, 
-                TEXT_FONT, 
-                Color.DARK_RED, 
-                UIStateManager.UI_SPRITE_DEPTH + 1)
+                this.n.text.toUpperCase(),
+                textPos,
+                TEXT_SIZE,
+                TEXT_FONT,
+                Color.DARK_RED,
+                UIStateManager.UI_SPRITE_DEPTH + 1
+            ),
         ]
     }
 
@@ -111,7 +116,6 @@ class NotificationComponent extends Component {
 }
 
 export class NotificationDisplay extends Component {
-
     static instance: NotificationDisplay
 
     private displayEntity: Entity
@@ -130,14 +134,14 @@ export class NotificationDisplay extends Component {
     }
 
     update(updateData: UpdateData) {
-        this.nComponents = this.nComponents.filter(n => !(n.isOffScreen() && n.n.isExpired()))
+        this.nComponents = this.nComponents.filter((n) => !(n.isOffScreen() && n.n.isExpired()))
     }
 
     getNotifications() {
-        return this.nComponents.map(nc => nc.n)
+        return this.nComponents.map((nc) => nc.n)
     }
 
     getEntities(): Entity[] {
-        return [this.displayEntity].concat(this.nComponents.map(c => c.entity))
+        return [this.displayEntity].concat(this.nComponents.map((c) => c.entity))
     }
 }

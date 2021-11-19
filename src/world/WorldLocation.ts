@@ -25,14 +25,15 @@ import { StaticSprites } from "./StaticSprites"
 import { Teleporter, TeleporterPrefix, Teleporters, TeleporterSound } from "./Teleporter"
 
 export class WorldLocation {
-
     private _uuid: string = newUUID()
-    get uuid() { return this._uuid }
+    get uuid() {
+        return this._uuid
+    }
 
     readonly dudes = new Set<Dude>()
 
     // Non-moving entities with tile coords (not pixel coords)
-    // Entities may be duplicated in multiple spots 
+    // Entities may be duplicated in multiple spots
     // (entities spawning multiple tiles eg a tent)
     // BUT an entity should only be in one of these data structures
     private readonly elements = new Grid<ElementComponent>()
@@ -43,11 +44,11 @@ export class WorldLocation {
     // TODO: Make dropped items saveable
     readonly droppedItems = new Set<Entity>()
 
-    private teleporters: { [key: string]: string } = {} 
+    private teleporters: { [key: string]: string } = {}
     private barriers: Entity[] = []
     readonly sprites = new Entity().addComponent(new StaticSprites())
 
-    readonly size: number  // tile dimensions (square)
+    readonly size: number // tile dimensions (square)
     readonly isInterior: boolean
     readonly allowPlacing: boolean
 
@@ -76,21 +77,21 @@ export class WorldLocation {
     }
 
     /**
-     * @param type 
+     * @param type
      * @param pos tile point
-     * @param data 
+     * @param data
      */
     addElement(type: ElementType, pos: Point, data: object = {}): ElementComponent {
         const factory = Elements.instance.getElementFactory(type)
         const elementPts = ElementUtils.rectPoints(pos, factory.dimensions)
-        if (elementPts.some(pt => !!this.elements.get(pt))) {
+        if (elementPts.some((pt) => !!this.elements.get(pt))) {
             return null
         }
 
         if (!factory.canPlaceAtPos(this, pos)) {
             return null
         }
-        
+
         const el = factory.make(this, pos, data)
         if (el.type !== type) {
             throw new Error("constructed element type doesn't match requested type")
@@ -101,10 +102,10 @@ export class WorldLocation {
         }
 
         // stake the element's claim for the land
-        elementPts.forEach(pt => this.elements.set(pt, el))
+        elementPts.forEach((pt) => this.elements.set(pt, el))
 
         // mark points as occupied for pathfinding, etc
-        el.occupiedPoints.forEach(pt => {
+        el.occupiedPoints.forEach((pt) => {
             this.occupied.set(pt, el)
             // reset the ground in order to handle things like flattening tall grass
             const groundData = this.ground.get(pt)
@@ -116,12 +117,12 @@ export class WorldLocation {
         if (!this.isInterior) {
             HUD.instance.miniMap.refresh()
         }
-        
+
         return el
     }
 
     getElementsOfType(type: ElementType): ElementComponent[] {
-        return this.elements.values().filter(el => el.type === type)
+        return this.elements.values().filter((el) => el.type === type)
     }
 
     getElements() {
@@ -165,7 +166,7 @@ export class WorldLocation {
     }
 
     /**
-     * @returns All the reasonable ground spots in the location. 
+     * @returns All the reasonable ground spots in the location.
      *          For exterior locations, excludes the very edge of the map.
      */
     getGroundSpots() {
@@ -180,7 +181,7 @@ export class WorldLocation {
         if (this.exteriorFleeingSpotsCache) {
             return this.exteriorFleeingSpotsCache
         }
-        const range = this.size/2 - 8  // don't run right to the edge of the map
+        const range = this.size / 2 - 8 // don't run right to the edge of the map
         const possibilities = []
         for (let x = -range; x < range; x++) {
             for (let y = -range; y < range; y++) {
@@ -196,23 +197,23 @@ export class WorldLocation {
      *                   (in addition to points which are globally occupied)
      */
     findPath(
-        tileStart: Point, 
-        tileEnd: Point, 
+        tileStart: Point,
+        tileEnd: Point,
         heuristic: (pt: Point, goal: Point) => number,
-        isOccupied: (pt: Point) => boolean = () => false,
+        isOccupied: (pt: Point) => boolean = () => false
     ) {
         const buffer = 5
-        const range = this.size/2 + buffer
+        const range = this.size / 2 + buffer
 
         const isOutsideRange = (pt: Point) => {
             return pt.x < -range || pt.x > range || pt.y < -range || pt.y > range
         }
 
         const shouldCheckRange = !(isOutsideRange(tileStart) || isOutsideRange(tileEnd))
-        
+
         return this.occupied.findPath(tileStart, tileEnd, {
             heuristic: (pt) => heuristic(pt, tileEnd),
-            distance: (a, b) => Ground.isWater(this.getGround(b)?.type) ? 3 : 1,
+            distance: (a, b) => (Ground.isWater(this.getGround(b)?.type) ? 3 : 1),
             isOccupied: (pt) => {
                 // Assuming this is used for character-to-character pathfinding, the start
                 // and end points in the grid should be assumed to be open. For instance,
@@ -236,12 +237,12 @@ export class WorldLocation {
 
     getTeleporter(toUUID: string) {
         return Object.entries(this.teleporters)
-                .filter(kv => kv[0].startsWith(toUUID))
-                .map(kv => ({
-                    to: toUUID,
-                    pos: Point.fromString(kv[1]),
-                    id: Teleporters.getId(kv[0])
-                }))[0]
+            .filter((kv) => kv[0].startsWith(toUUID))
+            .map((kv) => ({
+                to: toUUID,
+                pos: Point.fromString(kv[1]),
+                id: Teleporters.getId(kv[0]),
+            }))[0]
     }
 
     private getTeleporterLinkedPos(to: string, id: string): Point {
@@ -275,14 +276,14 @@ export class WorldLocation {
                 Sounds.play(...TeleporterSound.DOOR)
             } else if (id.startsWith(TeleporterPrefix.TENT)) {
                 Sounds.play(...TeleporterSound.TENT)
-            } 
-        }, 500);
+            }
+        }, 500)
 
         // load a new location
         HUD.instance.locationTransition.transition(() => {
             const linkedLocation = LocationManager.instance.get(to)
             const linkedPosition = this.getTeleporterLinkedPos(to, id)
-            
+
             // move the player to the new location's dude store
             const p = Player.instance.dude
             const beforeTeleportPos = p.standingPosition
@@ -292,18 +293,18 @@ export class WorldLocation {
 
             // update carried light sources
             if (p.shieldType === ShieldType.LANTERN) {
-                (p.shield as Lantern).removeLight()
+                ;(p.shield as Lantern).removeLight()
             }
 
             // refresh the HUD hide stale data
             HUD.instance.refresh()
-    
+
             // actually set the location
             LocationManager.instance.currentLocation = linkedLocation
 
             // delete existing particles
             Particles.instance.clear()
-    
+
             // position the player and camera
             const offset = p.standingPosition.minus(p.position)
             p.moveTo(linkedPosition.minus(offset), true)
@@ -311,25 +312,30 @@ export class WorldLocation {
 
             setTimeout(() => {
                 CutscenePlayerController.instance.disable()
-            }, 400);
+            }, 400)
         })
     }
 
     setBarriers(barriers: Barrier[]) {
-        this.barriers = barriers.map(b => b.entity || new Entity([b]))
+        this.barriers = barriers.map((b) => b.entity || new Entity([b]))
     }
 
     getEntities() {
-        return Array.from(Array.from(this.dudes.values()).map(d => d.entity))
-                .concat(this.elements.values().map(c => c.entity))
-                .concat(this.ground.values().filter(c => !c.tickExclude).map(c => c.entity))
-                .concat(Array.from(this.droppedItems))
-                .concat(this.barriers)
-                .concat([this.sprites.entity])
+        return Array.from(Array.from(this.dudes.values()).map((d) => d.entity))
+            .concat(this.elements.values().map((c) => c.entity))
+            .concat(
+                this.ground
+                    .values()
+                    .filter((c) => !c.tickExclude)
+                    .map((c) => c.entity)
+            )
+            .concat(Array.from(this.droppedItems))
+            .concat(this.barriers)
+            .concat([this.sprites.entity])
     }
 
     getDude(dudeType: DudeType): Dude {
-        return Array.from(this.dudes.values()).filter(d => d.type === dudeType)[0]
+        return Array.from(this.dudes.values()).filter((d) => d.type === dudeType)[0]
     }
 
     save(): LocationSaveState {
@@ -337,9 +343,11 @@ export class WorldLocation {
             uuid: this.uuid,
             ground: this.saveGround(),
             elements: this.saveElements(),
-            dudes: Array.from(this.dudes).filter(d => d.isAlive && !!d.entity).map(d => d.save()),
+            dudes: Array.from(this.dudes)
+                .filter((d) => d.isAlive && !!d.entity)
+                .map((d) => d.save()),
             teleporters: this.teleporters,
-            barriers: this.barriers.map(b => b.getComponent(Barrier).toJson()),
+            barriers: this.barriers.map((b) => b.getComponent(Barrier).toJson()),
             staticSprites: this.sprites.toJson(),
             isInterior: this.isInterior,
             allowPlacing: this.allowPlacing,
@@ -349,11 +357,13 @@ export class WorldLocation {
     }
 
     toggleAudio(active: boolean) {
-        this.getEntities().flatMap(e => e.getComponents(PointAudio)).forEach(aud => aud.setActive(active))
+        this.getEntities()
+            .flatMap((e) => e.getComponents(PointAudio))
+            .forEach((aud) => aud.setActive(active))
     }
 
     private saveElements(): SavedElement[] {
-        return this.elements.values().map(entity => {
+        return this.elements.values().map((entity) => {
             const el = new SavedElement()
             el.pos = entity.pos.toString()
             el.type = entity.type
@@ -363,7 +373,7 @@ export class WorldLocation {
     }
 
     private saveGround(): SavedGround[] {
-        return this.ground.entries().map(kv => {
+        return this.ground.entries().map((kv) => {
             const el = new SavedGround()
             el.pos = kv[0].toString()
             el.type = kv[1].type
@@ -377,22 +387,19 @@ export class WorldLocation {
         const size = saveState.size || (saveState.isInterior ? null : 70)
         const levels = saveState.levels ? Grid.deserialize(saveState.levels) : null
 
-        const n = new WorldLocation(
-            saveState.isInterior, 
-            saveState.allowPlacing, 
-            size,
-            levels
-        )
+        const n = new WorldLocation(saveState.isInterior, saveState.allowPlacing, size, levels)
 
         n._uuid = saveState.uuid
         n.teleporters = saveState.teleporters
-        n.barriers = saveState.barriers.map(b => Barrier.fromJson(b))
+        n.barriers = saveState.barriers.map((b) => Barrier.fromJson(b))
         n.sprites.fromJson(saveState.staticSprites)
-        saveState.ground.forEach(el => n.setGroundElement(el.type, Point.fromString(el.pos), el.obj))
-        saveState.elements.forEach(el => n.addElement(el.type, Point.fromString(el.pos), el.obj))
-        saveState.dudes.forEach(d => DudeFactory.instance.load(d, n))
+        saveState.ground.forEach((el) =>
+            n.setGroundElement(el.type, Point.fromString(el.pos), el.obj)
+        )
+        saveState.elements.forEach((el) => n.addElement(el.type, Point.fromString(el.pos), el.obj))
+        saveState.dudes.forEach((d) => DudeFactory.instance.load(d, n))
         n.toggleAudio(false)
-        
+
         return n
     }
 }

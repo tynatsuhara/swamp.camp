@@ -38,13 +38,12 @@ import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { Residence } from "../world/residences/Residence"
 
 export class Dude extends Component implements DialogueSource {
-
     static readonly PLAYER_COLLISION_LAYER = "playa"
     static readonly NPC_COLLISION_LAYER = "npc"
 
     // managed by WorldLocation/LocationManager classes
     location: WorldLocation
-    
+
     blob: object
     readonly uuid: string
     readonly type: DudeType
@@ -52,32 +51,49 @@ export class Dude extends Component implements DialogueSource {
     readonly inventory: Inventory
     readonly maxHealth: number
     private _health: number
-    get health() { return this._health }
+    get health() {
+        return this._health
+    }
     speed: number
     private characterAnimName: string
     private _animation: AnimatedSpriteComponent
-    get animation() { return this._animation }
+    get animation() {
+        return this._animation
+    }
 
     private _weapon: Weapon
-    get weapon() { return this._weapon }
-    get weaponType() { return this.weapon?.getType() ?? WeaponType.NONE}
+    get weapon() {
+        return this._weapon
+    }
+    get weaponType() {
+        return this.weapon?.getType() ?? WeaponType.NONE
+    }
     private _shield: Shield
-    get shield() { return this._shield }
-    get shieldType() { return this.shield?.type ?? ShieldType.NONE}
+    get shield() {
+        return this._shield
+    }
+    get shieldType() {
+        return this.shield?.type ?? ShieldType.NONE
+    }
 
     private collider: BoxCollider
     private relativeColliderPos: Point = new Point(3, 15)
-    get colliderSize() { 
+    get colliderSize() {
         return this.collider.dimensions
-     }
-    
+    }
+
     private _position: Point
     get position(): Point {
         return this._position
     }
     // bottom center of the tile
     get standingPosition(): Point {
-        return this.position.plus(new Point(this.animation.transform.dimensions.x/2, this.animation.transform.dimensions.y))
+        return this.position.plus(
+            new Point(
+                this.animation.transform.dimensions.x / 2,
+                this.animation.transform.dimensions.y
+            )
+        )
     }
     private _isMoving: boolean
     get isMoving() {
@@ -101,7 +117,7 @@ export class Dude extends Component implements DialogueSource {
         inventory: Inventory,
         dialogue: string,
         blob: object,
-        colliderSize: Point,
+        colliderSize: Point
     ) {
         super()
         this.uuid = uuid
@@ -123,10 +139,13 @@ export class Dude extends Component implements DialogueSource {
             const jumpAnim = DudeAnimationUtils.getCharacterJumpAnimation(characterAnimName, blob)
             const height = idleAnim.getSprite(0).dimensions.y
             this._animation = this.entity.addComponent(
-                new AnimatedSpriteComponent([idleAnim, runAnim, jumpAnim], new SpriteTransform(new Point(0, 28-height)))
+                new AnimatedSpriteComponent(
+                    [idleAnim, runAnim, jumpAnim],
+                    new SpriteTransform(new Point(0, 28 - height))
+                )
             )
-            this._animation.fastForward(Math.random() * 1000)  // so not all the animations sync up
-    
+            this._animation.fastForward(Math.random() * 1000) // so not all the animations sync up
+
             this.setWeapon(weaponType)
             this.setShield(shieldType)
 
@@ -134,21 +153,30 @@ export class Dude extends Component implements DialogueSource {
 
             // Set up collider
             this.relativeColliderPos = new Point(
-                this.animation.transform.dimensions.x/2 - colliderSize.x/2, 
+                this.animation.transform.dimensions.x / 2 - colliderSize.x / 2,
                 this.animation.transform.dimensions.y - colliderSize.y
             )
-            this.collider = this.entity.addComponent(new BoxCollider(
-                this.position.plus(this.relativeColliderPos), 
-                colliderSize, 
-                this.type === DudeType.PLAYER ? Dude.PLAYER_COLLISION_LAYER : Dude.NPC_COLLISION_LAYER
-            ))
+            this.collider = this.entity.addComponent(
+                new BoxCollider(
+                    this.position.plus(this.relativeColliderPos),
+                    colliderSize,
+                    this.type === DudeType.PLAYER
+                        ? Dude.PLAYER_COLLISION_LAYER
+                        : Dude.NPC_COLLISION_LAYER
+                )
+            )
 
-            this.dialogueInteract = this.entity.addComponent(new Interactable(
-                new Point(0, 0), 
-                () => DialogueDisplay.instance.startDialogue(this),
-                Point.ZERO,
-                () => !UIStateManager.instance.isMenuOpen && !!this.dialogue && this.entity.getComponent(NPC)?.canTalk()
-            ))
+            this.dialogueInteract = this.entity.addComponent(
+                new Interactable(
+                    new Point(0, 0),
+                    () => DialogueDisplay.instance.startDialogue(this),
+                    Point.ZERO,
+                    () =>
+                        !UIStateManager.instance.isMenuOpen &&
+                        !!this.dialogue &&
+                        this.entity.getComponent(NPC)?.canTalk()
+                )
+            )
 
             StepSounds.startFootstepSoundLoop(this)
         }
@@ -164,15 +192,22 @@ export class Dude extends Component implements DialogueSource {
         // All other transforms (eg the weapon) are positioned relative to the animation
         this.animation.transform.position = this.position
         if (this.layingDownOffset) {
-            this.animation.transform.position = this.animation.transform.position.plus(this.layingDownOffset)
+            this.animation.transform.position = this.animation.transform.position.plus(
+                this.layingDownOffset
+            )
         } else if (this.isRolling && this.animation.transform.rotation !== 0) {
-            this.animation.transform.position = this.animation.transform.position.plus(this.rollingOffset)
+            this.animation.transform.position = this.animation.transform.position.plus(
+                this.rollingOffset
+            )
         }
 
         if (!!this.dialogueInteract) {
             this.dialogueInteract.position = this.standingPosition.minus(new Point(0, 5))
-            this.dialogueInteract.uiOffset = new Point(0, -TILE_SIZE * 1.5).plus(this.getAnimationOffsetPosition())
-            this.dialogueInteract.enabled = this.dialogue !== EMPTY_DIALOGUE && DialogueDisplay.instance.source !== this
+            this.dialogueInteract.uiOffset = new Point(0, -TILE_SIZE * 1.5).plus(
+                this.getAnimationOffsetPosition()
+            )
+            this.dialogueInteract.enabled =
+                this.dialogue !== EMPTY_DIALOGUE && DialogueDisplay.instance.source !== this
         }
     }
 
@@ -186,7 +221,9 @@ export class Dude extends Component implements DialogueSource {
         this._shield = this.entity.addComponent(ShieldFactory.make(type))
     }
 
-    get isAlive() { return this._health > 0 }
+    get isAlive() {
+        return this._health > 0
+    }
 
     damage(damage: number, direction: Point, knockback: number) {
         if (this.rolling()) {
@@ -194,20 +231,24 @@ export class Dude extends Component implements DialogueSource {
         }
 
         // absorb damage if facing the direction of the enemy
-        let blocked = this.shield?.isBlocking() && !this.isFacing(this.standingPosition.plus(direction))
+        let blocked =
+            this.shield?.isBlocking() && !this.isFacing(this.standingPosition.plus(direction))
         if (blocked) {
-            damage *= .25
-            knockback *= .4
+            damage *= 0.25
+            knockback *= 0.4
         }
-        
+
         if (this.isAlive) {
-            if ((this.type === DudeType.PLAYER && debug.godMode) || this.maxHealth === Number.MAX_SAFE_INTEGER) {
+            if (
+                (this.type === DudeType.PLAYER && debug.godMode) ||
+                this.maxHealth === Number.MAX_SAFE_INTEGER
+            ) {
                 damage = 0
             }
             this._health -= damage
             if (!this.isAlive) {
                 this.die(direction)
-                knockback *= (1 + Math.random())
+                knockback *= 1 + Math.random()
             }
         }
 
@@ -225,14 +266,14 @@ export class Dude extends Component implements DialogueSource {
 
     droppedItemSupplier: () => Item[] = () => [Item.COIN]
     private layingDownOffset: Point
-    
+
     die(direction: Point = new Point(-1, 0)) {
         this._health = 0
 
         // position the body
         const prePos = this.animation.transform.position
         this.animation.transform.rotate(
-            90 * (direction.x >= 0 ? 1 : -1), 
+            90 * (direction.x >= 0 ? 1 : -1),
             this.standingPosition.plusY(-5)
         )
         this.layingDownOffset = this.animation.transform.position.minus(prePos)
@@ -241,11 +282,19 @@ export class Dude extends Component implements DialogueSource {
 
         // spawn items
         const items = this.droppedItemSupplier()
-        items.forEach(item => {
+        items.forEach((item) => {
             const randomness = 8
-            const velocity = direction.normalized().plus(new Point(Math.random()-.5, Math.random()-.5).times(randomness))
+            const velocity = direction
+                .normalized()
+                .plus(new Point(Math.random() - 0.5, Math.random() - 0.5).times(randomness))
             setTimeout(
-                () => spawnItem(this.standingPosition.minus(new Point(0, 2)), item, velocity, this.collider), 
+                () =>
+                    spawnItem(
+                        this.standingPosition.minus(new Point(0, 2)),
+                        item,
+                        velocity,
+                        this.collider
+                    ),
                 100
             )
         })
@@ -268,26 +317,27 @@ export class Dude extends Component implements DialogueSource {
         // play death cutscene if applicable
         if (this.type === DudeType.PLAYER) {
             if (CutsceneManager.instance.isCutsceneActive(IntroCutscene)) {
-                setTimeout(() => this.revive(), 1000 + Math.random() * 1000);
+                setTimeout(() => this.revive(), 1000 + Math.random() * 1000)
             } else {
                 CutsceneManager.instance.startCutscene(new DeathCutscene())
             }
         } else if (this.factions.includes(DudeFaction.VILLAGERS)) {
             // If they have a home, mark it as vacant
-            this.location.getElements()
-                    .map(e => e.entity.getComponent(Residence))
-                    .filter(residence => residence?.isHomeOf(this.uuid))
-                    .forEach(residence => residence.evictResident(this.uuid))
+            this.location
+                .getElements()
+                .map((e) => e.entity.getComponent(Residence))
+                .filter((residence) => residence?.isHomeOf(this.uuid))
+                .forEach((residence) => residence.evictResident(this.uuid))
 
-            NotificationDisplay.instance.push({ 
+            NotificationDisplay.instance.push({
                 text: "Villager killed",
-                icon: "skull1"
+                icon: "skull1",
             })
         }
     }
 
     revive() {
-        this._health = this.maxHealth * .25
+        this._health = this.maxHealth * 0.25
 
         // stand up
         this.animation.transform.rotation = 0
@@ -295,10 +345,10 @@ export class Dude extends Component implements DialogueSource {
     }
 
     dissolve() {
-        let dissolveChance = .1
+        let dissolveChance = 0.1
         const interval = setInterval(() => {
             this.animation.applyFilter(ImageFilters.dissolve(() => dissolveChance))
-            this.animation.goToAnimation(0)  // refresh even though it's paused
+            this.animation.goToAnimation(0) // refresh even though it's paused
             if (dissolveChance >= 1) {
                 this.entity?.selfDestruct()
                 clearInterval(interval)
@@ -320,13 +370,13 @@ export class Dude extends Component implements DialogueSource {
         const goal = this.position.plus(direction.normalized().times(knockback))
         const distToStop = 2
         let intervalsRemaining = 50
-        
+
         let last = new Date().getTime()
         const knock = () => {
             const now = new Date().getTime()
             const diff = now - last
             if (diff > 0) {
-                this.moveTo(this.position.lerp(.15 * diff/30, goal))
+                this.moveTo(this.position.lerp((0.15 * diff) / 30, goal))
             }
             intervalsRemaining--
             if (intervalsRemaining === 0 || goal.minus(this.position).magnitude() < distToStop) {
@@ -346,22 +396,23 @@ export class Dude extends Component implements DialogueSource {
     }
 
     /**
-     * Should be called on EVERY update step for 
-     * @param updateData 
+     * Should be called on EVERY update step for
+     * @param updateData
      * @param direction the direction they are moving in, will be normalized by this code
      * @param facingOverride if < 0, will face left, if > 0, will face right. if == 0, will face the direction they're moving
      */
     move(
-        updateData: UpdateData, 
-        direction: Point, 
-        facingOverride: number = 0, 
-        speedMultiplier: number = 1,
+        updateData: UpdateData,
+        direction: Point,
+        facingOverride: number = 0,
+        speedMultiplier: number = 1
     ) {
         if (this._health <= 0) {
             return
         }
 
-        if (this.knockIntervalCallback !== 0) {  // being knocked back, don't let em walk
+        if (this.knockIntervalCallback !== 0) {
+            // being knocked back, don't let em walk
             direction = Point.ZERO
         }
 
@@ -370,7 +421,7 @@ export class Dude extends Component implements DialogueSource {
         } else if ((direction.x > 0 && facingOverride === 0) || facingOverride > 0) {
             this.animation.transform.mirrorX = false
         }
-        
+
         const wasMoving = this.isMoving
         this._isMoving = direction.x !== 0 || direction.y !== 0
 
@@ -388,15 +439,15 @@ export class Dude extends Component implements DialogueSource {
 
         const standingTilePos = pixelPtToTilePt(this.standingPosition)
         const ground = this.location.getGround(standingTilePos)
-        
+
         if (Ground.isWater(ground?.type)) {
             if (this.factions.includes(DudeFaction.AQUATIC)) {
                 // don't affect speed
             } else if (!this.isJumping) {
-                speedMultiplier *= .4
+                speedMultiplier *= 0.4
             }
         }
-        
+
         const verticalMovement = this.getVerticalMovement(updateData)
         if (verticalMovement.y < 0) {
             // climbing uphill takes effort
@@ -411,7 +462,7 @@ export class Dude extends Component implements DialogueSource {
         const depthAfterWalk = this.getLevelAt(standingPosAfterWalk)
         const depthAfterVerticalMove = this.getLevelAt(standingPosAfterWalk.plus(verticalMovement))
         let totalMovement: Point
-        if (depthAfterWalk === depthAfterVerticalMove){
+        if (depthAfterWalk === depthAfterVerticalMove) {
             totalMovement = walkMovement.plus(verticalMovement)
         } else {
             totalMovement = walkMovement
@@ -425,7 +476,7 @@ export class Dude extends Component implements DialogueSource {
         this.animationDirty = false
     }
 
-    private seaLevel: number  // matches the scale of WorldLocation.levels
+    private seaLevel: number // matches the scale of WorldLocation.levels
 
     private getLevelAt(pos: Point) {
         const tilePos = pixelPtToTilePt(pos)
@@ -444,9 +495,9 @@ export class Dude extends Component implements DialogueSource {
             this.log("what the fuck")
         }
 
-        const fallSpeedY = .0075
-        const climbSpeed = .0050
-        const pixelHeightBetweenLevels = 10  // the distance between levels
+        const fallSpeedY = 0.0075
+        const climbSpeed = 0.005
+        const pixelHeightBetweenLevels = 10 // the distance between levels
 
         const goalLevel = this.getLevelAt(this.standingPosition)
 
@@ -483,10 +534,12 @@ export class Dude extends Component implements DialogueSource {
      * @param point World point where the dude will be moved, unless they hit a collider (with skipColliderCheck = false)
      */
     moveTo(point: Point, skipColliderCheck = false) {
-        const moveFn = skipColliderCheck 
+        const moveFn = skipColliderCheck
             ? (pos: Point) => this.collider.forceSetPosition(pos)
             : (pos: Point) => this.collider.moveTo(pos)
-        this._position = moveFn(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos)
+        this._position = moveFn(point.plus(this.relativeColliderPos)).minus(
+            this.relativeColliderPos
+        )
         if (skipColliderCheck) {
             this.seaLevel = this.location.levels?.get(pixelPtToTilePt(this.standingPosition)) ?? 0
         }
@@ -508,14 +561,14 @@ export class Dude extends Component implements DialogueSource {
         }
         this.canRoll = false
         this.rollFunction()
-        setTimeout(() => this.canRoll = true, 750)
+        setTimeout(() => (this.canRoll = true), 750)
     }
 
     // just a stepping dodge instead of a roll
     private dashRoll() {
         StepSounds.singleFootstepSound(this, 2)
-        this.isRolling = true;
-        this.animation.goToAnimation(2)  
+        this.isRolling = true
+        this.animation.goToAnimation(2)
         setTimeout(() => {
             StepSounds.singleFootstepSound(this, 3)
             this.isRolling = false
@@ -556,14 +609,14 @@ export class Dude extends Component implements DialogueSource {
      * Returns true if these dudes have no factions in common
      */
     isEnemy(d: Dude) {
-        return !d.factions.some(fac => this.factions.includes(fac))
+        return !d.factions.some((fac) => this.factions.includes(fac))
     }
 
     isFacing(pt: Point) {
         if (pt.x === this.standingPosition.x) {
             return true
         }
-        return this.animation.transform.mirrorX === (pt.x < this.standingPosition.x)
+        return this.animation.transform.mirrorX === pt.x < this.standingPosition.x
     }
 
     facingMultipler() {
@@ -617,7 +670,7 @@ export class Dude extends Component implements DialogueSource {
         if (!this.isAlive) {
             return []
         }
-        
+
         const npcAttackIndicator = this.entity.getComponent(NPC)?.attackIndicator
         if (!!npcAttackIndicator) {
             indicator = npcAttackIndicator
@@ -634,13 +687,28 @@ export class Dude extends Component implements DialogueSource {
 
         // render indicator icon overhead
         let tile: StaticSpriteSource = DudeInteractIndicator.getTile(indicator)
-        if (!tile || this.dialogueInteract?.isShowingUI || DialogueDisplay.instance.source === this) {
+        if (
+            !tile ||
+            this.dialogueInteract?.isShowingUI ||
+            DialogueDisplay.instance.source === this
+        ) {
             return []
         } else {
-            return [tile.toImageRender(new SpriteTransform(
-                this.standingPosition.plusY(-28).plus(new Point(1, 1).times(-TILE_SIZE/2)).plus(this.getAnimationOffsetPosition()),
-                new Point(TILE_SIZE, TILE_SIZE), 0, false, false, UIStateManager.UI_SPRITE_DEPTH
-            ))]
+            return [
+                tile.toImageRender(
+                    new SpriteTransform(
+                        this.standingPosition
+                            .plusY(-28)
+                            .plus(new Point(1, 1).times(-TILE_SIZE / 2))
+                            .plus(this.getAnimationOffsetPosition()),
+                        new Point(TILE_SIZE, TILE_SIZE),
+                        0,
+                        false,
+                        false,
+                        UIStateManager.UI_SPRITE_DEPTH
+                    )
+                ),
+            ]
         }
     }
 

@@ -3,23 +3,22 @@ const SIDES = 6
 const STARTING_DICE = 5
 
 type DiceBid = {
-    readonly face: number,
+    readonly face: number
     readonly count: number
 }
 
 const factorial = (num: number) => {
-    var result = num;
-    if (num === 0 || num === 1) 
-        return 1; 
-    while (num > 1) { 
-        num--;
-        result *= num;
+    var result = num
+    if (num === 0 || num === 1) return 1
+    while (num > 1) {
+        num--
+        result *= num
     }
-    return result;
+    return result
 }
 
 const choose = (n, k) => {
-    return factorial(n)/(factorial(k) * factorial(n - k))
+    return factorial(n) / (factorial(k) * factorial(n - k))
 }
 
 // const probabilityExactly = (faceCount: number, totalDice: number) => {
@@ -34,7 +33,7 @@ const probabilityAtLeast = (faceCount: number, totalDice: number) => {
     const q = faceCount
     let result = 0
     for (let x = q; x <= n; x++) {
-        result += (choose(n, x) * Math.pow(1/6, x) * Math.pow(5/6, n - x))
+        result += choose(n, x) * Math.pow(1 / 6, x) * Math.pow(5 / 6, n - x)
     }
     return result
 }
@@ -46,17 +45,16 @@ const probabilityWithHand = (hand: number[], bid: DiceBid, totalDice: number) =>
 const rollDice = (diceInHand: number): number[] => {
     const rolls = [0, 0, 0, 0, 0, 0]
     for (let i = 0; i < diceInHand; i++) {
-        const r = Math.floor(Math.random() * SIDES);
+        const r = Math.floor(Math.random() * SIDES)
         rolls[r]++
     }
     return rolls
 }
 
 class DicePlayer {
-
     readonly name: string
     diceCount: number = STARTING_DICE
-    hand: number[]  // a hand is represented by the counts for each side EG [0, 0, 2, 1, 0, 2] = 2 3s, 1 4, 2 6s
+    hand: number[] // a hand is represented by the counts for each side EG [0, 0, 2, 1, 0, 2] = 2 3s, 1 4, 2 6s
 
     constructor(name: string) {
         this.name = name
@@ -76,7 +74,7 @@ class DicePlayer {
         }
         return {
             face: possibleBids[Math.floor(Math.random() * possibleBids.length)],
-            count: 1
+            count: 1,
         }
     }
 
@@ -88,10 +86,10 @@ class DicePlayer {
          * options:
          *   increase bid: face, number, or both
          *   call liar
-         * 
+         *
          * steps:
          *   1. are they a liar or not? (considering your own dice + probability)
-         *   2. they're not lying. 
+         *   2. they're not lying.
          */
 
         const probabilityOfPreviousBid = probabilityAtLeast(bid.count, totalDice)
@@ -100,12 +98,12 @@ class DicePlayer {
         if (this.hand[bid.face] > bid.count) {
             return {
                 face: bid.face,
-                count: bid.count + 1
+                count: bid.count + 1,
             }
         }
 
         console.log(`probabilityOfPreviousBid=${probabilityOfPreviousBid}`)
-        if (probabilityOfPreviousBid < .2) {
+        if (probabilityOfPreviousBid < 0.2) {
             return null
         }
 
@@ -114,14 +112,14 @@ class DicePlayer {
         // increase count by 1
         possibleBids.push({
             face: bid.face,
-            count: bid.count + 1, 
+            count: bid.count + 1,
         })
 
         // increase face
         for (let f = bid.face + 1; f < SIDES; f++) {
             possibleBids.push({
                 face: f,
-                count: bid.count, 
+                count: bid.count,
             })
         }
 
@@ -129,14 +127,18 @@ class DicePlayer {
         for (let f = 0; f < SIDES; f++) {
             possibleBids.push({
                 face: f,
-                count: bid.count + 1, 
+                count: bid.count + 1,
             })
         }
 
         // TODO add randomness and random bluffing
 
-        possibleBids.sort((a, b) => probabilityWithHand(this.hand, b, totalDice) - probabilityWithHand(this.hand, a, totalDice))
-        
+        possibleBids.sort(
+            (a, b) =>
+                probabilityWithHand(this.hand, b, totalDice) -
+                probabilityWithHand(this.hand, a, totalDice)
+        )
+
         return possibleBids[0]
     }
 }
@@ -150,7 +152,7 @@ const doGame = () => {
     ]
 
     console.log(allPlayers)
-    const s = (bid: DiceBid) => `${bid.count}x${bid.face+1}`
+    const s = (bid: DiceBid) => `${bid.count}x${bid.face + 1}`
 
     let playersInGame = [...allPlayers]
     let previousPlayer = playersInGame.shift()
@@ -160,14 +162,15 @@ const doGame = () => {
         let bid = previousPlayer.aiFirstBid()
         console.log(`${previousPlayer}: starting bid ${s(bid)}`)
 
-        while (!!bid)  {
+        while (!!bid) {
             const p = playersInGame.shift()
             playersInGame.push(p)
-            const totalDice = playersInGame.map(p => p.diceCount).reduce((a, b) => a + b)
+            const totalDice = playersInGame.map((p) => p.diceCount).reduce((a, b) => a + b)
             const nextBid = p.aiPlayRound(bid, totalDice)
             if (!nextBid) {
                 console.log(`${p.name}: ${previousPlayer.name} is a liar!`)
-                const wasLie = playersInGame.map(p => p.hand[bid.face]).reduce((a, b) => a + b) < bid.count
+                const wasLie =
+                    playersInGame.map((p) => p.hand[bid.face]).reduce((a, b) => a + b) < bid.count
                 // TODO make the loser start the next round
                 if (wasLie) {
                     previousPlayer.diceCount--
@@ -181,12 +184,12 @@ const doGame = () => {
             }
             previousPlayer = p
             bid = nextBid
-            playersInGame.forEach(p => {
+            playersInGame.forEach((p) => {
                 if (p.diceCount == 0) {
                     console.log(`${p.name} eliminated`)
                 }
             })
-            playersInGame = playersInGame.filter(p => p.diceCount > 0)
+            playersInGame = playersInGame.filter((p) => p.diceCount > 0)
         }
 
         if (playersInGame.length == 1) {
@@ -194,10 +197,10 @@ const doGame = () => {
             break
         }
 
-        playersInGame.forEach(p => p.roll())
+        playersInGame.forEach((p) => p.roll())
     }
 
     console.log(`${playersInGame[0].name} wins!`)
 }
 
-window['dice'] = doGame
+window["dice"] = doGame

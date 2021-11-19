@@ -3,7 +3,7 @@ import { TimeUnit } from "../../world/TimeUnit"
 
 export enum NPCScheduleType {
     DO_NOTHING,
-    GO_TO_SPOT,  // fields: p (stringified tile Point)
+    GO_TO_SPOT, // fields: p (stringified tile Point)
     ROAM,
     DEFAULT_VILLAGER,
     GO_TO_LOCATION,
@@ -11,7 +11,7 @@ export enum NPCScheduleType {
 
 export type NPCSchedule = {
     type: NPCScheduleType
-    [others: string]: any;
+    [others: string]: any
 }
 
 /**
@@ -24,17 +24,22 @@ export const NPCSchedules = {
     newNoOpSchedule: () => ({ type: NPCScheduleType.DO_NOTHING }),
 
     // go to a specific spot and hang out there
-    newGoToSchedule: (tilePoint: Point) => ({ type: NPCScheduleType.GO_TO_SPOT, p: tilePoint.toString() }),
+    newGoToSchedule: (tilePoint: Point) => ({
+        type: NPCScheduleType.GO_TO_SPOT,
+        p: tilePoint.toString(),
+    }),
 
     // just walk around aimlessly
     newFreeRoamSchedule: () => ({ type: NPCScheduleType.ROAM }),
 
     // go home at night and roam around during the day
-    newDefaultVillagerSchedule: () => ({ type: NPCScheduleType.DEFAULT_VILLAGER }),
+    newDefaultVillagerSchedule: () => ({
+        type: NPCScheduleType.DEFAULT_VILLAGER,
+    }),
 
     // hang out in a specific location, either roaming or at a specific position
-    newGoToLocationSchedule: (locationUUID: string, tilePoint?: Point) => ({ 
-        type: NPCScheduleType.GO_TO_LOCATION, 
+    newGoToLocationSchedule: (locationUUID: string, tilePoint?: Point) => ({
+        type: NPCScheduleType.GO_TO_LOCATION,
         l: locationUUID,
         p: tilePoint?.toString(),
     }),

@@ -22,16 +22,16 @@ import { NPCTask } from "./ai/NPCTask"
  * Shared logic for different types of NPCs. These should be invoked by an NPC controller component.
  */
 export class NPC extends Component {
-
     private dude: Dude
 
     isEnemyFn: (dude: Dude) => boolean = () => false
     enemyFilterFn: (enemies: Dude[]) => Dude[] = (enemies) => {
         // default behavior is to fight armed enemies first
-        const armedEnemies = enemies.filter(d => !!d.weapon)
+        const armedEnemies = enemies.filter((d) => !!d.weapon)
         return armedEnemies.length > 0 ? armedEnemies : enemies
     }
-    pathFindingHeuristic: (pt: Point, goal: Point) => number = (pt, goal) => pt.manhattanDistanceTo(goal)
+    pathFindingHeuristic: (pt: Point, goal: Point) => number = (pt, goal) =>
+        pt.manhattanDistanceTo(goal)
     pathIsOccupied: (pt: Point) => boolean = () => false
 
     findTargetRange = TILE_SIZE * 10
@@ -51,8 +51,7 @@ export class NPC extends Component {
         }
     }
 
-    awake() {
-    }
+    awake() {}
 
     start() {
         this.doWhileLiving(() => this.checkForEnemies(), 1000 + 1000 * Math.random())
@@ -66,7 +65,11 @@ export class NPC extends Component {
          */
 
         // clear their attack target if the target has died
-        if (!this.attackTarget || !this.attackTarget.isAlive || !this.isEnemyFn(this.attackTarget)) {
+        if (
+            !this.attackTarget ||
+            !this.attackTarget.isAlive ||
+            !this.isEnemyFn(this.attackTarget)
+        ) {
             this.attackTarget = null
             this.targetPath = null
         }
@@ -75,9 +78,13 @@ export class NPC extends Component {
 
         if (DialogueDisplay.instance.source === this.dude) {
             // don't move when talking
-            this.dude.move(updateData, Point.ZERO, Player.instance.dude.standingPosition.x - this.dude.standingPosition.x)
+            this.dude.move(
+                updateData,
+                Point.ZERO,
+                Player.instance.dude.standingPosition.x - this.dude.standingPosition.x
+            )
         } else if (this.enemiesPresent) {
-            // re-check the enemy function for dynamic enemy status 
+            // re-check the enemy function for dynamic enemy status
             // (such as demons only targeting people in the dark)
             if (this.attackTarget) {
                 this.doAttack(updateData)
@@ -101,7 +108,7 @@ export class NPC extends Component {
                 dude: this.dude,
                 walkTo: (pt) => this.walkTo(pt, updateData),
                 roam: (speed, options) => this.doRoam(updateData, speed, options),
-                goToLocation: (location) => this.goToLocation(updateData, location),  // TODO
+                goToLocation: (location) => this.goToLocation(updateData, location), // TODO
             }
             task.performTask(context)
         } else {
@@ -117,14 +124,18 @@ export class NPC extends Component {
         this.clearExistingAIState()
 
         const task = this.getScheduledTask()
-        
+
         // TODO improve simulation implementations
         const context: NPCTaskContext = {
             dude: this.dude,
             walkTo: (pt) => this.forceMoveToTilePosition(pt),
             roam: (_, options) => {
-                const goalOptions = options?.goalOptionsSupplier ? options.goalOptionsSupplier() : this.dude.location.getGroundSpots()
-                const pos = Lists.oneOf(goalOptions.filter(pt => !this.dude.location.isOccupied(pt)))
+                const goalOptions = options?.goalOptionsSupplier
+                    ? options.goalOptionsSupplier()
+                    : this.dude.location.getGroundSpots()
+                const pos = Lists.oneOf(
+                    goalOptions.filter((pt) => !this.dude.location.isOccupied(pt))
+                )
                 this.forceMoveToTilePosition(pos)
             },
             goToLocation: (location) => this.simulateGoToLocation(location),
@@ -141,7 +152,9 @@ export class NPC extends Component {
     getSchedule(): NPCSchedule {
         const schedule: NPCSchedule = this.dude.blob[NPCSchedules.SCHEDULE_KEY]
         if (!schedule) {
-            throw new Error(`NPCs must have a "${NPCSchedules.SCHEDULE_KEY}" field in the blob. It's possible it got overwritten.`)
+            throw new Error(
+                `NPCs must have a "${NPCSchedules.SCHEDULE_KEY}" field in the blob. It's possible it got overwritten.`
+            )
         }
         return schedule
     }
@@ -161,7 +174,7 @@ export class NPC extends Component {
 
     // fn will execute immediately and every intervalMillis milliseconds
     // until the NPC is dead or the function returns true
-    doWhileLiving(fn: () => boolean|void, intervalMillis: number) {
+    doWhileLiving(fn: () => boolean | void, intervalMillis: number) {
         if (!this.dude.isAlive) {
             return
         }
@@ -170,28 +183,35 @@ export class NPC extends Component {
             return
         }
 
-        const invoker = this.entity.addComponent(new RepeatedInvoker(
-            () => {
+        const invoker = this.entity.addComponent(
+            new RepeatedInvoker(() => {
                 if (!this.dude.isAlive || fn()) {
                     invoker.delete()
                 }
                 return intervalMillis
-            }, 
-            intervalMillis
-        ))
+            }, intervalMillis)
+        )
     }
 
     private walkPath: Point[] = null
     private walkTo(tilePt: Point, updateData: UpdateData, speedMultiplier: number = 1) {
         // TODO: make sure the existing path is to the same pt
-        if (!this.walkPath || this.walkPath.length === 0) {  // only try once per upate() to find a path
+        if (!this.walkPath || this.walkPath.length === 0) {
+            // only try once per upate() to find a path
             this.walkPath = this.findPath(tilePt)
             if (!this.walkPath || this.walkPath.length === 0) {
                 this.dude.move(updateData, Point.ZERO)
                 return
             }
         }
-        if (this.walkDirectlyTo(this.walkPath[0], updateData, this.walkPath.length === 1, speedMultiplier)) {
+        if (
+            this.walkDirectlyTo(
+                this.walkPath[0],
+                updateData,
+                this.walkPath.length === 1,
+                speedMultiplier
+            )
+        ) {
             this.walkPath.shift()
         }
     }
@@ -200,24 +220,25 @@ export class NPC extends Component {
     private roamNextPauseTime: number = -1
     private roamNextUnpauseTime: number = -1
     private doRoam(
-        updateData: UpdateData, 
-        speedMultiplier: number = 1, 
+        updateData: UpdateData,
+        speedMultiplier: number = 1,
         {
             ptSelectionFilter = () => true,
             goalOptionsSupplier,
             pauseEveryMillis,
             pauseForMillis,
         }: {
-            ptSelectionFilter?: (pt) => boolean,
-            goalOptionsSupplier?: () => Point[],
-            pauseEveryMillis?: number,
-            pauseForMillis?: number,
+            ptSelectionFilter?: (pt) => boolean
+            goalOptionsSupplier?: () => Point[]
+            pauseEveryMillis?: number
+            pauseForMillis?: number
         } = {}
     ) {
-        if (!this.roamPath || this.roamPath.length === 0) {  // only try once per upate() to find a path
+        if (!this.roamPath || this.roamPath.length === 0) {
+            // only try once per upate() to find a path
             const l = LocationManager.instance.currentLocation
             const goalOptions = goalOptionsSupplier ? goalOptionsSupplier() : l.getGroundSpots()
-            const openPoints = goalOptions.filter(pt => !l.isOccupied(pt))
+            const openPoints = goalOptions.filter((pt) => !l.isOccupied(pt))
             let pt: Point
             for (let i = 0; i < 5 && !pt; i++) {
                 const maybePt = Lists.oneOf(openPoints)
@@ -301,29 +322,38 @@ export class NPC extends Component {
         // }
 
         const stoppingDist = weapon.getStoppingDistance()
-        const inRangeAndArmed = mag < weapon.getRange() 
+        const inRangeAndArmed =
+            mag <
+            weapon.getRange() +
                 // the default collider has a width of 10
                 // big entities have a collider width of 15
-                + (this.dude.colliderSize.x - 10) * 3
+                (this.dude.colliderSize.x - 10) * 3
         const timeLeftUntilCanAttack = this.nextAttackTime - WorldTime.instance.time
-        
-        if (stoppingDist === 0 
-                && inRangeAndArmed 
-                && this.attackTarget === Player.instance.dude 
-                && timeLeftUntilCanAttack < this.PARRY_TIME) {
-            this._attackIndicator = timeLeftUntilCanAttack < this.PARRY_TIME/2 
-                    ? DudeInteractIndicator.ATTACKING_NOW 
+
+        if (
+            stoppingDist === 0 &&
+            inRangeAndArmed &&
+            this.attackTarget === Player.instance.dude &&
+            timeLeftUntilCanAttack < this.PARRY_TIME
+        ) {
+            this._attackIndicator =
+                timeLeftUntilCanAttack < this.PARRY_TIME / 2
+                    ? DudeInteractIndicator.ATTACKING_NOW
                     : DudeInteractIndicator.ATTACKING_SOON
         }
 
         // in range and armed
         if (inRangeAndArmed && timeLeftUntilCanAttack <= 0) {
             weapon.attack(true)
-            this.nextAttackTime = Math.max(this.nextAttackTime, WorldTime.instance.time + weapon.getMillisBetweenAttacks())
+            this.nextAttackTime = Math.max(
+                this.nextAttackTime,
+                WorldTime.instance.time + weapon.getMillisBetweenAttacks()
+            )
         } else {
             weapon.cancelAttack()
 
-            if (stoppingDist > 0 && mag < (stoppingDist * .75)) {  // TODO make this more configurable?
+            if (stoppingDist > 0 && mag < stoppingDist * 0.75) {
+                // TODO make this more configurable?
                 this.doRoam(updateData)
                 return
             }
@@ -331,7 +361,10 @@ export class NPC extends Component {
 
         // make sure they always wait at least PARRY_TIME once getting into range
         if (!inRangeAndArmed && timeLeftUntilCanAttack > 0) {
-            this.nextAttackTime = Math.max(this.nextAttackTime, WorldTime.instance.time + this.PARRY_TIME)
+            this.nextAttackTime = Math.max(
+                this.nextAttackTime,
+                WorldTime.instance.time + this.PARRY_TIME
+            )
         }
 
         if (!this.targetPath || this.targetPath.length === 0) {
@@ -343,13 +376,17 @@ export class NPC extends Component {
             return
         }
 
-        if (this.walkDirectlyTo(
-            this.targetPath[0], 
-            updateData, 
-            false, 
-            1, 
-            this.targetPath.length < 2 ? (this.attackTarget.standingPosition.x - this.dude.standingPosition.x) : 0
-        )) {
+        if (
+            this.walkDirectlyTo(
+                this.targetPath[0],
+                updateData,
+                false,
+                1,
+                this.targetPath.length < 2
+                    ? this.attackTarget.standingPosition.x - this.dude.standingPosition.x
+                    : 0
+            )
+        ) {
             this.targetPath.shift()
         }
     }
@@ -370,13 +407,24 @@ export class NPC extends Component {
     // }
 
     // returns true if they are pretty close (half a tile) away from the goal
-    private walkDirectlyTo(pt: Point, updateData: UpdateData, stopWhenClose = false, speedMultiplier: number = 1, facingOverride: number = 0) {
+    private walkDirectlyTo(
+        pt: Point,
+        updateData: UpdateData,
+        stopWhenClose = false,
+        speedMultiplier: number = 1,
+        facingOverride: number = 0
+    ) {
         const isCloseEnough = this.isCloseEnoughToStopWalking(pt)
         if (isCloseEnough && stopWhenClose) {
             this.dude.move(updateData, Point.ZERO, facingOverride)
         } else {
             const pos = this.dude.standingPosition
-            this.dude.move(updateData, pt.minus(this.dude.standingPosition), facingOverride, speedMultiplier)
+            this.dude.move(
+                updateData,
+                pt.minus(this.dude.standingPosition),
+                facingOverride,
+                speedMultiplier
+            )
             if (!this.dude.standingPosition.equals(pos)) {
                 this.lastMoveTime = new Date().getMilliseconds()
             }
@@ -384,8 +432,10 @@ export class NPC extends Component {
         return isCloseEnough
     }
 
-    private lastMoveTime: number 
-    private stuck() { return new Date().getMilliseconds() - this.lastMoveTime > 1000 }
+    private lastMoveTime: number
+    private stuck() {
+        return new Date().getMilliseconds() - this.lastMoveTime > 1000
+    }
 
     private isCloseEnoughToStopWalking(pt: Point) {
         return this.dude.standingPosition.distanceTo(pt) < 8
@@ -393,26 +443,31 @@ export class NPC extends Component {
 
     private checkForEnemies() {
         let enemies = Array.from(LocationManager.instance.currentLocation.dudes)
-                .filter(d => d.isAlive)
-                .filter(this.isEnemyFn)
-                .filter(d => d.standingPosition.distanceTo(this.dude.standingPosition) < this.findTargetRange)
+            .filter((d) => d.isAlive)
+            .filter(this.isEnemyFn)
+            .filter(
+                (d) =>
+                    d.standingPosition.distanceTo(this.dude.standingPosition) < this.findTargetRange
+            )
 
         this.enemiesPresent = enemies.length > 0
         if (!this.dude.weapon || !this.enemiesPresent) {
             // should flee instead
             return
         }
-        
+
         enemies = this.enemyFilterFn(enemies)
 
         // attack the closest enemy
-        const target = Lists.minBy(enemies, d => d.standingPosition.distanceTo(this.dude.standingPosition))
+        const target = Lists.minBy(enemies, (d) =>
+            d.standingPosition.distanceTo(this.dude.standingPosition)
+        )
 
         if (!!target) {
             let shouldComputePath = true
 
             if (target === this.attackTarget && !!this.targetPath && this.targetPath.length > 0) {
-                // We're already tracking this target. Only update the path if they have gotten closer, 
+                // We're already tracking this target. Only update the path if they have gotten closer,
                 // otherwise the attack() function will automatically extend the path.
                 // const currentGoal = pixelPtToTilePt(this.targetPath[this.targetPath.length-1])
                 const newGoal = pixelPtToTilePt(target.standingPosition)
@@ -436,7 +491,9 @@ export class NPC extends Component {
     }
 
     private forceMoveToTilePosition(pt: Point) {
-        const pos = this.tilePtToStandingPos(pt).minus(this.dude.standingPosition).plus(this.dude.position)
+        const pos = this.tilePtToStandingPos(pt)
+            .minus(this.dude.standingPosition)
+            .plus(this.dude.position)
         this.dude.moveTo(pos, true)
     }
 
@@ -444,9 +501,9 @@ export class NPC extends Component {
         const start = pixelPtToTilePt(this.dude.standingPosition)
         // TODO: NPCs can sometimes get stuck if their starting square is "occupied"
         return LocationManager.instance.currentLocation
-                .findPath(start, targetTilePoint, this.pathFindingHeuristic)
-                ?.map(pt => this.tilePtToStandingPos(pt))
-                .slice(1)  // slice(1) because we don't need the start in the path
+            .findPath(start, targetTilePoint, this.pathFindingHeuristic)
+            ?.map((pt) => this.tilePtToStandingPos(pt))
+            .slice(1) // slice(1) because we don't need the start in the path
     }
 
     private goToLocation(updateData: UpdateData, goalLocation: WorldLocation) {
@@ -461,7 +518,7 @@ export class NPC extends Component {
     }
 
     private getNextLocation(goalLocation: WorldLocation) {
-        // For now, we're lazy about this and assume every linked location is 
+        // For now, we're lazy about this and assume every linked location is
         // at most 1 off from the exterior, so we can avoid doing pathfinding
         if (this.dude.location === LocationManager.instance.exterior()) {
             return goalLocation
@@ -492,7 +549,7 @@ export class NPC extends Component {
         this.clearExistingAIState()
     }
     private tilePtToStandingPos(tilePt: Point) {
-        const ptOffset = new Point(.5, .8)
+        const ptOffset = new Point(0.5, 0.8)
         return tilePt.plus(ptOffset).times(TILE_SIZE)
     }
 }

@@ -11,10 +11,9 @@ import { assets } from "brigsby/dist/Assets"
 import { Sounds } from "../audio/Sounds"
 import { Lists } from "brigsby/dist/util/Lists"
 
-const PICK_UP_SOUNDS = Lists.range(0, 4).map(i => `audio/impact/impactWood_medium_00${i}.ogg`)
+const PICK_UP_SOUNDS = Lists.range(0, 4).map((i) => `audio/impact/impactWood_medium_00${i}.ogg`)
 
 export class DroppedItem extends Component {
-
     static readonly COLLISION_LAYER = "item"
 
     private sprite: SpriteComponent
@@ -33,20 +32,26 @@ export class DroppedItem extends Component {
 
         this.itemType = item
         this.start = () => {
-            this.sprite = this.entity.addComponent(ITEM_METADATA_MAP[item].droppedIconSupplier().toComponent())
-            const pos = position.minus(new Point(
-                this.sprite.transform.dimensions.x/2,
-                this.sprite.transform.dimensions.y
-            ))
+            this.sprite = this.entity.addComponent(
+                ITEM_METADATA_MAP[item].droppedIconSupplier().toComponent()
+            )
+            const pos = position.minus(
+                new Point(
+                    this.sprite.transform.dimensions.x / 2,
+                    this.sprite.transform.dimensions.y
+                )
+            )
             this.sprite.transform.position = pos
 
             const colliderSize = new Point(8, 8)
-            this.collider = this.entity.addComponent(new BoxCollider(
-                pos.plus(this.sprite.transform.dimensions.minus(colliderSize).div(2)), 
-                colliderSize, 
-                DroppedItem.COLLISION_LAYER,
-                !!sourceCollider ? [sourceCollider] : []
-            ))
+            this.collider = this.entity.addComponent(
+                new BoxCollider(
+                    pos.plus(this.sprite.transform.dimensions.minus(colliderSize).div(2)),
+                    colliderSize,
+                    DroppedItem.COLLISION_LAYER,
+                    !!sourceCollider ? [sourceCollider] : []
+                )
+            )
 
             this.reposition()
 
@@ -59,9 +64,9 @@ export class DroppedItem extends Component {
                 const diff = now - last
                 if (diff > 0) {
                     this.reposition(velocity)
-                    velocity = velocity.times(.6)
+                    velocity = velocity.times(0.6)
                 }
-                if (velocity.magnitude() >= .1) {
+                if (velocity.magnitude() >= 0.1) {
                     requestAnimationFrame(move)
                 }
                 last = now
@@ -70,27 +75,33 @@ export class DroppedItem extends Component {
         }
 
         this.update = () => {
-            const colliding = Player.instance.dude.standingPosition.plusY(-6).distanceTo(position) < 12
+            const colliding =
+                Player.instance.dude.standingPosition.plusY(-6).distanceTo(position) < 12
 
             if (colliding && this.canPickUp) {
                 this.canPickUp = false
                 setTimeout(() => {
                     if (Player.instance.dude.isAlive && !!this.entity) {
                         if (this.itemType === Item.COIN) {
-                            saveManager.setState({ 
-                                coins: saveManager.getState().coins + 1 
+                            saveManager.setState({
+                                coins: saveManager.getState().coins + 1,
                             })
                         }
 
-                        if (this.itemType === Item.COIN || Player.instance.dude.inventory.addItem(this.itemType)) {
-                            LocationManager.instance.currentLocation.droppedItems.delete(this.entity)
+                        if (
+                            this.itemType === Item.COIN ||
+                            Player.instance.dude.inventory.addItem(this.itemType)
+                        ) {
+                            LocationManager.instance.currentLocation.droppedItems.delete(
+                                this.entity
+                            )
                             this.entity.selfDestruct()
                             setTimeout(() => {
-                                Sounds.play(Lists.oneOf(PICK_UP_SOUNDS), .15)
-                            }, Math.random() * 350);
+                                Sounds.play(Lists.oneOf(PICK_UP_SOUNDS), 0.15)
+                            }, Math.random() * 350)
                             return
                         }
-                        
+
                         // inventory is full
                         this.canPickUp = true
                     }
@@ -101,7 +112,10 @@ export class DroppedItem extends Component {
 
     private reposition(delta = new Point(0, 0)) {
         const colliderOffset = this.collider.position.minus(this.sprite.transform.position)
-        this.sprite.transform.position = this.collider.moveTo(this.collider.position.plus(delta)).minus(colliderOffset)
-        this.sprite.transform.depth = this.sprite.transform.position.y + this.sprite.transform.dimensions.y
+        this.sprite.transform.position = this.collider
+            .moveTo(this.collider.position.plus(delta))
+            .minus(colliderOffset)
+        this.sprite.transform.depth =
+            this.sprite.transform.position.y + this.sprite.transform.dimensions.y
     }
 }

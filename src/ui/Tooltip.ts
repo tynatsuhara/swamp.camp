@@ -13,11 +13,10 @@ import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
 
 export class Tooltip extends Component {
-    
     position: Point = new Point(0, 0)
 
     private static readonly margin = 6
-    private static readonly textOffset = new Point(Tooltip.margin, Tooltip.margin-1)
+    private static readonly textOffset = new Point(Tooltip.margin, Tooltip.margin - 1)
     private text: string[]
 
     private tiles: ImageRender[] = []
@@ -36,30 +35,65 @@ export class Tooltip extends Component {
             return
         }
 
-        const longestLineLength = Lists.maxBy(this.text, line => line.length).length
+        const longestLineLength = Lists.maxBy(this.text, (line) => line.length).length
         const width = longestLineLength * TEXT_PIXEL_WIDTH
 
-        const leftPos = this.position.plus(new Point(TILE_SIZE/2, -TILE_SIZE)).apply(Math.floor)
+        const leftPos = this.position.plus(new Point(TILE_SIZE / 2, -TILE_SIZE)).apply(Math.floor)
         const centerPos = leftPos.plus(new Point(TILE_SIZE, 0))
-        const rightPos = leftPos.plus(new Point(width - TILE_SIZE + Tooltip.margin * 2, 0)).apply(Math.floor)
+        const rightPos = leftPos
+            .plus(new Point(width - TILE_SIZE + Tooltip.margin * 2, 0))
+            .apply(Math.floor)
 
         const spacing = 6
-        const centerWidth = new Point(width + Tooltip.margin * 2 - TILE_SIZE*2, TILE_SIZE)
+        const centerWidth = new Point(width + Tooltip.margin * 2 - TILE_SIZE * 2, TILE_SIZE)
 
         const tiles: ImageRender[] = []
-        for (let i = 0; i < (this.text.length-1) * 2 + 1; i++) {
+        for (let i = 0; i < (this.text.length - 1) * 2 + 1; i++) {
             // left
-            tiles.push(Tilesets.instance.oneBit.getTileSource("tooltipLeft").toImageRender(
-                new SpriteTransform(leftPos.plusY(-i * spacing), TILE_DIMENSIONS, 0, false, false, UIStateManager.UI_SPRITE_DEPTH + 1)
-            ))
+            tiles.push(
+                Tilesets.instance.oneBit
+                    .getTileSource("tooltipLeft")
+                    .toImageRender(
+                        new SpriteTransform(
+                            leftPos.plusY(-i * spacing),
+                            TILE_DIMENSIONS,
+                            0,
+                            false,
+                            false,
+                            UIStateManager.UI_SPRITE_DEPTH + 1
+                        )
+                    )
+            )
             // center
-            tiles.push(Tilesets.instance.oneBit.getTileSource("tooltipCenter").toImageRender(
-                new SpriteTransform(centerPos.plusY(-i * spacing), centerWidth, 0, false, false, UIStateManager.UI_SPRITE_DEPTH + 1)
-            ))
+            tiles.push(
+                Tilesets.instance.oneBit
+                    .getTileSource("tooltipCenter")
+                    .toImageRender(
+                        new SpriteTransform(
+                            centerPos.plusY(-i * spacing),
+                            centerWidth,
+                            0,
+                            false,
+                            false,
+                            UIStateManager.UI_SPRITE_DEPTH + 1
+                        )
+                    )
+            )
             // right
-            tiles.push(Tilesets.instance.oneBit.getTileSource("tooltipRight").toImageRender(
-                new SpriteTransform(rightPos.plusY(-i * spacing), TILE_DIMENSIONS, 0, false, false, UIStateManager.UI_SPRITE_DEPTH + 1)
-            ))
+            tiles.push(
+                Tilesets.instance.oneBit
+                    .getTileSource("tooltipRight")
+                    .toImageRender(
+                        new SpriteTransform(
+                            rightPos.plusY(-i * spacing),
+                            TILE_DIMENSIONS,
+                            0,
+                            false,
+                            false,
+                            UIStateManager.UI_SPRITE_DEPTH + 1
+                        )
+                    )
+            )
         }
 
         this.tiles = tiles
@@ -67,7 +101,7 @@ export class Tooltip extends Component {
         const totalWidth = width + Tooltip.margin * 2
         if (this.position.x + totalWidth > updateData.dimensions.x) {
             // shift left
-            this.tiles.forEach(t => t.position = t.position.plusX(-totalWidth - TILE_SIZE))
+            this.tiles.forEach((t) => (t.position = t.position.plusX(-totalWidth - TILE_SIZE)))
         }
     }
 
@@ -75,13 +109,20 @@ export class Tooltip extends Component {
         if (!this.text) {
             return []
         }
-        return this.text.map((line, index) => new TextRender(
-            line,
-            this.tiles[0].position.plus(Tooltip.textOffset).plusY((this.text.length-index-1) * -(TEXT_SIZE+4)),
-            TEXT_SIZE,
-            TEXT_FONT,
-            Color.DARK_RED,
-            UIStateManager.UI_SPRITE_DEPTH + 2
-        ) as RenderMethod).concat(this.tiles)
+        return this.text
+            .map(
+                (line, index) =>
+                    new TextRender(
+                        line,
+                        this.tiles[0].position
+                            .plus(Tooltip.textOffset)
+                            .plusY((this.text.length - index - 1) * -(TEXT_SIZE + 4)),
+                        TEXT_SIZE,
+                        TEXT_FONT,
+                        Color.DARK_RED,
+                        UIStateManager.UI_SPRITE_DEPTH + 2
+                    ) as RenderMethod
+            )
+            .concat(this.tiles)
     }
 }

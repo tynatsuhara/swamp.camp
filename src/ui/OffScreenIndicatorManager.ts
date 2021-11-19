@@ -3,7 +3,6 @@ import { Point } from "brigsby/dist/Point"
 import { OffScreenIndicator } from "./OffScreenIndicator"
 
 export class OffScreenIndicatorManager {
-
     private entity = new Entity()
     private map: Map<any, OffScreenIndicator> = new Map()
 

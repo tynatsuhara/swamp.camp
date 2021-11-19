@@ -6,8 +6,9 @@ export enum GenericDialogue {
 }
 
 export const GENERIC_DIALOGUE: { [key: string]: () => DialogueInstance } = {
-    [GenericDialogue.HELLO]: () => dialogue(
-        [Lists.oneOf(["Hello!", "Greetings."])],
-        () => new NextDialogue(GenericDialogue.HELLO, false),
-    ),
+    [GenericDialogue.HELLO]: () =>
+        dialogue(
+            [Lists.oneOf(["Hello!", "Greetings."])],
+            () => new NextDialogue(GenericDialogue.HELLO, false)
+        ),
 }

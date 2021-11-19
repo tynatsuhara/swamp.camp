@@ -5,7 +5,6 @@ import { DudeFaction } from "../DudeFactory"
 import { NPC } from "../NPC"
 
 export class Centaur extends Component {
-    
     private npc: NPC
     private dude: Dude
 
@@ -15,10 +14,12 @@ export class Centaur extends Component {
 
         this.dude.dialogue = GenericDialogue.HELLO
 
-        this.npc.isEnemyFn = d => {
+        this.npc.isEnemyFn = (d) => {
             // TODO: Make centaurs potential enemies
-            return !d.factions.includes(DudeFaction.CENTAURS) 
-                && !d.factions.includes(DudeFaction.VILLAGERS)
+            return (
+                !d.factions.includes(DudeFaction.CENTAURS) &&
+                !d.factions.includes(DudeFaction.VILLAGERS)
+            )
         }
     }
 

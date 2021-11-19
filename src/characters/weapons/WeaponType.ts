@@ -22,5 +22,5 @@ export enum WeaponType {
     STAFF_1,
     STAFF_2,
     SPEAR,
-    PICKAXE
+    PICKAXE,
 }

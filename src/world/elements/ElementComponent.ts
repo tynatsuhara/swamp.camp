@@ -8,10 +8,9 @@ import { LocationManager } from "../LocationManager"
  * Elements should not subclass this.
  */
 export class ElementComponent extends Component {
-
     readonly type: ElementType
-    readonly pos: Point  // TODO: do we need to add this?
-    readonly occupiedPoints: Point[]  // these are the points that are non-walkable
+    readonly pos: Point // TODO: do we need to add this?
+    readonly occupiedPoints: Point[] // these are the points that are non-walkable
 
     constructor(type: ElementType, pos: Point, occupiedPoints: Point[], saveFn: () => object) {
         super()
@@ -27,6 +26,6 @@ export class ElementComponent extends Component {
 
     delete() {
         super.delete()
-        LocationManager.instance.getLocations().forEach(l => l.removeElement(this))
+        LocationManager.instance.getLocations().forEach((l) => l.removeElement(this))
     }
 }

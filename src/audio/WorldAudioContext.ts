@@ -46,6 +46,6 @@ export class WorldAudioContext {
         if (!Player.instance?.dude) {
             return
         }
-        this.listeners.forEach(l => l(this))
+        this.listeners.forEach((l) => l(this))
     }
 }

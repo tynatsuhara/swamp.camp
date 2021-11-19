@@ -32,8 +32,7 @@ export const CUSTOMIZATION_OPTIONS = [
 ]
 
 export class PlumePicker extends Component {
-
-    position: Point = Point.ZERO  // top-center position
+    position: Point = Point.ZERO // top-center position
     entity = new Entity([this])
     initialColor: Color[]
     selected: Color[]
@@ -45,7 +44,7 @@ export class PlumePicker extends Component {
         super()
         this.initialColor = initialColor || [Color.PINK, Color.LIGHT_PINK]
         this.callback = callback
-        
+
         this.select(this.initialColor)
     }
 
@@ -70,11 +69,12 @@ export class PlumePicker extends Component {
     update(updateData: UpdateData) {
         const sqSize = TILE_SIZE
         const rowLen = 9
-        const topLeftPos = this.position.plusX(-rowLen * sqSize / 2)
+        const topLeftPos = this.position.plusX((-rowLen * sqSize) / 2)
 
         this.renders = CUSTOMIZATION_OPTIONS.map((colors, index) => {
-            const position = topLeftPos.plusX((index % rowLen) * TILE_SIZE)
-                                       .plusY(Math.floor(index/rowLen) * TILE_SIZE)
+            const position = topLeftPos
+                .plusX((index % rowLen) * TILE_SIZE)
+                .plusY(Math.floor(index / rowLen) * TILE_SIZE)
             const dimensions = new Point(TILE_SIZE, TILE_SIZE)
 
             const hovered = Maths.rectContains(position, dimensions, updateData.input.mousePos)
@@ -84,12 +84,14 @@ export class PlumePicker extends Component {
             if (hovered && updateData.input.isMouseDown) {
                 this.select(colors)
             }
-            
+
             return new RectRender({
                 position: position.plus(big ? new Point(-bigBuffer, -bigBuffer) : Point.ZERO),
-                dimensions: dimensions.plus(big ? new Point(bigBuffer, bigBuffer).times(2) : Point.ZERO),
+                dimensions: dimensions.plus(
+                    big ? new Point(bigBuffer, bigBuffer).times(2) : Point.ZERO
+                ),
                 color: colors[1],
-                depth: UIStateManager.UI_SPRITE_DEPTH + (big && !hovered ? 2 : hovered ? 1 : 0)
+                depth: UIStateManager.UI_SPRITE_DEPTH + (big && !hovered ? 2 : hovered ? 1 : 0),
             })
         })
     }

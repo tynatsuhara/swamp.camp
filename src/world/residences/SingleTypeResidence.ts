@@ -22,7 +22,8 @@ export class SingleTypeResidence extends Residence {
 
     hasCapacity = (type: DudeType) => type === this.type && this.residents.length < this.capacity
 
-    canClaimPendingSlot = (type: DudeType) => type === this.type && this.residents.includes(SingleTypeResidence.PENDING_RESIDENT)
+    canClaimPendingSlot = (type: DudeType) =>
+        type === this.type && this.residents.includes(SingleTypeResidence.PENDING_RESIDENT)
 
     isHomeOf = (uuid: string) => this.residents.includes(uuid)
 
@@ -42,6 +43,6 @@ export class SingleTypeResidence extends Residence {
     }
 
     evictResident = (uuid: string) => {
-        this.residents = this.residents.filter(r => r !== uuid)
+        this.residents = this.residents.filter((r) => r !== uuid)
     }
 }

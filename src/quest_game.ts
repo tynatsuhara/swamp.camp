@@ -5,11 +5,11 @@ import { GameScene } from "./scenes/GameScene"
 import { MainMenuScene } from "./scenes/MainMenuScene"
 
 const enum Scene {
-    MAIN_MENU, GAME
+    MAIN_MENU,
+    GAME,
 }
 
 export class QuestGame extends Game {
-
     private static _instance: QuestGame
     static get instance() {
         return this._instance

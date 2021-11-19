@@ -14,24 +14,26 @@ enum State {
     SHEATHED,
     DRAWN,
     DRAWING,
-    ATTACKING
+    ATTACKING,
 }
 
 export class SpearWeapon extends Weapon {
-
     private weaponSprite: StaticSpriteSource
     private weaponTransform: SpriteTransform
     private offsetFromCenter: Point
     private state: State = State.DRAWN
     private _range: number
 
-    private timeDrawn = 0;
+    private timeDrawn = 0
 
     constructor() {
         super()
         this.start = (startData) => {
             this.weaponSprite = Tilesets.instance.dungeonCharacters.getTileSource("weapon_spear")
-            this.weaponTransform = new SpriteTransform(Point.ZERO, this.weaponSprite.dimensions).relativeTo(this.dude.animation.transform)
+            this.weaponTransform = new SpriteTransform(
+                Point.ZERO,
+                this.weaponSprite.dimensions
+            ).relativeTo(this.dude.animation.transform)
             this.offsetFromCenter = new Point(-5, 0)
             this._range = this.weaponSprite.dimensions.y
         }
@@ -48,7 +50,7 @@ export class SpearWeapon extends Weapon {
 
         this.animate()
     }
-    
+
     getRenderMethods() {
         return [this.weaponSprite.toImageRender(this.weaponTransform)]
     }
@@ -74,7 +76,7 @@ export class SpearWeapon extends Weapon {
     }
 
     /**
-     * @param newAttack 
+     * @param newAttack
      */
     attack(newAttack: boolean) {
         if (this.dude.shield && !this.dude.shield?.canAttack()) {
@@ -94,7 +96,7 @@ export class SpearWeapon extends Weapon {
         if (this.timeDrawn > timeToThrow) {
             this.dude.inventory.removeItem(Item.SPEAR, 1)
             this.dude.setWeapon(WeaponType.UNARMED)
-            
+
             const newTransform = new SpriteTransform(
                 this.weaponTransform.position,
                 this.weaponTransform.dimensions,
@@ -124,23 +126,23 @@ export class SpearWeapon extends Weapon {
         if (!this.enabled) {
             return
         }
-        const attackDistance = this.getRange() + 4  // add a tiny buffer for small weapons like the dagger to still work
+        const attackDistance = this.getRange() + 4 // add a tiny buffer for small weapons like the dagger to still work
         // TODO maybe only allow big weapons to hit multiple targets
-        Weapon.getEnemiesInRange(this.dude, attackDistance).forEach(d => {
+        Weapon.getEnemiesInRange(this.dude, attackDistance).forEach((d) => {
             d.damage(1, d.standingPosition.minus(this.dude.standingPosition), 30)
         })
     }
 
     private getBasePosition(rotation) {
         let offset = new Point(
-            this.dude.animation.transform.dimensions.x/2 - this.weaponTransform.dimensions.x/2,
+            this.dude.animation.transform.dimensions.x / 2 - this.weaponTransform.dimensions.x / 2,
             this.dude.animation.transform.dimensions.y - this.weaponTransform.dimensions.y
         ).plus(this.offsetFromCenter)
-        
+
         if (rotation === 90) {
             offset = offset.plus(new Point(10, 10))
         }
-        
+
         return offset.plus(this.dude.getAnimationOffsetPosition())
     }
 
@@ -158,7 +160,7 @@ export class SpearWeapon extends Weapon {
             // center on back
             pos = new Point(3, -2)
         } else if (this.state === State.DRAWING) {
-            const drawn = Math.floor(this.timeDrawn/-drawSpeed)
+            const drawn = Math.floor(this.timeDrawn / -drawSpeed)
             pos = new Point(Math.max(drawn, -4), 0)
             rotation = 90
         } else if (this.state === State.ATTACKING) {
@@ -168,12 +170,12 @@ export class SpearWeapon extends Weapon {
         }
 
         pos = pos.plus(this.getBasePosition(rotation))
-        
+
         this.weaponTransform.rotation = rotation
         this.weaponTransform.position = pos
 
         // show sword behind character if sheathed
-        this.weaponTransform.depth = this.state == State.SHEATHED ? -.5 : .5
+        this.weaponTransform.depth = this.state == State.SHEATHED ? -0.5 : 0.5
         this.weaponTransform.mirrorY = rotation === 90
     }
 
@@ -182,14 +184,14 @@ export class SpearWeapon extends Weapon {
     private currentAnimationFrame: number = 0
     private playAttackAnimation() {
         this.animator = new Animator(
-            Animator.frames(this.frameCount, 40), 
-            (index) => this.currentAnimationFrame = index, 
+            Animator.frames(this.frameCount, 40),
+            (index) => (this.currentAnimationFrame = index),
             () => {
                 this.animator = null
                 // TODO: use delayBetweenAttacks to allow NPCs to use spears
-                this.state = State.DRAWN  // reset to DRAWN when animation finishes
+                this.state = State.DRAWN // reset to DRAWN when animation finishes
             }
-        ) 
+        )
     }
 
     /**

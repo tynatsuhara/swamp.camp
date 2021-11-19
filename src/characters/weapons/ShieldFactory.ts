@@ -3,7 +3,6 @@ import { Shield } from "./Shield"
 import { Lantern } from "./Lantern"
 
 export const ShieldFactory = {
-
     // TODO support additional weapons
     make(type: ShieldType): Shield {
         switch (type) {
@@ -16,5 +15,5 @@ export const ShieldFactory = {
             default:
                 throw new Error(`weapon type ${type} is not supported yet`)
         }
-    }
+    },
 }

@@ -6,14 +6,16 @@ import { Color } from "./Color"
 
 const getIcon = (indicator: string) => {
     switch (indicator) {
-        case DudeInteractIndicator.NONE: 
+        case DudeInteractIndicator.NONE:
             return null
-        case DudeInteractIndicator.IMPORTANT_DIALOGUE: 
+        case DudeInteractIndicator.IMPORTANT_DIALOGUE:
             return Tilesets.instance.oneBit.getTileAt(new Point(19, 25))
-        case DudeInteractIndicator.ATTACKING_SOON: 
+        case DudeInteractIndicator.ATTACKING_SOON:
             return Tilesets.instance.oneBit.getTileAt(new Point(27, 20))
-        case DudeInteractIndicator.ATTACKING_NOW: 
-            return Tilesets.instance.oneBit.getTileAt(new Point(27, 20)).filtered(ImageFilters.tint(Color.SUPER_ORANGE))
+        case DudeInteractIndicator.ATTACKING_NOW:
+            return Tilesets.instance.oneBit
+                .getTileAt(new Point(27, 20))
+                .filtered(ImageFilters.tint(Color.SUPER_ORANGE))
     }
 }
 

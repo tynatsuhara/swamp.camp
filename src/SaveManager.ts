@@ -13,7 +13,6 @@ import { PlumePicker } from "./ui/PlumePicker"
 const CURRENT_SAVE_FORMAT_VERSION = 1
 
 class SaveManager {
-
     static readonly SLOTS = 3
 
     // Fields for the currently loaded save
@@ -39,11 +38,11 @@ class SaveManager {
      */
     setState(newState: SaveState) {
         if (!this.state) {
-            this.getState()    
+            this.getState()
         }
         this.state = {
             ...this.state,
-            ...newState
+            ...newState,
         }
     }
 
@@ -84,7 +83,9 @@ class SaveManager {
     // Save managment functions
 
     private saveKeyForSlot(slot: number) {
-        return Array.from({ length: SaveManager.SLOTS }, (v, k) => `save${k > 0 ? k+1 : ''}`)[slot]
+        return Array.from({ length: SaveManager.SLOTS }, (v, k) => `save${k > 0 ? k + 1 : ""}`)[
+            slot
+        ]
     }
 
     getLastSaveSlot() {
@@ -105,14 +106,11 @@ class SaveManager {
     }
 
     getSaveCount() {
-        return this.getSaves().filter(save => !!save).length
+        return this.getSaves().filter((save) => !!save).length
     }
 
     getSaves() {
-        return Array.from(
-            { length: 3 }, 
-            (v, k) => this.getSave(this.saveKeyForSlot(k))
-        )
+        return Array.from({ length: 3 }, (v, k) => this.getSave(this.saveKeyForSlot(k)))
     }
 
     private deleteSave(slot: number) {
@@ -149,7 +147,7 @@ class SaveManager {
     /**
      * @return true if a save was loaded successfully
      */
-    load(slot: number = -1) {        
+    load(slot: number = -1) {
         const saveKey = slot === -1 ? this.saveKey : this.saveKeyForSlot(slot)
 
         // ensures that the file exists
@@ -164,13 +162,17 @@ class SaveManager {
         console.log(`loaded save from ${saveDate} with ${timePlayed} played`)
 
         Singletons.destroy()
-        
+
         WorldTime.instance.initialize(save.worldTime)
         LocationManager.instance.initialize(save.locations)
         EventQueue.instance.initialize(save.eventQueue)
 
         // Camera.instance.destroy()
-        Camera.instance.focusOnDude(Array.from(LocationManager.instance.currentLocation.dudes).filter(d => d.type === DudeType.PLAYER)[0])
+        Camera.instance.focusOnDude(
+            Array.from(LocationManager.instance.currentLocation.dudes).filter(
+                (d) => d.type === DudeType.PLAYER
+            )[0]
+        )
 
         // clear existing UI state
         // UIStateManager.instance.destroy()
@@ -181,7 +183,7 @@ class SaveManager {
         if (!saveJson) {
             return null
         }
-        
+
         return JSON.parse(saveJson)
     }
 }

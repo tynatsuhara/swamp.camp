@@ -8,28 +8,28 @@ export const TEXT_FONT = '"Press Start 2P"'
 export const enum TextAlign {
     LEFT,
     CENTER,
-    RIGHT
+    RIGHT,
 }
 
 export const NO_BREAK_SPACE_CHAR = "∆"
 
 export const formatText = (
-    s: string, 
+    s: string,
     color: string,
-    position: Point, 
-    width: number, 
+    position: Point,
+    width: number,
     alignment: TextAlign = TextAlign.LEFT,
     lineSpacing: number = 4
 ): TextRender[] => {
     const rawRows = s.split("\n")
-    
+
     const rows: string[] = []
 
     for (const rawRow of rawRows) {
         let row = ""
         const words = rawRow.split(" ")
         for (const word of words) {
-            const newRow = row === "" ? word : (row + " " + word)
+            const newRow = row === "" ? word : row + " " + word
             if (newRow.length * TEXT_PIXEL_WIDTH < width) {
                 row = newRow
             } else {
@@ -43,17 +43,17 @@ export const formatText = (
     return rows.map((r, i) => {
         let offset = 0
         if (alignment === TextAlign.CENTER) {
-            offset = Math.floor((width - r.length*TEXT_PIXEL_WIDTH)/2)
+            offset = Math.floor((width - r.length * TEXT_PIXEL_WIDTH) / 2)
         } else if (alignment === TextAlign.RIGHT) {
-            offset = Math.floor(width - r.length*TEXT_PIXEL_WIDTH)
+            offset = Math.floor(width - r.length * TEXT_PIXEL_WIDTH)
         }
 
         return new TextRender(
             // replace placeholder space character
             r.replaceAll(NO_BREAK_SPACE_CHAR, " "),
-            position.plus(new Point(offset, i * (TEXT_SIZE+lineSpacing))), 
-            TEXT_SIZE, 
-            TEXT_FONT, 
+            position.plus(new Point(offset, i * (TEXT_SIZE + lineSpacing))),
+            TEXT_SIZE,
+            TEXT_FONT,
             color
         )
     })

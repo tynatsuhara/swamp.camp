@@ -1,4 +1,11 @@
-import { DialogueInstance, dialogue, NextDialogue, dialogueWithOptions, option, DialogueOption } from "./Dialogue"
+import {
+    DialogueInstance,
+    dialogue,
+    NextDialogue,
+    dialogueWithOptions,
+    option,
+    DialogueOption,
+} from "./Dialogue"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { Campfire } from "../../world/elements/Campfire"
@@ -31,15 +38,23 @@ export const ITEM_DIALOGUES: { [key: string]: () => DialogueInstance } = {
 
         if (logsYouCanAdd === 0) {
             return dialogue(
-                [playerLogCount === 0 ? "You don't have any logs to add to the fire." : "The fire already has the maximum amount of logs."], 
+                [
+                    playerLogCount === 0
+                        ? "You don't have any logs to add to the fire."
+                        : "The fire already has the maximum amount of logs.",
+                ],
                 completeDialogue(0)
             )
         } else if (logsYouCanAdd === 1) {
             return dialogueWithOptions(
-                [playerLogCount === 1 ? "You only have one log to add to the fire." : "You can fit one more log in the fire."],
+                [
+                    playerLogCount === 1
+                        ? "You only have one log to add to the fire."
+                        : "You can fit one more log in the fire.",
+                ],
                 DudeInteractIndicator.NONE,
                 new DialogueOption("Add log", completeDialogue(1)),
-                new DialogueOption(CANCEL_TEXT, completeDialogue(0)),
+                new DialogueOption(CANCEL_TEXT, completeDialogue(0))
             )
         }
 
@@ -49,7 +64,9 @@ export const ITEM_DIALOGUES: { [key: string]: () => DialogueInstance } = {
         } else if (logCount === 0) {
             prompt = `Add logs to ignite the fire? You can add up to ${logsYouCanAdd} logs.`
         } else {
-            prompt = `The fire will burn for at least ${(logCount-1) * Campfire.LOG_DURATION_HOURS} more hours. You can add up to ${logsYouCanAdd} more logs right now.`
+            prompt = `The fire will burn for at least ${
+                (logCount - 1) * Campfire.LOG_DURATION_HOURS
+            } more hours. You can add up to ${logsYouCanAdd} more logs right now.`
         }
 
         return dialogueWithOptions(
@@ -57,7 +74,7 @@ export const ITEM_DIALOGUES: { [key: string]: () => DialogueInstance } = {
             DudeInteractIndicator.NONE,
             new DialogueOption(`Add ${logsYouCanAdd} logs`, completeDialogue(logsYouCanAdd)),
             new DialogueOption("Add one log", completeDialogue(1)),
-            new DialogueOption(CANCEL_TEXT, completeDialogue(0)),
+            new DialogueOption(CANCEL_TEXT, completeDialogue(0))
         )
     },
 
@@ -81,20 +98,17 @@ export const ITEM_DIALOGUES: { [key: string]: () => DialogueInstance } = {
         if (bed.canSleepFor(8)) {
             text = "The comfy bed beckons to you. Do you give in?"
         } else if (bed.canSleepFor(1)) {
-            text = "Your campfire will not burn long enough for a full rest, but you have time for a nap."
+            text =
+                "Your campfire will not burn long enough for a full rest, but you have time for a nap."
             options.splice(0, 1)
         } else {
             return dialogue(
-                ["You cannot sleep if your campfire is out."], 
-                () => completeDialogue, 
+                ["You cannot sleep if your campfire is out."],
+                () => completeDialogue,
                 DudeInteractIndicator.NONE
             )
         }
 
-        return dialogueWithOptions(
-            [text],
-            DudeInteractIndicator.NONE,
-            ...options
-        )
-    }
+        return dialogueWithOptions([text], DudeInteractIndicator.NONE, ...options)
+    },
 }

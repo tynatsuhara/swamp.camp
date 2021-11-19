@@ -14,7 +14,11 @@ export class ConnectingTile extends Component {
     /**
      * Connecting tiles require a tile grid. The position parameter should be tile-scale, not pixel-scale.
      */
-    constructor(schema: ConnectingTileSchema, location: WorldLocation, position: Point = new Point(0, 0)) {
+    constructor(
+        schema: ConnectingTileSchema,
+        location: WorldLocation,
+        position: Point = new Point(0, 0)
+    ) {
         super()
         this.schema = schema
         this.location = location

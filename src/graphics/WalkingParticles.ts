@@ -12,10 +12,9 @@ import { pixelPtToTilePt } from "./Tilesets"
 
 const MILLIS_BETWEEN_EMISSIONS = 50
 const LIFESPAN_MILLIS = 300
-const BLOOD_PROBABILITY = .75
+const BLOOD_PROBABILITY = 0.75
 
 export class WalkingParticles extends Component {
-
     private dude: Dude
     private timeUntilNextEmission = 0
 
@@ -25,15 +24,20 @@ export class WalkingParticles extends Component {
 
     update(updateData: UpdateData) {
         // TODO blood
-        if (debug.enableBlood && this.dude.isAlive && this.dude.health < this.dude.maxHealth 
-            && Math.random() > this.dude.health/this.dude.maxHealth && Math.random() < BLOOD_PROBABILITY) {
+        if (
+            debug.enableBlood &&
+            this.dude.isAlive &&
+            this.dude.health < this.dude.maxHealth &&
+            Math.random() > this.dude.health / this.dude.maxHealth &&
+            Math.random() < BLOOD_PROBABILITY
+        ) {
             Particles.instance.emitParticle(
-                Math.random() > .9 ? Color.RED : Color.DARK_RED, 
+                Math.random() > 0.9 ? Color.RED : Color.DARK_RED,
                 this.dude.standingPosition.randomCircularShift(4),
                 GroundRenderer.DEPTH + 1,
                 10_000 + Math.random() * 5_000,
                 () => Point.ZERO,
-                Math.random() > .5 ? new Point(2, 2) : new Point(1, 1),
+                Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
             )
         }
 
@@ -49,28 +53,30 @@ export class WalkingParticles extends Component {
             return
         }
 
-        const groud = LocationManager.instance.currentLocation.getGround(pixelPtToTilePt(this.dude.standingPosition))
+        const groud = LocationManager.instance.currentLocation.getGround(
+            pixelPtToTilePt(this.dude.standingPosition)
+        )
 
         if (Ground.isWater(groud?.type)) {
             const depth = this.dude.standingPosition.y + 6
             const xRange = this.dude.colliderSize.x - 1
             for (let i = 0; i < 15; i++) {
                 Particles.instance.emitParticle(
-                    Color.BRIGHT_BLUE, 
+                    Color.BRIGHT_BLUE,
                     this.dude.standingPosition.randomlyShifted(xRange, 3).plusY(-2),
-                    depth, 
+                    depth,
                     LIFESPAN_MILLIS,
                     () => Point.ZERO,
-                    new Point(3, 3),
+                    new Point(3, 3)
                 )
             }
             Particles.instance.emitParticle(
-                Math.random() < .7 ? Color.LIGHT_BLUE : Color.WHITE, 
+                Math.random() < 0.7 ? Color.LIGHT_BLUE : Color.WHITE,
                 this.dude.standingPosition.randomlyShifted(xRange, 3).plusY(-2),
-                depth + 1, 
+                depth + 1,
                 LIFESPAN_MILLIS,
                 () => Point.ZERO,
-                new Point(1, 1),
+                new Point(1, 1)
             )
         } else {
             if (!this.dude.isMoving) {
@@ -79,14 +85,12 @@ export class WalkingParticles extends Component {
             }
 
             Particles.instance.emitParticle(
-                Color.LIGHT_BROWN, 
-                this.dude.standingPosition
-                        .randomlyShifted(4, 0)
-                        .plusY(Math.random() * -5), 
-                GroundRenderer.DEPTH + 1, 
+                Color.LIGHT_BROWN,
+                this.dude.standingPosition.randomlyShifted(4, 0).plusY(Math.random() * -5),
+                GroundRenderer.DEPTH + 1,
                 LIFESPAN_MILLIS,
                 () => Point.ZERO,
-                Math.random() > .5 ? new Point(2, 2) : new Point(1, 1),
+                Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
             )
         }
 

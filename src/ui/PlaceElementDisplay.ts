@@ -9,7 +9,6 @@ import { Player } from "../characters/Player"
 import { PlaceElementFrame } from "./PlaceElementFrame"
 
 export class PlaceElementDisplay extends Component {
-
     static instance: PlaceElementDisplay
 
     private e: Entity = new Entity([this])
@@ -20,7 +19,9 @@ export class PlaceElementDisplay extends Component {
     private successFn: () => void
     private count: number = 0
 
-    get isOpen() { return this.element !== null && this.element !== undefined }
+    get isOpen() {
+        return this.element !== null && this.element !== undefined
+    }
 
     constructor() {
         super()
@@ -48,13 +49,15 @@ export class PlaceElementDisplay extends Component {
         this.successFn = successFn
         this.count = count
         this.dimensions = Elements.instance.getElementFactory(element).dimensions
-        this.placingFrame = Player.instance.entity.addComponent(new PlaceElementFrame(this.dimensions))
+        this.placingFrame = Player.instance.entity.addComponent(
+            new PlaceElementFrame(this.dimensions)
+        )
     }
 
     // Should only be called by PlaceElementFrame
     finishPlacing(elementPos: Point) {
         this.count--
-        this.successFn()  // remove from inv
+        this.successFn() // remove from inv
         LocationManager.instance.currentLocation.addElement(this.element, elementPos)
         if (this.count === 0) {
             this.close()

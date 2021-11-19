@@ -61,15 +61,18 @@ export enum DudeType {
 }
 
 export class DudeFactory {
-
     static get instance() {
         return Singletons.getOrCreate(DudeFactory)
     }
-    
+
     /**
      * Create a new Dude in the specified location, defaults to the exterior world location
      */
-    new(type: DudeType, pos: Point, location: WorldLocation = LocationManager.instance.exterior()): Dude {
+    new(
+        type: DudeType,
+        pos: Point,
+        location: WorldLocation = LocationManager.instance.exterior()
+    ): Dude {
         return this.make(type, pos, null, location)
     }
 
@@ -81,7 +84,7 @@ export class DudeFactory {
     }
 
     private make(
-        type: DudeType, 
+        type: DudeType,
         pos: Point,
         saveState: DudeSaveState,
         location: WorldLocation
@@ -106,7 +109,7 @@ export class DudeFactory {
         let colliderSize = defaultColliderSize
 
         // type-specific defaults
-        switch(type) {
+        switch (type) {
             case DudeType.PLAYER: {
                 animationName = "knight_f"
                 weapon = WeaponType.SWORD
@@ -121,10 +124,10 @@ export class DudeFactory {
             case DudeType.DIP: {
                 animationName = "lizard_f"
                 maxHealth = Number.MAX_SAFE_INTEGER
-                speed *= .7
+                speed *= 0.7
                 additionalComponents = [
-                    new NPC(NPCSchedules.newGoToSchedule(new Point(0, 0))), 
-                    new Villager()
+                    new NPC(NPCSchedules.newGoToSchedule(new Point(0, 0))),
+                    new Villager(),
                 ]
                 window["dip"] = additionalComponents[0]
                 break
@@ -132,13 +135,23 @@ export class DudeFactory {
             case DudeType.HERALD: {
                 animationName = "Herald"
                 maxHealth = Number.MAX_SAFE_INTEGER
-                speed *= .6
+                speed *= 0.6
                 dialogue = BERTO_STARTING_DIALOGUE
                 additionalComponents = [
-                    new NPC(NPCSchedules.newGoToSchedule(  // filter out occupied points to not get stuck in the campfire
-                        Lists.oneOf([new Point(-3, 0), new Point(-3, 1), new Point(-2, 0), new Point(-2, 1)].filter(pt => !location.isOccupied(pt)))
-                    )),
-                    new Villager()
+                    new NPC(
+                        NPCSchedules.newGoToSchedule(
+                            // filter out occupied points to not get stuck in the campfire
+                            Lists.oneOf(
+                                [
+                                    new Point(-3, 0),
+                                    new Point(-3, 1),
+                                    new Point(-2, 0),
+                                    new Point(-2, 1),
+                                ].filter((pt) => !location.isOccupied(pt))
+                            )
+                        )
+                    ),
+                    new Villager(),
                 ]
                 window["berto"] = additionalComponents[0]
                 break
@@ -149,7 +162,7 @@ export class DudeFactory {
                 shield = ShieldType.BASIC
                 maxHealth = 4
                 additionalComponents = [new NPC(), new Villager()]
-                speed *= (.3 + Math.random()/2)
+                speed *= 0.3 + Math.random() / 2
                 break
             }
             case DudeType.ORC_WARRIOR: {
@@ -158,7 +171,7 @@ export class DudeFactory {
                 weapon = WeaponType.CLUB
                 additionalComponents = [new NPC(), new Enemy()]
                 maxHealth = 2
-                speed *= (.3 + Math.random()/2)
+                speed *= 0.3 + Math.random() / 2
                 break
             }
             case DudeType.ORC_BRUTE: {
@@ -167,7 +180,7 @@ export class DudeFactory {
                 weapon = WeaponType.CLUB
                 additionalComponents = [new NPC(), new Enemy()]
                 maxHealth = 4
-                speed *= .5
+                speed *= 0.5
                 colliderSize = bigColliderSize
                 break
             }
@@ -177,50 +190,56 @@ export class DudeFactory {
                 weapon = WeaponType.STAFF_1
                 additionalComponents = [new NPC(), new Enemy()]
                 maxHealth = 2
-                speed *= (.4 + Math.random()/4)
+                speed *= 0.4 + Math.random() / 4
                 break
             }
             case DudeType.HORNED_DEMON: {
                 factions = [DudeFaction.DEMONS]
-                animationName = "chort" 
+                animationName = "chort"
                 weapon = WeaponType.UNARMED
                 additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new Enemy()]
                 maxHealth = 2
-                speed *= (.6 + Math.random()/5)
+                speed *= 0.6 + Math.random() / 5
                 break
             }
             case DudeType.DEMON_BRUTE: {
                 factions = [DudeFaction.DEMONS]
-                animationName = "big_demon" 
+                animationName = "big_demon"
                 weapon = WeaponType.UNARMED
                 additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new Enemy()]
                 maxHealth = 8
-                speed *= (1 + .3 * Math.random())
+                speed *= 1 + 0.3 * Math.random()
                 colliderSize = bigColliderSize
                 break
             }
             case DudeType.SHROOM: {
                 factions = [DudeFaction.SHROOMS]
-                animationName = "SmallMushroom" 
-                additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new ShroomNPC()]
+                animationName = "SmallMushroom"
+                additionalComponents = [
+                    new NPC(NPCSchedules.newFreeRoamSchedule()),
+                    new ShroomNPC(),
+                ]
                 maxHealth = 2
-                speed *= (.6 + Math.random()/5)
+                speed *= 0.6 + Math.random() / 5
                 break
             }
             case DudeType.VILLAGER: {
                 animationName = `prisoner${Math.ceil(Math.random() * 2)}`
                 maxHealth = 4
-                speed *= .6
+                speed *= 0.6
                 // TODO: add a new type of schedule for a villager with a home
-                additionalComponents = [new NPC(NPCSchedules.newDefaultVillagerSchedule()), new Villager()]
+                additionalComponents = [
+                    new NPC(NPCSchedules.newDefaultVillagerSchedule()),
+                    new Villager(),
+                ]
                 break
             }
             case DudeType.CENTAUR: {
                 factions = [DudeFaction.CENTAURS]
-                animationName = "Centaur_M" 
+                animationName = "Centaur_M"
                 additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new Centaur()]
                 maxHealth = 2
-                speed *= .5
+                speed *= 0.5
                 break
             }
             case DudeType.BEAR: {
@@ -229,7 +248,7 @@ export class DudeFactory {
                 weapon = WeaponType.UNARMED
                 additionalComponents = [new NPC(), new Enemy()]
                 maxHealth = 5
-                speed *= .5
+                speed *= 0.5
                 colliderSize = bigColliderSize
                 break
             }
@@ -246,28 +265,32 @@ export class DudeFactory {
                 factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
                 animationName = Lists.oneOf(["FatCleric", "NormalCleric", "TallCleric"])
                 additionalComponents = [new NPC()]
-                speed *= .3
+                speed *= 0.3
                 break
             case DudeType.NUN:
                 factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
                 animationName = Lists.oneOf(["FatNun", "NormalNun", "TallNun"])
                 additionalComponents = [new NPC()]
-                speed *= .3
+                speed *= 0.3
                 break
             case DudeType.BISHOP: {
                 factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
                 animationName = "Bishop"
                 additionalComponents = [new NPC()]
-                speed *= .2
+                speed *= 0.2
                 break
             }
             case DudeType.SWAMP_THING:
                 factions = [DudeFaction.AQUATIC]
-                animationName = "swampy" 
+                animationName = "swampy"
                 weapon = WeaponType.UNARMED
-                additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new Enemy(), new AquaticNPC()]
+                additionalComponents = [
+                    new NPC(NPCSchedules.newFreeRoamSchedule()),
+                    new Enemy(),
+                    new AquaticNPC(),
+                ]
                 maxHealth = 2
-                speed *= .55
+                speed *= 0.55
                 break
             default: {
                 throw new Error(`DudeType ${type} can't be instantiated`)
@@ -277,10 +300,10 @@ export class DudeFactory {
         // use saved data instead of defaults
         const d = new Dude(
             uuid,
-            type, 
-            factions,  // TODO: Save factions? Only if they become mutable
-            saveState?.anim ?? animationName, 
-            pos, 
+            type,
+            factions, // TODO: Save factions? Only if they become mutable
+            saveState?.anim ?? animationName,
+            pos,
             saveState?.weapon ?? weapon,
             saveState?.shield ?? shield,
             saveState?.maxHealth ?? maxHealth,
@@ -289,7 +312,7 @@ export class DudeFactory {
             !!saveState?.inventory ? Inventory.load(saveState.inventory) : defaultInventory,
             saveState?.dialogue ?? dialogue,
             saveState?.blob ?? blob,
-            colliderSize,
+            colliderSize
         )
 
         // Always add dude component first to make sure additional components can access it
@@ -303,23 +326,24 @@ export class DudeFactory {
 
     private claimResidence(type: DudeType, uuid: string) {
         if (!LocationManager.instance.exterior()) {
-            // Our locations aren't initialized yet, so this NPC is being spawned as a 
+            // Our locations aren't initialized yet, so this NPC is being spawned as a
             // save is loaded. We can assume that the residence is already configured.
             return
         }
 
-        const residences = LocationManager.instance.exterior()
+        const residences = LocationManager.instance
+            .exterior()
             .getElements()
-            .map(e => e.entity.getComponent(Residence))
-            .filter(e => !!e)
+            .map((e) => e.entity.getComponent(Residence))
+            .filter((e) => !!e)
 
-        const hasResidence = residences.some(residence => residence.isHomeOf(uuid))
+        const hasResidence = residences.some((residence) => residence.isHomeOf(uuid))
 
         if (hasResidence) {
             return
         }
-    
-        const pending = residences.filter(res => res?.canClaimPendingSlot(type))
+
+        const pending = residences.filter((res) => res?.canClaimPendingSlot(type))
         if (pending.length > 0) {
             pending[0].claimPendingSlot(uuid)
         }

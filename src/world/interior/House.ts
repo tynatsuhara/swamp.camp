@@ -11,23 +11,20 @@ export const makeHouseInterior = (outside: WorldLocation): WorldLocation => {
     const l = new WorldLocation(true, false)
     LocationManager.instance.add(l)
     const dimensions = new Point(7, 5)
-    const interactablePos = new Point(dimensions.x/2, dimensions.y).times(TILE_SIZE)
-    const teleporter: Teleporter = { 
-        to: outside.uuid, 
-        pos: interactablePos.plusY(-4), 
-        id: TeleporterPrefix.DOOR }
+    const interactablePos = new Point(dimensions.x / 2, dimensions.y).times(TILE_SIZE)
+    const teleporter: Teleporter = {
+        to: outside.uuid,
+        pos: interactablePos.plusY(-4),
+        id: TeleporterPrefix.DOOR,
+    }
 
     l.setBarriers(InteriorUtils.makeBarriers(dimensions))
     l.addTeleporter(teleporter)
-    l.addElement(
-        ElementType.TELEPORTER, 
-        new Point(3, 5), 
-        { 
-            to: outside.uuid, 
-            i: interactablePos.toString(),
-            id: TeleporterPrefix.DOOR
-        }
-    )
+    l.addElement(ElementType.TELEPORTER, new Point(3, 5), {
+        to: outside.uuid,
+        i: interactablePos.toString(),
+        id: TeleporterPrefix.DOOR,
+    })
 
     const woodType = Math.ceil(Math.random() * 2)
 
@@ -37,12 +34,14 @@ export const makeHouseInterior = (outside: WorldLocation): WorldLocation => {
 
     for (let x = 0; x < dimensions.x; x++) {
         for (let y = 0; y < dimensions.y; y++) {
-            l.setGroundElement(GroundType.BASIC, new Point(x, y), { k: `hardwood${woodType}` })
+            l.setGroundElement(GroundType.BASIC, new Point(x, y), {
+                k: `hardwood${woodType}`,
+            })
         }
         let topAndBottomTiles = ["wallCenter", "wallCenter"]
         if (x === 0) {
             topAndBottomTiles = ["wallLeft", "wallRight"]
-        } else if (x === dimensions.x-1) {
+        } else if (x === dimensions.x - 1) {
             topAndBottomTiles = ["wallRight", "wallLeft"]
         }
         addWallSprite(topAndBottomTiles[0], new Point(x, -1), 0)

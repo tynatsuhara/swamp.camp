@@ -14,15 +14,14 @@ class TownStat {
         saveManager.setState({
             townStats: {
                 ...existingStats,
-                [this.id]: currentValue + adjustment
-            }
+                [this.id]: currentValue + adjustment,
+            },
         })
         console.log(`new stat value for ${this.id}: ${saveManager.getState().townStats[this.id]}`)
     }
 }
 
 export class TownStats {
-
     static get instance() {
         return Singletons.getOrCreate(TownStats)
     }
@@ -33,6 +32,6 @@ export class TownStats {
      *   - safety/strength of your military for sending them out (protecting villagers in the forest)
      *   - black magic (converse to theocracy)
      */
-    readonly happiness = new TownStat("happiness");
-    readonly theocracy = new TownStat("theocracy");
+    readonly happiness = new TownStat("happiness")
+    readonly theocracy = new TownStat("theocracy")
 }

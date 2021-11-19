@@ -4,7 +4,6 @@ import { NPCTask } from "./NPCTask"
 import { NPCTaskContext } from "./NPCTaskContext"
 
 export class NPCTaskScheduleGoToSpot extends NPCTask {
-
     private readonly pt: Point
 
     constructor(schedule: NPCSchedule) {

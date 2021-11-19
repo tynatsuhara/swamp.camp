@@ -16,28 +16,28 @@ export class Ambiance {
 
     private static readonly DAY = new QueueAudioPlayer(
         "chirpy daytime ambiance",
-        .75,
+        0.75,
         ["audio/ambiance/daytime.ogg"],
-        0,  // don't crossfade
-        0,  // no time between end/start
+        0, // don't crossfade
+        0 // no time between end/start
     )
     private static readonly NIGHT = new QueueAudioPlayer(
-        "spoopy nighttime ambiance", 
-        .025, 
-        Lists.shuffled(Lists.range(1, 9).map(i => `audio/ambiance/yewbic__ambience0${i}.wav`)),
-        0,  // don't crossfade
+        "spoopy nighttime ambiance",
+        0.025,
+        Lists.shuffled(Lists.range(1, 9).map((i) => `audio/ambiance/yewbic__ambience0${i}.wav`)),
+        0, // don't crossfade
         30_000
     )
 
     static determineAmbiance(ctx: WorldAudioContext) {
-        // Ambiance volume is closely tied to the world context so we don't update 
+        // Ambiance volume is closely tied to the world context so we don't update
         // the volume from the settings until determineAmbiance is called
 
-        const volume = Settings.getSoundVolume() * (ctx.isInterior ? .1 : 1)
+        const volume = Settings.getSoundVolume() * (ctx.isInterior ? 0.1 : 1)
         Ambiance.DAY.setVolume(volume)
 
         const inDarkness = LightManager.instance.isDark(Player.instance.dude.standingPosition)
-        Ambiance.NIGHT.setVolume(volume * (inDarkness ? 1 : .5))
+        Ambiance.NIGHT.setVolume(volume * (inDarkness ? 1 : 0.5))
 
         // fade out at night
         const timeOfDay = ctx.time % TimeUnit.DAY
@@ -50,7 +50,7 @@ export class Ambiance {
             Ambiance.play(Ambiance.DAY)
         }
 
-        window['currentAmbiance'] = Ambiance.currentAmbiance
+        window["currentAmbiance"] = Ambiance.currentAmbiance
     }
 
     private static play(newAmbiance: AudioPlayer) {

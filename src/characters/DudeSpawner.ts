@@ -14,7 +14,6 @@ import { WorldTime } from "../world/WorldTime"
 import { DudeFaction, DudeFactory, DudeType } from "./DudeFactory"
 
 export class DudeSpawner extends Component {
-
     static get instance() {
         return Singletons.getOrCreate(DudeSpawner)
     }
@@ -30,9 +29,9 @@ export class DudeSpawner extends Component {
         }
 
         // Maybe consider moving this code elsewhere later
-        WorldAudioContext.instance.isInBattle = 
-                Array.from(LocationManager.instance.exterior().dudes.values())
-                        .some(d => d.isAlive && d.factions.includes(DudeFaction.ORCS))
+        WorldAudioContext.instance.isInBattle = Array.from(
+            LocationManager.instance.exterior().dudes.values()
+        ).some((d) => d.isAlive && d.factions.includes(DudeFaction.ORCS))
     }
 
     private spawn() {
@@ -47,39 +46,59 @@ export class DudeSpawner extends Component {
 
         const l = LocationManager.instance.currentLocation
         if (l.isInterior) {
-            return  // don't spawn demons inside
+            return // don't spawn demons inside
         }
-        const demons = Array.from(l.dudes.values()).filter(d => d.factions.includes(DudeFaction.DEMONS))
+        const demons = Array.from(l.dudes.values()).filter((d) =>
+            d.factions.includes(DudeFaction.DEMONS)
+        )
         if (demons.length > 0) {
-            return  // just wait to spawn until all the demons have been killed
+            return // just wait to spawn until all the demons have been killed
         }
         const goalDemonCount = Math.random() * 5
 
         if (demons.length < goalDemonCount) {
-            const openPoints = l.getGroundSpots().filter(pt => 
-                !l.isOccupied(pt) && LightManager.instance.isTotalDarkness(pt.times(TILE_SIZE)))
+            const openPoints = l
+                .getGroundSpots()
+                .filter(
+                    (pt) =>
+                        !l.isOccupied(pt) &&
+                        LightManager.instance.isTotalDarkness(pt.times(TILE_SIZE))
+                )
 
             for (let i = 0; i < Math.min(openPoints.length, goalDemonCount - demons.length); i++) {
                 const pt = Lists.oneOf(openPoints)
-                const type = Math.random() > .95 ? DudeType.DEMON_BRUTE : DudeType.HORNED_DEMON
+                const type = Math.random() > 0.95 ? DudeType.DEMON_BRUTE : DudeType.HORNED_DEMON
                 DudeFactory.instance.new(type, pt.times(TILE_SIZE), l)
             }
         }
     }
 
     spawnOrcs() {
-        setTimeout(() => NotificationDisplay.instance.push({
-            text: "Orc attack!",
-            icon: "sword",
-        }), 6500)
+        setTimeout(
+            () =>
+                NotificationDisplay.instance.push({
+                    text: "Orc attack!",
+                    icon: "sword",
+                }),
+            6500
+        )
         const extSize = LocationManager.instance.exterior().size
-        const spawnSide = (Math.random() > .5 ? 1 : -1) * extSize/2 * TILE_SIZE
-        const spawnMiddle = Math.random() * extSize * TILE_SIZE - extSize/2
-        const spawnPos = Math.random() > .5 ? new Point(spawnSide, spawnMiddle) : new Point(spawnMiddle, spawnSide)
+        const spawnSide = (((Math.random() > 0.5 ? 1 : -1) * extSize) / 2) * TILE_SIZE
+        const spawnMiddle = Math.random() * extSize * TILE_SIZE - extSize / 2
+        const spawnPos =
+            Math.random() > 0.5
+                ? new Point(spawnSide, spawnMiddle)
+                : new Point(spawnMiddle, spawnSide)
         console.log(spawnPos)
-        Lists.range(0, 5 + Math.random() * 10).forEach(() => DudeFactory.instance.new(DudeType.ORC_WARRIOR, spawnPos))
-        Lists.range(0, 1 + Math.random() * 4).forEach(() => DudeFactory.instance.new(DudeType.ORC_BRUTE, spawnPos))
-        Lists.range(0, 1 + Math.random() * 4).forEach(() => DudeFactory.instance.new(DudeType.ORC_SHAMAN, spawnPos))
+        Lists.range(0, 5 + Math.random() * 10).forEach(() =>
+            DudeFactory.instance.new(DudeType.ORC_WARRIOR, spawnPos)
+        )
+        Lists.range(0, 1 + Math.random() * 4).forEach(() =>
+            DudeFactory.instance.new(DudeType.ORC_BRUTE, spawnPos)
+        )
+        Lists.range(0, 1 + Math.random() * 4).forEach(() =>
+            DudeFactory.instance.new(DudeType.ORC_SHAMAN, spawnPos)
+        )
     }
 
     getEntity() {

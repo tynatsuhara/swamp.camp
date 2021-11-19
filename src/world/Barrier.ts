@@ -19,20 +19,14 @@ export class Barrier extends Component {
     }
 
     awake() {
-        this.entity.addComponent(new BoxCollider(
-            this.position,
-            this.dimensions,
-            CollisionEngine.DEFAULT_LAYER,
-        ))
+        this.entity.addComponent(
+            new BoxCollider(this.position, this.dimensions, CollisionEngine.DEFAULT_LAYER)
+        )
     }
 
     static fromJson(obj: object): Entity {
         return new Entity([
-            new Barrier(
-                Point.fromString(obj['p']), 
-                Point.fromString(obj['d']), 
-                obj['a']
-            )
+            new Barrier(Point.fromString(obj["p"]), Point.fromString(obj["d"]), obj["a"]),
         ])
     }
 
@@ -40,7 +34,7 @@ export class Barrier extends Component {
         return {
             p: this.position.toString(),
             d: this.dimensions.toString(),
-            a: this.allow
+            a: this.allow,
         }
     }
 }

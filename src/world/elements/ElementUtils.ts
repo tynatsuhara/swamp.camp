@@ -9,5 +9,5 @@ export const ElementUtils = {
             }
         }
         return result
-    }
+    },
 }

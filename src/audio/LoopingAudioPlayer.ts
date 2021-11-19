@@ -1,7 +1,6 @@
-import { AudioPlayer } from "./AudioPlayer";
+import { AudioPlayer } from "./AudioPlayer"
 
 export class LoopingAudioPlayer extends AudioPlayer {
-
     readonly fileName: string
     private track: HTMLAudioElement
 

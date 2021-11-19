@@ -8,14 +8,13 @@ import { GroundType } from "./Ground"
 import { WorldLocation } from "../WorldLocation"
 import { GroundRenderer } from "../GroundRenderer"
 
-const CORNER_SIZE = TILE_SIZE/2
+const CORNER_SIZE = TILE_SIZE / 2
 const CORNER_DIMS = new Point(CORNER_SIZE, CORNER_SIZE)
 
 /**
  * Defines how a type of connecting tiles interacts with other types of connecting tiles.
  */
 export class ConnectingTilePathSchema extends ConnectingTileSchema {
-
     private readonly type: GroundType
     private _cap: StaticSpriteSource
     private _single: StaticSpriteSource
@@ -31,7 +30,7 @@ export class ConnectingTilePathSchema extends ConnectingTileSchema {
         this._cap = source
         return this
     }
-   
+
     // a tile with no connections
     single(source: StaticSpriteSource) {
         this._single = source
@@ -42,14 +41,14 @@ export class ConnectingTilePathSchema extends ConnectingTileSchema {
         this._corners = source
         return this
     }
-  
+
     canConnect(schema: ConnectingTileSchema) {
         if (schema instanceof ConnectingTilePathSchema) {
             return (schema as ConnectingTilePathSchema).type === this.type
         }
         return false
     }
-   
+
     /**
      * Renders the tile source based on the given grid and position
      */
@@ -65,22 +64,24 @@ export class ConnectingTilePathSchema extends ConnectingTileSchema {
         const sw = this.get(location, new Point(x - 1, y + 1))
         const w = this.get(location, new Point(x - 1, y))
         const nw = this.get(location, new Point(x - 1, y - 1))
-        
-        const count = [n, ne, e, se, s, sw, w, nw].filter(dir => !!dir).length
+
+        const count = [n, ne, e, se, s, sw, w, nw].filter((dir) => !!dir).length
 
         const render = (source: StaticSpriteSource, rotation: number = 0, offset = Point.ZERO) => {
-            return source.toImageRender(SpriteTransform.new({ 
-                position: position.times(TILE_SIZE).plus(offset), 
-                rotation, 
-                depth: GroundRenderer.DEPTH + 1
-            }))
+            return source.toImageRender(
+                SpriteTransform.new({
+                    position: position.times(TILE_SIZE).plus(offset),
+                    rotation,
+                    depth: GroundRenderer.DEPTH + 1,
+                })
+            )
         }
 
         const corner = (x: number, y: number) => {
             const offset = new Point(x, y).times(CORNER_SIZE)
             const tile = new StaticSpriteSource(
-                this._corners.image, 
-                this._corners.position.plus(offset), 
+                this._corners.image,
+                this._corners.position.plus(offset),
                 CORNER_DIMS
             )
             return render(tile, 0, offset)
@@ -88,7 +89,7 @@ export class ConnectingTilePathSchema extends ConnectingTileSchema {
 
         let results: ImageRender[] = [
             // grass
-            render(Tilesets.instance.tilemap.getTileAt(new Point(0, 7)))
+            render(Tilesets.instance.tilemap.getTileAt(new Point(0, 7))),
         ]
 
         if (!n && !e && !s && !w) {
@@ -123,5 +124,5 @@ export class ConnectingTilePathSchema extends ConnectingTileSchema {
         }
 
         return results
-}
+    }
 }

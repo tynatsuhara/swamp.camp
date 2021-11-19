@@ -11,13 +11,12 @@ import { NPC } from "../NPC"
  * Something that probably wants to eat the player
  */
 export class Enemy extends Component {
-
     awake() {
         const dude = this.entity.getComponent(Dude)
         const npc = this.entity.getComponent(NPC)
 
         // Default enemy behavior is to attack anything that isn't in an overlapping faction
-        npc.isEnemyFn = d => d.isEnemy(dude)
+        npc.isEnemyFn = (d) => d.isEnemy(dude)
 
         if (dude.factions.includes(DudeFaction.ORCS)) {
             this.orc(dude, npc)
@@ -35,12 +34,16 @@ export class Enemy extends Component {
         if (dude.type === DudeType.ORC_SHAMAN) {
             // Shamans use AOE attacks and will only target the player
             npc.enemyFilterFn = (enemies) => {
-                return enemies.filter(e => e.type === DudeType.PLAYER)
+                return enemies.filter((e) => e.type === DudeType.PLAYER)
             }
         } else {
             // Only attack armed enemies if they are close enough to be dangerous, otherwise target the weak
             npc.enemyFilterFn = (enemies) => {
-                const nearbyArmedEnemies = enemies.filter(d => !!d.weapon && d.standingPosition.manhattanDistanceTo(dude.standingPosition) < 100)
+                const nearbyArmedEnemies = enemies.filter(
+                    (d) =>
+                        !!d.weapon &&
+                        d.standingPosition.manhattanDistanceTo(dude.standingPosition) < 100
+                )
                 return nearbyArmedEnemies.length > 0 ? nearbyArmedEnemies : enemies
             }
         }
@@ -50,20 +53,26 @@ export class Enemy extends Component {
         npc.findTargetRange *= 3
 
         // demons only attack enemies in the dark
-        npc.isEnemyFn = d => {
-            return !d.factions.includes(DudeFaction.DEMONS) && LightManager.instance.isDark(d.standingPosition)
+        npc.isEnemyFn = (d) => {
+            return (
+                !d.factions.includes(DudeFaction.DEMONS) &&
+                LightManager.instance.isDark(d.standingPosition)
+            )
         }
 
         // demons only attack roam in the dark
         npc.pathFindingHeuristic = (pt: Point, goal: Point) => {
-            return pt.distanceTo(goal) + (LightManager.instance.isDark(pt.times(TILE_SIZE)) ? 0 : 100)
+            return (
+                pt.distanceTo(goal) + (LightManager.instance.isDark(pt.times(TILE_SIZE)) ? 0 : 100)
+            )
         }
-        
+
         // dissolve if they end up in the light for too long
         let lastSunlightCheck = false
         npc.doWhileLiving(() => {
             if (!LightManager.instance.isDark(dude.standingPosition)) {
-                if (lastSunlightCheck) {  // they've been in sunlight for a while, time to die
+                if (lastSunlightCheck) {
+                    // they've been in sunlight for a while, time to die
                     dude.dissolve()
                     return true // end the loop
                 }
@@ -76,10 +85,12 @@ export class Enemy extends Component {
 
     private acquatic(dude: Dude, npc: NPC) {
         // only attack enemies in the water
-        npc.isEnemyFn = d => {
-            return !d.factions.includes(DudeFaction.AQUATIC) 
-                && Ground.isWater(d.location.getGround(pixelPtToTilePt(d.standingPosition)).type)
-                && Ground.isWater(dude.location.getGround(pixelPtToTilePt(dude.standingPosition)).type)
+        npc.isEnemyFn = (d) => {
+            return (
+                !d.factions.includes(DudeFaction.AQUATIC) &&
+                Ground.isWater(d.location.getGround(pixelPtToTilePt(d.standingPosition)).type) &&
+                Ground.isWater(dude.location.getGround(pixelPtToTilePt(dude.standingPosition)).type)
+            )
         }
 
         // only traverse water

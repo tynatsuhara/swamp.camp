@@ -12,21 +12,22 @@ import { WorldLocation } from "../WorldLocation"
 import { ConnectingTileWaterfallSchema } from "./ConnectingTileWaterfallSchema"
 import { GroundRenderer } from "../GroundRenderer"
 
-const CORNER_SIZE = TILE_SIZE/2
+const CORNER_SIZE = TILE_SIZE / 2
 const CORNER_DIMS = new Point(CORNER_SIZE, CORNER_SIZE)
 
 /**
  * Defines how a type of connecting tiles interacts with other types of connecting tiles.
  */
 export class ConnectingTileWaterSchema extends ConnectingTileSchema {
-
     static readonly DEPTH = GroundRenderer.DEPTH + 2
 
     canConnect(schema: ConnectingTileSchema) {
-        return schema instanceof ConnectingTileWaterSchema
-            || schema instanceof ConnectingTileWaterfallSchema
+        return (
+            schema instanceof ConnectingTileWaterSchema ||
+            schema instanceof ConnectingTileWaterfallSchema
+        )
     }
-   
+
     /**
      * Renders the tile source based on the given grid and position
      */
@@ -42,15 +43,23 @@ export class ConnectingTileWaterSchema extends ConnectingTileSchema {
         const sw = this.get(location, new Point(x - 1, y + 1))
         const w = this.get(location, new Point(x - 1, y))
         const nw = this.get(location, new Point(x - 1, y - 1))
-        
+
         let results: ImageRender[] = []
 
-        const render = (source: StaticSpriteSource, mirrorX: boolean = false, offset = Point.ZERO) => {
-            results.push(source.toImageRender(SpriteTransform.new({ 
-                position: position.times(TILE_SIZE).plus(offset), 
-                mirrorX, 
-                depth: ConnectingTileWaterSchema.DEPTH
-            })))
+        const render = (
+            source: StaticSpriteSource,
+            mirrorX: boolean = false,
+            offset = Point.ZERO
+        ) => {
+            results.push(
+                source.toImageRender(
+                    SpriteTransform.new({
+                        position: position.times(TILE_SIZE).plus(offset),
+                        mirrorX,
+                        depth: ConnectingTileWaterSchema.DEPTH,
+                    })
+                )
+            )
         }
 
         const tilemap = Tilesets.instance.tilemap
@@ -59,8 +68,8 @@ export class ConnectingTileWaterSchema extends ConnectingTileSchema {
             const offset = new Point(x, y).times(CORNER_SIZE)
             const corners = tilemap.getTileAt(new Point(5, 1))
             const tile = new StaticSpriteSource(
-                corners.image, 
-                corners.position.plus(offset), 
+                corners.image,
+                corners.position.plus(offset),
                 CORNER_DIMS
             )
             render(tile, false, offset)
@@ -86,7 +95,7 @@ export class ConnectingTileWaterSchema extends ConnectingTileSchema {
         if (!w && !s) {
             render(tilemap.getTileAt(new Point(4, 2)))
         }
-        
+
         if (!e && !n) {
             render(tilemap.getTileAt(new Point(4, 0)), true)
         } else if (!e) {

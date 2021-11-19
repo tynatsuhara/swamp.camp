@@ -17,14 +17,13 @@ export const TILE_SIZE = 16
 export const TILE_DIMENSIONS = new Point(TILE_SIZE, TILE_SIZE)
 
 export const pixelPtToTilePt = (pixelPt: Point) => {
-    return pixelPt.apply(n => Math.floor(n/TILE_SIZE))
+    return pixelPt.apply((n) => Math.floor(n / TILE_SIZE))
 }
 
 /**
  * Manages different tile sources
  */
 export class Tilesets {
-
     static get instance() {
         return Singletons.getOrCreate(Tilesets)
     }

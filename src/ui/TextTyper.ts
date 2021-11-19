@@ -2,7 +2,6 @@ import { UpdateData } from "brigsby/dist/Engine"
 import { NO_BREAK_SPACE_CHAR } from "./Text"
 
 export class TextTyper {
-
     private static readonly MS_PER_CHAR = 35
 
     private text: string
@@ -11,7 +10,9 @@ export class TextTyper {
     private letterTicker = 0
     private finishedPrinting = false
 
-    get isFinished() { return this.finishedPrinting }
+    get isFinished() {
+        return this.finishedPrinting
+    }
 
     constructor(text: string, onFinish: () => void) {
         this.text = text
@@ -32,7 +33,7 @@ export class TextTyper {
         }
 
         this.letterTicker += elapsedTimeMillis
-        const charsToShow = Math.floor(this.letterTicker/TextTyper.MS_PER_CHAR)
+        const charsToShow = Math.floor(this.letterTicker / TextTyper.MS_PER_CHAR)
 
         if (charsToShow === this.text.length) {
             this.finishedPrinting = true

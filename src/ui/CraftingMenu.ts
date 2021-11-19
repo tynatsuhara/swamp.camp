@@ -23,10 +23,9 @@ import { Sounds } from "../audio/Sounds"
 import { assets } from "brigsby/dist/Assets"
 
 export class CraftingMenu extends Component {
-    
     static instance: CraftingMenu
 
-    private readonly e: Entity = new Entity([this])  // entity for this component
+    private readonly e: Entity = new Entity([this]) // entity for this component
     private displayEntity: Entity
     isOpen = false
     private recipes: CraftingRecipeCategory[]
@@ -36,8 +35,8 @@ export class CraftingMenu extends Component {
     private dimensions = new Point(160, 158)
     private innerDimensions = this.dimensions.minus(new Point(10, 14))
     private scrollOffset = 0
-    private justCraftedRow = -1  // if this is non-negative, this row was just crafted and will be highlighted
-    private justOpened = false  // prevent bug where the mouse is held down immediately
+    private justCraftedRow = -1 // if this is non-negative, this row was just crafted and will be highlighted
+    private justOpened = false // prevent bug where the mouse is held down immediately
     private tooltip = this.e.addComponent(new Tooltip())
     private readonly craftNoise = "audio/rpg/inventory/metal-small3.wav"
 
@@ -61,10 +60,16 @@ export class CraftingMenu extends Component {
         if (this.isOpen) {
             this.tooltip.clear()
             this.tooltip.position = updateData.input.mousePos
-            const rowsTall = 6  // will need to change this if dimensions are adjusted
+            const rowsTall = 6 // will need to change this if dimensions are adjusted
             const category = this.recipes[this.recipeCategory]
-            this.scrollOffset -= updateData.input.mouseWheelDeltaY * updateData.elapsedTimeMillis * 0.01
-            this.scrollOffset = Math.floor(Math.max(Math.min(0, this.scrollOffset), -Math.max(category.recipes.length, rowsTall)*24 + this.innerDimensions.y))
+            this.scrollOffset -=
+                updateData.input.mouseWheelDeltaY * updateData.elapsedTimeMillis * 0.01
+            this.scrollOffset = Math.floor(
+                Math.max(
+                    Math.min(0, this.scrollOffset),
+                    -Math.max(category.recipes.length, rowsTall) * 24 + this.innerDimensions.y
+                )
+            )
             const screenDimensions = Camera.instance.dimensions
             const topLeft = screenDimensions.div(2).minus(this.dimensions.div(2)).plusY(-TILE_SIZE)
             this.displayEntity = new Entity([
@@ -104,11 +109,30 @@ export class CraftingMenu extends Component {
             const category = this.recipes[i]
             const pos = topLeft.plusX(i * TILE_SIZE * 2)
             const dims = new Point(2, 2)
-            const hovered = Maths.rectContains(pos, dims.times(TILE_SIZE), updateData.input.mousePos)
+            const hovered = Maths.rectContains(
+                pos,
+                dims.times(TILE_SIZE),
+                updateData.input.mousePos
+            )
 
-            result.push(...NineSlice.makeNineSliceComponents(Tilesets.instance.oneBit.getNineSlice("invBoxNW"), pos, dims))
-            const icon = i === this.recipeCategory || hovered ? category.icon : this.tintedIcon(category.icon, Color.PINK)
-            result.push(icon.toComponent(new SpriteTransform(topLeft.plusX(i * TILE_SIZE * 2 + TILE_SIZE/2).plusY(TILE_SIZE/2))))
+            result.push(
+                ...NineSlice.makeNineSliceComponents(
+                    Tilesets.instance.oneBit.getNineSlice("invBoxNW"),
+                    pos,
+                    dims
+                )
+            )
+            const icon =
+                i === this.recipeCategory || hovered
+                    ? category.icon
+                    : this.tintedIcon(category.icon, Color.PINK)
+            result.push(
+                icon.toComponent(
+                    new SpriteTransform(
+                        topLeft.plusX(i * TILE_SIZE * 2 + TILE_SIZE / 2).plusY(TILE_SIZE / 2)
+                    )
+                )
+            )
 
             if (!this.justOpened && hovered && updateData.input.isMouseDown) {
                 this.selectCategory(i)
@@ -122,20 +146,32 @@ export class CraftingMenu extends Component {
     }
 
     private canCraft(recipe: CraftingRecipe) {
-        return this.justCraftedRow === -1 
-                && !this.justOpened 
-                && Player.instance.dude.inventory.canAddItem(recipe.output)
-                && recipe.input.every(input => Player.instance.dude.inventory.getItemCount(input.item) >= input.count)
+        return (
+            this.justCraftedRow === -1 &&
+            !this.justOpened &&
+            Player.instance.dude.inventory.canAddItem(recipe.output) &&
+            recipe.input.every(
+                (input) => Player.instance.dude.inventory.getItemCount(input.item) >= input.count
+            )
+        )
     }
 
-    private renderRecipes(updateData: UpdateData, topLeft: Point, recipes: CraftingRecipe[]): Component[] {
-        topLeft = topLeft.plusY(TILE_SIZE*2)
+    private renderRecipes(
+        updateData: UpdateData,
+        topLeft: Point,
+        recipes: CraftingRecipe[]
+    ): Component[] {
+        topLeft = topLeft.plusY(TILE_SIZE * 2)
 
-        this.context.imageSmoothingEnabled = false  // TODO figure out why text is aliased
+        this.context.imageSmoothingEnabled = false // TODO figure out why text is aliased
         this.context.font = `${TEXT_SIZE}px '${TEXT_FONT}'`
 
         // draw background
-        const backgroundTiles = NineSlice.makeStretchedNineSliceComponents(Tilesets.instance.outdoorTiles.getNineSlice("invBoxFrame"), topLeft, this.dimensions)
+        const backgroundTiles = NineSlice.makeStretchedNineSliceComponents(
+            Tilesets.instance.outdoorTiles.getNineSlice("invBoxFrame"),
+            topLeft,
+            this.dimensions
+        )
         backgroundTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
         this.context.fillStyle = Color.RED
         this.context.fillRect(0, 0, this.innerDimensions.x, this.innerDimensions.y)
@@ -151,36 +187,43 @@ export class CraftingMenu extends Component {
         const shiftedMousePos = updateData.input.mousePos.plusY(-this.scrollOffset)
 
         for (let r = 0; r < recipes.length; r++) {
-
-            const hovered = Maths.rectContains(
-                topLeft.plusX(margin).plusY(rowHeight * r + margin*2), 
-                new Point(this.innerDimensions.x, rowHeight), 
-                shiftedMousePos
-            ) && Maths.rectContains(  // within the frame itself
-                topLeft.plus(innerOffset),
-                this.innerDimensions,
-                updateData.input.mousePos
-            )
+            const hovered =
+                Maths.rectContains(
+                    topLeft.plusX(margin).plusY(rowHeight * r + margin * 2),
+                    new Point(this.innerDimensions.x, rowHeight),
+                    shiftedMousePos
+                ) &&
+                Maths.rectContains(
+                    // within the frame itself
+                    topLeft.plus(innerOffset),
+                    this.innerDimensions,
+                    updateData.input.mousePos
+                )
 
             const recipe = recipes[r]
             const craftedItem = ITEM_METADATA_MAP[recipe.output]
 
             // craft the item
             if (hovered && updateData.input.isMouseDown && this.canCraft(recipe)) {
-                Sounds.play(this.craftNoise, .6)
-                recipe.input.forEach(ingr => {
+                Sounds.play(this.craftNoise, 0.6)
+                recipe.input.forEach((ingr) => {
                     Player.instance.dude.inventory.removeItem(ingr.item, ingr.count)
                 })
                 Player.instance.dude.inventory.addItem(recipe.output)
                 this.justCraftedRow = r
-                setTimeout(() => this.justCraftedRow = -1, 900)
+                setTimeout(() => (this.justCraftedRow = -1), 900)
             }
 
             const prefix = recipe.desc + "\n"
             if (hovered && !this.canCraft(recipe)) {
                 if (!Player.instance.dude.inventory.canAddItem(recipe.output)) {
                     this.tooltip.say(prefix + "[Inventory full]")
-                } else if (recipe.input.some(input => Player.instance.dude.inventory.getItemCount(input.item) < input.count)) {
+                } else if (
+                    recipe.input.some(
+                        (input) =>
+                            Player.instance.dude.inventory.getItemCount(input.item) < input.count
+                    )
+                ) {
                     this.tooltip.say(prefix + "[Need ingredients]")
                 }
             } else if (hovered) {
@@ -203,12 +246,16 @@ export class CraftingMenu extends Component {
             this.context.fillStyle = craftedItemColor
             const craftedItemIcon = this.tintedIcon(plainIcon, craftedItemColor)
             this.drawIconAt(craftedItemIcon, margin, verticalOffset)
-            this.context.fillText(craftedItem.displayName, TILE_SIZE + margin * 2, verticalTextOffset + verticalOffset)
+            this.context.fillText(
+                craftedItem.displayName,
+                TILE_SIZE + margin * 2,
+                verticalTextOffset + verticalOffset
+            )
 
             // ingredients
             let offsetFromRight = 0
             for (let i = 0; i < recipe.input.length; i++) {
-                const ingr = recipe.input[recipe.input.length-i-1]
+                const ingr = recipe.input[recipe.input.length - i - 1]
                 const plainIngredientIcon = this.getItemIcon(ingr.item)
                 let ingredientIcon: StaticSpriteSource = plainIngredientIcon
                 if (Player.instance.dude.inventory.getItemCount(ingr.item) < ingr.count) {
@@ -224,31 +271,42 @@ export class CraftingMenu extends Component {
                 // this.context.fillText(countStr, width - offsetFromRight, verticalTextOffset + verticalOffset)
                 offsetFromRight += TILE_SIZE + margin
                 this.drawIconAt(ingredientIcon, width - offsetFromRight, verticalOffset)
-                if (Maths.rectContains(
+                if (
+                    Maths.rectContains(
                         // I have no idea why this math works :(
-                        new Point(width - offsetFromRight + margin, verticalOffset + margin * 1.5).plus(topLeft), 
-                        new Point(TILE_SIZE + margin, TILE_SIZE + margin), 
+                        new Point(
+                            width - offsetFromRight + margin,
+                            verticalOffset + margin * 1.5
+                        ).plus(topLeft),
+                        new Point(TILE_SIZE + margin, TILE_SIZE + margin),
                         updateData.input.mousePos
-                )) {
+                    )
+                ) {
                     const displayName = ITEM_METADATA_MAP[ingr.item].displayName
-                    this.tooltip.say(`${displayName} (${Player.instance.dude.inventory.getItemCount(ingr.item)}/${ingr.count})`)
+                    this.tooltip.say(
+                        `${displayName} (${Player.instance.dude.inventory.getItemCount(
+                            ingr.item
+                        )}/${ingr.count})`
+                    )
                 }
             }
 
             // draw line
-            verticalOffset += (margin + TILE_SIZE)
+            verticalOffset += margin + TILE_SIZE
             this.context.fillStyle = Color.DARK_RED
-            this.context.fillRect(margin, verticalOffset, this.innerDimensions.x-2*margin, 1)
+            this.context.fillRect(margin, verticalOffset, this.innerDimensions.x - 2 * margin, 1)
         }
 
-        const renderComp = new BasicRenderComponent(new ImageRender(
-            this.canvas, 
-            Point.ZERO, 
-            this.innerDimensions, 
-            innerOffset.plus(topLeft).apply(Math.floor),
-            this.innerDimensions,
-            UIStateManager.UI_SPRITE_DEPTH - 10,
-        ))
+        const renderComp = new BasicRenderComponent(
+            new ImageRender(
+                this.canvas,
+                Point.ZERO,
+                this.innerDimensions,
+                innerOffset.plus(topLeft).apply(Math.floor),
+                this.innerDimensions,
+                UIStateManager.UI_SPRITE_DEPTH - 10
+            )
+        )
 
         return [...backgroundTiles, renderComp]
     }
@@ -259,9 +317,15 @@ export class CraftingMenu extends Component {
 
     private drawIconAt(icon: StaticSpriteSource, x: number, y: number) {
         this.context.drawImage(
-            icon.image, 
-            icon.position.x, icon.position.y, icon.dimensions.x, icon.dimensions.y, 
-            x, y, icon.dimensions.x, icon.dimensions.y
+            icon.image,
+            icon.position.x,
+            icon.position.y,
+            icon.dimensions.x,
+            icon.dimensions.y,
+            x,
+            y,
+            icon.dimensions.x,
+            icon.dimensions.y
         )
     }
 
@@ -294,9 +358,6 @@ export class CraftingMenu extends Component {
     }
 
     getEntities(): Entity[] {
-        return [
-            this.e, 
-            this.displayEntity,
-        ]
+        return [this.e, this.displayEntity]
     }
 }

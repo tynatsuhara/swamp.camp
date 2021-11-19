@@ -26,7 +26,6 @@ import { Lists } from "brigsby/dist/util/Lists"
 import { Item } from "../../items/Items"
 
 export class BedFactory extends ElementFactory {
-
     readonly type = ElementType.BED
     readonly dimensions = new Point(1, 1)
 
@@ -34,43 +33,47 @@ export class BedFactory extends ElementFactory {
         const e = new Entity()
         const scaledPos = pos.times(TILE_SIZE)
         const depth = scaledPos.y + TILE_SIZE - 10
-        const pixelCenterPos = scaledPos.plus(new Point(TILE_SIZE/2-1, TILE_SIZE/2-1))
+        const pixelCenterPos = scaledPos.plus(new Point(TILE_SIZE / 2 - 1, TILE_SIZE / 2 - 1))
 
-        const tile = e.addComponent(new SpriteComponent(
-            Tilesets.instance.outdoorTiles.getTileSource("bed"), 
-            SpriteTransform.new({ position: scaledPos, depth })
-        ))
+        const tile = e.addComponent(
+            new SpriteComponent(
+                Tilesets.instance.outdoorTiles.getTileSource("bed"),
+                SpriteTransform.new({ position: scaledPos, depth })
+            )
+        )
 
         e.addComponent(new BoxCollider(scaledPos, new Point(TILE_SIZE, TILE_SIZE)))
 
-        const bed = e.addComponent(new Bed())  
+        const bed = e.addComponent(new Bed())
 
-        e.addComponent(new Breakable(
-            pixelCenterPos, 
-            [tile.transform], 
-            () => Lists.repeat(Math.random() * 4 + 4, [Item.WOOD])
-        ))
+        e.addComponent(
+            new Breakable(pixelCenterPos, [tile.transform], () =>
+                Lists.repeat(Math.random() * 4 + 4, [Item.WOOD])
+            )
+        )
 
-        e.addComponent(new Interactable(
-            pixelCenterPos, 
-            () => {
-                DialogueDisplay.instance.startDialogue(bed)
-            }, 
-            new Point(1, -TILE_SIZE),
-            () => {
-                // Proxy for determining that this bed belongs to the player
-                return LocationManager.instance.currentLocation.allowPlacing 
-                        && !UIStateManager.instance.isMenuOpen
-                    
-            }
-        ))
+        e.addComponent(
+            new Interactable(
+                pixelCenterPos,
+                () => {
+                    DialogueDisplay.instance.startDialogue(bed)
+                },
+                new Point(1, -TILE_SIZE),
+                () => {
+                    // Proxy for determining that this bed belongs to the player
+                    return (
+                        LocationManager.instance.currentLocation.allowPlacing &&
+                        !UIStateManager.instance.isMenuOpen
+                    )
+                }
+            )
+        )
 
-        return e.addComponent(new ElementComponent(
-            ElementType.BED, 
-            pos,
-            [pos], 
-            () => { return {} }
-        ))
+        return e.addComponent(
+            new ElementComponent(ElementType.BED, pos, [pos], () => {
+                return {}
+            })
+        )
     }
 
     canPlaceInLocation(wl: WorldLocation) {
@@ -79,7 +82,6 @@ export class BedFactory extends ElementFactory {
 }
 
 export class Bed extends Component implements DialogueSource {
-
     dialogue: string = BED_DIALOGUE
 
     sleep(duration: number) {
@@ -102,9 +104,10 @@ export class Bed extends Component implements DialogueSource {
             }
         }
 
-        return LocationManager.instance.exterior()
-                .getElementsOfType(ElementType.CAMPFIRE)
-                .map(el => el.entity.getComponent(Campfire))
-                .some(campfire => campfire.willBurnFor(hoursNeeded * TimeUnit.HOUR))
+        return LocationManager.instance
+            .exterior()
+            .getElementsOfType(ElementType.CAMPFIRE)
+            .map((el) => el.entity.getComponent(Campfire))
+            .some((campfire) => campfire.willBurnFor(hoursNeeded * TimeUnit.HOUR))
     }
 }

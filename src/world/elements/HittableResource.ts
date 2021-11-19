@@ -8,23 +8,22 @@ import { ElementComponent } from "./ElementComponent"
 import { Hittable } from "./Hittable"
 
 export class HittableResource extends Hittable {
-
     private static negativeThreshold = -4
 
     freeResources: number
     readonly maxResources: number
-    private itemSupplier: () => Item[]    
+    private itemSupplier: () => Item[]
     private audioCallback: () => void
 
     constructor(
-        position: Point, 
-        tileTransforms: SpriteTransform[], 
-        freeResources: number, 
-        maxResources: number, 
+        position: Point,
+        tileTransforms: SpriteTransform[],
+        freeResources: number,
+        maxResources: number,
         itemSupplier: () => Item[],
         audioCallback: () => void = () => {}
     ) {
-        super(position, tileTransforms, hitDir => this.hitCallback(hitDir))
+        super(position, tileTransforms, (hitDir) => this.hitCallback(hitDir))
         this.freeResources = freeResources
         this.maxResources = maxResources
         this.itemSupplier = itemSupplier
@@ -40,18 +39,20 @@ export class HittableResource extends Hittable {
         }
 
         const finishingMove = this.freeResources < 0
-        let velocityMultiplier = finishingMove ? .6 : 1
+        let velocityMultiplier = finishingMove ? 0.6 : 1
         let placeDistance = finishingMove ? 2 : 8
         let itemsOut = finishingMove ? 3 : 1
 
         for (let i = 0; i < itemsOut; i++) {
             const items = this.itemSupplier()
             for (const item of items) {
-                const itemDirection = hitDir.randomlyShifted(.5).normalized()
+                const itemDirection = hitDir.randomlyShifted(0.5).normalized()
                 const velocity = itemDirection.times(1 + 3 * Math.random())
                 spawnItem(
-                    this.position.plus(new Point(0, TILE_SIZE/2)).plus(itemDirection.times(placeDistance)),  // bottom center, then randomly adjusted
-                    item, 
+                    this.position
+                        .plus(new Point(0, TILE_SIZE / 2))
+                        .plus(itemDirection.times(placeDistance)), // bottom center, then randomly adjusted
+                    item,
                     velocity.times(velocityMultiplier),
                     this.entity.getComponent(BoxCollider)
                 )
@@ -59,12 +60,14 @@ export class HittableResource extends Hittable {
         }
 
         if (finishingMove) {
-            LocationManager.instance.currentLocation.removeElement(this.entity.getComponent(ElementComponent))
+            LocationManager.instance.currentLocation.removeElement(
+                this.entity.getComponent(ElementComponent)
+            )
             this.entity.selfDestruct()
         }
     }
 
-    // TODO actually call this 
+    // TODO actually call this
     replenish() {
         if (!!this.entity && this.enabled) {
             this.freeResources = Math.min(Math.max(this.freeResources + 1, 0), this.maxResources)

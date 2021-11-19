@@ -9,16 +9,17 @@ import { Ground } from "../../world/ground/Ground"
 import { pixelPtToTilePt } from "../../graphics/Tilesets"
 
 export class Villager extends Component {
-    
     awake() {
         const npc = this.entity.getComponent(NPC)
         const dude = this.entity.getComponent(Dude)
 
-        npc.isEnemyFn = d => {
+        npc.isEnemyFn = (d) => {
             // Villagers will only flee from demons if the villager is in the dark or really close to the demon
             if (d.factions.includes(DudeFaction.DEMONS)) {
-                return LightManager.instance.isDark(dude.standingPosition)
-                        || d.standingPosition.distanceTo(dude.standingPosition) < 30
+                return (
+                    LightManager.instance.isDark(dude.standingPosition) ||
+                    d.standingPosition.distanceTo(dude.standingPosition) < 30
+                )
             }
 
             // Villagers only flee from shrooms if the shroom is aggro
@@ -33,7 +34,9 @@ export class Villager extends Component {
 
             // Villagers only flee from acquatic creatures if they are in water
             if (d.factions.includes(DudeFaction.AQUATIC)) {
-                return Ground.isWater(dude.location.getGround(pixelPtToTilePt(dude.standingPosition))?.type)
+                return Ground.isWater(
+                    dude.location.getGround(pixelPtToTilePt(dude.standingPosition))?.type
+                )
             }
 
             return !d.factions.includes(DudeFaction.VILLAGERS)

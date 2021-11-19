@@ -11,7 +11,6 @@ import { UIStateManager } from "./UIStateManager"
 import { Color } from "./Color"
 
 export class KeyPressIndicator extends Component {
-
     private readonly pos: Point
     private readonly key: InputKey
 
@@ -23,16 +22,26 @@ export class KeyPressIndicator extends Component {
 
     getRenderMethods(): RenderMethod[] {
         return [
-            Tilesets.instance.oneBit.getTileSource("keycap").toImageRender(
-                new SpriteTransform(this.pos, null, 0, false, false, UIStateManager.UI_SPRITE_DEPTH)
-            ),
+            Tilesets.instance.oneBit
+                .getTileSource("keycap")
+                .toImageRender(
+                    new SpriteTransform(
+                        this.pos,
+                        null,
+                        0,
+                        false,
+                        false,
+                        UIStateManager.UI_SPRITE_DEPTH
+                    )
+                ),
             new TextRender(
-                InputKeyString.for(this.key).toLowerCase(), 
-                this.pos.plus(new Point(4, 4)), 
-                TEXT_SIZE, TEXT_FONT, 
-                Color.BLACK, 
+                InputKeyString.for(this.key).toLowerCase(),
+                this.pos.plus(new Point(4, 4)),
+                TEXT_SIZE,
+                TEXT_FONT,
+                Color.BLACK,
                 UIStateManager.UI_SPRITE_DEPTH
-            )
+            ),
         ]
     }
 }

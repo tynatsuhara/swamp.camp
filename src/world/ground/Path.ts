@@ -8,19 +8,11 @@ import { ConnectingTilePathSchema } from "./ConnectingTilePathSchema"
 
 export const makePath = (d: MakeGroundFuncData): GroundComponent => {
     const schema = new ConnectingTilePathSchema(GroundType.PATH)
-        .cap(Tilesets.instance.tilemap.getTileAt(
-            new Point(Math.floor(Math.random() * 4), 6)
-        ))
-        .single(Tilesets.instance.tilemap.getTileAt(
-            new Point(6, 5)
-        ))
-        .corners(Tilesets.instance.tilemap.getTileAt(
-            new Point(Math.floor(Math.random() * 4), 5)
-        ))
+        .cap(Tilesets.instance.tilemap.getTileAt(new Point(Math.floor(Math.random() * 4), 6)))
+        .single(Tilesets.instance.tilemap.getTileAt(new Point(6, 5)))
+        .corners(Tilesets.instance.tilemap.getTileAt(new Point(Math.floor(Math.random() * 4), 5)))
 
-    const e = new Entity([
-        new ConnectingTile(schema, d.wl, d.pos)
-    ])
+    const e = new Entity([new ConnectingTile(schema, d.wl, d.pos)])
 
     return e.addComponent(new GroundComponent(GroundType.PATH))
 }

@@ -17,10 +17,9 @@ import { Color, getHex } from "./Color"
 import { UIStateManager } from "./UIStateManager"
 
 export class MiniMap extends Component {
-
-    private static readonly SCALE = 12          // full-size pixels per map pixel
-    private static readonly PX_PER_HIDDEN_UPDATE = 50   // how many pixels we draw each update() when hidden
-    private static readonly PX_PER_SHOWN_UPDATE = 1000  // how many pixels we draw each update() when showing
+    private static readonly SCALE = 12 // full-size pixels per map pixel
+    private static readonly PX_PER_HIDDEN_UPDATE = 50 // how many pixels we draw each update() when hidden
+    private static readonly PX_PER_SHOWN_UPDATE = 1000 // how many pixels we draw each update() when showing
     private lastPixelDrawn = Point.ZERO
     private fullyRenderedAtLeastOnce = false
     private isShowing = false
@@ -60,21 +59,31 @@ export class MiniMap extends Component {
 
         // draw entities
         const entities = wl.getEntities()
-        const mapOffset = wl.size/2 * TILE_SIZE
-        entities.filter(e => e.getComponent(ElementComponent) || e.getComponent(GroundComponent)).forEach(ec => {
-            ec.components.filter(c => c?.enabled).forEach(c => {
-                c.getRenderMethods().filter(rm => rm instanceof ImageRender).forEach(rm => {
-                    const render = rm as ImageRender
-                    context.drawImage(
-                        render.source, 
-                        render.sourcePosition.x, render.sourcePosition.y,
-                        render.sourceDimensions.x, render.sourceDimensions.y,
-                        render.position.x + mapOffset, render.position.y + mapOffset,
-                        render.dimensions.x, render.dimensions.y
-                    )
-                })
+        const mapOffset = (wl.size / 2) * TILE_SIZE
+        entities
+            .filter((e) => e.getComponent(ElementComponent) || e.getComponent(GroundComponent))
+            .forEach((ec) => {
+                ec.components
+                    .filter((c) => c?.enabled)
+                    .forEach((c) => {
+                        c.getRenderMethods()
+                            .filter((rm) => rm instanceof ImageRender)
+                            .forEach((rm) => {
+                                const render = rm as ImageRender
+                                context.drawImage(
+                                    render.source,
+                                    render.sourcePosition.x,
+                                    render.sourcePosition.y,
+                                    render.sourceDimensions.x,
+                                    render.sourceDimensions.y,
+                                    render.position.x + mapOffset,
+                                    render.position.y + mapOffset,
+                                    render.dimensions.x,
+                                    render.dimensions.y
+                                )
+                            })
+                    })
             })
-        })
 
         // Draw the scaled-down canvas
         if (!this.smallCanvas) {
@@ -88,33 +97,36 @@ export class MiniMap extends Component {
             return
         }
 
-        if (this.lastPixelDrawn.x === this.smallCanvas.width-1 
-                && this.lastPixelDrawn.y === this.smallCanvas.height-1) {
+        if (
+            this.lastPixelDrawn.x === this.smallCanvas.width - 1 &&
+            this.lastPixelDrawn.y === this.smallCanvas.height - 1
+        ) {
             return
         }
 
         const bigContext = this.bigCanvas.getContext("2d")
         const smallContext = this.smallCanvas.getContext("2d")
         let drawn = 0
-        const pxToRender = (this.isShowing && !this.fullyRenderedAtLeastOnce) 
-                ? MiniMap.PX_PER_SHOWN_UPDATE 
+        const pxToRender =
+            this.isShowing && !this.fullyRenderedAtLeastOnce
+                ? MiniMap.PX_PER_SHOWN_UPDATE
                 : MiniMap.PX_PER_HIDDEN_UPDATE
 
         for (let y = this.lastPixelDrawn.y; y < this.smallCanvas.height; y++) {
             const start = y === this.lastPixelDrawn.y ? this.lastPixelDrawn.x : 0
-            
+
             for (let x = start; x < this.smallCanvas.width; x++) {
                 const imageData = bigContext.getImageData(
-                    x * MiniMap.SCALE, 
-                    y * MiniMap.SCALE, 
-                    MiniMap.SCALE, 
+                    x * MiniMap.SCALE,
+                    y * MiniMap.SCALE,
+                    MiniMap.SCALE,
                     MiniMap.SCALE
                 )
 
                 // get the most common color from that square
                 const hexStrings = []
                 for (let i = 0; i < imageData.data.length; i += 4) {
-                    const hex = getHex(imageData.data[i], imageData.data[i+1], imageData.data[2])
+                    const hex = getHex(imageData.data[i], imageData.data[i + 1], imageData.data[2])
                     hexStrings.push(hex)
                     // weigh other colors higher than grass color to show non-nature things on the map
                     if (hex !== Color.TEAL) {
@@ -135,7 +147,7 @@ export class MiniMap extends Component {
 
         this.fullyRenderedAtLeastOnce = true
     }
-    
+
     getRenderMethods() {
         if (!this.isShowing || !this.fullyRenderedAtLeastOnce) {
             return []
@@ -153,9 +165,9 @@ export class MiniMap extends Component {
             new Point(this.smallCanvas.width, this.smallCanvas.height),
             topLeft,
             new Point(this.smallCanvas.width, this.smallCanvas.height),
-            UIStateManager.UI_SPRITE_DEPTH,
+            UIStateManager.UI_SPRITE_DEPTH
         )
-         
+
         return [mapRender, this.getPlayerIndicator(topLeft)]
     }
 
@@ -167,17 +179,17 @@ export class MiniMap extends Component {
         const indicatorSize = 4
 
         const position = Player.instance.dude.standingPosition
-                .plus(new Point(1, 1).times(wl.size * TILE_SIZE/2))
-                .div(MiniMap.SCALE)
-                .minus(new Point(indicatorSize/2, indicatorSize/2))
-                .apply(n => Math.floor(n))
-                .apply(n => Maths.clamp(n, 0, wl.size * TILE_SIZE/MiniMap.SCALE - indicatorSize))
-                .plus(topLeft)
+            .plus(new Point(1, 1).times((wl.size * TILE_SIZE) / 2))
+            .div(MiniMap.SCALE)
+            .minus(new Point(indicatorSize / 2, indicatorSize / 2))
+            .apply((n) => Math.floor(n))
+            .apply((n) => Maths.clamp(n, 0, (wl.size * TILE_SIZE) / MiniMap.SCALE - indicatorSize))
+            .plus(topLeft)
 
         return Tilesets.instance.oneBit.getTileSource("miniMapPlayer").toImageRender(
-            SpriteTransform.new({ 
+            SpriteTransform.new({
                 position,
-                depth: UIStateManager.UI_SPRITE_DEPTH
+                depth: UIStateManager.UI_SPRITE_DEPTH,
             })
         )
     }

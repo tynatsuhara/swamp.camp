@@ -18,30 +18,31 @@ import { Interactable } from "./Interactable"
 const RESIDENT_ATTRIBUTE = "rez"
 
 export class HouseFactory extends BuildingFactory {
-
     readonly type = ElementType.HOUSE
     readonly dimensions = new Point(5, 4)
 
-    make(wl: WorldLocation, pos: Point, data: any): ElementComponent {    
+    make(wl: WorldLocation, pos: Point, data: any): ElementComponent {
         const e = new Entity()
 
         // the interior location UUID
         const destinationUUID: string = data.destinationUUID ?? makeHouseInterior(wl).uuid
 
         const interactablePos = pos.plus(new Point(2.5, 3)).times(TILE_SIZE)
-        const doorId = TeleporterPrefix.DOOR 
-        wl.addTeleporter({ 
-            to: destinationUUID, 
-            pos: interactablePos.plusY(12), 
-            id: doorId
+        const doorId = TeleporterPrefix.DOOR
+        wl.addTeleporter({
+            to: destinationUUID,
+            pos: interactablePos.plusY(12),
+            id: doorId,
         })
-        
+
         // Set up tiles
         const depth = (pos.y + 3) * TILE_SIZE
 
         const addTile = (tileSheetPos: Point, pos: Point) => {
             const tile = Tilesets.instance.tilemap.getTileAt(tileSheetPos)
-            const el = e.addComponent(new SpriteComponent(tile, new SpriteTransform(pos.times(TILE_SIZE))))
+            const el = e.addComponent(
+                new SpriteComponent(tile, new SpriteTransform(pos.times(TILE_SIZE)))
+            )
             el.transform.depth = depth
         }
 
@@ -66,14 +67,21 @@ export class HouseFactory extends BuildingFactory {
         // addTile(new Point(5, 6), basePos.plusY(2))
         // addTile(new Point(6, 6), basePos.plusY(2).plusX(2))
 
-        e.addComponent(new BoxCollider(basePos.plus(new Point(0, 1)).times(TILE_SIZE), new Point(TILE_SIZE*3, TILE_SIZE*2)))
+        e.addComponent(
+            new BoxCollider(
+                basePos.plus(new Point(0, 1)).times(TILE_SIZE),
+                new Point(TILE_SIZE * 3, TILE_SIZE * 2)
+            )
+        )
 
         // Set up teleporter
-        e.addComponent(new Interactable(
-            interactablePos, 
-            () => wl.useTeleporter(destinationUUID, doorId), 
-            new Point(0, -TILE_SIZE*1.4)
-        ))
+        e.addComponent(
+            new Interactable(
+                interactablePos,
+                () => wl.useTeleporter(destinationUUID, doorId),
+                new Point(0, -TILE_SIZE * 1.4)
+            )
+        )
 
         // parse residents as string or array for backwards compatibility
         let residents: string[]
@@ -85,20 +93,19 @@ export class HouseFactory extends BuildingFactory {
             residents = data[RESIDENT_ATTRIBUTE]
         }
 
-        const house = e.addComponent(new SingleTypeResidence(DudeType.VILLAGER, 1, destinationUUID, residents))
+        const house = e.addComponent(
+            new SingleTypeResidence(DudeType.VILLAGER, 1, destinationUUID, residents)
+        )
 
-        return e.addComponent(new ElementComponent(
-            ElementType.HOUSE, 
-            pos,
-            this.getOccupiedPoints(pos),
-            () => ({
+        return e.addComponent(
+            new ElementComponent(ElementType.HOUSE, pos, this.getOccupiedPoints(pos), () => ({
                 destinationUUID,
                 // store rez as string for backwards compatibility
-                [RESIDENT_ATTRIBUTE]: house.getResidents()
-            })
-        ))
+                [RESIDENT_ATTRIBUTE]: house.getResidents(),
+            }))
+        )
     }
-    
+
     getOccupiedPoints(pos: Point) {
         return ElementUtils.rectPoints(pos.plus(new Point(1, 1)), new Point(3, 2))
     }

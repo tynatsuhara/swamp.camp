@@ -15,7 +15,6 @@ const CHARACTERS = new Map([
 ])
 
 export class ExtraCharacterSet2TileLoader {
-
     getIdleAnimation(key: string, speed: number): SpriteAnimation {
         return this.getAnimation(key, speed, 0)
     }
@@ -33,18 +32,14 @@ export class ExtraCharacterSet2TileLoader {
         const row = result[1]
         const pos = new Point(col * ROW_WIDTH, ROW_START + TILE_HEIGHT * row)
         return new SpriteAnimation(
-            Array.from({length: 4}, (v, k) => k)
-                    .map((index) => this.getTileAt(pos.plusX(TILE_WIDTH * (index + offset))))
-                    .map(tileSource => [tileSource, speed])
+            Array.from({ length: 4 }, (v, k) => k)
+                .map((index) => this.getTileAt(pos.plusX(TILE_WIDTH * (index + offset))))
+                .map((tileSource) => [tileSource, speed])
         )
     }
 
     private getTileAt(pos: Point) {
-        return new StaticSpriteSource(
-            this.image(), 
-            pos,
-            new Point(TILE_WIDTH, TILE_HEIGHT)
-        )
+        return new StaticSpriteSource(this.image(), pos, new Point(TILE_WIDTH, TILE_HEIGHT))
     }
 
     private image() {

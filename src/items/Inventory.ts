@@ -4,10 +4,7 @@ export class ItemStack {
     readonly item: Item
     count: number
 
-    constructor(
-        item: Item, 
-        count: number
-    ) {
+    constructor(item: Item, count: number) {
         this.item = item
         this.count = count
     }
@@ -83,7 +80,7 @@ export class Inventory {
             if (!slotValue) {
                 availableRoom += stackLimit
             } else if (slotValue.item === item) {
-                availableRoom += (stackLimit - slotValue.count)
+                availableRoom += stackLimit - slotValue.count
             }
         }
 
@@ -95,7 +92,7 @@ export class Inventory {
         if (currentCount < count) {
             throw new Error("inventory cannot go negative")
         }
-        this.countMap.set(item, currentCount-count)
+        this.countMap.set(item, currentCount - count)
 
         for (let i = 0; i < this.stacks.length; i++) {
             const slotValue = this.stacks[i]
@@ -127,7 +124,7 @@ export class Inventory {
 
     private recomputeCountsMap() {
         this.countMap = new Map()
-        this.stacks.forEach(stack => {
+        this.stacks.forEach((stack) => {
             if (!!stack) {
                 this.countMap.set(stack.item, this.getItemCount(stack.item) + stack.count)
             }
@@ -137,7 +134,7 @@ export class Inventory {
     static load(stacks: ItemStack[]) {
         const inv = new Inventory()
         inv.stacks = stacks
-        stacks.forEach(stack => {
+        stacks.forEach((stack) => {
             if (!!stack) {
                 inv.countMap.set(stack.item, stack.count + (inv.countMap.get(stack.item) ?? 0))
             }

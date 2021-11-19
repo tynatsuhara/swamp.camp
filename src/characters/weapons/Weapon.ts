@@ -6,7 +6,6 @@ import { Hittable } from "../../world/elements/Hittable"
 import { Point } from "brigsby/dist/Point"
 
 export abstract class Weapon extends Component {
-
     protected dude: Dude
 
     awake() {
@@ -16,19 +15,22 @@ export abstract class Weapon extends Component {
     // TODO find a better place for these static functions?
     static getEnemiesInRange(attacker: Dude, attackDistance: number) {
         return Array.from(LocationManager.instance.currentLocation.dudes)
-                .filter(d => !!d && d !== attacker && d.isEnemy(attacker))
-                .filter(d => attacker.isFacing(d.standingPosition))
-                .filter(d => d.standingPosition.distanceTo(attacker.standingPosition) < attackDistance)
+            .filter((d) => !!d && d !== attacker && d.isEnemy(attacker))
+            .filter((d) => attacker.isFacing(d.standingPosition))
+            .filter(
+                (d) => d.standingPosition.distanceTo(attacker.standingPosition) < attackDistance
+            )
     }
 
     static hitResources(dude: Dude) {
         const interactDistance = 20
         const interactCenter = dude.standingPosition.minus(new Point(0, 7))
-        const possibilities = LocationManager.instance.currentLocation.getElements()
-                .map(e => e.entity.getComponent(Hittable))
-                .filter(e => !!e)
-                .filter(e => dude.isFacing(e.position))
-        
+        const possibilities = LocationManager.instance.currentLocation
+            .getElements()
+            .map((e) => e.entity.getComponent(Hittable))
+            .filter((e) => !!e)
+            .filter((e) => dude.isFacing(e.position))
+
         let closestDist = Number.MAX_SAFE_INTEGER
         let closest: Hittable
         for (const i of possibilities) {
@@ -64,7 +66,7 @@ export abstract class Weapon extends Component {
 
     /**
      * This can be called every single frame and should handle that appropriately
-     * @param newAttack should be true if this is a new attack, false otherwise 
+     * @param newAttack should be true if this is a new attack, false otherwise
      * (this is useful for weapons that involve charging up, such as the spear)
      */
     abstract attack(newAttack: boolean)

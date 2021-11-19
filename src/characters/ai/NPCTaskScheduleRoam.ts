@@ -10,39 +10,34 @@ import { NPCTask } from "./NPCTask"
 import { NPCTaskContext } from "./NPCTaskContext"
 
 export class NPCTaskScheduleRoam extends NPCTask {
-
     performTask(context: NPCTaskContext) {
         const { factions, location, standingPosition } = context.dude
         const tilePos = pixelPtToTilePt(standingPosition)
 
         if (factions.includes(DudeFaction.DEMONS)) {
-            context.roam(
-                LightManager.instance.isDark(standingPosition, location) ? 0.5 : 1,
-                {
-                    ptSelectionFilter: (pt) => LightManager.instance.isDark(pt.times(TILE_SIZE), location)
-                }
-            )
+            context.roam(LightManager.instance.isDark(standingPosition, location) ? 0.5 : 1, {
+                ptSelectionFilter: (pt) =>
+                    LightManager.instance.isDark(pt.times(TILE_SIZE), location),
+            })
         } else if (factions.includes(DudeFaction.AQUATIC)) {
             const inWater = Ground.isWater(location.getGround(tilePos)?.type)
-            context.roam(
-                inWater ? 1 : 0.2,
-                {
-                    goalOptionsSupplier: () => this.getTilesAround(context.dude, tilePos, inWater ? 5 : 15),
-                    pauseEveryMillis: inWater ? (2500 + 2500 * Math.random()) : 0,
-                    pauseForMillis: inWater ? (2500 + 5000 * Math.random()) : 0,
-                }
-            )
+            context.roam(inWater ? 1 : 0.2, {
+                goalOptionsSupplier: () =>
+                    this.getTilesAround(context.dude, tilePos, inWater ? 5 : 15),
+                pauseEveryMillis: inWater ? 2500 + 2500 * Math.random() : 0,
+                pauseForMillis: inWater ? 2500 + 5000 * Math.random() : 0,
+            })
         } else {
             context.roam(0.5)
         }
     }
 
     private getTilesAround(dude: Dude, point: Point, range: number) {
-        const shift = new Point(range/2, range/2).apply(Math.floor)
+        const shift = new Point(range / 2, range / 2).apply(Math.floor)
 
         return Lists.range(0, range)
-                .flatMap(row => Lists.range(0, range).map(col => new Point(row, col)))
-                .map(pt => pt.plus(point).minus(shift))
-                .filter(pt => Ground.isWater(dude.location.getGround(pt)?.type))
+            .flatMap((row) => Lists.range(0, range).map((col) => new Point(row, col)))
+            .map((pt) => pt.plus(point).minus(shift))
+            .filter((pt) => Ground.isWater(dude.location.getGround(pt)?.type))
     }
 }

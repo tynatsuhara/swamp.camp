@@ -9,7 +9,6 @@ import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
 import { UIStateManager } from "./UIStateManager"
 
 export class MainMenuButton extends Component {
-
     private readonly width: number = 500
 
     private readonly position: Point
@@ -19,12 +18,7 @@ export class MainMenuButton extends Component {
 
     private hovering: boolean = false
 
-    constructor(
-        position: Point, 
-        text: string, 
-        onClick: () => void, 
-        onHover: () => void,
-    ) {
+    constructor(position: Point, text: string, onClick: () => void, onHover: () => void) {
         super()
         this.position = position.apply(Math.floor)
         this.text = text
@@ -34,8 +28,8 @@ export class MainMenuButton extends Component {
 
     update(updateData: UpdateData) {
         this.hovering = Maths.rectContains(
-            this.position.plusX(-this.width/2).plusY(-4), 
-            new Point(this.width, TILE_SIZE), 
+            this.position.plusX(-this.width / 2).plusY(-4),
+            new Point(this.width, TILE_SIZE),
             updateData.input.mousePos
         )
 
@@ -52,28 +46,30 @@ export class MainMenuButton extends Component {
         if (this.text === null) {
             return []
         }
-        
+
         let text = this.text
-        
+
         // if manually aligning whitespace, put "> " after leading spaces
         if (this.text.startsWith("  ")) {
-            if(this.hovering) {
+            if (this.hovering) {
                 const startSpaces = text.length - text.trimStart().length
                 text = " ".repeat(startSpaces - 2) + "> " + text.trimStart()
             }
         } else {
-            text = this.hovering ? `> ${this.text}  ` : `  ${this.text}  ` 
+            text = this.hovering ? `> ${this.text}  ` : `  ${this.text}  `
         }
 
-        const offset = Math.floor((this.width - text.length*TEXT_PIXEL_WIDTH)/2)
+        const offset = Math.floor((this.width - text.length * TEXT_PIXEL_WIDTH) / 2)
 
-        return [new TextRender(
-            text.toUpperCase(),
-            this.position.plusX(-this.width/2).plusX(offset), 
-            TEXT_SIZE, 
-            TEXT_FONT,             
-            this.hovering ? Color.WHITE : Color.TEAL,
-            UIStateManager.UI_SPRITE_DEPTH
-        )]
+        return [
+            new TextRender(
+                text.toUpperCase(),
+                this.position.plusX(-this.width / 2).plusX(offset),
+                TEXT_SIZE,
+                TEXT_FONT,
+                this.hovering ? Color.WHITE : Color.TEAL,
+                UIStateManager.UI_SPRITE_DEPTH
+            ),
+        ]
     }
 }

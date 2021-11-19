@@ -19,16 +19,15 @@ export class Particles {
     }
 
     emitParticle(
-        color: Color, 
-        position: Point, 
-        depth: number, 
+        color: Color,
+        position: Point,
+        depth: number,
         lifetime: number,
         velocity: (t: number) => Point = () => Point.ZERO,
-        size: Point = new Point(1, 1),
+        size: Point = new Point(1, 1)
     ) {
-        const emit = (image: ImageBitmap) => this.entity.addComponent(
-            new Particle(image, position, depth, lifetime, velocity, size)
-        )
+        const emit = (image: ImageBitmap) =>
+            this.entity.addComponent(new Particle(image, position, depth, lifetime, velocity, size))
 
         const prefabBitmap = this.prefabs.get(color)
         if (prefabBitmap) {
@@ -36,11 +35,11 @@ export class Particles {
             return
         }
 
-        // Generate and cache a bitmap. ImageBitmap is usable by 
+        // Generate and cache a bitmap. ImageBitmap is usable by
         // the GPU, whereas ImageData is only usable by the CPU.
         const rgba = [...getRGB(color), 255]
         const imageData = new ImageData(new Uint8ClampedArray(rgba), 1, 1)
-        createImageBitmap(imageData).then(bitmap => {
+        createImageBitmap(imageData).then((bitmap) => {
             this.prefabs.set(color, bitmap)
             emit(bitmap)
         })
@@ -54,7 +53,6 @@ export class Particles {
 const SIZE = new Point(1, 1)
 
 class Particle extends Component {
-
     private readonly image: ImageBitmap
     private readonly position: Point
     private readonly depth: number
@@ -65,12 +63,12 @@ class Particle extends Component {
     private elapsedTime = 0
 
     constructor(
-        image: ImageBitmap, 
-        position: Point, 
-        depth: number, 
+        image: ImageBitmap,
+        position: Point,
+        depth: number,
         lifetime: number,
         velocity: (t: number) => Point,
-        size: Point = new Point(1, 1),
+        size: Point = new Point(1, 1)
     ) {
         super()
         this.image = image
@@ -91,13 +89,13 @@ class Particle extends Component {
     getRenderMethods() {
         return [
             new ImageRender(
-                this.image, 
-                Point.ZERO, 
-                SIZE, 
-                this.position.plus(this.velocity(this.elapsedTime)), 
-                this.size, 
+                this.image,
+                Point.ZERO,
+                SIZE,
+                this.position.plus(this.velocity(this.elapsedTime)),
+                this.size,
                 this.depth
-            )
+            ),
         ]
     }
 }

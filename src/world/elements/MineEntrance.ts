@@ -15,56 +15,65 @@ import { ElementType } from "./Elements"
 import { Interactable } from "./Interactable"
 
 export class MineEntranceFactory extends BuildingFactory {
-
     readonly type = ElementType.MINE_ENTRANCE
     readonly dimensions = new Point(1, 1)
 
-    make(wl: WorldLocation, pos: Point, data: any): ElementComponent {    
+    make(wl: WorldLocation, pos: Point, data: any): ElementComponent {
         const e = new Entity()
         const pixelPt = pos.times(TILE_SIZE)
 
         // the interior location UUID
         // TODO add mine interior
         const destinationUUID: string = data.destinationUUID ?? makeMineInterior(wl).uuid
-        
+
         // Render hole
-        e.addComponent(new SpriteComponent(
-            Tilesets.instance.tilemap.getTileAt(new Point(0, 8)), 
-            SpriteTransform.new({ 
-                position: pixelPt, 
-                depth: pixelPt.y + 3 
-            })
-        ))
+        e.addComponent(
+            new SpriteComponent(
+                Tilesets.instance.tilemap.getTileAt(new Point(0, 8)),
+                SpriteTransform.new({
+                    position: pixelPt,
+                    depth: pixelPt.y + 3,
+                })
+            )
+        )
 
         // Set up collider
         const colliderSize = new Point(14, 12)
-        e.addComponent(new BoxCollider(
-            pixelPt.plus(new Point(TILE_SIZE/2, TILE_SIZE/2)).minus(colliderSize.div(2)), 
-            colliderSize
-        ))
+        e.addComponent(
+            new BoxCollider(
+                pixelPt.plus(new Point(TILE_SIZE / 2, TILE_SIZE / 2)).minus(colliderSize.div(2)),
+                colliderSize
+            )
+        )
 
         // Set up teleporter
-        const interactablePos = pixelPt.plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
-        const doorId = TeleporterPrefix.MINE 
-        wl.addTeleporter({ 
-            to: destinationUUID, 
-            pos: interactablePos.plusY(16), 
-            id: doorId
+        const interactablePos = pixelPt.plus(new Point(TILE_SIZE / 2, TILE_SIZE / 2))
+        const doorId = TeleporterPrefix.MINE
+        wl.addTeleporter({
+            to: destinationUUID,
+            pos: interactablePos.plusY(16),
+            id: doorId,
         })
-        e.addComponent(new Interactable(
-            interactablePos, 
-            () => wl.useTeleporter(destinationUUID, doorId), 
-            new Point(0, -17)
-        ))
+        e.addComponent(
+            new Interactable(
+                interactablePos,
+                () => wl.useTeleporter(destinationUUID, doorId),
+                new Point(0, -17)
+            )
+        )
 
-        return e.addComponent(new ElementComponent(
-            ElementType.MINE_ENTRANCE, 
-            pos,
-            this.getOccupiedPoints(pos),
-            () => ({ destinationUUID })
-        ))
+        return e.addComponent(
+            new ElementComponent(
+                ElementType.MINE_ENTRANCE,
+                pos,
+                this.getOccupiedPoints(pos),
+                () => ({
+                    destinationUUID,
+                })
+            )
+        )
     }
-    
+
     getOccupiedPoints(pos: Point) {
         return [pos]
     }

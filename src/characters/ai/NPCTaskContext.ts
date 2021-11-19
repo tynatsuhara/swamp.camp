@@ -3,15 +3,14 @@ import { WorldLocation } from "../../world/WorldLocation"
 import { Dude } from "../Dude"
 
 /**
- * Contains context on the current state of the NPC/world, as well as callbacks 
+ * Contains context on the current state of the NPC/world, as well as callbacks
  * that a task can call. All task decisions should be made based on this context.
- * 
- * The goal of this interface is to enable NPCTask implementations to describe an 
+ *
+ * The goal of this interface is to enable NPCTask implementations to describe an
  * NPC behavior at a high level, which can then be applied in real-time (the active
  * location) or in a background simulation.
  */
 export interface NPCTaskContext {
-
     /**
      * Should only be used for read-only operations
      */
@@ -26,12 +25,12 @@ export interface NPCTaskContext {
      * Roam around aimlessly
      */
     roam: (
-        speedMultiplier: number, 
+        speedMultiplier: number,
         options?: {
-            ptSelectionFilter?: (pt: Point) => boolean,
-            goalOptionsSupplier?: () => Point[],
-            pauseEveryMillis?: number,
-            pauseForMillis?: number,
+            ptSelectionFilter?: (pt: Point) => boolean
+            goalOptionsSupplier?: () => Point[]
+            pauseEveryMillis?: number
+            pauseForMillis?: number
         }
     ) => void
 

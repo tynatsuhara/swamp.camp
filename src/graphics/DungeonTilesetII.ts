@@ -3,7 +3,8 @@ import { Point } from "brigsby/dist/Point"
 import { SpriteAnimation } from "brigsby/dist/sprites/SpriteAnimation"
 import { assets } from "brigsby/dist/Assets"
 
-const map = new Map(`
+const map = new Map(
+    `
     wall_top_left 16 0 16 16
     wall_top_mid 32 0 16 16
     wall_top_right 48 0 16 16
@@ -225,19 +226,18 @@ const map = new Map(`
     lizard_m_idle_anim 128 228 16 28 4
     lizard_m_run_anim 192 228 16 28 4
     lizard_m_hit_anim 256 228 16 28 1
-    `.split("\n")
-    .map(line => line.trim())
-    .filter(line => !!line)
-    .map(line => line.split(" "))
-    .map(cols => [cols[0], cols.slice(1)])
+    `
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => !!line)
+        .map((line) => line.split(" "))
+        .map((cols) => [cols[0], cols.slice(1)])
 )
 
-
 /**
- * A custom tile loader for the special string-based format 
+ * A custom tile loader for the special string-based format
  */
 export class DungeonTilesetII {
-
     getTileSource(key: string): StaticSpriteSource {
         const row = map.get(key)
         if (!row) {
@@ -259,13 +259,12 @@ export class DungeonTilesetII {
         if (row?.length != 5) {
             throw Error("invalid animation spec")
         }
-    
-        return Array.from({length: +row[4]}, (value, key) => key)
-                .map(frameIndex => {
-                    const pos = new Point(+row[0] + frameIndex * +row[2], +row[1])
-                    const dim = new Point(+row[2], +row[3])
-                    return new StaticSpriteSource(this.getFile(), pos, dim)
-                })
+
+        return Array.from({ length: +row[4] }, (value, key) => key).map((frameIndex) => {
+            const pos = new Point(+row[0] + frameIndex * +row[2], +row[1])
+            const dim = new Point(+row[2], +row[3])
+            return new StaticSpriteSource(this.getFile(), pos, dim)
+        })
     }
 
     getTileSetAnimation(key: string, speed: number): SpriteAnimation {
@@ -273,8 +272,8 @@ export class DungeonTilesetII {
         if (!frames) {
             return null
         }
-        
-        return new SpriteAnimation(frames.map(tileSource => [tileSource, speed]))
+
+        return new SpriteAnimation(frames.map((tileSource) => [tileSource, speed]))
     }
 
     private getFile(): HTMLImageElement {

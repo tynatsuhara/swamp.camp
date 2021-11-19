@@ -14,11 +14,10 @@ import { ElementFactory } from "./ElementFactory"
  *   3. Misc metadata about the building
  */
 export abstract class BuildingFactory extends ElementFactory {
-
     canPlaceAtPos(wl: WorldLocation, pos: Point) {
         return this.getOccupiedPoints(pos)
-                .map(pt => wl.getGround(pt)?.type)
-                .every(type => Ground.isNaturalGround(type))
+            .map((pt) => wl.getGround(pt)?.type)
+            .every((type) => Ground.isNaturalGround(type))
     }
 
     /**

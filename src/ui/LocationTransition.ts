@@ -13,7 +13,7 @@ const makeCircle = (context: CanvasRenderingContext2D, radius: number, centerPos
         return
     }
 
-    const relativeCenter = new Point(radius, radius).minus(new Point(.5, .5))
+    const relativeCenter = new Point(radius, radius).minus(new Point(0.5, 0.5))
     const absoluteTopLeft = centerPos.plusX(-radius).plusY(-radius)
     const diameter = 2 * radius
 
@@ -22,12 +22,7 @@ const makeCircle = (context: CanvasRenderingContext2D, radius: number, centerPos
         // From there, clear a rect (essentially drawing vertical strips).
         for (let y = 0; y < radius; y++) {
             if (relativeCenter.distanceTo(new Point(x, y)) < radius) {
-                context.clearRect(
-                    absoluteTopLeft.x + x,
-                    absoluteTopLeft.y + y,
-                    1,
-                    (radius - y) * 2
-                )
+                context.clearRect(absoluteTopLeft.x + x, absoluteTopLeft.y + y, 1, (radius - y) * 2)
                 break
             }
         }
@@ -41,7 +36,6 @@ const TRANSITION_SPEED = 1500
  * Animation that plays when going through a doorway
  */
 export class LocationTransition extends Component {
-
     private animator: Animator
     private render: ImageRender
     private canvas: HTMLCanvasElement
@@ -67,7 +61,7 @@ export class LocationTransition extends Component {
         // circles big->small->big
         const radiuses = []
         for (let i = 0; i < FRAMES; i++) {
-            const radius = Math.floor(maxRadius/FRAMES * i)
+            const radius = Math.floor((maxRadius / FRAMES) * i)
             radiuses.push(radius)
             if (radiuses.length > 1 && !openOnly) {
                 radiuses.unshift(radius)
@@ -75,12 +69,13 @@ export class LocationTransition extends Component {
         }
 
         const getRender = (frame: number) => {
-            const circleCenter = Player.instance.dude.standingPosition.plusY(-12)
+            const circleCenter = Player.instance.dude.standingPosition
+                .plusY(-12)
                 .minus(Camera.instance.position)
                 .apply(Math.floor)
-                
+
             const radius = radiuses[frame]
-            
+
             this.context.fillStyle = Color.BLACK
             this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
 
@@ -98,12 +93,14 @@ export class LocationTransition extends Component {
 
         this.render = getRender(0)
 
-        const transitionFrame = openOnly ? 0 : FRAMES-1
+        const transitionFrame = openOnly ? 0 : FRAMES - 1
         const blackScreenSpeed = pauseMillis
-        const speed = TRANSITION_SPEED/(2*FRAMES-1)
+        const speed = TRANSITION_SPEED / (2 * FRAMES - 1)
 
         this.animator = new Animator(
-            Array.from({length: radiuses.length}, (v, k) => k === transitionFrame ? blackScreenSpeed : speed),
+            Array.from({ length: radiuses.length }, (v, k) =>
+                k === transitionFrame ? blackScreenSpeed : speed
+            ),
             (frame) => {
                 if (!!this.animator && frame !== 0) {
                     this.render = getRender(frame)
@@ -126,5 +123,5 @@ export class LocationTransition extends Component {
 
     getRenderMethods() {
         return [this.render]
-    }    
+    }
 }

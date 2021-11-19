@@ -11,11 +11,10 @@ import { GroundRenderer } from "../GroundRenderer"
  * Defines how a type of connecting tiles interacts with other types of connecting tiles.
  */
 export class ConnectingTileLedgeSchema extends ConnectingTileSchema {
-
     canConnect(schema: ConnectingTileSchema) {
         return schema instanceof ConnectingTileLedgeSchema
     }
-   
+
     /**
      * Renders the tile source based on the given grid and position
      */
@@ -32,21 +31,22 @@ export class ConnectingTileLedgeSchema extends ConnectingTileSchema {
         const sw = location.levels.get(new Point(x - 1, y + 1))
         const w = location.levels.get(new Point(x - 1, y))
         const nw = location.levels.get(new Point(x - 1, y - 1))
-        
+
         const render = (source: Point, mirrorX = false) => {
-            return Tilesets.instance.tilemap.getTileAt(source)
-                    .toImageRender(SpriteTransform.new({ 
-                        position: position.times(TILE_SIZE), 
-                        depth: GroundRenderer.DEPTH + 1,
-                        mirrorX
-                    }))
+            return Tilesets.instance.tilemap.getTileAt(source).toImageRender(
+                SpriteTransform.new({
+                    position: position.times(TILE_SIZE),
+                    depth: GroundRenderer.DEPTH + 1,
+                    mirrorX,
+                })
+            )
         }
 
         /**
-         * Preconditions: 
-         *   - Every ledge should have at least 2 adjacent ledges (not across from each other) 
+         * Preconditions:
+         *   - Every ledge should have at least 2 adjacent ledges (not across from each other)
          *   - No ledge should have 4 N/E/S/W connections
-         */ 
+         */
 
         let result: ImageRender
 
@@ -87,16 +87,16 @@ export class ConnectingTileLedgeSchema extends ConnectingTileSchema {
             // top right corner
             result = render(new Point(5, 10), true)
         } else if (se < level) {
-            // top left inside corner 
+            // top left inside corner
             result = render(new Point(7, 7), true)
         } else if (sw < level) {
-            // top right inside corner 
+            // top right inside corner
             result = render(new Point(7, 7))
         } else if (ne < level) {
-            // bottom left inside corner 
+            // bottom left inside corner
             result = render(new Point(4, 8), true)
         } else if (nw < level) {
-            // bottom right inside corner 
+            // bottom right inside corner
             result = render(new Point(4, 8))
         }
 
@@ -110,11 +110,14 @@ export class ConnectingTileLedgeSchema extends ConnectingTileSchema {
     private bottomLedge: ImageRender
     private getBottomLedge(render: (source: Point, mirrorX: boolean) => ImageRender) {
         if (!this.bottomLedge) {
-            if (Math.random() < .3) {
-                this.bottomLedge = render(new Point(6, 7), Math.random() > .5)
+            if (Math.random() < 0.3) {
+                this.bottomLedge = render(new Point(6, 7), Math.random() > 0.5)
             } else {
                 const choices = 5
-                this.bottomLedge = render(new Point(1 + Math.floor(Math.random() * choices), 7), Math.random() > .5)
+                this.bottomLedge = render(
+                    new Point(1 + Math.floor(Math.random() * choices), 7),
+                    Math.random() > 0.5
+                )
             }
         }
         return this.bottomLedge

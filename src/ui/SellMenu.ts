@@ -26,9 +26,9 @@ import { Sounds } from "../audio/Sounds"
 import { Lists } from "brigsby/dist/util/Lists"
 
 export type SalePackage = {
-    readonly item: Item,
-    readonly count: number,
-    readonly price: number,  // number of gold
+    readonly item: Item
+    readonly count: number
+    readonly price: number // number of gold
 }
 
 const CLINK_NOISES = [
@@ -39,13 +39,12 @@ const CLINK_NOISES = [
 
 // this is mostly copied from CraftingMenu and InventoryDisplay
 export class SellMenu extends Component {
-    
     static instance: SellMenu
 
-    private readonly e: Entity = new Entity([this])  // entity for this component
+    private readonly e: Entity = new Entity([this]) // entity for this component
     private displayEntity: Entity
-    private coinEntity: Entity  // for the spinny coin in the corner
-    private coinsOffset: Point = new Point(7, -11)  // for the spinny coin in the corner
+    private coinEntity: Entity // for the spinny coin in the corner
+    private coinsOffset: Point = new Point(7, -11) // for the spinny coin in the corner
     isOpen = false
     private items: SalePackage[]
     private canvas: HTMLCanvasElement
@@ -53,8 +52,8 @@ export class SellMenu extends Component {
     private dimensions = new Point(160, 158)
     private innerDimensions = this.dimensions.minus(new Point(10, 14))
     private scrollOffset = 0
-    private justSoldRow = -1  // if this is non-negative, this row was just sold and will be highlighted
-    private justOpened = false  // prevent bug where the mouse is held down immediately
+    private justSoldRow = -1 // if this is non-negative, this row was just sold and will be highlighted
+    private justOpened = false // prevent bug where the mouse is held down immediately
     private tooltip = this.e.addComponent(new Tooltip())
 
     constructor() {
@@ -64,7 +63,7 @@ export class SellMenu extends Component {
         this.canvas = document.createElement("canvas")
         this.canvas.width = this.innerDimensions.x
         this.canvas.height = this.innerDimensions.y
-        this.context = this.canvas.getContext("2d", {alpha: false})
+        this.context = this.canvas.getContext("2d", { alpha: false })
 
         assets.loadAudioFiles(CLINK_NOISES)
     }
@@ -77,11 +76,17 @@ export class SellMenu extends Component {
         if (this.isOpen) {
             this.tooltip.clear()
             this.tooltip.position = updateData.input.mousePos
-            const rowsTall = 6  // will need to change this if dimensions are adjusted
-            this.scrollOffset -= updateData.input.mouseWheelDeltaY * updateData.elapsedTimeMillis * 0.01
-            this.scrollOffset = Math.floor(Math.max(Math.min(0, this.scrollOffset), -Math.max(this.items.length, rowsTall)*24 + this.innerDimensions.y))
+            const rowsTall = 6 // will need to change this if dimensions are adjusted
+            this.scrollOffset -=
+                updateData.input.mouseWheelDeltaY * updateData.elapsedTimeMillis * 0.01
+            this.scrollOffset = Math.floor(
+                Math.max(
+                    Math.min(0, this.scrollOffset),
+                    -Math.max(this.items.length, rowsTall) * 24 + this.innerDimensions.y
+                )
+            )
             this.displayEntity = new Entity(
-                this.renderRecipes(updateData, this.getTopLeft(), this.items),
+                this.renderRecipes(updateData, this.getTopLeft(), this.items)
             )
             this.justOpened = false
 
@@ -108,7 +113,7 @@ export class SellMenu extends Component {
             new AnimatedSpriteComponent(
                 [Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)],
                 new SpriteTransform(this.getTopLeft().plus(this.coinsOffset))
-            )
+            ),
         ])
     }
 
@@ -118,30 +123,40 @@ export class SellMenu extends Component {
     }
 
     private canSell(sale: SalePackage) {
-        return this.justSoldRow === -1 
-                && !this.justOpened 
-                && Player.instance.dude.inventory.getItemCount(sale.item) >= sale.count
+        return (
+            this.justSoldRow === -1 &&
+            !this.justOpened &&
+            Player.instance.dude.inventory.getItemCount(sale.item) >= sale.count
+        )
     }
 
-    private renderRecipes(updateData: UpdateData, topLeft: Point, items: SalePackage[]): Component[] {
+    private renderRecipes(
+        updateData: UpdateData,
+        topLeft: Point,
+        items: SalePackage[]
+    ): Component[] {
         const inv = Player.instance.dude.inventory
 
         const coinCountComponent = new BasicRenderComponent(
             new TextRender(
-                `x${inv.getItemCount(Item.COIN)}`, 
-                new Point(9, 1).plus(topLeft).plus(this.coinsOffset), 
-                TEXT_SIZE, 
-                TEXT_FONT, 
+                `x${inv.getItemCount(Item.COIN)}`,
+                new Point(9, 1).plus(topLeft).plus(this.coinsOffset),
+                TEXT_SIZE,
+                TEXT_FONT,
                 Color.YELLOW,
                 UIStateManager.UI_SPRITE_DEPTH
             )
         )
 
-        this.context.imageSmoothingEnabled = false  // TODO figure out why text is aliased
+        this.context.imageSmoothingEnabled = false // TODO figure out why text is aliased
         this.context.font = `${TEXT_SIZE}px '${TEXT_FONT}'`
 
         // draw background
-        const backgroundTiles = NineSlice.makeStretchedNineSliceComponents(Tilesets.instance.outdoorTiles.getNineSlice("invBoxFrame"), topLeft, this.dimensions)
+        const backgroundTiles = NineSlice.makeStretchedNineSliceComponents(
+            Tilesets.instance.outdoorTiles.getNineSlice("invBoxFrame"),
+            topLeft,
+            this.dimensions
+        )
         backgroundTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
         this.context.fillStyle = Color.RED
         this.context.fillRect(0, 0, this.innerDimensions.x, this.innerDimensions.y)
@@ -157,16 +172,18 @@ export class SellMenu extends Component {
         const shiftedMousePos = updateData.input.mousePos.plusY(-this.scrollOffset)
 
         for (let r = 0; r < items.length; r++) {
-
-            const hovered = Maths.rectContains(
-                topLeft.plusX(margin).plusY(rowHeight * r + margin*2), 
-                new Point(this.innerDimensions.x, rowHeight), 
-                shiftedMousePos
-            ) && Maths.rectContains(  // within the frame itself
-                topLeft.plus(innerOffset),
-                this.innerDimensions,
-                updateData.input.mousePos
-            )
+            const hovered =
+                Maths.rectContains(
+                    topLeft.plusX(margin).plusY(rowHeight * r + margin * 2),
+                    new Point(this.innerDimensions.x, rowHeight),
+                    shiftedMousePos
+                ) &&
+                Maths.rectContains(
+                    // within the frame itself
+                    topLeft.plus(innerOffset),
+                    this.innerDimensions,
+                    updateData.input.mousePos
+                )
 
             const sale = items[r]
             const saleItem = ITEM_METADATA_MAP[sale.item]
@@ -174,13 +191,13 @@ export class SellMenu extends Component {
 
             // sell the item
             if (hovered && updateData.input.isMouseDown && sellable) {
-                Sounds.play(Lists.oneOf(CLINK_NOISES), .4)
+                Sounds.play(Lists.oneOf(CLINK_NOISES), 0.4)
                 inv.removeItem(sale.item, sale.count)
-                saveManager.setState({ 
-                    coins: saveManager.getState().coins + sale.price
+                saveManager.setState({
+                    coins: saveManager.getState().coins + sale.price,
                 })
                 this.justSoldRow = r
-                setTimeout(() => this.justSoldRow = -1, 900)
+                setTimeout(() => (this.justSoldRow = -1), 900)
             }
 
             if (hovered && !sellable) {
@@ -206,33 +223,46 @@ export class SellMenu extends Component {
             this.context.fillStyle = itemColor
             const craftedItemIcon = this.tintedIcon(plainIcon, itemColor)
             this.drawIconAt(craftedItemIcon, margin, verticalOffset)
-            this.context.fillText(`${sale.count}x ${saleItem.displayName}`, TILE_SIZE + margin * 2, verticalTextOffset + verticalOffset)
+            this.context.fillText(
+                `${sale.count}x ${saleItem.displayName}`,
+                TILE_SIZE + margin * 2,
+                verticalTextOffset + verticalOffset
+            )
 
             // coinage
             let offsetFromRight = 0
             const coinIcon = this.getItemIcon(Item.COIN)
-            let ingredientIcon: StaticSpriteSource = this.tintedIcon(coinIcon, itemColor === Color.WHITE ? Color.YELLOW : itemColor)  // make coin icon yellow on hover
+            let ingredientIcon: StaticSpriteSource = this.tintedIcon(
+                coinIcon,
+                itemColor === Color.WHITE ? Color.YELLOW : itemColor
+            ) // make coin icon yellow on hover
             this.context.fillStyle = itemColor
             const countStr = `${sale.price}`
-            offsetFromRight += (countStr.length * TEXT_PIXEL_WIDTH + margin)
-            this.context.fillText(countStr, width - offsetFromRight, verticalTextOffset + verticalOffset)
+            offsetFromRight += countStr.length * TEXT_PIXEL_WIDTH + margin
+            this.context.fillText(
+                countStr,
+                width - offsetFromRight,
+                verticalTextOffset + verticalOffset
+            )
             offsetFromRight += TILE_SIZE
             this.drawIconAt(ingredientIcon, width - offsetFromRight, verticalOffset)
 
             // draw line
-            verticalOffset += (margin + TILE_SIZE)
+            verticalOffset += margin + TILE_SIZE
             this.context.fillStyle = Color.DARK_RED
-            this.context.fillRect(margin, verticalOffset, this.innerDimensions.x-2*margin, 1)
+            this.context.fillRect(margin, verticalOffset, this.innerDimensions.x - 2 * margin, 1)
         }
 
-        const renderComp = new BasicRenderComponent(new ImageRender(
-            this.canvas, 
-            Point.ZERO, 
-            this.innerDimensions, 
-            innerOffset.plus(topLeft).apply(Math.floor),
-            this.innerDimensions,
-            UIStateManager.UI_SPRITE_DEPTH - 10,
-        ))
+        const renderComp = new BasicRenderComponent(
+            new ImageRender(
+                this.canvas,
+                Point.ZERO,
+                this.innerDimensions,
+                innerOffset.plus(topLeft).apply(Math.floor),
+                this.innerDimensions,
+                UIStateManager.UI_SPRITE_DEPTH - 10
+            )
+        )
 
         return [...backgroundTiles, renderComp, coinCountComponent]
     }
@@ -243,9 +273,15 @@ export class SellMenu extends Component {
 
     private drawIconAt(icon: StaticSpriteSource, x: number, y: number) {
         this.context.drawImage(
-            icon.image, 
-            icon.position.x, icon.position.y, icon.dimensions.x, icon.dimensions.y, 
-            x, y, icon.dimensions.x, icon.dimensions.y
+            icon.image,
+            icon.position.x,
+            icon.position.y,
+            icon.dimensions.x,
+            icon.dimensions.y,
+            x,
+            y,
+            icon.dimensions.x,
+            icon.dimensions.y
         )
     }
 
@@ -278,10 +314,6 @@ export class SellMenu extends Component {
     }
 
     getEntities(): Entity[] {
-        return [
-            this.e, 
-            this.displayEntity,
-            this.coinEntity
-        ]
+        return [this.e, this.displayEntity, this.coinEntity]
     }
 }

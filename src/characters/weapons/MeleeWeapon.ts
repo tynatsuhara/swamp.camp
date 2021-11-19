@@ -12,11 +12,10 @@ import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
 enum State {
     SHEATHED,
     DRAWN,
-    ATTACKING
+    ATTACKING,
 }
 
 export class MeleeWeapon extends Weapon {
-
     private weaponType: WeaponType
     private weaponSprite: StaticSpriteSource
     private weaponTransform: SpriteTransform
@@ -29,10 +28,15 @@ export class MeleeWeapon extends Weapon {
         super()
         this.start = (startData) => {
             this.weaponSprite = Tilesets.instance.dungeonCharacters.getTileSource(weaponId)
-            this.weaponTransform = new SpriteTransform(Point.ZERO, this.weaponSprite.dimensions).relativeTo(this.dude.animation.transform)
+            this.weaponTransform = new SpriteTransform(
+                Point.ZERO,
+                this.weaponSprite.dimensions
+            ).relativeTo(this.dude.animation.transform)
             this.offsetFromCenter = offsetFromCenter
             this._range = this.weaponSprite.dimensions.y
-            this.slashSprite = this.entity.addComponent(Tilesets.instance.oneBit.getTileSource("slash").toComponent())
+            this.slashSprite = this.entity.addComponent(
+                Tilesets.instance.oneBit.getTileSource("slash").toComponent()
+            )
         }
         this.weaponType = weaponType
     }
@@ -44,7 +48,7 @@ export class MeleeWeapon extends Weapon {
 
         this.animate()
     }
-    
+
     getRenderMethods() {
         return [this.weaponSprite.toImageRender(this.weaponTransform)]
     }
@@ -84,12 +88,12 @@ export class MeleeWeapon extends Weapon {
         if (!this.enabled) {
             return
         }
-        const attackDistance = this.getRange() + 4  // add a tiny buffer for small weapons like the dagger to still work
-        
+        const attackDistance = this.getRange() + 4 // add a tiny buffer for small weapons like the dagger to still work
+
         // TODO maybe only allow big weapons to hit multiple targets
         const enemies = Weapon.getEnemiesInRange(this.dude, attackDistance)
-        
-        enemies.forEach(d => {
+
+        enemies.forEach((d) => {
             d.damage(1, d.standingPosition.minus(this.dude.standingPosition), 30)
         })
 
@@ -100,7 +104,7 @@ export class MeleeWeapon extends Weapon {
 
     private animate() {
         const offsetFromEdge = new Point(
-            this.dude.animation.transform.dimensions.x/2 - this.weaponTransform.dimensions.x/2,
+            this.dude.animation.transform.dimensions.x / 2 - this.weaponTransform.dimensions.x / 2,
             this.dude.animation.transform.dimensions.y - this.weaponTransform.dimensions.y
         ).plus(this.offsetFromCenter)
 
@@ -109,7 +113,8 @@ export class MeleeWeapon extends Weapon {
 
         if (this.state === State.DRAWN) {
             pos = offsetFromEdge
-        } else if (this.state === State.SHEATHED) {  // TODO add side sheath for swords
+        } else if (this.state === State.SHEATHED) {
+            // TODO add side sheath for swords
             // center on back
             pos = offsetFromEdge.plus(new Point(3, -1))
         } else if (this.state === State.ATTACKING) {
@@ -126,14 +131,17 @@ export class MeleeWeapon extends Weapon {
         this.weaponTransform.position = pos
 
         // show sword behind character if sheathed
-        this.weaponTransform.depth = this.state == State.SHEATHED ? -.5 : .5
+        this.weaponTransform.depth = this.state == State.SHEATHED ? -0.5 : 0.5
 
         const frame = this.animator?.getCurrentFrame()
         this.slashSprite.enabled = frame === 3
         this.slashSprite.transform.depth = this.dude.animation.transform.depth + 2
         this.slashSprite.transform.mirrorX = this.weaponTransform.mirrorX
         this.slashSprite.transform.position = this.dude.animation.transform.position.plus(
-            new Point((this.weaponTransform.mirrorX ? -1 : 1) * (this.weaponTransform.dimensions.y - 10), 8)
+            new Point(
+                (this.weaponTransform.mirrorX ? -1 : 1) * (this.weaponTransform.dimensions.y - 10),
+                8
+            )
         )
     }
 
@@ -141,13 +149,13 @@ export class MeleeWeapon extends Weapon {
     private currentAnimationFrame: number = 0
     private playAttackAnimation() {
         this.animator = new Animator(
-            Animator.frames(8, 40), 
-            (index) => this.currentAnimationFrame = index, 
+            Animator.frames(8, 40),
+            (index) => (this.currentAnimationFrame = index),
             () => {
                 this.animator = null
-                this.state = State.DRAWN  // reset to DRAWN when animation finishes
+                this.state = State.DRAWN // reset to DRAWN when animation finishes
             }
-        ) 
+        )
     }
 
     /**
@@ -162,13 +170,16 @@ export class MeleeWeapon extends Weapon {
         } else if (this.currentAnimationFrame < resettingFrame) {
             return [
                 new Point(
-                    (6-this.currentAnimationFrame) + this.weaponTransform.dimensions.y - swingStartFrame*3, 
-                    Math.floor(this.weaponTransform.dimensions.y/2 - 1)
+                    6 -
+                        this.currentAnimationFrame +
+                        this.weaponTransform.dimensions.y -
+                        swingStartFrame * 3,
+                    Math.floor(this.weaponTransform.dimensions.y / 2 - 1)
                 ),
-                90
+                90,
             ]
         } else {
-            return [new Point((1-this.currentAnimationFrame+resettingFrame) * 3, 2), 0]
+            return [new Point((1 - this.currentAnimationFrame + resettingFrame) * 3, 2), 0]
         }
     }
 }

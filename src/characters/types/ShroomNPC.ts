@@ -12,11 +12,10 @@ import { DudeFactory, DudeType } from "../DudeFactory"
 import { Enemy } from "./Enemy"
 import { WeaponType } from "../weapons/WeaponType"
 
-const SIZE = "s"  // one of [1, 2, 3]
+const SIZE = "s" // one of [1, 2, 3]
 const NEXT_GROWTH_TIME = "ngt"
 
 export class ShroomNPC extends Component {
-    
     private dude: Dude
     private enemy: Enemy
 
@@ -44,7 +43,7 @@ export class ShroomNPC extends Component {
         })
     }
 
-    // push back NEXT_GROWTH_TIME to make sure they don't get 
+    // push back NEXT_GROWTH_TIME to make sure they don't get
     // big and aggressive right when the player respawns
     delayTime(duration: number) {
         this.dude.blob[NEXT_GROWTH_TIME] += duration
@@ -61,20 +60,22 @@ export class ShroomNPC extends Component {
         if (ogSize === 3 || Math.random() > 0.5) {
             // spread more shrooms
             const tilePos = pixelPtToTilePt(this.dude.standingPosition)
-            const plantedShroom = LocationManager.instance.exterior().addElement(ElementType.MUSHROOM, tilePos)
+            const plantedShroom = LocationManager.instance
+                .exterior()
+                .addElement(ElementType.MUSHROOM, tilePos)
             if (!!plantedShroom) {
                 // successfully planted
                 return
             }
         }
-        
+
         // grow
         const newSize = ogSize + 1
         this.dude.blob[SIZE] = newSize
 
         // overwrite the animation
         const newData = this.dude.save()
-        newData.anim = ["SmallMushroom", "NormalMushroom", "LargeMushroom",][newSize-1]
+        newData.anim = ["SmallMushroom", "NormalMushroom", "LargeMushroom"][newSize - 1]
 
         // delete and respawn the shroom dude
         this.entity.selfDestruct()
@@ -87,6 +88,6 @@ export class ShroomNPC extends Component {
 
     private nextGrowthTime() {
         // grow every 12-24 hours
-        return WorldTime.instance.time + TimeUnit.DAY * (0.5 + Math.random()/2)
+        return WorldTime.instance.time + TimeUnit.DAY * (0.5 + Math.random() / 2)
     }
 }

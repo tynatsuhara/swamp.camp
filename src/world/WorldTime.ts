@@ -9,13 +9,14 @@ import { Singletons } from "../Singletons"
 import { LocationManager } from "./LocationManager"
 
 export class WorldTime extends Component {
-
     static get instance() {
         return Singletons.getOrCreate(WorldTime)
     }
 
-    private _time: number = 0  // millis
-    get time() { return this._time }
+    private _time: number = 0 // millis
+    get time() {
+        return this._time
+    }
 
     private title = window.document.title
 
@@ -25,8 +26,8 @@ export class WorldTime extends Component {
 
     update(updateData: UpdateData) {
         this._time += updateData.elapsedTimeMillis
-        saveManager.setState({ 
-            timePlayed: (saveManager.getState().timePlayed || 0) + updateData.elapsedTimeMillis
+        saveManager.setState({
+            timePlayed: (saveManager.getState().timePlayed || 0) + updateData.elapsedTimeMillis,
         })
 
         EventQueue.instance.processEvents(this.time)
@@ -47,16 +48,18 @@ export class WorldTime extends Component {
     }
 
     future({ minutes = 0, hours = 0, days = 0 }) {
-        return this.time + (minutes * TimeUnit.MINUTE) + (hours * TimeUnit.HOUR) + (days * TimeUnit.DAY)
+        return this.time + minutes * TimeUnit.MINUTE + hours * TimeUnit.HOUR + days * TimeUnit.DAY
     }
 
     tomorrow(timeOfDay: number = 0) {
-        return Math.floor(this.time/TimeUnit.DAY) * TimeUnit.DAY + TimeUnit.DAY + timeOfDay
+        return Math.floor(this.time / TimeUnit.DAY) * TimeUnit.DAY + TimeUnit.DAY + timeOfDay
     }
 
     private clockTime() {
-        const hour = Math.floor(this.time % TimeUnit.DAY/TimeUnit.HOUR)
-        const minute = Math.floor(this.time % TimeUnit.HOUR/TimeUnit.MINUTE)
-        return `${hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour)}:${(minute < 10 ? "0" : "")}${minute} ${hour < 12 ? "AM" : "PM"}`
+        const hour = Math.floor((this.time % TimeUnit.DAY) / TimeUnit.HOUR)
+        const minute = Math.floor((this.time % TimeUnit.HOUR) / TimeUnit.MINUTE)
+        return `${hour == 0 ? 12 : hour > 12 ? hour - 12 : hour}:${
+            minute < 10 ? "0" : ""
+        }${minute} ${hour < 12 ? "AM" : "PM"}`
     }
 }

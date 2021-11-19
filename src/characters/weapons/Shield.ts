@@ -19,7 +19,6 @@ enum State {
  * A shield being wielded by a dude
  */
 export class Shield extends Component {
-
     dude: Dude
     sprite: StaticSpriteSource
     transform: SpriteTransform
@@ -37,7 +36,9 @@ export class Shield extends Component {
         this.awake = () => {
             this.dude = this.entity.getComponent(Dude)
             this.sprite = Tilesets.instance.dungeonCharacters.getTileSource(spriteId)
-            this.transform = SpriteTransform.new({dimensions: this.sprite.dimensions}).relativeTo(this.dude.animation.transform)
+            this.transform = SpriteTransform.new({
+                dimensions: this.sprite.dimensions,
+            }).relativeTo(this.dude.animation.transform)
         }
     }
 
@@ -52,19 +53,31 @@ export class Shield extends Component {
         if (this.state === State.ON_BACK) {
             pos = pos.plus(new Point(-6, -1))
         } else if (this.state === State.DRAWN) {
-            pos = pos.plus(new Point(5, 4).times(this.raisedPerc < .7 ? this.raisedPerc : 1.4-this.raisedPerc).apply(Math.floor))
+            pos = pos.plus(
+                new Point(5, 4)
+                    .times(this.raisedPerc < 0.7 ? this.raisedPerc : 1.4 - this.raisedPerc)
+                    .apply(Math.floor)
+            )
 
-            if (this.blockingActive) {  // raising
-                this.raisedPerc = Math.min(this.raisedPerc + updateData.elapsedTimeMillis/this.timeToRaiseMs, 1)
-            } else {  // lowering
-                this.raisedPerc = Math.max(this.raisedPerc - updateData.elapsedTimeMillis/this.timeToRaiseMs, 0)
+            if (this.blockingActive) {
+                // raising
+                this.raisedPerc = Math.min(
+                    this.raisedPerc + updateData.elapsedTimeMillis / this.timeToRaiseMs,
+                    1
+                )
+            } else {
+                // lowering
+                this.raisedPerc = Math.max(
+                    this.raisedPerc - updateData.elapsedTimeMillis / this.timeToRaiseMs,
+                    0
+                )
             }
         }
 
         pos = pos.plus(this.dude.getAnimationOffsetPosition())
 
         this.transform.position = pos
-        this.transform.depth = this.raisedPerc > .7 ? .75 : -.75
+        this.transform.depth = this.raisedPerc > 0.7 ? 0.75 : -0.75
     }
 
     toggleOnBack() {
@@ -79,14 +92,15 @@ export class Shield extends Component {
         if (this.state === State.ON_BACK || !this.dude) {
             return
         }
-        if (blockingActive && this.dude.weapon?.isAttacking()) {  // you can't start blocking when you're attacking
+        if (blockingActive && this.dude.weapon?.isAttacking()) {
+            // you can't start blocking when you're attacking
             return
         }
         this.blockingActive = blockingActive
     }
 
     isBlocking() {
-        return this.state === State.DRAWN && this.raisedPerc > .3
+        return this.state === State.DRAWN && this.raisedPerc > 0.3
     }
 
     canAttack() {

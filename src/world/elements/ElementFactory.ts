@@ -4,7 +4,6 @@ import { ElementComponent } from "./ElementComponent"
 import { WorldLocation } from "../WorldLocation"
 
 export abstract class ElementFactory {
-
     abstract readonly type: ElementType
 
     /**
@@ -13,8 +12,8 @@ export abstract class ElementFactory {
     abstract readonly dimensions: Point
 
     /**
-     * 
-     * @param wl The location to which the element is being added. Implementations should NOT 
+     *
+     * @param wl The location to which the element is being added. Implementations should NOT
      *           add the entity to the given locations, the location should be read-only.
      * @param pos The position of the element in tile coordinates (not pixel coordinates!)
      * @param data Previous save data

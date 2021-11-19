@@ -5,7 +5,6 @@ import { UpdateData } from "brigsby/dist/Engine"
 import { Point } from "brigsby/dist/Point"
 
 export class CutscenePlayerController extends Component {
-
     static instance: CutscenePlayerController
 
     private _dude: Dude

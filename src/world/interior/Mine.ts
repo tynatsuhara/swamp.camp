@@ -17,33 +17,24 @@ export const makeMineInterior = (outside: WorldLocation) => {
     l.setBarriers(InteriorUtils.makeBarriers(dimensions))
 
     // background sprite
-    l.sprites.addSprite(
-        "mine-small", 
-        new Point(0, -2 * TILE_SIZE), 
-        0, 
-        GroundRenderer.DEPTH
-    )
-    
-    const interactablePos = new Point(dimensions.x/2, 0).times(TILE_SIZE)
-    const teleporter: Teleporter = { 
-        to: outside.uuid, 
-        pos: interactablePos.plusY(12), 
-        id: TeleporterPrefix.MINE 
+    l.sprites.addSprite("mine-small", new Point(0, -2 * TILE_SIZE), 0, GroundRenderer.DEPTH)
+
+    const interactablePos = new Point(dimensions.x / 2, 0).times(TILE_SIZE)
+    const teleporter: Teleporter = {
+        to: outside.uuid,
+        pos: interactablePos.plusY(12),
+        id: TeleporterPrefix.MINE,
     }
     l.addTeleporter(teleporter)
 
-    l.addElement(
-        ElementType.MINE_EXIT,
-        new Point(1, 0),
-        { 
-            to: outside.uuid, 
-            i: interactablePos.toString(),
-            id: TeleporterPrefix.MINE
-        }
-    )
+    l.addElement(ElementType.MINE_EXIT, new Point(1, 0), {
+        to: outside.uuid,
+        i: interactablePos.toString(),
+        id: TeleporterPrefix.MINE,
+    })
 
     // Indicate the open floor points so NPCs can roam
-    ElementUtils.rectPoints(Point.ZERO, dimensions).forEach(pt => 
+    ElementUtils.rectPoints(Point.ZERO, dimensions).forEach((pt) =>
         l.setGroundElement(GroundType.BASIC, pt)
     )
 

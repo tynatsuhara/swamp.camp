@@ -10,7 +10,6 @@ import { NPCTask } from "./NPCTask"
 import { NPCTaskContext } from "./NPCTaskContext"
 
 export class NPCTaskScheduleDefaultVillager extends NPCTask {
-
     constructor(schedule: NPCSchedule) {
         super()
     }
@@ -19,9 +18,11 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         const timeOfDay = WorldTime.instance.time % TimeUnit.DAY
 
         let goalLocation: WorldLocation
-        if (timeOfDay > NPCSchedules.VILLAGER_WAKE_UP_TIME 
-            && timeOfDay < NPCSchedules.VILLAGER_GO_HOME_TIME) {
-            // Are you feeling zen? If not, a staycation is what I recommend. 
+        if (
+            timeOfDay > NPCSchedules.VILLAGER_WAKE_UP_TIME &&
+            timeOfDay < NPCSchedules.VILLAGER_GO_HOME_TIME
+        ) {
+            // Are you feeling zen? If not, a staycation is what I recommend.
             // Or better yet, don't be a jerk. Unwind by being a man... and goin' to work.
             goalLocation = this.findWorkLocation()
             if (!goalLocation) {
@@ -33,7 +34,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         }
 
         if (!goalLocation || context.dude.location === goalLocation) {
-            context.roam(0.5, { 
+            context.roam(0.5, {
                 pauseEveryMillis: 2500 + 2500 * Math.random(),
                 pauseForMillis: 2500 + 5000 * Math.random(),
             })
@@ -43,9 +44,11 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
     }
 
     private findHomeLocation(dude: Dude) {
-        const houses = LocationManager.instance.exterior().getElements()
-                .map(el => el.entity.getComponent(Residence))
-                .filter(residence => residence?.isHomeOf(dude.uuid))
+        const houses = LocationManager.instance
+            .exterior()
+            .getElements()
+            .map((el) => el.entity.getComponent(Residence))
+            .filter((residence) => residence?.isHomeOf(dude.uuid))
 
         if (houses.length > 0) {
             return LocationManager.instance.get(houses[0].locationUUID)
@@ -53,10 +56,11 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
     }
 
     private findWorkLocation() {
-        const mines = LocationManager.instance.exterior()
-                .getElementsOfType(ElementType.MINE_ENTRANCE)
-                .map(el => el.save()['destinationUUID'])
-                
+        const mines = LocationManager.instance
+            .exterior()
+            .getElementsOfType(ElementType.MINE_ENTRANCE)
+            .map((el) => el.save()["destinationUUID"])
+
         if (mines.length === 0) {
             return null
         }

@@ -19,28 +19,25 @@ import { ShroomNPC } from "../characters/types/ShroomNPC"
 
 // This is the cutscene that plays when the player dies
 export class DeathCutscene extends Component {
-
     // durations in ms
     private readonly TRANSITION_PAUSE = 1000
     private readonly SHOW_TRANSITION = 3000
 
     start() {
-        const centerPos = new Point(Camera.instance.dimensions.x/2, TextOverlayManager.TOP_BORDER)
-                .plus(new Point(-TILE_SIZE/2, -TILE_SIZE))
-        
+        const centerPos = new Point(
+            Camera.instance.dimensions.x / 2,
+            TextOverlayManager.TOP_BORDER
+        ).plus(new Point(-TILE_SIZE / 2, -TILE_SIZE))
+
         const deathIcon = Tilesets.instance.oneBit
-                .getTileSource(Lists.oneOf(["tombstone1", "tombstone2", "skull-n-bones", "skull1", "skull2"]))
-                .toComponent(SpriteTransform.new({ position: centerPos }))
+            .getTileSource(
+                Lists.oneOf(["tombstone1", "tombstone2", "skull-n-bones", "skull1", "skull2"])
+            )
+            .toComponent(SpriteTransform.new({ position: centerPos }))
 
-        const text = Lists.oneOf([
-            "You died. How unfortunate.",
-        ])
+        const text = Lists.oneOf(["You died. How unfortunate."])
 
-        const button = Lists.oneOf([
-            "WALK IT OFF",
-            "GET UP",
-            "OW!"
-        ])
+        const button = Lists.oneOf(["WALK IT OFF", "GET UP", "OW!"])
 
         setTimeout(() => {
             HUD.instance.locationTransition.transition(() => {
@@ -50,7 +47,7 @@ export class DeathCutscene extends Component {
                     button,
                     () => this.respawn(),
                     [deathIcon],
-                    TextAlign.CENTER,
+                    TextAlign.CENTER
                 )
             }, this.TRANSITION_PAUSE)
         }, this.SHOW_TRANSITION)
@@ -65,7 +62,7 @@ export class DeathCutscene extends Component {
 
         // Clear out any enemies
         const dudes = LocationManager.instance.currentLocation.dudes
-        dudes.forEach(d => {
+        dudes.forEach((d) => {
             if (d.entity.getComponent(Enemy)) {
                 dudes.delete(d)
             }
@@ -76,6 +73,6 @@ export class DeathCutscene extends Component {
 
         CutsceneManager.instance.finishCutscene()
 
-        setTimeout(() => saveManager.save(), 1500);
+        setTimeout(() => saveManager.save(), 1500)
     }
 }

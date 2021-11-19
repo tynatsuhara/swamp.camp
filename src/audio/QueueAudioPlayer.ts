@@ -7,11 +7,11 @@ export class QueueAudioPlayer extends AudioPlayer {
 
     // the first track is always the current one
     private files: string[]
-    private crossFading: Promise<void>  // used to track if we're currently crossfading
+    private crossFading: Promise<void> // used to track if we're currently crossfading
     private crossFadeVolume: number = 1
     private crossFadeDurationMillis: number
     private timeBetweenTracksMillis: number
-    
+
     private static readonly TIME_BETWEEN_FADE_CHECKS = 200
 
     get fileName() {
@@ -21,7 +21,7 @@ export class QueueAudioPlayer extends AudioPlayer {
     constructor(
         queueId: string,
         volumeMultiplier: number = 1,
-        files: string[], 
+        files: string[],
         crossFadeDurationMillis: number = 5000,
         timeBetweenTracksMillis: number = 5000
     ) {
@@ -43,9 +43,10 @@ export class QueueAudioPlayer extends AudioPlayer {
         // start fading out when we're close to the end
         const currentTime = 1000 * this.currentAudio.currentTime
         // make sure we fade to 0 before the end of the song
-        const fadeStart = 1000 * this.currentAudio.duration 
-                - this.crossFadeDurationMillis 
-                - QueueAudioPlayer.TIME_BETWEEN_FADE_CHECKS
+        const fadeStart =
+            1000 * this.currentAudio.duration -
+            this.crossFadeDurationMillis -
+            QueueAudioPlayer.TIME_BETWEEN_FADE_CHECKS
         if (currentTime >= fadeStart) {
             this.crossFading = this.crossFadeOut().then(() => {
                 this.crossFading = null
@@ -77,12 +78,12 @@ export class QueueAudioPlayer extends AudioPlayer {
 
         return AudioUtils.adjustVolume(
             oldVolume,
-            newVolume, 
-            v => this.setCrossFadeVolume(v), 
+            newVolume,
+            (v) => this.setCrossFadeVolume(v),
             this.crossFadeDurationMillis
         ).then(() => {
             // sleep between tracks
-            return new Promise(resolve => {
+            return new Promise((resolve) => {
                 setTimeout(() => resolve(), this.timeBetweenTracksMillis)
             })
         })

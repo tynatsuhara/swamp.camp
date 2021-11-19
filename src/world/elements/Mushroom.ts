@@ -19,7 +19,6 @@ import { Hittable } from "./Hittable"
 const NEXT_GROWTH_TIME = "ngt"
 
 export class MushroomFactory extends ElementFactory {
-
     readonly type = ElementType.MUSHROOM
     readonly dimensions = new Point(1, 1)
 
@@ -31,22 +30,31 @@ export class MushroomFactory extends ElementFactory {
         const depth = (pos.y + 1) * TILE_SIZE + randomOffset.y
 
         const addTile = (s: string, pos: Point) => {
-            const tile = e.addComponent(new SpriteComponent(
-                Tilesets.instance.outdoorTiles.getTileSource(s), 
-                new SpriteTransform(pos.times(TILE_SIZE).plus(randomOffset))
-            ))
+            const tile = e.addComponent(
+                new SpriteComponent(
+                    Tilesets.instance.outdoorTiles.getTileSource(s),
+                    new SpriteTransform(pos.times(TILE_SIZE).plus(randomOffset))
+                )
+            )
             tile.transform.depth = depth
             return tile
         }
 
         let tile: SpriteComponent = addTile("mushroomPlaced", pos)
-        
-        const hittableCenter = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE/2, TILE_SIZE/2))
+
+        const hittableCenter = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE / 2, TILE_SIZE / 2))
         e.addComponent(
             new Hittable(hittableCenter, [tile.transform], (dir) => {
                 e.selfDestruct()
-                const itemDirection = dir.randomlyShifted(.2).normalized()
-                spawnItem(pos.times(TILE_SIZE).plusY(TILE_SIZE).plusX(TILE_SIZE/2), Item.MUSHROOM, itemDirection.times(5))
+                const itemDirection = dir.randomlyShifted(0.2).normalized()
+                spawnItem(
+                    pos
+                        .times(TILE_SIZE)
+                        .plusY(TILE_SIZE)
+                        .plusX(TILE_SIZE / 2),
+                    Item.MUSHROOM,
+                    itemDirection.times(5)
+                )
             })
         )
 
@@ -54,21 +62,21 @@ export class MushroomFactory extends ElementFactory {
             new GrowableShroom(nextGrowthTime, () => {
                 e.selfDestruct()
                 DudeFactory.instance.new(
-                    DudeType.SHROOM, 
-                    pos.times(TILE_SIZE).plusY(-TILE_SIZE).plusX(-TILE_SIZE/2), 
+                    DudeType.SHROOM,
+                    pos
+                        .times(TILE_SIZE)
+                        .plusY(-TILE_SIZE)
+                        .plusX(-TILE_SIZE / 2),
                     LocationManager.instance.exterior()
                 )
             })
         )
 
-        return e.addComponent(new ElementComponent(
-            this.type, 
-            pos,
-            [pos], 
-            () => ({
-                [NEXT_GROWTH_TIME]: nextGrowthTime
-            })
-        ))
+        return e.addComponent(
+            new ElementComponent(this.type, pos, [pos], () => ({
+                [NEXT_GROWTH_TIME]: nextGrowthTime,
+            }))
+        )
     }
 
     canPlaceInLocation(wl: WorldLocation) {
@@ -81,12 +89,12 @@ export class MushroomFactory extends ElementFactory {
 
     private nextGrowthTime() {
         // grow every 12-24 hours
-        return WorldTime.instance.time + TimeUnit.DAY * (0.5 + Math.random()/2)
+        return WorldTime.instance.time + TimeUnit.DAY * (0.5 + Math.random() / 2)
     }
 }
 
 class GrowableShroom extends Component {
-    private nextGrowthTime: number;
+    private nextGrowthTime: number
     private growFn: () => void
 
     constructor(nextGrowthTime: number, growFn: () => void) {

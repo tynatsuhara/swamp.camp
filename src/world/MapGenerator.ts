@@ -9,15 +9,13 @@ import { GroundType } from "./ground/Ground"
 import { LocationManager } from "./LocationManager"
 import { WorldLocation } from "./WorldLocation"
 
-
 export class MapGenerator {
-
     static get instance() {
         return Singletons.getOrCreate(MapGenerator)
     }
 
     private static readonly MAP_RANGE = 40
-    private static readonly MAP_SIZE = MapGenerator.MAP_RANGE * 2  // map goes from [-MAP_RANGE, MAP_RANGE]
+    private static readonly MAP_SIZE = MapGenerator.MAP_RANGE * 2 // map goes from [-MAP_RANGE, MAP_RANGE]
 
     private location: WorldLocation
     private readonly tentPos = new Point(-3, -3)
@@ -26,14 +24,21 @@ export class MapGenerator {
         for (let elementsPlaced = false, attempt = 1; !elementsPlaced; attempt++) {
             console.log(`generation attept ${attempt}`)
 
-            this.location = new WorldLocation(false, true, MapGenerator.MAP_SIZE, MapGenerator.levels())
+            this.location = new WorldLocation(
+                false,
+                true,
+                MapGenerator.MAP_SIZE,
+                MapGenerator.levels()
+            )
 
             // make the ground
             this.placeGround()
             this.placeWater()
 
             // spawn tent
-            const tent = this.location.addElement(ElementType.TENT, this.tentPos, { color: TentColor.RED })
+            const tent = this.location.addElement(ElementType.TENT, this.tentPos, {
+                color: TentColor.RED,
+            })
 
             // if the tent couldn't be placed, redo the map topography
             elementsPlaced = !!tent
@@ -65,7 +70,9 @@ export class MapGenerator {
                 if (distToCenter > MapGenerator.VIGNETTE_EDGE) {
                     possibilities.push(pt)
                 } else if (distToCenter > MapGenerator.TREELINE) {
-                    const chance = (distToCenter - MapGenerator.TREELINE) / (MapGenerator.VIGNETTE_EDGE - MapGenerator.TREELINE)
+                    const chance =
+                        (distToCenter - MapGenerator.TREELINE) /
+                        (MapGenerator.VIGNETTE_EDGE - MapGenerator.TREELINE)
                     if (Math.random() < chance) {
                         possibilities.push(pt)
                     }
@@ -73,7 +80,7 @@ export class MapGenerator {
             }
         }
         Lists.shuffle(possibilities)
-        possibilities.forEach(pt => this.spawnTree(pt))
+        possibilities.forEach((pt) => this.spawnTree(pt))
     }
 
     private spawnTrees() {
@@ -81,7 +88,7 @@ export class MapGenerator {
         for (let i = 0; i < trees; i++) {
             const pt = new Point(
                 Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_RANGE,
-                Math.floor(Math.random() * (MapGenerator.MAP_SIZE-1)) - MapGenerator.MAP_RANGE,
+                Math.floor(Math.random() * (MapGenerator.MAP_SIZE - 1)) - MapGenerator.MAP_RANGE
             )
             this.spawnTree(pt)
         }
@@ -93,9 +100,9 @@ export class MapGenerator {
             return
         }
         this.location.addElement(
-            Math.random() < .7 ? ElementType.TREE_POINTY : ElementType.TREE_ROUND,
+            Math.random() < 0.7 ? ElementType.TREE_POINTY : ElementType.TREE_ROUND,
             pt,
-            { s: 3 }  // make adult trees
+            { s: 3 } // make adult trees
         )
     }
 
@@ -103,8 +110,8 @@ export class MapGenerator {
         const typesToClear = [ElementType.ROCK, ElementType.TREE_POINTY, ElementType.TREE_ROUND]
 
         // clear in corner
-        for (let x = MapGenerator.MAP_RANGE-11; x < MapGenerator.MAP_RANGE + 10; x++) {
-            for (let y = MapGenerator.MAP_RANGE-25; y < MapGenerator.MAP_RANGE-23; y++) {
+        for (let x = MapGenerator.MAP_RANGE - 11; x < MapGenerator.MAP_RANGE + 10; x++) {
+            for (let y = MapGenerator.MAP_RANGE - 25; y < MapGenerator.MAP_RANGE - 23; y++) {
                 const element = this.location.getElement(new Point(x, y))
                 if (!!element && typesToClear.indexOf(element.type) !== -1) {
                     this.location.removeElement(element)
@@ -129,9 +136,12 @@ export class MapGenerator {
         while (placed < count) {
             const p = new Point(
                 Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_RANGE,
-                Math.floor(Math.random() * (MapGenerator.MAP_SIZE)) - MapGenerator.MAP_RANGE,
+                Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_RANGE
             )
-            if (this.location.getGround(p)?.type === GroundType.GRASS && this.location.addElement(element, p)) {
+            if (
+                this.location.getGround(p)?.type === GroundType.GRASS &&
+                this.location.addElement(element, p)
+            ) {
                 placed++
             }
         }
@@ -143,16 +153,18 @@ export class MapGenerator {
                 const pt = new Point(i, j)
                 const thisLevel = this.location.levels?.get(pt)
                 const adjacent = [
-                    pt.plus(new Point(0, -1)), 
-                    pt.plus(new Point(1, -1)), 
-                    pt.plus(new Point(1, 0)), 
-                    pt.plus(new Point(1, 1)), 
-                    pt.plus(new Point(0, 1)), 
-                    pt.plus(new Point(-1, 1)), 
-                    pt.plus(new Point(-1, 0)), 
-                    pt.plus(new Point(-1, -1)), 
+                    pt.plus(new Point(0, -1)),
+                    pt.plus(new Point(1, -1)),
+                    pt.plus(new Point(1, 0)),
+                    pt.plus(new Point(1, 1)),
+                    pt.plus(new Point(0, 1)),
+                    pt.plus(new Point(-1, 1)),
+                    pt.plus(new Point(-1, 0)),
+                    pt.plus(new Point(-1, -1)),
                 ]
-                const isLedge = adjacent.map(pt => this.location.levels.get(pt)).some(level => level < thisLevel)
+                const isLedge = adjacent
+                    .map((pt) => this.location.levels.get(pt))
+                    .some((level) => level < thisLevel)
                 if (isLedge) {
                     this.location.setGroundElement(GroundType.LEDGE, pt)
                 } else {
@@ -164,7 +176,7 @@ export class MapGenerator {
 
     static levels() {
         // We want more bottom ledges than top because it looks nicer with the camera "angle"
-        const topBottomThreshold = .3
+        const topBottomThreshold = 0.3
         const sideBottomThreshold = 1
 
         let levelGrid: Grid<number>
@@ -173,7 +185,7 @@ export class MapGenerator {
         let sideBottomRatio: number
 
         do {
-            [levelGrid, levelString, topBottomRatio, sideBottomRatio] = this.levelNoise()
+            ;[levelGrid, levelString, topBottomRatio, sideBottomRatio] = this.levelNoise()
         } while (topBottomRatio > topBottomThreshold || sideBottomRatio > sideBottomThreshold)
 
         console.log(levelString)
@@ -190,7 +202,10 @@ export class MapGenerator {
      *      the ratio of side/bottom ledges
      * ]
      */
-    static levelNoise(levels: number = 3, seed = Math.random()): [Grid<number>, string, number, number] {
+    static levelNoise(
+        levels: number = 3,
+        seed = Math.random()
+    ): [Grid<number>, string, number, number] {
         const noise = new Noise(seed)
 
         const grid = new Grid<number>()
@@ -200,7 +215,7 @@ export class MapGenerator {
         const sq = 2
         const noiseScale = 2.5
 
-        // Each entry will occupy a sq x sq tile section to prevent 
+        // Each entry will occupy a sq x sq tile section to prevent
         // 1-wide entries that are hard to make work art-wise
         // TODO: Smooth out edges to prevent stair-step pattern?
 
@@ -210,13 +225,16 @@ export class MapGenerator {
 
         for (let i = -MapGenerator.MAP_RANGE; i < MapGenerator.MAP_RANGE; i += sq) {
             for (let j = -MapGenerator.MAP_RANGE; j < MapGenerator.MAP_RANGE; j += sq) {
-                var value = noise.simplex2(i / (this.MAP_RANGE * noiseScale), j / (this.MAP_RANGE * noiseScale))
-                value = (value + 1)/2  // scale to 0-1
+                var value = noise.simplex2(
+                    i / (this.MAP_RANGE * noiseScale),
+                    j / (this.MAP_RANGE * noiseScale)
+                )
+                value = (value + 1) / 2 // scale to 0-1
                 const level = Math.floor(levels * value)
                 str += level
 
                 // Compare top/bottom ratio
-                const above = grid.get(new Point(j, i-1))
+                const above = grid.get(new Point(j, i - 1))
                 if (above != null) {
                     if (above < level) {
                         topLedges++
@@ -225,15 +243,15 @@ export class MapGenerator {
                     }
                 }
 
-                const left = grid.get(new Point(j-1, i))
-                const right = grid.get(new Point(j+1, i))
+                const left = grid.get(new Point(j - 1, i))
+                const right = grid.get(new Point(j + 1, i))
                 if ((left != null && left !== level) || (right != null && right !== level)) {
                     sideLedges++
                 }
 
                 for (let m = 0; m < sq; m++) {
                     for (let n = 0; n < sq; n++) {
-                        grid.set(new Point(j+m, i+n), level)
+                        grid.set(new Point(j + m, i + n), level)
                     }
                 }
             }
@@ -242,15 +260,15 @@ export class MapGenerator {
 
         str += `top ledges = ${topLedges}\n`
         str += `bottom ledges = ${bottomLedges}\n`
-        str += `ratio top/bottom = ${topLedges/bottomLedges}\n`
+        str += `ratio top/bottom = ${topLedges / bottomLedges}\n`
         str += `side ledges = ${sideLedges}\n`
-        str += `ratio side/bottom = ${sideLedges/bottomLedges}\n`
+        str += `ratio side/bottom = ${sideLedges / bottomLedges}\n`
 
-        return [grid, str, topLedges/bottomLedges, sideLedges/bottomLedges]
+        return [grid, str, topLedges / bottomLedges, sideLedges / bottomLedges]
     }
 
     placeWater() {
-        let waterVolume = (MapGenerator.MAP_SIZE * MapGenerator.MAP_SIZE) * .06
+        let waterVolume = MapGenerator.MAP_SIZE * MapGenerator.MAP_SIZE * 0.06
         for (let i = 0; i < 50; i++) {
             const tilesPlaced = this.tryPlaceWater()
             waterVolume -= tilesPlaced
@@ -277,7 +295,7 @@ export class MapGenerator {
                 return 0
             }
         }
-        pts.forEach(pt => {
+        pts.forEach((pt) => {
             this.location.setGroundElement(GroundType.WATER, pt)
         })
         return pts.length
@@ -286,7 +304,7 @@ export class MapGenerator {
     /**
      * @returns null if nothing crosses the threshold
      */
-    static waterNoise(threshold: number = .85, seed = Math.random()): [Point[], string] {
+    static waterNoise(threshold: number = 0.85, seed = Math.random()): [Point[], string] {
         const noise = new Noise(seed)
 
         const pts: Point[] = []
@@ -296,8 +314,11 @@ export class MapGenerator {
 
         for (let i = -MapGenerator.MAP_RANGE; i < MapGenerator.MAP_RANGE; i++) {
             for (let j = -MapGenerator.MAP_RANGE; j < MapGenerator.MAP_RANGE; j++) {
-                var value = noise.simplex2(i / (this.MAP_RANGE * noiseScale), j / (this.MAP_RANGE * noiseScale));
-                value = (value + 1)/2  // scale to 0-1
+                var value = noise.simplex2(
+                    i / (this.MAP_RANGE * noiseScale),
+                    j / (this.MAP_RANGE * noiseScale)
+                )
+                value = (value + 1) / 2 // scale to 0-1
                 if (value > threshold) {
                     str += "W"
                     validResult = true

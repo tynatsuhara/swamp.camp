@@ -11,11 +11,11 @@ export const Singletons = {
         if (!!s) {
             return s
         }
-    
+
         const supplied = supplier()
         singletons.set(type, supplied)
         return supplied
     },
 
-    destroy: () => singletons.clear()
+    destroy: () => singletons.clear(),
 }

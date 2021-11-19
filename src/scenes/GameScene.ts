@@ -31,20 +31,28 @@ import { Singletons } from "../Singletons"
 import { Particles } from "../graphics/Particles"
 
 export class GameScene {
-
     initialize() {
-        collisionEngine.setCollisionMatrix(new Map([
-            [CollisionEngine.DEFAULT_LAYER, [DroppedItem.COLLISION_LAYER, Dude.PLAYER_COLLISION_LAYER, Dude.NPC_COLLISION_LAYER]],
-            [Dude.PLAYER_COLLISION_LAYER, [Dude.NPC_COLLISION_LAYER]],
-            // [Barrier.PLAYER_ONLY, [Dude.PLAYER_COLLISION_LAYER]]
-        ]))
+        collisionEngine.setCollisionMatrix(
+            new Map([
+                [
+                    CollisionEngine.DEFAULT_LAYER,
+                    [
+                        DroppedItem.COLLISION_LAYER,
+                        Dude.PLAYER_COLLISION_LAYER,
+                        Dude.NPC_COLLISION_LAYER,
+                    ],
+                ],
+                [Dude.PLAYER_COLLISION_LAYER, [Dude.NPC_COLLISION_LAYER]],
+                // [Barrier.PLAYER_ONLY, [Dude.PLAYER_COLLISION_LAYER]]
+            ])
+        )
     }
 
     newGame() {
         Singletons.destroy()
 
         WorldTime.instance.initialize(TimeUnit.HOUR * 18.5)
-        
+
         // World must be initialized before we do anything else
         MapGenerator.instance.generateExterior()
 
@@ -58,18 +66,20 @@ export class GameScene {
 
         EventQueue.instance.addEvent({
             type: QueuedEventType.SIMULATE_NPCS,
-            time: WorldTime.instance.time + NPC.SCHEDULE_FREQUENCY
+            time: WorldTime.instance.time + NPC.SCHEDULE_FREQUENCY,
         })
     }
 
     getViews(updateViewsContext: UpdateViewsContext) {
-        const cameraOffset = Camera.instance.getUpdatedPosition(updateViewsContext.elapsedTimeMillis)
+        const cameraOffset = Camera.instance.getUpdatedPosition(
+            updateViewsContext.elapsedTimeMillis
+        )
 
         // full-screen text overlay that pauses gameplay
         const isTextOverlayActive = TextOverlayManager.instance.isActive
 
-        const uiEntities = isTextOverlayActive 
-            ? [TextOverlayManager.instance.getEntity()] 
+        const uiEntities = isTextOverlayActive
+            ? [TextOverlayManager.instance.getEntity()]
             : UIStateManager.instance.get(updateViewsContext.elapsedTimeMillis)
 
         const gameEntities: Entity[] = [
@@ -85,19 +95,22 @@ export class GameScene {
                 WorldTime.instance.getEntity(),
                 GroundRenderer.instance.getEntity(),
                 DudeSpawner.instance.getEntity(),
-                Particles.instance.getEntity(),
+                Particles.instance.getEntity()
             )
         }
 
-        return [{
-            zoom: Camera.ZOOM,
-            offset: cameraOffset,
-            entities: gameEntities
-        }, {
-            zoom: Camera.ZOOM,
-            offset: Point.ZERO,
-            entities: uiEntities
-        }]
+        return [
+            {
+                zoom: Camera.ZOOM,
+                offset: cameraOffset,
+                entities: gameEntities,
+            },
+            {
+                zoom: Camera.ZOOM,
+                offset: Point.ZERO,
+                entities: uiEntities,
+            },
+        ]
     }
 
     private getDebugEntity() {
@@ -111,13 +124,19 @@ export class GameScene {
 
         // vertical lines
         for (let i = -gridRange; i < gridRange; i++) {
-            const top = base.times(TILE_SIZE).plusX(i * TILE_SIZE).plusY(-gridRange * TILE_SIZE)
+            const top = base
+                .times(TILE_SIZE)
+                .plusX(i * TILE_SIZE)
+                .plusY(-gridRange * TILE_SIZE)
             lines.push(new LineRender(top, top.plusY(2 * gridRange * TILE_SIZE)))
         }
 
         // horizontal lines
         for (let i = -gridRange; i < gridRange; i++) {
-            const left = base.times(TILE_SIZE).plusX(-gridRange * TILE_SIZE).plusY(i * TILE_SIZE)
+            const left = base
+                .times(TILE_SIZE)
+                .plusX(-gridRange * TILE_SIZE)
+                .plusY(i * TILE_SIZE)
             lines.push(new LineRender(left, left.plusX(2 * gridRange * TILE_SIZE)))
         }
 

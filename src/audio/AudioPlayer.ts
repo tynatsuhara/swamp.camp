@@ -1,8 +1,7 @@
-import { debug } from "brigsby/dist/Debug";
-import { AudioUtils } from "./AudioUtils";
+import { debug } from "brigsby/dist/Debug"
+import { AudioUtils } from "./AudioUtils"
 
 export abstract class AudioPlayer {
-
     private readonly queueId: string
     private readonly volumeMultiplier: number
 
@@ -17,9 +16,9 @@ export abstract class AudioPlayer {
     }
 
     abstract playFromStart()
-    
+
     abstract stop()
-    
+
     fadeOut(duration = 1000): Promise<void> {
         if (duration === 0) {
             this.log(`skipping fade for ${this.fileName}`)
@@ -27,9 +26,14 @@ export abstract class AudioPlayer {
             return Promise.resolve()
         }
         this.log(`fading out ${this.fileName}`)
-        return AudioUtils.adjustVolume(this.fadeVolume, 0, v => {
-            this.setFadeVolume(v)
-        }, duration)
+        return AudioUtils.adjustVolume(
+            this.fadeVolume,
+            0,
+            (v) => {
+                this.setFadeVolume(v)
+            },
+            duration
+        )
     }
 
     fadeIn(duration = 1000): Promise<void> {
@@ -39,9 +43,14 @@ export abstract class AudioPlayer {
             return Promise.resolve()
         }
         this.log(`fading in ${this.fileName}`)
-        return AudioUtils.adjustVolume(this.fadeVolume, 1, v => {
-            this.setFadeVolume(v)
-        }, duration)
+        return AudioUtils.adjustVolume(
+            this.fadeVolume,
+            1,
+            (v) => {
+                this.setFadeVolume(v)
+            },
+            duration
+        )
     }
 
     setVolume(volume: number) {

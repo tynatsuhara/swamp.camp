@@ -35,27 +35,26 @@ export class SavedElement {
 }
 
 export class Elements {
-
     static get instance() {
         return Singletons.getOrCreate(Elements)
     }
 
     private readonly ELEMENT_FACTORIES: { [key: number]: ElementFactory } = {
-       [ElementType.TREE_ROUND]: new TreeFactory(ElementType.TREE_ROUND),
-       [ElementType.TREE_POINTY]: new TreeFactory(ElementType.TREE_POINTY),
-       [ElementType.ROCK]: new RockFactory(),
-       [ElementType.CAMPFIRE]: new CampfireFactory(),
-       [ElementType.TELEPORTER]: new TeleporterFactory(),
-       [ElementType.MUSHROOM]: new MushroomFactory(),
-       [ElementType.CHEST]: new ChestFactory(),
-       [ElementType.BED]: new BedFactory(),
-       [ElementType.TENT]: new TentFactory(),
-       [ElementType.HOUSE]: new HouseFactory(),
-       [ElementType.MINE_ENTRANCE]: new MineEntranceFactory(),
-       [ElementType.MINE_EXIT]: new MineExitFactory(),
-   }
+        [ElementType.TREE_ROUND]: new TreeFactory(ElementType.TREE_ROUND),
+        [ElementType.TREE_POINTY]: new TreeFactory(ElementType.TREE_POINTY),
+        [ElementType.ROCK]: new RockFactory(),
+        [ElementType.CAMPFIRE]: new CampfireFactory(),
+        [ElementType.TELEPORTER]: new TeleporterFactory(),
+        [ElementType.MUSHROOM]: new MushroomFactory(),
+        [ElementType.CHEST]: new ChestFactory(),
+        [ElementType.BED]: new BedFactory(),
+        [ElementType.TENT]: new TentFactory(),
+        [ElementType.HOUSE]: new HouseFactory(),
+        [ElementType.MINE_ENTRANCE]: new MineEntranceFactory(),
+        [ElementType.MINE_EXIT]: new MineExitFactory(),
+    }
 
-   getElementFactory(type: ElementType) {
-       return this.ELEMENT_FACTORIES[type]
-   }
+    getElementFactory(type: ElementType) {
+        return this.ELEMENT_FACTORIES[type]
+    }
 }
