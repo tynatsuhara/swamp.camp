@@ -169,8 +169,8 @@ export class WorldLocation {
      * @returns All the reasonable ground spots in the location.
      *          For exterior locations, excludes the very edge of the map.
      */
-    getGroundSpots() {
-        if (this.isInterior) {
+    getGroundSpots(forceGetAll = false) {
+        if (this.isInterior || forceGetAll) {
             return this.ground.keys()
         }
         return this.exteriorFleeingSpots()

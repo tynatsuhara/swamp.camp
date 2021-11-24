@@ -7,6 +7,7 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { DarknessMask } from "../world/DarknessMask"
+import { Ground } from "../world/ground/Ground"
 import { LightManager } from "../world/LightManager"
 import { LocationManager } from "../world/LocationManager"
 import { TimeUnit } from "../world/TimeUnit"
@@ -36,6 +37,7 @@ export class DudeSpawner extends Component {
 
     private spawn() {
         this.spawnDemons()
+        this.spawnSwampThings()
     }
 
     private spawnDemons() {
@@ -69,6 +71,34 @@ export class DudeSpawner extends Component {
                 const pt = Lists.oneOf(openPoints)
                 const type = Math.random() > 0.95 ? DudeType.DEMON_BRUTE : DudeType.HORNED_DEMON
                 DudeFactory.instance.new(type, pt.times(TILE_SIZE), l)
+            }
+        }
+    }
+
+    private spawnSwampThings() {
+        const l = LocationManager.instance.currentLocation
+        if (l.isInterior) {
+            return // don't spawn swamp things inside
+        }
+
+        const thingCount = Array.from(l.dudes.values()).filter(
+            (d) => d.type === DudeType.SWAMP_THING
+        )
+
+        const waterSpots = l
+            .getGroundSpots(true)
+            .filter((pt) => Ground.isWater(l.getGround(pt)?.type))
+
+        const goalCount = waterSpots.length / 50
+
+        // TODO: Some way to make swamp things not spawn?
+
+        if (thingCount.length < goalCount) {
+            const spawnCount = Math.min(waterSpots.length, goalCount - thingCount.length)
+            console.log(`spawning ${spawnCount} swamp things`)
+            for (let i = 0; i < spawnCount; i++) {
+                const pt = Lists.oneOf(waterSpots)
+                DudeFactory.instance.new(DudeType.SWAMP_THING, pt.times(TILE_SIZE), l)
             }
         }
     }
