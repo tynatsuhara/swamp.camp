@@ -1,9 +1,9 @@
 import { Component } from "brigsby/dist/Component"
+import { debug } from "brigsby/dist/Debug"
 import { UpdateData } from "brigsby/dist/Engine"
 import { InputKey } from "brigsby/dist/Input"
 import { Point } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util/Lists"
-import { StepSounds } from "../audio/StepSounds"
 import { Controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { PlaceElementDisplay } from "../ui/PlaceElementDisplay"
@@ -80,6 +80,8 @@ export class Player extends Component {
         if (this.dude.shield?.isBlocking()) {
             speed -= 0.4
         }
+
+        speed *= debug.speedMultiplier
 
         this._velocity = new Point(dx, dy)
 
