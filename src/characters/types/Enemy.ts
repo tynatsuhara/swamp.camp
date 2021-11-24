@@ -93,6 +93,14 @@ export class Enemy extends Component {
             )
         }
 
+        // npc.pathFindingHeuristic = (pt: Point, goal: Point) => {
+        //     const isByLand = [pt.plusX(1), pt.plusX(-1), pt.plusY(1), pt.plusY(-1)].some(
+        //         (ptAdjacent) => !Ground.isWater(dude.location.getGround(ptAdjacent)?.type)
+        //     )
+
+        //     return pt.distanceTo(goal) + (isByLand ? 5 : 0)
+        // }
+
         // only traverse water
         npc.pathIsOccupied = (pt: Point) => {
             return !Ground.isWater(dude.location.getGround(pt)?.type)
