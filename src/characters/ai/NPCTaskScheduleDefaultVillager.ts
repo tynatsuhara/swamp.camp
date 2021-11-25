@@ -5,15 +5,11 @@ import { TimeUnit } from "../../world/TimeUnit"
 import { WorldLocation } from "../../world/WorldLocation"
 import { WorldTime } from "../../world/WorldTime"
 import { Dude } from "../Dude"
-import { NPCSchedule, NPCSchedules } from "./NPCSchedule"
+import { NPCSchedules } from "./NPCSchedule"
 import { NPCTask } from "./NPCTask"
 import { NPCTaskContext } from "./NPCTaskContext"
 
 export class NPCTaskScheduleDefaultVillager extends NPCTask {
-    constructor(schedule: NPCSchedule) {
-        super()
-    }
-
     performTask(context: NPCTaskContext): void {
         const timeOfDay = WorldTime.instance.time % TimeUnit.DAY
 

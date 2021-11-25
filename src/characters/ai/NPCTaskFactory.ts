@@ -18,7 +18,7 @@ export class NPCTaskFactory {
             case NPCScheduleType.ROAM:
                 return new NPCTaskScheduleRoam()
             case NPCScheduleType.DEFAULT_VILLAGER:
-                return new NPCTaskScheduleDefaultVillager(schedule)
+                return new NPCTaskScheduleDefaultVillager()
             case NPCScheduleType.GO_TO_LOCATION:
                 return new NPCTaskScheduleGoToLocation(schedule)
             default:
