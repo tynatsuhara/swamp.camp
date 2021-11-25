@@ -1,12 +1,12 @@
-import { DudeFactory, DudeType } from "../../characters/DudeFactory"
-import { LocationManager } from "../LocationManager"
 import { NPCSchedules } from "../../characters/ai/NPCSchedule"
-import { NPC } from "../../characters/NPC"
-import { TILE_SIZE, pixelPtToTilePt } from "../../graphics/Tilesets"
-import { EventQueue } from "./EventQueue"
-import { WorldTime } from "../WorldTime"
-import { NotificationDisplay, Notifications } from "../../ui/NotificationDisplay"
+import { DudeFactory, DudeType } from "../../characters/DudeFactory"
 import { DudeSpawner } from "../../characters/DudeSpawner"
+import { NPC } from "../../characters/NPC"
+import { pixelPtToTilePt, TILE_SIZE } from "../../graphics/Tilesets"
+import { NotificationDisplay, Notifications } from "../../ui/NotificationDisplay"
+import { LocationManager } from "../LocationManager"
+import { WorldTime } from "../WorldTime"
+import { EventQueue } from "./EventQueue"
 
 export enum QueuedEventType {
     SIMULATE_NPCS,

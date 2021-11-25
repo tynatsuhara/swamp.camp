@@ -7,6 +7,8 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { DarknessMask } from "../world/DarknessMask"
+import { EventQueue } from "../world/events/EventQueue"
+import { QueuedEventType } from "../world/events/QueuedEvent"
 import { Ground } from "../world/ground/Ground"
 import { LightManager } from "../world/LightManager"
 import { LocationManager } from "../world/LocationManager"
@@ -35,9 +37,14 @@ export class DudeSpawner extends Component {
         ).some((d) => d.isAlive && d.factions.includes(DudeFaction.ORCS))
     }
 
+    getEntity() {
+        return new Entity([this])
+    }
+
     private spawn() {
         this.spawnDemons()
         this.spawnSwampThings()
+        this.checkForOrcSeige()
     }
 
     private spawnDemons() {
@@ -103,6 +110,16 @@ export class DudeSpawner extends Component {
         }
     }
 
+    checkForOrcSeige() {
+        if (!EventQueue.instance.containsEventType(QueuedEventType.ORC_SEIGE)) {
+            const nextSeigeTime = WorldTime.instance.future({ days: 2 + Math.random() * 3 })
+            EventQueue.instance.addEvent({
+                type: QueuedEventType.ORC_SEIGE,
+                time: nextSeigeTime,
+            })
+        }
+    }
+
     spawnOrcs() {
         setTimeout(
             () =>
@@ -129,9 +146,5 @@ export class DudeSpawner extends Component {
         Lists.range(0, 1 + Math.random() * 4).forEach(() =>
             DudeFactory.instance.new(DudeType.ORC_SHAMAN, spawnPos)
         )
-    }
-
-    getEntity() {
-        return new Entity([this])
     }
 }
