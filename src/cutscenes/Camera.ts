@@ -1,8 +1,9 @@
+import { debug } from "brigsby/dist/Debug"
 import { Point } from "brigsby/dist/Point"
-import { TILE_SIZE } from "../graphics/Tilesets"
-import { Dude } from "../characters/Dude"
-import { Maths } from "brigsby/dist/util/Maths"
 import { renderer } from "brigsby/dist/renderer/Renderer"
+import { Maths } from "brigsby/dist/util/Maths"
+import { Dude } from "../characters/Dude"
+import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { LocationManager } from "../world/LocationManager"
 
@@ -58,6 +59,11 @@ export class Camera {
         }
         if (this.dimensions.y > mapSize * TILE_SIZE) {
             yLimit = mapSize
+        }
+
+        if (debug.freeCamera) {
+            xLimit = Number.MAX_SAFE_INTEGER
+            yLimit = Number.MAX_SAFE_INTEGER
         }
 
         const trackedPoint = this.dudeTarget?.position ?? this.pointTarget

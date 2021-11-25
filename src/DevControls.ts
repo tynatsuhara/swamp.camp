@@ -119,6 +119,7 @@ export class DevControls extends Component {
 debug.autoPlay = debug.autoPlay || false
 debug.enableBlood = debug.enableBlood || false
 debug.enableDevControls = debug.enableDevControls || false
+debug.freeCamera = debug.freeCamera || false
 debug.godMode = debug.godMode || false
 debug.nightVision = debug.nightVision || false
 debug.showAudioLogs = debug.showAudioLogs || false
