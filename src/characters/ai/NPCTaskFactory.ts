@@ -1,11 +1,14 @@
-import { NPCTaskScheduleGoToSpot } from "./NPCTaskScheduleGoToSpot"
 import { NPCSchedule, NPCScheduleType } from "./NPCSchedule"
 import { NPCTask } from "./NPCTask"
-import { NPCTaskScheduleRoam } from "./NPCTaskScheduleRoam"
 import { NPCTaskScheduleDefaultVillager } from "./NPCTaskScheduleDefaultVillager"
 import { NPCTaskScheduleGoToLocation } from "./NPCTaskScheduleGoToLocation"
+import { NPCTaskScheduleGoToSpot } from "./NPCTaskScheduleGoToSpot"
+import { NPCTaskScheduleRoam } from "./NPCTaskScheduleRoam"
 
 export class NPCTaskFactory {
+    /**
+     * This function will be created on every update()
+     */
     static fromSchedule(schedule: NPCSchedule): NPCTask {
         switch (schedule.type) {
             case NPCScheduleType.DO_NOTHING:
@@ -19,7 +22,8 @@ export class NPCTaskFactory {
             case NPCScheduleType.GO_TO_LOCATION:
                 return new NPCTaskScheduleGoToLocation(schedule)
             default:
-                throw new Error(`invalid schedule: ${JSON.stringify(schedule)}`)
+                console.log(`invalid schedule: ${JSON.stringify(schedule)}`)
+                return null
         }
     }
 }
