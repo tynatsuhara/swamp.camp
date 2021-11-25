@@ -41,23 +41,8 @@ export class Villager extends Component {
             return !d.factions.includes(DudeFaction.VILLAGERS)
         }
 
-        // TODO figure out how to set these up properly
         if (dude.type === DudeType.DIP) {
             npc.setSchedule(NPCSchedules.newGoToSchedule(new Point(0, 0)))
-        } else if (dude.type === DudeType.HERALD) {
-            // TODO: Fix this to be dynamic
-            npc.setSchedule(NPCSchedules.newGoToSchedule(new Point(0, 0)))
-
-            // currently the HERALD events change his schedule so we need to reconcile that
-
-            // NPCSchedules.newGoToSchedule(
-            //     // filter out occupied points to not get stuck in the campfire
-            //     Lists.oneOf(
-            //         [new Point(-3, 0), new Point(-3, 1), new Point(-2, 0), new Point(-2, 1)].filter(
-            //             (pt) => !location.isOccupied(pt)
-            //         )
-            //     )
-            // )
         } else {
             npc.setSchedule(NPCSchedules.newDefaultVillagerSchedule())
         }
