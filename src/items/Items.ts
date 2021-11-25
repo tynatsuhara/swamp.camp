@@ -1,15 +1,15 @@
-import { Tilesets } from "../graphics/Tilesets"
+import { Collider } from "brigsby/dist/collision/Collider"
 import { Entity } from "brigsby/dist/Entity"
-import { LocationManager } from "../world/LocationManager"
-import { DroppedItem } from "./DroppedItem"
 import { Point } from "brigsby/dist/Point"
 import { SpriteSource } from "brigsby/dist/sprites/SpriteSource"
-import { Collider } from "brigsby/dist/collision/Collider"
-import { ElementType } from "../world/elements/Elements"
 import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
-import { WeaponType } from "../characters/weapons/WeaponType"
 import { Player } from "../characters/Player"
 import { ShieldType } from "../characters/weapons/ShieldType"
+import { WeaponType } from "../characters/weapons/WeaponType"
+import { Tilesets } from "../graphics/Tilesets"
+import { ElementType } from "../world/elements/Elements"
+import { LocationManager } from "../world/LocationManager"
+import { DroppedItem } from "./DroppedItem"
 
 export class ItemMetadata {
     readonly displayName: string
@@ -66,6 +66,7 @@ export enum Item {
     CHEST,
     BED,
     MINE_ENTRANCE,
+    CHURCH,
 
     // weapon values should match the WeaponType enum so we can cast them
     KNIFE = WeaponType.KNIFE,
@@ -170,6 +171,12 @@ export const ITEM_METADATA_MAP = {
     }),
     [Item.HOUSE]: new ItemMetadata({
         displayName: "House",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("house"),
+        stackLimit: 1,
+        element: ElementType.HOUSE,
+    }),
+    [Item.CHURCH]: new ItemMetadata({
+        displayName: "Church",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("house"),
         stackLimit: 1,
         element: ElementType.HOUSE,

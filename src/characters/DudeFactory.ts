@@ -1,29 +1,29 @@
+import { Component } from "brigsby/dist/Component"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
-import { Component } from "brigsby/dist/Component"
-import { Player } from "./Player"
+import { Lists } from "brigsby/dist/util/Lists"
+import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
+import { Inventory } from "../items/Inventory"
+import { Item } from "../items/Items"
+import { DudeSaveState } from "../saves/DudeSaveState"
+import { newUUID } from "../saves/uuid"
+import { Singletons } from "../Singletons"
+import { LocationManager } from "../world/LocationManager"
+import { Residence } from "../world/residences/Residence"
+import { WorldLocation } from "../world/WorldLocation"
+import { NPCSchedules } from "./ai/NPCSchedule"
+import { BERTO_STARTING_DIALOGUE } from "./dialogue/BertoDialogue"
+import { EMPTY_DIALOGUE } from "./dialogue/Dialogue"
 import { Dude } from "./Dude"
 import { NPC } from "./NPC"
-import { LocationManager } from "../world/LocationManager"
-import { Enemy } from "./types/Enemy"
-import { DudeSaveState } from "../saves/DudeSaveState"
-import { Inventory } from "../items/Inventory"
-import { EMPTY_DIALOGUE } from "./dialogue/Dialogue"
-import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
-import { Villager } from "./types/Villager"
-import { NPCSchedules } from "./ai/NPCSchedule"
-import { WorldLocation } from "../world/WorldLocation"
-import { Lists } from "brigsby/dist/util/Lists"
-import { WeaponType } from "./weapons/WeaponType"
-import { Item } from "../items/Items"
-import { BERTO_STARTING_DIALOGUE } from "./dialogue/BertoDialogue"
-import { ShroomNPC } from "./types/ShroomNPC"
-import { newUUID } from "../saves/uuid"
-import { Centaur } from "./types/Centaur"
-import { ShieldType } from "./weapons/ShieldType"
-import { Singletons } from "../Singletons"
-import { Residence } from "../world/residences/Residence"
+import { Player } from "./Player"
 import { AquaticNPC } from "./types/AquaticNPC"
+import { Centaur } from "./types/Centaur"
+import { Enemy } from "./types/Enemy"
+import { ShroomNPC } from "./types/ShroomNPC"
+import { Villager } from "./types/Villager"
+import { ShieldType } from "./weapons/ShieldType"
+import { WeaponType } from "./weapons/WeaponType"
 
 export enum DudeFaction {
     VILLAGERS,
@@ -139,6 +139,7 @@ export class DudeFactory {
                 dialogue = BERTO_STARTING_DIALOGUE
                 additionalComponents = [
                     new NPC(
+                        // TODO: Fix this to be dynamic
                         NPCSchedules.newGoToSchedule(
                             // filter out occupied points to not get stuck in the campfire
                             Lists.oneOf(
