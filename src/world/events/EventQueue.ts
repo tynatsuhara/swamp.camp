@@ -21,6 +21,14 @@ export class EventQueue {
                 time: WorldTime.instance.tomorrow(),
             })
         }
+
+        window["eventQueue"] = () =>
+            console.log(
+                EventQueue.instance.heap.getContents(true).map((data) => ({
+                    ...data,
+                    type: QueuedEventType[data.type], // print a human-readable type
+                }))
+            )
     }
 
     addEvent(event: QueuedEventData) {
@@ -38,7 +46,7 @@ export class EventQueue {
         return this.heap.getContents()
     }
 
-    private containsEventType(type: QueuedEventType) {
+    containsEventType(type: QueuedEventType) {
         return this.heap.getContents().some((data) => data.type === type)
     }
 }
