@@ -7,6 +7,7 @@ import { LocationManager } from "../../world/LocationManager"
 import { Residence } from "../../world/residences/Residence"
 import { WorldTime } from "../../world/WorldTime"
 import { DudeType } from "../DudeFactory"
+import { Berto } from "../types/Berto"
 import {
     dialogue,
     DialogueInstance,
@@ -98,9 +99,13 @@ const fetchNpcDialogue = (): DialogueInstance => {
     const criminalOption = new DialogueOption("Bring me a criminal.", () => {
         openHouses[0].setResidentPending()
         EventQueue.instance.addEvent({
-            type: QueuedEventType.HERALD_DEPARTURE,
+            type: QueuedEventType.HERALD_DEPARTURE_CHECK,
             time: WorldTime.instance.time,
         })
+        LocationManager.instance.currentLocation
+            .getDude(DudeType.HERALD)
+            .entity.getComponent(Berto)
+            .updateSchedule()
         return new NextDialogue(BERT_LEAVING, true)
     })
 

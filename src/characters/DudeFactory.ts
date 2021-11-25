@@ -11,13 +11,13 @@ import { Singletons } from "../Singletons"
 import { LocationManager } from "../world/LocationManager"
 import { Residence } from "../world/residences/Residence"
 import { WorldLocation } from "../world/WorldLocation"
-import { NPCSchedules } from "./ai/NPCSchedule"
 import { BERTO_STARTING_DIALOGUE } from "./dialogue/BertoDialogue"
 import { EMPTY_DIALOGUE } from "./dialogue/Dialogue"
 import { Dude } from "./Dude"
 import { NPC } from "./NPC"
 import { Player } from "./Player"
 import { AquaticNPC } from "./types/AquaticNPC"
+import { Berto } from "./types/Berto"
 import { Centaur } from "./types/Centaur"
 import { Enemy } from "./types/Enemy"
 import { ShroomNPC } from "./types/ShroomNPC"
@@ -125,10 +125,7 @@ export class DudeFactory {
                 animationName = "lizard_f"
                 maxHealth = Number.MAX_SAFE_INTEGER
                 speed *= 0.7
-                additionalComponents = [
-                    new NPC(NPCSchedules.newGoToSchedule(new Point(0, 0))),
-                    new Villager(),
-                ]
+                additionalComponents = [new NPC(), new Villager()]
                 window["dip"] = additionalComponents[0]
                 break
             }
@@ -137,23 +134,7 @@ export class DudeFactory {
                 maxHealth = Number.MAX_SAFE_INTEGER
                 speed *= 0.6
                 dialogue = BERTO_STARTING_DIALOGUE
-                additionalComponents = [
-                    new NPC(
-                        // TODO: Fix this to be dynamic
-                        NPCSchedules.newGoToSchedule(
-                            // filter out occupied points to not get stuck in the campfire
-                            Lists.oneOf(
-                                [
-                                    new Point(-3, 0),
-                                    new Point(-3, 1),
-                                    new Point(-2, 0),
-                                    new Point(-2, 1),
-                                ].filter((pt) => !location.isOccupied(pt))
-                            )
-                        )
-                    ),
-                    new Villager(),
-                ]
+                additionalComponents = [new NPC(), new Villager(), new Berto()]
                 window["berto"] = additionalComponents[0]
                 break
             }
@@ -198,7 +179,7 @@ export class DudeFactory {
                 factions = [DudeFaction.DEMONS]
                 animationName = "chort"
                 weapon = WeaponType.UNARMED
-                additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new Enemy()]
+                additionalComponents = [new NPC(), new Enemy()]
                 maxHealth = 2
                 speed *= 0.6 + Math.random() / 5
                 break
@@ -207,7 +188,7 @@ export class DudeFactory {
                 factions = [DudeFaction.DEMONS]
                 animationName = "big_demon"
                 weapon = WeaponType.UNARMED
-                additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new Enemy()]
+                additionalComponents = [new NPC(), new Enemy()]
                 maxHealth = 8
                 speed *= 1 + 0.3 * Math.random()
                 colliderSize = bigColliderSize
@@ -216,10 +197,7 @@ export class DudeFactory {
             case DudeType.SHROOM: {
                 factions = [DudeFaction.SHROOMS]
                 animationName = "SmallMushroom"
-                additionalComponents = [
-                    new NPC(NPCSchedules.newFreeRoamSchedule()),
-                    new ShroomNPC(),
-                ]
+                additionalComponents = [new NPC(), new ShroomNPC()]
                 maxHealth = 2
                 speed *= 0.6 + Math.random() / 5
                 break
@@ -229,16 +207,13 @@ export class DudeFactory {
                 maxHealth = 4
                 speed *= 0.6
                 // TODO: add a new type of schedule for a villager with a home
-                additionalComponents = [
-                    new NPC(NPCSchedules.newDefaultVillagerSchedule()),
-                    new Villager(),
-                ]
+                additionalComponents = [new NPC(), new Villager()]
                 break
             }
             case DudeType.CENTAUR: {
                 factions = [DudeFaction.CENTAURS]
                 animationName = "Centaur_M"
-                additionalComponents = [new NPC(NPCSchedules.newFreeRoamSchedule()), new Centaur()]
+                additionalComponents = [new NPC(), new Centaur()]
                 maxHealth = 2
                 speed *= 0.5
                 break
@@ -285,11 +260,7 @@ export class DudeFactory {
                 factions = [DudeFaction.AQUATIC]
                 animationName = "swampy"
                 weapon = WeaponType.UNARMED
-                additionalComponents = [
-                    new NPC(NPCSchedules.newFreeRoamSchedule()),
-                    new Enemy(),
-                    new AquaticNPC(),
-                ]
+                additionalComponents = [new NPC(), new Enemy(), new AquaticNPC()]
                 maxHealth = 2
                 speed *= 0.55
                 break

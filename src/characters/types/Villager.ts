@@ -1,12 +1,13 @@
 import { Component } from "brigsby/dist/Component"
-import { Dude } from "../Dude"
-import { NPC } from "../NPC"
-import { DudeFaction } from "../DudeFactory"
-import { ShroomNPC } from "./ShroomNPC"
-import { Centaur } from "./Centaur"
-import { LightManager } from "../../world/LightManager"
+import { Point } from "brigsby/dist/Point"
 import { Ground } from "../../world/ground/Ground"
-import { pixelPtToTilePt } from "../../graphics/Tilesets"
+import { LightManager } from "../../world/LightManager"
+import { NPCSchedules } from "../ai/NPCSchedule"
+import { Dude } from "../Dude"
+import { DudeFaction, DudeType } from "../DudeFactory"
+import { NPC } from "../NPC"
+import { Centaur } from "./Centaur"
+import { ShroomNPC } from "./ShroomNPC"
 
 export class Villager extends Component {
     awake() {
@@ -38,6 +39,27 @@ export class Villager extends Component {
             }
 
             return !d.factions.includes(DudeFaction.VILLAGERS)
+        }
+
+        // TODO figure out how to set these up properly
+        if (dude.type === DudeType.DIP) {
+            npc.setSchedule(NPCSchedules.newGoToSchedule(new Point(0, 0)))
+        } else if (dude.type === DudeType.HERALD) {
+            // TODO: Fix this to be dynamic
+            npc.setSchedule(NPCSchedules.newGoToSchedule(new Point(0, 0)))
+
+            // currently the HERALD events change his schedule so we need to reconcile that
+
+            // NPCSchedules.newGoToSchedule(
+            //     // filter out occupied points to not get stuck in the campfire
+            //     Lists.oneOf(
+            //         [new Point(-3, 0), new Point(-3, 1), new Point(-2, 0), new Point(-2, 1)].filter(
+            //             (pt) => !location.isOccupied(pt)
+            //         )
+            //     )
+            // )
+        } else {
+            npc.setSchedule(NPCSchedules.newDefaultVillagerSchedule())
         }
     }
 }

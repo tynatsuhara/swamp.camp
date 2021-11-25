@@ -16,6 +16,7 @@ export type NPCSchedule = {
 
 /**
  * Creates simple schedule objects which can be directly serialized
+ * This will be translated into an NPCTask in {@link NPCTaskFactory}
  */
 export const NPCSchedules = {
     SCHEDULE_KEY: "sch",

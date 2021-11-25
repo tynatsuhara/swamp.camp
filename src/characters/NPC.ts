@@ -40,18 +40,18 @@ export class NPC extends Component {
         return WorldTime.instance.time % TimeUnit.DAY
     }
 
-    constructor(defaultSchedule: NPCSchedule = NPCSchedules.newNoOpSchedule()) {
+    constructor() {
         super()
 
         this.awake = () => {
             this.dude = this.entity.getComponent(Dude)
+
+            // set a default schedule
             if (!this.dude.blob[NPCSchedules.SCHEDULE_KEY]) {
-                this.setSchedule(defaultSchedule)
+                this.setSchedule(NPCSchedules.newFreeRoamSchedule())
             }
         }
     }
-
-    awake() {}
 
     start() {
         this.doWhileLiving(() => this.checkForEnemies(), 1000 + 1000 * Math.random())
