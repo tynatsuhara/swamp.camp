@@ -110,7 +110,7 @@ export class DudeSpawner extends Component {
         }
     }
 
-    checkForOrcSeige() {
+    private checkForOrcSeige() {
         if (!EventQueue.instance.containsEventType(QueuedEventType.ORC_SEIGE)) {
             const nextSeigeTime = WorldTime.instance.future({ days: 2 + Math.random() * 3 })
             EventQueue.instance.addEvent({
