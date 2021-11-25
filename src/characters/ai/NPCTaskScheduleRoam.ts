@@ -3,7 +3,6 @@ import { Lists } from "brigsby/dist/util/Lists"
 import { pixelPtToTilePt, TILE_SIZE } from "../../graphics/Tilesets"
 import { Ground } from "../../world/ground/Ground"
 import { LightManager } from "../../world/LightManager"
-import { Dude } from "../Dude"
 import { DudeFaction } from "../DudeFactory"
 import { NPCTask } from "./NPCTask"
 import { NPCTaskContext } from "./NPCTaskContext"
@@ -22,7 +21,9 @@ export class NPCTaskScheduleRoam extends NPCTask {
             const inWater = Ground.isWater(location.getGround(tilePos)?.type)
             context.roam(inWater ? 1 : 0.2, {
                 goalOptionsSupplier: () =>
-                    this.getTilesAround(context.dude, tilePos, inWater ? 5 : 15),
+                    this.getTilesAround(tilePos, inWater ? 5 : 15).filter((pt) =>
+                        Ground.isWater(context.dude.location.getGround(pt)?.type)
+                    ),
                 pauseEveryMillis: inWater ? 2500 + 2500 * Math.random() : 0,
                 pauseForMillis: inWater ? 2500 + 5000 * Math.random() : 0,
             })
@@ -31,12 +32,11 @@ export class NPCTaskScheduleRoam extends NPCTask {
         }
     }
 
-    private getTilesAround(dude: Dude, point: Point, range: number) {
+    private getTilesAround(point: Point, range: number) {
         const shift = new Point(range / 2, range / 2).apply(Math.floor)
 
         return Lists.range(0, range)
             .flatMap((row) => Lists.range(0, range).map((col) => new Point(row, col)))
             .map((pt) => pt.plus(point).minus(shift))
-            .filter((pt) => Ground.isWater(dude.location.getGround(pt)?.type))
     }
 }
