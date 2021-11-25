@@ -27,13 +27,13 @@ export class Berto extends Component {
             // off the map, do nothing
             npc.setSchedule(NPCSchedules.newNoOpSchedule())
         } else {
-            const location = dude.location
+            // TODO update this to be more dynamic, right now it will probably break if these are all occupied
             const pts = [new Point(-3, 0), new Point(-3, 1), new Point(-2, 0), new Point(-2, 1)]
 
             npc.setSchedule(
                 NPCSchedules.newGoToSchedule(
                     // filter out occupied points to not get stuck in the campfire
-                    Lists.oneOf(pts.filter((pt) => !location.isOccupied(pt)))
+                    Lists.oneOf(pts.filter((pt) => !dude.location.isOccupied(pt)))
                 )
             )
         }
