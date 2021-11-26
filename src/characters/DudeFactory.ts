@@ -306,7 +306,7 @@ export class DudeFactory {
         const residences = LocationManager.instance
             .exterior()
             .getElements()
-            .map((e) => e.entity.getComponent(Residence))
+            .flatMap((e) => e.entity.getComponents(Residence))
             .filter((e) => !!e)
 
         const hasResidence = residences.some((residence) => residence.isHomeOf(uuid))

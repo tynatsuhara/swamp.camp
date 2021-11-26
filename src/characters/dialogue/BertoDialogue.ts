@@ -83,7 +83,7 @@ export const BERTO_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
 const fetchNpcDialogue = (): DialogueInstance => {
     const allResidences = LocationManager.instance.currentLocation
         .getElements()
-        .map((e) => e.entity.getComponent(Residence))
+        .flatMap((e) => e.entity.getComponents(Residence))
 
     const houseableTypes = [DudeType.VILLAGER, DudeType.NUN, DudeType.BISHOP]
 

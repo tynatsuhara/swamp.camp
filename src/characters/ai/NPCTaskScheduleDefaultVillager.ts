@@ -43,7 +43,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         const houses = LocationManager.instance
             .exterior()
             .getElements()
-            .map((el) => el.entity.getComponent(Residence))
+            .flatMap((el) => el.entity.getComponents(Residence))
             .filter((residence) => residence?.isHomeOf(dude.uuid))
 
         if (houses.length > 0) {

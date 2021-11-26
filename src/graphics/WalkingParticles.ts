@@ -4,11 +4,10 @@ import { UpdateData } from "brigsby/dist/Engine"
 import { Point } from "brigsby/dist/Point"
 import { Dude } from "../characters/Dude"
 import { Color } from "../ui/Color"
-import { Ground, GroundType } from "../world/ground/Ground"
+import { Ground } from "../world/ground/Ground"
 import { GroundRenderer } from "../world/GroundRenderer"
 import { LocationManager } from "../world/LocationManager"
 import { Particles } from "./Particles"
-import { pixelPtToTilePt } from "./Tilesets"
 
 const MILLIS_BETWEEN_EMISSIONS = 50
 const LIFESPAN_MILLIS = 300
@@ -41,8 +40,10 @@ export class WalkingParticles extends Component {
             )
         }
 
-        // Conditions for not showing walking particles
-        if (this.dude.isJumping || LocationManager.instance.currentLocation.isInterior) {
+        const doNotShowParticles =
+            this.dude.isJumping || LocationManager.instance.currentLocation.isInterior
+
+        if (doNotShowParticles) {
             // set to 0 so that particles will be emitted immediately once it makes sense
             this.timeUntilNextEmission = 0
             return

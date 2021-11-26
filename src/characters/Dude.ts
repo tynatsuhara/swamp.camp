@@ -5,8 +5,8 @@ import { UpdateData } from "brigsby/dist/Engine"
 import { Point } from "brigsby/dist/Point"
 import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
 import { AnimatedSpriteComponent } from "brigsby/dist/sprites/AnimatedSpriteComponent"
-import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { StepSounds } from "../audio/StepSounds"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { DeathCutscene } from "../cutscenes/DeathCutscene"
@@ -20,9 +20,11 @@ import { DudeSaveState } from "../saves/DudeSaveState"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
 import { HUD } from "../ui/HUD"
+import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Interactable } from "../world/elements/Interactable"
 import { Ground, GroundType } from "../world/ground/Ground"
+import { Residence } from "../world/residences/Residence"
 import { WorldLocation } from "../world/WorldLocation"
 import { DialogueSource, EMPTY_DIALOGUE, getDialogue } from "./dialogue/Dialogue"
 import { DudeAnimationUtils } from "./DudeAnimationUtils"
@@ -34,8 +36,6 @@ import { ShieldType } from "./weapons/ShieldType"
 import { Weapon } from "./weapons/Weapon"
 import { WeaponFactory } from "./weapons/WeaponFactory"
 import { WeaponType } from "./weapons/WeaponType"
-import { NotificationDisplay } from "../ui/NotificationDisplay"
-import { Residence } from "../world/residences/Residence"
 
 export class Dude extends Component implements DialogueSource {
     static readonly PLAYER_COLLISION_LAYER = "playa"
@@ -328,7 +328,7 @@ export class Dude extends Component implements DialogueSource {
             // If they have a home, mark it as vacant
             this.location
                 .getElements()
-                .map((e) => e.entity.getComponent(Residence))
+                .flatMap((e) => e.entity.getComponents(Residence))
                 .filter((residence) => residence?.isHomeOf(this.uuid))
                 .forEach((residence) => residence.evictResident(this.uuid))
 
