@@ -111,7 +111,7 @@ export class MainMenuScene {
         this.plumes.position = menuTop
         const knightPos = menuTop
             .minus(this.knight.transform.dimensions.floorDiv(2).plusY(24))
-            .plusX(-15)
+            .plusX(-17)
             .plusY(-37)
         this.knight.transform.position = knightPos
 
@@ -278,7 +278,7 @@ export class MainMenuScene {
         const campfirePos = new Point(0.5, 0)
             .times(TILE_SIZE)
             .plus(offset)
-            .plusX(6)
+            .plusX(8)
             .plusY(20)
             .apply(Math.floor)
         components.push(
