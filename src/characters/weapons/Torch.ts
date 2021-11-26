@@ -1,4 +1,3 @@
-import { AwakeData } from "brigsby/dist/Engine"
 import { Point } from "brigsby/dist/Point"
 import { FireParticles } from "../../graphics/FireParticles"
 import { TILE_SIZE } from "../../graphics/Tilesets"
@@ -11,20 +10,27 @@ import { ShieldType } from "./ShieldType"
  * A torch, which is a short-lived lantern that can be used to burn shit
  */
 export class Torch extends Shield {
-    static readonly DIAMETER = 100
+    static readonly DIAMETER = 100 // TODO add lifespan
+
+    private particles: FireParticles
 
     constructor() {
-        super(ShieldType.TORCH, "tool_lantern")
+        super(ShieldType.TORCH, "tool_torch")
     }
 
-    awake(awakeData: AwakeData) {
-        super.awake(awakeData)
+    start() {
         this.update() // set up the light
-        this.entity.addComponent(new FireParticles(2, () => this.getPosition()))
+        this.particles = this.entity.addComponent(
+            new FireParticles(
+                3,
+                () => this.getPosition().plus(this.transform.position).minus(new Point(9, 6)),
+                () => this.transform.depth + 0.1
+            )
+        )
     }
 
     update() {
-        this.transform.position = this.getPosition().minus(new Point(8, 16))
+        this.transform.position = this.getPosition()
 
         this.transform.depth = -0.5
 
@@ -39,6 +45,7 @@ export class Torch extends Shield {
     }
 
     delete() {
+        this.particles.delete()
         this.removeLight()
         super.delete()
     }
@@ -60,6 +67,8 @@ export class Torch extends Shield {
     }
 
     private getPosition() {
-        return this.dude.animation.transform.dimensions.plus(this.dude.getAnimationOffsetPosition())
+        return this.dude.animation.transform.dimensions
+            .plus(this.dude.getAnimationOffsetPosition())
+            .minus(new Point(4, 18))
     }
 }

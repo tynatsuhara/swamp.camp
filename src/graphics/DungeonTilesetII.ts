@@ -1,7 +1,7 @@
-import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
+import { assets } from "brigsby/dist/Assets"
 import { Point } from "brigsby/dist/Point"
 import { SpriteAnimation } from "brigsby/dist/sprites/SpriteAnimation"
-import { assets } from "brigsby/dist/Assets"
+import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 
 const map = new Map(
     `
@@ -143,6 +143,7 @@ const map = new Map(
     weapon_shovel 328 183 8 24
 
     tool_lantern 336 192 16 16
+    tool_torch 352 192 6 16
 
     tiny_zombie_idle_anim 368 16 16 16 4
     tiny_zombie_run_anim 432 16 16 16 4

@@ -5,6 +5,7 @@ import { Bed } from "../../world/elements/Bed"
 import { Campfire } from "../../world/elements/Campfire"
 import { TimeUnit } from "../../world/TimeUnit"
 import { Player } from "../Player"
+import { ShieldType } from "../weapons/ShieldType"
 import {
     dialogue,
     DialogueInstance,
@@ -78,7 +79,7 @@ export const ITEM_DIALOGUES: { [key: string]: () => DialogueInstance } = {
         if (logCount > 0) {
             options.push(
                 new DialogueOption("Take a log", () => {
-                    // TODO add torch to player's hand
+                    Player.instance.dude.setShield(ShieldType.TORCH)
                     return completeDialogue(-1)()
                 })
             )

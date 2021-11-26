@@ -1,4 +1,3 @@
-import { AwakeData } from "brigsby/dist/Engine"
 import { Point } from "brigsby/dist/Point"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { LightManager } from "../../world/LightManager"
@@ -14,11 +13,6 @@ export class Lantern extends Shield {
 
     constructor() {
         super(ShieldType.LANTERN, "tool_lantern")
-    }
-
-    awake(awakeData: AwakeData) {
-        super.awake(awakeData)
-        this.update() // set up the light
     }
 
     update() {
