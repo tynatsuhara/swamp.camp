@@ -45,6 +45,7 @@ export class DudeSpawner extends Component {
         this.spawnDemons()
         this.spawnSwampThings()
         this.checkForOrcSeige()
+        this.spawnWildlife()
     }
 
     private spawnDemons() {
@@ -129,14 +130,9 @@ export class DudeSpawner extends Component {
                 }),
             6500
         )
-        const extSize = LocationManager.instance.exterior().size
-        const spawnSide = (((Math.random() > 0.5 ? 1 : -1) * extSize) / 2) * TILE_SIZE
-        const spawnMiddle = Math.random() * extSize * TILE_SIZE - extSize / 2
-        const spawnPos =
-            Math.random() > 0.5
-                ? new Point(spawnSide, spawnMiddle)
-                : new Point(spawnMiddle, spawnSide)
-        console.log(spawnPos)
+
+        const spawnPos = this.getSpawnPosOffMap()
+
         Lists.range(0, 5 + Math.random() * 10).forEach(() =>
             DudeFactory.instance.new(DudeType.ORC_WARRIOR, spawnPos)
         )
@@ -146,5 +142,39 @@ export class DudeSpawner extends Component {
         Lists.range(0, 1 + Math.random() * 4).forEach(() =>
             DudeFactory.instance.new(DudeType.ORC_SHAMAN, spawnPos)
         )
+    }
+
+    private spawnWildlife() {
+        const l = LocationManager.instance.currentLocation
+
+        if (this.shouldRandomlySpawn(TimeUnit.DAY * 7)) {
+            DudeFactory.instance.new(DudeType.BEAR, this.getSpawnPosOffMap())
+        }
+
+        if (this.shouldRandomlySpawn(TimeUnit.DAY * 3)) {
+            const wolves = 2 + Math.random() * 4
+            const spawnPos = this.getSpawnPosOffMap()
+            for (let i = 0; i < wolves; i++) {
+                DudeFactory.instance.new(DudeType.WOLF, spawnPos)
+            }
+        }
+    }
+
+    /**
+     * @returns true if the creature should spawn based on randomness and averageMillisBetweenSpawns
+     */
+    private shouldRandomlySpawn(averageMillisBetweenSpawns: number) {
+        const probability = 1 / (averageMillisBetweenSpawns / DudeSpawner.INTERVAL_MILLIS)
+        console.log(`probability of spawning: ${probability}`)
+        return Math.random() < probability
+    }
+
+    private getSpawnPosOffMap() {
+        const extSize = LocationManager.instance.exterior().size
+        const spawnSide = (((Math.random() > 0.5 ? 1 : -1) * extSize) / 2) * TILE_SIZE
+        const spawnMiddle = Math.random() * extSize * TILE_SIZE - extSize / 2
+        return Math.random() > 0.5
+            ? new Point(spawnSide, spawnMiddle)
+            : new Point(spawnMiddle, spawnSide)
     }
 }
