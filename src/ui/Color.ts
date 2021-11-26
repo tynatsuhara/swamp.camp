@@ -29,7 +29,7 @@ export enum Color {
     TAN = "#d3bfa9",
     LIGHT_BROWN = "#aa8d7a",
     BROWN = "#775c55",
-    DARK_BROWN = "#483b3ai",
+    DARK_BROWN = "#483b3a",
 }
 
 const toHex = (c: number) => {
