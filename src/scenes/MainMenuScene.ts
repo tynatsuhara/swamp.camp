@@ -6,15 +6,17 @@ import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { BasicRenderComponent } from "brigsby/dist/renderer/BasicRenderComponent"
 import { ImageRender } from "brigsby/dist/renderer/ImageRender"
-import { AnimatedSpriteComponent } from "brigsby/dist/sprites/AnimatedSpriteComponent"
-import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
+import { renderer } from "brigsby/dist/renderer/Renderer"
 import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Lists } from "brigsby/dist/util/Lists"
 import { View } from "brigsby/dist/View"
 import { Ambiance } from "../audio/Ambiance"
 import { Music } from "../audio/Music"
 import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
+import { FireParticles } from "../graphics/FireParticles"
+import { Particles } from "../graphics/Particles"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { QuestGame } from "../quest_game"
 import { saveManager } from "../SaveManager"
@@ -22,10 +24,9 @@ import { Save } from "../saves/SaveGame"
 import { Color } from "../ui/Color"
 import { MainMenuButtonSection } from "../ui/MainMenuButtonSection"
 import { CUSTOMIZATION_OPTIONS, PlumePicker } from "../ui/PlumePicker"
+import { TEXT_SIZE } from "../ui/Text"
 import { UIStateManager } from "../ui/UIStateManager"
 import { DarknessMask } from "../world/DarknessMask"
-import { renderer } from "brigsby/dist/renderer/Renderer"
-import { TEXT_SIZE } from "../ui/Text"
 
 const ZOOM = 3
 
@@ -273,7 +274,7 @@ export class MainMenuScene {
             }
         }
 
-        // campfire
+        // campfire stuff (unfortunately copied from Campfire.ts)
         const campfirePos = new Point(0.5, 0)
             .times(TILE_SIZE)
             .plus(offset)
@@ -281,17 +282,26 @@ export class MainMenuScene {
             .plusY(20)
             .apply(Math.floor)
         components.push(
-            new AnimatedSpriteComponent(
-                [Tilesets.instance.outdoorTiles.getTileSetAnimation("campfireOn", 2, 200)],
-                new SpriteTransform(campfirePos)
+            new SpriteComponent(
+                Tilesets.instance.outdoorTiles.getTileSource("campfireRing"),
+                SpriteTransform.new({ position: campfirePos })
             )
+        )
+        components.push(
+            new SpriteComponent(
+                Tilesets.instance.outdoorTiles.getTileSource("campfireLogs"),
+                SpriteTransform.new({ position: campfirePos })
+            )
+        )
+        components.push(
+            new FireParticles(4, () => campfirePos.plus(new Point(TILE_SIZE / 2 - 1, 7)))
         )
 
         // darkness
         this.darkness = new DarknessMask(false)
         this.darkness.addLightCircle(campfirePos.plusX(TILE_SIZE / 2).plusY(TILE_SIZE / 2), 72)
 
-        return [new Entity(components)]
+        return [new Entity(components), Particles.instance.getEntity()]
     }
 
     private previewingSlotPlume: number

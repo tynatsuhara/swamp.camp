@@ -2,7 +2,6 @@ import { BoxCollider } from "brigsby/dist/collision/BoxCollider"
 import { Component } from "brigsby/dist/Component"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
-import { AnimatedSpriteComponent } from "brigsby/dist/sprites/AnimatedSpriteComponent"
 import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Lists } from "brigsby/dist/util/Lists"
@@ -13,6 +12,7 @@ import {
     WOOD_NEEDED_FOR_CAMPFIRE,
 } from "../../characters/dialogue/DipDialogue"
 import { CAMPFIRE_DIALOGUE } from "../../characters/dialogue/ItemDialogues"
+import { FireParticles } from "../../graphics/FireParticles"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
@@ -36,37 +36,51 @@ export class CampfireFactory extends ElementFactory {
         const scaledPos = pos.times(TILE_SIZE)
         const depth = scaledPos.y + TILE_SIZE - 10
 
-        const campfireOff = e.addComponent(
+        const campfireSprite = e.addComponent(
             new SpriteComponent(
-                Tilesets.instance.outdoorTiles.getTileSource("campfireOff"),
-                new SpriteTransform(scaledPos)
+                Tilesets.instance.outdoorTiles.getTileSource("campfireRing"),
+                SpriteTransform.new({ position: scaledPos, depth })
             )
         )
-        campfireOff.transform.depth = depth
 
-        const campfireOn = e.addComponent(
-            new AnimatedSpriteComponent(
-                [Tilesets.instance.outdoorTiles.getTileSetAnimation("campfireOn", 2, 200)],
-                new SpriteTransform(scaledPos)
+        const logSprite = e.addComponent(
+            new SpriteComponent(
+                Tilesets.instance.outdoorTiles.getTileSource("campfireLogs"),
+                SpriteTransform.new({ position: scaledPos, depth: depth + 1 })
             )
         )
-        campfireOn.transform.depth = depth
 
-        const offset = new Point(0, 5)
+        const logSpriteSmall = e.addComponent(
+            new SpriteComponent(
+                Tilesets.instance.outdoorTiles.getTileSource("campfireLogsSmall"),
+                SpriteTransform.new({ position: scaledPos, depth: depth + 1 })
+            )
+        )
+
+        const colliderOffset = new Point(0, 2)
         e.addComponent(
-            new BoxCollider(scaledPos.plus(offset), new Point(TILE_SIZE, TILE_SIZE).minus(offset))
+            new BoxCollider(
+                scaledPos.plus(colliderOffset),
+                new Point(TILE_SIZE, TILE_SIZE).minus(colliderOffset)
+            )
         )
 
-        const logsOnFire = data.logs ?? 0
-        const lastLogConsumedTime = data.llct ?? 0
+        const fire = e.addComponent(
+            new FireParticles(1, () =>
+                campfireSprite.transform.position.plus(new Point(TILE_SIZE / 2 - 1, 7))
+            )
+        )
 
         const pixelCenterPos = scaledPos.plus(new Point(TILE_SIZE / 2, TILE_SIZE / 2))
 
         e.addComponent(
-            new Breakable(pixelCenterPos, [campfireOff.transform, campfireOn.transform], () =>
-                Lists.repeat(WOOD_NEEDED_FOR_CAMPFIRE / 2, [Item.WOOD]).concat(
-                    Lists.repeat(ROCKS_NEEDED_FOR_CAMPFIRE / 2, [Item.ROCK])
-                )
+            new Breakable(
+                pixelCenterPos,
+                [campfireSprite.transform, logSprite.transform, logSpriteSmall.transform],
+                () =>
+                    Lists.repeat(WOOD_NEEDED_FOR_CAMPFIRE / 2, [Item.WOOD]).concat(
+                        Lists.repeat(ROCKS_NEEDED_FOR_CAMPFIRE / 2, [Item.ROCK])
+                    )
             )
         )
 
@@ -75,13 +89,17 @@ export class CampfireFactory extends ElementFactory {
         )
 
         const updateFire = (logCount: number) => {
-            campfireOff.enabled = logCount === 0
-            campfireOn.enabled = !campfireOff.enabled
+            logSprite.enabled = logCount > Campfire.LOG_CAPACITY / 2
+            logSpriteSmall.enabled = logCount > 0 && !logSprite.enabled
+
+            fire.enabled = logCount > 0
+            // fireSize can be in range [1, 5]
+            fire.size = Math.ceil((logCount / Campfire.LOG_CAPACITY) * 5)
             audio.setMultiplier(logCount === 0 ? 0 : 1)
             const lightCenterPos = pos
                 .times(TILE_SIZE)
                 .plus(new Point(TILE_SIZE / 2, TILE_SIZE / 2))
-            if (campfireOn.enabled) {
+            if (fire.enabled) {
                 LightManager.instance.addLight(
                     wl,
                     e,
@@ -93,7 +111,7 @@ export class CampfireFactory extends ElementFactory {
             }
         }
 
-        const cf = e.addComponent(new Campfire(logsOnFire, lastLogConsumedTime, updateFire))
+        const cf = e.addComponent(new Campfire(data.logs ?? 0, data.llct ?? 0, updateFire))
 
         // Toggle between on/off when interacted with
         e.addComponent(
