@@ -1,18 +1,17 @@
-import {
-    DialogueInstance,
-    dialogue,
-    NextDialogue,
-    dialogueWithOptions,
-    option,
-    DialogueOption,
-} from "./Dialogue"
-import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
-import { DialogueDisplay } from "../../ui/DialogueDisplay"
-import { Campfire } from "../../world/elements/Campfire"
-import { Player } from "../Player"
 import { Item } from "../../items/Items"
-import { TimeUnit } from "../../world/TimeUnit"
+import { DialogueDisplay } from "../../ui/DialogueDisplay"
+import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { Bed } from "../../world/elements/Bed"
+import { Campfire } from "../../world/elements/Campfire"
+import { TimeUnit } from "../../world/TimeUnit"
+import { Player } from "../Player"
+import {
+    dialogue,
+    DialogueInstance,
+    DialogueOption,
+    dialogueWithOptions,
+    NextDialogue,
+} from "./Dialogue"
 
 export const CAMPFIRE_DIALOGUE = "campfire"
 export const BED_DIALOGUE = "bed"
@@ -30,7 +29,9 @@ export const ITEM_DIALOGUES: { [key: string]: () => DialogueInstance } = {
 
         const completeDialogue = (logsTransferred: number) => {
             return () => {
-                Player.instance.dude.inventory.removeItem(Item.WOOD, logsTransferred)
+                if (logsTransferred > 0) {
+                    Player.instance.dude.inventory.removeItem(Item.WOOD, logsTransferred)
+                }
                 cf.addLogs(logsTransferred)
                 return new NextDialogue(CAMPFIRE_DIALOGUE, false)
             }
@@ -69,11 +70,24 @@ export const ITEM_DIALOGUES: { [key: string]: () => DialogueInstance } = {
             } more hours. You can add up to ${logsYouCanAdd} more logs right now.`
         }
 
+        const options = [
+            new DialogueOption(`Add ${logsYouCanAdd} logs`, completeDialogue(logsYouCanAdd)),
+            new DialogueOption("Add one log", completeDialogue(1)),
+        ]
+
+        if (logCount > 0) {
+            options.push(
+                new DialogueOption("Take a log", () => {
+                    // TODO add torch to player's hand
+                    return completeDialogue(-1)()
+                })
+            )
+        }
+
         return dialogueWithOptions(
             [prompt],
             DudeInteractIndicator.NONE,
-            new DialogueOption(`Add ${logsYouCanAdd} logs`, completeDialogue(logsYouCanAdd)),
-            new DialogueOption("Add one log", completeDialogue(1)),
+            ...options,
             new DialogueOption(CANCEL_TEXT, completeDialogue(0))
         )
     },

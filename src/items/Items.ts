@@ -95,6 +95,7 @@ export enum Item {
     // shield values should match the ShieldType enum so we can cast them
     BASIC_SHIELD = ShieldType.BASIC,
     LANTERN,
+    TORCH,
 }
 
 window["Item"] = Item
