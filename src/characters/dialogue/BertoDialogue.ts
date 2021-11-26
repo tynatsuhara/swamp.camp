@@ -81,12 +81,21 @@ export const BERTO_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
 }
 
 const fetchNpcDialogue = (): DialogueInstance => {
-    const openHouses = LocationManager.instance.currentLocation
+    const allResidences = LocationManager.instance.currentLocation
         .getElements()
         .map((e) => e.entity.getComponent(Residence))
-        .filter((residence) => residence?.hasCapacity(DudeType.VILLAGER))
 
-    if (openHouses.length === 0) {
+    const houseableTypes = [DudeType.VILLAGER, DudeType.NUN, DudeType.BISHOP]
+
+    const residenceMap = houseableTypes.reduce((map, type) => {
+        const r = allResidences.filter((residence) => residence?.hasCapacity(type))
+        if (r.length > 0) {
+            map.set(type, r)
+        }
+        return map
+    }, new Map<DudeType, Residence[]>())
+
+    if (residenceMap.size === 0) {
         return dialogue(
             [
                 "Alas, thy settlement does not have appropriate lodging for a new settler.",
@@ -96,27 +105,47 @@ const fetchNpcDialogue = (): DialogueInstance => {
         )
     }
 
-    const criminalOption = new DialogueOption("Bring me a criminal.", () => {
-        openHouses[0].setResidentPending()
+    const fetchNpc = (type: DudeType) => () => {
+        residenceMap.get(type)[0].setResidentPending()
         EventQueue.instance.addEvent({
             type: QueuedEventType.HERALD_DEPARTURE_CHECK,
             time: WorldTime.instance.time,
+            dudeTypes: [type],
         })
         LocationManager.instance.currentLocation
             .getDude(DudeType.HERALD)
             .entity.getComponent(Berto)
             .updateSchedule()
         return new NextDialogue(BERT_LEAVING, true)
-    })
+    }
 
-    const options = [criminalOption, option("Never mind.", BERT_MENU_INTRO, false)]
+    const introText = [
+        // "Thy camp contains suitable domiciles for several occupations.",
+        "Which class of settler dost thy request I procure from The Kingdom?",
+    ]
+    const options: DialogueOption[] = []
 
-    return dialogueWithOptions(
-        [
-            "At present, only felonious peons can be spared by The King.",
-            "Shall I return to The Kingdom, bringing word that thou art requesting a settler?",
-        ],
-        DudeInteractIndicator.NONE,
-        ...options
-    )
+    if (residenceMap.get(DudeType.VILLAGER)) {
+        options.push(new DialogueOption("Bring me a convict.", fetchNpc(DudeType.VILLAGER)))
+        // if (residenceMap.size === 1) {
+        //     introText = [
+        //         "At present, only felonious peons can be spared by The King.",
+        //         "Shall I return to The Kingdom, bringing word that thou art requesting a settler?",
+        //     ]
+        // }
+    }
+
+    if (residenceMap.get(DudeType.NUN)) {
+        options.push(new DialogueOption("The church needs a new nun.", fetchNpc(DudeType.NUN)))
+    }
+
+    if (residenceMap.get(DudeType.BISHOP)) {
+        options.push(
+            new DialogueOption("We need a priest to lead the chuch.", fetchNpc(DudeType.BISHOP))
+        )
+    }
+
+    options.push(option("Never mind.", BERT_MENU_INTRO, false))
+
+    return dialogueWithOptions(introText, DudeInteractIndicator.NONE, ...options)
 }
