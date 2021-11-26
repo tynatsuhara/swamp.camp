@@ -1,5 +1,6 @@
 import { Point } from "brigsby/dist/Point"
 import { WorldAudioContext } from "../audio/WorldAudioContext"
+import { DudeType } from "../characters/DudeFactory"
 import { NPC } from "../characters/NPC"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { LocationManagerSaveState } from "../saves/LocationManagerSaveState"
@@ -13,6 +14,14 @@ export class LocationManager {
 
     constructor() {
         window["locationManager"] = this
+        window["showDudes"] = () => {
+            const counts = {}
+            Array.from(LocationManager.instance.currentLocation.dudes.values()).forEach((d) => {
+                const type = DudeType[d.type]
+                return (counts[type] = (counts[type] || 0) + 1)
+            })
+            console.log(counts)
+        }
     }
 
     private _currentLocation: WorldLocation

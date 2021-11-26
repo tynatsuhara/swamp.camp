@@ -165,7 +165,6 @@ export class DudeSpawner extends Component {
      */
     private shouldRandomlySpawn(averageMillisBetweenSpawns: number) {
         const probability = 1 / (averageMillisBetweenSpawns / DudeSpawner.INTERVAL_MILLIS)
-        console.log(`probability of spawning: ${probability}`)
         return Math.random() < probability
     }
 
