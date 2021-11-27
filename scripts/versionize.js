@@ -45,7 +45,10 @@ Promise.resolve(hashesPromise).then((hashPairs) => {
     hashPairs.forEach((pair) => (map[pair[0]] = pair[1]))
 
     readFile(path.join(STATICS_DIR, "index_template.html"), "utf8").then((template) => {
-        const output = template.replace('"{SWAMP_CAMP_ASSETS}"', JSON.stringify(map))
+        // inject the version map into the window scope via the template
+        const output = template
+            .replace('"{SWAMP_CAMP_ASSETS}"', JSON.stringify(map))
+            .replace("{BUILD_TIME}", Date.now())
         writeFile(path.join(STATICS_DIR, "index.html"), output, "utf8")
     })
 })
