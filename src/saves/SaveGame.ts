@@ -1,6 +1,7 @@
-import { LocationManagerSaveState } from "./LocationManagerSaveState"
-import { QueuedEventData } from "../world/events/QueuedEvent"
 import { Color } from "../ui/Color"
+import { QueuedEventData } from "../world/events/QueuedEvent"
+import { TaxRate } from "../world/TaxRate"
+import { LocationManagerSaveState } from "./LocationManagerSaveState"
 
 export class Save {
     version: number
@@ -20,4 +21,8 @@ export class SaveState {
     plume?: Color[]
     townStats?: { [key: string]: number }
     timePlayed?: number = 0
+    taxRate?: TaxRate = TaxRate.NONE
+
+    // miscellaneous flags and values for game progress milestones
+    hasRecruitedAnyVillagers?: boolean = false
 }

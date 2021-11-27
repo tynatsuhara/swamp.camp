@@ -1,10 +1,12 @@
 import { Item } from "../../items/Items"
+import { saveManager } from "../../SaveManager"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { SalePackage, SellMenu } from "../../ui/SellMenu"
 import { EventQueue } from "../../world/events/EventQueue"
 import { QueuedEventType } from "../../world/events/QueuedEvent"
 import { LocationManager } from "../../world/LocationManager"
 import { Residence } from "../../world/residences/Residence"
+import { TaxRate } from "../../world/TaxRate"
 import { WorldTime } from "../../world/WorldTime"
 import { DudeType } from "../DudeFactory"
 import { Berto } from "../types/Berto"
@@ -19,9 +21,11 @@ import {
 
 export const BERTO_STARTING_DIALOGUE = "bert-start"
 const BERT_MENU = "bert-menu",
-    BERT_MENU_INTRO = "bert-menu-intro",
+    BERT_ENTRYPOINT = "bert-menu-intro",
     BERT_VILLAGERS = "bert-villagers",
-    BERT_LEAVING = "bert-leaving"
+    BERT_LEAVING = "bert-leaving",
+    BERT_TAXES = "bert-taxes",
+    BERT_TAXES_UPDATED = "bert-taxes-updated"
 
 const getItemsToSell = (): SalePackage[] => {
     return [
@@ -59,25 +63,45 @@ export const BERTO_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
             ],
             DudeInteractIndicator.IMPORTANT_DIALOGUE,
             option("Sure!", BERT_MENU, true),
-            option("Maybe later.", BERT_MENU_INTRO, false)
+            option("Maybe later.", BERT_ENTRYPOINT, false)
         ),
-    [BERT_MENU_INTRO]: () => dialogue([getGreeting()], () => new NextDialogue(BERT_MENU, true)),
-    [BERT_MENU]: () =>
-        dialogueWithOptions(
-            ["How shall I assist thee?"],
-            DudeInteractIndicator.NONE,
+    [BERT_ENTRYPOINT]: () => dialogue([getGreeting()], () => new NextDialogue(BERT_MENU, true)),
+    [BERT_MENU]: () => {
+        const options = [
             new DialogueOption("What are you buying?", () => {
                 SellMenu.instance.show(getItemsToSell())
-                return new NextDialogue(BERT_MENU_INTRO, false)
+                return new NextDialogue(BERT_ENTRYPOINT, false)
             }),
             new DialogueOption("We need a new settler.", () => {
+                saveManager.setState({ hasRecruitedAnyVillagers: true })
                 return new NextDialogue(BERT_VILLAGERS, true)
             }),
-            option("Never mind.", BERT_MENU_INTRO, false)
-        ),
+        ]
+        if (saveManager.getState().hasRecruitedAnyVillagers) {
+            options.push(
+                new DialogueOption("Let's talk taxes.", () => new NextDialogue(BERT_TAXES, true))
+            )
+        }
+        return dialogueWithOptions(
+            ["How shall I assist thee?"],
+            DudeInteractIndicator.NONE,
+            ...options,
+            option("Never mind.", BERT_ENTRYPOINT, false)
+        )
+    },
     [BERT_VILLAGERS]: () => fetchNpcDialogue(),
     [BERT_LEAVING]: () =>
-        dialogue(["I shall return posthaste!"], () => new NextDialogue(BERT_MENU_INTRO, false)),
+        dialogue(["I shall return posthaste!"], () => new NextDialogue(BERT_ENTRYPOINT, false)),
+    [BERT_TAXES]: () => adjustTaxRateDialogue(),
+    [BERT_TAXES_UPDATED]: () =>
+        dialogue(
+            [
+                saveManager.getState().taxRate === TaxRate.NONE
+                    ? "Henceforth, taxes shall no longer be collected."
+                    : "The new rate shall be communicated to all settlers and collected henceforth.",
+            ],
+            () => new NextDialogue(BERT_ENTRYPOINT, false)
+        ),
 }
 
 const fetchNpcDialogue = (): DialogueInstance => {
@@ -101,7 +125,7 @@ const fetchNpcDialogue = (): DialogueInstance => {
                 "Alas, thy settlement does not have appropriate lodging for a new settler.",
                 "Return to me once thou hast constructed a dwelling.",
             ],
-            () => new NextDialogue(BERT_MENU_INTRO, false)
+            () => new NextDialogue(BERT_ENTRYPOINT, false)
         )
     }
 
@@ -145,7 +169,47 @@ const fetchNpcDialogue = (): DialogueInstance => {
         )
     }
 
-    options.push(option("Never mind.", BERT_MENU_INTRO, false))
+    options.push(option("Never mind.", BERT_ENTRYPOINT, false))
 
     return dialogueWithOptions(introText, DudeInteractIndicator.NONE, ...options)
+}
+
+const adjustTaxRateDialogue = (): DialogueInstance => {
+    const currentRate = saveManager.getState().taxRate
+    console.log("current rate " + currentRate)
+    const rateText = ["at zero", "low", "moderate", "high", "very high"]
+
+    const setTaxRateOption = (taxRate: TaxRate) =>
+        new DialogueOption(
+            taxRate === TaxRate.NONE ? "Don't collect taxes." : `Make it ${rateText[taxRate]}.`,
+            () => {
+                saveManager.setState({ taxRate })
+                return new NextDialogue(BERT_TAXES_UPDATED, true)
+            }
+        )
+
+    const options = [
+        TaxRate.NONE,
+        TaxRate.LOW,
+        TaxRate.MODERATE,
+        TaxRate.HIGH,
+        TaxRate.VERY_HIGH,
+    ].map((rate) => setTaxRateOption(rate))
+
+    // don't show the current option
+    options.splice(currentRate, 1)
+
+    options.push(option(`Keep it ${rateText[currentRate]}.`, BERT_ENTRYPOINT, false))
+
+    return dialogueWithOptions(
+        [
+            `${
+                currentRate === TaxRate.NONE
+                    ? "Presently, thou art not collecting taxes from thy settlers."
+                    : `Presently, the tax rate is ${rateText[currentRate]}.`
+            } Dost thou wish to adjust it?`,
+        ],
+        DudeInteractIndicator.NONE,
+        ...options
+    )
 }
