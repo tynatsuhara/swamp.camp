@@ -30,7 +30,7 @@ export class Torch extends Shield {
         this.particles = this.entity.addComponent(
             new FireParticles(
                 3,
-                () => this.transform.position.plus(new Point(2, 4)),
+                () => this.transform.position.plus(new Point(2, 5)),
                 () => this.transform.depth + 0.1
             )
         )

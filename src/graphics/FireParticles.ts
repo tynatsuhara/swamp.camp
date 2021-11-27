@@ -4,7 +4,7 @@ import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
 import { Color } from "../ui/Color"
 import { Particles } from "./Particles"
 
-const FIRE_DRIFT_DISTANCE = 2
+const FIRE_DRIFT_DISTANCE = 1.5
 const FIRE_COLORS = [Color.ORANGE, Color.SUPER_ORANGE, Color.LIGHT_ORANGE]
 
 export class FireParticles extends RepeatedInvoker {
