@@ -1,7 +1,7 @@
-import { assets } from "brigsby/dist/Assets"
 import { Point } from "brigsby/dist/Point"
 import { SpriteAnimation } from "brigsby/dist/sprites/SpriteAnimation"
 import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
+import { getImage } from "./Tilesets"
 
 const map = new Map(
     `
@@ -278,6 +278,6 @@ export class DungeonTilesetII {
     }
 
     private getFile(): HTMLImageElement {
-        return assets.getImageByFileName("images/dungeon_base.png")
+        return getImage("images/dungeon_base.png")
     }
 }

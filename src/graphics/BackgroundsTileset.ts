@@ -1,7 +1,6 @@
-import { assets } from "brigsby/dist/Assets"
 import { Point } from "brigsby/dist/Point"
 import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
-import { TILE_SIZE } from "./Tilesets"
+import { getImage, TILE_SIZE } from "./Tilesets"
 
 export class BackgroundsTileset {
     getTileSource(key: string): StaticSpriteSource {
@@ -16,6 +15,6 @@ export class BackgroundsTileset {
     }
 
     private image() {
-        return assets.getImageByFileName("images/backgrounds.png")
+        return getImage("images/backgrounds.png")
     }
 }

@@ -1,7 +1,7 @@
-import { assets } from "brigsby/dist/Assets"
 import { Point } from "brigsby/dist/Point"
-import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { SpriteAnimation } from "brigsby/dist/sprites/SpriteAnimation"
+import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
+import { getImage } from "./Tilesets"
 
 const ROW_WIDTH = 160
 const ROW_START = 32
@@ -43,6 +43,6 @@ export class ExtraCharacterSet2TileLoader {
     }
 
     private image() {
-        return assets.getImageByFileName("images/extra_characters.png")
+        return getImage("images/extra_characters.png")
     }
 }

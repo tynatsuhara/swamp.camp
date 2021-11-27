@@ -1,7 +1,7 @@
-import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
-import { assets } from "brigsby/dist/Assets"
 import { Point } from "brigsby/dist/Point"
 import { SpriteAnimation } from "brigsby/dist/sprites/SpriteAnimation"
+import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
+import { getImage } from "./Tilesets"
 
 export class SplitFileTileLoader {
     private readonly dirPath: string
@@ -11,7 +11,7 @@ export class SplitFileTileLoader {
     }
 
     getTileSource(key: string): StaticSpriteSource {
-        const image = assets.getImageByFileName(`${this.dirPath}/${key}.png`)
+        const image = getImage(`${this.dirPath}/${key}.png`)
         if (!image) {
             return null
         }

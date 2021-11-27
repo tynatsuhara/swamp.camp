@@ -1,11 +1,11 @@
-import { assets } from "brigsby/dist/Assets"
 import { Component } from "brigsby/dist/Component"
 import { Point } from "brigsby/dist/Point"
 import { AnimatedSpriteComponent } from "brigsby/dist/sprites/AnimatedSpriteComponent"
-import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { SpriteAnimation } from "brigsby/dist/sprites/SpriteAnimation"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Lists } from "brigsby/dist/util/Lists"
+import { getImage } from "./Tilesets"
 
 export class ExplosionTileset {
     /**
@@ -73,6 +73,6 @@ export class ExplosionTileset {
     }
 
     private image() {
-        return assets.getImageByFileName("images/explosions.png")
+        return getImage("images/explosions.png")
     }
 }

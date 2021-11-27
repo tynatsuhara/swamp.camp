@@ -1,4 +1,3 @@
-import { assets } from "brigsby/dist/Assets"
 import { Component } from "brigsby/dist/Component"
 import { debug } from "brigsby/dist/Debug"
 import { UpdateViewsContext } from "brigsby/dist/Engine"
@@ -17,7 +16,7 @@ import { Music } from "../audio/Music"
 import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
 import { FireParticles } from "../graphics/FireParticles"
 import { Particles } from "../graphics/Particles"
-import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { getImage, Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { QuestGame } from "../quest_game"
 import { saveManager } from "../SaveManager"
 import { Save } from "../saves/SaveGame"
@@ -41,7 +40,7 @@ enum Menu {
 export class MainMenuScene {
     private plumes: PlumePicker
     private knight: SpriteComponent
-    private title = assets.getImageByFileName("images/title.png")
+    private title = getImage("images/title.png")
     private darkness: DarknessMask
     private view: View
 

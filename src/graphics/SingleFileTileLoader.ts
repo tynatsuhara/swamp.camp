@@ -1,8 +1,8 @@
 import { Point } from "brigsby/dist/Point"
-import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
-import { assets } from "brigsby/dist/Assets"
 import { SpriteAnimation } from "brigsby/dist/sprites/SpriteAnimation"
 import { SpriteSource } from "brigsby/dist/sprites/SpriteSource"
+import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
+import { getImage } from "./Tilesets"
 
 export class SingleFileTileLoader {
     private readonly filename: string
@@ -68,6 +68,6 @@ export class SingleFileTileLoader {
     }
 
     private image() {
-        return assets.getImageByFileName(this.filename)
+        return getImage(this.filename)
     }
 }
