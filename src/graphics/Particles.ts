@@ -1,5 +1,4 @@
 import { Component } from "brigsby/dist/Component"
-import { UpdateData } from "brigsby/dist/Engine"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { ImageRender } from "brigsby/dist/renderer/ImageRender"
@@ -24,10 +23,13 @@ export class Particles {
         depth: number,
         lifetime: number,
         velocity: (t: number) => Point = () => Point.ZERO,
-        size: Point = new Point(1, 1)
+        size: Point = new Point(1, 1),
+        offsetSupplier: () => Point = () => Point.ZERO
     ) {
         const emit = (image: ImageBitmap) =>
-            this.entity.addComponent(new Particle(image, position, depth, lifetime, velocity, size))
+            this.entity.addComponent(
+                new Particle(image, position, depth, lifetime, velocity, size, offsetSupplier)
+            )
 
         const prefabBitmap = this.prefabs.get(color)
         if (prefabBitmap) {
@@ -53,13 +55,6 @@ export class Particles {
 const SIZE = new Point(1, 1)
 
 class Particle extends Component {
-    private readonly image: ImageBitmap
-    private readonly position: Point
-    private readonly depth: number
-    private readonly lifetime: number
-    private readonly velocity: (t: number) => Point
-    private readonly size: Point
-
     private elapsedTime = 0
 
     constructor(
@@ -68,33 +63,26 @@ class Particle extends Component {
         depth: number,
         lifetime: number,
         velocity: (t: number) => Point,
-        size: Point = new Point(1, 1)
+        size: Point = new Point(1, 1),
+        offsetSupplier: () => Point
     ) {
         super()
-        this.image = image
-        this.position = position
-        this.depth = depth
-        this.lifetime = lifetime
-        this.velocity = velocity
-        this.size = size
-    }
 
-    update(updateData: UpdateData) {
-        this.elapsedTime += updateData.elapsedTimeMillis
-        if (this.elapsedTime > this.lifetime) {
-            this.delete()
+        this.update = (updateData) => {
+            this.elapsedTime += updateData.elapsedTimeMillis
+            if (this.elapsedTime > lifetime) {
+                this.delete()
+            }
         }
-    }
 
-    getRenderMethods() {
-        return [
+        this.getRenderMethods = () => [
             new ImageRender(
-                this.image,
+                image,
                 Point.ZERO,
                 SIZE,
-                this.position.plus(this.velocity(this.elapsedTime)),
-                this.size,
-                this.depth
+                position.plus(velocity(this.elapsedTime)).plus(offsetSupplier()),
+                size,
+                depth
             ),
         ]
     }

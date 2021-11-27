@@ -38,6 +38,8 @@ export const ITEM_DIALOGUES: { [key: string]: () => DialogueInstance } = {
             }
         }
 
+        // TODO make sure the player can always take a log if possible
+
         if (logsYouCanAdd === 0) {
             return dialogue(
                 [
