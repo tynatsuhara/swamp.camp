@@ -1,14 +1,14 @@
-import { Player } from "./characters/Player"
-import { Save, SaveState } from "./saves/SaveGame"
-import { LocationManager } from "./world/LocationManager"
-import { Camera } from "./cutscenes/Camera"
 import { DudeType } from "./characters/DudeFactory"
-import { HUD } from "./ui/HUD"
-import { WorldTime } from "./world/WorldTime"
-import { EventQueue } from "./world/events/EventQueue"
+import { Player } from "./characters/Player"
+import { Camera } from "./cutscenes/Camera"
+import { Save, SaveState } from "./saves/SaveGame"
 import { newUUID } from "./saves/uuid"
 import { Singletons } from "./Singletons"
+import { HUD } from "./ui/HUD"
 import { PlumePicker } from "./ui/PlumePicker"
+import { EventQueue } from "./world/events/EventQueue"
+import { LocationManager } from "./world/LocationManager"
+import { WorldTime } from "./world/WorldTime"
 
 const CURRENT_SAVE_FORMAT_VERSION = 1
 
@@ -53,7 +53,10 @@ class SaveManager {
         if (!this.state) {
             if (this.getSaveCount() > 0) {
                 // pre-load this before "load" is called to display data on the main menu
-                this.state = this.getLastSave().state
+                this.state = {
+                    ...new SaveState(), // initialize default values
+                    ...this.getLastSave().state,
+                }
             } else {
                 this.state = new SaveState()
             }
@@ -152,7 +155,10 @@ class SaveManager {
 
         // ensures that the file exists
         const save = this.getSave(saveKey)
-        this.state = save.state
+        this.state = {
+            ...new SaveState(), // initialize default values
+            ...save.state,
+        }
         this.saveKey = saveKey
 
         // Logging
