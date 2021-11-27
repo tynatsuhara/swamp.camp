@@ -38,16 +38,23 @@ export const ITEM_DIALOGUES: { [key: string]: () => DialogueInstance } = {
             }
         }
 
+        const takeLogOption = new DialogueOption("Take a torch", () => {
+            Player.instance.dude.setShield(ShieldType.TORCH)
+            return completeDialogue(-1)()
+        })
+
         // TODO make sure the player can always take a log if possible
 
         if (logsYouCanAdd === 0) {
-            return dialogue(
+            return dialogueWithOptions(
                 [
                     playerLogCount === 0
                         ? "You don't have any logs to add to the fire."
                         : "The fire already has the maximum amount of logs.",
                 ],
-                completeDialogue(0)
+                DudeInteractIndicator.NONE,
+                logCount > 0 ? takeLogOption : null,
+                new DialogueOption(CANCEL_TEXT, completeDialogue(0))
             )
         } else if (logsYouCanAdd === 1) {
             return dialogueWithOptions(
@@ -57,7 +64,8 @@ export const ITEM_DIALOGUES: { [key: string]: () => DialogueInstance } = {
                         : "You can fit one more log in the fire.",
                 ],
                 DudeInteractIndicator.NONE,
-                new DialogueOption("Add log", completeDialogue(1)),
+                new DialogueOption("Add a log", completeDialogue(1)),
+                takeLogOption,
                 new DialogueOption(CANCEL_TEXT, completeDialogue(0))
             )
         }
@@ -79,12 +87,7 @@ export const ITEM_DIALOGUES: { [key: string]: () => DialogueInstance } = {
         ]
 
         if (logCount > 0) {
-            options.push(
-                new DialogueOption("Take a log", () => {
-                    Player.instance.dude.setShield(ShieldType.TORCH)
-                    return completeDialogue(-1)()
-                })
-            )
+            options.push(takeLogOption)
         }
 
         return dialogueWithOptions(

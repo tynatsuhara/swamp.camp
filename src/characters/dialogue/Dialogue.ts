@@ -30,7 +30,7 @@ export class DialogueInstance {
     ) {
         this.lines = lines
         this.next = next
-        this.options = options
+        this.options = options.filter((o) => !!o)
         this.indicator = indicator
     }
 }
