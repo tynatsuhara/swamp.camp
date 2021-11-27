@@ -1,28 +1,27 @@
-import {
-    DialogueInstance,
-    dialogueWithOptions,
-    dialogue,
-    option,
-    NextDialogue,
-    saveAfterDialogueStage,
-    DialogueOption,
-    inv,
-} from "./Dialogue"
-import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
-import { Item } from "../../items/Items"
+import { InputKeyString } from "brigsby/dist/Input"
 import { Controls } from "../../Controls"
-import { LocationManager } from "../../world/LocationManager"
+import { getDipRecipes } from "../../items/CraftingRecipe"
+import { Item } from "../../items/Items"
+import { CraftingMenu } from "../../ui/CraftingMenu"
+import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { ElementType } from "../../world/elements/Elements"
 import { EventQueue } from "../../world/events/EventQueue"
 import { QueuedEventType } from "../../world/events/QueuedEvent"
-import { WorldTime } from "../../world/WorldTime"
-import { CraftingMenu } from "../../ui/CraftingMenu"
-import { getDipRecipes } from "../../items/CraftingRecipe"
-import { InputKeyString } from "brigsby/dist/Input"
+import { LocationManager } from "../../world/LocationManager"
 import { TimeUnit } from "../../world/TimeUnit"
+import { WorldTime } from "../../world/WorldTime"
+import {
+    dialogue,
+    DialogueInstance,
+    DialogueOption,
+    dialogueWithOptions,
+    inv,
+    NextDialogue,
+    option,
+    saveAfterDialogueStage,
+} from "./Dialogue"
 
 export const ROCKS_NEEDED_FOR_CAMPFIRE = 8
-export const WOOD_NEEDED_FOR_CAMPFIRE = 4
 const CRAFT_OPTION = "<Craft>"
 
 export const DIP_STARTING_DIALOGUE = "dip-0"
@@ -121,10 +120,7 @@ export const DIP_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
                 ],
                 () => new NextDialogue(DIP_MAKE_CAMPFIRE, false)
             )
-        } else if (
-            inv().getItemCount(Item.ROCK) >= ROCKS_NEEDED_FOR_CAMPFIRE &&
-            inv().getItemCount(Item.WOOD) >= WOOD_NEEDED_FOR_CAMPFIRE
-        ) {
+        } else if (inv().getItemCount(Item.ROCK) >= ROCKS_NEEDED_FOR_CAMPFIRE) {
             // can craft
             return dialogueWithOptions(
                 [
@@ -141,7 +137,7 @@ export const DIP_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
             // do not have enough ingredients to craft
             return dialogue(
                 [
-                    `We need ${ROCKS_NEEDED_FOR_CAMPFIRE} rocks and ${WOOD_NEEDED_FOR_CAMPFIRE} wood to make a campfire. Try hitting big rocks and trees with your sword!`,
+                    `We need ${ROCKS_NEEDED_FOR_CAMPFIRE} rocks and some wood to make a campfire. Try hitting big rocks and trees with your sword!`,
                 ],
                 () => new NextDialogue(DIP_MAKE_CAMPFIRE, false)
             )

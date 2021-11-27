@@ -1,9 +1,6 @@
 import { Point } from "brigsby/dist/Point"
 import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
-import {
-    ROCKS_NEEDED_FOR_CAMPFIRE,
-    WOOD_NEEDED_FOR_CAMPFIRE,
-} from "../characters/dialogue/DipDialogue"
+import { ROCKS_NEEDED_FOR_CAMPFIRE } from "../characters/dialogue/DipDialogue"
 import { Tilesets } from "../graphics/Tilesets"
 import { ItemStack } from "./Inventory"
 import { Item } from "./Items"
@@ -29,10 +26,7 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => {
             {
                 desc: "Illuminates an area",
                 output: Item.CAMPFIRE,
-                input: [
-                    new ItemStack(Item.ROCK, ROCKS_NEEDED_FOR_CAMPFIRE),
-                    new ItemStack(Item.WOOD, WOOD_NEEDED_FOR_CAMPFIRE),
-                ],
+                input: [new ItemStack(Item.ROCK, ROCKS_NEEDED_FOR_CAMPFIRE)],
             },
             {
                 desc: "Stores junk",

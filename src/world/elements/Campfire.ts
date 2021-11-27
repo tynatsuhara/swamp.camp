@@ -7,10 +7,7 @@ import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Lists } from "brigsby/dist/util/Lists"
 import { PointAudio } from "../../audio/PointAudio"
 import { DialogueSource } from "../../characters/dialogue/Dialogue"
-import {
-    ROCKS_NEEDED_FOR_CAMPFIRE,
-    WOOD_NEEDED_FOR_CAMPFIRE,
-} from "../../characters/dialogue/DipDialogue"
+import { ROCKS_NEEDED_FOR_CAMPFIRE } from "../../characters/dialogue/DipDialogue"
 import { CAMPFIRE_DIALOGUE } from "../../characters/dialogue/ItemDialogues"
 import { FireParticles } from "../../graphics/FireParticles"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
@@ -73,17 +70,6 @@ export class CampfireFactory extends ElementFactory {
 
         const pixelCenterPos = scaledPos.plus(new Point(TILE_SIZE / 2, TILE_SIZE / 2))
 
-        e.addComponent(
-            new Breakable(
-                pixelCenterPos,
-                [campfireSprite.transform, logSprite.transform, logSpriteSmall.transform],
-                () =>
-                    Lists.repeat(WOOD_NEEDED_FOR_CAMPFIRE / 2, [Item.WOOD]).concat(
-                        Lists.repeat(ROCKS_NEEDED_FOR_CAMPFIRE / 2, [Item.ROCK])
-                    )
-            )
-        )
-
         const audio = e.addComponent(
             new PointAudio("audio/ambiance/campfire.ogg", pixelCenterPos, TILE_SIZE * 6, true)
         )
@@ -112,6 +98,17 @@ export class CampfireFactory extends ElementFactory {
         }
 
         const cf = e.addComponent(new Campfire(data.logs ?? 0, data.llct ?? 0, updateFire))
+
+        e.addComponent(
+            new Breakable(
+                pixelCenterPos,
+                [campfireSprite.transform, logSprite.transform, logSpriteSmall.transform],
+                () =>
+                    Lists.repeat(cf.logs, [Item.WOOD]).concat(
+                        Lists.repeat(ROCKS_NEEDED_FOR_CAMPFIRE, [Item.ROCK])
+                    )
+            )
+        )
 
         // Toggle between on/off when interacted with
         e.addComponent(
