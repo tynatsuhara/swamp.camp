@@ -121,25 +121,28 @@ export class DudeSpawner extends Component {
     }
 
     spawnOrcs() {
+        const spawnPos = this.getSpawnPosOffMap()
+
+        const orcs = [
+            ...Lists.range(0, 5 + Math.random() * 10).map(() =>
+                DudeFactory.instance.new(DudeType.ORC_WARRIOR, spawnPos)
+            ),
+            ...Lists.range(0, 1 + Math.random() * 4).map(() =>
+                DudeFactory.instance.new(DudeType.ORC_BRUTE, spawnPos)
+            ),
+            ...Lists.range(0, 1 + Math.random() * 4).map(() =>
+                DudeFactory.instance.new(DudeType.ORC_SHAMAN, spawnPos)
+            ),
+        ]
+
         setTimeout(
             () =>
                 NotificationDisplay.instance.push({
-                    text: "Orc attack!",
+                    text: "Orc siege!",
                     icon: "sword",
+                    isExpired: () => orcs.every((orc) => !orc.isAlive),
                 }),
             6500
-        )
-
-        const spawnPos = this.getSpawnPosOffMap()
-
-        Lists.range(0, 5 + Math.random() * 10).forEach(() =>
-            DudeFactory.instance.new(DudeType.ORC_WARRIOR, spawnPos)
-        )
-        Lists.range(0, 1 + Math.random() * 4).forEach(() =>
-            DudeFactory.instance.new(DudeType.ORC_BRUTE, spawnPos)
-        )
-        Lists.range(0, 1 + Math.random() * 4).forEach(() =>
-            DudeFactory.instance.new(DudeType.ORC_SHAMAN, spawnPos)
         )
     }
 
