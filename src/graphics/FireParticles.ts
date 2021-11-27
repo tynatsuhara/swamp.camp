@@ -4,7 +4,8 @@ import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
 import { Color } from "../ui/Color"
 import { Particles } from "./Particles"
 
-const FIRE_DRIFT_DISTANCE = 2 //
+const FIRE_DRIFT_DISTANCE = 2
+const FIRE_COLORS = [Color.ORANGE, Color.SUPER_ORANGE, Color.LIGHT_ORANGE]
 
 export class FireParticles extends RepeatedInvoker {
     private lastPos: Point
@@ -45,11 +46,24 @@ export class FireParticles extends RepeatedInvoker {
             )
         }
 
-        // fire
-        for (let i = 0; i < size; i++) {
+        // drifting fire particles
+        for (let i = 0; i < size / 2; i++) {
             const speed = -0.005
             Particles.instance.emitParticle(
-                Lists.oneOf([Color.ORANGE, Color.SUPER_ORANGE, Color.LIGHT_ORANGE]),
+                Lists.oneOf(FIRE_COLORS),
+                fireBase.randomCircularShift(size),
+                depth,
+                150 + Math.random() * 100,
+                (t) => new Point(velocity.x, velocity.y + speed * t),
+                Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
+            )
+        }
+
+        // fire particles which track the source
+        for (let i = 0; i < (size * 2) / 3; i++) {
+            const speed = -0.005
+            Particles.instance.emitParticle(
+                Lists.oneOf(FIRE_COLORS),
                 Point.ZERO.randomCircularShift(size),
                 depth,
                 600,
