@@ -103,7 +103,6 @@ export class DudeSpawner extends Component {
 
         if (thingCount.length < goalCount) {
             const spawnCount = Math.min(waterSpots.length, goalCount - thingCount.length)
-            console.log(`spawning ${spawnCount} swamp things`)
             for (let i = 0; i < spawnCount; i++) {
                 const pt = Lists.oneOf(waterSpots)
                 DudeFactory.instance.new(DudeType.SWAMP_THING, pt.times(TILE_SIZE), l)
