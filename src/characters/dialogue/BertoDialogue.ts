@@ -85,7 +85,7 @@ const fetchNpcDialogue = (): DialogueInstance => {
         .getElements()
         .flatMap((e) => e.entity.getComponents(Residence))
 
-    const houseableTypes = [DudeType.VILLAGER, DudeType.NUN, DudeType.BISHOP]
+    const houseableTypes = [DudeType.VILLAGER, DudeType.NUN, DudeType.CLERIC]
 
     const residenceMap = houseableTypes.reduce((map, type) => {
         const r = allResidences.filter((residence) => residence?.hasCapacity(type))
@@ -139,9 +139,9 @@ const fetchNpcDialogue = (): DialogueInstance => {
         options.push(new DialogueOption("The church needs a new nun.", fetchNpc(DudeType.NUN)))
     }
 
-    if (residenceMap.get(DudeType.BISHOP)) {
+    if (residenceMap.get(DudeType.CLERIC)) {
         options.push(
-            new DialogueOption("We need a priest to lead the chuch.", fetchNpc(DudeType.BISHOP))
+            new DialogueOption("We need a priest to lead the chuch.", fetchNpc(DudeType.CLERIC))
         )
     }
 
