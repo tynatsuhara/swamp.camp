@@ -155,7 +155,8 @@ export class StaffWeapon extends Weapon {
                                 d.standingPosition.distanceTo(this.attackPosition) < attackDistance
                         )
                         .forEach((d) =>
-                            d.damage(2, d.position.minus(this.attackPosition), 50, this.dude)
+                            // don't track lastAttacker because it can cause friendly fire and get weird
+                            d.damage(2, d.position.minus(this.attackPosition), 50, undefined)
                         )
 
                     Camera.instance.shake(5, 500)
