@@ -2,13 +2,13 @@ import { BoxCollider } from "brigsby/dist/collision/BoxCollider"
 import { Component } from "brigsby/dist/Component"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
-import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
+import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
+import { Lists } from "brigsby/dist/util/Lists"
+import { DroppedItem } from "../../items/DroppedItem"
 import { Item } from "../../items/Items"
 import { LocationManager } from "../../world/LocationManager"
 import { Dude } from "../Dude"
-import { DroppedItem } from "../../items/DroppedItem"
-import { Lists } from "brigsby/dist/util/Lists"
 
 class Projectile extends Component {
     private sprite: SpriteComponent
@@ -93,7 +93,8 @@ class Projectile extends Component {
                             enemy.damage(
                                 1,
                                 enemy.standingPosition.minus(attacker.standingPosition),
-                                30
+                                30,
+                                attacker
                             )
                         }
                     }

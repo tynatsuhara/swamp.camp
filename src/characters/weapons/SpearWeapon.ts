@@ -1,14 +1,13 @@
-import { Weapon } from "./Weapon"
-import { WeaponType } from "./WeaponType"
-import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
-import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
-import { Point } from "brigsby/dist/Point"
-import { Tilesets } from "../../graphics/Tilesets"
 import { UpdateData } from "brigsby/dist/Engine"
+import { Point } from "brigsby/dist/Point"
+import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Animator } from "brigsby/dist/util/Animator"
+import { Tilesets } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
 import { spawnProjectile } from "./Projectile"
-import { BoxCollider } from "brigsby/dist/collision/BoxCollider"
+import { Weapon } from "./Weapon"
+import { WeaponType } from "./WeaponType"
 
 enum State {
     SHEATHED,
@@ -129,7 +128,7 @@ export class SpearWeapon extends Weapon {
         const attackDistance = this.getRange() + 4 // add a tiny buffer for small weapons like the dagger to still work
         // TODO maybe only allow big weapons to hit multiple targets
         Weapon.getEnemiesInRange(this.dude, attackDistance).forEach((d) => {
-            d.damage(1, d.standingPosition.minus(this.dude.standingPosition), 30)
+            d.damage(1, d.standingPosition.minus(this.dude.standingPosition), 30, this.dude)
         })
     }
 

@@ -442,32 +442,41 @@ export class NPC extends Component {
     }
 
     private checkForEnemies() {
-        let enemies = Array.from(LocationManager.instance.currentLocation.dudes)
-            .filter((d) => d.isAlive)
-            .filter(this.isEnemyFn)
-            .filter(
-                (d) =>
-                    d.standingPosition.distanceTo(this.dude.standingPosition) < this.findTargetRange
-            )
-
-        this.enemiesPresent = enemies.length > 0
-        if (!this.dude.weapon || !this.enemiesPresent) {
-            // should flee instead
-            return
-        }
-
-        enemies = this.enemyFilterFn(enemies)
-
         let target: Dude
 
-        if (this.attackTarget && enemies.includes(this.attackTarget)) {
-            // continue attacking their current target if they're still valid
-            target = this.attackTarget
+        if (
+            this.dude.lastAttacker &&
+            this.dude.lastAttacker.standingPosition.distanceTo(this.dude.standingPosition) <
+                this.findTargetRange
+        ) {
+            target = this.dude.lastAttacker
         } else {
-            // otherwise attack the closest enemy
-            target = Lists.minBy(enemies, (d) =>
-                d.standingPosition.distanceTo(this.dude.standingPosition)
-            )
+            let enemies = Array.from(LocationManager.instance.currentLocation.dudes)
+                .filter((d) => d.isAlive)
+                .filter(this.isEnemyFn)
+                .filter(
+                    (d) =>
+                        d.standingPosition.distanceTo(this.dude.standingPosition) <
+                        this.findTargetRange
+                )
+
+            this.enemiesPresent = enemies.length > 0
+            if (!this.dude.weapon || !this.enemiesPresent) {
+                // should flee instead
+                return
+            }
+
+            enemies = this.enemyFilterFn(enemies)
+
+            if (this.attackTarget && enemies.includes(this.attackTarget)) {
+                // continue attacking their current target if they're still valid
+                target = this.attackTarget
+            } else {
+                // otherwise attack the closest enemy
+                target = Lists.minBy(enemies, (d) =>
+                    d.standingPosition.distanceTo(this.dude.standingPosition)
+                )
+            }
         }
 
         if (!!target) {

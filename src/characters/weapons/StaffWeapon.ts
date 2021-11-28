@@ -1,8 +1,7 @@
 import { UpdateData } from "brigsby/dist/Engine"
 import { Point } from "brigsby/dist/Point"
-import { AnimatedSpriteComponent } from "brigsby/dist/sprites/AnimatedSpriteComponent"
-import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Animator } from "brigsby/dist/util/Animator"
 import { Lists } from "brigsby/dist/util/Lists"
 import { Camera } from "../../cutscenes/Camera"
@@ -155,7 +154,9 @@ export class StaffWeapon extends Weapon {
                             (d) =>
                                 d.standingPosition.distanceTo(this.attackPosition) < attackDistance
                         )
-                        .forEach((d) => d.damage(2, d.position.minus(this.attackPosition), 50))
+                        .forEach((d) =>
+                            d.damage(2, d.position.minus(this.attackPosition), 50, this.dude)
+                        )
 
                     Camera.instance.shake(5, 500)
 

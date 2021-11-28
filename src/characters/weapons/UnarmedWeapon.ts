@@ -46,7 +46,8 @@ export class UnarmedWeapon extends Weapon {
         closestEnemy.damage(
             this.getDamageAmount(),
             closestEnemy.standingPosition.minus(this.dude.standingPosition),
-            50
+            50,
+            this.dude
         )
 
         setTimeout(() => (this.state = State.DRAWN), this.delay)

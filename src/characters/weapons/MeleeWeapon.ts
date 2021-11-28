@@ -1,13 +1,13 @@
+import { UpdateData } from "brigsby/dist/Engine"
+import { Point } from "brigsby/dist/Point"
+import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
+import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
+import { Animator } from "brigsby/dist/util/Animator"
+import { Tilesets } from "../../graphics/Tilesets"
+import { DudeType } from "../DudeFactory"
 import { Weapon } from "./Weapon"
 import { WeaponType } from "./WeaponType"
-import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
-import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
-import { Point } from "brigsby/dist/Point"
-import { Tilesets } from "../../graphics/Tilesets"
-import { UpdateData } from "brigsby/dist/Engine"
-import { Animator } from "brigsby/dist/util/Animator"
-import { DudeType } from "../DudeFactory"
-import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
 
 enum State {
     SHEATHED,
@@ -94,7 +94,7 @@ export class MeleeWeapon extends Weapon {
         const enemies = Weapon.getEnemiesInRange(this.dude, attackDistance)
 
         enemies.forEach((d) => {
-            d.damage(1, d.standingPosition.minus(this.dude.standingPosition), 30)
+            d.damage(1, d.standingPosition.minus(this.dude.standingPosition), 30, this.dude)
         })
 
         if (this.dude.type === DudeType.PLAYER && enemies.length === 0) {

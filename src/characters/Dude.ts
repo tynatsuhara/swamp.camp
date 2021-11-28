@@ -228,7 +228,7 @@ export class Dude extends Component implements DialogueSource {
         return this._health > 0
     }
 
-    damage(damage: number, direction: Point, knockback: number) {
+    damage(damage: number, direction: Point, knockback: number, attacker: Dude) {
         if (this.rolling()) {
             return
         }
@@ -260,7 +260,12 @@ export class Dude extends Component implements DialogueSource {
         if (!!this.onDamageCallback) {
             this.onDamageCallback(blocked)
         }
+
+        if (attacker) {
+            this.lastAttacker = attacker
+        }
     }
+    lastAttacker: Dude
 
     private onDamageCallback: (blocked: boolean) => void
     setOnDamageCallback(fn: (blocked: boolean) => void) {
