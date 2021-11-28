@@ -458,10 +458,17 @@ export class NPC extends Component {
 
         enemies = this.enemyFilterFn(enemies)
 
-        // attack the closest enemy
-        const target = Lists.minBy(enemies, (d) =>
-            d.standingPosition.distanceTo(this.dude.standingPosition)
-        )
+        let target: Dude
+
+        if (this.attackTarget && enemies.includes(this.attackTarget)) {
+            // continue attacking their current target if they're still valid
+            target = this.attackTarget
+        } else {
+            // otherwise attack the closest enemy
+            target = Lists.minBy(enemies, (d) =>
+                d.standingPosition.distanceTo(this.dude.standingPosition)
+            )
+        }
 
         if (!!target) {
             let shouldComputePath = true
