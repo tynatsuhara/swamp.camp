@@ -3,6 +3,7 @@ import { Point } from "brigsby/dist/Point"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Ground } from "../../world/ground/Ground"
 import { LightManager } from "../../world/LightManager"
+import { WorldTime } from "../../world/WorldTime"
 import { Dude } from "../Dude"
 import { DudeFaction, DudeType } from "../DudeFactory"
 import { NPC } from "../NPC"
@@ -15,8 +16,11 @@ export class Enemy extends Component {
         const dude = this.entity.getComponent(Dude)
         const npc = this.entity.getComponent(NPC)
 
-        // Default enemy behavior is to attack anything that isn't in an overlapping faction
-        npc.isEnemyFn = (d) => d.isEnemy(dude)
+        npc.isEnemyFn = (d) =>
+            // Default land enemy behavior is to attack anything that isn't in an overlapping faction
+            (d.isEnemy(dude) && !d.factions.includes(DudeFaction.AQUATIC)) ||
+            // Always attack their last assailant even if they're not normally considered an enemy
+            (d === dude.lastAttacker && WorldTime.instance.time - dude.lastAttackerTime < 10_000)
 
         if (dude.factions.includes(DudeFaction.ORCS)) {
             this.orc(dude, npc)
@@ -56,6 +60,7 @@ export class Enemy extends Component {
         npc.isEnemyFn = (d) => {
             return (
                 !d.factions.includes(DudeFaction.DEMONS) &&
+                !d.factions.includes(DudeFaction.AQUATIC) &&
                 LightManager.instance.isDark(d.standingPosition)
             )
         }

@@ -26,6 +26,7 @@ import { Interactable } from "../world/elements/Interactable"
 import { Ground, GroundType } from "../world/ground/Ground"
 import { Residence } from "../world/residences/Residence"
 import { WorldLocation } from "../world/WorldLocation"
+import { WorldTime } from "../world/WorldTime"
 import { DialogueSource, EMPTY_DIALOGUE, getDialogue } from "./dialogue/Dialogue"
 import { DudeAnimationUtils } from "./DudeAnimationUtils"
 import { DudeFaction, DudeType } from "./DudeFactory"
@@ -263,9 +264,11 @@ export class Dude extends Component implements DialogueSource {
 
         if (attacker) {
             this.lastAttacker = attacker
+            this.lastAttackerTime = WorldTime.instance.time
         }
     }
     lastAttacker: Dude
+    lastAttackerTime: number
 
     private onDamageCallback: (blocked: boolean) => void
     setOnDamageCallback(fn: (blocked: boolean) => void) {
