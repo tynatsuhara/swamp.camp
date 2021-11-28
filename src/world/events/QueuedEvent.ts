@@ -5,6 +5,8 @@ import { Berto } from "../../characters/types/Berto"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { NotificationDisplay, Notifications } from "../../ui/NotificationDisplay"
 import { LocationManager } from "../LocationManager"
+import { collectTaxes } from "../TaxRate"
+import { Day } from "../TimeUnit"
 import { WorldTime } from "../WorldTime"
 import { EventQueue } from "./EventQueue"
 
@@ -15,6 +17,7 @@ export enum QueuedEventType {
     HERALD_RETURN_WITH_NPC,
     DAILY_SCHEDULE, // executes daily at midnight
     ORC_SEIGE,
+    COLLECT_TAXES,
 }
 
 export type QueuedEventData = {
@@ -92,7 +95,15 @@ export const EVENT_QUEUE_HANDLERS: {
     },
 
     [QueuedEventType.DAILY_SCHEDULE]: () => {
-        console.log("daily schedule task executed")
+        console.log(`executing daily schedule for ${Day[WorldTime.instance.currentDay]}`)
+
+        if (WorldTime.instance.currentDay === Day.MONDAY) {
+            EventQueue.instance.addEvent({
+                type: QueuedEventType.COLLECT_TAXES,
+                time: WorldTime.instance.future({ hours: 8 }),
+            })
+        }
+
         EventQueue.instance.addEvent({
             type: QueuedEventType.DAILY_SCHEDULE,
             time: WorldTime.instance.tomorrow(),
@@ -101,4 +112,6 @@ export const EVENT_QUEUE_HANDLERS: {
 
     // TODO: This should wake up the player if they are sleeping
     [QueuedEventType.ORC_SEIGE]: () => DudeSpawner.instance.spawnOrcs(),
+
+    [QueuedEventType.COLLECT_TAXES]: collectTaxes,
 }

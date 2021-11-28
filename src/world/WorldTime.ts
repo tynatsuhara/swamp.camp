@@ -1,12 +1,12 @@
-import { Entity } from "brigsby/dist/Entity"
 import { Component } from "brigsby/dist/Component"
 import { UpdateData } from "brigsby/dist/Engine"
-import { EventQueue } from "./events/EventQueue"
-import { TimeUnit } from "./TimeUnit"
+import { Entity } from "brigsby/dist/Entity"
 import { WorldAudioContext } from "../audio/WorldAudioContext"
 import { saveManager } from "../SaveManager"
 import { Singletons } from "../Singletons"
+import { EventQueue } from "./events/EventQueue"
 import { LocationManager } from "./LocationManager"
+import { Day, TimeUnit } from "./TimeUnit"
 
 export class WorldTime extends Component {
     static get instance() {
@@ -16,6 +16,10 @@ export class WorldTime extends Component {
     private _time: number = 0 // millis
     get time() {
         return this._time
+    }
+
+    get currentDay(): Day {
+        return Math.floor((WorldTime.instance.time % (TimeUnit.DAY * 7)) / TimeUnit.DAY)
     }
 
     private title = window.document.title
