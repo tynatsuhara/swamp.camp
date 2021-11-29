@@ -73,7 +73,6 @@ export const BERTO_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
                 return new NextDialogue(BERT_ENTRYPOINT, false)
             }),
             new DialogueOption("We need a new settler.", () => {
-                saveManager.setState({ hasRecruitedAnyVillagers: true })
                 return new NextDialogue(BERT_VILLAGERS, true)
             }),
         ]
@@ -90,8 +89,19 @@ export const BERTO_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
         )
     },
     [BERT_VILLAGERS]: () => fetchNpcDialogue(),
-    [BERT_LEAVING]: () =>
-        dialogue(["I shall return posthaste!"], () => new NextDialogue(BERT_ENTRYPOINT, false)),
+    [BERT_LEAVING]: () => {
+        let txt = ["I shall return posthaste!"]
+        if (!saveManager.getState().hasRecruitedAnyVillagers) {
+            txt = [
+                "I shall return posthaste with thine first settler!",
+                "Upon my return, thou shalt have the option to establish a tax upon thy residents.",
+            ]
+        }
+        return dialogue(txt, () => {
+            saveManager.setState({ hasRecruitedAnyVillagers: true })
+            return new NextDialogue(BERT_ENTRYPOINT, false)
+        })
+    },
     [BERT_TAXES]: () => adjustTaxRateDialogue(),
     [BERT_TAXES_UPDATED]: () =>
         dialogue(
