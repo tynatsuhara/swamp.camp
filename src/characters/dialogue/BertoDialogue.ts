@@ -56,7 +56,7 @@ export const BERTO_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
         dialogueWithOptions(
             [
                 "Good morrow! I, Sir Berto of Dube, present myself unto thee as an emissary of The Honourable King Bob XVIII.",
-                "Should thy choose to collect raw materials, I will purchase them on behalf of The Kingdom.",
+                "Should thy choose to collect raw materials, I will purchase them on behalf of the Kingdom.",
                 "Upon receipt of a fee and construction of an appropriate dwelling, I can also bring tax-paying subjects to populate thy settlement.",
                 "Tradesmen! Knights! Worthless peons to scrub latrines and polish thine armor!",
                 "Art thou interested in any of my services at the moment?",
@@ -155,7 +155,7 @@ const fetchNpcDialogue = (): DialogueInstance => {
 
     const introText = [
         // "Thy camp contains suitable domiciles for several occupations.",
-        "Which class of settler dost thy request I procure from The Kingdom?",
+        "Which class of settler dost thy request I procure from the Kingdom?",
     ]
     const options: DialogueOption[] = []
 
@@ -164,7 +164,7 @@ const fetchNpcDialogue = (): DialogueInstance => {
         // if (residenceMap.size === 1) {
         //     introText = [
         //         "At present, only felonious peons can be spared by The King.",
-        //         "Shall I return to The Kingdom, bringing word that thou art requesting a settler?",
+        //         "Shall I return to the Kingdom, bringing word that thou art requesting a settler?",
         //     ]
         // }
     }
