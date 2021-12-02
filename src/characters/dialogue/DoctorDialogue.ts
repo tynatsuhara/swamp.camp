@@ -16,19 +16,9 @@ export const DOCTOR_DIALOGUE_ENTRYPOINT = "doc-start"
 const getItemsToBuy = (): SalePackage[] => {
     return [
         {
-            item: Item.WOOD,
-            count: 10,
-            price: 5,
-        },
-        {
-            item: Item.ROCK,
-            count: 10,
-            price: 5,
-        },
-        {
-            item: Item.IRON,
-            count: 10,
-            price: 20,
+            item: Item.WEAK_MEDICINE,
+            count: 1,
+            price: 10,
         },
     ]
 }

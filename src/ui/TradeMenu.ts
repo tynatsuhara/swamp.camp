@@ -57,7 +57,9 @@ export class TradeMenu extends Component {
     private canvas: HTMLCanvasElement
     private context: CanvasRenderingContext2D
     private dimensions = new Point(160, 158)
-    private innerDimensions = this.dimensions.minus(new Point(10, 14))
+    private get innerDimensions() {
+        return this.dimensions.minus(new Point(10, 14))
+    }
     private scrollOffset = 0
     private justSoldRow = -1 // if this is non-negative, this row was just sold and will be highlighted
     private justOpened = false // prevent bug where the mouse is held down immediately
@@ -70,8 +72,6 @@ export class TradeMenu extends Component {
         TradeMenu.instance = this
 
         this.canvas = document.createElement("canvas")
-        this.canvas.width = this.innerDimensions.x
-        this.canvas.height = this.innerDimensions.y
         this.context = this.canvas.getContext("2d", { alpha: false })
 
         assets.loadAudioFiles(CLINK_NOISES)
@@ -129,6 +129,11 @@ export class TradeMenu extends Component {
      *                        otherwise should be the storekeeper's inventory
      */
     private open(items: SalePackage[], tradeMode: TradeMode) {
+        const longestStr = Lists.maxBy(items.map(this.textForSale), (str) => str.length)
+        this.dimensions = new Point(Math.max(160, 75 + longestStr.length * TEXT_PIXEL_WIDTH), 158)
+        this.canvas.width = this.innerDimensions.x
+        this.canvas.height = this.innerDimensions.y
+
         this.isOpen = true
         this.items = items
         this.scrollOffset = 0
@@ -182,8 +187,6 @@ export class TradeMenu extends Component {
         topLeft: Point,
         items: SalePackage[]
     ): Component[] {
-        const playerInv = Player.instance.dude.inventory
-
         const coinCountComponent = new BasicRenderComponent(
             new TextRender(
                 `x${saveManager.getState().coins}`,
@@ -233,19 +236,18 @@ export class TradeMenu extends Component {
                 )
 
             const sale = items[r]
-            const saleItem = ITEM_METADATA_MAP[sale.item]
             const tradeError = this.getTradeError(sale)
 
             // trade the item
             if (hovered && updateData.input.isMouseDown && !tradeError) {
                 Sounds.play(Lists.oneOf(CLINK_NOISES), 0.4)
+                this.sourceInventory.removeItem(sale.item, sale.count)
                 if (this.tradeMode === TradeMode.PLAYER_SELLING) {
-                    playerInv.removeItem(sale.item, sale.count)
                     saveManager.setState({
                         coins: saveManager.getState().coins + sale.price,
                     })
                 } else {
-                    playerInv.addItem(sale.item, sale.count)
+                    Player.instance.dude.inventory.addItem(sale.item, sale.count)
                     saveManager.setState({
                         coins: saveManager.getState().coins - sale.price,
                     })
@@ -279,7 +281,7 @@ export class TradeMenu extends Component {
             const craftedItemIcon = this.tintedIcon(plainIcon, itemColor)
             this.drawIconAt(craftedItemIcon, margin, verticalOffset)
             this.context.fillText(
-                `${sale.count}x ${saleItem.displayName}`,
+                this.textForSale(sale),
                 TILE_SIZE + margin * 2,
                 verticalTextOffset + verticalOffset
             )
@@ -320,6 +322,10 @@ export class TradeMenu extends Component {
         )
 
         return [...backgroundTiles, renderComp, coinCountComponent]
+    }
+
+    private textForSale(sale: SalePackage) {
+        return `${sale.count}x ${ITEM_METADATA_MAP[sale.item].displayName}`
     }
 
     // caching stuff

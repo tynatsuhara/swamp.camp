@@ -217,6 +217,7 @@ export class DudeFactory {
                 speed *= 0.6
                 dialogue = DOCTOR_DIALOGUE_ENTRYPOINT
                 additionalComponents = [new NPC(), new Villager()]
+                defaultInventory.addItem(Item.WEAK_MEDICINE, 3)
                 break
             }
             case DudeType.CENTAUR: {

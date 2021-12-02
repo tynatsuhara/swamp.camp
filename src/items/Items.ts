@@ -67,6 +67,7 @@ export enum Item {
     BED,
     MINE_ENTRANCE,
     CHURCH,
+    WEAK_MEDICINE,
 
     // weapon values should match the WeaponType enum so we can cast them
     KNIFE = WeaponType.KNIFE,
@@ -161,6 +162,12 @@ export const ITEM_METADATA_MAP = {
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("bed"),
         stackLimit: 1,
         element: ElementType.BED,
+    }),
+    [Item.WEAK_MEDICINE]: new ItemMetadata({
+        displayName: "Weak medicine",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("potion1"),
+        stackLimit: 1,
+        consumable: () => Player.instance.dude.heal(2),
     }),
 
     // Locations
