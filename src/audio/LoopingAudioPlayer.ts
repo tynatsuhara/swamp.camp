@@ -12,6 +12,11 @@ export class LoopingAudioPlayer extends AudioPlayer {
     playFromStart() {
         this.stop()
 
+        if (this.track) {
+            // garbage collect
+            this.track.src = ""
+        }
+
         this.track = new Audio(this.fileName)
         this.track.loop = true
         this.track.oncanplaythrough = () => {

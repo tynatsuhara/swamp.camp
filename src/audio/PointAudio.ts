@@ -5,14 +5,14 @@ import { Settings } from "../Settings"
 
 export class PointAudio extends Component {
     private readonly audio: HTMLAudioElement
-    private readonly pos: Point
-    private readonly distance: number
-    private multiplier: number
+    position: Point
+    distance: number
+    multiplier: number
     private active: boolean = true
 
     constructor(
         filePath: string,
-        pos: Point,
+        position: Point,
         distance: number,
         loop: boolean,
         multiplier: number = 1
@@ -25,7 +25,7 @@ export class PointAudio extends Component {
             this.audio.play()
         }
 
-        this.pos = pos
+        this.position = position
         this.distance = distance
         this.multiplier = multiplier
     }
@@ -34,7 +34,7 @@ export class PointAudio extends Component {
         if (!this.active) {
             return
         }
-        const distance = Player.instance.dude.standingPosition.distanceTo(this.pos)
+        const distance = Player.instance.dude.standingPosition.distanceTo(this.position)
         this.audio.volume =
             Math.max(0, Math.min(1, 1 - distance / this.distance)) *
             Settings.getSoundVolume() *
@@ -46,6 +46,12 @@ export class PointAudio extends Component {
         if (!active) {
             this.audio.volume = 0
         }
+    }
+
+    delete() {
+        // garbage collect
+        this.audio.src = ""
+        super.delete()
     }
 
     setMultiplier(multiplier: number) {
