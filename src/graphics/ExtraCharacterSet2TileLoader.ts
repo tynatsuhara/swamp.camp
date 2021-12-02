@@ -13,6 +13,7 @@ const CHARACTERS = new Map([
     ["doctor", [0, 2]],
     ["prisoner1", [1, 1]],
     ["prisoner2", [1, 3]],
+    ["santa", [2, 4]],
 ])
 
 export class ExtraCharacterSet2TileLoader {
