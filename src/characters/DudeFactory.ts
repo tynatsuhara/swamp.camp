@@ -13,6 +13,7 @@ import { Residence } from "../world/residences/Residence"
 import { WorldLocation } from "../world/WorldLocation"
 import { BERTO_STARTING_DIALOGUE } from "./dialogue/BertoDialogue"
 import { EMPTY_DIALOGUE } from "./dialogue/Dialogue"
+import { DOCTOR_DIALOGUE_ENTRYPOINT } from "./dialogue/DoctorDialogue"
 import { Dude } from "./Dude"
 import { NPC } from "./NPC"
 import { Player } from "./Player"
@@ -214,6 +215,7 @@ export class DudeFactory {
                 animationName = "doctor"
                 maxHealth = 10
                 speed *= 0.6
+                dialogue = DOCTOR_DIALOGUE_ENTRYPOINT
                 additionalComponents = [new NPC(), new Villager()]
                 break
             }
