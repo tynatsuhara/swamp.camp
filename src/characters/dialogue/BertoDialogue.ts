@@ -15,6 +15,7 @@ import {
     DialogueInstance,
     DialogueOption,
     dialogueWithOptions,
+    getExitText,
     NextDialogue,
     option,
 } from "./Dialogue"
@@ -85,7 +86,7 @@ export const BERTO_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
             ["How shall I assist thee?"],
             DudeInteractIndicator.NONE,
             ...options,
-            option("Never mind.", BERT_ENTRYPOINT, false)
+            option(getExitText(), BERT_ENTRYPOINT, false)
         )
     },
     [BERT_VILLAGERS]: () => fetchNpcDialogue(),
@@ -179,7 +180,7 @@ const fetchNpcDialogue = (): DialogueInstance => {
         )
     }
 
-    options.push(option("Never mind.", BERT_ENTRYPOINT, false))
+    options.push(option(getExitText(), BERT_ENTRYPOINT, false))
 
     return dialogueWithOptions(introText, DudeInteractIndicator.NONE, ...options)
 }

@@ -7,6 +7,7 @@ import {
     DialogueInstance,
     DialogueOption,
     dialogueWithOptions,
+    getExitText,
     NextDialogue,
     option,
 } from "./Dialogue"
@@ -28,13 +29,13 @@ export const DOCTOR_DIALOGUE: { [key: string]: () => DialogueInstance } = {
         const doctor: Dude = DialogueDisplay.instance.source as Dude
 
         return dialogueWithOptions(
-            [`It looks like you have enough rocks and wood. Should we put together a campfire?`],
+            ["I offer goods and services to keep the town healthy."],
             DudeInteractIndicator.NONE,
-            new DialogueOption("Let's craft", () => {
+            new DialogueOption("What's for sale?", () => {
                 TradeMenu.instance.buy(getItemsToBuy()).from(doctor)
                 return new NextDialogue(DOCTOR_DIALOGUE_ENTRYPOINT, false)
             }),
-            option("Not yet.", DOCTOR_DIALOGUE_ENTRYPOINT, false)
+            option(getExitText(), DOCTOR_DIALOGUE_ENTRYPOINT, false)
         )
     },
 }

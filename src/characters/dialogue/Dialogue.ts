@@ -64,6 +64,8 @@ export const saveAfterDialogueStage = () => {
 }
 export const inv = () => Player.instance.dude.inventory
 
+export const getExitText = () => "Never mind."
+
 export interface DialogueSource {
     /**
      * the unique dialogue key

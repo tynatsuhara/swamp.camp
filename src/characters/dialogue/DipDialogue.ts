@@ -15,6 +15,7 @@ import {
     DialogueInstance,
     DialogueOption,
     dialogueWithOptions,
+    getExitText,
     inv,
     NextDialogue,
     option,
@@ -152,7 +153,7 @@ export const DIP_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
                 CraftingMenu.instance.open(getDipRecipes())
                 return new NextDialogue(DIP_CRAFT, false)
             }),
-            option("Nope.", DIP_CRAFT, false)
+            option(getExitText(), DIP_CRAFT, false)
         )
     },
 }
