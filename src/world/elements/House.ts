@@ -15,17 +15,21 @@ import { ElementType } from "./Elements"
 import { ElementUtils } from "./ElementUtils"
 import { Interactable } from "./Interactable"
 
-const RESIDENT_ATTRIBUTE = "rez"
+type HouseData = {
+    destinationUUID: string
+    residents: string[]
+}
 
 export class HouseFactory extends BuildingFactory {
     readonly type = ElementType.HOUSE
     readonly dimensions = new Point(5, 4)
 
-    make(wl: WorldLocation, pos: Point, data: any): ElementComponent {
+    make(wl: WorldLocation, pos: Point, data: HouseData): ElementComponent {
         const e = new Entity()
 
         // the interior location UUID
         const destinationUUID: string = data.destinationUUID ?? makeHouseInterior(wl).uuid
+        const residents = data.residents || []
 
         const interactablePos = pos.plus(new Point(2.5, 3)).times(TILE_SIZE)
         const doorId = TeleporterPrefix.DOOR
@@ -83,26 +87,17 @@ export class HouseFactory extends BuildingFactory {
             )
         )
 
-        // parse residents as string or array for backwards compatibility
-        let residents: string[]
-        if (!data[RESIDENT_ATTRIBUTE]) {
-            residents = []
-        } else if (typeof data[RESIDENT_ATTRIBUTE] === "string") {
-            residents = [data[RESIDENT_ATTRIBUTE]]
-        } else {
-            residents = data[RESIDENT_ATTRIBUTE]
-        }
-
-        const house = e.addComponent(
+        const residence = e.addComponent(
             new SingleTypeResidence(DudeType.VILLAGER, 1, destinationUUID, residents)
         )
 
+        const save: () => HouseData = () => ({
+            destinationUUID,
+            residents: residence.getResidents(),
+        })
+
         return e.addComponent(
-            new ElementComponent(ElementType.HOUSE, pos, this.getOccupiedPoints(pos), () => ({
-                destinationUUID,
-                // store rez as string for backwards compatibility
-                [RESIDENT_ATTRIBUTE]: house.getResidents(),
-            }))
+            new ElementComponent(this.type, pos, this.getOccupiedPoints(pos), save)
         )
     }
 
