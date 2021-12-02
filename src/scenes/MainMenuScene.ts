@@ -14,6 +14,7 @@ import { View } from "brigsby/dist/View"
 import { Ambiance } from "../audio/Ambiance"
 import { Music } from "../audio/Music"
 import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
+import { Player } from "../characters/Player"
 import { FireParticles } from "../graphics/FireParticles"
 import { Particles } from "../graphics/Particles"
 import { getImage, Tilesets, TILE_SIZE } from "../graphics/Tilesets"
@@ -53,6 +54,9 @@ export class MainMenuScene {
     }
 
     reset() {
+        Player.instance = undefined
+
+        // TODO: this isn't fully effective
         Music.stop()
         Ambiance.stop()
 

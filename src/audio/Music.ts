@@ -77,7 +77,7 @@ export class Music {
     /**
      * currentMusic will always be updated after calling
      */
-    static play(music: AudioPlayer) {
+    private static play(music: AudioPlayer) {
         if (Music.currentMusic === music) {
             return
         }

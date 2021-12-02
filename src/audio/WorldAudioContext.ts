@@ -1,9 +1,10 @@
 import { Player } from "../characters/Player"
+import { Singletons } from "../Singletons"
 import { Ambiance } from "./Ambiance"
 import { Music } from "./Music"
 
 export class WorldAudioContext {
-    static readonly instance = new WorldAudioContext()
+    static readonly instance = Singletons.getOrCreate(WorldAudioContext)
     private readonly listeners: ((ctx: WorldAudioContext) => void)[] = [
         Ambiance.determineAmbiance,
         Music.determineMusic,
@@ -27,7 +28,7 @@ export class WorldAudioContext {
     set isInterior(value: boolean) {
         if (this._isInterior != value) {
             this._isInterior = value
-            this.notifyListeners()
+            // this.notifyListeners()
         }
     }
 
@@ -38,11 +39,14 @@ export class WorldAudioContext {
     set isInBattle(value: boolean) {
         if (this._isInBattle != value) {
             this._isInBattle = value
-            this.notifyListeners()
+            // this.notifyListeners()
         }
     }
 
     private notifyListeners() {
+        // This is a proxy that prevents music from starting until
+        // the game has really started (after the first cutscene)
+        // TODO: How to do this better?
         if (!Player.instance?.dude) {
             return
         }

@@ -1,16 +1,17 @@
+import { assets } from "brigsby/dist/Assets"
 import { BoxCollider } from "brigsby/dist/collision/BoxCollider"
 import { Collider } from "brigsby/dist/collision/Collider"
 import { Component } from "brigsby/dist/Component"
 import { Point } from "brigsby/dist/Point"
 import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
+import { Lists } from "brigsby/dist/util/Lists"
+import { Sounds } from "../audio/Sounds"
 import { Player } from "../characters/Player"
+import { saveManager } from "../SaveManager"
 import { LocationManager } from "../world/LocationManager"
 import { Item, ITEM_METADATA_MAP } from "./Items"
-import { saveManager } from "../SaveManager"
-import { assets } from "brigsby/dist/Assets"
-import { Sounds } from "../audio/Sounds"
-import { Lists } from "brigsby/dist/util/Lists"
 
+// TODO: Find a better sound effect (this one isn't very audible)
 const PICK_UP_SOUNDS = Lists.range(0, 4).map((i) => `audio/impact/impactWood_medium_00${i}.ogg`)
 
 export class DroppedItem extends Component {

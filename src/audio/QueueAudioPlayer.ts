@@ -92,7 +92,7 @@ export class QueueAudioPlayer extends AudioPlayer {
     private playNextSong() {
         this.log(`finished playing ${this.fileName}`)
 
-        this.currentAudio.pause()
+        this.stop()
         this.files.push(this.files.shift())
         // start next track
         this.playFromStart()
@@ -116,7 +116,12 @@ export class QueueAudioPlayer extends AudioPlayer {
     }
 
     stop() {
-        this.currentAudio?.pause()
+        if (this.currentAudio) {
+            this.currentAudio.pause()
+            this.currentAudio.src = ""
+            this.currentAudio = null
+        }
+        console.log("music stopped")
     }
 
     updateAudioElementVolume() {
