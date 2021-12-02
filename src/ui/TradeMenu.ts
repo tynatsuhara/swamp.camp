@@ -38,8 +38,8 @@ const CLINK_NOISES = [
 ]
 
 // this is mostly copied from CraftingMenu and InventoryDisplay
-export class SellMenu extends Component {
-    static instance: SellMenu
+export class TradeMenu extends Component {
+    static instance: TradeMenu
 
     private readonly e: Entity = new Entity([this]) // entity for this component
     private displayEntity: Entity
@@ -58,7 +58,7 @@ export class SellMenu extends Component {
 
     constructor() {
         super()
-        SellMenu.instance = this
+        TradeMenu.instance = this
 
         this.canvas = document.createElement("canvas")
         this.canvas.width = this.innerDimensions.x

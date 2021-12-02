@@ -1,6 +1,6 @@
 import { Item } from "../../items/Items"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
-import { SalePackage, SellMenu } from "../../ui/SellMenu"
+import { SalePackage, TradeMenu } from "../../ui/TradeMenu"
 import {
     DialogueInstance,
     DialogueOption,
@@ -37,7 +37,7 @@ export const DOCTOR_DIALOGUE: { [key: string]: () => DialogueInstance } = {
             [`It looks like you have enough rocks and wood. Should we put together a campfire?`],
             DudeInteractIndicator.NONE,
             new DialogueOption("Let's craft", () => {
-                SellMenu.instance.show(getItemsToSell())
+                TradeMenu.instance.show(getItemsToSell())
                 return new NextDialogue(DOCTOR_DIALOGUE_ENTRYPOINT, false)
             }),
             option("Not yet.", DOCTOR_DIALOGUE_ENTRYPOINT, false)

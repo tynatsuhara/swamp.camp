@@ -1,7 +1,7 @@
 import { Item } from "../../items/Items"
 import { saveManager } from "../../SaveManager"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
-import { SalePackage, SellMenu } from "../../ui/SellMenu"
+import { SalePackage, TradeMenu } from "../../ui/TradeMenu"
 import { EventQueue } from "../../world/events/EventQueue"
 import { QueuedEventType } from "../../world/events/QueuedEvent"
 import { LocationManager } from "../../world/LocationManager"
@@ -69,7 +69,7 @@ export const BERTO_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
     [BERT_MENU]: () => {
         const options = [
             new DialogueOption("What are you buying?", () => {
-                SellMenu.instance.show(getItemsToSell())
+                TradeMenu.instance.show(getItemsToSell())
                 return new NextDialogue(BERT_ENTRYPOINT, false)
             }),
             new DialogueOption("We need a new settler.", () => {

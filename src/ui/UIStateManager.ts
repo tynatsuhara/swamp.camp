@@ -9,7 +9,7 @@ import { InventoryDisplay } from "./InventoryDisplay"
 import { NotificationDisplay } from "./NotificationDisplay"
 import { PauseMenu } from "./PauseMenu"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
-import { SellMenu } from "./SellMenu"
+import { TradeMenu } from "./TradeMenu"
 
 export class UIStateManager {
     static get instance() {
@@ -23,7 +23,7 @@ export class UIStateManager {
     private readonly placeElementDisplay = new PlaceElementDisplay()
     private readonly pauseMenu = new PauseMenu()
     private readonly craftingMenu = new CraftingMenu()
-    private readonly sellMenu = new SellMenu()
+    private readonly sellMenu = new TradeMenu()
     private readonly notificationDisplay = new NotificationDisplay()
 
     // if this is true, input observed by other components (like the player)
