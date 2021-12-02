@@ -214,7 +214,10 @@ export class WorldLocation {
 
         return this.occupied.findPath(tileStart, tileEnd, {
             heuristic: (pt) => heuristic(pt, tileEnd),
-            distance: (a, b) => (Ground.isWater(this.getGround(b)?.type) ? 3 : 1),
+            distance: (a, b) => {
+                const type = this.getGround(b)?.type
+                return type === GroundType.LEDGE || Ground.isWater(type) ? 3 : 1
+            },
             isOccupied: (pt) => {
                 // Assuming this is used for character-to-character pathfinding, the start
                 // and end points in the grid should be assumed to be open. For instance,
