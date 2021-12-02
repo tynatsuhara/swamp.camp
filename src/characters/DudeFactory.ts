@@ -58,6 +58,7 @@ export enum DudeType {
     NUN,
     BISHOP,
     SWAMP_THING,
+    DOCTOR,
 }
 
 export class DudeFactory {
@@ -206,7 +207,13 @@ export class DudeFactory {
                 animationName = `prisoner${Math.ceil(Math.random() * 2)}`
                 maxHealth = 4
                 speed *= 0.6
-                // TODO: add a new type of schedule for a villager with a home
+                additionalComponents = [new NPC(), new Villager()]
+                break
+            }
+            case DudeType.DOCTOR: {
+                animationName = "doctor"
+                maxHealth = 10
+                speed *= 0.6
                 additionalComponents = [new NPC(), new Villager()]
                 break
             }

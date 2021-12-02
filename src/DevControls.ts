@@ -13,8 +13,8 @@ import { WorldTime } from "./world/WorldTime"
 const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     [
         InputKey.O,
-        "spawn swampy",
-        (input) => DudeFactory.instance.new(DudeType.SWAMP_THING, input.mousePos),
+        "spawn doctor",
+        (input) => DudeFactory.instance.new(DudeType.DOCTOR, input.mousePos),
     ],
     [
         InputKey.P,
