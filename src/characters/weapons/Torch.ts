@@ -1,4 +1,5 @@
 import { Point } from "brigsby/dist/Point"
+import { PointAudio } from "../../audio/PointAudio"
 import { FireParticles } from "../../graphics/FireParticles"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { LightManager } from "../../world/LightManager"
@@ -17,6 +18,7 @@ const DIAMETERS = [40, 60, 80]
  */
 export class Torch extends Shield {
     private particles: FireParticles
+    private audio: PointAudio
 
     constructor() {
         super(ShieldType.TORCH, "tool_torch")
@@ -34,6 +36,15 @@ export class Torch extends Shield {
                 () => this.transform.depth + 0.1
             )
         )
+
+        this.audio = this.entity.addComponent(
+            new PointAudio(
+                "audio/ambiance/campfire.ogg",
+                this.dude.standingPosition,
+                TILE_SIZE,
+                true
+            )
+        )
     }
 
     update() {
@@ -48,6 +59,7 @@ export class Torch extends Shield {
             return
         }
 
+        // one-based index of the DIAMETERS array
         const size =
             DIAMETERS.length - Math.floor((DIAMETERS.length * (now - fireStart)) / LIFESPAN_MILLIS)
         this.particles.size = size
@@ -61,11 +73,15 @@ export class Torch extends Shield {
                 .plus(this.dude.getAnimationOffsetPosition()),
             diameter
         )
+
+        this.audio.position = this.dude.standingPosition
+        this.audio.multiplier = (1 / (DIAMETERS.length - size + 1)) * 0.5
     }
 
     delete() {
         this.dude.blob[BLOB_ATTRIBUTE] = undefined
         this.particles.delete()
+        this.audio.delete()
         this.removeLight()
         super.delete()
     }
