@@ -759,7 +759,7 @@ export class Dude extends Component implements DialogueSource {
         }
     }
 
-    private log(message: any) {
+    log(message: any) {
         console.log(`${DudeType[this.type]}: ${message}`)
     }
 }

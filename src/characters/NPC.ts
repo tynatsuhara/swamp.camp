@@ -147,6 +147,7 @@ export class NPC extends Component {
     setSchedule(schedule: NPCSchedule) {
         this.dude.blob[NPCSchedules.SCHEDULE_KEY] = schedule
         this.clearExistingAIState()
+        this.task = this.getScheduledTask()
     }
 
     getSchedule(): NPCSchedule {
@@ -196,8 +197,12 @@ export class NPC extends Component {
 
     private walkPath: Point[] = null
     private walkTo(tilePt: Point, updateData: UpdateData, speedMultiplier: number = 1) {
-        // TODO: make sure the existing path is to the same pt
-        if (!this.walkPath || this.walkPath.length === 0) {
+        if (
+            this.walkPath?.length > 0 &&
+            pixelPtToTilePt(Lists.last(this.walkPath)).distanceTo(tilePt) <= 1
+        ) {
+            // already en route to this spot
+        } else if (!this.walkPath || this.walkPath.length === 0) {
             // only try once per upate() to find a path
             this.walkPath = this.findPath(tilePt)
             if (!this.walkPath || this.walkPath.length === 0) {
@@ -205,6 +210,7 @@ export class NPC extends Component {
                 return
             }
         }
+
         if (
             this.walkDirectlyTo(
                 this.walkPath[0],
