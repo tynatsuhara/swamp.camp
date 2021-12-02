@@ -9,7 +9,6 @@ import { DudeSaveState } from "../saves/DudeSaveState"
 import { newUUID } from "../saves/uuid"
 import { Singletons } from "../Singletons"
 import { LocationManager } from "../world/LocationManager"
-import { Residence } from "../world/residences/Residence"
 import { WorldLocation } from "../world/WorldLocation"
 import { BERTO_STARTING_DIALOGUE } from "./dialogue/BertoDialogue"
 import { EMPTY_DIALOGUE } from "./dialogue/Dialogue"
@@ -69,31 +68,33 @@ export class DudeFactory {
 
     /**
      * Create a new Dude in the specified location, defaults to the exterior world location
+     * @param hasPendingSlot should be true if the character already had a home reserved
+     *                       for them. If not, they will try to mark a spot as pending.
      */
     new(
         type: DudeType,
         pos: Point,
-        location: WorldLocation = LocationManager.instance.exterior()
+        location: WorldLocation = LocationManager.instance.exterior(),
+        hasPendingSlot = false
     ): Dude {
-        return this.make(type, pos, null, location)
+        return this.make(type, pos, null, location, hasPendingSlot)
     }
 
     /**
      * Instantiates a Dude+Entity in the specified location
      */
     load(saveState: DudeSaveState, location: WorldLocation) {
-        this.make(saveState.type, Point.fromString(saveState.pos), saveState, location)
+        this.make(saveState.type, Point.fromString(saveState.pos), saveState, location, false)
     }
 
     private make(
         type: DudeType,
         pos: Point,
         saveState: DudeSaveState,
-        location: WorldLocation
+        location: WorldLocation,
+        hasPendingSlot: boolean
     ): Dude {
         const uuid = saveState?.uuid ?? newUUID()
-
-        this.claimResidence(type, uuid)
 
         // defaults
         let factions: DudeFaction[] = [DudeFaction.VILLAGERS]
@@ -282,6 +283,7 @@ export class DudeFactory {
         // use saved data instead of defaults
         const d = new Dude(
             uuid,
+            hasPendingSlot,
             type,
             factions, // TODO: Save factions? Only if they become mutable
             saveState?.anim ?? animationName,
@@ -304,32 +306,5 @@ export class DudeFactory {
         new Entity([d, ...additionalComponents])
 
         return d
-    }
-
-    private claimResidence(type: DudeType, uuid: string) {
-        if (!LocationManager.instance.exterior()) {
-            // Our locations aren't initialized yet, so this NPC is being spawned as a
-            // save is loaded. We can assume that the residence is already configured.
-            return
-        }
-
-        const residences = LocationManager.instance
-            .exterior()
-            .getElements()
-            .flatMap((e) => e.entity.getComponents(Residence))
-            .filter((e) => !!e)
-
-        const hasResidence = residences.some((residence) => residence.isHomeOf(uuid))
-
-        if (hasResidence) {
-            return
-        }
-
-        const pending = residences.filter((res) => res?.canClaimPendingSlot(type))
-        if (pending.length > 0) {
-            pending[0].claimPendingSlot(uuid)
-        }
-
-        // TODO: this might make someone homeless if you spawn an NPC with dev controls
     }
 }

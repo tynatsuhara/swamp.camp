@@ -89,7 +89,8 @@ export const EVENT_QUEUE_HANDLERS: {
             DudeFactory.instance.new(
                 type,
                 LocationManager.instance.exteriorEntrancePosition(),
-                LocationManager.instance.exterior()
+                LocationManager.instance.exterior(),
+                true // they already have a claimed residence
             )
         })
     },

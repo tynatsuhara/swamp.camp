@@ -24,6 +24,7 @@ import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Interactable } from "../world/elements/Interactable"
 import { Ground, GroundType } from "../world/ground/Ground"
+import { LocationManager } from "../world/LocationManager"
 import { Residence } from "../world/residences/Residence"
 import { WorldLocation } from "../world/WorldLocation"
 import { WorldTime } from "../world/WorldTime"
@@ -109,6 +110,7 @@ export class Dude extends Component implements DialogueSource {
 
     constructor(
         uuid: string,
+        hasPendingSlot: boolean,
         type: DudeType,
         factions: DudeFaction[],
         characterAnimName: string,
@@ -187,6 +189,7 @@ export class Dude extends Component implements DialogueSource {
 
         this.start = () => {
             this.seaLevel = this.location.levels?.get(this.tile) ?? 0
+            this.claimResidence(type, uuid, hasPendingSlot)
         }
     }
 
@@ -674,6 +677,39 @@ export class Dude extends Component implements DialogueSource {
     delete() {
         this.location.dudes.delete(this)
         super.delete()
+    }
+
+    private claimResidence(type: DudeType, uuid: string, hasPendingSlot: boolean) {
+        if (!this.factions.includes(DudeFaction.VILLAGERS)) {
+            return
+        }
+
+        const residences = LocationManager.instance
+            .exterior()
+            .getElements()
+            .flatMap((e) => e.entity.getComponents(Residence))
+            .filter((e) => !!e)
+
+        const hasResidence = residences.some((residence) => residence.isHomeOf(uuid))
+
+        if (hasResidence) {
+            return
+        }
+
+        if (hasPendingSlot) {
+            const pending = residences.filter((res) => res.canClaimPendingSlot(type))
+            if (pending.length > 0) {
+                pending[0].claimPendingSlot(uuid)
+            }
+            return
+        }
+
+        // Probably spawned via dev controls
+        const availableResidences = residences.filter((res) => res.hasCapacity(type))
+        if (availableResidences.length > 0) {
+            availableResidences[0].setResidentPending()
+            availableResidences[0].claimPendingSlot(uuid)
+        }
     }
 
     private getIndicator(): RenderMethod[] {

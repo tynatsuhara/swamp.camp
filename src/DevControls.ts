@@ -18,8 +18,8 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     ],
     [
         InputKey.P,
-        "spawn small demon",
-        (input) => DudeFactory.instance.new(DudeType.HORNED_DEMON, input.mousePos),
+        "spawn villager",
+        (input) => DudeFactory.instance.new(DudeType.VILLAGER, input.mousePos),
     ],
     [
         InputKey.U,
