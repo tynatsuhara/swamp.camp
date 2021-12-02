@@ -25,12 +25,7 @@ export class NPC extends Component {
     private dude: Dude
 
     isEnemyFn: (dude: Dude) => boolean = () => false
-    enemyToAttackFilterFn: (enemies: Dude[]) => Dude[] = (enemies) => {
-        // default behavior is to fight armed enemies first
-        // TODO: dumb enemies (wildlife) shouldn't care about this
-        const armedEnemies = enemies.filter((d) => !!d.weapon)
-        return armedEnemies.length > 0 ? armedEnemies : enemies
-    }
+    enemyToAttackFilterFn: (enemies: Dude[]) => Dude[] = (enemies) => enemies
     pathFindingHeuristic: (pt: Point, goal: Point) => number = (pt, goal) =>
         pt.manhattanDistanceTo(goal)
     pathIsOccupied: (pt: Point) => boolean = () => false
