@@ -69,7 +69,7 @@ export const BERTO_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
     [BERT_MENU]: () => {
         const options = [
             new DialogueOption("What are you buying?", () => {
-                TradeMenu.instance.show(getItemsToSell())
+                TradeMenu.instance.open(getItemsToSell())
                 return new NextDialogue(BERT_ENTRYPOINT, false)
             }),
             new DialogueOption("We need a new settler.", () => {

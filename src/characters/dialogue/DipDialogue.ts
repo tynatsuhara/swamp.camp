@@ -128,7 +128,7 @@ export const DIP_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
                 ],
                 DudeInteractIndicator.IMPORTANT_DIALOGUE,
                 new DialogueOption(CRAFT_OPTION, () => {
-                    CraftingMenu.instance.show(getDipRecipes())
+                    CraftingMenu.instance.open(getDipRecipes())
                     return new NextDialogue(DIP_MAKE_CAMPFIRE, false)
                 }),
                 option("Not yet.", DIP_MAKE_CAMPFIRE, false)
@@ -149,7 +149,7 @@ export const DIP_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
             ["Can I help you make something?"],
             DudeInteractIndicator.NONE,
             new DialogueOption(CRAFT_OPTION, () => {
-                CraftingMenu.instance.show(getDipRecipes())
+                CraftingMenu.instance.open(getDipRecipes())
                 return new NextDialogue(DIP_CRAFT, false)
             }),
             option("Nope.", DIP_CRAFT, false)

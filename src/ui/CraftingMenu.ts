@@ -90,7 +90,7 @@ export class CraftingMenu extends Component {
         this.tooltip.clear()
     }
 
-    show(recipes: CraftingRecipeCategory[]) {
+    open(recipes: CraftingRecipeCategory[]) {
         this.isOpen = true
         this.recipes = recipes
         this.scrollOffset = 0

@@ -28,7 +28,7 @@ export class PauseMenu extends Component {
         if ((pressEsc && this.isOpen) || CutsceneManager.instance.isMidCutscene) {
             this.close()
         } else if (pressEsc && !UIStateManager.instance.isMenuOpen) {
-            this.show(updateData.dimensions)
+            this.open(updateData.dimensions)
         }
     }
 
@@ -38,7 +38,7 @@ export class PauseMenu extends Component {
         this.controlsDisplay = null
     }
 
-    show(dimensions: Point) {
+    open(dimensions: Point) {
         const buttons = [
             {
                 text: "SAVE GAME",
@@ -56,7 +56,7 @@ export class PauseMenu extends Component {
                     } else {
                         Settings.increaseMusicVolume()
                     }
-                    this.show(dimensions) // refresh
+                    this.open(dimensions) // refresh
                 },
             },
             {
@@ -67,7 +67,7 @@ export class PauseMenu extends Component {
                     } else {
                         Settings.increaseSoundVolume()
                     }
-                    this.show(dimensions) // refresh
+                    this.open(dimensions) // refresh
                 },
             },
             {

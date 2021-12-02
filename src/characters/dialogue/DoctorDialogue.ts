@@ -37,7 +37,7 @@ export const DOCTOR_DIALOGUE: { [key: string]: () => DialogueInstance } = {
             [`It looks like you have enough rocks and wood. Should we put together a campfire?`],
             DudeInteractIndicator.NONE,
             new DialogueOption("Let's craft", () => {
-                TradeMenu.instance.show(getItemsToSell())
+                TradeMenu.instance.open(getItemsToSell())
                 return new NextDialogue(DOCTOR_DIALOGUE_ENTRYPOINT, false)
             }),
             option("Not yet.", DOCTOR_DIALOGUE_ENTRYPOINT, false)

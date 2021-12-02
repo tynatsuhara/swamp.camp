@@ -103,7 +103,7 @@ export class TradeMenu extends Component {
         this.tooltip.clear()
     }
 
-    show(items: SalePackage[]) {
+    open(items: SalePackage[]) {
         this.isOpen = true
         this.items = items
         this.scrollOffset = 0

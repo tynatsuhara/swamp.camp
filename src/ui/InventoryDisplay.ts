@@ -68,14 +68,14 @@ export class InventoryDisplay extends Component {
         if (this.isOpen && (pressI || pressEsc)) {
             this.close()
         } else if (pressI && !UIStateManager.instance.isMenuOpen) {
-            this.show()
+            this.open()
         }
 
         if (!this.isOpen) {
             return
         }
 
-        const refreshView = () => this.show(this.onClose, this.tradingInv)
+        const refreshView = () => this.open(this.onClose, this.tradingInv)
         const canRemoveFromPlayerInv = (item: Item) => {
             if (this.playerInv.getItemCount(item) === 1) {
                 // unequip equipped weapons
@@ -298,7 +298,7 @@ export class InventoryDisplay extends Component {
         }
     }
 
-    show(onClose: () => void = null, tradingInv: Inventory = null) {
+    open(onClose: () => void = null, tradingInv: Inventory = null) {
         this.onClose = onClose
         this.tradingInv = tradingInv
         const screenDimensions = Camera.instance.dimensions

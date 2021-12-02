@@ -61,7 +61,7 @@ export class ChestFactory extends ElementFactory {
                 .plusX(TILE_SIZE / 2)
                 .plusY(10),
             () => {
-                InventoryDisplay.instance.show(() => animator.goToAnimation(1).play(), inventory)
+                InventoryDisplay.instance.open(() => animator.goToAnimation(1).play(), inventory)
                 animator.goToAnimation(0).play()
             },
             new Point(0, -17)
