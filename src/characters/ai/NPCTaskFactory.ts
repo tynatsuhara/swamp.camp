@@ -6,9 +6,6 @@ import { NPCTaskScheduleGoToSpot } from "./NPCTaskScheduleGoToSpot"
 import { NPCTaskScheduleRoam } from "./NPCTaskScheduleRoam"
 
 export class NPCTaskFactory {
-    /**
-     * This function will be created on every update()
-     */
     static fromSchedule(schedule: NPCSchedule): NPCTask {
         switch (schedule.type) {
             case NPCScheduleType.DO_NOTHING:

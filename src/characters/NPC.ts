@@ -25,8 +25,9 @@ export class NPC extends Component {
     private dude: Dude
 
     isEnemyFn: (dude: Dude) => boolean = () => false
-    enemyFilterFn: (enemies: Dude[]) => Dude[] = (enemies) => {
+    enemyToAttackFilterFn: (enemies: Dude[]) => Dude[] = (enemies) => {
         // default behavior is to fight armed enemies first
+        // TODO: dumb enemies (wildlife) shouldn't care about this
         const armedEnemies = enemies.filter((d) => !!d.weapon)
         return armedEnemies.length > 0 ? armedEnemies : enemies
     }
@@ -39,6 +40,8 @@ export class NPC extends Component {
     get timeOfDay() {
         return WorldTime.instance.time % TimeUnit.DAY
     }
+
+    private task: NPCTask
 
     constructor() {
         super()
@@ -54,7 +57,7 @@ export class NPC extends Component {
     }
 
     start() {
-        this.doWhileLiving(() => this.checkForEnemies(), 1000 + 1000 * Math.random())
+        this.doWhileLiving(() => this.decideWhatToDo(), 1000 + 1000 * Math.random())
     }
 
     update(updateData: UpdateData) {
@@ -101,16 +104,14 @@ export class NPC extends Component {
     }
 
     private doNormalScheduledActivity(updateData: UpdateData) {
-        const task = this.getScheduledTask()
-
-        if (task) {
+        if (this.task) {
             const context: NPCTaskContext = {
                 dude: this.dude,
                 walkTo: (pt) => this.walkTo(pt, updateData),
                 roam: (speed, options) => this.doRoam(updateData, speed, options),
                 goToLocation: (location) => this.goToLocation(updateData, location), // TODO
             }
-            task.performTask(context)
+            this.task.performTask(context)
         } else {
             // Stand still and do nothing by default
             this.dude.move(updateData, Point.ZERO)
@@ -121,6 +122,10 @@ export class NPC extends Component {
 
     // TODO: Should this take some time variable to determine how long the simulation is?
     simulate() {
+        if (!this.dude.isAlive) {
+            return
+        }
+
         this.clearExistingAIState()
 
         const task = this.getScheduledTask()
@@ -169,6 +174,7 @@ export class NPC extends Component {
         this.attackTarget = null
         this.targetPath = null
         this.teleporterTarget = null
+        this.task = null
         // this.followTarget = null
     }
 
@@ -441,7 +447,21 @@ export class NPC extends Component {
         return this.dude.standingPosition.distanceTo(pt) < 8
     }
 
-    private checkForEnemies() {
+    /**
+     * Called on a regular interval (every few seconds)
+     * Updates cached tasks, attack targets, etc
+     */
+    private decideWhatToDo() {
+        const foundEnemies = this.checkForEnemies()
+        if (!foundEnemies) {
+            this.task = this.getScheduledTask()
+        }
+    }
+
+    /**
+     * @returns true if an enemy is encountered
+     */
+    private checkForEnemies(): boolean {
         let target: Dude
 
         if (
@@ -462,12 +482,15 @@ export class NPC extends Component {
                 )
 
             this.enemiesPresent = enemies.length > 0
-            if (!this.dude.weapon || !this.enemiesPresent) {
+            if (!this.enemiesPresent) {
+                return false
+            }
+            if (!this.dude.weapon) {
                 // should flee instead
-                return
+                return true
             }
 
-            enemies = this.enemyFilterFn(enemies)
+            enemies = this.enemyToAttackFilterFn(enemies)
 
             if (this.attackTarget && enemies.includes(this.attackTarget)) {
                 // continue attacking their current target if they're still valid
@@ -502,6 +525,8 @@ export class NPC extends Component {
 
             this.attackTarget = target
         }
+
+        return !!target
     }
 
     private forceMoveToTilePosition(pt: Point) {

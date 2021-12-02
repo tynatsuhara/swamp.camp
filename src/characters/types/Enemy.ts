@@ -37,12 +37,12 @@ export class Enemy extends Component {
 
         if (dude.type === DudeType.ORC_SHAMAN) {
             // Shamans use AOE attacks and will only target the player
-            npc.enemyFilterFn = (enemies) => {
+            npc.enemyToAttackFilterFn = (enemies) => {
                 return enemies.filter((e) => e.type === DudeType.PLAYER)
             }
         } else {
             // Only attack armed enemies if they are close enough to be dangerous, otherwise target the weak
-            npc.enemyFilterFn = (enemies) => {
+            npc.enemyToAttackFilterFn = (enemies) => {
                 const nearbyArmedEnemies = enemies.filter(
                     (d) =>
                         !!d.weapon &&
