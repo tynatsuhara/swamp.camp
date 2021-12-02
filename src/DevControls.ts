@@ -135,3 +135,10 @@ window["help"] = () => {
     })
     console.log(help)
 }
+
+window["getPlayer"] = () => {
+    return LocationManager.instance
+        .getLocations()
+        .map((l) => l.getDude(DudeType.PLAYER))
+        .find((p) => !!p)
+}
