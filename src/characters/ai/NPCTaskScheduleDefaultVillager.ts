@@ -27,6 +27,9 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         } else {
             // Go home!
             goalLocation = this.findHomeLocation(context.dude)
+
+            // TODO: Go to light
+            // if !(goalLocation) {}
         }
 
         if (!goalLocation || context.dude.location === goalLocation) {
