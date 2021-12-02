@@ -14,16 +14,23 @@ import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Lists } from "brigsby/dist/util/Lists"
 import { Maths } from "brigsby/dist/util/Maths"
 import { Sounds } from "../audio/Sounds"
+import { Dude } from "../characters/Dude"
 import { Player } from "../characters/Player"
 import { Camera } from "../cutscenes/Camera"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { Inventory } from "../items/Inventory"
 import { Item, ITEM_METADATA_MAP } from "../items/Items"
 import { saveManager } from "../SaveManager"
 import { Color } from "./Color"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
 import { Tooltip } from "./Tooltip"
 import { UIStateManager } from "./UIStateManager"
+
+export enum TradeMode {
+    PLAYER_SELLING = "sell",
+    PLAYER_BUYING = "buy",
+}
 
 export type SalePackage = {
     readonly item: Item
@@ -55,6 +62,8 @@ export class TradeMenu extends Component {
     private justSoldRow = -1 // if this is non-negative, this row was just sold and will be highlighted
     private justOpened = false // prevent bug where the mouse is held down immediately
     private tooltip = this.e.addComponent(new Tooltip())
+    private tradeMode: TradeMode
+    private sourceInventory: Inventory
 
     constructor() {
         super()
@@ -91,7 +100,9 @@ export class TradeMenu extends Component {
             this.justOpened = false
 
             if (this.justSoldRow !== -1) {
-                this.tooltip.say("Sold!")
+                this.tooltip.say(
+                    this.tradeMode === TradeMode.PLAYER_SELLING ? "Sold!" : "Purchased!"
+                )
             }
         }
     }
@@ -103,11 +114,26 @@ export class TradeMenu extends Component {
         this.tooltip.clear()
     }
 
-    open(items: SalePackage[]) {
+    sell(items: SalePackage[]) {
+        this.open(items, TradeMode.PLAYER_SELLING)
+        this.sourceInventory = Player.instance.dude.inventory
+    }
+
+    buy(items: SalePackage[]) {
+        this.open(items, TradeMode.PLAYER_BUYING)
+        return this
+    }
+
+    /**
+     * @param sourceInventory should be the player inventory if tradeMode=PLAYER_SELLING,
+     *                        otherwise should be the storekeeper's inventory
+     */
+    private open(items: SalePackage[], tradeMode: TradeMode) {
         this.isOpen = true
         this.items = items
         this.scrollOffset = 0
         this.justOpened = true
+        this.tradeMode = tradeMode
 
         this.coinEntity = new Entity([
             new AnimatedSpriteComponent(
@@ -117,17 +143,38 @@ export class TradeMenu extends Component {
         ])
     }
 
+    /**
+     * Fluent API for opening buy menu
+     */
+    from(dude: Dude) {
+        this.sourceInventory = dude.inventory
+    }
+
     private getTopLeft() {
         const screenDimensions = Camera.instance.dimensions
         return screenDimensions.div(2).minus(this.dimensions.div(2))
     }
 
-    private canSell(sale: SalePackage) {
-        return (
-            this.justSoldRow === -1 &&
-            !this.justOpened &&
-            Player.instance.dude.inventory.getItemCount(sale.item) >= sale.count
-        )
+    private getTradeError(sale: SalePackage) {
+        const canInteract = this.justSoldRow === -1 && !this.justOpened
+        if (!canInteract) {
+            return "oh shit" // not shown
+        }
+        const playerInv = Player.instance.dude.inventory
+
+        if (this.tradeMode === TradeMode.PLAYER_SELLING) {
+            if (playerInv.getItemCount(sale.item) < sale.count) {
+                return "Not enough resources"
+            }
+        } else {
+            if (!playerInv.canAddItem(sale.item, sale.count)) {
+                return "Inventory full"
+            } else if (saveManager.getState().coins < sale.price) {
+                return "Not enough gold"
+            } else if (this.sourceInventory.getItemCount(sale.item) < sale.count) {
+                return "Out of stock"
+            }
+        }
     }
 
     private renderRecipes(
@@ -135,11 +182,11 @@ export class TradeMenu extends Component {
         topLeft: Point,
         items: SalePackage[]
     ): Component[] {
-        const inv = Player.instance.dude.inventory
+        const playerInv = Player.instance.dude.inventory
 
         const coinCountComponent = new BasicRenderComponent(
             new TextRender(
-                `x${inv.getItemCount(Item.COIN)}`,
+                `x${saveManager.getState().coins}`,
                 new Point(9, 1).plus(topLeft).plus(this.coinsOffset),
                 TEXT_SIZE,
                 TEXT_FONT,
@@ -187,23 +234,31 @@ export class TradeMenu extends Component {
 
             const sale = items[r]
             const saleItem = ITEM_METADATA_MAP[sale.item]
-            const sellable = this.canSell(sale)
+            const tradeError = this.getTradeError(sale)
 
-            // sell the item
-            if (hovered && updateData.input.isMouseDown && sellable) {
+            // trade the item
+            if (hovered && updateData.input.isMouseDown && !tradeError) {
                 Sounds.play(Lists.oneOf(CLINK_NOISES), 0.4)
-                inv.removeItem(sale.item, sale.count)
-                saveManager.setState({
-                    coins: saveManager.getState().coins + sale.price,
-                })
+                if (this.tradeMode === TradeMode.PLAYER_SELLING) {
+                    playerInv.removeItem(sale.item, sale.count)
+                    saveManager.setState({
+                        coins: saveManager.getState().coins + sale.price,
+                    })
+                } else {
+                    playerInv.addItem(sale.item, sale.count)
+                    saveManager.setState({
+                        coins: saveManager.getState().coins - sale.price,
+                    })
+                }
                 this.justSoldRow = r
                 setTimeout(() => (this.justSoldRow = -1), 900)
             }
 
-            if (hovered && !sellable) {
-                this.tooltip.say("Not enough resources")
+            if (hovered && tradeError) {
+                this.tooltip.say(tradeError)
             } else if (hovered) {
-                this.tooltip.say(`Click to sell ${sale.count}/${inv.getItemCount(sale.item)}`)
+                const totalCount = this.sourceInventory.getItemCount(sale.item)
+                this.tooltip.say(`Click to ${this.tradeMode} ${sale.count}/${totalCount}`)
             }
 
             // craftable item
@@ -213,11 +268,11 @@ export class TradeMenu extends Component {
             if (hovered) {
                 if (r === this.justSoldRow) {
                     itemColor = Color.DARK_RED
-                } else if (sellable) {
+                } else if (!tradeError) {
                     itemColor = Color.WHITE
                 }
             }
-            if (!sellable) {
+            if (tradeError) {
                 itemColor = Color.DARK_RED
             }
             this.context.fillStyle = itemColor

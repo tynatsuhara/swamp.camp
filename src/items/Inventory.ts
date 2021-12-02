@@ -27,6 +27,10 @@ export class Inventory {
         return this.stacks[index]
     }
 
+    getStacks() {
+        return this.stacks
+    }
+
     setStack(index: number, stack: ItemStack) {
         this.stacks[index] = stack
         this.recomputeCountsMap()

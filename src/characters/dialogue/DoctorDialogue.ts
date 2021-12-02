@@ -1,6 +1,8 @@
 import { Item } from "../../items/Items"
+import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { SalePackage, TradeMenu } from "../../ui/TradeMenu"
+import { Dude } from "../Dude"
 import {
     DialogueInstance,
     DialogueOption,
@@ -11,7 +13,7 @@ import {
 
 export const DOCTOR_DIALOGUE_ENTRYPOINT = "doc-start"
 
-const getItemsToSell = (): SalePackage[] => {
+const getItemsToBuy = (): SalePackage[] => {
     return [
         {
             item: Item.WOOD,
@@ -33,11 +35,13 @@ const getItemsToSell = (): SalePackage[] => {
 
 export const DOCTOR_DIALOGUE: { [key: string]: () => DialogueInstance } = {
     [DOCTOR_DIALOGUE_ENTRYPOINT]: () => {
+        const doctor: Dude = DialogueDisplay.instance.source as Dude
+
         return dialogueWithOptions(
             [`It looks like you have enough rocks and wood. Should we put together a campfire?`],
             DudeInteractIndicator.NONE,
             new DialogueOption("Let's craft", () => {
-                TradeMenu.instance.open(getItemsToSell())
+                TradeMenu.instance.buy(getItemsToBuy()).from(doctor)
                 return new NextDialogue(DOCTOR_DIALOGUE_ENTRYPOINT, false)
             }),
             option("Not yet.", DOCTOR_DIALOGUE_ENTRYPOINT, false)
