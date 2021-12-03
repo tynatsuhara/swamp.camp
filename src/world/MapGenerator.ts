@@ -6,7 +6,7 @@ import { Singletons } from "../Singletons"
 import { ElementType } from "./elements/Elements"
 import { TentColor } from "./elements/Tent"
 import { GroundType } from "./ground/Ground"
-import { LocationManager } from "./LocationManager"
+import { LocationManager, LocationType } from "./LocationManager"
 import { WorldLocation } from "./WorldLocation"
 
 export class MapGenerator {
@@ -25,6 +25,7 @@ export class MapGenerator {
             console.log(`generation attept ${attempt}`)
 
             this.location = new WorldLocation(
+                LocationType.BASE_CAMP,
                 false,
                 true,
                 MapGenerator.MAP_SIZE,

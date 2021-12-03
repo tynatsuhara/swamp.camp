@@ -7,6 +7,13 @@ import { LocationManagerSaveState } from "../saves/LocationManagerSaveState"
 import { Singletons } from "../Singletons"
 import { WorldLocation } from "./WorldLocation"
 
+export enum LocationType {
+    BASE_CAMP = "base",
+    TENT_INTERIOR = "tent",
+    MINE_INTERIOR = "mine",
+    HOUSE_INTERIOR = "house",
+}
+
 export class LocationManager {
     static get instance() {
         return Singletons.getOrCreate(LocationManager)
@@ -51,7 +58,9 @@ export class LocationManager {
     exterior(): WorldLocation {
         if (!this.ext) {
             // TODO do this in a less hacky fashion
-            this.ext = Array.from(this.locations.values()).filter((l) => !l.isInterior)[0]
+            this.ext = Array.from(this.locations.values()).find(
+                (l) => l.type === LocationType.BASE_CAMP
+            )
         }
         return this.ext
     }

@@ -10,7 +10,7 @@ import { EventQueue } from "./world/events/EventQueue"
 import { LocationManager } from "./world/LocationManager"
 import { WorldTime } from "./world/WorldTime"
 
-const CURRENT_SAVE_FORMAT_VERSION = 1
+const CURRENT_SAVE_FORMAT_VERSION = 2
 
 class SaveManager {
     static readonly SLOTS = 3

@@ -21,7 +21,7 @@ import { Elements, ElementType, SavedElement } from "./elements/Elements"
 import { ElementUtils } from "./elements/ElementUtils"
 import { Ground, GroundType, SavedGround } from "./ground/Ground"
 import { GroundComponent } from "./ground/GroundComponent"
-import { LocationManager } from "./LocationManager"
+import { LocationManager, LocationType } from "./LocationManager"
 import { StaticSprites } from "./StaticSprites"
 import { Teleporter, TeleporterPrefix, Teleporters, TeleporterSound } from "./Teleporter"
 
@@ -30,6 +30,8 @@ export class WorldLocation {
     get uuid() {
         return this._uuid
     }
+
+    readonly type: LocationType
 
     readonly dudes = new Set<Dude>()
 
@@ -58,10 +60,17 @@ export class WorldLocation {
      * @param allowPlacing if the user can place elements here
      * @param size the size of the location in tiles (square), can be omitted for interiors
      */
-    constructor(isInterior: boolean, allowPlacing: boolean, size?: number, levels?: Grid<number>) {
-        this.size = size
+    constructor(
+        type: LocationType,
+        isInterior: boolean,
+        allowPlacing: boolean,
+        size?: number,
+        levels?: Grid<number>
+    ) {
+        this.type = type
         this.isInterior = isInterior
         this.allowPlacing = allowPlacing
+        this.size = size
         this.levels = levels
     }
 
@@ -347,6 +356,7 @@ export class WorldLocation {
     save(): LocationSaveState {
         return {
             uuid: this.uuid,
+            type: this.type,
             ground: this.saveGround(),
             elements: this.saveElements(),
             dudes: Array.from(this.dudes)
@@ -393,7 +403,13 @@ export class WorldLocation {
         const size = saveState.size || (saveState.isInterior ? null : 70)
         const levels = saveState.levels ? Grid.deserialize(saveState.levels) : null
 
-        const n = new WorldLocation(saveState.isInterior, saveState.allowPlacing, size, levels)
+        const n = new WorldLocation(
+            saveState.type,
+            saveState.isInterior,
+            saveState.allowPlacing,
+            size,
+            levels
+        )
 
         n._uuid = saveState.uuid
         n.teleporters = saveState.teleporters
