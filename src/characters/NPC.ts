@@ -1,6 +1,8 @@
 import { Component } from "brigsby/dist/Component"
+import { debug } from "brigsby/dist/Debug"
 import { UpdateData } from "brigsby/dist/Engine"
 import { Point } from "brigsby/dist/Point"
+import { LineRender } from "brigsby/dist/renderer/LineRender"
 import { Lists } from "brigsby/dist/util/Lists"
 import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
@@ -596,5 +598,35 @@ export class NPC extends Component {
     private tilePtToStandingPos(tilePt: Point) {
         const ptOffset = new Point(0.5, 0.8)
         return tilePt.plus(ptOffset).times(TILE_SIZE)
+    }
+
+    getRenderMethods() {
+        if (!debug.showPathfinding) {
+            return []
+        }
+        if (this.walkPath) {
+            return this.renderPath(this.walkPath)
+        }
+        if (this.roamPath) {
+            return this.renderPath(this.roamPath)
+        }
+        if (this.targetPath) {
+            return this.renderPath(this.targetPath)
+        }
+        return []
+    }
+
+    private renderPath(path: Point[], color: string = "#ff0000") {
+        if (path.length < 2) {
+            return []
+        }
+        let lineStart = path[0]
+        const result = []
+        for (let i = 1; i < path.length; i++) {
+            const lineEnd = path[i]
+            result.push(new LineRender(lineStart, lineEnd, color))
+            lineStart = lineEnd
+        }
+        return result
     }
 }
