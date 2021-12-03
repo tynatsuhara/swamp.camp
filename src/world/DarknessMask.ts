@@ -59,8 +59,8 @@ export class DarknessMask {
 
     // constants for time of day
     static readonly SUNRISE_START = 5 * TimeUnit.HOUR
-    static readonly SUNRISE_END = 5.5 * TimeUnit.HOUR
-    static readonly SUNSET_START = 20.5 * TimeUnit.HOUR
+    private static readonly SUNRISE_END = 5.5 * TimeUnit.HOUR
+    private static readonly SUNSET_START = 20.5 * TimeUnit.HOUR
     static readonly SUNSET_END = 21 * TimeUnit.HOUR
 
     // constants for light rendering
