@@ -105,6 +105,7 @@ export class NPC extends Component {
                 walkTo: (pt) => this.walkTo(pt, updateData),
                 roam: (speed, options) => this.doRoam(updateData, speed, options),
                 goToLocation: (location) => this.goToLocation(updateData, location), // TODO
+                doNothing: () => this.dude.move(updateData, Point.ZERO),
             }
             this.task.performTask(context)
         } else {
@@ -139,6 +140,7 @@ export class NPC extends Component {
                 this.forceMoveToTilePosition(pos)
             },
             goToLocation: (location) => this.simulateGoToLocation(location),
+            doNothing: () => {},
         }
 
         task?.performTask(context)

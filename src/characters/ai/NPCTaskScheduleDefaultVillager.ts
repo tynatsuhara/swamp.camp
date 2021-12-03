@@ -1,4 +1,8 @@
+import { Lists } from "brigsby/dist/util/Lists"
+import { DarknessMask } from "../../world/DarknessMask"
+import { Campfire } from "../../world/elements/Campfire"
 import { ElementType } from "../../world/elements/Elements"
+import { LightManager } from "../../world/LightManager"
 import { LocationManager } from "../../world/LocationManager"
 import { Residence } from "../../world/residences/Residence"
 import { TimeUnit } from "../../world/TimeUnit"
@@ -11,6 +15,7 @@ import { NPCTaskContext } from "./NPCTaskContext"
 
 export class NPCTaskScheduleDefaultVillager extends NPCTask {
     performTask(context: NPCTaskContext): void {
+        const { dude } = context
         const timeOfDay = WorldTime.instance.time % TimeUnit.DAY
 
         let goalLocation: WorldLocation
@@ -26,14 +31,34 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             }
         } else {
             // Go home!
-            goalLocation = this.findHomeLocation(context.dude)
-
-            // TODO: Go to light
-            if (!goalLocation) {
-            }
+            goalLocation = this.findHomeLocation(dude)
         }
 
-        if (!goalLocation || context.dude.location === goalLocation) {
+        if (!goalLocation || dude.location === goalLocation) {
+            // TODO: Go to light
+            if (timeOfDay < DarknessMask.SUNRISE_START || timeOfDay > DarknessMask.SUNSET_END) {
+                if (!LightManager.instance.isDark(dude.standingPosition, dude.location)) {
+                    context.doNothing()
+                    return
+                }
+
+                const burningFires = dude.location
+                    .getElementsOfType(ElementType.CAMPFIRE)
+                    .filter((c) => c.entity.getComponent(Campfire).logs > 0)
+
+                if (burningFires.length === 0) {
+                    context.doNothing()
+                    return
+                }
+
+                const closestFire = Lists.minBy(burningFires, (e) =>
+                    e.pos.distanceTo(dude.standingPosition)
+                )
+
+                // this works fine enough ¯\_(ツ)_/¯
+                context.walkTo(closestFire.pos.plusY(1))
+            }
+
             context.roam(0.5, {
                 pauseEveryMillis: 2500 + 2500 * Math.random(),
                 pauseForMillis: 2500 + 5000 * Math.random(),

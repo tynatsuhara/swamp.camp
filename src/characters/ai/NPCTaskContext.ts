@@ -38,4 +38,6 @@ export interface NPCTaskContext {
      * Go to a different location
      */
     goToLocation: (wl: WorldLocation) => void
+
+    doNothing: () => void
 }
