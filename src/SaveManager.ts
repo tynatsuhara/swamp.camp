@@ -173,15 +173,11 @@ class SaveManager {
         LocationManager.instance.initialize(save.locations)
         EventQueue.instance.initialize(save.eventQueue)
 
-        // Camera.instance.destroy()
         Camera.instance.focusOnDude(
-            Array.from(LocationManager.instance.currentLocation.dudes).filter(
+            Array.from(LocationManager.instance.currentLocation.dudes).find(
                 (d) => d.type === DudeType.PLAYER
-            )[0]
+            )
         )
-
-        // clear existing UI state
-        // UIStateManager.instance.destroy()
     }
 
     private getSave(saveKey: string): Save {
