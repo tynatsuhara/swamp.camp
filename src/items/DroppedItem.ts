@@ -7,7 +7,6 @@ import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
 import { Lists } from "brigsby/dist/util/Lists"
 import { Sounds } from "../audio/Sounds"
 import { Player } from "../characters/Player"
-import { saveManager } from "../SaveManager"
 import { LocationManager } from "../world/LocationManager"
 import { Item, ITEM_METADATA_MAP } from "./Items"
 
@@ -83,16 +82,7 @@ export class DroppedItem extends Component {
                 this.canPickUp = false
                 setTimeout(() => {
                     if (Player.instance.dude.isAlive && !!this.entity) {
-                        if (this.itemType === Item.COIN) {
-                            saveManager.setState({
-                                coins: saveManager.getState().coins + 1,
-                            })
-                        }
-
-                        if (
-                            this.itemType === Item.COIN ||
-                            Player.instance.dude.inventory.addItem(this.itemType)
-                        ) {
+                        if (Player.instance.dude.inventory.addItem(this.itemType)) {
                             LocationManager.instance.currentLocation.droppedItems.delete(
                                 this.entity
                             )
