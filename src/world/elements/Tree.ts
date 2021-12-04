@@ -11,7 +11,7 @@ import { WeaponType } from "../../characters/weapons/WeaponType"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
 import { Ground } from "../ground/Ground"
-import { LocationManager } from "../LocationManager"
+import { camp } from "../LocationManager"
 import { TimeUnit } from "../TimeUnit"
 import { WorldLocation } from "../WorldLocation"
 import { WorldTime } from "../WorldTime"
@@ -133,7 +133,7 @@ export class TreeFactory extends ElementFactory {
     }
 
     canPlaceInLocation(wl: WorldLocation) {
-        return wl === LocationManager.instance.exterior()
+        return wl === camp()
     }
 
     canPlaceAtPos(wl: WorldLocation, pos: Point) {

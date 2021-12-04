@@ -8,7 +8,7 @@ import { Item } from "../items/Items"
 import { DudeSaveState } from "../saves/DudeSaveState"
 import { newUUID } from "../saves/uuid"
 import { Singletons } from "../Singletons"
-import { LocationManager } from "../world/LocationManager"
+import { camp } from "../world/LocationManager"
 import { WorldLocation } from "../world/WorldLocation"
 import { BERTO_STARTING_DIALOGUE } from "./dialogue/BertoDialogue"
 import { EMPTY_DIALOGUE } from "./dialogue/Dialogue"
@@ -74,7 +74,7 @@ export class DudeFactory {
     new(
         type: DudeType,
         pos: Point,
-        location: WorldLocation = LocationManager.instance.exterior(),
+        location: WorldLocation = camp(),
         hasPendingSlot = false
     ): Dude {
         return this.make(type, pos, null, location, hasPendingSlot)

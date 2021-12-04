@@ -6,7 +6,7 @@ import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { GroundType } from "../ground/Ground"
 import { makeMineInterior } from "../interior/Mine"
-import { LocationManager } from "../LocationManager"
+import { camp } from "../LocationManager"
 import { TeleporterPrefix } from "../Teleporter"
 import { WorldLocation } from "../WorldLocation"
 import { BuildingFactory } from "./Building"
@@ -79,7 +79,7 @@ export class MineEntranceFactory extends BuildingFactory {
     }
 
     canPlaceInLocation(wl: WorldLocation) {
-        return wl === LocationManager.instance.exterior()
+        return wl === camp()
     }
 
     canPlaceAtPos(wl: WorldLocation, pos: Point) {

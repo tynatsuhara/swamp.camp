@@ -1,17 +1,16 @@
+import { assets } from "brigsby/dist/Assets"
 import { Component } from "brigsby/dist/Component"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { UIStateManager } from "../ui/UIStateManager"
 import { ElementComponent } from "./elements/ElementComponent"
+import { ElementFactory } from "./elements/ElementFactory"
 import { ElementType } from "./elements/Elements"
 import { Interactable } from "./elements/Interactable"
 import { WorldLocation } from "./WorldLocation"
-import { ElementFactory } from "./elements/ElementFactory"
-import { Sounds } from "../audio/Sounds"
-import { assets } from "brigsby/dist/Assets"
-import { UIStateManager } from "../ui/UIStateManager"
 
 export type Teleporter = {
     to: string // destination uuid

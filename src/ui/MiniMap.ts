@@ -12,7 +12,7 @@ import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { ElementComponent } from "../world/elements/ElementComponent"
 import { GroundComponent } from "../world/ground/GroundComponent"
 import { GroundRenderer } from "../world/GroundRenderer"
-import { LocationManager } from "../world/LocationManager"
+import { camp } from "../world/LocationManager"
 import { Color, getHex } from "./Color"
 import { UIStateManager } from "./UIStateManager"
 
@@ -41,7 +41,7 @@ export class MiniMap extends Component {
     }
 
     private renderFullSizeMap() {
-        const wl = LocationManager.instance.exterior()
+        const wl = camp()
         const ground = GroundRenderer.instance.getCanvas(wl)
         if (!ground) {
             return
@@ -173,7 +173,7 @@ export class MiniMap extends Component {
 
     private getPlayerIndicator(topLeft: Point) {
         const wl = Player.instance.dude.location
-        if (Player.instance.dude.location !== LocationManager.instance.exterior()) {
+        if (Player.instance.dude.location !== camp()) {
             return null
         }
         const indicatorSize = 4

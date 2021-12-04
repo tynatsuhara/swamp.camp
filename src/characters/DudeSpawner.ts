@@ -11,7 +11,7 @@ import { EventQueue } from "../world/events/EventQueue"
 import { QueuedEventType } from "../world/events/QueuedEvent"
 import { Ground } from "../world/ground/Ground"
 import { LightManager } from "../world/LightManager"
-import { LocationManager } from "../world/LocationManager"
+import { camp, LocationManager } from "../world/LocationManager"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
 import { DudeFaction, DudeFactory, DudeType } from "./DudeFactory"
@@ -32,9 +32,9 @@ export class DudeSpawner extends Component {
         }
 
         // Maybe consider moving this code elsewhere later
-        WorldAudioContext.instance.isInBattle = Array.from(
-            LocationManager.instance.exterior().dudes.values()
-        ).some((d) => d.isAlive && d.factions.includes(DudeFaction.ORCS))
+        WorldAudioContext.instance.isInBattle = Array.from(camp().dudes.values()).some(
+            (d) => d.isAlive && d.factions.includes(DudeFaction.ORCS)
+        )
     }
 
     getEntity() {
@@ -171,7 +171,7 @@ export class DudeSpawner extends Component {
     }
 
     private getSpawnPosOffMap() {
-        const extSize = LocationManager.instance.exterior().size
+        const extSize = camp().size
         const spawnSide = (((Math.random() > 0.5 ? 1 : -1) * extSize) / 2) * TILE_SIZE
         const spawnMiddle = Math.random() * extSize * TILE_SIZE - extSize / 2
         return Math.random() > 0.5

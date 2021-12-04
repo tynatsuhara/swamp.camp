@@ -14,7 +14,7 @@ import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { LightManager } from "../LightManager"
-import { LocationManager } from "../LocationManager"
+import { camp } from "../LocationManager"
 import { TimeUnit } from "../TimeUnit"
 import { WorldLocation } from "../WorldLocation"
 import { WorldTime } from "../WorldTime"
@@ -129,7 +129,7 @@ export class CampfireFactory extends ElementFactory {
     }
 
     canPlaceInLocation(wl: WorldLocation) {
-        return wl === LocationManager.instance.exterior()
+        return wl === camp()
     }
 }
 

@@ -7,7 +7,7 @@ import { DudeFactory, DudeType } from "../../characters/DudeFactory"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item, spawnItem } from "../../items/Items"
 import { Ground } from "../ground/Ground"
-import { LocationManager } from "../LocationManager"
+import { camp } from "../LocationManager"
 import { TimeUnit } from "../TimeUnit"
 import { WorldLocation } from "../WorldLocation"
 import { WorldTime } from "../WorldTime"
@@ -67,7 +67,7 @@ export class MushroomFactory extends ElementFactory {
                         .times(TILE_SIZE)
                         .plusY(-TILE_SIZE)
                         .plusX(-TILE_SIZE / 2),
-                    LocationManager.instance.exterior()
+                    camp()
                 )
             })
         )
@@ -80,7 +80,7 @@ export class MushroomFactory extends ElementFactory {
     }
 
     canPlaceInLocation(wl: WorldLocation) {
-        return wl === LocationManager.instance.exterior()
+        return wl === camp()
     }
 
     canPlaceAtPos(wl: WorldLocation, pos: Point) {

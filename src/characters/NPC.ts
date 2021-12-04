@@ -8,7 +8,7 @@ import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
-import { LocationManager } from "../world/LocationManager"
+import { camp, LocationManager } from "../world/LocationManager"
 import { Teleporter } from "../world/Teleporter"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldLocation } from "../world/WorldLocation"
@@ -568,10 +568,10 @@ export class NPC extends Component {
     private getNextLocation(goalLocation: WorldLocation) {
         // For now, we're lazy about this and assume every linked location is
         // at most 1 off from the exterior, so we can avoid doing pathfinding
-        if (this.dude.location === LocationManager.instance.exterior()) {
+        if (this.dude.location === camp()) {
             return goalLocation
         } else {
-            return LocationManager.instance.exterior()
+            return camp()
         }
     }
 

@@ -24,7 +24,7 @@ import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Interactable } from "../world/elements/Interactable"
 import { Ground, GroundType } from "../world/ground/Ground"
-import { LocationManager } from "../world/LocationManager"
+import { camp } from "../world/LocationManager"
 import { Residence } from "../world/residences/Residence"
 import { WorldLocation } from "../world/WorldLocation"
 import { WorldTime } from "../world/WorldTime"
@@ -684,8 +684,7 @@ export class Dude extends Component implements DialogueSource {
             return
         }
 
-        const residences = LocationManager.instance
-            .exterior()
+        const residences = camp()
             .getElements()
             .flatMap((e) => e.entity.getComponents(Residence))
             .filter((e) => !!e)

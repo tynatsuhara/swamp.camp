@@ -3,7 +3,7 @@ import { DarknessMask } from "../../world/DarknessMask"
 import { Campfire } from "../../world/elements/Campfire"
 import { ElementType } from "../../world/elements/Elements"
 import { LightManager } from "../../world/LightManager"
-import { LocationManager } from "../../world/LocationManager"
+import { camp, LocationManager } from "../../world/LocationManager"
 import { Residence } from "../../world/residences/Residence"
 import { TimeUnit } from "../../world/TimeUnit"
 import { WorldLocation } from "../../world/WorldLocation"
@@ -27,7 +27,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             // Or better yet, don't be a jerk. Unwind by being a man... and goin' to work.
             goalLocation = this.findWorkLocation()
             if (!goalLocation) {
-                goalLocation = LocationManager.instance.exterior()
+                goalLocation = camp()
             }
         } else {
             // Go home!
@@ -69,8 +69,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
     }
 
     private findHomeLocation(dude: Dude) {
-        const houses = LocationManager.instance
-            .exterior()
+        const houses = camp()
             .getElements()
             .flatMap((el) => el.entity.getComponents(Residence))
             .filter((residence) => residence?.isHomeOf(dude.uuid))
@@ -81,8 +80,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
     }
 
     private findWorkLocation() {
-        const mines = LocationManager.instance
-            .exterior()
+        const mines = camp()
             .getElementsOfType(ElementType.MINE_ENTRANCE)
             .map((el) => el.save()["destinationUUID"])
 

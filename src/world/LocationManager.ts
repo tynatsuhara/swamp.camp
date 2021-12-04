@@ -55,6 +55,9 @@ export class LocationManager {
         return location
     }
 
+    /**
+     * @deprecated use camp() instead
+     */
     exterior(): WorldLocation {
         if (!this.ext) {
             // TODO do this in a less hacky fashion
@@ -100,3 +103,5 @@ export class LocationManager {
             .forEach((d) => d.entity.getComponent(NPC)?.simulate())
     }
 }
+
+export const camp = () => LocationManager.instance.exterior()

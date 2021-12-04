@@ -4,7 +4,7 @@ import { NPC } from "../../characters/NPC"
 import { Berto } from "../../characters/types/Berto"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { NotificationDisplay, Notifications } from "../../ui/NotificationDisplay"
-import { LocationManager } from "../LocationManager"
+import { camp, LocationManager } from "../LocationManager"
 import { collectTaxes } from "../TaxRate"
 import { Day } from "../TimeUnit"
 import { WorldTime } from "../WorldTime"
@@ -42,14 +42,14 @@ export const EVENT_QUEUE_HANDLERS: {
         DudeFactory.instance.new(
             DudeType.HERALD,
             LocationManager.instance.exteriorEntrancePosition(),
-            LocationManager.instance.exterior()
+            camp()
         )
         NotificationDisplay.instance.push(Notifications.NEW_VILLAGER)
     },
 
     [QueuedEventType.HERALD_DEPARTURE_CHECK]: (data) => {
         const goalPosition = LocationManager.instance.exteriorEntrancePosition()
-        const berto = LocationManager.instance.exterior().getDude(DudeType.HERALD)
+        const berto = camp().getDude(DudeType.HERALD)
         if (!berto) {
             return
         }
@@ -76,7 +76,7 @@ export const EVENT_QUEUE_HANDLERS: {
     [QueuedEventType.HERALD_RETURN_WITH_NPC]: (data) => {
         NotificationDisplay.instance.push(Notifications.NEW_VILLAGER)
 
-        const berto = LocationManager.instance.exterior().getDude(DudeType.HERALD)
+        const berto = camp().getDude(DudeType.HERALD)
         if (!berto) {
             throw new Error("berto should exist")
         }
@@ -89,7 +89,7 @@ export const EVENT_QUEUE_HANDLERS: {
             DudeFactory.instance.new(
                 type,
                 LocationManager.instance.exteriorEntrancePosition(),
-                LocationManager.instance.exterior(),
+                camp(),
                 true // they already have a claimed residence
             )
         })

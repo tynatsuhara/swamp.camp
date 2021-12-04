@@ -1,16 +1,15 @@
 import { Component } from "brigsby/dist/Component"
 import { UpdateData } from "brigsby/dist/Engine"
 import { Lists } from "brigsby/dist/util/Lists"
-import { pixelPtToTilePt } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
 import { ElementType } from "../../world/elements/Elements"
-import { LocationManager } from "../../world/LocationManager"
+import { camp } from "../../world/LocationManager"
 import { TimeUnit } from "../../world/TimeUnit"
 import { WorldTime } from "../../world/WorldTime"
 import { Dude } from "../Dude"
-import { DudeFactory, DudeType } from "../DudeFactory"
-import { Enemy } from "./Enemy"
+import { DudeFactory } from "../DudeFactory"
 import { WeaponType } from "../weapons/WeaponType"
+import { Enemy } from "./Enemy"
 
 const SIZE = "s" // one of [1, 2, 3]
 const NEXT_GROWTH_TIME = "ngt"
@@ -59,9 +58,7 @@ export class ShroomNPC extends Component {
 
         if (ogSize === 3 || Math.random() > 0.5) {
             // spread more shrooms
-            const plantedShroom = LocationManager.instance
-                .exterior()
-                .addElement(ElementType.MUSHROOM, this.dude.tile)
+            const plantedShroom = camp().addElement(ElementType.MUSHROOM, this.dude.tile)
             if (!!plantedShroom) {
                 // successfully planted
                 return
@@ -78,7 +75,7 @@ export class ShroomNPC extends Component {
 
         // delete and respawn the shroom dude
         this.entity.selfDestruct()
-        DudeFactory.instance.load(newData, LocationManager.instance.exterior())
+        DudeFactory.instance.load(newData, camp())
     }
 
     isAggro() {

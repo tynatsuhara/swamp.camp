@@ -7,7 +7,7 @@ import { Camera } from "../cutscenes/Camera"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { DarknessMask } from "./DarknessMask"
-import { LocationManager } from "./LocationManager"
+import { camp, LocationManager } from "./LocationManager"
 import { TimeUnit } from "./TimeUnit"
 import { Vignette } from "./Vignette"
 import { WorldLocation } from "./WorldLocation"
@@ -81,10 +81,8 @@ export class LightManager extends Component {
         if (!this.vignette) {
             this.vignette = new Entity().addComponent(
                 new Vignette(
-                    new Point(1, 1).times(
-                        (-LocationManager.instance.exterior().size / 2) * TILE_SIZE
-                    ),
-                    LocationManager.instance.exterior().size * TILE_SIZE
+                    new Point(1, 1).times((-camp().size / 2) * TILE_SIZE),
+                    camp().size * TILE_SIZE
                 )
             )
         }

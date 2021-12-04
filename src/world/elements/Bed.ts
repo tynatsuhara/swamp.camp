@@ -14,7 +14,7 @@ import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { HUD } from "../../ui/HUD"
 import { UIStateManager } from "../../ui/UIStateManager"
 import { DarknessMask } from "../DarknessMask"
-import { LocationManager } from "../LocationManager"
+import { camp, LocationManager } from "../LocationManager"
 import { TimeUnit } from "../TimeUnit"
 import { WorldLocation } from "../WorldLocation"
 import { WorldTime } from "../WorldTime"
@@ -77,7 +77,7 @@ export class BedFactory extends ElementFactory {
     }
 
     canPlaceInLocation(wl: WorldLocation) {
-        return wl !== LocationManager.instance.exterior()
+        return wl !== camp()
     }
 }
 
@@ -104,8 +104,7 @@ export class Bed extends Component implements DialogueSource {
             }
         }
 
-        return LocationManager.instance
-            .exterior()
+        return camp()
             .getElementsOfType(ElementType.CAMPFIRE)
             .map((el) => el.entity.getComponent(Campfire))
             .some((campfire) => campfire.willBurnFor(hoursNeeded * TimeUnit.HOUR))
