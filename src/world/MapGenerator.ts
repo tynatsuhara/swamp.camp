@@ -15,7 +15,11 @@ export class MapGenerator {
     }
 
     private static readonly MAP_RANGE = 40
-    private static readonly MAP_SIZE = MapGenerator.MAP_RANGE * 2 // map goes from [-MAP_RANGE, MAP_RANGE]
+    /**
+     * The map goes from [-MAP_RANGE, MAP_RANGE], although some of the grids extend
+     * one tile further in each direction to prevent janky cutoffs at the edge
+     */
+    private static readonly MAP_SIZE = MapGenerator.MAP_RANGE * 2
 
     private location: Location
     private readonly tentPos = new Point(-3, -3)
@@ -224,8 +228,8 @@ export class MapGenerator {
         let topLedges = 0
         let sideLedges = 0
 
-        for (let i = -MapGenerator.MAP_RANGE; i < MapGenerator.MAP_RANGE; i += sq) {
-            for (let j = -MapGenerator.MAP_RANGE; j < MapGenerator.MAP_RANGE; j += sq) {
+        for (let i = -MapGenerator.MAP_RANGE - 1; i < MapGenerator.MAP_RANGE + 1; i += sq) {
+            for (let j = -MapGenerator.MAP_RANGE - 1; j < MapGenerator.MAP_RANGE + 1; j += sq) {
                 var value = noise.simplex2(
                     i / (this.MAP_RANGE * noiseScale),
                     j / (this.MAP_RANGE * noiseScale)
@@ -313,8 +317,8 @@ export class MapGenerator {
         let validResult = false
         const noiseScale = 1
 
-        for (let i = -MapGenerator.MAP_RANGE; i < MapGenerator.MAP_RANGE; i++) {
-            for (let j = -MapGenerator.MAP_RANGE; j < MapGenerator.MAP_RANGE; j++) {
+        for (let i = -MapGenerator.MAP_RANGE - 1; i < MapGenerator.MAP_RANGE + 1; i++) {
+            for (let j = -MapGenerator.MAP_RANGE - 1; j < MapGenerator.MAP_RANGE + 1; j++) {
                 var value = noise.simplex2(
                     i / (this.MAP_RANGE * noiseScale),
                     j / (this.MAP_RANGE * noiseScale)

@@ -33,13 +33,12 @@ export class GroundRenderer {
         context.clearRect(pos.x, pos.y, TILE_SIZE, TILE_SIZE)
     }
 
+    /**
+     * @param position will NOT be checked against location size bounds
+     */
     addTile(wl: Location, position: Point, tile: StaticSpriteSource) {
         if (wl.isInterior || !wl.size) {
             throw new Error("location cannot use GroundRenderer")
-        }
-        const lim = wl.size / 2
-        if (position.x < -lim || position.x > lim || position.y < -lim || position.y > lim) {
-            throw new Error("tile is outside of valid bounds")
         }
 
         let canvas = this.locations.get(wl)
