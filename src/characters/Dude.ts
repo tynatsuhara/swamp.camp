@@ -717,6 +717,7 @@ export class Dude extends Component implements DialogueSource {
             return []
         }
 
+        // little flashing circle right before attacking the player
         const npcAttackIndicator = this.entity.getComponent(NPC)?.attackIndicator
         if (!!npcAttackIndicator) {
             indicator = npcAttackIndicator
@@ -724,8 +725,15 @@ export class Dude extends Component implements DialogueSource {
             indicator = getDialogue(this.dialogue).indicator
         }
 
-        // Update off screen indicator
+        // if (
+        //     this.factions.includes(DudeFaction.VILLAGERS) &&
+        //     WorldTime.instance.time < this.lastAttackerTime + 10_000
+        // ) {
+        //     indicator = DudeInteractIndicator.IMPORTANT_DIALOGUE
+        // }
+
         if (indicator === DudeInteractIndicator.IMPORTANT_DIALOGUE) {
+            // update off screen indicator
             HUD.instance.addIndicator(this, () => this.standingPosition)
         } else {
             HUD.instance.removeIndicator(this)
