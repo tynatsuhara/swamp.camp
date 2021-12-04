@@ -13,6 +13,7 @@ module.exports = {
     },
     resolve: {
         extensions: [".ts", ".js"],
+        symlinks: false,
     },
     output: {
         filename: "app.js",
@@ -23,7 +24,7 @@ module.exports = {
         contentBase: path.join(__dirname, "static"),
         hot: false,
         liveReload: false,
-        open: true,
+        open: false,
         port: 8000,
         staticOptions: {
             setHeaders: function (res, path, stat) {
