@@ -5,6 +5,7 @@ import { Lists } from "brigsby/dist/util/Lists"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 import { Inventory } from "../items/Inventory"
 import { Item } from "../items/Items"
+import { PlayerInventory } from "../items/PlayerInventory"
 import { DudeSaveState } from "../saves/DudeSaveState"
 import { newUUID } from "../saves/uuid"
 import { Singletons } from "../Singletons"
@@ -61,6 +62,9 @@ export enum DudeType {
     DOCTOR,
 }
 
+const DEFAULT_COLLIDER_SIZE = new Point(10, 8)
+const BIG_COLLIDER_SIZE = new Point(15, 12)
+
 export class DudeFactory {
     static get instance() {
         return Singletons.getOrCreate(DudeFactory)
@@ -101,10 +105,9 @@ export class DudeFactory {
         let dialogue: string = EMPTY_DIALOGUE
         let additionalComponents: Component[] = []
         let blob = {}
-        const defaultInventory = new Inventory()
-        const defaultColliderSize = new Point(10, 8)
-        const bigColliderSize = defaultColliderSize.times(1.5)
-        let colliderSize = defaultColliderSize
+        let inventoryClass = Inventory
+        let defaultInventory = new Inventory()
+        let colliderSize = DEFAULT_COLLIDER_SIZE
 
         // type-specific defaults
         switch (type) {
@@ -115,6 +118,8 @@ export class DudeFactory {
                 maxHealth = 4
                 additionalComponents = [new Player(), new CutscenePlayerController()]
                 window["player"] = additionalComponents[0]
+                inventoryClass = PlayerInventory
+                defaultInventory = new PlayerInventory()
                 defaultInventory.addItem(Item.SWORD)
                 defaultInventory.addItem(Item.BASIC_SHIELD)
                 break
@@ -161,7 +166,7 @@ export class DudeFactory {
                 additionalComponents = [new NPC(), new Enemy()]
                 maxHealth = 4
                 speed *= 0.5
-                colliderSize = bigColliderSize
+                colliderSize = BIG_COLLIDER_SIZE
                 break
             }
             case DudeType.ORC_SHAMAN: {
@@ -189,7 +194,7 @@ export class DudeFactory {
                 additionalComponents = [new NPC(), new Enemy()]
                 maxHealth = 8
                 speed *= 1 + 0.3 * Math.random()
-                colliderSize = bigColliderSize
+                colliderSize = BIG_COLLIDER_SIZE
                 break
             }
             case DudeType.SHROOM: {
@@ -214,6 +219,7 @@ export class DudeFactory {
                 dialogue = DOCTOR_DIALOGUE_ENTRYPOINT
                 additionalComponents = [new NPC(), new Villager()]
                 defaultInventory.addItem(Item.WEAK_MEDICINE, 3)
+                defaultInventory.addItem(Item.HEART_CONTAINER, 1)
                 break
             }
             case DudeType.CENTAUR: {
@@ -231,7 +237,7 @@ export class DudeFactory {
                 additionalComponents = [new NPC(), new Enemy()]
                 maxHealth = 5
                 speed *= 0.5
-                colliderSize = bigColliderSize
+                colliderSize = BIG_COLLIDER_SIZE
                 break
             }
             case DudeType.WOLF: {
@@ -288,7 +294,7 @@ export class DudeFactory {
             saveState?.maxHealth ?? maxHealth,
             saveState?.health ?? maxHealth,
             saveState?.speed ?? speed,
-            !!saveState?.inventory ? Inventory.load(saveState.inventory) : defaultInventory,
+            !!saveState?.inventory ? inventoryClass.load(saveState.inventory) : defaultInventory,
             saveState?.dialogue ?? dialogue,
             saveState?.blob ?? blob,
             colliderSize

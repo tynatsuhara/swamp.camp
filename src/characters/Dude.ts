@@ -51,7 +51,7 @@ export class Dude extends Component implements DialogueSource {
     readonly type: DudeType
     readonly factions: DudeFaction[]
     readonly inventory: Inventory
-    readonly maxHealth: number
+    maxHealth: number
     private _health: number
     get health() {
         return this._health

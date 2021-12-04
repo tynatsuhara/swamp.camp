@@ -21,6 +21,11 @@ const getItemsToBuy = (): SalePackage[] => {
             count: 1,
             price: 10,
         },
+        {
+            item: Item.HEART_CONTAINER,
+            count: 1,
+            price: 1,
+        },
     ]
 }
 

@@ -37,7 +37,7 @@ export class Inventory {
     }
 
     /**
-     * returns true if the item can fit in the inventory
+     * returns true if the item was successfully added
      */
     addItem(item: Item, count: number = 1): boolean {
         const canAdd = this.canAddItem(item, count)
@@ -136,7 +136,7 @@ export class Inventory {
     }
 
     static load(stacks: ItemStack[]) {
-        const inv = new Inventory()
+        const inv = new this()
         inv.stacks = stacks
         stacks.forEach((stack) => {
             if (!!stack) {

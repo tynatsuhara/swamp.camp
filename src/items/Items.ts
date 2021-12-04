@@ -11,6 +11,56 @@ import { ElementType } from "../world/elements/Elements"
 import { LocationManager } from "../world/LocationManager"
 import { DroppedItem } from "./DroppedItem"
 
+export enum Item {
+    COIN,
+    ROCK,
+    WOOD,
+    TENT,
+    CAMPFIRE,
+    IRON,
+    HOUSE,
+    ROUND_SAPLING,
+    POINTY_SAPLING,
+    MUSHROOM,
+    CHEST,
+    BED,
+    MINE_ENTRANCE,
+    CHURCH,
+    WEAK_MEDICINE,
+    HEART_CONTAINER,
+
+    // weapon values should match the WeaponType enum so we can cast them
+    KNIFE = WeaponType.KNIFE,
+    SHITTY_SWORD,
+    SWORD,
+    FANCY_SWORD,
+    BIG_HAMMER,
+    HAMMER,
+    CLUB,
+    MACE,
+    KATANA,
+    SERRATED_SWORD,
+    BIG_SWORD,
+    AXE,
+    MACHETE,
+    CLEAVER,
+    FENCING_SWORD,
+    GREATSWORD,
+    GOLD_SWORD,
+    BIG_GOLD_SWORD,
+    STAFF_1,
+    STAFF_2,
+    SPEAR,
+    PICKAXE,
+
+    // shield values should match the ShieldType enum so we can cast them
+    BASIC_SHIELD = ShieldType.BASIC,
+    LANTERN,
+    TORCH,
+}
+
+window["Item"] = Item
+
 export class ItemMetadata {
     readonly displayName: string
     readonly droppedIconSupplier: () => SpriteSource
@@ -51,55 +101,6 @@ export class ItemMetadata {
         this.consumable = consumable
     }
 }
-
-export enum Item {
-    COIN,
-    ROCK,
-    WOOD,
-    TENT,
-    CAMPFIRE,
-    IRON,
-    HOUSE,
-    ROUND_SAPLING,
-    POINTY_SAPLING,
-    MUSHROOM,
-    CHEST,
-    BED,
-    MINE_ENTRANCE,
-    CHURCH,
-    WEAK_MEDICINE,
-
-    // weapon values should match the WeaponType enum so we can cast them
-    KNIFE = WeaponType.KNIFE,
-    SHITTY_SWORD,
-    SWORD,
-    FANCY_SWORD,
-    BIG_HAMMER,
-    HAMMER,
-    CLUB,
-    MACE,
-    KATANA,
-    SERRATED_SWORD,
-    BIG_SWORD,
-    AXE,
-    MACHETE,
-    CLEAVER,
-    FENCING_SWORD,
-    GREATSWORD,
-    GOLD_SWORD,
-    BIG_GOLD_SWORD,
-    STAFF_1,
-    STAFF_2,
-    SPEAR,
-    PICKAXE,
-
-    // shield values should match the ShieldType enum so we can cast them
-    BASIC_SHIELD = ShieldType.BASIC,
-    LANTERN,
-    TORCH,
-}
-
-window["Item"] = Item
 
 // Data that doesn't get serialized (TODO make builder pattern)
 export const ITEM_METADATA_MAP = {
@@ -168,6 +169,11 @@ export const ITEM_METADATA_MAP = {
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("potion1"),
         stackLimit: 1,
         consumable: () => Player.instance.dude.heal(2),
+    }),
+    [Item.HEART_CONTAINER]: new ItemMetadata({
+        displayName: "Heart container",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("heart"),
+        stackLimit: 1,
     }),
 
     // Locations
