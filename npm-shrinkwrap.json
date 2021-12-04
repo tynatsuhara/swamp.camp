@@ -8,7 +8,7 @@
             "name": "swamp.camp",
             "version": "1.0.0",
             "dependencies": {
-                "brigsby": "^0.3.3",
+                "brigsby": "^0.3.5",
                 "prettier": "^2.4.1"
             },
             "devDependencies": {
@@ -354,7 +354,9 @@
             "resolved": "https://registry.npmjs.org/ansi-html/-/ansi-html-0.0.7.tgz",
             "integrity": "sha1-gTWEAhliqenm/QOflA0S9WynhZ4=",
             "dev": true,
-            "engines": ["node >= 0.8.0"],
+            "engines": [
+                "node >= 0.8.0"
+            ],
             "bin": {
                 "ansi-html": "bin/ansi-html"
             }
@@ -783,9 +785,9 @@
             }
         },
         "node_modules/brigsby": {
-            "version": "0.3.3",
-            "resolved": "https://registry.npmjs.org/brigsby/-/brigsby-0.3.3.tgz",
-            "integrity": "sha512-GPW+6JyyTGE7C72nE1U4m6IJ7KFEGg4Sks9AFp/qUYskWwM7+RcbkbW4/aOQqfDyjDspZjBpCtWBz+mK0FTMBg==",
+            "version": "0.3.5",
+            "resolved": "https://registry.npmjs.org/brigsby/-/brigsby-0.3.5.tgz",
+            "integrity": "sha512-ekxWYHHVyhuarIgifN3a3Hwni8v4j8zYWT9V+pav34Ac0Xh7dOE/54Od2zrCHF0XWjDdvY9ST3gdgHU198ylTg==",
             "dependencies": {
                 "@types/css-font-loading-module": "^0.0.6"
             }
@@ -2264,7 +2266,9 @@
             "dev": true,
             "hasInstallScript": true,
             "optional": true,
-            "os": ["darwin"],
+            "os": [
+                "darwin"
+            ],
             "dependencies": {
                 "bindings": "^1.5.0",
                 "nan": "^2.12.1"
@@ -6836,9 +6840,9 @@
             }
         },
         "brigsby": {
-            "version": "0.3.3",
-            "resolved": "https://registry.npmjs.org/brigsby/-/brigsby-0.3.3.tgz",
-            "integrity": "sha512-GPW+6JyyTGE7C72nE1U4m6IJ7KFEGg4Sks9AFp/qUYskWwM7+RcbkbW4/aOQqfDyjDspZjBpCtWBz+mK0FTMBg==",
+            "version": "0.3.5",
+            "resolved": "https://registry.npmjs.org/brigsby/-/brigsby-0.3.5.tgz",
+            "integrity": "sha512-ekxWYHHVyhuarIgifN3a3Hwni8v4j8zYWT9V+pav34Ac0Xh7dOE/54Od2zrCHF0XWjDdvY9ST3gdgHU198ylTg==",
             "requires": {
                 "@types/css-font-loading-module": "^0.0.6"
             }
