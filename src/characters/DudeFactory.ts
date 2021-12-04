@@ -8,8 +8,8 @@ import { Item } from "../items/Items"
 import { DudeSaveState } from "../saves/DudeSaveState"
 import { newUUID } from "../saves/uuid"
 import { Singletons } from "../Singletons"
+import { Location } from "../world/Location"
 import { camp } from "../world/LocationManager"
-import { WorldLocation } from "../world/WorldLocation"
 import { BERTO_STARTING_DIALOGUE } from "./dialogue/BertoDialogue"
 import { EMPTY_DIALOGUE } from "./dialogue/Dialogue"
 import { DOCTOR_DIALOGUE_ENTRYPOINT } from "./dialogue/DoctorDialogue"
@@ -71,19 +71,14 @@ export class DudeFactory {
      * @param hasPendingSlot should be true if the character already had a home reserved
      *                       for them. If not, they will try to mark a spot as pending.
      */
-    new(
-        type: DudeType,
-        pos: Point,
-        location: WorldLocation = camp(),
-        hasPendingSlot = false
-    ): Dude {
+    new(type: DudeType, pos: Point, location: Location = camp(), hasPendingSlot = false): Dude {
         return this.make(type, pos, null, location, hasPendingSlot)
     }
 
     /**
      * Instantiates a Dude+Entity in the specified location
      */
-    load(saveState: DudeSaveState, location: WorldLocation) {
+    load(saveState: DudeSaveState, location: Location) {
         this.make(saveState.type, Point.fromString(saveState.pos), saveState, location, false)
     }
 
@@ -91,7 +86,7 @@ export class DudeFactory {
         type: DudeType,
         pos: Point,
         saveState: DudeSaveState,
-        location: WorldLocation,
+        location: Location,
         hasPendingSlot: boolean
     ): Dude {
         const uuid = saveState?.uuid ?? newUUID()

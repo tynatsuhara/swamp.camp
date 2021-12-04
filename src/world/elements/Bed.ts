@@ -14,9 +14,9 @@ import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { HUD } from "../../ui/HUD"
 import { UIStateManager } from "../../ui/UIStateManager"
 import { DarknessMask } from "../DarknessMask"
+import { Location } from "../Location"
 import { camp, LocationManager } from "../LocationManager"
 import { TimeUnit } from "../TimeUnit"
-import { WorldLocation } from "../WorldLocation"
 import { WorldTime } from "../WorldTime"
 import { Breakable } from "./Breakable"
 import { Campfire } from "./Campfire"
@@ -29,7 +29,7 @@ export class BedFactory extends ElementFactory {
     readonly type = ElementType.BED
     readonly dimensions = new Point(1, 1)
 
-    make(wl: WorldLocation, pos: Point, data: object): ElementComponent {
+    make(wl: Location, pos: Point, data: object): ElementComponent {
         const e = new Entity()
         const scaledPos = pos.times(TILE_SIZE)
         const depth = scaledPos.y + TILE_SIZE - 10
@@ -76,7 +76,7 @@ export class BedFactory extends ElementFactory {
         )
     }
 
-    canPlaceInLocation(wl: WorldLocation) {
+    canPlaceInLocation(wl: Location) {
         return wl !== camp()
     }
 }

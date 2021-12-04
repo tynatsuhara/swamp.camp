@@ -5,8 +5,8 @@ import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { makeTentInterior } from "../interior/Tent"
+import { Location } from "../Location"
 import { TeleporterPrefix } from "../Teleporter"
-import { WorldLocation } from "../WorldLocation"
 import { BuildingFactory } from "./Building"
 import { ElementComponent } from "./ElementComponent"
 import { ElementType } from "./Elements"
@@ -22,7 +22,7 @@ export class TentFactory extends BuildingFactory {
     readonly type = ElementType.TENT
     readonly dimensions = new Point(4, 3)
 
-    make(wl: WorldLocation, pos: Point, data: any): ElementComponent {
+    make(wl: Location, pos: Point, data: any): ElementComponent {
         const e = new Entity()
 
         const color: TentColor = data.color ?? TentColor.BLUE

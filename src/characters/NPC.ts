@@ -8,10 +8,10 @@ import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
+import { Location } from "../world/Location"
 import { camp, LocationManager } from "../world/LocationManager"
 import { Teleporter } from "../world/Teleporter"
 import { TimeUnit } from "../world/TimeUnit"
-import { WorldLocation } from "../world/WorldLocation"
 import { WorldTime } from "../world/WorldTime"
 import { NPCSchedule, NPCSchedules } from "./ai/NPCSchedule"
 import { NPCTask } from "./ai/NPCTask"
@@ -554,18 +554,18 @@ export class NPC extends Component {
             .slice(1) // slice(1) because we don't need the start in the path
     }
 
-    private goToLocation(updateData: UpdateData, goalLocation: WorldLocation) {
+    private goToLocation(updateData: UpdateData, goalLocation: Location) {
         const nextLocation = this.getNextLocation(goalLocation)
         this.findTeleporter(nextLocation.uuid)
         this.goToTeleporter(updateData, 0.5)
     }
 
-    private simulateGoToLocation(goalLocation: WorldLocation) {
+    private simulateGoToLocation(goalLocation: Location) {
         const nextLocation = this.getNextLocation(goalLocation)
         this.useTeleporter(this.dude.location.getTeleporter(nextLocation.uuid))
     }
 
-    private getNextLocation(goalLocation: WorldLocation) {
+    private getNextLocation(goalLocation: Location) {
         // For now, we're lazy about this and assume every linked location is
         // at most 1 off from the exterior, so we can avoid doing pathfinding
         if (this.dude.location === camp()) {

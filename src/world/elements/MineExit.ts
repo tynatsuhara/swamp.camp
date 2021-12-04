@@ -2,7 +2,7 @@ import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { LightManager } from "../LightManager"
-import { WorldLocation } from "../WorldLocation"
+import { Location } from "../Location"
 import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
@@ -12,7 +12,7 @@ export class MineExitFactory extends ElementFactory {
     readonly type = ElementType.MINE_EXIT
     readonly dimensions = new Point(1, 1)
 
-    make(wl: WorldLocation, pos: Point, data: any): ElementComponent {
+    make(wl: Location, pos: Point, data: any): ElementComponent {
         const e = new Entity()
         const centerPos = pos.plus(new Point(0.5, 0.5)).times(TILE_SIZE)
 

@@ -1,12 +1,12 @@
-import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Point } from "brigsby/dist/Point"
 import { ImageRender } from "brigsby/dist/renderer/ImageRender"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
-import { ConnectingTileSchema } from "./ConnectingTileSchema"
-import { WorldLocation } from "../WorldLocation"
-import { ConnectingTileWaterSchema } from "./ConnectingTileWaterSchema"
 import { GroundRenderer } from "../GroundRenderer"
+import { Location } from "../Location"
+import { ConnectingTileSchema } from "./ConnectingTileSchema"
+import { ConnectingTileWaterSchema } from "./ConnectingTileWaterSchema"
 
 export class ConnectingTileWaterfallSchema extends ConnectingTileSchema {
     static readonly DEPTH = GroundRenderer.DEPTH + 10
@@ -21,7 +21,7 @@ export class ConnectingTileWaterfallSchema extends ConnectingTileSchema {
     /**
      * Renders the tile source based on the given grid and position
      */
-    render(location: WorldLocation, position: Point): ImageRender[] {
+    render(location: Location, position: Point): ImageRender[] {
         const x = position.x
         const y = position.y
 

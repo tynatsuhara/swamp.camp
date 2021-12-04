@@ -4,13 +4,13 @@ import { ElementType } from "../elements/Elements"
 import { ElementUtils } from "../elements/ElementUtils"
 import { GroundType } from "../ground/Ground"
 import { GroundRenderer } from "../GroundRenderer"
+import { Location } from "../Location"
 import { LocationManager, LocationType } from "../LocationManager"
 import { Teleporter, TeleporterPrefix } from "../Teleporter"
-import { WorldLocation } from "../WorldLocation"
 import { InteriorUtils } from "./InteriorUtils"
 
-export const makeMineInterior = (outside: WorldLocation) => {
-    const l = new WorldLocation(LocationType.MINE_INTERIOR, true, false)
+export const makeMineInterior = (outside: Location) => {
+    const l = new Location(LocationType.MINE_INTERIOR, true, false)
     LocationManager.instance.add(l)
 
     const dimensions = new Point(3, 2)

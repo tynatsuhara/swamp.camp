@@ -10,7 +10,7 @@ import { Player } from "../../characters/Player"
 import { WeaponType } from "../../characters/weapons/WeaponType"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
-import { WorldLocation } from "../WorldLocation"
+import { Location } from "../Location"
 import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
@@ -28,7 +28,7 @@ export class RockFactory extends ElementFactory {
         assets.loadAudioFiles(MINING_AUDIO)
     }
 
-    make(wl: WorldLocation, pos: Point, data: any): ElementComponent {
+    make(wl: Location, pos: Point, data: any): ElementComponent {
         const e = new Entity()
         const variation = data.v ?? Math.floor(Math.random() * 3) + 1
         const mossy = data.m ?? Math.random() > 0.7

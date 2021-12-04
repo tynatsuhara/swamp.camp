@@ -14,9 +14,9 @@ import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { LightManager } from "../LightManager"
+import { Location } from "../Location"
 import { camp } from "../LocationManager"
 import { TimeUnit } from "../TimeUnit"
-import { WorldLocation } from "../WorldLocation"
 import { WorldTime } from "../WorldTime"
 import { Breakable } from "./Breakable"
 import { ElementComponent } from "./ElementComponent"
@@ -28,7 +28,7 @@ export class CampfireFactory extends ElementFactory {
     readonly type = ElementType.CAMPFIRE
     readonly dimensions = new Point(1, 1)
 
-    make(wl: WorldLocation, pos: Point, data: any): ElementComponent {
+    make(wl: Location, pos: Point, data: any): ElementComponent {
         const e = new Entity()
         const scaledPos = pos.times(TILE_SIZE)
         const depth = scaledPos.y + TILE_SIZE - 10
@@ -128,7 +128,7 @@ export class CampfireFactory extends ElementFactory {
         )
     }
 
-    canPlaceInLocation(wl: WorldLocation) {
+    canPlaceInLocation(wl: Location) {
         return wl === camp()
     }
 }

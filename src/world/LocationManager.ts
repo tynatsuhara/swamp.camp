@@ -5,7 +5,7 @@ import { NPC } from "../characters/NPC"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { LocationManagerSaveState } from "../saves/LocationManagerSaveState"
 import { Singletons } from "../Singletons"
-import { WorldLocation } from "./WorldLocation"
+import { Location } from "./Location"
 
 export enum LocationType {
     BASE_CAMP = "base",
@@ -31,7 +31,7 @@ export class LocationManager {
         }
     }
 
-    private _currentLocation: WorldLocation
+    private _currentLocation: Location
     get currentLocation() {
         return this._currentLocation
     }
@@ -41,13 +41,13 @@ export class LocationManager {
         newLocation.toggleAudio(true)
         this._currentLocation = newLocation
     }
-    private locations: Map<string, WorldLocation> = new Map() // uuid -> location
+    private locations: Map<string, Location> = new Map() // uuid -> location
 
     get(uuid: string) {
         return this.locations.get(uuid)
     }
 
-    add(location: WorldLocation) {
+    add(location: Location) {
         this.locations.set(location.uuid, location)
         if (!this.currentLocation) {
             this.currentLocation = location
@@ -58,7 +58,7 @@ export class LocationManager {
     /**
      * @deprecated use camp() instead
      */
-    exterior(): WorldLocation {
+    exterior(): Location {
         if (!this.ext) {
             // TODO do this in a less hacky fashion
             this.ext = Array.from(this.locations.values()).find(
@@ -67,9 +67,9 @@ export class LocationManager {
         }
         return this.ext
     }
-    private ext: WorldLocation
+    private ext: Location
 
-    getLocations(): WorldLocation[] {
+    getLocations(): Location[] {
         return Array.from(this.locations.values())
     }
 
@@ -83,7 +83,7 @@ export class LocationManager {
     initialize(saveState: LocationManagerSaveState) {
         this.locations = new Map()
         saveState.values.forEach((l) => {
-            const loadedLocation = WorldLocation.load(l)
+            const loadedLocation = Location.load(l)
             this.locations.set(l.uuid, loadedLocation)
         })
         this.currentLocation = this.locations.get(saveState.currentLocationUUID)

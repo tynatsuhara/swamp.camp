@@ -6,8 +6,8 @@ import { Singletons } from "../Singletons"
 import { ElementType } from "./elements/Elements"
 import { TentColor } from "./elements/Tent"
 import { GroundType } from "./ground/Ground"
+import { Location } from "./Location"
 import { LocationManager, LocationType } from "./LocationManager"
-import { WorldLocation } from "./WorldLocation"
 
 export class MapGenerator {
     static get instance() {
@@ -17,14 +17,14 @@ export class MapGenerator {
     private static readonly MAP_RANGE = 40
     private static readonly MAP_SIZE = MapGenerator.MAP_RANGE * 2 // map goes from [-MAP_RANGE, MAP_RANGE]
 
-    private location: WorldLocation
+    private location: Location
     private readonly tentPos = new Point(-3, -3)
 
-    generateExterior(): WorldLocation {
+    generateExterior(): Location {
         for (let elementsPlaced = false, attempt = 1; !elementsPlaced; attempt++) {
             console.log(`generation attept ${attempt}`)
 
-            this.location = new WorldLocation(
+            this.location = new Location(
                 LocationType.BASE_CAMP,
                 false,
                 true,
@@ -149,8 +149,8 @@ export class MapGenerator {
     }
 
     private placeGround() {
-        for (let i = -MapGenerator.MAP_RANGE; i < MapGenerator.MAP_RANGE; i++) {
-            for (let j = -MapGenerator.MAP_RANGE; j < MapGenerator.MAP_RANGE; j++) {
+        for (let i = -MapGenerator.MAP_RANGE - 1; i < MapGenerator.MAP_RANGE + 1; i++) {
+            for (let j = -MapGenerator.MAP_RANGE - 1; j < MapGenerator.MAP_RANGE + 1; j++) {
                 const pt = new Point(i, j)
                 const thisLevel = this.location.levels?.get(pt)
                 const adjacent = [

@@ -4,15 +4,15 @@ import { TILE_SIZE } from "../../graphics/Tilesets"
 import { ElementType } from "../elements/Elements"
 import { TentColor } from "../elements/Tent"
 import { GroundType } from "../ground/Ground"
+import { Location } from "../Location"
 import { LocationManager, LocationType } from "../LocationManager"
 import { Teleporter, TeleporterPrefix } from "../Teleporter"
-import { WorldLocation } from "../WorldLocation"
 import { AsciiInteriorBuilder } from "./AsciiInteriorBuilder"
 import { InteriorUtils } from "./InteriorUtils"
 
-export const makeTentInterior = (outside: WorldLocation, color: TentColor): WorldLocation => {
+export const makeTentInterior = (outside: Location, color: TentColor): Location => {
     const isPlayerTent = color === TentColor.BLUE
-    const l = new WorldLocation(LocationType.TENT_INTERIOR, true, isPlayerTent)
+    const l = new Location(LocationType.TENT_INTERIOR, true, isPlayerTent)
     LocationManager.instance.add(l)
 
     const floorDimensions = new Point(5, 4)

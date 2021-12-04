@@ -7,10 +7,10 @@ import { Camera } from "../cutscenes/Camera"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { DarknessMask } from "./DarknessMask"
+import { Location } from "./Location"
 import { camp, LocationManager } from "./LocationManager"
 import { TimeUnit } from "./TimeUnit"
 import { Vignette } from "./Vignette"
-import { WorldLocation } from "./WorldLocation"
 import { WorldTime } from "./WorldTime"
 
 export class LightManager extends Component {
@@ -18,8 +18,8 @@ export class LightManager extends Component {
         return Singletons.getOrCreate(LightManager)
     }
 
-    private lightTiles: Map<WorldLocation, Map<any, [Point, number]>> = new Map<
-        WorldLocation,
+    private lightTiles: Map<Location, Map<any, [Point, number]>> = new Map<
+        Location,
         Map<any, [Point, number]>
     >()
     private mask = new DarknessMask(true)
@@ -29,7 +29,7 @@ export class LightManager extends Component {
     /**
      * @param key the unique key for location, will overwrite that light source if it already exists
      */
-    addLight(wl: WorldLocation, key: any, pixelPosition: Point, diameter: number = 16) {
+    addLight(wl: Location, key: any, pixelPosition: Point, diameter: number = 16) {
         if (diameter % 4 !== 0) {
             throw new Error("only circle with a diameter multiple of 4 works")
         }
@@ -38,7 +38,7 @@ export class LightManager extends Component {
         this.lightTiles.set(wl, locationLightMap)
     }
 
-    removeLight(wl: WorldLocation, key: any) {
+    removeLight(wl: Location, key: any) {
         const locationLightMap = this.lightTiles.get(wl)
         if (!locationLightMap) {
             return // it is ok to fail silently here
@@ -49,17 +49,17 @@ export class LightManager extends Component {
     /**
      * returns true if it is dark enough for a demon to tolerate
      */
-    isDark = (pixelPt: Point, location: WorldLocation = LocationManager.instance.currentLocation) =>
+    isDark = (pixelPt: Point, location: Location = LocationManager.instance.currentLocation) =>
         this.isDarkHelper(pixelPt, location, 1)
 
     isTotalDarkness = (
         pixelPt: Point,
-        location: WorldLocation = LocationManager.instance.currentLocation
+        location: Location = LocationManager.instance.currentLocation
     ) => this.isDarkHelper(pixelPt, location, DarknessMask.VISIBILITY_MULTIPLIER)
 
     private isDarkHelper(
         pixelPt: Point,
-        location: WorldLocation,
+        location: Location,
         tolerableDistanceFromLightMultiplier: number
     ): boolean {
         const time = WorldTime.instance.time % TimeUnit.DAY

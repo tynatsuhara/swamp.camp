@@ -1,6 +1,6 @@
 import { Point } from "brigsby/dist/Point"
 import { Ground } from "../ground/Ground"
-import { WorldLocation } from "../WorldLocation"
+import { Location } from "../Location"
 import { ElementFactory } from "./ElementFactory"
 
 /**
@@ -14,7 +14,7 @@ import { ElementFactory } from "./ElementFactory"
  *   3. Misc metadata about the building
  */
 export abstract class BuildingFactory extends ElementFactory {
-    canPlaceAtPos(wl: WorldLocation, pos: Point) {
+    canPlaceAtPos(wl: Location, pos: Point) {
         return this.getOccupiedPoints(pos)
             .map((pt) => wl.getGround(pt)?.type)
             .every((type) => Ground.isNaturalGround(type))

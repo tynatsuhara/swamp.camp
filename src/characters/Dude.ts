@@ -24,9 +24,9 @@ import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Interactable } from "../world/elements/Interactable"
 import { Ground, GroundType } from "../world/ground/Ground"
+import { Location } from "../world/Location"
 import { camp } from "../world/LocationManager"
 import { Residence } from "../world/residences/Residence"
-import { WorldLocation } from "../world/WorldLocation"
 import { WorldTime } from "../world/WorldTime"
 import { DialogueSource, EMPTY_DIALOGUE, getDialogue } from "./dialogue/Dialogue"
 import { DudeAnimationUtils } from "./DudeAnimationUtils"
@@ -44,7 +44,7 @@ export class Dude extends Component implements DialogueSource {
     static readonly NPC_COLLISION_LAYER = "npc"
 
     // managed by WorldLocation/LocationManager classes
-    location: WorldLocation
+    location: Location
 
     blob: object
     readonly uuid: string

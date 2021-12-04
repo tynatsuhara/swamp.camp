@@ -10,7 +10,7 @@ import { ElementComponent } from "./elements/ElementComponent"
 import { ElementFactory } from "./elements/ElementFactory"
 import { ElementType } from "./elements/Elements"
 import { Interactable } from "./elements/Interactable"
-import { WorldLocation } from "./WorldLocation"
+import { Location } from "./Location"
 
 export type Teleporter = {
     to: string // destination uuid
@@ -53,7 +53,7 @@ export class TeleporterFactory extends ElementFactory {
     readonly type = ElementType.TELEPORTER
     readonly dimensions = new Point(1, 1)
 
-    make(wl: WorldLocation, pos: Point, data: any): ElementComponent {
+    make(wl: Location, pos: Point, data: any): ElementComponent {
         const e = new Entity()
 
         const destinationUUID = data.to

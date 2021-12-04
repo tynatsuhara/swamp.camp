@@ -4,7 +4,7 @@ import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { GroundRenderer } from "../GroundRenderer"
-import { WorldLocation } from "../WorldLocation"
+import { Location } from "../Location"
 import { ConnectingTileSchema } from "./ConnectingTileSchema"
 import { GroundType } from "./Ground"
 
@@ -52,7 +52,7 @@ export class ConnectingTilePathSchema extends ConnectingTileSchema {
     /**
      * Renders the tile source based on the given grid and position
      */
-    render(location: WorldLocation, position: Point): ImageRender[] {
+    render(location: Location, position: Point): ImageRender[] {
         const x = position.x
         const y = position.y
 

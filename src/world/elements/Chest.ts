@@ -7,7 +7,7 @@ import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Inventory } from "../../items/Inventory"
 import { InventoryDisplay } from "../../ui/InventoryDisplay"
-import { WorldLocation } from "../WorldLocation"
+import { Location } from "../Location"
 import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
@@ -19,7 +19,7 @@ export class ChestFactory extends ElementFactory {
     type = ElementType.CHEST
     dimensions = new Point(1, 1)
 
-    make(wl: WorldLocation, pos: Point, data: object): ElementComponent {
+    make(wl: Location, pos: Point, data: object): ElementComponent {
         const inventory = !!data[INVENTORY] ? Inventory.load(data[INVENTORY]) : new Inventory(20)
 
         const tiles =

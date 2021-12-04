@@ -1,11 +1,10 @@
-import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Point } from "brigsby/dist/Point"
 import { ImageRender } from "brigsby/dist/renderer/ImageRender"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
-import { ConnectingTileSchema } from "./ConnectingTileSchema"
-import { WorldLocation } from "../WorldLocation"
 import { GroundRenderer } from "../GroundRenderer"
+import { Location } from "../Location"
+import { ConnectingTileSchema } from "./ConnectingTileSchema"
 
 /**
  * Defines how a type of connecting tiles interacts with other types of connecting tiles.
@@ -18,7 +17,7 @@ export class ConnectingTileLedgeSchema extends ConnectingTileSchema {
     /**
      * Renders the tile source based on the given grid and position
      */
-    render(location: WorldLocation, position: Point): ImageRender[] {
+    render(location: Location, position: Point): ImageRender[] {
         const level = location.levels.get(position)
         const x = position.x
         const y = position.y

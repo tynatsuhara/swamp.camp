@@ -1,9 +1,7 @@
 import { Point } from "brigsby/dist/Point"
 import { ImageRender } from "brigsby/dist/renderer/ImageRender"
-import { Grid } from "brigsby/dist/util/Grid"
-import { WorldLocation } from "../WorldLocation"
+import { Location } from "../Location"
 import { ConnectingTile } from "./ConnectingTile"
-import { GroundComponent } from "./GroundComponent"
 
 /**
  * Defines how a type of connecting tiles interacts with other types of connecting tiles.
@@ -17,9 +15,9 @@ export abstract class ConnectingTileSchema {
     /**
      * Renders the tile source based on the given grid and position
      */
-    abstract render(location: WorldLocation, position: Point): ImageRender[]
+    abstract render(location: Location, position: Point): ImageRender[]
 
-    protected get(location: WorldLocation, pt: Point): ConnectingTile {
+    protected get(location: Location, pt: Point): ConnectingTile {
         const ground = location.getGround(pt)
         if (ground) {
             const ct = ground.entity.getComponent(ConnectingTile)

@@ -1,13 +1,13 @@
-import { Point } from "brigsby/dist/Point"
-import { ImageRender } from "brigsby/dist/renderer/ImageRender"
 import { Entity } from "brigsby/dist/Entity"
+import { Point } from "brigsby/dist/Point"
 import { BasicRenderComponent } from "brigsby/dist/renderer/BasicRenderComponent"
+import { ImageRender } from "brigsby/dist/renderer/ImageRender"
+import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Camera } from "../cutscenes/Camera"
 import { TILE_SIZE } from "../graphics/Tilesets"
-import { WorldLocation } from "./WorldLocation"
-import { LocationManager } from "./LocationManager"
-import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Singletons } from "../Singletons"
+import { Location } from "./Location"
+import { LocationManager } from "./LocationManager"
 
 /**
  * This is an optimization that pre-renders ground on an offscreen canvas.
@@ -20,12 +20,9 @@ export class GroundRenderer {
         return Singletons.getOrCreate(GroundRenderer)
     }
 
-    private locations: Map<WorldLocation, HTMLCanvasElement> = new Map<
-        WorldLocation,
-        HTMLCanvasElement
-    >()
+    private locations: Map<Location, HTMLCanvasElement> = new Map<Location, HTMLCanvasElement>()
 
-    clearTile(wl: WorldLocation, position: Point) {
+    clearTile(wl: Location, position: Point) {
         let canvas = this.locations.get(wl)
         if (!canvas) {
             return
@@ -36,7 +33,7 @@ export class GroundRenderer {
         context.clearRect(pos.x, pos.y, TILE_SIZE, TILE_SIZE)
     }
 
-    addTile(wl: WorldLocation, position: Point, tile: StaticSpriteSource) {
+    addTile(wl: Location, position: Point, tile: StaticSpriteSource) {
         if (wl.isInterior || !wl.size) {
             throw new Error("location cannot use GroundRenderer")
         }
@@ -69,7 +66,7 @@ export class GroundRenderer {
         )
     }
 
-    getCanvas(wl: WorldLocation) {
+    getCanvas(wl: Location) {
         return this.locations.get(LocationManager.instance.currentLocation)
     }
 

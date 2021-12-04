@@ -6,9 +6,9 @@ import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { GroundType } from "../ground/Ground"
 import { makeMineInterior } from "../interior/Mine"
+import { Location } from "../Location"
 import { camp } from "../LocationManager"
 import { TeleporterPrefix } from "../Teleporter"
-import { WorldLocation } from "../WorldLocation"
 import { BuildingFactory } from "./Building"
 import { ElementComponent } from "./ElementComponent"
 import { ElementType } from "./Elements"
@@ -18,7 +18,7 @@ export class MineEntranceFactory extends BuildingFactory {
     readonly type = ElementType.MINE_ENTRANCE
     readonly dimensions = new Point(1, 1)
 
-    make(wl: WorldLocation, pos: Point, data: any): ElementComponent {
+    make(wl: Location, pos: Point, data: any): ElementComponent {
         const e = new Entity()
         const pixelPt = pos.times(TILE_SIZE)
 
@@ -78,11 +78,11 @@ export class MineEntranceFactory extends BuildingFactory {
         return [pos]
     }
 
-    canPlaceInLocation(wl: WorldLocation) {
+    canPlaceInLocation(wl: Location) {
         return wl === camp()
     }
 
-    canPlaceAtPos(wl: WorldLocation, pos: Point) {
+    canPlaceAtPos(wl: Location, pos: Point) {
         return wl.getGround(pos)?.type === GroundType.PATH
     }
 }

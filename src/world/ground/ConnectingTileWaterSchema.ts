@@ -1,16 +1,14 @@
-import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Point } from "brigsby/dist/Point"
 import { ImageRender } from "brigsby/dist/renderer/ImageRender"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
-import { ConnectingTile } from "./ConnectingTile"
-import { Grid } from "brigsby/dist/util/Grid"
-import { GroundComponent } from "./GroundComponent"
+import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
-import { ConnectingTileSchema } from "./ConnectingTileSchema"
-import { Ground, GroundType } from "./Ground"
-import { WorldLocation } from "../WorldLocation"
-import { ConnectingTileWaterfallSchema } from "./ConnectingTileWaterfallSchema"
 import { GroundRenderer } from "../GroundRenderer"
+import { Location } from "../Location"
+import { ConnectingTileSchema } from "./ConnectingTileSchema"
+import { ConnectingTileWaterfallSchema } from "./ConnectingTileWaterfallSchema"
+import { GroundType } from "./Ground"
+import { GroundComponent } from "./GroundComponent"
 
 const CORNER_SIZE = TILE_SIZE / 2
 const CORNER_DIMS = new Point(CORNER_SIZE, CORNER_SIZE)
@@ -31,7 +29,7 @@ export class ConnectingTileWaterSchema extends ConnectingTileSchema {
     /**
      * Renders the tile source based on the given grid and position
      */
-    render(location: WorldLocation, position: Point): ImageRender[] {
+    render(location: Location, position: Point): ImageRender[] {
         const x = position.x
         const y = position.y
 

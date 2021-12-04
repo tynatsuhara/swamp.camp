@@ -3,10 +3,10 @@ import { DarknessMask } from "../../world/DarknessMask"
 import { Campfire } from "../../world/elements/Campfire"
 import { ElementType } from "../../world/elements/Elements"
 import { LightManager } from "../../world/LightManager"
+import { Location } from "../../world/Location"
 import { camp, LocationManager } from "../../world/LocationManager"
 import { Residence } from "../../world/residences/Residence"
 import { TimeUnit } from "../../world/TimeUnit"
-import { WorldLocation } from "../../world/WorldLocation"
 import { WorldTime } from "../../world/WorldTime"
 import { Dude } from "../Dude"
 import { NPCSchedules } from "./NPCSchedule"
@@ -18,7 +18,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         const { dude } = context
         const timeOfDay = WorldTime.instance.time % TimeUnit.DAY
 
-        let goalLocation: WorldLocation
+        let goalLocation: Location
         if (
             timeOfDay > NPCSchedules.VILLAGER_WAKE_UP_TIME &&
             timeOfDay < NPCSchedules.VILLAGER_GO_HOME_TIME

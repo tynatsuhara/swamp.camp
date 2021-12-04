@@ -1,11 +1,11 @@
 import { Point } from "brigsby/dist/Point"
-import { WorldLocation } from "../WorldLocation"
-import { GroundComponent } from "./GroundComponent"
-import { makeGrass } from "./Grass"
-import { makePath } from "./Path"
-import { makeBasicNineSliceGround, makeBasicGround } from "./BasicGround"
-import { makeLedge } from "./Ledge"
 import { Singletons } from "../../Singletons"
+import { Location } from "../Location"
+import { makeBasicGround, makeBasicNineSliceGround } from "./BasicGround"
+import { makeGrass } from "./Grass"
+import { GroundComponent } from "./GroundComponent"
+import { makeLedge } from "./Ledge"
+import { makePath } from "./Path"
 import { makeWater } from "./Water"
 import { makeWaterfall } from "./Waterfall"
 
@@ -26,7 +26,7 @@ export class SavedGround {
 }
 
 export type MakeGroundFuncData = {
-    wl: WorldLocation
+    wl: Location
     pos: Point
     data: any
 }
@@ -51,7 +51,7 @@ export class Ground {
         [GroundType.WATERFALL]: makeWaterfall,
     }
 
-    make(type: GroundType, wl: WorldLocation, pos: Point, data: object) {
+    make(type: GroundType, wl: Location, pos: Point, data: object) {
         const ground = this.GROUND_FUNCTION_MAP[type]({ wl, pos, data })
         if (ground.type !== type) {
             throw new Error("constructed ground type doesn't match requested type")

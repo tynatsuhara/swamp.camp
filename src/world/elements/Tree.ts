@@ -11,9 +11,9 @@ import { WeaponType } from "../../characters/weapons/WeaponType"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
 import { Ground } from "../ground/Ground"
+import { Location } from "../Location"
 import { camp } from "../LocationManager"
 import { TimeUnit } from "../TimeUnit"
-import { WorldLocation } from "../WorldLocation"
 import { WorldTime } from "../WorldTime"
 import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
@@ -36,7 +36,7 @@ export class TreeFactory extends ElementFactory {
         assets.loadAudioFiles(CHOPPING_AUDIO)
     }
 
-    make(wl: WorldLocation, pos: Point, data: object): ElementComponent {
+    make(wl: Location, pos: Point, data: object): ElementComponent {
         const maxResourcesCount = 4
 
         const nextGrowthTime = data[NEXT_GROWTH_TIME] ?? this.nextGrowthTime()
@@ -132,11 +132,11 @@ export class TreeFactory extends ElementFactory {
         )
     }
 
-    canPlaceInLocation(wl: WorldLocation) {
+    canPlaceInLocation(wl: Location) {
         return wl === camp()
     }
 
-    canPlaceAtPos(wl: WorldLocation, pos: Point) {
+    canPlaceAtPos(wl: Location, pos: Point) {
         const ground = wl.getGround(pos.plusY(1))
         return Ground.isNaturalGround(ground?.type)
     }

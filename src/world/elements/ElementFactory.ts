@@ -1,5 +1,5 @@
 import { Point } from "brigsby/dist/Point"
-import { WorldLocation } from "../WorldLocation"
+import { Location } from "../Location"
 import { ElementComponent } from "./ElementComponent"
 import { ElementType } from "./Elements"
 
@@ -19,19 +19,19 @@ export abstract class ElementFactory {
      * @param data Previous save data
      * @returns An ElementComponent with the factory's type, which MUST have a nonnull entity
      */
-    abstract make(wl: WorldLocation, pos: Point, data: any): ElementComponent
+    abstract make(wl: Location, pos: Point, data: any): ElementComponent
 
     /**
      * @param wl The location in which the user is trying to place an element
      */
-    canPlaceInLocation(wl: WorldLocation) {
+    canPlaceInLocation(wl: Location) {
         return true
     }
 
     /**
      * @param pos The position of the element in tile coordinates (not pixel coordinates!)
      */
-    canPlaceAtPos(wl: WorldLocation, pos: Point) {
+    canPlaceAtPos(wl: Location, pos: Point) {
         return true
     }
 }

@@ -2,13 +2,13 @@ import { Point } from "brigsby/dist/Point"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { ElementType } from "../elements/Elements"
 import { GroundType } from "../ground/Ground"
+import { Location } from "../Location"
 import { LocationManager, LocationType } from "../LocationManager"
 import { Teleporter, TeleporterPrefix } from "../Teleporter"
-import { WorldLocation } from "../WorldLocation"
 import { InteriorUtils } from "./InteriorUtils"
 
-export const makeHouseInterior = (outside: WorldLocation): WorldLocation => {
-    const l = new WorldLocation(LocationType.HOUSE_INTERIOR, true, false)
+export const makeHouseInterior = (outside: Location): Location => {
+    const l = new Location(LocationType.HOUSE_INTERIOR, true, false)
     LocationManager.instance.add(l)
     const dimensions = new Point(7, 5)
     const interactablePos = new Point(dimensions.x / 2, dimensions.y).times(TILE_SIZE)

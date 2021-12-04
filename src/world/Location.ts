@@ -25,7 +25,7 @@ import { LocationManager, LocationType } from "./LocationManager"
 import { StaticSprites } from "./StaticSprites"
 import { Teleporter, TeleporterPrefix, Teleporters, TeleporterSound } from "./Teleporter"
 
-export class WorldLocation {
+export class Location {
     private _uuid: string = newUUID()
     get uuid() {
         return this._uuid
@@ -398,12 +398,12 @@ export class WorldLocation {
         })
     }
 
-    static load(saveState: LocationSaveState): WorldLocation {
+    static load(saveState: LocationSaveState): Location {
         // previously we did not save location size
         const size = saveState.size || (saveState.isInterior ? null : 70)
         const levels = saveState.levels ? Grid.deserialize(saveState.levels) : null
 
-        const n = new WorldLocation(
+        const n = new Location(
             saveState.type,
             saveState.isInterior,
             saveState.allowPlacing,

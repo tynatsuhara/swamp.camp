@@ -7,9 +7,9 @@ import { DudeFactory, DudeType } from "../../characters/DudeFactory"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item, spawnItem } from "../../items/Items"
 import { Ground } from "../ground/Ground"
+import { Location } from "../Location"
 import { camp } from "../LocationManager"
 import { TimeUnit } from "../TimeUnit"
-import { WorldLocation } from "../WorldLocation"
 import { WorldTime } from "../WorldTime"
 import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
@@ -22,7 +22,7 @@ export class MushroomFactory extends ElementFactory {
     readonly type = ElementType.MUSHROOM
     readonly dimensions = new Point(1, 1)
 
-    make(wl: WorldLocation, pos: Point, data: object): ElementComponent {
+    make(wl: Location, pos: Point, data: object): ElementComponent {
         const nextGrowthTime = data[NEXT_GROWTH_TIME] ?? this.nextGrowthTime()
 
         const e = new Entity()
@@ -79,11 +79,11 @@ export class MushroomFactory extends ElementFactory {
         )
     }
 
-    canPlaceInLocation(wl: WorldLocation) {
+    canPlaceInLocation(wl: Location) {
         return wl === camp()
     }
 
-    canPlaceAtPos(wl: WorldLocation, pos: Point) {
+    canPlaceAtPos(wl: Location, pos: Point) {
         return Ground.isNaturalGround(wl.getGround(pos)?.type)
     }
 

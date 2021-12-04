@@ -6,9 +6,9 @@ import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { DudeType } from "../../characters/DudeFactory"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { makeHouseInterior } from "../interior/House"
+import { Location } from "../Location"
 import { SingleTypeResidence } from "../residences/SingleTypeResidence"
 import { TeleporterPrefix } from "../Teleporter"
-import { WorldLocation } from "../WorldLocation"
 import { BuildingFactory } from "./Building"
 import { ElementComponent } from "./ElementComponent"
 import { ElementType } from "./Elements"
@@ -24,7 +24,7 @@ export class HouseFactory extends BuildingFactory {
     readonly type = ElementType.HOUSE
     readonly dimensions = new Point(5, 4)
 
-    make(wl: WorldLocation, pos: Point, data: HouseData): ElementComponent {
+    make(wl: Location, pos: Point, data: HouseData): ElementComponent {
         const e = new Entity()
 
         // the interior location UUID

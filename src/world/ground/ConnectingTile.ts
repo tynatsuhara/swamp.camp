@@ -2,13 +2,13 @@ import { Component } from "brigsby/dist/Component"
 import { Point } from "brigsby/dist/Point"
 import { ImageRender } from "brigsby/dist/renderer/ImageRender"
 import { GroundRenderer } from "../GroundRenderer"
+import { Location } from "../Location"
 import { LocationManager } from "../LocationManager"
-import { WorldLocation } from "../WorldLocation"
 import { ConnectingTileSchema } from "./ConnectingTileSchema"
 
 export class ConnectingTile extends Component {
     readonly schema: ConnectingTileSchema
-    private readonly location: WorldLocation
+    private readonly location: Location
     private readonly position: Point
 
     /**
@@ -16,7 +16,7 @@ export class ConnectingTile extends Component {
      */
     constructor(
         schema: ConnectingTileSchema,
-        location: WorldLocation,
+        location: Location,
         position: Point = new Point(0, 0)
     ) {
         super()

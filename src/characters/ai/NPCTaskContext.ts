@@ -1,5 +1,5 @@
 import { Point } from "brigsby/dist/Point"
-import { WorldLocation } from "../../world/WorldLocation"
+import { Location } from "../../world/Location"
 import { Dude } from "../Dude"
 
 /**
@@ -37,7 +37,7 @@ export interface NPCTaskContext {
     /**
      * Go to a different location
      */
-    goToLocation: (wl: WorldLocation) => void
+    goToLocation: (wl: Location) => void
 
     doNothing: () => void
 }

@@ -1,12 +1,12 @@
 import { Point } from "brigsby/dist/Point"
+import { Location } from "../../world/Location"
 import { LocationManager } from "../../world/LocationManager"
-import { WorldLocation } from "../../world/WorldLocation"
 import { NPCSchedule } from "./NPCSchedule"
 import { NPCTask } from "./NPCTask"
 import { NPCTaskContext } from "./NPCTaskContext"
 
 export class NPCTaskScheduleGoToLocation extends NPCTask {
-    private readonly location: WorldLocation
+    private readonly location: Location
     private readonly pt: Point
 
     constructor(schedule: NPCSchedule) {
