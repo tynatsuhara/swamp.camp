@@ -25,6 +25,8 @@ export class MapGenerator {
     private readonly tentPos = new Point(-3, -3)
 
     generateExterior(): Location {
+        console.groupCollapsed("map generation")
+
         for (let elementsPlaced = false, attempt = 1; !elementsPlaced; attempt++) {
             console.log(`generation attept ${attempt}`)
 
@@ -59,6 +61,8 @@ export class MapGenerator {
 
         LocationManager.instance.add(this.location)
         LocationManager.instance.currentLocation = this.location
+
+        console.groupEnd()
 
         return this.location
     }
