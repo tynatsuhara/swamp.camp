@@ -90,7 +90,7 @@ export class QueueAudioPlayer extends AudioPlayer {
     }
 
     private playNextSong() {
-        this.log(`finished playing ${this.fileName}`)
+        this.log(`finished music: ${this.fileName}`)
 
         this.stop()
         this.files.push(this.files.shift())
@@ -104,6 +104,8 @@ export class QueueAudioPlayer extends AudioPlayer {
             return
         }
 
+        this.log(`started music: ${this.fileName}`)
+
         const track = new Audio(file)
 
         track.oncanplaythrough = () => {
@@ -112,7 +114,6 @@ export class QueueAudioPlayer extends AudioPlayer {
         }
 
         this.currentAudio = track
-        this.log(`playing ${this.fileName}`)
     }
 
     stop() {

@@ -99,7 +99,6 @@ export class Music {
         }
 
         Music.currentMusic = music
-        console.log(`set currentMusic to ${Music.currentMusic.fileName}`)
     }
 
     static stop() {

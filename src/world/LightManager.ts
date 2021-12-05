@@ -57,6 +57,9 @@ export class LightManager extends Component {
         location: Location = LocationManager.instance.currentLocation
     ) => this.isDarkHelper(pixelPt, location, DarknessMask.VISIBILITY_MULTIPLIER)
 
+    /**
+     * currently this is O(n) for n light sources in a location — don't call on every update()
+     */
     private isDarkHelper(
         pixelPt: Point,
         location: Location,
