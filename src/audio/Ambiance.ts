@@ -33,7 +33,7 @@ export class Ambiance {
         // Ambiance volume is closely tied to the world context so we don't update
         // the volume from the settings until determineAmbiance is called
 
-        const volume = Settings.getSoundVolume() * (ctx.isInterior ? 0.1 : 1)
+        const volume = Settings.getAmbienceVolume() * (ctx.isInterior ? 0.1 : 1)
         Ambiance.DAY.setVolume(volume)
 
         const inDarkness = LightManager.instance.isDark(Player.instance.dude.standingPosition)

@@ -71,6 +71,17 @@ export class PauseMenu extends Component {
                 },
             },
             {
+                text: `AMBIENCE (${Settings.getAmbienceVolume() * 100}%)`,
+                fn: () => {
+                    if (this.isShiftDown) {
+                        Settings.decreaseAmbienceVolume()
+                    } else {
+                        Settings.increaseAmbienceVolume()
+                    }
+                    this.open(dimensions) // refresh
+                },
+            },
+            {
                 text: `MAIN MENU`,
                 fn: () => QuestGame.instance.loadMainMenu(),
             },
