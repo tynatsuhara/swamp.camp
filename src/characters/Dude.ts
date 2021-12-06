@@ -223,9 +223,7 @@ export class Dude extends Component implements DialogueSource {
             .getStacks()
             .map((stack) => WeaponType[WeaponType[stack.item]] as WeaponType)
             .find((w) => !!w)
-        if (weapon) {
-            this.setWeapon(weapon)
-        }
+        this.setWeapon(weapon || WeaponType.NONE)
     }
 
     equipFirstShieldInInventory() {
@@ -233,9 +231,7 @@ export class Dude extends Component implements DialogueSource {
             .getStacks()
             .map((stack) => ShieldType[ShieldType[stack.item]])
             .find((s) => !!s)
-        if (shield) {
-            this.setShield(shield)
-        }
+        this.setShield(shield || ShieldType.NONE)
     }
 
     setWeapon(type: WeaponType) {
