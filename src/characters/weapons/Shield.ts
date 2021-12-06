@@ -1,14 +1,12 @@
 import { Component } from "brigsby/dist/Component"
-import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
-import { Tilesets } from "../../graphics/Tilesets"
 import { UpdateData } from "brigsby/dist/Engine"
-import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Point } from "brigsby/dist/Point"
-import { Dude } from "../Dude"
-import { Animator } from "brigsby/dist/util/Animator"
-import { ShieldType } from "./ShieldType"
 import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
+import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
+import { Tilesets } from "../../graphics/Tilesets"
+import { Dude } from "../Dude"
+import { ShieldType } from "./ShieldType"
 
 enum State {
     ON_BACK,

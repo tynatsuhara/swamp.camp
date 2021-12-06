@@ -218,6 +218,26 @@ export class Dude extends Component implements DialogueSource {
         }
     }
 
+    equipFirstWeaponInInventory() {
+        const weapon = this.inventory
+            .getStacks()
+            .map((stack) => WeaponType[WeaponType[stack.item]] as WeaponType)
+            .find((w) => !!w)
+        if (weapon) {
+            this.setWeapon(weapon)
+        }
+    }
+
+    equipFirstShieldInInventory() {
+        const shield = this.inventory
+            .getStacks()
+            .map((stack) => ShieldType[ShieldType[stack.item]])
+            .find((s) => !!s)
+        if (shield) {
+            this.setShield(shield)
+        }
+    }
+
     setWeapon(type: WeaponType) {
         this.weapon?.delete()
         this._weapon = this.entity.addComponent(WeaponFactory.make(type, this.type))

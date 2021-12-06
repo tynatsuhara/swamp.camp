@@ -55,7 +55,7 @@ export class Torch extends Shield {
         const fireStart = this.dude.blob[BLOB_ATTRIBUTE]
 
         if (now > fireStart + LIFESPAN_MILLIS) {
-            this.delete()
+            this.dude.equipFirstShieldInInventory()
             return
         }
 

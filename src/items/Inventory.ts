@@ -28,7 +28,7 @@ export class Inventory {
     }
 
     getStacks() {
-        return this.stacks
+        return this.stacks.filter((s) => !!s)
     }
 
     setStack(index: number, stack: ItemStack) {
