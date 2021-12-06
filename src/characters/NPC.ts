@@ -4,7 +4,6 @@ import { UpdateData } from "brigsby/dist/Engine"
 import { Point } from "brigsby/dist/Point"
 import { LineRender } from "brigsby/dist/renderer/LineRender"
 import { Lists } from "brigsby/dist/util/Lists"
-import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
@@ -54,7 +53,7 @@ export class NPC extends Component {
     }
 
     start() {
-        this.doWhileLiving(() => this.decideWhatToDo(), 1000 + 1000 * Math.random())
+        this.dude.doWhileLiving(() => this.decideWhatToDo(), 1000 + 1000 * Math.random())
     }
 
     update(updateData: UpdateData) {
@@ -176,27 +175,6 @@ export class NPC extends Component {
         this.teleporterTarget = null
         this.task = null
         // this.followTarget = null
-    }
-
-    // fn will execute immediately and every intervalMillis milliseconds
-    // until the NPC is dead or the function returns true
-    doWhileLiving(fn: () => boolean | void, intervalMillis: number) {
-        if (!this.dude.isAlive) {
-            return
-        }
-
-        if (fn()) {
-            return
-        }
-
-        const invoker = this.entity.addComponent(
-            new RepeatedInvoker(() => {
-                if (!this.dude.isAlive || fn()) {
-                    invoker.delete()
-                }
-                return intervalMillis
-            }, intervalMillis)
-        )
     }
 
     private walkPath: Point[] = null

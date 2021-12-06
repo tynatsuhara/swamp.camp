@@ -74,7 +74,7 @@ export class Enemy extends Component {
 
         // dissolve if they end up in the light for too long
         let lastSunlightCheck = false
-        npc.doWhileLiving(() => {
+        dude.doWhileLiving(() => {
             if (!LightManager.instance.isDark(dude.standingPosition)) {
                 if (lastSunlightCheck) {
                     // they've been in sunlight for a while, time to die

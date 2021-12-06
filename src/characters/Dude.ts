@@ -7,6 +7,7 @@ import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
 import { AnimatedSpriteComponent } from "brigsby/dist/sprites/AnimatedSpriteComponent"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
+import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
 import { StepSounds } from "../audio/StepSounds"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { DeathCutscene } from "../cutscenes/DeathCutscene"
@@ -633,6 +634,27 @@ export class Dude extends Component implements DialogueSource {
 
     rolling() {
         return this.isRolling
+    }
+
+    // fn will execute immediately and every intervalMillis milliseconds
+    // until the NPC is dead or the function returns true
+    doWhileLiving(fn: () => boolean | void, intervalMillis: number) {
+        if (!this.isAlive) {
+            return
+        }
+
+        if (fn()) {
+            return
+        }
+
+        const invoker = this.entity.addComponent(
+            new RepeatedInvoker(() => {
+                if (!this.isAlive || fn()) {
+                    invoker.delete()
+                }
+                return intervalMillis
+            }, intervalMillis)
+        )
     }
 
     /**
