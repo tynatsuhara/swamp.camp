@@ -229,10 +229,16 @@ export class Dude extends Component implements DialogueSource {
     updateActiveConditions() {
         this.conditions = this.conditions.filter((c) => c.expiration > WorldTime.instance.time)
         this.conditions.forEach((c) => {
+            const timeSinceLastExec = WorldTime.instance.time - c.lastExec
+
             // TODO: add condition effects
             switch (c.condition) {
                 case Condition.ON_FIRE:
                     console.log("on fire!")
+                    if (timeSinceLastExec > 500) {
+                        console.log("TODO: fire damage")
+                        c.lastExec = WorldTime.instance.time
+                    }
                     return
                 case Condition.POISONED:
                     console.log("poisoned!")
@@ -276,9 +282,13 @@ export class Dude extends Component implements DialogueSource {
             this.conditions.push({
                 condition,
                 expiration,
-                lastExec: WorldTime.instance.time,
+                lastExec: -1,
             })
         }
+    }
+
+    removeCondition(condition: Condition) {
+        this.conditions = this.conditions.filter((c) => c.condition !== condition)
     }
 
     get isAlive() {
@@ -508,6 +518,8 @@ export class Dude extends Component implements DialogueSource {
         const ground = this.location.getGround(standingTilePos)
 
         if (Ground.isWater(ground?.type)) {
+            this.removeCondition(Condition.ON_FIRE)
+
             if (this.factions.includes(DudeFaction.AQUATIC)) {
                 // don't affect speed
             } else if (!this.isJumping) {
