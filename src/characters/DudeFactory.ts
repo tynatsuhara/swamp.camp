@@ -297,7 +297,8 @@ export class DudeFactory {
             !!saveState?.inventory ? inventoryClass.load(saveState.inventory) : defaultInventory,
             saveState?.dialogue ?? dialogue,
             saveState?.blob ?? blob,
-            colliderSize
+            colliderSize,
+            saveState.conditions ?? []
         )
 
         location.dudes.add(d)

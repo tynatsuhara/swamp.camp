@@ -2,8 +2,10 @@ import { Component } from "brigsby/dist/Component"
 import { debug } from "brigsby/dist/Debug"
 import { UpdateData } from "brigsby/dist/Engine"
 import { CapturedInput, InputKey, InputKeyString } from "brigsby/dist/Input"
+import { Condition } from "./characters/Condition"
 import { DudeFactory, DudeType } from "./characters/DudeFactory"
 import { DudeSpawner } from "./characters/DudeSpawner"
+import { Player } from "./characters/Player"
 import { pixelPtToTilePt } from "./graphics/Tilesets"
 import { GroundType } from "./world/ground/Ground"
 import { LocationManager } from "./world/LocationManager"
@@ -23,8 +25,8 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     ],
     [
         InputKey.U,
-        "spawn orc shaman",
-        (input) => DudeFactory.instance.new(DudeType.ORC_SHAMAN, input.mousePos),
+        "set player on fire",
+        () => Player.instance.dude.addCondition(Condition.ON_FIRE, 1000),
     ],
     [InputKey.B, "spawn bear", (input) => DudeFactory.instance.new(DudeType.BEAR, input.mousePos)],
     [InputKey.V, "spawn wolf", (input) => DudeFactory.instance.new(DudeType.WOLF, input.mousePos)],

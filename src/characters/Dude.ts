@@ -29,6 +29,7 @@ import { Location } from "../world/Location"
 import { camp } from "../world/LocationManager"
 import { Residence } from "../world/residences/Residence"
 import { WorldTime } from "../world/WorldTime"
+import { ActiveCondition, Condition } from "./Condition"
 import { DialogueSource, EMPTY_DIALOGUE, getDialogue } from "./dialogue/Dialogue"
 import { DudeAnimationUtils } from "./DudeAnimationUtils"
 import { DudeFaction, DudeType } from "./DudeFactory"
@@ -109,6 +110,8 @@ export class Dude extends Component implements DialogueSource {
     private dialogueInteract: Interactable
     dialogue: string
 
+    private conditions: ActiveCondition[] = []
+
     constructor(
         uuid: string,
         hasPendingSlot: boolean,
@@ -124,7 +127,8 @@ export class Dude extends Component implements DialogueSource {
         inventory: Inventory,
         dialogue: string,
         blob: object,
-        colliderSize: Point
+        colliderSize: Point,
+        conditions: ActiveCondition[]
     ) {
         super()
         this.uuid = uuid
@@ -137,6 +141,7 @@ export class Dude extends Component implements DialogueSource {
         this.inventory = inventory
         this.dialogue = dialogue
         this.blob = blob
+        this.conditions = conditions
 
         this.awake = () => {
             // Set up animations
@@ -217,6 +222,23 @@ export class Dude extends Component implements DialogueSource {
             this.dialogueInteract.enabled =
                 this.dialogue !== EMPTY_DIALOGUE && DialogueDisplay.instance.source !== this
         }
+
+        this.updateActiveConditions()
+    }
+
+    updateActiveConditions() {
+        this.conditions = this.conditions.filter((c) => c.expiration > WorldTime.instance.time)
+        this.conditions.forEach((c) => {
+            // TODO: add condition effects
+            switch (c.condition) {
+                case Condition.ON_FIRE:
+                    console.log("on fire!")
+                    return
+                case Condition.POISONED:
+                    console.log("poisoned!")
+                    return
+            }
+        })
     }
 
     equipFirstWeaponInInventory() {
@@ -243,6 +265,20 @@ export class Dude extends Component implements DialogueSource {
     setShield(type: ShieldType) {
         this.shield?.delete()
         this._shield = this.entity.addComponent(ShieldFactory.make(type))
+    }
+
+    addCondition(condition: Condition, duration: number) {
+        const expiration = WorldTime.instance.time + duration
+        const existing = this.conditions.find((c) => c.condition === condition)
+        if (existing) {
+            existing.expiration = Math.max(existing.expiration, expiration)
+        } else {
+            this.conditions.push({
+                condition,
+                expiration,
+                lastExec: WorldTime.instance.time,
+            })
+        }
     }
 
     get isAlive() {
@@ -705,6 +741,7 @@ export class Dude extends Component implements DialogueSource {
             inventory: this.inventory.save(),
             dialogue: this.dialogue,
             blob: this.blob,
+            conditions: this.conditions,
         }
     }
 
