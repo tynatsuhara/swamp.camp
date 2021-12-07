@@ -28,8 +28,9 @@ import { Campfire } from "../world/elements/Campfire"
 import { ElementType } from "../world/elements/Elements"
 import { Interactable } from "../world/elements/Interactable"
 import { Ground, GroundType } from "../world/ground/Ground"
+import { LightManager } from "../world/LightManager"
 import { Location } from "../world/Location"
-import { camp } from "../world/LocationManager"
+import { camp, LocationManager } from "../world/LocationManager"
 import { Residence } from "../world/residences/Residence"
 import { WorldTime } from "../world/WorldTime"
 import { ActiveCondition, Condition } from "./Condition"
@@ -258,7 +259,7 @@ export class Dude extends Component implements DialogueSource {
     private fireParticles: FireParticles
 
     updateActiveConditions() {
-        if (!this.isAlive || this.conditions.length === 0) {
+        if (this.conditions.length === 0) {
             return
         }
 
@@ -282,6 +283,14 @@ export class Dude extends Component implements DialogueSource {
                             )
                         )
                     }
+                    LightManager.instance.addLight(
+                        LocationManager.instance.currentLocation,
+                        this.fireParticles,
+                        this.standingPosition
+                            .plusY(-TILE_SIZE / 2)
+                            .plus(this.getAnimationOffsetPosition()),
+                        40
+                    )
                     if (timeSinceLastExec > 500) {
                         const fireDamage = 0.3
                         this.damage(fireDamage, Point.ZERO, 0, null, false, false)
@@ -315,6 +324,7 @@ export class Dude extends Component implements DialogueSource {
             case Condition.ON_FIRE:
                 if (this.fireParticles) {
                     this.entity.removeComponent(this.fireParticles)
+                    LightManager.instance.removeLight(this.fireParticles)
                     this.fireParticles = undefined
                 }
                 return
@@ -334,6 +344,10 @@ export class Dude extends Component implements DialogueSource {
         dodgeable: boolean = true
     ) {
         if (dodgeable && this.rolling()) {
+            return
+        }
+
+        if (!this.isAlive) {
             return
         }
 
