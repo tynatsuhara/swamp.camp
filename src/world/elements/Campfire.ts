@@ -1,4 +1,3 @@
-import { BoxCollider } from "brigsby/dist/collision/BoxCollider"
 import { Component } from "brigsby/dist/Component"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
@@ -54,13 +53,13 @@ export class CampfireFactory extends ElementFactory {
             )
         )
 
-        const colliderOffset = new Point(0, 2)
-        e.addComponent(
-            new BoxCollider(
-                scaledPos.plus(colliderOffset),
-                new Point(TILE_SIZE, TILE_SIZE).minus(colliderOffset)
-            )
-        )
+        // const colliderOffset = new Point(0, 2)
+        // e.addComponent(
+        //     new BoxCollider(
+        //         scaledPos.plus(colliderOffset),
+        //         new Point(TILE_SIZE, TILE_SIZE).minus(colliderOffset)
+        //     )
+        // )
 
         const fire = e.addComponent(
             new FireParticles(1, () =>

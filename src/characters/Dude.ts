@@ -24,6 +24,8 @@ import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
 import { HUD } from "../ui/HUD"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { UIStateManager } from "../ui/UIStateManager"
+import { Campfire } from "../world/elements/Campfire"
+import { ElementType } from "../world/elements/Elements"
 import { Interactable } from "../world/elements/Interactable"
 import { Ground, GroundType } from "../world/ground/Ground"
 import { Location } from "../world/Location"
@@ -260,9 +262,13 @@ export class Dude extends Component implements DialogueSource {
             return
         }
 
-        this.conditions = this.conditions.filter((c) => c.expiration > WorldTime.instance.time)
         this.conditions.forEach((c) => {
             const timeSinceLastExec = WorldTime.instance.time - c.lastExec
+
+            if (c.expiration < WorldTime.instance.time) {
+                this.removeCondition(c.condition)
+                return
+            }
 
             // TODO: add condition effects
             switch (c.condition) {
@@ -554,6 +560,7 @@ export class Dude extends Component implements DialogueSource {
 
         const standingTilePos = pixelPtToTilePt(this.standingPosition)
         const ground = this.location.getGround(standingTilePos)
+        const element = this.location.getElement(standingTilePos)
 
         if (Ground.isWater(ground?.type)) {
             this.removeCondition(Condition.ON_FIRE)
@@ -563,6 +570,15 @@ export class Dude extends Component implements DialogueSource {
             } else if (!this.isJumping) {
                 speedMultiplier *= 0.4
             }
+        } else if (
+            !this.isRolling &&
+            element?.type === ElementType.CAMPFIRE &&
+            element.entity.getComponent(Campfire).logs > 0 &&
+            this.standingPosition.distanceTo(
+                standingTilePos.times(TILE_SIZE).plus(new Point(8, 10))
+            ) < 5
+        ) {
+            this.addCondition(Condition.ON_FIRE, 1000 + Math.random() * 1000)
         }
 
         const verticalMovement = this.getVerticalMovement(updateData)
