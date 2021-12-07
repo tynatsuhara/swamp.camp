@@ -455,6 +455,8 @@ export class Dude extends Component implements DialogueSource {
         // stand up
         this.animation.transform.rotation = 0
         this.layingDownOffset = null
+
+        this.conditions.forEach((c) => this.removeCondition(c.condition))
     }
 
     dissolve() {

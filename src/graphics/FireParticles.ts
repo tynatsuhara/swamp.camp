@@ -12,25 +12,24 @@ export class FireParticles extends RepeatedInvoker {
 
     size: number
 
-    constructor(
-        size: number,
-        positionSupplier: () => Point,
-        depthSupplier: () => number = undefined
-    ) {
+    constructor(size: number, positionSupplier: () => Point, depthSupplier?: () => number) {
         super(() => this.emit(positionSupplier, depthSupplier))
 
         this.size = size
         this.lastPos = positionSupplier()
     }
 
-    private emit(positionSupplier: () => Point, depthSupplier: () => number) {
+    private emit(positionSupplier: () => Point, depthSupplier?: () => number) {
         const size = this.size
         const fireBase = positionSupplier()
         const diff = this.lastPos.minus(fireBase)
         const velocity = diff.equals(Point.ZERO)
             ? Point.ZERO
             : diff.normalized().times(FIRE_DRIFT_DISTANCE)
-        const depth = depthSupplier ? depthSupplier() : fireBase.y
+        if (!depthSupplier) {
+            depthSupplier = () => fireBase.y
+        }
+        const depth = depthSupplier()
 
         // smoke
         const smokes = (Math.random() * (size + 1) - 1) * 0.4
@@ -62,14 +61,14 @@ export class FireParticles extends RepeatedInvoker {
         // fire particles which track the source
         for (let i = 0; i < (size * 2) / 3; i++) {
             const speed = -0.005
-            Particles.instance.emitParticle(
+            const baseOffset = Point.ZERO.randomCircularShift(size)
+            Particles.instance.emitComplexParticle(
                 Lists.oneOf(FIRE_COLORS),
-                Point.ZERO.randomCircularShift(size),
-                depth,
+                () => positionSupplier().plus(baseOffset),
+                depthSupplier,
                 600,
                 (t) => new Point(velocity.x, velocity.y + speed * t),
-                Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1),
-                positionSupplier
+                Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
             )
         }
 

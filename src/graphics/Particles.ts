@@ -17,23 +17,40 @@ export class Particles {
         this.entity = new Entity()
     }
 
+    emitComplexParticle(
+        color: Color,
+        positionSupplier: () => Point,
+        depthSupplier: () => number,
+        lifetime: number,
+        velocity: (t: number) => Point = () => Point.ZERO,
+        size: Point = new Point(1, 1)
+    ) {
+        const emitFn = (image: ImageBitmap) =>
+            this.entity.addComponent(
+                Particle.dynamic(lifetime, image, positionSupplier, depthSupplier, velocity, size)
+            )
+
+        this.createParticle(emitFn, color)
+    }
+
     emitParticle(
         color: Color,
         position: Point,
         depth: number,
         lifetime: number,
         velocity: (t: number) => Point = () => Point.ZERO,
-        size: Point = new Point(1, 1),
-        offsetSupplier: () => Point = () => Point.ZERO
+        size: Point = new Point(1, 1)
     ) {
-        const emit = (image: ImageBitmap) =>
-            this.entity.addComponent(
-                new Particle(image, position, depth, lifetime, velocity, size, offsetSupplier)
-            )
+        const emitFn = (image: ImageBitmap) =>
+            this.entity.addComponent(Particle.new(lifetime, image, position, depth, velocity, size))
 
+        this.createParticle(emitFn, color)
+    }
+
+    private createParticle(emitFn: (image: ImageBitmap) => void, color: Color) {
         const prefabBitmap = this.prefabs.get(color)
         if (prefabBitmap) {
-            emit(prefabBitmap)
+            emitFn(prefabBitmap)
             return
         }
 
@@ -43,7 +60,7 @@ export class Particles {
         const imageData = new ImageData(new Uint8ClampedArray(rgba), 1, 1)
         createImageBitmap(imageData).then((bitmap) => {
             this.prefabs.set(color, bitmap)
-            emit(bitmap)
+            emitFn(bitmap)
         })
     }
 
@@ -57,15 +74,7 @@ const SIZE = new Point(1, 1)
 class Particle extends Component {
     private elapsedTime = 0
 
-    constructor(
-        image: ImageBitmap,
-        position: Point,
-        depth: number,
-        lifetime: number,
-        velocity: (t: number) => Point,
-        size: Point = new Point(1, 1),
-        offsetSupplier: () => Point
-    ) {
+    private constructor(lifetime: number) {
         super()
 
         this.update = (updateData) => {
@@ -74,16 +83,49 @@ class Particle extends Component {
                 this.delete()
             }
         }
+    }
 
-        this.getRenderMethods = () => [
+    static new(
+        lifetime: number,
+        image: ImageBitmap,
+        position: Point,
+        depth: number,
+        velocity: (t: number) => Point,
+        size: Point = new Point(1, 1)
+    ) {
+        const p = new Particle(lifetime)
+        p.getRenderMethods = () => [
             new ImageRender(
                 image,
                 Point.ZERO,
                 SIZE,
-                position.plus(velocity(this.elapsedTime)).plus(offsetSupplier()),
+                position.plus(velocity(p.elapsedTime)),
                 size,
                 depth
             ),
         ]
+        return p
+    }
+
+    static dynamic(
+        lifetime: number,
+        image: ImageBitmap,
+        positionSupplier: () => Point,
+        depthSupplier: () => number,
+        velocity: (t: number) => Point,
+        size: Point = new Point(1, 1)
+    ) {
+        const p = new Particle(lifetime)
+        p.getRenderMethods = () => [
+            new ImageRender(
+                image,
+                Point.ZERO,
+                SIZE,
+                positionSupplier().plus(velocity(p.elapsedTime)),
+                size,
+                depthSupplier()
+            ),
+        ]
+        return p
     }
 }
