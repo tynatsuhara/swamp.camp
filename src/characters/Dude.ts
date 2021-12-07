@@ -12,6 +12,7 @@ import { StepSounds } from "../audio/StepSounds"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { DeathCutscene } from "../cutscenes/DeathCutscene"
 import { IntroCutscene } from "../cutscenes/IntroCutscene"
+import { FireParticles } from "../graphics/FireParticles"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { WalkingParticles } from "../graphics/WalkingParticles"
@@ -226,27 +227,6 @@ export class Dude extends Component implements DialogueSource {
         this.updateActiveConditions()
     }
 
-    updateActiveConditions() {
-        this.conditions = this.conditions.filter((c) => c.expiration > WorldTime.instance.time)
-        this.conditions.forEach((c) => {
-            const timeSinceLastExec = WorldTime.instance.time - c.lastExec
-
-            // TODO: add condition effects
-            switch (c.condition) {
-                case Condition.ON_FIRE:
-                    console.log("on fire!")
-                    if (timeSinceLastExec > 500) {
-                        console.log("TODO: fire damage")
-                        c.lastExec = WorldTime.instance.time
-                    }
-                    return
-                case Condition.POISONED:
-                    console.log("poisoned!")
-                    return
-            }
-        })
-    }
-
     equipFirstWeaponInInventory() {
         const weapon = this.inventory
             .getStacks()
@@ -273,6 +253,42 @@ export class Dude extends Component implements DialogueSource {
         this._shield = this.entity.addComponent(ShieldFactory.make(type))
     }
 
+    private fireParticles: FireParticles
+
+    updateActiveConditions() {
+        if (!this.isAlive || this.conditions.length === 0) {
+            return
+        }
+
+        this.conditions = this.conditions.filter((c) => c.expiration > WorldTime.instance.time)
+        this.conditions.forEach((c) => {
+            const timeSinceLastExec = WorldTime.instance.time - c.lastExec
+
+            // TODO: add condition effects
+            switch (c.condition) {
+                case Condition.ON_FIRE:
+                    if (!this.fireParticles) {
+                        this.fireParticles = this.entity.addComponent(
+                            new FireParticles(
+                                this.colliderSize.x - 4,
+                                () => this.standingPosition.plusY(-8),
+                                () => this.animation.transform.depth + 1
+                            )
+                        )
+                    }
+                    if (timeSinceLastExec > 500) {
+                        const fireDamage = 0.3
+                        this.damage(fireDamage, Point.ZERO, 0, null, false, false)
+                        c.lastExec = WorldTime.instance.time
+                    }
+                    return
+                case Condition.POISONED:
+                    console.log("poisoned!")
+                    return
+            }
+        })
+    }
+
     addCondition(condition: Condition, duration: number) {
         const expiration = WorldTime.instance.time + duration
         const existing = this.conditions.find((c) => c.condition === condition)
@@ -289,20 +305,38 @@ export class Dude extends Component implements DialogueSource {
 
     removeCondition(condition: Condition) {
         this.conditions = this.conditions.filter((c) => c.condition !== condition)
+        switch (condition) {
+            case Condition.ON_FIRE:
+                if (this.fireParticles) {
+                    this.entity.removeComponent(this.fireParticles)
+                    this.fireParticles = undefined
+                }
+                return
+        }
     }
 
     get isAlive() {
         return this._health > 0
     }
 
-    damage(damage: number, direction: Point, knockback: number, attacker: Dude) {
-        if (this.rolling()) {
+    damage(
+        damage: number,
+        direction?: Point,
+        knockback?: number,
+        attacker?: Dude,
+        blockable: boolean = true,
+        dodgeable: boolean = true
+    ) {
+        if (dodgeable && this.rolling()) {
             return
         }
 
-        // absorb damage if facing the direction of the enemy
-        let blocked =
-            this.shield?.isBlocking() && !this.isFacing(this.standingPosition.plus(direction))
+        const blocked =
+            blockable &&
+            this.shield?.isBlocking() &&
+            // absorb damage if facing the direction of the enemy
+            !this.isFacing(this.standingPosition.plus(direction))
+
         if (blocked) {
             damage *= 0.25
             knockback *= 0.4
@@ -322,7 +356,9 @@ export class Dude extends Component implements DialogueSource {
             }
         }
 
-        this.knockback(direction, knockback)
+        if (knockback > 0) {
+            this.knockback(direction, knockback)
+        }
 
         if (!!this.onDamageCallback) {
             this.onDamageCallback(blocked)
