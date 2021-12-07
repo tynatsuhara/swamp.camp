@@ -448,7 +448,7 @@ export class NPC extends Component {
         let target: Dude
 
         if (
-            this.dude.lastAttacker &&
+            this.dude.lastAttacker?.isAlive &&
             this.isEnemyFn(this.dude.lastAttacker) &&
             this.dude.lastAttacker.standingPosition.distanceTo(this.dude.standingPosition) <
                 this.findTargetRange
