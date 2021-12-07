@@ -92,7 +92,7 @@ export class CampfireFactory extends ElementFactory {
                     Campfire.getLightSizeForLogCount(logCount)
                 )
             } else {
-                LightManager.instance.removeLight(wl, e)
+                LightManager.instance.removeLight(e)
             }
         }
 

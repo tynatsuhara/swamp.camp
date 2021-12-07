@@ -18,6 +18,7 @@ export class LightManager extends Component {
         return Singletons.getOrCreate(LightManager)
     }
 
+    private keyLocationMap: Map<any, Location> = new Map()
     private lightTiles: Map<Location, Map<any, [Point, number]>> = new Map<
         Location,
         Map<any, [Point, number]>
@@ -33,12 +34,17 @@ export class LightManager extends Component {
         if (diameter % 4 !== 0) {
             throw new Error("only circle with a diameter multiple of 4 works")
         }
+        if (this.keyLocationMap.has(key)) {
+            this.removeLight(key)
+        }
+        this.keyLocationMap.set(key, wl)
         const locationLightMap = this.lightTiles.get(wl) ?? new Map()
         locationLightMap.set(key, [pixelPosition, diameter])
         this.lightTiles.set(wl, locationLightMap)
     }
 
-    removeLight(wl: Location, key: any) {
+    removeLight(key: any) {
+        const wl = this.keyLocationMap.get(key)
         const locationLightMap = this.lightTiles.get(wl)
         if (!locationLightMap) {
             return // it is ok to fail silently here

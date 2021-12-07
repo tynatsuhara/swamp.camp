@@ -6,9 +6,6 @@ import { Sounds } from "../audio/Sounds"
 import { Dude } from "../characters/Dude"
 import { DudeFactory, DudeType } from "../characters/DudeFactory"
 import { Player } from "../characters/Player"
-import { Lantern } from "../characters/weapons/Lantern"
-import { ShieldType } from "../characters/weapons/ShieldType"
-import { Torch } from "../characters/weapons/Torch"
 import { Camera } from "../cutscenes/Camera"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 import { Particles } from "../graphics/Particles"
@@ -303,13 +300,6 @@ export class Location {
             this.dudes.delete(p)
             linkedLocation.dudes.add(p)
             p.location = linkedLocation
-
-            // update carried light sources
-            if (p.shieldType === ShieldType.LANTERN) {
-                ;(p.shield as Lantern).removeLight()
-            } else if (p.shieldType === ShieldType.TORCH) {
-                ;(p.shield as Torch).removeLight()
-            }
 
             // refresh the HUD hide stale data
             HUD.instance.refresh()

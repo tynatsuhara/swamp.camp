@@ -38,7 +38,7 @@ export class Lantern extends Shield {
     }
 
     removeLight() {
-        LightManager.instance.removeLight(LocationManager.instance.currentLocation, this)
+        LightManager.instance.removeLight(this)
     }
 
     toggleOnBack() {}
