@@ -298,7 +298,7 @@ export class DudeFactory {
             saveState?.dialogue ?? dialogue,
             saveState?.blob ?? blob,
             colliderSize,
-            saveState.conditions ?? []
+            saveState?.conditions ?? []
         )
 
         location.dudes.add(d)
