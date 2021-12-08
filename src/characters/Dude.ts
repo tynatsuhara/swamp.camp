@@ -721,7 +721,7 @@ export class Dude extends Component implements DialogueSource {
     private canRoll = true
     private rollingOffset: Point
     private animationDirty: boolean
-    private rollFunction = this.dashRoll
+    private rollFunction = this.legacyRoll //this.dashRoll
 
     roll() {
         const ground = this.location.getGround(this.tile)
@@ -762,12 +762,14 @@ export class Dude extends Component implements DialogueSource {
         this.canRoll = false
 
         setRotation(90, new Point(6, 8))
-        setTimeout(() => setRotation(180, new Point(0, 14)), animationSpeed)
-        setTimeout(() => setRotation(270, new Point(-6, 8)), animationSpeed * 2)
+        const rotations = [180, 270]
+        rotations.forEach((r, i) =>
+            setTimeout(() => setRotation(r, new Point(0, 14)), animationSpeed * (i + 1))
+        )
         setTimeout(() => {
             setRotation(0, Point.ZERO)
             this.isRolling = false
-        }, animationSpeed * 3)
+        }, animationSpeed * (rotations.length + 1))
     }
 
     rolling() {
