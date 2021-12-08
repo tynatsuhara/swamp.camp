@@ -335,6 +335,10 @@ export class Dude extends Component implements DialogueSource {
         }
     }
 
+    hasCondition(condition: Condition) {
+        return this.conditions.some((c) => c.condition === condition)
+    }
+
     get isAlive() {
         return this._health > 0
     }

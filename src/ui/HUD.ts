@@ -2,12 +2,18 @@ import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { Condition } from "../characters/Condition"
 import { Dude } from "../characters/Dude"
+import { Player } from "../characters/Player"
+import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
+import { Color } from "./Color"
 import { LocationTransition } from "./LocationTransition"
 import { MiniMap } from "./MiniMap"
 import { OffScreenIndicatorManager } from "./OffScreenIndicatorManager"
+
+const POISONED_HEART_FILTER = ImageFilters.recolor(Color.SUPER_ORANGE, Color.PURPLE)
 
 export class HUD {
     static get instance() {
@@ -22,6 +28,13 @@ export class HUD {
     private readonly offset = new Point(4, 4)
     private readonly offScreenIndicatorManager = new OffScreenIndicatorManager()
     readonly miniMap = new Entity().addComponent(new MiniMap())
+
+    private readonly fullHeart = Tilesets.instance.dungeonCharacters.getTileSource("ui_heart_full")
+    private readonly fullHeartPoisoned = this.fullHeart.filtered(POISONED_HEART_FILTER)
+    private readonly halfHeart = Tilesets.instance.dungeonCharacters.getTileSource("ui_heart_half")
+    private readonly halfHeartPoisoned = this.halfHeart.filtered(POISONED_HEART_FILTER)
+    private readonly emptyHeart =
+        Tilesets.instance.dungeonCharacters.getTileSource("ui_heart_empty")
 
     // used for determining what should be updated
     private lastHealthCount = 0
@@ -64,8 +77,9 @@ export class HUD {
         this.heartsEntity = new Entity()
 
         const heartOffset = new Point(16, 0)
-        const full = Tilesets.instance.dungeonCharacters.getTileSource("ui_heart_full")
-        const half = Tilesets.instance.dungeonCharacters.getTileSource("ui_heart_half")
+        const poisoned = Player.instance.dude.hasCondition(Condition.POISONED)
+        const full = poisoned ? this.fullHeartPoisoned : this.fullHeart
+        const half = poisoned ? this.halfHeartPoisoned : this.halfHeart
         const empty = Tilesets.instance.dungeonCharacters.getTileSource("ui_heart_empty")
         const result = []
 
