@@ -41,7 +41,7 @@ export class WalkingParticles extends Component {
         }
 
         const doNotShowParticles =
-            this.dude.isJumping || LocationManager.instance.currentLocation.isInterior
+            this.dude.jumping || LocationManager.instance.currentLocation.isInterior
 
         if (doNotShowParticles) {
             // set to 0 so that particles will be emitted immediately once it makes sense

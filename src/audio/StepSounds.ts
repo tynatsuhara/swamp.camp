@@ -51,7 +51,8 @@ export class StepSounds {
                             if (
                                 dude?.isAlive &&
                                 dude.isMoving &&
-                                !dude.rolling() &&
+                                !dude.rolling &&
+                                !dude.jumping &&
                                 distance <= FOOTSTEP_SOUND_DISTANCE
                             ) {
                                 const vol = Math.max(

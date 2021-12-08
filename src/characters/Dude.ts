@@ -7,6 +7,8 @@ import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
 import { AnimatedSpriteComponent } from "brigsby/dist/sprites/AnimatedSpriteComponent"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
+import { Animator } from "brigsby/dist/util/Animator"
+import { Lists } from "brigsby/dist/util/Lists"
 import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
 import { StepSounds } from "../audio/StepSounds"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
@@ -216,6 +218,10 @@ export class Dude extends Component implements DialogueSource {
             this.animation.transform.position = this.animation.transform.position.plus(
                 this.rollingOffset
             )
+        } else if (this.isJumping) {
+            this.animation.transform.position = this.animation.transform.position.plusY(
+                -this.jumpingOffset || 0
+            )
         }
 
         if (!!this.dialogueInteract) {
@@ -228,6 +234,8 @@ export class Dude extends Component implements DialogueSource {
         }
 
         this.updateActiveConditions()
+
+        this.jumpingAnimator?.update(updateData.elapsedTimeMillis)
     }
 
     equipFirstWeaponInInventory() {
@@ -278,7 +286,10 @@ export class Dude extends Component implements DialogueSource {
                         this.fireParticles = this.entity.addComponent(
                             new FireParticles(
                                 this.colliderSize.x - 4,
-                                () => this.standingPosition.plusY(-8),
+                                () =>
+                                    this.standingPosition
+                                        .plusY(-8)
+                                        .plus(this.getAnimationOffsetPosition()),
                                 () => this.animation.transform.depth + 1
                             )
                         )
@@ -365,7 +376,7 @@ export class Dude extends Component implements DialogueSource {
             dodgeable?: boolean
         }
     ) {
-        if (dodgeable && this.rolling()) {
+        if (dodgeable && (this.rolling || this.jumping)) {
             return
         }
 
@@ -607,7 +618,7 @@ export class Dude extends Component implements DialogueSource {
                 speedMultiplier *= 0.4
             }
         } else if (
-            !this.isRolling &&
+            !this.isJumping &&
             element?.type === ElementType.CAMPFIRE &&
             element.entity.getComponent(Campfire).logs > 0 &&
             this.standingPosition.distanceTo(
@@ -714,39 +725,32 @@ export class Dude extends Component implements DialogueSource {
         }
     }
 
-    private isRolling = false
-    get isJumping() {
-        return this.isRolling
-    }
-    private canRoll = true
-    private rollingOffset: Point
     private animationDirty: boolean
-    private rollFunction = this.dashRoll
+
+    private isRolling = false
+    private canJumpOrRoll = true // jumping cooldown
+    private rollingOffset: Point
+
+    private isJumping = false
+    private jumpingAnimator: Animator
+    private jumpingOffset: number
 
     roll() {
         const ground = this.location.getGround(this.tile)
-        if (!this.canRoll || Ground.isWater(ground?.type)) {
+        if (!this.canJumpOrRoll || Ground.isWater(ground?.type)) {
             return
         }
-        this.canRoll = false
-        this.rollFunction()
-        setTimeout(() => (this.canRoll = true), 750)
+        this.canJumpOrRoll = false
+        this.doRoll()
+        setTimeout(() => (this.canJumpOrRoll = true), 750)
     }
 
-    // just a stepping dodge instead of a roll
-    private dashRoll() {
-        StepSounds.singleFootstepSound(this, 2)
-        this.isRolling = true
-        this.animation.goToAnimation(2)
-        setTimeout(() => {
-            StepSounds.singleFootstepSound(this, 3)
-            this.isRolling = false
-            this.animationDirty = true
-        }, 200)
+    get rolling() {
+        return this.isRolling
     }
 
     // has a rolling animation, however janky
-    private legacyRoll() {
+    private doRoll() {
         const setRotation = (rot: number, offset: Point) => {
             if (this.animation.transform.mirrorX) {
                 this.animation.transform.rotation = -rot
@@ -759,7 +763,7 @@ export class Dude extends Component implements DialogueSource {
 
         const animationSpeed = 40
         this.isRolling = true
-        this.canRoll = false
+        this.canJumpOrRoll = false
 
         setRotation(45, new Point(6, 8))
         const rotations = [90, 180, 225, , 270, 315]
@@ -772,8 +776,37 @@ export class Dude extends Component implements DialogueSource {
         }, animationSpeed * (rotations.length + 1))
     }
 
-    rolling() {
-        return this.isRolling
+    jump() {
+        const ground = this.location.getGround(this.tile)
+        if (!this.canJumpOrRoll || Ground.isWater(ground?.type)) {
+            return
+        }
+        this.canJumpOrRoll = false
+        this.doJump()
+        setTimeout(() => (this.canJumpOrRoll = true), 750)
+    }
+
+    get jumping() {
+        return this.isJumping
+    }
+
+    // just a stepping dodge instead of a roll
+    private doJump() {
+        StepSounds.singleFootstepSound(this, 2)
+        this.isJumping = true
+        this.animation.goToAnimation(2)
+        const frames = [3, 8, 11, 12, 13, 14, 12, 9, 3]
+        this.jumpingAnimator = new Animator(
+            Lists.repeat(frames.length, [40]),
+            (i) => (this.jumpingOffset = frames[i]),
+            () => {
+                StepSounds.singleFootstepSound(this, 3)
+                this.isJumping = false
+                this.animationDirty = true
+                this.jumpingAnimator = undefined
+                this.jumpingOffset = undefined
+            }
+        )
     }
 
     // fn will execute immediately and every intervalMillis milliseconds
@@ -816,7 +849,7 @@ export class Dude extends Component implements DialogueSource {
     }
 
     getAnimationOffsetPosition(): Point {
-        if (this.isRolling && this.rollFunction === this.dashRoll) {
+        if (this.isJumping) {
             return new Point(0, -5)
         }
 

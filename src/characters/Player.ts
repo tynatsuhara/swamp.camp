@@ -55,7 +55,7 @@ export class Player extends Component {
         let dx = 0
         let dy = 0
 
-        if (this.dude.rolling()) {
+        if (this.dude.rolling) {
             // TODO: change how momentum works if we implement slippery ice
             dx = this.rollingMomentum.x
             dy = this.rollingMomentum.y
@@ -75,7 +75,7 @@ export class Player extends Component {
         }
 
         let speed = 1
-        if (this.dude.rolling()) {
+        if (this.dude.rolling) {
             speed += 1.5
         }
         if (this.dude.shield?.isBlocking()) {
@@ -89,7 +89,7 @@ export class Player extends Component {
         this.dude.move(
             updateData,
             this.velocity,
-            this.dude.rolling() ? 0 : updateData.input.mousePos.x - this.dude.standingPosition.x,
+            this.dude.rolling ? 0 : updateData.input.mousePos.x - this.dude.standingPosition.x,
             speed
         )
 
@@ -97,12 +97,13 @@ export class Player extends Component {
             return
         }
 
-        if (
-            !this.dude.rolling() &&
-            updateData.input.isKeyDown(InputKey.SPACE) &&
+        if (!this.dude.jumping && updateData.input.isKeyDown(InputKey.SPACE)) {
+            this.dude.jump()
+        } else if (
+            !this.dude.rolling &&
+            updateData.input.isKeyDown(InputKey.C) &&
             (dx !== 0 || dy !== 0)
         ) {
-            // && !rollingBackwards) {
             this.dude.roll()
             this.rollingMomentum = new Point(dx, dy)
         }
