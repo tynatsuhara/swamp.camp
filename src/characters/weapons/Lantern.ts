@@ -17,7 +17,7 @@ export class Lantern extends Shield {
 
     update() {
         this.transform.position = this.dude.animation.transform.dimensions
-            .plus(this.dude.getAnimationOffsetPosition())
+            .plus(this.dude.getOffsetRelativeToAnimation())
             .minus(new Point(8, 16))
 
         this.transform.depth = -0.5
@@ -25,9 +25,7 @@ export class Lantern extends Shield {
         LightManager.instance.addLight(
             LocationManager.instance.currentLocation,
             this,
-            this.dude.standingPosition
-                .plusY(-TILE_SIZE / 2)
-                .plus(this.dude.getAnimationOffsetPosition()),
+            this.dude.standingPosition.plusY(-TILE_SIZE / 2).plus(this.dude.getAnimationOffset()),
             Lantern.DIAMETER
         )
     }

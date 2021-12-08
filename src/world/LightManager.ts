@@ -110,9 +110,7 @@ export class LightManager extends Component {
         if (!!player) {
             if (player.shieldType !== ShieldType.LANTERN) {
                 this.mask.addFaintLightCircle(
-                    player.standingPosition
-                        .plusY(-TILE_SIZE / 2)
-                        .plus(player.getAnimationOffsetPosition())
+                    player.standingPosition.plusY(-TILE_SIZE / 2).plus(player.getAnimationOffset())
                 )
             }
         }

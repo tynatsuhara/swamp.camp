@@ -209,25 +209,21 @@ export class Dude extends Component implements DialogueSource {
         this.animation.transform.depth = this.collider.position.y + this.collider.dimensions.y
 
         // All other transforms (eg the weapon) are positioned relative to the animation
-        this.animation.transform.position = this.position
+        const transform = this.animation.transform
+        transform.position = this.position
+
         if (this.layingDownOffset) {
-            this.animation.transform.position = this.animation.transform.position.plus(
-                this.layingDownOffset
-            )
+            transform.position = transform.position.plus(this.layingDownOffset)
         } else if (this.isRolling && this.animation.transform.rotation !== 0) {
-            this.animation.transform.position = this.animation.transform.position.plus(
-                this.rollingOffset
-            )
+            transform.position = transform.position.plus(this.rollingOffset)
         } else if (this.isJumping) {
-            this.animation.transform.position = this.animation.transform.position.plusY(
-                -this.jumpingOffset || 0
-            )
+            transform.position = transform.position.plusY(-this.jumpingOffset)
         }
 
         if (!!this.dialogueInteract) {
             this.dialogueInteract.position = this.standingPosition.minus(new Point(0, 5))
             this.dialogueInteract.uiOffset = new Point(0, -TILE_SIZE * 1.5).plus(
-                this.getAnimationOffsetPosition()
+                this.getAnimationOffset()
             )
             this.dialogueInteract.enabled =
                 this.dialogue !== EMPTY_DIALOGUE && DialogueDisplay.instance.source !== this
@@ -287,9 +283,7 @@ export class Dude extends Component implements DialogueSource {
                             new FireParticles(
                                 this.colliderSize.x - 4,
                                 () =>
-                                    this.standingPosition
-                                        .plusY(-8)
-                                        .plus(this.getAnimationOffsetPosition()),
+                                    this.standingPosition.plusY(-8).plus(this.getAnimationOffset()),
                                 () => this.animation.transform.depth + 1
                             )
                         )
@@ -297,9 +291,7 @@ export class Dude extends Component implements DialogueSource {
                     LightManager.instance.addLight(
                         LocationManager.instance.currentLocation,
                         this.fireParticles,
-                        this.standingPosition
-                            .plusY(-TILE_SIZE / 2)
-                            .plus(this.getAnimationOffsetPosition()),
+                        this.standingPosition.plusY(-TILE_SIZE / 2).plus(this.getAnimationOffset()),
                         40
                     )
                     if (timeSinceLastExec > 500) {
@@ -733,7 +725,7 @@ export class Dude extends Component implements DialogueSource {
 
     private isJumping = false
     private jumpingAnimator: Animator
-    private jumpingOffset: number
+    private jumpingOffset = 0
 
     roll() {
         const ground = this.location.getGround(this.tile)
@@ -761,14 +753,21 @@ export class Dude extends Component implements DialogueSource {
             }
         }
 
-        const animationSpeed = 40
+        const animationSpeed = 45
         this.isRolling = true
         this.canJumpOrRoll = false
 
         setRotation(45, new Point(6, 8))
-        const rotations = [90, 180, 225, , 270, 315]
-        rotations.forEach((r, i) =>
-            setTimeout(() => setRotation(r, new Point(0, 14)), animationSpeed * (i + 1))
+        const rotations: [number, Point][] = [
+            [90, new Point(6, 10)],
+            [135, new Point(4, 12)],
+            [180, new Point(2, 14)],
+            [225, new Point(0, 12)],
+            [270, new Point(-2, 10)],
+            [315, new Point(-4, 8)],
+        ]
+        rotations.forEach(([rotation, offset], i) =>
+            setTimeout(() => setRotation(rotation, offset), animationSpeed * (i + 1))
         )
         setTimeout(() => {
             setRotation(0, Point.ZERO)
@@ -804,7 +803,7 @@ export class Dude extends Component implements DialogueSource {
                 this.isJumping = false
                 this.animationDirty = true
                 this.jumpingAnimator = undefined
-                this.jumpingOffset = undefined
+                this.jumpingOffset = 0
             }
         )
     }
@@ -848,7 +847,12 @@ export class Dude extends Component implements DialogueSource {
         return this.animation.transform.mirrorX ? -1 : 1
     }
 
-    getAnimationOffsetPosition(): Point {
+    getAnimationOffset(): Point {
+        const offset = new Point(0, -this.jumpingOffset)
+        return this.getOffsetRelativeToAnimation().plus(offset)
+    }
+
+    getOffsetRelativeToAnimation(): Point {
         if (this.isJumping) {
             return new Point(0, -5)
         }
@@ -966,7 +970,7 @@ export class Dude extends Component implements DialogueSource {
                         this.standingPosition
                             .plusY(-28)
                             .plus(new Point(1, 1).times(-TILE_SIZE / 2))
-                            .plus(this.getAnimationOffsetPosition()),
+                            .plus(this.getAnimationOffset()),
                         new Point(TILE_SIZE, TILE_SIZE),
                         0,
                         false,

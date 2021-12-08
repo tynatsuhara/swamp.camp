@@ -48,8 +48,10 @@ export class Torch extends Shield {
     }
 
     update() {
-        this.transform.position = this.getPosition()
         this.transform.depth = -0.5
+        this.transform.position = this.dude.animation.transform.dimensions
+            .plus(this.dude.getOffsetRelativeToAnimation())
+            .minus(new Point(4, 18))
 
         const now = WorldTime.instance.time
         const fireStart = this.dude.blob[BLOB_ATTRIBUTE]
@@ -68,9 +70,7 @@ export class Torch extends Shield {
         LightManager.instance.addLight(
             LocationManager.instance.currentLocation,
             this,
-            this.dude.standingPosition
-                .plusY(-TILE_SIZE / 2)
-                .plus(this.dude.getAnimationOffsetPosition()),
+            this.dude.standingPosition.plusY(-TILE_SIZE / 2).plus(this.dude.getAnimationOffset()),
             diameter
         )
 
@@ -100,11 +100,5 @@ export class Torch extends Shield {
 
     canAttack() {
         return true
-    }
-
-    private getPosition() {
-        return this.dude.animation.transform.dimensions
-            .plus(this.dude.getAnimationOffsetPosition())
-            .minus(new Point(4, 18))
     }
 }

@@ -72,7 +72,7 @@ export class Shield extends Component {
             }
         }
 
-        pos = pos.plus(this.dude.getAnimationOffsetPosition())
+        pos = pos.plus(this.dude.getOffsetRelativeToAnimation())
 
         this.transform.position = pos
         this.transform.depth = this.raisedPerc > 0.7 ? 0.75 : -0.75

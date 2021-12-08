@@ -130,7 +130,7 @@ export class MeleeWeapon extends Weapon {
         this.weaponTransform.rotation = rotation
         this.weaponTransform.mirrorY = this.state == State.SHEATHED
 
-        pos = pos.plus(this.dude.getAnimationOffsetPosition())
+        pos = pos.plus(this.dude.getOffsetRelativeToAnimation())
 
         this.weaponTransform.position = pos
 

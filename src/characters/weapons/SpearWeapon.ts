@@ -146,7 +146,7 @@ export class SpearWeapon extends Weapon {
             offset = offset.plus(new Point(10, 10))
         }
 
-        return offset.plus(this.dude.getAnimationOffsetPosition())
+        return offset.plus(this.dude.getOffsetRelativeToAnimation())
     }
 
     private animate() {
