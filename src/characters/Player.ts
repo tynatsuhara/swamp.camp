@@ -1,7 +1,6 @@
 import { Component } from "brigsby/dist/Component"
 import { debug } from "brigsby/dist/Debug"
 import { UpdateData } from "brigsby/dist/Engine"
-import { InputKey } from "brigsby/dist/Input"
 import { Point } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util/Lists"
 import { Controls } from "../Controls"
@@ -76,7 +75,7 @@ export class Player extends Component {
 
         let speed = 1
         if (this.dude.rolling) {
-            speed += 1.5
+            speed += 1.2
         }
         if (this.dude.shield?.isBlocking()) {
             speed -= 0.4
@@ -97,18 +96,18 @@ export class Player extends Component {
             return
         }
 
-        if (!this.dude.jumping && updateData.input.isKeyDown(InputKey.SPACE)) {
+        if (!this.dude.jumping && updateData.input.isKeyDown(Controls.jumpKey)) {
             this.dude.jump()
         } else if (
             !this.dude.rolling &&
-            updateData.input.isKeyDown(InputKey.C) &&
+            updateData.input.isKeyDown(Controls.rollKey) &&
             (dx !== 0 || dy !== 0)
         ) {
             this.dude.roll()
             this.rollingMomentum = new Point(dx, dy)
         }
 
-        if (updateData.input.isKeyDown(InputKey.F)) {
+        if (updateData.input.isKeyDown(Controls.sheathKey)) {
             // todo: these could get out of sync if one is null
             this.dude.weapon.toggleSheathed()
             this.dude.shield.toggleOnBack()

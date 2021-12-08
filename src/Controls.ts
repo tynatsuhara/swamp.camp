@@ -9,6 +9,9 @@ export const Controls = {
     walkDown: InputKey.S,
     walkLeft: InputKey.A,
     walkRight: InputKey.D,
-    blockKey: InputKey.SHIFT,
+    blockKey: InputKey.CONTROL,
     mapKey: InputKey.M,
+    jumpKey: InputKey.SPACE,
+    sheathKey: InputKey.F,
+    rollKey: InputKey.SHIFT,
 }
