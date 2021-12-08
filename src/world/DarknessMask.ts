@@ -207,7 +207,7 @@ export class DarknessMask {
     }
 
     private getInnerCircleDiameter(diameter: number) {
-        const innerOffset = Math.floor(((diameter / 2) * 1) / 4)
+        const innerOffset = Math.floor(diameter / 8)
         return diameter - innerOffset * 2
     }
 

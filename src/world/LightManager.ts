@@ -53,7 +53,13 @@ export class LightManager extends Component {
     }
 
     /**
-     * returns true if it is dark enough for a demon to tolerate
+     * @returns true if the point is at max brightness
+     */
+    isFullyLit = (pixelPt: Point, location: Location = LocationManager.instance.currentLocation) =>
+        !this.isDarkHelper(pixelPt, location, 0.6)
+
+    /**
+     * @returns true if it is dark enough for a demon to tolerate
      */
     isDark = (pixelPt: Point, location: Location = LocationManager.instance.currentLocation) =>
         this.isDarkHelper(pixelPt, location, 1)

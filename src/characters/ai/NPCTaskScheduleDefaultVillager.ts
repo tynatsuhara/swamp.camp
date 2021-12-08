@@ -37,7 +37,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         if (!goalLocation || dude.location === goalLocation) {
             // TODO: Go to light
             if (timeOfDay < DarknessMask.SUNRISE_START || timeOfDay > DarknessMask.SUNSET_END) {
-                if (!LightManager.instance.isDark(dude.standingPosition, dude.location)) {
+                if (LightManager.instance.isFullyLit(dude.standingPosition, dude.location)) {
                     context.doNothing()
                     return
                 }
@@ -57,6 +57,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
 
                 // this works fine enough ¯\_(ツ)_/¯
                 context.walkTo(closestFire.pos.plusY(1))
+                return
             }
 
             context.roam(0.5, {
