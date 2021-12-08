@@ -32,8 +32,8 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     [InputKey.V, "spawn wolf", (input) => DudeFactory.instance.new(DudeType.WOLF, input.mousePos)],
     [
         InputKey.SEMICOLON,
-        "spawn shroom",
-        (input) => DudeFactory.instance.new(DudeType.SHROOM, input.mousePos),
+        "poison player",
+        () => Player.instance.dude.addCondition(Condition.POISONED, 10_000),
     ],
     [InputKey.QUOTE, "trigger orc raid", () => DudeSpawner.instance.spawnOrcs()],
     [

@@ -298,7 +298,11 @@ export class Dude extends Component implements DialogueSource {
                     }
                     return
                 case Condition.POISONED:
-                    console.log("poisoned!")
+                    if (timeSinceLastExec > 500) {
+                        const poisonDamage = 0.25
+                        this.damage(poisonDamage, Point.ZERO, 0, null, false, false)
+                        c.lastExec = WorldTime.instance.time
+                    }
                     return
             }
         })

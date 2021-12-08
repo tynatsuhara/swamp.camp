@@ -48,6 +48,7 @@ export class Player extends Component {
             return
         }
 
+        // TODO: Should we remove auto-healing?
         this.dude.heal(updateData.elapsedTimeMillis / 6500)
         const possibleInteractable = this.updateInteractables(updateData)
 
