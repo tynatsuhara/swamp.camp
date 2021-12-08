@@ -94,7 +94,11 @@ export class MeleeWeapon extends Weapon {
         const enemies = Weapon.getEnemiesInRange(this.dude, attackDistance)
 
         enemies.forEach((d) => {
-            d.damage(1, d.standingPosition.minus(this.dude.standingPosition), 30, this.dude)
+            d.damage(1, {
+                direction: d.standingPosition.minus(this.dude.standingPosition),
+                knockback: 30,
+                attacker: this.dude,
+            })
         })
 
         if (this.dude.type === DudeType.PLAYER && enemies.length === 0) {

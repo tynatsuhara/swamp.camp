@@ -128,7 +128,11 @@ export class SpearWeapon extends Weapon {
         const attackDistance = this.getRange() + 4 // add a tiny buffer for small weapons like the dagger to still work
         // TODO maybe only allow big weapons to hit multiple targets
         Weapon.getEnemiesInRange(this.dude, attackDistance).forEach((d) => {
-            d.damage(1, d.standingPosition.minus(this.dude.standingPosition), 30, this.dude)
+            d.damage(1, {
+                direction: d.standingPosition.minus(this.dude.standingPosition),
+                knockback: 30,
+                attacker: this.dude,
+            })
         })
     }
 

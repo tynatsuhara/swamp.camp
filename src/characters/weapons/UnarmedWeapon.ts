@@ -43,12 +43,11 @@ export class UnarmedWeapon extends Weapon {
         const closestEnemy = enemies[0]
         const attackDir = closestEnemy.standingPosition.minus(this.dude.standingPosition)
         this.dude.knockback(attackDir, 30) // pounce
-        closestEnemy.damage(
-            this.getDamageAmount(),
-            closestEnemy.standingPosition.minus(this.dude.standingPosition),
-            50,
-            this.dude
-        )
+        closestEnemy.damage(this.getDamageAmount(), {
+            direction: closestEnemy.standingPosition.minus(this.dude.standingPosition),
+            knockback: 50,
+            attacker: this.dude,
+        })
 
         setTimeout(() => (this.state = State.DRAWN), this.delay)
     }

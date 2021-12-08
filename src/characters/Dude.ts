@@ -293,14 +293,20 @@ export class Dude extends Component implements DialogueSource {
                     )
                     if (timeSinceLastExec > 500) {
                         const fireDamage = 0.3
-                        this.damage(fireDamage, Point.ZERO, 0, null, false, false)
+                        this.damage(fireDamage, {
+                            blockable: false,
+                            dodgeable: false,
+                        })
                         c.lastExec = WorldTime.instance.time
                     }
                     return
                 case Condition.POISONED:
                     if (timeSinceLastExec > 500) {
                         const poisonDamage = 0.25
-                        this.damage(poisonDamage, Point.ZERO, 0, null, false, false)
+                        this.damage(poisonDamage, {
+                            blockable: false,
+                            dodgeable: false,
+                        })
                         c.lastExec = WorldTime.instance.time
                     }
                     return
@@ -345,11 +351,19 @@ export class Dude extends Component implements DialogueSource {
 
     damage(
         damage: number,
-        direction?: Point,
-        knockback?: number,
-        attacker?: Dude,
-        blockable: boolean = true,
-        dodgeable: boolean = true
+        {
+            direction = Point.ZERO,
+            knockback = 0,
+            attacker = undefined,
+            blockable = true,
+            dodgeable = true,
+        }: {
+            direction?: Point
+            knockback?: number
+            attacker?: Dude
+            blockable?: boolean
+            dodgeable?: boolean
+        }
     ) {
         if (dodgeable && this.rolling()) {
             return

@@ -90,12 +90,11 @@ class Projectile extends Component {
                                 relativeOffset.y
                             )
 
-                            enemy.damage(
-                                1,
-                                enemy.standingPosition.minus(attacker.standingPosition),
-                                30,
-                                attacker
-                            )
+                            enemy.damage(1, {
+                                direction: enemy.standingPosition.minus(attacker.standingPosition),
+                                knockback: 30,
+                                attacker,
+                            })
                         }
                     }
                     velocity = velocity.times(0.6)
