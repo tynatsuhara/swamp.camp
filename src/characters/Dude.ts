@@ -596,6 +596,11 @@ export class Dude extends Component implements DialogueSource {
             } else if (wasMoving || this.animationDirty) {
                 // start idle animation
                 this.animation.goToAnimation(0)
+                // hacky slight improvement to the landing animation when standing still
+                if (this.wasJumping) {
+                    this.animation.fastForward(2 * 80)
+                    this.wasJumping = false
+                }
             }
         }
 
@@ -726,6 +731,7 @@ export class Dude extends Component implements DialogueSource {
     private rollingOffset: Point
 
     private isJumping = false
+    private wasJumping = false
     private jumpingAnimator: Animator
     private jumpingOffset = 0
 
@@ -803,6 +809,7 @@ export class Dude extends Component implements DialogueSource {
             () => {
                 StepSounds.singleFootstepSound(this, 3)
                 this.isJumping = false
+                this.wasJumping = true
                 this.animationDirty = true
                 this.jumpingAnimator = undefined
                 this.jumpingOffset = 0
