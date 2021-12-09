@@ -78,7 +78,7 @@ export class TradeMenu extends Component {
     }
 
     update(updateData: UpdateData) {
-        if (updateData.input.isKeyDown(Controls.closeButton) && this.isOpen) {
+        if (Controls.isCloseButtonDown(updateData.input) && this.isOpen) {
             this.close()
         }
 

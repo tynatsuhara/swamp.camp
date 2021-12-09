@@ -49,11 +49,7 @@ export class DialogueDisplay extends Component {
             return
         }
 
-        // We don't allow the user to close dialogue because it might end up in a weird state
-        // if (updateData.input.isKeyDown(Controls.closeButton)) {
-        //     this.close()
-        //     return
-        // }
+        // NOTE: We don't allow the user to close dialogue because it might end up in a weird state
 
         const typer = this.lines[Math.min(this.lineIndex, this.lines.length - 1)]
         const showOptions =

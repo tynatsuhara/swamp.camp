@@ -28,7 +28,7 @@ export class MiniMap extends Component {
     private smallCanvas: HTMLCanvasElement
 
     update(updateData: UpdateData) {
-        this.isShowing = updateData.input.isKeyHeld(Controls.mapKey)
+        this.isShowing = Controls.isMapKeyHeld(updateData.input)
 
         if (this.lastPixelDrawn.equals(Point.ZERO)) {
             this.renderFullSizeMap()

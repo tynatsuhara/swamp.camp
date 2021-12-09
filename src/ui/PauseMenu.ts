@@ -22,7 +22,7 @@ export class PauseMenu extends Component {
     isOpen = false
 
     update(updateData: UpdateData) {
-        const pressEsc = updateData.input.isKeyDown(Controls.closeButton)
+        const pressEsc = Controls.isCloseButtonDown(updateData.input)
         this.isShiftDown = updateData.input.isKeyHeld(Controls.pcModifierKey)
 
         if ((pressEsc && this.isOpen) || CutsceneManager.instance.isMidCutscene) {

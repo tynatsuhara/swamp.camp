@@ -33,7 +33,7 @@ export class PlaceElementDisplay extends Component {
             return
         }
 
-        if (updateData.input.isKeyDown(Controls.closeButton)) {
+        if (Controls.isCloseButtonDown(updateData.input)) {
             this.close()
         }
     }
