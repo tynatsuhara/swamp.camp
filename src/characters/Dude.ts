@@ -586,15 +586,17 @@ export class Dude extends Component implements DialogueSource {
         this._isMoving = direction.x !== 0 || direction.y !== 0
 
         // Update animations
-        if (this.isMoving) {
-            // start walking animation
-            // TODO make the run animation backwards if they run backwards :)
-            if (!wasMoving || this.animationDirty) {
-                this.animation.goToAnimation(1)
+        if (!this.isJumping) {
+            if (this.isMoving) {
+                // start walking animation
+                // TODO make the run animation backwards if they run backwards :)
+                if (!wasMoving || this.animationDirty) {
+                    this.animation.goToAnimation(1)
+                }
+            } else if (wasMoving || this.animationDirty) {
+                // start idle animation
+                this.animation.goToAnimation(0)
             }
-        } else if (wasMoving || this.animationDirty) {
-            // start idle animation
-            this.animation.goToAnimation(0)
         }
 
         const standingTilePos = pixelPtToTilePt(this.standingPosition)
