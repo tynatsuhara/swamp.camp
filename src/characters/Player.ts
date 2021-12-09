@@ -91,7 +91,7 @@ export class Player extends Component {
             updateData,
             this.velocity,
             // TODO: Use new controls pattern
-            this.dude.rolling ? 0 : updateData.input.mousePos.x - this.dude.standingPosition.x,
+            this.dude.rolling ? 0 : controls.getPlayerFacingDirection(updateData.input, this.dude),
             speed
         )
 

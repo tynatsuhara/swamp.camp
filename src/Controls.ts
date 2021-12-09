@@ -9,12 +9,15 @@ import {
     InputKey,
     MouseButton,
 } from "brigsby/dist/Input"
+import { Dude } from "./characters/Dude"
 
 const AXIS_DEAD_ZONE = 0.2
 
 // The last gamepad which accepted input. Undefined if the user is using kb/m.
 let currentGamepad: CapturedGamepad | undefined
 // let gamepadMousePos: Point | undefined  // TODO
+
+// NOTE: This view is scaled to the UI layer
 let input: CapturedInput
 
 type InputHandlers = {
@@ -158,6 +161,10 @@ class ControlsWrapper extends Component {
 
     getScrollDeltaY = () => {
         return input.mouseWheelDeltaY
+    }
+
+    getPlayerFacingDirection = (gameSpaceInput: CapturedInput, dude: Dude) => {
+        return gameSpaceInput.mousePos.x - dude.standingPosition.x
     }
 }
 
