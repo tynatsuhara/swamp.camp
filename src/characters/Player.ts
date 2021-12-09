@@ -32,6 +32,7 @@ export class Player extends Component {
     awake() {
         this._dude = this.entity.getComponent(Dude)
         this.dude.setOnDamageCallback((blocked) => {
+            // TODO: Add controller vibration if possible
             if (!this.dude.isAlive) {
                 Camera.instance.shake(6, 600)
             } else if (blocked) {
