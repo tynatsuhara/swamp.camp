@@ -201,21 +201,28 @@ export class InventoryDisplay extends Component {
             }
 
             // We currently only support up to 2 interaction types per item
-            const interactButtonOrder = [Controls.interactButton, Controls.interactButtonSecondary]
+            const interactButtonOrder: [string, () => boolean][] = [
+                [
+                    InputKeyString.for(Controls.interactButton),
+                    () => Controls.isInteractDown(updateData.input),
+                ],
+                [
+                    InputKeyString.for(Controls.interactButtonSecondary),
+                    () => Controls.isInteractSecondaryDown(updateData.input),
+                ],
+            ]
 
             let tooltipString = `${item.displayName}${count}`
 
             actions.forEach((action, i) => {
-                tooltipString += `\n[${InputKeyString.for(interactButtonOrder[i])} to ${
-                    action.verb
-                }]`
+                tooltipString += `\n[${interactButtonOrder[i][0]} to ${action.verb}]`
             })
 
             this.tooltip.say(tooltipString)
 
             if (this.canUseItems) {
                 actions.forEach((action, i) => {
-                    if (updateData.input.isKeyDown(interactButtonOrder[i])) {
+                    if (interactButtonOrder[i][1]()) {
                         action.actionFn()
                     }
                 })

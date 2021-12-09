@@ -69,10 +69,9 @@ export const Controls = {
     walkLeft: InputKey.A,
     walkRight: InputKey.D,
     inventoryButton: InputKey.TAB,
-
-    // TODO move checking logic here
     interactButton: InputKey.E,
     interactButtonSecondary: InputKey.F,
 
+    // special case, we don't care about this on controllers (at least for now)
     pcModifierKey: InputKey.SHIFT,
 }
