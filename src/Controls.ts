@@ -15,6 +15,9 @@ const AXIS_DEAD_ZONE = 0.2
  *   - Add UI hints for both mouse/keyboard and gamepad
  */
 export const Controls = {
+    isMenuClickDown: (input: CapturedInput) =>
+        input.isMouseDown || getController(input)?.isButtonDown(GamepadButton.X),
+
     isInteractDown: (input: CapturedInput) =>
         input.isKeyDown(Controls.interactButton) ||
         getController(input)?.isButtonDown(GamepadButton.SQUARE),

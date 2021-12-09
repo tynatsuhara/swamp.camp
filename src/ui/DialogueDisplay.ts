@@ -57,7 +57,7 @@ export class DialogueDisplay extends Component {
             this.dialogue.options.length > 0 &&
             this.lineIndex >= this.lines.length - 1
         const shouldProceed =
-            updateData.input.isMouseDown || Controls.isInteractDown(updateData.input)
+            Controls.isMenuClickDown(updateData.input) || Controls.isInteractDown(updateData.input)
 
         const line = typer.update(shouldProceed, updateData.elapsedTimeMillis)
 
