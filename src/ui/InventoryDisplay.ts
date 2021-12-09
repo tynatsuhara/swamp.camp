@@ -240,7 +240,7 @@ export class InventoryDisplay extends Component {
                     const otherInv = hoverInv === this.playerInv ? this.tradingInv : this.playerInv
                     if (
                         !!otherInv &&
-                        updateData.input.isKeyHeld(Controls.pcModifierKey) &&
+                        controls.isModifierHeld() &&
                         otherInv.canAddItem(item, count) &&
                         canRemoveFromPlayerInv(item)
                     ) {

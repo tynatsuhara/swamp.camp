@@ -90,8 +90,7 @@ export class Player extends Component {
         this.dude.move(
             updateData,
             this.velocity,
-            // TODO: Use new controls pattern
-            this.dude.rolling ? 0 : controls.getPlayerFacingDirection(updateData.input, this.dude),
+            this.dude.rolling ? 0 : controls.getPlayerFacingDirection(this.dude),
             speed
         )
 

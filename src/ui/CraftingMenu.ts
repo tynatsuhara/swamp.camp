@@ -129,7 +129,7 @@ export class CraftingMenu extends Component {
                 )
             )
 
-            if (!this.justOpened && hovered && controls.isMouseDown()) {
+            if (!this.justOpened && hovered && controls.isMenuClickDown()) {
                 this.selectCategory(i)
             }
 
@@ -195,7 +195,7 @@ export class CraftingMenu extends Component {
             const craftedItem = ITEM_METADATA_MAP[recipe.output]
 
             // craft the item
-            if (hovered && controls.isMouseDown() && this.canCraft(recipe)) {
+            if (hovered && controls.isMenuClickDown() && this.canCraft(recipe)) {
                 Sounds.play(this.craftNoise, 0.6)
                 recipe.input.forEach((ingr) => {
                     Player.instance.dude.inventory.removeItem(ingr.item, ingr.count)
