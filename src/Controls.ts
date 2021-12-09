@@ -14,4 +14,5 @@ export const Controls = {
     jumpKey: InputKey.SPACE,
     sheathKey: InputKey.F,
     rollKey: InputKey.SHIFT,
+    pcModifierKey: InputKey.SHIFT,
 }

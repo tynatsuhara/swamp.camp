@@ -1,9 +1,9 @@
 import { Component } from "brigsby/dist/Component"
 import { UpdateData } from "brigsby/dist/Engine"
 import { Entity } from "brigsby/dist/Entity"
-import { InputKey } from "brigsby/dist/Input"
 import { Point } from "brigsby/dist/Point"
 import { BasicRenderComponent } from "brigsby/dist/renderer/BasicRenderComponent"
+import { Controls } from "../Controls"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { QuestGame } from "../quest_game"
@@ -22,8 +22,8 @@ export class PauseMenu extends Component {
     isOpen = false
 
     update(updateData: UpdateData) {
-        const pressEsc = updateData.input.isKeyDown(InputKey.ESC)
-        this.isShiftDown = updateData.input.isKeyHeld(InputKey.SHIFT)
+        const pressEsc = updateData.input.isKeyDown(Controls.closeButton)
+        this.isShiftDown = updateData.input.isKeyHeld(Controls.pcModifierKey)
 
         if ((pressEsc && this.isOpen) || CutsceneManager.instance.isMidCutscene) {
             this.close()

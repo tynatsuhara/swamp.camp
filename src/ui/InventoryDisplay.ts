@@ -1,7 +1,7 @@
 import { Component } from "brigsby/dist/Component"
 import { UpdateData } from "brigsby/dist/Engine"
 import { Entity } from "brigsby/dist/Entity"
-import { InputKey, InputKeyString } from "brigsby/dist/Input"
+import { InputKeyString } from "brigsby/dist/Input"
 import { Point } from "brigsby/dist/Point"
 import { BasicRenderComponent } from "brigsby/dist/renderer/BasicRenderComponent"
 import { TextRender } from "brigsby/dist/renderer/TextRender"
@@ -63,7 +63,7 @@ export class InventoryDisplay extends Component {
 
     lateUpdate(updateData: UpdateData) {
         const pressI = updateData.input.isKeyDown(Controls.inventoryButton)
-        const pressEsc = updateData.input.isKeyDown(InputKey.ESC)
+        const pressEsc = updateData.input.isKeyDown(Controls.closeButton)
 
         if (this.isOpen && (pressI || pressEsc)) {
             this.close()
@@ -236,7 +236,7 @@ export class InventoryDisplay extends Component {
                     const otherInv = hoverInv === this.playerInv ? this.tradingInv : this.playerInv
                     if (
                         !!otherInv &&
-                        updateData.input.isKeyHeld(InputKey.SHIFT) &&
+                        updateData.input.isKeyHeld(Controls.pcModifierKey) &&
                         otherInv.canAddItem(item, count) &&
                         canRemoveFromPlayerInv(item)
                     ) {

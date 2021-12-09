@@ -2,7 +2,6 @@ import { assets } from "brigsby/dist/Assets"
 import { Component } from "brigsby/dist/Component"
 import { UpdateData } from "brigsby/dist/Engine"
 import { Entity } from "brigsby/dist/Entity"
-import { InputKey } from "brigsby/dist/Input"
 import { Point } from "brigsby/dist/Point"
 import { BasicRenderComponent } from "brigsby/dist/renderer/BasicRenderComponent"
 import { ImageRender } from "brigsby/dist/renderer/ImageRender"
@@ -16,6 +15,7 @@ import { Maths } from "brigsby/dist/util/Maths"
 import { Sounds } from "../audio/Sounds"
 import { Dude } from "../characters/Dude"
 import { Player } from "../characters/Player"
+import { Controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
@@ -78,7 +78,7 @@ export class TradeMenu extends Component {
     }
 
     update(updateData: UpdateData) {
-        if (updateData.input.isKeyDown(InputKey.ESC) && this.isOpen) {
+        if (updateData.input.isKeyDown(Controls.closeButton) && this.isOpen) {
             this.close()
         }
 

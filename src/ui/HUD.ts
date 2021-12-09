@@ -33,8 +33,6 @@ export class HUD {
     private readonly fullHeartPoisoned = this.fullHeart.filtered(POISONED_HEART_FILTER)
     private readonly halfHeart = Tilesets.instance.dungeonCharacters.getTileSource("ui_heart_half")
     private readonly halfHeartPoisoned = this.halfHeart.filtered(POISONED_HEART_FILTER)
-    private readonly emptyHeart =
-        Tilesets.instance.dungeonCharacters.getTileSource("ui_heart_empty")
 
     // used for determining what should be updated
     private lastHealthCount = 0
