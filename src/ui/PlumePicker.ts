@@ -1,10 +1,10 @@
 import { Component } from "brigsby/dist/Component"
-import { UpdateData } from "brigsby/dist/Engine"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { RectRender } from "brigsby/dist/renderer/RectRender"
 import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
 import { Maths } from "brigsby/dist/util/Maths"
+import { controls } from "../Controls"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "./Color"
 import { UIStateManager } from "./UIStateManager"
@@ -66,7 +66,7 @@ export class PlumePicker extends Component {
         this.callback(colors)
     }
 
-    update(updateData: UpdateData) {
+    update() {
         const sqSize = TILE_SIZE
         const rowLen = 9
         const topLeftPos = this.position.plusX((-rowLen * sqSize) / 2)
@@ -77,11 +77,11 @@ export class PlumePicker extends Component {
                 .plusY(Math.floor(index / rowLen) * TILE_SIZE)
             const dimensions = new Point(TILE_SIZE, TILE_SIZE)
 
-            const hovered = Maths.rectContains(position, dimensions, updateData.input.mousePos)
+            const hovered = Maths.rectContains(position, dimensions, controls.getMousePos())
             const big = hovered || JSON.stringify(colors) == JSON.stringify(this.selected)
             const bigBuffer = 2
 
-            if (hovered && updateData.input.isMouseDown) {
+            if (hovered && controls.isMouseDown()) {
                 this.select(colors)
             }
 

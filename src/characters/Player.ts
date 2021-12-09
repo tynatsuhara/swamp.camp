@@ -90,6 +90,7 @@ export class Player extends Component {
         this.dude.move(
             updateData,
             this.velocity,
+            // TODO: Use new controls pattern
             this.dude.rolling ? 0 : updateData.input.mousePos.x - this.dude.standingPosition.x,
             speed
         )

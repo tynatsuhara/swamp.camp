@@ -14,6 +14,7 @@ const AXIS_DEAD_ZONE = 0.2
 
 // The last gamepad which accepted input. Undefined if the user is using kb/m.
 let currentGamepad: CapturedGamepad | undefined
+// let gamepadMousePos: Point | undefined  // TODO
 let input: CapturedInput
 
 type InputHandlers = {
@@ -30,6 +31,7 @@ const check = (handlers: InputHandlers) => {
     }
     if (handlers.kbm && handlers.kbm(input)) {
         currentGamepad = undefined
+        // gamepadMousePos = undefined
         return true
     } else if (handlers.gamepad) {
         currentGamepad = input.gamepads.find((gp) => gp)
@@ -139,6 +141,24 @@ class ControlsWrapper extends Component {
             kbm: () => input.isMouse(MouseButton.LEFT, state),
             gamepad: (pad) => pad.isButton(GamepadButton.R2, state),
         })
+
+    // TODO: Support virtual mouse for gamepads
+
+    getMousePos = () => {
+        return input.mousePos
+    }
+
+    isMouseUp = () => {
+        return input.isMouseUp
+    }
+
+    isMouseDown = () => {
+        return input.isMouseDown
+    }
+
+    getScrollDeltaY = () => {
+        return input.mouseWheelDeltaY
+    }
 }
 
 /**

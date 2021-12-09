@@ -144,13 +144,7 @@ export class MainMenuScene {
         }
 
         // by default, render the title and the scene with the knight
-        const entities = [
-            controls.entity,
-            title,
-            this.knight.entity,
-            darknessEntity,
-            ...sceneEntities,
-        ]
+        const entities = [title, this.knight.entity, darknessEntity, ...sceneEntities]
 
         if (this.menu === Menu.ROOT) {
             const saveCount = saveManager.getSaveCount()
@@ -241,6 +235,9 @@ export class MainMenuScene {
                     .getEntity()
             )
         }
+
+        // Always update the controls entity first
+        entities.unshift(controls.entity)
 
         this.view = {
             zoom: ZOOM,

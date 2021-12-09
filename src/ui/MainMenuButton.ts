@@ -1,8 +1,8 @@
 import { Component } from "brigsby/dist/Component"
-import { UpdateData } from "brigsby/dist/Engine"
 import { Point } from "brigsby/dist/Point"
 import { TextRender } from "brigsby/dist/renderer/TextRender"
 import { Maths } from "brigsby/dist/util/Maths"
+import { controls } from "../Controls"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "./Color"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
@@ -26,18 +26,18 @@ export class MainMenuButton extends Component {
         this.onHover = onHover
     }
 
-    update(updateData: UpdateData) {
+    update() {
         this.hovering = Maths.rectContains(
             this.position.plusX(-this.width / 2).plusY(-4),
             new Point(this.width, TILE_SIZE),
-            updateData.input.mousePos
+            controls.getMousePos()
         )
 
         if (this.hovering) {
             this.onHover()
         }
 
-        if (this.hovering && updateData.input.isMouseDown) {
+        if (this.hovering && controls.isMouseDown()) {
             this.onClick()
         }
     }

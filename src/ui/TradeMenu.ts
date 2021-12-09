@@ -84,19 +84,16 @@ export class TradeMenu extends Component {
 
         if (this.isOpen) {
             this.tooltip.clear()
-            this.tooltip.position = updateData.input.mousePos
+            this.tooltip.position = controls.getMousePos()
             const rowsTall = 6 // will need to change this if dimensions are adjusted
-            this.scrollOffset -=
-                updateData.input.mouseWheelDeltaY * updateData.elapsedTimeMillis * 0.01
+            this.scrollOffset -= controls.getScrollDeltaY() * updateData.elapsedTimeMillis * 0.01
             this.scrollOffset = Math.floor(
                 Math.max(
                     Math.min(0, this.scrollOffset),
                     -Math.max(this.items.length, rowsTall) * 24 + this.innerDimensions.y
                 )
             )
-            this.displayEntity = new Entity(
-                this.renderRecipes(updateData, this.getTopLeft(), this.items)
-            )
+            this.displayEntity = new Entity(this.renderRecipes(this.getTopLeft(), this.items))
             this.justOpened = false
 
             if (this.justSoldRow !== -1) {
@@ -182,11 +179,7 @@ export class TradeMenu extends Component {
         }
     }
 
-    private renderRecipes(
-        updateData: UpdateData,
-        topLeft: Point,
-        items: SalePackage[]
-    ): Component[] {
+    private renderRecipes(topLeft: Point, items: SalePackage[]): Component[] {
         const coinCountComponent = new BasicRenderComponent(
             new TextRender(
                 `x${saveManager.getState().coins}`,
@@ -219,7 +212,7 @@ export class TradeMenu extends Component {
         const verticalTextOffset = 13
         let verticalOffset = this.scrollOffset
 
-        const shiftedMousePos = updateData.input.mousePos.plusY(-this.scrollOffset)
+        const shiftedMousePos = controls.getMousePos().plusY(-this.scrollOffset)
 
         for (let r = 0; r < items.length; r++) {
             const hovered =
@@ -232,14 +225,14 @@ export class TradeMenu extends Component {
                     // within the frame itself
                     topLeft.plus(innerOffset),
                     this.innerDimensions,
-                    updateData.input.mousePos
+                    controls.getMousePos()
                 )
 
             const sale = items[r]
             const tradeError = this.getTradeError(sale)
 
             // trade the item
-            if (hovered && updateData.input.isMouseDown && !tradeError) {
+            if (hovered && controls.isMouseDown() && !tradeError) {
                 Sounds.play(Lists.oneOf(CLINK_NOISES), 0.4)
                 this.sourceInventory.removeItem(sale.item, sale.count)
                 if (this.tradeMode === TradeMode.PLAYER_SELLING) {

@@ -1,10 +1,10 @@
 import { Component } from "brigsby/dist/Component"
-import { UpdateData } from "brigsby/dist/Engine"
 import { Point } from "brigsby/dist/Point"
 import { ImageRender } from "brigsby/dist/renderer/ImageRender"
 import { TextRender } from "brigsby/dist/renderer/TextRender"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Maths } from "brigsby/dist/util/Maths"
+import { controls } from "../Controls"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
 import { UIStateManager } from "./UIStateManager"
@@ -67,13 +67,13 @@ export class TextButton extends Component {
         }
     }
 
-    update(updateData: UpdateData) {
+    update() {
         this.hovering = Maths.rectContains(
             this.position,
             new Point(this.width, TILE_SIZE),
-            updateData.input.mousePos
+            controls.getMousePos()
         )
-        if (this.hovering && updateData.input.isMouseDown) {
+        if (this.hovering && controls.isMouseDown()) {
             this.onClick()
         }
     }

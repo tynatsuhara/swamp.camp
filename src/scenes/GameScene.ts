@@ -84,7 +84,6 @@ export class GameScene {
             : UIStateManager.instance.get(updateViewsContext.elapsedTimeMillis)
 
         const gameEntities: Entity[] = [
-            controls.entity,
             CutsceneManager.instance.getEntity(),
             this.getDebugEntity(),
             new Entity([new DevControls()]),
@@ -102,6 +101,11 @@ export class GameScene {
         }
 
         return [
+            {
+                zoom: Camera.ZOOM,
+                offset: Point.ZERO,
+                entities: [controls.entity],
+            },
             {
                 zoom: Camera.ZOOM,
                 offset: cameraOffset,

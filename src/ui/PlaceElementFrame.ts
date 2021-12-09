@@ -1,11 +1,11 @@
 import { Component } from "brigsby/dist/Component"
-import { UpdateData } from "brigsby/dist/Engine"
 import { Point } from "brigsby/dist/Point"
 import { NineSlice } from "brigsby/dist/sprites/NineSlice"
 import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Maths } from "brigsby/dist/util/Maths"
 import { Player } from "../characters/Player"
+import { controls } from "../Controls"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Elements } from "../world/elements/Elements"
 import { LocationManager } from "../world/LocationManager"
@@ -63,8 +63,8 @@ export class PlaceElementFrame extends Component {
         )
     }
 
-    update(updateData: UpdateData) {
-        const mousePos = updateData.input.mousePos
+    update() {
+        const mousePos = controls.getMousePos()
         const baseDist = 2
         const maxDistX = TILE_SIZE * (baseDist + this.dimensions.x / 2)
         const maxDistY = TILE_SIZE * (baseDist + this.dimensions.y / 2)
@@ -89,7 +89,7 @@ export class PlaceElementFrame extends Component {
         this.goodTiles[0].transform.position = tilePt.times(TILE_SIZE)
         this.badTiles[0].transform.position = tilePt.times(TILE_SIZE)
 
-        if (canPlace && updateData.input.isMouseDown) {
+        if (canPlace && controls.isMouseDown()) {
             PlaceElementDisplay.instance.finishPlacing(tilePt)
         }
     }

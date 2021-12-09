@@ -93,14 +93,14 @@ export class InventoryDisplay extends Component {
             return true
         }
 
-        const hoverResult = this.getHoveredInventoryIndex(updateData.input.mousePos)
+        const hoverResult = this.getHoveredInventoryIndex(controls.getMousePos())
         const hoverInv = hoverResult[0]
         const hoverIndex = hoverResult[1]
 
         if (!!this.trackedTile) {
             // dragging
             this.tooltip.clear()
-            if (updateData.input.isMouseUp) {
+            if (controls.isMouseUp()) {
                 // drop n swap
                 if (hoverIndex !== -1) {
                     // Swap the stacks
@@ -124,12 +124,12 @@ export class InventoryDisplay extends Component {
             } else {
                 // track
                 this.trackedTile.transform.position = this.trackedTile.transform.position.plus(
-                    updateData.input.mousePos.minus(this.lastMousPos)
+                    controls.getMousePos().minus(this.lastMousPos)
                 )
             }
         } else if (hoverIndex > -1 && !!hoverInv.getStack(hoverIndex)) {
             // we're hovering over an item
-            this.tooltip.position = updateData.input.mousePos
+            this.tooltip.position = controls.getMousePos()
             const stack = hoverInv.getStack(hoverIndex)
             const item = ITEM_METADATA_MAP[stack.item]
             const count = stack.count > 1 ? " x" + stack.count : ""
@@ -231,9 +231,9 @@ export class InventoryDisplay extends Component {
         // Re-check isOpen because actions could have closed the menu
         if (this.isOpen) {
             this.canUseItems = true
-            this.lastMousPos = updateData.input.mousePos
+            this.lastMousPos = controls.getMousePos()
 
-            if (updateData.input.isMouseDown) {
+            if (controls.isMouseDown()) {
                 const hoveredItemStack = hoverInv?.getStack(hoverIndex)
                 if (!!hoveredItemStack) {
                     const { item, count } = hoveredItemStack

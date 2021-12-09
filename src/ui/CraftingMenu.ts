@@ -59,11 +59,10 @@ export class CraftingMenu extends Component {
 
         if (this.isOpen) {
             this.tooltip.clear()
-            this.tooltip.position = updateData.input.mousePos
+            this.tooltip.position = controls.getMousePos()
             const rowsTall = 6 // will need to change this if dimensions are adjusted
             const category = this.recipes[this.recipeCategory]
-            this.scrollOffset -=
-                updateData.input.mouseWheelDeltaY * updateData.elapsedTimeMillis * 0.01
+            this.scrollOffset -= controls.getScrollDeltaY() * updateData.elapsedTimeMillis * 0.01
             this.scrollOffset = Math.floor(
                 Math.max(
                     Math.min(0, this.scrollOffset),
@@ -73,8 +72,8 @@ export class CraftingMenu extends Component {
             const screenDimensions = Camera.instance.dimensions
             const topLeft = screenDimensions.div(2).minus(this.dimensions.div(2)).plusY(-TILE_SIZE)
             this.displayEntity = new Entity([
-                ...this.renderCategories(updateData, topLeft),
-                ...this.renderRecipes(updateData, topLeft, category.recipes),
+                ...this.renderCategories(topLeft),
+                ...this.renderRecipes(topLeft, category.recipes),
             ])
             this.justOpened = false
 
@@ -103,17 +102,13 @@ export class CraftingMenu extends Component {
         this.justCraftedRow = -1
     }
 
-    private renderCategories(updateData: UpdateData, topLeft: Point): Component[] {
+    private renderCategories(topLeft: Point): Component[] {
         const result: Component[] = []
         for (let i = 0; i < this.recipes.length; i++) {
             const category = this.recipes[i]
             const pos = topLeft.plusX(i * TILE_SIZE * 2)
             const dims = new Point(2, 2)
-            const hovered = Maths.rectContains(
-                pos,
-                dims.times(TILE_SIZE),
-                updateData.input.mousePos
-            )
+            const hovered = Maths.rectContains(pos, dims.times(TILE_SIZE), controls.getMousePos())
 
             result.push(
                 ...NineSlice.makeNineSliceComponents(
@@ -134,7 +129,7 @@ export class CraftingMenu extends Component {
                 )
             )
 
-            if (!this.justOpened && hovered && updateData.input.isMouseDown) {
+            if (!this.justOpened && hovered && controls.isMouseDown()) {
                 this.selectCategory(i)
             }
 
@@ -156,11 +151,7 @@ export class CraftingMenu extends Component {
         )
     }
 
-    private renderRecipes(
-        updateData: UpdateData,
-        topLeft: Point,
-        recipes: CraftingRecipe[]
-    ): Component[] {
+    private renderRecipes(topLeft: Point, recipes: CraftingRecipe[]): Component[] {
         topLeft = topLeft.plusY(TILE_SIZE * 2)
 
         this.context.imageSmoothingEnabled = false // TODO figure out why text is aliased
@@ -184,7 +175,7 @@ export class CraftingMenu extends Component {
         const verticalTextOffset = 13
         let verticalOffset = this.scrollOffset
 
-        const shiftedMousePos = updateData.input.mousePos.plusY(-this.scrollOffset)
+        const shiftedMousePos = controls.getMousePos().plusY(-this.scrollOffset)
 
         for (let r = 0; r < recipes.length; r++) {
             const hovered =
@@ -197,14 +188,14 @@ export class CraftingMenu extends Component {
                     // within the frame itself
                     topLeft.plus(innerOffset),
                     this.innerDimensions,
-                    updateData.input.mousePos
+                    controls.getMousePos()
                 )
 
             const recipe = recipes[r]
             const craftedItem = ITEM_METADATA_MAP[recipe.output]
 
             // craft the item
-            if (hovered && updateData.input.isMouseDown && this.canCraft(recipe)) {
+            if (hovered && controls.isMouseDown() && this.canCraft(recipe)) {
                 Sounds.play(this.craftNoise, 0.6)
                 recipe.input.forEach((ingr) => {
                     Player.instance.dude.inventory.removeItem(ingr.item, ingr.count)
@@ -279,7 +270,7 @@ export class CraftingMenu extends Component {
                             verticalOffset + margin * 1.5
                         ).plus(topLeft),
                         new Point(TILE_SIZE + margin, TILE_SIZE + margin),
-                        updateData.input.mousePos
+                        controls.getMousePos()
                     )
                 ) {
                     const displayName = ITEM_METADATA_MAP[ingr.item].displayName
