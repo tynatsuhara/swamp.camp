@@ -30,7 +30,7 @@ export const getFilesToLoad = () => {
 }
 
 // returns the image asset after applying the versionized hash
-export const getImage = (fileName) => {
+export const getImage = (fileName: string) => {
     return assets.getImageByFileName(versionize(fileName))
 }
 
