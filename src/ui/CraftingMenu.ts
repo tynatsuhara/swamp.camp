@@ -11,7 +11,7 @@ import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Maths } from "brigsby/dist/util/Maths"
 import { Sounds } from "../audio/Sounds"
 import { Player } from "../characters/Player"
-import { Controls } from "../Controls"
+import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
@@ -53,7 +53,7 @@ export class CraftingMenu extends Component {
     }
 
     update(updateData: UpdateData) {
-        if (Controls.isCloseButtonDown(updateData.input) && this.isOpen) {
+        if (controls.isCloseButtonDown() && this.isOpen) {
             this.close()
         }
 

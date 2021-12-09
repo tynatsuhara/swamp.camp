@@ -6,7 +6,7 @@ import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Lists } from "brigsby/dist/util/Lists"
 import { Maths } from "brigsby/dist/util/Maths"
 import { Player } from "../characters/Player"
-import { Controls } from "../Controls"
+import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { ElementComponent } from "../world/elements/ElementComponent"
@@ -28,7 +28,7 @@ export class MiniMap extends Component {
     private smallCanvas: HTMLCanvasElement
 
     update(updateData: UpdateData) {
-        this.isShowing = Controls.isMapKeyHeld(updateData.input)
+        this.isShowing = controls.isMapKeyHeld()
 
         if (this.lastPixelDrawn.equals(Point.ZERO)) {
             this.renderFullSizeMap()

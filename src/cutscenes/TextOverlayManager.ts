@@ -4,7 +4,7 @@ import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Lists } from "brigsby/dist/util/Lists"
-import { Controls } from "../Controls"
+import { controls } from "../Controls"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { Color } from "../ui/Color"
@@ -72,7 +72,7 @@ export class TextOverlayManager extends Component {
 
         const text = this.text[this.index]
         const typedText = text.update(
-            !this.firstFrame && Controls.isMenuClickDown(updateData.input),
+            !this.firstFrame && controls.isMenuClickDown(),
             updateData.elapsedTimeMillis
         )
 

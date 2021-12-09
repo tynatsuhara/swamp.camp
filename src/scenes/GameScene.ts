@@ -1,34 +1,35 @@
 import { CollisionEngine, collisionEngine } from "brigsby/dist/collision/CollisionEngine"
+import { debug } from "brigsby/dist/Debug"
 import { UpdateViewsContext } from "brigsby/dist/Engine"
+import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
+import { BasicRenderComponent } from "brigsby/dist/renderer/BasicRenderComponent"
+import { LineRender } from "brigsby/dist/renderer/LineRender"
+import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
 import { Dude } from "../characters/Dude"
 import { DudeFactory, DudeType } from "../characters/DudeFactory"
+import { DudeSpawner } from "../characters/DudeSpawner"
+import { NPC } from "../characters/NPC"
+import { Player } from "../characters/Player"
+import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { IntroCutscene } from "../cutscenes/IntroCutscene"
-import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
+import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
+import { DevControls } from "../DevControls"
+import { Particles } from "../graphics/Particles"
+import { TILE_SIZE } from "../graphics/Tilesets"
 import { DroppedItem } from "../items/DroppedItem"
+import { Singletons } from "../Singletons"
 import { UIStateManager } from "../ui/UIStateManager"
+import { EventQueue } from "../world/events/EventQueue"
+import { QueuedEventType } from "../world/events/QueuedEvent"
 import { GroundRenderer } from "../world/GroundRenderer"
+import { LightManager } from "../world/LightManager"
 import { LocationManager } from "../world/LocationManager"
 import { MapGenerator } from "../world/MapGenerator"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
-import { EventQueue } from "../world/events/EventQueue"
-import { QueuedEventType } from "../world/events/QueuedEvent"
-import { NPC } from "../characters/NPC"
-import { BasicRenderComponent } from "brigsby/dist/renderer/BasicRenderComponent"
-import { Player } from "../characters/Player"
-import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
-import { LineRender } from "brigsby/dist/renderer/LineRender"
-import { Entity } from "brigsby/dist/Entity"
-import { debug } from "brigsby/dist/Debug"
-import { DudeSpawner } from "../characters/DudeSpawner"
-import { DevControls } from "../DevControls"
-import { LightManager } from "../world/LightManager"
-import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
-import { Singletons } from "../Singletons"
-import { Particles } from "../graphics/Particles"
 
 export class GameScene {
     initialize() {
@@ -83,6 +84,7 @@ export class GameScene {
             : UIStateManager.instance.get(updateViewsContext.elapsedTimeMillis)
 
         const gameEntities: Entity[] = [
+            controls.entity,
             CutsceneManager.instance.getEntity(),
             this.getDebugEntity(),
             new Entity([new DevControls()]),

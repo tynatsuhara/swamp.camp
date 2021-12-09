@@ -12,7 +12,7 @@ import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Player } from "../characters/Player"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { WeaponType } from "../characters/weapons/WeaponType"
-import { Controls } from "../Controls"
+import { controls, Controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Inventory } from "../items/Inventory"
@@ -62,8 +62,8 @@ export class InventoryDisplay extends Component {
     }
 
     lateUpdate(updateData: UpdateData) {
-        const pressI = Controls.isInventoryButtonDown(updateData.input)
-        const pressEsc = Controls.isCloseButtonDown(updateData.input)
+        const pressI = controls.isInventoryButtonDown()
+        const pressEsc = controls.isCloseButtonDown()
 
         if (this.isOpen && (pressI || pressEsc)) {
             this.close()
@@ -202,13 +202,10 @@ export class InventoryDisplay extends Component {
 
             // We currently only support up to 2 interaction types per item
             const interactButtonOrder: [string, () => boolean][] = [
-                [
-                    InputKeyString.for(Controls.interactButton),
-                    () => Controls.isInteractDown(updateData.input),
-                ],
+                [InputKeyString.for(Controls.interactButton), () => controls.isInteractDown()],
                 [
                     InputKeyString.for(Controls.interactButtonSecondary),
-                    () => Controls.isInteractSecondaryDown(updateData.input),
+                    () => controls.isInteractSecondaryDown(),
                 ],
             ]
 

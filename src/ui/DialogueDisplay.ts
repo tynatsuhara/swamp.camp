@@ -11,7 +11,7 @@ import {
     getDialogue,
     NextDialogue,
 } from "../characters/dialogue/Dialogue"
-import { Controls } from "../Controls"
+import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { ButtonsMenu } from "./ButtonsMenu"
@@ -56,8 +56,7 @@ export class DialogueDisplay extends Component {
             typer.isFinished &&
             this.dialogue.options.length > 0 &&
             this.lineIndex >= this.lines.length - 1
-        const shouldProceed =
-            Controls.isMenuClickDown(updateData.input) || Controls.isInteractDown(updateData.input)
+        const shouldProceed = controls.isMenuClickDown() || controls.isInteractDown()
 
         const line = typer.update(shouldProceed, updateData.elapsedTimeMillis)
 

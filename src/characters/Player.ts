@@ -4,7 +4,7 @@ import { UpdateData } from "brigsby/dist/Engine"
 import { ButtonState } from "brigsby/dist/Input"
 import { Point } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util/Lists"
-import { Controls } from "../Controls"
+import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { PlaceElementDisplay } from "../ui/PlaceElementDisplay"
 import { UIStateManager } from "../ui/UIStateManager"
@@ -61,16 +61,16 @@ export class Player extends Component {
             dx = this.rollingMomentum.x
             dy = this.rollingMomentum.y
         } else if (!UIStateManager.instance.isMenuOpen || PlaceElementDisplay.instance.isOpen) {
-            if (Controls.isWalkUpHeld(updateData.input)) {
+            if (controls.isWalkUpHeld()) {
                 dy--
             }
-            if (Controls.isWalkDownHeld(updateData.input)) {
+            if (controls.isWalkDownHeld()) {
                 dy++
             }
-            if (Controls.isWalkLeftHeld(updateData.input)) {
+            if (controls.isWalkLeftHeld()) {
                 dx--
             }
-            if (Controls.isWalkRightHeld(updateData.input)) {
+            if (controls.isWalkRightHeld()) {
                 dx++
             }
         }
@@ -98,18 +98,14 @@ export class Player extends Component {
             return
         }
 
-        if (!this.dude.jumping && Controls.isJumpDown(updateData.input)) {
+        if (!this.dude.jumping && controls.isJumpDown()) {
             this.dude.jump()
-        } else if (
-            !this.dude.rolling &&
-            Controls.isRollDown(updateData.input) &&
-            (dx !== 0 || dy !== 0)
-        ) {
+        } else if (!this.dude.rolling && controls.isRollDown() && (dx !== 0 || dy !== 0)) {
             this.dude.roll()
             this.rollingMomentum = new Point(dx, dy)
         }
 
-        if (Controls.isSheathKeyDown(updateData.input)) {
+        if (controls.isSheathKeyDown()) {
             // todo: these could get out of sync if one is null
             this.dude.weapon.toggleSheathed()
             this.dude.shield.toggleOnBack()
@@ -117,18 +113,18 @@ export class Player extends Component {
 
         let blocking = false
         if (!!this.dude.shield) {
-            blocking = Controls.isBlockHeld(updateData.input)
+            blocking = controls.isBlockHeld()
             this.dude.shield.block(blocking)
         }
 
-        if (Controls.isAttack(ButtonState.HELD, updateData.input) && !blocking) {
-            const newAttack = Controls.isAttack(ButtonState.DOWN, updateData.input)
+        if (controls.isAttack(ButtonState.HELD) && !blocking) {
+            const newAttack = controls.isAttack(ButtonState.DOWN)
             this.dude.weapon?.attack(newAttack)
         } else {
             this.dude.weapon?.cancelAttack()
         }
 
-        if (Controls.isInteractDown(updateData.input) && !!possibleInteractable) {
+        if (controls.isInteractDown() && !!possibleInteractable) {
             possibleInteractable.interact()
         }
     }

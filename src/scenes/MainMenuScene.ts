@@ -15,6 +15,7 @@ import { Ambiance } from "../audio/Ambiance"
 import { Music } from "../audio/Music"
 import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
 import { Player } from "../characters/Player"
+import { controls } from "../Controls"
 import { FireParticles } from "../graphics/FireParticles"
 import { Particles } from "../graphics/Particles"
 import { getImage, Tilesets, TILE_SIZE } from "../graphics/Tilesets"
@@ -143,7 +144,13 @@ export class MainMenuScene {
         }
 
         // by default, render the title and the scene with the knight
-        const entities = [title, this.knight.entity, darknessEntity, ...sceneEntities]
+        const entities = [
+            controls.entity,
+            title,
+            this.knight.entity,
+            darknessEntity,
+            ...sceneEntities,
+        ]
 
         if (this.menu === Menu.ROOT) {
             const saveCount = saveManager.getSaveCount()

@@ -3,7 +3,7 @@ import { UpdateData } from "brigsby/dist/Engine"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { Player } from "../characters/Player"
-import { Controls } from "../Controls"
+import { controls } from "../Controls"
 import { Elements, ElementType } from "../world/elements/Elements"
 import { LocationManager } from "../world/LocationManager"
 import { PlaceElementFrame } from "./PlaceElementFrame"
@@ -33,7 +33,7 @@ export class PlaceElementDisplay extends Component {
             return
         }
 
-        if (Controls.isCloseButtonDown(updateData.input)) {
+        if (controls.isCloseButtonDown()) {
             this.close()
         }
     }
