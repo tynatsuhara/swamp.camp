@@ -2,13 +2,11 @@ import { Component } from "brigsby/dist/Component"
 import { UpdateData } from "brigsby/dist/Engine"
 import { Point } from "brigsby/dist/Point"
 import { ImageRender } from "brigsby/dist/renderer/ImageRender"
-import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
-import { TextRender } from "brigsby/dist/renderer/TextRender"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Lists } from "brigsby/dist/util/Lists"
 import { Tilesets, TILE_DIMENSIONS, TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "./Color"
-import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
+import { formatText, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
 import { UIStateManager } from "./UIStateManager"
 
 export class Tooltip extends Component {
@@ -108,20 +106,19 @@ export class Tooltip extends Component {
         if (!this.text) {
             return []
         }
-        return this.text
-            .map(
-                (line, index) =>
-                    new TextRender(
-                        line,
-                        this.tiles[0].position
-                            .plus(Tooltip.textOffset)
-                            .plusY((this.text.length - index - 1) * -(TEXT_SIZE + 4)),
-                        TEXT_SIZE,
-                        TEXT_FONT,
-                        Color.DARK_RED,
-                        UIStateManager.UI_SPRITE_DEPTH + 2
-                    ) as RenderMethod
-            )
-            .concat(this.tiles)
+        return [
+            ...this.tiles,
+            ...formatText(
+                this.text.join("\n"),
+                Color.DARK_RED,
+                this.tiles[0].position
+                    .plus(Tooltip.textOffset)
+                    .plusY(-(this.text.length - 1) * (TEXT_SIZE + 4)),
+                Number.MAX_SAFE_INTEGER
+            ).map((t) => {
+                t.depth = UIStateManager.UI_SPRITE_DEPTH + 2
+                return t
+            }),
+        ]
     }
 }
