@@ -100,7 +100,7 @@ export class InventoryDisplay extends Component {
         if (!!this.trackedTile) {
             // dragging
             this.tooltip.clear()
-            if (controls.isMouseUp()) {
+            if (controls.isInventoryStackDrop()) {
                 // drop n swap
                 if (hoverIndex !== -1) {
                     // Swap the stacks
@@ -202,10 +202,13 @@ export class InventoryDisplay extends Component {
 
             // We currently only support up to 2 interaction types per item
             const interactButtonOrder: [string, () => boolean][] = [
-                [InputKeyString.for(Controls.interactButton), () => controls.isInteractDown()],
+                [
+                    InputKeyString.for(Controls.interactButton),
+                    () => controls.isInventoryOptionOneDown(),
+                ],
                 [
                     InputKeyString.for(Controls.interactButtonSecondary),
-                    () => controls.isInteractSecondaryDown(),
+                    () => controls.isInventoryOptionTwoDown(),
                 ],
             ]
 
@@ -233,7 +236,7 @@ export class InventoryDisplay extends Component {
             this.canUseItems = true
             this.lastMousPos = controls.getMousePos()
 
-            if (controls.isMouseDown()) {
+            if (controls.isInventoryStackPickUp()) {
                 const hoveredItemStack = hoverInv?.getStack(hoverIndex)
                 if (!!hoveredItemStack) {
                     const { item, count } = hoveredItemStack

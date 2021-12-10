@@ -122,14 +122,37 @@ class ControlsWrapper extends Component {
     isInteractDown = () =>
         check({
             kbm: () => input.isKeyDown(Controls.interactButton),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.X),
+        })
+
+    isInventoryButtonDown = () =>
+        check({
+            kbm: () => input.isKeyDown(Controls.inventoryButton),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.UP),
+        })
+
+    isInventoryOptionOneDown = () =>
+        check({
+            kbm: () => input.isKeyDown(Controls.interactButton),
             gamepad: () => gamepadInput.isButtonDown(GamepadButton.SQUARE),
         })
 
-    // TODO figure out the best controller mapping for this
-    isInteractSecondaryDown = () =>
+    isInventoryOptionTwoDown = () =>
         check({
             kbm: () => input.isKeyDown(Controls.interactButtonSecondary),
-            gamepad: () => gamepadInput.isButtonDown(GamepadButton.X),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.TRIANGLE),
+        })
+
+    isInventoryStackPickUp = () =>
+        check({
+            kbm: () => input.isMouseDown,
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.R2),
+        })
+
+    isInventoryStackDrop = () =>
+        check({
+            kbm: () => input.isMouseUp,
+            gamepad: () => gamepadInput.isButtonUp(GamepadButton.R2),
         })
 
     isCloseMenuButtonDown = () =>
@@ -142,12 +165,6 @@ class ControlsWrapper extends Component {
         check({
             kbm: () => input.isKeyDown(InputKey.ESC),
             gamepad: () => gamepadInput.isButtonDown(GamepadButton.START),
-        })
-
-    isInventoryButtonDown = () =>
-        check({
-            kbm: () => input.isKeyDown(Controls.inventoryButton),
-            gamepad: () => gamepadInput.isButtonDown(GamepadButton.TRIANGLE),
         })
 
     // TODO: Make walk functions return [0, 1] to support analog sticks
@@ -179,25 +196,27 @@ class ControlsWrapper extends Component {
     isBlockHeld = () =>
         check({
             kbm: () => input.isRightMouseHeld || input.isKeyHeld(InputKey.CONTROL),
-            gamepad: () => gamepadInput.isButtonHeld(GamepadButton.L2),
+            gamepad: () =>
+                gamepadInput.isButtonHeld(GamepadButton.L1) ||
+                gamepadInput.isButtonHeld(GamepadButton.L2),
         })
 
     isRollDown = () =>
         check({
             kbm: () => input.isKeyDown(InputKey.SHIFT),
-            gamepad: () => gamepadInput.isButtonDown(GamepadButton.R1),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.CIRCLE),
         })
 
     isJumpDown = () =>
         check({
             kbm: () => input.isKeyDown(InputKey.SPACE),
-            gamepad: () => gamepadInput.isButtonDown(GamepadButton.X),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.SQUARE),
         })
 
     isMapKeyHeld = () =>
         check({
             kbm: () => input.isKeyHeld(InputKey.M),
-            gamepad: () => gamepadInput.isButtonHeld(GamepadButton.LEFT),
+            gamepad: () => gamepadInput.isButtonHeld(GamepadButton.RIGHT),
         })
 
     isSheathKeyDown = () =>
@@ -209,7 +228,9 @@ class ControlsWrapper extends Component {
     isAttack = (state: ButtonState) =>
         check({
             kbm: () => input.isMouse(MouseButton.LEFT, state),
-            gamepad: () => gamepadInput.isButton(GamepadButton.R2, state),
+            gamepad: () =>
+                gamepadInput.isButton(GamepadButton.R1, state) ||
+                gamepadInput.isButton(GamepadButton.R2, state),
         })
 
     isModifierHeld = () =>
@@ -226,24 +247,13 @@ class ControlsWrapper extends Component {
         return this.translateToWorldSpace(this.getMousePos())
     }
 
-    // TODO
-    isMouseUp = () => {
-        return input.isMouseUp
-    }
-
-    // TODO
-    isMouseDown = () => {
-        return input.isMouseDown
-    }
-
-    // TODO test this
     getScrollDeltaY = () => {
-        return isGamepadMode ? gamepadInput.getRightAxes().y : input.mouseWheelDeltaY
+        // TODO: the scale is completely different
+        return isGamepadMode ? deaden(gamepadInput.getLeftAxes()).y : input.mouseWheelDeltaY
     }
 
     getPlayerFacingDirection = (dude: Dude) => {
         if (isGamepadMode) {
-            // TODO: remember the last non-zero input and use that instead
             const axis = gamepadInput.getRightAxes().x
             if (axis < -AXIS_DEAD_ZONE) {
                 return -1
