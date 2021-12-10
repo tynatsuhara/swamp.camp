@@ -86,12 +86,14 @@ export class TradeMenu extends Component {
             this.tooltip.clear()
             this.tooltip.position = controls.getMousePos()
             const rowsTall = 6 // will need to change this if dimensions are adjusted
-            this.scrollOffset -= controls.getScrollDeltaY() * updateData.elapsedTimeMillis * 0.01
-            this.scrollOffset = Math.floor(
-                Math.max(
-                    Math.min(0, this.scrollOffset),
-                    -Math.max(this.items.length, rowsTall) * 24 + this.innerDimensions.y
-                )
+            this.scrollOffset -=
+                controls.getScrollDeltaY() *
+                updateData.elapsedTimeMillis *
+                UIStateManager.SCROLL_SPEED
+            this.scrollOffset = Maths.clamp(
+                this.scrollOffset,
+                -Math.max(this.items.length, rowsTall) * 24 + this.innerDimensions.y,
+                0
             )
             this.displayEntity = new Entity(this.renderRecipes(this.getTopLeft(), this.items))
             this.justOpened = false

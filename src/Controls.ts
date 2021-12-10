@@ -248,7 +248,6 @@ class ControlsWrapper extends Component {
     }
 
     getScrollDeltaY = () => {
-        // TODO: the scale is completely different
         return isGamepadMode ? deaden(gamepadInput.getLeftAxes()).y : input.mouseWheelDeltaY
     }
 

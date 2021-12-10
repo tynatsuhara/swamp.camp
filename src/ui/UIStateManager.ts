@@ -17,6 +17,7 @@ export class UIStateManager {
     }
 
     static UI_SPRITE_DEPTH = Number.MAX_SAFE_INTEGER / 2
+    static SCROLL_SPEED = 0.25
 
     private readonly inventory = new InventoryDisplay()
     private readonly dialogueDisplay = new DialogueDisplay()

@@ -62,12 +62,14 @@ export class CraftingMenu extends Component {
             this.tooltip.position = controls.getMousePos()
             const rowsTall = 6 // will need to change this if dimensions are adjusted
             const category = this.recipes[this.recipeCategory]
-            this.scrollOffset -= controls.getScrollDeltaY() * updateData.elapsedTimeMillis * 0.01
-            this.scrollOffset = Math.floor(
-                Math.max(
-                    Math.min(0, this.scrollOffset),
-                    -Math.max(category.recipes.length, rowsTall) * 24 + this.innerDimensions.y
-                )
+            this.scrollOffset -=
+                controls.getScrollDeltaY() *
+                updateData.elapsedTimeMillis *
+                UIStateManager.SCROLL_SPEED
+            this.scrollOffset = Maths.clamp(
+                this.scrollOffset,
+                -Math.max(category.recipes.length, rowsTall) * 24 + this.innerDimensions.y,
+                0
             )
             const screenDimensions = Camera.instance.dimensions
             const topLeft = screenDimensions.div(2).minus(this.dimensions.div(2)).plusY(-TILE_SIZE)
