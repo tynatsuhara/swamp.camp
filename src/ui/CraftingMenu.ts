@@ -58,6 +58,12 @@ export class CraftingMenu extends Component {
         }
 
         if (this.isOpen) {
+            if (controls.isTabRightDown()) {
+                this.tabRight()
+            } else if (controls.isTabLeftDown()) {
+                this.tabLeft()
+            }
+
             this.tooltip.clear()
             this.tooltip.position = controls.getMousePos()
             const rowsTall = 6 // will need to change this if dimensions are adjusted
@@ -83,6 +89,18 @@ export class CraftingMenu extends Component {
                 this.tooltip.say("Crafted!")
             }
         }
+    }
+
+    private tabRight() {
+        this.selectCategory(
+            this.recipeCategory === this.recipes.length - 1 ? 0 : this.recipeCategory + 1
+        )
+    }
+
+    private tabLeft() {
+        this.selectCategory(
+            this.recipeCategory === 0 ? this.recipes.length - 1 : this.recipeCategory - 1
+        )
     }
 
     close() {

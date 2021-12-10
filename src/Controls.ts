@@ -239,6 +239,18 @@ class ControlsWrapper extends Component {
             gamepad: () => gamepadInput.isButtonHeld(GamepadButton.L1),
         })
 
+    isTabRightDown = () =>
+        check({
+            kbm: () => input.isKeyDown(InputKey.D),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.R1),
+        })
+
+    isTabLeftDown = () =>
+        check({
+            kbm: () => input.isKeyDown(InputKey.A),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.L1),
+        })
+
     getMousePos = () => {
         return isGamepadMode ? gamepadMousePos : input.mousePos
     }
