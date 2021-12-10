@@ -1,18 +1,17 @@
-import { KeyPressIndicator } from "./KeyPressIndicator"
 import { Point } from "brigsby/dist/Point"
-import { InputKey } from "brigsby/dist/Input"
-import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
-import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
-import { formatText } from "./Text"
-import { Color } from "./Color"
 import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
-import { UIStateManager } from "./UIStateManager"
+import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Controls } from "../Controls"
+import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { Color } from "./Color"
+import { KeyPressIndicator } from "./KeyPressIndicator"
+import { formatText } from "./Text"
+import { UIStateManager } from "./UIStateManager"
 
 export const makeControlsUI = (dimensions: Point, offset: Point): RenderMethod[] => {
     const topLeft = new Point(
         dimensions.x / 2 - TILE_SIZE * 6 - 1,
-        dimensions.y / 2 - TILE_SIZE * 5
+        dimensions.y / 2 - TILE_SIZE * 6
     ).plus(offset)
     const controlsOffset = 5
     const dashOffset = TILE_SIZE * 5 - 4
