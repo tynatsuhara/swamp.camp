@@ -13,6 +13,6 @@ export const Mouse = {
     },
 
     show: () => {
-        document.body.style["cursor"] = "url(cursor.png), default"
+        document.body.style["cursor"] = "url(cursor_3x.png), default"
     },
 }
