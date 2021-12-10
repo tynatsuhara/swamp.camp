@@ -107,27 +107,19 @@ export const getDialogue = (dialogue: string): DialogueInstance => {
     if (dialogue === EMPTY_DIALOGUE) {
         return
     }
-    const f = DIALOGUE_MAP[dialogue]
+
+    // making this a static constant caused issues
+    const dialogueMap = {
+        ...DIP_INTRO_DIALOGUE,
+        ...BERTO_INTRO_DIALOGUE,
+        ...GENERIC_DIALOGUE,
+        ...DOCTOR_DIALOGUE,
+        ...ITEM_DIALOGUES,
+    }
+
+    const f = dialogueMap[dialogue]
     if (!f) {
         throw new Error("cannot find dialogue " + dialogue)
     }
     return f()
 }
-
-const DIALOGUE_SOURCES: { [key: string]: () => DialogueInstance }[] = [
-    DIP_INTRO_DIALOGUE,
-    BERTO_INTRO_DIALOGUE,
-    ITEM_DIALOGUES,
-    GENERIC_DIALOGUE,
-    DOCTOR_DIALOGUE,
-]
-
-/**
- * State should only be modified in the "next" functions. If state is changed
- * in the top-level Dialogue functions, it can be triggered repeatedly if the
- * dialogue is opened/closed or if the game is saved then loaded.
- */
-const DIALOGUE_MAP: { [key: number]: () => DialogueInstance } = Object.assign(
-    {},
-    ...DIALOGUE_SOURCES
-)
