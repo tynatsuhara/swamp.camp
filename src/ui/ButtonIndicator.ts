@@ -35,8 +35,23 @@ export class ButtonIndicator extends Component {
 
     private getTile(): Point {
         switch (this.button) {
+            case GamepadButton.TRIANGLE:
+                return new Point(28, 25)
+            case GamepadButton.CIRCLE:
+                return new Point(29, 25)
             case GamepadButton.X:
                 return new Point(30, 25)
+            case GamepadButton.SQUARE:
+                return new Point(31, 25)
+
+            case GamepadButton.UP:
+                return new Point(28, 23)
+            case GamepadButton.RIGHT:
+                return new Point(29, 23)
+            case GamepadButton.DOWN:
+                return new Point(30, 23)
+            case GamepadButton.LEFT:
+                return new Point(31, 23)
         }
     }
 }

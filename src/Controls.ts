@@ -82,31 +82,42 @@ class ControlsWrapper extends Component {
 
         gamepadInput = input.gamepads.find((gp) => gp)
 
-        if (gamepadInput && !isGamepadMode) {
-            if (
-                deaden(gamepadInput.getLeftAxes()).magnitude() > 0 ||
-                deaden(gamepadInput.getRightAxes()).magnitude() > 0
-            ) {
-                isGamepadMode = true
-            }
-        } else if (isGamepadMode && input.mousePosDelta.magnitude() > 0) {
+        if (!gamepadInput || (isGamepadMode && input.mousePosDelta.magnitude() > 0)) {
             isGamepadMode = false
             gamepadMousePos = undefined
+            return
         }
 
-        // Adjust the virtual mouse position if they're using a gamepad
-        if (isGamepadMode && gamepadInput) {
-            if (!gamepadMousePos) {
-                gamepadMousePos = input.mousePos
+        if (gamepadInput && !isGamepadMode) {
+            const leftStick = deaden(gamepadInput.getLeftAxes())
+            const rightStick = deaden(gamepadInput.getRightAxes())
+
+            if (leftStick.magnitude() > 0 || rightStick.magnitude() > 0) {
+                isGamepadMode = true
             }
-            const stickInput = deaden(gamepadInput.getRightAxes()).times(CURSOR_SENSITIVITY)
-            const adjustedPos = gamepadMousePos.plus(stickInput)
-            const bounds = Camera.instance.dimensions.minus(new Point(3, 3))
-            gamepadMousePos = new Point(
-                Maths.clamp(adjustedPos.x, 0, bounds.x),
-                Maths.clamp(adjustedPos.y, 0, bounds.y)
-            )
         }
+    }
+
+    updateGamepadCursorPosition() {
+        if (!isGamepadMode || !gamepadInput) {
+            return
+        }
+
+        if (!gamepadMousePos) {
+            gamepadMousePos = input.mousePos
+        }
+
+        // Both left and right stick can be used for mouse
+        const leftStick = deaden(gamepadInput.getLeftAxes())
+        const rightStick = deaden(gamepadInput.getRightAxes())
+        const stickInput = leftStick.plus(rightStick).times(CURSOR_SENSITIVITY)
+
+        const adjustedPos = gamepadMousePos.plus(stickInput)
+        const bounds = Camera.instance.dimensions.minus(new Point(3, 3))
+        gamepadMousePos = new Point(
+            Maths.clamp(adjustedPos.x, 0, bounds.x),
+            Maths.clamp(adjustedPos.y, 0, bounds.y)
+        )
     }
 
     isGamepadMode() {
@@ -260,7 +271,7 @@ class ControlsWrapper extends Component {
     }
 
     getScrollDeltaY = () => {
-        return isGamepadMode ? deaden(gamepadInput.getLeftAxes()).y : input.mouseWheelDeltaY
+        return isGamepadMode ? deaden(gamepadInput.getRightAxes()).y : input.mouseWheelDeltaY
     }
 
     getPlayerFacingDirection = (dude: Dude) => {

@@ -8,6 +8,18 @@ import { KeyPressIndicator } from "./KeyPressIndicator"
 import { formatText } from "./Text"
 import { UIStateManager } from "./UIStateManager"
 
+/**
+ * Controls that need to be shown here:
+ *   - Attack
+ *   - Block
+ *   - Jump
+ *   - Roll
+ *   - Move
+ *   - Inventory
+ *   - Map
+ *   - Sheath weapon
+ */
+
 export const makeControlsUI = (dimensions: Point, offset: Point): RenderMethod[] => {
     const topLeft = new Point(
         dimensions.x / 2 - TILE_SIZE * 6 - 1,

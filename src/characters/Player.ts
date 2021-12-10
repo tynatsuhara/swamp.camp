@@ -6,7 +6,6 @@ import { Point } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util/Lists"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
-import { PlaceElementDisplay } from "../ui/PlaceElementDisplay"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Interactable } from "../world/elements/Interactable"
 import { Dude } from "./Dude"
@@ -65,7 +64,7 @@ export class Player extends Component {
             // TODO: change how momentum works if we implement slippery ice
             dx = this.rollingMomentum.x
             dy = this.rollingMomentum.y
-        } else if (!UIStateManager.instance.isMenuOpen || PlaceElementDisplay.instance.isOpen) {
+        } else if (!UIStateManager.instance.isMenuOpen) {
             if (controls.isWalkUpHeld()) {
                 dy--
             }

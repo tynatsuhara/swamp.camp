@@ -23,6 +23,8 @@ export class Cursor extends Component {
             this.cursorRenderMethod = undefined
             if (controls.isGamepadMode()) {
                 if (shouldShow()) {
+                    controls.updateGamepadCursorPosition()
+
                     this.cursorRenderMethod = this.cursorSprite.toImageRender(
                         SpriteTransform.new({
                             position: controls.getMousePos(),
