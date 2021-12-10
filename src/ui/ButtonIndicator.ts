@@ -19,7 +19,7 @@ export class ButtonIndicator extends Component {
     getRenderMethods(): RenderMethod[] {
         return [
             Tilesets.instance.oneBit
-                .getTileAt(this.getTile())
+                .getTileSource(this.getTileKey())
                 .toImageRender(
                     new SpriteTransform(
                         this.pos,
@@ -33,25 +33,25 @@ export class ButtonIndicator extends Component {
         ]
     }
 
-    private getTile(): Point {
+    private getTileKey(): string {
         switch (this.button) {
             case GamepadButton.TRIANGLE:
-                return new Point(28, 25)
+                return "gamepad-triangle"
             case GamepadButton.CIRCLE:
-                return new Point(29, 25)
+                return "gamepad-circle"
             case GamepadButton.X:
-                return new Point(30, 25)
+                return "gamepad-x"
             case GamepadButton.SQUARE:
-                return new Point(31, 25)
+                return "gamepad-square"
 
             case GamepadButton.UP:
-                return new Point(28, 23)
+                return "gamepad-up"
             case GamepadButton.RIGHT:
-                return new Point(29, 23)
+                return "gamepad-right"
             case GamepadButton.DOWN:
-                return new Point(30, 23)
+                return "gamepad-down"
             case GamepadButton.LEFT:
-                return new Point(31, 23)
+                return "gamepad-left"
         }
     }
 }

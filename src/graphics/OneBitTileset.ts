@@ -6,6 +6,16 @@ export class OneBitTileset extends SingleFileTileLoader {
         super(
             "images/monochrome_transparent_1_bit.png",
             new Map([
+                // controls
+                ["gamepad-triangle", new Point(28, 25)],
+                ["gamepad-circle", new Point(29, 25)],
+                ["gamepad-x", new Point(30, 25)],
+                ["gamepad-square", new Point(31, 25)],
+                ["gamepad-up", new Point(28, 23)],
+                ["gamepad-right", new Point(29, 23)],
+                ["gamepad-down", new Point(30, 23)],
+                ["gamepad-left", new Point(31, 23)],
+
                 ["heart", new Point(26, 22)],
                 ["potion1", new Point(16, 25)],
                 ["potion2", new Point(17, 25)],
