@@ -95,7 +95,7 @@ class ControlsWrapper extends Component {
         }
 
         // Adjust the virtual mouse position if they're using a gamepad
-        if (isGamepadMode) {
+        if (isGamepadMode && gamepadInput) {
             if (!gamepadMousePos) {
                 gamepadMousePos = input.mousePos
             }
