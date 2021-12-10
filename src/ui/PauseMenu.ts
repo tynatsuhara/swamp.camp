@@ -22,12 +22,15 @@ export class PauseMenu extends Component {
     isOpen = false
 
     update(updateData: UpdateData) {
-        const pressEsc = controls.isCloseButtonDown()
+        const pressPauseButton = controls.isOpenPauseMenuButtonDown()
         this.isShiftDown = controls.isModifierHeld()
 
-        if ((pressEsc && this.isOpen) || CutsceneManager.instance.isMidCutscene) {
+        if (
+            ((pressPauseButton || controls.isCloseMenuButtonDown()) && this.isOpen) ||
+            CutsceneManager.instance.isMidCutscene
+        ) {
             this.close()
-        } else if (pressEsc && !UIStateManager.instance.isMenuOpen) {
+        } else if (pressPauseButton && !UIStateManager.instance.isMenuOpen) {
             this.open(updateData.dimensions)
         }
     }

@@ -63,7 +63,7 @@ export class InventoryDisplay extends Component {
 
     lateUpdate(updateData: UpdateData) {
         const pressI = controls.isInventoryButtonDown()
-        const pressEsc = controls.isCloseButtonDown()
+        const pressEsc = controls.isCloseMenuButtonDown()
 
         if (this.isOpen && (pressI || pressEsc)) {
             this.close()

@@ -53,7 +53,7 @@ export class CraftingMenu extends Component {
     }
 
     update(updateData: UpdateData) {
-        if (controls.isCloseButtonDown() && this.isOpen) {
+        if (controls.isCloseMenuButtonDown() && this.isOpen) {
             this.close()
         }
 

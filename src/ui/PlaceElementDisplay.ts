@@ -33,7 +33,7 @@ export class PlaceElementDisplay extends Component {
             return
         }
 
-        if (controls.isCloseButtonDown()) {
+        if (controls.isCloseMenuButtonDown()) {
             this.close()
         }
     }
