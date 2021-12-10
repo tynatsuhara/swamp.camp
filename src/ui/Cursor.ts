@@ -1,5 +1,4 @@
 import { Component } from "brigsby/dist/Component"
-import { UpdateData } from "brigsby/dist/Engine"
 import { Point } from "brigsby/dist/Point"
 import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
@@ -20,7 +19,7 @@ export class Cursor extends Component {
     constructor(shouldShow: () => boolean = () => true) {
         super()
 
-        this.update = (updateData: UpdateData) => {
+        this.update = () => {
             this.cursorRenderMethod = undefined
             if (controls.isGamepadMode()) {
                 if (shouldShow()) {

@@ -81,7 +81,7 @@ export class PlumePicker extends Component {
             const big = hovered || JSON.stringify(colors) == JSON.stringify(this.selected)
             const bigBuffer = 2
 
-            if (hovered && controls.isMouseDown()) {
+            if (hovered && controls.isMenuClickDown()) {
                 this.select(colors)
             }
 

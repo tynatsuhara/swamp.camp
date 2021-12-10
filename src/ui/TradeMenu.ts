@@ -232,7 +232,7 @@ export class TradeMenu extends Component {
             const tradeError = this.getTradeError(sale)
 
             // trade the item
-            if (hovered && controls.isMouseDown() && !tradeError) {
+            if (hovered && controls.isMenuClickDown() && !tradeError) {
                 Sounds.play(Lists.oneOf(CLINK_NOISES), 0.4)
                 this.sourceInventory.removeItem(sale.item, sale.count)
                 if (this.tradeMode === TradeMode.PLAYER_SELLING) {

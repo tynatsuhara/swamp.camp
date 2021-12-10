@@ -89,7 +89,7 @@ export class PlaceElementFrame extends Component {
         this.goodTiles[0].transform.position = tilePt.times(TILE_SIZE)
         this.badTiles[0].transform.position = tilePt.times(TILE_SIZE)
 
-        if (canPlace && controls.isMouseDown()) {
+        if (canPlace && controls.isMenuClickDown()) {
             PlaceElementDisplay.instance.finishPlacing(tilePt)
         }
     }

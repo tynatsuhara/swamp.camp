@@ -16,7 +16,7 @@ import { Dude } from "./characters/Dude"
 import { Camera } from "./cutscenes/Camera"
 
 // The last gamepad which accepted input. Undefined if the user is using kb/m.
-let gamepad: CapturedGamepad | undefined
+let gamepadInput: CapturedGamepad | undefined
 let gamepadMousePos: Point | undefined
 let isGamepadMode = false
 
@@ -31,7 +31,7 @@ type InputHandlers<T> = {
     kbm: () => T
     /**
      * If kbm returns a falsey value, and this returns a truthy value, {@link isGamepadMode}
-     * will be true. This will only be executed if {@link gamepad} is defined
+     * will be true. This will only be executed if {@link gamepadInput} is defined
      */
     gamepad: () => T
 }
@@ -44,7 +44,7 @@ const check = <T>(handlers: InputHandlers<T>) => {
     }
 
     const kbmResult = handlers.kbm()
-    if (kbmResult || !gamepad) {
+    if (kbmResult || !gamepadInput) {
         isGamepadMode = false
         gamepadMousePos = undefined
         return kbmResult
@@ -62,7 +62,7 @@ const check = <T>(handlers: InputHandlers<T>) => {
 }
 
 const AXIS_DEAD_ZONE = 0.2
-const CURSOR_SENSITIVITY = 2
+const CURSOR_SENSITIVITY = 2.5
 
 const deaden = (axes: Point) =>
     new Point(
@@ -80,18 +80,16 @@ class ControlsWrapper extends Component {
     update(updateData: UpdateData) {
         input = updateData.input
 
-        gamepad = input.gamepads.find((gp) => gp)
+        gamepadInput = input.gamepads.find((gp) => gp)
 
-        if (gamepad && !isGamepadMode) {
+        if (gamepadInput && !isGamepadMode) {
             if (
-                deaden(gamepad.getLeftAxes()).magnitude() > 0 ||
-                deaden(gamepad.getRightAxes()).magnitude() > 0
+                deaden(gamepadInput.getLeftAxes()).magnitude() > 0 ||
+                deaden(gamepadInput.getRightAxes()).magnitude() > 0
             ) {
                 isGamepadMode = true
             }
-        }
-
-        if (isGamepadMode && input.mousePosDelta.magnitude() > 0) {
+        } else if (isGamepadMode && input.mousePosDelta.magnitude() > 0) {
             isGamepadMode = false
             gamepadMousePos = undefined
         }
@@ -101,7 +99,7 @@ class ControlsWrapper extends Component {
             if (!gamepadMousePos) {
                 gamepadMousePos = input.mousePos
             }
-            const stickInput = deaden(gamepad.getRightAxes()).times(CURSOR_SENSITIVITY)
+            const stickInput = deaden(gamepadInput.getRightAxes()).times(CURSOR_SENSITIVITY)
             const adjustedPos = gamepadMousePos.plus(stickInput)
             const bounds = Camera.instance.dimensions.minus(new Point(3, 3))
             gamepadMousePos = new Point(
@@ -118,32 +116,32 @@ class ControlsWrapper extends Component {
     isMenuClickDown = () =>
         check({
             kbm: () => input.isMouseDown,
-            gamepad: () => gamepad.isButtonDown(GamepadButton.X),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.X),
         })
 
     isInteractDown = () =>
         check({
             kbm: () => input.isKeyDown(Controls.interactButton),
-            gamepad: () => gamepad.isButtonDown(GamepadButton.SQUARE),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.SQUARE),
         })
 
     // TODO figure out the best controller mapping for this
     isInteractSecondaryDown = () =>
         check({
             kbm: () => input.isKeyDown(Controls.interactButtonSecondary),
-            gamepad: () => gamepad.isButtonDown(GamepadButton.X),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.X),
         })
 
     isCloseButtonDown = () =>
         check({
             kbm: () => input.isKeyDown(InputKey.ESC),
-            gamepad: () => gamepad.isButtonDown(GamepadButton.CIRCLE),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.CIRCLE),
         })
 
     isInventoryButtonDown = () =>
         check({
             kbm: () => input.isKeyDown(Controls.inventoryButton),
-            gamepad: () => gamepad.isButtonDown(GamepadButton.TRIANGLE),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.TRIANGLE),
         })
 
     // TODO: Make walk functions return [0, 1] to support analog sticks
@@ -151,67 +149,67 @@ class ControlsWrapper extends Component {
     isWalkUpHeld = () =>
         check({
             kbm: () => input.isKeyHeld(Controls.walkUp),
-            gamepad: () => gamepad.getLeftAxes().y < -AXIS_DEAD_ZONE,
+            gamepad: () => gamepadInput.getLeftAxes().y < -AXIS_DEAD_ZONE,
         })
 
     isWalkDownHeld = () =>
         check({
             kbm: () => input.isKeyHeld(Controls.walkDown),
-            gamepad: () => gamepad.getLeftAxes().y > AXIS_DEAD_ZONE,
+            gamepad: () => gamepadInput.getLeftAxes().y > AXIS_DEAD_ZONE,
         })
 
     isWalkLeftHeld = () =>
         check({
             kbm: () => input.isKeyHeld(Controls.walkLeft),
-            gamepad: () => gamepad.getLeftAxes().x < -AXIS_DEAD_ZONE,
+            gamepad: () => gamepadInput.getLeftAxes().x < -AXIS_DEAD_ZONE,
         })
 
     isWalkRightHeld = () =>
         check({
             kbm: () => input.isKeyHeld(Controls.walkRight),
-            gamepad: () => gamepad.getLeftAxes().x > AXIS_DEAD_ZONE,
+            gamepad: () => gamepadInput.getLeftAxes().x > AXIS_DEAD_ZONE,
         })
 
     isBlockHeld = () =>
         check({
             kbm: () => input.isRightMouseHeld || input.isKeyHeld(InputKey.CONTROL),
-            gamepad: () => gamepad.isButtonHeld(GamepadButton.L2),
+            gamepad: () => gamepadInput.isButtonHeld(GamepadButton.L2),
         })
 
     isRollDown = () =>
         check({
             kbm: () => input.isKeyDown(InputKey.SHIFT),
-            gamepad: () => gamepad.isButtonDown(GamepadButton.R1),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.R1),
         })
 
     isJumpDown = () =>
         check({
             kbm: () => input.isKeyDown(InputKey.SPACE),
-            gamepad: () => gamepad.isButtonDown(GamepadButton.X),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.X),
         })
 
     isMapKeyHeld = () =>
         check({
             kbm: () => input.isKeyHeld(InputKey.M),
-            gamepad: () => gamepad.isButtonHeld(GamepadButton.LEFT),
+            gamepad: () => gamepadInput.isButtonHeld(GamepadButton.LEFT),
         })
 
     isSheathKeyDown = () =>
         check({
             kbm: () => input.isKeyDown(InputKey.F),
-            gamepad: () => gamepad.isButtonDown(GamepadButton.DOWN),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.DOWN),
         })
 
     isAttack = (state: ButtonState) =>
         check({
             kbm: () => input.isMouse(MouseButton.LEFT, state),
-            gamepad: () => gamepad.isButton(GamepadButton.R2, state),
+            gamepad: () => gamepadInput.isButton(GamepadButton.R2, state),
         })
 
     isModifierHeld = () =>
         check({
             kbm: () => input.isKeyHeld(InputKey.SHIFT),
-            gamepad: () => gamepad.isButtonHeld(GamepadButton.L1),
+            gamepad: () => gamepadInput.isButtonHeld(GamepadButton.L1),
         })
 
     getMousePos = () => {
@@ -234,13 +232,13 @@ class ControlsWrapper extends Component {
 
     // TODO test this
     getScrollDeltaY = () => {
-        return isGamepadMode ? gamepad.getRightAxes().y : input.mouseWheelDeltaY
+        return isGamepadMode ? gamepadInput.getRightAxes().y : input.mouseWheelDeltaY
     }
 
     getPlayerFacingDirection = (dude: Dude) => {
         if (isGamepadMode) {
             // TODO: remember the last non-zero input and use that instead
-            const axis = gamepad.getRightAxes().x
+            const axis = gamepadInput.getRightAxes().x
             if (axis < -AXIS_DEAD_ZONE) {
                 return -1
             } else if (axis > AXIS_DEAD_ZONE) {
@@ -252,7 +250,7 @@ class ControlsWrapper extends Component {
         }
     }
 
-    vibrate = (options: GamepadVibrationOptions) => gamepad?.vibrate(options)
+    vibrate = (options: GamepadVibrationOptions) => gamepadInput?.vibrate(options)
 
     private translateToWorldSpace = (mousePos: Point) => mousePos.plus(Camera.instance.position)
 

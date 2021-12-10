@@ -73,7 +73,7 @@ export class TextButton extends Component {
             new Point(this.width, TILE_SIZE),
             controls.getMousePos()
         )
-        if (this.hovering && controls.isMouseDown()) {
+        if (this.hovering && controls.isMenuClickDown()) {
             this.onClick()
         }
     }

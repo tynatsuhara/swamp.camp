@@ -37,7 +37,7 @@ export class MainMenuButton extends Component {
             this.onHover()
         }
 
-        if (this.hovering && controls.isMouseDown()) {
+        if (this.hovering && controls.isMenuClickDown()) {
             this.onClick()
         }
     }
