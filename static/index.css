@@ -5,7 +5,7 @@ body {
     height: 100%;
     -webkit-font-smoothing: none;
     -moz-osx-font-smoothing: none;
-    cursor: url(cursor.png), default;
+    cursor: url(cursor_3x.png), default;
     overflow: hidden;
 }
 

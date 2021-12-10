@@ -23,6 +23,7 @@ import { QuestGame } from "../quest_game"
 import { saveManager } from "../SaveManager"
 import { Save } from "../saves/SaveGame"
 import { Color } from "../ui/Color"
+import { Cursor } from "../ui/Cursor"
 import { MainMenuButtonSection } from "../ui/MainMenuButtonSection"
 import { CUSTOMIZATION_OPTIONS, PlumePicker } from "../ui/PlumePicker"
 import { TEXT_SIZE } from "../ui/Text"
@@ -237,7 +238,7 @@ export class MainMenuScene {
         }
 
         // Always update the controls entity first
-        entities.unshift(controls.entity)
+        entities.unshift(controls.entity, new Entity([new Cursor()]))
 
         this.view = {
             zoom: ZOOM,

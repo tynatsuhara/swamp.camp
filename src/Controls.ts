@@ -15,24 +15,23 @@ import { Maths } from "brigsby/dist/util/Maths"
 import { Dude } from "./characters/Dude"
 import { Camera } from "./cutscenes/Camera"
 
-const AXIS_DEAD_ZONE = 0.2
-
 // The last gamepad which accepted input. Undefined if the user is using kb/m.
 let gamepad: CapturedGamepad | undefined
 let gamepadMousePos: Point | undefined
+let isGamepadMode = false
 
 // NOTE: This view is scaled to the UI layer
 let input: CapturedInput
 
 type InputHandlers<T> = {
     /**
-     * If this returns a truthy value, {@link gamepad} will be undefined
+     * If this returns a truthy value, {@link isGamepadMode} will be false
      * and gamepad input will not be checked
      */
     kbm: () => T
     /**
-     * If kbm returns a falsey value, and this returns a truthy value, {@link gamepad}
-     * will be defined. This will only be executed if {@link gamepad} is defined
+     * If kbm returns a falsey value, and this returns a truthy value, {@link isGamepadMode}
+     * will be true. This will only be executed if {@link gamepad} is defined
      */
     gamepad: () => T
 }
@@ -45,23 +44,31 @@ const check = <T>(handlers: InputHandlers<T>) => {
     }
 
     const kbmResult = handlers.kbm()
-    if (kbmResult) {
-        gamepad = undefined
+    if (kbmResult || !gamepad) {
+        isGamepadMode = false
         gamepadMousePos = undefined
         return kbmResult
     }
 
-    gamepad = input.gamepads.find((gp) => gp)
-    if (!gamepad) {
-        return kbmResult
+    const gamepadResult = handlers.gamepad()
+    if (gamepadResult) {
+        isGamepadMode = true
+        if (!gamepadMousePos) {
+            gamepadMousePos = input.mousePos
+        }
     }
 
-    const gamepadResult = handlers.gamepad()
-    if (gamepadResult && !gamepadMousePos) {
-        gamepadMousePos = input.mousePos
-    }
     return gamepadResult
 }
+
+const AXIS_DEAD_ZONE = 0.2
+const CURSOR_SENSITIVITY = 2
+
+const deaden = (axes: Point) =>
+    new Point(
+        axes.x < AXIS_DEAD_ZONE && axes.x > -AXIS_DEAD_ZONE ? 0 : axes.x,
+        axes.y < AXIS_DEAD_ZONE && axes.y > -AXIS_DEAD_ZONE ? 0 : axes.y
+    )
 
 /**
  * TODO:
@@ -73,18 +80,39 @@ class ControlsWrapper extends Component {
     update(updateData: UpdateData) {
         input = updateData.input
 
+        gamepad = input.gamepads.find((gp) => gp)
+
+        if (gamepad && !isGamepadMode) {
+            if (
+                deaden(gamepad.getLeftAxes()).magnitude() > 0 ||
+                deaden(gamepad.getRightAxes()).magnitude() > 0
+            ) {
+                isGamepadMode = true
+            }
+        }
+
+        if (isGamepadMode && input.mousePosDelta.magnitude() > 0) {
+            isGamepadMode = false
+            gamepadMousePos = undefined
+        }
+
         // Adjust the virtual mouse position if they're using a gamepad
-        if (gamepad) {
+        if (isGamepadMode) {
             if (!gamepadMousePos) {
                 gamepadMousePos = input.mousePos
             }
-            const adjustedPos = gamepadMousePos.plus(gamepad.getRightAxes())
-            const bounds = Camera.instance.dimensions
+            const stickInput = deaden(gamepad.getRightAxes()).times(CURSOR_SENSITIVITY)
+            const adjustedPos = gamepadMousePos.plus(stickInput)
+            const bounds = Camera.instance.dimensions.minus(new Point(3, 3))
             gamepadMousePos = new Point(
                 Maths.clamp(adjustedPos.x, 0, bounds.x),
                 Maths.clamp(adjustedPos.y, 0, bounds.y)
             )
         }
+    }
+
+    isGamepadMode() {
+        return isGamepadMode
     }
 
     isMenuClickDown = () =>
@@ -153,7 +181,7 @@ class ControlsWrapper extends Component {
     isRollDown = () =>
         check({
             kbm: () => input.isKeyDown(InputKey.SHIFT),
-            gamepad: () => gamepad.isButtonDown(GamepadButton.X),
+            gamepad: () => gamepad.isButtonDown(GamepadButton.R1),
         })
 
     isJumpDown = () =>
@@ -186,31 +214,32 @@ class ControlsWrapper extends Component {
             gamepad: () => gamepad.isButtonHeld(GamepadButton.L1),
         })
 
-    // TODO: Support virtual mouse for gamepads
-
     getMousePos = () => {
-        return gamepad ? gamepadMousePos : input.mousePos
+        return isGamepadMode ? gamepadMousePos : input.mousePos
     }
 
     getWorldSpaceMousePos = () => {
         return this.translateToWorldSpace(this.getMousePos())
     }
 
+    // TODO
     isMouseUp = () => {
         return input.isMouseUp
     }
 
+    // TODO
     isMouseDown = () => {
         return input.isMouseDown
     }
 
     // TODO test this
     getScrollDeltaY = () => {
-        return gamepad ? gamepad.getRightAxes().y : input.mouseWheelDeltaY
+        return isGamepadMode ? gamepad.getRightAxes().y : input.mouseWheelDeltaY
     }
 
     getPlayerFacingDirection = (dude: Dude) => {
-        if (gamepad) {
+        if (isGamepadMode) {
+            // TODO: remember the last non-zero input and use that instead
             const axis = gamepad.getRightAxes().x
             if (axis < -AXIS_DEAD_ZONE) {
                 return -1
@@ -227,8 +256,11 @@ class ControlsWrapper extends Component {
 
     private translateToWorldSpace = (mousePos: Point) => mousePos.plus(Camera.instance.position)
 
+    /**
+     * DO NOT USE THIS METHOD — BECAUSE CONTROLS IS RENDERED IN THE FIRST VIEW,
+     * ANY RENDER METHODS WILL ALWAYS BE OBSCURED BY THE SUBSEQUENT VIEWS
+     */
     getRenderMethods = () => {
-        // TODO: virtual cursor for gamepad
         return []
     }
 }

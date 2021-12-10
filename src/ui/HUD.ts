@@ -9,9 +9,11 @@ import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { Color } from "./Color"
+import { Cursor } from "./Cursor"
 import { LocationTransition } from "./LocationTransition"
 import { MiniMap } from "./MiniMap"
 import { OffScreenIndicatorManager } from "./OffScreenIndicatorManager"
+import { UIStateManager } from "./UIStateManager"
 
 const POISONED_HEART_FILTER = ImageFilters.recolor(Color.SUPER_ORANGE, Color.PURPLE)
 
@@ -56,13 +58,16 @@ export class HUD {
         this.updateHearts(player.health, player.maxHealth)
         this.updateAutosave(screenDimensions, elapsedMillis)
 
-        return [
+        const entities = [
             this.heartsEntity,
             this.autosaveComponent.entity,
             this.locationTransition.entity,
             this.offScreenIndicatorManager.getEntity(),
             this.miniMap.entity,
+            new Entity([new Cursor(() => UIStateManager.instance.isMenuOpen)]),
         ]
+
+        return entities
     }
 
     private updateHearts(health: number, maxHealth: number) {
