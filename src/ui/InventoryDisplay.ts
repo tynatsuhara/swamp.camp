@@ -1,7 +1,6 @@
 import { Component } from "brigsby/dist/Component"
 import { UpdateData } from "brigsby/dist/Engine"
 import { Entity } from "brigsby/dist/Entity"
-import { InputKeyString } from "brigsby/dist/Input"
 import { Point } from "brigsby/dist/Point"
 import { BasicRenderComponent } from "brigsby/dist/renderer/BasicRenderComponent"
 import { TextRender } from "brigsby/dist/renderer/TextRender"
@@ -12,7 +11,7 @@ import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Player } from "../characters/Player"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { WeaponType } from "../characters/weapons/WeaponType"
-import { controls, Controls } from "../Controls"
+import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Inventory } from "../items/Inventory"
@@ -202,20 +201,14 @@ export class InventoryDisplay extends Component {
 
             // We currently only support up to 2 interaction types per item
             const interactButtonOrder: [string, () => boolean][] = [
-                [
-                    InputKeyString.for(Controls.interactButton),
-                    () => controls.isInventoryOptionOneDown(),
-                ],
-                [
-                    InputKeyString.for(Controls.interactButtonSecondary),
-                    () => controls.isInventoryOptionTwoDown(),
-                ],
+                [controls.getInventoryOptionOneString(), () => controls.isInventoryOptionOneDown()],
+                [controls.getInventoryOptionTwoString(), () => controls.isInventoryOptionTwoDown()],
             ]
 
             let tooltipString = `${item.displayName}${count}`
 
             actions.forEach((action, i) => {
-                tooltipString += `\n[${interactButtonOrder[i][0]} to ${action.verb}]`
+                tooltipString += `\n${interactButtonOrder[i][0]} to ${action.verb}`
             })
 
             this.tooltip.say(tooltipString)

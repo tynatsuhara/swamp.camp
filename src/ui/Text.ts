@@ -23,11 +23,17 @@ export const NO_BREAK_SPACE_CHAR = "∆"
 const ICON_PLACEHOLDER_PREFIX = "λ"
 const ICON_PLACEHOLDER_REGEX = /λ./g
 export enum TextIcon {
-    SWORD = "λ1",
+    GAMEPAD_UP = "λ1",
+    GAMEPAD_X = "λx",
+    GAMEPAD_SQUARE = "λ2",
+    GAMEPAD_TRIANGLE = "λ3",
 }
 // maps placeholder -> one bit key
 const ICON_PLACEHOLDER_MAP = {
-    [TextIcon.SWORD]: "sword",
+    [TextIcon.GAMEPAD_UP]: "gamepad-up",
+    [TextIcon.GAMEPAD_X]: "gamepad-x",
+    [TextIcon.GAMEPAD_SQUARE]: "gamepad-square",
+    [TextIcon.GAMEPAD_TRIANGLE]: "gamepad-triangle",
 }
 
 export const formatText = ({

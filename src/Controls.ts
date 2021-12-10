@@ -14,6 +14,7 @@ import { Point } from "brigsby/dist/Point"
 import { Maths } from "brigsby/dist/util/Maths"
 import { Dude } from "./characters/Dude"
 import { Camera } from "./cutscenes/Camera"
+import { TextIcon } from "./ui/Text"
 
 // The last gamepad which accepted input. Undefined if the user is using kb/m.
 let gamepadInput: CapturedGamepad | undefined
@@ -119,35 +120,31 @@ class ControlsWrapper extends Component {
         return isGamepadMode
     }
 
-    isMenuClickDown = () =>
-        check({
-            kbm: () => input.isMouseDown,
-            gamepad: () => gamepadInput.isButtonDown(GamepadButton.X),
-        })
-
-    isInteractDown = () =>
-        check({
-            kbm: () => input.isKeyDown(Controls.interactButton),
-            gamepad: () => gamepadInput.isButtonDown(GamepadButton.X),
-        })
+    // ======== INVENTORY STUFF ========
 
     isInventoryButtonDown = () =>
         check({
-            kbm: () => input.isKeyDown(Controls.inventoryButton),
+            kbm: () => input.isKeyDown(InputKey.TAB),
             gamepad: () => gamepadInput.isButtonDown(GamepadButton.UP),
         })
 
+    getInventoryButtonString = () => (isGamepadMode ? TextIcon.GAMEPAD_UP : "[TAB]")
+
     isInventoryOptionOneDown = () =>
         check({
-            kbm: () => input.isKeyDown(Controls.interactButton),
+            kbm: () => input.isKeyDown(InputKey.E),
             gamepad: () => gamepadInput.isButtonDown(GamepadButton.SQUARE),
         })
 
+    getInventoryOptionOneString = () => (isGamepadMode ? TextIcon.GAMEPAD_SQUARE : "[e]")
+
     isInventoryOptionTwoDown = () =>
         check({
-            kbm: () => input.isKeyDown(Controls.interactButtonSecondary),
+            kbm: () => input.isKeyDown(InputKey.F),
             gamepad: () => gamepadInput.isButtonDown(GamepadButton.TRIANGLE),
         })
+
+    getInventoryOptionTwoString = () => (isGamepadMode ? TextIcon.GAMEPAD_TRIANGLE : "[f]")
 
     isInventoryStackPickUp = () =>
         check({
@@ -161,6 +158,8 @@ class ControlsWrapper extends Component {
             gamepad: () => gamepadInput.isButtonUp(GamepadButton.X),
         })
 
+    // ======== OTHER MENU STUFF ========
+
     isCloseMenuButtonDown = () =>
         check({
             kbm: () => input.isKeyDown(InputKey.ESC),
@@ -173,7 +172,34 @@ class ControlsWrapper extends Component {
             gamepad: () => gamepadInput.isButtonDown(GamepadButton.START),
         })
 
+    isTabRightDown = () =>
+        check({
+            kbm: () => input.isKeyDown(InputKey.D),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.R1),
+        })
+
+    isTabLeftDown = () =>
+        check({
+            kbm: () => input.isKeyDown(InputKey.A),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.L1),
+        })
+
+    isMenuClickDown = () =>
+        check({
+            kbm: () => input.isMouseDown,
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.X),
+        })
+
+    // ======== PLAYER CONTROLS ========
     // TODO: Make walk functions return [0, 1] to support analog sticks
+
+    isInteractDown = () =>
+        check({
+            kbm: () => input.isKeyDown(InputKey.E),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.X),
+        })
+
+    getInteractButtonString = () => (isGamepadMode ? TextIcon.GAMEPAD_SQUARE : "[e]")
 
     isWalkUpHeld = () =>
         check({
@@ -245,18 +271,6 @@ class ControlsWrapper extends Component {
             gamepad: () => gamepadInput.isButtonHeld(GamepadButton.L1),
         })
 
-    isTabRightDown = () =>
-        check({
-            kbm: () => input.isKeyDown(InputKey.D),
-            gamepad: () => gamepadInput.isButtonDown(GamepadButton.R1),
-        })
-
-    isTabLeftDown = () =>
-        check({
-            kbm: () => input.isKeyDown(InputKey.A),
-            gamepad: () => gamepadInput.isButtonDown(GamepadButton.L1),
-        })
-
     getMousePos = () => {
         if (isGamepadMode) {
             if (!gamepadMousePos) {
@@ -319,7 +333,5 @@ export const Controls = {
     walkDown: InputKey.S,
     walkLeft: InputKey.A,
     walkRight: InputKey.D,
-    inventoryButton: InputKey.TAB,
-    interactButton: InputKey.E,
-    interactButtonSecondary: InputKey.F,
+    // inventoryButton: InputKey.TAB,
 }

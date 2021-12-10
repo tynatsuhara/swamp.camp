@@ -1,5 +1,4 @@
-import { InputKeyString } from "brigsby/dist/Input"
-import { Controls } from "../../Controls"
+import { controls } from "../../Controls"
 import { getDipRecipes } from "../../items/CraftingRecipe"
 import { Item } from "../../items/Items"
 import { CraftingMenu } from "../../ui/CraftingMenu"
@@ -89,9 +88,7 @@ export const DIP_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
             ]
             if (campfires[0].save()["logs"] === 0) {
                 lines.push(
-                    `You can add logs to the fire by standing close to it and pressing [${InputKeyString.for(
-                        Controls.interactButton
-                    )}].`
+                    `You can add logs to the fire by standing close to it and pressing ${controls.getInteractButtonString()}.`
                 )
             }
             lines.push(
@@ -115,9 +112,7 @@ export const DIP_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
             // campfire has been crafted
             return dialogue(
                 [
-                    `Try placing the campfire down near my tent. You can open your inventory by pressing [${InputKeyString.for(
-                        Controls.inventoryButton
-                    )}].`,
+                    `Try placing the campfire down near my tent. You can open your inventory by pressing ${controls.getInventoryButtonString()}.`,
                 ],
                 () => new NextDialogue(DIP_MAKE_CAMPFIRE, false)
             )

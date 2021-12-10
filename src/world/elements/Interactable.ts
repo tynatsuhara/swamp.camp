@@ -1,10 +1,10 @@
 import { Component } from "brigsby/dist/Component"
 import { debug } from "brigsby/dist/Debug"
-import { GamepadButton } from "brigsby/dist/Input"
+import { GamepadButton, InputKey } from "brigsby/dist/Input"
 import { Point } from "brigsby/dist/Point"
 import { EllipseRender } from "brigsby/dist/renderer/EllipseRender"
 import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
-import { controls, Controls } from "../../Controls"
+import { controls } from "../../Controls"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { ButtonIndicator } from "../../ui/ButtonIndicator"
 import { KeyPressIndicator } from "../../ui/KeyPressIndicator"
@@ -59,7 +59,7 @@ export class Interactable extends Component {
         if (controls.isGamepadMode()) {
             return new ButtonIndicator(indicatorPos, GamepadButton.X).getRenderMethods()
         } else {
-            return new KeyPressIndicator(indicatorPos, Controls.interactButton).getRenderMethods()
+            return new KeyPressIndicator(indicatorPos, InputKey.E).getRenderMethods()
         }
     }
 }
