@@ -6,7 +6,6 @@ import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "./Color"
 import { KeyPressIndicator } from "./KeyPressIndicator"
 import { formatText } from "./Text"
-import { UIStateManager } from "./UIStateManager"
 
 /**
  * Controls that need to be shown here:
@@ -27,6 +26,14 @@ export const makeControlsUI = (dimensions: Point, offset: Point): RenderMethod[]
     ).plus(offset)
     const controlsOffset = 5
     const dashOffset = TILE_SIZE * 5 - 4
+
+    const format = (text: string, position: Point) =>
+        formatText({
+            text,
+            color: Color.WHITE,
+            position,
+            width: 100,
+        })
 
     return [
         ...new KeyPressIndicator(topLeft.plusX(TILE_SIZE), Controls.walkUp).getRenderMethods(),
@@ -51,38 +58,16 @@ export const makeControlsUI = (dimensions: Point, offset: Point): RenderMethod[]
                     topLeft.plusX(TILE_SIZE * 4).plusY(TILE_SIZE * 1 + controlsOffset)
                 )
             ),
-        ...formatText(
-            "MOVE",
-            Color.WHITE,
-            topLeft.plusX(TILE_SIZE / 2).plusY(TILE_SIZE * 2 + 2),
-            100
-        ),
-        ...formatText(
-            "ATTACK",
-            Color.WHITE,
-            topLeft.plusX(TILE_SIZE * 5).plusY(4 + controlsOffset),
-            100
-        ),
-        ...formatText(
-            "BLOCK",
-            Color.WHITE,
-            topLeft.plusX(TILE_SIZE * 5).plusY(TILE_SIZE + 4 + controlsOffset),
-            100
-        ),
-        ...formatText(
+        ...format("MOVE", topLeft.plusX(TILE_SIZE / 2).plusY(TILE_SIZE * 2 + 2)),
+        ...format("ATTACK", topLeft.plusX(TILE_SIZE * 5).plusY(4 + controlsOffset)),
+        ...format("BLOCK", topLeft.plusX(TILE_SIZE * 5).plusY(TILE_SIZE + 4 + controlsOffset)),
+        ...format(
             "[SPACE]",
-            Color.WHITE,
-            topLeft.plusX(TILE_SIZE * 4 + dashOffset).plusY(4 + controlsOffset + 3),
-            100
+            topLeft.plusX(TILE_SIZE * 4 + dashOffset).plusY(4 + controlsOffset + 3)
         ),
-        ...formatText(
+        ...format(
             "DASH",
-            Color.WHITE,
-            topLeft.plusX(TILE_SIZE * 4.75 + dashOffset).plusY(TILE_SIZE + 4 + controlsOffset - 3),
-            100
+            topLeft.plusX(TILE_SIZE * 4.75 + dashOffset).plusY(TILE_SIZE + 4 + controlsOffset - 3)
         ),
-    ].map((r) => {
-        r.depth = UIStateManager.UI_SPRITE_DEPTH
-        return r
-    })
+    ]
 }

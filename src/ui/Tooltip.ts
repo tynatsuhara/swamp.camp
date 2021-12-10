@@ -108,16 +108,13 @@ export class Tooltip extends Component {
         }
         return [
             ...this.tiles,
-            ...formatText(
-                this.text.join("\n"),
-                Color.DARK_RED,
-                this.tiles[0].position
+            ...formatText({
+                text: this.text.join("\n"),
+                color: Color.DARK_RED,
+                position: this.tiles[0].position
                     .plus(Tooltip.textOffset)
                     .plusY(-(this.text.length - 1) * (TEXT_SIZE + 4)),
-                Number.MAX_SAFE_INTEGER
-            ).map((t) => {
-                t.depth = UIStateManager.UI_SPRITE_DEPTH + 2
-                return t
+                depth: UIStateManager.UI_SPRITE_DEPTH + 2,
             }),
         ]
     }

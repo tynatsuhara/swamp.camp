@@ -1,5 +1,7 @@
 import { Point } from "brigsby/dist/Point"
 import { TextRender } from "brigsby/dist/renderer/TextRender"
+import { Color } from "./Color"
+import { UIStateManager } from "./UIStateManager"
 
 export const TEXT_PIXEL_WIDTH = 8
 export const TEXT_SIZE = 8
@@ -13,15 +15,24 @@ export const enum TextAlign {
 
 export const NO_BREAK_SPACE_CHAR = "∆"
 
-export const formatText = (
-    s: string,
-    color: string,
-    position: Point,
-    width: number,
-    alignment: TextAlign = TextAlign.LEFT,
-    lineSpacing: number = 4
-): TextRender[] => {
-    const rawRows = s.split("\n")
+export const formatText = ({
+    text,
+    position,
+    color = Color.DARK_RED,
+    width = Number.MAX_SAFE_INTEGER,
+    alignment = TextAlign.LEFT,
+    lineSpacing = 4,
+    depth = UIStateManager.UI_SPRITE_DEPTH + 1,
+}: {
+    text: string
+    position: Point
+    color?: Color
+    width?: number
+    alignment?: TextAlign
+    lineSpacing?: number
+    depth?: number
+}): TextRender[] => {
+    const rawRows = text.split("\n")
 
     const rows: string[] = []
 
@@ -54,7 +65,8 @@ export const formatText = (
             position.plus(new Point(offset, i * (TEXT_SIZE + lineSpacing))),
             TEXT_SIZE,
             TEXT_FONT,
-            color
+            color,
+            depth
         )
     })
 }

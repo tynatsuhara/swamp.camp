@@ -95,19 +95,19 @@ export class TextOverlayManager extends Component {
                     ? this.finishAction
                     : "..."
             return [
-                ...formatText(
-                    typedText,
-                    Color.WHITE,
-                    topLeft,
-                    TextOverlayManager.WIDTH,
-                    this.textAlign
-                ),
-                ...formatText(
-                    action,
-                    Color.WHITE,
-                    mouseIconPos.plus(new Point(-TEXT_PIXEL_WIDTH * action.length, 4)),
-                    TextOverlayManager.WIDTH
-                ),
+                ...formatText({
+                    text: typedText,
+                    color: Color.WHITE,
+                    position: topLeft,
+                    width: TextOverlayManager.WIDTH,
+                    alignment: this.textAlign,
+                }),
+                ...formatText({
+                    text: action,
+                    color: Color.WHITE,
+                    position: mouseIconPos.plus(new Point(-TEXT_PIXEL_WIDTH * action.length, 4)),
+                    width: TextOverlayManager.WIDTH,
+                }),
                 Tilesets.instance.oneBit
                     .getTileSource("leftClick")
                     .toImageRender(new SpriteTransform(mouseIconPos)),

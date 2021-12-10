@@ -139,14 +139,12 @@ export class DialogueDisplay extends Component {
         const margin = 12
         const width = dimensions.x - margin * 2
 
-        const lines = formatText(
-            line,
-            Color.DARK_RED,
-            topLeft.plus(new Point(margin, topOffset + margin)),
+        const lines = formatText({
+            text: line,
+            position: topLeft.plus(new Point(margin, topOffset + margin)),
             width,
-            TextAlign.CENTER
-        )
-        lines.forEach((fr) => (fr.depth = UIStateManager.UI_SPRITE_DEPTH + 1))
+            alignment: TextAlign.CENTER,
+        })
 
         backgroundTiles.forEach((tile) => this.displayEntity.addComponent(tile))
         this.displayEntity.addComponent(new BasicRenderComponent(...lines))
