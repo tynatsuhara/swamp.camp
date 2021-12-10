@@ -277,7 +277,11 @@ class ControlsWrapper extends Component {
         }
     }
 
-    vibrate = (options: GamepadVibrationOptions) => gamepadInput?.vibrate(options)
+    vibrate = (options: GamepadVibrationOptions) => {
+        if (isGamepadMode) {
+            gamepadInput?.vibrate(options)
+        }
+    }
 
     private translateToWorldSpace = (mousePos: Point) => mousePos.plus(Camera.instance.position)
 

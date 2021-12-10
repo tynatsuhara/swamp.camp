@@ -2,7 +2,9 @@ import { assets } from "brigsby/dist/Assets"
 import { Lists } from "brigsby/dist/util/Lists"
 import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
 import { Dude } from "../characters/Dude"
+import { DudeType } from "../characters/DudeFactory"
 import { Player } from "../characters/Player"
+import { controls } from "../Controls"
 import { GroundType } from "../world/ground/Ground"
 import { LocationManager } from "../world/LocationManager"
 import { Sounds } from "./Sounds"
@@ -94,6 +96,13 @@ export class StepSounds {
                 return [StepSounds.MUD, 0.3]
             case GroundType.WATER:
             case GroundType.WATERFALL:
+                if (dude.type === DudeType.PLAYER) {
+                    controls.vibrate({
+                        duration: 70,
+                        strongMagnitude: 0,
+                        weakMagnitude: 0.075,
+                    })
+                }
                 const waterVolume = 0.035
                 return Lists.oneOf([
                     [StepSounds.WATER_1, waterVolume],

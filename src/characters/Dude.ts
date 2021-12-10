@@ -11,6 +11,7 @@ import { Animator } from "brigsby/dist/util/Animator"
 import { Lists } from "brigsby/dist/util/Lists"
 import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
 import { StepSounds } from "../audio/StepSounds"
+import { controls } from "../Controls"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { DeathCutscene } from "../cutscenes/DeathCutscene"
 import { IntroCutscene } from "../cutscenes/IntroCutscene"
@@ -751,6 +752,12 @@ export class Dude extends Component implements DialogueSource {
 
     // has a rolling animation, however janky
     private doRoll() {
+        controls.vibrate({
+            duration: 100,
+            strongMagnitude: 0.2,
+            weakMagnitude: 0.2,
+        })
+
         const setRotation = (rot: number, offset: Point) => {
             if (this.animation.transform.mirrorX) {
                 this.animation.transform.rotation = -rot
@@ -813,6 +820,13 @@ export class Dude extends Component implements DialogueSource {
                 this.animationDirty = true
                 this.jumpingAnimator = undefined
                 this.jumpingOffset = 0
+                if (this.type === DudeType.PLAYER) {
+                    controls.vibrate({
+                        duration: 100,
+                        strongMagnitude: 0,
+                        weakMagnitude: 0.5,
+                    })
+                }
             }
         )
     }

@@ -40,6 +40,11 @@ export class Player extends Component {
             } else {
                 Camera.instance.shake(3.5, 400)
             }
+            controls.vibrate({
+                duration: 300,
+                strongMagnitude: 0.5,
+                weakMagnitude: 0.5,
+            })
         })
         this.dude.droppedItemSupplier = () => []
     }

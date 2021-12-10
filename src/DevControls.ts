@@ -6,6 +6,7 @@ import { Condition } from "./characters/Condition"
 import { DudeFactory, DudeType } from "./characters/DudeFactory"
 import { DudeSpawner } from "./characters/DudeSpawner"
 import { Player } from "./characters/Player"
+import { controls } from "./Controls"
 import { pixelPtToTilePt } from "./graphics/Tilesets"
 import { GroundType } from "./world/ground/Ground"
 import { LocationManager } from "./world/LocationManager"
@@ -103,6 +104,14 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
             ),
     ],
 ]
+
+window["vibrate"] = (duration: number, strongMagnitude: number, weakMagnitude: number) => {
+    controls.vibrate({
+        duration,
+        strongMagnitude,
+        weakMagnitude,
+    })
+}
 
 export class DevControls extends Component {
     update(updateData: UpdateData) {

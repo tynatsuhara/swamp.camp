@@ -5,6 +5,7 @@ import { Point } from "brigsby/dist/Point"
 import { TextRender } from "brigsby/dist/renderer/TextRender"
 import { NineSlice } from "brigsby/dist/sprites/NineSlice"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
@@ -128,6 +129,11 @@ export class NotificationDisplay extends Component {
     }
 
     push(notification: Notification) {
+        controls.vibrate({
+            duration: 50,
+            strongMagnitude: 1,
+            weakMagnitude: 0,
+        })
         const component = new NotificationComponent(notification)
         this.nComponents.push(component)
         new Entity([component])
