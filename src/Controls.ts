@@ -53,9 +53,6 @@ const check = <T>(handlers: InputHandlers<T>) => {
     const gamepadResult = handlers.gamepad()
     if (gamepadResult) {
         isGamepadMode = true
-        if (!gamepadMousePos) {
-            gamepadMousePos = input.mousePos
-        }
     }
 
     return gamepadResult
@@ -103,16 +100,14 @@ class ControlsWrapper extends Component {
             return
         }
 
-        if (!gamepadMousePos) {
-            gamepadMousePos = input.mousePos
-        }
+        const currentGamePadMousePos = this.getMousePos()
 
         // Both left and right stick can be used for mouse
         const leftStick = deaden(gamepadInput.getLeftAxes())
         const rightStick = deaden(gamepadInput.getRightAxes())
         const stickInput = leftStick.plus(rightStick).times(CURSOR_SENSITIVITY)
 
-        const adjustedPos = gamepadMousePos.plus(stickInput)
+        const adjustedPos = currentGamePadMousePos.plus(stickInput)
         const bounds = Camera.instance.dimensions.minus(new Point(3, 3))
         gamepadMousePos = new Point(
             Maths.clamp(adjustedPos.x, 0, bounds.x),
@@ -263,7 +258,13 @@ class ControlsWrapper extends Component {
         })
 
     getMousePos = () => {
-        return isGamepadMode ? gamepadMousePos : input.mousePos
+        if (isGamepadMode) {
+            if (!gamepadMousePos) {
+                gamepadMousePos = input.mousePos
+            }
+            return gamepadMousePos
+        }
+        return input.mousePos
     }
 
     getWorldSpaceMousePos = () => {
