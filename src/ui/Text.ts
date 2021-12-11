@@ -19,15 +19,21 @@ export const enum TextAlign {
 
 export const NO_BREAK_SPACE_CHAR = "∆"
 
-// All icon placeholders must start with λ and be 2 characters wide
-const ICON_PLACEHOLDER_PREFIX = "λ"
-const ICON_PLACEHOLDER_REGEX = /λ./g
+/**
+ * A special string which will be replaced with a sprite.
+ * All icon values must start with "λ", be 2 characters long,
+ * and have a corresponding entry in {@link ICON_PLACEHOLDER_MAP}
+ */
 export enum TextIcon {
     GAMEPAD_UP = "λ1",
     GAMEPAD_X = "λx",
     GAMEPAD_SQUARE = "λ2",
     GAMEPAD_TRIANGLE = "λ3",
 }
+
+const ICON_PLACEHOLDER_PREFIX = "λ"
+const ICON_PLACEHOLDER_REGEX = /λ./g
+
 // maps placeholder -> one bit key
 const ICON_PLACEHOLDER_MAP = {
     [TextIcon.GAMEPAD_UP]: "gamepad-up",

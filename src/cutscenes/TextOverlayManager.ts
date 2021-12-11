@@ -109,7 +109,7 @@ export class TextOverlayManager extends Component {
                     width: TextOverlayManager.WIDTH,
                 }),
                 Tilesets.instance.oneBit
-                    .getTileSource("leftClick")
+                    .getTileSource(controls.isGamepadMode() ? "gamepad-x" : "leftClick")
                     .toImageRender(new SpriteTransform(mouseIconPos)),
             ]
         }
