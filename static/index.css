@@ -1,7 +1,6 @@
 html,
 body {
     margin: 0;
-    background-color: #222;
     height: 100%;
     -webkit-font-smoothing: none;
     -moz-osx-font-smoothing: none;
@@ -25,6 +24,12 @@ body {
 #canvas {
     width: 100%;
     height: 100%;
+}
+
+#canvas,
+html,
+body {
+    background-color: #222;
 }
 
 canvas {
