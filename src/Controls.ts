@@ -124,11 +124,11 @@ class ControlsWrapper extends Component {
 
     isInventoryButtonDown = () =>
         check({
-            kbm: () => input.isKeyDown(InputKey.TAB),
+            kbm: () => input.isKeyDown(InputKey.Q),
             gamepad: () => gamepadInput.isButtonDown(GamepadButton.UP),
         })
 
-    getInventoryButtonString = () => (isGamepadMode ? TextIcon.GAMEPAD_UP : "[TAB]")
+    getInventoryButtonString = () => (isGamepadMode ? TextIcon.GAMEPAD_UP : "[q]")
 
     isInventoryOptionOneDown = () =>
         check({
@@ -162,13 +162,13 @@ class ControlsWrapper extends Component {
 
     isCloseMenuButtonDown = () =>
         check({
-            kbm: () => input.isKeyDown(InputKey.ESC),
+            kbm: () => input.isKeyDown(InputKey.TAB),
             gamepad: () => gamepadInput.isButtonDown(GamepadButton.CIRCLE),
         })
 
     isOpenPauseMenuButtonDown = () =>
         check({
-            kbm: () => input.isKeyDown(InputKey.ESC),
+            kbm: () => input.isKeyDown(InputKey.TAB),
             gamepad: () => gamepadInput.isButtonDown(GamepadButton.START),
         })
 

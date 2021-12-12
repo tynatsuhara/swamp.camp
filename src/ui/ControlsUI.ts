@@ -26,7 +26,7 @@ const format = (text: string, position: Point) =>
     formatText({
         text,
         color: Color.WHITE,
-        position: position.plusY(4),
+        position: position.plusY(5),
         width: COLUMN_WIDTH,
         alignment: TextAlign.CENTER,
     })
@@ -81,7 +81,7 @@ const CONTROLS: { [key: string]: ControlRender } = {
             new ButtonIndicator(pos.plusX(ICON_OFFSET), GamepadButton.CIRCLE).getRenderMethods(),
     },
     [`Inventory`]: {
-        kbm: (pos) => format("TAB", pos),
+        kbm: (pos) => format("Q", pos),
         gamepad: (pos) =>
             new ButtonIndicator(pos.plusX(ICON_OFFSET), GamepadButton.UP).getRenderMethods(),
     },
@@ -95,11 +95,15 @@ const CONTROLS: { [key: string]: ControlRender } = {
         gamepad: (pos) =>
             new ButtonIndicator(pos.plusX(ICON_OFFSET), GamepadButton.DOWN).getRenderMethods(),
     },
+    [`Options`]: {
+        kbm: (pos) => format("TAB", pos),
+        gamepad: (pos) => format("START", pos),
+    },
 }
 
 const COLUMN_WIDTH = 90
 const ICON_OFFSET = (COLUMN_WIDTH - TILE_SIZE) / 2
-const ROW_HEIGHT = 18
+const ROW_HEIGHT = 17
 
 export class ControlsUI extends Component {
     /**
