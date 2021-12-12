@@ -12,6 +12,11 @@ import { Color } from "./Color"
 import { ControlsUI } from "./ControlsUI"
 import { UIStateManager } from "./UIStateManager"
 
+type PauseOption = {
+    text: string
+    fn: () => void
+}
+
 export class PauseMenu extends Component {
     private readonly e: Entity = new Entity([this]) // entity for this component
     private displayEntity: Entity
@@ -29,6 +34,8 @@ export class PauseMenu extends Component {
             this.close()
         } else if (pressPauseButton && !UIStateManager.instance.isMenuOpen) {
             this.open()
+        } else if (this.isOpen) {
+            this.refresh()
         }
     }
 
@@ -37,8 +44,12 @@ export class PauseMenu extends Component {
         this.displayEntity = null
     }
 
+    private refresh() {
+        this.open()
+    }
+
     open() {
-        const buttons = [
+        const buttons: PauseOption[] = [
             {
                 text: "SAVE GAME",
                 fn: () => saveManager.save(),
@@ -59,7 +70,6 @@ export class PauseMenu extends Component {
                     } else {
                         Settings.increaseMusicVolume()
                     }
-                    this.open() // refresh
                 },
             },
             {
@@ -70,7 +80,6 @@ export class PauseMenu extends Component {
                     } else {
                         Settings.increaseSoundVolume()
                     }
-                    this.open() // refresh
                 },
             },
             {
@@ -81,9 +90,9 @@ export class PauseMenu extends Component {
                     } else {
                         Settings.increaseAmbienceVolume()
                     }
-                    this.open() // refresh
                 },
             },
+            this.getFullScreenOption(),
             {
                 text: `MAIN MENU`,
                 fn: () => QuestGame.instance.loadMainMenu(),
@@ -116,6 +125,32 @@ export class PauseMenu extends Component {
             () => {},
             () => [controlsUI]
         )
+    }
+
+    private getFullScreenOption(): PauseOption {
+        const canvas = document.getElementById("canvas")
+        if (document.fullscreenElement) {
+            return {
+                text: `FULL-SCREEN: ON`,
+                fn: () =>
+                    document.exitFullscreen().then(() => {
+                        console.log("fullscreen disabled")
+                    }),
+            }
+        } else {
+            return {
+                text: `FULL-SCREEN: OFF`,
+                fn: () => {
+                    canvas
+                        .requestFullscreen({
+                            navigationUI: "hide",
+                        })
+                        .then(() => {
+                            console.log("fullscreen enabled")
+                        })
+                },
+            }
+        }
     }
 
     getEntities(): Entity[] {
