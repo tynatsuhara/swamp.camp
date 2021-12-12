@@ -2,6 +2,7 @@ import { Component } from "brigsby/dist/Component"
 import { UpdateData } from "brigsby/dist/Engine"
 import { Entity } from "brigsby/dist/Entity"
 import { controls } from "../Controls"
+import { Camera } from "../cutscenes/Camera"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
 import { QuestGame } from "../quest_game"
@@ -113,7 +114,8 @@ export class PauseMenu extends Component {
                 buttonColor,
                 textColor,
                 hoverColor,
-            }))
+            })),
+            Camera.instance.dimensions.div(2)
         )
     }
 

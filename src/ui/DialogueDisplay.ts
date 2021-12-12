@@ -23,6 +23,9 @@ import { UIStateManager } from "./UIStateManager"
 export class DialogueDisplay extends Component {
     static instance: DialogueDisplay
 
+    private static readonly TEXT_BOX_DIMENSIONS = new Point(288, 83)
+    private static readonly PADDING = TILE_SIZE
+
     private dialogueSource: DialogueSource
     private e: Entity = new Entity([this])
     private displayEntity: Entity
@@ -120,24 +123,24 @@ export class DialogueDisplay extends Component {
     }
 
     private renderNextLine(line: string) {
-        const dimensions = new Point(288, 83)
-        const bottomBuffer = TILE_SIZE
         const screenDimensions = Camera.instance.dimensions
         const topLeft = new Point(
-            Math.floor(screenDimensions.x / 2 - dimensions.x / 2),
-            Math.floor(screenDimensions.y - dimensions.y - bottomBuffer)
+            Math.floor(screenDimensions.x / 2 - DialogueDisplay.TEXT_BOX_DIMENSIONS.x / 2),
+            Math.floor(
+                screenDimensions.y - DialogueDisplay.TEXT_BOX_DIMENSIONS.y - DialogueDisplay.PADDING
+            )
         )
 
         const backgroundTiles = NineSlice.makeStretchedNineSliceComponents(
             Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"),
             topLeft,
-            dimensions
+            DialogueDisplay.TEXT_BOX_DIMENSIONS
         )
         backgroundTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
 
         const topOffset = 2
         const margin = 12
-        const width = dimensions.x - margin * 2
+        const width = DialogueDisplay.TEXT_BOX_DIMENSIONS.x - margin * 2
 
         const lines = formatText({
             text: line,
@@ -156,6 +159,15 @@ export class DialogueDisplay extends Component {
         // provide some buffer to prevent misclicks
         const canClickTime = this.optionsPopupTime + 350
 
+        const centeredButtonMenuPos = new Point(
+            Camera.instance.dimensions.x / 2,
+            DialogueDisplay.PADDING +
+                (Camera.instance.dimensions.y -
+                    DialogueDisplay.TEXT_BOX_DIMENSIONS.y -
+                    DialogueDisplay.PADDING) /
+                    2
+        )
+
         this.optionsEntity = ButtonsMenu.render(
             "white",
             this.dialogue.options.map((o) => {
@@ -170,7 +182,8 @@ export class DialogueDisplay extends Component {
                     textColor: Color.WHITE,
                     hoverColor: Color.DARK_RED,
                 }
-            })
+            }),
+            centeredButtonMenuPos
         )
     }
 }

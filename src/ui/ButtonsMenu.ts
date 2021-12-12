@@ -1,7 +1,6 @@
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { NineSlice } from "brigsby/dist/sprites/NineSlice"
-import { Camera } from "../cutscenes/Camera"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { TEXT_PIXEL_WIDTH } from "./Text"
 import { TextButton } from "./TextButton"
@@ -20,7 +19,7 @@ export const ButtonsMenu = {
     render: (
         backgroundColor: "red" | "white",
         options: OptionButton[],
-        offset: Point = Point.ZERO
+        centerPos: Point
     ): Entity => {
         const longestOption = Math.max(...options.map((o) => o.text.length))
 
@@ -37,7 +36,7 @@ export const ButtonsMenu = {
                 marginBottom
         )
 
-        const topLeft = Camera.instance.dimensions.div(2).minus(dimensions.div(2)).plus(offset)
+        const topLeft = centerPos.minus(dimensions.div(2))
 
         const backgroundTiles = NineSlice.makeStretchedNineSliceComponents(
             backgroundColor === "red"
