@@ -140,7 +140,7 @@ export class DudeSpawner extends Component {
                 NotificationDisplay.instance.push({
                     text: "Orc siege!",
                     icon: "sword",
-                    isExpired: () => orcs.every((orc) => !orc.isAlive),
+                    isExpired: () => orcs.every((orc) => !orc.isAlive || !orc.entity),
                 }),
             6500
         )

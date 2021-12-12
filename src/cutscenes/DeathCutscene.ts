@@ -64,9 +64,10 @@ export class DeathCutscene extends Component {
         const dudes = LocationManager.instance.currentLocation.dudes
         dudes.forEach((d) => {
             if (d.entity.getComponent(Enemy)) {
-                dudes.delete(d)
+                d.entity.selfDestruct()
+            } else {
+                d.entity.getComponent(ShroomNPC)?.delayTime(timeUntilRespawn)
             }
-            d.entity.getComponent(ShroomNPC)?.delayTime(timeUntilRespawn)
         })
 
         // TODO take away resources, impact town stats, etc
