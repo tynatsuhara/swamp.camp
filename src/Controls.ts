@@ -309,6 +309,10 @@ class ControlsWrapper extends Component {
         }
     }
 
+    isGamepadButton = (button: GamepadButton, state: ButtonState) => {
+        return isGamepadMode ? gamepadInput.isButton(button, state) : false
+    }
+
     private translateToWorldSpace = (mousePos: Point) => mousePos.plus(Camera.instance.position)
 
     /**

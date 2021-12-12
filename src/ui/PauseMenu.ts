@@ -1,6 +1,7 @@
 import { Component } from "brigsby/dist/Component"
 import { UpdateData } from "brigsby/dist/Engine"
 import { Entity } from "brigsby/dist/Entity"
+import { ButtonState, GamepadButton } from "brigsby/dist/Input"
 import { controls } from "../Controls"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
@@ -36,6 +37,11 @@ export class PauseMenu extends Component {
             this.open()
         } else if (this.isOpen) {
             this.refresh()
+        }
+
+        // toggle fullscreen gamepad shortcut
+        if (controls.isGamepadButton(GamepadButton.SELECT, ButtonState.DOWN)) {
+            this.getFullScreenOption().fn()
         }
     }
 
