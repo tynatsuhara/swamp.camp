@@ -45,7 +45,7 @@ export const ButtonsMenu = {
             topLeft,
             dimensions
         )
-        backgroundTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
+        backgroundTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH + 1
 
         const e = new Entity()
 
