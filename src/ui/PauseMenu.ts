@@ -2,22 +2,18 @@ import { Component } from "brigsby/dist/Component"
 import { UpdateData } from "brigsby/dist/Engine"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
-import { BasicRenderComponent } from "brigsby/dist/renderer/BasicRenderComponent"
 import { controls } from "../Controls"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
-import { TILE_SIZE } from "../graphics/Tilesets"
 import { QuestGame } from "../quest_game"
 import { saveManager } from "../SaveManager"
 import { Settings } from "../Settings"
 import { ButtonsMenu } from "./ButtonsMenu"
 import { Color } from "./Color"
-import { makeControlsUI } from "./ControlsUI"
 import { UIStateManager } from "./UIStateManager"
 
 export class PauseMenu extends Component {
     private readonly e: Entity = new Entity([this]) // entity for this component
     private displayEntity: Entity
-    private controlsDisplay: Entity
     private isShiftDown: boolean
     isOpen = false
 
@@ -38,9 +34,9 @@ export class PauseMenu extends Component {
     close() {
         this.isOpen = false
         this.displayEntity = null
-        this.controlsDisplay = null
     }
 
+    // TODO: Stop passing dimensions param
     open(dimensions: Point) {
         const buttons = [
             {
@@ -104,16 +100,11 @@ export class PauseMenu extends Component {
                 buttonColor,
                 textColor,
                 hoverColor,
-            })),
-            new Point(0, 20)
+            }))
         )
-
-        this.controlsDisplay = new Entity([
-            new BasicRenderComponent(...makeControlsUI(dimensions, new Point(0, -TILE_SIZE / 2))),
-        ])
     }
 
     getEntities(): Entity[] {
-        return [this.e, this.displayEntity, this.controlsDisplay]
+        return [this.e, this.displayEntity]
     }
 }

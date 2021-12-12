@@ -1,22 +1,22 @@
 import { Component } from "brigsby/dist/Component"
 import { UpdateData } from "brigsby/dist/Engine"
-import { CutscenePlayerController } from "./CutscenePlayerController"
-import { Player } from "../characters/Player"
 import { Point } from "brigsby/dist/Point"
+import { BasicRenderComponent } from "brigsby/dist/renderer/BasicRenderComponent"
+import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { DIP_STARTING_DIALOGUE } from "../characters/dialogue/DipDialogue"
+import { Dude } from "../characters/Dude"
+import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
+import { DudeFaction, DudeFactory, DudeType } from "../characters/DudeFactory"
+import { Player } from "../characters/Player"
+import { TILE_SIZE } from "../graphics/Tilesets"
+import { saveManager } from "../SaveManager"
+import { makeControlsUI } from "../ui/ControlsUI"
+import { HUD } from "../ui/HUD"
+import { LocationManager } from "../world/LocationManager"
 import { Camera } from "./Camera"
 import { CutsceneManager } from "./CutsceneManager"
-import { Dude } from "../characters/Dude"
-import { LocationManager } from "../world/LocationManager"
-import { DudeFaction, DudeFactory, DudeType } from "../characters/DudeFactory"
-import { makeControlsUI } from "../ui/ControlsUI"
-import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
-import { DIP_STARTING_DIALOGUE } from "../characters/dialogue/DipDialogue"
+import { CutscenePlayerController } from "./CutscenePlayerController"
 import { TextOverlayManager } from "./TextOverlayManager"
-import { TILE_SIZE } from "../graphics/Tilesets"
-import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
-import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
-import { saveManager } from "../SaveManager"
-import { HUD } from "../ui/HUD"
 
 // This is the cutscene that plays when the player arrives in the new land
 export class IntroCutscene extends Component {
@@ -25,12 +25,10 @@ export class IntroCutscene extends Component {
     private readonly STOP_WALKING_IN = this.START_WALKING_IN + 2000
     private readonly PAN_TO_DIP = this.STOP_WALKING_IN + 750
     private readonly PAN_BACK = this.PAN_TO_DIP + 2000
-    private readonly HIDE_CONTROLS = this.PAN_BACK + 7000
 
     private waitingForOrcsToDie = false
     private orcs: Dude[]
     private dip: Dude
-    private showControls = false
 
     /**
      * 1. position player in corner
@@ -64,42 +62,51 @@ export class IntroCutscene extends Component {
 
         const centerPos = new Point(Camera.instance.dimensions.x / 2, TextOverlayManager.TOP_BORDER)
 
-        TextOverlayManager.instance.enable(
-            [
-                `Champion, your time has come!
+        const charactersAtTop = [
+            characterAnimation(
+                "MountainKing",
+                SpriteTransform.new({ position: centerPos.plusX(-35) })
+            ),
+            characterAnimation(
+                "knight_f",
+                SpriteTransform.new({
+                    position: centerPos.plusX(9),
+                    mirrorX: true,
+                })
+            ),
+        ]
+
+        const text = [
+            `Champion, your time has come!
 
 Our explorers have discovered a vast swampland, untamed and full of precious resources.
 
 We believe that the Kingdom could benefit greatly from establishing a settlement in these uncharted lands.`,
-                `... 
+            `... 
 
 However, due to budgetary constraints, you'll be going alone. 
 
 Once you establish a camp and begin demonstrating value, we shall send more settlers and grow the camp into a colony!`,
-                `...
+            `...
 
 One other thing - We believe that several other factions may be vying for control of these lands. Form alliances or engage them in battle as you deem necessary.`,
-                `...
+            `...
 
 ANOTHER thing - Only one of the explorers returned, and she reported that her colleagues were devoured by demons in the night.`,
-                `...`,
-                `Good luck. Go now, venture into the swamp, and bring glory to the Kingdom!`,
-            ],
+            `...`,
+            `Good luck. Go now, venture into the swamp, and bring glory to the Kingdom!`,
+            "", // blank page to show controls
+        ]
+
+        const controlsUI = new BasicRenderComponent(
+            ...makeControlsUI(TextOverlayManager.VERTICAL_MARGIN)
+        )
+
+        TextOverlayManager.instance.enable(
+            text,
             "START",
             () => HUD.instance.locationTransition.transition(() => this.cutscene(), 100, true),
-            [
-                characterAnimation(
-                    "MountainKing",
-                    SpriteTransform.new({ position: centerPos.plusX(-35) })
-                ),
-                characterAnimation(
-                    "knight_f",
-                    SpriteTransform.new({
-                        position: centerPos.plusX(9),
-                        mirrorX: true,
-                    })
-                ),
-            ]
+            (index) => [...charactersAtTop, index === text.length - 1 ? controlsUI : undefined]
         )
     }
 
@@ -123,14 +130,9 @@ ANOTHER thing - Only one of the explorers returned, and she reported that her co
         }, this.PAN_TO_DIP)
 
         setTimeout(() => {
-            this.showControls = true
             Camera.instance.focusOnDude(Player.instance.dude)
             this.waitingForOrcsToDie = true
         }, this.PAN_BACK)
-
-        setTimeout(() => {
-            this.showControls = false
-        }, this.HIDE_CONTROLS)
     }
 
     update(updateData: UpdateData) {
@@ -151,12 +153,5 @@ ANOTHER thing - Only one of the explorers returned, and she reported that her co
             CutsceneManager.instance.finishCutscene()
             saveManager.save()
         }
-    }
-
-    getRenderMethods(): RenderMethod[] {
-        if (this.showControls) {
-            return makeControlsUI(Camera.instance.dimensions, Camera.instance.position)
-        }
-        return []
     }
 }

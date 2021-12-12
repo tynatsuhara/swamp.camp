@@ -1,21 +1,21 @@
 import { Component } from "brigsby/dist/Component"
 import { Point } from "brigsby/dist/Point"
-import { Camera } from "./Camera"
-import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Lists } from "brigsby/dist/util/Lists"
-import { HUD } from "../ui/HUD"
-import { TextOverlayManager } from "./TextOverlayManager"
-import { WorldTime } from "../world/WorldTime"
-import { TimeUnit } from "../world/TimeUnit"
-import { DarknessMask } from "../world/DarknessMask"
 import { Player } from "../characters/Player"
-import { LocationManager } from "../world/LocationManager"
 import { Enemy } from "../characters/types/Enemy"
-import { TextAlign } from "../ui/Text"
-import { CutsceneManager } from "./CutsceneManager"
-import { saveManager } from "../SaveManager"
 import { ShroomNPC } from "../characters/types/ShroomNPC"
+import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { saveManager } from "../SaveManager"
+import { HUD } from "../ui/HUD"
+import { TextAlign } from "../ui/Text"
+import { DarknessMask } from "../world/DarknessMask"
+import { LocationManager } from "../world/LocationManager"
+import { TimeUnit } from "../world/TimeUnit"
+import { WorldTime } from "../world/WorldTime"
+import { Camera } from "./Camera"
+import { CutsceneManager } from "./CutsceneManager"
+import { TextOverlayManager } from "./TextOverlayManager"
 
 // This is the cutscene that plays when the player dies
 export class DeathCutscene extends Component {
@@ -46,7 +46,7 @@ export class DeathCutscene extends Component {
                     [text],
                     button,
                     () => this.respawn(),
-                    [deathIcon],
+                    () => [deathIcon],
                     TextAlign.CENTER
                 )
             }, this.TRANSITION_PAUSE)

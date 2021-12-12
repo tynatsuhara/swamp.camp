@@ -17,14 +17,15 @@ export class TextOverlayManager extends Component {
     }
 
     private static readonly WIDTH = 240
-    private static readonly VERTICAL_MARGIN = 88
+
+    static readonly VERTICAL_MARGIN = 88
     // the bottom of any icons should line up with this Y coordinate
     static readonly TOP_BORDER = TextOverlayManager.VERTICAL_MARGIN - TILE_SIZE
 
     private text: TextTyper[]
     private finishAction: string
     private onFinish: () => void
-    private additionalComponents: Component[] = []
+    private additionalComponents: (index: number) => Component[]
     private textAlign: TextAlign
 
     private index = 0
@@ -43,7 +44,7 @@ export class TextOverlayManager extends Component {
         text: string[],
         finishAction: string,
         onFinish: () => void,
-        additionalComponents: Component[] = [],
+        additionalComponents: (index: number) => Component[] = () => [],
         textAlign: TextAlign = TextAlign.LEFT
     ) {
         this.index = 0
@@ -116,6 +117,6 @@ export class TextOverlayManager extends Component {
     }
 
     getEntity() {
-        return new Entity([this, ...this.additionalComponents])
+        return new Entity([this, ...this.additionalComponents(this.index)])
     }
 }

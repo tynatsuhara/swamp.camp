@@ -203,25 +203,25 @@ class ControlsWrapper extends Component {
 
     isWalkUpHeld = () =>
         check({
-            kbm: () => input.isKeyHeld(Controls.walkUp),
+            kbm: () => input.isKeyHeld(InputKey.W),
             gamepad: () => gamepadInput.getLeftAxes().y < -AXIS_DEAD_ZONE,
         })
 
     isWalkDownHeld = () =>
         check({
-            kbm: () => input.isKeyHeld(Controls.walkDown),
+            kbm: () => input.isKeyHeld(InputKey.S),
             gamepad: () => gamepadInput.getLeftAxes().y > AXIS_DEAD_ZONE,
         })
 
     isWalkLeftHeld = () =>
         check({
-            kbm: () => input.isKeyHeld(Controls.walkLeft),
+            kbm: () => input.isKeyHeld(InputKey.A),
             gamepad: () => gamepadInput.getLeftAxes().x < -AXIS_DEAD_ZONE,
         })
 
     isWalkRightHeld = () =>
         check({
-            kbm: () => input.isKeyHeld(Controls.walkRight),
+            kbm: () => input.isKeyHeld(InputKey.D),
             gamepad: () => gamepadInput.getLeftAxes().x > AXIS_DEAD_ZONE,
         })
 
@@ -326,12 +326,3 @@ class ControlsWrapper extends Component {
  * components which need to check for user input.
  */
 export const controls = new Entity().addComponent(new ControlsWrapper())
-
-export const Controls = {
-    // TODO these are still used for UI — need to move that logic here as well
-    walkUp: InputKey.W,
-    walkDown: InputKey.S,
-    walkLeft: InputKey.A,
-    walkRight: InputKey.D,
-    // inventoryButton: InputKey.TAB,
-}
