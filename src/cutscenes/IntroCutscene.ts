@@ -127,6 +127,7 @@ ANOTHER thing - Only one of the explorers returned, and she reported that her co
         }, this.PAN_TO_DIP)
 
         setTimeout(() => {
+            this.dip.dialogue = DIP_STARTING_DIALOGUE
             Camera.instance.focusOnDude(Player.instance.dude)
             this.waitingForOrcsToDie = true
         }, this.PAN_BACK)
@@ -146,7 +147,6 @@ ANOTHER thing - Only one of the explorers returned, and she reported that her co
         // TODO prevent the player from going to a different location until this is over
 
         if (!this.orcs.some((o) => o.isAlive)) {
-            this.dip.dialogue = DIP_STARTING_DIALOGUE
             CutsceneManager.instance.finishCutscene()
             saveManager.save()
         }
