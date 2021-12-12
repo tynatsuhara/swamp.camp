@@ -1,6 +1,7 @@
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { NineSlice } from "brigsby/dist/sprites/NineSlice"
+import { Camera } from "../cutscenes/Camera"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { TEXT_PIXEL_WIDTH } from "./Text"
 import { TextButton } from "./TextButton"
@@ -17,7 +18,6 @@ export type OptionButton = {
 // TODO: Update this to use the color replace filter instead of different sprites
 export const ButtonsMenu = {
     render: (
-        screenDimensions: Point,
         backgroundColor: "red" | "white",
         options: OptionButton[],
         offset: Point = Point.ZERO
@@ -37,7 +37,7 @@ export const ButtonsMenu = {
                 marginBottom
         )
 
-        const topLeft = screenDimensions.div(2).minus(dimensions.div(2)).plus(offset)
+        const topLeft = Camera.instance.dimensions.div(2).minus(dimensions.div(2)).plus(offset)
 
         const backgroundTiles = NineSlice.makeStretchedNineSliceComponents(
             backgroundColor === "red"

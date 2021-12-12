@@ -1,7 +1,6 @@
 import { Component } from "brigsby/dist/Component"
 import { UpdateData } from "brigsby/dist/Engine"
 import { Entity } from "brigsby/dist/Entity"
-import { Point } from "brigsby/dist/Point"
 import { controls } from "../Controls"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { QuestGame } from "../quest_game"
@@ -27,7 +26,7 @@ export class PauseMenu extends Component {
         ) {
             this.close()
         } else if (pressPauseButton && !UIStateManager.instance.isMenuOpen) {
-            this.open(updateData.dimensions)
+            this.open()
         }
     }
 
@@ -36,8 +35,7 @@ export class PauseMenu extends Component {
         this.displayEntity = null
     }
 
-    // TODO: Stop passing dimensions param
-    open(dimensions: Point) {
+    open() {
         const buttons = [
             {
                 text: "SAVE GAME",
@@ -55,7 +53,7 @@ export class PauseMenu extends Component {
                     } else {
                         Settings.increaseMusicVolume()
                     }
-                    this.open(dimensions) // refresh
+                    this.open() // refresh
                 },
             },
             {
@@ -66,7 +64,7 @@ export class PauseMenu extends Component {
                     } else {
                         Settings.increaseSoundVolume()
                     }
-                    this.open(dimensions) // refresh
+                    this.open() // refresh
                 },
             },
             {
@@ -77,7 +75,7 @@ export class PauseMenu extends Component {
                     } else {
                         Settings.increaseAmbienceVolume()
                     }
-                    this.open(dimensions) // refresh
+                    this.open() // refresh
                 },
             },
             {
@@ -93,7 +91,6 @@ export class PauseMenu extends Component {
         const hoverColor = Color.WHITE
 
         this.displayEntity = ButtonsMenu.render(
-            dimensions,
             "red",
             buttons.map((obj) => ({
                 ...obj,

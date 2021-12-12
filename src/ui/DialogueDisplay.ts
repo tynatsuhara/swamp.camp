@@ -157,7 +157,6 @@ export class DialogueDisplay extends Component {
         const canClickTime = this.optionsPopupTime + 350
 
         this.optionsEntity = ButtonsMenu.render(
-            Camera.instance.dimensions,
             "white",
             this.dialogue.options.map((o) => {
                 return {
