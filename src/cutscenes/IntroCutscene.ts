@@ -1,7 +1,6 @@
 import { Component } from "brigsby/dist/Component"
 import { UpdateData } from "brigsby/dist/Engine"
 import { Point } from "brigsby/dist/Point"
-import { BasicRenderComponent } from "brigsby/dist/renderer/BasicRenderComponent"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { DIP_STARTING_DIALOGUE } from "../characters/dialogue/DipDialogue"
 import { Dude } from "../characters/Dude"
@@ -10,7 +9,7 @@ import { DudeFaction, DudeFactory, DudeType } from "../characters/DudeFactory"
 import { Player } from "../characters/Player"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { saveManager } from "../SaveManager"
-import { makeControlsUI } from "../ui/ControlsUI"
+import { ControlsUI } from "../ui/ControlsUI"
 import { HUD } from "../ui/HUD"
 import { LocationManager } from "../world/LocationManager"
 import { Camera } from "./Camera"
@@ -98,9 +97,7 @@ ANOTHER thing - Only one of the explorers returned, and she reported that her co
             "", // blank page to show controls
         ]
 
-        const controlsUI = new BasicRenderComponent(
-            ...makeControlsUI(TextOverlayManager.VERTICAL_MARGIN)
-        )
+        const controlsUI = new ControlsUI(TextOverlayManager.VERTICAL_MARGIN)
 
         TextOverlayManager.instance.enable(
             text,

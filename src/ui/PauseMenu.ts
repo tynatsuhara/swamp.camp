@@ -3,11 +3,13 @@ import { UpdateData } from "brigsby/dist/Engine"
 import { Entity } from "brigsby/dist/Entity"
 import { controls } from "../Controls"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
+import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
 import { QuestGame } from "../quest_game"
 import { saveManager } from "../SaveManager"
 import { Settings } from "../Settings"
 import { ButtonsMenu } from "./ButtonsMenu"
 import { Color } from "./Color"
+import { ControlsUI } from "./ControlsUI"
 import { UIStateManager } from "./UIStateManager"
 
 export class PauseMenu extends Component {
@@ -44,6 +46,10 @@ export class PauseMenu extends Component {
             {
                 text: "LOAD LAST SAVE",
                 fn: () => saveManager.load(),
+            },
+            {
+                text: "VIEW CONTROLS",
+                fn: () => this.showControls(),
             },
             {
                 text: `MUSIC (${Settings.getMusicVolume() * 100}%)`,
@@ -98,6 +104,17 @@ export class PauseMenu extends Component {
                 textColor,
                 hoverColor,
             }))
+        )
+    }
+
+    private showControls() {
+        const controlsUI = new ControlsUI(TextOverlayManager.VERTICAL_MARGIN)
+
+        TextOverlayManager.instance.enable(
+            [""],
+            "COOL",
+            () => {},
+            () => [controlsUI]
         )
     }
 

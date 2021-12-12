@@ -1,3 +1,4 @@
+import { Component } from "brigsby/dist/Component"
 import { GamepadButton } from "brigsby/dist/Input"
 import { Point } from "brigsby/dist/Point"
 import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
@@ -100,26 +101,32 @@ const COLUMN_WIDTH = 90
 const ICON_OFFSET = (COLUMN_WIDTH - TILE_SIZE) / 2
 const ROW_HEIGHT = 18
 
-/**
- * @param topMargin the distance from the top (if undefined, will be centered vertically)
- */
-export const makeControlsUI = (topMargin?: number): RenderMethod[] => {
-    const topLeft = new Point(
-        (Camera.instance.dimensions.x - COLUMN_WIDTH * 3) / 2,
-        topMargin
-            ? topMargin
-            : (Camera.instance.dimensions.y - ROW_HEIGHT * Object.keys(CONTROLS).length) / 2
-    )
+export class ControlsUI extends Component {
+    /**
+     * @param topMargin the distance from the top (if undefined, will be centered vertically)
+     */
+    constructor(topMargin: number) {
+        super()
 
-    const result: RenderMethod[] = []
+        this.getRenderMethods = () => {
+            const topLeft = new Point(
+                (Camera.instance.dimensions.x - COLUMN_WIDTH * 3) / 2,
+                topMargin === undefined
+                    ? (Camera.instance.dimensions.y - ROW_HEIGHT * Object.keys(CONTROLS).length) / 2
+                    : topMargin
+            )
 
-    Object.entries(CONTROLS).forEach(([name, { kbm, gamepad }], i) => {
-        const rowPos = topLeft.plusY(i * ROW_HEIGHT)
+            const result: RenderMethod[] = []
 
-        result.push(...format(name, rowPos))
-        result.push(...kbm(rowPos.plusX(COLUMN_WIDTH)))
-        result.push(...gamepad(rowPos.plusX(COLUMN_WIDTH * 2)))
-    })
+            Object.entries(CONTROLS).forEach(([name, { kbm, gamepad }], i) => {
+                const rowPos = topLeft.plusY(i * ROW_HEIGHT)
 
-    return result
+                result.push(...format(name, rowPos))
+                result.push(...kbm(rowPos.plusX(COLUMN_WIDTH)))
+                result.push(...gamepad(rowPos.plusX(COLUMN_WIDTH * 2)))
+            })
+
+            return result
+        }
+    }
 }
