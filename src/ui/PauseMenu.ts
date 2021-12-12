@@ -1,7 +1,6 @@
 import { Component } from "brigsby/dist/Component"
 import { UpdateData } from "brigsby/dist/Engine"
 import { Entity } from "brigsby/dist/Entity"
-import { ButtonState, GamepadButton } from "brigsby/dist/Input"
 import { controls } from "../Controls"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
@@ -11,6 +10,7 @@ import { Settings } from "../Settings"
 import { ButtonsMenu } from "./ButtonsMenu"
 import { Color } from "./Color"
 import { ControlsUI } from "./ControlsUI"
+import { FullScreenMode } from "./FullScreenMode"
 import { UIStateManager } from "./UIStateManager"
 
 type PauseOption = {
@@ -37,11 +37,6 @@ export class PauseMenu extends Component {
             this.open()
         } else if (this.isOpen) {
             this.refresh()
-        }
-
-        // toggle fullscreen gamepad shortcut
-        if (controls.isGamepadButton(GamepadButton.SELECT, ButtonState.DOWN)) {
-            this.getFullScreenOption().fn()
         }
     }
 
@@ -134,27 +129,15 @@ export class PauseMenu extends Component {
     }
 
     private getFullScreenOption(): PauseOption {
-        const canvas = document.getElementById("canvas")
-        if (document.fullscreenElement) {
+        if (FullScreenMode.isFullScreen()) {
             return {
                 text: `FULL-SCREEN: ON`,
-                fn: () =>
-                    document.exitFullscreen().then(() => {
-                        console.log("fullscreen disabled")
-                    }),
+                fn: FullScreenMode.exit,
             }
         } else {
             return {
                 text: `FULL-SCREEN: OFF`,
-                fn: () => {
-                    canvas
-                        .requestFullscreen({
-                            navigationUI: "hide",
-                        })
-                        .then(() => {
-                            console.log("fullscreen enabled")
-                        })
-                },
+                fn: FullScreenMode.enter,
             }
         }
     }

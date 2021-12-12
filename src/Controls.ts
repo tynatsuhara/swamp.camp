@@ -14,6 +14,7 @@ import { Point } from "brigsby/dist/Point"
 import { Maths } from "brigsby/dist/util/Maths"
 import { Dude } from "./characters/Dude"
 import { Camera } from "./cutscenes/Camera"
+import { FullScreenMode } from "./ui/FullScreenMode"
 import { TextIcon } from "./ui/Text"
 
 // The last gamepad which accepted input. Undefined if the user is using kb/m.
@@ -92,6 +93,15 @@ class ControlsWrapper extends Component {
 
             if (leftStick.magnitude() > 0 || rightStick.magnitude() > 0) {
                 isGamepadMode = true
+            }
+        }
+
+        // toggle fullscreen gamepad shortcut
+        if (isGamepadMode && gamepadInput.isButton(GamepadButton.SELECT, ButtonState.DOWN)) {
+            if (FullScreenMode.isFullScreen()) {
+                FullScreenMode.exit()
+            } else {
+                FullScreenMode.enter()
             }
         }
     }
@@ -307,10 +317,6 @@ class ControlsWrapper extends Component {
         if (isGamepadMode) {
             gamepadInput?.vibrate(options)
         }
-    }
-
-    isGamepadButton = (button: GamepadButton, state: ButtonState) => {
-        return isGamepadMode ? gamepadInput.isButton(button, state) : false
     }
 
     private translateToWorldSpace = (mousePos: Point) => mousePos.plus(Camera.instance.position)
