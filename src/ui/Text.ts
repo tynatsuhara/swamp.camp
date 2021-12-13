@@ -42,6 +42,28 @@ const ICON_PLACEHOLDER_MAP = {
     [TextIcon.GAMEPAD_TRIANGLE]: "gamepad-triangle",
 }
 
+export const formatTextRows = (text: string, width: number) => {
+    const rawRows = text.split("\n")
+    const rows: string[] = []
+
+    for (const rawRow of rawRows) {
+        let row = ""
+        const words = rawRow.split(" ")
+        for (let word of words) {
+            const newRow = row === "" ? word : row + " " + word
+            if (newRow.length * TEXT_PIXEL_WIDTH < width) {
+                row = newRow
+            } else {
+                rows.push(row)
+                row = word
+            }
+        }
+        rows.push(row)
+    }
+
+    return rows
+}
+
 export const formatText = ({
     text,
     position,
@@ -59,24 +81,7 @@ export const formatText = ({
     lineSpacing?: number
     depth?: number
 }): RenderMethod[] => {
-    const rawRows = text.split("\n")
-
-    const rows: string[] = []
-
-    for (const rawRow of rawRows) {
-        let row = ""
-        const words = rawRow.split(" ")
-        for (let word of words) {
-            const newRow = row === "" ? word : row + " " + word
-            if (newRow.length * TEXT_PIXEL_WIDTH < width) {
-                row = newRow
-            } else {
-                rows.push(row)
-                row = word
-            }
-        }
-        rows.push(row)
-    }
+    const rows: string[] = formatTextRows(text, width)
 
     const rowPosition = (r: string, i: number): Point => {
         let offset = 0

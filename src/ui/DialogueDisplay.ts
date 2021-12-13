@@ -16,15 +16,16 @@ import { Camera } from "../cutscenes/Camera"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { ButtonsMenu } from "./ButtonsMenu"
 import { Color } from "./Color"
-import { formatText, TextAlign } from "./Text"
+import { formatText, formatTextRows, TextAlign, TEXT_SIZE } from "./Text"
 import { TextTyper } from "./TextTyper"
 import { UIStateManager } from "./UIStateManager"
 
 export class DialogueDisplay extends Component {
     static instance: DialogueDisplay
 
-    private static readonly TEXT_BOX_DIMENSIONS = new Point(288, 83)
+    private static readonly TEXT_BOX_WIDTH = 288
     private static readonly PADDING = TILE_SIZE
+    private static readonly BUTTON_HEIGHT = 19
 
     private dialogueSource: DialogueSource
     private e: Entity = new Entity([this])
@@ -72,7 +73,10 @@ export class DialogueDisplay extends Component {
         this.displayEntity = new Entity()
         this.optionsEntity = null
 
-        this.renderNextLine(line)
+        this.renderNextLine(
+            line,
+            this.lineIndex >= this.lines.length - 1 ? this.dialogue.options.length : 0
+        )
 
         if (showOptions) {
             this.renderOptions()
@@ -122,31 +126,36 @@ export class DialogueDisplay extends Component {
         this.optionsPopupTime = Number.MAX_SAFE_INTEGER
     }
 
-    private renderNextLine(line: string) {
-        const screenDimensions = Camera.instance.dimensions
+    private renderNextLine(line: string, options: number) {
+        const topOffset = 2
+        const margin = 12
+        const width = DialogueDisplay.TEXT_BOX_WIDTH - margin * 2
+        const lineSpacing = 4
+
+        const heightOfText =
+            formatTextRows(line, width).length * (TEXT_SIZE + lineSpacing) + margin * 2
+        const heightOfOptions = options * DialogueDisplay.BUTTON_HEIGHT
+        const dimensions = new Point(DialogueDisplay.TEXT_BOX_WIDTH, heightOfText + heightOfOptions)
+
         const topLeft = new Point(
-            Math.floor(screenDimensions.x / 2 - DialogueDisplay.TEXT_BOX_DIMENSIONS.x / 2),
-            Math.floor(
-                screenDimensions.y - DialogueDisplay.TEXT_BOX_DIMENSIONS.y - DialogueDisplay.PADDING
-            )
+            Math.floor(Camera.instance.dimensions.x / 2 - dimensions.x / 2),
+            Math.floor(Camera.instance.dimensions.y - dimensions.y - DialogueDisplay.PADDING)
         )
 
         const backgroundTiles = NineSlice.makeStretchedNineSliceComponents(
             Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"),
             topLeft,
-            DialogueDisplay.TEXT_BOX_DIMENSIONS
+            dimensions
         )
-        backgroundTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
 
-        const topOffset = 2
-        const margin = 12
-        const width = DialogueDisplay.TEXT_BOX_DIMENSIONS.x - margin * 2
+        backgroundTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
 
         const lines = formatText({
             text: line,
             position: topLeft.plus(new Point(margin, topOffset + margin)),
             width,
             alignment: TextAlign.CENTER,
+            lineSpacing,
         })
 
         backgroundTiles.forEach((tile) => this.displayEntity.addComponent(tile))
@@ -161,15 +170,14 @@ export class DialogueDisplay extends Component {
 
         const centeredButtonMenuPos = new Point(
             Camera.instance.dimensions.x / 2,
-            DialogueDisplay.PADDING +
-                (Camera.instance.dimensions.y -
-                    DialogueDisplay.TEXT_BOX_DIMENSIONS.y -
-                    DialogueDisplay.PADDING) /
-                    2
+            Camera.instance.dimensions.y -
+                DialogueDisplay.PADDING -
+                (this.dialogue.options.length * DialogueDisplay.BUTTON_HEIGHT) / 2 -
+                11
         )
 
         this.optionsEntity = ButtonsMenu.render(
-            "white",
+            "none",
             this.dialogue.options.map((o) => {
                 return {
                     text: o.text,

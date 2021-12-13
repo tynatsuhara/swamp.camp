@@ -17,7 +17,7 @@ export type OptionButton = {
 // TODO: Update this to use the color replace filter instead of different sprites
 export const ButtonsMenu = {
     render: (
-        backgroundColor: "red" | "white",
+        background: "red" | "white" | "none",
         options: OptionButton[],
         centerPos: Point
     ): Entity => {
@@ -37,19 +37,19 @@ export const ButtonsMenu = {
         )
 
         const topLeft = centerPos.minus(dimensions.div(2))
-
-        const backgroundTiles = NineSlice.makeStretchedNineSliceComponents(
-            backgroundColor === "red"
-                ? Tilesets.instance.oneBit.getNineSlice("invBoxNW")
-                : Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"),
-            topLeft,
-            dimensions
-        )
-        backgroundTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH + 1
-
         const e = new Entity()
 
-        backgroundTiles.forEach((tile) => e.addComponent(tile))
+        if (background !== "none") {
+            const backgroundTiles = NineSlice.makeStretchedNineSliceComponents(
+                background === "red"
+                    ? Tilesets.instance.oneBit.getNineSlice("invBoxNW")
+                    : Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"),
+                topLeft,
+                dimensions
+            )
+            backgroundTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH + 1
+            backgroundTiles.forEach((tile) => e.addComponent(tile))
+        }
 
         options.forEach((option, i) =>
             e.addComponent(
