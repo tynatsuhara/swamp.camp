@@ -103,7 +103,7 @@ const CONTROLS: { [key: string]: ControlRender } = {
 
 const COLUMN_WIDTH = 90
 const ICON_OFFSET = (COLUMN_WIDTH - TILE_SIZE) / 2
-const ROW_HEIGHT = 17
+const ROW_HEIGHT = 18
 
 export class ControlsUI extends Component {
     /**
