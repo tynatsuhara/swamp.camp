@@ -7,6 +7,8 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { LocationManager } from "../world/LocationManager"
 
+type FocalPoint = "center" | "top"
+
 export class Camera {
     static readonly ZOOM = 3
 
@@ -30,6 +32,8 @@ export class Camera {
         return renderer.getDimensions().div(Camera.ZOOM)
     }
 
+    private focalPoint: FocalPoint = "center"
+
     shake(power: number, duration: number) {
         this.shakePower = power
         this.shakeDuration = duration
@@ -49,6 +53,10 @@ export class Camera {
         this._position = this._position.plus(translation)
     }
 
+    setFocalPoint(focalPoint: FocalPoint) {
+        this.focalPoint = focalPoint
+    }
+
     getUpdatedPosition(elapsedTimeMillis: number): Point {
         const mapSize = LocationManager.instance.currentLocation.size || 0
         let xLimit = (mapSize / 2) * TILE_SIZE - this.dimensions.x / 2
@@ -66,12 +74,23 @@ export class Camera {
             yLimit = Number.MAX_SAFE_INTEGER
         }
 
-        const trackedPoint = this.dudeTarget?.position ?? this.pointTarget
+        const trackedPoint = this.dudeTarget?.standingPosition.plusY(-10) ?? this.pointTarget
         const clampedTrackedPoint = new Point(
             Maths.clamp(trackedPoint.x, -xLimit, xLimit),
             Maths.clamp(trackedPoint.y, -yLimit, yLimit)
         )
-        const cameraGoal = this.dimensions.div(2).minus(clampedTrackedPoint)
+
+        const focalPoint = (() => {
+            switch (this.focalPoint) {
+                // currently unused. this API might end up changing
+                case "top":
+                    return new Point(this.dimensions.x / 2, this.dimensions.y / 3)
+                default:
+                    return this.dimensions.div(2)
+            }
+        })()
+
+        const cameraGoal = focalPoint.minus(clampedTrackedPoint)
 
         if (!this._position) {
             this._position = cameraGoal
