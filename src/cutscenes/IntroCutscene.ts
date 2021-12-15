@@ -99,12 +99,16 @@ ANOTHER thing - Only one of the explorers returned, and she reported that her co
 
         const controlsUI = new ControlsUI(TextOverlayManager.VERTICAL_MARGIN)
 
-        TextOverlayManager.instance.enable(
+        TextOverlayManager.instance.open({
             text,
-            "START",
-            () => HUD.instance.locationTransition.transition(() => this.cutscene(), 100, true),
-            (index) => [...charactersAtTop, index === text.length - 1 ? controlsUI : undefined]
-        )
+            finishAction: "START",
+            onFinish: () =>
+                HUD.instance.locationTransition.transition(() => this.cutscene(), 100, true),
+            additionalComponents: (index) => [
+                ...charactersAtTop,
+                index === text.length - 1 ? controlsUI : undefined,
+            ],
+        })
     }
 
     cutscene() {

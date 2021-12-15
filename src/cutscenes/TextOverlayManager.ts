@@ -40,13 +40,19 @@ export class TextOverlayManager extends Component {
      * @param onFinish called after the clicking through the last string in the text array
      * @param additionalComponents
      */
-    enable(
-        text: string[],
-        finishAction: string,
-        onFinish: () => void,
-        additionalComponents: (index: number) => Component[] = () => [],
-        textAlign: TextAlign = TextAlign.LEFT
-    ) {
+    open({
+        text,
+        finishAction,
+        onFinish = () => {},
+        additionalComponents = () => [],
+        textAlign = TextAlign.LEFT,
+    }: {
+        text: string[]
+        finishAction: string
+        onFinish?: () => void
+        additionalComponents?: (index: number) => Component[]
+        textAlign?: TextAlign
+    }) {
         this.index = 0
         this.text = text.map((t) => new TextTyper(t, () => this.nextLine()))
         this.finishAction = finishAction

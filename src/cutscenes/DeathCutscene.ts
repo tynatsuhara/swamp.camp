@@ -42,13 +42,13 @@ export class DeathCutscene extends Component {
         setTimeout(() => {
             HUD.instance.locationTransition.transition(() => {
                 // While the text overlay is active, the location transition will pause
-                TextOverlayManager.instance.enable(
-                    [text],
-                    button,
-                    () => this.respawn(),
-                    () => [deathIcon],
-                    TextAlign.CENTER
-                )
+                TextOverlayManager.instance.open({
+                    text: [text],
+                    finishAction: button,
+                    onFinish: () => this.respawn(),
+                    additionalComponents: () => [deathIcon],
+                    textAlign: TextAlign.CENTER,
+                })
             }, this.TRANSITION_PAUSE)
         }, this.SHOW_TRANSITION)
     }

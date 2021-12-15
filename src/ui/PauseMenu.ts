@@ -122,7 +122,7 @@ export class PauseMenu extends Component {
     private showControls() {
         const controlsUI = new ControlsUI(TextOverlayManager.VERTICAL_MARGIN)
 
-        TextOverlayManager.instance.enable(
+        TextOverlayManager.instance.open(
             [""],
             "COOL",
             () => {},

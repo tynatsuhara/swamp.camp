@@ -7,7 +7,9 @@ import { DudeFactory, DudeType } from "./characters/DudeFactory"
 import { DudeSpawner } from "./characters/DudeSpawner"
 import { Player } from "./characters/Player"
 import { controls } from "./Controls"
+import { TextOverlayManager } from "./cutscenes/TextOverlayManager"
 import { pixelPtToTilePt } from "./graphics/Tilesets"
+import { TextAlign } from "./ui/Text"
 import { GroundType } from "./world/ground/Ground"
 import { LocationManager } from "./world/LocationManager"
 import { TimeUnit } from "./world/TimeUnit"
@@ -16,8 +18,13 @@ import { WorldTime } from "./world/WorldTime"
 const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     [
         InputKey.O,
-        "spawn doctor",
-        (input) => DudeFactory.instance.new(DudeType.DOCTOR, input.mousePos),
+        "show town stats",
+        () =>
+            TextOverlayManager.instance.open({
+                text: ["blah"],
+                finishAction: "OKAY",
+                textAlign: TextAlign.CENTER,
+            }),
     ],
     [
         InputKey.P,
