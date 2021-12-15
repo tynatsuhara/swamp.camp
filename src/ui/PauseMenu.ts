@@ -122,12 +122,11 @@ export class PauseMenu extends Component {
     private showControls() {
         const controlsUI = new ControlsUI(TextOverlayManager.VERTICAL_MARGIN)
 
-        TextOverlayManager.instance.open(
-            [""],
-            "COOL",
-            () => {},
-            () => [controlsUI]
-        )
+        TextOverlayManager.instance.open({
+            text: [""],
+            finishAction: "COOL",
+            additionalComponents: () => [controlsUI],
+        })
     }
 
     private getFullScreenOption(): PauseOption {
