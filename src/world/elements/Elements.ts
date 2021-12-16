@@ -1,4 +1,5 @@
 import { Singletons } from "../../Singletons"
+import { ChurchFactory } from "../buildings/Church"
 import { HouseFactory } from "../buildings/House"
 import { MineEntranceFactory } from "../buildings/MineEntrance"
 import { MineExitFactory } from "../buildings/MineExit"
@@ -26,6 +27,7 @@ export enum ElementType {
     BED,
     MINE_ENTRANCE,
     MINE_EXIT,
+    CHURCH,
 }
 
 export class SavedElement {
@@ -50,6 +52,7 @@ export class Elements {
         [ElementType.BED]: new BedFactory(),
         [ElementType.TENT]: new TentFactory(),
         [ElementType.HOUSE]: new HouseFactory(),
+        [ElementType.CHURCH]: new ChurchFactory(),
         [ElementType.MINE_ENTRANCE]: new MineEntranceFactory(),
         [ElementType.MINE_EXIT]: new MineExitFactory(),
     }

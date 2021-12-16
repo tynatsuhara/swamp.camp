@@ -16,10 +16,10 @@ export abstract class ElementFactory {
      * @param wl The location to which the element is being added. Implementations should NOT
      *           add the entity to the given locations, the location should be read-only.
      * @param pos The position of the element in tile coordinates (not pixel coordinates!)
-     * @param data Previous save data
+     * @param data Previous save data (or an empty object)
      * @returns An ElementComponent with the factory's type, which MUST have a nonnull entity
      */
-    abstract make(wl: Location, pos: Point, data: any): ElementComponent
+    abstract make(wl: Location, pos: Point, data: object): ElementComponent
 
     /**
      * @param wl The location in which the user is trying to place an element

@@ -249,15 +249,15 @@ export class DudeFactory {
                 speed *= 1
                 break
             }
-            case DudeType.CLERIC:
-                factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
-                animationName = Lists.oneOf(["FatCleric", "NormalCleric", "TallCleric"])
-                additionalComponents = [new NPC()]
-                speed *= 0.3
-                break
             case DudeType.NUN:
                 factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
                 animationName = Lists.oneOf(["FatNun", "NormalNun", "TallNun"])
+                additionalComponents = [new NPC()]
+                speed *= 0.3
+                break
+            case DudeType.CLERIC:
+                factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
+                animationName = Lists.oneOf(["FatCleric", "NormalCleric", "TallCleric"])
                 additionalComponents = [new NPC()]
                 speed *= 0.3
                 break
