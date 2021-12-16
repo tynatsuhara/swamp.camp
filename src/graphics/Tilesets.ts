@@ -3,7 +3,7 @@ import { Point } from "brigsby/dist/Point"
 import { SpriteSource } from "brigsby/dist/sprites/SpriteSource"
 import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Singletons } from "../Singletons"
-import { BackgroundsTileset } from "./BackgroundsTileset"
+import { LargeSpriteTileset } from "./BackgroundsTileset"
 import { DungeonTilesetII } from "./DungeonTilesetII"
 import { ExplosionTileset } from "./ExplosionTileset"
 import { ExtraCharacterSet2TileLoader } from "./ExtraCharacterSet2TileLoader"
@@ -56,10 +56,10 @@ export class Tilesets {
     readonly extraCharacterSet1 = new SplitFileTileLoader("images/individual_characters")
     readonly extraCharacterSet2 = new ExtraCharacterSet2TileLoader()
     readonly explosions = new ExplosionTileset()
-    readonly backgrounds = new BackgroundsTileset()
+    readonly largeSprites = new LargeSpriteTileset()
 
     getBasicTileSource(key: string): StaticSpriteSource {
-        const sources = [this.outdoorTiles, this.tilemap, this.backgrounds]
+        const sources = [this.outdoorTiles, this.tilemap, this.largeSprites]
         for (const src of sources) {
             try {
                 return src.getTileSource(key)

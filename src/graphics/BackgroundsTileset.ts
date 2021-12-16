@@ -2,7 +2,7 @@ import { Point } from "brigsby/dist/Point"
 import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { getImage, TILE_SIZE } from "./Tilesets"
 
-export class BackgroundsTileset {
+export class LargeSpriteTileset {
     getTileSource(key: string): StaticSpriteSource {
         if (key === "mine-small") {
             return new StaticSpriteSource(
@@ -15,6 +15,6 @@ export class BackgroundsTileset {
     }
 
     private image() {
-        return getImage("images/backgrounds.png")
+        return getImage("images/large-sprites.png")
     }
 }
