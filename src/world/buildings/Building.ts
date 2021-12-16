@@ -1,7 +1,7 @@
 import { Point } from "brigsby/dist/Point"
+import { ElementFactory } from "../elements/ElementFactory"
 import { Ground } from "../ground/Ground"
 import { Location } from "../Location"
-import { ElementFactory } from "./ElementFactory"
 
 /**
  * At runtime, a building exterior is built with several components:

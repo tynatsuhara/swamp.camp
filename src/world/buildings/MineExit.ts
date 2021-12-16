@@ -1,12 +1,12 @@
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { TILE_SIZE } from "../../graphics/Tilesets"
+import { ElementComponent } from "../elements/ElementComponent"
+import { ElementFactory } from "../elements/ElementFactory"
+import { ElementType } from "../elements/Elements"
+import { Interactable } from "../elements/Interactable"
 import { LightManager } from "../LightManager"
 import { Location } from "../Location"
-import { ElementComponent } from "./ElementComponent"
-import { ElementFactory } from "./ElementFactory"
-import { ElementType } from "./Elements"
-import { Interactable } from "./Interactable"
 
 export class MineExitFactory extends ElementFactory {
     readonly type = ElementType.MINE_EXIT
