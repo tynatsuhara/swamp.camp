@@ -191,7 +191,7 @@ export const ITEM_METADATA_MAP = {
     }),
     [Item.CHURCH]: new ItemMetadata({
         displayName: "Church",
-        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("house"),
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("church"),
         stackLimit: 1,
         element: ElementType.CHURCH,
     }),
