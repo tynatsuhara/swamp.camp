@@ -41,37 +41,40 @@ export class HouseFactory extends BuildingFactory {
             id: doorId,
         })
 
-        // Set up tiles
-        const depth = (pos.y + 3) * TILE_SIZE
-
-        const addTile = (tileSheetPos: Point, pos: Point) => {
-            const tile = Tilesets.instance.tilemap.getTileAt(tileSheetPos)
-            const el = e.addComponent(
-                new SpriteComponent(tile, new SpriteTransform(pos.times(TILE_SIZE)))
-            )
-            el.transform.depth = depth
-        }
-
-        // flat roof
-        const flatRoofTopLeft = new Point(6, 0)
         const basePos = pos.plusX(1)
-        addTile(flatRoofTopLeft.plusX(1), basePos)
-        addTile(flatRoofTopLeft.plusX(2), basePos.plusX(1))
-        addTile(flatRoofTopLeft.plusX(3), basePos.plusX(2))
-        addTile(flatRoofTopLeft.plusY(2).plusX(1), basePos.plusY(1))
-        addTile(flatRoofTopLeft.plusY(2).plusX(2), basePos.plusY(1).plusX(1))
-        addTile(flatRoofTopLeft.plusY(2).plusX(3), basePos.plusY(1).plusX(2))
 
-        // door
-        addTile(new Point(7, 6), basePos.plusY(2).plusX(1))
+        // Set up tiles
+        {
+            const depth = (pos.y + 3) * TILE_SIZE
 
-        // no windows
-        addTile(new Point(7, 5), basePos.plusY(2))
-        addTile(new Point(9, 5), basePos.plusY(2).plusX(2))
+            const addTile = (tileSheetPos: Point, pos: Point) => {
+                const tile = Tilesets.instance.tilemap.getTileAt(tileSheetPos)
+                const el = e.addComponent(
+                    new SpriteComponent(tile, new SpriteTransform(pos.times(TILE_SIZE)))
+                )
+                el.transform.depth = depth
+            }
 
-        // alternative with windows
-        // addTile(new Point(5, 6), basePos.plusY(2))
-        // addTile(new Point(6, 6), basePos.plusY(2).plusX(2))
+            // flat roof
+            const flatRoofTopLeft = new Point(6, 0)
+            addTile(flatRoofTopLeft.plusX(1), basePos)
+            addTile(flatRoofTopLeft.plusX(2), basePos.plusX(1))
+            addTile(flatRoofTopLeft.plusX(3), basePos.plusX(2))
+            addTile(flatRoofTopLeft.plusY(2).plusX(1), basePos.plusY(1))
+            addTile(flatRoofTopLeft.plusY(2).plusX(2), basePos.plusY(1).plusX(1))
+            addTile(flatRoofTopLeft.plusY(2).plusX(3), basePos.plusY(1).plusX(2))
+
+            // door
+            addTile(new Point(7, 6), basePos.plusY(2).plusX(1))
+
+            // no windows
+            addTile(new Point(7, 5), basePos.plusY(2))
+            addTile(new Point(9, 5), basePos.plusY(2).plusX(2))
+
+            // alternative with windows
+            // addTile(new Point(5, 6), basePos.plusY(2))
+            // addTile(new Point(6, 6), basePos.plusY(2).plusX(2))
+        }
 
         e.addComponent(
             new BoxCollider(
