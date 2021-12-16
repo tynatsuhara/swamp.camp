@@ -9,7 +9,7 @@ import { Player } from "./characters/Player"
 import { controls } from "./Controls"
 import { TextOverlayManager } from "./cutscenes/TextOverlayManager"
 import { pixelPtToTilePt } from "./graphics/Tilesets"
-import { TextAlign } from "./ui/Text"
+import { TextAlign, TextIcon } from "./ui/Text"
 import { GroundType } from "./world/ground/Ground"
 import { LocationManager } from "./world/LocationManager"
 import { TimeUnit } from "./world/TimeUnit"
@@ -21,7 +21,15 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
         "show town stats",
         () =>
             TextOverlayManager.instance.open({
-                text: ["blah"],
+                text: [
+                    [
+                        `blah ${TextIcon.FACE_VERY_SAD}`,
+                        `blah ${TextIcon.FACE_SAD}`,
+                        `blah ${TextIcon.FACE_NEUTRAL}`,
+                        `blah ${TextIcon.FACE_HAPPY}`,
+                        `blah ${TextIcon.FACE_VERY_HAPPY}`,
+                    ].join("\n\n"),
+                ],
                 finishAction: "OKAY",
                 textAlign: TextAlign.CENTER,
             }),

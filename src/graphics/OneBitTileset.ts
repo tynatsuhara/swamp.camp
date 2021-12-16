@@ -21,10 +21,10 @@ export class OneBitTileset extends SingleFileTileLoader {
                 ["rightClick", new Point(30, 15)],
 
                 ["face-happy1", new Point(19, 26)],
-                ["face-happy2", new Point(19, 28)],
+                ["face-happy2", new Point(21, 26)],
                 ["face-neutral", new Point(19, 32)],
-                ["face-unhappy1", new Point(19, 29)],
-                ["face-unhappy2", new Point(19, 27)],
+                ["face-sad1", new Point(22, 26)],
+                ["face-sad2", new Point(20, 26)],
 
                 ["heart", new Point(26, 22)],
                 ["potion1", new Point(16, 25)],

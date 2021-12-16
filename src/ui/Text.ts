@@ -29,6 +29,11 @@ export enum TextIcon {
     GAMEPAD_X = "λx",
     GAMEPAD_SQUARE = "λ2",
     GAMEPAD_TRIANGLE = "λ3",
+    FACE_VERY_SAD = "λ4",
+    FACE_SAD = "λ5",
+    FACE_NEUTRAL = "λ6",
+    FACE_HAPPY = "λ7",
+    FACE_VERY_HAPPY = "λ8",
 }
 
 const ICON_PLACEHOLDER_PREFIX = "λ"
@@ -40,6 +45,11 @@ const ICON_PLACEHOLDER_MAP = {
     [TextIcon.GAMEPAD_X]: "gamepad-x",
     [TextIcon.GAMEPAD_SQUARE]: "gamepad-square",
     [TextIcon.GAMEPAD_TRIANGLE]: "gamepad-triangle",
+    [TextIcon.FACE_VERY_SAD]: "face-sad2",
+    [TextIcon.FACE_SAD]: "face-sad1",
+    [TextIcon.FACE_NEUTRAL]: "face-neutral",
+    [TextIcon.FACE_HAPPY]: "face-happy1",
+    [TextIcon.FACE_VERY_HAPPY]: "face-happy2",
 }
 
 export const formatTextRows = (text: string, width: number) => {
