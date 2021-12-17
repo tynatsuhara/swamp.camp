@@ -26,9 +26,9 @@ export type QueuedEventData = {
     [others: string]: any
 }
 
-export const EVENT_QUEUE_HANDLERS: {
+export const getEventQueueHandlers = (): {
     [type: number]: (data: QueuedEventData) => void
-} = {
+} => ({
     [QueuedEventType.SIMULATE_NPCS]: () => {
         LocationManager.instance.simulateLocations(false)
 
@@ -60,6 +60,7 @@ export const EVENT_QUEUE_HANDLERS: {
             EventQueue.instance.addEvent({
                 type: QueuedEventType.HERALD_DEPARTURE_CHECK,
                 time: WorldTime.instance.future({ minutes: 2 }),
+                dudeTypes: data.dudeTypes,
             })
         } else {
             console.log("[Berto] left the map")
@@ -115,4 +116,4 @@ export const EVENT_QUEUE_HANDLERS: {
     [QueuedEventType.ORC_SEIGE]: () => DudeSpawner.instance.spawnOrcs(),
 
     [QueuedEventType.COLLECT_TAXES]: collectTaxes,
-}
+})

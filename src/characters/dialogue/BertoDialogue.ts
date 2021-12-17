@@ -175,9 +175,7 @@ const fetchNpcDialogue = (): DialogueInstance => {
     }
 
     if (residenceMap.get(DudeType.CLERIC)) {
-        options.push(
-            new DialogueOption("We need a priest to lead the chuch.", fetchNpc(DudeType.CLERIC))
-        )
+        options.push(new DialogueOption("The church requires a cleric.", fetchNpc(DudeType.CLERIC)))
     }
 
     options.push(option(getExitText(), BERT_ENTRYPOINT, false))

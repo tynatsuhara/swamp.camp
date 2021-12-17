@@ -1,7 +1,7 @@
 import { BinaryHeap } from "brigsby/dist/util/BinaryHeap"
 import { Singletons } from "../../Singletons"
 import { WorldTime } from "../WorldTime"
-import { EVENT_QUEUE_HANDLERS, QueuedEventData, QueuedEventType } from "./QueuedEvent"
+import { getEventQueueHandlers, QueuedEventData, QueuedEventType } from "./QueuedEvent"
 
 export class EventQueue {
     static get instance() {
@@ -38,7 +38,7 @@ export class EventQueue {
     processEvents(currentTime: number) {
         while (this.heap.size() > 0 && this.heap.peek().time <= currentTime) {
             const event = this.heap.pop()
-            EVENT_QUEUE_HANDLERS[event.type](event)
+            getEventQueueHandlers()[event.type](event)
         }
     }
 
