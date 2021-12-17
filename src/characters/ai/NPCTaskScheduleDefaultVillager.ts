@@ -9,6 +9,7 @@ import { Residence } from "../../world/residences/Residence"
 import { TimeUnit } from "../../world/TimeUnit"
 import { WorldTime } from "../../world/WorldTime"
 import { Dude } from "../Dude"
+import { DudeFaction } from "../DudeFactory"
 import { NPCSchedules } from "./NPCSchedule"
 import { NPCTask } from "./NPCTask"
 import { NPCTaskContext } from "./NPCTaskContext"
@@ -25,7 +26,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         ) {
             // Are you feeling zen? If not, a staycation is what I recommend.
             // Or better yet, don't be a jerk. Unwind by being a man... and goin' to work.
-            goalLocation = this.findWorkLocation()
+            goalLocation = this.findWorkLocation(dude)
             if (!goalLocation) {
                 goalLocation = camp()
             }
@@ -35,8 +36,10 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         }
 
         if (!goalLocation || dude.location === goalLocation) {
-            // TODO: Go to light
-            if (timeOfDay < DarknessMask.SUNRISE_START || timeOfDay > DarknessMask.SUNSET_END) {
+            // Go to a campfire if it's dark out
+            const isDarkOut =
+                timeOfDay < DarknessMask.SUNRISE_START || timeOfDay > DarknessMask.SUNSET_END
+            if (dude.location === camp() && isDarkOut) {
                 if (LightManager.instance.isFullyLit(dude.standingPosition, dude.location)) {
                     context.doNothing()
                     return
@@ -60,6 +63,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
                 return
             }
 
+            // Roam around now that they're in their goal location
             context.roam(0.5, {
                 pauseEveryMillis: 2500 + 2500 * Math.random(),
                 pauseForMillis: 2500 + 5000 * Math.random(),
@@ -80,7 +84,11 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         }
     }
 
-    private findWorkLocation() {
+    private findWorkLocation(dude: Dude) {
+        if (dude.factions.includes(DudeFaction.CLERGY)) {
+            return this.findHomeLocation(dude)
+        }
+
         const mines = camp()
             .getElementsOfType(ElementType.MINE_ENTRANCE)
             .map((el) => el.save()["destinationUUID"])

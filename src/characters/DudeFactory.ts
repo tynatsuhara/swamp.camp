@@ -251,21 +251,21 @@ export class DudeFactory {
             }
             case DudeType.NUN:
                 factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
-                animationName = Lists.oneOf(["FatNun", "NormalNun", "TallNun"])
-                additionalComponents = [new NPC()]
-                speed *= 0.3
+                animationName = Lists.oneOf(["FatNun", "NormalNun", "SkinnyNun"])
+                additionalComponents = [new NPC(), new Villager()]
+                speed *= 0.4
                 break
             case DudeType.CLERIC:
                 factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
                 animationName = Lists.oneOf(["FatCleric", "NormalCleric", "TallCleric"])
-                additionalComponents = [new NPC()]
-                speed *= 0.3
+                additionalComponents = [new NPC(), new Villager()]
+                speed *= 0.4
                 break
             case DudeType.BISHOP: {
                 factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
                 animationName = "Bishop"
-                additionalComponents = [new NPC()]
-                speed *= 0.2
+                additionalComponents = [new NPC(), new Villager()]
+                speed *= 0.3
                 break
             }
             case DudeType.SWAMP_THING:

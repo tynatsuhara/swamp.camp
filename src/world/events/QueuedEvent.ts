@@ -58,9 +58,8 @@ export const getEventQueueHandlers = (): {
         if (berto.standingPosition.distanceTo(goalPosition) > TILE_SIZE) {
             console.log("[Berto] en route -- potentially stuck")
             EventQueue.instance.addEvent({
-                type: QueuedEventType.HERALD_DEPARTURE_CHECK,
+                ...data,
                 time: WorldTime.instance.future({ minutes: 2 }),
-                dudeTypes: data.dudeTypes,
             })
         } else {
             console.log("[Berto] left the map")

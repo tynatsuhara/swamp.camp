@@ -34,11 +34,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
                 textAlign: TextAlign.CENTER,
             }),
     ],
-    [
-        InputKey.P,
-        "spawn villager",
-        (input) => DudeFactory.instance.new(DudeType.VILLAGER, input.mousePos),
-    ],
+    [InputKey.P, "spawn nun", (input) => DudeFactory.instance.new(DudeType.NUN, input.mousePos)],
     [
         InputKey.U,
         "set player on fire",
