@@ -5,6 +5,7 @@ import { NPC } from "../characters/NPC"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { LocationManagerSaveState } from "../saves/LocationManagerSaveState"
 import { Singletons } from "../Singletons"
+import { ElementType } from "./elements/Elements"
 import { Location } from "./Location"
 
 export enum LocationType {
@@ -29,6 +30,11 @@ export class LocationManager {
                 return (counts[type] = (counts[type] || 0) + 1)
             })
             console.log(counts)
+        }
+        window["bulldoze"] = (type: ElementType) => {
+            this.currentLocation
+                .getElementsOfType(type)
+                .forEach((el) => this.currentLocation.removeElement(el))
         }
     }
 
