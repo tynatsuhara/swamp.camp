@@ -15,6 +15,11 @@ import { LocationManager } from "./world/LocationManager"
 import { TimeUnit } from "./world/TimeUnit"
 import { WorldTime } from "./world/WorldTime"
 
+const spawn = (type: DudeType) => {
+    return (input: CapturedInput) =>
+        DudeFactory.instance.new(type, input.mousePos, LocationManager.instance.currentLocation)
+}
+
 const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     [
         InputKey.O,
@@ -34,19 +39,15 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
                 textAlign: TextAlign.CENTER,
             }),
     ],
-    [
-        InputKey.I,
-        "spawn doctor",
-        (input) => DudeFactory.instance.new(DudeType.DOCTOR, input.mousePos),
-    ],
-    [InputKey.P, "spawn nun", (input) => DudeFactory.instance.new(DudeType.NUN, input.mousePos)],
+    [InputKey.I, "spawn doctor", spawn(DudeType.DOCTOR)],
+    [InputKey.P, "spawn nun", spawn(DudeType.NUN)],
     [
         InputKey.U,
         "set player on fire",
         () => Player.instance.dude.addCondition(Condition.ON_FIRE, 2_000),
     ],
-    [InputKey.B, "spawn bear", (input) => DudeFactory.instance.new(DudeType.BEAR, input.mousePos)],
-    [InputKey.V, "spawn wolf", (input) => DudeFactory.instance.new(DudeType.WOLF, input.mousePos)],
+    [InputKey.B, "spawn bear", spawn(DudeType.BEAR)],
+    [InputKey.V, "spawn wolf", spawn(DudeType.WOLF)],
     [
         InputKey.SEMICOLON,
         "poison player",
