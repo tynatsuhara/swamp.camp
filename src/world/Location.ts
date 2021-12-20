@@ -255,6 +255,10 @@ export class Location {
             }))[0]
     }
 
+    getTeleporterLocations() {
+        return Object.entries(this.teleporters).map((kv) => Point.fromString(kv[1]))
+    }
+
     private getTeleporterLinkedPos(to: string, id: string): Point {
         const dest = LocationManager.instance.get(to)
         const teleporterId = Teleporters.teleporterId(this.uuid, id)

@@ -153,6 +153,7 @@ debug.showAudioLogs = debug.showAudioLogs || false
 debug.showGrid = debug.showGrid || false
 debug.showInteractables = debug.showInteractables || false
 debug.showPathfinding = debug.showPathfinding || false
+debug.showTeleporters = debug.showTeleporters || false
 debug.speedMultiplier = debug.speedMultiplier || 1
 
 const help = () => {

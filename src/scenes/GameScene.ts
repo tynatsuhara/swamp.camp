@@ -4,6 +4,7 @@ import { UpdateViewsContext } from "brigsby/dist/Engine"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { BasicRenderComponent } from "brigsby/dist/renderer/BasicRenderComponent"
+import { EllipseRender } from "brigsby/dist/renderer/EllipseRender"
 import { LineRender } from "brigsby/dist/renderer/LineRender"
 import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
 import { Dude } from "../characters/Dude"
@@ -120,32 +121,52 @@ export class GameScene {
     }
 
     private getDebugEntity() {
-        if (!Player.instance?.dude || !debug.showGrid) {
+        if (!Player.instance?.dude) {
             return
         }
 
-        const base = Player.instance.dude.tile
-        const lines: RenderMethod[] = []
-        const gridRange = 50
+        const e = new Entity()
 
-        // vertical lines
-        for (let i = -gridRange; i < gridRange; i++) {
-            const top = base
-                .times(TILE_SIZE)
-                .plusX(i * TILE_SIZE)
-                .plusY(-gridRange * TILE_SIZE)
-            lines.push(new LineRender(top, top.plusY(2 * gridRange * TILE_SIZE)))
+        if (debug.showGrid) {
+            const base = Player.instance.dude.tile
+            const lines: RenderMethod[] = []
+            const gridRange = 50
+
+            // vertical lines
+            for (let i = -gridRange; i < gridRange; i++) {
+                const top = base
+                    .times(TILE_SIZE)
+                    .plusX(i * TILE_SIZE)
+                    .plusY(-gridRange * TILE_SIZE)
+                lines.push(new LineRender(top, top.plusY(2 * gridRange * TILE_SIZE)))
+            }
+
+            // horizontal lines
+            for (let i = -gridRange; i < gridRange; i++) {
+                const left = base
+                    .times(TILE_SIZE)
+                    .plusX(-gridRange * TILE_SIZE)
+                    .plusY(i * TILE_SIZE)
+                lines.push(new LineRender(left, left.plusX(2 * gridRange * TILE_SIZE)))
+            }
+
+            e.addComponent(new BasicRenderComponent(...lines))
         }
 
-        // horizontal lines
-        for (let i = -gridRange; i < gridRange; i++) {
-            const left = base
-                .times(TILE_SIZE)
-                .plusX(-gridRange * TILE_SIZE)
-                .plusY(i * TILE_SIZE)
-            lines.push(new LineRender(left, left.plusX(2 * gridRange * TILE_SIZE)))
+        if (debug.showTeleporters) {
+            const pts = LocationManager.instance.currentLocation.getTeleporterLocations()
+            const renders = pts.map(
+                (pt) =>
+                    new EllipseRender({
+                        depth: Number.MAX_SAFE_INTEGER,
+                        position: pt.plus(new Point(-2, -2)),
+                        dimensions: new Point(4, 4),
+                    })
+            )
+
+            e.addComponent(new BasicRenderComponent(...renders))
         }
 
-        return new Entity([new BasicRenderComponent(...lines)])
+        return e
     }
 }
