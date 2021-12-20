@@ -104,7 +104,8 @@ export class ChurchFactory extends BuildingFactory {
 
 // TODO
 const makeChurchInterior = (outside: Location): Location => {
-    const l = new Location(LocationType.HOUSE_INTERIOR, true, false)
+    const l = new Location(LocationType.CHUCH_INTERIOR, true, false)
+
     LocationManager.instance.add(l)
     const dimensions = new Point(7, 5)
     const interactablePos = new Point(dimensions.x / 2, dimensions.y).times(TILE_SIZE)
