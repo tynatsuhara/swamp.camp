@@ -119,25 +119,52 @@ export class Dude extends Component implements DialogueSource {
 
     private conditions: ActiveCondition[] = []
 
-    constructor(
-        uuid: string,
-        hasPendingSlot: boolean,
-        type: DudeType,
-        factions: DudeFaction[],
-        characterAnimName: string,
-        position: Point,
-        weaponType: WeaponType,
-        shieldType: ShieldType,
-        maxHealth: number,
-        health: number,
-        speed: number,
-        inventory: Inventory,
-        dialogue: string,
-        blob: object,
-        colliderSize: Point,
+    constructor(params: {
+        uuid: string
+        hasPendingSlot: boolean
+        type: DudeType
+        factions: DudeFaction[]
+        characterAnimName: string
+        position: Point
+        weaponType: WeaponType
+        shieldType: ShieldType
+        maxHealth: number
+        health: number
+        speed: number
+        inventory: Inventory
+        dialogue: string
+        blob: object
+        colliderSize: Point
         conditions: ActiveCondition[]
-    ) {
+    }) {
         super()
+
+        // All parameters must be defined
+        Object.entries(params).forEach(([key, value]) => {
+            if (value === undefined || value === null) {
+                console.error(`parameter ${key} should not be ${value}`)
+            }
+        })
+
+        const {
+            uuid,
+            hasPendingSlot,
+            type,
+            factions,
+            characterAnimName,
+            position,
+            weaponType,
+            shieldType,
+            maxHealth,
+            health,
+            speed,
+            inventory,
+            dialogue,
+            blob,
+            colliderSize,
+            conditions,
+        } = { ...params }
+
         this.uuid = uuid
         this.type = type
         this.factions = factions

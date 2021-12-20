@@ -282,24 +282,26 @@ export class DudeFactory {
         }
 
         // use saved data instead of defaults
-        const d = new Dude(
+        const d = new Dude({
             uuid,
             hasPendingSlot,
             type,
             factions, // TODO: Save factions? Only if they become mutable
-            saveState?.anim ?? animationName,
-            pos,
-            saveState?.weapon ?? weapon,
-            saveState?.shield ?? shield,
-            saveState?.maxHealth ?? maxHealth,
-            saveState?.health ?? maxHealth,
-            saveState?.speed ?? speed,
-            !!saveState?.inventory ? inventoryClass.load(saveState.inventory) : defaultInventory,
-            saveState?.dialogue ?? dialogue,
-            saveState?.blob ?? blob,
-            colliderSize,
-            saveState?.conditions ?? []
-        )
+            characterAnimName: saveState?.anim ?? animationName,
+            position: pos,
+            weaponType: saveState?.weapon ?? weapon,
+            shieldType: saveState?.shield ?? shield,
+            maxHealth: saveState?.maxHealth ?? maxHealth,
+            health: saveState?.health ?? maxHealth,
+            speed: saveState?.speed ?? speed,
+            inventory: saveState?.inventory
+                ? inventoryClass.load(saveState.inventory)
+                : defaultInventory,
+            dialogue: saveState?.dialogue ?? dialogue,
+            blob: saveState?.blob ?? blob,
+            colliderSize: colliderSize,
+            conditions: saveState?.conditions ?? [],
+        })
 
         location.dudes.add(d)
         d.location = location
