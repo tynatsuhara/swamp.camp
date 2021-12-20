@@ -26,51 +26,31 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         ) {
             // Are you feeling zen? If not, a staycation is what I recommend.
             // Or better yet, don't be a jerk. Unwind by being a man... and goin' to work.
-            goalLocation = this.findWorkLocation(dude)
-            if (!goalLocation) {
-                goalLocation = camp()
-            }
+            goalLocation = this.findWorkLocation(dude) ?? camp()
         } else {
             // Go home!
             goalLocation = this.findHomeLocation(dude)
         }
 
-        if (!goalLocation || dude.location === goalLocation) {
-            // Go to a campfire if it's dark out
-            const isDarkOut =
-                timeOfDay < DarknessMask.SUNRISE_START || timeOfDay > DarknessMask.SUNSET_END
-            if (dude.location === camp() && isDarkOut) {
-                if (LightManager.instance.isFullyLit(dude.standingPosition, dude.location)) {
-                    context.doNothing()
-                    return
-                }
-
-                const burningFires = dude.location
-                    .getElementsOfType(ElementType.CAMPFIRE)
-                    .filter((c) => c.entity.getComponent(Campfire).logs > 0)
-
-                if (burningFires.length === 0) {
-                    context.doNothing()
-                    return
-                }
-
-                const closestFire = Lists.minBy(burningFires, (e) =>
-                    e.pos.distanceTo(dude.standingPosition)
-                )
-
-                // this works fine enough ¯\_(ツ)_/¯
-                context.walkTo(closestFire.pos.plusY(1))
-                return
-            }
-
-            // Roam around now that they're in their goal location
-            context.roam(0.5, {
-                pauseEveryMillis: 2500 + 2500 * Math.random(),
-                pauseForMillis: 2500 + 5000 * Math.random(),
-            })
-        } else {
+        if (goalLocation && dude.location !== goalLocation) {
             context.goToLocation(goalLocation)
+            return
         }
+
+        if (
+            dude.location === camp() &&
+            (timeOfDay < DarknessMask.SUNRISE_START || timeOfDay > DarknessMask.SUNSET_END)
+        ) {
+            // Go to a campfire if it's dark out
+            this.goToClosestFire(context)
+            return
+        }
+
+        // Roam around wherever they're at
+        context.roam(0.5, {
+            pauseEveryMillis: 2500 + 2500 * Math.random(),
+            pauseForMillis: 2500 + 5000 * Math.random(),
+        })
     }
 
     private findHomeLocation(dude: Dude) {
@@ -85,6 +65,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
     }
 
     private findWorkLocation(dude: Dude) {
+        // wfh today
         if (dude.factions.includes(DudeFaction.CLERGY)) {
             return this.findHomeLocation(dude)
         }
@@ -98,5 +79,30 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         }
 
         return LocationManager.instance.get(mines[0])
+    }
+
+    private goToClosestFire(context: NPCTaskContext) {
+        if (
+            LightManager.instance.isFullyLit(context.dude.standingPosition, context.dude.location)
+        ) {
+            context.doNothing()
+            return
+        }
+
+        const burningFires = context.dude.location
+            .getElementsOfType(ElementType.CAMPFIRE)
+            .filter((c) => c.entity.getComponent(Campfire).logs > 0)
+
+        if (burningFires.length === 0) {
+            context.doNothing()
+            return
+        }
+
+        const closestFire = Lists.minBy(burningFires, (e) =>
+            e.pos.distanceTo(context.dude.standingPosition)
+        )
+
+        // this works fine enough ¯\_(ツ)_/¯
+        context.walkTo(closestFire.pos.plusY(1))
     }
 }
