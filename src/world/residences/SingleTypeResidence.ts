@@ -28,9 +28,6 @@ export class SingleTypeResidence extends Residence {
     isHomeOf = (uuid: string) => this.residents.includes(uuid)
 
     setResidentPending = () => {
-        if (!this.hasCapacity) {
-            throw new Error("can't set a pending resident if capacity is met")
-        }
         this.residents.push(SingleTypeResidence.PENDING_RESIDENT)
     }
 
