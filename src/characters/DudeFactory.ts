@@ -100,7 +100,7 @@ export class DudeFactory {
         let animationName: string
         let weapon: WeaponType = WeaponType.NONE
         let shield: ShieldType = ShieldType.NONE
-        let maxHealth: number
+        let maxHealth: number = 2
         let speed: number = 0.085
         let dialogue: string = EMPTY_DIALOGUE
         let additionalComponents: Component[] = []
@@ -304,7 +304,7 @@ export class DudeFactory {
         location.dudes.add(d)
         d.location = location
 
-        // Always add dude component first to make sure additional components can access it
+        // Always add dude component first to make sure additional components can access it in awake()
         new Entity([d, ...additionalComponents])
 
         return d
