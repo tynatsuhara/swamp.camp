@@ -30,6 +30,8 @@ export enum ElementType {
     CHURCH,
 }
 
+window["ElementType"] = ElementType
+
 export class SavedElement {
     pos: string
     type: ElementType
