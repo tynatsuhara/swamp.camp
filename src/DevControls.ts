@@ -150,6 +150,7 @@ debug.enableDevControls = debug.enableDevControls || false
 debug.freeCamera = debug.freeCamera || false
 debug.godMode = debug.godMode || false
 debug.nightVision = debug.nightVision || false
+debug.peacefulMode = debug.peacefulMode || false
 debug.showAudioLogs = debug.showAudioLogs || false
 debug.showGrid = debug.showGrid || false
 debug.showInteractables = debug.showInteractables || false

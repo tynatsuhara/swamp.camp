@@ -1,4 +1,5 @@
 import { Component } from "brigsby/dist/Component"
+import { debug } from "brigsby/dist/Debug"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util/Lists"
@@ -42,10 +43,12 @@ export class DudeSpawner extends Component {
     }
 
     private spawn() {
-        this.spawnDemons()
-        this.spawnSwampThings()
-        this.checkForOrcSeige()
-        this.spawnWildlife()
+        if (!debug.peacefulMode) {
+            this.spawnDemons()
+            this.spawnSwampThings()
+            this.checkForOrcSeige()
+            this.spawnWildlife()
+        }
     }
 
     private spawnDemons() {
@@ -121,6 +124,11 @@ export class DudeSpawner extends Component {
     }
 
     spawnOrcs() {
+        if (debug.peacefulMode) {
+            console.log("peaceful mode enabled — no orcs will spawn")
+            return
+        }
+
         const spawnPos = this.getSpawnPosOffMap()
 
         const orcs = [
