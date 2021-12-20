@@ -34,6 +34,11 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
                 textAlign: TextAlign.CENTER,
             }),
     ],
+    [
+        InputKey.I,
+        "spawn doctor",
+        (input) => DudeFactory.instance.new(DudeType.DOCTOR, input.mousePos),
+    ],
     [InputKey.P, "spawn nun", (input) => DudeFactory.instance.new(DudeType.NUN, input.mousePos)],
     [
         InputKey.U,
@@ -150,7 +155,7 @@ debug.showInteractables = debug.showInteractables || false
 debug.showPathfinding = debug.showPathfinding || false
 debug.speedMultiplier = debug.speedMultiplier || 1
 
-window["help"] = () => {
+const help = () => {
     let help = `dev controls (enable with debug.enableDevControls=true)
 -------------------------------------------------------\n`
     devCommands.forEach((cmd) => {
@@ -158,3 +163,5 @@ window["help"] = () => {
     })
     console.log(help)
 }
+window["help"] = help
+help()
