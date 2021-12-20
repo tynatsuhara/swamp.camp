@@ -498,7 +498,7 @@ export class NPC extends Component {
             }
 
             if (this.stuck()) {
-                console.log("stuck")
+                this.dude.log("stuck")
                 shouldComputePath = true
             }
 

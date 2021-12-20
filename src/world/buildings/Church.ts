@@ -98,7 +98,7 @@ export class ChurchFactory extends BuildingFactory {
     }
 
     getOccupiedPoints(pos: Point) {
-        return ElementUtils.rectPoints(pos.plus(new Point(1, 1)), new Point(3, 2))
+        return ElementUtils.rectPoints(pos.plus(new Point(1, 3)), new Point(3, 2))
     }
 }
 
