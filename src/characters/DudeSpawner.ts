@@ -7,6 +7,7 @@ import { WorldAudioContext } from "../audio/WorldAudioContext"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
+import { tilesAround } from "../Utils"
 import { DarknessMask } from "../world/DarknessMask"
 import { EventQueue } from "../world/events/EventQueue"
 import { QueuedEventType } from "../world/events/QueuedEvent"
@@ -16,6 +17,7 @@ import { camp, LocationManager } from "../world/LocationManager"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
 import { DudeFaction, DudeFactory, DudeType } from "./DudeFactory"
+import { NPC } from "./NPC"
 
 export class DudeSpawner extends Component {
     static get instance() {
@@ -167,10 +169,15 @@ export class DudeSpawner extends Component {
     }
 
     spawnWolves() {
-        const wolves = 2 + Math.random() * 4
-        const spawnPos = this.getSpawnPosOffMap()
+        const leaderSpawnPos = this.getSpawnPosOffMap()
+        const leader = DudeFactory.instance.new(DudeType.WOLF, leaderSpawnPos)
+
+        const spawnPoints = tilesAround(leaderSpawnPos, 3)
+        const wolves = Math.floor(1 + Math.random() * 4)
+        console.log(`spawning ${wolves + 1} wolves`)
         for (let i = 0; i < wolves; i++) {
-            DudeFactory.instance.new(DudeType.WOLF, spawnPos)
+            const wolf = DudeFactory.instance.new(DudeType.WOLF, Lists.oneOf(spawnPoints))
+            wolf.entity.getComponent(NPC).setLeader(leader)
         }
     }
 

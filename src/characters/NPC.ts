@@ -7,6 +7,7 @@ import { Lists } from "brigsby/dist/util/Lists"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
+import { tilesAround } from "../Utils"
 import { Location } from "../world/Location"
 import { camp, LocationManager } from "../world/LocationManager"
 import { Teleporter } from "../world/Teleporter"
@@ -132,12 +133,10 @@ export class NPC extends Component {
             dude: this.dude,
             walkTo: (pt) => this.forceMoveToTilePosition(pt),
             roam: (_, options) => {
-                const goalOptions = options?.goalOptionsSupplier
-                    ? options.goalOptionsSupplier()
-                    : this.dude.location.getGroundSpots()
-                const pos = Lists.oneOf(
-                    goalOptions.filter((pt) => !this.dude.location.isOccupied(pt))
+                const goalOptions = this.getRoamingLocationPossiblities(
+                    options?.goalOptionsSupplier
                 )
+                const pos = Lists.oneOf(goalOptions)
                 this.forceMoveToTilePosition(pos)
             },
             goToLocation: (location) => this.simulateGoToLocation(location),
@@ -225,9 +224,7 @@ export class NPC extends Component {
     ) {
         if (!this.roamPath || this.roamPath.length === 0) {
             // only try once per upate() to find a path
-            const l = LocationManager.instance.currentLocation
-            const goalOptions = goalOptionsSupplier ? goalOptionsSupplier() : l.getGroundSpots()
-            const openPoints = goalOptions.filter((pt) => !l.isOccupied(pt))
+            const openPoints = this.getRoamingLocationPossiblities(goalOptionsSupplier)
             let pt: Point
             for (let i = 0; i < 5 && !pt; i++) {
                 const maybePt = Lists.oneOf(openPoints)
@@ -264,6 +261,23 @@ export class NPC extends Component {
         if (this.walkDirectlyTo(this.roamPath[0], updateData, false, speedMultiplier)) {
             this.roamPath.shift()
         }
+    }
+
+    private getRoamingLocationPossiblities(goalOptionsSupplier?: () => Point[]) {
+        let pts: Point[] = []
+
+        // If there is a leader, just follow them
+        const leader = this.getLeader()
+
+        if (leader && leader.isAlive) {
+            pts = tilesAround(leader.tile, 3)
+        } else if (goalOptionsSupplier) {
+            pts = goalOptionsSupplier()
+        } else {
+            pts = this.dude.location.getGroundSpots()
+        }
+
+        return pts.filter((pt) => !this.dude.location.isOccupied(pt))
     }
 
     // Can be called very update()
@@ -576,6 +590,24 @@ export class NPC extends Component {
     private tilePtToStandingPos(tilePt: Point) {
         const ptOffset = new Point(0.5, 0.8)
         return tilePt.plus(ptOffset).times(TILE_SIZE)
+    }
+
+    private leader: Dude
+    private getLeader() {
+        const savedLeaderUUID = this.dude.blob["leader"]
+        if (!savedLeaderUUID) {
+            return undefined
+        }
+        if (!this.leader) {
+            this.leader = Array.from(this.dude.location.dudes).find(
+                (d) => d.uuid === savedLeaderUUID
+            )
+        }
+        return this.leader
+    }
+    setLeader(val: Dude) {
+        this.leader = val
+        this.dude.blob["leader"] = val.uuid
     }
 
     getRenderMethods() {

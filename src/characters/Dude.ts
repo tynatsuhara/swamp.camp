@@ -964,7 +964,7 @@ export class Dude extends Component implements DialogueSource {
         if (hasPendingSlot) {
             const pending = residences.filter((res) => res.canClaimPendingSlot(type))
             if (pending.length > 0) {
-                console.log("claimed a pending house slot")
+                this.log("claimed a pending house slot")
                 pending[0].claimPendingSlot(uuid)
             }
             return
@@ -975,9 +975,9 @@ export class Dude extends Component implements DialogueSource {
         if (availableResidences.length > 0) {
             availableResidences[0].setResidentPending()
             availableResidences[0].claimPendingSlot(uuid)
-            console.log("claimed a house slot")
+            this.log("claimed a house slot")
         } else {
-            console.log("could not find a home")
+            this.log("could not find a home")
         }
     }
 
