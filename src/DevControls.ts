@@ -47,7 +47,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
         () => Player.instance.dude.addCondition(Condition.ON_FIRE, 2_000),
     ],
     [InputKey.B, "spawn bear", spawn(DudeType.BEAR)],
-    [InputKey.V, "spawn wolf", spawn(DudeType.WOLF)],
+    [InputKey.V, "spawn wolves", () => DudeSpawner.instance.spawnWolves()],
     [
         InputKey.SEMICOLON,
         "poison player",

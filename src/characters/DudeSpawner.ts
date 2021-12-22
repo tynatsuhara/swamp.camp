@@ -162,11 +162,15 @@ export class DudeSpawner extends Component {
         }
 
         if (this.shouldRandomlySpawn(TimeUnit.DAY * 3)) {
-            const wolves = 2 + Math.random() * 4
-            const spawnPos = this.getSpawnPosOffMap()
-            for (let i = 0; i < wolves; i++) {
-                DudeFactory.instance.new(DudeType.WOLF, spawnPos)
-            }
+            this.spawnWolves()
+        }
+    }
+
+    spawnWolves() {
+        const wolves = 2 + Math.random() * 4
+        const spawnPos = this.getSpawnPosOffMap()
+        for (let i = 0; i < wolves; i++) {
+            DudeFactory.instance.new(DudeType.WOLF, spawnPos)
         }
     }
 
