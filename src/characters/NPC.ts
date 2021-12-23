@@ -173,11 +173,11 @@ export class NPC extends Component {
         this.targetPath = null
         this.teleporterTarget = null
         this.task = null
-        // this.followTarget = null
     }
 
     private walkPath: Point[] = null
     private walkTo(tilePt: Point, updateData: UpdateData, speedMultiplier: number = 1) {
+        // Compute the walking path
         if (
             this.walkPath?.length > 0 &&
             pixelPtToTilePt(Lists.last(this.walkPath)).distanceTo(tilePt) <= 1
@@ -192,16 +192,7 @@ export class NPC extends Component {
             }
         }
 
-        if (
-            this.walkDirectlyTo(
-                this.walkPath[0],
-                updateData,
-                this.walkPath.length === 1,
-                speedMultiplier
-            )
-        ) {
-            this.walkPath.shift()
-        }
+        this.followPath(this.walkPath, updateData, this.walkPath.length === 1, speedMultiplier)
     }
 
     private roamPath: Point[] = null
@@ -222,6 +213,7 @@ export class NPC extends Component {
             pauseForMillis?: number
         } = {}
     ) {
+        // Compute the roaming path
         if (!this.roamPath || this.roamPath.length === 0) {
             // only try once per upate() to find a path
             const openPoints = this.getRoamingLocationPossiblities(goalOptionsSupplier)
@@ -258,9 +250,7 @@ export class NPC extends Component {
             this.roamNextUnpauseTime = -1
         }
 
-        if (this.walkDirectlyTo(this.roamPath[0], updateData, false, speedMultiplier)) {
-            this.roamPath.shift()
-        }
+        this.followPath(this.roamPath, updateData, false, speedMultiplier)
     }
 
     private getRoamingLocationPossiblities(goalOptionsSupplier?: () => Point[]) {
@@ -279,12 +269,6 @@ export class NPC extends Component {
 
         return pts.filter((pt) => !this.dude.location.isOccupied(pt))
     }
-
-    // Can be called very update()
-    // follow(followTarget: Dude) {
-    //     // TODO we probably want to make this serializable (character uuid?) if we end up using it
-    //     this.followTarget = followTarget
-    // }
 
     private attackTarget: Dude
     get targetedEnemy() {
@@ -312,17 +296,8 @@ export class NPC extends Component {
 
         // TODO maybe switch dynamically between A* and direct walking?
 
-        // const followDistance = this.dude.weapon.getRange()/2 ?? 20
-        // const buffer = 0  // this basically determines how long they will stop for if they get too close
-
         const dist = this.attackTarget.standingPosition.minus(this.dude.standingPosition)
         const mag = dist.magnitude()
-
-        // if (mag > followDistance || ((followDistance-mag) < buffer && this.attackTarget.isMoving) && this.dude.isMoving) {
-        //     this.dude.move(updateData, dist)
-        // } else {
-        //     this.dude.move(updateData, new Point(0, 0))
-        // }
 
         const stoppingDist = weapon.getStoppingDistance()
         const inRangeAndArmed =
@@ -379,45 +354,29 @@ export class NPC extends Component {
             return
         }
 
-        if (
-            this.walkDirectlyTo(
-                this.targetPath[0],
-                updateData,
-                false,
-                1,
-                this.targetPath.length < 2
-                    ? this.attackTarget.standingPosition.x - this.dude.standingPosition.x
-                    : 0
-            )
-        ) {
-            this.targetPath.shift()
-        }
+        // Make sure they always face their opponent if close
+        const facingOverride =
+            this.targetPath.length < 2
+                ? this.attackTarget.standingPosition.x - this.dude.standingPosition.x
+                : 0
+
+        this.followPath(this.targetPath, updateData, false, 1, facingOverride)
     }
 
-    // private followTarget: Dude
-    // private doFollow(updateData: UpdateData) {
-    //     const followDistance = 75
-    //     const buffer = 40  // this basically determines how long they will stop for if they get too close
-
-    //     const dist = Player.instance.dude.standingPosition.minus(this.dude.standingPosition)
-    //     const mag = dist.magnitude()
-
-    //     if (mag > followDistance || ((followDistance-mag) < buffer && Player.instance.dude.isMoving) && this.dude.isMoving) {
-    //         this.dude.move(updateData, dist)
-    //     } else {
-    //         this.dude.move(updateData, new Point(0, 0))
-    //     }
-    // }
-
-    // returns true if they are pretty close (half a tile) away from the goal
-    private walkDirectlyTo(
-        pt: Point,
+    /**
+     * @param path the path for the NPC the follow (WILL BE MODIFIED)
+     */
+    private followPath(
+        path: Point[],
         updateData: UpdateData,
         stopWhenClose = false,
         speedMultiplier: number = 1,
         facingOverride: number = 0
     ) {
-        const isCloseEnough = this.isCloseEnoughToStopWalking(pt)
+        const pt = path[0]
+
+        const isCloseEnough = this.dude.standingPosition.distanceTo(pt) < 8
+
         if (isCloseEnough && stopWhenClose) {
             this.dude.move(updateData, Point.ZERO, facingOverride)
         } else {
@@ -432,16 +391,15 @@ export class NPC extends Component {
                 this.lastMoveTime = new Date().getMilliseconds()
             }
         }
-        return isCloseEnough
+
+        if (isCloseEnough) {
+            path.shift()
+        }
     }
 
     private lastMoveTime: number
     private stuck() {
         return new Date().getMilliseconds() - this.lastMoveTime > 1000
-    }
-
-    private isCloseEnoughToStopWalking(pt: Point) {
-        return this.dude.standingPosition.distanceTo(pt) < 8
     }
 
     /**
