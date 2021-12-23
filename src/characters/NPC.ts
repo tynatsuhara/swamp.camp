@@ -594,6 +594,12 @@ export class NPC extends Component {
 
     private leader: Dude
     private getLeader() {
+        if (this.leader) {
+            if (!this.leader.isAlive || this.leader.location !== this.dude.location) {
+                this.setLeader(undefined)
+                this.dude.log("stopped following leader")
+            }
+        }
         const savedLeaderUUID = this.dude.blob["leader"]
         if (!savedLeaderUUID) {
             return undefined
