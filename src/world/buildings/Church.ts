@@ -13,6 +13,7 @@ import { Location } from "../Location"
 import { LocationManager, LocationType } from "../LocationManager"
 import { SingleTypeResidence } from "../residences/SingleTypeResidence"
 import { Teleporter, TeleporterPrefix } from "../Teleporter"
+import { AsciiInteriorBuilder } from "./AsciiInteriorBuilder"
 import { BuildingFactory } from "./Building"
 import { InteriorUtils } from "./InteriorUtils"
 
@@ -102,12 +103,24 @@ export class ChurchFactory extends BuildingFactory {
     }
 }
 
-// TODO
+const CHURCH_TEMPLATE = `
+.......
+...O...
+.......
+.__.__.
+.......
+.__.__.
+.......
+.__.__.
+.......
+   T   
+`
+
 const makeChurchInterior = (outside: Location): Location => {
     const l = new Location(LocationType.CHUCH_INTERIOR, true, false)
 
     LocationManager.instance.add(l)
-    const dimensions = new Point(7, 5)
+    const dimensions = new Point(7, 9)
     const interactablePos = new Point(dimensions.x / 2, dimensions.y).times(TILE_SIZE)
     const teleporter: Teleporter = {
         to: outside.uuid,
@@ -117,11 +130,16 @@ const makeChurchInterior = (outside: Location): Location => {
 
     l.setBarriers(InteriorUtils.makeBarriers(dimensions))
     l.addTeleporter(teleporter)
-    l.addElement(ElementType.TELEPORTER, new Point(3, 5), {
-        to: outside.uuid,
-        i: interactablePos.toString(),
-        id: TeleporterPrefix.DOOR,
-    })
+
+    new AsciiInteriorBuilder(CHURCH_TEMPLATE)
+        .map("_", (pos) => l.addElement(ElementType.BENCH, pos))
+        .map("T", (pos) =>
+            l.addElement(ElementType.TELEPORTER, pos, {
+                to: outside.uuid,
+                i: interactablePos.toString(),
+                id: TeleporterPrefix.DOOR,
+            })
+        )
 
     const woodType = Math.ceil(Math.random() * 2)
 
@@ -129,6 +147,7 @@ const makeChurchInterior = (outside: Location): Location => {
         l.sprites.addSprite(key, pt.times(TILE_SIZE), rotation, -100000)
     }
 
+    // walls
     for (let x = 0; x < dimensions.x; x++) {
         for (let y = 0; y < dimensions.y; y++) {
             l.setGroundElement(GroundType.BASIC, new Point(x, y), {
