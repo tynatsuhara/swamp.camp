@@ -222,6 +222,7 @@ export class DudeFactory {
                 additionalComponents = [new NPC(), new Villager()]
                 defaultInventory.addItem(Item.WEAK_MEDICINE, 3)
                 defaultInventory.addItem(Item.HEART_CONTAINER, 1)
+                nameGen = () => peopleNames.generate("<doctor>")
                 break
             }
             case DudeType.CENTAUR: {

@@ -17,7 +17,16 @@ import { WorldTime } from "./world/WorldTime"
 
 export const spawnMenu = {
     show: false,
-    type: DudeType.SHROOM,
+    selectedType: DudeType.SHROOM,
+    types: [
+        DudeType.SHROOM,
+        DudeType.NUN,
+        DudeType.CLERIC,
+        DudeType.BISHOP,
+        DudeType.DOCTOR,
+        DudeType.BEAR,
+        DudeType.WOLF,
+    ],
 }
 
 const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
@@ -44,7 +53,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
         "spawn selected type",
         (input) =>
             DudeFactory.instance.new(
-                spawnMenu.type,
+                spawnMenu.selectedType,
                 input.mousePos,
                 LocationManager.instance.currentLocation
             ),

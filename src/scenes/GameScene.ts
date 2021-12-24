@@ -176,22 +176,13 @@ export class GameScene {
 
     private getUiSpaceDebugEntity() {
         if (spawnMenu.show) {
-            const spawnableTypes = [
-                DudeType.SHROOM,
-                DudeType.NUN,
-                DudeType.CLERIC,
-                DudeType.BISHOP,
-                DudeType.BEAR,
-                DudeType.WOLF,
-            ]
-
             return ButtonsMenu.render(
                 "white",
-                spawnableTypes.map((type) => ({
+                spawnMenu.types.map((type) => ({
                     text: `SPAWN ${DudeType[type]}`,
                     fn: () => {
+                        spawnMenu.selectedType = type
                         spawnMenu.show = false
-                        spawnMenu.type = type
                     },
                     buttonColor: "white",
                     textColor: Color.WHITE,
