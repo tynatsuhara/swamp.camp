@@ -30,7 +30,7 @@ export class BenchFactory extends ElementFactory {
             )
         )
 
-        e.addComponent(new BoxCollider(pixelPos.plusY(12), new Point(15, 3)))
+        e.addComponent(new BoxCollider(pixelPos.plusX(2).plusY(12), new Point(12, 3)))
 
         if (wl.allowPlacing) {
             e.addComponent(
