@@ -6,6 +6,7 @@ import { MineExitFactory } from "../buildings/MineExit"
 import { TentFactory } from "../buildings/Tent"
 import { TeleporterFactory } from "../Teleporter"
 import { BedFactory } from "./Bed"
+import { BenchFactory } from "./BenchFactory"
 import { CampfireFactory } from "./Campfire"
 import { ChestFactory } from "./Chest"
 import { ElementFactory } from "./ElementFactory"
@@ -28,6 +29,7 @@ export enum ElementType {
     MINE_ENTRANCE,
     MINE_EXIT,
     CHURCH,
+    BENCH,
 }
 
 window["ElementType"] = ElementType
@@ -57,6 +59,7 @@ export class Elements {
         [ElementType.CHURCH]: new ChurchFactory(),
         [ElementType.MINE_ENTRANCE]: new MineEntranceFactory(),
         [ElementType.MINE_EXIT]: new MineExitFactory(),
+        [ElementType.BENCH]: new BenchFactory(),
     }
 
     getElementFactory(type: ElementType) {
