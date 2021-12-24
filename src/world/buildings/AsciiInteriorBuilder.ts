@@ -3,8 +3,14 @@ import { Point } from "brigsby/dist/Point"
 export class AsciiInteriorBuilder {
     private readonly ascii: String[]
 
-    constructor(...ascii: String[]) {
-        this.ascii = ascii
+    constructor(ascii: String) {
+        if (ascii.startsWith("\n")) {
+            ascii = ascii.replace("\n", "")
+        }
+        if (ascii.endsWith("\n")) {
+            ascii = ascii.substring(0, ascii.length - 1)
+        }
+        this.ascii = ascii.split("\n")
     }
 
     map(char: string, fn: (pos: Point) => void) {

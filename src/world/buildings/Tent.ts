@@ -85,6 +85,12 @@ const addTile = (e: Entity, s: string, pos: Point, depth: number) => {
     tile.transform.depth = depth
 }
 
+const TENT_TEMPLATE = `
+  ^  
+ /xl
+/xxxl
+`
+
 const makeTentInterior = (outside: Location, color: TentColor): Location => {
     const isPlayerTent = color === TentColor.BLUE
     const l = new Location(LocationType.TENT_INTERIOR, true, isPlayerTent)
@@ -124,7 +130,7 @@ const makeTentInterior = (outside: Location, color: TentColor): Location => {
         l.sprites.addSprite(key, pt.plusY(-3).times(TILE_SIZE), 0, -100000)
     }
 
-    new AsciiInteriorBuilder("  ^  ", " /xl ", "/xxxl")
+    new AsciiInteriorBuilder(TENT_TEMPLATE)
         .map("/", (pt) => addWallSprite(`${color}tentl`, pt))
         .map("^", (pt) => addWallSprite(`${color}tenttip`, pt))
         .map("l", (pt) => addWallSprite(`${color}tentr`, pt))
