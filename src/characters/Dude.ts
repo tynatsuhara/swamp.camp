@@ -118,6 +118,7 @@ export class Dude extends Component implements DialogueSource {
     dialogue: string
 
     private conditions: ActiveCondition[] = []
+    private name: string
 
     constructor(params: {
         uuid: string
@@ -136,11 +137,15 @@ export class Dude extends Component implements DialogueSource {
         blob: object
         colliderSize: Point
         conditions: ActiveCondition[]
+        name: string
     }) {
         super()
 
-        // All parameters must be defined
+        // Most parameters should be defined
         Object.entries(params).forEach(([key, value]) => {
+            if (key === "name") {
+                return
+            }
             if (value === undefined || value === null) {
                 console.error(`parameter ${key} should not be ${value}`)
             }
@@ -163,6 +168,7 @@ export class Dude extends Component implements DialogueSource {
             blob,
             colliderSize,
             conditions,
+            name,
         } = { ...params }
 
         this.uuid = uuid
@@ -176,6 +182,7 @@ export class Dude extends Component implements DialogueSource {
         this.dialogue = dialogue
         this.blob = blob
         this.conditions = conditions
+        this.name = name
 
         this.awake = () => {
             // Set up animations
@@ -933,6 +940,7 @@ export class Dude extends Component implements DialogueSource {
             dialogue: this.dialogue,
             blob: this.blob,
             conditions: this.conditions,
+            name: this.name,
         }
     }
 

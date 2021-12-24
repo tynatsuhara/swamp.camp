@@ -15,6 +15,7 @@ import { BERTO_STARTING_DIALOGUE } from "./dialogue/BertoDialogue"
 import { EMPTY_DIALOGUE } from "./dialogue/Dialogue"
 import { DOCTOR_DIALOGUE_ENTRYPOINT } from "./dialogue/DoctorDialogue"
 import { Dude } from "./Dude"
+import { peopleNames } from "./NameFactory"
 import { NPC } from "./NPC"
 import { Player } from "./Player"
 import { AquaticNPC } from "./types/AquaticNPC"
@@ -108,6 +109,7 @@ export class DudeFactory {
         let inventoryClass = Inventory
         let defaultInventory = new Inventory()
         let colliderSize = DEFAULT_COLLIDER_SIZE
+        let name: string
 
         // type-specific defaults
         switch (type) {
@@ -254,18 +256,21 @@ export class DudeFactory {
                 animationName = Lists.oneOf(["FatNun", "NormalNun", "SkinnyNun"])
                 additionalComponents = [new NPC(), new Villager()]
                 speed *= 0.4
+                name = peopleNames.generate("<nun>")
                 break
             case DudeType.CLERIC:
                 factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
                 animationName = Lists.oneOf(["FatCleric", "NormalCleric", "TallCleric"])
                 additionalComponents = [new NPC(), new Villager()]
                 speed *= 0.4
+                name = peopleNames.generate("<cleric>")
                 break
             case DudeType.BISHOP: {
                 factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
                 animationName = "Bishop"
                 additionalComponents = [new NPC(), new Villager()]
                 speed *= 0.3
+                name = peopleNames.generate("<bishop>")
                 break
             }
             case DudeType.SWAMP_THING:
@@ -301,6 +306,7 @@ export class DudeFactory {
             blob: saveState?.blob ?? blob,
             colliderSize: colliderSize,
             conditions: saveState?.conditions ?? [],
+            name: saveState?.name ?? name,
         })
 
         location.dudes.add(d)
