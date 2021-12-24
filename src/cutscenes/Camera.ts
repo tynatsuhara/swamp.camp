@@ -69,7 +69,7 @@ export class Camera {
             yLimit = mapSize
         }
 
-        if (debug.freeCamera) {
+        if (debug.freeCamera || !LocationManager.instance.currentLocation.size) {
             xLimit = Number.MAX_SAFE_INTEGER
             yLimit = Number.MAX_SAFE_INTEGER
         }
