@@ -15,14 +15,14 @@ import { LocationManager } from "./world/LocationManager"
 import { TimeUnit } from "./world/TimeUnit"
 import { WorldTime } from "./world/WorldTime"
 
-const spawn = (type: DudeType) => {
-    return (input: CapturedInput) =>
-        DudeFactory.instance.new(type, input.mousePos, LocationManager.instance.currentLocation)
+export const spawnMenu = {
+    show: false,
+    type: DudeType.SHROOM,
 }
 
 const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     [
-        InputKey.O,
+        InputKey.I,
         "show town stats",
         () =>
             TextOverlayManager.instance.open({
@@ -39,15 +39,23 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
                 textAlign: TextAlign.CENTER,
             }),
     ],
-    [InputKey.I, "spawn doctor", spawn(DudeType.DOCTOR)],
-    [InputKey.P, "spawn nun", spawn(DudeType.NUN)],
+    [
+        InputKey.O,
+        "spawn selected type",
+        (input) =>
+            DudeFactory.instance.new(
+                spawnMenu.type,
+                input.mousePos,
+                LocationManager.instance.currentLocation
+            ),
+    ],
+    [InputKey.P, "show spawn menu", () => (spawnMenu.show = !spawnMenu.show)],
     [
         InputKey.U,
         "set player on fire",
         () => Player.instance.dude.addCondition(Condition.ON_FIRE, 2_000),
     ],
-    [InputKey.B, "spawn bear", spawn(DudeType.BEAR)],
-    [InputKey.V, "spawn wolves", () => DudeSpawner.instance.spawnWolves()],
+    [InputKey.V, "spawn wolf pack", () => DudeSpawner.instance.spawnWolves()],
     [
         InputKey.SEMICOLON,
         "poison player",
@@ -135,7 +143,7 @@ export class DevControls extends Component {
         if (debug.enableDevControls) {
             devCommands.forEach((cmd) => {
                 if (updateData.input.isKeyDown(cmd[0])) {
-                    console.log(cmd[1])
+                    console.log(`executing command: ${cmd[1]}`)
                     cmd[2](updateData.input)
                 }
             })

@@ -17,11 +17,13 @@ import { Camera } from "../cutscenes/Camera"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { IntroCutscene } from "../cutscenes/IntroCutscene"
 import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
-import { DevControls } from "../DevControls"
+import { DevControls, spawnMenu } from "../DevControls"
 import { Particles } from "../graphics/Particles"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { DroppedItem } from "../items/DroppedItem"
 import { Singletons } from "../Singletons"
+import { ButtonsMenu } from "../ui/ButtonsMenu"
+import { Color } from "../ui/Color"
 import { UIStateManager } from "../ui/UIStateManager"
 import { EventQueue } from "../world/events/EventQueue"
 import { QueuedEventType } from "../world/events/QueuedEvent"
@@ -84,9 +86,11 @@ export class GameScene {
             ? [TextOverlayManager.instance.getEntity()]
             : UIStateManager.instance.get(updateViewsContext.elapsedTimeMillis)
 
+        uiEntities.push(this.getUiSpaceDebugEntity())
+
         const gameEntities: Entity[] = [
             CutsceneManager.instance.getEntity(),
-            this.getDebugEntity(),
+            this.getWorldSpaceDebugEntity(),
             new Entity([new DevControls()]),
         ]
 
@@ -120,7 +124,7 @@ export class GameScene {
         ]
     }
 
-    private getDebugEntity() {
+    private getWorldSpaceDebugEntity(): Entity {
         if (!Player.instance?.dude) {
             return
         }
@@ -168,5 +172,33 @@ export class GameScene {
         }
 
         return e
+    }
+
+    private getUiSpaceDebugEntity() {
+        if (spawnMenu.show) {
+            const spawnableTypes = [
+                DudeType.SHROOM,
+                DudeType.NUN,
+                DudeType.CLERIC,
+                DudeType.BISHOP,
+                DudeType.BEAR,
+                DudeType.WOLF,
+            ]
+
+            return ButtonsMenu.render(
+                "white",
+                spawnableTypes.map((type) => ({
+                    text: `SPAWN ${DudeType[type]}`,
+                    fn: () => {
+                        spawnMenu.show = false
+                        spawnMenu.type = type
+                    },
+                    buttonColor: "white",
+                    textColor: Color.WHITE,
+                    hoverColor: Color.DARK_RED,
+                })),
+                Camera.instance.dimensions.div(2)
+            )
+        }
     }
 }
