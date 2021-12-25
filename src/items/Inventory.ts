@@ -137,6 +137,10 @@ export class Inventory {
 
     static load(stacks: ItemStack[]) {
         const inv = new this()
+
+        // filter out now-invalid items
+        stacks = stacks.map((stack) => (ITEM_METADATA_MAP[stack?.item] ? stack : null))
+
         inv.stacks = stacks
         stacks.forEach((stack) => {
             if (!!stack) {
