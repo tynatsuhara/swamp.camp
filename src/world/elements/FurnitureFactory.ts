@@ -11,9 +11,17 @@ import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
 
-export class BenchFactory extends ElementFactory {
-    readonly type = ElementType.BENCH
+export class FurnitureFactory extends ElementFactory {
+    readonly type: ElementType
     readonly dimensions = new Point(1, 1)
+
+    private readonly tileKey: string
+
+    constructor(type: ElementType, tileKey: string) {
+        super()
+        this.type = type
+        this.tileKey = tileKey
+    }
 
     make(wl: Location, pos: Point, data: object): ElementComponent {
         const e = new Entity()
@@ -22,7 +30,7 @@ export class BenchFactory extends ElementFactory {
         const pixelCenterPos = pos.plus(new Point(0.5, 0.5)).times(TILE_SIZE)
 
         const sprite = e.addComponent(
-            Tilesets.instance.outdoorTiles.getTileSource("bench").toComponent(
+            Tilesets.instance.outdoorTiles.getTileSource(this.tileKey).toComponent(
                 SpriteTransform.new({
                     position: pixelPos,
                     depth: pixelPos.y + TILE_SIZE,

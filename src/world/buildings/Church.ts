@@ -132,6 +132,7 @@ const makeChurchInterior = (outside: Location): Location => {
     l.addTeleporter(teleporter)
 
     new AsciiInteriorBuilder(CHURCH_TEMPLATE)
+        .map("O", (pos) => l.addElement(ElementType.PODIUM, pos))
         .map("_", (pos) => l.addElement(ElementType.BENCH, pos))
         .map("T", (pos) =>
             l.addElement(ElementType.TELEPORTER, pos, {

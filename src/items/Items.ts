@@ -28,7 +28,6 @@ export enum Item {
     CHURCH,
     WEAK_MEDICINE,
     HEART_CONTAINER,
-    BENCH,
 
     // weapon values should match the WeaponType enum so we can cast them
     KNIFE = WeaponType.KNIFE,
@@ -175,12 +174,6 @@ export const ITEM_METADATA_MAP = {
         displayName: "Heart container",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("heart"),
         stackLimit: 1,
-    }),
-    [Item.BENCH]: new ItemMetadata({
-        displayName: "Bench",
-        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("heart"), // TODO
-        stackLimit: 1,
-        element: ElementType.BENCH,
     }),
 
     // Locations

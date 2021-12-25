@@ -6,10 +6,10 @@ import { MineExitFactory } from "../buildings/MineExit"
 import { TentFactory } from "../buildings/Tent"
 import { TeleporterFactory } from "../Teleporter"
 import { BedFactory } from "./Bed"
-import { BenchFactory } from "./BenchFactory"
 import { CampfireFactory } from "./Campfire"
 import { ChestFactory } from "./Chest"
 import { ElementFactory } from "./ElementFactory"
+import { FurnitureFactory } from "./FurnitureFactory"
 import { MushroomFactory } from "./Mushroom"
 import { RockFactory } from "./Rock"
 import { TreeFactory } from "./Tree"
@@ -30,6 +30,7 @@ export enum ElementType {
     MINE_EXIT,
     CHURCH,
     BENCH,
+    PODIUM,
 }
 
 window["ElementType"] = ElementType
@@ -45,6 +46,7 @@ export class Elements {
         return Singletons.getOrCreate(Elements)
     }
 
+    // TODO: Convert to array then invert, since the key and factory type fields are redundant
     private readonly ELEMENT_FACTORIES: { [key: number]: ElementFactory } = {
         [ElementType.TREE_ROUND]: new TreeFactory(ElementType.TREE_ROUND),
         [ElementType.TREE_POINTY]: new TreeFactory(ElementType.TREE_POINTY),
@@ -59,7 +61,8 @@ export class Elements {
         [ElementType.CHURCH]: new ChurchFactory(),
         [ElementType.MINE_ENTRANCE]: new MineEntranceFactory(),
         [ElementType.MINE_EXIT]: new MineExitFactory(),
-        [ElementType.BENCH]: new BenchFactory(),
+        [ElementType.BENCH]: new FurnitureFactory(ElementType.BENCH, "bench"),
+        [ElementType.PODIUM]: new FurnitureFactory(ElementType.PODIUM, "podium"),
     }
 
     getElementFactory(type: ElementType) {

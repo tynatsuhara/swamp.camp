@@ -64,6 +64,7 @@ export class OutdoorTileset extends SingleFileTileLoader {
                 ["hardwood3", new Point(8, 3)],
                 ["hardwood4", new Point(9, 3)],
                 ["bench", new Point(18, 5)],
+                ["podium", new Point(23, 3)],
             ])
         )
     }
