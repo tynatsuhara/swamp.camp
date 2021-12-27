@@ -373,21 +373,27 @@ export class NPC extends Component {
         speedMultiplier: number = 1,
         facingOverride: number = 0
     ) {
-        const pt = path[0]
+        const nextPt = path[0]
+        const nextTile = pixelPtToTilePt(nextPt)
 
-        const isCloseEnough = this.dude.standingPosition.distanceTo(pt) < 8
+        const isCloseEnough = this.dude.standingPosition.distanceTo(nextPt) < 8
+
+        // Make them face the right direction when traveling straight up/down
+        if (facingOverride === 0 && path.length > 1 && nextTile.x === this.dude.tile.x) {
+            facingOverride = path[1].x - this.dude.standingPosition.x
+        }
 
         if (isCloseEnough && stopWhenClose) {
             this.dude.move(updateData, Point.ZERO, facingOverride)
         } else {
-            const pos = this.dude.standingPosition
+            const oldPosition = this.dude.standingPosition
             this.dude.move(
                 updateData,
-                pt.minus(this.dude.standingPosition),
+                nextPt.minus(this.dude.standingPosition),
                 facingOverride,
                 speedMultiplier
             )
-            if (!this.dude.standingPosition.equals(pos)) {
+            if (!this.dude.standingPosition.equals(oldPosition)) {
                 this.lastMoveTime = new Date().getMilliseconds()
             }
         }
@@ -493,15 +499,32 @@ export class NPC extends Component {
 
     private findPath(targetTilePoint: Point) {
         // TODO: NPCs can sometimes get stuck if their starting square is "occupied"
-        return LocationManager.instance.currentLocation
-            .findPath(
-                this.dude.tile,
-                targetTilePoint,
-                this.pathFindingHeuristic,
-                this.pathIsOccupied
-            )
-            ?.map((pt) => this.tilePtToStandingPos(pt))
-            .slice(1) // slice(1) because we don't need the start in the path
+        const path = LocationManager.instance.currentLocation.findPath(
+            this.dude.tile,
+            targetTilePoint,
+            this.pathFindingHeuristic,
+            this.pathIsOccupied
+        )
+
+        if (!path) {
+            return undefined
+        }
+
+        for (let i = 1; i < path.length - 1; i++) {
+            const pt = path[i]
+            const before = path[i - 1]
+            const after = path[i + 1]
+            if (
+                (before.x === pt.x && pt.x === after.x) ||
+                (before.y === pt.y && pt.y === after.y)
+            ) {
+                path.splice(i, 1)
+                i--
+            }
+        }
+
+        // slice(1) because we don't need the start in the path
+        return path.map((pt) => this.tilePtToStandingPos(pt)).slice(1)
     }
 
     private goToLocation(updateData: UpdateData, goalLocation: Location) {
@@ -577,26 +600,23 @@ export class NPC extends Component {
     getRenderMethods() {
         if (!debug.showPathfinding) {
             return []
-        }
-        if (this.walkPath) {
-            return this.renderPath(this.walkPath)
-        }
-        if (this.roamPath) {
-            return this.renderPath(this.roamPath)
-        }
-        if (this.targetPath) {
+        } else if (this.targetPath) {
             return this.renderPath(this.targetPath)
+        } else if (this.walkPath) {
+            return this.renderPath(this.walkPath)
+        } else if (this.roamPath) {
+            return this.renderPath(this.roamPath)
         }
         return []
     }
 
     private renderPath(path: Point[], color: string = "#ff0000") {
-        if (path.length < 2) {
+        if (path.length === 0) {
             return []
         }
-        let lineStart = path[0]
+        let lineStart = this.tilePtToStandingPos(pixelPtToTilePt(this.dude.standingPosition))
         const result = []
-        for (let i = 1; i < path.length; i++) {
+        for (let i = 0; i < path.length; i++) {
             const lineEnd = path[i]
             result.push(new LineRender(lineStart, lineEnd, color))
             lineStart = lineEnd
