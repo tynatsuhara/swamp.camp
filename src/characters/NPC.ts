@@ -569,9 +569,9 @@ export class NPC extends Component {
         }
         return this.leader
     }
-    setLeader(val: Dude) {
+    setLeader(val?: Dude) {
         this.leader = val
-        this.dude.blob["leader"] = val.uuid
+        this.dude.blob["leader"] = val?.uuid
     }
 
     getRenderMethods() {
