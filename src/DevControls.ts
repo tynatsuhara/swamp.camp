@@ -20,6 +20,7 @@ export const spawnMenu = {
     selectedType: DudeType.SHROOM,
     types: [
         DudeType.SHROOM,
+        DudeType.BLACKSMITH,
         DudeType.NUN,
         DudeType.CLERIC,
         DudeType.BISHOP,

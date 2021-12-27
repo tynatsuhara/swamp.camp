@@ -61,6 +61,7 @@ export enum DudeType {
     BISHOP,
     SWAMP_THING,
     DOCTOR,
+    BLACKSMITH,
 }
 
 const DEFAULT_COLLIDER_SIZE = new Point(10, 8)
@@ -223,6 +224,15 @@ export class DudeFactory {
                 defaultInventory.addItem(Item.WEAK_MEDICINE, 3)
                 defaultInventory.addItem(Item.HEART_CONTAINER, 1)
                 nameGen = () => peopleNames.generate("<doctor>")
+                break
+            }
+            case DudeType.BLACKSMITH: {
+                animationName = "Alchemist"
+                maxHealth = 10
+                speed *= 0.6
+                // dialogue = DOCTOR_DIALOGUE_ENTRYPOINT
+                additionalComponents = [new NPC(), new Villager()]
+                nameGen = () => peopleNames.generate("<blacksmith>")
                 break
             }
             case DudeType.CENTAUR: {
