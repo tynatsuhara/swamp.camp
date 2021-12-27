@@ -52,3 +52,8 @@ tentative sound effects & music:
 -   https://opengameart.org/content/talking-synthesizer
 -   https://opengameart.org/content/swishes-sound-pack
 -   https://opengameart.org/content/voices-sound-effects-library
+
+color palettes:
+
+-   current: https://lospec.com/palette-list/linear-color-palette-basic
+-   aspirational: https://lospec.com/palette-list/vinik24
