@@ -5,35 +5,45 @@ import { Color, getRGB } from "../ui/Color"
 import { DarknessMask } from "./DarknessMask"
 
 export class Vignette extends Component {
+    // TODO move to top-level consts
     private buffer = 50 // pixels from beyond the edge of the map (useful for covering clipping things)
     private padding = 128 // distance from start of shadows to the edge of the screen
     private rings = 8
     private ringWidth = this.padding / this.rings
 
-    constructor(topLeftPosition: Point, diameter: number) {
+    constructor(topLeftPosition: Point, height: number) {
         super()
+
+        const width = height * 2
+
         this.start = () => {
             const canvas = document.createElement("canvas")
-            canvas.width = canvas.height = diameter + this.buffer * 2
+            canvas.width = width + this.buffer * 2
+            canvas.height = height + this.buffer * 2
             const context = canvas.getContext("2d")
+
+            // draw borders over edge
             context.fillStyle = Color.BLACK
             context.fillRect(0, 0, canvas.width, canvas.height)
-            context.clearRect(this.buffer, this.buffer, diameter, diameter)
-            const imageData = context.getImageData(0, 0, diameter, diameter)
+            context.clearRect(this.buffer, this.buffer, width, height)
+
+            const imageData = context.getImageData(0, 0, width, height)
             const rgb = getRGB(Color.BLACK)
 
-            const edge = this.rings * (this.ringWidth * 1.5)
+            const distanceFromEdge = this.rings * (this.ringWidth * 1.5)
 
             for (let ring = 0; ring < this.rings; ring++) {
+                // see https://en.wikipedia.org/wiki/Squircle
                 const n = 4 // superellipse n parameter
-                const radius = diameter / 2 - (this.rings - ring - 1) * this.ringWidth
-                const r = Math.pow(radius, n)
+                const ringDiff = (this.rings - ring - 1) * this.ringWidth
+                const ra = Math.pow(width / 2 - ringDiff, n)
+                const rb = Math.pow(height / 2 - ringDiff, n)
 
                 const colorPx = (x: number, y: number) => {
-                    const i = (x + y * diameter) * 4
-                    const xa = Math.pow(x - diameter / 2, n)
-                    const yb = Math.pow(y - diameter / 2, n)
-                    if (xa + yb > r) {
+                    const i = (x + y * width) * 4
+                    const xa = Math.pow(x - width / 2, n) / ra
+                    const yb = Math.pow(y - height / 2, n) / rb
+                    if (xa + yb > 1) {
                         imageData.data[i + 0] = rgb[0]
                         imageData.data[i + 1] = rgb[1]
                         imageData.data[i + 2] = rgb[2]
@@ -41,19 +51,20 @@ export class Vignette extends Component {
                     }
                 }
 
-                for (let x = 0; x < diameter; x++) {
-                    for (let y = 0; y < edge; y++) {
+                // color all pixels (skips checking the center pixels)
+                for (let x = 0; x < width; x++) {
+                    for (let y = 0; y < distanceFromEdge; y++) {
                         colorPx(x, y)
                     }
-                    for (let y = diameter - edge; y < diameter; y++) {
+                    for (let y = height - distanceFromEdge; y < height; y++) {
                         colorPx(x, y)
                     }
                 }
-                for (let y = 0; y < diameter; y++) {
-                    for (let x = 0; x < edge; x++) {
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < distanceFromEdge; x++) {
                         colorPx(x, y)
                     }
-                    for (let x = diameter - edge; x < diameter; x++) {
+                    for (let x = width - distanceFromEdge; x < width; x++) {
                         colorPx(x, y)
                     }
                 }
