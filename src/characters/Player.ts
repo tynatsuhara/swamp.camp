@@ -6,8 +6,12 @@ import { Point } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util/Lists"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
+import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
+import { TextAlign } from "../ui/Text"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Interactable } from "../world/elements/Interactable"
+import { camp } from "../world/LocationManager"
+import { MapGenerator } from "../world/MapGenerator"
 import { Dude } from "./Dude"
 
 export class Player extends Component {
@@ -22,6 +26,9 @@ export class Player extends Component {
     get dude() {
         return this._dude
     }
+
+    private offMapWarningShown = false
+    private timeOffMap = 0
 
     constructor() {
         super()
@@ -51,6 +58,28 @@ export class Player extends Component {
     update(updateData: UpdateData) {
         if (!this.dude.isAlive) {
             return
+        }
+
+        if (this.isOffMap()) {
+            this.timeOffMap += updateData.elapsedTimeMillis
+        } else {
+            this.timeOffMap = 0
+            this.offMapWarningShown = false
+        }
+
+        if (this.timeOffMap > 3_000 && !this.offMapWarningShown) {
+            TextOverlayManager.instance.open({
+                text: [
+                    this.isOffMap() === "ocean"
+                        ? "Venturing into the ocean without a ship is certain death. Turn back while you still can."
+                        : "Venturing deeper into the swamp alone is certain death. Turn back while you still can.",
+                ],
+                finishAction: "OKAY",
+                onFinish: () => (this.offMapWarningShown = true),
+                textAlign: TextAlign.CENTER,
+            })
+        } else if (this.timeOffMap > 10_000) {
+            this.dude.damage(Number.MAX_SAFE_INTEGER, {})
         }
 
         // TODO: Should we remove auto-healing?
@@ -130,6 +159,17 @@ export class Player extends Component {
 
         if (controls.isInteractDown() && !!possibleInteractable) {
             possibleInteractable.interact()
+        }
+    }
+
+    isOffMap(): "swamp" | "ocean" | undefined {
+        if (this.dude.location !== camp()) {
+            return
+        }
+        const margin = camp().size / 2
+        const pos = this.dude.tile
+        if (pos.x < -margin || pos.x > margin || pos.y < -margin || pos.y > margin) {
+            return pos.x > margin - MapGenerator.COAST_OCEAN_WIDTH ? "ocean" : "swamp"
         }
     }
 
