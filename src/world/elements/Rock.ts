@@ -10,7 +10,9 @@ import { Player } from "../../characters/Player"
 import { WeaponType } from "../../characters/weapons/WeaponType"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
+import { Ground } from "../ground/Ground"
 import { Location } from "../Location"
+import { camp } from "../LocationManager"
 import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
@@ -85,5 +87,13 @@ export class RockFactory extends ElementFactory {
                 }
             })
         )
+    }
+
+    canPlaceInLocation(wl: Location) {
+        return wl === camp()
+    }
+
+    canPlaceAtPos(wl: Location, pos: Point) {
+        return Ground.isNaturalGround(wl.getGround(pos)?.type)
     }
 }

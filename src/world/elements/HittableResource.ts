@@ -1,6 +1,7 @@
 import { BoxCollider } from "brigsby/dist/collision/BoxCollider"
 import { Point } from "brigsby/dist/Point"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { Maths } from "brigsby/dist/util/Maths"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Item, spawnItem } from "../../items/Items"
 import { LocationManager } from "../LocationManager"
@@ -67,10 +68,9 @@ export class HittableResource extends Hittable {
         }
     }
 
-    // TODO actually call this
     replenish() {
         if (!!this.entity && this.enabled) {
-            this.freeResources = Math.min(Math.max(this.freeResources + 1, 0), this.maxResources)
+            this.freeResources = Maths.clamp(this.freeResources + 1, 1, this.maxResources)
         }
     }
 }

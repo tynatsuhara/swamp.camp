@@ -1,9 +1,12 @@
+import { Lists } from "brigsby/dist/util/Lists"
 import { DudeFactory, DudeType } from "../../characters/DudeFactory"
 import { DudeSpawner } from "../../characters/DudeSpawner"
 import { NPC } from "../../characters/NPC"
 import { Berto } from "../../characters/types/Berto"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { NotificationDisplay, Notifications } from "../../ui/NotificationDisplay"
+import { Elements, ElementType } from "../elements/Elements"
+import { HittableResource } from "../elements/HittableResource"
 import { camp, LocationManager } from "../LocationManager"
 import { collectTaxes } from "../TaxRate"
 import { Day } from "../TimeUnit"
@@ -98,11 +101,27 @@ export const getEventQueueHandlers = (): {
     [QueuedEventType.DAILY_SCHEDULE]: () => {
         console.log(`executing daily schedule for ${Day[WorldTime.instance.currentDay]}`)
 
+        // Collect taxes
         if (WorldTime.instance.currentDay === Day.MONDAY) {
             EventQueue.instance.addEvent({
                 type: QueuedEventType.COLLECT_TAXES,
                 time: WorldTime.instance.future({ hours: 8 }),
             })
+        }
+
+        // Replenish resources
+        camp()
+            .getElements()
+            .map((e) => e.entity.getComponent(HittableResource)?.replenish())
+
+        // Spawn rocks
+        const rockFactory = Elements.instance.getElementFactory(ElementType.ROCK)
+        const openTiles = camp()
+            .getGroundSpots(true)
+            .filter((tile) => !camp().isOccupied(tile) && rockFactory.canPlaceAtPos(camp(), tile))
+        const rocksToSpawn = Math.random() * 5
+        for (let i = 0; i < rocksToSpawn; i++) {
+            camp().addElement(ElementType.ROCK, Lists.oneOf(openTiles))
         }
 
         EventQueue.instance.addEvent({

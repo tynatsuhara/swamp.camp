@@ -147,10 +147,7 @@ export class MapGenerator {
                 Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_RANGE,
                 Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_RANGE
             )
-            if (
-                this.location.getGround(p)?.type === GroundType.GRASS &&
-                this.location.addElement(element, p)
-            ) {
+            if (this.location.addElement(element, p)) {
                 placed++
             }
         }
