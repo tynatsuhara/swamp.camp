@@ -10,7 +10,8 @@ import { saveManager } from "../SaveManager"
 import { HUD } from "../ui/HUD"
 import { TextAlign } from "../ui/Text"
 import { DarknessMask } from "../world/DarknessMask"
-import { LocationManager } from "../world/LocationManager"
+import { Ground } from "../world/ground/Ground"
+import { camp, LocationManager } from "../world/LocationManager"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
 import { Camera } from "./Camera"
@@ -57,6 +58,16 @@ export class DeathCutscene extends Component {
         const respawnTime = DarknessMask.SUNRISE_START + TimeUnit.MINUTE * 10
         const timeUntilRespawn = WorldTime.instance.tomorrow(respawnTime) - WorldTime.instance.time
         WorldTime.instance.fastForward(timeUntilRespawn)
+
+        // If the player dies off map, just put them at a random on-map location.
+        // TODO: Respawn them at the doctor, their bed, or somewhere else that makes sense.
+        if (Player.instance.isOffMap()) {
+            const newSpot = Lists.findRandom(
+                camp().getGroundSpots(),
+                (pos) => !Ground.isWater(camp().getGround(pos)?.type) && !camp().isOccupied(pos)
+            )
+            Player.instance.dude.moveTo(newSpot.times(TILE_SIZE), true)
+        }
 
         Player.instance.dude.revive()
 
