@@ -12,6 +12,7 @@ const TILE_WIDTH = 16
 const CHARACTERS = new Map([
     ["doctor", [0, 2]],
     ["prisoner1", [1, 1]],
+    ["widdershins", [1, 2]],
     ["prisoner2", [1, 3]],
     ["santa", [2, 4]],
 ])
