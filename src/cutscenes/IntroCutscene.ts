@@ -78,7 +78,7 @@ export class IntroCutscene extends Component {
         const text = [
             `Champion, your time has come!
 
-Our explorers have discovered a vast swampland, untamed and full of precious resources.
+Our explorers have discovered a vast coastal swampland, untamed and full of precious resources.
 
 We believe that the Kingdom could benefit greatly from establishing a settlement in these uncharted lands.`,
             `... 
