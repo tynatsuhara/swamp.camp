@@ -9,6 +9,9 @@ import { GroundType } from "./ground/Ground"
 import { Location } from "./Location"
 import { LocationManager, LocationType } from "./LocationManager"
 
+const COAST_VARIABILITY = 3
+const COAST_OCEAN_WIDTH = 12
+
 export class MapGenerator {
     static get instance() {
         return Singletons.getOrCreate(MapGenerator)
@@ -16,10 +19,11 @@ export class MapGenerator {
 
     private static readonly MAP_RANGE = 40
     /**
-     * The map goes from [-MAP_RANGE, MAP_RANGE], although some of the grids extend
+     * The map goes from [-MAP_RANGE, MAP_RANGE), although some of the grids extend
      * one tile further in each direction to prevent janky cutoffs at the edge
      */
     private static readonly MAP_SIZE = MapGenerator.MAP_RANGE * 2
+    static readonly COAST_OCEAN_WIDTH = COAST_OCEAN_WIDTH
 
     private location: Location
     private readonly tentPos = new Point(-3, -3)
@@ -30,17 +34,20 @@ export class MapGenerator {
         for (let elementsPlaced = false, attempt = 1; !elementsPlaced; attempt++) {
             console.log(`generation attept ${attempt}`)
 
+            const [coastNoise] = MapGenerator.coastNoise()
+            const levels = MapGenerator.levels()
+
             this.location = new Location(
                 LocationType.BASE_CAMP,
                 false,
                 true,
                 MapGenerator.MAP_SIZE,
-                MapGenerator.levels()
+                levels
             )
 
             // make the ground
             this.placeGround()
-            this.placeWater()
+            this.placeWater(coastNoise)
 
             // spawn tent
             const tent = this.location.addElement(ElementType.TENT, this.tentPos, {
@@ -169,7 +176,7 @@ export class MapGenerator {
                     pt.plus(new Point(-1, -1)),
                 ]
                 const isLedge = adjacent
-                    .map((pt) => this.location.levels.get(pt))
+                    .map((pt) => this.location.levels?.get(pt))
                     .some((level) => level < thisLevel)
                 if (isLedge) {
                     this.location.setGroundElement(GroundType.LEDGE, pt)
@@ -191,6 +198,7 @@ export class MapGenerator {
         let sideBottomRatio: number
 
         do {
+            console.log("generating levels")
             ;[levelGrid, levelString, topBottomRatio, sideBottomRatio] = this.levelNoise()
         } while (topBottomRatio > topBottomThreshold || sideBottomRatio > sideBottomThreshold)
 
@@ -239,8 +247,21 @@ export class MapGenerator {
                 const level = Math.floor(levels * value)
                 str += level
 
+                for (let m = 0; m < sq; m++) {
+                    for (let n = 0; n < sq; n++) {
+                        grid.set(new Point(j + m, i + n), level)
+                    }
+                }
+            }
+            str += "\n"
+        }
+
+        for (let i = -MapGenerator.MAP_RANGE - 1; i < MapGenerator.MAP_RANGE + 1; i += sq) {
+            for (let j = -MapGenerator.MAP_RANGE - 1; j < MapGenerator.MAP_RANGE + 1; j += sq) {
+                const level = grid.get(new Point(j, i))
+
                 // Compare top/bottom ratio
-                const above = grid.get(new Point(j, i - 1))
+                const above = grid.get(new Point(j, i - sq))
                 if (above != null) {
                     if (above < level) {
                         topLedges++
@@ -249,19 +270,12 @@ export class MapGenerator {
                     }
                 }
 
-                const left = grid.get(new Point(j - 1, i))
-                const right = grid.get(new Point(j + 1, i))
+                const left = grid.get(new Point(j - sq, i))
+                const right = grid.get(new Point(j + sq, i))
                 if ((left != null && left !== level) || (right != null && right !== level)) {
                     sideLedges++
                 }
-
-                for (let m = 0; m < sq; m++) {
-                    for (let n = 0; n < sq; n++) {
-                        grid.set(new Point(j + m, i + n), level)
-                    }
-                }
             }
-            str += "\n"
         }
 
         str += `top ledges = ${topLedges}\n`
@@ -273,7 +287,11 @@ export class MapGenerator {
         return [grid, str, topLedges / bottomLedges, sideLedges / bottomLedges]
     }
 
-    placeWater() {
+    placeWater(coastNoise: Grid<boolean>) {
+        coastNoise.entries().forEach(([pt]) => {
+            this.location.setGroundElement(GroundType.WATER, pt)
+        })
+
         let waterVolume = MapGenerator.MAP_SIZE * MapGenerator.MAP_SIZE * 0.06
         for (let i = 0; i < 50; i++) {
             const tilesPlaced = this.tryPlaceWater()
@@ -315,7 +333,6 @@ export class MapGenerator {
 
         const pts: Point[] = []
         let str = `seed: ${seed} \n`
-        let validResult = false
         const noiseScale = 1
 
         for (let i = -MapGenerator.MAP_RANGE - 1; i < MapGenerator.MAP_RANGE + 1; i++) {
@@ -327,7 +344,6 @@ export class MapGenerator {
                 value = (value + 1) / 2 // scale to 0-1
                 if (value > threshold) {
                     str += "W"
-                    validResult = true
                     pts.push(new Point(j, i))
                 } else {
                     str += " "
@@ -338,14 +354,37 @@ export class MapGenerator {
 
         return [pts, str]
     }
+
+    // TODO scale like we do with levels
+    static coastNoise(noiseScale: number = 0.5, seed = Math.random()): [Grid<boolean>, string] {
+        const noise = new Noise(seed)
+
+        const pts: Grid<boolean> = new Grid()
+        let str = `seed: ${seed} \n`
+
+        for (let y = -MapGenerator.MAP_RANGE - 1; y < MapGenerator.MAP_RANGE + 1; y++) {
+            // [0, COAST_VARIABILITY)
+            var value = Math.floor(
+                ((noise.simplex2(0, y / (this.MAP_RANGE * noiseScale)) + 1) / 2) *
+                    (COAST_VARIABILITY + 1)
+            )
+
+            for (let i = 0; i < COAST_OCEAN_WIDTH; i++) {
+                if (i < value) {
+                    str += "X"
+                } else {
+                    str += " "
+                    pts.set(new Point(MapGenerator.MAP_RANGE - COAST_OCEAN_WIDTH + i + 1, y), true)
+                }
+            }
+
+            str += "\n"
+        }
+
+        return [pts, str]
+    }
 }
 
-window["levelNoise"] = (...args: any) => {
-    const result = MapGenerator.levelNoise(...args)
-    console.log(result[2])
-}
-
-window["waterNoise"] = (...args: any) => {
-    const result = MapGenerator.waterNoise(...args)
-    console.log(result[1])
-}
+window["levelNoise"] = (...args: any) => console.log(MapGenerator.levelNoise(...args)[1])
+window["waterNoise"] = (...args: any) => console.log(MapGenerator.waterNoise(...args)[1])
+window["coastNoise"] = (...args: any) => console.log(MapGenerator.coastNoise(...args)[1])
