@@ -34,6 +34,6 @@ export class MineExitFactory extends ElementFactory {
             )
         )
 
-        return e.addComponent(new ElementComponent(ElementType.MINE_EXIT, pos, [pos], () => ({})))
+        return e.addComponent(new ElementComponent(ElementType.MINE_EXIT, pos, [pos], () => data))
     }
 }
