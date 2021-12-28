@@ -56,4 +56,10 @@ tentative sound effects & music:
 color palettes:
 
 -   current: https://lospec.com/palette-list/linear-color-palette-basic
--   aspirational: https://lospec.com/palette-list/vinik24
+-   https://lospec.com/palette-list/vinik24
+-   https://lospec.com/palette-list/fantasy
+-   https://lospec.com/palette-list/shallowmarsh26
+-   https://lospec.com/palette-list/interstate-28
+-   https://lospec.com/palette-list/ty-future-computer-20
+-   https://lospec.com/palette-list/lost-century
+-   https://lospec.com/palette-list/mulfok32
