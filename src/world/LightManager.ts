@@ -8,7 +8,7 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { DarknessMask } from "./DarknessMask"
 import { Location } from "./Location"
-import { camp, LocationManager } from "./LocationManager"
+import { camp, LocationManager, LocationType } from "./LocationManager"
 import { TimeUnit } from "./TimeUnit"
 import { Vignette } from "./Vignette"
 import { WorldTime } from "./WorldTime"
@@ -91,6 +91,32 @@ export class LightManager extends Component {
         )
     }
 
+    private getLocationDarkness() {
+        const location = LocationManager.instance.currentLocation
+
+        // if (location === camp()) {
+        //     const pos = Player.instance.dude.standingPosition
+        //     const buffer = TILE_SIZE * 8
+        //     const fullDarknessBuffer = TILE_SIZE * 2
+        //     const margin = (camp().size / 2) * TILE_SIZE - buffer - fullDarknessBuffer
+        //     let darkness = 0
+        //     if (pos.x < -margin) {
+        //         darkness = Math.max(darkness, Maths.clamp((pos.x + margin) / -buffer, 0, 1))
+        //     }
+        //     if (pos.y < -margin) {
+        //         darkness = Math.max(darkness, Maths.clamp((pos.y + margin) / -buffer, 0, 1))
+        //     }
+        //     if (pos.y > margin) {
+        //         darkness = Math.max(darkness, Maths.clamp((pos.y - margin) / buffer, 0, 1))
+        //     }
+        //     return darkness
+        // }
+
+        if (location.type === LocationType.MINE_INTERIOR) {
+            return 0.9
+        }
+    }
+
     private render() {
         // lazy load the vignette
         if (!this.vignette) {
@@ -102,8 +128,7 @@ export class LightManager extends Component {
             )
         }
 
-        const location = LocationManager.instance.currentLocation
-        this.mask.reset(WorldTime.instance.time)
+        this.mask.reset(WorldTime.instance.time, this.getLocationDarkness())
 
         // Always provide slight visibility around the player
         const player = Player.instance?.dude
@@ -115,7 +140,7 @@ export class LightManager extends Component {
             }
         }
 
-        const locationLightGrid = this.lightTiles.get(location)
+        const locationLightGrid = this.lightTiles.get(LocationManager.instance.currentLocation)
         if (!locationLightGrid) {
             return
         }
@@ -141,7 +166,7 @@ export class LightManager extends Component {
 
         const location = LocationManager.instance.currentLocation
         if (!location.isInterior) {
-            result.push(this.vignette?.entity)
+            // result.push(this.vignette?.entity)
         }
 
         return result

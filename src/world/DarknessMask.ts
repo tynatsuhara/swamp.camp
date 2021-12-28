@@ -38,7 +38,7 @@ export class DarknessMask {
         this.context = this.canvas.getContext("2d")
         this.allowNightVision = allowNightVision
 
-        this.reset(0)
+        this.reset(0, 0)
 
         // pre-populate the cache with expected light sizes
         for (let i = 1; i <= Campfire.LOG_CAPACITY; i++) {
@@ -69,9 +69,13 @@ export class DarknessMask {
     private static readonly VISIBILE_LIGHT = 0.95
     private static readonly VISIBILE_LIGHT_EDGE = 0.975
 
-    reset(time: number) {
+    /**
+     * @param time the world time
+     * @param darknessLevel darkness level in range [0, 1] for non-nighttime darkness
+     */
+    reset(time: number, darknessLevel: number) {
         this.circleQueue = []
-        this.updateColorForTime(time)
+        this.updateColorForTime(time, darknessLevel)
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
         if (this.darkness === 0) {
@@ -85,25 +89,6 @@ export class DarknessMask {
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
     }
 
-    addFaintLightCircle(position: Point) {
-        this.makeLightCircle(
-            position,
-            DarknessMask.PLAYER_VISIBLE_SURROUNDINGS_DIAMETER,
-            DarknessMask.VISIBILE_LIGHT,
-            DarknessMask.VISIBILE_LIGHT_EDGE
-        )
-    }
-
-    addLightCircle(centerPos: Point, diameter: number) {
-        this.makeLightCircle(centerPos, diameter, 0, this.darkness / 2)
-        this.makeLightCircle(
-            centerPos,
-            diameter * DarknessMask.VISIBILITY_MULTIPLIER,
-            DarknessMask.VISIBILE_LIGHT,
-            DarknessMask.VISIBILE_LIGHT_EDGE
-        )
-    }
-
     private getPercentTransitioned = (current: number, start: number, end: number) => {
         const val = (current - start) / (end - start)
         return Math.min(Math.max(val, 0), 1)
@@ -114,7 +99,7 @@ export class DarknessMask {
     private readonly DAY_COLOR = this.colorFromString(Color.LIGHT_PINK, 0)
     private readonly SUNSET_COLOR = this.colorFromString(Color.PURPLE, 0.3)
 
-    private updateColorForTime(time: number) {
+    private updateColorForTime(time: number, darknessLevel: number) {
         const timeOfDay = time % TimeUnit.DAY
 
         let rgba: RGBA
@@ -137,6 +122,10 @@ export class DarknessMask {
             rgba = this.lerpColorStrings(this.DAY_COLOR, this.SUNSET_COLOR, this.NIGHT_COLOR, pct)
         } else {
             rgba = this.NIGHT_COLOR
+        }
+
+        if (darknessLevel > 0) {
+            rgba = this.lerpColorString(rgba, this.NIGHT_COLOR, darknessLevel)
         }
 
         if (debug.nightVision && this.allowNightVision) {
@@ -182,6 +171,25 @@ export class DarknessMask {
         const a = lerp(color1.a, color2.a)
 
         return { r, g, b, a }
+    }
+
+    addFaintLightCircle(position: Point) {
+        this.makeLightCircle(
+            position,
+            DarknessMask.PLAYER_VISIBLE_SURROUNDINGS_DIAMETER,
+            DarknessMask.VISIBILE_LIGHT,
+            DarknessMask.VISIBILE_LIGHT_EDGE
+        )
+    }
+
+    addLightCircle(centerPos: Point, diameter: number) {
+        this.makeLightCircle(centerPos, diameter, 0, this.darkness / 2)
+        this.makeLightCircle(
+            centerPos,
+            diameter * DarknessMask.VISIBILITY_MULTIPLIER,
+            DarknessMask.VISIBILE_LIGHT,
+            DarknessMask.VISIBILE_LIGHT_EDGE
+        )
     }
 
     private makeLightCircle(
