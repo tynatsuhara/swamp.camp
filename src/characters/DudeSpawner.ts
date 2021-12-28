@@ -14,6 +14,7 @@ import { QueuedEventType } from "../world/events/QueuedEvent"
 import { Ground } from "../world/ground/Ground"
 import { LightManager } from "../world/LightManager"
 import { camp, LocationManager } from "../world/LocationManager"
+import { MapGenerator } from "../world/MapGenerator"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
 import { DudeFaction, DudeFactory, DudeType } from "./DudeFactory"
@@ -98,9 +99,11 @@ export class DudeSpawner extends Component {
             (d) => d.type === DudeType.SWAMP_THING
         )
 
-        const waterSpots = l
-            .getGroundSpots(true)
-            .filter((pt) => Ground.isWater(l.getGround(pt)?.type))
+        const waterSpots = l.getGroundSpots(true).filter(
+            (pt) =>
+                Ground.isWater(l.getGround(pt)?.type) &&
+                pt.x < camp().size / 2 - MapGenerator.COAST_OCEAN_WIDTH // not in the ocean
+        )
 
         const goalCount = waterSpots.length / 50
 
@@ -190,11 +193,19 @@ export class DudeSpawner extends Component {
     }
 
     private getSpawnPosOffMap() {
-        const extSize = camp().size
-        const spawnSide = (((Math.random() > 0.5 ? 1 : -1) * extSize) / 2) * TILE_SIZE
-        const spawnMiddle = Math.random() * extSize * TILE_SIZE - extSize / 2
-        return Math.random() > 0.5
-            ? new Point(spawnSide, spawnMiddle)
-            : new Point(spawnMiddle, spawnSide)
+        const side = Math.random()
+        const distance = (camp().size / 2 + 5) * TILE_SIZE
+        const posOnSide = (Math.random() * camp().size - camp().size / 2) * TILE_SIZE
+
+        if (side < 0.33) {
+            // left
+            return new Point(-distance, posOnSide)
+        } else if (side < 0.66) {
+            // top
+            return new Point(posOnSide, -distance)
+        } else {
+            // bottom
+            return new Point(posOnSide, distance)
+        }
     }
 }
