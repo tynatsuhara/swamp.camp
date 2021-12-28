@@ -118,8 +118,7 @@ export class NPC extends Component {
 
     static SCHEDULE_FREQUENCY = 10 * TimeUnit.MINUTE
 
-    // TODO: Should this take some time variable to determine how long the simulation is?
-    simulate() {
+    simulate(duration: number) {
         if (!this.dude.isAlive) {
             return
         }

@@ -103,11 +103,11 @@ export class LocationManager {
             .plusY(-TILE_SIZE * 25)
     }
 
-    simulateLocations(simulateCurrentLocation: boolean) {
+    simulateLocations(simulateCurrentLocation: boolean, duration: number) {
         this.getLocations()
             .filter((l) => simulateCurrentLocation || l !== this.currentLocation)
             .flatMap((l) => Array.from(l.dudes))
-            .forEach((d) => d.entity.getComponent(NPC)?.simulate())
+            .forEach((d) => d.entity.getComponent(NPC)?.simulate(duration))
     }
 }
 

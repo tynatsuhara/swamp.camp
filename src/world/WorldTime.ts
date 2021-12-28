@@ -44,7 +44,7 @@ export class WorldTime extends Component {
         this._time += duration
         console.log(`fast forwarding time to ${this.clockTime()}`)
 
-        LocationManager.instance.simulateLocations(true)
+        LocationManager.instance.simulateLocations(true, duration)
     }
 
     getEntity(): Entity {

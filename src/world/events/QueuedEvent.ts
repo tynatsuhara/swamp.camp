@@ -33,7 +33,7 @@ export const getEventQueueHandlers = (): {
     [type: number]: (data: QueuedEventData) => void
 } => ({
     [QueuedEventType.SIMULATE_NPCS]: () => {
-        LocationManager.instance.simulateLocations(false)
+        LocationManager.instance.simulateLocations(false, NPC.SCHEDULE_FREQUENCY)
 
         EventQueue.instance.addEvent({
             type: QueuedEventType.SIMULATE_NPCS,
