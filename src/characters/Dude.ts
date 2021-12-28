@@ -533,6 +533,7 @@ export class Dude extends Component implements DialogueSource {
         this._health = this.maxHealth * 0.25
 
         // stand up
+        this.animationDirty = true
         this.animation.transform.rotation = 0
         this.layingDownOffset = null
 
