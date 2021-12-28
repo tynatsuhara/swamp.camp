@@ -11,6 +11,9 @@ import { LocationManager, LocationType } from "./LocationManager"
 
 const COAST_VARIABILITY = 3
 const COAST_OCEAN_WIDTH = 12
+// Represents the granularity of levels/coast variation.
+// Should be divisible by 2 and a divisor of MAP_SIZE.
+const SQ = 2
 
 export class MapGenerator {
     static get instance() {
@@ -226,7 +229,6 @@ export class MapGenerator {
         let str = `seed: ${seed} \n`
 
         // Should be divisible by 2 and a divisor of MAP_SIZE
-        const sq = 2
         const noiseScale = 2.5
 
         // Each entry will occupy a sq x sq tile section to prevent
@@ -237,8 +239,8 @@ export class MapGenerator {
         let topLedges = 0
         let sideLedges = 0
 
-        for (let i = -MapGenerator.MAP_RANGE - 1; i < MapGenerator.MAP_RANGE + 1; i += sq) {
-            for (let j = -MapGenerator.MAP_RANGE - 1; j < MapGenerator.MAP_RANGE + 1; j += sq) {
+        for (let i = -MapGenerator.MAP_RANGE - 1; i < MapGenerator.MAP_RANGE + 1; i += SQ) {
+            for (let j = -MapGenerator.MAP_RANGE - 1; j < MapGenerator.MAP_RANGE + 1; j += SQ) {
                 var value = noise.simplex2(
                     i / (this.MAP_RANGE * noiseScale),
                     j / (this.MAP_RANGE * noiseScale)
@@ -247,8 +249,8 @@ export class MapGenerator {
                 const level = Math.floor(levels * value)
                 str += level
 
-                for (let m = 0; m < sq; m++) {
-                    for (let n = 0; n < sq; n++) {
+                for (let m = 0; m < SQ; m++) {
+                    for (let n = 0; n < SQ; n++) {
                         grid.set(new Point(j + m, i + n), level)
                     }
                 }
@@ -256,12 +258,12 @@ export class MapGenerator {
             str += "\n"
         }
 
-        for (let i = -MapGenerator.MAP_RANGE - 1; i < MapGenerator.MAP_RANGE + 1; i += sq) {
-            for (let j = -MapGenerator.MAP_RANGE - 1; j < MapGenerator.MAP_RANGE + 1; j += sq) {
+        for (let i = -MapGenerator.MAP_RANGE - 1; i < MapGenerator.MAP_RANGE + 1; i += SQ) {
+            for (let j = -MapGenerator.MAP_RANGE - 1; j < MapGenerator.MAP_RANGE + 1; j += SQ) {
                 const level = grid.get(new Point(j, i))
 
                 // Compare top/bottom ratio
-                const above = grid.get(new Point(j, i - sq))
+                const above = grid.get(new Point(j, i - SQ))
                 if (above != null) {
                     if (above < level) {
                         topLedges++
@@ -270,8 +272,8 @@ export class MapGenerator {
                     }
                 }
 
-                const left = grid.get(new Point(j - sq, i))
-                const right = grid.get(new Point(j + sq, i))
+                const left = grid.get(new Point(j - SQ, i))
+                const right = grid.get(new Point(j + SQ, i))
                 if ((left != null && left !== level) || (right != null && right !== level)) {
                     sideLedges++
                 }
@@ -362,7 +364,7 @@ export class MapGenerator {
         const pts: Grid<boolean> = new Grid()
         let str = `seed: ${seed} \n`
 
-        for (let y = -MapGenerator.MAP_RANGE - 1; y < MapGenerator.MAP_RANGE + 1; y++) {
+        for (let y = -MapGenerator.MAP_RANGE - 1; y < MapGenerator.MAP_RANGE + 1; y += SQ) {
             // [0, COAST_VARIABILITY)
             var value = Math.floor(
                 ((noise.simplex2(0, y / (this.MAP_RANGE * noiseScale)) + 1) / 2) *
@@ -374,7 +376,12 @@ export class MapGenerator {
                     str += "X"
                 } else {
                     str += " "
-                    pts.set(new Point(MapGenerator.MAP_RANGE - COAST_OCEAN_WIDTH + i + 1, y), true)
+                    for (let j = 0; j < SQ; j++) {
+                        pts.set(
+                            new Point(MapGenerator.MAP_RANGE - COAST_OCEAN_WIDTH + i + 1, y + j),
+                            true
+                        )
+                    }
                 }
             }
 
