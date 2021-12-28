@@ -41,6 +41,7 @@ import { DialogueSource, EMPTY_DIALOGUE, getDialogue } from "./dialogue/Dialogue
 import { DudeAnimationUtils } from "./DudeAnimationUtils"
 import { DudeFaction, DudeType } from "./DudeFactory"
 import { NPC } from "./NPC"
+import { Player } from "./Player"
 import { Shield } from "./weapons/Shield"
 import { ShieldFactory } from "./weapons/ShieldFactory"
 import { ShieldType } from "./weapons/ShieldType"
@@ -1011,7 +1012,10 @@ export class Dude extends Component implements DialogueSource {
         //     indicator = DudeInteractIndicator.IMPORTANT_DIALOGUE
         // }
 
-        if (indicator === DudeInteractIndicator.IMPORTANT_DIALOGUE) {
+        if (
+            indicator === DudeInteractIndicator.IMPORTANT_DIALOGUE ||
+            (this.type === DudeType.PLAYER && this.entity.getComponent(Player).isOffMap())
+        ) {
             // update off screen indicator
             HUD.instance.addIndicator(this, () => this.standingPosition)
         } else {
