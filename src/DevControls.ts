@@ -2,6 +2,7 @@ import { Component } from "brigsby/dist/Component"
 import { debug } from "brigsby/dist/Debug"
 import { UpdateData } from "brigsby/dist/Engine"
 import { CapturedInput, InputKey, InputKeyString } from "brigsby/dist/Input"
+import { Point } from "brigsby/dist/Point"
 import { Condition } from "./characters/Condition"
 import { DudeFactory, DudeType } from "./characters/DudeFactory"
 import { DudeSpawner } from "./characters/DudeSpawner"
@@ -10,8 +11,9 @@ import { controls } from "./Controls"
 import { TextOverlayManager } from "./cutscenes/TextOverlayManager"
 import { pixelPtToTilePt } from "./graphics/Tilesets"
 import { TextAlign, TextIcon } from "./ui/Text"
+import { ElementType } from "./world/elements/Elements"
 import { GroundType } from "./world/ground/Ground"
-import { LocationManager } from "./world/LocationManager"
+import { camp, LocationManager } from "./world/LocationManager"
 import { TimeUnit } from "./world/TimeUnit"
 import { WorldTime } from "./world/WorldTime"
 
@@ -62,8 +64,8 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     [InputKey.P, "show spawn menu", () => (spawnMenu.show = !spawnMenu.show)],
     [
         InputKey.U,
-        "set player on fire",
-        () => Player.instance.dude.addCondition(Condition.ON_FIRE, 2_000),
+        "spawn queequeg",
+        () => camp().addElement(ElementType.QUEEQUEG, new Point(camp().size / 2 - 6, 10)),
     ],
     [InputKey.V, "spawn wolf pack", () => DudeSpawner.instance.spawnWolves()],
     [

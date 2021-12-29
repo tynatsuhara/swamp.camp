@@ -11,6 +11,7 @@ import { ChestFactory } from "./Chest"
 import { ElementFactory } from "./ElementFactory"
 import { FurnitureFactory } from "./FurnitureFactory"
 import { MushroomFactory } from "./Mushroom"
+import { QueequegFactory } from "./Queequeg"
 import { RockFactory } from "./Rock"
 import { TreeFactory } from "./Tree"
 
@@ -31,6 +32,7 @@ export enum ElementType {
     CHURCH,
     BENCH,
     PODIUM,
+    QUEEQUEG,
 }
 
 window["ElementType"] = ElementType
@@ -63,6 +65,7 @@ export class Elements {
         [ElementType.MINE_EXIT]: new MineExitFactory(),
         [ElementType.BENCH]: new FurnitureFactory(ElementType.BENCH, "bench"),
         [ElementType.PODIUM]: new FurnitureFactory(ElementType.PODIUM, "podium"),
+        [ElementType.QUEEQUEG]: new QueequegFactory(),
     }
 
     getElementFactory(type: ElementType) {

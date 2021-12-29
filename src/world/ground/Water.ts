@@ -1,13 +1,13 @@
-import { GroundComponent } from "./GroundComponent"
 import { Entity } from "brigsby/dist/Entity"
-import { GroundType, MakeGroundFuncData } from "./Ground"
+import { Point } from "brigsby/dist/Point"
+import { SpriteAnimation } from "brigsby/dist/sprites/SpriteAnimation"
+import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
+import { GroundRenderer } from "../GroundRenderer"
 import { ConnectingTile } from "./ConnectingTile"
 import { ConnectingTileWaterSchema } from "./ConnectingTileWaterSchema"
-import { SpriteAnimation } from "brigsby/dist/sprites/SpriteAnimation"
-import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
-import { Point } from "brigsby/dist/Point"
-import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
-import { GroundRenderer } from "../GroundRenderer"
+import { GroundType, MakeGroundFuncData } from "./Ground"
+import { GroundComponent } from "./GroundComponent"
 
 export const makeWater = (d: MakeGroundFuncData): GroundComponent => {
     const schema = new ConnectingTileWaterSchema()
@@ -20,6 +20,7 @@ export const makeWater = (d: MakeGroundFuncData): GroundComponent => {
     return e.addComponent(new GroundComponent(GroundType.WATER))
 }
 
+// TODO: Make the animation static somehow so the tiles are always in sync
 export const getAnimatedWaterTileComponent = (pos: Point) => {
     const animationSpeed = 750
     return new SpriteAnimation([

@@ -12,7 +12,7 @@ export class LargeSpriteTileset {
         throw new Error(`${key} is not a valid tile`)
     }
 
-    private get(position: Point, dimensions: Point) {
+    get(position: Point, dimensions: Point): StaticSpriteSource {
         return new StaticSpriteSource(
             this.image(),
             position.times(TILE_SIZE),
