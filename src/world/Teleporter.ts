@@ -44,20 +44,26 @@ export const Teleporters = {
     },
 }
 
+type TeleporterIndicatorSaveData = {
+    to: string // the destination uuid (TODO: support same-location teleporters)
+    i: string // stringified position for the interactable
+    id: string
+}
+
 /**
  * Not to be confused with the WorldLocation first-class citizen Teleporter.
  * This is a component which can be used to teleport to a logical Teleporer destination.
  * It has an arrow sprite and an Interactable which the player can use to teleport.
  */
-export class TeleporterFactory extends ElementFactory {
-    readonly type = ElementType.TELEPORTER
+export class TeleporterIndicatorFactory extends ElementFactory {
+    readonly type = ElementType.TELEPORTER_INDICATOR
     readonly dimensions = new Point(1, 1)
 
-    make(wl: Location, pos: Point, data: any): ElementComponent {
+    make(wl: Location, pos: Point, data: TeleporterIndicatorSaveData): ElementComponent {
         const e = new Entity()
 
         const destinationUUID = data.to
-        const i = data.i // the position for the interactable
+        const i = data.i
         if (!destinationUUID || !i) {
             throw new Error("teleporter element must have 'to' and 'i' parameters")
         }
@@ -91,6 +97,13 @@ export class TeleporterFactory extends ElementFactory {
             })()
         )
 
-        return e.addComponent(new ElementComponent(ElementType.TELEPORTER, pos, [pos], () => data))
+        return e.addComponent(
+            new ElementComponent(
+                ElementType.TELEPORTER_INDICATOR,
+                pos,
+                [pos],
+                (): TeleporterIndicatorSaveData => data
+            )
+        )
     }
 }

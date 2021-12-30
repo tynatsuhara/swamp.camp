@@ -107,7 +107,7 @@ const makeTentInterior = (outside: Location, color: TentColor): Location => {
         id: TeleporterPrefix.TENT,
     }
     l.addTeleporter(teleporter)
-    l.addElement(ElementType.TELEPORTER, new Point(2, 4), {
+    l.addElement(ElementType.TELEPORTER_INDICATOR, new Point(2, 4), {
         to: outside.uuid,
         i: interactablePos.toString(),
         id: TeleporterPrefix.TENT,

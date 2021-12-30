@@ -4,7 +4,7 @@ import { HouseFactory } from "../buildings/House"
 import { MineEntranceFactory } from "../buildings/MineEntrance"
 import { MineExitFactory } from "../buildings/MineExit"
 import { TentFactory } from "../buildings/Tent"
-import { TeleporterFactory } from "../Teleporter"
+import { TeleporterIndicatorFactory } from "../Teleporter"
 import { BedFactory } from "./Bed"
 import { CampfireFactory } from "./Campfire"
 import { ChestFactory } from "./Chest"
@@ -22,7 +22,7 @@ export enum ElementType {
     ROCK,
     TENT,
     CAMPFIRE,
-    TELEPORTER,
+    TELEPORTER_INDICATOR,
     HOUSE,
     MUSHROOM,
     CHEST,
@@ -54,7 +54,7 @@ export class Elements {
         [ElementType.TREE_POINTY]: new TreeFactory(ElementType.TREE_POINTY),
         [ElementType.ROCK]: new RockFactory(),
         [ElementType.CAMPFIRE]: new CampfireFactory(),
-        [ElementType.TELEPORTER]: new TeleporterFactory(),
+        [ElementType.TELEPORTER_INDICATOR]: new TeleporterIndicatorFactory(),
         [ElementType.MUSHROOM]: new MushroomFactory(),
         [ElementType.CHEST]: new ChestFactory(),
         [ElementType.BED]: new BedFactory(),
