@@ -7,12 +7,12 @@ import { ElementType } from "./Elements"
  * A component that all world space entities should have in order to be saveable.
  * Elements should not subclass this.
  */
-export class ElementComponent extends Component {
+export class ElementComponent<SaveFormat extends object = object> extends Component {
     readonly type: ElementType
     readonly pos: Point // TODO: do we need to add this?
     readonly occupiedPoints: Point[] // these are the points that are non-walkable
 
-    constructor(type: ElementType, pos: Point, occupiedPoints: Point[], saveFn: () => object) {
+    constructor(type: ElementType, pos: Point, occupiedPoints: Point[], saveFn: () => SaveFormat) {
         super()
         this.type = type
         this.pos = pos
@@ -20,7 +20,7 @@ export class ElementComponent extends Component {
         this.save = saveFn
     }
 
-    save(): object {
+    save(): SaveFormat {
         throw new Error("aaaaahhh!")
     }
 

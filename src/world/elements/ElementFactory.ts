@@ -3,7 +3,7 @@ import { Location } from "../Location"
 import { ElementComponent } from "./ElementComponent"
 import { ElementType } from "./Elements"
 
-export abstract class ElementFactory {
+export abstract class ElementFactory<SaveFormat extends object = object> {
     abstract readonly type: ElementType
 
     /**
@@ -19,7 +19,7 @@ export abstract class ElementFactory {
      * @param data Previous save data (or an empty object)
      * @returns An ElementComponent with the factory's type, which MUST have a nonnull entity
      */
-    abstract make(wl: Location, pos: Point, data: object): ElementComponent
+    abstract make(wl: Location, pos: Point, data: SaveFormat): ElementComponent<SaveFormat>
 
     /**
      * @param wl The location in which the user is trying to place an element
