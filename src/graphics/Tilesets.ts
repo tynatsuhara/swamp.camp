@@ -24,8 +24,18 @@ export const pixelPtToTilePt = (pixelPt: Point) => {
 
 const GLOBAL_VERSION_MAP_KEY = "SWAMP_CAMP_ASSETS"
 
-// loaded before the engine starts running the game
-export const getFilesToLoad = () => {
+// loaded before the the main menu is rendered
+export const getFilesToLoadForMainMenu = () => {
+    return [
+        "images/title.png",
+        "images/dungeon_base.png",
+        "images/tilemap.png",
+        "images/env_outdoor_recolor.png",
+    ].map(versionize)
+}
+
+// loaded before the main menu will put the player into the game scene
+export const getFilesToLoadForGame = () => {
     return Object.keys(window[GLOBAL_VERSION_MAP_KEY]).map(versionize)
 }
 

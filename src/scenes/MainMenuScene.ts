@@ -1,3 +1,4 @@
+import { assets } from "brigsby/dist/Assets"
 import { Component } from "brigsby/dist/Component"
 import { debug } from "brigsby/dist/Debug"
 import { UpdateViewsContext } from "brigsby/dist/Engine"
@@ -18,7 +19,7 @@ import { Player } from "../characters/Player"
 import { controls } from "../Controls"
 import { FireParticles } from "../graphics/FireParticles"
 import { Particles } from "../graphics/Particles"
-import { getImage, Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { getFilesToLoadForGame, getImage, Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { QuestGame } from "../quest_game"
 import { saveManager } from "../SaveManager"
 import { Save } from "../saves/SaveGame"
@@ -46,6 +47,8 @@ export class MainMenuScene {
     private title = getImage("images/title.png")
     private darkness: DarknessMask
     private view: View
+    private allAssetsLoaded = false
+    private waitingForAssets = false
 
     private menu = Menu.ROOT
 
@@ -53,6 +56,21 @@ export class MainMenuScene {
         if (saveManager.getSaveCount() > 0 && debug.autoPlay) {
             this.loadLastSave()
         }
+        this.loadAssets(false)
+    }
+
+    private loadAssets(blocking = true) {
+        if (this.allAssetsLoaded) {
+            return Promise.resolve()
+        }
+        if (blocking) {
+            this.waitingForAssets = true
+        }
+        return assets.loadImageFiles(getFilesToLoadForGame()).then(() => {
+            this.allAssetsLoaded = true
+            this.waitingForAssets = false
+            console.log("assets loaded!")
+        })
     }
 
     reset() {
@@ -79,17 +97,21 @@ export class MainMenuScene {
     }
 
     loadGame(slot: number) {
-        saveManager.load(slot)
-        QuestGame.instance.loadGameScene()
+        this.loadAssets().then(() => {
+            saveManager.load(slot)
+            QuestGame.instance.loadGameScene()
+        })
     }
 
     private overwritingSave: Save
     private selectedNewGameSlot: number
 
     newGame() {
-        saveManager.new(this.selectedNewGameSlot, this.plumes)
-        QuestGame.instance.loadGameScene()
-        QuestGame.instance.game.newGame()
+        this.loadAssets().then(() => {
+            saveManager.new(this.selectedNewGameSlot, this.plumes)
+            QuestGame.instance.loadGameScene()
+            QuestGame.instance.game.newGame()
+        })
     }
 
     private lastDimensions: Point
@@ -147,7 +169,11 @@ export class MainMenuScene {
         // by default, render the title and the scene with the knight
         const entities = [title, this.knight.entity, darknessEntity, ...sceneEntities]
 
-        if (this.menu === Menu.ROOT) {
+        if (this.waitingForAssets) {
+            entities.push(
+                new MainMenuButtonSection(menuTop).add("loading...", () => {}).getEntity()
+            )
+        } else if (this.menu === Menu.ROOT) {
             const saveCount = saveManager.getSaveCount()
             entities.push(
                 new MainMenuButtonSection(menuTop)
