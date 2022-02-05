@@ -71,7 +71,7 @@ export class ChurchFactory extends BuildingFactory {
         e.addComponent(
             new Interactable(
                 interactablePos,
-                () => wl.useTeleporter(interiorUUID, doorId),
+                () => wl.playerUseTeleporter(interiorUUID, doorId),
                 new Point(0, -TILE_SIZE * 1.4)
             )
         )

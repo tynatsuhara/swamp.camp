@@ -87,7 +87,7 @@ export class HouseFactory extends BuildingFactory {
         e.addComponent(
             new Interactable(
                 interactablePos,
-                () => wl.useTeleporter(destinationUUID, doorId),
+                () => wl.playerUseTeleporter(destinationUUID, doorId),
                 new Point(0, -TILE_SIZE * 1.4)
             )
         )

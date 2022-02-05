@@ -29,7 +29,7 @@ export class MineExitFactory extends ElementFactory {
         e.addComponent(
             new Interactable(
                 interactPos,
-                () => wl.useTeleporter(destinationUUID, id),
+                () => wl.playerUseTeleporter(destinationUUID, id),
                 new Point(0, -TILE_SIZE)
             )
         )

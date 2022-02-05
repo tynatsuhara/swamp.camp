@@ -281,7 +281,7 @@ export class Location {
         dude.moveTo(linkedPosition.minus(offset), true)
     }
 
-    useTeleporter(to: string, id: string) {
+    playerUseTeleporter(to: string, id: string) {
         CutscenePlayerController.instance.enable()
 
         setTimeout(() => {

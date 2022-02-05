@@ -5,6 +5,7 @@ export type Teleporter = {
     to: string // destination uuid
     pos: Point // point representing where a dude will be STANDING after traveling to this teleporter
     id: string // to distinguish multiple teleporters between the same destinations. prefixes can be used to trigger sound effects
+    toId?: string // use this if the ID doesn't match on the other side (EG same-location teleporters)
 }
 
 export const TeleporterPrefix = {
