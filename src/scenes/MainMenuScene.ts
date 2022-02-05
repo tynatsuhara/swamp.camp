@@ -64,6 +64,7 @@ export class MainMenuScene {
             return Promise.resolve()
         }
         if (blocking) {
+            console.log("waiting for assets to load before continuing")
             this.waitingForAssets = true
         }
         return assets.loadImageFiles(getFilesToLoadForGame()).then(() => {
@@ -101,6 +102,7 @@ export class MainMenuScene {
             saveManager.load(slot)
             QuestGame.instance.loadGameScene()
         })
+        this.render(Menu.ROOT) // force re-render
     }
 
     private overwritingSave: Save
@@ -112,6 +114,7 @@ export class MainMenuScene {
             QuestGame.instance.loadGameScene()
             QuestGame.instance.game.newGame()
         })
+        this.render(Menu.ROOT) // force re-render
     }
 
     private lastDimensions: Point
