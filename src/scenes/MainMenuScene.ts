@@ -173,9 +173,7 @@ export class MainMenuScene {
         const entities = [title, this.knight.entity, darknessEntity, ...sceneEntities]
 
         if (this.waitingForAssets) {
-            entities.push(
-                new MainMenuButtonSection(menuTop).add("loading...", () => {}).getEntity()
-            )
+            entities.push(new MainMenuButtonSection(menuTop).addText("loading...").getEntity())
         } else if (this.menu === Menu.ROOT) {
             const saveCount = saveManager.getSaveCount()
             entities.push(

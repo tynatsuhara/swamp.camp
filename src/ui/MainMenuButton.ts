@@ -15,23 +15,32 @@ export class MainMenuButton extends Component {
     private readonly text: string
     private readonly onClick: () => void
     private readonly onHover: () => void
-
+    private readonly hoverable: boolean
     private hovering: boolean = false
 
-    constructor(position: Point, text: string, onClick: () => void, onHover: () => void) {
+    constructor(
+        position: Point,
+        text: string,
+        onClick: () => void,
+        onHover: () => void,
+        hoverable: boolean
+    ) {
         super()
         this.position = position.apply(Math.floor)
         this.text = text
         this.onClick = onClick
         this.onHover = onHover
+        this.hoverable = hoverable
     }
 
     update() {
-        this.hovering = Maths.rectContains(
-            this.position.plusX(-this.width / 2).plusY(-4),
-            new Point(this.width, TILE_SIZE),
-            controls.getMousePos()
-        )
+        this.hovering =
+            this.hoverable &&
+            Maths.rectContains(
+                this.position.plusX(-this.width / 2).plusY(-4),
+                new Point(this.width, TILE_SIZE),
+                controls.getMousePos()
+            )
 
         if (this.hovering) {
             this.onHover()

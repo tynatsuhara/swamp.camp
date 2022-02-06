@@ -19,10 +19,24 @@ export class MainMenuButtonSection {
                     this.topCenter.plusY(MainMenuButtonSection.LINE_SPACING * this.buttons.length),
                     text,
                     onClick,
-                    onHover
+                    onHover,
+                    true
                 )
             )
         }
+        return this
+    }
+
+    addText(text: string) {
+        this.buttons.push(
+            new MainMenuButton(
+                this.topCenter.plusY(MainMenuButtonSection.LINE_SPACING * this.buttons.length),
+                text,
+                () => {},
+                () => {},
+                false
+            )
+        )
         return this
     }
 
