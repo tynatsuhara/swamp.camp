@@ -40,6 +40,12 @@
                 overflow: scroll;
             }
         </style>
+        <script>
+            const acknowledgeWarning = () => {
+                localStorage.setItem("chrome_warning_shown", true)
+                console.log("ack")
+            }
+        </script>
     </head>
     <body>
         <div id="container">
@@ -52,7 +58,9 @@
                 <a href="https://www.google.com/chrome/" target="_blank">GET GOOGLE CHROME</a>
             </div>
             <br />
-            <div><a href="/?chrome_warning_shown">CONTINUE ANYWAYS</a></div>
+            <div>
+                <a href="/" onclick="acknowledgeWarning()">CONTINUE ANYWAYS</a>
+            </div>
         </div>
     </body>
 </html>
