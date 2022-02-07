@@ -20,6 +20,17 @@
                 window.location.replace(redirect)
             }
 
+            if (window.location.href.match(/chrome_warning_shown/)) {
+                localStorage.setItem("chrome_warning_shown", true)
+            }
+
+            if (
+                !localStorage.getItem("chrome_warning_shown") &&
+                !navigator.userAgent.match(/chrome/i)
+            ) {
+                window.location.href = "/chrome_warning"
+            }
+
             window["SWAMP_CAMP_ASSETS"] = "{SWAMP_CAMP_ASSETS}"
         </script>
         <script src="app.js?q={JS_BUNDLE_HASH}" type="text/javascript"></script>
