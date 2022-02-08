@@ -31,6 +31,7 @@ export class QueequegFactory extends ElementFactory {
         const atSeaPosition = dockedPosition.plusX(TILE_SIZE * 7)
 
         const ship = e.addComponent(new Queequeg(dockedPosition, atSeaPosition))
+        window["queequeg"] = ship
 
         // TODO: Add a teleporter to get on top of the ship?
 
@@ -40,7 +41,7 @@ export class QueequegFactory extends ElementFactory {
                 pos,
                 ElementUtils.rectPoints(pos, this.dimensions),
                 (): QueequegData => ({
-                    docked: !!ship, // TODO
+                    docked: ship.isDocked,
                 })
             )
         )
@@ -50,12 +51,16 @@ export class QueequegFactory extends ElementFactory {
 class Queequeg extends Component {
     private widdershins: AnimatedSpriteComponent
     private collider: BoxCollider
+    private docked = true
+    get isDocked() {
+        return this.docked
+    }
 
     constructor(dockedPosition: Point, atSeaPosition: Point) {
         super()
 
         const colliderOffset = new Point(32, 20)
-        let position = dockedPosition
+        let position = atSeaPosition
 
         const depth = position.y + TILE_SIZE * 3 - 10
         const width = 6
@@ -110,13 +115,23 @@ class Queequeg extends Component {
             )
         }
 
+        // Move between the at-sea position and the docked position
         this.update = (updateData) => {
-            // TODO move between docked/at sea
+            const goalPos = this.docked ? dockedPosition : atSeaPosition
+
+            if (goalPos.equals(position)) {
+                return
+            }
+
+            const movement = goalPos
+                .minus(position)
+                .normalized()
+                .times(updateData.elapsedTimeMillis * 0.005)
+
             position = this.collider
-                .moveTo(
-                    position.plus(colliderOffset).plusX(-1 * updateData.elapsedTimeMillis * 0.005)
-                )
+                .moveTo(position.plus(colliderOffset).plus(movement))
                 .minus(colliderOffset)
+
             this.widdershins.transform.position = position.plus(new Point(50, -10))
         }
 
@@ -130,5 +145,13 @@ class Queequeg extends Component {
                     .toImageRender(SpriteTransform.new({ position, depth })),
             ]
         }
+    }
+
+    arrive() {
+        this.docked = true
+    }
+
+    depart() {
+        this.docked = false
     }
 }

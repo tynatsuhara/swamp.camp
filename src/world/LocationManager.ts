@@ -107,6 +107,7 @@ export class LocationManager {
         this.getLocations()
             .filter((l) => simulateCurrentLocation || l !== this.currentLocation)
             .flatMap((l) => Array.from(l.dudes))
+            // TODO add Simulateable interface
             .forEach((d) => d.entity.getComponent(NPC)?.simulate(duration))
     }
 }
