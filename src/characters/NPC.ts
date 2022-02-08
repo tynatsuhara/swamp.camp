@@ -1,4 +1,3 @@
-import { Component } from "brigsby/dist/Component"
 import { debug } from "brigsby/dist/Debug"
 import { UpdateData } from "brigsby/dist/Engine"
 import { Point } from "brigsby/dist/Point"
@@ -10,6 +9,7 @@ import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
 import { tilesAround } from "../Utils"
 import { Location } from "../world/Location"
 import { camp, LocationManager } from "../world/LocationManager"
+import { Simulatable } from "../world/Simulatable"
 import { Teleporter } from "../world/Teleporter"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
@@ -23,7 +23,7 @@ import { Player } from "./Player"
 /**
  * Shared logic for different types of NPCs. These should be invoked by an NPC controller component.
  */
-export class NPC extends Component {
+export class NPC extends Simulatable {
     private dude: Dude
 
     isEnemyFn: (dude: Dude) => boolean = () => false

@@ -1,12 +1,12 @@
 import { Point } from "brigsby/dist/Point"
 import { WorldAudioContext } from "../audio/WorldAudioContext"
 import { DudeType } from "../characters/DudeFactory"
-import { NPC } from "../characters/NPC"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { LocationManagerSaveState } from "../saves/LocationManagerSaveState"
 import { Singletons } from "../Singletons"
 import { ElementType } from "./elements/Elements"
 import { Location } from "./Location"
+import { Simulatable } from "./Simulatable"
 
 export enum LocationType {
     BASE_CAMP = "base",
@@ -107,8 +107,9 @@ export class LocationManager {
         this.getLocations()
             .filter((l) => simulateCurrentLocation || l !== this.currentLocation)
             .flatMap((l) => Array.from(l.dudes))
-            // TODO add Simulateable interface
-            .forEach((d) => d.entity.getComponent(NPC)?.simulate(duration))
+            .forEach((d) =>
+                d.entity.getComponents(Simulatable).forEach((s) => s.simulate(duration))
+            )
     }
 }
 
