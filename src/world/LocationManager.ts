@@ -1,4 +1,5 @@
 import { Point } from "brigsby/dist/Point"
+import { measure } from "brigsby/dist/Profiler"
 import { WorldAudioContext } from "../audio/WorldAudioContext"
 import { DudeType } from "../characters/DudeFactory"
 import { TILE_SIZE } from "../graphics/Tilesets"
@@ -104,12 +105,13 @@ export class LocationManager {
     }
 
     simulateLocations(simulateCurrentLocation: boolean, duration: number) {
-        this.getLocations()
-            .filter((l) => simulateCurrentLocation || l !== this.currentLocation)
-            .flatMap((l) => Array.from(l.dudes))
-            .forEach((d) =>
-                d.entity.getComponents(Simulatable).forEach((s) => s.simulate(duration))
-            )
+        const [time] = measure(() => {
+            this.getLocations()
+                .filter((l) => simulateCurrentLocation || l !== this.currentLocation)
+                .flatMap((l) => l.getEntities())
+                .forEach((e) => e.getComponents(Simulatable).forEach((s) => s.simulate(duration)))
+        })
+        // console.log(`simulation took ${time} milliseconds`)
     }
 }
 
