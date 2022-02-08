@@ -169,7 +169,6 @@ class Queequeg extends Simulatable {
         this.docked = false
     }
 
-    // overwritten in constructor
     simulate(duration: number): void {
         this.moveToGoal()
     }
