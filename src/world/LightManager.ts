@@ -166,7 +166,7 @@ export class LightManager extends Component {
 
         const location = LocationManager.instance.currentLocation
         if (!location.isInterior) {
-            // result.push(this.vignette?.entity)
+            result.push(this.vignette?.entity)
         }
 
         return result

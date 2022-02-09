@@ -1,7 +1,7 @@
 import { Component } from "brigsby/dist/Component"
 import { Point } from "brigsby/dist/Point"
 import { ImageRender } from "brigsby/dist/renderer/ImageRender"
-import { Color, getRGB } from "../ui/Color"
+import { Color } from "../ui/Color"
 import { DarknessMask } from "./DarknessMask"
 
 export class Vignette extends Component {
@@ -27,6 +27,7 @@ export class Vignette extends Component {
             context.fillRect(0, 0, canvas.width, canvas.height)
             context.clearRect(this.buffer, this.buffer, width, height)
 
+            /*
             const imageData = context.getImageData(0, 0, width, height)
             const rgb = getRGB(Color.BLACK)
 
@@ -71,6 +72,7 @@ export class Vignette extends Component {
             }
 
             context.putImageData(imageData, this.buffer, this.buffer)
+            */
 
             this.getRenderMethods = () => [
                 new ImageRender(
