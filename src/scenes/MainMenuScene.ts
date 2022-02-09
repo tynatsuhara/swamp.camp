@@ -205,6 +205,12 @@ export class MainMenuScene {
                             "https://github.com/tylerbonnell/swamp-camp-native/releases/download/macos-latest/swamp-camp-darwin-x64.zip"
                         )
                     )
+                    .add(
+                        "Mac (Apple Silicon)",
+                        link(
+                            "https://github.com/tylerbonnell/swamp-camp-native/releases/tag/macos-apple-silicon"
+                        )
+                    )
                     .add("Back", () => this.render(Menu.ROOT))
                     .getEntity()
             )
