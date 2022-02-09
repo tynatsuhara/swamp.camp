@@ -33,12 +33,15 @@ import { DarknessMask } from "../world/DarknessMask"
 
 const ZOOM = 3
 
+const IS_NATIVE_APP = !!new URL(window.location.href).searchParams.get("native_app")
+
 enum Menu {
     ROOT,
     LOAD_GAME,
     NEW_GAME,
     PICK_COLOR,
     CREDITS,
+    DOWNLOADS,
 }
 
 export class MainMenuScene {
@@ -172,6 +175,8 @@ export class MainMenuScene {
         // by default, render the title and the scene with the knight
         const entities = [title, this.knight.entity, darknessEntity, ...sceneEntities]
 
+        const link = (url: string) => () => window.open(url, "_blank")
+
         if (this.waitingForAssets) {
             entities.push(new MainMenuButtonSection(menuTop).addText("loading...").getEntity())
         } else if (this.menu === Menu.ROOT) {
@@ -181,7 +186,26 @@ export class MainMenuScene {
                     .add("continue", () => this.loadLastSave(), saveCount > 0)
                     .add("load save", () => this.render(Menu.LOAD_GAME), saveCount > 1)
                     .add("New game", () => this.render(Menu.NEW_GAME))
+                    .add("Download", () => this.render(Menu.DOWNLOADS), !IS_NATIVE_APP)
                     .add("Credits", () => this.render(Menu.CREDITS))
+                    .getEntity()
+            )
+        } else if (this.menu === Menu.DOWNLOADS) {
+            entities.push(
+                new MainMenuButtonSection(menuTop)
+                    .add(
+                        "Windows",
+                        link(
+                            "https://github.com/tylerbonnell/swamp-camp-native/releases/download/windows-latest/swamp-camp-win32-x64.zip"
+                        )
+                    )
+                    .add(
+                        "Mac (Intel)",
+                        link(
+                            "https://github.com/tylerbonnell/swamp-camp-native/releases/download/macos-latest/swamp-camp-darwin-x64.zip"
+                        )
+                    )
+                    .add("Back", () => this.render(Menu.ROOT))
                     .getEntity()
             )
         } else if (this.menu === Menu.LOAD_GAME) {
@@ -237,7 +261,6 @@ export class MainMenuScene {
             )
         } else if (this.menu === Menu.CREDITS) {
             entities.splice(0) // don't show title and scene
-            const link = (url: string) => () => window.open(url, "_blank")
             const entryCount = 13 // UPDATE THIS IF YOU ADD MORE CREDITS
             const top = new Point(
                 dimensions.x / 2,
