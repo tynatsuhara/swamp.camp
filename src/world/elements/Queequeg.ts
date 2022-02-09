@@ -30,11 +30,12 @@ export class QueequegFactory extends ElementFactory {
     make(wl: Location, pos: Point, data: QueequegData): ElementComponent {
         const e = new Entity()
 
-        const dockedPosition = pos.times(TILE_SIZE).plusX(1)
-        const atSeaPosition = dockedPosition.plusX(TILE_SIZE * 7)
+        const dockedPositionX = pos.x * TILE_SIZE + 1
+        const atSeaPositionX = dockedPositionX + TILE_SIZE * 7
+        const positionY = pos.y * TILE_SIZE
 
         const ship = e.addComponent(
-            new Queequeg(dockedPosition, atSeaPosition, data.docked, [
+            new Queequeg(dockedPositionX, atSeaPositionX, positionY, data.docked, [
                 /* TODO */
             ])
         )
@@ -59,8 +60,8 @@ class Queequeg extends Simulatable {
     private widdershins: AnimatedSpriteComponent
     private collider: BoxCollider
     private colliderOffset = new Point(32, 20)
-    private dockedPosition: Point
-    private atSeaPosition: Point
+    private dockedPositionX: number
+    private atSeaPositionX: number
     private position: Point
     private docked: boolean
     get isDocked() {
@@ -72,14 +73,20 @@ class Queequeg extends Simulatable {
     private width = 6
     private passengers: Dude[] // TODO serialize
 
-    constructor(dockedPosition: Point, atSeaPosition: Point, docked: boolean, passengers: Dude[]) {
+    constructor(
+        dockedPositionX: number,
+        atSeaPositionX: number,
+        positionY: number,
+        docked: boolean,
+        passengers: Dude[]
+    ) {
         super()
-        this.dockedPosition = dockedPosition
-        this.atSeaPosition = atSeaPosition
+        this.dockedPositionX = dockedPositionX
+        this.atSeaPositionX = atSeaPositionX
         this.docked = docked
         this.passengers = passengers
 
-        this.position = docked ? dockedPosition : atSeaPosition
+        this.position = new Point(docked ? dockedPositionX : atSeaPositionX, positionY)
     }
 
     awake() {
@@ -133,20 +140,18 @@ class Queequeg extends Simulatable {
     }
 
     private moveToGoal(distanceMultiplier?: number) {
-        const goalPos = this.docked ? this.dockedPosition : this.atSeaPosition
+        const goalPosX = this.docked ? this.dockedPositionX : this.atSeaPositionX
 
-        if (goalPos.equals(this.position)) {
-            return
+        if (goalPosX !== this.position.x) {
+            const moveDir = new Point(goalPosX - this.position.x, 0)
+            const movement = distanceMultiplier
+                ? moveDir.normalized().times(distanceMultiplier)
+                : moveDir
+
+            this.position = this.collider
+                .moveTo(this.position.plus(this.colliderOffset).plus(movement))
+                .minus(this.colliderOffset)
         }
-
-        const moveDir = goalPos.minus(this.position)
-        const movement = distanceMultiplier
-            ? moveDir.normalized().times(distanceMultiplier)
-            : moveDir
-
-        this.position = this.collider
-            .moveTo(this.position.plus(this.colliderOffset).plus(movement))
-            .minus(this.colliderOffset)
 
         this.widdershins.transform.position = this.position.plus(new Point(52, -12))
 
