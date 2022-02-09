@@ -5,7 +5,10 @@ import { AnimatedSpriteComponent } from "brigsby/dist/sprites/AnimatedSpriteComp
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Lists } from "brigsby/dist/util/Lists"
 import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
+import { Dude } from "../../characters/Dude"
 import { DudeAnimationUtils } from "../../characters/DudeAnimationUtils"
+import { DudeType } from "../../characters/DudeFactory"
+import { NPC } from "../../characters/NPC"
 import { Particles } from "../../graphics/Particles"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Color } from "../../ui/Color"
@@ -30,7 +33,11 @@ export class QueequegFactory extends ElementFactory {
         const dockedPosition = pos.times(TILE_SIZE).plusX(1)
         const atSeaPosition = dockedPosition.plusX(TILE_SIZE * 7)
 
-        const ship = e.addComponent(new Queequeg(dockedPosition, atSeaPosition, data.docked))
+        const ship = e.addComponent(
+            new Queequeg(dockedPosition, atSeaPosition, data.docked, [
+                /* TODO */
+            ])
+        )
         window["queequeg"] = ship
 
         // TODO: Add a teleporter to get on top of the ship?
@@ -63,16 +70,16 @@ class Queequeg extends Simulatable {
         return this.position.y + TILE_SIZE * 3 - 10
     }
     private width = 6
+    private passengers: Dude[] // TODO serialize
 
-    constructor(dockedPosition: Point, atSeaPosition: Point, docked: boolean) {
+    constructor(dockedPosition: Point, atSeaPosition: Point, docked: boolean, passengers: Dude[]) {
         super()
-        const colliderOffset = new Point(32, 20)
-        this.docked = docked
         this.dockedPosition = dockedPosition
         this.atSeaPosition = atSeaPosition
-        this.position = docked ? dockedPosition : atSeaPosition
+        this.docked = docked
+        this.passengers = passengers
 
-        const width = 6
+        this.position = docked ? dockedPosition : atSeaPosition
     }
 
     awake() {
@@ -141,7 +148,25 @@ class Queequeg extends Simulatable {
             .moveTo(this.position.plus(this.colliderOffset).plus(movement))
             .minus(this.colliderOffset)
 
-        this.widdershins.transform.position = this.position.plus(new Point(50, -10))
+        this.widdershins.transform.position = this.position.plus(new Point(52, -12))
+
+        // the boat can only fit {positionsByIndex.length} passengers
+        const positionsByIndex = [new Point(20, 8)]
+
+        this.passengers.forEach((p, i) => {
+            if (i >= positionsByIndex.length) {
+                throw new Error("too many passengers in the ship")
+            }
+            const pos = this.widdershins.transform.position.plus(positionsByIndex[i])
+            p.manualDepth = this.depth - 1
+            p.moveTo(pos, true)
+            if (p.type === DudeType.PLAYER) {
+                // TODO
+            } else {
+                // don't worry about any NPC logic right now
+                p.entity.getComponent(NPC).enabled = false
+            }
+        })
     }
 
     // Move between the at-sea position and the docked position
@@ -171,5 +196,21 @@ class Queequeg extends Simulatable {
 
     simulate(duration: number): void {
         this.moveToGoal()
+    }
+
+    pushPassenger(dude: Dude) {
+        this.passengers.push(dude)
+    }
+
+    popPassenger() {
+        const p = this.passengers.pop()
+        const pos = p.position.plusY(30)
+        p.moveTo(pos, true)
+        p.manualDepth = undefined
+        if (p.type === DudeType.PLAYER) {
+            // TODO
+        } else {
+            p.entity.getComponent(NPC).enabled = true
+        }
     }
 }

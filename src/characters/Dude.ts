@@ -115,6 +115,9 @@ export class Dude extends Component implements DialogueSource {
         return this._isMoving
     }
 
+    // manually set a depth for the player sprite
+    manualDepth = 0
+
     private dialogueInteract: Interactable
     dialogue: string
 
@@ -242,7 +245,8 @@ export class Dude extends Component implements DialogueSource {
     }
 
     update(updateData: UpdateData) {
-        this.animation.transform.depth = this.collider.position.y + this.collider.dimensions.y
+        this.animation.transform.depth =
+            this.manualDepth || this.collider.position.y + this.collider.dimensions.y
 
         // All other transforms (eg the weapon) are positioned relative to the animation
         const transform = this.animation.transform
