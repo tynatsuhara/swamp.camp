@@ -277,8 +277,7 @@ export class Location {
         linkedLocation.dudes.add(dude)
         dude.location = linkedLocation
 
-        const offset = dude.standingPosition.minus(dude.position)
-        dude.moveTo(linkedPosition.minus(offset), true)
+        dude.moveTo(linkedPosition, true)
     }
 
     playerUseTeleporter(to: string, id: string) {
@@ -315,8 +314,7 @@ export class Location {
             Particles.instance.clear()
 
             // position the player and camera
-            const offset = p.standingPosition.minus(p.position)
-            p.moveTo(linkedPosition.minus(offset), true)
+            p.moveTo(linkedPosition, true)
             Camera.instance.jump(beforeTeleportPos.minus(p.standingPosition))
 
             setTimeout(() => {

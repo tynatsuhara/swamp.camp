@@ -209,7 +209,7 @@ class Queequeg extends Simulatable {
 
     popPassenger() {
         const p = this.passengers.pop()
-        const pos = p.position.plusY(30)
+        const pos = p.standingPosition.plusY(30)
         p.moveTo(pos, true)
         p.manualDepth = undefined
         if (p.type === DudeType.PLAYER) {

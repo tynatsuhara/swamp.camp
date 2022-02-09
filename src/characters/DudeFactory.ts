@@ -304,7 +304,7 @@ export class DudeFactory {
             type,
             factions, // TODO: Save factions? Only if they become mutable
             characterAnimName: saveState?.anim ?? animationName,
-            position: pos,
+            standingPosition: pos,
             weaponType: saveState?.weapon ?? weapon,
             shieldType: saveState?.shield ?? shield,
             maxHealth: saveState?.maxHealth ?? maxHealth,

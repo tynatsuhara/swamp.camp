@@ -491,8 +491,6 @@ export class NPC extends Simulatable {
 
     private forceMoveToTilePosition(pt: Point) {
         const pos = this.tilePtToStandingPos(pt)
-            .minus(this.dude.standingPosition)
-            .plus(this.dude.position)
         this.dude.moveTo(pos, true)
     }
 

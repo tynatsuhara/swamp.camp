@@ -94,18 +94,13 @@ export class Dude extends Component implements DialogueSource {
         return this.collider.dimensions
     }
 
-    private _position: Point
-    get position(): Point {
-        return this._position
-    }
+    // top left corner of the sprite - externally we should only use standingPosition
+    private position: Point
+    private standingOffset: Point
+
     // bottom center of the tile
     get standingPosition(): Point {
-        return this.position.plus(
-            new Point(
-                this.animation.transform.dimensions.x / 2,
-                this.animation.transform.dimensions.y
-            )
-        )
+        return this.position.plus(this.standingOffset)
     }
     get tile(): Point {
         return pixelPtToTilePt(this.standingPosition)
@@ -130,7 +125,7 @@ export class Dude extends Component implements DialogueSource {
         type: DudeType
         factions: DudeFaction[]
         characterAnimName: string
-        position: Point
+        standingPosition: Point
         weaponType: WeaponType
         shieldType: ShieldType
         maxHealth: number
@@ -161,7 +156,7 @@ export class Dude extends Component implements DialogueSource {
             type,
             factions,
             characterAnimName,
-            position,
+            standingPosition,
             weaponType,
             shieldType,
             maxHealth,
@@ -178,7 +173,6 @@ export class Dude extends Component implements DialogueSource {
         this.uuid = uuid
         this.type = type
         this.factions = factions
-        this._position = position
         this.maxHealth = maxHealth
         this._health = maxHealth === Number.MAX_SAFE_INTEGER ? Number.MAX_SAFE_INTEGER : health
         this.speed = speed
@@ -201,6 +195,11 @@ export class Dude extends Component implements DialogueSource {
                     new SpriteTransform(new Point(0, 28 - height))
                 )
             )
+            this.standingOffset = new Point(
+                this.animation.transform.dimensions.x / 2,
+                this.animation.transform.dimensions.y
+            )
+            this.position = standingPosition.minus(this.standingOffset)
             this._animation.fastForward(Math.random() * 1000) // so not all the animations sync up
 
             this.setWeapon(weaponType)
@@ -568,7 +567,7 @@ export class Dude extends Component implements DialogueSource {
             window.cancelAnimationFrame(this.knockIntervalCallback)
         }
 
-        const goal = this.position.plus(direction.normalized().times(knockback))
+        const goal = this.standingPosition.plus(direction.normalized().times(knockback))
         const distToStop = 2
         let intervalsRemaining = 50
 
@@ -577,10 +576,13 @@ export class Dude extends Component implements DialogueSource {
             const now = new Date().getTime()
             const diff = now - last
             if (diff > 0) {
-                this.moveTo(this.position.lerp((0.15 * diff) / 30, goal))
+                this.moveTo(this.standingPosition.lerp((0.15 * diff) / 30, goal))
             }
             intervalsRemaining--
-            if (intervalsRemaining === 0 || goal.minus(this.position).magnitude() < distToStop) {
+            if (
+                intervalsRemaining === 0 ||
+                goal.minus(this.standingPosition).magnitude() < distToStop
+            ) {
                 this.knockIntervalCallback = 0
             } else {
                 this.knockIntervalCallback = requestAnimationFrame(knock)
@@ -689,7 +691,7 @@ export class Dude extends Component implements DialogueSource {
         }
 
         if (totalMovement.x !== 0 || totalMovement.y !== 0) {
-            const newPos = this._position.plus(totalMovement)
+            const newPos = this.standingPosition.plus(totalMovement)
             this.moveTo(newPos)
         }
 
@@ -751,15 +753,19 @@ export class Dude extends Component implements DialogueSource {
     }
 
     /**
-     * @param point World point where the dude will be moved, unless they hit a collider (with skipColliderCheck = false)
+     * @param point World point where the dude will be moved to (standing position),
+     *              unless they hit a collider (with skipColliderCheck = false)
      */
     moveTo(point: Point, skipColliderCheck = false) {
+        // movement is done based on top-left corner point
+        point = point.minus(this.standingOffset)
+
         const moveFn = skipColliderCheck
             ? (pos: Point) => this.collider.forceSetPosition(pos)
             : (pos: Point) => this.collider.moveTo(pos)
-        this._position = moveFn(point.plus(this.relativeColliderPos)).minus(
-            this.relativeColliderPos
-        )
+
+        this.position = moveFn(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos)
+
         if (skipColliderCheck) {
             this.seaLevel = this.location.levels?.get(this.tile) ?? 0
         }
@@ -935,7 +941,7 @@ export class Dude extends Component implements DialogueSource {
         return {
             uuid: this.uuid,
             type: this.type,
-            pos: this.position.toString(),
+            pos: this.standingPosition.toString(),
             anim: this.characterAnimName,
             maxHealth: this.maxHealth,
             health: this._health,

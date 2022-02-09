@@ -157,7 +157,7 @@ export class StaffWeapon extends Weapon {
                         .forEach((d) =>
                             // don't track lastAttacker because it can cause friendly fire and get weird
                             d.damage(2, {
-                                direction: d.position.minus(this.attackPosition),
+                                direction: d.standingPosition.minus(this.attackPosition),
                                 knockback: 50,
                             })
                         )
