@@ -126,9 +126,15 @@ export class HUD {
 
     showSaveIcon() {
         this.isShowingAutosaveIcon = true
+        this.autosaveComponent.enabled = true
+
+        const timeToShowIcon = 3000
         setTimeout(() => {
             this.isShowingAutosaveIcon = false
-        }, 3000)
+        }, timeToShowIcon)
+        setTimeout(() => {
+            this.autosaveComponent.enabled = false
+        }, timeToShowIcon + 1000)
     }
 
     private updateAutosave(screenDimensions: Point, elapsedMillis: number) {
