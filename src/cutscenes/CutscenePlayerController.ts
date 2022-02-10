@@ -1,8 +1,8 @@
 import { Component } from "brigsby/dist/Component"
-import { Player } from "../characters/Player"
-import { Dude } from "../characters/Dude"
 import { UpdateData } from "brigsby/dist/Engine"
 import { Point } from "brigsby/dist/Point"
+import { Dude } from "../characters/Dude"
+import { Player } from "../characters/Player"
 
 export class CutscenePlayerController extends Component {
     static instance: CutscenePlayerController
@@ -22,7 +22,7 @@ export class CutscenePlayerController extends Component {
     }
 
     update(updateData: UpdateData) {
-        this._dude.move(updateData, this.moveDir)
+        this._dude.move(updateData.elapsedTimeMillis, this.moveDir)
     }
 
     startMoving(moveDir: Point) {

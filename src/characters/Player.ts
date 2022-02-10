@@ -121,7 +121,7 @@ export class Player extends Component {
         this._velocity = new Point(dx, dy)
 
         this.dude.move(
-            updateData,
+            updateData.elapsedTimeMillis,
             this.velocity,
             this.dude.rolling ? 0 : controls.getPlayerFacingDirection(this.dude),
             speed

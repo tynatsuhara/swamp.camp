@@ -79,7 +79,7 @@ export class NPC extends Simulatable {
         if (DialogueDisplay.instance.source === this.dude) {
             // don't move when talking
             this.dude.move(
-                updateData,
+                updateData.elapsedTimeMillis,
                 Point.ZERO,
                 Player.instance.dude.standingPosition.x - this.dude.standingPosition.x
             )
@@ -107,12 +107,12 @@ export class NPC extends Simulatable {
                 walkTo: (pt) => this.walkTo(pt, updateData),
                 roam: (speed, options) => this.doRoam(updateData, speed, options),
                 goToLocation: (location) => this.goToLocation(updateData, location), // TODO
-                doNothing: () => this.dude.move(updateData, Point.ZERO),
+                doNothing: () => this.dude.move(updateData.elapsedTimeMillis, Point.ZERO),
             }
             this.task.performTask(context)
         } else {
             // Stand still and do nothing by default
-            this.dude.move(updateData, Point.ZERO)
+            this.dude.move(updateData.elapsedTimeMillis, Point.ZERO)
         }
     }
 
@@ -186,7 +186,7 @@ export class NPC extends Simulatable {
             // only try once per upate() to find a path
             this.walkPath = this.findPath(tilePt)
             if (!this.walkPath || this.walkPath.length === 0) {
-                this.dude.move(updateData, Point.ZERO)
+                this.dude.move(updateData.elapsedTimeMillis, Point.ZERO)
                 return
             }
         }
@@ -224,12 +224,12 @@ export class NPC extends Simulatable {
                 }
             }
             if (!pt) {
-                this.dude.move(updateData, Point.ZERO)
+                this.dude.move(updateData.elapsedTimeMillis, Point.ZERO)
                 return
             }
             this.roamPath = this.findPath(pt)
             if (!this.roamPath || this.roamPath.length === 0) {
-                this.dude.move(updateData, Point.ZERO)
+                this.dude.move(updateData.elapsedTimeMillis, Point.ZERO)
                 return
             }
         }
@@ -241,7 +241,7 @@ export class NPC extends Simulatable {
                 this.roamNextPauseTime = WorldTime.instance.time + pauseEveryMillis
                 this.roamNextUnpauseTime = this.roamNextPauseTime + pauseForMillis
             } else if (time > this.roamNextPauseTime) {
-                this.dude.move(updateData, Point.ZERO)
+                this.dude.move(updateData.elapsedTimeMillis, Point.ZERO)
                 return
             }
         } else {
@@ -289,7 +289,7 @@ export class NPC extends Simulatable {
         const weapon = this.dude.weapon
 
         if (!weapon || !this.attackTarget || !this.attackTarget.isAlive) {
-            this.dude.move(updateData, Point.ZERO)
+            this.dude.move(updateData.elapsedTimeMillis, Point.ZERO)
             return
         }
 
@@ -349,7 +349,7 @@ export class NPC extends Simulatable {
         }
         if (!this.targetPath || this.targetPath.length === 0 || mag < stoppingDist) {
             // TODO: If using a ranged weapon, keep distance from enemies
-            this.dude.move(updateData, Point.ZERO)
+            this.dude.move(updateData.elapsedTimeMillis, Point.ZERO)
             return
         }
 
@@ -383,11 +383,11 @@ export class NPC extends Simulatable {
         }
 
         if (isCloseEnough && stopWhenClose) {
-            this.dude.move(updateData, Point.ZERO, facingOverride)
+            this.dude.move(updateData.elapsedTimeMillis, Point.ZERO, facingOverride)
         } else {
             const oldPosition = this.dude.standingPosition
             this.dude.move(
-                updateData,
+                updateData.elapsedTimeMillis,
                 nextPt.minus(this.dude.standingPosition),
                 facingOverride,
                 speedMultiplier

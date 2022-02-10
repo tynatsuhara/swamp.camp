@@ -245,7 +245,7 @@ export class Dude extends Component implements DialogueSource {
 
     update(updateData: UpdateData) {
         this.animation.transform.depth =
-            this.manualDepth || this.collider.position.y + this.collider.dimensions.y
+            this.manualDepth ?? this.collider.position.y + this.collider.dimensions.y
 
         // All other transforms (eg the weapon) are positioned relative to the animation
         const transform = this.animation.transform
@@ -599,13 +599,12 @@ export class Dude extends Component implements DialogueSource {
     }
 
     /**
-     * Should be called on EVERY update step for
-     * @param updateData
+     * Should be called on EVERY update step to ensure Dude state is maintained correctly
      * @param direction the direction they are moving in, will be normalized by this code
      * @param facingOverride if < 0, will face left, if > 0, will face right. if == 0, will face the direction they're moving
      */
     move(
-        updateData: UpdateData,
+        elapsedTimeMillis: number,
         direction: Point,
         facingOverride: number = 0,
         speedMultiplier: number = 1
@@ -670,13 +669,13 @@ export class Dude extends Component implements DialogueSource {
             this.addCondition(Condition.ON_FIRE, 1000 + Math.random() * 1000)
         }
 
-        const verticalMovement = this.getVerticalMovement(updateData)
+        const verticalMovement = this.getVerticalMovement(elapsedTimeMillis)
         if (verticalMovement.y < 0) {
             // climbing uphill takes effort
             speedMultiplier = 0
         }
 
-        const walkDistance = updateData.elapsedTimeMillis * this.speed * speedMultiplier
+        const walkDistance = elapsedTimeMillis * this.speed * speedMultiplier
         const walkMovement = this.isMoving ? direction.normalized().times(walkDistance) : Point.ZERO
         const standingPosAfterWalk = this.standingPosition.plus(walkMovement)
 
@@ -710,7 +709,7 @@ export class Dude extends Component implements DialogueSource {
         return currentLevel
     }
 
-    private getVerticalMovement(updateData: UpdateData) {
+    private getVerticalMovement(elapsedTimeMillis: number) {
         let dx = 0
         let dy = 0
         if (dx == NaN || dy == NaN) {
@@ -736,13 +735,13 @@ export class Dude extends Component implements DialogueSource {
         // }
 
         if (goalLevel < this.seaLevel) {
-            const speed = fallSpeedY * updateData.elapsedTimeMillis
+            const speed = fallSpeedY * elapsedTimeMillis
             const levelDiff = this.seaLevel - goalLevel
             const distanceWillMove = Math.min(speed, levelDiff)
             this.seaLevel = this.seaLevel - distanceWillMove
             dy = distanceWillMove * pixelHeightBetweenLevels
         } else if (goalLevel > this.seaLevel) {
-            const speed = climbSpeed * updateData.elapsedTimeMillis
+            const speed = climbSpeed * elapsedTimeMillis
             const levelDiff = goalLevel - this.seaLevel
             const distanceWillMove = Math.min(speed, levelDiff)
             this.seaLevel = this.seaLevel + distanceWillMove

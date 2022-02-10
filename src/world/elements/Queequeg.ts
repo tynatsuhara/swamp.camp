@@ -167,6 +167,7 @@ class Queequeg extends Simulatable {
                 .plus(positionsByIndex[i])
             p.manualDepth = this.depth - 1
             p.moveTo(pos, true)
+            p.move(0, Point.ZERO, -1)
         })
     }
 
