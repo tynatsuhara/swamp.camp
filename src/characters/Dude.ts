@@ -111,7 +111,7 @@ export class Dude extends Component implements DialogueSource {
     }
 
     // manually set a depth for the player sprite
-    manualDepth = 0
+    manualDepth = undefined
 
     private dialogueInteract: Interactable
     dialogue: string
