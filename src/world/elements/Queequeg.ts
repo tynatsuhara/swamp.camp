@@ -156,21 +156,17 @@ class Queequeg extends Simulatable {
         this.widdershins.transform.position = this.position.plus(new Point(52, -12))
 
         // the boat can only fit {positionsByIndex.length} passengers
-        const positionsByIndex = [new Point(20, 8)]
+        const positionsByIndex = [new Point(25, 5)]
 
         this.passengers.forEach((p, i) => {
             if (i >= positionsByIndex.length) {
                 throw new Error("too many passengers in the ship")
             }
-            const pos = this.widdershins.transform.position.plus(positionsByIndex[i])
+            const pos = this.widdershins.transform.position
+                .plusY(this.widdershins.transform.dimensions.y)
+                .plus(positionsByIndex[i])
             p.manualDepth = this.depth - 1
             p.moveTo(pos, true)
-            if (p.type === DudeType.PLAYER) {
-                // TODO
-            } else {
-                // don't worry about any NPC logic right now
-                p.entity.getComponent(NPC).enabled = false
-            }
         })
     }
 
@@ -205,6 +201,12 @@ class Queequeg extends Simulatable {
 
     pushPassenger(dude: Dude) {
         this.passengers.push(dude)
+        if (dude.type === DudeType.PLAYER) {
+            // TODO
+        } else {
+            // don't worry about any NPC logic right now
+            dude.entity.getComponent(NPC).enabled = false
+        }
     }
 
     popPassenger() {
