@@ -165,7 +165,7 @@ class Queequeg extends Simulatable {
             const pos = this.widdershins.transform.position
                 .plusY(this.widdershins.transform.dimensions.y)
                 .plus(positionsByIndex[i])
-            p.manualDepth = this.depth - 1
+            p.manualDepth = this.depth
             p.moveTo(pos, true)
             p.move(0, Point.ZERO, -1)
         })
@@ -184,7 +184,7 @@ class Queequeg extends Simulatable {
                 .toImageRender(SpriteTransform.new({ position, depth: depth - 2 })),
             Tilesets.instance.largeSprites
                 .get(new Point(8, 2), new Point(this.width, 3))
-                .toImageRender(SpriteTransform.new({ position, depth })),
+                .toImageRender(SpriteTransform.new({ position, depth: depth + 2 })),
         ]
     }
 
