@@ -11,6 +11,8 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { saveManager } from "../SaveManager"
 import { ControlsUI } from "../ui/ControlsUI"
 import { HUD } from "../ui/HUD"
+import { ElementType } from "../world/elements/Elements"
+import { Queequeg } from "../world/elements/Queequeg"
 import { LocationManager } from "../world/LocationManager"
 import { Camera } from "./Camera"
 import { CutsceneManager } from "./CutsceneManager"
@@ -21,9 +23,9 @@ import { TextOverlayManager } from "./TextOverlayManager"
 export class IntroCutscene extends Component {
     // durations in ms
     private readonly START_WALKING_IN = 1000
-    private readonly STOP_WALKING_IN = this.START_WALKING_IN + 2000
-    private readonly PAN_TO_DIP = this.STOP_WALKING_IN + 750
-    private readonly PAN_BACK = this.PAN_TO_DIP + 2000
+    private readonly PAN_TO_DIP = this.START_WALKING_IN + 3000
+    private readonly GET_OFF_SHIP = this.PAN_TO_DIP + 500
+    private readonly PAN_BACK = this.GET_OFF_SHIP + 1500
 
     private waitingForOrcsToDie = false
     private orcs: Dude[]
@@ -113,25 +115,32 @@ ANOTHER thing - Only one of the explorers returned, and she reported that her co
 
     cutscene() {
         CutscenePlayerController.instance.enable()
+
         this.dip = Array.from(LocationManager.instance.currentLocation.dudes).filter(
             (d) => d.type === DudeType.DIP
         )[0]
 
+        const queequeg = LocationManager.instance.currentLocation
+            .getElementsOfType(ElementType.QUEEQUEG)[0]
+            .entity.getComponent(Queequeg)
+
+        queequeg.pushPassenger(Player.instance.dude)
+
         setTimeout(() => {
-            CutscenePlayerController.instance.startMoving(new Point(-1, 0))
+            queequeg.arrive()
         }, this.START_WALKING_IN)
 
         setTimeout(() => {
-            CutscenePlayerController.instance.stopMoving()
-        }, this.STOP_WALKING_IN)
-
-        setTimeout(() => {
             Camera.instance.focusOnPoint(this.dip.standingPosition)
-            CutscenePlayerController.instance.disable()
         }, this.PAN_TO_DIP)
 
         setTimeout(() => {
+            queequeg.popPassenger()
+        }, this.GET_OFF_SHIP)
+
+        setTimeout(() => {
             this.dip.dialogue = DIP_STARTING_DIALOGUE
+            CutscenePlayerController.instance.disable()
             Camera.instance.focusOnDude(Player.instance.dude)
             this.waitingForOrcsToDie = true
         }, this.PAN_BACK)

@@ -69,6 +69,8 @@ export class MapGenerator {
         // TODO short trees, bushes, fruit, tall grass, etc
         this.spawn(ElementType.MUSHROOM, 3 + Math.random() * 5)
 
+        this.location.addElement(ElementType.QUEEQUEG, new Point(MapGenerator.MAP_RANGE - 6, 10))
+
         LocationManager.instance.add(this.location)
         LocationManager.instance.currentLocation = this.location
 

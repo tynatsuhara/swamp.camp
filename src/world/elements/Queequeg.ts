@@ -40,8 +40,8 @@ export class QueequegFactory extends ElementFactory {
                 dockedPositionX,
                 atSeaPositionX,
                 positionY,
-                data.docked,
-                data.passengers,
+                data.docked ?? false,
+                data.passengers ?? [],
                 wl
             )
         )
@@ -60,7 +60,7 @@ export class QueequegFactory extends ElementFactory {
     }
 }
 
-class Queequeg extends Simulatable {
+export class Queequeg extends Simulatable {
     private widdershins: AnimatedSpriteComponent
     private collider: BoxCollider
     private colliderOffset = new Point(32, 20)
@@ -158,7 +158,7 @@ class Queequeg extends Simulatable {
                 movementX = fullDistanceMovementX
             } else if (this.docked) {
                 // lerp in
-                movementX = fullDistanceMovementX * 0.0006 * elapsedTimeMillis
+                movementX = fullDistanceMovementX * 0.0012 * elapsedTimeMillis
             } else {
                 // constant speed move out
                 movementX = elapsedTimeMillis * 0.01
@@ -228,7 +228,7 @@ class Queequeg extends Simulatable {
 
     popPassenger() {
         const p = this.passengers.pop()
-        const pos = p.standingPosition.plusY(34)
+        const pos = p.standingPosition.plusY(24)
         p.moveTo(pos, true)
         p.manualDepth = undefined
         if (p.type === DudeType.PLAYER) {
