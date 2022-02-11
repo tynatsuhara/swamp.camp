@@ -6,7 +6,7 @@ import { DarknessMask } from "./DarknessMask"
 
 export class Vignette extends Component {
     // TODO move to top-level consts
-    private buffer = 50 // pixels from beyond the edge of the map (useful for covering clipping things)
+    private buffer = 200 // pixels from beyond the edge of the map (useful for covering clipping things)
     private padding = 128 // distance from start of shadows to the edge of the screen
     private rings = 8
     private ringWidth = this.padding / this.rings
