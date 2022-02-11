@@ -143,6 +143,7 @@ ANOTHER thing - Only one of the explorers returned, and she reported that her co
             CutscenePlayerController.instance.disable()
             Camera.instance.focusOnDude(Player.instance.dude)
             this.waitingForOrcsToDie = true
+            queequeg.depart()
         }, this.PAN_BACK)
     }
 

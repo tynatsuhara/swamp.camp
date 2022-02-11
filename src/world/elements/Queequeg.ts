@@ -161,7 +161,7 @@ export class Queequeg extends Simulatable {
                 movementX = fullDistanceMovementX * 0.0012 * elapsedTimeMillis
             } else {
                 // constant speed move out
-                movementX = elapsedTimeMillis * 0.01
+                movementX = Math.min(elapsedTimeMillis * 0.01, fullDistanceMovementX)
             }
 
             this.position = this.collider
