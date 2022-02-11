@@ -14,7 +14,7 @@ export class Vignette extends Component {
     constructor(topLeftPosition: Point, height: number) {
         super()
 
-        const width = height * 2
+        const width = height
 
         this.start = () => {
             const canvas = document.createElement("canvas")
