@@ -23,9 +23,7 @@ export class HUD {
     }
 
     private heartsEntity: Entity = new Entity()
-    private autosaveComponent: SpriteComponent = new Entity().addComponent(
-        Tilesets.instance.oneBit.getTileSource("floppy_drive").toComponent()
-    )
+    private autosaveComponent: SpriteComponent
     private isShowingAutosaveIcon = false
     private readonly offset = new Point(4, 4)
     private readonly offScreenIndicatorManager = new OffScreenIndicatorManager()
@@ -41,6 +39,13 @@ export class HUD {
     private lastMaxHealthCount = 0
 
     readonly locationTransition = new Entity().addComponent(new LocationTransition())
+
+    constructor() {
+        this.autosaveComponent = new Entity().addComponent(
+            Tilesets.instance.oneBit.getTileSource("floppy_drive").toComponent()
+        )
+        this.autosaveComponent.enabled = false
+    }
 
     addIndicator(key: any, positionSupplier: () => Point) {
         this.offScreenIndicatorManager.addIndicator(key, positionSupplier)
