@@ -217,7 +217,6 @@ class Queequeg extends Simulatable {
     }
 
     pushPassenger(dude: Dude) {
-        console.log("push")
         this.passengers.push(dude)
         if (dude.type === DudeType.PLAYER) {
             // TODO
@@ -229,7 +228,7 @@ class Queequeg extends Simulatable {
 
     popPassenger() {
         const p = this.passengers.pop()
-        const pos = p.standingPosition.plusY(30)
+        const pos = p.standingPosition.plusY(34)
         p.moveTo(pos, true)
         p.manualDepth = undefined
         if (p.type === DudeType.PLAYER) {

@@ -177,6 +177,7 @@ debug.showInteractables = debug.showInteractables || false
 debug.showPathfinding = debug.showPathfinding || false
 debug.showTeleporters = debug.showTeleporters || false
 debug.speedMultiplier = debug.speedMultiplier || 1
+debug.showOccupiedSpots = debug.showOccupiedSpots || false
 
 const help = () => {
     let help = `dev controls (enable with debug.enableDevControls=true)

@@ -171,6 +171,21 @@ export class GameScene {
             e.addComponent(new BasicRenderComponent(...renders))
         }
 
+        if (debug.showOccupiedSpots) {
+            const pts = LocationManager.instance.currentLocation.getOccupiedSpots()
+            const renders = pts.map(
+                (pt) =>
+                    new EllipseRender({
+                        depth: Number.MAX_SAFE_INTEGER,
+                        position: pt.times(TILE_SIZE).plus(new Point(2, 2)),
+                        dimensions: new Point(12, 12),
+                        color: "#0000FF",
+                    })
+            )
+
+            e.addComponent(new BasicRenderComponent(...renders))
+        }
+
         return e
     }
 

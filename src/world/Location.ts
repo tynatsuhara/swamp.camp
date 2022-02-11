@@ -159,6 +159,10 @@ export class Location {
         return !!this.occupied.get(pos)
     }
 
+    getOccupiedSpots() {
+        return this.occupied.keys()
+    }
+
     removeElementAt(pos: Point) {
         this.removeElement(this.getElement(pos))
     }
