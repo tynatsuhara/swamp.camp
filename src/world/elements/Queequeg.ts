@@ -21,6 +21,7 @@ import { ElementUtils } from "./ElementUtils"
 
 type QueequegData = {
     docked: boolean
+    passengers: string[]
 }
 
 export class QueequegFactory extends ElementFactory {
@@ -35,9 +36,14 @@ export class QueequegFactory extends ElementFactory {
         const positionY = pos.y * TILE_SIZE
 
         const ship = e.addComponent(
-            new Queequeg(dockedPositionX, atSeaPositionX, positionY, data.docked, [
-                /* TODO */
-            ])
+            new Queequeg(
+                dockedPositionX,
+                atSeaPositionX,
+                positionY,
+                data.docked,
+                data.passengers,
+                wl
+            )
         )
         window["queequeg"] = ship
 
@@ -48,9 +54,7 @@ export class QueequegFactory extends ElementFactory {
                 this.type,
                 pos,
                 ElementUtils.rectPoints(pos, this.dimensions),
-                (): QueequegData => ({
-                    docked: ship.isDocked,
-                })
+                ship.save
             )
         )
     }
@@ -64,29 +68,32 @@ class Queequeg extends Simulatable {
     private atSeaPositionX: number
     private position: Point
     private docked: boolean
-    get isDocked() {
-        return this.docked
-    }
     private get depth() {
         return this.position.y + TILE_SIZE * 3 - 10
     }
     private width = 6
-    private passengers: Dude[] // TODO serialize
+    private passengers: Dude[] = []
 
     constructor(
         dockedPositionX: number,
         atSeaPositionX: number,
         positionY: number,
         docked: boolean,
-        passengers: Dude[]
+        passengers: string[],
+        wl: Location
     ) {
         super()
         this.dockedPositionX = dockedPositionX
         this.atSeaPositionX = atSeaPositionX
         this.docked = docked
-        this.passengers = passengers
 
         this.position = new Point(docked ? dockedPositionX : atSeaPositionX, positionY)
+
+        this.start = () => {
+            const dudes: { [key: string]: Dude } = {}
+            wl.dudes.forEach((d) => (dudes[d.uuid] = d))
+            passengers.map((uuid) => dudes[uuid]).forEach((dude) => this.pushPassenger(dude))
+        }
     }
 
     awake() {
@@ -140,7 +147,6 @@ class Queequeg extends Simulatable {
     }
 
     private moveToGoal(elapsedTimeMillis?: number) {
-        const range = this.dockedPositionX - this.atSeaPositionX
         const goalPosX = this.docked ? this.dockedPositionX : this.atSeaPositionX
 
         if (goalPosX !== this.position.x) {
@@ -211,6 +217,7 @@ class Queequeg extends Simulatable {
     }
 
     pushPassenger(dude: Dude) {
+        console.log("push")
         this.passengers.push(dude)
         if (dude.type === DudeType.PLAYER) {
             // TODO
@@ -231,4 +238,9 @@ class Queequeg extends Simulatable {
             p.entity.getComponent(NPC).enabled = true
         }
     }
+
+    save = (): QueequegData => ({
+        docked: this.docked,
+        passengers: this.passengers.map((p) => p.uuid),
+    })
 }
