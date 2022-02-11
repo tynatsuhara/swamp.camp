@@ -141,11 +141,12 @@ class Queequeg extends Simulatable {
 
     private moveToGoal(distanceMultiplier?: number) {
         const goalPosX = this.docked ? this.dockedPositionX : this.atSeaPositionX
+        const speed = 1.5
 
         if (goalPosX !== this.position.x) {
             const moveDir = new Point(goalPosX - this.position.x, 0)
             const movement = distanceMultiplier
-                ? moveDir.normalized().times(distanceMultiplier)
+                ? moveDir.normalized().times(distanceMultiplier * speed)
                 : moveDir
 
             this.position = this.collider
