@@ -139,18 +139,27 @@ class Queequeg extends Simulatable {
         )
     }
 
-    private moveToGoal(distanceMultiplier?: number) {
+    private moveToGoal(elapsedTimeMillis?: number) {
+        const range = this.dockedPositionX - this.atSeaPositionX
         const goalPosX = this.docked ? this.dockedPositionX : this.atSeaPositionX
-        const speed = 1.5
 
         if (goalPosX !== this.position.x) {
-            const moveDir = new Point(goalPosX - this.position.x, 0)
-            const movement = distanceMultiplier
-                ? moveDir.normalized().times(distanceMultiplier * speed)
-                : moveDir
+            const fullDistanceMovementX = goalPosX - this.position.x
+
+            let movementX: number
+
+            if (!elapsedTimeMillis) {
+                movementX = fullDistanceMovementX
+            } else if (this.docked) {
+                // lerp in
+                movementX = fullDistanceMovementX * 0.0006 * elapsedTimeMillis
+            } else {
+                // constant speed move out
+                movementX = elapsedTimeMillis * 0.01
+            }
 
             this.position = this.collider
-                .moveTo(this.position.plus(this.colliderOffset).plus(movement))
+                .moveTo(this.position.plus(this.colliderOffset).plusX(movementX))
                 .minus(this.colliderOffset)
         }
 
@@ -174,7 +183,7 @@ class Queequeg extends Simulatable {
 
     // Move between the at-sea position and the docked position
     update(updateData) {
-        this.moveToGoal(updateData.elapsedTimeMillis * 0.005)
+        this.moveToGoal(updateData.elapsedTimeMillis)
     }
 
     getRenderMethods() {
