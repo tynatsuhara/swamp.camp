@@ -59,20 +59,21 @@ export class TreeFactory extends ElementFactory {
         }
 
         const prefix = this.type === ElementType.TREE_ROUND ? "treeRound" : "treePointy"
+        const topVariant = Math.floor(Math.random() * 3)
+        const bottomVariant = Math.floor(Math.random() * 3)
         let tiles: SpriteComponent[]
         if (size === 3) {
             tiles = [
-                addTile(`${prefix}Top`, pos),
-                addTile(`${prefix}Base`, pos.plus(new Point(0, 1))),
+                addTile(`${prefix}Top${topVariant}`, pos),
+                addTile(`${prefix}Base${bottomVariant}`, pos.plus(new Point(0, 1))),
             ]
+        } else if (size == 2) {
+            tiles = [addTile(`${prefix}Small${topVariant}`, pos.plus(new Point(0, 1)))]
         } else {
-            tiles = [
-                addTile(`${prefix}${["Sapling", "Small"][size - 1]}`, pos.plus(new Point(0, 1))),
-            ]
+            tiles = [addTile(`${prefix}Sapling`, pos.plus(new Point(0, 1)))]
         }
 
-        const mirrored = Math.random() > 0.5
-        tiles.forEach((t) => (t.transform.mirrorX = mirrored))
+        tiles.forEach((t) => (t.transform.mirrorX = Math.random() > 0.5))
 
         // const hitboxDims = new Point(8, 3)
         // e.addComponent(new BoxCollider(
