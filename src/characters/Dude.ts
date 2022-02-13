@@ -13,6 +13,7 @@ import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
 import { StepSounds } from "../audio/StepSounds"
 import { controls } from "../Controls"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
+import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 import { DeathCutscene } from "../cutscenes/DeathCutscene"
 import { IntroCutscene } from "../cutscenes/IntroCutscene"
 import { FireParticles } from "../graphics/FireParticles"
@@ -1023,7 +1024,9 @@ export class Dude extends Component implements DialogueSource {
 
         if (
             indicator === DudeInteractIndicator.IMPORTANT_DIALOGUE ||
-            (this.type === DudeType.PLAYER && this.entity.getComponent(Player).isOffMap())
+            (this.type === DudeType.PLAYER &&
+                this.entity.getComponent(Player).isOffMap() &&
+                !CutscenePlayerController.instance.enabled)
         ) {
             // update off screen indicator
             HUD.instance.addIndicator(this, () => this.standingPosition)
