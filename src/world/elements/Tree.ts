@@ -19,6 +19,7 @@ import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
 import { HittableResource } from "./HittableResource"
+import { Pushable } from "./Pushable"
 
 const NEXT_GROWTH_TIME = "ngt"
 const SIZE = "s" // one of [1, 2, 3]
@@ -121,6 +122,14 @@ export class TreeFactory extends ElementFactory {
                 })
             )
         }
+
+        e.addComponent(
+            new Pushable(
+                pos.plusX(0.5).plusY(2).times(TILE_SIZE),
+                tiles.map((t) => t.transform),
+                () => !hittableResource.isBeingHit()
+            )
+        )
 
         return e.addComponent(
             new ElementComponent(this.type, pos, [], () => {

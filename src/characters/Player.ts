@@ -10,7 +10,8 @@ import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
 import { TextAlign } from "../ui/Text"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Interactable } from "../world/elements/Interactable"
-import { camp } from "../world/LocationManager"
+import { Pushable } from "../world/elements/Pushable"
+import { camp, LocationManager } from "../world/LocationManager"
 import { MapGenerator } from "../world/MapGenerator"
 import { Dude } from "./Dude"
 
@@ -126,6 +127,11 @@ export class Player extends Component {
             this.dude.rolling ? 0 : controls.getPlayerFacingDirection(this.dude),
             speed
         )
+
+        LocationManager.instance.currentLocation
+            .getElement(this.dude.tile)
+            ?.entity.getComponent(Pushable)
+            ?.push(this.dude.standingPosition, this.velocity)
 
         if (UIStateManager.instance.isMenuOpen) {
             return
