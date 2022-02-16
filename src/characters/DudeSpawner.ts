@@ -165,8 +165,6 @@ export class DudeSpawner extends Component {
     }
 
     private spawnWildlife() {
-        const l = LocationManager.instance.currentLocation
-
         if (this.shouldRandomlySpawn(TimeUnit.DAY * 7)) {
             DudeFactory.instance.new(DudeType.BEAR, this.getSpawnPosOffMap())
         }
