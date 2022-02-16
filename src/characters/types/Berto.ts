@@ -1,10 +1,9 @@
 import { Component } from "brigsby/dist/Component"
 import { Point } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util/Lists"
-import { pixelPtToTilePt } from "../../graphics/Tilesets"
+import { Queequeg } from "../../world/elements/Queequeg"
 import { EventQueue } from "../../world/events/EventQueue"
 import { QueuedEventType } from "../../world/events/QueuedEvent"
-import { LocationManager } from "../../world/LocationManager"
 import { NPCSchedules } from "../ai/NPCSchedule"
 import { Dude } from "../Dude"
 import { NPC } from "../NPC"
@@ -21,8 +20,7 @@ export class Berto extends Component {
 
         if (EventQueue.instance.containsEventType(QueuedEventType.HERALD_DEPARTURE_CHECK)) {
             // head towards the exit
-            const destination = pixelPtToTilePt(LocationManager.instance.exteriorEntrancePosition())
-            npc.setSchedule(NPCSchedules.newGoToSchedule(destination))
+            npc.setSchedule(NPCSchedules.newGoToSchedule(Queequeg.instance.entryTile))
         } else if (EventQueue.instance.containsEventType(QueuedEventType.HERALD_RETURN_WITH_NPC)) {
             // off the map, do nothing
             npc.setSchedule(NPCSchedules.newNoOpSchedule())

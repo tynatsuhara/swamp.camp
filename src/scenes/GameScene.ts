@@ -29,7 +29,7 @@ import { EventQueue } from "../world/events/EventQueue"
 import { QueuedEventType } from "../world/events/QueuedEvent"
 import { GroundRenderer } from "../world/GroundRenderer"
 import { LightManager } from "../world/LightManager"
-import { LocationManager } from "../world/LocationManager"
+import { camp, LocationManager } from "../world/LocationManager"
 import { MapGenerator } from "../world/MapGenerator"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
@@ -60,7 +60,7 @@ export class GameScene {
         // World must be initialized before we do anything else
         MapGenerator.instance.generateExterior()
 
-        const playerStartPos = LocationManager.instance.exteriorEntrancePosition()
+        const playerStartPos = new Point(camp().size, camp().size).times(TILE_SIZE)
         const playerDude = DudeFactory.instance.new(DudeType.PLAYER, playerStartPos)
 
         // Camera.instance.clearPosition()

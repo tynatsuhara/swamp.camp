@@ -37,6 +37,7 @@ export class QueequegFactory extends ElementFactory {
 
         const ship = e.addComponent(
             new Queequeg(
+                pos,
                 dockedPositionX,
                 atSeaPositionX,
                 positionY,
@@ -61,6 +62,8 @@ export class QueequegFactory extends ElementFactory {
 }
 
 export class Queequeg extends Simulatable {
+    static instance: Queequeg
+
     private widdershins: AnimatedSpriteComponent
     private collider: BoxCollider
     private colliderOffset = new Point(32, 20)
@@ -74,7 +77,11 @@ export class Queequeg extends Simulatable {
     private width = 6
     private passengers: Dude[] = []
 
+    // where NPCs should walk to
+    readonly entryTile: Point
+
     constructor(
+        tilePoint: Point,
         dockedPositionX: number,
         atSeaPositionX: number,
         positionY: number,
@@ -83,6 +90,8 @@ export class Queequeg extends Simulatable {
         wl: Location
     ) {
         super()
+        this.entryTile = tilePoint.plus(new Point(4, 2))
+
         this.dockedPositionX = dockedPositionX
         this.atSeaPositionX = atSeaPositionX
         this.docked = docked
@@ -94,6 +103,8 @@ export class Queequeg extends Simulatable {
             wl.dudes.forEach((d) => (dudes[d.uuid] = d))
             passengers.map((uuid) => dudes[uuid]).forEach((dude) => this.pushPassenger(dude))
         }
+
+        Queequeg.instance = this
     }
 
     awake() {
@@ -226,15 +237,20 @@ export class Queequeg extends Simulatable {
         }
     }
 
-    popPassenger() {
-        const p = this.passengers.pop()
-        const pos = p.standingPosition.plusY(24)
-        p.moveTo(pos, true)
-        p.manualDepth = undefined
-        if (p.type === DudeType.PLAYER) {
+    removePassenger(dude: Dude) {
+        if (!this.passengers.includes(dude)) {
+            console.error(`${DudeType[dude.type]} ${dude.uuid} is not on the ship`)
+        } else {
+            console.log(`${DudeType[dude.type]} ${dude.uuid} got off the ship`)
+        }
+        this.passengers = this.passengers.filter((p) => p !== dude)
+        const pos = dude.standingPosition.plusY(24)
+        dude.moveTo(pos, true)
+        dude.manualDepth = undefined
+        if (dude.type === DudeType.PLAYER) {
             // TODO
         } else {
-            p.entity.getComponent(NPC).enabled = true
+            dude.entity.getComponent(NPC).enabled = true
         }
     }
 

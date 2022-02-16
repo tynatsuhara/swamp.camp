@@ -7,6 +7,7 @@ import { TILE_SIZE } from "../../graphics/Tilesets"
 import { NotificationDisplay, Notifications } from "../../ui/NotificationDisplay"
 import { Elements, ElementType } from "../elements/Elements"
 import { HittableResource } from "../elements/HittableResource"
+import { Queequeg } from "../elements/Queequeg"
 import { camp, LocationManager } from "../LocationManager"
 import { collectTaxes } from "../TaxRate"
 import { Day } from "../TimeUnit"
@@ -44,21 +45,23 @@ export const getEventQueueHandlers = (): {
     [QueuedEventType.HERALD_ARRIVAL]: () => {
         DudeFactory.instance.new(
             DudeType.HERALD,
-            LocationManager.instance.exteriorEntrancePosition(),
+            Queequeg.instance.entryTile.times(TILE_SIZE),
             camp()
         )
         NotificationDisplay.instance.push(Notifications.NEW_VILLAGER)
     },
 
     [QueuedEventType.HERALD_DEPARTURE_CHECK]: (data) => {
-        const goalPosition = LocationManager.instance.exteriorEntrancePosition()
         const berto = camp().getDude(DudeType.HERALD)
         if (!berto) {
             return
         }
 
+        const goalPosition = Queequeg.instance.entryTile.times(TILE_SIZE)
+        const bertoDistance = berto.standingPosition.distanceTo(goalPosition)
+
         // check repeatedly until he's at the goal
-        if (berto.standingPosition.distanceTo(goalPosition) > TILE_SIZE) {
+        if (bertoDistance > TILE_SIZE * 1.7) {
             console.log("[Berto] en route -- potentially stuck")
             EventQueue.instance.addEvent({
                 ...data,
@@ -66,6 +69,7 @@ export const getEventQueueHandlers = (): {
             })
         } else {
             console.log("[Berto] left the map")
+            Queequeg.instance.pushPassenger(berto)
             EventQueue.instance.addEvent({
                 type: QueuedEventType.HERALD_RETURN_WITH_NPC,
                 time: WorldTime.instance.future({ hours: 12 }),
@@ -88,6 +92,10 @@ export const getEventQueueHandlers = (): {
 
         const typesToSpawn = (data.dudeTypes || [DudeType.VILLAGER]) as DudeType[]
 
+        // Remove Berto
+        Queequeg.instance.removePassenger(berto)
+
+        // TODO: push all onto the queequeg
         typesToSpawn.forEach((type) => {
             DudeFactory.instance.new(
                 type,

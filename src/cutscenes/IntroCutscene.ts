@@ -11,7 +11,6 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { saveManager } from "../SaveManager"
 import { ControlsUI } from "../ui/ControlsUI"
 import { HUD } from "../ui/HUD"
-import { ElementType } from "../world/elements/Elements"
 import { Queequeg } from "../world/elements/Queequeg"
 import { LocationManager } from "../world/LocationManager"
 import { Camera } from "./Camera"
@@ -120,14 +119,10 @@ ANOTHER thing - Only one of the explorers returned, and she reported that her co
             (d) => d.type === DudeType.DIP
         )[0]
 
-        const queequeg = LocationManager.instance.currentLocation
-            .getElementsOfType(ElementType.QUEEQUEG)[0]
-            .entity.getComponent(Queequeg)
-
-        queequeg.pushPassenger(Player.instance.dude)
+        Queequeg.instance.pushPassenger(Player.instance.dude)
 
         setTimeout(() => {
-            queequeg.arrive()
+            Queequeg.instance.arrive()
         }, this.START_WALKING_IN)
 
         setTimeout(() => {
@@ -135,7 +130,7 @@ ANOTHER thing - Only one of the explorers returned, and she reported that her co
         }, this.PAN_TO_DIP)
 
         setTimeout(() => {
-            queequeg.popPassenger()
+            Queequeg.instance.removePassenger(Player.instance.dude)
         }, this.GET_OFF_SHIP)
 
         setTimeout(() => {
@@ -143,7 +138,7 @@ ANOTHER thing - Only one of the explorers returned, and she reported that her co
             CutscenePlayerController.instance.disable()
             Camera.instance.focusOnDude(Player.instance.dude)
             this.waitingForOrcsToDie = true
-            queequeg.depart()
+            Queequeg.instance.depart()
         }, this.PAN_BACK)
     }
 

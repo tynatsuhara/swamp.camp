@@ -6,6 +6,7 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { LocationManagerSaveState } from "../saves/LocationManagerSaveState"
 import { Singletons } from "../Singletons"
 import { ElementType } from "./elements/Elements"
+import { Queequeg } from "./elements/Queequeg"
 import { Location } from "./Location"
 import { Simulatable } from "./Simulatable"
 
@@ -97,7 +98,9 @@ export class LocationManager {
         this.currentLocation = this.locations.get(saveState.currentLocationUUID)
     }
 
+    // TODO: Get rid of this, always arrive on ship
     exteriorEntrancePosition() {
+        return Queequeg.instance.entryTile.times(TILE_SIZE)
         return new Point(1, 1)
             .times((this.exterior().size / 2) * TILE_SIZE)
             .plusX(TILE_SIZE * 2)
