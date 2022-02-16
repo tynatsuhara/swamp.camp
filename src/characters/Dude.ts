@@ -567,6 +567,9 @@ export class Dude extends Component implements DialogueSource {
         if (this.knockIntervalCallback !== 0) {
             window.cancelAnimationFrame(this.knockIntervalCallback)
         }
+        if (direction.equals(Point.ZERO)) {
+            return
+        }
 
         const goal = this.standingPosition.plus(direction.normalized().times(knockback))
         const distToStop = 2
