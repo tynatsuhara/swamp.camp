@@ -183,7 +183,7 @@ export class Queequeg extends Simulatable {
         this.widdershins.transform.position = this.position.plus(new Point(52, -12))
 
         // the boat can only fit {positionsByIndex.length} passengers
-        const positionsByIndex = [new Point(25, 5)]
+        const positionsByIndex = [new Point(25, 5), new Point(35, 0)]
 
         this.passengers.forEach((p, i) => {
             if (i >= positionsByIndex.length) {
@@ -228,6 +228,9 @@ export class Queequeg extends Simulatable {
     }
 
     pushPassenger(dude: Dude) {
+        if (!dude) {
+            return
+        }
         this.passengers.push(dude)
         if (dude.type === DudeType.PLAYER) {
             // TODO

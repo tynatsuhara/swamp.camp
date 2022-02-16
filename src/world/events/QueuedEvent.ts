@@ -75,6 +75,8 @@ export const getEventQueueHandlers = (): {
                 time: WorldTime.instance.future({ hours: 12 }),
                 dudeTypes: data.dudeTypes,
             })
+            // TODO: Make the ship depart and arrive
+            // Queequeg.instance.depart()
         }
 
         berto.entity.getComponent(Berto).updateSchedule()
@@ -96,14 +98,22 @@ export const getEventQueueHandlers = (): {
         Queequeg.instance.removePassenger(berto)
 
         // TODO: push all onto the queequeg
-        typesToSpawn.forEach((type) => {
-            DudeFactory.instance.new(
+        const spawned = typesToSpawn.map((type) => {
+            const dude = DudeFactory.instance.new(
                 type,
-                LocationManager.instance.exteriorEntrancePosition(),
+                Queequeg.instance.entryTile.plusX(10).times(TILE_SIZE),
                 camp(),
                 true // they already have a claimed residence
             )
+            Queequeg.instance.pushPassenger(dude)
+            return dude
         })
+
+        spawned.forEach((dude) => {
+            Queequeg.instance.removePassenger(dude)
+        })
+
+        // Queequeg.instance.arrive()
     },
 
     [QueuedEventType.DAILY_SCHEDULE]: () => {
