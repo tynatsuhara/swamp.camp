@@ -136,17 +136,22 @@ export class DudeSpawner extends Component {
 
         const spawnPos = this.getSpawnPosOffMap()
 
-        const orcs = [
+        const leaders = Lists.range(1, 1 + Math.random() * 4).map(() =>
+            DudeFactory.instance.new(DudeType.ORC_BRUTE, spawnPos)
+        )
+
+        const followers = [
             ...Lists.range(0, 5 + Math.random() * 10).map(() =>
                 DudeFactory.instance.new(DudeType.ORC_WARRIOR, spawnPos)
-            ),
-            ...Lists.range(0, 1 + Math.random() * 4).map(() =>
-                DudeFactory.instance.new(DudeType.ORC_BRUTE, spawnPos)
             ),
             ...Lists.range(0, 1 + Math.random() * 4).map(() =>
                 DudeFactory.instance.new(DudeType.ORC_SHAMAN, spawnPos)
             ),
         ]
+
+        followers.forEach((f) => f.entity.getComponent(NPC).setLeader(Lists.oneOf(leaders)))
+
+        const orcs = [...leaders, ...followers]
 
         setTimeout(
             () =>
