@@ -240,6 +240,10 @@ export class Queequeg extends Simulatable {
         }
     }
 
+    getPassengers() {
+        return this.passengers
+    }
+
     removePassenger(dude: Dude) {
         if (!this.passengers.includes(dude)) {
             console.error(`${DudeType[dude.type]} ${dude.uuid} is not on the ship`)

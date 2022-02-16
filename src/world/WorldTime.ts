@@ -37,12 +37,12 @@ export class WorldTime extends Component {
         EventQueue.instance.processEvents(this.time)
         WorldAudioContext.instance.time = this.time
 
-        window.document.title = `${this.title} | ${this.clockTime()}`
+        window.document.title = `${this.title} | ${WorldTime.clockTime()}`
     }
 
     fastForward(duration: number) {
         this._time += duration
-        console.log(`fast forwarding time to ${this.clockTime()}`)
+        console.log(`fast forwarding time to ${WorldTime.clockTime()}`)
 
         LocationManager.instance.simulateLocations(true, duration)
     }
@@ -59,9 +59,9 @@ export class WorldTime extends Component {
         return Math.floor(this.time / TimeUnit.DAY) * TimeUnit.DAY + TimeUnit.DAY + timeOfDay
     }
 
-    private clockTime() {
-        const hour = Math.floor((this.time % TimeUnit.DAY) / TimeUnit.HOUR)
-        const minute = Math.floor((this.time % TimeUnit.HOUR) / TimeUnit.MINUTE)
+    static clockTime(time: number = WorldTime.instance.time) {
+        const hour = Math.floor((time % TimeUnit.DAY) / TimeUnit.HOUR)
+        const minute = Math.floor((time % TimeUnit.HOUR) / TimeUnit.MINUTE)
         return `${hour == 0 ? 12 : hour > 12 ? hour - 12 : hour}:${
             minute < 10 ? "0" : ""
         }${minute} ${hour < 12 ? "AM" : "PM"}`

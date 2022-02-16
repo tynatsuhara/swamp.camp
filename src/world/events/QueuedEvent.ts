@@ -10,7 +10,7 @@ import { HittableResource } from "../elements/HittableResource"
 import { Queequeg } from "../elements/Queequeg"
 import { camp, LocationManager } from "../LocationManager"
 import { collectTaxes } from "../TaxRate"
-import { Day } from "../TimeUnit"
+import { Day, TimeUnit } from "../TimeUnit"
 import { WorldTime } from "../WorldTime"
 import { EventQueue } from "./EventQueue"
 
@@ -22,6 +22,7 @@ export enum QueuedEventType {
     DAILY_SCHEDULE, // executes daily at midnight
     ORC_SEIGE,
     COLLECT_TAXES,
+    QUEEQUEG_DISEMBARK_PASSENGERS,
 }
 
 export type QueuedEventData = {
@@ -68,15 +69,17 @@ export const getEventQueueHandlers = (): {
                 time: WorldTime.instance.future({ minutes: 2 }),
             })
         } else {
-            console.log("[Berto] left the map")
+            const returnTime = WorldTime.instance.future({ hours: 12 })
             Queequeg.instance.pushPassenger(berto)
             EventQueue.instance.addEvent({
                 type: QueuedEventType.HERALD_RETURN_WITH_NPC,
-                time: WorldTime.instance.future({ hours: 12 }),
+                time: returnTime,
                 dudeTypes: data.dudeTypes,
             })
-            // TODO: Make the ship depart and arrive
-            // Queequeg.instance.depart()
+            Queequeg.instance.depart()
+            console.log(
+                `[Berto] left the map and will return at ${WorldTime.clockTime(returnTime)}`
+            )
         }
 
         berto.entity.getComponent(Berto).updateSchedule()
@@ -94,11 +97,8 @@ export const getEventQueueHandlers = (): {
 
         const typesToSpawn = (data.dudeTypes || [DudeType.VILLAGER]) as DudeType[]
 
-        // Remove Berto
-        Queequeg.instance.removePassenger(berto)
-
         // TODO: push all onto the queequeg
-        const spawned = typesToSpawn.map((type) => {
+        typesToSpawn.forEach((type) => {
             const dude = DudeFactory.instance.new(
                 type,
                 Queequeg.instance.entryTile.plusX(10).times(TILE_SIZE),
@@ -106,14 +106,26 @@ export const getEventQueueHandlers = (): {
                 true // they already have a claimed residence
             )
             Queequeg.instance.pushPassenger(dude)
-            return dude
         })
 
-        spawned.forEach((dude) => {
+        Queequeg.instance.arrive()
+
+        EventQueue.instance.addEvent({
+            type: QueuedEventType.QUEEQUEG_DISEMBARK_PASSENGERS,
+            time: data.time + TimeUnit.MINUTE * 5,
+        })
+    },
+
+    [QueuedEventType.QUEEQUEG_DISEMBARK_PASSENGERS]: () => {
+        const berto = camp().getDude(DudeType.HERALD)
+        if (!berto) {
+            throw new Error("berto should exist")
+        }
+        Queequeg.instance.removePassenger(berto)
+
+        Queequeg.instance.getPassengers().forEach((dude) => {
             Queequeg.instance.removePassenger(dude)
         })
-
-        // Queequeg.instance.arrive()
     },
 
     [QueuedEventType.DAILY_SCHEDULE]: () => {
