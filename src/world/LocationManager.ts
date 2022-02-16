@@ -1,12 +1,9 @@
-import { Point } from "brigsby/dist/Point"
 import { measure } from "brigsby/dist/Profiler"
 import { WorldAudioContext } from "../audio/WorldAudioContext"
 import { DudeType } from "../characters/DudeFactory"
-import { TILE_SIZE } from "../graphics/Tilesets"
 import { LocationManagerSaveState } from "../saves/LocationManagerSaveState"
 import { Singletons } from "../Singletons"
 import { ElementType } from "./elements/Elements"
-import { Queequeg } from "./elements/Queequeg"
 import { Location } from "./Location"
 import { Simulatable } from "./Simulatable"
 
@@ -96,15 +93,6 @@ export class LocationManager {
             this.locations.set(l.uuid, loadedLocation)
         })
         this.currentLocation = this.locations.get(saveState.currentLocationUUID)
-    }
-
-    // TODO: Get rid of this, always arrive on ship
-    exteriorEntrancePosition() {
-        return Queequeg.instance.entryTile.times(TILE_SIZE)
-        return new Point(1, 1)
-            .times((this.exterior().size / 2) * TILE_SIZE)
-            .plusX(TILE_SIZE * 2)
-            .plusY(-TILE_SIZE * 25)
     }
 
     simulateLocations(simulateCurrentLocation: boolean, duration: number) {
