@@ -31,6 +31,7 @@ import { UIStateManager } from "../ui/UIStateManager"
 import { Campfire } from "../world/elements/Campfire"
 import { ElementType } from "../world/elements/Elements"
 import { Interactable } from "../world/elements/Interactable"
+import { Pushable } from "../world/elements/Pushable"
 import { Ground, GroundType } from "../world/ground/Ground"
 import { LightManager } from "../world/LightManager"
 import { Location } from "../world/Location"
@@ -631,6 +632,10 @@ export class Dude extends Component implements DialogueSource {
         const wasMoving = this.isMoving
         this._isMoving = direction.x !== 0 || direction.y !== 0
 
+        if (direction.x !== 0 || direction.y !== 0) {
+            direction = direction.normalized()
+        }
+
         // Update animations
         if (!this.isJumping) {
             if (this.isMoving) {
@@ -680,7 +685,7 @@ export class Dude extends Component implements DialogueSource {
         }
 
         const walkDistance = elapsedTimeMillis * this.speed * speedMultiplier
-        const walkMovement = this.isMoving ? direction.normalized().times(walkDistance) : Point.ZERO
+        const walkMovement = this.isMoving ? direction.times(walkDistance) : Point.ZERO
         const standingPosAfterWalk = this.standingPosition.plus(walkMovement)
 
         // Prevent buggy positioning near a ledge
@@ -696,6 +701,11 @@ export class Dude extends Component implements DialogueSource {
         if (totalMovement.x !== 0 || totalMovement.y !== 0) {
             const newPos = this.standingPosition.plus(totalMovement)
             this.moveTo(newPos)
+
+            LocationManager.instance.currentLocation
+                .getElement(this.tile)
+                ?.entity.getComponent(Pushable)
+                ?.push(this.standingPosition, direction)
         }
 
         this.animationDirty = false
