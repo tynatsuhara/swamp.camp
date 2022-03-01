@@ -37,7 +37,7 @@ export class WorldTime extends Component {
         EventQueue.instance.processEvents(this.time)
         WorldAudioContext.instance.time = this.time
 
-        window.document.title = `${this.title} | ${WorldTime.clockTime()}`
+        window.document.title = `SWAMP CAMP | ${WorldTime.clockTime()}`
     }
 
     fastForward(duration: number) {
