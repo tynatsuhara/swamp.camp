@@ -180,7 +180,7 @@ export class Queequeg extends Simulatable {
                 .minus(this.colliderOffset)
         }
 
-        this.widdershins.transform.position = this.position.plus(new Point(52, -12))
+        this.widdershins.transform.position = this.position.plus(new Point(52, -13))
 
         // the boat can only fit {positionsByIndex.length} passengers
         const positionsByIndex = [new Point(25, 5), new Point(35, 0)]
