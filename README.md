@@ -53,13 +53,15 @@ tentative sound effects & music:
 -   https://opengameart.org/content/swishes-sound-pack
 -   https://opengameart.org/content/voices-sound-effects-library
 
-color palettes:
+# art
 
--   current: https://lospec.com/palette-list/linear-color-palette-basic
+No-outline style art overhaul is on the `art` branch.
+
+-   current palette: https://lospec.com/palette-list/linear-color-palette-basic (for the most part)
+
+alternate palettes to consider:
+
 -   https://lospec.com/palette-list/vinik24
--   https://lospec.com/palette-list/fantasy
--   https://lospec.com/palette-list/shallowmarsh26
--   https://lospec.com/palette-list/interstate-28
--   https://lospec.com/palette-list/ty-future-computer-20
--   https://lospec.com/palette-list/lost-century
--   https://lospec.com/palette-list/mulfok32
+-   https://lospec.com/palette-list/nanner-pancakes
+-   https://lospec.com/palette-list/nanner-16
+-   https://lospec.com/palette-list/luap-40
