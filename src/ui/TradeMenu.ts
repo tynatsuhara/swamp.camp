@@ -44,6 +44,11 @@ const CLINK_NOISES = [
     "audio/rpg/inventory/coin3.wav",
 ]
 
+const COLOR_BACKGROUND = Color.RED_2
+const COLOR_BACKGROUND_BORDER = Color.RED_1
+const COLOR_TEXT_NOT_HOVERED = Color.PINK_3
+const COLOR_ERROR = Color.RED_1
+
 // this is mostly copied from CraftingMenu and InventoryDisplay
 export class TradeMenu extends Component {
     static instance: TradeMenu
@@ -203,7 +208,7 @@ export class TradeMenu extends Component {
             this.dimensions
         )
         backgroundTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
-        this.context.fillStyle = Color.RED
+        this.context.fillStyle = COLOR_BACKGROUND
         this.context.fillRect(0, 0, this.innerDimensions.x, this.innerDimensions.y)
 
         const width = this.innerDimensions.x
@@ -261,16 +266,16 @@ export class TradeMenu extends Component {
             // craftable item
             verticalOffset += margin
             const plainIcon = this.getItemIcon(sale.item)
-            let itemColor: Color = Color.PINK
+            let itemColor: Color = COLOR_TEXT_NOT_HOVERED
             if (hovered) {
                 if (r === this.justSoldRow) {
-                    itemColor = Color.DARK_RED
+                    itemColor = COLOR_ERROR
                 } else if (!tradeError) {
                     itemColor = Color.WHITE
                 }
             }
             if (tradeError) {
-                itemColor = Color.DARK_RED
+                itemColor = COLOR_ERROR
             }
             this.context.fillStyle = itemColor
             const craftedItemIcon = this.tintedIcon(plainIcon, itemColor)
@@ -301,7 +306,7 @@ export class TradeMenu extends Component {
 
             // draw line
             verticalOffset += margin + TILE_SIZE
-            this.context.fillStyle = Color.DARK_RED
+            this.context.fillStyle = COLOR_BACKGROUND_BORDER
             this.context.fillRect(margin, verticalOffset, this.innerDimensions.x - 2 * margin, 1)
         }
 

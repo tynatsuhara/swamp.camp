@@ -58,7 +58,7 @@ class NotificationComponent extends Component {
             if (!!n.icon) {
                 const icon = Tilesets.instance.oneBit
                     .getTileSource(n.icon)
-                    .filtered(ImageFilters.tint(Color.DARK_RED))
+                    .filtered(ImageFilters.tint(Color.RED_2))
                     .toComponent(
                         SpriteTransform.new({
                             position: new Point(TILE_SIZE / 2, 7),
@@ -84,7 +84,7 @@ class NotificationComponent extends Component {
                 textPos,
                 TEXT_SIZE,
                 TEXT_FONT,
-                Color.DARK_RED,
+                Color.RED_2,
                 UIStateManager.UI_SPRITE_DEPTH + 1
             ),
         ]

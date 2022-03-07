@@ -120,7 +120,7 @@ export class StaffWeapon extends Weapon {
 
                 // magic-y particles
                 Particles.instance.emitParticle(
-                    Math.random() > 0.5 ? Color.RED_4 : Color.RED,
+                    Math.random() > 0.5 ? Color.RED_4 : Color.RED_3,
                     this.dude.standingPosition.plusY(-26).randomlyShifted(6),
                     this.dude.standingPosition.y,
                     500,

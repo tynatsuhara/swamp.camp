@@ -188,7 +188,7 @@ export class DialogueDisplay extends Component {
                     },
                     buttonColor: "white",
                     textColor: Color.WHITE,
-                    hoverColor: Color.DARK_RED,
+                    hoverColor: Color.RED_2,
                 }
             }),
             centeredButtonMenuPos

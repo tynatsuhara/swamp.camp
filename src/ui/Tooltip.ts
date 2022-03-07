@@ -110,7 +110,7 @@ export class Tooltip extends Component {
             ...this.tiles,
             ...formatText({
                 text: this.text.join("\n"),
-                color: Color.DARK_RED,
+                color: Color.RED_2,
                 position: this.tiles[0].position
                     .plus(Tooltip.textOffset)
                     .plusY(-(this.text.length - 1) * (TEXT_SIZE + 4)),

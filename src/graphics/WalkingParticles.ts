@@ -31,7 +31,7 @@ export class WalkingParticles extends Component {
             Math.random() < BLOOD_PROBABILITY
         ) {
             Particles.instance.emitParticle(
-                Math.random() > 0.9 ? Color.RED : Color.DARK_RED,
+                Math.random() > 0.9 ? Color.RED_3 : Color.RED_2,
                 this.dude.standingPosition.randomCircularShift(4),
                 GroundRenderer.DEPTH + 1,
                 10_000 + Math.random() * 5_000,

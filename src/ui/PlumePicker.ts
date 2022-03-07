@@ -18,13 +18,12 @@ export const PLUME_COLORS: [Color, Color][] = [
     [Color.BLUE_4, Color.BLUE_5],
     [Color.BLUE_5, Color.BLUE_6],
 
-    // [Color.GREEN_1, Color.GREEN_2],
     [Color.GREEN_2, Color.GREEN_3],
     [Color.GREEN_3, Color.GREEN_4],
     [Color.GREEN_4, Color.GREEN_5],
     [Color.GREEN_5, Color.GREEN_6],
 
-    [Color.RED_1, Color.RED_2],
+    [Color.RED_2, Color.RED_2],
     [Color.RED_2, Color.RED_3],
     [Color.RED_3, Color.RED_4],
     [Color.RED_4, Color.RED_5],
@@ -34,7 +33,6 @@ export const PLUME_COLORS: [Color, Color][] = [
     [Color.PINK_2, Color.PINK_3],
     [Color.PINK_3, Color.PINK_4],
     [Color.PINK_4, Color.PINK_5],
-    // [Color.PINK_5, Color.PINK_6],
 ]
 
 export class PlumePicker extends Component {

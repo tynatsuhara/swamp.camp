@@ -55,26 +55,9 @@ export enum Color {
 
     // TODO below this comment
 
-    // only used for plumes
-    DARK_DARK_PINK = "#5f2d56",
-    DARK_PINK = "#993970",
-    DARK_PURPLE = "#473579",
-    DARK_PINKLE = "#8156aa",
-    PINKLE = "#c278d0",
-    LIGHT_PINKLE = "#f0b3dd",
-    TEAL = "#49a790",
-    DARK_BLUE = "#417089",
-    DARK_DARK_BLUE = "#314152",
-    DARK_GREEN = "#3d734f",
-    LIME = "#97da3f",
-    TAN = "#d3bfa9",
-
     // used for other shit
-    DARK_RED = "#62232f",
     RED = "#9f294e",
-    PURPLE = "#5956bd",
     PINK = "#dc4a7b",
-    LIGHT_PINK = "#f78697",
 }
 
 const toHex = (c: number) => {

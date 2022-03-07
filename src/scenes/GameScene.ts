@@ -201,7 +201,7 @@ export class GameScene {
                     },
                     buttonColor: "white",
                     textColor: Color.WHITE,
-                    hoverColor: Color.DARK_RED,
+                    hoverColor: Color.RED_2,
                 })),
                 Camera.instance.dimensions.div(2)
             )

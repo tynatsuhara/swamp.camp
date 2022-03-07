@@ -22,6 +22,12 @@ import { TEXT_FONT, TEXT_SIZE } from "./Text"
 import { Tooltip } from "./Tooltip"
 import { UIStateManager } from "./UIStateManager"
 
+const COLOR_TEXT_HOVERED = Color.WHITE
+const COLOR_BACKGROUND = Color.RED_2
+const COLOR_BACKGROUND_BORDER = Color.RED_1
+const COLOR_TEXT_NOT_HOVERED = Color.PINK_3
+const COLOR_LACKING_INGREDIENT = Color.RED_1
+
 export class CraftingMenu extends Component {
     static instance: CraftingMenu
 
@@ -140,7 +146,7 @@ export class CraftingMenu extends Component {
             const icon =
                 i === this.recipeCategory || hovered
                     ? category.icon
-                    : this.tintedIcon(category.icon, Color.PINK)
+                    : this.tintedIcon(category.icon, COLOR_TEXT_NOT_HOVERED)
             result.push(
                 icon.toComponent(
                     new SpriteTransform(
@@ -184,7 +190,7 @@ export class CraftingMenu extends Component {
             this.dimensions
         )
         backgroundTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
-        this.context.fillStyle = Color.RED
+        this.context.fillStyle = COLOR_BACKGROUND
         this.context.fillRect(0, 0, this.innerDimensions.x, this.innerDimensions.y)
 
         const width = this.innerDimensions.x
@@ -247,12 +253,12 @@ export class CraftingMenu extends Component {
             let craftedItemColor: Color
             if (hovered) {
                 if (r === this.justCraftedRow) {
-                    craftedItemColor = Color.DARK_RED
+                    craftedItemColor = COLOR_LACKING_INGREDIENT
                 } else {
-                    craftedItemColor = Color.WHITE
+                    craftedItemColor = COLOR_TEXT_HOVERED
                 }
             } else {
-                craftedItemColor = Color.PINK
+                craftedItemColor = COLOR_TEXT_NOT_HOVERED
             }
             this.context.fillStyle = craftedItemColor
             const craftedItemIcon = this.tintedIcon(plainIcon, craftedItemColor)
@@ -270,8 +276,8 @@ export class CraftingMenu extends Component {
                 const plainIngredientIcon = this.getItemIcon(ingr.item)
                 let ingredientIcon: StaticSpriteSource = plainIngredientIcon
                 if (Player.instance.dude.inventory.getItemCount(ingr.item) < ingr.count) {
-                    this.context.fillStyle = Color.DARK_RED
-                    ingredientIcon = this.tintedIcon(ingredientIcon, Color.DARK_RED)
+                    this.context.fillStyle = COLOR_LACKING_INGREDIENT
+                    ingredientIcon = this.tintedIcon(ingredientIcon, COLOR_LACKING_INGREDIENT)
                 } else {
                     this.context.fillStyle = craftedItemColor
                     ingredientIcon = this.tintedIcon(plainIngredientIcon, craftedItemColor)
@@ -304,7 +310,7 @@ export class CraftingMenu extends Component {
 
             // draw line
             verticalOffset += margin + TILE_SIZE
-            this.context.fillStyle = Color.DARK_RED
+            this.context.fillStyle = COLOR_BACKGROUND_BORDER
             this.context.fillRect(margin, verticalOffset, this.innerDimensions.x - 2 * margin, 1)
         }
 
@@ -351,7 +357,7 @@ export class CraftingMenu extends Component {
     }
 
     private tintedIcon(icon: StaticSpriteSource, tint: Color): StaticSpriteSource {
-        if (tint === Color.WHITE) {
+        if (tint === COLOR_TEXT_HOVERED) {
             return icon
         }
         let cache = this.tintedIcons.get(tint)

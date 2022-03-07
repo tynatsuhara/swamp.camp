@@ -96,8 +96,8 @@ export class DarknessMask {
 
     private readonly NIGHT_COLOR = this.colorFromString(Color.BLACK, 1)
     private readonly SUNRISE_COLOR = this.colorFromString(Color.PINK, 0.5)
-    private readonly DAY_COLOR = this.colorFromString(Color.LIGHT_PINK, 0)
-    private readonly SUNSET_COLOR = this.colorFromString(Color.PURPLE, 0.3)
+    private readonly DAY_COLOR = this.colorFromString(Color.PINK_4, 0)
+    private readonly SUNSET_COLOR = this.colorFromString(Color.BLUE_3, 0.3)
 
     private updateColorForTime(time: number, darknessLevel: number) {
         const timeOfDay = time % TimeUnit.DAY
@@ -129,7 +129,7 @@ export class DarknessMask {
         }
 
         if (debug.nightVision && this.allowNightVision) {
-            rgba = this.colorFromString(Color.PURPLE, 0.85)
+            rgba = this.colorFromString(Color.BLUE_3, 0.85)
         }
 
         const { r, g, b, a } = rgba

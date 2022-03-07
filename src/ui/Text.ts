@@ -77,7 +77,7 @@ export const formatTextRows = (text: string, width: number) => {
 export const formatText = ({
     text,
     position,
-    color = Color.DARK_RED,
+    color = Color.RED_2,
     width = Number.MAX_SAFE_INTEGER,
     alignment = TextAlign.LEFT,
     lineSpacing = 4,
