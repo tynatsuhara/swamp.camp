@@ -55,7 +55,4 @@ tentative sound effects & music:
 
 # art
 
-No-outline style art overhaul is on the `art` branch.
-
--   current palette: https://lospec.com/palette-list/linear-color-palette-basic (for the most part)
--   aspirational color palette: https://lospec.com/palette-list/nanner-pancakes
+-   color palette: https://lospec.com/palette-list/nanner-pancakes
