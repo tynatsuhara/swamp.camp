@@ -176,7 +176,7 @@ export class MainMenuScene {
         // by default, render the title and the scene with the knight
         const entities = [title, this.knight.entity, darknessEntity, ...sceneEntities]
 
-        const link = (url: string) => () => window.open(url, "_blank")
+        const link = (url: string) => () => window.open(`https://${url}`, "_blank")
 
         if (this.waitingForAssets) {
             entities.push(new MainMenuButtonSection(menuTop).addText("loading...").getEntity())
@@ -197,19 +197,19 @@ export class MainMenuScene {
                     .add(
                         "Windows",
                         link(
-                            "https://github.com/tylerbonnell/swamp-camp-native/releases/download/windows-latest/swamp-camp-win32-x64.zip"
+                            "github.com/tylerbonnell/swamp-camp-native/releases/download/windows-latest/swamp-camp-win32-x64.zip"
                         )
                     )
                     .add(
                         "Mac (Intel)",
                         link(
-                            "https://github.com/tylerbonnell/swamp-camp-native/releases/download/macos-latest/swamp-camp-darwin-x64.zip"
+                            "github.com/tylerbonnell/swamp-camp-native/releases/download/macos-latest/swamp-camp-darwin-x64.zip"
                         )
                     )
                     .add(
                         "Mac (Apple Silicon)",
                         link(
-                            "https://github.com/tylerbonnell/swamp-camp-native/releases/tag/macos-apple-silicon"
+                            "github.com/tylerbonnell/swamp-camp-native/releases/tag/macos-apple-silicon"
                         )
                     )
                     .add("Back", () => this.render(Menu.ROOT))
@@ -277,17 +277,18 @@ export class MainMenuScene {
             )
             entities.push(
                 new MainMenuButtonSection(top)
-                    .add(" code: Tyler Bonnell   ", link("https://ty.pizza/"))
-                    .add("  art: Robert Norenberg", link("http://0x72.pl/"))
-                    .add("       Cael Johnson    ", link("https://caeljohnson.artstation.com/"))
-                    .add("       Kenney          ", link("https://kenney.nl/"))
-                    .add("music: Juhani Junkala  ", link("https://juhanijunkala.com/"))
-                    .add("       Brent Bunn      ", link("https://bertn1991.newgrounds.com/"))
-                    .add("       Playonloop.com  ", link("https://playonloop.com/"))
-                    .add("sound: BurghRecords    ", link("https://www.edinburghrecords.com/"))
-                    .add("   qa: Lane Van Elderen", link("https://lane.computer/"))
+                    .add("code & art: Tyler Bonnell   ", link("ty.pizza/"))
+                    .add(" add'l art: Robert Norenberg", link("0x72.pl/"))
+                    .add("            Cael Johnson    ", link("caeljohnson.artstation.com/"))
+                    .add("            Kenney          ", link("kenney.nl/"))
+                    .add("            Nanner          ", link("www.pixilart.com/nanner"))
+                    .add("     music: Juhani Junkala  ", link("juhanijunkala.com/"))
+                    .add("            Brent Bunn      ", link("bertn1991.newgrounds.com/"))
+                    .add("            Playonloop.com  ", link("playonloop.com/"))
+                    .add("     sound: BurghRecords    ", link("www.edinburghrecords.com/"))
+                    .add("        qa: Lane Van Elderen", link("lane.computer/"))
                     .addLineBreak()
-                    .add("made with brigsby!", link("https://brigsby.js.org/"))
+                    .add("made with brigsby!", link("brigsby.js.org/"))
                     .addLineBreak()
                     .add("back", () => this.render(Menu.ROOT))
                     .getEntity()
