@@ -15,7 +15,7 @@ import { MiniMap } from "./MiniMap"
 import { OffScreenIndicatorManager } from "./OffScreenIndicatorManager"
 import { UIStateManager } from "./UIStateManager"
 
-const POISONED_HEART_FILTER = ImageFilters.recolor(Color.SUPER_ORANGE, Color.PURPLE)
+const POISONED_HEART_FILTER = ImageFilters.recolor(Color.RED_4, Color.PURPLE)
 
 export class HUD {
     static get instance() {

@@ -61,7 +61,7 @@ export class WalkingParticles extends Component {
             const xRange = this.dude.colliderSize.x - 1
             for (let i = 0; i < 15; i++) {
                 Particles.instance.emitParticle(
-                    Color.BRIGHT_BLUE,
+                    Color.BLUE_6,
                     this.dude.standingPosition.randomlyShifted(xRange, 3).plusY(-2),
                     depth,
                     LIFESPAN_MILLIS,
@@ -70,7 +70,7 @@ export class WalkingParticles extends Component {
                 )
             }
             Particles.instance.emitParticle(
-                Math.random() < 0.7 ? Color.LIGHT_BLUE : Color.WHITE,
+                Math.random() < 0.7 ? Color.BLUE_5 : Color.WHITE,
                 this.dude.standingPosition.randomlyShifted(xRange, 3).plusY(-2),
                 depth + 1,
                 LIFESPAN_MILLIS,
@@ -84,7 +84,7 @@ export class WalkingParticles extends Component {
             }
 
             Particles.instance.emitParticle(
-                Color.LIGHT_BROWN,
+                Color.TAUPE_3,
                 this.dude.standingPosition.randomlyShifted(4, 0).plusY(Math.random() * -5),
                 GroundRenderer.DEPTH + 1,
                 LIFESPAN_MILLIS,

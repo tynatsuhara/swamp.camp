@@ -5,7 +5,7 @@ import { Color } from "../ui/Color"
 import { Particles } from "./Particles"
 
 const FIRE_DRIFT_DISTANCE = 1.5
-const FIRE_COLORS = [Color.ORANGE, Color.SUPER_ORANGE, Color.LIGHT_ORANGE]
+const FIRE_COLORS = [Color.RED_3, Color.RED_4, Color.RED_5]
 
 export class FireParticles extends RepeatedInvoker {
     private lastPos: Point
@@ -36,7 +36,7 @@ export class FireParticles extends RepeatedInvoker {
         for (let i = 0; i < smokes; i++) {
             const speed = Math.random() > 0.5 ? -0.01 : -0.007
             Particles.instance.emitParticle(
-                Lists.oneOf([Color.BROWN, Color.DARK_BROWN, Color.BLACK, Color.BLACK]),
+                Lists.oneOf([Color.TAUPE_2, Color.TAUPE_1, Color.BLACK, Color.BLACK]),
                 fireBase.randomCircularShift(1 + size / 2).plusY(-1),
                 depth - 1,
                 500 + Math.random() * 1500,

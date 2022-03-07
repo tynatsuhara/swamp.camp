@@ -135,7 +135,7 @@ export class Queequeg extends Simulatable {
                 for (let i = 0; i < 10; i++) {
                     const size = Math.ceil(Math.random() * 3)
                     Particles.instance.emitParticle(
-                        Lists.oneOf([Color.WHITE, Color.BRIGHT_BLUE]),
+                        Lists.oneOf([Color.WHITE, Color.BLUE_6]),
                         this.position.plus(
                             Lists.oneOf([
                                 new Point(35 + Math.random() * 10, 35),

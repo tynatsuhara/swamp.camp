@@ -45,7 +45,7 @@ export class StaffWeapon extends Weapon {
             this.offsetFromCenter = new Point(-5, 0)
             this.targetSprite1 = Tilesets.instance.oneBit
                 .getTileSource("aoe_target")
-                .filtered(ImageFilters.tint(Color.SUPER_ORANGE))
+                .filtered(ImageFilters.tint(Color.RED_4))
             this.targetSprite2 = Tilesets.instance.oneBit
                 .getTileSource("aoe_target")
                 .filtered(ImageFilters.tint(Color.WHITE))
@@ -120,7 +120,7 @@ export class StaffWeapon extends Weapon {
 
                 // magic-y particles
                 Particles.instance.emitParticle(
-                    Math.random() > 0.5 ? Color.SUPER_ORANGE : Color.RED,
+                    Math.random() > 0.5 ? Color.RED_4 : Color.RED,
                     this.dude.standingPosition.plusY(-26).randomlyShifted(6),
                     this.dude.standingPosition.y,
                     500,
@@ -189,7 +189,7 @@ export class StaffWeapon extends Weapon {
         for (let i = 0; i < 50; i++) {
             const speed = Math.random() > 0.5 ? -0.01 : -0.007
             Particles.instance.emitParticle(
-                Lists.oneOf([Color.BROWN, Color.DARK_BROWN, Color.BLACK, Color.BLACK]),
+                Lists.oneOf([Color.TAUPE_2, Color.TAUPE_1, Color.BLACK, Color.BLACK]),
                 this.attackPosition.randomCircularShift(12).plusY(-4),
                 this.attackPosition.y,
                 500 + Math.random() * 1500,
@@ -201,7 +201,7 @@ export class StaffWeapon extends Weapon {
         // impact crater
         for (let i = 0; i < 25; i++) {
             Particles.instance.emitParticle(
-                Math.random() > 0.7 ? Color.BROWN : Color.DARK_BROWN,
+                Math.random() > 0.7 ? Color.TAUPE_2 : Color.TAUPE_1,
                 this.attackPosition.randomCircularShift(6),
                 GroundRenderer.DEPTH + 1,
                 10_000 + Math.random() * 5_000,
@@ -216,7 +216,7 @@ export class StaffWeapon extends Weapon {
             const x = random.x
             const y = -Math.abs(random.y)
             Particles.instance.emitParticle(
-                Math.random() > 0.5 ? Color.BROWN : Color.LIGHT_BROWN,
+                Math.random() > 0.5 ? Color.TAUPE_2 : Color.TAUPE_3,
                 this.attackPosition.plus(random.times(10)),
                 this.attackPosition.y,
                 100 + Math.random() * 250,

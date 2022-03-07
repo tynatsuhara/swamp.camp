@@ -15,7 +15,7 @@ const getIcon = (indicator: string) => {
         case DudeInteractIndicator.ATTACKING_NOW:
             return Tilesets.instance.oneBit
                 .getTileAt(new Point(27, 20))
-                .filtered(ImageFilters.tint(Color.SUPER_ORANGE))
+                .filtered(ImageFilters.tint(Color.RED_4))
     }
 }
 

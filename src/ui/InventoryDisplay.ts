@@ -330,7 +330,7 @@ export class InventoryDisplay extends Component {
                     new Point(9, 1).plus(this.offset).plus(this.coinsOffset),
                     TEXT_SIZE,
                     TEXT_FONT,
-                    Color.YELLOW,
+                    Color.RED_6,
                     UIStateManager.UI_SPRITE_DEPTH
                 )
             ),

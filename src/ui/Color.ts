@@ -1,16 +1,57 @@
 export enum Color {
-    // nanner colors
-    // TODO rename
+    // nanner pancakes colors
+
+    // each color band starts with black and ends with white
     BLACK = "#2d1e2f",
     WHITE = "#fcecd1",
-    DARK_ORANGE = "#7a3b4f",
-    ORANGE = "#a94b54",
-    SUPER_ORANGE = "#d8725e",
-    LIGHT_ORANGE = "#f09f71",
-    GREEN = "#64b082",
-    DARK_BROWN = "#452e3f",
-    BROWN = "#5d4550",
-    LIGHT_BROWN = "#7b6268",
+
+    // dull browns
+    TAUPE_1 = "#452e3f",
+    TAUPE_2 = "#5d4550",
+    TAUPE_3 = "#7b6268",
+    TAUPE_4 = "#9c807e",
+    TAUPE_5 = "#c3a79c",
+    TAUPE_6 = "#dbc9b4",
+
+    // purples, blues
+    BLUE_1 = "#392945",
+    BLUE_2 = "#3e3b66",
+    BLUE_3 = "#4a5786",
+    BLUE_4 = "#577f9d",
+    BLUE_5 = "#6fb0b7",
+    BLUE_6 = "#a0ddd3",
+
+    // teals, greens
+    GREEN_1 = "#392945",
+    GREEN_2 = "#3e3b66",
+    GREEN_3 = "#3f5b74",
+    GREEN_4 = "#488885",
+    GREEN_5 = "#64b082",
+    GREEN_6 = "#aad795",
+
+    // purples, pinks, flesh tones
+    PINK_1 = "#4e2b45",
+    PINK_2 = "#7c3d64",
+    PINK_3 = "#ab597d",
+    PINK_4 = "#c57f79",
+    PINK_5 = "#d3a084",
+    PINK_6 = "#ebc8a7",
+
+    // reddish-browns, flesh tones
+    BROWN_1 = "#4e2b45",
+    BROWN_2 = "#6a3948",
+    BROWN_3 = "#8f5252",
+    BROWN_4 = "#b87e6c",
+    BROWN_5 = "#d3a084",
+    BROWN_6 = "#ebc8a7",
+
+    // reds, oranges, yellow
+    RED_1 = "#4e2b45",
+    RED_2 = "#7a3b4f",
+    RED_3 = "#a94b54",
+    RED_4 = "#d8725e",
+    RED_5 = "#f09f71",
+    RED_6 = "#f7cf91",
 
     // TODO below this comment
 
@@ -21,22 +62,19 @@ export enum Color {
     DARK_PINKLE = "#8156aa",
     PINKLE = "#c278d0",
     LIGHT_PINKLE = "#f0b3dd",
+    TEAL = "#49a790",
+    DARK_BLUE = "#417089",
+    DARK_DARK_BLUE = "#314152",
+    DARK_GREEN = "#3d734f",
+    LIME = "#97da3f",
+    TAN = "#d3bfa9",
 
+    // used for other shit
+    DARK_RED = "#62232f",
+    RED = "#9f294e",
+    PURPLE = "#5956bd",
     PINK = "#dc4a7b",
     LIGHT_PINK = "#f78697",
-    RED = "#9f294e",
-    DARK_RED = "#62232f",
-    FLESH = "#fccba3",
-    YELLOW = "#facb3e",
-    LIME = "#97da3f",
-    DARK_GREEN = "#3d734f",
-    DARK_DARK_BLUE = "#314152",
-    DARK_BLUE = "#417089",
-    TEAL = "#49a790",
-    BRIGHT_BLUE = "#72d6ce",
-    LIGHT_BLUE = "#5698cc",
-    PURPLE = "#5956bd",
-    TAN = "#d3bfa9",
 }
 
 const toHex = (c: number) => {

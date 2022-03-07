@@ -188,7 +188,7 @@ export class TradeMenu extends Component {
                 new Point(9, 1).plus(topLeft).plus(this.coinsOffset),
                 TEXT_SIZE,
                 TEXT_FONT,
-                Color.YELLOW,
+                Color.RED_6,
                 UIStateManager.UI_SPRITE_DEPTH
             )
         )
@@ -286,7 +286,7 @@ export class TradeMenu extends Component {
             const coinIcon = this.getItemIcon(Item.COIN)
             let ingredientIcon: StaticSpriteSource = this.tintedIcon(
                 coinIcon,
-                itemColor === Color.WHITE ? Color.YELLOW : itemColor
+                itemColor === Color.WHITE ? Color.RED_6 : itemColor
             ) // make coin icon yellow on hover
             this.context.fillStyle = itemColor
             const countStr = `${sale.price}`
