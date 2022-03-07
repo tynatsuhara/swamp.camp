@@ -144,7 +144,7 @@ class SaveManager {
         this.deleteSave(slot)
         this.saveKey = this.saveKeyForSlot(slot)
         this.state = new SaveState()
-        this.state.plume = plumePicker.getSelection()
+        this.state.plumeIndex = plumePicker.getSelection()
     }
 
     /**

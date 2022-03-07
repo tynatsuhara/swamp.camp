@@ -1,4 +1,3 @@
-import { Color } from "../ui/Color"
 import { QueuedEventData } from "../world/events/QueuedEvent"
 import { TaxRate } from "../world/TaxRate"
 import { LocationManagerSaveState } from "./LocationManagerSaveState"
@@ -18,7 +17,7 @@ export class Save {
  */
 export class SaveState {
     coins?: number = 0
-    plume?: Color[]
+    plumeIndex?: number = 0
     townStats?: { [key: string]: number }
     timePlayed?: number = 0
     taxRate?: TaxRate = TaxRate.NONE

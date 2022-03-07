@@ -1,8 +1,9 @@
 import { SpriteAnimation } from "brigsby/dist/sprites/SpriteAnimation"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets } from "../graphics/Tilesets"
-import { Color } from "../ui/Color"
 import { saveManager } from "../SaveManager"
+import { Color } from "../ui/Color"
+import { PLUME_COLORS } from "../ui/PlumePicker"
 
 const maybeFilter = (characterAnimName: string, blob: any, anim: SpriteAnimation) => {
     if (!anim) {
@@ -10,11 +11,12 @@ const maybeFilter = (characterAnimName: string, blob: any, anim: SpriteAnimation
     }
 
     if (characterAnimName === "knight_f") {
-        const color = blob.color || saveManager.getState().plume
+        const colorIndex = blob.color || saveManager.getState().plumeIndex || 0
+        const color = PLUME_COLORS[colorIndex]
         if (!!color) {
             return anim
-                .filtered(ImageFilters.recolor(Color.PINK, color[0]))
-                .filtered(ImageFilters.recolor(Color.LIGHT_PINK, color[1]))
+                .filtered(ImageFilters.recolor(Color.PINK_2, color[0]))
+                .filtered(ImageFilters.recolor(Color.PINK_3, color[1]))
         }
     }
 

@@ -11,7 +11,7 @@ import { UIStateManager } from "./UIStateManager"
 
 // array of [dark, light] pairs
 // TODO support new colors
-export const CUSTOMIZATION_OPTIONS = [
+export const PLUME_COLORS: [Color, Color][] = [
     [Color.DARK_DARK_PINK, Color.DARK_PINK],
     [Color.DARK_PINK, Color.PINK],
     [Color.PINK, Color.LIGHT_PINK],
@@ -35,15 +35,15 @@ export const CUSTOMIZATION_OPTIONS = [
 export class PlumePicker extends Component {
     position: Point = Point.ZERO // top-center position
     entity = new Entity([this])
-    initialColor: Color[]
-    selected: Color[]
+    initialColor: number
+    selected: number
 
     private renders: RenderMethod[]
-    private readonly callback: (color: Color[]) => void
+    private readonly callback: (color: number) => void
 
-    constructor(initialColor: Color[], callback: (color: Color[]) => void) {
+    constructor(initialColor: number, callback: (color: number) => void) {
         super()
-        this.initialColor = initialColor || [Color.PINK, Color.LIGHT_PINK]
+        this.initialColor = initialColor || 0
         this.callback = callback
 
         this.select(this.initialColor)
@@ -62,9 +62,9 @@ export class PlumePicker extends Component {
         return this.selected
     }
 
-    select(colors: Color[]) {
-        this.selected = colors
-        this.callback(colors)
+    select(colorIndex: number) {
+        this.selected = colorIndex
+        this.callback(colorIndex)
     }
 
     update() {
@@ -72,18 +72,18 @@ export class PlumePicker extends Component {
         const rowLen = 9
         const topLeftPos = this.position.plusX((-rowLen * sqSize) / 2)
 
-        this.renders = CUSTOMIZATION_OPTIONS.map((colors, index) => {
+        this.renders = PLUME_COLORS.map((colors, index) => {
             const position = topLeftPos
                 .plusX((index % rowLen) * TILE_SIZE)
                 .plusY(Math.floor(index / rowLen) * TILE_SIZE)
             const dimensions = new Point(TILE_SIZE, TILE_SIZE)
 
             const hovered = Maths.rectContains(position, dimensions, controls.getMousePos())
-            const big = hovered || JSON.stringify(colors) == JSON.stringify(this.selected)
+            const big = hovered || this.selected === index
             const bigBuffer = 2
 
             if (hovered && controls.isMenuClickDown()) {
-                this.select(colors)
+                this.select(index)
             }
 
             return new RectRender({

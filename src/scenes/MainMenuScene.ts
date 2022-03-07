@@ -23,10 +23,9 @@ import { getFilesToLoadForGame, getImage, Tilesets, TILE_SIZE } from "../graphic
 import { QuestGame } from "../quest_game"
 import { saveManager } from "../SaveManager"
 import { Save } from "../saves/SaveGame"
-import { Color } from "../ui/Color"
 import { Cursor } from "../ui/Cursor"
 import { MainMenuButtonSection } from "../ui/MainMenuButtonSection"
-import { CUSTOMIZATION_OPTIONS, PlumePicker } from "../ui/PlumePicker"
+import { PlumePicker, PLUME_COLORS } from "../ui/PlumePicker"
 import { TEXT_SIZE } from "../ui/Text"
 import { UIStateManager } from "../ui/UIStateManager"
 import { DarknessMask } from "../world/DarknessMask"
@@ -87,7 +86,7 @@ export class MainMenuScene {
         Ambiance.stop()
 
         this.render(Menu.ROOT)
-        this.plumes = new PlumePicker(saveManager.getState().plume, (color) => {
+        this.plumes = new PlumePicker(saveManager.getState().plumeIndex, (color) => {
             this.knight = new Entity().addComponent(
                 DudeAnimationUtils.getCharacterIdleAnimation("knight_f", {
                     color,
@@ -371,23 +370,25 @@ export class MainMenuScene {
     }
 
     private previewingSlotPlume: number
-    private slotColors: Color[][]
-    private unusedColors: Color[][]
+    private slotColors: number[]
+    private unusedColors: number[]
 
     private showPlumeForSave(slot: number) {
         if (!this.slotColors) {
             const saves = saveManager.getSaves()
-            const saveColors = saves.filter((save) => !!save).map((save) => save.state.plume[0])
-            this.slotColors = saves.map((save) => save?.state?.plume)
-            this.unusedColors = CUSTOMIZATION_OPTIONS.filter(
-                (colorArray) => !saveColors.includes(colorArray[0])
+            const saveColors = saves
+                .filter((save) => !!save)
+                .map((save) => save.state.plumeIndex ?? 0)
+            this.slotColors = saves.map((save) => save?.state?.plumeIndex ?? 0)
+            this.unusedColors = Lists.range(0, PLUME_COLORS.length).filter(
+                (colorIndex) => !saveColors.includes(colorIndex)
             )
         }
         if (slot === this.previewingSlotPlume) {
             return
         }
         this.previewingSlotPlume = slot
-        this.plumes.select(this.slotColors[slot] || Lists.oneOf(this.unusedColors))
+        this.plumes.select(this.slotColors[slot] ?? Lists.oneOf(this.unusedColors))
     }
 
     private resetPlume() {
