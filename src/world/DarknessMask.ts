@@ -95,9 +95,9 @@ export class DarknessMask {
     }
 
     private readonly NIGHT_COLOR = this.colorFromString(Color.BLACK, 1)
-    private readonly SUNRISE_COLOR = this.colorFromString(Color.PINK, 0.5)
+    private readonly SUNRISE_COLOR = this.colorFromString(Color.PINK_3, 0.5)
     private readonly DAY_COLOR = this.colorFromString(Color.PINK_4, 0)
-    private readonly SUNSET_COLOR = this.colorFromString(Color.BLUE_3, 0.3)
+    private readonly SUNSET_COLOR = this.colorFromString(Color.BLUE_4, 0.3)
 
     private updateColorForTime(time: number, darknessLevel: number) {
         const timeOfDay = time % TimeUnit.DAY
