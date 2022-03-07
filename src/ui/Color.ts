@@ -52,12 +52,6 @@ export enum Color {
     RED_4 = "#d8725e",
     RED_5 = "#f09f71",
     RED_6 = "#f7cf91",
-
-    // TODO below this comment
-
-    // used for other shit
-    RED = "#9f294e",
-    PINK = "#dc4a7b",
 }
 
 const toHex = (c: number) => {

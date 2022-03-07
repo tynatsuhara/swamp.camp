@@ -104,7 +104,7 @@ export class PauseMenu extends Component {
         this.isOpen = true
 
         const buttonColor = "red"
-        const textColor = Color.PINK
+        const textColor = Color.PINK_3
         const hoverColor = Color.WHITE
 
         this.displayEntity = ButtonsMenu.render(
