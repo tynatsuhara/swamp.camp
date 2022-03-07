@@ -118,7 +118,7 @@ export const formatText = ({
                     Tilesets.instance.oneBit
                         .getTileSource(iconKey)
                         // TODO cache recolored icons
-                        .filtered(ImageFilters.recolor(Color.WHITE, color))
+                        .filtered(ImageFilters.recolor([Color.WHITE, color]))
                         .toImageRender(
                             SpriteTransform.new({
                                 position: rowPosition(row, i)

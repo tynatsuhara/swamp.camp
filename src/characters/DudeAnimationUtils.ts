@@ -14,9 +14,9 @@ const maybeFilter = (characterAnimName: string, blob: any, anim: SpriteAnimation
         const colorIndex = blob.color || saveManager.getState().plumeIndex || 0
         const color = PLUME_COLORS[colorIndex]
         if (!!color) {
-            return anim
-                .filtered(ImageFilters.recolor(Color.PINK_2, color[0]))
-                .filtered(ImageFilters.recolor(Color.PINK_3, color[1]))
+            return anim.filtered(
+                ImageFilters.recolor([Color.PINK_2, color[0]], [Color.PINK_3, color[1]])
+            )
         }
     }
 

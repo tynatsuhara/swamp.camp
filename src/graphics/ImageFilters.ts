@@ -1,21 +1,26 @@
-import { Color, getRGB } from "../ui/Color"
 import { Point } from "brigsby/dist/Point"
+import { Color, getRGB } from "../ui/Color"
 
 export const ImageFilters = {
     /**
      * any oldColor pixels will be set to newColor
      */
-    recolor: (oldColor: Color, newColor: Color) => {
-        const rgbOld = getRGB(oldColor)
-        const rgbNew = getRGB(newColor)
+    recolor: (...colors: [oldColor: Color, newColor: Color][]) => {
+        const rgbsOld = colors.map(([oldColor, newColor]) => getRGB(oldColor))
+        const rgbsNew = colors.map(([oldColor, newColor]) => getRGB(newColor))
         return (img: ImageData) => {
             const result = new ImageData(new Uint8ClampedArray(img.data), img.width, img.height)
             const d = result.data
             for (let i = 0; i < result.data.length; i += 4) {
-                if (d[i] === rgbOld[0] && d[i + 1] === rgbOld[1] && d[i + 2] === rgbOld[2]) {
-                    result.data[i] = rgbNew[0]
-                    result.data[i + 1] = rgbNew[1]
-                    result.data[i + 2] = rgbNew[2]
+                for (let j = 0; j < rgbsOld.length; j++) {
+                    const rgbOld = rgbsOld[j]
+                    if (d[i] === rgbOld[0] && d[i + 1] === rgbOld[1] && d[i + 2] === rgbOld[2]) {
+                        const rgbNew = rgbsNew[j]
+                        result.data[i] = rgbNew[0]
+                        result.data[i + 1] = rgbNew[1]
+                        result.data[i + 2] = rgbNew[2]
+                        break
+                    }
                 }
             }
             return result

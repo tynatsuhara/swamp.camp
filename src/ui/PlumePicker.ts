@@ -10,26 +10,50 @@ import { Color } from "./Color"
 import { UIStateManager } from "./UIStateManager"
 
 // array of [dark, light] pairs
-// TODO support new colors
+// TODO support new nanner colors
 export const PLUME_COLORS: [Color, Color][] = [
-    [Color.DARK_DARK_PINK, Color.DARK_PINK],
-    [Color.DARK_PINK, Color.PINK],
-    [Color.PINK, Color.LIGHT_PINK],
-    [Color.DARK_RED, Color.RED],
+    [Color.BLUE_1, Color.BLUE_2],
+    [Color.BLUE_2, Color.BLUE_3],
+    [Color.BLUE_3, Color.BLUE_4],
+    [Color.BLUE_4, Color.BLUE_5],
+    [Color.BLUE_5, Color.BLUE_6],
+
+    // [Color.GREEN_1, Color.GREEN_2],
+    [Color.GREEN_2, Color.GREEN_3],
+    [Color.GREEN_3, Color.GREEN_4],
+    [Color.GREEN_4, Color.GREEN_5],
+    [Color.GREEN_5, Color.GREEN_6],
+
+    [Color.PINK_1, Color.PINK_2],
+    [Color.PINK_2, Color.PINK_3],
+    [Color.PINK_3, Color.PINK_4],
+    [Color.PINK_4, Color.PINK_5],
+    [Color.PINK_5, Color.PINK_6],
+
+    [Color.RED_1, Color.RED_2],
     [Color.RED_2, Color.RED_3],
-    [Color.RED_3, Color.RED_5],
+    [Color.RED_3, Color.RED_4],
+    [Color.RED_4, Color.RED_5],
     [Color.RED_5, Color.RED_6],
-    [Color.GREEN_5, Color.LIME],
-    [Color.DARK_GREEN, Color.GREEN_5],
-    [Color.DARK_DARK_BLUE, Color.DARK_BLUE],
-    [Color.DARK_BLUE, Color.BLUE_5],
-    [Color.TEAL, Color.BLUE_6],
-    [Color.DARK_PURPLE, Color.PURPLE],
-    [Color.DARK_PINKLE, Color.PINKLE],
-    [Color.PINKLE, Color.LIGHT_PINKLE],
-    [Color.TAUPE_3, Color.TAN],
-    [Color.TAUPE_2, Color.TAUPE_3],
-    [Color.TAUPE_1, Color.TAUPE_2],
+
+    // [Color.DARK_DARK_PINK, Color.DARK_PINK],
+    // [Color.DARK_PINK, Color.PINK],
+    // [Color.PINK, Color.LIGHT_PINK],
+    // [Color.DARK_RED, Color.RED],
+    // [Color.RED_2, Color.RED_3],
+    // [Color.RED_3, Color.RED_5],
+    // [Color.RED_5, Color.RED_6],
+    // [Color.GREEN_5, Color.LIME],
+    // [Color.DARK_GREEN, Color.GREEN_5],
+    // [Color.DARK_DARK_BLUE, Color.DARK_BLUE],
+    // [Color.DARK_BLUE, Color.BLUE_5],
+    // [Color.TEAL, Color.BLUE_6],
+    // [Color.DARK_PURPLE, Color.PURPLE],
+    // [Color.DARK_PINKLE, Color.PINKLE],
+    // [Color.PINKLE, Color.LIGHT_PINKLE],
+    // [Color.TAUPE_3, Color.TAN],
+    // [Color.TAUPE_2, Color.TAUPE_3],
+    // [Color.TAUPE_1, Color.TAUPE_2],
 ]
 
 export class PlumePicker extends Component {
