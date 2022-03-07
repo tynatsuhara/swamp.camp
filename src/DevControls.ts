@@ -29,6 +29,7 @@ export const spawnMenu = {
         DudeType.DOCTOR,
         DudeType.BEAR,
         DudeType.WOLF,
+        DudeType.DEMON_BRUTE,
     ],
 }
 

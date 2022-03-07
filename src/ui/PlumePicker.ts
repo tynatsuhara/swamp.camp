@@ -10,6 +10,7 @@ import { Color } from "./Color"
 import { UIStateManager } from "./UIStateManager"
 
 // array of [dark, light] pairs
+// TODO support new colors
 export const CUSTOMIZATION_OPTIONS = [
     [Color.DARK_DARK_PINK, Color.DARK_PINK],
     [Color.DARK_PINK, Color.PINK],

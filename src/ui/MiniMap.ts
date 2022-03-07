@@ -129,7 +129,7 @@ export class MiniMap extends Component {
                     const hex = getHex(imageData.data[i], imageData.data[i + 1], imageData.data[2])
                     hexStrings.push(hex)
                     // weigh other colors higher than grass color to show non-nature things on the map
-                    if (hex !== Color.TEAL) {
+                    if (hex !== Color.GREEN) {
                         hexStrings.push(hex)
                     }
                 }

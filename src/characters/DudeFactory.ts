@@ -145,6 +145,7 @@ export class DudeFactory {
                 break
             }
             case DudeType.ELF: {
+                // unused
                 animationName = "elf_m"
                 weapon = WeaponType.KATANA
                 shield = ShieldType.BASIC
@@ -201,6 +202,7 @@ export class DudeFactory {
                 break
             }
             case DudeType.SHROOM: {
+                // needs art update
                 factions = [DudeFaction.SHROOMS]
                 animationName = "SmallMushroom"
                 additionalComponents = [new NPC(), new ShroomNPC()]
@@ -209,6 +211,7 @@ export class DudeFactory {
                 break
             }
             case DudeType.VILLAGER: {
+                // needs art update
                 animationName = `prisoner${Math.ceil(Math.random() * 2)}`
                 maxHealth = 4
                 speed *= 0.6
@@ -216,6 +219,7 @@ export class DudeFactory {
                 break
             }
             case DudeType.DOCTOR: {
+                // needs art update
                 animationName = "doctor"
                 maxHealth = 10
                 speed *= 0.6
@@ -227,6 +231,7 @@ export class DudeFactory {
                 break
             }
             case DudeType.BLACKSMITH: {
+                // unused
                 animationName = "Alchemist"
                 maxHealth = 10
                 speed *= 0.6
@@ -236,6 +241,7 @@ export class DudeFactory {
                 break
             }
             case DudeType.CENTAUR: {
+                // unused
                 factions = [DudeFaction.CENTAURS]
                 animationName = "Centaur_M"
                 additionalComponents = [new NPC(), new Centaur()]
@@ -244,6 +250,7 @@ export class DudeFactory {
                 break
             }
             case DudeType.BEAR: {
+                // needs art update
                 factions = [DudeFaction.BEARS]
                 animationName = "Bear"
                 weapon = WeaponType.UNARMED
@@ -254,6 +261,7 @@ export class DudeFactory {
                 break
             }
             case DudeType.WOLF: {
+                // needs art update
                 factions = [DudeFaction.WOLVES]
                 animationName = "Wolf"
                 weapon = WeaponType.UNARMED
@@ -263,6 +271,7 @@ export class DudeFactory {
                 break
             }
             case DudeType.NUN:
+                // needs art update
                 factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
                 animationName = Lists.oneOf(["FatNun", "NormalNun", "SkinnyNun"])
                 additionalComponents = [new NPC(), new Villager()]
@@ -270,6 +279,7 @@ export class DudeFactory {
                 nameGen = () => peopleNames.generate("<nun>")
                 break
             case DudeType.CLERIC:
+                // needs art update
                 factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
                 animationName = Lists.oneOf(["FatCleric", "NormalCleric", "TallCleric"])
                 additionalComponents = [new NPC(), new Villager()]
@@ -277,6 +287,7 @@ export class DudeFactory {
                 nameGen = () => peopleNames.generate("<cleric>")
                 break
             case DudeType.BISHOP: {
+                // needs art update
                 factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
                 animationName = "Bishop"
                 additionalComponents = [new NPC(), new Villager()]

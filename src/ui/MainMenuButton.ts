@@ -76,7 +76,7 @@ export class MainMenuButton extends Component {
                 this.position.plusX(-this.width / 2).plusX(offset),
                 TEXT_SIZE,
                 TEXT_FONT,
-                this.hovering ? Color.WHITE : Color.TEAL,
+                this.hovering ? Color.WHITE : Color.GREEN,
                 UIStateManager.UI_SPRITE_DEPTH
             ),
         ]
