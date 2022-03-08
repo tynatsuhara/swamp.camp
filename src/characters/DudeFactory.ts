@@ -282,7 +282,6 @@ export class DudeFactory {
                 nameGen = () => peopleNames.generate("<cleric>")
                 break
             case DudeType.BISHOP: {
-                // needs art update
                 factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
                 animationName = "Bishop"
                 additionalComponents = [new NPC(), new Villager()]
