@@ -484,7 +484,7 @@ export class Dude extends Component implements DialogueSource {
         items.forEach((item) => {
             const randomness = 8
             const velocity = direction
-                .normalized()
+                .normalizedOrZero()
                 .plus(new Point(Math.random() - 0.5, Math.random() - 0.5).times(randomness))
             setTimeout(
                 () =>
