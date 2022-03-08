@@ -266,7 +266,6 @@ export class DudeFactory {
                 break
             }
             case DudeType.NUN:
-                // needs art update
                 factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
                 animationName = Lists.oneOf(["FatNun", "NormalNun", "SkinnyNun"])
                 additionalComponents = [new NPC(), new Villager()]
@@ -274,7 +273,6 @@ export class DudeFactory {
                 nameGen = () => peopleNames.generate("<nun>")
                 break
             case DudeType.CLERIC:
-                // needs art update
                 factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
                 animationName = Lists.oneOf(["FatCleric", "NormalCleric", "TallCleric"])
                 additionalComponents = [new NPC(), new Villager()]
