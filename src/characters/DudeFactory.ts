@@ -202,7 +202,6 @@ export class DudeFactory {
                 break
             }
             case DudeType.SHROOM: {
-                // needs art update
                 factions = [DudeFaction.SHROOMS]
                 animationName = "SmallMushroom"
                 additionalComponents = [new NPC(), new ShroomNPC()]
@@ -211,7 +210,6 @@ export class DudeFactory {
                 break
             }
             case DudeType.VILLAGER: {
-                // needs art update
                 animationName = `prisoner${Math.ceil(Math.random() * 2)}`
                 maxHealth = 4
                 speed *= 0.6
@@ -250,7 +248,6 @@ export class DudeFactory {
                 break
             }
             case DudeType.BEAR: {
-                // needs art update
                 factions = [DudeFaction.BEARS]
                 animationName = "Bear"
                 weapon = WeaponType.UNARMED
@@ -261,7 +258,6 @@ export class DudeFactory {
                 break
             }
             case DudeType.WOLF: {
-                // needs art update
                 factions = [DudeFaction.WOLVES]
                 animationName = "Wolf"
                 weapon = WeaponType.UNARMED
