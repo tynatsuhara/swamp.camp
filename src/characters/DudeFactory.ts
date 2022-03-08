@@ -217,7 +217,6 @@ export class DudeFactory {
                 break
             }
             case DudeType.DOCTOR: {
-                // needs art update
                 animationName = "doctor"
                 maxHealth = 10
                 speed *= 0.6
