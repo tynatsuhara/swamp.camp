@@ -84,7 +84,7 @@ export class WalkingParticles extends Component {
             }
 
             Particles.instance.emitParticle(
-                Color.TAUPE_3,
+                Color.TAUPE_5,
                 this.dude.standingPosition.randomlyShifted(4, 0).plusY(Math.random() * -5),
                 GroundRenderer.DEPTH + 1,
                 LIFESPAN_MILLIS,
