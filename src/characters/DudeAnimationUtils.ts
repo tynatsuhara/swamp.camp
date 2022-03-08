@@ -11,7 +11,7 @@ const maybeFilter = (characterAnimName: string, blob: any, anim: SpriteAnimation
     }
 
     if (characterAnimName === "knight_f") {
-        const colorIndex = blob.color || saveManager.getState().plumeIndex || 0
+        const colorIndex = blob.color ?? saveManager.getState().plumeIndex ?? 0
         const color = PLUME_COLORS[colorIndex]
         if (!!color) {
             return anim.filtered(
