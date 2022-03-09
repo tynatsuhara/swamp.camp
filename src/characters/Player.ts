@@ -111,6 +111,8 @@ export class Player extends Component {
         let speed = 1
         if (this.dude.rolling) {
             speed += 1.2
+        } else if (!this.dude.weapon || this.dude.weapon.isSheathed()) {
+            speed += 0.35
         }
         if (this.dude.shield?.isBlocking()) {
             speed -= 0.4
@@ -139,7 +141,6 @@ export class Player extends Component {
         }
 
         if (controls.isSheathKeyDown()) {
-            // todo: these could get out of sync if one is null
             const sheathed = !this.dude.weapon?.isSheathed() ?? false
             this.dude.weapon.setSheathed(sheathed)
             this.dude.shield.setOnBack(sheathed)
