@@ -119,6 +119,7 @@ export class DudeFactory {
                 weapon = WeaponType.SWORD
                 shield = ShieldType.BASIC
                 maxHealth = 4
+                speed = 0.075
                 additionalComponents = [new Player(), new CutscenePlayerController()]
                 window["player"] = additionalComponents[0]
                 inventoryClass = PlayerInventory

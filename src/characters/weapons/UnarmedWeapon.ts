@@ -19,8 +19,12 @@ export class UnarmedWeapon extends Weapon {
         return this.state === State.ATTACKING
     }
 
-    toggleSheathed() {
+    setSheathed(sheathed: boolean) {
         /* no-op */
+    }
+
+    isSheathed() {
+        return false
     }
 
     getRange(): number {

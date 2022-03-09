@@ -1,9 +1,9 @@
 import { Component } from "brigsby/dist/Component"
+import { Point } from "brigsby/dist/Point"
+import { Hittable } from "../../world/elements/Hittable"
 import { LocationManager } from "../../world/LocationManager"
 import { Dude } from "../Dude"
 import { WeaponType } from "./WeaponType"
-import { Hittable } from "../../world/elements/Hittable"
-import { Point } from "brigsby/dist/Point"
 
 export abstract class Weapon extends Component {
     protected dude: Dude
@@ -50,7 +50,8 @@ export abstract class Weapon extends Component {
      * Used to determine if a shield can block
      */
     abstract isAttacking()
-    abstract toggleSheathed()
+    abstract setSheathed(sheathed: boolean): void
+    abstract isSheathed(): boolean
     abstract getRange(): number
 
     /**

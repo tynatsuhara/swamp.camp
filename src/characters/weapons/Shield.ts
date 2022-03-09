@@ -78,12 +78,8 @@ export class Shield extends Component {
         this.transform.depth = this.raisedPerc > 0.7 ? 0.75 : -0.75
     }
 
-    toggleOnBack() {
-        if (this.state === State.DRAWN) {
-            this.state = State.ON_BACK
-        } else {
-            this.state = State.DRAWN
-        }
+    setOnBack(onBack: boolean) {
+        this.state = onBack ? State.ON_BACK : State.DRAWN
     }
 
     block(blockingActive: boolean) {

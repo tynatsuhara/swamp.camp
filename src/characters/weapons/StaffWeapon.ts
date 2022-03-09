@@ -80,8 +80,13 @@ export class StaffWeapon extends Weapon {
         return !!this.animator || !!this.attackPosition
     }
 
-    toggleSheathed() {
-        throw new Error("toggleSheathed not implemented.")
+    setSheathed(sheathed: boolean) {
+        /* no-op */
+    }
+
+    isSheathed(): boolean {
+        /* no-op */
+        return false
     }
 
     getRange(): number {

@@ -294,11 +294,13 @@ export class Dude extends Component implements DialogueSource {
     setWeapon(type: WeaponType) {
         this.weapon?.delete()
         this._weapon = this.entity.addComponent(WeaponFactory.make(type, this.type))
+        this.shield?.setOnBack(false) // keep em in sync
     }
 
     setShield(type: ShieldType) {
         this.shield?.delete()
         this._shield = this.entity.addComponent(ShieldFactory.make(type))
+        this.weapon?.setSheathed(false) // keep em in sync
     }
 
     private fireParticles: FireParticles

@@ -62,12 +62,12 @@ export class SpearWeapon extends Weapon {
         return this.state === State.DRAWING || this.state === State.ATTACKING
     }
 
-    toggleSheathed() {
-        if (this.state === State.SHEATHED) {
-            this.state = State.DRAWN
-        } else if (this.state === State.DRAWN) {
-            this.state = State.SHEATHED
-        }
+    setSheathed(sheathed: boolean) {
+        this.state = sheathed ? State.SHEATHED : State.DRAWN
+    }
+
+    isSheathed() {
+        return this.state === State.SHEATHED
     }
 
     getRange() {

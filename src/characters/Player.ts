@@ -140,8 +140,9 @@ export class Player extends Component {
 
         if (controls.isSheathKeyDown()) {
             // todo: these could get out of sync if one is null
-            this.dude.weapon.toggleSheathed()
-            this.dude.shield.toggleOnBack()
+            const sheathed = !this.dude.weapon?.isSheathed() ?? false
+            this.dude.weapon.setSheathed(sheathed)
+            this.dude.shield.setOnBack(sheathed)
         }
 
         let blocking = false
