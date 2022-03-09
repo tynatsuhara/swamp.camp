@@ -115,9 +115,9 @@ ANOTHER thing - Only one of the explorers returned, and she reported that her co
     cutscene() {
         CutscenePlayerController.instance.enable()
 
-        this.dip = Array.from(LocationManager.instance.currentLocation.dudes).filter(
-            (d) => d.type === DudeType.DIP
-        )[0]
+        this.dip = LocationManager.instance.currentLocation
+            .getDudes()
+            .filter((d) => d.type === DudeType.DIP)[0]
 
         Queequeg.instance.pushPassenger(Player.instance.dude)
 
@@ -148,9 +148,9 @@ ANOTHER thing - Only one of the explorers returned, and she reported that her co
         }
 
         if (!this.orcs) {
-            this.orcs = Array.from(LocationManager.instance.currentLocation.dudes).filter((d) =>
-                d.factions.includes(DudeFaction.ORCS)
-            )
+            this.orcs = LocationManager.instance.currentLocation
+                .getDudes()
+                .filter((d) => d.factions.includes(DudeFaction.ORCS))
         }
 
         // TODO prevent the player from going to a different location until this is over

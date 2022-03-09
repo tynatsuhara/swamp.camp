@@ -14,7 +14,7 @@ export enum TaxRate {
 export const collectTaxes = () => {
     const taxPayers = LocationManager.instance
         .getLocations()
-        .flatMap((l) => Array.from(l.dudes.values()))
+        .flatMap((l) => l.getDudes())
         .filter(
             (dude) => dude.type !== DudeType.PLAYER && dude.factions.includes(DudeFaction.VILLAGERS)
         ).length

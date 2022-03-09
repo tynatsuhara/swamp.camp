@@ -432,7 +432,8 @@ export class NPC extends Simulatable {
         ) {
             target = this.dude.lastAttacker
         } else {
-            let enemies = Array.from(LocationManager.instance.currentLocation.dudes)
+            let enemies = LocationManager.instance.currentLocation
+                .getDudes()
                 .filter((d) => d.isAlive)
                 .filter(this.isEnemyFn)
                 .filter(
@@ -583,9 +584,7 @@ export class NPC extends Simulatable {
             return undefined
         }
         if (!this.leader) {
-            this.leader = Array.from(this.dude.location.dudes).find(
-                (d) => d.uuid === savedLeaderUUID
-            )
+            this.leader = this.dude.location.getDudes().find((d) => d.uuid === savedLeaderUUID)
         }
         return this.leader
     }

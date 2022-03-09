@@ -153,7 +153,8 @@ export class StaffWeapon extends Weapon {
                     const attackDistance = TILE_SIZE * 1.5
 
                     // everyone can get damaged by explosions, friend or foe
-                    Array.from(LocationManager.instance.currentLocation.dudes)
+                    LocationManager.instance.currentLocation
+                        .getDudes()
                         .filter((d) => !!d)
                         .filter(
                             (d) =>

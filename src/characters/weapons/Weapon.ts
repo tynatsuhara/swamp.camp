@@ -14,7 +14,8 @@ export abstract class Weapon extends Component {
 
     // TODO find a better place for these static functions?
     static getEnemiesInRange(attacker: Dude, attackDistance: number) {
-        return Array.from(LocationManager.instance.currentLocation.dudes)
+        return LocationManager.instance.currentLocation
+            .getDudes()
             .filter((d) => !!d && d !== attacker && d.isEnemy(attacker))
             .filter((d) => attacker.isFacing(d.standingPosition))
             .filter(

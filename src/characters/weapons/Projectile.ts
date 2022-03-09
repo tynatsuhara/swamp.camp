@@ -111,7 +111,8 @@ class Projectile extends Component {
     }
 
     getEnemy(attacker: Dude, projectilePos: Point, velocity: Point, attackDistance: number): Dude {
-        const allEnemies = Array.from(LocationManager.instance.currentLocation.dudes)
+        const allEnemies = LocationManager.instance.currentLocation
+            .getDudes()
             .filter((d) => !!d && d !== attacker && d.isEnemy(attacker))
             .filter((d) => d.standingPosition.distanceTo(projectilePos) < attackDistance)
 

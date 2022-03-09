@@ -975,7 +975,7 @@ export class Dude extends Component implements DialogueSource {
     }
 
     delete() {
-        this.location.dudes.delete(this)
+        this.location.removeDude(this)
         super.delete()
     }
 

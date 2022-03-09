@@ -100,7 +100,7 @@ export class Queequeg extends Simulatable {
 
         this.start = () => {
             const dudes: { [key: string]: Dude } = {}
-            wl.dudes.forEach((d) => (dudes[d.uuid] = d))
+            wl.getDudes().forEach((d) => (dudes[d.uuid] = d))
             passengers.map((uuid) => dudes[uuid]).forEach((dude) => this.pushPassenger(dude))
         }
 

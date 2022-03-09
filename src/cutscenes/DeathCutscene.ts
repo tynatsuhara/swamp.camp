@@ -72,8 +72,7 @@ export class DeathCutscene extends Component {
         Player.instance.dude.revive()
 
         // Clear out any enemies
-        const dudes = LocationManager.instance.currentLocation.dudes
-        dudes.forEach((d) => {
+        LocationManager.instance.currentLocation.getDudes().forEach((d) => {
             if (d.entity.getComponent(Enemy)) {
                 d.entity.selfDestruct()
             } else {

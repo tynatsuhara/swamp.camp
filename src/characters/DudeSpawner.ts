@@ -36,9 +36,9 @@ export class DudeSpawner extends Component {
         }
 
         // Maybe consider moving this code elsewhere later
-        WorldAudioContext.instance.isInBattle = Array.from(camp().dudes.values()).some(
-            (d) => d.isAlive && d.factions.includes(DudeFaction.ORCS)
-        )
+        WorldAudioContext.instance.isInBattle = camp()
+            .getDudes()
+            .some((d) => d.isAlive && d.factions.includes(DudeFaction.ORCS))
     }
 
     getEntity() {
@@ -64,9 +64,7 @@ export class DudeSpawner extends Component {
         if (l.isInterior) {
             return // don't spawn demons inside
         }
-        const demons = Array.from(l.dudes.values()).filter((d) =>
-            d.factions.includes(DudeFaction.DEMONS)
-        )
+        const demons = l.getDudes().filter((d) => d.factions.includes(DudeFaction.DEMONS))
         if (demons.length > 0) {
             return // just wait to spawn until all the demons have been killed
         }
@@ -95,9 +93,7 @@ export class DudeSpawner extends Component {
             return // don't spawn swamp things inside
         }
 
-        const thingCount = Array.from(l.dudes.values()).filter(
-            (d) => d.type === DudeType.SWAMP_THING
-        )
+        const thingCount = l.getDudes().filter((d) => d.type === DudeType.SWAMP_THING)
 
         const waterSpots = l.getGroundSpots(true).filter(
             (pt) =>

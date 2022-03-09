@@ -174,9 +174,9 @@ class SaveManager {
         EventQueue.instance.initialize(save.eventQueue)
 
         Camera.instance.focusOnDude(
-            Array.from(LocationManager.instance.currentLocation.dudes).find(
-                (d) => d.type === DudeType.PLAYER
-            )
+            LocationManager.instance.currentLocation
+                .getDudes()
+                .find((d) => d.type === DudeType.PLAYER)
         )
     }
 

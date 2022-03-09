@@ -30,8 +30,7 @@ export class Location {
 
     readonly type: LocationType
 
-    // TODO encapsulate
-    readonly dudes = new Set<Dude>()
+    private readonly dudes = new Set<Dude>()
 
     // Non-moving entities with tile coords (not pixel coords)
     // Entities may be duplicated in multiple spots
@@ -70,6 +69,24 @@ export class Location {
         this.allowPlacing = allowPlacing
         this.size = size
         this.levels = levels
+    }
+
+    private dudeCache: Dude[]
+    getDudes() {
+        if (!this.dudeCache) {
+            this.dudeCache = Array.from(this.dudes)
+        }
+        return this.dudeCache
+    }
+
+    addDude(dude: Dude) {
+        this.dudes.add(dude)
+        this.dudeCache = undefined
+    }
+
+    removeDude(dude: Dude) {
+        this.dudes.delete(dude)
+        this.dudeCache = undefined
     }
 
     setGroundElement(type: GroundType, pos: Point, data: object = {}): GroundComponent {
@@ -278,8 +295,8 @@ export class Location {
         const linkedLocation = LocationManager.instance.get(teleporter.to)
         const linkedPosition = this.getTeleporterLinkedPos(teleporter.to, teleporter.id)
 
-        this.dudes.delete(dude)
-        linkedLocation.dudes.add(dude)
+        this.removeDude(dude)
+        linkedLocation.addDude(dude)
         dude.location = linkedLocation
 
         dude.moveTo(linkedPosition, true)
@@ -305,8 +322,8 @@ export class Location {
             // move the player to the new location's dude store
             const p = Player.instance.dude
             const beforeTeleportPos = p.standingPosition
-            this.dudes.delete(p)
-            linkedLocation.dudes.add(p)
+            this.removeDude(p)
+            linkedLocation.addDude(p)
             p.location = linkedLocation
 
             // refresh the HUD hide stale data
@@ -333,7 +350,7 @@ export class Location {
     }
 
     getEntities() {
-        return Array.from(Array.from(this.dudes.values()).map((d) => d.entity))
+        return Array.from(this.getDudes().map((d) => d.entity))
             .concat(this.elements.values().map((c) => c.entity))
             .concat(
                 this.ground
@@ -347,7 +364,7 @@ export class Location {
     }
 
     getDude(dudeType: DudeType): Dude {
-        return Array.from(this.dudes.values()).filter((d) => d.type === dudeType)[0]
+        return this.getDudes().filter((d) => d.type === dudeType)[0]
     }
 
     save(): LocationSaveState {
@@ -356,7 +373,7 @@ export class Location {
             type: this.type,
             ground: this.saveGround(),
             elements: this.saveElements(),
-            dudes: Array.from(this.dudes)
+            dudes: this.getDudes()
                 .filter((d) => d.isAlive && !!d.entity)
                 .map((d) => d.save()),
             teleporters: this.teleporters,

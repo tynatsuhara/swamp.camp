@@ -324,7 +324,7 @@ export class DudeFactory {
             name: saveState?.name ?? nameGen(),
         })
 
-        location.dudes.add(d)
+        location.addDude(d)
         d.location = location
 
         // Always add dude component first to make sure additional components can access it in awake()

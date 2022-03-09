@@ -158,7 +158,7 @@ export const getEventQueueHandlers = (): {
         const foodAmount = 0 // TODO
         const villagerCount = LocationManager.instance
             .getLocations()
-            .flatMap((l) => Array.from(l.dudes.values()))
+            .flatMap((l) => l.getDudes())
             .filter((d) => d.isAlive && d.factions.includes(DudeFaction.VILLAGERS)).length
         // TODO calculate food amount
 

@@ -24,7 +24,7 @@ export class LocationManager {
         window["locationManager"] = this
         window["showDudes"] = () => {
             const counts = {}
-            Array.from(LocationManager.instance.currentLocation.dudes.values()).forEach((d) => {
+            LocationManager.instance.currentLocation.getDudes().forEach((d) => {
                 const type = DudeType[d.type]
                 return (counts[type] = (counts[type] || 0) + 1)
             })
