@@ -14,7 +14,6 @@ export class DudeSaveState {
     shield: ShieldType
     maxHealth: number
     health: number
-    speed: number
     inventory: ItemStack[]
     dialogue: string
     blob: object // This can be used for DudeType-specific data

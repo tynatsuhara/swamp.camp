@@ -312,7 +312,7 @@ export class DudeFactory {
             shieldType: saveState?.shield ?? shield,
             maxHealth: saveState?.maxHealth ?? maxHealth,
             health: saveState?.health ?? maxHealth,
-            speed: saveState?.speed ?? speed,
+            speed: speed ?? speed,
             inventory: saveState?.inventory
                 ? inventoryClass.load(saveState.inventory)
                 : defaultInventory,

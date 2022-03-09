@@ -958,7 +958,6 @@ export class Dude extends Component implements DialogueSource {
             anim: this.characterAnimName,
             maxHealth: this.maxHealth,
             health: this._health,
-            speed: this.speed,
             weapon: this.weaponType,
             shield: this.shieldType,
             inventory: this.inventory.save(),
