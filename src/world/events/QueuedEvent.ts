@@ -1,5 +1,5 @@
 import { Lists } from "brigsby/dist/util/Lists"
-import { DudeFactory, DudeType } from "../../characters/DudeFactory"
+import { DudeFaction, DudeFactory, DudeType } from "../../characters/DudeFactory"
 import { DudeSpawner } from "../../characters/DudeSpawner"
 import { NPC } from "../../characters/NPC"
 import { Berto } from "../../characters/types/Berto"
@@ -153,6 +153,14 @@ export const getEventQueueHandlers = (): {
         for (let i = 0; i < rocksToSpawn; i++) {
             camp().addElement(ElementType.ROCK, Lists.oneOf(openTiles))
         }
+
+        // Update town stats
+        const foodAmount = 0 // TODO
+        const villagerCount = LocationManager.instance
+            .getLocations()
+            .flatMap((l) => Array.from(l.dudes.values()))
+            .filter((d) => d.isAlive && d.factions.includes(DudeFaction.VILLAGERS)).length
+        // TODO calculate food amount
 
         EventQueue.instance.addEvent({
             type: QueuedEventType.DAILY_SCHEDULE,

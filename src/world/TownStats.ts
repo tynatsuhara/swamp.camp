@@ -1,6 +1,7 @@
 import { saveManager } from "../SaveManager"
 import { Singletons } from "../Singletons"
 
+// TODO can we clean this all up?
 class TownStat {
     readonly id: string
 

@@ -30,6 +30,7 @@ export class Location {
 
     readonly type: LocationType
 
+    // TODO encapsulate
     readonly dudes = new Set<Dude>()
 
     // Non-moving entities with tile coords (not pixel coords)
