@@ -12,10 +12,9 @@ import { Item } from "../../items/Items"
 import { saveManager } from "../../SaveManager"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { HUD } from "../../ui/HUD"
-import { UIStateManager } from "../../ui/UIStateManager"
 import { DarknessMask } from "../DarknessMask"
 import { Location } from "../Location"
-import { camp, LocationManager } from "../LocationManager"
+import { camp } from "../LocationManager"
 import { TimeUnit } from "../TimeUnit"
 import { WorldTime } from "../WorldTime"
 import { Breakable } from "./Breakable"
@@ -58,14 +57,7 @@ export class BedFactory extends ElementFactory {
                 () => {
                     DialogueDisplay.instance.startDialogue(bed)
                 },
-                new Point(1, -TILE_SIZE),
-                () => {
-                    // Proxy for determining that this bed belongs to the player
-                    return (
-                        LocationManager.instance.currentLocation.allowPlacing &&
-                        !UIStateManager.instance.isMenuOpen
-                    )
-                }
+                new Point(1, -TILE_SIZE)
             )
         )
 
