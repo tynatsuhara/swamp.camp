@@ -14,6 +14,7 @@ import { camp } from "../world/LocationManager"
 import { BERTO_STARTING_DIALOGUE } from "./dialogue/BertoDialogue"
 import { EMPTY_DIALOGUE } from "./dialogue/Dialogue"
 import { DOCTOR_DIALOGUE_ENTRYPOINT } from "./dialogue/DoctorDialogue"
+import { VILLAGER_DIALOGUE_ENTRYPOINT } from "./dialogue/VillagerDialogue"
 import { Dude } from "./Dude"
 import { peopleNames } from "./NameFactory"
 import { NPC } from "./NPC"
@@ -215,6 +216,7 @@ export class DudeFactory {
                 maxHealth = 4
                 speed *= 0.6
                 additionalComponents = [new NPC(), new Villager()]
+                dialogue = VILLAGER_DIALOGUE_ENTRYPOINT
                 break
             }
             case DudeType.DOCTOR: {

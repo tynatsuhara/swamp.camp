@@ -17,20 +17,22 @@ import { camp, LocationManager } from "./world/LocationManager"
 import { TimeUnit } from "./world/TimeUnit"
 import { WorldTime } from "./world/WorldTime"
 
+const SPAWNABLE_TYPES = [
+    DudeType.VILLAGER,
+    DudeType.SHROOM,
+    DudeType.BLACKSMITH,
+    DudeType.NUN,
+    DudeType.CLERIC,
+    DudeType.BISHOP,
+    DudeType.DOCTOR,
+    DudeType.BEAR,
+    DudeType.WOLF,
+    DudeType.DEMON_BRUTE,
+]
 export const spawnMenu = {
     show: false,
-    selectedType: DudeType.SHROOM,
-    types: [
-        DudeType.SHROOM,
-        DudeType.BLACKSMITH,
-        DudeType.NUN,
-        DudeType.CLERIC,
-        DudeType.BISHOP,
-        DudeType.DOCTOR,
-        DudeType.BEAR,
-        DudeType.WOLF,
-        DudeType.DEMON_BRUTE,
-    ],
+    selectedType: SPAWNABLE_TYPES[0],
+    types: SPAWNABLE_TYPES,
 }
 
 const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [

@@ -6,6 +6,7 @@ import { DIP_INTRO_DIALOGUE } from "./DipDialogue"
 import { DOCTOR_DIALOGUE } from "./DoctorDialogue"
 import { GENERIC_DIALOGUE } from "./GenericDialogue"
 import { ITEM_DIALOGUES } from "./ItemDialogues"
+import { VILLAGER_DIALOGUE } from "./VillagerDialogue"
 
 export const EMPTY_DIALOGUE = "-"
 
@@ -115,6 +116,7 @@ export const getDialogue = (dialogue: string): DialogueInstance => {
         ...GENERIC_DIALOGUE,
         ...DOCTOR_DIALOGUE,
         ...ITEM_DIALOGUES,
+        ...VILLAGER_DIALOGUE,
     }
 
     const f = dialogueMap[dialogue]
