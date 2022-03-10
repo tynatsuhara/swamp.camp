@@ -4,6 +4,7 @@ import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Ground } from "../../world/ground/Ground"
 import { LightManager } from "../../world/LightManager"
 import { WorldTime } from "../../world/WorldTime"
+import { Condition } from "../Condition"
 import { Dude } from "../Dude"
 import { DudeFaction, DudeType } from "../DudeFactory"
 import { NPC } from "../NPC"
@@ -79,6 +80,7 @@ export class Enemy extends Component {
                 if (lastSunlightCheck) {
                     // they've been in sunlight for a while, time to die
                     dude.dissolve()
+                    dude.addCondition(Condition.ON_FIRE, 10_000)
                     return true // end the loop
                 }
                 lastSunlightCheck = true
