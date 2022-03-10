@@ -56,6 +56,11 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => {
                 input: [new ItemStack(Item.IRON, 3), new ItemStack(Item.WOOD, 5)],
             },
             {
+                desc: "Slices and/or dices",
+                output: Item.SWORD,
+                input: [new ItemStack(Item.IRON, 3), new ItemStack(Item.WOOD, 5)],
+            },
+            {
                 desc: "Ranged or melee weapon",
                 output: Item.SPEAR,
                 input: [new ItemStack(Item.ROCK, 1), new ItemStack(Item.WOOD, 3)],
