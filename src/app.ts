@@ -1,7 +1,7 @@
 import { assets } from "brigsby/dist/Assets"
 import { Engine } from "brigsby/dist/Engine"
 import { getFilesToLoadForMainMenu } from "./graphics/Tilesets"
-import { QuestGame } from "./quest_game"
+import { SwampCampGame } from "./SwampCampGame"
 import { TEXT_FONT } from "./ui/Text"
 
 Promise.all([
@@ -13,5 +13,5 @@ Promise.all([
     ),
 ]).then(() => {
     // start the engine (vroom vroom)
-    Engine.start(new QuestGame(), <HTMLCanvasElement>document.getElementById("canvas"))
+    Engine.start(new SwampCampGame(), <HTMLCanvasElement>document.getElementById("canvas"))
 })

@@ -20,9 +20,9 @@ import { controls } from "../Controls"
 import { FireParticles } from "../graphics/FireParticles"
 import { Particles } from "../graphics/Particles"
 import { getFilesToLoadForGame, getImage, Tilesets, TILE_SIZE } from "../graphics/Tilesets"
-import { QuestGame } from "../quest_game"
 import { saveManager } from "../SaveManager"
 import { Save } from "../saves/SaveGame"
+import { SwampCampGame } from "../SwampCampGame"
 import { Cursor } from "../ui/Cursor"
 import { MainMenuButtonSection } from "../ui/MainMenuButtonSection"
 import { PlumePicker, PLUME_COLORS } from "../ui/PlumePicker"
@@ -104,7 +104,7 @@ export class MainMenuScene {
     loadGame(slot: number) {
         this.loadAssets().then(() => {
             saveManager.load(slot)
-            QuestGame.instance.loadGameScene()
+            SwampCampGame.instance.loadGameScene()
         })
         this.render(Menu.ROOT) // force re-render
     }
@@ -115,8 +115,8 @@ export class MainMenuScene {
     newGame() {
         this.loadAssets().then(() => {
             saveManager.new(this.selectedNewGameSlot, this.plumes)
-            QuestGame.instance.loadGameScene()
-            QuestGame.instance.game.newGame()
+            SwampCampGame.instance.loadGameScene()
+            SwampCampGame.instance.game.newGame()
         })
         this.render(Menu.ROOT) // force re-render
     }

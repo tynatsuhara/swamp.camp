@@ -5,9 +5,9 @@ import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
-import { QuestGame } from "../quest_game"
 import { saveManager } from "../SaveManager"
 import { Settings } from "../Settings"
+import { SwampCampGame } from "../SwampCampGame"
 import { ButtonsMenu } from "./ButtonsMenu"
 import { Color } from "./Color"
 import { ControlsUI } from "./ControlsUI"
@@ -97,7 +97,7 @@ export class PauseMenu extends Component {
             this.getFullScreenOption(),
             {
                 text: `MAIN MENU`,
-                fn: () => QuestGame.instance.loadMainMenu(),
+                fn: () => SwampCampGame.instance.loadMainMenu(),
             },
         ]
 

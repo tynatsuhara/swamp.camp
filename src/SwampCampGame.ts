@@ -9,8 +9,8 @@ const enum Scene {
     GAME,
 }
 
-export class QuestGame extends Game {
-    private static _instance: QuestGame
+export class SwampCampGame extends Game {
+    private static _instance: SwampCampGame
     static get instance() {
         return this._instance
     }
@@ -21,7 +21,7 @@ export class QuestGame extends Game {
 
     constructor() {
         super()
-        QuestGame._instance = this
+        SwampCampGame._instance = this
     }
 
     initialize() {
