@@ -313,12 +313,14 @@ export class Dude extends Component implements DialogueSource {
         this.conditions.forEach((c) => {
             const timeSinceLastExec = WorldTime.instance.time - c.lastExec
 
-            if (c.expiration < WorldTime.instance.time) {
+            if (c.expiration < WorldTime.instance.time || !this.isAlive) {
                 this.removeCondition(c.condition)
+                if (!this.isAlive) {
+                    console.log(`removing ${c.condition} because ded`)
+                }
                 return
             }
 
-            // TODO: add condition effects
             switch (c.condition) {
                 case Condition.ON_FIRE:
                     if (!this.fireParticles) {
@@ -975,6 +977,7 @@ export class Dude extends Component implements DialogueSource {
     }
 
     delete() {
+        this.conditions.forEach((c) => this.removeCondition(c.condition))
         this.location.removeDude(this)
         super.delete()
     }
