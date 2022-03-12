@@ -1,4 +1,6 @@
+import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
+import { Dude } from "../Dude"
 import {
     DialogueInstance,
     DialogueOption,
@@ -13,6 +15,8 @@ export const VILLAGER_DIALOGUE_ENTRYPOINT = "villager-start"
 export const VILLAGER_DIALOGUE: { [key: string]: () => DialogueInstance } = {
     [VILLAGER_DIALOGUE_ENTRYPOINT]: () => {
         // TODO add a different initial dialogue with a "!"
+
+        const villager: Dude = DialogueDisplay.instance.source as Dude
 
         return dialogueWithOptions(
             ["What should I do?"], // TODO flesh out the text

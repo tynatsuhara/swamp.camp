@@ -10,6 +10,7 @@ import { TimeUnit } from "../../world/TimeUnit"
 import { WorldTime } from "../../world/WorldTime"
 import { Dude } from "../Dude"
 import { DudeFaction } from "../DudeFactory"
+import { WeaponType } from "../weapons/WeaponType"
 import { NPCSchedules } from "./NPCSchedule"
 import { NPCTask } from "./NPCTask"
 import { NPCTaskContext } from "./NPCTaskContext"
@@ -30,6 +31,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         } else {
             // Go home!
             goalLocation = this.findHomeLocation(dude)
+            dude.setWeapon(WeaponType.NONE)
         }
 
         if (goalLocation && dude.location !== goalLocation) {
@@ -77,6 +79,8 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         if (mines.length === 0) {
             return null
         }
+
+        dude.setWeapon(WeaponType.PICKAXE)
 
         return LocationManager.instance.get(mines[0])
     }
