@@ -5,7 +5,7 @@ import { Noise } from "brigsby/dist/util/Noise"
 import { Singletons } from "../Singletons"
 import { TentColor } from "./buildings/Tent"
 import { ElementType } from "./elements/Elements"
-import { GroundType } from "./ground/Ground"
+import { Ground, GroundType } from "./ground/Ground"
 import { Location } from "./Location"
 import { LocationManager, LocationType } from "./LocationManager"
 
@@ -332,23 +332,27 @@ export class MapGenerator {
     addRiver(location: Location) {
         location.getGroundSpots().filter((pt) => !location.isOccupied(pt))
 
-        const start = new Point(30, 30)
+        const start = new Point(10, 30)
         const end = new Point(-30, -30)
+        const heuristicRandomness = 50
 
-        const adjacentLevels = (pt: Point) => {
-            const adjacent = [pt.plusX(1), pt.plusX(-1), pt.plusY(1), pt.plusY(-1)]
-            return adjacent.map((pt) => location.levels.get(pt))
-        }
+        const adjacent = (pt: Point) => [pt.plusX(1), pt.plusX(-1), pt.plusY(1), pt.plusY(-1)]
+        const adjacentLevels = (pt: Point) => adjacent(pt).map((pt) => location.levels.get(pt))
 
         const river = location.findPath(
             start,
             end,
-            (pt, goal) => pt.distanceTo(goal),
+            (pt, goal) => pt.distanceTo(goal) + Math.random() * heuristicRandomness,
             (pt) => {
                 const level = location.levels.get(pt)
                 // for waterfalls to not happen on corners, at least 3 adjacent squares need to be the same level
                 return adjacentLevels(pt).filter((l) => l === level).length < 3
-            }
+            },
+            // TODO: exclude weird corner case
+            (pt) =>
+                adjacent(pt).some((p) => Ground.isWater(location.getGround(p)?.type))
+                    ? 1
+                    : 1 + Math.random()
         )
 
         river.forEach((pt) => {
@@ -359,6 +363,21 @@ export class MapGenerator {
                     : GroundType.WATER,
                 pt
             )
+        })
+
+        river.forEach((pt) => {
+            if (location.getGround(pt)?.type === GroundType.WATERFALL) {
+                if (
+                    location.getGround(pt.plusY(-1))?.type === GroundType.WATER ||
+                    location.getGround(pt.plusY(1))?.type === GroundType.WATER
+                ) {
+                    location.setGroundElement(GroundType.WATER, pt.plusY(-1))
+                    location.setGroundElement(GroundType.WATER, pt.plusY(1))
+                } else {
+                    location.setGroundElement(GroundType.WATER, pt.plusX(-1))
+                    location.setGroundElement(GroundType.WATER, pt.plusX(1))
+                }
+            }
         })
     }
 
