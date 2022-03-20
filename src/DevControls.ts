@@ -18,6 +18,7 @@ import { TimeUnit } from "./world/TimeUnit"
 import { WorldTime } from "./world/WorldTime"
 
 const SPAWNABLE_TYPES = [
+    DudeType.SPOOKY_VISITOR,
     DudeType.VILLAGER,
     DudeType.SHROOM,
     DudeType.BLACKSMITH,
@@ -142,6 +143,15 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
             WorldTime.instance.fastForward(
                 input.isKeyHeld(InputKey.SHIFT) ? TimeUnit.MINUTE : TimeUnit.HOUR
             ),
+    ],
+    [
+        InputKey.Y,
+        "vanish spooky visitor(s)",
+        () =>
+            camp()
+                .getDudes()
+                .filter((d) => d.type === DudeType.SPOOKY_VISITOR)
+                .forEach((d) => d.entity.selfDestruct()),
     ],
 ]
 

@@ -24,6 +24,7 @@ import { Berto } from "./types/Berto"
 import { Centaur } from "./types/Centaur"
 import { Enemy } from "./types/Enemy"
 import { ShroomNPC } from "./types/ShroomNPC"
+import { SpookyVisitor } from "./types/SpookyVisitor"
 import { Villager } from "./types/Villager"
 import { ShieldType } from "./weapons/ShieldType"
 import { WeaponType } from "./weapons/WeaponType"
@@ -63,6 +64,7 @@ export enum DudeType {
     SWAMP_THING,
     DOCTOR,
     BLACKSMITH,
+    SPOOKY_VISITOR,
 }
 
 const DEFAULT_COLLIDER_SIZE = new Point(10, 8)
@@ -238,6 +240,13 @@ export class DudeFactory {
                 // dialogue = DOCTOR_DIALOGUE_ENTRYPOINT
                 additionalComponents = [new NPC(), new Villager()]
                 nameGen = () => peopleNames.generate("<blacksmith>")
+                break
+            }
+            case DudeType.SPOOKY_VISITOR: {
+                animationName = "necromancer"
+                speed *= 0.3
+                additionalComponents = [new NPC(), new SpookyVisitor()]
+                maxHealth = Number.MAX_SAFE_INTEGER
                 break
             }
             case DudeType.CENTAUR: {
