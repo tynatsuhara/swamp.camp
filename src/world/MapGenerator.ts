@@ -291,7 +291,7 @@ export class MapGenerator {
         return [grid, str, topLedges / bottomLedges, sideLedges / bottomLedges]
     }
 
-    placeWater(coastNoise: Grid<boolean>) {
+    private placeWater(coastNoise: Grid<boolean>) {
         coastNoise.entries().forEach(([pt]) => {
             this.location.setGroundElement(GroundType.WATER, pt)
         })
@@ -327,6 +327,39 @@ export class MapGenerator {
             this.location.setGroundElement(GroundType.WATER, pt)
         })
         return pts.length
+    }
+
+    addRiver(location: Location) {
+        location.getGroundSpots().filter((pt) => !location.isOccupied(pt))
+
+        const start = new Point(30, 30)
+        const end = new Point(-30, -30)
+
+        const adjacentLevels = (pt: Point) => {
+            const adjacent = [pt.plusX(1), pt.plusX(-1), pt.plusY(1), pt.plusY(-1)]
+            return adjacent.map((pt) => location.levels.get(pt))
+        }
+
+        const river = location.findPath(
+            start,
+            end,
+            (pt, goal) => pt.distanceTo(goal),
+            (pt) => {
+                const level = location.levels.get(pt)
+                // for waterfalls to not happen on corners, at least 3 adjacent squares need to be the same level
+                return adjacentLevels(pt).filter((l) => l === level).length < 3
+            }
+        )
+
+        river.forEach((pt) => {
+            const level = location.levels.get(pt)
+            location.setGroundElement(
+                adjacentLevels(pt).filter((l) => l < level).length === 1
+                    ? GroundType.WATERFALL
+                    : GroundType.WATER,
+                pt
+            )
+        })
     }
 
     /**
@@ -397,3 +430,7 @@ export class MapGenerator {
 window["levelNoise"] = (...args: any) => console.log(MapGenerator.levelNoise(...args)[1])
 window["waterNoise"] = (...args: any) => console.log(MapGenerator.waterNoise(...args)[1])
 window["coastNoise"] = (...args: any) => console.log(MapGenerator.coastNoise(...args)[1])
+
+window["river"] = () => {
+    MapGenerator.instance.addRiver(LocationManager.instance.currentLocation)
+}
