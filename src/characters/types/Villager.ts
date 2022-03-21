@@ -43,6 +43,8 @@ export class Villager extends Component {
 
         if (dude.type === DudeType.DIP) {
             npc.setSchedule(NPCSchedules.newGoToSchedule(new Point(0, 0)))
+        } else if (dude.type === DudeType.SPOOKY_VISITOR) {
+            npc.setSchedule(NPCSchedules.newFreeRoamSchedule())
         } else if (dude.type !== DudeType.HERALD) {
             npc.setSchedule(NPCSchedules.newDefaultVillagerSchedule())
         }

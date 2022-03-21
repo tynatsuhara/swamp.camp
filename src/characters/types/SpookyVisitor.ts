@@ -4,23 +4,26 @@ import { Point } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util/Lists"
 import { Particles } from "../../graphics/Particles"
 import { Color } from "../../ui/Color"
-import { NPCSchedules } from "../ai/NPCSchedule"
 import { Dude } from "../Dude"
 import { NPC } from "../NPC"
 
 export class SpookyVisitor extends Component {
+    private npc: NPC
     private dude: Dude
     private position: Point
 
     start(startData: StartData) {
-        const npc = this.entity.getComponent(NPC)
-        npc.setSchedule(NPCSchedules.newNoOpSchedule())
+        this.npc = this.entity.getComponent(NPC)
         this.dude = this.entity.getComponent(Dude)
         emitAppiritionParticles(this.dude.standingPosition)
     }
 
     update(updateData: UpdateData) {
         this.position = this.dude.standingPosition
+
+        if (this.npc.enemiesPresent) {
+            this.entity.selfDestruct()
+        }
     }
 
     delete() {

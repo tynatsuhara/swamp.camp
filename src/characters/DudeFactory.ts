@@ -245,7 +245,7 @@ export class DudeFactory {
             case DudeType.SPOOKY_VISITOR: {
                 animationName = "necromancer"
                 speed *= 0.3
-                additionalComponents = [new NPC(), new SpookyVisitor()]
+                additionalComponents = [new NPC(), new Villager(), new SpookyVisitor()]
                 maxHealth = Number.MAX_SAFE_INTEGER
                 break
             }

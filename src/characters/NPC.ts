@@ -33,7 +33,7 @@ export class NPC extends Simulatable {
     pathIsOccupied: (pt: Point) => boolean = () => false
 
     findTargetRange = TILE_SIZE * 10
-    private enemiesPresent = false
+    enemiesPresent = false
     get timeOfDay() {
         return WorldTime.instance.time % TimeUnit.DAY
     }
