@@ -65,6 +65,7 @@ export enum DudeType {
     DOCTOR,
     BLACKSMITH,
     SPOOKY_VISITOR,
+    GNOLL_SCOUT,
 }
 
 const DEFAULT_COLLIDER_SIZE = new Point(10, 8)
@@ -306,6 +307,14 @@ export class DudeFactory {
                 additionalComponents = [new NPC(), new Enemy(), new AquaticNPC()]
                 maxHealth = 2
                 speed *= 0.55
+                break
+            case DudeType.GNOLL_SCOUT:
+                factions = [DudeFaction.GNOLLS, DudeFaction.WOLVES, DudeFaction.VILLAGERS]
+                animationName = "GnollScout"
+                weapon = WeaponType.UNARMED
+                additionalComponents = [new NPC()]
+                maxHealth = 2
+                speed *= 0.8
                 break
             default: {
                 throw new Error(`DudeType ${type} can't be instantiated`)
