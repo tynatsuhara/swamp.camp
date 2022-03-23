@@ -25,17 +25,16 @@ type ChurchData = {
 
 export class ChurchFactory extends BuildingFactory {
     readonly type = ElementType.CHURCH
-    readonly dimensions = new Point(5, 5)
+    readonly dimensions = new Point(5, 4)
 
     make(wl: Location, pos: Point, data: ChurchData): ElementComponent {
         const e = new Entity()
-        const width = this.dimensions.x
-        const height = this.dimensions.y
 
         // the interior location UUID
         const interiorUUID: string = data.interiorUUID ?? makeChurchInterior(wl).uuid
 
-        const interactablePos = pos.plus(new Point(width / 2, height)).times(TILE_SIZE)
+        const spriteTilePos = pos.plus(new Point(1, -2))
+        const interactablePos = spriteTilePos.plus(new Point(1.5, 5)).times(TILE_SIZE)
         const doorId = TeleporterPrefix.DOOR
 
         // TODO: Can we combine this with the interactable step below?
@@ -45,14 +44,14 @@ export class ChurchFactory extends BuildingFactory {
             id: doorId,
         })
 
-        const basePos = pos.plusX(1) // accounting for 1 tile of space on sides
-        const depth = (pos.y + height) * TILE_SIZE
+        // basePos accounts for 1 tile of space on sides and the roof
+        const depth = (spriteTilePos.y + 5) * TILE_SIZE
 
         // Set up sprite
         e.addComponent(
             Tilesets.instance.largeSprites.getTileSource("church").toComponent(
                 SpriteTransform.new({
-                    position: basePos.times(TILE_SIZE),
+                    position: spriteTilePos.times(TILE_SIZE),
                     depth,
                 })
             )
@@ -62,7 +61,7 @@ export class ChurchFactory extends BuildingFactory {
         e.addComponent(
             new NavMeshCollider(
                 wl,
-                basePos.plusY(3).times(TILE_SIZE),
+                spriteTilePos.plusY(3).times(TILE_SIZE),
                 new Point(TILE_SIZE * 3, TILE_SIZE * 2)
             )
         )

@@ -23,17 +23,19 @@ type ChurchData = {
 
 export class ApothecaryFactory extends BuildingFactory {
     readonly type = ElementType.APOTHECARY
-    readonly dimensions = new Point(5, 5)
+    readonly dimensions = new Point(5, 4)
 
     make(wl: Location, pos: Point, data: ChurchData): ElementComponent {
         const e = new Entity()
-        const width = this.dimensions.x
-        const height = this.dimensions.y
+        const width = 3
+        const height = 2
 
         // the interior location UUID
         const interiorUUID: string = data.interiorUUID ?? makeApothecaryInterior(wl).uuid
 
-        const interactablePos = pos.plus(new Point(width / 2, height)).times(TILE_SIZE)
+        // spriteTilePos accounts for 1 tile of space on sides and the roof
+        const spriteTilePos = pos.plusX(1).plusY(-2)
+        const interactablePos = spriteTilePos.plus(new Point(1, 5)).times(TILE_SIZE).plusX(-1)
         const doorId = TeleporterPrefix.DOOR
 
         // TODO: Can we combine this with the interactable step below?
@@ -43,14 +45,13 @@ export class ApothecaryFactory extends BuildingFactory {
             id: doorId,
         })
 
-        const basePos = pos.plusX(1) // accounting for 1 tile of space on sides
-        const depth = (pos.y + height) * TILE_SIZE
+        const depth = (spriteTilePos.y + 5) * TILE_SIZE
 
         // Set up sprite
         e.addComponent(
-            Tilesets.instance.largeSprites.getTileSource("church").toComponent(
+            Tilesets.instance.largeSprites.getTileSource("apothecary").toComponent(
                 SpriteTransform.new({
-                    position: basePos.times(TILE_SIZE),
+                    position: spriteTilePos.times(TILE_SIZE),
                     depth,
                 })
             )
@@ -60,7 +61,7 @@ export class ApothecaryFactory extends BuildingFactory {
         e.addComponent(
             new NavMeshCollider(
                 wl,
-                basePos.plusY(3).times(TILE_SIZE),
+                spriteTilePos.plusY(3).times(TILE_SIZE),
                 new Point(TILE_SIZE * 3, TILE_SIZE * 2)
             )
         )
@@ -94,6 +95,8 @@ export class ApothecaryFactory extends BuildingFactory {
         return e.addComponent(new ElementComponent(this.type, pos, save))
     }
 }
+
+// TODO below
 
 const makeApothecaryInterior = (outside: Location): Location => {
     const l = new Location(LocationType.APOTHECARY_INTERIOR, true, false)

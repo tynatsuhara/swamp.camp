@@ -6,7 +6,6 @@ import { DudeType } from "../../characters/DudeFactory"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/Elements"
-import { ElementUtils } from "../elements/ElementUtils"
 import { Interactable } from "../elements/Interactable"
 import { NavMeshCollider } from "../elements/NavMeshCollider"
 import { GroundType } from "../ground/Ground"
@@ -103,10 +102,6 @@ export class HouseFactory extends BuildingFactory {
         })
 
         return e.addComponent(new ElementComponent(this.type, pos, save))
-    }
-
-    getOccupiedPoints(pos: Point) {
-        return ElementUtils.rectPoints(pos.plus(new Point(1, 1)), new Point(3, 2))
     }
 }
 
