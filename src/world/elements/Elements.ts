@@ -16,7 +16,7 @@ import { QueequegFactory } from "./Queequeg"
 import { RockFactory } from "./Rock"
 import { TreeFactory } from "./Tree"
 
-// Elements are things which take up multiple squares in the non-ground ground
+// Elements are things which take up 1+ squares on top of the ground
 export enum ElementType {
     TREE_ROUND,
     TREE_POINTY,
@@ -39,39 +39,49 @@ export enum ElementType {
 
 window["ElementType"] = ElementType
 
-export class SavedElement {
-    pos: string
-    type: ElementType
-    obj: object
-}
+const ELEMENT_FACTORIES = [
+    new TreeFactory(ElementType.TREE_ROUND),
+    new TreeFactory(ElementType.TREE_POINTY),
+    new RockFactory(),
+    new CampfireFactory(),
+    new TeleporterIndicatorFactory(),
+    new MushroomFactory(),
+    new ChestFactory(),
+    new BedFactory(),
+    new TentFactory(),
+    new HouseFactory(),
+    new ChurchFactory(),
+    new MineEntranceFactory(),
+    new MineExitFactory(),
+    new FurnitureFactory(ElementType.BENCH, "bench"),
+    new FurnitureFactory(ElementType.PODIUM, "podium"),
+    new QueequegFactory(),
+    new ApothecaryFactory(),
+]
 
 export class Elements {
     static get instance() {
         return Singletons.getOrCreate(Elements)
     }
 
-    // TODO: Convert to array then invert, since the key and factory type fields are redundant
-    private readonly ELEMENT_FACTORIES: { [key: number]: ElementFactory } = {
-        [ElementType.TREE_ROUND]: new TreeFactory(ElementType.TREE_ROUND),
-        [ElementType.TREE_POINTY]: new TreeFactory(ElementType.TREE_POINTY),
-        [ElementType.ROCK]: new RockFactory(),
-        [ElementType.CAMPFIRE]: new CampfireFactory(),
-        [ElementType.TELEPORTER_INDICATOR]: new TeleporterIndicatorFactory(),
-        [ElementType.MUSHROOM]: new MushroomFactory(),
-        [ElementType.CHEST]: new ChestFactory(),
-        [ElementType.BED]: new BedFactory(),
-        [ElementType.TENT]: new TentFactory(),
-        [ElementType.HOUSE]: new HouseFactory(),
-        [ElementType.CHURCH]: new ChurchFactory(),
-        [ElementType.MINE_ENTRANCE]: new MineEntranceFactory(),
-        [ElementType.MINE_EXIT]: new MineExitFactory(),
-        [ElementType.BENCH]: new FurnitureFactory(ElementType.BENCH, "bench"),
-        [ElementType.PODIUM]: new FurnitureFactory(ElementType.PODIUM, "podium"),
-        [ElementType.QUEEQUEG]: new QueequegFactory(),
-        [ElementType.APOTHECARY]: new ApothecaryFactory(),
+    private readonly factories: { [key: number]: ElementFactory } = {}
+
+    constructor() {
+        ELEMENT_FACTORIES.forEach((f) => {
+            if (this.factories[f.type]) {
+                throw new Error("duplicate element factory!!!!!")
+            }
+            this.factories[f.type] = f
+        })
     }
 
     getElementFactory(type: ElementType) {
-        return this.ELEMENT_FACTORIES[type]
+        return this.factories[type]
     }
+}
+
+export class SavedElement {
+    pos: string
+    type: ElementType
+    obj: object
 }
