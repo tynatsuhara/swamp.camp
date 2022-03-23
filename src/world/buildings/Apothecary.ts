@@ -1,4 +1,3 @@
-import { BoxCollider } from "brigsby/dist/collision/BoxCollider"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
@@ -6,8 +5,8 @@ import { DudeType } from "../../characters/DudeFactory"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/Elements"
-import { ElementUtils } from "../elements/ElementUtils"
 import { Interactable } from "../elements/Interactable"
+import { NavMeshCollider } from "../elements/NavMeshCollider"
 import { Location } from "../Location"
 import { LocationManager, LocationType } from "../LocationManager"
 import { SingleTypeResidence } from "../residences/SingleTypeResidence"
@@ -59,7 +58,8 @@ export class ApothecaryFactory extends BuildingFactory {
 
         // Set up collider
         e.addComponent(
-            new BoxCollider(
+            new NavMeshCollider(
+                wl,
                 basePos.plusY(3).times(TILE_SIZE),
                 new Point(TILE_SIZE * 3, TILE_SIZE * 2)
             )
@@ -91,13 +91,7 @@ export class ApothecaryFactory extends BuildingFactory {
             bishops: bishopsRez.getResidents(),
         })
 
-        return e.addComponent(
-            new ElementComponent(this.type, pos, this.getOccupiedPoints(pos), save)
-        )
-    }
-
-    getOccupiedPoints(pos: Point) {
-        return ElementUtils.rectPoints(pos.plus(new Point(1, 3)), new Point(3, 2))
+        return e.addComponent(new ElementComponent(this.type, pos, save))
     }
 }
 

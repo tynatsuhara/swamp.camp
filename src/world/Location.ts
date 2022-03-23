@@ -127,11 +127,8 @@ export class Location {
         }
 
         // stake the element's claim for the land
-        elementPts.forEach((pt) => this.elements.set(pt, el))
-
-        // mark points as occupied for pathfinding, etc
-        el.occupiedPoints.forEach((pt) => {
-            this.occupied.set(pt, true)
+        elementPts.forEach((pt) => {
+            this.elements.set(pt, el)
             // reset the ground in order to handle things like flattening tall grass
             const groundData = this.ground.get(pt)
             if (groundData) {
@@ -181,6 +178,7 @@ export class Location {
         if (occupied) {
             this.occupied.set(pos, true)
         } else {
+            this.occupied.remove(pos)
         }
     }
 

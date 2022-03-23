@@ -69,7 +69,7 @@ export class TeleporterIndicatorFactory extends ElementFactory<TeleporterIndicat
         )
 
         return e.addComponent(
-            new ElementComponent(ElementType.TELEPORTER_INDICATOR, pos, [pos], () => data)
+            new ElementComponent(ElementType.TELEPORTER_INDICATOR, pos, () => data)
         )
     }
 }

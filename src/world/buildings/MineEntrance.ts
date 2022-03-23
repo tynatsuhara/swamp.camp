@@ -1,4 +1,3 @@
-import { BoxCollider } from "brigsby/dist/collision/BoxCollider"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
@@ -8,6 +7,7 @@ import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/Elements"
 import { ElementUtils } from "../elements/ElementUtils"
 import { Interactable } from "../elements/Interactable"
+import { NavMeshCollider } from "../elements/NavMeshCollider"
 import { GroundType } from "../ground/Ground"
 import { GroundRenderer } from "../GroundRenderer"
 import { Location } from "../Location"
@@ -42,7 +42,8 @@ export class MineEntranceFactory extends BuildingFactory {
         // Set up collider
         const colliderSize = new Point(14, 12)
         e.addComponent(
-            new BoxCollider(
+            new NavMeshCollider(
+                wl,
                 pixelPt.plus(new Point(TILE_SIZE / 2, TILE_SIZE / 2)).minus(colliderSize.div(2)),
                 colliderSize
             )
@@ -65,19 +66,10 @@ export class MineEntranceFactory extends BuildingFactory {
         )
 
         return e.addComponent(
-            new ElementComponent(
-                ElementType.MINE_ENTRANCE,
-                pos,
-                this.getOccupiedPoints(pos),
-                () => ({
-                    destinationUUID,
-                })
-            )
+            new ElementComponent(ElementType.MINE_ENTRANCE, pos, () => ({
+                destinationUUID,
+            }))
         )
-    }
-
-    getOccupiedPoints(pos: Point) {
-        return [pos]
     }
 
     canPlaceInLocation(wl: Location) {

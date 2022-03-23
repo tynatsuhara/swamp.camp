@@ -76,12 +76,6 @@ export class TreeFactory extends ElementFactory {
 
         tiles.forEach((t) => (t.transform.mirrorX = Math.random() > 0.5))
 
-        // const hitboxDims = new Point(8, 3)
-        // e.addComponent(new BoxCollider(
-        //     pos.plus(new Point(.5, 2)).times(TILE_SIZE).minus(new Point(hitboxDims.x/2, hitboxDims.y)).plus(randomOffset),
-        //     hitboxDims
-        // ))
-
         const saplingType =
             this.type === ElementType.TREE_ROUND ? Item.ROUND_SAPLING : Item.POINTY_SAPLING
 
@@ -132,7 +126,7 @@ export class TreeFactory extends ElementFactory {
         )
 
         return e.addComponent(
-            new ElementComponent(this.type, pos, [], () => {
+            new ElementComponent(this.type, pos, () => {
                 return {
                     [NEXT_GROWTH_TIME]: nextGrowthTime,
                     [SIZE]: size,

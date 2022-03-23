@@ -1,4 +1,3 @@
-import { BoxCollider } from "brigsby/dist/collision/BoxCollider"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { NineSlice } from "brigsby/dist/sprites/NineSlice"
@@ -7,8 +6,8 @@ import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/Elements"
-import { ElementUtils } from "../elements/ElementUtils"
 import { Interactable } from "../elements/Interactable"
+import { NavMeshCollider } from "../elements/NavMeshCollider"
 import { GroundType } from "../ground/Ground"
 import { Location } from "../Location"
 import { LocationManager, LocationType } from "../LocationManager"
@@ -48,7 +47,8 @@ export class TentFactory extends BuildingFactory {
         addTile(e, `${color}tentSW`, pos.plus(new Point(1, 1)), depth)
         addTile(e, `${color}tentSE`, pos.plus(new Point(2, 1)), depth)
         e.addComponent(
-            new BoxCollider(
+            new NavMeshCollider(
+                wl,
                 pos.plus(new Point(1, 1)).times(TILE_SIZE),
                 new Point(TILE_SIZE * 2, TILE_SIZE)
             )
@@ -64,14 +64,10 @@ export class TentFactory extends BuildingFactory {
         )
 
         return e.addComponent(
-            new ElementComponent(ElementType.TENT, pos, this.getOccupiedPoints(pos), () => {
+            new ElementComponent(ElementType.TENT, pos, () => {
                 return { destinationUUID, color }
             })
         )
-    }
-
-    getOccupiedPoints(pos: Point) {
-        return ElementUtils.rectPoints(pos.plus(new Point(1, 1)), new Point(2, 1))
     }
 }
 

@@ -1,5 +1,6 @@
 import { Point } from "brigsby/dist/Point"
 import { ElementFactory } from "../elements/ElementFactory"
+import { ElementUtils } from "../elements/ElementUtils"
 import { Ground } from "../ground/Ground"
 import { Location } from "../Location"
 
@@ -15,13 +16,8 @@ import { Location } from "../Location"
  */
 export abstract class BuildingFactory extends ElementFactory {
     canPlaceAtPos(wl: Location, pos: Point) {
-        return this.getOccupiedPoints(pos)
+        return ElementUtils.rectPoints(pos, this.dimensions)
             .map((pt) => wl.getGround(pt)?.type)
             .every((type) => Ground.isNaturalGround(type))
     }
-
-    /**
-     * returns the points occupied by the building given a global tile position
-     */
-    abstract getOccupiedPoints(pos: Point): Point[]
 }

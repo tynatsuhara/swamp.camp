@@ -81,7 +81,7 @@ export const DIP_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
         if (campfires.length > 0) {
             // campfire has been placed
             const lines = [
-                dipTent.occupiedPoints[0].distanceTo(campfires[0].occupiedPoints[0]) < 5
+                dipTent.pos.distanceTo(campfires[0].pos) < 5
                     ? "That should keep us warm tonight!"
                     : "Well, the fire is a bit far from my tent, but that's okay!",
                 "It's important to keep your camp well-lit out here. There's no telling what danger lurks in the darkness...",

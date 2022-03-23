@@ -73,7 +73,7 @@ export class MushroomFactory extends ElementFactory {
         )
 
         return e.addComponent(
-            new ElementComponent(this.type, pos, [pos], () => ({
+            new ElementComponent(this.type, pos, () => ({
                 [NEXT_GROWTH_TIME]: nextGrowthTime,
             }))
         )

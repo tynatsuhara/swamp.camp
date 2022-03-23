@@ -1,5 +1,4 @@
 import { assets } from "brigsby/dist/Assets"
-import { BoxCollider } from "brigsby/dist/collision/BoxCollider"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
@@ -17,6 +16,7 @@ import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
 import { HittableResource } from "./HittableResource"
+import { NavMeshCollider } from "./NavMeshCollider"
 
 const MINING_AUDIO = Lists.range(0, 5).map((n) => `audio/impact/impactMining_00${n}.ogg`)
 const MINING_AUDIO_VOLUME = 0.4
@@ -51,7 +51,8 @@ export class RockFactory extends ElementFactory {
 
         const hitboxDims = new Point(12, 4)
         e.addComponent(
-            new BoxCollider(
+            new NavMeshCollider(
+                wl,
                 pos
                     .plus(new Point(0.5, 1))
                     .times(TILE_SIZE)
@@ -78,7 +79,7 @@ export class RockFactory extends ElementFactory {
         )
 
         return e.addComponent(
-            new ElementComponent(ElementType.ROCK, pos, [pos], () => {
+            new ElementComponent(ElementType.ROCK, pos, () => {
                 return {
                     v: variation,
                     m: mossy,

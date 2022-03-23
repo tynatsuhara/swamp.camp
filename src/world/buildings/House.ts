@@ -1,4 +1,3 @@
-import { BoxCollider } from "brigsby/dist/collision/BoxCollider"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
@@ -9,6 +8,7 @@ import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/Elements"
 import { ElementUtils } from "../elements/ElementUtils"
 import { Interactable } from "../elements/Interactable"
+import { NavMeshCollider } from "../elements/NavMeshCollider"
 import { GroundType } from "../ground/Ground"
 import { Location } from "../Location"
 import { LocationManager, LocationType } from "../LocationManager"
@@ -77,7 +77,8 @@ export class HouseFactory extends BuildingFactory {
         }
 
         e.addComponent(
-            new BoxCollider(
+            new NavMeshCollider(
+                wl,
                 basePos.plus(new Point(0, 1)).times(TILE_SIZE),
                 new Point(TILE_SIZE * 3, TILE_SIZE * 2)
             )
@@ -101,9 +102,7 @@ export class HouseFactory extends BuildingFactory {
             residents: residence.getResidents(),
         })
 
-        return e.addComponent(
-            new ElementComponent(this.type, pos, this.getOccupiedPoints(pos), save)
-        )
+        return e.addComponent(new ElementComponent(this.type, pos, save))
     }
 
     getOccupiedPoints(pos: Point) {

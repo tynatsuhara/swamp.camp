@@ -1,4 +1,3 @@
-import { BoxCollider } from "brigsby/dist/collision/BoxCollider"
 import { Component } from "brigsby/dist/Component"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
@@ -23,6 +22,7 @@ import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
 import { Interactable } from "./Interactable"
+import { NavMeshCollider } from "./NavMeshCollider"
 
 export class BedFactory extends ElementFactory {
     readonly type = ElementType.BED
@@ -41,7 +41,7 @@ export class BedFactory extends ElementFactory {
             )
         )
 
-        e.addComponent(new BoxCollider(scaledPos, new Point(TILE_SIZE, TILE_SIZE)))
+        e.addComponent(new NavMeshCollider(wl, scaledPos, new Point(TILE_SIZE, TILE_SIZE)))
 
         const bed = e.addComponent(new Bed())
 
@@ -62,7 +62,7 @@ export class BedFactory extends ElementFactory {
         )
 
         return e.addComponent(
-            new ElementComponent(ElementType.BED, pos, [pos], () => {
+            new ElementComponent(ElementType.BED, pos, () => {
                 return {}
             })
         )

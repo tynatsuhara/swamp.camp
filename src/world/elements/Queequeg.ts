@@ -17,7 +17,6 @@ import { Simulatable } from "../Simulatable"
 import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
-import { ElementUtils } from "./ElementUtils"
 
 type QueequegData = {
     docked: boolean
@@ -50,14 +49,7 @@ export class QueequegFactory extends ElementFactory {
 
         // TODO: Add a teleporter to get on top of the ship?
 
-        return e.addComponent(
-            new ElementComponent(
-                this.type,
-                pos,
-                ElementUtils.rectPoints(pos, this.dimensions),
-                ship.save
-            )
-        )
+        return e.addComponent(new ElementComponent(this.type, pos, ship.save))
     }
 }
 

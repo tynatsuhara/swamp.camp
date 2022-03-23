@@ -1,4 +1,3 @@
-import { BoxCollider } from "brigsby/dist/collision/BoxCollider"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
@@ -10,6 +9,7 @@ import { Breakable } from "./Breakable"
 import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
+import { NavMeshCollider } from "./NavMeshCollider"
 
 export class FurnitureFactory extends ElementFactory {
     readonly type: ElementType
@@ -38,7 +38,7 @@ export class FurnitureFactory extends ElementFactory {
             )
         )
 
-        e.addComponent(new BoxCollider(pixelPos.plusX(2).plusY(12), new Point(12, 3)))
+        e.addComponent(new NavMeshCollider(wl, pixelPos.plusX(2).plusY(12), new Point(12, 3)))
 
         if (wl.allowPlacing) {
             e.addComponent(
@@ -48,6 +48,6 @@ export class FurnitureFactory extends ElementFactory {
             )
         }
 
-        return e.addComponent(new ElementComponent(this.type, pos, [pos], () => data))
+        return e.addComponent(new ElementComponent(this.type, pos, () => data))
     }
 }

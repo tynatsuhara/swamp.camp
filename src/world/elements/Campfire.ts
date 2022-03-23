@@ -22,6 +22,7 @@ import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
 import { Interactable } from "./Interactable"
+import { NavMeshObstacle } from "./NavMeshObstacle"
 
 export class CampfireFactory extends ElementFactory {
     readonly type = ElementType.CAMPFIRE
@@ -53,13 +54,7 @@ export class CampfireFactory extends ElementFactory {
             )
         )
 
-        // const colliderOffset = new Point(0, 2)
-        // e.addComponent(
-        //     new BoxCollider(
-        //         scaledPos.plus(colliderOffset),
-        //         new Point(TILE_SIZE, TILE_SIZE).minus(colliderOffset)
-        //     )
-        // )
+        e.addComponent(new NavMeshObstacle(wl, pos))
 
         const fire = e.addComponent(
             new FireParticles(1, () =>
@@ -121,7 +116,7 @@ export class CampfireFactory extends ElementFactory {
         )
 
         return e.addComponent(
-            new ElementComponent(ElementType.CAMPFIRE, pos, [pos], () => {
+            new ElementComponent(ElementType.CAMPFIRE, pos, () => {
                 return { logs: cf.logs, llct: cf.lastLogConsumedTime }
             })
         )

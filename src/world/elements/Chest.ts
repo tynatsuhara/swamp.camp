@@ -1,4 +1,3 @@
-import { BoxCollider } from "brigsby/dist/collision/BoxCollider"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { AnimatedSpriteComponent } from "brigsby/dist/sprites/AnimatedSpriteComponent"
@@ -12,6 +11,7 @@ import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
 import { Interactable } from "./Interactable"
+import { NavMeshCollider } from "./NavMeshCollider"
 
 const INVENTORY = "i"
 
@@ -67,12 +67,16 @@ export class ChestFactory extends ElementFactory {
             new Point(0, -17)
         )
 
-        const collider = new BoxCollider(pos.times(TILE_SIZE).plusY(9), new Point(TILE_SIZE, 7))
+        const collider = new NavMeshCollider(
+            wl,
+            pos.times(TILE_SIZE).plusY(9),
+            new Point(TILE_SIZE, 7)
+        )
 
         const e = new Entity([animator, interactable, collider])
 
         return e.addComponent(
-            new ElementComponent(this.type, pos, [pos], () => ({
+            new ElementComponent(this.type, pos, () => ({
                 [INVENTORY]: inventory.save(),
             }))
         )
