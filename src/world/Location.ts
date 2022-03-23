@@ -37,7 +37,7 @@ export class Location {
     // (entities spawning multiple tiles eg a tent)
     // BUT an entity should only be in one of these data structures
     private readonly elements = new Grid<ElementComponent>()
-    private readonly occupied = new Grid<ElementComponent>()
+    private readonly occupied = new Grid<boolean>()
     private readonly ground = new Grid<GroundComponent>()
     readonly levels = new Grid<number>()
 
@@ -131,7 +131,7 @@ export class Location {
 
         // mark points as occupied for pathfinding, etc
         el.occupiedPoints.forEach((pt) => {
-            this.occupied.set(pt, el)
+            this.occupied.set(pt, true)
             // reset the ground in order to handle things like flattening tall grass
             const groundData = this.ground.get(pt)
             if (groundData) {
@@ -177,6 +177,13 @@ export class Location {
         return !!this.occupied.get(pos)
     }
 
+    setOccupied(pos: Point, occupied: boolean) {
+        if (occupied) {
+            this.occupied.set(pos, true)
+        } else {
+        }
+    }
+
     getOccupiedSpots() {
         return this.occupied.keys()
     }
@@ -187,7 +194,10 @@ export class Location {
 
     removeElement(el: ElementComponent) {
         this.elements.removeAll(el)
-        this.occupied.removeAll(el)
+        ElementUtils.rectPoints(
+            el.pos,
+            Elements.instance.getElementFactory(el.type).dimensions
+        ).forEach((pos) => this.setOccupied(pos, false))
 
         if (!this.isInterior) {
             HUD.instance.miniMap.refresh()
