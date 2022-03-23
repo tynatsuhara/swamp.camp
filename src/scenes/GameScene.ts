@@ -6,6 +6,7 @@ import { Point } from "brigsby/dist/Point"
 import { BasicRenderComponent } from "brigsby/dist/renderer/BasicRenderComponent"
 import { EllipseRender } from "brigsby/dist/renderer/EllipseRender"
 import { LineRender } from "brigsby/dist/renderer/LineRender"
+import { RectRender } from "brigsby/dist/renderer/RectRender"
 import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
 import { Dude } from "../characters/Dude"
 import { DudeFactory, DudeType } from "../characters/DudeFactory"
@@ -175,11 +176,11 @@ export class GameScene {
             const pts = LocationManager.instance.currentLocation.getOccupiedSpots()
             const renders = pts.map(
                 (pt) =>
-                    new EllipseRender({
+                    new RectRender({
                         depth: Number.MAX_SAFE_INTEGER,
-                        position: pt.times(TILE_SIZE).plus(new Point(2, 2)),
-                        dimensions: new Point(12, 12),
-                        color: "#0000FF",
+                        position: pt.times(TILE_SIZE),
+                        dimensions: new Point(TILE_SIZE, TILE_SIZE),
+                        color: "#0000FF7E",
                     })
             )
 
