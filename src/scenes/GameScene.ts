@@ -26,6 +26,7 @@ import { Singletons } from "../Singletons"
 import { ButtonsMenu } from "../ui/ButtonsMenu"
 import { Color } from "../ui/Color"
 import { UIStateManager } from "../ui/UIStateManager"
+import { Elements } from "../world/elements/Elements"
 import { EventQueue } from "../world/events/EventQueue"
 import { QueuedEventType } from "../world/events/QueuedEvent"
 import { GroundRenderer } from "../world/GroundRenderer"
@@ -181,6 +182,22 @@ export class GameScene {
                         position: pt.times(TILE_SIZE),
                         dimensions: new Point(TILE_SIZE, TILE_SIZE),
                         color: "#0000FF7E",
+                    })
+            )
+
+            e.addComponent(new BasicRenderComponent(...renders))
+        }
+
+        if (debug.showElementGrid) {
+            const renders = LocationManager.instance.currentLocation.getElements().map(
+                (el) =>
+                    new RectRender({
+                        depth: Number.MAX_SAFE_INTEGER,
+                        position: el.pos.times(TILE_SIZE),
+                        dimensions: Elements.instance
+                            .getElementFactory(el.type)
+                            .dimensions.times(TILE_SIZE),
+                        color: "#A000A07E",
                     })
             )
 

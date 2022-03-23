@@ -192,6 +192,7 @@ debug.showPathfinding = debug.showPathfinding || false
 debug.showTeleporters = debug.showTeleporters || false
 debug.speedMultiplier = debug.speedMultiplier || 1
 debug.showNavMesh = debug.showNavMesh || false
+debug.showElementGrid = debug.showElementGrid || false
 
 const help = () => {
     let help = `dev controls (enable with debug.enableDevControls=true)
