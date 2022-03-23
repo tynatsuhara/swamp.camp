@@ -172,7 +172,7 @@ export class GameScene {
             e.addComponent(new BasicRenderComponent(...renders))
         }
 
-        if (debug.showOccupiedSpots) {
+        if (debug.showNavMesh) {
             const pts = LocationManager.instance.currentLocation.getOccupiedSpots()
             const renders = pts.map(
                 (pt) =>
