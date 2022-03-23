@@ -33,6 +33,7 @@ export class ChurchFactory extends BuildingFactory {
         // the interior location UUID
         const interiorUUID: string = data.interiorUUID ?? makeChurchInterior(wl).uuid
 
+        // spriteTilePos accounts for 1 tile of space on sides and the roof
         const spriteTilePos = pos.plus(new Point(1, -2))
         const interactablePos = spriteTilePos.plus(new Point(1.5, 5)).times(TILE_SIZE)
         const doorId = TeleporterPrefix.DOOR
@@ -44,7 +45,6 @@ export class ChurchFactory extends BuildingFactory {
             id: doorId,
         })
 
-        // basePos accounts for 1 tile of space on sides and the roof
         const depth = (spriteTilePos.y + 5) * TILE_SIZE
 
         // Set up sprite
