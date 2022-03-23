@@ -13,6 +13,7 @@ export enum LocationType {
     MINE_INTERIOR = "mine",
     HOUSE_INTERIOR = "house",
     CHUCH_INTERIOR = "church",
+    APOTHECARY_INTERIOR = "apothecary",
 }
 
 export class LocationManager {

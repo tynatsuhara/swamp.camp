@@ -1,4 +1,5 @@
 import { Singletons } from "../../Singletons"
+import { ApothecaryFactory } from "../buildings/Apothecary"
 import { ChurchFactory } from "../buildings/Church"
 import { HouseFactory } from "../buildings/House"
 import { MineEntranceFactory } from "../buildings/MineEntrance"
@@ -33,6 +34,7 @@ export enum ElementType {
     BENCH,
     PODIUM,
     QUEEQUEG,
+    APOTHECARY,
 }
 
 window["ElementType"] = ElementType
@@ -66,6 +68,7 @@ export class Elements {
         [ElementType.BENCH]: new FurnitureFactory(ElementType.BENCH, "bench"),
         [ElementType.PODIUM]: new FurnitureFactory(ElementType.PODIUM, "podium"),
         [ElementType.QUEEQUEG]: new QueequegFactory(),
+        [ElementType.APOTHECARY]: new ApothecaryFactory(),
     }
 
     getElementFactory(type: ElementType) {
