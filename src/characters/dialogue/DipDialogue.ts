@@ -65,7 +65,7 @@ export const DIP_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
         dialogue(
             [
                 "You know, this is a very dangerous place. It's tough to survive without someone watching your back.",
-                "How about I help you set up camp? I know these woods better than anyone.",
+                "How about I help you set up camp? I know this swamp better than anyone.",
                 "I'll put together a tent for you, if you collect rocks and wood for a campfire.",
             ],
             () => new NextDialogue(DIP_MAKE_CAMPFIRE, false)
