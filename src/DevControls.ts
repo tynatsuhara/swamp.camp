@@ -18,14 +18,15 @@ import { TimeUnit } from "./world/TimeUnit"
 import { WorldTime } from "./world/WorldTime"
 
 const SPAWNABLE_TYPES = [
+    DudeType.TRAVELING_MERCHANT,
     DudeType.GNOLL_SCOUT,
     DudeType.BLACKSMITH,
     DudeType.SPOOKY_VISITOR,
     DudeType.VILLAGER,
-    DudeType.SHROOM,
-    DudeType.NUN,
-    DudeType.CLERIC,
-    DudeType.BISHOP,
+    // DudeType.SHROOM,
+    // DudeType.NUN,
+    // DudeType.CLERIC,
+    // DudeType.BISHOP,
     DudeType.DOCTOR,
     DudeType.BEAR,
     DudeType.WOLF,

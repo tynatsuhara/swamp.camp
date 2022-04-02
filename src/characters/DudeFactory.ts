@@ -66,6 +66,7 @@ export enum DudeType {
     BLACKSMITH,
     SPOOKY_VISITOR,
     GNOLL_SCOUT,
+    TRAVELING_MERCHANT,
 }
 
 const DEFAULT_COLLIDER_SIZE = new Point(10, 8)
@@ -247,6 +248,13 @@ export class DudeFactory {
                 animationName = "necromancer"
                 speed *= 0.3
                 additionalComponents = [new NPC(), new Villager(), new SpookyVisitor()]
+                maxHealth = Number.MAX_SAFE_INTEGER
+                break
+            }
+            case DudeType.TRAVELING_MERCHANT: {
+                animationName = "Merchant"
+                speed *= 0.6
+                additionalComponents = [new NPC(), new Villager()]
                 maxHealth = Number.MAX_SAFE_INTEGER
                 break
             }
