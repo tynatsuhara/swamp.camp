@@ -17,6 +17,8 @@ export class Enemy extends Component {
         const dude = this.entity.getComponent(Dude)
         const npc = this.entity.getComponent(NPC)
 
+        this.start = () => npc.decideWhatToDo()
+
         npc.isEnemyFn = (d) =>
             // Default land enemy behavior is to attack anything that isn't in an overlapping faction
             (d.isEnemy(dude) && !d.factions.includes(DudeFaction.AQUATIC)) ||

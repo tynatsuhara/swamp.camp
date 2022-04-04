@@ -34,9 +34,6 @@ export class NPC extends Simulatable {
 
     findTargetRange = TILE_SIZE * 10
     enemiesPresent = false
-    get timeOfDay() {
-        return WorldTime.instance.time % TimeUnit.DAY
-    }
 
     private task: NPCTask
 
@@ -411,9 +408,9 @@ export class NPC extends Simulatable {
      * Called on a regular interval (every few seconds)
      * Updates cached tasks, attack targets, etc
      */
-    private decideWhatToDo() {
-        const foundEnemies = this.checkForEnemies()
-        if (!foundEnemies) {
+    decideWhatToDo() {
+        this.enemiesPresent = this.checkForEnemies()
+        if (!this.enemiesPresent) {
             this.task = this.getScheduledTask()
         }
     }
@@ -442,8 +439,7 @@ export class NPC extends Simulatable {
                         this.findTargetRange
                 )
 
-            this.enemiesPresent = enemies.length > 0
-            if (!this.enemiesPresent) {
+            if (enemies.length === 0) {
                 return false
             }
             if (!this.dude.weapon) {
