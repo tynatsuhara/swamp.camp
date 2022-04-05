@@ -51,7 +51,7 @@ export class NPC extends Simulatable {
     }
 
     start() {
-        this.dude.doWhileLiving(() => this.decideWhatToDo(), 1000 + 1000 * Math.random())
+        this.dude.doWhileLiving(() => this.decideWhatToDoNext(), 1000 + 1000 * Math.random())
     }
 
     update(updateData: UpdateData) {
@@ -87,6 +87,7 @@ export class NPC extends Simulatable {
                 this.doAttack(updateData)
             } else {
                 this.doRoam(updateData)
+                console.log("flee flee flee")
             }
         } else {
             this.doNormalScheduledActivity(updateData)
@@ -287,6 +288,7 @@ export class NPC extends Simulatable {
 
         if (!weapon || !this.attackTarget || !this.attackTarget.isAlive) {
             this.dude.move(updateData.elapsedTimeMillis, Point.ZERO)
+            this.decideWhatToDoNext()
             return
         }
 
@@ -408,7 +410,7 @@ export class NPC extends Simulatable {
      * Called on a regular interval (every few seconds)
      * Updates cached tasks, attack targets, etc
      */
-    decideWhatToDo() {
+    decideWhatToDoNext() {
         this.enemiesPresent = this.checkForEnemies()
         if (!this.enemiesPresent) {
             this.task = this.getScheduledTask()
@@ -427,7 +429,12 @@ export class NPC extends Simulatable {
             this.dude.lastAttacker.standingPosition.distanceTo(this.dude.standingPosition) <
                 this.findTargetRange
         ) {
+            console.log("just got attacked")
             target = this.dude.lastAttacker
+            if (!this.dude.weapon) {
+                // should flee instead
+                return true
+            }
         } else {
             let enemies = LocationManager.instance.currentLocation
                 .getDudes()
