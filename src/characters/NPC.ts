@@ -410,7 +410,7 @@ export class NPC extends Simulatable {
      * Called on a regular interval (every few seconds)
      * Updates cached tasks, attack targets, etc
      */
-    decideWhatToDoNext() {
+    private decideWhatToDoNext() {
         this.enemiesPresent = this.checkForEnemies()
         if (!this.enemiesPresent) {
             this.task = this.getScheduledTask()
