@@ -87,7 +87,6 @@ export class NPC extends Simulatable {
                 this.doAttack(updateData)
             } else {
                 this.doRoam(updateData)
-                console.log("flee flee flee")
             }
         } else {
             this.doNormalScheduledActivity(updateData)
