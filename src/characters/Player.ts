@@ -60,31 +60,13 @@ export class Player extends Component {
             return
         }
 
-        if (this.isOffMap()) {
-            this.timeOffMap += updateData.elapsedTimeMillis
-        } else {
-            this.timeOffMap = 0
-            this.offMapWarningShown = false
-        }
-
-        if (this.timeOffMap > 3_000 && !this.offMapWarningShown) {
-            TextOverlayManager.instance.open({
-                text: [
-                    this.isOffMap() === "ocean"
-                        ? "Venturing into the ocean without a ship is certain death. Turn back while you still can."
-                        : "Venturing deeper into the swamp alone is certain death. Turn back while you still can.",
-                ],
-                finishAction: "OKAY",
-                onFinish: () => (this.offMapWarningShown = true),
-                textAlign: TextAlign.CENTER,
-            })
-        } else if (this.timeOffMap > 10_000) {
-            this.dude.damage(Number.MAX_SAFE_INTEGER, {})
-        }
+        this.checkIsOffMap(updateData)
 
         // TODO: Should we remove auto-healing?
         this.dude.heal(updateData.elapsedTimeMillis / 6500)
         const possibleInteractable = this.updateInteractables(updateData)
+
+        // Determine player movement
 
         let dx = 0
         let dy = 0
@@ -133,6 +115,8 @@ export class Player extends Component {
             return
         }
 
+        // Check other user input
+
         if (!this.dude.jumping && controls.isJumpDown()) {
             this.dude.jump()
         } else if (!this.dude.rolling && controls.isRollDown() && (dx !== 0 || dy !== 0)) {
@@ -172,6 +156,29 @@ export class Player extends Component {
         const pos = this.dude.tile
         if (pos.x < -margin || pos.x > margin || pos.y < -margin || pos.y > margin) {
             return pos.x > margin - MapGenerator.COAST_OCEAN_WIDTH ? "ocean" : "swamp"
+        }
+    }
+
+    private checkIsOffMap(updateData: UpdateData) {
+        if (this.isOffMap()) {
+            this.timeOffMap += updateData.elapsedTimeMillis
+        } else {
+            this.timeOffMap = 0
+            this.offMapWarningShown = false
+        }
+        if (this.timeOffMap > 3_000 && !this.offMapWarningShown) {
+            TextOverlayManager.instance.open({
+                text: [
+                    this.isOffMap() === "ocean"
+                        ? "Venturing into the ocean without a ship is certain death. Turn back while you still can."
+                        : "Venturing deeper into the swamp alone is certain death. Turn back while you still can.",
+                ],
+                finishAction: "OKAY",
+                onFinish: () => (this.offMapWarningShown = true),
+                textAlign: TextAlign.CENTER,
+            })
+        } else if (this.timeOffMap > 10_000) {
+            this.dude.damage(Number.MAX_SAFE_INTEGER, {})
         }
     }
 
