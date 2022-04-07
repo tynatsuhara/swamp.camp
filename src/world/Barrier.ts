@@ -5,8 +5,6 @@ import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 
 export class Barrier extends Component {
-    // static PLAYER_ONLY = "player-only"
-
     private readonly position: Point
     private readonly dimensions: Point
     private readonly allow: String[]

@@ -10,8 +10,9 @@ import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
 import { TextAlign } from "../ui/Text"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Interactable } from "../world/elements/Interactable"
-import { camp } from "../world/LocationManager"
+import { camp, LocationManager } from "../world/LocationManager"
 import { MapGenerator } from "../world/MapGenerator"
+import { WorldTime } from "../world/WorldTime"
 import { Dude } from "./Dude"
 
 export class Player extends Component {
@@ -100,6 +101,10 @@ export class Player extends Component {
             speed -= 0.4
         }
 
+        if (dx !== 0 || dy !== 0) {
+            speed *= this.pushCheck()
+        }
+
         speed *= debug.speedMultiplier
 
         this._velocity = new Point(dx, dy)
@@ -158,6 +163,38 @@ export class Player extends Component {
             return pos.x > margin - MapGenerator.COAST_OCEAN_WIDTH ? "ocean" : "swamp"
         }
     }
+
+    /**
+     * @returns a speed multiplier
+     */
+    private pushCheck(): number {
+        const minDistanceToBePushed = 10
+        const dudesToPush = LocationManager.instance.currentLocation
+            .getDudes()
+            .filter(
+                (d) =>
+                    d !== this.dude &&
+                    d.standingPosition.distanceTo(this.dude.standingPosition) <
+                        minDistanceToBePushed
+            )
+
+        dudesToPush.forEach((d) =>
+            d.knockback(d.standingPosition.minus(this.dude.standingPosition), 10)
+        )
+
+        const now = WorldTime.instance.time
+        if (dudesToPush.length === 0 && this.pushingUntil < now) {
+            return 1
+        }
+
+        if (dudesToPush.length > 0) {
+            const pushingDuration = 100 // we need to cache this since they won't be colliding every frame
+            this.pushingUntil = Math.max(this.pushingUntil, now + pushingDuration)
+        }
+
+        return 0.45
+    }
+    private pushingUntil = 0
 
     private checkIsOffMap(updateData: UpdateData) {
         if (this.isOffMap()) {
