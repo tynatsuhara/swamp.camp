@@ -32,15 +32,15 @@ import { WeaponType } from "./weapons/WeaponType"
 export enum DudeFaction {
     VILLAGERS,
     CLERGY,
-    ORCS,
+    ORCS, // sounds: rpg/npc/ogre
     UNDEAD,
-    DEMONS,
+    DEMONS, // sounds: rpg/npc/shade
     SHROOMS,
     CENTAURS,
     GNOLLS,
     BEARS,
-    WOLVES,
-    AQUATIC,
+    WOLVES, // sounds: gumball
+    AQUATIC, // sounds: lots of options in rpg/npc/* that would work here
 }
 
 export enum DudeType {
