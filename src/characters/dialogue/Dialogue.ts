@@ -102,6 +102,8 @@ export class NextDialogue {
     }
 }
 
+export type DialogueSet = { [key: string]: () => DialogueInstance }
+
 /**
  * @param dialogue the unique dialogue key
  */
@@ -111,7 +113,7 @@ export const getDialogue = (dialogue: string): DialogueInstance => {
     }
 
     // making this a static constant caused issues
-    const dialogueMap = {
+    const set: DialogueSet = {
         ...DIP_INTRO_DIALOGUE,
         ...BERTO_INTRO_DIALOGUE,
         ...GENERIC_DIALOGUE,
@@ -121,9 +123,9 @@ export const getDialogue = (dialogue: string): DialogueInstance => {
         ...SPOOKY_VISITOR_DIALOGUE,
     }
 
-    const f = dialogueMap[dialogue]
-    if (!f) {
+    const dialogueSupplier = set[dialogue]
+    if (!dialogueSupplier) {
         throw new Error("cannot find dialogue " + dialogue)
     }
-    return f()
+    return dialogueSupplier()
 }

@@ -9,8 +9,8 @@ import { Player } from "../Player"
 import { ShieldType } from "../weapons/ShieldType"
 import {
     dialogue,
-    DialogueInstance,
     DialogueOption,
+    DialogueSet,
     dialogueWithOptions,
     NextDialogue,
 } from "./Dialogue"
@@ -20,7 +20,7 @@ export const BED_DIALOGUE = "bed"
 
 const CANCEL_TEXT = "Leave"
 
-export const ITEM_DIALOGUES: { [key: string]: () => DialogueInstance } = {
+export const ITEM_DIALOGUES: DialogueSet = {
     [CAMPFIRE_DIALOGUE]: () => {
         // the fire can be dead, almost dead, partially full, almost entirely full, or totally full
 

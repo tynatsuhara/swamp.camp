@@ -14,6 +14,7 @@ import {
     dialogue,
     DialogueInstance,
     DialogueOption,
+    DialogueSet,
     dialogueWithOptions,
     getExitText,
     NextDialogue,
@@ -52,7 +53,7 @@ const getGreeting = () => {
     return "Tally ho!"
 }
 
-export const BERTO_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
+export const BERTO_INTRO_DIALOGUE: DialogueSet = {
     [BERTO_STARTING_DIALOGUE]: () =>
         dialogueWithOptions(
             [

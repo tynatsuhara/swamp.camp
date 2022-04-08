@@ -4,8 +4,8 @@ import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { SalePackage, TradeMenu } from "../../ui/TradeMenu"
 import { Dude } from "../Dude"
 import {
-    DialogueInstance,
     DialogueOption,
+    DialogueSet,
     dialogueWithOptions,
     getExitText,
     NextDialogue,
@@ -29,7 +29,7 @@ const getItemsToBuy = (): SalePackage[] => {
     ]
 }
 
-export const DOCTOR_DIALOGUE: { [key: string]: () => DialogueInstance } = {
+export const DOCTOR_DIALOGUE: DialogueSet = {
     [DOCTOR_DIALOGUE_ENTRYPOINT]: () => {
         const doctor: Dude = DialogueDisplay.instance.source as Dude
 

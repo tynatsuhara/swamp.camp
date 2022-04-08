@@ -1,5 +1,5 @@
 import { Lists } from "brigsby/dist/util/Lists"
-import { dialogue, DialogueInstance, NextDialogue } from "./Dialogue"
+import { dialogue, DialogueSet, NextDialogue } from "./Dialogue"
 
 /**
  * All supported glyphs:
@@ -31,7 +31,7 @@ const getSentence = () => {
 
 export const SPOOKY_VISITOR_STARTING_DIALOGUE = "spooky-0"
 
-export const SPOOKY_VISITOR_DIALOGUE: { [key: string]: () => DialogueInstance } = {
+export const SPOOKY_VISITOR_DIALOGUE: DialogueSet = {
     [SPOOKY_VISITOR_STARTING_DIALOGUE]: () => {
         return dialogue(
             [getSentence()],

@@ -1,11 +1,11 @@
 import { Lists } from "brigsby/dist/util/Lists"
-import { dialogue, DialogueInstance, NextDialogue } from "./Dialogue"
+import { dialogue, DialogueSet, NextDialogue } from "./Dialogue"
 
 export enum GenericDialogue {
     HELLO = "hello",
 }
 
-export const GENERIC_DIALOGUE: { [key: string]: () => DialogueInstance } = {
+export const GENERIC_DIALOGUE: DialogueSet = {
     [GenericDialogue.HELLO]: () =>
         dialogue(
             [Lists.oneOf(["Hello!", "Greetings."])],

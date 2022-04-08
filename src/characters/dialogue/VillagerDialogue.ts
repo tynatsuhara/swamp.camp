@@ -2,8 +2,8 @@ import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { Dude } from "../Dude"
 import {
-    DialogueInstance,
     DialogueOption,
+    DialogueSet,
     dialogueWithOptions,
     getExitText,
     NextDialogue,
@@ -12,7 +12,7 @@ import {
 
 export const VILLAGER_DIALOGUE_ENTRYPOINT = "villager-start"
 
-export const VILLAGER_DIALOGUE: { [key: string]: () => DialogueInstance } = {
+export const VILLAGER_DIALOGUE: DialogueSet = {
     [VILLAGER_DIALOGUE_ENTRYPOINT]: () => {
         // TODO add a different initial dialogue with a "!"
 

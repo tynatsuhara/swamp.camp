@@ -11,8 +11,8 @@ import { TimeUnit } from "../../world/TimeUnit"
 import { WorldTime } from "../../world/WorldTime"
 import {
     dialogue,
-    DialogueInstance,
     DialogueOption,
+    DialogueSet,
     dialogueWithOptions,
     getExitText,
     inv,
@@ -34,7 +34,7 @@ const DIP_1 = "dip-1",
 
 // TODO: make DIP introduce himself, have player input their name
 
-export const DIP_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
+export const DIP_INTRO_DIALOGUE: DialogueSet = {
     [DIP_STARTING_DIALOGUE]: () =>
         dialogueWithOptions(
             [
