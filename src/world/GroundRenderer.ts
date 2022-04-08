@@ -36,7 +36,7 @@ export class GroundRenderer {
     /**
      * @param position will NOT be checked against location size bounds
      */
-    addTile(wl: Location, position: Point, tile: StaticSpriteSource) {
+    setTile(wl: Location, position: Point, tile: StaticSpriteSource) {
         if (wl.isInterior || !wl.size) {
             throw new Error("location cannot use GroundRenderer")
         }

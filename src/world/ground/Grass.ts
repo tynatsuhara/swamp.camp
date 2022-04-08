@@ -1,8 +1,8 @@
 import { Component } from "brigsby/dist/Component"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
-import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { GroundRenderer } from "../GroundRenderer"
 import { GroundType, MakeGroundFuncData } from "./Ground"
@@ -25,7 +25,7 @@ export const makeGrass = (d: MakeGroundFuncData): GroundComponent => {
         tile = Tilesets.instance.tilemap.getTileAt(new Point(0, 7))
     }
 
-    GroundRenderer.instance.addTile(d.wl, d.pos, tile)
+    GroundRenderer.instance.setTile(d.wl, d.pos, tile)
 
     const e = new Entity()
 
