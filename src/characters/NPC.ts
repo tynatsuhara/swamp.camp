@@ -17,6 +17,7 @@ import { NPCSchedule, NPCSchedules } from "./ai/NPCSchedule"
 import { NPCTask } from "./ai/NPCTask"
 import { NPCTaskContext } from "./ai/NPCTaskContext"
 import { NPCTaskFactory } from "./ai/NPCTaskFactory"
+import { Condition } from "./Condition"
 import { Dude } from "./Dude"
 import { Player } from "./Player"
 
@@ -80,13 +81,15 @@ export class NPC extends Simulatable {
                 Point.ZERO,
                 Player.instance.dude.standingPosition.x - this.dude.standingPosition.x
             )
+        } else if (this.dude.hasCondition(Condition.ON_FIRE)) {
+            this.doRoam(updateData) // flee
         } else if (this.enemiesPresent) {
             // re-check the enemy function for dynamic enemy status
             // (such as demons only targeting people in the dark)
             if (this.attackTarget && this.isEnemyFn(this.attackTarget)) {
                 this.doAttack(updateData)
             } else {
-                this.doRoam(updateData)
+                this.doRoam(updateData) // flee
             }
         } else {
             this.doNormalScheduledActivity(updateData)
