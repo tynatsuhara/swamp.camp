@@ -31,7 +31,7 @@ export class CampfireFactory extends ElementFactory {
     make(wl: Location, pos: Point, data: any): ElementComponent {
         const e = new Entity()
         const scaledPos = pos.times(TILE_SIZE)
-        const depth = scaledPos.y + TILE_SIZE - 10
+        const depth = scaledPos.y + TILE_SIZE - 12
 
         const campfireSprite = e.addComponent(
             new SpriteComponent(
