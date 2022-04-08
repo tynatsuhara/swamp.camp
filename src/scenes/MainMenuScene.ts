@@ -1,6 +1,5 @@
 import { assets } from "brigsby/dist/Assets"
 import { Component } from "brigsby/dist/Component"
-import { debug } from "brigsby/dist/Debug"
 import { UpdateViewsContext } from "brigsby/dist/Engine"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
@@ -55,9 +54,6 @@ export class MainMenuScene {
     private menu = Menu.ROOT
 
     constructor() {
-        if (saveManager.getSaveCount() > 0 && debug.autoPlay) {
-            this.loadLastSave()
-        }
         this.loadAssets(false)
     }
 

@@ -151,7 +151,6 @@ export class DevControls extends Component {
 }
 
 // Set up autocomplete for non-engine debug flags
-debug.autoPlay = debug.autoPlay || false
 debug.enableBlood = debug.enableBlood || false
 debug.enableDevControls = debug.enableDevControls || false
 debug.freeCamera = debug.freeCamera || false
