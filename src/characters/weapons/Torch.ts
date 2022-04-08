@@ -75,7 +75,7 @@ export class Torch extends Shield {
         )
 
         this.audio.position = this.dude.standingPosition
-        this.audio.multiplier = (1 / (DIAMETERS.length - size + 1)) * 0.5
+        this.audio.multiplier = (1 / (DIAMETERS.length - size + 1)) * 0.6
     }
 
     delete() {
