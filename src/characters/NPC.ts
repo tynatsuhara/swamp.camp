@@ -83,7 +83,7 @@ export class NPC extends Simulatable {
         } else if (this.enemiesPresent) {
             // re-check the enemy function for dynamic enemy status
             // (such as demons only targeting people in the dark)
-            if (this.attackTarget) {
+            if (this.attackTarget && this.isEnemyFn(this.attackTarget)) {
                 this.doAttack(updateData)
             } else {
                 this.doRoam(updateData)
