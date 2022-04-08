@@ -63,7 +63,7 @@ export class LocationManager {
     add(location: Location) {
         this.locations.set(location.uuid, location)
         if (!this.currentLocation) {
-            this.currentLocation = location
+            this.loadLocation(location)
         }
         return location
     }
@@ -99,7 +99,7 @@ export class LocationManager {
             const loadedLocation = Location.load(l)
             this.locations.set(l.uuid, loadedLocation)
         })
-        this.currentLocation = this.locations.get(saveState.currentLocationUUID)
+        this.loadLocation(this.locations.get(saveState.currentLocationUUID))
     }
 
     simulateLocations(simulateCurrentLocation: boolean, duration: number) {
