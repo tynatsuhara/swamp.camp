@@ -26,6 +26,7 @@ import { Cursor } from "../ui/Cursor"
 import { MainMenuButtonSection } from "../ui/MainMenuButtonSection"
 import { PlumePicker, PLUME_COLORS } from "../ui/PlumePicker"
 import { TEXT_SIZE } from "../ui/Text"
+import { UISounds } from "../ui/UISounds"
 import { UIStateManager } from "../ui/UIStateManager"
 import { DarknessMask } from "../world/DarknessMask"
 
@@ -58,6 +59,7 @@ export class MainMenuScene {
     }
 
     private loadAssets(blocking = true) {
+        UISounds.loadAll()
         if (this.allAssetsLoaded) {
             return Promise.resolve()
         }

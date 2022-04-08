@@ -7,6 +7,7 @@ import { Maths } from "brigsby/dist/util/Maths"
 import { controls } from "../Controls"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
+import { UISounds } from "./UISounds"
 import { UIStateManager } from "./UIStateManager"
 
 export class TextButton extends Component {
@@ -74,6 +75,7 @@ export class TextButton extends Component {
             controls.getMousePos()
         )
         if (this.hovering && controls.isMenuClickDown()) {
+            UISounds.playClickSound()
             this.onClick()
         }
     }

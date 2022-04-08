@@ -7,6 +7,7 @@ import { Maths } from "brigsby/dist/util/Maths"
 import { controls } from "../Controls"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "./Color"
+import { UISounds } from "./UISounds"
 import { UIStateManager } from "./UIStateManager"
 
 // array of [dark, light] pairs
@@ -86,6 +87,7 @@ export class PlumePicker extends Component {
             const bigBuffer = 2
 
             if (hovered && controls.isMenuClickDown()) {
+                UISounds.playClickSound()
                 this.select(index)
             }
 

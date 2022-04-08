@@ -6,6 +6,7 @@ import { controls } from "../Controls"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "./Color"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
+import { UISounds } from "./UISounds"
 import { UIStateManager } from "./UIStateManager"
 
 export class MainMenuButton extends Component {
@@ -47,7 +48,8 @@ export class MainMenuButton extends Component {
         }
 
         if (this.hovering && controls.isMenuClickDown()) {
-            this.onClick()
+            // Use a promise to ensure the sound starts playing before executing onClick
+            UISounds.playClickSound().then(() => this.onClick())
         }
     }
 

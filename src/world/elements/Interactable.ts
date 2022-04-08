@@ -8,10 +8,12 @@ import { controls } from "../../Controls"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { ButtonIndicator } from "../../ui/ButtonIndicator"
 import { KeyPressIndicator } from "../../ui/KeyPressIndicator"
+import { UISounds } from "../../ui/UISounds"
 import { UIStateManager } from "../../ui/UIStateManager"
 
 export class Interactable extends Component {
     position: Point
+    private readonly fn: () => void
     uiOffset: Point
     private showUI: boolean
     get isShowingUI() {
@@ -27,7 +29,7 @@ export class Interactable extends Component {
     ) {
         super()
         this.position = position
-        this.interact = fn
+        this.fn = fn
         this.uiOffset = uiOffset
         this.isInteractable = isInteractable
     }
@@ -36,7 +38,10 @@ export class Interactable extends Component {
         this.showUI = showUI
     }
 
-    interact() {}
+    interact() {
+        UISounds.playClickSound()
+        this.fn()
+    }
 
     getRenderMethods(): RenderMethod[] {
         if (!this.showUI) {

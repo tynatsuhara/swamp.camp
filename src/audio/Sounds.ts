@@ -5,7 +5,10 @@ import { Settings } from "../Settings"
  * Used for general purpose one-off sound effects
  */
 export class Sounds {
-    static play(path: string, volume: number = 1) {
+    /**
+     * @returns a promise that will resolve when the sound starts playing
+     */
+    static play(path: string, volume: number = 1): Promise<void> {
         const audio = assets.getAudioByFileName(path)
 
         if (!audio) {
@@ -14,6 +17,12 @@ export class Sounds {
         }
 
         audio.volume = Math.min(1, Settings.getSoundVolume() * volume)
-        audio.play()
+
+        return new Promise((resolve) => {
+            audio.oncanplay = () => {
+                audio.play()
+                resolve()
+            }
+        })
     }
 }
