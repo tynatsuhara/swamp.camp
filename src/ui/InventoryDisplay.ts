@@ -18,7 +18,7 @@ import { Inventory } from "../items/Inventory"
 import { Item, ITEM_METADATA_MAP } from "../items/Items"
 import { saveManager } from "../SaveManager"
 import { Elements } from "../world/elements/Elements"
-import { LocationManager } from "../world/LocationManager"
+import { here } from "../world/LocationManager"
 import { Color } from "./Color"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
 import { TEXT_FONT, TEXT_SIZE } from "./Text"
@@ -145,7 +145,7 @@ export class InventoryDisplay extends Component {
 
             // Only allow actions when in the inventory menu
             if (!this.tradingInv) {
-                const wl = LocationManager.instance.currentLocation
+                const wl = here()
                 if (
                     item.element !== null &&
                     wl.allowPlacing &&

@@ -5,7 +5,7 @@ import { Point } from "brigsby/dist/Point"
 import { Player } from "../characters/Player"
 import { controls } from "../Controls"
 import { Elements, ElementType } from "../world/elements/Elements"
-import { LocationManager } from "../world/LocationManager"
+import { here } from "../world/LocationManager"
 import { PlaceElementFrame } from "./PlaceElementFrame"
 
 export class PlaceElementDisplay extends Component {
@@ -58,7 +58,7 @@ export class PlaceElementDisplay extends Component {
     finishPlacing(elementPos: Point) {
         this.count--
         this.successFn() // remove from inv
-        LocationManager.instance.currentLocation.addElement(this.element, elementPos)
+        here().addElement(this.element, elementPos)
         if (this.count === 0) {
             this.close()
         }

@@ -10,7 +10,7 @@ import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
 import { TextAlign } from "../ui/Text"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Interactable } from "../world/elements/Interactable"
-import { camp, LocationManager } from "../world/LocationManager"
+import { camp, here } from "../world/LocationManager"
 import { MapGenerator } from "../world/MapGenerator"
 import { WorldTime } from "../world/WorldTime"
 import { Dude } from "./Dude"
@@ -169,7 +169,7 @@ export class Player extends Component {
      */
     private pushCheck(): number {
         const minDistanceToBePushed = 10
-        const dudesToPush = LocationManager.instance.currentLocation
+        const dudesToPush = here()
             .getDudes()
             .filter(
                 (d) =>

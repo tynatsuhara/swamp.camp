@@ -8,7 +8,7 @@ import { ShieldType } from "../characters/weapons/ShieldType"
 import { WeaponType } from "../characters/weapons/WeaponType"
 import { Tilesets } from "../graphics/Tilesets"
 import { ElementType } from "../world/elements/Elements"
-import { LocationManager } from "../world/LocationManager"
+import { here } from "../world/LocationManager"
 import { DroppedItem } from "./DroppedItem"
 
 export enum Item {
@@ -260,7 +260,5 @@ export const spawnItem = (
     velocity: Point = new Point(0, 0),
     sourceCollider: Collider = null
 ) => {
-    LocationManager.instance.currentLocation.droppedItems.add(
-        new Entity([new DroppedItem(pos, item, velocity, sourceCollider)])
-    )
+    here().droppedItems.add(new Entity([new DroppedItem(pos, item, velocity, sourceCollider)]))
 }

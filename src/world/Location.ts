@@ -339,7 +339,7 @@ export class Location {
             HUD.instance.refresh()
 
             // actually set the location
-            LocationManager.instance.currentLocation = linkedLocation
+            LocationManager.instance.loadLocation(linkedLocation)
 
             // delete existing particles
             Particles.instance.clear()

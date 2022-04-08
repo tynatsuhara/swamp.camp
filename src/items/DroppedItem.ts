@@ -7,7 +7,7 @@ import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
 import { Lists } from "brigsby/dist/util/Lists"
 import { Sounds } from "../audio/Sounds"
 import { Player } from "../characters/Player"
-import { LocationManager } from "../world/LocationManager"
+import { here } from "../world/LocationManager"
 import { Item, ITEM_METADATA_MAP } from "./Items"
 
 // TODO: Find a better sound effect (this one isn't very audible)
@@ -83,9 +83,7 @@ export class DroppedItem extends Component {
                 setTimeout(() => {
                     if (Player.instance.dude.isAlive && !!this.entity) {
                         if (Player.instance.dude.inventory.addItem(this.itemType)) {
-                            LocationManager.instance.currentLocation.droppedItems.delete(
-                                this.entity
-                            )
+                            here().droppedItems.delete(this.entity)
                             this.entity.selfDestruct()
                             setTimeout(() => {
                                 Sounds.play(Lists.oneOf(PICK_UP_SOUNDS), 0.15)

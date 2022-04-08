@@ -8,7 +8,7 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { DarknessMask } from "./DarknessMask"
 import { Location } from "./Location"
-import { camp, LocationManager, LocationType } from "./LocationManager"
+import { camp, here, LocationType } from "./LocationManager"
 import { TimeUnit } from "./TimeUnit"
 import { Vignette } from "./Vignette"
 import { WorldTime } from "./WorldTime"
@@ -55,19 +55,17 @@ export class LightManager extends Component {
     /**
      * @returns true if the point is at max brightness
      */
-    isFullyLit = (pixelPt: Point, location: Location = LocationManager.instance.currentLocation) =>
+    isFullyLit = (pixelPt: Point, location: Location = here()) =>
         !this.isDarkHelper(pixelPt, location, 0.6)
 
     /**
      * @returns true if it is dark enough for a demon to tolerate
      */
-    isDark = (pixelPt: Point, location: Location = LocationManager.instance.currentLocation) =>
+    isDark = (pixelPt: Point, location: Location = here()) =>
         this.isDarkHelper(pixelPt, location, 1)
 
-    isTotalDarkness = (
-        pixelPt: Point,
-        location: Location = LocationManager.instance.currentLocation
-    ) => this.isDarkHelper(pixelPt, location, DarknessMask.VISIBILITY_MULTIPLIER)
+    isTotalDarkness = (pixelPt: Point, location: Location = here()) =>
+        this.isDarkHelper(pixelPt, location, DarknessMask.VISIBILITY_MULTIPLIER)
 
     /**
      * currently this is O(n) for n light sources in a location — don't call on every update()
@@ -92,7 +90,7 @@ export class LightManager extends Component {
     }
 
     private getLocationDarkness() {
-        const location = LocationManager.instance.currentLocation
+        const location = here()
 
         // if (location === camp()) {
         //     const pos = Player.instance.dude.standingPosition
@@ -140,7 +138,7 @@ export class LightManager extends Component {
             }
         }
 
-        const locationLightGrid = this.lightTiles.get(LocationManager.instance.currentLocation)
+        const locationLightGrid = this.lightTiles.get(here())
         if (!locationLightGrid) {
             return
         }
@@ -164,7 +162,7 @@ export class LightManager extends Component {
     getEntities(): Entity[] {
         const result = [new Entity([this]), this.renderedEntity]
 
-        const location = LocationManager.instance.currentLocation
+        const location = here()
         if (!location.isInterior) {
             result.push(this.vignette?.entity)
         }

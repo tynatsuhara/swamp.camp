@@ -13,7 +13,7 @@ import { EventQueue } from "../world/events/EventQueue"
 import { QueuedEventType } from "../world/events/QueuedEvent"
 import { Ground } from "../world/ground/Ground"
 import { LightManager } from "../world/LightManager"
-import { camp, LocationManager } from "../world/LocationManager"
+import { camp } from "../world/LocationManager"
 import { MapGenerator } from "../world/MapGenerator"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
@@ -60,10 +60,8 @@ export class DudeSpawner extends Component {
             return
         }
 
-        const l = LocationManager.instance.currentLocation
-        if (l.isInterior) {
-            return // don't spawn demons inside
-        }
+        const l = camp()
+
         const demons = l.getDudes().filter((d) => d.factions.includes(DudeFaction.DEMONS))
         if (demons.length > 0) {
             return // just wait to spawn until all the demons have been killed
@@ -88,10 +86,7 @@ export class DudeSpawner extends Component {
     }
 
     private spawnSwampThings() {
-        const l = LocationManager.instance.currentLocation
-        if (l.isInterior) {
-            return // don't spawn swamp things inside
-        }
+        const l = camp()
 
         const thingCount = l.getDudes().filter((d) => d.type === DudeType.SWAMP_THING)
 

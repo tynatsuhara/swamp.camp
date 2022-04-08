@@ -7,7 +7,7 @@ import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Lists } from "brigsby/dist/util/Lists"
 import { DroppedItem } from "../../items/DroppedItem"
 import { Item } from "../../items/Items"
-import { LocationManager } from "../../world/LocationManager"
+import { here } from "../../world/LocationManager"
 import { Dude } from "../Dude"
 
 class Projectile extends Component {
@@ -111,7 +111,7 @@ class Projectile extends Component {
     }
 
     getEnemy(attacker: Dude, projectilePos: Point, velocity: Point, attackDistance: number): Dude {
-        const allEnemies = LocationManager.instance.currentLocation
+        const allEnemies = here()
             .getDudes()
             .filter((d) => !!d && d !== attacker && d.isEnemy(attacker))
             .filter((d) => d.standingPosition.distanceTo(projectilePos) < attackDistance)
@@ -144,7 +144,5 @@ export const spawnProjectile = (
     velocity: Point,
     attacker: Dude
 ) => {
-    LocationManager.instance.currentLocation.droppedItems.add(
-        new Entity([new Projectile(pos, sprite, item, velocity, attacker)])
-    )
+    here().droppedItems.add(new Entity([new Projectile(pos, sprite, item, velocity, attacker)]))
 }

@@ -4,7 +4,7 @@ import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Maths } from "brigsby/dist/util/Maths"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Item, spawnItem } from "../../items/Items"
-import { LocationManager } from "../LocationManager"
+import { here } from "../LocationManager"
 import { ElementComponent } from "./ElementComponent"
 import { Hittable } from "./Hittable"
 
@@ -61,9 +61,7 @@ export class HittableResource extends Hittable {
         }
 
         if (finishingMove) {
-            LocationManager.instance.currentLocation.removeElement(
-                this.entity.getComponent(ElementComponent)
-            )
+            here().removeElement(this.entity.getComponent(ElementComponent))
             this.entity.selfDestruct()
         }
     }

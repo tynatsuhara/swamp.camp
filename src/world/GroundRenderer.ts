@@ -7,7 +7,7 @@ import { Camera } from "../cutscenes/Camera"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { Location } from "./Location"
-import { LocationManager } from "./LocationManager"
+import { here } from "./LocationManager"
 
 /**
  * This is an optimization that pre-renders ground on an offscreen canvas.
@@ -66,12 +66,12 @@ export class GroundRenderer {
     }
 
     getCanvas(wl: Location) {
-        return this.locations.get(LocationManager.instance.currentLocation)
+        return this.locations.get(here())
     }
 
     getEntity(): Entity {
-        const wl = LocationManager.instance.currentLocation
-        const canvas = this.locations.get(LocationManager.instance.currentLocation)
+        const wl = here()
+        const canvas = this.locations.get(wl)
         if (!canvas) {
             return
         }

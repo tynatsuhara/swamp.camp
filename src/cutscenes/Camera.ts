@@ -5,7 +5,7 @@ import { Maths } from "brigsby/dist/util/Maths"
 import { Dude } from "../characters/Dude"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
-import { LocationManager } from "../world/LocationManager"
+import { here } from "../world/LocationManager"
 
 type FocalPoint = "center" | "top"
 
@@ -58,7 +58,7 @@ export class Camera {
     }
 
     getUpdatedPosition(elapsedTimeMillis: number): Point {
-        const mapSize = LocationManager.instance.currentLocation.size || 0
+        const mapSize = here().size || 0
         let xLimit = (mapSize / 2) * TILE_SIZE - this.dimensions.x / 2
         let yLimit = (mapSize / 2) * TILE_SIZE - this.dimensions.y / 2
 
@@ -69,7 +69,7 @@ export class Camera {
             yLimit = mapSize
         }
 
-        if (debug.freeCamera || !LocationManager.instance.currentLocation.size) {
+        if (debug.freeCamera || !here().size) {
             xLimit = Number.MAX_SAFE_INTEGER
             yLimit = Number.MAX_SAFE_INTEGER
         }

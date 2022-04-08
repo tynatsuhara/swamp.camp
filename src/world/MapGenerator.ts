@@ -7,7 +7,7 @@ import { TentColor } from "./buildings/Tent"
 import { ElementType } from "./elements/Elements"
 import { Ground, GroundType } from "./ground/Ground"
 import { Location } from "./Location"
-import { LocationManager, LocationType } from "./LocationManager"
+import { here, LocationManager, LocationType } from "./LocationManager"
 
 const COAST_VARIABILITY = 3
 const COAST_OCEAN_WIDTH = 12
@@ -72,7 +72,7 @@ export class MapGenerator {
         this.location.addElement(ElementType.QUEEQUEG, new Point(MapGenerator.MAP_RANGE - 6, 10))
 
         LocationManager.instance.add(this.location)
-        LocationManager.instance.currentLocation = this.location
+        LocationManager.instance.loadLocation(this.location)
 
         console.groupEnd()
 
@@ -451,5 +451,5 @@ window["waterNoise"] = (...args: any) => console.log(MapGenerator.waterNoise(...
 window["coastNoise"] = (...args: any) => console.log(MapGenerator.coastNoise(...args)[1])
 
 window["river"] = () => {
-    MapGenerator.instance.addRiver(LocationManager.instance.currentLocation)
+    MapGenerator.instance.addRiver(here())
 }

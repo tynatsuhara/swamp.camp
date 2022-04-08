@@ -8,7 +8,7 @@ import { Player } from "../characters/Player"
 import { controls } from "../Controls"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Elements } from "../world/elements/Elements"
-import { LocationManager } from "../world/LocationManager"
+import { here } from "../world/LocationManager"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
 import { UIStateManager } from "./UIStateManager"
 
@@ -106,15 +106,16 @@ export class PlaceElementFrame extends Component {
     }
 
     private canPlace(pos: Point) {
+        const l = here()
         for (let x = pos.x; x < pos.x + this.dimensions.x; x++) {
             for (let y = pos.y; y < pos.y + this.dimensions.y; y++) {
                 const pt = new Point(x, y)
                 // there's already an element here
-                if (!!LocationManager.instance.currentLocation.getElement(pt)) {
+                if (!!l.getElement(pt)) {
                     return false
                 }
                 // there's no ground here
-                if (!LocationManager.instance.currentLocation.getGround(pt)) {
+                if (!l.getGround(pt)) {
                     return false
                 }
             }
@@ -122,8 +123,7 @@ export class PlaceElementFrame extends Component {
 
         const p = pos.times(TILE_SIZE)
         const d = this.dimensions.times(TILE_SIZE)
-        const wl = LocationManager.instance.currentLocation
-        const intersectingDudes = wl
+        const intersectingDudes = l
             .getDudes()
             .some(
                 (dude) =>
@@ -136,6 +136,6 @@ export class PlaceElementFrame extends Component {
 
         return Elements.instance
             .getElementFactory(PlaceElementDisplay.instance.getElementType())
-            .canPlaceAtPos(wl, pos)
+            .canPlaceAtPos(l, pos)
     }
 }

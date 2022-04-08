@@ -25,29 +25,35 @@ export class LocationManager {
         window["locationManager"] = this
         window["showDudes"] = () => {
             const counts = {}
-            LocationManager.instance.currentLocation.getDudes().forEach((d) => {
-                const type = DudeType[d.type]
-                return (counts[type] = (counts[type] || 0) + 1)
-            })
+            here()
+                .getDudes()
+                .forEach((d) => {
+                    const type = DudeType[d.type]
+                    return (counts[type] = (counts[type] || 0) + 1)
+                })
             console.log(counts)
         }
         window["bulldoze"] = (type: ElementType) => {
-            this.currentLocation
+            here()
                 .getElementsOfType(type)
-                .forEach((el) => this.currentLocation.removeElement(el))
+                .forEach((el) => here().removeElement(el))
         }
     }
 
-    private _currentLocation: Location
-    get currentLocation() {
-        return this._currentLocation
+    /**
+     * @deprecated use here() instead
+     */
+    current() {
+        return this.currentLocation
     }
-    set currentLocation(newLocation) {
+    loadLocation(newLocation: Location) {
         WorldAudioContext.instance.isInterior = newLocation.isInterior
         this.currentLocation?.toggleAudio(false)
         newLocation.toggleAudio(true)
-        this._currentLocation = newLocation
+        this.currentLocation = newLocation
     }
+    private currentLocation: Location
+
     private locations: Map<string, Location> = new Map() // uuid -> location
 
     get(uuid: string) {
@@ -108,3 +114,4 @@ export class LocationManager {
 }
 
 export const camp = () => LocationManager.instance.exterior()
+export const here = () => LocationManager.instance.current()

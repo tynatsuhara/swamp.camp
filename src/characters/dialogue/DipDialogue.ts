@@ -6,7 +6,7 @@ import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { ElementType } from "../../world/elements/Elements"
 import { EventQueue } from "../../world/events/EventQueue"
 import { QueuedEventType } from "../../world/events/QueuedEvent"
-import { LocationManager } from "../../world/LocationManager"
+import { here } from "../../world/LocationManager"
 import { TimeUnit } from "../../world/TimeUnit"
 import { WorldTime } from "../../world/WorldTime"
 import {
@@ -72,12 +72,8 @@ export const DIP_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
         ),
 
     [DIP_MAKE_CAMPFIRE]: () => {
-        const campfires = LocationManager.instance.currentLocation.getElementsOfType(
-            ElementType.CAMPFIRE
-        )
-        const dipTent = LocationManager.instance.currentLocation.getElementsOfType(
-            ElementType.TENT
-        )[0]
+        const campfires = here().getElementsOfType(ElementType.CAMPFIRE)
+        const dipTent = here().getElementsOfType(ElementType.TENT)[0]
         if (campfires.length > 0) {
             // campfire has been placed
             const lines = [

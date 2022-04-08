@@ -3,7 +3,7 @@ import { Point } from "brigsby/dist/Point"
 import { ImageRender } from "brigsby/dist/renderer/ImageRender"
 import { GroundRenderer } from "../GroundRenderer"
 import { Location } from "../Location"
-import { LocationManager } from "../LocationManager"
+import { here } from "../LocationManager"
 import { ConnectingTileSchema } from "./ConnectingTileSchema"
 
 export class ConnectingTile extends Component {
@@ -26,7 +26,7 @@ export class ConnectingTile extends Component {
     }
 
     start() {
-        GroundRenderer.instance.clearTile(LocationManager.instance.currentLocation, this.position)
+        GroundRenderer.instance.clearTile(here(), this.position)
     }
 
     getRenderMethods(): ImageRender[] {

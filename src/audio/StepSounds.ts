@@ -6,7 +6,7 @@ import { DudeType } from "../characters/DudeFactory"
 import { Player } from "../characters/Player"
 import { controls } from "../Controls"
 import { GroundType } from "../world/ground/Ground"
-import { LocationManager } from "../world/LocationManager"
+import { here } from "../world/LocationManager"
 import { Sounds } from "./Sounds"
 
 const FOOTSTEP_SOUND_DISTANCE = 160
@@ -78,7 +78,7 @@ export class StepSounds {
     }
 
     private static getSound = (dude: Dude): [string, number] => {
-        const ground = LocationManager.instance.currentLocation.getGround(dude.tile)
+        const ground = here().getGround(dude.tile)
         if (!ground) {
             return [undefined, 0]
         }

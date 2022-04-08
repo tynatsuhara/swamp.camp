@@ -3,7 +3,7 @@ import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { Bed } from "../../world/elements/Bed"
 import { Campfire } from "../../world/elements/Campfire"
-import { LocationManager } from "../../world/LocationManager"
+import { here } from "../../world/LocationManager"
 import { TimeUnit } from "../../world/TimeUnit"
 import { Player } from "../Player"
 import { ShieldType } from "../weapons/ShieldType"
@@ -104,7 +104,7 @@ export const ITEM_DIALOGUES: { [key: string]: () => DialogueInstance } = {
         const completeDialogue = new NextDialogue(BED_DIALOGUE, false)
 
         // Proxy for determining that this bed belongs to the player
-        if (!LocationManager.instance.currentLocation.allowPlacing) {
+        if (!here().allowPlacing) {
             return dialogue(
                 ["This bed doesn't belong to you."],
                 () => completeDialogue,

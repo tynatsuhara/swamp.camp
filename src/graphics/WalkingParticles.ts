@@ -6,7 +6,7 @@ import { Dude } from "../characters/Dude"
 import { Color } from "../ui/Color"
 import { Ground } from "../world/ground/Ground"
 import { GroundRenderer } from "../world/GroundRenderer"
-import { LocationManager } from "../world/LocationManager"
+import { here } from "../world/LocationManager"
 import { Particles } from "./Particles"
 
 const MILLIS_BETWEEN_EMISSIONS = 50
@@ -40,8 +40,7 @@ export class WalkingParticles extends Component {
             )
         }
 
-        const doNotShowParticles =
-            this.dude.jumping || LocationManager.instance.currentLocation.isInterior
+        const doNotShowParticles = this.dude.jumping || here().isInterior
 
         if (doNotShowParticles) {
             // set to 0 so that particles will be emitted immediately once it makes sense
@@ -54,7 +53,7 @@ export class WalkingParticles extends Component {
             return
         }
 
-        const groud = LocationManager.instance.currentLocation.getGround(this.dude.tile)
+        const groud = here().getGround(this.dude.tile)
 
         if (Ground.isWater(groud?.type)) {
             const depth = this.dude.standingPosition.y + 6

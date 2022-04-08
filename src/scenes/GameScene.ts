@@ -31,7 +31,7 @@ import { EventQueue } from "../world/events/EventQueue"
 import { QueuedEventType } from "../world/events/QueuedEvent"
 import { GroundRenderer } from "../world/GroundRenderer"
 import { LightManager } from "../world/LightManager"
-import { camp, LocationManager } from "../world/LocationManager"
+import { camp, here } from "../world/LocationManager"
 import { MapGenerator } from "../world/MapGenerator"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
@@ -96,7 +96,7 @@ export class GameScene {
 
         if (!isTextOverlayActive) {
             gameEntities.push(
-                ...LocationManager.instance.currentLocation.getEntities(),
+                ...here().getEntities(),
                 ...LightManager.instance.getEntities(),
                 WorldTime.instance.getEntity(),
                 GroundRenderer.instance.getEntity(),
@@ -158,7 +158,7 @@ export class GameScene {
         }
 
         if (debug.showTeleporters) {
-            const pts = LocationManager.instance.currentLocation.getTeleporterLocations()
+            const pts = here().getTeleporterLocations()
             const renders = pts.map(
                 (pt) =>
                     new EllipseRender({
@@ -172,7 +172,7 @@ export class GameScene {
         }
 
         if (debug.showNavMesh) {
-            const pts = LocationManager.instance.currentLocation.getOccupiedSpots()
+            const pts = here().getOccupiedSpots()
             const renders = pts.map(
                 (pt) =>
                     new RectRender({
@@ -187,17 +187,19 @@ export class GameScene {
         }
 
         if (debug.showElementGrid) {
-            const renders = LocationManager.instance.currentLocation.getElements().map(
-                (el) =>
-                    new RectRender({
-                        depth: Number.MAX_SAFE_INTEGER,
-                        position: el.pos.times(TILE_SIZE),
-                        dimensions: Elements.instance
-                            .getElementFactory(el.type)
-                            .dimensions.times(TILE_SIZE),
-                        color: "#A000A07E",
-                    })
-            )
+            const renders = here()
+                .getElements()
+                .map(
+                    (el) =>
+                        new RectRender({
+                            depth: Number.MAX_SAFE_INTEGER,
+                            position: el.pos.times(TILE_SIZE),
+                            dimensions: Elements.instance
+                                .getElementFactory(el.type)
+                                .dimensions.times(TILE_SIZE),
+                            color: "#A000A07E",
+                        })
+                )
 
             e.addComponent(new BasicRenderComponent(...renders))
         }

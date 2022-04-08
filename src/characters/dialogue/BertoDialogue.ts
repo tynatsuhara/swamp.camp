@@ -4,7 +4,7 @@ import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { SalePackage, TradeMenu } from "../../ui/TradeMenu"
 import { EventQueue } from "../../world/events/EventQueue"
 import { QueuedEventType } from "../../world/events/QueuedEvent"
-import { LocationManager } from "../../world/LocationManager"
+import { here } from "../../world/LocationManager"
 import { Residence } from "../../world/residences/Residence"
 import { TaxRate } from "../../world/TaxRate"
 import { WorldTime } from "../../world/WorldTime"
@@ -116,7 +116,7 @@ export const BERTO_INTRO_DIALOGUE: { [key: string]: () => DialogueInstance } = {
 }
 
 const fetchNpcDialogue = (): DialogueInstance => {
-    const allResidences = LocationManager.instance.currentLocation
+    const allResidences = here()
         .getElements()
         .flatMap((e) => e.entity.getComponents(Residence))
 
@@ -147,10 +147,7 @@ const fetchNpcDialogue = (): DialogueInstance => {
             time: WorldTime.instance.time,
             dudeTypes: [type],
         })
-        LocationManager.instance.currentLocation
-            .getDude(DudeType.HERALD)
-            .entity.getComponent(Berto)
-            .updateSchedule()
+        here().getDude(DudeType.HERALD).entity.getComponent(Berto).updateSchedule()
         return new NextDialogue(BERT_LEAVING, true)
     }
 

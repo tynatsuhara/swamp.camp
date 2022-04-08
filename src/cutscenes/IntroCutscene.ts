@@ -12,7 +12,7 @@ import { saveManager } from "../SaveManager"
 import { ControlsUI } from "../ui/ControlsUI"
 import { HUD } from "../ui/HUD"
 import { Queequeg } from "../world/elements/Queequeg"
-import { LocationManager } from "../world/LocationManager"
+import { here } from "../world/LocationManager"
 import { Camera } from "./Camera"
 import { CutsceneManager } from "./CutsceneManager"
 import { CutscenePlayerController } from "./CutscenePlayerController"
@@ -115,7 +115,7 @@ ANOTHER thing - Only one of the explorers returned, and she reported that her co
     cutscene() {
         CutscenePlayerController.instance.enable()
 
-        this.dip = LocationManager.instance.currentLocation
+        this.dip = here()
             .getDudes()
             .filter((d) => d.type === DudeType.DIP)[0]
 
@@ -148,7 +148,7 @@ ANOTHER thing - Only one of the explorers returned, and she reported that her co
         }
 
         if (!this.orcs) {
-            this.orcs = LocationManager.instance.currentLocation
+            this.orcs = here()
                 .getDudes()
                 .filter((d) => d.factions.includes(DudeFaction.ORCS))
         }

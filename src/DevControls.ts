@@ -13,7 +13,7 @@ import { pixelPtToTilePt } from "./graphics/Tilesets"
 import { TextAlign, TextIcon } from "./ui/Text"
 import { ElementType } from "./world/elements/Elements"
 import { GroundType } from "./world/ground/Ground"
-import { camp, LocationManager } from "./world/LocationManager"
+import { camp, here } from "./world/LocationManager"
 import { TimeUnit } from "./world/TimeUnit"
 import { WorldTime } from "./world/WorldTime"
 
@@ -60,12 +60,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     [
         InputKey.O,
         "spawn selected type",
-        (input) =>
-            DudeFactory.instance.new(
-                spawnMenu.selectedType,
-                input.mousePos,
-                LocationManager.instance.currentLocation
-            ),
+        (input) => DudeFactory.instance.new(spawnMenu.selectedType, input.mousePos, here()),
     ],
     [InputKey.P, "show spawn menu", () => (spawnMenu.show = !spawnMenu.show)],
     [
@@ -85,18 +80,11 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
         "toggle ground path",
         (input) => {
             const mouseTilePos = pixelPtToTilePt(input.mousePos)
-            const currentType =
-                LocationManager.instance.currentLocation.getGround(mouseTilePos)?.type
+            const currentType = here().getGround(mouseTilePos)?.type
             if (currentType === GroundType.PATH) {
-                LocationManager.instance.currentLocation.setGroundElement(
-                    GroundType.GRASS,
-                    mouseTilePos
-                )
+                here().setGroundElement(GroundType.GRASS, mouseTilePos)
             } else if (currentType === GroundType.GRASS) {
-                LocationManager.instance.currentLocation.setGroundElement(
-                    GroundType.PATH,
-                    mouseTilePos
-                )
+                here().setGroundElement(GroundType.PATH, mouseTilePos)
             }
         },
     ],
@@ -105,38 +93,22 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
         "place water",
         (input) => {
             const mouseTilePos = pixelPtToTilePt(input.mousePos)
-            const currentType =
-                LocationManager.instance.currentLocation.getGround(mouseTilePos)?.type
+            const currentType = here().getGround(mouseTilePos)?.type
             if (currentType === GroundType.WATER) {
-                LocationManager.instance.currentLocation.setGroundElement(
-                    GroundType.GRASS,
-                    mouseTilePos
-                )
+                here().setGroundElement(GroundType.GRASS, mouseTilePos)
             } else if (currentType === GroundType.GRASS) {
-                LocationManager.instance.currentLocation.setGroundElement(
-                    GroundType.WATER,
-                    mouseTilePos
-                )
+                here().setGroundElement(GroundType.WATER, mouseTilePos)
             } else if (currentType === GroundType.WATERFALL) {
-                LocationManager.instance.currentLocation.setGroundElement(
-                    GroundType.LEDGE,
-                    mouseTilePos
-                )
+                here().setGroundElement(GroundType.LEDGE, mouseTilePos)
             } else if (currentType === GroundType.LEDGE) {
-                LocationManager.instance.currentLocation.setGroundElement(
-                    GroundType.WATERFALL,
-                    mouseTilePos
-                )
+                here().setGroundElement(GroundType.WATERFALL, mouseTilePos)
             }
         },
     ],
     [
         InputKey.PERIOD,
         "delete hovered element",
-        (input) =>
-            LocationManager.instance.currentLocation.removeElementAt(
-                pixelPtToTilePt(input.mousePos)
-            ),
+        (input) => here().removeElementAt(pixelPtToTilePt(input.mousePos)),
     ],
     [
         InputKey.N,

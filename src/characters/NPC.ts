@@ -8,7 +8,7 @@ import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
 import { tilesAround } from "../Utils"
 import { Location } from "../world/Location"
-import { camp, LocationManager } from "../world/LocationManager"
+import { camp, here } from "../world/LocationManager"
 import { Simulatable } from "../world/Simulatable"
 import { Teleporter } from "../world/Teleporter"
 import { TimeUnit } from "../world/TimeUnit"
@@ -435,7 +435,7 @@ export class NPC extends Simulatable {
                 return true
             }
         } else {
-            let enemies = LocationManager.instance.currentLocation
+            let enemies = here()
                 .getDudes()
                 .filter((d) => d.isAlive)
                 .filter(this.isEnemyFn)
@@ -499,7 +499,7 @@ export class NPC extends Simulatable {
 
     private findPath(targetTilePoint: Point) {
         // TODO: NPCs can sometimes get stuck if their starting square is "occupied"
-        const path = LocationManager.instance.currentLocation.findPath(
+        const path = here().findPath(
             this.dude.tile,
             targetTilePoint,
             this.pathFindingHeuristic,

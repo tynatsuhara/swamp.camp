@@ -10,7 +10,7 @@ import { Particles } from "../../graphics/Particles"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Color } from "../../ui/Color"
 import { GroundRenderer } from "../../world/GroundRenderer"
-import { LocationManager } from "../../world/LocationManager"
+import { here } from "../../world/LocationManager"
 import { Player } from "../Player"
 import { Weapon } from "./Weapon"
 import { WeaponType } from "./WeaponType"
@@ -153,7 +153,7 @@ export class StaffWeapon extends Weapon {
                     const attackDistance = TILE_SIZE * 1.5
 
                     // everyone can get damaged by explosions, friend or foe
-                    LocationManager.instance.currentLocation
+                    here()
                         .getDudes()
                         .filter((d) => !!d)
                         .filter(

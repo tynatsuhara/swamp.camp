@@ -1,7 +1,7 @@
 import { Point } from "brigsby/dist/Point"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { LightManager } from "../../world/LightManager"
-import { LocationManager } from "../../world/LocationManager"
+import { here } from "../../world/LocationManager"
 import { Shield } from "./Shield"
 import { ShieldType } from "./ShieldType"
 
@@ -23,7 +23,7 @@ export class Lantern extends Shield {
         this.transform.depth = -0.5
 
         LightManager.instance.addLight(
-            LocationManager.instance.currentLocation,
+            here(),
             this,
             this.dude.standingPosition.plusY(-TILE_SIZE / 2).plus(this.dude.getAnimationOffset()),
             Lantern.DIAMETER

@@ -1,7 +1,7 @@
 import { Component } from "brigsby/dist/Component"
 import { Point } from "brigsby/dist/Point"
 import { Hittable } from "../../world/elements/Hittable"
-import { LocationManager } from "../../world/LocationManager"
+import { here } from "../../world/LocationManager"
 import { Dude } from "../Dude"
 import { WeaponType } from "./WeaponType"
 
@@ -14,7 +14,7 @@ export abstract class Weapon extends Component {
 
     // TODO find a better place for these static functions?
     static getEnemiesInRange(attacker: Dude, attackDistance: number) {
-        return LocationManager.instance.currentLocation
+        return here()
             .getDudes()
             .filter((d) => !!d && d !== attacker && d.isEnemy(attacker))
             .filter((d) => attacker.isFacing(d.standingPosition))
@@ -26,7 +26,7 @@ export abstract class Weapon extends Component {
     static hitResources(dude: Dude) {
         const interactDistance = 20
         const interactCenter = dude.standingPosition.minus(new Point(0, 7))
-        const possibilities = LocationManager.instance.currentLocation
+        const possibilities = here()
             .getElements()
             .map((e) => e.entity.getComponent(Hittable))
             .filter((e) => !!e)

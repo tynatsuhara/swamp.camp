@@ -35,7 +35,7 @@ import { Pushable } from "../world/elements/Pushable"
 import { Ground, GroundType } from "../world/ground/Ground"
 import { LightManager } from "../world/LightManager"
 import { Location } from "../world/Location"
-import { camp, LocationManager } from "../world/LocationManager"
+import { camp, here } from "../world/LocationManager"
 import { Residence } from "../world/residences/Residence"
 import { WorldTime } from "../world/WorldTime"
 import { ActiveCondition, Condition } from "./Condition"
@@ -340,7 +340,7 @@ export class Dude extends Component implements DialogueSource {
                         )
                     }
                     LightManager.instance.addLight(
-                        LocationManager.instance.currentLocation,
+                        here(),
                         this.fireParticles,
                         this.standingPosition.plusY(-TILE_SIZE / 2).plus(this.getAnimationOffset()),
                         40
@@ -712,7 +712,7 @@ export class Dude extends Component implements DialogueSource {
             const newPos = this.standingPosition.plus(totalMovement)
             this.moveTo(newPos)
 
-            LocationManager.instance.currentLocation
+            here()
                 .getElement(this.tile)
                 ?.entity.getComponent(Pushable)
                 ?.push(this.standingPosition, direction)

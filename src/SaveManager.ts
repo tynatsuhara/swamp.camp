@@ -7,7 +7,7 @@ import { Singletons } from "./Singletons"
 import { HUD } from "./ui/HUD"
 import { PlumePicker } from "./ui/PlumePicker"
 import { EventQueue } from "./world/events/EventQueue"
-import { LocationManager } from "./world/LocationManager"
+import { here, LocationManager } from "./world/LocationManager"
 import { WorldTime } from "./world/WorldTime"
 
 const CURRENT_SAVE_FORMAT_VERSION = 2
@@ -174,7 +174,7 @@ class SaveManager {
         EventQueue.instance.initialize(save.eventQueue)
 
         Camera.instance.focusOnDude(
-            LocationManager.instance.currentLocation
+            here()
                 .getDudes()
                 .find((d) => d.type === DudeType.PLAYER)
         )

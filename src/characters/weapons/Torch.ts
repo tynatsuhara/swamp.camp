@@ -3,7 +3,7 @@ import { PointAudio } from "../../audio/PointAudio"
 import { FireParticles } from "../../graphics/FireParticles"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { LightManager } from "../../world/LightManager"
-import { LocationManager } from "../../world/LocationManager"
+import { here } from "../../world/LocationManager"
 import { TimeUnit } from "../../world/TimeUnit"
 import { WorldTime } from "../../world/WorldTime"
 import { Shield } from "./Shield"
@@ -68,7 +68,7 @@ export class Torch extends Shield {
         const diameter = DIAMETERS[size - 1]
 
         LightManager.instance.addLight(
-            LocationManager.instance.currentLocation,
+            here(),
             this,
             this.dude.standingPosition.plusY(-TILE_SIZE / 2).plus(this.dude.getAnimationOffset()),
             diameter

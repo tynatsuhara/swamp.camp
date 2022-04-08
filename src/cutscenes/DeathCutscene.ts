@@ -11,7 +11,7 @@ import { HUD } from "../ui/HUD"
 import { TextAlign } from "../ui/Text"
 import { DarknessMask } from "../world/DarknessMask"
 import { Ground } from "../world/ground/Ground"
-import { camp, LocationManager } from "../world/LocationManager"
+import { camp, here } from "../world/LocationManager"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
 import { Camera } from "./Camera"
@@ -72,13 +72,15 @@ export class DeathCutscene extends Component {
         Player.instance.dude.revive()
 
         // Clear out any enemies
-        LocationManager.instance.currentLocation.getDudes().forEach((d) => {
-            if (d.entity.getComponent(Enemy)) {
-                d.entity.selfDestruct()
-            } else {
-                d.entity.getComponent(ShroomNPC)?.delayTime(timeUntilRespawn)
-            }
-        })
+        here()
+            .getDudes()
+            .forEach((d) => {
+                if (d.entity.getComponent(Enemy)) {
+                    d.entity.selfDestruct()
+                } else {
+                    d.entity.getComponent(ShroomNPC)?.delayTime(timeUntilRespawn)
+                }
+            })
 
         // TODO take away resources, impact town stats, etc
 
