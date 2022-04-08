@@ -14,6 +14,7 @@ import { camp } from "../world/LocationManager"
 import { BERTO_STARTING_DIALOGUE } from "./dialogue/BertoDialogue"
 import { EMPTY_DIALOGUE } from "./dialogue/Dialogue"
 import { DOCTOR_DIALOGUE_ENTRYPOINT } from "./dialogue/DoctorDialogue"
+import { SPOOKY_VISITOR_STARTING_DIALOGUE } from "./dialogue/SpookyVisitorDialogue"
 import { VILLAGER_DIALOGUE_ENTRYPOINT } from "./dialogue/VillagerDialogue"
 import { Dude } from "./Dude"
 import { peopleNames } from "./NameFactory"
@@ -35,12 +36,12 @@ export enum DudeFaction {
     ORCS, // sounds: rpg/npc/ogre
     UNDEAD,
     DEMONS, // sounds: rpg/npc/shade
-    SHROOMS,
+    SHROOMS, // sounds: lots of options in rpg/npc/* that could work here
     CENTAURS,
     GNOLLS,
     BEARS,
     WOLVES, // sounds: gumball
-    AQUATIC, // sounds: lots of options in rpg/npc/* that would work here
+    AQUATIC, // sounds: lots of options in rpg/npc/* that could work here
 }
 
 export enum DudeType {
@@ -247,6 +248,7 @@ export class DudeFactory {
             case DudeType.SPOOKY_VISITOR: {
                 animationName = "necromancer"
                 speed *= 0.3
+                dialogue = SPOOKY_VISITOR_STARTING_DIALOGUE
                 additionalComponents = [new NPC(), new Villager(), new SpookyVisitor()]
                 maxHealth = Number.MAX_SAFE_INTEGER
                 break
