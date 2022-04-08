@@ -166,6 +166,7 @@ debug.showTeleporters = debug.showTeleporters || false
 debug.speedMultiplier = debug.speedMultiplier || 1
 debug.showNavMesh = debug.showNavMesh || false
 debug.showElementGrid = debug.showElementGrid || false
+debug.groundRenderDisabled = debug.groundRenderDisabled || false
 
 const help = () => {
     let help = `dev controls (enable with debug.enableDevControls=true)

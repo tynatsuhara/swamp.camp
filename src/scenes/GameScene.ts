@@ -99,10 +99,12 @@ export class GameScene {
                 ...here().getEntities(),
                 ...LightManager.instance.getEntities(),
                 WorldTime.instance.getEntity(),
-                GroundRenderer.instance.getEntity(),
                 DudeSpawner.instance.getEntity(),
                 Particles.instance.getEntity()
             )
+            if (!debug.groundRenderDisabled) {
+                gameEntities.push(GroundRenderer.instance.getEntity())
+            }
         }
 
         return [
