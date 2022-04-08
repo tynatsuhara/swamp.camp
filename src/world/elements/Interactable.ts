@@ -8,7 +8,6 @@ import { controls } from "../../Controls"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { ButtonIndicator } from "../../ui/ButtonIndicator"
 import { KeyPressIndicator } from "../../ui/KeyPressIndicator"
-import { UISounds } from "../../ui/UISounds"
 import { UIStateManager } from "../../ui/UIStateManager"
 
 export class Interactable extends Component {
@@ -39,7 +38,6 @@ export class Interactable extends Component {
     }
 
     interact() {
-        UISounds.playClickSound()
         this.fn()
     }
 
