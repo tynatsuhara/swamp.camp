@@ -25,7 +25,7 @@ const getSentence = () => {
     Lists.range(0, wordCount).forEach(() => {
         result += ` ${word()}`
     })
-    result += Lists.oneOf([".", "!", "?"])
+    result += Lists.oneOf([".", ".", "!", "?"])
     return result
 }
 
