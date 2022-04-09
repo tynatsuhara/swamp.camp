@@ -18,6 +18,7 @@ import { DeathCutscene } from "../cutscenes/DeathCutscene"
 import { IntroCutscene } from "../cutscenes/IntroCutscene"
 import { FireParticles } from "../graphics/FireParticles"
 import { ImageFilters } from "../graphics/ImageFilters"
+import { PoisonParticles } from "../graphics/PoisonParticles"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { WalkingParticles } from "../graphics/WalkingParticles"
 import { Inventory } from "../items/Inventory"
@@ -310,6 +311,7 @@ export class Dude extends Component implements DialogueSource {
     }
 
     private fireParticles: FireParticles
+    private poisonParticles: PoisonParticles
 
     updateActiveConditions() {
         if (this.conditions.length === 0) {
@@ -355,6 +357,18 @@ export class Dude extends Component implements DialogueSource {
                     }
                     return
                 case Condition.POISONED:
+                    if (!this.poisonParticles) {
+                        this.poisonParticles = this.entity.addComponent(
+                            new PoisonParticles(
+                                this.colliderSize.x - 4,
+                                () =>
+                                    this.standingPosition
+                                        .plusY(-10)
+                                        .plus(this.getAnimationOffset()),
+                                () => this.animation.transform.depth + 1
+                            )
+                        )
+                    }
                     if (timeSinceLastExec > 500) {
                         const poisonDamage = 0.25
                         this.damage(poisonDamage, {
@@ -390,6 +404,12 @@ export class Dude extends Component implements DialogueSource {
                     this.entity.removeComponent(this.fireParticles)
                     LightManager.instance.removeLight(this.fireParticles)
                     this.fireParticles = undefined
+                }
+                return
+            case Condition.POISONED:
+                if (this.poisonParticles) {
+                    this.entity.removeComponent(this.poisonParticles)
+                    this.poisonParticles = undefined
                 }
                 return
         }
