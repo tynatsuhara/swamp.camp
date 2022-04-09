@@ -24,6 +24,7 @@ import { AquaticNPC } from "./types/AquaticNPC"
 import { Berto } from "./types/Berto"
 import { Centaur } from "./types/Centaur"
 import { Enemy } from "./types/Enemy"
+import { PetNPC } from "./types/PetNPC"
 import { ShroomNPC } from "./types/ShroomNPC"
 import { SpookyVisitor } from "./types/SpookyVisitor"
 import { Villager } from "./types/Villager"
@@ -68,6 +69,7 @@ export enum DudeType {
     SPOOKY_VISITOR,
     GNOLL_SCOUT,
     TRAVELING_MERCHANT,
+    GUMBALL,
 }
 
 const DEFAULT_COLLIDER_SIZE = new Point(10, 8)
@@ -324,6 +326,14 @@ export class DudeFactory {
                 weapon = WeaponType.UNARMED
                 additionalComponents = [new NPC()]
                 maxHealth = 2
+                speed *= 0.8
+                break
+            case DudeType.GUMBALL:
+                factions = [DudeFaction.GNOLLS, DudeFaction.VILLAGERS]
+                animationName = "gumball"
+                weapon = WeaponType.UNARMED
+                additionalComponents = [new NPC(), new PetNPC()]
+                maxHealth = 50
                 speed *= 0.8
                 break
             default: {

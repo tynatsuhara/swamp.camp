@@ -154,6 +154,9 @@ const map = new Map(
     imp_idle_anim 368 48 16 16 4
     imp_run_anim 432 48 16 16 4
 
+    gumball_idle_anim 368 64 16 16 4
+    gumball_run_anim 432 64 16 16 4
+
     skelet_idle_anim 368 80 16 16 4
     skelet_run_anim 432 80 16 16 4
 
