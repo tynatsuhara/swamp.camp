@@ -137,9 +137,6 @@ export const formatText = ({
         return new TextRender(
             // replace placeholder space character
             r.replaceAll(NO_BREAK_SPACE_CHAR, " ").replaceAll(ICON_PLACEHOLDER_REGEX, "  "),
-            // quotes are screwy since switching to unicode
-            // .replaceAll("'", "'")
-            // .replaceAll('"', "”"),
             rowPosition(r, i),
             TEXT_SIZE,
             TEXT_FONT,
