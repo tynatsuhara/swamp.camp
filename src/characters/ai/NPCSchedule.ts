@@ -7,6 +7,7 @@ export enum NPCScheduleType {
     ROAM,
     DEFAULT_VILLAGER,
     GO_TO_LOCATION,
+    FOLLOW_LEADER,
 }
 
 export type NPCSchedule = {
@@ -43,6 +44,10 @@ export const NPCSchedules = {
         type: NPCScheduleType.GO_TO_LOCATION,
         l: locationUUID,
         p: tilePoint?.toString(),
+    }),
+
+    newFollowLeaderSchedule: () => ({
+        type: NPCScheduleType.FOLLOW_LEADER,
     }),
 
     VILLAGER_WAKE_UP_TIME: TimeUnit.HOUR * 8,

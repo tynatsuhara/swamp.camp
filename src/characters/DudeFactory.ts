@@ -334,7 +334,7 @@ export class DudeFactory {
                 weapon = WeaponType.UNARMED
                 additionalComponents = [new NPC(), new PetNPC()]
                 maxHealth = 50
-                speed *= 0.8
+                speed *= 0.7
                 break
             default: {
                 throw new Error(`DudeType ${type} can't be instantiated`)

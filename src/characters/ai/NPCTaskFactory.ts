@@ -1,5 +1,6 @@
 import { NPCSchedule, NPCScheduleType } from "./NPCSchedule"
 import { NPCTask } from "./NPCTask"
+import { NPCTaskFollowLeader } from "./NPCTaskFollowLeader"
 import { NPCTaskScheduleDefaultVillager } from "./NPCTaskScheduleDefaultVillager"
 import { NPCTaskScheduleGoToLocation } from "./NPCTaskScheduleGoToLocation"
 import { NPCTaskScheduleGoToSpot } from "./NPCTaskScheduleGoToSpot"
@@ -18,6 +19,8 @@ export class NPCTaskFactory {
                 return new NPCTaskScheduleDefaultVillager()
             case NPCScheduleType.GO_TO_LOCATION:
                 return new NPCTaskScheduleGoToLocation(schedule)
+            case NPCScheduleType.FOLLOW_LEADER:
+                return new NPCTaskFollowLeader()
             default:
                 console.log(`invalid schedule: ${JSON.stringify(schedule)}`)
                 return null
