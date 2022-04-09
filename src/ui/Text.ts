@@ -9,7 +9,7 @@ import { UIStateManager } from "./UIStateManager"
 
 export const TEXT_PIXEL_WIDTH = 8
 export const TEXT_SIZE = 8
-export const TEXT_FONT = "Press Start 2P script=all rev=2"
+export const TEXT_FONT = "Press Start 2P"
 
 export const enum TextAlign {
     LEFT,
