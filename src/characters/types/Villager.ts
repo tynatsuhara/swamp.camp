@@ -6,6 +6,7 @@ import { NPCSchedules } from "../ai/NPCSchedule"
 import { Dude } from "../Dude"
 import { DudeFaction, DudeType } from "../DudeFactory"
 import { NPC } from "../NPC"
+import { Player } from "../Player"
 import { Centaur } from "./Centaur"
 import { ShroomNPC } from "./ShroomNPC"
 
@@ -41,7 +42,10 @@ export class Villager extends Component {
             return !d.factions.includes(DudeFaction.VILLAGERS)
         }
 
-        if (dude.type === DudeType.DIP) {
+        if (dude.type === DudeType.GUMBALL) {
+            npc.setLeader(Player.instance.dude)
+            npc.setSchedule(NPCSchedules.newFollowLeaderSchedule())
+        } else if (dude.type === DudeType.DIP) {
             npc.setSchedule(NPCSchedules.newGoToSchedule(new Point(0, 0)))
         } else if (dude.type === DudeType.SPOOKY_VISITOR) {
             npc.setSchedule(NPCSchedules.newFreeRoamSchedule())

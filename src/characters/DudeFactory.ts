@@ -24,7 +24,6 @@ import { AquaticNPC } from "./types/AquaticNPC"
 import { Berto } from "./types/Berto"
 import { Centaur } from "./types/Centaur"
 import { Enemy } from "./types/Enemy"
-import { PetNPC } from "./types/PetNPC"
 import { ShroomNPC } from "./types/ShroomNPC"
 import { SpookyVisitor } from "./types/SpookyVisitor"
 import { Villager } from "./types/Villager"
@@ -332,7 +331,7 @@ export class DudeFactory {
                 factions = [DudeFaction.GNOLLS, DudeFaction.VILLAGERS]
                 animationName = "gumball"
                 weapon = WeaponType.UNARMED
-                additionalComponents = [new NPC(), new PetNPC()]
+                additionalComponents = [new NPC(), new Villager()]
                 maxHealth = 50
                 speed *= 0.7
                 break
