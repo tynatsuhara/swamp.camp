@@ -1,5 +1,6 @@
 import { Lists } from "brigsby/dist/util/Lists"
-import { dialogue, DialogueSet, NextDialogue } from "./Dialogue"
+import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
+import { DialogueOption, DialogueSet, dialogueWithOptions, NextDialogue } from "./Dialogue"
 
 /**
  * All supported glyphs:
@@ -13,7 +14,7 @@ const LANGUAGE_CHARACTERS = Array.from(
     "ČĆĐŠŽčćđšžБГҐДЂЁЄЖЗЅИЇЙЛЉЊПЋЎФЦЧЏШЩЪЫЬЭЮЯбвгґдђёєжзѕиїйклљмнњптћуўфхцчџшщъыьэюяΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψω"
 )
 
-const getSentence = () => {
+const getSentence = (punctuation: string[]) => {
     const word = () => {
         const wordLen = Math.ceil(Math.random() * 10)
         return Lists.range(0, wordLen)
@@ -25,7 +26,7 @@ const getSentence = () => {
     Lists.range(0, wordCount).forEach(() => {
         result += ` ${word()}`
     })
-    result += Lists.oneOf([".", ".", "!", "?"])
+    result += Lists.oneOf(punctuation)
     return result
 }
 
@@ -33,9 +34,21 @@ export const SPOOKY_VISITOR_STARTING_DIALOGUE = "spooky-0"
 
 export const SPOOKY_VISITOR_DIALOGUE: DialogueSet = {
     [SPOOKY_VISITOR_STARTING_DIALOGUE]: () => {
-        return dialogue(
-            [getSentence()],
-            () => new NextDialogue(SPOOKY_VISITOR_STARTING_DIALOGUE, false)
+        return dialogueWithOptions(
+            [
+                getSentence([".", "!"]),
+                "*The mysterious visitor opens their cloak, revealing an array of trinkets.*",
+                getSentence(["?"]),
+            ],
+            DudeInteractIndicator.NONE,
+            new DialogueOption("Take a look", () => {
+                console.log("TODO: open trade window")
+                new NextDialogue(SPOOKY_VISITOR_STARTING_DIALOGUE, false)
+            }),
+            new DialogueOption(
+                "Back away",
+                () => new NextDialogue(SPOOKY_VISITOR_STARTING_DIALOGUE, false)
+            )
         )
     },
 }
