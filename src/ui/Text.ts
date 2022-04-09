@@ -9,7 +9,7 @@ import { UIStateManager } from "./UIStateManager"
 
 export const TEXT_PIXEL_WIDTH = 8
 export const TEXT_SIZE = 8
-export const TEXT_FONT = "Press Start 2P"
+export const TEXT_FONT = "Press Start 2P script=all rev=2"
 
 export const enum TextAlign {
     LEFT,
@@ -137,6 +137,9 @@ export const formatText = ({
         return new TextRender(
             // replace placeholder space character
             r.replaceAll(NO_BREAK_SPACE_CHAR, " ").replaceAll(ICON_PLACEHOLDER_REGEX, "  "),
+            // quotes are screwy since switching to unicode
+            // .replaceAll("'", "'")
+            // .replaceAll('"', "”"),
             rowPosition(r, i),
             TEXT_SIZE,
             TEXT_FONT,
