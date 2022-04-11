@@ -579,8 +579,7 @@ export class NPC extends Simulatable {
     private leader: Dude
     getLeader() {
         if (this.leader) {
-            if (!this.leader.isAlive || this.leader.location !== this.dude.location) {
-                this.setLeader(undefined)
+            if (!this.leader.isAlive) {
                 this.dude.log("stopped following leader")
             }
         }

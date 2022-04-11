@@ -6,6 +6,7 @@ import { Singletons } from "../Singletons"
 import { ElementType } from "./elements/Elements"
 import { Location } from "./Location"
 import { Simulatable } from "./Simulatable"
+import { TimeUnit } from "./TimeUnit"
 
 export enum LocationType {
     BASE_CAMP = "base",
@@ -51,6 +52,7 @@ export class LocationManager {
         this.currentLocation?.toggleAudio(false)
         newLocation.toggleAudio(true)
         this.currentLocation = newLocation
+        this.simulateLocations(false, TimeUnit.MINUTE)
     }
     private currentLocation: Location
 
