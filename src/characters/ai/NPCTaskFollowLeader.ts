@@ -21,7 +21,7 @@ export class NPCTaskFollowLeader extends NPCTask {
 
         const t = leader.tile
         const options = [t.plusX(1), t.plusX(-1), t.plusY(1), t.plusY(-1)].filter(
-            (p) => !dude.location.isOccupied(p)
+            (p) => dude.location.getGround(p) && !dude.location.isOccupied(p)
         )
 
         if (
