@@ -101,9 +101,7 @@ export class Player extends Component {
             speed -= 0.4
         }
 
-        if (dx !== 0 || dy !== 0) {
-            speed *= this.pushCheck()
-        }
+        speed *= this.pushCheck()
 
         speed *= debug.speedMultiplier
 
