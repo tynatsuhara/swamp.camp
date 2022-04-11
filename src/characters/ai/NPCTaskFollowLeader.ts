@@ -6,29 +6,33 @@ import { NPCTaskContext } from "./NPCTaskContext"
 
 export class NPCTaskFollowLeader extends NPCTask {
     performTask(context: NPCTaskContext) {
-        const leader = context.dude.entity.getComponent(NPC).getLeader()
+        const { dude } = context
+        const leader = dude.entity.getComponent(NPC).getLeader()
         const stoppingDistance = TILE_SIZE * 2
         if (!leader) {
             context.doNothing()
             return
         }
 
-        if (leader.location !== context.dude.location) {
+        if (leader.location !== dude.location) {
             context.goToLocation(leader.location)
             return
         }
 
         const t = leader.tile
-        const options = [t.plusX(1), t.plusX(-1), t.plusY(1), t.plusY(-1)]
+        const options = [t.plusX(1), t.plusX(-1), t.plusY(1), t.plusY(-1)].filter(
+            (p) => !dude.location.isOccupied(p)
+        )
         if (
             options.length === 0 ||
-            context.dude.standingPosition.distanceTo(leader.standingPosition) < stoppingDistance
+            (dude.standingPosition.distanceTo(leader.standingPosition) < stoppingDistance &&
+                !dude.tile.equals(leader.tile))
         ) {
             context.doNothing()
             return
         }
 
-        const position = Lists.oneOf(options.filter((p) => !context.dude.location.isOccupied(p)))
+        const position = Lists.oneOf(options)
         context.walkTo(position)
     }
 }

@@ -304,14 +304,11 @@ export class Location {
         const linkedLocation = LocationManager.instance.get(teleporter.to)
         const linkedPosition = this.getTeleporterLinkedPos(teleporter.to, teleporter.id)
 
-        // Make them slightly off-center of the player so they get pushed away
-        const position = linkedPosition.plus(new Point(Math.random() - 0.5, Math.random() - 0.5))
-
         this.removeDude(dude)
         linkedLocation.addDude(dude)
         dude.location = linkedLocation
 
-        dude.moveTo(position, true)
+        dude.moveTo(linkedPosition, true)
     }
 
     playerUseTeleporter(to: string, id: string) {
