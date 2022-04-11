@@ -42,7 +42,7 @@ export class Villager extends Component {
             return !d.factions.includes(DudeFaction.VILLAGERS)
         }
 
-        if (dude.type === DudeType.GUMBALL) {
+        if (dude.type === DudeType.GUMBALL || dude.type === DudeType.ONION) {
             npc.setLeader(Player.instance.dude)
             npc.setSchedule(NPCSchedules.newFollowLeaderSchedule())
         } else if (dude.type === DudeType.DIP) {

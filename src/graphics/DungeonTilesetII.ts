@@ -145,6 +145,9 @@ const map = new Map(
     tool_lantern 336 192 16 16
     tool_torch 352 192 6 16
 
+    onion_idle_anim 368 0 16 16 4
+    onion_run_anim 432 0 16 16 4
+
     tiny_zombie_idle_anim 368 16 16 16 4
     tiny_zombie_run_anim 432 16 16 16 4
 

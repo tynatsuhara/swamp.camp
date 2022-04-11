@@ -13,6 +13,8 @@ export class NPCTaskFollowLeader extends NPCTask {
             return
         }
 
+        // TODO: Follow inside
+
         const t = leader.tile
         const options = [t.plusX(1), t.plusX(-1), t.plusY(1), t.plusY(-1)]
         if (
