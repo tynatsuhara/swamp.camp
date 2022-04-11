@@ -13,7 +13,10 @@ export class NPCTaskFollowLeader extends NPCTask {
             return
         }
 
-        // TODO: Follow inside
+        if (leader.location !== context.dude.location) {
+            context.goToLocation(leader.location)
+            return
+        }
 
         const t = leader.tile
         const options = [t.plusX(1), t.plusX(-1), t.plusY(1), t.plusY(-1)]
