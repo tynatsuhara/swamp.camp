@@ -23,6 +23,7 @@ export class NPCTaskFollowLeader extends NPCTask {
         const options = [t.plusX(1), t.plusX(-1), t.plusY(1), t.plusY(-1)].filter(
             (p) => !dude.location.isOccupied(p)
         )
+
         if (
             options.length === 0 ||
             (dude.standingPosition.distanceTo(leader.standingPosition) < stoppingDistance &&

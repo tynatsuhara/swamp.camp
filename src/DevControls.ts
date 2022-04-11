@@ -153,21 +153,22 @@ export class DevControls extends Component {
 }
 
 // Set up autocomplete for non-engine debug flags
-debug.enableBlood = debug.enableBlood || false
-debug.enableDevControls = debug.enableDevControls || false
-debug.freeCamera = debug.freeCamera || false
-debug.godMode = debug.godMode || false
-debug.nightVision = debug.nightVision || false
-debug.peacefulMode = debug.peacefulMode || false
-debug.showAudioLogs = debug.showAudioLogs || false
-debug.showGrid = debug.showGrid || false
-debug.showInteractables = debug.showInteractables || false
-debug.showPathfinding = debug.showPathfinding || false
-debug.showTeleporters = debug.showTeleporters || false
-debug.speedMultiplier = debug.speedMultiplier || 1
-debug.showNavMesh = debug.showNavMesh || false
-debug.showElementGrid = debug.showElementGrid || false
-debug.groundRenderDisabled = debug.groundRenderDisabled || false
+debug.enableBlood = debug.enableBlood ?? false
+debug.enableDevControls = debug.enableDevControls ?? false
+debug.freeCamera = debug.freeCamera ?? false
+debug.godMode = debug.godMode ?? false
+debug.nightVision = debug.nightVision ?? false
+debug.peacefulMode = debug.peacefulMode ?? false
+debug.showAudioLogs = debug.showAudioLogs ?? false
+debug.showGrid = debug.showGrid ?? false
+debug.showInteractables = debug.showInteractables ?? false
+debug.showPathfinding = debug.showPathfinding ?? false
+debug.showTeleporters = debug.showTeleporters ?? false
+debug.speedMultiplier = debug.speedMultiplier ?? 1
+debug.showNavMesh = debug.showNavMesh ?? false
+debug.showElementGrid = debug.showElementGrid ?? false
+debug.groundRenderDisabled = debug.groundRenderDisabled ?? false
+debug.showGroundTiles = debug.showGroundTiles ?? false
 
 const help = () => {
     let help = `dev controls (enable with debug.enableDevControls=true)

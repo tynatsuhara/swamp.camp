@@ -188,6 +188,21 @@ export class GameScene {
             e.addComponent(new BasicRenderComponent(...renders))
         }
 
+        if (debug.showGroundTiles) {
+            const pts = here().getGroundSpots(true)
+            const renders = pts.map(
+                (pt) =>
+                    new RectRender({
+                        depth: Number.MAX_SAFE_INTEGER,
+                        position: pt.times(TILE_SIZE),
+                        dimensions: new Point(TILE_SIZE, TILE_SIZE),
+                        color: "#00FFFF7E",
+                    })
+            )
+
+            e.addComponent(new BasicRenderComponent(...renders))
+        }
+
         if (debug.showElementGrid) {
             const renders = here()
                 .getElements()
