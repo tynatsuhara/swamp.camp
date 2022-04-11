@@ -89,10 +89,10 @@ export class Location {
         this.dudeCache = undefined
     }
 
-    setGroundElement(type: GroundType, pos: Point, data: object = {}): GroundComponent {
-        this.ground.get(pos)?.entity.selfDestruct()
-        const groundComponent = Ground.instance.make(type, this, pos, data)
-        this.ground.set(pos, groundComponent)
+    setGroundElement(type: GroundType, tilePoint: Point, data: object = {}): GroundComponent {
+        this.ground.get(tilePoint)?.entity.selfDestruct()
+        const groundComponent = Ground.instance.make(type, this, tilePoint, data)
+        this.ground.set(tilePoint, groundComponent)
 
         if (!this.isInterior) {
             HUD.instance.miniMap.refresh()
@@ -103,24 +103,24 @@ export class Location {
 
     /**
      * @param type
-     * @param pos tile point
+     * @param tilePoint tile point
      * @param data
      */
-    addElement(type: ElementType, pos: Point, data: object = {}): ElementComponent {
+    addElement(type: ElementType, tilePoint: Point, data: object = {}): ElementComponent {
         const factory = Elements.instance.getElementFactory(type)
-        const elementPts = ElementUtils.rectPoints(pos, factory.dimensions)
+        const elementPts = ElementUtils.rectPoints(tilePoint, factory.dimensions)
         if (elementPts.some((pt) => !!this.elements.get(pt))) {
             return null
         }
 
-        if (!factory.canPlaceAtPos(this, pos)) {
+        if (!factory.canPlaceAtPos(this, tilePoint)) {
             return null
         }
 
-        const el = factory.make(this, pos, data)
+        const el = factory.make(this, tilePoint, data)
         if (el.type !== type) {
             throw new Error("constructed element type doesn't match requested type")
-        } else if (el.pos !== pos) {
+        } else if (el.pos !== tilePoint) {
             throw new Error("constructed element position doesn't match requested position")
         } else if (!el.entity) {
             throw new Error("constructed element has a null entity")
@@ -155,30 +155,30 @@ export class Location {
      * @returns the element component at the position. NOTE this can return an
      *          element even if this is an "empty" square
      */
-    getElement(pos: Point) {
-        return this.elements.get(pos)
+    getElement(tilePoint: Point) {
+        return this.elements.get(tilePoint)
     }
 
     /**
      * @returns the ground component at the position
      */
-    getGround(pos: Point) {
-        return this.ground.get(pos)
+    getGround(tilePoint: Point) {
+        return this.ground.get(tilePoint)
     }
 
     /**
      * @returns true if this position in the grid has a solid item
      *          (aka it cannot be walked through)
      */
-    isOccupied(pos: Point) {
-        return !!this.occupied.get(pos)
+    isOccupied(tilePoint: Point) {
+        return !!this.occupied.get(tilePoint)
     }
 
-    setOccupied(pos: Point, occupied: boolean) {
+    setOccupied(tilePoint: Point, occupied: boolean) {
         if (occupied) {
-            this.occupied.set(pos, true)
+            this.occupied.set(tilePoint, true)
         } else {
-            this.occupied.remove(pos)
+            this.occupied.remove(tilePoint)
         }
     }
 
@@ -186,8 +186,8 @@ export class Location {
         return this.occupied.keys()
     }
 
-    removeElementAt(pos: Point) {
-        this.removeElement(this.getElement(pos))
+    removeElementAt(tilePoint: Point) {
+        this.removeElement(this.getElement(tilePoint))
     }
 
     removeElement(el: ElementComponent) {
