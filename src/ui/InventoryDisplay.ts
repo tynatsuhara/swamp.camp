@@ -74,152 +74,14 @@ export class InventoryDisplay extends Component {
             return
         }
 
-        const refreshView = () => this.open(this.onClose, this.tradingInv)
-        const canRemoveFromPlayerInv = (item: Item) => {
-            if (this.playerInv.getItemCount(item) === 1) {
-                // unequip equipped weapons
-                const weapon: WeaponType = WeaponType[WeaponType[item]]
-                if (!!weapon && Player.instance.dude.weaponType === weapon) {
-                    return false
-                }
-
-                // unequip equipped shields
-                const shield: ShieldType = ShieldType[ShieldType[item]]
-                if (!!shield && Player.instance.dude.shieldType === shield) {
-                    return false
-                }
-            }
-            return true
-        }
-
         const hoverResult = this.getHoveredInventoryIndex(controls.getMousePos())
         const hoverInv = hoverResult[0]
         const hoverIndex = hoverResult[1]
 
-        if (!!this.trackedTile) {
-            // dragging
-            this.tooltip.clear()
-            if (controls.isInventoryStackDrop()) {
-                // drop n swap
-                if (hoverIndex !== -1) {
-                    // Swap the stacks
-                    const draggedValue = this.trackedTileInventory.getStack(this.trackedTileIndex)
-
-                    // Swap the stacks
-                    if (hoverInv === this.playerInv || canRemoveFromPlayerInv(draggedValue.item)) {
-                        const currentlyOccupiedSpotValue = hoverInv.getStack(hoverIndex)
-                        hoverInv.setStack(hoverIndex, draggedValue)
-                        this.trackedTileInventory.setStack(
-                            this.trackedTileIndex,
-                            currentlyOccupiedSpotValue
-                        )
-                    }
-                }
-
-                this.trackedTileInventory = null
-                this.trackedTile = null
-
-                refreshView()
-            } else {
-                // track
-                this.trackedTile.transform.position = this.trackedTile.transform.position.plus(
-                    controls.getMousePos().minus(this.lastMousPos)
-                )
-            }
+        if (this.trackedTile) {
+            this.doDrag(hoverInv, hoverIndex)
         } else if (hoverIndex > -1 && !!hoverInv.getStack(hoverIndex)) {
-            // we're hovering over an item
-            this.tooltip.position = controls.getMousePos()
-            const stack = hoverInv.getStack(hoverIndex)
-            const item = ITEM_METADATA_MAP[stack.item]
-            const count = stack.count > 1 ? " x" + stack.count : ""
-
-            const actions: { verb: string; actionFn: () => void }[] = []
-
-            const decrementStack = () => {
-                if (stack.count === 1) {
-                    hoverInv.setStack(hoverIndex, null)
-                } else {
-                    stack.count--
-                }
-            }
-
-            // Only allow actions when in the inventory menu
-            if (!this.tradingInv) {
-                const wl = here()
-                if (
-                    item.element !== null &&
-                    wl.allowPlacing &&
-                    Elements.instance.getElementFactory(item.element).canPlaceInLocation(wl)
-                ) {
-                    actions.push({
-                        verb: "place",
-                        actionFn: () => {
-                            this.close()
-                            PlaceElementDisplay.instance.startPlacing(
-                                item.element,
-                                decrementStack,
-                                stack.count
-                            )
-                        },
-                    })
-                }
-                if (
-                    !!item.equippableWeapon &&
-                    Player.instance.dude.weaponType !== item.equippableWeapon
-                ) {
-                    actions.push({
-                        verb: "equip",
-                        actionFn: () => {
-                            Player.instance.dude.setWeapon(item.equippableWeapon)
-                            refreshView()
-                        },
-                    })
-                }
-                if (
-                    !!item.equippableShield &&
-                    Player.instance.dude.shieldType !== item.equippableShield
-                ) {
-                    actions.push({
-                        verb: "equip off-hand",
-                        actionFn: () => {
-                            Player.instance.dude.setShield(item.equippableShield)
-                            refreshView()
-                        },
-                    })
-                }
-                if (!!item.consumable) {
-                    actions.push({
-                        verb: "eat",
-                        actionFn: () => {
-                            item.consumable()
-                            decrementStack()
-                            refreshView()
-                        },
-                    })
-                }
-            }
-
-            // We currently only support up to 2 interaction types per item
-            const interactButtonOrder: [string, () => boolean][] = [
-                [controls.getInventoryOptionOneString(), () => controls.isInventoryOptionOneDown()],
-                [controls.getInventoryOptionTwoString(), () => controls.isInventoryOptionTwoDown()],
-            ]
-
-            let tooltipString = `${item.displayName}${count}`
-
-            actions.forEach((action, i) => {
-                tooltipString += `\n${interactButtonOrder[i][0]} to ${action.verb}`
-            })
-
-            this.tooltip.say(tooltipString)
-
-            if (this.canUseItems) {
-                actions.forEach((action, i) => {
-                    if (interactButtonOrder[i][1]()) {
-                        action.actionFn()
-                    }
-                })
-            }
+            this.doHover(hoverInv, hoverIndex)
         } else {
             this.tooltip.clear()
         }
@@ -229,29 +91,182 @@ export class InventoryDisplay extends Component {
             this.canUseItems = true
             this.lastMousPos = controls.getMousePos()
 
-            if (controls.isInventoryStackPickUp()) {
-                const hoveredItemStack = hoverInv?.getStack(hoverIndex)
-                if (!!hoveredItemStack) {
-                    const { item, count } = hoveredItemStack
-                    const otherInv = hoverInv === this.playerInv ? this.tradingInv : this.playerInv
-                    if (
-                        !!otherInv &&
-                        controls.isModifierHeld() &&
-                        otherInv.canAddItem(item, count) &&
-                        canRemoveFromPlayerInv(item)
-                    ) {
-                        hoverInv.removeItem(item, count)
-                        otherInv.addItem(item, count)
-                        refreshView()
-                    } else {
-                        this.trackedTileInventory = hoverInv
-                        // some stupid math to account for the fact that this.tiles contains tiles from potentially two inventories
-                        this.trackedTile =
-                            this.tiles[
-                                hoverIndex + (hoverInv === this.playerInv ? 0 : this.playerInv.size)
-                            ]
-                        this.trackedTileIndex = hoverIndex
-                    }
+            this.checkForPickUp(hoverInv, hoverIndex)
+        }
+    }
+
+    private refreshView() {
+        this.open(this.onClose, this.tradingInv)
+    }
+
+    private canRemoveFromPlayerInv(item: Item) {
+        if (this.playerInv.getItemCount(item) === 1) {
+            // unequip equipped weapons
+            const weapon: WeaponType = WeaponType[WeaponType[item]]
+            if (!!weapon && Player.instance.dude.weaponType === weapon) {
+                return false
+            }
+
+            // unequip equipped shields
+            const shield: ShieldType = ShieldType[ShieldType[item]]
+            if (!!shield && Player.instance.dude.shieldType === shield) {
+                return false
+            }
+        }
+        return true
+    }
+
+    private doDrag(hoverInv: Inventory, hoverIndex: number) {
+        // dragging
+        this.tooltip.clear()
+        if (controls.isInventoryStackDrop()) {
+            // drop n swap
+            if (hoverIndex !== -1) {
+                // Swap the stacks
+                const draggedValue = this.trackedTileInventory.getStack(this.trackedTileIndex)
+
+                // Swap the stacks
+                if (hoverInv === this.playerInv || this.canRemoveFromPlayerInv(draggedValue.item)) {
+                    const currentlyOccupiedSpotValue = hoverInv.getStack(hoverIndex)
+                    hoverInv.setStack(hoverIndex, draggedValue)
+                    this.trackedTileInventory.setStack(
+                        this.trackedTileIndex,
+                        currentlyOccupiedSpotValue
+                    )
+                }
+            }
+
+            this.trackedTileInventory = null
+            this.trackedTile = null
+
+            this.refreshView()
+        } else {
+            // track
+            this.trackedTile.transform.position = this.trackedTile.transform.position.plus(
+                controls.getMousePos().minus(this.lastMousPos)
+            )
+        }
+    }
+
+    private doHover(hoverInv: Inventory, hoverIndex: number) {
+        // we're hovering over an item
+        this.tooltip.position = controls.getMousePos()
+        const stack = hoverInv.getStack(hoverIndex)
+        const item = ITEM_METADATA_MAP[stack.item]
+        const count = stack.count > 1 ? " x" + stack.count : ""
+
+        const actions: { verb: string; actionFn: () => void }[] = []
+
+        const decrementStack = () => {
+            if (stack.count === 1) {
+                hoverInv.setStack(hoverIndex, null)
+            } else {
+                stack.count--
+            }
+        }
+
+        // Only allow actions when in the inventory menu
+        if (!this.tradingInv) {
+            const wl = here()
+            if (
+                item.element !== null &&
+                wl.allowPlacing &&
+                Elements.instance.getElementFactory(item.element).canPlaceInLocation(wl)
+            ) {
+                actions.push({
+                    verb: "place",
+                    actionFn: () => {
+                        this.close()
+                        PlaceElementDisplay.instance.startPlacing(
+                            item.element,
+                            decrementStack,
+                            stack.count
+                        )
+                    },
+                })
+            }
+            if (
+                !!item.equippableWeapon &&
+                Player.instance.dude.weaponType !== item.equippableWeapon
+            ) {
+                actions.push({
+                    verb: "equip",
+                    actionFn: () => {
+                        Player.instance.dude.setWeapon(item.equippableWeapon)
+                        this.refreshView()
+                    },
+                })
+            }
+            if (
+                !!item.equippableShield &&
+                Player.instance.dude.shieldType !== item.equippableShield
+            ) {
+                actions.push({
+                    verb: "equip off-hand",
+                    actionFn: () => {
+                        Player.instance.dude.setShield(item.equippableShield)
+                        this.refreshView()
+                    },
+                })
+            }
+            if (!!item.consumable) {
+                actions.push({
+                    verb: "eat",
+                    actionFn: () => {
+                        item.consumable()
+                        decrementStack()
+                        this.refreshView()
+                    },
+                })
+            }
+        }
+
+        // We currently only support up to 2 interaction types per item
+        const interactButtonOrder: [string, () => boolean][] = [
+            [controls.getInventoryOptionOneString(), () => controls.isInventoryOptionOneDown()],
+            [controls.getInventoryOptionTwoString(), () => controls.isInventoryOptionTwoDown()],
+        ]
+
+        let tooltipString = `${item.displayName}${count}`
+
+        actions.forEach((action, i) => {
+            tooltipString += `\n${interactButtonOrder[i][0]} to ${action.verb}`
+        })
+
+        this.tooltip.say(tooltipString)
+
+        if (this.canUseItems) {
+            actions.forEach((action, i) => {
+                if (interactButtonOrder[i][1]()) {
+                    action.actionFn()
+                }
+            })
+        }
+    }
+
+    private checkForPickUp(hoverInv: Inventory, hoverIndex: number) {
+        if (controls.isInventoryStackPickUp()) {
+            const hoveredItemStack = hoverInv?.getStack(hoverIndex)
+            if (!!hoveredItemStack) {
+                const { item, count } = hoveredItemStack
+                const otherInv = hoverInv === this.playerInv ? this.tradingInv : this.playerInv
+                if (
+                    !!otherInv &&
+                    controls.isModifierHeld() &&
+                    otherInv.canAddItem(item, count) &&
+                    this.canRemoveFromPlayerInv(item)
+                ) {
+                    hoverInv.removeItem(item, count)
+                    otherInv.addItem(item, count)
+                    this.refreshView()
+                } else {
+                    this.trackedTileInventory = hoverInv
+                    // some stupid math to account for the fact that this.tiles contains tiles from potentially two inventories
+                    this.trackedTile =
+                        this.tiles[
+                            hoverIndex + (hoverInv === this.playerInv ? 0 : this.playerInv.size)
+                        ]
+                    this.trackedTileIndex = hoverIndex
                 }
             }
         }
