@@ -223,14 +223,18 @@ export class CraftingMenu extends Component {
             const craftedItem = ITEM_METADATA_MAP[recipe.output]
 
             // craft the item
-            if (hovered && controls.isMenuClickDown() && this.canCraft(recipe)) {
-                Sounds.play(this.craftNoise, 0.6)
-                recipe.input.forEach((ingr) => {
-                    Player.instance.dude.inventory.removeItem(ingr.item, ingr.count)
-                })
-                Player.instance.dude.inventory.addItem(recipe.output)
-                this.justCraftedRow = r
-                setTimeout(() => (this.justCraftedRow = -1), 900)
+            if (hovered && controls.isMenuClickDown()) {
+                if (this.canCraft(recipe)) {
+                    Sounds.play(this.craftNoise, 0.6)
+                    recipe.input.forEach((ingr) => {
+                        Player.instance.dude.inventory.removeItem(ingr.item, ingr.count)
+                    })
+                    Player.instance.dude.inventory.addItem(recipe.output)
+                    this.justCraftedRow = r
+                    setTimeout(() => (this.justCraftedRow = -1), 900)
+                } else {
+                    UISounds.playErrorSound()
+                }
             }
 
             const prefix = recipe.desc + "\n"
