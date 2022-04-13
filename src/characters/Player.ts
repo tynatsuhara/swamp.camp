@@ -7,6 +7,7 @@ import { Lists } from "brigsby/dist/util/Lists"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
+import { ITEM_METADATA_MAP } from "../items/Items"
 import { TextAlign } from "../ui/Text"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Interactable } from "../world/elements/Interactable"
@@ -122,6 +123,8 @@ export class Player extends Component {
 
         // Check other user input
 
+        this.checkHotKeys(updateData)
+
         if (!this.dude.jumping && controls.isJumpDown()) {
             this.dude.jump()
         } else if (!this.dude.rolling && controls.isRollDown() && (dx !== 0 || dy !== 0)) {
@@ -195,6 +198,24 @@ export class Player extends Component {
         return 0.45
     }
     private pushingUntil = 0
+
+    private checkHotKeys(updateData) {
+        controls.HOT_KEY_OPTIONS.forEach((hotKey) => {
+            if (updateData.input.isKeyDown(hotKey)) {
+                const hotKeyItem = this.dude.inventory
+                    .getStacks()
+                    .find((s) => s.metadata.hotKey === hotKey)?.item
+                if (hotKeyItem) {
+                    const itemData = ITEM_METADATA_MAP[hotKeyItem]
+                    if (itemData.equippableWeapon && !this.dude.weapon?.isAttacking()) {
+                        this.dude.setWeapon(itemData.equippableWeapon)
+                    } else if (itemData.equippableShield && !this.dude.shield?.isBlocking()) {
+                        this.dude.setShield(itemData.equippableShield)
+                    }
+                }
+            }
+        })
+    }
 
     private checkIsOffMap(updateData: UpdateData) {
         if (this.isOffMap()) {

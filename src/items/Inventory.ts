@@ -1,12 +1,19 @@
+import { InputKey } from "brigsby/dist/Input"
 import { Item, ITEM_METADATA_MAP } from "./Items"
+
+export type ItemStackMetadata = {
+    hotKey?: InputKey
+}
 
 export class ItemStack {
     readonly item: Item
     count: number
+    readonly metadata: ItemStackMetadata
 
-    constructor(item: Item, count: number) {
+    constructor(item: Item, count: number, metadata: ItemStackMetadata = {}) {
         this.item = item
         this.count = count
+        this.metadata = metadata
     }
 }
 
@@ -39,7 +46,7 @@ export class Inventory {
     /**
      * returns true if the item was successfully added
      */
-    addItem(item: Item, count: number = 1): boolean {
+    addItem(item: Item, count: number = 1, metadata?: ItemStackMetadata): boolean {
         const canAdd = this.canAddItem(item, count)
         if (!canAdd) {
             return false
@@ -49,8 +56,9 @@ export class Inventory {
 
         let leftToAdd = count
 
-        // First, add to existing stacks to preserve space
-        for (let i = 0; i < this.stacks.length && leftToAdd > 0; i++) {
+        // First, add to existing stacks to preserve space.
+        // Only works if the stack doesn't have metadata.
+        for (let i = 0; i < this.stacks.length && leftToAdd > 0 && !metadata; i++) {
             const slotValue = this.stacks[i]
             if (slotValue?.item === item) {
                 const addedHere = Math.min(stackLimit - slotValue.count, leftToAdd)
@@ -59,13 +67,13 @@ export class Inventory {
             }
         }
 
-        // Then add to empty slots
+        // Then add to empty slots (TODO: Merge stacks if metadata is identical)
         for (let i = 0; i < this.stacks.length && leftToAdd > 0; i++) {
             const slotValue = this.stacks[i]
             if (!slotValue) {
                 const addedHere = Math.min(stackLimit, leftToAdd)
                 leftToAdd -= addedHere
-                this.stacks[i] = new ItemStack(item, addedHere)
+                this.stacks[i] = new ItemStack(item, addedHere, metadata ?? {})
             }
         }
 
@@ -141,12 +149,16 @@ export class Inventory {
         // filter out now-invalid items
         stacks = stacks.map((stack) => (ITEM_METADATA_MAP[stack?.item] ? stack : null))
 
-        inv.stacks = stacks
-        stacks.forEach((stack) => {
+        inv.stacks = stacks.map((s) =>
+            s === null ? null : new ItemStack(s.item, s.count, s.metadata ?? {})
+        )
+
+        inv.stacks.forEach((stack) => {
             if (!!stack) {
                 inv.countMap.set(stack.item, stack.count + (inv.countMap.get(stack.item) ?? 0))
             }
         })
+
         return inv
     }
 }

@@ -76,6 +76,19 @@ const deaden = (axes: Point) =>
  *   - Make sure the APIs are consistently named
  */
 class ControlsWrapper extends Component {
+    readonly HOT_KEY_OPTIONS = [
+        InputKey.ZERO,
+        InputKey.ONE,
+        InputKey.TWO,
+        InputKey.THREE,
+        InputKey.FOUR,
+        InputKey.FIVE,
+        InputKey.SIX,
+        InputKey.SEVEN,
+        InputKey.EIGHT,
+        InputKey.NINE,
+    ]
+
     update(updateData: UpdateData) {
         input = updateData.input
 

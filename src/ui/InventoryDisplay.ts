@@ -1,6 +1,7 @@
 import { Component } from "brigsby/dist/Component"
 import { UpdateData } from "brigsby/dist/Engine"
 import { Entity } from "brigsby/dist/Entity"
+import { InputKeyString } from "brigsby/dist/Input"
 import { Point } from "brigsby/dist/Point"
 import { BasicRenderComponent } from "brigsby/dist/renderer/BasicRenderComponent"
 import { TextRender } from "brigsby/dist/renderer/TextRender"
@@ -14,7 +15,7 @@ import { WeaponType } from "../characters/weapons/WeaponType"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
-import { Inventory } from "../items/Inventory"
+import { Inventory, ItemStack } from "../items/Inventory"
 import { Item, ITEM_METADATA_MAP } from "../items/Items"
 import { saveManager } from "../SaveManager"
 import { Elements } from "../world/elements/Elements"
@@ -81,7 +82,7 @@ export class InventoryDisplay extends Component {
         if (this.trackedTile) {
             this.doDrag(hoverInv, hoverIndex)
         } else if (hoverIndex > -1 && !!hoverInv.getStack(hoverIndex)) {
-            this.doHover(hoverInv, hoverIndex)
+            this.doHover(hoverInv, hoverIndex, updateData)
         } else {
             this.tooltip.clear()
         }
@@ -93,6 +94,19 @@ export class InventoryDisplay extends Component {
 
             this.checkForPickUp(hoverInv, hoverIndex)
         }
+    }
+
+    private checkSetHotKey(stack: ItemStack, updateData: UpdateData) {
+        controls.HOT_KEY_OPTIONS.forEach((key) => {
+            if (updateData.input.isKeyDown(key)) {
+                this.playerInv.getStacks().forEach((s) => {
+                    if (s.metadata?.hotKey === key) {
+                        s.metadata.hotKey = undefined
+                    }
+                })
+                stack.metadata.hotKey = key
+            }
+        })
     }
 
     private refreshView() {
@@ -139,6 +153,7 @@ export class InventoryDisplay extends Component {
             this.trackedTileInventory = null
             this.trackedTile = null
 
+            this.stripHotKeysFromOtherInv()
             this.refreshView()
         } else {
             // track
@@ -148,11 +163,14 @@ export class InventoryDisplay extends Component {
         }
     }
 
-    private doHover(hoverInv: Inventory, hoverIndex: number) {
+    private doHover(hoverInv: Inventory, hoverIndex: number, updateData: UpdateData) {
         // we're hovering over an item
         this.tooltip.position = controls.getMousePos()
         const stack = hoverInv.getStack(hoverIndex)
         const item = ITEM_METADATA_MAP[stack.item]
+        const hotKeyPrefix = stack.metadata.hotKey
+            ? `(${InputKeyString.for(stack.metadata.hotKey)}) `
+            : ""
         const count = stack.count > 1 ? " x" + stack.count : ""
 
         const actions: { verb: string; actionFn: () => void }[] = []
@@ -185,29 +203,31 @@ export class InventoryDisplay extends Component {
                     },
                 })
             }
-            if (
-                !!item.equippableWeapon &&
-                Player.instance.dude.weaponType !== item.equippableWeapon
-            ) {
-                actions.push({
-                    verb: "equip",
-                    actionFn: () => {
-                        Player.instance.dude.setWeapon(item.equippableWeapon)
-                        this.refreshView()
-                    },
-                })
+            if (item.equippableWeapon) {
+                if (Player.instance.dude.weaponType !== item.equippableWeapon) {
+                    actions.push({
+                        verb: "equip",
+                        actionFn: () => {
+                            Player.instance.dude.setWeapon(item.equippableWeapon)
+                            this.refreshView()
+                        },
+                    })
+                }
+
+                this.checkSetHotKey(stack, updateData)
             }
-            if (
-                !!item.equippableShield &&
-                Player.instance.dude.shieldType !== item.equippableShield
-            ) {
-                actions.push({
-                    verb: "equip off-hand",
-                    actionFn: () => {
-                        Player.instance.dude.setShield(item.equippableShield)
-                        this.refreshView()
-                    },
-                })
+            if (item.equippableShield) {
+                if (Player.instance.dude.shieldType !== item.equippableShield) {
+                    actions.push({
+                        verb: "equip off-hand",
+                        actionFn: () => {
+                            Player.instance.dude.setShield(item.equippableShield)
+                            this.refreshView()
+                        },
+                    })
+                }
+
+                this.checkSetHotKey(stack, updateData)
             }
             if (!!item.consumable) {
                 actions.push({
@@ -227,7 +247,7 @@ export class InventoryDisplay extends Component {
             [controls.getInventoryOptionTwoString(), () => controls.isInventoryOptionTwoDown()],
         ]
 
-        let tooltipString = `${item.displayName}${count}`
+        let tooltipString = `${hotKeyPrefix}${item.displayName}${count}`
 
         actions.forEach((action, i) => {
             tooltipString += `\n${interactButtonOrder[i][0]} to ${action.verb}`
@@ -251,13 +271,14 @@ export class InventoryDisplay extends Component {
                 const { item, count } = hoveredItemStack
                 const otherInv = hoverInv === this.playerInv ? this.tradingInv : this.playerInv
                 if (
-                    !!otherInv &&
+                    otherInv &&
                     controls.isModifierHeld() &&
                     otherInv.canAddItem(item, count) &&
                     this.canRemoveFromPlayerInv(item)
                 ) {
                     hoverInv.removeItem(item, count)
                     otherInv.addItem(item, count)
+                    this.stripHotKeysFromOtherInv()
                     this.refreshView()
                 } else {
                     this.trackedTileInventory = hoverInv
@@ -270,6 +291,10 @@ export class InventoryDisplay extends Component {
                 }
             }
         }
+    }
+
+    private stripHotKeysFromOtherInv() {
+        this.tradingInv?.getStacks().forEach((s) => (s.metadata.hotKey = undefined))
     }
 
     private getOffsetForInv(inv: Inventory) {

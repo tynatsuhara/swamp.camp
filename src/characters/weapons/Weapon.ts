@@ -50,7 +50,7 @@ export abstract class Weapon extends Component {
     /**
      * Used to determine if a shield can block
      */
-    abstract isAttacking()
+    abstract isAttacking(): boolean
     abstract setSheathed(sheathed: boolean): void
     abstract isSheathed(): boolean
     abstract getRange(): number
