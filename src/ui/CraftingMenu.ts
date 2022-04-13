@@ -20,6 +20,7 @@ import { Item, ITEM_METADATA_MAP } from "../items/Items"
 import { Color } from "./Color"
 import { TEXT_FONT, TEXT_SIZE } from "./Text"
 import { Tooltip } from "./Tooltip"
+import { UISounds } from "./UISounds"
 import { UIStateManager } from "./UIStateManager"
 
 const COLOR_TEXT_HOVERED = Color.WHITE
@@ -156,6 +157,7 @@ export class CraftingMenu extends Component {
             )
 
             if (!this.justOpened && hovered && controls.isMenuClickDown()) {
+                UISounds.playClickSound()
                 this.selectCategory(i)
             }
 
