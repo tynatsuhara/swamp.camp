@@ -80,6 +80,7 @@ export class Shield extends Component {
 
     setOnBack(onBack: boolean) {
         this.state = onBack ? State.ON_BACK : State.DRAWN
+        this.raisedPerc = 0
     }
 
     block(blockingActive: boolean) {
