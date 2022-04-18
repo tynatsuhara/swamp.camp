@@ -21,7 +21,7 @@ import { Particles } from "../graphics/Particles"
 import { getFilesToLoadForGame, getImage, Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { saveManager } from "../SaveManager"
 import { Save } from "../saves/SaveGame"
-import { SwampCampGame } from "../SwampCampGame"
+import { IS_NATIVE_APP, SwampCampGame, ZOOM } from "../SwampCampGame"
 import { Cursor } from "../ui/Cursor"
 import { MainMenuButtonSection } from "../ui/MainMenuButtonSection"
 import { PlumePicker, PLUME_COLORS } from "../ui/PlumePicker"
@@ -29,10 +29,6 @@ import { TEXT_SIZE } from "../ui/Text"
 import { UISounds } from "../ui/UISounds"
 import { UIStateManager } from "../ui/UIStateManager"
 import { DarknessMask } from "../world/DarknessMask"
-
-const ZOOM = 3
-
-const IS_NATIVE_APP = !!new URL(window.location.href).searchParams.get("native_app")
 
 enum Menu {
     ROOT,

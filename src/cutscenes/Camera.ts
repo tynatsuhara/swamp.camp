@@ -5,13 +5,12 @@ import { Maths } from "brigsby/dist/util/Maths"
 import { Dude } from "../characters/Dude"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
+import { ZOOM } from "../SwampCampGame"
 import { here } from "../world/LocationManager"
 
 type FocalPoint = "center" | "top"
 
 export class Camera {
-    static readonly ZOOM = 3
-
     static get instance() {
         return Singletons.getOrCreate(Camera)
     }
@@ -29,7 +28,7 @@ export class Camera {
         return this._position.times(-1).minus(this.shakeOffset)
     }
     get dimensions() {
-        return renderer.getDimensions().div(Camera.ZOOM)
+        return renderer.getDimensions().div(ZOOM)
     }
 
     private focalPoint: FocalPoint = "center"

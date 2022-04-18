@@ -23,6 +23,7 @@ import { Particles } from "../graphics/Particles"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { DroppedItem } from "../items/DroppedItem"
 import { Singletons } from "../Singletons"
+import { ZOOM } from "../SwampCampGame"
 import { ButtonsMenu } from "../ui/ButtonsMenu"
 import { Color } from "../ui/Color"
 import { UIStateManager } from "../ui/UIStateManager"
@@ -109,17 +110,17 @@ export class GameScene {
 
         return [
             {
-                zoom: Camera.ZOOM,
+                zoom: ZOOM,
                 offset: Point.ZERO,
                 entities: [controls.entity],
             },
             {
-                zoom: Camera.ZOOM,
+                zoom: ZOOM,
                 offset: cameraOffset,
                 entities: gameEntities,
             },
             {
-                zoom: Camera.ZOOM,
+                zoom: ZOOM,
                 offset: Point.ZERO,
                 entities: uiEntities,
             },
