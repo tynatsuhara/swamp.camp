@@ -52,6 +52,26 @@ export class DudeSpawner extends Component {
             this.checkForOrcSeige()
             this.spawnWildlife()
         }
+        this.spawnVisitors()
+    }
+
+    private spawnVisitors() {
+        const visitorTypes = [DudeType.SPOOKY_VISITOR]
+        const currentVisitors = camp()
+            .getDudes()
+            .filter((d) => visitorTypes.includes(d.type))
+
+        if (currentVisitors.length === 0) {
+            return
+        }
+
+        if (this.shouldRandomlySpawn(TimeUnit.DAY * 7)) {
+            const visitorType = Lists.oneOf(visitorTypes)
+            DudeFactory.instance.new(visitorType, this.getSpawnPosOffMap())
+            // TODO: Make the visitor leave after a while.
+            // Should this use the event queue?
+            // The spooky visitor will vanish as soon as they sense an enemy.
+        }
     }
 
     private spawnDemons() {
