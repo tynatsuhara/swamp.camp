@@ -1,6 +1,7 @@
 export enum Condition {
     ON_FIRE,
     POISONED,
+    BLACK_LUNG,
 }
 
 export type ActiveCondition = {
@@ -8,7 +9,7 @@ export type ActiveCondition = {
     /**
      * The world time when the effect will expire
      */
-    expiration: number
+    expiration?: number
     /**
      * For conditions which need to apply an effect
      * repeatedly, this tracks the last tick

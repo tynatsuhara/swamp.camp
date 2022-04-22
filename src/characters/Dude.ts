@@ -382,11 +382,18 @@ export class Dude extends Component implements DialogueSource {
         })
     }
 
-    addCondition(condition: Condition, duration: number) {
-        const expiration = WorldTime.instance.time + duration
+    /**
+     * @param duration if zero, unlimited duration
+     */
+    addCondition(condition: Condition, duration?: number) {
+        const expiration = duration ? WorldTime.instance.time + duration : undefined
         const existing = this.conditions.find((c) => c.condition === condition)
         if (existing) {
-            existing.expiration = Math.max(existing.expiration, expiration)
+            if (!duration) {
+                existing.expiration = undefined
+            } else {
+                existing.expiration = Math.max(existing.expiration, expiration)
+            }
         } else {
             this.conditions.push({
                 condition,
@@ -413,6 +420,10 @@ export class Dude extends Component implements DialogueSource {
                 }
                 return
         }
+    }
+
+    removeAllConditions() {
+        this.conditions.forEach((c) => this.removeCondition(c.condition))
     }
 
     hasCondition(condition: Condition) {
@@ -573,7 +584,7 @@ export class Dude extends Component implements DialogueSource {
         this.animation.transform.rotation = 0
         this.layingDownOffset = null
 
-        this.conditions.forEach((c) => this.removeCondition(c.condition))
+        this.removeAllConditions()
     }
 
     dissolve() {
@@ -1004,7 +1015,7 @@ export class Dude extends Component implements DialogueSource {
     }
 
     delete() {
-        this.conditions.forEach((c) => this.removeCondition(c.condition))
+        this.removeAllConditions()
         this.location.removeDude(this)
         super.delete()
     }

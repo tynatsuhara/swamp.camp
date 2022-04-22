@@ -74,7 +74,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     [
         InputKey.SEMICOLON,
         "poison player",
-        () => Player.instance.dude.addCondition(Condition.POISONED, 10_000),
+        () => Player.instance.dude.addCondition(Condition.POISONED),
     ],
     [InputKey.QUOTE, "trigger orc raid", () => DudeSpawner.instance.spawnOrcs()],
     [
