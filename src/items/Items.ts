@@ -3,6 +3,7 @@ import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { SpriteSource } from "brigsby/dist/sprites/SpriteSource"
 import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
+import { Condition } from "../characters/Condition"
 import { Player } from "../characters/Player"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { WeaponType } from "../characters/weapons/WeaponType"
@@ -151,7 +152,12 @@ export const ITEM_METADATA_MAP = {
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("mushroom"),
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("mushroom"),
         element: ElementType.MUSHROOM,
-        consumable: () => Player.instance.dude.heal(1),
+        consumable: () => {
+            Player.instance.dude.heal(1)
+            if (Math.random() < 0.25) {
+                Player.instance.dude.addCondition(Condition.POISONED, 5_000)
+            }
+        },
     }),
     [Item.CHEST]: new ItemMetadata({
         displayName: "Chest",
