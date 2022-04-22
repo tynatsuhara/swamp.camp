@@ -66,13 +66,13 @@ window["Item"] = Item
 
 export class ItemMetadata {
     readonly displayName: string
-    readonly droppedIconSupplier: () => SpriteSource
+    readonly droppedIconSupplier?: () => SpriteSource
     readonly inventoryIconSupplier: () => StaticSpriteSource
     readonly stackLimit: number
-    readonly element: ElementType
-    readonly equippableWeapon: WeaponType
-    readonly equippableShield: ShieldType
-    readonly consumable: () => void
+    readonly element?: ElementType
+    readonly equippableWeapon?: WeaponType
+    readonly equippableShield?: ShieldType
+    readonly consumable?: [string, () => void]
 
     // TODO maybe make this a builder
     constructor({
@@ -92,7 +92,7 @@ export class ItemMetadata {
         element?: ElementType
         equippableWeapon?: WeaponType
         equippableShield?: ShieldType
-        consumable?: () => void
+        consumable?: [string, () => void]
     }) {
         this.displayName = displayName
         this.droppedIconSupplier = droppedIconSupplier
@@ -153,12 +153,18 @@ export const ITEM_METADATA_MAP = {
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("mushroom"),
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("mushroom"),
         element: ElementType.MUSHROOM,
-        consumable: () => {
-            Player.instance.dude.heal(1)
-            if (Math.random() < 0.25) {
-                Player.instance.dude.addCondition(Condition.POISONED, 2_500 + Math.random() * 5_000)
-            }
-        },
+        consumable: [
+            "eat",
+            () => {
+                Player.instance.dude.heal(1)
+                if (Math.random() < 0.25) {
+                    Player.instance.dude.addCondition(
+                        Condition.POISONED,
+                        2_500 + Math.random() * 5_000
+                    )
+                }
+            },
+        ],
     }),
     [Item.CHEST]: new ItemMetadata({
         displayName: "Chest",
@@ -176,7 +182,7 @@ export const ITEM_METADATA_MAP = {
         displayName: "Weak medicine",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("potion1"),
         stackLimit: 1,
-        consumable: () => Player.instance.dude.heal(2),
+        consumable: ["drink", () => Player.instance.dude.heal(2)],
     }),
     [Item.HEART_CONTAINER]: new ItemMetadata({
         displayName: "Heart container",
@@ -187,7 +193,7 @@ export const ITEM_METADATA_MAP = {
         displayName: "Antidote",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("potion3"),
         stackLimit: 1,
-        consumable: () => Player.instance.dude.removeCondition(Condition.POISONED),
+        consumable: ["drink", () => Player.instance.dude.removeCondition(Condition.POISONED)],
     }),
 
     // Locations

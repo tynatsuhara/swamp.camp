@@ -230,10 +230,11 @@ export class InventoryDisplay extends Component {
                 this.checkSetHotKey(stack, updateData)
             }
             if (!!item.consumable) {
+                const [verb, consumeFn] = item.consumable
                 actions.push({
-                    verb: "eat",
+                    verb,
                     actionFn: () => {
-                        item.consumable()
+                        consumeFn()
                         decrementStack()
                         this.refreshView()
                     },
