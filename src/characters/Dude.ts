@@ -904,6 +904,7 @@ export class Dude extends Component implements DialogueSource {
             (i) => (this.jumpingOffset = frames[i]),
             () => {
                 StepSounds.singleFootstepSound(this, 3)
+                this.entity.getComponent(WalkingParticles).land()
                 this.isJumping = false
                 this.wasJumping = true
                 this.animationDirty = true

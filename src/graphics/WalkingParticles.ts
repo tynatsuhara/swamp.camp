@@ -21,6 +21,26 @@ export class WalkingParticles extends Component {
         this.dude = this.entity.getComponent(Dude)
     }
 
+    land() {
+        const particles = 10 + Math.random() * 5
+
+        for (let i = 0; i < particles; i++) {
+            const moveTimeLimit = 100 + Math.random() * 200
+            const lifeSpan = moveTimeLimit * 2
+
+            const offset = Point.ZERO.randomCircularShift(1)
+
+            Particles.instance.emitParticle(
+                Color.TAUPE_5,
+                this.dude.standingPosition.plus(offset),
+                GroundRenderer.DEPTH + 1,
+                lifeSpan,
+                (t) => offset.times(Math.min(moveTimeLimit, t) * 0.035),
+                Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
+            )
+        }
+    }
+
     update(updateData: UpdateData) {
         // TODO blood
         if (
