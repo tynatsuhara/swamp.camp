@@ -155,7 +155,7 @@ export const ITEM_METADATA_MAP = {
         consumable: () => {
             Player.instance.dude.heal(1)
             if (Math.random() < 0.25) {
-                Player.instance.dude.addCondition(Condition.POISONED, 5_000)
+                Player.instance.dude.addCondition(Condition.POISONED, 2_500 + Math.random() * 5_000)
             }
         },
     }),
