@@ -22,9 +22,14 @@ const getItemsToBuy = (): SalePackage[] => {
             price: 10,
         },
         {
+            item: Item.POISON_ANTIDOTE,
+            count: 1,
+            price: 5,
+        },
+        {
             item: Item.HEART_CONTAINER,
             count: 1,
-            price: 1,
+            price: 20,
         },
     ]
 }

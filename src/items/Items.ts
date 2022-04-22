@@ -30,6 +30,7 @@ export enum Item {
     WEAK_MEDICINE,
     HEART_CONTAINER,
     APOTHECARY,
+    POISON_ANTIDOTE,
 
     // weapon values should match the WeaponType enum so we can cast them
     KNIFE = WeaponType.KNIFE,
@@ -181,6 +182,12 @@ export const ITEM_METADATA_MAP = {
         displayName: "Heart container",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("heart"),
         stackLimit: 1,
+    }),
+    [Item.POISON_ANTIDOTE]: new ItemMetadata({
+        displayName: "Antidote",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("potion3"),
+        stackLimit: 1,
+        consumable: () => Player.instance.dude.removeCondition(Condition.POISONED),
     }),
 
     // Locations
