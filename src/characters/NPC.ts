@@ -578,11 +578,6 @@ export class NPC extends Simulatable {
 
     private leader: Dude
     getLeader() {
-        if (this.leader) {
-            if (!this.leader.isAlive) {
-                this.dude.log("stopped following leader")
-            }
-        }
         const savedLeaderUUID = this.dude.blob["leader"]
         if (!savedLeaderUUID) {
             return undefined
