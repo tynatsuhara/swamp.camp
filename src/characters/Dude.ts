@@ -442,12 +442,18 @@ export class Dude extends Component implements DialogueSource {
             attacker = undefined,
             blockable = true,
             dodgeable = true,
+            condition = undefined,
+            conditionDuration = 0,
+            conditionBlockable = true,
         }: {
             direction?: Point
             knockback?: number
             attacker?: Dude
             blockable?: boolean
             dodgeable?: boolean
+            condition?: Condition
+            conditionDuration?: number
+            conditionBlockable?: boolean
         }
     ) {
         if (dodgeable && (this.rolling || this.jumping)) {
@@ -458,15 +464,20 @@ export class Dude extends Component implements DialogueSource {
             return
         }
 
-        const blocked =
-            blockable &&
+        const blocking =
             this.shield?.isBlocking() &&
             // absorb damage if facing the direction of the enemy
             !this.isFacing(this.standingPosition.plus(direction))
 
+        const blocked = blockable && blocking
+
         if (blocked) {
             damage *= 0.25
             knockback *= 0.4
+        }
+
+        if (condition && (!conditionBlockable || !blocking)) {
+            this.addCondition(condition, conditionDuration)
         }
 
         if (this.isAlive) {

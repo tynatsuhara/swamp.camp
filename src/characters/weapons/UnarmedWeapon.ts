@@ -1,3 +1,4 @@
+import { Condition } from "../Condition"
 import { DudeType } from "../DudeFactory"
 import { Weapon } from "./Weapon"
 import { WeaponType } from "./WeaponType"
@@ -46,11 +47,18 @@ export class UnarmedWeapon extends Weapon {
 
         const closestEnemy = enemies[0]
         const attackDir = closestEnemy.standingPosition.minus(this.dude.standingPosition)
+
         this.dude.knockback(attackDir, 30) // pounce
+
         closestEnemy.damage(this.getDamageAmount(), {
             direction: closestEnemy.standingPosition.minus(this.dude.standingPosition),
             knockback: 50,
             attacker: this.dude,
+            condition:
+                this.dude.type === DudeType.SHROOM && Math.random() > 0.5
+                    ? Condition.POISONED
+                    : undefined,
+            conditionDuration: 5_000 + Math.random() * 5_000,
         })
 
         setTimeout(() => (this.state = State.DRAWN), this.delay)
