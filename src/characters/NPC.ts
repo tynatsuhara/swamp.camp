@@ -25,7 +25,10 @@ import { Player } from "./Player"
  * Shared logic for different types of NPCs. These should be invoked by an NPC controller component.
  */
 export class NPC extends Simulatable {
-    private dude: Dude
+    private _dude: Dude
+    get dude() {
+        return this._dude
+    }
 
     isEnemyFn: (dude: Dude) => boolean = () => false
     enemyToAttackFilterFn: (enemies: Dude[]) => Dude[] = (enemies) => enemies
@@ -42,17 +45,17 @@ export class NPC extends Simulatable {
         super()
 
         this.awake = () => {
-            this.dude = this.entity.getComponent(Dude)
+            this._dude = this.entity.getComponent(Dude)
 
             // set a default schedule
-            if (!this.dude.blob[NPCSchedules.SCHEDULE_KEY]) {
+            if (!this._dude.blob[NPCSchedules.SCHEDULE_KEY]) {
                 this.setSchedule(NPCSchedules.newFreeRoamSchedule())
             }
         }
     }
 
     start() {
-        this.dude.doWhileLiving(() => this.decideWhatToDoNext(), 1000 + 1000 * Math.random())
+        this._dude.doWhileLiving(() => this.decideWhatToDoNext(), 1000 + 1000 * Math.random())
     }
 
     update(updateData: UpdateData) {
@@ -74,14 +77,14 @@ export class NPC extends Simulatable {
 
         this._attackIndicator = DudeInteractIndicator.NONE
 
-        if (DialogueDisplay.instance.source === this.dude) {
+        if (DialogueDisplay.instance.source === this._dude) {
             // don't move when talking
-            this.dude.move(
+            this._dude.move(
                 updateData.elapsedTimeMillis,
                 Point.ZERO,
-                Player.instance.dude.standingPosition.x - this.dude.standingPosition.x
+                Player.instance.dude.standingPosition.x - this._dude.standingPosition.x
             )
-        } else if (this.dude.hasCondition(Condition.ON_FIRE)) {
+        } else if (this._dude.hasCondition(Condition.ON_FIRE)) {
             this.doRoam(updateData) // flee
         } else if (this.enemiesPresent) {
             // re-check the enemy function for dynamic enemy status
@@ -103,23 +106,23 @@ export class NPC extends Simulatable {
     private doNormalScheduledActivity(updateData: UpdateData) {
         if (this.task) {
             const context: NPCTaskContext = {
-                dude: this.dude,
+                dude: this._dude,
                 walkTo: (pt) => this.walkTo(pt, updateData),
                 roam: (speed, options) => this.doRoam(updateData, speed, options),
                 goToLocation: (location) => this.goToLocation(updateData, location), // TODO
-                doNothing: () => this.dude.move(updateData.elapsedTimeMillis, Point.ZERO),
+                doNothing: () => this._dude.move(updateData.elapsedTimeMillis, Point.ZERO),
             }
             this.task.performTask(context)
         } else {
             // Stand still and do nothing by default
-            this.dude.move(updateData.elapsedTimeMillis, Point.ZERO)
+            this._dude.move(updateData.elapsedTimeMillis, Point.ZERO)
         }
     }
 
     static SCHEDULE_FREQUENCY = 10 * TimeUnit.MINUTE
 
     simulate(duration: number) {
-        if (!this.dude.isAlive) {
+        if (!this._dude.isAlive) {
             return
         }
 
@@ -129,7 +132,7 @@ export class NPC extends Simulatable {
 
         // TODO improve simulation implementations
         const context: NPCTaskContext = {
-            dude: this.dude,
+            dude: this._dude,
             walkTo: (pt) => this.forceMoveToTilePosition(pt),
             roam: (_, options) => {
                 const goalOptions = this.getRoamingLocationPossiblities(
@@ -146,13 +149,13 @@ export class NPC extends Simulatable {
     }
 
     setSchedule(schedule: NPCSchedule) {
-        this.dude.blob[NPCSchedules.SCHEDULE_KEY] = schedule
+        this._dude.blob[NPCSchedules.SCHEDULE_KEY] = schedule
         this.clearExistingAIState()
         this.task = this.getScheduledTask()
     }
 
     getSchedule(): NPCSchedule {
-        const schedule: NPCSchedule = this.dude.blob[NPCSchedules.SCHEDULE_KEY]
+        const schedule: NPCSchedule = this._dude.blob[NPCSchedules.SCHEDULE_KEY]
         if (!schedule) {
             throw new Error(
                 `NPCs must have a "${NPCSchedules.SCHEDULE_KEY}" field in the blob. It's possible it got overwritten.`
@@ -186,7 +189,7 @@ export class NPC extends Simulatable {
             // only try once per upate() to find a path
             this.walkPath = this.findPath(tilePt)
             if (!this.walkPath || this.walkPath.length === 0) {
-                this.dude.move(updateData.elapsedTimeMillis, Point.ZERO)
+                this._dude.move(updateData.elapsedTimeMillis, Point.ZERO)
                 return
             }
         }
@@ -224,12 +227,12 @@ export class NPC extends Simulatable {
                 }
             }
             if (!pt) {
-                this.dude.move(updateData.elapsedTimeMillis, Point.ZERO)
+                this._dude.move(updateData.elapsedTimeMillis, Point.ZERO)
                 return
             }
             this.roamPath = this.findPath(pt)
             if (!this.roamPath || this.roamPath.length === 0) {
-                this.dude.move(updateData.elapsedTimeMillis, Point.ZERO)
+                this._dude.move(updateData.elapsedTimeMillis, Point.ZERO)
                 return
             }
         }
@@ -241,7 +244,7 @@ export class NPC extends Simulatable {
                 this.roamNextPauseTime = WorldTime.instance.time + pauseEveryMillis
                 this.roamNextUnpauseTime = this.roamNextPauseTime + pauseForMillis
             } else if (time > this.roamNextPauseTime) {
-                this.dude.move(updateData.elapsedTimeMillis, Point.ZERO)
+                this._dude.move(updateData.elapsedTimeMillis, Point.ZERO)
                 return
             }
         } else {
@@ -263,10 +266,10 @@ export class NPC extends Simulatable {
         } else if (goalOptionsSupplier) {
             pts = goalOptionsSupplier()
         } else {
-            pts = this.dude.location.getGroundSpots()
+            pts = this._dude.location.getGroundSpots()
         }
 
-        return pts.filter((pt) => !this.dude.location.isOccupied(pt))
+        return pts.filter((pt) => !this._dude.location.isOccupied(pt))
     }
 
     private attackTarget: Dude
@@ -282,21 +285,21 @@ export class NPC extends Simulatable {
     private nextAttackTime = WorldTime.instance.time + Math.random() * 2000
 
     private doAttack(updateData: UpdateData) {
-        if (!this.dude.isAlive) {
+        if (!this._dude.isAlive) {
             return
         }
 
-        const weapon = this.dude.weapon
+        const weapon = this._dude.weapon
 
         if (!weapon || !this.attackTarget || !this.attackTarget.isAlive) {
-            this.dude.move(updateData.elapsedTimeMillis, Point.ZERO)
+            this._dude.move(updateData.elapsedTimeMillis, Point.ZERO)
             this.decideWhatToDoNext()
             return
         }
 
         // TODO maybe switch dynamically between A* and direct walking?
 
-        const dist = this.attackTarget.standingPosition.minus(this.dude.standingPosition)
+        const dist = this.attackTarget.standingPosition.minus(this._dude.standingPosition)
         const mag = dist.magnitude()
 
         const stoppingDist = weapon.getStoppingDistance()
@@ -305,7 +308,7 @@ export class NPC extends Simulatable {
             weapon.getRange() +
                 // the default collider has a width of 10
                 // big entities have a collider width of 15
-                (this.dude.colliderSize.x - 10) * 3
+                (this._dude.colliderSize.x - 10) * 3
         const timeLeftUntilCanAttack = this.nextAttackTime - WorldTime.instance.time
 
         if (
@@ -350,14 +353,14 @@ export class NPC extends Simulatable {
         }
         if (!this.targetPath || this.targetPath.length === 0 || mag < stoppingDist) {
             // TODO: If using a ranged weapon, keep distance from enemies
-            this.dude.move(updateData.elapsedTimeMillis, Point.ZERO)
+            this._dude.move(updateData.elapsedTimeMillis, Point.ZERO)
             return
         }
 
         // Make sure they always face their opponent if close
         const facingOverride =
             this.targetPath.length < 2
-                ? this.attackTarget.standingPosition.x - this.dude.standingPosition.x
+                ? this.attackTarget.standingPosition.x - this._dude.standingPosition.x
                 : 0
 
         this.followPath(this.targetPath, updateData, false, 1, facingOverride)
@@ -376,24 +379,24 @@ export class NPC extends Simulatable {
         const nextPt = path[0]
         const nextTile = pixelPtToTilePt(nextPt)
 
-        const isCloseEnough = this.dude.standingPosition.distanceTo(nextPt) < 8
+        const isCloseEnough = this._dude.standingPosition.distanceTo(nextPt) < 8
 
         // Make them face the right direction when traveling straight up/down
-        if (facingOverride === 0 && path.length > 1 && nextTile.x === this.dude.tile.x) {
-            facingOverride = path[1].x - this.dude.standingPosition.x
+        if (facingOverride === 0 && path.length > 1 && nextTile.x === this._dude.tile.x) {
+            facingOverride = path[1].x - this._dude.standingPosition.x
         }
 
         if (isCloseEnough && stopWhenClose) {
-            this.dude.move(updateData.elapsedTimeMillis, Point.ZERO, facingOverride)
+            this._dude.move(updateData.elapsedTimeMillis, Point.ZERO, facingOverride)
         } else {
-            const oldPosition = this.dude.standingPosition
-            this.dude.move(
+            const oldPosition = this._dude.standingPosition
+            this._dude.move(
                 updateData.elapsedTimeMillis,
-                nextPt.minus(this.dude.standingPosition),
+                nextPt.minus(this._dude.standingPosition),
                 facingOverride,
                 speedMultiplier
             )
-            if (!this.dude.standingPosition.equals(oldPosition)) {
+            if (!this._dude.standingPosition.equals(oldPosition)) {
                 this.lastMoveTime = new Date().getMilliseconds()
             }
         }
@@ -426,14 +429,14 @@ export class NPC extends Simulatable {
         let target: Dude
 
         if (
-            this.dude.lastAttacker?.isAlive &&
-            this.isEnemyFn(this.dude.lastAttacker) &&
-            this.dude.lastAttacker.standingPosition.distanceTo(this.dude.standingPosition) <
+            this._dude.lastAttacker?.isAlive &&
+            this.isEnemyFn(this._dude.lastAttacker) &&
+            this._dude.lastAttacker.standingPosition.distanceTo(this._dude.standingPosition) <
                 this.findTargetRange
         ) {
             console.log("just got attacked")
-            target = this.dude.lastAttacker
-            if (!this.dude.weapon) {
+            target = this._dude.lastAttacker
+            if (!this._dude.weapon) {
                 // should flee instead
                 return true
             }
@@ -444,14 +447,14 @@ export class NPC extends Simulatable {
                 .filter(this.isEnemyFn)
                 .filter(
                     (d) =>
-                        d.standingPosition.distanceTo(this.dude.standingPosition) <
+                        d.standingPosition.distanceTo(this._dude.standingPosition) <
                         this.findTargetRange
                 )
 
             if (enemies.length === 0) {
                 return false
             }
-            if (!this.dude.weapon) {
+            if (!this._dude.weapon) {
                 // should flee instead
                 return true
             }
@@ -464,7 +467,7 @@ export class NPC extends Simulatable {
             } else {
                 // otherwise attack the closest enemy
                 target = Lists.minBy(enemies, (d) =>
-                    d.standingPosition.distanceTo(this.dude.standingPosition)
+                    d.standingPosition.distanceTo(this._dude.standingPosition)
                 )
             }
         }
@@ -475,13 +478,13 @@ export class NPC extends Simulatable {
             if (target === this.attackTarget && !!this.targetPath && this.targetPath.length > 0) {
                 // We're already tracking this target. Only update the path if they have gotten closer,
                 // otherwise the attack() function will automatically extend the path.
-                if (this.targetPath.length <= this.dude.tile.manhattanDistanceTo(target.tile)) {
+                if (this.targetPath.length <= this._dude.tile.manhattanDistanceTo(target.tile)) {
                     shouldComputePath = false
                 }
             }
 
             if (this.stuck()) {
-                this.dude.log("stuck")
+                this._dude.log("stuck")
                 shouldComputePath = true
             }
 
@@ -497,13 +500,13 @@ export class NPC extends Simulatable {
 
     private forceMoveToTilePosition(pt: Point) {
         const pos = this.tilePtToStandingPos(pt)
-        this.dude.moveTo(pos, true)
+        this._dude.moveTo(pos, true)
     }
 
     private findPath(targetTilePoint: Point) {
         // TODO: NPCs can sometimes get stuck if their starting square is "occupied"
         const path = here().findPath(
-            this.dude.tile,
+            this._dude.tile,
             targetTilePoint,
             this.pathFindingHeuristic,
             this.pathIsOccupied
@@ -538,13 +541,13 @@ export class NPC extends Simulatable {
 
     private simulateGoToLocation(goalLocation: Location) {
         const nextLocation = this.getNextLocation(goalLocation)
-        this.useTeleporter(this.dude.location.getTeleporter(nextLocation.uuid))
+        this.useTeleporter(this._dude.location.getTeleporter(nextLocation.uuid))
     }
 
     private getNextLocation(goalLocation: Location) {
         // For now, we're lazy about this and assume every linked location is
         // at most 1 off from the exterior, so we can avoid doing pathfinding
-        if (this.dude.location === camp()) {
+        if (this._dude.location === camp()) {
             return goalLocation
         } else {
             return camp()
@@ -554,7 +557,7 @@ export class NPC extends Simulatable {
     private teleporterTarget: Teleporter
     private findTeleporter(uuid: string) {
         if (this.teleporterTarget?.to !== uuid) {
-            this.teleporterTarget = this.dude.location.getTeleporter(uuid)
+            this.teleporterTarget = this._dude.location.getTeleporter(uuid)
         }
     }
     private goToTeleporter(updateData: UpdateData, speedMultiplier: number = 1) {
@@ -563,12 +566,12 @@ export class NPC extends Simulatable {
         }
         const tilePt = pixelPtToTilePt(this.teleporterTarget.pos)
         this.walkTo(tilePt, updateData, speedMultiplier)
-        if (this.dude.tile.manhattanDistanceTo(tilePt) <= 1) {
+        if (this._dude.tile.manhattanDistanceTo(tilePt) <= 1) {
             this.useTeleporter(this.teleporterTarget)
         }
     }
     private useTeleporter(teleporter: Teleporter) {
-        this.dude.location.npcUseTeleporter(this.dude, teleporter)
+        this._dude.location.npcUseTeleporter(this._dude, teleporter)
         this.clearExistingAIState()
     }
     private tilePtToStandingPos(tilePt: Point) {
@@ -578,18 +581,18 @@ export class NPC extends Simulatable {
 
     private leader: Dude
     getLeader() {
-        const savedLeaderUUID = this.dude.blob["leader"]
+        const savedLeaderUUID = this._dude.blob["leader"]
         if (!savedLeaderUUID) {
             return undefined
         }
         if (!this.leader) {
-            this.leader = this.dude.location.getDudes().find((d) => d.uuid === savedLeaderUUID)
+            this.leader = this._dude.location.getDudes().find((d) => d.uuid === savedLeaderUUID)
         }
         return this.leader
     }
     setLeader(val?: Dude) {
         this.leader = val
-        this.dude.blob["leader"] = val?.uuid
+        this._dude.blob["leader"] = val?.uuid
     }
 
     getRenderMethods() {
@@ -609,7 +612,7 @@ export class NPC extends Simulatable {
         if (path.length === 0) {
             return []
         }
-        let lineStart = this.tilePtToStandingPos(pixelPtToTilePt(this.dude.standingPosition))
+        let lineStart = this.tilePtToStandingPos(pixelPtToTilePt(this._dude.standingPosition))
         const result = []
         for (let i = 0; i < path.length; i++) {
             const lineEnd = path[i]
