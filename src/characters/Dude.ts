@@ -16,6 +16,7 @@ import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 import { DeathCutscene } from "../cutscenes/DeathCutscene"
 import { IntroCutscene } from "../cutscenes/IntroCutscene"
+import { BlackLungParticles } from "../graphics/BlackLungParticles"
 import { FireParticles } from "../graphics/FireParticles"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { PoisonParticles } from "../graphics/PoisonParticles"
@@ -312,6 +313,7 @@ export class Dude extends Component implements DialogueSource {
 
     private fireParticles: FireParticles
     private poisonParticles: PoisonParticles
+    private blackLungParticles: BlackLungParticles
 
     updateActiveConditions() {
         if (this.conditions.length === 0) {
@@ -378,6 +380,25 @@ export class Dude extends Component implements DialogueSource {
                         c.lastExec = WorldTime.instance.time
                     }
                     return
+                case Condition.BLACK_LUNG:
+                    if (!this.blackLungParticles) {
+                        this.blackLungParticles = this.entity.addComponent(
+                            new BlackLungParticles(
+                                () =>
+                                    this.standingPosition.plusY(-8).plus(this.getAnimationOffset()),
+                                () => this.animation.transform.depth + 1
+                            )
+                        )
+                    }
+                    if (timeSinceLastExec > 500) {
+                        // const poisonDamage = 0.25
+                        // this.damage(poisonDamage, {
+                        //     blockable: false,
+                        //     dodgeable: false,
+                        // })
+                        c.lastExec = WorldTime.instance.time
+                    }
+                    return
             }
         })
     }
@@ -411,6 +432,12 @@ export class Dude extends Component implements DialogueSource {
                     this.entity.removeComponent(this.fireParticles)
                     LightManager.instance.removeLight(this.fireParticles)
                     this.fireParticles = undefined
+                }
+                return
+            case Condition.POISONED:
+                if (this.poisonParticles) {
+                    this.entity.removeComponent(this.poisonParticles)
+                    this.poisonParticles = undefined
                 }
                 return
             case Condition.POISONED:

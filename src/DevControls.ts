@@ -73,8 +73,8 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     [InputKey.V, "spawn wolf pack", () => DudeSpawner.instance.spawnWolves()],
     [
         InputKey.SEMICOLON,
-        "poison player",
-        () => Player.instance.dude.addCondition(Condition.POISONED),
+        "inflict black lung",
+        () => Player.instance.dude.addCondition(Condition.BLACK_LUNG),
     ],
     [InputKey.QUOTE, "trigger orc raid", () => DudeSpawner.instance.spawnOrcs()],
     [
