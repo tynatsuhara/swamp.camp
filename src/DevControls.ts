@@ -34,6 +34,7 @@ const SPAWNABLE_TYPES = [
     DudeType.BEAR,
     DudeType.WOLF,
     DudeType.DEMON_BRUTE,
+    DudeType.CENTAUR,
 ]
 export const spawnMenu = {
     show: false,

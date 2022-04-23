@@ -267,7 +267,7 @@ export class DudeFactory {
                 factions = [DudeFaction.CENTAURS]
                 animationName = "Centaur_M"
                 additionalComponents = [new NPC(), new Centaur()]
-                maxHealth = 2
+                maxHealth = 15
                 speed *= 0.5
                 break
             }
