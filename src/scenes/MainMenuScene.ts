@@ -357,6 +357,16 @@ export class MainMenuScene {
             new FireParticles(4, () => campfirePos.plus(new Point(TILE_SIZE / 2 - 1, 7)))
         )
 
+        // TODO: Add pets to main menu
+        // const gb = DudeAnimationUtils.getCharacterIdleAnimation("gumball").toComponent(
+        //     SpriteTransform.new({
+        //         mirrorX: false,
+        //         position: campfirePos.plus(new Point(-22, 3)),
+        //     })
+        // )
+        // gb.fastForward(Math.random() * 1000)
+        // components.push(gb)
+
         // darkness
         this.darkness = new DarknessMask(false)
         this.darkness.addLightCircle(campfirePos.plusX(TILE_SIZE / 2).plusY(TILE_SIZE / 2), 72)
