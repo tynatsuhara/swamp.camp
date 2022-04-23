@@ -7,6 +7,7 @@ import { Condition } from "./characters/Condition"
 import { DudeFactory, DudeType } from "./characters/DudeFactory"
 import { DudeSpawner } from "./characters/DudeSpawner"
 import { Player } from "./characters/Player"
+import { Berto } from "./characters/types/Berto"
 import { controls } from "./Controls"
 import { TextOverlayManager } from "./cutscenes/TextOverlayManager"
 import { pixelPtToTilePt } from "./graphics/Tilesets"
@@ -128,6 +129,18 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
                 .getDudes()
                 .filter((d) => d.type === DudeType.SPOOKY_VISITOR)
                 .forEach((d) => d.entity.selfDestruct()),
+    ],
+    [
+        InputKey.T,
+        "add test announcement",
+        () =>
+            here()
+                .getDudes()
+                .filter((d) => d.type === DudeType.HERALD)[0]
+                .entity.getComponent(Berto)
+                .addAnnouncement({
+                    dialogueKey: "test",
+                }),
     ],
 ]
 

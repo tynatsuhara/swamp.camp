@@ -1,5 +1,6 @@
 import { Item } from "../../items/Items"
 import { saveManager } from "../../SaveManager"
+import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { SalePackage, TradeMenu } from "../../ui/TradeMenu"
 import { EventQueue } from "../../world/events/EventQueue"
@@ -8,8 +9,10 @@ import { here } from "../../world/LocationManager"
 import { Residence } from "../../world/residences/Residence"
 import { TaxRate } from "../../world/TaxRate"
 import { WorldTime } from "../../world/WorldTime"
+import { Dude } from "../Dude"
 import { DudeType } from "../DudeFactory"
 import { Berto } from "../types/Berto"
+import { getAnnouncementDialogue } from "./Announcements"
 import {
     dialogue,
     DialogueInstance,
@@ -27,7 +30,8 @@ const BERT_MENU = "bert-menu",
     BERT_VILLAGERS = "bert-villagers",
     BERT_LEAVING = "bert-leaving",
     BERT_TAXES = "bert-taxes",
-    BERT_TAXES_UPDATED = "bert-taxes-updated"
+    BERT_TAXES_UPDATED = "bert-taxes-updated",
+    BERT_ANNOUNCEMENTS = "bert-announcements"
 
 const getItemsToSell = (): SalePackage[] => {
     return [
@@ -53,6 +57,8 @@ const getGreeting = () => {
     return "Tally ho!"
 }
 
+const berto = () => (DialogueDisplay.instance.source as Dude).entity.getComponent(Berto)
+
 export const BERTO_INTRO_DIALOGUE: DialogueSet = {
     [BERTO_STARTING_DIALOGUE]: () =>
         dialogueWithOptions(
@@ -69,15 +75,25 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
         ),
     [BERT_ENTRYPOINT]: () => dialogue([getGreeting()], () => new NextDialogue(BERT_MENU, true)),
     [BERT_MENU]: () => {
-        const options = [
+        const options = []
+        const announcements = berto().getAnnouncements()
+        if (announcements.length > 0) {
+            options.push(
+                new DialogueOption(
+                    "What news is there?",
+                    () => new NextDialogue(BERT_ANNOUNCEMENTS, true)
+                )
+            )
+        }
+        options.push(
             new DialogueOption("What are you buying?", () => {
                 TradeMenu.instance.sell(getItemsToSell())
                 return new NextDialogue(BERT_ENTRYPOINT, false)
             }),
             new DialogueOption("We need a new settler.", () => {
                 return new NextDialogue(BERT_VILLAGERS, true)
-            }),
-        ]
+            })
+        )
         if (saveManager.getState().hasRecruitedAnyVillagers) {
             options.push(
                 new DialogueOption("Let's talk taxes.", () => new NextDialogue(BERT_TAXES, true))
@@ -114,6 +130,13 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
             ],
             () => new NextDialogue(BERT_ENTRYPOINT, false)
         ),
+    [BERT_ANNOUNCEMENTS]: () => {
+        const a = berto().shiftAnnouncement()
+        if (!a) {
+            return dialogue(["Alas, I have no announcements at the moment."])
+        }
+        return getAnnouncementDialogue(a, new NextDialogue(BERT_ENTRYPOINT, false))
+    },
 }
 
 const fetchNpcDialogue = (): DialogueInstance => {
