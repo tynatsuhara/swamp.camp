@@ -1,6 +1,5 @@
 import { Item } from "../../items/Items"
 import { saveManager } from "../../SaveManager"
-import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { SalePackage, TradeMenu } from "../../ui/TradeMenu"
 import { EventQueue } from "../../world/events/EventQueue"
@@ -9,7 +8,6 @@ import { here } from "../../world/LocationManager"
 import { Residence } from "../../world/residences/Residence"
 import { TaxRate } from "../../world/TaxRate"
 import { WorldTime } from "../../world/WorldTime"
-import { Dude } from "../Dude"
 import { DudeType } from "../DudeFactory"
 import { Berto } from "../types/Berto"
 import { getAnnouncementDialogue } from "./Announcements"
@@ -57,8 +55,6 @@ const getGreeting = () => {
     return "Tally ho!"
 }
 
-const berto = () => (DialogueDisplay.instance.source as Dude).entity.getComponent(Berto)
-
 export const BERTO_INTRO_DIALOGUE: DialogueSet = {
     [BERTO_STARTING_DIALOGUE]: () =>
         dialogueWithOptions(
@@ -73,10 +69,19 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
             option("Sure!", BERT_MENU, true),
             option("Maybe later.", BERT_ENTRYPOINT, false)
         ),
-    [BERT_ENTRYPOINT]: () => dialogue([getGreeting()], () => new NextDialogue(BERT_MENU, true)),
+    [BERT_ENTRYPOINT]: () => {
+        const announcements = Berto.instance.getAnnouncements()
+        return dialogue(
+            [getGreeting()],
+            () => new NextDialogue(BERT_MENU, true),
+            announcements.length > 0
+                ? DudeInteractIndicator.IMPORTANT_DIALOGUE
+                : DudeInteractIndicator.NONE
+        )
+    },
     [BERT_MENU]: () => {
         const options = []
-        const announcements = berto().getAnnouncements()
+        const announcements = Berto.instance.getAnnouncements()
         if (announcements.length > 0) {
             options.push(
                 new DialogueOption(
@@ -131,7 +136,7 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
             () => new NextDialogue(BERT_ENTRYPOINT, false)
         ),
     [BERT_ANNOUNCEMENTS]: () => {
-        const a = berto().shiftAnnouncement()
+        const a = Berto.instance.shiftAnnouncement()
         if (!a) {
             return dialogue(["Alas, I have no announcements at the moment."])
         }

@@ -9,7 +9,13 @@ import { Announcement } from "../dialogue/Announcements"
 import { NPC } from "../NPC"
 
 export class Berto extends Component {
+    static instance: Berto
     private npc: NPC
+
+    constructor() {
+        super()
+        Berto.instance = this
+    }
 
     awake() {
         this.npc = this.entity.getComponent(NPC)
