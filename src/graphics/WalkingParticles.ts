@@ -22,22 +22,42 @@ export class WalkingParticles extends Component {
     }
 
     land() {
-        const particles = 10 + Math.random() * 5
+        const groud = here().getGround(this.dude.tile)
 
-        for (let i = 0; i < particles; i++) {
-            const moveTimeLimit = 100 + Math.random() * 200
-            const lifeSpan = moveTimeLimit * 2
+        if (Ground.isWater(groud?.type)) {
+            const particles = 10 + Math.random() * 5
+            for (let i = 0; i < particles; i++) {
+                const moveTimeLimit = 100 + Math.random() * 200
+                const lifeSpan = moveTimeLimit * 2
+                const depth = this.dude.standingPosition.y + 6
+                const offset = Point.ZERO.randomCircularShift(1)
 
-            const offset = Point.ZERO.randomCircularShift(1)
+                Particles.instance.emitParticle(
+                    Color.WHITE,
+                    this.dude.standingPosition.plus(offset).plusY(-7),
+                    depth + 1,
+                    lifeSpan,
+                    (t) => offset.times(Math.min(moveTimeLimit, t) * 0.035),
+                    Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
+                )
+            }
+        } else {
+            const particles = 10 + Math.random() * 5
+            for (let i = 0; i < particles; i++) {
+                const moveTimeLimit = 100 + Math.random() * 200
+                const lifeSpan = moveTimeLimit * 2
 
-            Particles.instance.emitParticle(
-                Color.TAUPE_5,
-                this.dude.standingPosition.plus(offset),
-                GroundRenderer.DEPTH + 1,
-                lifeSpan,
-                (t) => offset.times(Math.min(moveTimeLimit, t) * 0.035),
-                Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
-            )
+                const offset = Point.ZERO.randomCircularShift(1)
+
+                Particles.instance.emitParticle(
+                    Color.TAUPE_5,
+                    this.dude.standingPosition.plus(offset),
+                    GroundRenderer.DEPTH + 1,
+                    lifeSpan,
+                    (t) => offset.times(Math.min(moveTimeLimit, t) * 0.035),
+                    Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
+                )
+            }
         }
     }
 
