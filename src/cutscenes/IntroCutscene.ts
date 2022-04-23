@@ -92,7 +92,7 @@ Once you establish a camp and begin demonstrating value, we shall send more sett
 One other thing - We believe that several other factions may be vying for control of these lands. Form alliances or engage them in battle as you deem necessary.`,
             `...
 
-ANOTHER thing - Only one of the explorers returned, and she reported that her colleagues were devoured by demons in the night.`,
+ANOTHER thing - Only one of the explorers returned, and they reported that their colleagues were devoured by demons in the night.`,
             `...`,
             `Good luck. Go now, venture into the swamp, and bring glory to the Kingdom!`,
             "", // blank page to show controls
