@@ -906,18 +906,24 @@ export class Dude extends Component implements DialogueSource {
             }
         }
 
-        const animationSpeed = 45
+        const animationSpeed = 22.5
         this.isRolling = true
         this.canJumpOrRoll = false
 
         setRotation(45, new Point(6, 8))
         const rotations: [number, Point][] = [
             [90, new Point(6, 10)],
+            [112.5, new Point(5, 11)],
             [135, new Point(4, 12)],
+            [157.5, new Point(3, 13)],
             [180, new Point(2, 14)],
+            [202.5, new Point(1, 13)],
             [225, new Point(0, 12)],
+            [247.5, new Point(-1, 11)],
             [270, new Point(-2, 10)],
+            [292.5, new Point(-3, 9)],
             [315, new Point(-4, 8)],
+            [337.5, new Point(-5, 7)],
         ]
         rotations.forEach(([rotation, offset], i) =>
             setTimeout(() => setRotation(rotation, offset), animationSpeed * (i + 1))
