@@ -222,6 +222,18 @@ export class GameScene {
             e.addComponent(new BasicRenderComponent(...renders))
         }
 
+        // TODO figure out a nice way to draw pixelated lines for bomb tossing
+        // e.addComponent(
+        //     new BasicRenderComponent(
+        //         new LineRender(
+        //             Player.instance.dude.standingPosition,
+        //             controls.getWorldSpaceMousePos(),
+        //             Color.WHITE,
+        //             ZOOM
+        //         )
+        //     )
+        // )
+
         return e
     }
 

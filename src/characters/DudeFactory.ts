@@ -70,6 +70,7 @@ export enum DudeType {
     TRAVELING_MERCHANT,
     GUMBALL,
     ONION,
+    KNIGHT,
 }
 
 const DEFAULT_COLLIDER_SIZE = new Point(10, 8)
@@ -345,6 +346,16 @@ export class DudeFactory {
                 factions = [DudeFaction.VILLAGERS]
                 animationName = "onion"
                 weapon = WeaponType.UNARMED
+                additionalComponents = [new NPC(), new Villager()]
+                maxHealth = 50
+                speed *= 0.7
+                break
+            }
+            case DudeType.KNIGHT: {
+                factions = [DudeFaction.VILLAGERS]
+                animationName = "Knight"
+                weapon = WeaponType.SWORD
+                shield = ShieldType.BASIC
                 additionalComponents = [new NPC(), new Villager()]
                 maxHealth = 50
                 speed *= 0.7
