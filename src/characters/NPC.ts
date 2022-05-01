@@ -20,6 +20,7 @@ import { Condition } from "./Condition"
 import { Dude } from "./Dude"
 import { Player } from "./Player"
 
+// TODO maybe this shouldn't be NPC-specific
 export enum NPCAttackState {
     NOT_ATTACKING,
     ATTACKING_SOON,
@@ -78,6 +79,7 @@ export class NPC extends Simulatable {
         ) {
             this.attackTarget = null
             this.targetPath = null
+            this.dude.shield?.block(false)
         }
 
         this._attackState = NPCAttackState.NOT_ATTACKING
@@ -323,20 +325,31 @@ export class NPC extends Simulatable {
                     : NPCAttackState.ATTACKING_SOON
         }
 
-        // in range and armed
-        if (inRangeAndArmed && timeLeftUntilCanAttack <= 0) {
-            weapon.attack(true)
-            this.nextAttackTime = Math.max(
-                this.nextAttackTime,
-                WorldTime.instance.time + weapon.getMillisBetweenAttacks()
+        if (
+            this.dude.shield &&
+            this.dude.isFacing(this.attackTarget.standingPosition) &&
+            [NPCAttackState.ATTACKING_SOON, NPCAttackState.ATTACKING_NOW].includes(
+                this.attackTarget.entity.getComponent(NPC)?.attackState
             )
+        ) {
+            this.dude.shield.block(true)
         } else {
-            weapon.cancelAttack()
+            this.dude.shield?.block(false)
 
-            if (stoppingDist > 0 && mag < stoppingDist * 0.75) {
-                // TODO make this more configurable?
-                this.doRoam(updateData)
-                return
+            if (inRangeAndArmed && timeLeftUntilCanAttack <= 0) {
+                weapon.attack(true)
+                this.nextAttackTime = Math.max(
+                    this.nextAttackTime,
+                    WorldTime.instance.time + weapon.getMillisBetweenAttacks()
+                )
+            } else {
+                weapon.cancelAttack()
+
+                if (stoppingDist > 0 && mag < stoppingDist * 0.75) {
+                    // TODO make this more configurable?
+                    this.doRoam(updateData)
+                    return
+                }
             }
         }
 

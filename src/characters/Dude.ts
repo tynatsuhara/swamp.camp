@@ -738,6 +738,16 @@ export class Dude extends Component implements DialogueSource {
         const ground = this.location.getGround(standingTilePos)
         const element = this.location.getElement(standingTilePos)
 
+        let speed = 1
+        if (this.rolling) {
+            speed += 1.2
+        } else if (!this.weapon || this.weapon.isSheathed()) {
+            speed += 0.35
+        }
+        if (this.shield?.isBlocking()) {
+            speed -= 0.4
+        }
+
         if (Ground.isWater(ground?.type)) {
             this.removeCondition(Condition.ON_FIRE)
 
@@ -763,7 +773,7 @@ export class Dude extends Component implements DialogueSource {
             speedMultiplier = 0
         }
 
-        const walkDistance = elapsedTimeMillis * this.speed * speedMultiplier
+        const walkDistance = elapsedTimeMillis * this.speed * speed * speedMultiplier
         const walkMovement = this.isMoving ? direction.times(walkDistance) : Point.ZERO
         const standingPosAfterWalk = this.standingPosition.plus(walkMovement)
 

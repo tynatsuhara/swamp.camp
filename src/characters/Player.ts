@@ -92,21 +92,8 @@ export class Player extends Component {
             }
         }
 
-        let speed = 1
-        if (this.dude.rolling) {
-            speed += 1.2
-        } else if (!this.dude.weapon || this.dude.weapon.isSheathed()) {
-            speed += 0.35
-        }
-        if (this.dude.shield?.isBlocking()) {
-            speed -= 0.4
-        }
-
-        if (dx !== 0 || dy !== 0) {
-            speed *= this.pushCheck()
-        }
-
-        speed *= debug.speedMultiplier
+        const speedMultiplier =
+            (dx !== 0 || dy !== 0 ? this.pushCheck() : 1) * debug.speedMultiplier
 
         this._velocity = new Point(dx, dy)
 
@@ -114,7 +101,7 @@ export class Player extends Component {
             updateData.elapsedTimeMillis,
             this.velocity,
             this.dude.rolling ? 0 : controls.getPlayerFacingDirection(this.dude),
-            speed
+            speedMultiplier
         )
 
         if (UIStateManager.instance.isMenuOpen) {
