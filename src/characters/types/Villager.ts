@@ -42,12 +42,12 @@ export class Villager extends Component {
             return !d.factions.includes(DudeFaction.VILLAGERS)
         }
 
-        if (dude.type === DudeType.GUMBALL || dude.type === DudeType.ONION) {
+        if ([DudeType.GUMBALL, DudeType.ONION].includes(dude.type)) {
             npc.setLeader(Player.instance.dude)
             npc.setSchedule(NPCSchedules.newFollowLeaderSchedule())
         } else if (dude.type === DudeType.DIP) {
             npc.setSchedule(NPCSchedules.newGoToSchedule(new Point(0, 0)))
-        } else if (dude.type === DudeType.SPOOKY_VISITOR) {
+        } else if ([DudeType.SPOOKY_VISITOR, DudeType.KNIGHT].includes(dude.type)) {
             npc.setSchedule(NPCSchedules.newFreeRoamSchedule())
         } else if (dude.type === DudeType.HERALD) {
             // no-op
