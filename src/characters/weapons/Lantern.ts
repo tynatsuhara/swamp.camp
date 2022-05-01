@@ -16,9 +16,10 @@ export class Lantern extends Shield {
     }
 
     update() {
-        this.transform.position = this.dude.animation.transform.dimensions
+        const dims = this.dude.animation.transform.dimensions
+        this.transform.position = new Point(dims.x / 2, dims.y)
             .plus(this.dude.getOffsetRelativeToAnimation())
-            .minus(new Point(8, 16))
+            .minus(new Point(0, 16))
 
         this.transform.depth = -0.5
 

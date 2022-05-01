@@ -46,7 +46,10 @@ export class Shield extends Component {
 
     update(updateData: UpdateData) {
         // default (drawn) position
-        let pos = this.dude.animation.transform.dimensions.minus(new Point(12, 16))
+        // 16x28
+        // -> 4, 12
+        const dims = this.dude.animation.transform.dimensions
+        let pos = new Point(dims.x / 2, dims.y).minus(new Point(4, 16))
 
         if (this.state === State.ON_BACK) {
             pos = pos.plus(new Point(-6, -1))
