@@ -44,7 +44,7 @@ import { ActiveCondition, Condition } from "./Condition"
 import { DialogueSource, EMPTY_DIALOGUE, getDialogue } from "./dialogue/Dialogue"
 import { DudeAnimationUtils } from "./DudeAnimationUtils"
 import { DudeFaction, DudeType } from "./DudeFactory"
-import { NPC } from "./NPC"
+import { NPC, NPCAttackState } from "./NPC"
 import { Player } from "./Player"
 import { Shield } from "./weapons/Shield"
 import { ShieldFactory } from "./weapons/ShieldFactory"
@@ -1107,9 +1107,14 @@ export class Dude extends Component implements DialogueSource {
         }
 
         // little flashing circle right before attacking the player
-        const npcAttackIndicator = this.entity.getComponent(NPC)?.attackIndicator
-        if (!!npcAttackIndicator) {
-            indicator = npcAttackIndicator
+        const npc = this.entity.getComponent(NPC)
+        const attackState = npc?.attackState
+        if (npc?.targetedEnemy?.type === DudeType.PLAYER) {
+            if (attackState === NPCAttackState.ATTACKING_SOON) {
+                indicator = DudeInteractIndicator.ATTACKING_SOON
+            } else if (attackState === NPCAttackState.ATTACKING_NOW) {
+                indicator = DudeInteractIndicator.ATTACKING_NOW
+            }
         } else if (!!this.dialogue && this.dialogue != EMPTY_DIALOGUE) {
             indicator = getDialogue(this.dialogue).indicator
         }
