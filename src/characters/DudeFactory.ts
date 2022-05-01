@@ -290,20 +290,22 @@ export class DudeFactory {
                 speed *= 1
                 break
             }
-            case DudeType.NUN:
+            case DudeType.NUN: {
                 factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
                 animationName = Lists.oneOf(["FatNun", "NormalNun", "SkinnyNun"])
                 additionalComponents = [new NPC(), new Villager()]
                 speed *= 0.4
                 nameGen = () => peopleNames.generate("<nun>")
                 break
-            case DudeType.CLERIC:
+            }
+            case DudeType.CLERIC: {
                 factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
                 animationName = Lists.oneOf(["FatCleric", "NormalCleric", "TallCleric"])
                 additionalComponents = [new NPC(), new Villager()]
                 speed *= 0.4
                 nameGen = () => peopleNames.generate("<cleric>")
                 break
+            }
             case DudeType.BISHOP: {
                 factions = [DudeFaction.VILLAGERS, DudeFaction.CLERGY]
                 animationName = "Bishop"
@@ -312,7 +314,7 @@ export class DudeFactory {
                 nameGen = () => peopleNames.generate("<bishop>")
                 break
             }
-            case DudeType.SWAMP_THING:
+            case DudeType.SWAMP_THING: {
                 factions = [DudeFaction.AQUATIC]
                 animationName = "swampy"
                 weapon = WeaponType.UNARMED
@@ -320,7 +322,8 @@ export class DudeFactory {
                 maxHealth = 2
                 speed *= 0.55
                 break
-            case DudeType.GNOLL_SCOUT:
+            }
+            case DudeType.GNOLL_SCOUT: {
                 factions = [DudeFaction.GNOLLS, DudeFaction.WOLVES, DudeFaction.VILLAGERS]
                 animationName = "GnollScout"
                 weapon = WeaponType.UNARMED
@@ -328,7 +331,8 @@ export class DudeFactory {
                 maxHealth = 2
                 speed *= 0.8
                 break
-            case DudeType.GUMBALL:
+            }
+            case DudeType.GUMBALL: {
                 factions = [DudeFaction.GNOLLS, DudeFaction.VILLAGERS]
                 animationName = "gumball"
                 weapon = WeaponType.UNARMED
@@ -336,7 +340,8 @@ export class DudeFactory {
                 maxHealth = 50
                 speed *= 0.7
                 break
-            case DudeType.ONION:
+            }
+            case DudeType.ONION: {
                 factions = [DudeFaction.VILLAGERS]
                 animationName = "onion"
                 weapon = WeaponType.UNARMED
@@ -344,6 +349,7 @@ export class DudeFactory {
                 maxHealth = 50
                 speed *= 0.7
                 break
+            }
             default: {
                 throw new Error(`DudeType ${type} can't be instantiated`)
             }
