@@ -28,17 +28,18 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
     private static readonly MAP_SIZE = CampLocationGenerator.MAP_RANGE * 2
     static readonly COAST_OCEAN_WIDTH = COAST_OCEAN_WIDTH
 
-    private location: Location
-    private readonly tentPos = new Point(-3, -3)
+    private readonly TENT_POS = new Point(-3, -3)
 
     protected _generate(): Location {
+        let location: Location
+
         for (let elementsPlaced = false, attempt = 1; !elementsPlaced; attempt++) {
             console.log(`generation attept ${attempt}`)
 
             const [coastNoise] = CampLocationGenerator.coastNoise()
             const levels = this.levels(CampLocationGenerator.MAP_RANGE)
 
-            this.location = new Location(
+            location = new Location(
                 LocationType.BASE_CAMP,
                 false,
                 true,
@@ -47,11 +48,11 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
             )
 
             // make the ground
-            this.placeGround(this.location)
-            this.placeWater(this.location, coastNoise)
+            this.placeGround(location)
+            this.placeWater(location, coastNoise)
 
             // spawn tent
-            const tent = this.location.addElement(ElementType.TENT, this.tentPos, {
+            const tent = location.addElement(ElementType.TENT, this.TENT_POS, {
                 color: TentColor.RED,
             })
 
@@ -59,24 +60,24 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
             elementsPlaced = !!tent
         }
 
-        this.spawnTreesAtEdge(this.location)
-        this.spawnTrees(this.location)
+        this.spawnTreesAtEdge(location)
+        this.spawnTrees(location)
 
-        this.spawn(this.location, ElementType.ROCK, 15 + Math.random() * 10)
-        this.clearPathToCenter()
+        this.spawn(location, ElementType.ROCK, 15 + Math.random() * 10)
+        this.clearPathToCenter(location)
 
         // TODO short trees, bushes, fruit, tall grass, etc
-        this.spawn(this.location, ElementType.MUSHROOM, 3 + Math.random() * 5)
+        this.spawn(location, ElementType.MUSHROOM, 3 + Math.random() * 5)
 
-        this.location.addElement(
+        location.addElement(
             ElementType.QUEEQUEG,
             new Point(CampLocationGenerator.MAP_RANGE - 6, 10)
         )
 
-        return this.location
+        return location
     }
 
-    private clearPathToCenter() {
+    private clearPathToCenter(location: Location) {
         const typesToClear = [ElementType.ROCK, ElementType.TREE_POINTY, ElementType.TREE_ROUND]
 
         // clear in corner
@@ -90,20 +91,20 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
                 y < CampLocationGenerator.MAP_RANGE - 23;
                 y++
             ) {
-                const element = this.location.getElement(new Point(x, y))
+                const element = location.getElement(new Point(x, y))
                 if (!!element && typesToClear.indexOf(element.type) !== -1) {
-                    this.location.removeElement(element)
+                    location.removeElement(element)
                 }
             }
         }
 
         // clear around tent
-        const clearingCorner = this.tentPos.minus(new Point(1, 0))
+        const clearingCorner = this.TENT_POS.minus(new Point(1, 0))
         for (let x = 0; x < 6; x++) {
             for (let y = 0; y < 4; y++) {
-                const element = this.location.getElement(clearingCorner.plus(new Point(x, y)))
+                const element = location.getElement(clearingCorner.plus(new Point(x, y)))
                 if (!!element && typesToClear.indexOf(element.type) !== -1) {
-                    this.location.removeElement(element)
+                    location.removeElement(element)
                 }
             }
         }
