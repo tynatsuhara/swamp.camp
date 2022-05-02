@@ -10,9 +10,9 @@ import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
 import { ITEM_METADATA_MAP } from "../items/Items"
 import { TextAlign } from "../ui/Text"
 import { UIStateManager } from "../ui/UIStateManager"
+import { CampLocationGenerator } from "../world/CampLocationGenerator"
 import { Interactable } from "../world/elements/Interactable"
 import { camp, here } from "../world/LocationManager"
-import { MapGenerator } from "../world/MapGenerator"
 import { WorldTime } from "../world/WorldTime"
 import { Dude } from "./Dude"
 
@@ -150,7 +150,7 @@ export class Player extends Component {
         const margin = camp().size / 2
         const pos = this.dude.tile
         if (pos.x < -margin || pos.x > margin || pos.y < -margin || pos.y > margin) {
-            return pos.x > margin - MapGenerator.COAST_OCEAN_WIDTH ? "ocean" : "swamp"
+            return pos.x > margin - CampLocationGenerator.COAST_OCEAN_WIDTH ? "ocean" : "swamp"
         }
     }
 

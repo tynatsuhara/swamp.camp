@@ -15,9 +15,9 @@ const COAST_OCEAN_WIDTH = 12
 // Should be divisible by 2 and a divisor of MAP_SIZE.
 const SQ = 2
 
-export class MapGenerator {
+export class CampLocationGenerator {
     static get instance() {
-        return Singletons.getOrCreate(MapGenerator)
+        return Singletons.getOrCreate(CampLocationGenerator)
     }
 
     private static readonly MAP_RANGE = 40
@@ -25,7 +25,7 @@ export class MapGenerator {
      * The map goes from [-MAP_RANGE, MAP_RANGE), although some of the grids extend
      * one tile further in each direction to prevent janky cutoffs at the edge
      */
-    private static readonly MAP_SIZE = MapGenerator.MAP_RANGE * 2
+    private static readonly MAP_SIZE = CampLocationGenerator.MAP_RANGE * 2
     static readonly COAST_OCEAN_WIDTH = COAST_OCEAN_WIDTH
 
     private location: Location
@@ -37,14 +37,14 @@ export class MapGenerator {
         for (let elementsPlaced = false, attempt = 1; !elementsPlaced; attempt++) {
             console.log(`generation attept ${attempt}`)
 
-            const [coastNoise] = MapGenerator.coastNoise()
-            const levels = MapGenerator.levels()
+            const [coastNoise] = CampLocationGenerator.coastNoise()
+            const levels = CampLocationGenerator.levels()
 
             this.location = new Location(
                 LocationType.BASE_CAMP,
                 false,
                 true,
-                MapGenerator.MAP_SIZE,
+                CampLocationGenerator.MAP_SIZE,
                 levels
             )
 
@@ -69,7 +69,10 @@ export class MapGenerator {
         // TODO short trees, bushes, fruit, tall grass, etc
         this.spawn(ElementType.MUSHROOM, 3 + Math.random() * 5)
 
-        this.location.addElement(ElementType.QUEEQUEG, new Point(MapGenerator.MAP_RANGE - 6, 10))
+        this.location.addElement(
+            ElementType.QUEEQUEG,
+            new Point(CampLocationGenerator.MAP_RANGE - 6, 10)
+        )
 
         LocationManager.instance.add(this.location)
         LocationManager.instance.loadLocation(this.location)
@@ -79,21 +82,25 @@ export class MapGenerator {
         return this.location
     }
 
-    private static VIGNETTE_EDGE = MapGenerator.MAP_RANGE - 1
-    private static TREELINE = MapGenerator.VIGNETTE_EDGE - 8
+    private static VIGNETTE_EDGE = CampLocationGenerator.MAP_RANGE - 1
+    private static TREELINE = CampLocationGenerator.VIGNETTE_EDGE - 8
 
     private spawnTreesAtEdge() {
         const possibilities = []
-        for (let x = -MapGenerator.MAP_RANGE; x < MapGenerator.MAP_RANGE; x++) {
-            for (let y = -MapGenerator.MAP_RANGE; y < MapGenerator.MAP_RANGE; y++) {
+        for (let x = -CampLocationGenerator.MAP_RANGE; x < CampLocationGenerator.MAP_RANGE; x++) {
+            for (
+                let y = -CampLocationGenerator.MAP_RANGE;
+                y < CampLocationGenerator.MAP_RANGE;
+                y++
+            ) {
                 const distToCenter = new Point(x, y).distanceTo(Point.ZERO)
                 const pt = new Point(x, y)
-                if (distToCenter > MapGenerator.VIGNETTE_EDGE) {
+                if (distToCenter > CampLocationGenerator.VIGNETTE_EDGE) {
                     possibilities.push(pt)
-                } else if (distToCenter > MapGenerator.TREELINE) {
+                } else if (distToCenter > CampLocationGenerator.TREELINE) {
                     const chance =
-                        (distToCenter - MapGenerator.TREELINE) /
-                        (MapGenerator.VIGNETTE_EDGE - MapGenerator.TREELINE)
+                        (distToCenter - CampLocationGenerator.TREELINE) /
+                        (CampLocationGenerator.VIGNETTE_EDGE - CampLocationGenerator.TREELINE)
                     if (Math.random() < chance) {
                         possibilities.push(pt)
                     }
@@ -108,8 +115,10 @@ export class MapGenerator {
         const trees = Math.random() * 500 + 500
         for (let i = 0; i < trees; i++) {
             const pt = new Point(
-                Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_RANGE,
-                Math.floor(Math.random() * (MapGenerator.MAP_SIZE - 1)) - MapGenerator.MAP_RANGE
+                Math.floor(Math.random() * CampLocationGenerator.MAP_SIZE) -
+                    CampLocationGenerator.MAP_RANGE,
+                Math.floor(Math.random() * (CampLocationGenerator.MAP_SIZE - 1)) -
+                    CampLocationGenerator.MAP_RANGE
             )
             this.spawnTree(pt)
         }
@@ -131,8 +140,16 @@ export class MapGenerator {
         const typesToClear = [ElementType.ROCK, ElementType.TREE_POINTY, ElementType.TREE_ROUND]
 
         // clear in corner
-        for (let x = MapGenerator.MAP_RANGE - 11; x < MapGenerator.MAP_RANGE + 10; x++) {
-            for (let y = MapGenerator.MAP_RANGE - 25; y < MapGenerator.MAP_RANGE - 23; y++) {
+        for (
+            let x = CampLocationGenerator.MAP_RANGE - 11;
+            x < CampLocationGenerator.MAP_RANGE + 10;
+            x++
+        ) {
+            for (
+                let y = CampLocationGenerator.MAP_RANGE - 25;
+                y < CampLocationGenerator.MAP_RANGE - 23;
+                y++
+            ) {
                 const element = this.location.getElement(new Point(x, y))
                 if (!!element && typesToClear.indexOf(element.type) !== -1) {
                     this.location.removeElement(element)
@@ -156,8 +173,10 @@ export class MapGenerator {
         let placed = 0
         while (placed < count) {
             const p = new Point(
-                Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_RANGE,
-                Math.floor(Math.random() * MapGenerator.MAP_SIZE) - MapGenerator.MAP_RANGE
+                Math.floor(Math.random() * CampLocationGenerator.MAP_SIZE) -
+                    CampLocationGenerator.MAP_RANGE,
+                Math.floor(Math.random() * CampLocationGenerator.MAP_SIZE) -
+                    CampLocationGenerator.MAP_RANGE
             )
             if (this.location.addElement(element, p)) {
                 placed++
@@ -166,8 +185,16 @@ export class MapGenerator {
     }
 
     private placeGround() {
-        for (let i = -MapGenerator.MAP_RANGE - 1; i < MapGenerator.MAP_RANGE + 1; i++) {
-            for (let j = -MapGenerator.MAP_RANGE - 1; j < MapGenerator.MAP_RANGE + 1; j++) {
+        for (
+            let i = -CampLocationGenerator.MAP_RANGE - 1;
+            i < CampLocationGenerator.MAP_RANGE + 1;
+            i++
+        ) {
+            for (
+                let j = -CampLocationGenerator.MAP_RANGE - 1;
+                j < CampLocationGenerator.MAP_RANGE + 1;
+                j++
+            ) {
                 const pt = new Point(i, j)
                 const thisLevel = this.location.levels?.get(pt)
                 const adjacent = [
@@ -241,8 +268,16 @@ export class MapGenerator {
         let topLedges = 0
         let sideLedges = 0
 
-        for (let i = -MapGenerator.MAP_RANGE - 1; i < MapGenerator.MAP_RANGE + 1; i += SQ) {
-            for (let j = -MapGenerator.MAP_RANGE - 1; j < MapGenerator.MAP_RANGE + 1; j += SQ) {
+        for (
+            let i = -CampLocationGenerator.MAP_RANGE - 1;
+            i < CampLocationGenerator.MAP_RANGE + 1;
+            i += SQ
+        ) {
+            for (
+                let j = -CampLocationGenerator.MAP_RANGE - 1;
+                j < CampLocationGenerator.MAP_RANGE + 1;
+                j += SQ
+            ) {
                 var value = noise.simplex2(
                     i / (this.MAP_RANGE * noiseScale),
                     j / (this.MAP_RANGE * noiseScale)
@@ -260,8 +295,16 @@ export class MapGenerator {
             str += "\n"
         }
 
-        for (let i = -MapGenerator.MAP_RANGE - 1; i < MapGenerator.MAP_RANGE + 1; i += SQ) {
-            for (let j = -MapGenerator.MAP_RANGE - 1; j < MapGenerator.MAP_RANGE + 1; j += SQ) {
+        for (
+            let i = -CampLocationGenerator.MAP_RANGE - 1;
+            i < CampLocationGenerator.MAP_RANGE + 1;
+            i += SQ
+        ) {
+            for (
+                let j = -CampLocationGenerator.MAP_RANGE - 1;
+                j < CampLocationGenerator.MAP_RANGE + 1;
+                j += SQ
+            ) {
                 const level = grid.get(new Point(j, i))
 
                 // Compare top/bottom ratio
@@ -296,7 +339,7 @@ export class MapGenerator {
             this.location.setGroundElement(GroundType.WATER, pt)
         })
 
-        let waterVolume = MapGenerator.MAP_SIZE * MapGenerator.MAP_SIZE * 0.06
+        let waterVolume = CampLocationGenerator.MAP_SIZE * CampLocationGenerator.MAP_SIZE * 0.06
         for (let i = 0; i < 50; i++) {
             const tilesPlaced = this.tryPlaceWater()
             waterVolume -= tilesPlaced
@@ -312,8 +355,11 @@ export class MapGenerator {
     private static readonly MAX_WATER_SIZE = 500
 
     private tryPlaceWater() {
-        const [pts] = MapGenerator.waterNoise()
-        if (pts.length < MapGenerator.MIN_WATER_SIZE || pts.length > MapGenerator.MAX_WATER_SIZE) {
+        const [pts] = CampLocationGenerator.waterNoise()
+        if (
+            pts.length < CampLocationGenerator.MIN_WATER_SIZE ||
+            pts.length > CampLocationGenerator.MAX_WATER_SIZE
+        ) {
             return 0
         }
         // Check the placement
@@ -391,8 +437,16 @@ export class MapGenerator {
         let str = `seed: ${seed} \n`
         const noiseScale = 1
 
-        for (let i = -MapGenerator.MAP_RANGE - 1; i < MapGenerator.MAP_RANGE + 1; i++) {
-            for (let j = -MapGenerator.MAP_RANGE - 1; j < MapGenerator.MAP_RANGE + 1; j++) {
+        for (
+            let i = -CampLocationGenerator.MAP_RANGE - 1;
+            i < CampLocationGenerator.MAP_RANGE + 1;
+            i++
+        ) {
+            for (
+                let j = -CampLocationGenerator.MAP_RANGE - 1;
+                j < CampLocationGenerator.MAP_RANGE + 1;
+                j++
+            ) {
                 var value = noise.simplex2(
                     i / (this.MAP_RANGE * noiseScale),
                     j / (this.MAP_RANGE * noiseScale)
@@ -418,7 +472,11 @@ export class MapGenerator {
         const pts: Grid<boolean> = new Grid()
         let str = `seed: ${seed} \n`
 
-        for (let y = -MapGenerator.MAP_RANGE - 1; y < MapGenerator.MAP_RANGE + 1; y += SQ) {
+        for (
+            let y = -CampLocationGenerator.MAP_RANGE - 1;
+            y < CampLocationGenerator.MAP_RANGE + 1;
+            y += SQ
+        ) {
             // [0, COAST_VARIABILITY)
             var value = Math.floor(
                 ((noise.simplex2(0, y / (this.MAP_RANGE * noiseScale)) + 1) / 2) *
@@ -432,7 +490,10 @@ export class MapGenerator {
                     str += " "
                     for (let j = 0; j < SQ; j++) {
                         pts.set(
-                            new Point(MapGenerator.MAP_RANGE - COAST_OCEAN_WIDTH + i + 1, y + j),
+                            new Point(
+                                CampLocationGenerator.MAP_RANGE - COAST_OCEAN_WIDTH + i + 1,
+                                y + j
+                            ),
                             true
                         )
                     }
@@ -446,10 +507,10 @@ export class MapGenerator {
     }
 }
 
-window["levelNoise"] = (...args: any) => console.log(MapGenerator.levelNoise(...args)[1])
-window["waterNoise"] = (...args: any) => console.log(MapGenerator.waterNoise(...args)[1])
-window["coastNoise"] = (...args: any) => console.log(MapGenerator.coastNoise(...args)[1])
+window["levelNoise"] = (...args: any) => console.log(CampLocationGenerator.levelNoise(...args)[1])
+window["waterNoise"] = (...args: any) => console.log(CampLocationGenerator.waterNoise(...args)[1])
+window["coastNoise"] = (...args: any) => console.log(CampLocationGenerator.coastNoise(...args)[1])
 
 window["river"] = () => {
-    MapGenerator.instance.addRiver(here())
+    CampLocationGenerator.instance.addRiver(here())
 }

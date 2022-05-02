@@ -8,13 +8,13 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { tilesAround } from "../Utils"
+import { CampLocationGenerator } from "../world/CampLocationGenerator"
 import { DarknessMask } from "../world/DarknessMask"
 import { EventQueue } from "../world/events/EventQueue"
 import { QueuedEventType } from "../world/events/QueuedEvent"
 import { Ground } from "../world/ground/Ground"
 import { LightManager } from "../world/LightManager"
 import { camp } from "../world/LocationManager"
-import { MapGenerator } from "../world/MapGenerator"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
 import { DudeFaction, DudeFactory, DudeType } from "./DudeFactory"
@@ -113,7 +113,7 @@ export class DudeSpawner extends Component {
         const waterSpots = l.getGroundSpots(true).filter(
             (pt) =>
                 Ground.isWater(l.getGround(pt)?.type) &&
-                pt.x < camp().size / 2 - MapGenerator.COAST_OCEAN_WIDTH // not in the ocean
+                pt.x < camp().size / 2 - CampLocationGenerator.COAST_OCEAN_WIDTH // not in the ocean
         )
 
         const goalCount = waterSpots.length / 50
