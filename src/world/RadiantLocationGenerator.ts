@@ -4,7 +4,7 @@ import { ElementType } from "./elements/Elements"
 import { Location } from "./Location"
 import { LocationType } from "./LocationManager"
 
-const MAP_SIZE = 30
+const MAP_SIZE = 40
 
 export class RadiantLocationGenerator extends AbstractLocationGenerator {
     static get instance() {

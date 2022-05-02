@@ -260,7 +260,8 @@ export abstract class AbstractLocationGenerator {
     }
 
     protected spawnTrees(location: Location) {
-        const trees = Math.random() * 500 + 500
+        const treeAmountRange = (location.size * location.size) / 12
+        const trees = Math.random() * treeAmountRange + treeAmountRange
         for (let i = 0; i < trees; i++) {
             const pt = new Point(
                 Math.floor(Math.random() * location.range * 2) - location.range,

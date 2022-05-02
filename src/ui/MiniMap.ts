@@ -193,8 +193,4 @@ export class MiniMap extends Component {
             })
         )
     }
-
-    private renderPlayerIndicator
-
-    private playerIndicatorBitmap: ImageBitmap
 }
