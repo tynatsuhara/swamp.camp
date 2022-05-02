@@ -26,7 +26,6 @@ export abstract class AbstractLocationGenerator {
         const location = this._generate()
 
         LocationManager.instance.add(location)
-        LocationManager.instance.loadLocation(location)
 
         console.groupEnd()
     }
