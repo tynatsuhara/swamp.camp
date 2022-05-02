@@ -28,6 +28,8 @@ export abstract class AbstractLocationGenerator {
         LocationManager.instance.add(location)
 
         console.groupEnd()
+
+        return location
     }
 
     protected abstract _generate(): Location
@@ -164,7 +166,7 @@ export abstract class AbstractLocationGenerator {
     // Water! //
     ////////////
 
-    protected placeWater(location: Location, presetWater: Grid<boolean>) {
+    protected placeWater(location: Location, presetWater: Grid<boolean> = new Grid()) {
         presetWater.entries().forEach(([pt]) => {
             location.setGroundElement(GroundType.WATER, pt)
         })

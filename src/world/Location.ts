@@ -314,8 +314,42 @@ export class Location {
         dude.moveTo(linkedPosition, true)
     }
 
-    playerUseTeleporter(to: string, id: string) {
+    playerLoadLocation(newLocation: Location, newPosition: Point) {
         CutscenePlayerController.instance.enable()
+
+        // load a new location
+        HUD.instance.locationTransition.transition(() => {
+            // move the player to the new location's dude store
+            const p = Player.instance.dude
+            const beforeTeleportPos = p.standingPosition
+            this.removeDude(p)
+            newLocation.addDude(p)
+            p.location = newLocation
+
+            // refresh the HUD hide stale data
+            HUD.instance.refresh()
+
+            // actually set the location
+            LocationManager.instance.loadLocation(newLocation)
+
+            // delete existing particles
+            Particles.instance.clear()
+
+            // position the player and camera
+            p.moveTo(newPosition, true)
+            Camera.instance.jump(beforeTeleportPos.minus(p.standingPosition))
+
+            setTimeout(() => {
+                CutscenePlayerController.instance.disable()
+            }, 400)
+        })
+    }
+
+    playerUseTeleporter(to: string, id: string) {
+        const linkedLocation = LocationManager.instance.get(to)
+        const linkedPosition = this.getTeleporterLinkedPos(to, id)
+
+        this.playerLoadLocation(linkedLocation, linkedPosition)
 
         setTimeout(() => {
             // play a sound, if applicable
@@ -325,36 +359,6 @@ export class Location {
                 Sounds.play(...TeleporterSound.TENT)
             }
         }, 500)
-
-        // load a new location
-        HUD.instance.locationTransition.transition(() => {
-            const linkedLocation = LocationManager.instance.get(to)
-            const linkedPosition = this.getTeleporterLinkedPos(to, id)
-
-            // move the player to the new location's dude store
-            const p = Player.instance.dude
-            const beforeTeleportPos = p.standingPosition
-            this.removeDude(p)
-            linkedLocation.addDude(p)
-            p.location = linkedLocation
-
-            // refresh the HUD hide stale data
-            HUD.instance.refresh()
-
-            // actually set the location
-            LocationManager.instance.loadLocation(linkedLocation)
-
-            // delete existing particles
-            Particles.instance.clear()
-
-            // position the player and camera
-            p.moveTo(linkedPosition, true)
-            Camera.instance.jump(beforeTeleportPos.minus(p.standingPosition))
-
-            setTimeout(() => {
-                CutscenePlayerController.instance.disable()
-            }, 400)
-        })
     }
 
     setBarriers(barriers: Barrier[]) {

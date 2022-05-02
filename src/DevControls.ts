@@ -12,9 +12,9 @@ import { controls } from "./Controls"
 import { TextOverlayManager } from "./cutscenes/TextOverlayManager"
 import { pixelPtToTilePt } from "./graphics/Tilesets"
 import { TextAlign, TextIcon } from "./ui/Text"
-import { ElementType } from "./world/elements/Elements"
 import { GroundType } from "./world/ground/Ground"
 import { camp, here } from "./world/LocationManager"
+import { RadiantLocationGenerator } from "./world/RadiantLocationGenerator"
 import { TimeUnit } from "./world/TimeUnit"
 import { WorldTime } from "./world/WorldTime"
 
@@ -70,8 +70,11 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     [InputKey.P, "show spawn menu", () => (spawnMenu.show = !spawnMenu.show)],
     [
         InputKey.U,
-        "spawn queequeg",
-        () => camp().addElement(ElementType.QUEEQUEG, new Point(camp().size / 2 - 6, 10)),
+        "generate radiant location",
+        () => {
+            const l = RadiantLocationGenerator.instance.generate()
+            l.playerLoadLocation(l, Point.ZERO)
+        },
     ],
     [InputKey.V, "spawn wolf pack", () => DudeSpawner.instance.spawnWolves()],
     [

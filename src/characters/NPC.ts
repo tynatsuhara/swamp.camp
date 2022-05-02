@@ -554,7 +554,10 @@ export class NPC extends Simulatable {
 
     private simulateGoToLocation(goalLocation: Location) {
         const nextLocation = this.getNextLocation(goalLocation)
-        this.useTeleporter(this._dude.location.getTeleporter(nextLocation.uuid))
+        const teleporter = this._dude.location.getTeleporter(nextLocation.uuid)
+        if (teleporter) {
+            this.useTeleporter(teleporter)
+        }
     }
 
     private getNextLocation(goalLocation: Location) {
