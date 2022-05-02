@@ -13,7 +13,7 @@ import { TextOverlayManager } from "./cutscenes/TextOverlayManager"
 import { pixelPtToTilePt } from "./graphics/Tilesets"
 import { TextAlign, TextIcon } from "./ui/Text"
 import { GroundType } from "./world/ground/Ground"
-import { camp, here } from "./world/LocationManager"
+import { camp, here, LocationManager } from "./world/LocationManager"
 import { RadiantLocationGenerator } from "./world/RadiantLocationGenerator"
 import { TimeUnit } from "./world/TimeUnit"
 import { WorldTime } from "./world/WorldTime"
@@ -73,7 +73,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
         "generate radiant location",
         () => {
             const l = RadiantLocationGenerator.instance.generate()
-            here().playerLoadLocation(l, Point.ZERO)
+            LocationManager.instance.playerLoadLocation(l, Point.ZERO)
         },
     ],
     [InputKey.V, "spawn wolf pack", () => DudeSpawner.instance.spawnWolves()],

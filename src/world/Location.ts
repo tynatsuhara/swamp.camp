@@ -5,10 +5,6 @@ import { PointAudio } from "../audio/PointAudio"
 import { Sounds } from "../audio/Sounds"
 import { Dude } from "../characters/Dude"
 import { DudeFactory, DudeType } from "../characters/DudeFactory"
-import { Player } from "../characters/Player"
-import { Camera } from "../cutscenes/Camera"
-import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
-import { Particles } from "../graphics/Particles"
 import { LocationSaveState } from "../saves/LocationSaveState"
 import { newUUID } from "../saves/uuid"
 import { HUD } from "../ui/HUD"
@@ -314,53 +310,11 @@ export class Location {
         dude.moveTo(linkedPosition, true)
     }
 
-    /**
-     * @param newLocation
-     * @param newPosition The pixel position of the player
-     */
-    playerLoadLocation(
-        newLocation: Location,
-        newPosition: Point,
-        afterTransitionCallback?: () => void
-    ) {
-        CutscenePlayerController.instance.enable()
-
-        // load a new location
-        HUD.instance.locationTransition.transition(() => {
-            // move the player to the new location's dude store
-            const p = Player.instance.dude
-            this.removeDude(p)
-            newLocation.addDude(p)
-            p.location = newLocation
-
-            // refresh the HUD hide stale data
-            HUD.instance.refresh()
-
-            // actually set the location
-            LocationManager.instance.loadLocation(newLocation)
-
-            // delete existing particles
-            Particles.instance.clear()
-
-            // position the player and camera
-            p.moveTo(newPosition, true)
-            Camera.instance.jumpCutToFocalPoint()
-
-            setTimeout(() => {
-                CutscenePlayerController.instance.disable()
-
-                if (afterTransitionCallback) {
-                    afterTransitionCallback()
-                }
-            }, 400)
-        })
-    }
-
     playerUseTeleporter(to: string, id: string) {
         const linkedLocation = LocationManager.instance.get(to)
         const linkedPosition = this.getTeleporterLinkedPos(to, id)
 
-        this.playerLoadLocation(linkedLocation, linkedPosition)
+        LocationManager.instance.playerLoadLocation(linkedLocation, linkedPosition)
 
         setTimeout(() => {
             // play a sound, if applicable

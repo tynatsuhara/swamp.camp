@@ -232,7 +232,7 @@ export class Player extends Component {
                 this.timeOffMap = 0
                 const position = DudeSpawner.instance.getSpawnPosOutsideOfCamp()
                 const currentLocation = here()
-                currentLocation.playerLoadLocation(camp(), position, () => {
+                LocationManager.instance.playerLoadLocation(camp(), position, () => {
                     LocationManager.instance.delete(currentLocation)
                     CutscenePlayerController.instance.enable()
                     CutscenePlayerController.instance.startMoving(Point.ZERO.minus(position))

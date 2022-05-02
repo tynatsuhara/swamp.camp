@@ -1,8 +1,14 @@
+import { Point } from "brigsby/dist/Point"
 import { measure } from "brigsby/dist/Profiler"
 import { WorldAudioContext } from "../audio/WorldAudioContext"
 import { DudeType } from "../characters/DudeFactory"
+import { Player } from "../characters/Player"
+import { Camera } from "../cutscenes/Camera"
+import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
+import { Particles } from "../graphics/Particles"
 import { LocationManagerSaveState } from "../saves/LocationManagerSaveState"
 import { Singletons } from "../Singletons"
+import { HUD } from "../ui/HUD"
 import { ElementType } from "./elements/Elements"
 import { Location } from "./Location"
 import { Simulatable } from "./Simulatable"
@@ -118,6 +124,48 @@ export class LocationManager {
                 .forEach((e) => e.getComponents(Simulatable).forEach((s) => s.simulate(duration)))
         })
         // console.log(`simulation took ${time} milliseconds`)
+    }
+
+    /**
+     * @param newLocation
+     * @param newPosition The pixel position of the player
+     */
+    playerLoadLocation(
+        newLocation: Location,
+        newPosition: Point,
+        afterTransitionCallback?: () => void
+    ) {
+        CutscenePlayerController.instance.enable()
+
+        // load a new location
+        HUD.instance.locationTransition.transition(() => {
+            // move the player to the new location's dude store
+            const p = Player.instance.dude
+            p.location.removeDude(p)
+            newLocation.addDude(p)
+            p.location = newLocation
+
+            // refresh the HUD hide stale data
+            HUD.instance.refresh()
+
+            // actually set the location
+            this.loadLocation(newLocation)
+
+            // delete existing particles
+            Particles.instance.clear()
+
+            // position the player and camera
+            p.moveTo(newPosition, true)
+            Camera.instance.jumpCutToFocalPoint()
+
+            setTimeout(() => {
+                CutscenePlayerController.instance.disable()
+
+                if (afterTransitionCallback) {
+                    afterTransitionCallback()
+                }
+            }, 400)
+        })
     }
 }
 
