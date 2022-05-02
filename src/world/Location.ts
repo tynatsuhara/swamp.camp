@@ -314,14 +314,21 @@ export class Location {
         dude.moveTo(linkedPosition, true)
     }
 
-    playerLoadLocation(newLocation: Location, newPosition: Point) {
+    /**
+     * @param newLocation
+     * @param newPosition The pixel position of the player
+     */
+    playerLoadLocation(
+        newLocation: Location,
+        newPosition: Point,
+        afterTransitionCallback?: () => void
+    ) {
         CutscenePlayerController.instance.enable()
 
         // load a new location
         HUD.instance.locationTransition.transition(() => {
             // move the player to the new location's dude store
             const p = Player.instance.dude
-            const beforeTeleportPos = p.standingPosition
             this.removeDude(p)
             newLocation.addDude(p)
             p.location = newLocation
@@ -337,10 +344,14 @@ export class Location {
 
             // position the player and camera
             p.moveTo(newPosition, true)
-            Camera.instance.jump(beforeTeleportPos.minus(p.standingPosition))
+            Camera.instance.jumpCutToFocalPoint()
 
             setTimeout(() => {
                 CutscenePlayerController.instance.disable()
+
+                if (afterTransitionCallback) {
+                    afterTransitionCallback()
+                }
             }, 400)
         })
     }

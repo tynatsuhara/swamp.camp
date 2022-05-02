@@ -48,8 +48,8 @@ export class Camera {
         this.dudeTarget = null
     }
 
-    jump(translation: Point) {
-        this._position = this._position.plus(translation)
+    jumpCutToFocalPoint() {
+        this._position = this.getGoalPosition()
     }
 
     setFocalPoint(focalPoint: FocalPoint) {
@@ -57,6 +57,26 @@ export class Camera {
     }
 
     getUpdatedPosition(elapsedTimeMillis: number): Point {
+        const cameraGoal = this.getGoalPosition()
+
+        if (!this._position) {
+            this._position = cameraGoal
+        } else {
+            this._position = this._position.lerp(0.0018 * elapsedTimeMillis, cameraGoal)
+        }
+
+        if (this.shakeDuration > 0) {
+            this.shakePower *= 1 - elapsedTimeMillis / this.shakeDuration
+            this.shakeDuration -= elapsedTimeMillis
+            this.shakeOffset = new Point(Math.random() - 0.5, Math.random() - 0.5).times(
+                this.shakePower
+            )
+        }
+
+        return this._position.plus(this.shakeOffset)
+    }
+
+    private getGoalPosition() {
         const mapSize = here().size || 0
         let xLimit = (mapSize / 2) * TILE_SIZE - this.dimensions.x / 2
         let yLimit = (mapSize / 2) * TILE_SIZE - this.dimensions.y / 2
@@ -89,22 +109,6 @@ export class Camera {
             }
         })()
 
-        const cameraGoal = focalPoint.minus(clampedTrackedPoint)
-
-        if (!this._position) {
-            this._position = cameraGoal
-        } else {
-            this._position = this._position.lerp(0.0018 * elapsedTimeMillis, cameraGoal)
-        }
-
-        if (this.shakeDuration > 0) {
-            this.shakePower *= 1 - elapsedTimeMillis / this.shakeDuration
-            this.shakeDuration -= elapsedTimeMillis
-            this.shakeOffset = new Point(Math.random() - 0.5, Math.random() - 0.5).times(
-                this.shakePower
-            )
-        }
-
-        return this._position.plus(this.shakeOffset)
+        return focalPoint.minus(clampedTrackedPoint)
     }
 }

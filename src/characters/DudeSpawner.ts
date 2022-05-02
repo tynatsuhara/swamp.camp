@@ -67,7 +67,7 @@ export class DudeSpawner extends Component {
 
         if (this.shouldRandomlySpawn(TimeUnit.DAY * 7)) {
             const visitorType = Lists.oneOf(visitorTypes)
-            DudeFactory.instance.new(visitorType, this.getSpawnPosOffMap())
+            DudeFactory.instance.new(visitorType, this.getSpawnPosOutsideOfCamp())
             // TODO: Make the visitor leave after a while.
             // Should this use the event queue?
             // The spooky visitor will vanish as soon as they sense an enemy.
@@ -145,7 +145,7 @@ export class DudeSpawner extends Component {
             return
         }
 
-        const spawnPos = this.getSpawnPosOffMap()
+        const spawnPos = this.getSpawnPosOutsideOfCamp()
 
         const leaders = Lists.range(1, 1 + Math.random() * 4).map(() =>
             DudeFactory.instance.new(DudeType.ORC_BRUTE, spawnPos)
@@ -177,7 +177,7 @@ export class DudeSpawner extends Component {
 
     private spawnWildlife() {
         if (this.shouldRandomlySpawn(TimeUnit.DAY * 7)) {
-            DudeFactory.instance.new(DudeType.BEAR, this.getSpawnPosOffMap())
+            DudeFactory.instance.new(DudeType.BEAR, this.getSpawnPosOutsideOfCamp())
         }
 
         if (this.shouldRandomlySpawn(TimeUnit.DAY * 3)) {
@@ -186,7 +186,7 @@ export class DudeSpawner extends Component {
     }
 
     spawnWolves() {
-        const leaderSpawnPos = this.getSpawnPosOffMap()
+        const leaderSpawnPos = this.getSpawnPosOutsideOfCamp()
         const leader = DudeFactory.instance.new(DudeType.WOLF, leaderSpawnPos)
 
         const spawnPoints = tilesAround(leaderSpawnPos, 3)
@@ -206,10 +206,14 @@ export class DudeSpawner extends Component {
         return Math.random() < probability
     }
 
-    private getSpawnPosOffMap() {
+    /**
+     * @returns A pixel coordinate (not point)
+     */
+    getSpawnPosOutsideOfCamp() {
         const side = Math.random()
-        const distance = (camp().size / 2 + 5) * TILE_SIZE
-        const posOnSide = (Math.random() * camp().size - camp().size / 2) * TILE_SIZE
+        // distance from (0, 0)
+        const distance = (camp().range + 2) * TILE_SIZE
+        const posOnSide = Math.random() * camp().range * TILE_SIZE
 
         if (side < 0.33) {
             // left

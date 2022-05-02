@@ -6,6 +6,7 @@ import { Point } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util/Lists"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
+import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
 import { ITEM_METADATA_MAP } from "../items/Items"
 import { TextAlign } from "../ui/Text"
@@ -15,6 +16,7 @@ import { Interactable } from "../world/elements/Interactable"
 import { camp, here } from "../world/LocationManager"
 import { WorldTime } from "../world/WorldTime"
 import { Dude } from "./Dude"
+import { DudeSpawner } from "./DudeSpawner"
 
 export class Player extends Component {
     static instance: Player
@@ -144,13 +146,13 @@ export class Player extends Component {
     }
 
     isOffMap(): "swamp" | "ocean" | undefined {
-        if (this.dude.location !== camp()) {
+        if (this.dude.location.isInterior) {
             return
         }
-        const margin = camp().size / 2
+        const range = here().range
         const pos = this.dude.tile
-        if (pos.x < -margin || pos.x > margin || pos.y < -margin || pos.y > margin) {
-            return pos.x > margin - CampLocationGenerator.COAST_OCEAN_WIDTH ? "ocean" : "swamp"
+        if (pos.x < -range || pos.x > range || pos.y < -range || pos.y > range) {
+            return pos.x > range - CampLocationGenerator.COAST_OCEAN_WIDTH ? "ocean" : "swamp"
         }
     }
 
@@ -205,23 +207,36 @@ export class Player extends Component {
     }
 
     private checkIsOffMap(updateData: UpdateData) {
-        if (this.isOffMap()) {
+        const offMap = this.isOffMap()
+
+        if (offMap && !CutscenePlayerController.instance.enabled) {
             this.timeOffMap += updateData.elapsedTimeMillis
         } else {
             this.timeOffMap = 0
             this.offMapWarningShown = false
         }
-        if (this.timeOffMap > 3_000 && !this.offMapWarningShown) {
-            TextOverlayManager.instance.open({
-                text: [
-                    this.isOffMap() === "ocean"
-                        ? "Venturing into the ocean without a ship is certain death. Turn back while you still can."
-                        : "Venturing deeper into the swamp alone is certain death. Turn back while you still can.",
-                ],
-                finishAction: "OKAY",
-                onFinish: () => (this.offMapWarningShown = true),
-                textAlign: TextAlign.CENTER,
-            })
+
+        if (this.timeOffMap > 2_500 && !this.offMapWarningShown) {
+            if (here() === camp()) {
+                TextOverlayManager.instance.open({
+                    text: [
+                        offMap === "ocean"
+                            ? "Venturing into the ocean without a ship is certain death. Turn back while you still can."
+                            : "Venturing deeper into the swamp alone is certain death. Turn back while you still can.",
+                    ],
+                    finishAction: "OKAY",
+                    onFinish: () => (this.offMapWarningShown = true),
+                    textAlign: TextAlign.CENTER,
+                })
+            } else {
+                this.timeOffMap = 0
+                const position = DudeSpawner.instance.getSpawnPosOutsideOfCamp()
+                here().playerLoadLocation(camp(), position, () => {
+                    CutscenePlayerController.instance.enable()
+                    CutscenePlayerController.instance.startMoving(Point.ZERO.minus(position))
+                    setTimeout(() => CutscenePlayerController.instance.disable(), 1_000)
+                })
+            }
         } else if (this.timeOffMap > 10_000) {
             this.dude.damage(Number.MAX_SAFE_INTEGER, {})
         }
