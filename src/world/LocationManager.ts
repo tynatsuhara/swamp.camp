@@ -26,14 +26,15 @@ export class LocationManager {
     constructor() {
         window["locationManager"] = this
         window["showDudes"] = () => {
-            const counts = {}
+            const ids = {}
             here()
                 .getDudes()
                 .forEach((d) => {
                     const type = DudeType[d.type]
-                    return (counts[type] = (counts[type] || 0) + 1)
+                    ids[type] = ids[type] || []
+                    ids[type].push(d.uuid)
                 })
-            console.log(counts)
+            console.log(ids)
         }
         window["bulldoze"] = (type: ElementType) => {
             here()
@@ -69,6 +70,10 @@ export class LocationManager {
             this.loadLocation(location)
         }
         return location
+    }
+
+    delete(location: Location) {
+        this.locations.delete(location.uuid)
     }
 
     /**

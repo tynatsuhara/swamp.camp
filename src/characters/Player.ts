@@ -13,7 +13,7 @@ import { TextAlign } from "../ui/Text"
 import { UIStateManager } from "../ui/UIStateManager"
 import { CampLocationGenerator } from "../world/CampLocationGenerator"
 import { Interactable } from "../world/elements/Interactable"
-import { camp, here } from "../world/LocationManager"
+import { camp, here, LocationManager } from "../world/LocationManager"
 import { WorldTime } from "../world/WorldTime"
 import { Dude } from "./Dude"
 import { DudeSpawner } from "./DudeSpawner"
@@ -231,7 +231,9 @@ export class Player extends Component {
             } else {
                 this.timeOffMap = 0
                 const position = DudeSpawner.instance.getSpawnPosOutsideOfCamp()
-                here().playerLoadLocation(camp(), position, () => {
+                const currentLocation = here()
+                currentLocation.playerLoadLocation(camp(), position, () => {
+                    LocationManager.instance.delete(currentLocation)
                     CutscenePlayerController.instance.enable()
                     CutscenePlayerController.instance.startMoving(Point.ZERO.minus(position))
                     setTimeout(() => CutscenePlayerController.instance.disable(), 1_000)

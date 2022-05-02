@@ -73,7 +73,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
         "generate radiant location",
         () => {
             const l = RadiantLocationGenerator.instance.generate()
-            l.playerLoadLocation(l, Point.ZERO)
+            here().playerLoadLocation(l, Point.ZERO)
         },
     ],
     [InputKey.V, "spawn wolf pack", () => DudeSpawner.instance.spawnWolves()],
