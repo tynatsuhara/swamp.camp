@@ -49,6 +49,9 @@ export class Location {
     readonly sprites = new Entity().addComponent(new StaticSprites())
 
     readonly size: number // tile dimensions (square)
+    get range() {
+        return this.size / 2
+    }
     readonly isInterior: boolean
     readonly allowPlacing: boolean
 

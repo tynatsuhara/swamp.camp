@@ -59,7 +59,7 @@ export class GameScene {
         WorldTime.instance.initialize(TimeUnit.HOUR * 18.5)
 
         // World must be initialized before we do anything else
-        CampLocationGenerator.instance.generateExterior()
+        CampLocationGenerator.instance.generate()
 
         const playerStartPos = new Point(camp().size, camp().size).times(TILE_SIZE)
         const playerDude = DudeFactory.instance.new(DudeType.PLAYER, playerStartPos)
