@@ -66,7 +66,7 @@ export class GroundRenderer {
     }
 
     getCanvas(wl: Location) {
-        return this.locations.get(here())
+        return this.locations.get(wl)
     }
 
     getEntity(): Entity {
