@@ -12,7 +12,7 @@ import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { ElementComponent } from "../world/elements/ElementComponent"
 import { GroundComponent } from "../world/ground/GroundComponent"
 import { GroundRenderer } from "../world/GroundRenderer"
-import { camp } from "../world/LocationManager"
+import { camp, here } from "../world/LocationManager"
 import { Color, getHex } from "./Color"
 import { UIStateManager } from "./UIStateManager"
 
@@ -28,7 +28,7 @@ export class MiniMap extends Component {
     private smallCanvas: HTMLCanvasElement
 
     update(updateData: UpdateData) {
-        this.isShowing = controls.isMapKeyHeld()
+        this.isShowing = controls.isMapKeyHeld() && here() === camp()
 
         if (this.lastPixelDrawn.equals(Point.ZERO)) {
             this.renderFullSizeMap()
@@ -193,4 +193,8 @@ export class MiniMap extends Component {
             })
         )
     }
+
+    private renderPlayerIndicator
+
+    private playerIndicatorBitmap: ImageBitmap
 }
