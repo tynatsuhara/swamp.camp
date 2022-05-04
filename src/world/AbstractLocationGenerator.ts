@@ -13,6 +13,9 @@ const SQ = 2
 const MIN_WATER_SIZE = 50
 const MAX_WATER_SIZE = 500
 
+// TODO generalize to other foliage
+export type TreeTypeSupplier = () => ElementType.TREE_POINTY | ElementType.TREE_ROUND
+
 /**
  * Base class with utility functions for generating exterior locations.
  * Exterior locations follow these conventions:
@@ -236,7 +239,7 @@ export abstract class AbstractLocationGenerator {
     // Foliage! //
     //////////////
 
-    protected spawnTreesAtEdge(location: Location) {
+    protected spawnTreesAtEdge(location: Location, treeTypeSupplier?: TreeTypeSupplier) {
         const vignetteEdge = location.range - 1
         const treeline = vignetteEdge - 8
 
@@ -256,10 +259,10 @@ export abstract class AbstractLocationGenerator {
             }
         }
         Lists.shuffle(possibilities)
-        possibilities.forEach((pt) => this.spawnTree(location, pt))
+        possibilities.forEach((pt) => this.spawnTree(location, pt, treeTypeSupplier))
     }
 
-    protected spawnTrees(location: Location) {
+    protected spawnTrees(location: Location, treeTypeSupplier?: TreeTypeSupplier) {
         const treeAmountRange = (location.size * location.size) / 12
         const trees = Math.random() * treeAmountRange + treeAmountRange
         for (let i = 0; i < trees; i++) {
@@ -267,17 +270,22 @@ export abstract class AbstractLocationGenerator {
                 Math.floor(Math.random() * location.range * 2) - location.range,
                 Math.floor(Math.random() * (location.range * 2 - 1)) - location.range
             )
-            this.spawnTree(location, pt)
+            this.spawnTree(location, pt, treeTypeSupplier)
         }
     }
 
-    private spawnTree(location: Location, pt: Point) {
+    private spawnTree(
+        location: Location,
+        pt: Point,
+        treeTypeSupplier: TreeTypeSupplier = () =>
+            Math.random() < 0.7 ? ElementType.TREE_POINTY : ElementType.TREE_ROUND
+    ) {
         const treeBase = pt.plusY(1)
         if (location.getGround(treeBase)?.type !== GroundType.GRASS) {
             return
         }
         location.addElement(
-            Math.random() < 0.7 ? ElementType.TREE_POINTY : ElementType.TREE_ROUND,
+            treeTypeSupplier(),
             pt,
             { s: 3 } // make adult trees
         )
