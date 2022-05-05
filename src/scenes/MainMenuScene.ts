@@ -384,7 +384,9 @@ export class MainMenuScene {
             const saveColors = saves
                 .filter((save) => !!save)
                 .map((save) => save.state.plumeIndex ?? 0)
-            this.slotColors = saves.map((save) => save?.state?.plumeIndex ?? 0)
+            // Defaulting to color index 16 because that is the default plume color
+            // (despite it not being the first color in the selector)
+            this.slotColors = saves.map((save) => save?.state?.plumeIndex ?? 16)
             this.unusedColors = Lists.range(0, PLUME_COLORS.length).filter(
                 (colorIndex) => !saveColors.includes(colorIndex)
             )
