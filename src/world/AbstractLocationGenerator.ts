@@ -245,7 +245,7 @@ export abstract class AbstractLocationGenerator {
 
         const possibilities = []
         for (let x = -location.range; x < location.range; x++) {
-            for (let y = -location.range; y < location.range; y++) {
+            for (let y = -location.range - 1; y < location.range; y++) {
                 const distToCenter = new Point(x, y).distanceTo(Point.ZERO)
                 const pt = new Point(x, y)
                 if (distToCenter > vignetteEdge) {
