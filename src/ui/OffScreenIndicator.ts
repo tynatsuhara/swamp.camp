@@ -9,7 +9,7 @@ import { Camera } from "../cutscenes/Camera"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 
 export class OffScreenIndicator extends Component {
-    private markerDistFromEdge = 12
+    private markerDistFromEdge = 13
     private tileSource: string
     private tilePoint: Point
     private positionSupplier: () => Point
