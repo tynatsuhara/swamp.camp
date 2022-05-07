@@ -6,6 +6,16 @@ import { LocationType } from "./LocationManager"
 
 const MAP_SIZE = 30
 
+/**
+ * Radiant location ideas:
+ *   - Orc camp with enslaved villagers and/or treasure
+ *   - Centaur settlement
+ *   - Elf settlement
+ *   - Forest guardian with treasure
+ *   - Troll with treasure
+ *   - Ambush?
+ */
+
 export class RadiantLocationGenerator extends AbstractLocationGenerator {
     static get instance() {
         return Singletons.getOrCreate(RadiantLocationGenerator)
