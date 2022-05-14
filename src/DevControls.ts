@@ -19,6 +19,7 @@ import { TimeUnit } from "./world/TimeUnit"
 import { WorldTime } from "./world/WorldTime"
 
 const SPAWNABLE_TYPES = [
+    DudeType.FOREST_GUARDIAN,
     DudeType.KNIGHT,
     DudeType.ONION,
     DudeType.GUMBALL,

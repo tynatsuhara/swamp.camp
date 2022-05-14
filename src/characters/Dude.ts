@@ -311,6 +311,11 @@ export class Dude extends Component implements DialogueSource {
         this.weapon?.setSheathed(false) // keep em in sync
     }
 
+    setWeaponAndShieldDrawn(drawn: boolean) {
+        this.weapon?.setSheathed(!drawn)
+        this.shield?.setOnBack(!drawn)
+    }
+
     private fireParticles: FireParticles
     private poisonParticles: PoisonParticles
     private blackLungParticles: BlackLungParticles

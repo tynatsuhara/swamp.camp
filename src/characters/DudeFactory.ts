@@ -71,6 +71,7 @@ export enum DudeType {
     GUMBALL,
     ONION,
     KNIGHT,
+    FOREST_GUARDIAN,
 }
 
 const DEFAULT_COLLIDER_SIZE = new Point(10, 8)
@@ -359,6 +360,17 @@ export class DudeFactory {
                 additionalComponents = [new NPC(), new Villager()]
                 maxHealth = 50
                 speed *= 0.7
+                break
+            }
+            case DudeType.FOREST_GUARDIAN: {
+                factions = [DudeFaction.VILLAGERS]
+                animationName = "ForestGuardian"
+                weapon = WeaponType.SWORD
+                shield = ShieldType.BASIC
+                additionalComponents = [new NPC(), new Villager()]
+                maxHealth = 30
+                speed *= 0.7
+                colliderSize = BIG_COLLIDER_SIZE
                 break
             }
             default: {

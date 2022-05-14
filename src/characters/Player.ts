@@ -123,8 +123,7 @@ export class Player extends Component {
 
         if (controls.isSheathKeyDown()) {
             const sheathed = !this.dude.weapon?.isSheathed() ?? false
-            this.dude.weapon.setSheathed(sheathed)
-            this.dude.shield.setOnBack(sheathed)
+            this.dude.setWeaponAndShieldDrawn(!sheathed)
         }
 
         let blocking = false
