@@ -3,15 +3,16 @@ import { debug } from "brigsby/dist/Debug"
 import { UpdateData } from "brigsby/dist/Engine"
 import { CapturedInput, InputKey, InputKeyString } from "brigsby/dist/Input"
 import { Point } from "brigsby/dist/Point"
+import { Lists } from "brigsby/dist/util/Lists"
 import { Condition } from "./characters/Condition"
 import { DudeFactory, DudeType } from "./characters/DudeFactory"
 import { DudeSpawner } from "./characters/DudeSpawner"
 import { Player } from "./characters/Player"
 import { Berto } from "./characters/types/Berto"
 import { controls } from "./Controls"
-import { TextOverlayManager } from "./cutscenes/TextOverlayManager"
+import { Particles } from "./graphics/Particles"
 import { pixelPtToTilePt } from "./graphics/Tilesets"
-import { TextAlign, TextIcon } from "./ui/Text"
+import { Color } from "./ui/Color"
 import { GroundType } from "./world/ground/Ground"
 import { camp, here, LocationManager } from "./world/LocationManager"
 import { RadiantLocationGenerator } from "./world/RadiantLocationGenerator"
@@ -45,23 +46,45 @@ export const spawnMenu = {
 }
 
 const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
+    // [
+    //     InputKey.I,
+    //     "show town stats",
+    //     () =>
+    //         TextOverlayManager.instance.open({
+    //             text: [
+    //                 [
+    //                     `blah ${TextIcon.FACE_VERY_SAD}`,
+    //                     `blah ${TextIcon.FACE_SAD}`,
+    //                     `blah ${TextIcon.FACE_NEUTRAL}`,
+    //                     `blah ${TextIcon.FACE_HAPPY}`,
+    //                     `blah ${TextIcon.FACE_VERY_HAPPY}`,
+    //                 ].join("\n\n"),
+    //             ],
+    //             finishAction: "OKAY",
+    //             textAlign: TextAlign.CENTER,
+    //         }),
+    // ],
     [
         InputKey.I,
-        "show town stats",
-        () =>
-            TextOverlayManager.instance.open({
-                text: [
-                    [
-                        `blah ${TextIcon.FACE_VERY_SAD}`,
-                        `blah ${TextIcon.FACE_SAD}`,
-                        `blah ${TextIcon.FACE_NEUTRAL}`,
-                        `blah ${TextIcon.FACE_HAPPY}`,
-                        `blah ${TextIcon.FACE_VERY_HAPPY}`,
-                    ].join("\n\n"),
-                ],
-                finishAction: "OKAY",
-                textAlign: TextAlign.CENTER,
-            }),
+        "smoke bomb",
+        () => {
+            const pos = Player.instance.dude.standingPosition
+            const radius = 45
+            const depth = pos.y + radius
+
+            // smoke
+            for (let i = 0; i < 1250; i++) {
+                const speed = Math.random() > 0.5 ? -0.001 : -0.005
+                Particles.instance.emitParticle(
+                    Lists.oneOf([Color.WHITE, Color.WHITE, Color.TAUPE_6]),
+                    pos.randomCircularShift(radius).plusY(-4),
+                    depth,
+                    1000 + Math.random() * 2500,
+                    (t) => new Point(0, t * speed),
+                    Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
+                )
+            }
+        },
     ],
     [
         InputKey.O,
