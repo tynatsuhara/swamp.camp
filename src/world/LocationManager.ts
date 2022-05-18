@@ -13,6 +13,7 @@ import { ElementType } from "./elements/Elements"
 import { Location } from "./Location"
 import { Simulatable } from "./Simulatable"
 import { TimeUnit } from "./TimeUnit"
+import { VisibleRegionMask } from "./VisibleRegionMask"
 
 export enum LocationType {
     BASE_CAMP = "base",
@@ -153,6 +154,9 @@ export class LocationManager {
 
             // delete existing particles
             Particles.instance.clear()
+
+            // clip edges of all locations
+            VisibleRegionMask.instance.refresh()
 
             // position the player and camera
             p.moveTo(newPosition, true)

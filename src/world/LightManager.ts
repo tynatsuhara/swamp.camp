@@ -8,9 +8,9 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { DarknessMask } from "./DarknessMask"
 import { Location } from "./Location"
-import { camp, here, LocationType } from "./LocationManager"
+import { here, LocationType } from "./LocationManager"
 import { TimeUnit } from "./TimeUnit"
-import { Vignette } from "./Vignette"
+import { VisibleRegionMask } from "./VisibleRegionMask"
 import { WorldTime } from "./WorldTime"
 
 export class LightManager extends Component {
@@ -25,7 +25,7 @@ export class LightManager extends Component {
     >()
     private mask = new DarknessMask(true)
 
-    private vignette: Vignette
+    private vignette: VisibleRegionMask
 
     /**
      * @param key the unique key for location, will overwrite that light source if it already exists
@@ -117,14 +117,6 @@ export class LightManager extends Component {
 
     private render() {
         // lazy load the vignette
-        if (!this.vignette) {
-            this.vignette = new Entity().addComponent(
-                new Vignette(
-                    new Point(1, 1).times((-camp().size / 2) * TILE_SIZE),
-                    camp().size * TILE_SIZE
-                )
-            )
-        }
 
         this.mask.reset(WorldTime.instance.time, this.getLocationDarkness())
 
@@ -164,7 +156,7 @@ export class LightManager extends Component {
 
         const location = here()
         if (!location.isInterior) {
-            result.push(this.vignette?.entity)
+            result.push(VisibleRegionMask.instance.entity)
         }
 
         return result

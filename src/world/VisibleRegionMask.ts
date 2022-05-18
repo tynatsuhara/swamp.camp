@@ -1,33 +1,43 @@
 import { Component } from "brigsby/dist/Component"
 import { Point } from "brigsby/dist/Point"
 import { ImageRender } from "brigsby/dist/renderer/ImageRender"
+import { TILE_SIZE } from "../graphics/Tilesets"
+import { Singletons } from "../Singletons"
 import { Color } from "../ui/Color"
 import { DarknessMask } from "./DarknessMask"
+import { here } from "./LocationManager"
 
-export class Vignette extends Component {
+export class VisibleRegionMask extends Component {
+    static instance = Singletons.getOrCreate(VisibleRegionMask)
+
     // TODO move to top-level consts
     private buffer = 200 // pixels from beyond the edge of the map (useful for covering clipping things)
     private padding = 128 // distance from start of shadows to the edge of the screen
     private rings = 8
     private ringWidth = this.padding / this.rings
 
-    constructor(topLeftPosition: Point, height: number) {
-        super()
+    refresh() {
+        // only used for exteriors
+        if (here().isInterior) {
+            return
+        }
 
+        const height = here().size * TILE_SIZE
         const width = height
 
-        this.start = () => {
-            const canvas = document.createElement("canvas")
-            canvas.width = width + this.buffer * 2
-            canvas.height = height + this.buffer * 2
-            const context = canvas.getContext("2d")
+        const topLeftPosition = new Point(1, 1).times(-height / 2)
 
-            // draw borders over edge
-            context.fillStyle = Color.BLACK
-            context.fillRect(0, 0, canvas.width, canvas.height)
-            context.clearRect(this.buffer, this.buffer, width, height)
+        const canvas = document.createElement("canvas")
+        canvas.width = width + this.buffer * 2
+        canvas.height = height + this.buffer * 2
+        const context = canvas.getContext("2d")
 
-            /*
+        // draw borders over edge
+        context.fillStyle = Color.BLACK
+        context.fillRect(0, 0, canvas.width, canvas.height)
+        context.clearRect(this.buffer, this.buffer, width, height)
+
+        /*
             const imageData = context.getImageData(0, 0, width, height)
             const rgb = getRGB(Color.BLACK)
 
@@ -74,16 +84,15 @@ export class Vignette extends Component {
             context.putImageData(imageData, this.buffer, this.buffer)
             */
 
-            this.getRenderMethods = () => [
-                new ImageRender(
-                    canvas,
-                    new Point(0, 0),
-                    new Point(canvas.width, canvas.height),
-                    topLeftPosition.plus(new Point(-this.buffer, -this.buffer)),
-                    new Point(canvas.width, canvas.height),
-                    DarknessMask.DEPTH - 1 // make sure this goes below the darkness mask
-                ),
-            ]
-        }
+        this.getRenderMethods = () => [
+            new ImageRender(
+                canvas,
+                new Point(0, 0),
+                new Point(canvas.width, canvas.height),
+                topLeftPosition.plus(new Point(-this.buffer, -this.buffer)),
+                new Point(canvas.width, canvas.height),
+                DarknessMask.DEPTH - 1 // make sure this goes below the darkness mask
+            ),
+        ]
     }
 }
