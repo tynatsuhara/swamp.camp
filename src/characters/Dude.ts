@@ -893,6 +893,11 @@ export class Dude extends Component implements DialogueSource {
         }
         this.canJumpOrRoll = false
         this.doRoll()
+        for (let i = 0; i < 3; i++) {
+            setTimeout(() => {
+                StepSounds.singleFootstepSound(this, 2)
+            }, i * 150)
+        }
         setTimeout(() => (this.canJumpOrRoll = true), 750)
     }
 
