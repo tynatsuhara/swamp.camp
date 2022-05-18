@@ -262,7 +262,7 @@ export class MainMenuScene {
             )
         } else if (this.menu === Menu.CREDITS) {
             entities.splice(0) // don't show title and scene
-            const entryCount = 13 // UPDATE THIS IF YOU ADD MORE CREDITS
+            const entryCount = 15 // UPDATE THIS IF YOU ADD MORE CREDITS
             const top = new Point(
                 dimensions.x / 2,
                 dimensions.y / 2 -
@@ -280,6 +280,7 @@ export class MainMenuScene {
                     .add("            Brent Bunn      ", link("bertn1991.newgrounds.com/"))
                     .add("            Playonloop.com  ", link("playonloop.com/"))
                     .add("     sound: BurghRecords    ", link("www.edinburghrecords.com/"))
+                    .add("            Antoine Goumain ", link("antoinegoumain.fr"))
                     .add("        qa: Lane Van Elderen", link("lane.computer/"))
                     .addLineBreak()
                     .add("made with brigsby!", link("brigsby.js.org/"))
