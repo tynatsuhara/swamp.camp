@@ -3,6 +3,7 @@ import { UpdateData } from "brigsby/dist/Engine"
 import { Point } from "brigsby/dist/Point"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Animator } from "brigsby/dist/util/Animator"
+import { Dude } from "../../characters/Dude"
 
 /**
  * Something that can be lightly nudged when a dude walks through it
@@ -12,28 +13,35 @@ export class Pushable extends Component {
     private tileTransforms: Map<SpriteTransform, Point>
     private animator: Animator
     private canPush: () => boolean
+    private onPush: (dude: Dude) => void
 
     /**
      * @param position world pixel position (probably centered) referenced for finding hittables
      * @param tileTransforms the tiles which will be moved
      */
-    constructor(position: Point, tileTransforms: SpriteTransform[], canPush: () => boolean) {
+    constructor(
+        position: Point,
+        tileTransforms: SpriteTransform[],
+        canPush: () => boolean,
+        onPush: (dude: Dude) => void
+    ) {
         super()
         this.position = position
         this.tileTransforms = new Map(tileTransforms.map((t) => [t, t.position]))
         this.canPush = canPush
+        this.onPush = onPush
     }
 
     update(updateData: UpdateData) {
         this.animator?.update(updateData.elapsedTimeMillis)
     }
 
-    push(dudeStandingPosition: Point, dudeWalkingVelocity: Point) {
+    push(dude: Dude, dudeWalkingVelocity: Point) {
         if (
             !!this.animator ||
             !this.entity ||
             (dudeWalkingVelocity.x === 0 && dudeWalkingVelocity.y === 0) ||
-            dudeStandingPosition.distanceTo(this.position) > 12
+            dude.standingPosition.distanceTo(this.position) > 12
         ) {
             return
         }
@@ -41,8 +49,8 @@ export class Pushable extends Component {
         // perpendicular to the walking direction
         let velocity = new Point(dudeWalkingVelocity.y, -dudeWalkingVelocity.x)
         if (
-            dudeStandingPosition.distanceTo(this.position) >
-            dudeStandingPosition.distanceTo(this.position.plus(velocity))
+            dude.standingPosition.distanceTo(this.position) >
+            dude.standingPosition.distanceTo(this.position.plus(velocity))
         ) {
             velocity = velocity.times(-1)
         }
@@ -60,5 +68,7 @@ export class Pushable extends Component {
             },
             () => (this.animator = null)
         )
+
+        this.onPush(dude)
     }
 }

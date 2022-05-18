@@ -796,10 +796,7 @@ export class Dude extends Component implements DialogueSource {
             const newPos = this.standingPosition.plus(totalMovement)
             this.moveTo(newPos)
 
-            here()
-                .getElement(this.tile)
-                ?.entity.getComponent(Pushable)
-                ?.push(this.standingPosition, direction)
+            here().getElement(this.tile)?.entity.getComponent(Pushable)?.push(this, direction)
         }
 
         this.animationDirty = false

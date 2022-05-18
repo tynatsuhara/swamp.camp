@@ -26,6 +26,10 @@ const SIZE = "s" // one of [1, 2, 3]
 const AVAILABLE_RESOURCES = "a"
 const CHOPPING_AUDIO = Lists.range(0, 5).map((n) => `audio/impact/impactPlank_medium_00${n}.ogg`)
 const CHOPPING_AUDIO_VOLUME = 0.3
+const PUSH_AUDIO = [
+    ...Lists.range(1, 10).map((i) => `audio/nature/Footstep/FootstepGrass0${i}.wav`),
+    ...Lists.range(1, 6).map((i) => `audio/nature/Foliage/Foliage0${i}.wav`),
+]
 
 export class TreeFactory extends ElementFactory {
     readonly type: ElementType.TREE_ROUND | ElementType.TREE_POINTY
@@ -34,7 +38,7 @@ export class TreeFactory extends ElementFactory {
     constructor(type: ElementType.TREE_ROUND | ElementType.TREE_POINTY) {
         super()
         this.type = type
-        assets.loadAudioFiles(CHOPPING_AUDIO)
+        assets.loadAudioFiles([...CHOPPING_AUDIO, ...PUSH_AUDIO])
     }
 
     make(wl: Location, pos: Point, data: object): ElementComponent {
@@ -121,7 +125,14 @@ export class TreeFactory extends ElementFactory {
             new Pushable(
                 pos.plusX(0.5).plusY(2).times(TILE_SIZE),
                 tiles.map((t) => t.transform),
-                () => !hittableResource.isBeingHit()
+                () => !hittableResource.isBeingHit(),
+                (dude) =>
+                    Sounds.playAtPoint(
+                        Lists.oneOf(PUSH_AUDIO),
+                        0.2,
+                        dude.standingPosition,
+                        TILE_SIZE * 10
+                    )
             )
         )
 

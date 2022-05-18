@@ -38,23 +38,17 @@ export class StepSounds {
             .then(() =>
                 dude.entity.addComponent(
                     new RepeatedInvoker(() => {
-                        const player = Player.instance.dude
-                        if (player) {
-                            const distance = player.standingPosition.manhattanDistanceTo(
-                                dude.standingPosition
-                            )
-                            if (
-                                dude?.isAlive &&
-                                dude.isMoving &&
-                                !dude.rolling &&
-                                !dude.jumping &&
-                                distance <= FOOTSTEP_SOUND_DISTANCE
-                            ) {
-                                const vol = Math.max(
-                                    0,
-                                    (FOOTSTEP_SOUND_DISTANCE - distance) / FOOTSTEP_SOUND_DISTANCE
-                                )
-                                StepSounds.singleFootstepSound(dude, vol)
+                        if (Player.instance.dude) {
+                            if (dude?.isAlive && dude.isMoving && !dude.rolling && !dude.jumping) {
+                                const [sound, volume] = StepSounds.getSound(dude)
+                                if (!!sound) {
+                                    Sounds.playAtPoint(
+                                        sound,
+                                        volume,
+                                        dude.standingPosition,
+                                        FOOTSTEP_SOUND_DISTANCE
+                                    )
+                                }
                             }
                         }
                         return StepSounds.SPEED
