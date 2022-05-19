@@ -8,6 +8,7 @@ import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
 import { saveManager } from "../SaveManager"
 import { Settings } from "../Settings"
 import { SwampCampGame } from "../SwampCampGame"
+import { here } from "../world/LocationManager"
 import { ButtonsMenu } from "./ButtonsMenu"
 import { Color } from "./Color"
 import { ControlsUI } from "./ControlsUI"
@@ -97,7 +98,10 @@ export class PauseMenu extends Component {
             this.getFullScreenOption(),
             {
                 text: `MAIN MENU`,
-                fn: () => SwampCampGame.instance.loadMainMenu(),
+                fn: () => {
+                    here().toggleAudio(false)
+                    SwampCampGame.instance.loadMainMenu()
+                },
             },
         ]
 
