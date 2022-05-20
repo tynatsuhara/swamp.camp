@@ -69,6 +69,8 @@ export class DudeSpawner extends Component {
         if (this.shouldRandomlySpawn(TimeUnit.DAY * 7)) {
             const visitorType = Lists.oneOf(visitorTypes)
 
+            console.log(`spawning villager ${DudeType[visitorType]}`)
+
             const announcement: string = {
                 // TODO herald-ify the language
                 [DudeType.SPOOKY_VISITOR]: "I spotted a spooky person lurking outside the camp...",

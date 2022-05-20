@@ -146,10 +146,17 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     [
         InputKey.N,
         "fast forward",
-        (input) =>
-            WorldTime.instance.fastForward(
-                input.isKeyHeld(InputKey.SHIFT) ? TimeUnit.MINUTE : TimeUnit.HOUR
-            ),
+        (input) => {
+            let time: number
+            if (input.isKeyHeld(InputKey.SHIFT)) {
+                time = TimeUnit.MINUTE
+            } else if (input.isKeyHeld(InputKey.CONTROL)) {
+                time = TimeUnit.DAY
+            } else {
+                time = TimeUnit.HOUR
+            }
+            WorldTime.instance.fastForward(time)
+        },
     ],
     [
         InputKey.Y,
