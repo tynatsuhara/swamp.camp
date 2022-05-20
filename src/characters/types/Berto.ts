@@ -62,6 +62,10 @@ export class Berto extends Component {
         this.npc.dude.blob[ANNOUNCEMENT_KEY] = announcements
         return result
     }
+
+    removeAnnouncement(id: string) {
+        this.npc.dude.blob[ANNOUNCEMENT_KEY] = this.getAnnouncements().filter((a) => a.id !== id)
+    }
 }
 
 const ANNOUNCEMENT_KEY = "announcements"

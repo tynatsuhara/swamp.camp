@@ -1,13 +1,19 @@
 import { dialogue, DialogueInstance, NextDialogue } from "./Dialogue"
 
 export type Announcement = {
-    dialogueKey: string
-    metadata?: object
+    id: string
+    metadata?: any
 }
 
 export const getAnnouncementDialogue = (
     a: Announcement,
-    completeAnnouncement: NextDialogue
+    completeAnnouncement: () => NextDialogue
 ): DialogueInstance => {
-    return dialogue(["Fuck you!"], () => completeAnnouncement)
+    const metadata = a.metadata ?? {}
+
+    if (a.id.startsWith("visitor-")) {
+        return dialogue([metadata.message], completeAnnouncement)
+    }
+
+    return dialogue(["Fuck you!"], completeAnnouncement)
 }

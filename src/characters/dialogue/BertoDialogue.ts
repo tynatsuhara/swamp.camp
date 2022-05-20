@@ -140,7 +140,7 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
         if (!a) {
             return dialogue(["Alas, I have no announcements at the moment."])
         }
-        return getAnnouncementDialogue(a, new NextDialogue(BERT_ENTRYPOINT, false))
+        return getAnnouncementDialogue(a, () => new NextDialogue(BERT_ENTRYPOINT, false))
     },
 }
 
