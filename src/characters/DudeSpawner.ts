@@ -61,7 +61,7 @@ export class DudeSpawner extends Component {
             .getDudes()
             .filter((d) => visitorTypes.includes(d.type))
 
-        if (currentVisitors.length === 0) {
+        if (currentVisitors.length > 0) {
             return
         }
 
