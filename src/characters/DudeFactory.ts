@@ -27,6 +27,7 @@ import { Enemy } from "./types/Enemy"
 import { ShroomNPC } from "./types/ShroomNPC"
 import { SpookyVisitor } from "./types/SpookyVisitor"
 import { Villager } from "./types/Villager"
+import { Visitor } from "./types/Visitor"
 import { ShieldType } from "./weapons/ShieldType"
 import { WeaponType } from "./weapons/WeaponType"
 
@@ -253,7 +254,12 @@ export class DudeFactory {
                 animationName = "necromancer"
                 speed *= 0.3
                 dialogue = SPOOKY_VISITOR_STARTING_DIALOGUE
-                additionalComponents = [new NPC(), new Villager(), new SpookyVisitor()]
+                additionalComponents = [
+                    new NPC(),
+                    new Villager(),
+                    new SpookyVisitor(),
+                    new Visitor(),
+                ]
                 maxHealth = Number.MAX_SAFE_INTEGER
                 break
             }

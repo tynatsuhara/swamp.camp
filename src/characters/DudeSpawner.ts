@@ -19,7 +19,7 @@ import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
 import { DudeFaction, DudeFactory, DudeType } from "./DudeFactory"
 import { NPC } from "./NPC"
-import { Berto } from "./types/Berto"
+import { Visitor } from "./types/Visitor"
 
 export class DudeSpawner extends Component {
     static get instance() {
@@ -56,8 +56,9 @@ export class DudeSpawner extends Component {
         this.spawnVisitors()
     }
 
-    private spawnVisitors() {
+    spawnVisitors(forceSpawn = false) {
         const visitorTypes = [DudeType.SPOOKY_VISITOR]
+
         const currentVisitors = camp()
             .getDudes()
             .filter((d) => visitorTypes.includes(d.type))
@@ -66,32 +67,13 @@ export class DudeSpawner extends Component {
             return
         }
 
-        if (this.shouldRandomlySpawn(TimeUnit.DAY * 7)) {
+        if (forceSpawn || this.shouldRandomlySpawn(TimeUnit.DAY * 7)) {
             const visitorType = Lists.oneOf(visitorTypes)
 
-            console.log(`spawning villager ${DudeType[visitorType]}`)
+            console.log(`spawning villager ${visitorTypes}`)
 
-            const announcement: string = {
-                // TODO herald-ify the language
-                [DudeType.SPOOKY_VISITOR]: "I spotted a spooky person lurking outside the camp...",
-            }[visitorType]
-
-            DudeFactory.instance.new(visitorType, this.getSpawnPosOutsideOfCamp())
-
-            if (announcement) {
-                Berto.instance.addAnnouncement({
-                    id: `visitor-${visitorType}`,
-                    metadata: {
-                        message: announcement,
-                    },
-                })
-            }
-
-            // TODO: Make the visitor leave after a while.
-            // Should this use the event queue?
-            // The spooky visitor will vanish as soon as they sense an enemy.
-            // It should also delete the announcement.
-            // Maybe we can create a Visitor component?
+            const dude = DudeFactory.instance.new(visitorType, this.getSpawnPosOutsideOfCamp())
+            dude.entity.getComponent(Visitor)?.welcome()
         }
     }
 
