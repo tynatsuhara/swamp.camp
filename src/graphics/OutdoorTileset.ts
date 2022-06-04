@@ -8,6 +8,7 @@ export class OutdoorTileset extends SingleFileTileLoader {
             new Map([
                 ["bed", new Point(15, 3)],
                 ["mushroomPlaced", new Point(29, 9)],
+                ["meat1", new Point(55, 18)],
                 ["mushroom", new Point(30, 9)],
                 ["treeRoundSapling", new Point(27, 8)],
                 ["treeRoundSmall0", new Point(13, 9)],
