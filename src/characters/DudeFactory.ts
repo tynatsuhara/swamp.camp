@@ -23,6 +23,7 @@ import { Player } from "./Player"
 import { AquaticNPC } from "./types/AquaticNPC"
 import { Berto } from "./types/Berto"
 import { Centaur } from "./types/Centaur"
+import { DudeModifier } from "./types/DudeModifier"
 import { Enemy } from "./types/Enemy"
 import { ShroomNPC } from "./types/ShroomNPC"
 import { SpookyVisitor } from "./types/SpookyVisitor"
@@ -283,7 +284,13 @@ export class DudeFactory {
                 factions = [DudeFaction.BEARS]
                 animationName = "Bear"
                 weapon = WeaponType.UNARMED
-                additionalComponents = [new NPC(), new Enemy()]
+                additionalComponents = [
+                    new NPC(),
+                    new Enemy(),
+                    new DudeModifier(
+                        (d) => (d.droppedItemSupplier = () => [Item.MEAT, Item.MEAT, Item.MEAT])
+                    ),
+                ]
                 maxHealth = 5
                 speed *= 0.5
                 colliderSize = BIG_COLLIDER_SIZE
