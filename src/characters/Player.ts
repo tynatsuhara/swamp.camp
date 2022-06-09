@@ -56,7 +56,6 @@ export class Player extends Component {
                 weakMagnitude: 0.5,
             })
         })
-        this.dude.droppedItemSupplier = () => []
     }
 
     update(updateData: UpdateData) {

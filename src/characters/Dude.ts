@@ -547,7 +547,8 @@ export class Dude extends Component implements DialogueSource {
         this.onDamageCallback = fn
     }
 
-    droppedItemSupplier: () => Item[] = () => [Item.COIN]
+    // TODO: Consider just dropping everything in their inventory instead
+    droppedItemSupplier: (() => Item[]) | undefined
     private layingDownOffset: Point
 
     die(direction: Point = new Point(-1, 0)) {
@@ -564,23 +565,26 @@ export class Dude extends Component implements DialogueSource {
         this.animation.pause()
 
         // spawn items
-        const items = this.droppedItemSupplier()
-        items.forEach((item) => {
-            const randomness = 8
-            const velocity = direction
-                .normalizedOrZero()
-                .plus(new Point(Math.random() - 0.5, Math.random() - 0.5).times(randomness))
-            setTimeout(
-                () =>
-                    spawnItem(
-                        this.standingPosition.minus(new Point(0, 2)),
-                        item,
-                        velocity,
-                        this.collider
-                    ),
-                100
-            )
-        })
+        if (this.droppedItemSupplier) {
+            const items = this.droppedItemSupplier()
+            items.forEach((item) => {
+                const randomness = 8
+                const velocity = direction
+                    .normalizedOrZero()
+                    .plus(new Point(Math.random() - 0.5, Math.random() - 0.5).times(randomness))
+                setTimeout(
+                    () =>
+                        spawnItem(
+                            this.standingPosition.minus(new Point(0, 2)),
+                            item,
+                            velocity,
+                            this.collider
+                        ),
+                    100
+                )
+            })
+        }
+
         this.dropWeapon()
 
         // remove the body

@@ -1,6 +1,7 @@
 import { Component } from "brigsby/dist/Component"
 import { Point } from "brigsby/dist/Point"
 import { TILE_SIZE } from "../../graphics/Tilesets"
+import { Item } from "../../items/Items"
 import { Ground } from "../../world/ground/Ground"
 import { LightManager } from "../../world/LightManager"
 import { WorldTime } from "../../world/WorldTime"
@@ -16,6 +17,11 @@ export class Enemy extends Component {
     awake() {
         const dude = this.entity.getComponent(Dude)
         const npc = this.entity.getComponent(NPC)
+
+        // Don't overwrite another custom droppedItemSupplier such as one from the shroom class
+        if (!dude.droppedItemSupplier) {
+            dude.droppedItemSupplier = () => [Item.COIN]
+        }
 
         npc.isEnemyFn = (d) =>
             // Default land enemy behavior is to attack anything that isn't in an overlapping faction

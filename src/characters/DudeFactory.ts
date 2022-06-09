@@ -300,7 +300,11 @@ export class DudeFactory {
                 factions = [DudeFaction.WOLVES]
                 animationName = "Wolf"
                 weapon = WeaponType.UNARMED
-                additionalComponents = [new NPC(), new Enemy()]
+                additionalComponents = [
+                    new NPC(),
+                    new Enemy(),
+                    new DudeModifier((d) => (d.droppedItemSupplier = () => [Item.MEAT])),
+                ]
                 maxHealth = 2
                 speed *= 1
                 break
