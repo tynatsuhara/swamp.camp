@@ -40,7 +40,13 @@ const SPAWNABLE_TYPES = [
 ]
 export const spawnMenu = {
     show: false,
-    selectedType: SPAWNABLE_TYPES[0],
+    setSelectedType: (type: DudeType) => {
+        localStorage.setItem("spawnMenuType", JSON.stringify(type))
+    },
+    getSelectedType: () => {
+        const cacheType = localStorage.getItem("spawnMenuType")
+        return cacheType ? (JSON.parse(cacheType) as DudeType) : SPAWNABLE_TYPES[0]
+    },
     types: SPAWNABLE_TYPES,
 }
 
@@ -88,7 +94,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     [
         InputKey.O,
         "spawn selected type",
-        (input) => DudeFactory.instance.new(spawnMenu.selectedType, input.mousePos, here()),
+        (input) => DudeFactory.instance.new(spawnMenu.getSelectedType(), input.mousePos, here()),
     ],
     [InputKey.P, "show spawn menu", () => (spawnMenu.show = !spawnMenu.show)],
     [

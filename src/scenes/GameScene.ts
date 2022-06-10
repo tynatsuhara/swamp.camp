@@ -245,7 +245,7 @@ export class GameScene {
                 spawnMenu.types.map((type) => ({
                     text: `SPAWN ${DudeType[type]}`,
                     fn: () => {
-                        spawnMenu.selectedType = type
+                        spawnMenu.setSelectedType(type)
                         spawnMenu.show = false
                     },
                     buttonColor: "white",
