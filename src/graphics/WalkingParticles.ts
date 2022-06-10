@@ -12,7 +12,7 @@ import { Particles } from "./Particles"
 
 const MILLIS_BETWEEN_EMISSIONS = 50
 const LIFESPAN_MILLIS = 300
-const BLOOD_PROBABILITY = 0.25
+const BLOOD_PROBABILITY = 0.2
 
 export class WalkingParticles extends Component {
     private dude: Dude
@@ -71,8 +71,8 @@ export class WalkingParticles extends Component {
             debug.enableBlood &&
             this.dude.health < this.dude.maxHealth &&
             this.dude.lastAttackerTime > WorldTime.instance.time - 10_000 &&
-            Math.random() > this.dude.health / this.dude.maxHealth &&
-            Math.random() < BLOOD_PROBABILITY
+            Math.random() < BLOOD_PROBABILITY &&
+            Math.random() > this.dude.health / this.dude.maxHealth
         ) {
             let duration = 10_000 + Math.random() * 10_000
             let depth = GroundRenderer.DEPTH + 1
