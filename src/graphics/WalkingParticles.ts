@@ -7,6 +7,7 @@ import { Color } from "../ui/Color"
 import { Ground } from "../world/ground/Ground"
 import { GroundRenderer } from "../world/GroundRenderer"
 import { here } from "../world/LocationManager"
+import { WorldTime } from "../world/WorldTime"
 import { Particles } from "./Particles"
 
 const MILLIS_BETWEEN_EMISSIONS = 50
@@ -65,14 +66,14 @@ export class WalkingParticles extends Component {
         // TODO blood
         if (
             debug.enableBlood &&
-            this.dude.isAlive &&
             this.dude.health < this.dude.maxHealth &&
+            this.dude.lastAttackerTime > WorldTime.instance.time - 10_000 &&
             Math.random() > this.dude.health / this.dude.maxHealth &&
             Math.random() < BLOOD_PROBABILITY
         ) {
             Particles.instance.emitParticle(
                 Math.random() > 0.9 ? Color.RED_3 : Color.RED_2,
-                this.dude.standingPosition.randomCircularShift(4),
+                this.dude.standingPosition.randomCircularShift(4 * (this.dude.isAlive ? 1 : 2)),
                 GroundRenderer.DEPTH + 1,
                 10_000 + Math.random() * 5_000,
                 () => Point.ZERO,
