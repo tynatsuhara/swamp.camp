@@ -1,11 +1,11 @@
-import { WeaponType } from "./WeaponType"
-import { Weapon } from "./Weapon"
-import { UnarmedWeapon } from "./UnarmedWeapon"
-import { MeleeWeapon } from "./MeleeWeapon"
 import { Point } from "brigsby/dist/Point"
-import { SpearWeapon } from "./SpearWeapon"
 import { DudeType } from "../DudeFactory"
+import { MeleeWeapon } from "./MeleeWeapon"
+import { SpearWeapon } from "./SpearWeapon"
 import { StaffWeapon } from "./StaffWeapon"
+import { UnarmedWeapon } from "./UnarmedWeapon"
+import { Weapon } from "./Weapon"
+import { WeaponType } from "./WeaponType"
 
 const offsetForDudeType = (type: DudeType) => {
     switch (type) {
@@ -48,7 +48,7 @@ export const WeaponFactory = {
             case WeaponType.SPEAR:
                 return new SpearWeapon() // NPCs can't currently use ranged weapons
             case WeaponType.STAFF_1:
-                return new StaffWeapon()
+                return new StaffWeapon() // Players can't currently use AOE weapons
             default:
                 throw new Error(`weapon type ${type} is not supported yet`)
         }
