@@ -12,7 +12,7 @@ import { Particles } from "./Particles"
 
 const MILLIS_BETWEEN_EMISSIONS = 50
 const LIFESPAN_MILLIS = 300
-const BLOOD_PROBABILITY = 0.75
+const BLOOD_PROBABILITY = 0.25
 
 export class WalkingParticles extends Component {
     private dude: Dude
@@ -63,9 +63,13 @@ export class WalkingParticles extends Component {
     }
 
     update(updateData: UpdateData) {
+        const groud = here().getGround(this.dude.tile)
+        const isInWater = Ground.isWater(groud?.type)
+
         // TODO blood
         if (
             debug.enableBlood &&
+            !isInWater &&
             this.dude.health < this.dude.maxHealth &&
             this.dude.lastAttackerTime > WorldTime.instance.time - 10_000 &&
             Math.random() > this.dude.health / this.dude.maxHealth &&
@@ -75,7 +79,7 @@ export class WalkingParticles extends Component {
                 Math.random() > 0.9 ? Color.RED_3 : Color.RED_2,
                 this.dude.standingPosition.randomCircularShift(4 * (this.dude.isAlive ? 1 : 2)),
                 GroundRenderer.DEPTH + 1,
-                10_000 + Math.random() * 5_000,
+                10_000 + Math.random() * 10_000,
                 () => Point.ZERO,
                 Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
             )
@@ -94,9 +98,7 @@ export class WalkingParticles extends Component {
             return
         }
 
-        const groud = here().getGround(this.dude.tile)
-
-        if (Ground.isWater(groud?.type)) {
+        if (isInWater) {
             const depth = this.dude.standingPosition.y + 6
             const xRange = this.dude.colliderSize.x - 1
             for (let i = 0; i < 15; i++) {
