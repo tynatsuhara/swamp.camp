@@ -69,17 +69,24 @@ export class WalkingParticles extends Component {
         // TODO blood
         if (
             debug.enableBlood &&
-            !isInWater &&
             this.dude.health < this.dude.maxHealth &&
             this.dude.lastAttackerTime > WorldTime.instance.time - 10_000 &&
             Math.random() > this.dude.health / this.dude.maxHealth &&
             Math.random() < BLOOD_PROBABILITY
         ) {
+            let duration = 10_000 + Math.random() * 10_000
+            let depth = GroundRenderer.DEPTH + 1
+
+            if (isInWater) {
+                duration *= 0.08
+                depth = this.dude.standingPosition.y + 7
+            }
+
             Particles.instance.emitParticle(
                 Math.random() > 0.9 ? Color.RED_3 : Color.RED_2,
                 this.dude.standingPosition.randomCircularShift(4 * (this.dude.isAlive ? 1 : 2)),
-                GroundRenderer.DEPTH + 1,
-                10_000 + Math.random() * 10_000,
+                depth,
+                duration,
                 () => Point.ZERO,
                 Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
             )
