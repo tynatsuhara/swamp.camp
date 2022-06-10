@@ -329,7 +329,7 @@ export class NPC extends Simulatable {
             this.dude.shield &&
             this.dude.isFacing(this.attackTarget.standingPosition) &&
             [NPCAttackState.ATTACKING_SOON, NPCAttackState.ATTACKING_NOW].includes(
-                this.attackTarget.entity.getComponent(NPC)?.attackState
+                this.attackTarget?.entity?.getComponent(NPC)?.attackState
             )
         ) {
             this.dude.shield.block(true)
