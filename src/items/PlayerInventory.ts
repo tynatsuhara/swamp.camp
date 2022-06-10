@@ -3,52 +3,46 @@ import { saveManager } from "../SaveManager"
 import { Inventory } from "./Inventory"
 import { Item } from "./Items"
 
+type SpecialItem = {
+    // If true, this item doesn't actually go in the inventory
+    noInventorySlot?: boolean
+    // Called when the item is added
+    onAdd: (number) => void
+}
+
+const SPECIAL_ITEMS: { [item: number]: SpecialItem } = {
+    [Item.COIN]: {
+        noInventorySlot: true,
+        onAdd: (count) => {
+            saveManager.setState({
+                coins: saveManager.getState().coins + count,
+            })
+        },
+    },
+    [Item.HEART_CONTAINER]: {
+        noInventorySlot: true,
+        onAdd: () => {
+            Player.instance.dude.maxHealth += 1
+            Player.instance.dude.heal(1)
+        },
+    },
+    [Item.CAMPFIRE]: {
+        onAdd: () => {
+            saveManager.setState({ hasMadeFire: true })
+        },
+    },
+}
+
 export class PlayerInventory extends Inventory {
     addItem(item: Item, count: number = 1): boolean {
-        if (this.specialItemCheck(item, count, true)) {
-            return true
+        const added = SPECIAL_ITEMS[item]?.noInventorySlot || super.addItem(item, count)
+        if (added) {
+            SPECIAL_ITEMS[item]?.onAdd(count)
         }
-        return super.addItem(item, count)
+        return added
     }
 
     canAddItem(item: Item, count: number = 1): boolean {
-        if (this.specialItemCheck(item, count, false)) {
-            return true
-        }
-        return super.canAddItem(item, count)
-    }
-
-    /**
-     * This function can be used to check if an item is special. Special items
-     * are not actually added to or removed from an inventory slot. For instance,
-     * items which will trigger an effect on the player as soon as they get them.
-     *
-     * @param item the item type
-     * @param doSideEffect whether or not the item should be added/removed
-     * @returns true if this item is special and doesn't take an inventory slot
-     */
-    private specialItemCheck(item: Item, count: number, doSideEffect: boolean): boolean {
-        switch (item) {
-            case Item.COIN:
-                if (doSideEffect) {
-                    saveManager.setState({
-                        coins: saveManager.getState().coins + count,
-                    })
-                }
-                return true
-            case Item.HEART_CONTAINER:
-                if (doSideEffect) {
-                    Player.instance.dude.maxHealth += 1
-                    Player.instance.dude.heal(1)
-                }
-                return true
-            case Item.CAMPFIRE:
-                if (doSideEffect) {
-                    saveManager.setState({ hasMadeFire: true })
-                }
-                return false
-            default:
-                return false
-        }
+        return SPECIAL_ITEMS[item]?.noInventorySlot || super.canAddItem(item, count)
     }
 }

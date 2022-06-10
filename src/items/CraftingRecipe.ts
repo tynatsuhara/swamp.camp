@@ -44,6 +44,7 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => {
         {
             desc: "Snooze to pass time",
             output: Item.BED,
+            // TODO: This should require something that isn't immediately attainable. Some kind of padding?
             input: [new ItemStack(Item.WOOD, 10)],
         }
     )
