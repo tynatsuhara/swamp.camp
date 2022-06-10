@@ -2,6 +2,7 @@ import { Point } from "brigsby/dist/Point"
 import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { ROCKS_NEEDED_FOR_CAMPFIRE } from "../characters/dialogue/DipDialogue"
 import { Tilesets } from "../graphics/Tilesets"
+import { saveManager } from "../SaveManager"
 import { ItemStack } from "./Inventory"
 import { Item } from "./Items"
 
@@ -17,9 +18,8 @@ export type CraftingRecipeCategory = {
     recipes: CraftingRecipe[]
 }
 
-// TODO: Make it so recipes are unlocked over time
 export const getDipRecipes = (): CraftingRecipeCategory[] => {
-    const utilities = {
+    const utilities: CraftingRecipeCategory = {
         icon: Tilesets.instance.oneBit.getTileAt(new Point(0, 7)),
         name: "Utilities",
         recipes: [
@@ -28,20 +28,27 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => {
                 output: Item.CAMPFIRE,
                 input: [new ItemStack(Item.ROCK, ROCKS_NEEDED_FOR_CAMPFIRE)],
             },
-            {
-                desc: "Stores junk",
-                output: Item.CHEST,
-                input: [new ItemStack(Item.WOOD, 10)],
-            },
-            {
-                desc: "Snooze to pass time",
-                output: Item.BED,
-                input: [new ItemStack(Item.WOOD, 10)],
-            },
         ],
     }
 
-    const equipment = {
+    if (!saveManager.getState().hasMadeFire) {
+        return [utilities]
+    }
+
+    utilities.recipes.push(
+        {
+            desc: "Stores junk",
+            output: Item.CHEST,
+            input: [new ItemStack(Item.WOOD, 10)],
+        },
+        {
+            desc: "Snooze to pass time",
+            output: Item.BED,
+            input: [new ItemStack(Item.WOOD, 10)],
+        }
+    )
+
+    const equipment: CraftingRecipeCategory = {
         icon: Tilesets.instance.oneBit.getTileAt(new Point(10, 27)),
         name: "Equipment",
         recipes: [
@@ -73,7 +80,7 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => {
         ],
     }
 
-    const buildings = {
+    const buildings: CraftingRecipeCategory = {
         icon: Tilesets.instance.oneBit.getTileAt(new Point(0, 19)),
         name: "Buildings",
         recipes: [

@@ -42,6 +42,11 @@ export class PlayerInventory extends Inventory {
                     Player.instance.dude.heal(1)
                 }
                 return true
+            case Item.CAMPFIRE:
+                if (doSideEffect) {
+                    saveManager.setState({ hasMadeFire: true })
+                }
+                return false
             default:
                 return false
         }

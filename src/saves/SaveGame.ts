@@ -23,5 +23,6 @@ export class SaveState {
     taxRate?: TaxRate = TaxRate.NONE
 
     // miscellaneous flags and values for game progress milestones
+    hasMadeFire?: boolean = false
     hasRecruitedAnyVillagers?: boolean = false
 }
