@@ -11,6 +11,8 @@ const offsetForDudeType = (type: DudeType) => {
     switch (type) {
         case DudeType.ORC_BRUTE:
             return new Point(-2, -3)
+        case DudeType.FOREST_GUARDIAN:
+            return new Point(-3, -4)
         default:
             return Point.ZERO
     }
