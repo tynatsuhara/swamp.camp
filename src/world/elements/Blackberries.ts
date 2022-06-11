@@ -2,7 +2,6 @@ import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
-import { DudeFactory, DudeType } from "../../characters/DudeFactory"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item, spawnItem } from "../../items/Items"
 import { Ground } from "../ground/Ground"
@@ -16,31 +15,50 @@ import { ElementType } from "./Elements"
 import { Growable } from "./Growable"
 import { Hittable } from "./Hittable"
 
-const NEXT_GROWTH_TIME = "ngt"
+type SaveData = {
+    // next growth time
+    ngt?: number
+    // has berries (undefined if bush isn't fully grown yet)
+    hb?: boolean
+}
 
-export class MushroomFactory extends ElementFactory {
-    readonly type = ElementType.MUSHROOM
+export class BlackberriesFactory extends ElementFactory<SaveData> {
+    readonly type = ElementType.BLACKBERRIES
     readonly dimensions = new Point(1, 1)
 
-    make(wl: Location, pos: Point, data: object): ElementComponent {
-        const nextGrowthTime = data[NEXT_GROWTH_TIME] ?? this.nextGrowthTime()
+    make(wl: Location, pos: Point, data: SaveData): ElementComponent<SaveData> {
+        const nextGrowthTime = data.ngt ?? this.nextGrowthTime()
+        const hasBerries = data.hb ?? false
 
         const e = new Entity()
-        const randomOffset = new Point(0, -4).randomlyShifted(3, 3)
 
-        const tile: SpriteComponent = e.addComponent(
-            new SpriteComponent(
-                Tilesets.instance.outdoorTiles.getTileSource("mushroomPlaced"),
-                SpriteTransform.new({
-                    position: pos.times(TILE_SIZE).plus(randomOffset),
-                    depth: (pos.y + 1) * TILE_SIZE + randomOffset.y,
-                })
+        const addTile = (pt: Point, mirrorY: boolean, depthOffset: number) =>
+            e.addComponent(
+                new SpriteComponent(
+                    Tilesets.instance.outdoorTiles.getTileAt(pt),
+                    SpriteTransform.new({
+                        position: pos.times(TILE_SIZE),
+                        depth: (pos.y + depthOffset) * TILE_SIZE,
+                        mirrorX: Math.random() > 0.5,
+                        mirrorY: mirrorY && Math.random() > 0.5,
+                    })
+                )
             )
-        )
+
+        // const tileTransforms = [new Point(19, 9), new Point(20, 9)].map(
+        //     (pt) => addTile(pt, true).transform
+        // )
+
+        const tileTransforms =
+            nextGrowthTime === -1
+                ? [new Point(19, 9) /*, new Point(20, 9)*/].map(
+                      (pt) => addTile(pt, true, 1).transform
+                  )
+                : [addTile(new Point(19, 10), false, 0).transform]
 
         const hittableCenter = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE / 2, TILE_SIZE / 2))
         e.addComponent(
-            new Hittable(hittableCenter, [tile.transform], (dir) => {
+            new Hittable(hittableCenter, tileTransforms, (dir) => {
                 e.selfDestruct()
                 const itemDirection = dir.randomlyShifted(0.2).normalized()
                 spawnItem(
@@ -54,23 +72,19 @@ export class MushroomFactory extends ElementFactory {
             })
         )
 
-        e.addComponent(
-            new Growable(nextGrowthTime, () => {
-                e.selfDestruct()
-                DudeFactory.instance.new(
-                    DudeType.SHROOM,
-                    pos
-                        .times(TILE_SIZE)
-                        .plusY(-TILE_SIZE)
-                        .plusX(-TILE_SIZE / 2),
-                    camp()
-                )
-            })
-        )
+        if (nextGrowthTime !== -1) {
+            e.addComponent(
+                new Growable(nextGrowthTime, () => {
+                    e.selfDestruct()
+                    wl.addElement(ElementType.BLACKBERRIES, pos, { ngt: -1 })
+                })
+            )
+        }
 
         return e.addComponent(
             new ElementComponent(this.type, pos, () => ({
-                [NEXT_GROWTH_TIME]: nextGrowthTime,
+                ngt: nextGrowthTime,
+                hb: hasBerries,
             }))
         )
     }

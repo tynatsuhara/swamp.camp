@@ -12,6 +12,7 @@ import { controls } from "./Controls"
 import { Particles } from "./graphics/Particles"
 import { pixelPtToTilePt } from "./graphics/Tilesets"
 import { Color } from "./ui/Color"
+import { ElementType } from "./world/elements/Elements"
 import { GroundType } from "./world/ground/Ground"
 import { camp, here, LocationManager } from "./world/LocationManager"
 import { RadiantLocationGenerator } from "./world/RadiantLocationGenerator"
@@ -127,19 +128,20 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     ],
     [
         InputKey.L,
-        "place water",
+        "place blackberries",
         (input) => {
             const mouseTilePos = pixelPtToTilePt(input.mousePos)
-            const currentType = here().getGround(mouseTilePos)?.type
-            if (currentType === GroundType.WATER) {
-                here().setGroundElement(GroundType.GRASS, mouseTilePos)
-            } else if (currentType === GroundType.GRASS) {
-                here().setGroundElement(GroundType.WATER, mouseTilePos)
-            } else if (currentType === GroundType.WATERFALL) {
-                here().setGroundElement(GroundType.LEDGE, mouseTilePos)
-            } else if (currentType === GroundType.LEDGE) {
-                here().setGroundElement(GroundType.WATERFALL, mouseTilePos)
-            }
+            here().addElement(ElementType.BLACKBERRIES, mouseTilePos)
+            // const currentType = here().getGround(mouseTilePos)?.type
+            // if (currentType === GroundType.WATER) {
+            //     here().setGroundElement(GroundType.GRASS, mouseTilePos)
+            // } else if (currentType === GroundType.GRASS) {
+            //     here().setGroundElement(GroundType.WATER, mouseTilePos)
+            // } else if (currentType === GroundType.WATERFALL) {
+            //     here().setGroundElement(GroundType.LEDGE, mouseTilePos)
+            // } else if (currentType === GroundType.LEDGE) {
+            //     here().setGroundElement(GroundType.WATERFALL, mouseTilePos)
+            // }
         },
     ],
     [
@@ -149,7 +151,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     ],
     [
         InputKey.N,
-        "fast forward",
+        "fast forward (shift: 1 minute, ctrl: 1 day, default: 1 hour)",
         (input) => {
             let time: number
             if (input.isKeyHeld(InputKey.SHIFT)) {

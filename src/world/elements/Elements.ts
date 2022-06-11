@@ -7,6 +7,7 @@ import { MineExitFactory } from "../buildings/MineExit"
 import { TentFactory } from "../buildings/Tent"
 import { TeleporterIndicatorFactory } from "../TeleporterIndicator"
 import { BedFactory } from "./Bed"
+import { BlackberriesFactory } from "./Blackberries"
 import { CampfireFactory } from "./Campfire"
 import { ChestFactory } from "./Chest"
 import { ElementFactory } from "./ElementFactory"
@@ -35,6 +36,7 @@ export enum ElementType {
     PODIUM,
     QUEEQUEG,
     APOTHECARY,
+    BLACKBERRIES,
 }
 
 window["ElementType"] = ElementType
@@ -57,6 +59,7 @@ const ELEMENT_FACTORIES = [
     new FurnitureFactory(ElementType.PODIUM, "podium"),
     new QueequegFactory(),
     new ApothecaryFactory(),
+    new BlackberriesFactory(),
 ]
 
 export class Elements {
