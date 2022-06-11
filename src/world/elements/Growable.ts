@@ -3,9 +3,9 @@ import { WorldTime } from "../WorldTime"
 
 export class Growable extends Component {
     private nextGrowthTime: number
-    private growFn: () => void
+    private growFn: () => number | void
 
-    constructor(nextGrowthTime: number, growFn: () => void) {
+    constructor(nextGrowthTime: number, growFn: () => number | void) {
         super()
         this.nextGrowthTime = nextGrowthTime
         this.growFn = growFn
@@ -13,8 +13,10 @@ export class Growable extends Component {
 
     lateUpdate() {
         if (WorldTime.instance.time >= this.nextGrowthTime) {
-            this.growFn()
-            this.delete()
+            const nextGrowthTime = this.growFn()
+            if (nextGrowthTime === undefined) {
+                this.delete()
+            }
         }
     }
 }
