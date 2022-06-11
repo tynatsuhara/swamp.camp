@@ -757,6 +757,10 @@ export class Dude extends Component implements DialogueSource {
             speed -= 0.4
         }
 
+        if (element?.type === ElementType.BLACKBERRIES && !this.isJumping) {
+            speed *= 0.6
+        }
+
         if (Ground.isWater(ground?.type)) {
             this.removeCondition(Condition.ON_FIRE)
 
