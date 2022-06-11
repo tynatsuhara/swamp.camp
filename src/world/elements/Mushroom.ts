@@ -1,4 +1,3 @@
-import { Component } from "brigsby/dist/Component"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
@@ -14,6 +13,7 @@ import { WorldTime } from "../WorldTime"
 import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
+import { Growable } from "./Growable"
 import { Hittable } from "./Hittable"
 
 const NEXT_GROWTH_TIME = "ngt"
@@ -59,7 +59,7 @@ export class MushroomFactory extends ElementFactory {
         )
 
         e.addComponent(
-            new GrowableShroom(nextGrowthTime, () => {
+            new Growable(nextGrowthTime, () => {
                 e.selfDestruct()
                 DudeFactory.instance.new(
                     DudeType.SHROOM,
@@ -90,24 +90,5 @@ export class MushroomFactory extends ElementFactory {
     private nextGrowthTime() {
         // grow every 12-24 hours
         return WorldTime.instance.time + TimeUnit.DAY * (0.5 + Math.random() / 2)
-    }
-}
-
-class GrowableShroom extends Component {
-    private nextGrowthTime: number
-    private growFn: () => void
-
-    constructor(nextGrowthTime: number, growFn: () => void) {
-        super()
-        this.nextGrowthTime = nextGrowthTime
-        this.growFn = growFn
-    }
-
-    lateUpdate() {
-        if (WorldTime.instance.time < this.nextGrowthTime) {
-            return
-        }
-
-        this.growFn()
     }
 }
