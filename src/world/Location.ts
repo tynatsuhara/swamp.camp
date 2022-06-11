@@ -190,6 +190,9 @@ export class Location {
     }
 
     removeElement(el: ElementComponent) {
+        if (!el) {
+            return
+        }
         this.elements.removeAll(el)
         ElementUtils.rectPoints(
             el.pos,
