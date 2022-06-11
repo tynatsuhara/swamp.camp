@@ -16,6 +16,11 @@ export class Villager extends Component {
         const dude = this.entity.getComponent(Dude)
 
         npc.isEnemyFn = (d) => {
+            if (!d.entity) {
+                // avoid weird null pointer
+                return
+            }
+
             // Villagers will only flee from demons if the villager is in the dark or really close to the demon
             if (d.factions.includes(DudeFaction.DEMONS)) {
                 return (
