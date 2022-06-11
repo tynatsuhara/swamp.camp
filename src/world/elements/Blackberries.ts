@@ -2,9 +2,10 @@ import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { Lists } from "brigsby/dist/util/Lists"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item, spawnItem } from "../../items/Items"
-import { Ground } from "../ground/Ground"
+import { Ground, GroundType } from "../ground/Ground"
 import { Location } from "../Location"
 import { camp } from "../LocationManager"
 import { TimeUnit } from "../TimeUnit"
@@ -15,11 +16,17 @@ import { ElementType } from "./Elements"
 import { Growable } from "./Growable"
 import { Hittable } from "./Hittable"
 
+enum State {
+    GROWING,
+    NO_BERRIES,
+    HAS_BERRIES,
+}
+
 type SaveData = {
     // next growth time
     ngt?: number
-    // has berries (undefined if bush isn't fully grown yet)
-    hb?: boolean
+    // state
+    s?: State
 }
 
 export class BlackberriesFactory extends ElementFactory<SaveData> {
@@ -27,8 +34,8 @@ export class BlackberriesFactory extends ElementFactory<SaveData> {
     readonly dimensions = new Point(1, 1)
 
     make(wl: Location, pos: Point, data: SaveData): ElementComponent<SaveData> {
-        const nextGrowthTime = data.ngt ?? this.nextGrowthTime()
-        const hasBerries = data.hb ?? false
+        let nextGrowthTime = data.ngt ?? this.determineNextGrowthTime()
+        const state = data.s ?? State.GROWING
 
         const e = new Entity()
 
@@ -45,46 +52,64 @@ export class BlackberriesFactory extends ElementFactory<SaveData> {
                 )
             )
 
-        // const tileTransforms = [new Point(19, 9), new Point(20, 9)].map(
-        //     (pt) => addTile(pt, true).transform
-        // )
+        let tileTransforms: SpriteTransform[]
+        if (state === State.GROWING) {
+            tileTransforms = [addTile(new Point(19, 10), false, 0).transform]
+        } else {
+            const sprites = [new Point(19, 9)]
+            if (state === State.HAS_BERRIES) {
+                sprites.push(new Point(20, 9))
+            }
+            tileTransforms = sprites.map((pt) => addTile(pt, true, 1).transform)
+        }
 
-        const tileTransforms =
-            nextGrowthTime === -1
-                ? [new Point(19, 9) /*, new Point(20, 9)*/].map(
-                      (pt) => addTile(pt, true, 1).transform
-                  )
-                : [addTile(new Point(19, 10), false, 0).transform]
-
-        const hittableCenter = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE / 2, TILE_SIZE / 2))
+        const center = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE / 2, TILE_SIZE / 2))
         e.addComponent(
-            new Hittable(hittableCenter, tileTransforms, (dir) => {
+            new Hittable(center, tileTransforms, (dir) => {
                 e.selfDestruct()
-                const itemDirection = dir.randomlyShifted(0.2).normalized()
-                spawnItem(
-                    pos
-                        .times(TILE_SIZE)
-                        .plusY(TILE_SIZE)
-                        .plusX(TILE_SIZE / 2),
-                    Item.MUSHROOM,
-                    itemDirection.times(5)
-                )
+                if (state === State.HAS_BERRIES) {
+                    const itemDirection = dir.randomlyShifted(0.2).normalized()
+                    spawnItem(
+                        pos
+                            .times(TILE_SIZE)
+                            .plusY(TILE_SIZE)
+                            .plusX(TILE_SIZE / 2),
+                        Item.BLACKBERRIES,
+                        itemDirection.times(5)
+                    )
+                    wl.addElement(this.type, pos, {
+                        s: State.NO_BERRIES,
+                    })
+                } else {
+                    // TODO: Add destruction particles
+                }
             })
         )
 
-        if (nextGrowthTime !== -1) {
-            e.addComponent(
-                new Growable(nextGrowthTime, () => {
+        e.addComponent(
+            new Growable(nextGrowthTime, () => {
+                const adjacentSpots = [pos.plusX(1), pos.plusX(-1), pos.plusY(1), pos.plusY(-1)]
+                const openAdjacentSpots = adjacentSpots.filter(
+                    (pt) => wl.getGround(pt)?.type === GroundType.GRASS && !wl.getElement(pt)
+                )
+
+                if (openAdjacentSpots.length > 0 && Math.random() < 0.5) {
+                    wl.addElement(this.type, Lists.oneOf(openAdjacentSpots))
+                    nextGrowthTime = this.determineNextGrowthTime()
+                    return nextGrowthTime
+                } else {
                     e.selfDestruct()
-                    wl.addElement(ElementType.BLACKBERRIES, pos, { ngt: -1 })
-                })
-            )
-        }
+                    wl.addElement(this.type, pos, {
+                        s: state === State.GROWING ? State.NO_BERRIES : State.HAS_BERRIES,
+                    })
+                }
+            })
+        )
 
         return e.addComponent(
             new ElementComponent(this.type, pos, () => ({
                 ngt: nextGrowthTime,
-                hb: hasBerries,
+                s: state,
             }))
         )
     }
@@ -97,7 +122,7 @@ export class BlackberriesFactory extends ElementFactory<SaveData> {
         return Ground.isNaturalGround(wl.getGround(pos)?.type)
     }
 
-    private nextGrowthTime() {
+    private determineNextGrowthTime() {
         // grow every 12-24 hours
         return WorldTime.instance.time + TimeUnit.DAY * (0.5 + Math.random() / 2)
     }

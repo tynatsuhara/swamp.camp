@@ -31,6 +31,7 @@ export class OneBitTileset extends SingleFileTileLoader {
                 ["potion2", new Point(17, 25)],
                 ["potion3", new Point(18, 25)],
                 ["meat1", new Point(16, 28)],
+                ["berries", new Point(18, 32)],
                 ["bed", new Point(5, 8)],
                 ["aoe_target", new Point(22, 14)],
                 ["treePointy", new Point(0, 1)],

@@ -32,6 +32,7 @@ export enum Item {
     APOTHECARY,
     POISON_ANTIDOTE,
     MEAT,
+    BLACKBERRIES,
 
     // weapon values should match the WeaponType enum so we can cast them
     KNIFE = WeaponType.KNIFE,
@@ -201,6 +202,12 @@ export const ITEM_METADATA_MAP = {
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("meat1"),
         consumable: ["eat", () => Player.instance.dude.heal(1)],
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("meat1"),
+    }),
+    [Item.BLACKBERRIES]: new ItemMetadata({
+        displayName: "Berries",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("berries"),
+        consumable: ["eat", () => Player.instance.dude.heal(1)],
+        droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("berries"),
     }),
 
     // Locations
