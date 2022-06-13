@@ -144,15 +144,20 @@ export const getEventQueueHandlers = (): {
             .getElements()
             .map((e) => e.entity.getComponent(HittableResource)?.replenish())
 
-        // Spawn rocks
-        const rockFactory = Elements.instance.getElementFactory(ElementType.ROCK)
-        const openTiles = camp()
-            .getGroundSpots(true)
-            .filter((tile) => !camp().isOccupied(tile) && rockFactory.canPlaceAtPos(camp(), tile))
-        const rocksToSpawn = Math.random() * 5
-        for (let i = 0; i < rocksToSpawn; i++) {
-            camp().addElement(ElementType.ROCK, Lists.oneOf(openTiles))
+        const allSpots = camp().getGroundSpots(true)
+        const spawnResource = (type: ElementType, count: number) => {
+            const typeFactory = Elements.instance.getElementFactory(type)
+            const openTiles = allSpots.filter(
+                (tile) => !camp().isOccupied(tile) && typeFactory.canPlaceAtPos(camp(), tile)
+            )
+            for (let i = 0; i < count; i++) {
+                camp().addElement(type, Lists.oneOf(openTiles))
+            }
         }
+
+        // Spawn new resources
+        spawnResource(ElementType.ROCK, Math.random() * 5)
+        spawnResource(ElementType.BLACKBERRIES, Math.random() * 3)
 
         // Update town stats
         const foodAmount = 0 // TODO

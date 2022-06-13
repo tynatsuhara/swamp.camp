@@ -22,8 +22,6 @@ export class WorldTime extends Component {
         return Math.floor((WorldTime.instance.time % (TimeUnit.DAY * 7)) / TimeUnit.DAY)
     }
 
-    private title = window.document.title
-
     initialize(time: number) {
         this._time = time
     }
