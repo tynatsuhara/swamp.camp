@@ -16,6 +16,11 @@ import { ElementType } from "./Elements"
 import { Growable } from "./Growable"
 import { Hittable } from "./Hittable"
 
+/**
+ * TODO:
+ * - inflict damage
+ */
+
 enum State {
     GROWING,
     NO_BERRIES,
@@ -39,28 +44,34 @@ export class BlackberriesFactory extends ElementFactory<SaveData> {
 
         const e = new Entity()
 
-        const addTile = (pt: Point, mirrorY: boolean, depthOffset: number) =>
-            e.addComponent(
+        const addSprite = (spritePt: Point, offsetFromBottom: number) => {
+            const position = pos.times(TILE_SIZE).plusY(offsetFromBottom)
+            return e.addComponent(
                 new SpriteComponent(
-                    Tilesets.instance.outdoorTiles.getTileAt(pt),
+                    Tilesets.instance.outdoorTiles.getTileAt(spritePt),
                     SpriteTransform.new({
-                        position: pos.times(TILE_SIZE),
-                        depth: (pos.y + depthOffset) * TILE_SIZE,
+                        position,
+                        depth: position.y + TILE_SIZE,
                         mirrorX: Math.random() > 0.5,
-                        mirrorY: mirrorY && Math.random() > 0.5,
                     })
                 )
-            )
+            ).transform
+        }
 
-        let tileTransforms: SpriteTransform[]
+        let tileTransforms: SpriteTransform[] = []
         if (state === State.GROWING) {
-            tileTransforms = [addTile(new Point(19, 10), false, 0).transform]
-        } else {
-            const sprites = [new Point(19, 9)]
-            if (state === State.HAS_BERRIES) {
-                sprites.push(new Point(20, 9))
+            for (let i = 0; i < 2; i++) {
+                const spritePt = new Point(Lists.oneOf([19, 20, 21]), 10)
+                tileTransforms.push(addSprite(spritePt, i * -8))
             }
-            tileTransforms = sprites.map((pt) => addTile(pt, true, 1).transform)
+        } else {
+            for (let i = 0; i < 2; i++) {
+                const spritePt = new Point(Lists.oneOf([19, 20]), 9)
+                tileTransforms.push(addSprite(spritePt, i * -8))
+                if (state === State.HAS_BERRIES) {
+                    tileTransforms.push(addSprite(new Point(20, 11), i * -8))
+                }
+            }
         }
 
         const center = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE / 2, TILE_SIZE / 2))
@@ -93,7 +104,7 @@ export class BlackberriesFactory extends ElementFactory<SaveData> {
                     (pt) => wl.getGround(pt)?.type === GroundType.GRASS && !wl.getElement(pt)
                 )
 
-                if (openAdjacentSpots.length > 0 && Math.random() < 0.5) {
+                if (openAdjacentSpots.length > 0 && Math.random() < 0.8) {
                     wl.addElement(this.type, Lists.oneOf(openAdjacentSpots))
                     nextGrowthTime = this.determineNextGrowthTime()
                     return nextGrowthTime
