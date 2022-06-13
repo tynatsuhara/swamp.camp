@@ -1,4 +1,5 @@
 import { Component } from "brigsby/dist/Component"
+import { debug } from "brigsby/dist/Debug"
 import { Point } from "brigsby/dist/Point"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
@@ -23,11 +24,16 @@ export class Enemy extends Component {
             dude.droppedItemSupplier = () => [Item.COIN]
         }
 
-        npc.isEnemyFn = (d) =>
+        npc.isEnemyFn = (d) => {
             // Default land enemy behavior is to attack anything that isn't in an overlapping faction
-            (d.isEnemy(dude) && !d.factions.includes(DudeFaction.AQUATIC)) ||
-            // Always attack their last assailant even if they're not normally considered an enemy
-            (d === dude.lastAttacker && WorldTime.instance.time - dude.lastAttackerTime < 10_000)
+            return (
+                !debug.peacefulMode &&
+                ((d.isEnemy(dude) && !d.factions.includes(DudeFaction.AQUATIC)) ||
+                    // Always attack their last assailant even if they're not normally considered an enemy
+                    (d === dude.lastAttacker &&
+                        WorldTime.instance.time - dude.lastAttackerTime < 10_000))
+            )
+        }
 
         if (dude.factions.includes(DudeFaction.ORCS)) {
             this.orc(dude, npc)
