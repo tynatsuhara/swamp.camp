@@ -3,8 +3,10 @@ import { Point } from "brigsby/dist/Point"
 import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Lists } from "brigsby/dist/util/Lists"
+import { Particles } from "../../graphics/Particles"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item, spawnItem } from "../../items/Items"
+import { Color } from "../../ui/Color"
 import { Ground, GroundType } from "../ground/Ground"
 import { Location } from "../Location"
 import { camp } from "../LocationManager"
@@ -69,6 +71,21 @@ export class BlackberriesFactory extends ElementFactory<SaveData> {
             }
         }
 
+        const emitBreakParticles = () => {
+            const position = pos.plus(new Point(0.5, 0.5)).times(TILE_SIZE)
+            for (let i = 0; i < 20; i++) {
+                const speed = Math.random() > 0.5 ? 0.01 : 0.02
+                Particles.instance.emitParticle(
+                    Lists.oneOf([Color.GREEN_4, Color.GREEN_6, Color.GREEN_6]),
+                    position.randomCircularShift(8).plusY(-4),
+                    (pos.y + 1) * TILE_SIZE,
+                    200 + Math.random() * 200,
+                    (t) => new Point(0, t * speed),
+                    Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
+                )
+            }
+        }
+
         const center = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE / 2, TILE_SIZE / 2))
         e.addComponent(
             new Hittable(center, tileTransforms, (dir) => {
@@ -87,7 +104,7 @@ export class BlackberriesFactory extends ElementFactory<SaveData> {
                         s: State.NO_BERRIES,
                     })
                 } else {
-                    // TODO: Add destruction particles
+                    emitBreakParticles()
                 }
             })
         )
