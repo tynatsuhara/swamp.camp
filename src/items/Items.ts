@@ -206,7 +206,7 @@ export const ITEM_METADATA_MAP = {
     [Item.BLACKBERRIES]: new ItemMetadata({
         displayName: "Berries",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("berries"),
-        consumable: ["eat", () => Player.instance.dude.heal(1)],
+        consumable: ["eat", () => Player.instance.dude.heal(0.25)],
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("berries"),
     }),
 
