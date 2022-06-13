@@ -70,7 +70,7 @@ export class WalkingParticles extends Component {
         if (
             debug.enableBlood &&
             this.dude.health < this.dude.maxHealth &&
-            this.dude.lastAttackerTime > WorldTime.instance.time - 10_000 &&
+            this.dude.lastDamageTime > WorldTime.instance.time - 10_000 &&
             Math.random() < BLOOD_PROBABILITY &&
             Math.random() > this.dude.health / this.dude.maxHealth
         ) {

@@ -244,6 +244,21 @@ export class Dude extends Component implements DialogueSource {
         this.start = () => {
             this.seaLevel = this.location.levels?.get(this.tile) ?? 0
             this.claimResidence(type, uuid, hasPendingSlot)
+
+            this.doWhileLiving(() => {
+                if (
+                    this.isMoving &&
+                    !this.isJumping &&
+                    here().getElement(this.tile)?.type === ElementType.BLACKBERRIES
+                ) {
+                    this.damage(0.25, {
+                        direction: Point.ZERO.randomCircularShift(1),
+                        knockback: 5,
+                        blockable: false,
+                        dodgeable: false,
+                    })
+                }
+            }, 600)
         }
     }
 
@@ -538,9 +553,11 @@ export class Dude extends Component implements DialogueSource {
             this.lastAttacker = attacker
             this.lastAttackerTime = WorldTime.instance.time
         }
+        this.lastDamageTime = WorldTime.instance.time
     }
     lastAttacker: Dude
     lastAttackerTime: number
+    lastDamageTime: number
 
     private onDamageCallback: (blocked: boolean) => void
     setOnDamageCallback(fn: (blocked: boolean) => void) {

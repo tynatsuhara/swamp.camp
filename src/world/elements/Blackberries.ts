@@ -16,11 +16,6 @@ import { ElementType } from "./Elements"
 import { Growable } from "./Growable"
 import { Hittable } from "./Hittable"
 
-/**
- * TODO:
- * - inflict damage
- */
-
 enum State {
     GROWING,
     NO_BERRIES,
@@ -104,8 +99,12 @@ export class BlackberriesFactory extends ElementFactory<SaveData> {
                     (pt) => wl.getGround(pt)?.type === GroundType.GRASS && !wl.getElement(pt)
                 )
 
-                if (openAdjacentSpots.length > 0 && Math.random() < 0.8) {
+                if (openAdjacentSpots.length > 0 && Math.random() < 0.5) {
                     wl.addElement(this.type, Lists.oneOf(openAdjacentSpots))
+                    nextGrowthTime = this.determineNextGrowthTime()
+                    return nextGrowthTime
+                } else if (Math.random() < 0.3) {
+                    // No-op. It will take a while to grow
                     nextGrowthTime = this.determineNextGrowthTime()
                     return nextGrowthTime
                 } else {
