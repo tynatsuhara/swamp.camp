@@ -1,18 +1,39 @@
 import { Component } from "brigsby/dist/Component"
-import { ElementComponent } from "./ElementComponent"
+import { Point } from "brigsby/dist/Point"
+import { FireParticles } from "../../graphics/FireParticles"
+import { TILE_SIZE } from "../../graphics/Tilesets"
 
 export class Burnable extends Component {
-    private element: ElementComponent
+    private pts: Point[]
+    private burning: boolean
 
-    // constructor(burning: boolean, tilePt: Point) {
-    //     super()
-    // }
+    public get isBurning() {
+        return this.burning
+    }
 
-    start() {
-        this.element = this.entity.getComponent(ElementComponent)
+    // private element: ElementComponent
+    // private particles: FireParticles
+    // private burning: boolean
+
+    constructor(burning: boolean, pts: Point[]) {
+        super()
+        this.pts = pts
+        if (burning) {
+            this.burn()
+        }
     }
 
     burn() {
-        console.warn("burning!")
+        if (this.burning) {
+            return
+        }
+        this.burning = true
+        this.pts.forEach((pt) =>
+            this.entity.addComponent(
+                new FireParticles(8, () => {
+                    return pt.plus(new Point(0.5, 0.5)).times(TILE_SIZE)
+                })
+            )
+        )
     }
 }

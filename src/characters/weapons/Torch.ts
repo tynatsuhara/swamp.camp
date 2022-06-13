@@ -96,10 +96,8 @@ export class Torch extends Shield {
 
     block(blockingActive: boolean) {
         if (blockingActive) {
-            here()
-                .getElement(this.dude.tile.plusX(this.dude.facingMultipler()))
-                ?.entity.getComponent(Burnable)
-                ?.burn()
+            const pt = this.dude.tile.plusX(this.dude.facingMultipler())
+            here().getElement(pt)?.entity.getComponent(Burnable)?.burn()
         }
     }
 

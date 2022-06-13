@@ -30,6 +30,8 @@ type SaveData = {
     ngt?: number
     // state
     s?: State
+    // burning
+    b?: boolean
 }
 
 export class BlackberriesFactory extends ElementFactory<SaveData> {
@@ -134,12 +136,13 @@ export class BlackberriesFactory extends ElementFactory<SaveData> {
             })
         )
 
-        e.addComponent(new Burnable())
+        const burnable = e.addComponent(new Burnable(data.b ?? false, [pos]))
 
         return e.addComponent(
             new ElementComponent(this.type, pos, () => ({
                 ngt: nextGrowthTime,
                 s: state,
+                b: burnable.isBurning ? true : undefined,
             }))
         )
     }
