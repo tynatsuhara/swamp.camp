@@ -16,6 +16,8 @@ export class Growable extends Component {
             const nextGrowthTime = this.growFn()
             if (nextGrowthTime === undefined) {
                 this.delete()
+            } else {
+                this.nextGrowthTime = nextGrowthTime as number
             }
         }
     }
