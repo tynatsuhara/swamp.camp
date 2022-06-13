@@ -1053,7 +1053,10 @@ export class Dude extends Component implements DialogueSource {
         return this.animation.transform.mirrorX === pt.x < this.standingPosition.x
     }
 
-    facingMultipler() {
+    /**
+     * @returns -1 if the player is facing left, otherwise 1
+     */
+    facingMultipler(): 1 | -1 {
         return this.animation.transform.mirrorX ? -1 : 1
     }
 

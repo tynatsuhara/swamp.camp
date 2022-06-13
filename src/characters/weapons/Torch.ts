@@ -2,6 +2,7 @@ import { Point } from "brigsby/dist/Point"
 import { PointAudio } from "../../audio/PointAudio"
 import { FireParticles } from "../../graphics/FireParticles"
 import { TILE_SIZE } from "../../graphics/Tilesets"
+import { Burnable } from "../../world/elements/Burnable"
 import { LightManager } from "../../world/LightManager"
 import { here } from "../../world/LocationManager"
 import { TimeUnit } from "../../world/TimeUnit"
@@ -93,7 +94,14 @@ export class Torch extends Shield {
 
     toggleOnBack() {}
 
-    block() {}
+    block(blockingActive: boolean) {
+        if (blockingActive) {
+            here()
+                .getElement(this.dude.tile.plusX(this.dude.facingMultipler()))
+                ?.entity.getComponent(Burnable)
+                ?.burn()
+        }
+    }
 
     isBlocking() {
         return false

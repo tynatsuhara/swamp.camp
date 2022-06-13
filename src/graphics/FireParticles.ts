@@ -12,10 +12,10 @@ export class FireParticles extends RepeatedInvoker {
 
     size: number
 
-    constructor(size: number, positionSupplier: () => Point, depthSupplier?: () => number) {
+    constructor(radius: number, positionSupplier: () => Point, depthSupplier?: () => number) {
         super(() => this.emit(positionSupplier, depthSupplier))
 
-        this.size = size
+        this.size = radius
         this.lastPos = positionSupplier()
     }
 

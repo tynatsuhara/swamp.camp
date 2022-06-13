@@ -12,6 +12,7 @@ import { Location } from "../Location"
 import { camp } from "../LocationManager"
 import { TimeUnit } from "../TimeUnit"
 import { WorldTime } from "../WorldTime"
+import { Burnable } from "./Burnable"
 import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
@@ -132,6 +133,8 @@ export class BlackberriesFactory extends ElementFactory<SaveData> {
                 }
             })
         )
+
+        e.addComponent(new Burnable())
 
         return e.addComponent(
             new ElementComponent(this.type, pos, () => ({
