@@ -1,25 +1,47 @@
-import { Component } from "brigsby/dist/Component"
+import { UpdateData } from "brigsby/dist/Engine"
 import { Point } from "brigsby/dist/Point"
+import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
 import { FireParticles } from "../../graphics/FireParticles"
 import { TILE_SIZE } from "../../graphics/Tilesets"
+import { here } from "../LocationManager"
+import { WorldTime } from "../WorldTime"
 
-export class Burnable extends Component {
+const INTERVAL = 5_000
+const TIME_UNTIL_DESTROY = 15_000
+
+export class Burnable extends RepeatedInvoker {
     private pts: Point[]
     private burning: boolean
+    private burnStart: number
 
     public get isBurning() {
         return this.burning
     }
 
-    // private element: ElementComponent
-    // private particles: FireParticles
-    // private burning: boolean
-
-    constructor(burning: boolean, pts: Point[]) {
-        super()
+    constructor(initialBurning: boolean, pts: Point[]) {
+        super(() => {
+            if (!this.burning) {
+                return INTERVAL
+            }
+            this.pts.forEach((pt) => {
+                const adjacent = [pt.plusX(1), pt.plusX(-1), pt.plusY(1), pt.plusY(-1)]
+                adjacent.forEach((adj) => {
+                    here().getElement(adj)?.entity.getComponent(Burnable)?.burn()
+                })
+            })
+            return INTERVAL
+        }, INTERVAL)
         this.pts = pts
-        if (burning) {
+        if (initialBurning) {
             this.burn()
+        }
+    }
+
+    update(updateData: UpdateData) {
+        super.update(updateData)
+
+        if (WorldTime.instance.time - this.burnStart > TIME_UNTIL_DESTROY) {
+            this.entity.selfDestruct()
         }
     }
 
@@ -28,6 +50,7 @@ export class Burnable extends Component {
             return
         }
         this.burning = true
+        this.burnStart = WorldTime.instance.time
         this.pts.forEach((pt) =>
             this.entity.addComponent(
                 new FireParticles(8, () => {
