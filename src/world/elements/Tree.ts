@@ -8,8 +8,10 @@ import { Lists } from "brigsby/dist/util/Lists"
 import { Sounds } from "../../audio/Sounds"
 import { Player } from "../../characters/Player"
 import { WeaponType } from "../../characters/weapons/WeaponType"
+import { Particles } from "../../graphics/Particles"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
+import { Color } from "../../ui/Color"
 import { Ground } from "../ground/Ground"
 import { Location } from "../Location"
 import { camp } from "../LocationManager"
@@ -96,6 +98,26 @@ export class TreeFactory extends ElementFactory<SaveData> {
         const saplingType =
             this.type === ElementType.TREE_ROUND ? Item.ROUND_SAPLING : Item.POINTY_SAPLING
 
+        const particleColors =
+            this.type === ElementType.TREE_ROUND
+                ? [Color.BROWN_4, Color.GREEN_6, Color.GREEN_6]
+                : [Color.TAUPE_3, Color.GREEN_4, Color.GREEN_4]
+
+        const emitParticles = () => {
+            const position = pos.plus(new Point(0.5, 1)).times(TILE_SIZE).plus(randomOffset)
+            for (let i = 0; i < 40; i++) {
+                const speed = Math.random() > 0.5 ? 0.01 : 0.03
+                Particles.instance.emitParticle(
+                    Lists.oneOf(particleColors),
+                    position.randomCircularShift(10),
+                    (pos.y + 2) * TILE_SIZE,
+                    250 + Math.random() * 250,
+                    (t) => new Point(0, t * speed),
+                    Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
+                )
+            }
+        }
+
         const hittableCenter = pos
             .times(TILE_SIZE)
             .plus(new Point(TILE_SIZE / 2, TILE_SIZE + TILE_SIZE / 2))
@@ -117,7 +139,8 @@ export class TreeFactory extends ElementFactory<SaveData> {
                         return [getItem()]
                     }
                 },
-                () => Sounds.play(Lists.oneOf(CHOPPING_AUDIO), CHOPPING_AUDIO_VOLUME)
+                () => Sounds.play(Lists.oneOf(CHOPPING_AUDIO), CHOPPING_AUDIO_VOLUME),
+                () => emitParticles()
             )
         )
 

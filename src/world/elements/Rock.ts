@@ -74,7 +74,8 @@ export class RockFactory extends ElementFactory {
                         return Math.random() > 0.9 ? [Item.IRON] : [Item.ROCK]
                     }
                 },
-                () => Sounds.play(Lists.oneOf(MINING_AUDIO), MINING_AUDIO_VOLUME)
+                () => Sounds.play(Lists.oneOf(MINING_AUDIO), MINING_AUDIO_VOLUME),
+                () => {}
             )
         )
 

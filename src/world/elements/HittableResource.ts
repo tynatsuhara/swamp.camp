@@ -4,8 +4,6 @@ import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { Maths } from "brigsby/dist/util/Maths"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Item, spawnItem } from "../../items/Items"
-import { here } from "../LocationManager"
-import { ElementComponent } from "./ElementComponent"
 import { Hittable } from "./Hittable"
 
 export class HittableResource extends Hittable {
@@ -15,6 +13,7 @@ export class HittableResource extends Hittable {
     readonly maxResources: number
     private itemSupplier: () => Item[]
     private audioCallback: () => void
+    private finishCallback: () => void
 
     constructor(
         position: Point,
@@ -22,13 +21,15 @@ export class HittableResource extends Hittable {
         freeResources: number,
         maxResources: number,
         itemSupplier: () => Item[],
-        audioCallback: () => void = () => {}
+        audioCallback: () => void = () => {},
+        finishCallback: () => void
     ) {
         super(position, tileTransforms, (hitDir) => this.hitCallback(hitDir))
         this.freeResources = freeResources
         this.maxResources = maxResources
         this.itemSupplier = itemSupplier
         this.audioCallback = audioCallback
+        this.finishCallback = finishCallback
     }
 
     private hitCallback(hitDir: Point) {
@@ -61,7 +62,7 @@ export class HittableResource extends Hittable {
         }
 
         if (finishingMove) {
-            here().removeElement(this.entity.getComponent(ElementComponent))
+            this.finishCallback()
             this.entity.selfDestruct()
         }
     }
