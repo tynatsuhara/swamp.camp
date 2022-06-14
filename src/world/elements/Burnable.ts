@@ -17,8 +17,10 @@ export class Burnable extends RepeatedInvoker {
     private burning: boolean
     private burnStart: number
     private depth: number
+    private lighting = false
+    private timeToLight = 500 + Math.random() * 1000
 
-    public get isBurning() {
+    get isBurning() {
         return this.burning
     }
 
@@ -31,7 +33,7 @@ export class Burnable extends RepeatedInvoker {
             this.pts.forEach((pt) => {
                 const adjacent = [pt.plusX(1), pt.plusX(-1), pt.plusY(1), pt.plusY(-1)]
                 adjacent.forEach((adj) => {
-                    here().getElement(adj)?.entity.getComponent(Burnable)?.burn()
+                    here().getElement(adj)?.entity.getComponent(Burnable)?.burn(true)
                 })
             })
             return INTERVAL
@@ -66,10 +68,18 @@ export class Burnable extends RepeatedInvoker {
             })
             this.entity.selfDestruct()
         }
+
+        if (this.lighting && !this.burning) {
+            this.timeToLight -= updateData.elapsedTimeMillis
+            this.lighting = false // needs to be set every tick
+        }
     }
 
-    burn() {
+    burn(immediately = false) {
         if (this.burning) {
+            return
+        } else if (!immediately && this.timeToLight > 0) {
+            this.lighting = true
             return
         }
         this.burning = true

@@ -1,7 +1,7 @@
 import { Point } from "brigsby/dist/Point"
 import { PointAudio } from "../../audio/PointAudio"
 import { FireParticles } from "../../graphics/FireParticles"
-import { TILE_SIZE } from "../../graphics/Tilesets"
+import { pixelPtToTilePt, TILE_SIZE } from "../../graphics/Tilesets"
 import { Burnable } from "../../world/elements/Burnable"
 import { LightManager } from "../../world/LightManager"
 import { here } from "../../world/LocationManager"
@@ -20,6 +20,7 @@ const DIAMETERS = [40, 60, 80]
 export class Torch extends Shield {
     private particles: FireParticles
     private audio: PointAudio
+    private burning = false
 
     constructor() {
         super(ShieldType.TORCH, "tool_torch")
@@ -49,11 +50,20 @@ export class Torch extends Shield {
     }
 
     update() {
+        this.transform.rotation = 0
         this.transform.depth = -0.5
         const dims = this.dude.animation.transform.dimensions
-        this.transform.position = new Point(dims.x / 2, dims.y)
+
+        let newPos = new Point(dims.x / 2, dims.y)
             .plus(this.dude.getOffsetRelativeToAnimation())
             .minus(new Point(-4, 18))
+
+        if (this.burning) {
+            this.transform.rotation = 90
+            newPos = newPos.plus(new Point(5, 5))
+        }
+
+        this.transform.position = newPos
 
         const now = WorldTime.instance.time
         const fireStart = this.dude.blob[BLOB_ATTRIBUTE]
@@ -95,8 +105,12 @@ export class Torch extends Shield {
     toggleOnBack() {}
 
     block(blockingActive: boolean) {
+        this.burning = blockingActive
+
         if (blockingActive) {
-            const pt = this.dude.tile.plusX(this.dude.facingMultipler())
+            const pt = pixelPtToTilePt(this.dude.standingPosition.plusY(-4)).plusX(
+                this.dude.facingMultipler()
+            )
             here().getElement(pt)?.entity.getComponent(Burnable)?.burn()
         }
     }
