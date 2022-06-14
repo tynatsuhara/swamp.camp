@@ -95,7 +95,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
 
         const burningFires = context.dude.location
             .getElementsOfType(ElementType.CAMPFIRE)
-            .filter((c) => c.entity.getComponent(Campfire).logs > 0)
+            .filter((c) => c.entity.getComponent(Campfire).isBurning)
 
         if (burningFires.length === 0) {
             context.doNothing()

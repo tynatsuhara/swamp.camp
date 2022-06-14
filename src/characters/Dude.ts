@@ -790,7 +790,7 @@ export class Dude extends Component implements DialogueSource {
         } else if (
             !this.isJumping &&
             ((element?.type === ElementType.CAMPFIRE &&
-                element.entity.getComponent(Campfire).logs > 0 &&
+                element.entity.getComponent(Campfire).isBurning &&
                 this.standingPosition.distanceTo(
                     standingTilePos.times(TILE_SIZE).plus(new Point(8, 10))
                 ) < 5) ||

@@ -135,6 +135,11 @@ export class Campfire extends Component implements DialogueSource {
     dialogue: string = CAMPFIRE_DIALOGUE
     logs: number
     lastLogConsumedTime: number
+
+    public get isBurning() {
+        return this.logs > 0
+    }
+
     private updateFire: (logs: number) => void
 
     constructor(logs: number, lastLogConsumedTime: number, updateFire: (logs: number) => void) {
