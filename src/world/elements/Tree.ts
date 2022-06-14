@@ -15,15 +15,24 @@ import { Location } from "../Location"
 import { camp } from "../LocationManager"
 import { TimeUnit } from "../TimeUnit"
 import { WorldTime } from "../WorldTime"
+import { Burnable } from "./Burnable"
 import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
 import { HittableResource } from "./HittableResource"
 import { Pushable } from "./Pushable"
 
-const NEXT_GROWTH_TIME = "ngt"
-const SIZE = "s" // one of [1, 2, 3]
-const AVAILABLE_RESOURCES = "a"
+type SaveData = {
+    // next growth time
+    ngt?: number
+    // size
+    s?: 1 | 2 | 3
+    // available resources
+    a?: number
+    // burning
+    b?: boolean
+}
+
 const CHOPPING_AUDIO = Lists.range(0, 5).map((n) => `audio/impact/impactPlank_medium_00${n}.ogg`)
 const CHOPPING_AUDIO_VOLUME = 0.3
 const PUSH_AUDIO = [
@@ -31,7 +40,7 @@ const PUSH_AUDIO = [
     ...Lists.range(1, 6).map((i) => `audio/nature/Foliage/Foliage0${i}.wav`),
 ]
 
-export class TreeFactory extends ElementFactory {
+export class TreeFactory extends ElementFactory<SaveData> {
     readonly type: ElementType.TREE_ROUND | ElementType.TREE_POINTY
     readonly dimensions = new Point(1, 2)
 
@@ -41,16 +50,20 @@ export class TreeFactory extends ElementFactory {
         assets.loadAudioFiles([...CHOPPING_AUDIO, ...PUSH_AUDIO])
     }
 
-    make(wl: Location, pos: Point, data: object): ElementComponent {
+    make(wl: Location, pos: Point, data: SaveData): ElementComponent<SaveData> {
         const maxResourcesCount = 4
 
-        const nextGrowthTime = data[NEXT_GROWTH_TIME] ?? this.nextGrowthTime()
-        const size = data[SIZE] ?? 1
-        const availableResources = data[AVAILABLE_RESOURCES] ?? maxResourcesCount
+        const nextGrowthTime = data.ngt ?? this.nextGrowthTime()
+        const size = data.s ?? 1
+        const availableResources = data.a ?? maxResourcesCount
 
         const e = new Entity()
         const randomOffset = new Point(0, -4).randomlyShifted(2, 4)
         const depth = (pos.y + 2) * TILE_SIZE + randomOffset.y
+
+        const burnable = e.addComponent(
+            new Burnable(!!data.b, size === 3 ? [pos, pos.plusY(1)] : [pos.plusY(1)])
+        )
 
         const addTile = (s: string, pos: Point) => {
             const tile = e.addComponent(
@@ -70,12 +83,12 @@ export class TreeFactory extends ElementFactory {
         if (size === 3) {
             tiles = [
                 addTile(`${prefix}Top${topVariant}`, pos),
-                addTile(`${prefix}Base${bottomVariant}`, pos.plus(new Point(0, 1))),
+                addTile(`${prefix}Base${bottomVariant}`, pos.plusY(1)),
             ]
         } else if (size == 2) {
-            tiles = [addTile(`${prefix}Small${topVariant}`, pos.plus(new Point(0, 1)))]
+            tiles = [addTile(`${prefix}Small${topVariant}`, pos.plusY(1))]
         } else {
-            tiles = [addTile(`${prefix}Sapling`, pos.plus(new Point(0, 1)))]
+            tiles = [addTile(`${prefix}Sapling`, pos.plusY(1))]
         }
 
         tiles.forEach((t) => (t.transform.mirrorX = Math.random() > 0.5))
@@ -112,11 +125,12 @@ export class TreeFactory extends ElementFactory {
             e.addComponent(
                 new GrowableTree(nextGrowthTime, () => {
                     e.selfDestruct()
-                    wl.addElement(this.type, pos, {
-                        [NEXT_GROWTH_TIME]: this.nextGrowthTime(),
-                        [SIZE]: Math.min(size + 1, 3),
-                        [AVAILABLE_RESOURCES]: hittableResource.freeResources,
-                    })
+                    const treeData: SaveData = {
+                        ngt: this.nextGrowthTime(),
+                        s: Math.min(size + 1, 3) as 1 | 2 | 3,
+                        a: hittableResource.freeResources,
+                    }
+                    wl.addElement(this.type, pos, treeData)
                 })
             )
         }
@@ -139,9 +153,10 @@ export class TreeFactory extends ElementFactory {
         return e.addComponent(
             new ElementComponent(this.type, pos, () => {
                 return {
-                    [NEXT_GROWTH_TIME]: nextGrowthTime,
-                    [SIZE]: size,
-                    [AVAILABLE_RESOURCES]: hittableResource.freeResources,
+                    ngt: nextGrowthTime,
+                    s: size,
+                    a: hittableResource.freeResources,
+                    b: burnable.isBurning ? true : undefined,
                 }
             })
         )
