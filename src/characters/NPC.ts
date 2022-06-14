@@ -6,6 +6,10 @@ import { Lists } from "brigsby/dist/util/Lists"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { tilesAround } from "../Utils"
+import { Burnable } from "../world/elements/Burnable"
+import { Campfire } from "../world/elements/Campfire"
+import { ElementType } from "../world/elements/Elements"
+import { Ground, GroundType } from "../world/ground/Ground"
 import { Location } from "../world/Location"
 import { camp, here } from "../world/LocationManager"
 import { Simulatable } from "../world/Simulatable"
@@ -518,11 +522,31 @@ export class NPC extends Simulatable {
 
     private findPath(targetTilePoint: Point) {
         // TODO: NPCs can sometimes get stuck if their starting square is "occupied"
-        const path = here().findPath(
+        const location = here()
+        const path = location.findPath(
             this._dude.tile,
             targetTilePoint,
             this.pathFindingHeuristic,
-            this.pathIsOccupied
+            this.pathIsOccupied,
+            (_, nextSquare) => {
+                const type = location.getGround(nextSquare)?.type
+                if (type === GroundType.LEDGE || Ground.isWater(type)) {
+                    return 3
+                }
+                const element = location.getElement(nextSquare)
+                if (element?.type === ElementType.BLACKBERRIES) {
+                    return 3
+                }
+                // TODO: Maybe add a fun fireproof enemy in the future :)
+                if (
+                    element?.entity?.getComponent(Burnable)?.isBurning ||
+                    (element?.type === ElementType.CAMPFIRE &&
+                        element.entity.getComponent(Campfire).isBurning)
+                ) {
+                    return 20
+                }
+                return 1
+            }
         )
 
         if (!path) {

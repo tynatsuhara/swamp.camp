@@ -240,10 +240,7 @@ export class Location {
         tileEnd: Point,
         heuristic: (pt: Point, goal: Point) => number,
         isOccupied: (pt: Point) => boolean,
-        distance: (a: Point, b: Point) => number = (a, b) => {
-            const type = this.getGround(b)?.type
-            return type === GroundType.LEDGE || Ground.isWater(type) ? 3 : 1
-        }
+        distance: (a: Point, b: Point) => number
     ) {
         const buffer = 5
         const range = this.size / 2 + buffer
