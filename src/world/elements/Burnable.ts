@@ -48,6 +48,21 @@ export class Burnable extends RepeatedInvoker {
         super.update(updateData)
 
         if (WorldTime.instance.time - this.burnStart > TIME_UNTIL_DESTROY) {
+            // Emit ash particles
+            this.pts.forEach((pos) => {
+                const position = pos.plus(new Point(0.5, 0.5)).times(TILE_SIZE)
+                for (let i = 0; i < 20; i++) {
+                    const speed = Math.random() > 0.5 ? 0.003 : 0.001
+                    Particles.instance.emitParticle(
+                        Lists.oneOf([Color.TAUPE_2, Color.TAUPE_1, Color.BLACK, Color.BLACK]),
+                        position.randomCircularShift(8).plusY(-4),
+                        (pos.y + 1) * TILE_SIZE,
+                        500 + Math.random() * 500,
+                        (t) => new Point(0, t * speed),
+                        Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
+                    )
+                }
+            })
             this.entity.selfDestruct()
         }
     }
@@ -69,23 +84,5 @@ export class Burnable extends RepeatedInvoker {
                 )
             )
         )
-    }
-
-    delete() {
-        this.pts.forEach((pos) => {
-            const position = pos.plus(new Point(0.5, 0.5)).times(TILE_SIZE)
-            for (let i = 0; i < 20; i++) {
-                const speed = Math.random() > 0.5 ? 0.003 : 0.001
-                Particles.instance.emitParticle(
-                    Lists.oneOf([Color.TAUPE_2, Color.TAUPE_1, Color.BLACK, Color.BLACK]),
-                    position.randomCircularShift(8).plusY(-4),
-                    (pos.y + 1) * TILE_SIZE,
-                    500 + Math.random() * 500,
-                    (t) => new Point(0, t * speed),
-                    Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
-                )
-            }
-        })
-        super.delete()
     }
 }
