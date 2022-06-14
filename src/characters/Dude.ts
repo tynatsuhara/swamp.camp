@@ -30,6 +30,7 @@ import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
 import { HUD } from "../ui/HUD"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { UIStateManager } from "../ui/UIStateManager"
+import { Burnable } from "../world/elements/Burnable"
 import { Campfire } from "../world/elements/Campfire"
 import { ElementType } from "../world/elements/Elements"
 import { Interactable } from "../world/elements/Interactable"
@@ -788,11 +789,12 @@ export class Dude extends Component implements DialogueSource {
             }
         } else if (
             !this.isJumping &&
-            element?.type === ElementType.CAMPFIRE &&
-            element.entity.getComponent(Campfire).logs > 0 &&
-            this.standingPosition.distanceTo(
-                standingTilePos.times(TILE_SIZE).plus(new Point(8, 10))
-            ) < 5
+            ((element?.type === ElementType.CAMPFIRE &&
+                element.entity.getComponent(Campfire).logs > 0 &&
+                this.standingPosition.distanceTo(
+                    standingTilePos.times(TILE_SIZE).plus(new Point(8, 10))
+                ) < 5) ||
+                element?.entity?.getComponent(Burnable)?.isBurning)
         ) {
             this.addCondition(Condition.ON_FIRE, 1000 + Math.random() * 1000)
         }
