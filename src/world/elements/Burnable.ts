@@ -27,6 +27,7 @@ export class Burnable extends RepeatedInvoker {
             if (!this.burning) {
                 return INTERVAL
             }
+            // spread to adjacent squares
             this.pts.forEach((pt) => {
                 const adjacent = [pt.plusX(1), pt.plusX(-1), pt.plusY(1), pt.plusY(-1)]
                 adjacent.forEach((adj) => {
@@ -34,7 +35,7 @@ export class Burnable extends RepeatedInvoker {
                 })
             })
             return INTERVAL
-        }, INTERVAL)
+        }, Math.random() * INTERVAL * 2)
 
         this.pts = pts
         this.depth = Math.max(...pts.map((pt) => pt.y + 1)) * TILE_SIZE
