@@ -43,7 +43,7 @@ export class Burnable extends RepeatedInvoker {
         this.depth = Math.max(...pts.map((pt) => pt.y + 1)) * TILE_SIZE
 
         if (initialBurning) {
-            this.burn()
+            this.awake = () => this.burn(true)
         }
     }
 
