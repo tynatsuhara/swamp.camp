@@ -12,17 +12,33 @@ import {
 
 export const VILLAGER_DIALOGUE_ENTRYPOINT = "villager-start"
 
+export enum VillagerJob {
+    MINE = "mine",
+    HARVEST_WOOD = "chop",
+}
+
 export const VILLAGER_DIALOGUE: DialogueSet = {
     [VILLAGER_DIALOGUE_ENTRYPOINT]: () => {
         // TODO add a different initial dialogue with a "!"
 
         const villager: Dude = DialogueDisplay.instance.source as Dude
 
+        const setJob = (job: VillagerJob | undefined) => {
+            villager.blob["job"] = job
+            return new NextDialogue(VILLAGER_DIALOGUE_ENTRYPOINT, false)
+        }
+
         return dialogueWithOptions(
-            ["What should I do?"], // TODO flesh out the text
+            ["What do you need?"],
             DudeInteractIndicator.NONE,
             new DialogueOption("Head down to the mines.", () => {
-                return new NextDialogue(VILLAGER_DIALOGUE_ENTRYPOINT, false)
+                return setJob(VillagerJob.MINE)
+            }),
+            new DialogueOption("Work on collecting lumber.", () => {
+                return setJob(VillagerJob.HARVEST_WOOD)
+            }),
+            new DialogueOption("Take some time off.", () => {
+                return setJob(undefined)
             }),
             option(getExitText(), VILLAGER_DIALOGUE_ENTRYPOINT, false)
         )

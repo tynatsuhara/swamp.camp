@@ -138,6 +138,7 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
     [BERT_ANNOUNCEMENTS]: () => {
         const a = Berto.instance.shiftAnnouncement()
         if (!a) {
+            // This probably shouldn't ever happen
             return dialogue(["Alas, I have no announcements at the moment."])
         }
         return getAnnouncementDialogue(a, () => new NextDialogue(BERT_ENTRYPOINT, false))
@@ -151,6 +152,7 @@ const fetchNpcDialogue = (): DialogueInstance => {
 
     const houseableTypes = [DudeType.VILLAGER, DudeType.NUN, DudeType.CLERIC]
 
+    // Residences with capacity for each type
     const residenceMap = houseableTypes.reduce((map, type) => {
         const r = allResidences.filter((residence) => residence?.hasCapacity(type))
         if (r.length > 0) {

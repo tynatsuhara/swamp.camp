@@ -8,6 +8,7 @@ import { camp, LocationManager } from "../../world/LocationManager"
 import { Residence } from "../../world/residences/Residence"
 import { TimeUnit } from "../../world/TimeUnit"
 import { WorldTime } from "../../world/WorldTime"
+import { VillagerJob } from "../dialogue/VillagerDialogue"
 import { Dude } from "../Dude"
 import { DudeFaction } from "../DudeFactory"
 import { WeaponType } from "../weapons/WeaponType"
@@ -66,23 +67,31 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         }
     }
 
-    private findWorkLocation(dude: Dude) {
+    private findWorkLocation(dude: Dude): Location | undefined {
         // wfh today
         if (dude.factions.includes(DudeFaction.CLERGY)) {
             return this.findHomeLocation(dude)
         }
 
-        const mines = camp()
-            .getElementsOfType(ElementType.MINE_ENTRANCE)
-            .map((el) => el.save()["destinationUUID"])
+        const job = dude.blob["job"] as VillagerJob
 
-        if (mines.length === 0) {
-            return null
+        if (job === VillagerJob.MINE) {
+            const mines = camp()
+                .getElementsOfType(ElementType.MINE_ENTRANCE)
+                .map((el) => el.save()["destinationUUID"])
+
+            if (mines.length === 0) {
+                return
+            }
+
+            dude.setWeapon(WeaponType.PICKAXE)
+
+            return LocationManager.instance.get(mines[0])
+        } else if (job === VillagerJob.HARVEST_WOOD) {
+            dude.setWeapon(WeaponType.AXE)
+
+            return camp()
         }
-
-        dude.setWeapon(WeaponType.PICKAXE)
-
-        return LocationManager.instance.get(mines[0])
     }
 
     private goToClosestFire(context: NPCTaskContext) {
