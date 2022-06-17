@@ -24,7 +24,7 @@ export const PLUME_COLORS: [Color, Color][] = [
     [Color.GREEN_4, Color.GREEN_5],
     [Color.GREEN_5, Color.GREEN_6],
 
-    [Color.RED_2, Color.RED_2],
+    [Color.RED_1, Color.RED_2],
     [Color.RED_2, Color.RED_3],
     [Color.RED_3, Color.RED_4],
     [Color.RED_4, Color.RED_5],
