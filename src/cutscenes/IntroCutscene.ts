@@ -157,7 +157,7 @@ ANOTHER thing - Only one of the explorers returned, and they reported that their
 
         if (!this.orcs.some((o) => o.isAlive)) {
             CutsceneManager.instance.finishCutscene()
-            saveManager.save()
+            saveManager.autosave()
         }
     }
 }
