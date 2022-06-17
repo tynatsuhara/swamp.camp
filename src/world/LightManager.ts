@@ -25,8 +25,6 @@ export class LightManager extends Component {
     >()
     private mask = new DarknessMask(true)
 
-    private vignette: VisibleRegionMask
-
     /**
      * @param key the unique key for location, will overwrite that light source if it already exists
      */
@@ -92,6 +90,7 @@ export class LightManager extends Component {
     private getLocationDarkness() {
         const location = here()
 
+        // Get dark when approaching the edge of the map
         // if (location === camp()) {
         //     const pos = Player.instance.dude.standingPosition
         //     const buffer = TILE_SIZE * 8
