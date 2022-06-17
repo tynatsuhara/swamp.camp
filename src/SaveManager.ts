@@ -1,3 +1,4 @@
+import { debug } from "brigsby/dist/Debug"
 import { DudeType } from "./characters/DudeFactory"
 import { Player } from "./characters/Player"
 import { Camera } from "./cutscenes/Camera"
@@ -62,6 +63,12 @@ class SaveManager {
             }
         }
         return this.state
+    }
+
+    autosave() {
+        if (!debug.disableAutosave) {
+            this.save()
+        }
     }
 
     save() {

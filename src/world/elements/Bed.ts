@@ -80,7 +80,7 @@ export class Bed extends Component implements DialogueSource {
         const pause = 1200
         HUD.instance.locationTransition.transition(() => {
             WorldTime.instance.fastForward(duration)
-            setTimeout(() => saveManager.save(), pause + 500)
+            setTimeout(() => saveManager.autosave(), pause + 500)
         }, pause)
     }
 

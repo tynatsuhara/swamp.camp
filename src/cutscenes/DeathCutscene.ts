@@ -86,6 +86,6 @@ export class DeathCutscene extends Component {
 
         CutsceneManager.instance.finishCutscene()
 
-        setTimeout(() => saveManager.save(), 1500)
+        setTimeout(() => saveManager.autosave(), 1500)
     }
 }

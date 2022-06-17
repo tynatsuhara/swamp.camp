@@ -62,7 +62,7 @@ export const option = (
 }
 export const saveAfterDialogueStage = () => {
     // save after a delay to account for the next dialogue stage being set
-    setTimeout(() => saveManager.save(), 500)
+    setTimeout(() => saveManager.autosave(), 500)
 }
 export const inv = () => Player.instance.dude.inventory
 
