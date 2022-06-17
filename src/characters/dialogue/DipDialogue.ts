@@ -30,7 +30,8 @@ const DIP_1 = "dip-1",
     DIP_3 = "dip-3",
     DIP_BEFRIEND = "dip-4",
     DIP_MAKE_CAMPFIRE = "dip-5",
-    DIP_CRAFT = "dip-6"
+    DIP_CRAFT = "dip-6",
+    DIP_TENT_PLACED = "dip-7"
 
 // TODO: make DIP introduce himself, have player input their name
 
@@ -100,7 +101,7 @@ export const DIP_INTRO_DIALOGUE: DialogueSet = {
                         time: WorldTime.instance.tomorrow(TimeUnit.HOUR * 7),
                     })
                     saveAfterDialogueStage()
-                    return new NextDialogue(DIP_CRAFT, false)
+                    return new NextDialogue(DIP_TENT_PLACED, false)
                 },
                 DudeInteractIndicator.IMPORTANT_DIALOGUE
             )
@@ -136,6 +137,27 @@ export const DIP_INTRO_DIALOGUE: DialogueSet = {
         }
     },
 
+    [DIP_TENT_PLACED]: () => {
+        const tents = here().getElementsOfType(ElementType.TENT)
+        if (tents.length < 2) {
+            return dialogue(
+                [
+                    `You should put down your tent before it gets dark! You can open your inventory by pressing ${controls.getInventoryButtonString()}.`,
+                ],
+                () => new NextDialogue(DIP_TENT_PLACED, false)
+            )
+        }
+        return dialogue(
+            [
+                "We'll want to keep the fire burning all night long. Hungry spirits roam the swamp once the sun sets, but they stay in the darkness.",
+                "You should collect more resources so we can improve our camp. If you grab a torch from a burning campfire, you'll be able to light your way.",
+                "Be careful though, torches don't usually stay lit for long.",
+            ],
+            () => new NextDialogue(DIP_CRAFT, false),
+            DudeInteractIndicator.IMPORTANT_DIALOGUE
+        )
+    },
+
     [DIP_CRAFT]: () => {
         return dialogueWithOptions(
             ["Can I help you make something?"],
@@ -144,6 +166,7 @@ export const DIP_INTRO_DIALOGUE: DialogueSet = {
                 CraftingMenu.instance.open(getDipRecipes())
                 return new NextDialogue(DIP_CRAFT, false)
             }),
+            // TODO: Add town upgrades option
             option(getExitText(), DIP_CRAFT, false)
         )
     },
