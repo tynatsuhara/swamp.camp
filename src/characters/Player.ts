@@ -9,6 +9,7 @@ import { Camera } from "../cutscenes/Camera"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
 import { ITEM_METADATA_MAP } from "../items/Items"
+import { PlaceElementDisplay } from "../ui/PlaceElementDisplay"
 import { TextAlign } from "../ui/Text"
 import { UIStateManager } from "../ui/UIStateManager"
 import { CampLocationGenerator } from "../world/CampLocationGenerator"
@@ -78,7 +79,7 @@ export class Player extends Component {
             // TODO: change how momentum works if we implement slippery ice
             dx = this.rollingMomentum.x
             dy = this.rollingMomentum.y
-        } else if (!UIStateManager.instance.isMenuOpen) {
+        } else if (!UIStateManager.instance.isMenuOpen || PlaceElementDisplay.instance.isOpen) {
             if (controls.isWalkUpHeld()) {
                 dy--
             }
