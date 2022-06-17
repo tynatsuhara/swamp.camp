@@ -323,7 +323,7 @@ export class Dude extends Component implements DialogueSource {
             return
         }
         this.shield?.delete()
-        this._shield = this.entity.addComponent(ShieldFactory.make(type))
+        this._shield = this.entity.addComponent(ShieldFactory.make(type, this.type))
         this.weapon?.setSheathed(false) // keep em in sync
     }
 

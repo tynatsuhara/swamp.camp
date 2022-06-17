@@ -21,6 +21,7 @@ export class Shield extends Component {
     sprite: StaticSpriteSource
     transform: SpriteTransform
 
+    private offsetFromCenter: Point
     private state: State = State.DRAWN
     // private slashSprite: TileComponent  // TODO try adding particles when someone hits a blocking shield
     private blockingActive = false
@@ -28,9 +29,10 @@ export class Shield extends Component {
     private timeToRaiseMs = 120
     readonly type: ShieldType
 
-    constructor(type: ShieldType, spriteId: string) {
+    constructor(type: ShieldType, spriteId: string, offsetFromCenter = Point.ZERO) {
         super()
         this.type = type
+        this.offsetFromCenter = offsetFromCenter
         this.awake = () => {
             this.dude = this.entity.getComponent(Dude)
             this.sprite = Tilesets.instance.dungeonCharacters.getTileSource(spriteId)
@@ -54,11 +56,13 @@ export class Shield extends Component {
         if (this.state === State.ON_BACK) {
             pos = pos.plus(new Point(-6, -1))
         } else if (this.state === State.DRAWN) {
-            pos = pos.plus(
-                new Point(5, 4)
-                    .times(this.raisedPerc < 0.7 ? this.raisedPerc : 1.4 - this.raisedPerc)
-                    .apply(Math.floor)
-            )
+            pos = pos
+                .plus(
+                    new Point(5, 4)
+                        .times(this.raisedPerc < 0.7 ? this.raisedPerc : 1.4 - this.raisedPerc)
+                        .apply(Math.floor)
+                )
+                .plus(this.offsetFromCenter)
 
             if (this.blockingActive) {
                 // raising
