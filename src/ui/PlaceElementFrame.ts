@@ -7,6 +7,7 @@ import { Maths } from "brigsby/dist/util/Maths"
 import { Player } from "../characters/Player"
 import { controls } from "../Controls"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { ElementComponent } from "../world/elements/ElementComponent"
 import { Elements } from "../world/elements/Elements"
 import { here } from "../world/LocationManager"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
@@ -19,10 +20,12 @@ export class PlaceElementFrame extends Component {
     private readonly dimensions: Point
     private goodTiles: SpriteComponent[]
     private badTiles: SpriteComponent[]
+    private replacingElement: ElementComponent | undefined
 
-    constructor(dimensions: Point) {
+    constructor(dimensions: Point, replacingElement?: ElementComponent) {
         super()
         this.dimensions = dimensions
+        this.replacingElement = replacingElement
         if (
             (this.dimensions.x === 1 && this.dimensions.y > 2) ||
             (this.dimensions.y === 1 && this.dimensions.x !== 1)
@@ -65,7 +68,8 @@ export class PlaceElementFrame extends Component {
 
     update() {
         const mousePos = controls.getWorldSpaceMousePos()
-        const baseDist = 6
+        const baseDist = 3
+        // Divide these by 2 since the mouse will be in the center of the frame
         const maxDistX = TILE_SIZE * (baseDist + this.dimensions.x / 2)
         const maxDistY = TILE_SIZE * (baseDist + this.dimensions.y / 2)
         const playerPos = Player.instance.dude.standingPosition.plusY(-TILE_SIZE / 2)
@@ -111,7 +115,8 @@ export class PlaceElementFrame extends Component {
             for (let y = pos.y; y < pos.y + this.dimensions.y; y++) {
                 const pt = new Point(x, y)
                 // there's already an element here
-                if (!!l.getElement(pt)) {
+                const existingElement = l.getElement(pt)
+                if (existingElement && existingElement !== this.replacingElement) {
                     return false
                 }
                 // there's no ground here

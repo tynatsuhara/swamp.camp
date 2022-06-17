@@ -4,6 +4,7 @@ import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { Player } from "../characters/Player"
 import { controls } from "../Controls"
+import { ElementComponent } from "../world/elements/ElementComponent"
 import { Elements, ElementType } from "../world/elements/Elements"
 import { here } from "../world/LocationManager"
 import { PlaceElementFrame } from "./PlaceElementFrame"
@@ -18,6 +19,7 @@ export class PlaceElementDisplay extends Component {
     private placingFrame: PlaceElementFrame
     private successFn: () => void
     private count: number = 0
+    private replacingElement: ElementComponent | undefined
 
     get isOpen() {
         return this.element !== null && this.element !== undefined
@@ -44,13 +46,19 @@ export class PlaceElementDisplay extends Component {
         this.placingFrame.delete()
     }
 
-    startPlacing(element: ElementType, successFn: () => void, count: number) {
+    startPlacing(
+        element: ElementType,
+        successFn: () => void,
+        count: number,
+        replacingElement?: ElementComponent
+    ) {
         this.element = element
         this.successFn = successFn
         this.count = count
+        this.replacingElement = replacingElement
         this.dimensions = Elements.instance.getElementFactory(element).dimensions
         this.placingFrame = Player.instance.entity.addComponent(
-            new PlaceElementFrame(this.dimensions)
+            new PlaceElementFrame(this.dimensions, this.replacingElement)
         )
     }
 
@@ -58,6 +66,9 @@ export class PlaceElementDisplay extends Component {
     finishPlacing(elementPos: Point) {
         this.count--
         this.successFn() // remove from inv
+        if (this.replacingElement) {
+            here().removeElement(this.replacingElement)
+        }
         here().addElement(this.element, elementPos)
         if (this.count === 0) {
             this.close()
