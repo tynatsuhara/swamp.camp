@@ -193,14 +193,16 @@ export class Location {
         if (!el) {
             return
         }
-        this.elements.removeAll(el)
-        ElementUtils.rectPoints(
-            el.pos,
-            Elements.instance.getElementFactory(el.type).dimensions
-        ).forEach((pos) => this.setOccupied(pos, false))
+        if (this.elements.get(el.pos) === el) {
+            this.elements.removeAll(el)
+            ElementUtils.rectPoints(
+                el.pos,
+                Elements.instance.getElementFactory(el.type).dimensions
+            ).forEach((pos) => this.setOccupied(pos, false))
 
-        if (!this.isInterior) {
-            HUD.instance.miniMap.refresh()
+            if (!this.isInterior) {
+                HUD.instance.miniMap.refresh()
+            }
         }
     }
 
