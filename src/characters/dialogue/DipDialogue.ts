@@ -30,8 +30,9 @@ const DIP_1 = "dip-1",
     DIP_3 = "dip-3",
     DIP_BEFRIEND = "dip-4",
     DIP_MAKE_CAMPFIRE = "dip-5",
-    DIP_CRAFT = "dip-6",
-    DIP_TENT_PLACED = "dip-7"
+    DIP_ENTRYPOINT = "dip-6",
+    DIP_TENT_PLACED = "dip-7",
+    DIP_UPGRADES = "dip-8"
 
 // TODO: make DIP introduce himself, have player input their name
 
@@ -153,21 +154,38 @@ export const DIP_INTRO_DIALOGUE: DialogueSet = {
                 "You should collect more resources so we can improve our camp. If you grab a torch from a burning campfire, you'll be able to light your way.",
                 "Be careful though, torches don't usually stay lit for long.",
             ],
-            () => new NextDialogue(DIP_CRAFT, false),
+            () => new NextDialogue(DIP_ENTRYPOINT, false),
             DudeInteractIndicator.IMPORTANT_DIALOGUE
         )
     },
 
-    [DIP_CRAFT]: () => {
+    [DIP_ENTRYPOINT]: () => {
         return dialogueWithOptions(
             ["Can I help you make something?"],
             DudeInteractIndicator.NONE,
             new DialogueOption(CRAFT_OPTION, () => {
                 CraftingMenu.instance.open(getDipRecipes())
-                return new NextDialogue(DIP_CRAFT, false)
+                return new NextDialogue(DIP_ENTRYPOINT, false)
+            }),
+            // new DialogueOption("I want to upgrade a building.", () => {
+            //     CraftingMenu.instance.open(getDipRecipes())
+            //     return new NextDialogue(DIP_UPGRADES, false)
+            // }),
+            // TODO: Add town upgrades option
+            option(getExitText(), DIP_ENTRYPOINT, false)
+        )
+    },
+
+    [DIP_UPGRADES]: () => {
+        return dialogueWithOptions(
+            ["Can I help you make something?"],
+            DudeInteractIndicator.NONE,
+            new DialogueOption(CRAFT_OPTION, () => {
+                CraftingMenu.instance.open(getDipRecipes())
+                return new NextDialogue(DIP_ENTRYPOINT, false)
             }),
             // TODO: Add town upgrades option
-            option(getExitText(), DIP_CRAFT, false)
+            option(getExitText(), DIP_ENTRYPOINT, false)
         )
     },
 }
