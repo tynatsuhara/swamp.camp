@@ -96,8 +96,8 @@ export class PlaceElementDisplay extends Component {
             intersectingDudes.forEach((d) => {
                 // If they're in an unoccupied tile, still center them so that they don't clip through walls
                 const newPos = here().isOccupied(d.tile)
-                    ? d.tile
-                    : Grid.spiralSearch(d.tile, (p) => !here().isOccupied(p))
+                    ? Grid.spiralSearch(d.tile, (p) => !here().isOccupied(p))
+                    : d.tile
                 // put them in the center of that tile
                 d.moveTo(newPos.plus(new Point(0.5, 0.75)).times(TILE_SIZE), true)
             })
