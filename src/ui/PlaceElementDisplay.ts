@@ -87,11 +87,7 @@ export class PlaceElementDisplay extends Component {
             const d = this.dimensions.times(TILE_SIZE)
             const intersectingDudes = here()
                 .getDudes()
-                .filter(
-                    (dude) =>
-                        Maths.rectContains(p, d, dude.standingPosition) ||
-                        Maths.rectContains(p, d, dude.standingPosition.plusY(-TILE_SIZE))
-                )
+                .filter((dude) => Maths.rectContains(p, d, dude.standingPosition))
 
             intersectingDudes.forEach((d) => {
                 // If they're in an unoccupied tile, still center them so that they don't clip through walls
