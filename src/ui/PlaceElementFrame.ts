@@ -126,19 +126,6 @@ export class PlaceElementFrame extends Component {
             }
         }
 
-        const p = pos.times(TILE_SIZE)
-        const d = this.dimensions.times(TILE_SIZE)
-        const intersectingDudes = l
-            .getDudes()
-            .some(
-                (dude) =>
-                    Maths.rectContains(p, d, dude.standingPosition) ||
-                    Maths.rectContains(p, d, dude.standingPosition.plusY(-TILE_SIZE))
-            )
-        if (intersectingDudes) {
-            return false
-        }
-
         return Elements.instance
             .getElementFactory(PlaceElementDisplay.instance.getElementType())
             .canPlaceAtPos(l, pos)

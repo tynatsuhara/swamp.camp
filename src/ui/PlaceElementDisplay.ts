@@ -2,10 +2,14 @@ import { Component } from "brigsby/dist/Component"
 import { UpdateData } from "brigsby/dist/Engine"
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
+import { Grid } from "brigsby/dist/util/Grid"
+import { Maths } from "brigsby/dist/util/Maths"
 import { Player } from "../characters/Player"
 import { controls } from "../Controls"
+import { TILE_SIZE } from "../graphics/Tilesets"
 import { ElementComponent } from "../world/elements/ElementComponent"
 import { Elements, ElementType } from "../world/elements/Elements"
+import { ElementUtils } from "../world/elements/ElementUtils"
 import { here } from "../world/LocationManager"
 import { PlaceElementFrame } from "./PlaceElementFrame"
 
@@ -69,7 +73,36 @@ export class PlaceElementDisplay extends Component {
         if (this.replacingElement) {
             here().removeElement(this.replacingElement)
         }
+
         here().addElement(this.element, elementPos)
+
+        // Push if there are any colliders
+        const shouldPush = ElementUtils.rectPoints(elementPos, this.dimensions).some((pt) =>
+            here().isOccupied(pt)
+        )
+
+        // Push dudes out of the way
+        if (shouldPush) {
+            const p = elementPos.times(TILE_SIZE)
+            const d = this.dimensions.times(TILE_SIZE)
+            const intersectingDudes = here()
+                .getDudes()
+                .filter(
+                    (dude) =>
+                        Maths.rectContains(p, d, dude.standingPosition) ||
+                        Maths.rectContains(p, d, dude.standingPosition.plusY(-TILE_SIZE))
+                )
+
+            intersectingDudes.forEach((d) => {
+                // If they're in an unoccupied tile, still center them so that they don't clip through walls
+                const newPos = here().isOccupied(d.tile)
+                    ? d.tile
+                    : Grid.spiralSearch(d.tile, (p) => !here().isOccupied(p))
+                // put them in the center of that tile
+                d.moveTo(newPos.plus(new Point(0.5, 0.75)).times(TILE_SIZE), true)
+            })
+        }
+
         if (this.count === 0) {
             this.close()
         }
