@@ -23,6 +23,10 @@ export class WalkingParticles extends Component {
     }
 
     land() {
+        if (here().isInterior) {
+            return
+        }
+
         const groud = here().getGround(this.dude.tile)
 
         if (Ground.isWater(groud?.type)) {
