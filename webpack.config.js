@@ -21,21 +21,23 @@ module.exports = {
     },
     devServer: {
         compress: true,
-        contentBase: path.join(__dirname, "static"),
         hot: false,
         liveReload: false,
         open: false,
         port: 8000,
-        staticOptions: {
-            setHeaders: function (res, path, stat) {
-                if (path.endsWith(".png")) {
-                    res.set("Cache-Control", "public, max-age=604800, immutable")
-                }
+        static: {
+            directory: path.join(__dirname, "static"),
+            staticOptions: {
+                setHeaders: function (res, path, stat) {
+                    if (path.endsWith(".png")) {
+                        res.set("Cache-Control", "public, max-age=604800, immutable")
+                    }
+                },
             },
         },
-        stats: {
-            assets: false,
-            modules: false,
-        },
+    },
+    stats: {
+        assets: false,
+        modules: false,
     },
 }
