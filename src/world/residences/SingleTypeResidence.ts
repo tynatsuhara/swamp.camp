@@ -31,7 +31,7 @@ export class SingleTypeResidence extends Residence {
         this.residents.push(SingleTypeResidence.PENDING_RESIDENT)
     }
 
-    claimPendingSlot = (uuid: string) => {
+    claimPendingSlot = (type: DudeType, uuid: string) => {
         const i = this.residents.indexOf(SingleTypeResidence.PENDING_RESIDENT)
         if (i < 0 && this.residents.length === this.capacity) {
             throw new Error("no room! no room!")
