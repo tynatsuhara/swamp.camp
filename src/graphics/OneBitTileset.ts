@@ -51,6 +51,7 @@ export class OneBitTileset extends SingleFileTileLoader {
                 ["mushroom", new Point(31, 1)],
                 ["house", new Point(8, 19)],
                 ["church", new Point(0, 19)],
+                ["cabin", new Point(1, 19)],
                 ["chest", new Point(8, 6)],
                 ["invBoxNW", new Point(16, 19)],
                 ["textBoxNW", new Point(16, 16)],

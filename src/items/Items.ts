@@ -33,6 +33,7 @@ export enum Item {
     POISON_ANTIDOTE,
     MEAT,
     BLACKBERRIES,
+    SMALL_CABIN,
 
     // weapon values should match the WeaponType enum so we can cast them
     KNIFE = WeaponType.KNIFE,
@@ -223,6 +224,12 @@ export const ITEM_METADATA_MAP = {
         stackLimit: 1,
         element: ElementType.HOUSE,
     }),
+    [Item.SMALL_CABIN]: new ItemMetadata({
+        displayName: "Small cabin",
+        inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("cabin"),
+        stackLimit: 1,
+        element: ElementType.CABIN,
+    }),
     [Item.APOTHECARY]: new ItemMetadata({
         displayName: "Apothecary",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("house"),
@@ -237,7 +244,7 @@ export const ITEM_METADATA_MAP = {
     }),
     // TODO
     [Item.MINE_ENTRANCE]: new ItemMetadata({
-        displayName: "Mine Entrance",
+        displayName: "Mine entrance",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("ladder"),
         stackLimit: 1,
         element: ElementType.MINE_ENTRANCE,

@@ -17,6 +17,8 @@ export class LargeSpriteTileset {
                 return this.get(new Point(0, 11), new Point(1, 2))
             case "apothecary":
                 return this.get(new Point(6, 10), new Point(3, 5))
+            case "cabin-small":
+                return this.get(new Point(0, 6), new Point(3, 3))
             default:
                 throw new Error(`${key} is not a valid tile`)
         }

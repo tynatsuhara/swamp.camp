@@ -1,5 +1,6 @@
 import { Singletons } from "../../Singletons"
 import { ApothecaryFactory } from "../buildings/Apothecary"
+import { CabinFactory } from "../buildings/Cabin"
 import { ChurchFactory } from "../buildings/Church"
 import { HouseFactory } from "../buildings/House"
 import { MineEntranceFactory } from "../buildings/MineEntrance"
@@ -37,6 +38,7 @@ export enum ElementType {
     QUEEQUEG,
     APOTHECARY,
     BLACKBERRIES,
+    CABIN,
 }
 
 window["ElementType"] = ElementType
@@ -60,6 +62,7 @@ const ELEMENT_FACTORIES = [
     new QueequegFactory(),
     new ApothecaryFactory(),
     new BlackberriesFactory(),
+    new CabinFactory(),
 ]
 
 export class Elements {
