@@ -10,7 +10,7 @@ export abstract class Residence extends Component {
 
     abstract isHomeOf: (uuid: string) => boolean
 
-    abstract setResidentPending: () => void
+    abstract setResidentPending: (type: DudeType) => void
 
     abstract canClaimPendingSlot: (type: DudeType) => boolean
 

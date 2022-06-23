@@ -1139,7 +1139,7 @@ export class Dude extends Component implements DialogueSource {
         // Probably spawned via dev controls
         const availableResidences = residences.filter((res) => res.hasCapacity(type))
         if (availableResidences.length > 0) {
-            availableResidences[0].setResidentPending()
+            availableResidences[0].setResidentPending(this.type)
             availableResidences[0].claimPendingSlot(uuid)
             this.log("claimed a house slot")
         } else {

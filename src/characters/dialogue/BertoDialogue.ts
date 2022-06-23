@@ -172,7 +172,7 @@ const fetchNpcDialogue = (): DialogueInstance => {
     }
 
     const fetchNpc = (type: DudeType) => () => {
-        residenceMap.get(type)[0].setResidentPending()
+        residenceMap.get(type)[0].setResidentPending(type)
         EventQueue.instance.addEvent({
             type: QueuedEventType.HERALD_DEPARTURE_CHECK,
             time: WorldTime.instance.time,
