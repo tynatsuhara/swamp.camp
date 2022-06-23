@@ -17,6 +17,7 @@ import { DOCTOR_DIALOGUE_ENTRYPOINT } from "./dialogue/DoctorDialogue"
 import { SPOOKY_VISITOR_STARTING_DIALOGUE } from "./dialogue/SpookyVisitorDialogue"
 import { VILLAGER_DIALOGUE_ENTRYPOINT } from "./dialogue/VillagerDialogue"
 import { Dude } from "./Dude"
+import { DudeType } from "./DudeType"
 import { peopleNames } from "./NameFactory"
 import { NPC } from "./NPC"
 import { Player } from "./Player"
@@ -44,36 +45,6 @@ export enum DudeFaction {
     BEARS,
     WOLVES, // sounds: gumball
     AQUATIC, // sounds: lots of options in rpg/npc/* that could work here
-}
-
-export enum DudeType {
-    PLAYER,
-    DIP,
-    ELF,
-    ORC_WARRIOR,
-    HERALD,
-    HORNED_DEMON,
-    SHROOM,
-    VILLAGER,
-    CENTAUR,
-    BEAR,
-    ORC_BRUTE,
-    ORC_SHAMAN,
-    DEMON_BRUTE,
-    WOLF,
-    CLERIC,
-    NUN,
-    BISHOP,
-    SWAMP_THING,
-    DOCTOR,
-    BLACKSMITH,
-    SPOOKY_VISITOR,
-    GNOLL_SCOUT,
-    TRAVELING_MERCHANT,
-    GUMBALL,
-    ONION,
-    KNIGHT,
-    FOREST_GUARDIAN,
 }
 
 const DEFAULT_COLLIDER_SIZE = new Point(10, 8)

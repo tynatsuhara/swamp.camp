@@ -1,5 +1,5 @@
 import { debug } from "brigsby/dist/Debug"
-import { DudeType } from "./characters/DudeFactory"
+import { DudeType } from "./characters/DudeType"
 import { Player } from "./characters/Player"
 import { Camera } from "./cutscenes/Camera"
 import { Save, SaveState } from "./saves/SaveGame"

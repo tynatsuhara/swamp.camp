@@ -1,5 +1,5 @@
 import { Condition } from "../Condition"
-import { DudeType } from "../DudeFactory"
+import { DudeType } from "../DudeType"
 import { Weapon } from "./Weapon"
 import { WeaponType } from "./WeaponType"
 

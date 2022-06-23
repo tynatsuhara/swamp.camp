@@ -5,7 +5,7 @@ import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Animator } from "brigsby/dist/util/Animator"
 import { Tilesets } from "../../graphics/Tilesets"
-import { DudeType } from "../DudeFactory"
+import { DudeType } from "../DudeType"
 import { Weapon } from "./Weapon"
 import { WeaponType } from "./WeaponType"
 

@@ -1,4 +1,5 @@
-import { DudeFaction, DudeType } from "../characters/DudeFactory"
+import { DudeFaction } from "../characters/DudeFactory"
+import { DudeType } from "../characters/DudeType"
 import { saveManager } from "../SaveManager"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { LocationManager } from "./LocationManager"

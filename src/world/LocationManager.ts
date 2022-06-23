@@ -1,7 +1,7 @@
 import { Point } from "brigsby/dist/Point"
 import { measure } from "brigsby/dist/Profiler"
 import { WorldAudioContext } from "../audio/WorldAudioContext"
-import { DudeType } from "../characters/DudeFactory"
+import { DudeType } from "../characters/DudeType"
 import { Player } from "../characters/Player"
 import { Camera } from "../cutscenes/Camera"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"

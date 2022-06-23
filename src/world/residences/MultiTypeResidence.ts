@@ -1,4 +1,4 @@
-import { DudeType } from "../../characters/DudeFactory"
+import { DudeType } from "../../characters/DudeType"
 import { Residence } from "./Residence"
 
 export class MultiTypeResidence extends Residence {

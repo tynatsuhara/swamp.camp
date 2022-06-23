@@ -8,7 +8,8 @@ import { LightManager } from "../../world/LightManager"
 import { WorldTime } from "../../world/WorldTime"
 import { Condition } from "../Condition"
 import { Dude } from "../Dude"
-import { DudeFaction, DudeType } from "../DudeFactory"
+import { DudeFaction } from "../DudeFactory"
+import { DudeType } from "../DudeType"
 import { NPC } from "../NPC"
 
 /**

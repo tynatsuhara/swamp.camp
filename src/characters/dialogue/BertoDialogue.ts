@@ -8,7 +8,7 @@ import { here } from "../../world/LocationManager"
 import { Residence } from "../../world/residences/Residence"
 import { TaxRate } from "../../world/TaxRate"
 import { WorldTime } from "../../world/WorldTime"
-import { DudeType } from "../DudeFactory"
+import { DudeType } from "../DudeType"
 import { Berto } from "../types/Berto"
 import { getAnnouncementDialogue } from "./Announcements"
 import {

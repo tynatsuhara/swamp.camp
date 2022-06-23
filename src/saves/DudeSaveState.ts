@@ -1,5 +1,5 @@
 import { ActiveCondition } from "../characters/Condition"
-import { DudeType } from "../characters/DudeFactory"
+import { DudeType } from "../characters/DudeType"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { WeaponType } from "../characters/weapons/WeaponType"
 import { ItemStack } from "../items/Inventory"

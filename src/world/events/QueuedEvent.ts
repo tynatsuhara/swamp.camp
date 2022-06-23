@@ -1,6 +1,7 @@
 import { Lists } from "brigsby/dist/util/Lists"
-import { DudeFaction, DudeFactory, DudeType } from "../../characters/DudeFactory"
+import { DudeFaction, DudeFactory } from "../../characters/DudeFactory"
 import { DudeSpawner } from "../../characters/DudeSpawner"
+import { DudeType } from "../../characters/DudeType"
 import { NPC } from "../../characters/NPC"
 import { Berto } from "../../characters/types/Berto"
 import { TILE_SIZE } from "../../graphics/Tilesets"

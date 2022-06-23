@@ -1,6 +1,6 @@
 import { Component } from "brigsby/dist/Component"
 import { Dude } from "../Dude"
-import { DudeType } from "../DudeFactory"
+import { DudeType } from "../DudeType"
 import { Berto } from "./Berto"
 
 export class Visitor extends Component {

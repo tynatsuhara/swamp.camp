@@ -1,5 +1,5 @@
 import { Component } from "brigsby/dist/Component"
-import { DudeType } from "../../characters/DudeFactory"
+import { DudeType } from "../../characters/DudeType"
 
 export abstract class Residence extends Component {
     abstract readonly locationUUID: string
