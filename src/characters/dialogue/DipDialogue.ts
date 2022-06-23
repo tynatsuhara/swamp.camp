@@ -160,6 +160,8 @@ export const DIP_INTRO_DIALOGUE: DialogueSet = {
     },
 
     [DIP_ENTRYPOINT]: () => {
+        // TODO: If there are no buildings yet, explain the upgrade process
+
         return dialogueWithOptions(
             ["Can I help you make something?"],
             DudeInteractIndicator.NONE,
