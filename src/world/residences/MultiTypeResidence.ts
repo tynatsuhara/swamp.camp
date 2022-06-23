@@ -20,6 +20,10 @@ export class MultiTypeResidence extends Residence {
         this.residents = residents
     }
 
+    getResidents = () => {
+        return this.residents
+    }
+
     hasCapacity = (type: DudeType) => {
         const capacityForType = this.capacity[type] ?? 0
         const currentlyFilled = this.residents[type] ?? []

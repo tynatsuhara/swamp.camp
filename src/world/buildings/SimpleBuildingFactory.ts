@@ -1,20 +1,19 @@
 import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
-import { DudeType } from "../../characters/DudeFactory"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/Elements"
 import { Interactable } from "../elements/Interactable"
 import { NavMeshCollider } from "../elements/NavMeshCollider"
 import { Location } from "../Location"
-import { SingleTypeResidence } from "../residences/SingleTypeResidence"
+import { MultiTypeResidence } from "../residences/MultiTypeResidence"
 import { TeleporterPrefix } from "../Teleporter"
 import { BuildingFactory } from "./Building"
 
 type SimpleBuildingData = {
     interiorUUID: string
-    residents: string[]
+    residents: { [type: number]: string[] }
 }
 
 export class SimpleBuildingFactory extends BuildingFactory {
@@ -24,6 +23,7 @@ export class SimpleBuildingFactory extends BuildingFactory {
     private readonly spriteTileSource: string
     private readonly interiorSupplier: (outside: Location) => Location
     private readonly colliderDimensions: Point
+    private readonly residenceCapacity: { [type: number]: number }
     private readonly doorHorizontalOffset: number
 
     /**
@@ -38,6 +38,7 @@ export class SimpleBuildingFactory extends BuildingFactory {
         spriteTileSource: string,
         interiorSupplier: (outside: Location) => Location,
         colliderDimensions: Point,
+        residenceCapacity: { [type: number]: number },
         doorHorizontalOffset = 0 // relative to the center
     ) {
         super()
@@ -46,6 +47,7 @@ export class SimpleBuildingFactory extends BuildingFactory {
         this.spriteTileSource = spriteTileSource
         this.interiorSupplier = interiorSupplier
         this.colliderDimensions = colliderDimensions
+        this.residenceCapacity = residenceCapacity
         this.doorHorizontalOffset = doorHorizontalOffset
     }
 
@@ -106,17 +108,14 @@ export class SimpleBuildingFactory extends BuildingFactory {
             )
         )
 
-        // TODO
         const rez = e.addComponent(
-            new SingleTypeResidence(DudeType.DOCTOR, 1, interiorUUID, data.residents || [])
+            new MultiTypeResidence(this.residenceCapacity, interiorUUID, data.residents ?? {})
         )
 
         const save: () => SimpleBuildingData = () => ({
             interiorUUID,
             residents: rez.getResidents(),
         })
-
-        console.log(e)
 
         return e.addComponent(new ElementComponent(this.type, pos, save))
     }
