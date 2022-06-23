@@ -11,6 +11,7 @@ import { WorldTime } from "../../world/WorldTime"
 import { VillagerJob } from "../dialogue/VillagerDialogue"
 import { Dude } from "../Dude"
 import { DudeFaction } from "../DudeFactory"
+import { DudeType } from "../DudeType"
 import { WeaponType } from "../weapons/WeaponType"
 import { NPCSchedules } from "./NPCSchedule"
 import { NPCTask } from "./NPCTask"
@@ -69,7 +70,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
 
     private findWorkLocation(dude: Dude): Location | undefined {
         // wfh today
-        if (dude.factions.includes(DudeFaction.CLERGY)) {
+        if (dude.factions.includes(DudeFaction.CLERGY) || dude.type === DudeType.DOCTOR) {
             return this.findHomeLocation(dude)
         }
 
