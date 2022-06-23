@@ -16,7 +16,7 @@ export class CabinFactory extends SimpleBuildingFactory {
             ElementType.CABIN,
             new Point(5, 4),
             "cabin-small",
-            (outside) => makeCabinInterior(outside),
+            makeCabinInterior,
             new Point(2, 1.5).times(TILE_SIZE),
             { [DudeType.VILLAGER]: 2 }
         )

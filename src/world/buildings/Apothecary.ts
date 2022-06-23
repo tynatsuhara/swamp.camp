@@ -1,88 +1,26 @@
-import { Entity } from "brigsby/dist/Entity"
 import { Point } from "brigsby/dist/Point"
-import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { DudeType } from "../../characters/DudeType"
-import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
-import { ElementComponent } from "../elements/ElementComponent"
+import { TILE_SIZE } from "../../graphics/Tilesets"
 import { ElementType } from "../elements/Elements"
 import { ElementUtils } from "../elements/ElementUtils"
-import { Interactable } from "../elements/Interactable"
-import { NavMeshCollider } from "../elements/NavMeshCollider"
 import { GroundType } from "../ground/Ground"
 import { Location } from "../Location"
 import { LocationManager, LocationType } from "../LocationManager"
-import { SingleTypeResidence } from "../residences/SingleTypeResidence"
 import { TeleporterPrefix } from "../Teleporter"
-import { BuildingFactory } from "./Building"
 import { InteriorUtils } from "./InteriorUtils"
+import { SimpleBuildingFactory } from "./SimpleBuildingFactory"
 
-type ApothecaryData = {
-    interiorUUID: string
-    residents: string[]
-}
-
-export class ApothecaryFactory extends BuildingFactory {
-    readonly type = ElementType.APOTHECARY
-    readonly dimensions = new Point(5, 4)
-
-    make(wl: Location, pos: Point, data: ApothecaryData): ElementComponent {
-        const e = new Entity()
-
-        // the interior location UUID
-        const interiorUUID: string = data.interiorUUID ?? makeApothecaryInterior(wl).uuid
-
-        // spriteTilePos accounts for 1 tile of space on sides and the roof
-        const spriteTilePos = pos.plusX(1).plusY(-2)
-        const interactablePos = spriteTilePos.plus(new Point(1, 5)).times(TILE_SIZE).plusX(-1)
-        const doorId = TeleporterPrefix.DOOR
-
-        // TODO: Can we combine this with the interactable step below?
-        wl.addTeleporter({
-            to: interiorUUID,
-            pos: interactablePos.plusY(12),
-            id: doorId,
-        })
-
-        const depth = (spriteTilePos.y + 5) * TILE_SIZE
-
-        // Set up sprite
-        e.addComponent(
-            Tilesets.instance.largeSprites.getTileSource("apothecary").toComponent(
-                SpriteTransform.new({
-                    position: spriteTilePos.times(TILE_SIZE),
-                    depth,
-                })
-            )
+export class ApothecaryFactory extends SimpleBuildingFactory {
+    constructor() {
+        super(
+            ElementType.APOTHECARY,
+            new Point(5, 4),
+            "apothecary",
+            makeApothecaryInterior,
+            new Point(TILE_SIZE * 3, TILE_SIZE * 2),
+            { [DudeType.DOCTOR]: 1 },
+            -7
         )
-
-        // Set up collider
-        e.addComponent(
-            new NavMeshCollider(
-                wl,
-                spriteTilePos.plusY(3).times(TILE_SIZE),
-                new Point(TILE_SIZE * 3, TILE_SIZE * 2)
-            )
-        )
-
-        // Set up teleporter
-        e.addComponent(
-            new Interactable(
-                interactablePos,
-                () => wl.playerUseTeleporter(interiorUUID, doorId),
-                new Point(0, -TILE_SIZE * 1.4)
-            )
-        )
-
-        const rez = e.addComponent(
-            new SingleTypeResidence(DudeType.DOCTOR, 1, interiorUUID, data.residents || [])
-        )
-
-        const save: () => ApothecaryData = () => ({
-            interiorUUID,
-            residents: rez.getResidents(),
-        })
-
-        return e.addComponent(new ElementComponent(this.type, pos, save))
     }
 }
 

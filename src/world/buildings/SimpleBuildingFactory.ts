@@ -67,7 +67,7 @@ export class SimpleBuildingFactory extends BuildingFactory {
         ).plus(pixelPos)
 
         const interactablePos = new Point(
-            (this.dimensions.x / 2) * TILE_SIZE - this.doorHorizontalOffset - 1,
+            (this.dimensions.x / 2) * TILE_SIZE + this.doorHorizontalOffset - 1,
             this.dimensions.y * TILE_SIZE - TILE_SIZE
         ).plus(pixelPos)
 
