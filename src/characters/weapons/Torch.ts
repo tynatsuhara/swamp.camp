@@ -1,6 +1,6 @@
 import { Point } from "brigsby/dist/Point"
 import { PointAudio } from "../../audio/PointAudio"
-import { FireParticles } from "../../graphics/FireParticles"
+import { FireParticles } from "../../graphics/particles/FireParticles"
 import { pixelPtToTilePt, TILE_SIZE } from "../../graphics/Tilesets"
 import { Burnable } from "../../world/elements/Burnable"
 import { LightManager } from "../../world/LightManager"

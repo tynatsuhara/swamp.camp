@@ -1,28 +1,32 @@
 import { Point } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util/Lists"
 import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
-import { Color } from "../ui/Color"
+import { Color } from "../../ui/Color"
 import { Particles } from "./Particles"
 
-const COLORS = [Color.BLACK, Color.TAUPE_1]
+export class PoisonParticles extends RepeatedInvoker {
+    size: number
 
-export class BlackLungParticles extends RepeatedInvoker {
-    constructor(positionSupplier: () => Point, depthSupplier?: () => number) {
+    constructor(size: number, positionSupplier: () => Point, depthSupplier?: () => number) {
         super(() => this.emit(positionSupplier, depthSupplier))
+
+        this.size = size
     }
 
     private emit(positionSupplier: () => Point, depthSupplier?: () => number) {
+        const size = this.size
         const basePosition = positionSupplier()
         if (!depthSupplier) {
             depthSupplier = () => basePosition.y
         }
         const depth = depthSupplier()
 
-        for (let i = 0; i < 1; i++) {
+        const driftingParticles = (Math.random() * (size + 1) - 1) * 0.4
+        for (let i = 0; i < driftingParticles; i++) {
             const speed = Math.random() > 0.5 ? -0.01 : -0.002
             Particles.instance.emitParticle(
-                Lists.oneOf(COLORS),
-                basePosition.randomCircularShift(4).plusY(-1),
+                Lists.oneOf([Color.GREEN_5, Color.GREEN_6]),
+                basePosition.randomCircularShift(1 + size / 2).plusY(-1),
                 depth - 1,
                 500 + Math.random() * 1500,
                 (t) => new Point(0, t * speed),
@@ -31,11 +35,11 @@ export class BlackLungParticles extends RepeatedInvoker {
         }
 
         // particles which track the source
-        for (let i = 0; i < 1; i++) {
+        for (let i = 0; i < (size * 2) / 5; i++) {
             const speed = -0.002
-            const baseOffset = Point.ZERO.randomCircularShift(4)
+            const baseOffset = Point.ZERO.randomCircularShift(size)
             Particles.instance.emitComplexParticle(
-                Lists.oneOf(COLORS),
+                Lists.oneOf([Color.GREEN_5, Color.GREEN_6]),
                 () => positionSupplier().plus(baseOffset),
                 depthSupplier,
                 600,
@@ -44,6 +48,6 @@ export class BlackLungParticles extends RepeatedInvoker {
             )
         }
 
-        return 300 // millis between emissions
+        return 50 // millis between emissions
     }
 }

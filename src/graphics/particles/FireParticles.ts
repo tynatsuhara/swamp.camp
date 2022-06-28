@@ -1,7 +1,7 @@
 import { Point } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util/Lists"
 import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
-import { Color } from "../ui/Color"
+import { Color } from "../../ui/Color"
 import { Particles } from "./Particles"
 
 const FIRE_DRIFT_DISTANCE = 1.5
