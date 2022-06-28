@@ -1,5 +1,4 @@
 import { Component } from "brigsby/dist/Component"
-import { debug } from "brigsby/dist/Debug"
 import { UpdateData } from "brigsby/dist/Engine"
 import { Point } from "brigsby/dist/Point"
 import { Dude } from "../../characters/Dude"
@@ -72,7 +71,6 @@ export class WalkingParticles extends Component {
 
         // TODO blood
         if (
-            debug.enableBlood &&
             this.dude.health < this.dude.maxHealth &&
             this.dude.lastDamageTime > WorldTime.instance.time - 10_000 &&
             Math.random() < BLOOD_PROBABILITY &&

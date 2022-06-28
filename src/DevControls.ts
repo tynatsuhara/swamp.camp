@@ -232,7 +232,6 @@ export class DevControls extends Component {
 }
 
 // Set up autocomplete for non-engine debug flags
-debug.enableBlood = debug.enableBlood ?? false
 debug.enableDevControls = debug.enableDevControls ?? false
 debug.disableAutosave = debug.disableAutosave ?? false
 debug.freeCamera = debug.freeCamera ?? false
