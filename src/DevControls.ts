@@ -10,6 +10,7 @@ import { DudeSpawner } from "./characters/DudeSpawner"
 import { DudeType } from "./characters/DudeType"
 import { Player } from "./characters/Player"
 import { controls } from "./Controls"
+import { emitBlockParticles } from "./graphics/particles/CombatParticles"
 import { Particles } from "./graphics/particles/Particles"
 import { pixelPtToTilePt } from "./graphics/Tilesets"
 import { Color } from "./ui/Color"
@@ -107,7 +108,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
             LocationManager.instance.playerLoadLocation(l, Point.ZERO)
         },
     ],
-    [InputKey.V, "spawn wolf pack", () => DudeSpawner.instance.spawnWolves()],
+    [InputKey.V, "emit block particles", () => emitBlockParticles(Player.instance.dude)],
     [
         InputKey.SEMICOLON,
         "inflict black lung",

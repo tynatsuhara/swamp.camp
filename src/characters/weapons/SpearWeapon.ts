@@ -109,7 +109,7 @@ export class SpearWeapon extends Weapon {
                 newTransform.position.plusY(24),
                 this.weaponSprite,
                 Item.SPEAR,
-                new Point(40 * this.dude.facingMultipler(), 4.5),
+                new Point(40 * this.dude.getFacingMultiplier(), 4.5),
                 this.dude
             )
         } else {

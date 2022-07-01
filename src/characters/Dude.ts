@@ -18,6 +18,7 @@ import { DeathCutscene } from "../cutscenes/DeathCutscene"
 import { IntroCutscene } from "../cutscenes/IntroCutscene"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { BlackLungParticles } from "../graphics/particles/BlackLungParticles"
+import { emitBlockParticles } from "../graphics/particles/CombatParticles"
 import { FireParticles } from "../graphics/particles/FireParticles"
 import { PoisonParticles } from "../graphics/particles/PoisonParticles"
 import { WalkingParticles } from "../graphics/particles/WalkingParticles"
@@ -412,14 +413,6 @@ export class Dude extends Component implements DialogueSource {
                             )
                         )
                     }
-                    if (timeSinceLastExec > 500) {
-                        // const poisonDamage = 0.25
-                        // this.damage(poisonDamage, {
-                        //     blockable: false,
-                        //     dodgeable: false,
-                        // })
-                        c.lastExec = WorldTime.instance.time
-                    }
                     return
             }
         })
@@ -521,6 +514,7 @@ export class Dude extends Component implements DialogueSource {
         const blocked = blockable && blocking
 
         if (blocked) {
+            emitBlockParticles(this)
             damage *= 0.25
             knockback *= 0.4
         }
@@ -1059,7 +1053,7 @@ export class Dude extends Component implements DialogueSource {
     /**
      * @returns -1 if the player is facing left, otherwise 1
      */
-    facingMultipler(): 1 | -1 {
+    getFacingMultiplier(): 1 | -1 {
         return this.animation.transform.mirrorX ? -1 : 1
     }
 
