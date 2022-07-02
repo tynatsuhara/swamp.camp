@@ -83,7 +83,7 @@ const makeMineInterior = (outside: Location) => {
     const l = new Location(LocationType.MINE_INTERIOR, true, false)
     LocationManager.instance.add(l)
 
-    const dimensions = new Point(3, 2)
+    const dimensions = new Point(5, 3)
     l.setBarriers(InteriorUtils.makeBarriers(dimensions))
 
     // background sprite
@@ -97,7 +97,7 @@ const makeMineInterior = (outside: Location) => {
     }
     l.addTeleporter(teleporter)
 
-    l.addElement(ElementType.MINE_EXIT, new Point(1, 0), {
+    l.addElement(ElementType.MINE_EXIT, new Point(2, 0), {
         to: outside.uuid,
         i: interactablePos.toString(),
         id: TeleporterPrefix.MINE,

@@ -6,9 +6,9 @@ export class LargeSpriteTileset {
     getTileSource(key: string): StaticSpriteSource {
         switch (key) {
             case "mine-small":
-                return this.get(Point.ZERO, new Point(3, 4))
+                return this.get(Point.ZERO, new Point(5, 5))
             case "church":
-                return this.get(new Point(4, 0), new Point(3, 5))
+                return this.get(new Point(16, 0), new Point(3, 5))
             case "dr-interior":
                 return this.get(new Point(1, 10), new Point(4, 5))
             case "dr-counter":
