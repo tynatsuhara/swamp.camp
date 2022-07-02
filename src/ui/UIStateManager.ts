@@ -4,6 +4,7 @@ import { Camera } from "../cutscenes/Camera"
 import { Singletons } from "../Singletons"
 import { CraftingMenu } from "./CraftingMenu"
 import { DialogueDisplay } from "./DialogueDisplay"
+import { DrawMenu } from "./DrawMenu"
 import { HUD } from "./HUD"
 import { InventoryDisplay } from "./InventoryDisplay"
 import { NotificationDisplay } from "./NotificationDisplay"
@@ -26,6 +27,7 @@ export class UIStateManager {
     private readonly craftingMenu = new CraftingMenu()
     private readonly sellMenu = new TradeMenu()
     private readonly notificationDisplay = new NotificationDisplay()
+    private readonly drawMenu = new DrawMenu()
 
     // if this is true, input observed by other components (like the player)
     // should be skipped because a menu is open. Other menus should only open
@@ -46,7 +48,8 @@ export class UIStateManager {
             this.placeElementDisplay.isOpen ||
             this.pauseMenu.isOpen ||
             this.craftingMenu.isOpen ||
-            this.sellMenu.isOpen
+            this.sellMenu.isOpen ||
+            this.drawMenu.isOpen
 
         return HUD.instance
             .getEntities(Player.instance.dude, Camera.instance.dimensions, elapsedMillis)
@@ -57,5 +60,6 @@ export class UIStateManager {
             .concat(this.craftingMenu.getEntities())
             .concat(this.sellMenu.getEntities())
             .concat(this.notificationDisplay.getEntities())
+            .concat(this.drawMenu.getEntities())
     }
 }

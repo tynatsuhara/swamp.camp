@@ -10,10 +10,10 @@ import { DudeSpawner } from "./characters/DudeSpawner"
 import { DudeType } from "./characters/DudeType"
 import { Player } from "./characters/Player"
 import { controls } from "./Controls"
-import { emitBlockParticles } from "./graphics/particles/CombatParticles"
 import { Particles } from "./graphics/particles/Particles"
 import { pixelPtToTilePt } from "./graphics/Tilesets"
 import { Color } from "./ui/Color"
+import { DrawMenu } from "./ui/DrawMenu"
 import { ElementType } from "./world/elements/Elements"
 import { GroundType } from "./world/ground/Ground"
 import { camp, here, LocationManager } from "./world/LocationManager"
@@ -108,7 +108,17 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
             LocationManager.instance.playerLoadLocation(l, Point.ZERO)
         },
     ],
-    [InputKey.V, "emit block particles", () => emitBlockParticles(Player.instance.dude)],
+    [
+        InputKey.V,
+        "open/close draw menu",
+        () => {
+            if (DrawMenu.instance.isOpen) {
+                DrawMenu.instance.close()
+            } else {
+                DrawMenu.instance.open()
+            }
+        },
+    ],
     [
         InputKey.SEMICOLON,
         "inflict black lung",
