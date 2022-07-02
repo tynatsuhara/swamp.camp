@@ -8,7 +8,9 @@ import { DarknessMask } from "./DarknessMask"
 import { here } from "./LocationManager"
 
 export class VisibleRegionMask extends Component {
-    static instance = Singletons.getOrCreate(VisibleRegionMask)
+    static get instance() {
+        return Singletons.getOrCreate(VisibleRegionMask)
+    }
 
     // TODO move to top-level consts
     private buffer = 200 // pixels from beyond the edge of the map (useful for covering clipping things)

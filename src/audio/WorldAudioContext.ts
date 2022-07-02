@@ -4,7 +4,10 @@ import { Ambiance } from "./Ambiance"
 import { Music } from "./Music"
 
 export class WorldAudioContext {
-    static readonly instance = Singletons.getOrCreate(WorldAudioContext)
+    static get instance() {
+        return Singletons.getOrCreate(WorldAudioContext)
+    }
+
     private readonly listeners: ((ctx: WorldAudioContext) => void)[] = [
         Ambiance.determineAmbiance,
         Music.determineMusic,
