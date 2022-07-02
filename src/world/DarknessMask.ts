@@ -70,7 +70,7 @@ export class DarknessMask {
      * @param time the world time
      * @param darknessLevel darkness level in range [0, 1] for non-nighttime darkness
      */
-    reset(time: number, darknessLevel: number) {
+    reset(time: number, darknessLevel: number | undefined) {
         this.circleQueue = []
         this.updateColorForTime(time, darknessLevel)
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
@@ -96,7 +96,7 @@ export class DarknessMask {
     private readonly DAY_COLOR = this.colorFromString(Color.PINK_4, 0)
     private readonly SUNSET_COLOR = this.colorFromString(Color.BLUE_4, 0.3)
 
-    private updateColorForTime(time: number, darknessLevel: number) {
+    private updateColorForTime(time: number, darknessLevel: number | undefined) {
         const timeOfDay = time % TimeUnit.DAY
 
         let rgba: RGBA
@@ -170,10 +170,10 @@ export class DarknessMask {
         return { r, g, b, a }
     }
 
-    addFaintLightCircle(position: Point) {
+    addFaintLightCircle(position: Point, diameterMultiplier: number) {
         this.makeLightCircle(
             position,
-            DarknessMask.PLAYER_VISIBLE_SURROUNDINGS_DIAMETER,
+            diameterMultiplier * DarknessMask.PLAYER_VISIBLE_SURROUNDINGS_DIAMETER,
             DarknessMask.VISIBILE_LIGHT,
             DarknessMask.VISIBILE_LIGHT_EDGE
         )

@@ -108,13 +108,11 @@ export class LightManager extends Component {
         // }
 
         if (location.type === LocationType.MINE_INTERIOR) {
-            return 0.9
+            return 0.99
         }
     }
 
     private render() {
-        // lazy load the vignette
-
         this.mask.reset(WorldTime.instance.time, this.getLocationDarkness())
 
         // Always provide slight visibility around the player
@@ -122,7 +120,8 @@ export class LightManager extends Component {
         if (!!player) {
             if (player.shieldType !== ShieldType.LANTERN) {
                 this.mask.addFaintLightCircle(
-                    player.standingPosition.plusY(-TILE_SIZE / 2).plus(player.getAnimationOffset())
+                    player.standingPosition.plusY(-TILE_SIZE / 2).plus(player.getAnimationOffset()),
+                    here().isInterior ? 0.5 : 1
                 )
             }
         }
