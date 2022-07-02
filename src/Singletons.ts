@@ -1,21 +1,35 @@
 import { ConcreteType } from "brigsby/lib"
 
-const singletons = new Map<any, any>()
+const singletonMap = new Map<any, any>()
 
 /**
- * A static cache for managing stateful singletons.
+ * A global cache for managing stateful singletons.
+ *
+ * You can easily add a static reference in a class like so:
+ *
+ *    static get instance() {
+ *        return singletons.getOrCreate(this)
+ *    }
+ *
+ * TODO: move to engine?
  */
 export const Singletons = {
+    get: <T>(type: ConcreteType<T>): T | undefined => {
+        return singletonMap.get(type)
+    },
+
     getOrCreate: <T>(type: ConcreteType<T>, supplier: () => T = () => new type()): T => {
-        const s = singletons.get(type)
+        const s = singletonMap.get(type)
         if (!!s) {
             return s
         }
 
         const supplied = supplier()
-        singletons.set(type, supplied)
+        singletonMap.set(type, supplied)
         return supplied
     },
 
-    destroy: () => singletons.clear(),
+    delete: <T>(type: ConcreteType<T>) => singletonMap.delete(type),
+
+    clear: () => singletonMap.clear(),
 }

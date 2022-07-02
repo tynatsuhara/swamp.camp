@@ -54,7 +54,7 @@ export class GameScene {
     }
 
     newGame() {
-        Singletons.destroy()
+        Singletons.clear()
 
         WorldTime.instance.initialize(TimeUnit.HOUR * 18.5)
 

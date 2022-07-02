@@ -174,7 +174,7 @@ class SaveManager {
         const timePlayed = new Date(save.state.timePlayed).toISOString().substr(11, 8)
         console.log(`loaded save from ${saveDate} with ${timePlayed} played`)
 
-        Singletons.destroy()
+        Singletons.clear()
 
         WorldTime.instance.initialize(save.worldTime)
         LocationManager.instance.initialize(save.locations)
