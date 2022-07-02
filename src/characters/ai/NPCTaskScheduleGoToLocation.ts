@@ -1,4 +1,4 @@
-import { Point } from "brigsby/dist/Point"
+import { Point } from "brigsby/dist"
 import { Location } from "../../world/Location"
 import { LocationManager } from "../../world/LocationManager"
 import { NPCSchedule } from "./NPCSchedule"

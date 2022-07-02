@@ -1,5 +1,5 @@
-import { Point } from "brigsby/dist/Point"
-import { Lists } from "brigsby/dist/util/Lists"
+import { Point } from "brigsby/dist"
+import { Lists } from "brigsby/dist/util"
 import { Dude } from "../../characters/Dude"
 import { Color } from "../../ui/Color"
 import { Particles } from "./Particles"

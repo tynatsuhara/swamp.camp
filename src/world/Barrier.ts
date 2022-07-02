@@ -1,8 +1,5 @@
-import { BoxCollider } from "brigsby/dist/collision/BoxCollider"
-import { CollisionEngine } from "brigsby/dist/collision/CollisionEngine"
-import { Component } from "brigsby/dist/Component"
-import { Entity } from "brigsby/dist/Entity"
-import { Point } from "brigsby/dist/Point"
+import { Component, Entity, Point } from "brigsby/dist"
+import { BoxCollider, CollisionEngine } from "brigsby/dist/collision"
 
 export class Barrier extends Component {
     private readonly position: Point

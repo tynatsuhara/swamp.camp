@@ -1,5 +1,4 @@
-import { assets } from "brigsby/dist/Assets"
-import { Engine } from "brigsby/dist/Engine"
+import { assets, Engine } from "brigsby/dist"
 import { getFilesToLoadForMainMenu } from "./graphics/Tilesets"
 import { SwampCampGame } from "./SwampCampGame"
 import { TEXT_FONT } from "./ui/Text"

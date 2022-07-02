@@ -1,4 +1,4 @@
-import { Lists } from "brigsby/dist/util/Lists"
+import { Lists } from "brigsby/dist/util"
 import { DarknessMask } from "../../world/DarknessMask"
 import { Campfire } from "../../world/elements/Campfire"
 import { ElementType } from "../../world/elements/Elements"

@@ -1,4 +1,4 @@
-import { Component } from "brigsby/dist/Component"
+import { Component } from "brigsby/dist"
 import { DudeType } from "../../characters/DudeType"
 
 export abstract class Residence extends Component {

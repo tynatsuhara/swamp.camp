@@ -1,4 +1,4 @@
-import { Lists } from "brigsby/dist/util/Lists"
+import { Lists } from "brigsby/dist/util"
 import { AudioPlayer } from "./AudioPlayer"
 import { AudioUtils } from "./AudioUtils"
 

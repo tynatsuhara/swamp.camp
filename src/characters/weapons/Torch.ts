@@ -1,4 +1,4 @@
-import { Point } from "brigsby/dist/Point"
+import { Point } from "brigsby/dist"
 import { PointAudio } from "../../audio/PointAudio"
 import { FireParticles } from "../../graphics/particles/FireParticles"
 import { pixelPtToTilePt, TILE_SIZE } from "../../graphics/Tilesets"

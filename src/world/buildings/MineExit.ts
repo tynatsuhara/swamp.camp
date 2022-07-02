@@ -1,5 +1,4 @@
-import { Entity } from "brigsby/dist/Entity"
-import { Point } from "brigsby/dist/Point"
+import { Entity, Point } from "brigsby/dist"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementFactory } from "../elements/ElementFactory"

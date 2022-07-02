@@ -1,4 +1,4 @@
-import { Lists } from "brigsby/dist/util/Lists"
+import { Lists } from "brigsby/dist/util"
 import { DudeFaction, DudeFactory } from "../../characters/DudeFactory"
 import { DudeSpawner } from "../../characters/DudeSpawner"
 import { DudeType } from "../../characters/DudeType"

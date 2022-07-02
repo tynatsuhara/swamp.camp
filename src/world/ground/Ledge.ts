@@ -1,8 +1,8 @@
-import { GroundComponent } from "./GroundComponent"
-import { Entity } from "brigsby/dist/Entity"
-import { GroundType, MakeGroundFuncData } from "./Ground"
-import { ConnectingTileLedgeSchema } from "./ConnectingTileLedgeSchema"
+import { Entity } from "brigsby/dist"
 import { ConnectingTile } from "./ConnectingTile"
+import { ConnectingTileLedgeSchema } from "./ConnectingTileLedgeSchema"
+import { GroundType, MakeGroundFuncData } from "./Ground"
+import { GroundComponent } from "./GroundComponent"
 
 export const makeLedge = (d: MakeGroundFuncData): GroundComponent => {
     const schema = new ConnectingTileLedgeSchema()

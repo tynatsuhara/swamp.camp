@@ -1,5 +1,4 @@
-import { assets } from "brigsby/dist/Assets"
-import { Point } from "brigsby/dist/Point"
+import { assets, Point } from "brigsby/dist"
 
 export type Teleporter = {
     to: string // destination uuid

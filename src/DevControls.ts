@@ -1,9 +1,13 @@
-import { Component } from "brigsby/dist/Component"
-import { debug } from "brigsby/dist/Debug"
-import { UpdateData } from "brigsby/dist/Engine"
-import { CapturedInput, InputKey, InputKeyString } from "brigsby/dist/Input"
-import { Point } from "brigsby/dist/Point"
-import { Lists } from "brigsby/dist/util/Lists"
+import {
+    CapturedInput,
+    Component,
+    debug,
+    InputKey,
+    InputKeyString,
+    Point,
+    UpdateData,
+} from "brigsby/dist"
+import { Lists } from "brigsby/dist/util"
 import { Condition } from "./characters/Condition"
 import { DudeFactory } from "./characters/DudeFactory"
 import { DudeSpawner } from "./characters/DudeSpawner"

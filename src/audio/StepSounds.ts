@@ -1,6 +1,5 @@
-import { assets } from "brigsby/dist/Assets"
-import { Lists } from "brigsby/dist/util/Lists"
-import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
+import { assets } from "brigsby/dist"
+import { Lists, RepeatedInvoker } from "brigsby/dist/util"
 import { Dude } from "../characters/Dude"
 import { DudeType } from "../characters/DudeType"
 import { Player } from "../characters/Player"

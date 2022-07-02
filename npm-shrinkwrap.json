@@ -613,9 +613,9 @@
             }
         },
         "brigsby": {
-            "version": "0.3.15",
-            "resolved": "https://registry.npmjs.org/brigsby/-/brigsby-0.3.15.tgz",
-            "integrity": "sha512-mGOr5WHOpEP+1kIF+PvH3iRDUtJTO5adh+8GJWJBgLrY06j4n3CpGEyMFstiTEBnEvUUNDy3K+RmgKAU+t9p9w==",
+            "version": "0.3.16",
+            "resolved": "https://registry.npmjs.org/brigsby/-/brigsby-0.3.16.tgz",
+            "integrity": "sha512-Dbow8KfiAywkKfCxjuB7GHCpZ+UU2z4hjWJk12c8QCOWbhe9JTuf6QDWyt/xf6VMKffuTFGOa+VfURfqHh+EtA==",
             "requires": {
                 "@types/css-font-loading-module": "^0.0.6"
             }

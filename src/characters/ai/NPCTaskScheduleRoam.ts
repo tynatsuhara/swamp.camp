@@ -1,5 +1,5 @@
-import { Point } from "brigsby/dist/Point"
-import { Lists } from "brigsby/dist/util/Lists"
+import { Point } from "brigsby/dist"
+import { Lists } from "brigsby/dist/util"
 import { pixelPtToTilePt, TILE_SIZE } from "../../graphics/Tilesets"
 import { Ground } from "../../world/ground/Ground"
 import { LightManager } from "../../world/LightManager"

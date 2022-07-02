@@ -1,6 +1,4 @@
-import { Component } from "brigsby/dist/Component"
-import { UpdateData } from "brigsby/dist/Engine"
-import { Point } from "brigsby/dist/Point"
+import { Component, Point, UpdateData } from "brigsby/dist"
 import { Dude } from "../characters/Dude"
 import { Player } from "../characters/Player"
 

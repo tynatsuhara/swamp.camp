@@ -1,14 +1,11 @@
-import { Component } from "brigsby/dist/Component"
-import { UpdateData } from "brigsby/dist/Engine"
-import { Entity } from "brigsby/dist/Entity"
-import { InputKeyString } from "brigsby/dist/Input"
-import { Point } from "brigsby/dist/Point"
-import { BasicRenderComponent } from "brigsby/dist/renderer/BasicRenderComponent"
-import { TextRender } from "brigsby/dist/renderer/TextRender"
-import { AnimatedSpriteComponent } from "brigsby/dist/sprites/AnimatedSpriteComponent"
-import { NineSlice } from "brigsby/dist/sprites/NineSlice"
-import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
-import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { Component, Entity, InputKeyString, Point, UpdateData } from "brigsby/dist"
+import { BasicRenderComponent, TextRender } from "brigsby/dist/renderer"
+import {
+    AnimatedSpriteComponent,
+    NineSlice,
+    SpriteComponent,
+    SpriteTransform,
+} from "brigsby/dist/sprites"
 import { Player } from "../characters/Player"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { WeaponType } from "../characters/weapons/WeaponType"

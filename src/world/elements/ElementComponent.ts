@@ -1,5 +1,4 @@
-import { Component } from "brigsby/dist/Component"
-import { Point } from "brigsby/dist/Point"
+import { Component, Point } from "brigsby/dist"
 import { LocationManager } from "../LocationManager"
 import { ElementType } from "./Elements"
 

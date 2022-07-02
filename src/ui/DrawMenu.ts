@@ -1,8 +1,5 @@
-import { Component } from "brigsby/dist/Component"
-import { Entity } from "brigsby/dist/Entity"
-import { Point } from "brigsby/dist/Point"
-import { BasicRenderComponent } from "brigsby/dist/renderer/BasicRenderComponent"
-import { ImageRender } from "brigsby/dist/renderer/ImageRender"
+import { Component, Entity, Point } from "brigsby/dist"
+import { BasicRenderComponent, ImageRender } from "brigsby/dist/renderer"
 import { UIStateManager } from "./UIStateManager"
 
 const WIDTH = 20

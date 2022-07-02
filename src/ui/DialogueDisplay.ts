@@ -1,9 +1,6 @@
-import { Component } from "brigsby/dist/Component"
-import { UpdateData } from "brigsby/dist/Engine"
-import { Entity } from "brigsby/dist/Entity"
-import { Point } from "brigsby/dist/Point"
-import { BasicRenderComponent } from "brigsby/dist/renderer/BasicRenderComponent"
-import { NineSlice } from "brigsby/dist/sprites/NineSlice"
+import { Component, Entity, Point, UpdateData } from "brigsby/dist"
+import { BasicRenderComponent } from "brigsby/dist/renderer"
+import { NineSlice } from "brigsby/dist/sprites"
 import {
     DialogueInstance,
     DialogueSource,

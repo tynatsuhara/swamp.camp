@@ -1,4 +1,4 @@
-import { ConcreteType } from "brigsby/dist/Types"
+import { ConcreteType } from "brigsby/dist"
 
 const singletons = new Map<any, any>()
 

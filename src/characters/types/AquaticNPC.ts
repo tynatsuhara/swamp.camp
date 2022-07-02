@@ -1,4 +1,4 @@
-import { Component } from "brigsby/dist/Component"
+import { Component } from "brigsby/dist"
 import { Ground } from "../../world/ground/Ground"
 import { WorldTime } from "../../world/WorldTime"
 import { Dude } from "../Dude"

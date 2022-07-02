@@ -1,4 +1,4 @@
-import { assets } from "brigsby/dist/Assets"
+import { assets } from "brigsby/dist"
 import { Sounds } from "../audio/Sounds"
 
 const SOUNDS = {

@@ -1,5 +1,4 @@
-import { Component } from "brigsby/dist/Component"
-import { Point } from "brigsby/dist/Point"
+import { Component, Point } from "brigsby/dist"
 import { Location } from "../Location"
 
 export class NavMeshObstacle extends Component {

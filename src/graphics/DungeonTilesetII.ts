@@ -1,6 +1,5 @@
-import { Point } from "brigsby/dist/Point"
-import { SpriteAnimation } from "brigsby/dist/sprites/SpriteAnimation"
-import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
+import { Point } from "brigsby/dist"
+import { SpriteAnimation, StaticSpriteSource } from "brigsby/dist/sprites"
 import { getImage } from "./Tilesets"
 
 const map = new Map(

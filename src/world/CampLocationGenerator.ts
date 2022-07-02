@@ -1,6 +1,5 @@
-import { Point } from "brigsby/dist/Point"
-import { Grid } from "brigsby/dist/util/Grid"
-import { Noise } from "brigsby/dist/util/Noise"
+import { Point } from "brigsby/dist"
+import { Grid, Noise } from "brigsby/dist/util"
 import { Singletons } from "../Singletons"
 import { AbstractLocationGenerator } from "./AbstractLocationGenerator"
 import { TentColor } from "./buildings/Tent"

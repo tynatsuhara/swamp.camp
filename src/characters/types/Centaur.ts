@@ -1,4 +1,4 @@
-import { Component } from "brigsby/dist/Component"
+import { Component } from "brigsby/dist"
 import { GenericDialogue } from "../dialogue/GenericDialogue"
 import { Dude } from "../Dude"
 import { DudeFaction } from "../DudeFactory"

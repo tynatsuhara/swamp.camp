@@ -1,6 +1,5 @@
-import { Component } from "brigsby/dist/Component"
-import { Point } from "brigsby/dist/Point"
-import { LineRender } from "brigsby/dist/renderer/LineRender"
+import { Component, Point } from "brigsby/dist"
+import { LineRender } from "brigsby/dist/renderer"
 import { ZOOM } from "../SwampCampGame"
 import { Color } from "./Color"
 

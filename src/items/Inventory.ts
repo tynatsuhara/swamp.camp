@@ -1,4 +1,4 @@
-import { InputKey } from "brigsby/dist/Input"
+import { InputKey } from "brigsby/dist"
 import { Item, ITEM_METADATA_MAP } from "./Items"
 
 export type ItemStackMetadata = {

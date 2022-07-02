@@ -1,7 +1,6 @@
-import { Component } from "brigsby/dist/Component"
-import { Point } from "brigsby/dist/Point"
-import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
-import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { Component, Point } from "brigsby/dist"
+import { RenderMethod } from "brigsby/dist/renderer"
+import { SpriteTransform } from "brigsby/dist/sprites"
 import { Tilesets } from "../graphics/Tilesets"
 
 export class StringTiles extends Component {

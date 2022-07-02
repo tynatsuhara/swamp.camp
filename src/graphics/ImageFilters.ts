@@ -1,4 +1,4 @@
-import { Point } from "brigsby/dist/Point"
+import { Point } from "brigsby/dist"
 import { Color, getRGB } from "../ui/Color"
 
 export const ImageFilters = {

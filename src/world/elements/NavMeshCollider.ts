@@ -1,6 +1,5 @@
-import { BoxCollider } from "brigsby/dist/collision/BoxCollider"
-import { Collider } from "brigsby/dist/collision/Collider"
-import { Point } from "brigsby/dist/Point"
+import { Point } from "brigsby/dist"
+import { BoxCollider, Collider } from "brigsby/dist/collision"
 import { pixelPtToTilePt } from "../../graphics/Tilesets"
 import { Location } from "../Location"
 import { ElementUtils } from "./ElementUtils"

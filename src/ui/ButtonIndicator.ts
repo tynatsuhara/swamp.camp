@@ -1,8 +1,6 @@
-import { Component } from "brigsby/dist/Component"
-import { GamepadButton } from "brigsby/dist/Input"
-import { Point } from "brigsby/dist/Point"
-import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
-import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { Component, GamepadButton, Point } from "brigsby/dist"
+import { RenderMethod } from "brigsby/dist/renderer"
+import { SpriteTransform } from "brigsby/dist/sprites"
 import { Tilesets } from "../graphics/Tilesets"
 import { UIStateManager } from "./UIStateManager"
 

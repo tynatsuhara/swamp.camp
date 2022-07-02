@@ -1,6 +1,4 @@
-import { Component } from "brigsby/dist/Component"
-import { debug } from "brigsby/dist/Debug"
-import { Point } from "brigsby/dist/Point"
+import { Component, debug, Point } from "brigsby/dist"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
 import { Ground } from "../../world/ground/Ground"

@@ -1,8 +1,6 @@
-import { Component } from "brigsby/dist/Component"
-import { UpdateData } from "brigsby/dist/Engine"
-import { Point } from "brigsby/dist/Point"
-import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
-import { Animator } from "brigsby/dist/util/Animator"
+import { Component, Point, UpdateData } from "brigsby/dist"
+import { SpriteTransform } from "brigsby/dist/sprites"
+import { Animator } from "brigsby/dist/util"
 import { Dude } from "../../characters/Dude"
 
 /**

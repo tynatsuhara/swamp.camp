@@ -1,6 +1,5 @@
-import { Entity } from "brigsby/dist/Entity"
-import { Point } from "brigsby/dist/Point"
-import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { Entity, Point } from "brigsby/dist"
+import { SpriteTransform } from "brigsby/dist/sprites"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/Elements"

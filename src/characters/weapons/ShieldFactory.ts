@@ -1,4 +1,4 @@
-import { Point } from "brigsby/dist/Point"
+import { Point } from "brigsby/dist"
 import { DudeType } from "../DudeType"
 import { Lantern } from "./Lantern"
 import { Shield } from "./Shield"

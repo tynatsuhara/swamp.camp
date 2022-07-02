@@ -1,13 +1,12 @@
-import { CollisionEngine, collisionEngine } from "brigsby/dist/collision/CollisionEngine"
-import { debug } from "brigsby/dist/Debug"
-import { UpdateViewsContext } from "brigsby/dist/Engine"
-import { Entity } from "brigsby/dist/Entity"
-import { Point } from "brigsby/dist/Point"
-import { BasicRenderComponent } from "brigsby/dist/renderer/BasicRenderComponent"
-import { EllipseRender } from "brigsby/dist/renderer/EllipseRender"
-import { LineRender } from "brigsby/dist/renderer/LineRender"
-import { RectRender } from "brigsby/dist/renderer/RectRender"
-import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
+import { debug, Entity, Point, UpdateViewsContext } from "brigsby/dist"
+import { CollisionEngine, collisionEngine } from "brigsby/dist/collision"
+import {
+    BasicRenderComponent,
+    EllipseRender,
+    LineRender,
+    RectRender,
+    RenderMethod,
+} from "brigsby/dist/renderer"
 import { Dude } from "../characters/Dude"
 import { DudeFactory } from "../characters/DudeFactory"
 import { DudeSpawner } from "../characters/DudeSpawner"

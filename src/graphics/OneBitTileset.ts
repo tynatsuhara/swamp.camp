@@ -1,4 +1,4 @@
-import { Point } from "brigsby/dist/Point"
+import { Point } from "brigsby/dist"
 import { SingleFileTileLoader } from "./SingleFileTileLoader"
 
 export class OneBitTileset extends SingleFileTileLoader {

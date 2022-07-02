@@ -1,7 +1,5 @@
-import { Point } from "brigsby/dist/Point"
-import { SpriteAnimation } from "brigsby/dist/sprites/SpriteAnimation"
-import { SpriteSource } from "brigsby/dist/sprites/SpriteSource"
-import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
+import { Point } from "brigsby/dist"
+import { SpriteAnimation, SpriteSource, StaticSpriteSource } from "brigsby/dist/sprites"
 import { getImage } from "./Tilesets"
 
 export class SingleFileTileLoader {

@@ -1,17 +1,17 @@
-import { Component } from "brigsby/dist/Component"
-import { UpdateData } from "brigsby/dist/Engine"
-import { Entity } from "brigsby/dist/Entity"
 import {
     ButtonState,
     CapturedGamepad,
     CapturedInput,
+    Component,
+    Entity,
     GamepadButton,
     GamepadVibrationOptions,
     InputKey,
     MouseButton,
-} from "brigsby/dist/Input"
-import { Point } from "brigsby/dist/Point"
-import { Maths } from "brigsby/dist/util/Maths"
+    Point,
+    UpdateData,
+} from "brigsby/dist"
+import { Maths } from "brigsby/dist/util"
 import { Dude } from "./characters/Dude"
 import { Camera } from "./cutscenes/Camera"
 import { FullScreenMode } from "./ui/FullScreenMode"

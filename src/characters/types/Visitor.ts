@@ -1,4 +1,4 @@
-import { Component } from "brigsby/dist/Component"
+import { Component } from "brigsby/dist"
 import { Dude } from "../Dude"
 import { DudeType } from "../DudeType"
 import { Berto } from "./Berto"

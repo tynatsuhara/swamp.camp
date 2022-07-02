@@ -25,7 +25,7 @@
         "webpack-dev-server": "^4.9.2"
     },
     "dependencies": {
-        "brigsby": "^0.3.15",
+        "brigsby": "^0.3.16",
         "prettier": "^2.4.1"
     }
 }
