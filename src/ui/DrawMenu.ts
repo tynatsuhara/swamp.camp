@@ -5,6 +5,9 @@ import { UIStateManager } from "./UIStateManager"
 const WIDTH = 20
 const HEIGHT = 20
 
+/**
+ * WIP: This class should eventually support drawing/changing weapon sprites
+ */
 export class DrawMenu extends Component {
     static instance: DrawMenu
 
