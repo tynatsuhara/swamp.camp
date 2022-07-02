@@ -1,5 +1,5 @@
-import { Entity, Point } from "brigsby/dist"
-import { AnimatedSpriteComponent, SpriteAnimation, SpriteTransform } from "brigsby/dist/sprites"
+import { Entity, Point } from "brigsby/lib"
+import { AnimatedSpriteComponent, SpriteAnimation, SpriteTransform } from "brigsby/lib/sprites"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Inventory } from "../../items/Inventory"
 import { InventoryDisplay } from "../../ui/InventoryDisplay"

@@ -1,11 +1,11 @@
-import { Component, Entity, InputKeyString, Point, UpdateData } from "brigsby/dist"
-import { BasicRenderComponent, TextRender } from "brigsby/dist/renderer"
+import { Component, Entity, InputKeyString, Point, UpdateData } from "brigsby/lib"
+import { BasicRenderComponent, TextRender } from "brigsby/lib/renderer"
 import {
     AnimatedSpriteComponent,
     NineSlice,
     SpriteComponent,
     SpriteTransform,
-} from "brigsby/dist/sprites"
+} from "brigsby/lib/sprites"
 import { Player } from "../characters/Player"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { WeaponType } from "../characters/weapons/WeaponType"

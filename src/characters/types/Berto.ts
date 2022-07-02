@@ -1,5 +1,5 @@
-import { Component, Point } from "brigsby/dist"
-import { Lists } from "brigsby/dist/util"
+import { Component, Point } from "brigsby/lib"
+import { Lists } from "brigsby/lib/util"
 import { Queequeg } from "../../world/elements/Queequeg"
 import { EventQueue } from "../../world/events/EventQueue"
 import { QueuedEventType } from "../../world/events/QueuedEvent"

@@ -1,5 +1,5 @@
-import { Entity } from "brigsby/dist"
-import { SpriteTransform } from "brigsby/dist/sprites"
+import { Entity } from "brigsby/lib"
+import { SpriteTransform } from "brigsby/lib/sprites"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { GroundRenderer } from "../GroundRenderer"
 import { GroundType, MakeGroundFuncData } from "./Ground"

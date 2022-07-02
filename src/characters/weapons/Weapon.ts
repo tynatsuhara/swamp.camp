@@ -1,4 +1,4 @@
-import { Component, Point } from "brigsby/dist"
+import { Component, Point } from "brigsby/lib"
 import { Hittable } from "../../world/elements/Hittable"
 import { here } from "../../world/LocationManager"
 import { Dude } from "../Dude"

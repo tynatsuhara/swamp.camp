@@ -1,4 +1,4 @@
-import { Point } from "brigsby/dist"
+import { Point } from "brigsby/lib"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Barrier } from "../Barrier"
 

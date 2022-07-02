@@ -1,5 +1,5 @@
-import { Game, UpdateViewsContext } from "brigsby/dist"
-import { View } from "brigsby/dist/View"
+import { Game, UpdateViewsContext } from "brigsby/lib"
+import { View } from "brigsby/lib/View"
 import { GameScene } from "./scenes/GameScene"
 import { MainMenuScene } from "./scenes/MainMenuScene"
 

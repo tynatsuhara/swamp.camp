@@ -1,4 +1,4 @@
-import { Lists } from "brigsby/dist/util"
+import { Lists } from "brigsby/lib/util"
 import { DarknessMask } from "../world/DarknessMask"
 import { TimeUnit } from "../world/TimeUnit"
 import { AudioPlayer } from "./AudioPlayer"

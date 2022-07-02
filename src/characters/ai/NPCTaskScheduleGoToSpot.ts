@@ -1,4 +1,4 @@
-import { Point } from "brigsby/dist"
+import { Point } from "brigsby/lib"
 import { NPCSchedule } from "./NPCSchedule"
 import { NPCTask } from "./NPCTask"
 import { NPCTaskContext } from "./NPCTaskContext"

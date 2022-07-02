@@ -1,5 +1,5 @@
-import { Point } from "brigsby/dist"
-import { StaticSpriteSource } from "brigsby/dist/sprites"
+import { Point } from "brigsby/lib"
+import { StaticSpriteSource } from "brigsby/lib/sprites"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets } from "../graphics/Tilesets"
 import { Color } from "./Color"

@@ -1,5 +1,5 @@
-import { Component, debug, Entity, Point } from "brigsby/dist"
-import { Lists } from "brigsby/dist/util"
+import { Component, debug, Entity, Point } from "brigsby/lib"
+import { Lists } from "brigsby/lib/util"
 import { WorldAudioContext } from "../audio/WorldAudioContext"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"

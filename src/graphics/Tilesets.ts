@@ -1,5 +1,5 @@
-import { assets, Point } from "brigsby/dist"
-import { SpriteSource, StaticSpriteSource } from "brigsby/dist/sprites"
+import { assets, Point } from "brigsby/lib"
+import { SpriteSource, StaticSpriteSource } from "brigsby/lib/sprites"
 import { Singletons } from "../Singletons"
 import { DungeonTilesetII } from "./DungeonTilesetII"
 import { ExplosionTileset } from "./ExplosionTileset"

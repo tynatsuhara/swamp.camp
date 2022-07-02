@@ -1,4 +1,4 @@
-import { Point } from "brigsby/dist"
+import { Point } from "brigsby/lib"
 import { DudeType } from "../../characters/DudeType"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { ElementType } from "../elements/Elements"

@@ -1,4 +1,4 @@
-import { AbstractType, Component, Entity } from "brigsby/dist"
+import { AbstractType, Component, Entity } from "brigsby/lib"
 import { Singletons } from "../Singletons"
 
 export class CutsceneManager {

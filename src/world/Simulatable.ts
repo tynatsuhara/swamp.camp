@@ -1,4 +1,4 @@
-import { Component } from "brigsby/dist"
+import { Component } from "brigsby/lib"
 
 export abstract class Simulatable extends Component {
     abstract simulate(duration: number): void

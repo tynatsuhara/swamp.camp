@@ -1,5 +1,5 @@
-import { Point } from "brigsby/dist"
-import { StaticSpriteSource } from "brigsby/dist/sprites"
+import { Point } from "brigsby/lib"
+import { StaticSpriteSource } from "brigsby/lib/sprites"
 import { getImage, TILE_SIZE } from "./Tilesets"
 
 export class LargeSpriteTileset {

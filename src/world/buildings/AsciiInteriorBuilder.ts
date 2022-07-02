@@ -1,4 +1,4 @@
-import { Point } from "brigsby/dist"
+import { Point } from "brigsby/lib"
 
 export class AsciiInteriorBuilder {
     private readonly ascii: String[]

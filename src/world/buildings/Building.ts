@@ -1,4 +1,4 @@
-import { Point } from "brigsby/dist"
+import { Point } from "brigsby/lib"
 import { ElementFactory } from "../elements/ElementFactory"
 import { ElementUtils } from "../elements/ElementUtils"
 import { Ground } from "../ground/Ground"

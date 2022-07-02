@@ -1,12 +1,12 @@
-import { assets, Component, Entity, Point, UpdateData } from "brigsby/dist"
-import { BasicRenderComponent, ImageRender, TextRender } from "brigsby/dist/renderer"
+import { assets, Component, Entity, Point, UpdateData } from "brigsby/lib"
+import { BasicRenderComponent, ImageRender, TextRender } from "brigsby/lib/renderer"
 import {
     AnimatedSpriteComponent,
     NineSlice,
     SpriteTransform,
     StaticSpriteSource,
-} from "brigsby/dist/sprites"
-import { Lists, Maths } from "brigsby/dist/util"
+} from "brigsby/lib/sprites"
+import { Lists, Maths } from "brigsby/lib/util"
 import { Sounds } from "../audio/Sounds"
 import { Dude } from "../characters/Dude"
 import { Player } from "../characters/Player"

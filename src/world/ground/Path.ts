@@ -1,4 +1,4 @@
-import { Entity, Point } from "brigsby/dist"
+import { Entity, Point } from "brigsby/lib"
 import { Tilesets } from "../../graphics/Tilesets"
 import { ConnectingTile } from "./ConnectingTile"
 import { ConnectingTilePathSchema } from "./ConnectingTilePathSchema"

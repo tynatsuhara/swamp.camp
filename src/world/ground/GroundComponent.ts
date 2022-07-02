@@ -1,4 +1,4 @@
-import { Component } from "brigsby/dist"
+import { Component } from "brigsby/lib"
 import { GroundType } from "./Ground"
 
 /**

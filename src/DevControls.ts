@@ -6,8 +6,8 @@ import {
     InputKeyString,
     Point,
     UpdateData,
-} from "brigsby/dist"
-import { Lists } from "brigsby/dist/util"
+} from "brigsby/lib"
+import { Lists } from "brigsby/lib/util"
 import { Condition } from "./characters/Condition"
 import { DudeFactory } from "./characters/DudeFactory"
 import { DudeSpawner } from "./characters/DudeSpawner"

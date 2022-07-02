@@ -1,4 +1,4 @@
-import { Component, Entity, Point } from "brigsby/dist"
+import { Component, Entity, Point } from "brigsby/lib"
 import { Player } from "../characters/Player"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { Camera } from "../cutscenes/Camera"

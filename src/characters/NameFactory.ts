@@ -1,4 +1,4 @@
-import { Lists } from "brigsby/dist/util"
+import { Lists } from "brigsby/lib/util"
 
 class NameRuleSet<T extends string> {
     private dict = new Map<T, string[]>()

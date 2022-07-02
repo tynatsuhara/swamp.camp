@@ -1,5 +1,5 @@
-import { Component, Point, UpdateData } from "brigsby/dist"
-import { SpriteTransform } from "brigsby/dist/sprites"
+import { Component, Point, UpdateData } from "brigsby/lib"
+import { SpriteTransform } from "brigsby/lib/sprites"
 import { DIP_STARTING_DIALOGUE } from "../characters/dialogue/DipDialogue"
 import { Dude } from "../characters/Dude"
 import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"

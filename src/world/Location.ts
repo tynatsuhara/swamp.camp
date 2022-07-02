@@ -1,5 +1,5 @@
-import { Entity, Point } from "brigsby/dist"
-import { Grid } from "brigsby/dist/util"
+import { Entity, Point } from "brigsby/lib"
+import { Grid } from "brigsby/lib/util"
 import { PointAudio } from "../audio/PointAudio"
 import { Sounds } from "../audio/Sounds"
 import { Dude } from "../characters/Dude"

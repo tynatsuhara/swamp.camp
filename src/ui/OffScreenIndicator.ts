@@ -1,7 +1,7 @@
-import { Component, Point, UpdateData } from "brigsby/dist"
-import { ImageRender } from "brigsby/dist/renderer"
-import { SpriteTransform } from "brigsby/dist/sprites"
-import { Lists, Maths } from "brigsby/dist/util"
+import { Component, Point, UpdateData } from "brigsby/lib"
+import { ImageRender } from "brigsby/lib/renderer"
+import { SpriteTransform } from "brigsby/lib/sprites"
+import { Lists, Maths } from "brigsby/lib/util"
 import { Camera } from "../cutscenes/Camera"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 

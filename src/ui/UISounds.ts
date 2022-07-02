@@ -1,4 +1,4 @@
-import { assets } from "brigsby/dist"
+import { assets } from "brigsby/lib"
 import { Sounds } from "../audio/Sounds"
 
 const SOUNDS = {

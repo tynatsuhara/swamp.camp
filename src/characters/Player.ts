@@ -1,5 +1,5 @@
-import { ButtonState, Component, debug, Point, UpdateData } from "brigsby/dist"
-import { Lists } from "brigsby/dist/util"
+import { ButtonState, Component, debug, Point, UpdateData } from "brigsby/lib"
+import { Lists } from "brigsby/lib/util"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"

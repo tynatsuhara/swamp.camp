@@ -1,4 +1,4 @@
-import { BinaryHeap } from "brigsby/dist/util"
+import { BinaryHeap } from "brigsby/lib/util"
 import { Singletons } from "../../Singletons"
 import { WorldTime } from "../WorldTime"
 import { getEventQueueHandlers, QueuedEventData, QueuedEventType } from "./QueuedEvent"

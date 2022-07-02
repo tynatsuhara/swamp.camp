@@ -1,5 +1,5 @@
-import { Point } from "brigsby/dist"
-import { measure } from "brigsby/dist/Profiler"
+import { Point } from "brigsby/lib"
+import { measure } from "brigsby/lib/Profiler"
 import { WorldAudioContext } from "../audio/WorldAudioContext"
 import { DudeType } from "../characters/DudeType"
 import { Player } from "../characters/Player"

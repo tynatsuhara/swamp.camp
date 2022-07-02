@@ -1,5 +1,5 @@
-import { Component, Point, StartData, UpdateData } from "brigsby/dist"
-import { Lists } from "brigsby/dist/util"
+import { Component, Point, StartData, UpdateData } from "brigsby/lib"
+import { Lists } from "brigsby/lib/util"
 import { Particles } from "../../graphics/particles/Particles"
 import { Color } from "../../ui/Color"
 import { Dude } from "../Dude"

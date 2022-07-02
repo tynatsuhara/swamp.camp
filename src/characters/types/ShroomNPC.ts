@@ -1,5 +1,5 @@
-import { Component, UpdateData } from "brigsby/dist"
-import { Lists } from "brigsby/dist/util"
+import { Component, UpdateData } from "brigsby/lib"
+import { Lists } from "brigsby/lib/util"
 import { Item } from "../../items/Items"
 import { ElementType } from "../../world/elements/Elements"
 import { camp } from "../../world/LocationManager"

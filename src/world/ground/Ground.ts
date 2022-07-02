@@ -1,4 +1,4 @@
-import { Point } from "brigsby/dist"
+import { Point } from "brigsby/lib"
 import { Singletons } from "../../Singletons"
 import { Location } from "../Location"
 import { makeBasicGround, makeBasicNineSliceGround } from "./BasicGround"

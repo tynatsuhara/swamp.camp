@@ -1,4 +1,4 @@
-import { Component, Entity, UpdateData } from "brigsby/dist"
+import { Component, Entity, UpdateData } from "brigsby/lib"
 import { WorldAudioContext } from "../audio/WorldAudioContext"
 import { saveManager } from "../SaveManager"
 import { Singletons } from "../Singletons"

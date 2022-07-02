@@ -1,5 +1,5 @@
-import { Point, UpdateData } from "brigsby/dist"
-import { Lists, RepeatedInvoker } from "brigsby/dist/util"
+import { Point, UpdateData } from "brigsby/lib"
+import { Lists, RepeatedInvoker } from "brigsby/lib/util"
 import { FireParticles } from "../../graphics/particles/FireParticles"
 import { Particles } from "../../graphics/particles/Particles"
 import { TILE_SIZE } from "../../graphics/Tilesets"

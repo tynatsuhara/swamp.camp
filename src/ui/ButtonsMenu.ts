@@ -1,5 +1,5 @@
-import { Entity, Point } from "brigsby/dist"
-import { NineSlice } from "brigsby/dist/sprites"
+import { Entity, Point } from "brigsby/lib"
+import { NineSlice } from "brigsby/lib/sprites"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { TEXT_PIXEL_WIDTH } from "./Text"
 import { TextButton } from "./TextButton"
