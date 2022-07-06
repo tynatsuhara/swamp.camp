@@ -1,4 +1,4 @@
-import { Point } from "brigsby/lib"
+import { Point } from "brigsby/dist"
 import { TimeUnit } from "../../world/TimeUnit"
 
 export enum NPCScheduleType {

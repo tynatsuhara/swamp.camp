@@ -1,5 +1,5 @@
-import { Entity, Point } from "brigsby/lib"
-import { SpriteComponent, SpriteTransform } from "brigsby/lib/sprites"
+import { Entity, Point } from "brigsby/dist"
+import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Condition } from "../characters/Condition"
 import { Dude } from "../characters/Dude"
 import { Player } from "../characters/Player"

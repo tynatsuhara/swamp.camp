@@ -1,4 +1,4 @@
-import { Lists } from "brigsby/lib/util"
+import { Lists } from "brigsby/dist/util"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { DialogueOption, DialogueSet, dialogueWithOptions, NextDialogue } from "./Dialogue"
 

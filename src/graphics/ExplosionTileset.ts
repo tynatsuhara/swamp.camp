@@ -1,11 +1,11 @@
-import { Component, Point } from "brigsby/lib"
+import { Component, Point } from "brigsby/dist"
 import {
     AnimatedSpriteComponent,
     SpriteAnimation,
     SpriteTransform,
     StaticSpriteSource,
-} from "brigsby/lib/sprites"
-import { Lists } from "brigsby/lib/util"
+} from "brigsby/dist/sprites"
+import { Lists } from "brigsby/dist/util"
 import { getImage } from "./Tilesets"
 
 export class ExplosionTileset {

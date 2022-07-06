@@ -1,5 +1,5 @@
-import { Component, Point } from "brigsby/lib"
-import { ImageRender } from "brigsby/lib/renderer"
+import { Component, Point } from "brigsby/dist"
+import { ImageRender } from "brigsby/dist/renderer"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { Color } from "../ui/Color"

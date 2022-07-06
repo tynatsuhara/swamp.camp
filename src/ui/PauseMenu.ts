@@ -1,4 +1,4 @@
-import { Component, Entity, UpdateData } from "brigsby/lib"
+import { Component, Entity, UpdateData } from "brigsby/dist"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"

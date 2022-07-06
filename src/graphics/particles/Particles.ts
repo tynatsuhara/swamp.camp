@@ -1,5 +1,5 @@
-import { Component, Entity, Point } from "brigsby/lib"
-import { ImageRender } from "brigsby/lib/renderer"
+import { Component, Entity, Point } from "brigsby/dist"
+import { ImageRender } from "brigsby/dist/renderer"
 import { Singletons } from "../../Singletons"
 import { Color, getRGB } from "../../ui/Color"
 

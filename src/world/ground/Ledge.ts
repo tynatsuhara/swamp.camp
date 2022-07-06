@@ -1,4 +1,4 @@
-import { Entity } from "brigsby/lib"
+import { Entity } from "brigsby/dist"
 import { ConnectingTile } from "./ConnectingTile"
 import { ConnectingTileLedgeSchema } from "./ConnectingTileLedgeSchema"
 import { GroundType, MakeGroundFuncData } from "./Ground"

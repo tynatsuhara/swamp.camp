@@ -1,5 +1,5 @@
-import { Component, debug, GamepadButton, InputKey, Point } from "brigsby/lib"
-import { EllipseRender, RenderMethod } from "brigsby/lib/renderer"
+import { Component, debug, GamepadButton, InputKey, Point } from "brigsby/dist"
+import { EllipseRender, RenderMethod } from "brigsby/dist/renderer"
 import { controls } from "../../Controls"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { ButtonIndicator } from "../../ui/ButtonIndicator"

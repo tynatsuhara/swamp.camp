@@ -1,4 +1,4 @@
-import { Entity, Point } from "brigsby/lib"
+import { Entity, Point } from "brigsby/dist"
 import { MainMenuButton } from "./MainMenuButton"
 
 export class MainMenuButtonSection {

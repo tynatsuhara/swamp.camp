@@ -1,4 +1,4 @@
-import { SpriteAnimation } from "brigsby/lib/sprites"
+import { SpriteAnimation } from "brigsby/dist/sprites"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets } from "../graphics/Tilesets"
 import { saveManager } from "../SaveManager"

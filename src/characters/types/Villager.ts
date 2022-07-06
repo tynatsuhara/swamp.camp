@@ -1,4 +1,4 @@
-import { Component, Point } from "brigsby/lib"
+import { Component, Point } from "brigsby/dist"
 import { Ground } from "../../world/ground/Ground"
 import { LightManager } from "../../world/LightManager"
 import { NPCSchedules } from "../ai/NPCSchedule"

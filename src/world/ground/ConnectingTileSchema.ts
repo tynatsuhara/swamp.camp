@@ -1,5 +1,5 @@
-import { Point } from "brigsby/lib"
-import { ImageRender } from "brigsby/lib/renderer"
+import { Point } from "brigsby/dist"
+import { ImageRender } from "brigsby/dist/renderer"
 import { Location } from "../Location"
 import { ConnectingTile } from "./ConnectingTile"
 

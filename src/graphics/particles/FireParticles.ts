@@ -1,5 +1,5 @@
-import { Point } from "brigsby/lib"
-import { Lists, RepeatedInvoker } from "brigsby/lib/util"
+import { Point } from "brigsby/dist"
+import { Lists, RepeatedInvoker } from "brigsby/dist/util"
 import { Color } from "../../ui/Color"
 import { Particles } from "./Particles"
 

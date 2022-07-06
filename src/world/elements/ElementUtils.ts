@@ -1,4 +1,4 @@
-import { Point } from "brigsby/lib"
+import { Point } from "brigsby/dist"
 
 export const ElementUtils = {
     rectPoints: (position: Point, dimensions: Point): Point[] => {

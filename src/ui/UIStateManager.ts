@@ -1,4 +1,4 @@
-import { Entity } from "brigsby/lib"
+import { Entity } from "brigsby/dist"
 import { Player } from "../characters/Player"
 import { Camera } from "../cutscenes/Camera"
 import { Singletons } from "../Singletons"

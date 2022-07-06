@@ -1,5 +1,5 @@
-import { Entity, Point } from "brigsby/lib"
-import { SpriteAnimation, SpriteTransform } from "brigsby/lib/sprites"
+import { Entity, Point } from "brigsby/dist"
+import { SpriteAnimation, SpriteTransform } from "brigsby/dist/sprites"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { GroundRenderer } from "../GroundRenderer"
 import { ConnectingTile } from "./ConnectingTile"

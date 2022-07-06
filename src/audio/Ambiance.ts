@@ -1,4 +1,4 @@
-import { Lists } from "brigsby/lib/util"
+import { Lists } from "brigsby/dist/util"
 import { Player } from "../characters/Player"
 import { Settings } from "../Settings"
 import { DarknessMask } from "../world/DarknessMask"

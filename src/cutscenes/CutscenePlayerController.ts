@@ -1,4 +1,4 @@
-import { Component, Point, UpdateData } from "brigsby/lib"
+import { Component, Point, UpdateData } from "brigsby/dist"
 import { Dude } from "../characters/Dude"
 import { Player } from "../characters/Player"
 

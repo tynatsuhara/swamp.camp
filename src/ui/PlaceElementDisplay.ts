@@ -1,5 +1,5 @@
-import { Component, Entity, Point, UpdateData } from "brigsby/lib"
-import { Grid, Maths } from "brigsby/lib/util"
+import { Component, Entity, Point, UpdateData } from "brigsby/dist"
+import { Grid, Maths } from "brigsby/dist/util"
 import { Player } from "../characters/Player"
 import { controls } from "../Controls"
 import { TILE_SIZE } from "../graphics/Tilesets"

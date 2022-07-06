@@ -1,5 +1,5 @@
-import { Point } from "brigsby/lib"
-import { StaticSpriteSource } from "brigsby/lib/sprites"
+import { Point } from "brigsby/dist"
+import { StaticSpriteSource } from "brigsby/dist/sprites"
 import { ROCKS_NEEDED_FOR_CAMPFIRE } from "../characters/dialogue/DipDialogue"
 import { Tilesets } from "../graphics/Tilesets"
 import { saveManager } from "../SaveManager"

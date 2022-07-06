@@ -1,5 +1,5 @@
-import { Component, Entity, Point } from "brigsby/lib"
-import { Lists } from "brigsby/lib/util"
+import { Component, Entity, Point } from "brigsby/dist"
+import { Lists } from "brigsby/dist/util"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 import { Inventory } from "../items/Inventory"
 import { Item } from "../items/Items"

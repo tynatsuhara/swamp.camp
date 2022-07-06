@@ -1,4 +1,4 @@
-import { Point } from "brigsby/lib"
+import { Point } from "brigsby/dist"
 
 export const tilesAround = (center: Point, radius: number = 1): Point[] => {
     let result = []

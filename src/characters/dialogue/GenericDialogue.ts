@@ -1,4 +1,4 @@
-import { Lists } from "brigsby/lib/util"
+import { Lists } from "brigsby/dist/util"
 import { dialogue, DialogueSet, NextDialogue } from "./Dialogue"
 
 export enum GenericDialogue {

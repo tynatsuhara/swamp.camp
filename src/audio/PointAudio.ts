@@ -1,4 +1,4 @@
-import { Component, Point } from "brigsby/lib"
+import { Component, Point } from "brigsby/dist"
 import { Player } from "../characters/Player"
 import { Settings } from "../Settings"
 

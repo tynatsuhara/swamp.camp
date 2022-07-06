@@ -1,4 +1,4 @@
-import { debug } from "brigsby/lib"
+import { debug } from "brigsby/dist"
 import { DudeType } from "./characters/DudeType"
 import { Player } from "./characters/Player"
 import { Camera } from "./cutscenes/Camera"

@@ -10,8 +10,8 @@ import {
     MouseButton,
     Point,
     UpdateData,
-} from "brigsby/lib"
-import { Maths } from "brigsby/lib/util"
+} from "brigsby/dist"
+import { Maths } from "brigsby/dist/util"
 import { Dude } from "./characters/Dude"
 import { Camera } from "./cutscenes/Camera"
 import { FullScreenMode } from "./ui/FullScreenMode"

@@ -1,6 +1,6 @@
-import { Component, Point, UpdateData } from "brigsby/lib"
-import { SpriteTransform } from "brigsby/lib/sprites"
-import { Animator } from "brigsby/lib/util"
+import { Component, Point, UpdateData } from "brigsby/dist"
+import { SpriteTransform } from "brigsby/dist/sprites"
+import { Animator } from "brigsby/dist/util"
 
 export class Hittable extends Component {
     readonly position: Point

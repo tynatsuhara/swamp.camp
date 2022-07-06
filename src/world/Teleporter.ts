@@ -1,4 +1,4 @@
-import { assets, Point } from "brigsby/lib"
+import { assets, Point } from "brigsby/dist"
 
 export type Teleporter = {
     to: string // destination uuid

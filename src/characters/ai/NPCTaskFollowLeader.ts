@@ -1,4 +1,4 @@
-import { Lists } from "brigsby/lib/util"
+import { Lists } from "brigsby/dist/util"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { NPC } from "../NPC"
 import { NPCTask } from "./NPCTask"

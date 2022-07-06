@@ -1,4 +1,4 @@
-import { Point } from "brigsby/lib"
+import { Point } from "brigsby/dist"
 import { Location } from "../Location"
 import { ElementComponent } from "./ElementComponent"
 import { ElementType } from "./Elements"

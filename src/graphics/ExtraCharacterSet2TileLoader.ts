@@ -1,5 +1,5 @@
-import { Point } from "brigsby/lib"
-import { SpriteAnimation, StaticSpriteSource } from "brigsby/lib/sprites"
+import { Point } from "brigsby/dist"
+import { SpriteAnimation, StaticSpriteSource } from "brigsby/dist/sprites"
 import { getImage } from "./Tilesets"
 
 const ROW_WIDTH = 160

@@ -1,4 +1,4 @@
-import { debug } from "brigsby/lib"
+import { debug } from "brigsby/dist"
 import { AudioUtils } from "./AudioUtils"
 
 export abstract class AudioPlayer {

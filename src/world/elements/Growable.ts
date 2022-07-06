@@ -1,4 +1,4 @@
-import { Component } from "brigsby/lib"
+import { Component } from "brigsby/dist"
 import { WorldTime } from "../WorldTime"
 
 export class Growable extends Component {
