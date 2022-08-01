@@ -71,13 +71,16 @@ export class MainMenuButton extends Component {
 
         const offset = Math.floor((this.width - text.length * TEXT_PIXEL_WIDTH) / 2)
 
+        const defaultColor = Color.GREEN_5
+        const hoverColor = text.toLowerCase().includes("brigsby") ? "#eb6b6f" : Color.WHITE
+
         return [
             new TextRender(
                 text.toUpperCase(),
                 this.position.plusX(-this.width / 2).plusX(offset),
                 TEXT_SIZE,
                 TEXT_FONT,
-                this.hovering ? Color.WHITE : Color.GREEN_5,
+                this.hovering ? hoverColor : defaultColor,
                 UIStateManager.UI_SPRITE_DEPTH
             ),
         ]

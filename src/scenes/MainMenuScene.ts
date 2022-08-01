@@ -254,32 +254,40 @@ export class MainMenuScene {
             )
         } else if (this.menu === Menu.CREDITS) {
             entities.splice(0) // don't show title and scene
-            const entryCount = 15 // UPDATE THIS IF YOU ADD MORE CREDITS
-            const top = new Point(
-                dimensions.x / 2,
-                dimensions.y / 2 -
-                    (entryCount * MainMenuButtonSection.LINE_SPACING) / 2 +
-                    TEXT_SIZE / 2
+            const creditEntries: [credit: string, fn: () => void][] = [
+                ["a game by Tyler Bonnell", link("ty.pizza/")],
+                null,
+                ["add'l art: Robert Norenberg", link("0x72.pl/")],
+                ["           Cael Johnson    ", link("caeljohnson.artstation.com/")],
+                ["           Kenney          ", link("kenney.nl/")],
+                ["           Nanner          ", link("www.pixilart.com/nanner")],
+                ["    music: Juhani Junkala  ", link("juhanijunkala.com/")],
+                ["           Brent Bunn      ", link("bertn1991.newgrounds.com/")],
+                ["           Playonloop.com  ", link("playonloop.com/")],
+                ["    sound: BurghRecords    ", link("www.edinburghrecords.com/")],
+                ["           Antoine Goumain ", link("antoinegoumain.fr")],
+                ["       qa: Lane Van Elderen", link("lane.computer/")],
+                null,
+                ["made with brigsby!", link("brigsby.js.org/")],
+                null,
+                ["back", () => this.render(Menu.ROOT)],
+            ]
+            const section = new MainMenuButtonSection(
+                new Point(
+                    dimensions.x / 2,
+                    dimensions.y / 2 -
+                        (creditEntries.length * MainMenuButtonSection.LINE_SPACING) / 2 +
+                        TEXT_SIZE / 2
+                )
             )
-            entities.push(
-                new MainMenuButtonSection(top)
-                    .add("code & art: Tyler Bonnell   ", link("ty.pizza/"))
-                    .add(" add'l art: Robert Norenberg", link("0x72.pl/"))
-                    .add("            Cael Johnson    ", link("caeljohnson.artstation.com/"))
-                    .add("            Kenney          ", link("kenney.nl/"))
-                    .add("            Nanner          ", link("www.pixilart.com/nanner"))
-                    .add("     music: Juhani Junkala  ", link("juhanijunkala.com/"))
-                    .add("            Brent Bunn      ", link("bertn1991.newgrounds.com/"))
-                    .add("            Playonloop.com  ", link("playonloop.com/"))
-                    .add("     sound: BurghRecords    ", link("www.edinburghrecords.com/"))
-                    .add("            Antoine Goumain ", link("antoinegoumain.fr"))
-                    .add("        qa: Lane Van Elderen", link("lane.computer/"))
-                    .addLineBreak()
-                    .add("made with brigsby!", link("brigsby.js.org/"))
-                    .addLineBreak()
-                    .add("back", () => this.render(Menu.ROOT))
-                    .getEntity()
-            )
+            creditEntries.forEach((credit) => {
+                if (credit) {
+                    section.add(...credit)
+                } else {
+                    section.addLineBreak()
+                }
+            })
+            entities.push(section.getEntity())
         }
 
         // Always update the controls entity first
