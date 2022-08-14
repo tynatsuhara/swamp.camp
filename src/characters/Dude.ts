@@ -465,6 +465,13 @@ export class Dude extends Component implements DialogueSource {
         return this.conditions.some((c) => c.condition === condition)
     }
 
+    accelerateConditionExpiration(condition: Condition, skipDuration: number) {
+        const c = this.conditions.find((c) => c.condition === condition)
+        if (c?.expiration) {
+            c.expiration -= skipDuration
+        }
+    }
+
     get isAlive() {
         return this._health > 0
     }
@@ -784,7 +791,7 @@ export class Dude extends Component implements DialogueSource {
                 ) < 5) ||
                 element?.entity?.getComponent(Burnable)?.isBurning)
         ) {
-            this.addCondition(Condition.ON_FIRE, 1000 + Math.random() * 1000)
+            this.addCondition(Condition.ON_FIRE, 2000 + Math.random() * 2000)
         }
 
         const verticalMovement = this.getVerticalMovement(elapsedTimeMillis)
@@ -908,6 +915,7 @@ export class Dude extends Component implements DialogueSource {
         }
         this.canJumpOrRoll = false
         this.doRoll()
+        this.accelerateConditionExpiration(Condition.ON_FIRE, 500)
         for (let i = 0; i < 3; i++) {
             setTimeout(() => {
                 StepSounds.singleFootstepSound(this, 2)
