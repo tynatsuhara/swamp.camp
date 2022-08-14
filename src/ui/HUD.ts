@@ -1,9 +1,9 @@
 import { Entity, Point } from "brigsby/dist"
-import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
+import { SpriteComponent, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Condition } from "../characters/Condition"
 import { Dude } from "../characters/Dude"
 import { Player } from "../characters/Player"
-import { ImageFilters } from "../graphics/ImageFilters"
+import { ImageFilter, ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { Color } from "./Color"
@@ -13,7 +13,20 @@ import { MiniMap } from "./MiniMap"
 import { OffScreenIndicatorManager } from "./OffScreenIndicatorManager"
 import { UIStateManager } from "./UIStateManager"
 
-const POISONED_HEART_FILTER = ImageFilters.recolor([Color.RED_3, Color.GREEN_6])
+type HeartFilter = "default" | "poisoned"
+const HEART_COLOR_FILTER: Record<HeartFilter, ImageFilter> = {
+    default: (img) => img,
+    poisoned: ImageFilters.recolor([Color.RED_3, Color.GREEN_6]),
+}
+
+const getFilteredVariants = (
+    source: StaticSpriteSource
+): Record<HeartFilter, StaticSpriteSource> => {
+    return Object.keys(HEART_COLOR_FILTER).reduce((acc, cur) => {
+        acc[cur] = source.filtered(HEART_COLOR_FILTER[cur])
+        return acc
+    }, {}) as Record<HeartFilter, StaticSpriteSource>
+}
 
 export class HUD {
     static get instance() {
@@ -27,10 +40,12 @@ export class HUD {
     private readonly offScreenIndicatorManager = new OffScreenIndicatorManager()
     readonly miniMap = new Entity().addComponent(new MiniMap())
 
-    private readonly fullHeart = Tilesets.instance.dungeonCharacters.getTileSource("ui_heart_full")
-    private readonly fullHeartPoisoned = this.fullHeart.filtered(POISONED_HEART_FILTER)
-    private readonly halfHeart = Tilesets.instance.dungeonCharacters.getTileSource("ui_heart_half")
-    private readonly halfHeartPoisoned = this.halfHeart.filtered(POISONED_HEART_FILTER)
+    private readonly halfHeartSprites: Record<string, StaticSpriteSource> = getFilteredVariants(
+        Tilesets.instance.dungeonCharacters.getTileSource("ui_heart_half")
+    )
+    private readonly fullHeartSprites: Record<string, StaticSpriteSource> = getFilteredVariants(
+        Tilesets.instance.dungeonCharacters.getTileSource("ui_heart_full")
+    )
 
     // used for determining what should be updated
     private lastHealthCount = 0
@@ -79,13 +94,18 @@ export class HUD {
         }
         this.lastHealthCount = health
         this.lastMaxHealthCount = maxHealth
-
         this.heartsEntity = new Entity()
-
         const heartOffset = new Point(16, 0)
-        const poisoned = Player.instance.dude.hasCondition(Condition.POISONED)
-        const full = poisoned ? this.fullHeartPoisoned : this.fullHeart
-        const half = poisoned ? this.halfHeartPoisoned : this.halfHeart
+
+        const filter: HeartFilter = (() => {
+            if (Player.instance.dude.hasCondition(Condition.POISONED)) {
+                return "poisoned"
+            }
+            return "default"
+        })()
+
+        const full = this.fullHeartSprites[filter]
+        const half = this.halfHeartSprites[filter]
         const empty = Tilesets.instance.dungeonCharacters.getTileSource("ui_heart_empty")
         const result = []
 
