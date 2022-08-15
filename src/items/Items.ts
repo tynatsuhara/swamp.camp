@@ -183,7 +183,7 @@ export const ITEM_METADATA_MAP = {
         displayName: "Weak medicine",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("potion1"),
         stackLimit: 1,
-        consumable: ["drink", () => Player.instance.dude.heal(2)],
+        consumable: ["drink", () => Player.instance.dude.addCondition(Condition.HEALING, 10_000)],
     }),
     [Item.HEART_CONTAINER]: new ItemMetadata({
         displayName: "Heart container",
