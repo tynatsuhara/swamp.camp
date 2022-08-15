@@ -63,8 +63,6 @@ export class MainMenuScene {
     }
 
     reset() {
-        window.document.title = `SWAMP CAMP`
-
         Player.instance = undefined
 
         // TODO: this isn't fully effective
