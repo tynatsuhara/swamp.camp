@@ -63,9 +63,9 @@ export class Player extends Component {
 
         this.checkIsOffMap(updateData)
 
-        // TODO: Make non-players have the ability to heal
+        // TODO: Move to the same code as other conditional effects
         if (this.dude.hasCondition(Condition.HEALING)) {
-            this.dude.heal(updateData.elapsedTimeMillis / 6500)
+            this.dude.heal(updateData.elapsedTimeMillis / 3500)
         }
         const possibleInteractable = this.updateInteractables(updateData)
 

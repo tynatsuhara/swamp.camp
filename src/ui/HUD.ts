@@ -6,6 +6,7 @@ import { Player } from "../characters/Player"
 import { ImageFilter, ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
+import { WorldTime } from "../world/WorldTime"
 import { Color } from "./Color"
 import { Cursor } from "./Cursor"
 import { LocationTransition } from "./LocationTransition"
@@ -88,7 +89,6 @@ export class HUD {
 
     private updateHearts(health: number, maxHealth: number) {
         this.heartsEntity = new Entity()
-        const heartOffset = new Point(16, 0)
 
         const filter: HeartFilter = (() => {
             if (debug.godMode) {
@@ -106,38 +106,38 @@ export class HUD {
         const empty = Tilesets.instance.dungeonCharacters.getTileSource("ui_heart_empty")
         const result = []
 
+        const getHeartPosition = (i: number) => {
+            let pos = this.offset.plus(new Point(16, 0).times(i))
+
+            if (filter === "healing") {
+                const speed = 115
+                const range = 1
+                const time = WorldTime.instance.time
+                const offset = range / 2 + range * Math.sin(Math.floor(time / speed) + i)
+                pos = pos.plusY(Math.floor(offset))
+            }
+
+            return pos
+        }
+
         const fullHearts = Math.floor(health)
         for (let i = 0; i < fullHearts; i++) {
-            result.push(
-                new SpriteComponent(
-                    full,
-                    new SpriteTransform(this.offset.plus(heartOffset.times(i)))
-                )
-            )
+            result.push(new SpriteComponent(full, new SpriteTransform(getHeartPosition(i))))
         }
 
         if (health % 1 > 0.5) {
             result.push(
-                new SpriteComponent(
-                    full,
-                    new SpriteTransform(this.offset.plus(heartOffset.times(result.length)))
-                )
+                new SpriteComponent(full, new SpriteTransform(getHeartPosition(result.length)))
             )
         } else if (health % 1 > 0) {
             result.push(
-                new SpriteComponent(
-                    half,
-                    new SpriteTransform(this.offset.plus(heartOffset.times(result.length)))
-                )
+                new SpriteComponent(half, new SpriteTransform(getHeartPosition(result.length)))
             )
         }
 
         while (result.length < maxHealth) {
             result.push(
-                new SpriteComponent(
-                    empty,
-                    new SpriteTransform(this.offset.plus(heartOffset.times(result.length)))
-                )
+                new SpriteComponent(empty, new SpriteTransform(getHeartPosition(result.length)))
             )
         }
 
