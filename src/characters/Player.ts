@@ -12,6 +12,7 @@ import { CampLocationGenerator } from "../world/CampLocationGenerator"
 import { Interactable } from "../world/elements/Interactable"
 import { camp, here, LocationManager } from "../world/LocationManager"
 import { WorldTime } from "../world/WorldTime"
+import { Condition } from "./Condition"
 import { Dude } from "./Dude"
 import { DudeSpawner } from "./DudeSpawner"
 
@@ -62,8 +63,10 @@ export class Player extends Component {
 
         this.checkIsOffMap(updateData)
 
-        // TODO: Should we remove auto-healing?
-        this.dude.heal(updateData.elapsedTimeMillis / 6500)
+        // TODO: Make non-players have the ability to heal
+        if (this.dude.hasCondition(Condition.HEALING)) {
+            this.dude.heal(updateData.elapsedTimeMillis / 6500)
+        }
         const possibleInteractable = this.updateInteractables(updateData)
 
         // Determine player movement

@@ -2,6 +2,7 @@ export enum Condition {
     ON_FIRE,
     POISONED,
     BLACK_LUNG,
+    HEALING,
 }
 
 export type ActiveCondition = {

@@ -1,4 +1,4 @@
-import { Entity, Point } from "brigsby/dist"
+import { debug, Entity, Point } from "brigsby/dist"
 import { SpriteComponent, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Condition } from "../characters/Condition"
 import { Dude } from "../characters/Dude"
@@ -13,10 +13,12 @@ import { MiniMap } from "./MiniMap"
 import { OffScreenIndicatorManager } from "./OffScreenIndicatorManager"
 import { UIStateManager } from "./UIStateManager"
 
-type HeartFilter = "default" | "poisoned"
+type HeartFilter = "default" | "poisoned" | "god" | "healing"
 const HEART_COLOR_FILTER: Record<HeartFilter, ImageFilter> = {
     default: (img) => img,
     poisoned: ImageFilters.recolor([Color.RED_3, Color.GREEN_6]),
+    god: ImageFilters.recolor([Color.RED_3, Color.WHITE]),
+    healing: ImageFilters.recolor([Color.RED_3, Color.PINK_3]),
 }
 
 const getFilteredVariants = (
@@ -46,10 +48,6 @@ export class HUD {
     private readonly fullHeartSprites: Record<string, StaticSpriteSource> = getFilteredVariants(
         Tilesets.instance.dungeonCharacters.getTileSource("ui_heart_full")
     )
-
-    // used for determining what should be updated
-    private lastHealthCount = 0
-    private lastMaxHealthCount = 0
 
     readonly locationTransition = new Entity().addComponent(new LocationTransition())
 
@@ -89,17 +87,16 @@ export class HUD {
     }
 
     private updateHearts(health: number, maxHealth: number) {
-        if (this.lastHealthCount === health && this.lastMaxHealthCount === maxHealth) {
-            return
-        }
-        this.lastHealthCount = health
-        this.lastMaxHealthCount = maxHealth
         this.heartsEntity = new Entity()
         const heartOffset = new Point(16, 0)
 
         const filter: HeartFilter = (() => {
-            if (Player.instance.dude.hasCondition(Condition.POISONED)) {
+            if (debug.godMode) {
+                return "god"
+            } else if (Player.instance.dude.hasCondition(Condition.POISONED)) {
                 return "poisoned"
+            } else if (Player.instance.dude.hasCondition(Condition.HEALING)) {
+                return "healing"
             }
             return "default"
         })()
