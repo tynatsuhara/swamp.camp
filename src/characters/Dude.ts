@@ -617,7 +617,10 @@ export class Dude extends Component implements DialogueSource {
         // play death cutscene if applicable
         if (this.type === DudeType.PLAYER) {
             if (CutsceneManager.instance.isCutsceneActive(IntroCutscene)) {
-                setTimeout(() => this.revive(), 1000 + Math.random() * 1000)
+                setTimeout(() => {
+                    this.revive()
+                    this.addCondition(Condition.HEALING, 10_000)
+                }, 1000 + Math.random() * 1000)
             } else {
                 CutsceneManager.instance.startCutscene(new DeathCutscene())
             }
@@ -698,9 +701,13 @@ export class Dude extends Component implements DialogueSource {
         this.knockIntervalCallback = requestAnimationFrame(knock)
     }
 
-    heal(amount: number) {
+    heal(amount?: number) {
         if (this.isAlive) {
-            this._health = Math.min(this.maxHealth, this.health + amount)
+            if (amount === undefined) {
+                this._health = this.maxHealth
+            } else {
+                this._health = Math.min(this.maxHealth, this.health + amount)
+            }
         }
     }
 

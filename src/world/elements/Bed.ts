@@ -3,6 +3,7 @@ import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
 import { DialogueSource } from "../../characters/dialogue/Dialogue"
 import { BED_DIALOGUE } from "../../characters/dialogue/ItemDialogues"
+import { Player } from "../../characters/Player"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
 import { saveManager } from "../../SaveManager"
@@ -77,6 +78,7 @@ export class Bed extends Component implements DialogueSource {
         const pause = 1200
         HUD.instance.locationTransition.transition(() => {
             WorldTime.instance.fastForward(duration)
+            Player.instance.dude.heal()
             setTimeout(() => saveManager.autosave(), pause + 500)
         }, pause)
     }
