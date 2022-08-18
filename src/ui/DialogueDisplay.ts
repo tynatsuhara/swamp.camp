@@ -9,6 +9,7 @@ import {
     getDialogue,
     NextDialogue,
 } from "../characters/dialogue/Dialogue"
+import { Dude } from "../characters/Dude"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
@@ -116,7 +117,11 @@ export class DialogueDisplay extends Component {
         this.dialogue = getDialogue(dialogueSource.dialogue)
         this.lineIndex = 0
 
-        const playTalkSound = () => startTalkingSounds(this.dialogue.lines[this.lineIndex].length)
+        const playTalkSound = () => {
+            if (dialogueSource instanceof Dude) {
+                startTalkingSounds(this.dialogue.lines[this.lineIndex].length)
+            }
+        }
         playTalkSound()
 
         this.lines = this.dialogue.lines.map(
