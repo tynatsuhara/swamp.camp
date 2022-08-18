@@ -227,7 +227,7 @@ export class InventoryDisplay extends Component {
                 this.checkSetHotKey(stack, updateData)
             }
             if (!!item.consumable) {
-                const [verb, consumeFn] = item.consumable
+                const { verb, fn: consumeFn } = item.consumable
                 actions.push({
                     verb,
                     actionFn: () => {

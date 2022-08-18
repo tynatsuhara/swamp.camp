@@ -1,6 +1,7 @@
-import { Entity, Point } from "brigsby/dist"
+import { assets, Entity, Point } from "brigsby/dist"
 import { Collider } from "brigsby/dist/collision"
 import { SpriteSource, StaticSpriteSource } from "brigsby/dist/sprites"
+import { Sounds } from "../audio/Sounds"
 import { Condition } from "../characters/Condition"
 import { Player } from "../characters/Player"
 import { ShieldType } from "../characters/weapons/ShieldType"
@@ -65,6 +66,8 @@ export enum Item {
 
 window["Item"] = Item
 
+type Consumable = { verb: string; fn: () => void }
+
 export class ItemMetadata {
     readonly displayName: string
     readonly droppedIconSupplier?: () => SpriteSource
@@ -73,7 +76,7 @@ export class ItemMetadata {
     readonly element?: ElementType
     readonly equippableWeapon?: WeaponType
     readonly equippableShield?: ShieldType
-    readonly consumable?: [string, () => void]
+    readonly consumable?: Consumable
 
     // TODO maybe make this a builder
     constructor({
@@ -93,7 +96,7 @@ export class ItemMetadata {
         element?: ElementType
         equippableWeapon?: WeaponType
         equippableShield?: ShieldType
-        consumable?: [string, () => void]
+        consumable?: Consumable
     }) {
         this.displayName = displayName
         this.droppedIconSupplier = droppedIconSupplier
@@ -105,6 +108,12 @@ export class ItemMetadata {
         this.consumable = consumable
     }
 }
+
+const SOUNDS: { [key: string]: [string, number] } = {
+    drink: ["/audio/rpg/inventory/bottle.wav", 0.2],
+    eat: ["/audio/rpg/inventory/bottle.wav", 0.2],
+}
+assets.loadAudioFiles(Object.values(SOUNDS).map((s) => s[0]))
 
 // Data that doesn't get serialized (TODO make builder pattern)
 export const ITEM_METADATA_MAP = {
@@ -154,9 +163,9 @@ export const ITEM_METADATA_MAP = {
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("mushroom"),
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("mushroom"),
         element: ElementType.MUSHROOM,
-        consumable: [
-            "eat",
-            () => {
+        consumable: {
+            verb: "eat",
+            fn: () => {
                 Player.instance.dude.heal(1)
                 if (Math.random() < 0.25) {
                     Player.instance.dude.addCondition(
@@ -165,7 +174,7 @@ export const ITEM_METADATA_MAP = {
                     )
                 }
             },
-        ],
+        },
     }),
     [Item.CHEST]: new ItemMetadata({
         displayName: "Chest",
@@ -183,7 +192,13 @@ export const ITEM_METADATA_MAP = {
         displayName: "Weak medicine",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("potion1"),
         stackLimit: 1,
-        consumable: ["drink", () => Player.instance.dude.addCondition(Condition.HEALING, 10_000)],
+        consumable: {
+            verb: "drink",
+            fn: () => {
+                Player.instance.dude.addCondition(Condition.HEALING, 10_000)
+                Sounds.play(...SOUNDS.drink)
+            },
+        },
     }),
     [Item.HEART_CONTAINER]: new ItemMetadata({
         displayName: "Heart container",
@@ -194,18 +209,30 @@ export const ITEM_METADATA_MAP = {
         displayName: "Antidote",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("potion3"),
         stackLimit: 1,
-        consumable: ["drink", () => Player.instance.dude.removeCondition(Condition.POISONED)],
+        consumable: {
+            verb: "drink",
+            fn: () => {
+                Player.instance.dude.removeCondition(Condition.POISONED)
+                Sounds.play(...SOUNDS.drink)
+            },
+        },
     }),
     [Item.MEAT]: new ItemMetadata({
         displayName: "Meat",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("meat1"),
-        consumable: ["eat", () => Player.instance.dude.heal(1)],
+        consumable: {
+            verb: "eat",
+            fn: () => Player.instance.dude.heal(1),
+        },
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("meat1"),
     }),
     [Item.BLACKBERRIES]: new ItemMetadata({
         displayName: "Berries",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("berries"),
-        consumable: ["eat", () => Player.instance.dude.heal(0.25)],
+        consumable: {
+            verb: "eat",
+            fn: () => Player.instance.dude.heal(0.25),
+        },
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("berries"),
     }),
 
