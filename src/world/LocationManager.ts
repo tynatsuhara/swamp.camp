@@ -32,21 +32,28 @@ export class LocationManager {
 
     constructor() {
         window["locationManager"] = this
-        window["showDudes"] = () => {
-            const ids = {}
-            here()
-                .getDudes()
-                .forEach((d) => {
-                    const type = DudeType[d.type]
-                    ids[type] = ids[type] || []
-                    ids[type].push(d.uuid)
-                })
-            console.log(ids)
-        }
-        window["bulldoze"] = (type: ElementType) => {
-            here()
-                .getElementsOfType(type)
-                .forEach((el) => here().removeElement(el))
+        window["here"] = {
+            listDudes: () => {
+                const ids = {}
+                here()
+                    .getDudes()
+                    .forEach((d) => {
+                        const type = DudeType[d.type]
+                        ids[type] = ids[type] || []
+                        ids[type].push(d.uuid)
+                    })
+                console.log(ids)
+            },
+
+            bulldoze: (type: ElementType) => {
+                here()
+                    .getElementsOfType(type)
+                    .forEach((el) => here().removeElement(el))
+            },
+
+            listElements: (type: ElementType) => {
+                console.log(here().getElementsOfType(type))
+            },
         }
     }
 
