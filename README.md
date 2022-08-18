@@ -50,8 +50,8 @@ sound effects & music by:
 
 tentative sound effects & music:
 
--   https://opengameart.org/content/talking-synthesizer
--   https://opengameart.org/content/swishes-sound-pack
+-   https://opengameart.org/content/talking-synthesizer (cc-by 4.0)
+-   https://opengameart.org/content/swishes-sound-pack (cc0)
 -   https://opengameart.org/content/voices-sound-effects-library
 
 # art

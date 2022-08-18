@@ -1,6 +1,7 @@
 import { Component, Entity, Point, UpdateData } from "brigsby/dist"
 import { BasicRenderComponent } from "brigsby/dist/renderer"
 import { NineSlice } from "brigsby/dist/sprites"
+import { startTalkingSounds } from "../audio/Talking"
 import {
     DialogueInstance,
     DialogueSource,
@@ -114,10 +115,17 @@ export class DialogueDisplay extends Component {
         this.dialogueSource = dialogueSource
         this.dialogue = getDialogue(dialogueSource.dialogue)
         this.lineIndex = 0
+
+        const playTalkSound = () => startTalkingSounds(this.dialogue.lines[this.lineIndex].length)
+        playTalkSound()
+
         this.lines = this.dialogue.lines.map(
             (l, i) =>
                 new TextTyper(l, () => {
                     this.lineIndex = Math.min(this.lineIndex + 1, this.lines.length)
+                    if (this.lineIndex < this.lines.length) {
+                        playTalkSound()
+                    }
                 })
         )
         this.optionsPopupTime = Number.MAX_SAFE_INTEGER

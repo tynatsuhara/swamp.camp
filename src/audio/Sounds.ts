@@ -9,7 +9,7 @@ export class Sounds {
     /**
      * @returns a promise that will resolve when the sound starts playing
      */
-    static play(path: string, volume: number = 1): Promise<void> {
+    static play(path: string, volume: number = 1): Promise<HTMLAudioElement> {
         const audio = assets.getAudioByFileName(path)
 
         if (!audio?.src) {
@@ -22,7 +22,7 @@ export class Sounds {
         return new Promise((resolve) => {
             audio.oncanplay = () => {
                 audio.play()
-                resolve()
+                resolve(audio)
             }
         })
     }
