@@ -30,9 +30,9 @@ NOTE: Cloudflare pages has a limit of 25MB per file.
 
 additional art by:
 
--   https://0x72.itch.io/dungeontileset-ii (robert norenberg)
--   https://superdark.itch.io/enchanted-forest-characters (cael johnson)
--   https://superdark.itch.io/16x16-free-npc-pack
+-   https://0x72.itch.io/dungeontileset-ii (robert norenberg, cc0)
+-   https://superdark.itch.io/enchanted-forest-characters (cael johnson, cc0)
+-   https://superdark.itch.io/16x16-free-npc-pack (cael johnson, cc0)
 -   https://anritool.itch.io/cr-tileset (cc0)
 -   https://kenney.nl/ (cc0)
 -   https://opengameart.org/content/explosion-set-1-m484-games (cc0)
@@ -46,6 +46,7 @@ sound effects & music by:
 -   https://opengameart.org/content/different-steps-on-wood-stone-leaves-gravel-and-mud (cc0)
 -   https://freesound.org/people/yewbic/packs/2122/ (cc0)
 -   https://opengameart.org/content/battle-march-epic-orchestral-music-loop (playonloop.com)
+-   https://opengameart.org/content/nature-sounds-pack (cc-by 4.0)
 
 tentative sound effects & music:
 
