@@ -12,7 +12,7 @@ export class Sounds {
     static play(path: string, volume: number = 1): Promise<void> {
         const audio = assets.getAudioByFileName(path)
 
-        if (!audio) {
+        if (!audio?.src) {
             console.log(`audio file [${path}] not loaded`)
             return
         }
