@@ -213,7 +213,6 @@ const fetchNpcDialogue = (): DialogueInstance => {
 
 const adjustTaxRateDialogue = (): DialogueInstance => {
     const currentRate = saveManager.getState().taxRate
-    console.log("current rate " + currentRate)
     const rateText = ["at zero", "low", "moderate", "high", "very high"]
 
     const setTaxRateOption = (taxRate: TaxRate) =>
