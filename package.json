@@ -10,11 +10,11 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/tylerbonnell/quest.git"
+        "url": "git+https://github.com/tylerbonnell/swamp.camp.git"
     },
     "author": "Tyler Bonnell",
     "bugs": {
-        "url": "https://github.com/tylerbonnell/quest/issues"
+        "url": "https://github.com/tylerbonnell/swamp.camp/issues"
     },
     "homepage": "https://swamp.camp",
     "devDependencies": {
