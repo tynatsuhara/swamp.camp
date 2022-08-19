@@ -2,7 +2,7 @@ import { assets } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
 import { Sounds } from "./Sounds"
 
-const VOLUME = 0.7
+const VOLUME = 0.4
 
 const SHORT = [17, 18, 19, 21, 6, 4]
 const MEDIUM = [0, 16, 20]
