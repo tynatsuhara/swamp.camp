@@ -264,6 +264,7 @@ export class MainMenuScene {
                 ["    sound: BurghRecords    ", link("www.edinburghrecords.com")],
                 ["           Antoine Goumain ", link("antoinegoumain.fr")],
                 ["           Thor Arisland   ", link("tcarisland.no")],
+                // ["           Morten SΘegaard ", link("twitter.com/littlerobotsfx")],  // TODO if we use the "voices" pack
                 null,
                 ["made with brigsby!", link("brigsby.js.org/")],
                 null,

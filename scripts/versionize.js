@@ -10,6 +10,8 @@ const crypto = require("crypto")
 const FILE_TYPES = [".png"]
 const STATICS_DIR = path.join(__dirname, "../static/")
 
+const LAST_COMMIT = require("child_process").execSync("git rev-parse HEAD").toString().trim()
+
 /**
  * @returns all files in the directory as a promise
  */
@@ -47,9 +49,8 @@ Promise.resolve(hashesPromise).then((hashPairs) => {
     readFile(path.join(STATICS_DIR, "index_template.html"), "utf8").then((template) => {
         const output = template
             // inject the version map into the window scope via the template
-            .replace('"{SWAMP_CAMP_ASSETS}"', JSON.stringify(map))
-            // use build time as the cache key for the JS bundle
-            .replace("{JS_BUNDLE_HASH}", Date.now())
+            .replaceAll('"{SWAMP_CAMP_ASSETS}"', JSON.stringify(map))
+            .replaceAll("{JS_BUNDLE_HASH}", LAST_COMMIT)
 
         writeFile(path.join(STATICS_DIR, "index.html"), output, "utf8")
     })
