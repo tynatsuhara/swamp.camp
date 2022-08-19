@@ -20,8 +20,6 @@ export const pixelPtToTilePt = (pixelPt: Point) => {
     return pixelPt.apply((n) => Math.floor(n / TILE_SIZE))
 }
 
-const GLOBAL_VERSION_MAP_KEY = "SWAMP_CAMP_ASSETS"
-
 // loaded before the the main menu is rendered
 export const getFilesToLoadForMainMenu = () => {
     return [
@@ -34,7 +32,7 @@ export const getFilesToLoadForMainMenu = () => {
 
 // loaded before the main menu will put the player into the game scene
 export const getFilesToLoadForGame = () => {
-    return Object.keys(window[GLOBAL_VERSION_MAP_KEY]).map(versionize)
+    return Object.keys(window.SWAMP_CAMP.assets).map(versionize)
 }
 
 // returns the image asset after applying the versionized hash
@@ -43,7 +41,7 @@ export const getImage = (fileName: string) => {
 }
 
 const versionize = (fileName: string) => {
-    const hash = window[GLOBAL_VERSION_MAP_KEY][fileName]
+    const hash = window.SWAMP_CAMP.assets[fileName]
     return `${fileName}?q=${hash}`
 }
 

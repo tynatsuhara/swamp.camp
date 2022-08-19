@@ -3,6 +3,15 @@ import { getFilesToLoadForMainMenu } from "./graphics/Tilesets"
 import { SwampCampGame } from "./SwampCampGame"
 import { TEXT_FONT } from "./ui/Text"
 
+declare global {
+    interface Window {
+        SWAMP_CAMP: {
+            version: string
+            assets: { [key: string]: string }
+        }
+    }
+}
+
 Promise.all([
     // load all required assets
     assets.loadImageFiles(getFilesToLoadForMainMenu()),

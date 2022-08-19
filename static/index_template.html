@@ -27,8 +27,10 @@
                 window.location.href = "/chrome_warning"
             }
 
-            window["SWAMP_CAMP_ASSETS"] = "{SWAMP_CAMP_ASSETS}"
-            window["SWAMP_CAMP_VERSION"] = "{JS_BUNDLE_HASH}"
+            window["SWAMP_CAMP"] = {
+                version: "{JS_BUNDLE_HASH}",
+                assets: "{SWAMP_CAMP_ASSETS}",
+            }
         </script>
         <script src="app.js?q={JS_BUNDLE_HASH}" type="text/javascript"></script>
         <link rel="stylesheet" type="text/css" href="index.css" />
