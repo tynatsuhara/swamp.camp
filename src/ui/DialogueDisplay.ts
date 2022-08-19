@@ -137,13 +137,15 @@ export class DialogueDisplay extends Component {
     }
 
     private renderNextLine(line: string, options: number) {
-        const topOffset = 2
         const margin = 12
         const width = DialogueDisplay.TEXT_BOX_WIDTH - margin * 2
         const lineSpacing = 4
 
-        const heightOfText =
-            formatTextRows(line, width).length * (TEXT_SIZE + lineSpacing) + margin * 2
+        const textRows = formatTextRows(line, width).length
+        const topOffset = textRows > 0 ? 2 : 0
+        const optionsPadding = textRows > 0 && options > 0 ? 2 : 0
+
+        const heightOfText = textRows * (TEXT_SIZE + lineSpacing) + margin * 2 + optionsPadding
         const heightOfOptions = options * DialogueDisplay.BUTTON_HEIGHT
         const dimensions = new Point(DialogueDisplay.TEXT_BOX_WIDTH, heightOfText + heightOfOptions)
 
@@ -183,7 +185,7 @@ export class DialogueDisplay extends Component {
             Camera.instance.dimensions.y -
                 DialogueDisplay.PADDING -
                 (this.dialogue.options.length * DialogueDisplay.BUTTON_HEIGHT) / 2 -
-                11
+                12
         )
 
         this.optionsEntity = ButtonsMenu.render(

@@ -67,7 +67,9 @@ export const formatTextRows = (text: string, width: number) => {
                 row = word
             }
         }
-        rows.push(row)
+        if (row.length > 0) {
+            rows.push(row)
+        }
     }
 
     return rows

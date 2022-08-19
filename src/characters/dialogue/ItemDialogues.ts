@@ -80,6 +80,7 @@ export const ITEM_DIALOGUES: DialogueSet = {
             prompt = `The fire will burn for at least ${
                 (logCount - 1) * Campfire.LOG_DURATION_HOURS
             } more hours. You can add up to ${logsYouCanAdd} more logs right now.`
+            prompt = ""
         }
 
         const options = [
