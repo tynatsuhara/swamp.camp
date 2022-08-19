@@ -14,6 +14,7 @@ body {
     -moz-osx-font-smoothing: none;
     cursor: url(cursor_3x.png), default;
     overflow: hidden;
+    font-variant-ligatures: none;
 }
 
 #column {
