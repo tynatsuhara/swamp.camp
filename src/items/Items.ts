@@ -111,7 +111,7 @@ export class ItemMetadata {
 
 const SOUNDS: { [key: string]: [string, number] } = {
     drink: ["/audio/rpg/inventory/bottle.wav", 0.2],
-    eat: ["/audio/rpg/inventory/bottle.wav", 0.2],
+    eat: ["/audio/rpg/NPC/beetle/bite-small.wav", 0.3],
 }
 assets.loadAudioFiles(Object.values(SOUNDS).map((s) => s[0]))
 
@@ -167,6 +167,7 @@ export const ITEM_METADATA_MAP = {
             verb: "eat",
             fn: () => {
                 Player.instance.dude.heal(1)
+                Sounds.play(...SOUNDS.eat)
                 if (Math.random() < 0.25) {
                     Player.instance.dude.addCondition(
                         Condition.POISONED,
@@ -222,7 +223,10 @@ export const ITEM_METADATA_MAP = {
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("meat1"),
         consumable: {
             verb: "eat",
-            fn: () => Player.instance.dude.heal(1),
+            fn: () => {
+                Player.instance.dude.heal(1)
+                Sounds.play(...SOUNDS.eat)
+            },
         },
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("meat1"),
     }),
@@ -231,7 +235,9 @@ export const ITEM_METADATA_MAP = {
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("berries"),
         consumable: {
             verb: "eat",
-            fn: () => Player.instance.dude.heal(0.25),
+            fn: () => {
+                Player.instance.dude.heal(0.25), Sounds.play(...SOUNDS.eat)
+            },
         },
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("berries"),
     }),
