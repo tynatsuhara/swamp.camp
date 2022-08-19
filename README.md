@@ -37,6 +37,10 @@ additional art by:
 -   https://kenney.nl/ (cc0)
 -   https://opengameart.org/content/explosion-set-1-m484-games (cc0)
 
+fonts:
+
+-   https://www.1001fonts.com/press-start-2p-font.html#license (free for commercial use)
+
 sound effects & music by:
 
 -   https://www.newgrounds.com/audio/listen/1017053 (brent bunn)
@@ -47,10 +51,10 @@ sound effects & music by:
 -   https://freesound.org/people/yewbic/packs/2122/ (cc0)
 -   https://opengameart.org/content/battle-march-epic-orchestral-music-loop (playonloop.com)
 -   https://opengameart.org/content/nature-sounds-pack (cc-by 4.0)
+-   https://opengameart.org/content/talking-synthesizer (cc-by 4.0)
 
 tentative sound effects & music:
 
--   https://opengameart.org/content/talking-synthesizer (cc-by 4.0)
 -   https://opengameart.org/content/swishes-sound-pack (cc0)
 -   https://opengameart.org/content/voices-sound-effects-library
 
