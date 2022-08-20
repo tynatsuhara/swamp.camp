@@ -73,6 +73,7 @@ export const ITEM_DIALOGUES: DialogueSet = {
             CANCEL_TEXT,
             () => new NextDialogue(CAMPFIRE_DIALOGUE, false)
         )
+        const hoursLeft = (logCount - 1) * Campfire.LOG_DURATION_HOURS
 
         const completeDialogue = (logsTransferred: number) => {
             return () => {
@@ -89,7 +90,7 @@ export const ITEM_DIALOGUES: DialogueSet = {
                 [
                     playerLogCount === 0
                         ? "You don't have any logs to add to the fire."
-                        : "The fire has the maximum amount of logs.",
+                        : "Adding any more logs to this fire would be dangerous.",
                 ],
                 DudeInteractIndicator.NONE,
                 exitOption
@@ -99,23 +100,21 @@ export const ITEM_DIALOGUES: DialogueSet = {
                 [
                     playerLogCount === 1
                         ? "You only have one log to add to the fire."
-                        : "You can fit one more log in the fire.",
+                        : "The fire is almost too big.",
                 ],
                 DudeInteractIndicator.NONE,
-                new DialogueOption("Add a log", completeDialogue(1)),
+                new DialogueOption("Add one log", completeDialogue(1)),
                 exitOption
             )
         }
 
         let prompt: string
         if (logCount === 1) {
-            prompt = `The fire will go out soon. You can add up to ${logsYouCanAdd} more logs right now.`
+            prompt = `The fire will go out soon.`
         } else if (logCount === 0) {
-            prompt = `Add logs to ignite the fire? You can add up to ${logsYouCanAdd} logs.`
+            prompt = `Add logs to ignite the fire?`
         } else {
-            prompt = `The fire will burn for at least ${
-                (logCount - 1) * Campfire.LOG_DURATION_HOURS
-            } more hours. You can add up to ${logsYouCanAdd} more logs right now.`
+            prompt = `The fire will burn for at least ${hoursLeft} more hours.`
         }
 
         const options = [
