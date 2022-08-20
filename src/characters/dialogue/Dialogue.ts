@@ -12,7 +12,13 @@ import { VILLAGER_DIALOGUE } from "./VillagerDialogue"
 export const EMPTY_DIALOGUE = "-"
 
 export class DialogueInstance {
-    readonly lines: string[]
+    private _lines: string[] | (() => string[])
+    get lines() {
+        if (typeof this._lines === "function") {
+            this._lines = this._lines()
+        }
+        return this._lines
+    }
     readonly next: () => void | NextDialogue
     readonly options: DialogueOption[]
     readonly indicator: string
@@ -26,12 +32,12 @@ export class DialogueInstance {
      *                If the function returns a Dialogue, that will then be prompted.
      */
     constructor(
-        lines: string[],
+        lines: string[] | (() => string[]),
         next: () => void | NextDialogue,
         options: DialogueOption[],
         indicator: string = DudeInteractIndicator.NONE
     ) {
-        this.lines = lines
+        this._lines = lines
         this.next = next
         this.options = options.filter((o) => !!o)
         this.indicator = indicator
@@ -40,7 +46,7 @@ export class DialogueInstance {
 
 // Shorthand functions for creating dialogue
 export const dialogueWithOptions = (
-    lines: string[],
+    lines: string[] | (() => string[]),
     indicator: string = DudeInteractIndicator.NONE,
     ...options: DialogueOption[]
 ): DialogueInstance => {
