@@ -90,7 +90,7 @@ export const ITEM_DIALOGUES: DialogueSet = {
                 [
                     playerLogCount === 0
                         ? "You don't have any logs to add to the fire."
-                        : "Adding any more logs to this fire would be dangerous.",
+                        : "Adding any more logs to the fire would be dangerous.",
                 ],
                 DudeInteractIndicator.NONE,
                 exitOption
