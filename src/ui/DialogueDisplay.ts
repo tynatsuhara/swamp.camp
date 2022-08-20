@@ -56,15 +56,23 @@ export class DialogueDisplay extends Component {
 
         const skipButtonClick = controls.isMenuClickDown() || controls.isInteractDown()
 
-        this.lineTypers[this.lineIndex].update(skipButtonClick, updateData.elapsedTimeMillis)
-        const line = this.lineTypers[this.lineIndex].getText()
+        const wasFinishedBeforeUpdate = this.lineTypers[this.lineIndex]?.isFinished
+        this.lineTypers[this.lineIndex]?.update(skipButtonClick, updateData.elapsedTimeMillis)
+        const line = this.lineTypers[this.lineIndex]?.getText()
 
         const showOptions =
-            this.lineTypers[this.lineIndex].isFinished &&
-            this.dialogue.options.length > 0 &&
-            this.lineIndex === this.lineTypers.length - 1
+            this.lineTypers.length === 0 ||
+            (this.lineTypers[this.lineIndex].isFinished &&
+                this.dialogue.options.length > 0 &&
+                this.lineIndex === this.lineTypers.length - 1)
 
-        if (!showOptions && this.lineIndex === this.dialogue.lines.length) {
+        if (
+            !showOptions &&
+            this.lineIndex === this.dialogue.lines.length - 1 &&
+            this.lineTypers[this.lineIndex].isFinished &&
+            skipButtonClick &&
+            wasFinishedBeforeUpdate
+        ) {
             this.completeSourceDialogue(this.dialogue.next)
             return
         }
@@ -75,6 +83,7 @@ export class DialogueDisplay extends Component {
 
         this.renderNextLine(
             line,
+            // allocate space for options even if showOptions=false (>= to account for no-typers case)
             this.lineIndex >= this.lineTypers.length - 1 ? this.dialogue.options.length : 0
         )
 
@@ -118,21 +127,21 @@ export class DialogueDisplay extends Component {
         this.dialogue = getDialogue(dialogueSource.dialogue)
         this.lineIndex = 0
 
-        const playTalkSound = () => {
-            if (dialogueSource instanceof Dude) {
-                startTalkingSounds(this.dialogue.lines[this.lineIndex].length)
-            }
-        }
-        playTalkSound()
-
         this.lineTypers = this.dialogue.lines.map(
             (l, i) =>
-                new TextTyper(l, () => {
-                    this.lineIndex = Math.min(this.lineIndex + 1, this.lineTypers.length - 1)
-                    if (this.lineIndex < this.lineTypers.length - 1) {
-                        playTalkSound()
+                new TextTyper(
+                    l,
+                    () => {
+                        if (this.lineIndex <= this.lineTypers.length && !l.startsWith("*")) {
+                        }
+                        this.lineIndex = Math.min(this.lineIndex + 1, this.lineTypers.length - 1)
+                    },
+                    () => {
+                        if (!l.startsWith("*") && dialogueSource instanceof Dude) {
+                            startTalkingSounds(this.dialogue.lines[this.lineIndex].length)
+                        }
                     }
-                })
+                )
         )
         this.optionsPopupTime = Number.MAX_SAFE_INTEGER
     }
@@ -142,7 +151,7 @@ export class DialogueDisplay extends Component {
         const width = DialogueDisplay.TEXT_BOX_WIDTH - margin * 2
         const lineSpacing = 4
 
-        const textRows = formatTextRows(line, width).length
+        const textRows = !line ? 0 : formatTextRows(line, width).length
         const topOffset = textRows > 0 ? 2 : 0
         const optionsPadding = textRows > 0 && options > 0 ? 2 : 0
 
@@ -160,19 +169,19 @@ export class DialogueDisplay extends Component {
             topLeft,
             dimensions
         )
-
         backgroundTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
-
-        const lines = formatText({
-            text: line,
-            position: topLeft.plus(new Point(margin, topOffset + margin)),
-            width,
-            alignment: TextAlign.CENTER,
-            lineSpacing,
-        })
-
         backgroundTiles.forEach((tile) => this.displayEntity.addComponent(tile))
-        this.displayEntity.addComponent(new BasicRenderComponent(...lines))
+
+        if (textRows > 0) {
+            const lines = formatText({
+                text: line,
+                position: topLeft.plus(new Point(margin, topOffset + margin)),
+                width,
+                alignment: TextAlign.CENTER,
+                lineSpacing,
+            })
+            this.displayEntity.addComponent(new BasicRenderComponent(...lines))
+        }
     }
 
     private renderOptions() {

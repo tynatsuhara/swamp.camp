@@ -31,10 +31,6 @@ export class DialogueInstance {
         options: DialogueOption[],
         indicator: string = DudeInteractIndicator.NONE
     ) {
-        if (lines.length === 0) {
-            // prevent renderer errors
-            lines.push("")
-        }
         this.lines = lines
         this.next = next
         this.options = options.filter((o) => !!o)

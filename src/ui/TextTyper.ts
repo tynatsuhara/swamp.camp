@@ -5,6 +5,7 @@ export class TextTyper {
 
     private text: string
     private onFinish: () => void
+    private onStart: () => void
 
     private letterTicker = 0
     private finishedPrinting = false
@@ -13,13 +14,17 @@ export class TextTyper {
         return this.finishedPrinting
     }
 
-    constructor(text: string, onFinish: () => void) {
+    constructor(text: string, onFinish: () => void, onStart: () => void = () => {}) {
         this.text = text
         this.onFinish = onFinish
+        this.onStart = onStart
     }
 
     update(skipButtonClick: boolean, elapsedTimeMillis: number) {
-        if (this.letterTicker !== 0 && skipButtonClick) {
+        if (this.letterTicker === 0) {
+            this.onStart()
+            this.onStart = () => {}
+        } else if (skipButtonClick) {
             if (this.finishedPrinting) {
                 this.onFinish()
                 this.onFinish = () => {}
