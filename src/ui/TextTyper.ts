@@ -18,20 +18,22 @@ export class TextTyper {
         this.onFinish = onFinish
     }
 
-    update(shouldProceed: boolean, elapsedTimeMillis: number): string {
-        if (this.letterTicker !== 0 && shouldProceed) {
+    update(skipButtonClick: boolean, elapsedTimeMillis: number) {
+        if (this.letterTicker !== 0 && skipButtonClick) {
             if (this.finishedPrinting) {
                 this.onFinish()
                 this.onFinish = () => {}
             }
             this.finishedPrinting = true
         }
+        this.letterTicker += elapsedTimeMillis
+    }
 
+    getText(): string {
         if (this.finishedPrinting) {
             return this.text
         }
 
-        this.letterTicker += elapsedTimeMillis
         const charsToShow = Math.floor(this.letterTicker / TextTyper.MS_PER_CHAR)
 
         if (charsToShow === this.text.length) {

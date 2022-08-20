@@ -32,7 +32,7 @@ export class DialogueDisplay extends Component {
     private optionsEntity: Entity
     private dialogue: DialogueInstance
     private lineIndex: number
-    private lines: TextTyper[]
+    private lineTypers: TextTyper[]
     private optionsPopupTime: number
 
     get isOpen() {
@@ -47,21 +47,22 @@ export class DialogueDisplay extends Component {
         DialogueDisplay.instance = this
     }
 
-    update(updateData: UpdateData) {
+    lateUpdate(updateData: UpdateData) {
         if (!this.dialogue) {
             return
         }
 
         // NOTE: We don't allow the user to close dialogue because it might end up in a weird state
 
-        const typer = this.lines[Math.min(this.lineIndex, this.lines.length - 1)]
-        const showOptions =
-            typer.isFinished &&
-            this.dialogue.options.length > 0 &&
-            this.lineIndex >= this.lines.length - 1
-        const shouldProceed = controls.isMenuClickDown() || controls.isInteractDown()
+        const skipButtonClick = controls.isMenuClickDown() || controls.isInteractDown()
 
-        const line = typer.update(shouldProceed, updateData.elapsedTimeMillis)
+        this.lineTypers[this.lineIndex].update(skipButtonClick, updateData.elapsedTimeMillis)
+        const line = this.lineTypers[this.lineIndex].getText()
+
+        const showOptions =
+            this.lineTypers[this.lineIndex].isFinished &&
+            this.dialogue.options.length > 0 &&
+            this.lineIndex === this.lineTypers.length - 1
 
         if (!showOptions && this.lineIndex === this.dialogue.lines.length) {
             this.completeSourceDialogue(this.dialogue.next)
@@ -74,7 +75,7 @@ export class DialogueDisplay extends Component {
 
         this.renderNextLine(
             line,
-            this.lineIndex >= this.lines.length - 1 ? this.dialogue.options.length : 0
+            this.lineIndex >= this.lineTypers.length - 1 ? this.dialogue.options.length : 0
         )
 
         if (showOptions) {
@@ -124,11 +125,11 @@ export class DialogueDisplay extends Component {
         }
         playTalkSound()
 
-        this.lines = this.dialogue.lines.map(
+        this.lineTypers = this.dialogue.lines.map(
             (l, i) =>
                 new TextTyper(l, () => {
-                    this.lineIndex = Math.min(this.lineIndex + 1, this.lines.length)
-                    if (this.lineIndex < this.lines.length) {
+                    this.lineIndex = Math.min(this.lineIndex + 1, this.lineTypers.length - 1)
+                    if (this.lineIndex < this.lineTypers.length - 1) {
                         playTalkSound()
                     }
                 })
