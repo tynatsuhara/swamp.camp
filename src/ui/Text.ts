@@ -20,23 +20,23 @@ export const NO_BREAK_SPACE_CHAR = "∆"
 
 /**
  * A special string which will be replaced with a sprite.
- * All icon values must start with "λ", be 2 characters long,
+ * All icon values must start with "ö", be 2 characters long,
  * and have a corresponding entry in {@link ICON_PLACEHOLDER_MAP}
  */
 export enum TextIcon {
-    GAMEPAD_UP = "λ1",
-    GAMEPAD_X = "λx",
-    GAMEPAD_SQUARE = "λ2",
-    GAMEPAD_TRIANGLE = "λ3",
-    FACE_VERY_SAD = "λ4",
-    FACE_SAD = "λ5",
-    FACE_NEUTRAL = "λ6",
-    FACE_HAPPY = "λ7",
-    FACE_VERY_HAPPY = "λ8",
+    GAMEPAD_UP = "ö1",
+    GAMEPAD_X = "öx",
+    GAMEPAD_SQUARE = "ö2",
+    GAMEPAD_TRIANGLE = "ö3",
+    FACE_VERY_SAD = "ö4",
+    FACE_SAD = "ö5",
+    FACE_NEUTRAL = "ö6",
+    FACE_HAPPY = "ö7",
+    FACE_VERY_HAPPY = "ö8",
 }
 
-const ICON_PLACEHOLDER_PREFIX = "λ"
-const ICON_PLACEHOLDER_REGEX = /λ./g
+const ICON_PLACEHOLDER_PREFIX = "ö"
+const ICON_PLACEHOLDER_REGEX = /ö./g
 
 // maps placeholder -> one bit key
 const ICON_PLACEHOLDER_MAP = {
