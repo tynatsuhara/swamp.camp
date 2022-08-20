@@ -78,7 +78,7 @@ export class TextOverlayManager extends Component {
             !this.firstFrame && controls.isMenuClickDown(),
             updateData.elapsedTimeMillis
         )
-        const typedText = this.text[this.index].getText()
+        const typedText = this.text[this.index]?.getText() ?? ""
 
         this.firstFrame = false
 
