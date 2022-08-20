@@ -16,6 +16,7 @@ import {
 } from "./Dialogue"
 
 export const CAMPFIRE_DIALOGUE = "campfire"
+export const CAMPFIRE_ADD_LOGS = "campfire-add-logs"
 export const BED_DIALOGUE = "bed"
 
 const CANCEL_TEXT = "Leave"
@@ -26,8 +27,6 @@ export const ITEM_DIALOGUES: DialogueSet = {
 
         const cf: Campfire = DialogueDisplay.instance.source as Campfire
         const logCount = cf.logs
-        const playerLogCount = Player.instance.dude.inventory.getItemCount(Item.WOOD)
-        const logsYouCanAdd = Math.min(Campfire.LOG_CAPACITY - logCount, playerLogCount)
 
         const completeDialogue = (logsTransferred: number) => {
             return () => {
@@ -39,23 +38,61 @@ export const ITEM_DIALOGUES: DialogueSet = {
             }
         }
 
-        const takeLogOption = new DialogueOption("Take a torch", () => {
-            Player.instance.dude.setShield(ShieldType.TORCH)
-            return completeDialogue(-1)()
-        })
+        const options = [
+            new DialogueOption(
+                !logCount ? `Start a fire` : `Stoke the fire`,
+                () => new NextDialogue(CAMPFIRE_ADD_LOGS, true)
+            ),
+        ]
 
-        // TODO make sure the player can always take a log if possible
+        if (logCount > 0) {
+            options.push(
+                new DialogueOption("Take a torch", () => {
+                    Player.instance.dude.setShield(ShieldType.TORCH)
+                    return completeDialogue(-1)()
+                })
+            )
+        }
+
+        return dialogueWithOptions(
+            [],
+            DudeInteractIndicator.NONE,
+            ...options,
+            new DialogueOption(CANCEL_TEXT, completeDialogue(0))
+        )
+    },
+
+    [CAMPFIRE_ADD_LOGS]: () => {
+        // the fire can be dead, almost dead, partially full, almost entirely full, or totally full
+
+        const cf: Campfire = DialogueDisplay.instance.source as Campfire
+        const logCount = cf.logs
+        const playerLogCount = Player.instance.dude.inventory.getItemCount(Item.WOOD)
+        const logsYouCanAdd = Math.min(Campfire.LOG_CAPACITY - logCount, playerLogCount)
+        const exitOption = new DialogueOption(
+            CANCEL_TEXT,
+            () => new NextDialogue(CAMPFIRE_DIALOGUE, false)
+        )
+
+        const completeDialogue = (logsTransferred: number) => {
+            return () => {
+                if (logsTransferred > 0) {
+                    Player.instance.dude.inventory.removeItem(Item.WOOD, logsTransferred)
+                }
+                cf.addLogs(logsTransferred)
+                return new NextDialogue(CAMPFIRE_ADD_LOGS, true)
+            }
+        }
 
         if (logsYouCanAdd === 0) {
             return dialogueWithOptions(
                 [
                     playerLogCount === 0
                         ? "You don't have any logs to add to the fire."
-                        : "The fire already has the maximum amount of logs.",
+                        : "The fire has the maximum amount of logs.",
                 ],
                 DudeInteractIndicator.NONE,
-                logCount > 0 ? takeLogOption : null,
-                new DialogueOption(CANCEL_TEXT, completeDialogue(0))
+                exitOption
             )
         } else if (logsYouCanAdd === 1) {
             return dialogueWithOptions(
@@ -66,8 +103,7 @@ export const ITEM_DIALOGUES: DialogueSet = {
                 ],
                 DudeInteractIndicator.NONE,
                 new DialogueOption("Add a log", completeDialogue(1)),
-                takeLogOption,
-                new DialogueOption(CANCEL_TEXT, completeDialogue(0))
+                exitOption
             )
         }
 
@@ -80,7 +116,6 @@ export const ITEM_DIALOGUES: DialogueSet = {
             prompt = `The fire will burn for at least ${
                 (logCount - 1) * Campfire.LOG_DURATION_HOURS
             } more hours. You can add up to ${logsYouCanAdd} more logs right now.`
-            // prompt = ""
         }
 
         const options = [
@@ -88,16 +123,7 @@ export const ITEM_DIALOGUES: DialogueSet = {
             new DialogueOption("Add one log", completeDialogue(1)),
         ]
 
-        if (logCount > 0) {
-            options.push(takeLogOption)
-        }
-
-        return dialogueWithOptions(
-            [prompt],
-            DudeInteractIndicator.NONE,
-            ...options,
-            new DialogueOption(CANCEL_TEXT, completeDialogue(0))
-        )
+        return dialogueWithOptions([prompt], DudeInteractIndicator.NONE, ...options, exitOption)
     },
 
     [BED_DIALOGUE]: () => {
