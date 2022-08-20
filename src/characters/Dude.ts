@@ -115,6 +115,7 @@ export class Dude extends Component implements DialogueSource {
 
     private dialogueInteract: Interactable
     dialogue: string
+    private dialogueIndicator = ""
 
     private conditions: ActiveCondition[] = []
     private name: string
@@ -255,6 +256,12 @@ export class Dude extends Component implements DialogueSource {
                     })
                 }
             }, 600)
+
+            this.doWhileLiving(() => {
+                if (this.dialogue && this.dialogue != EMPTY_DIALOGUE) {
+                    this.dialogueIndicator = getDialogue(this.dialogue).indicator
+                }
+            }, 1000)
         }
     }
 
@@ -1165,8 +1172,8 @@ export class Dude extends Component implements DialogueSource {
             } else if (attackState === NPCAttackState.ATTACKING_NOW) {
                 indicator = DudeInteractIndicator.ATTACKING_NOW
             }
-        } else if (!!this.dialogue && this.dialogue != EMPTY_DIALOGUE) {
-            indicator = getDialogue(this.dialogue).indicator
+        } else if (this.dialogue && this.dialogue != EMPTY_DIALOGUE) {
+            indicator = this.dialogueIndicator
         }
 
         // if (
