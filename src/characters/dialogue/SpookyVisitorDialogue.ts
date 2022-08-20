@@ -35,7 +35,7 @@ export const SPOOKY_VISITOR_STARTING_DIALOGUE = "spooky-0"
 export const SPOOKY_VISITOR_DIALOGUE: DialogueSet = {
     [SPOOKY_VISITOR_STARTING_DIALOGUE]: () => {
         return dialogueWithOptions(
-            [
+            () => [
                 getSentence([".", "!"]),
                 "*The mysterious visitor opens their cloak, revealing an array of trinkets.*",
                 getSentence(["?"]),
