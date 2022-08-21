@@ -799,7 +799,7 @@ export class Dude extends Component implements DialogueSource {
                 this.standingPosition.distanceTo(
                     standingTilePos.times(TILE_SIZE).plus(new Point(8, 10))
                 ) < 5) ||
-                element?.entity?.getComponent(Burnable)?.isBurning)
+                element?.entity?.getComponent(Burnable)?.isBurningAt(this.tile))
         ) {
             this.addCondition(Condition.ON_FIRE, 2000 + Math.random() * 2000)
         }

@@ -111,7 +111,7 @@ export class Torch extends Shield {
             const pt = pixelPtToTilePt(this.dude.standingPosition.plusY(-4)).plusX(
                 this.dude.getFacingMultiplier()
             )
-            here().getElement(pt)?.entity.getComponent(Burnable)?.burn()
+            here().getElement(pt)?.entity.getComponent(Burnable)?.burn(pt)
         }
     }
 

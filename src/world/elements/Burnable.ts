@@ -31,7 +31,7 @@ export class Burnable extends RepeatedInvoker {
             this.pts.forEach((pt) => {
                 const adjacent = [pt.plusX(1), pt.plusX(-1), pt.plusY(1), pt.plusY(-1)]
                 adjacent.forEach((adj) => {
-                    here().getElement(adj)?.entity.getComponent(Burnable)?.burn(true)
+                    here().getElement(adj)?.entity.getComponent(Burnable)?.burn(null, true)
                 })
             })
             return INTERVAL
@@ -41,7 +41,7 @@ export class Burnable extends RepeatedInvoker {
         this.depth = Math.max(...pts.map((pt) => pt.y + 1)) * TILE_SIZE
 
         if (initialBurning) {
-            this.awake = () => this.burn(true)
+            this.awake = () => this.burn(null, true)
         }
     }
 
@@ -73,8 +73,8 @@ export class Burnable extends RepeatedInvoker {
         }
     }
 
-    burn(immediately = false) {
-        if (this.burning) {
+    burn(pt?: Point, immediately = false) {
+        if (this.burning || (pt && !this.pts.some((p) => p.equals(pt)))) {
             return
         } else if (!immediately && this.timeToLight > 0) {
             this.lighting = true
@@ -93,5 +93,9 @@ export class Burnable extends RepeatedInvoker {
                 )
             )
         )
+    }
+
+    isBurningAt(pt: Point) {
+        return this.isBurning && this.pts.some((p) => p.equals(pt))
     }
 }
