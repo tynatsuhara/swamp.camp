@@ -1,10 +1,13 @@
 import { Item } from "../../items/Items"
+import { saveManager } from "../../SaveManager"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { Bed } from "../../world/elements/Bed"
 import { Campfire } from "../../world/elements/Campfire"
+import { RestPoint } from "../../world/elements/RestPoint"
 import { here } from "../../world/LocationManager"
 import { TimeUnit } from "../../world/TimeUnit"
+import { WorldTime } from "../../world/WorldTime"
 import { Player } from "../Player"
 import { ShieldType } from "../weapons/ShieldType"
 import {
@@ -50,6 +53,23 @@ export const ITEM_DIALOGUES: DialogueSet = {
                 new DialogueOption("Take a torch", () => {
                     Player.instance.dude.setShield(ShieldType.TORCH)
                     return completeDialogue(-1)()
+                })
+            )
+        }
+
+        const restPoint = cf.entity.getComponent(RestPoint)
+        const restDurationHours = 2
+        const now = WorldTime.instance.time
+        if (
+            restPoint.canRestFor(restDurationHours, cf) &&
+            saveManager.getState().lastCampfireRestTime < now - 12 * TimeUnit.HOUR
+        ) {
+            options.push(
+                new DialogueOption("Rest briefly", () => {
+                    saveManager.setState({ lastCampfireRestTime: now })
+                    restPoint.rest(restDurationHours)
+                    Player.instance.dude.heal(Player.instance.dude.maxHealth / 2)
+                    return completeDialogue(0)()
                 })
             )
         }
@@ -141,19 +161,21 @@ export const ITEM_DIALOGUES: DialogueSet = {
         let text: string
         let options = [
             new DialogueOption("Sleep (8 hours)", () => {
-                bed.sleep(TimeUnit.HOUR * 8)
+                bed.rest(8)
+                Player.instance.dude.heal(Player.instance.dude.maxHealth)
                 return completeDialogue
             }),
             new DialogueOption("Nap (1 hour)", () => {
-                bed.sleep(TimeUnit.HOUR)
+                bed.rest(1)
+                Player.instance.dude.heal(Player.instance.dude.maxHealth / 2)
                 return completeDialogue
             }),
             new DialogueOption(CANCEL_TEXT, () => completeDialogue),
         ]
 
-        if (bed.canSleepFor(8)) {
+        if (bed.canRestFor(8)) {
             text = "The comfy bed beckons to you. Do you give in?"
-        } else if (bed.canSleepFor(1)) {
+        } else if (bed.canRestFor(1)) {
             text =
                 "Your campfire will not burn long enough for a full rest, but you have time for a nap."
             options.splice(0, 1)

@@ -708,13 +708,9 @@ export class Dude extends Component implements DialogueSource {
         this.knockIntervalCallback = requestAnimationFrame(knock)
     }
 
-    heal(amount?: number) {
+    heal(amount: number) {
         if (this.isAlive) {
-            if (amount === undefined) {
-                this._health = this.maxHealth
-            } else {
-                this._health = Math.min(this.maxHealth, this.health + amount)
-            }
+            this._health = Math.min(this.maxHealth, this.health + amount)
         }
     }
 

@@ -1,26 +1,20 @@
-import { Component, Entity, Point } from "brigsby/dist"
+import { Entity, Point } from "brigsby/dist"
 import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
 import { DialogueSource } from "../../characters/dialogue/Dialogue"
 import { BED_DIALOGUE } from "../../characters/dialogue/ItemDialogues"
-import { Player } from "../../characters/Player"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
-import { saveManager } from "../../SaveManager"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
-import { HUD } from "../../ui/HUD"
-import { DarknessMask } from "../DarknessMask"
 import { Location } from "../Location"
 import { camp } from "../LocationManager"
-import { TimeUnit } from "../TimeUnit"
-import { WorldTime } from "../WorldTime"
 import { Breakable } from "./Breakable"
-import { Campfire } from "./Campfire"
 import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
 import { Interactable } from "./Interactable"
 import { NavMeshCollider } from "./NavMeshCollider"
+import { RestPoint } from "./RestPoint"
 
 export class BedFactory extends ElementFactory {
     readonly type = ElementType.BED
@@ -71,33 +65,6 @@ export class BedFactory extends ElementFactory {
     }
 }
 
-export class Bed extends Component implements DialogueSource {
+export class Bed extends RestPoint implements DialogueSource {
     dialogue: string = BED_DIALOGUE
-
-    sleep(duration: number) {
-        const pause = 1200
-        HUD.instance.locationTransition.transition(() => {
-            WorldTime.instance.fastForward(duration)
-            Player.instance.dude.heal()
-            setTimeout(() => saveManager.autosave(), pause + 500)
-        }, pause)
-    }
-
-    canSleepFor(hours: number) {
-        const timeOfDay = WorldTime.instance.time % TimeUnit.DAY
-
-        let hoursNeeded = 0
-        for (let i = 1; i <= hours; i++) {
-            const time = (timeOfDay + i * TimeUnit.HOUR) % TimeUnit.DAY
-            // if it'll be dark in that hour, we need the campfire to burn until then
-            if (time < DarknessMask.SUNRISE_START || time >= DarknessMask.SUNSET_END) {
-                hoursNeeded = i
-            }
-        }
-
-        return camp()
-            .getElementsOfType(ElementType.CAMPFIRE)
-            .map((el) => el.entity.getComponent(Campfire))
-            .some((campfire) => campfire.willBurnFor(hoursNeeded * TimeUnit.HOUR))
-    }
 }

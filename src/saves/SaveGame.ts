@@ -25,4 +25,5 @@ export class SaveState {
     // miscellaneous flags and values for game progress milestones
     hasMadeFire?: boolean = false
     hasRecruitedAnyVillagers?: boolean = false
+    lastCampfireRestTime?: number = Number.MIN_SAFE_INTEGER
 }

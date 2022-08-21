@@ -20,6 +20,7 @@ import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
 import { Interactable } from "./Interactable"
 import { NavMeshObstacle } from "./NavMeshObstacle"
+import { RestPoint } from "./RestPoint"
 
 export class CampfireFactory extends ElementFactory {
     readonly type = ElementType.CAMPFIRE
@@ -52,6 +53,8 @@ export class CampfireFactory extends ElementFactory {
         )
 
         e.addComponent(new NavMeshObstacle(wl, pos))
+
+        e.addComponent(new RestPoint())
 
         const fire = e.addComponent(
             new FireParticles(1, () =>
