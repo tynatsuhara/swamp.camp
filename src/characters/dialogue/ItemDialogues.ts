@@ -57,6 +57,8 @@ export const ITEM_DIALOGUES: DialogueSet = {
             )
         }
 
+        // TODO: Instead of hiding the button, consider adding an explanation as
+        //       to why they can't rest right now (this could be annoying tho)
         const restPoint = cf.entity.getComponent(RestPoint)
         const restDurationHours = 2
         const now = WorldTime.instance.time

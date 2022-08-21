@@ -23,6 +23,7 @@ export class RestPoint extends Component {
         const isTargeted = here()
             .getDudes()
             .some((d) => d.entity.getComponent(NPC)?.targetedEnemy === Player.instance.dude)
+
         if (isTargeted) {
             return false
         }
