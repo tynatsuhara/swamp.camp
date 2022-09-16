@@ -119,50 +119,43 @@ export class MiniMap extends Component {
 
             for (let x = start; x < this.smallCanvas.width; x++) {
                 // round the corners
-                let isCorner = false
                 if (y < cornerShape.length) {
                     const rowBlankCount = cornerShape[y]
                     if (x < rowBlankCount || x >= this.smallCanvas.width - rowBlankCount) {
-                        isCorner = true
+                        continue
                     }
                 } else if (y >= this.smallCanvas.height - cornerShape.length) {
                     const rowBlankCount = cornerShape[this.smallCanvas.height - y - 1]
                     if (x < rowBlankCount || x >= this.smallCanvas.width - rowBlankCount) {
-                        isCorner = true
+                        continue
                     }
                 }
 
-                if (!isCorner) {
-                    const imageData = bigContext.getImageData(
-                        x * MiniMap.SCALE,
-                        y * MiniMap.SCALE,
-                        MiniMap.SCALE,
-                        MiniMap.SCALE
-                    )
+                const imageData = bigContext.getImageData(
+                    x * MiniMap.SCALE,
+                    y * MiniMap.SCALE,
+                    MiniMap.SCALE,
+                    MiniMap.SCALE
+                )
 
-                    // get the most common color from that square
-                    const hexStrings = []
-                    for (let i = 0; i < imageData.data.length; i += 4) {
-                        const hex = getHex(
-                            imageData.data[i],
-                            imageData.data[i + 1],
-                            imageData.data[2]
-                        )
+                // get the most common color from that square
+                const hexStrings = []
+                for (let i = 0; i < imageData.data.length; i += 4) {
+                    const hex = getHex(imageData.data[i], imageData.data[i + 1], imageData.data[2])
+                    hexStrings.push(hex)
+                    // weigh other colors higher than grass color to show non-nature things on the map
+                    if (hex !== Color.GREEN_5) {
                         hexStrings.push(hex)
-                        // weigh other colors higher than grass color to show non-nature things on the map
-                        if (hex !== Color.GREEN_5) {
-                            hexStrings.push(hex)
-                        }
                     }
-                    smallContext.fillStyle = Lists.mode(hexStrings)
-                    smallContext.fillRect(x, y, 1, 1)
+                }
+                smallContext.fillStyle = Lists.mode(hexStrings)
+                smallContext.fillRect(x, y, 1, 1)
 
-                    this.lastPixelDrawn = new Point(x, y)
+                this.lastPixelDrawn = new Point(x, y)
 
-                    drawn++
-                    if (drawn === pxToRender) {
-                        return
-                    }
+                drawn++
+                if (drawn === pxToRender) {
+                    return
                 }
             }
         }
