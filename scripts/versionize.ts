@@ -1,3 +1,4 @@
+import { execSync } from "child_process"
 import * as crypto from "crypto"
 import * as fs from "fs"
 import * as path from "path"
@@ -24,7 +25,7 @@ const assets = getFiles(STATICS_DIR)
         return obj
     }, {} as Record<string, string>)
 
-const version = require("child_process").execSync("git rev-parse HEAD").toString().trim()
+const version = execSync("git rev-parse HEAD").toString().trim()
 
 const data = {
     /**
