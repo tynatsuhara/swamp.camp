@@ -1,11 +1,11 @@
-const path = require("path")
-const fs = require("fs")
-const { promisify } = require("util")
+import * as crypto from "crypto"
+import * as fs from "fs"
+import * as path from "path"
+import { promisify } from "util"
 const readdir = promisify(fs.readdir)
 const stat = promisify(fs.stat)
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
-const crypto = require("crypto")
 
 const FILE_TYPES = [".png"]
 const STATICS_DIR = path.join(__dirname, "../static/")
