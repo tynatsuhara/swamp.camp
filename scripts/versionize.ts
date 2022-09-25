@@ -1,57 +1,47 @@
 import * as crypto from "crypto"
 import * as fs from "fs"
 import * as path from "path"
-import { promisify } from "util"
-const readdir = promisify(fs.readdir)
-const stat = promisify(fs.stat)
-const readFile = promisify(fs.readFile)
-const writeFile = promisify(fs.writeFile)
 
-const FILE_TYPES = [".png"]
+const VERSIONIZED_FILE_TYPES = [".png"]
 const STATICS_DIR = path.join(__dirname, "../static/")
 
-const LAST_COMMIT = require("child_process").execSync("git rev-parse HEAD").toString().trim()
-
 /**
- * @returns all files in the directory as a promise
+ * @returns all full file paths in the given directory
  */
-async function getFiles(dir) {
-    const subdirs = await readdir(dir)
-    const files = await Promise.all(
-        subdirs.map(async (subdir) => {
-            const res = path.resolve(dir, subdir)
-            return (await stat(res)).isDirectory() ? getFiles(res) : res
-        })
-    )
-    return files.reduce((a, f) => a.concat(f), [])
+const getFiles = (dir: string): string[] =>
+    fs.readdirSync(dir).flatMap((subdir) => {
+        const file = path.resolve(dir, subdir)
+        return fs.statSync(file).isDirectory() ? getFiles(file) : file
+    })
+
+const hash = (data: string) => crypto.createHash("md5").update(data, "utf8").digest("hex")
+
+// { [fileName]: fileHash }
+const assets = getFiles(STATICS_DIR)
+    .filter((fileName) => VERSIONIZED_FILE_TYPES.some((type) => fileName.endsWith(type)))
+    .reduce((obj, fileName) => {
+        obj[fileName.replace(STATICS_DIR, "")] = hash(fs.readFileSync(fileName).toString())
+        return obj
+    }, {} as Record<string, string>)
+
+const version = require("child_process").execSync("git rev-parse HEAD").toString().trim()
+
+const data = {
+    /**
+     * eagerly loaded static files, hashed for cache busting
+     */
+    assets,
+    /**
+     * latest git commit hash, for observability
+     */
+    version,
 }
 
-const checksum = (str) => crypto.createHash("md5").update(str, "utf8").digest("hex")
+// inject the version map into the window scope via the template
+const indexOutput = fs
+    .readFileSync(path.join(STATICS_DIR, "index_template.html"), "utf8")
+    .replaceAll('"%SWAMP_CAMP_DATA%"', JSON.stringify(data))
 
-// resolves to a list of [fileName, fileHash] pairs
-const hashesPromise = getFiles(STATICS_DIR).then((files) => {
-    return Promise.all(
-        files
-            .filter((fileName) => FILE_TYPES.some((type) => fileName.endsWith(type)))
-            .map((fileName) =>
-                readFile(fileName).then((data) => [
-                    fileName.replace(STATICS_DIR, ""),
-                    checksum(data),
-                ])
-            )
-    )
-})
+fs.writeFileSync(path.join(STATICS_DIR, "index.html"), indexOutput, "utf8")
 
-Promise.resolve(hashesPromise).then((hashPairs) => {
-    const map = {}
-    hashPairs.forEach((pair) => (map[pair[0]] = pair[1]))
-
-    readFile(path.join(STATICS_DIR, "index_template.html"), "utf8").then((template) => {
-        const output = template
-            // inject the version map into the window scope via the template
-            .replaceAll('"{SWAMP_CAMP_ASSETS}"', JSON.stringify(map))
-            .replaceAll("{JS_BUNDLE_HASH}", LAST_COMMIT)
-
-        writeFile(path.join(STATICS_DIR, "index.html"), output, "utf8")
-    })
-})
+console.log("🎉 versionizing complete 🎉\n")
