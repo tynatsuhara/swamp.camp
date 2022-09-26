@@ -2,9 +2,7 @@ import { Point, UpdateData } from "brigsby/dist"
 import { SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Animator } from "brigsby/dist/util"
 import { Tilesets } from "../../graphics/Tilesets"
-import { Item } from "../../items/Items"
-import { spawnProjectile } from "./Projectile"
-import { Weapon } from "./Weapon"
+import { Weapon, WEAPON_ROTATION_INCREMENT } from "./Weapon"
 import { WeaponType } from "./WeaponType"
 
 enum State {
@@ -14,10 +12,12 @@ enum State {
     ATTACKING,
 }
 
+let spriteCache: Record<number, StaticSpriteSource>
+
 export class SpearWeapon extends Weapon {
     private weaponSprite: StaticSpriteSource
-    private weaponTransform: SpriteTransform
-    private offsetFromCenter: Point
+    // private weaponTransform: SpriteTransform
+    private offsetFromCenter = new Point(-5, 0)
     private state: State = State.DRAWN
     private _range: number
 
@@ -27,11 +27,22 @@ export class SpearWeapon extends Weapon {
         super()
         this.start = (startData) => {
             this.weaponSprite = Tilesets.instance.dungeonCharacters.getTileSource("weapon_spear")
-            this.weaponTransform = new SpriteTransform(
-                Point.ZERO,
-                this.weaponSprite.dimensions
-            ).relativeTo(this.dude.animation.transform)
-            this.offsetFromCenter = new Point(-5, 0)
+            spriteCache =
+                spriteCache ??
+                Array.from(
+                    { length: 180 / WEAPON_ROTATION_INCREMENT + 1 },
+                    (v, k) => k * WEAPON_ROTATION_INCREMENT
+                ).reduce((obj, rotation) => {
+                    console.log(`caching sprite rotated at ${rotation} degrees`)
+                    obj[rotation] = Tilesets.instance.dungeonCharacters
+                        .getTileSource("weapon_spear")
+                        .rotated(rotation)
+                    return obj
+                }, {} as Record<number, StaticSpriteSource>)
+            // this.weaponTransform = new SpriteTransform(
+            //     Point.ZERO,
+            //     this.weaponSprite.dimensions
+            // ).relativeTo(this.dude.animation.transform)
             this._range = this.weaponSprite.dimensions.y
         }
     }
@@ -49,7 +60,20 @@ export class SpearWeapon extends Weapon {
     }
 
     getRenderMethods() {
-        return [this.weaponSprite.toImageRender(this.weaponTransform)]
+        // return [this.weaponSprite.toImageRender(this.weaponTransform)]
+
+        const sprite = spriteCache[this.getSpearCursorRotation()]
+        return [
+            sprite?.toImageRender(
+                new SpriteTransform(
+                    this.offsetFromCenter
+                        .plusY(22 - sprite.dimensions.y / 2)
+                        .plus(this.dude.getAnimationOffset())
+                        .apply(Math.floor),
+                    sprite.dimensions
+                ).relativeTo(this.dude.animation.transform)
+            ),
+        ]
     }
 
     getType() {
@@ -89,32 +113,33 @@ export class SpearWeapon extends Weapon {
             return
         }
 
-        const timeToThrow = 500
-        if (this.timeDrawn > timeToThrow) {
-            this.dude.inventory.removeItem(Item.SPEAR, 1)
-            this.dude.setWeapon(WeaponType.UNARMED)
+        // TODO throwing
+        // const timeToThrow = 500
+        // if (this.timeDrawn > timeToThrow) {
+        //     this.dude.inventory.removeItem(Item.SPEAR, 1)
+        //     this.dude.setWeapon(WeaponType.UNARMED)
 
-            const newTransform = new SpriteTransform(
-                this.weaponTransform.position,
-                this.weaponTransform.dimensions,
-                this.weaponTransform.rotation,
-                this.weaponTransform.mirrorX,
-                this.weaponTransform.mirrorY,
-                this.weaponTransform.depth
-            )
+        //     const newTransform = new SpriteTransform(
+        //         this.weaponTransform.position,
+        //         this.weaponTransform.dimensions,
+        //         this.weaponTransform.rotation,
+        //         this.weaponTransform.mirrorX,
+        //         this.weaponTransform.mirrorY,
+        //         this.weaponTransform.depth
+        //     )
 
-            spawnProjectile(
-                newTransform.position.plusY(24),
-                this.weaponSprite,
-                Item.SPEAR,
-                new Point(40 * this.dude.getFacingMultiplier(), 4.5),
-                this.dude
-            )
-        } else {
-            this.state = State.ATTACKING
-            setTimeout(() => this.damageEnemies(), 100)
-            this.playAttackAnimation()
-        }
+        //     spawnProjectile(
+        //         newTransform.position.plusY(24),
+        //         this.weaponSprite,
+        //         Item.SPEAR,
+        //         new Point(40 * this.dude.getFacingMultiplier(), 4.5),
+        //         this.dude
+        //     )
+        // } else {
+        //     this.state = State.ATTACKING
+        //     setTimeout(() => this.damageEnemies(), 100)
+        //     this.playAttackAnimation()
+        // }
 
         this.timeDrawn = 0
     }
@@ -134,18 +159,18 @@ export class SpearWeapon extends Weapon {
         })
     }
 
-    private getBasePosition(rotation) {
-        let offset = new Point(
-            this.dude.animation.transform.dimensions.x / 2 - this.weaponTransform.dimensions.x / 2,
-            this.dude.animation.transform.dimensions.y - this.weaponTransform.dimensions.y
-        ).plus(this.offsetFromCenter)
+    // private getBasePosition(rotation) {
+    //     let offset = new Point(
+    //         this.dude.animation.transform.dimensions.x / 2 - this.weaponTransform.dimensions.x / 2,
+    //         this.dude.animation.transform.dimensions.y - this.weaponTransform.dimensions.y
+    //     ).plus(this.offsetFromCenter)
 
-        if (rotation === 90) {
-            offset = offset.plus(new Point(10, 10))
-        }
+    //     if (rotation === 90) {
+    //         offset = offset.plus(new Point(10, 10))
+    //     }
 
-        return offset.plus(this.dude.getOffsetRelativeToAnimation())
-    }
+    //     return offset.plus(this.dude.getOffsetRelativeToAnimation())
+    // }
 
     private animate() {
         const drawSpeed = 100
@@ -155,7 +180,7 @@ export class SpearWeapon extends Weapon {
 
         if (this.state === State.DRAWN) {
             if (!this.dude.shield || this.dude.shield.canAttack()) {
-                rotation = 90
+                // rotation = this.getSpearCursorRotation()
             }
         } else if (this.state === State.SHEATHED) {
             // center on back
@@ -163,21 +188,25 @@ export class SpearWeapon extends Weapon {
         } else if (this.state === State.DRAWING) {
             const drawn = Math.floor(this.timeDrawn / -drawSpeed)
             pos = new Point(Math.max(drawn, -4), 0)
-            rotation = 90
+            // rotation = this.getSpearCursorRotation()
         } else if (this.state === State.ATTACKING) {
-            const posWithRotation = this.getAttackAnimationPosition()
-            pos = posWithRotation[0]
-            rotation = posWithRotation[1]
+            pos = this.getAttackAnimationPosition()
+            // rotation = this.getSpearCursorRotation()
         }
 
-        pos = pos.plus(this.getBasePosition(rotation))
+        // pos = pos.plus(this.getBasePosition(rotation))
 
-        this.weaponTransform.rotation = rotation
-        this.weaponTransform.position = pos
+        // this.weaponTransform.rotation = rotation
+        // this.weaponTransform.position = pos
 
-        // show sword behind character if sheathed
-        this.weaponTransform.depth = this.state == State.SHEATHED ? -0.5 : 0.5
-        this.weaponTransform.mirrorY = rotation === 90
+        // // show sword behind character if sheathed
+        // this.weaponTransform.depth = this.state == State.SHEATHED ? -0.5 : 0.5
+        // this.weaponTransform.mirrorY = rotation === 90
+    }
+
+    private getSpearCursorRotation() {
+        // +90 because this sprite is vertical but defaults facing right
+        return super.getCursorRotation(this.offsetFromCenter) + 90
     }
 
     private frameCount = 6
@@ -195,15 +224,12 @@ export class SpearWeapon extends Weapon {
         )
     }
 
-    /**
-     * Returns (position, rotation)
-     */
-    private getAttackAnimationPosition(): [Point, number] {
+    private getAttackAnimationPosition(): Point {
         if (this.currentAnimationFrame >= this.frameCount - 1) {
-            return [new Point(2, 0), 90]
+            return new Point(2, 0)
         } else {
             const x = [8, 14, 16, 12, 8][this.currentAnimationFrame]
-            return [new Point(x, 0), 90]
+            return new Point(x, 0)
         }
     }
 }

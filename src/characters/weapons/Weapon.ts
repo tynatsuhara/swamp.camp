@@ -1,8 +1,11 @@
 import { Component, Point } from "brigsby/dist"
+import { controls } from "../../Controls"
 import { Hittable } from "../../world/elements/Hittable"
 import { here } from "../../world/LocationManager"
 import { Dude } from "../Dude"
 import { WeaponType } from "./WeaponType"
+
+export const WEAPON_ROTATION_INCREMENT = 15
 
 export abstract class Weapon extends Component {
     protected dude: Dude
@@ -76,4 +79,14 @@ export abstract class Weapon extends Component {
      * This will be called on any frame that attack() is not called
      */
     cancelAttack() {}
+
+    getCursorRotation(offsetFromStandingPosition: Point) {
+        const mousePos = controls.getWorldSpaceMousePos()
+        const centerPos = this.dude.standingPosition.plus(offsetFromStandingPosition)
+        const xDiff = Math.abs(mousePos.x - centerPos.x)
+        const yDiff = mousePos.y - centerPos.y
+        const degrees = (180 / Math.PI) * Math.atan(yDiff / xDiff)
+        const result = Math.round(degrees / WEAPON_ROTATION_INCREMENT) * WEAPON_ROTATION_INCREMENT
+        return result
+    }
 }
