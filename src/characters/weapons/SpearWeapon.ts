@@ -2,7 +2,8 @@ import { Point, UpdateData } from "brigsby/dist"
 import { SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Animator } from "brigsby/dist/util"
 import { Tilesets } from "../../graphics/Tilesets"
-import { Weapon, WEAPON_ROTATION_INCREMENT } from "./Weapon"
+import { showBoundingBox } from "../../Utils"
+import { HAND_POSITION_OFFSET, Weapon, WEAPON_ROTATION_INCREMENT } from "./Weapon"
 import { WeaponType } from "./WeaponType"
 
 enum State {
@@ -12,12 +13,46 @@ enum State {
     ATTACKING,
 }
 
-let spriteCache: Record<number, StaticSpriteSource>
+type SpriteCache = Record<number, { sprite: StaticSpriteSource; position: Point }>
+
+let spriteCache: SpriteCache
+
+/**
+ * @param baseSprite the sprite at 0 degrees rotation
+ * @param baseSpritePosition the position of a sprite at 0 degrees
+ * @param rotationPoint the point to rotate the sprite around
+ */
+const initSpriteCache = (
+    baseSprite: StaticSpriteSource,
+    baseSpritePosition: Point,
+    rotationPoint: Point
+) => {
+    const cache: SpriteCache = {}
+    const ogCenter = baseSpritePosition.plus(baseSprite.dimensions.floorDiv(2))
+
+    for (let i = -90; i <= 90; i += WEAPON_ROTATION_INCREMENT) {
+        if (i === 0) {
+            cache[i] = {
+                sprite: baseSprite,
+                position: baseSpritePosition,
+            }
+        } else {
+            const rotatedSprite = baseSprite.rotated(i)
+            const centerAfterRotation = ogCenter.rotatedAround(rotationPoint, i)
+            cache[i] = {
+                sprite: rotatedSprite,
+                position: centerAfterRotation.minus(rotatedSprite.dimensions.floorDiv(2)),
+            }
+        }
+    }
+
+    return cache
+}
 
 export class SpearWeapon extends Weapon {
-    private weaponSprite: StaticSpriteSource
+    // private weaponSprite: StaticSpriteSource
     // private weaponTransform: SpriteTransform
-    private offsetFromCenter = new Point(-5, 0)
+    private offsetFromCenter: Point
     private state: State = State.DRAWN
     private _range: number
 
@@ -26,24 +61,40 @@ export class SpearWeapon extends Weapon {
     constructor() {
         super()
         this.start = (startData) => {
-            this.weaponSprite = Tilesets.instance.dungeonCharacters.getTileSource("weapon_spear")
+            const baseSprite = Tilesets.instance.dungeonCharacters
+                .getTileSource("weapon_spear")
+                .rotated(90)
+            this._range = baseSprite.dimensions.x
+
+            this.offsetFromCenter = new Point(-12, -9)
+
             spriteCache =
                 spriteCache ??
-                Array.from(
-                    { length: 180 / WEAPON_ROTATION_INCREMENT + 1 },
-                    (v, k) => k * WEAPON_ROTATION_INCREMENT
-                ).reduce((obj, rotation) => {
-                    console.log(`caching sprite rotated at ${rotation} degrees`)
-                    obj[rotation] = Tilesets.instance.dungeonCharacters
-                        .getTileSource("weapon_spear")
-                        .rotated(rotation)
-                    return obj
-                }, {} as Record<number, StaticSpriteSource>)
+                initSpriteCache(
+                    baseSprite,
+                    this.offsetFromCenter,
+                    HAND_POSITION_OFFSET
+                    // new Point(
+                    //     -(this.offsetFromCenter.x - HAND_POSITION_OFFSET.x),
+                    //     -(this.offsetFromCenter.y - HAND_POSITION_OFFSET.y)
+                    // )
+                )
+            // Array.from(
+            //     { length: 180 / WEAPON_ROTATION_INCREMENT + 1 },
+            //     (v, k) => k * WEAPON_ROTATION_INCREMENT - 90
+            // ).reduce((obj, rotation) => {
+            //     obj[rotation] = {
+            //         sprite: Tilesets.instance.dungeonCharacters
+            //             .getTileSource("weapon_spear")
+            //             .rotated(rotation + 90),
+            //         offset: Point.ZERO, // TODO figure out how to rotate around the hand position
+            //     }
+            //     return obj
+            // }, {})
             // this.weaponTransform = new SpriteTransform(
             //     Point.ZERO,
             //     this.weaponSprite.dimensions
             // ).relativeTo(this.dude.animation.transform)
-            this._range = this.weaponSprite.dimensions.y
         }
     }
 
@@ -60,20 +111,26 @@ export class SpearWeapon extends Weapon {
     }
 
     getRenderMethods() {
-        // return [this.weaponSprite.toImageRender(this.weaponTransform)]
+        const { sprite, position } = spriteCache[this.getCursorRotation()]
+        // TODO use offset
+        const spriteRender = sprite?.toImageRender(
+            new SpriteTransform(
+                // this.offsetFromCenter
+                // .plus(offset)
+                new Point(
+                    this.dude.animation.sprite.dimensions.x / 2,
+                    this.dude.animation.sprite.dimensions.y
+                )
+                    .plus(position)
+                    // .minus(sprite.dimensions.div(2).apply(Math.floor))
+                    // .plusY(22 - sprite.dimensions.y / 2)
+                    .plus(this.dude.getAnimationOffset())
+                    .apply(Math.floor),
+                sprite.dimensions
+            ).relativeTo(this.dude.animation.transform)
+        )
 
-        const sprite = spriteCache[this.getSpearCursorRotation()]
-        return [
-            sprite?.toImageRender(
-                new SpriteTransform(
-                    this.offsetFromCenter
-                        .plusY(22 - sprite.dimensions.y / 2)
-                        .plus(this.dude.getAnimationOffset())
-                        .apply(Math.floor),
-                    sprite.dimensions
-                ).relativeTo(this.dude.animation.transform)
-            ),
-        ]
+        return [spriteRender, ...showBoundingBox(spriteRender)]
     }
 
     getType() {
@@ -202,11 +259,6 @@ export class SpearWeapon extends Weapon {
         // // show sword behind character if sheathed
         // this.weaponTransform.depth = this.state == State.SHEATHED ? -0.5 : 0.5
         // this.weaponTransform.mirrorY = rotation === 90
-    }
-
-    private getSpearCursorRotation() {
-        // +90 because this sprite is vertical but defaults facing right
-        return super.getCursorRotation(this.offsetFromCenter) + 90
     }
 
     private frameCount = 6
