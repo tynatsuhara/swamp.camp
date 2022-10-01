@@ -42,6 +42,7 @@ const data = {
 const indexOutput = fs
     .readFileSync(path.join(STATICS_DIR, "index_template.html"), "utf8")
     .replaceAll('"%SWAMP_CAMP_DATA%"', JSON.stringify(data))
+    .replaceAll("%JS_BUNDLE_HASH%", version)
 
 fs.writeFileSync(path.join(STATICS_DIR, "index.html"), indexOutput, "utf8")
 
