@@ -1075,6 +1075,7 @@ export class Dude extends Component implements DialogueSource {
 
     getOffsetRelativeToAnimation(): Point {
         if (this.isJumping) {
+            // The jumping animation is a single static frame
             return new Point(0, -5)
         }
 

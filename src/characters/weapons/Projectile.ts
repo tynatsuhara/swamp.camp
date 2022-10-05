@@ -1,6 +1,6 @@
 import { Component, Entity, Point } from "brigsby/dist"
 import { BoxCollider } from "brigsby/dist/collision"
-import { SpriteComponent, StaticSpriteSource } from "brigsby/dist/sprites"
+import { SpriteComponent } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
 import { DroppedItem } from "../../items/DroppedItem"
 import { Item } from "../../items/Items"
@@ -16,34 +16,28 @@ class Projectile extends Component {
      * @param position The bottom center where the item should be placed
      * @param sourceCollider will be ignored to prevent physics issues
      */
-    constructor(
-        position: Point,
-        sprite: StaticSpriteSource,
-        item: Item,
-        velocity: Point,
-        attacker: Dude
-    ) {
+    constructor(sprite: SpriteComponent, tip: Point, item: Item, velocity: Point, attacker: Dude) {
         super()
         this.itemType = item
         this.start = () => {
-            this.sprite = this.entity.addComponent(sprite.toComponent())
-            const pos = position.minus(
-                new Point(
-                    this.sprite.transform.dimensions.x / 2,
-                    this.sprite.transform.dimensions.y
-                )
-            )
-            this.sprite.transform.position = pos
-            this.sprite.transform.rotation = velocity.x > 0 ? 90 : -90
-            this.sprite.transform.mirrorX = velocity.x > 0
+            this.sprite = this.entity.addComponent(sprite)
+            // this.sprite.transform.position = sprite.transform.position.minus(
+            //     new Point(
+            //         this.sprite.transform.dimensions.x / 2,
+            //         this.sprite.transform.dimensions.y
+            //     )
+            // )
+            // this.sprite.transform.rotation = velocity.x > 0 ? 90 : -90
+            // this.sprite.transform.mirrorX = velocity.x > 0
 
-            const colliderSize = new Point(8, 8)
             const sourceCollider = attacker.entity.getComponent(BoxCollider)
+
+            const colliderRadius = 2
 
             this.collider = this.entity.addComponent(
                 new BoxCollider(
-                    pos.plus(new Point(10, 10)),
-                    colliderSize,
+                    tip.plus(new Point(-colliderRadius, -colliderRadius)),
+                    new Point(2, 2).times(colliderRadius),
                     DroppedItem.COLLISION_LAYER,
                     !!sourceCollider ? [sourceCollider] : []
                 )
@@ -64,28 +58,31 @@ class Projectile extends Component {
                         const enemy = this.getEnemy(
                             attacker,
                             this.collider.position.plus(this.collider.dimensions),
-                            velocity,
                             20
                         )
 
-                        if (!!enemy) {
-                            this.collider.delete()
+                        if (enemy) {
+                            // this.collider.delete()  // TODO
                             velocity = Point.ZERO
 
                             // make the projectile stick to the enemy
-                            const relativeOffset = this.sprite.transform.position.minus(
-                                enemy.animation.transform.position
-                            )
-                            const relativeDepth =
-                                this.sprite.transform.depth - enemy.animation.transform.depth
-                            this.sprite.transform.relativeTo(enemy.animation.transform)
-                            this.sprite.transform.position = relativeOffset
-                            this.sprite.transform.depth = relativeDepth
+                            // const relativeOffset = this.sprite.transform.position.minus(
+                            //     enemy.animation.transform.position
+                            // )
+                            // const relativeDepth =
+                            //     this.sprite.transform.depth - enemy.animation.transform.depth
+                            // const isMirrored = this.sprite.transform.mirrorX
+                            // this.sprite.transform.relativeTo(enemy.animation.transform)
+                            // this.sprite.transform.position = relativeOffset
+                            // this.sprite.transform.depth = relativeDepth
+                            // if (enemy.animation.transform.mirrorX) {
+                            //     this.sprite.transform.mirrorX = !isMirrored
+                            // }
 
-                            this.sprite.transform.position = new Point(
-                                this.sprite.transform.dimensions.y - 10,
-                                relativeOffset.y
-                            )
+                            // this.sprite.transform.position = new Point(
+                            //     this.sprite.transform.dimensions.y - 10,
+                            //     relativeOffset.y
+                            // )
 
                             enemy.damage(1, {
                                 direction: enemy.standingPosition.minus(attacker.standingPosition),
@@ -107,7 +104,7 @@ class Projectile extends Component {
         }
     }
 
-    getEnemy(attacker: Dude, projectilePos: Point, velocity: Point, attackDistance: number): Dude {
+    getEnemy(attacker: Dude, projectilePos: Point, attackDistance: number): Dude {
         const allEnemies = here()
             .getDudes()
             .filter((d) => !!d && d !== attacker && d.isEnemy(attacker))
@@ -127,19 +124,26 @@ class Projectile extends Component {
             .moveTo(this.collider.position.plus(delta).apply(Math.floor))
             .minus(colliderOffset)
         this.sprite.transform.depth =
-            this.sprite.transform.position.y + this.sprite.transform.dimensions.y - 14
+            this.sprite.transform.position.y + this.sprite.transform.dimensions.y
 
         const afterPos = this.sprite.transform.position
         return beforePos.distanceTo(afterPos) >= 0.05
     }
 }
 
+/**
+ * @param sprite
+ * @param tip global position
+ * @param item
+ * @param velocity
+ * @param attacker
+ */
 export const spawnProjectile = (
-    pos: Point,
-    sprite: StaticSpriteSource,
+    sprite: SpriteComponent,
+    tip: Point,
     item: Item,
     velocity: Point,
     attacker: Dude
 ) => {
-    here().droppedItems.add(new Entity([new Projectile(pos, sprite, item, velocity, attacker)]))
+    here().droppedItems.add(new Entity([new Projectile(sprite, tip, item, velocity, attacker)]))
 }

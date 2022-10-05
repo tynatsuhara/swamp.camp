@@ -6,7 +6,7 @@ import { Dude } from "../Dude"
 import { WeaponType } from "./WeaponType"
 
 export const WEAPON_ROTATION_INCREMENT = 15
-export const HAND_POSITION_OFFSET = new Point(-4, -5)
+export const HAND_POSITION_OFFSET = new Point(-4, -6)
 
 export abstract class Weapon extends Component {
     protected dude: Dude
@@ -81,12 +81,15 @@ export abstract class Weapon extends Component {
      */
     cancelAttack() {}
 
-    getCursorRotation() {
+    getAimingDirection(): Point {
         const mousePos = controls.getWorldSpaceMousePos()
         const centerPos = this.dude.standingPosition.plusY(HAND_POSITION_OFFSET.y)
-        const xDiff = Math.abs(mousePos.x - centerPos.x)
-        const yDiff = mousePos.y - centerPos.y
-        const degrees = (180 / Math.PI) * Math.atan(yDiff / xDiff)
+        return new Point(mousePos.x - centerPos.x, mousePos.y - centerPos.y)
+    }
+
+    getCursorRotation() {
+        const { x: xDiff, y: yDiff } = this.getAimingDirection()
+        const degrees = (180 / Math.PI) * Math.atan(yDiff / Math.abs(xDiff))
         const result = Math.round(degrees / WEAPON_ROTATION_INCREMENT) * WEAPON_ROTATION_INCREMENT
         return result
     }

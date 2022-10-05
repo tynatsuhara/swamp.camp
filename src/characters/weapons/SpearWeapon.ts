@@ -2,7 +2,8 @@ import { Point, UpdateData } from "brigsby/dist"
 import { SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Animator } from "brigsby/dist/util"
 import { Tilesets } from "../../graphics/Tilesets"
-import { showBoundingBox } from "../../Utils"
+import { Item } from "../../items/Items"
+import { spawnProjectile } from "./Projectile"
 import { HAND_POSITION_OFFSET, Weapon, WEAPON_ROTATION_INCREMENT } from "./Weapon"
 import { WeaponType } from "./WeaponType"
 
@@ -50,8 +51,6 @@ const initSpriteCache = (
 }
 
 export class SpearWeapon extends Weapon {
-    // private weaponSprite: StaticSpriteSource
-    // private weaponTransform: SpriteTransform
     private offsetFromCenter: Point
     private state: State = State.DRAWN
     private _range: number
@@ -66,35 +65,11 @@ export class SpearWeapon extends Weapon {
                 .rotated(90)
             this._range = baseSprite.dimensions.x
 
-            this.offsetFromCenter = new Point(-12, -9)
+            this.offsetFromCenter = new Point(-12, -8)
 
             spriteCache =
                 spriteCache ??
-                initSpriteCache(
-                    baseSprite,
-                    this.offsetFromCenter,
-                    HAND_POSITION_OFFSET
-                    // new Point(
-                    //     -(this.offsetFromCenter.x - HAND_POSITION_OFFSET.x),
-                    //     -(this.offsetFromCenter.y - HAND_POSITION_OFFSET.y)
-                    // )
-                )
-            // Array.from(
-            //     { length: 180 / WEAPON_ROTATION_INCREMENT + 1 },
-            //     (v, k) => k * WEAPON_ROTATION_INCREMENT - 90
-            // ).reduce((obj, rotation) => {
-            //     obj[rotation] = {
-            //         sprite: Tilesets.instance.dungeonCharacters
-            //             .getTileSource("weapon_spear")
-            //             .rotated(rotation + 90),
-            //         offset: Point.ZERO, // TODO figure out how to rotate around the hand position
-            //     }
-            //     return obj
-            // }, {})
-            // this.weaponTransform = new SpriteTransform(
-            //     Point.ZERO,
-            //     this.weaponSprite.dimensions
-            // ).relativeTo(this.dude.animation.transform)
+                initSpriteCache(baseSprite, this.offsetFromCenter, HAND_POSITION_OFFSET)
         }
     }
 
@@ -110,27 +85,27 @@ export class SpearWeapon extends Weapon {
         this.animate()
     }
 
-    getRenderMethods() {
+    private getSpriteAndTransform(): { sprite: StaticSpriteSource; transform: SpriteTransform } {
         const { sprite, position } = spriteCache[this.getCursorRotation()]
-        // TODO use offset
-        const spriteRender = sprite?.toImageRender(
-            new SpriteTransform(
-                // this.offsetFromCenter
-                // .plus(offset)
-                new Point(
-                    this.dude.animation.sprite.dimensions.x / 2,
-                    this.dude.animation.sprite.dimensions.y
-                )
-                    .plus(position)
-                    // .minus(sprite.dimensions.div(2).apply(Math.floor))
-                    // .plusY(22 - sprite.dimensions.y / 2)
-                    .plus(this.dude.getAnimationOffset())
-                    .apply(Math.floor),
-                sprite.dimensions
-            ).relativeTo(this.dude.animation.transform)
-        )
+        const transform = new SpriteTransform(
+            // convert from "bottom center" to "top left" for the relative sprite
+            new Point(
+                this.dude.animation.sprite.dimensions.x / 2,
+                this.dude.animation.sprite.dimensions.y
+            )
+                .plus(position)
+                .plus(this.dude.getOffsetRelativeToAnimation())
+                .apply(Math.round),
+            sprite.dimensions
+        ).relativeTo(this.dude.animation.transform)
+        return { sprite, transform }
+    }
 
-        return [spriteRender, ...showBoundingBox(spriteRender)]
+    getRenderMethods() {
+        const { sprite, transform } = this.getSpriteAndTransform()
+        const spriteRender = sprite?.toImageRender(transform)
+
+        return [spriteRender]
     }
 
     getType() {
@@ -171,32 +146,40 @@ export class SpearWeapon extends Weapon {
         }
 
         // TODO throwing
-        // const timeToThrow = 500
-        // if (this.timeDrawn > timeToThrow) {
-        //     this.dude.inventory.removeItem(Item.SPEAR, 1)
-        //     this.dude.setWeapon(WeaponType.UNARMED)
+        const timeToThrow = 500
+        if (this.timeDrawn > timeToThrow) {
+            this.dude.inventory.removeItem(Item.SPEAR, 1)
+            this.dude.setWeapon(WeaponType.UNARMED)
 
-        //     const newTransform = new SpriteTransform(
-        //         this.weaponTransform.position,
-        //         this.weaponTransform.dimensions,
-        //         this.weaponTransform.rotation,
-        //         this.weaponTransform.mirrorX,
-        //         this.weaponTransform.mirrorY,
-        //         this.weaponTransform.depth
-        //     )
+            const { sprite, transform } = this.getSpriteAndTransform()
 
-        //     spawnProjectile(
-        //         newTransform.position.plusY(24),
-        //         this.weaponSprite,
-        //         Item.SPEAR,
-        //         new Point(40 * this.dude.getFacingMultiplier(), 4.5),
-        //         this.dude
-        //     )
-        // } else {
-        //     this.state = State.ATTACKING
-        //     setTimeout(() => this.damageEnemies(), 100)
-        //     this.playAttackAnimation()
-        // }
+            const newTransform = new SpriteTransform(
+                transform.position,
+                transform.dimensions,
+                transform.rotation,
+                transform.mirrorX,
+                transform.mirrorY,
+                transform.depth
+            )
+
+            // TODO
+            const tip = this.offsetFromCenter.plus(new Point(26, 2))
+            const rotatedTip = tip.rotatedAround(HAND_POSITION_OFFSET, this.getCursorRotation())
+
+            spawnProjectile(
+                sprite.toComponent(newTransform),
+                this.dude.standingPosition.plus(
+                    new Point(rotatedTip.x * this.dude.getFacingMultiplier(), rotatedTip.y)
+                ),
+                Item.SPEAR,
+                this.getAimingDirection().normalized().times(40),
+                this.dude
+            )
+        } else {
+            this.state = State.ATTACKING
+            setTimeout(() => this.damageEnemies(), 100)
+            this.playAttackAnimation()
+        }
 
         this.timeDrawn = 0
     }
