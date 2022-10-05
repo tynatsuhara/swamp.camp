@@ -68,11 +68,12 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => {
                 output: Item.SWORD,
                 input: [new ItemStack(Item.IRON, 3), new ItemStack(Item.WOOD, 5)],
             },
-            {
-                desc: "Ranged or melee weapon",
-                output: Item.SPEAR,
-                input: [new ItemStack(Item.ROCK, 1), new ItemStack(Item.WOOD, 3)],
-            },
+            // TODO reenable crafting spears once they're done
+            // {
+            //     desc: "Ranged or melee weapon",
+            //     output: Item.SPEAR,
+            //     input: [new ItemStack(Item.ROCK, 1), new ItemStack(Item.WOOD, 3)],
+            // },
             {
                 desc: "Portable light source",
                 output: Item.LANTERN,
