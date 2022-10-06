@@ -1,9 +1,14 @@
 import { debug, Entity, Point } from "brigsby/dist"
-import { SpriteComponent, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
+import {
+    ImageFilter,
+    SpriteComponent,
+    SpriteTransform,
+    StaticSpriteSource,
+} from "brigsby/dist/sprites"
 import { Condition } from "../characters/Condition"
 import { Dude } from "../characters/Dude"
 import { Player } from "../characters/Player"
-import { ImageFilter, ImageFilters } from "../graphics/ImageFilters"
+import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { WorldTime } from "../world/WorldTime"

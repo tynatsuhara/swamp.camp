@@ -1,8 +1,6 @@
 import { Point } from "brigsby/dist"
 import { Color, getRGB } from "../ui/Color"
 
-export type ImageFilter = (img: ImageData) => ImageData
-
 export const ImageFilters = {
     /**
      * any oldColor pixels will be set to newColor
