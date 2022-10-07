@@ -370,6 +370,7 @@ export class MainMenuScene {
 
         // darkness
         // this.darkness = new DarknessMask(false)
+        this.darkness.reset(0, 1)
         this.darkness.addLightCircle(campfirePos.plusX(TILE_SIZE / 2).plusY(TILE_SIZE / 2), 72)
 
         return [new Entity(components), Particles.instance.getEntity()]
