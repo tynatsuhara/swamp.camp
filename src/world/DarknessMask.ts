@@ -2,6 +2,7 @@ import { Component, debug, Point, UpdateData } from "brigsby/dist"
 import { pt } from "brigsby/dist/Point"
 import { ImageRender } from "brigsby/dist/renderer"
 import { Lists } from "brigsby/dist/util"
+import { Dude } from "../characters/Dude"
 import { Lantern } from "../characters/weapons/Lantern"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Color, getRGB } from "../ui/Color"
@@ -44,8 +45,10 @@ export class DarknessMask extends Component {
         // pre-populate the cache with expected light sizes
         for (let i = 1; i <= Campfire.LOG_CAPACITY; i++) {
             this.populateBitmapCache(Campfire.getLightSizeForLogCount(i))
+            this.populateBitmapCache(Campfire.getLightSizeForLogCount(i) + 4)
         }
         this.populateBitmapCache(Lantern.DIAMETER)
+        this.populateBitmapCache(Dude.ON_FIRE_LIGHT_DIAMETER)
     }
 
     private populateBitmapCache(diameter: number) {
@@ -203,15 +206,13 @@ export class DarknessMask extends Component {
             return
         }
 
-        const circleOffset = pt(-0.5).times(diameter)
+        const circleOffset = pt(-0.5 * diameter)
         const adjustedPos = centerPos.plus(DarknessMask.shift).plus(circleOffset).apply(Math.floor)
 
         this.addCircleToQueue(diameter, adjustedPos, outerAlpha)
 
         const innerDiameter = this.getInnerCircleDiameter(diameter)
-        const innerPos = adjustedPos
-            .plus(pt(1).times((diameter - innerDiameter) / 2))
-            .apply(Math.floor)
+        const innerPos = adjustedPos.plus(pt((diameter - innerDiameter) / 2)).apply(Math.floor)
         this.addCircleToQueue(innerDiameter, innerPos, innerAlpha)
     }
 
@@ -220,39 +221,37 @@ export class DarknessMask extends Component {
         return diameter - innerOffset * 2
     }
 
-    // array of (diameter, topLeftPos, alpha)
-    private circleQueue: [number, Point, number][] = []
+    // position is top left
+    private circleQueue: { diameter: number; position: Point; alpha: number }[] = []
 
     /**
      * Queues a light to be rendered
      */
     private addCircleToQueue(diameter: number, position: Point, alpha: number) {
-        this.circleQueue.push([diameter, position, alpha])
+        this.circleQueue.push({ diameter, position, alpha })
         // sort in decreasing order of alpha (most opaque => most transparent)
-        this.circleQueue.sort((a, b) => b[2] - a[2])
+        // this.circleQueue.sort((a, b) => b.alpha - a.alpha)
     }
 
     private imageRender: ImageRender | undefined
     offset: Point = Point.ZERO
 
-    /**
-     * Renders the darkness mask. This can't be called as a one-off
-     * because circle image bitmaps render asyncronously.
-     * @returns null if the darkness mask wasn't drawn yet
-     */
     update(updateData: UpdateData) {
         // prevent tint not extending to the edge
         const _dimensions = updateData.dimensions.plus(pt(1))
 
         if (this.darkness > 0) {
+            this.circleQueue.sort((a, b) => b.alpha - a.alpha)
+
+            // bitmaps are rendered async
             const missingBitmaps = this.circleQueue
-                .map(([diameter]) => diameter)
+                .map(({ diameter }) => diameter)
                 .filter((diameter) => !DarknessMask.circleCache.get(diameter))
 
             if (missingBitmaps.length > 0) {
                 missingBitmaps.forEach(this.createImageBitmap)
             } else {
-                this.circleQueue.forEach((circle) => this.drawCircleToCanvas(...circle))
+                this.circleQueue.forEach((circle) => this.drawCircleToCanvas(circle))
             }
 
             // overlay the time-specific color
@@ -276,7 +275,15 @@ export class DarknessMask extends Component {
         return [this.imageRender]
     }
 
-    private drawCircleToCanvas(diameter: number, position: Point, alpha: number) {
+    private drawCircleToCanvas({
+        diameter,
+        position,
+        alpha,
+    }: {
+        diameter: number
+        position: Point
+        alpha: number
+    }) {
         const circleBitmap = DarknessMask.circleCache.get(diameter)
 
         // Erase the circle
@@ -296,7 +303,7 @@ export class DarknessMask extends Component {
         if (DarknessMask.circleCache.get(diameter)) {
             return
         }
-        const center = pt(diameter / 2).minus(pt(0.5))
+        const center = pt(diameter / 2 - 0.5)
         const imageBuffer: number[] = Lists.repeat(diameter * diameter, [...getRGB(Color.BLACK), 0])
         for (let x = 0; x < diameter; x++) {
             for (let y = 0; y < diameter; y++) {

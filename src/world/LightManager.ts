@@ -137,7 +137,7 @@ export class LightManager extends Component {
 
         // Always provide slight visibility around the player
         const player = Player.instance?.dude
-        if (!!player) {
+        if (player) {
             if (player.shieldType !== ShieldType.LANTERN) {
                 this.mask.addFaintLightCircle(
                     player.standingPosition.plusY(-TILE_SIZE / 2).plus(player.getAnimationOffset()),

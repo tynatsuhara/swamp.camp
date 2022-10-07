@@ -52,6 +52,7 @@ import { WeaponType } from "./weapons/WeaponType"
 export class Dude extends Component implements DialogueSource {
     static readonly PLAYER_COLLISION_LAYER = "playa"
     static readonly NPC_COLLISION_LAYER = "npc"
+    static readonly ON_FIRE_LIGHT_DIAMETER = 40
 
     // managed by WorldLocation/LocationManager classes
     location: Location
@@ -370,7 +371,7 @@ export class Dude extends Component implements DialogueSource {
                         here(),
                         this.fireParticles,
                         this.standingPosition.plusY(-TILE_SIZE / 2).plus(this.getAnimationOffset()),
-                        40
+                        Dude.ON_FIRE_LIGHT_DIAMETER
                     )
                     if (timeSinceLastExec > 500) {
                         const fireDamage = 0.3
