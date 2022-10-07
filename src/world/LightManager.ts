@@ -11,15 +11,20 @@ import { TimeUnit } from "./TimeUnit"
 import { VisibleRegionMask } from "./VisibleRegionMask"
 import { WorldTime } from "./WorldTime"
 
+type LightCircle = {
+    position: Point
+    diameter: number
+}
+
 export class LightManager extends Component {
     static get instance() {
         return Singletons.getOrCreate(LightManager)
     }
 
     private keyLocationMap: Map<any, Location> = new Map()
-    private lightTiles: Map<Location, Map<any, [Point, number]>> = new Map<
+    private lightTiles: Map<Location, Map<any, LightCircle>> = new Map<
         Location,
-        Map<any, [Point, number]>
+        Map<any, LightCircle>
     >()
     private mask: DarknessMask
 
@@ -41,7 +46,7 @@ export class LightManager extends Component {
     /**
      * @param key the unique key for location, will overwrite that light source if it already exists
      */
-    addLight(wl: Location, key: any, pixelPosition: Point, diameter: number = 16) {
+    addLight(wl: Location, key: any, position: Point, diameter: number = 16) {
         if (diameter % 4 !== 0) {
             throw new Error("only circle with a diameter multiple of 4 works")
         }
@@ -49,8 +54,8 @@ export class LightManager extends Component {
             this.removeLight(key)
         }
         this.keyLocationMap.set(key, wl)
-        const locationLightMap = this.lightTiles.get(wl) ?? new Map()
-        locationLightMap.set(key, [pixelPosition, diameter])
+        const locationLightMap = this.lightTiles.get(wl) ?? new Map<any, LightCircle>()
+        locationLightMap.set(key, { position, diameter })
         this.lightTiles.set(wl, locationLightMap)
     }
 
@@ -95,8 +100,8 @@ export class LightManager extends Component {
             return true // nighttime with no lights
         }
         return !Array.from(locationLightMap.values()).some(
-            (entry) =>
-                entry[0].distanceTo(pixelPt) < entry[1] * 0.5 * tolerableDistanceFromLightMultiplier
+            ({ position, diameter }) =>
+                position.distanceTo(pixelPt) < diameter * 0.5 * tolerableDistanceFromLightMultiplier
         )
     }
 
@@ -122,7 +127,7 @@ export class LightManager extends Component {
         //     return darkness
         // }
 
-        if (location?.type === LocationType.MINE_INTERIOR) {
+        if (location.type === LocationType.MINE_INTERIOR) {
             return 0.99
         }
     }
@@ -146,8 +151,8 @@ export class LightManager extends Component {
             return
         }
 
-        Array.from(locationLightGrid.values()).forEach((entry) => {
-            this.mask.addLightCircle(entry[0], entry[1])
+        Array.from(locationLightGrid.values()).forEach(({ position, diameter }) => {
+            this.mask.addLightCircle(position, diameter)
         })
     }
 
