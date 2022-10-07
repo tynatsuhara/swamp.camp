@@ -3,6 +3,7 @@ import { BoxCollider } from "brigsby/dist/collision"
 import { SpriteComponent } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
 import { DroppedItem } from "../../items/DroppedItem"
+import { GroundRenderer } from "../../world/GroundRenderer"
 import { here } from "../../world/LocationManager"
 import { WorldTime } from "../../world/WorldTime"
 import { Dude } from "../Dude"
@@ -63,6 +64,8 @@ class Projectile extends Component {
 
         this.velocity = Point.ZERO
         this.collider.delete()
+        this.sprite.transform.depth = GroundRenderer.DEPTH + 1000 // should be above all ground stuff but under all players
+        this.enabled = false // no more updates! no more updates!
 
         // collided, short circuit
         const enemy = this.getEnemy(

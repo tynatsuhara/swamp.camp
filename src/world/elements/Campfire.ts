@@ -9,6 +9,7 @@ import { FireParticles } from "../../graphics/particles/FireParticles"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
+import { GroundRenderer } from "../GroundRenderer"
 import { LightManager } from "../LightManager"
 import { Location } from "../Location"
 import { camp } from "../LocationManager"
@@ -34,7 +35,7 @@ export class CampfireFactory extends ElementFactory {
         const campfireSprite = e.addComponent(
             new SpriteComponent(
                 Tilesets.instance.outdoorTiles.getTileSource("campfireRing"),
-                SpriteTransform.new({ position: scaledPos, depth })
+                SpriteTransform.new({ position: scaledPos, depth: GroundRenderer.DEPTH + 1 })
             )
         )
 
