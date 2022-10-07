@@ -45,7 +45,6 @@ export class DarknessMask extends Component {
         // pre-populate the cache with expected light sizes
         for (let i = 1; i <= Campfire.LOG_CAPACITY; i++) {
             this.populateBitmapCache(Campfire.getLightSizeForLogCount(i))
-            this.populateBitmapCache(Campfire.getLightSizeForLogCount(i) + 4)
         }
         this.populateBitmapCache(Lantern.DIAMETER)
         this.populateBitmapCache(Dude.ON_FIRE_LIGHT_DIAMETER)
