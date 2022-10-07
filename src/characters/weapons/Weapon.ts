@@ -87,7 +87,10 @@ export abstract class Weapon extends Component {
         return new Point(mousePos.x - centerPos.x, mousePos.y - centerPos.y)
     }
 
-    getCursorRotation() {
+    /**
+     * @returns the angle in degrees of the line between the player and the cursor
+     */
+    getAimingAngle() {
         const { x: xDiff, y: yDiff } = this.getAimingDirection()
         const degrees = (180 / Math.PI) * Math.atan(yDiff / Math.abs(xDiff))
         const result = Math.round(degrees / WEAPON_ROTATION_INCREMENT) * WEAPON_ROTATION_INCREMENT

@@ -81,12 +81,16 @@ export class SpearWeapon extends Weapon {
         if (!!this.animator) {
             this.animator.update(updateData.elapsedTimeMillis)
         }
-
-        this.animate()
     }
 
-    private getSpriteAndTransform(): { sprite: StaticSpriteSource; transform: SpriteTransform } {
-        const { sprite, position } = spriteCache[this.getCursorRotation()]
+    private getSpriteAndTransform(
+        angle: number,
+        offset = Point.ZERO
+    ): {
+        sprite: StaticSpriteSource
+        transform: SpriteTransform
+    } {
+        const { sprite, position } = spriteCache[angle]
         const transform = new SpriteTransform(
             // convert from "bottom center" to "top left" for the relative sprite
             new Point(
@@ -94,6 +98,7 @@ export class SpearWeapon extends Weapon {
                 this.dude.animation.sprite.dimensions.y
             )
                 .plus(position)
+                .plus(offset)
                 .plus(this.dude.getOffsetRelativeToAnimation())
                 .apply(Math.round),
             sprite.dimensions
@@ -102,10 +107,27 @@ export class SpearWeapon extends Weapon {
     }
 
     getRenderMethods() {
-        const { sprite, transform } = this.getSpriteAndTransform()
-        const spriteRender = sprite?.toImageRender(transform)
+        let angle = this.getAimingAngle()
+        let offset = Point.ZERO
 
-        return [spriteRender]
+        const drawSpeed = 100
+
+        if (this.state === State.DRAWN) {
+            // no-op
+        } else if (this.state === State.SHEATHED) {
+            offset = new Point(0, -2)
+            angle = -90
+        } else if (this.state === State.DRAWING) {
+            const drawn = Math.floor(this.timeDrawn / -drawSpeed)
+            offset = new Point(Math.max(drawn, -4), 0).rotatedAround(Point.ZERO, angle)
+        } else if (this.state === State.ATTACKING) {
+            offset = this.getAttackAnimationPosition().rotatedAround(Point.ZERO, angle)
+        }
+
+        const { sprite, transform } = this.getSpriteAndTransform(angle, offset)
+        transform.depth = this.state == State.SHEATHED ? -0.5 : 0.5
+
+        return [sprite?.toImageRender(transform)]
     }
 
     getType() {
@@ -145,13 +167,12 @@ export class SpearWeapon extends Weapon {
             return
         }
 
-        // TODO throwing
         const timeToThrow = 500
         if (this.timeDrawn > timeToThrow) {
             this.dude.inventory.removeItem(Item.SPEAR, 1)
             this.dude.setWeapon(WeaponType.UNARMED)
 
-            const { sprite, transform } = this.getSpriteAndTransform()
+            const { sprite, transform } = this.getSpriteAndTransform(this.getAimingAngle())
 
             const newTransform = new SpriteTransform(
                 transform.position,
@@ -162,9 +183,8 @@ export class SpearWeapon extends Weapon {
                 transform.depth
             )
 
-            // TODO
             const tip = this.offsetFromCenter.plus(new Point(26, 2))
-            const rotatedTip = tip.rotatedAround(HAND_POSITION_OFFSET, this.getCursorRotation())
+            const rotatedTip = tip.rotatedAround(HAND_POSITION_OFFSET, this.getAimingAngle())
 
             spawnProjectile(
                 sprite.toComponent(newTransform),
@@ -189,59 +209,12 @@ export class SpearWeapon extends Weapon {
             return
         }
         const attackDistance = this.getRange() + 4 // add a tiny buffer for small weapons like the dagger to still work
-        // TODO maybe only allow big weapons to hit multiple targets
-        Weapon.getEnemiesInRange(this.dude, attackDistance).forEach((d) => {
-            d.damage(1, {
-                direction: d.standingPosition.minus(this.dude.standingPosition),
-                knockback: 30,
-                attacker: this.dude,
-            })
+        const enemy = Weapon.getEnemiesInRange(this.dude, attackDistance)[0]
+        enemy?.damage(1, {
+            direction: enemy.standingPosition.minus(this.dude.standingPosition),
+            knockback: 30,
+            attacker: this.dude,
         })
-    }
-
-    // private getBasePosition(rotation) {
-    //     let offset = new Point(
-    //         this.dude.animation.transform.dimensions.x / 2 - this.weaponTransform.dimensions.x / 2,
-    //         this.dude.animation.transform.dimensions.y - this.weaponTransform.dimensions.y
-    //     ).plus(this.offsetFromCenter)
-
-    //     if (rotation === 90) {
-    //         offset = offset.plus(new Point(10, 10))
-    //     }
-
-    //     return offset.plus(this.dude.getOffsetRelativeToAnimation())
-    // }
-
-    private animate() {
-        const drawSpeed = 100
-
-        let pos = Point.ZERO
-        let rotation = 0
-
-        if (this.state === State.DRAWN) {
-            if (!this.dude.shield || this.dude.shield.canAttack()) {
-                // rotation = this.getSpearCursorRotation()
-            }
-        } else if (this.state === State.SHEATHED) {
-            // center on back
-            pos = new Point(3, -2)
-        } else if (this.state === State.DRAWING) {
-            const drawn = Math.floor(this.timeDrawn / -drawSpeed)
-            pos = new Point(Math.max(drawn, -4), 0)
-            // rotation = this.getSpearCursorRotation()
-        } else if (this.state === State.ATTACKING) {
-            pos = this.getAttackAnimationPosition()
-            // rotation = this.getSpearCursorRotation()
-        }
-
-        // pos = pos.plus(this.getBasePosition(rotation))
-
-        // this.weaponTransform.rotation = rotation
-        // this.weaponTransform.position = pos
-
-        // // show sword behind character if sheathed
-        // this.weaponTransform.depth = this.state == State.SHEATHED ? -0.5 : 0.5
-        // this.weaponTransform.mirrorY = rotation === 90
     }
 
     private frameCount = 6
