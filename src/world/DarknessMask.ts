@@ -246,6 +246,7 @@ export class DarknessMask extends Component {
             if (missingBitmaps.length > 0) {
                 missingBitmaps.forEach(this.createImageBitmap)
             } else {
+                // sort in decreasing order of alpha (most opaque => most transparent) to draw properly
                 this.circleQueue.sort((a, b) => b.alpha - a.alpha)
                 this.circleQueue.forEach((circle) => this.drawCircleToCanvas(circle))
             }
