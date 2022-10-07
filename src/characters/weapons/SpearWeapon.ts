@@ -191,8 +191,8 @@ export class SpearWeapon extends Weapon {
                 this.dude.standingPosition.plus(
                     new Point(rotatedTip.x * this.dude.getFacingMultiplier(), rotatedTip.y)
                 ),
-                Item.SPEAR,
-                this.getAimingDirection().normalized().times(40),
+                // Item.SPEAR,
+                this.getAimingDirection().normalized().times(1.1),
                 this.dude
             )
         } else {
