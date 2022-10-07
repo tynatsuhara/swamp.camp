@@ -103,7 +103,7 @@ export const ITEM_DIALOGUES: DialogueSet = {
                     Player.instance.dude.inventory.removeItem(Item.WOOD, logsTransferred)
                 }
                 cf.addLogs(logsTransferred)
-                return new NextDialogue(CAMPFIRE_ADD_LOGS, true)
+                return new NextDialogue(CAMPFIRE_DIALOGUE, false)
             }
         }
 
