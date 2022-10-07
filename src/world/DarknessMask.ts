@@ -228,8 +228,6 @@ export class DarknessMask extends Component {
      */
     private addCircleToQueue(diameter: number, position: Point, alpha: number) {
         this.circleQueue.push({ diameter, position, alpha })
-        // sort in decreasing order of alpha (most opaque => most transparent)
-        // this.circleQueue.sort((a, b) => b.alpha - a.alpha)
     }
 
     private imageRender: ImageRender | undefined
@@ -240,8 +238,6 @@ export class DarknessMask extends Component {
         const _dimensions = updateData.dimensions.plus(pt(1))
 
         if (this.darkness > 0) {
-            this.circleQueue.sort((a, b) => b.alpha - a.alpha)
-
             // bitmaps are rendered async
             const missingBitmaps = this.circleQueue
                 .map(({ diameter }) => diameter)
@@ -250,6 +246,7 @@ export class DarknessMask extends Component {
             if (missingBitmaps.length > 0) {
                 missingBitmaps.forEach(this.createImageBitmap)
             } else {
+                this.circleQueue.sort((a, b) => b.alpha - a.alpha)
                 this.circleQueue.forEach((circle) => this.drawCircleToCanvas(circle))
             }
 
