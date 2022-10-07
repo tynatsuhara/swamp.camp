@@ -183,7 +183,7 @@ export class SpearWeapon extends Weapon {
                 transform.depth
             )
 
-            const tip = this.offsetFromCenter.plus(new Point(26, 2))
+            const tip = this.offsetFromCenter.plus(new Point(22, 2))
             const rotatedTip = tip.rotatedAround(HAND_POSITION_OFFSET, this.getAimingAngle())
 
             spawnProjectile(

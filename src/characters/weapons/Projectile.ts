@@ -48,7 +48,7 @@ class Projectile extends Component {
         const beforePos = this.sprite.transform.position
 
         this.sprite.transform.position = this.collider
-            .moveTo(this.collider.position.plus(this.velocity.times(elapsedTimeMillis)))
+            .moveTo(this.collider.position.plus(this.velocity.times(elapsedTimeMillis)), false)
             .minus(colliderOffset)
         this.sprite.transform.depth =
             this.sprite.transform.position.y + this.sprite.transform.dimensions.y
@@ -62,7 +62,7 @@ class Projectile extends Component {
         }
 
         this.velocity = Point.ZERO
-        this.collider.delete() // TODO
+        this.collider.delete()
 
         // collided, short circuit
         const enemy = this.getEnemy(
