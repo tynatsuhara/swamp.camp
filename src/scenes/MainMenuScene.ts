@@ -78,6 +78,8 @@ export class MainMenuScene {
             )
             this.view = null // force re-render
         })
+
+        this.darkness = new Entity().addComponent(new DarknessMask(false))
     }
 
     loadLastSave() {
@@ -116,7 +118,7 @@ export class MainMenuScene {
         const dimensions = renderer.getDimensions().div(ZOOM)
 
         // we need to re-render this each time since image bitmaps are async
-        this.darkness?.render(dimensions, Point.ZERO)
+        // this.darkness?.render(dimensions, Point.ZERO)
 
         // Don't re-render if nothing has changed, since a lot of
         // these functions involve parsing all of our save slots
@@ -151,14 +153,14 @@ export class MainMenuScene {
         const sceneEntities = this.getSceneEntities(knightPos)
         this.lastDimensions = renderer.getDimensions()
 
-        const darknessEntity = this.darkness.render(dimensions, Point.ZERO)
-        if (!darknessEntity) {
-            // darkness bitmaps haven't processed yet, wait to draw
-            return []
-        }
+        // const darknessEntity = this.darkness.render(dimensions, Point.ZERO)
+        // if (!darknessEntity) {
+        //     // darkness bitmaps haven't processed yet, wait to draw
+        //     return []
+        // }
 
         // by default, render the title and the scene with the knight
-        const entities = [title, this.knight.entity, darknessEntity, ...sceneEntities]
+        const entities = [title, this.knight.entity, this.darkness.entity, ...sceneEntities]
 
         const link = (url: string) => () => window.open(`https://${url}`, "_blank")
 
@@ -367,7 +369,7 @@ export class MainMenuScene {
         // components.push(gb)
 
         // darkness
-        this.darkness = new DarknessMask(false)
+        // this.darkness = new DarknessMask(false)
         this.darkness.addLightCircle(campfirePos.plusX(TILE_SIZE / 2).plusY(TILE_SIZE / 2), 72)
 
         return [new Entity(components), Particles.instance.getEntity()]

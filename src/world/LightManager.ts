@@ -21,7 +21,22 @@ export class LightManager extends Component {
         Location,
         Map<any, [Point, number]>
     >()
-    private mask = new DarknessMask(true)
+    private mask: DarknessMask
+
+    constructor() {
+        super()
+        // Set up the entity
+        new Entity([this])
+    }
+
+    awake() {
+        this.mask = this.entity.addComponent(new DarknessMask(true))
+    }
+
+    update() {
+        this.mask.offset = Camera.instance.position
+        this.render()
+    }
 
     /**
      * @param key the unique key for location, will overwrite that light source if it already exists
@@ -107,7 +122,7 @@ export class LightManager extends Component {
         //     return darkness
         // }
 
-        if (location.type === LocationType.MINE_INTERIOR) {
+        if (location?.type === LocationType.MINE_INTERIOR) {
             return 0.99
         }
     }
@@ -136,19 +151,8 @@ export class LightManager extends Component {
         })
     }
 
-    awake() {
-        this.update()
-    }
-
-    update() {
-        this.render()
-        this.renderedEntity = this.mask.render(Camera.instance.dimensions, Camera.instance.position)
-    }
-
-    private renderedEntity: Entity
-
     getEntities(): Entity[] {
-        const result = [new Entity([this]), this.renderedEntity]
+        const result = [this.entity]
 
         const location = here()
         if (!location.isInterior) {
