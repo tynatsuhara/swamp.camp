@@ -1,5 +1,5 @@
-import { assets } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
+import { loadAudio } from "./DeferLoadAudio"
 import { Sounds } from "./Sounds"
 
 const VOLUME = 0.4
@@ -10,7 +10,7 @@ const MEDIUM_LONG = [3, 9, 5, 1, 8]
 const LONG = [2, 7, 10, 11]
 
 const AUDIO_FILES = Lists.range(0, 22).map((i) => `audio/talkingsynth/TalkingSynth_${i}.wav`)
-assets.loadAudioFiles(AUDIO_FILES)
+loadAudio(AUDIO_FILES)
 
 let currentAudio: HTMLAudioElement
 

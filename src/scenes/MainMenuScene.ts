@@ -4,6 +4,7 @@ import { SpriteComponent, SpriteTransform, StaticSpriteSource } from "brigsby/di
 import { Lists } from "brigsby/dist/util"
 import { View } from "brigsby/dist/View"
 import { Ambiance } from "../audio/Ambiance"
+import { loadDeferredAudio } from "../audio/DeferLoadAudio"
 import { Music } from "../audio/Music"
 import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
 import { Player } from "../characters/Player"
@@ -56,6 +57,9 @@ export class MainMenuScene {
             this.waitingForAssets = true
         }
         return assets.loadImageFiles(getFilesToLoadForGame()).then(() => {
+            // it's probably okay if audio loads late
+            loadDeferredAudio()
+
             this.allAssetsLoaded = true
             this.waitingForAssets = false
             console.log("assets loaded!")

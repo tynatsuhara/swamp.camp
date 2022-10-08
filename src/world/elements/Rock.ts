@@ -1,6 +1,7 @@
-import { assets, Entity, Point } from "brigsby/dist"
+import { Entity, Point } from "brigsby/dist"
 import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
+import { loadAudio } from "../../audio/DeferLoadAudio"
 import { Sounds } from "../../audio/Sounds"
 import { Player } from "../../characters/Player"
 import { WeaponType } from "../../characters/weapons/WeaponType"
@@ -24,7 +25,7 @@ export class RockFactory extends ElementFactory {
 
     constructor() {
         super()
-        assets.loadAudioFiles(MINING_AUDIO)
+        loadAudio(MINING_AUDIO)
     }
 
     make(wl: Location, pos: Point, data: any): ElementComponent {

@@ -1,6 +1,7 @@
-import { assets, Component, Entity, Point } from "brigsby/dist"
+import { Component, Entity, Point } from "brigsby/dist"
 import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
+import { loadAudio } from "../../audio/DeferLoadAudio"
 import { Sounds } from "../../audio/Sounds"
 import { Player } from "../../characters/Player"
 import { WeaponType } from "../../characters/weapons/WeaponType"
@@ -45,7 +46,7 @@ export class TreeFactory extends ElementFactory<SaveData> {
     constructor(type: ElementType.TREE_ROUND | ElementType.TREE_POINTY) {
         super()
         this.type = type
-        assets.loadAudioFiles([...CHOPPING_AUDIO, ...PUSH_AUDIO])
+        loadAudio([...CHOPPING_AUDIO, ...PUSH_AUDIO])
     }
 
     make(wl: Location, pos: Point, data: SaveData): ElementComponent<SaveData> {

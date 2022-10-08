@@ -42,7 +42,7 @@ export const getImage = (fileName: string) => {
 
 const versionize = (fileName: string) => {
     const hash = window.SWAMP_CAMP.assets[fileName]
-    return `${fileName}?q=${hash}`
+    return `${fileName}?v=${hash}`
 }
 
 /**

@@ -1,7 +1,8 @@
-import { assets, Component, Entity, Point, UpdateData } from "brigsby/dist"
+import { Component, Entity, Point, UpdateData } from "brigsby/dist"
 import { BasicRenderComponent, ImageRender } from "brigsby/dist/renderer"
 import { NineSlice, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Maths } from "brigsby/dist/util"
+import { loadAudio } from "../audio/DeferLoadAudio"
 import { Sounds } from "../audio/Sounds"
 import { Player } from "../characters/Player"
 import { controls } from "../Controls"
@@ -49,7 +50,7 @@ export class CraftingMenu extends Component {
         this.canvas.height = this.innerDimensions.y
         this.context = this.canvas.getContext("2d", { alpha: false })
 
-        assets.loadAudioFiles([this.craftNoise])
+        loadAudio([this.craftNoise])
     }
 
     update(updateData: UpdateData) {

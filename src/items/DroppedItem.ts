@@ -1,7 +1,8 @@
-import { assets, Component, Point } from "brigsby/dist"
+import { Component, Point } from "brigsby/dist"
 import { BoxCollider, Collider } from "brigsby/dist/collision"
 import { SpriteComponent } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
+import { loadAudio } from "../audio/DeferLoadAudio"
 import { Sounds } from "../audio/Sounds"
 import { Player } from "../characters/Player"
 import { here } from "../world/locations/LocationManager"
@@ -25,7 +26,7 @@ export class DroppedItem extends Component {
     constructor(position: Point, item: Item, velocity: Point, sourceCollider: Collider = null) {
         super()
 
-        assets.loadAudioFiles(PICK_UP_SOUNDS)
+        loadAudio(PICK_UP_SOUNDS)
 
         this.itemType = item
         this.start = () => {

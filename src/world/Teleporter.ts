@@ -1,4 +1,5 @@
-import { assets, Point } from "brigsby/dist"
+import { Point } from "brigsby/dist"
+import { loadAudio } from "../audio/DeferLoadAudio"
 
 export type Teleporter = {
     to: string // destination uuid
@@ -31,4 +32,4 @@ export const Teleporters = {
     },
 }
 
-assets.loadAudioFiles([TeleporterSound.TENT, TeleporterSound.DOOR].map((ts) => ts[0]))
+loadAudio([TeleporterSound.TENT, TeleporterSound.DOOR].map((ts) => ts[0]))

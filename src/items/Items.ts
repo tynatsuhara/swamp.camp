@@ -1,6 +1,7 @@
-import { assets, Entity, Point } from "brigsby/dist"
+import { Entity, Point } from "brigsby/dist"
 import { Collider } from "brigsby/dist/collision"
 import { SpriteSource, StaticSpriteSource } from "brigsby/dist/sprites"
+import { loadAudio } from "../audio/DeferLoadAudio"
 import { Sounds } from "../audio/Sounds"
 import { Condition } from "../characters/Condition"
 import { Player } from "../characters/Player"
@@ -113,7 +114,7 @@ const SOUNDS: { [key: string]: [string, number] } = {
     drink: ["/audio/rpg/inventory/bottle.wav", 0.2],
     eat: ["/audio/rpg/NPC/beetle/bite-small.wav", 0.3],
 }
-assets.loadAudioFiles(Object.values(SOUNDS).map((s) => s[0]))
+loadAudio(Object.values(SOUNDS).map((s) => s[0]))
 
 // Data that doesn't get serialized (TODO make builder pattern)
 export const ITEM_METADATA_MAP = {

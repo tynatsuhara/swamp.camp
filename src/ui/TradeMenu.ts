@@ -1,4 +1,4 @@
-import { assets, Component, Entity, Point, UpdateData } from "brigsby/dist"
+import { Component, Entity, Point, UpdateData } from "brigsby/dist"
 import { BasicRenderComponent, ImageRender, TextRender } from "brigsby/dist/renderer"
 import {
     AnimatedSpriteComponent,
@@ -7,6 +7,7 @@ import {
     StaticSpriteSource,
 } from "brigsby/dist/sprites"
 import { Lists, Maths } from "brigsby/dist/util"
+import { loadAudio } from "../audio/DeferLoadAudio"
 import { Sounds } from "../audio/Sounds"
 import { Dude } from "../characters/Dude"
 import { Player } from "../characters/Player"
@@ -74,7 +75,7 @@ export class TradeMenu extends Component {
         this.canvas = document.createElement("canvas")
         this.context = this.canvas.getContext("2d", { alpha: false })
 
-        assets.loadAudioFiles(CLINK_NOISES)
+        loadAudio(CLINK_NOISES)
     }
 
     update(updateData: UpdateData) {
