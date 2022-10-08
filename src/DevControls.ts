@@ -26,25 +26,43 @@ import { TimeUnit } from "./world/TimeUnit"
 import { WorldTime } from "./world/WorldTime"
 
 const SPAWNABLE_TYPES = [
-    DudeType.FOREST_GUARDIAN,
-    DudeType.KNIGHT,
-    DudeType.ONION,
-    DudeType.GUMBALL,
-    DudeType.TRAVELING_MERCHANT,
-    DudeType.GNOLL_SCOUT,
+    // Wildlife
+    DudeType.WOLF,
+    DudeType.SWAMP_THING,
+    DudeType.BEAR,
+    DudeType.SHROOM,
+
+    // Demons
+    DudeType.HORNED_DEMON,
+    DudeType.DEMON_BRUTE,
+
+    // Orcs
+    DudeType.ORC_WARRIOR,
+    DudeType.ORC_BRUTE,
+    DudeType.ORC_SHAMAN,
+
+    // Villagers
+    DudeType.VILLAGER,
+    DudeType.DOCTOR,
     DudeType.BLACKSMITH,
     DudeType.SPOOKY_VISITOR,
-    DudeType.VILLAGER,
-    DudeType.SHROOM,
-    DudeType.NUN,
+    DudeType.TRAVELING_MERCHANT,
+    DudeType.KNIGHT,
     DudeType.CLERIC,
+    DudeType.NUN,
     DudeType.BISHOP,
-    DudeType.DOCTOR,
-    DudeType.BEAR,
-    DudeType.WOLF,
-    DudeType.DEMON_BRUTE,
+
+    // Pets
+    DudeType.GUMBALL,
+    DudeType.ONION,
+
+    // Misc
+    DudeType.FOREST_GUARDIAN,
+    DudeType.GNOLL_SCOUT,
     DudeType.CENTAUR,
+    DudeType.ELF,
 ]
+
 export const spawnMenu = {
     show: false,
     page: 0,
@@ -105,7 +123,16 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
         "spawn selected type",
         (input) => DudeFactory.instance.new(spawnMenu.getSelectedType(), input.mousePos, here()),
     ],
-    [InputKey.P, "show spawn menu", () => (spawnMenu.show = !spawnMenu.show)],
+    [
+        InputKey.P,
+        "show/hide spawn menu",
+        () => {
+            spawnMenu.show = !spawnMenu.show
+            if (!spawnMenu.show) {
+                spawnMenu.page = 0
+            }
+        },
+    ],
     [
         InputKey.U,
         "generate radiant location",
