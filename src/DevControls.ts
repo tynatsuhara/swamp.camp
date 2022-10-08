@@ -35,10 +35,10 @@ const SPAWNABLE_TYPES = [
     DudeType.BLACKSMITH,
     DudeType.SPOOKY_VISITOR,
     DudeType.VILLAGER,
-    // DudeType.SHROOM,
-    // DudeType.NUN,
-    // DudeType.CLERIC,
-    // DudeType.BISHOP,
+    DudeType.SHROOM,
+    DudeType.NUN,
+    DudeType.CLERIC,
+    DudeType.BISHOP,
     DudeType.DOCTOR,
     DudeType.BEAR,
     DudeType.WOLF,
@@ -47,6 +47,8 @@ const SPAWNABLE_TYPES = [
 ]
 export const spawnMenu = {
     show: false,
+    page: 0,
+    pageSize: 10,
     setSelectedType: (type: DudeType) => {
         localStorage.setItem("spawnMenuType", JSON.stringify(type))
     },

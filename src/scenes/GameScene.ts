@@ -24,7 +24,7 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { DroppedItem } from "../items/DroppedItem"
 import { Singletons } from "../Singletons"
 import { ZOOM } from "../SwampCampGame"
-import { ButtonsMenu } from "../ui/ButtonsMenu"
+import { ButtonsMenu, OptionButton } from "../ui/ButtonsMenu"
 import { Color } from "../ui/Color"
 import { UIStateManager } from "../ui/UIStateManager"
 import { CampLocationGenerator } from "../world/CampLocationGenerator"
@@ -236,20 +236,44 @@ export class GameScene {
 
     private getUiSpaceDebugEntity() {
         if (spawnMenu.show) {
-            return ButtonsMenu.render(
-                "white",
-                spawnMenu.types.map((type) => ({
-                    text: `SPAWN ${DudeType[type]}`,
+            const selectedType = spawnMenu.getSelectedType()
+            const pageStart = spawnMenu.page * spawnMenu.pageSize
+            const dudeTypeButtons: OptionButton[] = [
+                selectedType,
+                ...spawnMenu.types.filter((t) => t !== selectedType),
+            ]
+                .slice(pageStart, pageStart + spawnMenu.pageSize)
+                .map((type, index) => ({
+                    text:
+                        type === selectedType
+                            ? `[SELECTED] ${DudeType[type]}`
+                            : `SPAWN ${DudeType[type]}`,
                     fn: () => {
                         spawnMenu.setSelectedType(type)
+                        console.log(`press [O] to spawn ${DudeType[type]} at mouse position`)
                         spawnMenu.show = false
                     },
                     buttonColor: "white",
                     textColor: Color.WHITE,
                     hoverColor: Color.RED_2,
-                })),
-                Camera.instance.dimensions.div(2)
-            )
+                }))
+
+            const nextPageButton: OptionButton = {
+                text: "NEXT",
+                fn: () => {
+                    spawnMenu.page++
+                    if (spawnMenu.page * spawnMenu.pageSize > spawnMenu.types.length) {
+                        spawnMenu.page = 0
+                    }
+                },
+                buttonColor: "white",
+                textColor: Color.WHITE,
+                hoverColor: Color.RED_2,
+            }
+
+            const buttons = [...dudeTypeButtons, nextPageButton]
+
+            return ButtonsMenu.render("white", buttons, Camera.instance.dimensions.div(2))
         }
     }
 }
