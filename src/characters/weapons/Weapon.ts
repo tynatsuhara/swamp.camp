@@ -1,12 +1,17 @@
 import { Component, Point } from "brigsby/dist"
+import { StaticSpriteSource } from "brigsby/dist/sprites"
 import { controls } from "../../Controls"
 import { Hittable } from "../../world/elements/Hittable"
 import { here } from "../../world/LocationManager"
 import { Dude } from "../Dude"
 import { WeaponType } from "./WeaponType"
 
+// This should be a factor of 90 to make sure we can aim up/down/left/right
 export const WEAPON_ROTATION_INCREMENT = 15
 export const HAND_POSITION_OFFSET = new Point(-4, -6)
+
+// maps rotation -> { sprite, position (relative offset to the original sprite ) }
+export type WeaponSpriteCache = Record<number, { sprite: StaticSpriteSource; position: Point }>
 
 export abstract class Weapon extends Component {
     protected dude: Dude
@@ -59,7 +64,8 @@ export abstract class Weapon extends Component {
     abstract getRange(): number
 
     /**
-     * Melee weapons will return 0
+     * This is the minimum distance that NPCs using this weapon will want to be from their target.
+     * Melee weapons should return 0.
      */
     getStoppingDistance() {
         return 0
@@ -81,7 +87,7 @@ export abstract class Weapon extends Component {
      */
     cancelAttack() {}
 
-    getAimingDirection(): Point {
+    getPlayerAimingDirection(): Point {
         const mousePos = controls.getWorldSpaceMousePos()
         const centerPos = this.dude.standingPosition.plusY(HAND_POSITION_OFFSET.y)
         return new Point(mousePos.x - centerPos.x, mousePos.y - centerPos.y)
@@ -91,9 +97,36 @@ export abstract class Weapon extends Component {
      * @returns the angle in degrees of the line between the player and the cursor
      */
     getAimingAngle() {
-        const { x: xDiff, y: yDiff } = this.getAimingDirection()
+        const { x: xDiff, y: yDiff } = this.getPlayerAimingDirection()
         const degrees = (180 / Math.PI) * Math.atan(yDiff / Math.abs(xDiff))
         const result = Math.round(degrees / WEAPON_ROTATION_INCREMENT) * WEAPON_ROTATION_INCREMENT
         return result
+    }
+
+    static initSpriteCache(
+        baseSprite: StaticSpriteSource,
+        baseSpritePosition: Point,
+        rotationPoint: Point
+    ): WeaponSpriteCache {
+        const cache: WeaponSpriteCache = {}
+        const ogCenter = baseSpritePosition.plus(baseSprite.dimensions.floorDiv(2))
+
+        for (let i = -90; i <= 90; i += WEAPON_ROTATION_INCREMENT) {
+            if (i === 0) {
+                cache[i] = {
+                    sprite: baseSprite,
+                    position: baseSpritePosition,
+                }
+            } else {
+                const rotatedSprite = baseSprite.rotated(i)
+                const centerAfterRotation = ogCenter.rotatedAround(rotationPoint, i)
+                cache[i] = {
+                    sprite: rotatedSprite,
+                    position: centerAfterRotation.minus(rotatedSprite.dimensions.floorDiv(2)),
+                }
+            }
+        }
+
+        return cache
     }
 }

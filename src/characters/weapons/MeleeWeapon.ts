@@ -21,10 +21,10 @@ export class MeleeWeapon extends Weapon {
     private slashSprite: SpriteComponent
     private _range: number
 
-    constructor(weaponType: WeaponType, weaponId: string, offsetFromCenter: Point) {
+    constructor(weaponType: WeaponType, spriteId: string, offsetFromCenter: Point) {
         super()
         this.start = (startData) => {
-            this.weaponSprite = Tilesets.instance.dungeonCharacters.getTileSource(weaponId)
+            this.weaponSprite = Tilesets.instance.dungeonCharacters.getTileSource(spriteId)
             this.weaponTransform = new SpriteTransform(
                 Point.ZERO,
                 this.weaponSprite.dimensions

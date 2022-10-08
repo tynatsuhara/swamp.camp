@@ -4,7 +4,7 @@ import { Animator } from "brigsby/dist/util"
 import { Tilesets } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
 import { spawnProjectile } from "./Projectile"
-import { HAND_POSITION_OFFSET, Weapon, WEAPON_ROTATION_INCREMENT } from "./Weapon"
+import { HAND_POSITION_OFFSET, Weapon, WeaponSpriteCache } from "./Weapon"
 import { WeaponType } from "./WeaponType"
 
 enum State {
@@ -14,41 +14,7 @@ enum State {
     ATTACKING,
 }
 
-type SpriteCache = Record<number, { sprite: StaticSpriteSource; position: Point }>
-
-let spriteCache: SpriteCache
-
-/**
- * @param baseSprite the sprite at 0 degrees rotation
- * @param baseSpritePosition the position of a sprite at 0 degrees
- * @param rotationPoint the point to rotate the sprite around
- */
-const initSpriteCache = (
-    baseSprite: StaticSpriteSource,
-    baseSpritePosition: Point,
-    rotationPoint: Point
-) => {
-    const cache: SpriteCache = {}
-    const ogCenter = baseSpritePosition.plus(baseSprite.dimensions.floorDiv(2))
-
-    for (let i = -90; i <= 90; i += WEAPON_ROTATION_INCREMENT) {
-        if (i === 0) {
-            cache[i] = {
-                sprite: baseSprite,
-                position: baseSpritePosition,
-            }
-        } else {
-            const rotatedSprite = baseSprite.rotated(i)
-            const centerAfterRotation = ogCenter.rotatedAround(rotationPoint, i)
-            cache[i] = {
-                sprite: rotatedSprite,
-                position: centerAfterRotation.minus(rotatedSprite.dimensions.floorDiv(2)),
-            }
-        }
-    }
-
-    return cache
-}
+let spriteCache: WeaponSpriteCache
 
 export class SpearWeapon extends Weapon {
     private offsetFromCenter: Point
@@ -69,7 +35,7 @@ export class SpearWeapon extends Weapon {
 
             spriteCache =
                 spriteCache ??
-                initSpriteCache(baseSprite, this.offsetFromCenter, HAND_POSITION_OFFSET)
+                Weapon.initSpriteCache(baseSprite, this.offsetFromCenter, HAND_POSITION_OFFSET)
         }
     }
 
@@ -192,7 +158,7 @@ export class SpearWeapon extends Weapon {
                     new Point(rotatedTip.x * this.dude.getFacingMultiplier(), rotatedTip.y)
                 ),
                 // Item.SPEAR,
-                this.getAimingDirection().normalized().times(1.1),
+                this.getPlayerAimingDirection().normalized().times(1.1),
                 this.dude
             )
         } else {
