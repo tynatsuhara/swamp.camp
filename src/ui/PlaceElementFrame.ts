@@ -6,7 +6,7 @@ import { controls } from "../Controls"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { ElementComponent } from "../world/elements/ElementComponent"
 import { Elements } from "../world/elements/Elements"
-import { here } from "../world/LocationManager"
+import { here } from "../world/locations/LocationManager"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
 import { UIStateManager } from "./UIStateManager"
 

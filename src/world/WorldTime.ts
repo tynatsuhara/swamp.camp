@@ -3,7 +3,7 @@ import { WorldAudioContext } from "../audio/WorldAudioContext"
 import { saveManager } from "../SaveManager"
 import { Singletons } from "../Singletons"
 import { EventQueue } from "./events/EventQueue"
-import { LocationManager } from "./LocationManager"
+import { LocationManager } from "./locations/LocationManager"
 import { Day, TimeUnit } from "./TimeUnit"
 
 export class WorldTime extends Component {

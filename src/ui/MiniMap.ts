@@ -9,7 +9,7 @@ import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { ElementComponent } from "../world/elements/ElementComponent"
 import { GroundComponent } from "../world/ground/GroundComponent"
 import { GroundRenderer } from "../world/GroundRenderer"
-import { camp, here } from "../world/LocationManager"
+import { camp, here } from "../world/locations/LocationManager"
 import { Color, getHex } from "./Color"
 import { UIStateManager } from "./UIStateManager"
 

@@ -4,7 +4,7 @@ import { ElementComponent } from "../elements/ElementComponent"
 import { ElementFactory } from "../elements/ElementFactory"
 import { ElementType } from "../elements/Elements"
 import { Interactable } from "../elements/Interactable"
-import { Location } from "../Location"
+import { Location } from "../locations/Location"
 
 export class MineExitFactory extends ElementFactory {
     readonly type = ElementType.MINE_EXIT

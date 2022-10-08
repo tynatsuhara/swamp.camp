@@ -5,7 +5,7 @@ import { DudeType } from "../characters/DudeType"
 import { Player } from "../characters/Player"
 import { controls } from "../Controls"
 import { GroundType } from "../world/ground/Ground"
-import { here } from "../world/LocationManager"
+import { here } from "../world/locations/LocationManager"
 import { Sounds } from "./Sounds"
 
 const FOOTSTEP_SOUND_DISTANCE = 160

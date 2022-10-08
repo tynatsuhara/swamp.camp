@@ -4,7 +4,7 @@ import { SpriteComponent } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
 import { Sounds } from "../audio/Sounds"
 import { Player } from "../characters/Player"
-import { here } from "../world/LocationManager"
+import { here } from "../world/locations/LocationManager"
 import { Item, ITEM_METADATA_MAP } from "./Items"
 
 // TODO: Find a better sound effect (this one isn't very audible)

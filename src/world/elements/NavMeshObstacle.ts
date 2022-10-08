@@ -1,5 +1,5 @@
 import { Component, Point } from "brigsby/dist"
-import { Location } from "../Location"
+import { Location } from "../locations/Location"
 
 export class NavMeshObstacle extends Component {
     private readonly location: Location

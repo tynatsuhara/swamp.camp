@@ -8,7 +8,7 @@ import { Singletons } from "./Singletons"
 import { HUD } from "./ui/HUD"
 import { PlumePicker } from "./ui/PlumePicker"
 import { EventQueue } from "./world/events/EventQueue"
-import { here, LocationManager } from "./world/LocationManager"
+import { here, LocationManager } from "./world/locations/LocationManager"
 import { WorldTime } from "./world/WorldTime"
 
 const CURRENT_SAVE_FORMAT_VERSION = 2

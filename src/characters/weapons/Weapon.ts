@@ -2,7 +2,7 @@ import { Component, Point } from "brigsby/dist"
 import { StaticSpriteSource } from "brigsby/dist/sprites"
 import { controls } from "../../Controls"
 import { Hittable } from "../../world/elements/Hittable"
-import { here } from "../../world/LocationManager"
+import { here } from "../../world/locations/LocationManager"
 import { Dude } from "../Dude"
 import { WeaponType } from "./WeaponType"
 

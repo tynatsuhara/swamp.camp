@@ -2,7 +2,7 @@ import { DudeFaction } from "../characters/DudeFactory"
 import { DudeType } from "../characters/DudeType"
 import { saveManager } from "../SaveManager"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
-import { LocationManager } from "./LocationManager"
+import { LocationManager } from "./locations/LocationManager"
 
 export enum TaxRate {
     NONE,

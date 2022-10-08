@@ -7,7 +7,7 @@ import { ElementComponent } from "./elements/ElementComponent"
 import { ElementFactory } from "./elements/ElementFactory"
 import { ElementType } from "./elements/Elements"
 import { Interactable } from "./elements/Interactable"
-import { Location } from "./Location"
+import { Location } from "./locations/Location"
 
 type TeleporterIndicatorSaveData = {
     to: string // the destination uuid (TODO: support same-location teleporters)

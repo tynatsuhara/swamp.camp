@@ -1,6 +1,6 @@
 import { Point } from "brigsby/dist"
 import { ImageRender } from "brigsby/dist/renderer"
-import { Location } from "../Location"
+import { Location } from "../locations/Location"
 import { ConnectingTile } from "./ConnectingTile"
 
 /**

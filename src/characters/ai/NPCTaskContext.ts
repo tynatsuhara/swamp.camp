@@ -1,5 +1,5 @@
 import { Point } from "brigsby/dist"
-import { Location } from "../../world/Location"
+import { Location } from "../../world/locations/Location"
 import { Dude } from "../Dude"
 
 /**

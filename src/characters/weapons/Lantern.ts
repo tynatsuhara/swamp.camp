@@ -1,7 +1,7 @@
 import { Point } from "brigsby/dist"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { LightManager } from "../../world/LightManager"
-import { here } from "../../world/LocationManager"
+import { here } from "../../world/locations/LocationManager"
 import { Shield } from "./Shield"
 import { ShieldType } from "./ShieldType"
 

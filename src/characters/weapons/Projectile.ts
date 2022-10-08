@@ -4,7 +4,7 @@ import { SpriteComponent } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
 import { DroppedItem } from "../../items/DroppedItem"
 import { GroundRenderer } from "../../world/GroundRenderer"
-import { here } from "../../world/LocationManager"
+import { here } from "../../world/locations/LocationManager"
 import { WorldTime } from "../../world/WorldTime"
 import { Dude } from "../Dude"
 

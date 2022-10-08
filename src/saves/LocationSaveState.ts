@@ -1,6 +1,6 @@
 import { SavedElement } from "../world/elements/Elements"
 import { SavedGround } from "../world/ground/Ground"
-import { LocationType } from "../world/LocationManager"
+import { LocationType } from "../world/locations/LocationManager"
 import { DudeSaveState } from "./DudeSaveState"
 
 export class LocationSaveState {

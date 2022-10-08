@@ -4,7 +4,7 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { Color } from "../ui/Color"
 import { DarknessMask } from "./DarknessMask"
-import { here } from "./LocationManager"
+import { here } from "./locations/LocationManager"
 
 export class VisibleRegionMask extends Component {
     static get instance() {

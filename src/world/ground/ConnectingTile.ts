@@ -1,8 +1,8 @@
 import { Component, Point } from "brigsby/dist"
 import { ImageRender } from "brigsby/dist/renderer"
 import { GroundRenderer } from "../GroundRenderer"
-import { Location } from "../Location"
-import { here } from "../LocationManager"
+import { Location } from "../locations/Location"
+import { here } from "../locations/LocationManager"
 import { ConnectingTileSchema } from "./ConnectingTileSchema"
 
 export class ConnectingTile extends Component {

@@ -8,7 +8,7 @@ import { ShieldType } from "../characters/weapons/ShieldType"
 import { WeaponType } from "../characters/weapons/WeaponType"
 import { Tilesets } from "../graphics/Tilesets"
 import { ElementType } from "../world/elements/Elements"
-import { here } from "../world/LocationManager"
+import { here } from "../world/locations/LocationManager"
 import { DroppedItem } from "./DroppedItem"
 
 export enum Item {

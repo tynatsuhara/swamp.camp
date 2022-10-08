@@ -1,6 +1,6 @@
-import { Singletons } from "../Singletons"
+import { Singletons } from "../../Singletons"
+import { ElementType } from "../elements/Elements"
 import { AbstractLocationGenerator, TreeTypeSupplier } from "./AbstractLocationGenerator"
-import { ElementType } from "./elements/Elements"
 import { Location } from "./Location"
 import { LocationType } from "./LocationManager"
 

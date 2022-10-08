@@ -6,7 +6,7 @@ import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { ElementType } from "../../world/elements/Elements"
 import { EventQueue } from "../../world/events/EventQueue"
 import { QueuedEventType } from "../../world/events/QueuedEvent"
-import { here } from "../../world/LocationManager"
+import { here } from "../../world/locations/LocationManager"
 import { TimeUnit } from "../../world/TimeUnit"
 import { WorldTime } from "../../world/WorldTime"
 import {

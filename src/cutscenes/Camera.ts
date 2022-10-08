@@ -5,7 +5,7 @@ import { Dude } from "../characters/Dude"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { ZOOM } from "../SwampCampGame"
-import { here } from "../world/LocationManager"
+import { here } from "../world/locations/LocationManager"
 
 type FocalPoint = "center" | "top"
 

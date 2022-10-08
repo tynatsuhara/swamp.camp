@@ -1,7 +1,7 @@
 import { Point } from "brigsby/dist"
 import { BoxCollider, Collider } from "brigsby/dist/collision"
 import { pixelPtToTilePt } from "../../graphics/Tilesets"
-import { Location } from "../Location"
+import { Location } from "../locations/Location"
 import { ElementUtils } from "./ElementUtils"
 
 export class NavMeshCollider extends BoxCollider {

@@ -1,6 +1,6 @@
 import { Point } from "brigsby/dist"
-import { Location } from "../../world/Location"
-import { LocationManager } from "../../world/LocationManager"
+import { Location } from "../../world/locations/Location"
+import { LocationManager } from "../../world/locations/LocationManager"
 import { NPCSchedule } from "./NPCSchedule"
 import { NPCTask } from "./NPCTask"
 import { NPCTaskContext } from "./NPCTaskContext"

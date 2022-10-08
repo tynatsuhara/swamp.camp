@@ -1,7 +1,7 @@
 import { Point } from "brigsby/dist"
 import { Grid, Lists, Noise } from "brigsby/dist/util"
-import { ElementType } from "./elements/Elements"
-import { GroundType } from "./ground/Ground"
+import { ElementType } from "../elements/Elements"
+import { GroundType } from "../ground/Ground"
 import { Location } from "./Location"
 import { LocationManager } from "./LocationManager"
 

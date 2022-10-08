@@ -6,7 +6,7 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { ElementComponent } from "../world/elements/ElementComponent"
 import { Elements, ElementType } from "../world/elements/Elements"
 import { ElementUtils } from "../world/elements/ElementUtils"
-import { here } from "../world/LocationManager"
+import { here } from "../world/locations/LocationManager"
 import { PlaceElementFrame } from "./PlaceElementFrame"
 
 export class PlaceElementDisplay extends Component {

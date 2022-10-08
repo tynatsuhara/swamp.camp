@@ -9,7 +9,7 @@ import { NotificationDisplay, Notifications } from "../../ui/NotificationDisplay
 import { Elements, ElementType } from "../elements/Elements"
 import { HittableResource } from "../elements/HittableResource"
 import { Queequeg } from "../elements/Queequeg"
-import { camp, LocationManager } from "../LocationManager"
+import { camp, LocationManager } from "../locations/LocationManager"
 import { collectTaxes } from "../TaxRate"
 import { Day, TimeUnit } from "../TimeUnit"
 import { WorldTime } from "../WorldTime"

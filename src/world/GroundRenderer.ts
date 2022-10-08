@@ -4,8 +4,8 @@ import { StaticSpriteSource } from "brigsby/dist/sprites"
 import { Camera } from "../cutscenes/Camera"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
-import { Location } from "./Location"
-import { here } from "./LocationManager"
+import { Location } from "./locations/Location"
+import { here } from "./locations/LocationManager"
 
 /**
  * This is an optimization that pre-renders ground on an offscreen canvas.

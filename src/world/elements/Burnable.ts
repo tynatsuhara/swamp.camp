@@ -5,7 +5,7 @@ import { Particles } from "../../graphics/particles/Particles"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Color } from "../../ui/Color"
 import { LightManager } from "../LightManager"
-import { here } from "../LocationManager"
+import { here } from "../locations/LocationManager"
 import { WorldTime } from "../WorldTime"
 import { Campfire } from "./Campfire"
 

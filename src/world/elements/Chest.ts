@@ -3,7 +3,7 @@ import { AnimatedSpriteComponent, SpriteAnimation, SpriteTransform } from "brigs
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Inventory } from "../../items/Inventory"
 import { InventoryDisplay } from "../../ui/InventoryDisplay"
-import { Location } from "../Location"
+import { Location } from "../locations/Location"
 import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
