@@ -4,8 +4,10 @@ import { FireParticles } from "../../graphics/particles/FireParticles"
 import { Particles } from "../../graphics/particles/Particles"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Color } from "../../ui/Color"
+import { LightManager } from "../LightManager"
 import { here } from "../LocationManager"
 import { WorldTime } from "../WorldTime"
+import { Campfire } from "./Campfire"
 
 const INTERVAL = 5_000
 const TIME_UNTIL_DESTROY = 15_000
@@ -41,7 +43,8 @@ export class Burnable extends RepeatedInvoker {
         this.depth = Math.max(...pts.map((pt) => pt.y + 1)) * TILE_SIZE
 
         if (initialBurning) {
-            this.awake = () => this.burn(null, true)
+            // doing this on awake seemed to not work for lights
+            this.start = () => this.burn(null, true)
         }
     }
 
@@ -50,19 +53,22 @@ export class Burnable extends RepeatedInvoker {
 
         if (WorldTime.instance.time - this.burnStart > TIME_UNTIL_DESTROY) {
             // Emit ash particles
-            this.pts.forEach((pos) => {
-                const position = pos.plus(new Point(0.5, 0.5)).times(TILE_SIZE)
+            this.pts.forEach((pt) => {
+                const position = pt.plus(new Point(0.5, 0.5)).times(TILE_SIZE)
                 for (let i = 0; i < 20; i++) {
                     const speed = Math.random() > 0.5 ? 0.003 : 0.001
                     Particles.instance.emitParticle(
                         Lists.oneOf([Color.TAUPE_2, Color.TAUPE_1, Color.BLACK, Color.BLACK]),
                         position.randomCircularShift(8).plusY(-4),
-                        (pos.y + 1) * TILE_SIZE,
+                        (pt.y + 1) * TILE_SIZE,
                         500 + Math.random() * 500,
                         (t) => new Point(0, t * speed),
                         Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
                     )
                 }
+
+                // remove light sources
+                LightManager.instance.removeLight(this.lightKeyForPoint(pt))
             })
             this.entity.selfDestruct()
         }
@@ -82,18 +88,25 @@ export class Burnable extends RepeatedInvoker {
         }
         this.burning = true
         this.burnStart = WorldTime.instance.time
-        this.pts.forEach((pt) =>
+        this.pts.forEach((pt) => {
+            const burnableCenter = pt.plus(new Point(0.5, 0.5)).times(TILE_SIZE)
             this.entity.addComponent(
                 new FireParticles(
                     8,
-                    () => {
-                        return pt.plus(new Point(0.5, 0.5)).times(TILE_SIZE)
-                    },
+                    () => burnableCenter,
                     () => this.depth
                 )
             )
-        )
+            LightManager.instance.addLight(
+                here(),
+                this.lightKeyForPoint(pt),
+                burnableCenter,
+                Campfire.getLightSizeForLogCount(3)
+            )
+        })
     }
+
+    private lightKeyForPoint = (pt: Point) => `burnable:${pt}`
 
     isBurningAt(pt: Point) {
         return this.isBurning && this.pts.some((p) => p.equals(pt))
