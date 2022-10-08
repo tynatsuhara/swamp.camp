@@ -11,7 +11,7 @@ import { QueuedEventType } from "../world/events/QueuedEvent"
 import { Ground } from "../world/ground/Ground"
 import { LightManager } from "../world/LightManager"
 import { camp } from "../world/locations/LocationManager"
-import { CampLocationGenerator } from "../world/locations/ProceduralCampLocationGenerator"
+import { ProceduralCampLocationGenerator } from "../world/locations/ProceduralCampLocationGenerator"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
 import { DudeFaction, DudeFactory } from "./DudeFactory"
@@ -114,7 +114,7 @@ export class DudeSpawner extends Component {
         const waterSpots = l.getGroundSpots(true).filter(
             (pt) =>
                 Ground.isWater(l.getGround(pt)?.type) &&
-                pt.x < camp().size / 2 - CampLocationGenerator.COAST_OCEAN_WIDTH // not in the ocean
+                pt.x < camp().size / 2 - ProceduralCampLocationGenerator.COAST_OCEAN_WIDTH // not in the ocean
         )
 
         const goalCount = waterSpots.length / 50

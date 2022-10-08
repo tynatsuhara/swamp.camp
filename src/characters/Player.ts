@@ -10,7 +10,7 @@ import { TextAlign } from "../ui/Text"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Interactable } from "../world/elements/Interactable"
 import { camp, here, LocationManager } from "../world/locations/LocationManager"
-import { CampLocationGenerator } from "../world/locations/ProceduralCampLocationGenerator"
+import { ProceduralCampLocationGenerator } from "../world/locations/ProceduralCampLocationGenerator"
 import { WorldTime } from "../world/WorldTime"
 import { Condition } from "./Condition"
 import { Dude } from "./Dude"
@@ -150,7 +150,9 @@ export class Player extends Component {
         const range = here().range
         const pos = this.dude.tile
         if (pos.x < -range || pos.x > range || pos.y < -range || pos.y > range) {
-            return pos.x > range - CampLocationGenerator.COAST_OCEAN_WIDTH ? "ocean" : "swamp"
+            return pos.x > range - ProceduralCampLocationGenerator.COAST_OCEAN_WIDTH
+                ? "ocean"
+                : "swamp"
         }
     }
 

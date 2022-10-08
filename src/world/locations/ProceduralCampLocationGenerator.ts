@@ -14,9 +14,9 @@ const COAST_OCEAN_WIDTH = 12
 // Should be divisible by 2 and a divisor of MAP_SIZE.
 const SQ = 2
 
-export class CampLocationGenerator extends AbstractLocationGenerator {
+export class ProceduralCampLocationGenerator extends AbstractLocationGenerator {
     static get instance() {
-        return Singletons.getOrCreate(CampLocationGenerator)
+        return Singletons.getOrCreate(ProceduralCampLocationGenerator)
     }
 
     private static readonly MAP_RANGE = 40
@@ -24,7 +24,7 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
      * The map goes from [-MAP_RANGE, MAP_RANGE), although some of the grids extend
      * one tile further in each direction to prevent janky cutoffs at the edge
      */
-    private static readonly MAP_SIZE = CampLocationGenerator.MAP_RANGE * 2
+    private static readonly MAP_SIZE = ProceduralCampLocationGenerator.MAP_RANGE * 2
     static readonly COAST_OCEAN_WIDTH = COAST_OCEAN_WIDTH
 
     private readonly TENT_POS = new Point(-3, -3)
@@ -35,14 +35,14 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
         for (let elementsPlaced = false, attempt = 1; !elementsPlaced; attempt++) {
             console.log(`generation attept ${attempt}`)
 
-            const [coastNoise] = CampLocationGenerator.coastNoise()
-            const levels = this.levels(CampLocationGenerator.MAP_RANGE)
+            const [coastNoise] = ProceduralCampLocationGenerator.coastNoise()
+            const levels = this.levels(ProceduralCampLocationGenerator.MAP_RANGE)
 
             location = new Location(
                 LocationType.BASE_CAMP,
                 false,
                 true,
-                CampLocationGenerator.MAP_SIZE,
+                ProceduralCampLocationGenerator.MAP_SIZE,
                 levels
             )
 
@@ -70,7 +70,7 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
 
         location.addElement(
             ElementType.QUEEQUEG,
-            new Point(CampLocationGenerator.MAP_RANGE - 6, 10)
+            new Point(ProceduralCampLocationGenerator.MAP_RANGE - 6, 10)
         )
 
         return location
@@ -81,13 +81,13 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
 
         // clear in corner
         for (
-            let x = CampLocationGenerator.MAP_RANGE - 11;
-            x < CampLocationGenerator.MAP_RANGE + 10;
+            let x = ProceduralCampLocationGenerator.MAP_RANGE - 11;
+            x < ProceduralCampLocationGenerator.MAP_RANGE + 10;
             x++
         ) {
             for (
-                let y = CampLocationGenerator.MAP_RANGE - 25;
-                y < CampLocationGenerator.MAP_RANGE - 23;
+                let y = ProceduralCampLocationGenerator.MAP_RANGE - 25;
+                y < ProceduralCampLocationGenerator.MAP_RANGE - 23;
                 y++
             ) {
                 const element = location.getElement(new Point(x, y))
@@ -169,8 +169,8 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
         let str = `seed: ${seed} \n`
 
         for (
-            let y = -CampLocationGenerator.MAP_RANGE - 1;
-            y < CampLocationGenerator.MAP_RANGE + 1;
+            let y = -ProceduralCampLocationGenerator.MAP_RANGE - 1;
+            y < ProceduralCampLocationGenerator.MAP_RANGE + 1;
             y += SQ
         ) {
             // [0, COAST_VARIABILITY)
@@ -187,7 +187,10 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
                     for (let j = 0; j < SQ; j++) {
                         pts.set(
                             new Point(
-                                CampLocationGenerator.MAP_RANGE - COAST_OCEAN_WIDTH + i + 1,
+                                ProceduralCampLocationGenerator.MAP_RANGE -
+                                    COAST_OCEAN_WIDTH +
+                                    i +
+                                    1,
                                 y + j
                             ),
                             true
@@ -208,5 +211,5 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
 // window["coastNoise"] = (...args: any) => console.log(CampLocationGenerator.coastNoise(...args)[1])
 
 window["river"] = () => {
-    CampLocationGenerator.instance.addRiver(here())
+    ProceduralCampLocationGenerator.instance.addRiver(here())
 }
