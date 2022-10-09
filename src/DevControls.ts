@@ -292,6 +292,7 @@ debug.showNavMesh = debug.showNavMesh ?? false
 debug.showElementGrid = debug.showElementGrid ?? false
 debug.groundRenderDisabled = debug.groundRenderDisabled ?? false
 debug.showGroundTiles = debug.showGroundTiles ?? false
+debug.manualCampGeneration = debug.manualCampGeneration ?? false
 
 const help = () => {
     let help = `dev controls (enable with debug.enableDevControls=true)

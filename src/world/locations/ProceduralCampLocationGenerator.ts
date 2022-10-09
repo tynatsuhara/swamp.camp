@@ -5,11 +5,12 @@ import { TentColor } from "../buildings/Tent"
 import { ElementType } from "../elements/Elements"
 import { Ground, GroundType } from "../ground/Ground"
 import { AbstractLocationGenerator } from "./AbstractLocationGenerator"
+import { EAST_COAST_OCEAN_WIDTH } from "./CampLocationGenerator"
 import { Location } from "./Location"
 import { here, LocationType } from "./LocationManager"
 
 const COAST_VARIABILITY = 3
-const COAST_OCEAN_WIDTH = 12
+const COAST_OCEAN_WIDTH = EAST_COAST_OCEAN_WIDTH
 // Represents the granularity of levels/coast variation.
 // Should be divisible by 2 and a divisor of MAP_SIZE.
 const SQ = 2
@@ -25,7 +26,6 @@ export class ProceduralCampLocationGenerator extends AbstractLocationGenerator {
      * one tile further in each direction to prevent janky cutoffs at the edge
      */
     private static readonly MAP_SIZE = ProceduralCampLocationGenerator.MAP_RANGE * 2
-    static readonly COAST_OCEAN_WIDTH = COAST_OCEAN_WIDTH
 
     private readonly TENT_POS = new Point(-3, -3)
 
@@ -144,6 +144,8 @@ export class ProceduralCampLocationGenerator extends AbstractLocationGenerator {
                 pt
             )
         })
+
+        // TODO: This logic might not be correct anymore, but it's not being used so it's okay
 
         river.forEach((pt) => {
             if (location.getGround(pt)?.type === GroundType.WATERFALL) {
