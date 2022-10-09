@@ -1,8 +1,8 @@
 {
     "compilerOptions": {
         "module": "ES6",
-        "target": "ES5",
-        "lib": ["ES5", "ES6", "DOM", "ES2019", "ESNext"],
+        "target": "ES2019",
+        "lib": ["DOM", "ESNext"],
         "moduleResolution": "node"
     }
 }
