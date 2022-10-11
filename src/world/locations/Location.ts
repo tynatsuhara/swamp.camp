@@ -142,6 +142,13 @@ export class Location {
         return el
     }
 
+    /**
+     * @returns the first element found of the given type, or undefined if none exist
+     */
+    getElementOfType(type: ElementType): ElementComponent | undefined {
+        return this.elements.values().find((el) => el.type === type)
+    }
+
     getElementsOfType(type: ElementType): ElementComponent[] {
         return this.elements.values().filter((el) => el.type === type)
     }

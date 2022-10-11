@@ -1,4 +1,5 @@
-import { Component, Point } from "brigsby/dist"
+import { Component, pt } from "brigsby/dist"
+import { ElementType } from "../../world/elements/Elements"
 import { Ground } from "../../world/ground/Ground"
 import { LightManager } from "../../world/LightManager"
 import { NPCSchedules } from "../ai/NPCSchedule"
@@ -11,9 +12,15 @@ import { Centaur } from "./Centaur"
 import { ShroomNPC } from "./ShroomNPC"
 
 export class Villager extends Component {
+    get npc() {
+        return this.entity.getComponent(NPC)
+    }
+    get dude() {
+        return this.entity.getComponent(Dude)
+    }
+
     awake() {
-        const npc = this.entity.getComponent(NPC)
-        const dude = this.entity.getComponent(Dude)
+        const { npc, dude } = this
 
         npc.isEnemyFn = (d) => {
             if (!d.entity) {
@@ -46,12 +53,18 @@ export class Villager extends Component {
 
             return !d.factions.includes(DudeFaction.VILLAGERS)
         }
+    }
+
+    start() {
+        const { npc, dude } = this
 
         if ([DudeType.GUMBALL, DudeType.ONION].includes(dude.type)) {
             npc.setLeader(Player.instance.dude)
             npc.setSchedule(NPCSchedules.newFollowLeaderSchedule())
         } else if (dude.type === DudeType.DIP) {
-            npc.setSchedule(NPCSchedules.newGoToSchedule(new Point(0, 0)))
+            // TODO: Make this a more robust schedule
+            const tentPos = dude.location.getElementOfType(ElementType.TENT).pos
+            npc.setSchedule(NPCSchedules.newGoToSchedule(tentPos.plus(pt(3))))
         } else if ([DudeType.SPOOKY_VISITOR, DudeType.KNIGHT].includes(dude.type)) {
             npc.setSchedule(NPCSchedules.newFreeRoamSchedule())
         } else if (dude.type === DudeType.HERALD) {
