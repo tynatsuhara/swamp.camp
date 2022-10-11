@@ -15,20 +15,20 @@ export class ExplosionTileset {
     getExplosionAnimation(center: Point): AnimatedSpriteComponent {
         let component: AnimatedSpriteComponent
 
-        // TODO: don't hardcode these when we need to support other sizes
+        // TODO: don't hardcode these when we need to support other sizes/colors
         const size = 30
-        const col = 375
-        const row = 10
+        const col = 376
+        const row = 298
         const space = 4
-        const speed = 65
+        const speed = 35
 
         const pos = new Point(col, row)
-        component = new SpriteAnimation(
-            Lists.range(0, 4)
-                .map((index) => this.getTileAt(pos.plusX((size + space) * index), size))
-                .map((tileSource) => [tileSource, speed]),
-            () => component.delete()
-        ).toComponent(
+        const animation = Lists.range(0, 7).map((index): [StaticSpriteSource, number] => {
+            const tileSource = this.getTileAt(pos.plusX((size + space) * index), size)
+            return [tileSource, index === 0 ? speed * 3 : speed]
+        })
+
+        component = new SpriteAnimation(animation, () => component.delete()).toComponent(
             SpriteTransform.new({
                 position: center.plus(new Point(size, size).div(-2)),
                 depth: center.y + size / 2,
