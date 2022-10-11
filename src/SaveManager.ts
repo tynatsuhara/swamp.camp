@@ -12,7 +12,7 @@ import { here, LocationManager } from "./world/locations/LocationManager"
 import { WorldTime } from "./world/WorldTime"
 
 const CURRENT_SAVE_FORMAT_VERSION = 2
-const SLOTS: number = 3 + debug.extraSaveSlots
+const SLOTS: number = 3 + (debug.extraSaveSlots ?? 0)
 
 class SaveManager {
     // Fields for the currently loaded save
