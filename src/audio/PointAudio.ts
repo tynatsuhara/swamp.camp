@@ -2,12 +2,15 @@ import { Component, Point } from "brigsby/dist"
 import { Player } from "../characters/Player"
 import { Settings } from "../Settings"
 
+// TODO: all active point audio sounds should be registered to prevent redundant
+// sounds (eg multiple adjacent waterfalls) from playing at the same time
+
 export class PointAudio extends Component {
-    private readonly audio: HTMLAudioElement
+    private audio: HTMLAudioElement
     position: Point
     distance: number
     multiplier: number
-    private active: boolean = true
+    private active: boolean = false
 
     constructor(
         filePath: string,
@@ -17,16 +20,17 @@ export class PointAudio extends Component {
         multiplier: number = 1
     ) {
         super()
-
-        this.audio = new Audio(filePath)
-        this.audio.oncanplaythrough = () => {
-            this.audio.loop = loop
-            this.audio.play()
-        }
-
         this.position = position
         this.distance = distance
         this.multiplier = multiplier
+        this.audio = new Audio(filePath)
+
+        this.start = () => {
+            this.audio.oncanplaythrough = () => {
+                this.audio.loop = loop
+                this.audio.play()
+            }
+        }
     }
 
     update() {
