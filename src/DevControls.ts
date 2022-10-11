@@ -8,11 +8,11 @@ import {
     UpdateData,
 } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
-import { Condition } from "./characters/Condition"
 import { DudeFactory } from "./characters/DudeFactory"
 import { DudeSpawner } from "./characters/DudeSpawner"
 import { DudeType } from "./characters/DudeType"
 import { Player } from "./characters/Player"
+import { spawnMagicProjectile } from "./characters/weapons/MagicProjectile"
 import { controls } from "./Controls"
 import { Particles } from "./graphics/particles/Particles"
 import { pixelPtToTilePt } from "./graphics/Tilesets"
@@ -154,8 +154,14 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     ],
     [
         InputKey.SEMICOLON,
-        "healing potion",
-        () => Player.instance.dude.addCondition(Condition.HEALING, 5_000),
+        "spawn projectile",
+        (input) => {
+            const standingPos = Player.instance.dude.standingPosition
+            spawnMagicProjectile(
+                input.mousePos,
+                standingPos.minus(input.mousePos).normalized().times(0.2)
+            )
+        },
     ],
     [InputKey.QUOTE, "trigger orc raid", () => DudeSpawner.instance.spawnOrcs()],
     [
