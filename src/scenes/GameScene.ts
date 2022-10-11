@@ -34,7 +34,6 @@ import { GroundRenderer } from "../world/GroundRenderer"
 import { LightManager } from "../world/LightManager"
 import { CampLocationGenerator } from "../world/locations/CampLocationGenerator"
 import { camp, here, LocationManager } from "../world/locations/LocationManager"
-import { ProceduralCampLocationGenerator } from "../world/locations/ProceduralCampLocationGenerator"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
 
@@ -61,11 +60,7 @@ export class GameScene {
 
         // World must be initialized before we do anything else
 
-        if (debug.manualCampGeneration) {
-            CampLocationGenerator.instance.generate()
-        } else {
-            ProceduralCampLocationGenerator.instance.generate()
-        }
+        CampLocationGenerator.instance.generate()
         LocationManager.instance.loadLocation(camp())
 
         const playerStartPos = new Point(camp().size, camp().size).times(TILE_SIZE)
