@@ -10,7 +10,7 @@ export class PointAudio extends Component {
     position: Point
     distance: number
     multiplier: number
-    private active: boolean = false
+    private active: boolean = true
 
     constructor(
         filePath: string,
@@ -24,12 +24,10 @@ export class PointAudio extends Component {
         this.distance = distance
         this.multiplier = multiplier
         this.audio = new Audio(filePath)
-
-        this.start = () => {
-            this.audio.oncanplaythrough = () => {
-                this.audio.loop = loop
-                this.audio.play()
-            }
+        this.audio.volume = 0 // update() will set volume appropriately
+        this.audio.oncanplaythrough = () => {
+            this.audio.loop = loop
+            this.audio.play()
         }
     }
 
