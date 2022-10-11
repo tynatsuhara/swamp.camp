@@ -98,14 +98,12 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
 
     e.addComponent(getAnimatedWaterTileComponent(d.pos))
 
-    // TODO: Multiple waterfalls can create a weird robotic sound when audio overlaps
     e.addComponent(
         new PointAudio(
             "/audio/ambiance/waterfall.wav",
             pixelPos.plus(new Point(TILE_SIZE / 2, TILE_SIZE / 2)),
             TILE_SIZE * 8,
-            true,
-            0.3
+            0.2
         )
     )
 

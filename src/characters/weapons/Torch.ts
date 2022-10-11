@@ -40,12 +40,7 @@ export class Torch extends Shield {
         )
 
         this.audio = this.entity.addComponent(
-            new PointAudio(
-                "audio/ambiance/campfire.ogg",
-                this.dude.standingPosition,
-                TILE_SIZE,
-                true
-            )
+            new PointAudio("audio/ambiance/campfire.ogg", this.dude.standingPosition, TILE_SIZE)
         )
     }
 

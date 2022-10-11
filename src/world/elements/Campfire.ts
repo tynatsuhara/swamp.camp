@@ -66,7 +66,7 @@ export class CampfireFactory extends ElementFactory {
         const pixelCenterPos = scaledPos.plus(new Point(TILE_SIZE / 2, TILE_SIZE / 2))
 
         const audio = e.addComponent(
-            new PointAudio("audio/ambiance/campfire.ogg", pixelCenterPos, TILE_SIZE * 6, true)
+            new PointAudio("audio/ambiance/campfire.ogg", pixelCenterPos, TILE_SIZE * 6)
         )
 
         const updateFire = (logCount: number) => {
