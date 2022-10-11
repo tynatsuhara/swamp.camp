@@ -276,23 +276,24 @@ export class DevControls extends Component {
 }
 
 // Set up autocomplete for non-engine debug flags
-debug.enableDevControls = debug.enableDevControls ?? false
-debug.disableAutosave = debug.disableAutosave ?? false
-debug.freeCamera = debug.freeCamera ?? false
-debug.godMode = debug.godMode ?? false
-debug.nightVision = debug.nightVision ?? false
-debug.peacefulMode = debug.peacefulMode ?? false
-debug.showAudioLogs = debug.showAudioLogs ?? false
-debug.showGrid = debug.showGrid ?? false
-debug.showInteractables = debug.showInteractables ?? false
-debug.showPathfinding = debug.showPathfinding ?? false
-debug.showTeleporters = debug.showTeleporters ?? false
-debug.speedMultiplier = debug.speedMultiplier ?? 1
-debug.showNavMesh = debug.showNavMesh ?? false
-debug.showElementGrid = debug.showElementGrid ?? false
-debug.groundRenderDisabled = debug.groundRenderDisabled ?? false
-debug.showGroundTiles = debug.showGroundTiles ?? false
-debug.forceMapId = debug.forceMapId ?? ""
+debug.enableDevControls ??= false
+debug.disableAutosave ??= false
+debug.freeCamera ??= false
+debug.godMode ??= false
+debug.nightVision ??= false
+debug.peacefulMode ??= false
+debug.showAudioLogs ??= false
+debug.showGrid ??= false
+debug.showInteractables ??= false
+debug.showPathfinding ??= false
+debug.showTeleporters ??= false
+debug.speedMultiplier ??= 1
+debug.showNavMesh ??= false
+debug.showElementGrid ??= false
+debug.groundRenderDisabled ??= false
+debug.showGroundTiles ??= false
+debug.forceMapId ??= ""
+debug.extraSaveSlots ??= 0
 
 const help = () => {
     let help = `dev controls (enable with debug.enableDevControls=true)

@@ -12,16 +12,15 @@ import { here, LocationManager } from "./world/locations/LocationManager"
 import { WorldTime } from "./world/WorldTime"
 
 const CURRENT_SAVE_FORMAT_VERSION = 2
+const SLOTS: number = 3 + debug.extraSaveSlots
 
 class SaveManager {
-    static readonly SLOTS = 3
-
     // Fields for the currently loaded save
     private saveKey: string
     private state: SaveState
 
     constructor() {
-        for (let slot = 0; slot < SaveManager.SLOTS; slot++) {
+        for (let slot = 0; slot < SLOTS; slot++) {
             if (!this.isSaveFormatVersionCompatible(slot)) {
                 // TODO: add a mechanism for upgrading saves when it's worth the effort
                 console.log("archiving incompatible save file")
@@ -93,9 +92,7 @@ class SaveManager {
     // Save managment functions
 
     private saveKeyForSlot(slot: number) {
-        return Array.from({ length: SaveManager.SLOTS }, (v, k) => `save${k > 0 ? k + 1 : ""}`)[
-            slot
-        ]
+        return Array.from({ length: SLOTS }, (v, k) => `save${k > 0 ? k + 1 : ""}`)[slot]
     }
 
     getLastSaveSlot() {
@@ -120,7 +117,7 @@ class SaveManager {
     }
 
     getSaves() {
-        return Array.from({ length: 3 }, (v, k) => this.getSave(this.saveKeyForSlot(k)))
+        return Array.from({ length: SLOTS }, (v, k) => this.getSave(this.saveKeyForSlot(k)))
     }
 
     private deleteSave(slot: number) {
