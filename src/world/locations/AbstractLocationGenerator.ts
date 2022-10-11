@@ -1,4 +1,4 @@
-import { Point } from "brigsby/dist"
+import { debug, Point } from "brigsby/dist"
 import { Grid, Lists, Noise } from "brigsby/dist/util"
 import { ElementType } from "../elements/Elements"
 import { GroundType } from "../ground/Ground"
@@ -40,17 +40,19 @@ export abstract class AbstractLocationGenerator {
         const adjacentLevels = (pt: Point) => adjacent(pt).map((pt) => location.levels.get(pt))
 
         // Generate waterfalls for water on level edges
-        location.getGroundSpots(true).forEach((pt) => {
-            if (location.getGround(pt)?.type === GroundType.WATER) {
-                const level = location.levels.get(pt)
-                location.setGroundElement(
-                    adjacentLevels(pt).filter((l) => l < level).length === 1
-                        ? GroundType.WATERFALL
-                        : GroundType.WATER,
-                    pt
-                )
-            }
-        })
+        if (debug.manualCampGeneration) {
+            location.getGroundSpots(true).forEach((pt) => {
+                if (location.getGround(pt)?.type === GroundType.WATER) {
+                    const level = location.levels.get(pt)
+                    location.setGroundElement(
+                        adjacentLevels(pt).filter((l) => l < level).length === 1
+                            ? GroundType.WATERFALL
+                            : GroundType.WATER,
+                        pt
+                    )
+                }
+            })
+        }
     }
 
     protected abstract _generate(): Location
