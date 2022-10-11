@@ -105,7 +105,7 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
             pixelPos.plus(new Point(TILE_SIZE / 2, TILE_SIZE / 2)),
             TILE_SIZE * 8,
             true,
-            0.1
+            0.3
         )
     )
 
