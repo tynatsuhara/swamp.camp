@@ -3,6 +3,7 @@ import { measure } from "brigsby/dist/Profiler"
 import { WorldAudioContext } from "../../audio/WorldAudioContext"
 import { DudeType } from "../../characters/DudeType"
 import { Player } from "../../characters/Player"
+import { Enemy } from "../../characters/types/Enemy"
 import { Camera } from "../../cutscenes/Camera"
 import { CutscenePlayerController } from "../../cutscenes/CutscenePlayerController"
 import { Particles } from "../../graphics/particles/Particles"
@@ -43,6 +44,16 @@ export class LocationManager {
                         ids[type].push(d.uuid)
                     })
                 console.log(ids)
+            },
+
+            killEnemies: () => {
+                here()
+                    .getDudes()
+                    .forEach((d) => {
+                        if (d.entity.getComponent(Enemy)) {
+                            d.die()
+                        }
+                    })
             },
 
             bulldoze: (type: ElementType) => {
