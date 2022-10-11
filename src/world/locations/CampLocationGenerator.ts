@@ -35,17 +35,18 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
         return Singletons.getOrCreate(CampLocationGenerator)
     }
 
-    private readonly map: HTMLImageElement
-
-    constructor() {
-        super()
-        const mapOptions = Object.keys(window.SWAMP_CAMP.assets).filter((path) =>
-            path.startsWith(`images/maps/camp/`)
-        )
-        this.map = getImage(Lists.oneOf(mapOptions))
-    }
+    private map: HTMLImageElement
 
     protected _generate() {
+        // TODO: improve this logic to avoid creating maps the player has already seen
+        const mapOptions = Object.keys(window.SWAMP_CAMP.assets).filter((path) =>
+            path.startsWith(`images/maps/camp/map`)
+        )
+        const mapId = Lists.oneOf(mapOptions)
+        console.log({ mapId })
+
+        this.map = getImage(mapId)
+
         const colors = this.getColorGrid()
         const levels = this.createLevels(colors)
 
@@ -75,6 +76,10 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
             .filter(([point, color]) => [LEVEL_1_TENT, LEVEL_2_TENT, LEVEL_3_TENT].includes(color))
             .map(([point]) => point)
             .sort((a, b) => (a.x === b.x ? a.y - b.y : a.x - b.x))
+
+        if (tentSpots.length === 0) {
+            throw new Error("no tent spot found")
+        }
 
         const tentPos = tentSpots[0].plusX(3)
         location.addElement(ElementType.TENT, tentPos, {
@@ -124,7 +129,7 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
             for (let y = 0; y < height; y++) {
                 const i = (x + y * width) * 4
                 const hex = getHex(imageData.data[i], imageData.data[i + 1], imageData.data[i + 2])
-                grid.set(pt(x - MAP_RANGE, y - MAP_RANGE), hex as Color)
+                grid.set(pt(x - width / 2, y - height / 2), hex as Color)
             }
         }
 
