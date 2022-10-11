@@ -95,12 +95,13 @@ export class HUD {
     private updateHearts(health: number, maxHealth: number) {
         this.heartsEntity = new Entity()
 
+        const healing = Player.instance.dude.hasCondition(Condition.HEALING)
         const filter: HeartFilter = (() => {
             if (debug.godMode) {
                 return "god"
             } else if (Player.instance.dude.hasCondition(Condition.POISONED)) {
                 return "poisoned"
-            } else if (Player.instance.dude.hasCondition(Condition.HEALING)) {
+            } else if (healing) {
                 return "healing"
             }
             return "default"
@@ -114,7 +115,7 @@ export class HUD {
         const getHeartPosition = (i: number) => {
             let pos = this.offset.plus(new Point(16, 0).times(i))
 
-            if (filter === "healing") {
+            if (healing) {
                 const speed = 115
                 const range = 1
                 const time = WorldTime.instance.time
