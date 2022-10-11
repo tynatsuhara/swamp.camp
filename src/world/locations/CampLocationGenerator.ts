@@ -1,4 +1,4 @@
-import { pt } from "brigsby/dist"
+import { debug, pt } from "brigsby/dist"
 import { Grid, Lists } from "brigsby/dist/util"
 import { getImage } from "../../graphics/Tilesets"
 import { Singletons } from "../../Singletons"
@@ -39,10 +39,7 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
 
     protected _generate() {
         // TODO: improve this logic to avoid creating maps the player has already seen
-        const mapOptions = Object.keys(window.SWAMP_CAMP.assets).filter((path) =>
-            path.startsWith(`images/maps/camp/map`)
-        )
-        const mapId = Lists.oneOf(mapOptions)
+        const mapId = this.pickMap()
         console.log({ mapId })
 
         this.map = getImage(mapId)
@@ -67,6 +64,30 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
         // TODO short trees, bushes, fruit, tall grass, etc
 
         return location
+    }
+
+    private pickMap() {
+        const mapOptions = Object.keys(window.SWAMP_CAMP.assets).filter((path) =>
+            path.startsWith(`images/maps/camp/map`)
+        )
+
+        if (debug.forceMapId) {
+            return mapOptions.find((mapFile) => mapFile.includes(debug.forceMapId))
+        }
+
+        const mapsKey = "maps"
+        let exclude: Set<string> = new Set<string>(JSON.parse(localStorage.getItem(mapsKey)) ?? [])
+
+        // They've seen all maps, so just pick one
+        if (exclude.size === mapOptions.length) {
+            return Lists.oneOf(mapOptions)
+        }
+
+        // Add it to the serialized set to avoid regenerating this map again
+        const mapId = Lists.oneOf(mapOptions)
+        exclude.add(mapId)
+        localStorage.setItem(mapsKey, JSON.stringify(Array.from(exclude)))
+        return mapId
     }
 
     private placeTent(location: Location, colors: Grid<Color>) {
