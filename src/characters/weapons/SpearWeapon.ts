@@ -3,7 +3,7 @@ import { SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Animator } from "brigsby/dist/util"
 import { Tilesets } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
-import { spawnProjectile } from "./Projectile"
+import { spawnThrownProjectile } from "./ThrownProjectile"
 import { HAND_POSITION_OFFSET, Weapon, WeaponSpriteCache } from "./Weapon"
 import { WeaponType } from "./WeaponType"
 
@@ -152,7 +152,7 @@ export class SpearWeapon extends Weapon {
             const tip = this.offsetFromCenter.plus(new Point(22, 2))
             const rotatedTip = tip.rotatedAround(HAND_POSITION_OFFSET, this.getAimingAngle())
 
-            spawnProjectile(
+            spawnThrownProjectile(
                 sprite.toComponent(newTransform),
                 this.dude.standingPosition.plus(
                     new Point(rotatedTip.x * this.dude.getFacingMultiplier(), rotatedTip.y)

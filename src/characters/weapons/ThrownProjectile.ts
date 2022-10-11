@@ -10,7 +10,7 @@ import { Dude } from "../Dude"
 
 const flightTime = 150
 
-class Projectile extends Component {
+class ThrownProjectile extends Component {
     private sprite: SpriteComponent
     private collider: BoxCollider
     private velocity: Point
@@ -114,11 +114,11 @@ class Projectile extends Component {
     }
 }
 
-export const spawnProjectile = (
+export const spawnThrownProjectile = (
     sprite: SpriteComponent,
     tip: Point,
     velocity: Point,
     attacker: Dude
 ) => {
-    here().droppedItems.add(new Entity([new Projectile(sprite, tip, velocity, attacker)]))
+    here().droppedItems.add(new Entity([new ThrownProjectile(sprite, tip, velocity, attacker)]))
 }
