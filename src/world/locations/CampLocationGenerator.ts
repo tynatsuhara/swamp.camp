@@ -84,7 +84,7 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
         }
 
         // Add it to the serialized set to avoid regenerating this map again
-        const mapId = Lists.oneOf(mapOptions)
+        const mapId = Lists.oneOf(mapOptions.filter((id) => !exclude.has(id)))
         exclude.add(mapId)
         localStorage.setItem(mapsKey, JSON.stringify(Array.from(exclude)))
         return mapId
