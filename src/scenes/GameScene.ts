@@ -236,7 +236,7 @@ export class GameScene {
     }
 
     private getUiSpaceDebugEntity() {
-        if (spawnMenu.show) {
+        if (spawnMenu.isOpen) {
             const selectedType = spawnMenu.getSelectedType()
             const pageStart = spawnMenu.page * spawnMenu.pageSize
             const dudeTypeButtons: OptionButton[] = [
@@ -252,7 +252,7 @@ export class GameScene {
                     fn: () => {
                         spawnMenu.setSelectedType(type)
                         console.log(`press [O] to spawn ${DudeType[type]} at mouse position`)
-                        spawnMenu.show = false
+                        spawnMenu.isOpen = false
                     },
                     buttonColor: "white",
                     textColor: Color.WHITE,

@@ -18,6 +18,7 @@ import { Particles } from "./graphics/particles/Particles"
 import { pixelPtToTilePt } from "./graphics/Tilesets"
 import { Color } from "./ui/Color"
 import { DrawMenu } from "./ui/DrawMenu"
+import { UIStateManager } from "./ui/UIStateManager"
 import { ElementType } from "./world/elements/Elements"
 import { GroundType } from "./world/ground/Ground"
 import { camp, here, LocationManager } from "./world/locations/LocationManager"
@@ -64,7 +65,7 @@ const SPAWNABLE_TYPES = [
 ]
 
 export const spawnMenu = {
-    show: false,
+    isOpen: false,
     page: 0,
     pageSize: 10,
     setSelectedType: (type: DudeType) => {
@@ -127,8 +128,12 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
         InputKey.P,
         "show/hide spawn menu",
         () => {
-            spawnMenu.show = !spawnMenu.show
-            if (!spawnMenu.show) {
+            if (spawnMenu.isOpen) {
+                spawnMenu.isOpen = false
+            } else if (!UIStateManager.instance.isMenuOpen) {
+                spawnMenu.isOpen = true
+            }
+            if (!spawnMenu.isOpen) {
                 spawnMenu.page = 0
             }
         },
