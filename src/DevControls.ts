@@ -164,7 +164,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
             const standingPos = Player.instance.dude.standingPosition
             spawnMagicProjectile(
                 input.mousePos,
-                standingPos.minus(input.mousePos).normalized().times(0.2)
+                standingPos.minus(input.mousePos).normalized().times(0.15)
             )
         },
     ],
