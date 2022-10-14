@@ -29,7 +29,7 @@ import { Campfire } from "../world/elements/Campfire"
 import { ElementType } from "../world/elements/Elements"
 import { Interactable } from "../world/elements/Interactable"
 import { Pushable } from "../world/elements/Pushable"
-import { Ground, GroundType } from "../world/ground/Ground"
+import { Ground } from "../world/ground/Ground"
 import { LightManager } from "../world/LightManager"
 import { Location } from "../world/locations/Location"
 import { camp, here } from "../world/locations/LocationManager"
@@ -841,7 +841,7 @@ export class Dude extends Component implements DialogueSource {
         const tilePos = pixelPtToTilePt(pos)
         const currentLevel = this.location.levels?.get(tilePos) ?? 0
         const ground = this.location.getGround(tilePos)
-        if (ground?.type === GroundType.WATER) {
+        if (Ground.isWater(ground?.type)) {
             return currentLevel - 1
         }
         return currentLevel
