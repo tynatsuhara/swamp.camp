@@ -1,4 +1,5 @@
-import { Component, Point } from "brigsby/dist"
+import { Component, Point, pt } from "brigsby/dist"
+import { ImageRender } from "brigsby/dist/renderer"
 import {
     AnimatedSpriteComponent,
     SpriteAnimation,
@@ -9,6 +10,15 @@ import { Lists } from "brigsby/dist/util"
 import { getImage } from "./Tilesets"
 
 export class ExplosionTileset {
+    getSprite(center: Point): ImageRender {
+        const x = 641
+        const y = 220 // 367 red
+        const size = 15
+        return this.getTileAt(pt(x, y), size).toImageRender(
+            SpriteTransform.new({ position: center.plus(pt(-size / 2)) })
+        )
+    }
+
     /**
      * returns an AnimatedTileComponent which will self-destruct once the animation completes
      */
@@ -17,7 +27,7 @@ export class ExplosionTileset {
 
         // TODO: don't hardcode these when we need to support other sizes/colors
         const size = 30
-        const col = 376
+        const col = 375
         const row = 298
         const space = 4
         const speed = 35
@@ -30,7 +40,7 @@ export class ExplosionTileset {
 
         component = new SpriteAnimation(animation, () => component.delete()).toComponent(
             SpriteTransform.new({
-                position: center.plus(new Point(size, size).div(-2)),
+                position: center.plus(pt(size).div(-2)),
                 depth: center.y + size / 2,
             })
         )
@@ -70,7 +80,7 @@ export class ExplosionTileset {
     }
 
     private getTileAt(pos: Point, size: number) {
-        return new StaticSpriteSource(this.image(), pos, new Point(size, size))
+        return new StaticSpriteSource(this.image(), pos, pt(size))
     }
 
     private image() {
