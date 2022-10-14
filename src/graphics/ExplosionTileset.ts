@@ -14,8 +14,9 @@ export class ExplosionTileset {
         const x = 641
         const y = 220 // 367 red
         const size = 15
+        const position = center.plus(pt(-size / 2))
         return this.getTileAt(pt(x, y), size).toImageRender(
-            SpriteTransform.new({ position: center.plus(pt(-size / 2)) })
+            SpriteTransform.new({ position, depth: position.y + size })
         )
     }
 

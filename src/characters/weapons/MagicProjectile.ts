@@ -1,25 +1,18 @@
-import { Component, Entity, Point, pt } from "brigsby/dist"
-import { EllipseRender } from "brigsby/dist/renderer"
+import { Component, Entity, Point } from "brigsby/dist"
+import { Tilesets } from "../../graphics/Tilesets"
 import { here } from "../../world/locations/LocationManager"
 import { Dude } from "../Dude"
 
 class MagicProjectile extends Component {
     constructor(centerPosition: Point, velocity: Point, attacker?: Dude) {
         super()
-        const size = pt(10)
 
         this.update = ({ elapsedTimeMillis }) => {
             centerPosition = centerPosition.plus(velocity.times(elapsedTimeMillis))
         }
 
         this.getRenderMethods = () => {
-            return [
-                new EllipseRender({
-                    depth: centerPosition.y + size.y / 2,
-                    position: centerPosition.minus(size.div(2)),
-                    dimensions: size,
-                }),
-            ]
+            return [Tilesets.instance.explosions.getSprite(centerPosition)]
         }
     }
 }
