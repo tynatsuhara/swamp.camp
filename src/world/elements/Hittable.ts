@@ -3,6 +3,7 @@ import { SpriteTransform } from "brigsby/dist/sprites"
 import { Animator } from "brigsby/dist/util"
 
 export class Hittable extends Component {
+    extraRange = 0
     readonly position: Point
     private tileTransforms: Map<SpriteTransform, Point>
     private animator: Animator

@@ -44,7 +44,7 @@ export abstract class Weapon extends Component {
         let closest: Hittable
         for (const i of possibilities) {
             const dist = i.position.distanceTo(interactCenter)
-            if (dist < interactDistance && dist < closestDist) {
+            if (dist < interactDistance + i.extraRange && dist < closestDist) {
                 closestDist = dist
                 closest = i
             }

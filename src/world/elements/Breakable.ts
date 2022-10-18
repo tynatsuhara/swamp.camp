@@ -23,11 +23,13 @@ export class Breakable extends Hittable {
         position: Point,
         tileTransforms: SpriteTransform[],
         itemSupplier: () => Item[],
-        audioCallback: () => void = () => {}
+        audioCallback: () => void = () => {},
+        extraRange: number = 0
     ) {
         super(position, tileTransforms, (hitDir) => this.hitCallback(hitDir))
         this.itemSupplier = itemSupplier
         this.audioCallback = audioCallback
+        this.extraRange = extraRange
     }
 
     update(updateData: UpdateData) {
