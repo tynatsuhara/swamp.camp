@@ -2,6 +2,7 @@ import { Component, debug, Entity, Point } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
 import { WorldAudioContext } from "../audio/WorldAudioContext"
 import { TILE_SIZE } from "../graphics/Tilesets"
+import { saveManager } from "../SaveManager"
 import { Singletons } from "../Singletons"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { tilesAround } from "../Utils"
@@ -45,12 +46,17 @@ export class DudeSpawner extends Component {
     }
 
     private spawn() {
+        if (!saveManager.getState() || !saveManager.getState().hasMadeFire) {
+            return
+        }
+
         if (!debug.peacefulMode) {
             this.spawnDemons()
             this.spawnSwampThings()
             this.checkForOrcSeige()
             this.spawnWildlife()
         }
+
         this.spawnVisitors()
     }
 
