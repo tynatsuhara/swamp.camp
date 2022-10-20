@@ -86,7 +86,6 @@ export class ItemSpec {
     readonly equippableShield?: ShieldType
     readonly consumable?: Consumable
 
-    // TODO maybe make this a builder
     constructor({
         displayName,
         inventoryIconSupplier,
@@ -123,7 +122,6 @@ const SOUNDS: { [key: string]: [string, number] } = {
 }
 loadAudio(Object.values(SOUNDS).map((s) => s[0]))
 
-// Data that doesn't get serialized (TODO make builder pattern)
 export const ITEM_METADATA_MAP = {
     [Item.COIN]: new ItemSpec({
         displayName: "Coin",
