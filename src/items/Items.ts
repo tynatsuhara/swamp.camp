@@ -69,7 +69,14 @@ window["Item"] = Item
 
 type Consumable = { verb: string; fn: () => void }
 
-export class ItemMetadata {
+// Items of the same type can have different metadata
+// eg enchantments on weapons, owners of items, etc.
+// Currently, metadata only applies to non-stackable items
+export type ItemMetadata = {
+    // TODO
+}
+
+export class ItemSpec {
     readonly displayName: string
     readonly droppedIconSupplier?: () => SpriteSource
     readonly inventoryIconSupplier: () => StaticSpriteSource
@@ -118,48 +125,48 @@ loadAudio(Object.values(SOUNDS).map((s) => s[0]))
 
 // Data that doesn't get serialized (TODO make builder pattern)
 export const ITEM_METADATA_MAP = {
-    [Item.COIN]: new ItemMetadata({
+    [Item.COIN]: new ItemSpec({
         displayName: "Coin",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("coin"),
         droppedIconSupplier: () =>
             Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150),
         stackLimit: Number.MAX_SAFE_INTEGER,
     }),
-    [Item.ROCK]: new ItemMetadata({
+    [Item.ROCK]: new ItemSpec({
         displayName: "Rock",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("rock"),
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("rockItem"),
     }),
-    [Item.WOOD]: new ItemMetadata({
+    [Item.WOOD]: new ItemSpec({
         displayName: "Wood",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("wood"),
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("woodItem"),
     }),
-    [Item.CAMPFIRE]: new ItemMetadata({
+    [Item.CAMPFIRE]: new ItemSpec({
         displayName: "Campfire",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("campfire"),
         stackLimit: 1,
         element: ElementType.CAMPFIRE,
     }),
-    [Item.IRON]: new ItemMetadata({
+    [Item.IRON]: new ItemSpec({
         displayName: "Iron",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("iron"),
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("ironItem"),
     }),
-    [Item.ROUND_SAPLING]: new ItemMetadata({
+    [Item.ROUND_SAPLING]: new ItemSpec({
         displayName: "Sapling",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("treeRound"),
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("treeRoundSapling"),
         element: ElementType.TREE_ROUND,
     }),
-    [Item.POINTY_SAPLING]: new ItemMetadata({
+    [Item.POINTY_SAPLING]: new ItemSpec({
         displayName: "Sapling",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("treePointy"),
         droppedIconSupplier: () =>
             Tilesets.instance.outdoorTiles.getTileSource("treePointySapling"),
         element: ElementType.TREE_POINTY,
     }),
-    [Item.MUSHROOM]: new ItemMetadata({
+    [Item.MUSHROOM]: new ItemSpec({
         displayName: "Mushroom",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("mushroom"),
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("mushroom"),
@@ -178,19 +185,19 @@ export const ITEM_METADATA_MAP = {
             },
         },
     }),
-    [Item.CHEST]: new ItemMetadata({
+    [Item.CHEST]: new ItemSpec({
         displayName: "Chest",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("chest"),
         stackLimit: 1,
         element: ElementType.CHEST,
     }),
-    [Item.BED]: new ItemMetadata({
+    [Item.BED]: new ItemSpec({
         displayName: "Bed",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("bed"),
         stackLimit: 1,
         element: ElementType.BED,
     }),
-    [Item.WEAK_MEDICINE]: new ItemMetadata({
+    [Item.WEAK_MEDICINE]: new ItemSpec({
         displayName: "Weak medicine",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("potion1"),
         stackLimit: 1,
@@ -202,12 +209,12 @@ export const ITEM_METADATA_MAP = {
             },
         },
     }),
-    [Item.HEART_CONTAINER]: new ItemMetadata({
+    [Item.HEART_CONTAINER]: new ItemSpec({
         displayName: "Heart container",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("heart"),
         stackLimit: 1,
     }),
-    [Item.POISON_ANTIDOTE]: new ItemMetadata({
+    [Item.POISON_ANTIDOTE]: new ItemSpec({
         displayName: "Antidote",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("potion3"),
         stackLimit: 1,
@@ -219,7 +226,7 @@ export const ITEM_METADATA_MAP = {
             },
         },
     }),
-    [Item.MEAT]: new ItemMetadata({
+    [Item.MEAT]: new ItemSpec({
         displayName: "Meat",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("meat1"),
         consumable: {
@@ -231,7 +238,7 @@ export const ITEM_METADATA_MAP = {
         },
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("meat1"),
     }),
-    [Item.BLACKBERRIES]: new ItemMetadata({
+    [Item.BLACKBERRIES]: new ItemSpec({
         displayName: "Berries",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("berries"),
         consumable: {
@@ -244,38 +251,39 @@ export const ITEM_METADATA_MAP = {
     }),
 
     // Locations
-    [Item.TENT]: new ItemMetadata({
+    [Item.TENT]: new ItemSpec({
         displayName: "Tent",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("tent"),
         stackLimit: 1,
         element: ElementType.TENT,
+        droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("tentdropped"),
     }),
-    [Item.HOUSE]: new ItemMetadata({
+    [Item.HOUSE]: new ItemSpec({
         displayName: "House",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("house"),
         stackLimit: 1,
         element: ElementType.HOUSE,
     }),
-    [Item.SMALL_CABIN]: new ItemMetadata({
+    [Item.SMALL_CABIN]: new ItemSpec({
         displayName: "Small cabin",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("cabin"),
         stackLimit: 1,
         element: ElementType.CABIN,
     }),
-    [Item.APOTHECARY]: new ItemMetadata({
+    [Item.APOTHECARY]: new ItemSpec({
         displayName: "Apothecary",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("house"),
         stackLimit: 1,
         element: ElementType.APOTHECARY,
     }),
-    [Item.CHURCH]: new ItemMetadata({
+    [Item.CHURCH]: new ItemSpec({
         displayName: "Church",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("church"),
         stackLimit: 1,
         element: ElementType.CHURCH,
     }),
     // TODO
-    [Item.MINE_ENTRANCE]: new ItemMetadata({
+    [Item.MINE_ENTRANCE]: new ItemSpec({
         displayName: "Mine entrance",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("ladder"),
         stackLimit: 1,
@@ -283,25 +291,25 @@ export const ITEM_METADATA_MAP = {
     }),
 
     // Weapons
-    [Item.AXE]: new ItemMetadata({
+    [Item.AXE]: new ItemSpec({
         displayName: "Axe",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("axe"),
         stackLimit: 1,
         equippableWeapon: WeaponType.AXE,
     }),
-    [Item.PICKAXE]: new ItemMetadata({
+    [Item.PICKAXE]: new ItemSpec({
         displayName: "Pickaxe",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("pickaxe"),
         stackLimit: 1,
         equippableWeapon: WeaponType.PICKAXE,
     }),
-    [Item.SWORD]: new ItemMetadata({
+    [Item.SWORD]: new ItemSpec({
         displayName: "Sword",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("sword"),
         stackLimit: 1,
         equippableWeapon: WeaponType.SWORD,
     }),
-    [Item.SPEAR]: new ItemMetadata({
+    [Item.SPEAR]: new ItemSpec({
         displayName: "Spear",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("spear"),
         stackLimit: 1,
@@ -309,13 +317,13 @@ export const ITEM_METADATA_MAP = {
     }),
 
     // Shields
-    [Item.BASIC_SHIELD]: new ItemMetadata({
+    [Item.BASIC_SHIELD]: new ItemSpec({
         displayName: "Shield",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("shield0"),
         stackLimit: 1,
         equippableShield: ShieldType.BASIC,
     }),
-    [Item.LANTERN]: new ItemMetadata({
+    [Item.LANTERN]: new ItemSpec({
         displayName: "Lantern",
         inventoryIconSupplier: () => Tilesets.instance.oneBit.getTileSource("lantern"),
         stackLimit: 1,

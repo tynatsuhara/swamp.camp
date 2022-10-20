@@ -1,7 +1,7 @@
 import { InputKey } from "brigsby/dist"
-import { Item, ITEM_METADATA_MAP } from "./Items"
+import { Item, ItemMetadata, ITEM_METADATA_MAP } from "./Items"
 
-export type ItemStackMetadata = {
+export type ItemStackMetadata = ItemMetadata & {
     hotKey?: InputKey
 }
 
