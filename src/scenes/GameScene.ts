@@ -1,4 +1,4 @@
-import { debug, Entity, Point, UpdateViewsContext } from "brigsby/dist"
+import { debug, Entity, Point, profiler, UpdateViewsContext } from "brigsby/dist"
 import { CollisionEngine, collisionEngine } from "brigsby/dist/collision"
 import {
     BasicRenderComponent,
@@ -20,7 +20,7 @@ import { IntroCutscene } from "../cutscenes/IntroCutscene"
 import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
 import { DevControls, spawnMenu } from "../DevControls"
 import { Particles } from "../graphics/particles/Particles"
-import { TILE_SIZE } from "../graphics/Tilesets"
+import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { DroppedItem } from "../items/DroppedItem"
 import { Singletons } from "../Singletons"
 import { ZOOM } from "../SwampCampGame"
@@ -90,6 +90,10 @@ export class GameScene {
             : UIStateManager.instance.get(updateViewsContext.elapsedTimeMillis)
 
         uiEntities.push(this.getUiSpaceDebugEntity())
+
+        if (debug.showProfiler) {
+            profiler.showInfo(`mouse tile: ${pixelPtToTilePt(controls.getWorldSpaceMousePos())}`)
+        }
 
         const gameEntities: Entity[] = [
             CutsceneManager.instance.getEntity(),
