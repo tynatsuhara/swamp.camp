@@ -96,7 +96,7 @@ export const DIP_INTRO_DIALOGUE: DialogueSet = {
                 lines,
                 () => {
                     // TODO actually decide what should happen here
-                    inv().addItem(Item.TENT)
+                    inv().addItem(Item.TENT, 1, { color: "blue" })
                     EventQueue.instance.addEvent({
                         type: QueuedEventType.HERALD_ARRIVAL,
                         time: WorldTime.instance.tomorrow(TimeUnit.HOUR * 7),
