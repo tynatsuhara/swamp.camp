@@ -1,6 +1,6 @@
 import { Player } from "../characters/Player"
 import { saveManager } from "../SaveManager"
-import { Inventory } from "./Inventory"
+import { Inventory, ItemStackMetadata } from "./Inventory"
 import { Item } from "./Items"
 
 type SpecialItem = {
@@ -34,8 +34,8 @@ const SPECIAL_ITEMS: { [item: number]: SpecialItem } = {
 }
 
 export class PlayerInventory extends Inventory {
-    addItem(item: Item, count: number = 1): boolean {
-        const added = SPECIAL_ITEMS[item]?.noInventorySlot || super.addItem(item, count)
+    addItem(item: Item, count: number = 1, metadata?: ItemStackMetadata): boolean {
+        const added = SPECIAL_ITEMS[item]?.noInventorySlot || super.addItem(item, count, metadata)
         if (added) {
             SPECIAL_ITEMS[item]?.onAdd(count)
         }
