@@ -14,7 +14,7 @@ export class Sounds {
 
         if (!audio?.src) {
             console.log(`audio file [${path}] not loaded`)
-            return
+            return Promise.reject()
         }
 
         audio.volume = Math.min(1, Settings.getSoundVolume() * volume)
