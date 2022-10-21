@@ -2,7 +2,7 @@ import { Point, UpdateData } from "brigsby/dist"
 import { BoxCollider } from "brigsby/dist/collision"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { TILE_SIZE } from "../../graphics/Tilesets"
-import { Item, spawnItem } from "../../items/Items"
+import { Item, ItemMetadata, spawnItem } from "../../items/Items"
 import { Hittable } from "./Hittable"
 
 /**
@@ -12,7 +12,7 @@ import { Hittable } from "./Hittable"
  * TODO: Make this use the item recipe instead of manually specifying what drops.
  */
 export class Breakable extends Hittable {
-    private itemSupplier: () => Item[]
+    private itemSupplier: () => { item: Item; metadata?: ItemMetadata }[]
     private audioCallback: () => void
 
     private score = 0 // increases on each hit, decreases with time
@@ -22,7 +22,7 @@ export class Breakable extends Hittable {
     constructor(
         position: Point,
         tileTransforms: SpriteTransform[],
-        itemSupplier: () => Item[],
+        itemSupplier: () => { item: Item; metadata?: ItemMetadata }[],
         audioCallback: () => void = () => {},
         extraRange: number = 0
     ) {
@@ -47,7 +47,7 @@ export class Breakable extends Hittable {
         }
 
         const items = this.itemSupplier()
-        for (const item of items) {
+        for (const { item, metadata } of items) {
             const itemDirection = hitDir.randomlyShifted(0.5).normalized()
             const velocity = itemDirection.times(1 + 3 * Math.random())
             spawnItem({
@@ -55,6 +55,7 @@ export class Breakable extends Hittable {
                 item,
                 velocity,
                 sourceCollider: this.entity.getComponent(BoxCollider),
+                metadata,
             })
         }
 

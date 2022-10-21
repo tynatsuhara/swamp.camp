@@ -42,7 +42,7 @@ export class FurnitureFactory extends ElementFactory {
         if (wl.allowPlacing) {
             e.addComponent(
                 new Breakable(pixelCenterPos, [sprite.transform], () =>
-                    Lists.repeat(3, [Item.WOOD])
+                    Lists.repeat(3, [{ item: Item.WOOD }])
                 )
             )
         }

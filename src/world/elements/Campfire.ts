@@ -99,8 +99,8 @@ export class CampfireFactory extends ElementFactory {
                 pixelCenterPos,
                 [campfireSprite.transform, logSprite.transform, logSpriteSmall.transform],
                 () =>
-                    Lists.repeat(cf.logs, [Item.WOOD]).concat(
-                        Lists.repeat(ROCKS_NEEDED_FOR_CAMPFIRE, [Item.ROCK])
+                    Lists.repeat(cf.logs, [{ item: Item.WOOD }]).concat(
+                        Lists.repeat(ROCKS_NEEDED_FOR_CAMPFIRE, [{ item: Item.ROCK }])
                     )
             )
         )

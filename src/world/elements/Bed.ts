@@ -39,7 +39,7 @@ export class BedFactory extends ElementFactory {
 
         e.addComponent(
             new Breakable(pixelCenterPos, [tile.transform], () =>
-                Lists.repeat(Math.random() * 4 + 4, [Item.WOOD])
+                Lists.repeat(Math.random() * 4 + 4, [{ item: Item.WOOD }])
             )
         )
 
