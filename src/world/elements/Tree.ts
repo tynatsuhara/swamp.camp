@@ -193,7 +193,7 @@ export class TreeFactory extends ElementFactory<SaveData> {
 
     private nextGrowthTime() {
         // grow every 24-48 hours
-        return WorldTime.instance.time + TimeUnit.DAY * (1 + Math.random())
+        return Math.floor(WorldTime.instance.time + TimeUnit.DAY * (1 + Math.random()))
     }
 }
 
