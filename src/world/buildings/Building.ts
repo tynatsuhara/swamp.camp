@@ -14,7 +14,9 @@ import { Location } from "../locations/Location"
  *   2. "Occupied points" which determines occupied squares in the world grid
  *   3. Misc metadata about the building
  */
-export abstract class BuildingFactory extends ElementFactory {
+export abstract class BuildingFactory<
+    SaveFormat extends object = object
+> extends ElementFactory<SaveFormat> {
     canPlaceAtPos(wl: Location, pos: Point) {
         return ElementUtils.rectPoints(pos, this.dimensions)
             .map((pt) => wl.getGround(pt)?.type)
