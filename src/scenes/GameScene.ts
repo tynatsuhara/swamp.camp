@@ -78,6 +78,8 @@ export class GameScene {
     }
 
     getViews(updateViewsContext: UpdateViewsContext) {
+        this.updateProfilerInfo()
+
         const cameraOffset = Camera.instance.getUpdatedPosition(
             updateViewsContext.elapsedTimeMillis
         )
@@ -90,10 +92,6 @@ export class GameScene {
             : UIStateManager.instance.get(updateViewsContext.elapsedTimeMillis)
 
         uiEntities.push(this.getUiSpaceDebugEntity())
-
-        if (debug.showProfiler) {
-            profiler.showInfo(`mouse tile: ${pixelPtToTilePt(controls.getWorldSpaceMousePos())}`)
-        }
 
         const gameEntities: Entity[] = [
             CutsceneManager.instance.getEntity(),
@@ -279,6 +277,20 @@ export class GameScene {
             const buttons = [...dudeTypeButtons, nextPageButton]
 
             return ButtonsMenu.render("white", buttons, Camera.instance.dimensions.div(2))
+        }
+    }
+
+    private updateProfilerInfo() {
+        if (debug.showProfiler) {
+            const mouseTile = pixelPtToTilePt(controls.getWorldSpaceMousePos())
+            profiler.showInfo(`mouse tile: ${mouseTile}`)
+            profiler.showInfo(
+                `time: ${WorldTime.clockTime()} (${Math.floor(WorldTime.instance.time)})`
+            )
+            const elementData = here().getElement(mouseTile)?.save()
+            if (elementData) {
+                profiler.showInfo(`element data: ${JSON.stringify(elementData)}`)
+            }
         }
     }
 }
