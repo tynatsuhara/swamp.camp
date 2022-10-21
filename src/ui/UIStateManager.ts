@@ -1,7 +1,7 @@
 import { Entity } from "brigsby/dist"
 import { Player } from "../characters/Player"
 import { Camera } from "../cutscenes/Camera"
-import { spawnMenu } from "../DevControls"
+import { spawnMenu } from "../debug/SpawnMenu"
 import { Singletons } from "../Singletons"
 import { CraftingMenu } from "./CraftingMenu"
 import { DialogueDisplay } from "./DialogueDisplay"

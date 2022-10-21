@@ -5,79 +5,27 @@ import {
     InputKey,
     InputKeyString,
     Point,
-    profiler,
     UpdateData,
 } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
-import { DudeFactory } from "./characters/DudeFactory"
-import { DudeSpawner } from "./characters/DudeSpawner"
-import { DudeType } from "./characters/DudeType"
-import { Player } from "./characters/Player"
-import { spawnMagicProjectile } from "./characters/weapons/MagicProjectile"
-import { controls } from "./Controls"
-import { Particles } from "./graphics/particles/Particles"
-import { pixelPtToTilePt } from "./graphics/Tilesets"
-import { Color } from "./ui/Color"
-import { DrawMenu } from "./ui/DrawMenu"
-import { UIStateManager } from "./ui/UIStateManager"
-import { ElementType } from "./world/elements/Elements"
-import { GroundType } from "./world/ground/Ground"
-import { camp, here, LocationManager } from "./world/locations/LocationManager"
-import { RadiantLocationGenerator } from "./world/locations/RadiantLocationGenerator"
-import { TimeUnit } from "./world/TimeUnit"
-import { WorldTime } from "./world/WorldTime"
-
-const SPAWNABLE_TYPES = [
-    // Wildlife
-    DudeType.WOLF,
-    DudeType.SWAMP_THING,
-    DudeType.BEAR,
-    DudeType.SHROOM,
-
-    // Demons
-    DudeType.HORNED_DEMON,
-    DudeType.DEMON_BRUTE,
-
-    // Orcs
-    DudeType.ORC_WARRIOR,
-    DudeType.ORC_BRUTE,
-    DudeType.ORC_SHAMAN,
-
-    // Villagers
-    DudeType.VILLAGER,
-    DudeType.DOCTOR,
-    DudeType.BLACKSMITH,
-    DudeType.SPOOKY_VISITOR,
-    DudeType.TRAVELING_MERCHANT,
-    DudeType.KNIGHT,
-    DudeType.CLERIC,
-    DudeType.NUN,
-    DudeType.BISHOP,
-
-    // Pets
-    DudeType.GUMBALL,
-    DudeType.ONION,
-
-    // Misc
-    DudeType.FOREST_GUARDIAN,
-    DudeType.GNOLL_SCOUT,
-    DudeType.CENTAUR,
-    DudeType.ELF,
-]
-
-export const spawnMenu = {
-    isOpen: false,
-    page: 0,
-    pageSize: 10,
-    setSelectedType: (type: DudeType) => {
-        localStorage.setItem("spawnMenuType", JSON.stringify(type))
-    },
-    getSelectedType: () => {
-        const cacheType = localStorage.getItem("spawnMenuType")
-        return cacheType ? (JSON.parse(cacheType) as DudeType) : SPAWNABLE_TYPES[0]
-    },
-    types: SPAWNABLE_TYPES,
-}
+import { DudeFactory } from "../characters/DudeFactory"
+import { DudeSpawner } from "../characters/DudeSpawner"
+import { DudeType } from "../characters/DudeType"
+import { Player } from "../characters/Player"
+import { spawnMagicProjectile } from "../characters/weapons/MagicProjectile"
+import { controls } from "../Controls"
+import { Particles } from "../graphics/particles/Particles"
+import { pixelPtToTilePt } from "../graphics/Tilesets"
+import { Color } from "../ui/Color"
+import { DrawMenu } from "../ui/DrawMenu"
+import { UIStateManager } from "../ui/UIStateManager"
+import { ElementType } from "../world/elements/Elements"
+import { GroundType } from "../world/ground/Ground"
+import { camp, here, LocationManager } from "../world/locations/LocationManager"
+import { RadiantLocationGenerator } from "../world/locations/RadiantLocationGenerator"
+import { TimeUnit } from "../world/TimeUnit"
+import { WorldTime } from "../world/WorldTime"
+import { spawnMenu } from "./SpawnMenu"
 
 const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     // [
@@ -284,18 +232,6 @@ export class DevControls extends Component {
                     cmd[2](updateData.input)
                 }
             })
-        }
-    }
-}
-
-export class ProfilerUpdateComponent extends Component {
-    update(updateData: UpdateData): void {
-        const mouseTile = pixelPtToTilePt(controls.getWorldSpaceMousePos())
-        profiler.showInfo(`mouse tile: ${mouseTile}`)
-        profiler.showInfo(`time: ${WorldTime.clockTime()} (${Math.floor(WorldTime.instance.time)})`)
-        const elementData = here().getElement(mouseTile)?.save()
-        if (elementData) {
-            profiler.showInfo(`element data: ${JSON.stringify(elementData)}`)
         }
     }
 }

@@ -18,7 +18,9 @@ import { Camera } from "../cutscenes/Camera"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { IntroCutscene } from "../cutscenes/IntroCutscene"
 import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
-import { DevControls, ProfilerUpdateComponent, spawnMenu } from "../DevControls"
+import { DevControls } from "../debug/DevControls"
+import { ProfilerData } from "../debug/ProfilerData"
+import { spawnMenu } from "../debug/SpawnMenu"
 import { Particles } from "../graphics/particles/Particles"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { DroppedItem } from "../items/DroppedItem"
@@ -281,7 +283,7 @@ export class GameScene {
         }
 
         if (debug.showProfiler) {
-            result.push(new Entity([new ProfilerUpdateComponent()]))
+            result.push(new Entity([new ProfilerData()]))
         }
 
         return result
