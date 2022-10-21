@@ -595,12 +595,12 @@ export class Dude extends Component implements DialogueSource {
                     .plus(new Point(Math.random() - 0.5, Math.random() - 0.5).times(randomness))
                 setTimeout(
                     () =>
-                        spawnItem(
-                            this.standingPosition.minus(new Point(0, 2)),
+                        spawnItem({
+                            pos: this.standingPosition.minus(new Point(0, 2)),
                             item,
                             velocity,
-                            this.collider
-                        ),
+                            sourceCollider: this.collider,
+                        }),
                     100
                 )
             })

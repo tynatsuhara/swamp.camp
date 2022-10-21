@@ -50,12 +50,12 @@ export class Breakable extends Hittable {
         for (const item of items) {
             const itemDirection = hitDir.randomlyShifted(0.5).normalized()
             const velocity = itemDirection.times(1 + 3 * Math.random())
-            spawnItem(
-                this.position.plus(new Point(0, TILE_SIZE / 2)),
+            spawnItem({
+                pos: this.position.plus(new Point(0, TILE_SIZE / 2)),
                 item,
                 velocity,
-                this.entity.getComponent(BoxCollider)
-            )
+                sourceCollider: this.entity.getComponent(BoxCollider),
+            })
         }
 
         this.entity.selfDestruct()

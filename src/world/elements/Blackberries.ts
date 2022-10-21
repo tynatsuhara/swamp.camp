@@ -93,14 +93,14 @@ export class BlackberriesFactory extends ElementFactory<SaveData> {
                 e.selfDestruct()
                 if (state === State.HAS_BERRIES) {
                     const itemDirection = dir.randomlyShifted(0.2).normalized()
-                    spawnItem(
-                        pos
+                    spawnItem({
+                        pos: pos
                             .times(TILE_SIZE)
                             .plusY(TILE_SIZE)
                             .plusX(TILE_SIZE / 2),
-                        Item.BLACKBERRIES,
-                        itemDirection.times(5)
-                    )
+                        item: Item.BLACKBERRIES,
+                        velocity: itemDirection.times(5),
+                    })
                     wl.addElement(this.type, pos, {
                         s: State.NO_BERRIES,
                     })

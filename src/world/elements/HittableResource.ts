@@ -50,14 +50,14 @@ export class HittableResource extends Hittable {
             for (const item of items) {
                 const itemDirection = hitDir.randomlyShifted(0.5).normalized()
                 const velocity = itemDirection.times(1 + 3 * Math.random())
-                spawnItem(
-                    this.position
+                spawnItem({
+                    pos: this.position
                         .plus(new Point(0, TILE_SIZE / 2))
                         .plus(itemDirection.times(placeDistance)), // bottom center, then randomly adjusted
                     item,
-                    velocity.times(velocityMultiplier),
-                    this.entity.getComponent(BoxCollider)
-                )
+                    velocity: velocity.times(velocityMultiplier),
+                    sourceCollider: this.entity.getComponent(BoxCollider),
+                })
             }
         }
 

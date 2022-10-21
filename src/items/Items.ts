@@ -332,11 +332,18 @@ export const ITEM_METADATA_MAP = {
 /**
  * @param position The bottom center where the item should be placed
  */
-export const spawnItem = (
-    pos: Point,
-    item: Item,
-    velocity: Point = new Point(0, 0),
-    sourceCollider: Collider = null
-) => {
+export const spawnItem = ({
+    pos,
+    item,
+    velocity = new Point(0, 0),
+    sourceCollider,
+    metadata = {},
+}: {
+    pos: Point
+    item: Item
+    velocity?: Point
+    sourceCollider?: Collider
+    metadata?: ItemMetadata
+}) => {
     here().droppedItems.add(new Entity([new DroppedItem(pos, item, velocity, sourceCollider)]))
 }
