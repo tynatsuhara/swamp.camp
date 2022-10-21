@@ -5,6 +5,7 @@ import {
     InputKey,
     InputKeyString,
     Point,
+    profiler,
     UpdateData,
 } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
@@ -283,6 +284,18 @@ export class DevControls extends Component {
                     cmd[2](updateData.input)
                 }
             })
+        }
+    }
+}
+
+export class ProfilerUpdateComponent extends Component {
+    update(updateData: UpdateData): void {
+        const mouseTile = pixelPtToTilePt(controls.getWorldSpaceMousePos())
+        profiler.showInfo(`mouse tile: ${mouseTile}`)
+        profiler.showInfo(`time: ${WorldTime.clockTime()} (${Math.floor(WorldTime.instance.time)})`)
+        const elementData = here().getElement(mouseTile)?.save()
+        if (elementData) {
+            profiler.showInfo(`element data: ${JSON.stringify(elementData)}`)
         }
     }
 }

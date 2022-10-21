@@ -1,4 +1,4 @@
-import { debug, Entity, Point, profiler, UpdateViewsContext } from "brigsby/dist"
+import { debug, Entity, Point, UpdateViewsContext } from "brigsby/dist"
 import { CollisionEngine, collisionEngine } from "brigsby/dist/collision"
 import {
     BasicRenderComponent,
@@ -18,9 +18,9 @@ import { Camera } from "../cutscenes/Camera"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { IntroCutscene } from "../cutscenes/IntroCutscene"
 import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
-import { DevControls, spawnMenu } from "../DevControls"
+import { DevControls, ProfilerUpdateComponent, spawnMenu } from "../DevControls"
 import { Particles } from "../graphics/particles/Particles"
-import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
+import { TILE_SIZE } from "../graphics/Tilesets"
 import { DroppedItem } from "../items/DroppedItem"
 import { Singletons } from "../Singletons"
 import { ZOOM } from "../SwampCampGame"
@@ -78,8 +78,6 @@ export class GameScene {
     }
 
     getViews(updateViewsContext: UpdateViewsContext) {
-        this.updateProfilerInfo()
-
         const cameraOffset = Camera.instance.getUpdatedPosition(
             updateViewsContext.elapsedTimeMillis
         )
@@ -87,11 +85,12 @@ export class GameScene {
         // full-screen text overlay that pauses gameplay
         const isTextOverlayActive = TextOverlayManager.instance.isActive
 
-        const uiEntities = isTextOverlayActive
-            ? [TextOverlayManager.instance.getEntity()]
-            : UIStateManager.instance.get(updateViewsContext.elapsedTimeMillis)
-
-        uiEntities.push(this.getUiSpaceDebugEntity())
+        const uiEntities = [
+            ...(isTextOverlayActive
+                ? [TextOverlayManager.instance.getEntity()]
+                : UIStateManager.instance.get(updateViewsContext.elapsedTimeMillis)),
+            ...this.getUiSpaceDebugEntities(),
+        ]
 
         const gameEntities: Entity[] = [
             CutsceneManager.instance.getEntity(),
@@ -237,7 +236,9 @@ export class GameScene {
         return e
     }
 
-    private getUiSpaceDebugEntity() {
+    private getUiSpaceDebugEntities(): Entity[] {
+        const result = []
+
         if (spawnMenu.isOpen) {
             const selectedType = spawnMenu.getSelectedType()
             const pageStart = spawnMenu.page * spawnMenu.pageSize
@@ -276,21 +277,13 @@ export class GameScene {
 
             const buttons = [...dudeTypeButtons, nextPageButton]
 
-            return ButtonsMenu.render("white", buttons, Camera.instance.dimensions.div(2))
+            result.push(ButtonsMenu.render("white", buttons, Camera.instance.dimensions.div(2)))
         }
-    }
 
-    private updateProfilerInfo() {
         if (debug.showProfiler) {
-            const mouseTile = pixelPtToTilePt(controls.getWorldSpaceMousePos())
-            profiler.showInfo(`mouse tile: ${mouseTile}`)
-            profiler.showInfo(
-                `time: ${WorldTime.clockTime()} (${Math.floor(WorldTime.instance.time)})`
-            )
-            const elementData = here().getElement(mouseTile)?.save()
-            if (elementData) {
-                profiler.showInfo(`element data: ${JSON.stringify(elementData)}`)
-            }
+            result.push(new Entity([new ProfilerUpdateComponent()]))
         }
+
+        return result
     }
 }
