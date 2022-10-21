@@ -6,7 +6,7 @@ import { loadAudio } from "../audio/DeferLoadAudio"
 import { Sounds } from "../audio/Sounds"
 import { Player } from "../characters/Player"
 import { here } from "../world/locations/LocationManager"
-import { Item, ITEM_METADATA_MAP } from "./Items"
+import { Item, ItemMetadata, ITEM_METADATA_MAP } from "./Items"
 
 // TODO: Find a better sound effect (this one isn't very audible)
 const PICK_UP_SOUNDS = Lists.range(0, 4).map((i) => `audio/impact/impactWood_medium_00${i}.ogg`)
@@ -23,7 +23,13 @@ export class DroppedItem extends Component {
      * @param position The bottom center where the item should be placed
      * @param sourceCollider will be ignored to prevent physics issues
      */
-    constructor(position: Point, item: Item, velocity: Point, sourceCollider: Collider = null) {
+    constructor(
+        position: Point,
+        item: Item,
+        velocity: Point,
+        sourceCollider: Collider,
+        metadata: ItemMetadata
+    ) {
         super()
 
         loadAudio(PICK_UP_SOUNDS)
@@ -80,7 +86,7 @@ export class DroppedItem extends Component {
                 this.canPickUp = false
                 setTimeout(() => {
                     if (Player.instance.dude.isAlive && !!this.entity) {
-                        if (Player.instance.dude.inventory.addItem(this.itemType)) {
+                        if (Player.instance.dude.inventory.addItem(this.itemType, 1, metadata)) {
                             here().droppedItems.delete(this.entity)
                             this.entity.selfDestruct()
                             setTimeout(() => {

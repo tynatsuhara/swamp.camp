@@ -345,5 +345,7 @@ export const spawnItem = ({
     sourceCollider?: Collider
     metadata?: ItemMetadata
 }) => {
-    here().droppedItems.add(new Entity([new DroppedItem(pos, item, velocity, sourceCollider)]))
+    here().droppedItems.add(
+        new Entity([new DroppedItem(pos, item, velocity, sourceCollider, metadata)])
+    )
 }
