@@ -3,7 +3,10 @@ import { Grid, Maths } from "brigsby/dist/util"
 import { Player } from "../characters/Player"
 import { controls } from "../Controls"
 import { TILE_SIZE } from "../graphics/Tilesets"
+import { ItemStack } from "../items/Inventory"
+import { ITEM_METADATA_MAP } from "../items/Items"
 import { ElementComponent } from "../world/elements/ElementComponent"
+import { ElementFactory } from "../world/elements/ElementFactory"
 import { Elements, ElementType } from "../world/elements/Elements"
 import { ElementUtils } from "../world/elements/ElementUtils"
 import { here } from "../world/locations/LocationManager"
@@ -14,11 +17,11 @@ export class PlaceElementDisplay extends Component {
 
     private e: Entity = new Entity([this])
 
+    private stack: ItemStack
     private element: ElementType
-    private dimensions: Point
+    private elementFactory: ElementFactory
     private placingFrame: PlaceElementFrame
     private successFn: () => void
-    private count: number = 0
     private replacingElement: ElementComponent | undefined
 
     get isOpen() {
@@ -31,7 +34,7 @@ export class PlaceElementDisplay extends Component {
     }
 
     update(updateData: UpdateData) {
-        if (this.count === 0) {
+        if (!this.stack?.count) {
             return
         }
 
@@ -42,45 +45,45 @@ export class PlaceElementDisplay extends Component {
 
     close() {
         this.element = null
-        this.count = 0
+        this.stack = null
         this.placingFrame.delete()
     }
 
-    startPlacing(
-        element: ElementType,
-        successFn: () => void,
-        count: number,
-        replacingElement?: ElementComponent
-    ) {
-        this.element = element
+    startPlacing(stack: ItemStack, successFn: () => void, replacingElement?: ElementComponent) {
+        this.stack = stack
         this.successFn = successFn
-        this.count = count
         this.replacingElement = replacingElement
-        this.dimensions = Elements.instance.getElementFactory(element).dimensions
+
+        this.element = ITEM_METADATA_MAP[stack.item].element
+        this.elementFactory = Elements.instance.getElementFactory(this.element)
+
         this.placingFrame = Player.instance.entity.addComponent(
-            new PlaceElementFrame(this.dimensions, this.replacingElement)
+            new PlaceElementFrame(this.elementFactory.dimensions, this.replacingElement)
         )
     }
 
     // Should only be called by PlaceElementFrame
     finishPlacing(elementPos: Point) {
-        this.count--
-        this.successFn() // remove from inv
+        this.successFn() // decrement and maybe remove from inv
         if (this.replacingElement) {
             here().removeElement(this.replacingElement)
         }
 
-        here().addElement(this.element, elementPos)
+        const data = this.stack.metadata
+            ? this.elementFactory.itemMetadataToSaveFormat(this.stack.metadata)
+            : undefined
+
+        here().addElement(this.element, elementPos, data)
 
         // Push if there are any colliders
-        const shouldPush = ElementUtils.rectPoints(elementPos, this.dimensions).some((pt) =>
-            here().isOccupied(pt)
+        const shouldPush = ElementUtils.rectPoints(elementPos, this.elementFactory.dimensions).some(
+            (pt) => here().isOccupied(pt)
         )
 
         // Push dudes out of the way
         if (shouldPush) {
             const p = elementPos.times(TILE_SIZE)
-            const d = this.dimensions.times(TILE_SIZE)
+            const d = this.elementFactory.dimensions.times(TILE_SIZE)
             const intersectingDudes = here()
                 .getDudes()
                 .filter((dude) => Maths.rectContains(p, d, dude.standingPosition))
@@ -95,7 +98,7 @@ export class PlaceElementDisplay extends Component {
             })
         }
 
-        if (this.count === 0) {
+        if (!this.stack?.count) {
             this.close()
         }
     }

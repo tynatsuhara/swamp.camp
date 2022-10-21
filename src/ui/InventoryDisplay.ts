@@ -1,4 +1,4 @@
-import { Component, Entity, InputKeyString, Point, UpdateData } from "brigsby/dist"
+import { Component, Entity, InputKeyString, Point, profiler, UpdateData } from "brigsby/dist"
 import { BasicRenderComponent, TextRender } from "brigsby/dist/renderer"
 import {
     AnimatedSpriteComponent,
@@ -173,10 +173,9 @@ export class InventoryDisplay extends Component {
         const actions: { verb: string; actionFn: () => void }[] = []
 
         const decrementStack = () => {
-            if (stack.count === 1) {
+            stack.count--
+            if (stack.count === 0) {
                 hoverInv.setStack(hoverIndex, null)
-            } else {
-                stack.count--
             }
         }
 
@@ -188,15 +187,12 @@ export class InventoryDisplay extends Component {
                 wl.allowPlacing &&
                 Elements.instance.getElementFactory(item.element).canPlaceInLocation(wl)
             ) {
+                profiler.showInfo(`item metadata: ${JSON.stringify(stack.metadata)}`)
                 actions.push({
                     verb: "place",
                     actionFn: () => {
                         this.close()
-                        PlaceElementDisplay.instance.startPlacing(
-                            item.element,
-                            decrementStack,
-                            stack.count
-                        )
+                        PlaceElementDisplay.instance.startPlacing(stack, decrementStack)
                     },
                 })
             }

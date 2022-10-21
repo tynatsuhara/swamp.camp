@@ -1,4 +1,5 @@
 import { Point } from "brigsby/dist"
+import { ItemMetadata } from "../../items/Items"
 import { Location } from "../locations/Location"
 import { ElementComponent } from "./ElementComponent"
 import { ElementType } from "./Elements"
@@ -19,7 +20,7 @@ export abstract class ElementFactory<SaveFormat extends object = object> {
      * @param data Previous save data (or an empty object)
      * @returns An ElementComponent with the factory's type, which MUST have a nonnull entity
      */
-    abstract make(wl: Location, pos: Point, data: SaveFormat): ElementComponent<SaveFormat>
+    abstract make(wl: Location, pos: Point, data: Partial<SaveFormat>): ElementComponent<SaveFormat>
 
     /**
      * @param wl The location in which the user is trying to place an element
@@ -33,5 +34,11 @@ export abstract class ElementFactory<SaveFormat extends object = object> {
      */
     canPlaceAtPos(wl: Location, pos: Point) {
         return true
+    }
+
+    itemMetadataToSaveFormat(metadata: ItemMetadata): SaveFormat {
+        // factories should override if they can be instantiated
+        // from an item and depend on unique item metadata
+        return undefined
     }
 }
