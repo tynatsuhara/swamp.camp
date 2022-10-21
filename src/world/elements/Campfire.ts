@@ -118,7 +118,7 @@ export class CampfireFactory extends ElementFactory {
 
         return e.addComponent(
             new ElementComponent(ElementType.CAMPFIRE, pos, () => {
-                return { logs: cf.logs, llct: cf.lastLogConsumedTime }
+                return { logs: cf.logs, llct: Math.floor(cf.lastLogConsumedTime) }
             })
         )
     }

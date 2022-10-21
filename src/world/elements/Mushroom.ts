@@ -15,14 +15,12 @@ import { ElementType } from "./Elements"
 import { Growable } from "./Growable"
 import { Hittable } from "./Hittable"
 
-const NEXT_GROWTH_TIME = "ngt"
-
-export class MushroomFactory extends ElementFactory {
+export class MushroomFactory extends ElementFactory<{ ngt: number }> {
     readonly type = ElementType.MUSHROOM
     readonly dimensions = new Point(1, 1)
 
-    make(wl: Location, pos: Point, data: object): ElementComponent {
-        const nextGrowthTime = data[NEXT_GROWTH_TIME] ?? this.nextGrowthTime()
+    make(wl: Location, pos: Point, { ngt = this.nextGrowthTime() }) {
+        // const nextGrowthTime = data[NEXT_GROWTH_TIME] ?? this.nextGrowthTime()
 
         const e = new Entity()
         const randomOffset = new Point(0, -4).randomlyShifted(3, 3)
@@ -54,7 +52,7 @@ export class MushroomFactory extends ElementFactory {
         )
 
         e.addComponent(
-            new Growable(nextGrowthTime, () => {
+            new Growable(ngt, () => {
                 e.selfDestruct()
                 DudeFactory.instance.new(
                     DudeType.SHROOM,
@@ -69,7 +67,7 @@ export class MushroomFactory extends ElementFactory {
 
         return e.addComponent(
             new ElementComponent(this.type, pos, () => ({
-                [NEXT_GROWTH_TIME]: nextGrowthTime,
+                ngt,
             }))
         )
     }
@@ -84,6 +82,6 @@ export class MushroomFactory extends ElementFactory {
 
     private nextGrowthTime() {
         // grow every 12-24 hours
-        return WorldTime.instance.time + TimeUnit.DAY * (0.5 + Math.random() / 2)
+        return Math.floor(WorldTime.instance.time + TimeUnit.DAY * (0.5 + Math.random() / 2))
     }
 }
