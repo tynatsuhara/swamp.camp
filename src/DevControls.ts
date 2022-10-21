@@ -230,7 +230,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
                 .forEach((d) => d.entity.selfDestruct()),
     ],
     [InputKey.T, "spawn visitor", () => DudeSpawner.instance.spawnVisitors(true)],
-    [InputKey.SLASH, "toggle profiler", () => (debug.showProfiler = !debug.showProfiler)],
+    [InputKey.BACKSPACE, "toggle profiler", () => (debug.showProfiler = !debug.showProfiler)],
 ]
 
 window["vibrate"] = (duration: number, strongMagnitude: number, weakMagnitude: number) => {
