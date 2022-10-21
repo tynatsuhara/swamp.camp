@@ -11,7 +11,7 @@ import { EventQueue } from "./world/events/EventQueue"
 import { here, LocationManager } from "./world/locations/LocationManager"
 import { WorldTime } from "./world/WorldTime"
 
-const CURRENT_SAVE_FORMAT_VERSION = 2
+const CURRENT_SAVE_FORMAT_VERSION = 3
 const SLOTS: number = 3 + (debug.extraSaveSlots ?? 0)
 
 class SaveManager {

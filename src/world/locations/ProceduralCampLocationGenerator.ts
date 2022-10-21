@@ -1,7 +1,6 @@
 import { Point } from "brigsby/dist"
 import { Grid, Noise } from "brigsby/dist/util"
 import { Singletons } from "../../Singletons"
-import { TentColor } from "../buildings/Tent"
 import { ElementType } from "../elements/Elements"
 import { Ground, GroundType } from "../ground/Ground"
 import { AbstractLocationGenerator } from "./AbstractLocationGenerator"
@@ -52,7 +51,7 @@ export class ProceduralCampLocationGenerator extends AbstractLocationGenerator {
 
             // spawn tent
             const tent = location.addElement(ElementType.TENT, this.TENT_POS, {
-                color: TentColor.RED,
+                color: "red",
             })
 
             // if the tent couldn't be placed, redo the map topography

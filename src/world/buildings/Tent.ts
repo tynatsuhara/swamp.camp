@@ -1,34 +1,47 @@
 import { Entity, Point } from "brigsby/dist"
-import { NineSlice, SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
+import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
+import { Sounds } from "../../audio/Sounds"
+import { ImageFilters } from "../../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
+import { Item, ItemMetadata } from "../../items/Items"
+import { Color } from "../../ui/Color"
+import { Breakable } from "../elements/Breakable"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/Elements"
+import { ElementUtils } from "../elements/ElementUtils"
 import { Interactable } from "../elements/Interactable"
 import { NavMeshCollider } from "../elements/NavMeshCollider"
 import { GroundType } from "../ground/Ground"
 import { Location } from "../locations/Location"
 import { LocationManager, LocationType } from "../locations/LocationManager"
-import { Teleporter, TeleporterPrefix } from "../Teleporter"
-import { AsciiInteriorBuilder } from "./AsciiInteriorBuilder"
+import { Teleporter, TeleporterPrefix, TeleporterSound } from "../Teleporter"
 import { BuildingFactory } from "./Building"
 import { InteriorUtils } from "./InteriorUtils"
 
-export const enum TentColor {
-    RED = "red",
-    BLUE = "blue",
+type Variant = { dark: Color; light: Color; accent: Color }
+
+const VARIANTS = {
+    red: { dark: Color.PINK_2, light: Color.PINK_3, accent: Color.PINK_4 },
+    blue: { dark: Color.BLUE_3, light: Color.BLUE_4, accent: Color.BLUE_5 },
 }
 
-export class TentFactory extends BuildingFactory {
+export type TentColor = keyof typeof VARIANTS
+type TentData = { color: TentColor; destinationUUID: string }
+
+export class TentFactory extends BuildingFactory<TentData> {
     readonly type = ElementType.TENT
     readonly dimensions = new Point(4, 3)
 
-    make(wl: Location, pos: Point, data: any): ElementComponent {
+    make(
+        wl: Location,
+        pos: Point,
+        { color = "blue", destinationUUID = makeTentInterior(wl, color).uuid }
+    ) {
         const e = new Entity()
 
-        const color: TentColor = data.color ?? TentColor.BLUE
-        const destinationUUID: string = data.destinationUUID ?? makeTentInterior(wl, color).uuid
-
-        const interactablePos = pos.plus(new Point(2, 2)).times(TILE_SIZE)
+        const colorVariant = VARIANTS[color]
+        const tentCenterPos = pos.plus(new Point(2, 1)).times(TILE_SIZE)
+        const interactablePos = tentCenterPos.plusY(TILE_SIZE)
         const doorId = TeleporterPrefix.TENT
         const sourceTeleporter = {
             to: destinationUUID,
@@ -39,10 +52,12 @@ export class TentFactory extends BuildingFactory {
 
         // Set up tiles
         const depth = (pos.y + 1) * TILE_SIZE + /* prevent clipping */ 1
-        addTile(e, `${color}tentNW`, pos.plusX(1), depth)
-        addTile(e, `${color}tentNE`, pos.plus(new Point(2, 0)), depth)
-        addTile(e, `${color}tentSW`, pos.plus(new Point(1, 1)), depth)
-        addTile(e, `${color}tentSE`, pos.plus(new Point(2, 1)), depth)
+        const tiles = [
+            addTile(e, `tentNW`, pos.plusX(1), depth, colorVariant),
+            addTile(e, `tentNE`, pos.plus(new Point(2, 0)), depth, colorVariant),
+            addTile(e, `tentSW`, pos.plus(new Point(1, 1)), depth, colorVariant),
+            addTile(e, `tentSE`, pos.plus(new Point(2, 1)), depth, colorVariant),
+        ]
         e.addComponent(
             new NavMeshCollider(
                 wl,
@@ -60,40 +75,64 @@ export class TentFactory extends BuildingFactory {
             )
         )
 
+        // TODO: Disable for now?
+        e.addComponent(
+            new Breakable(
+                interactablePos,
+                tiles.map((t) => t.transform),
+                () => [{ item: Item.TENT, metadata: { color } }],
+                () => Sounds.play(...TeleporterSound.TENT),
+                10
+            )
+        )
+
         return e.addComponent(
-            new ElementComponent(ElementType.TENT, pos, () => {
+            new ElementComponent<TentData>(ElementType.TENT, pos, () => {
                 return { destinationUUID, color }
             })
         )
     }
+
+    itemMetadataToSaveFormat(metadata: ItemMetadata): TentData {
+        return {
+            color: metadata.color,
+            destinationUUID: undefined,
+        }
+    }
 }
 
-const addTile = (e: Entity, s: string, pos: Point, depth: number) => {
-    const tile = e.addComponent(
+const getVariantFilter = (color: Variant) => {
+    return ImageFilters.recolor(
+        [Color.PINK_2, color.dark],
+        [Color.PINK_3, color.light],
+        [Color.PINK_4, color.accent]
+    )
+}
+
+const addTile = (e: Entity, s: string, pos: Point, depth: number, color: Variant) => {
+    return e.addComponent(
         new SpriteComponent(
             Tilesets.instance.outdoorTiles.getTileSource(s),
-            new SpriteTransform(pos.times(TILE_SIZE))
+            // .filtered(getVariantFilter(color)), // TODO support color later
+            SpriteTransform.new({ position: pos.times(TILE_SIZE), depth })
         )
     )
-    tile.transform.depth = depth
 }
 
-const TENT_TEMPLATE = `
-  ^  
- /xl
-/xxxl
-`
-
 const makeTentInterior = (outside: Location, color: TentColor): Location => {
-    const isPlayerTent = color === TentColor.BLUE
+    // TODO change the isPlayerTent logic to support more than 2 tents
+    const isPlayerTent = color === "blue"
     const l = new Location(LocationType.TENT_INTERIOR, true, isPlayerTent)
     LocationManager.instance.add(l)
 
     const floorDimensions = new Point(5, 4)
+    ElementUtils.rectPoints(Point.ZERO, floorDimensions).forEach((p) =>
+        l.setGroundElement(GroundType.BASIC, p)
+    )
 
     l.setBarriers(InteriorUtils.makeBarriers(floorDimensions))
 
-    const interactablePos = new Point(2.5, 4).times(TILE_SIZE)
+    const interactablePos = new Point(floorDimensions.x / 2, floorDimensions.y).times(TILE_SIZE)
     const teleporter: Teleporter = {
         to: outside.uuid,
         pos: interactablePos.plusY(-4),
@@ -106,28 +145,26 @@ const makeTentInterior = (outside: Location, color: TentColor): Location => {
         id: TeleporterPrefix.TENT,
     })
 
+    // TODO: color mismatch
+    l.sprites.addSprite("tent-interior", new Point(0, -TILE_SIZE * 3), 0, Number.MIN_SAFE_INTEGER)
+
+    // TODO change the bed to a bedroll
     if (!isPlayerTent) {
         l.addElement(ElementType.BED, new Point(3, 0))
     }
 
-    const groundType = `${color}tentInterior`
-
-    NineSlice.nineSliceForEach(floorDimensions, (pt, index) =>
-        l.setGroundElement(GroundType.BASIC_NINE_SLICE, pt, {
-            k: groundType,
-            i: index,
-        })
-    )
-
-    const addWallSprite = (key: string, pt: Point) => {
-        l.sprites.addSprite(key, pt.plusY(-3).times(TILE_SIZE), 0, -100000)
-    }
-
-    new AsciiInteriorBuilder(TENT_TEMPLATE)
-        .map("/", (pt) => addWallSprite(`${color}tentl`, pt))
-        .map("^", (pt) => addWallSprite(`${color}tenttip`, pt))
-        .map("l", (pt) => addWallSprite(`${color}tentr`, pt))
-        .map("x", (pt) => addWallSprite(`${color}tentCenter`, pt))
-
     return l
 }
+
+// proof of concept for how we could redesign location sprites to be more dynamic (less breakable via serialization)
+// class TentInteriorSprite extends Component {
+//     constructor(position: Point, variant: Variant) {
+//         super()
+
+//         const sprite = Tilesets.instance.largeSprites
+//             .getTileSource("tent-interior")
+//             .filtered(getVariantFilter(variant))
+
+//         this.getRenderMethods = () => [sprite.toImageRender(SpriteTransform.new({}))]
+//     }
+// }

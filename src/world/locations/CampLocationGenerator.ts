@@ -3,7 +3,6 @@ import { Grid, Lists } from "brigsby/dist/util"
 import { getImage } from "../../graphics/Tilesets"
 import { Singletons } from "../../Singletons"
 import { Color, getHex } from "../../ui/Color"
-import { TentColor } from "../buildings/Tent"
 import { ElementType } from "../elements/Elements"
 import { GroundType } from "../ground/Ground"
 import { AbstractLocationGenerator } from "./AbstractLocationGenerator"
@@ -104,7 +103,7 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
 
         const tentPos = tentSpots[0].plusX(3)
         location.addElement(ElementType.TENT, tentPos, {
-            color: TentColor.RED,
+            color: "red",
         })
     }
 
