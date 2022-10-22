@@ -9,6 +9,7 @@ import { Music } from "../audio/Music"
 import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
 import { Player } from "../characters/Player"
 import { controls } from "../Controls"
+import { DevControls } from "../debug/DevControls"
 import { FireParticles } from "../graphics/particles/FireParticles"
 import { Particles } from "../graphics/particles/Particles"
 import { getFilesToLoadForGame, getImage, Tilesets, TILE_SIZE } from "../graphics/Tilesets"
@@ -164,7 +165,13 @@ export class MainMenuScene {
         // }
 
         // by default, render the title and the scene with the knight
-        const entities = [title, this.knight.entity, this.darkness.entity, ...sceneEntities]
+        const entities = [
+            title,
+            this.knight.entity,
+            this.darkness.entity,
+            ...sceneEntities,
+            new Entity([new DevControls()]),
+        ]
 
         const link = (url: string) => () => window.open(`https://${url}`, "_blank")
 

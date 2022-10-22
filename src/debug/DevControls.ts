@@ -228,8 +228,12 @@ export class DevControls extends Component {
         if (debug.enableDevControls) {
             devCommands.forEach((cmd) => {
                 if (updateData.input.isKeyDown(cmd[0])) {
-                    console.log(`executing command: ${cmd[1]}`)
-                    cmd[2](updateData.input)
+                    try {
+                        console.log(`executing command: ${cmd[1]}`)
+                        cmd[2](updateData.input)
+                    } catch (e) {
+                        console.error(e)
+                    }
                 }
             })
         }
