@@ -183,12 +183,12 @@ export class InventoryDisplay extends Component {
         // Only allow actions when in the inventory menu
         if (!this.tradingInv) {
             const wl = here()
+            profiler.showInfo(`item metadata: ${prettyPrint(stack.metadata)}`)
             if (
                 item.element !== null &&
                 wl.allowPlacing &&
                 Elements.instance.getElementFactory(item.element).canPlaceInLocation(wl)
             ) {
-                profiler.showInfo(`item metadata: ${prettyPrint(stack.metadata)}`)
                 actions.push({
                     verb: "place",
                     actionFn: () => {
