@@ -1,12 +1,11 @@
-// WIP
-
 import { Entity, pt } from "brigsby/dist"
 import { BoxCollider } from "brigsby/dist/collision"
 import { BasicRenderComponent } from "brigsby/dist/renderer"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { Tilesets } from "../../graphics/Tilesets"
 
-// function args must be serializable
+// Features are non-grid aligned aspects of a location.
+// These functions should take a single serializable object argument.
 const Features = {
     sprite: ({
         key,
@@ -21,6 +20,7 @@ const Features = {
         rotation: number
         depth: number
     }) => {
+        // TODO
         const tile = Tilesets.instance.getBasicTileSource(key)
         return new Entity([
             new BasicRenderComponent(
@@ -35,6 +35,7 @@ const Features = {
         ])
     },
     droppedItem: () => {
+        // TODO
         return new Entity()
     },
     barrier: ({ x, y, width, height }: { x: number; y: number; width: number; height: number }) => {
@@ -43,7 +44,7 @@ const Features = {
 }
 
 export type FeatureType = keyof typeof Features
-export type FeatureData<F extends FeatureType> = Parameters<typeof Features[F]>
+export type FeatureData<F extends FeatureType> = Parameters<typeof Features[F]>[0]
 
 export type Feature<F extends FeatureType> = {
     type: F
