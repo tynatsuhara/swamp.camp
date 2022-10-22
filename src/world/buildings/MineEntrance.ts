@@ -7,7 +7,6 @@ import { ElementUtils } from "../elements/ElementUtils"
 import { Interactable } from "../elements/Interactable"
 import { NavMeshCollider } from "../elements/NavMeshCollider"
 import { GroundType } from "../ground/Ground"
-import { GroundRenderer } from "../GroundRenderer"
 import { Location } from "../locations/Location"
 import { camp, LocationManager, LocationType } from "../locations/LocationManager"
 import { Teleporter, TeleporterPrefix } from "../Teleporter"
@@ -87,7 +86,12 @@ const makeMineInterior = (outside: Location) => {
     InteriorUtils.addBarriers(l, dimensions)
 
     // background sprite
-    l.sprites.addSprite("mine-small", new Point(0, -2 * TILE_SIZE), 0, GroundRenderer.DEPTH)
+    l.addFeature("sprite", {
+        key: "mine-small",
+        pixelX: 0,
+        pixelY: -2 * TILE_SIZE,
+        depth: Number.MIN_SAFE_INTEGER,
+    })
 
     const interactablePos = new Point(dimensions.x / 2, 0).times(TILE_SIZE)
     const teleporter: Teleporter = {

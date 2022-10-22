@@ -130,7 +130,7 @@ const makeHouseInterior = (outside: Location): Location => {
             pixelX: pt.x * TILE_SIZE,
             pixelY: pt.y * TILE_SIZE,
             rotation,
-            depth: -100000,
+            depth: Number.MIN_SAFE_INTEGER,
         })
     }
 

@@ -47,14 +47,29 @@ const makeCabinInterior = (outside: Location): Location => {
         id: TeleporterPrefix.DOOR,
     })
 
-    l.sprites.addSprite("dr-interior", new Point(0, -TILE_SIZE * 2), 0, Number.MIN_SAFE_INTEGER)
+    l.addFeature("sprite", {
+        key: "dr-interior",
+        pixelX: 0,
+        pixelY: -TILE_SIZE * 2,
+        depth: Number.MIN_SAFE_INTEGER,
+    })
 
     const skeletonPos = new Point(3, 1).times(TILE_SIZE)
-    l.sprites.addSprite("skeleton", skeletonPos, 0, skeletonPos.y + TILE_SIZE * 2 - 4)
+    l.addFeature("sprite", {
+        key: "skeleton",
+        pixelX: skeletonPos.x,
+        pixelY: skeletonPos.y,
+        depth: skeletonPos.y + TILE_SIZE * 2 - 4,
+    })
 
     // TODO: add counter collider..... this is annoying
     const counterPos = new Point(TILE_SIZE, 6)
-    l.sprites.addSprite("dr-counter", counterPos, 0, counterPos.y + TILE_SIZE)
+    l.addFeature("sprite", {
+        key: "dr-counter",
+        pixelX: counterPos.x,
+        pixelY: counterPos.y,
+        depth: counterPos.y + TILE_SIZE,
+    })
 
     return l
 }

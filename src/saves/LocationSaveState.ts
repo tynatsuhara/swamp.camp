@@ -12,7 +12,6 @@ export class LocationSaveState {
     dudes: DudeSaveState[]
     features: Feature<any>[]
     teleporters: { [key: string]: string }
-    staticSprites: object[]
     isInterior: boolean
     allowPlacing: boolean
     size?: number

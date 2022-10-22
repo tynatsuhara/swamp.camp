@@ -14,7 +14,6 @@ import { ElementUtils } from "../elements/ElementUtils"
 import { Feature, FeatureType, instantiateFeature } from "../features/Features"
 import { Ground, GroundType, SavedGround } from "../ground/Ground"
 import { GroundComponent } from "../ground/GroundComponent"
-import { StaticSprites } from "../StaticSprites"
 import { Teleporter, TeleporterPrefix, Teleporters, TeleporterSound } from "../Teleporter"
 import { LocationManager, LocationType } from "./LocationManager"
 
@@ -43,7 +42,6 @@ export class Location {
     private features: Feature<any>[] = []
     private readonly featureEntities: Entity[] = []
     private teleporters: { [key: string]: string } = {}
-    readonly sprites = new Entity().addComponent(new StaticSprites())
 
     readonly size: number // tile dimensions (square)
     get range() {
@@ -354,7 +352,6 @@ export class Location {
             )
             .concat(this.featureEntities)
             .concat(Array.from(this.droppedItems))
-            .concat([this.sprites.entity])
     }
 
     getDude(dudeType: DudeType): Dude {
@@ -372,7 +369,6 @@ export class Location {
                 .map((d) => d.save()),
             features: this.features,
             teleporters: this.teleporters,
-            staticSprites: this.sprites.toJson(),
             isInterior: this.isInterior,
             allowPlacing: this.allowPlacing,
             size: this.size,
@@ -422,7 +418,6 @@ export class Location {
         n._uuid = saveState.uuid
         saveState.features.forEach((f) => n.addFeature(f.type, f.data))
         n.teleporters = saveState.teleporters
-        n.sprites.fromJson(saveState.staticSprites)
         saveState.ground.forEach((el) =>
             n.setGroundElement(el.type, Point.fromString(el.pos), el.obj)
         )
