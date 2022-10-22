@@ -1,4 +1,5 @@
 import { InputKey } from "brigsby/dist"
+import { stringifySorted } from "../debug/JSON"
 import { Item, ItemMetadata, ITEM_METADATA_MAP } from "./Items"
 
 export type ItemStackMetadata = ItemMetadata & {
@@ -17,7 +18,13 @@ export class ItemStack {
     }
 }
 
-// TODO flesh this out more when we have more items
+const doesMetadataMatch = (a: ItemStackMetadata, b: ItemStackMetadata) => {
+    // ignore hotkey — we just put it in the metadata for easy serialization
+    a = { ...a, hotKey: undefined }
+    b = { ...b, hotKey: undefined }
+    return stringifySorted(a) === stringifySorted(b)
+}
+
 export class Inventory {
     private stacks: ItemStack[]
     private countMap = new Map<Item, number>()
@@ -46,7 +53,7 @@ export class Inventory {
     /**
      * returns true if the item was successfully added
      */
-    addItem(item: Item, count: number = 1, metadata?: ItemStackMetadata): boolean {
+    addItem(item: Item, count: number = 1, metadata: ItemStackMetadata = {}): boolean {
         const canAdd = this.canAddItem(item, count)
         if (!canAdd) {
             return false
@@ -57,23 +64,22 @@ export class Inventory {
         let leftToAdd = count
 
         // First, add to existing stacks to preserve space.
-        // Only works if the stack doesn't have metadata.
-        for (let i = 0; i < this.stacks.length && leftToAdd > 0 && !metadata; i++) {
+        for (let i = 0; i < this.stacks.length && leftToAdd > 0; i++) {
             const slotValue = this.stacks[i]
-            if (slotValue?.item === item) {
+            if (slotValue?.item === item && doesMetadataMatch(slotValue.metadata, metadata)) {
                 const addedHere = Math.min(stackLimit - slotValue.count, leftToAdd)
                 slotValue.count += addedHere
                 leftToAdd -= addedHere
             }
         }
 
-        // Then add to empty slots (TODO: Merge stacks if metadata is identical)
+        // Then add to empty slots
         for (let i = 0; i < this.stacks.length && leftToAdd > 0; i++) {
             const slotValue = this.stacks[i]
             if (!slotValue) {
                 const addedHere = Math.min(stackLimit, leftToAdd)
                 leftToAdd -= addedHere
-                this.stacks[i] = new ItemStack(item, addedHere, metadata ?? {})
+                this.stacks[i] = new ItemStack(item, addedHere, metadata)
             }
         }
 
