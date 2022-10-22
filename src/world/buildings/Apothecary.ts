@@ -37,7 +37,7 @@ const makeApothecaryInterior = (outside: Location): Location => {
     )
 
     const interactablePos = new Point(1.5, 3).times(TILE_SIZE)
-    l.setBarriers(InteriorUtils.makeBarriers(dimensions))
+    InteriorUtils.addBarriers(l, dimensions)
     l.addTeleporter({
         to: outside.uuid,
         pos: interactablePos.plusY(-4),

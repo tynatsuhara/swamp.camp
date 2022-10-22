@@ -48,7 +48,7 @@ const makeChurchInterior = (outside: Location): Location => {
         id: TeleporterPrefix.DOOR,
     }
 
-    l.setBarriers(InteriorUtils.makeBarriers(dimensions))
+    InteriorUtils.addBarriers(l, dimensions)
     l.addTeleporter(teleporter)
 
     new AsciiInteriorBuilder(CHURCH_TEMPLATE)

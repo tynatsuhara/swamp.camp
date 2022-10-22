@@ -1,4 +1,5 @@
 import { SavedElement } from "../world/elements/Elements"
+import { Feature } from "../world/features/Features"
 import { SavedGround } from "../world/ground/Ground"
 import { LocationType } from "../world/locations/LocationManager"
 import { DudeSaveState } from "./DudeSaveState"
@@ -9,8 +10,8 @@ export class LocationSaveState {
     ground: SavedGround[]
     elements: SavedElement[]
     dudes: DudeSaveState[]
+    features: Feature<any>[]
     teleporters: { [key: string]: string }
-    barriers: object[]
     staticSprites: object[]
     isInterior: boolean
     allowPlacing: boolean

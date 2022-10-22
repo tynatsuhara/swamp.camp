@@ -130,7 +130,7 @@ const makeTentInterior = (outside: Location, color: TentColor): Location => {
         l.setGroundElement(GroundType.BASIC, p)
     )
 
-    l.setBarriers(InteriorUtils.makeBarriers(floorDimensions))
+    InteriorUtils.addBarriers(l, floorDimensions)
 
     const interactablePos = new Point(floorDimensions.x / 2, floorDimensions.y).times(TILE_SIZE)
     const teleporter: Teleporter = {

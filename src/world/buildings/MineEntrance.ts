@@ -84,7 +84,7 @@ const makeMineInterior = (outside: Location) => {
     LocationManager.instance.add(l)
 
     const dimensions = new Point(5, 3)
-    l.setBarriers(InteriorUtils.makeBarriers(dimensions))
+    InteriorUtils.addBarriers(l, dimensions)
 
     // background sprite
     l.sprites.addSprite("mine-small", new Point(0, -2 * TILE_SIZE), 0, GroundRenderer.DEPTH)

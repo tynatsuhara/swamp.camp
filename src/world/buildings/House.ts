@@ -114,7 +114,7 @@ const makeHouseInterior = (outside: Location): Location => {
         id: TeleporterPrefix.DOOR,
     }
 
-    l.setBarriers(InteriorUtils.makeBarriers(dimensions))
+    InteriorUtils.addBarriers(l, dimensions)
     l.addTeleporter(teleporter)
     l.addElement(ElementType.TELEPORTER_INDICATOR, new Point(3, 5), {
         to: outside.uuid,

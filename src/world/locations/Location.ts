@@ -8,10 +8,10 @@ import { DudeType } from "../../characters/DudeType"
 import { LocationSaveState } from "../../saves/LocationSaveState"
 import { newUUID } from "../../saves/uuid"
 import { HUD } from "../../ui/HUD"
-import { Barrier } from "../Barrier"
 import { ElementComponent } from "../elements/ElementComponent"
 import { Elements, ElementType, SavedElement } from "../elements/Elements"
 import { ElementUtils } from "../elements/ElementUtils"
+import { Feature, FeatureType, instantiateFeature } from "../features/Features"
 import { Ground, GroundType, SavedGround } from "../ground/Ground"
 import { GroundComponent } from "../ground/GroundComponent"
 import { StaticSprites } from "../StaticSprites"
@@ -40,8 +40,9 @@ export class Location {
     // TODO: Make dropped items saveable
     readonly droppedItems = new Set<Entity>()
 
+    private features: Feature<any>[] = []
+    private readonly featureEntities: Entity[] = []
     private teleporters: { [key: string]: string } = {}
-    private barriers: Entity[] = []
     readonly sprites = new Entity().addComponent(new StaticSprites())
 
     readonly size: number // tile dimensions (square)
@@ -335,8 +336,11 @@ export class Location {
         }, 500)
     }
 
-    setBarriers(barriers: Barrier[]) {
-        this.barriers = barriers.map((b) => b.entity || new Entity([b]))
+    addFeature<F extends FeatureType>(type: F, data: Feature<F>["data"][0]) {
+        const f: Feature<F> = { type, data } as unknown as Feature<F>
+        this.features.push(f)
+        const entity = instantiateFeature(type, data)
+        this.featureEntities.push(entity)
     }
 
     getEntities() {
@@ -348,8 +352,8 @@ export class Location {
                     .filter((c) => !c.tickExclude)
                     .map((c) => c.entity)
             )
+            .concat(this.featureEntities)
             .concat(Array.from(this.droppedItems))
-            .concat(this.barriers)
             .concat([this.sprites.entity])
     }
 
@@ -366,8 +370,8 @@ export class Location {
             dudes: this.getDudes()
                 .filter((d) => d.isAlive && !!d.entity)
                 .map((d) => d.save()),
+            features: this.features,
             teleporters: this.teleporters,
-            barriers: this.barriers.map((b) => b.getComponent(Barrier).toJson()),
             staticSprites: this.sprites.toJson(),
             isInterior: this.isInterior,
             allowPlacing: this.allowPlacing,
@@ -416,8 +420,8 @@ export class Location {
         )
 
         n._uuid = saveState.uuid
+        saveState.features.forEach((f) => n.addFeature(f.type, f.data))
         n.teleporters = saveState.teleporters
-        n.barriers = saveState.barriers.map((b) => Barrier.fromJson(b))
         n.sprites.fromJson(saveState.staticSprites)
         saveState.ground.forEach((el) =>
             n.setGroundElement(el.type, Point.fromString(el.pos), el.obj)
