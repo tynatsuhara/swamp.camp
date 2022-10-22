@@ -335,7 +335,7 @@ export const spawnItem = ({
     item,
     velocity = new Point(0, 0),
     sourceCollider,
-    metadata = {},
+    metadata,
 }: {
     pos: Point
     item: Item

@@ -28,7 +28,7 @@ export class DroppedItem extends Component {
         item: Item,
         velocity: Point,
         sourceCollider: Collider,
-        metadata: ItemMetadata
+        metadata?: ItemMetadata
     ) {
         super()
 
