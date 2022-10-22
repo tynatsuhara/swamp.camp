@@ -17,8 +17,8 @@ const Features = {
         key: string
         pixelX: number
         pixelY: number
-        rotation: number
-        depth: number
+        rotation?: number
+        depth?: number
     }) => {
         // TODO
         const tile = Tilesets.instance.getBasicTileSource(key)

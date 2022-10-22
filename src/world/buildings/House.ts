@@ -125,7 +125,13 @@ const makeHouseInterior = (outside: Location): Location => {
     const woodType = Math.ceil(Math.random() * 2)
 
     const addWallSprite = (key: string, pt: Point, rotation: number) => {
-        l.sprites.addSprite(key, pt.times(TILE_SIZE), rotation, -100000)
+        l.addFeature("sprite", {
+            key,
+            pixelX: pt.x * TILE_SIZE,
+            pixelY: pt.y * TILE_SIZE,
+            rotation,
+            depth: -100000,
+        })
     }
 
     for (let x = 0; x < dimensions.x; x++) {
