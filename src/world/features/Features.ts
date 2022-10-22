@@ -53,10 +53,8 @@ export type Feature<F extends FeatureType> = {
 
 export const instantiateFeature = <F extends FeatureType>(
     type: F,
-    data: Parameters<typeof Features[F]>[0]
+    data: FeatureData<F>
 ): Entity => {
     // @ts-ignore
     return Features[type](data)
 }
-
-export type InstantiateFeatureArgs = Parameters<typeof instantiateFeature>
