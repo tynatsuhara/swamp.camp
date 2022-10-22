@@ -11,7 +11,7 @@ import { HUD } from "../../ui/HUD"
 import { ElementComponent } from "../elements/ElementComponent"
 import { Elements, ElementType, SavedElement } from "../elements/Elements"
 import { ElementUtils } from "../elements/ElementUtils"
-import { Feature, FeatureType, instantiateFeature } from "../features/Features"
+import { Feature, FeatureData, FeatureType, instantiateFeature } from "../features/Features"
 import { Ground, GroundType, SavedGround } from "../ground/Ground"
 import { GroundComponent } from "../ground/GroundComponent"
 import { Teleporter, TeleporterPrefix, Teleporters, TeleporterSound } from "../Teleporter"
@@ -334,7 +334,7 @@ export class Location {
         }, 500)
     }
 
-    addFeature<F extends FeatureType>(type: F, data: Feature<F>["data"]) {
+    addFeature<F extends FeatureType>(type: F, data: FeatureData<F>) {
         const f: Feature<F> = { type, data } as unknown as Feature<F>
         this.features.push(f)
         const entity = instantiateFeature(type, data)
