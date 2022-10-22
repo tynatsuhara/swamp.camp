@@ -146,7 +146,12 @@ const makeTentInterior = (outside: Location, color: TentColor): Location => {
     })
 
     // TODO: color mismatch
-    l.sprites.addSprite("tent-interior", new Point(0, -TILE_SIZE * 3), 0, Number.MIN_SAFE_INTEGER)
+    l.addFeature("sprite", {
+        key: "tent-interior",
+        pixelX: 0,
+        pixelY: -TILE_SIZE * 3,
+        depth: Number.MIN_SAFE_INTEGER,
+    })
 
     // TODO change the bed to a bedroll
     if (!isPlayerTent) {
