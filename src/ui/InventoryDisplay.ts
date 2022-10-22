@@ -11,6 +11,7 @@ import { ShieldType } from "../characters/weapons/ShieldType"
 import { WeaponType } from "../characters/weapons/WeaponType"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
+import { prettyPrint } from "../debug/JSON"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Inventory, ItemStack } from "../items/Inventory"
 import { Item, ITEM_METADATA_MAP } from "../items/Items"
@@ -187,7 +188,7 @@ export class InventoryDisplay extends Component {
                 wl.allowPlacing &&
                 Elements.instance.getElementFactory(item.element).canPlaceInLocation(wl)
             ) {
-                profiler.showInfo(`item metadata: ${JSON.stringify(stack.metadata)}`)
+                profiler.showInfo(`item metadata: ${prettyPrint(stack.metadata)}`)
                 actions.push({
                     verb: "place",
                     actionFn: () => {
