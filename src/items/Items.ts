@@ -71,7 +71,7 @@ type Consumable = { verb: string; fn: () => void }
 
 // Items of the same type can have different metadata
 // eg enchantments on weapons, owners of items, etc.
-// Currently, metadata only applies to non-stackable items
+// These should be serializable primitives!
 export type ItemMetadata = Record<string, any>
 
 export class ItemSpec {
