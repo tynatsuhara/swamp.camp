@@ -156,7 +156,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     ],
     [
         InputKey.N,
-        "fast forward (shift: 1 minute, ctrl: 1 day, default: 1 hour)",
+        "fast forward (shift: 1m, ctrl: 1d, default: 1h)",
         (input) => {
             let time: number
             if (input.isKeyHeld(InputKey.SHIFT)) {
