@@ -11,6 +11,7 @@ import { Player } from "../characters/Player"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
+import { Location } from "../world/locations/Location"
 import { WorldTime } from "../world/WorldTime"
 import { Color } from "./Color"
 import { Cursor } from "./Cursor"
@@ -64,8 +65,8 @@ export class HUD {
         this.autosaveComponent.enabled = false
     }
 
-    addIndicator(key: any, positionSupplier: () => Point) {
-        this.offScreenIndicatorManager.addIndicator(key, positionSupplier)
+    addIndicator(key: any, positionSupplier: () => Point, locationSupplier: () => Location) {
+        this.offScreenIndicatorManager.addIndicator(key, positionSupplier, locationSupplier)
     }
 
     removeIndicator(key: any) {

@@ -1188,7 +1188,11 @@ export class Dude extends Component implements DialogueSource {
                 !CutscenePlayerController.instance.enabled)
         ) {
             // update off screen indicator
-            HUD.instance.addIndicator(this, () => this.standingPosition)
+            HUD.instance.addIndicator(
+                this,
+                () => this.standingPosition,
+                () => this.location
+            )
         } else {
             HUD.instance.removeIndicator(this)
         }

@@ -4,16 +4,20 @@ import { SpriteTransform } from "brigsby/dist/sprites"
 import { Lists, Maths } from "brigsby/dist/util"
 import { Camera } from "../cutscenes/Camera"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { Location } from "../world/locations/Location"
+import { here } from "../world/locations/LocationManager"
 
 export class OffScreenIndicator extends Component {
     private markerDistFromEdge = 13
     private tileSource: string
     private tilePoint: Point
     private positionSupplier: () => Point
+    private locationSupplier: () => Location
 
-    constructor(positionSupplier: () => Point) {
+    constructor(positionSupplier: () => Point, locationSupplier: () => Location) {
         super()
         this.positionSupplier = positionSupplier
+        this.locationSupplier = locationSupplier
     }
 
     update(updateData: UpdateData) {
@@ -35,7 +39,7 @@ export class OffScreenIndicator extends Component {
     }
 
     getRenderMethods(): ImageRender[] {
-        if (!this.tileSource) return []
+        if (!this.tileSource || this.locationSupplier() !== here()) return []
         return [
             Tilesets.instance.oneBit
                 .getTileSource(this.tileSource)
