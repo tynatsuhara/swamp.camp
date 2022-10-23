@@ -46,7 +46,7 @@ class NotificationComponent extends Component {
             const textPixelWidth = data.text.length * TEXT_PIXEL_WIDTH
             this.width = textPixelWidth + TILE_SIZE + (!!data.icon ? ICON_WIDTH : 0)
             this.height = TILE_SIZE * 2 - 2
-            const pos = initialPos ?? this.getPositon()
+            const pos = initialPos ?? this.getPosition()
 
             const backgroundTiles = NineSlice.makeStretchedNineSliceComponents(
                 Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"),
@@ -71,8 +71,8 @@ class NotificationComponent extends Component {
         }
     }
 
-    update(updateData: UpdateData) {
-        this.t.position = this.getPositon(updateData.elapsedTimeMillis)
+    update() {
+        this.t.position = this.getPosition()
     }
 
     getRenderMethods() {
@@ -95,8 +95,9 @@ class NotificationComponent extends Component {
         return this.t.position.x > Camera.instance.dimensions.x
     }
 
-    private getPositon(elapsedMillis = 0) {
+    private getPosition() {
         const index = NotificationDisplay.instance.getNotifications().indexOf(this.data)
+        console.log(index)
         const yOffset = 32 * index + OFFSET.y
         const offScreenPos = new Point(Camera.instance.dimensions.x + 10, yOffset)
 
@@ -135,8 +136,10 @@ export class NotificationDisplay extends Component {
             strongMagnitude: 1,
             weakMagnitude: 0,
         })
-        const component = new Entity().addComponent(new NotificationComponent(notification))
+        const component = new NotificationComponent(notification)
         this.notifications.push(component)
+        // make sure awake() gets called after the notifications array is updated
+        new Entity().addComponent(component)
     }
 
     update(updateData: UpdateData) {
@@ -156,9 +159,8 @@ export class NotificationDisplay extends Component {
     replace(notification: Notification & Required<Pick<Notification, "id">>) {
         const i = this.notifications.findIndex((n) => n.data.id === notification.id)
         const position = this.notifications[i].position
-        this.notifications[i] = new Entity().addComponent(
-            new NotificationComponent(notification, position)
-        )
+        this.notifications[i] = new NotificationComponent(notification, position)
+        new Entity().addComponent(this.notifications[i])
     }
 
     getEntities(): Entity[] {
