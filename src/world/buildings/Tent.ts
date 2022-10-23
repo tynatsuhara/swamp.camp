@@ -1,4 +1,5 @@
-import { Entity, Point } from "brigsby/dist"
+import { Entity, Point, pt } from "brigsby/dist"
+import { BasicRenderComponent } from "brigsby/dist/renderer"
 import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Sounds } from "../../audio/Sounds"
 import { ImageFilters } from "../../graphics/ImageFilters"
@@ -112,8 +113,7 @@ const getVariantFilter = (color: Variant) => {
 const addTile = (e: Entity, s: string, pos: Point, depth: number, color: Variant) => {
     return e.addComponent(
         new SpriteComponent(
-            Tilesets.instance.outdoorTiles.getTileSource(s),
-            // .filtered(getVariantFilter(color)), // TODO support color later
+            Tilesets.instance.outdoorTiles.getTileSource(s).filtered(getVariantFilter(color)),
             SpriteTransform.new({ position: pos.times(TILE_SIZE), depth })
         )
     )
@@ -145,13 +145,7 @@ const makeTentInterior = (outside: Location, color: TentColor): Location => {
         id: TeleporterPrefix.TENT,
     })
 
-    // TODO: color mismatch
-    l.addFeature("sprite", {
-        key: "tent-interior",
-        pixelX: 0,
-        pixelY: -TILE_SIZE * 3,
-        depth: Number.MIN_SAFE_INTEGER,
-    })
+    l.addFeature("tentInteriorSprite", { color })
 
     // TODO change the bed to a bedroll
     if (!isPlayerTent) {
@@ -161,15 +155,15 @@ const makeTentInterior = (outside: Location, color: TentColor): Location => {
     return l
 }
 
-// proof of concept for how we could redesign location sprites to be more dynamic (less breakable via serialization)
-// class TentInteriorSprite extends Component {
-//     constructor(position: Point, variant: Variant) {
-//         super()
-
-//         const sprite = Tilesets.instance.largeSprites
-//             .getTileSource("tent-interior")
-//             .filtered(getVariantFilter(variant))
-
-//         this.getRenderMethods = () => [sprite.toImageRender(SpriteTransform.new({}))]
-//     }
-// }
+export const tentInteriorSprite = ({ color }: { color: TentColor }) => {
+    const render = Tilesets.instance.largeSprites
+        .getTileSource("tent-interior")
+        .filtered(getVariantFilter(VARIANTS[color]))
+        .toImageRender(
+            SpriteTransform.new({
+                position: pt(0, -TILE_SIZE * 3),
+                depth: Number.MIN_SAFE_INTEGER,
+            })
+        )
+    return new Entity([new BasicRenderComponent(render)])
+}

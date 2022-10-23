@@ -3,6 +3,7 @@ import { BoxCollider } from "brigsby/dist/collision"
 import { BasicRenderComponent } from "brigsby/dist/renderer"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { Tilesets } from "../../graphics/Tilesets"
+import { tentInteriorSprite } from "../buildings/Tent"
 
 // Features are non-grid aligned aspects of a location.
 // These functions should take a single serializable object argument.
@@ -34,13 +35,10 @@ const Features = {
             ),
         ])
     },
-    droppedItem: () => {
-        // TODO
-        return new Entity()
-    },
     barrier: ({ x, y, width, height }: { x: number; y: number; width: number; height: number }) => {
         return new Entity([new BoxCollider(pt(x, y), pt(width, height))])
     },
+    tentInteriorSprite,
 }
 
 export type FeatureType = keyof typeof Features
