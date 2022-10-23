@@ -57,7 +57,8 @@ export class DudeSpawner extends Component {
             this.spawnWildlife()
         }
 
-        this.spawnVisitors()
+        // TODO: Re-enable once visitors are ready to go
+        // this.spawnVisitors()
     }
 
     spawnVisitors(forceSpawn = false) {
