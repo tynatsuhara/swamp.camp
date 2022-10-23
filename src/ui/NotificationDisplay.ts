@@ -22,6 +22,7 @@ export type Notification = {
     icon?: string // one-bit tile key
     isExpired?: () => boolean // default behavior is to expire after DEFAULT_LIFESPAN_MILLIS
     id?: string // for lookups
+    count?: number // used for inv push notification
 }
 
 class NotificationComponent extends Component {
@@ -29,8 +30,11 @@ class NotificationComponent extends Component {
     private t: SpriteTransform
     private width: number
     private height: number
+    get position() {
+        return this.t.position
+    }
 
-    constructor(data: Notification) {
+    constructor(data: Notification, initialPos?: Point) {
         super()
         if (!data.isExpired) {
             const expirationTime = Date.now() + DEFAULT_LIFESPAN_MILLIS
@@ -42,7 +46,7 @@ class NotificationComponent extends Component {
             const textPixelWidth = data.text.length * TEXT_PIXEL_WIDTH
             this.width = textPixelWidth + TILE_SIZE + (!!data.icon ? ICON_WIDTH : 0)
             this.height = TILE_SIZE * 2 - 2
-            const pos = this.getPositon()
+            const pos = initialPos ?? this.getPositon()
 
             const backgroundTiles = NineSlice.makeStretchedNineSliceComponents(
                 Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"),
@@ -131,9 +135,8 @@ export class NotificationDisplay extends Component {
             strongMagnitude: 1,
             weakMagnitude: 0,
         })
-        const component = new NotificationComponent(notification)
+        const component = new Entity().addComponent(new NotificationComponent(notification))
         this.notifications.push(component)
-        new Entity([component])
     }
 
     update(updateData: UpdateData) {
@@ -148,6 +151,14 @@ export class NotificationDisplay extends Component {
 
     getById(id: string) {
         return this.notifications.find((n) => n.data.id === id)?.data
+    }
+
+    replace(notification: Notification & Required<Pick<Notification, "id">>) {
+        const i = this.notifications.findIndex((n) => n.data.id === notification.id)
+        const position = this.notifications[i].position
+        this.notifications[i] = new Entity().addComponent(
+            new NotificationComponent(notification, position)
+        )
     }
 
     getEntities(): Entity[] {

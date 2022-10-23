@@ -42,13 +42,18 @@ export class PlayerInventory extends Inventory {
 
             if (NotificationDisplay.instance) {
                 const itemData = ITEM_METADATA_MAP[item]
+                const id = `add-inv-${item}`
+                const existing = NotificationDisplay.instance.getById(id)
+                const count = (existing?.count ?? 0) + 1
                 const n = {
-                    id: `add-inv-${item}`,
-                    text: `${itemData.displayName}`,
+                    id,
+                    text: `+${count} ${itemData.displayName}`,
                     icon: itemData.inventoryIcon,
+                    count,
                 }
-                const existing = NotificationDisplay.instance.getById(n.id)
-                if (!existing) {
+                if (existing) {
+                    NotificationDisplay.instance.replace(n)
+                } else {
                     NotificationDisplay.instance.push(n)
                 }
             }
