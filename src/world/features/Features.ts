@@ -7,7 +7,7 @@ import { tentInteriorSprite } from "../buildings/Tent"
 
 // Features are non-grid aligned aspects of a location.
 // These functions should take a single serializable object argument.
-const Features = {
+const FEATURES = {
     sprite: ({
         key,
         pixelX,
@@ -21,7 +21,6 @@ const Features = {
         rotation?: number
         depth?: number
     }) => {
-        // TODO
         const tile = Tilesets.instance.getBasicTileSource(key)
         return new Entity([
             new BasicRenderComponent(
@@ -41,8 +40,8 @@ const Features = {
     tentInteriorSprite,
 }
 
-export type FeatureType = keyof typeof Features
-export type FeatureData<F extends FeatureType> = Parameters<typeof Features[F]>[0]
+export type FeatureType = keyof typeof FEATURES
+export type FeatureData<F extends FeatureType> = Parameters<typeof FEATURES[F]>[0]
 
 export type Feature<F extends FeatureType> = {
     type: F
@@ -54,5 +53,5 @@ export const instantiateFeature = <F extends FeatureType>(
     data: FeatureData<F>
 ): Entity => {
     // @ts-ignore
-    return Features[type](data)
+    return FEATURES[type](data)
 }
