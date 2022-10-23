@@ -20,7 +20,7 @@ export class Visitor extends Component {
         }[this.dude.type]
 
         if (announcement) {
-            Berto.instance.addAnnouncement({
+            Berto.instance?.addAnnouncement({
                 id: this.getAnnouncementId(),
                 metadata: {
                     message: announcement,
@@ -36,7 +36,7 @@ export class Visitor extends Component {
     }
 
     delete() {
-        Berto.instance.removeAnnouncement(this.getAnnouncementId())
+        Berto.instance?.removeAnnouncement(this.getAnnouncementId())
         super.delete()
     }
 
