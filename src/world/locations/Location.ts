@@ -337,7 +337,7 @@ export class Location {
     addFeature<F extends FeatureType>(type: F, data: FeatureData<F>) {
         const f: Feature<F> = { type, data } as unknown as Feature<F>
         this.features.push(f)
-        const entity = instantiateFeature(type, data)
+        const entity = instantiateFeature(type, data, this)
         this.featureEntities.push(entity)
     }
 

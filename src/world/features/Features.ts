@@ -4,6 +4,8 @@ import { BasicRenderComponent } from "brigsby/dist/renderer"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { Tilesets } from "../../graphics/Tilesets"
 import { tentInteriorSprite } from "../buildings/Tent"
+import { NavMeshCollider } from "../elements/NavMeshCollider"
+import { Location } from "../locations/Location"
 
 // Features are non-grid aligned aspects of a location.
 // These functions should take a single serializable object argument.
@@ -37,6 +39,22 @@ const FEATURES = {
     barrier: ({ x, y, width, height }: { x: number; y: number; width: number; height: number }) => {
         return new Entity([new BoxCollider(pt(x, y), pt(width, height))])
     },
+    navMeshCollider: (
+        {
+            x,
+            y,
+            width,
+            height,
+        }: {
+            x: number
+            y: number
+            width: number
+            height: number
+        },
+        location: Location
+    ) => {
+        return new Entity([new NavMeshCollider(location, pt(x, y), pt(width, height))])
+    },
     tentInteriorSprite,
 }
 
@@ -50,8 +68,9 @@ export type Feature<F extends FeatureType> = {
 
 export const instantiateFeature = <F extends FeatureType>(
     type: F,
-    data: FeatureData<F>
+    data: FeatureData<F>,
+    location: Location
 ): Entity => {
     // @ts-ignore
-    return FEATURES[type](data)
+    return FEATURES[type](data, location)
 }

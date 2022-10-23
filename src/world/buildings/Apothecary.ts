@@ -64,13 +64,18 @@ const makeApothecaryInterior = (outside: Location): Location => {
         depth: skeletonPos.y + TILE_SIZE * 2 - 4,
     })
 
-    // TODO: add counter collider..... this is annoying
     const counterPos = new Point(TILE_SIZE, 6)
     l.addFeature("sprite", {
         key: "dr-counter",
         pixelX: counterPos.x,
         pixelY: counterPos.y,
         depth: counterPos.y + TILE_SIZE,
+    })
+    l.addFeature("navMeshCollider", {
+        x: counterPos.x + 5,
+        y: counterPos.y + 10,
+        width: 2.5 * TILE_SIZE,
+        height: 5,
     })
 
     return l
