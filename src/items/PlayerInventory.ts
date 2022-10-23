@@ -1,7 +1,8 @@
 import { Player } from "../characters/Player"
 import { saveManager } from "../SaveManager"
+import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { Inventory, ItemStackMetadata } from "./Inventory"
-import { Item } from "./Items"
+import { Item, ITEM_METADATA_MAP } from "./Items"
 
 type SpecialItem = {
     // If true, this item doesn't actually go in the inventory
@@ -38,6 +39,19 @@ export class PlayerInventory extends Inventory {
         const added = SPECIAL_ITEMS[item]?.noInventorySlot || super.addItem(item, count, metadata)
         if (added) {
             SPECIAL_ITEMS[item]?.onAdd(count)
+
+            if (NotificationDisplay.instance) {
+                const itemData = ITEM_METADATA_MAP[item]
+                const n = {
+                    id: `add-inv-${item}`,
+                    text: `${itemData.displayName}`,
+                    icon: itemData.inventoryIcon,
+                }
+                const existing = NotificationDisplay.instance.getById(n.id)
+                if (!existing) {
+                    NotificationDisplay.instance.push(n)
+                }
+            }
         }
         return added
     }

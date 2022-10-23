@@ -21,25 +21,26 @@ export type Notification = {
     text: string
     icon?: string // one-bit tile key
     isExpired?: () => boolean // default behavior is to expire after DEFAULT_LIFESPAN_MILLIS
+    id?: string // for lookups
 }
 
 class NotificationComponent extends Component {
-    readonly n: Notification
+    readonly data: Notification
     private t: SpriteTransform
     private width: number
     private height: number
 
-    constructor(n: Notification) {
+    constructor(data: Notification) {
         super()
-        if (!n.isExpired) {
+        if (!data.isExpired) {
             const expirationTime = Date.now() + DEFAULT_LIFESPAN_MILLIS
-            n.isExpired = () => Date.now() > expirationTime
+            data.isExpired = () => Date.now() > expirationTime
         }
-        this.n = n
+        this.data = data
 
         this.awake = () => {
-            const textPixelWidth = n.text.length * TEXT_PIXEL_WIDTH
-            this.width = textPixelWidth + TILE_SIZE + (!!n.icon ? ICON_WIDTH : 0)
+            const textPixelWidth = data.text.length * TEXT_PIXEL_WIDTH
+            this.width = textPixelWidth + TILE_SIZE + (!!data.icon ? ICON_WIDTH : 0)
             this.height = TILE_SIZE * 2 - 2
             const pos = this.getPositon()
 
@@ -51,9 +52,9 @@ class NotificationComponent extends Component {
             backgroundTiles.forEach((c) => this.entity.addComponent(c))
             this.t = backgroundTiles[0].transform
 
-            if (!!n.icon) {
+            if (!!data.icon) {
                 const icon = Tilesets.instance.oneBit
-                    .getTileSource(n.icon)
+                    .getTileSource(data.icon)
                     .filtered(ImageFilters.tint(Color.RED_2))
                     .toComponent(
                         SpriteTransform.new({
@@ -72,11 +73,11 @@ class NotificationComponent extends Component {
 
     getRenderMethods() {
         const textPos = this.t.position
-            .plusX(TILE_SIZE / 2 + (!!this.n.icon ? ICON_WIDTH : 0))
+            .plusX(TILE_SIZE / 2 + (!!this.data.icon ? ICON_WIDTH : 0))
             .plusY(this.height / 2 - TEXT_SIZE / 2 + 0.5)
         return [
             new TextRender(
-                this.n.text.toUpperCase(),
+                this.data.text.toUpperCase(),
                 textPos,
                 TEXT_SIZE,
                 TEXT_FONT,
@@ -91,7 +92,7 @@ class NotificationComponent extends Component {
     }
 
     private getPositon(elapsedMillis = 0) {
-        const index = NotificationDisplay.instance.getNotifications().indexOf(this.n)
+        const index = NotificationDisplay.instance.getNotifications().indexOf(this.data)
         const yOffset = 32 * index + OFFSET.y
         const offScreenPos = new Point(Camera.instance.dimensions.x + 10, yOffset)
 
@@ -100,7 +101,7 @@ class NotificationComponent extends Component {
         }
 
         const onScreenPos = new Point(Camera.instance.dimensions.x - this.width + OFFSET.x, yOffset)
-        const goalPosition = this.n.isExpired() ? offScreenPos : onScreenPos
+        const goalPosition = this.data.isExpired() ? offScreenPos : onScreenPos
         const diff = goalPosition.minus(this.t.position)
         const lerpRate = 0.22
 
@@ -116,7 +117,7 @@ export class NotificationDisplay extends Component {
     static instance: NotificationDisplay
 
     private displayEntity: Entity
-    private nComponents: NotificationComponent[] = []
+    private notifications: NotificationComponent[] = []
 
     constructor() {
         super()
@@ -131,19 +132,25 @@ export class NotificationDisplay extends Component {
             weakMagnitude: 0,
         })
         const component = new NotificationComponent(notification)
-        this.nComponents.push(component)
+        this.notifications.push(component)
         new Entity([component])
     }
 
     update(updateData: UpdateData) {
-        this.nComponents = this.nComponents.filter((n) => !(n.isOffScreen() && n.n.isExpired()))
+        this.notifications = this.notifications.filter(
+            (n) => !(n.isOffScreen() && n.data.isExpired())
+        )
     }
 
     getNotifications() {
-        return this.nComponents.map((nc) => nc.n)
+        return this.notifications.map((n) => n.data)
+    }
+
+    getById(id: string) {
+        return this.notifications.find((n) => n.data.id === id)?.data
     }
 
     getEntities(): Entity[] {
-        return [this.displayEntity].concat(this.nComponents.map((c) => c.entity))
+        return [this.displayEntity].concat(this.notifications.map((c) => c.entity))
     }
 }
