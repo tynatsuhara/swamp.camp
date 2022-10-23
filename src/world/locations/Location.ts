@@ -273,7 +273,10 @@ export class Location {
                 if (shouldCheckRange && isOutsideRange(pt)) {
                     return true
                 }
-                return !!this.occupied.get(pt) || isOccupied(pt)
+                if (this.isInterior && !this.ground.get(pt)) {
+                    return true
+                }
+                return this.occupied.get(pt) || isOccupied(pt)
             },
         })
     }
