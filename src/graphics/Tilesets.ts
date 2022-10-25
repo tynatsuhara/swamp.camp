@@ -55,8 +55,8 @@ export class Tilesets {
 
     readonly dungeonCharacters = new DungeonTilesetII()
     readonly tilemap = new OGTileset()
-    readonly dungeonTiles = new SingleFileTileLoader("images/env_dungeon.png")
-    readonly indoorTiles = new SingleFileTileLoader("images/env_indoor.png")
+    readonly dungeonTiles = new SingleFileTileLoader("images/env_dungeon.png", {})
+    readonly indoorTiles = new SingleFileTileLoader("images/env_indoor.png", {})
     readonly outdoorTiles = new OutdoorTileset()
     readonly oneBit = new OneBitTileset()
     readonly extraCharacterSet1 = new SplitFileTileLoader("images/individual_characters")

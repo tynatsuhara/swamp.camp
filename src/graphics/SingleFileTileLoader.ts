@@ -2,15 +2,15 @@ import { Point } from "brigsby/dist"
 import { SpriteAnimation, SpriteSource, StaticSpriteSource } from "brigsby/dist/sprites"
 import { getImage } from "./Tilesets"
 
-export class SingleFileTileLoader {
+export class SingleFileTileLoader<K extends string> {
     private readonly filename: string
-    private readonly map: Map<string, Point>
+    private readonly map: Record<K, Point>
     private readonly tileSize: Point
     private readonly padding: number
 
     constructor(
         filename: string,
-        map: Map<string, Point> = new Map(),
+        map: Record<K, Point>,
         tileSize: Point = new Point(16, 16),
         padding = 1
     ) {
@@ -21,7 +21,7 @@ export class SingleFileTileLoader {
     }
 
     getNineSlice(key: string): SpriteSource[] {
-        const pt = this.map.get(key)
+        const pt = this.map[key]
         if (!pt) {
             throw new Error(`${key} is not a valid tile`)
         }
@@ -35,7 +35,7 @@ export class SingleFileTileLoader {
     }
 
     getTileSource(key: string): StaticSpriteSource {
-        const result = this.map.get(key)
+        const result = this.map[key]
         if (!result) {
             throw new Error(`${key} is not a valid tile`)
         }
@@ -54,7 +54,7 @@ export class SingleFileTileLoader {
     }
 
     getTileSetAnimation(key: string, frames: number, speed: number): SpriteAnimation {
-        const result = this.map.get(key)
+        const result = this.map[key]
         if (!result) {
             return null
         }
