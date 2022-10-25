@@ -10,7 +10,7 @@ import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
 import { UIStateManager } from "./UIStateManager"
 
 export const Notifications = {
-    NEW_VILLAGER: { text: "Someone has arrived!" },
+    NEW_VILLAGER: { text: "Someone has arrived!", icon: "personsingle" },
 }
 
 const OFFSET = new Point(-4, 4)
@@ -19,7 +19,7 @@ const DEFAULT_LIFESPAN_MILLIS = 5_000
 
 export type Notification = {
     text: string
-    icon?: string // one-bit tile key
+    icon: string // one-bit tile key
     isExpired?: () => boolean // default behavior is to expire after DEFAULT_LIFESPAN_MILLIS
     id?: string // for lookups
     count?: number // used for inv push notification
