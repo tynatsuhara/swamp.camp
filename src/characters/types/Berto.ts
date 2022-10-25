@@ -49,14 +49,16 @@ export class Berto extends Component {
                         b.pos.distanceTo(closestCampfireGoal)
                 )[0]?.pos
 
-            const tileOptions: Point[] = closestCampfire
-                ? tilesAround(closestCampfire, 2)
-                : // TODO this will break if he goes inside
-                  tilesAround(camp().getDude(DudeType.DIP).tile, 4)
+            const tileOptions: Point[] = (
+                closestCampfire
+                    ? tilesAround(closestCampfire, 2)
+                    : // TODO this will break if he goes inside
+                      tilesAround(camp().getDude(DudeType.DIP).tile, 4)
+            ).filter((pt) => !location.isOccupied(pt))
 
+            // stay where he is if it's fine, otherwise find a new tile
             const tile =
-                tileOptions.find((pt) => pt.equals(this.npc.dude.tile)) ??
-                Lists.oneOf(tileOptions.filter((pt) => !location.isOccupied(pt)))
+                tileOptions.find((pt) => pt.equals(this.npc.dude.tile)) ?? Lists.oneOf(tileOptions)
 
             this.npc.setSchedule(NPCSchedules.newGoToLocationSchedule(location.uuid, tile))
         }
