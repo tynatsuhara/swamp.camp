@@ -137,7 +137,6 @@ ANOTHER thing - Only one of the explorers returned, and they reported that their
             CutscenePlayerController.instance.disable()
             Camera.instance.focusOnDude(Player.instance.dude)
             this.waitingForOrcsToDie = true
-            Queequeg.instance.depart()
         }, this.PAN_BACK)
     }
 
@@ -155,6 +154,7 @@ ANOTHER thing - Only one of the explorers returned, and they reported that their
         // TODO prevent the player from going to a different location until this is over
 
         if (!this.orcs.some((o) => o.isAlive)) {
+            Queequeg.instance.depart()
             CutsceneManager.instance.finishCutscene()
             saveManager.autosave()
         }
