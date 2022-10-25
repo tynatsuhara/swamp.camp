@@ -1,6 +1,6 @@
 import { Player } from "../characters/Player"
 import { saveManager } from "../SaveManager"
-import { NotificationDisplay } from "../ui/NotificationDisplay"
+import { Notification, NotificationDisplay } from "../ui/NotificationDisplay"
 import { Inventory, ItemStackMetadata } from "./Inventory"
 import { Item, ITEM_METADATA_MAP } from "./Items"
 
@@ -45,7 +45,7 @@ export class PlayerInventory extends Inventory {
                 const id = `add-inv-${item}`
                 const existing = NotificationDisplay.instance.getById(id)
                 const count = (existing?.count ?? 0) + 1
-                const n = {
+                const n: Notification & { id: string } = {
                     id,
                     text: `+${count} ${itemData.displayName}`,
                     icon: itemData.inventoryIcon,

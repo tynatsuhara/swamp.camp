@@ -7,6 +7,7 @@ import { Condition } from "../characters/Condition"
 import { Player } from "../characters/Player"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { WeaponType } from "../characters/weapons/WeaponType"
+import { Icon } from "../graphics/OneBitTileset"
 import { Tilesets } from "../graphics/Tilesets"
 import { ElementType } from "../world/elements/Elements"
 import { here } from "../world/locations/LocationManager"
@@ -77,7 +78,7 @@ export type ItemMetadata = Record<string, any>
 export class ItemSpec {
     readonly displayName: string
     readonly droppedIconSupplier?: () => SpriteSource
-    readonly inventoryIcon: string
+    readonly inventoryIcon: Icon
     readonly stackLimit: number
     readonly element?: ElementType
     readonly equippableWeapon?: WeaponType
@@ -95,7 +96,7 @@ export class ItemSpec {
         consumable = null,
     }: {
         displayName: string
-        inventoryIcon: string
+        inventoryIcon: Icon
         droppedIconSupplier?: () => SpriteSource
         stackLimit?: number
         element?: ElementType

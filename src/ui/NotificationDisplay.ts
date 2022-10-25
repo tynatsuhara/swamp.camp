@@ -4,12 +4,13 @@ import { NineSlice, SpriteTransform } from "brigsby/dist/sprites"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { ImageFilters } from "../graphics/ImageFilters"
+import { Icon } from "../graphics/OneBitTileset"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "./Color"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
 import { UIStateManager } from "./UIStateManager"
 
-export const Notifications = {
+export const Notifications: { [key: string]: Notification } = {
     NEW_VILLAGER: { text: "Someone has arrived!", icon: "personsingle" },
 }
 
@@ -19,7 +20,7 @@ const DEFAULT_LIFESPAN_MILLIS = 5_000
 
 export type Notification = {
     text: string
-    icon: string // one-bit tile key
+    icon: Icon // one-bit tile key
     isExpired?: () => boolean // default behavior is to expire after DEFAULT_LIFESPAN_MILLIS
     id?: string // for lookups
     count?: number // used for inv push notification
