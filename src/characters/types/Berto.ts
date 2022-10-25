@@ -9,6 +9,7 @@ import { camp } from "../../world/locations/LocationManager"
 import { TimeUnit } from "../../world/TimeUnit"
 import { NPCSchedules } from "../ai/NPCSchedule"
 import { Announcement } from "../dialogue/Announcements"
+import { DudeType } from "../DudeType"
 import { NPC } from "../NPC"
 
 export class Berto extends Component {
@@ -48,14 +49,13 @@ export class Berto extends Component {
                         b.pos.distanceTo(closestCampfireGoal)
                 )[0]?.pos
 
-            if (!closestCampfire) {
-                this.npc.setSchedule(NPCSchedules.newNoOpSchedule())
-            } else {
-                const tile = Lists.oneOf(
-                    tilesAround(closestCampfire, 2).filter((pt) => !location.isOccupied(pt))
-                )
-                this.npc.setSchedule(NPCSchedules.newGoToLocationSchedule(location.uuid, tile))
-            }
+            const tileOptions: Point[] = closestCampfire
+                ? tilesAround(closestCampfire, 2)
+                : // TODO this will break if he goes inside
+                  tilesAround(camp().getDude(DudeType.DIP).tile, 4)
+
+            const tile = Lists.oneOf(tileOptions.filter((pt) => !location.isOccupied(pt)))
+            this.npc.setSchedule(NPCSchedules.newGoToLocationSchedule(location.uuid, tile))
         }
     }
 
