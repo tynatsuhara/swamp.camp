@@ -32,7 +32,7 @@ export const startTalkingSounds = (lineLength: number) => {
         currentAudio = null
     }
 
-    console.log(`line length = ${lineLength}, playing speech audio ${audioToPlay}`)
+    // console.log(`line length = ${lineLength}, playing speech audio ${audioToPlay}`)
 
     Sounds.play(audioToPlay, VOLUME).then((audio) => {
         currentAudio = audio
