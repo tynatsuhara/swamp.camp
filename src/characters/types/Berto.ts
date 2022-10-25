@@ -1,8 +1,12 @@
 import { Component, Point } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
+import { tilesAround } from "../../Utils"
+import { ElementType } from "../../world/elements/Elements"
 import { Queequeg } from "../../world/elements/Queequeg"
 import { EventQueue } from "../../world/events/EventQueue"
 import { QueuedEventType } from "../../world/events/QueuedEvent"
+import { camp } from "../../world/locations/LocationManager"
+import { TimeUnit } from "../../world/TimeUnit"
 import { NPCSchedules } from "../ai/NPCSchedule"
 import { Announcement } from "../dialogue/Announcements"
 import { NPC } from "../NPC"
@@ -23,6 +27,7 @@ export class Berto extends Component {
     start() {
         // wait until start() since schedule relies on the EventQueue and locations being initialized
         this.updateSchedule()
+        this.npc.dude.doWhileLiving(() => this.updateSchedule(), TimeUnit.HOUR)
     }
 
     updateSchedule() {
@@ -33,15 +38,24 @@ export class Berto extends Component {
             // off the map, do nothing
             this.npc.setSchedule(NPCSchedules.newNoOpSchedule())
         } else {
-            // TODO update this to be more dynamic, right now it will probably break if these are all occupied
-            const pts = [new Point(-3, 0), new Point(-3, 1), new Point(-2, 0), new Point(-2, 1)]
+            const closestCampfireGoal = Point.ZERO // closest to middle of map
+            const location = camp()
+            const closestCampfire = location
+                .getElementsOfType(ElementType.CAMPFIRE)
+                .sort(
+                    (a, b) =>
+                        a.pos.distanceTo(closestCampfireGoal) -
+                        b.pos.distanceTo(closestCampfireGoal)
+                )[0]?.pos
 
-            this.npc.setSchedule(
-                NPCSchedules.newGoToSchedule(
-                    // filter out occupied points to not get stuck in the campfire
-                    Lists.oneOf(pts.filter((pt) => !this.npc.dude.location.isOccupied(pt)))
+            if (!closestCampfire) {
+                this.npc.setSchedule(NPCSchedules.newNoOpSchedule())
+            } else {
+                const tile = Lists.oneOf(
+                    tilesAround(closestCampfire, 2).filter((pt) => !location.isOccupied(pt))
                 )
-            )
+                this.npc.setSchedule(NPCSchedules.newGoToLocationSchedule(location.uuid, tile))
+            }
         }
     }
 
