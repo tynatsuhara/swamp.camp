@@ -54,7 +54,10 @@ export class Berto extends Component {
                 : // TODO this will break if he goes inside
                   tilesAround(camp().getDude(DudeType.DIP).tile, 4)
 
-            const tile = Lists.oneOf(tileOptions.filter((pt) => !location.isOccupied(pt)))
+            const tile =
+                tileOptions.find((pt) => pt.equals(this.npc.dude.tile)) ??
+                Lists.oneOf(tileOptions.filter((pt) => !location.isOccupied(pt)))
+
             this.npc.setSchedule(NPCSchedules.newGoToLocationSchedule(location.uuid, tile))
         }
     }
