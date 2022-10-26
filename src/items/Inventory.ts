@@ -108,7 +108,8 @@ export class Inventory {
     removeItem(item: Item, count: number = 1) {
         const currentCount = this.getItemCount(item)
         if (currentCount < count) {
-            throw new Error("inventory cannot go negative")
+            console.error("inventory cannot go negative")
+            return
         }
         this.countMap.set(item, currentCount - count)
 
