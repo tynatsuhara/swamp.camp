@@ -79,7 +79,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         if (job === VillagerJob.MINE) {
             const mines = camp()
                 .getElementsOfType(ElementType.MINE_ENTRANCE)
-                .map((el) => el.save()["destinationUUID"])
+                .map((el) => el.save().destinationUUID)
 
             if (mines.length === 0) {
                 return
