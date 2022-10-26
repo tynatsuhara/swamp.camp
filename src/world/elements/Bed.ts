@@ -44,15 +44,14 @@ export class BedFactory extends ElementFactory {
 
         if (!isBedroll) {
             e.addComponent(new NavMeshCollider(wl, scaledPos, new Point(TILE_SIZE, TILE_SIZE)))
+            e.addComponent(
+                new Breakable(pixelCenterPos, [tile.transform], () =>
+                    Lists.repeat(Math.random() * 4 + 4, [{ item: Item.WOOD }])
+                )
+            )
         }
 
         const bed = e.addComponent(new Bed())
-
-        e.addComponent(
-            new Breakable(pixelCenterPos, [tile.transform], () =>
-                Lists.repeat(Math.random() * 4 + 4, [{ item: Item.WOOD }])
-            )
-        )
 
         e.addComponent(
             new Interactable(
