@@ -10,9 +10,9 @@ export class LargeSpriteTileset {
             case "church":
                 return this.get(pt(16, 0), pt(3, 5))
             case "dr-interior":
-                return this.get(pt(1, 10), pt(4, 5))
+                return this.get(pt(1, 10), pt(5, 6))
             case "dr-counter":
-                return this.get(pt(0, 15), pt(3, 1))
+                return this.get(pt(0, 16), pt(3, 1))
             case "skeleton":
                 return this.get(pt(0, 11), pt(1, 2))
             case "apothecary":
