@@ -147,9 +147,7 @@ const makeTentInterior = (outside: Location, color: TentColor): Location => {
 
     l.addFeature("tentInteriorSprite", { color })
 
-    if (!isPlayerTent) {
-        l.addElement(ElementType.BEDROLL, new Point(3, 0))
-    }
+    l.addElement(ElementType.BEDROLL, new Point(3, 0))
 
     return l
 }
