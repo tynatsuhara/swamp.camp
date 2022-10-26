@@ -2,12 +2,14 @@ import { Component, pt } from "brigsby/dist"
 import { ElementType } from "../../world/elements/Elements"
 import { Ground } from "../../world/ground/Ground"
 import { LightManager } from "../../world/LightManager"
+import { LocationType } from "../../world/locations/LocationManager"
 import { NPCSchedules } from "../ai/NPCSchedule"
 import { Dude } from "../Dude"
 import { DudeFaction } from "../DudeFactory"
 import { DudeType } from "../DudeType"
 import { NPC } from "../NPC"
 import { Player } from "../Player"
+import { WeaponType } from "../weapons/WeaponType"
 import { Centaur } from "./Centaur"
 import { ShroomNPC } from "./ShroomNPC"
 
@@ -71,6 +73,19 @@ export class Villager extends Component {
             // no-op
         } else {
             npc.setSchedule(NPCSchedules.newDefaultVillagerSchedule())
+            dude.doWhileLiving(
+                () => {
+                    // swing pickaxe randomly if working in the mines
+                    if (
+                        dude.weaponType === WeaponType.PICKAXE &&
+                        dude.location.type === LocationType.MINE_INTERIOR
+                    ) {
+                        dude.weapon.attack(true)
+                    }
+                },
+                2_000,
+                Math.random() * 2_000
+            )
         }
     }
 }

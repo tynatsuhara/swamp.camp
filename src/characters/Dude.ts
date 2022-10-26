@@ -1027,14 +1027,14 @@ export class Dude extends Component implements DialogueSource {
         )
     }
 
-    // fn will execute immediately and every intervalMillis milliseconds
+    // fn will execute immediately (unless initialDelay > 0) and every intervalMillis milliseconds
     // until the NPC is dead or the function returns true
-    doWhileLiving(fn: () => boolean | void, intervalMillis: number) {
+    doWhileLiving(fn: () => boolean | void, intervalMillis: number, initialDelay?: number) {
         if (!this.isAlive) {
             return
         }
 
-        if (fn()) {
+        if (!initialDelay && fn()) {
             return
         }
 
@@ -1044,7 +1044,7 @@ export class Dude extends Component implements DialogueSource {
                     invoker.delete()
                 }
                 return intervalMillis
-            }, intervalMillis)
+            }, initialDelay ?? intervalMillis)
         )
     }
 

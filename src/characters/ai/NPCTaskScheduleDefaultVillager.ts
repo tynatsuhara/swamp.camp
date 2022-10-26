@@ -85,10 +85,12 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
                 return
             }
 
+            // side effect
             dude.setWeapon(WeaponType.PICKAXE)
 
             return LocationManager.instance.get(mines[0])
         } else if (job === VillagerJob.HARVEST_WOOD) {
+            // side effect
             dude.setWeapon(WeaponType.AXE)
 
             return camp()
