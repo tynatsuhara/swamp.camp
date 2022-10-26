@@ -1,11 +1,12 @@
 import { Entity, Point } from "brigsby/dist"
-import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
+import { SpriteTransform } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
 import { DialogueSource } from "../../characters/dialogue/Dialogue"
 import { BED_DIALOGUE } from "../../characters/dialogue/ItemDialogues"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
+import { GroundRenderer } from "../GroundRenderer"
 import { Location } from "../locations/Location"
 import { camp } from "../locations/LocationManager"
 import { Breakable } from "./Breakable"
@@ -16,24 +17,34 @@ import { Interactable } from "./Interactable"
 import { NavMeshCollider } from "./NavMeshCollider"
 import { RestPoint } from "./RestPoint"
 
+type BedType = ElementType.BEDROLL | ElementType.BED
+
 export class BedFactory extends ElementFactory {
-    readonly type = ElementType.BED
+    readonly type: BedType
     readonly dimensions = new Point(1, 1)
+
+    constructor(type: BedType) {
+        super()
+        this.type = type
+    }
 
     make(wl: Location, pos: Point, data: object): ElementComponent {
         const e = new Entity()
         const scaledPos = pos.times(TILE_SIZE)
-        const depth = scaledPos.y + TILE_SIZE - 10
         const pixelCenterPos = scaledPos.plus(new Point(TILE_SIZE / 2 - 1, TILE_SIZE / 2 - 1))
 
+        const isBedroll = this.type === ElementType.BEDROLL
+        const depth = isBedroll ? GroundRenderer.DEPTH + 1 : scaledPos.y + TILE_SIZE - 10
+
         const tile = e.addComponent(
-            new SpriteComponent(
-                Tilesets.instance.outdoorTiles.getTileSource("bed"),
-                SpriteTransform.new({ position: scaledPos, depth })
-            )
+            Tilesets.instance.outdoorTiles
+                .getTileSource(isBedroll ? "bedroll" : "bed")
+                .toComponent(SpriteTransform.new({ position: scaledPos, depth }))
         )
 
-        e.addComponent(new NavMeshCollider(wl, scaledPos, new Point(TILE_SIZE, TILE_SIZE)))
+        if (!isBedroll) {
+            e.addComponent(new NavMeshCollider(wl, scaledPos, new Point(TILE_SIZE, TILE_SIZE)))
+        }
 
         const bed = e.addComponent(new Bed())
 
@@ -54,7 +65,7 @@ export class BedFactory extends ElementFactory {
         )
 
         return e.addComponent(
-            new ElementComponent(ElementType.BED, pos, () => {
+            new ElementComponent(this.type, pos, () => {
                 return {}
             })
         )

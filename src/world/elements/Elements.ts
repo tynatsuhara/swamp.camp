@@ -39,6 +39,7 @@ export enum ElementType {
     APOTHECARY,
     BLACKBERRIES,
     CABIN,
+    BEDROLL,
 }
 
 window["ElementType"] = ElementType
@@ -51,7 +52,8 @@ const ELEMENT_FACTORIES = [
     new TeleporterIndicatorFactory(),
     new MushroomFactory(),
     new ChestFactory(),
-    new BedFactory(),
+    new BedFactory(ElementType.BED),
+    new BedFactory(ElementType.BEDROLL),
     new TentFactory(),
     new HouseFactory(),
     new ChurchFactory(),

@@ -148,9 +148,9 @@ const makeTentInterior = (outside: Location, color: TentColor): Location => {
     l.addFeature("tentInteriorSprite", { color })
 
     // TODO change the bed to a bedroll
-    if (!isPlayerTent) {
-        l.addElement(ElementType.BED, new Point(3, 0))
-    }
+    // if (!isPlayerTent) {
+    l.addElement(ElementType.BEDROLL, new Point(3, 0))
+    // }
 
     return l
 }

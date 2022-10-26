@@ -27,6 +27,7 @@ const KEYS = {
     treePointyTop0: new Point(16, 10),
     treePointyTop1: new Point(17, 10),
     treePointyTop2: new Point(18, 10),
+    bedroll: new Point(48, 10),
     tentNW: new Point(46, 10),
     tentNE: new Point(47, 10),
     tentSW: new Point(46, 11),
