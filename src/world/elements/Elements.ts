@@ -11,7 +11,6 @@ import { BedFactory } from "./Bed"
 import { BlackberriesFactory } from "./Blackberries"
 import { CampfireFactory } from "./Campfire"
 import { ChestFactory } from "./Chest"
-import { ElementFactory } from "./ElementFactory"
 import { FurnitureFactory } from "./FurnitureFactory"
 import { MushroomFactory } from "./Mushroom"
 import { QueequegFactory } from "./Queequeg"
@@ -44,47 +43,42 @@ export enum ElementType {
 
 window["ElementType"] = ElementType
 
-const ELEMENT_FACTORIES = [
-    new TreeFactory(ElementType.TREE_ROUND),
-    new TreeFactory(ElementType.TREE_POINTY),
-    new RockFactory(),
-    new CampfireFactory(),
-    new TeleporterIndicatorFactory(),
-    new MushroomFactory(),
-    new ChestFactory(),
-    new BedFactory(ElementType.BED),
-    new BedFactory(ElementType.BEDROLL),
-    new TentFactory(),
-    new HouseFactory(),
-    new ChurchFactory(),
-    new MineEntranceFactory(),
-    new MineExitFactory(),
-    new FurnitureFactory(ElementType.BENCH, "bench"),
-    new FurnitureFactory(ElementType.PODIUM, "podium"),
-    new QueequegFactory(),
-    new ApothecaryFactory(),
-    new BlackberriesFactory(),
-    new CabinFactory(),
-]
+const ELEMENT_FACTORIES = {
+    [ElementType.TREE_ROUND]: new TreeFactory(ElementType.TREE_ROUND),
+    [ElementType.TREE_POINTY]: new TreeFactory(ElementType.TREE_POINTY),
+    [ElementType.ROCK]: new RockFactory(),
+    [ElementType.CAMPFIRE]: new CampfireFactory(),
+    [ElementType.TELEPORTER_INDICATOR]: new TeleporterIndicatorFactory(),
+    [ElementType.MUSHROOM]: new MushroomFactory(),
+    [ElementType.CHEST]: new ChestFactory(),
+    [ElementType.BED]: new BedFactory(ElementType.BED),
+    [ElementType.BEDROLL]: new BedFactory(ElementType.BEDROLL),
+    [ElementType.TENT]: new TentFactory(),
+    [ElementType.HOUSE]: new HouseFactory(),
+    [ElementType.CHURCH]: new ChurchFactory(),
+    [ElementType.MINE_ENTRANCE]: new MineEntranceFactory(),
+    [ElementType.MINE_EXIT]: new MineExitFactory(),
+    [ElementType.BENCH]: new FurnitureFactory(ElementType.BENCH, "bench"),
+    [ElementType.PODIUM]: new FurnitureFactory(ElementType.PODIUM, "podium"),
+    [ElementType.QUEEQUEG]: new QueequegFactory(),
+    [ElementType.APOTHECARY]: new ApothecaryFactory(),
+    [ElementType.BLACKBERRIES]: new BlackberriesFactory(),
+    [ElementType.CABIN]: new CabinFactory(),
+}
+
+export type ElementDataFormat = {
+    [P in keyof typeof ELEMENT_FACTORIES]?: ReturnType<
+        ReturnType<typeof ELEMENT_FACTORIES[P]["make"]>["save"]
+    >
+}
 
 export class Elements {
     static get instance() {
         return Singletons.getOrCreate(Elements)
     }
 
-    private readonly factories: { [key: number]: ElementFactory<any> } = {}
-
-    constructor() {
-        ELEMENT_FACTORIES.forEach((f) => {
-            if (this.factories[f.type]) {
-                throw new Error("duplicate element factory!!!!!")
-            }
-            this.factories[f.type] = f
-        })
-    }
-
     getElementFactory(type: ElementType) {
-        return this.factories[type]
+        return ELEMENT_FACTORIES[type]
     }
 }
 

@@ -9,7 +9,7 @@ import { LocationSaveState } from "../../saves/LocationSaveState"
 import { newUUID } from "../../saves/uuid"
 import { HUD } from "../../ui/HUD"
 import { ElementComponent } from "../elements/ElementComponent"
-import { Elements, ElementType, SavedElement } from "../elements/Elements"
+import { ElementDataFormat, Elements, ElementType, SavedElement } from "../elements/Elements"
 import { ElementUtils } from "../elements/ElementUtils"
 import { Feature, FeatureData, FeatureType, instantiateFeature } from "../features/Features"
 import { Ground, GroundType, SavedGround } from "../ground/Ground"
@@ -107,8 +107,8 @@ export class Location {
     addElement<T extends ElementType>(
         type: T,
         tilePoint: Point,
-        data: object = {}
-    ): ElementComponent<T> {
+        data: Partial<ElementDataFormat[T]> = {}
+    ): ElementComponent<T, ElementDataFormat[T]> {
         const factory = Elements.instance.getElementFactory(type)
         const elementPts = ElementUtils.rectPoints(tilePoint, factory.dimensions)
         if (elementPts.some((pt) => !!this.elements.get(pt))) {
@@ -142,17 +142,19 @@ export class Location {
             HUD.instance.miniMap.refresh()
         }
 
-        return el
+        return el as ElementComponent<T, ElementDataFormat[T]>
     }
 
     /**
      * @returns the first element found of the given type, or undefined if none exist
      */
-    getElementOfType<T extends ElementType>(type: T): ElementComponent<T> | undefined {
+    getElementOfType<T extends ElementType>(
+        type: T
+    ): ElementComponent<T, ElementDataFormat[T]> | undefined {
         return this.elements.values().find((el) => el.type === type)
     }
 
-    getElementsOfType<T extends ElementType>(type: T): ElementComponent<T>[] {
+    getElementsOfType<T extends ElementType>(type: T): ElementComponent<T, ElementDataFormat[T]>[] {
         return this.elements.values().filter((el) => el.type === type)
     }
 
