@@ -27,10 +27,7 @@ export const startTalkingSounds = (lineLength: number) => {
     }
     const audioToPlay = AUDIO_FILES[Lists.oneOf(audioOptions)]
 
-    if (currentAudio) {
-        currentAudio.pause()
-        currentAudio = null
-    }
+    stopTalkingSounds()
 
     // console.log(`line length = ${lineLength}, playing speech audio ${audioToPlay}`)
 
@@ -42,4 +39,11 @@ export const startTalkingSounds = (lineLength: number) => {
             }
         }
     })
+}
+
+export const stopTalkingSounds = () => {
+    if (currentAudio) {
+        currentAudio.pause()
+        currentAudio = null
+    }
 }

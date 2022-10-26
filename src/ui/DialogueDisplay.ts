@@ -1,7 +1,7 @@
 import { Component, Entity, Point, UpdateData } from "brigsby/dist"
 import { BasicRenderComponent } from "brigsby/dist/renderer"
 import { NineSlice } from "brigsby/dist/sprites"
-import { startTalkingSounds } from "../audio/Talking"
+import { startTalkingSounds, stopTalkingSounds } from "../audio/Talking"
 import {
     DialogueInstance,
     DialogueSource,
@@ -117,6 +117,7 @@ export class DialogueDisplay extends Component {
     }
 
     close() {
+        stopTalkingSounds()
         this.dialogueSource = null
         this.dialogue = null
         this.displayEntity = null
