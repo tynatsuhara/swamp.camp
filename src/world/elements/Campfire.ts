@@ -23,11 +23,15 @@ import { Interactable } from "./Interactable"
 import { NavMeshObstacle } from "./NavMeshObstacle"
 import { RestPoint } from "./RestPoint"
 
-export class CampfireFactory extends ElementFactory {
+export class CampfireFactory extends ElementFactory<ElementType.CAMPFIRE> {
     readonly type = ElementType.CAMPFIRE
     readonly dimensions = new Point(1, 1)
 
-    make(wl: Location, pos: Point, data: any): ElementComponent {
+    constructor() {
+        super(ElementType.CAMPFIRE)
+    }
+
+    make(wl: Location, pos: Point, data: any) {
         const e = new Entity()
         const scaledPos = pos.times(TILE_SIZE)
         const depth = scaledPos.y + TILE_SIZE - 12

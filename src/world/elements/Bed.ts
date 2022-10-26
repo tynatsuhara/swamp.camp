@@ -19,16 +19,14 @@ import { RestPoint } from "./RestPoint"
 
 type BedType = ElementType.BEDROLL | ElementType.BED
 
-export class BedFactory extends ElementFactory {
-    readonly type: BedType
+export class BedFactory extends ElementFactory<BedType> {
     readonly dimensions = new Point(1, 1)
 
     constructor(type: BedType) {
-        super()
-        this.type = type
+        super(type)
     }
 
-    make(wl: Location, pos: Point, data: object): ElementComponent {
+    make(wl: Location, pos: Point, data: object) {
         const e = new Entity()
         const scaledPos = pos.times(TILE_SIZE)
         const pixelCenterPos = scaledPos.plus(new Point(TILE_SIZE / 2 - 1, TILE_SIZE / 2 - 1))

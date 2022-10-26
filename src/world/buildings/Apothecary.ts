@@ -10,7 +10,7 @@ import { TeleporterPrefix } from "../Teleporter"
 import { InteriorUtils } from "./InteriorUtils"
 import { SimpleBuildingFactory } from "./SimpleBuildingFactory"
 
-export class ApothecaryFactory extends SimpleBuildingFactory {
+export class ApothecaryFactory extends SimpleBuildingFactory<ElementType.APOTHECARY> {
     constructor() {
         super(
             ElementType.APOTHECARY,

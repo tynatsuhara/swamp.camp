@@ -15,8 +15,7 @@ type SimpleBuildingData = {
     residents: { [type: number]: string[] }
 }
 
-export class SimpleBuildingFactory extends BuildingFactory {
-    readonly type: ElementType
+export class SimpleBuildingFactory<Type extends ElementType> extends BuildingFactory<Type> {
     readonly dimensions: Point
 
     private readonly spriteTileSource: string
@@ -32,7 +31,7 @@ export class SimpleBuildingFactory extends BuildingFactory {
      *   * Has a single door along the bottom
      */
     constructor(
-        type: ElementType,
+        type: Type,
         dimensions: Point, // tile dimensions
         spriteTileSource: string,
         interiorSupplier: (outside: Location) => Location,
@@ -40,8 +39,7 @@ export class SimpleBuildingFactory extends BuildingFactory {
         residenceCapacity: { [type: number]: number },
         doorHorizontalOffset = 0 // relative to the center
     ) {
-        super()
-        this.type = type
+        super(type)
         this.dimensions = dimensions
         this.spriteTileSource = spriteTileSource
         this.interiorSupplier = interiorSupplier
@@ -50,7 +48,7 @@ export class SimpleBuildingFactory extends BuildingFactory {
         this.doorHorizontalOffset = doorHorizontalOffset
     }
 
-    make(wl: Location, pos: Point, data: SimpleBuildingData): ElementComponent {
+    make(wl: Location, pos: Point, data: SimpleBuildingData) {
         const e = new Entity()
 
         // the interior location UUID

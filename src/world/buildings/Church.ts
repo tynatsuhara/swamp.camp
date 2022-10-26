@@ -10,7 +10,7 @@ import { AsciiInteriorBuilder } from "./AsciiInteriorBuilder"
 import { InteriorUtils } from "./InteriorUtils"
 import { SimpleBuildingFactory } from "./SimpleBuildingFactory"
 
-export class ChurchFactory extends SimpleBuildingFactory {
+export class ChurchFactory extends SimpleBuildingFactory<ElementType.CHURCH> {
     constructor() {
         super(
             ElementType.CHURCH,

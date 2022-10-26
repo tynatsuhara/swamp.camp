@@ -72,7 +72,7 @@ export class Elements {
         return Singletons.getOrCreate(Elements)
     }
 
-    private readonly factories: { [key: number]: ElementFactory } = {}
+    private readonly factories: { [key: number]: ElementFactory<any> } = {}
 
     constructor() {
         ELEMENT_FACTORIES.forEach((f) => {

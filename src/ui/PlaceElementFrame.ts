@@ -17,9 +17,9 @@ export class PlaceElementFrame extends Component {
     private readonly dimensions: Point
     private goodTiles: SpriteComponent[]
     private badTiles: SpriteComponent[]
-    private replacingElement: ElementComponent | undefined
+    private replacingElement: ElementComponent<any> | undefined
 
-    constructor(dimensions: Point, replacingElement?: ElementComponent) {
+    constructor(dimensions: Point, replacingElement?: ElementComponent<any>) {
         super()
         this.dimensions = dimensions
         this.replacingElement = replacingElement

@@ -32,11 +32,18 @@ type SaveData = {
     b?: boolean
 }
 
-export class BlackberriesFactory extends ElementFactory<SaveData> {
-    readonly type = ElementType.BLACKBERRIES
+export class BlackberriesFactory extends ElementFactory<ElementType.BLACKBERRIES, SaveData> {
     readonly dimensions = new Point(1, 1)
 
-    make(wl: Location, pos: Point, data: SaveData): ElementComponent<SaveData> {
+    constructor() {
+        super(ElementType.BLACKBERRIES)
+    }
+
+    make(
+        wl: Location,
+        pos: Point,
+        data: SaveData
+    ): ElementComponent<ElementType.BLACKBERRIES, SaveData> {
         let nextGrowthTime = data.ngt ?? this.determineNextGrowthTime()
         const state = data.s ?? State.GROWING
 

@@ -32,6 +32,8 @@ type SaveData = {
     b?: boolean
 }
 
+type TreeType = ElementType.TREE_ROUND | ElementType.TREE_POINTY
+
 const CHOPPING_AUDIO = Lists.range(0, 5).map((n) => `audio/impact/impactPlank_medium_00${n}.ogg`)
 const CHOPPING_AUDIO_VOLUME = 0.3
 const PUSH_AUDIO = [
@@ -39,17 +41,15 @@ const PUSH_AUDIO = [
     ...Lists.range(1, 6).map((i) => `audio/nature/Foliage/Foliage0${i}.wav`),
 ]
 
-export class TreeFactory extends ElementFactory<SaveData> {
-    readonly type: ElementType.TREE_ROUND | ElementType.TREE_POINTY
+export class TreeFactory extends ElementFactory<TreeType, SaveData> {
     readonly dimensions = new Point(1, 2)
 
-    constructor(type: ElementType.TREE_ROUND | ElementType.TREE_POINTY) {
-        super()
-        this.type = type
+    constructor(type: TreeType) {
+        super(type)
         loadAudio([...CHOPPING_AUDIO, ...PUSH_AUDIO])
     }
 
-    make(wl: Location, pos: Point, data: SaveData): ElementComponent<SaveData> {
+    make(wl: Location, pos: Point, data: SaveData): ElementComponent<TreeType, SaveData> {
         const maxResourcesCount = 4
 
         const nextGrowthTime = data.ngt ?? this.nextGrowthTime()

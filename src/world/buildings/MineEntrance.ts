@@ -13,11 +13,15 @@ import { Teleporter, TeleporterPrefix } from "../Teleporter"
 import { BuildingFactory } from "./Building"
 import { InteriorUtils } from "./InteriorUtils"
 
-export class MineEntranceFactory extends BuildingFactory {
+export class MineEntranceFactory extends BuildingFactory<ElementType.MINE_ENTRANCE> {
     readonly type = ElementType.MINE_ENTRANCE
     readonly dimensions = new Point(1, 1)
 
-    make(wl: Location, pos: Point, data: any): ElementComponent {
+    constructor() {
+        super(ElementType.MINE_ENTRANCE)
+    }
+
+    make(wl: Location, pos: Point, data: any) {
         const e = new Entity()
         const pixelPt = pos.times(TILE_SIZE)
 

@@ -19,16 +19,15 @@ import { NavMeshCollider } from "./NavMeshCollider"
 const MINING_AUDIO = Lists.range(0, 5).map((n) => `audio/impact/impactMining_00${n}.ogg`)
 const MINING_AUDIO_VOLUME = 0.4
 
-export class RockFactory extends ElementFactory {
-    readonly type = ElementType.ROCK
+export class RockFactory extends ElementFactory<ElementType.ROCK> {
     readonly dimensions = new Point(1, 1)
 
     constructor() {
-        super()
+        super(ElementType.ROCK)
         loadAudio(MINING_AUDIO)
     }
 
-    make(wl: Location, pos: Point, data: any): ElementComponent {
+    make(wl: Location, pos: Point, data: any): ElementComponent<ElementType.ROCK> {
         const e = new Entity()
         const variation = data.v ?? Math.floor(Math.random() * 3) + 1
         const mossy = data.m ?? Math.random() > 0.7

@@ -19,11 +19,14 @@ type HouseData = {
     residents: string[]
 }
 
-export class HouseFactory extends BuildingFactory {
-    readonly type = ElementType.HOUSE
+export class HouseFactory extends BuildingFactory<ElementType.HOUSE> {
     readonly dimensions = new Point(5, 4)
 
-    make(wl: Location, pos: Point, data: HouseData): ElementComponent {
+    constructor() {
+        super(ElementType.HOUSE)
+    }
+
+    make(wl: Location, pos: Point, data: HouseData) {
         const e = new Entity()
 
         // the interior location UUID

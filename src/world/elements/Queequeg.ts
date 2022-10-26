@@ -20,11 +20,14 @@ type QueequegData = {
     passengers: string[]
 }
 
-export class QueequegFactory extends ElementFactory {
-    type = ElementType.QUEEQUEG
+export class QueequegFactory extends ElementFactory<ElementType.QUEEQUEG> {
     dimensions = new Point(6, 3)
 
-    make(wl: Location, pos: Point, data: QueequegData): ElementComponent {
+    constructor() {
+        super(ElementType.QUEEQUEG)
+    }
+
+    make(wl: Location, pos: Point, data: QueequegData): ElementComponent<ElementType.QUEEQUEG> {
         const e = new Entity()
 
         const dockedPositionX = pos.x * TILE_SIZE + 1

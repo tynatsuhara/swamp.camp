@@ -6,11 +6,14 @@ import { ElementType } from "./Elements"
  * A component that all world space entities should have in order to be saveable.
  * Elements should not subclass this.
  */
-export class ElementComponent<SaveFormat extends object = object> extends Component {
-    readonly type: ElementType
+export class ElementComponent<
+    Type extends ElementType,
+    SaveFormat extends object = object
+> extends Component {
+    readonly type: Type
     readonly pos: Point
 
-    constructor(type: ElementType, pos: Point, saveFn: () => SaveFormat) {
+    constructor(type: Type, pos: Point, saveFn: () => SaveFormat) {
         super()
         this.type = type
         this.pos = pos

@@ -1,5 +1,6 @@
 import { Point } from "brigsby/dist"
 import { ElementFactory } from "../elements/ElementFactory"
+import { ElementType } from "../elements/Elements"
 import { ElementUtils } from "../elements/ElementUtils"
 import { Ground } from "../ground/Ground"
 import { Location } from "../locations/Location"
@@ -15,8 +16,9 @@ import { Location } from "../locations/Location"
  *   3. Misc metadata about the building
  */
 export abstract class BuildingFactory<
+    Type extends ElementType,
     SaveFormat extends object = object
-> extends ElementFactory<SaveFormat> {
+> extends ElementFactory<Type, SaveFormat> {
     canPlaceAtPos(wl: Location, pos: Point) {
         return ElementUtils.rectPoints(pos, this.dimensions)
             .map((pt) => wl.getGround(pt)?.type)

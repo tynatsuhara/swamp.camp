@@ -20,15 +20,21 @@ type TeleporterIndicatorSaveData = {
  * This is a component which can be used to teleport to a logical Teleporer destination.
  * It has an arrow sprite and an Interactable which the player can use to teleport.
  */
-export class TeleporterIndicatorFactory extends ElementFactory<TeleporterIndicatorSaveData> {
-    readonly type = ElementType.TELEPORTER_INDICATOR
+export class TeleporterIndicatorFactory extends ElementFactory<
+    ElementType.TELEPORTER_INDICATOR,
+    TeleporterIndicatorSaveData
+> {
     readonly dimensions = new Point(1, 1)
+
+    constructor() {
+        super(ElementType.TELEPORTER_INDICATOR)
+    }
 
     make(
         wl: Location,
         pos: Point,
         data: TeleporterIndicatorSaveData
-    ): ElementComponent<TeleporterIndicatorSaveData> {
+    ): ElementComponent<ElementType.TELEPORTER_INDICATOR, TeleporterIndicatorSaveData> {
         const e = new Entity()
 
         const destinationUUID = data.to

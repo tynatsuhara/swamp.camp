@@ -15,9 +15,12 @@ import { ElementType } from "./Elements"
 import { Growable } from "./Growable"
 import { Hittable } from "./Hittable"
 
-export class MushroomFactory extends ElementFactory<{ ngt: number }> {
-    readonly type = ElementType.MUSHROOM
+export class MushroomFactory extends ElementFactory<ElementType.MUSHROOM, { ngt: number }> {
     readonly dimensions = new Point(1, 1)
+
+    constructor() {
+        super(ElementType.MUSHROOM)
+    }
 
     make(wl: Location, pos: Point, { ngt = this.nextGrowthTime() }) {
         // const nextGrowthTime = data[NEXT_GROWTH_TIME] ?? this.nextGrowthTime()

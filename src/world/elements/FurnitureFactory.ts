@@ -10,19 +10,17 @@ import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
 import { NavMeshCollider } from "./NavMeshCollider"
 
-export class FurnitureFactory extends ElementFactory {
-    readonly type: ElementType
+export class FurnitureFactory<Type extends ElementType> extends ElementFactory<Type> {
     readonly dimensions = new Point(1, 1)
 
     private readonly tileKey: string
 
-    constructor(type: ElementType, tileKey: string) {
-        super()
-        this.type = type
+    constructor(type: Type, tileKey: string) {
+        super(type)
         this.tileKey = tileKey
     }
 
-    make(wl: Location, pos: Point, data: object): ElementComponent {
+    make(wl: Location, pos: Point, data: object): ElementComponent<Type> {
         const e = new Entity()
 
         const pixelPos = pos.times(TILE_SIZE)

@@ -19,10 +19,10 @@ export class PlaceElementDisplay extends Component {
 
     private stack: ItemStack
     private element: ElementType
-    private elementFactory: ElementFactory
+    private elementFactory: ElementFactory<any>
     private placingFrame: PlaceElementFrame
     private successFn: () => void
-    private replacingElement: ElementComponent | undefined
+    private replacingElement: ElementComponent<any> | undefined
 
     get isOpen() {
         return this.element !== null && this.element !== undefined
@@ -49,7 +49,11 @@ export class PlaceElementDisplay extends Component {
         this.placingFrame.delete()
     }
 
-    startPlacing(stack: ItemStack, successFn: () => void, replacingElement?: ElementComponent) {
+    startPlacing(
+        stack: ItemStack,
+        successFn: () => void,
+        replacingElement?: ElementComponent<any>
+    ) {
         this.stack = stack
         this.successFn = successFn
         this.replacingElement = replacingElement

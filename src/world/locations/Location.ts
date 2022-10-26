@@ -31,7 +31,7 @@ export class Location {
     // Entities may be duplicated in multiple spots
     // (entities spawning multiple tiles eg a tent)
     // BUT an entity should only be in one of these data structures
-    private readonly elements = new Grid<ElementComponent>()
+    private readonly elements = new Grid<ElementComponent<any>>()
     private readonly occupied = new Grid<boolean>()
     private readonly ground = new Grid<GroundComponent>()
     readonly levels = new Grid<number>()
@@ -104,7 +104,11 @@ export class Location {
      * @param tilePoint tile point
      * @param data
      */
-    addElement(type: ElementType, tilePoint: Point, data: object = {}): ElementComponent {
+    addElement<T extends ElementType>(
+        type: T,
+        tilePoint: Point,
+        data: object = {}
+    ): ElementComponent<T> {
         const factory = Elements.instance.getElementFactory(type)
         const elementPts = ElementUtils.rectPoints(tilePoint, factory.dimensions)
         if (elementPts.some((pt) => !!this.elements.get(pt))) {
@@ -144,11 +148,11 @@ export class Location {
     /**
      * @returns the first element found of the given type, or undefined if none exist
      */
-    getElementOfType(type: ElementType): ElementComponent | undefined {
+    getElementOfType<T extends ElementType>(type: T): ElementComponent<T> | undefined {
         return this.elements.values().find((el) => el.type === type)
     }
 
-    getElementsOfType(type: ElementType): ElementComponent[] {
+    getElementsOfType<T extends ElementType>(type: T): ElementComponent<T>[] {
         return this.elements.values().filter((el) => el.type === type)
     }
 
@@ -195,7 +199,7 @@ export class Location {
         this.removeElement(this.getElement(tilePoint))
     }
 
-    removeElement(el: ElementComponent) {
+    removeElement(el: ElementComponent<any>) {
         if (!el) {
             return
         }

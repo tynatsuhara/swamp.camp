@@ -6,11 +6,14 @@ import { ElementType } from "../elements/Elements"
 import { Interactable } from "../elements/Interactable"
 import { Location } from "../locations/Location"
 
-export class MineExitFactory extends ElementFactory {
-    readonly type = ElementType.MINE_EXIT
+export class MineExitFactory extends ElementFactory<ElementType.MINE_EXIT> {
     readonly dimensions = new Point(1, 1)
 
-    make(wl: Location, pos: Point, data: any): ElementComponent {
+    constructor() {
+        super(ElementType.MINE_EXIT)
+    }
+
+    make(wl: Location, pos: Point, data: any) {
         const e = new Entity()
 
         const destinationUUID = data.to

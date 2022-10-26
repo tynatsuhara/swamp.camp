@@ -4,8 +4,12 @@ import { Location } from "../locations/Location"
 import { ElementComponent } from "./ElementComponent"
 import { ElementType } from "./Elements"
 
-export abstract class ElementFactory<SaveFormat extends object = object> {
-    abstract readonly type: ElementType
+export abstract class ElementFactory<Type extends ElementType, SaveFormat extends object = object> {
+    readonly type: Type
+
+    constructor(type: Type) {
+        this.type = type
+    }
 
     /**
      * Free spaces that are required to place this element
@@ -20,7 +24,11 @@ export abstract class ElementFactory<SaveFormat extends object = object> {
      * @param data Previous save data (or an empty object)
      * @returns An ElementComponent with the factory's type, which MUST have a nonnull entity
      */
-    abstract make(wl: Location, pos: Point, data: Partial<SaveFormat>): ElementComponent<SaveFormat>
+    abstract make(
+        wl: Location,
+        pos: Point,
+        data: Partial<SaveFormat>
+    ): ElementComponent<Type, SaveFormat>
 
     /**
      * @param wl The location in which the user is trying to place an element

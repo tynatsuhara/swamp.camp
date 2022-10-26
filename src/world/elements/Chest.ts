@@ -12,11 +12,14 @@ import { NavMeshCollider } from "./NavMeshCollider"
 
 const INVENTORY = "i"
 
-export class ChestFactory extends ElementFactory {
-    type = ElementType.CHEST
+export class ChestFactory extends ElementFactory<ElementType.CHEST> {
     dimensions = new Point(1, 1)
 
-    make(wl: Location, pos: Point, data: object): ElementComponent {
+    constructor() {
+        super(ElementType.CHEST)
+    }
+
+    make(wl: Location, pos: Point, data: object) {
         const inventory = !!data[INVENTORY] ? Inventory.load(data[INVENTORY]) : new Inventory(20)
 
         const tiles =

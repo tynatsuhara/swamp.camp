@@ -29,9 +29,12 @@ const VARIANTS = {
 export type TentColor = keyof typeof VARIANTS
 type TentData = { color: TentColor; destinationUUID: string }
 
-export class TentFactory extends BuildingFactory<TentData> {
-    readonly type = ElementType.TENT
+export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
     readonly dimensions = new Point(4, 3)
+
+    constructor() {
+        super(ElementType.TENT)
+    }
 
     make(
         wl: Location,
@@ -88,7 +91,7 @@ export class TentFactory extends BuildingFactory<TentData> {
         )
 
         return e.addComponent(
-            new ElementComponent<TentData>(ElementType.TENT, pos, () => {
+            new ElementComponent<ElementType.TENT, TentData>(ElementType.TENT, pos, () => {
                 return { destinationUUID, color }
             })
         )
