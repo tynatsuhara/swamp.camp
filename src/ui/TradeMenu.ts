@@ -198,12 +198,11 @@ export class TradeMenu extends Component {
         this.context.font = `${TEXT_SIZE}px '${TEXT_FONT}'`
 
         // draw background
-        const backgroundTiles = NineSlice.makeStretchedNineSliceComponents(
+        const { sprites: bgSprites } = NineSlice.makeStretchedNineSliceComponents(
             Tilesets.instance.outdoorTiles.getNineSlice("invBoxFrame"),
-            topLeft,
-            this.dimensions
+            this.dimensions,
+            { position: topLeft, depth: UIStateManager.UI_SPRITE_DEPTH }
         )
-        backgroundTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
         this.context.fillStyle = COLOR_BACKGROUND
         this.context.fillRect(0, 0, this.innerDimensions.x, this.innerDimensions.y)
 
@@ -317,7 +316,7 @@ export class TradeMenu extends Component {
             )
         )
 
-        return [...backgroundTiles, renderComp, coinCountComponent]
+        return [...bgSprites, renderComp, coinCountComponent]
     }
 
     private textForSale(sale: SalePackage) {

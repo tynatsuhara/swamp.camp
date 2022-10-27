@@ -302,14 +302,17 @@ export class InventoryDisplay extends Component {
 
     private spawnBG(inv: Inventory) {
         const offset = this.getOffsetForInv(inv)
-        const bgTiles = NineSlice.makeNineSliceComponents(
-            Tilesets.instance.oneBit.getNineSlice("invBoxNW"),
-            offset.minus(new Point(TILE_SIZE / 2, TILE_SIZE / 2)),
-            new Point(1 + InventoryDisplay.COLUMNS, 1 + inv.size / InventoryDisplay.COLUMNS)
-        )
 
-        bgTiles.forEach((tile) => this.displayEntity.addComponent(tile))
-        bgTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
+        NineSlice.makeNineSliceComponents(
+            Tilesets.instance.oneBit.getNineSlice("invBoxNW").map((s) => () => s),
+            new Point(1 + InventoryDisplay.COLUMNS, 1 + inv.size / InventoryDisplay.COLUMNS),
+            {
+                position: offset.minus(new Point(TILE_SIZE / 2, TILE_SIZE / 2)),
+                depth: UIStateManager.UI_SPRITE_DEPTH,
+            }
+        )
+            .sprites.values()
+            .forEach((tile) => this.displayEntity.addComponent(tile))
     }
 
     getEntities(): Entity[] {

@@ -127,16 +127,20 @@ export class CraftingMenu extends Component {
         const result: Component[] = []
         for (let i = 0; i < this.recipes.length; i++) {
             const category = this.recipes[i]
-            const pos = topLeft.plusX(i * TILE_SIZE * 2)
+            const position = topLeft.plusX(i * TILE_SIZE * 2)
             const dims = new Point(2, 2)
-            const hovered = Maths.rectContains(pos, dims.times(TILE_SIZE), controls.getMousePos())
+            const hovered = Maths.rectContains(
+                position,
+                dims.times(TILE_SIZE),
+                controls.getMousePos()
+            )
 
             result.push(
                 ...NineSlice.makeNineSliceComponents(
-                    Tilesets.instance.oneBit.getNineSlice("invBoxNW"),
-                    pos,
-                    dims
-                )
+                    Tilesets.instance.oneBit.getNineSlice("invBoxNW").map((s) => () => s),
+                    dims,
+                    { position }
+                ).sprites.values()
             )
             const icon =
                 i === this.recipeCategory || hovered
@@ -180,12 +184,11 @@ export class CraftingMenu extends Component {
         this.context.font = `${TEXT_SIZE}px '${TEXT_FONT}'`
 
         // draw background
-        const backgroundTiles = NineSlice.makeStretchedNineSliceComponents(
+        const { sprites } = NineSlice.makeStretchedNineSliceComponents(
             Tilesets.instance.outdoorTiles.getNineSlice("invBoxFrame"),
-            topLeft,
-            this.dimensions
+            this.dimensions,
+            { position: topLeft, depth: UIStateManager.UI_SPRITE_DEPTH }
         )
-        backgroundTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
         this.context.fillStyle = COLOR_BACKGROUND
         this.context.fillRect(0, 0, this.innerDimensions.x, this.innerDimensions.y)
 
@@ -325,7 +328,7 @@ export class CraftingMenu extends Component {
             )
         )
 
-        return [...backgroundTiles, renderComp]
+        return [...sprites, renderComp]
     }
 
     // caching stuff

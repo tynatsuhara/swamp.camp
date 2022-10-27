@@ -57,10 +57,11 @@ export class PlaceElementFrame extends Component {
             ]
         }
         return NineSlice.makeNineSliceComponents(
-            Tilesets.instance.outdoorTiles.getNineSlice(`placingElementFrame_${suffix}`),
-            new Point(0, 0),
+            Tilesets.instance.outdoorTiles
+                .getNineSlice(`placingElementFrame_${suffix}`)
+                .map((s) => () => s),
             this.dimensions
-        )
+        ).sprites.values()
     }
 
     update() {

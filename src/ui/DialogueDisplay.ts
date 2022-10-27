@@ -165,13 +165,11 @@ export class DialogueDisplay extends Component {
             Math.floor(Camera.instance.dimensions.y - dimensions.y - DialogueDisplay.PADDING)
         )
 
-        const backgroundTiles = NineSlice.makeStretchedNineSliceComponents(
+        NineSlice.makeStretchedNineSliceComponents(
             Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"),
-            topLeft,
-            dimensions
-        )
-        backgroundTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
-        backgroundTiles.forEach((tile) => this.displayEntity.addComponent(tile))
+            dimensions,
+            { position: topLeft, depth: UIStateManager.UI_SPRITE_DEPTH }
+        ).sprites.forEach((tile) => this.displayEntity.addComponent(tile))
 
         if (textRows > 0) {
             const lines = formatText({

@@ -47,15 +47,15 @@ class NotificationComponent extends Component {
             const textPixelWidth = data.text.length * TEXT_PIXEL_WIDTH
             this.width = textPixelWidth + TILE_SIZE + (!!data.icon ? ICON_WIDTH : 0)
             this.height = TILE_SIZE * 2 - 2
-            const pos = initialPos ?? this.getPosition()
+            const position = initialPos ?? this.getPosition()
 
-            const backgroundTiles = NineSlice.makeStretchedNineSliceComponents(
+            const { transform, sprites } = NineSlice.makeStretchedNineSliceComponents(
                 Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"),
-                pos,
-                new Point(this.width, this.height)
+                new Point(this.width, this.height),
+                { position }
             )
-            backgroundTiles.forEach((c) => this.entity.addComponent(c))
-            this.t = backgroundTiles[0].transform
+            sprites.forEach((c) => this.entity.addComponent(c))
+            this.t = transform
 
             if (!!data.icon) {
                 const icon = Tilesets.instance.oneBit

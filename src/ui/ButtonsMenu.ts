@@ -39,15 +39,14 @@ export const ButtonsMenu = {
         const e = new Entity()
 
         if (background !== "none") {
-            const backgroundTiles = NineSlice.makeStretchedNineSliceComponents(
+            const { sprites } = NineSlice.makeStretchedNineSliceComponents(
                 background === "red"
                     ? Tilesets.instance.oneBit.getNineSlice("invBoxNW")
                     : Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"),
-                topLeft,
-                dimensions
+                dimensions,
+                { position: topLeft, depth: UIStateManager.UI_SPRITE_DEPTH + 1 }
             )
-            backgroundTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH + 1
-            backgroundTiles.forEach((tile) => e.addComponent(tile))
+            sprites.forEach((tile) => e.addComponent(tile))
         }
 
         options.forEach((option, i) =>
