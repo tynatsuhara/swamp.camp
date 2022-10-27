@@ -3,12 +3,12 @@ import { Dude } from "../../characters/Dude"
 import { Color } from "../../ui/Color"
 import { Ground } from "../../world/ground/Ground"
 import { GroundRenderer } from "../../world/GroundRenderer"
-import { here } from "../../world/locations/LocationManager"
+import { here, LocationType } from "../../world/locations/LocationManager"
 import { WorldTime } from "../../world/WorldTime"
 import { Particles } from "./Particles"
 
 const MILLIS_BETWEEN_EMISSIONS = 50
-const LIFESPAN_MILLIS = 300
+const LIFESPAN_MILLIS = 300 // todo change
 const BLOOD_PROBABILITY = 0.2
 
 export class WalkingParticles extends Component {
@@ -20,7 +20,7 @@ export class WalkingParticles extends Component {
     }
 
     land() {
-        if (here().isInterior) {
+        if (this.isLocationParticleFree()) {
             return
         }
 
@@ -67,7 +67,6 @@ export class WalkingParticles extends Component {
         const groud = here().getGround(this.dude.tile)
         const isInWater = Ground.isWater(groud?.type)
 
-        // TODO blood
         if (
             this.dude.health < this.dude.maxHealth &&
             this.dude.lastDamageTime > WorldTime.instance.time - 10_000 &&
@@ -92,7 +91,7 @@ export class WalkingParticles extends Component {
             )
         }
 
-        const doNotShowParticles = this.dude.jumping || here().isInterior
+        const doNotShowParticles = this.dude.jumping || this.isLocationParticleFree()
 
         if (doNotShowParticles) {
             // set to 0 so that particles will be emitted immediately once it makes sense
@@ -143,5 +142,9 @@ export class WalkingParticles extends Component {
         }
 
         this.timeUntilNextEmission = MILLIS_BETWEEN_EMISSIONS
+    }
+
+    private isLocationParticleFree() {
+        return here().isInterior && here().type !== LocationType.MINE_INTERIOR
     }
 }
