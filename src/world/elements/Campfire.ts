@@ -39,7 +39,7 @@ export class CampfireFactory extends ElementFactory<ElementType.CAMPFIRE> {
         const campfireSprite = e.addComponent(
             new SpriteComponent(
                 Tilesets.instance.outdoorTiles.getTileSource("campfireRing"),
-                SpriteTransform.new({ position: scaledPos, depth: GroundRenderer.DEPTH + 1 })
+                SpriteTransform.new({ position: scaledPos, depth: GroundRenderer.DEPTH + 10 })
             )
         )
 
