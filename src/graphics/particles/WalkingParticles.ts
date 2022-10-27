@@ -8,7 +8,6 @@ import { WorldTime } from "../../world/WorldTime"
 import { Particles } from "./Particles"
 
 const MILLIS_BETWEEN_EMISSIONS = 50
-const LIFESPAN_MILLIS = 300 // todo change
 const BLOOD_PROBABILITY = 0.2
 
 export class WalkingParticles extends Component {
@@ -112,7 +111,7 @@ export class WalkingParticles extends Component {
                     Color.BLUE_6,
                     this.dude.standingPosition.randomlyShifted(xRange, 3).plusY(-2),
                     depth,
-                    LIFESPAN_MILLIS,
+                    300, // lifespan
                     () => Point.ZERO,
                     new Point(3, 3)
                 )
@@ -121,7 +120,7 @@ export class WalkingParticles extends Component {
                 Math.random() < 0.7 ? Color.BLUE_5 : Color.WHITE,
                 this.dude.standingPosition.randomlyShifted(xRange, 3).plusY(-2),
                 depth + 1,
-                LIFESPAN_MILLIS,
+                300, // lifespan
                 () => Point.ZERO,
                 new Point(1, 1)
             )
@@ -135,7 +134,7 @@ export class WalkingParticles extends Component {
                 Color.TAUPE_5,
                 this.dude.standingPosition.randomlyShifted(4, 0).plusY(Math.random() * -5),
                 GroundRenderer.DEPTH + 1,
-                LIFESPAN_MILLIS,
+                500 + Math.random() * 500, // lifespan
                 () => Point.ZERO,
                 Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
             )
