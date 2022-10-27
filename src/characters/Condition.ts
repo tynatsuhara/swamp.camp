@@ -5,6 +5,8 @@ export enum Condition {
     HEALING,
 }
 
+window["Condition"] = Condition
+
 export type ActiveCondition = {
     condition: Condition
     /**
