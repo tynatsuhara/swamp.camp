@@ -11,6 +11,11 @@ export const session = {
     open: () => {
         host = true
         room = joinRoom({ appId: APP_ID }, ROOM_ID)
+        room.onPeerJoin((peer) => {
+            console.log(`${peer} joined!`)
+            // TODO: push world state to them
+            room.makeAction("world")
+        })
         console.log("opening lobby")
     },
 
@@ -44,15 +49,23 @@ export const session = {
 
         const proxy = new Proxy(data, {
             set(target, property, value, receiver) {
+                // offline syncData is just a normal object
+                if (!session.isOnline()) {
+                    return Reflect.set(target, property, value, receiver)
+                }
+
                 if (!host) {
                     console.warn("client cannot update data")
                     return true
                 }
+
+                // Update the data locally, then sync it
                 let success = Reflect.set(target, property, value, receiver)
                 if (success) {
                     // @ts-ignore
                     sender({ [property]: value })
                 }
+
                 return success
             },
         })
