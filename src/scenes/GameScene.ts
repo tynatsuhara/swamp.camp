@@ -150,7 +150,7 @@ export class GameScene {
                     .times(TILE_SIZE)
                     .plusX(i * TILE_SIZE)
                     .plusY(-gridRange * TILE_SIZE)
-                lines.push(new LineRender(top, top.plusY(2 * gridRange * TILE_SIZE)))
+                lines.push(new LineRender(top, top.plusY(2 * gridRange * TILE_SIZE), "#0000FF7E"))
             }
 
             // horizontal lines
@@ -159,7 +159,7 @@ export class GameScene {
                     .times(TILE_SIZE)
                     .plusX(-gridRange * TILE_SIZE)
                     .plusY(i * TILE_SIZE)
-                lines.push(new LineRender(left, left.plusX(2 * gridRange * TILE_SIZE)))
+                lines.push(new LineRender(left, left.plusX(2 * gridRange * TILE_SIZE), "#0000FF7E"))
             }
 
             e.addComponent(new BasicRenderComponent(...lines))
