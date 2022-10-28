@@ -90,16 +90,18 @@ const makeMineInterior = (outside: Location) => {
     const l = new Location(LocationType.MINE_INTERIOR, true, false)
     LocationManager.instance.add(l)
 
-    const dimensions = new Point(7, 6)
+    const dimensions = new Point(3, 2)
     InteriorUtils.addBarriers(l, dimensions)
+
+    const ladderIndex = 1
 
     l.addFeature("mineInteriorBackground", {
         width: dimensions.x,
         height: dimensions.y,
-        ladderIndex: 2,
+        ladderIndex,
     })
 
-    const interactablePos = new Point(dimensions.x / 2, 0).times(TILE_SIZE)
+    const interactablePos = new Point(ladderIndex + 0.5, 0).times(TILE_SIZE)
     const teleporter: Teleporter = {
         to: outside.uuid,
         pos: interactablePos.plusY(12),

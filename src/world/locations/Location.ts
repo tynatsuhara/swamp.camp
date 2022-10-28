@@ -354,6 +354,10 @@ export class Location {
         this.featureEntities.push(entity)
     }
 
+    getFeatureOfType<F extends FeatureType>(type: F): FeatureData<F> {
+        return this.features.find((f) => f.type === type)?.data as unknown as FeatureData<F>
+    }
+
     getEntities() {
         return Array.from(this.getDudes().map((d) => d.entity))
             .concat(this.elements.values().map((c) => c.entity))
