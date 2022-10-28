@@ -1,5 +1,6 @@
 node_modules/
-static/app.js
+static/*.js
+static/*.js.map
 static/index.html
 .DS_Store
 *.code-workspace
