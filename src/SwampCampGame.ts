@@ -1,5 +1,6 @@
 import { Game, UpdateViewsContext } from "brigsby/dist"
 import { View } from "brigsby/dist/View"
+import { session } from "./online/session"
 import { GameScene } from "./scenes/GameScene"
 import { MainMenuScene } from "./scenes/MainMenuScene"
 
@@ -38,6 +39,7 @@ export class SwampCampGame extends Game {
     loadMainMenu() {
         this.scene = Scene.MAIN_MENU
         this.mainMenu.reset()
+        session.close()
     }
 
     // entities in the world space

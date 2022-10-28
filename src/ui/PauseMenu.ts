@@ -3,6 +3,7 @@ import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
+import { session } from "../online/session"
 import { saveManager } from "../SaveManager"
 import { Settings } from "../Settings"
 import { SwampCampGame } from "../SwampCampGame"
@@ -55,10 +56,11 @@ export class PauseMenu extends Component {
                 text: "SAVE GAME",
                 fn: () => saveManager.save(),
             },
-            {
-                text: "LOAD LAST SAVE",
-                fn: () => saveManager.load(),
-            },
+            // {
+            //     text: "LOAD LAST SAVE",
+            //     fn: () => saveManager.load(),
+            // },
+            this.getOnlineOption(),
             {
                 text: "VIEW CONTROLS",
                 fn: () => this.showControls(),
@@ -141,6 +143,24 @@ export class PauseMenu extends Component {
             return {
                 text: `FULL-SCREEN: OFF`,
                 fn: FullScreenMode.enter,
+            }
+        }
+    }
+
+    private getOnlineOption(): PauseOption {
+        if (session.isOnline()) {
+            return {
+                text: "LEAVE SESSION",
+                fn: () => {
+                    if (!session.isHost()) {
+                        SwampCampGame.instance.loadMainMenu()
+                    }
+                },
+            }
+        } else {
+            return {
+                text: "OPEN LOBBY",
+                fn: () => session.open(),
             }
         }
     }

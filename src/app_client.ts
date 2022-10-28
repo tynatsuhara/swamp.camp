@@ -1,13 +1,5 @@
-import { isHost, room, syncData } from "./online/OnlineUtils"
+import { session } from "./online/session"
 
-const exampleSyncData = syncData<{ health: number }>("p1-health", { health: 5 }, () => {
-    console.log(exampleSyncData.health)
-})
-
-room.onPeerJoin((peerId) => {
-    if (isHost) {
-        console.log(`${peerId} joined`)
-        exampleSyncData.health--
-        console.log(exampleSyncData)
-    }
+session.join().then(() => {
+    console.log(`joined session! player IDs = ${session.getRoom().getPeers()}`)
 })

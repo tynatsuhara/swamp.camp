@@ -13,6 +13,7 @@ import { DevControls } from "../debug/DevControls"
 import { FireParticles } from "../graphics/particles/FireParticles"
 import { Particles } from "../graphics/particles/Particles"
 import { getFilesToLoadForGame, getImage, Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { session } from "../online/session"
 import { saveManager } from "../SaveManager"
 import { Save } from "../saves/SaveGame"
 import { IS_NATIVE_APP, SwampCampGame, ZOOM } from "../SwampCampGame"
@@ -184,6 +185,12 @@ export class MainMenuScene {
                     .add("continue", () => this.loadLastSave(), saveCount > 0)
                     .add("load save", () => this.render(Menu.LOAD_GAME), saveCount > 1)
                     .add("New game", () => this.render(Menu.NEW_GAME))
+                    .add("multiplayer", () =>
+                        session.join().then(() => {
+                            console.log(session.getRoom().getPeers())
+                            console.log("start online session")
+                        })
+                    )
                     .add("Download", () => this.render(Menu.DOWNLOADS), !IS_NATIVE_APP)
                     .add("Credits", () => this.render(Menu.CREDITS))
                     .getEntity()
