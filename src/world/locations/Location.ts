@@ -347,6 +347,10 @@ export class Location {
         const f: Feature<F> = { type, data } as unknown as Feature<F>
         this.features.push(f)
         const entity = instantiateFeature(type, data, this)
+        if (!entity) {
+            console.error(`feature ${type} not instantiated! data = ${JSON.stringify(data)}`)
+            return
+        }
         this.featureEntities.push(entity)
     }
 
