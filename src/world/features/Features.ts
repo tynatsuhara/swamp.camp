@@ -3,6 +3,7 @@ import { BoxCollider } from "brigsby/dist/collision"
 import { BasicRenderComponent } from "brigsby/dist/renderer"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { Tilesets } from "../../graphics/Tilesets"
+import { mineInteriorBackground } from "../buildings/MineEntrance"
 import { tentInteriorSprite } from "../buildings/Tent"
 import { NavMeshCollider } from "../elements/NavMeshCollider"
 import { Location } from "../locations/Location"
@@ -56,6 +57,7 @@ const FEATURES = {
         return new Entity([new NavMeshCollider(location, pt(x, y), pt(width, height))])
     },
     tentInteriorSprite,
+    mineInteriorBackground,
 }
 
 export type FeatureType = keyof typeof FEATURES

@@ -1,5 +1,6 @@
-import { Entity, Point } from "brigsby/dist"
-import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
+import { Entity, Point, pt } from "brigsby/dist"
+import { NineSlice, SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
+import { Lists } from "brigsby/dist/util"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/Elements"
@@ -7,6 +8,7 @@ import { ElementUtils } from "../elements/ElementUtils"
 import { Interactable } from "../elements/Interactable"
 import { NavMeshCollider } from "../elements/NavMeshCollider"
 import { GroundType } from "../ground/Ground"
+import { GroundRenderer } from "../GroundRenderer"
 import { Location } from "../locations/Location"
 import { camp, LocationManager, LocationType } from "../locations/LocationManager"
 import { Teleporter, TeleporterPrefix } from "../Teleporter"
@@ -88,15 +90,13 @@ const makeMineInterior = (outside: Location) => {
     const l = new Location(LocationType.MINE_INTERIOR, true, false)
     LocationManager.instance.add(l)
 
-    const dimensions = new Point(5, 3)
+    const dimensions = new Point(7, 6)
     InteriorUtils.addBarriers(l, dimensions)
 
-    // background sprite
-    l.addFeature("sprite", {
-        key: "mine-small",
-        pixelX: 0,
-        pixelY: -2 * TILE_SIZE,
-        depth: Number.MIN_SAFE_INTEGER,
+    l.addFeature("mineInteriorBackground", {
+        width: dimensions.x,
+        height: dimensions.y,
+        ladderIndex: 2,
     })
 
     const interactablePos = new Point(dimensions.x / 2, 0).times(TILE_SIZE)
@@ -107,7 +107,7 @@ const makeMineInterior = (outside: Location) => {
     }
     l.addTeleporter(teleporter)
 
-    l.addElement(ElementType.MINE_EXIT, new Point(2, 0), {
+    l.addElement(ElementType.MINE_EXIT, new Point(Math.ceil(dimensions.x / 2), 0), {
         to: outside.uuid,
         i: interactablePos.toString(),
         id: TeleporterPrefix.MINE,
@@ -119,4 +119,75 @@ const makeMineInterior = (outside: Location) => {
     )
 
     return l
+}
+
+/**
+ * @param width the ground tile width
+ * @param height the ground tile height
+ */
+export const mineInteriorBackground = ({
+    width,
+    height,
+    ladderIndex,
+}: {
+    width: number
+    height: number
+    ladderIndex: number
+}) => {
+    const e = new Entity()
+
+    const tile = (p: Point, size = pt(1)) => {
+        return Tilesets.instance.largeSprites.get(pt(24, 0).plus(p), size)
+    }
+
+    const topLeft = pt(2, 1)
+    const topRight = pt(3, 1)
+    const bottomLeft = pt(2, 2)
+    const bottomRight = pt(3, 2)
+    const topSprites = Lists.range(0, 3).map((i) => pt(i + 1, 0))
+    const sideSprites = Lists.range(0, 7).map((i) => pt(0, i))
+    const center = Lists.range(0, 6).map((i) => pt(1, i + 1))
+
+    const dimensions = new Point(width, height + 1) // accomodate 1 tile wide walls
+
+    const { sprites } = NineSlice.makeNineSliceComponents(
+        [
+            () => tile(topLeft),
+            () => tile(Lists.oneOf(topSprites)),
+            () => tile(topRight),
+            () => tile(Lists.oneOf(sideSprites)),
+            () => tile(Lists.oneOf(center)),
+            () => tile(Lists.oneOf(sideSprites)),
+            () => tile(bottomLeft),
+            () => tile(Lists.oneOf(sideSprites)),
+            () => tile(bottomRight),
+        ],
+        dimensions,
+        {
+            position: pt(0, -TILE_SIZE + 3), // shift up a bit to accomodate walls
+            depth: GroundRenderer.DEPTH,
+        }
+    )
+    NineSlice.nineSliceForEach(dimensions, (pt, i) => {
+        if (i === 5) {
+            sprites.get(pt).transform.rotation = 180
+        } else if (i === 7) {
+            sprites.get(pt).transform.rotation = 270
+        }
+    })
+
+    // place the ladder
+    sprites.remove(pt(ladderIndex, 0))
+    e.addComponent(
+        tile(pt(2, 3), pt(1, 3)).toComponent(
+            SpriteTransform.new({
+                position: pt(ladderIndex, -2).times(TILE_SIZE),
+                depth: GroundRenderer.DEPTH + 1,
+            })
+        )
+    )
+
+    e.addComponents(sprites.values())
+
+    return e
 }
