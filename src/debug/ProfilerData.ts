@@ -11,6 +11,7 @@ import { prettyPrint } from "./JSON"
 export class ProfilerData extends Component {
     update(updateData: UpdateData): void {
         const mouseTile = pixelPtToTilePt(controls.getWorldSpaceMousePos())
+        profiler.showInfo(`UI mouse pos: ${controls.getMousePos().apply(Math.floor)}`)
         profiler.showInfo(`mouse tile: ${mouseTile}`)
         profiler.showInfo(`time: ${WorldTime.clockTime()} (${Math.floor(WorldTime.instance.time)})`)
         const elementData = here().getElement(mouseTile)?.save()
