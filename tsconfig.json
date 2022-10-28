@@ -3,6 +3,7 @@
         "module": "ES6",
         "target": "ES2019",
         "lib": ["DOM", "ESNext"],
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "sourceMap": true
     }
 }

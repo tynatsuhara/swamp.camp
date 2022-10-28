@@ -1,4 +1,5 @@
 const path = require("path")
+const process = require("process")
 
 module.exports = {
     entry: "./src/app.ts",
@@ -19,6 +20,10 @@ module.exports = {
         filename: "app.js",
         path: path.resolve(__dirname, "static"),
     },
+    devtool:
+        process.env.NODE_ENV === "production"
+            ? "nosources-source-map"
+            : "eval-cheap-module-source-map",
     devServer: {
         compress: true,
         hot: false,
