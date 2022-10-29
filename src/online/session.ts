@@ -126,20 +126,21 @@ export const session = {
 
     /**
      * A function which can be called on the host, which will be invoked client-side.
+     * Args should be serializable!
      * If the client calls this function, it will be a no-op that generates a warning log.
      */
-    syncFn: (id: string, fn: () => void) => {
+    syncFn: <T extends any[]>(id: string, fn: (...args: T) => void) => {
         let sendAndReceiveRoom: Room
-        let sendFn: ActionSender<any>
-        let receiveFn: ActionReceiver<any>
+        let sendFn: ActionSender<T>
+        let receiveFn: ActionReceiver<T>
         const lazyInit = () => {
-            const [lazySender, lazyReceiver] = room.makeAction(id)
+            const [lazySender, lazyReceiver] = room.makeAction<T>(id)
             sendFn = lazySender
             receiveFn = lazyReceiver
             sendAndReceiveRoom = room
         }
 
-        const wrappedFn = () => {
+        const wrappedFn = (...args: T) => {
             // clear out sender/receiver if they were initialized in a previous session
             if (room !== sendAndReceiveRoom) {
                 sendFn = null
@@ -149,7 +150,7 @@ export const session = {
 
             // offline syncFn is just a normal fn
             if (!session.isOnline()) {
-                fn()
+                fn(...args)
                 return
             }
 
@@ -160,16 +161,16 @@ export const session = {
             if (session.isGuest()) {
                 console.warn("client cannot call syncFn")
             } else {
-                fn()
-                sendFn(null)
+                fn(...args)
+                sendFn(args)
             }
         }
 
         if (session.isGuest()) {
             lazyInit()
 
-            receiveFn(() => {
-                fn()
+            receiveFn((args) => {
+                fn(...args)
             })
         }
 

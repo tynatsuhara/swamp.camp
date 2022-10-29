@@ -1,4 +1,4 @@
-import { Point } from "brigsby/dist"
+import { Point, pt } from "brigsby/dist"
 import { measure } from "brigsby/dist/Profiler"
 import { WorldAudioContext } from "../../audio/WorldAudioContext"
 import { DudeType } from "../../characters/DudeType"
@@ -7,6 +7,7 @@ import { Enemy } from "../../characters/types/Enemy"
 import { Camera } from "../../cutscenes/Camera"
 import { CutscenePlayerController } from "../../cutscenes/CutscenePlayerController"
 import { Particles } from "../../graphics/particles/Particles"
+import { session } from "../../online/session"
 import { LocationManagerSaveState } from "../../saves/LocationManagerSaveState"
 import { Singletons } from "../../Singletons"
 import { HUD } from "../../ui/HUD"
@@ -89,6 +90,7 @@ export class LocationManager {
         return this.locations.get(uuid)
     }
 
+    // MPTODO
     add(location: Location) {
         this.locations.set(location.uuid, location)
         if (!this.currentLocation) {
@@ -97,6 +99,7 @@ export class LocationManager {
         return location
     }
 
+    // MPTODO
     delete(location: Location) {
         this.locations.delete(location.uuid)
     }
@@ -135,6 +138,7 @@ export class LocationManager {
         this.loadLocation(this.locations.get(saveState.currentLocationUUID))
     }
 
+    // MPTODO?
     simulateLocations(simulateCurrentLocation: boolean, duration: number) {
         const [time] = measure(() => {
             this.getLocations()
@@ -145,7 +149,9 @@ export class LocationManager {
         // console.log(`simulation took ${time} milliseconds`)
     }
 
+    // MPTODO?
     /**
+     * This function is only called on the host
      * @param newLocation
      * @param newPosition The pixel position of the player
      */
@@ -154,41 +160,59 @@ export class LocationManager {
         newPosition: Point,
         afterTransitionCallback?: () => void
     ) {
-        CutscenePlayerController.instance.enable()
-
-        // load a new location
-        HUD.instance.locationTransition.transition(() => {
-            // move the player to the new location's dude store
-            const p = Player.instance.dude
-            p.location.removeDude(p)
-            newLocation.addDude(p)
-            p.location = newLocation
-
-            // refresh the HUD hide stale data
-            HUD.instance.refresh()
-
-            // actually set the location
-            this.loadLocation(newLocation)
-
-            // delete existing particles
-            Particles.instance.clear()
-
-            // clip edges of all locations
-            VisibleRegionMask.instance.refresh()
-
-            // position the player and camera
-            p.moveTo(newPosition, true)
-            Camera.instance.jumpCutToFocalPoint()
-
-            setTimeout(() => {
-                CutscenePlayerController.instance.disable()
-
-                if (afterTransitionCallback) {
-                    afterTransitionCallback()
-                }
-            }, 400)
-        })
+        this.playerLoadLocal(
+            newLocation.uuid,
+            newPosition.x,
+            newPosition.y,
+            session.isHost() ? afterTransitionCallback : undefined
+        )
     }
+
+    /**
+     * @param afterTransitionCallback Only should be supplied host-side!
+     */
+    private playerLoadLocal = session.syncFn(
+        "lm:pll",
+        (uuid: string, px: number, py: number, afterTransitionCallback?: () => void) => {
+            const newLocation = this.get(uuid)
+            const newPosition = pt(px, py)
+
+            CutscenePlayerController.instance.enable()
+
+            // load a new location
+            HUD.instance.locationTransition.transition(() => {
+                // move the player to the new location's dude store
+                const p = Player.instance.dude
+                p.location.removeDude(p)
+                newLocation.addDude(p)
+                p.location = newLocation
+
+                // refresh the HUD hide stale data
+                HUD.instance.refresh()
+
+                // actually set the location
+                this.loadLocation(newLocation)
+
+                // delete existing particles
+                Particles.instance.clear()
+
+                // clip edges of all locations
+                VisibleRegionMask.instance.refresh()
+
+                // position the player and camera
+                p.moveTo(newPosition, true)
+                Camera.instance.jumpCutToFocalPoint()
+
+                setTimeout(() => {
+                    CutscenePlayerController.instance.disable()
+
+                    if (afterTransitionCallback) {
+                        afterTransitionCallback()
+                    }
+                }, 400)
+            })
+        }
+    )
 }
 
 export const camp = () => LocationManager.instance.exterior()
