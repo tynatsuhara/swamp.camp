@@ -188,7 +188,7 @@ export class MainMenuScene {
                     .add("multiplayer", () => {
                         session.join().then(() => {
                             console.log(session.getPeers())
-                            console.log("start online session")
+                            console.log("joined online session")
                         })
                         guestListenForInit()
                     })

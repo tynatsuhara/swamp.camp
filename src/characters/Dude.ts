@@ -341,6 +341,7 @@ export class Dude extends Component implements DialogueSource {
         this.jumpingAnimator?.update(updateData.elapsedTimeMillis)
     }
 
+    // MPTODO
     equipFirstWeaponInInventory() {
         const weapon = this.inventory
             .getStacks()
@@ -349,6 +350,7 @@ export class Dude extends Component implements DialogueSource {
         this.setWeapon(weapon || WeaponType.NONE)
     }
 
+    // MPTODO
     equipFirstShieldInInventory() {
         const shield = this.inventory
             .getStacks()

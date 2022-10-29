@@ -50,6 +50,8 @@ export const session = {
      */
     isGuest: () => session.isOnline() && !host,
 
+    getRoom: () => room,
+
     getPeers: () => room?.getPeers(),
 
     syncAction: <T extends object>(namespace: string) => {
