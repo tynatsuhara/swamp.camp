@@ -65,21 +65,27 @@ export const session = {
      * If the client writes data, it will be a no-op that generates a warning log.
      */
     syncData: <T extends object>(id: string, data: T, onChange = (updated: T) => {}) => {
+        let sendAndReceiveRoom: Room
         let sendFn: ActionSender<Partial<T>>
         let receiveFn: ActionReceiver<Partial<T>>
         const lazyInit = () => {
             const [lazySender, lazyReceiver] = room.makeAction<Partial<T>>(id)
             sendFn = lazySender
             receiveFn = lazyReceiver
+            sendAndReceiveRoom = room
         }
 
         const proxy = new Proxy(data, {
             set(target, property, value, receiver) {
-                // offline syncData is just a normal object
-                if (!session.isOnline()) {
-                    // clear out sender/receiver if they were initialized in a previous session
+                // clear out sender/receiver if they were initialized in a previous session
+                if (room !== sendAndReceiveRoom) {
                     sendFn = null
                     receiveFn = null
+                    sendAndReceiveRoom = null
+                }
+
+                // offline syncData is just a normal object
+                if (!session.isOnline()) {
                     return Reflect.set(target, property, value, receiver)
                 }
 
@@ -123,20 +129,26 @@ export const session = {
      * If the client calls this function, it will be a no-op that generates a warning log.
      */
     syncFn: (id: string, fn: () => void) => {
+        let sendAndReceiveRoom: Room
         let sendFn: ActionSender<any>
         let receiveFn: ActionReceiver<any>
         const lazyInit = () => {
             const [lazySender, lazyReceiver] = room.makeAction(id)
             sendFn = lazySender
             receiveFn = lazyReceiver
+            sendAndReceiveRoom = room
         }
 
         const wrappedFn = () => {
-            // offline syncFn is just a normal fn
-            if (!session.isOnline()) {
-                // clear out sender/receiver if they were initialized in a previous session
+            // clear out sender/receiver if they were initialized in a previous session
+            if (room !== sendAndReceiveRoom) {
                 sendFn = null
                 receiveFn = null
+                sendAndReceiveRoom = null
+            }
+
+            // offline syncFn is just a normal fn
+            if (!session.isOnline()) {
                 fn()
                 return
             }
