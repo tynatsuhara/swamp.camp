@@ -62,7 +62,7 @@ export const session = {
      * The client received data from the host when the object is updated.
      * If the client writes data, it will be a no-op that generates a warning log.
      */
-    syncData: <T extends object>(id: string, data: T, onChange = () => {}) => {
+    syncData: <T extends object>(id: string, data: T, onChange = (updated: T) => {}) => {
         let sender: ActionSender<Partial<T>>
         let receiver: ActionReceiver<Partial<T>>
         const lazyInit = () => {
@@ -106,7 +106,7 @@ export const session = {
                 Object.keys(newData).forEach((key) => {
                     data[key] = newData[key]
                 })
-                onChange()
+                onChange(data)
             })
         }
 
@@ -130,6 +130,7 @@ export const session = {
             // offline syncFn is just a normal fn
             if (!session.isOnline()) {
                 fn()
+                return
             }
 
             if (!sender) {

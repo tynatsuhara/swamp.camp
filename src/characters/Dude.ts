@@ -53,6 +53,7 @@ import { WeaponType } from "./weapons/WeaponType"
 type SyncData = {
     // MPTODO constantly syncing position might be inefficient, revisit later
     p: { x: number; y: number } // standing position
+    f: boolean // true if facing left, false otherwise
     manualDepth?: number // MPTODO
 }
 
@@ -187,9 +188,14 @@ export class Dude extends Component implements DialogueSource {
             this.syncId,
             {
                 p: { x: standingPosition.x, y: standingPosition.y },
+                f: false,
             },
-            () => {
-                this.moveTo(pt(this.syncData.p.x, this.syncData.p.y), true, true)
+            (newData) => {
+                const newStandingPos = pt(newData.p.x, newData.p.y)
+                const direction = newStandingPos.minus(this.standingPosition)
+                this.moveTo(newStandingPos, true, true)
+                this.setFacing(newData.f)
+                this.updateAnimationFromMovement(direction)
             }
         )
 
@@ -753,6 +759,23 @@ export class Dude extends Component implements DialogueSource {
         }
     }
 
+    private setFacing(facingLeft: boolean) {
+        const existingDir = this.animation.transform.mirrorX
+        if (existingDir !== facingLeft) {
+            this.animation.transform.mirrorX = facingLeft
+            if (session.isHost()) {
+                if (this.type === DudeType.PLAYER) {
+                    console.log(`sending f=${facingLeft}`)
+                }
+                this.syncData.f = facingLeft
+            } else {
+                if (this.type === DudeType.PLAYER) {
+                    console.log(`receiving f=${facingLeft}`)
+                }
+            }
+        }
+    }
+
     /**
      * Should be called on EVERY update step to ensure Dude state is maintained correctly
      * @param direction the direction they are moving in, will be normalized by this code
@@ -764,6 +787,11 @@ export class Dude extends Component implements DialogueSource {
         facingOverride: number = 0,
         speedMultiplier: number = 1
     ) {
+        // this is only executed on the host
+        if (session.isGuest()) {
+            return
+        }
+
         if (this._health <= 0) {
             return
         }
@@ -774,36 +802,16 @@ export class Dude extends Component implements DialogueSource {
         }
 
         if ((direction.x < 0 && facingOverride === 0) || facingOverride < 0) {
-            this.animation.transform.mirrorX = true
+            this.setFacing(true)
         } else if ((direction.x > 0 && facingOverride === 0) || facingOverride > 0) {
-            this.animation.transform.mirrorX = false
+            this.setFacing(false)
         }
 
-        const wasMoving = this.isMoving
-        this._isMoving = direction.x !== 0 || direction.y !== 0
+        direction = direction.normalizedOrZero()
 
-        if (direction.x !== 0 || direction.y !== 0) {
-            direction = direction.normalized()
-        }
+        this.updateAnimationFromMovement(direction)
 
-        // Update animations
-        if (!this.isJumping) {
-            if (this.isMoving) {
-                // start walking animation
-                // TODO make the run animation backwards if they run backwards :)
-                if (!wasMoving || this.animationDirty) {
-                    this.animation.goToAnimation(1)
-                }
-            } else if (wasMoving || this.animationDirty) {
-                // start idle animation
-                this.animation.goToAnimation(0)
-                // hacky slight improvement to the landing animation when standing still
-                if (this.wasJumping) {
-                    this.animation.fastForward(2 * 80)
-                    this.wasJumping = false
-                }
-            }
-        }
+        // Movement calculations and conditions based on movement — only done host-side
 
         const standingTilePos = pixelPtToTilePt(this.standingPosition)
         const ground = this.location.getGround(standingTilePos)
@@ -866,8 +874,6 @@ export class Dude extends Component implements DialogueSource {
         if (totalMovement.x !== 0 || totalMovement.y !== 0) {
             const newPos = this.standingPosition.plus(totalMovement)
             this.moveTo(newPos)
-
-            here().getElement(this.tile)?.entity.getComponent(Pushable)?.push(this, direction)
         }
 
         this.animationDirty = false
@@ -928,6 +934,37 @@ export class Dude extends Component implements DialogueSource {
     }
 
     /**
+     * Run host and guest side on sync
+     */
+    private updateAnimationFromMovement(direction: Point) {
+        direction = direction.normalizedOrZero()
+        const wasMoving = this.isMoving
+        this._isMoving = direction.x !== 0 || direction.y !== 0
+
+        // Update animations
+        if (!this.isJumping) {
+            if (this.isMoving) {
+                // start walking animation
+                // TODO make the run animation backwards if they run backwards :)
+                if (!wasMoving || this.animationDirty) {
+                    this.animation.goToAnimation(1)
+                }
+            } else if (wasMoving || this.animationDirty) {
+                // start idle animation
+                this.animation.goToAnimation(0)
+                // hacky slight improvement to the landing animation when standing still
+                if (this.wasJumping) {
+                    this.animation.fastForward(2 * 80)
+                    this.wasJumping = false
+                }
+            }
+        }
+
+        // Just do this here because why not
+        here().getElement(this.tile)?.entity.getComponent(Pushable)?.push(this, direction)
+    }
+
+    /**
      * @param point World point where the dude will be moved to (standing position),
      *              unless they hit a collider (with skipColliderCheck = false)
      */
@@ -938,6 +975,11 @@ export class Dude extends Component implements DialogueSource {
 
         // movement is done based on top-left corner point
         point = point.minus(this.standingOffset)
+
+        // no need to move
+        if (this.position.equals(point)) {
+            return
+        }
 
         const moveFn = skipColliderCheck
             ? (pos: Point) => this.collider.forceSetPosition(pos)
