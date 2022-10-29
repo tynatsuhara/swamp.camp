@@ -70,12 +70,12 @@ export class Player extends Component {
             return
         }
 
-        this.checkIsOffMap(updateData)
-
         // MPTODO: We will probably want to use GuestPlayer instead of adding this at all
         if (session.isGuest()) {
             return
         }
+
+        this.checkIsOffMap(updateData)
 
         // TODO: Move to the same code as other conditional effects
         if (this.dude.hasCondition(Condition.HEALING)) {
