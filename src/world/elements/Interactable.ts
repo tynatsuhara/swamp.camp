@@ -2,6 +2,7 @@ import { Component, debug, GamepadButton, InputKey, Point } from "brigsby/dist"
 import { EllipseRender, RenderMethod } from "brigsby/dist/renderer"
 import { controls } from "../../Controls"
 import { TILE_SIZE } from "../../graphics/Tilesets"
+import { session } from "../../online/session"
 import { ButtonIndicator } from "../../ui/ButtonIndicator"
 import { KeyPressIndicator } from "../../ui/KeyPressIndicator"
 import { UIStateManager } from "../../ui/UIStateManager"
@@ -26,7 +27,10 @@ export class Interactable extends Component {
         this.position = position
         this.fn = fn
         this.uiOffset = uiOffset
-        this.isInteractable = isInteractable
+        this.isInteractable = () => {
+            // TODO: Certain things might be interactable for guests, move this logic up
+            return session.isHost() && isInteractable()
+        }
     }
 
     updateIndicator(showUI: boolean) {
