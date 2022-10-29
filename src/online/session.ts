@@ -22,6 +22,7 @@ export const session = {
     close: () => {
         room?.leave()
         room = null
+        host = true
     },
 
     join: (): Promise<string> => {
@@ -39,9 +40,15 @@ export const session = {
 
     isOnline: () => !!room,
 
+    /**
+     * @returns true if they are not a guest! This DOES NOT mean that the player is necessarily online!
+     */
     isHost: () => host,
 
-    isGuest: () => !host,
+    /**
+     * @returns true if the user is online in someone else's world
+     */
+    isGuest: () => session.isOnline() && !host,
 
     getRoom: () => room,
 
