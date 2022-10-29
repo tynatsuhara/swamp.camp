@@ -1,5 +1,5 @@
 import { Lists } from "brigsby/dist/util"
-import { Player } from "../characters/Player"
+import { player } from "../characters/Player"
 import { Settings } from "../Settings"
 import { DarknessMask } from "../world/DarknessMask"
 import { LightManager } from "../world/LightManager"
@@ -36,7 +36,7 @@ export class Ambiance {
         const volume = Settings.getAmbienceVolume() * (ctx.isInterior ? 0.1 : 1)
         Ambiance.DAY.setVolume(volume)
 
-        const inDarkness = LightManager.instance.isDark(Player.instance.dude.standingPosition)
+        const inDarkness = LightManager.instance.isDark(player().dude.standingPosition)
         Ambiance.NIGHT.setVolume(volume * (inDarkness ? 1 : 0.5))
 
         // fade out at night

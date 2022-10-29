@@ -1,4 +1,4 @@
-import { Player } from "../characters/Player"
+import { player } from "../characters/Player"
 import { saveManager } from "../SaveManager"
 import { Notification, NotificationDisplay } from "../ui/NotificationDisplay"
 import { Inventory, ItemStackMetadata } from "./Inventory"
@@ -23,8 +23,8 @@ const SPECIAL_ITEMS: { [item: number]: SpecialItem } = {
     [Item.HEART_CONTAINER]: {
         noInventorySlot: true,
         onAdd: () => {
-            Player.instance.dude.maxHealth += 1
-            Player.instance.dude.heal(1)
+            player().dude.maxHealth += 1
+            player().dude.heal(1)
         },
     },
     [Item.CAMPFIRE]: {

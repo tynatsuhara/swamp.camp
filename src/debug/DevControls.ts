@@ -11,7 +11,7 @@ import { Lists } from "brigsby/dist/util"
 import { DudeFactory } from "../characters/DudeFactory"
 import { DudeSpawner } from "../characters/DudeSpawner"
 import { DudeType } from "../characters/DudeType"
-import { Player } from "../characters/Player"
+import { player } from "../characters/Player"
 import { spawnMagicProjectile } from "../characters/weapons/MagicProjectile"
 import { controls } from "../Controls"
 import { Particles } from "../graphics/particles/Particles"
@@ -50,7 +50,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
         InputKey.I,
         "smoke bomb",
         () => {
-            const pos = Player.instance.dude.standingPosition
+            const pos = player().dude.standingPosition
             const radius = 45
             const depth = pos.y + radius
 
@@ -110,7 +110,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
         InputKey.SEMICOLON,
         "spawn projectile",
         (input) => {
-            const standingPos = Player.instance.dude.standingPosition
+            const standingPos = player().dude.standingPosition
             spawnMagicProjectile(
                 input.mousePos,
                 standingPos.minus(input.mousePos).normalized().times(0.15)

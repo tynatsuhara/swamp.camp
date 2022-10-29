@@ -12,7 +12,7 @@ import { DudeFactory } from "../characters/DudeFactory"
 import { DudeSpawner } from "../characters/DudeSpawner"
 import { DudeType } from "../characters/DudeType"
 import { NPC } from "../characters/NPC"
-import { Player } from "../characters/Player"
+import { player } from "../characters/Player"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
@@ -133,14 +133,14 @@ export class GameScene {
     }
 
     private getWorldSpaceDebugEntity(): Entity {
-        if (!Player.instance?.dude) {
+        if (!player()?.dude) {
             return
         }
 
         const e = new Entity()
 
         if (debug.showGrid) {
-            const base = Player.instance.dude.tile
+            const base = player().dude.tile
             const lines: RenderMethod[] = []
             const gridRange = 50
 

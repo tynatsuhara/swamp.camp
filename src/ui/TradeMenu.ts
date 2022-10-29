@@ -10,7 +10,7 @@ import { Lists, Maths } from "brigsby/dist/util"
 import { loadAudio } from "../audio/DeferLoadAudio"
 import { Sounds } from "../audio/Sounds"
 import { Dude } from "../characters/Dude"
-import { Player } from "../characters/Player"
+import { player } from "../characters/Player"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { ImageFilters } from "../graphics/ImageFilters"
@@ -116,7 +116,7 @@ export class TradeMenu extends Component {
 
     sell(items: SalePackage[]) {
         this.open(items, TradeMode.PLAYER_SELLING)
-        this.sourceInventory = Player.instance.dude.inventory
+        this.sourceInventory = player().dude.inventory
     }
 
     buy(items: SalePackage[]) {
@@ -165,7 +165,7 @@ export class TradeMenu extends Component {
         if (!canInteract) {
             return "oh shit" // not shown
         }
-        const playerInv = Player.instance.dude.inventory
+        const playerInv = player().dude.inventory
 
         if (this.tradeMode === TradeMode.PLAYER_SELLING) {
             if (playerInv.getItemCount(sale.item) < sale.count) {
@@ -242,7 +242,7 @@ export class TradeMenu extends Component {
                         coins: saveManager.getState().coins + sale.price,
                     })
                 } else {
-                    Player.instance.dude.inventory.addItem(sale.item, sale.count)
+                    player().dude.inventory.addItem(sale.item, sale.count)
                     saveManager.setState({
                         coins: saveManager.getState().coins - sale.price,
                     })

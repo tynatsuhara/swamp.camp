@@ -1,7 +1,7 @@
 import { Component, Point, UpdateData } from "brigsby/dist"
 import { ImageRender } from "brigsby/dist/renderer"
 import { Animator } from "brigsby/dist/util"
-import { Player } from "../characters/Player"
+import { player } from "../characters/Player"
 import { Camera } from "../cutscenes/Camera"
 import { Color } from "./Color"
 import { UIStateManager } from "./UIStateManager"
@@ -67,8 +67,8 @@ export class LocationTransition extends Component {
         }
 
         const getRender = (frame: number) => {
-            const circleCenter = Player.instance.dude.standingPosition
-                .plusY(-12)
+            const circleCenter = player()
+                .dude.standingPosition.plusY(-12)
                 .minus(Camera.instance.position)
                 .apply(Math.floor)
 

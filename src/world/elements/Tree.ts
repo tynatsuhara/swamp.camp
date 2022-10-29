@@ -3,7 +3,7 @@ import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
 import { loadAudio } from "../../audio/DeferLoadAudio"
 import { Sounds } from "../../audio/Sounds"
-import { Player } from "../../characters/Player"
+import { player } from "../../characters/Player"
 import { WeaponType } from "../../characters/weapons/WeaponType"
 import { Particles } from "../../graphics/particles/Particles"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
@@ -130,7 +130,7 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
                         return []
                     }
                     const getItem = () => (Math.random() < 0.2 ? saplingType : Item.WOOD)
-                    if (Player.instance.dude.weaponType === WeaponType.AXE) {
+                    if (player().dude.weaponType === WeaponType.AXE) {
                         return [getItem(), getItem()]
                     } else {
                         return [getItem()]

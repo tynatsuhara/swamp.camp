@@ -20,7 +20,7 @@ import { NPCTaskContext } from "./ai/NPCTaskContext"
 import { NPCTaskFactory } from "./ai/NPCTaskFactory"
 import { Condition } from "./Condition"
 import { Dude } from "./Dude"
-import { Player } from "./Player"
+import { player } from "./Player"
 
 // TODO maybe this shouldn't be NPC-specific
 export enum NPCAttackState {
@@ -91,7 +91,7 @@ export class NPC extends Simulatable {
             this._dude.move(
                 updateData.elapsedTimeMillis,
                 Point.ZERO,
-                Player.instance.dude.standingPosition.x - this._dude.standingPosition.x
+                player().dude.standingPosition.x - this._dude.standingPosition.x
             )
         } else if (this._dude.hasCondition(Condition.ON_FIRE)) {
             this.doRoam(updateData) // flee

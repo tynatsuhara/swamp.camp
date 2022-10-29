@@ -8,7 +8,7 @@ import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Color } from "../../ui/Color"
 import { GroundRenderer } from "../../world/GroundRenderer"
 import { here } from "../../world/locations/LocationManager"
-import { Player } from "../Player"
+import { player } from "../Player"
 import { Weapon } from "./Weapon"
 import { WeaponType } from "./WeaponType"
 
@@ -181,10 +181,10 @@ export class StaffWeapon extends Weapon {
 
     private guessAttackPos() {
         // TODO: target other villagers?
-        if (!Player.instance.dude.isAlive) {
+        if (!player().dude.isAlive) {
             return
         }
-        return Player.instance.dude.standingPosition.plus(Player.instance.velocity.times(60))
+        return player().dude.standingPosition.plus(player().velocity.times(60))
     }
 
     private explosionParticleEffects() {

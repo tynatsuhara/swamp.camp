@@ -4,7 +4,7 @@ import { SpriteSource } from "brigsby/dist/sprites"
 import { loadAudio } from "../audio/DeferLoadAudio"
 import { Sounds } from "../audio/Sounds"
 import { Condition } from "../characters/Condition"
-import { Player } from "../characters/Player"
+import { player } from "../characters/Player"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { WeaponType } from "../characters/weapons/WeaponType"
 import { Icon } from "../graphics/OneBitTileset"
@@ -175,13 +175,10 @@ export const ITEM_METADATA_MAP = {
         consumable: {
             verb: "eat",
             fn: () => {
-                Player.instance.dude.heal(1)
+                player().dude.heal(1)
                 Sounds.play(...SOUNDS.eat)
                 if (Math.random() < 0.25) {
-                    Player.instance.dude.addCondition(
-                        Condition.POISONED,
-                        2_500 + Math.random() * 5_000
-                    )
+                    player().dude.addCondition(Condition.POISONED, 2_500 + Math.random() * 5_000)
                 }
             },
         },
@@ -205,7 +202,7 @@ export const ITEM_METADATA_MAP = {
         consumable: {
             verb: "drink",
             fn: () => {
-                Player.instance.dude.addCondition(Condition.HEALING, 10_000)
+                player().dude.addCondition(Condition.HEALING, 10_000)
                 Sounds.play(...SOUNDS.drink)
             },
         },
@@ -222,7 +219,7 @@ export const ITEM_METADATA_MAP = {
         consumable: {
             verb: "drink",
             fn: () => {
-                Player.instance.dude.removeCondition(Condition.POISONED)
+                player().dude.removeCondition(Condition.POISONED)
                 Sounds.play(...SOUNDS.drink)
             },
         },
@@ -233,7 +230,7 @@ export const ITEM_METADATA_MAP = {
         consumable: {
             verb: "eat",
             fn: () => {
-                Player.instance.dude.heal(1)
+                player().dude.heal(1)
                 Sounds.play(...SOUNDS.eat)
             },
         },
@@ -245,7 +242,7 @@ export const ITEM_METADATA_MAP = {
         consumable: {
             verb: "eat",
             fn: () => {
-                Player.instance.dude.heal(0.25), Sounds.play(...SOUNDS.eat)
+                player().dude.heal(0.25), Sounds.play(...SOUNDS.eat)
             },
         },
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("berries"),

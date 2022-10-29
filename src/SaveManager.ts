@@ -1,6 +1,6 @@
 import { debug } from "brigsby/dist"
 import { DudeType } from "./characters/DudeType"
-import { Player } from "./characters/Player"
+import { player } from "./characters/Player"
 import { Camera } from "./cutscenes/Camera"
 import { Save, SaveState } from "./saves/SaveGame"
 import { newUUID } from "./saves/uuid"
@@ -72,7 +72,7 @@ class SaveManager {
     }
 
     save(flush = true) {
-        if (!Player.instance.dude.isAlive) {
+        if (!player().dude.isAlive) {
             console.log("cannot save after death")
             return
         }

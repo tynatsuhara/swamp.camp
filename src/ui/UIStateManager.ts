@@ -1,5 +1,5 @@
 import { Entity } from "brigsby/dist"
-import { Player } from "../characters/Player"
+import { player } from "../characters/Player"
 import { Camera } from "../cutscenes/Camera"
 import { spawnMenu } from "../debug/SpawnMenu"
 import { Singletons } from "../Singletons"
@@ -39,7 +39,7 @@ export class UIStateManager {
     }
 
     get(elapsedMillis: number): Entity[] {
-        if (!Player.instance.dude) {
+        if (!player().dude) {
             return []
         }
 
@@ -54,7 +54,7 @@ export class UIStateManager {
             spawnMenu.isOpen
 
         return HUD.instance
-            .getEntities(Player.instance.dude, Camera.instance.dimensions, elapsedMillis)
+            .getEntities(player().dude, Camera.instance.dimensions, elapsedMillis)
             .concat(this.inventory.getEntities())
             .concat(this.dialogueDisplay.getEntities())
             .concat(this.placeElementDisplay.getEntities())

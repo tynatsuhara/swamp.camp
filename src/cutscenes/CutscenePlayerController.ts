@@ -1,6 +1,6 @@
 import { Component, Point, UpdateData } from "brigsby/dist"
 import { Dude } from "../characters/Dude"
-import { Player } from "../characters/Player"
+import { player } from "../characters/Player"
 
 export class CutscenePlayerController extends Component {
     static instance: CutscenePlayerController
@@ -33,13 +33,13 @@ export class CutscenePlayerController extends Component {
 
     enable() {
         this.enabled = true
-        Player.instance.enabled = false
+        player().enabled = false
         this.stopMoving()
     }
 
     disable() {
         this.enabled = false
-        Player.instance.enabled = true
+        player().enabled = true
         this.stopMoving()
     }
 }

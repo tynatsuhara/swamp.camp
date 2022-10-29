@@ -4,7 +4,7 @@ import { SpriteComponent } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
 import { loadAudio } from "../audio/DeferLoadAudio"
 import { Sounds } from "../audio/Sounds"
-import { Player } from "../characters/Player"
+import { player } from "../characters/Player"
 import { here } from "../world/locations/LocationManager"
 import { Item, ItemMetadata, ITEM_METADATA_MAP } from "./Items"
 
@@ -79,14 +79,13 @@ export class DroppedItem extends Component {
         }
 
         this.update = () => {
-            const colliding =
-                Player.instance.dude.standingPosition.plusY(-6).distanceTo(position) < 12
+            const colliding = player().dude.standingPosition.plusY(-6).distanceTo(position) < 12
 
             if (colliding && this.canPickUp) {
                 this.canPickUp = false
                 setTimeout(() => {
-                    if (Player.instance.dude.isAlive && !!this.entity) {
-                        if (Player.instance.dude.inventory.addItem(this.itemType, 1, metadata)) {
+                    if (player().dude.isAlive && !!this.entity) {
+                        if (player().dude.inventory.addItem(this.itemType, 1, metadata)) {
                             here().droppedItems.delete(this.entity)
                             this.entity.selfDestruct()
                             setTimeout(() => {

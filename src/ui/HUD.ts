@@ -7,7 +7,7 @@ import {
 } from "brigsby/dist/sprites"
 import { Condition } from "../characters/Condition"
 import { Dude } from "../characters/Dude"
-import { Player } from "../characters/Player"
+import { player } from "../characters/Player"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
@@ -96,11 +96,11 @@ export class HUD {
     private updateHearts(health: number, maxHealth: number) {
         this.heartsEntity = new Entity()
 
-        const healing = Player.instance.dude.hasCondition(Condition.HEALING)
+        const healing = player().dude.hasCondition(Condition.HEALING)
         const filter: HeartFilter = (() => {
             if (debug.godMode) {
                 return "god"
-            } else if (Player.instance.dude.hasCondition(Condition.POISONED)) {
+            } else if (player().dude.hasCondition(Condition.POISONED)) {
                 return "poisoned"
             } else if (healing) {
                 return "healing"

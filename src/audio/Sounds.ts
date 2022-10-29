@@ -1,5 +1,5 @@
 import { assets, Point } from "brigsby/dist"
-import { Player } from "../characters/Player"
+import { player } from "../characters/Player"
 import { Settings } from "../Settings"
 
 /**
@@ -28,7 +28,7 @@ export class Sounds {
     }
 
     static playAtPoint(path: string, volume: number, point: Point, distance: number) {
-        const distanceToPlayer = Player.instance.dude.standingPosition.manhattanDistanceTo(point)
+        const distanceToPlayer = player().dude.standingPosition.manhattanDistanceTo(point)
         if (distance < distanceToPlayer) {
             return
         }

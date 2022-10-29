@@ -7,7 +7,7 @@ import { Ambiance } from "../audio/Ambiance"
 import { loadDeferredAudio } from "../audio/DeferLoadAudio"
 import { Music } from "../audio/Music"
 import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
-import { Player } from "../characters/Player"
+import { resetPlayerInstances } from "../characters/Player"
 import { controls } from "../Controls"
 import { DevControls } from "../debug/DevControls"
 import { FireParticles } from "../graphics/particles/FireParticles"
@@ -70,7 +70,7 @@ export class MainMenuScene {
     }
 
     reset() {
-        Player.instance = undefined
+        resetPlayerInstances()
 
         // TODO: this isn't fully effective
         Music.stop()

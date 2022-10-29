@@ -2,7 +2,7 @@ import { Point, pt } from "brigsby/dist"
 import { measure } from "brigsby/dist/Profiler"
 import { WorldAudioContext } from "../../audio/WorldAudioContext"
 import { DudeType } from "../../characters/DudeType"
-import { Player } from "../../characters/Player"
+import { player } from "../../characters/Player"
 import { Enemy } from "../../characters/types/Enemy"
 import { Camera } from "../../cutscenes/Camera"
 import { CutscenePlayerController } from "../../cutscenes/CutscenePlayerController"
@@ -182,7 +182,7 @@ export class LocationManager {
             // load a new location
             HUD.instance.locationTransition.transition(() => {
                 // move the player to the new location's dude store
-                const p = Player.instance.dude
+                const p = player().dude
                 p.location.removeDude(p)
                 newLocation.addDude(p)
                 p.location = newLocation

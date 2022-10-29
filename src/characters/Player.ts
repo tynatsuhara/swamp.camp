@@ -17,9 +17,17 @@ import { Condition } from "./Condition"
 import { Dude } from "./Dude"
 import { DudeSpawner } from "./DudeSpawner"
 
-export class Player extends Component {
-    static instance: Player
+let playerInstance: Player
 
+export const player = () => {
+    return playerInstance
+}
+
+export const resetPlayerInstances = () => {
+    playerInstance = undefined
+}
+
+export class Player extends Component {
     private rollingMomentum: Point
     private _velocity: Point = Point.ZERO
     get velocity() {
@@ -35,7 +43,7 @@ export class Player extends Component {
 
     constructor() {
         super()
-        Player.instance = this
+        playerInstance = this
     }
 
     awake() {

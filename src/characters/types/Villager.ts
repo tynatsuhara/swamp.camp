@@ -8,7 +8,7 @@ import { Dude } from "../Dude"
 import { DudeFaction } from "../DudeFactory"
 import { DudeType } from "../DudeType"
 import { NPC } from "../NPC"
-import { Player } from "../Player"
+import { player } from "../Player"
 import { WeaponType } from "../weapons/WeaponType"
 import { Centaur } from "./Centaur"
 import { ShroomNPC } from "./ShroomNPC"
@@ -61,7 +61,7 @@ export class Villager extends Component {
         const { npc, dude } = this
 
         if ([DudeType.GUMBALL, DudeType.ONION].includes(dude.type)) {
-            npc.setLeader(Player.instance.dude)
+            npc.setLeader(player().dude)
             npc.setSchedule(NPCSchedules.newFollowLeaderSchedule())
         } else if (dude.type === DudeType.DIP) {
             // TODO: Make this a more robust schedule

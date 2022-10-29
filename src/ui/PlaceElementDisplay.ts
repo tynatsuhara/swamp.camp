@@ -1,6 +1,6 @@
 import { Component, Entity, Point, UpdateData } from "brigsby/dist"
 import { Grid, Maths } from "brigsby/dist/util"
-import { Player } from "../characters/Player"
+import { player } from "../characters/Player"
 import { controls } from "../Controls"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { ItemStack } from "../items/Inventory"
@@ -61,7 +61,7 @@ export class PlaceElementDisplay extends Component {
         this.element = ITEM_METADATA_MAP[stack.item].element
         this.elementFactory = Elements.instance.getElementFactory(this.element)
 
-        this.placingFrame = Player.instance.entity.addComponent(
+        this.placingFrame = player().entity.addComponent(
             new PlaceElementFrame(this.elementFactory.dimensions, this.replacingElement)
         )
     }

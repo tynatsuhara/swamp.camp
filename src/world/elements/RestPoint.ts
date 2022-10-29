@@ -1,6 +1,6 @@
 import { Component } from "brigsby/dist"
 import { NPC } from "../../characters/NPC"
-import { Player } from "../../characters/Player"
+import { player } from "../../characters/Player"
 import { saveManager } from "../../SaveManager"
 import { HUD } from "../../ui/HUD"
 import { DarknessMask } from "../DarknessMask"
@@ -22,7 +22,7 @@ export class RestPoint extends Component {
     canRestFor(hours: number, atCampfire?: Campfire) {
         const isTargeted = here()
             .getDudes()
-            .some((d) => d.entity.getComponent(NPC)?.targetedEnemy === Player.instance.dude)
+            .some((d) => d.entity.getComponent(NPC)?.targetedEnemy === player().dude)
 
         if (isTargeted) {
             return false

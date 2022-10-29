@@ -5,7 +5,7 @@ import { Dude } from "../characters/Dude"
 import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
 import { DudeFaction, DudeFactory } from "../characters/DudeFactory"
 import { DudeType } from "../characters/DudeType"
-import { Player } from "../characters/Player"
+import { player } from "../characters/Player"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { saveManager } from "../SaveManager"
 import { ControlsUI } from "../ui/ControlsUI"
@@ -118,7 +118,7 @@ ANOTHER thing - Only one of the explorers returned, and they reported that their
             .getDudes()
             .filter((d) => d.type === DudeType.DIP)[0]
 
-        Queequeg.instance.pushPassenger(Player.instance.dude)
+        Queequeg.instance.pushPassenger(player().dude)
 
         setTimeout(() => {
             Queequeg.instance.arrive()
@@ -129,13 +129,13 @@ ANOTHER thing - Only one of the explorers returned, and they reported that their
         }, this.PAN_TO_DIP)
 
         setTimeout(() => {
-            Queequeg.instance.removePassenger(Player.instance.dude)
+            Queequeg.instance.removePassenger(player().dude)
         }, this.GET_OFF_SHIP)
 
         setTimeout(() => {
             this.dip.dialogue = DIP_STARTING_DIALOGUE
             CutscenePlayerController.instance.disable()
-            Camera.instance.focusOnDude(Player.instance.dude)
+            Camera.instance.focusOnDude(player().dude)
             this.waitingForOrcsToDie = true
         }, this.PAN_BACK)
     }

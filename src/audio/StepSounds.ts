@@ -2,7 +2,7 @@ import { assets } from "brigsby/dist"
 import { Lists, RepeatedInvoker } from "brigsby/dist/util"
 import { Dude } from "../characters/Dude"
 import { DudeType } from "../characters/DudeType"
-import { Player } from "../characters/Player"
+import { player } from "../characters/Player"
 import { controls } from "../Controls"
 import { GroundType } from "../world/ground/Ground"
 import { here } from "../world/locations/LocationManager"
@@ -37,7 +37,7 @@ export class StepSounds {
             .then(() =>
                 dude.entity.addComponent(
                     new RepeatedInvoker(() => {
-                        if (Player.instance.dude) {
+                        if (player().dude) {
                             if (dude?.isAlive && dude.isMoving && !dude.rolling && !dude.jumping) {
                                 const [sound, volume] = StepSounds.getSound(dude)
                                 if (!!sound) {

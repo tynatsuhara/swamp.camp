@@ -1,7 +1,7 @@
 import { Component, Point } from "brigsby/dist"
 import { NineSlice, SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Maths } from "brigsby/dist/util"
-import { Player } from "../characters/Player"
+import { player } from "../characters/Player"
 import { controls } from "../Controls"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { ElementComponent } from "../world/elements/ElementComponent"
@@ -70,7 +70,7 @@ export class PlaceElementFrame extends Component {
         // Divide these by 2 since the mouse will be in the center of the frame
         const maxDistX = TILE_SIZE * (baseDist + this.dimensions.x / 2)
         const maxDistY = TILE_SIZE * (baseDist + this.dimensions.y / 2)
-        const playerPos = Player.instance.dude.standingPosition.plusY(-TILE_SIZE / 2)
+        const playerPos = player().dude.standingPosition.plusY(-TILE_SIZE / 2)
 
         // only allow placing near the player
         const centerPos = new Point(
