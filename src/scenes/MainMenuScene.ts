@@ -97,7 +97,6 @@ export class MainMenuScene {
     loadGame(slot: number) {
         this.loadAssets().then(() => {
             saveManager.load(slot)
-            SwampCampGame.instance.loadGameScene()
         })
         this.render(Menu.ROOT) // force re-render
     }

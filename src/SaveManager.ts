@@ -5,6 +5,7 @@ import { Camera } from "./cutscenes/Camera"
 import { Save, SaveState } from "./saves/SaveGame"
 import { newUUID } from "./saves/uuid"
 import { Singletons } from "./Singletons"
+import { SwampCampGame } from "./SwampCampGame"
 import { HUD } from "./ui/HUD"
 import { PlumePicker } from "./ui/PlumePicker"
 import { EventQueue } from "./world/events/EventQueue"
@@ -161,15 +162,17 @@ class SaveManager {
      * @return true if a save was loaded successfully
      */
     load(slot: number = -1) {
-        const saveKey = slot === -1 ? this.saveKey : this.saveKeyForSlot(slot)
+        this.saveKey = slot === -1 ? this.saveKey : this.saveKeyForSlot(slot)
 
         // ensures that the file exists
-        const save = this.getSave(saveKey)
+        this.loadSave(this.getSave(this.saveKey))
+    }
+
+    loadSave(save: Save) {
         this.state = {
             ...new SaveState(), // initialize default values
             ...save.state,
         }
-        this.saveKey = saveKey
 
         // Logging
         const saveDate = new Date()
@@ -188,6 +191,8 @@ class SaveManager {
                 .getDudes()
                 .find((d) => d.type === DudeType.PLAYER)
         )
+
+        SwampCampGame.instance.loadGameScene()
     }
 
     private getSave(saveKey: string): Save {
