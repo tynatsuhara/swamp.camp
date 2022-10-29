@@ -65,23 +65,26 @@ export const session = {
      * If the client writes data, it will be a no-op that generates a warning log.
      */
     syncData: <T extends object>(id: string, data: T, onChange = (updated: T) => {}) => {
-        let sender: ActionSender<Partial<T>>
-        let receiver: ActionReceiver<Partial<T>>
+        let sendFn: ActionSender<Partial<T>>
+        let receiveFn: ActionReceiver<Partial<T>>
         const lazyInit = () => {
             const [lazySender, lazyReceiver] = room.makeAction<Partial<T>>(id)
-            sender = lazySender
-            receiver = lazyReceiver
+            sendFn = lazySender
+            receiveFn = lazyReceiver
         }
 
         const proxy = new Proxy(data, {
             set(target, property, value, receiver) {
                 // offline syncData is just a normal object
                 if (!session.isOnline()) {
+                    // clear out sender/receiver if they were initialized in a previous session
+                    sendFn = null
+                    receiveFn = null
                     return Reflect.set(target, property, value, receiver)
                 }
 
                 // lazy initialize
-                if (!sender) {
+                if (!sendFn) {
                     lazyInit()
                 }
 
@@ -93,7 +96,7 @@ export const session = {
                     let success = Reflect.set(target, property, value, receiver)
                     if (success) {
                         // @ts-ignore
-                        sender({ [property]: value })
+                        sendFn({ [property]: value })
                     }
 
                     return success
@@ -104,7 +107,7 @@ export const session = {
         if (session.isGuest()) {
             lazyInit()
 
-            receiver((newData) => {
+            receiveFn((newData) => {
                 Object.keys(newData).forEach((key) => {
                     data[key] = newData[key]
                 })
@@ -120,22 +123,25 @@ export const session = {
      * If the client calls this function, it will be a no-op that generates a warning log.
      */
     syncFn: (id: string, fn: () => void) => {
-        let sender: ActionSender<any>
-        let receiver: ActionReceiver<any>
+        let sendFn: ActionSender<any>
+        let receiveFn: ActionReceiver<any>
         const lazyInit = () => {
             const [lazySender, lazyReceiver] = room.makeAction(id)
-            sender = lazySender
-            receiver = lazyReceiver
+            sendFn = lazySender
+            receiveFn = lazyReceiver
         }
 
         const wrappedFn = () => {
             // offline syncFn is just a normal fn
             if (!session.isOnline()) {
+                // clear out sender/receiver if they were initialized in a previous session
+                sendFn = null
+                receiveFn = null
                 fn()
                 return
             }
 
-            if (!sender) {
+            if (!sendFn) {
                 lazyInit()
             }
 
@@ -143,14 +149,14 @@ export const session = {
                 console.warn("client cannot call syncFn")
             } else {
                 fn()
-                sender(null)
+                sendFn(null)
             }
         }
 
         if (session.isGuest()) {
             lazyInit()
 
-            receiver(() => {
+            receiveFn(() => {
                 fn()
             })
         }
