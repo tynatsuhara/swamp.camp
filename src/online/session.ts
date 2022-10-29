@@ -112,4 +112,46 @@ export const session = {
 
         return proxy
     },
+
+    /**
+     * A function which can be called on the host, which will be invoked client-side.
+     * If the client calls this function, it will be a no-op that generates a warning log.
+     */
+    syncFn: (id: string, fn: () => void) => {
+        let sender: ActionSender<any>
+        let receiver: ActionReceiver<any>
+        const lazyInit = () => {
+            const [lazySender, lazyReceiver] = room.makeAction(id)
+            sender = lazySender
+            receiver = lazyReceiver
+        }
+
+        const wrappedFn = () => {
+            // offline syncFn is just a normal fn
+            if (!session.isOnline()) {
+                fn()
+            }
+
+            if (!sender) {
+                lazyInit()
+            }
+
+            if (session.isGuest()) {
+                console.warn("client cannot call syncFn")
+            } else {
+                fn()
+                sender(null)
+            }
+        }
+
+        if (session.isGuest()) {
+            lazyInit()
+
+            receiver(() => {
+                fn()
+            })
+        }
+
+        return wrappedFn
+    },
 }

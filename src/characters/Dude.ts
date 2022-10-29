@@ -289,6 +289,16 @@ export class Dude extends Component implements DialogueSource {
                 }
             }, 1000)
         }
+
+        this.jump = session.syncFn(`${this.syncId}jump`, () => {
+            const ground = this.location.getGround(this.tile)
+            if (!this.canJumpOrRoll || Ground.isWater(ground?.type)) {
+                return
+            }
+            this.canJumpOrRoll = false
+            this.doJump()
+            setTimeout(() => (this.canJumpOrRoll = true), 750)
+        })
     }
 
     update(updateData: UpdateData) {
@@ -1022,15 +1032,7 @@ export class Dude extends Component implements DialogueSource {
         }, animationSpeed * (rotations.length + 1))
     }
 
-    jump() {
-        const ground = this.location.getGround(this.tile)
-        if (!this.canJumpOrRoll || Ground.isWater(ground?.type)) {
-            return
-        }
-        this.canJumpOrRoll = false
-        this.doJump()
-        setTimeout(() => (this.canJumpOrRoll = true), 750)
-    }
+    readonly jump: () => void
 
     get jumping() {
         return this.isJumping
