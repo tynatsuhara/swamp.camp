@@ -5,6 +5,7 @@ import { Camera } from "../cutscenes/Camera"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
 import { ITEM_METADATA_MAP } from "../items/Items"
+import { session } from "../online/session"
 import { PlaceElementDisplay } from "../ui/PlaceElementDisplay"
 import { TextAlign } from "../ui/Text"
 import { UIStateManager } from "../ui/UIStateManager"
@@ -62,6 +63,11 @@ export class Player extends Component {
         }
 
         this.checkIsOffMap(updateData)
+
+        // MPTODO: We will probably want to use GuestPlayer instead of adding this at all
+        if (session.isGuest()) {
+            return
+        }
 
         // TODO: Move to the same code as other conditional effects
         if (this.dude.hasCondition(Condition.HEALING)) {

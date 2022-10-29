@@ -307,6 +307,22 @@ export class Dude extends Component implements DialogueSource {
             this.doJumpAnimation()
             setTimeout(() => (this.canJumpOrRoll = true), 750)
         })
+
+        this.roll = session.syncFn(`${this.syncId}roll`, () => {
+            const ground = this.location.getGround(this.tile)
+            if (!this.canJumpOrRoll || Ground.isWater(ground?.type)) {
+                return
+            }
+            this.canJumpOrRoll = false
+            this.doRollAnimation()
+            this.accelerateConditionExpiration(Condition.ON_FIRE, 500)
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    StepSounds.singleFootstepSound(this, 2)
+                }, i * 150)
+            }
+            setTimeout(() => (this.canJumpOrRoll = true), 750)
+        })
     }
 
     update(updateData: UpdateData) {
@@ -1008,28 +1024,14 @@ export class Dude extends Component implements DialogueSource {
     private jumpingAnimator: Animator
     private jumpingOffset = 0
 
-    roll() {
-        const ground = this.location.getGround(this.tile)
-        if (!this.canJumpOrRoll || Ground.isWater(ground?.type)) {
-            return
-        }
-        this.canJumpOrRoll = false
-        this.doRoll()
-        this.accelerateConditionExpiration(Condition.ON_FIRE, 500)
-        for (let i = 0; i < 3; i++) {
-            setTimeout(() => {
-                StepSounds.singleFootstepSound(this, 2)
-            }, i * 150)
-        }
-        setTimeout(() => (this.canJumpOrRoll = true), 750)
-    }
+    readonly roll: () => void
 
     get rolling() {
         return this.isRolling
     }
 
     // has a rolling animation, however janky
-    private doRoll() {
+    private doRollAnimation() {
         controls.vibrate({
             duration: 100,
             strongMagnitude: 0.2,
