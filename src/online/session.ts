@@ -50,7 +50,12 @@ export const session = {
      */
     isGuest: () => session.isOnline() && !host,
 
-    getRoom: () => room,
+    getPeers: () => room?.getPeers(),
+
+    syncAction: <T extends object>(namespace: string) => {
+        const [send, receive] = room.makeAction<T>(namespace)
+        return { send, receive }
+    },
 
     syncData: <T extends object>(id: string, data: T, onChange = () => {}) => {
         const [sender, receiver] = room.makeAction<Partial<T>>(id)

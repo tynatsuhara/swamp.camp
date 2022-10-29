@@ -18,6 +18,7 @@ import { WalkingParticles } from "../graphics/particles/WalkingParticles"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { Inventory } from "../items/Inventory"
 import { Item, spawnItem } from "../items/Items"
+import { session } from "../online/session"
 import { DudeSaveState } from "../saves/DudeSaveState"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
@@ -49,10 +50,18 @@ import { Weapon } from "./weapons/Weapon"
 import { WeaponFactory } from "./weapons/WeaponFactory"
 import { WeaponType } from "./weapons/WeaponType"
 
+type SyncData = {
+    position: Point // MPTODO this might be inefficient, revisit later
+    manualDepth?: number // MPTODO
+}
+
 export class Dude extends Component implements DialogueSource {
     static readonly PLAYER_COLLISION_LAYER = "playa"
     static readonly NPC_COLLISION_LAYER = "npc"
     static readonly ON_FIRE_LIGHT_DIAMETER = 40
+
+    readonly syncId: string
+    readonly syncData: SyncData
 
     // managed by WorldLocation/LocationManager classes
     location: Location
@@ -172,6 +181,8 @@ export class Dude extends Component implements DialogueSource {
             name,
         } = { ...params }
 
+        this.syncId = uuid.substring(0, 8) // 36^8 should be fine, we have a 12 char limit
+
         this.uuid = uuid
         this.type = type
         this.factions = factions
@@ -241,23 +252,27 @@ export class Dude extends Component implements DialogueSource {
 
         this.start = () => {
             this.seaLevel = this.location.levels?.get(this.tile) ?? 0
-            this.claimResidence(type, uuid, hasPendingSlot)
+            this.claimResidence(type, uuid, hasPendingSlot) // MPTODO how does this get synced?
 
-            this.doWhileLiving(() => {
-                if (
-                    this.isMoving &&
-                    !this.isJumping &&
-                    here().getElement(this.tile)?.type === ElementType.BLACKBERRIES
-                ) {
-                    this.damage(0.25, {
-                        direction: Point.ZERO.randomCircularShift(1),
-                        knockback: 5,
-                        blockable: false,
-                        dodgeable: false,
-                    })
-                }
-            }, 600)
+            if (session.isHost()) {
+                // Damage dudes walking through blackberries
+                this.doWhileLiving(() => {
+                    if (
+                        this.isMoving &&
+                        !this.isJumping &&
+                        here().getElement(this.tile)?.type === ElementType.BLACKBERRIES
+                    ) {
+                        this.damage(0.25, {
+                            direction: Point.ZERO.randomCircularShift(1),
+                            knockback: 5,
+                            blockable: false,
+                            dodgeable: false,
+                        })
+                    }
+                }, 600)
+            }
 
+            // Update dialogue indicator
             this.doWhileLiving(() => {
                 if (this.dialogue && this.dialogue != EMPTY_DIALOGUE) {
                     this.dialogueIndicator = getDialogue(this.dialogue).indicator
@@ -282,6 +297,7 @@ export class Dude extends Component implements DialogueSource {
             transform.position = transform.position.plusY(-this.jumpingOffset)
         }
 
+        // MPTODO
         if (!!this.dialogueInteract) {
             this.dialogueInteract.position = this.standingPosition.minus(new Point(0, 5))
             this.dialogueInteract.uiOffset = new Point(0, -TILE_SIZE * 1.5).plus(
@@ -291,6 +307,7 @@ export class Dude extends Component implements DialogueSource {
                 this.dialogue !== EMPTY_DIALOGUE && DialogueDisplay.instance.source !== this
         }
 
+        // MPTODO
         this.updateActiveConditions()
 
         this.jumpingAnimator?.update(updateData.elapsedTimeMillis)
@@ -312,6 +329,7 @@ export class Dude extends Component implements DialogueSource {
         this.setShield(shield || ShieldType.NONE)
     }
 
+    // MPTODO: How do we sync these functions? syncFn?
     setWeapon(type: WeaponType) {
         if (this.weapon?.getType() === type) {
             return

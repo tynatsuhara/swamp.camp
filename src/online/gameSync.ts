@@ -2,17 +2,17 @@ import { saveManager } from "../SaveManager"
 import { Save } from "../saves/SaveGame"
 import { session } from "./session"
 
-const getInitAction = () => session.getRoom().makeAction("init")
+const getInitAction = () => session.syncAction<Save>("init")
 
 export const hostOnJoin = (peerId: string) => {
-    const [sender] = getInitAction()
+    const { send } = getInitAction()
 
-    sender(saveManager.save(false), [peerId])
+    send(saveManager.save(false), [peerId])
 }
 
 export const guestListenForInit = () => {
-    const [_, receiver] = getInitAction()
-    receiver((data, peerId) => {
+    const { receive } = getInitAction()
+    receive((data, peerId) => {
         console.log(`received save data from ${peerId}:`)
         console.log(data)
         saveManager.loadSave(data as Save)
