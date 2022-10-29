@@ -70,12 +70,12 @@ class SaveManager {
         }
     }
 
-    save() {
+    save(flush = true) {
         if (!Player.instance.dude.isAlive) {
             console.log("cannot save after death")
             return
         }
-        HUD.instance.showSaveIcon()
+
         const save: Save = {
             version: CURRENT_SAVE_FORMAT_VERSION,
             timeSaved: new Date().getTime(),
@@ -85,8 +85,14 @@ class SaveManager {
             eventQueue: EventQueue.instance.save(),
             state: this.state,
         }
-        console.log("saved game")
-        localStorage.setItem(this.saveKey, JSON.stringify(save))
+
+        if (flush) {
+            HUD.instance.showSaveIcon()
+            console.log("saved game")
+            localStorage.setItem(this.saveKey, JSON.stringify(save))
+        }
+
+        return save
     }
 
     // Save managment functions

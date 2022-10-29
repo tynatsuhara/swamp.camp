@@ -3,6 +3,7 @@ import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
+import { hostOnJoin } from "../online/gameSync"
 import { session } from "../online/session"
 import { saveManager } from "../SaveManager"
 import { Settings } from "../Settings"
@@ -150,17 +151,18 @@ export class PauseMenu extends Component {
     private getOnlineOption(): PauseOption {
         if (session.isOnline()) {
             return {
-                text: "LEAVE SESSION",
+                text: `${session.isHost() ? "END" : "LEAVE"} SESSION`,
                 fn: () => {
-                    if (!session.isHost()) {
+                    if (session.isGuest()) {
                         SwampCampGame.instance.loadMainMenu()
                     }
+                    session.close()
                 },
             }
         } else {
             return {
                 text: "OPEN LOBBY",
-                fn: () => session.open(),
+                fn: () => session.open((peerId) => hostOnJoin(peerId)),
             }
         }
     }
