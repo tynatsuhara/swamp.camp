@@ -1097,6 +1097,7 @@ export class Dude extends Component implements DialogueSource {
                 this.animationDirty = true
                 this.jumpingAnimator = undefined
                 this.jumpingOffset = 0
+                this.updateAnimationFromMovement(Point.ZERO)
                 if (this.type === DudeType.PLAYER) {
                     controls.vibrate({
                         duration: 100,
