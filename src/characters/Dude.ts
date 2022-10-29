@@ -53,6 +53,7 @@ import { WeaponType } from "./weapons/WeaponType"
 type SyncData = {
     // MPTODO constantly syncing position might be inefficient, revisit later
     p: { x: number; y: number } // standing position
+    d: { x: number; y: number } // walking direction
     f: boolean // true if facing left, false otherwise
     manualDepth?: number // MPTODO
 }
@@ -189,10 +190,11 @@ export class Dude extends Component implements DialogueSource {
             {
                 p: { x: standingPosition.x, y: standingPosition.y },
                 f: false,
+                d: { x: 0, y: 0 },
             },
             (newData) => {
                 const newStandingPos = pt(newData.p.x, newData.p.y)
-                const direction = newStandingPos.minus(this.standingPosition)
+                const direction = pt(newData.d.x, newData.d.y)
                 this.moveTo(newStandingPos, true, true)
                 this.setFacing(newData.f)
                 this.updateAnimationFromMovement(direction)
@@ -803,6 +805,9 @@ export class Dude extends Component implements DialogueSource {
         direction = direction.normalizedOrZero()
 
         this.updateAnimationFromMovement(direction)
+        if (this.syncData.d.x !== direction.x || this.syncData.d.y !== direction.y) {
+            this.syncData.d = { x: direction.x, y: direction.y }
+        }
 
         // Movement calculations and conditions based on movement — only done host-side
 
@@ -868,8 +873,6 @@ export class Dude extends Component implements DialogueSource {
             const newPos = this.standingPosition.plus(totalMovement)
             this.moveTo(newPos)
         }
-
-        this.animationDirty = false
     }
 
     private seaLevel: number // matches the scale of WorldLocation.levels
@@ -952,6 +955,8 @@ export class Dude extends Component implements DialogueSource {
                 }
             }
         }
+
+        this.animationDirty = false
 
         // Just do this here because why not
         here().getElement(this.tile)?.entity.getComponent(Pushable)?.push(this, direction)
