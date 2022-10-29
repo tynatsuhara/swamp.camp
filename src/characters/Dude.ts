@@ -302,7 +302,7 @@ export class Dude extends Component implements DialogueSource {
                 return
             }
             this.canJumpOrRoll = false
-            this.doJump()
+            this.doJumpAnimation()
             setTimeout(() => (this.canJumpOrRoll = true), 750)
         })
     }
@@ -764,14 +764,7 @@ export class Dude extends Component implements DialogueSource {
         if (existingDir !== facingLeft) {
             this.animation.transform.mirrorX = facingLeft
             if (session.isHost()) {
-                if (this.type === DudeType.PLAYER) {
-                    console.log(`sending f=${facingLeft}`)
-                }
                 this.syncData.f = facingLeft
-            } else {
-                if (this.type === DudeType.PLAYER) {
-                    console.log(`receiving f=${facingLeft}`)
-                }
             }
         }
     }
@@ -1081,7 +1074,7 @@ export class Dude extends Component implements DialogueSource {
     }
 
     // just a stepping dodge instead of a roll
-    private doJump() {
+    private doJumpAnimation() {
         StepSounds.singleFootstepSound(this, 2)
         this.isJumping = true
         this.animation.goToAnimation(2)
