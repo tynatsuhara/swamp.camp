@@ -5,7 +5,6 @@ import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
 import { hostOnJoin } from "../online/gameSync"
 import { session } from "../online/session"
-import { saveManager } from "../SaveManager"
 import { Settings } from "../Settings"
 import { SwampCampGame } from "../SwampCampGame"
 import { here } from "../world/locations/LocationManager"
@@ -53,10 +52,11 @@ export class PauseMenu extends Component {
 
     open() {
         const buttons: PauseOption[] = [
-            {
-                text: "SAVE GAME",
-                fn: () => saveManager.save(),
-            },
+            // TODO figure out how to handle saving with multiplayer
+            // {
+            //     text: "SAVE GAME",
+            //     fn: () => saveManager.save(),
+            // },
             // {
             //     text: "LOAD LAST SAVE",
             //     fn: () => saveManager.load(),
