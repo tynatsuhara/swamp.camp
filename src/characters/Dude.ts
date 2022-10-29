@@ -1,4 +1,4 @@
-import { Component, debug, Point, UpdateData } from "brigsby/dist"
+import { Component, debug, Point, pt, UpdateData } from "brigsby/dist"
 import { BoxCollider } from "brigsby/dist/collision"
 import { RenderMethod } from "brigsby/dist/renderer"
 import { AnimatedSpriteComponent, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
@@ -51,7 +51,8 @@ import { WeaponFactory } from "./weapons/WeaponFactory"
 import { WeaponType } from "./weapons/WeaponType"
 
 type SyncData = {
-    position: Point // MPTODO this might be inefficient, revisit later
+    // MPTODO constantly syncing position might be inefficient, revisit later
+    p: { x: number; y: number } // standing position
     manualDepth?: number // MPTODO
 }
 
@@ -182,6 +183,15 @@ export class Dude extends Component implements DialogueSource {
         } = { ...params }
 
         this.syncId = uuid.substring(0, 8) // 36^8 should be fine, we have a 12 char limit
+        this.syncData = session.syncData(
+            this.syncId,
+            {
+                p: { x: standingPosition.x, y: standingPosition.y },
+            },
+            () => {
+                this.moveTo(pt(this.syncData.p.x, this.syncData.p.y), true, true)
+            }
+        )
 
         this.uuid = uuid
         this.type = type
@@ -911,7 +921,11 @@ export class Dude extends Component implements DialogueSource {
      * @param point World point where the dude will be moved to (standing position),
      *              unless they hit a collider (with skipColliderCheck = false)
      */
-    moveTo(point: Point, skipColliderCheck = false) {
+    moveTo(point: Point, skipColliderCheck = false, isReceivedFromHost = false) {
+        if (session.isGuest() && !isReceivedFromHost) {
+            return
+        }
+
         // movement is done based on top-left corner point
         point = point.minus(this.standingOffset)
 
@@ -920,6 +934,11 @@ export class Dude extends Component implements DialogueSource {
             : (pos: Point) => this.collider.moveTo(pos)
 
         this.position = moveFn(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos)
+
+        // TODO translate to standing pos
+        if (session.isHost()) {
+            this.syncData.p = { x: this.standingPosition.x, y: this.standingPosition.y }
+        }
 
         if (skipColliderCheck) {
             this.seaLevel = this.location.levels?.get(this.tile) ?? 0

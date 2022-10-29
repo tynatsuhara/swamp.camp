@@ -1,4 +1,4 @@
-import { joinRoom, Room } from "trystero"
+import { ActionReceiver, ActionSender, joinRoom, Room } from "trystero"
 
 let room: Room
 let host = true
@@ -57,8 +57,19 @@ export const session = {
         return { send, receive }
     },
 
+    /**
+     * The provided data is the initial data on both host and client.
+     * The client received data from the host when the object is updated.
+     * If the client writes data, it will be a no-op that generates a warning log.
+     */
     syncData: <T extends object>(id: string, data: T, onChange = () => {}) => {
-        const [sender, receiver] = room.makeAction<Partial<T>>(id)
+        let sender: ActionSender<Partial<T>>
+        let receiver: ActionReceiver<Partial<T>>
+        const lazyInit = () => {
+            const [lazySender, lazyReceiver] = room.makeAction<Partial<T>>(id)
+            sender = lazySender
+            receiver = lazyReceiver
+        }
 
         const proxy = new Proxy(data, {
             set(target, property, value, receiver) {
@@ -67,28 +78,37 @@ export const session = {
                     return Reflect.set(target, property, value, receiver)
                 }
 
-                if (!host) {
+                // lazy initialize
+                if (!sender) {
+                    lazyInit()
+                }
+
+                if (session.isGuest()) {
                     console.warn("client cannot update data")
-                    return true
-                }
+                    return true // no-op
+                } else {
+                    // Update the data locally, then sync it
+                    let success = Reflect.set(target, property, value, receiver)
+                    if (success) {
+                        // @ts-ignore
+                        sender({ [property]: value })
+                    }
 
-                // Update the data locally, then sync it
-                let success = Reflect.set(target, property, value, receiver)
-                if (success) {
-                    // @ts-ignore
-                    sender({ [property]: value })
+                    return success
                 }
-
-                return success
             },
         })
 
-        receiver((newData) => {
-            Object.keys(newData).forEach((key) => {
-                data[key] = newData[key]
+        if (session.isGuest()) {
+            lazyInit()
+
+            receiver((newData) => {
+                Object.keys(newData).forEach((key) => {
+                    data[key] = newData[key]
+                })
+                onChange()
             })
-            onChange()
-        })
+        }
 
         return proxy
     },
