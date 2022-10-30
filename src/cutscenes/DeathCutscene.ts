@@ -60,7 +60,7 @@ export class DeathCutscene extends Component {
 
         // If the player dies off map, just put them at a random on-map location.
         // TODO: Respawn them at the doctor, their bed, or somewhere else that makes sense.
-        if (player().isOffMap()) {
+        if (player().dude.getCurrentOffMapArea()) {
             const newSpot = Lists.findRandom(
                 camp().getGroundSpots(),
                 (pos) => !Ground.isWater(camp().getGround(pos)?.type) && !camp().isOccupied(pos)

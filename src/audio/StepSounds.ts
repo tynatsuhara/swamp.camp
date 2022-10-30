@@ -1,7 +1,6 @@
 import { assets } from "brigsby/dist"
 import { Lists, RepeatedInvoker } from "brigsby/dist/util"
 import { Dude } from "../characters/Dude"
-import { DudeType } from "../characters/DudeType"
 import { player } from "../characters/Player"
 import { controls } from "../Controls"
 import { GroundType } from "../world/ground/Ground"
@@ -79,7 +78,7 @@ export class StepSounds {
                 return [StepSounds.MUD_SOUND, 0.3]
             case GroundType.WATER:
             case GroundType.WATERFALL:
-                if (dude.type === DudeType.PLAYER) {
+                if (dude === player().dude) {
                     controls.vibrate({
                         duration: 70,
                         strongMagnitude: 0,

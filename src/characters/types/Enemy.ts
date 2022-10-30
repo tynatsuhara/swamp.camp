@@ -48,7 +48,7 @@ export class Enemy extends Component {
         npc.findTargetRange = Number.MAX_SAFE_INTEGER
 
         if (dude.type === DudeType.ORC_SHAMAN) {
-            // Shamans use AOE attacks and will only target the player
+            // Shamans use AOE attacks and will only target players
             npc.enemyToAttackFilterFn = (enemies) => {
                 return enemies.filter((e) => e.type === DudeType.PLAYER)
             }

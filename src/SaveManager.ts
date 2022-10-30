@@ -1,5 +1,4 @@
 import { debug } from "brigsby/dist"
-import { DudeType } from "./characters/DudeType"
 import { player } from "./characters/Player"
 import { Camera } from "./cutscenes/Camera"
 import { Save, SaveState } from "./saves/SaveGame"
@@ -9,7 +8,7 @@ import { SwampCampGame } from "./SwampCampGame"
 import { HUD } from "./ui/HUD"
 import { PlumePicker } from "./ui/PlumePicker"
 import { EventQueue } from "./world/events/EventQueue"
-import { here, LocationManager } from "./world/locations/LocationManager"
+import { LocationManager } from "./world/locations/LocationManager"
 import { WorldTime } from "./world/WorldTime"
 
 const CURRENT_SAVE_FORMAT_VERSION = 3
@@ -186,13 +185,9 @@ class SaveManager {
         LocationManager.instance.initialize(save.locations)
         EventQueue.instance.initialize(save.eventQueue)
 
-        Camera.instance.focusOnDude(
-            here()
-                .getDudes()
-                .find((d) => d.type === DudeType.PLAYER)
-        )
-
         SwampCampGame.instance.loadGameScene()
+
+        Camera.instance.focusOnDude(player().dude)
     }
 
     private getSave(saveKey: string): Save {

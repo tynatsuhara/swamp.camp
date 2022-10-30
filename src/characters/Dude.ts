@@ -33,6 +33,7 @@ import { Interactable } from "../world/elements/Interactable"
 import { Pushable } from "../world/elements/Pushable"
 import { Ground } from "../world/ground/Ground"
 import { LightManager } from "../world/LightManager"
+import { EAST_COAST_OCEAN_WIDTH } from "../world/locations/CampLocationGenerator"
 import { Location } from "../world/locations/Location"
 import { camp, here } from "../world/locations/LocationManager"
 import { Residence } from "../world/residences/Residence"
@@ -43,7 +44,6 @@ import { DudeAnimationUtils } from "./DudeAnimationUtils"
 import { DudeFaction } from "./DudeFactory"
 import { DudeType } from "./DudeType"
 import { NPC, NPCAttackState } from "./NPC"
-import { Player } from "./Player"
 import { Shield } from "./weapons/Shield"
 import { ShieldFactory } from "./weapons/ShieldFactory"
 import { ShieldType } from "./weapons/ShieldType"
@@ -1207,6 +1207,17 @@ export class Dude extends Component implements DialogueSource {
         super.delete()
     }
 
+    getCurrentOffMapArea(): "swamp" | "ocean" | undefined {
+        if (this.location.isInterior) {
+            return
+        }
+        const range = here().range
+        const pos = this.tile
+        if (pos.x < -range || pos.x > range || pos.y < -range || pos.y > range) {
+            return pos.x > range - EAST_COAST_OCEAN_WIDTH ? "ocean" : "swamp"
+        }
+    }
+
     private claimResidence(type: DudeType, uuid: string, hasPendingSlot: boolean) {
         if (!this.factions.includes(DudeFaction.VILLAGERS)) {
             return
@@ -1272,7 +1283,7 @@ export class Dude extends Component implements DialogueSource {
         if (
             indicator === DudeInteractIndicator.IMPORTANT_DIALOGUE ||
             (this.type === DudeType.PLAYER &&
-                this.entity.getComponent(Player).isOffMap() &&
+                this.getCurrentOffMapArea() &&
                 !CutscenePlayerController.instance.enabled)
         ) {
             // update off screen indicator

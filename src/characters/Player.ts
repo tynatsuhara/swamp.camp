@@ -10,7 +10,6 @@ import { PlaceElementDisplay } from "../ui/PlaceElementDisplay"
 import { TextAlign } from "../ui/Text"
 import { UIStateManager } from "../ui/UIStateManager"
 import { Interactable } from "../world/elements/Interactable"
-import { EAST_COAST_OCEAN_WIDTH } from "../world/locations/CampLocationGenerator"
 import { camp, here, LocationManager } from "../world/locations/LocationManager"
 import { WorldTime } from "../world/WorldTime"
 import { Condition } from "./Condition"
@@ -26,7 +25,6 @@ export const player = (): {
     dude: Dude
     enabled: boolean
     entity: Entity
-    isOffMap: () => string
 } => {
     return playerInstance
 }
@@ -165,17 +163,6 @@ export class Player extends Component {
         }
     }
 
-    isOffMap(): "swamp" | "ocean" | undefined {
-        if (this.dude.location.isInterior) {
-            return
-        }
-        const range = here().range
-        const pos = this.dude.tile
-        if (pos.x < -range || pos.x > range || pos.y < -range || pos.y > range) {
-            return pos.x > range - EAST_COAST_OCEAN_WIDTH ? "ocean" : "swamp"
-        }
-    }
-
     /**
      * @returns a speed multiplier
      */
@@ -227,7 +214,7 @@ export class Player extends Component {
     }
 
     private checkIsOffMap(updateData: UpdateData) {
-        const offMap = this.isOffMap()
+        const offMap = this.dude.getCurrentOffMapArea()
 
         if (offMap && !CutscenePlayerController.instance.enabled) {
             this.timeOffMap += updateData.elapsedTimeMillis
