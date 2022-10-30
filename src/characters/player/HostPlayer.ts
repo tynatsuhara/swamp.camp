@@ -4,7 +4,6 @@ import { controls } from "../../Controls"
 import { CutscenePlayerController } from "../../cutscenes/CutscenePlayerController"
 import { TextOverlayManager } from "../../cutscenes/TextOverlayManager"
 import { ITEM_METADATA_MAP } from "../../items/Items"
-import { session } from "../../online/session"
 import { PlaceElementDisplay } from "../../ui/PlaceElementDisplay"
 import { TextAlign } from "../../ui/Text"
 import { UIStateManager } from "../../ui/UIStateManager"
@@ -27,11 +26,6 @@ export class HostPlayer extends AbstractPlayer {
 
     update(updateData: UpdateData) {
         if (!this.dude.isAlive) {
-            return
-        }
-
-        // MPTODO: We will probably want to use GuestPlayer instead of adding this at all
-        if (session.isGuest()) {
             return
         }
 

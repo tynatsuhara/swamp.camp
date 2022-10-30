@@ -119,7 +119,6 @@ export class DudeFactory {
                 maxHealth = 4
                 speed = 0.075
                 if (session.isHost()) {
-                    // this is the host player
                     const isHostPlayerDude = !uuid.startsWith(ONLINE_PLAYER_DUDE_ID_PREFIX)
                     if (isHostPlayerDude) {
                         additionalComponents = [new HostPlayer(), new CutscenePlayerController()]
