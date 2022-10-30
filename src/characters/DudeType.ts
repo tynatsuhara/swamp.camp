@@ -1,5 +1,5 @@
 export enum DudeType {
-    PLAYER, // MPTODO make sure everything supports multiple PLAYERs existing
+    PLAYER,
     DIP,
     ELF,
     ORC_WARRIOR,
