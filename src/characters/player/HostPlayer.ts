@@ -1,75 +1,29 @@
-import { ButtonState, Component, debug, Entity, Point, UpdateData } from "brigsby/dist"
+import { ButtonState, debug, Point, UpdateData } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
-import { controls } from "../Controls"
-import { Camera } from "../cutscenes/Camera"
-import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
-import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
-import { ITEM_METADATA_MAP } from "../items/Items"
-import { session } from "../online/session"
-import { PlaceElementDisplay } from "../ui/PlaceElementDisplay"
-import { TextAlign } from "../ui/Text"
-import { UIStateManager } from "../ui/UIStateManager"
-import { Interactable } from "../world/elements/Interactable"
-import { camp, here, LocationManager } from "../world/locations/LocationManager"
-import { WorldTime } from "../world/WorldTime"
-import { Condition } from "./Condition"
-import { Dude } from "./Dude"
-import { DudeSpawner } from "./DudeSpawner"
+import { controls } from "../../Controls"
+import { CutscenePlayerController } from "../../cutscenes/CutscenePlayerController"
+import { TextOverlayManager } from "../../cutscenes/TextOverlayManager"
+import { ITEM_METADATA_MAP } from "../../items/Items"
+import { session } from "../../online/session"
+import { PlaceElementDisplay } from "../../ui/PlaceElementDisplay"
+import { TextAlign } from "../../ui/Text"
+import { UIStateManager } from "../../ui/UIStateManager"
+import { Interactable } from "../../world/elements/Interactable"
+import { camp, here, LocationManager } from "../../world/locations/LocationManager"
+import { WorldTime } from "../../world/WorldTime"
+import { Condition } from "../Condition"
+import { DudeSpawner } from "../DudeSpawner"
+import { AbstractPlayer } from "./AbstractPlayer"
 
-let playerInstance: Player
-
-/**
- * @returns A reference to the local player
- */
-export const player = (): {
-    dude: Dude
-    enabled: boolean
-    entity: Entity
-} => {
-    return playerInstance
-}
-
-export const resetPlayerInstances = () => {
-    playerInstance = undefined
-}
-
-export class Player extends Component {
+export class HostPlayer extends AbstractPlayer {
     private rollingMomentum: Point
     private _velocity: Point = Point.ZERO
     get velocity() {
         return this._velocity
     }
-    private _dude: Dude
-    get dude() {
-        return this._dude
-    }
 
     private offMapWarningShown = false
     private timeOffMap = 0
-
-    constructor() {
-        super()
-        playerInstance = this
-    }
-
-    awake() {
-        this._dude = this.entity.getComponent(Dude)
-        this.dude.setOnDamageCallback((blocked) => {
-            // TODO: Add controller vibration if possible
-            if (!this.dude.isAlive) {
-                Camera.instance.shake(6, 600)
-            } else if (blocked) {
-                Camera.instance.shake(2.5, 400)
-            } else {
-                Camera.instance.shake(3.5, 400)
-            }
-            controls.vibrate({
-                duration: 300,
-                strongMagnitude: 0.5,
-                weakMagnitude: 0.5,
-            })
-        })
-    }
 
     update(updateData: UpdateData) {
         if (!this.dude.isAlive) {

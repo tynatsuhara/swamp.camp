@@ -1,5 +1,5 @@
 import { debug } from "brigsby/dist"
-import { player } from "./characters/Player"
+import { player } from "./characters/player"
 import { Camera } from "./cutscenes/Camera"
 import { Save, SaveState } from "./saves/SaveGame"
 import { newUUID } from "./saves/uuid"

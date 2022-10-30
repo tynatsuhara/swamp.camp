@@ -1,4 +1,4 @@
-import { player } from "../characters/Player"
+import { player } from "../characters/player"
 import { saveManager } from "../SaveManager"
 import { Notification, NotificationDisplay } from "../ui/NotificationDisplay"
 import { Inventory, ItemStackMetadata } from "./Inventory"

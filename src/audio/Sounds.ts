@@ -1,5 +1,5 @@
 import { assets, Point } from "brigsby/dist"
-import { player } from "../characters/Player"
+import { player } from "../characters/player"
 import { Settings } from "../Settings"
 
 /**

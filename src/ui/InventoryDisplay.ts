@@ -6,7 +6,7 @@ import {
     SpriteComponent,
     SpriteTransform,
 } from "brigsby/dist/sprites"
-import { player } from "../characters/Player"
+import { player } from "../characters/player"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { WeaponType } from "../characters/weapons/WeaponType"
 import { controls } from "../Controls"

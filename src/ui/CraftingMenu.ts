@@ -4,7 +4,7 @@ import { NineSlice, SpriteTransform, StaticSpriteSource } from "brigsby/dist/spr
 import { Maths } from "brigsby/dist/util"
 import { loadAudio } from "../audio/DeferLoadAudio"
 import { Sounds } from "../audio/Sounds"
-import { player } from "../characters/Player"
+import { player } from "../characters/player"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { ImageFilters } from "../graphics/ImageFilters"

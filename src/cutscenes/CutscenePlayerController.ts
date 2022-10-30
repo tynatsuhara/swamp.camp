@@ -1,6 +1,6 @@
 import { Component, Point, UpdateData } from "brigsby/dist"
 import { Dude } from "../characters/Dude"
-import { player } from "../characters/Player"
+import { player } from "../characters/player"
 
 export class CutscenePlayerController extends Component {
     static instance: CutscenePlayerController

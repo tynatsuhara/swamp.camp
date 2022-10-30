@@ -1,5 +1,5 @@
 import { Component, Entity, Point } from "brigsby/dist"
-import { player } from "../characters/Player"
+import { player } from "../characters/player"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { Camera } from "../cutscenes/Camera"
 import { TILE_SIZE } from "../graphics/Tilesets"

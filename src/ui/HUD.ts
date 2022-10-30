@@ -7,7 +7,7 @@ import {
 } from "brigsby/dist/sprites"
 import { Condition } from "../characters/Condition"
 import { Dude } from "../characters/Dude"
-import { player } from "../characters/Player"
+import { player } from "../characters/player"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"

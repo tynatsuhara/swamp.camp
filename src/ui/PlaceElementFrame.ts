@@ -1,7 +1,7 @@
 import { Component, Point } from "brigsby/dist"
 import { NineSlice, SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Maths } from "brigsby/dist/util"
-import { player } from "../characters/Player"
+import { player } from "../characters/player"
 import { controls } from "../Controls"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { ElementComponent } from "../world/elements/ElementComponent"

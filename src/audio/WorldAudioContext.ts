@@ -1,4 +1,4 @@
-import { player } from "../characters/Player"
+import { player } from "../characters/player"
 import { Singletons } from "../Singletons"
 import { Ambiance } from "./Ambiance"
 import { Music } from "./Music"

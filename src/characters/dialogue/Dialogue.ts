@@ -1,6 +1,6 @@
 import { saveManager } from "../../SaveManager"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
-import { player } from "../Player"
+import { player } from "../player"
 import { BERTO_INTRO_DIALOGUE } from "./BertoDialogue"
 import { DIP_INTRO_DIALOGUE } from "./DipDialogue"
 import { DOCTOR_DIALOGUE } from "./DoctorDialogue"

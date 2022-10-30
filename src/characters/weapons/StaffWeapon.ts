@@ -8,7 +8,7 @@ import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Color } from "../../ui/Color"
 import { GroundRenderer } from "../../world/GroundRenderer"
 import { here } from "../../world/locations/LocationManager"
-import { player } from "../Player"
+import { player } from "../player"
 import { Weapon } from "./Weapon"
 import { WeaponType } from "./WeaponType"
 

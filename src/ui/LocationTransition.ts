@@ -1,7 +1,7 @@
 import { Component, Point, UpdateData } from "brigsby/dist"
 import { ImageRender } from "brigsby/dist/renderer"
 import { Animator } from "brigsby/dist/util"
-import { player } from "../characters/Player"
+import { player } from "../characters/player"
 import { Camera } from "../cutscenes/Camera"
 import { Color } from "./Color"
 import { UIStateManager } from "./UIStateManager"

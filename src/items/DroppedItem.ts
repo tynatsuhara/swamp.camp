@@ -4,7 +4,7 @@ import { SpriteComponent } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
 import { loadAudio } from "../audio/DeferLoadAudio"
 import { Sounds } from "../audio/Sounds"
-import { player } from "../characters/Player"
+import { player } from "../characters/player"
 import { here } from "../world/locations/LocationManager"
 import { Item, ItemMetadata, ITEM_METADATA_MAP } from "./Items"
 

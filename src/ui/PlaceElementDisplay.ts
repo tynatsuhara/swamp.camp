@@ -1,6 +1,6 @@
 import { Component, Entity, Point, UpdateData } from "brigsby/dist"
 import { Grid, Maths } from "brigsby/dist/util"
-import { player } from "../characters/Player"
+import { player } from "../characters/player"
 import { controls } from "../Controls"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { ItemStack } from "../items/Inventory"

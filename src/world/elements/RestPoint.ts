@@ -1,6 +1,6 @@
 import { Component } from "brigsby/dist"
 import { NPC } from "../../characters/NPC"
-import { player } from "../../characters/Player"
+import { player } from "../../characters/player"
 import { saveManager } from "../../SaveManager"
 import { HUD } from "../../ui/HUD"
 import { DarknessMask } from "../DarknessMask"

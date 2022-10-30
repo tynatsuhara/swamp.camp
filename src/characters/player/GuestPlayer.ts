@@ -1,12 +1,9 @@
-import { Component, UpdateData } from "brigsby/dist"
-import { session } from "../online/session"
+import { UpdateData } from "brigsby/dist"
+import { session } from "../../online/session"
+import { AbstractPlayer } from "./AbstractPlayer"
 
 // TODO
-export class GuestPlayer extends Component {
-    constructor() {
-        super()
-    }
-
+export class GuestPlayer extends AbstractPlayer {
     update(updateData: UpdateData): void {
         if (session.isGuest()) {
             // send input to host

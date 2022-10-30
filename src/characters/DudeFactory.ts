@@ -4,6 +4,8 @@ import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 import { Inventory } from "../items/Inventory"
 import { Item } from "../items/Items"
 import { PlayerInventory } from "../items/PlayerInventory"
+import { session } from "../online/session"
+import { MULTIPLAYER_ID } from "../online/sync"
 import { DudeSaveState } from "../saves/DudeSaveState"
 import { newUUID } from "../saves/uuid"
 import { Singletons } from "../Singletons"
@@ -18,7 +20,9 @@ import { Dude } from "./Dude"
 import { DudeType } from "./DudeType"
 import { peopleNames } from "./NameFactory"
 import { NPC } from "./NPC"
-import { player, Player } from "./Player"
+import { player } from "./player"
+import { GuestPlayer } from "./player/GuestPlayer"
+import { HostPlayer } from "./player/HostPlayer"
 import { AquaticNPC } from "./types/AquaticNPC"
 import { Berto } from "./types/Berto"
 import { Centaur } from "./types/Centaur"
@@ -114,12 +118,26 @@ export class DudeFactory {
                 shield = ShieldType.BASIC
                 maxHealth = 4
                 speed = 0.075
-                if (!uuid.startsWith(ONLINE_PLAYER_DUDE_ID_PREFIX)) {
-                    additionalComponents = [new Player(), new CutscenePlayerController()]
-                    window["player"] = additionalComponents[0]
-                    inventoryClass = PlayerInventory
-                    defaultInventory = new PlayerInventory()
+                if (session.isHost()) {
+                    // this is the host player
+                    const isHostPlayerDude = !uuid.startsWith(ONLINE_PLAYER_DUDE_ID_PREFIX)
+                    if (isHostPlayerDude) {
+                        additionalComponents = [new HostPlayer(), new CutscenePlayerController()]
+                        window["player"] = additionalComponents[0]
+                    }
+                } else {
+                    /**
+                     * For guest sessions, all the players are basically normal dudes
+                     * except for the one that you control, which is responsible for
+                     * sending data to the host to update that dude
+                     */
+                    if (uuid === ONLINE_PLAYER_DUDE_ID_PREFIX + MULTIPLAYER_ID) {
+                        additionalComponents = [new GuestPlayer()]
+                    }
                 }
+                // MPTODO: We probably need a GuestPlayerInventory
+                inventoryClass = PlayerInventory
+                defaultInventory = new PlayerInventory()
                 defaultInventory.addItem(Item.SWORD)
                 defaultInventory.addItem(Item.BASIC_SHIELD)
                 break

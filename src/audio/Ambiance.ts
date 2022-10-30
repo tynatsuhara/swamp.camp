@@ -1,5 +1,5 @@
 import { Lists } from "brigsby/dist/util"
-import { player } from "../characters/Player"
+import { player } from "../characters/player"
 import { Settings } from "../Settings"
 import { DarknessMask } from "../world/DarknessMask"
 import { LightManager } from "../world/LightManager"

@@ -1,5 +1,5 @@
 import { Component, Point, UpdateData } from "brigsby/dist"
-import { player } from "../characters/Player"
+import { player } from "../characters/player"
 import { Settings } from "../Settings"
 
 // We store and use a single instance of each unique audio file because having

@@ -1,7 +1,7 @@
 import { assets } from "brigsby/dist"
 import { Lists, RepeatedInvoker } from "brigsby/dist/util"
 import { Dude } from "../characters/Dude"
-import { player } from "../characters/Player"
+import { player } from "../characters/player"
 import { controls } from "../Controls"
 import { GroundType } from "../world/ground/Ground"
 import { here } from "../world/locations/LocationManager"

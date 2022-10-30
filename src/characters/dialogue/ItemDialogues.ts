@@ -8,7 +8,7 @@ import { RestPoint } from "../../world/elements/RestPoint"
 import { here } from "../../world/locations/LocationManager"
 import { TimeUnit } from "../../world/TimeUnit"
 import { WorldTime } from "../../world/WorldTime"
-import { player } from "../Player"
+import { player } from "../player"
 import { ShieldType } from "../weapons/ShieldType"
 import {
     dialogue,

@@ -20,7 +20,7 @@ import { NPCTaskContext } from "./ai/NPCTaskContext"
 import { NPCTaskFactory } from "./ai/NPCTaskFactory"
 import { Condition } from "./Condition"
 import { Dude } from "./Dude"
-import { player } from "./Player"
+import { player } from "./player"
 
 // TODO maybe this shouldn't be NPC-specific
 export enum NPCAttackState {

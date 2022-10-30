@@ -1,5 +1,5 @@
 import { Entity } from "brigsby/dist"
-import { player } from "../characters/Player"
+import { player } from "../characters/player"
 import { Camera } from "../cutscenes/Camera"
 import { spawnMenu } from "../debug/SpawnMenu"
 import { Singletons } from "../Singletons"

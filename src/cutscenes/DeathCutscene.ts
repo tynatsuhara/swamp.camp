@@ -1,7 +1,7 @@
 import { Component, Point } from "brigsby/dist"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
-import { player } from "../characters/Player"
+import { player } from "../characters/player"
 import { Enemy } from "../characters/types/Enemy"
 import { ShroomNPC } from "../characters/types/ShroomNPC"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
