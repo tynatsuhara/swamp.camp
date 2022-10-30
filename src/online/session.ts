@@ -56,4 +56,14 @@ export const session = {
     getRoom: () => room,
 
     getPeers: () => room?.getPeers(),
+
+    pingPeers: () => {
+        room.getPeers().forEach((p) =>
+            room.ping(p).then((pingVal) => {
+                console.log(`${p}: ${pingVal} ms`)
+            })
+        )
+    },
 }
+
+window["session"] = session
