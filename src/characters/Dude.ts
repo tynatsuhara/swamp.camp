@@ -122,6 +122,9 @@ export class Dude extends Component implements DialogueSource {
     get isMoving() {
         return this._isMoving
     }
+    get velocity() {
+        return pt(this.syncData.d.x, this.syncData.d.y)
+    }
 
     // manually set a depth for the player sprite
     manualDepth = undefined

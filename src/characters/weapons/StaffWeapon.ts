@@ -184,7 +184,7 @@ export class StaffWeapon extends Weapon {
         if (!player().dude.isAlive) {
             return
         }
-        return player().dude.standingPosition.plus(player().velocity.times(60))
+        return player().dude.standingPosition.plus(player().dude.velocity.times(60))
     }
 
     private explosionParticleEffects() {

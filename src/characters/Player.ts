@@ -1,4 +1,4 @@
-import { ButtonState, Component, debug, Point, UpdateData } from "brigsby/dist"
+import { ButtonState, Component, debug, Entity, Point, UpdateData } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
@@ -19,7 +19,12 @@ import { DudeSpawner } from "./DudeSpawner"
 
 let playerInstance: Player
 
-export const player = () => {
+export const player = (): {
+    dude: Dude
+    enabled: boolean
+    entity: Entity
+    isOffMap: () => string
+} => {
     return playerInstance
 }
 
