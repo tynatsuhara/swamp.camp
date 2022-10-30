@@ -18,7 +18,7 @@ import { Dude } from "./Dude"
 import { DudeType } from "./DudeType"
 import { peopleNames } from "./NameFactory"
 import { NPC } from "./NPC"
-import { Player } from "./Player"
+import { player, Player } from "./Player"
 import { AquaticNPC } from "./types/AquaticNPC"
 import { Berto } from "./types/Berto"
 import { Centaur } from "./types/Centaur"
@@ -48,9 +48,22 @@ export enum DudeFaction {
 const DEFAULT_COLLIDER_SIZE = new Point(10, 8)
 const BIG_COLLIDER_SIZE = new Point(15, 12)
 
+const ONLINE_PLAYER_ID_PREFIX = "mp:"
+
 export class DudeFactory {
     static get instance() {
         return Singletons.getOrCreate(DudeFactory)
+    }
+
+    newOnlinePlayer(multiplayerId: string) {
+        const hostPlayer = player().dude
+        this.make(
+            DudeType.PLAYER,
+            hostPlayer.standingPosition,
+            { uuid: ONLINE_PLAYER_ID_PREFIX + multiplayerId },
+            hostPlayer.location,
+            false
+        )
     }
 
     /**
@@ -72,7 +85,7 @@ export class DudeFactory {
     private make(
         type: DudeType,
         pos: Point,
-        saveState: DudeSaveState,
+        saveState: Partial<DudeSaveState>,
         location: Location,
         hasPendingSlot: boolean
     ): Dude {
@@ -101,10 +114,12 @@ export class DudeFactory {
                 shield = ShieldType.BASIC
                 maxHealth = 4
                 speed = 0.075
-                additionalComponents = [new Player(), new CutscenePlayerController()]
-                window["player"] = additionalComponents[0]
-                inventoryClass = PlayerInventory
-                defaultInventory = new PlayerInventory()
+                if (!uuid.startsWith(ONLINE_PLAYER_ID_PREFIX)) {
+                    additionalComponents = [new Player(), new CutscenePlayerController()]
+                    window["player"] = additionalComponents[0]
+                    inventoryClass = PlayerInventory
+                    defaultInventory = new PlayerInventory()
+                }
                 defaultInventory.addItem(Item.SWORD)
                 defaultInventory.addItem(Item.BASIC_SHIELD)
                 break

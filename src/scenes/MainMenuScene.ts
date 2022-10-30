@@ -14,7 +14,7 @@ import { FireParticles } from "../graphics/particles/FireParticles"
 import { Particles } from "../graphics/particles/Particles"
 import { getFilesToLoadForGame, getImage, Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { session } from "../online/session"
-import { guestListenForInit } from "../online/sync"
+import { guestOnJoin } from "../online/sync"
 import { saveManager } from "../SaveManager"
 import { Save } from "../saves/SaveGame"
 import { IS_NATIVE_APP, SwampCampGame, ZOOM } from "../SwampCampGame"
@@ -189,8 +189,8 @@ export class MainMenuScene {
                         session.join().then(() => {
                             console.log(session.getPeers())
                             console.log("joined online session")
+                            guestOnJoin()
                         })
-                        guestListenForInit()
                     })
                     .add("Download", () => this.render(Menu.DOWNLOADS), !IS_NATIVE_APP)
                     .add("Credits", () => this.render(Menu.CREDITS))

@@ -1,4 +1,5 @@
 import { ActionReceiver, ActionSender, Room } from "trystero"
+import { DudeFactory } from "../characters/DudeFactory"
 import { saveManager } from "../SaveManager"
 import { Save } from "../saves/SaveGame"
 import { newUUID } from "../saves/uuid"
@@ -10,6 +11,7 @@ import { session } from "./session"
  */
 
 let hostId: string
+let initializedPeers: string[] = []
 
 // Store a stable multiplayer ID for the user.
 const MULTIPLAYER_ID_KEY = "multiplayer_id"
@@ -19,24 +21,44 @@ if (!localStorage.getItem(MULTIPLAYER_ID_KEY)) {
 export const MULTIPLAYER_ID = localStorage.getItem(MULTIPLAYER_ID_KEY)
 
 // Core actions
-const actionInit = () => session.getRoom().makeAction<Save>("init")
+const actionMultiplayerId = () => session.getRoom().makeAction<{ id: string }>("mpid")
+const actionInitWorld = () => session.getRoom().makeAction<Save>("init")
+const actionInitWorldAck = () => session.getRoom().makeAction<void>("init:ack")
 
 // Called when a new user has joined the game
 export const hostOnJoin = (peerId: string) => {
-    // MPTODO: Refactor this so that the action doesn't get re-initialized if a third player joins
-    const [send, receive] = actionInit()
+    // MPTODO: Refactor this so that these actions don't get re-initialized if a third player joins
+    const [_, receiveMultiplayerId] = actionMultiplayerId()
+    const [sendInitWorld] = actionInitWorld()
+    const [_2, receiveInitWorldAck] = actionInitWorldAck()
 
-    send(saveManager.save(false), [peerId])
+    receiveMultiplayerId(({ id }, peerId) => {
+        DudeFactory.instance.newOnlinePlayer(id)
+        sendInitWorld(saveManager.save(false), peerId)
+    })
+
+    receiveInitWorldAck((_, peerId) => {
+        initializedPeers.push(peerId)
+    })
+
+    session.getRoom().onPeerLeave((peerId) => {
+        initializedPeers = initializedPeers.filter((p) => p !== peerId)
+    })
 }
 
-export const guestListenForInit = () => {
-    const [send, receive] = actionInit()
+export const guestOnJoin = () => {
+    const [sendMultiplayerId] = actionMultiplayerId()
+    const [_, receiveInitWorld] = actionInitWorld()
+    const [sendInitWorldAck] = actionInitWorldAck()
 
-    receive((data, peerId) => {
+    sendMultiplayerId({ id: MULTIPLAYER_ID })
+
+    receiveInitWorld((data, peerId) => {
         hostId = peerId
         console.log(`received save data from ${peerId}:`)
         console.log(data)
         saveManager.loadSave(data as Save)
+        sendInitWorldAck(null, hostId)
     })
 
     session.getRoom().onPeerLeave((peerId) => {
@@ -87,7 +109,7 @@ export const syncFn = <T extends any[]>(id: string, fn: (...args: T) => void) =>
             console.warn("client cannot call syncFn")
         } else {
             fn(...args)
-            sendFn(args)
+            sendFn(args, initializedPeers)
         }
     }
 
@@ -146,7 +168,7 @@ export const syncData = <T extends object>(id: string, data: T, onChange = (upda
                 let success = Reflect.set(target, property, value, receiver)
                 if (success) {
                     // @ts-ignore
-                    sendFn({ [property]: value })
+                    sendFn({ [property]: value }, initializedPeers)
                 }
 
                 return success
