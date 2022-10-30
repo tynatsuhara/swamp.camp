@@ -19,6 +19,9 @@ import { DudeSpawner } from "./DudeSpawner"
 
 let playerInstance: Player
 
+/**
+ * @returns A reference to the local player
+ */
 export const player = (): {
     dude: Dude
     enabled: boolean

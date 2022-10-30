@@ -5,6 +5,10 @@ import { newUUID } from "../saves/uuid"
 import { SwampCampGame } from "../SwampCampGame"
 import { session } from "./session"
 
+/**
+ * Utilities for syncing game state and logic
+ */
+
 let hostId: string
 
 // Store a stable multiplayer ID for the user.
@@ -17,7 +21,9 @@ export const MULTIPLAYER_ID = localStorage.getItem(MULTIPLAYER_ID_KEY)
 // Core actions
 const actionInit = () => session.getRoom().makeAction<Save>("init")
 
+// Called when a new user has joined the game
 export const hostOnJoin = (peerId: string) => {
+    // MPTODO: Refactor this so that the action doesn't get re-initialized if a third player joins
     const [send, receive] = actionInit()
 
     send(saveManager.save(false), [peerId])
