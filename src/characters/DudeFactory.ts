@@ -48,7 +48,7 @@ export enum DudeFaction {
 const DEFAULT_COLLIDER_SIZE = new Point(10, 8)
 const BIG_COLLIDER_SIZE = new Point(15, 12)
 
-const ONLINE_PLAYER_ID_PREFIX = "mp:"
+export const ONLINE_PLAYER_DUDE_ID_PREFIX = "mp:"
 
 export class DudeFactory {
     static get instance() {
@@ -60,7 +60,7 @@ export class DudeFactory {
         this.make(
             DudeType.PLAYER,
             hostPlayer.standingPosition,
-            { uuid: ONLINE_PLAYER_ID_PREFIX + multiplayerId },
+            { uuid: ONLINE_PLAYER_DUDE_ID_PREFIX + multiplayerId },
             hostPlayer.location,
             false
         )
@@ -114,7 +114,7 @@ export class DudeFactory {
                 shield = ShieldType.BASIC
                 maxHealth = 4
                 speed = 0.075
-                if (!uuid.startsWith(ONLINE_PLAYER_ID_PREFIX)) {
+                if (!uuid.startsWith(ONLINE_PLAYER_DUDE_ID_PREFIX)) {
                     additionalComponents = [new Player(), new CutscenePlayerController()]
                     window["player"] = additionalComponents[0]
                     inventoryClass = PlayerInventory

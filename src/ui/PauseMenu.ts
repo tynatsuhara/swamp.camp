@@ -4,7 +4,7 @@ import { Camera } from "../cutscenes/Camera"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
 import { session } from "../online/session"
-import { hostOnJoin } from "../online/sync"
+import { hostOnJoin, hostSessionClose } from "../online/sync"
 import { Settings } from "../Settings"
 import { SwampCampGame } from "../SwampCampGame"
 import { here } from "../world/locations/LocationManager"
@@ -155,8 +155,9 @@ export class PauseMenu extends Component {
                 fn: () => {
                     if (session.isGuest()) {
                         SwampCampGame.instance.loadMainMenu()
+                    } else {
+                        hostSessionClose()
                     }
-                    session.close()
                 },
             }
         } else {

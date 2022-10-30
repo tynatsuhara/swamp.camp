@@ -1,9 +1,10 @@
 import { ActionReceiver, ActionSender, Room } from "trystero"
-import { DudeFactory } from "../characters/DudeFactory"
+import { DudeFactory, ONLINE_PLAYER_DUDE_ID_PREFIX } from "../characters/DudeFactory"
 import { saveManager } from "../SaveManager"
 import { Save } from "../saves/SaveGame"
 import { newUUID } from "../saves/uuid"
 import { SwampCampGame } from "../SwampCampGame"
+import { here } from "../world/locations/LocationManager"
 import { session } from "./session"
 
 /**
@@ -12,6 +13,7 @@ import { session } from "./session"
 
 let hostId: string
 let initializedPeers: string[] = []
+const peerToMultiplayerId: Record<string, string> = {}
 
 // Store a stable multiplayer ID for the user.
 const MULTIPLAYER_ID_KEY = "multiplayer_id"
@@ -33,6 +35,7 @@ export const hostOnJoin = (peerId: string) => {
     const [_2, receiveInitWorldAck] = actionInitWorldAck()
 
     receiveMultiplayerId(({ id }, peerId) => {
+        peerToMultiplayerId[peerId] = id
         DudeFactory.instance.newOnlinePlayer(id)
         sendInitWorld(saveManager.save(false), peerId)
     })
@@ -42,10 +45,17 @@ export const hostOnJoin = (peerId: string) => {
     })
 
     session.getRoom().onPeerLeave((peerId) => {
-        initializedPeers = initializedPeers.filter((p) => p !== peerId)
+        cleanUpPeer(peerId)
     })
 }
 
+export const hostSessionClose = () => {
+    session.close()
+    initializedPeers.forEach((p) => cleanUpPeer(p))
+    initializedPeers = []
+}
+
+// MPTODO it seems like something here is breaking if the host closes then reopens the lobby
 export const guestOnJoin = () => {
     const [sendMultiplayerId] = actionMultiplayerId()
     const [_, receiveInitWorld] = actionInitWorld()
@@ -188,4 +198,13 @@ export const syncData = <T extends object>(id: string, data: T, onChange = (upda
     }
 
     return proxy
+}
+
+const cleanUpPeer = (peerId: string) => {
+    // TODO: Change the cleanup logic so that their state is still persisted for future joins
+    const multiplayerDude = here()
+        .getDudes()
+        .find((d) => d.uuid === ONLINE_PLAYER_DUDE_ID_PREFIX + peerToMultiplayerId[peerId])
+    here().removeDude(multiplayerDude)
+    initializedPeers = initializedPeers.filter((p) => p !== peerId)
 }
