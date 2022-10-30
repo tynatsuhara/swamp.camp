@@ -7,6 +7,7 @@ import { Enemy } from "../../characters/types/Enemy"
 import { Camera } from "../../cutscenes/Camera"
 import { CutscenePlayerController } from "../../cutscenes/CutscenePlayerController"
 import { Particles } from "../../graphics/particles/Particles"
+import { syncFn } from "../../online/gameSync"
 import { session } from "../../online/session"
 import { LocationManagerSaveState } from "../../saves/LocationManagerSaveState"
 import { Singletons } from "../../Singletons"
@@ -171,7 +172,7 @@ export class LocationManager {
     /**
      * @param afterTransitionCallback Only should be supplied host-side!
      */
-    private playerLoadLocal = session.syncFn(
+    private playerLoadLocal = syncFn(
         "lm:pll",
         (uuid: string, px: number, py: number, afterTransitionCallback?: () => void) => {
             const newLocation = this.get(uuid)

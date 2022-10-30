@@ -18,6 +18,7 @@ import { WalkingParticles } from "../graphics/particles/WalkingParticles"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { Inventory } from "../items/Inventory"
 import { Item, spawnItem } from "../items/Items"
+import { syncData, syncFn } from "../online/gameSync"
 import { session } from "../online/session"
 import { DudeSaveState } from "../saves/DudeSaveState"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
@@ -188,7 +189,7 @@ export class Dude extends Component implements DialogueSource {
         } = { ...params }
 
         this.syncId = uuid.substring(0, 8) // 36^8 should be fine, we have a 12 char limit
-        this.syncData = session.syncData(
+        this.syncData = syncData(
             this.syncId,
             {
                 p: { x: standingPosition.x, y: standingPosition.y },
@@ -301,7 +302,7 @@ export class Dude extends Component implements DialogueSource {
             }, 1000)
         }
 
-        this.jump = session.syncFn(`${this.syncId}jump`, () => {
+        this.jump = syncFn(`${this.syncId}jump`, () => {
             const ground = this.location.getGround(this.tile)
             if (!this.canJumpOrRoll || Ground.isWater(ground?.type)) {
                 return
@@ -311,7 +312,7 @@ export class Dude extends Component implements DialogueSource {
             setTimeout(() => (this.canJumpOrRoll = true), 750)
         })
 
-        this.roll = session.syncFn(`${this.syncId}roll`, () => {
+        this.roll = syncFn(`${this.syncId}roll`, () => {
             const ground = this.location.getGround(this.tile)
             if (!this.canJumpOrRoll || Ground.isWater(ground?.type)) {
                 return

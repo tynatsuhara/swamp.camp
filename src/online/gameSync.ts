@@ -1,20 +1,31 @@
+import { ActionReceiver, ActionSender, Room } from "trystero"
 import { saveManager } from "../SaveManager"
 import { Save } from "../saves/SaveGame"
+import { newUUID } from "../saves/uuid"
 import { SwampCampGame } from "../SwampCampGame"
 import { session } from "./session"
 
 let hostId: string
 
-const getInitAction = () => session.syncAction<Save>("init")
+// Store a stable multiplayer ID for the user.
+const MULTIPLAYER_ID_KEY = "multiplayer_id"
+if (!localStorage.getItem(MULTIPLAYER_ID_KEY)) {
+    localStorage.setItem(MULTIPLAYER_ID_KEY, newUUID())
+}
+export const MULTIPLAYER_ID = localStorage.getItem(MULTIPLAYER_ID_KEY)
+
+// Core actions
+const actionInit = () => session.getRoom().makeAction<Save>("init")
 
 export const hostOnJoin = (peerId: string) => {
-    const { send } = getInitAction()
+    const [send, receive] = actionInit()
 
     send(saveManager.save(false), [peerId])
 }
 
 export const guestListenForInit = () => {
-    const { receive } = getInitAction()
+    const [send, receive] = actionInit()
+
     receive((data, peerId) => {
         hostId = peerId
         console.log(`received save data from ${peerId}:`)
@@ -29,4 +40,124 @@ export const guestListenForInit = () => {
             SwampCampGame.instance.loadMainMenu()
         }
     })
+}
+
+/**
+ * A function which can be called on the host, which will be invoked client-side.
+ * Args should be serializable!
+ * If the client calls this function, it will be a no-op that generates a warning log.
+ */
+export const syncFn = <T extends any[]>(id: string, fn: (...args: T) => void) => {
+    let sendAndReceiveRoom: Room
+    let sendFn: ActionSender<T>
+    let receiveFn: ActionReceiver<T>
+    const lazyInit = () => {
+        const [lazySender, lazyReceiver] = session.getRoom().makeAction<T>(id)
+        sendFn = lazySender
+        receiveFn = lazyReceiver
+        sendAndReceiveRoom = session.getRoom()
+    }
+
+    const wrappedFn = (...args: T) => {
+        // clear out sender/receiver if they were initialized in a previous session
+        // (or the session has ended and the room is now undefined)
+        if (session.getRoom() !== sendAndReceiveRoom) {
+            sendFn = undefined
+            receiveFn = undefined
+            sendAndReceiveRoom = undefined
+        }
+
+        // offline syncFn is just a normal fn
+        if (!session.isOnline()) {
+            fn(...args)
+            return
+        }
+
+        if (!sendFn) {
+            lazyInit()
+        }
+
+        if (session.isGuest()) {
+            console.warn("client cannot call syncFn")
+        } else {
+            fn(...args)
+            sendFn(args)
+        }
+    }
+
+    if (session.isGuest()) {
+        lazyInit()
+
+        receiveFn((args) => {
+            fn(...args)
+        })
+    }
+
+    return wrappedFn
+}
+
+/**
+ * The provided data is the initial data on both host and client.
+ * The client received data from the host when the object is updated.
+ * If the client writes data, it will be a no-op that generates a warning log.
+ */
+export const syncData = <T extends object>(id: string, data: T, onChange = (updated: T) => {}) => {
+    let sendAndReceiveRoom: Room
+    let sendFn: ActionSender<Partial<T>>
+    let receiveFn: ActionReceiver<Partial<T>>
+    const lazyInit = () => {
+        const [lazySender, lazyReceiver] = session.getRoom().makeAction<Partial<T>>(id)
+        sendFn = lazySender
+        receiveFn = lazyReceiver
+        sendAndReceiveRoom = session.getRoom()
+    }
+
+    const proxy = new Proxy(data, {
+        set(target, property, value, receiver) {
+            // clear out sender/receiver if they were initialized in a previous session
+            // (or the session has ended and the room is now undefined)
+            if (session.getRoom() !== sendAndReceiveRoom) {
+                sendFn = undefined
+                receiveFn = undefined
+                sendAndReceiveRoom = undefined
+            }
+
+            // offline syncData is just a normal object
+            if (!session.isOnline()) {
+                return Reflect.set(target, property, value, receiver)
+            }
+
+            // lazy initialize
+            if (!sendFn) {
+                lazyInit()
+            }
+
+            if (session.isGuest()) {
+                console.warn("client cannot update data")
+                return true // no-op
+            } else {
+                // Update the data locally, then sync it
+                let success = Reflect.set(target, property, value, receiver)
+                if (success) {
+                    // @ts-ignore
+                    sendFn({ [property]: value })
+                }
+
+                return success
+            }
+        },
+    })
+
+    if (session.isGuest()) {
+        lazyInit()
+
+        receiveFn((newData) => {
+            Object.keys(newData).forEach((key) => {
+                data[key] = newData[key]
+            })
+            onChange(data)
+        })
+    }
+
+    return proxy
 }
