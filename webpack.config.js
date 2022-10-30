@@ -3,7 +3,6 @@ const path = require("path")
 module.exports = (_, argv) => ({
     entry: {
         app: "./src/app.ts",
-        app_client: "./src/app_client.ts",
     },
     module: {
         rules: [
