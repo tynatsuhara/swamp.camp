@@ -1,10 +1,11 @@
-import { joinRoom, Room } from "trystero"
+import { Room } from "trystero"
+import { joinRoom } from "trystero/firebase"
 
 let room: Room
 let host = true
 
 // TODO don't hardcode these
-const APP_ID = "92fe373a-2446-426a-8b8d-28b51bb30b01"
+const APP_ID = "https://swamp-camp-default-rtdb.firebaseio.com/"
 const ROOM_ID = "30908535-9bba-4e21-8a68-3384b7cd604f"
 
 /**
@@ -16,7 +17,6 @@ export const session = {
         room = joinRoom({ appId: APP_ID }, ROOM_ID)
         room.onPeerJoin((peerId) => {
             console.log(`${peerId} joined!`)
-            // TODO: push world state to them
             onPeerJoin(peerId)
         })
         console.log("opening lobby")
