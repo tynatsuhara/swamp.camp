@@ -10,12 +10,10 @@ import { UIStateManager } from "../../ui/UIStateManager"
 import { Interactable } from "../../world/elements/Interactable"
 import { camp, here, LocationManager } from "../../world/locations/LocationManager"
 import { WorldTime } from "../../world/WorldTime"
-import { Condition } from "../Condition"
 import { DudeSpawner } from "../DudeSpawner"
 import { AbstractPlayer } from "./AbstractPlayer"
 
 export class HostPlayer extends AbstractPlayer {
-    private rollingMomentum: Point
     private _velocity: Point = Point.ZERO
     get velocity() {
         return this._velocity
@@ -29,12 +27,9 @@ export class HostPlayer extends AbstractPlayer {
             return
         }
 
+        // MPTODO
         this.checkIsOffMap(updateData)
 
-        // TODO: Move to the same code as other conditional effects
-        if (this.dude.hasCondition(Condition.HEALING)) {
-            this.dude.heal(updateData.elapsedTimeMillis / 3500)
-        }
         const possibleInteractable = this.updateInteractables(updateData)
 
         // Determine player movement
@@ -44,8 +39,8 @@ export class HostPlayer extends AbstractPlayer {
 
         if (this.dude.rolling) {
             // TODO: change how momentum works if we implement slippery ice
-            dx = this.rollingMomentum.x
-            dy = this.rollingMomentum.y
+            dx = this.dude.rollingMomentum.x
+            dy = this.dude.rollingMomentum.y
         } else if (!UIStateManager.instance.isMenuOpen || PlaceElementDisplay.instance.isOpen) {
             if (controls.isWalkUpHeld()) {
                 dy--
@@ -85,7 +80,7 @@ export class HostPlayer extends AbstractPlayer {
             this.dude.jump()
         } else if (!this.dude.rolling && controls.isRollDown() && (dx !== 0 || dy !== 0)) {
             this.dude.roll()
-            this.rollingMomentum = new Point(dx, dy)
+            this.dude.rollingMomentum = new Point(dx, dy)
         }
 
         if (controls.isSheathKeyDown()) {
@@ -171,6 +166,7 @@ export class HostPlayer extends AbstractPlayer {
             this.offMapWarningShown = false
         }
 
+        // MPTODO figure out the desired behavior here
         if (this.timeOffMap > 2_500 && !this.offMapWarningShown) {
             if (here() === camp()) {
                 TextOverlayManager.instance.open({
@@ -184,6 +180,7 @@ export class HostPlayer extends AbstractPlayer {
                     textAlign: TextAlign.CENTER,
                 })
             } else {
+                // This is a radiant location — go back to camp
                 this.timeOffMap = 0
                 const position = DudeSpawner.instance.getSpawnPosOutsideOfCamp()
                 const currentLocation = here()

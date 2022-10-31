@@ -1,4 +1,4 @@
-import { Component, debug, Point, pt, UpdateData } from "brigsby/dist"
+import { Component, debug, Point, pt } from "brigsby/dist"
 import { BoxCollider } from "brigsby/dist/collision"
 import { RenderMethod } from "brigsby/dist/renderer"
 import { AnimatedSpriteComponent, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
@@ -126,6 +126,7 @@ export class Dude extends Component implements DialogueSource {
     get velocity() {
         return pt(this.syncData.d.x, this.syncData.d.y)
     }
+    rollingMomentum: Point
 
     // manually set a depth for the player sprite
     manualDepth = undefined
@@ -313,6 +314,7 @@ export class Dude extends Component implements DialogueSource {
         })
 
         this.roll = syncFn(`${this.syncId}roll`, () => {
+            this.rollingMomentum = new Point(this.syncData.d.x, this.syncData.d.y)
             const ground = this.location.getGround(this.tile)
             if (!this.canJumpOrRoll || Ground.isWater(ground?.type)) {
                 return
@@ -329,7 +331,7 @@ export class Dude extends Component implements DialogueSource {
         })
     }
 
-    update(updateData: UpdateData) {
+    update({ elapsedTimeMillis }) {
         this.animation.transform.depth =
             this.manualDepth ?? this.collider.position.y + this.collider.dimensions.y
 
@@ -356,9 +358,9 @@ export class Dude extends Component implements DialogueSource {
         }
 
         // MPTODO
-        this.updateActiveConditions()
+        this.updateActiveConditions(elapsedTimeMillis)
 
-        this.jumpingAnimator?.update(updateData.elapsedTimeMillis)
+        this.jumpingAnimator?.update(elapsedTimeMillis)
     }
 
     // MPTODO
@@ -407,7 +409,7 @@ export class Dude extends Component implements DialogueSource {
     private poisonParticles: PoisonParticles
     private blackLungParticles: BlackLungParticles
 
-    updateActiveConditions() {
+    updateActiveConditions(elapsedTimeMillis: number) {
         if (this.conditions.length === 0) {
             return
         }
@@ -482,6 +484,9 @@ export class Dude extends Component implements DialogueSource {
                             )
                         )
                     }
+                    return
+                case Condition.HEALING:
+                    this.heal(elapsedTimeMillis / 3500)
                     return
             }
         })
