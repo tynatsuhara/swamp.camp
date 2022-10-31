@@ -84,6 +84,12 @@ export class DudeFactory {
      * Instantiates a Dude+Entity in the specified location
      */
     load(saveState: DudeSaveState, location: Location) {
+        // Guest player state will get serialized but we don't want to spawn them on the host when loading
+        // MPTODO: Persist guest state so they can leave and rejoin
+        if (session.isHost() && saveState.uuid.startsWith(ONLINE_PLAYER_DUDE_ID_PREFIX)) {
+            return
+        }
+
         this.make(saveState.type, Point.fromString(saveState.pos), saveState, location, false)
     }
 
