@@ -1,5 +1,4 @@
-import { ActionProgress, ActionReceiver, ActionSender, Room } from "trystero"
-import { joinRoom } from "trystero/firebase"
+import { ActionProgress, ActionReceiver, ActionSender, joinRoom, Room } from "trystero"
 
 let room: Room
 let host = true
