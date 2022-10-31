@@ -1,31 +1,31 @@
-import { ButtonState, debug, Point, UpdateData } from "brigsby/dist"
+import { Point, UpdateData } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
 import { controls } from "../../Controls"
 import { CutscenePlayerController } from "../../cutscenes/CutscenePlayerController"
 import { TextOverlayManager } from "../../cutscenes/TextOverlayManager"
 import { ITEM_METADATA_MAP } from "../../items/Items"
-import { PlaceElementDisplay } from "../../ui/PlaceElementDisplay"
 import { TextAlign } from "../../ui/Text"
-import { UIStateManager } from "../../ui/UIStateManager"
 import { Interactable } from "../../world/elements/Interactable"
 import { camp, here, LocationManager } from "../../world/locations/LocationManager"
-import { WorldTime } from "../../world/WorldTime"
 import { DudeSpawner } from "../DudeSpawner"
 import { AbstractPlayer } from "./AbstractPlayer"
+import { registerPlayerInstance as registerLocalPlayerInstance } from "./index"
 
 export class HostPlayer extends AbstractPlayer {
-    private _velocity: Point = Point.ZERO
-    get velocity() {
-        return this._velocity
-    }
-
     private offMapWarningShown = false
     private timeOffMap = 0
+
+    constructor() {
+        super()
+        registerLocalPlayerInstance(this)
+    }
 
     update(updateData: UpdateData) {
         if (!this.dude.isAlive) {
             return
         }
+
+        const playerControls = this.getSerializablePlayerControls()
 
         // MPTODO
         this.checkIsOffMap(updateData)
@@ -34,109 +34,16 @@ export class HostPlayer extends AbstractPlayer {
 
         // Determine player movement
 
-        let dx = 0
-        let dy = 0
+        this.doMovementOnHost(updateData.elapsedTimeMillis, playerControls)
 
-        if (this.dude.rolling) {
-            // TODO: change how momentum works if we implement slippery ice
-            dx = this.dude.rollingMomentum.x
-            dy = this.dude.rollingMomentum.y
-        } else if (!UIStateManager.instance.isMenuOpen || PlaceElementDisplay.instance.isOpen) {
-            if (controls.isWalkUpHeld()) {
-                dy--
-            }
-            if (controls.isWalkDownHeld()) {
-                dy++
-            }
-            if (controls.isWalkLeftHeld()) {
-                dx--
-            }
-            if (controls.isWalkRightHeld()) {
-                dx++
-            }
-        }
-
-        const speedMultiplier =
-            (dx !== 0 || dy !== 0 ? this.pushCheck() : 1) * debug.speedMultiplier
-
-        this._velocity = new Point(dx, dy)
-
-        this.dude.move(
-            updateData.elapsedTimeMillis,
-            this.velocity,
-            this.dude.rolling ? 0 : controls.getPlayerFacingDirection(this.dude),
-            speedMultiplier
-        )
-
-        if (UIStateManager.instance.isMenuOpen) {
-            return
-        }
-
-        // Check other user input
-
-        this.checkHotKeys(updateData)
-
-        if (!this.dude.jumping && controls.isJumpDown()) {
-            this.dude.jump()
-        } else if (!this.dude.rolling && controls.isRollDown() && (dx !== 0 || dy !== 0)) {
-            this.dude.roll()
-            this.dude.rollingMomentum = new Point(dx, dy)
-        }
-
-        if (controls.isSheathKeyDown()) {
-            const sheathed = !this.dude.weapon?.isSheathed() ?? false
-            this.dude.setWeaponAndShieldDrawn(!sheathed)
-        }
-
-        let blocking = false
-        if (!!this.dude.shield) {
-            blocking = controls.isBlockHeld()
-            this.dude.shield.block(blocking)
-        }
-
-        if (controls.isAttack(ButtonState.HELD) && !blocking) {
-            const newAttack = controls.isAttack(ButtonState.DOWN)
-            this.dude.weapon?.attack(newAttack)
-        } else {
-            this.dude.weapon?.cancelAttack()
-        }
-
+        // MPTODO
         if (controls.isInteractDown() && !!possibleInteractable) {
             possibleInteractable.interact()
         }
+
+        // MPTODO
+        this.checkHotKeys(updateData)
     }
-
-    /**
-     * @returns a speed multiplier
-     */
-    private pushCheck(): number {
-        const minDistanceToBePushed = 10
-        const dudesToPush = here()
-            .getDudes()
-            .filter(
-                (d) =>
-                    d !== this.dude &&
-                    d.standingPosition.distanceTo(this.dude.standingPosition) <
-                        minDistanceToBePushed
-            )
-
-        dudesToPush.forEach((d) =>
-            d.knockback(d.standingPosition.minus(this.dude.standingPosition), 10)
-        )
-
-        const now = WorldTime.instance.time
-        if (dudesToPush.length === 0 && this.pushingUntil < now) {
-            return 1
-        }
-
-        if (dudesToPush.length > 0) {
-            const pushingDuration = 100 // we need to cache this since they won't be colliding every frame
-            this.pushingUntil = Math.max(this.pushingUntil, now + pushingDuration)
-        }
-
-        return 0.45
-    }
-    private pushingUntil = 0
 
     private checkHotKeys(updateData) {
         controls.HOT_KEY_OPTIONS.forEach((hotKey) => {

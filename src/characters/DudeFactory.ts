@@ -123,6 +123,8 @@ export class DudeFactory {
                     if (isHostPlayerDude) {
                         additionalComponents = [new HostPlayer(), new CutscenePlayerController()]
                         window["player"] = additionalComponents[0]
+                    } else {
+                        additionalComponents = [new GuestPlayer()]
                     }
                 } else {
                     /**
