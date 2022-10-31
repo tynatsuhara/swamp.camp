@@ -35,12 +35,12 @@ const SPECIAL_ITEMS: { [item: number]: SpecialItem } = {
 }
 
 export class PlayerInventory extends Inventory {
-    addItem(item: Item, count: number = 1, metadata?: ItemStackMetadata): boolean {
+    addItem(item: Item, count: number = 1, metadata?: ItemStackMetadata, quiet = false): boolean {
         const added = SPECIAL_ITEMS[item]?.noInventorySlot || super.addItem(item, count, metadata)
         if (added) {
             SPECIAL_ITEMS[item]?.onAdd(count)
 
-            if (NotificationDisplay.instance) {
+            if (!quiet && NotificationDisplay.instance) {
                 const itemData = ITEM_METADATA_MAP[item]
                 const id = `add-inv-${item}`
                 const existing = NotificationDisplay.instance.getById(id)

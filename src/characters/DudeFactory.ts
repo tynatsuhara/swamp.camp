@@ -165,9 +165,10 @@ export class DudeFactory {
                 }
                 // MPTODO: We probably need a GuestPlayerInventory
                 inventoryClass = PlayerInventory
-                defaultInventory = new PlayerInventory()
-                defaultInventory.addItem(Item.SWORD)
-                defaultInventory.addItem(Item.BASIC_SHIELD)
+                const pInv = new PlayerInventory()
+                pInv.addItem(Item.SWORD, 1, null, true)
+                pInv.addItem(Item.BASIC_SHIELD, 1, null, true)
+                defaultInventory = pInv
                 break
             }
             case DudeType.DIP: {
