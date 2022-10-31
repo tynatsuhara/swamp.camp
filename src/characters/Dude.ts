@@ -135,6 +135,7 @@ export class Dude extends Component implements DialogueSource {
     dialogue: string
     private dialogueIndicator = ""
 
+    // conditions are synchronized, but the time-based fields only matter on the host
     private conditions: ActiveCondition[] = []
     private name: string
 
@@ -348,6 +349,49 @@ export class Dude extends Component implements DialogueSource {
         this.cancelAttacking = syncFn(`${this.syncId}catk`, () => {
             this.weapon?.cancelAttack()
         })
+
+        this.addCondition = syncFn(`${this.syncId}ac`, (condition, duration) => {
+            const expiration = duration ? WorldTime.instance.time + duration : undefined
+            const existing = this.conditions.find((c) => c.condition === condition)
+            if (existing) {
+                if (!duration) {
+                    existing.expiration = undefined
+                } else {
+                    existing.expiration = Math.max(existing.expiration, expiration)
+                }
+            } else {
+                this.conditions.push({
+                    condition,
+                    expiration,
+                    lastExec: -1,
+                })
+            }
+        })
+
+        this.removeCondition = syncFn(`${this.syncId}rc`, (condition) => {
+            this.conditions = this.conditions.filter((c) => c.condition !== condition)
+            switch (condition) {
+                case Condition.ON_FIRE:
+                    if (this.fireParticles) {
+                        this.entity.removeComponent(this.fireParticles)
+                        LightManager.instance.removeLight(this.fireParticles)
+                        this.fireParticles = undefined
+                    }
+                    return
+                case Condition.POISONED:
+                    if (this.poisonParticles) {
+                        this.entity.removeComponent(this.poisonParticles)
+                        this.poisonParticles = undefined
+                    }
+                    return
+                case Condition.BLACK_LUNG:
+                    if (this.blackLungParticles) {
+                        this.entity.removeComponent(this.blackLungParticles)
+                        this.blackLungParticles = undefined
+                    }
+                    return
+            }
+        })
     }
 
     update({ elapsedTimeMillis }) {
@@ -376,7 +420,6 @@ export class Dude extends Component implements DialogueSource {
                 this.dialogue !== EMPTY_DIALOGUE && DialogueDisplay.instance.source !== this
         }
 
-        // MPTODO
         this.updateActiveConditions(elapsedTimeMillis)
 
         this.jumpingAnimator?.update(elapsedTimeMillis)
@@ -436,12 +479,14 @@ export class Dude extends Component implements DialogueSource {
         this.conditions.forEach((c) => {
             const timeSinceLastExec = WorldTime.instance.time - c.lastExec
 
-            if (c.expiration < WorldTime.instance.time || !this.isAlive) {
-                this.removeCondition(c.condition)
-                if (!this.isAlive) {
-                    console.log(`removing ${c.condition} because ded`)
+            if (session.isHost()) {
+                if (c.expiration < WorldTime.instance.time || !this.isAlive) {
+                    this.removeCondition(c.condition)
+                    if (!this.isAlive) {
+                        console.log(`removing ${c.condition} because ded`)
+                    }
+                    return
                 }
-                return
             }
 
             switch (c.condition) {
@@ -462,7 +507,7 @@ export class Dude extends Component implements DialogueSource {
                         this.standingPosition.plusY(-TILE_SIZE / 2).plus(this.getAnimationOffset()),
                         Dude.ON_FIRE_LIGHT_DIAMETER
                     )
-                    if (timeSinceLastExec > 500) {
+                    if (session.isHost() && timeSinceLastExec > 500) {
                         const fireDamage = 0.3
                         this.damage(fireDamage, {
                             blockable: false,
@@ -484,7 +529,7 @@ export class Dude extends Component implements DialogueSource {
                             )
                         )
                     }
-                    if (timeSinceLastExec > 500) {
+                    if (session.isHost() && timeSinceLastExec > 500) {
                         const poisonDamage = 0.25
                         this.damage(poisonDamage, {
                             blockable: false,
@@ -505,7 +550,9 @@ export class Dude extends Component implements DialogueSource {
                     }
                     return
                 case Condition.HEALING:
-                    this.heal(elapsedTimeMillis / 3500)
+                    if (session.isHost()) {
+                        this.heal(elapsedTimeMillis / 3500)
+                    }
                     return
             }
         })
@@ -514,48 +561,9 @@ export class Dude extends Component implements DialogueSource {
     /**
      * @param duration if zero, unlimited duration
      */
-    addCondition(condition: Condition, duration?: number) {
-        const expiration = duration ? WorldTime.instance.time + duration : undefined
-        const existing = this.conditions.find((c) => c.condition === condition)
-        if (existing) {
-            if (!duration) {
-                existing.expiration = undefined
-            } else {
-                existing.expiration = Math.max(existing.expiration, expiration)
-            }
-        } else {
-            this.conditions.push({
-                condition,
-                expiration,
-                lastExec: -1,
-            })
-        }
-    }
+    addCondition: (condition: Condition, duration?: number) => void
 
-    removeCondition(condition: Condition) {
-        this.conditions = this.conditions.filter((c) => c.condition !== condition)
-        switch (condition) {
-            case Condition.ON_FIRE:
-                if (this.fireParticles) {
-                    this.entity.removeComponent(this.fireParticles)
-                    LightManager.instance.removeLight(this.fireParticles)
-                    this.fireParticles = undefined
-                }
-                return
-            case Condition.POISONED:
-                if (this.poisonParticles) {
-                    this.entity.removeComponent(this.poisonParticles)
-                    this.poisonParticles = undefined
-                }
-                return
-            case Condition.POISONED:
-                if (this.poisonParticles) {
-                    this.entity.removeComponent(this.poisonParticles)
-                    this.poisonParticles = undefined
-                }
-                return
-        }
-    }
+    removeCondition: (condition: Condition) => void
 
     removeAllConditions() {
         this.conditions.forEach((c) => this.removeCondition(c.condition))
