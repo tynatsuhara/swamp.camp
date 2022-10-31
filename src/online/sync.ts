@@ -4,6 +4,7 @@ import { saveManager } from "../SaveManager"
 import { Save } from "../saves/SaveGame"
 import { newUUID } from "../saves/uuid"
 import { SwampCampGame } from "../SwampCampGame"
+import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { here } from "../world/locations/LocationManager"
 import { session } from "./session"
 
@@ -42,10 +43,12 @@ export const hostOnJoin = (peerId: string) => {
 
     receiveInitWorldAck((_, peerId) => {
         initializedPeers.push(peerId)
+        NotificationDisplay.instance.push({ icon: "personmultiple", text: "someone joined" })
     })
 
     session.getRoom().onPeerLeave((peerId) => {
         cleanUpPeer(peerId)
+        NotificationDisplay.instance.push({ icon: "personmultiple", text: "someone left" })
     })
 }
 
