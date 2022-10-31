@@ -36,6 +36,8 @@ export class LocationManager {
     constructor() {
         window["locationManager"] = this
         window["here"] = {
+            uuid: () => here().uuid,
+
             listDudes: () => {
                 const ids = {}
                 here()

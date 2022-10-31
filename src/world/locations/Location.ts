@@ -5,6 +5,7 @@ import { Sounds } from "../../audio/Sounds"
 import { Dude } from "../../characters/Dude"
 import { DudeFactory } from "../../characters/DudeFactory"
 import { DudeType } from "../../characters/DudeType"
+import { syncFn } from "../../online/sync"
 import { LocationSaveState } from "../../saves/LocationSaveState"
 import { newUUID } from "../../saves/uuid"
 import { HUD } from "../../ui/HUD"
@@ -18,10 +19,7 @@ import { Teleporter, TeleporterPrefix, Teleporters, TeleporterSound } from "../T
 import { LocationManager, LocationType } from "./LocationManager"
 
 export class Location {
-    private _uuid: string = newUUID()
-    get uuid() {
-        return this._uuid
-    }
+    readonly uuid: string
 
     readonly type: LocationType
 
@@ -60,13 +58,21 @@ export class Location {
         isInterior: boolean,
         allowPlacing: boolean,
         size?: number,
-        levels?: Grid<number>
+        levels?: Grid<number>,
+        uuid = newUUID()
     ) {
         this.type = type
         this.isInterior = isInterior
         this.allowPlacing = allowPlacing
         this.size = size
         this.levels = levels
+        this.uuid = uuid
+
+        const syncId = this.uuid.substring(0, 8)
+        this.syncLoadElement = syncFn(`${syncId}le`, (...args) => {
+            console.log("sync load element")
+            return this.loadElement(...args)
+        })
     }
 
     private dudeCache: Dude[]
@@ -77,13 +83,11 @@ export class Location {
         return this.dudeCache
     }
 
-    // runs locally
     addDude(dude: Dude) {
         this.dudes.add(dude)
         this.dudeCache = undefined
     }
 
-    // MPTODO
     removeDude(dude: Dude) {
         this.dudes.delete(dude)
         this.dudeCache = undefined
@@ -102,15 +106,28 @@ export class Location {
     }
 
     /**
-     * @param type
-     * @param tilePoint tile point
-     * @param data
+     * Should only be called on hosts!
      */
     addElement<T extends ElementType>(
         type: T,
         tilePoint: Point,
         data: Partial<ElementDataFormat[T]> = {}
     ): ElementComponent<T, ElementDataFormat[T]> {
+        return this.syncLoadElement(type, tilePoint.toString(), data)
+    }
+
+    private syncLoadElement: typeof this.loadElement
+
+    /**
+     * The same as addElement, except that it can be called by guests during their initial load-in
+     */
+    private loadElement<T extends ElementType>(
+        type: T,
+        tilePointString: string,
+        data: Partial<ElementDataFormat[T]> = {}
+    ): ElementComponent<T, ElementDataFormat[T]> {
+        const tilePoint = Point.fromString(tilePointString)
+
         const factory = Elements.instance.getElementFactory(type)
         const elementPts = ElementUtils.rectPoints(tilePoint, factory.dimensions)
         if (elementPts.some((pt) => !!this.elements.get(pt))) {
@@ -431,16 +448,16 @@ export class Location {
             saveState.isInterior,
             saveState.allowPlacing,
             size,
-            levels
+            levels,
+            saveState.uuid
         )
 
-        n._uuid = saveState.uuid
         saveState.features.forEach((f) => n.addFeature(f.type, f.data))
         n.teleporters = saveState.teleporters
         saveState.ground.forEach((el) =>
             n.setGroundElement(el.type, Point.fromString(el.pos), el.obj)
         )
-        saveState.elements.forEach((el) => n.addElement(el.type, Point.fromString(el.pos), el.obj))
+        saveState.elements.forEach((el) => n.loadElement(el.type, el.pos, el.obj))
         saveState.dudes.forEach((d) => DudeFactory.instance.load(d, n))
         n.toggleAudio(false)
 

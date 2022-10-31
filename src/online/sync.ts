@@ -203,7 +203,8 @@ export const syncData = <T extends object>(id: string, data: T, onChange = (upda
 }
 
 const cleanUpPeer = (peerId: string) => {
-    // TODO: Change the cleanup logic so that their state is still persisted for future joins
+    // MPTODO: Change the cleanup logic so that their state is still persisted for future joins
+    // MPTODO: Make this a syncFn when we support more than 2 players
     const multiplayerDude = here()
         .getDudes()
         .find((d) => d.uuid === ONLINE_PLAYER_DUDE_ID_PREFIX + peerToMultiplayerId[peerId])
