@@ -1,4 +1,5 @@
 import { BinaryHeap } from "brigsby/dist/util"
+import { session } from "../../online/session"
 import { Singletons } from "../../Singletons"
 import { WorldTime } from "../WorldTime"
 import { getEventQueueHandlers, QueuedEventData, QueuedEventType } from "./QueuedEvent"
@@ -36,6 +37,9 @@ export class EventQueue {
     }
 
     processEvents(currentTime: number) {
+        if (session.isGuest()) {
+            return
+        }
         while (this.heap.size() > 0 && this.heap.peek().time <= currentTime) {
             const event = this.heap.pop()
             getEventQueueHandlers()[event.type](event)
