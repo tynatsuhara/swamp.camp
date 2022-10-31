@@ -322,7 +322,7 @@ class ControlsWrapper extends Component {
             }
             return 0
         } else {
-            return this.translateToWorldSpace(input.mousePos).x - dude.standingPosition.x
+            return Math.sign(this.translateToWorldSpace(input.mousePos).x - dude.standingPosition.x)
         }
     }
 
