@@ -6,6 +6,7 @@ import { UIStateManager } from "../../ui/UIStateManager"
 import { here } from "../../world/locations/LocationManager"
 import { WorldTime } from "../../world/WorldTime"
 import { Dude } from "../Dude"
+import { player } from "./index"
 
 export type SerializablePlayerControls = {
     isWalkUpHeld: boolean
@@ -30,21 +31,22 @@ export abstract class AbstractPlayer extends Component {
 
     awake() {
         this._dude = this.entity.getComponent(Dude)
-        this.dude.setOnDamageCallback((blocked) => {
-            // TODO: Add controller vibration if possible
-            if (!this.dude.isAlive) {
-                Camera.instance.shake(6, 600)
-            } else if (blocked) {
-                Camera.instance.shake(2.5, 400)
-            } else {
-                Camera.instance.shake(3.5, 400)
-            }
-            controls.vibrate({
-                duration: 300,
-                strongMagnitude: 0.5,
-                weakMagnitude: 0.5,
+        if (this === player()) {
+            this.dude.setOnDamageCallback((blocked) => {
+                if (!this.dude.isAlive) {
+                    Camera.instance.shake(6, 600)
+                } else if (blocked) {
+                    Camera.instance.shake(2.5, 400)
+                } else {
+                    Camera.instance.shake(3.5, 400)
+                }
+                controls.vibrate({
+                    duration: 300,
+                    strongMagnitude: 0.5,
+                    weakMagnitude: 0.5,
+                })
             })
-        })
+        }
     }
 
     // MPTODO clean up?
