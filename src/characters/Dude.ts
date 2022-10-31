@@ -303,6 +303,8 @@ export class Dude extends Component implements DialogueSource {
             }, 1000)
         }
 
+        // Synchronized host->client functions
+
         this.jump = syncFn(`${this.syncId}jump`, () => {
             const ground = this.location.getGround(this.tile)
             if (!this.canJumpOrRoll || Ground.isWater(ground?.type)) {
@@ -328,6 +330,11 @@ export class Dude extends Component implements DialogueSource {
                 }, i * 150)
             }
             setTimeout(() => (this.canJumpOrRoll = true), 750)
+        })
+
+        this.setWeaponAndShieldDrawn = syncFn(`${this.syncId}wsd`, (drawn: boolean) => {
+            this.weapon?.setSheathed(!drawn)
+            this.shield?.setOnBack(!drawn)
         })
     }
 
@@ -400,10 +407,7 @@ export class Dude extends Component implements DialogueSource {
         this.weapon?.setSheathed(false) // keep em in sync
     }
 
-    setWeaponAndShieldDrawn(drawn: boolean) {
-        this.weapon?.setSheathed(!drawn)
-        this.shield?.setOnBack(!drawn)
-    }
+    readonly setWeaponAndShieldDrawn: (drawn: boolean) => void
 
     private fireParticles: FireParticles
     private poisonParticles: PoisonParticles
