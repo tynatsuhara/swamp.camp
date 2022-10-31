@@ -14,7 +14,7 @@ import { session } from "./session"
 
 let hostId: string
 let initializedPeers: string[] = []
-const peerToMultiplayerId: Record<string, string> = {}
+let peerToMultiplayerId: Record<string, string> = {}
 
 // Store a stable multiplayer ID for the user.
 const MULTIPLAYER_ID_KEY = "multiplayer_id"
@@ -24,24 +24,26 @@ if (!localStorage.getItem(MULTIPLAYER_ID_KEY)) {
 export const MULTIPLAYER_ID = localStorage.getItem(MULTIPLAYER_ID_KEY)
 
 // Core actions
-const actionMultiplayerId = () => session.getRoom().makeAction<{ id: string }>("mpid")
-const actionInitWorld = () => session.getRoom().makeAction<Save>("init")
-const actionInitWorldAck = () => session.getRoom().makeAction<void>("init:ack")
+const actionMultiplayerId = () => session.cachedAction<{ id: string }>("mpid")
+const actionInitWorld = () => session.cachedAction<Save>("init")
+const actionInitWorldAck = () => session.cachedAction<void>("init:ack")
 
 // Called when a new user has joined the game
 export const hostOnJoin = (peerId: string) => {
-    // MPTODO: Refactor this so that these actions don't get re-initialized if a third player joins
+    // MPTODO: Refactor this so that these actions don't get re-initialized if a third player joins or on leave/join
     const [_, receiveMultiplayerId] = actionMultiplayerId()
     const [sendInitWorld] = actionInitWorld()
     const [_2, receiveInitWorldAck] = actionInitWorldAck()
 
     receiveMultiplayerId(({ id }, peerId) => {
+        console.log(`received multiplayer ID ${id} from peer ${peerId}`)
         peerToMultiplayerId[peerId] = id
         DudeFactory.instance.newOnlinePlayer(id)
         sendInitWorld(saveManager.save(false), peerId)
     })
 
     receiveInitWorldAck((_, peerId) => {
+        console.log(`received world ack from peer ${peerId}`)
         initializedPeers.push(peerId)
         NotificationDisplay.instance.push({ icon: "personmultiple", text: "someone joined" })
     })
@@ -53,12 +55,11 @@ export const hostOnJoin = (peerId: string) => {
 }
 
 export const hostSessionClose = () => {
-    session.close()
     initializedPeers.forEach((p) => cleanUpPeer(p))
-    initializedPeers = []
+    cleanUpSession()
 }
 
-// MPTODO it seems like something here is breaking if the host closes then reopens the lobby
+// MPTODO it seems like something here is breaking if a peer leaves and tries to rejoin
 export const guestOnJoin = () => {
     const [sendMultiplayerId] = actionMultiplayerId()
     const [_, receiveInitWorld] = actionInitWorld()
@@ -83,6 +84,23 @@ export const guestOnJoin = () => {
     })
 }
 
+export const cleanUpSession = () => {
+    session.close()
+    hostId = undefined
+    initializedPeers = []
+    peerToMultiplayerId = {}
+}
+
+const cleanUpPeer = (peerId: string) => {
+    // MPTODO: Change the cleanup logic so that their state is still persisted for future joins
+    // MPTODO: Make this a syncFn when we support more than 2 players
+    const multiplayerDude = here()
+        .getDudes()
+        .find((d) => d.uuid === ONLINE_PLAYER_DUDE_ID_PREFIX + peerToMultiplayerId[peerId])
+    here().removeDude(multiplayerDude)
+    initializedPeers = initializedPeers.filter((p) => p !== peerId)
+}
+
 /**
  * A function which can be called on the host, which will be invoked client-side.
  * Args should be serializable!
@@ -96,7 +114,7 @@ export const syncFn = <T extends any[], R = void>(
     let sendFn: ActionSender<T>
     let receiveFn: ActionReceiver<T>
     const lazyInit = () => {
-        const [lazySender, lazyReceiver] = session.getRoom().makeAction<T>(id)
+        const [lazySender, lazyReceiver] = session.cachedAction<T>(id)
         sendFn = lazySender
         receiveFn = lazyReceiver
         sendAndReceiveRoom = session.getRoom()
@@ -149,7 +167,7 @@ export const syncData = <T extends object>(id: string, data: T, onChange = (upda
     let sendFn: ActionSender<Partial<T>>
     let receiveFn: ActionReceiver<Partial<T>>
     const lazyInit = () => {
-        const [lazySender, lazyReceiver] = session.getRoom().makeAction<Partial<T>>(id)
+        const [lazySender, lazyReceiver] = session.cachedAction<Partial<T>>(id)
         sendFn = lazySender
         receiveFn = lazyReceiver
         sendAndReceiveRoom = session.getRoom()
@@ -203,14 +221,4 @@ export const syncData = <T extends object>(id: string, data: T, onChange = (upda
     }
 
     return proxy
-}
-
-const cleanUpPeer = (peerId: string) => {
-    // MPTODO: Change the cleanup logic so that their state is still persisted for future joins
-    // MPTODO: Make this a syncFn when we support more than 2 players
-    const multiplayerDude = here()
-        .getDudes()
-        .find((d) => d.uuid === ONLINE_PLAYER_DUDE_ID_PREFIX + peerToMultiplayerId[peerId])
-    here().removeDude(multiplayerDude)
-    initializedPeers = initializedPeers.filter((p) => p !== peerId)
 }

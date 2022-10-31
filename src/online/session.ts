@@ -1,8 +1,9 @@
-import { Room } from "trystero"
+import { ActionProgress, ActionReceiver, ActionSender, Room } from "trystero"
 import { joinRoom } from "trystero/firebase"
 
 let room: Room
 let host = true
+let cachedActions: Record<string, any> = {}
 
 // TODO don't hardcode these
 const APP_ID = "https://swamp-camp-default-rtdb.firebaseio.com/"
@@ -26,12 +27,13 @@ export const session = {
         room?.leave()
         room = undefined
         host = true
+        cachedActions = {}
     },
 
     join: (): Promise<string> => {
         host = false
         room = joinRoom({ appId: APP_ID }, ROOM_ID)
-        console.log("joining lobby")
+        console.log("looking for lobby")
 
         return new Promise((resolve) => {
             // Right now, let's assume we only allow 2 peers
@@ -63,6 +65,13 @@ export const session = {
                 console.log(`${p}: ${pingVal} ms`)
             })
         )
+    },
+
+    cachedAction: <T>(id: string): [ActionSender<T>, ActionReceiver<T>, ActionProgress] => {
+        if (!cachedActions[id]) {
+            cachedActions[id] = session.getRoom().makeAction<T>(id)
+        }
+        return cachedActions[id]
     },
 }
 
