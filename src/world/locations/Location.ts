@@ -77,11 +77,13 @@ export class Location {
         return this.dudeCache
     }
 
+    // runs locally
     addDude(dude: Dude) {
         this.dudes.add(dude)
         this.dudeCache = undefined
     }
 
+    // MPTODO
     removeDude(dude: Dude) {
         this.dudes.delete(dude)
         this.dudeCache = undefined

@@ -44,10 +44,10 @@ export class IntroCutscene extends Component {
         // has to start before the initial render, we do it in the
         // constructor to prevent a single-frame "flash" of the actual game
 
-        DudeFactory.instance.new(DudeType.DIP, Point.ZERO)
-        DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(3, 1).times(TILE_SIZE))
-        DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(-1, 3).times(TILE_SIZE))
-        DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(-4, 0).times(TILE_SIZE))
+        DudeFactory.instance.create(DudeType.DIP, Point.ZERO)
+        DudeFactory.instance.create(DudeType.ORC_WARRIOR, new Point(3, 1).times(TILE_SIZE))
+        DudeFactory.instance.create(DudeType.ORC_WARRIOR, new Point(-1, 3).times(TILE_SIZE))
+        DudeFactory.instance.create(DudeType.ORC_WARRIOR, new Point(-4, 0).times(TILE_SIZE))
 
         const characterAnimation = (key: string, transform: SpriteTransform) => {
             const anim = DudeAnimationUtils.getCharacterIdleAnimation(key).toComponent(transform)

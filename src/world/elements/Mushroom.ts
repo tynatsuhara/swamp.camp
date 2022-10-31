@@ -57,7 +57,7 @@ export class MushroomFactory extends ElementFactory<ElementType.MUSHROOM, { ngt:
         e.addComponent(
             new Growable(ngt, () => {
                 e.selfDestruct()
-                DudeFactory.instance.new(
+                DudeFactory.instance.create(
                     DudeType.SHROOM,
                     pos
                         .times(TILE_SIZE)

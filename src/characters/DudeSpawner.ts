@@ -77,7 +77,7 @@ export class DudeSpawner extends Component {
 
             console.log(`spawning villager ${visitorTypes}`)
 
-            const dude = DudeFactory.instance.new(visitorType, this.getSpawnPosOutsideOfCamp())
+            const dude = DudeFactory.instance.create(visitorType, this.getSpawnPosOutsideOfCamp())
             dude.entity.getComponent(Visitor)?.welcome()
         }
     }
@@ -108,7 +108,7 @@ export class DudeSpawner extends Component {
             for (let i = 0; i < Math.min(openPoints.length, goalDemonCount - demons.length); i++) {
                 const pt = Lists.oneOf(openPoints)
                 const type = Math.random() > 0.95 ? DudeType.DEMON_BRUTE : DudeType.HORNED_DEMON
-                DudeFactory.instance.new(type, pt.times(TILE_SIZE), l)
+                DudeFactory.instance.create(type, pt.times(TILE_SIZE), l)
             }
         }
     }
@@ -132,7 +132,7 @@ export class DudeSpawner extends Component {
             const spawnCount = Math.min(waterSpots.length, goalCount - thingCount.length)
             for (let i = 0; i < spawnCount; i++) {
                 const pt = Lists.oneOf(waterSpots)
-                DudeFactory.instance.new(DudeType.SWAMP_THING, pt.times(TILE_SIZE), l)
+                DudeFactory.instance.create(DudeType.SWAMP_THING, pt.times(TILE_SIZE), l)
             }
         }
     }
@@ -156,15 +156,15 @@ export class DudeSpawner extends Component {
         const spawnPos = this.getSpawnPosOutsideOfCamp()
 
         const leaders = Lists.range(1, 1 + Math.random() * 4).map(() =>
-            DudeFactory.instance.new(DudeType.ORC_BRUTE, spawnPos)
+            DudeFactory.instance.create(DudeType.ORC_BRUTE, spawnPos)
         )
 
         const followers = [
             ...Lists.range(0, 5 + Math.random() * 10).map(() =>
-                DudeFactory.instance.new(DudeType.ORC_WARRIOR, spawnPos)
+                DudeFactory.instance.create(DudeType.ORC_WARRIOR, spawnPos)
             ),
             ...Lists.range(0, 1 + Math.random() * 4).map(() =>
-                DudeFactory.instance.new(DudeType.ORC_SHAMAN, spawnPos)
+                DudeFactory.instance.create(DudeType.ORC_SHAMAN, spawnPos)
             ),
         ]
 
@@ -185,7 +185,7 @@ export class DudeSpawner extends Component {
 
     private spawnWildlife() {
         if (this.shouldRandomlySpawn(TimeUnit.DAY * 7)) {
-            DudeFactory.instance.new(DudeType.BEAR, this.getSpawnPosOutsideOfCamp())
+            DudeFactory.instance.create(DudeType.BEAR, this.getSpawnPosOutsideOfCamp())
         }
 
         if (this.shouldRandomlySpawn(TimeUnit.DAY * 3)) {
@@ -195,13 +195,13 @@ export class DudeSpawner extends Component {
 
     spawnWolves() {
         const leaderSpawnPos = this.getSpawnPosOutsideOfCamp()
-        const leader = DudeFactory.instance.new(DudeType.WOLF, leaderSpawnPos)
+        const leader = DudeFactory.instance.create(DudeType.WOLF, leaderSpawnPos)
 
         const spawnPoints = tilesAround(leaderSpawnPos, 3)
         const wolves = Math.floor(1 + Math.random() * 4)
         console.log(`spawning ${wolves + 1} wolves`)
         for (let i = 0; i < wolves; i++) {
-            const wolf = DudeFactory.instance.new(DudeType.WOLF, Lists.oneOf(spawnPoints))
+            const wolf = DudeFactory.instance.create(DudeType.WOLF, Lists.oneOf(spawnPoints))
             wolf.entity.getComponent(NPC).setLeader(leader)
         }
     }

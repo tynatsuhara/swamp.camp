@@ -66,7 +66,7 @@ export class GameScene {
         LocationManager.instance.loadLocation(camp())
 
         const playerStartPos = new Point(camp().size, camp().size).times(TILE_SIZE)
-        const playerDude = DudeFactory.instance.new(DudeType.PLAYER, playerStartPos)
+        const playerDude = DudeFactory.instance.create(DudeType.PLAYER, playerStartPos)
 
         // Camera.instance.clearPosition()
         Camera.instance.focusOnDude(playerDude)

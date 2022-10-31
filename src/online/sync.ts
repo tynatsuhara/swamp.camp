@@ -85,7 +85,10 @@ export const guestOnJoin = () => {
  * Args should be serializable!
  * If the client calls this function, it will be a no-op that generates a warning log.
  */
-export const syncFn = <T extends any[]>(id: string, fn: (...args: T) => void) => {
+export const syncFn = <T extends any[], R = void>(
+    id: string,
+    fn: (...args: T) => R
+): ((...args: T) => R) => {
     let sendAndReceiveRoom: Room
     let sendFn: ActionSender<T>
     let receiveFn: ActionReceiver<T>
@@ -107,8 +110,7 @@ export const syncFn = <T extends any[]>(id: string, fn: (...args: T) => void) =>
 
         // offline syncFn is just a normal fn
         if (!session.isOnline()) {
-            fn(...args)
-            return
+            return fn(...args)
         }
 
         if (!sendFn) {
@@ -118,8 +120,8 @@ export const syncFn = <T extends any[]>(id: string, fn: (...args: T) => void) =>
         if (session.isGuest()) {
             console.warn("client cannot call syncFn")
         } else {
-            fn(...args)
             sendFn(args, initializedPeers)
+            return fn(...args)
         }
     }
 

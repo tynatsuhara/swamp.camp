@@ -71,7 +71,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     [
         InputKey.O,
         "spawn selected type",
-        (input) => DudeFactory.instance.new(spawnMenu.getSelectedType(), input.mousePos, here()),
+        (input) => DudeFactory.instance.create(spawnMenu.getSelectedType(), input.mousePos, here()),
     ],
     [
         InputKey.P,

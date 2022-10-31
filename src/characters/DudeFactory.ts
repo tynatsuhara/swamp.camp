@@ -1,16 +1,16 @@
-import { Component, Entity, Point } from "brigsby/dist"
+import { Component, Entity, Point, pt } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 import { Inventory } from "../items/Inventory"
 import { Item } from "../items/Items"
 import { PlayerInventory } from "../items/PlayerInventory"
 import { session } from "../online/session"
-import { MULTIPLAYER_ID } from "../online/sync"
+import { MULTIPLAYER_ID, syncFn } from "../online/sync"
 import { DudeSaveState } from "../saves/DudeSaveState"
 import { newUUID } from "../saves/uuid"
 import { Singletons } from "../Singletons"
 import { Location } from "../world/locations/Location"
-import { camp } from "../world/locations/LocationManager"
+import { camp, LocationManager } from "../world/locations/LocationManager"
 import { BERTO_STARTING_DIALOGUE } from "./dialogue/BertoDialogue"
 import { EMPTY_DIALOGUE } from "./dialogue/Dialogue"
 import { DOCTOR_DIALOGUE_ENTRYPOINT } from "./dialogue/DoctorDialogue"
@@ -71,12 +71,13 @@ export class DudeFactory {
     }
 
     /**
+     * Host only!
      * Create a new Dude in the specified location, defaults to the exterior world location
      * @param hasPendingSlot should be true if the character already had a home reserved
      *                       for them. If not, they will try to mark a spot as pending.
      */
-    new(type: DudeType, pos: Point, location: Location = camp(), hasPendingSlot = false): Dude {
-        return this.make(type, pos, null, location, hasPendingSlot)
+    create(type: DudeType, pos: Point, location: Location = camp(), hasPendingSlot = false): Dude {
+        return this.syncCreate(type, newUUID(), pos.x, pos.y, location.uuid, hasPendingSlot)
     }
 
     /**
@@ -86,6 +87,26 @@ export class DudeFactory {
         this.make(saveState.type, Point.fromString(saveState.pos), saveState, location, false)
     }
 
+    private readonly syncCreate = syncFn(
+        "df:create",
+        (
+            type: DudeType,
+            uuid: string,
+            posX: number,
+            posY: number,
+            locationUUID: string,
+            hasPendingSlot: boolean
+        ) => {
+            return this.make(
+                type,
+                pt(posX, posY),
+                { uuid },
+                LocationManager.instance.get(locationUUID),
+                hasPendingSlot
+            )
+        }
+    )
+
     private make(
         type: DudeType,
         pos: Point,
@@ -93,7 +114,7 @@ export class DudeFactory {
         location: Location,
         hasPendingSlot: boolean
     ): Dude {
-        const uuid = saveState?.uuid ?? newUUID()
+        const uuid = saveState.uuid
 
         // defaults
         let factions: DudeFaction[] = [DudeFaction.VILLAGERS]
