@@ -134,9 +134,9 @@ export abstract class AbstractPlayer extends Component {
 
         if (playerControls.isAttackHeld && !blocking) {
             const newAttack = playerControls.isAttackDown
-            this.dude.weapon?.attack(newAttack)
+            this.dude.updateAttacking(newAttack)
         } else {
-            this.dude.weapon?.cancelAttack()
+            this.dude.cancelAttacking()
         }
     }
 

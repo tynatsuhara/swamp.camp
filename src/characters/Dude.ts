@@ -340,6 +340,14 @@ export class Dude extends Component implements DialogueSource {
         this.updateBlocking = syncFn(`${this.syncId}blk`, (blocking) => {
             this.shield.block(blocking)
         })
+
+        this.updateAttacking = syncFn(`${this.syncId}atk`, (isNewAttack) => {
+            this.weapon?.attack(isNewAttack)
+        })
+
+        this.cancelAttacking = syncFn(`${this.syncId}catk`, () => {
+            this.weapon?.cancelAttack()
+        })
     }
 
     update({ elapsedTimeMillis }) {
@@ -413,6 +421,8 @@ export class Dude extends Component implements DialogueSource {
 
     readonly setWeaponAndShieldDrawn: (drawn: boolean) => void
     readonly updateBlocking: (blocking: boolean) => void
+    readonly updateAttacking: (isNewAttack: boolean) => void
+    readonly cancelAttacking: () => void
 
     private fireParticles: FireParticles
     private poisonParticles: PoisonParticles
