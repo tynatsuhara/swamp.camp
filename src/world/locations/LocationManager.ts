@@ -141,14 +141,17 @@ export class LocationManager {
         this.loadLocation(this.locations.get(saveState.currentLocationUUID))
     }
 
-    // MPTODO?
     simulateLocations(simulateCurrentLocation: boolean, duration: number) {
-        const [time] = measure(() => {
-            this.getLocations()
-                .filter((l) => simulateCurrentLocation || l !== this.currentLocation)
-                .flatMap((l) => l.getEntities())
-                .forEach((e) => e.getComponents(Simulatable).forEach((s) => s.simulate(duration)))
-        })
+        if (session.isHost()) {
+            const [time] = measure(() => {
+                this.getLocations()
+                    .filter((l) => simulateCurrentLocation || l !== this.currentLocation)
+                    .flatMap((l) => l.getEntities())
+                    .forEach((e) =>
+                        e.getComponents(Simulatable).forEach((s) => s.simulate(duration))
+                    )
+            })
+        }
         // console.log(`simulation took ${time} milliseconds`)
     }
 
