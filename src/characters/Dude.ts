@@ -336,6 +336,10 @@ export class Dude extends Component implements DialogueSource {
             this.weapon?.setSheathed(!drawn)
             this.shield?.setOnBack(!drawn)
         })
+
+        this.updateBlocking = syncFn(`${this.syncId}blk`, (blocking) => {
+            this.shield.block(blocking)
+        })
     }
 
     update({ elapsedTimeMillis }) {
@@ -408,6 +412,7 @@ export class Dude extends Component implements DialogueSource {
     }
 
     readonly setWeaponAndShieldDrawn: (drawn: boolean) => void
+    readonly updateBlocking: (blocking: boolean) => void
 
     private fireParticles: FireParticles
     private poisonParticles: PoisonParticles

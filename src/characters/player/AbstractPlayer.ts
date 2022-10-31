@@ -129,7 +129,7 @@ export abstract class AbstractPlayer extends Component {
         let blocking = false
         if (!!this.dude.shield) {
             blocking = playerControls.isBlockHeld
-            this.dude.shield.block(blocking)
+            this.dude.updateBlocking(blocking)
         }
 
         if (playerControls.isAttackHeld && !blocking) {
