@@ -160,7 +160,7 @@ export class DudeFactory {
                      * sending data to the host to update that dude
                      */
                     if (uuid === ONLINE_PLAYER_DUDE_ID_PREFIX + MULTIPLAYER_ID) {
-                        additionalComponents = [new GuestPlayer()]
+                        additionalComponents = [new GuestPlayer(), new CutscenePlayerController()]
                     }
                 }
                 // MPTODO: We probably need a GuestPlayerInventory

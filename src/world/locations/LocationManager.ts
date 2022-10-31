@@ -2,7 +2,6 @@ import { Point, pt } from "brigsby/dist"
 import { measure } from "brigsby/dist/Profiler"
 import { WorldAudioContext } from "../../audio/WorldAudioContext"
 import { DudeType } from "../../characters/DudeType"
-import { player } from "../../characters/player"
 import { Enemy } from "../../characters/types/Enemy"
 import { Camera } from "../../cutscenes/Camera"
 import { CutscenePlayerController } from "../../cutscenes/CutscenePlayerController"
@@ -187,11 +186,18 @@ export class LocationManager {
 
             // load a new location
             HUD.instance.locationTransition.transition(() => {
-                // move the player to the new location's dude store
-                const p = player().dude
-                p.location.removeDude(p)
-                newLocation.addDude(p)
-                p.location = newLocation
+                // move the players to the new location's dude store
+                const oldLocation = here()
+
+                oldLocation
+                    .getDudes()
+                    .filter((d) => d.type === DudeType.PLAYER)
+                    .forEach((p) => {
+                        oldLocation.removeDude(p)
+                        newLocation.addDude(p)
+                        p.location = newLocation
+                        p.moveTo(newPosition, true)
+                    })
 
                 // refresh the HUD hide stale data
                 HUD.instance.refresh()
@@ -206,7 +212,6 @@ export class LocationManager {
                 VisibleRegionMask.instance.refresh()
 
                 // position the player and camera
-                p.moveTo(newPosition, true)
                 Camera.instance.jumpCutToFocalPoint()
 
                 setTimeout(() => {
