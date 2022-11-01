@@ -8,6 +8,7 @@ import { CAMPFIRE_DIALOGUE } from "../../characters/dialogue/ItemDialogues"
 import { FireParticles } from "../../graphics/particles/FireParticles"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
+import { session } from "../../online/session"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { GroundRenderer } from "../GroundRenderer"
 import { LightManager } from "../LightManager"
@@ -23,7 +24,9 @@ import { Interactable } from "./Interactable"
 import { NavMeshObstacle } from "./NavMeshObstacle"
 import { RestPoint } from "./RestPoint"
 
-export class CampfireFactory extends ElementFactory<ElementType.CAMPFIRE> {
+type SaveData = { logs: number; llct: number /* last log consumed time */ }
+
+export class CampfireFactory extends ElementFactory<ElementType.CAMPFIRE, SaveData> {
     readonly type = ElementType.CAMPFIRE
     readonly dimensions = new Point(1, 1)
 
@@ -31,7 +34,7 @@ export class CampfireFactory extends ElementFactory<ElementType.CAMPFIRE> {
         super(ElementType.CAMPFIRE)
     }
 
-    make(wl: Location, pos: Point, data: any) {
+    make(wl: Location, pos: Point, data: SaveData) {
         const e = new Entity()
         const scaledPos = pos.times(TILE_SIZE)
         const depth = scaledPos.y + TILE_SIZE - 12
@@ -73,7 +76,10 @@ export class CampfireFactory extends ElementFactory<ElementType.CAMPFIRE> {
             new PointAudio("audio/ambiance/campfire.ogg", pixelCenterPos, TILE_SIZE * 6)
         )
 
+        // const [sendFireUpdate, receiveFireUpdate] = wl.elementAction<{ logCount: number }>(pos)
+
         const updateFire = (logCount: number) => {
+            console.log(`update fire called: ${logCount}`)
             logSprite.enabled = logCount > Campfire.LOG_CAPACITY / 2
             logSpriteSmall.enabled = logCount > 0 && !logSprite.enabled
 
@@ -96,7 +102,19 @@ export class CampfireFactory extends ElementFactory<ElementType.CAMPFIRE> {
             }
         }
 
-        const cf = e.addComponent(new Campfire(data.logs ?? 0, data.llct ?? 0, updateFire))
+        updateFire(data.logs ?? 0)
+
+        const updateFireSync = wl.elementSyncFn("fire", pos, updateFire)
+
+        // receiveFireUpdate(({ logCount }) => updateFire(logCount))
+
+        const cf = e.addComponent(
+            new Campfire(data.logs ?? 0, data.llct ?? 0, (logCount) => {
+                if (session.isHost()) {
+                    updateFireSync(logCount)
+                }
+            })
+        )
 
         e.addComponent(
             new Breakable(

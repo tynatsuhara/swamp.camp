@@ -152,7 +152,10 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     [
         InputKey.PERIOD,
         "delete hovered element",
-        (input) => here().removeElementAt(pixelPtToTilePt(input.mousePos)),
+        (input) => {
+            const { x, y } = pixelPtToTilePt(input.mousePos)
+            here().removeElementAt(x, y)
+        },
     ],
     [
         InputKey.N,

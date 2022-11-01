@@ -4,7 +4,7 @@ let room: Room
 let host = true
 let cachedActions: Record<string, any> = {}
 
-// TODO don't hardcode these
+// MPTODO don't hardcode these
 const APP_ID = "https://swamp-camp-default-rtdb.firebaseio.com/"
 const ROOM_ID = "30908535-9bba-4e21-8a68-3384b7cd604f"
 

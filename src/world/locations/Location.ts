@@ -1,4 +1,4 @@
-import { Entity, Point } from "brigsby/dist"
+import { Entity, Point, pt } from "brigsby/dist"
 import { Grid } from "brigsby/dist/util"
 import { PointAudio } from "../../audio/PointAudio"
 import { Sounds } from "../../audio/Sounds"
@@ -41,6 +41,9 @@ export class Location {
     private readonly featureEntities: Entity[] = []
     private teleporters: { [key: string]: string } = {}
 
+    // private readonly syncListeners = new Map<string, (...args: any[]) => void>()
+    private readonly syncFunctions = new Map<string, (...args: any[]) => void>()
+
     readonly size: number // tile dimensions (square)
     get range() {
         return this.size / 2
@@ -73,7 +76,65 @@ export class Location {
             console.log("sync load element")
             return this.loadElement(...args)
         })
+
+        // syncElement is a central syncFn which redirects data to elements that have registed callbacks
+        this.syncElement = syncFn(`${syncId}se`, <T extends any[]>(id: string, ...args: T) => {
+            const syncFn = this.syncFunctions.get(id)
+            if (syncFn) {
+                syncFn(...args)
+            } else {
+                console.warn("unexpected element syncFn called")
+            }
+        })
+
+        this.removeElementAt = syncFn(`${syncId}rma`, (x: number, y: number) => {
+            this.removeElement(this.getElement(pt(x, y)))
+        })
     }
+
+    /**
+     * @returns A syncFn which will properly redirects data to elements based on grid position.
+     */
+    elementSyncFn<T extends any[]>(
+        namespace: string,
+        { x, y }: Point,
+        fn: (...args: T) => void
+    ): (...args: T) => void {
+        const id = `${pt(x, y).toString()}:${namespace}`
+        // store the function in a map based on x/y so that it can be looked up client side
+        this.syncFunctions.set(id, fn)
+        // return a sync function which binds the x/y coords
+        return (...args: T) => this.syncElement(id, ...args)
+    }
+
+    private syncElement: <T extends any[]>(id: string, ...args: T) => void
+
+    // /**
+    //  * @returns A syncFn which will properly
+    //  */
+    // elementAction<T extends any>({
+    //     x,
+    //     y,
+    // }: Point): [(...args: T[]) => void, (listener: (...args: T[]) => void) => void] {
+    //     const [sendElementSync, receiveElementSync] = session.cachedAction("elem:sync")
+    //     const sendWrapper = <T extends any[]>(...data: T) => {
+    //         if (session.isGuest()) {
+    //             console.warn("guests can't send element data")
+    //         } else {
+    //             sendElementSync(data, null, { x, y })
+    //         }
+    //     }
+    //     const receiveWrapper = <T extends any[]>(fn: (...args: T) => void) => {
+    //         if (session.isGuest()) {
+    //             this.syncListeners.set(pt.toString(), fn)
+    //         }
+    //     }
+    //     receiveElementSync((data, _, { x, y }: { x: number; y: number }) => {
+    //         const listener = this.syncListeners.get(pt(x, y).toString())
+    //         listener(data)
+    //     })
+    //     return [sendWrapper, receiveWrapper]
+    // }
 
     private dudeCache: Dude[]
     getDudes() {
@@ -216,14 +277,24 @@ export class Location {
         return this.occupied.keys()
     }
 
-    removeElementAt(tilePoint: Point) {
-        this.removeElement(this.getElement(tilePoint))
-    }
+    /**
+     * synced host->client
+     */
+    removeElementAt: (x: number, y: number) => void
 
+    /**
+     * runs locally
+     */
     removeElement(el: ElementComponent<any>) {
         if (!el) {
             return
         }
+
+        for (const syncFn of this.syncFunctions.keys()) {
+            Point.fromString(syncFn.split(":")[0])
+            // MPTODO: If we have element data channels or sync FNs, clean them up
+        }
+
         if (this.elements.get(el.pos) === el) {
             this.elements.removeAll(el)
             ElementUtils.rectPoints(
