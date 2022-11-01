@@ -140,7 +140,7 @@ export class DudeFactory {
         // type-specific defaults
         switch (type) {
             case DudeType.PLAYER: {
-                animationName = "knight_f"
+                animationName = "lizard_m"
                 weapon = WeaponType.SWORD
                 shield = ShieldType.BASIC
                 maxHealth = 4
@@ -148,6 +148,7 @@ export class DudeFactory {
                 if (session.isHost()) {
                     const isHostPlayerDude = !uuid.startsWith(ONLINE_PLAYER_DUDE_ID_PREFIX)
                     if (isHostPlayerDude) {
+                        animationName = "knight_f"
                         additionalComponents = [new HostPlayer(), new CutscenePlayerController()]
                         window["player"] = additionalComponents[0]
                     } else {
