@@ -1,6 +1,7 @@
 import { Component, Entity, Point, pt } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
+import { TILE_SIZE } from "../graphics/Tilesets"
 import { Inventory } from "../items/Inventory"
 import { Item } from "../items/Items"
 import { PlayerInventory } from "../items/PlayerInventory"
@@ -9,6 +10,7 @@ import { MULTIPLAYER_ID, syncFn } from "../online/sync"
 import { DudeSaveState } from "../saves/DudeSaveState"
 import { newUUID } from "../saves/uuid"
 import { Singletons } from "../Singletons"
+import { tilesAround } from "../Utils"
 import { Location } from "../world/locations/Location"
 import { camp, LocationManager } from "../world/locations/LocationManager"
 import { BERTO_STARTING_DIALOGUE } from "./dialogue/BertoDialogue"
@@ -61,9 +63,16 @@ export class DudeFactory {
 
     newOnlinePlayer(multiplayerId: string) {
         const hostPlayer = player().dude
+        const tileOptions = tilesAround(hostPlayer.tile, 3)
+            .filter((p) => hostPlayer.location.getGround(p) && !hostPlayer.location.isOccupied(p))
+            .sort((a, b) => a.distanceTo(hostPlayer.tile) - b.distanceTo(hostPlayer.tile))
+        // take any tile in the 2nd half when sorted by distance
+        const furtherHalf = tileOptions.slice(tileOptions.length / 2)
+        const position = Lists.oneOf(furtherHalf).times(TILE_SIZE)
+
         this.make(
             DudeType.PLAYER,
-            hostPlayer.standingPosition,
+            position,
             { uuid: ONLINE_PLAYER_DUDE_ID_PREFIX + multiplayerId },
             hostPlayer.location,
             false
