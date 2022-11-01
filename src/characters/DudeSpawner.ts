@@ -2,6 +2,7 @@ import { Component, debug, Entity, Point } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
 import { WorldAudioContext } from "../audio/WorldAudioContext"
 import { TILE_SIZE } from "../graphics/Tilesets"
+import { session } from "../online/session"
 import { saveManager } from "../SaveManager"
 import { Singletons } from "../Singletons"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
@@ -46,7 +47,7 @@ export class DudeSpawner extends Component {
     }
 
     private spawn() {
-        if (!saveManager.getState() || !saveManager.getState().hasMadeFire) {
+        if (!saveManager.getState() || !saveManager.getState().hasMadeFire || session.isGuest()) {
             return
         }
 
