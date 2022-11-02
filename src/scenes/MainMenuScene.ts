@@ -43,7 +43,7 @@ export class MainMenuScene {
     private view: View
     private allAssetsLoaded = false
     private waitingForAssets = false
-    private waitingToJoinSession = false
+    private sessionLoadingState: string
 
     private menu = Menu.ROOT
 
@@ -69,6 +69,8 @@ export class MainMenuScene {
     }
 
     reset() {
+        this.sessionLoadingState = undefined
+
         resetPlayerInstances()
 
         // TODO: this isn't fully effective
@@ -175,12 +177,12 @@ export class MainMenuScene {
 
         const link = (url: string) => () => window.open(`https://${url}`, "_blank")
 
-        if (this.waitingToJoinSession) {
+        if (this.sessionLoadingState) {
             entities.push(
                 new MainMenuButtonSection(menuTop)
-                    .addText("looking for lobby...")
+                    .addText(`${this.sessionLoadingState}...`)
                     .add("cancel", () => {
-                        this.waitingToJoinSession = false
+                        this.sessionLoadingState = undefined
                         session.close()
                         this.render(Menu.ROOT) // force re-render
                     })
@@ -196,12 +198,11 @@ export class MainMenuScene {
                     .add("load save", () => this.render(Menu.LOAD_GAME), saveCount > 1)
                     .add("New game", () => this.render(Menu.NEW_GAME))
                     .add("multiplayer", () => {
-                        this.waitingToJoinSession = true
+                        this.sessionLoadingState = "looking for lobby"
                         Promise.all([this.loadAssets(), session.join()]).then(() => {
-                            if (this.waitingToJoinSession) {
-                                this.waitingToJoinSession = false
-                                console.log(session.getPeers())
-                                console.log("joined online session")
+                            if (this.sessionLoadingState) {
+                                this.sessionLoadingState = "loading world"
+                                this.render(Menu.ROOT) // force re-render
                                 guestOnJoin()
                             }
                         })
