@@ -43,9 +43,29 @@ body {
     background-color: #2d1e2f;
 }
 
+body,
+input {
+    color: #fcecd1;
+    line-height: 32px;
+    font-family: "Press Start 2P", cursive;
+    font-size: 24px;
+}
+
+a {
+    color: #64b082;
+    text-decoration: none;
+}
+a:hover {
+    color: #fcecd1;
+}
+
 * {
     image-rendering: -moz-crisp-edges; /* Firefox */
     image-rendering: -webkit-crisp-edges; /* Webkit (Safari) */
     image-rendering: pixelated; /* Chrome */
     image-rendering: crisp-edges;
+}
+
+.game-text-input {
+    display: fixed;
 }
