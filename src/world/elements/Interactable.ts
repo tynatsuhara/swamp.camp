@@ -21,7 +21,7 @@ export class Interactable extends Component {
         position: Point,
         fn: () => void,
         uiOffset: Point = Point.ZERO,
-        isInteractable: () => boolean = () => !UIStateManager.instance.isMenuOpen
+        isInteractable: () => boolean = () => true
     ) {
         super()
         this.position = position
@@ -29,7 +29,7 @@ export class Interactable extends Component {
         this.uiOffset = uiOffset
         this.isInteractable = () => {
             // TODO: Certain things might be interactable for guests, move this logic up
-            return session.isHost() && isInteractable()
+            return !UIStateManager.instance.isMenuOpen && session.isHost() && isInteractable()
         }
     }
 
