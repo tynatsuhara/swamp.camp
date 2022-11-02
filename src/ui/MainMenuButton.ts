@@ -71,8 +71,8 @@ export class MainMenuButton extends Component {
 
         const offset = Math.floor((this.width - text.length * TEXT_PIXEL_WIDTH) / 2)
 
-        const defaultColor = Color.GREEN_5
         const hoverColor = Color.WHITE
+        const defaultColor = this.hoverable ? Color.GREEN_5 : hoverColor
 
         return [
             new TextRender(

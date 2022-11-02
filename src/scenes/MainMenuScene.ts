@@ -35,6 +35,8 @@ enum Menu {
     DOWNLOADS,
 }
 
+// new TextInput()
+
 export class MainMenuScene {
     private plumes: PlumePicker
     private knight: SpriteComponent
@@ -198,7 +200,7 @@ export class MainMenuScene {
                     .add("load save", () => this.render(Menu.LOAD_GAME), saveCount > 1)
                     .add("New game", () => this.render(Menu.NEW_GAME))
                     .add("multiplayer", () => {
-                        this.sessionLoadingState = "looking for lobby"
+                        this.sessionLoadingState = "connecting"
                         Promise.all([this.loadAssets(), session.join()]).then(() => {
                             if (this.sessionLoadingState) {
                                 this.sessionLoadingState = "loading world"
