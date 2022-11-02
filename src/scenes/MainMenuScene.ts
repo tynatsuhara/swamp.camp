@@ -43,6 +43,7 @@ export class MainMenuScene {
     private view: View
     private allAssetsLoaded = false
     private waitingForAssets = false
+    private waitingToJoinSession = false
 
     private menu = Menu.ROOT
 
@@ -50,7 +51,7 @@ export class MainMenuScene {
         this.loadAssets(false)
     }
 
-    private loadAssets(blocking = true) {
+    private async loadAssets(blocking = true) {
         UISounds.loadAll()
         if (this.allAssetsLoaded) {
             return Promise.resolve()
@@ -59,14 +60,12 @@ export class MainMenuScene {
             console.log("waiting for assets to load before continuing")
             this.waitingForAssets = true
         }
-        return assets.loadImageFiles(getFilesToLoadForGame()).then(() => {
-            // it's probably okay if audio loads late
-            loadDeferredAudio()
-
-            this.allAssetsLoaded = true
-            this.waitingForAssets = false
-            console.log("assets loaded!")
-        })
+        await assets.loadImageFiles(getFilesToLoadForGame())
+        // it's probably okay if audio loads late
+        loadDeferredAudio()
+        this.allAssetsLoaded = true
+        this.waitingForAssets = false
+        console.log("assets loaded!")
     }
 
     reset() {
@@ -176,7 +175,18 @@ export class MainMenuScene {
 
         const link = (url: string) => () => window.open(`https://${url}`, "_blank")
 
-        if (this.waitingForAssets) {
+        if (this.waitingToJoinSession) {
+            entities.push(
+                new MainMenuButtonSection(menuTop)
+                    .addText("looking for lobby...")
+                    .add("cancel", () => {
+                        this.waitingToJoinSession = false
+                        session.close()
+                        this.render(Menu.ROOT) // force re-render
+                    })
+                    .getEntity()
+            )
+        } else if (this.waitingForAssets) {
             entities.push(new MainMenuButtonSection(menuTop).addText("loading...").getEntity())
         } else if (this.menu === Menu.ROOT) {
             const saveCount = saveManager.getSaveCount()
@@ -186,11 +196,16 @@ export class MainMenuScene {
                     .add("load save", () => this.render(Menu.LOAD_GAME), saveCount > 1)
                     .add("New game", () => this.render(Menu.NEW_GAME))
                     .add("multiplayer", () => {
-                        session.join().then(() => {
-                            console.log(session.getPeers())
-                            console.log("joined online session")
-                            guestOnJoin()
+                        this.waitingToJoinSession = true
+                        Promise.all([this.loadAssets(), session.join()]).then(() => {
+                            if (this.waitingToJoinSession) {
+                                this.waitingToJoinSession = false
+                                console.log(session.getPeers())
+                                console.log("joined online session")
+                                guestOnJoin()
+                            }
                         })
+                        this.render(Menu.ROOT) // force re-render
                     })
                     .add("Download", () => this.render(Menu.DOWNLOADS), !IS_NATIVE_APP)
                     .add("Credits", () => this.render(Menu.CREDITS))
