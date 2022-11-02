@@ -49,7 +49,7 @@ export class MiniMap extends Component {
             this.bigCanvas = document.createElement("canvas")
             this.bigCanvas.width = this.bigCanvas.height = wl.size * TILE_SIZE
         }
-        const context = this.bigCanvas.getContext("2d")
+        const context = this.bigCanvas.getContext("2d", { willReadFrequently: true })
 
         // draw the ground from the groundrenderer
         context.drawImage(ground, 0, 0)
