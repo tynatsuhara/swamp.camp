@@ -121,6 +121,7 @@ const KEYS = {
     ["x"]: new Point(29, 31),
     ["y"]: new Point(30, 31),
     ["z"]: new Point(31, 31),
+    ["copy"]: new Point(31, 32),
     ["campfire"]: new Point(14, 10),
     ["tombstone1"]: new Point(0, 14),
     ["tombstone2"]: new Point(1, 14),
