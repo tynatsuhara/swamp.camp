@@ -7,7 +7,7 @@ export class TextInput {
     private readonly cursorFlashInterval: NodeJS.Timer
     private value: string = ""
 
-    constructor(topCenterPos: Point, maxLength: number) {
+    constructor(topCenterPos: Point, maxLength: number, onEnter: () => void) {
         const wrapper = document.createElement("div")
         this.element = document.body.appendChild(wrapper)
         this.reposition(topCenterPos)
@@ -40,6 +40,9 @@ export class TextInput {
 
         input.onkeydown = (e) => {
             e.stopPropagation()
+            if (e.key === "Enter") {
+                onEnter()
+            }
         }
 
         input.onblur = () => {
@@ -71,7 +74,10 @@ export class TextInput {
     delete(): undefined {
         clearInterval(this.cursorFlashInterval)
         document.body.removeChild(this.element)
-        // TODO: return focus to the document
+        // focus then blur the canvas to send key events back to it properly
+        const canvas = document.getElementById("canvas")
+        canvas.focus()
+        canvas.blur()
         return undefined
     }
 }
