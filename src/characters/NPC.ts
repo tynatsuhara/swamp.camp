@@ -2,6 +2,7 @@ import { debug, Point, UpdateData } from "brigsby/dist"
 import { LineRender } from "brigsby/dist/renderer"
 import { Lists } from "brigsby/dist/util"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
+import { session } from "../online/session"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { tilesAround } from "../Utils"
 import { Burnable } from "../world/elements/Burnable"
@@ -63,10 +64,16 @@ export class NPC extends Simulatable {
     }
 
     start() {
-        this._dude.doWhileLiving(() => this.decideWhatToDoNext(), 1000 + 1000 * Math.random())
+        if (session.isHost()) {
+            this._dude.doWhileLiving(() => this.decideWhatToDoNext(), 1000 + 1000 * Math.random())
+        }
     }
 
     update(updateData: UpdateData) {
+        if (session.isGuest()) {
+            return
+        }
+
         /**
          * NPC behavior:
          * If threatened, fight or flee
