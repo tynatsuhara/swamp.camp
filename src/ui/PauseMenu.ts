@@ -164,7 +164,7 @@ export class PauseMenu extends Component {
         } else {
             return {
                 text: "OPEN LOBBY",
-                fn: () => session.open((peerId) => hostOnJoin(peerId)),
+                fn: () => session.open(() => hostOnJoin()),
             }
         }
     }

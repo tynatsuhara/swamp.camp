@@ -1,4 +1,3 @@
-import { ActionReceiver, ActionSender, Room } from "trystero"
 import { DudeFactory, ONLINE_PLAYER_DUDE_ID_PREFIX } from "../characters/DudeFactory"
 import { saveManager } from "../SaveManager"
 import { Save } from "../saves/SaveGame"
@@ -24,17 +23,12 @@ if (!localStorage.getItem(MULTIPLAYER_ID_KEY)) {
 export const MULTIPLAYER_ID = localStorage.getItem(MULTIPLAYER_ID_KEY)
 
 // Core actions
-const actionMultiplayerId = () => session.cachedAction<{ id: string }>("mpid")
-const actionInitWorld = () => session.cachedAction<Save>("init")
-const actionInitWorldAck = () => session.cachedAction<void>("init:ack")
+const [sendMultiplayerId, receiveMultiplayerId] = session.action<{ id: string }>("mpid")
+const [sendInitWorld, receiveInitWorld] = session.action<Save>("init")
+const [sendInitWorldAck, receiveInitWorldAck] = session.action<void>("init:ack")
 
 // Called when a new user has joined the game
-export const hostOnJoin = (peerId: string) => {
-    // MPTODO: Refactor this so that these actions don't get re-initialized if a third player joins or on leave/join
-    const [_, receiveMultiplayerId] = actionMultiplayerId()
-    const [sendInitWorld] = actionInitWorld()
-    const [_2, receiveInitWorldAck] = actionInitWorldAck()
-
+export const hostOnJoin = () => {
     receiveMultiplayerId(({ id }, peerId) => {
         console.log(`received multiplayer ID ${id} from peer ${peerId}`)
         peerToMultiplayerId[peerId] = id
@@ -59,12 +53,7 @@ export const hostSessionClose = () => {
     cleanUpSession()
 }
 
-// MPTODO it seems like something here is breaking if a peer leaves and tries to rejoin
 export const guestOnJoin = () => {
-    const [sendMultiplayerId] = actionMultiplayerId()
-    const [_, receiveInitWorld] = actionInitWorld()
-    const [sendInitWorldAck] = actionInitWorldAck()
-
     sendMultiplayerId({ id: MULTIPLAYER_ID })
 
     receiveInitWorld((data, peerId) => {
@@ -110,46 +99,24 @@ export const syncFn = <T extends any[], R = void>(
     id: string,
     fn: (...args: T) => R
 ): ((...args: T) => R) => {
-    let sendAndReceiveRoom: Room
-    let sendFn: ActionSender<T>
-    let receiveFn: ActionReceiver<T>
-    const lazyInit = () => {
-        const [lazySender, lazyReceiver] = session.cachedAction<T>(id)
-        sendFn = lazySender
-        receiveFn = lazyReceiver
-        sendAndReceiveRoom = session.getRoom()
-    }
+    const [send, receive] = session.action<T>(id)
 
     const wrappedFn = (...args: T) => {
-        // clear out sender/receiver if they were initialized in a previous session
-        // (or the session has ended and the room is now undefined)
-        if (session.getRoom() !== sendAndReceiveRoom) {
-            sendFn = undefined
-            receiveFn = undefined
-            sendAndReceiveRoom = undefined
-        }
-
         // offline syncFn is just a normal fn
         if (!session.isOnline()) {
             return fn(...args)
         }
 
-        if (!sendFn) {
-            lazyInit()
-        }
-
         if (session.isGuest()) {
             console.warn("client cannot call syncFn")
         } else {
-            sendFn(args, initializedPeers)
+            send(args, initializedPeers)
             return fn(...args)
         }
     }
 
     if (session.isGuest()) {
-        lazyInit()
-
-        receiveFn((args) => {
+        receive((args) => {
             fn(...args)
         })
     }
@@ -163,34 +130,13 @@ export const syncFn = <T extends any[], R = void>(
  * If the client writes data, it will be a no-op that generates a warning log.
  */
 export const syncData = <T extends object>(id: string, data: T, onChange = (updated: T) => {}) => {
-    let sendAndReceiveRoom: Room
-    let sendFn: ActionSender<Partial<T>>
-    let receiveFn: ActionReceiver<Partial<T>>
-    const lazyInit = () => {
-        const [lazySender, lazyReceiver] = session.cachedAction<Partial<T>>(id)
-        sendFn = lazySender
-        receiveFn = lazyReceiver
-        sendAndReceiveRoom = session.getRoom()
-    }
+    const [send, receive] = session.action<T>(id)
 
     const proxy = new Proxy(data, {
         set(target, property, value, receiver) {
-            // clear out sender/receiver if they were initialized in a previous session
-            // (or the session has ended and the room is now undefined)
-            if (session.getRoom() !== sendAndReceiveRoom) {
-                sendFn = undefined
-                receiveFn = undefined
-                sendAndReceiveRoom = undefined
-            }
-
             // offline syncData is just a normal object
             if (!session.isOnline()) {
                 return Reflect.set(target, property, value, receiver)
-            }
-
-            // lazy initialize
-            if (!sendFn) {
-                lazyInit()
             }
 
             if (session.isGuest()) {
@@ -201,7 +147,7 @@ export const syncData = <T extends object>(id: string, data: T, onChange = (upda
                 let success = Reflect.set(target, property, value, receiver)
                 if (success) {
                     // @ts-ignore
-                    sendFn({ [property]: value }, initializedPeers)
+                    send({ [property]: value }, initializedPeers)
                 }
 
                 return success
@@ -210,9 +156,7 @@ export const syncData = <T extends object>(id: string, data: T, onChange = (upda
     })
 
     if (session.isGuest()) {
-        lazyInit()
-
-        receiveFn((newData) => {
+        receive((newData) => {
             Object.keys(newData).forEach((key) => {
                 data[key] = newData[key]
             })
@@ -221,4 +165,48 @@ export const syncData = <T extends object>(id: string, data: T, onChange = (upda
     }
 
     return proxy
+}
+
+/**
+ * MPTODO
+ * Similar to syncFn, but can be invoked on either clients or the host.
+ * If the client invocation is accepted by the host, it will be forwarded to other clients.
+ * MPTODO: How should we propagate the trusted nature?
+ *
+ * The syncFn receives a "trusted" argument which will be true if:
+ *   1) The function is invoked locally OR
+ *   2) The function is invoked by the host
+ */
+export const clientSyncFn = <T extends any[], R = void>(
+    id: string,
+    fn: (trusted: boolean, ...args: T) => R
+): ((...args: T) => R) => {
+    const [send, receive] = session.action<T>(id)
+
+    const wrappedFn = (...args: T) => {
+        // offline clientSyncFn is just a normal fn
+        if (!session.isOnline()) {
+            return fn(true, ...args)
+        }
+
+        if (session.isGuest()) {
+            // if you're a guest, you can only talk directly to the host
+            send(args, hostId)
+        } else {
+            // host talks to everyone
+            send(args, initializedPeers)
+        }
+
+        return fn(true, ...args)
+    }
+
+    receive((args, peerId) => {
+        fn(peerId === hostId, ...args)
+        // MPTODO: forward to other peers. we need to decide if it's trusted first
+        // if (session.isHost()) {
+        //     sendFn(args, initializedPeers.filter(p => p !== peerId))
+        // }
+    })
+
+    return wrappedFn
 }

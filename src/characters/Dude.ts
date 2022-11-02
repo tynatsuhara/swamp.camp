@@ -19,7 +19,7 @@ import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { Inventory } from "../items/Inventory"
 import { Item, spawnItem } from "../items/Items"
 import { session } from "../online/session"
-import { syncData, syncFn } from "../online/sync"
+import { clientSyncFn, syncData, syncFn } from "../online/sync"
 import { DudeSaveState } from "../saves/DudeSaveState"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
@@ -219,91 +219,6 @@ export class Dude extends Component implements DialogueSource {
         this.conditions = conditions
         this.name = name
 
-        this.awake = () => {
-            // Set up animations
-            this.characterAnimName = characterAnimName
-            const idleAnim = DudeAnimationUtils.getCharacterIdleAnimation(characterAnimName, blob)
-            const runAnim = DudeAnimationUtils.getCharacterWalkAnimation(characterAnimName, blob)
-            const jumpAnim = DudeAnimationUtils.getCharacterJumpAnimation(characterAnimName, blob)
-            const height = idleAnim.getSprite(0).dimensions.y
-            this._animation = this.entity.addComponent(
-                new AnimatedSpriteComponent(
-                    [idleAnim, runAnim, jumpAnim],
-                    new SpriteTransform(new Point(0, 28 - height))
-                )
-            )
-            this.standingOffset = new Point(
-                this.animation.transform.dimensions.x / 2,
-                this.animation.transform.dimensions.y
-            )
-            this.position = standingPosition.minus(this.standingOffset)
-            this._animation.fastForward(Math.random() * 1000) // so not all the animations sync up
-
-            this.setWeapon(weaponType)
-            this.setShield(shieldType)
-
-            this.entity.addComponent(new WalkingParticles())
-
-            // Set up collider
-            this.relativeColliderPos = new Point(
-                this.animation.transform.dimensions.x / 2 - colliderSize.x / 2,
-                this.animation.transform.dimensions.y - colliderSize.y
-            )
-            this.collider = this.entity.addComponent(
-                new BoxCollider(
-                    this.position.plus(this.relativeColliderPos),
-                    colliderSize,
-                    this.type === DudeType.PLAYER
-                        ? Dude.PLAYER_COLLISION_LAYER
-                        : Dude.NPC_COLLISION_LAYER
-                )
-            )
-
-            this.dialogueInteract = this.entity.addComponent(
-                new Interactable(
-                    new Point(0, 0),
-                    () => DialogueDisplay.instance.startDialogue(this),
-                    Point.ZERO,
-                    () =>
-                        !UIStateManager.instance.isMenuOpen &&
-                        !!this.dialogue &&
-                        this.entity.getComponent(NPC)?.canTalk()
-                )
-            )
-
-            StepSounds.startFootstepSoundLoop(this)
-        }
-
-        this.start = () => {
-            this.seaLevel = this.location.levels?.get(this.tile) ?? 0
-            this.claimResidence(type, uuid, hasPendingSlot) // MPTODO how does this get synced?
-
-            if (session.isHost()) {
-                // Damage dudes walking through blackberries
-                this.doWhileLiving(() => {
-                    if (
-                        this.isMoving &&
-                        !this.isJumping &&
-                        here().getElement(this.tile)?.type === ElementType.BLACKBERRIES
-                    ) {
-                        this.damage(0.25, {
-                            direction: Point.ZERO.randomCircularShift(1),
-                            knockback: 5,
-                            blockable: false,
-                            dodgeable: false,
-                        })
-                    }
-                }, 600)
-            }
-
-            // Update dialogue indicator
-            this.doWhileLiving(() => {
-                if (this.dialogue && this.dialogue != EMPTY_DIALOGUE) {
-                    this.dialogueIndicator = getDialogue(this.dialogue).indicator
-                }
-            }, 1000)
-        }
-
         // Synchronized host->client functions
 
         this.jump = syncFn(`${this.syncId}jump`, () => {
@@ -392,6 +307,127 @@ export class Dude extends Component implements DialogueSource {
                     return
             }
         })
+
+        // Synchronized client->host functions
+
+        const setWeapon = (type: WeaponType) => {
+            this.weapon?.delete()
+            this._weapon = this.entity.addComponent(WeaponFactory.make(type, this.type))
+            this.shield?.setOnBack(false) // keep em in sync
+        }
+        this.setWeapon = clientSyncFn(`${this.syncId}eqw`, (trusted, type: WeaponType) => {
+            if (this.weapon?.getType() === type) {
+                return
+            }
+            if (!trusted && !this.inventory.getItemCount(type as unknown as Item)) {
+                return
+            }
+            setWeapon(type)
+        })
+
+        const setShield = (type: ShieldType) => {
+            this.shield?.delete()
+            this._shield = this.entity.addComponent(ShieldFactory.make(type, this.type))
+            this.weapon?.setSheathed(false) // keep em in sync
+        }
+        this.setShield = clientSyncFn(`${this.syncId}eqs`, (trusted, type: ShieldType) => {
+            if (this.shield?.type === type) {
+                return
+            }
+            console.log(`equip shield ${type}`)
+            if (!trusted && !this.inventory.getItemCount(type as unknown as Item)) {
+                return
+            }
+            setShield(type)
+        })
+
+        // Component lifecycle functions
+
+        this.awake = () => {
+            // Set up animations
+            this.characterAnimName = characterAnimName
+            const idleAnim = DudeAnimationUtils.getCharacterIdleAnimation(characterAnimName, blob)
+            const runAnim = DudeAnimationUtils.getCharacterWalkAnimation(characterAnimName, blob)
+            const jumpAnim = DudeAnimationUtils.getCharacterJumpAnimation(characterAnimName, blob)
+            const height = idleAnim.getSprite(0).dimensions.y
+            this._animation = this.entity.addComponent(
+                new AnimatedSpriteComponent(
+                    [idleAnim, runAnim, jumpAnim],
+                    new SpriteTransform(new Point(0, 28 - height))
+                )
+            )
+            this.standingOffset = new Point(
+                this.animation.transform.dimensions.x / 2,
+                this.animation.transform.dimensions.y
+            )
+            this.position = standingPosition.minus(this.standingOffset)
+            this._animation.fastForward(Math.random() * 1000) // so not all the animations sync up
+
+            // Not using the synchronized methods because clients don't need to tell hosts
+            setWeapon(weaponType)
+            setShield(shieldType)
+
+            this.entity.addComponent(new WalkingParticles())
+
+            // Set up collider
+            this.relativeColliderPos = new Point(
+                this.animation.transform.dimensions.x / 2 - colliderSize.x / 2,
+                this.animation.transform.dimensions.y - colliderSize.y
+            )
+            this.collider = this.entity.addComponent(
+                new BoxCollider(
+                    this.position.plus(this.relativeColliderPos),
+                    colliderSize,
+                    this.type === DudeType.PLAYER
+                        ? Dude.PLAYER_COLLISION_LAYER
+                        : Dude.NPC_COLLISION_LAYER
+                )
+            )
+
+            this.dialogueInteract = this.entity.addComponent(
+                new Interactable(
+                    new Point(0, 0),
+                    () => DialogueDisplay.instance.startDialogue(this),
+                    Point.ZERO,
+                    () =>
+                        !UIStateManager.instance.isMenuOpen &&
+                        !!this.dialogue &&
+                        this.entity.getComponent(NPC)?.canTalk()
+                )
+            )
+
+            StepSounds.startFootstepSoundLoop(this)
+        }
+
+        this.start = () => {
+            this.seaLevel = this.location.levels?.get(this.tile) ?? 0
+            this.claimResidence(type, uuid, hasPendingSlot) // MPTODO how does this get synced?
+
+            if (session.isHost()) {
+                // Damage dudes walking through blackberries
+                this.doWhileLiving(() => {
+                    if (
+                        this.isMoving &&
+                        !this.isJumping &&
+                        here().getElement(this.tile)?.type === ElementType.BLACKBERRIES
+                    ) {
+                        this.damage(0.25, {
+                            direction: Point.ZERO.randomCircularShift(1),
+                            knockback: 5,
+                            blockable: false,
+                            dodgeable: false,
+                        })
+                    }
+                }, 600)
+            }
+
+            // Update dialogue indicator
+            this.doWhileLiving(() => {
+                if (this.dialogue && this.dialogue != EMPTY_DIALOGUE) {
+                    this.dialogueIndicator = getDialogue(this.dialogue).indicator
+                }
+            }, 1000)
+        }
     }
 
     update({ elapsedTimeMillis }) {
@@ -425,7 +461,6 @@ export class Dude extends Component implements DialogueSource {
         this.jumpingAnimator?.update(elapsedTimeMillis)
     }
 
-    // MPTODO
     equipFirstWeaponInInventory() {
         const weapon = this.inventory
             .getStacks()
@@ -434,7 +469,6 @@ export class Dude extends Component implements DialogueSource {
         this.setWeapon(weapon || WeaponType.NONE)
     }
 
-    // MPTODO
     equipFirstShieldInInventory() {
         const shield = this.inventory
             .getStacks()
@@ -443,29 +477,18 @@ export class Dude extends Component implements DialogueSource {
         this.setShield(shield || ShieldType.NONE)
     }
 
-    // MPTODO: How do we sync these functions? syncFn?
-    setWeapon(type: WeaponType) {
-        if (this.weapon?.getType() === type) {
-            return
-        }
-        this.weapon?.delete()
-        this._weapon = this.entity.addComponent(WeaponFactory.make(type, this.type))
-        this.shield?.setOnBack(false) // keep em in sync
-    }
-
-    setShield(type: ShieldType) {
-        if (this.shield?.type === type) {
-            return
-        }
-        this.shield?.delete()
-        this._shield = this.entity.addComponent(ShieldFactory.make(type, this.type))
-        this.weapon?.setSheathed(false) // keep em in sync
-    }
-
+    // sync functions
+    readonly setWeapon: (type: WeaponType) => void
+    readonly setShield: (type: ShieldType) => void
     readonly setWeaponAndShieldDrawn: (drawn: boolean) => void
     readonly updateBlocking: (blocking: boolean) => void
     readonly updateAttacking: (isNewAttack: boolean) => void
     readonly cancelAttacking: () => void
+    /**
+     * @param duration if zero, unlimited duration
+     */
+    readonly addCondition: (condition: Condition, duration?: number) => void
+    readonly removeCondition: (condition: Condition) => void
 
     private fireParticles: FireParticles
     private poisonParticles: PoisonParticles
@@ -558,13 +581,6 @@ export class Dude extends Component implements DialogueSource {
         })
     }
 
-    /**
-     * @param duration if zero, unlimited duration
-     */
-    addCondition: (condition: Condition, duration?: number) => void
-
-    removeCondition: (condition: Condition) => void
-
     removeAllConditions() {
         this.conditions.forEach((c) => this.removeCondition(c.condition))
     }
@@ -584,6 +600,7 @@ export class Dude extends Component implements DialogueSource {
         return this._health > 0
     }
 
+    // MPTODO
     damage(
         damage: number,
         {
