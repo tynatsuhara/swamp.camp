@@ -175,7 +175,7 @@ export class MainMenuScene {
             new Entity([new DevControls()]),
         ]
 
-        const link = (url: string) => () => window.open(`https://${url}`, "_blank")
+        const link = (url: string) => () => window.open(url, "_blank")
 
         if (this.sessionLoadingState) {
             entities.push(
@@ -218,19 +218,19 @@ export class MainMenuScene {
                     .add(
                         "Windows",
                         link(
-                            "github.com/tylerbonnell/swamp-camp-native/releases/download/windows-latest/swamp-camp-win32-x64.zip"
+                            "https://github.com/tylerbonnell/swamp-camp-native/releases/download/windows-latest/swamp-camp-win32-x64.zip"
                         )
                     )
                     .add(
                         "Mac (Intel)",
                         link(
-                            "github.com/tylerbonnell/swamp-camp-native/releases/download/macos-latest/swamp-camp-darwin-x64.zip"
+                            "https://github.com/tylerbonnell/swamp-camp-native/releases/download/macos-latest/swamp-camp-darwin-x64.zip"
                         )
                     )
                     .add(
                         "Mac (Apple Silicon)",
                         link(
-                            "github.com/tylerbonnell/swamp-camp-native/releases/tag/macos-apple-silicon"
+                            "https://github.com/tylerbonnell/swamp-camp-native/releases/tag/macos-apple-silicon"
                         )
                     )
                     .add("Back", () => this.render(Menu.ROOT))
@@ -290,20 +290,20 @@ export class MainMenuScene {
         } else if (this.menu === Menu.CREDITS) {
             entities.splice(0) // don't show title and scene
             const creditEntries: [credit: string, fn: () => void][] = [
-                ["a game by Tyler Bonnell", link("ty.pizza/")],
+                ["a game by Tyler Bonnell", link("https://ty.pizza/")],
                 null,
-                ["add'l art: Robert Norenberg", link("0x72.pl")],
-                ["           Cael Johnson    ", link("caeljohnson.artstation.com")],
-                ["           Kenney          ", link("kenney.nl")],
-                ["    music: Juhani Junkala  ", link("juhanijunkala.com")],
-                ["           Brent Bunn      ", link("bertn1991.newgrounds.com")],
-                ["           Playonloop.com  ", link("playonloop.com")],
-                ["    sound: BurghRecords    ", link("www.edinburghrecords.com")],
-                ["           Antoine Goumain ", link("antoinegoumain.fr")],
-                ["           Thor Arisland   ", link("tcarisland.no")],
+                ["add'l art: Robert Norenberg", link("https://0x72.pl")],
+                ["           Cael Johnson    ", link("https://caeljohnson.artstation.com")],
+                ["           Kenney          ", link("https://kenney.nl")],
+                ["    music: Juhani Junkala  ", link("https://juhanijunkala.com")],
+                ["           Brent Bunn      ", link("https://bertn1991.newgrounds.com")],
+                ["           Playonloop.com  ", link("https://playonloop.com")],
+                ["    sound: BurghRecords    ", link("https://www.edinburghrecords.com")],
+                ["           Antoine Goumain ", link("https://antoinegoumain.fr")],
+                ["           Thor Arisland   ", link("https://tcarisland.no")],
                 // ["           Morten SΘegaard ", link("twitter.com/littlerobotsfx")],  // TODO if we use the "voices" pack
                 null,
-                ["made with brigsby!", link("brigsby.js.org/")],
+                ["made with brigsby!", link("https://brigsby.js.org/")],
                 null,
                 ["back", () => this.render(Menu.ROOT)],
             ]
