@@ -13,7 +13,7 @@ import { DevControls } from "../debug/DevControls"
 import { FireParticles } from "../graphics/particles/FireParticles"
 import { Particles } from "../graphics/particles/Particles"
 import { getFilesToLoadForGame, getImage, Tilesets, TILE_SIZE } from "../graphics/Tilesets"
-import { session } from "../online/session"
+import { session, SESSION_ID_LENGTH } from "../online/session"
 import { guestOnJoin } from "../online/sync"
 import { saveManager } from "../SaveManager"
 import { Save } from "../saves/SaveGame"
@@ -22,6 +22,7 @@ import { Cursor } from "../ui/Cursor"
 import { MainMenuButtonSection } from "../ui/MainMenuButtonSection"
 import { PlumePicker, PLUME_COLORS } from "../ui/PlumePicker"
 import { TEXT_SIZE } from "../ui/Text"
+import { TextInput } from "../ui/TextInput"
 import { UISounds } from "../ui/UISounds"
 import { UIStateManager } from "../ui/UIStateManager"
 import { DarknessMask } from "../world/DarknessMask"
@@ -33,9 +34,8 @@ enum Menu {
     PICK_COLOR,
     CREDITS,
     DOWNLOADS,
+    MULTIPLAYER,
 }
-
-// new TextInput()
 
 export class MainMenuScene {
     private plumes: PlumePicker
@@ -46,6 +46,7 @@ export class MainMenuScene {
     private allAssetsLoaded = false
     private waitingForAssets = false
     private sessionLoadingState: string
+    private sessionIdTextInput: TextInput
 
     private menu = Menu.ROOT
 
@@ -190,6 +191,39 @@ export class MainMenuScene {
                     })
                     .getEntity()
             )
+        } else if (this.menu === Menu.MULTIPLAYER) {
+            const joinSession = () => {
+                Promise.all([
+                    this.loadAssets(),
+                    session.join(this.sessionIdTextInput.getValue()),
+                ]).then(() => {
+                    if (this.sessionLoadingState) {
+                        this.sessionLoadingState = "loading world"
+                        this.render(Menu.ROOT) // force re-render
+                        guestOnJoin()
+                    }
+                })
+                this.sessionIdTextInput = this.sessionIdTextInput.delete()
+                this.sessionLoadingState = "connecting"
+                this.render(Menu.ROOT) // force re-render
+            }
+            if (!this.sessionIdTextInput) {
+                this.sessionIdTextInput = new TextInput(menuTop, SESSION_ID_LENGTH)
+            } else {
+                this.sessionIdTextInput.reposition(menuTop)
+            }
+            entities.push(
+                new MainMenuButtonSection(menuTop)
+                    .addLineBreak()
+                    .add("connect", joinSession, !this.sessionLoadingState)
+                    .add("cancel", () => {
+                        this.sessionIdTextInput = this.sessionIdTextInput.delete()
+                        this.sessionLoadingState = undefined
+                        session.close()
+                        this.render(Menu.ROOT) // force re-render
+                    })
+                    .getEntity()
+            )
         } else if (this.waitingForAssets) {
             entities.push(new MainMenuButtonSection(menuTop).addText("loading...").getEntity())
         } else if (this.menu === Menu.ROOT) {
@@ -199,17 +233,7 @@ export class MainMenuScene {
                     .add("continue", () => this.loadLastSave(), saveCount > 0)
                     .add("load save", () => this.render(Menu.LOAD_GAME), saveCount > 1)
                     .add("New game", () => this.render(Menu.NEW_GAME))
-                    .add("multiplayer", () => {
-                        this.sessionLoadingState = "connecting"
-                        Promise.all([this.loadAssets(), session.join()]).then(() => {
-                            if (this.sessionLoadingState) {
-                                this.sessionLoadingState = "loading world"
-                                this.render(Menu.ROOT) // force re-render
-                                guestOnJoin()
-                            }
-                        })
-                        this.render(Menu.ROOT) // force re-render
-                    })
+                    .add("multiplayer", () => this.render(Menu.MULTIPLAYER))
                     .add("Download", () => this.render(Menu.DOWNLOADS), !IS_NATIVE_APP)
                     .add("Credits", () => this.render(Menu.CREDITS))
                     .getEntity()

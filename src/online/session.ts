@@ -1,5 +1,7 @@
+import { Lists } from "brigsby/dist/util/Lists"
 import { ActionProgress, ActionReceiver, ActionSender, joinRoom, Room } from "trystero"
 
+let sessionId: string
 let room: Room
 let host = true
 let cachedActions: Record<string, any> = {}
@@ -7,9 +9,21 @@ const cachedLazyActions: Record<string, any> = {}
 const lazyActionInitFns: (() => void)[] = []
 const initLazyActions = () => lazyActionInitFns.forEach((fn) => fn())
 
-// MPTODO don't hardcode these
-const APP_ID = "https://swamp-camp-default-rtdb.firebaseio.com/"
-const ROOM_ID = "30908535-9bba-4e21-8a68-3384b7cd604f"
+export const SESSION_ID_LENGTH = 4
+
+const makeSessionId = () => {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    return Lists.range(0, SESSION_ID_LENGTH)
+        .map(() => chars.charAt(Math.floor(Math.random() * chars.length)))
+        .join("")
+}
+
+const APP_ID = "9fea88cf-69d4-4ab8-b9cb-44c88d9de16b"
+/**
+ * This isn't a real password — it is used for encrypting session descriptions in the matching
+ * network in order to prevent unnecessary PII exposure to sources other than SWAMP CAMP.
+ */
+const PASSWORD = "30908535-9bba-4e21-8a68-3384b7cd604f"
 
 /**
  * Wrapper around generic P2P rooms, adding host and guest semantics to match the game network model.
@@ -17,7 +31,8 @@ const ROOM_ID = "30908535-9bba-4e21-8a68-3384b7cd604f"
 export const session = {
     open: (onPeerJoin: (peerId: string) => void) => {
         host = true
-        room = joinRoom({ appId: APP_ID }, ROOM_ID)
+        sessionId = makeSessionId()
+        room = joinRoom({ appId: APP_ID, password: PASSWORD }, sessionId)
         initLazyActions()
         room.onPeerJoin((peerId) => {
             console.log(`${peerId} joined!`)
@@ -33,9 +48,9 @@ export const session = {
         cachedActions = {}
     },
 
-    join: (): Promise<string> => {
+    join: (sessionId: string): Promise<string> => {
         host = false
-        room = joinRoom({ appId: APP_ID }, ROOM_ID)
+        room = joinRoom({ appId: APP_ID, password: PASSWORD }, sessionId)
         initLazyActions()
         console.log("looking for lobby")
 
@@ -58,6 +73,8 @@ export const session = {
      * @returns true if the user is online in someone else's world
      */
     isGuest: () => session.isOnline() && !host,
+
+    getId: () => sessionId,
 
     getRoom: () => room,
 

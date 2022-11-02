@@ -149,21 +149,23 @@ export class PauseMenu extends Component {
         }
     }
 
-    private getOnlineOption(): PauseOption {
+    private getOnlineOption(): PauseOption | undefined {
         if (session.isOnline()) {
-            return {
-                text: `${session.isHost() ? "END" : "LEAVE"} SESSION`,
-                fn: () => {
-                    if (session.isGuest()) {
-                        SwampCampGame.instance.loadMainMenu()
-                    } else {
-                        hostSessionClose()
-                    }
-                },
+            if (session.isHost()) {
+                return {
+                    text: `END SESSION @${session.getId()}`,
+                    fn: () => {
+                        if (session.isGuest()) {
+                            SwampCampGame.instance.loadMainMenu()
+                        } else {
+                            hostSessionClose()
+                        }
+                    },
+                }
             }
         } else {
             return {
-                text: "OPEN LOBBY",
+                text: "MULTIPLAYER",
                 fn: () => session.open(() => hostOnJoin()),
             }
         }
