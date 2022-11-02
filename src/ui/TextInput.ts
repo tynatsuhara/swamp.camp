@@ -74,10 +74,7 @@ export class TextInput {
     delete(): undefined {
         clearInterval(this.cursorFlashInterval)
         document.body.removeChild(this.element)
-        // focus then blur the canvas to send key events back to it properly
-        const canvas = document.getElementById("canvas")
-        canvas.focus()
-        canvas.blur()
+        document.getElementById("canvas").focus()
         return undefined
     }
 }
