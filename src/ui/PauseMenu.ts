@@ -13,6 +13,7 @@ import { ButtonsMenu } from "./ButtonsMenu"
 import { Color } from "./Color"
 import { ControlsUI } from "./ControlsUI"
 import { FullScreenMode } from "./FullScreenMode"
+import { NotificationDisplay } from "./NotificationDisplay"
 import { UIStateManager } from "./UIStateManager"
 
 type PauseOption = {
@@ -99,7 +100,7 @@ export class PauseMenu extends Component {
             },
             this.getFullScreenOption(),
             {
-                text: `MAIN MENU`,
+                text: session.isGuest() ? `LEAVE SESSION` : `MAIN MENU`,
                 fn: () => {
                     here().toggleAudio(false)
                     SwampCampGame.instance.loadMainMenu()
@@ -166,7 +167,15 @@ export class PauseMenu extends Component {
         } else {
             return {
                 text: "MULTIPLAYER",
-                fn: () => session.open(() => hostOnJoin()),
+                fn: () => {
+                    session.open(() => hostOnJoin())
+                    navigator.clipboard.writeText(session.getId()).then(() => {
+                        NotificationDisplay.instance.push({
+                            icon: "copy",
+                            text: `copied "${session.getId()}"`,
+                        })
+                    })
+                },
             }
         }
     }
