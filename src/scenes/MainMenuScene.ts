@@ -187,7 +187,7 @@ export class MainMenuScene {
                     .add("cancel", () => {
                         this.sessionLoadingState = undefined
                         session.close()
-                        this.render(Menu.ROOT) // force re-render
+                        this.render(Menu.MULTIPLAYER)
                     })
                     .getEntity()
             )
