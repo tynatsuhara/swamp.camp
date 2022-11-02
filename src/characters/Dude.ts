@@ -318,9 +318,8 @@ export class Dude extends Component implements DialogueSource {
         this.setWeapon = clientSyncFn(`${this.syncId}eqw`, (trusted, type: WeaponType) => {
             if (this.weapon?.getType() === type) {
                 return
-            }
-            if (!trusted && !this.inventory.getItemCount(type as unknown as Item)) {
-                return
+            } else if (!trusted && !this.inventory.getItemCount(type as unknown as Item)) {
+                return "reject"
             }
             setWeapon(type)
         })
@@ -333,10 +332,8 @@ export class Dude extends Component implements DialogueSource {
         this.setShield = clientSyncFn(`${this.syncId}eqs`, (trusted, type: ShieldType) => {
             if (this.shield?.type === type) {
                 return
-            }
-            console.log(`equip shield ${type}`)
-            if (!trusted && !this.inventory.getItemCount(type as unknown as Item)) {
-                return
+            } else if (!trusted && !this.inventory.getItemCount(type as unknown as Item)) {
+                return "reject"
             }
             setShield(type)
         })

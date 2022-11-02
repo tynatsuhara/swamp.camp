@@ -88,6 +88,7 @@ export abstract class Weapon extends Component {
     cancelAttack() {}
 
     getPlayerAimingDirection(): Point {
+        // TODO get this from the serialized controls instead to work properly online
         const mousePos = controls.getWorldSpaceMousePos()
         const centerPos = this.dude.standingPosition.plusY(HAND_POSITION_OFFSET.y)
         return new Point(mousePos.x - centerPos.x, mousePos.y - centerPos.y)

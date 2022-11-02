@@ -168,19 +168,20 @@ export const syncData = <T extends object>(id: string, data: T, onChange = (upda
 }
 
 /**
- * MPTODO
  * Similar to syncFn, but can be invoked on either clients or the host.
  * If the client invocation is accepted by the host, it will be forwarded to other clients.
- * MPTODO: How should we propagate the trusted nature?
  *
  * The syncFn receives a "trusted" argument which will be true if:
  *   1) The function is invoked locally OR
  *   2) The function is invoked by the host
+ *
+ * If the syncFn returns nothing, it will be propagated from the host to other clients.
+ * If the syncFn returns the string "reject", it will cancel the propagation.
  */
-export const clientSyncFn = <T extends any[], R = void>(
+export const clientSyncFn = <T extends any[]>(
     id: string,
-    fn: (trusted: boolean, ...args: T) => R
-): ((...args: T) => R) => {
+    fn: (trusted: boolean, ...args: T) => "reject" | void
+): ((...args: T) => void) => {
     const [send, receive] = session.action<T>(id)
 
     const wrappedFn = (...args: T) => {
@@ -201,11 +202,11 @@ export const clientSyncFn = <T extends any[], R = void>(
     }
 
     receive((args, peerId) => {
-        fn(peerId === hostId, ...args)
-        // MPTODO: forward to other peers. we need to decide if it's trusted first
-        // if (session.isHost()) {
-        //     sendFn(args, initializedPeers.filter(p => p !== peerId))
-        // }
+        const result = fn(peerId === hostId, ...args)
+        const otherPeers = session.getPeers().filter((p) => p !== peerId)
+        if (result !== "reject" && otherPeers.length > 0) {
+            send(args, otherPeers)
+        }
     })
 
     return wrappedFn
