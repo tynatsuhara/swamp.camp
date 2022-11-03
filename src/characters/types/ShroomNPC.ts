@@ -74,6 +74,7 @@ export class ShroomNPC extends Component {
 
         // delete and respawn the shroom dude
         this.entity.selfDestruct()
+        // MPTODO: This probably won't work online
         DudeFactory.instance.load(newData, camp())
     }
 
