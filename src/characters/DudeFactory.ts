@@ -162,6 +162,9 @@ export class DudeFactory {
                         window["player"] = additionalComponents[0]
                     } else {
                         additionalComponents = [new GuestPlayer()]
+                        const playerIndex =
+                            location.getDudes().filter((d) => d.type === DudeType.PLAYER).length + 1
+                        window[`player${playerIndex}`] = additionalComponents[0]
                     }
                 } else {
                     /**
@@ -171,6 +174,7 @@ export class DudeFactory {
                      */
                     if (uuid === ONLINE_PLAYER_DUDE_ID_PREFIX + MULTIPLAYER_ID) {
                         additionalComponents = [new GuestPlayer(), new CutscenePlayerController()]
+                        window["player"] = additionalComponents[0]
                     }
                 }
                 // MPTODO: We probably need a GuestPlayerInventory
