@@ -1,8 +1,11 @@
 import { ButtonState, Component, debug, pt, UpdateData } from "brigsby/dist"
+import { Lists } from "brigsby/dist/util/Lists"
 import { controls } from "../../Controls"
 import { Camera } from "../../cutscenes/Camera"
+import { ITEM_METADATA_MAP } from "../../items/Items"
 import { PlaceElementDisplay } from "../../ui/PlaceElementDisplay"
 import { UIStateManager } from "../../ui/UIStateManager"
+import { Interactable } from "../../world/elements/Interactable"
 import { here } from "../../world/locations/LocationManager"
 import { WorldTime } from "../../world/WorldTime"
 import { Dude } from "../Dude"
@@ -173,4 +176,42 @@ export abstract class AbstractPlayer extends Component {
         return 0.45
     }
     private pushingUntil = 0
+
+    checkHotKeys(updateData: UpdateData) {
+        controls.HOT_KEY_OPTIONS.forEach((hotKey) => {
+            if (updateData.input.isKeyDown(hotKey)) {
+                const hotKeyItem = this.dude.inventory
+                    .getStacks()
+                    .find((s) => s.metadata.hotKey === hotKey)?.item
+                if (hotKeyItem) {
+                    const itemData = ITEM_METADATA_MAP[hotKeyItem]
+                    if (itemData.equippableWeapon && !this.dude.weapon?.isAttacking()) {
+                        this.dude.setWeapon(itemData.equippableWeapon)
+                    } else if (itemData.equippableShield && !this.dude.shield?.isBlocking()) {
+                        this.dude.setShield(itemData.equippableShield)
+                    }
+                }
+            }
+        })
+    }
+
+    updateInteractables(updateData: UpdateData) {
+        const interactDistance = 20
+        const interactCenter = this.dude.standingPosition.minus(pt(0, 7))
+        const interactables = updateData.view.entities
+            .map((e) => e.getComponent(Interactable))
+            .filter((e) => e?.enabled)
+        interactables.forEach((i) => i.updateIndicator(false))
+
+        const possibilities = interactables
+            .filter((e) => this.dude.isFacing(e.position)) // interactables the dude is facing
+            .filter((e) => e.position.distanceTo(interactCenter) < interactDistance)
+            .filter((e) => e.isInteractable())
+
+        const i = Lists.minBy(possibilities, (e) => e.position.distanceTo(interactCenter))
+        if (!!i) {
+            i.updateIndicator(true)
+        }
+        return i
+    }
 }
