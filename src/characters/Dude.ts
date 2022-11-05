@@ -52,11 +52,9 @@ import { WeaponFactory } from "./weapons/WeaponFactory"
 import { WeaponType } from "./weapons/WeaponType"
 
 type SyncData = {
-    // MPTODO constantly syncing position might be inefficient, revisit later
     p: { x: number; y: number } // standing position
     d: { x: number; y: number } // walking direction
     f: boolean // true if facing left, false otherwise
-    manualDepth?: number // MPTODO
 }
 
 export class Dude extends Component implements DialogueSource {
@@ -1293,7 +1291,7 @@ export class Dude extends Component implements DialogueSource {
             availableResidences[0].claimPendingSlot(this.type, uuid)
             this.log("claimed a house slot")
         } else {
-            this.log("could not find a home")
+            // this.log("could not find a home")
         }
     }
 
