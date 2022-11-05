@@ -229,4 +229,5 @@ class SaveManager {
 
 export const saveManager = new SaveManager()
 
+window["getSaveState"] = () => saveManager.getState()
 window["setSaveState"] = (newState: SaveState) => saveManager.setState(newState)
