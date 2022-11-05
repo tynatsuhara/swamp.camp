@@ -1,5 +1,4 @@
-import { Lists } from "brigsby/dist/util/Lists"
-import { ActionProgress, ActionReceiver, ActionSender, joinRoom, Room } from "trystero"
+import { ActionProgress, ActionReceiver, ActionSender, joinRoom, Room, selfId } from "trystero"
 
 let sessionId: string
 let room: Room
@@ -11,12 +10,16 @@ const initLazyActions = () => lazyActionInitFns.forEach((fn) => fn())
 
 export const SESSION_ID_LENGTH = 4
 
-// TODO: Make the session ID a hash prefix of a world ID, to prevent fake host attack
-const makeSessionId = () => {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    return Lists.range(0, SESSION_ID_LENGTH)
-        .map(() => chars.charAt(Math.floor(Math.random() * chars.length)))
-        .join("")
+// Session ID is a hash prefix of the host peer ID, to prevent fake host attack
+const makeSessionId = async () => {
+    const hashBytes = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(selfId))
+    const u8 = new Uint8Array(hashBytes)
+    let byteString = ""
+    for (const byte of u8) {
+        byteString += String.fromCharCode(byte)
+    }
+    // convert bytestring to base64 (or really, base36)
+    return btoa(byteString).toUpperCase().substring(0, 4)
 }
 
 const APP_ID = "9fea88cf-69d4-4ab8-b9cb-44c88d9de16b"
@@ -30,16 +33,19 @@ const PASSWORD = "30908535-9bba-4e21-8a68-3384b7cd604f"
  * Wrapper around generic P2P rooms, adding host and guest semantics to match the game network model.
  */
 export const session = {
-    open: (onPeerJoin: (peerId: string) => void) => {
+    /**
+     * @returns a promise that resolves once the session is established
+     */
+    open: async (onPeerJoin: (peerId: string) => void) => {
         host = true
-        sessionId = makeSessionId()
+        sessionId = await makeSessionId()
+        console.log("opening lobby")
         room = joinRoom({ appId: APP_ID, password: PASSWORD }, sessionId)
         initLazyActions()
         room.onPeerJoin((peerId) => {
             console.log(`${peerId} joined!`)
             onPeerJoin(peerId)
         })
-        console.log("opening lobby")
     },
 
     close: () => {

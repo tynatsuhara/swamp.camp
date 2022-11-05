@@ -16,12 +16,18 @@ let initializedPeers: string[] = []
 let peerToMultiplayerId: Record<string, string> = {}
 
 // Store a stable multiplayer ID for the user.
-// MPTODO: Generate a private-ish key as well so that other players can't impersonate
 const MULTIPLAYER_ID_KEY = "multiplayer_id"
 if (!localStorage.getItem(MULTIPLAYER_ID_KEY)) {
     localStorage.setItem(MULTIPLAYER_ID_KEY, newUUID())
 }
 export const MULTIPLAYER_ID = localStorage.getItem(MULTIPLAYER_ID_KEY)
+
+// Multiplayer secret which will only ever be sent to the host.
+const MULTIPLAYER_SECRET_KEY = "multiplayer_secret"
+if (!localStorage.getItem(MULTIPLAYER_SECRET_KEY)) {
+    localStorage.setItem(MULTIPLAYER_SECRET_KEY, newUUID())
+}
+export const MULTIPLAYER_SECRET = localStorage.getItem(MULTIPLAYER_SECRET_KEY)
 
 // Core actions
 const [sendMultiplayerId, receiveMultiplayerId] = session.action<{ id: string }>("mpid")

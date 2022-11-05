@@ -168,13 +168,16 @@ export class PauseMenu extends Component {
             return {
                 text: "MULTIPLAYER",
                 fn: () => {
-                    session.open(() => hostOnJoin())
-                    navigator.clipboard.writeText(session.getId()).then(() => {
-                        NotificationDisplay.instance.push({
-                            icon: "copy",
-                            text: `copied "${session.getId()}"`,
+                    session
+                        .open(() => hostOnJoin())
+                        .then(() => {
+                            navigator.clipboard.writeText(session.getId()).then(() => {
+                                NotificationDisplay.instance.push({
+                                    icon: "copy",
+                                    text: `copied "${session.getId()}"`,
+                                })
+                            })
                         })
-                    })
                 },
             }
         }
