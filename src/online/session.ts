@@ -11,6 +11,7 @@ const initLazyActions = () => lazyActionInitFns.forEach((fn) => fn())
 
 export const SESSION_ID_LENGTH = 4
 
+// TODO: Make the session ID a hash prefix of a world ID, to prevent fake host attack
 const makeSessionId = () => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     return Lists.range(0, SESSION_ID_LENGTH)

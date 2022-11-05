@@ -1,5 +1,6 @@
 import { QueuedEventData } from "../world/events/QueuedEvent"
 import { TaxRate } from "../world/TaxRate"
+import { DudeSaveState } from "./DudeSaveState"
 import { LocationManagerSaveState } from "./LocationManagerSaveState"
 
 export class Save {
@@ -26,4 +27,7 @@ export class SaveState {
     hasMadeFire?: boolean = false
     hasRecruitedAnyVillagers?: boolean = false
     lastCampfireRestTime?: number = Number.MIN_SAFE_INTEGER
+
+    // stored in a location-agnostic spot, in state so that it is persisted easily
+    onlinePlayers?: Record<string, DudeSaveState> = {}
 }

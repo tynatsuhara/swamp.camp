@@ -1,4 +1,5 @@
 import { debug } from "brigsby/dist"
+import { ONLINE_PLAYER_DUDE_ID_PREFIX } from "./characters/DudeFactory"
 import { player } from "./characters/player"
 import { Camera } from "./cutscenes/Camera"
 import { Save, SaveState } from "./saves/SaveGame"
@@ -8,11 +9,17 @@ import { SwampCampGame } from "./SwampCampGame"
 import { HUD } from "./ui/HUD"
 import { PlumePicker } from "./ui/PlumePicker"
 import { EventQueue } from "./world/events/EventQueue"
-import { LocationManager } from "./world/locations/LocationManager"
+import { here, LocationManager } from "./world/locations/LocationManager"
 import { WorldTime } from "./world/WorldTime"
 
 const CURRENT_SAVE_FORMAT_VERSION = 3
 const SLOTS: number = 3 + (debug.extraSaveSlots ?? 0)
+
+/**
+ * 'save' — actually saving the world to storage
+ * 'multiplayer' — syncing this world to another person over the internet
+ */
+export type SaveContext = "save" | "multiplayer"
 
 class SaveManager {
     // Fields for the currently loaded save
@@ -70,24 +77,40 @@ class SaveManager {
         }
     }
 
-    save(flush = true) {
+    save(context: SaveContext = "save") {
         if (!player().dude.isAlive) {
             console.log("cannot save after death")
             return
         }
 
+        const onlinePlayers =
+            context === "multiplayer"
+                ? {}
+                : here()
+                      .getDudes()
+                      .filter((d) => d.uuid.startsWith(ONLINE_PLAYER_DUDE_ID_PREFIX))
+                      .reduce((map, dude) => {
+                          map[dude.uuid] = dude.save()
+                          return map
+                      }, this.state.onlinePlayers)
+
         const save: Save = {
             version: CURRENT_SAVE_FORMAT_VERSION,
             timeSaved: new Date().getTime(),
             saveVersion: 0,
-            locations: LocationManager.instance.save(),
+            locations: LocationManager.instance.save(context),
             worldTime: WorldTime.instance.time,
             eventQueue: EventQueue.instance.save(),
-            state: this.state,
+            state: {
+                ...this.state,
+                onlinePlayers,
+            },
         }
 
-        if (flush) {
+        if (context === "save") {
             HUD.instance.showSaveIcon()
+            console.log("saving online players:")
+            console.log(onlinePlayers)
             console.log("saved game")
             localStorage.setItem(this.saveKey, JSON.stringify(save))
         }

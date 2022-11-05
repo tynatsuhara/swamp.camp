@@ -8,6 +8,7 @@ import { CutscenePlayerController } from "../../cutscenes/CutscenePlayerControll
 import { Particles } from "../../graphics/particles/Particles"
 import { session } from "../../online/session"
 import { syncFn } from "../../online/sync"
+import { SaveContext } from "../../SaveManager"
 import { LocationManagerSaveState } from "../../saves/LocationManagerSaveState"
 import { Singletons } from "../../Singletons"
 import { HUD } from "../../ui/HUD"
@@ -124,9 +125,9 @@ export class LocationManager {
         return Array.from(this.locations.values())
     }
 
-    save(): LocationManagerSaveState {
+    save(context: SaveContext): LocationManagerSaveState {
         return {
-            values: Array.from(this.locations.values()).map((l) => l.save()),
+            values: Array.from(this.locations.values()).map((l) => l.save(context)),
             currentLocationUUID: this.currentLocation.uuid,
         }
     }

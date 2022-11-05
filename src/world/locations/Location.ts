@@ -3,9 +3,10 @@ import { Grid } from "brigsby/dist/util"
 import { PointAudio } from "../../audio/PointAudio"
 import { Sounds } from "../../audio/Sounds"
 import { Dude } from "../../characters/Dude"
-import { DudeFactory } from "../../characters/DudeFactory"
+import { DudeFactory, ONLINE_PLAYER_DUDE_ID_PREFIX } from "../../characters/DudeFactory"
 import { DudeType } from "../../characters/DudeType"
 import { syncFn } from "../../online/sync"
+import { SaveContext } from "../../SaveManager"
 import { LocationSaveState } from "../../saves/LocationSaveState"
 import { newUUID } from "../../saves/uuid"
 import { HUD } from "../../ui/HUD"
@@ -465,7 +466,7 @@ export class Location {
         return this.getDudes().filter((d) => d.type === dudeType)[0]
     }
 
-    save(): LocationSaveState {
+    save(context: SaveContext): LocationSaveState {
         return {
             uuid: this.uuid,
             type: this.type,
@@ -473,6 +474,16 @@ export class Location {
             elements: this.saveElements(),
             dudes: this.getDudes()
                 .filter((d) => d.isAlive && !!d.entity)
+                .filter((d) => {
+                    switch (context) {
+                        case "multiplayer":
+                            // sync all spawned dudes as they exist in the world
+                            return true
+                        case "save":
+                            // we don't want to include online players in the location save data
+                            return !d.uuid.startsWith(ONLINE_PLAYER_DUDE_ID_PREFIX)
+                    }
+                })
                 .map((d) => d.save()),
             features: this.features,
             teleporters: this.teleporters,

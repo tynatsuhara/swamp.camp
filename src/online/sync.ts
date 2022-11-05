@@ -16,6 +16,7 @@ let initializedPeers: string[] = []
 let peerToMultiplayerId: Record<string, string> = {}
 
 // Store a stable multiplayer ID for the user.
+// MPTODO: Generate a private-ish key as well so that other players can't impersonate
 const MULTIPLAYER_ID_KEY = "multiplayer_id"
 if (!localStorage.getItem(MULTIPLAYER_ID_KEY)) {
     localStorage.setItem(MULTIPLAYER_ID_KEY, newUUID())
@@ -33,7 +34,7 @@ export const hostOnJoin = () => {
         console.log(`received multiplayer ID ${id} from peer ${peerId}`)
         peerToMultiplayerId[peerId] = id
         DudeFactory.instance.newOnlinePlayer(id)
-        sendInitWorld(saveManager.save(false), peerId)
+        sendInitWorld(saveManager.save("multiplayer"), peerId)
     })
 
     receiveInitWorldAck((_, peerId) => {
@@ -81,11 +82,19 @@ export const cleanUpSession = () => {
 }
 
 const cleanUpPeer = (peerId: string) => {
-    // MPTODO: Change the cleanup logic so that their state is still persisted for future joins
     // MPTODO: Make this a syncFn when we support more than 2 players
     const multiplayerDude = here()
         .getDudes()
         .find((d) => d.uuid === ONLINE_PLAYER_DUDE_ID_PREFIX + peerToMultiplayerId[peerId])
+
+    // serialize the dude so their stuff is persisted in future sessions
+    saveManager.setState({
+        onlinePlayers: {
+            ...saveManager.getState().onlinePlayers,
+            [multiplayerDude.uuid]: multiplayerDude.save(),
+        },
+    })
+
     here().removeDude(multiplayerDude)
     initializedPeers = initializedPeers.filter((p) => p !== peerId)
 }
@@ -108,7 +117,7 @@ export const syncFn = <T extends any[], R = void>(
         }
 
         if (session.isGuest()) {
-            console.warn("client cannot call syncFn")
+            console.warn(`client cannot call syncFn ${id}`)
         } else {
             send(args, initializedPeers)
             return fn(...args)
@@ -140,7 +149,7 @@ export const syncData = <T extends object>(id: string, data: T, onChange = (upda
             }
 
             if (session.isGuest()) {
-                console.warn("client cannot update data")
+                console.warn(`client cannot update data ${id}`)
                 return true // no-op
             } else {
                 // Update the data locally, then sync it
