@@ -11,8 +11,8 @@ const initLazyActions = () => lazyActionInitFns.forEach((fn) => fn())
 export const SESSION_ID_LENGTH = 4
 
 // Session ID is a hash prefix of the host peer ID, to prevent fake host attack
-const makeSessionId = async () => {
-    const hashBytes = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(selfId))
+export const computeSessionIdFromPeerId = async (peerId: string) => {
+    const hashBytes = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(peerId))
     const u8 = new Uint8Array(hashBytes)
     let byteString = ""
     for (const byte of u8) {
@@ -38,7 +38,7 @@ export const session = {
      */
     open: async (onPeerJoin: (peerId: string) => void) => {
         host = true
-        sessionId = await makeSessionId()
+        sessionId = await computeSessionIdFromPeerId(selfId)
         console.log("opening lobby")
         room = joinRoom({ appId: APP_ID, password: PASSWORD }, sessionId)
         initLazyActions()
@@ -55,7 +55,8 @@ export const session = {
         cachedActions = {}
     },
 
-    join: (sessionId: string): Promise<string> => {
+    join: (id: string): Promise<string> => {
+        sessionId = id
         host = false
         room = joinRoom({ appId: APP_ID, password: PASSWORD }, sessionId)
         initLazyActions()

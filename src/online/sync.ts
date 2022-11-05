@@ -5,7 +5,7 @@ import { newUUID } from "../saves/uuid"
 import { SwampCampGame } from "../SwampCampGame"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { here } from "../world/locations/LocationManager"
-import { session } from "./session"
+import { computeSessionIdFromPeerId, session } from "./session"
 
 /**
  * Utilities for syncing game state and logic
@@ -64,11 +64,19 @@ export const guestOnJoin = () => {
     sendMultiplayerId({ id: MULTIPLAYER_ID })
 
     receiveInitWorld((data, peerId) => {
-        hostId = peerId
-        console.log(`received save data from ${peerId}:`)
-        console.log(data)
-        saveManager.loadSave(data as Save)
-        sendInitWorldAck(null, hostId)
+        computeSessionIdFromPeerId(peerId).then((expectedSessionId) => {
+            if (session.getId() !== expectedSessionId) {
+                console.warn(
+                    `received world init signal from imposter host ${peerId} (expected session ID ${expectedSessionId})`
+                )
+                return
+            }
+            hostId = peerId
+            console.log(`received save data from ${peerId}:`)
+            console.log(data)
+            saveManager.loadSave(data as Save)
+            sendInitWorldAck(null, hostId)
+        })
     })
 
     session.getRoom().onPeerLeave((peerId) => {
