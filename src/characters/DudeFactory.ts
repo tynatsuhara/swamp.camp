@@ -1,7 +1,7 @@
 import { Component, Entity, Point, pt } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
-import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
+import { TILE_SIZE } from "../graphics/Tilesets"
 import { Inventory } from "../items/Inventory"
 import { Item } from "../items/Items"
 import { PlayerInventory } from "../items/PlayerInventory"
@@ -86,8 +86,6 @@ export class DudeFactory {
             const furtherHalf = tileOptions.slice(tileOptions.length / 2)
             return Lists.oneOf(furtherHalf).plus(pt(0.5)).times(TILE_SIZE)
         })()
-
-        console.log(`place at position ${position} / tile = ${pixelPtToTilePt(position)}`)
 
         this.make(DudeType.PLAYER, position, saveData, hostPlayer.location, false)
     }
