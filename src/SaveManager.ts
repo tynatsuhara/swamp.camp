@@ -85,12 +85,16 @@ class SaveManager {
 
         const onlinePlayers =
             context === "multiplayer"
-                ? {}
+                ? {} // don't send potentially sensitive multiplayer info to peers!
                 : here()
                       .getDudes()
                       .filter((d) => d.uuid.startsWith(ONLINE_PLAYER_DUDE_ID_PREFIX))
                       .reduce((map, dude) => {
-                          map[dude.uuid] = dude.save()
+                          const password = map[dude.uuid].password
+                          map[dude.uuid] = {
+                              ...dude.save(),
+                              password,
+                          }
                           return map
                       }, this.state.onlinePlayers)
 
@@ -224,3 +228,5 @@ class SaveManager {
 }
 
 export const saveManager = new SaveManager()
+
+window["setSaveState"] = (newState: SaveState) => saveManager.setState(newState)

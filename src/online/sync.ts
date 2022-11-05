@@ -1,4 +1,5 @@
 import { DudeFactory, ONLINE_PLAYER_DUDE_ID_PREFIX } from "../characters/DudeFactory"
+import { player } from "../characters/player/index"
 import { saveManager } from "../SaveManager"
 import { Save } from "../saves/SaveGame"
 import { newUUID } from "../saves/uuid"
@@ -6,6 +7,7 @@ import { SwampCampGame } from "../SwampCampGame"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { here } from "../world/locations/LocationManager"
 import { computeSessionIdFromPeerId, session } from "./session"
+import { base64hash } from "./utils"
 
 /**
  * Utilities for syncing game state and logic
@@ -30,17 +32,33 @@ if (!localStorage.getItem(MULTIPLAYER_SECRET_KEY)) {
 export const MULTIPLAYER_SECRET = localStorage.getItem(MULTIPLAYER_SECRET_KEY)
 
 // Core actions
-const [sendMultiplayerId, receiveMultiplayerId] = session.action<{ id: string }>("mpid")
+const [sendCredentials, receiveCredentials] = session.action<{ id: string; secret: string }>("mpid")
 const [sendInitWorld, receiveInitWorld] = session.action<Save>("init")
 const [sendInitWorldAck, receiveInitWorldAck] = session.action<void>("init:ack")
 
 // Called when a new user has joined the game
 export const hostOnJoin = () => {
-    receiveMultiplayerId(({ id }, peerId) => {
+    receiveCredentials(({ id, secret }, peerId) => {
         console.log(`received multiplayer ID ${id} from peer ${peerId}`)
-        peerToMultiplayerId[peerId] = id
-        DudeFactory.instance.newOnlinePlayer(id)
-        sendInitWorld(saveManager.save("multiplayer"), peerId)
+        const salt = player().dude.uuid
+        base64hash(secret + salt).then((password) => {
+            const dudeUUID = ONLINE_PLAYER_DUDE_ID_PREFIX + id
+            const onlinePlayers = saveManager.getState().onlinePlayers
+            const existingPlayerData = onlinePlayers[dudeUUID]
+            if (existingPlayerData) {
+                console.log(existingPlayerData)
+                if (password !== onlinePlayers[dudeUUID].password) {
+                    console.warn(`invalid credentials for player ${id}`)
+                    return
+                }
+            } else {
+                onlinePlayers[dudeUUID] = { password }
+            }
+            saveManager.setState({ onlinePlayers })
+            peerToMultiplayerId[peerId] = id
+            DudeFactory.instance.newOnlinePlayer(dudeUUID)
+            sendInitWorld(saveManager.save("multiplayer"), peerId)
+        })
     })
 
     receiveInitWorldAck((_, peerId) => {
@@ -61,7 +79,7 @@ export const hostSessionClose = () => {
 }
 
 export const guestOnJoin = () => {
-    sendMultiplayerId({ id: MULTIPLAYER_ID })
+    sendCredentials({ id: MULTIPLAYER_ID, secret: MULTIPLAYER_SECRET })
 
     receiveInitWorld((data, peerId) => {
         computeSessionIdFromPeerId(peerId).then((expectedSessionId) => {
@@ -101,11 +119,16 @@ const cleanUpPeer = (peerId: string) => {
         .getDudes()
         .find((d) => d.uuid === ONLINE_PLAYER_DUDE_ID_PREFIX + peerToMultiplayerId[peerId])
 
+    const { uuid, password } = saveManager.getState().onlinePlayers[multiplayerDude.uuid]
+
     // serialize the dude so their stuff is persisted in future sessions
     saveManager.setState({
         onlinePlayers: {
             ...saveManager.getState().onlinePlayers,
-            [multiplayerDude.uuid]: multiplayerDude.save(),
+            [uuid]: {
+                ...multiplayerDude.save(),
+                password,
+            },
         },
     })
 

@@ -1,4 +1,5 @@
 import { ActionProgress, ActionReceiver, ActionSender, joinRoom, Room, selfId } from "trystero"
+import { base64hash } from "./utils"
 
 let sessionId: string
 let room: Room
@@ -12,14 +13,8 @@ export const SESSION_ID_LENGTH = 4
 
 // Session ID is a hash prefix of the host peer ID, to prevent fake host attack
 export const computeSessionIdFromPeerId = async (peerId: string) => {
-    const hashBytes = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(peerId))
-    const u8 = new Uint8Array(hashBytes)
-    let byteString = ""
-    for (const byte of u8) {
-        byteString += String.fromCharCode(byte)
-    }
-    // convert bytestring to base64 (or really, base36)
-    return btoa(byteString).toUpperCase().substring(0, 4)
+    const hash = await base64hash(peerId, SESSION_ID_LENGTH)
+    return hash.toUpperCase()
 }
 
 const APP_ID = "9fea88cf-69d4-4ab8-b9cb-44c88d9de16b"

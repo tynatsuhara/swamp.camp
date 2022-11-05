@@ -66,16 +66,15 @@ export class DudeFactory {
      * Host only!
      * @param multiplayerId
      */
-    newOnlinePlayer(multiplayerId: string) {
-        const uuid = ONLINE_PLAYER_DUDE_ID_PREFIX + multiplayerId
-        const saveData: Partial<DudeSaveState> = saveManager.getState().onlinePlayers[uuid] ?? {}
-        saveData.uuid = uuid
+    newOnlinePlayer(uuid: string) {
+        const playerSaveData = saveManager.getState().onlinePlayers[uuid]
+        playerSaveData.uuid = uuid
 
         const hostPlayer = player().dude
 
         const position = (() => {
-            if (saveData?.pos) {
-                return Point.fromString(saveData.pos)
+            if (playerSaveData?.pos) {
+                return Point.fromString(playerSaveData.pos)
             }
             const tileOptions = tilesAround(hostPlayer.tile, 3)
                 .filter(
@@ -87,7 +86,7 @@ export class DudeFactory {
             return Lists.oneOf(furtherHalf).plus(pt(0.5)).times(TILE_SIZE)
         })()
 
-        this.make(DudeType.PLAYER, position, saveData, hostPlayer.location, false)
+        this.make(DudeType.PLAYER, position, playerSaveData, hostPlayer.location, false)
     }
 
     /**
