@@ -292,8 +292,10 @@ export class Location {
         }
 
         for (const syncFn of this.syncFunctions.keys()) {
-            Point.fromString(syncFn.split(":")[0])
-            // MPTODO: If we have element data channels or sync FNs, clean them up
+            const pos = Point.fromString(syncFn.split(":")[0])
+            if (pos.equals(el.pos)) {
+                this.syncFunctions.delete(syncFn)
+            }
         }
 
         if (this.elements.get(el.pos) === el) {
