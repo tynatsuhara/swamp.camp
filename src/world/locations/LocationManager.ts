@@ -155,7 +155,6 @@ export class LocationManager {
         // console.log(`simulation took ${time} milliseconds`)
     }
 
-    // MPTODO?
     /**
      * This function is only called on the host
      * @param newLocation
