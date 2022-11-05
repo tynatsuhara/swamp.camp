@@ -869,7 +869,7 @@ export class Dude extends Component implements DialogueSource {
 
         this.updateAnimationFromMovement(direction)
         if (this.syncData.d.x !== direction.x || this.syncData.d.y !== direction.y) {
-            this.syncData.d = { x: direction.x, y: direction.y }
+            this.syncData.d = direction
         }
 
         // Movement calculations and conditions based on movement — only done host-side
@@ -1050,7 +1050,7 @@ export class Dude extends Component implements DialogueSource {
 
         // TODO translate to standing pos
         if (session.isHost()) {
-            this.syncData.p = { x: this.standingPosition.x, y: this.standingPosition.y }
+            this.syncData.p = this.standingPosition
         }
 
         if (skipColliderCheck) {
