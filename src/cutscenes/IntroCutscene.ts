@@ -118,7 +118,7 @@ ANOTHER thing - Only one of the explorers returned, and they reported that their
             .getDudes()
             .filter((d) => d.type === DudeType.DIP)[0]
 
-        Queequeg.instance.pushPassenger(player().dude)
+        Queequeg.instance.pushPassenger(player())
 
         setTimeout(() => {
             Queequeg.instance.arrive()
@@ -129,13 +129,13 @@ ANOTHER thing - Only one of the explorers returned, and they reported that their
         }, this.PAN_TO_DIP)
 
         setTimeout(() => {
-            Queequeg.instance.removePassenger(player().dude)
+            Queequeg.instance.removePassenger(player())
         }, this.GET_OFF_SHIP)
 
         setTimeout(() => {
             this.dip.dialogue = DIP_STARTING_DIALOGUE
             CutscenePlayerController.instance.disable()
-            Camera.instance.focusOnDude(player().dude)
+            Camera.instance.focusOnDude(player())
             this.waitingForOrcsToDie = true
         }, this.PAN_BACK)
     }

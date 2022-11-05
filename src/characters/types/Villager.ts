@@ -61,7 +61,7 @@ export class Villager extends Component {
         const { npc, dude } = this
 
         if ([DudeType.GUMBALL, DudeType.ONION].includes(dude.type)) {
-            npc.setLeader(player().dude)
+            npc.setLeader(player())
             npc.setSchedule(NPCSchedules.newFollowLeaderSchedule())
         } else if (dude.type === DudeType.DIP) {
             // TODO: Make this a more robust schedule

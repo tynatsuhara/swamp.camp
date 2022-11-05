@@ -43,7 +43,7 @@ export const hostOnJoin = () => {
 
     receiveCredentials(({ id, secret }, peerId) => {
         console.log(`received multiplayer ID ${id} from peer ${peerId}`)
-        const salt = player().dude.uuid
+        const salt = player().uuid
         base64hash(secret + salt).then((password) => {
             const dudeUUID = ONLINE_PLAYER_DUDE_ID_PREFIX + id
             const onlinePlayers = saveManager.getState().onlinePlayers

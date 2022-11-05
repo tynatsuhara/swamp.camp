@@ -133,14 +133,14 @@ export class GameScene {
     }
 
     private getWorldSpaceDebugEntity(): Entity {
-        if (!player()?.dude) {
+        if (!player()) {
             return
         }
 
         const e = new Entity()
 
         if (debug.showGrid) {
-            const base = player().dude.tile
+            const base = player().tile
             const lines: RenderMethod[] = []
             const gridRange = 50
 

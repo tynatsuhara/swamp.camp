@@ -70,7 +70,7 @@ export class PlaceElementFrame extends Component {
         // Divide these by 2 since the mouse will be in the center of the frame
         const maxDistX = TILE_SIZE * (baseDist + this.dimensions.x / 2)
         const maxDistY = TILE_SIZE * (baseDist + this.dimensions.y / 2)
-        const playerPos = player().dude.standingPosition.plusY(-TILE_SIZE / 2)
+        const playerPos = player().standingPosition.plusY(-TILE_SIZE / 2)
 
         // only allow placing near the player
         const centerPos = new Point(

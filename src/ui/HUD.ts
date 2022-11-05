@@ -96,11 +96,11 @@ export class HUD {
     private updateHearts(health: number, maxHealth: number) {
         this.heartsEntity = new Entity()
 
-        const healing = player().dude.hasCondition(Condition.HEALING)
+        const healing = player().hasCondition(Condition.HEALING)
         const filter: HeartFilter = (() => {
             if (debug.godMode) {
                 return "god"
-            } else if (player().dude.hasCondition(Condition.POISONED)) {
+            } else if (player().hasCondition(Condition.POISONED)) {
                 return "poisoned"
             } else if (healing) {
                 return "healing"

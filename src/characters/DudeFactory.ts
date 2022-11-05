@@ -70,23 +70,19 @@ export class DudeFactory {
         const playerSaveData = saveManager.getState().onlinePlayers[uuid]
         playerSaveData.uuid = uuid
 
-        const hostPlayer = player().dude
-
         const position = (() => {
             if (playerSaveData?.pos) {
                 return Point.fromString(playerSaveData.pos)
             }
-            const tileOptions = tilesAround(hostPlayer.tile, 3)
-                .filter(
-                    (p) => hostPlayer.location.getGround(p) && !hostPlayer.location.isOccupied(p)
-                )
-                .sort((a, b) => a.distanceTo(hostPlayer.tile) - b.distanceTo(hostPlayer.tile))
+            const tileOptions = tilesAround(player().tile, 3)
+                .filter((p) => player().location.getGround(p) && !player().location.isOccupied(p))
+                .sort((a, b) => a.distanceTo(player().tile) - b.distanceTo(player().tile))
             // take any tile in the 2nd half when sorted by distance
             const furtherHalf = tileOptions.slice(tileOptions.length / 2)
             return Lists.oneOf(furtherHalf).plus(pt(0.5)).times(TILE_SIZE)
         })()
 
-        this.make(DudeType.PLAYER, position, playerSaveData, hostPlayer.location, false)
+        this.make(DudeType.PLAYER, position, playerSaveData, player().location, false)
     }
 
     /**

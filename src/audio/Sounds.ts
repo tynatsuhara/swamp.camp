@@ -28,7 +28,7 @@ export class Sounds {
     }
 
     static playAtPoint(path: string, volume: number, point: Point, distance: number) {
-        const distanceToPlayer = player().dude.standingPosition.manhattanDistanceTo(point)
+        const distanceToPlayer = player().standingPosition.manhattanDistanceTo(point)
         if (distance < distanceToPlayer) {
             return
         }

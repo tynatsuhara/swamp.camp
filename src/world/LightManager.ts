@@ -136,7 +136,7 @@ export class LightManager extends Component {
         this.mask.reset(WorldTime.instance.time, this.getLocationDarkness())
 
         // Always provide slight visibility around the player
-        const p = player()?.dude
+        const p = player()
         if (p) {
             if (p.shieldType !== ShieldType.LANTERN) {
                 this.mask.addFaintLightCircle(

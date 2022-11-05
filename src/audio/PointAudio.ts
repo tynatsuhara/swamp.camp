@@ -55,7 +55,7 @@ export class PointAudio extends Component {
         }
 
         // TODO: Maybe this should be relative to the camera and not the player?
-        const distance = player().dude.standingPosition.distanceTo(this.position)
+        const distance = player().standingPosition.distanceTo(this.position)
 
         const audioElement = audioElements[this.file]
         const volumeByDistance =

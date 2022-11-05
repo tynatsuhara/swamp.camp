@@ -56,7 +56,7 @@ export class InventoryDisplay extends Component {
     }
 
     get playerInv() {
-        return player().dude.inventory
+        return player().inventory
     }
 
     lateUpdate(updateData: UpdateData) {
@@ -115,13 +115,13 @@ export class InventoryDisplay extends Component {
         if (this.playerInv.getItemCount(item) === 1) {
             // unequip equipped weapons
             const weapon: WeaponType = WeaponType[WeaponType[item]]
-            if (!!weapon && player().dude.weaponType === weapon) {
+            if (!!weapon && player().weaponType === weapon) {
                 return false
             }
 
             // unequip equipped shields
             const shield: ShieldType = ShieldType[ShieldType[item]]
-            if (!!shield && player().dude.shieldType === shield) {
+            if (!!shield && player().shieldType === shield) {
                 return false
             }
         }
@@ -198,11 +198,11 @@ export class InventoryDisplay extends Component {
                 })
             }
             if (item.equippableWeapon) {
-                if (player().dude.weaponType !== item.equippableWeapon) {
+                if (player().weaponType !== item.equippableWeapon) {
                     actions.push({
                         verb: "equip",
                         actionFn: () => {
-                            player().dude.setWeapon(item.equippableWeapon)
+                            player().setWeapon(item.equippableWeapon)
                             this.refreshView()
                         },
                     })
@@ -211,11 +211,11 @@ export class InventoryDisplay extends Component {
                 this.checkSetHotKey(stack, updateData)
             }
             if (item.equippableShield) {
-                if (player().dude.shieldType !== item.equippableShield) {
+                if (player().shieldType !== item.equippableShield) {
                     actions.push({
                         verb: "equip off-hand",
                         actionFn: () => {
-                            player().dude.setShield(item.equippableShield)
+                            player().setShield(item.equippableShield)
                             this.refreshView()
                         },
                     })

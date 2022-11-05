@@ -98,7 +98,7 @@ export class NPC extends Simulatable {
             this._dude.move(
                 updateData.elapsedTimeMillis,
                 Point.ZERO,
-                player().dude.standingPosition.x - this._dude.standingPosition.x
+                player().standingPosition.x - this._dude.standingPosition.x
             )
         } else if (this._dude.hasCondition(Condition.ON_FIRE)) {
             this.doRoam(updateData) // flee

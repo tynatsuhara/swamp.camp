@@ -22,7 +22,7 @@ export class RestPoint extends Component {
     canRestFor(hours: number, atCampfire?: Campfire) {
         const isTargeted = here()
             .getDudes()
-            .some((d) => d.entity.getComponent(NPC)?.targetedEnemy === player().dude)
+            .some((d) => d.entity.getComponent(NPC)?.targetedEnemy === player())
 
         if (isTargeted) {
             return false

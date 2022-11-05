@@ -181,10 +181,10 @@ export class StaffWeapon extends Weapon {
 
     private guessAttackPos() {
         // TODO: target other villagers?
-        if (!player().dude.isAlive) {
+        if (!player().isAlive) {
             return
         }
-        return player().dude.standingPosition.plus(player().dude.velocity.times(60))
+        return player().standingPosition.plus(player().velocity.times(60))
     }
 
     private explosionParticleEffects() {

@@ -79,13 +79,13 @@ export class DroppedItem extends Component {
         }
 
         this.update = () => {
-            const colliding = player().dude.standingPosition.plusY(-6).distanceTo(position) < 12
+            const colliding = player().standingPosition.plusY(-6).distanceTo(position) < 12
 
             if (colliding && this.canPickUp) {
                 this.canPickUp = false
                 setTimeout(() => {
-                    if (player().dude.isAlive && !!this.entity) {
-                        if (player().dude.inventory.addItem(this.itemType, 1, metadata)) {
+                    if (player().isAlive && !!this.entity) {
+                        if (player().inventory.addItem(this.itemType, 1, metadata)) {
                             here().droppedItems.delete(this.entity)
                             this.entity.selfDestruct()
                             setTimeout(() => {

@@ -70,7 +70,7 @@ export const saveAfterDialogueStage = () => {
     // save after a delay to account for the next dialogue stage being set
     setTimeout(() => saveManager.autosave(), 500)
 }
-export const inv = () => player().dude.inventory
+export const inv = () => player().inventory
 
 export const getExitText = () => "Never mind."
 

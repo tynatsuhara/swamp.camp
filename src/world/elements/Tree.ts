@@ -130,7 +130,7 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
                         return []
                     }
                     const getItem = () => (Math.random() < 0.2 ? saplingType : Item.WOOD)
-                    if (player().dude.weaponType === WeaponType.AXE) {
+                    if (player().weaponType === WeaponType.AXE) {
                         return [getItem(), getItem()]
                     } else {
                         return [getItem()]

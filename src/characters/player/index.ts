@@ -1,4 +1,3 @@
-import { Entity } from "brigsby/dist"
 import { Dude } from "../Dude"
 import { AbstractPlayer } from "./AbstractPlayer"
 
@@ -11,12 +10,8 @@ export const registerPlayerInstance = (player: AbstractPlayer) => {
 /**
  * @returns A reference to the local player
  */
-export const player = (): {
-    dude: Dude
-    enabled: boolean
-    entity: Entity
-} => {
-    return playerInstance
+export const player = (): Dude => {
+    return playerInstance?.dude
 }
 
 export const resetPlayerInstances = () => {

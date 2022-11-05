@@ -68,7 +68,7 @@ export class LocationTransition extends Component {
 
         const getRender = (frame: number) => {
             const circleCenter = player()
-                .dude.standingPosition.plusY(-12)
+                .standingPosition.plusY(-12)
                 .minus(Camera.instance.position)
                 .apply(Math.floor)
 

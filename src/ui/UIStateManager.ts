@@ -39,7 +39,7 @@ export class UIStateManager {
     }
 
     get(elapsedMillis: number): Entity[] {
-        if (!player().dude) {
+        if (!player()) {
             return []
         }
 
@@ -54,7 +54,7 @@ export class UIStateManager {
             spawnMenu.isOpen
 
         return HUD.instance
-            .getEntities(player().dude, Camera.instance.dimensions, elapsedMillis)
+            .getEntities(player(), Camera.instance.dimensions, elapsedMillis)
             .concat(this.inventory.getEntities())
             .concat(this.dialogueDisplay.getEntities())
             .concat(this.placeElementDisplay.getEntities())

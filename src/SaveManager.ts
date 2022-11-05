@@ -78,7 +78,7 @@ class SaveManager {
     }
 
     save(context: SaveContext = "save") {
-        if (!player().dude.isAlive) {
+        if (!player().isAlive) {
             console.log("cannot save after death")
             return
         }
@@ -214,7 +214,7 @@ class SaveManager {
 
         SwampCampGame.instance.loadGameScene()
 
-        Camera.instance.focusOnDude(player().dude)
+        Camera.instance.focusOnDude(player())
     }
 
     private getSave(saveKey: string): Save {

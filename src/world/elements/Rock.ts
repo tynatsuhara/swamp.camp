@@ -65,7 +65,7 @@ export class RockFactory extends ElementFactory<ElementType.ROCK> {
                 availableResources,
                 maxResourcesCount,
                 () => {
-                    if (player().dude.weaponType === WeaponType.PICKAXE) {
+                    if (player().weaponType === WeaponType.PICKAXE) {
                         return Math.random() > 0.5 ? [Item.IRON] : [Item.ROCK]
                     } else {
                         return Math.random() > 0.9 ? [Item.IRON] : [Item.ROCK]

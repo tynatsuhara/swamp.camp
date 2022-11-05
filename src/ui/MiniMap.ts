@@ -188,14 +188,14 @@ export class MiniMap extends Component {
 
     // MPTODO: add multiple!
     private getPlayerIndicator(topLeft: Point) {
-        const wl = player().dude.location
-        if (player().dude.location !== camp()) {
+        const wl = player().location
+        if (player().location !== camp()) {
             return null
         }
         const indicatorSize = 4
 
         const position = player()
-            .dude.standingPosition.plus(new Point(1, 1).times((wl.size * TILE_SIZE) / 2))
+            .standingPosition.plus(new Point(1, 1).times((wl.size * TILE_SIZE) / 2))
             .div(MiniMap.SCALE)
             .minus(new Point(indicatorSize / 2, indicatorSize / 2))
             .apply((n) => Math.floor(n))

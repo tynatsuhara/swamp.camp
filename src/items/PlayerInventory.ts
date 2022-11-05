@@ -23,8 +23,8 @@ const SPECIAL_ITEMS: { [item: number]: SpecialItem } = {
     [Item.HEART_CONTAINER]: {
         noInventorySlot: true,
         onAdd: () => {
-            player().dude.maxHealth += 1
-            player().dude.heal(1)
+            player().maxHealth += 1
+            player().heal(1)
         },
     },
     [Item.CAMPFIRE]: {

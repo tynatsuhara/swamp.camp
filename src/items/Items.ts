@@ -175,10 +175,10 @@ export const ITEM_METADATA_MAP = {
         consumable: {
             verb: "eat",
             fn: () => {
-                player().dude.heal(1)
+                player().heal(1)
                 Sounds.play(...SOUNDS.eat)
                 if (Math.random() < 0.25) {
-                    player().dude.addCondition(Condition.POISONED, 2_500 + Math.random() * 5_000)
+                    player().addCondition(Condition.POISONED, 2_500 + Math.random() * 5_000)
                 }
             },
         },
@@ -202,7 +202,7 @@ export const ITEM_METADATA_MAP = {
         consumable: {
             verb: "drink",
             fn: () => {
-                player().dude.addCondition(Condition.HEALING, 10_000)
+                player().addCondition(Condition.HEALING, 10_000)
                 Sounds.play(...SOUNDS.drink)
             },
         },
@@ -219,7 +219,7 @@ export const ITEM_METADATA_MAP = {
         consumable: {
             verb: "drink",
             fn: () => {
-                player().dude.removeCondition(Condition.POISONED)
+                player().removeCondition(Condition.POISONED)
                 Sounds.play(...SOUNDS.drink)
             },
         },
@@ -230,7 +230,7 @@ export const ITEM_METADATA_MAP = {
         consumable: {
             verb: "eat",
             fn: () => {
-                player().dude.heal(1)
+                player().heal(1)
                 Sounds.play(...SOUNDS.eat)
             },
         },
@@ -242,7 +242,7 @@ export const ITEM_METADATA_MAP = {
         consumable: {
             verb: "eat",
             fn: () => {
-                player().dude.heal(0.25), Sounds.play(...SOUNDS.eat)
+                player().heal(0.25), Sounds.play(...SOUNDS.eat)
             },
         },
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("berries"),

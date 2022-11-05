@@ -34,7 +34,7 @@ export abstract class AbstractPlayer extends Component {
 
     awake() {
         this._dude = this.entity.getComponent(Dude)
-        if (this === player()) {
+        if (this.dude === player()) {
             this.dude.setOnDamageCallback((blocked) => {
                 if (!this.dude.isAlive) {
                     Camera.instance.shake(6, 600)

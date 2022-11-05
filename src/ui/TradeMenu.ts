@@ -116,7 +116,7 @@ export class TradeMenu extends Component {
 
     sell(items: SalePackage[]) {
         this.open(items, TradeMode.PLAYER_SELLING)
-        this.sourceInventory = player().dude.inventory
+        this.sourceInventory = player().inventory
     }
 
     buy(items: SalePackage[]) {
@@ -165,7 +165,7 @@ export class TradeMenu extends Component {
         if (!canInteract) {
             return "oh shit" // not shown
         }
-        const playerInv = player().dude.inventory
+        const playerInv = player().inventory
 
         if (this.tradeMode === TradeMode.PLAYER_SELLING) {
             if (playerInv.getItemCount(sale.item) < sale.count) {
@@ -242,7 +242,7 @@ export class TradeMenu extends Component {
                         coins: saveManager.getState().coins + sale.price,
                     })
                 } else {
-                    player().dude.inventory.addItem(sale.item, sale.count)
+                    player().inventory.addItem(sale.item, sale.count)
                     saveManager.setState({
                         coins: saveManager.getState().coins - sale.price,
                     })

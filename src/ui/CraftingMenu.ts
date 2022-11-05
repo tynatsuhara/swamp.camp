@@ -170,9 +170,9 @@ export class CraftingMenu extends Component {
         return (
             this.justCraftedRow === -1 &&
             !this.justOpened &&
-            player().dude.inventory.canAddItem(recipe.output) &&
+            player().inventory.canAddItem(recipe.output) &&
             recipe.input.every(
-                (input) => player().dude.inventory.getItemCount(input.item) >= input.count
+                (input) => player().inventory.getItemCount(input.item) >= input.count
             )
         )
     }
@@ -224,9 +224,9 @@ export class CraftingMenu extends Component {
                 if (this.canCraft(recipe)) {
                     Sounds.play(this.craftNoise, 0.6)
                     recipe.input.forEach((ingr) => {
-                        player().dude.inventory.removeItem(ingr.item, ingr.count)
+                        player().inventory.removeItem(ingr.item, ingr.count)
                     })
-                    player().dude.inventory.addItem(recipe.output)
+                    player().inventory.addItem(recipe.output)
                     this.justCraftedRow = r
                     setTimeout(() => (this.justCraftedRow = -1), 900)
                 } else {
@@ -236,11 +236,11 @@ export class CraftingMenu extends Component {
 
             const prefix = recipe.desc + "\n"
             if (hovered && !this.canCraft(recipe)) {
-                if (!player().dude.inventory.canAddItem(recipe.output)) {
+                if (!player().inventory.canAddItem(recipe.output)) {
                     this.tooltip.say(prefix + "[Inventory full]")
                 } else if (
                     recipe.input.some(
-                        (input) => player().dude.inventory.getItemCount(input.item) < input.count
+                        (input) => player().inventory.getItemCount(input.item) < input.count
                     )
                 ) {
                     this.tooltip.say(prefix + "[Need ingredients]")
@@ -277,7 +277,7 @@ export class CraftingMenu extends Component {
                 const ingr = recipe.input[recipe.input.length - i - 1]
                 const plainIngredientIcon = this.getItemIcon(ingr.item)
                 let ingredientIcon: StaticSpriteSource = plainIngredientIcon
-                if (player().dude.inventory.getItemCount(ingr.item) < ingr.count) {
+                if (player().inventory.getItemCount(ingr.item) < ingr.count) {
                     this.context.fillStyle = COLOR_LACKING_INGREDIENT
                     ingredientIcon = this.tintedIcon(ingredientIcon, COLOR_LACKING_INGREDIENT)
                 } else {
@@ -303,7 +303,7 @@ export class CraftingMenu extends Component {
                 ) {
                     const displayName = ITEM_METADATA_MAP[ingr.item].displayName
                     this.tooltip.say(
-                        `${displayName} (${player().dude.inventory.getItemCount(ingr.item)}/${
+                        `${displayName} (${player().inventory.getItemCount(ingr.item)}/${
                             ingr.count
                         })`
                     )

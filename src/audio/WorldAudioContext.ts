@@ -50,7 +50,7 @@ export class WorldAudioContext {
         // This is a proxy that prevents music from starting until
         // the game has really started (after the first cutscene)
         // TODO: How to do this better?
-        if (!player()?.dude) {
+        if (!player()) {
             return
         }
         this.listeners.forEach((l) => l(this))

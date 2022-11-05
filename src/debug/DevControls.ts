@@ -50,7 +50,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
         InputKey.I,
         "smoke bomb",
         () => {
-            const pos = player().dude.standingPosition
+            const pos = player().standingPosition
             const radius = 45
             const depth = pos.y + radius
 
@@ -110,7 +110,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
         InputKey.SEMICOLON,
         "spawn projectile",
         (input) => {
-            const standingPos = player().dude.standingPosition
+            const standingPos = player().standingPosition
             spawnMagicProjectile(
                 input.mousePos,
                 standingPos.minus(input.mousePos).normalized().times(0.15)

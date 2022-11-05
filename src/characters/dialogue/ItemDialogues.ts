@@ -34,7 +34,7 @@ export const ITEM_DIALOGUES: DialogueSet = {
         const completeDialogue = (logsTransferred: number) => {
             return () => {
                 if (logsTransferred > 0) {
-                    player().dude.inventory.removeItem(Item.WOOD, logsTransferred)
+                    player().inventory.removeItem(Item.WOOD, logsTransferred)
                 }
                 cf.addLogs(logsTransferred)
                 return new NextDialogue(CAMPFIRE_DIALOGUE, false)
@@ -51,7 +51,7 @@ export const ITEM_DIALOGUES: DialogueSet = {
         if (logCount > 0) {
             options.push(
                 new DialogueOption("Take a torch", () => {
-                    player().dude.setShield(ShieldType.TORCH)
+                    player().setShield(ShieldType.TORCH)
                     return completeDialogue(-1)()
                 })
             )
@@ -70,7 +70,7 @@ export const ITEM_DIALOGUES: DialogueSet = {
                 new DialogueOption("Rest briefly", () => {
                     saveManager.setState({ lastCampfireRestTime: now })
                     restPoint.rest(restDurationHours)
-                    player().dude.heal(player().dude.maxHealth / 2)
+                    player().heal(player().maxHealth / 2)
                     return completeDialogue(0)()
                 })
             )
@@ -89,7 +89,7 @@ export const ITEM_DIALOGUES: DialogueSet = {
 
         const cf: Campfire = DialogueDisplay.instance.source as Campfire
         const logCount = cf.logs
-        const playerLogCount = player().dude.inventory.getItemCount(Item.WOOD)
+        const playerLogCount = player().inventory.getItemCount(Item.WOOD)
         const logsYouCanAdd = Math.min(Campfire.LOG_CAPACITY - logCount, playerLogCount)
         const exitOption = new DialogueOption(
             CANCEL_TEXT,
@@ -100,7 +100,7 @@ export const ITEM_DIALOGUES: DialogueSet = {
         const completeDialogue = (logsTransferred: number) => {
             return () => {
                 if (logsTransferred > 0) {
-                    player().dude.inventory.removeItem(Item.WOOD, logsTransferred)
+                    player().inventory.removeItem(Item.WOOD, logsTransferred)
                 }
                 cf.addLogs(logsTransferred)
                 return new NextDialogue(CAMPFIRE_DIALOGUE, false)
@@ -164,12 +164,12 @@ export const ITEM_DIALOGUES: DialogueSet = {
         let options = [
             new DialogueOption("Sleep (8 hours)", () => {
                 bed.rest(8)
-                player().dude.heal(player().dude.maxHealth)
+                player().heal(player().maxHealth)
                 return completeDialogue
             }),
             new DialogueOption("Nap (1 hour)", () => {
                 bed.rest(1)
-                player().dude.heal(player().dude.maxHealth / 2)
+                player().heal(player().maxHealth / 2)
                 return completeDialogue
             }),
             new DialogueOption(CANCEL_TEXT, () => completeDialogue),

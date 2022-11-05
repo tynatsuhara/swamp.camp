@@ -36,7 +36,7 @@ export class StepSounds {
             .then(() =>
                 dude.entity.addComponent(
                     new RepeatedInvoker(() => {
-                        if (player().dude) {
+                        if (player()) {
                             if (dude?.isAlive && dude.isMoving && !dude.rolling && !dude.jumping) {
                                 const [sound, volume] = StepSounds.getSound(dude)
                                 if (!!sound) {
@@ -78,7 +78,7 @@ export class StepSounds {
                 return [StepSounds.MUD_SOUND, 0.3]
             case GroundType.WATER:
             case GroundType.WATERFALL:
-                if (dude === player().dude) {
+                if (dude === player()) {
                     controls.vibrate({
                         duration: 70,
                         strongMagnitude: 0,
