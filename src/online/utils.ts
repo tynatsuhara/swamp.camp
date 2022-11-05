@@ -7,5 +7,5 @@ export const base64hash = async (data: string, maxLen?: number) => {
         byteString += String.fromCharCode(byte)
     }
     // convert bytestring to base64 (or really, base36)
-    return btoa(byteString).substring(0, 4).substring(0, maxLen)
+    return btoa(byteString).substring(0, maxLen)
 }
