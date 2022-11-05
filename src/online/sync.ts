@@ -32,12 +32,15 @@ if (!localStorage.getItem(MULTIPLAYER_SECRET_KEY)) {
 export const MULTIPLAYER_SECRET = localStorage.getItem(MULTIPLAYER_SECRET_KEY)
 
 // Core actions
+const [sendIntialHostPing, receiveInitialHostPing] = session.action<void>("hostping")
 const [sendCredentials, receiveCredentials] = session.action<{ id: string; secret: string }>("mpid")
-const [sendInitWorld, receiveInitWorld] = session.action<Save>("init")
+const [sendInitWorld, receiveInitWorld] = session.action<Save>("initworld")
 const [sendInitWorldAck, receiveInitWorldAck] = session.action<void>("init:ack")
 
 // Called when a new user has joined the game
 export const hostOnJoin = () => {
+    sendIntialHostPing(null)
+
     receiveCredentials(({ id, secret }, peerId) => {
         console.log(`received multiplayer ID ${id} from peer ${peerId}`)
         const salt = player().dude.uuid
@@ -79,9 +82,7 @@ export const hostSessionClose = () => {
 }
 
 export const guestOnJoin = () => {
-    sendCredentials({ id: MULTIPLAYER_ID, secret: MULTIPLAYER_SECRET })
-
-    receiveInitWorld((data, peerId) => {
+    receiveInitialHostPing((_, peerId) => {
         computeSessionIdFromPeerId(peerId).then((expectedSessionId) => {
             if (session.getId() !== expectedSessionId) {
                 console.warn(
@@ -90,11 +91,19 @@ export const guestOnJoin = () => {
                 return
             }
             hostId = peerId
-            console.log(`received save data from ${peerId}:`)
-            console.log(data)
-            saveManager.loadSave(data as Save)
-            sendInitWorldAck(null, hostId)
+
+            sendCredentials({ id: MULTIPLAYER_ID, secret: MULTIPLAYER_SECRET }, hostId)
         })
+    })
+
+    receiveInitWorld((data, peerId) => {
+        if (peerId !== hostId) {
+            console.warn(`received world init signal from imposter host ${peerId}`)
+        }
+        console.log(`received save data from ${peerId}:`)
+        console.log(data)
+        saveManager.loadSave(data as Save)
+        sendInitWorldAck(null, hostId)
     })
 
     session.getRoom().onPeerLeave((peerId) => {
@@ -162,8 +171,12 @@ export const syncFn = <T extends any[], R = void>(
     }
 
     if (session.isGuest()) {
-        receive((args) => {
-            fn(...args)
+        receive((args, peerId) => {
+            if (peerId === hostId) {
+                fn(...args)
+            } else {
+                console.warn("other clients should not be calling syncFn")
+            }
         })
     }
 
@@ -202,11 +215,15 @@ export const syncData = <T extends object>(id: string, data: T, onChange = (upda
     })
 
     if (session.isGuest()) {
-        receive((newData) => {
-            Object.keys(newData).forEach((key) => {
-                data[key] = newData[key]
-            })
-            onChange(data)
+        receive((newData, peerId) => {
+            if (peerId === hostId) {
+                Object.keys(newData).forEach((key) => {
+                    data[key] = newData[key]
+                })
+                onChange(data)
+            } else {
+                console.warn("other clients should not be calling syncFn")
+            }
         })
     }
 
