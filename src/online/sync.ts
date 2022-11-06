@@ -31,10 +31,14 @@ if (!localStorage.getItem(MULTIPLAYER_SECRET_KEY)) {
 }
 export const MULTIPLAYER_SECRET = localStorage.getItem(MULTIPLAYER_SECRET_KEY)
 
-// Core actions
+// Session establishment handshake
+// 1. When a peer joins, the host identifies themselves (and the peer validates that they're the real host)
 const [sendIntialHostPing, receiveInitialHostPing] = session.action<void>("hostping")
+// 2. The peer identifies and authenticates themselves with their persistent multiplayer ID & secret
 const [sendCredentials, receiveCredentials] = session.action<{ id: string; secret: string }>("mpid")
+// 3. The host sends the world information to the peer
 const [sendInitWorld, receiveInitWorld] = session.action<Save>("initworld")
+// 4. The peer lets the host know their world (and network actions) have been initialized
 const [sendInitWorldAck, receiveInitWorldAck] = session.action<void>("init:ack")
 
 // Called when a new user has joined the game
@@ -77,7 +81,7 @@ export const hostOnJoin = () => {
 }
 
 export const hostSessionClose = () => {
-    initializedPeers.forEach((p) => cleanUpPeer(p))
+    session.getPeers().forEach((p) => cleanUpPeer(p))
     cleanUpSession()
 }
 
