@@ -12,7 +12,10 @@ export const newUUID = () => {
 // this could be denser — but a lot of utf8 code points cause issues
 const CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 
-export const randomByteString = (bytes: number = 4) => {
+/**
+ * @param bytes defaults to 12, the max length for a sync function
+ */
+export const randomByteString = (bytes: number = 12) => {
     return Lists.range(0, bytes)
         .map(() => CHARACTERS.charAt(Math.floor(Math.random() * CHARACTERS.length)))
         .join("")

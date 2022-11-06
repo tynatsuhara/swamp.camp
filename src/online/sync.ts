@@ -59,7 +59,7 @@ export const hostOnJoin = () => {
                     return
                 }
             } else {
-                onlinePlayers[dudeUUID] = { password }
+                onlinePlayers[dudeUUID] = { uuid: dudeUUID, password }
             }
             saveManager.setState({ onlinePlayers })
             peerToMultiplayerId[peerId] = id

@@ -131,11 +131,12 @@ export class DudeFactory {
     private make(
         type: DudeType,
         pos: Point,
-        saveState: Partial<DudeSaveState>,
+        saveState: Partial<DudeSaveState> & { uuid: string },
         location: Location,
         hasPendingSlot: boolean
     ): Dude {
         const uuid = saveState.uuid
+        const invIdPrefix = Dude.createSyncId(uuid, "iv")
 
         // defaults
         let factions: DudeFaction[] = [DudeFaction.VILLAGERS]
@@ -148,7 +149,7 @@ export class DudeFactory {
         let additionalComponents: Component[] = []
         let blob = {}
         let inventoryClass = Inventory
-        let defaultInventory = new Inventory()
+        let defaultInventory = new Inventory(invIdPrefix)
         let colliderSize = DEFAULT_COLLIDER_SIZE
         let nameGen: () => string = () => undefined
 
@@ -160,6 +161,11 @@ export class DudeFactory {
                 shield = ShieldType.BASIC
                 maxHealth = 4
                 speed = 0.075
+                inventoryClass = PlayerInventory
+                const defaultPlayerInv = new PlayerInventory(invIdPrefix)
+                defaultPlayerInv.addItem(Item.SWORD, 1, null, true)
+                defaultPlayerInv.addItem(Item.BASIC_SHIELD, 1, null, true)
+                defaultInventory = defaultPlayerInv
                 if (session.isHost()) {
                     const isHostPlayerDude = !uuid.startsWith(ONLINE_PLAYER_DUDE_ID_PREFIX)
                     if (isHostPlayerDude) {
@@ -181,14 +187,11 @@ export class DudeFactory {
                     if (uuid === ONLINE_PLAYER_DUDE_ID_PREFIX + MULTIPLAYER_ID) {
                         additionalComponents = [new GuestPlayer(), new CutscenePlayerController()]
                         window["player"] = additionalComponents[0]
+                    } else {
+                        // This is a guest player on a different guest's machine
+                        inventoryClass = Inventory
                     }
                 }
-                // MPTODO: We probably need a GuestPlayerInventory
-                inventoryClass = PlayerInventory
-                const pInv = new PlayerInventory()
-                pInv.addItem(Item.SWORD, 1, null, true)
-                pInv.addItem(Item.BASIC_SHIELD, 1, null, true)
-                defaultInventory = pInv
                 break
             }
             case DudeType.DIP: {
@@ -460,7 +463,7 @@ export class DudeFactory {
             health: saveState?.health ?? maxHealth,
             speed: speed ?? speed,
             inventory: saveState?.inventory
-                ? inventoryClass.load(saveState.inventory)
+                ? inventoryClass.load(invIdPrefix, saveState.inventory)
                 : defaultInventory,
             dialogue: saveState?.dialogue ?? dialogue,
             blob: saveState?.blob ?? blob,

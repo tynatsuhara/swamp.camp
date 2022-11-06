@@ -29,7 +29,10 @@ export class Inventory {
     private stacks: ItemStack[]
     private countMap = new Map<Item, number>()
 
-    constructor(size: number = 20) {
+    /**
+     * @param syncIdPrefix a unique identifier used for sync functions, max len 10 characters
+     */
+    constructor(syncIdPrefix: string, size: number = 20) {
         this.stacks = Array.from({ length: size })
     }
 
@@ -150,8 +153,8 @@ export class Inventory {
         })
     }
 
-    static load(stacks: ItemStack[]) {
-        const inv = new this()
+    static load(id: string, stacks: ItemStack[]) {
+        const inv = new this(id)
 
         // filter out now-invalid items
         stacks = stacks.map((stack) => (ITEM_METADATA_MAP[stack?.item] ? stack : null))

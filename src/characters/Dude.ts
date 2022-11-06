@@ -62,7 +62,6 @@ export class Dude extends Component implements DialogueSource {
     static readonly NPC_COLLISION_LAYER = "npc"
     static readonly ON_FIRE_LIGHT_DIAMETER = 40
 
-    readonly syncId: string
     readonly syncData: SyncData
 
     // managed by WorldLocation/LocationManager classes
@@ -137,6 +136,19 @@ export class Dude extends Component implements DialogueSource {
     private conditions: ActiveCondition[] = []
     private name: string
 
+    static createSyncId(uuid: string, namespace: string) {
+        const prefix = uuid.substring(0, 8) // 36^8 should be fine, we have a 12 char limit
+        const syncId = prefix + namespace
+        if (syncId.length > 12) {
+            console.warn(`sync ID ${syncId} is longer than the 12 character limit`)
+        }
+        return syncId
+    }
+
+    syncId(namespace: string) {
+        return Dude.createSyncId(this.uuid, namespace)
+    }
+
     constructor(params: {
         uuid: string
         hasPendingSlot: boolean
@@ -188,9 +200,9 @@ export class Dude extends Component implements DialogueSource {
             name,
         } = { ...params }
 
-        this.syncId = uuid.substring(0, 8) // 36^8 should be fine, we have a 12 char limit
+        const syncId = uuid.substring(0, 8) // 36^8 should be fine, we have a 12 char limit
         this.syncData = syncData(
-            this.syncId,
+            syncId,
             {
                 p: { x: standingPosition.x, y: standingPosition.y },
                 f: false,
@@ -219,7 +231,7 @@ export class Dude extends Component implements DialogueSource {
 
         // Synchronized host->client functions
 
-        this.jump = syncFn(`${this.syncId}jump`, () => {
+        this.jump = syncFn(this.syncId("jump"), () => {
             const ground = this.location.getGround(this.tile)
             if (!this.canJumpOrRoll || Ground.isWater(ground?.type)) {
                 return
@@ -229,7 +241,7 @@ export class Dude extends Component implements DialogueSource {
             setTimeout(() => (this.canJumpOrRoll = true), 750)
         })
 
-        this.roll = syncFn(`${this.syncId}roll`, () => {
+        this.roll = syncFn(this.syncId("roll"), () => {
             this.rollingMomentum = new Point(this.syncData.d.x, this.syncData.d.y)
             const ground = this.location.getGround(this.tile)
             if (!this.canJumpOrRoll || Ground.isWater(ground?.type)) {
@@ -246,24 +258,24 @@ export class Dude extends Component implements DialogueSource {
             setTimeout(() => (this.canJumpOrRoll = true), 750)
         })
 
-        this.setWeaponAndShieldDrawn = syncFn(`${this.syncId}wsd`, (drawn: boolean) => {
+        this.setWeaponAndShieldDrawn = syncFn(`${syncId}wsd`, (drawn: boolean) => {
             this.weapon?.setSheathed(!drawn)
             this.shield?.setOnBack(!drawn)
         })
 
-        this.updateBlocking = syncFn(`${this.syncId}blk`, (blocking) => {
+        this.updateBlocking = syncFn(`${syncId}blk`, (blocking) => {
             this.shield.block(blocking)
         })
 
-        this.updateAttacking = syncFn(`${this.syncId}atk`, (isNewAttack) => {
+        this.updateAttacking = syncFn(`${syncId}atk`, (isNewAttack) => {
             this.weapon?.attack(isNewAttack)
         })
 
-        this.cancelAttacking = syncFn(`${this.syncId}catk`, () => {
+        this.cancelAttacking = syncFn(`${syncId}catk`, () => {
             this.weapon?.cancelAttack()
         })
 
-        this.addCondition = syncFn(`${this.syncId}ac`, (condition, duration) => {
+        this.addCondition = syncFn(`${syncId}ac`, (condition, duration) => {
             const expiration = duration ? WorldTime.instance.time + duration : undefined
             const existing = this.conditions.find((c) => c.condition === condition)
             if (existing) {
@@ -281,7 +293,7 @@ export class Dude extends Component implements DialogueSource {
             }
         })
 
-        this.removeCondition = syncFn(`${this.syncId}rc`, (condition) => {
+        this.removeCondition = syncFn(`${syncId}rc`, (condition) => {
             this.conditions = this.conditions.filter((c) => c.condition !== condition)
             switch (condition) {
                 case Condition.ON_FIRE:
@@ -313,7 +325,7 @@ export class Dude extends Component implements DialogueSource {
             this._weapon = this.entity.addComponent(WeaponFactory.make(type, this.type))
             this.shield?.setOnBack(false) // keep em in sync
         }
-        this.setWeapon = clientSyncFn(`${this.syncId}eqw`, (trusted, type: WeaponType) => {
+        this.setWeapon = clientSyncFn(`${syncId}eqw`, (trusted, type: WeaponType) => {
             if (this.weapon?.getType() === type) {
                 return
             } else if (!trusted && !this.inventory.getItemCount(type as unknown as Item)) {
@@ -327,7 +339,7 @@ export class Dude extends Component implements DialogueSource {
             this._shield = this.entity.addComponent(ShieldFactory.make(type, this.type))
             this.weapon?.setSheathed(false) // keep em in sync
         }
-        this.setShield = clientSyncFn(`${this.syncId}eqs`, (trusted, type: ShieldType) => {
+        this.setShield = clientSyncFn(`${syncId}eqs`, (trusted, type: ShieldType) => {
             if (this.shield?.type === type) {
                 return
             } else if (!trusted && !this.inventory.getItemCount(type as unknown as Item)) {

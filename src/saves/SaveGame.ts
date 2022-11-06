@@ -29,5 +29,5 @@ export class SaveState {
     lastCampfireRestTime?: number = Number.MIN_SAFE_INTEGER
 
     // stored in a location-agnostic spot, in state so that it is persisted easily
-    onlinePlayers?: Record<string, Partial<DudeSaveState> & { password: string }> = {}
+    onlinePlayers?: Record<string, Partial<DudeSaveState> & { uuid: string; password: string }> = {}
 }

@@ -24,7 +24,7 @@ export class GuestPlayer extends AbstractPlayer {
     awake() {
         super.awake()
         const [sendControls, receiveControls] = session.action<SerializablePlayerControls>(
-            `${this.dude.syncId}ctrl`
+            this.dude.syncId("ctrl")
         )
 
         this.sendControls = sendControls
