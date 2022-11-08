@@ -120,5 +120,5 @@ export const spawnThrownProjectile = (
     velocity: Point,
     attacker: Dude
 ) => {
-    here().droppedItems.add(new Entity([new ThrownProjectile(sprite, tip, velocity, attacker)]))
+    here().miscEntities.add(new Entity([new ThrownProjectile(sprite, tip, velocity, attacker)]))
 }

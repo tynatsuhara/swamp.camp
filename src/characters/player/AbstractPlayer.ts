@@ -52,13 +52,6 @@ export abstract class AbstractPlayer extends Component {
         }
     }
 
-    // MPTODO clean up?
-    update(updateData: UpdateData): void {
-        if (!this.dude.isAlive) {
-            return
-        }
-    }
-
     getSerializablePlayerControls(): SerializablePlayerControls {
         // Controls we'll need to pass
         const canMove = !UIStateManager.instance.isMenuOpen || PlaceElementDisplay.instance.isOpen
@@ -112,6 +105,8 @@ export abstract class AbstractPlayer extends Component {
             this.dude.rolling ? 0 : playerControls.playerFacingDirection,
             speedMultiplier
         )
+
+        this.droppedItemPickupCheck()
 
         if (!playerControls.canProvideInput) {
             return
@@ -176,6 +171,29 @@ export abstract class AbstractPlayer extends Component {
         return 0.45
     }
     private pushingUntil = 0
+
+    private droppedItemPickupCheck() {
+        // here().droppedItems.forEach((item) => {
+        //     const colliding = this.dude.standingPosition.plusY(-6).distanceTo(position) < 12
+        //     if (colliding && this.canPickUp) {
+        //         this.canPickUp = false
+        //         setTimeout(() => {
+        //             if (player().isAlive && !!this.entity) {
+        //                 if (player().inventory.addItem(this.itemType, 1, metadata)) {
+        //                     here().droppedItems.delete(this.entity)
+        //                     this.entity.selfDestruct()
+        //                     setTimeout(() => {
+        //                         Sounds.play(Lists.oneOf(PICK_UP_SOUNDS), 0.15)
+        //                     }, Math.random() * 350)
+        //                     return
+        //                 }
+        //                 // inventory is full
+        //                 this.canPickUp = true
+        //             }
+        //         }, 150)
+        //     }
+        // })
+    }
 
     checkHotKeys(updateData: UpdateData) {
         controls.HOT_KEY_OPTIONS.forEach((hotKey) => {

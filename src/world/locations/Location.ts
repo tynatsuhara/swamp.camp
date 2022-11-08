@@ -5,6 +5,7 @@ import { Sounds } from "../../audio/Sounds"
 import { Dude } from "../../characters/Dude"
 import { DudeFactory, ONLINE_PLAYER_DUDE_ID_PREFIX } from "../../characters/DudeFactory"
 import { DudeType } from "../../characters/DudeType"
+import { DroppedItem } from "../../items/DroppedItem"
 import { syncFn } from "../../online/sync"
 import { SaveContext } from "../../SaveManager"
 import { LocationSaveState } from "../../saves/LocationSaveState"
@@ -36,7 +37,8 @@ export class Location {
     readonly levels = new Grid<number>()
 
     // TODO: Make dropped items saveable
-    readonly droppedItems = new Set<Entity>()
+    readonly droppedItems = new Set<DroppedItem>()
+    readonly miscEntities = new Set<Entity>()
 
     private features: Feature<any>[] = []
     private readonly featureEntities: Entity[] = []
@@ -461,7 +463,8 @@ export class Location {
                     .map((c) => c.entity)
             )
             .concat(this.featureEntities)
-            .concat(Array.from(this.droppedItems))
+            .concat(Array.from(this.droppedItems).map((i) => i.entity))
+            .concat(Array.from(this.miscEntities))
     }
 
     getDude(dudeType: DudeType): Dude {

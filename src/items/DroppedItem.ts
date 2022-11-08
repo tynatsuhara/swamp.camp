@@ -86,7 +86,7 @@ export class DroppedItem extends Component {
                 setTimeout(() => {
                     if (player().isAlive && !!this.entity) {
                         if (player().inventory.addItem(this.itemType, 1, metadata)) {
-                            here().droppedItems.delete(this.entity)
+                            here().droppedItems.delete(this)
                             this.entity.selfDestruct()
                             setTimeout(() => {
                                 Sounds.play(Lists.oneOf(PICK_UP_SOUNDS), 0.15)

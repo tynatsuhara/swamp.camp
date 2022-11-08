@@ -346,6 +346,6 @@ export const spawnItem = ({
     metadata?: ItemMetadata
 }) => {
     here().droppedItems.add(
-        new Entity([new DroppedItem(pos, item, velocity, sourceCollider, metadata)])
+        new Entity().addComponent(new DroppedItem(pos, item, velocity, sourceCollider, metadata))
     )
 }
