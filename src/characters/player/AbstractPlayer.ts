@@ -24,6 +24,7 @@ export type SerializablePlayerControls = {
     isAttackHeld: boolean
     isAttackDown: boolean
     canProvideInput: boolean
+    isInteractDown: boolean
 }
 
 export abstract class AbstractPlayer extends Component {
@@ -68,6 +69,7 @@ export abstract class AbstractPlayer extends Component {
             isAttackHeld: controls.isAttack(ButtonState.HELD),
             isAttackDown: controls.isAttack(ButtonState.DOWN),
             canProvideInput: !UIStateManager.instance.isMenuOpen,
+            isInteractDown: controls.isInteractDown(),
         }
     }
 
@@ -196,13 +198,16 @@ export abstract class AbstractPlayer extends Component {
         })
     }
 
-    updateInteractables(updateData: UpdateData) {
+    updateInteractables(updateData: UpdateData, updateUI: boolean) {
         const interactDistance = 20
         const interactCenter = this.dude.standingPosition.minus(pt(0, 7))
         const interactables = updateData.view.entities
             .map((e) => e.getComponent(Interactable))
             .filter((e) => e?.enabled)
-        interactables.forEach((i) => i.updateIndicator(false))
+
+        if (updateUI) {
+            interactables.forEach((i) => i.updateIndicator(false))
+        }
 
         const possibilities = interactables
             .filter((e) => this.dude.isFacing(e.position)) // interactables the dude is facing
@@ -210,10 +215,11 @@ export abstract class AbstractPlayer extends Component {
             .filter((e) => e.isInteractable())
 
         const i = Lists.minBy(possibilities, (e) => e.position.distanceTo(interactCenter))
-        if (!!i) {
-            // MPTODO: Only show indicator for the controlling player
-            i.updateIndicator(true)
+
+        if (updateUI) {
+            i?.updateIndicator(true)
         }
+
         return i
     }
 }

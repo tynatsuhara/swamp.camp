@@ -2,6 +2,7 @@ import { Component, debug, GamepadButton, InputKey, Point } from "brigsby/dist"
 import { EllipseRender, RenderMethod } from "brigsby/dist/renderer"
 import { controls } from "../../Controls"
 import { TILE_SIZE } from "../../graphics/Tilesets"
+import { session } from "../../online/session"
 import { ButtonIndicator } from "../../ui/ButtonIndicator"
 import { KeyPressIndicator } from "../../ui/KeyPressIndicator"
 import { UIStateManager } from "../../ui/UIStateManager"
@@ -36,9 +37,10 @@ export class Interactable extends Component {
         this.showUI = showUI
     }
 
-    // MPTODO: Interactables should be triggerable on host AND client at the same time
     interact() {
-        this.fn()
+        if (session.isHost()) {
+            this.fn()
+        }
     }
 
     getRenderMethods(): RenderMethod[] {

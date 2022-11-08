@@ -27,7 +27,7 @@ export class HostPlayer extends AbstractPlayer {
         // MPTODO
         this.checkIsOffMap(updateData)
 
-        const possibleInteractable = this.updateInteractables(updateData)
+        const possibleInteractable = this.updateInteractables(updateData, true)
 
         // Determine player movement
         this.doMovementOnHost(updateData.elapsedTimeMillis, playerControls)
