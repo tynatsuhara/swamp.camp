@@ -5,7 +5,6 @@ import { session } from "../../online/session"
 import { AbstractPlayer, SerializablePlayerControls } from "./AbstractPlayer"
 import { registerPlayerInstance } from "./index"
 
-// TODO
 export class GuestPlayer extends AbstractPlayer {
     constructor() {
         super()

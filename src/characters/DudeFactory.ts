@@ -148,8 +148,8 @@ export class DudeFactory {
         let dialogue: string = EMPTY_DIALOGUE
         let additionalComponents: Component[] = []
         let blob = {}
-        let inventoryClass = Inventory
-        let defaultInventory = new Inventory(invIdPrefix)
+        let inventorySupplier = () => new Inventory(invIdPrefix)
+        let defaultInventorySupplier = () => new Inventory(invIdPrefix)
         let colliderSize = DEFAULT_COLLIDER_SIZE
         let nameGen: () => string = () => undefined
 
@@ -161,14 +161,25 @@ export class DudeFactory {
                 shield = ShieldType.BASIC
                 maxHealth = 4
                 speed = 0.075
-                inventoryClass = PlayerInventory
-                const defaultPlayerInv = new PlayerInventory(invIdPrefix)
-                defaultPlayerInv.addItem(Item.SWORD, 1, null, true)
-                defaultPlayerInv.addItem(Item.BASIC_SHIELD, 1, null, true)
-                defaultInventory = defaultPlayerInv
+
+                // Inventory stuff
+                const isLocalHostPlayer =
+                    session.isHost() && !uuid.startsWith(ONLINE_PLAYER_DUDE_ID_PREFIX)
+                const isLocalGuestPlayer = uuid === ONLINE_PLAYER_DUDE_ID_PREFIX + MULTIPLAYER_ID
+                const showNotifications = isLocalHostPlayer || isLocalGuestPlayer
+
+                if (!session.isHost() && !isLocalGuestPlayer) {
+                    inventorySupplier = () => new PlayerInventory(showNotifications, invIdPrefix)
+                    defaultInventorySupplier = () => {
+                        const defaultPlayerInv = new PlayerInventory(showNotifications, invIdPrefix)
+                        defaultPlayerInv.addItem(Item.SWORD, 1, null, true)
+                        defaultPlayerInv.addItem(Item.BASIC_SHIELD, 1, null, true)
+                        return defaultPlayerInv
+                    }
+                }
+
                 if (session.isHost()) {
-                    const isHostPlayerDude = !uuid.startsWith(ONLINE_PLAYER_DUDE_ID_PREFIX)
-                    if (isHostPlayerDude) {
+                    if (isLocalHostPlayer) {
                         animationName = "knight_f"
                         additionalComponents = [new HostPlayer(), new CutscenePlayerController()]
                         window["player"] = additionalComponents[0]
@@ -184,12 +195,11 @@ export class DudeFactory {
                      * except for the one that you control, which is responsible for
                      * sending data to the host to update that dude
                      */
-                    if (uuid === ONLINE_PLAYER_DUDE_ID_PREFIX + MULTIPLAYER_ID) {
+                    if (isLocalGuestPlayer) {
                         additionalComponents = [new GuestPlayer(), new CutscenePlayerController()]
                         window["player"] = additionalComponents[0]
                     } else {
-                        // This is a guest player on a different guest's machine
-                        inventoryClass = Inventory
+                        // This is an uncontrolled player on a different guest's machine (see the if statement above)
                     }
                 }
                 break
@@ -290,8 +300,12 @@ export class DudeFactory {
                 speed *= 0.6
                 dialogue = DOCTOR_DIALOGUE_ENTRYPOINT
                 additionalComponents = [new NPC(), new Villager()]
-                defaultInventory.addItem(Item.WEAK_MEDICINE, 3)
-                defaultInventory.addItem(Item.HEART_CONTAINER, 1)
+                defaultInventorySupplier = () => {
+                    const inv = new Inventory(invIdPrefix)
+                    inv.addItem(Item.WEAK_MEDICINE, 3)
+                    inv.addItem(Item.HEART_CONTAINER, 1)
+                    return inv
+                }
                 nameGen = () => peopleNames.generate("<doctor>")
                 break
             }
@@ -463,8 +477,8 @@ export class DudeFactory {
             health: saveState?.health ?? maxHealth,
             speed: speed ?? speed,
             inventory: saveState?.inventory
-                ? inventoryClass.load(invIdPrefix, saveState.inventory)
-                : defaultInventory,
+                ? inventorySupplier().load(saveState.inventory)
+                : defaultInventorySupplier(),
             dialogue: saveState?.dialogue ?? dialogue,
             blob: saveState?.blob ?? blob,
             colliderSize: colliderSize,

@@ -1,5 +1,6 @@
 import { InputKey } from "brigsby/dist"
 import { stringifySorted } from "../debug/JSON"
+import { syncFn } from "../online/sync"
 import { Item, ItemMetadata, ITEM_METADATA_MAP } from "./Items"
 
 export type ItemStackMetadata = ItemMetadata & {
@@ -34,6 +35,7 @@ export class Inventory {
      */
     constructor(syncIdPrefix: string, size: number = 20) {
         this.stacks = Array.from({ length: size })
+        this.addItem = syncFn(`${syncIdPrefix}ai`, this._addItem)
     }
 
     get size() {
@@ -56,7 +58,8 @@ export class Inventory {
     /**
      * returns true if the item was successfully added
      */
-    addItem(item: Item, count: number = 1, metadata: ItemStackMetadata = {}): boolean {
+    addItem: (item: Item, count?: number, metadata?: ItemStackMetadata) => boolean
+    private _addItem: typeof this.addItem = (item, count = 1, metadata = {}) => {
         const canAdd = this.canAddItem(item, count)
         if (!canAdd) {
             return false
@@ -153,22 +156,20 @@ export class Inventory {
         })
     }
 
-    static load(id: string, stacks: ItemStack[]) {
-        const inv = new this(id)
-
+    load(stacks: ItemStack[]) {
         // filter out now-invalid items
         stacks = stacks.map((stack) => (ITEM_METADATA_MAP[stack?.item] ? stack : null))
 
-        inv.stacks = stacks.map((s) =>
+        this.stacks = stacks.map((s) =>
             s === null ? null : new ItemStack(s.item, s.count, s.metadata ?? {})
         )
 
-        inv.stacks.forEach((stack) => {
+        this.stacks.forEach((stack) => {
             if (!!stack) {
-                inv.countMap.set(stack.item, stack.count + (inv.countMap.get(stack.item) ?? 0))
+                this.countMap.set(stack.item, stack.count + (this.countMap.get(stack.item) ?? 0))
             }
         })
 
-        return inv
+        return this
     }
 }
