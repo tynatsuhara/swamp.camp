@@ -1,5 +1,6 @@
 import { Component, debug, GamepadButton, InputKey, Point } from "brigsby/dist"
 import { EllipseRender, RenderMethod } from "brigsby/dist/renderer"
+import { Dude } from "../../characters/Dude"
 import { controls } from "../../Controls"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { session } from "../../online/session"
@@ -15,21 +16,23 @@ export class Interactable extends Component {
     get isShowingUI() {
         return this.showUI
     }
-    readonly isInteractable: () => boolean
+
+    // This will be evaluated on host AND client, even though interact can only be called on host!
+    readonly isInteractable: (interactor: Dude) => boolean
 
     constructor(
         position: Point,
         fn: () => void,
         uiOffset: Point = Point.ZERO,
-        isInteractable: () => boolean = () => true
+        isInteractable: (interactor: Dude) => boolean = () => true
     ) {
         super()
         this.position = position
         this.fn = fn
         this.uiOffset = uiOffset
-        this.isInteractable = () => {
+        this.isInteractable = (interactor: Dude) => {
             // TODO: Certain things might be interactable for guests, move this logic up
-            return !UIStateManager.instance.isMenuOpen && isInteractable()
+            return !UIStateManager.instance.isMenuOpen && isInteractable(interactor)
         }
     }
 
@@ -37,7 +40,7 @@ export class Interactable extends Component {
         this.showUI = showUI
     }
 
-    interact() {
+    interact(interactor: Dude) {
         if (session.isHost()) {
             this.fn()
         }

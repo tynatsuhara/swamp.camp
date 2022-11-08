@@ -5,6 +5,7 @@ import { PointAudio } from "../../audio/PointAudio"
 import { DialogueSource } from "../../characters/dialogue/Dialogue"
 import { ROCKS_NEEDED_FOR_CAMPFIRE } from "../../characters/dialogue/DipDialogue"
 import { CAMPFIRE_DIALOGUE } from "../../characters/dialogue/ItemDialogues"
+import { player } from "../../characters/player/index"
 import { FireParticles } from "../../graphics/particles/FireParticles"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
@@ -135,7 +136,8 @@ export class CampfireFactory extends ElementFactory<ElementType.CAMPFIRE, SaveDa
                     DialogueDisplay.instance.startDialogue(cf)
                 },
                 new Point(1, -TILE_SIZE),
-                () => session.isHost()
+                // only allow the host player to interact (for now)
+                (interactor) => session.isHost() && interactor === player()
             )
         )
 

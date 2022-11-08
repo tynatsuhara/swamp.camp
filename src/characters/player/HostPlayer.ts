@@ -33,7 +33,7 @@ export class HostPlayer extends AbstractPlayer {
         this.doMovementOnHost(updateData.elapsedTimeMillis, playerControls)
 
         if (controls.isInteractDown() && possibleInteractable) {
-            possibleInteractable.interact()
+            possibleInteractable.interact(this.dude)
         }
 
         this.checkHotKeys(updateData)

@@ -44,6 +44,7 @@ import { DudeAnimationUtils } from "./DudeAnimationUtils"
 import { DudeFaction } from "./DudeFactory"
 import { DudeType } from "./DudeType"
 import { NPC, NPCAttackState } from "./NPC"
+import { player } from "./player/index"
 import { Shield } from "./weapons/Shield"
 import { ShieldFactory } from "./weapons/ShieldFactory"
 import { ShieldType } from "./weapons/ShieldType"
@@ -396,10 +397,11 @@ export class Dude extends Component implements DialogueSource {
                     new Point(0, 0),
                     () => DialogueDisplay.instance.startDialogue(this),
                     Point.ZERO,
-                    () =>
+                    (interactor) =>
                         this.dialogue &&
                         this.entity.getComponent(NPC)?.canTalk() &&
-                        session.isHost()
+                        session.isHost() &&
+                        interactor === player()
                 )
             )
 

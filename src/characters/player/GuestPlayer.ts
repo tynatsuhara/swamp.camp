@@ -46,7 +46,7 @@ export class GuestPlayer extends AbstractPlayer {
             }
             const possibleInteractable = this.updateInteractables(updateData, false)
             if (this.controls?.isInteractDown && possibleInteractable) {
-                possibleInteractable.interact()
+                possibleInteractable.interact(this.dude)
             }
         }
     }

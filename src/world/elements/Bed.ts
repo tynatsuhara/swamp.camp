@@ -3,6 +3,7 @@ import { SpriteTransform } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
 import { DialogueSource } from "../../characters/dialogue/Dialogue"
 import { BED_DIALOGUE } from "../../characters/dialogue/ItemDialogues"
+import { player } from "../../characters/player/index"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
 import { session } from "../../online/session"
@@ -59,7 +60,7 @@ export class BedFactory extends ElementFactory<BedType> {
                     DialogueDisplay.instance.startDialogue(bed)
                 },
                 new Point(1, -TILE_SIZE),
-                () => session.isHost()
+                (interactor) => session.isHost() && interactor === player()
             )
         )
 
