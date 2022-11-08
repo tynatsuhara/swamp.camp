@@ -134,7 +134,8 @@ export class CampfireFactory extends ElementFactory<ElementType.CAMPFIRE, SaveDa
                 () => {
                     DialogueDisplay.instance.startDialogue(cf)
                 },
-                new Point(1, -TILE_SIZE)
+                new Point(1, -TILE_SIZE),
+                () => session.isHost()
             )
         )
 

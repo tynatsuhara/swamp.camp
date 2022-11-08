@@ -2,6 +2,7 @@ import { Entity, Point } from "brigsby/dist"
 import { AnimatedSpriteComponent, SpriteAnimation, SpriteTransform } from "brigsby/dist/sprites"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Inventory, ItemStack } from "../../items/Inventory"
+import { session } from "../../online/session"
 import { randomByteString } from "../../saves/uuid"
 import { InventoryDisplay } from "../../ui/InventoryDisplay"
 import { Location } from "../locations/Location"
@@ -72,7 +73,8 @@ export class ChestFactory extends ElementFactory<ElementType.CHEST, SaveData> {
                 InventoryDisplay.instance.open(() => animator.goToAnimation(1).play(), inventory)
                 animator.goToAnimation(0).play()
             },
-            new Point(0, -17)
+            new Point(0, -17),
+            () => session.isHost()
         )
 
         const collider = new NavMeshCollider(

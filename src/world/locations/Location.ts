@@ -6,6 +6,7 @@ import { Dude } from "../../characters/Dude"
 import { DudeFactory, ONLINE_PLAYER_DUDE_ID_PREFIX } from "../../characters/DudeFactory"
 import { DudeType } from "../../characters/DudeType"
 import { DroppedItem } from "../../items/DroppedItem"
+import { session } from "../../online/session"
 import { syncFn } from "../../online/sync"
 import { SaveContext } from "../../SaveManager"
 import { LocationSaveState } from "../../saves/LocationSaveState"
@@ -424,6 +425,11 @@ export class Location {
     }
 
     playerUseTeleporter(to: string, id: string) {
+        // teleporter will get executed on the host
+        if (session.isGuest()) {
+            return
+        }
+
         const linkedLocation = LocationManager.instance.get(to)
         const linkedPosition = this.getTeleporterLinkedPos(to, id)
 

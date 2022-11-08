@@ -396,7 +396,10 @@ export class Dude extends Component implements DialogueSource {
                     new Point(0, 0),
                     () => DialogueDisplay.instance.startDialogue(this),
                     Point.ZERO,
-                    () => !!this.dialogue && this.entity.getComponent(NPC)?.canTalk()
+                    () =>
+                        this.dialogue &&
+                        this.entity.getComponent(NPC)?.canTalk() &&
+                        session.isHost()
                 )
             )
 

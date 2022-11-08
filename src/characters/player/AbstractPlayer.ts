@@ -211,6 +211,7 @@ export abstract class AbstractPlayer extends Component {
 
         const i = Lists.minBy(possibilities, (e) => e.position.distanceTo(interactCenter))
         if (!!i) {
+            // MPTODO: Only show indicator for the controlling player
             i.updateIndicator(true)
         }
         return i
