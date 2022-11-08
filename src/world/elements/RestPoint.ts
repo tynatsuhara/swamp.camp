@@ -13,6 +13,7 @@ import { ElementType } from "./Elements"
 export class RestPoint extends Component {
     rest(hours: number) {
         const pause = 1200
+        // MPTODO make this nice for online players
         HUD.instance.locationTransition.transition(() => {
             WorldTime.instance.fastForward(hours * TimeUnit.HOUR)
             setTimeout(() => saveManager.autosave(), pause + 500)
