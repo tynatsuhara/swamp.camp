@@ -18,6 +18,7 @@ import { CutsceneManager } from "./CutsceneManager"
 import { TextOverlayManager } from "./TextOverlayManager"
 
 // This is the cutscene that plays when the player dies
+// MPTODO: Only trigger this is all players are dead. Allow others to revive!
 export class DeathCutscene extends Component {
     // durations in ms
     private readonly TRANSITION_PAUSE = 1000
