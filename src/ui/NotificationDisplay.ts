@@ -65,7 +65,7 @@ class NotificationComponent extends Component {
                     .toComponent(
                         SpriteTransform.new({
                             position: new Point(TILE_SIZE / 2, 7),
-                            depth,
+                            depth: 1,
                         }).relativeTo(this.t)
                     )
                 this.entity.addComponent(icon)
