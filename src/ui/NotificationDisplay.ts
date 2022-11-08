@@ -16,7 +16,7 @@ export const Notifications: { [key: string]: Notification } = {
 
 const OFFSET = new Point(-4, 4)
 const ICON_WIDTH = 20
-const DEFAULT_LIFESPAN_MILLIS = 5_000
+const DEFAULT_LIFESPAN_MILLIS = 3_000
 
 export type Notification = {
     text: string
