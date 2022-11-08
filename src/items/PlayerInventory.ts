@@ -1,3 +1,4 @@
+import { Dude } from "../characters/Dude"
 import { player } from "../characters/player"
 import { syncFn } from "../online/sync"
 import { saveManager } from "../SaveManager"
@@ -36,29 +37,30 @@ const SPECIAL_ITEMS: { [item: number]: SpecialItem } = {
 }
 
 export class PlayerInventory extends Inventory {
-    private showNotifications: boolean
+    constructor(playerUUID: string, size?: number) {
+        const syncIdPrefix = Dude.createSyncId(playerUUID, "iv")
 
-    constructor(showNotifications: boolean, syncIdPrefix: string, size?: number) {
         super(syncIdPrefix, size)
-        this.showNotifications = showNotifications
 
         const addItem = this.addItem
 
         const pushNotification = syncFn(`${syncIdPrefix}pn`, (item: Item, count: number) => {
-            const itemData = ITEM_METADATA_MAP[item]
-            const id = `add-inv-${item}`
-            const existing = NotificationDisplay.instance.getById(id)
-            const updatedCount = (existing?.count ?? 0) + count
-            const n: Notification & { id: string } = {
-                id,
-                text: `+${updatedCount} ${itemData.displayName}`,
-                icon: itemData.inventoryIcon,
-                count: updatedCount,
-            }
-            if (existing) {
-                NotificationDisplay.instance.replace(n)
-            } else {
-                NotificationDisplay.instance.push(n)
+            if (player().uuid === playerUUID) {
+                const itemData = ITEM_METADATA_MAP[item]
+                const id = `add-inv-${item}`
+                const existing = NotificationDisplay.instance.getById(id)
+                const updatedCount = (existing?.count ?? 0) + count
+                const n: Notification & { id: string } = {
+                    id,
+                    text: `+${updatedCount} ${itemData.displayName}`,
+                    icon: itemData.inventoryIcon,
+                    count: updatedCount,
+                }
+                if (existing) {
+                    NotificationDisplay.instance.replace(n)
+                } else {
+                    NotificationDisplay.instance.push(n)
+                }
             }
         })
 
@@ -70,7 +72,7 @@ export class PlayerInventory extends Inventory {
                 SPECIAL_ITEMS[item]?.onAdd(count)
 
                 // Push a notification, if appropriate
-                if (this.showNotifications && !quiet && NotificationDisplay.instance) {
+                if (!quiet && NotificationDisplay.instance) {
                     pushNotification(item, count)
                 }
             }

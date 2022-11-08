@@ -173,26 +173,9 @@ export abstract class AbstractPlayer extends Component {
     private pushingUntil = 0
 
     private droppedItemPickupCheck() {
-        // here().droppedItems.forEach((item) => {
-        //     const colliding = this.dude.standingPosition.plusY(-6).distanceTo(position) < 12
-        //     if (colliding && this.canPickUp) {
-        //         this.canPickUp = false
-        //         setTimeout(() => {
-        //             if (player().isAlive && !!this.entity) {
-        //                 if (player().inventory.addItem(this.itemType, 1, metadata)) {
-        //                     here().droppedItems.delete(this.entity)
-        //                     this.entity.selfDestruct()
-        //                     setTimeout(() => {
-        //                         Sounds.play(Lists.oneOf(PICK_UP_SOUNDS), 0.15)
-        //                     }, Math.random() * 350)
-        //                     return
-        //                 }
-        //                 // inventory is full
-        //                 this.canPickUp = true
-        //             }
-        //         }, 150)
-        //     }
-        // })
+        here().droppedItems.forEach((item) => {
+            item.checkCollision(this.dude)
+        })
     }
 
     checkHotKeys(updateData: UpdateData) {

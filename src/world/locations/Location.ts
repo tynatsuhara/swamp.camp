@@ -37,6 +37,7 @@ export class Location {
     readonly levels = new Grid<number>()
 
     // TODO: Make dropped items saveable
+    // MPTODO: Sync dropped items
     readonly droppedItems = new Set<DroppedItem>()
     readonly miscEntities = new Set<Entity>()
 

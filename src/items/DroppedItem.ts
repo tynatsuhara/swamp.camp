@@ -4,7 +4,7 @@ import { SpriteComponent } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
 import { loadAudio } from "../audio/DeferLoadAudio"
 import { Sounds } from "../audio/Sounds"
-import { player } from "../characters/player"
+import { Dude } from "../characters/Dude"
 import { here } from "../world/locations/LocationManager"
 import { Item, ItemMetadata, ITEM_METADATA_MAP } from "./Items"
 
@@ -79,28 +79,39 @@ export class DroppedItem extends Component {
         }
 
         this.update = () => {
-            const colliding = player().standingPosition.plusY(-6).distanceTo(position) < 12
+            this.checkCollision = (dude) => {
+                const colliding =
+                    dude.standingPosition
+                        .plusY(-6)
+                        .distanceTo(
+                            this.sprite.transform.position.plus(
+                                this.sprite.transform.dimensions.div(2)
+                            )
+                        ) < 12
 
-            if (colliding && this.canPickUp) {
-                this.canPickUp = false
-                setTimeout(() => {
-                    if (player().isAlive && !!this.entity) {
-                        if (player().inventory.addItem(this.itemType, 1, metadata)) {
-                            here().droppedItems.delete(this)
-                            this.entity.selfDestruct()
-                            setTimeout(() => {
-                                Sounds.play(Lists.oneOf(PICK_UP_SOUNDS), 0.15)
-                            }, Math.random() * 350)
-                            return
+                if (colliding && this.canPickUp) {
+                    this.canPickUp = false
+                    setTimeout(() => {
+                        if (dude.isAlive && !!this.entity) {
+                            if (dude.inventory.addItem(this.itemType, 1, metadata)) {
+                                here().droppedItems.delete(this)
+                                this.entity.selfDestruct()
+                                setTimeout(() => {
+                                    Sounds.play(Lists.oneOf(PICK_UP_SOUNDS), 0.15)
+                                }, Math.random() * 350)
+                                return
+                            }
+
+                            // inventory is full
+                            this.canPickUp = true
                         }
-
-                        // inventory is full
-                        this.canPickUp = true
-                    }
-                }, 150)
+                    }, 150)
+                }
             }
         }
     }
+
+    checkCollision: (dude: Dude) => void = () => {}
 
     private reposition(delta = new Point(0, 0)) {
         const colliderOffset = this.collider.position.minus(this.sprite.transform.position)
