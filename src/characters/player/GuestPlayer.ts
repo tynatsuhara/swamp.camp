@@ -1,5 +1,6 @@
 import { UpdateData } from "brigsby/dist"
 import { ActionSender } from "trystero"
+import { controls } from "../../Controls"
 import { session } from "../../online/session"
 import { AbstractPlayer, SerializablePlayerControls } from "./AbstractPlayer"
 import { registerPlayerInstance } from "./index"
@@ -36,8 +37,10 @@ export class GuestPlayer extends AbstractPlayer {
         if (session.isGuest()) {
             // send input to host
             this.sendControls(this.getSerializablePlayerControls())
-            // update interactables just for UI — actual interaction happens on the server
-            this.updateInteractables(updateData, true)
+            const possibleInteractable = this.updateInteractables(updateData, true)
+            if (controls.isInteractDown() && possibleInteractable) {
+                possibleInteractable.interact(this.dude)
+            }
             this.checkHotKeys(updateData)
         } else if (session.isHost()) {
             // receive data, update dude
