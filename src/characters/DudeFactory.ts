@@ -168,7 +168,7 @@ export class DudeFactory {
                 const isLocalGuestPlayer = uuid === ONLINE_PLAYER_DUDE_ID_PREFIX + MULTIPLAYER_ID
                 const showNotifications = isLocalHostPlayer || isLocalGuestPlayer
 
-                if (!session.isHost() && !isLocalGuestPlayer) {
+                if (session.isHost() || isLocalGuestPlayer) {
                     inventorySupplier = () => new PlayerInventory(showNotifications, invIdPrefix)
                     defaultInventorySupplier = () => {
                         const defaultPlayerInv = new PlayerInventory(showNotifications, invIdPrefix)
@@ -199,7 +199,7 @@ export class DudeFactory {
                         additionalComponents = [new GuestPlayer(), new CutscenePlayerController()]
                         window["player"] = additionalComponents[0]
                     } else {
-                        // This is an uncontrolled player on a different guest's machine (see the if statement above)
+                        // This is an uncontrolled player on a different guest's machine
                     }
                 }
                 break
