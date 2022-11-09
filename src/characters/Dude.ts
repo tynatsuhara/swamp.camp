@@ -732,8 +732,6 @@ export class Dude extends Component implements DialogueSource {
             })
         }
 
-        this.dropWeapon()
-
         // remove the body
         setTimeout(() => {
             if (!this.factions.includes(DudeFaction.VILLAGERS)) {
@@ -773,6 +771,7 @@ export class Dude extends Component implements DialogueSource {
         }
     }
 
+    // MPTODO
     revive() {
         this._health = this.maxHealth * 0.25
 
@@ -784,6 +783,7 @@ export class Dude extends Component implements DialogueSource {
         this.removeAllConditions()
     }
 
+    // MPTODO
     dissolve() {
         let dissolveChance = 0.1
         const interval = setInterval(() => {
@@ -795,10 +795,6 @@ export class Dude extends Component implements DialogueSource {
             }
             dissolveChance *= 2
         }, 200)
-    }
-
-    private dropWeapon() {
-        // TODO
     }
 
     private knockIntervalCallback: number = 0
