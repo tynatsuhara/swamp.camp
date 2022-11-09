@@ -29,7 +29,6 @@ export class ApothecaryFactory extends SimpleBuildingFactory<ElementType.APOTHEC
 const makeApothecaryInterior = (outside: Location): Location => {
     const l = new Location(LocationType.APOTHECARY_INTERIOR, true, false)
 
-    LocationManager.instance.add(l)
     const dimensions = new Point(5, 4)
 
     ElementUtils.rectPoints(Point.ZERO, dimensions).forEach((p) =>
@@ -78,5 +77,5 @@ const makeApothecaryInterior = (outside: Location): Location => {
         height: 5,
     })
 
-    return l
+    return LocationManager.instance.add(l)
 }

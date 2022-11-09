@@ -88,7 +88,6 @@ export class MineEntranceFactory extends BuildingFactory<ElementType.MINE_ENTRAN
 
 const makeMineInterior = (outside: Location) => {
     const l = new Location(LocationType.MINE_INTERIOR, true, false)
-    LocationManager.instance.add(l)
 
     const dimensions = new Point(3, 2)
     InteriorUtils.addBarriers(l, dimensions)
@@ -120,7 +119,7 @@ const makeMineInterior = (outside: Location) => {
         l.setGroundElement(GroundType.BASIC, pt)
     )
 
-    return l
+    return LocationManager.instance.add(l)
 }
 
 /**

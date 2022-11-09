@@ -184,7 +184,12 @@ export class Location {
         // On the host, create the element
         const element = this.loadElement(type, tilePoint.toString(), data)
 
-        return this.syncLoadElement(type, tilePoint.toString(), element.save())
+        // For some reason this breaks world creation if you don't check isOnline
+        if (session.isOnline()) {
+            this.syncLoadElement(type, tilePoint.toString(), element.save())
+        }
+
+        return element
     }
 
     private syncLoadElement: typeof this.loadElement

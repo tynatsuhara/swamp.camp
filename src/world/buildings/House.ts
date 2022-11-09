@@ -108,7 +108,7 @@ export class HouseFactory extends BuildingFactory<ElementType.HOUSE> {
 
 const makeHouseInterior = (outside: Location): Location => {
     const l = new Location(LocationType.HOUSE_INTERIOR, true, false)
-    LocationManager.instance.add(l)
+
     const dimensions = new Point(7, 5)
     const interactablePos = new Point(dimensions.x / 2, dimensions.y).times(TILE_SIZE)
     const teleporter: Teleporter = {
@@ -153,5 +153,5 @@ const makeHouseInterior = (outside: Location): Location => {
         addWallSprite(topAndBottomTiles[1], new Point(x, -2), 180)
     }
 
-    return l
+    return LocationManager.instance.add(l)
 }

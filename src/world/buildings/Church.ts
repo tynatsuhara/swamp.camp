@@ -39,7 +39,6 @@ const CHURCH_TEMPLATE = `
 const makeChurchInterior = (outside: Location): Location => {
     const l = new Location(LocationType.CHUCH_INTERIOR, true, false)
 
-    LocationManager.instance.add(l)
     const dimensions = new Point(7, 9)
     const interactablePos = new Point(dimensions.x / 2, dimensions.y).times(TILE_SIZE)
     const teleporter: Teleporter = {
@@ -91,5 +90,5 @@ const makeChurchInterior = (outside: Location): Location => {
         addWallSprite(topAndBottomTiles[1], new Point(x, -2), 180)
     }
 
-    return l
+    return LocationManager.instance.add(l)
 }

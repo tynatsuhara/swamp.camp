@@ -10,6 +10,7 @@ import { session } from "../../online/session"
 import { syncFn } from "../../online/sync"
 import { SaveContext } from "../../SaveManager"
 import { LocationManagerSaveState } from "../../saves/LocationManagerSaveState"
+import { LocationSaveState } from "../../saves/LocationSaveState"
 import { Singletons } from "../../Singletons"
 import { HUD } from "../../ui/HUD"
 import { ElementType } from "../elements/Elements"
@@ -93,12 +94,12 @@ export class LocationManager {
         return this.locations.get(uuid)
     }
 
-    // MPTODO
     add(location: Location) {
         this.locations.set(location.uuid, location)
         if (!this.currentLocation) {
             this.loadLocation(location)
         }
+        this.syncIntializeLocation(location.save("multiplayer"))
         return location
     }
 
@@ -132,12 +133,20 @@ export class LocationManager {
         }
     }
 
+    private syncIntializeLocation = syncFn("lm:sil", (l: LocationSaveState) => {
+        if (!session.isHost()) {
+            this.initializeLocation(l)
+        }
+    })
+
+    private initializeLocation(l: LocationSaveState) {
+        const loadedLocation = Location.load(l)
+        this.locations.set(l.uuid, loadedLocation)
+    }
+
     initialize(saveState: LocationManagerSaveState) {
         this.locations = new Map()
-        saveState.values.forEach((l) => {
-            const loadedLocation = Location.load(l)
-            this.locations.set(l.uuid, loadedLocation)
-        })
+        saveState.values.forEach((l) => this.initializeLocation(l))
         this.loadLocation(this.locations.get(saveState.currentLocationUUID))
     }
 
