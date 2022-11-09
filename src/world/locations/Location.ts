@@ -78,8 +78,10 @@ export class Location {
 
         const syncId = this.uuid.substring(0, 8)
         this.syncLoadElement = syncFn(`${syncId}le`, (...args) => {
-            console.log("sync load element")
-            return this.loadElement(...args)
+            if (session.isGuest()) {
+                console.log("sync load element")
+                return this.loadElement(...args)
+            }
         })
 
         // syncElement is a central syncFn which redirects data to elements that have registed callbacks
@@ -179,7 +181,10 @@ export class Location {
         tilePoint: Point,
         data: Partial<ElementDataFormat[T]> = {}
     ): ElementComponent<T, ElementDataFormat[T]> {
-        return this.syncLoadElement(type, tilePoint.toString(), data)
+        // On the host, create the element
+        const element = this.loadElement(type, tilePoint.toString(), data)
+
+        return this.syncLoadElement(type, tilePoint.toString(), element.save())
     }
 
     private syncLoadElement: typeof this.loadElement
