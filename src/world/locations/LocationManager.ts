@@ -64,7 +64,7 @@ export class LocationManager {
             bulldoze: (type: ElementType) => {
                 here()
                     .getElementsOfType(type)
-                    .forEach((el) => here().removeElement(el))
+                    .forEach((el) => here().removeElementLocally(el))
             },
 
             listElements: (type: ElementType) => {

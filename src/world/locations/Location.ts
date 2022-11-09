@@ -95,7 +95,7 @@ export class Location {
         })
 
         this.removeElementAt = syncFn(`${syncId}rma`, (x: number, y: number) => {
-            this.removeElement(this.getElement(pt(x, y)))
+            this.removeElementLocally(this.getElement(pt(x, y)))
         })
     }
 
@@ -184,10 +184,11 @@ export class Location {
         // On the host, create the element
         const element = this.loadElement(type, tilePoint.toString(), data)
 
-        // For some reason this breaks world creation if you don't check isOnline
-        if (session.isOnline()) {
-            this.syncLoadElement(type, tilePoint.toString(), element.save())
+        if (!element) {
+            return null
         }
+
+        this.syncLoadElement(type, tilePoint.toString(), element.save())
 
         return element
     }
@@ -297,10 +298,7 @@ export class Location {
      */
     removeElementAt: (x: number, y: number) => void
 
-    /**
-     * runs locally
-     */
-    removeElement(el: ElementComponent<any>) {
+    removeElementLocally(el: ElementComponent<any>) {
         if (!el) {
             return
         }

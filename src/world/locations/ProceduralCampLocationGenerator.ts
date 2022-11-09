@@ -91,7 +91,7 @@ export class ProceduralCampLocationGenerator extends AbstractLocationGenerator {
             ) {
                 const element = location.getElement(new Point(x, y))
                 if (!!element && typesToClear.indexOf(element.type) !== -1) {
-                    location.removeElement(element)
+                    location.removeElementLocally(element)
                 }
             }
         }
@@ -102,7 +102,7 @@ export class ProceduralCampLocationGenerator extends AbstractLocationGenerator {
             for (let y = 0; y < 4; y++) {
                 const element = location.getElement(clearingCorner.plus(new Point(x, y)))
                 if (!!element && typesToClear.indexOf(element.type) !== -1) {
-                    location.removeElement(element)
+                    location.removeElementLocally(element)
                 }
             }
         }

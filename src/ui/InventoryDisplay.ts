@@ -181,6 +181,7 @@ export class InventoryDisplay extends Component {
         }
 
         // Only allow actions when in the inventory menu
+        // MPTODO all these actions
         if (!this.tradingInv) {
             const wl = here()
             profiler.showInfo(`item metadata: ${prettyPrint(stack.metadata)}`)

@@ -26,6 +26,10 @@ export class ElementComponent<
 
     delete() {
         super.delete()
-        LocationManager.instance.getLocations().forEach((l) => l.removeElement(this))
+        LocationManager.instance.getLocations().forEach((l) => {
+            if (l.getElement(this.pos) === this) {
+                l.removeElementAt(this.pos.x, this.pos.y)
+            }
+        })
     }
 }

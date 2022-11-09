@@ -70,7 +70,7 @@ export class PlaceElementDisplay extends Component {
     finishPlacing(elementPos: Point) {
         this.successFn() // decrement and maybe remove from inv
         if (this.replacingElement) {
-            here().removeElement(this.replacingElement)
+            here().removeElementLocally(this.replacingElement)
         }
 
         const data = this.stack.metadata
