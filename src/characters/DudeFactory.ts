@@ -166,15 +166,12 @@ export class DudeFactory {
                 const isLocalHostPlayer =
                     session.isHost() && !uuid.startsWith(ONLINE_PLAYER_DUDE_ID_PREFIX)
                 const isLocalGuestPlayer = uuid === ONLINE_PLAYER_DUDE_ID_PREFIX + MULTIPLAYER_ID
-
-                if (session.isHost() || isLocalGuestPlayer) {
-                    inventorySupplier = () => new PlayerInventory(uuid)
-                    defaultInventorySupplier = () => {
-                        const defaultPlayerInv = new PlayerInventory(uuid)
-                        defaultPlayerInv.addItem(Item.SWORD, 1, null, true)
-                        defaultPlayerInv.addItem(Item.BASIC_SHIELD, 1, null, true)
-                        return defaultPlayerInv
-                    }
+                inventorySupplier = () => new PlayerInventory(uuid)
+                defaultInventorySupplier = () => {
+                    const defaultPlayerInv = new PlayerInventory(uuid)
+                    defaultPlayerInv.addItem(Item.SWORD, 1, null, true)
+                    defaultPlayerInv.addItem(Item.BASIC_SHIELD, 1, null, true)
+                    return defaultPlayerInv
                 }
 
                 if (session.isHost()) {
