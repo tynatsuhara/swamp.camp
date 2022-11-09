@@ -269,7 +269,11 @@ export const clientSyncFn = <T extends any[]>(
     }
 
     receive((args, peerId) => {
-        const result = fn(peerId === hostId, ...args)
+        if (session.isGuest() && peerId !== hostId) {
+            return
+        }
+        const trusted = !session.isHost() // only the host should be untrusting
+        const result = fn(trusted, ...args)
         const otherPeers = session.getPeers().filter((p) => p !== peerId)
         if (result !== "reject" && otherPeers.length > 0) {
             send(args, otherPeers)
