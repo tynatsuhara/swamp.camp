@@ -1,4 +1,5 @@
 import { Item } from "../../items/Items"
+import { session } from "../../online/session"
 import { saveManager } from "../../SaveManager"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
@@ -58,6 +59,7 @@ export const ITEM_DIALOGUES: DialogueSet = {
         const restDurationHours = 2
         const now = WorldTime.instance.time
         if (
+            session.isHost() && // MPTODO
             restPoint.canRestFor(restDurationHours, cf) &&
             saveManager.getState().lastCampfireRestTime < now - 12 * TimeUnit.HOUR
         ) {
