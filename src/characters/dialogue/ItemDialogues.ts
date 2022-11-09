@@ -9,7 +9,6 @@ import { here } from "../../world/locations/LocationManager"
 import { TimeUnit } from "../../world/TimeUnit"
 import { WorldTime } from "../../world/WorldTime"
 import { player } from "../player"
-import { ShieldType } from "../weapons/ShieldType"
 import {
     dialogue,
     DialogueOption,
@@ -33,10 +32,7 @@ export const ITEM_DIALOGUES: DialogueSet = {
 
         const completeDialogue = (logsTransferred: number) => {
             return () => {
-                if (logsTransferred > 0) {
-                    player().inventory.removeItem(Item.WOOD, logsTransferred)
-                }
-                cf.addLogs(logsTransferred)
+                cf.addLogs(player().uuid, logsTransferred)
                 return new NextDialogue(CAMPFIRE_DIALOGUE, false)
             }
         }
@@ -51,7 +47,6 @@ export const ITEM_DIALOGUES: DialogueSet = {
         if (logCount > 0) {
             options.push(
                 new DialogueOption("Take a torch", () => {
-                    player().setShield(ShieldType.TORCH)
                     return completeDialogue(-1)()
                 })
             )
@@ -99,10 +94,8 @@ export const ITEM_DIALOGUES: DialogueSet = {
 
         const completeDialogue = (logsTransferred: number) => {
             return () => {
-                if (logsTransferred > 0) {
-                    player().inventory.removeItem(Item.WOOD, logsTransferred)
-                }
-                cf.addLogs(logsTransferred)
+                cf.addLogs(player().uuid, logsTransferred)
+                // cf.addLogs(logsTransferred)
                 return new NextDialogue(CAMPFIRE_DIALOGUE, false)
             }
         }

@@ -6,15 +6,18 @@ import { DialogueSource } from "../../characters/dialogue/Dialogue"
 import { ROCKS_NEEDED_FOR_CAMPFIRE } from "../../characters/dialogue/DipDialogue"
 import { CAMPFIRE_DIALOGUE } from "../../characters/dialogue/ItemDialogues"
 import { player } from "../../characters/player/index"
+import { ShieldType } from "../../characters/weapons/ShieldType"
 import { FireParticles } from "../../graphics/particles/FireParticles"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
 import { session } from "../../online/session"
+import { clientSyncFn } from "../../online/sync"
+import { randomByteString } from "../../saves/uuid"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { GroundRenderer } from "../GroundRenderer"
 import { LightManager } from "../LightManager"
 import { Location } from "../locations/Location"
-import { camp } from "../locations/LocationManager"
+import { camp, here } from "../locations/LocationManager"
 import { TimeUnit } from "../TimeUnit"
 import { WorldTime } from "../WorldTime"
 import { Breakable } from "./Breakable"
@@ -25,7 +28,11 @@ import { Interactable } from "./Interactable"
 import { NavMeshObstacle } from "./NavMeshObstacle"
 import { RestPoint } from "./RestPoint"
 
-type SaveData = { logs: number; llct: number /* last log consumed time */ }
+type SaveData = {
+    logs: number
+    llct: number // ast log consumed time
+    id: string
+}
 
 export class CampfireFactory extends ElementFactory<ElementType.CAMPFIRE, SaveData> {
     readonly type = ElementType.CAMPFIRE
@@ -36,6 +43,8 @@ export class CampfireFactory extends ElementFactory<ElementType.CAMPFIRE, SaveDa
     }
 
     make(wl: Location, pos: Point, data: SaveData) {
+        data.id ??= randomByteString()
+
         const e = new Entity()
         const scaledPos = pos.times(TILE_SIZE)
         const depth = scaledPos.y + TILE_SIZE - 12
@@ -110,7 +119,7 @@ export class CampfireFactory extends ElementFactory<ElementType.CAMPFIRE, SaveDa
         // receiveFireUpdate(({ logCount }) => updateFire(logCount))
 
         const cf = e.addComponent(
-            new Campfire(data.logs ?? 0, data.llct ?? 0, (logCount) => {
+            new Campfire(data.id, data.logs ?? 0, data.llct ?? 0, (logCount) => {
                 if (session.isHost()) {
                     updateFireSync(logCount)
                 }
@@ -136,14 +145,13 @@ export class CampfireFactory extends ElementFactory<ElementType.CAMPFIRE, SaveDa
                     DialogueDisplay.instance.startDialogue(cf)
                 },
                 new Point(1, -TILE_SIZE),
-                // only allow the host player to interact (for now)
-                (interactor) => session.isHost() && interactor === player()
+                (interactor) => interactor === player()
             )
         )
 
         return e.addComponent(
             new ElementComponent(ElementType.CAMPFIRE, pos, () => {
-                return { logs: cf.logs, llct: Math.floor(cf.lastLogConsumedTime) }
+                return { logs: cf.logs, llct: Math.floor(cf.lastLogConsumedTime), id: data.id }
             })
         )
     }
@@ -168,12 +176,34 @@ export class Campfire extends Component implements DialogueSource {
 
     private updateFire: (logs: number) => void
 
-    constructor(logs: number, lastLogConsumedTime: number, updateFire: (logs: number) => void) {
+    constructor(
+        id: string,
+        logs: number,
+        lastLogConsumedTime: number,
+        updateFire: (logs: number) => void
+    ) {
         super()
         this.logs = logs
         this.lastLogConsumedTime = lastLogConsumedTime
         this.updateFire = updateFire
         updateFire(this.logs)
+
+        this.addLogs = clientSyncFn(
+            id,
+            (trusted, interactingPlayerId: string, logsTransferred: number) => {
+                console.log(`addLogsToFire clientSync (trusted=${trusted})`)
+                const interactingPlayer = here()
+                    .getDudes()
+                    .find((d) => d.uuid === interactingPlayerId)
+                if (logsTransferred === -1 && session.isHost()) {
+                    interactingPlayer.setShield(ShieldType.TORCH)
+                }
+                if (logsTransferred > 0) {
+                    interactingPlayer.inventory.removeItem(Item.WOOD, logsTransferred)
+                }
+                this._addLogs(logsTransferred)
+            }
+        )
     }
 
     static getLightSizeForLogCount(logs: number) {
@@ -194,13 +224,20 @@ export class Campfire extends Component implements DialogueSource {
         }
     }
 
-    addLogs(count: number) {
+    private _addLogs(count: number) {
         if (this.logs === 0) {
             this.lastLogConsumedTime = WorldTime.instance.time
         }
         this.logs += count
         this.updateFire(this.logs)
     }
+
+    /**
+     * Send a request to the host to add logs to fire
+     * @param interactingPlayerId the interacting player uuid
+     * @param logsTransferred the number of logs added to the fire, could be negative if taking a torch
+     */
+    addLogs: (interactingPlayerId: string, logsTransferred: number) => void
 
     willBurnFor(duration: number) {
         // this gets called when the campfire is not loaded, so we need for force an update
