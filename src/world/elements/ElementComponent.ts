@@ -1,4 +1,5 @@
 import { Component, Point } from "brigsby/dist"
+import { session } from "../../online/session"
 import { LocationManager } from "../locations/LocationManager"
 import { ElementType } from "./Elements"
 
@@ -26,10 +27,12 @@ export class ElementComponent<
 
     delete() {
         super.delete()
-        LocationManager.instance.getLocations().forEach((l) => {
-            if (l.getElement(this.pos) === this) {
-                l.removeElementAt(this.pos.x, this.pos.y)
-            }
-        })
+        if (session.isHost()) {
+            LocationManager.instance.getLocations().forEach((l) => {
+                if (l.getElement(this.pos) === this) {
+                    l.removeElementAt(this.pos.x, this.pos.y)
+                }
+            })
+        }
     }
 }

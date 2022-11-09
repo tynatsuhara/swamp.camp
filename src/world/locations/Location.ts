@@ -181,6 +181,11 @@ export class Location {
         tilePoint: Point,
         data: Partial<ElementDataFormat[T]> = {}
     ): ElementComponent<T, ElementDataFormat[T]> {
+        if (!session.isHost()) {
+            console.warn("addElement cannot be called by guest!")
+            return null
+        }
+
         // On the host, create the element
         const element = this.loadElement(type, tilePoint.toString(), data)
 
@@ -227,6 +232,9 @@ export class Location {
         // stake the element's claim for the land
         elementPts.forEach((pt) => {
             this.elements.set(pt, el)
+            if (el === null) {
+                console.error(`null element of type ${ElementType[type]}`)
+            }
             // reset the ground in order to handle things like flattening tall grass
             const groundData = this.ground.get(pt)
             if (groundData) {
