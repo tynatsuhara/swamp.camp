@@ -4,6 +4,7 @@ import { NineSlice, SpriteTransform, StaticSpriteSource } from "brigsby/dist/spr
 import { Maths } from "brigsby/dist/util"
 import { loadAudio } from "../audio/DeferLoadAudio"
 import { Sounds } from "../audio/Sounds"
+import { Dude } from "../characters/Dude"
 import { player } from "../characters/player"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
@@ -11,6 +12,9 @@ import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { CraftingRecipe, CraftingRecipeCategory } from "../items/CraftingRecipe"
 import { Item, ITEM_METADATA_MAP } from "../items/Items"
+import { session } from "../online/session"
+import { clientSyncFn } from "../online/sync"
+import { here } from "../world/locations/LocationManager"
 import { Color } from "./Color"
 import { TEXT_FONT, TEXT_SIZE } from "./Text"
 import { Tooltip } from "./Tooltip"
@@ -166,13 +170,13 @@ export class CraftingMenu extends Component {
         return result
     }
 
-    private canCraft(recipe: CraftingRecipe) {
+    private canCraft(craftingPlayer: Dude, recipe: CraftingRecipe) {
         return (
             this.justCraftedRow === -1 &&
             !this.justOpened &&
-            player().inventory.canAddItem(recipe.output) &&
+            craftingPlayer.inventory.canAddItem(recipe.output) &&
             recipe.input.every(
-                (input) => player().inventory.getItemCount(input.item) >= input.count
+                (input) => craftingPlayer.inventory.getItemCount(input.item) >= input.count
             )
         )
     }
@@ -221,13 +225,10 @@ export class CraftingMenu extends Component {
 
             // craft the item
             if (hovered && controls.isMenuClickDown()) {
-                if (this.canCraft(recipe)) {
+                if (this.canCraft(player(), recipe)) {
+                    this.doCraftOnHost(player().uuid, recipe)
                     Sounds.play(this.craftNoise, 0.6)
-                    recipe.input.forEach((ingr) => {
-                        player().inventory.removeItem(ingr.item, ingr.count)
-                    })
-                    player().inventory.addItem(recipe.output)
-                    this.justCraftedRow = r
+                    this.justCraftedRow = r // set this AFTER crafting
                     setTimeout(() => (this.justCraftedRow = -1), 900)
                 } else {
                     UISounds.playErrorSound()
@@ -235,7 +236,7 @@ export class CraftingMenu extends Component {
             }
 
             const prefix = recipe.desc + "\n"
-            if (hovered && !this.canCraft(recipe)) {
+            if (hovered && !this.canCraft(player(), recipe)) {
                 if (!player().inventory.canAddItem(recipe.output)) {
                     this.tooltip.say(prefix + "[Inventory full]")
                 } else if (
@@ -329,6 +330,24 @@ export class CraftingMenu extends Component {
 
         return [...sprites, renderComp]
     }
+
+    private doCraftOnHost = clientSyncFn(
+        "craft",
+        (trusted, craftingPlayerUUID: string, recipe: CraftingRecipe) => {
+            if (session.isHost()) {
+                const craftingPlayer = here()
+                    .getDudes()
+                    .find((d) => d.uuid === craftingPlayerUUID)
+                if (!this.canCraft(craftingPlayer, recipe)) {
+                    return "reject"
+                }
+                recipe.input.forEach((ingr) => {
+                    craftingPlayer.inventory.removeItem(ingr.item, ingr.count)
+                })
+                craftingPlayer.inventory.addItem(recipe.output)
+            }
+        }
+    )
 
     // caching stuff
     private itemIcons = new Map<Item, StaticSpriteSource>()
