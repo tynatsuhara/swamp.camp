@@ -108,12 +108,12 @@ export class NextDialogue {
     }
 }
 
-export type DialogueSet = { [key: string]: () => DialogueInstance }
+export type DialogueSet = { [key: string]: () => DialogueInstance | undefined }
 
 /**
  * @param dialogue the unique dialogue key
  */
-export const getDialogue = (dialogue: string): DialogueInstance => {
+export const getDialogue = (dialogue: string): DialogueInstance | undefined => {
     if (dialogue === EMPTY_DIALOGUE) {
         return
     }

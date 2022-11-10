@@ -15,6 +15,11 @@ import { NPC } from "../NPC"
  */
 export class Enemy extends Component {
     awake() {
+        // MPTODO
+        // if (session.isGuest()) {
+        //     return
+        // }
+
         const dude = this.entity.getComponent(Dude)
         const npc = this.entity.getComponent(NPC)
 

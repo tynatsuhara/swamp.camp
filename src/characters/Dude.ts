@@ -40,6 +40,7 @@ import { Residence } from "../world/residences/Residence"
 import { WorldTime } from "../world/WorldTime"
 import { ActiveCondition, Condition } from "./Condition"
 import { DialogueSource, EMPTY_DIALOGUE, getDialogue } from "./dialogue/Dialogue"
+import { DIP_ENTRYPOINT } from "./dialogue/DipDialogue"
 import { DudeAnimationUtils } from "./DudeAnimationUtils"
 import { DudeFaction } from "./DudeFactory"
 import { DudeType } from "./DudeType"
@@ -397,11 +398,19 @@ export class Dude extends Component implements DialogueSource {
                     new Point(0, 0),
                     () => DialogueDisplay.instance.startDialogue(this),
                     Point.ZERO,
-                    (interactor) =>
-                        this.dialogue &&
-                        this.entity.getComponent(NPC)?.canTalk() &&
-                        session.isHost() &&
-                        interactor === player()
+                    (interactor) => {
+                        if (!this.dialogue || !this.entity.getComponent(NPC)?.canTalk()) {
+                            return false
+                        }
+
+                        if (session.isHost()) {
+                            return interactor === player()
+                        } else {
+                            // TODO: Implement a more thorough approach to this
+                            const canGuestAccessDialogue = [DIP_ENTRYPOINT].includes(this.dialogue)
+                            return canGuestAccessDialogue
+                        }
+                    }
                 )
             )
 
@@ -432,8 +441,9 @@ export class Dude extends Component implements DialogueSource {
 
             // Update dialogue indicator
             this.doWhileLiving(() => {
-                if (this.dialogue && this.dialogue != EMPTY_DIALOGUE) {
-                    this.dialogueIndicator = getDialogue(this.dialogue).indicator
+                if (this.dialogue) {
+                    this.dialogueIndicator =
+                        getDialogue(this.dialogue)?.indicator ?? DudeInteractIndicator.NONE
                 }
             }, 1000)
         }
