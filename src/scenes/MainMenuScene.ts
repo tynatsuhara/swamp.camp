@@ -266,7 +266,7 @@ export class MainMenuScene {
         } else if (this.menu === Menu.CREDITS) {
             entities.splice(0) // don't show title and scene
             const creditEntries: [credit: string, fn: () => void][] = [
-                ["a game by Tyler Bonnell", link("ty.pizza/")],
+                ["a game by Ty Natsuhara", link("ty.pizza/")],
                 null,
                 ["add'l art: Robert Norenberg", link("0x72.pl")],
                 ["           Cael Johnson    ", link("caeljohnson.artstation.com")],
