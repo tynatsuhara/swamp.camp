@@ -9,6 +9,8 @@ const DRIFT_DISTANCE = 2
 const COLORS = [Color.BLUE_5, Color.BLUE_6]
 
 export class ShamanHealingParticles extends RepeatedInvoker {
+    static readonly PARTICLE_COLORS = COLORS
+
     constructor() {
         let dude: Dude
         let lastPos: Point

@@ -1,5 +1,8 @@
 import { Component } from "brigsby/dist/Component"
 import { StartData, UpdateData } from "brigsby/dist/Engine"
+import { pt } from "brigsby/dist/Point"
+import { Lists } from "brigsby/dist/util/Lists"
+import { Particles } from "../../graphics/particles/Particles"
 import { ShamanHealingParticles } from "../../graphics/particles/ShamanHealingParticles"
 import { Color } from "../../ui/Color"
 import { here } from "../../world/locations/LocationManager"
@@ -26,14 +29,43 @@ export class ShamanHealer extends Component {
         this.entity.addComponent(new ShamanHealingParticles())
 
         this.dude.doWhileLiving(() => this.updateHealTargets(), 3_000)
+
+        this.dude.doWhileLiving(() => this.doParticleEffects(), 100)
     }
 
-    update({ elapsedTimeMillis }: UpdateData) {
-        // dude.heal(elapsedTimeMillis * 0.001) // TODO rate
+    update({ elapsedTimeMillis }: UpdateData): void {
+        this.healTargets.forEach((_, dude) => {
+            if (!dude.isAlive) {
+                this.removeHealTarget(dude)
+            } else {
+                dude.heal(elapsedTimeMillis * 0.005)
+            }
+        })
+    }
+
+    doParticleEffects() {
+        const centerOffset = -6
+        this.healTargets.forEach((_, dude) => {
+            // place some particles on the line between them, randomly shifted a bit
+            const a = this.dude.standingPosition.plusY(centerOffset)
+            const b = dude.standingPosition.plusY(centerOffset)
+            const diff = b.minus(a)
+            for (let i = 0; i < 5; i++) {
+                const midpoint = a.plus(diff.times(Math.random()))
+                Particles.instance.emitParticle(
+                    Lists.oneOf(ShamanHealingParticles.PARTICLE_COLORS),
+                    midpoint.randomCircularShift(5),
+                    midpoint.y - centerOffset,
+                    400 + Math.random() * 400,
+                    () => pt(0, -0.008),
+                    pt(Math.random() > 0.5 ? 1 : 2)
+                )
+            }
+        })
     }
 
     private updateHealTargets() {
-        const maxTileDistance = 8
+        const maxTileDistance = 15
         const maxHealTargets = 5
         const newHealTargets = here()
             .getDudes()
