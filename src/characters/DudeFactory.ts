@@ -31,6 +31,7 @@ import { Berto } from "./types/Berto"
 import { Centaur } from "./types/Centaur"
 import { DudeModifier } from "./types/DudeModifier"
 import { Enemy } from "./types/Enemy"
+import { ShamanHealer } from "./types/ShamanHealer"
 import { ShroomNPC } from "./types/ShroomNPC"
 import { SpookyVisitor } from "./types/SpookyVisitor"
 import { Villager } from "./types/Villager"
@@ -407,10 +408,19 @@ export class DudeFactory {
                 break
             }
             case DudeType.GNOLL_SCOUT: {
-                factions = [DudeFaction.GNOLLS, DudeFaction.WOLVES, DudeFaction.VILLAGERS]
+                factions = [DudeFaction.GNOLLS, DudeFaction.WOLVES]
                 animationName = "GnollScout"
                 weapon = WeaponType.UNARMED
                 additionalComponents = [new NPC()]
+                maxHealth = 2
+                speed *= 0.8
+                break
+            }
+            case DudeType.GNOLL_SHAMAN: {
+                factions = [DudeFaction.GNOLLS, DudeFaction.WOLVES]
+                animationName = "GnollShaman"
+                weapon = WeaponType.UNARMED
+                additionalComponents = [new NPC(), new ShamanHealer()]
                 maxHealth = 2
                 speed *= 0.8
                 break
