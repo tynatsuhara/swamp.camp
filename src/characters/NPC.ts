@@ -20,15 +20,8 @@ import { NPCTask } from "./ai/NPCTask"
 import { NPCTaskContext } from "./ai/NPCTaskContext"
 import { NPCTaskFactory } from "./ai/NPCTaskFactory"
 import { Condition } from "./Condition"
-import { Dude } from "./Dude"
+import { AttackState, Dude } from "./Dude"
 import { player } from "./player"
-
-// TODO maybe this shouldn't be NPC-specific
-export enum NPCAttackState {
-    NOT_ATTACKING,
-    ATTACKING_SOON,
-    ATTACKING_NOW,
-}
 
 /**
  * Shared logic for different types of NPCs. These should be invoked by an NPC controller component.
@@ -91,7 +84,7 @@ export class NPC extends Simulatable {
             this.dude.updateBlocking(false)
         }
 
-        this._attackState = NPCAttackState.NOT_ATTACKING
+        this.dude.attackState = AttackState.NOT_ATTACKING
 
         if (DialogueDisplay.instance.source === this._dude) {
             // don't move when talking
@@ -293,10 +286,6 @@ export class NPC extends Simulatable {
         return this.attackTarget
     }
     private targetPath: Point[] = null
-    private _attackState = NPCAttackState.NOT_ATTACKING
-    get attackState() {
-        return this._attackState
-    }
     private readonly PARRY_TIME = 300 + Math.random() * 200
     private nextAttackTime = WorldTime.instance.time + Math.random() * 2000
 
@@ -328,17 +317,17 @@ export class NPC extends Simulatable {
         const timeLeftUntilCanAttack = this.nextAttackTime - WorldTime.instance.time
 
         if (stoppingDist === 0 && inRangeAndArmed && timeLeftUntilCanAttack < this.PARRY_TIME) {
-            this._attackState =
+            this.dude.attackState =
                 timeLeftUntilCanAttack < this.PARRY_TIME / 2
-                    ? NPCAttackState.ATTACKING_NOW
-                    : NPCAttackState.ATTACKING_SOON
+                    ? AttackState.ATTACKING_NOW
+                    : AttackState.ATTACKING_SOON
         }
 
         if (
             this.dude.shield &&
             this.dude.isFacing(this.attackTarget.standingPosition) &&
-            [NPCAttackState.ATTACKING_SOON, NPCAttackState.ATTACKING_NOW].includes(
-                this.attackTarget?.entity?.getComponent(NPC)?.attackState
+            [AttackState.ATTACKING_SOON, AttackState.ATTACKING_NOW].includes(
+                this.attackTarget?.attackState
             )
         ) {
             this.dude.updateBlocking(true)

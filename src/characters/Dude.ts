@@ -44,7 +44,7 @@ import { DIP_ENTRYPOINT } from "./dialogue/DipDialogue"
 import { DudeAnimationUtils } from "./DudeAnimationUtils"
 import { DudeFaction } from "./DudeFactory"
 import { DudeType } from "./DudeType"
-import { NPC, NPCAttackState } from "./NPC"
+import { NPC } from "./NPC"
 import { player } from "./player/index"
 import { ReadOnlyShield, Shield } from "./weapons/Shield"
 import { ShieldFactory } from "./weapons/ShieldFactory"
@@ -53,10 +53,17 @@ import { ReadOnlyWeapon, Weapon } from "./weapons/Weapon"
 import { WeaponFactory } from "./weapons/WeaponFactory"
 import { WeaponType } from "./weapons/WeaponType"
 
+export enum AttackState {
+    NOT_ATTACKING,
+    ATTACKING_SOON,
+    ATTACKING_NOW,
+}
+
 type SyncData = {
     p: { x: number; y: number } // standing position
     d: { x: number; y: number } // walking direction
     f: boolean // true if facing left, false otherwise
+    as: AttackState
 }
 
 export class Dude extends Component implements DialogueSource {
@@ -110,6 +117,13 @@ export class Dude extends Component implements DialogueSource {
     // top left corner of the sprite - externally we should only use standingPosition
     private position: Point
     private standingOffset: Point
+
+    get attackState() {
+        return this.syncData.as
+    }
+    set attackState(state: AttackState) {
+        this.syncData.as = state
+    }
 
     // bottom center of the tile
     get standingPosition(): Point {
@@ -209,6 +223,7 @@ export class Dude extends Component implements DialogueSource {
                 p: { x: standingPosition.x, y: standingPosition.y },
                 f: false,
                 d: { x: 0, y: 0 },
+                as: AttackState.NOT_ATTACKING,
             },
             (newData) => {
                 const newStandingPos = pt(newData.p.x, newData.p.y)
@@ -1326,11 +1341,10 @@ export class Dude extends Component implements DialogueSource {
 
         // little flashing circle right before attacking the player
         const npc = this.entity.getComponent(NPC)
-        const attackState = npc?.attackState
         if (npc?.targetedEnemy?.type === DudeType.PLAYER) {
-            if (attackState === NPCAttackState.ATTACKING_SOON) {
+            if (this.attackState === AttackState.ATTACKING_SOON) {
                 indicator = DudeInteractIndicator.ATTACKING_SOON
-            } else if (attackState === NPCAttackState.ATTACKING_NOW) {
+            } else if (this.attackState === AttackState.ATTACKING_NOW) {
                 indicator = DudeInteractIndicator.ATTACKING_NOW
             }
         } else if (this.dialogue && this.dialogue != EMPTY_DIALOGUE) {
