@@ -3,6 +3,7 @@ import { LineRender } from "brigsby/dist/renderer"
 import { Lists } from "brigsby/dist/util"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { session } from "../online/session"
+import { syncData } from "../online/sync"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { tilesAround } from "../Utils"
 import { Burnable } from "../world/elements/Burnable"
@@ -23,6 +24,10 @@ import { Condition } from "./Condition"
 import { AttackState, Dude } from "./Dude"
 import { player } from "./player"
 
+type SyncData = {
+    t: string | undefined // target uuid
+}
+
 /**
  * Shared logic for different types of NPCs. These should be invoked by an NPC controller component.
  */
@@ -31,6 +36,8 @@ export class NPC extends Simulatable {
     get dude() {
         return this._dude
     }
+
+    private syncData: SyncData
 
     isEnemyFn: (dude: Dude) => boolean = () => false
     enemyToAttackFilterFn: (enemies: Dude[]) => Dude[] = (enemies) => enemies
@@ -48,6 +55,21 @@ export class NPC extends Simulatable {
 
         this.awake = () => {
             this._dude = this.entity.getComponent(Dude)
+            const syncId = this.dude.uuid.substring(0, 8)
+
+            this.syncData = syncData(
+                `${syncId}npcd`,
+                {
+                    t: undefined,
+                },
+                (newData) => {
+                    if (this.attackTarget?.uuid !== newData.t) {
+                        this.attackTarget = here()
+                            .getDudes()
+                            .find((d) => d.uuid === newData.t)
+                    }
+                }
+            )
 
             // set a default schedule
             if (!this._dude.blob[NPCSchedules.SCHEDULE_KEY]) {
@@ -80,6 +102,7 @@ export class NPC extends Simulatable {
             !this.isEnemyFn(this.attackTarget)
         ) {
             this.attackTarget = null
+            this.syncData.t = null
             this.targetPath = null
             this.dude.updateBlocking(false)
         }
@@ -181,6 +204,7 @@ export class NPC extends Simulatable {
         this.walkPath = null
         this.roamPath = null
         this.attackTarget = null
+        this.syncData.t = null
         this.targetPath = null
         this.teleporterTarget = null
         this.task = null
@@ -504,6 +528,7 @@ export class NPC extends Simulatable {
             }
 
             this.attackTarget = target
+            this.syncData.t = target.uuid
         }
 
         return !!target

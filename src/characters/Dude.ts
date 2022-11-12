@@ -71,7 +71,7 @@ export class Dude extends Component implements DialogueSource {
     static readonly NPC_COLLISION_LAYER = "npc"
     static readonly ON_FIRE_LIGHT_DIAMETER = 40
 
-    readonly syncData: SyncData
+    private readonly syncData: SyncData
 
     // managed by WorldLocation/LocationManager classes
     location: Location
@@ -434,9 +434,10 @@ export class Dude extends Component implements DialogueSource {
 
         this.start = () => {
             this.seaLevel = this.location.levels?.get(this.tile) ?? 0
-            this.claimResidence(type, uuid, hasPendingSlot) // MPTODO how does this get synced?
 
             if (session.isHost()) {
+                this.claimResidence(type, uuid, hasPendingSlot)
+
                 // Damage dudes walking through blackberries
                 this.doWhileLiving(() => {
                     if (
@@ -480,7 +481,6 @@ export class Dude extends Component implements DialogueSource {
             transform.position = transform.position.plusY(-this.jumpingOffset)
         }
 
-        // MPTODO
         if (!!this.dialogueInteract) {
             this.dialogueInteract.position = this.standingPosition.minus(new Point(0, 5))
             this.dialogueInteract.uiOffset = new Point(0, -TILE_SIZE * 1.5).plus(
@@ -1341,7 +1341,7 @@ export class Dude extends Component implements DialogueSource {
 
         // little flashing circle right before attacking the player
         const npc = this.entity.getComponent(NPC)
-        if (npc?.targetedEnemy?.type === DudeType.PLAYER) {
+        if (npc?.targetedEnemy === player()) {
             if (this.attackState === AttackState.ATTACKING_SOON) {
                 indicator = DudeInteractIndicator.ATTACKING_SOON
             } else if (this.attackState === AttackState.ATTACKING_NOW) {
