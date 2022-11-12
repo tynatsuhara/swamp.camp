@@ -88,7 +88,7 @@ export class NPC extends Simulatable {
         ) {
             this.attackTarget = null
             this.targetPath = null
-            this.dude.shield?.block(false)
+            this.dude.updateBlocking(false)
         }
 
         this._attackState = NPCAttackState.NOT_ATTACKING
@@ -341,18 +341,18 @@ export class NPC extends Simulatable {
                 this.attackTarget?.entity?.getComponent(NPC)?.attackState
             )
         ) {
-            this.dude.shield.block(true)
+            this.dude.updateBlocking(true)
         } else {
-            this.dude.shield?.block(false)
+            this.dude.updateBlocking(false)
 
             if (inRangeAndArmed && timeLeftUntilCanAttack <= 0) {
-                weapon.attack(true)
+                this.dude.updateAttacking(true)
                 this.nextAttackTime = Math.max(
                     this.nextAttackTime,
                     WorldTime.instance.time + weapon.getMillisBetweenAttacks()
                 )
             } else {
-                weapon.cancelAttack()
+                this.dude.cancelAttacking()
 
                 if (stoppingDist > 0 && mag < stoppingDist * 0.75) {
                     // TODO make this more configurable?

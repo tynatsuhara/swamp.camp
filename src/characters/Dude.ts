@@ -266,7 +266,7 @@ export class Dude extends Component implements DialogueSource {
         })
 
         this.updateBlocking = syncFn(`${syncId}blk`, (blocking) => {
-            this.shield.block(blocking)
+            this.shield?.block(blocking)
         })
 
         this.updateAttacking = syncFn(`${syncId}atk`, (isNewAttack) => {
