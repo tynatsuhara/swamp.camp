@@ -4,7 +4,6 @@ import { pt } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util/Lists"
 import { Particles } from "../../graphics/particles/Particles"
 import { ShamanHealingParticles } from "../../graphics/particles/ShamanHealingParticles"
-import { Color } from "../../ui/Color"
 import { here } from "../../world/locations/LocationManager"
 import { NPCSchedules } from "../ai/NPCSchedule"
 import { Dude } from "../Dude"
@@ -12,24 +11,19 @@ import { DudeFaction } from "../DudeFactory"
 import { DudeType } from "../DudeType"
 import { NPC } from "../NPC"
 
-const DRIFT_DISTANCE = 1
-const COLORS = [Color.BLUE_5, Color.BLUE_6]
-
 export class ShamanHealer extends Component {
     private dude: Dude
     private healTargets: Map<Dude, ShamanHealingParticles> = new Map()
+    private selfParticles: ShamanHealingParticles
 
     start(startData: StartData): void {
         this.dude = this.entity.getComponent(Dude)
+        this.selfParticles = this.entity.addComponent(new ShamanHealingParticles())
 
         // TODO
         this.dude.entity.getComponent(NPC).setSchedule(NPCSchedules.newNoOpSchedule())
 
-        // particles on shaman
-        this.entity.addComponent(new ShamanHealingParticles())
-
         this.dude.doWhileLiving(() => this.updateHealTargets(), 3_000)
-
         this.dude.doWhileLiving(() => this.doParticleEffects(), 100)
     }
 
@@ -41,6 +35,8 @@ export class ShamanHealer extends Component {
                 dude.heal(elapsedTimeMillis * 0.005)
             }
         })
+
+        this.selfParticles.enabled = this.healTargets.size > 0
     }
 
     doParticleEffects() {
@@ -50,7 +46,8 @@ export class ShamanHealer extends Component {
             const a = this.dude.standingPosition.plusY(centerOffset)
             const b = dude.standingPosition.plusY(centerOffset)
             const diff = b.minus(a)
-            for (let i = 0; i < 5; i++) {
+            const particles = diff.magnitude() / 15
+            for (let i = 0; i < particles; i++) {
                 const midpoint = a.plus(diff.times(Math.random()))
                 Particles.instance.emitParticle(
                     Lists.oneOf(ShamanHealingParticles.PARTICLE_COLORS),
