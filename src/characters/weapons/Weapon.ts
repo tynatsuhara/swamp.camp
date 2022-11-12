@@ -131,3 +131,5 @@ export abstract class Weapon extends Component {
         return cache
     }
 }
+
+export type ReadOnlyWeapon = Omit<Weapon, "attack" | "setSheathed" | "cancelAttack">

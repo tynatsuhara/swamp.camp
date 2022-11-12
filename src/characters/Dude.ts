@@ -49,7 +49,7 @@ import { player } from "./player/index"
 import { Shield } from "./weapons/Shield"
 import { ShieldFactory } from "./weapons/ShieldFactory"
 import { ShieldType } from "./weapons/ShieldType"
-import { Weapon } from "./weapons/Weapon"
+import { ReadOnlyWeapon, Weapon } from "./weapons/Weapon"
 import { WeaponFactory } from "./weapons/WeaponFactory"
 import { WeaponType } from "./weapons/WeaponType"
 
@@ -87,7 +87,7 @@ export class Dude extends Component implements DialogueSource {
     }
 
     private _weapon: Weapon
-    get weapon() {
+    get weapon(): ReadOnlyWeapon {
         return this._weapon
     }
     get weaponType() {
@@ -261,7 +261,7 @@ export class Dude extends Component implements DialogueSource {
         })
 
         this.setWeaponAndShieldDrawn = syncFn(`${syncId}wsd`, (drawn: boolean) => {
-            this.weapon?.setSheathed(!drawn)
+            this._weapon?.setSheathed(!drawn)
             this.shield?.setOnBack(!drawn)
         })
 
@@ -270,11 +270,11 @@ export class Dude extends Component implements DialogueSource {
         })
 
         this.updateAttacking = syncFn(`${syncId}atk`, (isNewAttack) => {
-            this.weapon?.attack(isNewAttack)
+            this._weapon?.attack(isNewAttack)
         })
 
         this.cancelAttacking = syncFn(`${syncId}catk`, () => {
-            this.weapon?.cancelAttack()
+            this._weapon?.cancelAttack()
         })
 
         this.addCondition = syncFn(`${syncId}ac`, (condition, duration) => {
@@ -339,7 +339,7 @@ export class Dude extends Component implements DialogueSource {
         const setShield = (type: ShieldType) => {
             this.shield?.delete()
             this._shield = this.entity.addComponent(ShieldFactory.make(type, this.type))
-            this.weapon?.setSheathed(false) // keep em in sync
+            this._weapon?.setSheathed(false) // keep em in sync
         }
         this.setShield = clientSyncFn(`${syncId}eqs`, (trusted, type: ShieldType) => {
             if (this.shield?.type === type) {

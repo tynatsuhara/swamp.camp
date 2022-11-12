@@ -80,7 +80,7 @@ export class Villager extends Component {
                         dude.weaponType === WeaponType.PICKAXE &&
                         dude.location.type === LocationType.MINE_INTERIOR
                     ) {
-                        dude.weapon.attack(true)
+                        dude.updateAttacking(true)
                     }
                 },
                 2_000,
