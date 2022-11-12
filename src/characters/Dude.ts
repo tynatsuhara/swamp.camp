@@ -46,7 +46,7 @@ import { DudeFaction } from "./DudeFactory"
 import { DudeType } from "./DudeType"
 import { NPC, NPCAttackState } from "./NPC"
 import { player } from "./player/index"
-import { Shield } from "./weapons/Shield"
+import { ReadOnlyShield, Shield } from "./weapons/Shield"
 import { ShieldFactory } from "./weapons/ShieldFactory"
 import { ShieldType } from "./weapons/ShieldType"
 import { ReadOnlyWeapon, Weapon } from "./weapons/Weapon"
@@ -94,7 +94,7 @@ export class Dude extends Component implements DialogueSource {
         return this.weapon?.getType() ?? WeaponType.NONE
     }
     private _shield: Shield
-    get shield() {
+    get shield(): ReadOnlyShield {
         return this._shield
     }
     get shieldType() {
@@ -262,11 +262,11 @@ export class Dude extends Component implements DialogueSource {
 
         this.setWeaponAndShieldDrawn = syncFn(`${syncId}wsd`, (drawn: boolean) => {
             this._weapon?.setSheathed(!drawn)
-            this.shield?.setOnBack(!drawn)
+            this._shield?.setOnBack(!drawn)
         })
 
         this.updateBlocking = syncFn(`${syncId}blk`, (blocking) => {
-            this.shield?.block(blocking)
+            this._shield?.block(blocking)
         })
 
         this.updateAttacking = syncFn(`${syncId}atk`, (isNewAttack) => {
@@ -325,7 +325,7 @@ export class Dude extends Component implements DialogueSource {
         const setWeapon = (type: WeaponType) => {
             this.weapon?.delete()
             this._weapon = this.entity.addComponent(WeaponFactory.make(type, this.type))
-            this.shield?.setOnBack(false) // keep em in sync
+            this._shield?.setOnBack(false) // keep em in sync
         }
         this.setWeapon = clientSyncFn(`${syncId}eqw`, (trusted, type: WeaponType) => {
             if (this.weapon?.getType() === type) {
