@@ -1,6 +1,10 @@
 import { ActionProgress, ActionReceiver, ActionSender, joinRoom, Room, selfId } from "trystero"
 import { base64hash } from "./utils"
 
+/**
+ * This file should be generally not-game-specific, in order to prevent circular imports
+ */
+
 let sessionId: string
 let room: Room
 let host = true
@@ -28,6 +32,10 @@ const PASSWORD = "30908535-9bba-4e21-8a68-3384b7cd604f"
  * Wrapper around generic P2P rooms, adding host and guest semantics to match the game network model.
  */
 export const session = {
+    // mutable fields managed by game sync functions
+    hostId: undefined as string,
+    initializedPeers: [] as string[],
+
     /**
      * @returns a promise that resolves once the session is established
      */

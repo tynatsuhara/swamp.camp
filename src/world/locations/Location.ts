@@ -7,7 +7,7 @@ import { DudeFactory, ONLINE_PLAYER_DUDE_ID_PREFIX } from "../../characters/Dude
 import { DudeType } from "../../characters/DudeType"
 import { DroppedItem } from "../../items/DroppedItem"
 import { session } from "../../online/session"
-import { syncFn } from "../../online/sync"
+import { syncFn } from "../../online/utils"
 import { SaveContext } from "../../SaveManager"
 import { LocationSaveState } from "../../saves/LocationSaveState"
 import { newUUID } from "../../saves/uuid"

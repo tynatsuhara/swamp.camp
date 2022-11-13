@@ -20,7 +20,7 @@ import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { Inventory } from "../items/Inventory"
 import { Item, spawnItem } from "../items/Items"
 import { session } from "../online/session"
-import { clientSyncFn, syncData, syncFn } from "../online/sync"
+import { clientSyncFn, syncData, syncFn } from "../online/utils"
 import { DudeSaveState } from "../saves/DudeSaveState"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
@@ -678,7 +678,7 @@ export class Dude extends Component implements DialogueSource {
         const blocked = blockable && blocking
 
         if (blocked) {
-            emitBlockParticles(this)
+            emitBlockParticles(this.getFacingMultiplier(), this.standingPosition)
             damage *= 0.25
             knockback *= 0.4
         }

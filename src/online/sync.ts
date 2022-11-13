@@ -13,8 +13,6 @@ import { base64hash } from "./utils"
  * Utilities for syncing game state and logic
  */
 
-let hostId: string
-let initializedPeers: string[] = []
 let peerToMultiplayerId: Record<string, string> = {}
 
 // Store a stable multiplayer ID for the user.
@@ -70,7 +68,7 @@ export const hostOnJoin = () => {
 
     receiveInitWorldAck((_, peerId) => {
         console.log(`received world ack from peer ${peerId}`)
-        initializedPeers.push(peerId)
+        session.initializedPeers.push(peerId)
         NotificationDisplay.instance.push({ icon: "personmultiple", text: "someone joined" })
     })
 
@@ -94,26 +92,26 @@ export const guestOnJoin = () => {
                 )
                 return
             }
-            hostId = peerId
+            session.hostId = peerId
 
-            sendCredentials({ id: MULTIPLAYER_ID, secret: MULTIPLAYER_SECRET }, hostId)
+            sendCredentials({ id: MULTIPLAYER_ID, secret: MULTIPLAYER_SECRET }, session.hostId)
         })
     })
 
     receiveInitWorld((data, peerId) => {
-        if (peerId !== hostId) {
+        if (peerId !== session.hostId) {
             console.warn(`received world init signal from imposter host ${peerId}`)
         }
         console.log(`received save data from ${peerId}:`)
         console.log(data)
         saveManager.loadSave(data as Save)
-        sendInitWorldAck(null, hostId)
+        sendInitWorldAck(null, session.hostId)
     })
 
     session.getRoom().onPeerLeave((peerId) => {
-        if (peerId === hostId) {
+        if (peerId === session.hostId) {
             console.log("host left — returning to main menu")
-            hostId = undefined
+            session.hostId = undefined
             SwampCampGame.instance.loadMainMenu()
         }
     })
@@ -121,8 +119,8 @@ export const guestOnJoin = () => {
 
 export const cleanUpSession = () => {
     session.close()
-    hostId = undefined
-    initializedPeers = []
+    session.hostId = undefined
+    session.initializedPeers = []
     peerToMultiplayerId = {}
 }
 
@@ -146,139 +144,5 @@ const cleanUpPeer = (peerId: string) => {
     })
 
     here().removeDude(multiplayerDude)
-    initializedPeers = initializedPeers.filter((p) => p !== peerId)
-}
-
-/**
- * A function which can be called on the host, which will be invoked client-side.
- * Args should be serializable!
- * If the client calls this function, it will be a no-op that generates a warning log.
- */
-export const syncFn = <T extends any[], R = void>(
-    id: string,
-    fn: (...args: T) => R
-): ((...args: T) => R) => {
-    const [send, receive] = session.action<T>(id)
-
-    const wrappedFn = (...args: T) => {
-        // offline syncFn is just a normal fn
-        if (!session.isOnline()) {
-            return fn(...args)
-        }
-
-        if (session.isGuest()) {
-            console.warn(`client cannot call syncFn ${id}`)
-        } else {
-            send(args, initializedPeers)
-            return fn(...args)
-        }
-    }
-
-    if (session.isGuest()) {
-        receive((args, peerId) => {
-            if (peerId === hostId) {
-                fn(...args)
-            } else {
-                console.warn("other clients should not be calling syncFn")
-            }
-        })
-    }
-
-    return wrappedFn
-}
-
-/**
- * The provided data is the initial data on both host and client.
- * The client received data from the host when the object is updated.
- * If the client writes data, it will be a no-op that generates a warning log.
- */
-export const syncData = <T extends object>(id: string, data: T, onChange = (updated: T) => {}) => {
-    const [send, receive] = session.action<T>(id)
-
-    const proxy = new Proxy(data, {
-        set(target, property, value, receiver) {
-            // offline syncData is just a normal object
-            if (!session.isOnline()) {
-                return Reflect.set(target, property, value, receiver)
-            }
-
-            if (session.isGuest()) {
-                console.warn(`client cannot update data ${id}`)
-                return true // no-op
-            } else {
-                // Update the data locally, then sync it
-                let success = Reflect.set(target, property, value, receiver)
-                if (success) {
-                    // @ts-ignore
-                    send({ [property]: value }, initializedPeers)
-                }
-
-                return success
-            }
-        },
-    })
-
-    if (session.isGuest()) {
-        receive((newData, peerId) => {
-            if (peerId === hostId) {
-                Object.keys(newData).forEach((key) => {
-                    data[key] = newData[key]
-                })
-                onChange(data)
-            } else {
-                console.warn("other clients should not be calling syncFn")
-            }
-        })
-    }
-
-    return proxy
-}
-
-/**
- * Similar to syncFn, but can be invoked on either clients or the host.
- * If the client invocation is accepted by the host, it will be forwarded to other clients.
- *
- * The syncFn receives a "trusted" argument which will be true if:
- *   1) The function is invoked locally OR
- *   2) The function is invoked by the host
- *
- * If the syncFn returns nothing, it will be propagated from the host to other clients.
- * If the syncFn returns the string "reject", it will cancel the propagation.
- */
-export const clientSyncFn = <T extends any[]>(
-    id: string,
-    fn: (trusted: boolean, ...args: T) => "reject" | void
-): ((...args: T) => void) => {
-    const [send, receive] = session.action<T>(id)
-
-    const wrappedFn = (...args: T) => {
-        // offline clientSyncFn is just a normal fn
-        if (!session.isOnline()) {
-            return fn(true, ...args)
-        }
-
-        if (session.isGuest()) {
-            // if you're a guest, you can only talk directly to the host
-            send(args, hostId)
-        } else {
-            // host talks to everyone
-            send(args, initializedPeers)
-        }
-
-        return fn(true, ...args)
-    }
-
-    receive((args, peerId) => {
-        if (session.isGuest() && peerId !== hostId) {
-            return
-        }
-        const trusted = !session.isHost() // only the host should be untrusting
-        const result = fn(trusted, ...args)
-        const otherPeers = session.getPeers().filter((p) => p !== peerId)
-        if (result !== "reject" && otherPeers.length > 0) {
-            send(args, otherPeers)
-        }
-    })
-
-    return wrappedFn
+    session.initializedPeers = session.initializedPeers.filter((p) => p !== peerId)
 }

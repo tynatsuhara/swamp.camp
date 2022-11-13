@@ -1,6 +1,6 @@
 import { Dude } from "../characters/Dude"
 import { player } from "../characters/player"
-import { syncFn } from "../online/sync"
+import { syncFn } from "../online/utils"
 import { saveManager } from "../SaveManager"
 import { Notification, NotificationDisplay } from "../ui/NotificationDisplay"
 import { Inventory, ItemStackMetadata } from "./Inventory"

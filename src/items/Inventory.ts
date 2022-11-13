@@ -1,6 +1,6 @@
 import { InputKey } from "brigsby/dist"
 import { stringifySorted } from "../debug/JSON"
-import { syncFn } from "../online/sync"
+import { syncFn } from "../online/utils"
 import { Item, ItemMetadata, ITEM_METADATA_MAP } from "./Items"
 
 export type ItemStackMetadata = ItemMetadata & {
