@@ -25,15 +25,15 @@ export const syncFn = <T extends any[], R = void>(
         }
     }
 
-    if (session.isGuest()) {
-        receive((args, peerId) => {
+    receive((args, peerId) => {
+        if (session.isGuest()) {
             if (peerId === session.hostId) {
                 fn(...args)
             } else {
                 console.warn("other clients should not be calling syncFn")
             }
-        })
-    }
+        }
+    })
 
     return wrappedFn
 }
@@ -69,8 +69,8 @@ export const syncData = <T extends object>(id: string, data: T, onChange = (upda
         },
     })
 
-    if (session.isGuest()) {
-        receive((newData, peerId) => {
+    receive((newData, peerId) => {
+        if (session.isGuest()) {
             if (peerId === session.hostId) {
                 Object.keys(newData).forEach((key) => {
                     data[key] = newData[key]
@@ -79,8 +79,8 @@ export const syncData = <T extends object>(id: string, data: T, onChange = (upda
             } else {
                 console.warn("other clients should not be calling syncFn")
             }
-        })
-    }
+        }
+    })
 
     return proxy
 }
