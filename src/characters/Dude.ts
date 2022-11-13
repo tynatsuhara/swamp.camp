@@ -1320,6 +1320,7 @@ export class Dude extends Component implements DialogueSource {
     delete() {
         this.removeAllConditions()
         this.location.removeDude(this)
+        dudeCache[this.uuid] = undefined
         super.delete()
     }
 
