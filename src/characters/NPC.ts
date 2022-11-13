@@ -63,11 +63,7 @@ export class NPC extends Simulatable {
                     t: undefined,
                 },
                 (newData) => {
-                    if (this.attackTarget?.uuid !== newData.t) {
-                        this.attackTarget = here()
-                            .getDudes()
-                            .find((d) => d.uuid === newData.t)
-                    }
+                    this.attackTarget = Dude.get(newData.t)
                 }
             )
 
@@ -645,7 +641,7 @@ export class NPC extends Simulatable {
             return undefined
         }
         if (!this.leader) {
-            this.leader = this._dude.location.getDudes().find((d) => d.uuid === savedLeaderUUID)
+            this.leader = Dude.get(savedLeaderUUID)
         }
         return this.leader
     }

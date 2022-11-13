@@ -91,9 +91,7 @@ export class Queequeg extends Simulatable {
         this.position = new Point(docked ? dockedPositionX : atSeaPositionX, positionY)
 
         this.start = () => {
-            const dudes: { [key: string]: Dude } = {}
-            wl.getDudes().forEach((d) => (dudes[d.uuid] = d))
-            passengers.map((uuid) => dudes[uuid]).forEach((dude) => this.pushPassenger(dude))
+            passengers.map((uuid) => Dude.get(uuid)).forEach((dude) => this.pushPassenger(dude))
         }
 
         Queequeg.instance = this

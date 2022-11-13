@@ -1,3 +1,4 @@
+import { Dude } from "../characters/Dude"
 import { DudeFactory, ONLINE_PLAYER_DUDE_ID_PREFIX } from "../characters/DudeFactory"
 import { player } from "../characters/player/index"
 import { saveManager } from "../SaveManager"
@@ -126,9 +127,7 @@ export const cleanUpSession = () => {
 
 const cleanUpPeer = (peerId: string) => {
     // MPTODO: Make this a syncFn when we support more than 2 players
-    const multiplayerDude = here()
-        .getDudes()
-        .find((d) => d.uuid === ONLINE_PLAYER_DUDE_ID_PREFIX + peerToMultiplayerId[peerId])
+    const multiplayerDude = Dude.get(ONLINE_PLAYER_DUDE_ID_PREFIX + peerToMultiplayerId[peerId])
 
     const { uuid, password } = saveManager.getState().onlinePlayers[multiplayerDude.uuid]
 

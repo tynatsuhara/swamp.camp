@@ -5,6 +5,7 @@ import { PointAudio } from "../../audio/PointAudio"
 import { DialogueSource } from "../../characters/dialogue/Dialogue"
 import { ROCKS_NEEDED_FOR_CAMPFIRE } from "../../characters/dialogue/DipDialogue"
 import { CAMPFIRE_DIALOGUE } from "../../characters/dialogue/ItemDialogues"
+import { Dude } from "../../characters/Dude"
 import { player } from "../../characters/player/index"
 import { ShieldType } from "../../characters/weapons/ShieldType"
 import { FireParticles } from "../../graphics/particles/FireParticles"
@@ -17,7 +18,7 @@ import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { GroundRenderer } from "../GroundRenderer"
 import { LightManager } from "../LightManager"
 import { Location } from "../locations/Location"
-import { camp, here } from "../locations/LocationManager"
+import { camp } from "../locations/LocationManager"
 import { TimeUnit } from "../TimeUnit"
 import { WorldTime } from "../WorldTime"
 import { Breakable } from "./Breakable"
@@ -192,9 +193,7 @@ export class Campfire extends Component implements DialogueSource {
             id,
             (trusted, interactingPlayerId: string, logsTransferred: number) => {
                 console.log(`addLogsToFire clientSync (trusted=${trusted})`)
-                const interactingPlayer = here()
-                    .getDudes()
-                    .find((d) => d.uuid === interactingPlayerId)
+                const interactingPlayer = Dude.get(interactingPlayerId)
                 if (logsTransferred === -1 && session.isHost()) {
                     interactingPlayer.setShield(ShieldType.TORCH)
                 }
