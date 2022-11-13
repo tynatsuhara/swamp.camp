@@ -1460,6 +1460,10 @@ export class Dude extends Component implements DialogueSource {
     static getAll() {
         return Object.values(dudeCache)
     }
+
+    static clearLookupCache() {
+        dudeCache = {}
+    }
 }
 
-const dudeCache: Record<string, Dude> = {}
+let dudeCache: Record<string, Dude> = {}

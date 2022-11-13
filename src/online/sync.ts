@@ -6,7 +6,6 @@ import { Save } from "../saves/SaveGame"
 import { newUUID } from "../saves/uuid"
 import { SwampCampGame } from "../SwampCampGame"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
-import { here } from "../world/locations/LocationManager"
 import { computeSessionIdFromPeerId, session } from "./session"
 import { base64hash } from "./utils"
 
@@ -119,6 +118,7 @@ export const guestOnJoin = () => {
 }
 
 export const cleanUpSession = () => {
+    Dude.clearLookupCache()
     session.close()
     session.hostId = undefined
     session.initializedPeers = []
@@ -142,6 +142,6 @@ const cleanUpPeer = (peerId: string) => {
         },
     })
 
-    here().removeDude(multiplayerDude)
+    multiplayerDude.entity.selfDestruct()
     session.initializedPeers = session.initializedPeers.filter((p) => p !== peerId)
 }
