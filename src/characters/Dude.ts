@@ -229,14 +229,18 @@ export class Dude extends Component implements DialogueSource {
             name,
         } = { ...params }
 
+        // populate dudecache for O(1) lookup by uuid
         if (dudeCache[uuid]) {
             console.error(`duplicate dude ${uuid} instantiated`)
         }
         dudeCache[uuid] = this
 
-        const syncId = uuid.substring(0, 8) // 36^8 should be fine, we have a 12 char limit
+        // set this before doing anything else because it's needed for generating sync IDs
+        this.uuid = uuid
+
+        // initialize synchronized data fields
         this.syncData = syncData(
-            syncId,
+            this.syncId("data"),
             {
                 p: { x: standingPosition.x, y: standingPosition.y },
                 f: false,
@@ -254,7 +258,6 @@ export class Dude extends Component implements DialogueSource {
             }
         )
 
-        this.uuid = uuid
         this.type = type
         this.factions = factions
         this.maxHealth = maxHealth
@@ -295,24 +298,24 @@ export class Dude extends Component implements DialogueSource {
             setTimeout(() => (this.canJumpOrRoll = true), 750)
         })
 
-        this.setWeaponAndShieldDrawn = syncFn(`${syncId}wsd`, (drawn: boolean) => {
+        this.setWeaponAndShieldDrawn = syncFn(this.syncId("wsd"), (drawn: boolean) => {
             this._weapon?.setSheathed(!drawn)
             this._shield?.setOnBack(!drawn)
         })
 
-        this.updateBlocking = syncFn(`${syncId}blk`, (blocking) => {
+        this.updateBlocking = syncFn(this.syncId("blk"), (blocking) => {
             this._shield?.block(blocking)
         })
 
-        this.updateAttacking = syncFn(`${syncId}atk`, (isNewAttack) => {
+        this.updateAttacking = syncFn(this.syncId("atk"), (isNewAttack) => {
             this._weapon?.attack(isNewAttack)
         })
 
-        this.cancelAttacking = syncFn(`${syncId}catk`, () => {
+        this.cancelAttacking = syncFn(this.syncId("catk"), () => {
             this._weapon?.cancelAttack()
         })
 
-        this.addCondition = syncFn(`${syncId}ac`, (condition, duration) => {
+        this.addCondition = syncFn(this.syncId("ac"), (condition, duration) => {
             const expiration = duration ? WorldTime.instance.time + duration : undefined
             const existing = this.conditions.find((c) => c.condition === condition)
             if (existing) {
@@ -330,7 +333,7 @@ export class Dude extends Component implements DialogueSource {
             }
         })
 
-        this.removeCondition = syncFn(`${syncId}rc`, (condition) => {
+        this.removeCondition = syncFn(this.syncId("rc"), (condition) => {
             this.conditions = this.conditions.filter((c) => c.condition !== condition)
             switch (condition) {
                 case Condition.ON_FIRE:
@@ -355,6 +358,12 @@ export class Dude extends Component implements DialogueSource {
             }
         })
 
+        this.onDamageSyncFn = syncFn(this.syncId("odmg"), (...args) => {
+            if (this.onDamageCallback) {
+                this.onDamageCallback(...args)
+            }
+        })
+
         // Synchronized client->host functions
 
         const setWeapon = (type: WeaponType) => {
@@ -362,7 +371,7 @@ export class Dude extends Component implements DialogueSource {
             this._weapon = this.entity.addComponent(WeaponFactory.make(type, this.type))
             this._shield?.setOnBack(false) // keep em in sync
         }
-        this.setWeapon = clientSyncFn(`${syncId}eqw`, (trusted, type: WeaponType) => {
+        this.setWeapon = clientSyncFn(this.syncId("eqw"), (trusted, type: WeaponType) => {
             if (this.weapon?.getType() === type) {
                 return
             } else if (!trusted && !this.inventory.getItemCount(type as unknown as Item)) {
@@ -376,7 +385,7 @@ export class Dude extends Component implements DialogueSource {
             this._shield = this.entity.addComponent(ShieldFactory.make(type, this.type))
             this._weapon?.setSheathed(false) // keep em in sync
         }
-        this.setShield = clientSyncFn(`${syncId}eqs`, (trusted, type: ShieldType) => {
+        this.setShield = clientSyncFn(this.syncId("eqs"), (trusted, type: ShieldType) => {
             if (this.shield?.type === type) {
                 return
             } else if (!trusted && !this.inventory.getItemCount(type as unknown as Item)) {
@@ -713,10 +722,12 @@ export class Dude extends Component implements DialogueSource {
             ) {
                 damage = 0
             }
-            this._health -= damage // MPTODO sync health
-            if (!this.isAlive) {
-                this.die(direction) // MPTODO sync die
-                knockback *= 1 + Math.random()
+            if (damage !== 0) {
+                this._health -= damage
+                if (!this.isAlive) {
+                    this.die(direction) // MPTODO sync die
+                    knockback *= 1 + Math.random()
+                }
             }
         }
 
@@ -724,9 +735,7 @@ export class Dude extends Component implements DialogueSource {
             this.knockback(direction, knockback)
         }
 
-        if (this.onDamageCallback) {
-            this.onDamageCallback(blocked) // sync fn MPTODO
-        }
+        this.onDamageSyncFn(blocked) // sync fn
 
         if (attacker) {
             this.lastAttacker = attacker
@@ -739,8 +748,9 @@ export class Dude extends Component implements DialogueSource {
     lastAttackerTime: number
     lastDamageTime: number
 
+    private onDamageSyncFn: typeof this.onDamageCallback
     private onDamageCallback: (blocked: boolean) => void
-    setOnDamageCallback(fn: (blocked: boolean) => void) {
+    setOnDamageCallback(fn: typeof this.onDamageCallback) {
         this.onDamageCallback = fn
     }
 
