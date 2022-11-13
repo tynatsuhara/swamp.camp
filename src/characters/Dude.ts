@@ -697,7 +697,7 @@ export class Dude extends Component implements DialogueSource {
         const blocked = blockable && blocking
 
         if (blocked) {
-            emitBlockParticles(this.getFacingMultiplier(), this.standingPosition) // sync fn
+            emitBlockParticles(this.uuid) // sync fn
             damage *= 0.25
             knockback *= 0.4
         }
