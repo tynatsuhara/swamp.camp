@@ -229,6 +229,11 @@ export class Dude extends Component implements DialogueSource {
             name,
         } = { ...params }
 
+        if (dudeCache[uuid]) {
+            console.error(`duplicate dude ${uuid} instantiated`)
+        }
+        dudeCache[uuid] = this
+
         const syncId = uuid.substring(0, 8) // 36^8 should be fine, we have a 12 char limit
         this.syncData = syncData(
             syncId,
@@ -1436,4 +1441,14 @@ export class Dude extends Component implements DialogueSource {
     log(message: any) {
         console.log(`${DudeType[this.type]}: ${message}`)
     }
+
+    static get(uuid: string) {
+        return dudeCache[uuid]
+    }
+
+    static getAll() {
+        return Object.values(dudeCache)
+    }
 }
+
+const dudeCache: Record<string, Dude> = {}
