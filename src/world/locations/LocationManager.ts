@@ -51,6 +51,13 @@ export class LocationManager {
                 console.log(ids)
             },
 
+            kill: (type: DudeType) => {
+                here()
+                    .getDudes()
+                    .filter((d) => d.type === type)
+                    .forEach((d) => d.die())
+            },
+
             killEnemies: () => {
                 here()
                     .getDudes()
