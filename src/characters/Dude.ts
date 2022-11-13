@@ -65,6 +65,8 @@ type SyncData = {
     d: { x: number; y: number } // walking direction
     f: boolean // true if facing left, false otherwise
     as: AttackState
+    mh: number // max health
+    h: number // health
 }
 
 export class Dude extends Component implements DialogueSource {
@@ -82,8 +84,18 @@ export class Dude extends Component implements DialogueSource {
     readonly type: DudeType
     readonly factions: DudeFaction[]
     readonly inventory: Inventory
-    maxHealth: number
-    private _health: number
+    set maxHealth(val: number) {
+        this.syncData.mh = val
+    }
+    get maxHealth() {
+        return this.syncData.mh
+    }
+    private set _health(val: number) {
+        this.syncData.h = val
+    }
+    private get _health() {
+        return this.syncData.h
+    }
     get health() {
         return this._health
     }
@@ -225,6 +237,8 @@ export class Dude extends Component implements DialogueSource {
                 f: false,
                 d: { x: 0, y: 0 },
                 as: AttackState.NOT_ATTACKING,
+                mh: maxHealth,
+                h: health,
             },
             (newData) => {
                 const newStandingPos = pt(newData.p.x, newData.p.y)
@@ -632,7 +646,7 @@ export class Dude extends Component implements DialogueSource {
     }
 
     get isAlive() {
-        return this._health > 0
+        return this.health > 0
     }
 
     // MPTODO
@@ -678,13 +692,13 @@ export class Dude extends Component implements DialogueSource {
         const blocked = blockable && blocking
 
         if (blocked) {
-            emitBlockParticles(this.getFacingMultiplier(), this.standingPosition)
+            emitBlockParticles(this.getFacingMultiplier(), this.standingPosition) // sync fn
             damage *= 0.25
             knockback *= 0.4
         }
 
         if (condition && (!conditionBlockable || !blocking)) {
-            this.addCondition(condition, conditionDuration)
+            this.addCondition(condition, conditionDuration) // sync fn
         }
 
         if (this.isAlive) {
@@ -694,9 +708,9 @@ export class Dude extends Component implements DialogueSource {
             ) {
                 damage = 0
             }
-            this._health -= damage
+            this._health -= damage // MPTODO sync health
             if (!this.isAlive) {
-                this.die(direction)
+                this.die(direction) // MPTODO sync die
                 knockback *= 1 + Math.random()
             }
         }
@@ -705,8 +719,8 @@ export class Dude extends Component implements DialogueSource {
             this.knockback(direction, knockback)
         }
 
-        if (!!this.onDamageCallback) {
-            this.onDamageCallback(blocked)
+        if (this.onDamageCallback) {
+            this.onDamageCallback(blocked) // sync fn MPTODO
         }
 
         if (attacker) {
@@ -729,6 +743,7 @@ export class Dude extends Component implements DialogueSource {
     droppedItemSupplier: (() => Item[]) | undefined
     private layingDownOffset: Point
 
+    // MPTODO
     die({ x: dx, y: dy }: PointValue = new Point(-1, 0)) {
         this._health = 0
         const direction = pt(dx, dy)
@@ -905,7 +920,7 @@ export class Dude extends Component implements DialogueSource {
             return
         }
 
-        if (this._health <= 0) {
+        if (!this.isAlive) {
             return
         }
 
@@ -1282,7 +1297,7 @@ export class Dude extends Component implements DialogueSource {
             pos: this.standingPosition.toString(),
             anim: this.characterAnimName,
             maxHealth: this.maxHealth,
-            health: this._health,
+            health: this.health,
             weapon: this.weaponType,
             shield: this.shieldType,
             inventory: this.inventory.save(),
