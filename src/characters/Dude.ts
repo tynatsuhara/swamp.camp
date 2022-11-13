@@ -247,7 +247,7 @@ export class Dude extends Component implements DialogueSource {
                 d: { x: 0, y: 0 },
                 as: AttackState.NOT_ATTACKING,
                 mh: maxHealth,
-                h: health,
+                h: maxHealth === Number.MAX_SAFE_INTEGER ? Number.MAX_SAFE_INTEGER : health,
             },
             (newData) => {
                 const newStandingPos = pt(newData.p.x, newData.p.y)
@@ -260,8 +260,6 @@ export class Dude extends Component implements DialogueSource {
 
         this.type = type
         this.factions = factions
-        this.maxHealth = maxHealth
-        this._health = maxHealth === Number.MAX_SAFE_INTEGER ? Number.MAX_SAFE_INTEGER : health
         this.speed = speed
         this.inventory = inventory
         this.dialogue = dialogue
