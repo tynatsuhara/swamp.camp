@@ -1,5 +1,6 @@
 import { Component, debug, Point, pt } from "brigsby/dist"
 import { BoxCollider } from "brigsby/dist/collision"
+import { PointValue } from "brigsby/dist/Point"
 import { RenderMethod } from "brigsby/dist/renderer"
 import { AnimatedSpriteComponent, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Animator, Lists, RepeatedInvoker } from "brigsby/dist/util"
@@ -647,7 +648,7 @@ export class Dude extends Component implements DialogueSource {
             conditionDuration = 0,
             conditionBlockable = true,
         }: {
-            direction?: Point
+            direction?: { x: number; y: number }
             knockback?: number
             attacker?: Dude
             blockable?: boolean
@@ -657,6 +658,10 @@ export class Dude extends Component implements DialogueSource {
             conditionBlockable?: boolean
         }
     ) {
+        if (session.isGuest()) {
+            console.warn(`guests can't call damage()`)
+            return
+        }
         if (dodgeable && (this.rolling || this.jumping)) {
             return
         }
@@ -710,6 +715,7 @@ export class Dude extends Component implements DialogueSource {
         }
         this.lastDamageTime = WorldTime.instance.time
     }
+
     lastAttacker: Dude
     lastAttackerTime: number
     lastDamageTime: number
@@ -723,8 +729,9 @@ export class Dude extends Component implements DialogueSource {
     droppedItemSupplier: (() => Item[]) | undefined
     private layingDownOffset: Point
 
-    die(direction: Point = new Point(-1, 0)) {
+    die({ x: dx, y: dy }: PointValue = new Point(-1, 0)) {
         this._health = 0
+        const direction = pt(dx, dy)
 
         // position the body
         const prePos = this.animation.transform.position
@@ -823,14 +830,20 @@ export class Dude extends Component implements DialogueSource {
     }
 
     private knockIntervalCallback: number = 0
-    knockback(direction: Point, knockback: number) {
-        if (this.knockIntervalCallback !== 0) {
-            window.cancelAnimationFrame(this.knockIntervalCallback)
+    knockback({ x: dx, y: dy }: PointValue, knockback: number) {
+        if (session.isGuest()) {
+            console.warn(`guests can't call knockback()`)
+            return
         }
-        if (direction.equals(Point.ZERO)) {
+        if (dx === 0 && dy === 0) {
             return
         }
 
+        if (this.knockIntervalCallback !== 0) {
+            window.cancelAnimationFrame(this.knockIntervalCallback)
+        }
+
+        const direction = pt(dx, dy)
         const goal = this.standingPosition.plus(direction.normalized().times(knockback))
         const distToStop = 2
         let intervalsRemaining = 50
@@ -857,6 +870,10 @@ export class Dude extends Component implements DialogueSource {
     }
 
     heal(amount: number) {
+        if (session.isGuest()) {
+            console.warn(`guests can't call heal()`)
+            return
+        }
         if (this.isAlive) {
             this._health = Math.min(this.maxHealth, this.health + amount)
         }

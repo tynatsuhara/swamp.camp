@@ -1,3 +1,4 @@
+import { session } from "../../online/session"
 import { Condition } from "../Condition"
 import { DudeType } from "../DudeType"
 import { Weapon } from "./Weapon"
@@ -33,7 +34,7 @@ export class UnarmedWeapon extends Weapon {
     }
 
     attack(newAttack: boolean) {
-        if (this.state === State.ATTACKING) {
+        if (this.state === State.ATTACKING || session.isGuest()) {
             return
         }
         if (!newAttack) {

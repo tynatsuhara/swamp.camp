@@ -3,6 +3,7 @@ import { SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Animator } from "brigsby/dist/util"
 import { Tilesets } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
+import { session } from "../../online/session"
 import { spawnThrownProjectile } from "./ThrownProjectile"
 import { HAND_POSITION_OFFSET, Weapon, WeaponSpriteCache } from "./Weapon"
 import { WeaponType } from "./WeaponType"
@@ -171,7 +172,7 @@ export class SpearWeapon extends Weapon {
     }
 
     private damageEnemies() {
-        if (!this.enabled) {
+        if (!this.enabled || session.isGuest()) {
             return
         }
         const attackDistance = this.getRange() + 4 // add a tiny buffer for small weapons like the dagger to still work

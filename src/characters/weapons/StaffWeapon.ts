@@ -5,6 +5,7 @@ import { Camera } from "../../cutscenes/Camera"
 import { ImageFilters } from "../../graphics/ImageFilters"
 import { Particles } from "../../graphics/particles/Particles"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
+import { session } from "../../online/session"
 import { Color } from "../../ui/Color"
 import { GroundRenderer } from "../../world/GroundRenderer"
 import { here } from "../../world/locations/LocationManager"
@@ -150,20 +151,23 @@ export class StaffWeapon extends Weapon {
                     const attackDistance = TILE_SIZE * 1.5
 
                     // everyone can get damaged by explosions, friend or foe
-                    here()
-                        .getDudes()
-                        .filter((d) => !!d)
-                        .filter(
-                            (d) =>
-                                d.standingPosition.distanceTo(this.attackPosition) < attackDistance
-                        )
-                        .forEach((d) =>
-                            // don't track lastAttacker because it can cause friendly fire and get weird
-                            d.damage(2, {
-                                direction: d.standingPosition.minus(this.attackPosition),
-                                knockback: 50,
-                            })
-                        )
+                    if (session.isHost()) {
+                        here()
+                            .getDudes()
+                            .filter((d) => !!d)
+                            .filter(
+                                (d) =>
+                                    d.standingPosition.distanceTo(this.attackPosition) <
+                                    attackDistance
+                            )
+                            .forEach((d) =>
+                                // don't track lastAttacker because it can cause friendly fire and get weird
+                                d.damage(2, {
+                                    direction: d.standingPosition.minus(this.attackPosition),
+                                    knockback: 50,
+                                })
+                            )
+                    }
 
                     Camera.instance.shake(5, 500)
 

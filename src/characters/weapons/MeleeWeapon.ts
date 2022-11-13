@@ -2,6 +2,7 @@ import { Point, UpdateData } from "brigsby/dist"
 import { SpriteComponent, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Animator } from "brigsby/dist/util"
 import { Tilesets } from "../../graphics/Tilesets"
+import { session } from "../../online/session"
 import { DudeType } from "../DudeType"
 import { Weapon } from "./Weapon"
 import { WeaponType } from "./WeaponType"
@@ -82,7 +83,7 @@ export class MeleeWeapon extends Weapon {
     }
 
     private damageEnemies() {
-        if (!this.enabled) {
+        if (!this.enabled || session.isGuest()) {
             return
         }
         const attackDistance = this.getRange() + 4 // add a tiny buffer for small weapons like the dagger to still work
