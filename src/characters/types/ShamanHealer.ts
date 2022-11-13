@@ -4,6 +4,7 @@ import { pt } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util/Lists"
 import { Particles } from "../../graphics/particles/Particles"
 import { ShamanHealingParticles } from "../../graphics/particles/ShamanHealingParticles"
+import { session } from "../../online/session"
 import { here } from "../../world/locations/LocationManager"
 import { NPCSchedules } from "../ai/NPCSchedule"
 import { Dude } from "../Dude"
@@ -17,6 +18,10 @@ export class ShamanHealer extends Component {
     private selfParticles: ShamanHealingParticles
 
     start(startData: StartData): void {
+        if (session.isGuest()) {
+            return
+        }
+
         this.dude = this.entity.getComponent(Dude)
         this.selfParticles = this.entity.addComponent(new ShamanHealingParticles())
 
@@ -28,6 +33,10 @@ export class ShamanHealer extends Component {
     }
 
     update({ elapsedTimeMillis }: UpdateData): void {
+        if (session.isGuest()) {
+            return
+        }
+
         this.healTargets.forEach((_, dude) => {
             if (!dude.isAlive) {
                 this.removeHealTarget(dude)
@@ -39,7 +48,7 @@ export class ShamanHealer extends Component {
         this.selfParticles.enabled = this.healTargets.size > 0
     }
 
-    doParticleEffects() {
+    private doParticleEffects() {
         const centerOffset = -6
         this.healTargets.forEach((_, dude) => {
             // place some particles on the line between them, randomly shifted a bit

@@ -1,6 +1,7 @@
 import { Component, debug, Point } from "brigsby/dist"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
+import { session } from "../../online/session"
 import { Ground } from "../../world/ground/Ground"
 import { LightManager } from "../../world/LightManager"
 import { WorldTime } from "../../world/WorldTime"
@@ -15,10 +16,9 @@ import { NPC } from "../NPC"
  */
 export class Enemy extends Component {
     awake() {
-        // MPTODO
-        // if (session.isGuest()) {
-        //     return
-        // }
+        if (session.isGuest()) {
+            return
+        }
 
         const dude = this.entity.getComponent(Dude)
         const npc = this.entity.getComponent(NPC)

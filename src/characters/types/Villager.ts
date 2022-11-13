@@ -1,4 +1,5 @@
 import { Component, pt } from "brigsby/dist"
+import { session } from "../../online/session"
 import { ElementType } from "../../world/elements/Elements"
 import { Ground } from "../../world/ground/Ground"
 import { LightManager } from "../../world/LightManager"
@@ -22,6 +23,10 @@ export class Villager extends Component {
     }
 
     awake() {
+        if (session.isGuest()) {
+            return
+        }
+
         const { npc, dude } = this
 
         npc.isEnemyFn = (d) => {
@@ -58,6 +63,10 @@ export class Villager extends Component {
     }
 
     start() {
+        if (session.isGuest()) {
+            return
+        }
+
         const { npc, dude } = this
 
         if ([DudeType.GUMBALL, DudeType.ONION].includes(dude.type)) {

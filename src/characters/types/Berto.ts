@@ -1,5 +1,6 @@
 import { Component, Point } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
+import { session } from "../../online/session"
 import { tilesAround } from "../../Utils"
 import { ElementType } from "../../world/elements/Elements"
 import { Queequeg } from "../../world/elements/Queequeg"
@@ -26,6 +27,10 @@ export class Berto extends Component {
     }
 
     start() {
+        if (session.isGuest()) {
+            return
+        }
+
         // wait until start() since schedule relies on the EventQueue and locations being initialized
         this.updateSchedule()
         this.npc.dude.doWhileLiving(() => this.updateSchedule(), TimeUnit.HOUR)

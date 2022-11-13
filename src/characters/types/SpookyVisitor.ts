@@ -1,6 +1,7 @@
 import { Component, Point, StartData, UpdateData } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
 import { Particles } from "../../graphics/particles/Particles"
+import { session } from "../../online/session"
 import { Color } from "../../ui/Color"
 import { Dude } from "../Dude"
 import { NPC } from "../NPC"
@@ -17,6 +18,11 @@ export class SpookyVisitor extends Component {
     }
 
     update(updateData: UpdateData) {
+        // MPTODO
+        if (session.isGuest()) {
+            return
+        }
+
         this.position = this.dude.standingPosition
 
         if (this.npc.enemiesPresent) {

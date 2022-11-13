@@ -1,6 +1,7 @@
 import { Component, UpdateData } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
 import { Item } from "../../items/Items"
+import { session } from "../../online/session"
 import { ElementType } from "../../world/elements/Elements"
 import { camp } from "../../world/locations/LocationManager"
 import { TimeUnit } from "../../world/TimeUnit"
@@ -18,6 +19,10 @@ export class ShroomNPC extends Component {
     private enemy: Enemy
 
     awake() {
+        if (session.isGuest()) {
+            return
+        }
+
         this.dude = this.entity.getComponent(Dude)
         this.dude.blob[SIZE] = this.dude.blob[SIZE] || 1
         this.dude.droppedItemSupplier = () => Lists.repeat(this.dude.blob[SIZE], [Item.MUSHROOM])
