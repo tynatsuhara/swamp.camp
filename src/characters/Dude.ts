@@ -356,10 +356,18 @@ export class Dude extends Component implements DialogueSource {
             }
         })
 
-        this.onDamageSyncFn = syncFn(this.syncId("odmg"), (...args) => {
-            if (this.onDamageCallback) {
-                this.onDamageCallback(...args)
+        this.onDamageCallback = syncFn(this.syncId("odmg"), (...args) => {
+            if (this._onDamageCallback) {
+                this._onDamageCallback(...args)
             }
+        })
+
+        this.die = syncFn(this.syncId("die"), (...args) => {
+            this._die(...args)
+        })
+
+        this.revive = syncFn(this.syncId("rvv"), (...args) => {
+            this._revive(...args)
         })
 
         // Synchronized client->host functions
@@ -661,6 +669,7 @@ export class Dude extends Component implements DialogueSource {
         return this.health > 0
     }
 
+    // host only!
     damage(
         damage: number,
         {
@@ -681,7 +690,7 @@ export class Dude extends Component implements DialogueSource {
             condition?: Condition
             conditionDuration?: number
             conditionBlockable?: boolean
-        }
+        } = {}
     ) {
         if (session.isGuest()) {
             console.warn(`guests can't call damage()`)
@@ -722,7 +731,7 @@ export class Dude extends Component implements DialogueSource {
             if (damage !== 0) {
                 this._health -= damage
                 if (!this.isAlive) {
-                    this.die(direction) // MPTODO sync die
+                    this.die(direction) // sync fn
                     knockback *= 1 + Math.random()
                 }
             }
@@ -732,7 +741,7 @@ export class Dude extends Component implements DialogueSource {
             this.knockback(direction, knockback)
         }
 
-        this.onDamageSyncFn(blocked) // sync fn
+        this.onDamageCallback(blocked) // sync fn
 
         if (attacker) {
             this.lastAttacker = attacker
@@ -747,19 +756,23 @@ export class Dude extends Component implements DialogueSource {
     lastAttackerTime: number
     lastDamageTime: number
 
-    private onDamageSyncFn: typeof this.onDamageCallback
-    private onDamageCallback: (blocked: boolean) => void
-    setOnDamageCallback(fn: typeof this.onDamageCallback) {
-        this.onDamageCallback = fn
+    private onDamageCallback: typeof this._onDamageCallback
+    private _onDamageCallback: (blocked: boolean) => void
+    setOnDamageCallback(fn: typeof this._onDamageCallback) {
+        this._onDamageCallback = fn
     }
 
     // TODO: Consider just dropping everything in their inventory instead
     droppedItemSupplier: (() => Item[]) | undefined
     private layingDownOffset: Point
 
-    // MPTODO
-    die({ x: dx, y: dy }: PointValue = new Point(-1, 0)) {
-        this._health = 0
+    // on host and guests!
+    private readonly die: typeof this._die
+    private _die({ x: dx, y: dy }: PointValue = new Point(-1, 0)) {
+        if (session.isHost()) {
+            this._health = 0
+        }
+
         const direction = pt(dx, dy)
 
         // position the body
@@ -773,7 +786,7 @@ export class Dude extends Component implements DialogueSource {
         this.animation.pause()
 
         // spawn items
-        if (this.droppedItemSupplier) {
+        if (session.isHost() && this.droppedItemSupplier) {
             const items = this.droppedItemSupplier()
             items.forEach((item) => {
                 const randomness = 8
@@ -803,10 +816,11 @@ export class Dude extends Component implements DialogueSource {
             }
         }, 1000)
 
-        this.triggerDeathHooks()
+        if (session.isHost()) {
+            this.triggerDeathHooks()
+        }
     }
 
-    // MPTODO
     private triggerDeathHooks() {
         // play death cutscene if applicable
         if (this.type === DudeType.PLAYER) {
@@ -833,16 +847,17 @@ export class Dude extends Component implements DialogueSource {
         }
     }
 
-    // MPTODO
-    revive() {
-        this._health = this.maxHealth * 0.25
+    readonly revive: typeof this._revive
+    private _revive() {
+        if (session.isHost()) {
+            this._health = this.maxHealth * 0.25
+            this.removeAllConditions()
+        }
 
         // stand up
         this.animationDirty = true
         this.animation.transform.rotation = 0
         this.layingDownOffset = null
-
-        this.removeAllConditions()
     }
 
     // MPTODO

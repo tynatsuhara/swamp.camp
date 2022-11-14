@@ -55,7 +55,7 @@ export class LocationManager {
                 here()
                     .getDudes()
                     .filter((d) => d.type === type)
-                    .forEach((d) => d.die())
+                    .forEach((d) => d.damage(Number.MAX_SAFE_INTEGER))
             },
 
             killEnemies: () => {
@@ -63,7 +63,7 @@ export class LocationManager {
                     .getDudes()
                     .forEach((d) => {
                         if (d.entity.getComponent(Enemy)) {
-                            d.die()
+                            d.damage(Number.MAX_SAFE_INTEGER)
                         }
                     })
             },
