@@ -661,7 +661,6 @@ export class Dude extends Component implements DialogueSource {
         return this.health > 0
     }
 
-    // MPTODO
     damage(
         damage: number,
         {
@@ -739,6 +738,8 @@ export class Dude extends Component implements DialogueSource {
             this.lastAttacker = attacker
             this.lastAttackerTime = WorldTime.instance.time
         }
+
+        // MPTODO sync this for blood effects
         this.lastDamageTime = WorldTime.instance.time
     }
 
@@ -805,6 +806,7 @@ export class Dude extends Component implements DialogueSource {
         this.triggerDeathHooks()
     }
 
+    // MPTODO
     private triggerDeathHooks() {
         // play death cutscene if applicable
         if (this.type === DudeType.PLAYER) {
