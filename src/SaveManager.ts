@@ -1,5 +1,4 @@
 import { debug } from "brigsby/dist"
-import { Dude } from "./characters/Dude"
 import { ONLINE_PLAYER_DUDE_ID_PREFIX } from "./characters/DudeFactory"
 import { player } from "./characters/player"
 import { Camera } from "./cutscenes/Camera"
@@ -10,7 +9,7 @@ import { SwampCampGame } from "./SwampCampGame"
 import { HUD } from "./ui/HUD"
 import { PlumePicker } from "./ui/PlumePicker"
 import { EventQueue } from "./world/events/EventQueue"
-import { LocationManager } from "./world/locations/LocationManager"
+import { here, LocationManager } from "./world/locations/LocationManager"
 import { WorldTime } from "./world/WorldTime"
 
 const CURRENT_SAVE_FORMAT_VERSION = 3
@@ -87,7 +86,8 @@ class SaveManager {
         const onlinePlayers =
             context === "multiplayer"
                 ? {} // don't send potentially sensitive multiplayer info to peers!
-                : Dude.getAll()
+                : here()
+                      .getDudes()
                       .filter((d) => d.uuid.startsWith(ONLINE_PLAYER_DUDE_ID_PREFIX))
                       .reduce((map, dude) => {
                           const password = map[dude.uuid].password
