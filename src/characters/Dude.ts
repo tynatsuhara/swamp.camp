@@ -67,6 +67,7 @@ type SyncData = {
     as: AttackState
     mh: number // max health
     h: number // health
+    ld: number // last damage timestamp
 }
 
 export class Dude extends Component implements DialogueSource {
@@ -248,6 +249,7 @@ export class Dude extends Component implements DialogueSource {
                 as: AttackState.NOT_ATTACKING,
                 mh: maxHealth,
                 h: maxHealth === Number.MAX_SAFE_INTEGER ? Number.MAX_SAFE_INTEGER : health,
+                ld: 0,
             },
             (newData) => {
                 const newStandingPos = pt(newData.p.x, newData.p.y)
@@ -376,7 +378,6 @@ export class Dude extends Component implements DialogueSource {
                         if (session.isHost()) {
                             return interactor === player()
                         } else {
-                            // TODO: Implement a more thorough approach to this
                             const canGuestAccessDialogue = [DIP_ENTRYPOINT].includes(this.dialogue)
                             return canGuestAccessDialogue
                         }
@@ -722,13 +723,14 @@ export class Dude extends Component implements DialogueSource {
             this.lastAttackerTime = WorldTime.instance.time
         }
 
-        // MPTODO sync this for blood effects
-        this.lastDamageTime = WorldTime.instance.time
+        this.syncData.ld = WorldTime.instance.time
     }
 
     lastAttacker: Dude
     lastAttackerTime: number
-    lastDamageTime: number
+    get lastDamageTime() {
+        return this.syncData.ld
+    }
 
     private onDamageCallback(blocked: boolean) {
         if (this._onDamageCallback) {
@@ -836,7 +838,6 @@ export class Dude extends Component implements DialogueSource {
         this.layingDownOffset = null
     }
 
-    // MPTODO
     dissolve() {
         let dissolveChance = 0.1
         const interval = setInterval(() => {
@@ -1124,7 +1125,6 @@ export class Dude extends Component implements DialogueSource {
 
         this.position = moveFn(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos)
 
-        // TODO translate to standing pos
         if (session.isHost()) {
             this.syncData.p = this.standingPosition
         }
