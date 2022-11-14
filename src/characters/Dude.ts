@@ -279,97 +279,16 @@ export class Dude extends Component implements DialogueSource {
         }
 
         this.jump = makeSyncFn("jump", this.jump)
-
-        this.roll = syncFn(this.syncId("roll"), () => {
-            this.rollingMomentum = new Point(this.syncData.d.x, this.syncData.d.y)
-            const ground = this.location.getGround(this.tile)
-            if (!this.canJumpOrRoll || Ground.isWater(ground?.type)) {
-                return
-            }
-            this.canJumpOrRoll = false
-            this.doRollAnimation()
-            this.accelerateConditionExpiration(Condition.ON_FIRE, 500)
-            for (let i = 0; i < 3; i++) {
-                setTimeout(() => {
-                    StepSounds.singleFootstepSound(this, 2)
-                }, i * 150)
-            }
-            setTimeout(() => (this.canJumpOrRoll = true), 750)
-        })
-
-        this.setWeaponAndShieldDrawn = syncFn(this.syncId("wsd"), (drawn: boolean) => {
-            this._weapon?.setSheathed(!drawn)
-            this._shield?.setOnBack(!drawn)
-        })
-
-        this.updateBlocking = syncFn(this.syncId("blk"), (blocking) => {
-            this._shield?.block(blocking)
-        })
-
-        this.updateAttacking = syncFn(this.syncId("atk"), (isNewAttack) => {
-            this._weapon?.attack(isNewAttack)
-        })
-
-        this.cancelAttacking = syncFn(this.syncId("catk"), () => {
-            this._weapon?.cancelAttack()
-        })
-
-        this.addCondition = syncFn(this.syncId("ac"), (condition, duration) => {
-            const expiration = duration ? WorldTime.instance.time + duration : undefined
-            const existing = this.conditions.find((c) => c.condition === condition)
-            if (existing) {
-                if (!duration) {
-                    existing.expiration = undefined
-                } else {
-                    existing.expiration = Math.max(existing.expiration, expiration)
-                }
-            } else {
-                this.conditions.push({
-                    condition,
-                    expiration,
-                    lastExec: -1,
-                })
-            }
-        })
-
-        this.removeCondition = syncFn(this.syncId("rc"), (condition) => {
-            this.conditions = this.conditions.filter((c) => c.condition !== condition)
-            switch (condition) {
-                case Condition.ON_FIRE:
-                    if (this.fireParticles) {
-                        this.entity.removeComponent(this.fireParticles)
-                        LightManager.instance.removeLight(this.fireParticles)
-                        this.fireParticles = undefined
-                    }
-                    return
-                case Condition.POISONED:
-                    if (this.poisonParticles) {
-                        this.entity.removeComponent(this.poisonParticles)
-                        this.poisonParticles = undefined
-                    }
-                    return
-                case Condition.BLACK_LUNG:
-                    if (this.blackLungParticles) {
-                        this.entity.removeComponent(this.blackLungParticles)
-                        this.blackLungParticles = undefined
-                    }
-                    return
-            }
-        })
-
-        this.onDamageCallback = syncFn(this.syncId("odmg"), (...args) => {
-            if (this._onDamageCallback) {
-                this._onDamageCallback(...args)
-            }
-        })
-
-        this.die = syncFn(this.syncId("die"), (...args) => {
-            this._die(...args)
-        })
-
-        this.revive = syncFn(this.syncId("rvv"), (...args) => {
-            this._revive(...args)
-        })
+        this.roll = makeSyncFn("roll", this.roll)
+        this.setWeaponAndShieldDrawn = makeSyncFn("wsd", this.setWeaponAndShieldDrawn)
+        this.updateBlocking = makeSyncFn("blk", this.updateBlocking)
+        this.updateAttacking = makeSyncFn("atk", this.updateAttacking)
+        this.cancelAttacking = makeSyncFn("catk", this.cancelAttacking)
+        this.addCondition = makeSyncFn("ac", this.addCondition)
+        this.removeCondition = makeSyncFn("rc", this.removeCondition)
+        this.onDamageCallback = makeSyncFn("odmg", this.onDamageCallback)
+        this.die = makeSyncFn("die", this.die)
+        this.revive = makeSyncFn("rvv", this.revive)
 
         // Synchronized client->host functions
 
@@ -547,18 +466,72 @@ export class Dude extends Component implements DialogueSource {
         this.setShield(shield || ShieldType.NONE)
     }
 
-    // sync functions
+    // client sync functions
     readonly setWeapon: (type: WeaponType) => void
     readonly setShield: (type: ShieldType) => void
-    readonly setWeaponAndShieldDrawn: (drawn: boolean) => void
-    readonly updateBlocking: (blocking: boolean) => void
-    readonly updateAttacking: (isNewAttack: boolean) => void
-    readonly cancelAttacking: () => void
+
+    setWeaponAndShieldDrawn(drawn: boolean) {
+        this._weapon?.setSheathed(!drawn)
+        this._shield?.setOnBack(!drawn)
+    }
+
+    updateBlocking(blocking: boolean) {
+        this._shield?.block(blocking)
+    }
+
+    updateAttacking(isNewAttack: boolean) {
+        this._weapon?.attack(isNewAttack)
+    }
+
+    cancelAttacking() {
+        this._weapon?.cancelAttack()
+    }
+
     /**
      * @param duration if zero, unlimited duration
      */
-    readonly addCondition: (condition: Condition, duration?: number) => void
-    readonly removeCondition: (condition: Condition) => void
+    addCondition(condition: Condition, duration?: number) {
+        const expiration = duration ? WorldTime.instance.time + duration : undefined
+        const existing = this.conditions.find((c) => c.condition === condition)
+        if (existing) {
+            if (!duration) {
+                existing.expiration = undefined
+            } else {
+                existing.expiration = Math.max(existing.expiration, expiration)
+            }
+        } else {
+            this.conditions.push({
+                condition,
+                expiration,
+                lastExec: -1,
+            })
+        }
+    }
+
+    removeCondition(condition: Condition) {
+        this.conditions = this.conditions.filter((c) => c.condition !== condition)
+        switch (condition) {
+            case Condition.ON_FIRE:
+                if (this.fireParticles) {
+                    this.entity.removeComponent(this.fireParticles)
+                    LightManager.instance.removeLight(this.fireParticles)
+                    this.fireParticles = undefined
+                }
+                return
+            case Condition.POISONED:
+                if (this.poisonParticles) {
+                    this.entity.removeComponent(this.poisonParticles)
+                    this.poisonParticles = undefined
+                }
+                return
+            case Condition.BLACK_LUNG:
+                if (this.blackLungParticles) {
+                    this.entity.removeComponent(this.blackLungParticles)
+                    this.blackLungParticles = undefined
+                }
+                return
+        }
+    }
 
     private fireParticles: FireParticles
     private poisonParticles: PoisonParticles
@@ -757,7 +730,11 @@ export class Dude extends Component implements DialogueSource {
     lastAttackerTime: number
     lastDamageTime: number
 
-    private onDamageCallback: typeof this._onDamageCallback
+    private onDamageCallback(blocked: boolean) {
+        if (this._onDamageCallback) {
+            this._onDamageCallback(blocked)
+        }
+    }
     private _onDamageCallback: (blocked: boolean) => void
     setOnDamageCallback(fn: typeof this._onDamageCallback) {
         this._onDamageCallback = fn
@@ -768,8 +745,7 @@ export class Dude extends Component implements DialogueSource {
     private layingDownOffset: Point
 
     // on host and guests!
-    private readonly die: typeof this._die
-    private _die({ x: dx, y: dy }: PointValue = new Point(-1, 0)) {
+    private die({ x: dx, y: dy }: PointValue = new Point(-1, 0)) {
         if (session.isHost()) {
             this._health = 0
         }
@@ -848,8 +824,7 @@ export class Dude extends Component implements DialogueSource {
         }
     }
 
-    readonly revive: typeof this._revive
-    private _revive() {
+    revive() {
         if (session.isHost()) {
             this._health = this.maxHealth * 0.25
             this.removeAllConditions()
@@ -1170,7 +1145,22 @@ export class Dude extends Component implements DialogueSource {
     private jumpingAnimator: Animator
     private jumpingOffset = 0
 
-    readonly roll: () => void
+    roll() {
+        this.rollingMomentum = new Point(this.syncData.d.x, this.syncData.d.y)
+        const ground = this.location.getGround(this.tile)
+        if (!this.canJumpOrRoll || Ground.isWater(ground?.type)) {
+            return
+        }
+        this.canJumpOrRoll = false
+        this.doRollAnimation()
+        this.accelerateConditionExpiration(Condition.ON_FIRE, 500)
+        for (let i = 0; i < 3; i++) {
+            setTimeout(() => {
+                StepSounds.singleFootstepSound(this, 2)
+            }, i * 150)
+        }
+        setTimeout(() => (this.canJumpOrRoll = true), 750)
+    }
 
     get rolling() {
         return this.isRolling
