@@ -269,15 +269,16 @@ export class Dude extends Component implements DialogueSource {
 
         // Synchronized host->client functions
 
-        this.jump = syncFn(this.syncId("jump"), () => {
-            const ground = this.location.getGround(this.tile)
-            if (!this.canJumpOrRoll || Ground.isWater(ground?.type)) {
-                return
-            }
-            this.canJumpOrRoll = false
-            this.doJumpAnimation()
-            setTimeout(() => (this.canJumpOrRoll = true), 750)
-        })
+        const makeSyncFn = <T extends any[], R>(
+            namespace: string,
+            fn: (...args: T) => R
+        ): ((...args: T) => R) => {
+            return syncFn(this.syncId(namespace), (...args: T) => {
+                return fn.bind(this)(...args)
+            })
+        }
+
+        this.jump = makeSyncFn("jump", this.jump)
 
         this.roll = syncFn(this.syncId("roll"), () => {
             this.rollingMomentum = new Point(this.syncData.d.x, this.syncData.d.y)
@@ -1221,7 +1222,15 @@ export class Dude extends Component implements DialogueSource {
         }, animationSpeed * (rotations.length + 1))
     }
 
-    readonly jump: () => void
+    jump() {
+        const ground = this.location.getGround(this.tile)
+        if (!this.canJumpOrRoll || Ground.isWater(ground?.type)) {
+            return
+        }
+        this.canJumpOrRoll = false
+        this.doJumpAnimation()
+        setTimeout(() => (this.canJumpOrRoll = true), 750)
+    }
 
     get jumping() {
         return this.isJumping
