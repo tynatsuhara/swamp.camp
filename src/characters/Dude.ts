@@ -802,6 +802,7 @@ export class Dude extends Component implements DialogueSource {
 
     private triggerDeathHooks() {
         // play death cutscene if applicable
+        // MPTODO multiplayer death logic
         if (this.type === DudeType.PLAYER) {
             if (CutsceneManager.instance.isCutsceneActive(IntroCutscene)) {
                 setTimeout(() => {
