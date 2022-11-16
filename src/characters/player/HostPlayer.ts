@@ -32,6 +32,8 @@ export class HostPlayer extends AbstractPlayer {
         // Determine player movement
         this.doMovementOnHost(updateData.elapsedTimeMillis, playerControls)
 
+        this.droppedItemPickupCheck()
+
         if (controls.isInteractDown() && possibleInteractable) {
             possibleInteractable.interact(this.dude)
         }

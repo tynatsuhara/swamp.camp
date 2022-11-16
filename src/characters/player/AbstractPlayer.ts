@@ -108,8 +108,6 @@ export abstract class AbstractPlayer extends Component {
             speedMultiplier
         )
 
-        this.droppedItemPickupCheck()
-
         if (!playerControls.canProvideInput) {
             return
         }
@@ -174,7 +172,7 @@ export abstract class AbstractPlayer extends Component {
     }
     private pushingUntil = 0
 
-    private droppedItemPickupCheck() {
+    droppedItemPickupCheck() {
         here().droppedItems.forEach((item) => {
             item.checkCollision(this.dude)
         })

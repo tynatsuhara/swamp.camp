@@ -52,5 +52,7 @@ export class GuestPlayer extends AbstractPlayer {
                 possibleInteractable.interact(this.dude)
             }
         }
+
+        this.droppedItemPickupCheck()
     }
 }

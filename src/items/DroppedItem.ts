@@ -1,10 +1,13 @@
 import { Component, Point } from "brigsby/dist"
 import { BoxCollider, Collider } from "brigsby/dist/collision"
+import { PointValue, pt } from "brigsby/dist/Point"
 import { SpriteComponent } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
 import { loadAudio } from "../audio/DeferLoadAudio"
 import { Sounds } from "../audio/Sounds"
 import { Dude } from "../characters/Dude"
+import { session } from "../online/session"
+import { syncFn } from "../online/utils"
 import { here } from "../world/locations/LocationManager"
 import { Item, ItemMetadata, ITEM_METADATA_MAP } from "./Items"
 
@@ -24,11 +27,12 @@ export class DroppedItem extends Component {
      * @param sourceCollider will be ignored to prevent physics issues
      */
     constructor(
+        id: string,
         position: Point,
         item: Item,
         velocity: Point,
-        sourceCollider: Collider,
-        metadata?: ItemMetadata
+        metadata?: ItemMetadata,
+        sourceCollider?: Collider
     ) {
         super()
 
@@ -47,35 +51,43 @@ export class DroppedItem extends Component {
             )
             this.sprite.transform.position = pos
 
-            const colliderSize = new Point(8, 8)
-            this.collider = this.entity.addComponent(
-                new BoxCollider(
-                    pos.plus(this.sprite.transform.dimensions.minus(colliderSize).div(2)),
-                    colliderSize,
-                    DroppedItem.COLLISION_LAYER,
-                    !!sourceCollider ? [sourceCollider] : []
+            this.syncPosition = syncFn(id, ({ x, y }: PointValue) => {
+                this.sprite.transform.position = pt(x, y)
+                this.sprite.transform.depth =
+                    this.sprite.transform.position.y + this.sprite.transform.dimensions.y
+            })
+
+            if (session.isHost()) {
+                const colliderSize = new Point(8, 8)
+                this.collider = this.entity.addComponent(
+                    new BoxCollider(
+                        pos.plus(this.sprite.transform.dimensions.minus(colliderSize).div(2)),
+                        colliderSize,
+                        DroppedItem.COLLISION_LAYER,
+                        !!sourceCollider ? [sourceCollider] : []
+                    )
                 )
-            )
 
-            this.reposition()
+                this.reposition()
 
-            let last = new Date().getTime()
-            const move = () => {
-                if (!this.enabled) {
-                    return
+                let last = new Date().getTime()
+                const move = () => {
+                    if (!this.enabled) {
+                        return
+                    }
+                    const now = new Date().getTime()
+                    const diff = now - last
+                    if (diff > 0) {
+                        this.reposition(velocity)
+                        velocity = velocity.times(0.6)
+                    }
+                    if (velocity.magnitude() >= 0.1) {
+                        requestAnimationFrame(move)
+                    }
+                    last = now
                 }
-                const now = new Date().getTime()
-                const diff = now - last
-                if (diff > 0) {
-                    this.reposition(velocity)
-                    velocity = velocity.times(0.6)
-                }
-                if (velocity.magnitude() >= 0.1) {
-                    requestAnimationFrame(move)
-                }
-                last = now
+                requestAnimationFrame(move)
             }
-            requestAnimationFrame(move)
         }
 
         this.update = () => {
@@ -93,7 +105,10 @@ export class DroppedItem extends Component {
                     this.canPickUp = false
                     setTimeout(() => {
                         if (dude.isAlive && !!this.entity) {
-                            if (dude.inventory.addItem(this.itemType, 1, metadata)) {
+                            if (dude.inventory.canAddItem(this.itemType, 1)) {
+                                if (session.isHost()) {
+                                    dude.inventory.addItem(this.itemType, 1, metadata)
+                                }
                                 here().droppedItems.delete(this)
                                 this.entity.selfDestruct()
                                 setTimeout(() => {
@@ -115,10 +130,11 @@ export class DroppedItem extends Component {
 
     private reposition(delta = new Point(0, 0)) {
         const colliderOffset = this.collider.position.minus(this.sprite.transform.position)
-        this.sprite.transform.position = this.collider
+        const newPos = this.collider
             .moveTo(this.collider.position.plus(delta))
             .minus(colliderOffset)
-        this.sprite.transform.depth =
-            this.sprite.transform.position.y + this.sprite.transform.dimensions.y
+        this.syncPosition(newPos)
     }
+
+    private syncPosition: (pos: PointValue) => void
 }

@@ -1,5 +1,6 @@
 import { Entity, Point } from "brigsby/dist"
 import { Collider } from "brigsby/dist/collision"
+import { PointValue, pt } from "brigsby/dist/Point"
 import { SpriteSource } from "brigsby/dist/sprites"
 import { loadAudio } from "../audio/DeferLoadAudio"
 import { Sounds } from "../audio/Sounds"
@@ -9,6 +10,9 @@ import { ShieldType } from "../characters/weapons/ShieldType"
 import { WeaponType } from "../characters/weapons/WeaponType"
 import { Icon } from "../graphics/OneBitTileset"
 import { Tilesets } from "../graphics/Tilesets"
+import { session } from "../online/session"
+import { syncFn } from "../online/utils"
+import { randomByteString } from "../saves/uuid"
 import { ElementType } from "../world/elements/Elements"
 import { here } from "../world/locations/LocationManager"
 import { DroppedItem } from "./DroppedItem"
@@ -329,6 +333,17 @@ export const ITEM_METADATA_MAP = {
     }),
 }
 
+type SpawnItemArgs = {
+    pos: PointValue
+    item: Item
+    velocity?: PointValue
+    metadata?: ItemMetadata
+}
+
+const addSpawnedItem = (item: DroppedItem) => {
+    here().droppedItems.add(new Entity().addComponent(item))
+}
+
 /**
  * @param position The bottom center where the item should be placed
  */
@@ -336,16 +351,36 @@ export const spawnItem = ({
     pos,
     item,
     velocity = new Point(0, 0),
-    sourceCollider,
     metadata,
-}: {
-    pos: Point
-    item: Item
-    velocity?: Point
-    sourceCollider?: Collider
-    metadata?: ItemMetadata
-}) => {
-    here().droppedItems.add(
-        new Entity().addComponent(new DroppedItem(pos, item, velocity, sourceCollider, metadata))
+    sourceCollider,
+}: SpawnItemArgs & { sourceCollider?: Collider }) => {
+    if (session.isGuest()) {
+        console.warn("guests can't call spawnItem()")
+        return
+    }
+
+    const id = randomByteString()
+
+    syncSpawnedItem({ id, pos, item, velocity, metadata })
+    addSpawnedItem(
+        new DroppedItem(
+            id,
+            pt(pos.x, pos.y),
+            item,
+            pt(velocity.x, velocity.y),
+            metadata,
+            sourceCollider
+        )
     )
 }
+
+const syncSpawnedItem = syncFn(
+    "spawnItem",
+    ({ id, pos, item, velocity, metadata }: SpawnItemArgs & { id: string }) => {
+        if (session.isGuest()) {
+            addSpawnedItem(
+                new DroppedItem(id, pt(pos.x, pos.y), item, pt(velocity.x, velocity.y), metadata)
+            )
+        }
+    }
+)
