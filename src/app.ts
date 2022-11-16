@@ -1,4 +1,5 @@
 import { assets, Engine } from "brigsby/dist"
+import { initializeLogging } from "./debug/logging"
 import { getFilesToLoadForMainMenu } from "./graphics/Tilesets"
 import { SwampCampGame } from "./SwampCampGame"
 import { TEXT_FONT } from "./ui/Text"
@@ -15,6 +16,8 @@ declare global {
 // focusing adds an ugly outline, so automatically blur
 const canvas = <HTMLCanvasElement>document.getElementById("canvas")
 canvas.onfocus = () => canvas.blur()
+
+initializeLogging()
 
 Promise.all([
     // load all required assets
