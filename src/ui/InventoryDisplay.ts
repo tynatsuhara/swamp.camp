@@ -47,16 +47,15 @@ export class InventoryDisplay extends Component {
     private tradingInv: Inventory
     private tradingInvOffset: Point
     private canUseItems = false
+    private get playerInv() {
+        return player().inventory
+    }
 
     constructor() {
         super()
         this.e.addComponent(this)
         this.tooltip = this.e.addComponent(new Tooltip())
         InventoryDisplay.instance = this
-    }
-
-    get playerInv() {
-        return player().inventory
     }
 
     lateUpdate(updateData: UpdateData) {
