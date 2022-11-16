@@ -1,4 +1,5 @@
 import { Component } from "brigsby/dist"
+import { session } from "../../online/session"
 import { WorldTime } from "../WorldTime"
 
 export class Growable extends Component {
@@ -12,13 +13,21 @@ export class Growable extends Component {
     }
 
     lateUpdate() {
+        if (session.isGuest()) {
+            return
+        }
+
         if (WorldTime.instance.time >= this.nextGrowthTime) {
-            const nextGrowthTime = this.growFn()
-            if (nextGrowthTime === undefined) {
-                this.delete()
-            } else {
-                this.nextGrowthTime = nextGrowthTime as number
-            }
+            this.forceGrow()
+        }
+    }
+
+    forceGrow() {
+        const nextGrowthTime = this.growFn()
+        if (nextGrowthTime === undefined) {
+            this.delete()
+        } else {
+            this.nextGrowthTime = nextGrowthTime as number
         }
     }
 }

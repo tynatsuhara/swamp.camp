@@ -20,6 +20,7 @@ import { Color } from "../ui/Color"
 import { DrawMenu } from "../ui/DrawMenu"
 import { UIStateManager } from "../ui/UIStateManager"
 import { ElementType } from "../world/elements/Elements"
+import { Growable } from "../world/elements/Growable"
 import { GroundType } from "../world/ground/Ground"
 import { camp, here, LocationManager } from "../world/locations/LocationManager"
 import { RadiantLocationGenerator } from "../world/locations/RadiantLocationGenerator"
@@ -149,12 +150,23 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
             // }
         },
     ],
+    // [
+    //     InputKey.PERIOD,
+    //     "delete hovered element",
+    //     (input) => {
+    //         const { x, y } = pixelPtToTilePt(input.mousePos)
+    //         here().removeElementAt(x, y)
+    //     },
+    // ],
     [
         InputKey.PERIOD,
-        "delete hovered element",
+        "grow hovered growable",
         (input) => {
-            const { x, y } = pixelPtToTilePt(input.mousePos)
-            here().removeElementAt(x, y)
+            const growable = here()
+                .getElement(pixelPtToTilePt(input.mousePos))
+                ?.entity.getComponent(Growable)
+            console.log(`growable = ${growable}`)
+            growable?.forceGrow()
         },
     ],
     [

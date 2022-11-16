@@ -120,31 +120,29 @@ export class BlackberriesFactory extends ElementFactory<ElementType.BLACKBERRIES
             })
         )
 
-        if (session.isHost()) {
-            e.addComponent(
-                new Growable(nextGrowthTime, () => {
-                    const adjacentSpots = [pos.plusX(1), pos.plusX(-1), pos.plusY(1), pos.plusY(-1)]
-                    const openAdjacentSpots = adjacentSpots.filter(
-                        (pt) => wl.getGround(pt)?.type === GroundType.GRASS && !wl.getElement(pt)
-                    )
+        e.addComponent(
+            new Growable(nextGrowthTime, () => {
+                const adjacentSpots = [pos.plusX(1), pos.plusX(-1), pos.plusY(1), pos.plusY(-1)]
+                const openAdjacentSpots = adjacentSpots.filter(
+                    (pt) => wl.getGround(pt)?.type === GroundType.GRASS && !wl.getElement(pt)
+                )
 
-                    if (openAdjacentSpots.length > 0 && Math.random() < 0.5) {
-                        wl.addElement(this.type, Lists.oneOf(openAdjacentSpots))
-                        nextGrowthTime = this.determineNextGrowthTime()
-                        return nextGrowthTime
-                    } else if (Math.random() < 0.3) {
-                        // No-op. It will take a while to grow
-                        nextGrowthTime = this.determineNextGrowthTime()
-                        return nextGrowthTime
-                    } else {
-                        e.selfDestruct()
-                        wl.addElement(this.type, pos, {
-                            s: state === State.GROWING ? State.NO_BERRIES : State.HAS_BERRIES,
-                        })
-                    }
-                })
-            )
-        }
+                if (openAdjacentSpots.length > 0 && Math.random() < 0.5) {
+                    wl.addElement(this.type, Lists.oneOf(openAdjacentSpots))
+                    nextGrowthTime = this.determineNextGrowthTime()
+                    return nextGrowthTime
+                } else if (Math.random() < 0.3) {
+                    // No-op. It will take a while to grow
+                    nextGrowthTime = this.determineNextGrowthTime()
+                    return nextGrowthTime
+                } else {
+                    e.selfDestruct()
+                    wl.addElement(this.type, pos, {
+                        s: state === State.GROWING ? State.NO_BERRIES : State.HAS_BERRIES,
+                    })
+                }
+            })
+        )
 
         const burnable = e.addComponent(new Burnable(data.b ?? false, [pos]))
 
