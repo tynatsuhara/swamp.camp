@@ -1,4 +1,4 @@
-import { Component, Entity, InputKeyString, Point, profiler, UpdateData } from "brigsby/dist"
+import { Component, Entity, InputKeyString, Point, UpdateData } from "brigsby/dist"
 import { BasicRenderComponent, TextRender } from "brigsby/dist/renderer"
 import {
     AnimatedSpriteComponent,
@@ -11,15 +11,12 @@ import { ShieldType } from "../characters/weapons/ShieldType"
 import { WeaponType } from "../characters/weapons/WeaponType"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
-import { prettyPrint } from "../debug/JSON"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { getInventoryItemActions, ItemAction } from "../items/getInventoryItemActions"
 import { Inventory, ItemStack } from "../items/Inventory"
 import { Item, ItemSpec, ITEM_METADATA_MAP } from "../items/Items"
 import { saveManager } from "../SaveManager"
-import { Elements } from "../world/elements/Elements"
-import { here } from "../world/locations/LocationManager"
 import { Color } from "./Color"
-import { PlaceElementDisplay } from "./PlaceElementDisplay"
 import { TEXT_FONT, TEXT_SIZE } from "./Text"
 import { Tooltip } from "./Tooltip"
 import { UIStateManager } from "./UIStateManager"
@@ -176,8 +173,6 @@ export class InventoryDisplay extends Component {
             : ""
         const count = stack.count > 1 ? " x" + stack.count : ""
 
-        const actions: { verb: string; actionFn: () => void }[] = []
-
         const decrementStack = () => {
             stack.count--
             if (stack.count === 0) {
@@ -186,57 +181,9 @@ export class InventoryDisplay extends Component {
         }
 
         // Only allow actions when in the inventory menu
-        // MPTODO all these actions
-        if (!this.tradingInv) {
-            const wl = here()
-            profiler.showInfo(`item metadata: ${prettyPrint(stack.metadata)}`)
-            if (
-                item.element !== null &&
-                wl.allowPlacing &&
-                Elements.instance.getElementFactory(item.element).canPlaceInLocation(wl)
-            ) {
-                actions.push({
-                    verb: "place",
-                    actionFn: () => {
-                        this.close()
-                        PlaceElementDisplay.instance.startPlacing(stack, decrementStack)
-                    },
-                })
-            }
-            if (item.equippableWeapon) {
-                if (player().weaponType !== item.equippableWeapon) {
-                    actions.push({
-                        verb: "equip",
-                        actionFn: () => {
-                            player().setWeapon(item.equippableWeapon) // client sync fn
-                            this.refreshView()
-                        },
-                    })
-                }
-            }
-            if (item.equippableShield) {
-                if (player().shieldType !== item.equippableShield) {
-                    actions.push({
-                        verb: "equip off-hand",
-                        actionFn: () => {
-                            player().setShield(item.equippableShield) // client sync fn
-                            this.refreshView()
-                        },
-                    })
-                }
-            }
-            if (!!item.consumable) {
-                const { verb, fn: consumeFn } = item.consumable
-                actions.push({
-                    verb,
-                    actionFn: () => {
-                        consumeFn()
-                        decrementStack()
-                        this.refreshView()
-                    },
-                })
-            }
-        }
+        const actions: ItemAction[] = this.tradingInv
+            ? []
+            : getInventoryItemActions(item, stack, decrementStack)
 
         this.checkSetHotKey(stack, item, updateData)
 
