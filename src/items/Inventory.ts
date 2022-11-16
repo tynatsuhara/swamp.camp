@@ -1,6 +1,7 @@
 import { InputKey } from "brigsby/dist"
 import { stringifySorted } from "../debug/JSON"
 import { syncFn } from "../online/utils"
+import { InventoryDisplay } from "../ui/InventoryDisplay"
 import { Item, ItemMetadata, ITEM_METADATA_MAP } from "./Items"
 
 export type ItemStackMetadata = ItemMetadata & {
@@ -42,6 +43,12 @@ export class Inventory {
         return this.stacks.length
     }
 
+    private refreshUI() {
+        if (InventoryDisplay.instance.isShowingInventory(this)) {
+            InventoryDisplay.instance.refreshView()
+        }
+    }
+
     getStack(index: number): ItemStack {
         return this.stacks[index]
     }
@@ -51,6 +58,7 @@ export class Inventory {
     }
 
     setStack(index: number, stack: ItemStack) {
+        this.refreshUI()
         this.stacks[index] = stack
         this.recomputeCountsMap()
     }
@@ -90,6 +98,7 @@ export class Inventory {
         }
 
         this.recomputeCountsMap()
+        this.refreshUI()
 
         return true
     }
@@ -130,10 +139,12 @@ export class Inventory {
                     this.stacks[i] = null
                 }
                 if (count === 0) {
-                    return
+                    break
                 }
             }
         }
+
+        this.refreshUI()
     }
 
     /**

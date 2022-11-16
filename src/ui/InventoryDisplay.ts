@@ -107,7 +107,11 @@ export class InventoryDisplay extends Component {
         })
     }
 
-    private refreshView() {
+    isShowingInventory(inv: Inventory) {
+        return this.playerInv === inv || this.tradingInv === inv
+    }
+
+    refreshView() {
         this.open(this.onClose, this.tradingInv)
     }
 
@@ -203,7 +207,7 @@ export class InventoryDisplay extends Component {
                     actions.push({
                         verb: "equip",
                         actionFn: () => {
-                            player().setWeapon(item.equippableWeapon)
+                            player().setWeapon(item.equippableWeapon) // client sync fn
                             this.refreshView()
                         },
                     })
@@ -216,7 +220,7 @@ export class InventoryDisplay extends Component {
                     actions.push({
                         verb: "equip off-hand",
                         actionFn: () => {
-                            player().setShield(item.equippableShield)
+                            player().setShield(item.equippableShield) // client sync fn
                             this.refreshView()
                         },
                     })
