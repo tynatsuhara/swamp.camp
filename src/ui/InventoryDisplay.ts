@@ -14,7 +14,7 @@ import { Camera } from "../cutscenes/Camera"
 import { prettyPrint } from "../debug/JSON"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Inventory, ItemStack } from "../items/Inventory"
-import { Item, ITEM_METADATA_MAP } from "../items/Items"
+import { Item, ItemSpec, ITEM_METADATA_MAP } from "../items/Items"
 import { saveManager } from "../SaveManager"
 import { Elements } from "../world/elements/Elements"
 import { here } from "../world/locations/LocationManager"
@@ -93,17 +93,19 @@ export class InventoryDisplay extends Component {
         }
     }
 
-    private checkSetHotKey(stack: ItemStack, updateData: UpdateData) {
-        controls.HOT_KEY_OPTIONS.forEach((key) => {
-            if (updateData.input.isKeyDown(key)) {
-                this.playerInv.getStacks().forEach((s) => {
-                    if (s.metadata?.hotKey === key) {
-                        s.metadata.hotKey = undefined
-                    }
-                })
-                stack.metadata.hotKey = key
-            }
-        })
+    private checkSetHotKey(stack: ItemStack, spec: ItemSpec, updateData: UpdateData) {
+        if (spec.equippableWeapon || spec.equippableShield) {
+            controls.HOT_KEY_OPTIONS.forEach((key) => {
+                if (updateData.input.isKeyDown(key)) {
+                    this.playerInv.getStacks().forEach((s) => {
+                        if (s.metadata?.hotKey === key) {
+                            s.metadata.hotKey = undefined
+                        }
+                    })
+                    stack.metadata.hotKey = key
+                }
+            })
+        }
     }
 
     isShowingInventory(inv: Inventory) {
@@ -211,8 +213,6 @@ export class InventoryDisplay extends Component {
                         },
                     })
                 }
-
-                this.checkSetHotKey(stack, updateData)
             }
             if (item.equippableShield) {
                 if (player().shieldType !== item.equippableShield) {
@@ -224,8 +224,6 @@ export class InventoryDisplay extends Component {
                         },
                     })
                 }
-
-                this.checkSetHotKey(stack, updateData)
             }
             if (!!item.consumable) {
                 const { verb, fn: consumeFn } = item.consumable
@@ -239,6 +237,8 @@ export class InventoryDisplay extends Component {
                 })
             }
         }
+
+        this.checkSetHotKey(stack, item, updateData)
 
         // We currently only support up to 2 interaction types per item
         const interactButtonOrder: [string, () => boolean][] = [
