@@ -96,6 +96,7 @@ export const syncData = <T extends object>(id: string, data: T, onChange = (upda
  * If the syncFn returns nothing, it will be propagated from the host to other clients.
  * If the syncFn returns the string "reject", it will cancel the propagation.
  */
+// MPTODO: Make it so the player ID is passed and used for restricting (eg I shouldn't be able to send the host a different player's UUID to equip a certain weapon)
 export const clientSyncFn = <T extends any[]>(
     id: string,
     fn: (trusted: boolean, ...args: T) => "reject" | void
