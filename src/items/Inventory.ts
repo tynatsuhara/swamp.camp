@@ -10,13 +10,21 @@ export type ItemStackMetadata = ItemMetadata & {
 
 export class ItemStack {
     readonly item: Item
-    count: number
-    readonly metadata: ItemStackMetadata
+    readonly count: number
+    readonly metadata: Readonly<ItemStackMetadata>
 
     constructor(item: Item, count: number, metadata: ItemStackMetadata = {}) {
         this.item = item
         this.count = count
         this.metadata = metadata
+    }
+
+    withCount(newCount: number) {
+        return new ItemStack(this.item, newCount, this.metadata)
+    }
+
+    withMetadata(metadata: ItemStackMetadata) {
+        return new ItemStack(this.item, this.count, metadata)
     }
 }
 
@@ -58,8 +66,8 @@ export class Inventory {
     }
 
     setStack(index: number, stack: ItemStack) {
+        this.stacks[index] = !stack?.count ? null : stack
         this.refreshUI()
-        this.stacks[index] = stack
         this.recomputeCountsMap()
     }
 
@@ -79,25 +87,24 @@ export class Inventory {
 
         // First, add to existing stacks to preserve space.
         for (let i = 0; i < this.stacks.length && leftToAdd > 0; i++) {
-            const slotValue = this.stacks[i]
+            const slotValue = this.getStack(i)
             if (slotValue?.item === item && doesMetadataMatch(slotValue.metadata, metadata)) {
                 const addedHere = Math.min(stackLimit - slotValue.count, leftToAdd)
-                slotValue.count += addedHere
+                this.setStack(i, slotValue.withCount(slotValue.count + addedHere))
                 leftToAdd -= addedHere
             }
         }
 
         // Then add to empty slots
         for (let i = 0; i < this.stacks.length && leftToAdd > 0; i++) {
-            const slotValue = this.stacks[i]
+            const slotValue = this.getStack(i)
             if (!slotValue) {
                 const addedHere = Math.min(stackLimit, leftToAdd)
                 leftToAdd -= addedHere
-                this.stacks[i] = new ItemStack(item, addedHere, metadata)
+                this.setStack(i, new ItemStack(item, addedHere, metadata))
             }
         }
 
-        this.recomputeCountsMap()
         this.refreshUI()
 
         return true
@@ -109,7 +116,7 @@ export class Inventory {
         let availableRoom = 0
 
         for (let i = 0; i < this.stacks.length && availableRoom < count; i++) {
-            const slotValue = this.stacks[i]
+            const slotValue = this.getStack(i)
             if (!slotValue) {
                 availableRoom += stackLimit
             } else if (slotValue.item === item) {
@@ -129,15 +136,14 @@ export class Inventory {
         this.countMap.set(item, currentCount - count)
 
         for (let i = 0; i < this.stacks.length; i++) {
-            const slotValue = this.stacks[i]
+            const slotValue = this.getStack(i)
             if (slotValue?.item === item) {
-                while (slotValue.count > 0 && count > 0) {
+                let newSlotCount = slotValue.count
+                while (newSlotCount > 0 && count > 0) {
                     count--
-                    slotValue.count--
+                    newSlotCount--
                 }
-                if (slotValue.count === 0) {
-                    this.stacks[i] = null
-                }
+                this.setStack(i, slotValue.withCount(newSlotCount))
                 if (count === 0) {
                     break
                 }

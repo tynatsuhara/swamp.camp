@@ -1,6 +1,9 @@
 import { profiler } from "brigsby/dist/Profiler"
+import { Dude } from "../characters/Dude"
 import { player } from "../characters/player/index"
 import { prettyPrint } from "../debug/JSON"
+import { session } from "../online/session"
+import { clientSyncFn } from "../online/utils"
 import { InventoryDisplay } from "../ui/InventoryDisplay"
 import { PlaceElementDisplay } from "../ui/PlaceElementDisplay"
 import { Elements } from "../world/elements/Elements"
@@ -12,6 +15,16 @@ export type ItemAction = {
     verb: string
     actionFn: () => void
 }
+
+// MPTODO
+const consume = clientSyncFn("consume", (_, dudeUUID: string, invIndex: number) => {
+    if (session.isHost()) {
+        const inv = Dude.get(dudeUUID).inventory
+        let stack = inv.getStack(invIndex)
+        stack = stack.withCount(stack.count - 1)
+        inv.setStack(invIndex, stack)
+    }
+})
 
 export const getInventoryItemActions = (
     item: ItemSpec,
@@ -31,7 +44,7 @@ export const getInventoryItemActions = (
             verb: "place",
             actionFn: () => {
                 InventoryDisplay.instance.close()
-                PlaceElementDisplay.instance.startPlacing(stack, decrementStack)
+                PlaceElementDisplay.instance.startPlacing(stack.count, stack, decrementStack)
             },
         })
     }
@@ -60,7 +73,7 @@ export const getInventoryItemActions = (
         }
     }
 
-    if (!!item.consumable) {
+    if (item.consumable) {
         const { verb, fn: consumeFn } = item.consumable
         actions.push({
             verb,

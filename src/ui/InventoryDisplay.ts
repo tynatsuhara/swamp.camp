@@ -13,7 +13,7 @@ import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { getInventoryItemActions, ItemAction } from "../items/getInventoryItemActions"
-import { Inventory, ItemStack } from "../items/Inventory"
+import { Inventory } from "../items/Inventory"
 import { Item, ItemSpec, ITEM_METADATA_MAP } from "../items/Items"
 import { saveManager } from "../SaveManager"
 import { Color } from "./Color"
@@ -75,7 +75,7 @@ export class InventoryDisplay extends Component {
 
         if (this.trackedTile) {
             this.doDrag(hoverInv, hoverIndex)
-        } else if (hoverIndex > -1 && !!hoverInv.getStack(hoverIndex)) {
+        } else if (hoverIndex > -1 && hoverInv.getStack(hoverIndex)) {
             this.doHover(hoverInv, hoverIndex, updateData)
         } else {
             this.tooltip.clear()
@@ -90,23 +90,30 @@ export class InventoryDisplay extends Component {
         }
     }
 
-    private checkSetHotKey(stack: ItemStack, spec: ItemSpec, updateData: UpdateData) {
-        if (spec.equippableWeapon || spec.equippableShield) {
-            controls.HOT_KEY_OPTIONS.forEach((key) => {
-                if (updateData.input.isKeyDown(key)) {
-                    this.playerInv.getStacks().forEach((s) => {
-                        if (s.metadata?.hotKey === key) {
-                            s.metadata.hotKey = undefined
-                        }
-                    })
-                    stack.metadata.hotKey = key
-                }
-            })
+    private checkSetHotKey(index: number, spec: ItemSpec, updateData: UpdateData) {
+        if (!spec.equippableWeapon && !spec.equippableShield) {
+            return
         }
+
+        controls.HOT_KEY_OPTIONS.forEach((hotKey) => {
+            if (updateData.input.isKeyDown(hotKey)) {
+                this.playerInv.getStacks().forEach((s, i) => {
+                    if (s.metadata?.hotKey === hotKey) {
+                        this.playerInv.setStack(
+                            i,
+                            s.withMetadata({ ...s.metadata, hotKey: undefined })
+                        )
+                    }
+                })
+
+                const stack = this.playerInv.getStack(index)
+                this.playerInv.setStack(index, stack.withMetadata({ ...stack.metadata, hotKey }))
+            }
+        })
     }
 
     isShowingInventory(inv: Inventory) {
-        return this.playerInv === inv || this.tradingInv === inv
+        return this.isOpen && (this.playerInv === inv || this.tradingInv === inv)
     }
 
     refreshView() {
@@ -166,18 +173,17 @@ export class InventoryDisplay extends Component {
     private doHover(hoverInv: Inventory, hoverIndex: number, updateData: UpdateData) {
         // we're hovering over an item
         this.tooltip.position = controls.getMousePos()
-        const stack = hoverInv.getStack(hoverIndex)
+        let stack = hoverInv.getStack(hoverIndex)
         const item = ITEM_METADATA_MAP[stack.item]
         const hotKeyPrefix = stack.metadata.hotKey
             ? `(${InputKeyString.for(stack.metadata.hotKey)}) `
             : ""
         const count = stack.count > 1 ? " x" + stack.count : ""
 
+        // MPTODO probably get rid of this
         const decrementStack = () => {
-            stack.count--
-            if (stack.count === 0) {
-                hoverInv.setStack(hoverIndex, null)
-            }
+            stack = stack.withCount(stack.count - 1)
+            hoverInv.setStack(hoverIndex, stack)
         }
 
         // Only allow actions when in the inventory menu
@@ -185,7 +191,7 @@ export class InventoryDisplay extends Component {
             ? []
             : getInventoryItemActions(item, stack, decrementStack)
 
-        this.checkSetHotKey(stack, item, updateData)
+        this.checkSetHotKey(hoverIndex, item, updateData)
 
         // We currently only support up to 2 interaction types per item
         const interactButtonOrder: [string, () => boolean][] = [
@@ -213,7 +219,7 @@ export class InventoryDisplay extends Component {
     private checkForPickUp(hoverInv: Inventory, hoverIndex: number) {
         if (controls.isInventoryStackPickUp()) {
             const hoveredItemStack = hoverInv?.getStack(hoverIndex)
-            if (!!hoveredItemStack) {
+            if (hoveredItemStack) {
                 const { item, count } = hoveredItemStack
                 const otherInv = hoverInv === this.playerInv ? this.tradingInv : this.playerInv
                 if (
@@ -240,7 +246,11 @@ export class InventoryDisplay extends Component {
     }
 
     private stripHotKeysFromOtherInv() {
-        this.tradingInv?.getStacks().forEach((s) => (s.metadata.hotKey = undefined))
+        this.tradingInv?.getStacks().forEach((s, i) => {
+            if (s.metadata.hotKey) {
+                this.tradingInv.setStack(i, s.withMetadata({ ...s.metadata, hotKey: undefined }))
+            }
+        })
     }
 
     private getOffsetForInv(inv: Inventory) {
@@ -340,7 +350,7 @@ export class InventoryDisplay extends Component {
         for (let i = 0; i < inv.size; i++) {
             const stack = inv.getStack(i)
             let tile = null
-            if (!!stack) {
+            if (stack) {
                 const itemMeta = ITEM_METADATA_MAP[stack.item]
                 if (!itemMeta) {
                     console.log(`missing item metadata for ${stack.item}`)
