@@ -449,6 +449,8 @@ export class Dude extends Component implements DialogueSource {
         this.updateActiveConditions(elapsedTimeMillis)
 
         this.jumpingAnimator?.update(elapsedTimeMillis)
+
+        this.droppedItemPickupCheck()
     }
 
     equipFirstWeaponInInventory() {
@@ -1357,6 +1359,14 @@ export class Dude extends Component implements DialogueSource {
         const pos = this.tile
         if (pos.x < -range || pos.x > range || pos.y < -range || pos.y > range) {
             return pos.x > range - EAST_COAST_OCEAN_WIDTH ? "ocean" : "swamp"
+        }
+    }
+
+    private droppedItemPickupCheck() {
+        if (this.type === DudeType.PLAYER) {
+            here().droppedItems.forEach((item) => {
+                item.checkCollision(this)
+            })
         }
     }
 

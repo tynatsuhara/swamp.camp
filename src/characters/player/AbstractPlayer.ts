@@ -172,12 +172,6 @@ export abstract class AbstractPlayer extends Component {
     }
     private pushingUntil = 0
 
-    droppedItemPickupCheck() {
-        here().droppedItems.forEach((item) => {
-            item.checkCollision(this.dude)
-        })
-    }
-
     checkHotKeys(updateData: UpdateData) {
         controls.HOT_KEY_OPTIONS.forEach((hotKey) => {
             if (updateData.input.isKeyDown(hotKey)) {
