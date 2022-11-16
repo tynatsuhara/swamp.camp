@@ -66,7 +66,9 @@ export class HittableResource extends Hittable {
 
         if (finishingMove) {
             this.finishCallback()
-            this.entity.selfDestruct()
+            if (session.isHost()) {
+                this.entity.selfDestruct()
+            }
         }
     }
 
