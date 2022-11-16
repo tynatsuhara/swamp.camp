@@ -83,21 +83,24 @@ export class MeleeWeapon extends Weapon {
     }
 
     private damageEnemies() {
-        if (!this.enabled || session.isGuest()) {
+        if (!this.enabled) {
             return
         }
+
         const attackDistance = this.getRange() + 4 // add a tiny buffer for small weapons like the dagger to still work
 
         // TODO maybe only allow big weapons to hit multiple targets
         const enemies = Weapon.getEnemiesInRange(this.dude, attackDistance)
 
-        enemies.forEach((d) => {
-            d.damage(1, {
-                direction: d.standingPosition.minus(this.dude.standingPosition),
-                knockback: 30,
-                attacker: this.dude,
+        if (session.isHost()) {
+            enemies.forEach((d) => {
+                d.damage(1, {
+                    direction: d.standingPosition.minus(this.dude.standingPosition),
+                    knockback: 30,
+                    attacker: this.dude,
+                })
             })
-        })
+        }
 
         if (this.dude.type === DudeType.PLAYER && enemies.length === 0) {
             Weapon.hitResources(this.dude)

@@ -4,6 +4,7 @@ import { DudeFactory } from "../../characters/DudeFactory"
 import { DudeType } from "../../characters/DudeType"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item, spawnItem } from "../../items/Items"
+import { session } from "../../online/session"
 import { Ground } from "../ground/Ground"
 import { Location } from "../locations/Location"
 import { camp } from "../locations/LocationManager"
@@ -43,14 +44,16 @@ export class MushroomFactory extends ElementFactory<ElementType.MUSHROOM, { ngt:
             new Hittable(hittableCenter, [tile.transform], (dir) => {
                 e.selfDestruct()
                 const itemDirection = dir.randomlyShifted(0.2).normalized()
-                spawnItem({
-                    pos: pos
-                        .times(TILE_SIZE)
-                        .plusY(TILE_SIZE)
-                        .plusX(TILE_SIZE / 2),
-                    item: Item.MUSHROOM,
-                    velocity: itemDirection.times(5),
-                })
+                if (session.isHost()) {
+                    spawnItem({
+                        pos: pos
+                            .times(TILE_SIZE)
+                            .plusY(TILE_SIZE)
+                            .plusX(TILE_SIZE / 2),
+                        item: Item.MUSHROOM,
+                        velocity: itemDirection.times(5),
+                    })
+                }
             })
         )
 

@@ -31,6 +31,7 @@ export abstract class Weapon extends Component {
             )
     }
 
+    // Called on host and client
     static hitResources(dude: Dude) {
         const interactDistance = 20
         const interactCenter = dude.standingPosition.minus(new Point(0, 7))
