@@ -49,7 +49,7 @@ export const getInventoryItemActions = (playerInvIndex: number): ItemAction[] =>
             verb: "place",
             actionFn: () => {
                 InventoryDisplay.instance.close()
-                PlaceElementDisplay.instance.startPlacing(stack.count, stack, () => {
+                PlaceElementDisplay.instance.startPlacing(stack, () => {
                     /* todo */
                 })
             },

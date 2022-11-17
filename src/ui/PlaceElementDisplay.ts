@@ -16,8 +16,7 @@ export class PlaceElementDisplay extends Component {
 
     private e: Entity = new Entity([this])
 
-    private count: number
-    private stack: Omit<ItemStack, "count">
+    private stack: ItemStack
     private element: ElementType
     private elementFactory: ElementFactory<any>
     private placingFrame: PlaceElementFrame
@@ -33,7 +32,7 @@ export class PlaceElementDisplay extends Component {
     }
 
     update(updateData: UpdateData) {
-        if (this.count === 0) {
+        if (this.stack?.count === 0) {
             return
         }
 
@@ -48,8 +47,7 @@ export class PlaceElementDisplay extends Component {
         this.placingFrame?.delete()
     }
 
-    startPlacing(count: number, stack: Omit<ItemStack, "count">, successFn: () => void) {
-        this.count = count
+    startPlacing(stack: ItemStack, successFn: () => void) {
         this.stack = stack
         this.successFn = successFn
 
@@ -63,7 +61,7 @@ export class PlaceElementDisplay extends Component {
 
     // Should only be called by PlaceElementFrame
     finishPlacing(elementPos: Point) {
-        this.count--
+        this.stack = this.stack.withCount(this.stack.count - 1)
         this.successFn() // decrement and maybe remove from inv
 
         const data = this.stack.metadata
@@ -95,7 +93,7 @@ export class PlaceElementDisplay extends Component {
             })
         }
 
-        if (this.count === 0) {
+        if (this.stack.count === 0) {
             this.close()
         }
     }
