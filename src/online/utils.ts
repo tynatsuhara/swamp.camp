@@ -107,11 +107,12 @@ export const syncData = <T extends object>(id: string, data: T, onChange = (upda
  */
 export const clientSyncFn = <T extends any[]>(
     id: string,
-    mode: "all" | "host-only",
+    mode: "all" | "host-only" | "caller-and-host",
     fn: (auth: { trusted: boolean; dudeUUID: string | undefined }, ...args: T) => "reject" | void
 ): ((...args: T) => void) => {
     const [send, receive] = session.action<T>(id)
 
+    // the fn that actually gets called on the originator's machine
     const wrappedFn = (...args: T) => {
         const hostAuth = {
             trusted: true,
@@ -131,15 +132,21 @@ export const clientSyncFn = <T extends any[]>(
             send(args, session.initializedPeers)
         }
 
-        // call fn on the sender's machine
-        if (session.isHost() || mode !== "host-only") {
-            return fn(hostAuth, ...args)
+        // don't execute on guest
+        if (session.isGuest() && mode === "host-only") {
+            return
         }
+
+        // call fn on the sender's machine
+        return fn(hostAuth, ...args)
     }
 
     receive((args, peerId) => {
-        if (session.isGuest() && peerId !== session.hostId) {
-            return
+        if (session.isGuest()) {
+            // guests should only listen for the host, and should only listen to the host in "all" mode
+            if (peerId !== session.hostId || mode !== "all") {
+                return
+            }
         }
 
         const auth = {
@@ -150,16 +157,14 @@ export const clientSyncFn = <T extends any[]>(
                 : undefined,
         }
 
-        if (session.isHost() || mode !== "host-only") {
-            // call the fn on the receiver's machine
-            const result = fn(auth, ...args)
+        // call the fn on the receiver's machine
+        const result = fn(auth, ...args)
 
-            // propagate
-            if (mode === "all" && session.isHost()) {
-                const otherPeers = session.getPeers().filter((p) => p !== peerId)
-                if (result !== "reject" && otherPeers.length > 0) {
-                    send(args, otherPeers)
-                }
+        // propagate
+        if (mode === "all" && session.isHost()) {
+            const otherPeers = session.getPeers().filter((p) => p !== peerId)
+            if (result !== "reject" && otherPeers.length > 0) {
+                send(args, otherPeers)
             }
         }
     })

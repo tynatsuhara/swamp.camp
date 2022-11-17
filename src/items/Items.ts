@@ -5,6 +5,7 @@ import { SpriteSource } from "brigsby/dist/sprites"
 import { loadAudio } from "../audio/DeferLoadAudio"
 import { Sounds } from "../audio/Sounds"
 import { Condition } from "../characters/Condition"
+import { Dude } from "../characters/Dude"
 import { player } from "../characters/player"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { WeaponType } from "../characters/weapons/WeaponType"
@@ -72,7 +73,7 @@ export enum Item {
 
 window["Item"] = Item
 
-type Consumable = { verb: string; fn: () => void }
+type Consumable = { verb: string; fn: (consumer: Dude) => void }
 
 // Items of the same type can have different metadata
 // eg enchantments on weapons, owners of items, etc.
@@ -178,12 +179,14 @@ export const ITEM_METADATA_MAP = {
         element: ElementType.MUSHROOM,
         consumable: {
             verb: "eat",
-            fn: () => {
-                Sounds.play(...SOUNDS.eat)
+            fn: (consumer) => {
+                if (consumer === player()) {
+                    Sounds.play(...SOUNDS.eat)
+                }
                 if (session.isHost()) {
-                    player().heal(1)
+                    consumer.heal(1)
                     if (Math.random() < 0.25) {
-                        player().addCondition(Condition.POISONED, 2_500 + Math.random() * 5_000)
+                        consumer.addCondition(Condition.POISONED, 2_500 + Math.random() * 5_000)
                     }
                 }
             },
@@ -207,9 +210,13 @@ export const ITEM_METADATA_MAP = {
         stackLimit: 1,
         consumable: {
             verb: "drink",
-            fn: () => {
-                player().addCondition(Condition.HEALING, 10_000)
-                Sounds.play(...SOUNDS.drink)
+            fn: (consumer) => {
+                if (consumer === player()) {
+                    Sounds.play(...SOUNDS.drink)
+                }
+                if (session.isHost()) {
+                    consumer.addCondition(Condition.HEALING, 10_000)
+                }
             },
         },
     }),
@@ -224,9 +231,13 @@ export const ITEM_METADATA_MAP = {
         stackLimit: 1,
         consumable: {
             verb: "drink",
-            fn: () => {
-                player().removeCondition(Condition.POISONED)
-                Sounds.play(...SOUNDS.drink)
+            fn: (consumer) => {
+                if (consumer === player()) {
+                    Sounds.play(...SOUNDS.drink)
+                }
+                if (session.isHost()) {
+                    consumer.removeCondition(Condition.POISONED)
+                }
             },
         },
     }),
@@ -235,9 +246,13 @@ export const ITEM_METADATA_MAP = {
         inventoryIcon: "meat1",
         consumable: {
             verb: "eat",
-            fn: () => {
-                player().heal(1)
-                Sounds.play(...SOUNDS.eat)
+            fn: (consumer) => {
+                if (consumer === player()) {
+                    Sounds.play(...SOUNDS.eat)
+                }
+                if (session.isHost()) {
+                    consumer.heal(1)
+                }
             },
         },
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("meat1"),
@@ -247,8 +262,13 @@ export const ITEM_METADATA_MAP = {
         inventoryIcon: "berries",
         consumable: {
             verb: "eat",
-            fn: () => {
-                player().heal(0.25), Sounds.play(...SOUNDS.eat)
+            fn: (consumer) => {
+                if (consumer === player()) {
+                    Sounds.play(...SOUNDS.eat)
+                }
+                if (session.isHost()) {
+                    consumer.heal(0.25)
+                }
             },
         },
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("berries"),

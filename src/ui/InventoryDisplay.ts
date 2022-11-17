@@ -173,23 +173,15 @@ export class InventoryDisplay extends Component {
     private doHover(hoverInv: Inventory, hoverIndex: number, updateData: UpdateData) {
         // we're hovering over an item
         this.tooltip.position = controls.getMousePos()
-        let stack = hoverInv.getStack(hoverIndex)
+        const stack = hoverInv.getStack(hoverIndex)
         const item = ITEM_METADATA_MAP[stack.item]
         const hotKeyPrefix = stack.metadata.hotKey
             ? `(${InputKeyString.for(stack.metadata.hotKey)}) `
             : ""
         const count = stack.count > 1 ? " x" + stack.count : ""
 
-        // MPTODO probably get rid of this
-        const decrementStack = () => {
-            stack = stack.withCount(stack.count - 1)
-            hoverInv.setStack(hoverIndex, stack)
-        }
-
         // Only allow actions when in the inventory menu
-        const actions: ItemAction[] = this.tradingInv
-            ? []
-            : getInventoryItemActions(item, stack, decrementStack)
+        const actions: ItemAction[] = this.tradingInv ? [] : getInventoryItemActions(hoverIndex)
 
         this.checkSetHotKey(hoverIndex, item, updateData)
 

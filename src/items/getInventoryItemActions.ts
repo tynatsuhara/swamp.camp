@@ -2,31 +2,33 @@ import { profiler } from "brigsby/dist/Profiler"
 import { Dude } from "../characters/Dude"
 import { player } from "../characters/player/index"
 import { prettyPrint } from "../debug/JSON"
+import { session } from "../online/session"
 import { clientSyncFn } from "../online/utils"
 import { InventoryDisplay } from "../ui/InventoryDisplay"
 import { PlaceElementDisplay } from "../ui/PlaceElementDisplay"
 import { Elements } from "../world/elements/Elements"
 import { here } from "../world/locations/LocationManager"
-import { ItemStack } from "./Inventory"
-import { ItemSpec } from "./Items"
+import { ITEM_METADATA_MAP } from "./Items"
 
 export type ItemAction = {
     verb: string
     actionFn: () => void
 }
 
-const consume = clientSyncFn("consume", "host-only", ({ dudeUUID }, invIndex: number) => {
-    const inv = Dude.get(dudeUUID).inventory
-    let stack = inv.getStack(invIndex)
-    stack = stack.withCount(stack.count - 1)
-    inv.setStack(invIndex, stack)
+const consume = clientSyncFn("consume", "caller-and-host", ({ dudeUUID }, invIndex: number) => {
+    const dude = Dude.get(dudeUUID)
+    const stack = dude.inventory.getStack(invIndex)
+    ITEM_METADATA_MAP[stack.item].consumable?.fn(dude)
+
+    if (session.isHost()) {
+        dude.inventory.setStack(invIndex, stack.withCount(stack.count - 1))
+    }
 })
 
-export const getInventoryItemActions = (
-    item: ItemSpec,
-    stack: ItemStack,
-    decrementStack: () => void
-): ItemAction[] => {
+export const getInventoryItemActions = (playerInvIndex: number): ItemAction[] => {
+    const stack = player().inventory.getStack(playerInvIndex)
+    const item = ITEM_METADATA_MAP[stack.item]
+
     profiler.showInfo(`item metadata: ${prettyPrint(stack.metadata)}`)
     const wl = here()
     const actions: ItemAction[] = []
@@ -40,7 +42,9 @@ export const getInventoryItemActions = (
             verb: "place",
             actionFn: () => {
                 InventoryDisplay.instance.close()
-                PlaceElementDisplay.instance.startPlacing(stack.count, stack, decrementStack)
+                PlaceElementDisplay.instance.startPlacing(stack.count, stack, () => {
+                    /* todo */
+                })
             },
         })
     }
@@ -74,8 +78,7 @@ export const getInventoryItemActions = (
         actions.push({
             verb,
             actionFn: () => {
-                consumeFn()
-                decrementStack()
+                consume(playerInvIndex)
                 InventoryDisplay.instance.refreshView()
             },
         })
