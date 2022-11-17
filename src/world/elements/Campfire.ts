@@ -90,7 +90,6 @@ export class CampfireFactory extends ElementFactory<ElementType.CAMPFIRE, SaveDa
         // const [sendFireUpdate, receiveFireUpdate] = wl.elementAction<{ logCount: number }>(pos)
 
         const updateFire = (logCount: number) => {
-            console.log(`update fire called: ${logCount}`)
             logSprite.enabled = logCount > Campfire.LOG_CAPACITY / 2
             logSpriteSmall.enabled = logCount > 0 && !logSprite.enabled
 
@@ -189,24 +188,18 @@ export class Campfire extends Component implements DialogueSource {
         this.updateFire = updateFire
         updateFire(this.logs)
 
-        this.addLogs = clientSyncFn(
-            id,
-            "all",
-            // MPTODO use dudeUUID
-            ({ dudeUUID }, logsTransferred: number) => {
-                console.log(dudeUUID)
-                const interactingPlayer = Dude.get(dudeUUID)
-                if (session.isHost()) {
-                    if (logsTransferred === -1) {
-                        interactingPlayer.setShield(ShieldType.TORCH)
-                    }
-                    if (logsTransferred > 0) {
-                        interactingPlayer.inventory.removeItem(Item.WOOD, logsTransferred)
-                    }
+        this.addLogs = clientSyncFn(id, "all", ({ dudeUUID }, logsTransferred: number) => {
+            const interactingPlayer = Dude.get(dudeUUID)
+            if (session.isHost()) {
+                if (logsTransferred === -1) {
+                    interactingPlayer.setShield(ShieldType.TORCH)
                 }
-                this._addLogs(logsTransferred)
+                if (logsTransferred > 0) {
+                    interactingPlayer.inventory.removeItem(Item.WOOD, logsTransferred)
+                }
             }
-        )
+            this._addLogs(logsTransferred)
+        })
     }
 
     static getLightSizeForLogCount(logs: number) {
