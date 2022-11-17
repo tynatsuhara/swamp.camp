@@ -12,7 +12,6 @@ import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { CraftingRecipe, CraftingRecipeCategory } from "../items/CraftingRecipe"
 import { Item, ITEM_METADATA_MAP } from "../items/Items"
-import { session } from "../online/session"
 import { clientSyncFn } from "../online/utils"
 import { Color } from "./Color"
 import { TEXT_FONT, TEXT_SIZE } from "./Text"
@@ -330,8 +329,10 @@ export class CraftingMenu extends Component {
         return [...sprites, renderComp]
     }
 
-    private doCraftOnHost = clientSyncFn("craft", ({ dudeUUID }, recipe: CraftingRecipe) => {
-        if (session.isHost()) {
+    private doCraftOnHost = clientSyncFn(
+        "craft",
+        "host-only",
+        ({ dudeUUID }, recipe: CraftingRecipe) => {
             const craftingPlayer = Dude.get(dudeUUID)
             if (!this.canCraft(craftingPlayer, recipe)) {
                 return "reject"
@@ -341,7 +342,7 @@ export class CraftingMenu extends Component {
             })
             craftingPlayer.inventory.addItem(recipe.output)
         }
-    })
+    )
 
     // caching stuff
     private itemIcons = new Map<Item, StaticSpriteSource>()

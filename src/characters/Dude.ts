@@ -295,6 +295,7 @@ export class Dude extends Component implements DialogueSource {
         }
         this.setWeapon = clientSyncFn(
             this.syncId("eqw"),
+            "all",
             ({ trusted, dudeUUID }, type: WeaponType) => {
                 if (this.weapon?.getType() === type) {
                     return
@@ -316,6 +317,7 @@ export class Dude extends Component implements DialogueSource {
         }
         this.setShield = clientSyncFn(
             this.syncId("eqs"),
+            "all",
             ({ trusted, dudeUUID }, type: ShieldType) => {
                 if (this.shield?.type === type) {
                     return

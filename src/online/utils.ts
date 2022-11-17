@@ -92,6 +92,10 @@ export const syncData = <T extends object>(id: string, data: T, onChange = (upda
  * Similar to syncFn, but can be invoked on either clients or the host.
  * If the client invocation is accepted by the host, it will be forwarded to other clients.
  *
+ * @param mode
+ *   - all: the fn will be called on all hosts (as long as the fn doesn't return "reject" on host)
+ *   - host-only: the fn will only execute on the host
+ *
  * The syncFn receives an auth object:
  *   - auth.trusted will be true if:
  *     1) The function is invoked locally OR
@@ -103,6 +107,7 @@ export const syncData = <T extends object>(id: string, data: T, onChange = (upda
  */
 export const clientSyncFn = <T extends any[]>(
     id: string,
+    mode: "all" | "host-only",
     fn: (auth: { trusted: boolean; dudeUUID: string | undefined }, ...args: T) => "reject" | void
 ): ((...args: T) => void) => {
     const [send, receive] = session.action<T>(id)
@@ -127,13 +132,16 @@ export const clientSyncFn = <T extends any[]>(
         }
 
         // call fn on the sender's machine
-        return fn(hostAuth, ...args)
+        if (session.isHost() || mode !== "host-only") {
+            return fn(hostAuth, ...args)
+        }
     }
 
     receive((args, peerId) => {
         if (session.isGuest() && peerId !== session.hostId) {
             return
         }
+
         const auth = {
             trusted: !session.isHost(), // only the host should be untrusting
             // MPTODO peerToMultiplayerId only gets populated on the host right now
@@ -141,10 +149,18 @@ export const clientSyncFn = <T extends any[]>(
                 ? ONLINE_PLAYER_DUDE_ID_PREFIX + session.peerToMultiplayerId[peerId]
                 : undefined,
         }
-        const result = fn(auth, ...args)
-        const otherPeers = session.getPeers().filter((p) => p !== peerId)
-        if (result !== "reject" && otherPeers.length > 0) {
-            send(args, otherPeers)
+
+        if (session.isHost() || mode !== "host-only") {
+            // call the fn on the receiver's machine
+            const result = fn(auth, ...args)
+
+            // propagate
+            if (mode === "all" && session.isHost()) {
+                const otherPeers = session.getPeers().filter((p) => p !== peerId)
+                if (result !== "reject" && otherPeers.length > 0) {
+                    send(args, otherPeers)
+                }
+            }
         }
     })
 

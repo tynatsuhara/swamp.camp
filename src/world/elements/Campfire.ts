@@ -191,6 +191,7 @@ export class Campfire extends Component implements DialogueSource {
 
         this.addLogs = clientSyncFn(
             id,
+            "all",
             // MPTODO use dudeUUID
             ({ dudeUUID }, logsTransferred: number) => {
                 console.log(dudeUUID)

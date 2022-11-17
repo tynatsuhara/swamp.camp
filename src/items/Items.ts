@@ -179,10 +179,12 @@ export const ITEM_METADATA_MAP = {
         consumable: {
             verb: "eat",
             fn: () => {
-                player().heal(1)
                 Sounds.play(...SOUNDS.eat)
-                if (Math.random() < 0.25) {
-                    player().addCondition(Condition.POISONED, 2_500 + Math.random() * 5_000)
+                if (session.isHost()) {
+                    player().heal(1)
+                    if (Math.random() < 0.25) {
+                        player().addCondition(Condition.POISONED, 2_500 + Math.random() * 5_000)
+                    }
                 }
             },
         },
