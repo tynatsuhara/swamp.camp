@@ -127,14 +127,14 @@ export const clientSyncFn = <T extends any[]>(
         if (session.isGuest()) {
             // if you're a guest, you can only talk directly to the host
             send(args, session.hostId)
-        } else {
+
+            // don't execute on guest
+            if (mode === "host-only") {
+                return
+            }
+        } else if (mode === "all") {
             // host talks to everyone
             send(args, session.initializedPeers)
-        }
-
-        // don't execute on guest
-        if (session.isGuest() && mode === "host-only") {
-            return
         }
 
         // call fn on the sender's machine
