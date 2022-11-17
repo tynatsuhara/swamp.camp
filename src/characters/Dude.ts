@@ -271,26 +271,20 @@ export class Dude extends Component implements DialogueSource {
 
         // Synchronized host->client functions
 
-        const makeSyncFn = <T extends any[], R>(
-            namespace: string,
-            fn: (...args: T) => R
-        ): ((...args: T) => R) => {
-            return syncFn(this.syncId(namespace), (...args: T) => {
-                return fn.bind(this)(...args)
-            })
-        }
-
-        this.jump = makeSyncFn("jump", this.jump)
-        this.roll = makeSyncFn("roll", this.roll)
-        this.setWeaponAndShieldDrawn = makeSyncFn("wsd", this.setWeaponAndShieldDrawn)
-        this.updateBlocking = makeSyncFn("blk", this.updateBlocking)
-        this.updateAttacking = makeSyncFn("atk", this.updateAttacking)
-        this.cancelAttacking = makeSyncFn("catk", this.cancelAttacking)
-        this.addCondition = makeSyncFn("ac", this.addCondition)
-        this.removeCondition = makeSyncFn("rc", this.removeCondition)
-        this.onDamageCallback = makeSyncFn("odmg", this.onDamageCallback)
-        this.die = makeSyncFn("die", this.die)
-        this.revive = makeSyncFn("rvv", this.revive)
+        this.jump = syncFn(this.syncId("jump"), this.jump.bind(this))
+        this.roll = syncFn(this.syncId("roll"), this.roll.bind(this))
+        this.setWeaponAndShieldDrawn = syncFn(
+            this.syncId("wsd"),
+            this.setWeaponAndShieldDrawn.bind(this)
+        )
+        this.updateBlocking = syncFn(this.syncId("blk"), this.updateBlocking.bind(this))
+        this.updateAttacking = syncFn(this.syncId("atk"), this.updateAttacking.bind(this))
+        this.cancelAttacking = syncFn(this.syncId("catk"), this.cancelAttacking.bind(this))
+        this.addCondition = syncFn(this.syncId("ac"), this.addCondition.bind(this))
+        this.removeCondition = syncFn(this.syncId("rc"), this.removeCondition.bind(this))
+        this.onDamageCallback = syncFn(this.syncId("odmg"), this.onDamageCallback.bind(this))
+        this.die = syncFn(this.syncId("die"), this.die.bind(this))
+        this.revive = syncFn(this.syncId("rvv"), this.revive.bind(this))
 
         // Synchronized client->host functions
 
