@@ -42,8 +42,6 @@ export class PlayerInventory extends Inventory {
 
         super(syncIdPrefix, size)
 
-        const addItem = this.addItem
-
         const pushNotification = syncFn(`${syncIdPrefix}pn`, (item: Item, count: number) => {
             if (player().uuid === playerUUID) {
                 const itemData = ITEM_METADATA_MAP[item]
@@ -65,7 +63,8 @@ export class PlayerInventory extends Inventory {
         })
 
         this.addItem = (item, count = 1, metadata = {}, quiet = false) => {
-            const added = SPECIAL_ITEMS[item]?.noInventorySlot || addItem(item, count, metadata)
+            const added =
+                SPECIAL_ITEMS[item]?.noInventorySlot || super.addItem(item, count, metadata)
 
             if (added) {
                 // Apply special side effects

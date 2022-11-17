@@ -44,17 +44,11 @@ export class Inventory {
      */
     constructor(syncIdPrefix: string, size: number = 20) {
         this.stacks = Array.from({ length: size })
-        this.addItem = syncFn(`${syncIdPrefix}ai`, this._addItem)
+        this.setStack = syncFn(`${syncIdPrefix}ss`, this.setStack.bind(this))
     }
 
     get size() {
         return this.stacks.length
-    }
-
-    private refreshUI() {
-        if (InventoryDisplay.instance.isShowingInventory(this)) {
-            InventoryDisplay.instance.refreshView()
-        }
     }
 
     getStack(index: number): ItemStack {
@@ -74,8 +68,7 @@ export class Inventory {
     /**
      * returns true if the item was successfully added
      */
-    addItem: (item: Item, count?: number, metadata?: ItemStackMetadata) => boolean
-    private _addItem: typeof this.addItem = (item, count = 1, metadata = {}) => {
+    addItem(item: Item, count = 1, metadata: ItemStackMetadata = {}) {
         const canAdd = this.canAddItem(item, count)
         if (!canAdd) {
             return false
@@ -105,8 +98,6 @@ export class Inventory {
             }
         }
 
-        this.refreshUI()
-
         return true
     }
 
@@ -127,6 +118,7 @@ export class Inventory {
         return availableRoom >= count
     }
 
+    // MPTODO
     removeItem(item: Item, count: number = 1) {
         const currentCount = this.getItemCount(item)
         if (currentCount < count) {
@@ -149,8 +141,6 @@ export class Inventory {
                 }
             }
         }
-
-        this.refreshUI()
     }
 
     /**
@@ -162,6 +152,12 @@ export class Inventory {
 
     save() {
         return this.stacks
+    }
+
+    private refreshUI() {
+        if (InventoryDisplay.instance.isShowingInventory(this)) {
+            InventoryDisplay.instance.refreshView()
+        }
     }
 
     private recomputeCountsMap() {
