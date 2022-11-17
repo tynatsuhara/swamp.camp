@@ -333,7 +333,8 @@ export class CraftingMenu extends Component {
 
     private doCraftOnHost = clientSyncFn(
         "craft",
-        (trusted, craftingPlayerUUID: string, recipe: CraftingRecipe) => {
+        // MPTODO use dudeUUID
+        ({ trusted }, craftingPlayerUUID: string, recipe: CraftingRecipe) => {
             if (session.isHost()) {
                 const craftingPlayer = here()
                     .getDudes()

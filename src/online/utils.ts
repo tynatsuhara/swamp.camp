@@ -1,5 +1,7 @@
 import { session } from "./session"
 
+export const ONLINE_PLAYER_DUDE_ID_PREFIX = "mp:"
+
 /**
  * A function which can be called on the host, which will be invoked client-side.
  * Args should be serializable!
@@ -89,24 +91,30 @@ export const syncData = <T extends object>(id: string, data: T, onChange = (upda
  * Similar to syncFn, but can be invoked on either clients or the host.
  * If the client invocation is accepted by the host, it will be forwarded to other clients.
  *
- * The syncFn receives a "trusted" argument which will be true if:
- *   1) The function is invoked locally OR
- *   2) The function is invoked by the host
+ * The syncFn receives an auth object:
+ *   - auth.trusted will be true if:
+ *     1) The function is invoked locally OR
+ *     2) The function is invoked by the host
+ *   - auth.dudeUUID is the uuid of the peer's dude
  *
  * If the syncFn returns nothing, it will be propagated from the host to other clients.
  * If the syncFn returns the string "reject", it will cancel the propagation.
  */
-// MPTODO: Make it so the player ID is passed and used for restricting (eg I shouldn't be able to send the host a different player's UUID to equip a certain weapon)
 export const clientSyncFn = <T extends any[]>(
     id: string,
-    fn: (trusted: boolean, ...args: T) => "reject" | void
+    fn: (auth: { trusted: boolean; dudeUUID: string }, ...args: T) => "reject" | void
 ): ((...args: T) => void) => {
     const [send, receive] = session.action<T>(id)
 
     const wrappedFn = (...args: T) => {
+        const hostAuth = {
+            trusted: true,
+            dudeUUID: ONLINE_PLAYER_DUDE_ID_PREFIX + session.peerToMultiplayerId[session.hostId],
+        }
+
         // offline clientSyncFn is just a normal fn
         if (!session.isOnline()) {
-            return fn(true, ...args)
+            return fn(hostAuth, ...args)
         }
 
         if (session.isGuest()) {
@@ -117,15 +125,19 @@ export const clientSyncFn = <T extends any[]>(
             send(args, session.initializedPeers)
         }
 
-        return fn(true, ...args)
+        // call fn on the sender's machine
+        return fn(hostAuth, ...args)
     }
 
     receive((args, peerId) => {
         if (session.isGuest() && peerId !== session.hostId) {
             return
         }
-        const trusted = !session.isHost() // only the host should be untrusting
-        const result = fn(trusted, ...args)
+        const auth = {
+            trusted: !session.isHost(), // only the host should be untrusting
+            dudeUUID: ONLINE_PLAYER_DUDE_ID_PREFIX + session.peerToMultiplayerId[peerId],
+        }
+        const result = fn(auth, ...args)
         const otherPeers = session.getPeers().filter((p) => p !== peerId)
         if (result !== "reject" && otherPeers.length > 0) {
             send(args, otherPeers)

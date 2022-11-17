@@ -191,8 +191,8 @@ export class Campfire extends Component implements DialogueSource {
 
         this.addLogs = clientSyncFn(
             id,
-            (trusted, interactingPlayerId: string, logsTransferred: number) => {
-                console.log(`addLogsToFire clientSync (trusted=${trusted})`)
+            // MPTODO use dudeUUID
+            ({ trusted }, interactingPlayerId: string, logsTransferred: number) => {
                 const interactingPlayer = Dude.get(interactingPlayerId)
                 if (logsTransferred === -1 && session.isHost()) {
                     interactingPlayer.setShield(ShieldType.TORCH)

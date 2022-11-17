@@ -35,6 +35,7 @@ export const session = {
     // mutable fields managed by game sync functions
     hostId: undefined as string,
     initializedPeers: [] as string[],
+    peerToMultiplayerId: {} as Record<string, string>,
 
     /**
      * @returns a promise that resolves once the session is established

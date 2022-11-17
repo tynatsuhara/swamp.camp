@@ -299,28 +299,42 @@ export class Dude extends Component implements DialogueSource {
             this._weapon = this.entity.addComponent(WeaponFactory.make(type, this.type))
             this._shield?.setOnBack(false) // keep em in sync
         }
-        this.setWeapon = clientSyncFn(this.syncId("eqw"), (trusted, type: WeaponType) => {
-            if (this.weapon?.getType() === type) {
-                return
-            } else if (!trusted && !this.inventory.getItemCount(type as unknown as Item)) {
-                return "reject"
+        this.setWeapon = clientSyncFn(
+            this.syncId("eqw"),
+            ({ trusted, dudeUUID }, type: WeaponType) => {
+                if (this.weapon?.getType() === type) {
+                    return
+                } else if (
+                    !trusted &&
+                    (this.uuid !== dudeUUID ||
+                        !this.inventory.getItemCount(type as unknown as Item))
+                ) {
+                    return "reject"
+                }
+                setWeapon(type)
             }
-            setWeapon(type)
-        })
+        )
 
         const setShield = (type: ShieldType) => {
             this.shield?.delete()
             this._shield = this.entity.addComponent(ShieldFactory.make(type, this.type))
             this._weapon?.setSheathed(false) // keep em in sync
         }
-        this.setShield = clientSyncFn(this.syncId("eqs"), (trusted, type: ShieldType) => {
-            if (this.shield?.type === type) {
-                return
-            } else if (!trusted && !this.inventory.getItemCount(type as unknown as Item)) {
-                return "reject"
+        this.setShield = clientSyncFn(
+            this.syncId("eqs"),
+            ({ trusted, dudeUUID }, type: ShieldType) => {
+                if (this.shield?.type === type) {
+                    return
+                } else if (
+                    !trusted &&
+                    (this.uuid !== dudeUUID ||
+                        !this.inventory.getItemCount(type as unknown as Item))
+                ) {
+                    return "reject"
+                }
+                setShield(type)
             }
-            setShield(type)
-        })
+        )
 
         // Component lifecycle functions
 

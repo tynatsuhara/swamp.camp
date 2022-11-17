@@ -7,7 +7,7 @@ import { Item } from "../items/Items"
 import { PlayerInventory } from "../items/PlayerInventory"
 import { session } from "../online/session"
 import { MULTIPLAYER_ID } from "../online/sync"
-import { syncFn } from "../online/utils"
+import { ONLINE_PLAYER_DUDE_ID_PREFIX, syncFn } from "../online/utils"
 import { saveManager } from "../SaveManager"
 import { DudeSaveState } from "../saves/DudeSaveState"
 import { newUUID } from "../saves/uuid"
@@ -56,8 +56,6 @@ export enum DudeFaction {
 
 const DEFAULT_COLLIDER_SIZE = new Point(10, 8)
 const BIG_COLLIDER_SIZE = new Point(15, 12)
-
-export const ONLINE_PLAYER_DUDE_ID_PREFIX = "mp:"
 
 export class DudeFactory {
     static get instance() {

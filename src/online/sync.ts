@@ -1,5 +1,5 @@
 import { Dude } from "../characters/Dude"
-import { DudeFactory, ONLINE_PLAYER_DUDE_ID_PREFIX } from "../characters/DudeFactory"
+import { DudeFactory } from "../characters/DudeFactory"
 import { player } from "../characters/player/index"
 import { saveManager } from "../SaveManager"
 import { Save } from "../saves/SaveGame"
@@ -7,13 +7,11 @@ import { newUUID } from "../saves/uuid"
 import { SwampCampGame } from "../SwampCampGame"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { computeSessionIdFromPeerId, session } from "./session"
-import { base64hash } from "./utils"
+import { base64hash, ONLINE_PLAYER_DUDE_ID_PREFIX } from "./utils"
 
 /**
  * Utilities for syncing game state and logic
  */
-
-let peerToMultiplayerId: Record<string, string> = {}
 
 // Store a stable multiplayer ID for the user.
 const MULTIPLAYER_ID_KEY = "multiplayer_id"
@@ -60,7 +58,7 @@ export const hostOnJoin = () => {
                 onlinePlayers[dudeUUID] = { uuid: dudeUUID, password }
             }
             saveManager.setState({ onlinePlayers })
-            peerToMultiplayerId[peerId] = id
+            session.peerToMultiplayerId[peerId] = id
             DudeFactory.instance.newOnlinePlayer(dudeUUID)
             sendInitWorld(saveManager.save("multiplayer"), peerId)
         })
@@ -122,12 +120,14 @@ export const cleanUpSession = () => {
     session.close()
     session.hostId = undefined
     session.initializedPeers = []
-    peerToMultiplayerId = {}
+    session.peerToMultiplayerId = {}
 }
 
 const cleanUpPeer = (peerId: string) => {
     // MPTODO: Make this a syncFn when we support more than 2 players
-    const multiplayerDude = Dude.get(ONLINE_PLAYER_DUDE_ID_PREFIX + peerToMultiplayerId[peerId])
+    const multiplayerDude = Dude.get(
+        ONLINE_PLAYER_DUDE_ID_PREFIX + session.peerToMultiplayerId[peerId]
+    )
 
     const { uuid, password } = saveManager.getState().onlinePlayers[multiplayerDude.uuid]
 

@@ -1,9 +1,6 @@
 import { profiler } from "brigsby/dist/Profiler"
-import { Dude } from "../characters/Dude"
 import { player } from "../characters/player/index"
 import { prettyPrint } from "../debug/JSON"
-import { session } from "../online/session"
-import { clientSyncFn } from "../online/utils"
 import { InventoryDisplay } from "../ui/InventoryDisplay"
 import { PlaceElementDisplay } from "../ui/PlaceElementDisplay"
 import { Elements } from "../world/elements/Elements"
@@ -17,14 +14,14 @@ export type ItemAction = {
 }
 
 // MPTODO
-const consume = clientSyncFn("consume", (_, dudeUUID: string, invIndex: number) => {
-    if (session.isHost()) {
-        const inv = Dude.get(dudeUUID).inventory
-        let stack = inv.getStack(invIndex)
-        stack = stack.withCount(stack.count - 1)
-        inv.setStack(invIndex, stack)
-    }
-})
+// const consume = clientSyncFn("consume", (_, dudeUUID: string, invIndex: number) => {
+//     if (session.isHost()) {
+//         const inv = Dude.get(dudeUUID).inventory
+//         let stack = inv.getStack(invIndex)
+//         stack = stack.withCount(stack.count - 1)
+//         inv.setStack(invIndex, stack)
+//     }
+// })
 
 export const getInventoryItemActions = (
     item: ItemSpec,
