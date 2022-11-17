@@ -33,7 +33,7 @@ export const ITEM_DIALOGUES: DialogueSet = {
 
         const completeDialogue = (logsTransferred: number) => {
             return () => {
-                cf.addLogs(player().uuid, logsTransferred)
+                cf.addLogs(logsTransferred)
                 return new NextDialogue(CAMPFIRE_DIALOGUE, false)
             }
         }
@@ -96,7 +96,7 @@ export const ITEM_DIALOGUES: DialogueSet = {
 
         const completeDialogue = (logsTransferred: number) => {
             return () => {
-                cf.addLogs(player().uuid, logsTransferred)
+                cf.addLogs(logsTransferred)
                 // cf.addLogs(logsTransferred)
                 return new NextDialogue(CAMPFIRE_DIALOGUE, false)
             }

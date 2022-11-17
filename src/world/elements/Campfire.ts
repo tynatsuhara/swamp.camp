@@ -192,13 +192,16 @@ export class Campfire extends Component implements DialogueSource {
         this.addLogs = clientSyncFn(
             id,
             // MPTODO use dudeUUID
-            ({ trusted }, interactingPlayerId: string, logsTransferred: number) => {
-                const interactingPlayer = Dude.get(interactingPlayerId)
-                if (logsTransferred === -1 && session.isHost()) {
-                    interactingPlayer.setShield(ShieldType.TORCH)
-                }
-                if (logsTransferred > 0) {
-                    interactingPlayer.inventory.removeItem(Item.WOOD, logsTransferred)
+            ({ dudeUUID }, logsTransferred: number) => {
+                console.log(dudeUUID)
+                const interactingPlayer = Dude.get(dudeUUID)
+                if (session.isHost()) {
+                    if (logsTransferred === -1) {
+                        interactingPlayer.setShield(ShieldType.TORCH)
+                    }
+                    if (logsTransferred > 0) {
+                        interactingPlayer.inventory.removeItem(Item.WOOD, logsTransferred)
+                    }
                 }
                 this._addLogs(logsTransferred)
             }
@@ -233,10 +236,9 @@ export class Campfire extends Component implements DialogueSource {
 
     /**
      * Send a request to the host to add logs to fire
-     * @param interactingPlayerId the interacting player uuid
      * @param logsTransferred the number of logs added to the fire, could be negative if taking a torch
      */
-    addLogs: (interactingPlayerId: string, logsTransferred: number) => void
+    addLogs: (logsTransferred: number) => void
 
     willBurnFor(duration: number) {
         // this gets called when the campfire is not loaded, so we need for force an update

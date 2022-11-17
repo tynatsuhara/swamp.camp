@@ -1,3 +1,4 @@
+import { player } from "../characters/player/index"
 import { session } from "./session"
 
 export const ONLINE_PLAYER_DUDE_ID_PREFIX = "mp:"
@@ -95,21 +96,21 @@ export const syncData = <T extends object>(id: string, data: T, onChange = (upda
  *   - auth.trusted will be true if:
  *     1) The function is invoked locally OR
  *     2) The function is invoked by the host
- *   - auth.dudeUUID is the uuid of the peer's dude
+ *   - auth.dudeUUID is the uuid of the peer's dude, OR undefined for guests
  *
  * If the syncFn returns nothing, it will be propagated from the host to other clients.
  * If the syncFn returns the string "reject", it will cancel the propagation.
  */
 export const clientSyncFn = <T extends any[]>(
     id: string,
-    fn: (auth: { trusted: boolean; dudeUUID: string }, ...args: T) => "reject" | void
+    fn: (auth: { trusted: boolean; dudeUUID: string | undefined }, ...args: T) => "reject" | void
 ): ((...args: T) => void) => {
     const [send, receive] = session.action<T>(id)
 
     const wrappedFn = (...args: T) => {
         const hostAuth = {
             trusted: true,
-            dudeUUID: ONLINE_PLAYER_DUDE_ID_PREFIX + session.peerToMultiplayerId[session.hostId],
+            dudeUUID: player().uuid,
         }
 
         // offline clientSyncFn is just a normal fn
@@ -135,7 +136,10 @@ export const clientSyncFn = <T extends any[]>(
         }
         const auth = {
             trusted: !session.isHost(), // only the host should be untrusting
-            dudeUUID: ONLINE_PLAYER_DUDE_ID_PREFIX + session.peerToMultiplayerId[peerId],
+            // MPTODO peerToMultiplayerId only gets populated on the host right now
+            dudeUUID: session.isHost()
+                ? ONLINE_PLAYER_DUDE_ID_PREFIX + session.peerToMultiplayerId[peerId]
+                : undefined,
         }
         const result = fn(auth, ...args)
         const otherPeers = session.getPeers().filter((p) => p !== peerId)

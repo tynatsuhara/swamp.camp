@@ -14,7 +14,6 @@ import { CraftingRecipe, CraftingRecipeCategory } from "../items/CraftingRecipe"
 import { Item, ITEM_METADATA_MAP } from "../items/Items"
 import { session } from "../online/session"
 import { clientSyncFn } from "../online/utils"
-import { here } from "../world/locations/LocationManager"
 import { Color } from "./Color"
 import { TEXT_FONT, TEXT_SIZE } from "./Text"
 import { Tooltip } from "./Tooltip"
@@ -226,7 +225,7 @@ export class CraftingMenu extends Component {
             // craft the item
             if (hovered && controls.isMenuClickDown()) {
                 if (this.canCraft(player(), recipe)) {
-                    this.doCraftOnHost(player().uuid, recipe)
+                    this.doCraftOnHost(recipe)
                     Sounds.play(this.craftNoise, 0.6)
                     this.justCraftedRow = r // set this AFTER crafting
                     setTimeout(() => (this.justCraftedRow = -1), 900)
@@ -331,24 +330,18 @@ export class CraftingMenu extends Component {
         return [...sprites, renderComp]
     }
 
-    private doCraftOnHost = clientSyncFn(
-        "craft",
-        // MPTODO use dudeUUID
-        ({ trusted }, craftingPlayerUUID: string, recipe: CraftingRecipe) => {
-            if (session.isHost()) {
-                const craftingPlayer = here()
-                    .getDudes()
-                    .find((d) => d.uuid === craftingPlayerUUID)
-                if (!this.canCraft(craftingPlayer, recipe)) {
-                    return "reject"
-                }
-                recipe.input.forEach((ingr) => {
-                    craftingPlayer.inventory.removeItem(ingr.item, ingr.count)
-                })
-                craftingPlayer.inventory.addItem(recipe.output)
+    private doCraftOnHost = clientSyncFn("craft", ({ dudeUUID }, recipe: CraftingRecipe) => {
+        if (session.isHost()) {
+            const craftingPlayer = Dude.get(dudeUUID)
+            if (!this.canCraft(craftingPlayer, recipe)) {
+                return "reject"
             }
+            recipe.input.forEach((ingr) => {
+                craftingPlayer.inventory.removeItem(ingr.item, ingr.count)
+            })
+            craftingPlayer.inventory.addItem(recipe.output)
         }
-    )
+    })
 
     // caching stuff
     private itemIcons = new Map<Item, StaticSpriteSource>()
