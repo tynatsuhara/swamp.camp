@@ -15,6 +15,13 @@ export type ItemAction = {
     actionFn: () => void
 }
 
+// MPTODO
+const place = clientSyncFn("place", "host-only", ({ dudeUUID }, invIndex: number) => {
+    const dude = Dude.get(dudeUUID)
+    const stack = dude.inventory.getStack(invIndex)
+    dude.inventory.setStack(invIndex, stack.withCount(stack.count - 1))
+})
+
 const consume = clientSyncFn("consume", "caller-and-host", ({ dudeUUID }, invIndex: number) => {
     const dude = Dude.get(dudeUUID)
     const stack = dude.inventory.getStack(invIndex)

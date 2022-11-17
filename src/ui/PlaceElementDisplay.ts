@@ -5,7 +5,6 @@ import { controls } from "../Controls"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { ItemStack } from "../items/Inventory"
 import { ITEM_METADATA_MAP } from "../items/Items"
-import { ElementComponent } from "../world/elements/ElementComponent"
 import { ElementFactory } from "../world/elements/ElementFactory"
 import { Elements, ElementType } from "../world/elements/Elements"
 import { ElementUtils } from "../world/elements/ElementUtils"
@@ -23,7 +22,6 @@ export class PlaceElementDisplay extends Component {
     private elementFactory: ElementFactory<any>
     private placingFrame: PlaceElementFrame
     private successFn: () => void
-    private replacingElement: ElementComponent<any> | undefined
 
     get isOpen() {
         return this.element !== null && this.element !== undefined
@@ -50,22 +48,16 @@ export class PlaceElementDisplay extends Component {
         this.placingFrame?.delete()
     }
 
-    startPlacing(
-        count: number,
-        stack: Omit<ItemStack, "count">,
-        successFn: () => void,
-        replacingElement?: ElementComponent<any>
-    ) {
+    startPlacing(count: number, stack: Omit<ItemStack, "count">, successFn: () => void) {
         this.count = count
         this.stack = stack
         this.successFn = successFn
-        this.replacingElement = replacingElement
 
         this.element = ITEM_METADATA_MAP[stack.item].element
         this.elementFactory = Elements.instance.getElementFactory(this.element)
 
         this.placingFrame = player().entity.addComponent(
-            new PlaceElementFrame(this.elementFactory.dimensions, this.replacingElement)
+            new PlaceElementFrame(this.elementFactory.dimensions)
         )
     }
 
@@ -73,9 +65,6 @@ export class PlaceElementDisplay extends Component {
     finishPlacing(elementPos: Point) {
         this.count--
         this.successFn() // decrement and maybe remove from inv
-        if (this.replacingElement) {
-            here().removeElementLocally(this.replacingElement)
-        }
 
         const data = this.stack.metadata
             ? this.elementFactory.itemMetadataToSaveFormat(this.stack.metadata)

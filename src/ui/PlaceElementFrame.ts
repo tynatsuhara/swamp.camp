@@ -4,7 +4,6 @@ import { Maths } from "brigsby/dist/util"
 import { player } from "../characters/player"
 import { controls } from "../Controls"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
-import { ElementComponent } from "../world/elements/ElementComponent"
 import { Elements } from "../world/elements/Elements"
 import { here } from "../world/locations/LocationManager"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
@@ -17,12 +16,10 @@ export class PlaceElementFrame extends Component {
     private readonly dimensions: Point
     private goodTiles: SpriteComponent[]
     private badTiles: SpriteComponent[]
-    private replacingElement: ElementComponent<any> | undefined
 
-    constructor(dimensions: Point, replacingElement?: ElementComponent<any>) {
+    constructor(dimensions: Point) {
         super()
         this.dimensions = dimensions
-        this.replacingElement = replacingElement
         if (
             (this.dimensions.x === 1 && this.dimensions.y > 2) ||
             (this.dimensions.y === 1 && this.dimensions.x !== 1)
@@ -112,11 +109,6 @@ export class PlaceElementFrame extends Component {
         for (let x = pos.x; x < pos.x + this.dimensions.x; x++) {
             for (let y = pos.y; y < pos.y + this.dimensions.y; y++) {
                 const pt = new Point(x, y)
-                // there's already an element here
-                const existingElement = l.getElement(pt)
-                if (existingElement && existingElement !== this.replacingElement) {
-                    return false
-                }
                 // there's no ground here
                 if (!l.getGround(pt)) {
                     return false
