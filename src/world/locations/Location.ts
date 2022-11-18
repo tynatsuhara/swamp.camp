@@ -1,4 +1,5 @@
 import { Entity, Point, pt } from "brigsby/dist"
+import { PointValue } from "brigsby/dist/Point"
 import { Grid } from "brigsby/dist/util"
 import { PointAudio } from "../../audio/PointAudio"
 import { Sounds } from "../../audio/Sounds"
@@ -178,7 +179,7 @@ export class Location {
      */
     addElement<T extends ElementType>(
         type: T,
-        tilePoint: Point,
+        tilePoint: PointValue,
         data: Partial<ElementDataFormat[T]> = {}
     ): ElementComponent<T, ElementDataFormat[T]> {
         if (!session.isHost()) {
@@ -186,14 +187,16 @@ export class Location {
             return null
         }
 
+        const ptString = pt(tilePoint.x, tilePoint.y).toString()
+
         // On the host, create the element
-        const element = this.loadElement(type, tilePoint.toString(), data)
+        const element = this.loadElement(type, ptString, data)
 
         if (!element) {
             return null
         }
 
-        this.syncLoadElement(type, tilePoint.toString(), element.save())
+        this.syncLoadElement(type, ptString, element.save())
 
         return element
     }
