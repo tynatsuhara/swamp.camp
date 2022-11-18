@@ -28,11 +28,13 @@ import { UIStateManager } from "./UIStateManager"
  * [X] Can pick up half with right click
  * [X] Can swap FULL stacks
  * [X] Merge stacks
- * [ ] Can drop partial stacks
+ * [X] Shift click stacks
+ * [ ] Can drop portions of stacks 1 at at time
  * [ ] Make sure you handle the case where a different user updates the stack they're drawing from (probably just reset)
- * [ ] Show the count via the tooltip
+ * [X] Show the count via the tooltip
  * [ ] Some way to unselect your held stack (click outside? tab?)
- * [?] Fix bug where sprite gets stuck when clicking in between valid squares
+ * [?] BUG: Sprite gets stuck when clicking in between valid squares
+ * [ ] BUG: After putting an equipped item in the inventory, weapon hot key for item still in inv doesn't work
  *
  * [ ] Add "equipped" field to item metadata and prevent (or properly unequip) those items
  *
@@ -407,7 +409,6 @@ export class InventoryDisplay extends Component {
         }
     }
 
-    // MPTODO
     private checkForPickUp(hoverInv: Inventory, hoverIndex: number) {
         if (controls.isInventoryStackPickUp() || controls.isInventoryStackPickUpHalf()) {
             const hoveredItemStack = hoverInv?.getStack(hoverIndex)
@@ -420,10 +421,8 @@ export class InventoryDisplay extends Component {
                     otherInv.canAddItem(item, count, metadata)
                 ) {
                     // shift click transfer
-                    // TODO revisit
-                    // hoverInv.removeItem(item, count, metadata)
-                    // otherInv.addItem(item, count, metadata)
-                    // this.refreshView()
+                    hoverInv.removeItemAtIndex(hoverIndex, count)
+                    otherInv.addItem(item, count, metadata)
                 } else {
                     this.heldStackInventory = hoverInv
                     this.heldStackInvIndex = hoverIndex

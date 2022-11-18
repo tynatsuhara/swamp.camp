@@ -4,6 +4,7 @@ import { ShieldType } from "../characters/weapons/ShieldType"
 import { WeaponType } from "../characters/weapons/WeaponType"
 import { syncFn } from "../online/utils"
 import { saveManager } from "../SaveManager"
+import { InventoryDisplay } from "../ui/InventoryDisplay"
 import { Notification, NotificationDisplay } from "../ui/NotificationDisplay"
 import { Inventory, ItemStackMetadata } from "./Inventory"
 import { Item, ITEM_METADATA_MAP } from "./Items"
@@ -49,7 +50,7 @@ export class PlayerInventory extends Inventory {
         this.playerUUID = playerUUID
 
         const pushNotification = syncFn(`${syncIdPrefix}pn`, (item: Item, count: number) => {
-            if (player().uuid === playerUUID) {
+            if (player().uuid === playerUUID && !InventoryDisplay.instance.isOpen) {
                 const itemData = ITEM_METADATA_MAP[item]
                 const id = `add-inv-${item}`
                 const existing = NotificationDisplay.instance.getById(id)
