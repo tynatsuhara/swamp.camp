@@ -82,7 +82,7 @@ export class PlayerInventory extends Inventory {
 
     addItem: (item: Item, count?: number, metadata?: ItemStackMetadata, quiet?: boolean) => boolean
 
-    canAddItem(item: Item, count: number = 1): boolean {
-        return SPECIAL_ITEMS[item]?.noInventorySlot || super.canAddItem(item, count)
+    canAddItem(item: Item, count: number = 1, metadata: ItemStackMetadata = {}): boolean {
+        return SPECIAL_ITEMS[item]?.noInventorySlot || super.canAddItem(item, count, metadata)
     }
 }

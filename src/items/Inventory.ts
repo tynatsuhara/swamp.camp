@@ -82,11 +82,21 @@ export class Inventory {
      * returns true if the item was successfully added
      */
     addItem(item: Item, count = 1, metadata: ItemStackMetadata = {}) {
-        const canAdd = this.canAddItem(item, count)
-        if (!canAdd) {
+        if (!this.canAddItem(item, count, metadata)) {
             return false
         }
+        return this.addItemInternal(item, count, metadata, true)
+    }
 
+    canAddItem(item: Item, count: number = 1, metadata: ItemStackMetadata = {}): boolean {
+        return this.addItemInternal(item, count, metadata, false)
+    }
+
+    /**
+     * returns true if the item can be (or was) added
+     * @param commit true to actually update the stack
+     */
+    private addItemInternal(item: Item, count = 1, metadata: ItemStackMetadata, commit: boolean) {
         const stackLimit = ITEM_METADATA_MAP[item].stackLimit
 
         let leftToAdd = count
@@ -96,7 +106,9 @@ export class Inventory {
             const slotValue = this.getStack(i)
             if (slotValue?.item === item && doesMetadataMatch(slotValue.metadata, metadata)) {
                 const addedHere = Math.min(stackLimit - slotValue.count, leftToAdd)
-                this.setStack(i, slotValue.withCount(slotValue.count + addedHere))
+                if (commit) {
+                    this.setStack(i, slotValue.withCount(slotValue.count + addedHere))
+                }
                 leftToAdd -= addedHere
             }
         }
@@ -107,31 +119,16 @@ export class Inventory {
             if (!slotValue) {
                 const addedHere = Math.min(stackLimit, leftToAdd)
                 leftToAdd -= addedHere
-                this.setStack(i, new ItemStack(item, addedHere, metadata))
+                if (commit) {
+                    this.setStack(i, new ItemStack(item, addedHere, metadata))
+                }
             }
         }
 
-        return true
+        return leftToAdd === 0
     }
 
-    canAddItem(item: Item, count: number = 1): boolean {
-        const stackLimit = ITEM_METADATA_MAP[item].stackLimit
-
-        let availableRoom = 0
-
-        for (let i = 0; i < this.stacks.length && availableRoom < count; i++) {
-            const slotValue = this.getStack(i)
-            if (!slotValue) {
-                availableRoom += stackLimit
-            } else if (slotValue.item === item) {
-                availableRoom += stackLimit - slotValue.count
-            }
-        }
-
-        return availableRoom >= count
-    }
-
-    removeItem(item: Item, count: number = 1) {
+    removeItem(item: Item, count: number = 1, metadata: ItemStackMetadata = {}) {
         const currentCount = this.getItemCount(item)
         if (currentCount < count) {
             console.error("inventory cannot go negative")
@@ -141,7 +138,7 @@ export class Inventory {
 
         for (let i = 0; i < this.stacks.length; i++) {
             const slotValue = this.getStack(i)
-            if (slotValue?.item === item) {
+            if (slotValue?.item === item && doesMetadataMatch(slotValue.metadata, metadata)) {
                 let newSlotCount = slotValue.count
                 while (newSlotCount > 0 && count > 0) {
                     count--
