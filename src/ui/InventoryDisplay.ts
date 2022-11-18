@@ -142,6 +142,7 @@ export class InventoryDisplay extends Component {
         // dragging
         this.tooltip.clear()
         if (controls.isInventoryStackDrop()) {
+            let swapSuccess = false
             // drop n swap
             if (hoverIndex !== -1) {
                 // Swap the stacks
@@ -149,6 +150,7 @@ export class InventoryDisplay extends Component {
 
                 // Swap the stacks
                 if (hoverInv === this.playerInv || this.canRemoveFromPlayerInv(draggedValue.item)) {
+                    swapSuccess = true
                     this.swapStacks(
                         hoverInv.uuid,
                         hoverIndex,
@@ -162,6 +164,12 @@ export class InventoryDisplay extends Component {
             this.heldStackSprite = null
 
             this.stripHotKeysFromOtherInv()
+
+            if (!swapSuccess) {
+                // only refresh if we didn't successfully swap, otherwise there's a weird
+                // jitter in multiplayer as the inventory is only updated on the host
+                this.refreshView()
+            }
         } else {
             // track
             this.heldStackSprite.transform.position = this.heldStackSprite.transform.position.plus(
@@ -183,21 +191,37 @@ export class InventoryDisplay extends Component {
             }
 
             const dudeInv = Dude.get(dudeUUID).inventory
-            const selfInv = [invA, invB].filter((i) => i === dudeInv)
-            if (selfInv.length < 1) {
-                console.warn(`invalid inventory ID(s)`)
-                return
-            }
 
-            if (selfInv.length < 2) {
-                const doesOtherInvAllowTrading = [invA, invB].find(
-                    (i) => i !== dudeInv
-                )?.allowTrading
-                if (!doesOtherInvAllowTrading) {
-                    console.warn(`inventory does not allow trading`)
+            if (invA === invB) {
+                // moving stuff around in the same inventory
+                if (invA !== dudeInv && !invA.allowTrading) {
+                    console.warn(`invalid inventory ID(s)`)
                     return
                 }
+                if (stackIdxA === stackIdxB) {
+                    return
+                }
+            } else {
+                // at least one inv must be the player
+                const selfInv = [invA, invB].filter((i) => i === dudeInv)
+                if (selfInv.length < 1) {
+                    console.warn(`invalid inventory ID(s)`)
+                    return
+                }
+
+                // the other inv must be tradeable
+                if (selfInv.length < 2) {
+                    const doesOtherInvAllowTrading = [invA, invB].find(
+                        (i) => i !== dudeInv
+                    )?.allowTrading
+                    if (!doesOtherInvAllowTrading) {
+                        console.warn(`inventory does not allow trading`)
+                        return
+                    }
+                }
             }
+
+            console.log("swap")
 
             const stackA = invA.getStack(stackIdxA)
             const stackB = invB.getStack(stackIdxB)
