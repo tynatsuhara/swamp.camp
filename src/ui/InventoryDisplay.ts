@@ -13,7 +13,7 @@ import { Camera } from "../cutscenes/Camera"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { getInventoryItemActions, ItemAction } from "../items/getInventoryItemActions"
 import { Inventory, ItemStack } from "../items/Inventory"
-import { ItemSpec, ITEM_METADATA_MAP } from "../items/Items"
+import { ItemMetadata, ItemSpec, ITEM_METADATA_MAP } from "../items/Items"
 import { clientSyncFn } from "../online/utils"
 import { saveManager } from "../SaveManager"
 import { Color } from "./Color"
@@ -253,6 +253,11 @@ export class InventoryDisplay extends Component {
         return true
     }
 
+    private removePlayerInvOnlyMetadata(metadata: ItemMetadata) {
+        metadata.hotKey = undefined
+        metadata.equipped = undefined
+    }
+
     private canTransfer(
         invA: Inventory,
         stackIdxA: number,
@@ -295,8 +300,15 @@ export class InventoryDisplay extends Component {
                 return
             }
 
-            invB.addToStack(stackIdxB, stackA.item, transferAmount, stackA.metadata)
-            invA.setStack(stackIdxA, stackA.withCount(stackA.count - transferAmount))
+            // remove first
+            invA.removeItemAtIndex(stackIdxA, transferAmount)
+
+            // add to the other stack
+            const newMetadata = { ...stackA.metadata }
+            if (invB !== dudeInv) {
+                this.removePlayerInvOnlyMetadata(newMetadata)
+            }
+            invB.addToStack(stackIdxB, stackA.item, transferAmount, newMetadata)
         }
     )
 
@@ -316,12 +328,13 @@ export class InventoryDisplay extends Component {
                 return
             }
 
-            const updateInvStack = (inv: Inventory, stackIdx: number, stack: ItemStack) => {
-                // strip hotkey from metadata
-                const updatedStack = stack?.withMetadata({
-                    ...stack.metadata,
-                    hotKey: inv === dudeInv ? stack.metadata.hotKey : undefined,
-                })
+            const setInvStack = (inv: Inventory, stackIdx: number, stack: ItemStack) => {
+                const newMetadata = { ...stackA.metadata }
+                if (invB !== dudeInv) {
+                    this.removePlayerInvOnlyMetadata(newMetadata)
+                }
+
+                const updatedStack = stack?.withMetadata(newMetadata)
 
                 if (stackIdx !== -1) {
                     // put it in the slot specified
@@ -332,16 +345,22 @@ export class InventoryDisplay extends Component {
                 }
             }
 
+            const stackA = invA.getStack(stackIdxA)
+            const stackB = invB.getStack(stackIdxB)
+
             if (stackIdxB !== -1) {
                 // swap
-                const stackA = invA.getStack(stackIdxA)
-                const stackB = invB.getStack(stackIdxB)
-                updateInvStack(invA, stackIdxA, stackB)
-                updateInvStack(invB, stackIdxB, stackA)
+                // trigger removal hooks if necessary
+                invA.removeItemAtIndex(stackIdxA, stackA.count)
+                invB.removeItemAtIndex(stackIdxB, stackB.count)
+                // add stacks back
+                setInvStack(invA, stackIdxA, stackB)
+                setInvStack(invB, stackIdxB, stackA)
             } else {
-                // add
-                updateInvStack(invB, stackIdxB, invA.getStack(stackIdxA))
-                invA.setStack(stackIdxA, null)
+                // add wherever
+                // trigger removal hooks if necessary
+                invA.removeItemAtIndex(stackIdxA, stackA.count)
+                setInvStack(invB, -1, stackA)
             }
         }
     )
