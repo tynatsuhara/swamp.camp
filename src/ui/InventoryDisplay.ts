@@ -28,11 +28,11 @@ export class InventoryDisplay extends Component {
 
     private readonly e: Entity = new Entity() // entity for this component
     private displayEntity: Entity
-    private trackedTileInventory: Inventory
-    private trackedTileIndex: number
-    private trackedTile: SpriteComponent // non-null when being dragged
+    private heldStackInventory: Inventory
+    private heldStackInvIndex: number
+    private heldStackSprite: SpriteComponent // non-null when being dragged
     private lastMousPos: Point
-    private tiles: SpriteComponent[] = []
+    private stackSprites: SpriteComponent[] = []
     private showingInv = false
     get isOpen() {
         return this.showingInv
@@ -69,11 +69,9 @@ export class InventoryDisplay extends Component {
             return
         }
 
-        const hoverResult = this.getHoveredInventoryIndex(controls.getMousePos())
-        const hoverInv = hoverResult[0]
-        const hoverIndex = hoverResult[1]
+        const [hoverInv, hoverIndex] = this.getHoveredInventoryIndex(controls.getMousePos())
 
-        if (this.trackedTile) {
+        if (this.heldStackSprite) {
             this.doDrag(hoverInv, hoverIndex)
         } else if (hoverIndex > -1 && hoverInv.getStack(hoverIndex)) {
             this.doHover(hoverInv, hoverIndex, updateData)
@@ -146,27 +144,27 @@ export class InventoryDisplay extends Component {
             // drop n swap
             if (hoverIndex !== -1) {
                 // Swap the stacks
-                const draggedValue = this.trackedTileInventory.getStack(this.trackedTileIndex)
+                const draggedValue = this.heldStackInventory.getStack(this.heldStackInvIndex)
 
                 // Swap the stacks
                 if (hoverInv === this.playerInv || this.canRemoveFromPlayerInv(draggedValue.item)) {
                     const currentlyOccupiedSpotValue = hoverInv.getStack(hoverIndex)
                     hoverInv.setStack(hoverIndex, draggedValue)
-                    this.trackedTileInventory.setStack(
-                        this.trackedTileIndex,
+                    this.heldStackInventory.setStack(
+                        this.heldStackInvIndex,
                         currentlyOccupiedSpotValue
                     )
                 }
             }
 
-            this.trackedTileInventory = null
-            this.trackedTile = null
+            this.heldStackInventory = null
+            this.heldStackSprite = null
 
             this.stripHotKeysFromOtherInv()
             this.refreshView()
         } else {
             // track
-            this.trackedTile.transform.position = this.trackedTile.transform.position.plus(
+            this.heldStackSprite.transform.position = this.heldStackSprite.transform.position.plus(
                 controls.getMousePos().minus(this.lastMousPos)
             )
         }
@@ -228,13 +226,13 @@ export class InventoryDisplay extends Component {
                     this.stripHotKeysFromOtherInv()
                     this.refreshView()
                 } else {
-                    this.trackedTileInventory = hoverInv
+                    this.heldStackInventory = hoverInv
                     // some stupid math to account for the fact that this.tiles contains tiles from potentially two inventories
-                    this.trackedTile =
-                        this.tiles[
+                    this.heldStackSprite =
+                        this.stackSprites[
                             hoverIndex + (hoverInv === this.playerInv ? 0 : this.playerInv.size)
                         ]
-                    this.trackedTileIndex = hoverIndex
+                    this.heldStackInvIndex = hoverIndex
                 }
             }
         }
@@ -277,11 +275,11 @@ export class InventoryDisplay extends Component {
     }
 
     close() {
-        if (!!this.trackedTile) {
+        if (!!this.heldStackSprite) {
             return
         }
         this.showingInv = false
-        this.tiles = []
+        this.stackSprites = []
         this.tooltip.clear()
         this.displayEntity = null
         this.tradingInv = null
@@ -299,7 +297,7 @@ export class InventoryDisplay extends Component {
         const screenDimensions = Camera.instance.dimensions
         this.showingInv = true
 
-        this.tiles = []
+        this.stackSprites = []
 
         const displayDimensions = new Point(
             InventoryDisplay.COLUMNS,
@@ -356,7 +354,7 @@ export class InventoryDisplay extends Component {
                 tile = this.displayEntity.addComponent(c)
                 tile.transform.position = this.getPositionForInventoryIndex(i, inv)
             }
-            this.tiles.push(tile)
+            this.stackSprites.push(tile)
         }
     }
 
