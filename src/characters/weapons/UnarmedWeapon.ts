@@ -9,6 +9,7 @@ enum State {
     ATTACKING,
 }
 
+// TODO: Why doesn't UNARMED work for players?
 export class UnarmedWeapon extends Weapon {
     private state: State = State.DRAWN
     private delay: number

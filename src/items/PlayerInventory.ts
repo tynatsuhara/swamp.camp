@@ -1,5 +1,7 @@
 import { Dude } from "../characters/Dude"
 import { player } from "../characters/player"
+import { ShieldType } from "../characters/weapons/ShieldType"
+import { WeaponType } from "../characters/weapons/WeaponType"
 import { syncFn } from "../online/utils"
 import { saveManager } from "../SaveManager"
 import { Notification, NotificationDisplay } from "../ui/NotificationDisplay"
@@ -10,7 +12,7 @@ type SpecialItem = {
     // If true, this item doesn't actually go in the inventory
     noInventorySlot?: boolean
     // Called when the item is added. Only runs on the host!
-    onAdd: (number) => void
+    onAdd: (count: number) => void
 }
 
 const SPECIAL_ITEMS: { [item: number]: SpecialItem } = {
@@ -37,10 +39,14 @@ const SPECIAL_ITEMS: { [item: number]: SpecialItem } = {
 }
 
 export class PlayerInventory extends Inventory {
+    private playerUUID: string
+
     constructor(playerUUID: string) {
         const syncIdPrefix = Dude.createSyncId(playerUUID, "iv")
 
         super(syncIdPrefix, false)
+
+        this.playerUUID = playerUUID
 
         const pushNotification = syncFn(`${syncIdPrefix}pn`, (item: Item, count: number) => {
             if (player().uuid === playerUUID) {
@@ -84,5 +90,20 @@ export class PlayerInventory extends Inventory {
 
     canAddItem(item: Item, count: number = 1, metadata: ItemStackMetadata = {}): boolean {
         return SPECIAL_ITEMS[item]?.noInventorySlot || super.canAddItem(item, count, metadata)
+    }
+
+    removeItemAtIndex(index: number, amountToRemove = 1): void {
+        const beforeRemoval = this.getStack(index)
+        super.removeItemAtIndex(index, amountToRemove)
+        const afterRemoval = this.getStack(index)
+
+        if (!afterRemoval) {
+            const equipped = beforeRemoval?.metadata?.equipped
+            if (equipped === "weapon") {
+                Dude.get(this.playerUUID).setWeapon(WeaponType.UNARMED, -1)
+            } else if (equipped === "shield") {
+                Dude.get(this.playerUUID).setShield(ShieldType.NONE, -1)
+            }
+        }
     }
 }

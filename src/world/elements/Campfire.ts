@@ -192,7 +192,7 @@ export class Campfire extends Component implements DialogueSource {
             const interactingPlayer = Dude.get(dudeUUID)
             if (session.isHost()) {
                 if (logsTransferred === -1) {
-                    interactingPlayer.setShield(ShieldType.TORCH)
+                    interactingPlayer.setShield(ShieldType.TORCH, -1)
                 }
                 if (logsTransferred > 0) {
                     interactingPlayer.inventory.removeItem(Item.WOOD, logsTransferred)

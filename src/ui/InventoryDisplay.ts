@@ -8,14 +8,12 @@ import {
 } from "brigsby/dist/sprites"
 import { Dude } from "../characters/Dude"
 import { player } from "../characters/player"
-import { ShieldType } from "../characters/weapons/ShieldType"
-import { WeaponType } from "../characters/weapons/WeaponType"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { getInventoryItemActions, ItemAction } from "../items/getInventoryItemActions"
 import { Inventory, ItemStack } from "../items/Inventory"
-import { Item, ItemSpec, ITEM_METADATA_MAP } from "../items/Items"
+import { ItemSpec, ITEM_METADATA_MAP } from "../items/Items"
 import { clientSyncFn } from "../online/utils"
 import { saveManager } from "../SaveManager"
 import { Color } from "./Color"
@@ -34,7 +32,7 @@ import { UIStateManager } from "./UIStateManager"
  * [ ] Make sure you handle the case where a different user updates the stack they're drawing from (probably just reset)
  * [ ] Show the count via the tooltip
  * [ ] Some way to unselect your held stack (click outside? tab?)
- * [ ] Fix bug where sprite gets stuck when clicking in between valid squares
+ * [?] Fix bug where sprite gets stuck when clicking in between valid squares
  *
  * [ ] Add "equipped" field to item metadata and prevent (or properly unequip) those items
  *
@@ -152,23 +150,6 @@ export class InventoryDisplay extends Component {
         this.open(this.onClose, this.tradingInv)
     }
 
-    private canRemoveFromPlayerInv(item: Item) {
-        if (this.playerInv.getItemCount(item) === 1) {
-            // unequip equipped weapons
-            const weapon: WeaponType = WeaponType[WeaponType[item]]
-            if (!!weapon && player().weaponType === weapon) {
-                return false
-            }
-
-            // unequip equipped shields
-            const shield: ShieldType = ShieldType[ShieldType[item]]
-            if (!!shield && player().shieldType === shield) {
-                return false
-            }
-        }
-        return true
-    }
-
     private checkDragAndDrop(hoverInv: Inventory, hoverIndex: number) {
         // dragging
         this.tooltip.clear()
@@ -188,6 +169,7 @@ export class InventoryDisplay extends Component {
                         this.heldStackCount
                     )
                 ) {
+                    actionSuccess = true
                     this.transfer(
                         this.heldStackInventory.uuid,
                         this.heldStackInvIndex,
@@ -197,16 +179,7 @@ export class InventoryDisplay extends Component {
                     )
                 } else if (this.heldStackCount === draggedValue.count) {
                     // swap full stacks
-                    // drop n swap
-                    // Swap the stacks
-
-                    // Swap the stacks
-                    // TODO BUG: This needs to check both inventories, not just hoverInv
-                    // We could probably do this in a much better way
-                    if (
-                        hoverInv === this.playerInv ||
-                        this.canRemoveFromPlayerInv(draggedValue.item)
-                    ) {
+                    if (hoverInv === this.playerInv) {
                         actionSuccess = true
                         this.swapStacks(
                             this.heldStackInventory.uuid,
@@ -240,7 +213,7 @@ export class InventoryDisplay extends Component {
         }
     }
 
-    private isInventoryUpdateValid = (dudeInv: Inventory, invA: Inventory, invB: Inventory) => {
+    private isInventoryUpdateValid(dudeInv: Inventory, invA: Inventory, invB: Inventory) {
         // do a bunch of validation to prevent h4xx0rs
 
         if (!invA || !invB) {
@@ -397,11 +370,12 @@ export class InventoryDisplay extends Component {
             [controls.getInventoryOptionTwoString(), () => controls.isInventoryOptionTwoDown()],
         ]
 
-        let tooltipString = `${hotKeyPrefix}${item.displayName}${count}`
-
-        actions.forEach((action, i) => {
-            tooltipString += `\n${interactButtonOrder[i][0]} to ${action.verb}`
-        })
+        const tooltipString = [
+            hotKeyPrefix,
+            item.displayName,
+            count,
+            ...actions.map((action, i) => `\n${interactButtonOrder[i][0]} to ${action.verb}`),
+        ].join("")
 
         this.tooltip.say(tooltipString)
 
@@ -424,8 +398,7 @@ export class InventoryDisplay extends Component {
                 if (
                     otherInv &&
                     controls.isModifierHeld() &&
-                    otherInv.canAddItem(item, count, metadata) &&
-                    this.canRemoveFromPlayerInv(item)
+                    otherInv.canAddItem(item, count, metadata)
                 ) {
                     // shift click transfer
                     // TODO revisit

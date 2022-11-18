@@ -66,28 +66,24 @@ export const getInventoryItemActions = (playerInvIndex: number): ItemAction[] =>
         })
     }
 
-    if (item.equippableWeapon) {
-        if (player().weaponType !== item.equippableWeapon) {
-            actions.push({
-                verb: "equip",
-                actionFn: () => {
-                    player().setWeapon(item.equippableWeapon) // client sync fn
-                    InventoryDisplay.instance.refreshView()
-                },
-            })
-        }
+    if (item.equippableWeapon && !stack.metadata.equipped) {
+        actions.push({
+            verb: "equip",
+            actionFn: () => {
+                player().setWeapon(item.equippableWeapon, playerInvIndex) // client sync fn
+                InventoryDisplay.instance.refreshView()
+            },
+        })
     }
 
-    if (item.equippableShield) {
-        if (player().shieldType !== item.equippableShield) {
-            actions.push({
-                verb: "equip off-hand",
-                actionFn: () => {
-                    player().setShield(item.equippableShield) // client sync fn
-                    InventoryDisplay.instance.refreshView()
-                },
-            })
-        }
+    if (item.equippableShield && !stack.metadata.equipped) {
+        actions.push({
+            verb: "equip off-hand",
+            actionFn: () => {
+                player().setShield(item.equippableShield, playerInvIndex) // client sync fn
+                InventoryDisplay.instance.refreshView()
+            },
+        })
     }
 
     if (item.consumable) {

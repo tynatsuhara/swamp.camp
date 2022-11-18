@@ -29,7 +29,7 @@ export class ShroomNPC extends Component {
         this.dude.blob[NEXT_GROWTH_TIME] = this.dude.blob[NEXT_GROWTH_TIME] || this.nextGrowthTime()
 
         if (this.dude.blob[SIZE] == 3) {
-            this.dude.setWeapon(WeaponType.UNARMED)
+            this.dude.setWeapon(WeaponType.UNARMED, -1)
             this.enemy = this.entity.addComponent(new Enemy())
         }
 
@@ -37,7 +37,7 @@ export class ShroomNPC extends Component {
         this.dude.setOnDamageCallback(() => {
             // NPC will flee until it has a non-NONE weapon
             if (this.dude.blob[SIZE] == 2 && !this.dude.weapon) {
-                this.dude.setWeapon(WeaponType.UNARMED)
+                this.dude.setWeapon(WeaponType.UNARMED, -1)
             }
             // Adding enemy component will cause them to flee or engage in combat
             if (!this.enemy) {

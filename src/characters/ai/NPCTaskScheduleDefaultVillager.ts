@@ -33,7 +33,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         } else {
             // Go home!
             goalLocation = this.findHomeLocation(dude)
-            dude.setWeapon(WeaponType.NONE)
+            dude.setWeapon(WeaponType.NONE, -1)
         }
 
         if (goalLocation && dude.location !== goalLocation) {
@@ -86,12 +86,12 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             }
 
             // side effect
-            dude.setWeapon(WeaponType.PICKAXE)
+            dude.setWeapon(WeaponType.PICKAXE, -1)
 
             return LocationManager.instance.get(mines[0])
         } else if (job === VillagerJob.HARVEST_WOOD) {
             // side effect
-            dude.setWeapon(WeaponType.AXE)
+            dude.setWeapon(WeaponType.AXE, -1)
 
             return camp()
         }

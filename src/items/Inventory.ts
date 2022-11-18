@@ -6,6 +6,7 @@ import { Item, ItemMetadata, ITEM_METADATA_MAP } from "./Items"
 
 export type ItemStackMetadata = ItemMetadata & {
     hotKey?: InputKey
+    equipped?: "weapon" | "shield" | undefined
 }
 
 export class ItemStack {
@@ -23,8 +24,8 @@ export class ItemStack {
         return new ItemStack(this.item, newCount, this.metadata)
     }
 
-    withMetadata(metadata: ItemStackMetadata) {
-        return new ItemStack(this.item, this.count, metadata)
+    withMetadata(metadata: Partial<ItemStackMetadata>) {
+        return new ItemStack(this.item, this.count, { ...this.metadata, ...metadata })
     }
 }
 
@@ -59,6 +60,13 @@ export class Inventory {
 
     get size() {
         return this.stacks.length
+    }
+
+    /**
+     * @returns -1 if nothing matches the predicate
+     */
+    findIndex(predicate: (value: ItemStack | null, index: number) => boolean) {
+        return this.stacks.findIndex(predicate)
     }
 
     getStack(index: number): ItemStack {
@@ -157,25 +165,30 @@ export class Inventory {
         }
     }
 
-    removeItem(item: Item, count: number = 1, metadata: ItemStackMetadata = {}) {
+    removeItemAtIndex(index: number, amountToRemove: number = 1) {
+        const slotValue = this.getStack(index)
+        if (!slotValue) {
+            return
+        }
+        this.setStack(index, slotValue.withCount(slotValue.count - amountToRemove))
+    }
+
+    removeItem(item: Item, amountToRemove: number = 1, metadata: ItemStackMetadata = {}) {
         const currentCount = this.getItemCount(item)
-        if (currentCount < count) {
+        if (currentCount < amountToRemove) {
             console.error("inventory cannot go negative")
             return
         }
-        this.countMap.set(item, currentCount - count)
+        this.countMap.set(item, currentCount - amountToRemove)
 
         for (let i = 0; i < this.stacks.length; i++) {
             const slotValue = this.getStack(i)
             if (slotValue?.item === item && doesMetadataMatch(slotValue.metadata, metadata)) {
-                let newSlotCount = slotValue.count
-                while (newSlotCount > 0 && count > 0) {
-                    count--
-                    newSlotCount--
-                }
-                this.setStack(i, slotValue.withCount(newSlotCount))
-                if (count === 0) {
-                    break
+                const amountRemovedFromSlot = Math.min(slotValue.count, amountToRemove)
+                this.removeItemAtIndex(i, amountRemovedFromSlot)
+                amountToRemove -= amountRemovedFromSlot
+                if (amountToRemove === 0) {
+                    return
                 }
             }
         }

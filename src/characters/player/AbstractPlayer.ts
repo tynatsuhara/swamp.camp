@@ -175,15 +175,16 @@ export abstract class AbstractPlayer extends Component {
     checkHotKeys(updateData: UpdateData) {
         controls.HOT_KEY_OPTIONS.forEach((hotKey) => {
             if (updateData.input.isKeyDown(hotKey)) {
-                const hotKeyItem = this.dude.inventory
+                const hotKeyItemIndex = this.dude.inventory
                     .getStacks()
-                    .find((s) => s.metadata.hotKey === hotKey)?.item
+                    .findIndex((s) => s.metadata.hotKey === hotKey)
+                const hotKeyItem = this.dude.inventory.getStack(hotKeyItemIndex)?.item
                 if (hotKeyItem) {
                     const itemData = ITEM_METADATA_MAP[hotKeyItem]
                     if (itemData.equippableWeapon && !this.dude.weapon?.isAttacking()) {
-                        this.dude.setWeapon(itemData.equippableWeapon)
+                        this.dude.setWeapon(itemData.equippableWeapon, hotKeyItemIndex)
                     } else if (itemData.equippableShield && !this.dude.shield?.isBlocking()) {
-                        this.dude.setShield(itemData.equippableShield)
+                        this.dude.setShield(itemData.equippableShield, hotKeyItemIndex)
                     }
                 }
             }

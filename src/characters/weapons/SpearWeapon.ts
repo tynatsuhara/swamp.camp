@@ -136,8 +136,11 @@ export class SpearWeapon extends Weapon {
 
         const timeToThrow = 500
         if (this.timeDrawn > timeToThrow) {
-            this.dude.inventory.removeItem(Item.SPEAR, 1)
-            this.dude.setWeapon(WeaponType.UNARMED)
+            this.dude.inventory.removeItemAtIndex(
+                this.dude.inventory.findIndex(
+                    (stack) => stack?.item === Item.SPEAR && stack.metadata.equipped === "weapon"
+                )
+            )
 
             const { sprite, transform } = this.getSpriteAndTransform(this.getAimingAngle())
 
