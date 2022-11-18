@@ -1,3 +1,4 @@
+import { Point } from "brigsby/dist/Point"
 import { profiler } from "brigsby/dist/Profiler"
 import { Dude } from "../characters/Dude"
 import { player } from "../characters/player/index"
@@ -15,13 +16,21 @@ export type ItemAction = {
     actionFn: () => void
 }
 
-// MPTODO
-const place = clientSyncFn("place", "host-only", ({ dudeUUID }, invIndex: number) => {
-    const dude = Dude.get(dudeUUID)
-    const stack = dude.inventory.getStack(invIndex)
-    dude.inventory.setStack(invIndex, stack.withCount(stack.count - 1))
-})
+// place the item at a given inventory index
+const placeOnHost = clientSyncFn(
+    "place",
+    "host-only",
+    ({ dudeUUID }, invIndex: number, elementPos: Point) => {
+        const inv = Dude.get(dudeUUID).inventory
+        const stack = inv.getStack(invIndex)
 
+        PlaceElementDisplay.instance.finishPlacingOnHost(stack, elementPos)
+
+        inv.setStack(invIndex, stack.withCount(stack.count - 1))
+    }
+)
+
+// consume the item at a given inventory index
 const consume = clientSyncFn("consume", "caller-and-host", ({ dudeUUID }, invIndex: number) => {
     const dude = Dude.get(dudeUUID)
     const stack = dude.inventory.getStack(invIndex)
@@ -49,9 +58,10 @@ export const getInventoryItemActions = (playerInvIndex: number): ItemAction[] =>
             verb: "place",
             actionFn: () => {
                 InventoryDisplay.instance.close()
-                PlaceElementDisplay.instance.startPlacing(stack, () => {
-                    /* todo */
-                })
+                const stack = player().inventory.getStack(playerInvIndex)
+                PlaceElementDisplay.instance.startPlacing(stack, (elementPos) =>
+                    placeOnHost(playerInvIndex, elementPos)
+                )
             },
         })
     }

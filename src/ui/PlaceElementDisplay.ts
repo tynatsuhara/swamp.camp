@@ -1,4 +1,5 @@
 import { Component, Entity, Point, UpdateData } from "brigsby/dist"
+import { PointValue, pt } from "brigsby/dist/Point"
 import { Grid, Maths } from "brigsby/dist/util"
 import { player } from "../characters/player"
 import { controls } from "../Controls"
@@ -20,7 +21,7 @@ export class PlaceElementDisplay extends Component {
     private element: ElementType
     private elementFactory: ElementFactory<any>
     private placingFrame: PlaceElementFrame
-    private successFn: () => void
+    private successFn: (elementPos: Point) => void
 
     get isOpen() {
         return this.element !== null && this.element !== undefined
@@ -32,7 +33,7 @@ export class PlaceElementDisplay extends Component {
     }
 
     update(updateData: UpdateData) {
-        if (this.stack?.count === 0) {
+        if (!this.stack?.count) {
             return
         }
 
@@ -47,7 +48,7 @@ export class PlaceElementDisplay extends Component {
         this.placingFrame?.delete()
     }
 
-    startPlacing(stack: ItemStack, successFn: () => void) {
+    startPlacing(stack: ItemStack, successFn: (elementPos: Point) => void) {
         this.stack = stack
         this.successFn = successFn
 
@@ -59,26 +60,37 @@ export class PlaceElementDisplay extends Component {
         )
     }
 
-    // Should only be called by PlaceElementFrame
-    finishPlacing(elementPos: Point) {
-        this.stack = this.stack.withCount(this.stack.count - 1)
-        this.successFn() // decrement and maybe remove from inv
+    finishPlacingOnHost(stack: ItemStack, elementPos: PointValue) {
+        const itemMetadata = ITEM_METADATA_MAP[stack.item]
+        const element = itemMetadata.element
 
-        const data = this.stack.metadata
-            ? this.elementFactory.itemMetadataToSaveFormat(this.stack.metadata)
+        if (element === undefined || stack.count === 0) {
+            console.warn(`cannot place stack: ${JSON.stringify(stack)}`)
+            return
+        }
+
+        const elementFactory = Elements.instance.getElementFactory(element)
+
+        const data = stack.metadata
+            ? elementFactory.itemMetadataToSaveFormat(stack.metadata)
             : undefined
 
-        here().addElement(this.element, elementPos, data)
+        const addedElement = here().addElement(element, elementPos, data)
+
+        if (!addedElement) {
+            console.warn(`failed to place element: ${JSON.stringify(stack)}`)
+            return
+        }
 
         // Push if there are any colliders
-        const shouldPush = ElementUtils.rectPoints(elementPos, this.elementFactory.dimensions).some(
+        const shouldPush = ElementUtils.rectPoints(elementPos, elementFactory.dimensions).some(
             (pt) => here().isOccupied(pt)
         )
 
         // Push dudes out of the way
         if (shouldPush) {
-            const p = elementPos.times(TILE_SIZE)
-            const d = this.elementFactory.dimensions.times(TILE_SIZE)
+            const p = pt(elementPos.x, elementPos.y).times(TILE_SIZE)
+            const d = elementFactory.dimensions.times(TILE_SIZE)
             const intersectingDudes = here()
                 .getDudes()
                 .filter((dude) => Maths.rectContains(p, d, dude.standingPosition))
@@ -92,6 +104,13 @@ export class PlaceElementDisplay extends Component {
                 d.moveTo(newPos.plus(new Point(0.5, 0.75)).times(TILE_SIZE), true)
             })
         }
+    }
+
+    // Should only be called by PlaceElementFrame
+    finishPlacing(elementPos: Point) {
+        this.stack = this.stack.withCount(this.stack.count - 1)
+
+        this.successFn(elementPos) // remove from inventory and call doPlacingOnHost (on host)
 
         if (this.stack.count === 0) {
             this.close()

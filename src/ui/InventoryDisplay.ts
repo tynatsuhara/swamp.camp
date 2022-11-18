@@ -90,6 +90,7 @@ export class InventoryDisplay extends Component {
         }
     }
 
+    // MPTODO
     private checkSetHotKey(index: number, spec: ItemSpec, updateData: UpdateData) {
         if (!spec.equippableWeapon && !spec.equippableShield) {
             return
@@ -141,6 +142,7 @@ export class InventoryDisplay extends Component {
         // dragging
         this.tooltip.clear()
         if (controls.isInventoryStackDrop()) {
+            // MPTODO
             // drop n swap
             if (hoverIndex !== -1) {
                 // Swap the stacks
@@ -208,6 +210,7 @@ export class InventoryDisplay extends Component {
         }
     }
 
+    // MPTODO
     private checkForPickUp(hoverInv: Inventory, hoverIndex: number) {
         if (controls.isInventoryStackPickUp()) {
             const hoveredItemStack = hoverInv?.getStack(hoverIndex)
@@ -237,6 +240,7 @@ export class InventoryDisplay extends Component {
         }
     }
 
+    // MPTODO
     private stripHotKeysFromOtherInv() {
         this.tradingInv?.getStacks().forEach((s, i) => {
             if (s.metadata.hotKey) {
