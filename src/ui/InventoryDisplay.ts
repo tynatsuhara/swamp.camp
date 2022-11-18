@@ -31,24 +31,6 @@ import { TEXT_FONT, TEXT_SIZE } from "./Text"
 import { Tooltip } from "./Tooltip"
 import { UIStateManager } from "./UIStateManager"
 
-/**
- * NEW UX PLAN
- * REPRESENT THE STACK YOU ARE “DRAWING FROM”, AND THE AMOUNT YOU ARE DRAWING, RATHER THAN THE FULL STACK
- *
- * [X] Can pick up half with right click
- * [X] Can swap FULL stacks
- * [X] Merge stacks
- * [X] Shift click stacks
- * [ ] Can drop portions of stacks 1 at at time
- * [ ] Make sure you handle the case where a different user updates the stack they're drawing from (probably just reset)
- * [X] Show the count via the tooltip
- * [ ] Some way to unselect your held stack (click outside? tab?)
- * [?] BUG: Sprite gets stuck when clicking in between valid squares
- * [x] BUG: After putting an equipped item in the inventory, weapon hot key for item still in inv doesn't work
- * [x] Add "equipped" field to item metadata and prevent (or properly unequip) those items
- *
- */
-
 export class InventoryDisplay extends Component {
     static instance: InventoryDisplay
 
@@ -161,6 +143,15 @@ export class InventoryDisplay extends Component {
         this.open(this.onClose, this.tradingInv)
     }
 
+    private resetHeldItem() {
+        this.tooltip.clear()
+        this.heldStackCount = undefined
+        this.heldStackInvIndex = undefined
+        this.heldStackInventory = null
+        this.heldStackSprite?.delete()
+        this.heldStackSprite = null
+    }
+
     private checkDragAndDrop(hoverInv: Inventory, hoverIndex: number) {
         // dragging
         this.tooltip.clear()
@@ -202,11 +193,7 @@ export class InventoryDisplay extends Component {
                 }
             }
 
-            this.heldStackCount = undefined
-            this.heldStackInvIndex = undefined
-            this.heldStackInventory = null
-            this.heldStackSprite?.delete()
-            this.heldStackSprite = null
+            this.resetHeldItem()
 
             if (!actionSuccess) {
                 // only refresh if we didn't successfully swap, otherwise there's a weird
@@ -491,9 +478,6 @@ export class InventoryDisplay extends Component {
     }
 
     close() {
-        if (!!this.heldStackSprite) {
-            return
-        }
         this.showingInv = false
         this.stackSprites = []
         this.tooltip.clear()
@@ -508,6 +492,8 @@ export class InventoryDisplay extends Component {
     }
 
     open(onClose: () => void = null, tradingInv: Inventory = null) {
+        this.resetHeldItem()
+
         this.onClose = onClose
         this.tradingInv = tradingInv
         const screenDimensions = Camera.instance.dimensions
