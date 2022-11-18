@@ -184,6 +184,10 @@ export class InventoryDisplay extends Component {
         }
     }
 
+    /**
+     * invA refers to the src inventory, invB is the dst inventory
+     * stackIdxB can be -1 if we're just moving it wherever it fits (eg shift-clicking)
+     */
     private swapStacks = clientSyncFn(
         "swapstax",
         "host-only",
@@ -227,23 +231,33 @@ export class InventoryDisplay extends Component {
                 }
             }
 
-            console.log("swap")
-
-            const stackA = invA.getStack(stackIdxA)
-            const stackB = invB.getStack(stackIdxB)
-
             const updateInvStack = (inv: Inventory, stackIdx: number, stack: ItemStack) => {
-                inv.setStack(
-                    stackIdx,
-                    stack?.withMetadata({
-                        ...stack.metadata,
-                        hotKey: inv === dudeInv ? stack.metadata.hotKey : undefined,
-                    })
-                )
+                // strip hotkey from metadata
+                const updatedStack = stack?.withMetadata({
+                    ...stack.metadata,
+                    hotKey: inv === dudeInv ? stack.metadata.hotKey : undefined,
+                })
+
+                if (stackIdx !== -1) {
+                    // put it in the slot specified
+                    inv.setStack(stackIdx, updatedStack)
+                } else if (stack) {
+                    // stackIdx === -1 means to just add it wherever
+                    inv.addItem(stack.item, stack.count, stack.metadata)
+                }
             }
 
-            updateInvStack(invA, stackIdxA, stackB)
-            updateInvStack(invB, stackIdxB, stackA)
+            if (stackIdxB !== -1) {
+                // swap
+                const stackA = invA.getStack(stackIdxA)
+                const stackB = invB.getStack(stackIdxB)
+                updateInvStack(invA, stackIdxA, stackB)
+                updateInvStack(invB, stackIdxB, stackA)
+            } else {
+                // add
+                updateInvStack(invB, stackIdxB, invA.getStack(stackIdxA))
+                invA.setStack(stackIdxA, null)
+            }
         }
     )
 

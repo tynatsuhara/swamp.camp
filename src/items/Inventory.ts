@@ -8,7 +8,6 @@ export type ItemStackMetadata = ItemMetadata & {
     hotKey?: InputKey
 }
 
-// MPTODO: This breaks when serializing due to the methods
 export class ItemStack {
     readonly item: Item
     readonly count: number
@@ -132,7 +131,6 @@ export class Inventory {
         return availableRoom >= count
     }
 
-    // MPTODO
     removeItem(item: Item, count: number = 1) {
         const currentCount = this.getItemCount(item)
         if (currentCount < count) {
