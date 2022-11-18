@@ -6,8 +6,8 @@ import { syncFn } from "../online/utils"
 import { saveManager } from "../SaveManager"
 import { InventoryDisplay } from "../ui/InventoryDisplay"
 import { Notification, NotificationDisplay } from "../ui/NotificationDisplay"
-import { Inventory, ItemStackMetadata } from "./Inventory"
-import { Item, ITEM_METADATA_MAP } from "./Items"
+import { Inventory } from "./Inventory"
+import { Item, ItemMetadata, ITEM_METADATA_MAP } from "./Items"
 
 type SpecialItem = {
     // If true, this item doesn't actually go in the inventory
@@ -87,9 +87,9 @@ export class PlayerInventory extends Inventory {
         }
     }
 
-    addItem: (item: Item, count?: number, metadata?: ItemStackMetadata, quiet?: boolean) => boolean
+    addItem: (item: Item, count?: number, metadata?: ItemMetadata, quiet?: boolean) => boolean
 
-    canAddItem(item: Item, count: number = 1, metadata: ItemStackMetadata = {}): boolean {
+    canAddItem(item: Item, count: number = 1, metadata: ItemMetadata = {}): boolean {
         return SPECIAL_ITEMS[item]?.noInventorySlot || super.canAddItem(item, count, metadata)
     }
 

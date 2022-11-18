@@ -175,9 +175,10 @@ export abstract class AbstractPlayer extends Component {
     checkHotKeys(updateData: UpdateData) {
         controls.HOT_KEY_OPTIONS.forEach((hotKey) => {
             if (updateData.input.isKeyDown(hotKey)) {
-                const hotKeyItemIndex = this.dude.inventory
-                    .getStacks()
-                    .findIndex((s) => s.metadata.hotKey === hotKey)
+                const hotKeyItemIndex = this.dude.inventory.findIndex(
+                    (stack) => stack?.metadata.hotKey === hotKey
+                )
+                console.log(hotKeyItemIndex)
                 const hotKeyItem = this.dude.inventory.getStack(hotKeyItemIndex)?.item
                 if (hotKeyItem) {
                     const itemData = ITEM_METADATA_MAP[hotKeyItem]

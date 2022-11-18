@@ -1,4 +1,13 @@
-import { Component, Entity, InputKey, InputKeyString, Point, pt, UpdateData } from "brigsby/dist"
+import {
+    Component,
+    Entity,
+    InputKey,
+    InputKeyString,
+    Point,
+    profiler,
+    pt,
+    UpdateData,
+} from "brigsby/dist"
 import { BasicRenderComponent, TextRender } from "brigsby/dist/renderer"
 import {
     AnimatedSpriteComponent,
@@ -10,6 +19,7 @@ import { Dude } from "../characters/Dude"
 import { player } from "../characters/player"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
+import { prettyPrint } from "../debug/JSON"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { getInventoryItemActions, ItemAction } from "../items/getInventoryItemActions"
 import { Inventory, ItemStack } from "../items/Inventory"
@@ -135,12 +145,12 @@ export class InventoryDisplay extends Component {
 
             inv.getStacks().forEach((s, i) => {
                 if (s.metadata?.hotKey === hotKey) {
-                    inv.setStack(i, s.withMetadata({ ...s.metadata, hotKey: undefined }))
+                    inv.setStack(i, s.withMetadata({ hotKey: null }))
                 }
             })
 
             const stack = inv.getStack(index)
-            inv.setStack(index, stack.withMetadata({ ...stack.metadata, hotKey }))
+            inv.setStack(index, stack.withMetadata({ hotKey }))
         }
     )
 
@@ -256,8 +266,8 @@ export class InventoryDisplay extends Component {
     }
 
     private removePlayerInvOnlyMetadata(metadata: ItemMetadata) {
-        metadata.hotKey = undefined
-        metadata.equipped = undefined
+        metadata.hotKey = null
+        metadata.equipped = null
     }
 
     private canTransfer(
@@ -321,7 +331,13 @@ export class InventoryDisplay extends Component {
     private swapStacks = clientSyncFn(
         "swapstax",
         "host-only",
-        ({ dudeUUID }, invIdA: string, stackIdxA: number, invIdB: string, stackIdxB: number) => {
+        (
+            { dudeUUID },
+            invIdA: string,
+            stackIdxA: number,
+            invIdB: string,
+            stackIdxB: number = -1
+        ) => {
             const dudeInv = Dude.get(dudeUUID).inventory
             const invA = Inventory.get(invIdA)
             const invB = Inventory.get(invIdB)
@@ -336,14 +352,12 @@ export class InventoryDisplay extends Component {
                     this.removePlayerInvOnlyMetadata(newMetadata)
                 }
 
-                const updatedStack = stack?.withMetadata(newMetadata)
-
                 if (stackIdx !== -1) {
                     // put it in the slot specified
-                    inv.setStack(stackIdx, updatedStack)
+                    inv.setStack(stackIdx, stack?.withMetadata(newMetadata))
                 } else if (stack) {
                     // stackIdx === -1 means to just add it wherever
-                    inv.addItem(stack.item, stack.count, stack.metadata)
+                    inv.addItem(stack.item, stack.count, newMetadata)
                 }
             }
 
@@ -399,6 +413,7 @@ export class InventoryDisplay extends Component {
         ].join("")
 
         this.tooltip.say(tooltipString)
+        profiler.showInfo(`item metadata: ${prettyPrint(stack.metadata)}`)
 
         if (this.canUseItems) {
             actions.forEach((action, i) => {
@@ -420,9 +435,8 @@ export class InventoryDisplay extends Component {
                     controls.isModifierHeld() &&
                     otherInv.canAddItem(item, count, metadata)
                 ) {
-                    // shift click transfer
-                    hoverInv.removeItemAtIndex(hoverIndex, count)
-                    otherInv.addItem(item, count, metadata)
+                    // shift-click transfer
+                    this.swapStacks(hoverInv.uuid, hoverIndex, otherInv.uuid)
                 } else {
                     this.heldStackInventory = hoverInv
                     this.heldStackInvIndex = hoverIndex

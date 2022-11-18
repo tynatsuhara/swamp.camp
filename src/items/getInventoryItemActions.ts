@@ -1,8 +1,6 @@
 import { Point } from "brigsby/dist/Point"
-import { profiler } from "brigsby/dist/Profiler"
 import { Dude } from "../characters/Dude"
 import { player } from "../characters/player/index"
-import { prettyPrint } from "../debug/JSON"
 import { session } from "../online/session"
 import { clientSyncFn } from "../online/utils"
 import { InventoryDisplay } from "../ui/InventoryDisplay"
@@ -45,7 +43,6 @@ export const getInventoryItemActions = (playerInvIndex: number): ItemAction[] =>
     const stack = player().inventory.getStack(playerInvIndex)
     const item = ITEM_METADATA_MAP[stack.item]
 
-    profiler.showInfo(`item metadata: ${prettyPrint(stack.metadata)}`)
     const wl = here()
     const actions: ItemAction[] = []
 
