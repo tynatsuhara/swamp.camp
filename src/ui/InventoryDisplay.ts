@@ -14,7 +14,7 @@ import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { getInventoryItemActions, ItemAction } from "../items/getInventoryItemActions"
-import { Inventory } from "../items/Inventory"
+import { Inventory, ItemStack } from "../items/Inventory"
 import { Item, ItemSpec, ITEM_METADATA_MAP } from "../items/Items"
 import { clientSyncFn } from "../online/utils"
 import { saveManager } from "../SaveManager"
@@ -163,7 +163,7 @@ export class InventoryDisplay extends Component {
             this.heldStackInventory = null
             this.heldStackSprite = null
 
-            this.stripHotKeysFromOtherInv()
+            // this.stripHotKeysFromOtherInv()
 
             if (!swapSuccess) {
                 // only refresh if we didn't successfully swap, otherwise there's a weird
@@ -226,8 +226,18 @@ export class InventoryDisplay extends Component {
             const stackA = invA.getStack(stackIdxA)
             const stackB = invB.getStack(stackIdxB)
 
-            invA.setStack(stackIdxA, stackB)
-            invB.setStack(stackIdxB, stackA)
+            const updateInvStack = (inv: Inventory, stackIdx: number, stack: ItemStack) => {
+                inv.setStack(
+                    stackIdx,
+                    stack?.withMetadata({
+                        ...stack.metadata,
+                        hotKey: inv === dudeInv ? stack.metadata.hotKey : undefined,
+                    })
+                )
+            }
+
+            updateInvStack(invA, stackIdxA, stackB)
+            updateInvStack(invB, stackIdxB, stackA)
         }
     )
 
@@ -284,7 +294,7 @@ export class InventoryDisplay extends Component {
                 ) {
                     hoverInv.removeItem(item, count)
                     otherInv.addItem(item, count)
-                    this.stripHotKeysFromOtherInv()
+                    // this.stripHotKeysFromOtherInv()
                     this.refreshView()
                 } else {
                     this.heldStackInventory = hoverInv
@@ -297,15 +307,6 @@ export class InventoryDisplay extends Component {
                 }
             }
         }
-    }
-
-    // MPTODO
-    private stripHotKeysFromOtherInv() {
-        this.tradingInv?.getStacks().forEach((s, i) => {
-            if (s.metadata.hotKey) {
-                this.tradingInv.setStack(i, s.withMetadata({ ...s.metadata, hotKey: undefined }))
-            }
-        })
     }
 
     private getOffsetForInv(inv: Inventory) {
