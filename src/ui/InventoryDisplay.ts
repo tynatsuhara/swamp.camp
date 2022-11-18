@@ -304,16 +304,16 @@ export class InventoryDisplay extends Component {
         if (controls.isInventoryStackPickUp()) {
             const hoveredItemStack = hoverInv?.getStack(hoverIndex)
             if (hoveredItemStack) {
-                const { item, count } = hoveredItemStack
+                const { item, count, metadata } = hoveredItemStack
                 const otherInv = hoverInv === this.playerInv ? this.tradingInv : this.playerInv
                 if (
                     otherInv &&
                     controls.isModifierHeld() &&
-                    otherInv.canAddItem(item, count) &&
+                    otherInv.canAddItem(item, count, metadata) &&
                     this.canRemoveFromPlayerInv(item)
                 ) {
-                    hoverInv.removeItem(item, count)
-                    otherInv.addItem(item, count)
+                    hoverInv.removeItem(item, count, metadata)
+                    otherInv.addItem(item, count, metadata)
                     // this.stripHotKeysFromOtherInv()
                     this.refreshView()
                 } else {
