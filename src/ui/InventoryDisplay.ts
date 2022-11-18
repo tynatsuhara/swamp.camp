@@ -23,16 +23,34 @@ import { TEXT_FONT, TEXT_SIZE } from "./Text"
 import { Tooltip } from "./Tooltip"
 import { UIStateManager } from "./UIStateManager"
 
+/**
+ * NEW UX PLAN
+ * REPRESENT THE STACK YOU ARE “DRAWING FROM”, AND THE AMOUNT YOU ARE DRAWING, RATHER THAN THE FULL STACK
+ *
+ * [X] Can pick up half with right click
+ * [X] Can swap FULL stacks
+ * [ ] Can drop partial stacks
+ * [ ] Make sure you handle the case where a different user updates the stack they're drawing from (probably just reset)
+ * [ ] Show the count via the tooltip
+ * [ ] Some way to unselect your held stack (click outside? tab?)
+ * [ ] Fix bug where sprite gets stuck when clicking in between valid squares
+ *
+ * [ ] Add "equipped" field to item metadata and prevent (or properly unequip) those items
+ *
+ */
+
 export class InventoryDisplay extends Component {
     static instance: InventoryDisplay
 
     private static COLUMNS = 10
 
-    private readonly e: Entity = new Entity() // entity for this component
-    private displayEntity: Entity
+    private heldStackCount: number // should be <= the value of the stack in the inventory
     private heldStackInventory: Inventory
     private heldStackInvIndex: number
     private heldStackSprite: SpriteComponent // non-null when being dragged
+
+    private readonly e: Entity = new Entity() // entity for this component
+    private displayEntity: Entity
     private lastMousPos: Point
     private stackSprites: SpriteComponent[] = []
     private showingInv = false
@@ -71,14 +89,16 @@ export class InventoryDisplay extends Component {
             return
         }
 
+        this.tooltip.position = controls.getMousePos()
+
         const [hoverInv, hoverIndex] = this.getHoveredInventoryIndex(controls.getMousePos())
 
         const wasHoldingSomething = !!this.heldStackSprite
 
         if (wasHoldingSomething) {
-            this.doDrag(hoverInv, hoverIndex)
+            this.checkDragAndDrop(hoverInv, hoverIndex)
         } else if (hoverIndex > -1 && hoverInv.getStack(hoverIndex)) {
-            this.doHover(hoverInv, hoverIndex, updateData)
+            this.checkMouseHoverActions(hoverInv, hoverIndex, updateData)
         } else {
             this.tooltip.clear()
         }
@@ -148,44 +168,165 @@ export class InventoryDisplay extends Component {
         return true
     }
 
-    private doDrag(hoverInv: Inventory, hoverIndex: number) {
+    private checkDragAndDrop(hoverInv: Inventory, hoverIndex: number) {
         // dragging
         this.tooltip.clear()
         if (controls.isInventoryStackDrop()) {
-            let swapSuccess = false
-            // drop n swap
+            let actionSuccess = false
+
             if (hoverIndex !== -1) {
-                // Swap the stacks
                 const draggedValue = this.heldStackInventory.getStack(this.heldStackInvIndex)
 
-                // Swap the stacks
-                // BUG: This needs to check both inventories, not just hoverInv
-                if (hoverInv === this.playerInv || this.canRemoveFromPlayerInv(draggedValue.item)) {
-                    swapSuccess = true
-                    this.swapStacks(
-                        hoverInv.uuid,
-                        hoverIndex,
-                        this.heldStackInventory.uuid,
-                        this.heldStackInvIndex
-                    )
+                if (this.heldStackCount === draggedValue.count) {
+                    // swap full stacks
+                    // drop n swap
+                    // Swap the stacks
+
+                    // Swap the stacks
+                    // TODO BUG: This needs to check both inventories, not just hoverInv
+                    // We could probably do this in a much better way
+                    if (
+                        hoverInv === this.playerInv ||
+                        this.canRemoveFromPlayerInv(draggedValue.item)
+                    ) {
+                        actionSuccess = true
+                        this.swapStacks(
+                            this.heldStackInventory.uuid,
+                            this.heldStackInvIndex,
+                            hoverInv.uuid,
+                            hoverIndex
+                        )
+                    }
+                } else {
+                    // transfer partial stacks
+                    if (
+                        this.canTransfer(
+                            this.heldStackInventory,
+                            this.heldStackInvIndex,
+                            hoverInv,
+                            hoverIndex,
+                            this.heldStackCount
+                        )
+                    ) {
+                        this.transfer(
+                            this.heldStackInventory.uuid,
+                            this.heldStackInvIndex,
+                            hoverInv.uuid,
+                            hoverIndex,
+                            this.heldStackCount
+                        )
+                    }
                 }
             }
 
+            this.heldStackCount = undefined
+            this.heldStackInvIndex = undefined
             this.heldStackInventory = null
+            this.heldStackSprite?.delete()
             this.heldStackSprite = null
 
-            if (!swapSuccess) {
+            if (!actionSuccess) {
                 // only refresh if we didn't successfully swap, otherwise there's a weird
                 // jitter in multiplayer as the inventory is only updated on the host
                 this.refreshView()
             }
         } else {
+            if (this.heldStackCount > 1) {
+                this.tooltip.say(`x${this.heldStackCount}`)
+            }
             // track
             this.heldStackSprite.transform.position = this.heldStackSprite.transform.position.plus(
                 controls.getMousePos().minus(this.lastMousPos)
             )
         }
     }
+
+    private isInventoryUpdateValid = (dudeInv: Inventory, invA: Inventory, invB: Inventory) => {
+        // do a bunch of validation to prevent h4xx0rs
+
+        if (!invA || !invB) {
+            console.warn(`invalid inventory ID(s)`)
+            return false
+        }
+
+        if (invA === invB) {
+            // moving stuff around in the same inventory
+            if (invA !== dudeInv && !invA.allowTrading) {
+                console.warn(`invalid inventory ID(s)`)
+                return false
+            }
+            // if (stackIdxA === stackIdxB) {
+            //     return
+            // }
+        } else {
+            // at least one inv must be the player
+            const selfInv = [invA, invB].filter((i) => i === dudeInv)
+            if (selfInv.length < 1) {
+                console.warn(`invalid inventory ID(s)`)
+                return false
+            }
+
+            // the other inv must be tradeable
+            if (selfInv.length < 2) {
+                const doesOtherInvAllowTrading = [invA, invB].find(
+                    (i) => i !== dudeInv
+                )?.allowTrading
+                if (!doesOtherInvAllowTrading) {
+                    console.warn(`inventory does not allow trading`)
+                    return false
+                }
+            }
+        }
+
+        return true
+    }
+
+    private canTransfer(
+        invA: Inventory,
+        stackIdxA: number,
+        invB: Inventory,
+        stackIdxB: number,
+        transferAmount: number
+    ) {
+        const stackA = invA.getStack(stackIdxA)
+        const isSameStack = invA === invB && stackIdxA === stackIdxB
+        return (
+            !isSameStack &&
+            stackA &&
+            stackA.count >= transferAmount &&
+            invB.canAddToStack(stackIdxB, stackA.item, transferAmount, stackA.metadata)
+        )
+    }
+
+    private transfer = clientSyncFn(
+        "invtrans",
+        "host-only",
+        (
+            { dudeUUID },
+            invIdA: string,
+            stackIdxA: number,
+            invIdB: string,
+            stackIdxB: number,
+            transferAmount: number
+        ) => {
+            const dudeInv = Dude.get(dudeUUID).inventory
+            const invA = Inventory.get(invIdA)
+            const invB = Inventory.get(invIdB)
+
+            if (!this.isInventoryUpdateValid(dudeInv, invA, invB)) {
+                return
+            }
+
+            const stackA = invA.getStack(stackIdxA)
+            if (!this.canTransfer(invA, stackIdxA, invB, stackIdxB, transferAmount)) {
+                console.warn("invalid inventory transfer")
+                return
+            }
+
+            invB.addToStack(stackIdxB, stackA.item, transferAmount, stackA.metadata)
+            invA.setStack(stackIdxA, stackA.withCount(stackA.count - transferAmount))
+        }
+    )
 
     /**
      * invA refers to the src inventory, invB is the dst inventory
@@ -195,43 +336,12 @@ export class InventoryDisplay extends Component {
         "swapstax",
         "host-only",
         ({ dudeUUID }, invIdA: string, stackIdxA: number, invIdB: string, stackIdxB: number) => {
-            // do a bunch of validation to prevent h4xx0rs
+            const dudeInv = Dude.get(dudeUUID).inventory
             const invA = Inventory.get(invIdA)
             const invB = Inventory.get(invIdB)
-            if (!invA || !invB) {
-                console.warn(`invalid inventory ID(s)`)
+
+            if (!this.isInventoryUpdateValid(dudeInv, invA, invB)) {
                 return
-            }
-
-            const dudeInv = Dude.get(dudeUUID).inventory
-
-            if (invA === invB) {
-                // moving stuff around in the same inventory
-                if (invA !== dudeInv && !invA.allowTrading) {
-                    console.warn(`invalid inventory ID(s)`)
-                    return
-                }
-                if (stackIdxA === stackIdxB) {
-                    return
-                }
-            } else {
-                // at least one inv must be the player
-                const selfInv = [invA, invB].filter((i) => i === dudeInv)
-                if (selfInv.length < 1) {
-                    console.warn(`invalid inventory ID(s)`)
-                    return
-                }
-
-                // the other inv must be tradeable
-                if (selfInv.length < 2) {
-                    const doesOtherInvAllowTrading = [invA, invB].find(
-                        (i) => i !== dudeInv
-                    )?.allowTrading
-                    if (!doesOtherInvAllowTrading) {
-                        console.warn(`inventory does not allow trading`)
-                        return
-                    }
-                }
             }
 
             const updateInvStack = (inv: Inventory, stackIdx: number, stack: ItemStack) => {
@@ -264,9 +374,12 @@ export class InventoryDisplay extends Component {
         }
     )
 
-    private doHover(hoverInv: Inventory, hoverIndex: number, updateData: UpdateData) {
+    private checkMouseHoverActions(
+        hoverInv: Inventory,
+        hoverIndex: number,
+        updateData: UpdateData
+    ) {
         // we're hovering over an item
-        this.tooltip.position = controls.getMousePos()
         const stack = hoverInv.getStack(hoverIndex)
         const item = ITEM_METADATA_MAP[stack.item]
         const hotKeyPrefix = stack.metadata.hotKey
@@ -304,7 +417,7 @@ export class InventoryDisplay extends Component {
 
     // MPTODO
     private checkForPickUp(hoverInv: Inventory, hoverIndex: number) {
-        if (controls.isInventoryStackPickUp()) {
+        if (controls.isInventoryStackPickUp() || controls.isInventoryStackPickUpHalf()) {
             const hoveredItemStack = hoverInv?.getStack(hoverIndex)
             if (hoveredItemStack) {
                 const { item, count, metadata } = hoveredItemStack
@@ -316,20 +429,32 @@ export class InventoryDisplay extends Component {
                     this.canRemoveFromPlayerInv(item)
                 ) {
                     // shift click transfer
-                    hoverInv.removeItem(item, count, metadata)
-                    otherInv.addItem(item, count, metadata)
-                    this.refreshView()
+                    // TODO revisit
+                    // hoverInv.removeItem(item, count, metadata)
+                    // otherInv.addItem(item, count, metadata)
+                    // this.refreshView()
                 } else {
                     this.heldStackInventory = hoverInv
+                    this.heldStackInvIndex = hoverIndex
+                    this.heldStackCount = controls.isInventoryStackPickUpHalf()
+                        ? Math.ceil(count / 2)
+                        : count
+
                     // some stupid math to account for the fact that this.tiles contains tiles from potentially two inventories
-                    this.heldStackSprite =
+                    const hoveredSprite =
                         this.stackSprites[
                             hoverIndex + (hoverInv === this.playerInv ? 0 : this.playerInv.size)
                         ]
+                    this.heldStackSprite = this.displayEntity.addComponent(
+                        new SpriteComponent(hoveredSprite.sprite)
+                    )
                     this.heldStackSprite.transform.position = controls
                         .getMousePos()
                         .minus(pt(TILE_SIZE / 2))
-                    this.heldStackInvIndex = hoverIndex
+                    this.heldStackSprite.transform.depth = hoveredSprite.transform.depth
+                    if (this.heldStackCount === count) {
+                        hoveredSprite.enabled = false
+                    }
                 }
             }
         }

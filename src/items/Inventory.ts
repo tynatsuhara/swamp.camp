@@ -150,7 +150,11 @@ export class Inventory {
         }
 
         const slotValue = this.getStack(index)
-        this.setStack(index, slotValue.withCount(slotValue.count + count))
+        if (slotValue) {
+            this.setStack(index, slotValue.withCount(slotValue.count + count))
+        } else {
+            this.setStack(index, new ItemStack(item, count, metadata))
+        }
     }
 
     removeItem(item: Item, count: number = 1, metadata: ItemStackMetadata = {}) {
