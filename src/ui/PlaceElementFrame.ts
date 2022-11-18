@@ -109,6 +109,11 @@ export class PlaceElementFrame extends Component {
         for (let x = pos.x; x < pos.x + this.dimensions.x; x++) {
             for (let y = pos.y; y < pos.y + this.dimensions.y; y++) {
                 const pt = new Point(x, y)
+                // there's already an element here
+                const existingElement = l.getElement(pt)
+                if (existingElement) {
+                    return false
+                }
                 // there's no ground here
                 if (!l.getGround(pt)) {
                     return false
