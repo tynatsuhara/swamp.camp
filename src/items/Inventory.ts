@@ -128,6 +128,31 @@ export class Inventory {
         return leftToAdd === 0
     }
 
+    canAddToStack(index: number, item: Item, count = 1, metadata: ItemStackMetadata = {}) {
+        const slotValue = this.getStack(index)
+        const stackLimit = ITEM_METADATA_MAP[item].stackLimit
+
+        if (!slotValue) {
+            return true
+        }
+
+        return (
+            slotValue.item === item &&
+            doesMetadataMatch(slotValue.metadata, metadata) &&
+            slotValue.count + count <= stackLimit
+        )
+    }
+
+    addToStack(index: number, item: Item, count = 1, metadata: ItemStackMetadata = {}) {
+        if (!this.canAddToStack(index, item, count, metadata)) {
+            console.warn("can't add to stack")
+            return
+        }
+
+        const slotValue = this.getStack(index)
+        this.setStack(index, slotValue.withCount(slotValue.count + count))
+    }
+
     removeItem(item: Item, count: number = 1, metadata: ItemStackMetadata = {}) {
         const currentCount = this.getItemCount(item)
         if (currentCount < count) {
