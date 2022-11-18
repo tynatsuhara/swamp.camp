@@ -3,7 +3,6 @@ import { AnimatedSpriteComponent, SpriteAnimation, SpriteTransform } from "brigs
 import { player } from "../../characters/player/index"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Inventory, ItemStack } from "../../items/Inventory"
-import { session } from "../../online/session"
 import { randomByteString } from "../../saves/uuid"
 import { InventoryDisplay } from "../../ui/InventoryDisplay"
 import { Location } from "../locations/Location"
@@ -75,7 +74,7 @@ export class ChestFactory extends ElementFactory<ElementType.CHEST, SaveData> {
                 animator.goToAnimation(0).play()
             },
             new Point(0, -17),
-            (interactor) => session.isHost() && interactor === player()
+            (interactor) => interactor === player()
         )
 
         const collider = new NavMeshCollider(
