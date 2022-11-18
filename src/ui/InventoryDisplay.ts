@@ -174,8 +174,6 @@ export class InventoryDisplay extends Component {
             this.heldStackInventory = null
             this.heldStackSprite = null
 
-            // this.stripHotKeysFromOtherInv()
-
             if (!swapSuccess) {
                 // only refresh if we didn't successfully swap, otherwise there's a weird
                 // jitter in multiplayer as the inventory is only updated on the host
