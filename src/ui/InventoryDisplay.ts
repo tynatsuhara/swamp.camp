@@ -44,9 +44,8 @@ import { UIStateManager } from "./UIStateManager"
  * [X] Show the count via the tooltip
  * [ ] Some way to unselect your held stack (click outside? tab?)
  * [?] BUG: Sprite gets stuck when clicking in between valid squares
- * [ ] BUG: After putting an equipped item in the inventory, weapon hot key for item still in inv doesn't work
- *
- * [ ] Add "equipped" field to item metadata and prevent (or properly unequip) those items
+ * [x] BUG: After putting an equipped item in the inventory, weapon hot key for item still in inv doesn't work
+ * [x] Add "equipped" field to item metadata and prevent (or properly unequip) those items
  *
  */
 
@@ -145,7 +144,7 @@ export class InventoryDisplay extends Component {
 
             inv.getStacks().forEach((s, i) => {
                 if (s.metadata?.hotKey === hotKey) {
-                    inv.setStack(i, s.withMetadata({ hotKey: null }))
+                    inv.setStack(i, s.withMetadata({ hotKey: undefined }))
                 }
             })
 
@@ -266,8 +265,8 @@ export class InventoryDisplay extends Component {
     }
 
     private removePlayerInvOnlyMetadata(metadata: ItemMetadata) {
-        metadata.hotKey = null
-        metadata.equipped = null
+        metadata.hotKey = undefined
+        metadata.equipped = undefined
     }
 
     private canTransfer(

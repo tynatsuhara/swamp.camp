@@ -319,7 +319,7 @@ export class Dude extends Component implements DialogueSource {
                             currentWeaponIndex,
                             this.inventory
                                 .getStack(currentWeaponIndex)
-                                .withMetadata({ equipped: null })
+                                .withMetadata({ equipped: undefined })
                         )
                     }
                     this.inventory.setStack(invIndex, stack.withMetadata({ equipped: "weapon" }))
@@ -358,7 +358,7 @@ export class Dude extends Component implements DialogueSource {
                             currentShieldIndex,
                             this.inventory
                                 .getStack(currentShieldIndex)
-                                .withMetadata({ equipped: null })
+                                .withMetadata({ equipped: undefined })
                         )
                     }
                     this.inventory.setStack(invIndex, stack.withMetadata({ equipped: "shield" }))
