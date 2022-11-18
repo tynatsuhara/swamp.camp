@@ -29,6 +29,7 @@ import { UIStateManager } from "./UIStateManager"
  *
  * [X] Can pick up half with right click
  * [X] Can swap FULL stacks
+ * [X] Merge stacks
  * [ ] Can drop partial stacks
  * [ ] Make sure you handle the case where a different user updates the stack they're drawing from (probably just reset)
  * [ ] Show the count via the tooltip
@@ -177,7 +178,24 @@ export class InventoryDisplay extends Component {
             if (hoverIndex !== -1) {
                 const draggedValue = this.heldStackInventory.getStack(this.heldStackInvIndex)
 
-                if (this.heldStackCount === draggedValue.count) {
+                // transfer partial stacks
+                if (
+                    this.canTransfer(
+                        this.heldStackInventory,
+                        this.heldStackInvIndex,
+                        hoverInv,
+                        hoverIndex,
+                        this.heldStackCount
+                    )
+                ) {
+                    this.transfer(
+                        this.heldStackInventory.uuid,
+                        this.heldStackInvIndex,
+                        hoverInv.uuid,
+                        hoverIndex,
+                        this.heldStackCount
+                    )
+                } else if (this.heldStackCount === draggedValue.count) {
                     // swap full stacks
                     // drop n swap
                     // Swap the stacks
@@ -195,25 +213,6 @@ export class InventoryDisplay extends Component {
                             this.heldStackInvIndex,
                             hoverInv.uuid,
                             hoverIndex
-                        )
-                    }
-                } else {
-                    // transfer partial stacks
-                    if (
-                        this.canTransfer(
-                            this.heldStackInventory,
-                            this.heldStackInvIndex,
-                            hoverInv,
-                            hoverIndex,
-                            this.heldStackCount
-                        )
-                    ) {
-                        this.transfer(
-                            this.heldStackInventory.uuid,
-                            this.heldStackInvIndex,
-                            hoverInv.uuid,
-                            hoverIndex,
-                            this.heldStackCount
                         )
                     }
                 }
