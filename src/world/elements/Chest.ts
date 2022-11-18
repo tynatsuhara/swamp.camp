@@ -26,7 +26,7 @@ export class ChestFactory extends ElementFactory<ElementType.CHEST, SaveData> {
     }
 
     make(wl: Location, pos: Point, data: Partial<SaveData>) {
-        const id = data.id ?? randomByteString()
+        const id = data.id ?? randomByteString(10)
         const inventory = new Inventory(id)
         if (data.i) {
             inventory.load(data.i)
