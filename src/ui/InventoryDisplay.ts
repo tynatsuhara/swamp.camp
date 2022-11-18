@@ -73,7 +73,9 @@ export class InventoryDisplay extends Component {
 
         const [hoverInv, hoverIndex] = this.getHoveredInventoryIndex(controls.getMousePos())
 
-        if (this.heldStackSprite) {
+        const wasHoldingSomething = !!this.heldStackSprite
+
+        if (wasHoldingSomething) {
             this.doDrag(hoverInv, hoverIndex)
         } else if (hoverIndex > -1 && hoverInv.getStack(hoverIndex)) {
             this.doHover(hoverInv, hoverIndex, updateData)
@@ -86,7 +88,9 @@ export class InventoryDisplay extends Component {
             this.canUseItems = true
             this.lastMousPos = controls.getMousePos()
 
-            this.checkForPickUp(hoverInv, hoverIndex)
+            if (!wasHoldingSomething) {
+                this.checkForPickUp(hoverInv, hoverIndex)
+            }
         }
     }
 
@@ -314,7 +318,6 @@ export class InventoryDisplay extends Component {
                 ) {
                     hoverInv.removeItem(item, count, metadata)
                     otherInv.addItem(item, count, metadata)
-                    // this.stripHotKeysFromOtherInv()
                     this.refreshView()
                 } else {
                     this.heldStackInventory = hoverInv
