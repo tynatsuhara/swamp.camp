@@ -1,4 +1,4 @@
-import { Component, Entity, InputKey, InputKeyString, Point, UpdateData } from "brigsby/dist"
+import { Component, Entity, InputKey, InputKeyString, Point, pt, UpdateData } from "brigsby/dist"
 import { BasicRenderComponent, TextRender } from "brigsby/dist/renderer"
 import {
     AnimatedSpriteComponent,
@@ -159,6 +159,7 @@ export class InventoryDisplay extends Component {
                 const draggedValue = this.heldStackInventory.getStack(this.heldStackInvIndex)
 
                 // Swap the stacks
+                // BUG: This needs to check both inventories, not just hoverInv
                 if (hoverInv === this.playerInv || this.canRemoveFromPlayerInv(draggedValue.item)) {
                     swapSuccess = true
                     this.swapStacks(
@@ -316,6 +317,7 @@ export class InventoryDisplay extends Component {
                     otherInv.canAddItem(item, count, metadata) &&
                     this.canRemoveFromPlayerInv(item)
                 ) {
+                    // shift click transfer
                     hoverInv.removeItem(item, count, metadata)
                     otherInv.addItem(item, count, metadata)
                     this.refreshView()
@@ -326,6 +328,9 @@ export class InventoryDisplay extends Component {
                         this.stackSprites[
                             hoverIndex + (hoverInv === this.playerInv ? 0 : this.playerInv.size)
                         ]
+                    this.heldStackSprite.transform.position = controls
+                        .getMousePos()
+                        .minus(pt(TILE_SIZE / 2))
                     this.heldStackInvIndex = hoverIndex
                 }
             }
