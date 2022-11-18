@@ -1,4 +1,4 @@
-import { Component, Entity, InputKeyString, Point, UpdateData } from "brigsby/dist"
+import { Component, Entity, InputKey, InputKeyString, Point, UpdateData } from "brigsby/dist"
 import { BasicRenderComponent, TextRender } from "brigsby/dist/renderer"
 import {
     AnimatedSpriteComponent,
@@ -90,7 +90,6 @@ export class InventoryDisplay extends Component {
         }
     }
 
-    // MPTODO
     private checkSetHotKey(index: number, spec: ItemSpec, updateData: UpdateData) {
         if (!spec.equippableWeapon && !spec.equippableShield) {
             return
@@ -98,20 +97,27 @@ export class InventoryDisplay extends Component {
 
         controls.HOT_KEY_OPTIONS.forEach((hotKey) => {
             if (updateData.input.isKeyDown(hotKey)) {
-                this.playerInv.getStacks().forEach((s, i) => {
-                    if (s.metadata?.hotKey === hotKey) {
-                        this.playerInv.setStack(
-                            i,
-                            s.withMetadata({ ...s.metadata, hotKey: undefined })
-                        )
-                    }
-                })
-
-                const stack = this.playerInv.getStack(index)
-                this.playerInv.setStack(index, stack.withMetadata({ ...stack.metadata, hotKey }))
+                this.setHotKey(index, hotKey)
             }
         })
     }
+
+    private setHotKey = clientSyncFn(
+        "sethotkey",
+        "host-only",
+        ({ dudeUUID }, index: number, hotKey: InputKey) => {
+            const inv = Dude.get(dudeUUID).inventory
+
+            inv.getStacks().forEach((s, i) => {
+                if (s.metadata?.hotKey === hotKey) {
+                    inv.setStack(i, s.withMetadata({ ...s.metadata, hotKey: undefined }))
+                }
+            })
+
+            const stack = inv.getStack(index)
+            inv.setStack(index, stack.withMetadata({ ...stack.metadata, hotKey }))
+        }
+    )
 
     isShowingInventory(inv: Inventory) {
         return this.isOpen && (this.playerInv === inv || this.tradingInv === inv)
