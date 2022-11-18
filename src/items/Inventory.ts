@@ -36,6 +36,7 @@ const doesMetadataMatch = (a: ItemStackMetadata, b: ItemStackMetadata) => {
 }
 
 export class Inventory {
+    readonly uuid: string
     readonly allowTrading: boolean
     private stacks: ItemStack[]
     private countMap = new Map<Item, number>()
@@ -45,6 +46,7 @@ export class Inventory {
      * @param allowTrading true if players can take stuff out of this storage via UI (used to prevent multiplayer stealing hax)
      */
     constructor(syncId: string, allowTrading = false, size: number = 20) {
+        this.uuid = syncId
         this.stacks = Array.from({ length: size })
         this.allowTrading = allowTrading
         this.setStack = syncFn(`${syncId}ss`, this.setStack.bind(this))

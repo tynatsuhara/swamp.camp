@@ -6,6 +6,7 @@ import {
     SpriteComponent,
     SpriteTransform,
 } from "brigsby/dist/sprites"
+import { Dude } from "../characters/Dude"
 import { player } from "../characters/player"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { WeaponType } from "../characters/weapons/WeaponType"
@@ -15,6 +16,7 @@ import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { getInventoryItemActions, ItemAction } from "../items/getInventoryItemActions"
 import { Inventory } from "../items/Inventory"
 import { Item, ItemSpec, ITEM_METADATA_MAP } from "../items/Items"
+import { clientSyncFn } from "../online/utils"
 import { saveManager } from "../SaveManager"
 import { Color } from "./Color"
 import { TEXT_FONT, TEXT_SIZE } from "./Text"
@@ -140,7 +142,6 @@ export class InventoryDisplay extends Component {
         // dragging
         this.tooltip.clear()
         if (controls.isInventoryStackDrop()) {
-            // MPTODO
             // drop n swap
             if (hoverIndex !== -1) {
                 // Swap the stacks
@@ -148,11 +149,11 @@ export class InventoryDisplay extends Component {
 
                 // Swap the stacks
                 if (hoverInv === this.playerInv || this.canRemoveFromPlayerInv(draggedValue.item)) {
-                    const currentlyOccupiedSpotValue = hoverInv.getStack(hoverIndex)
-                    hoverInv.setStack(hoverIndex, draggedValue)
-                    this.heldStackInventory.setStack(
-                        this.heldStackInvIndex,
-                        currentlyOccupiedSpotValue
+                    this.swapStacks(
+                        hoverInv.uuid,
+                        hoverIndex,
+                        this.heldStackInventory.uuid,
+                        this.heldStackInvIndex
                     )
                 }
             }
@@ -161,7 +162,6 @@ export class InventoryDisplay extends Component {
             this.heldStackSprite = null
 
             this.stripHotKeysFromOtherInv()
-            this.refreshView()
         } else {
             // track
             this.heldStackSprite.transform.position = this.heldStackSprite.transform.position.plus(
@@ -169,6 +169,43 @@ export class InventoryDisplay extends Component {
             )
         }
     }
+
+    private swapStacks = clientSyncFn(
+        "swapstax",
+        "host-only",
+        ({ dudeUUID }, invIdA: string, stackIdxA: number, invIdB: string, stackIdxB: number) => {
+            // do a bunch of validation to prevent h4xx0rs
+            const invA = Inventory.get(invIdA)
+            const invB = Inventory.get(invIdB)
+            if (!invA || !invB) {
+                console.warn(`invalid inventory ID(s)`)
+                return
+            }
+
+            const dudeInv = Dude.get(dudeUUID).inventory
+            const selfInv = [invA, invB].filter((i) => i === dudeInv)
+            if (selfInv.length < 1) {
+                console.warn(`invalid inventory ID(s)`)
+                return
+            }
+
+            if (selfInv.length < 2) {
+                const doesOtherInvAllowTrading = [invA, invB].find(
+                    (i) => i !== dudeInv
+                )?.allowTrading
+                if (!doesOtherInvAllowTrading) {
+                    console.warn(`inventory does not allow trading`)
+                    return
+                }
+            }
+
+            const stackA = invA.getStack(stackIdxA)
+            const stackB = invB.getStack(stackIdxB)
+
+            invA.setStack(stackIdxA, stackB)
+            invB.setStack(stackIdxB, stackA)
+        }
+    )
 
     private doHover(hoverInv: Inventory, hoverIndex: number, updateData: UpdateData) {
         // we're hovering over an item
