@@ -8,6 +8,7 @@ export type ItemStackMetadata = ItemMetadata & {
     hotKey?: InputKey
 }
 
+// MPTODO: This breaks when serializing due to the methods
 export class ItemStack {
     readonly item: Item
     readonly count: number
@@ -70,7 +71,10 @@ export class Inventory {
     }
 
     setStack(index: number, stack: ItemStack) {
-        this.stacks[index] = !stack?.count ? null : stack
+        // reconstruct to prevent serialization bugs (this is kind of a hack)
+        this.stacks[index] = !stack?.count
+            ? null
+            : new ItemStack(stack.item, stack.count, stack.metadata)
         this.refreshUI()
         this.recomputeCountsMap()
     }
