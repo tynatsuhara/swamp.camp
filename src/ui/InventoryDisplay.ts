@@ -143,13 +143,31 @@ export class InventoryDisplay extends Component {
         this.open(this.onClose, this.tradingInv)
     }
 
-    private resetHeldItem() {
+    private clearHeldStack() {
         this.tooltip.clear()
         this.heldStackCount = undefined
         this.heldStackInvIndex = undefined
         this.heldStackInventory = null
         this.heldStackSprite?.delete()
         this.heldStackSprite = null
+    }
+
+    private setHeldStack(inv: Inventory, index: number, count: number) {
+        this.heldStackInventory = inv
+        this.heldStackInvIndex = index
+        this.heldStackCount = controls.isInventoryStackPickUpHalf() ? Math.ceil(count / 2) : count
+
+        // some stupid math to account for the fact that this.tiles contains tiles from potentially two inventories
+        const hoveredSprite =
+            this.stackSprites[index + (inv === this.playerInv ? 0 : this.playerInv.size)]
+        this.heldStackSprite = this.displayEntity.addComponent(
+            new SpriteComponent(hoveredSprite.sprite)
+        )
+        this.heldStackSprite.transform.position = controls.getMousePos().minus(pt(TILE_SIZE / 2))
+        this.heldStackSprite.transform.depth = hoveredSprite.transform.depth
+        if (this.heldStackCount === count) {
+            hoveredSprite.enabled = false
+        }
     }
 
     private checkDragAndDrop(hoverInv: Inventory, hoverIndex: number) {
@@ -193,7 +211,7 @@ export class InventoryDisplay extends Component {
                 }
             }
 
-            this.resetHeldItem()
+            this.clearHeldStack()
 
             if (!actionSuccess) {
                 // only refresh if we didn't successfully swap, otherwise there's a weird
@@ -424,27 +442,10 @@ export class InventoryDisplay extends Component {
                     // shift-click transfer
                     this.swapStacks(hoverInv.uuid, hoverIndex, otherInv.uuid)
                 } else {
-                    this.heldStackInventory = hoverInv
-                    this.heldStackInvIndex = hoverIndex
-                    this.heldStackCount = controls.isInventoryStackPickUpHalf()
+                    const amountPickedUp = controls.isInventoryStackPickUpHalf()
                         ? Math.ceil(count / 2)
                         : count
-
-                    // some stupid math to account for the fact that this.tiles contains tiles from potentially two inventories
-                    const hoveredSprite =
-                        this.stackSprites[
-                            hoverIndex + (hoverInv === this.playerInv ? 0 : this.playerInv.size)
-                        ]
-                    this.heldStackSprite = this.displayEntity.addComponent(
-                        new SpriteComponent(hoveredSprite.sprite)
-                    )
-                    this.heldStackSprite.transform.position = controls
-                        .getMousePos()
-                        .minus(pt(TILE_SIZE / 2))
-                    this.heldStackSprite.transform.depth = hoveredSprite.transform.depth
-                    if (this.heldStackCount === count) {
-                        hoveredSprite.enabled = false
-                    }
+                    this.setHeldStack(hoverInv, hoverIndex, amountPickedUp)
                 }
             }
         }
@@ -492,7 +493,7 @@ export class InventoryDisplay extends Component {
     }
 
     open(onClose: () => void = null, tradingInv: Inventory = null) {
-        this.resetHeldItem()
+        this.clearHeldStack()
 
         this.onClose = onClose
         this.tradingInv = tradingInv
