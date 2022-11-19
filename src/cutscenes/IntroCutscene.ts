@@ -64,13 +64,17 @@ export class IntroCutscene extends Component {
         const charactersAtTop = [
             characterAnimation(
                 "MountainKing",
-                SpriteTransform.new({ position: centerPos.plusX(-35) })
+                SpriteTransform.new({
+                    position: centerPos.plusX(-35),
+                    depth: TextOverlayManager.DEPTH,
+                })
             ),
             characterAnimation(
                 "knight_f",
                 SpriteTransform.new({
                     position: centerPos.plusX(9),
                     mirrorX: true,
+                    depth: TextOverlayManager.DEPTH,
                 })
             ),
         ]

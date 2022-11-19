@@ -1,6 +1,7 @@
 import { Entity } from "brigsby/dist"
 import { player } from "../characters/player"
 import { Camera } from "../cutscenes/Camera"
+import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
 import { spawnMenu } from "../debug/SpawnMenu"
 import { Singletons } from "../Singletons"
 import { CraftingMenu } from "./CraftingMenu"
@@ -51,7 +52,8 @@ export class UIStateManager {
             this.craftingMenu.isOpen ||
             this.sellMenu.isOpen ||
             this.drawMenu.isOpen ||
-            spawnMenu.isOpen
+            spawnMenu.isOpen ||
+            TextOverlayManager.instance.isActive
 
         return HUD.instance
             .getEntities(player(), Camera.instance.dimensions, elapsedMillis)

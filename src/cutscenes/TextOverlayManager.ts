@@ -1,4 +1,5 @@
 import { Component, Entity, Point, UpdateData } from "brigsby/dist"
+import { RectRender } from "brigsby/dist/renderer/RectRender"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
 import { controls } from "../Controls"
@@ -18,12 +19,14 @@ export class TextOverlayManager extends Component {
     static readonly VERTICAL_MARGIN = 72
     // the bottom of any icons should line up with this Y coordinate
     static readonly TOP_BORDER = TextOverlayManager.VERTICAL_MARGIN - TILE_SIZE
+    static readonly DEPTH = Number.MAX_SAFE_INTEGER / 2 + 11_000
 
     private text: TextTyper[]
     private finishAction: string
     private onFinish: () => void
     private additionalComponents: (index: number) => Component[]
     private textAlign: TextAlign
+    private pauseBackground: boolean
 
     private index = 0
     private firstFrame = false // prevent clicking "next" immediately
@@ -32,10 +35,14 @@ export class TextOverlayManager extends Component {
         return !!this.onFinish
     }
 
+    get shouldPauseBackground() {
+        return this.pauseBackground
+    }
+
     /**
      * @param text click-through displayed text, can include newlines
      * @param onFinish called after the clicking through the last string in the text array
-     * @param additionalComponents
+     * @param pauseBackground whether or not to continue updating game scene components (dudes, elements, etc)
      */
     open({
         text,
@@ -43,12 +50,14 @@ export class TextOverlayManager extends Component {
         onFinish = () => {},
         additionalComponents = () => [],
         textAlign = TextAlign.LEFT,
+        pauseBackground = true, // MPTODO maybe just make this match session.isOnline()
     }: {
         text: string[]
         finishAction: string
         onFinish?: () => void
         additionalComponents?: (index: number) => Component[]
         textAlign?: TextAlign
+        pauseBackground?: boolean
     }) {
         this.index = 0
         this.text = text.map((t) => new TextTyper(t, () => this.nextLine()))
@@ -56,6 +65,7 @@ export class TextOverlayManager extends Component {
         this.onFinish = onFinish
         this.additionalComponents = additionalComponents
         this.textAlign = textAlign
+        this.pauseBackground = pauseBackground
 
         this.firstFrame = true
     }
@@ -98,23 +108,37 @@ export class TextOverlayManager extends Component {
                 this.index >= this.text.length - 1 && Lists.last(this.text).isFinished
                     ? this.finishAction
                     : "..."
+
             return [
+                // background
+                new RectRender({
+                    dimensions: updateData.dimensions,
+                    color: Color.BLACK + "EE", // slightly transparent for cases where the background isn't paused
+                    depth: TextOverlayManager.DEPTH - 1,
+                }),
                 ...formatText({
                     text: typedText,
                     color: Color.WHITE,
                     position: topLeft,
                     width: TextOverlayManager.WIDTH,
                     alignment: this.textAlign,
+                    depth: TextOverlayManager.DEPTH,
                 }),
                 ...formatText({
                     text: action,
                     color: Color.WHITE,
                     position: mouseIconPos.plus(new Point(-TEXT_PIXEL_WIDTH * action.length, 4)),
                     width: TextOverlayManager.WIDTH,
+                    depth: TextOverlayManager.DEPTH,
                 }),
                 Tilesets.instance.oneBit
                     .getTileSource(controls.isGamepadMode() ? "gamepad-x" : "leftClick")
-                    .toImageRender(new SpriteTransform(mouseIconPos)),
+                    .toImageRender(
+                        SpriteTransform.new({
+                            position: mouseIconPos,
+                            depth: TextOverlayManager.DEPTH,
+                        })
+                    ),
             ]
         }
     }

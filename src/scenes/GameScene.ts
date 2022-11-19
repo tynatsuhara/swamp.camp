@@ -84,15 +84,7 @@ export class GameScene {
             updateViewsContext.elapsedTimeMillis
         )
 
-        // full-screen text overlay that pauses gameplay
-        const isTextOverlayActive = TextOverlayManager.instance.isActive
-
-        const uiEntities = [
-            ...(isTextOverlayActive
-                ? [TextOverlayManager.instance.getEntity()]
-                : UIStateManager.instance.get(updateViewsContext.elapsedTimeMillis)),
-            ...this.getUiSpaceDebugEntities(),
-        ]
+        const uiEntities = [...this.getUiSpaceDebugEntities()]
 
         const gameEntities: Entity[] = [
             CutsceneManager.instance.getEntity(),
@@ -100,7 +92,16 @@ export class GameScene {
             new Entity([new DevControls()]),
         ]
 
-        if (!isTextOverlayActive) {
+        if (TextOverlayManager.instance.isActive) {
+            uiEntities.unshift(TextOverlayManager.instance.getEntity())
+        }
+
+        const pauseBackground =
+            TextOverlayManager.instance.isActive &&
+            TextOverlayManager.instance.shouldPauseBackground
+
+        if (!pauseBackground) {
+            uiEntities.unshift(...UIStateManager.instance.get(updateViewsContext.elapsedTimeMillis))
             gameEntities.push(
                 ...here().getEntities(),
                 ...LightManager.instance.getEntities(),

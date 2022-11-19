@@ -7,7 +7,6 @@ import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { ButtonIndicator } from "./ButtonIndicator"
 import { Color } from "./Color"
 import { formatText, TextAlign } from "./Text"
-import { UIStateManager } from "./UIStateManager"
 
 /**
  * Controls that need to be shown here:
@@ -45,7 +44,7 @@ const CONTROLS: { [key: string]: ControlRender } = {
             Tilesets.instance.oneBit.getTileSource("leftClick").toImageRender(
                 SpriteTransform.new({
                     position: pos.plusX(ICON_OFFSET),
-                    depth: UIStateManager.UI_SPRITE_DEPTH,
+                    depth: TextOverlayManager.DEPTH,
                 })
             ),
         ],
@@ -56,7 +55,7 @@ const CONTROLS: { [key: string]: ControlRender } = {
             Tilesets.instance.oneBit.getTileSource("rightClick").toImageRender(
                 SpriteTransform.new({
                     position: pos.plusX(ICON_OFFSET),
-                    depth: UIStateManager.UI_SPRITE_DEPTH,
+                    depth: TextOverlayManager.DEPTH,
                 })
             ),
         ],
@@ -68,7 +67,7 @@ const CONTROLS: { [key: string]: ControlRender } = {
             Tilesets.instance.oneBit.getTileSource("joystick-up").toImageRender(
                 SpriteTransform.new({
                     position: pos.plusX(ICON_OFFSET),
-                    depth: UIStateManager.UI_SPRITE_DEPTH,
+                    depth: TextOverlayManager.DEPTH,
                 })
             ),
         ],

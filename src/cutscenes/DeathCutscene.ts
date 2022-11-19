@@ -34,7 +34,9 @@ export class DeathCutscene extends Component {
             .getTileSource(
                 Lists.oneOf(["tombstone1", "tombstone2", "skull-n-bones", "skull1", "skull2"])
             )
-            .toComponent(SpriteTransform.new({ position: centerPos }))
+            .toComponent(
+                SpriteTransform.new({ position: centerPos, depth: TextOverlayManager.DEPTH })
+            )
 
         const text = Lists.oneOf(["You died. How unfortunate."])
 

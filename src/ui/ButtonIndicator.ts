@@ -20,7 +20,7 @@ export class ButtonIndicator extends Component {
         return [
             Tilesets.instance.oneBit
                 .getTileSource(this.getTileKey())
-                .toImageRender(new SpriteTransform(this.pos, null, 0, false, false, this.depth)),
+                .toImageRender(SpriteTransform.new({ position: this.pos, depth: this.depth })),
         ]
     }
 
