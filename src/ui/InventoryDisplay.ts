@@ -195,14 +195,15 @@ export class InventoryDisplay extends Component {
 
     private checkDragAndDrop(hoverInv: Inventory, hoverIndex: number) {
         // dragging
-        if (controls.isInventoryStackDrop() || controls.isInventoryStackDropOne()) {
+        const dropFullStack = controls.isInventoryStackDrop()
+        const dropOne = controls.isInventoryStackDropOne()
+
+        if (dropFullStack || dropOne) {
             let actionSuccess = false
 
             if (hoverIndex !== -1) {
                 const stackInInventory = this.heldStackInventory.getStack(this.heldStackInvIndex)
-                const amountToTransfer = controls.isInventoryStackDropOne()
-                    ? 1
-                    : this.heldStack.count
+                const amountToTransfer = dropOne ? 1 : this.heldStack.count
                 const newHeldCount = this.heldStack.count - amountToTransfer
 
                 // transfer partial stacks
@@ -219,8 +220,12 @@ export class InventoryDisplay extends Component {
                         this.heldStackInventory === hoverInv &&
                         this.heldStackInvIndex === hoverIndex
                     if (isSameStack) {
-                        // no-op
-                        this.clearHeldStack()
+                        if (dropFullStack) {
+                            // no-op
+                            this.clearHeldStack()
+                        } else if (dropOne) {
+                            this.heldStack = this.heldStack.withCount(this.heldStack.count - 1)
+                        }
                     } else {
                         actionSuccess = true
                         this.heldStack = this.heldStack.withCount(newHeldCount)
