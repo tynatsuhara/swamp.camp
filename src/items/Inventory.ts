@@ -219,7 +219,7 @@ export class Inventory {
     }
 
     private refreshUI() {
-        if (InventoryDisplay.instance.isShowingInventory(this)) {
+        if (InventoryDisplay.instance?.isShowingInventory(this)) {
             InventoryDisplay.instance.refreshView()
         }
     }
