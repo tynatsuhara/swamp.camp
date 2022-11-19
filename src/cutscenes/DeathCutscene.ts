@@ -71,6 +71,8 @@ export class DeathCutscene extends Component {
             player().moveTo(newSpot.times(TILE_SIZE), true)
         }
 
+        Camera.instance.jumpCutToFocalPoint()
+
         player().revive()
 
         // Clear out any enemies
