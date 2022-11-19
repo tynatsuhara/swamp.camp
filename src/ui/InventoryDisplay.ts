@@ -68,7 +68,7 @@ export class InventoryDisplay extends Component {
         InventoryDisplay.instance = this
     }
 
-    update(updateData: UpdateData) {
+    lateUpdate(updateData: UpdateData) {
         const pressI = controls.isInventoryButtonDown()
         const pressEsc = controls.isCloseMenuButtonDown()
 
@@ -92,6 +92,8 @@ export class InventoryDisplay extends Component {
 
         if (hoverIndex > -1 && hoverInv.getStack(hoverIndex)) {
             this.checkMouseHoverActions(hoverInv, hoverIndex, updateData)
+        } else {
+            this.hoverTooltipString = undefined
         }
 
         // Re-check isOpen because actions could have closed the menu
