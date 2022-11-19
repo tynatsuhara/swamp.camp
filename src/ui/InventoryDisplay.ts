@@ -46,6 +46,7 @@ export class InventoryDisplay extends Component {
     private lastMousPos: Point
     private stackSprites: SpriteComponent[] = []
     private showingInv = false
+    private hoverTooltipString: string
     get isOpen() {
         return this.showingInv
     }
@@ -81,23 +82,16 @@ export class InventoryDisplay extends Component {
             return
         }
 
-        this.tooltip.position = controls.getMousePos()
-
         const [hoverInv, hoverIndex] = this.getHoveredInventoryIndex(controls.getMousePos())
 
         const wasHoldingSomething = !!this.heldStackSprite
 
         if (wasHoldingSomething) {
             this.checkDragAndDrop(hoverInv, hoverIndex)
-            // this logic is weird but necessary to prevent a flash on re-render
-            if (!this.heldStack || this.heldStack.count < 2) {
-                this.tooltip.clear()
-            }
-        } else if (hoverIndex > -1 && hoverInv.getStack(hoverIndex)) {
+        }
+
+        if (hoverIndex > -1 && hoverInv.getStack(hoverIndex)) {
             this.checkMouseHoverActions(hoverInv, hoverIndex, updateData)
-        } else {
-            // we're not hovering or holding anything so clear the tooltip
-            this.tooltip.clear()
         }
 
         // Re-check isOpen because actions could have closed the menu
@@ -108,6 +102,25 @@ export class InventoryDisplay extends Component {
             if (!wasHoldingSomething) {
                 this.checkForPickUp(hoverInv, hoverIndex)
             }
+        }
+
+        this.updateTooltip()
+    }
+
+    private updateTooltip() {
+        this.tooltip.position = controls.getMousePos()
+        let text: string = undefined
+        if (this.heldStack) {
+            if (this.heldStack.count > 1) {
+                text = `x${this.heldStack.count}`
+            }
+        } else {
+            text = this.hoverTooltipString
+        }
+        if (text) {
+            this.tooltip.say(text)
+        } else {
+            this.tooltip.clear()
         }
     }
 
@@ -261,10 +274,6 @@ export class InventoryDisplay extends Component {
                 this.refreshView()
             }
         } else {
-            if (this.heldStack.count > 1) {
-                this.tooltip.say(`x${this.heldStack.count}`)
-            }
-            // track
             this.heldStackSprite.transform.position = this.heldStackSprite.transform.position.plus(
                 controls.getMousePos().minus(this.lastMousPos)
             )
@@ -449,14 +458,13 @@ export class InventoryDisplay extends Component {
             [controls.getInventoryOptionTwoString(), () => controls.isInventoryOptionTwoDown()],
         ]
 
-        const tooltipString = [
+        this.hoverTooltipString = [
             hotKeyPrefix,
             item.displayName,
             count,
             ...actions.map((action, i) => `\n${interactButtonOrder[i][0]} to ${action.verb}`),
         ].join("")
 
-        this.tooltip.say(tooltipString)
         profiler.showInfo(`item metadata: ${prettyPrint(stack.metadata)}`)
 
         if (this.canUseItems) {
