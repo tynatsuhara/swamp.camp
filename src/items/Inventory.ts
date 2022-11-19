@@ -90,10 +90,10 @@ export class Inventory {
         return this.stacks.filter((s) => !!s)
     }
 
-    setStack(index: number, stack: ItemStack) {
-        // reconstruct to prevent serialization bugs (this is kind of a hack)
+    setStack(index: number, stack: Pick<ItemStack, "item" | "count" | "metadata">) {
+        // reconstruct the stack from serialized data
         this.stacks[index] = !stack?.count
-            ? null
+            ? null // empty stacks are null
             : new ItemStack(stack.item, stack.count, stack.metadata)
         this.refreshUI()
         this.recomputeCountsMap()
