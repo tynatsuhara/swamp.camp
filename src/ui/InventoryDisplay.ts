@@ -36,7 +36,7 @@ export class InventoryDisplay extends Component {
 
     private static COLUMNS = 10
 
-    private heldStackCount: number // should be <= the value of the stack in the inventory
+    private heldStack: ItemStack // count should be <= the value of the stack in the inventory
     private heldStackInventory: Inventory
     private heldStackInvIndex: number
     private heldStackSprite: SpriteComponent // non-null when being dragged
@@ -140,44 +140,67 @@ export class InventoryDisplay extends Component {
     }
 
     refreshView() {
+        // As long as what we're holding is a subset of the stack in the inventory, don't drop it!
+        const { heldStackInventory, heldStackInvIndex, heldStack } = this
+        const invStackPostUpdate = heldStackInventory?.getStack(heldStackInvIndex)
+        const rePickUpItem =
+            // we're currently holding something
+            this.heldStack &&
+            // and the superset stack is still in the inventory
+            invStackPostUpdate &&
+            // held stack should be a subset of the inventory stack
+            this.heldStack.count <= invStackPostUpdate.count &&
+            this.heldStack.count > 0 &&
+            // check that they're the same (other than count)
+            invStackPostUpdate.equals(this.heldStack.withCount(invStackPostUpdate.count))
+
         this.open(this.onClose, this.tradingInv)
+
+        if (rePickUpItem) {
+            this.setHeldStack(heldStackInventory, heldStackInvIndex, heldStack)
+        }
     }
 
     private clearHeldStack() {
         this.tooltip.clear()
-        this.heldStackCount = undefined
+        this.heldStack = undefined
         this.heldStackInvIndex = undefined
         this.heldStackInventory = null
         this.heldStackSprite?.delete()
         this.heldStackSprite = null
     }
 
-    private setHeldStack(inv: Inventory, index: number, count: number) {
+    private setHeldStack(inv: Inventory, index: number, stack: ItemStack) {
         this.heldStackInventory = inv
         this.heldStackInvIndex = index
-        this.heldStackCount = controls.isInventoryStackPickUpHalf() ? Math.ceil(count / 2) : count
+        this.heldStack = stack
 
         // some stupid math to account for the fact that this.tiles contains tiles from potentially two inventories
-        const hoveredSprite =
+        const stackSprite =
             this.stackSprites[index + (inv === this.playerInv ? 0 : this.playerInv.size)]
+        // create a new sprite which is the "picked up" one
         this.heldStackSprite = this.displayEntity.addComponent(
-            new SpriteComponent(hoveredSprite.sprite)
+            new SpriteComponent(stackSprite.sprite)
         )
+        // center it on the mouse
         this.heldStackSprite.transform.position = controls.getMousePos().minus(pt(TILE_SIZE / 2))
-        this.heldStackSprite.transform.depth = hoveredSprite.transform.depth
-        if (this.heldStackCount === count) {
-            hoveredSprite.enabled = false
-        }
+        this.heldStackSprite.transform.depth = stackSprite.transform.depth
+        // if we're holding all the items, hide the sprite in the slot
+        stackSprite.enabled = this.heldStack.count < inv.getStack(index)?.count
     }
 
     private checkDragAndDrop(hoverInv: Inventory, hoverIndex: number) {
         // dragging
         this.tooltip.clear()
-        if (controls.isInventoryStackDrop()) {
+        if (controls.isInventoryStackDrop() || controls.isInventoryStackDropOne()) {
             let actionSuccess = false
 
             if (hoverIndex !== -1) {
-                const draggedValue = this.heldStackInventory.getStack(this.heldStackInvIndex)
+                const stackInInventory = this.heldStackInventory.getStack(this.heldStackInvIndex)
+                const amountToTransfer = controls.isInventoryStackDropOne()
+                    ? 1
+                    : this.heldStack.count
+                const newHeldCount = this.heldStack.count - amountToTransfer
 
                 // transfer partial stacks
                 if (
@@ -186,41 +209,49 @@ export class InventoryDisplay extends Component {
                         this.heldStackInvIndex,
                         hoverInv,
                         hoverIndex,
-                        this.heldStackCount
+                        amountToTransfer
                     )
                 ) {
-                    actionSuccess = true
-                    this.transfer(
-                        this.heldStackInventory.uuid,
-                        this.heldStackInvIndex,
-                        hoverInv.uuid,
-                        hoverIndex,
-                        this.heldStackCount
-                    )
-                } else if (this.heldStackCount === draggedValue.count) {
-                    // swap full stacks
-                    if (hoverInv === this.playerInv) {
+                    const isSameStack =
+                        this.heldStackInventory === hoverInv &&
+                        this.heldStackInvIndex === hoverIndex
+                    if (isSameStack) {
+                        // no-op
+                        this.clearHeldStack()
+                    } else {
                         actionSuccess = true
-                        this.swapStacks(
+                        this.heldStack = this.heldStack.withCount(newHeldCount)
+
+                        this.transfer(
                             this.heldStackInventory.uuid,
                             this.heldStackInvIndex,
                             hoverInv.uuid,
-                            hoverIndex
+                            hoverIndex,
+                            amountToTransfer
                         )
                     }
+                } else if (this.heldStack.count === stackInInventory.count) {
+                    // swap full stacks
+                    actionSuccess = true
+                    this.heldStack = this.heldStack.withCount(newHeldCount)
+
+                    this.swapStacks(
+                        this.heldStackInventory.uuid,
+                        this.heldStackInvIndex,
+                        hoverInv.uuid,
+                        hoverIndex
+                    )
                 }
             }
 
-            this.clearHeldStack()
-
             if (!actionSuccess) {
-                // only refresh if we didn't successfully swap, otherwise there's a weird
-                // jitter in multiplayer as the inventory is only updated on the host
+                // only refresh if we didn't successfully swap, because inv
+                // updates from the host will trigger a refresh anyways
                 this.refreshView()
             }
         } else {
-            if (this.heldStackCount > 1) {
-                this.tooltip.say(`x${this.heldStackCount}`)
+            if (this.heldStack.count > 1) {
+                this.tooltip.say(`x${this.heldStack.count}`)
             }
             // track
             this.heldStackSprite.transform.position = this.heldStackSprite.transform.position.plus(
@@ -282,9 +313,7 @@ export class InventoryDisplay extends Component {
         transferAmount: number
     ) {
         const stackA = invA.getStack(stackIdxA)
-        const isSameStack = invA === invB && stackIdxA === stackIdxB
         return (
-            !isSameStack &&
             stackA &&
             stackA.count >= transferAmount &&
             invB.canAddToStack(stackIdxB, stackA.item, transferAmount, stackA.metadata)
@@ -439,13 +468,18 @@ export class InventoryDisplay extends Component {
                     controls.isModifierHeld() &&
                     otherInv.canAddItem(item, count, metadata)
                 ) {
+                    this.clearHeldStack()
                     // shift-click transfer
                     this.swapStacks(hoverInv.uuid, hoverIndex, otherInv.uuid)
                 } else {
                     const amountPickedUp = controls.isInventoryStackPickUpHalf()
                         ? Math.ceil(count / 2)
                         : count
-                    this.setHeldStack(hoverInv, hoverIndex, amountPickedUp)
+                    this.setHeldStack(
+                        hoverInv,
+                        hoverIndex,
+                        hoverInv.getStack(hoverIndex).withCount(amountPickedUp)
+                    )
                 }
             }
         }
@@ -479,9 +513,10 @@ export class InventoryDisplay extends Component {
     }
 
     close() {
+        this.clearHeldStack()
+
         this.showingInv = false
         this.stackSprites = []
-        this.tooltip.clear()
         this.displayEntity = null
         this.tradingInv = null
         this.canUseItems = false

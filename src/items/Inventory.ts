@@ -27,13 +27,26 @@ export class ItemStack {
     withMetadata(metadata: Partial<ItemStackMetadata>) {
         return new ItemStack(this.item, this.count, { ...this.metadata, ...metadata })
     }
+
+    equals(other: ItemStack): boolean {
+        if (!other) {
+            return false
+        }
+        return (
+            other.item === this.item &&
+            other.count === this.count &&
+            doesMetadataMatch(other.metadata, this.metadata)
+        )
+    }
 }
 
 const doesMetadataMatch = (a: ItemStackMetadata, b: ItemStackMetadata) => {
-    // ignore hotkey — we just put it in the metadata for easy serialization
-    a = { ...a, hotKey: undefined }
-    b = { ...b, hotKey: undefined }
-    return stringifySorted(a) === stringifySorted(b)
+    if (!a && !b) {
+        return true
+    } else if (a && b) {
+        return stringifySorted(a) === stringifySorted(b)
+    }
+    return false
 }
 
 export class Inventory {
