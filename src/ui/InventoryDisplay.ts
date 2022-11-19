@@ -517,7 +517,7 @@ export class InventoryDisplay extends Component {
 
     close() {
         this.clearHeldStack()
-
+        this.tooltip.clear()
         this.showingInv = false
         this.stackSprites = []
         this.displayEntity = null
