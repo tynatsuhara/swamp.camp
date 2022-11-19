@@ -400,7 +400,7 @@ export class InventoryDisplay extends Component {
             }
 
             const setInvStack = (inv: Inventory, stackIdx: number, stack: ItemStack) => {
-                const newMetadata = { ...stackA.metadata }
+                const newMetadata = { ...stack.metadata }
                 if (invB !== dudeInv) {
                     this.removePlayerInvOnlyMetadata(newMetadata)
                 }
