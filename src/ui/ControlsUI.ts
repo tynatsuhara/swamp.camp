@@ -2,6 +2,7 @@ import { Component, GamepadButton, Point } from "brigsby/dist"
 import { RenderMethod } from "brigsby/dist/renderer"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { Camera } from "../cutscenes/Camera"
+import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { ButtonIndicator } from "./ButtonIndicator"
 import { Color } from "./Color"
@@ -20,14 +21,18 @@ import { UIStateManager } from "./UIStateManager"
  *   - Sheath weapon |  f  | d-pad left
  */
 
-const format = (text: string, position: Point) =>
+const renderText = (text: string, position: Point) =>
     formatText({
         text,
         color: Color.WHITE,
         position: position.plusY(5),
         width: COLUMN_WIDTH,
         alignment: TextAlign.CENTER,
+        depth: TextOverlayManager.DEPTH,
     })
+
+const renderButton = (pos: Point, button: GamepadButton) =>
+    new ButtonIndicator(pos.plusX(ICON_OFFSET), button, TextOverlayManager.DEPTH).getRenderMethods()
 
 type ControlRender = {
     kbm: (topLeft: Point) => RenderMethod[]
@@ -44,7 +49,7 @@ const CONTROLS: { [key: string]: ControlRender } = {
                 })
             ),
         ],
-        gamepad: (pos) => format("R1/R2", pos),
+        gamepad: (pos) => renderText("R1/R2", pos),
     },
     [`Block`]: {
         kbm: (pos) => [
@@ -55,10 +60,10 @@ const CONTROLS: { [key: string]: ControlRender } = {
                 })
             ),
         ],
-        gamepad: (pos) => format("L1/L2", pos),
+        gamepad: (pos) => renderText("L1/L2", pos),
     },
     [`Move`]: {
-        kbm: (pos) => format("W/A/S/D", pos),
+        kbm: (pos) => renderText("W/A/S/D", pos),
         gamepad: (pos) => [
             Tilesets.instance.oneBit.getTileSource("joystick-up").toImageRender(
                 SpriteTransform.new({
@@ -69,33 +74,28 @@ const CONTROLS: { [key: string]: ControlRender } = {
         ],
     },
     [`Jump`]: {
-        kbm: (pos) => format("SPACE", pos),
-        gamepad: (pos) =>
-            new ButtonIndicator(pos.plusX(ICON_OFFSET), GamepadButton.SQUARE).getRenderMethods(),
+        kbm: (pos) => renderText("SPACE", pos),
+        gamepad: (pos) => renderButton(pos, GamepadButton.SQUARE),
     },
     [`Roll`]: {
-        kbm: (pos) => format("SHIFT", pos),
-        gamepad: (pos) =>
-            new ButtonIndicator(pos.plusX(ICON_OFFSET), GamepadButton.CIRCLE).getRenderMethods(),
+        kbm: (pos) => renderText("SHIFT", pos),
+        gamepad: (pos) => renderButton(pos, GamepadButton.CIRCLE),
     },
     [`Inventory`]: {
-        kbm: (pos) => format("Q", pos),
-        gamepad: (pos) =>
-            new ButtonIndicator(pos.plusX(ICON_OFFSET), GamepadButton.UP).getRenderMethods(),
+        kbm: (pos) => renderText("Q", pos),
+        gamepad: (pos) => renderButton(pos, GamepadButton.UP),
     },
     [`Minimap`]: {
-        kbm: (pos) => format("M", pos),
-        gamepad: (pos) =>
-            new ButtonIndicator(pos.plusX(ICON_OFFSET), GamepadButton.RIGHT).getRenderMethods(),
+        kbm: (pos) => renderText("M", pos),
+        gamepad: (pos) => renderButton(pos, GamepadButton.RIGHT),
     },
     [`Sheath`]: {
-        kbm: (pos) => format("F", pos),
-        gamepad: (pos) =>
-            new ButtonIndicator(pos.plusX(ICON_OFFSET), GamepadButton.DOWN).getRenderMethods(),
+        kbm: (pos) => renderText("F", pos),
+        gamepad: (pos) => renderButton(pos, GamepadButton.DOWN),
     },
     [`Options`]: {
-        kbm: (pos) => format("TAB", pos),
-        gamepad: (pos) => format("START", pos),
+        kbm: (pos) => renderText("TAB", pos),
+        gamepad: (pos) => renderText("START", pos),
     },
 }
 
@@ -123,7 +123,7 @@ export class ControlsUI extends Component {
             Object.entries(CONTROLS).forEach(([name, { kbm, gamepad }], i) => {
                 const rowPos = topLeft.plusY(i * ROW_HEIGHT)
 
-                result.push(...format(name, rowPos))
+                result.push(...renderText(name, rowPos))
                 result.push(...kbm(rowPos.plusX(COLUMN_WIDTH)))
                 result.push(...gamepad(rowPos.plusX(COLUMN_WIDTH * 2)))
             })
