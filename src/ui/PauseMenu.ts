@@ -133,7 +133,10 @@ export class PauseMenu extends Component {
             text: [""],
             finishAction: "COOL",
             additionalComponents: () => [controlsUI],
+            pauseBackground: false,
         })
+
+        this.close()
     }
 
     private getFullScreenOption(): PauseOption {

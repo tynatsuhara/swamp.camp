@@ -50,7 +50,7 @@ export class TextOverlayManager extends Component {
         onFinish = () => {},
         additionalComponents = () => [],
         textAlign = TextAlign.LEFT,
-        pauseBackground = true, // MPTODO maybe just make this match session.isOnline()
+        pauseBackground = true,
     }: {
         text: string[]
         finishAction: string

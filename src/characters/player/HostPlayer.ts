@@ -42,7 +42,11 @@ export class HostPlayer extends AbstractPlayer {
     private checkIsOffMap(updateData: UpdateData) {
         const offMap = this.dude.getCurrentOffMapArea()
 
-        if (offMap && !CutscenePlayerController.instance.enabled) {
+        if (
+            offMap &&
+            !CutscenePlayerController.instance.enabled &&
+            !TextOverlayManager.instance.isActive
+        ) {
             this.timeOffMap += updateData.elapsedTimeMillis
         } else {
             this.timeOffMap = 0
@@ -50,7 +54,11 @@ export class HostPlayer extends AbstractPlayer {
         }
 
         // MPTODO figure out the desired behavior here
-        if (this.timeOffMap > 2_500 && !this.offMapWarningShown) {
+        if (
+            this.timeOffMap > 2_500 &&
+            !this.offMapWarningShown &&
+            !TextOverlayManager.instance.isActive
+        ) {
             if (here() === camp()) {
                 TextOverlayManager.instance.open({
                     text: [
@@ -61,6 +69,7 @@ export class HostPlayer extends AbstractPlayer {
                     finishAction: "OKAY",
                     onFinish: () => (this.offMapWarningShown = true),
                     textAlign: TextAlign.CENTER,
+                    pauseBackground: false,
                 })
             } else {
                 // This is a radiant location — go back to camp
