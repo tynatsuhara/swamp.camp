@@ -67,7 +67,7 @@ export class InventoryDisplay extends Component {
         InventoryDisplay.instance = this
     }
 
-    lateUpdate(updateData: UpdateData) {
+    update(updateData: UpdateData) {
         const pressI = controls.isInventoryButtonDown()
         const pressEsc = controls.isCloseMenuButtonDown()
 
@@ -250,6 +250,9 @@ export class InventoryDisplay extends Component {
                         hoverIndex
                     )
                 }
+            } else {
+                // clicking outside inv will put the stack back
+                this.clearHeldStack()
             }
 
             if (!actionSuccess) {
