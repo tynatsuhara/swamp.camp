@@ -89,9 +89,14 @@ export class InventoryDisplay extends Component {
 
         if (wasHoldingSomething) {
             this.checkDragAndDrop(hoverInv, hoverIndex)
+            // this logic is weird but necessary to prevent a flash on re-render
+            if (!this.heldStack || this.heldStack.count < 2) {
+                this.tooltip.clear()
+            }
         } else if (hoverIndex > -1 && hoverInv.getStack(hoverIndex)) {
             this.checkMouseHoverActions(hoverInv, hoverIndex, updateData)
         } else {
+            // we're not hovering or holding anything so clear the tooltip
             this.tooltip.clear()
         }
 
@@ -162,7 +167,6 @@ export class InventoryDisplay extends Component {
     }
 
     private clearHeldStack() {
-        this.tooltip.clear()
         this.heldStack = undefined
         this.heldStackInvIndex = undefined
         this.heldStackInventory = null
@@ -191,7 +195,6 @@ export class InventoryDisplay extends Component {
 
     private checkDragAndDrop(hoverInv: Inventory, hoverIndex: number) {
         // dragging
-        this.tooltip.clear()
         if (controls.isInventoryStackDrop() || controls.isInventoryStackDropOne()) {
             let actionSuccess = false
 
