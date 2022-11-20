@@ -900,6 +900,9 @@ export class Dude extends Component implements DialogueSource {
         this.animation.transform.rotation = 0
         this.layingDownOffset = null
 
+        // manually set sea level since it can get screwed up by death + knockback
+        this.seaLevel = this.getLevelAt(this.standingPosition)
+
         emitApparitionParticles(this.standingPosition, LIGHT_SMOKE_PARTICLES)
     }
 
