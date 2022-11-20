@@ -236,6 +236,7 @@ export class Dude extends Component implements DialogueSource {
 
         // populate dudecache for O(1) lookup by uuid
         if (dudeCache[uuid]) {
+            dudeCache[uuid].entity.selfDestruct()
             console.error(`duplicate dude ${uuid} instantiated`)
         }
         dudeCache[uuid] = this
