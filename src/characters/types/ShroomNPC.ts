@@ -49,10 +49,18 @@ export class ShroomNPC extends Component {
     // push back NEXT_GROWTH_TIME to make sure they don't get
     // big and aggressive right when the player respawns
     delayTime(duration: number) {
+        if (session.isGuest()) {
+            return
+        }
+
         this.dude.blob[NEXT_GROWTH_TIME] += duration
     }
 
     lateUpdate(updateData: UpdateData) {
+        if (session.isGuest()) {
+            return
+        }
+
         if (WorldTime.instance.time < this.dude.blob[NEXT_GROWTH_TIME]) {
             return
         }
