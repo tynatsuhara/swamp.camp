@@ -160,13 +160,15 @@ export class StaffWeapon extends Weapon {
                                     d.standingPosition.distanceTo(this.attackPosition) <
                                     attackDistance
                             )
-                            .forEach((d) =>
+                            .forEach((d) => {
+                                // knockback but don't damage allies
+                                const damageVal = this.dude.isEnemy(d) ? 2 : 0
                                 // don't track lastAttacker because it can cause friendly fire and get weird
-                                d.damage(2, {
+                                d.damage(damageVal, {
                                     direction: d.standingPosition.minus(this.attackPosition),
                                     knockback: 50,
                                 })
-                            )
+                            })
                     }
 
                     Camera.instance.shake(5, 500)
