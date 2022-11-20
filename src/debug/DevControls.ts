@@ -7,16 +7,17 @@ import {
     Point,
     UpdateData,
 } from "brigsby/dist"
-import { Lists } from "brigsby/dist/util"
 import { DudeFactory } from "../characters/DudeFactory"
 import { DudeSpawner } from "../characters/DudeSpawner"
 import { DudeType } from "../characters/DudeType"
 import { player } from "../characters/player"
 import { spawnMagicProjectile } from "../characters/weapons/MagicProjectile"
 import { controls } from "../Controls"
-import { Particles } from "../graphics/particles/Particles"
+import {
+    emitApparitionParticles,
+    LIGHT_SMOKE_PARTICLES,
+} from "../graphics/particles/ApparitionParticles"
 import { pixelPtToTilePt } from "../graphics/Tilesets"
-import { Color } from "../ui/Color"
 import { DrawMenu } from "../ui/DrawMenu"
 import { UIStateManager } from "../ui/UIStateManager"
 import { ElementType } from "../world/elements/Elements"
@@ -47,26 +48,33 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     //             textAlign: TextAlign.CENTER,
     //         }),
     // ],
+    // [
+    //     InputKey.I,
+    //     "smoke bomb",
+    //     () => {
+    //         const pos = player().standingPosition
+    //         const radius = 45
+    //         const depth = pos.y + radius
+
+    //         // smoke
+    //         for (let i = 0; i < 1250; i++) {
+    //             const speed = Math.random() > 0.5 ? -0.001 : -0.005
+    //             Particles.instance.emitParticle(
+    //                 Lists.oneOf([Color.WHITE, Color.WHITE, Color.TAUPE_6]),
+    //                 pos.randomCircularShift(radius).plusY(-4),
+    //                 depth,
+    //                 1000 + Math.random() * 2500,
+    //                 (t) => new Point(0, t * speed),
+    //                 Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
+    //             )
+    //         }
+    //     },
+    // ],
     [
         InputKey.I,
-        "smoke bomb",
+        "emitApparitionParticles",
         () => {
-            const pos = player().standingPosition
-            const radius = 45
-            const depth = pos.y + radius
-
-            // smoke
-            for (let i = 0; i < 1250; i++) {
-                const speed = Math.random() > 0.5 ? -0.001 : -0.005
-                Particles.instance.emitParticle(
-                    Lists.oneOf([Color.WHITE, Color.WHITE, Color.TAUPE_6]),
-                    pos.randomCircularShift(radius).plusY(-4),
-                    depth,
-                    1000 + Math.random() * 2500,
-                    (t) => new Point(0, t * speed),
-                    Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
-                )
-            }
+            emitApparitionParticles(player().standingPosition, LIGHT_SMOKE_PARTICLES)
         },
     ],
     [

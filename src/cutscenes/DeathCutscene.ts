@@ -73,7 +73,7 @@ export class DeathCutscene extends Component {
 
         Camera.instance.jumpCutToFocalPoint()
 
-        player().revive()
+        setTimeout(() => player().revive(), 850)
 
         // Clear out any enemies
         here()

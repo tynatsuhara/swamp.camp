@@ -11,6 +11,10 @@ import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 import { DeathCutscene } from "../cutscenes/DeathCutscene"
 import { IntroCutscene } from "../cutscenes/IntroCutscene"
 import { ImageFilters } from "../graphics/ImageFilters"
+import {
+    emitApparitionParticles,
+    LIGHT_SMOKE_PARTICLES,
+} from "../graphics/particles/ApparitionParticles"
 import { BlackLungParticles } from "../graphics/particles/BlackLungParticles"
 import { emitBlockParticles } from "../graphics/particles/CombatParticles"
 import { FireParticles } from "../graphics/particles/FireParticles"
@@ -895,6 +899,8 @@ export class Dude extends Component implements DialogueSource {
         this.animationDirty = true
         this.animation.transform.rotation = 0
         this.layingDownOffset = null
+
+        emitApparitionParticles(this.standingPosition, LIGHT_SMOKE_PARTICLES)
     }
 
     dissolve() {
