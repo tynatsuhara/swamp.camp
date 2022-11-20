@@ -110,6 +110,11 @@ export class InventoryDisplay extends Component {
     }
 
     private updateTooltip() {
+        if (!this.isOpen) {
+            this.tooltip.clear()
+            return
+        }
+
         this.tooltip.position = controls.getMousePos()
         let text: string = undefined
         if (this.heldStack) {
