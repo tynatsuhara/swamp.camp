@@ -208,7 +208,12 @@ export class MainMenuScene {
                 this.render(Menu.ROOT) // force re-render
             }
             if (!this.sessionIdTextInput) {
-                this.sessionIdTextInput = new TextInput(menuTop, SESSION_ID_LENGTH, joinSession)
+                this.sessionIdTextInput = new TextInput(
+                    "SESSION @",
+                    menuTop,
+                    SESSION_ID_LENGTH,
+                    joinSession
+                )
             } else {
                 this.sessionIdTextInput.reposition(menuTop)
             }

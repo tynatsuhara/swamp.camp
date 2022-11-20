@@ -7,12 +7,12 @@ export class TextInput {
     private readonly cursorFlashInterval: NodeJS.Timer
     private value: string = ""
 
-    constructor(topCenterPos: Point, maxLength: number, onEnter: () => void) {
+    constructor(prefixText: string, topCenterPos: Point, maxLength: number, onEnter: () => void) {
         const wrapper = document.createElement("div")
         this.element = document.body.appendChild(wrapper)
         this.reposition(topCenterPos)
 
-        const prefix = document.createTextNode("SESSION @")
+        const prefix = document.createTextNode(prefixText)
         const input = document.createElement("input")
         const suffix = document.createTextNode("_")
 
