@@ -140,7 +140,13 @@ export class DudeSpawner extends Component {
 
     private checkForOrcSeige() {
         if (!EventQueue.instance.containsEventType(QueuedEventType.ORC_SEIGE)) {
-            const nextSeigeTime = WorldTime.instance.future({ days: 2 + Math.random() * 3 })
+            // orc siege should happen sometime during the day
+            let nextSeigeTime = WorldTime.instance.future({ days: 2 + Math.random() * 3 })
+            nextSeigeTime -= nextSeigeTime % TimeUnit.DAY
+            nextSeigeTime += TimeUnit.HOUR * (6 + Math.random() * 13)
+            nextSeigeTime += TimeUnit.MINUTE * Math.random() * 60
+            console.log(`next orc siege time: ${WorldTime.clockTime(nextSeigeTime)}`)
+
             EventQueue.instance.addEvent({
                 type: QueuedEventType.ORC_SEIGE,
                 time: nextSeigeTime,
@@ -156,17 +162,17 @@ export class DudeSpawner extends Component {
 
         const spawnPos = this.getSpawnPosOutsideOfCamp()
 
-        const leaders = Lists.range(1, 1 + Math.random() * 4).map(() =>
-            DudeFactory.instance.create(DudeType.ORC_BRUTE, spawnPos)
-        )
+        // TODO: Make these values dynamic based on progress
+        const leaderCount = 1
+        const warriorCount = 2 + Math.random() * 3
+        const shamanCount = 1
 
+        const spawn = (type: DudeType) => DudeFactory.instance.create(type, spawnPos)
+
+        const leaders = Lists.range(0, leaderCount).map(() => spawn(DudeType.ORC_BRUTE))
         const followers = [
-            ...Lists.range(0, 5 + Math.random() * 10).map(() =>
-                DudeFactory.instance.create(DudeType.ORC_WARRIOR, spawnPos)
-            ),
-            ...Lists.range(0, 1 + Math.random() * 4).map(() =>
-                DudeFactory.instance.create(DudeType.ORC_SHAMAN, spawnPos)
-            ),
+            ...Lists.range(0, warriorCount).map(() => spawn(DudeType.ORC_WARRIOR)),
+            ...Lists.range(0, shamanCount).map(() => spawn(DudeType.ORC_SHAMAN)),
         ]
 
         followers.forEach((f) => f.entity.getComponent(NPC).setLeader(Lists.oneOf(leaders)))
