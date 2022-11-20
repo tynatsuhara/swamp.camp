@@ -20,10 +20,13 @@
                 window.location.replace(redirect)
             }
 
-            if (
-                !localStorage.getItem("chrome_warning_shown") &&
-                !navigator.userAgent.match(/chrome/i)
-            ) {
+            const isNativeApp = !!new URL(window.location.href).searchParams.get("native_app")
+            const brands = navigator.userAgentData?.brands || []
+            const isGoogleChrome = brands.some((b) => b.brand === "Google Chrome")
+            const hasShownWarning = localStorage.getItem("chrome_warning_shown")
+            const shouldShowChromeWarning = !isNativeApp && !isGoogleChrome && !hasShownWarning
+
+            if (shouldShowChromeWarning) {
                 window.location.href = "/chrome_warning"
             }
 
