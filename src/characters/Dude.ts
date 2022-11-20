@@ -857,12 +857,14 @@ export class Dude extends Component implements DialogueSource {
             }
         }, 1000)
 
-        if (session.isHost()) {
-            this.triggerDeathHooks()
-        }
+        this.triggerDeathHooks()
     }
 
     private triggerDeathHooks() {
+        if (!session.isHost()) {
+            return
+        }
+
         // play death cutscene if applicable
         // MPTODO multiplayer death logic
         if (this.type === DudeType.PLAYER) {

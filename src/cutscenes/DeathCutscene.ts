@@ -1,7 +1,7 @@
 import { Component, Point } from "brigsby/dist"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
-import { player } from "../characters/player"
+import { DudeType } from "../characters/DudeType"
 import { Enemy } from "../characters/types/Enemy"
 import { ShroomNPC } from "../characters/types/ShroomNPC"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
@@ -63,17 +63,23 @@ export class DeathCutscene extends Component {
 
         // If the player dies off map, just put them at a random on-map location.
         // TODO: Respawn them at the doctor, their bed, or somewhere else that makes sense.
-        if (player().getCurrentOffMapArea()) {
-            const newSpot = Lists.findRandom(
-                camp().getGroundSpots(),
-                (pos) => !Ground.isWater(camp().getGround(pos)?.type) && !camp().isOccupied(pos)
-            )
-            player().moveTo(newSpot.times(TILE_SIZE), true)
-        }
+        here()
+            .getDudes()
+            .filter((d) => d.type === DudeType.PLAYER && !d.isAlive)
+            .forEach((p) => {
+                if (p.getCurrentOffMapArea()) {
+                    const newSpot = Lists.findRandom(
+                        camp().getGroundSpots(),
+                        (pos) =>
+                            !Ground.isWater(camp().getGround(pos)?.type) && !camp().isOccupied(pos)
+                    )
+                    p.moveTo(newSpot.times(TILE_SIZE), true)
+                }
+
+                setTimeout(() => p.revive(), 850)
+            })
 
         Camera.instance.jumpCutToFocalPoint()
-
-        setTimeout(() => player().revive(), 850)
 
         // Clear out any enemies
         here()
