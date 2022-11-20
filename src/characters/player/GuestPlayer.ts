@@ -2,8 +2,17 @@ import { UpdateData } from "brigsby/dist"
 import { ActionSender } from "trystero"
 import { controls } from "../../Controls"
 import { session } from "../../online/session"
-import { AbstractPlayer, SerializablePlayerControls } from "./AbstractPlayer"
+import { AbstractPlayer, PlayerControls } from "./AbstractPlayer"
 import { registerPlayerInstance } from "./index"
+
+// isAttackDown gets inferred based on the previously used controls
+type SerializedPlayerControls = Omit<PlayerControls, "isAttackDown">
+
+const KEY_PRESS_CONTROLS: (keyof SerializedPlayerControls)[] = [
+    "isJumpDown",
+    "isRollDown",
+    "isSheathKeyDown",
+]
 
 export class GuestPlayer extends AbstractPlayer {
     constructor() {
@@ -15,42 +24,68 @@ export class GuestPlayer extends AbstractPlayer {
 
     // on host
     // MPTODO: This will probably have some janky behavior because the "onKey" handlers might run multiple times in a row
-    private controls: SerializablePlayerControls
+    private controls: PlayerControls
 
     // on client
-    private sendControls: ActionSender<SerializablePlayerControls>
+    private sendControls: ActionSender<SerializedPlayerControls>
 
     awake() {
         super.awake()
-        const [sendControls, receiveControls] = session.action<SerializablePlayerControls>(
+        const [sendControls, receiveControls] = session.action<SerializedPlayerControls>(
             this.dude.syncId("ctrl")
         )
 
         this.sendControls = sendControls
 
-        receiveControls((data) => {
-            this.controls = data
+        receiveControls((receivedControls) => {
+            if (!this.controls) {
+                this.controls = { ...receivedControls, isAttackDown: false }
+                return
+            }
+
+            const newControls: Partial<SerializedPlayerControls> = {}
+
+            // ||= these to make sure they are true for 1 frame on the host
+            KEY_PRESS_CONTROLS.forEach((control) => {
+                // @ts-ignore
+                newControls[control] = this.controls[control] || receivedControls[control]
+            })
+
+            this.controls = {
+                ...receivedControls,
+                ...newControls,
+                isAttackDown: !this.controls.isAttackDown && receivedControls.isAttackHeld,
+            }
         })
     }
 
     update(updateData: UpdateData): void {
         if (session.isGuest()) {
             // send input to host
-            this.sendControls(this.getSerializablePlayerControls())
+            this.sendControls(this.getControls())
             const possibleInteractable = this.updateInteractables(updateData, true)
             if (controls.isInteractDown() && possibleInteractable) {
                 possibleInteractable.interact(this.dude)
             }
             this.checkHotKeys(updateData)
-        } else if (session.isHost()) {
+        } else if (session.isHost() && this.controls) {
+            // this.controls might get updated while this is executing, spread/copy to avoid weird behavior
+            const controls = { ...this.controls }
+
             // receive data, update dude
-            if (this.controls) {
-                this.doMovementOnHost(updateData.elapsedTimeMillis, this.controls)
-            }
+            this.doMovementOnHost(updateData.elapsedTimeMillis, this.controls)
+
             const possibleInteractable = this.updateInteractables(updateData, false)
-            if (this.controls?.isInteractDown && possibleInteractable) {
+            if (controls.isInteractDown && possibleInteractable) {
                 possibleInteractable.interact(this.dude)
             }
+
+            KEY_PRESS_CONTROLS.forEach((control) => {
+                if (controls[control]) {
+                    // @ts-ignore
+                    this.controls[control] = false
+                }
+            })
         }
     }
 }

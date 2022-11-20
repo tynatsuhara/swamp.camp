@@ -22,7 +22,7 @@ export class HostPlayer extends AbstractPlayer {
             return
         }
 
-        const playerControls = this.getSerializablePlayerControls()
+        const playerControls = this.getControls()
 
         // MPTODO
         this.checkIsOffMap(updateData)

@@ -11,20 +11,22 @@ import { WorldTime } from "../../world/WorldTime"
 import { Dude } from "../Dude"
 import { player } from "./index"
 
-export type SerializablePlayerControls = {
+export type PlayerControls = {
     isWalkUpHeld: boolean
     isWalkDownHeld: boolean
     isWalkLeftHeld: boolean
     isWalkRightHeld: boolean
-    isJumpDown: boolean
-    isRollDown: boolean
-    isSheathKeyDown: boolean
     isBlockHeld: boolean
     playerFacingDirection: number
     isAttackHeld: boolean
-    isAttackDown: boolean
     canProvideInput: boolean
     isInteractDown: boolean
+
+    // these need to be treated differently since they're only true for one frame
+    isJumpDown: boolean
+    isRollDown: boolean
+    isAttackDown: boolean
+    isSheathKeyDown: boolean
 }
 
 export abstract class AbstractPlayer extends Component {
@@ -53,7 +55,7 @@ export abstract class AbstractPlayer extends Component {
         }
     }
 
-    getSerializablePlayerControls(): SerializablePlayerControls {
+    getControls(): PlayerControls {
         // Controls we'll need to pass
         const canMove = !UIStateManager.instance.isMenuOpen || PlaceElementDisplay.instance.isOpen
         return {
@@ -73,7 +75,7 @@ export abstract class AbstractPlayer extends Component {
         }
     }
 
-    doMovementOnHost(elapsedTimeMillis: number, playerControls: SerializablePlayerControls) {
+    doMovementOnHost(elapsedTimeMillis: number, playerControls: PlayerControls) {
         let dx = 0
         let dy = 0
 
