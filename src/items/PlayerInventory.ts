@@ -6,8 +6,8 @@ import { syncFn } from "../online/utils"
 import { saveManager } from "../SaveManager"
 import { InventoryDisplay } from "../ui/InventoryDisplay"
 import { Notification, NotificationDisplay } from "../ui/NotificationDisplay"
-import { Inventory } from "./Inventory"
-import { Item, ItemMetadata, ITEM_METADATA_MAP } from "./Items"
+import { Inventory, ItemStackMetadata } from "./Inventory"
+import { Item, ITEM_METADATA_MAP } from "./Items"
 
 type SpecialItem = {
     // If true, this item doesn't actually go in the inventory
@@ -74,6 +74,13 @@ export class PlayerInventory extends Inventory {
                 SPECIAL_ITEMS[item]?.noInventorySlot || super.addItem(item, count, metadata)
 
             if (added) {
+                const itemData = ITEM_METADATA_MAP[item]
+                if (metadata.equipped === "weapon") {
+                    Dude.get(playerUUID).setWeapon(itemData.equippableWeapon, -1)
+                } else if (metadata.equipped === "shield") {
+                    Dude.get(playerUUID).setShield(itemData.equippableShield, -1)
+                }
+
                 // Apply special side effects
                 SPECIAL_ITEMS[item]?.onAdd(count)
 
@@ -87,9 +94,9 @@ export class PlayerInventory extends Inventory {
         }
     }
 
-    addItem: (item: Item, count?: number, metadata?: ItemMetadata, quiet?: boolean) => boolean
+    addItem: (item: Item, count?: number, metadata?: ItemStackMetadata, quiet?: boolean) => boolean
 
-    canAddItem(item: Item, count: number = 1, metadata: ItemMetadata = {}): boolean {
+    canAddItem(item: Item, count: number = 1, metadata: ItemStackMetadata = {}): boolean {
         return SPECIAL_ITEMS[item]?.noInventorySlot || super.canAddItem(item, count, metadata)
     }
 
