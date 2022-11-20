@@ -30,6 +30,41 @@ import { WorldTime } from "../world/WorldTime"
 import { spawnMenu } from "./SpawnMenu"
 
 const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
+    [InputKey.BACKSPACE, "toggle profiler", () => (debug.showProfiler = !debug.showProfiler)],
+    [
+        InputKey.P,
+        "show/hide spawn menu",
+        () => {
+            if (spawnMenu.isOpen) {
+                spawnMenu.isOpen = false
+            } else if (!UIStateManager.instance.isMenuOpen) {
+                spawnMenu.isOpen = true
+            }
+            if (!spawnMenu.isOpen) {
+                spawnMenu.page = 0
+            }
+        },
+    ],
+    [
+        InputKey.O,
+        "spawn selected type",
+        (input) => DudeFactory.instance.create(spawnMenu.getSelectedType(), input.mousePos, here()),
+    ],
+    [
+        InputKey.N,
+        "fast forward (shift: 1m, ctrl: 1d, default: 1h)",
+        (input) => {
+            let time: number
+            if (input.isKeyHeld(InputKey.SHIFT)) {
+                time = TimeUnit.MINUTE
+            } else if (input.isKeyHeld(InputKey.CONTROL)) {
+                time = TimeUnit.DAY
+            } else {
+                time = TimeUnit.HOUR
+            }
+            WorldTime.instance.fastForward(time)
+        },
+    ],
     // [
     //     InputKey.I,
     //     "show town stats",
@@ -77,25 +112,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
             emitApparitionParticles(player().standingPosition, LIGHT_SMOKE_PARTICLES)
         },
     ],
-    [
-        InputKey.O,
-        "spawn selected type",
-        (input) => DudeFactory.instance.create(spawnMenu.getSelectedType(), input.mousePos, here()),
-    ],
-    [
-        InputKey.P,
-        "show/hide spawn menu",
-        () => {
-            if (spawnMenu.isOpen) {
-                spawnMenu.isOpen = false
-            } else if (!UIStateManager.instance.isMenuOpen) {
-                spawnMenu.isOpen = true
-            }
-            if (!spawnMenu.isOpen) {
-                spawnMenu.page = 0
-            }
-        },
-    ],
+
     [
         InputKey.U,
         "generate radiant location",
@@ -177,21 +194,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
             growable?.forceGrow()
         },
     ],
-    [
-        InputKey.N,
-        "fast forward (shift: 1m, ctrl: 1d, default: 1h)",
-        (input) => {
-            let time: number
-            if (input.isKeyHeld(InputKey.SHIFT)) {
-                time = TimeUnit.MINUTE
-            } else if (input.isKeyHeld(InputKey.CONTROL)) {
-                time = TimeUnit.DAY
-            } else {
-                time = TimeUnit.HOUR
-            }
-            WorldTime.instance.fastForward(time)
-        },
-    ],
+
     [
         InputKey.Y,
         "vanish spooky visitor(s)",
@@ -202,7 +205,6 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
                 .forEach((d) => d.entity.selfDestruct()),
     ],
     [InputKey.T, "spawn visitor", () => DudeSpawner.instance.spawnVisitors(true)],
-    [InputKey.BACKSPACE, "toggle profiler", () => (debug.showProfiler = !debug.showProfiler)],
 ]
 
 window["vibrate"] = (duration: number, strongMagnitude: number, weakMagnitude: number) => {
@@ -213,7 +215,7 @@ window["vibrate"] = (duration: number, strongMagnitude: number, weakMagnitude: n
     })
 }
 
-// Maybe expose this somewhere in the future
+// WIP: Maybe expose this somewhere in the future
 window["saveImage"] = () => {
     let data = localStorage.getItem("save")
     console.log(`data length = ${data.length}`)
