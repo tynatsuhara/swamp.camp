@@ -1,4 +1,5 @@
 import { Component } from "brigsby/dist"
+import { session } from "../../online/session"
 import { Dude } from "../Dude"
 import { DudeType } from "../DudeType"
 import { Berto } from "./Berto"
@@ -14,6 +15,10 @@ export class Visitor extends Component {
      * Called after the visitor is spawned
      */
     welcome() {
+        if (session.isGuest()) {
+            return
+        }
+
         const announcement: string = {
             // TODO herald-ify the language
             [DudeType.SPOOKY_VISITOR]: "I spotted a spooky person lurking outside the camp...",

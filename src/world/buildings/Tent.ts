@@ -126,7 +126,6 @@ const makeTentInterior = (outside: Location, color: TentColor): Location => {
     // TODO change the isPlayerTent logic to support more than 2 tents
     const isPlayerTent = color === "blue"
     const l = new Location(LocationType.TENT_INTERIOR, true, isPlayerTent)
-    LocationManager.instance.add(l)
 
     const floorDimensions = new Point(5, 4)
     ElementUtils.rectPoints(Point.ZERO, floorDimensions).forEach((p) =>
@@ -152,7 +151,7 @@ const makeTentInterior = (outside: Location, color: TentColor): Location => {
 
     l.addElement(ElementType.BEDROLL, new Point(3, 0))
 
-    return l
+    return LocationManager.instance.add(l)
 }
 
 export const tentInteriorSprite = ({ color }: { color: TentColor }) => {

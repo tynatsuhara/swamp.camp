@@ -4,13 +4,15 @@ import { NineSlice, SpriteTransform, StaticSpriteSource } from "brigsby/dist/spr
 import { Maths } from "brigsby/dist/util"
 import { loadAudio } from "../audio/DeferLoadAudio"
 import { Sounds } from "../audio/Sounds"
-import { Player } from "../characters/Player"
+import { Dude } from "../characters/Dude"
+import { player } from "../characters/player"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { CraftingRecipe, CraftingRecipeCategory } from "../items/CraftingRecipe"
 import { Item, ITEM_METADATA_MAP } from "../items/Items"
+import { clientSyncFn } from "../online/utils"
 import { Color } from "./Color"
 import { TEXT_FONT, TEXT_SIZE } from "./Text"
 import { Tooltip } from "./Tooltip"
@@ -66,7 +68,6 @@ export class CraftingMenu extends Component {
             }
 
             this.tooltip.clear()
-            this.tooltip.position = controls.getMousePos()
             const rowsTall = 6 // will need to change this if dimensions are adjusted
             const category = this.recipes[this.recipeCategory]
             this.scrollOffset -=
@@ -166,13 +167,13 @@ export class CraftingMenu extends Component {
         return result
     }
 
-    private canCraft(recipe: CraftingRecipe) {
+    private canCraft(craftingPlayer: Dude, recipe: CraftingRecipe) {
         return (
             this.justCraftedRow === -1 &&
             !this.justOpened &&
-            Player.instance.dude.inventory.canAddItem(recipe.output) &&
+            craftingPlayer.inventory.canAddItem(recipe.output) &&
             recipe.input.every(
-                (input) => Player.instance.dude.inventory.getItemCount(input.item) >= input.count
+                (input) => craftingPlayer.inventory.getItemCount(input.item) >= input.count
             )
         )
     }
@@ -221,13 +222,10 @@ export class CraftingMenu extends Component {
 
             // craft the item
             if (hovered && controls.isMenuClickDown()) {
-                if (this.canCraft(recipe)) {
+                if (this.canCraft(player(), recipe)) {
+                    this.doCraftOnHost(recipe)
                     Sounds.play(this.craftNoise, 0.6)
-                    recipe.input.forEach((ingr) => {
-                        Player.instance.dude.inventory.removeItem(ingr.item, ingr.count)
-                    })
-                    Player.instance.dude.inventory.addItem(recipe.output)
-                    this.justCraftedRow = r
+                    this.justCraftedRow = r // set this AFTER crafting
                     setTimeout(() => (this.justCraftedRow = -1), 900)
                 } else {
                     UISounds.playErrorSound()
@@ -235,13 +233,12 @@ export class CraftingMenu extends Component {
             }
 
             const prefix = recipe.desc + "\n"
-            if (hovered && !this.canCraft(recipe)) {
-                if (!Player.instance.dude.inventory.canAddItem(recipe.output)) {
+            if (hovered && !this.canCraft(player(), recipe)) {
+                if (!player().inventory.canAddItem(recipe.output)) {
                     this.tooltip.say(prefix + "[Inventory full]")
                 } else if (
                     recipe.input.some(
-                        (input) =>
-                            Player.instance.dude.inventory.getItemCount(input.item) < input.count
+                        (input) => player().inventory.getItemCount(input.item) < input.count
                     )
                 ) {
                     this.tooltip.say(prefix + "[Need ingredients]")
@@ -278,7 +275,7 @@ export class CraftingMenu extends Component {
                 const ingr = recipe.input[recipe.input.length - i - 1]
                 const plainIngredientIcon = this.getItemIcon(ingr.item)
                 let ingredientIcon: StaticSpriteSource = plainIngredientIcon
-                if (Player.instance.dude.inventory.getItemCount(ingr.item) < ingr.count) {
+                if (player().inventory.getItemCount(ingr.item) < ingr.count) {
                     this.context.fillStyle = COLOR_LACKING_INGREDIENT
                     ingredientIcon = this.tintedIcon(ingredientIcon, COLOR_LACKING_INGREDIENT)
                 } else {
@@ -304,9 +301,9 @@ export class CraftingMenu extends Component {
                 ) {
                     const displayName = ITEM_METADATA_MAP[ingr.item].displayName
                     this.tooltip.say(
-                        `${displayName} (${Player.instance.dude.inventory.getItemCount(
-                            ingr.item
-                        )}/${ingr.count})`
+                        `${displayName} (${player().inventory.getItemCount(ingr.item)}/${
+                            ingr.count
+                        })`
                     )
                 }
             }
@@ -330,6 +327,21 @@ export class CraftingMenu extends Component {
 
         return [...sprites, renderComp]
     }
+
+    private doCraftOnHost = clientSyncFn(
+        "craft",
+        "host-only",
+        ({ dudeUUID }, recipe: CraftingRecipe) => {
+            const craftingPlayer = Dude.get(dudeUUID)
+            if (!this.canCraft(craftingPlayer, recipe)) {
+                return "reject"
+            }
+            recipe.input.forEach((ingr) => {
+                craftingPlayer.inventory.removeItem(ingr.item, ingr.count)
+            })
+            craftingPlayer.inventory.addItem(recipe.output)
+        }
+    )
 
     // caching stuff
     private itemIcons = new Map<Item, StaticSpriteSource>()

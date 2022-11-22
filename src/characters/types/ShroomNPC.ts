@@ -1,6 +1,7 @@
 import { Component, UpdateData } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
 import { Item } from "../../items/Items"
+import { session } from "../../online/session"
 import { ElementType } from "../../world/elements/Elements"
 import { camp } from "../../world/locations/LocationManager"
 import { TimeUnit } from "../../world/TimeUnit"
@@ -18,13 +19,17 @@ export class ShroomNPC extends Component {
     private enemy: Enemy
 
     awake() {
+        if (session.isGuest()) {
+            return
+        }
+
         this.dude = this.entity.getComponent(Dude)
         this.dude.blob[SIZE] = this.dude.blob[SIZE] || 1
         this.dude.droppedItemSupplier = () => Lists.repeat(this.dude.blob[SIZE], [Item.MUSHROOM])
         this.dude.blob[NEXT_GROWTH_TIME] = this.dude.blob[NEXT_GROWTH_TIME] || this.nextGrowthTime()
 
         if (this.dude.blob[SIZE] == 3) {
-            this.dude.setWeapon(WeaponType.UNARMED)
+            this.dude.setWeapon(WeaponType.UNARMED, -1)
             this.enemy = this.entity.addComponent(new Enemy())
         }
 
@@ -32,7 +37,7 @@ export class ShroomNPC extends Component {
         this.dude.setOnDamageCallback(() => {
             // NPC will flee until it has a non-NONE weapon
             if (this.dude.blob[SIZE] == 2 && !this.dude.weapon) {
-                this.dude.setWeapon(WeaponType.UNARMED)
+                this.dude.setWeapon(WeaponType.UNARMED, -1)
             }
             // Adding enemy component will cause them to flee or engage in combat
             if (!this.enemy) {
@@ -44,10 +49,18 @@ export class ShroomNPC extends Component {
     // push back NEXT_GROWTH_TIME to make sure they don't get
     // big and aggressive right when the player respawns
     delayTime(duration: number) {
+        if (session.isGuest()) {
+            return
+        }
+
         this.dude.blob[NEXT_GROWTH_TIME] += duration
     }
 
     lateUpdate(updateData: UpdateData) {
+        if (session.isGuest()) {
+            return
+        }
+
         if (WorldTime.instance.time < this.dude.blob[NEXT_GROWTH_TIME]) {
             return
         }
@@ -74,6 +87,7 @@ export class ShroomNPC extends Component {
 
         // delete and respawn the shroom dude
         this.entity.selfDestruct()
+        // MPTODO: This probably won't work online
         DudeFactory.instance.load(newData, camp())
     }
 

@@ -1,5 +1,6 @@
 import { Component, Entity, UpdateData } from "brigsby/dist"
 import { WorldAudioContext } from "../audio/WorldAudioContext"
+import { syncFn } from "../online/utils"
 import { saveManager } from "../SaveManager"
 import { Singletons } from "../Singletons"
 import { EventQueue } from "./events/EventQueue"
@@ -34,12 +35,12 @@ export class WorldTime extends Component {
         WorldAudioContext.instance.time = this.time
     }
 
-    fastForward(duration: number) {
+    fastForward = syncFn("wt:ff", (duration: number) => {
         this._time += duration
         console.log(`fast forwarding time to ${WorldTime.clockTime()}`)
 
         LocationManager.instance.simulateLocations(true, duration)
-    }
+    })
 
     getEntity(): Entity {
         return new Entity([this])

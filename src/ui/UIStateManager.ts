@@ -1,6 +1,7 @@
 import { Entity } from "brigsby/dist"
-import { Player } from "../characters/Player"
+import { player } from "../characters/player"
 import { Camera } from "../cutscenes/Camera"
+import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
 import { spawnMenu } from "../debug/SpawnMenu"
 import { Singletons } from "../Singletons"
 import { CraftingMenu } from "./CraftingMenu"
@@ -39,7 +40,7 @@ export class UIStateManager {
     }
 
     get(elapsedMillis: number): Entity[] {
-        if (!Player.instance.dude) {
+        if (!player()) {
             return []
         }
 
@@ -51,10 +52,11 @@ export class UIStateManager {
             this.craftingMenu.isOpen ||
             this.sellMenu.isOpen ||
             this.drawMenu.isOpen ||
-            spawnMenu.isOpen
+            spawnMenu.isOpen ||
+            TextOverlayManager.instance.isActive
 
         return HUD.instance
-            .getEntities(Player.instance.dude, Camera.instance.dimensions, elapsedMillis)
+            .getEntities(player(), Camera.instance.dimensions, elapsedMillis)
             .concat(this.inventory.getEntities())
             .concat(this.dialogueDisplay.getEntities())
             .concat(this.placeElementDisplay.getEntities())

@@ -1,9 +1,9 @@
-import { Component, Entity, Point } from "brigsby/dist"
+import { Entity, Point } from "brigsby/dist"
 import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
 import { loadAudio } from "../../audio/DeferLoadAudio"
 import { Sounds } from "../../audio/Sounds"
-import { Player } from "../../characters/Player"
+import { player } from "../../characters/player"
 import { WeaponType } from "../../characters/weapons/WeaponType"
 import { Particles } from "../../graphics/particles/Particles"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
@@ -18,6 +18,7 @@ import { Burnable } from "./Burnable"
 import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
+import { Growable } from "./Growable"
 import { HittableResource } from "./HittableResource"
 import { Pushable } from "./Pushable"
 
@@ -130,7 +131,7 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
                         return []
                     }
                     const getItem = () => (Math.random() < 0.2 ? saplingType : Item.WOOD)
-                    if (Player.instance.dude.weaponType === WeaponType.AXE) {
+                    if (player().weaponType === WeaponType.AXE) {
                         return [getItem(), getItem()]
                     } else {
                         return [getItem()]
@@ -143,7 +144,7 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
 
         if (size < 3) {
             e.addComponent(
-                new GrowableTree(nextGrowthTime, () => {
+                new Growable(nextGrowthTime, () => {
                     e.selfDestruct()
                     const treeData: SaveData = {
                         ngt: this.nextGrowthTime(),
@@ -194,24 +195,5 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
     private nextGrowthTime() {
         // grow every 24-48 hours
         return Math.floor(WorldTime.instance.time + TimeUnit.DAY * (1 + Math.random()))
-    }
-}
-
-class GrowableTree extends Component {
-    private nextGrowthTime: number
-    private growFn: () => void
-
-    constructor(nextGrowthTime: number, growFn: () => void) {
-        super()
-        this.nextGrowthTime = nextGrowthTime
-        this.growFn = growFn
-    }
-
-    lateUpdate() {
-        if (WorldTime.instance.time < this.nextGrowthTime) {
-            return
-        }
-
-        this.growFn()
     }
 }

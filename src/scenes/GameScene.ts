@@ -12,7 +12,7 @@ import { DudeFactory } from "../characters/DudeFactory"
 import { DudeSpawner } from "../characters/DudeSpawner"
 import { DudeType } from "../characters/DudeType"
 import { NPC } from "../characters/NPC"
-import { Player } from "../characters/Player"
+import { player } from "../characters/player"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
@@ -66,7 +66,7 @@ export class GameScene {
         LocationManager.instance.loadLocation(camp())
 
         const playerStartPos = new Point(camp().size, camp().size).times(TILE_SIZE)
-        const playerDude = DudeFactory.instance.new(DudeType.PLAYER, playerStartPos)
+        const playerDude = DudeFactory.instance.create(DudeType.PLAYER, playerStartPos)
 
         // Camera.instance.clearPosition()
         Camera.instance.focusOnDude(playerDude)
@@ -84,15 +84,7 @@ export class GameScene {
             updateViewsContext.elapsedTimeMillis
         )
 
-        // full-screen text overlay that pauses gameplay
-        const isTextOverlayActive = TextOverlayManager.instance.isActive
-
-        const uiEntities = [
-            ...(isTextOverlayActive
-                ? [TextOverlayManager.instance.getEntity()]
-                : UIStateManager.instance.get(updateViewsContext.elapsedTimeMillis)),
-            ...this.getUiSpaceDebugEntities(),
-        ]
+        const uiEntities = [...this.getUiSpaceDebugEntities()]
 
         const gameEntities: Entity[] = [
             CutsceneManager.instance.getEntity(),
@@ -100,7 +92,16 @@ export class GameScene {
             new Entity([new DevControls()]),
         ]
 
-        if (!isTextOverlayActive) {
+        if (TextOverlayManager.instance.isActive) {
+            uiEntities.unshift(TextOverlayManager.instance.getEntity())
+        }
+
+        const pauseBackground =
+            TextOverlayManager.instance.isActive &&
+            TextOverlayManager.instance.shouldPauseBackground
+
+        if (!pauseBackground) {
+            uiEntities.unshift(...UIStateManager.instance.get(updateViewsContext.elapsedTimeMillis))
             gameEntities.push(
                 ...here().getEntities(),
                 ...LightManager.instance.getEntities(),
@@ -133,14 +134,14 @@ export class GameScene {
     }
 
     private getWorldSpaceDebugEntity(): Entity {
-        if (!Player.instance?.dude) {
+        if (!player()) {
             return
         }
 
         const e = new Entity()
 
         if (debug.showGrid) {
-            const base = Player.instance.dude.tile
+            const base = player().tile
             const lines: RenderMethod[] = []
             const gridRange = 50
 

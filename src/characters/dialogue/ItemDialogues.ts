@@ -1,4 +1,5 @@
 import { Item } from "../../items/Items"
+import { session } from "../../online/session"
 import { saveManager } from "../../SaveManager"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
@@ -8,8 +9,7 @@ import { RestPoint } from "../../world/elements/RestPoint"
 import { here } from "../../world/locations/LocationManager"
 import { TimeUnit } from "../../world/TimeUnit"
 import { WorldTime } from "../../world/WorldTime"
-import { Player } from "../Player"
-import { ShieldType } from "../weapons/ShieldType"
+import { player } from "../player"
 import {
     dialogue,
     DialogueOption,
@@ -33,9 +33,6 @@ export const ITEM_DIALOGUES: DialogueSet = {
 
         const completeDialogue = (logsTransferred: number) => {
             return () => {
-                if (logsTransferred > 0) {
-                    Player.instance.dude.inventory.removeItem(Item.WOOD, logsTransferred)
-                }
                 cf.addLogs(logsTransferred)
                 return new NextDialogue(CAMPFIRE_DIALOGUE, false)
             }
@@ -51,7 +48,6 @@ export const ITEM_DIALOGUES: DialogueSet = {
         if (logCount > 0) {
             options.push(
                 new DialogueOption("Take a torch", () => {
-                    Player.instance.dude.setShield(ShieldType.TORCH)
                     return completeDialogue(-1)()
                 })
             )
@@ -63,6 +59,7 @@ export const ITEM_DIALOGUES: DialogueSet = {
         const restDurationHours = 2
         const now = WorldTime.instance.time
         if (
+            session.isHost() && // MPTODO
             restPoint.canRestFor(restDurationHours, cf) &&
             saveManager.getState().lastCampfireRestTime < now - 12 * TimeUnit.HOUR
         ) {
@@ -70,7 +67,7 @@ export const ITEM_DIALOGUES: DialogueSet = {
                 new DialogueOption("Rest briefly", () => {
                     saveManager.setState({ lastCampfireRestTime: now })
                     restPoint.rest(restDurationHours)
-                    Player.instance.dude.heal(Player.instance.dude.maxHealth / 2)
+                    player().heal(player().maxHealth / 2)
                     return completeDialogue(0)()
                 })
             )
@@ -89,7 +86,7 @@ export const ITEM_DIALOGUES: DialogueSet = {
 
         const cf: Campfire = DialogueDisplay.instance.source as Campfire
         const logCount = cf.logs
-        const playerLogCount = Player.instance.dude.inventory.getItemCount(Item.WOOD)
+        const playerLogCount = player().inventory.getItemCount(Item.WOOD)
         const logsYouCanAdd = Math.min(Campfire.LOG_CAPACITY - logCount, playerLogCount)
         const exitOption = new DialogueOption(
             CANCEL_TEXT,
@@ -99,10 +96,8 @@ export const ITEM_DIALOGUES: DialogueSet = {
 
         const completeDialogue = (logsTransferred: number) => {
             return () => {
-                if (logsTransferred > 0) {
-                    Player.instance.dude.inventory.removeItem(Item.WOOD, logsTransferred)
-                }
                 cf.addLogs(logsTransferred)
+                // cf.addLogs(logsTransferred)
                 return new NextDialogue(CAMPFIRE_DIALOGUE, false)
             }
         }
@@ -164,12 +159,12 @@ export const ITEM_DIALOGUES: DialogueSet = {
         let options = [
             new DialogueOption("Sleep (8 hours)", () => {
                 bed.rest(8)
-                Player.instance.dude.heal(Player.instance.dude.maxHealth)
+                player().heal(player().maxHealth)
                 return completeDialogue
             }),
             new DialogueOption("Nap (1 hour)", () => {
                 bed.rest(1)
-                Player.instance.dude.heal(Player.instance.dude.maxHealth / 2)
+                player().heal(player().maxHealth / 2)
                 return completeDialogue
             }),
             new DialogueOption(CANCEL_TEXT, () => completeDialogue),

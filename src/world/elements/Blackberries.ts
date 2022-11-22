@@ -4,6 +4,7 @@ import { Lists } from "brigsby/dist/util"
 import { Particles } from "../../graphics/particles/Particles"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item, spawnItem } from "../../items/Items"
+import { session } from "../../online/session"
 import { Color } from "../../ui/Color"
 import { Ground, GroundType } from "../ground/Ground"
 import { Location } from "../locations/Location"
@@ -99,18 +100,20 @@ export class BlackberriesFactory extends ElementFactory<ElementType.BLACKBERRIES
             new Hittable(center, tileTransforms, (dir) => {
                 e.selfDestruct()
                 if (state === State.HAS_BERRIES) {
-                    const itemDirection = dir.randomlyShifted(0.2).normalized()
-                    spawnItem({
-                        pos: pos
-                            .times(TILE_SIZE)
-                            .plusY(TILE_SIZE)
-                            .plusX(TILE_SIZE / 2),
-                        item: Item.BLACKBERRIES,
-                        velocity: itemDirection.times(5),
-                    })
-                    wl.addElement(this.type, pos, {
-                        s: State.NO_BERRIES,
-                    })
+                    if (session.isHost()) {
+                        const itemDirection = dir.randomlyShifted(0.2).normalized()
+                        spawnItem({
+                            pos: pos
+                                .times(TILE_SIZE)
+                                .plusY(TILE_SIZE)
+                                .plusX(TILE_SIZE / 2),
+                            item: Item.BLACKBERRIES,
+                            velocity: itemDirection.times(5),
+                        })
+                        wl.addElement(this.type, pos, {
+                            s: State.NO_BERRIES,
+                        })
+                    }
                 } else {
                     emitBreakParticles()
                 }

@@ -1,10 +1,11 @@
 import { debug } from "brigsby/dist"
-import { DudeType } from "./characters/DudeType"
-import { Player } from "./characters/Player"
+import { player } from "./characters/player"
 import { Camera } from "./cutscenes/Camera"
+import { ONLINE_PLAYER_DUDE_ID_PREFIX } from "./online/utils"
 import { Save, SaveState } from "./saves/SaveGame"
 import { newUUID } from "./saves/uuid"
 import { Singletons } from "./Singletons"
+import { SwampCampGame } from "./SwampCampGame"
 import { HUD } from "./ui/HUD"
 import { PlumePicker } from "./ui/PlumePicker"
 import { EventQueue } from "./world/events/EventQueue"
@@ -13,6 +14,12 @@ import { WorldTime } from "./world/WorldTime"
 
 const CURRENT_SAVE_FORMAT_VERSION = 3
 const SLOTS: number = 3 + (debug.extraSaveSlots ?? 0)
+
+/**
+ * 'save' — actually saving the world to storage
+ * 'multiplayer' — syncing this world to another person over the internet
+ */
+export type SaveContext = "save" | "multiplayer"
 
 class SaveManager {
     // Fields for the currently loaded save
@@ -70,23 +77,49 @@ class SaveManager {
         }
     }
 
-    save() {
-        if (!Player.instance.dude.isAlive) {
+    save(context: SaveContext = "save") {
+        if (!player().isAlive) {
             console.log("cannot save after death")
             return
         }
-        HUD.instance.showSaveIcon()
+
+        const onlinePlayers =
+            context === "multiplayer"
+                ? {} // don't send potentially sensitive multiplayer info to peers!
+                : here()
+                      .getDudes()
+                      .filter((d) => d.uuid.startsWith(ONLINE_PLAYER_DUDE_ID_PREFIX))
+                      .reduce((map, dude) => {
+                          const password = map[dude.uuid].password
+                          map[dude.uuid] = {
+                              ...dude.save(),
+                              password,
+                          }
+                          return map
+                      }, this.state.onlinePlayers)
+
         const save: Save = {
             version: CURRENT_SAVE_FORMAT_VERSION,
             timeSaved: new Date().getTime(),
             saveVersion: 0,
-            locations: LocationManager.instance.save(),
+            locations: LocationManager.instance.save(context),
             worldTime: WorldTime.instance.time,
             eventQueue: EventQueue.instance.save(),
-            state: this.state,
+            state: {
+                ...this.state,
+                onlinePlayers,
+            },
         }
-        console.log("saved game")
-        localStorage.setItem(this.saveKey, JSON.stringify(save))
+
+        if (context === "save") {
+            HUD.instance.showSaveIcon()
+            console.log("saving online players:")
+            console.log(onlinePlayers)
+            console.log("saved game")
+            localStorage.setItem(this.saveKey, JSON.stringify(save))
+        }
+
+        return save
     }
 
     // Save managment functions
@@ -155,15 +188,17 @@ class SaveManager {
      * @return true if a save was loaded successfully
      */
     load(slot: number = -1) {
-        const saveKey = slot === -1 ? this.saveKey : this.saveKeyForSlot(slot)
+        this.saveKey = slot === -1 ? this.saveKey : this.saveKeyForSlot(slot)
 
         // ensures that the file exists
-        const save = this.getSave(saveKey)
+        this.loadSave(this.getSave(this.saveKey))
+    }
+
+    loadSave(save: Save) {
         this.state = {
             ...new SaveState(), // initialize default values
             ...save.state,
         }
-        this.saveKey = saveKey
 
         // Logging
         const saveDate = new Date()
@@ -177,11 +212,9 @@ class SaveManager {
         LocationManager.instance.initialize(save.locations)
         EventQueue.instance.initialize(save.eventQueue)
 
-        Camera.instance.focusOnDude(
-            here()
-                .getDudes()
-                .find((d) => d.type === DudeType.PLAYER)
-        )
+        SwampCampGame.instance.loadGameScene()
+
+        Camera.instance.focusOnDude(player())
     }
 
     private getSave(saveKey: string): Save {
@@ -195,3 +228,6 @@ class SaveManager {
 }
 
 export const saveManager = new SaveManager()
+
+window["getSaveState"] = () => saveManager.getState()
+window["setSaveState"] = (newState: SaveState) => saveManager.setState(newState)

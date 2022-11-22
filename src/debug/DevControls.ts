@@ -7,19 +7,21 @@ import {
     Point,
     UpdateData,
 } from "brigsby/dist"
-import { Lists } from "brigsby/dist/util"
 import { DudeFactory } from "../characters/DudeFactory"
 import { DudeSpawner } from "../characters/DudeSpawner"
 import { DudeType } from "../characters/DudeType"
-import { Player } from "../characters/Player"
+import { player } from "../characters/player"
 import { spawnMagicProjectile } from "../characters/weapons/MagicProjectile"
 import { controls } from "../Controls"
-import { Particles } from "../graphics/particles/Particles"
+import {
+    emitApparitionParticles,
+    LIGHT_SMOKE_PARTICLES,
+} from "../graphics/particles/ApparitionParticles"
 import { pixelPtToTilePt } from "../graphics/Tilesets"
-import { Color } from "../ui/Color"
 import { DrawMenu } from "../ui/DrawMenu"
 import { UIStateManager } from "../ui/UIStateManager"
 import { ElementType } from "../world/elements/Elements"
+import { Growable } from "../world/elements/Growable"
 import { GroundType } from "../world/ground/Ground"
 import { camp, here, LocationManager } from "../world/locations/LocationManager"
 import { RadiantLocationGenerator } from "../world/locations/RadiantLocationGenerator"
@@ -28,6 +30,41 @@ import { WorldTime } from "../world/WorldTime"
 import { spawnMenu } from "./SpawnMenu"
 
 const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
+    [InputKey.BACKSPACE, "toggle profiler", () => (debug.showProfiler = !debug.showProfiler)],
+    [
+        InputKey.P,
+        "show/hide spawn menu",
+        () => {
+            if (spawnMenu.isOpen) {
+                spawnMenu.isOpen = false
+            } else if (!UIStateManager.instance.isMenuOpen) {
+                spawnMenu.isOpen = true
+            }
+            if (!spawnMenu.isOpen) {
+                spawnMenu.page = 0
+            }
+        },
+    ],
+    [
+        InputKey.O,
+        "spawn selected type",
+        (input) => DudeFactory.instance.create(spawnMenu.getSelectedType(), input.mousePos, here()),
+    ],
+    [
+        InputKey.N,
+        "fast forward (shift: 1m, ctrl: 1d, default: 1h)",
+        (input) => {
+            let time: number
+            if (input.isKeyHeld(InputKey.SHIFT)) {
+                time = TimeUnit.MINUTE
+            } else if (input.isKeyHeld(InputKey.CONTROL)) {
+                time = TimeUnit.DAY
+            } else {
+                time = TimeUnit.HOUR
+            }
+            WorldTime.instance.fastForward(time)
+        },
+    ],
     // [
     //     InputKey.I,
     //     "show town stats",
@@ -46,47 +83,36 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     //             textAlign: TextAlign.CENTER,
     //         }),
     // ],
+    // [
+    //     InputKey.I,
+    //     "smoke bomb",
+    //     () => {
+    //         const pos = player().standingPosition
+    //         const radius = 45
+    //         const depth = pos.y + radius
+
+    //         // smoke
+    //         for (let i = 0; i < 1250; i++) {
+    //             const speed = Math.random() > 0.5 ? -0.001 : -0.005
+    //             Particles.instance.emitParticle(
+    //                 Lists.oneOf([Color.WHITE, Color.WHITE, Color.TAUPE_6]),
+    //                 pos.randomCircularShift(radius).plusY(-4),
+    //                 depth,
+    //                 1000 + Math.random() * 2500,
+    //                 (t) => new Point(0, t * speed),
+    //                 Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
+    //             )
+    //         }
+    //     },
+    // ],
     [
         InputKey.I,
-        "smoke bomb",
+        "emitApparitionParticles",
         () => {
-            const pos = Player.instance.dude.standingPosition
-            const radius = 45
-            const depth = pos.y + radius
+            emitApparitionParticles(player().standingPosition, LIGHT_SMOKE_PARTICLES)
+        },
+    ],
 
-            // smoke
-            for (let i = 0; i < 1250; i++) {
-                const speed = Math.random() > 0.5 ? -0.001 : -0.005
-                Particles.instance.emitParticle(
-                    Lists.oneOf([Color.WHITE, Color.WHITE, Color.TAUPE_6]),
-                    pos.randomCircularShift(radius).plusY(-4),
-                    depth,
-                    1000 + Math.random() * 2500,
-                    (t) => new Point(0, t * speed),
-                    Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
-                )
-            }
-        },
-    ],
-    [
-        InputKey.O,
-        "spawn selected type",
-        (input) => DudeFactory.instance.new(spawnMenu.getSelectedType(), input.mousePos, here()),
-    ],
-    [
-        InputKey.P,
-        "show/hide spawn menu",
-        () => {
-            if (spawnMenu.isOpen) {
-                spawnMenu.isOpen = false
-            } else if (!UIStateManager.instance.isMenuOpen) {
-                spawnMenu.isOpen = true
-            }
-            if (!spawnMenu.isOpen) {
-                spawnMenu.page = 0
-            }
-        },
-    ],
     [
         InputKey.U,
         "generate radiant location",
@@ -110,7 +136,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
         InputKey.SEMICOLON,
         "spawn projectile",
         (input) => {
-            const standingPos = Player.instance.dude.standingPosition
+            const standingPos = player().standingPosition
             spawnMagicProjectile(
                 input.mousePos,
                 standingPos.minus(input.mousePos).normalized().times(0.15)
@@ -149,26 +175,26 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
             // }
         },
     ],
+    // [
+    //     InputKey.PERIOD,
+    //     "delete hovered element",
+    //     (input) => {
+    //         const { x, y } = pixelPtToTilePt(input.mousePos)
+    //         here().removeElementAt(x, y)
+    //     },
+    // ],
     [
         InputKey.PERIOD,
-        "delete hovered element",
-        (input) => here().removeElementAt(pixelPtToTilePt(input.mousePos)),
-    ],
-    [
-        InputKey.N,
-        "fast forward (shift: 1m, ctrl: 1d, default: 1h)",
+        "grow hovered growable",
         (input) => {
-            let time: number
-            if (input.isKeyHeld(InputKey.SHIFT)) {
-                time = TimeUnit.MINUTE
-            } else if (input.isKeyHeld(InputKey.CONTROL)) {
-                time = TimeUnit.DAY
-            } else {
-                time = TimeUnit.HOUR
-            }
-            WorldTime.instance.fastForward(time)
+            const growable = here()
+                .getElement(pixelPtToTilePt(input.mousePos))
+                ?.entity.getComponent(Growable)
+            console.log(`growable = ${growable}`)
+            growable?.forceGrow()
         },
     ],
+
     [
         InputKey.Y,
         "vanish spooky visitor(s)",
@@ -179,7 +205,6 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
                 .forEach((d) => d.entity.selfDestruct()),
     ],
     [InputKey.T, "spawn visitor", () => DudeSpawner.instance.spawnVisitors(true)],
-    [InputKey.BACKSPACE, "toggle profiler", () => (debug.showProfiler = !debug.showProfiler)],
 ]
 
 window["vibrate"] = (duration: number, strongMagnitude: number, weakMagnitude: number) => {
@@ -190,7 +215,7 @@ window["vibrate"] = (duration: number, strongMagnitude: number, weakMagnitude: n
     })
 }
 
-// Maybe expose this somewhere in the future
+// WIP: Maybe expose this somewhere in the future
 window["saveImage"] = () => {
     let data = localStorage.getItem("save")
     console.log(`data length = ${data.length}`)

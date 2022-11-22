@@ -20,22 +20,25 @@
                 window.location.replace(redirect)
             }
 
-            if (
-                !localStorage.getItem("chrome_warning_shown") &&
-                !navigator.userAgent.match(/chrome/i)
-            ) {
+            const isNativeApp = !!new URL(window.location.href).searchParams.get("native_app")
+            const brands = navigator.userAgentData?.brands || []
+            const isGoogleChrome = brands.some((b) => b.brand === "Google Chrome")
+            const hasShownWarning = localStorage.getItem("chrome_warning_shown")
+            const shouldShowChromeWarning = !isNativeApp && !isGoogleChrome && !hasShownWarning
+
+            if (shouldShowChromeWarning) {
                 window.location.href = "/chrome_warning"
             }
 
             window["SWAMP_CAMP"] = "%SWAMP_CAMP_DATA%"
         </script>
-        <script src="app.js?q=%JS_BUNDLE_HASH%" type="text/javascript"></script>
         <link rel="stylesheet" type="text/css" href="index.css" />
         <link rel="shortcut icon" href="favicon.png" />
     </head>
     <body>
         <div id="column">
-            <canvas id="canvas"></canvas>
+            <canvas id="canvas" tabindex="-1"></canvas>
         </div>
+        <script src="app.js?q=%JS_BUNDLE_HASH%" type="text/javascript"></script>
     </body>
 </html>

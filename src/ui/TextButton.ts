@@ -20,22 +20,37 @@ export class TextButton extends Component {
     private center: ImageRender
     private right: ImageRender
     private onClick: () => void
+    private onMouseOver: () => void
+    private onMouseOut: () => void
     private hovering: boolean
     private textColor: string
     private hoverColor: string
 
-    constructor(
-        position: Point,
-        text: string,
-        onClick: () => void,
-        buttonColor: "red" | "white",
-        textColor: string,
+    constructor({
+        position,
+        text,
+        onClick,
+        onMouseOver,
+        onMouseOut,
+        buttonColor,
+        textColor,
+        hoverColor,
+    }: {
+        position: Point
+        text: string
+        onClick: () => void
+        onMouseOver: () => void
+        onMouseOut: () => void
+        buttonColor: "red" | "white"
+        textColor: string
         hoverColor: string
-    ) {
+    }) {
         super()
         this.position = position
         this.text = text
         this.onClick = onClick
+        this.onMouseOver = onMouseOver
+        this.onMouseOut = onMouseOut
         this.textColor = textColor
         this.hoverColor = hoverColor
         this.width = this.text.length * TEXT_PIXEL_WIDTH + TextButton.margin * 2
@@ -67,11 +82,17 @@ export class TextButton extends Component {
     }
 
     update() {
+        const wasHovering = this.hovering
         this.hovering = Maths.rectContains(
             this.position,
             new Point(this.width, TILE_SIZE),
             controls.getMousePos()
         )
+        if (this.hovering && !wasHovering) {
+            this.onMouseOver?.()
+        } else if (!this.hovering && wasHovering) {
+            this.onMouseOut?.()
+        }
         if (this.hovering && controls.isMenuClickDown()) {
             UISounds.playClickSound()
             this.onClick()

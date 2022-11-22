@@ -3,6 +3,7 @@ import { BoxCollider } from "brigsby/dist/collision"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Item, ItemMetadata, spawnItem } from "../../items/Items"
+import { session } from "../../online/session"
 import { Hittable } from "./Hittable"
 
 /**
@@ -46,17 +47,19 @@ export class Breakable extends Hittable {
             return
         }
 
-        const items = this.itemSupplier()
-        for (const { item, metadata } of items) {
-            const itemDirection = hitDir.randomlyShifted(0.5).normalized()
-            const velocity = itemDirection.times(1 + 3 * Math.random())
-            spawnItem({
-                pos: this.position.plus(new Point(0, TILE_SIZE / 2)),
-                item,
-                velocity,
-                sourceCollider: this.entity.getComponent(BoxCollider),
-                metadata,
-            })
+        if (session.isHost()) {
+            const items = this.itemSupplier()
+            for (const { item, metadata } of items) {
+                const itemDirection = hitDir.randomlyShifted(0.5).normalized()
+                const velocity = itemDirection.times(1 + 3 * Math.random())
+                spawnItem({
+                    pos: this.position.plus(new Point(0, TILE_SIZE / 2)),
+                    item,
+                    velocity,
+                    sourceCollider: this.entity.getComponent(BoxCollider),
+                    metadata,
+                })
+            }
         }
 
         this.entity.selfDestruct()

@@ -3,20 +3,21 @@ import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
+import { session } from "../online/session"
+import { hostOnJoin, hostSessionClose } from "../online/sync"
 import { saveManager } from "../SaveManager"
 import { Settings } from "../Settings"
 import { SwampCampGame } from "../SwampCampGame"
 import { here } from "../world/locations/LocationManager"
-import { ButtonsMenu } from "./ButtonsMenu"
+import { ButtonsMenu, OptionButton } from "./ButtonsMenu"
 import { Color } from "./Color"
 import { ControlsUI } from "./ControlsUI"
 import { FullScreenMode } from "./FullScreenMode"
+import { NotificationDisplay } from "./NotificationDisplay"
+import { Tooltip } from "./Tooltip"
 import { UIStateManager } from "./UIStateManager"
 
-type PauseOption = {
-    text: string
-    fn: () => void
-}
+type PauseOption = Pick<OptionButton, "text" | "fn" | "onMouseOver" | "onMouseOut">
 
 export class PauseMenu extends Component {
     private readonly e: Entity = new Entity([this]) // entity for this component
@@ -50,15 +51,19 @@ export class PauseMenu extends Component {
     }
 
     open() {
+        const tooltip = new Tooltip()
+
         const buttons: PauseOption[] = [
-            {
+            // TODO figure out how to handle saving with multiplayer
+            session.isHost() && {
                 text: "SAVE GAME",
                 fn: () => saveManager.save(),
             },
-            {
-                text: "LOAD LAST SAVE",
-                fn: () => saveManager.load(),
-            },
+            // {
+            //     text: "LOAD LAST SAVE",
+            //     fn: () => saveManager.load(),
+            // },
+            this.getOnlineOption(tooltip),
             {
                 text: "VIEW CONTROLS",
                 fn: () => this.showControls(),
@@ -95,13 +100,13 @@ export class PauseMenu extends Component {
             },
             this.getFullScreenOption(),
             {
-                text: `MAIN MENU`,
+                text: session.isGuest() ? `LEAVE SESSION` : `MAIN MENU`,
                 fn: () => {
                     here().toggleAudio(false)
                     SwampCampGame.instance.loadMainMenu()
                 },
             },
-        ]
+        ].filter((btn) => !!btn)
 
         this.isOpen = true
 
@@ -119,6 +124,8 @@ export class PauseMenu extends Component {
             })),
             Camera.instance.dimensions.div(2)
         )
+
+        this.displayEntity.addComponent(tooltip)
     }
 
     private showControls() {
@@ -128,7 +135,10 @@ export class PauseMenu extends Component {
             text: [""],
             finishAction: "COOL",
             additionalComponents: () => [controlsUI],
+            pauseBackground: false,
         })
+
+        this.close()
     }
 
     private getFullScreenOption(): PauseOption {
@@ -141,6 +151,41 @@ export class PauseMenu extends Component {
             return {
                 text: `FULL-SCREEN: OFF`,
                 fn: FullScreenMode.enter,
+            }
+        }
+    }
+
+    private getOnlineOption(tooltip: Tooltip): PauseOption | undefined {
+        if (session.isOnline()) {
+            if (session.isHost()) {
+                return {
+                    text: `END SESSION @${session.getId()}`,
+                    fn: () => {
+                        if (session.isGuest()) {
+                            SwampCampGame.instance.loadMainMenu()
+                        } else {
+                            hostSessionClose()
+                        }
+                    },
+                }
+            }
+        } else {
+            return {
+                text: "MULTIPLAYER",
+                fn: () => {
+                    session
+                        .open(() => hostOnJoin())
+                        .then(() => {
+                            navigator.clipboard.writeText(session.getId()).then(() => {
+                                NotificationDisplay.instance.push({
+                                    icon: "copy",
+                                    text: `copied "${session.getId()}"`,
+                                })
+                            })
+                        })
+                },
+                onMouseOver: () => tooltip.say("VERY experimental!"),
+                onMouseOut: () => tooltip.clear(),
             }
         }
     }

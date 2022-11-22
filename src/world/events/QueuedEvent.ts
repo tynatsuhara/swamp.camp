@@ -45,7 +45,7 @@ export const getEventQueueHandlers = (): {
     },
 
     [QueuedEventType.HERALD_ARRIVAL]: () => {
-        DudeFactory.instance.new(
+        DudeFactory.instance.create(
             DudeType.HERALD,
             Queequeg.instance.entryTile.times(TILE_SIZE),
             camp()
@@ -100,7 +100,7 @@ export const getEventQueueHandlers = (): {
 
         // TODO: push all onto the queequeg
         typesToSpawn.forEach((type) => {
-            const dude = DudeFactory.instance.new(
+            const dude = DudeFactory.instance.create(
                 type,
                 Queequeg.instance.entryTile.plusX(10).times(TILE_SIZE),
                 camp(),

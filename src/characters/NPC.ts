@@ -2,6 +2,8 @@ import { debug, Point, UpdateData } from "brigsby/dist"
 import { LineRender } from "brigsby/dist/renderer"
 import { Lists } from "brigsby/dist/util"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
+import { session } from "../online/session"
+import { syncData } from "../online/utils"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { tilesAround } from "../Utils"
 import { Burnable } from "../world/elements/Burnable"
@@ -19,14 +21,11 @@ import { NPCTask } from "./ai/NPCTask"
 import { NPCTaskContext } from "./ai/NPCTaskContext"
 import { NPCTaskFactory } from "./ai/NPCTaskFactory"
 import { Condition } from "./Condition"
-import { Dude } from "./Dude"
-import { Player } from "./Player"
+import { AttackState, Dude } from "./Dude"
+import { player } from "./player"
 
-// TODO maybe this shouldn't be NPC-specific
-export enum NPCAttackState {
-    NOT_ATTACKING,
-    ATTACKING_SOON,
-    ATTACKING_NOW,
+type SyncData = {
+    t: string | undefined // target uuid
 }
 
 /**
@@ -37,6 +36,8 @@ export class NPC extends Simulatable {
     get dude() {
         return this._dude
     }
+
+    private syncData: SyncData
 
     isEnemyFn: (dude: Dude) => boolean = () => false
     enemyToAttackFilterFn: (enemies: Dude[]) => Dude[] = (enemies) => enemies
@@ -54,6 +55,17 @@ export class NPC extends Simulatable {
 
         this.awake = () => {
             this._dude = this.entity.getComponent(Dude)
+            const syncId = this.dude.uuid.substring(0, 8)
+
+            this.syncData = syncData(
+                `${syncId}npcd`,
+                {
+                    t: undefined,
+                },
+                (newData) => {
+                    this.attackTarget = Dude.get(newData.t)
+                }
+            )
 
             // set a default schedule
             if (!this._dude.blob[NPCSchedules.SCHEDULE_KEY]) {
@@ -63,10 +75,16 @@ export class NPC extends Simulatable {
     }
 
     start() {
-        this._dude.doWhileLiving(() => this.decideWhatToDoNext(), 1000 + 1000 * Math.random())
+        if (session.isHost()) {
+            this._dude.doWhileLiving(() => this.decideWhatToDoNext(), 1000 + 1000 * Math.random())
+        }
     }
 
     update(updateData: UpdateData) {
+        if (session.isGuest()) {
+            return
+        }
+
         /**
          * NPC behavior:
          * If threatened, fight or flee
@@ -80,18 +98,19 @@ export class NPC extends Simulatable {
             !this.isEnemyFn(this.attackTarget)
         ) {
             this.attackTarget = null
+            this.syncData.t = null
             this.targetPath = null
-            this.dude.shield?.block(false)
+            this.dude.updateBlocking(false)
         }
 
-        this._attackState = NPCAttackState.NOT_ATTACKING
+        this.dude.attackState = AttackState.NOT_ATTACKING
 
         if (DialogueDisplay.instance.source === this._dude) {
             // don't move when talking
             this._dude.move(
                 updateData.elapsedTimeMillis,
                 Point.ZERO,
-                Player.instance.dude.standingPosition.x - this._dude.standingPosition.x
+                player().standingPosition.x - this._dude.standingPosition.x
             )
         } else if (this._dude.hasCondition(Condition.ON_FIRE)) {
             this.doRoam(updateData) // flee
@@ -181,6 +200,7 @@ export class NPC extends Simulatable {
         this.walkPath = null
         this.roamPath = null
         this.attackTarget = null
+        this.syncData.t = null
         this.targetPath = null
         this.teleporterTarget = null
         this.task = null
@@ -286,10 +306,6 @@ export class NPC extends Simulatable {
         return this.attackTarget
     }
     private targetPath: Point[] = null
-    private _attackState = NPCAttackState.NOT_ATTACKING
-    get attackState() {
-        return this._attackState
-    }
     private readonly PARRY_TIME = 300 + Math.random() * 200
     private nextAttackTime = WorldTime.instance.time + Math.random() * 2000
 
@@ -321,31 +337,31 @@ export class NPC extends Simulatable {
         const timeLeftUntilCanAttack = this.nextAttackTime - WorldTime.instance.time
 
         if (stoppingDist === 0 && inRangeAndArmed && timeLeftUntilCanAttack < this.PARRY_TIME) {
-            this._attackState =
+            this.dude.attackState =
                 timeLeftUntilCanAttack < this.PARRY_TIME / 2
-                    ? NPCAttackState.ATTACKING_NOW
-                    : NPCAttackState.ATTACKING_SOON
+                    ? AttackState.ATTACKING_NOW
+                    : AttackState.ATTACKING_SOON
         }
 
         if (
             this.dude.shield &&
             this.dude.isFacing(this.attackTarget.standingPosition) &&
-            [NPCAttackState.ATTACKING_SOON, NPCAttackState.ATTACKING_NOW].includes(
-                this.attackTarget?.entity?.getComponent(NPC)?.attackState
+            [AttackState.ATTACKING_SOON, AttackState.ATTACKING_NOW].includes(
+                this.attackTarget?.attackState
             )
         ) {
-            this.dude.shield.block(true)
+            this.dude.updateBlocking(true)
         } else {
-            this.dude.shield?.block(false)
+            this.dude.updateBlocking(false)
 
             if (inRangeAndArmed && timeLeftUntilCanAttack <= 0) {
-                weapon.attack(true)
+                this.dude.updateAttacking(true)
                 this.nextAttackTime = Math.max(
                     this.nextAttackTime,
                     WorldTime.instance.time + weapon.getMillisBetweenAttacks()
                 )
             } else {
-                weapon.cancelAttack()
+                this.dude.cancelAttacking()
 
                 if (stoppingDist > 0 && mag < stoppingDist * 0.75) {
                     // TODO make this more configurable?
@@ -508,6 +524,7 @@ export class NPC extends Simulatable {
             }
 
             this.attackTarget = target
+            this.syncData.t = target.uuid
         }
 
         return !!target
@@ -624,7 +641,7 @@ export class NPC extends Simulatable {
             return undefined
         }
         if (!this.leader) {
-            this.leader = this._dude.location.getDudes().find((d) => d.uuid === savedLeaderUUID)
+            this.leader = Dude.get(savedLeaderUUID)
         }
         return this.leader
     }

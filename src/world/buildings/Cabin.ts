@@ -27,7 +27,6 @@ export class CabinFactory extends SimpleBuildingFactory<ElementType.CABIN> {
 const makeCabinInterior = (outside: Location): Location => {
     const l = new Location(LocationType.APOTHECARY_INTERIOR, true, false)
 
-    LocationManager.instance.add(l)
     const dimensions = new Point(4, 3)
 
     ElementUtils.rectPoints(Point.ZERO, dimensions).forEach((p) =>
@@ -71,5 +70,5 @@ const makeCabinInterior = (outside: Location): Location => {
         depth: counterPos.y + TILE_SIZE,
     })
 
-    return l
+    return LocationManager.instance.add(l)
 }

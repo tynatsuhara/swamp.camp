@@ -1,14 +1,19 @@
 import { Entity, Point } from "brigsby/dist"
 import { Collider } from "brigsby/dist/collision"
+import { PointValue, pt } from "brigsby/dist/Point"
 import { SpriteSource } from "brigsby/dist/sprites"
 import { loadAudio } from "../audio/DeferLoadAudio"
 import { Sounds } from "../audio/Sounds"
 import { Condition } from "../characters/Condition"
-import { Player } from "../characters/Player"
+import { Dude } from "../characters/Dude"
+import { player } from "../characters/player"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { WeaponType } from "../characters/weapons/WeaponType"
 import { Icon } from "../graphics/OneBitTileset"
 import { Tilesets } from "../graphics/Tilesets"
+import { session } from "../online/session"
+import { syncFn } from "../online/utils"
+import { randomByteString } from "../saves/uuid"
 import { ElementType } from "../world/elements/Elements"
 import { here } from "../world/locations/LocationManager"
 import { DroppedItem } from "./DroppedItem"
@@ -68,7 +73,7 @@ export enum Item {
 
 window["Item"] = Item
 
-type Consumable = { verb: string; fn: () => void }
+type Consumable = { verb: string; fn: (consumer: Dude) => void }
 
 // Items of the same type can have different metadata
 // eg enchantments on weapons, owners of items, etc.
@@ -174,14 +179,15 @@ export const ITEM_METADATA_MAP = {
         element: ElementType.MUSHROOM,
         consumable: {
             verb: "eat",
-            fn: () => {
-                Player.instance.dude.heal(1)
-                Sounds.play(...SOUNDS.eat)
-                if (Math.random() < 0.25) {
-                    Player.instance.dude.addCondition(
-                        Condition.POISONED,
-                        2_500 + Math.random() * 5_000
-                    )
+            fn: (consumer) => {
+                if (consumer === player()) {
+                    Sounds.play(...SOUNDS.eat)
+                }
+                if (session.isHost()) {
+                    consumer.heal(1)
+                    if (Math.random() < 0.25) {
+                        consumer.addCondition(Condition.POISONED, 2_500 + Math.random() * 5_000)
+                    }
                 }
             },
         },
@@ -204,9 +210,13 @@ export const ITEM_METADATA_MAP = {
         stackLimit: 1,
         consumable: {
             verb: "drink",
-            fn: () => {
-                Player.instance.dude.addCondition(Condition.HEALING, 10_000)
-                Sounds.play(...SOUNDS.drink)
+            fn: (consumer) => {
+                if (consumer === player()) {
+                    Sounds.play(...SOUNDS.drink)
+                }
+                if (session.isHost()) {
+                    consumer.addCondition(Condition.HEALING, 10_000)
+                }
             },
         },
     }),
@@ -221,9 +231,13 @@ export const ITEM_METADATA_MAP = {
         stackLimit: 1,
         consumable: {
             verb: "drink",
-            fn: () => {
-                Player.instance.dude.removeCondition(Condition.POISONED)
-                Sounds.play(...SOUNDS.drink)
+            fn: (consumer) => {
+                if (consumer === player()) {
+                    Sounds.play(...SOUNDS.drink)
+                }
+                if (session.isHost()) {
+                    consumer.removeCondition(Condition.POISONED)
+                }
             },
         },
     }),
@@ -232,9 +246,13 @@ export const ITEM_METADATA_MAP = {
         inventoryIcon: "meat1",
         consumable: {
             verb: "eat",
-            fn: () => {
-                Player.instance.dude.heal(1)
-                Sounds.play(...SOUNDS.eat)
+            fn: (consumer) => {
+                if (consumer === player()) {
+                    Sounds.play(...SOUNDS.eat)
+                }
+                if (session.isHost()) {
+                    consumer.heal(1)
+                }
             },
         },
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("meat1"),
@@ -244,8 +262,13 @@ export const ITEM_METADATA_MAP = {
         inventoryIcon: "berries",
         consumable: {
             verb: "eat",
-            fn: () => {
-                Player.instance.dude.heal(0.25), Sounds.play(...SOUNDS.eat)
+            fn: (consumer) => {
+                if (consumer === player()) {
+                    Sounds.play(...SOUNDS.eat)
+                }
+                if (session.isHost()) {
+                    consumer.heal(0.25)
+                }
             },
         },
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("berries"),
@@ -332,6 +355,17 @@ export const ITEM_METADATA_MAP = {
     }),
 }
 
+type SpawnItemArgs = {
+    pos: PointValue
+    item: Item
+    velocity?: PointValue
+    metadata?: ItemMetadata
+}
+
+const addSpawnedItem = (item: DroppedItem) => {
+    here().droppedItems.add(new Entity().addComponent(item))
+}
+
 /**
  * @param position The bottom center where the item should be placed
  */
@@ -339,16 +373,36 @@ export const spawnItem = ({
     pos,
     item,
     velocity = new Point(0, 0),
-    sourceCollider,
     metadata,
-}: {
-    pos: Point
-    item: Item
-    velocity?: Point
-    sourceCollider?: Collider
-    metadata?: ItemMetadata
-}) => {
-    here().droppedItems.add(
-        new Entity([new DroppedItem(pos, item, velocity, sourceCollider, metadata)])
+    sourceCollider,
+}: SpawnItemArgs & { sourceCollider?: Collider }) => {
+    if (session.isGuest()) {
+        console.warn("guests can't call spawnItem()")
+        return
+    }
+
+    const id = randomByteString()
+
+    syncSpawnedItem({ id, pos, item, velocity, metadata })
+    addSpawnedItem(
+        new DroppedItem(
+            id,
+            pt(pos.x, pos.y),
+            item,
+            pt(velocity.x, velocity.y),
+            metadata,
+            sourceCollider
+        )
     )
 }
+
+const syncSpawnedItem = syncFn(
+    "spawnItem",
+    ({ id, pos, item, velocity, metadata }: SpawnItemArgs & { id: string }) => {
+        if (session.isGuest()) {
+            addSpawnedItem(
+                new DroppedItem(id, pt(pos.x, pos.y), item, pt(velocity.x, velocity.y), metadata)
+            )
+        }
+    }
+)

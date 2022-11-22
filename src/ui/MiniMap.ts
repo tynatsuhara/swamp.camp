@@ -2,7 +2,7 @@ import { Component, Point, UpdateData } from "brigsby/dist"
 import { ImageRender } from "brigsby/dist/renderer"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { Lists, Maths } from "brigsby/dist/util"
-import { Player } from "../characters/Player"
+import { player } from "../characters/player"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
@@ -49,7 +49,7 @@ export class MiniMap extends Component {
             this.bigCanvas = document.createElement("canvas")
             this.bigCanvas.width = this.bigCanvas.height = wl.size * TILE_SIZE
         }
-        const context = this.bigCanvas.getContext("2d")
+        const context = this.bigCanvas.getContext("2d", { willReadFrequently: true })
 
         // draw the ground from the groundrenderer
         context.drawImage(ground, 0, 0)
@@ -186,15 +186,16 @@ export class MiniMap extends Component {
         return [mapRender, this.getPlayerIndicator(topLeft)]
     }
 
+    // MPTODO: add multiple!
     private getPlayerIndicator(topLeft: Point) {
-        const wl = Player.instance.dude.location
-        if (Player.instance.dude.location !== camp()) {
+        const wl = player().location
+        if (player().location !== camp()) {
             return null
         }
         const indicatorSize = 4
 
-        const position = Player.instance.dude.standingPosition
-            .plus(new Point(1, 1).times((wl.size * TILE_SIZE) / 2))
+        const position = player()
+            .standingPosition.plus(new Point(1, 1).times((wl.size * TILE_SIZE) / 2))
             .div(MiniMap.SCALE)
             .minus(new Point(indicatorSize / 2, indicatorSize / 2))
             .apply((n) => Math.floor(n))

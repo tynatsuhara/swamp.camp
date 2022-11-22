@@ -1,7 +1,9 @@
 import { Entity, Point } from "brigsby/dist"
 import { AnimatedSpriteComponent, SpriteAnimation, SpriteTransform } from "brigsby/dist/sprites"
+import { player } from "../../characters/player/index"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
-import { Inventory } from "../../items/Inventory"
+import { Inventory, ItemStack } from "../../items/Inventory"
+import { randomByteString } from "../../saves/uuid"
 import { InventoryDisplay } from "../../ui/InventoryDisplay"
 import { Location } from "../locations/Location"
 import { ElementComponent } from "./ElementComponent"
@@ -10,17 +12,24 @@ import { ElementType } from "./Elements"
 import { Interactable } from "./Interactable"
 import { NavMeshCollider } from "./NavMeshCollider"
 
-const INVENTORY = "i"
+type SaveData = {
+    id: string
+    i: ItemStack[]
+}
 
-export class ChestFactory extends ElementFactory<ElementType.CHEST> {
+export class ChestFactory extends ElementFactory<ElementType.CHEST, SaveData> {
     dimensions = new Point(1, 1)
 
     constructor() {
         super(ElementType.CHEST)
     }
 
-    make(wl: Location, pos: Point, data: object) {
-        const inventory = !!data[INVENTORY] ? Inventory.load(data[INVENTORY]) : new Inventory(20)
+    make(wl: Location, pos: Point, data: Partial<SaveData>) {
+        const id = data.id ?? randomByteString(10)
+        const inventory = new Inventory(id, true)
+        if (data.i) {
+            inventory.load(data.i)
+        }
 
         const tiles =
             Tilesets.instance.dungeonCharacters.getTileSetAnimationFrames("chest_empty_open_anim")
@@ -64,7 +73,8 @@ export class ChestFactory extends ElementFactory<ElementType.CHEST> {
                 InventoryDisplay.instance.open(() => animator.goToAnimation(1).play(), inventory)
                 animator.goToAnimation(0).play()
             },
-            new Point(0, -17)
+            new Point(0, -17),
+            (interactor) => interactor === player()
         )
 
         const collider = new NavMeshCollider(
@@ -77,7 +87,8 @@ export class ChestFactory extends ElementFactory<ElementType.CHEST> {
 
         return e.addComponent(
             new ElementComponent(this.type, pos, () => ({
-                [INVENTORY]: inventory.save(),
+                id,
+                i: inventory.save(),
             }))
         )
     }

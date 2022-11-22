@@ -1,7 +1,6 @@
 import { Component, Point, StartData, UpdateData } from "brigsby/dist"
-import { Lists } from "brigsby/dist/util"
-import { Particles } from "../../graphics/particles/Particles"
-import { Color } from "../../ui/Color"
+import { emitApparitionParticles } from "../../graphics/particles/ApparitionParticles"
+import { session } from "../../online/session"
 import { Dude } from "../Dude"
 import { NPC } from "../NPC"
 
@@ -13,10 +12,15 @@ export class SpookyVisitor extends Component {
     start(startData: StartData) {
         this.npc = this.entity.getComponent(NPC)
         this.dude = this.entity.getComponent(Dude)
-        emitAppiritionParticles(this.dude.standingPosition)
+        emitApparitionParticles(this.dude.standingPosition)
     }
 
     update(updateData: UpdateData) {
+        // MPTODO
+        if (session.isGuest()) {
+            return
+        }
+
         this.position = this.dude.standingPosition
 
         if (this.npc.enemiesPresent) {
@@ -25,23 +29,7 @@ export class SpookyVisitor extends Component {
     }
 
     delete() {
-        emitAppiritionParticles(this.position)
+        emitApparitionParticles(this.position)
         super.delete()
-    }
-}
-
-const PARTICLE_COLORS = [Color.BLACK, Color.BLUE_1, Color.BLUE_2, Color.BLUE_3]
-
-const emitAppiritionParticles = (position: Point) => {
-    for (let i = 0; i < 150; i++) {
-        const speed = Math.random() > 0.5 ? -0.005 : -0.004
-        Particles.instance.emitParticle(
-            Lists.oneOf(PARTICLE_COLORS),
-            position.randomCircularShift(9).plusY(-7),
-            position.y + 2,
-            250 + Math.random() * 1000,
-            (t) => new Point(0, t * speed),
-            Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
-        )
     }
 }

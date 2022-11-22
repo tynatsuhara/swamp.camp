@@ -1,6 +1,8 @@
 import { Component } from "brigsby/dist"
 import { NPC } from "../../characters/NPC"
-import { Player } from "../../characters/Player"
+import { player } from "../../characters/player"
+import { session } from "../../online/session"
+import { syncFn } from "../../online/utils"
 import { saveManager } from "../../SaveManager"
 import { HUD } from "../../ui/HUD"
 import { DarknessMask } from "../DarknessMask"
@@ -10,19 +12,25 @@ import { WorldTime } from "../WorldTime"
 import { Campfire } from "./Campfire"
 import { ElementType } from "./Elements"
 
-export class RestPoint extends Component {
-    rest(hours: number) {
-        const pause = 1200
-        HUD.instance.locationTransition.transition(() => {
+const restTransition = syncFn("rest", (hours: number) => {
+    const pause = 1200
+    HUD.instance.locationTransition.transition(() => {
+        if (session.isHost()) {
             WorldTime.instance.fastForward(hours * TimeUnit.HOUR)
             setTimeout(() => saveManager.autosave(), pause + 500)
-        }, pause)
+        }
+    }, pause)
+})
+
+export class RestPoint extends Component {
+    rest(hours: number) {
+        restTransition(hours)
     }
 
     canRestFor(hours: number, atCampfire?: Campfire) {
         const isTargeted = here()
             .getDudes()
-            .some((d) => d.entity.getComponent(NPC)?.targetedEnemy === Player.instance.dude)
+            .some((d) => d.entity.getComponent(NPC)?.targetedEnemy === player())
 
         if (isTargeted) {
             return false

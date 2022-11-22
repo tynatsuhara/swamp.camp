@@ -1,6 +1,7 @@
 import { Component, debug, Point } from "brigsby/dist"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
+import { session } from "../../online/session"
 import { Ground } from "../../world/ground/Ground"
 import { LightManager } from "../../world/LightManager"
 import { WorldTime } from "../../world/WorldTime"
@@ -15,6 +16,10 @@ import { NPC } from "../NPC"
  */
 export class Enemy extends Component {
     awake() {
+        if (session.isGuest()) {
+            return
+        }
+
         const dude = this.entity.getComponent(Dude)
         const npc = this.entity.getComponent(NPC)
 
@@ -48,7 +53,7 @@ export class Enemy extends Component {
         npc.findTargetRange = Number.MAX_SAFE_INTEGER
 
         if (dude.type === DudeType.ORC_SHAMAN) {
-            // Shamans use AOE attacks and will only target the player
+            // Shamans use AOE attacks and will only target players
             npc.enemyToAttackFilterFn = (enemies) => {
                 return enemies.filter((e) => e.type === DudeType.PLAYER)
             }

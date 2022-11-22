@@ -1,5 +1,6 @@
-import { Component, debug, Point, UpdateData } from "brigsby/dist"
+import { Component, debug, Point, pt } from "brigsby/dist"
 import { BoxCollider } from "brigsby/dist/collision"
+import { PointValue } from "brigsby/dist/Point"
 import { RenderMethod } from "brigsby/dist/renderer"
 import { AnimatedSpriteComponent, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Animator, Lists, RepeatedInvoker } from "brigsby/dist/util"
@@ -10,6 +11,10 @@ import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 import { DeathCutscene } from "../cutscenes/DeathCutscene"
 import { IntroCutscene } from "../cutscenes/IntroCutscene"
 import { ImageFilters } from "../graphics/ImageFilters"
+import {
+    emitApparitionParticles,
+    LIGHT_SMOKE_PARTICLES,
+} from "../graphics/particles/ApparitionParticles"
 import { BlackLungParticles } from "../graphics/particles/BlackLungParticles"
 import { emitBlockParticles } from "../graphics/particles/CombatParticles"
 import { FireParticles } from "../graphics/particles/FireParticles"
@@ -17,7 +22,9 @@ import { PoisonParticles } from "../graphics/particles/PoisonParticles"
 import { WalkingParticles } from "../graphics/particles/WalkingParticles"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { Inventory } from "../items/Inventory"
-import { Item, spawnItem } from "../items/Items"
+import { Item, ITEM_METADATA_MAP, spawnItem } from "../items/Items"
+import { session } from "../online/session"
+import { clientSyncFn, syncData, syncFn } from "../online/utils"
 import { DudeSaveState } from "../saves/DudeSaveState"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
@@ -31,28 +38,48 @@ import { Interactable } from "../world/elements/Interactable"
 import { Pushable } from "../world/elements/Pushable"
 import { Ground } from "../world/ground/Ground"
 import { LightManager } from "../world/LightManager"
+import { EAST_COAST_OCEAN_WIDTH } from "../world/locations/CampLocationGenerator"
 import { Location } from "../world/locations/Location"
 import { camp, here } from "../world/locations/LocationManager"
 import { Residence } from "../world/residences/Residence"
 import { WorldTime } from "../world/WorldTime"
 import { ActiveCondition, Condition } from "./Condition"
 import { DialogueSource, EMPTY_DIALOGUE, getDialogue } from "./dialogue/Dialogue"
+import { DIP_ENTRYPOINT } from "./dialogue/DipDialogue"
 import { DudeAnimationUtils } from "./DudeAnimationUtils"
 import { DudeFaction } from "./DudeFactory"
 import { DudeType } from "./DudeType"
-import { NPC, NPCAttackState } from "./NPC"
-import { Player } from "./Player"
-import { Shield } from "./weapons/Shield"
+import { NPC } from "./NPC"
+import { player } from "./player/index"
+import { ReadOnlyShield, Shield } from "./weapons/Shield"
 import { ShieldFactory } from "./weapons/ShieldFactory"
 import { ShieldType } from "./weapons/ShieldType"
-import { Weapon } from "./weapons/Weapon"
+import { ReadOnlyWeapon, Weapon } from "./weapons/Weapon"
 import { WeaponFactory } from "./weapons/WeaponFactory"
 import { WeaponType } from "./weapons/WeaponType"
+
+export enum AttackState {
+    NOT_ATTACKING,
+    ATTACKING_SOON,
+    ATTACKING_NOW,
+}
+
+type SyncData = {
+    p: { x: number; y: number } // standing position
+    d: { x: number; y: number } // walking direction
+    f: boolean // true if facing left, false otherwise
+    as: AttackState
+    mh: number // max health
+    h: number // health
+    ld: number // last damage timestamp
+}
 
 export class Dude extends Component implements DialogueSource {
     static readonly PLAYER_COLLISION_LAYER = "playa"
     static readonly NPC_COLLISION_LAYER = "npc"
     static readonly ON_FIRE_LIGHT_DIAMETER = 40
+
+    private readonly syncData: SyncData
 
     // managed by WorldLocation/LocationManager classes
     location: Location
@@ -62,8 +89,18 @@ export class Dude extends Component implements DialogueSource {
     readonly type: DudeType
     readonly factions: DudeFaction[]
     readonly inventory: Inventory
-    maxHealth: number
-    private _health: number
+    set maxHealth(val: number) {
+        this.syncData.mh = val
+    }
+    get maxHealth() {
+        return this.syncData.mh
+    }
+    private set _health(val: number) {
+        this.syncData.h = val
+    }
+    private get _health() {
+        return this.syncData.h
+    }
     get health() {
         return this._health
     }
@@ -75,14 +112,14 @@ export class Dude extends Component implements DialogueSource {
     }
 
     private _weapon: Weapon
-    get weapon() {
+    get weapon(): ReadOnlyWeapon {
         return this._weapon
     }
     get weaponType() {
         return this.weapon?.getType() ?? WeaponType.NONE
     }
     private _shield: Shield
-    get shield() {
+    get shield(): ReadOnlyShield {
         return this._shield
     }
     get shieldType() {
@@ -99,6 +136,13 @@ export class Dude extends Component implements DialogueSource {
     private position: Point
     private standingOffset: Point
 
+    get attackState() {
+        return this.syncData.as
+    }
+    set attackState(state: AttackState) {
+        this.syncData.as = state
+    }
+
     // bottom center of the tile
     get standingPosition(): Point {
         return this.position.plus(this.standingOffset)
@@ -110,6 +154,10 @@ export class Dude extends Component implements DialogueSource {
     get isMoving() {
         return this._isMoving
     }
+    get velocity() {
+        return pt(this.syncData.d.x, this.syncData.d.y)
+    }
+    rollingMomentum: Point
 
     // manually set a depth for the player sprite
     manualDepth = undefined
@@ -118,8 +166,22 @@ export class Dude extends Component implements DialogueSource {
     dialogue: string
     private dialogueIndicator = ""
 
+    // conditions are synchronized, but the time-based fields only matter on the host
     private conditions: ActiveCondition[] = []
     private name: string
+
+    static createSyncId(uuid: string, namespace: string) {
+        const prefix = uuid.substring(0, 8) // 36^8 should be fine, we have a 12 char limit
+        const syncId = prefix + namespace
+        if (syncId.length > 12) {
+            console.warn(`sync ID ${syncId} is longer than the 12 character limit`)
+        }
+        return syncId
+    }
+
+    syncId(namespace: string) {
+        return Dude.createSyncId(this.uuid, namespace)
+    }
 
     constructor(params: {
         uuid: string
@@ -172,17 +234,144 @@ export class Dude extends Component implements DialogueSource {
             name,
         } = { ...params }
 
+        // populate dudecache for O(1) lookup by uuid
+        if (dudeCache[uuid]) {
+            dudeCache[uuid].entity.selfDestruct()
+            console.error(`duplicate dude ${uuid} instantiated`)
+        }
+        dudeCache[uuid] = this
+
+        // set this before doing anything else because it's needed for generating sync IDs
         this.uuid = uuid
+
+        // initialize synchronized data fields
+        this.syncData = syncData(
+            this.syncId("data"),
+            {
+                p: { x: standingPosition.x, y: standingPosition.y },
+                f: false,
+                d: { x: 0, y: 0 },
+                as: AttackState.NOT_ATTACKING,
+                mh: maxHealth,
+                h: maxHealth === Number.MAX_SAFE_INTEGER ? Number.MAX_SAFE_INTEGER : health,
+                ld: 0,
+            },
+            (newData) => {
+                const newStandingPos = pt(newData.p.x, newData.p.y)
+                const direction = pt(newData.d.x, newData.d.y)
+                this.moveTo(newStandingPos, true, true)
+                this.setFacing(newData.f)
+                this.updateAnimationFromMovement(direction)
+            }
+        )
+
         this.type = type
         this.factions = factions
-        this.maxHealth = maxHealth
-        this._health = maxHealth === Number.MAX_SAFE_INTEGER ? Number.MAX_SAFE_INTEGER : health
         this.speed = speed
         this.inventory = inventory
         this.dialogue = dialogue
         this.blob = blob
         this.conditions = conditions
         this.name = name
+
+        // Synchronized host->client functions
+
+        this.jump = syncFn(this.syncId("jump"), this.jump.bind(this))
+        this.roll = syncFn(this.syncId("roll"), this.roll.bind(this))
+        this.setWeaponAndShieldDrawn = syncFn(
+            this.syncId("wsd"),
+            this.setWeaponAndShieldDrawn.bind(this)
+        )
+        this.updateBlocking = syncFn(this.syncId("blk"), this.updateBlocking.bind(this))
+        this.updateAttacking = syncFn(this.syncId("atk"), this.updateAttacking.bind(this))
+        this.cancelAttacking = syncFn(this.syncId("catk"), this.cancelAttacking.bind(this))
+        this.addCondition = syncFn(this.syncId("ac"), this.addCondition.bind(this))
+        this.removeCondition = syncFn(this.syncId("rc"), this.removeCondition.bind(this))
+        this.onDamageCallback = syncFn(this.syncId("odmg"), this.onDamageCallback.bind(this))
+        this.die = syncFn(this.syncId("die"), this.die.bind(this))
+        this.revive = syncFn(this.syncId("rvv"), this.revive.bind(this))
+
+        // Synchronized client->host functions
+
+        const setWeapon = (type: WeaponType) => {
+            this.weapon?.delete()
+            this._weapon = this.entity.addComponent(WeaponFactory.make(type, this.type))
+            this._shield?.setOnBack(false) // keep em in sync
+        }
+        this.setWeapon = clientSyncFn(
+            this.syncId("eqw"),
+            "all",
+            ({ trusted, dudeUUID }, type: WeaponType, invIndex: number) => {
+                const stack = invIndex === -1 ? null : this.inventory.getStack(invIndex)
+                if (
+                    !trusted &&
+                    (this.uuid !== dudeUUID ||
+                        !this.inventory.getItemCount(type as unknown as Item) ||
+                        ITEM_METADATA_MAP[stack?.item]?.equippableWeapon !== type)
+                ) {
+                    return "reject"
+                }
+
+                setWeapon(type)
+
+                // update equipped flag in inventory
+                if (session.isHost() && invIndex > -1) {
+                    const currentWeaponIndex = this.inventory.findIndex(
+                        (s) => s?.metadata?.equipped === "weapon"
+                    )
+                    if (currentWeaponIndex >= 0) {
+                        this.inventory.setStack(
+                            currentWeaponIndex,
+                            this.inventory
+                                .getStack(currentWeaponIndex)
+                                .withMetadata({ equipped: undefined })
+                        )
+                    }
+                    this.inventory.setStack(invIndex, stack.withMetadata({ equipped: "weapon" }))
+                }
+            }
+        )
+
+        const setShield = (type: ShieldType) => {
+            this.shield?.delete()
+            this._shield = this.entity.addComponent(ShieldFactory.make(type, this.type))
+            this._weapon?.setSheathed(false) // keep em in sync
+        }
+        this.setShield = clientSyncFn(
+            this.syncId("eqs"),
+            "all",
+            ({ trusted, dudeUUID }, type: ShieldType, invIndex: number) => {
+                const stack = invIndex === -1 ? null : this.inventory.getStack(invIndex)
+                if (
+                    !trusted &&
+                    (this.uuid !== dudeUUID ||
+                        !this.inventory.getItemCount(type as unknown as Item) ||
+                        ITEM_METADATA_MAP[stack?.item]?.equippableShield !== type)
+                ) {
+                    return "reject"
+                }
+
+                setShield(type)
+
+                // update equipped flag in inventory
+                if (session.isHost() && invIndex > -1) {
+                    const currentShieldIndex = this.inventory.findIndex(
+                        (s) => s?.metadata?.equipped === "shield"
+                    )
+                    if (currentShieldIndex >= 0) {
+                        this.inventory.setStack(
+                            currentShieldIndex,
+                            this.inventory
+                                .getStack(currentShieldIndex)
+                                .withMetadata({ equipped: undefined })
+                        )
+                    }
+                    this.inventory.setStack(invIndex, stack.withMetadata({ equipped: "shield" }))
+                }
+            }
+        )
+
+        // Component lifecycle functions
 
         this.awake = () => {
             // Set up animations
@@ -204,8 +393,9 @@ export class Dude extends Component implements DialogueSource {
             this.position = standingPosition.minus(this.standingOffset)
             this._animation.fastForward(Math.random() * 1000) // so not all the animations sync up
 
-            this.setWeapon(weaponType)
-            this.setShield(shieldType)
+            // Not using the synchronized methods because clients don't need to tell hosts
+            setWeapon(weaponType)
+            setShield(shieldType)
 
             this.entity.addComponent(new WalkingParticles())
 
@@ -229,10 +419,18 @@ export class Dude extends Component implements DialogueSource {
                     new Point(0, 0),
                     () => DialogueDisplay.instance.startDialogue(this),
                     Point.ZERO,
-                    () =>
-                        !UIStateManager.instance.isMenuOpen &&
-                        !!this.dialogue &&
-                        this.entity.getComponent(NPC)?.canTalk()
+                    (interactor) => {
+                        if (!this.dialogue || !this.entity.getComponent(NPC)?.canTalk()) {
+                            return false
+                        }
+
+                        if (session.isHost()) {
+                            return interactor === player()
+                        } else {
+                            const canGuestAccessDialogue = [DIP_ENTRYPOINT].includes(this.dialogue)
+                            return canGuestAccessDialogue
+                        }
+                    }
                 )
             )
 
@@ -241,32 +439,38 @@ export class Dude extends Component implements DialogueSource {
 
         this.start = () => {
             this.seaLevel = this.location.levels?.get(this.tile) ?? 0
-            this.claimResidence(type, uuid, hasPendingSlot)
 
-            this.doWhileLiving(() => {
-                if (
-                    this.isMoving &&
-                    !this.isJumping &&
-                    here().getElement(this.tile)?.type === ElementType.BLACKBERRIES
-                ) {
-                    this.damage(0.25, {
-                        direction: Point.ZERO.randomCircularShift(1),
-                        knockback: 5,
-                        blockable: false,
-                        dodgeable: false,
-                    })
-                }
-            }, 600)
+            if (session.isHost()) {
+                this.claimResidence(type, uuid, hasPendingSlot)
 
+                // Damage dudes walking through blackberries
+                this.doWhileLiving(() => {
+                    if (
+                        this.isMoving &&
+                        !this.isJumping &&
+                        here().getElement(this.tile)?.type === ElementType.BLACKBERRIES
+                    ) {
+                        this.damage(0.25, {
+                            direction: Point.ZERO.randomCircularShift(1),
+                            knockback: 5,
+                            blockable: false,
+                            dodgeable: false,
+                        })
+                    }
+                }, 600)
+            }
+
+            // Update dialogue indicator
             this.doWhileLiving(() => {
-                if (this.dialogue && this.dialogue != EMPTY_DIALOGUE) {
-                    this.dialogueIndicator = getDialogue(this.dialogue).indicator
+                if (this.dialogue) {
+                    this.dialogueIndicator =
+                        getDialogue(this.dialogue)?.indicator ?? DudeInteractIndicator.NONE
                 }
             }, 1000)
         }
     }
 
-    update(updateData: UpdateData) {
+    update({ elapsedTimeMillis }) {
         this.animation.transform.depth =
             this.manualDepth ?? this.collider.position.y + this.collider.dimensions.y
 
@@ -291,132 +495,60 @@ export class Dude extends Component implements DialogueSource {
                 this.dialogue !== EMPTY_DIALOGUE && DialogueDisplay.instance.source !== this
         }
 
-        this.updateActiveConditions()
+        this.updateActiveConditions(elapsedTimeMillis)
 
-        this.jumpingAnimator?.update(updateData.elapsedTimeMillis)
+        this.jumpingAnimator?.update(elapsedTimeMillis)
+
+        this.droppedItemPickupCheck()
     }
 
     equipFirstWeaponInInventory() {
-        const weapon = this.inventory
-            .getStacks()
-            .map((stack) => WeaponType[WeaponType[stack.item]] as WeaponType)
-            .find((w) => !!w)
-        this.setWeapon(weapon || WeaponType.NONE)
+        const weaponIndex = this.inventory.findIndex(
+            (stack) => stack && !!ITEM_METADATA_MAP[stack.item]?.equippableWeapon
+        )
+        if (weaponIndex > -1) {
+            this.setWeapon(
+                ITEM_METADATA_MAP[this.inventory.getStack(weaponIndex).item].equippableWeapon,
+                weaponIndex
+            )
+        } else {
+            this.setWeapon(WeaponType.UNARMED, -1)
+        }
     }
 
     equipFirstShieldInInventory() {
-        const shield = this.inventory
-            .getStacks()
-            .map((stack) => ShieldType[ShieldType[stack.item]])
-            .find((s) => !!s)
-        this.setShield(shield || ShieldType.NONE)
+        const shieldIndex = this.inventory.findIndex(
+            (stack) => stack && !!ITEM_METADATA_MAP[stack.item]?.equippableShield
+        )
+        if (shieldIndex > -1) {
+            this.setShield(
+                ITEM_METADATA_MAP[this.inventory.getStack(shieldIndex).item].equippableShield,
+                shieldIndex
+            )
+        } else {
+            this.setShield(ShieldType.NONE, -1)
+        }
     }
 
-    setWeapon(type: WeaponType) {
-        if (this.weapon?.getType() === type) {
-            return
-        }
-        this.weapon?.delete()
-        this._weapon = this.entity.addComponent(WeaponFactory.make(type, this.type))
-        this.shield?.setOnBack(false) // keep em in sync
-    }
-
-    setShield(type: ShieldType) {
-        if (this.shield?.type === type) {
-            return
-        }
-        this.shield?.delete()
-        this._shield = this.entity.addComponent(ShieldFactory.make(type, this.type))
-        this.weapon?.setSheathed(false) // keep em in sync
-    }
+    // client sync functions
+    readonly setWeapon: (type: WeaponType, invIndex: number) => void
+    readonly setShield: (type: ShieldType, invIndex: number) => void
 
     setWeaponAndShieldDrawn(drawn: boolean) {
-        this.weapon?.setSheathed(!drawn)
-        this.shield?.setOnBack(!drawn)
+        this._weapon?.setSheathed(!drawn)
+        this._shield?.setOnBack(!drawn)
     }
 
-    private fireParticles: FireParticles
-    private poisonParticles: PoisonParticles
-    private blackLungParticles: BlackLungParticles
+    updateBlocking(blocking: boolean) {
+        this._shield?.block(blocking)
+    }
 
-    updateActiveConditions() {
-        if (this.conditions.length === 0) {
-            return
-        }
+    updateAttacking(isNewAttack: boolean) {
+        this._weapon?.attack(isNewAttack)
+    }
 
-        this.conditions.forEach((c) => {
-            const timeSinceLastExec = WorldTime.instance.time - c.lastExec
-
-            if (c.expiration < WorldTime.instance.time || !this.isAlive) {
-                this.removeCondition(c.condition)
-                if (!this.isAlive) {
-                    console.log(`removing ${c.condition} because ded`)
-                }
-                return
-            }
-
-            switch (c.condition) {
-                case Condition.ON_FIRE:
-                    if (!this.fireParticles) {
-                        this.fireParticles = this.entity.addComponent(
-                            new FireParticles(
-                                this.colliderSize.x - 4,
-                                () =>
-                                    this.standingPosition.plusY(-8).plus(this.getAnimationOffset()),
-                                () => this.animation.transform.depth + 1
-                            )
-                        )
-                    }
-                    LightManager.instance.addLight(
-                        here(),
-                        this.fireParticles,
-                        this.standingPosition.plusY(-TILE_SIZE / 2).plus(this.getAnimationOffset()),
-                        Dude.ON_FIRE_LIGHT_DIAMETER
-                    )
-                    if (timeSinceLastExec > 500) {
-                        const fireDamage = 0.3
-                        this.damage(fireDamage, {
-                            blockable: false,
-                            dodgeable: false,
-                        })
-                        c.lastExec = WorldTime.instance.time
-                    }
-                    return
-                case Condition.POISONED:
-                    if (!this.poisonParticles) {
-                        this.poisonParticles = this.entity.addComponent(
-                            new PoisonParticles(
-                                this.colliderSize.x - 4,
-                                () =>
-                                    this.standingPosition
-                                        .plusY(-10)
-                                        .plus(this.getAnimationOffset()),
-                                () => this.animation.transform.depth + 1
-                            )
-                        )
-                    }
-                    if (timeSinceLastExec > 500) {
-                        const poisonDamage = 0.25
-                        this.damage(poisonDamage, {
-                            blockable: false,
-                            dodgeable: false,
-                        })
-                        c.lastExec = WorldTime.instance.time
-                    }
-                    return
-                case Condition.BLACK_LUNG:
-                    if (!this.blackLungParticles) {
-                        this.blackLungParticles = this.entity.addComponent(
-                            new BlackLungParticles(
-                                () =>
-                                    this.standingPosition.plusY(-8).plus(this.getAnimationOffset()),
-                                () => this.animation.transform.depth + 1
-                            )
-                        )
-                    }
-                    return
-            }
-        })
+    cancelAttacking() {
+        this._weapon?.cancelAttack()
     }
 
     /**
@@ -456,13 +588,104 @@ export class Dude extends Component implements DialogueSource {
                     this.poisonParticles = undefined
                 }
                 return
-            case Condition.POISONED:
-                if (this.poisonParticles) {
-                    this.entity.removeComponent(this.poisonParticles)
-                    this.poisonParticles = undefined
+            case Condition.BLACK_LUNG:
+                if (this.blackLungParticles) {
+                    this.entity.removeComponent(this.blackLungParticles)
+                    this.blackLungParticles = undefined
                 }
                 return
         }
+    }
+
+    private fireParticles: FireParticles
+    private poisonParticles: PoisonParticles
+    private blackLungParticles: BlackLungParticles
+
+    updateActiveConditions(elapsedTimeMillis: number) {
+        if (this.conditions.length === 0) {
+            return
+        }
+
+        this.conditions.forEach((c) => {
+            const timeSinceLastExec = WorldTime.instance.time - c.lastExec
+
+            if (session.isHost()) {
+                if (c.expiration < WorldTime.instance.time || !this.isAlive) {
+                    this.removeCondition(c.condition)
+                    if (!this.isAlive) {
+                        console.log(`removing ${c.condition} because ded`)
+                    }
+                    return
+                }
+            }
+
+            switch (c.condition) {
+                case Condition.ON_FIRE:
+                    if (!this.fireParticles) {
+                        this.fireParticles = this.entity.addComponent(
+                            new FireParticles(
+                                this.colliderSize.x - 4,
+                                () =>
+                                    this.standingPosition.plusY(-8).plus(this.getAnimationOffset()),
+                                () => this.animation.transform.depth + 1
+                            )
+                        )
+                    }
+                    LightManager.instance.addLight(
+                        here(),
+                        this.fireParticles,
+                        this.standingPosition.plusY(-TILE_SIZE / 2).plus(this.getAnimationOffset()),
+                        Dude.ON_FIRE_LIGHT_DIAMETER
+                    )
+                    if (session.isHost() && timeSinceLastExec > 500) {
+                        const fireDamage = 0.3
+                        this.damage(fireDamage, {
+                            blockable: false,
+                            dodgeable: false,
+                        })
+                        c.lastExec = WorldTime.instance.time
+                    }
+                    return
+                case Condition.POISONED:
+                    if (!this.poisonParticles) {
+                        this.poisonParticles = this.entity.addComponent(
+                            new PoisonParticles(
+                                this.colliderSize.x - 4,
+                                () =>
+                                    this.standingPosition
+                                        .plusY(-10)
+                                        .plus(this.getAnimationOffset()),
+                                () => this.animation.transform.depth + 1
+                            )
+                        )
+                    }
+                    if (session.isHost() && timeSinceLastExec > 500) {
+                        const poisonDamage = 0.25
+                        this.damage(poisonDamage, {
+                            blockable: false,
+                            dodgeable: false,
+                        })
+                        c.lastExec = WorldTime.instance.time
+                    }
+                    return
+                case Condition.BLACK_LUNG:
+                    if (!this.blackLungParticles) {
+                        this.blackLungParticles = this.entity.addComponent(
+                            new BlackLungParticles(
+                                () =>
+                                    this.standingPosition.plusY(-8).plus(this.getAnimationOffset()),
+                                () => this.animation.transform.depth + 1
+                            )
+                        )
+                    }
+                    return
+                case Condition.HEALING:
+                    if (session.isHost()) {
+                        this.heal(elapsedTimeMillis / 3500)
+                    }
+                    return
+            }
+        })
     }
 
     removeAllConditions() {
@@ -481,9 +704,10 @@ export class Dude extends Component implements DialogueSource {
     }
 
     get isAlive() {
-        return this._health > 0
+        return this.health > 0
     }
 
+    // host only!
     damage(
         damage: number,
         {
@@ -496,7 +720,7 @@ export class Dude extends Component implements DialogueSource {
             conditionDuration = 0,
             conditionBlockable = true,
         }: {
-            direction?: Point
+            direction?: { x: number; y: number }
             knockback?: number
             attacker?: Dude
             blockable?: boolean
@@ -504,8 +728,12 @@ export class Dude extends Component implements DialogueSource {
             condition?: Condition
             conditionDuration?: number
             conditionBlockable?: boolean
-        }
+        } = {}
     ) {
+        if (session.isGuest()) {
+            console.warn(`guests can't call damage()`)
+            return
+        }
         if (dodgeable && (this.rolling || this.jumping)) {
             return
         }
@@ -522,13 +750,13 @@ export class Dude extends Component implements DialogueSource {
         const blocked = blockable && blocking
 
         if (blocked) {
-            emitBlockParticles(this)
+            emitBlockParticles(this.uuid) // sync fn
             damage *= 0.25
             knockback *= 0.4
         }
 
         if (condition && (!conditionBlockable || !blocking)) {
-            this.addCondition(condition, conditionDuration)
+            this.addCondition(condition, conditionDuration) // sync fn
         }
 
         if (this.isAlive) {
@@ -538,10 +766,12 @@ export class Dude extends Component implements DialogueSource {
             ) {
                 damage = 0
             }
-            this._health -= damage
-            if (!this.isAlive) {
-                this.die(direction)
-                knockback *= 1 + Math.random()
+            if (damage !== 0) {
+                this._health -= damage
+                if (!this.isAlive) {
+                    this.die(direction) // sync fn
+                    knockback *= 1 + Math.random()
+                }
             }
         }
 
@@ -549,31 +779,43 @@ export class Dude extends Component implements DialogueSource {
             this.knockback(direction, knockback)
         }
 
-        if (!!this.onDamageCallback) {
-            this.onDamageCallback(blocked)
-        }
+        this.onDamageCallback(blocked) // sync fn
 
         if (attacker) {
             this.lastAttacker = attacker
             this.lastAttackerTime = WorldTime.instance.time
         }
-        this.lastDamageTime = WorldTime.instance.time
+
+        this.syncData.ld = WorldTime.instance.time
     }
+
     lastAttacker: Dude
     lastAttackerTime: number
-    lastDamageTime: number
+    get lastDamageTime() {
+        return this.syncData.ld
+    }
 
-    private onDamageCallback: (blocked: boolean) => void
-    setOnDamageCallback(fn: (blocked: boolean) => void) {
-        this.onDamageCallback = fn
+    private onDamageCallback(blocked: boolean) {
+        if (this._onDamageCallback) {
+            this._onDamageCallback(blocked)
+        }
+    }
+    private _onDamageCallback: (blocked: boolean) => void
+    setOnDamageCallback(fn: typeof this._onDamageCallback) {
+        this._onDamageCallback = fn
     }
 
     // TODO: Consider just dropping everything in their inventory instead
     droppedItemSupplier: (() => Item[]) | undefined
     private layingDownOffset: Point
 
-    die(direction: Point = new Point(-1, 0)) {
-        this._health = 0
+    // on host and guests!
+    private die({ x: dx, y: dy }: PointValue = new Point(-1, 0)) {
+        if (session.isHost()) {
+            this._health = 0
+        }
+
+        const direction = pt(dx, dy)
 
         // position the body
         const prePos = this.animation.transform.position
@@ -586,7 +828,7 @@ export class Dude extends Component implements DialogueSource {
         this.animation.pause()
 
         // spawn items
-        if (this.droppedItemSupplier) {
+        if (session.isHost() && this.droppedItemSupplier) {
             const items = this.droppedItemSupplier()
             items.forEach((item) => {
                 const randomness = 8
@@ -606,8 +848,6 @@ export class Dude extends Component implements DialogueSource {
             })
         }
 
-        this.dropWeapon()
-
         // remove the body
         setTimeout(() => {
             if (!this.factions.includes(DudeFaction.VILLAGERS)) {
@@ -622,7 +862,12 @@ export class Dude extends Component implements DialogueSource {
     }
 
     private triggerDeathHooks() {
+        if (!session.isHost()) {
+            return
+        }
+
         // play death cutscene if applicable
+        // MPTODO multiplayer death logic
         if (this.type === DudeType.PLAYER) {
             if (CutsceneManager.instance.isCutsceneActive(IntroCutscene)) {
                 setTimeout(() => {
@@ -648,14 +893,20 @@ export class Dude extends Component implements DialogueSource {
     }
 
     revive() {
-        this._health = this.maxHealth * 0.25
+        if (session.isHost()) {
+            this._health = this.maxHealth * 0.25
+            this.removeAllConditions()
+        }
 
         // stand up
         this.animationDirty = true
         this.animation.transform.rotation = 0
         this.layingDownOffset = null
 
-        this.removeAllConditions()
+        // manually set sea level since it can get screwed up by death + knockback
+        this.seaLevel = this.getLevelAt(this.standingPosition)
+
+        emitApparitionParticles(this.standingPosition, LIGHT_SMOKE_PARTICLES)
     }
 
     dissolve() {
@@ -671,19 +922,21 @@ export class Dude extends Component implements DialogueSource {
         }, 200)
     }
 
-    private dropWeapon() {
-        // TODO
-    }
-
     private knockIntervalCallback: number = 0
-    knockback(direction: Point, knockback: number) {
-        if (this.knockIntervalCallback !== 0) {
-            window.cancelAnimationFrame(this.knockIntervalCallback)
+    knockback({ x: dx, y: dy }: PointValue, knockback: number) {
+        if (session.isGuest()) {
+            console.warn(`guests can't call knockback()`)
+            return
         }
-        if (direction.equals(Point.ZERO)) {
+        if (dx === 0 && dy === 0) {
             return
         }
 
+        if (this.knockIntervalCallback !== 0) {
+            window.cancelAnimationFrame(this.knockIntervalCallback)
+        }
+
+        const direction = pt(dx, dy)
         const goal = this.standingPosition.plus(direction.normalized().times(knockback))
         const distToStop = 2
         let intervalsRemaining = 50
@@ -710,8 +963,22 @@ export class Dude extends Component implements DialogueSource {
     }
 
     heal(amount: number) {
+        if (session.isGuest()) {
+            console.warn(`guests can't call heal()`)
+            return
+        }
         if (this.isAlive) {
             this._health = Math.min(this.maxHealth, this.health + amount)
+        }
+    }
+
+    private setFacing(facingLeft: boolean) {
+        const existingDir = this.animation.transform.mirrorX
+        if (existingDir !== facingLeft) {
+            this.animation.transform.mirrorX = facingLeft
+            if (session.isHost()) {
+                this.syncData.f = facingLeft
+            }
         }
     }
 
@@ -726,7 +993,12 @@ export class Dude extends Component implements DialogueSource {
         facingOverride: number = 0,
         speedMultiplier: number = 1
     ) {
-        if (this._health <= 0) {
+        // this is only executed on the host
+        if (session.isGuest()) {
+            return
+        }
+
+        if (!this.isAlive) {
             return
         }
 
@@ -736,36 +1008,19 @@ export class Dude extends Component implements DialogueSource {
         }
 
         if ((direction.x < 0 && facingOverride === 0) || facingOverride < 0) {
-            this.animation.transform.mirrorX = true
+            this.setFacing(true)
         } else if ((direction.x > 0 && facingOverride === 0) || facingOverride > 0) {
-            this.animation.transform.mirrorX = false
+            this.setFacing(false)
         }
 
-        const wasMoving = this.isMoving
-        this._isMoving = direction.x !== 0 || direction.y !== 0
+        direction = direction.normalizedOrZero()
 
-        if (direction.x !== 0 || direction.y !== 0) {
-            direction = direction.normalized()
+        this.updateAnimationFromMovement(direction)
+        if (this.syncData.d.x !== direction.x || this.syncData.d.y !== direction.y) {
+            this.syncData.d = direction
         }
 
-        // Update animations
-        if (!this.isJumping) {
-            if (this.isMoving) {
-                // start walking animation
-                // TODO make the run animation backwards if they run backwards :)
-                if (!wasMoving || this.animationDirty) {
-                    this.animation.goToAnimation(1)
-                }
-            } else if (wasMoving || this.animationDirty) {
-                // start idle animation
-                this.animation.goToAnimation(0)
-                // hacky slight improvement to the landing animation when standing still
-                if (this.wasJumping) {
-                    this.animation.fastForward(2 * 80)
-                    this.wasJumping = false
-                }
-            }
-        }
+        // Movement calculations and conditions based on movement — only done host-side
 
         const standingTilePos = pixelPtToTilePt(this.standingPosition)
         const ground = this.location.getGround(standingTilePos)
@@ -828,11 +1083,7 @@ export class Dude extends Component implements DialogueSource {
         if (totalMovement.x !== 0 || totalMovement.y !== 0) {
             const newPos = this.standingPosition.plus(totalMovement)
             this.moveTo(newPos)
-
-            here().getElement(this.tile)?.entity.getComponent(Pushable)?.push(this, direction)
         }
-
-        this.animationDirty = false
     }
 
     private seaLevel: number // matches the scale of WorldLocation.levels
@@ -890,18 +1141,64 @@ export class Dude extends Component implements DialogueSource {
     }
 
     /**
+     * Run host and guest side on sync
+     */
+    private updateAnimationFromMovement(direction: Point) {
+        direction = direction.normalizedOrZero()
+        const wasMoving = this.isMoving
+        this._isMoving = direction.x !== 0 || direction.y !== 0
+
+        // Update animations
+        if (!this.isJumping) {
+            if (this.isMoving) {
+                // start walking animation
+                // TODO make the run animation backwards if they run backwards :)
+                if (!wasMoving || this.animationDirty) {
+                    this.animation.goToAnimation(1)
+                }
+            } else if (wasMoving || this.animationDirty) {
+                // start idle animation
+                this.animation.goToAnimation(0)
+                // hacky slight improvement to the landing animation when standing still
+                if (this.wasJumping) {
+                    this.animation.fastForward(2 * 80)
+                    this.wasJumping = false
+                }
+            }
+        }
+
+        this.animationDirty = false
+
+        // Just do this here because why not
+        here().getElement(this.tile)?.entity.getComponent(Pushable)?.push(this, direction)
+    }
+
+    /**
      * @param point World point where the dude will be moved to (standing position),
      *              unless they hit a collider (with skipColliderCheck = false)
      */
-    moveTo(point: Point, skipColliderCheck = false) {
+    moveTo(point: Point, skipColliderCheck = false, isReceivedFromHost = false) {
+        if (session.isGuest() && !isReceivedFromHost) {
+            return
+        }
+
         // movement is done based on top-left corner point
         point = point.minus(this.standingOffset)
+
+        // no need to move
+        if (this.position.equals(point)) {
+            return
+        }
 
         const moveFn = skipColliderCheck
             ? (pos: Point) => this.collider.forceSetPosition(pos)
             : (pos: Point) => this.collider.moveTo(pos)
 
         this.position = moveFn(point.plus(this.relativeColliderPos)).minus(this.relativeColliderPos)
+
+        if (session.isHost()) {
+            this.syncData.p = this.standingPosition
+        }
 
         if (skipColliderCheck) {
             this.seaLevel = this.location.levels?.get(this.tile) ?? 0
@@ -920,12 +1217,13 @@ export class Dude extends Component implements DialogueSource {
     private jumpingOffset = 0
 
     roll() {
+        this.rollingMomentum = new Point(this.syncData.d.x, this.syncData.d.y)
         const ground = this.location.getGround(this.tile)
         if (!this.canJumpOrRoll || Ground.isWater(ground?.type)) {
             return
         }
         this.canJumpOrRoll = false
-        this.doRoll()
+        this.doRollAnimation()
         this.accelerateConditionExpiration(Condition.ON_FIRE, 500)
         for (let i = 0; i < 3; i++) {
             setTimeout(() => {
@@ -940,7 +1238,7 @@ export class Dude extends Component implements DialogueSource {
     }
 
     // has a rolling animation, however janky
-    private doRoll() {
+    private doRollAnimation() {
         controls.vibrate({
             duration: 100,
             strongMagnitude: 0.2,
@@ -991,7 +1289,7 @@ export class Dude extends Component implements DialogueSource {
             return
         }
         this.canJumpOrRoll = false
-        this.doJump()
+        this.doJumpAnimation()
         setTimeout(() => (this.canJumpOrRoll = true), 750)
     }
 
@@ -1000,7 +1298,7 @@ export class Dude extends Component implements DialogueSource {
     }
 
     // just a stepping dodge instead of a roll
-    private doJump() {
+    private doJumpAnimation() {
         StepSounds.singleFootstepSound(this, 2)
         this.isJumping = true
         this.animation.goToAnimation(2)
@@ -1016,6 +1314,7 @@ export class Dude extends Component implements DialogueSource {
                 this.animationDirty = true
                 this.jumpingAnimator = undefined
                 this.jumpingOffset = 0
+                this.updateAnimationFromMovement(Point.ZERO)
                 if (this.type === DudeType.PLAYER) {
                     controls.vibrate({
                         duration: 100,
@@ -1098,7 +1397,7 @@ export class Dude extends Component implements DialogueSource {
             pos: this.standingPosition.toString(),
             anim: this.characterAnimName,
             maxHealth: this.maxHealth,
-            health: this._health,
+            health: this.health,
             weapon: this.weaponType,
             shield: this.shieldType,
             inventory: this.inventory.save(),
@@ -1116,7 +1415,27 @@ export class Dude extends Component implements DialogueSource {
     delete() {
         this.removeAllConditions()
         this.location.removeDude(this)
+        dudeCache[this.uuid] = undefined
         super.delete()
+    }
+
+    getCurrentOffMapArea(): "swamp" | "ocean" | undefined {
+        if (this.location.isInterior) {
+            return
+        }
+        const range = here().range
+        const pos = this.tile
+        if (pos.x < -range || pos.x > range || pos.y < -range || pos.y > range) {
+            return pos.x > range - EAST_COAST_OCEAN_WIDTH ? "ocean" : "swamp"
+        }
+    }
+
+    private droppedItemPickupCheck() {
+        if (this.type === DudeType.PLAYER) {
+            here().droppedItems.forEach((item) => {
+                item.checkCollision(this)
+            })
+        }
     }
 
     private claimResidence(type: DudeType, uuid: string, hasPendingSlot: boolean) {
@@ -1151,7 +1470,7 @@ export class Dude extends Component implements DialogueSource {
             availableResidences[0].claimPendingSlot(this.type, uuid)
             this.log("claimed a house slot")
         } else {
-            this.log("could not find a home")
+            // this.log("could not find a home")
         }
     }
 
@@ -1163,11 +1482,10 @@ export class Dude extends Component implements DialogueSource {
 
         // little flashing circle right before attacking the player
         const npc = this.entity.getComponent(NPC)
-        const attackState = npc?.attackState
-        if (npc?.targetedEnemy?.type === DudeType.PLAYER) {
-            if (attackState === NPCAttackState.ATTACKING_SOON) {
+        if (npc?.targetedEnemy === player()) {
+            if (this.attackState === AttackState.ATTACKING_SOON) {
                 indicator = DudeInteractIndicator.ATTACKING_SOON
-            } else if (attackState === NPCAttackState.ATTACKING_NOW) {
+            } else if (this.attackState === AttackState.ATTACKING_NOW) {
                 indicator = DudeInteractIndicator.ATTACKING_NOW
             }
         } else if (this.dialogue && this.dialogue != EMPTY_DIALOGUE) {
@@ -1184,7 +1502,7 @@ export class Dude extends Component implements DialogueSource {
         if (
             indicator === DudeInteractIndicator.IMPORTANT_DIALOGUE ||
             (this.type === DudeType.PLAYER &&
-                this.entity.getComponent(Player).isOffMap() &&
+                this.getCurrentOffMapArea() &&
                 !CutscenePlayerController.instance.enabled)
         ) {
             // update off screen indicator
@@ -1227,4 +1545,18 @@ export class Dude extends Component implements DialogueSource {
     log(message: any) {
         console.log(`${DudeType[this.type]}: ${message}`)
     }
+
+    static get(uuid: string) {
+        return dudeCache[uuid]
+    }
+
+    static getAll() {
+        return Object.values(dudeCache)
+    }
+
+    static clearLookupCache() {
+        dudeCache = {}
+    }
 }
+
+let dudeCache: Record<string, Dude> = {}

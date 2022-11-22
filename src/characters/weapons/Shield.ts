@@ -106,3 +106,5 @@ export class Shield extends Component {
         return this.state === State.DRAWN && this.raisedPerc < 1
     }
 }
+
+export type ReadOnlyShield = Omit<Shield, "setOnBack" | "block">

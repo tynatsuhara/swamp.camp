@@ -3,6 +3,7 @@ import { BoxCollider } from "brigsby/dist/collision"
 import { SpriteComponent } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
 import { DroppedItem } from "../../items/DroppedItem"
+import { session } from "../../online/session"
 import { GroundRenderer } from "../../world/GroundRenderer"
 import { here } from "../../world/locations/LocationManager"
 import { WorldTime } from "../../world/WorldTime"
@@ -96,11 +97,14 @@ class ThrownProjectile extends Component {
             //     relativeOffset.y
             // )
 
-            enemy.damage(1, {
-                direction: enemy.standingPosition.minus(this.attacker.standingPosition),
-                knockback: 30,
-                attacker: this.attacker,
-            })
+            // MPTODO — This is a little janky, we should probably sync projectiles
+            if (session.isHost()) {
+                enemy.damage(1, {
+                    direction: enemy.standingPosition.minus(this.attacker.standingPosition),
+                    knockback: 30,
+                    attacker: this.attacker,
+                })
+            }
         }
     }
 
@@ -120,5 +124,5 @@ export const spawnThrownProjectile = (
     velocity: Point,
     attacker: Dude
 ) => {
-    here().droppedItems.add(new Entity([new ThrownProjectile(sprite, tip, velocity, attacker)]))
+    here().miscEntities.add(new Entity([new ThrownProjectile(sprite, tip, velocity, attacker)]))
 }

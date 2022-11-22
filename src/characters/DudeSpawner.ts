@@ -2,6 +2,7 @@ import { Component, debug, Entity, Point } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
 import { WorldAudioContext } from "../audio/WorldAudioContext"
 import { TILE_SIZE } from "../graphics/Tilesets"
+import { session } from "../online/session"
 import { saveManager } from "../SaveManager"
 import { Singletons } from "../Singletons"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
@@ -46,7 +47,7 @@ export class DudeSpawner extends Component {
     }
 
     private spawn() {
-        if (!saveManager.getState() || !saveManager.getState().hasMadeFire) {
+        if (!saveManager.getState() || !saveManager.getState().hasMadeFire || session.isGuest()) {
             return
         }
 
@@ -77,7 +78,7 @@ export class DudeSpawner extends Component {
 
             console.log(`spawning villager ${visitorTypes}`)
 
-            const dude = DudeFactory.instance.new(visitorType, this.getSpawnPosOutsideOfCamp())
+            const dude = DudeFactory.instance.create(visitorType, this.getSpawnPosOutsideOfCamp())
             dude.entity.getComponent(Visitor)?.welcome()
         }
     }
@@ -108,7 +109,7 @@ export class DudeSpawner extends Component {
             for (let i = 0; i < Math.min(openPoints.length, goalDemonCount - demons.length); i++) {
                 const pt = Lists.oneOf(openPoints)
                 const type = Math.random() > 0.95 ? DudeType.DEMON_BRUTE : DudeType.HORNED_DEMON
-                DudeFactory.instance.new(type, pt.times(TILE_SIZE), l)
+                DudeFactory.instance.create(type, pt.times(TILE_SIZE), l)
             }
         }
     }
@@ -132,14 +133,20 @@ export class DudeSpawner extends Component {
             const spawnCount = Math.min(waterSpots.length, goalCount - thingCount.length)
             for (let i = 0; i < spawnCount; i++) {
                 const pt = Lists.oneOf(waterSpots)
-                DudeFactory.instance.new(DudeType.SWAMP_THING, pt.times(TILE_SIZE), l)
+                DudeFactory.instance.create(DudeType.SWAMP_THING, pt.times(TILE_SIZE), l)
             }
         }
     }
 
     private checkForOrcSeige() {
         if (!EventQueue.instance.containsEventType(QueuedEventType.ORC_SEIGE)) {
-            const nextSeigeTime = WorldTime.instance.future({ days: 2 + Math.random() * 3 })
+            // orc siege should happen sometime during the day
+            let nextSeigeTime = WorldTime.instance.future({ days: 2 + Math.random() * 3 })
+            nextSeigeTime -= nextSeigeTime % TimeUnit.DAY
+            nextSeigeTime += TimeUnit.HOUR * (6 + Math.random() * 13)
+            nextSeigeTime += TimeUnit.MINUTE * Math.random() * 60
+            console.log(`next orc siege time: ${WorldTime.clockTime(nextSeigeTime)}`)
+
             EventQueue.instance.addEvent({
                 type: QueuedEventType.ORC_SEIGE,
                 time: nextSeigeTime,
@@ -155,17 +162,17 @@ export class DudeSpawner extends Component {
 
         const spawnPos = this.getSpawnPosOutsideOfCamp()
 
-        const leaders = Lists.range(1, 1 + Math.random() * 4).map(() =>
-            DudeFactory.instance.new(DudeType.ORC_BRUTE, spawnPos)
-        )
+        // TODO: Make these values dynamic based on progress
+        const leaderCount = 1
+        const warriorCount = 2 + Math.random() * 3
+        const shamanCount = 1
 
+        const spawn = (type: DudeType) => DudeFactory.instance.create(type, spawnPos)
+
+        const leaders = Lists.range(0, leaderCount).map(() => spawn(DudeType.ORC_BRUTE))
         const followers = [
-            ...Lists.range(0, 5 + Math.random() * 10).map(() =>
-                DudeFactory.instance.new(DudeType.ORC_WARRIOR, spawnPos)
-            ),
-            ...Lists.range(0, 1 + Math.random() * 4).map(() =>
-                DudeFactory.instance.new(DudeType.ORC_SHAMAN, spawnPos)
-            ),
+            ...Lists.range(0, warriorCount).map(() => spawn(DudeType.ORC_WARRIOR)),
+            ...Lists.range(0, shamanCount).map(() => spawn(DudeType.ORC_SHAMAN)),
         ]
 
         followers.forEach((f) => f.entity.getComponent(NPC).setLeader(Lists.oneOf(leaders)))
@@ -185,7 +192,7 @@ export class DudeSpawner extends Component {
 
     private spawnWildlife() {
         if (this.shouldRandomlySpawn(TimeUnit.DAY * 7)) {
-            DudeFactory.instance.new(DudeType.BEAR, this.getSpawnPosOutsideOfCamp())
+            DudeFactory.instance.create(DudeType.BEAR, this.getSpawnPosOutsideOfCamp())
         }
 
         if (this.shouldRandomlySpawn(TimeUnit.DAY * 3)) {
@@ -195,13 +202,13 @@ export class DudeSpawner extends Component {
 
     spawnWolves() {
         const leaderSpawnPos = this.getSpawnPosOutsideOfCamp()
-        const leader = DudeFactory.instance.new(DudeType.WOLF, leaderSpawnPos)
+        const leader = DudeFactory.instance.create(DudeType.WOLF, leaderSpawnPos)
 
         const spawnPoints = tilesAround(leaderSpawnPos, 3)
         const wolves = Math.floor(1 + Math.random() * 4)
         console.log(`spawning ${wolves + 1} wolves`)
         for (let i = 0; i < wolves; i++) {
-            const wolf = DudeFactory.instance.new(DudeType.WOLF, Lists.oneOf(spawnPoints))
+            const wolf = DudeFactory.instance.create(DudeType.WOLF, Lists.oneOf(spawnPoints))
             wolf.entity.getComponent(NPC).setLeader(leader)
         }
     }

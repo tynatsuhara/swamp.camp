@@ -1,11 +1,11 @@
 import { Component, Entity, Point, UpdateData } from "brigsby/dist"
+import { PointValue, pt } from "brigsby/dist/Point"
 import { Grid, Maths } from "brigsby/dist/util"
-import { Player } from "../characters/Player"
+import { player } from "../characters/player"
 import { controls } from "../Controls"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { ItemStack } from "../items/Inventory"
 import { ITEM_METADATA_MAP } from "../items/Items"
-import { ElementComponent } from "../world/elements/ElementComponent"
 import { ElementFactory } from "../world/elements/ElementFactory"
 import { Elements, ElementType } from "../world/elements/Elements"
 import { ElementUtils } from "../world/elements/ElementUtils"
@@ -21,8 +21,7 @@ export class PlaceElementDisplay extends Component {
     private element: ElementType
     private elementFactory: ElementFactory<any>
     private placingFrame: PlaceElementFrame
-    private successFn: () => void
-    private replacingElement: ElementComponent<any> | undefined
+    private successFn: (elementPos: Point) => void
 
     get isOpen() {
         return this.element !== null && this.element !== undefined
@@ -46,48 +45,52 @@ export class PlaceElementDisplay extends Component {
     close() {
         this.element = null
         this.stack = null
-        this.placingFrame.delete()
+        this.placingFrame?.delete()
     }
 
-    startPlacing(
-        stack: ItemStack,
-        successFn: () => void,
-        replacingElement?: ElementComponent<any>
-    ) {
+    startPlacing(stack: ItemStack, successFn: (elementPos: Point) => void) {
         this.stack = stack
         this.successFn = successFn
-        this.replacingElement = replacingElement
 
         this.element = ITEM_METADATA_MAP[stack.item].element
         this.elementFactory = Elements.instance.getElementFactory(this.element)
 
-        this.placingFrame = Player.instance.entity.addComponent(
-            new PlaceElementFrame(this.elementFactory.dimensions, this.replacingElement)
+        this.placingFrame = player().entity.addComponent(
+            new PlaceElementFrame(this.elementFactory.dimensions)
         )
     }
 
-    // Should only be called by PlaceElementFrame
-    finishPlacing(elementPos: Point) {
-        this.successFn() // decrement and maybe remove from inv
-        if (this.replacingElement) {
-            here().removeElement(this.replacingElement)
+    finishPlacingOnHost(stack: ItemStack, elementPos: PointValue) {
+        const itemMetadata = ITEM_METADATA_MAP[stack.item]
+        const element = itemMetadata.element
+
+        if (element === undefined || stack.count === 0) {
+            console.warn(`cannot place stack: ${JSON.stringify(stack)}`)
+            return
         }
 
-        const data = this.stack.metadata
-            ? this.elementFactory.itemMetadataToSaveFormat(this.stack.metadata)
+        const elementFactory = Elements.instance.getElementFactory(element)
+
+        const data = stack.metadata
+            ? elementFactory.itemMetadataToSaveFormat(stack.metadata)
             : undefined
 
-        here().addElement(this.element, elementPos, data)
+        const addedElement = here().addElement(element, elementPos, data)
+
+        if (!addedElement) {
+            console.warn(`failed to place element: ${JSON.stringify(stack)}`)
+            return
+        }
 
         // Push if there are any colliders
-        const shouldPush = ElementUtils.rectPoints(elementPos, this.elementFactory.dimensions).some(
+        const shouldPush = ElementUtils.rectPoints(elementPos, elementFactory.dimensions).some(
             (pt) => here().isOccupied(pt)
         )
 
         // Push dudes out of the way
         if (shouldPush) {
-            const p = elementPos.times(TILE_SIZE)
-            const d = this.elementFactory.dimensions.times(TILE_SIZE)
+            const p = pt(elementPos.x, elementPos.y).times(TILE_SIZE)
+            const d = elementFactory.dimensions.times(TILE_SIZE)
             const intersectingDudes = here()
                 .getDudes()
                 .filter((dude) => Maths.rectContains(p, d, dude.standingPosition))
@@ -101,8 +104,15 @@ export class PlaceElementDisplay extends Component {
                 d.moveTo(newPos.plus(new Point(0.5, 0.75)).times(TILE_SIZE), true)
             })
         }
+    }
 
-        if (!this.stack?.count) {
+    // Should only be called by PlaceElementFrame
+    finishPlacing(elementPos: Point) {
+        this.stack = this.stack.withCount(this.stack.count - 1)
+
+        this.successFn(elementPos) // remove from inventory and call doPlacingOnHost (on host)
+
+        if (this.stack.count === 0) {
             this.close()
         }
     }

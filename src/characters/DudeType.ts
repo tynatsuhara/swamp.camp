@@ -26,4 +26,7 @@ export enum DudeType {
     ONION,
     KNIGHT,
     FOREST_GUARDIAN,
+    GNOLL_SHAMAN,
 }
+
+window["DudeType"] = DudeType

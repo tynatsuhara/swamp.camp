@@ -10,7 +10,7 @@ import { Lists, Maths } from "brigsby/dist/util"
 import { loadAudio } from "../audio/DeferLoadAudio"
 import { Sounds } from "../audio/Sounds"
 import { Dude } from "../characters/Dude"
-import { Player } from "../characters/Player"
+import { player } from "../characters/player"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { ImageFilters } from "../graphics/ImageFilters"
@@ -85,7 +85,6 @@ export class TradeMenu extends Component {
 
         if (this.isOpen) {
             this.tooltip.clear()
-            this.tooltip.position = controls.getMousePos()
             const rowsTall = 6 // will need to change this if dimensions are adjusted
             this.scrollOffset -=
                 controls.getScrollDeltaY() *
@@ -116,7 +115,7 @@ export class TradeMenu extends Component {
 
     sell(items: SalePackage[]) {
         this.open(items, TradeMode.PLAYER_SELLING)
-        this.sourceInventory = Player.instance.dude.inventory
+        this.sourceInventory = player().inventory
     }
 
     buy(items: SalePackage[]) {
@@ -165,7 +164,7 @@ export class TradeMenu extends Component {
         if (!canInteract) {
             return "oh shit" // not shown
         }
-        const playerInv = Player.instance.dude.inventory
+        const playerInv = player().inventory
 
         if (this.tradeMode === TradeMode.PLAYER_SELLING) {
             if (playerInv.getItemCount(sale.item) < sale.count) {
@@ -242,7 +241,7 @@ export class TradeMenu extends Component {
                         coins: saveManager.getState().coins + sale.price,
                     })
                 } else {
-                    Player.instance.dude.inventory.addItem(sale.item, sale.count)
+                    player().inventory.addItem(sale.item, sale.count)
                     saveManager.setState({
                         coins: saveManager.getState().coins - sale.price,
                     })

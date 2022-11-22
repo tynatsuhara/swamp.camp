@@ -1,10 +1,9 @@
 import { Component, Point } from "brigsby/dist"
 import { NineSlice, SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Maths } from "brigsby/dist/util"
-import { Player } from "../characters/Player"
+import { player } from "../characters/player"
 import { controls } from "../Controls"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
-import { ElementComponent } from "../world/elements/ElementComponent"
 import { Elements } from "../world/elements/Elements"
 import { here } from "../world/locations/LocationManager"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
@@ -17,12 +16,10 @@ export class PlaceElementFrame extends Component {
     private readonly dimensions: Point
     private goodTiles: SpriteComponent[]
     private badTiles: SpriteComponent[]
-    private replacingElement: ElementComponent<any> | undefined
 
-    constructor(dimensions: Point, replacingElement?: ElementComponent<any>) {
+    constructor(dimensions: Point) {
         super()
         this.dimensions = dimensions
-        this.replacingElement = replacingElement
         if (
             (this.dimensions.x === 1 && this.dimensions.y > 2) ||
             (this.dimensions.y === 1 && this.dimensions.x !== 1)
@@ -70,7 +67,7 @@ export class PlaceElementFrame extends Component {
         // Divide these by 2 since the mouse will be in the center of the frame
         const maxDistX = TILE_SIZE * (baseDist + this.dimensions.x / 2)
         const maxDistY = TILE_SIZE * (baseDist + this.dimensions.y / 2)
-        const playerPos = Player.instance.dude.standingPosition.plusY(-TILE_SIZE / 2)
+        const playerPos = player().standingPosition.plusY(-TILE_SIZE / 2)
 
         // only allow placing near the player
         const centerPos = new Point(
@@ -114,7 +111,7 @@ export class PlaceElementFrame extends Component {
                 const pt = new Point(x, y)
                 // there's already an element here
                 const existingElement = l.getElement(pt)
-                if (existingElement && existingElement !== this.replacingElement) {
+                if (existingElement) {
                     return false
                 }
                 // there's no ground here

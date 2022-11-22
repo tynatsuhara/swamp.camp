@@ -1,10 +1,15 @@
-import { Entity, Point } from "brigsby/dist"
+import { Entity, Point, pt } from "brigsby/dist"
+import { PointValue } from "brigsby/dist/Point"
 import { Grid } from "brigsby/dist/util"
 import { PointAudio } from "../../audio/PointAudio"
 import { Sounds } from "../../audio/Sounds"
 import { Dude } from "../../characters/Dude"
 import { DudeFactory } from "../../characters/DudeFactory"
 import { DudeType } from "../../characters/DudeType"
+import { DroppedItem } from "../../items/DroppedItem"
+import { session } from "../../online/session"
+import { ONLINE_PLAYER_DUDE_ID_PREFIX, syncFn } from "../../online/utils"
+import { SaveContext } from "../../SaveManager"
 import { LocationSaveState } from "../../saves/LocationSaveState"
 import { newUUID } from "../../saves/uuid"
 import { HUD } from "../../ui/HUD"
@@ -18,10 +23,7 @@ import { Teleporter, TeleporterPrefix, Teleporters, TeleporterSound } from "../T
 import { LocationManager, LocationType } from "./LocationManager"
 
 export class Location {
-    private _uuid: string = newUUID()
-    get uuid() {
-        return this._uuid
-    }
+    readonly uuid: string
 
     readonly type: LocationType
 
@@ -37,11 +39,16 @@ export class Location {
     readonly levels = new Grid<number>()
 
     // TODO: Make dropped items saveable
-    readonly droppedItems = new Set<Entity>()
+    // MPTODO: Sync dropped items
+    readonly droppedItems = new Set<DroppedItem>()
+    readonly miscEntities = new Set<Entity>()
 
     private features: Feature<any>[] = []
     private readonly featureEntities: Entity[] = []
     private teleporters: { [key: string]: string } = {}
+
+    // private readonly syncListeners = new Map<string, (...args: any[]) => void>()
+    private readonly syncFunctions = new Map<string, (...args: any[]) => void>()
 
     readonly size: number // tile dimensions (square)
     get range() {
@@ -60,14 +67,82 @@ export class Location {
         isInterior: boolean,
         allowPlacing: boolean,
         size?: number,
-        levels?: Grid<number>
+        levels?: Grid<number>,
+        uuid = newUUID()
     ) {
         this.type = type
         this.isInterior = isInterior
         this.allowPlacing = allowPlacing
         this.size = size
         this.levels = levels
+        this.uuid = uuid
+
+        const syncId = this.uuid.substring(0, 8)
+        this.syncLoadElement = syncFn(`${syncId}le`, (...args) => {
+            if (session.isGuest()) {
+                console.log("sync load element")
+                return this.loadElement(...args)
+            }
+        })
+
+        // syncElement is a central syncFn which redirects data to elements that have registed callbacks
+        this.syncElement = syncFn(`${syncId}se`, <T extends any[]>(id: string, ...args: T) => {
+            const syncFn = this.syncFunctions.get(id)
+            if (syncFn) {
+                syncFn(...args)
+            } else {
+                console.warn("unexpected element syncFn called")
+            }
+        })
+
+        this.removeElementAt = syncFn(`${syncId}rma`, (x: number, y: number) => {
+            this.removeElementLocally(this.getElement(pt(x, y)))
+        })
     }
+
+    /**
+     * @returns A syncFn which will properly redirects data to elements based on grid position.
+     */
+    elementSyncFn<T extends any[]>(
+        namespace: string,
+        { x, y }: Point,
+        fn: (...args: T) => void
+    ): (...args: T) => void {
+        const id = `${pt(x, y).toString()}:${namespace}`
+        // store the function in a map based on x/y so that it can be looked up client side
+        this.syncFunctions.set(id, fn)
+        // return a sync function which binds the x/y coords
+        return (...args: T) => this.syncElement(id, ...args)
+    }
+
+    private syncElement: <T extends any[]>(id: string, ...args: T) => void
+
+    // /**
+    //  * @returns A syncFn which will properly
+    //  */
+    // elementAction<T extends any>({
+    //     x,
+    //     y,
+    // }: Point): [(...args: T[]) => void, (listener: (...args: T[]) => void) => void] {
+    //     const [sendElementSync, receiveElementSync] = session.cachedAction("elem:sync")
+    //     const sendWrapper = <T extends any[]>(...data: T) => {
+    //         if (session.isGuest()) {
+    //             console.warn("guests can't send element data")
+    //         } else {
+    //             sendElementSync(data, null, { x, y })
+    //         }
+    //     }
+    //     const receiveWrapper = <T extends any[]>(fn: (...args: T) => void) => {
+    //         if (session.isGuest()) {
+    //             this.syncListeners.set(pt.toString(), fn)
+    //         }
+    //     }
+    //     receiveElementSync((data, _, { x, y }: { x: number; y: number }) => {
+    //         const listener = this.syncListeners.get(pt(x, y).toString())
+    //         listener(data)
+    //     })
+    //     return [sendWrapper, receiveWrapper]
+    // }
 
     private dudeCache: Dude[]
     getDudes() {
@@ -100,15 +175,44 @@ export class Location {
     }
 
     /**
-     * @param type
-     * @param tilePoint tile point
-     * @param data
+     * Should only be called on hosts!
      */
     addElement<T extends ElementType>(
         type: T,
-        tilePoint: Point,
+        tilePoint: PointValue,
         data: Partial<ElementDataFormat[T]> = {}
     ): ElementComponent<T, ElementDataFormat[T]> {
+        if (!session.isHost()) {
+            console.warn("addElement cannot be called by guest!")
+            return null
+        }
+
+        const ptString = pt(tilePoint.x, tilePoint.y).toString()
+
+        // On the host, create the element
+        const element = this.loadElement(type, ptString, data)
+
+        if (!element) {
+            return null
+        }
+
+        this.syncLoadElement(type, ptString, element.save())
+
+        return element
+    }
+
+    private syncLoadElement: typeof this.loadElement
+
+    /**
+     * The same as addElement, except that it can be called by guests during their initial load-in
+     */
+    private loadElement<T extends ElementType>(
+        type: T,
+        tilePointString: string,
+        data: Partial<ElementDataFormat[T]> = {}
+    ): ElementComponent<T, ElementDataFormat[T]> {
+        const tilePoint = Point.fromString(tilePointString)
+
         const factory = Elements.instance.getElementFactory(type)
         const elementPts = ElementUtils.rectPoints(tilePoint, factory.dimensions)
         if (elementPts.some((pt) => !!this.elements.get(pt))) {
@@ -131,6 +235,9 @@ export class Location {
         // stake the element's claim for the land
         elementPts.forEach((pt) => {
             this.elements.set(pt, el)
+            if (el === null) {
+                console.error(`null element of type ${ElementType[type]}`)
+            }
             // reset the ground in order to handle things like flattening tall grass
             const groundData = this.ground.get(pt)
             if (groundData) {
@@ -197,14 +304,23 @@ export class Location {
         return this.occupied.keys()
     }
 
-    removeElementAt(tilePoint: Point) {
-        this.removeElement(this.getElement(tilePoint))
-    }
+    /**
+     * synced host->client
+     */
+    removeElementAt: (x: number, y: number) => void
 
-    removeElement(el: ElementComponent<any>) {
+    removeElementLocally(el: ElementComponent<any>) {
         if (!el) {
             return
         }
+
+        for (const syncFn of this.syncFunctions.keys()) {
+            const pos = Point.fromString(syncFn.split(":")[0])
+            if (pos.equals(el.pos)) {
+                this.syncFunctions.delete(syncFn)
+            }
+        }
+
         if (this.elements.get(el.pos) === el) {
             this.elements.removeAll(el)
             ElementUtils.rectPoints(
@@ -328,6 +444,11 @@ export class Location {
     }
 
     playerUseTeleporter(to: string, id: string) {
+        // teleporter will get executed on the host
+        if (session.isGuest()) {
+            return
+        }
+
         const linkedLocation = LocationManager.instance.get(to)
         const linkedPosition = this.getTeleporterLinkedPos(to, id)
 
@@ -368,14 +489,15 @@ export class Location {
                     .map((c) => c.entity)
             )
             .concat(this.featureEntities)
-            .concat(Array.from(this.droppedItems))
+            .concat(Array.from(this.droppedItems).map((i) => i.entity))
+            .concat(Array.from(this.miscEntities))
     }
 
     getDude(dudeType: DudeType): Dude {
         return this.getDudes().filter((d) => d.type === dudeType)[0]
     }
 
-    save(): LocationSaveState {
+    save(context: SaveContext): LocationSaveState {
         return {
             uuid: this.uuid,
             type: this.type,
@@ -383,6 +505,16 @@ export class Location {
             elements: this.saveElements(),
             dudes: this.getDudes()
                 .filter((d) => d.isAlive && !!d.entity)
+                .filter((d) => {
+                    switch (context) {
+                        case "multiplayer":
+                            // sync all spawned dudes as they exist in the world
+                            return true
+                        case "save":
+                            // we don't want to include online players in the location save data
+                            return !d.uuid.startsWith(ONLINE_PLAYER_DUDE_ID_PREFIX)
+                    }
+                })
                 .map((d) => d.save()),
             features: this.features,
             teleporters: this.teleporters,
@@ -429,16 +561,16 @@ export class Location {
             saveState.isInterior,
             saveState.allowPlacing,
             size,
-            levels
+            levels,
+            saveState.uuid
         )
 
-        n._uuid = saveState.uuid
         saveState.features.forEach((f) => n.addFeature(f.type, f.data))
         n.teleporters = saveState.teleporters
         saveState.ground.forEach((el) =>
             n.setGroundElement(el.type, Point.fromString(el.pos), el.obj)
         )
-        saveState.elements.forEach((el) => n.addElement(el.type, Point.fromString(el.pos), el.obj))
+        saveState.elements.forEach((el) => n.loadElement(el.type, el.pos, el.obj))
         saveState.dudes.forEach((d) => DudeFactory.instance.load(d, n))
         n.toggleAudio(false)
 

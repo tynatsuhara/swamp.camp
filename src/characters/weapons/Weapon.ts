@@ -31,6 +31,7 @@ export abstract class Weapon extends Component {
             )
     }
 
+    // Called on host and client
     static hitResources(dude: Dude) {
         const interactDistance = 20
         const interactCenter = dude.standingPosition.minus(new Point(0, 7))
@@ -88,6 +89,7 @@ export abstract class Weapon extends Component {
     cancelAttack() {}
 
     getPlayerAimingDirection(): Point {
+        // MPTODO sync to and from the host
         const mousePos = controls.getWorldSpaceMousePos()
         const centerPos = this.dude.standingPosition.plusY(HAND_POSITION_OFFSET.y)
         return new Point(mousePos.x - centerPos.x, mousePos.y - centerPos.y)
@@ -130,3 +132,5 @@ export abstract class Weapon extends Component {
         return cache
     }
 }
+
+export type ReadOnlyWeapon = Omit<Weapon, "attack" | "setSheathed" | "cancelAttack">

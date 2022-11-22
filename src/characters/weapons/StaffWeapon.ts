@@ -5,10 +5,11 @@ import { Camera } from "../../cutscenes/Camera"
 import { ImageFilters } from "../../graphics/ImageFilters"
 import { Particles } from "../../graphics/particles/Particles"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
+import { session } from "../../online/session"
 import { Color } from "../../ui/Color"
 import { GroundRenderer } from "../../world/GroundRenderer"
 import { here } from "../../world/locations/LocationManager"
-import { Player } from "../Player"
+import { player } from "../player"
 import { Weapon } from "./Weapon"
 import { WeaponType } from "./WeaponType"
 
@@ -150,20 +151,25 @@ export class StaffWeapon extends Weapon {
                     const attackDistance = TILE_SIZE * 1.5
 
                     // everyone can get damaged by explosions, friend or foe
-                    here()
-                        .getDudes()
-                        .filter((d) => !!d)
-                        .filter(
-                            (d) =>
-                                d.standingPosition.distanceTo(this.attackPosition) < attackDistance
-                        )
-                        .forEach((d) =>
-                            // don't track lastAttacker because it can cause friendly fire and get weird
-                            d.damage(2, {
-                                direction: d.standingPosition.minus(this.attackPosition),
-                                knockback: 50,
+                    if (session.isHost()) {
+                        here()
+                            .getDudes()
+                            .filter((d) => !!d)
+                            .filter(
+                                (d) =>
+                                    d.standingPosition.distanceTo(this.attackPosition) <
+                                    attackDistance
+                            )
+                            .forEach((d) => {
+                                // knockback but don't damage allies
+                                const damageVal = this.dude.isEnemy(d) ? 2 : 0
+                                // don't track lastAttacker because it can cause friendly fire and get weird
+                                d.damage(damageVal, {
+                                    direction: d.standingPosition.minus(this.attackPosition),
+                                    knockback: 50,
+                                })
                             })
-                        )
+                    }
 
                     Camera.instance.shake(5, 500)
 
@@ -181,10 +187,10 @@ export class StaffWeapon extends Weapon {
 
     private guessAttackPos() {
         // TODO: target other villagers?
-        if (!Player.instance.dude.isAlive) {
+        if (!player().isAlive) {
             return
         }
-        return Player.instance.dude.standingPosition.plus(Player.instance.velocity.times(60))
+        return player().standingPosition.plus(player().velocity.times(60))
     }
 
     private explosionParticleEffects() {

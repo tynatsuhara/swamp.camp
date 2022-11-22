@@ -8,6 +8,8 @@ import { UIStateManager } from "./UIStateManager"
 export type OptionButton = {
     text: string
     fn: () => void
+    onMouseOver?: () => void
+    onMouseOut?: () => void
     buttonColor: "red" | "white"
     textColor: string
     hoverColor: string
@@ -51,8 +53,8 @@ export const ButtonsMenu = {
 
         options.forEach((option, i) =>
             e.addComponent(
-                new TextButton(
-                    topLeft.plus(
+                new TextButton({
+                    position: topLeft.plus(
                         new Point(
                             dimensions.x / 2 -
                                 (TEXT_PIXEL_WIDTH * option.text.length) / 2 -
@@ -60,12 +62,14 @@ export const ButtonsMenu = {
                             marginTop + i * (TILE_SIZE + buttonPadding)
                         )
                     ),
-                    option.text,
-                    () => option.fn(),
-                    option.buttonColor,
-                    option.textColor,
-                    option.hoverColor
-                )
+                    text: option.text,
+                    onClick: () => option.fn(),
+                    onMouseOver: () => option.onMouseOver?.(),
+                    onMouseOut: () => option.onMouseOut?.(),
+                    buttonColor: option.buttonColor,
+                    textColor: option.textColor,
+                    hoverColor: option.hoverColor,
+                })
             )
         )
 

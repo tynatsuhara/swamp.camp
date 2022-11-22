@@ -1,8 +1,7 @@
 import { assets } from "brigsby/dist"
 import { Lists, RepeatedInvoker } from "brigsby/dist/util"
 import { Dude } from "../characters/Dude"
-import { DudeType } from "../characters/DudeType"
-import { Player } from "../characters/Player"
+import { player } from "../characters/player"
 import { controls } from "../Controls"
 import { GroundType } from "../world/ground/Ground"
 import { here } from "../world/locations/LocationManager"
@@ -37,7 +36,7 @@ export class StepSounds {
             .then(() =>
                 dude.entity.addComponent(
                     new RepeatedInvoker(() => {
-                        if (Player.instance.dude) {
+                        if (player()) {
                             if (dude?.isAlive && dude.isMoving && !dude.rolling && !dude.jumping) {
                                 const [sound, volume] = StepSounds.getSound(dude)
                                 if (!!sound) {
@@ -79,7 +78,7 @@ export class StepSounds {
                 return [StepSounds.MUD_SOUND, 0.3]
             case GroundType.WATER:
             case GroundType.WATERFALL:
-                if (dude.type === DudeType.PLAYER) {
+                if (dude === player()) {
                     controls.vibrate({
                         duration: 70,
                         strongMagnitude: 0,

@@ -1,5 +1,5 @@
 import { Component, Entity, Point } from "brigsby/dist"
-import { Player } from "../characters/Player"
+import { player } from "../characters/player"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { Camera } from "../cutscenes/Camera"
 import { TILE_SIZE } from "../graphics/Tilesets"
@@ -136,11 +136,11 @@ export class LightManager extends Component {
         this.mask.reset(WorldTime.instance.time, this.getLocationDarkness())
 
         // Always provide slight visibility around the player
-        const player = Player.instance?.dude
-        if (player) {
-            if (player.shieldType !== ShieldType.LANTERN) {
+        const p = player()
+        if (p) {
+            if (p.shieldType !== ShieldType.LANTERN) {
                 this.mask.addFaintLightCircle(
-                    player.standingPosition.plusY(-TILE_SIZE / 2).plus(player.getAnimationOffset()),
+                    p.standingPosition.plusY(-TILE_SIZE / 2).plus(p.getAnimationOffset()),
                     here().isInterior ? 0.5 : 1
                 )
             }

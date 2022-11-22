@@ -7,27 +7,20 @@ import { UIStateManager } from "./UIStateManager"
 export class ButtonIndicator extends Component {
     private readonly pos: Point
     private readonly button: GamepadButton
+    private readonly depth: number
 
-    constructor(pos: Point, button: GamepadButton) {
+    constructor(pos: Point, button: GamepadButton, depth = UIStateManager.UI_SPRITE_DEPTH) {
         super()
         this.pos = pos
         this.button = button
+        this.depth = depth
     }
 
     getRenderMethods(): RenderMethod[] {
         return [
             Tilesets.instance.oneBit
                 .getTileSource(this.getTileKey())
-                .toImageRender(
-                    new SpriteTransform(
-                        this.pos,
-                        null,
-                        0,
-                        false,
-                        false,
-                        UIStateManager.UI_SPRITE_DEPTH
-                    )
-                ),
+                .toImageRender(SpriteTransform.new({ position: this.pos, depth: this.depth })),
         ]
     }
 

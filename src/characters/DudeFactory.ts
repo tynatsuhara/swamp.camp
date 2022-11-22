@@ -1,14 +1,20 @@
-import { Component, Entity, Point } from "brigsby/dist"
+import { Component, Entity, Point, pt } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
+import { TILE_SIZE } from "../graphics/Tilesets"
 import { Inventory } from "../items/Inventory"
-import { Item } from "../items/Items"
+import { Item, ITEM_METADATA_MAP } from "../items/Items"
 import { PlayerInventory } from "../items/PlayerInventory"
+import { session } from "../online/session"
+import { MULTIPLAYER_ID } from "../online/sync"
+import { ONLINE_PLAYER_DUDE_ID_PREFIX, syncFn } from "../online/utils"
+import { saveManager } from "../SaveManager"
 import { DudeSaveState } from "../saves/DudeSaveState"
 import { newUUID } from "../saves/uuid"
 import { Singletons } from "../Singletons"
+import { tilesAround } from "../Utils"
 import { Location } from "../world/locations/Location"
-import { camp } from "../world/locations/LocationManager"
+import { camp, LocationManager } from "../world/locations/LocationManager"
 import { BERTO_STARTING_DIALOGUE } from "./dialogue/BertoDialogue"
 import { EMPTY_DIALOGUE } from "./dialogue/Dialogue"
 import { DOCTOR_DIALOGUE_ENTRYPOINT } from "./dialogue/DoctorDialogue"
@@ -18,12 +24,15 @@ import { Dude } from "./Dude"
 import { DudeType } from "./DudeType"
 import { peopleNames } from "./NameFactory"
 import { NPC } from "./NPC"
-import { Player } from "./Player"
+import { player } from "./player"
+import { GuestPlayer } from "./player/GuestPlayer"
+import { HostPlayer } from "./player/HostPlayer"
 import { AquaticNPC } from "./types/AquaticNPC"
 import { Berto } from "./types/Berto"
 import { Centaur } from "./types/Centaur"
 import { DudeModifier } from "./types/DudeModifier"
 import { Enemy } from "./types/Enemy"
+import { ShamanHealer } from "./types/ShamanHealer"
 import { ShroomNPC } from "./types/ShroomNPC"
 import { SpookyVisitor } from "./types/SpookyVisitor"
 import { Villager } from "./types/Villager"
@@ -54,29 +63,80 @@ export class DudeFactory {
     }
 
     /**
+     * Host only!
+     * @param multiplayerId
+     */
+    newOnlinePlayer(uuid: string) {
+        const playerSaveData = saveManager.getState().onlinePlayers[uuid]
+        playerSaveData.uuid = uuid
+
+        const position = (() => {
+            if (playerSaveData?.pos) {
+                return Point.fromString(playerSaveData.pos)
+            }
+            const tileOptions = tilesAround(player().tile, 3)
+                .filter((p) => player().location.getGround(p) && !player().location.isOccupied(p))
+                .sort((a, b) => a.distanceTo(player().tile) - b.distanceTo(player().tile))
+            // take any tile in the 2nd half when sorted by distance
+            const furtherHalf = tileOptions.slice(tileOptions.length / 2)
+            return Lists.oneOf(furtherHalf).plus(pt(0.5)).times(TILE_SIZE)
+        })()
+
+        this.make(DudeType.PLAYER, position, playerSaveData, player().location, false)
+    }
+
+    /**
+     * Host only!
      * Create a new Dude in the specified location, defaults to the exterior world location
      * @param hasPendingSlot should be true if the character already had a home reserved
      *                       for them. If not, they will try to mark a spot as pending.
      */
-    new(type: DudeType, pos: Point, location: Location = camp(), hasPendingSlot = false): Dude {
-        return this.make(type, pos, null, location, hasPendingSlot)
+    create(type: DudeType, pos: Point, location: Location = camp(), hasPendingSlot = false): Dude {
+        return this.syncCreate(type, newUUID(), pos.x, pos.y, location.uuid, hasPendingSlot)
     }
 
     /**
      * Instantiates a Dude+Entity in the specified location
      */
     load(saveState: DudeSaveState, location: Location) {
+        // Guest player state will get serialized but we don't want to spawn them on the host when loading
+        // MPTODO: Persist guest state so they can leave and rejoin
+        if (session.isHost() && saveState.uuid.startsWith(ONLINE_PLAYER_DUDE_ID_PREFIX)) {
+            return
+        }
+
         this.make(saveState.type, Point.fromString(saveState.pos), saveState, location, false)
     }
+
+    private readonly syncCreate = syncFn(
+        "df:create",
+        (
+            type: DudeType,
+            uuid: string,
+            posX: number,
+            posY: number,
+            locationUUID: string,
+            hasPendingSlot: boolean
+        ) => {
+            return this.make(
+                type,
+                pt(posX, posY),
+                { uuid },
+                LocationManager.instance.get(locationUUID),
+                hasPendingSlot
+            )
+        }
+    )
 
     private make(
         type: DudeType,
         pos: Point,
-        saveState: DudeSaveState,
+        saveState: Partial<DudeSaveState> & { uuid: string },
         location: Location,
         hasPendingSlot: boolean
     ): Dude {
-        const uuid = saveState?.uuid ?? newUUID()
+        const uuid = saveState.uuid
+        const invIdPrefix = Dude.createSyncId(uuid, "iv")
 
         // defaults
         let factions: DudeFaction[] = [DudeFaction.VILLAGERS]
@@ -88,25 +148,56 @@ export class DudeFactory {
         let dialogue: string = EMPTY_DIALOGUE
         let additionalComponents: Component[] = []
         let blob = {}
-        let inventoryClass = Inventory
-        let defaultInventory = new Inventory()
+        let inventorySupplier = () => new Inventory(invIdPrefix)
+        let defaultInventorySupplier = () => new Inventory(invIdPrefix)
         let colliderSize = DEFAULT_COLLIDER_SIZE
         let nameGen: () => string = () => undefined
 
         // type-specific defaults
         switch (type) {
             case DudeType.PLAYER: {
-                animationName = "knight_f"
+                animationName = "lizard_m"
                 weapon = WeaponType.SWORD
                 shield = ShieldType.BASIC
                 maxHealth = 4
                 speed = 0.075
-                additionalComponents = [new Player(), new CutscenePlayerController()]
-                window["player"] = additionalComponents[0]
-                inventoryClass = PlayerInventory
-                defaultInventory = new PlayerInventory()
-                defaultInventory.addItem(Item.SWORD)
-                defaultInventory.addItem(Item.BASIC_SHIELD)
+
+                // Inventory stuff
+                const isLocalHostPlayer =
+                    session.isHost() && !uuid.startsWith(ONLINE_PLAYER_DUDE_ID_PREFIX)
+                const isLocalGuestPlayer = uuid === ONLINE_PLAYER_DUDE_ID_PREFIX + MULTIPLAYER_ID
+                inventorySupplier = () => new PlayerInventory(uuid)
+                defaultInventorySupplier = () => {
+                    const defaultPlayerInv = new PlayerInventory(uuid)
+                    defaultPlayerInv.addItem(Item.SWORD, 1, { equipped: "weapon" }, true)
+                    defaultPlayerInv.addItem(Item.BASIC_SHIELD, 1, { equipped: "shield" }, true)
+                    return defaultPlayerInv
+                }
+
+                if (session.isHost()) {
+                    if (isLocalHostPlayer) {
+                        animationName = "knight_f"
+                        additionalComponents = [new HostPlayer(), new CutscenePlayerController()]
+                        window["player"] = additionalComponents[0]
+                    } else {
+                        additionalComponents = [new GuestPlayer()]
+                        const playerIndex =
+                            location.getDudes().filter((d) => d.type === DudeType.PLAYER).length + 1
+                        window[`player${playerIndex}`] = additionalComponents[0]
+                    }
+                } else {
+                    /**
+                     * For guest sessions, all the players are basically normal dudes
+                     * except for the one that you control, which is responsible for
+                     * sending data to the host to update that dude
+                     */
+                    if (isLocalGuestPlayer) {
+                        additionalComponents = [new GuestPlayer(), new CutscenePlayerController()]
+                        window["player"] = additionalComponents[0]
+                    } else {
+                        // This is an uncontrolled player on a different guest's machine
+                    }
+                }
                 break
             }
             case DudeType.DIP: {
@@ -205,8 +296,12 @@ export class DudeFactory {
                 speed *= 0.6
                 dialogue = DOCTOR_DIALOGUE_ENTRYPOINT
                 additionalComponents = [new NPC(), new Villager()]
-                defaultInventory.addItem(Item.WEAK_MEDICINE, 3)
-                defaultInventory.addItem(Item.HEART_CONTAINER, 1)
+                defaultInventorySupplier = () => {
+                    const inv = new Inventory(invIdPrefix)
+                    inv.addItem(Item.WEAK_MEDICINE, 3)
+                    inv.addItem(Item.HEART_CONTAINER, 1)
+                    return inv
+                }
                 nameGen = () => peopleNames.generate("<doctor>")
                 break
             }
@@ -312,10 +407,19 @@ export class DudeFactory {
                 break
             }
             case DudeType.GNOLL_SCOUT: {
-                factions = [DudeFaction.GNOLLS, DudeFaction.WOLVES, DudeFaction.VILLAGERS]
+                factions = [DudeFaction.GNOLLS, DudeFaction.WOLVES]
                 animationName = "GnollScout"
                 weapon = WeaponType.UNARMED
                 additionalComponents = [new NPC()]
+                maxHealth = 2
+                speed *= 0.8
+                break
+            }
+            case DudeType.GNOLL_SHAMAN: {
+                factions = [DudeFaction.GNOLLS, DudeFaction.WOLVES]
+                animationName = "GnollShaman"
+                weapon = WeaponType.UNARMED
+                additionalComponents = [new NPC(), new ShamanHealer()]
                 maxHealth = 2
                 speed *= 0.8
                 break
@@ -364,6 +468,23 @@ export class DudeFactory {
             }
         }
 
+        const inventory = saveState?.inventory
+            ? inventorySupplier().load(saveState.inventory)
+            : defaultInventorySupplier()
+
+        let weaponType = saveState?.weapon ?? weapon
+        let shieldType = saveState?.shield ?? shield
+
+        // if the inventory has any weapons or shields marked 'equipped', overwrite
+        // the existing fields. not all weapons/shields are necessarily inv items
+        inventory.getStacks().forEach((stack) => {
+            if (stack.metadata.equipped === "weapon") {
+                weaponType = ITEM_METADATA_MAP[stack.item].equippableWeapon
+            } else if (stack.metadata.equipped === "shield") {
+                shieldType = ITEM_METADATA_MAP[stack.item].equippableShield
+            }
+        })
+
         // use saved data instead of defaults
         const d = new Dude({
             uuid,
@@ -372,14 +493,12 @@ export class DudeFactory {
             factions, // TODO: Save factions? Only if they become mutable
             characterAnimName: saveState?.anim ?? animationName,
             standingPosition: pos,
-            weaponType: saveState?.weapon ?? weapon,
-            shieldType: saveState?.shield ?? shield,
+            weaponType,
+            shieldType,
             maxHealth: saveState?.maxHealth ?? maxHealth,
             health: saveState?.health ?? maxHealth,
             speed: speed ?? speed,
-            inventory: saveState?.inventory
-                ? inventoryClass.load(saveState.inventory)
-                : defaultInventory,
+            inventory,
             dialogue: saveState?.dialogue ?? dialogue,
             blob: saveState?.blob ?? blob,
             colliderSize: colliderSize,

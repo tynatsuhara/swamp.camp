@@ -16,7 +16,7 @@ export const Notifications: { [key: string]: Notification } = {
 
 const OFFSET = new Point(-4, 4)
 const ICON_WIDTH = 20
-const DEFAULT_LIFESPAN_MILLIS = 5_000
+const DEFAULT_LIFESPAN_MILLIS = 3_000
 
 export type Notification = {
     text: string
@@ -48,11 +48,12 @@ class NotificationComponent extends Component {
             this.width = textPixelWidth + TILE_SIZE + (!!data.icon ? ICON_WIDTH : 0)
             this.height = TILE_SIZE * 2 - 2
             const position = initialPos ?? this.getPosition()
+            const depth = UIStateManager.UI_SPRITE_DEPTH + 19
 
             const { transform, sprites } = NineSlice.makeStretchedNineSliceComponents(
                 Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"),
                 new Point(this.width, this.height),
-                { position }
+                { position, depth }
             )
             sprites.forEach((c) => this.entity.addComponent(c))
             this.t = transform
@@ -64,7 +65,7 @@ class NotificationComponent extends Component {
                     .toComponent(
                         SpriteTransform.new({
                             position: new Point(TILE_SIZE / 2, 7),
-                            depth: UIStateManager.UI_SPRITE_DEPTH + 1,
+                            depth: 1,
                         }).relativeTo(this.t)
                     )
                 this.entity.addComponent(icon)
@@ -87,7 +88,7 @@ class NotificationComponent extends Component {
                 TEXT_SIZE,
                 TEXT_FONT,
                 Color.RED_2,
-                UIStateManager.UI_SPRITE_DEPTH + 1
+                UIStateManager.UI_SPRITE_DEPTH + 20
             ),
         ]
     }

@@ -1,7 +1,7 @@
 import { Component, Point } from "brigsby/dist"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
-import { Player } from "../characters/Player"
+import { DudeType } from "../characters/DudeType"
 import { Enemy } from "../characters/types/Enemy"
 import { ShroomNPC } from "../characters/types/ShroomNPC"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
@@ -18,6 +18,7 @@ import { CutsceneManager } from "./CutsceneManager"
 import { TextOverlayManager } from "./TextOverlayManager"
 
 // This is the cutscene that plays when the player dies
+// MPTODO: Only trigger this is all players are dead. Allow others to revive!
 export class DeathCutscene extends Component {
     // durations in ms
     private readonly TRANSITION_PAUSE = 1000
@@ -33,7 +34,9 @@ export class DeathCutscene extends Component {
             .getTileSource(
                 Lists.oneOf(["tombstone1", "tombstone2", "skull-n-bones", "skull1", "skull2"])
             )
-            .toComponent(SpriteTransform.new({ position: centerPos }))
+            .toComponent(
+                SpriteTransform.new({ position: centerPos, depth: TextOverlayManager.DEPTH })
+            )
 
         const text = Lists.oneOf(["You died. How unfortunate."])
 
@@ -60,15 +63,23 @@ export class DeathCutscene extends Component {
 
         // If the player dies off map, just put them at a random on-map location.
         // TODO: Respawn them at the doctor, their bed, or somewhere else that makes sense.
-        if (Player.instance.isOffMap()) {
-            const newSpot = Lists.findRandom(
-                camp().getGroundSpots(),
-                (pos) => !Ground.isWater(camp().getGround(pos)?.type) && !camp().isOccupied(pos)
-            )
-            Player.instance.dude.moveTo(newSpot.times(TILE_SIZE), true)
-        }
+        here()
+            .getDudes()
+            .filter((d) => d.type === DudeType.PLAYER && !d.isAlive)
+            .forEach((p) => {
+                if (p.getCurrentOffMapArea()) {
+                    const newSpot = Lists.findRandom(
+                        camp().getGroundSpots(),
+                        (pos) =>
+                            !Ground.isWater(camp().getGround(pos)?.type) && !camp().isOccupied(pos)
+                    )
+                    p.moveTo(newSpot.times(TILE_SIZE), true)
+                }
 
-        Player.instance.dude.revive()
+                setTimeout(() => p.revive(), 850)
+            })
+
+        Camera.instance.jumpCutToFocalPoint()
 
         // Clear out any enemies
         here()

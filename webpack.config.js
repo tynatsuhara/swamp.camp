@@ -1,7 +1,9 @@
 const path = require("path")
 
 module.exports = (_, argv) => ({
-    entry: "./src/app.ts",
+    entry: {
+        app: "./src/app.ts",
+    },
     module: {
         rules: [
             {
@@ -16,7 +18,7 @@ module.exports = (_, argv) => ({
         symlinks: false,
     },
     output: {
-        filename: "app.js",
+        filename: "[name].js",
         path: path.resolve(__dirname, "static"),
     },
     devtool: argv.mode === "development" ? "eval-cheap-module-source-map" : "nosources-source-map",

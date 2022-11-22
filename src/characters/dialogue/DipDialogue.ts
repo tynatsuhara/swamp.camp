@@ -24,13 +24,13 @@ import {
 export const ROCKS_NEEDED_FOR_CAMPFIRE = 8
 const CRAFT_OPTION = "<Craft>"
 
-export const DIP_STARTING_DIALOGUE = "dip-0"
+export const DIP_STARTING_DIALOGUE = "dip-0",
+    DIP_ENTRYPOINT = "dip-6"
 const DIP_1 = "dip-1",
     DIP_2 = "dip-2",
     DIP_3 = "dip-3",
     DIP_BEFRIEND = "dip-4",
     DIP_MAKE_CAMPFIRE = "dip-5",
-    DIP_ENTRYPOINT = "dip-6",
     DIP_TENT_PLACED = "dip-7",
     DIP_UPGRADES = "dip-8"
 

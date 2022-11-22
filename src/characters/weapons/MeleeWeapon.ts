@@ -2,6 +2,7 @@ import { Point, UpdateData } from "brigsby/dist"
 import { SpriteComponent, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Animator } from "brigsby/dist/util"
 import { Tilesets } from "../../graphics/Tilesets"
+import { session } from "../../online/session"
 import { DudeType } from "../DudeType"
 import { Weapon } from "./Weapon"
 import { WeaponType } from "./WeaponType"
@@ -85,18 +86,21 @@ export class MeleeWeapon extends Weapon {
         if (!this.enabled) {
             return
         }
+
         const attackDistance = this.getRange() + 4 // add a tiny buffer for small weapons like the dagger to still work
 
         // TODO maybe only allow big weapons to hit multiple targets
         const enemies = Weapon.getEnemiesInRange(this.dude, attackDistance)
 
-        enemies.forEach((d) => {
-            d.damage(1, {
-                direction: d.standingPosition.minus(this.dude.standingPosition),
-                knockback: 30,
-                attacker: this.dude,
+        if (session.isHost()) {
+            enemies.forEach((d) => {
+                d.damage(1, {
+                    direction: d.standingPosition.minus(this.dude.standingPosition),
+                    knockback: 30,
+                    attacker: this.dude,
+                })
             })
-        })
+        }
 
         if (this.dude.type === DudeType.PLAYER && enemies.length === 0) {
             Weapon.hitResources(this.dude)

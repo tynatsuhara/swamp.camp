@@ -5,7 +5,7 @@ import { Dude } from "../characters/Dude"
 import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
 import { DudeFaction, DudeFactory } from "../characters/DudeFactory"
 import { DudeType } from "../characters/DudeType"
-import { Player } from "../characters/Player"
+import { player } from "../characters/player"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { saveManager } from "../SaveManager"
 import { ControlsUI } from "../ui/ControlsUI"
@@ -44,10 +44,10 @@ export class IntroCutscene extends Component {
         // has to start before the initial render, we do it in the
         // constructor to prevent a single-frame "flash" of the actual game
 
-        DudeFactory.instance.new(DudeType.DIP, Point.ZERO)
-        DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(3, 1).times(TILE_SIZE))
-        DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(-1, 3).times(TILE_SIZE))
-        DudeFactory.instance.new(DudeType.ORC_WARRIOR, new Point(-4, 0).times(TILE_SIZE))
+        DudeFactory.instance.create(DudeType.DIP, Point.ZERO)
+        DudeFactory.instance.create(DudeType.ORC_WARRIOR, new Point(3, 1).times(TILE_SIZE))
+        DudeFactory.instance.create(DudeType.ORC_WARRIOR, new Point(-1, 3).times(TILE_SIZE))
+        DudeFactory.instance.create(DudeType.ORC_WARRIOR, new Point(-4, 0).times(TILE_SIZE))
 
         const characterAnimation = (key: string, transform: SpriteTransform) => {
             const anim = DudeAnimationUtils.getCharacterIdleAnimation(key).toComponent(transform)
@@ -64,13 +64,17 @@ export class IntroCutscene extends Component {
         const charactersAtTop = [
             characterAnimation(
                 "MountainKing",
-                SpriteTransform.new({ position: centerPos.plusX(-35) })
+                SpriteTransform.new({
+                    position: centerPos.plusX(-35),
+                    depth: TextOverlayManager.DEPTH,
+                })
             ),
             characterAnimation(
                 "knight_f",
                 SpriteTransform.new({
                     position: centerPos.plusX(9),
                     mirrorX: true,
+                    depth: TextOverlayManager.DEPTH,
                 })
             ),
         ]
@@ -118,7 +122,7 @@ ANOTHER thing - Only one of the explorers returned, and they reported that their
             .getDudes()
             .filter((d) => d.type === DudeType.DIP)[0]
 
-        Queequeg.instance.pushPassenger(Player.instance.dude)
+        Queequeg.instance.pushPassenger(player())
 
         setTimeout(() => {
             Queequeg.instance.arrive()
@@ -129,13 +133,13 @@ ANOTHER thing - Only one of the explorers returned, and they reported that their
         }, this.PAN_TO_DIP)
 
         setTimeout(() => {
-            Queequeg.instance.removePassenger(Player.instance.dude)
+            Queequeg.instance.removePassenger(player())
         }, this.GET_OFF_SHIP)
 
         setTimeout(() => {
             this.dip.dialogue = DIP_STARTING_DIALOGUE
             CutscenePlayerController.instance.disable()
-            Camera.instance.focusOnDude(Player.instance.dude)
+            Camera.instance.focusOnDude(player())
             this.waitingForOrcsToDie = true
         }, this.PAN_BACK)
     }

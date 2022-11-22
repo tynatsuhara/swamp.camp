@@ -1,4 +1,4 @@
-import { Player } from "../characters/Player"
+import { player } from "../characters/player"
 import { Singletons } from "../Singletons"
 import { Ambiance } from "./Ambiance"
 import { Music } from "./Music"
@@ -50,7 +50,7 @@ export class WorldAudioContext {
         // This is a proxy that prevents music from starting until
         // the game has really started (after the first cutscene)
         // TODO: How to do this better?
-        if (!Player.instance?.dude) {
+        if (!player()) {
             return
         }
         this.listeners.forEach((l) => l(this))

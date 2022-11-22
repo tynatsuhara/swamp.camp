@@ -4,6 +4,7 @@ import { SpriteTransform } from "brigsby/dist/sprites"
 import { Maths } from "brigsby/dist/util"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Item, spawnItem } from "../../items/Items"
+import { session } from "../../online/session"
 import { Hittable } from "./Hittable"
 
 export class HittableResource extends Hittable {
@@ -45,25 +46,29 @@ export class HittableResource extends Hittable {
         let placeDistance = finishingMove ? 2 : 8
         let itemsOut = finishingMove ? 3 : 1
 
-        for (let i = 0; i < itemsOut; i++) {
-            const items = this.itemSupplier()
-            for (const item of items) {
-                const itemDirection = hitDir.randomlyShifted(0.5).normalized()
-                const velocity = itemDirection.times(1 + 3 * Math.random())
-                spawnItem({
-                    pos: this.position
-                        .plus(new Point(0, TILE_SIZE / 2))
-                        .plus(itemDirection.times(placeDistance)), // bottom center, then randomly adjusted
-                    item,
-                    velocity: velocity.times(velocityMultiplier),
-                    sourceCollider: this.entity.getComponent(BoxCollider),
-                })
+        if (session.isHost()) {
+            for (let i = 0; i < itemsOut; i++) {
+                const items = this.itemSupplier()
+                for (const item of items) {
+                    const itemDirection = hitDir.randomlyShifted(0.5).normalized()
+                    const velocity = itemDirection.times(1 + 3 * Math.random())
+                    spawnItem({
+                        pos: this.position
+                            .plus(new Point(0, TILE_SIZE / 2))
+                            .plus(itemDirection.times(placeDistance)), // bottom center, then randomly adjusted
+                        item,
+                        velocity: velocity.times(velocityMultiplier),
+                        sourceCollider: this.entity.getComponent(BoxCollider),
+                    })
+                }
             }
         }
 
         if (finishingMove) {
             this.finishCallback()
-            this.entity.selfDestruct()
+            if (session.isHost()) {
+                this.entity.selfDestruct()
+            }
         }
     }
 

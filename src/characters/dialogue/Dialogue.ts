@@ -1,6 +1,6 @@
 import { saveManager } from "../../SaveManager"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
-import { Player } from "../Player"
+import { player } from "../player"
 import { BERTO_INTRO_DIALOGUE } from "./BertoDialogue"
 import { DIP_INTRO_DIALOGUE } from "./DipDialogue"
 import { DOCTOR_DIALOGUE } from "./DoctorDialogue"
@@ -70,7 +70,7 @@ export const saveAfterDialogueStage = () => {
     // save after a delay to account for the next dialogue stage being set
     setTimeout(() => saveManager.autosave(), 500)
 }
-export const inv = () => Player.instance.dude.inventory
+export const inv = () => player().inventory
 
 export const getExitText = () => "Never mind."
 
@@ -108,12 +108,12 @@ export class NextDialogue {
     }
 }
 
-export type DialogueSet = { [key: string]: () => DialogueInstance }
+export type DialogueSet = { [key: string]: () => DialogueInstance | undefined }
 
 /**
  * @param dialogue the unique dialogue key
  */
-export const getDialogue = (dialogue: string): DialogueInstance => {
+export const getDialogue = (dialogue: string): DialogueInstance | undefined => {
     if (dialogue === EMPTY_DIALOGUE) {
         return
     }

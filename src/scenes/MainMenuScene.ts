@@ -7,12 +7,14 @@ import { Ambiance } from "../audio/Ambiance"
 import { loadDeferredAudio } from "../audio/DeferLoadAudio"
 import { Music } from "../audio/Music"
 import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
-import { Player } from "../characters/Player"
+import { resetPlayerInstances } from "../characters/player"
 import { controls } from "../Controls"
 import { DevControls } from "../debug/DevControls"
 import { FireParticles } from "../graphics/particles/FireParticles"
 import { Particles } from "../graphics/particles/Particles"
 import { getFilesToLoadForGame, getImage, Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { session, SESSION_ID_LENGTH } from "../online/session"
+import { guestOnJoin } from "../online/sync"
 import { saveManager } from "../SaveManager"
 import { Save } from "../saves/SaveGame"
 import { IS_NATIVE_APP, SwampCampGame, ZOOM } from "../SwampCampGame"
@@ -20,6 +22,7 @@ import { Cursor } from "../ui/Cursor"
 import { MainMenuButtonSection } from "../ui/MainMenuButtonSection"
 import { PlumePicker, PLUME_COLORS } from "../ui/PlumePicker"
 import { TEXT_SIZE } from "../ui/Text"
+import { TextInput } from "../ui/TextInput"
 import { UISounds } from "../ui/UISounds"
 import { UIStateManager } from "../ui/UIStateManager"
 import { DarknessMask } from "../world/DarknessMask"
@@ -31,7 +34,16 @@ enum Menu {
     PICK_COLOR,
     CREDITS,
     DOWNLOADS,
+    MULTIPLAYER,
 }
+
+enum SessionLoadingState {
+    CONNECTING = "connecting...",
+    LOADING_WORLD = "loading world...",
+    NOT_FOUND = "session not found!",
+}
+
+let cancelJoinTimeout: NodeJS.Timeout
 
 export class MainMenuScene {
     private plumes: PlumePicker
@@ -41,6 +53,8 @@ export class MainMenuScene {
     private view: View
     private allAssetsLoaded = false
     private waitingForAssets = false
+    private sessionLoadingState: SessionLoadingState | undefined
+    private sessionIdTextInput: TextInput
 
     private menu = Menu.ROOT
 
@@ -48,7 +62,7 @@ export class MainMenuScene {
         this.loadAssets(false)
     }
 
-    private loadAssets(blocking = true) {
+    private async loadAssets(blocking = true) {
         UISounds.loadAll()
         if (this.allAssetsLoaded) {
             return Promise.resolve()
@@ -57,18 +71,18 @@ export class MainMenuScene {
             console.log("waiting for assets to load before continuing")
             this.waitingForAssets = true
         }
-        return assets.loadImageFiles(getFilesToLoadForGame()).then(() => {
-            // it's probably okay if audio loads late
-            loadDeferredAudio()
-
-            this.allAssetsLoaded = true
-            this.waitingForAssets = false
-            console.log("assets loaded!")
-        })
+        await assets.loadImageFiles(getFilesToLoadForGame())
+        // it's probably okay if audio loads late
+        loadDeferredAudio()
+        this.allAssetsLoaded = true
+        this.waitingForAssets = false
+        console.log("assets loaded!")
     }
 
     reset() {
-        Player.instance = undefined
+        this.sessionLoadingState = undefined
+
+        resetPlayerInstances()
 
         // TODO: this isn't fully effective
         Music.stop()
@@ -95,7 +109,6 @@ export class MainMenuScene {
     loadGame(slot: number) {
         this.loadAssets().then(() => {
             saveManager.load(slot)
-            SwampCampGame.instance.loadGameScene()
         })
         this.render(Menu.ROOT) // force re-render
     }
@@ -173,9 +186,77 @@ export class MainMenuScene {
             new Entity([new DevControls()]),
         ]
 
-        const link = (url: string) => () => window.open(`https://${url}`, "_blank")
+        const link = (url: string) => () => window.open(url, "_blank")
 
-        if (this.waitingForAssets) {
+        if (this.menu === Menu.MULTIPLAYER) {
+            if (this.sessionLoadingState) {
+                entities.push(
+                    new MainMenuButtonSection(menuTop)
+                        .addText(this.sessionLoadingState)
+                        .add("cancel", () => {
+                            clearTimeout(cancelJoinTimeout)
+                            this.sessionLoadingState = undefined
+                            session.close()
+                            this.render(Menu.MULTIPLAYER)
+                        })
+                        .getEntity()
+                )
+            } else {
+                const cancelJoin = () => {
+                    clearTimeout(cancelJoinTimeout)
+                    this.sessionIdTextInput = this.sessionIdTextInput?.delete()
+                    this.sessionLoadingState = undefined
+                    session.close()
+                    this.render(Menu.ROOT) // force re-render
+                }
+
+                const joinSession = () => {
+                    const sessionId = this.sessionIdTextInput.getValue()
+                    if (!sessionId.length) {
+                        return
+                    }
+
+                    Promise.all([this.loadAssets(), session.join(sessionId)]).then(() => {
+                        if (this.sessionLoadingState) {
+                            clearTimeout(cancelJoinTimeout)
+                            this.sessionLoadingState = SessionLoadingState.LOADING_WORLD
+                            this.render(Menu.MULTIPLAYER) // force re-render
+                            guestOnJoin()
+                        }
+                    })
+
+                    this.sessionIdTextInput = this.sessionIdTextInput.delete()
+                    this.sessionLoadingState = SessionLoadingState.CONNECTING
+
+                    cancelJoinTimeout = setTimeout(() => {
+                        cancelJoin()
+                        this.sessionLoadingState = SessionLoadingState.NOT_FOUND
+                        this.render(Menu.MULTIPLAYER) // force re-render
+                    }, 15_000)
+
+                    this.render(Menu.MULTIPLAYER) // force re-render
+                }
+
+                if (!this.sessionIdTextInput) {
+                    this.sessionIdTextInput = new TextInput(
+                        "SESSION @",
+                        menuTop,
+                        SESSION_ID_LENGTH,
+                        joinSession
+                    )
+                } else {
+                    this.sessionIdTextInput.reposition(menuTop)
+                }
+
+                entities.push(
+                    new MainMenuButtonSection(menuTop)
+                        .addLineBreak()
+                        .add("connect", joinSession, !this.sessionLoadingState)
+                        .add("cancel", cancelJoin)
+                        .getEntity()
+                )
+            }
+        } else if (this.waitingForAssets) {
             entities.push(new MainMenuButtonSection(menuTop).addText("loading...").getEntity())
         } else if (this.menu === Menu.ROOT) {
             const saveCount = saveManager.getSaveCount()
@@ -184,6 +265,7 @@ export class MainMenuScene {
                     .add("continue", () => this.loadLastSave(), saveCount > 0)
                     .add("load save", () => this.render(Menu.LOAD_GAME), saveCount > 1)
                     .add("New game", () => this.render(Menu.NEW_GAME))
+                    .add("multiplayer", () => this.render(Menu.MULTIPLAYER))
                     .add("Download", () => this.render(Menu.DOWNLOADS), !IS_NATIVE_APP)
                     .add("Credits", () => this.render(Menu.CREDITS))
                     .getEntity()
@@ -194,19 +276,19 @@ export class MainMenuScene {
                     .add(
                         "Windows",
                         link(
-                            "github.com/tylerbonnell/swamp-camp-native/releases/download/windows-latest/swamp-camp-win32-x64.zip"
+                            "https://github.com/tylerbonnell/swamp-camp-native/releases/download/windows-latest/swamp-camp-win32-x64.zip"
                         )
                     )
                     .add(
                         "Mac (Intel)",
                         link(
-                            "github.com/tylerbonnell/swamp-camp-native/releases/download/macos-latest/swamp-camp-darwin-x64.zip"
+                            "https://github.com/tylerbonnell/swamp-camp-native/releases/download/macos-latest/swamp-camp-darwin-x64.zip"
                         )
                     )
                     .add(
                         "Mac (Apple Silicon)",
                         link(
-                            "github.com/tylerbonnell/swamp-camp-native/releases/tag/macos-apple-silicon"
+                            "https://github.com/tylerbonnell/swamp-camp-native/releases/tag/macos-apple-silicon"
                         )
                     )
                     .add("Back", () => this.render(Menu.ROOT))
@@ -266,20 +348,20 @@ export class MainMenuScene {
         } else if (this.menu === Menu.CREDITS) {
             entities.splice(0) // don't show title and scene
             const creditEntries: [credit: string, fn: () => void][] = [
-                ["a game by Ty Natsuhara", link("ty.pizza/")],
+                ["a game by Ty Natsuhara", link("https://ty.pizza/")],
                 null,
-                ["add'l art: Robert Norenberg", link("0x72.pl")],
-                ["           Cael Johnson    ", link("caeljohnson.artstation.com")],
-                ["           Kenney          ", link("kenney.nl")],
-                ["    music: Juhani Junkala  ", link("juhanijunkala.com")],
-                ["           Brent Bunn      ", link("bertn1991.newgrounds.com")],
-                ["           Playonloop.com  ", link("playonloop.com")],
-                ["    sound: BurghRecords    ", link("www.edinburghrecords.com")],
-                ["           Antoine Goumain ", link("antoinegoumain.fr")],
-                ["           Thor Arisland   ", link("tcarisland.no")],
+                ["add'l art: Robert Norenberg", link("https://0x72.pl")],
+                ["           Cael Johnson    ", link("https://caeljohnson.artstation.com")],
+                ["           Kenney          ", link("https://kenney.nl")],
+                ["    music: Juhani Junkala  ", link("https://juhanijunkala.com")],
+                ["           Brent Bunn      ", link("https://bertn1991.newgrounds.com")],
+                ["           Playonloop.com  ", link("https://playonloop.com")],
+                ["    sound: BurghRecords    ", link("https://www.edinburghrecords.com")],
+                ["           Antoine Goumain ", link("https://antoinegoumain.fr")],
+                ["           Thor Arisland   ", link("https://tcarisland.no")],
                 // ["           Morten SΘegaard ", link("twitter.com/littlerobotsfx")],  // TODO if we use the "voices" pack
                 null,
-                ["made with brigsby!", link("brigsby.js.org/")],
+                ["made with brigsby!", link("https://brigsby.js.org/")],
                 null,
                 ["back", () => this.render(Menu.ROOT)],
             ]

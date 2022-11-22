@@ -1,5 +1,5 @@
 import { Component, Point, UpdateData } from "brigsby/dist"
-import { Player } from "../characters/Player"
+import { player } from "../characters/player"
 import { Settings } from "../Settings"
 
 // We store and use a single instance of each unique audio file because having
@@ -55,7 +55,7 @@ export class PointAudio extends Component {
         }
 
         // TODO: Maybe this should be relative to the camera and not the player?
-        const distance = Player.instance.dude.standingPosition.distanceTo(this.position)
+        const distance = player().standingPosition.distanceTo(this.position)
 
         const audioElement = audioElements[this.file]
         const volumeByDistance =

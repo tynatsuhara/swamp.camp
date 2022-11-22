@@ -169,6 +169,8 @@ class ControlsWrapper extends Component {
 
     getInventoryOptionTwoString = () => (isGamepadMode ? TextIcon.GAMEPAD_TRIANGLE : "[f]")
 
+    // TODO maybe revisit these controls on gamepad
+
     isInventoryStackPickUp = () =>
         check({
             kbm: () => input.isMouseDown,
@@ -177,8 +179,24 @@ class ControlsWrapper extends Component {
 
     isInventoryStackDrop = () =>
         check({
-            kbm: () => input.isMouseUp,
+            kbm: () => input.isMouseDown,
             gamepad: () => gamepadInput.isButtonUp(GamepadButton.X),
+        })
+
+    isInventoryStackPickUpHalf = () =>
+        check({
+            kbm: () => input.isRightMouseDown,
+            gamepad: () =>
+                gamepadInput.isButtonHeld(GamepadButton.L1) &&
+                gamepadInput.isButtonDown(GamepadButton.X),
+        })
+
+    isInventoryStackDropOne = () =>
+        check({
+            kbm: () => input.isRightMouseDown,
+            gamepad: () =>
+                gamepadInput.isButtonHeld(GamepadButton.L1) &&
+                gamepadInput.isButtonDown(GamepadButton.X),
         })
 
     // ======== OTHER MENU STUFF ========
@@ -322,7 +340,7 @@ class ControlsWrapper extends Component {
             }
             return 0
         } else {
-            return this.translateToWorldSpace(input.mousePos).x - dude.standingPosition.x
+            return Math.sign(this.translateToWorldSpace(input.mousePos).x - dude.standingPosition.x)
         }
     }
 

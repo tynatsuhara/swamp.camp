@@ -1,17 +1,16 @@
 import { Component, Point } from "brigsby/dist"
-import { TextRender } from "brigsby/dist/renderer"
 import { Maths } from "brigsby/dist/util"
 import { controls } from "../Controls"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "./Color"
-import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
+import { formatText, NO_BREAK_SPACE_CHAR, TextAlign, TEXT_PIXEL_WIDTH } from "./Text"
 import { UISounds } from "./UISounds"
 import { UIStateManager } from "./UIStateManager"
 
 export class MainMenuButton extends Component {
     private readonly width: number = 500
 
-    private readonly position: Point
+    private readonly centerPos: Point
     private readonly text: string
     private readonly onClick: () => void
     private readonly onHover: () => void
@@ -19,14 +18,14 @@ export class MainMenuButton extends Component {
     private hovering: boolean = false
 
     constructor(
-        position: Point,
+        centerPos: Point,
         text: string,
         onClick: () => void,
         onHover: () => void,
         hoverable: boolean
     ) {
         super()
-        this.position = position.apply(Math.floor)
+        this.centerPos = centerPos.apply(Math.floor)
         this.text = text
         this.onClick = onClick
         this.onHover = onHover
@@ -37,7 +36,7 @@ export class MainMenuButton extends Component {
         this.hovering =
             this.hoverable &&
             Maths.rectContains(
-                this.position.plusX(-this.width / 2).plusY(-4),
+                this.centerPos.plusX(-this.width / 2).plusY(-4),
                 new Point(this.width, TILE_SIZE),
                 controls.getMousePos()
             )
@@ -61,28 +60,29 @@ export class MainMenuButton extends Component {
 
         // if manually aligning whitespace, put "> " after leading spaces
         if (this.text.startsWith("  ")) {
+            const startSpaces = text.length - text.trimStart().length
             if (this.hovering) {
-                const startSpaces = text.length - text.trimStart().length
-                text = " ".repeat(startSpaces - 2) + "> " + text.trimStart()
+                text = NO_BREAK_SPACE_CHAR.repeat(startSpaces - 2) + "> " + text.trimStart()
+            } else {
+                text = NO_BREAK_SPACE_CHAR.repeat(startSpaces - 2) + "> " + text.trimStart()
             }
         } else {
-            text = this.hovering ? `> ${this.text}  ` : `  ${this.text}  `
+            const nbsp = NO_BREAK_SPACE_CHAR + NO_BREAK_SPACE_CHAR
+            text = this.hovering ? `> ${this.text}${nbsp}` : `${nbsp}${this.text}${nbsp}`
         }
 
         const offset = Math.floor((this.width - text.length * TEXT_PIXEL_WIDTH) / 2)
 
-        const defaultColor = Color.GREEN_5
         const hoverColor = Color.WHITE
+        const defaultColor = this.hoverable ? Color.GREEN_5 : hoverColor
 
-        return [
-            new TextRender(
-                text.toUpperCase(),
-                this.position.plusX(-this.width / 2).plusX(offset),
-                TEXT_SIZE,
-                TEXT_FONT,
-                this.hovering ? hoverColor : defaultColor,
-                UIStateManager.UI_SPRITE_DEPTH
-            ),
-        ]
+        return formatText({
+            width: this.width,
+            text: text.toUpperCase(),
+            position: this.centerPos.plusX(-this.width / 2).plusX(offset),
+            alignment: TextAlign.LEFT,
+            color: this.hovering ? hoverColor : defaultColor,
+            depth: UIStateManager.UI_SPRITE_DEPTH,
+        })
     }
 }

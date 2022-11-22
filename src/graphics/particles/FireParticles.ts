@@ -22,9 +22,7 @@ export class FireParticles extends RepeatedInvoker {
         const size = this.size
         const fireBase = positionSupplier()
         const diff = this.lastPos.minus(fireBase)
-        const velocity = diff.equals(Point.ZERO)
-            ? Point.ZERO
-            : diff.normalized().times(FIRE_DRIFT_DISTANCE)
+        const velocity = diff.normalizedOrZero().times(FIRE_DRIFT_DISTANCE)
         if (!depthSupplier) {
             depthSupplier = () => fireBase.y
         }

@@ -1,4 +1,5 @@
 import { Component, pt } from "brigsby/dist"
+import { session } from "../../online/session"
 import { ElementType } from "../../world/elements/Elements"
 import { Ground } from "../../world/ground/Ground"
 import { LightManager } from "../../world/LightManager"
@@ -8,7 +9,7 @@ import { Dude } from "../Dude"
 import { DudeFaction } from "../DudeFactory"
 import { DudeType } from "../DudeType"
 import { NPC } from "../NPC"
-import { Player } from "../Player"
+import { player } from "../player"
 import { WeaponType } from "../weapons/WeaponType"
 import { Centaur } from "./Centaur"
 import { ShroomNPC } from "./ShroomNPC"
@@ -22,6 +23,10 @@ export class Villager extends Component {
     }
 
     awake() {
+        if (session.isGuest()) {
+            return
+        }
+
         const { npc, dude } = this
 
         npc.isEnemyFn = (d) => {
@@ -58,10 +63,14 @@ export class Villager extends Component {
     }
 
     start() {
+        if (session.isGuest()) {
+            return
+        }
+
         const { npc, dude } = this
 
         if ([DudeType.GUMBALL, DudeType.ONION].includes(dude.type)) {
-            npc.setLeader(Player.instance.dude)
+            npc.setLeader(player())
             npc.setSchedule(NPCSchedules.newFollowLeaderSchedule())
         } else if (dude.type === DudeType.DIP) {
             // TODO: Make this a more robust schedule
@@ -80,7 +89,7 @@ export class Villager extends Component {
                         dude.weaponType === WeaponType.PICKAXE &&
                         dude.location.type === LocationType.MINE_INTERIOR
                     ) {
-                        dude.weapon.attack(true)
+                        dude.updateAttacking(true)
                     }
                 },
                 2_000,

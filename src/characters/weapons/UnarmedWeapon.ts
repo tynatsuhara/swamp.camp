@@ -1,3 +1,4 @@
+import { session } from "../../online/session"
 import { Condition } from "../Condition"
 import { DudeType } from "../DudeType"
 import { Weapon } from "./Weapon"
@@ -8,6 +9,7 @@ enum State {
     ATTACKING,
 }
 
+// TODO: Why doesn't UNARMED work for players?
 export class UnarmedWeapon extends Weapon {
     private state: State = State.DRAWN
     private delay: number
@@ -33,7 +35,7 @@ export class UnarmedWeapon extends Weapon {
     }
 
     attack(newAttack: boolean) {
-        if (this.state === State.ATTACKING) {
+        if (this.state === State.ATTACKING || session.isGuest()) {
             return
         }
         if (!newAttack) {
@@ -69,8 +71,6 @@ export class UnarmedWeapon extends Weapon {
             case DudeType.BEAR:
             case DudeType.DEMON_BRUTE:
                 return 3
-            case DudeType.SWAMP_THING:
-                return 2
             default:
                 return 1
         }
