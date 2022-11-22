@@ -60,15 +60,16 @@ export class MainMenuButton extends Component {
 
         // if manually aligning whitespace, put "> " after leading spaces
         if (this.text.startsWith("  ")) {
+            const startSpaces = text.length - text.trimStart().length
             if (this.hovering) {
-                const startSpaces = text.length - text.trimStart().length
-                text = " ".repeat(startSpaces - 2) + "> " + text.trimStart()
+                text = NO_BREAK_SPACE_CHAR.repeat(startSpaces - 2) + "> " + text.trimStart()
+            } else {
+                text = NO_BREAK_SPACE_CHAR.repeat(startSpaces - 2) + "> " + text.trimStart()
             }
         } else {
-            text = this.hovering ? `> ${this.text}  ` : `  ${this.text}  `
+            const nbsp = NO_BREAK_SPACE_CHAR + NO_BREAK_SPACE_CHAR
+            text = this.hovering ? `> ${this.text}${nbsp}` : `${nbsp}${this.text}${nbsp}`
         }
-
-        text = text.replaceAll(" ", NO_BREAK_SPACE_CHAR)
 
         const offset = Math.floor((this.width - text.length * TEXT_PIXEL_WIDTH) / 2)
 
