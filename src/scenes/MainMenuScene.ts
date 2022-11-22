@@ -37,6 +37,14 @@ enum Menu {
     MULTIPLAYER,
 }
 
+enum SessionLoadingState {
+    CONNECTING = "connecting...",
+    LOADING_WORLD = "loading world...",
+    NOT_FOUND = "session not found!",
+}
+
+let cancelJoinTimeout: NodeJS.Timeout
+
 export class MainMenuScene {
     private plumes: PlumePicker
     private knight: SpriteComponent
@@ -45,7 +53,7 @@ export class MainMenuScene {
     private view: View
     private allAssetsLoaded = false
     private waitingForAssets = false
-    private sessionLoadingState: string
+    private sessionLoadingState: SessionLoadingState | undefined
     private sessionIdTextInput: TextInput
 
     private menu = Menu.ROOT
@@ -180,55 +188,74 @@ export class MainMenuScene {
 
         const link = (url: string) => () => window.open(url, "_blank")
 
-        if (this.sessionLoadingState) {
-            entities.push(
-                new MainMenuButtonSection(menuTop)
-                    .addText(`${this.sessionLoadingState}...`)
-                    .add("cancel", () => {
-                        this.sessionLoadingState = undefined
-                        session.close()
-                        this.render(Menu.MULTIPLAYER)
-                    })
-                    .getEntity()
-            )
-        } else if (this.menu === Menu.MULTIPLAYER) {
-            const joinSession = () => {
-                Promise.all([
-                    this.loadAssets(),
-                    session.join(this.sessionIdTextInput.getValue()),
-                ]).then(() => {
-                    if (this.sessionLoadingState) {
-                        this.sessionLoadingState = "loading world"
-                        this.render(Menu.ROOT) // force re-render
-                        guestOnJoin()
-                    }
-                })
-                this.sessionIdTextInput = this.sessionIdTextInput.delete()
-                this.sessionLoadingState = "connecting"
-                this.render(Menu.ROOT) // force re-render
-            }
-            if (!this.sessionIdTextInput) {
-                this.sessionIdTextInput = new TextInput(
-                    "SESSION @",
-                    menuTop,
-                    SESSION_ID_LENGTH,
-                    joinSession
+        if (this.menu === Menu.MULTIPLAYER) {
+            if (this.sessionLoadingState) {
+                entities.push(
+                    new MainMenuButtonSection(menuTop)
+                        .addText(this.sessionLoadingState)
+                        .add("cancel", () => {
+                            clearTimeout(cancelJoinTimeout)
+                            this.sessionLoadingState = undefined
+                            session.close()
+                            this.render(Menu.MULTIPLAYER)
+                        })
+                        .getEntity()
                 )
             } else {
-                this.sessionIdTextInput.reposition(menuTop)
-            }
-            entities.push(
-                new MainMenuButtonSection(menuTop)
-                    .addLineBreak()
-                    .add("connect", joinSession, !this.sessionLoadingState)
-                    .add("cancel", () => {
-                        this.sessionIdTextInput = this.sessionIdTextInput.delete()
-                        this.sessionLoadingState = undefined
-                        session.close()
-                        this.render(Menu.ROOT) // force re-render
+                const cancelJoin = () => {
+                    clearTimeout(cancelJoinTimeout)
+                    this.sessionIdTextInput = this.sessionIdTextInput?.delete()
+                    this.sessionLoadingState = undefined
+                    session.close()
+                    this.render(Menu.ROOT) // force re-render
+                }
+
+                const joinSession = () => {
+                    const sessionId = this.sessionIdTextInput.getValue()
+                    if (!sessionId.length) {
+                        return
+                    }
+
+                    Promise.all([this.loadAssets(), session.join(sessionId)]).then(() => {
+                        if (this.sessionLoadingState) {
+                            clearTimeout(cancelJoinTimeout)
+                            this.sessionLoadingState = SessionLoadingState.LOADING_WORLD
+                            this.render(Menu.MULTIPLAYER) // force re-render
+                            guestOnJoin()
+                        }
                     })
-                    .getEntity()
-            )
+
+                    this.sessionIdTextInput = this.sessionIdTextInput.delete()
+                    this.sessionLoadingState = SessionLoadingState.CONNECTING
+
+                    cancelJoinTimeout = setTimeout(() => {
+                        cancelJoin()
+                        this.sessionLoadingState = SessionLoadingState.NOT_FOUND
+                        this.render(Menu.MULTIPLAYER) // force re-render
+                    }, 15_000)
+
+                    this.render(Menu.MULTIPLAYER) // force re-render
+                }
+
+                if (!this.sessionIdTextInput) {
+                    this.sessionIdTextInput = new TextInput(
+                        "SESSION @",
+                        menuTop,
+                        SESSION_ID_LENGTH,
+                        joinSession
+                    )
+                } else {
+                    this.sessionIdTextInput.reposition(menuTop)
+                }
+
+                entities.push(
+                    new MainMenuButtonSection(menuTop)
+                        .addLineBreak()
+                        .add("connect", joinSession, !this.sessionLoadingState)
+                        .add("cancel", cancelJoin)
+                        .getEntity()
+                )
+            }
         } else if (this.waitingForAssets) {
             entities.push(new MainMenuButtonSection(menuTop).addText("loading...").getEntity())
         } else if (this.menu === Menu.ROOT) {
