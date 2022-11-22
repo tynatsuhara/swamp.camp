@@ -68,7 +68,6 @@ export class CraftingMenu extends Component {
             }
 
             this.tooltip.clear()
-            this.tooltip.position = controls.getMousePos()
             const rowsTall = 6 // will need to change this if dimensions are adjusted
             const category = this.recipes[this.recipeCategory]
             this.scrollOffset -=

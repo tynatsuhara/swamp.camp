@@ -115,7 +115,6 @@ export class InventoryDisplay extends Component {
             return
         }
 
-        this.tooltip.position = controls.getMousePos()
         let text: string = undefined
         if (this.heldStack) {
             if (this.heldStack.count > 1) {

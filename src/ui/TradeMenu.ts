@@ -85,7 +85,6 @@ export class TradeMenu extends Component {
 
         if (this.isOpen) {
             this.tooltip.clear()
-            this.tooltip.position = controls.getMousePos()
             const rowsTall = 6 // will need to change this if dimensions are adjusted
             this.scrollOffset -=
                 controls.getScrollDeltaY() *

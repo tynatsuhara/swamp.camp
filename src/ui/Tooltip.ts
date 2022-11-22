@@ -2,13 +2,18 @@ import { Component, Point, UpdateData } from "brigsby/dist"
 import { ImageRender } from "brigsby/dist/renderer"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
+import { controls } from "../Controls"
 import { Tilesets, TILE_DIMENSIONS, TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "./Color"
 import { formatText, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
-import { UIStateManager } from "./UIStateManager"
 
+const DEPTH = Number.MAX_SAFE_INTEGER / 2 + 3
+
+/**
+ * TODO: Maybe make this a singleton on the Cursor class?
+ */
 export class Tooltip extends Component {
-    position: Point = new Point(0, 0)
+    private position: Point = new Point(0, 0)
 
     private static readonly margin = 6
     private static readonly textOffset = new Point(Tooltip.margin, Tooltip.margin - 1)
@@ -29,6 +34,8 @@ export class Tooltip extends Component {
         if (!this.text) {
             return
         }
+
+        this.position = controls.getMousePos()
 
         const longestLineLength = Lists.maxBy(this.text, (line) => line.length).length
         const width = longestLineLength * TEXT_PIXEL_WIDTH
@@ -55,7 +62,7 @@ export class Tooltip extends Component {
                             0,
                             false,
                             false,
-                            UIStateManager.UI_SPRITE_DEPTH + 1
+                            DEPTH
                         )
                     )
             )
@@ -70,7 +77,7 @@ export class Tooltip extends Component {
                             0,
                             false,
                             false,
-                            UIStateManager.UI_SPRITE_DEPTH + 1
+                            DEPTH
                         )
                     )
             )
@@ -85,7 +92,7 @@ export class Tooltip extends Component {
                             0,
                             false,
                             false,
-                            UIStateManager.UI_SPRITE_DEPTH + 1
+                            DEPTH
                         )
                     )
             )
@@ -112,7 +119,7 @@ export class Tooltip extends Component {
                 position: this.tiles[0].position
                     .plus(Tooltip.textOffset)
                     .plusY(-(this.text.length - 1) * (TEXT_SIZE + 4)),
-                depth: UIStateManager.UI_SPRITE_DEPTH + 2,
+                depth: DEPTH + 1,
             }),
         ]
     }

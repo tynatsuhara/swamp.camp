@@ -9,17 +9,15 @@ import { saveManager } from "../SaveManager"
 import { Settings } from "../Settings"
 import { SwampCampGame } from "../SwampCampGame"
 import { here } from "../world/locations/LocationManager"
-import { ButtonsMenu } from "./ButtonsMenu"
+import { ButtonsMenu, OptionButton } from "./ButtonsMenu"
 import { Color } from "./Color"
 import { ControlsUI } from "./ControlsUI"
 import { FullScreenMode } from "./FullScreenMode"
 import { NotificationDisplay } from "./NotificationDisplay"
+import { Tooltip } from "./Tooltip"
 import { UIStateManager } from "./UIStateManager"
 
-type PauseOption = {
-    text: string
-    fn: () => void
-}
+type PauseOption = Pick<OptionButton, "text" | "fn" | "onMouseOver" | "onMouseOut">
 
 export class PauseMenu extends Component {
     private readonly e: Entity = new Entity([this]) // entity for this component
@@ -53,6 +51,8 @@ export class PauseMenu extends Component {
     }
 
     open() {
+        const tooltip = new Tooltip()
+
         const buttons: PauseOption[] = [
             // TODO figure out how to handle saving with multiplayer
             session.isHost() && {
@@ -63,7 +63,7 @@ export class PauseMenu extends Component {
             //     text: "LOAD LAST SAVE",
             //     fn: () => saveManager.load(),
             // },
-            this.getOnlineOption(),
+            this.getOnlineOption(tooltip),
             {
                 text: "VIEW CONTROLS",
                 fn: () => this.showControls(),
@@ -124,6 +124,8 @@ export class PauseMenu extends Component {
             })),
             Camera.instance.dimensions.div(2)
         )
+
+        this.displayEntity.addComponent(tooltip)
     }
 
     private showControls() {
@@ -153,7 +155,7 @@ export class PauseMenu extends Component {
         }
     }
 
-    private getOnlineOption(): PauseOption | undefined {
+    private getOnlineOption(tooltip: Tooltip): PauseOption | undefined {
         if (session.isOnline()) {
             if (session.isHost()) {
                 return {
@@ -182,6 +184,8 @@ export class PauseMenu extends Component {
                             })
                         })
                 },
+                onMouseOver: () => tooltip.say("VERY experimental!"),
+                onMouseOut: () => tooltip.clear(),
             }
         }
     }
