@@ -3,6 +3,7 @@ import { Lists, RepeatedInvoker } from "brigsby/dist/util"
 import { FireParticles } from "../../graphics/particles/FireParticles"
 import { Particles } from "../../graphics/particles/Particles"
 import { TILE_SIZE } from "../../graphics/Tilesets"
+import { session } from "../../online/session"
 import { Color } from "../../ui/Color"
 import { LightManager } from "../LightManager"
 import { here } from "../locations/LocationManager"
@@ -51,25 +52,7 @@ export class Burnable extends RepeatedInvoker {
     update(updateData: UpdateData) {
         super.update(updateData)
 
-        if (WorldTime.instance.time - this.burnStart > TIME_UNTIL_DESTROY) {
-            // Emit ash particles
-            this.pts.forEach((pt) => {
-                const position = pt.plus(new Point(0.5, 0.5)).times(TILE_SIZE)
-                for (let i = 0; i < 20; i++) {
-                    const speed = Math.random() > 0.5 ? 0.003 : 0.001
-                    Particles.instance.emitParticle(
-                        Lists.oneOf([Color.TAUPE_2, Color.TAUPE_1, Color.BLACK, Color.BLACK]),
-                        position.randomCircularShift(8).plusY(-4),
-                        (pt.y + 1) * TILE_SIZE,
-                        500 + Math.random() * 500,
-                        (t) => new Point(0, t * speed),
-                        Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
-                    )
-                }
-
-                // remove light sources
-                LightManager.instance.removeLight(this.lightKeyForPoint(pt))
-            })
+        if (session.isHost() && WorldTime.instance.time - this.burnStart > TIME_UNTIL_DESTROY) {
             this.entity.selfDestruct()
         }
 
@@ -79,6 +62,7 @@ export class Burnable extends RepeatedInvoker {
         }
     }
 
+    // MPTODO sync
     burn(pt?: Point, immediately = false) {
         if (this.burning || (pt && !this.pts.some((p) => p.equals(pt)))) {
             return
@@ -110,5 +94,26 @@ export class Burnable extends RepeatedInvoker {
 
     isBurningAt(pt: Point) {
         return this.isBurning && this.pts.some((p) => p.equals(pt))
+    }
+
+    delete() {
+        // Emit ash particles
+        this.pts.forEach((pt) => {
+            const position = pt.plus(new Point(0.5, 0.5)).times(TILE_SIZE)
+            for (let i = 0; i < 20; i++) {
+                const speed = Math.random() > 0.5 ? 0.003 : 0.001
+                Particles.instance.emitParticle(
+                    Lists.oneOf([Color.TAUPE_2, Color.TAUPE_1, Color.BLACK, Color.BLACK]),
+                    position.randomCircularShift(8).plusY(-4),
+                    (pt.y + 1) * TILE_SIZE,
+                    500 + Math.random() * 500,
+                    (t) => new Point(0, t * speed),
+                    Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
+                )
+            }
+
+            // remove light sources
+            LightManager.instance.removeLight(this.lightKeyForPoint(pt))
+        })
     }
 }
