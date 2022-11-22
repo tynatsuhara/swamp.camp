@@ -65,9 +65,10 @@ export class MainMenuButton extends Component {
                 text = " ".repeat(startSpaces - 2) + "> " + text.trimStart()
             }
         } else {
-            const nbsp = NO_BREAK_SPACE_CHAR + NO_BREAK_SPACE_CHAR
-            text = this.hovering ? `> ${this.text}${nbsp}` : `${nbsp}${this.text}${nbsp}`
+            text = this.hovering ? `> ${this.text}  ` : `  ${this.text}  `
         }
+
+        text = text.replaceAll(" ", NO_BREAK_SPACE_CHAR)
 
         const offset = Math.floor((this.width - text.length * TEXT_PIXEL_WIDTH) / 2)
 
