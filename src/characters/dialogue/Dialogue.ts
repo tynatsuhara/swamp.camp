@@ -1,11 +1,12 @@
 import { saveManager } from "../../SaveManager"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { player } from "../player"
+import { BED_DIALOGUES } from "./BedDialogue"
 import { BERTO_INTRO_DIALOGUE } from "./BertoDialogue"
+import { CAMPFIRE_DIALOGUES } from "./CampfireDialogue"
 import { DIP_INTRO_DIALOGUE } from "./DipDialogue"
 import { DOCTOR_DIALOGUE } from "./DoctorDialogue"
 import { GENERIC_DIALOGUE } from "./GenericDialogue"
-import { ITEM_DIALOGUES } from "./ItemDialogues"
 import { SPOOKY_VISITOR_DIALOGUE } from "./SpookyVisitorDialogue"
 import { VILLAGER_DIALOGUE } from "./VillagerDialogue"
 
@@ -124,7 +125,8 @@ export const getDialogue = (dialogue: string): DialogueInstance | undefined => {
         ...BERTO_INTRO_DIALOGUE,
         ...GENERIC_DIALOGUE,
         ...DOCTOR_DIALOGUE,
-        ...ITEM_DIALOGUES,
+        ...BED_DIALOGUES,
+        ...CAMPFIRE_DIALOGUES,
         ...VILLAGER_DIALOGUE,
         ...SPOOKY_VISITOR_DIALOGUE,
     }
