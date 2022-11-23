@@ -51,7 +51,7 @@ export class BedFactory extends ElementFactory<BedType> {
             )
         }
 
-        const bed = e.addComponent(new Bed())
+        const bed = e.addComponent(new Bed(isBedroll))
 
         e.addComponent(
             new Interactable(
@@ -77,5 +77,11 @@ export class BedFactory extends ElementFactory<BedType> {
 }
 
 export class Bed extends RestPoint implements DialogueSource {
-    dialogue: string = BED_DIALOGUE
+    readonly dialogue: string = BED_DIALOGUE
+    readonly isBedroll: boolean
+
+    constructor(isBedroll: boolean) {
+        super()
+        this.isBedroll = isBedroll
+    }
 }

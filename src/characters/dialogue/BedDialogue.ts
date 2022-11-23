@@ -19,10 +19,12 @@ export const BED_DIALOGUES: DialogueSet = {
         const bed: Bed = DialogueDisplay.instance.source as Bed
         const completeDialogue = new NextDialogue(BED_DIALOGUE, false)
 
+        const bedType = bed.isBedroll ? "bedroll" : "bed"
+
         // Proxy for determining that this bed belongs to the player
         if (!here().allowPlacing) {
             return dialogue(
-                ["This bed doesn't belong to you."],
+                [`This ${bedType} doesn't belong to you.`],
                 () => completeDialogue,
                 DudeInteractIndicator.NONE
             )
@@ -44,7 +46,7 @@ export const BED_DIALOGUES: DialogueSet = {
         ]
 
         if (bed.canRestFor(8)) {
-            text = "The comfy bed beckons to you. Do you give in?"
+            text = `The comfy ${bedType} beckons to you. Do you give in?`
         } else if (bed.canRestFor(1)) {
             text =
                 "Your campfire will not burn long enough for a full rest, but you have time for a nap."
