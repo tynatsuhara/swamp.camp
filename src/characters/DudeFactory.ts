@@ -3,7 +3,7 @@ import { Lists } from "brigsby/dist/util"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Inventory } from "../items/Inventory"
-import { Item, ITEM_METADATA_MAP } from "../items/Items"
+import { Item } from "../items/Items"
 import { PlayerInventory } from "../items/PlayerInventory"
 import { session } from "../online/session"
 import { MULTIPLAYER_ID } from "../online/sync"
@@ -472,19 +472,6 @@ export class DudeFactory {
             ? inventorySupplier().load(saveState.inventory)
             : defaultInventorySupplier()
 
-        let weaponType = saveState?.weapon ?? weapon
-        let shieldType = saveState?.shield ?? shield
-
-        // if the inventory has any weapons or shields marked 'equipped', overwrite
-        // the existing fields. not all weapons/shields are necessarily inv items
-        inventory.getStacks().forEach((stack) => {
-            if (stack.metadata.equipped === "weapon") {
-                weaponType = ITEM_METADATA_MAP[stack.item].equippableWeapon
-            } else if (stack.metadata.equipped === "shield") {
-                shieldType = ITEM_METADATA_MAP[stack.item].equippableShield
-            }
-        })
-
         // use saved data instead of defaults
         const d = new Dude({
             uuid,
@@ -493,8 +480,8 @@ export class DudeFactory {
             factions, // TODO: Save factions? Only if they become mutable
             characterAnimName: saveState?.anim ?? animationName,
             standingPosition: pos,
-            weaponType,
-            shieldType,
+            weaponType: saveState?.weapon ?? weapon,
+            shieldType: saveState?.shield ?? shield,
             maxHealth: saveState?.maxHealth ?? maxHealth,
             health: saveState?.health ?? maxHealth,
             speed: speed ?? speed,
