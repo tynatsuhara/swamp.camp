@@ -2,7 +2,7 @@ import { Point } from "brigsby/dist"
 import { pt } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util"
 import { Dude } from "../../characters/Dude"
-import { syncFn } from "../../online/utils"
+import { syncFn } from "../../online/syncUtils"
 import { Color } from "../../ui/Color"
 import { Particles } from "./Particles"
 

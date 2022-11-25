@@ -7,7 +7,7 @@ import { newUUID } from "../saves/uuid"
 import { SwampCampGame } from "../SwampCampGame"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { computeSessionIdFromPeerId, session } from "./session"
-import { base64hash, ONLINE_PLAYER_DUDE_ID_PREFIX } from "./utils"
+import { base64hash, ONLINE_PLAYER_DUDE_ID_PREFIX } from "./syncUtils"
 
 /**
  * Utilities for syncing game state and logic

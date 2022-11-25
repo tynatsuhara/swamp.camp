@@ -1,7 +1,7 @@
 import { debug } from "brigsby/dist"
 import { player } from "./characters/player"
 import { Camera } from "./cutscenes/Camera"
-import { ONLINE_PLAYER_DUDE_ID_PREFIX } from "./online/utils"
+import { ONLINE_PLAYER_DUDE_ID_PREFIX } from "./online/syncUtils"
 import { Save, SaveState } from "./saves/SaveGame"
 import { newUUID } from "./saves/uuid"
 import { Singletons } from "./Singletons"

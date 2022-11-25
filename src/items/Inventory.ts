@@ -1,6 +1,6 @@
 import { InputKey } from "brigsby/dist"
 import { stringifySorted } from "../debug/JSON"
-import { syncFn } from "../online/utils"
+import { syncFn } from "../online/syncUtils"
 import { InventoryDisplay } from "../ui/InventoryDisplay"
 import { Item, ItemMetadata, ITEM_METADATA_MAP } from "./Items"
 

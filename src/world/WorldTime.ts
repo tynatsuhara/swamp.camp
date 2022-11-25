@@ -1,6 +1,6 @@
 import { Component, Entity, UpdateData } from "brigsby/dist"
 import { WorldAudioContext } from "../audio/WorldAudioContext"
-import { syncFn } from "../online/utils"
+import { syncFn } from "../online/syncUtils"
 import { saveManager } from "../SaveManager"
 import { Singletons } from "../Singletons"
 import { EventQueue } from "./events/EventQueue"

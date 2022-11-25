@@ -1,5 +1,5 @@
 import { ActionProgress, ActionReceiver, ActionSender, joinRoom, Room, selfId } from "trystero"
-import { base64hash } from "./utils"
+import { base64hash } from "./syncUtils"
 
 /**
  * This file should be generally not-game-specific, in order to prevent circular imports

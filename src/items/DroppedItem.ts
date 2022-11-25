@@ -7,7 +7,7 @@ import { loadAudio } from "../audio/DeferLoadAudio"
 import { Sounds } from "../audio/Sounds"
 import { Dude } from "../characters/Dude"
 import { session } from "../online/session"
-import { syncFn } from "../online/utils"
+import { syncFn } from "../online/syncUtils"
 import { here } from "../world/locations/LocationManager"
 import { Item, ItemMetadata, ITEM_METADATA_MAP } from "./Items"
 

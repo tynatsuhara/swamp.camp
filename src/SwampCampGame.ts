@@ -1,6 +1,6 @@
 import { Game, UpdateViewsContext } from "brigsby/dist"
 import { View } from "brigsby/dist/View"
-import { cleanUpSession as cleanUpExistingSession } from "./online/sync"
+import { cleanUpSession as cleanUpExistingSession } from "./online/syncGame"
 import { GameScene } from "./scenes/GameScene"
 import { MainMenuScene } from "./scenes/MainMenuScene"
 
