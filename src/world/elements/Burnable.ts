@@ -1,4 +1,5 @@
 import { Point, UpdateData } from "brigsby/dist"
+import { PointValue } from "brigsby/dist/Point"
 import { Lists, RepeatedInvoker } from "brigsby/dist/util"
 import { FireParticles } from "../../graphics/particles/FireParticles"
 import { Particles } from "../../graphics/particles/Particles"
@@ -9,6 +10,7 @@ import { LightManager } from "../LightManager"
 import { here } from "../locations/LocationManager"
 import { WorldTime } from "../WorldTime"
 import { Campfire } from "./Campfire"
+import { ElementComponent } from "./ElementComponent"
 
 const INTERVAL = 5_000
 const TIME_UNTIL_DESTROY = 15_000
@@ -20,6 +22,7 @@ export class Burnable extends RepeatedInvoker {
     private depth: number
     private lighting = false
     private timeToLight = 500 + Math.random() * 1000
+    private initialBurning: boolean
 
     get isBurning() {
         return this.burning
@@ -27,32 +30,46 @@ export class Burnable extends RepeatedInvoker {
 
     constructor(initialBurning: boolean, pts: Point[]) {
         super(() => {
-            if (!this.burning) {
-                return INTERVAL
-            }
-            // spread to adjacent squares
-            this.pts.forEach((pt) => {
-                const adjacent = [pt.plusX(1), pt.plusX(-1), pt.plusY(1), pt.plusY(-1)]
-                adjacent.forEach((adj) => {
-                    here().getElement(adj)?.entity.getComponent(Burnable)?.burn(null, true)
+            if (this.burning && session.isHost()) {
+                // spread to adjacent squares
+                this.pts.forEach((pt) => {
+                    const adjacent = [pt.plusX(1), pt.plusX(-1), pt.plusY(1), pt.plusY(-1)]
+                    adjacent.forEach((adj) => {
+                        if (Math.random() < 0.3) {
+                            here().getElement(adj)?.entity.getComponent(Burnable)?.burn(null, true)
+                        }
+                    })
                 })
-            })
+            }
+            // we only really care about one delayed invocation
             return INTERVAL
-        }, Math.random() * INTERVAL * 2)
+        }, INTERVAL + Math.random() * INTERVAL)
 
+        this.initialBurning = initialBurning
         this.pts = pts
         this.depth = Math.max(...pts.map((pt) => pt.y + 1)) * TILE_SIZE
+    }
 
-        if (initialBurning) {
-            // doing this on awake seemed to not work for lights
-            this.start = () => this.burn(null, true)
+    start() {
+        if (this.initialBurning) {
+            this.burn(null, true)
         }
+
+        this.burn = here().elementSyncFn(
+            "burnable",
+            this.entity.getComponent(ElementComponent).pos,
+            this.burn.bind(this)
+        )
     }
 
     update(updateData: UpdateData) {
         super.update(updateData)
 
-        if (session.isHost() && WorldTime.instance.time - this.burnStart > TIME_UNTIL_DESTROY) {
+        if (session.isGuest()) {
+            return
+        }
+
+        if (WorldTime.instance.time - this.burnStart > TIME_UNTIL_DESTROY) {
             this.entity.selfDestruct()
         }
 
@@ -62,8 +79,7 @@ export class Burnable extends RepeatedInvoker {
         }
     }
 
-    // MPTODO sync
-    burn(pt?: Point, immediately = false) {
+    burn(pt?: PointValue, immediately = false) {
         if (this.burning || (pt && !this.pts.some((p) => p.equals(pt)))) {
             return
         } else if (!immediately && this.timeToLight > 0) {
