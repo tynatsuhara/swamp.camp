@@ -19,6 +19,7 @@ export class Burnable extends RepeatedInvoker {
     private pts: Point[]
     private burning: boolean
     private burnStart: number
+    private offset: Point
     private depth: number
     private lighting = false
     private timeToLight = 500 + Math.random() * 1000
@@ -28,7 +29,7 @@ export class Burnable extends RepeatedInvoker {
         return this.burning
     }
 
-    constructor(initialBurning: boolean, pts: Point[]) {
+    constructor(initialBurning: boolean, pts: Point[], offset: Point = Point.ZERO) {
         super(() => {
             if (this.burning && session.isHost()) {
                 // spread to adjacent squares
@@ -47,6 +48,7 @@ export class Burnable extends RepeatedInvoker {
 
         this.initialBurning = initialBurning
         this.pts = pts
+        this.offset = offset
         this.depth = Math.max(...pts.map((pt) => pt.y + 1)) * TILE_SIZE
     }
 
@@ -89,7 +91,7 @@ export class Burnable extends RepeatedInvoker {
         this.burning = true
         this.burnStart = WorldTime.instance.time
         this.pts.forEach((pt) => {
-            const burnableCenter = pt.plus(new Point(0.5, 0.5)).times(TILE_SIZE)
+            const burnableCenter = pt.plus(new Point(0.5, 0.5)).times(TILE_SIZE).plus(this.offset)
             this.entity.addComponent(
                 new FireParticles(
                     8,

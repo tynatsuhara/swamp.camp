@@ -62,7 +62,7 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
         const depth = (pos.y + 2) * TILE_SIZE + randomOffset.y
 
         const burnable = e.addComponent(
-            new Burnable(!!data.b, size === 3 ? [pos, pos.plusY(1)] : [pos.plusY(1)])
+            new Burnable(!!data.b, size === 3 ? [pos, pos.plusY(1)] : [pos.plusY(1)], randomOffset)
         )
 
         const addTile = (s: string, pos: Point) => {
