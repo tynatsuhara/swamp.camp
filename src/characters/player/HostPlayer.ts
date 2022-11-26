@@ -17,6 +17,12 @@ export class HostPlayer extends AbstractPlayer {
         registerLocalPlayerInstance(this)
     }
 
+    awake(): void {
+        super.awake()
+
+        window["addItem"] = this.dude.inventory.addItem
+    }
+
     update(updateData: UpdateData) {
         if (!this.dude.isAlive) {
             return
