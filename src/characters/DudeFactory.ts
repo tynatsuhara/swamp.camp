@@ -491,6 +491,7 @@ export class DudeFactory {
             colliderSize: colliderSize,
             conditions: saveState?.conditions ?? [],
             name: saveState?.name ?? nameGen(),
+            lastDamageTime: saveState.lastDmgTime ?? 0,
         })
 
         location.addDude(d)

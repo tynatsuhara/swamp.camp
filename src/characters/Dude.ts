@@ -201,6 +201,7 @@ export class Dude extends Component implements DialogueSource {
         colliderSize: Point
         conditions: ActiveCondition[]
         name: string
+        lastDamageTime: number
     }) {
         super()
 
@@ -232,6 +233,7 @@ export class Dude extends Component implements DialogueSource {
             colliderSize,
             conditions,
             name,
+            lastDamageTime,
         } = { ...params }
 
         // populate dudecache for O(1) lookup by uuid
@@ -254,7 +256,7 @@ export class Dude extends Component implements DialogueSource {
                 as: AttackState.NOT_ATTACKING,
                 mh: maxHealth,
                 h: maxHealth === Number.MAX_SAFE_INTEGER ? Number.MAX_SAFE_INTEGER : health,
-                ld: 0,
+                ld: lastDamageTime,
             },
             (newData) => {
                 const newStandingPos = pt(newData.p.x, newData.p.y)
@@ -478,6 +480,7 @@ export class Dude extends Component implements DialogueSource {
         const transform = this.animation.transform
         transform.position = this.position
 
+        // update animation
         if (this.layingDownOffset) {
             transform.position = transform.position.plus(this.layingDownOffset)
         } else if (this.isRolling && this.animation.transform.rotation !== 0) {
@@ -486,6 +489,7 @@ export class Dude extends Component implements DialogueSource {
             transform.position = transform.position.plusY(-this.jumpingOffset)
         }
 
+        // position dialogue interact point
         if (!!this.dialogueInteract) {
             this.dialogueInteract.position = this.standingPosition.minus(new Point(0, 5))
             this.dialogueInteract.uiOffset = new Point(0, -TILE_SIZE * 1.5).plus(
@@ -500,6 +504,10 @@ export class Dude extends Component implements DialogueSource {
         this.jumpingAnimator?.update(elapsedTimeMillis)
 
         this.droppedItemPickupCheck()
+
+        if (session.isHost() && WorldTime.instance.time - this.lastDamageTime > 30_000) {
+            this.heal(elapsedTimeMillis / 20_000)
+        }
     }
 
     equipFirstWeaponInInventory() {
@@ -1405,6 +1413,7 @@ export class Dude extends Component implements DialogueSource {
             blob: this.blob,
             conditions: this.conditions,
             name: this.name,
+            lastDmgTime: this.lastDamageTime,
         }
     }
 

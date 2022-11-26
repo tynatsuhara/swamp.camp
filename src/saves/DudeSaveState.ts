@@ -18,4 +18,5 @@ export class DudeSaveState {
     blob: object // This can be used for DudeType-specific data
     conditions: ActiveCondition[]
     name?: string
+    lastDmgTime: number
 }
