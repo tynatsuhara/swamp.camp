@@ -180,7 +180,6 @@ export abstract class AbstractPlayer extends Component {
                 const hotKeyItemIndex = this.dude.inventory.findIndex(
                     (stack) => stack?.metadata.hotKey === hotKey
                 )
-                console.log(hotKeyItemIndex)
                 const hotKeyItem = this.dude.inventory.getStack(hotKeyItemIndex)?.item
                 if (hotKeyItem) {
                     const itemData = ITEM_METADATA_MAP[hotKeyItem]
