@@ -73,6 +73,10 @@ export enum Item {
 
 window["Item"] = Item
 
+// stack limits for consistency
+const STACK_LG = 99
+const STACK_SM = 5
+
 type Consumable = { verb: string; fn: (consumer: Dude) => void }
 
 // Items of the same type can have different metadata
@@ -94,7 +98,7 @@ export class ItemSpec {
         displayName,
         inventoryIcon,
         droppedIconSupplier = () => null,
-        stackLimit = 99,
+        stackLimit = STACK_LG,
         element = null, // for placing elements
         equippableWeapon = null,
         equippableShield = null,
@@ -207,7 +211,7 @@ export const ITEM_METADATA_MAP = {
     [Item.WEAK_MEDICINE]: new ItemSpec({
         displayName: "Weak medicine",
         inventoryIcon: "potion1",
-        stackLimit: 1,
+        stackLimit: STACK_SM,
         consumable: {
             verb: "drink",
             fn: (consumer) => {
@@ -228,7 +232,7 @@ export const ITEM_METADATA_MAP = {
     [Item.POISON_ANTIDOTE]: new ItemSpec({
         displayName: "Antidote",
         inventoryIcon: "potion3",
-        stackLimit: 1,
+        stackLimit: STACK_SM,
         consumable: {
             verb: "drink",
             fn: (consumer) => {
