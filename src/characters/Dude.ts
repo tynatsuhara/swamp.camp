@@ -681,7 +681,7 @@ export class Dude extends Component implements DialogueSource {
                     return
                 case Condition.HEALING:
                     if (session.isHost()) {
-                        this.heal(elapsedTimeMillis / 3500)
+                        this.heal(elapsedTimeMillis / 2_500)
                     }
                     return
             }
