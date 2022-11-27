@@ -24,6 +24,7 @@ type Variant = { dark: Color; light: Color; accent: Color }
 const VARIANTS = {
     red: { dark: Color.PINK_2, light: Color.PINK_3, accent: Color.PINK_4 },
     blue: { dark: Color.BLUE_3, light: Color.BLUE_4, accent: Color.BLUE_5 },
+    taupe: { dark: Color.TAUPE_3, light: Color.TAUPE_4, accent: Color.TAUPE_5 },
 }
 
 export type TentColor = keyof typeof VARIANTS
@@ -39,7 +40,7 @@ export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
     make(
         wl: Location,
         pos: Point,
-        { color = "blue", destinationUUID = makeTentInterior(wl, color).uuid }
+        { color = "taupe", destinationUUID = makeTentInterior(wl, color).uuid }
     ) {
         const e = new Entity()
 
@@ -53,6 +54,8 @@ export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
             id: doorId,
         }
         wl.addTeleporter(sourceTeleporter)
+
+        const data: TentData = { color, destinationUUID }
 
         // Set up tiles
         const depth = (pos.y + 1) * TILE_SIZE + /* prevent clipping */ 1
@@ -79,28 +82,23 @@ export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
             )
         )
 
-        // TODO: Disable for now?
         e.addComponent(
             new Breakable(
                 interactablePos,
                 tiles.map((t) => t.transform),
-                () => [{ item: Item.TENT, metadata: { color } }],
+                () => [{ item: Item.TENT, metadata: data }],
                 () => Sounds.play(...TeleporterSound.TENT),
                 10
             )
         )
 
-        return e.addComponent(
-            new ElementComponent<ElementType.TENT, TentData>(ElementType.TENT, pos, () => {
-                return { destinationUUID, color }
-            })
-        )
+        return e.addComponent(new ElementComponent(ElementType.TENT, pos, () => data))
     }
 
     itemMetadataToSaveFormat(metadata: ItemMetadata): TentData {
         return {
             color: metadata.color,
-            destinationUUID: undefined,
+            destinationUUID: metadata.destinationUUID,
         }
     }
 }
@@ -149,7 +147,7 @@ const makeTentInterior = (outside: Location, color: TentColor): Location => {
 
     l.addFeature("tentInteriorSprite", { color })
 
-    l.addElement(ElementType.BEDROLL, new Point(3, 0))
+    l.addElement(ElementType.BEDROLL, new Point(Math.floor(Math.random() * floorDimensions.x), 0))
 
     return LocationManager.instance.add(l)
 }
