@@ -904,7 +904,7 @@ export class Dude extends Component implements DialogueSource {
 
     revive() {
         if (session.isHost()) {
-            this._health = this.maxHealth * 0.25
+            this._health = this.maxHealth * 0.5
             this.removeAllConditions()
         }
 
