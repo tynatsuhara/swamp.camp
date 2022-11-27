@@ -159,6 +159,7 @@ export const getEventQueueHandlers = (): {
         // Spawn new resources
         spawnResource(ElementType.ROCK, Math.random() * 5)
         spawnResource(ElementType.BLACKBERRIES, Math.random() * 3)
+        spawnResource(ElementType.MUSHROOM, Math.round(Math.random()))
 
         // Update town stats
         const foodAmount = 0 // TODO
