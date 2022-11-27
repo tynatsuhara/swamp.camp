@@ -195,7 +195,6 @@ export class InventoryDisplay extends Component {
     }
 
     private clearHeldStack() {
-        console.warn("clear held stack")
         this.heldStack = undefined
         this.heldStackInvIndex = undefined
         this.heldStackInventory = null
@@ -204,7 +203,6 @@ export class InventoryDisplay extends Component {
     }
 
     private setHeldStack(inv: Inventory, index: number, stack: ItemStack) {
-        console.warn("set held stack")
         this.heldStackInventory = inv
         this.heldStackInvIndex = index
         this.heldStack = stack
@@ -505,8 +503,6 @@ export class InventoryDisplay extends Component {
         const isPickUp = controls.isInventoryStackPickUp()
         const isPickUpHalf = controls.isInventoryStackPickUpHalf()
         const isSwap = controls.isInventorySwap()
-
-        console.log(isPickUp)
 
         if (isPickUp || isPickUpHalf || isSwap) {
             const hoveredItemStack = hoverInv?.getStack(hoverIndex)
