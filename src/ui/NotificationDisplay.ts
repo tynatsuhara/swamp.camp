@@ -133,9 +133,9 @@ export class NotificationDisplay extends Component {
 
     push(notification: Notification) {
         controls.vibrate({
-            duration: 50,
-            strongMagnitude: 1,
-            weakMagnitude: 0,
+            duration: 100,
+            strongMagnitude: 0,
+            weakMagnitude: 0.5,
         })
         const component = new NotificationComponent(notification)
         this.notifications.push(component)
