@@ -151,8 +151,10 @@ export const DIP_INTRO_DIALOGUE: DialogueSet = {
         return dialogue(
             [
                 "We'll want to keep the fire burning all night long. Hungry spirits roam the swamp once the sun sets, but they stay in the darkness.",
+                "You can rest in your tent or at the campfire to pass time, as long as the camp is well-lit. Resting will heal you, but it can also put the camp at risk of attack.",
                 "You should collect more resources so we can improve our camp. If you grab a torch from a burning campfire, you'll be able to light your way.",
-                "Be careful though, torches don't usually stay lit for long.",
+                "Be careful though — torches don't stay lit for long. If you're willing to brave the darkness, there are many things that can only be found at night!",
+                "One last thing — I can also help make you some basic tools and utilities, if you bring me the necessary resources. Good luck!",
             ],
             () => new NextDialogue(DIP_ENTRYPOINT, false),
             DudeInteractIndicator.IMPORTANT_DIALOGUE
