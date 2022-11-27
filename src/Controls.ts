@@ -174,29 +174,35 @@ class ControlsWrapper extends Component {
     isInventoryStackPickUp = () =>
         check({
             kbm: () => input.isMouseDown,
-            gamepad: () => gamepadInput.isButtonDown(GamepadButton.X),
+            gamepad: () =>
+                gamepadInput.isButtonDown(GamepadButton.X) ||
+                gamepadInput.isButtonDown(GamepadButton.L1),
         })
 
     isInventoryStackDrop = () =>
         check({
             kbm: () => input.isMouseDown,
-            gamepad: () => gamepadInput.isButtonDown(GamepadButton.X),
+            gamepad: () =>
+                gamepadInput.isButtonDown(GamepadButton.X) ||
+                gamepadInput.isButtonDown(GamepadButton.R1),
         })
 
     isInventoryStackPickUpHalf = () =>
         check({
             kbm: () => input.isRightMouseDown,
-            gamepad: () =>
-                gamepadInput.isButtonHeld(GamepadButton.L1) &&
-                gamepadInput.isButtonDown(GamepadButton.X),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.L2),
         })
 
     isInventoryStackDropOne = () =>
         check({
             kbm: () => input.isRightMouseDown,
-            gamepad: () =>
-                gamepadInput.isButtonHeld(GamepadButton.L1) &&
-                gamepadInput.isButtonDown(GamepadButton.X),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.R2),
+        })
+
+    isInventorySwap = () =>
+        check({
+            kbm: () => input.isKeyHeld(InputKey.SHIFT) && input.isMouseDown,
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.R3),
         })
 
     // ======== OTHER MENU STUFF ========
@@ -306,7 +312,7 @@ class ControlsWrapper extends Component {
                 gamepadInput.isButton(GamepadButton.R2, state),
         })
 
-    isModifierHeld = () =>
+    isAudioDecreaseModifierHeld = () =>
         check({
             kbm: () => input.isKeyHeld(InputKey.SHIFT),
             gamepad: () => gamepadInput.isButtonHeld(GamepadButton.L1),

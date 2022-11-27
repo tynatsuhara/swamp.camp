@@ -27,7 +27,7 @@ export class PauseMenu extends Component {
 
     update(updateData: UpdateData) {
         const pressPauseButton = controls.isOpenPauseMenuButtonDown()
-        this.isShiftDown = controls.isModifierHeld()
+        this.isShiftDown = controls.isAudioDecreaseModifierHeld()
 
         if (
             ((pressPauseButton || controls.isCloseMenuButtonDown()) && this.isOpen) ||
