@@ -31,15 +31,18 @@ export const BED_DIALOGUES: DialogueSet = {
         }
 
         let text: string
+
+        const healMultiplier = bed.isBedroll ? 0.5 : 1
+
         let options = [
             new DialogueOption("Sleep (8 hours)", () => {
                 bed.rest(8)
-                player().heal(player().maxHealth)
+                player().heal(player().maxHealth * healMultiplier)
                 return completeDialogue
             }),
             new DialogueOption("Nap (1 hour)", () => {
                 bed.rest(1)
-                player().heal(player().maxHealth / 2)
+                player().heal((player().maxHealth / 2) * healMultiplier)
                 return completeDialogue
             }),
             new DialogueOption(DialogueConstants.CANCEL_TEXT, () => completeDialogue),
