@@ -1,4 +1,4 @@
-import { Entity, Point } from "brigsby/dist"
+import { Entity, Point, UpdateData } from "brigsby/dist"
 import { BoxCollider } from "brigsby/dist/collision"
 import { AnimatedSpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Lists, RepeatedInvoker } from "brigsby/dist/util"
@@ -46,8 +46,6 @@ export class QueequegFactory extends ElementFactory<ElementType.QUEEQUEG> {
             )
         )
         window["queequeg"] = ship
-
-        // TODO: Add a teleporter to get on top of the ship?
 
         return e.addComponent(new ElementComponent(this.type, pos, ship.save))
     }
@@ -189,8 +187,8 @@ export class Queequeg extends Simulatable {
     }
 
     // Move between the at-sea position and the docked position
-    update(updateData) {
-        this.moveToGoal(updateData.elapsedTimeMillis)
+    update({ elapsedTimeMillis }: UpdateData) {
+        this.moveToGoal(elapsedTimeMillis)
     }
 
     getRenderMethods() {
@@ -222,9 +220,7 @@ export class Queequeg extends Simulatable {
             return
         }
         this.passengers.push(dude)
-        if (dude.type === DudeType.PLAYER) {
-            // TODO
-        } else {
+        if (dude.type !== DudeType.PLAYER) {
             // don't worry about any NPC logic right now
             dude.entity.getComponent(NPC).enabled = false
         }
@@ -244,9 +240,7 @@ export class Queequeg extends Simulatable {
         const pos = dude.standingPosition.plusY(24)
         dude.moveTo(pos, true)
         dude.manualDepth = undefined
-        if (dude.type === DudeType.PLAYER) {
-            // TODO
-        } else {
+        if (dude.type !== DudeType.PLAYER) {
             dude.entity.getComponent(NPC).enabled = true
         }
     }
