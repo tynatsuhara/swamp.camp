@@ -132,14 +132,18 @@ export class HUD {
             result.push(new SpriteComponent(full, new SpriteTransform(getHeartPosition(i))))
         }
 
-        if (health % 1 > 0.5) {
-            result.push(
-                new SpriteComponent(full, new SpriteTransform(getHeartPosition(result.length)))
-            )
-        } else if (health % 1 > 0) {
-            result.push(
-                new SpriteComponent(half, new SpriteTransform(getHeartPosition(result.length)))
-            )
+        // partial heart
+        if (health % 1 > 0) {
+            // always show a partial heart if they're almost dead (< .5 health)
+            if (health % 1 >= 0.5 || fullHearts === 0) {
+                result.push(
+                    new SpriteComponent(half, new SpriteTransform(getHeartPosition(result.length)))
+                )
+            } else {
+                result.push(
+                    new SpriteComponent(empty, new SpriteTransform(getHeartPosition(result.length)))
+                )
+            }
         }
 
         while (result.length < maxHealth) {

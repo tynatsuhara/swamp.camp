@@ -13,10 +13,6 @@ import { DudeType } from "../characters/DudeType"
 import { player } from "../characters/player"
 import { spawnMagicProjectile } from "../characters/weapons/MagicProjectile"
 import { controls } from "../Controls"
-import {
-    emitApparitionParticles,
-    LIGHT_SMOKE_PARTICLES,
-} from "../graphics/particles/ApparitionParticles"
 import { pixelPtToTilePt } from "../graphics/Tilesets"
 import { DrawMenu } from "../ui/DrawMenu"
 import { UIStateManager } from "../ui/UIStateManager"
@@ -107,9 +103,9 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     // ],
     [
         InputKey.I,
-        "emitApparitionParticles",
+        "damage player",
         () => {
-            emitApparitionParticles(player().standingPosition, LIGHT_SMOKE_PARTICLES)
+            player().damage(0.25)
         },
     ],
 
