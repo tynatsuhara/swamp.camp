@@ -72,9 +72,9 @@ export class PlayerInventory extends Inventory {
         const equipOnAdd = (item: Item, metadata: ItemStackMetadata) => {
             const itemData = ITEM_METADATA_MAP[item]
             if (metadata.equipped === "weapon") {
-                Dude.get(playerUUID).setWeapon(itemData.equippableWeapon, -1)
+                Dude.get(playerUUID)?.setWeapon(itemData.equippableWeapon, -1)
             } else if (metadata.equipped === "shield") {
-                Dude.get(playerUUID).setShield(itemData.equippableShield, -1)
+                Dude.get(playerUUID)?.setShield(itemData.equippableShield, -1)
             }
         }
 
