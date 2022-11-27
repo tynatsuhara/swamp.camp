@@ -975,6 +975,9 @@ export class Dude extends Component implements DialogueSource {
             console.warn(`guests can't call heal()`)
             return
         }
+        if (this.health === this.maxHealth) {
+            return
+        }
         if (this.isAlive) {
             this._health = Math.min(this.maxHealth, this.health + amount)
         }
