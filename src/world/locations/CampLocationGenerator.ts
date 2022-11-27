@@ -37,7 +37,6 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
     private map: HTMLImageElement
 
     protected _generate() {
-        // TODO: improve this logic to avoid creating maps the player has already seen
         const mapId = this.pickMap()
         console.log({ mapId })
 
@@ -54,7 +53,6 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
 
         // essential elements
         location.addElement(ElementType.QUEEQUEG, pt(MAP_RANGE - 6, 10))
-        // TODO place tent
 
         this.spawnTreesAtEdge(location)
         this.spawnTrees(location)

@@ -98,7 +98,6 @@ export const getEventQueueHandlers = (): {
 
         const typesToSpawn = (data.dudeTypes || [DudeType.VILLAGER]) as DudeType[]
 
-        // TODO: push all onto the queequeg
         typesToSpawn.forEach((type) => {
             const dude = DudeFactory.instance.create(
                 type,

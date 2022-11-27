@@ -10,7 +10,7 @@ import { Interactable } from "./elements/Interactable"
 import { Location } from "./locations/Location"
 
 type TeleporterIndicatorSaveData = {
-    to: string // the destination uuid (TODO: support same-location teleporters)
+    to: string // the destination uuid (must be different than the current location)
     i: string // stringified position for the interactable
     id: string
 }
@@ -53,7 +53,6 @@ export class TeleporterIndicatorFactory extends ElementFactory<
             )
         )
 
-        // TODO have the arrow pointable in different directions
         e.addComponent(
             new (class extends Component {
                 getRenderMethods(): RenderMethod[] {

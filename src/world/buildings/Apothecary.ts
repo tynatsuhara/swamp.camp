@@ -24,8 +24,6 @@ export class ApothecaryFactory extends SimpleBuildingFactory<ElementType.APOTHEC
     }
 }
 
-// TODO below
-
 const makeApothecaryInterior = (outside: Location): Location => {
     const l = new Location(LocationType.APOTHECARY_INTERIOR, true, false)
 

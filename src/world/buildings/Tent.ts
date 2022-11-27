@@ -102,7 +102,7 @@ const addTile = (e: Entity, s: string, pos: Point, depth: number, color: TentCol
 }
 
 const makeTentInterior = (outside: Location, color: TentColor): Location => {
-    // TODO change the isPlayerTent logic to support more than 2 tents
+    // only the player should have a blue tent
     const isPlayerTent = color === "blue"
     const l = new Location(LocationType.TENT_INTERIOR, true, isPlayerTent)
 

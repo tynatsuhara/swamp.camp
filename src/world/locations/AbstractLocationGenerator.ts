@@ -11,7 +11,6 @@ const SQ = 2
 const MIN_WATER_SIZE = 50
 const MAX_WATER_SIZE = 500
 
-// TODO generalize to other foliage
 export type TreeTypeSupplier = () => ElementType.TREE_POINTY | ElementType.TREE_ROUND
 
 /**
@@ -103,7 +102,6 @@ export abstract class AbstractLocationGenerator {
 
         // Each entry will occupy a sq x sq tile section to prevent
         // 1-wide entries that are hard to make work art-wise
-        // TODO: Smooth out edges to prevent stair-step pattern?
 
         let bottomLedges = 0
         let topLedges = 0
