@@ -337,7 +337,9 @@ export class Dude extends Component implements DialogueSource {
         const setShield = (type: ShieldType) => {
             this.shield?.delete()
             this._shield = this.entity.addComponent(ShieldFactory.make(type, this.type))
-            this._weapon?.setSheathed(false) // keep em in sync
+            if (this._weapon?.isSheathed()) {
+                this._shield?.setOnBack(true) // keep em in sync
+            }
         }
         this.setShield = clientSyncFn(
             this.syncId("eqs"),
@@ -506,7 +508,7 @@ export class Dude extends Component implements DialogueSource {
         this.droppedItemPickupCheck()
 
         if (session.isHost() && WorldTime.instance.time - this.lastDamageTime > 30_000) {
-            this.heal(elapsedTimeMillis / 20_000)
+            this.heal(elapsedTimeMillis / 50_000)
         }
     }
 
