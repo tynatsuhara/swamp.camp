@@ -47,9 +47,11 @@ export class InventoryDisplay extends Component {
     private stackSprites: SpriteComponent[] = []
     private showingInv = false
     private hoverTooltipString: string
+
     get isOpen() {
         return this.showingInv
     }
+    private canAcceptInput: boolean
     private offset: Point
     private tooltip: Tooltip
     private readonly coinsOffset = new Point(0, -18)
@@ -107,6 +109,10 @@ export class InventoryDisplay extends Component {
         }
 
         this.updateTooltip()
+
+        // Because we use lateUpdate, it's possible a user just opened this (eg opened a chest)
+        // We need to prevent double input on a single frame. All input-checking should include this field.
+        this.canAcceptInput = true
     }
 
     private updateTooltip() {
@@ -131,6 +137,9 @@ export class InventoryDisplay extends Component {
     }
 
     private checkSetHotKey(index: number, spec: ItemSpec, updateData: UpdateData) {
+        if (!this.canAcceptInput) {
+            return
+        }
         if (!spec.equippableWeapon && !spec.equippableShield) {
             return
         }
@@ -215,6 +224,10 @@ export class InventoryDisplay extends Component {
     }
 
     private checkDragAndDrop(hoverInv: Inventory, hoverIndex: number) {
+        if (!this.canAcceptInput) {
+            return
+        }
+
         // dragging
         const dropFullStack = controls.isInventoryStackDrop()
         const dropOne = controls.isInventoryStackDropOne()
@@ -475,7 +488,7 @@ export class InventoryDisplay extends Component {
 
         profiler.showInfo(`item metadata: ${prettyPrint(stack.metadata)}`)
 
-        if (this.canUseItems) {
+        if (this.canUseItems && this.canAcceptInput) {
             actions.forEach((action, i) => {
                 if (interactButtonOrder[i][1]()) {
                     action.actionFn()
@@ -485,6 +498,10 @@ export class InventoryDisplay extends Component {
     }
 
     private checkForPickUp(hoverInv: Inventory, hoverIndex: number) {
+        if (!this.canAcceptInput) {
+            return
+        }
+
         const isPickUp = controls.isInventoryStackPickUp()
         const isPickUpHalf = controls.isInventoryStackPickUpHalf()
         const isSwap = controls.isInventorySwap()
@@ -556,6 +573,7 @@ export class InventoryDisplay extends Component {
 
     open(onClose: () => void = null, tradingInv: Inventory = null) {
         this.clearHeldStack()
+        this.canAcceptInput = false
 
         this.onClose = onClose
         this.tradingInv = tradingInv
