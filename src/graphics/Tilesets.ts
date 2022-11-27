@@ -27,6 +27,7 @@ export const getFilesToLoadForMainMenu = () => {
         "images/dungeon_base.png",
         "images/tilemap.png",
         "images/env_outdoor_recolor.png",
+        "cursor.png",
     ].map(versionize)
 }
 
