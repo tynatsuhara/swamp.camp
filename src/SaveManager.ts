@@ -113,8 +113,6 @@ class SaveManager {
 
         if (context === "save") {
             HUD.instance.showSaveIcon()
-            console.log("saving online players:")
-            console.log(onlinePlayers)
             console.log("saved game")
             localStorage.setItem(this.saveKey, JSON.stringify(save))
         }
