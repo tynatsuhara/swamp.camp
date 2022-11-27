@@ -1,4 +1,5 @@
 import { Component } from "brigsby/dist"
+import { DudeType } from "../../characters/DudeType"
 import { NPC } from "../../characters/NPC"
 import { player } from "../../characters/player"
 import { session } from "../../online/session"
@@ -14,10 +15,15 @@ import { ElementType } from "./Elements"
 
 const restTransition = syncFn("rest", (hours: number) => {
     const pause = 1200
+
     HUD.instance.locationTransition.transition(() => {
         if (session.isHost()) {
             WorldTime.instance.fastForward(hours * TimeUnit.HOUR)
             setTimeout(() => saveManager.autosave(), pause + 500)
+            here()
+                .getDudes()
+                .filter((d) => d.type === DudeType.PLAYER)
+                .forEach((d) => d.setWeaponAndShieldDrawn(false))
         }
     }, pause)
 })
