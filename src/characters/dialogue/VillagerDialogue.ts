@@ -1,3 +1,4 @@
+import { Lists } from "brigsby/dist/util/Lists"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { Dude } from "../Dude"
@@ -29,7 +30,15 @@ export const VILLAGER_DIALOGUE: DialogueSet = {
         }
 
         return dialogueWithOptions(
-            ["What do you need?"],
+            [
+                Lists.oneOf([
+                    "What do you need?",
+                    "Hey boss.",
+                    "What can I do?",
+                    "Hello, Champion!",
+                    "At your service, Champion.",
+                ]),
+            ],
             DudeInteractIndicator.NONE,
             new DialogueOption("Head down to the mines.", () => {
                 return setJob(VillagerJob.MINE)
