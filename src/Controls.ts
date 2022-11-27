@@ -180,7 +180,7 @@ class ControlsWrapper extends Component {
     isInventoryStackDrop = () =>
         check({
             kbm: () => input.isMouseDown,
-            gamepad: () => gamepadInput.isButtonUp(GamepadButton.X),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.X),
         })
 
     isInventoryStackPickUpHalf = () =>
