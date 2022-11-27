@@ -115,6 +115,10 @@ export class Burnable extends RepeatedInvoker {
     }
 
     delete() {
+        if (!this.isBurning) {
+            return
+        }
+
         // Emit ash particles
         this.pts.forEach((pt) => {
             const position = pt.plus(new Point(0.5, 0.5)).times(TILE_SIZE)
