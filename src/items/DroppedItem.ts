@@ -41,7 +41,7 @@ export class DroppedItem extends Component {
         this.itemType = item
         this.start = () => {
             this.sprite = this.entity.addComponent(
-                ITEM_METADATA_MAP[item].droppedIconSupplier().toComponent()
+                ITEM_METADATA_MAP[item].droppedIconSupplier(metadata).toComponent()
             )
             const pos = position.minus(
                 new Point(

@@ -17,6 +17,7 @@ import { randomByteString } from "../saves/uuid"
 import { ElementType } from "../world/elements/Elements"
 import { here } from "../world/locations/LocationManager"
 import { DroppedItem } from "./DroppedItem"
+import { getTentVariantImageFilter } from "./TentVariants"
 
 export enum Item {
     COIN,
@@ -86,7 +87,7 @@ export type ItemMetadata = Record<string, any>
 
 export class ItemSpec {
     readonly displayName: string
-    readonly droppedIconSupplier?: () => SpriteSource
+    readonly droppedIconSupplier?: (metadata?: ItemMetadata) => SpriteSource
     readonly inventoryIcon: Icon
     readonly stackLimit: number
     readonly element?: ElementType
@@ -106,7 +107,7 @@ export class ItemSpec {
     }: {
         displayName: string
         inventoryIcon: Icon
-        droppedIconSupplier?: () => SpriteSource
+        droppedIconSupplier?: (metadata?: ItemMetadata) => SpriteSource
         stackLimit?: number
         element?: ElementType
         equippableWeapon?: WeaponType
@@ -284,7 +285,10 @@ export const ITEM_METADATA_MAP = {
         inventoryIcon: "tent",
         stackLimit: 1,
         element: ElementType.TENT,
-        droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("tentdropped"),
+        droppedIconSupplier: (metadata) =>
+            Tilesets.instance.outdoorTiles
+                .getTileSource("tentdropped")
+                .filtered(getTentVariantImageFilter(metadata.color)),
     }),
     [Item.HOUSE]: new ItemSpec({
         displayName: "House",
@@ -310,7 +314,6 @@ export const ITEM_METADATA_MAP = {
         stackLimit: 1,
         element: ElementType.CHURCH,
     }),
-    // TODO
     [Item.MINE_ENTRANCE]: new ItemSpec({
         displayName: "Mine entrance",
         inventoryIcon: "ladder",

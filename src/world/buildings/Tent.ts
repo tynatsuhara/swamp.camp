@@ -2,10 +2,9 @@ import { Entity, Point, pt } from "brigsby/dist"
 import { BasicRenderComponent } from "brigsby/dist/renderer"
 import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Sounds } from "../../audio/Sounds"
-import { ImageFilters } from "../../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item, ItemMetadata } from "../../items/Items"
-import { Color } from "../../ui/Color"
+import { getTentVariantImageFilter, TentColor, TentData } from "../../items/TentVariants"
 import { Breakable } from "../elements/Breakable"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/Elements"
@@ -18,17 +17,6 @@ import { LocationManager, LocationType } from "../locations/LocationManager"
 import { Teleporter, TeleporterPrefix, TeleporterSound } from "../Teleporter"
 import { BuildingFactory } from "./Building"
 import { InteriorUtils } from "./InteriorUtils"
-
-type Variant = { dark: Color; light: Color; accent: Color }
-
-const VARIANTS = {
-    red: { dark: Color.PINK_2, light: Color.PINK_3, accent: Color.PINK_4 },
-    blue: { dark: Color.BLUE_3, light: Color.BLUE_4, accent: Color.BLUE_5 },
-    taupe: { dark: Color.TAUPE_3, light: Color.TAUPE_4, accent: Color.TAUPE_5 },
-}
-
-export type TentColor = keyof typeof VARIANTS
-type TentData = { color: TentColor; destinationUUID: string }
 
 export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
     readonly dimensions = new Point(4, 3)
@@ -44,7 +32,6 @@ export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
     ) {
         const e = new Entity()
 
-        const colorVariant = VARIANTS[color]
         const tentCenterPos = pos.plus(new Point(2, 1)).times(TILE_SIZE)
         const interactablePos = tentCenterPos.plusY(TILE_SIZE)
         const doorId = TeleporterPrefix.TENT
@@ -60,10 +47,10 @@ export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
         // Set up tiles
         const depth = (pos.y + 1) * TILE_SIZE + /* prevent clipping */ 1
         const tiles = [
-            addTile(e, `tentNW`, pos.plusX(1), depth, colorVariant),
-            addTile(e, `tentNE`, pos.plus(new Point(2, 0)), depth, colorVariant),
-            addTile(e, `tentSW`, pos.plus(new Point(1, 1)), depth, colorVariant),
-            addTile(e, `tentSE`, pos.plus(new Point(2, 1)), depth, colorVariant),
+            addTile(e, `tentNW`, pos.plusX(1), depth, color),
+            addTile(e, `tentNE`, pos.plus(new Point(2, 0)), depth, color),
+            addTile(e, `tentSW`, pos.plus(new Point(1, 1)), depth, color),
+            addTile(e, `tentSE`, pos.plus(new Point(2, 1)), depth, color),
         ]
         e.addComponent(
             new NavMeshCollider(
@@ -103,18 +90,12 @@ export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
     }
 }
 
-const getVariantFilter = (color: Variant) => {
-    return ImageFilters.recolor(
-        [Color.PINK_2, color.dark],
-        [Color.PINK_3, color.light],
-        [Color.PINK_4, color.accent]
-    )
-}
-
-const addTile = (e: Entity, s: string, pos: Point, depth: number, color: Variant) => {
+const addTile = (e: Entity, s: string, pos: Point, depth: number, color: TentColor) => {
     return e.addComponent(
         new SpriteComponent(
-            Tilesets.instance.outdoorTiles.getTileSource(s).filtered(getVariantFilter(color)),
+            Tilesets.instance.outdoorTiles
+                .getTileSource(s)
+                .filtered(getTentVariantImageFilter(color)),
             SpriteTransform.new({ position: pos.times(TILE_SIZE), depth })
         )
     )
@@ -155,7 +136,7 @@ const makeTentInterior = (outside: Location, color: TentColor): Location => {
 export const tentInteriorSprite = ({ color }: { color: TentColor }) => {
     const render = Tilesets.instance.largeSprites
         .getTileSource("tent-interior")
-        .filtered(getVariantFilter(VARIANTS[color]))
+        .filtered(getTentVariantImageFilter(color))
         .toImageRender(
             SpriteTransform.new({
                 position: pt(0, -TILE_SIZE * 3),
