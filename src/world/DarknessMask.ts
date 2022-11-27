@@ -4,6 +4,7 @@ import { ImageRender } from "brigsby/dist/renderer"
 import { Lists } from "brigsby/dist/util"
 import { Dude } from "../characters/Dude"
 import { Lantern } from "../characters/weapons/Lantern"
+import { Torch } from "../characters/weapons/Torch"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Color, getRGB } from "../ui/Color"
 import { UIStateManager } from "../ui/UIStateManager"
@@ -13,6 +14,9 @@ import { TimeUnit } from "./TimeUnit"
 /**
  * Renders a mask of darkness with light sources. This is a pure view
  * that does not touch any global state in order to allow reusability.
+ *
+ * NOTE: IF YOU SEE ANY FLICKERING LIGHT CIRCLES, IT IS PROBABLY DUE TO NOT
+ * PRE-POPULATING THE BITMAP CACHE. ADD THE DIAMETER TO THE CONSTRUCTOR HERE!
  */
 export class DarknessMask extends Component {
     static readonly DEPTH = UIStateManager.UI_SPRITE_DEPTH - 100 // make sure all UI goes on top of light
@@ -48,6 +52,7 @@ export class DarknessMask extends Component {
         }
         this.populateBitmapCache(Lantern.DIAMETER)
         this.populateBitmapCache(Dude.ON_FIRE_LIGHT_DIAMETER)
+        Torch.DIAMETERS.forEach((d) => this.populateBitmapCache(d))
     }
 
     private populateBitmapCache(diameter: number) {

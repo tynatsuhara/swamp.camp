@@ -18,6 +18,8 @@ const DIAMETERS = [40, 60, 80]
  * A torch, which is a short-lived lantern that can be used to burn shit
  */
 export class Torch extends Shield {
+    static readonly DIAMETERS = DIAMETERS
+
     private particles: FireParticles
     private audio: PointAudio
     private burning = false
