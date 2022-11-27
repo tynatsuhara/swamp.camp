@@ -38,15 +38,13 @@ export class DeathCutscene extends Component {
                 SpriteTransform.new({ position: centerPos, depth: TextOverlayManager.DEPTH })
             )
 
-        const text = Lists.oneOf(["You died. How unfortunate."])
-
         const button = Lists.oneOf(["WALK IT OFF", "GET UP", "OW!"])
 
         setTimeout(() => {
             HUD.instance.locationTransition.transition(() => {
                 // While the text overlay is active, the location transition will pause
                 TextOverlayManager.instance.open({
-                    text: [text],
+                    text: this.getText(),
                     finishAction: button,
                     onFinish: () => this.respawn(),
                     additionalComponents: () => [deathIcon],
@@ -54,6 +52,27 @@ export class DeathCutscene extends Component {
                 })
             }, this.TRANSITION_PAUSE)
         }, this.SHOW_TRANSITION)
+    }
+
+    private getText(): string[] {
+        if (!saveManager.getState().hasDied) {
+            saveManager.setState({ hasDied: true })
+            return [
+                `As your soul begins to leave your body, you feel the ancient magic of the swamp resist.
+                
+Your work here is not yet done.`,
+            ]
+        }
+
+        const suffix = Lists.oneOf([
+            "How unfortunate.",
+            "Again, really?",
+            "Oof.",
+            "Better luck next time.",
+            "Great job!",
+        ])
+
+        return [`You died. ${suffix}`]
     }
 
     respawn() {

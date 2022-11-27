@@ -27,6 +27,7 @@ export class SaveState {
     hasMadeFire?: boolean = false
     hasRecruitedAnyVillagers?: boolean = false
     lastCampfireRestTime?: number = Number.MIN_SAFE_INTEGER
+    hasDied?: boolean = false
 
     // stored in a location-agnostic spot, in state so that it is persisted easily
     onlinePlayers?: Record<string, Partial<DudeSaveState> & { uuid: string; password: string }> = {}
