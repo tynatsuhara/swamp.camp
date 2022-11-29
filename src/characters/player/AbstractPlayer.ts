@@ -80,7 +80,6 @@ export abstract class AbstractPlayer extends Component {
         let dy = 0
 
         if (this.dude.rolling) {
-            // TODO: change how momentum works if we implement slippery ice
             dx = this.dude.rollingMomentum.x
             dy = this.dude.rollingMomentum.y
         } else {

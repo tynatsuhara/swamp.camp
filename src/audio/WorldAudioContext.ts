@@ -31,7 +31,6 @@ export class WorldAudioContext {
     set isInterior(value: boolean) {
         if (this._isInterior != value) {
             this._isInterior = value
-            // this.notifyListeners()
         }
     }
 
@@ -42,14 +41,12 @@ export class WorldAudioContext {
     set isInBattle(value: boolean) {
         if (this._isInBattle != value) {
             this._isInBattle = value
-            // this.notifyListeners()
         }
     }
 
     private notifyListeners() {
         // This is a proxy that prevents music from starting until
         // the game has really started (after the first cutscene)
-        // TODO: How to do this better?
         if (!player()) {
             return
         }

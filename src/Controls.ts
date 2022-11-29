@@ -69,12 +69,6 @@ const deaden = (axes: Point) =>
         axes.y < AXIS_DEAD_ZONE && axes.y > -AXIS_DEAD_ZONE ? 0 : axes.y
     )
 
-/**
- * TODO:
- *   - Add UI hints for both mouse/keyboard and gamepad
- *   - Add vibration hook here
- *   - Make sure the APIs are consistently named
- */
 class ControlsWrapper extends Component {
     readonly HOT_KEY_OPTIONS = [
         InputKey.ZERO,
@@ -169,8 +163,6 @@ class ControlsWrapper extends Component {
 
     getInventoryOptionTwoString = () => (isGamepadMode ? TextIcon.GAMEPAD_TRIANGLE : "[f]")
 
-    // TODO maybe revisit these controls on gamepad
-
     isInventoryStackPickUp = () =>
         check({
             kbm: () => input.isMouseDown,
@@ -238,7 +230,6 @@ class ControlsWrapper extends Component {
         })
 
     // ======== PLAYER CONTROLS ========
-    // TODO: Make walk functions return [0, 1] to support analog sticks
 
     isInteractDown = () =>
         check({

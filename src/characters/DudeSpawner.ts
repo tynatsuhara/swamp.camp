@@ -127,7 +127,7 @@ export class DudeSpawner extends Component {
 
         const goalCount = waterSpots.length / 50
 
-        // TODO: Some way to make swamp things not spawn?
+        // TODO: Some unlockable way to make swamp things not spawn?
 
         if (thingCount.length < goalCount) {
             const spawnCount = Math.min(waterSpots.length, goalCount - thingCount.length)

@@ -1165,7 +1165,6 @@ export class Dude extends Component implements DialogueSource {
         if (!this.isJumping) {
             if (this.isMoving) {
                 // start walking animation
-                // TODO make the run animation backwards if they run backwards :)
                 if (!wasMoving || this.animationDirty) {
                     this.animation.goToAnimation(1)
                 }

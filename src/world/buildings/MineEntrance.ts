@@ -30,7 +30,6 @@ export class MineEntranceFactory extends BuildingFactory<ElementType.MINE_ENTRAN
         const pixelPt = pos.times(TILE_SIZE)
 
         // the interior location UUID
-        // TODO add mine interior
         const destinationUUID: string = data.destinationUUID ?? makeMineInterior(wl).uuid
 
         // Render hole

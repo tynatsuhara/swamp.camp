@@ -120,7 +120,6 @@ export class LocationManager {
      */
     exterior(): Location {
         if (!this.ext) {
-            // TODO do this in a less hacky fashion
             this.ext = Array.from(this.locations.values()).find(
                 (l) => l.type === LocationType.BASE_CAMP
             )

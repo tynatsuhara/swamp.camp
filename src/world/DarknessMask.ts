@@ -22,7 +22,7 @@ export class DarknessMask extends Component {
     static readonly DEPTH = UIStateManager.UI_SPRITE_DEPTH - 100 // make sure all UI goes on top of light
 
     // no lights should live outside of this range
-    // TODO: max this size dynamic (it will improve performance if we only fill the visible region)
+    // TODO: make this size dynamic (it will improve performance if we only fill the visible region)
     static readonly size = 110 * TILE_SIZE
     static readonly shift = pt(DarknessMask.size / 2)
 

@@ -34,8 +34,6 @@ const DIP_1 = "dip-1",
     DIP_TENT_PLACED = "dip-7",
     DIP_UPGRADES = "dip-8"
 
-// TODO: make DIP introduce himself, have player input their name
-
 export const DIP_INTRO_DIALOGUE: DialogueSet = {
     [DIP_STARTING_DIALOGUE]: () =>
         dialogueWithOptions(
@@ -95,7 +93,6 @@ export const DIP_INTRO_DIALOGUE: DialogueSet = {
             return dialogue(
                 lines,
                 () => {
-                    // TODO actually decide what should happen here
                     inv().addItem(Item.TENT, 1, { color: "blue" })
                     EventQueue.instance.addEvent({
                         type: QueuedEventType.HERALD_ARRIVAL,

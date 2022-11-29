@@ -11,7 +11,6 @@ export class VisibleRegionMask extends Component {
         return Singletons.getOrCreate(VisibleRegionMask)
     }
 
-    // TODO move to top-level consts
     private buffer = 200 // pixels from beyond the edge of the map (useful for covering clipping things)
     private padding = 128 // distance from start of shadows to the edge of the screen
     private rings = 8

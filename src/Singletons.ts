@@ -11,7 +11,6 @@ const singletonMap = new Map<any, any>()
  *        return Singletons.getOrCreate(this)
  *    }
  *
- * TODO: move to engine?
  */
 export const Singletons = {
     get: <T>(type: ConcreteType<T>): T | undefined => {

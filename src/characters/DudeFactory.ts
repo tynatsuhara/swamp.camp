@@ -100,7 +100,6 @@ export class DudeFactory {
      */
     load(saveState: DudeSaveState, location: Location) {
         // Guest player state will get serialized but we don't want to spawn them on the host when loading
-        // MPTODO: Persist guest state so they can leave and rejoin
         if (session.isHost() && saveState.uuid.startsWith(ONLINE_PLAYER_DUDE_ID_PREFIX)) {
             return
         }
@@ -477,7 +476,7 @@ export class DudeFactory {
             uuid,
             hasPendingSlot,
             type,
-            factions, // TODO: Save factions? Only if they become mutable
+            factions, // Factions aren't serialized because they're immutable
             characterAnimName: saveState?.anim ?? animationName,
             standingPosition: pos,
             weaponType: saveState?.weapon ?? weapon,
