@@ -20,7 +20,6 @@ export abstract class Weapon extends Component {
         this.dude = this.entity.getComponent(Dude)
     }
 
-    // TODO find a better place for these static functions?
     static getEnemiesInRange(attacker: Dude, attackDistance: number) {
         return here()
             .getDudes()
