@@ -23,7 +23,6 @@ export class GuestPlayer extends AbstractPlayer {
     }
 
     // on host
-    // MPTODO: This will probably have some janky behavior because the "onKey" handlers might run multiple times in a row
     private controls: PlayerControls
 
     // on client
@@ -62,7 +61,7 @@ export class GuestPlayer extends AbstractPlayer {
     update(updateData: UpdateData): void {
         if (session.isGuest()) {
             // send input to host
-            this.sendControls(this.getControls())
+            this.sendControls(this.serializeControls())
             const possibleInteractable = this.updateInteractables(updateData, true)
             if (controls.isInteractDown() && possibleInteractable) {
                 possibleInteractable.interact(this.dude)

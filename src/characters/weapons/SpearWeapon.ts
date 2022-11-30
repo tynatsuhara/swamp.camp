@@ -57,6 +57,10 @@ export class SpearWeapon extends Weapon {
         sprite: StaticSpriteSource
         transform: SpriteTransform
     } {
+        if (!spriteCache[angle]) {
+            return { sprite: null, transform: null }
+        }
+
         const { sprite, position } = spriteCache[angle]
         const transform = new SpriteTransform(
             // convert from "bottom center" to "top left" for the relative sprite
@@ -92,6 +96,10 @@ export class SpearWeapon extends Weapon {
         }
 
         const { sprite, transform } = this.getSpriteAndTransform(angle, offset)
+        if (!sprite) {
+            return []
+        }
+
         transform.depth = this.state == State.SHEATHED ? -0.5 : 0.5
 
         return [sprite?.toImageRender(transform)]
@@ -162,7 +170,7 @@ export class SpearWeapon extends Weapon {
                     new Point(rotatedTip.x * this.dude.getFacingMultiplier(), rotatedTip.y)
                 ),
                 // Item.SPEAR,
-                this.getPlayerAimingDirection().normalized().times(1.1),
+                this.getAimingDirection().normalized().times(1.1),
                 this.dude
             )
         } else {

@@ -1,4 +1,5 @@
 import { ButtonState, Component, debug, pt, UpdateData } from "brigsby/dist"
+import { PointValue } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util/Lists"
 import { controls } from "../../Controls"
 import { Camera } from "../../cutscenes/Camera"
@@ -9,6 +10,7 @@ import { Interactable } from "../../world/elements/Interactable"
 import { here } from "../../world/locations/LocationManager"
 import { WorldTime } from "../../world/WorldTime"
 import { Dude } from "../Dude"
+import { HAND_POSITION_OFFSET } from "../weapons/Weapon"
 import { player } from "./index"
 
 export type PlayerControls = {
@@ -21,6 +23,7 @@ export type PlayerControls = {
     isAttackHeld: boolean
     canProvideInput: boolean
     isInteractDown: boolean
+    aimingDirection: PointValue
 
     // these need to be treated differently since they're only true for one frame
     isJumpDown: boolean
@@ -55,9 +58,14 @@ export abstract class AbstractPlayer extends Component {
         }
     }
 
-    getControls(): PlayerControls {
+    serializeControls(): PlayerControls {
         // Controls we'll need to pass
         const canMove = !UIStateManager.instance.isMenuOpen || PlaceElementDisplay.instance.isOpen
+
+        const mousePos = controls.getWorldSpaceMousePos()
+        const centerPos = this.dude.standingPosition.plusY(HAND_POSITION_OFFSET.y)
+        const aimingDirection = pt(mousePos.x - centerPos.x, mousePos.y - centerPos.y)
+
         return {
             isWalkUpHeld: canMove ? controls.isWalkUpHeld() : false,
             isWalkDownHeld: canMove ? controls.isWalkDownHeld() : false,
@@ -72,6 +80,7 @@ export abstract class AbstractPlayer extends Component {
             isAttackDown: controls.isAttack(ButtonState.DOWN),
             canProvideInput: !UIStateManager.instance.isMenuOpen,
             isInteractDown: controls.isInteractDown(),
+            aimingDirection,
         }
     }
 
@@ -112,6 +121,8 @@ export abstract class AbstractPlayer extends Component {
         if (!playerControls.canProvideInput) {
             return
         }
+
+        this.dude.aimingDirection = playerControls.aimingDirection
 
         // Check other user input
 

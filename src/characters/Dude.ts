@@ -65,13 +65,14 @@ export enum AttackState {
 }
 
 type SyncData = {
-    p: { x: number; y: number } // standing position
-    d: { x: number; y: number } // walking direction
+    p: PointValue // standing position
+    d: PointValue // walking direction
     f: boolean // true if facing left, false otherwise
     as: AttackState
     mh: number // max health
     h: number // health
     ld: number // last damage timestamp
+    ad: PointValue // aiming direction
 }
 
 export class Dude extends Component implements DialogueSource {
@@ -124,6 +125,12 @@ export class Dude extends Component implements DialogueSource {
     }
     get shieldType() {
         return this.shield?.type ?? ShieldType.NONE
+    }
+    set aimingDirection(value: PointValue) {
+        this.syncData.ad = value
+    }
+    get aimingDirection() {
+        return this.syncData.ad
     }
 
     private collider: BoxCollider
@@ -252,11 +259,12 @@ export class Dude extends Component implements DialogueSource {
             {
                 p: { x: standingPosition.x, y: standingPosition.y },
                 f: false,
-                d: { x: 0, y: 0 },
+                d: Point.ZERO,
                 as: AttackState.NOT_ATTACKING,
                 mh: maxHealth,
                 h: maxHealth === Number.MAX_SAFE_INTEGER ? Number.MAX_SAFE_INTEGER : health,
                 ld: lastDamageTime,
+                ad: Point.ZERO,
             },
             (newData) => {
                 const newStandingPos = pt(newData.p.x, newData.p.y)

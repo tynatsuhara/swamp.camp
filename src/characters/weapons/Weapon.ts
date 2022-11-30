@@ -1,6 +1,6 @@
 import { Component, Point } from "brigsby/dist"
+import { pt } from "brigsby/dist/Point"
 import { StaticSpriteSource } from "brigsby/dist/sprites"
-import { controls } from "../../Controls"
 import { Hittable } from "../../world/elements/Hittable"
 import { here } from "../../world/locations/LocationManager"
 import { Dude } from "../Dude"
@@ -88,18 +88,19 @@ export abstract class Weapon extends Component {
      */
     cancelAttack() {}
 
-    getPlayerAimingDirection(): Point {
-        // MPTODO sync to and from the host
-        const mousePos = controls.getWorldSpaceMousePos()
-        const centerPos = this.dude.standingPosition.plusY(HAND_POSITION_OFFSET.y)
-        return new Point(mousePos.x - centerPos.x, mousePos.y - centerPos.y)
+    /**
+     * @returns d diff and y diff from the player "hand" point
+     */
+    getAimingDirection(): Point {
+        const { x, y } = this.dude.aimingDirection
+        return pt(x, y)
     }
 
     /**
      * @returns the angle in degrees of the line between the player and the cursor
      */
     getAimingAngle() {
-        const { x: xDiff, y: yDiff } = this.getPlayerAimingDirection()
+        const { x: xDiff, y: yDiff } = this.getAimingDirection()
         const degrees = (180 / Math.PI) * Math.atan(yDiff / Math.abs(xDiff))
         const result = Math.round(degrees / WEAPON_ROTATION_INCREMENT) * WEAPON_ROTATION_INCREMENT
         return result
