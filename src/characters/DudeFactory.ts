@@ -1,4 +1,5 @@
 import { Component, Entity, Point, pt } from "brigsby/dist"
+import { PointValue } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 import { TILE_SIZE } from "../graphics/Tilesets"
@@ -91,11 +92,24 @@ export class DudeFactory {
      * @param hasPendingSlot should be true if the character already had a home reserved
      *                       for them. If not, they will try to mark a spot as pending.
      */
-    create(type: DudeType, pos: Point, location: Location = camp(), hasPendingSlot = false): Dude {
-        return this.syncCreate(type, newUUID(), pos.x, pos.y, location.uuid, hasPendingSlot)
+    create(
+        type: DudeType,
+        standingPosition: Point,
+        location: Location = camp(),
+        hasPendingSlot = false,
+        existingData: Partial<DudeSaveState> = {}
+    ): Dude {
+        return this.syncMake(
+            type,
+            standingPosition,
+            { uuid: newUUID(), ...existingData },
+            location.uuid,
+            hasPendingSlot
+        )
     }
 
     /**
+     * Runs on host and client
      * Instantiates a Dude+Entity in the specified location
      */
     load(saveState: DudeSaveState, location: Location) {
@@ -107,20 +121,19 @@ export class DudeFactory {
         this.make(saveState.type, Point.fromString(saveState.pos), saveState, location, false)
     }
 
-    private readonly syncCreate = syncFn(
-        "df:create",
+    private readonly syncMake = syncFn(
+        "df:make",
         (
             type: DudeType,
-            uuid: string,
-            posX: number,
-            posY: number,
+            standingPosition: PointValue,
+            saveState: Partial<DudeSaveState> & { uuid: string },
             locationUUID: string,
             hasPendingSlot: boolean
         ) => {
             return this.make(
                 type,
-                pt(posX, posY),
-                { uuid },
+                standingPosition,
+                saveState,
                 LocationManager.instance.get(locationUUID),
                 hasPendingSlot
             )
@@ -129,7 +142,7 @@ export class DudeFactory {
 
     private make(
         type: DudeType,
-        pos: Point,
+        standingPosition: PointValue,
         saveState: Partial<DudeSaveState> & { uuid: string },
         location: Location,
         hasPendingSlot: boolean
@@ -478,7 +491,7 @@ export class DudeFactory {
             type,
             factions, // Factions aren't serialized because they're immutable
             characterAnimName: saveState?.anim ?? animationName,
-            standingPosition: pos,
+            standingPosition: pt(standingPosition.x, standingPosition.y),
             weaponType: saveState?.weapon ?? weapon,
             shieldType: saveState?.shield ?? shield,
             maxHealth: saveState?.maxHealth ?? maxHealth,

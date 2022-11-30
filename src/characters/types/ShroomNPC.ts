@@ -85,10 +85,11 @@ export class ShroomNPC extends Component {
         const newData = this.dude.save()
         newData.anim = ["SmallMushroom", "NormalMushroom", "LargeMushroom"][newSize - 1]
 
+        const { type, standingPosition, location } = this.dude
+
         // delete and respawn the shroom dude
         this.entity.selfDestruct()
-        // MPTODO: This probably won't work online
-        DudeFactory.instance.load(newData, camp())
+        DudeFactory.instance.create(type, standingPosition, location, false, newData)
     }
 
     isAggro() {
