@@ -10,12 +10,9 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/tylerbonnell/swamp.camp.git"
+        "url": "git+https://github.com/tynatsuhara/swamp.camp.git"
     },
-    "author": "Tyler Bonnell",
-    "bugs": {
-        "url": "https://github.com/tylerbonnell/swamp.camp/issues"
-    },
+    "author": "Tyler Natsuhara",
     "homepage": "https://swamp.camp",
     "devDependencies": {
         "prettier": "^2.7.1",
