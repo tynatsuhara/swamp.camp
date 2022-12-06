@@ -35,6 +35,7 @@ const SPAWNABLE_TYPES = [
     DudeType.FOREST_GUARDIAN,
     DudeType.GNOLL_SCOUT,
     DudeType.GNOLL_SHAMAN,
+    DudeType.GNOLL_OVERSEER,
     DudeType.CENTAUR,
     DudeType.ELF,
 ]

@@ -436,6 +436,15 @@ export class DudeFactory {
                 speed *= 0.8
                 break
             }
+            case DudeType.GNOLL_OVERSEER: {
+                factions = [DudeFaction.GNOLLS, DudeFaction.WOLVES]
+                animationName = "GnollOverseer"
+                weapon = WeaponType.UNARMED
+                additionalComponents = [new NPC()]
+                maxHealth = 20
+                speed *= 0.8
+                break
+            }
             case DudeType.GUMBALL: {
                 factions = [DudeFaction.GNOLLS, DudeFaction.VILLAGERS]
                 animationName = "gumball"
