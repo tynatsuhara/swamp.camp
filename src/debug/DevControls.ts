@@ -282,12 +282,9 @@ debug.forceMapId ??= ""
 debug.extraSaveSlots ??= 0
 
 const help = () => {
-    let help = `dev controls (enable with debug.enableDevControls=true)
--------------------------------------------------------\n`
-    devCommands.forEach((cmd) => {
-        help += `[${InputKeyString.for(cmd[0])}] ${cmd[1]}\n`
-    })
-    console.log(help)
+    let help = "dev controls (enable with debug.enableDevControls=true)"
+    const commands = devCommands.map((cmd) => `[${InputKeyString.for(cmd[0])}] ${cmd[1]}`)
+    console.log(help + "\n\n" + commands.join("\n"))
 }
 window["help"] = help
 help()
