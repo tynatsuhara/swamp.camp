@@ -9,7 +9,7 @@
             "version": "1.0.0",
             "dependencies": {
                 "brigsby": "^0.6.4",
-                "trystero": "^0.11.5"
+                "trystero": "^0.11.8"
             },
             "devDependencies": {
                 "prettier": "^2.7.1",
@@ -9253,9 +9253,9 @@
             }
         },
         "node_modules/trystero": {
-            "version": "0.11.5",
-            "resolved": "https://registry.npmjs.org/trystero/-/trystero-0.11.5.tgz",
-            "integrity": "sha512-Ul2+28+MO6dl0aaQejcUi+hx5GvrynCSagbNs9hxA8No0iva/5BEebZzHYUMh2hi58hkQV4W3zPuZhLKkdhELg==",
+            "version": "0.11.8",
+            "resolved": "https://registry.npmjs.org/trystero/-/trystero-0.11.8.tgz",
+            "integrity": "sha512-PfUzO0IVdxVQPkatp7KWAwPGKB2uJ9DlCxLGI33FfwWT8d9y/x5C4IHVYLflMFvZwSuFcss3GJ4tSca7qxB1jQ==",
             "dependencies": {
                 "firebase": "^9.6.5",
                 "ipfs-core": "0.9.0",
@@ -17493,9 +17493,9 @@
             }
         },
         "trystero": {
-            "version": "0.11.5",
-            "resolved": "https://registry.npmjs.org/trystero/-/trystero-0.11.5.tgz",
-            "integrity": "sha512-Ul2+28+MO6dl0aaQejcUi+hx5GvrynCSagbNs9hxA8No0iva/5BEebZzHYUMh2hi58hkQV4W3zPuZhLKkdhELg==",
+            "version": "0.11.8",
+            "resolved": "https://registry.npmjs.org/trystero/-/trystero-0.11.8.tgz",
+            "integrity": "sha512-PfUzO0IVdxVQPkatp7KWAwPGKB2uJ9DlCxLGI33FfwWT8d9y/x5C4IHVYLflMFvZwSuFcss3GJ4tSca7qxB1jQ==",
             "requires": {
                 "firebase": "^9.6.5",
                 "ipfs-core": "0.9.0",
