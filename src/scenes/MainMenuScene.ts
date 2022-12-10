@@ -1,4 +1,4 @@
-import { assets, Component, Entity, Point, UpdateViewsContext } from "brigsby/dist"
+import { assets, Component, Entity, Point, Scene, UpdateViewsContext } from "brigsby/dist"
 import { BasicRenderComponent, ImageRender, renderer } from "brigsby/dist/renderer"
 import { SpriteComponent, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
@@ -45,7 +45,7 @@ enum SessionLoadingState {
 
 let cancelJoinTimeout: NodeJS.Timeout
 
-export class MainMenuScene {
+export class MainMenuScene extends Scene {
     private plumes: PlumePicker
     private knight: SpriteComponent
     private title = getImage("images/title.png")
@@ -59,6 +59,7 @@ export class MainMenuScene {
     private menu = Menu.ROOT
 
     constructor() {
+        super()
         this.loadAssets(false)
     }
 

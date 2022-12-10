@@ -1,4 +1,4 @@
-import { debug, Entity, Point, UpdateViewsContext } from "brigsby/dist"
+import { debug, Entity, Point, Scene, UpdateViewsContext } from "brigsby/dist"
 import { CollisionEngine, collisionEngine } from "brigsby/dist/collision"
 import {
     BasicRenderComponent,
@@ -39,7 +39,7 @@ import { camp, here, LocationManager } from "../world/locations/LocationManager"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
 
-export class GameScene {
+export class GameScene extends Scene {
     initialize() {
         collisionEngine.setCollisionMatrix(
             new Map([
