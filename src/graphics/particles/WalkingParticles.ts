@@ -30,13 +30,13 @@ export class WalkingParticles extends Component {
             for (let i = 0; i < particles; i++) {
                 const moveTimeLimit = 100 + Math.random() * 200
                 const lifeSpan = moveTimeLimit * 2
-                const depth = this.dude.standingPosition.y + 6
+                const depth = this.dude.standingPosition.y + 7
                 const offset = Point.ZERO.randomCircularShift(1)
 
                 Particles.instance.emitParticle(
                     Color.WHITE,
                     this.dude.standingPosition.plus(offset).plusY(-7),
-                    depth + 1,
+                    depth,
                     lifeSpan,
                     (t) => offset.times(Math.min(moveTimeLimit, t) * 0.035),
                     Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
