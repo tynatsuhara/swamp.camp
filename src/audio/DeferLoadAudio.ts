@@ -5,6 +5,7 @@ let deferLoad = true
 
 /**
  * Load the provided audio files ASAP, but don't block the main menu from rendering
+ * @returns the urls passed in for easier chaining
  */
 export const loadAudio = (urls: string[]) => {
     if (deferLoad) {
@@ -12,6 +13,7 @@ export const loadAudio = (urls: string[]) => {
     } else {
         assets.loadAudioFiles(urls)
     }
+    return urls
 }
 
 /**

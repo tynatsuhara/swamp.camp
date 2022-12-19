@@ -9,8 +9,9 @@ const MEDIUM = [0, 16, 20]
 const MEDIUM_LONG = [3, 9, 5, 1, 8]
 const LONG = [2, 7, 10, 11]
 
-const AUDIO_FILES = Lists.range(0, 22).map((i) => `audio/talkingsynth/TalkingSynth_${i}.wav`)
-loadAudio(AUDIO_FILES)
+const AUDIO_FILES = loadAudio(
+    Lists.range(0, 22).map((i) => `audio/talkingsynth/TalkingSynth_${i}.wav`)
+)
 
 let currentAudio: HTMLAudioElement
 

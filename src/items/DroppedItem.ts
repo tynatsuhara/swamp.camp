@@ -12,7 +12,9 @@ import { here } from "../world/locations/LocationManager"
 import { Item, ItemMetadata, ITEM_METADATA_MAP } from "./Items"
 
 // TODO: Find a better sound effect (this one isn't very audible)
-const PICK_UP_SOUNDS = Lists.range(0, 4).map((i) => `audio/impact/impactWood_medium_00${i}.ogg`)
+const PICK_UP_SOUNDS = loadAudio(
+    Lists.range(0, 4).map((i) => `audio/impact/impactWood_medium_00${i}.ogg`)
+)
 
 export class DroppedItem extends Component {
     static readonly COLLISION_LAYER = "item"
@@ -35,8 +37,6 @@ export class DroppedItem extends Component {
         sourceCollider?: Collider
     ) {
         super()
-
-        loadAudio(PICK_UP_SOUNDS)
 
         this.itemType = item
         this.start = () => {

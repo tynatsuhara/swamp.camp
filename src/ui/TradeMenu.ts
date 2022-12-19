@@ -34,11 +34,11 @@ export type SalePackage = {
     readonly price: number // number of gold
 }
 
-const CLINK_NOISES = [
+const CLINK_NOISES = loadAudio([
     "audio/rpg/inventory/coin.wav",
     "audio/rpg/inventory/coin2.wav",
     "audio/rpg/inventory/coin3.wav",
-]
+])
 
 const COLOR_BACKGROUND = Color.RED_2
 const COLOR_BACKGROUND_BORDER = Color.RED_1
@@ -74,8 +74,6 @@ export class TradeMenu extends Component {
 
         this.canvas = document.createElement("canvas")
         this.context = this.canvas.getContext("2d", { alpha: false })
-
-        loadAudio(CLINK_NOISES)
     }
 
     update(updateData: UpdateData) {

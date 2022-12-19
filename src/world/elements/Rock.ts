@@ -16,7 +16,7 @@ import { ElementType } from "./Elements"
 import { HittableResource } from "./HittableResource"
 import { NavMeshCollider } from "./NavMeshCollider"
 
-const MINING_AUDIO = Lists.range(0, 5).map((n) => `audio/impact/impactMining_00${n}.ogg`)
+const MINING_AUDIO = loadAudio(Lists.range(0, 5).map((n) => `audio/impact/impactMining_00${n}.ogg`))
 const MINING_AUDIO_VOLUME = 0.4
 
 export class RockFactory extends ElementFactory<ElementType.ROCK> {
@@ -24,7 +24,6 @@ export class RockFactory extends ElementFactory<ElementType.ROCK> {
 
     constructor() {
         super(ElementType.ROCK)
-        loadAudio(MINING_AUDIO)
     }
 
     make(wl: Location, pos: Point, data: any): ElementComponent<ElementType.ROCK> {
