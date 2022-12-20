@@ -82,19 +82,16 @@ export class Villager extends Component {
             // no-op
         } else {
             npc.setSchedule(NPCSchedules.newDefaultVillagerSchedule())
-            dude.doWhileLiving(
-                () => {
-                    // swing pickaxe randomly if working in the mines
-                    if (
-                        dude.weaponType === WeaponType.PICKAXE &&
-                        dude.location.type === LocationType.MINE_INTERIOR
-                    ) {
-                        dude.updateAttacking(true)
-                    }
-                },
-                2_000,
-                Math.random() * 2_000
-            )
+            dude.doWhileLiving(() => {
+                // swing pickaxe randomly if working in the mines
+                if (
+                    dude.weaponType === WeaponType.PICKAXE &&
+                    dude.location.type === LocationType.MINE_INTERIOR
+                ) {
+                    dude.updateAttacking(true)
+                }
+                return 2_000
+            }, Math.random() * 2_000)
         }
     }
 }

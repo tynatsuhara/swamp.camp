@@ -28,8 +28,14 @@ export class ShamanHealer extends Component {
         // TODO
         this.dude.entity.getComponent(NPC).setSchedule(NPCSchedules.newNoOpSchedule())
 
-        this.dude.doWhileLiving(() => this.updateHealTargets(), 3_000)
-        this.dude.doWhileLiving(() => this.doParticleEffects(), 100)
+        this.dude.doWhileLiving(() => {
+            this.updateHealTargets()
+            return 3_000
+        })
+        this.dude.doWhileLiving(() => {
+            this.doParticleEffects()
+            return 100
+        })
     }
 
     update({ elapsedTimeMillis }: UpdateData): void {

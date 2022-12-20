@@ -470,7 +470,8 @@ export class Dude extends Component implements DialogueSource {
                             dodgeable: false,
                         })
                     }
-                }, 600)
+                    return 600
+                })
             }
 
             // Update dialogue indicator
@@ -479,11 +480,13 @@ export class Dude extends Component implements DialogueSource {
                     this.dialogueIndicator =
                         getDialogue(this.dialogue)?.indicator ?? DudeInteractIndicator.NONE
                 }
-            }, 1000)
+                return 1_000
+            })
 
             this.doWhileLiving(() => {
                 VocalSounds.ambient(this)
-            }, 2000)
+                return 1_000 + Math.random() * 5_000
+            })
         }
     }
 
@@ -1357,23 +1360,23 @@ export class Dude extends Component implements DialogueSource {
 
     // fn will execute immediately (unless initialDelay > 0) and every intervalMillis milliseconds
     // until the NPC is dead or the function returns true
-    // TODO support variable interval
-    doWhileLiving(fn: () => boolean | void, intervalMillis: number, initialDelay?: number) {
+    doWhileLiving(fn: () => number, initialDelay?: number) {
         if (!this.isAlive) {
             return
         }
 
-        if (!initialDelay && fn()) {
+        if (!initialDelay && fn() <= 0) {
             return
         }
 
         const invoker = this.entity.addComponent(
             new RepeatedInvoker(() => {
-                if (!this.isAlive || fn()) {
+                const result = fn()
+                if (!this.isAlive || result <= 0) {
                     invoker.delete()
                 }
-                return intervalMillis
-            }, initialDelay ?? intervalMillis)
+                return result ?? 0
+            }, initialDelay)
         )
     }
 

@@ -76,7 +76,10 @@ export class NPC extends Simulatable {
 
     start() {
         if (session.isHost()) {
-            this._dude.doWhileLiving(() => this.decideWhatToDoNext(), 1000 + 1000 * Math.random())
+            this._dude.doWhileLiving(() => {
+                this.decideWhatToDoNext()
+                return 1000 + 1000 * Math.random()
+            })
         }
     }
 

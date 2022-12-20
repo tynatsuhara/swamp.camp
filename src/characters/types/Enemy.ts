@@ -97,13 +97,14 @@ export class Enemy extends Component {
                     // they've been in sunlight for a while, time to die
                     dude.dissolve()
                     dude.addCondition(Condition.ON_FIRE, 10_000)
-                    return true // end the loop
+                    return -1 // end the loop
                 }
                 lastSunlightCheck = true
             } else {
                 lastSunlightCheck = false
             }
-        }, 1000 + 1000 * Math.random())
+            return 1000 + 1000 * Math.random()
+        })
     }
 
     private acquatic(dude: Dude, npc: NPC) {

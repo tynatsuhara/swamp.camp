@@ -33,7 +33,10 @@ export class Berto extends Component {
 
         // wait until start() since schedule relies on the EventQueue and locations being initialized
         this.updateSchedule()
-        this.npc.dude.doWhileLiving(() => this.updateSchedule(), TimeUnit.HOUR)
+        this.npc.dude.doWhileLiving(() => {
+            this.updateSchedule()
+            return TimeUnit.HOUR
+        })
     }
 
     updateSchedule() {
