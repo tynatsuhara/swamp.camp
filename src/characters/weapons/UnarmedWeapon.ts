@@ -1,3 +1,4 @@
+import { Point } from "brigsby/dist/Point"
 import { session } from "../../online/session"
 import { Condition } from "../Condition"
 import { DudeType } from "../DudeType"
@@ -12,7 +13,6 @@ enum State {
 // TODO: Why doesn't UNARMED work for players?
 export class UnarmedWeapon extends Weapon {
     private state: State = State.DRAWN
-    private delay: number
 
     getType() {
         return WeaponType.UNARMED
@@ -42,17 +42,20 @@ export class UnarmedWeapon extends Weapon {
             return
         }
         const enemies = Weapon.getEnemiesInRange(this.dude, this.getRange() * 1.5)
-        if (enemies.length === 0) {
+        if (enemies.length === 0 && this.dude.type !== DudeType.PLAYER) {
             return
         }
+
         this.state = State.ATTACKING
 
         const closestEnemy = enemies[0]
-        const attackDir = closestEnemy.standingPosition.minus(this.dude.standingPosition)
+        const attackDir = !closestEnemy
+            ? this.getAimingDirection()
+            : closestEnemy.standingPosition.minus(this.dude.standingPosition)
 
-        this.dude.knockback(attackDir, 30) // pounce
+        this.pounce(attackDir)
 
-        closestEnemy.damage(this.getDamageAmount(), {
+        closestEnemy?.damage(this.getDamageAmount(), {
             direction: closestEnemy.standingPosition.minus(this.dude.standingPosition),
             knockback: 50,
             attacker: this.dude,
@@ -63,7 +66,15 @@ export class UnarmedWeapon extends Weapon {
             conditionDuration: 5_000 + Math.random() * 5_000,
         })
 
-        setTimeout(() => (this.state = State.DRAWN), this.delay)
+        setTimeout(() => (this.state = State.DRAWN), this.getMillisBetweenAttacks())
+    }
+
+    getMillisBetweenAttacks(): number {
+        return 1_000
+    }
+
+    private pounce(direction: Point) {
+        this.dude.knockback(direction, 30)
     }
 
     private getDamageAmount() {
