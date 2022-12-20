@@ -1134,9 +1134,6 @@ export class Dude extends Component implements DialogueSource {
     private getVerticalMovement(elapsedTimeMillis: number) {
         let dx = 0
         let dy = 0
-        if (dx == NaN || dy == NaN) {
-            this.log("what the fuck")
-        }
 
         const fallSpeedY = 0.0075
         const climbSpeed = 0.005
