@@ -5,6 +5,7 @@ import { RenderMethod } from "brigsby/dist/renderer"
 import { AnimatedSpriteComponent, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Animator, Lists, RepeatedInvoker } from "brigsby/dist/util"
 import { StepSounds } from "../audio/StepSounds"
+import { VocalSounds } from "../audio/VocalSounds"
 import { controls } from "../Controls"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
@@ -479,6 +480,10 @@ export class Dude extends Component implements DialogueSource {
                         getDialogue(this.dialogue)?.indicator ?? DudeInteractIndicator.NONE
                 }
             }, 1000)
+
+            this.doWhileLiving(() => {
+                VocalSounds.ambient(this)
+            }, 2000)
         }
     }
 
@@ -562,6 +567,9 @@ export class Dude extends Component implements DialogueSource {
     }
 
     updateAttacking(isNewAttack: boolean) {
+        if (isNewAttack) {
+            VocalSounds.attack(this)
+        }
         this._weapon?.attack(isNewAttack)
     }
 
@@ -814,6 +822,7 @@ export class Dude extends Component implements DialogueSource {
     }
 
     private onDamageCallback(blocked: boolean) {
+        VocalSounds.damage(this)
         if (this._onDamageCallback) {
             this._onDamageCallback(blocked)
         }
@@ -1348,6 +1357,7 @@ export class Dude extends Component implements DialogueSource {
 
     // fn will execute immediately (unless initialDelay > 0) and every intervalMillis milliseconds
     // until the NPC is dead or the function returns true
+    // TODO support variable interval
     doWhileLiving(fn: () => boolean | void, intervalMillis: number, initialDelay?: number) {
         if (!this.isAlive) {
             return
