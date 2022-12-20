@@ -13,6 +13,9 @@ enum State {
     ATTACKING,
 }
 
+/**
+ * TODO: Rewrite this to use dynamic sprite rotations so that we can create some fun variance in attacks + combo animations
+ */
 export class MeleeWeapon extends Weapon {
     private weaponType: WeaponType
     private weaponSprite: StaticSpriteSource
