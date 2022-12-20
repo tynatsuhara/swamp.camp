@@ -27,12 +27,15 @@ export class Sounds {
         })
     }
 
-    static playAtPoint(path: string, volume: number, point: Point, distance: number) {
+    /**
+     * Plays the sound at the specified point, dropping off ~linearly
+     */
+    static playAtPoint(path: string, volume: number, point: Point, range: number) {
         const distanceToPlayer = player().standingPosition.manhattanDistanceTo(point)
-        if (distance < distanceToPlayer) {
+        if (range < distanceToPlayer) {
             return
         }
-        const vol = Math.max(0, (distance - distanceToPlayer) / distance)
+        const vol = Math.max(0, (range - distanceToPlayer) / range)
         Sounds.play(path, volume * vol)
     }
 }
