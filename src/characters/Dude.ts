@@ -1355,8 +1355,8 @@ export class Dude extends Component implements DialogueSource {
         )
     }
 
-    // fn will execute immediately (unless initialDelay > 0) and every intervalMillis milliseconds
-    // until the NPC is dead or the function returns true
+    // fn will execute immediately (unless initialDelay > 0) and delay by the returned interval.
+    // if fn returns something <= 0, or the NPC dies, the interval will be canceled.
     doWhileLiving(fn: () => number, initialDelay?: number) {
         if (!this.isAlive) {
             return
@@ -1368,11 +1368,16 @@ export class Dude extends Component implements DialogueSource {
 
         const invoker = this.entity.addComponent(
             new RepeatedInvoker(() => {
-                const result = fn()
-                if (!this.isAlive || result <= 0) {
+                if (!this.isAlive) {
                     invoker.delete()
+                    return 0
                 }
-                return result ?? 0
+                const result = fn()
+                if (result <= 0) {
+                    invoker.delete()
+                    return 0
+                }
+                return result
             }, initialDelay)
         )
     }
