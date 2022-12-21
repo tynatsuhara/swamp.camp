@@ -12,7 +12,6 @@ import { DudeSpawner } from "../characters/DudeSpawner"
 import { DudeType } from "../characters/DudeType"
 import { player } from "../characters/player"
 import { spawnMagicProjectile } from "../characters/weapons/MagicProjectile"
-import { controls } from "../Controls"
 import { pixelPtToTilePt } from "../graphics/Tilesets"
 import { DrawMenu } from "../ui/DrawMenu"
 import { UIStateManager } from "../ui/UIStateManager"
@@ -108,7 +107,6 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
             player().damage(0.25)
         },
     ],
-
     [
         InputKey.U,
         "generate radiant location",
@@ -202,47 +200,6 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     ],
     [InputKey.T, "spawn visitor", () => DudeSpawner.instance.spawnVisitors(true)],
 ]
-
-window["vibrate"] = (duration: number, strongMagnitude: number, weakMagnitude: number) => {
-    controls.vibrate({
-        duration,
-        strongMagnitude,
-        weakMagnitude,
-    })
-}
-
-// WIP: Maybe expose this somewhere in the future
-window["saveImage"] = () => {
-    let data = localStorage.getItem("save")
-    console.log(`data length = ${data.length}`)
-
-    if (data.length % 4 !== 0) {
-        data += " ".repeat(4 - (data.length % 4))
-    }
-
-    let width = Math.ceil(Math.sqrt(data.length / 4))
-
-    const height = width
-
-    const squaredSize = width * height * 4
-
-    data += " ".repeat(squaredSize - data.length)
-
-    const encoder = new TextEncoder()
-    const array = encoder.encode(data)
-    const imageData = new ImageData(new Uint8ClampedArray(array), width, height)
-    const canvas = document.createElement("canvas")
-    canvas.width = width
-    canvas.height = height
-    const context = canvas.getContext("2d", { alpha: false })
-    context.putImageData(imageData, 0, 0)
-    document.body.appendChild(canvas)
-
-    // Decode to verify
-    const decoder = new TextDecoder()
-    const decodedSave = JSON.parse(decoder.decode(imageData.data))
-    console.log(decodedSave)
-}
 
 export class DevControls extends Component {
     update(updateData: UpdateData) {
