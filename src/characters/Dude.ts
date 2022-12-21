@@ -2,7 +2,7 @@ import { Component, debug, Point, pt } from "brigsby/dist"
 import { BoxCollider } from "brigsby/dist/collision"
 import { PointValue } from "brigsby/dist/Point"
 import { RenderMethod } from "brigsby/dist/renderer"
-import { AnimatedSpriteComponent, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
+import { SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Animator, Lists, RepeatedInvoker } from "brigsby/dist/util"
 import { StepSounds } from "../audio/StepSounds"
 import { VocalSounds } from "../audio/VocalSounds"
@@ -47,7 +47,7 @@ import { WorldTime } from "../world/WorldTime"
 import { ActiveCondition, Condition } from "./Condition"
 import { DialogueSource, EMPTY_DIALOGUE, getDialogue } from "./dialogue/Dialogue"
 import { DIP_ENTRYPOINT } from "./dialogue/DipDialogue"
-import { DudeAnimationUtils } from "./DudeAnimationUtils"
+import { DudeAnimation } from "./DudeAnimation"
 import { DudeFaction } from "./DudeFactory"
 import { DudeType } from "./DudeType"
 import { NPC } from "./NPC"
@@ -107,8 +107,7 @@ export class Dude extends Component implements DialogueSource {
         return this._health
     }
     speed: number
-    private characterAnimName: string
-    private _animation: AnimatedSpriteComponent
+    private _animation: DudeAnimation
     get animation() {
         return this._animation
     }
@@ -387,24 +386,13 @@ export class Dude extends Component implements DialogueSource {
         // Component lifecycle functions
 
         this.awake = () => {
-            // Set up animations
-            this.characterAnimName = characterAnimName
-            const idleAnim = DudeAnimationUtils.getCharacterIdleAnimation(characterAnimName, blob)
-            const runAnim = DudeAnimationUtils.getCharacterWalkAnimation(characterAnimName, blob)
-            const jumpAnim = DudeAnimationUtils.getCharacterJumpAnimation(characterAnimName, blob)
-            const height = idleAnim.getSprite(0).dimensions.y
-            this._animation = this.entity.addComponent(
-                new AnimatedSpriteComponent(
-                    [idleAnim, runAnim, jumpAnim],
-                    new SpriteTransform(new Point(0, 28 - height))
-                )
-            )
+            this._animation = this.entity.addComponent(new DudeAnimation(characterAnimName, blob))
             this.standingOffset = new Point(
                 this.animation.transform.dimensions.x / 2,
                 this.animation.transform.dimensions.y
             )
             this.position = standingPosition.minus(this.standingOffset)
-            this._animation.fastForward(Math.random() * 1000) // so not all the animations sync up
+            this.animation.fastForward(Math.random() * 1000) // so not all the animations sync up
 
             // Not using the synchronized methods because clients don't need to tell hosts
             setWeapon(weaponType)
@@ -824,8 +812,14 @@ export class Dude extends Component implements DialogueSource {
         return this.syncData.ld
     }
 
+    // sync fn, runs on hosts and guests
     private onDamageCallback(blocked: boolean) {
         VocalSounds.damage(this)
+
+        // TODO: Sprite flash or something
+        // this._animation.applyFilter(ImageFilters.tint(Color.WHITE))
+
+        // Custom callback
         if (this._onDamageCallback) {
             this._onDamageCallback(blocked)
         }
@@ -1430,7 +1424,7 @@ export class Dude extends Component implements DialogueSource {
             uuid: this.uuid,
             type: this.type,
             pos: this.standingPosition.toString(),
-            anim: this.characterAnimName,
+            anim: this.animation.animationName,
             maxHealth: this.maxHealth,
             health: this.health,
             weapon: this.weaponType,
