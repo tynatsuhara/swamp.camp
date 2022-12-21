@@ -14,12 +14,6 @@
         />
         <title>SWAMP CAMP</title>
         <script>
-            // redirect www
-            if (window.location.href.startsWith("https://www.")) {
-                const redirect = window.location.href.replace("https://www.", "https://")
-                window.location.replace(redirect)
-            }
-
             const isNativeApp = !!new URL(window.location.href).searchParams.get("native_app")
             const brands = navigator.userAgentData?.brands || []
             const isGoogleChrome = brands.some((b) => b.brand === "Google Chrome")
