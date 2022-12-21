@@ -184,7 +184,7 @@ export class DialogueDisplay extends Component {
     }
 
     private renderOptions() {
-        const now = new Date().getTime()
+        const now = Date.now()
         this.optionsPopupTime = Math.min(this.optionsPopupTime, now)
         // provide some buffer to prevent misclicks
         const canClickTime = this.optionsPopupTime + 350

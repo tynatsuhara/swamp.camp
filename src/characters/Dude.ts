@@ -963,9 +963,9 @@ export class Dude extends Component implements DialogueSource {
         const distToStop = 2
         let intervalsRemaining = 50
 
-        let last = new Date().getTime()
+        let last = Date.now()
         const knock = () => {
-            const now = new Date().getTime()
+            const now = Date.now()
             const diff = now - last
             if (diff > 0) {
                 this.moveTo(this.standingPosition.lerp((0.15 * diff) / 30, goal))

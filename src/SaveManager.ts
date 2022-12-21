@@ -100,7 +100,7 @@ class SaveManager {
 
         const save: Save = {
             version: CURRENT_SAVE_FORMAT_VERSION,
-            timeSaved: new Date().getTime(),
+            timeSaved: Date.now(),
             saveVersion: 0,
             locations: LocationManager.instance.save(context),
             worldTime: WorldTime.instance.time,

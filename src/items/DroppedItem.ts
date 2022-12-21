@@ -70,12 +70,12 @@ export class DroppedItem extends Component {
 
                 this.reposition()
 
-                let last = new Date().getTime()
+                let last = Date.now()
                 const move = () => {
                     if (!this.enabled) {
                         return
                     }
-                    const now = new Date().getTime()
+                    const now = Date.now()
                     const diff = now - last
                     if (diff > 0) {
                         this.reposition(velocity)
