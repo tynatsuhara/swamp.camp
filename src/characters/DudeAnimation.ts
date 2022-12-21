@@ -40,21 +40,26 @@ export class DudeAnimation extends Component {
         this._animation.update(updateData)
     }
 
-    private doFlash = false
+    private flashUntil: number = 0
     flash() {
-        this.doFlash = true
+        this.flashUntil = Date.now() + 40
+        console.log(`flash until ${this.flashUntil}`)
     }
 
     getRenderMethods() {
-        const filter = this.doFlash ? ImageFilters.tint(Color.WHITE) : null
+        const doFlash = !!this.flashUntil
+        if (this.flashUntil < Date.now()) {
+            this.flashUntil = 0
+            console.log(`current time ${this.flashUntil}`)
+        }
+
+        const filter = doFlash ? ImageFilters.tint(Color.WHITE) : null
 
         const result = [
             this._animation.sprite.filtered(filter).toImageRender(this._transform),
             ...(this.dude.shield?.getWrappedRenderMethods(filter) ?? []),
             ...(this.dude.weapon?.getWrappedRenderMethods(filter) ?? []),
         ]
-
-        this.doFlash = false
 
         return result
     }
