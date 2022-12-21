@@ -43,14 +43,12 @@ export class DudeAnimation extends Component {
     private flashUntil: number = 0
     flash() {
         this.flashUntil = Date.now() + 40
-        console.log(`flash until ${this.flashUntil}`)
     }
 
     getRenderMethods() {
         const doFlash = !!this.flashUntil
         if (this.flashUntil < Date.now()) {
             this.flashUntil = 0
-            console.log(`current time ${this.flashUntil}`)
         }
 
         const filter = doFlash ? ImageFilters.tint(Color.WHITE) : null
