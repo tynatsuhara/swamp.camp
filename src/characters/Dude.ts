@@ -386,7 +386,7 @@ export class Dude extends Component implements DialogueSource {
         // Component lifecycle functions
 
         this.awake = () => {
-            this._animation = this.entity.addComponent(new DudeAnimation(characterAnimName, blob))
+            this._animation = this.entity.addComponent(new DudeAnimation(this, characterAnimName))
             this.standingOffset = new Point(
                 this.animation.transform.dimensions.x / 2,
                 this.animation.transform.dimensions.y
