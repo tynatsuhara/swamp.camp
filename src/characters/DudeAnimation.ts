@@ -2,6 +2,9 @@ import { Component, pt, UpdateData } from "brigsby/dist"
 import { AnimatedSpriteComponent, ImageFilter, SpriteTransform } from "brigsby/dist/sprites"
 import { DudeAnimationUtils } from "./DudeAnimationUtils"
 
+/**
+ * Wraps multiple animations and dude-animation-specific logic
+ */
 export class DudeAnimation extends Component {
     private _animation: AnimatedSpriteComponent
     private _transform: SpriteTransform
