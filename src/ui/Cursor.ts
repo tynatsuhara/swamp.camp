@@ -17,11 +17,11 @@ export class Cursor extends Component {
     constructor(shouldShow: () => boolean = () => true) {
         super()
 
-        this.update = () => {
+        this.update = ({ elapsedTimeMillis }) => {
             this.cursorRenderMethod = undefined
             if (controls.isGamepadMode()) {
                 if (shouldShow()) {
-                    controls.updateGamepadCursorPosition()
+                    controls.updateGamepadCursorPosition(elapsedTimeMillis)
 
                     this.cursorRenderMethod = this.cursorSprite.toImageRender(
                         SpriteTransform.new({

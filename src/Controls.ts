@@ -61,13 +61,17 @@ const check = <T>(handlers: InputHandlers<T>) => {
 }
 
 const AXIS_DEAD_ZONE = 0.2
-const CURSOR_SENSITIVITY = 2.5
+const CURSOR_SENSITIVITY = 0.35
 
-const deaden = (axes: Point) =>
-    new Point(
-        axes.x < AXIS_DEAD_ZONE && axes.x > -AXIS_DEAD_ZONE ? 0 : axes.x,
-        axes.y < AXIS_DEAD_ZONE && axes.y > -AXIS_DEAD_ZONE ? 0 : axes.y
-    )
+const deadenAxis = (axis: number) => {
+    if (axis < AXIS_DEAD_ZONE && axis > -AXIS_DEAD_ZONE) {
+        return 0
+    }
+    // scale it 0-1 excluding the dead zone
+    return (Math.sign(axis) * (Math.abs(axis) - AXIS_DEAD_ZONE)) / (1 - AXIS_DEAD_ZONE)
+}
+
+const deaden = (axes: Point) => axes.apply(deadenAxis)
 
 class ControlsWrapper extends Component {
     readonly HOT_KEY_OPTIONS = [
@@ -113,7 +117,7 @@ class ControlsWrapper extends Component {
         }
     }
 
-    updateGamepadCursorPosition() {
+    updateGamepadCursorPosition(elapsedTimeMillis: number) {
         if (!isGamepadMode || !gamepadInput) {
             return
         }
@@ -123,7 +127,7 @@ class ControlsWrapper extends Component {
         // Both left and right stick can be used for mouse
         const leftStick = deaden(gamepadInput.getLeftAxes())
         const rightStick = deaden(gamepadInput.getRightAxes())
-        const stickInput = leftStick.plus(rightStick).times(CURSOR_SENSITIVITY)
+        const stickInput = leftStick.plus(rightStick).times(elapsedTimeMillis * CURSOR_SENSITIVITY)
 
         const adjustedPos = currentGamePadMousePos.plus(stickInput)
         const bounds = Camera.instance.dimensions.minus(new Point(3, 3))
