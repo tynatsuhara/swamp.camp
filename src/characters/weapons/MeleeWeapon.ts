@@ -50,8 +50,8 @@ export class MeleeWeapon extends Weapon {
         this.animate()
     }
 
-    getRenderMethods() {
-        return [this.weaponSprite.toImageRender(this.weaponTransform)]
+    getWrappedRenderMethods() {
+        return this.weaponSprite ? [this.weaponSprite.toImageRender(this.weaponTransform)] : []
     }
 
     getType() {

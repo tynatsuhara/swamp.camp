@@ -77,7 +77,7 @@ export class SpearWeapon extends Weapon {
         return { sprite, transform }
     }
 
-    getRenderMethods() {
+    getWrappedRenderMethods() {
         let angle = this.getAimingAngle()
         let offset = Point.ZERO
 

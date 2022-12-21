@@ -31,7 +31,6 @@ export class DudeAnimation extends Component {
             [idleAnim, runAnim, jumpAnim],
             new SpriteTransform(pt(0, 28 - height))
         )
-
         this._transform = this._animation.transform
     }
 
@@ -40,8 +39,11 @@ export class DudeAnimation extends Component {
     }
 
     getRenderMethods() {
-        // TODO: Wrap weapon and shield sprites
-        return this._animation.getRenderMethods()
+        return [
+            this._animation.sprite.toImageRender(this._transform),
+            ...(this.dude.shield?.getWrappedRenderMethods() ?? []),
+            ...(this.dude.weapon?.getWrappedRenderMethods() ?? []),
+        ]
     }
 
     fastForward(ms: number) {

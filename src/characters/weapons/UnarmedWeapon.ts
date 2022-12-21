@@ -73,6 +73,10 @@ export class UnarmedWeapon extends Weapon {
         return 1_000
     }
 
+    getWrappedRenderMethods() {
+        return []
+    }
+
     private pounce(direction: Point) {
         this.dude.knockback(direction, 30)
     }

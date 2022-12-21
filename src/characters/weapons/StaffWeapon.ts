@@ -235,9 +235,9 @@ export class StaffWeapon extends Weapon {
         }
     }
 
-    getRenderMethods() {
+    getWrappedRenderMethods() {
         return [
-            this.weaponSprite.toImageRender(this.weaponTransform),
+            this.weaponSprite ? this.weaponSprite.toImageRender(this.weaponTransform) : null,
             !this.attackPosition
                 ? null
                 : this.targetSprite.toImageRender(

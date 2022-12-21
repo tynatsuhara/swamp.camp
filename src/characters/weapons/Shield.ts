@@ -1,5 +1,4 @@
 import { Component, Point, UpdateData } from "brigsby/dist"
-import { RenderMethod } from "brigsby/dist/renderer"
 import { SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Tilesets } from "../../graphics/Tilesets"
 import { Dude } from "../Dude"
@@ -39,8 +38,8 @@ export class Shield extends Component {
         }
     }
 
-    getRenderMethods(): RenderMethod[] {
-        return [this.sprite.toImageRender(this.transform)]
+    getWrappedRenderMethods() {
+        return this.sprite ? [this.sprite.toImageRender(this.transform)] : []
     }
 
     update(updateData: UpdateData) {
