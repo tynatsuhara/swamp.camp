@@ -1,5 +1,7 @@
 import { Component, pt, UpdateData } from "brigsby/dist"
 import { AnimatedSpriteComponent, ImageFilter, SpriteTransform } from "brigsby/dist/sprites"
+import { ImageFilters } from "../graphics/ImageFilters"
+import { Color } from "../ui/Color"
 import { Dude } from "./Dude"
 import { DudeAnimationUtils } from "./DudeAnimationUtils"
 
@@ -38,12 +40,23 @@ export class DudeAnimation extends Component {
         this._animation.update(updateData)
     }
 
+    private doFlash = false
+    flash() {
+        this.doFlash = true
+    }
+
     getRenderMethods() {
-        return [
-            this._animation.sprite.toImageRender(this._transform),
-            ...(this.dude.shield?.getWrappedRenderMethods() ?? []),
-            ...(this.dude.weapon?.getWrappedRenderMethods() ?? []),
+        const filter = this.doFlash ? ImageFilters.tint(Color.WHITE) : null
+
+        const result = [
+            this._animation.sprite.filtered(filter).toImageRender(this._transform),
+            ...(this.dude.shield?.getWrappedRenderMethods(filter) ?? []),
+            ...(this.dude.weapon?.getWrappedRenderMethods(filter) ?? []),
         ]
+
+        this.doFlash = false
+
+        return result
     }
 
     fastForward(ms: number) {

@@ -1,5 +1,5 @@
 import { Point, UpdateData } from "brigsby/dist"
-import { SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
+import { ImageFilter, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Animator, Lists } from "brigsby/dist/util"
 import { Camera } from "../../cutscenes/Camera"
 import { ImageFilters } from "../../graphics/ImageFilters"
@@ -235,9 +235,11 @@ export class StaffWeapon extends Weapon {
         }
     }
 
-    getWrappedRenderMethods() {
+    getWrappedRenderMethods(filter: ImageFilter) {
         return [
-            this.weaponSprite ? this.weaponSprite.toImageRender(this.weaponTransform) : null,
+            this.weaponSprite
+                ? this.weaponSprite.filtered(filter).toImageRender(this.weaponTransform)
+                : null,
             !this.attackPosition
                 ? null
                 : this.targetSprite.toImageRender(

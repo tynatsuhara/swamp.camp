@@ -816,8 +816,7 @@ export class Dude extends Component implements DialogueSource {
     private onDamageCallback(blocked: boolean) {
         VocalSounds.damage(this)
 
-        // TODO: Sprite flash or something
-        // this._animation.applyFilter(ImageFilters.tint(Color.WHITE))
+        this.animation.flash()
 
         // Custom callback
         if (this._onDamageCallback) {
@@ -937,7 +936,6 @@ export class Dude extends Component implements DialogueSource {
         let dissolveChance = 0.1
         const interval = setInterval(() => {
             this.animation.applyFilter(ImageFilters.dissolve(() => dissolveChance))
-            this.animation.goToAnimation(0) // refresh even though it's paused
             if (dissolveChance >= 1) {
                 this.entity?.selfDestruct()
                 clearInterval(interval)

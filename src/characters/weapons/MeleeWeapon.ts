@@ -1,5 +1,10 @@
 import { Point, UpdateData } from "brigsby/dist"
-import { SpriteComponent, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
+import {
+    ImageFilter,
+    SpriteComponent,
+    SpriteTransform,
+    StaticSpriteSource,
+} from "brigsby/dist/sprites"
 import { Animator } from "brigsby/dist/util"
 import { Tilesets } from "../../graphics/Tilesets"
 import { session } from "../../online/session"
@@ -50,8 +55,10 @@ export class MeleeWeapon extends Weapon {
         this.animate()
     }
 
-    getWrappedRenderMethods() {
-        return this.weaponSprite ? [this.weaponSprite.toImageRender(this.weaponTransform)] : []
+    getWrappedRenderMethods(filter: ImageFilter) {
+        return this.weaponSprite
+            ? [this.weaponSprite.filtered(filter).toImageRender(this.weaponTransform)]
+            : []
     }
 
     getType() {

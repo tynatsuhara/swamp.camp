@@ -1,7 +1,7 @@
 import { Component, Point } from "brigsby/dist"
 import { pt } from "brigsby/dist/Point"
 import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
-import { StaticSpriteSource } from "brigsby/dist/sprites"
+import { ImageFilter, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Hittable } from "../../world/elements/Hittable"
 import { here } from "../../world/locations/LocationManager"
 import { Dude } from "../Dude"
@@ -57,7 +57,7 @@ export abstract class Weapon extends Component {
     /**
      * Weapons should implement this method instead of getRenderMethods
      */
-    abstract getWrappedRenderMethods(): RenderMethod[]
+    abstract getWrappedRenderMethods(filter: ImageFilter): RenderMethod[]
 
     abstract getType(): WeaponType
 

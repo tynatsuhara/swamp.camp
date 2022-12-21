@@ -1,5 +1,5 @@
 import { Point, UpdateData } from "brigsby/dist"
-import { SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
+import { ImageFilter, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Animator } from "brigsby/dist/util"
 import { Tilesets } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
@@ -77,7 +77,7 @@ export class SpearWeapon extends Weapon {
         return { sprite, transform }
     }
 
-    getWrappedRenderMethods() {
+    getWrappedRenderMethods(filter: ImageFilter) {
         let angle = this.getAimingAngle()
         let offset = Point.ZERO
 
@@ -102,7 +102,7 @@ export class SpearWeapon extends Weapon {
 
         transform.depth = this.state == State.SHEATHED ? -0.5 : 0.5
 
-        return [sprite?.toImageRender(transform)]
+        return [sprite?.filtered(filter).toImageRender(transform)]
     }
 
     getType() {
