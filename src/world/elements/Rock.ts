@@ -57,9 +57,11 @@ export class RockFactory extends ElementFactory<ElementType.ROCK> {
             )
         )
 
+        const centerPos = pos.plus(new Point(0.5, 0.5)).times(TILE_SIZE)
+
         const hittableResource = e.addComponent(
             new HittableResource(
-                pos.plus(new Point(0.5, 0.5)).times(TILE_SIZE),
+                centerPos,
                 [tile.transform],
                 availableResources,
                 maxResourcesCount,
@@ -70,7 +72,7 @@ export class RockFactory extends ElementFactory<ElementType.ROCK> {
                         return Math.random() > 0.9 ? [Item.IRON] : [Item.ROCK]
                     }
                 },
-                () => Sounds.play(Lists.oneOf(MINING_AUDIO), MINING_AUDIO_VOLUME),
+                () => Sounds.playAtPoint(Lists.oneOf(MINING_AUDIO), MINING_AUDIO_VOLUME, centerPos),
                 () => {}
             )
         )

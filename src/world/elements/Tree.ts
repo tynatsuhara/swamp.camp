@@ -134,7 +134,12 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
                         return [getItem()]
                     }
                 },
-                () => Sounds.play(Lists.oneOf(CHOPPING_AUDIO), CHOPPING_AUDIO_VOLUME),
+                () =>
+                    Sounds.playAtPoint(
+                        Lists.oneOf(CHOPPING_AUDIO),
+                        CHOPPING_AUDIO_VOLUME,
+                        hittableCenter
+                    ),
                 () => emitParticles()
             )
         )
@@ -158,13 +163,7 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
                 pos.plusX(0.5).plusY(2).times(TILE_SIZE),
                 tiles.map((t) => t.transform),
                 () => !hittableResource.isBeingHit(),
-                (dude) =>
-                    Sounds.playAtPoint(
-                        Lists.oneOf(PUSH_AUDIO),
-                        0.2,
-                        dude.standingPosition,
-                        TILE_SIZE * 10
-                    )
+                (dude) => Sounds.playAtPoint(Lists.oneOf(PUSH_AUDIO), 0.2, dude.standingPosition)
             )
         )
 

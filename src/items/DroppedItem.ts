@@ -112,7 +112,11 @@ export class DroppedItem extends Component {
                                 here().droppedItems.delete(this)
                                 this.entity.selfDestruct()
                                 setTimeout(() => {
-                                    Sounds.play(Lists.oneOf(PICK_UP_SOUNDS), 0.15)
+                                    Sounds.playAtPoint(
+                                        Lists.oneOf(PICK_UP_SOUNDS),
+                                        0.15,
+                                        dude.standingPosition
+                                    )
                                 }, Math.random() * 350)
                                 return
                             }

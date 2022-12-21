@@ -40,12 +40,7 @@ export class StepSounds {
                             if (dude?.isAlive && dude.isMoving && !dude.rolling && !dude.jumping) {
                                 const [sound, volume] = StepSounds.getSound(dude)
                                 if (!!sound) {
-                                    Sounds.playAtPoint(
-                                        sound,
-                                        volume,
-                                        dude.standingPosition,
-                                        FOOTSTEP_SOUND_DISTANCE
-                                    )
+                                    Sounds.playAtPoint(sound, volume, dude.standingPosition)
                                 }
                             }
                         }
@@ -58,7 +53,7 @@ export class StepSounds {
     static singleFootstepSound(dude: Dude, volumeMultiplier: number) {
         const [sound, volume] = StepSounds.getSound(dude)
         if (!!sound) {
-            Sounds.play(sound, volume * volumeMultiplier)
+            Sounds.playAtPoint(sound, volume * volumeMultiplier, dude.standingPosition)
         }
     }
 

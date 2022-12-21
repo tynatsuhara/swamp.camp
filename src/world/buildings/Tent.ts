@@ -74,7 +74,7 @@ export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
                 interactablePos,
                 tiles.map((t) => t.transform),
                 () => [{ item: Item.TENT, metadata: data }],
-                () => Sounds.play(...TeleporterSound.TENT),
+                () => Sounds.playAtPoint(...TeleporterSound.TENT, tentCenterPos),
                 10
             )
         )
