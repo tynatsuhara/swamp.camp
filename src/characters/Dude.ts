@@ -1260,11 +1260,13 @@ export class Dude extends Component implements DialogueSource {
 
     // has a rolling animation, however janky
     private doRollAnimation() {
-        controls.vibrate({
-            duration: 100,
-            strongMagnitude: 0.2,
-            weakMagnitude: 0.2,
-        })
+        if (this === player()) {
+            controls.vibrate({
+                duration: 100,
+                strongMagnitude: 0.2,
+                weakMagnitude: 0.2,
+            })
+        }
 
         const setRotation = (rot: number, offset: Point) => {
             if (this.animation.transform.mirrorX) {
@@ -1336,7 +1338,7 @@ export class Dude extends Component implements DialogueSource {
                 this.jumpingAnimator = undefined
                 this.jumpingOffset = 0
                 this.updateAnimationFromMovement(Point.ZERO)
-                if (this.type === DudeType.PLAYER) {
+                if (this === player()) {
                     controls.vibrate({
                         duration: 100,
                         strongMagnitude: 0,
