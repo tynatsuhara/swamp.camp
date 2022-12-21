@@ -13,6 +13,7 @@ import { DudeType } from "../characters/DudeType"
 import { player } from "../characters/player"
 import { spawnMagicProjectile } from "../characters/weapons/MagicProjectile"
 import { pixelPtToTilePt } from "../graphics/Tilesets"
+import { session } from "../online/session"
 import { DrawMenu } from "../ui/DrawMenu"
 import { UIStateManager } from "../ui/UIStateManager"
 import { ElementType } from "../world/elements/Elements"
@@ -245,3 +246,10 @@ const help = () => {
 }
 window["help"] = help
 help()
+
+// debug chat
+const [sendChat, receiveChat] = session.action<string>("chat")
+window["chat"] = (text: string) => {
+    sendChat(text)
+}
+receiveChat((text, peerId) => console.log(`[chat] ${peerId} > ${text}`))
