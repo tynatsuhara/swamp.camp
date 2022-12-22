@@ -22,11 +22,12 @@ export class HostPlayer extends AbstractPlayer {
     awake(): void {
         super.awake()
 
+        const saveInterval = 15_000
         this.entity.addComponent(
             new RepeatedInvoker(() => {
                 saveManager.autosave()
-                return 15_000
-            })
+                return saveInterval
+            }, saveInterval)
         )
 
         window["addItem"] = this.dude.inventory.addItem
