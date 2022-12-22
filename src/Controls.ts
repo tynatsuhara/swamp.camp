@@ -241,7 +241,7 @@ class ControlsWrapper extends Component {
             gamepad: () => gamepadInput.isButtonDown(GamepadButton.X),
         })
 
-    getInteractButtonString = () => (isGamepadMode ? TextIcon.GAMEPAD_SQUARE : "[e]")
+    getInteractButtonString = () => (isGamepadMode ? TextIcon.GAMEPAD_X : "[e]")
 
     isWalkUpHeld = () =>
         check({
