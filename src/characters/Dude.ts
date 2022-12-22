@@ -474,7 +474,7 @@ export class Dude extends Component implements DialogueSource {
             this.doWhileLiving(() => {
                 VocalSounds.ambient(this)
                 return 1_000 + Math.random() * 5_000
-            })
+            }, Math.random() * 5_000)
         }
     }
 
