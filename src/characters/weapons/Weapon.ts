@@ -51,7 +51,7 @@ export abstract class Weapon extends Component {
             }
         }
 
-        closest?.hit(closest.position.minus(interactCenter))
+        closest?.hit(closest.position.minus(interactCenter), dude)
     }
 
     /**

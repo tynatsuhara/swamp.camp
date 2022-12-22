@@ -3,7 +3,6 @@ import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
 import { loadAudio } from "../../audio/DeferLoadAudio"
 import { Sounds } from "../../audio/Sounds"
-import { player } from "../../characters/player"
 import { WeaponType } from "../../characters/weapons/WeaponType"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
@@ -65,8 +64,8 @@ export class RockFactory extends ElementFactory<ElementType.ROCK> {
                 [tile.transform],
                 availableResources,
                 maxResourcesCount,
-                () => {
-                    if (player().weaponType === WeaponType.PICKAXE) {
+                (dude) => {
+                    if (dude.weaponType === WeaponType.PICKAXE) {
                         return Math.random() > 0.5 ? [Item.IRON] : [Item.ROCK]
                     } else {
                         return Math.random() > 0.9 ? [Item.IRON] : [Item.ROCK]

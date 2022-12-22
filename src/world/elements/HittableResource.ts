@@ -2,6 +2,7 @@ import { Point } from "brigsby/dist"
 import { BoxCollider } from "brigsby/dist/collision"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { Maths } from "brigsby/dist/util"
+import { Dude } from "../../characters/Dude"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Item, spawnItem } from "../../items/Items"
 import { session } from "../../online/session"
@@ -12,7 +13,7 @@ export class HittableResource extends Hittable {
 
     freeResources: number
     readonly maxResources: number
-    private itemSupplier: () => Item[]
+    private itemSupplier: (hitter: Dude) => Item[]
     private audioCallback: () => void
     private finishCallback: () => void
 
@@ -21,11 +22,11 @@ export class HittableResource extends Hittable {
         tileTransforms: SpriteTransform[],
         freeResources: number,
         maxResources: number,
-        itemSupplier: () => Item[],
+        itemSupplier: (hitter: Dude) => Item[],
         audioCallback: () => void = () => {},
         finishCallback: () => void
     ) {
-        super(position, tileTransforms, (hitDir) => this.hitCallback(hitDir))
+        super(position, tileTransforms, (hitDir, dude) => this.hitCallback(hitDir, dude))
         this.freeResources = freeResources
         this.maxResources = maxResources
         this.itemSupplier = itemSupplier
@@ -33,7 +34,7 @@ export class HittableResource extends Hittable {
         this.finishCallback = finishCallback
     }
 
-    private hitCallback(hitDir: Point) {
+    private hitCallback(hitDir: Point, dude: Dude) {
         this.freeResources--
         this.audioCallback()
 
@@ -48,7 +49,7 @@ export class HittableResource extends Hittable {
 
         if (session.isHost()) {
             for (let i = 0; i < itemsOut; i++) {
-                const items = this.itemSupplier()
+                const items = this.itemSupplier(dude)
                 for (const item of items) {
                     const itemDirection = hitDir.randomlyShifted(0.5).normalized()
                     const velocity = itemDirection.times(1 + 3 * Math.random())
