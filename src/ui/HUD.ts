@@ -6,10 +6,9 @@ import {
     StaticSpriteSource,
 } from "brigsby/dist/sprites"
 import { Condition } from "../characters/Condition"
-import { Dude } from "../characters/Dude"
 import { player } from "../characters/player"
 import { ImageFilters } from "../graphics/ImageFilters"
-import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { Tilesets } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { Location } from "../world/locations/Location"
 import { WorldTime } from "../world/WorldTime"
@@ -43,8 +42,6 @@ export class HUD {
     }
 
     private heartsEntity: Entity = new Entity()
-    private autosaveComponent: SpriteComponent
-    private isShowingAutosaveIcon = false
     private readonly offset = new Point(4, 4)
     private readonly offScreenIndicatorManager = new OffScreenIndicatorManager()
     readonly miniMap = new Entity().addComponent(new MiniMap())
@@ -58,13 +55,6 @@ export class HUD {
 
     readonly locationTransition = new Entity().addComponent(new LocationTransition())
 
-    constructor() {
-        this.autosaveComponent = new Entity().addComponent(
-            Tilesets.instance.oneBit.getTileSource("floppy_drive").toComponent()
-        )
-        this.autosaveComponent.enabled = false
-    }
-
     addIndicator(key: any, positionSupplier: () => Point, locationSupplier: () => Location) {
         this.offScreenIndicatorManager.addIndicator(key, positionSupplier, locationSupplier)
     }
@@ -77,13 +67,11 @@ export class HUD {
         this.offScreenIndicatorManager.clear()
     }
 
-    getEntities(player: Dude, screenDimensions: Point, elapsedMillis: number): Entity[] {
-        this.updateHearts(player.health, player.maxHealth)
-        this.updateAutosave(screenDimensions, elapsedMillis)
+    getEntities(): Entity[] {
+        this.updateHearts(player().health, player().maxHealth)
 
         const entities = [
             this.heartsEntity,
-            this.autosaveComponent.entity,
             this.locationTransition.entity,
             this.offScreenIndicatorManager.getEntity(),
             this.miniMap.entity,
@@ -153,32 +141,5 @@ export class HUD {
         }
 
         result.forEach((c) => this.heartsEntity.addComponent(c))
-    }
-
-    showSaveIcon() {
-        this.isShowingAutosaveIcon = true
-        this.autosaveComponent.enabled = true
-
-        const timeToShowIcon = 3000
-        setTimeout(() => {
-            this.isShowingAutosaveIcon = false
-        }, timeToShowIcon)
-        setTimeout(() => {
-            this.autosaveComponent.enabled = false
-        }, timeToShowIcon + 1000)
-    }
-
-    private updateAutosave(screenDimensions: Point, elapsedMillis: number) {
-        const base = screenDimensions.minus(this.offset).minus(new Point(TILE_SIZE, TILE_SIZE))
-        let lerpRate = 0.005 * elapsedMillis
-        if (this.autosaveComponent.transform.position.equals(Point.ZERO)) {
-            // for initializing
-            lerpRate = 1
-        }
-        const goal = this.isShowingAutosaveIcon ? Point.ZERO : new Point(0, 40)
-        this.autosaveComponent.transform.position = this.autosaveComponent.transform.position
-            .minus(base)
-            .lerp(lerpRate, goal)
-            .plus(base)
     }
 }

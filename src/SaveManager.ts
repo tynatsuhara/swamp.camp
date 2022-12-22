@@ -73,7 +73,6 @@ class SaveManager {
         return this.state
     }
 
-    // TODO: Where is the best place to call autosave() on a schedule?
     autosave() {
         const { isMidCutscene } = CutsceneManager.instance
         const { isMenuOpen } = UIStateManager.instance
@@ -126,7 +125,6 @@ class SaveManager {
         }
 
         if (context === "save") {
-            // HUD.instance.showSaveIcon()
             if (debug.showSaveLogs) {
                 console.log("saved game")
             }

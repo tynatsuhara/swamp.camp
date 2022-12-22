@@ -1,7 +1,9 @@
 import { Point, UpdateData } from "brigsby/dist"
+import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
 import { controls } from "../../Controls"
 import { CutscenePlayerController } from "../../cutscenes/CutscenePlayerController"
 import { TextOverlayManager } from "../../cutscenes/TextOverlayManager"
+import { saveManager } from "../../SaveManager"
 import { TextAlign } from "../../ui/Text"
 import { camp, here, LocationManager } from "../../world/locations/LocationManager"
 import { DudeSpawner } from "../DudeSpawner"
@@ -19,6 +21,13 @@ export class HostPlayer extends AbstractPlayer {
 
     awake(): void {
         super.awake()
+
+        this.entity.addComponent(
+            new RepeatedInvoker(() => {
+                saveManager.autosave()
+                return 15_000
+            })
+        )
 
         window["addItem"] = this.dude.inventory.addItem
     }
