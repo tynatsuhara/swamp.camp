@@ -58,6 +58,7 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
         this.spawnTrees(location)
         this.spawn(location, ElementType.ROCK, 15 + Math.random() * 10)
         this.spawn(location, ElementType.MUSHROOM, 3 + Math.random() * 5)
+        this.spawn(location, ElementType.BLACKBERRIES, 5 + Math.random() * 5)
         // TODO short trees, bushes, fruit, tall grass, etc
 
         return location
