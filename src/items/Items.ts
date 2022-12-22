@@ -272,7 +272,7 @@ export const ITEM_METADATA_MAP = {
                     Sounds.play(...SOUNDS.eat)
                 }
                 if (session.isHost()) {
-                    consumer.heal(0.25)
+                    consumer.heal(0.5)
                 }
             },
         },
