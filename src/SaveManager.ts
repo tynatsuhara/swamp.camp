@@ -243,7 +243,6 @@ export const saveManager = new SaveManager()
 
 // Autosave when the page is closed, refreshed, etc
 window.onbeforeunload = () => {
-    // use existence of player as a proxy for where
     if (SwampCampGame.instance.scene === SwampCampGame.instance.gameScene) {
         saveManager.autosave()
     }
