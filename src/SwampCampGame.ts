@@ -12,8 +12,8 @@ export class SwampCampGame extends Game {
         return this._instance
     }
 
-    readonly game = new GameScene()
-    readonly mainMenu = new MainMenuScene()
+    readonly gameScene = new GameScene()
+    readonly mainMenuScene = new MainMenuScene()
 
     constructor() {
         super()
@@ -21,17 +21,17 @@ export class SwampCampGame extends Game {
     }
 
     initialize() {
-        this.game.initialize()
+        this.gameScene.initialize()
         this.loadMainMenu()
     }
 
     loadGameScene() {
-        this.scene = this.game
+        this.scene = this.gameScene
     }
 
     loadMainMenu() {
-        this.scene = this.mainMenu
-        this.mainMenu.reset()
+        this.scene = this.mainMenuScene
+        this.mainMenuScene.reset()
         cleanUpExistingSession()
     }
 }

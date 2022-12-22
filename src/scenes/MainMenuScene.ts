@@ -121,7 +121,7 @@ export class MainMenuScene extends Scene {
         this.loadAssets().then(() => {
             saveManager.new(this.selectedNewGameSlot, this.plumes)
             SwampCampGame.instance.loadGameScene()
-            SwampCampGame.instance.game.newGame()
+            SwampCampGame.instance.gameScene.newGame()
         })
         this.render(Menu.ROOT) // force re-render
     }
