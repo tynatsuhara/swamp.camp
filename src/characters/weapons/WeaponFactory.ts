@@ -28,25 +28,45 @@ export const WeaponFactory = {
             case WeaponType.UNARMED:
                 return new UnarmedWeapon()
             case WeaponType.SWORD:
-                return new MeleeWeapon(
-                    WeaponType.SWORD,
-                    "weapon_regular_sword",
-                    new Point(-6, -2).plus(offset)
-                )
+                return new MeleeWeapon({
+                    weaponType: WeaponType.SWORD,
+                    spriteId: "weapon_regular_sword",
+                    offsetFromCenter: new Point(-6, -2).plus(offset),
+                    range: 20,
+                    damage: 1,
+                    canMultiAttack: false,
+                    speed: 1,
+                })
             case WeaponType.CLUB:
-                return new MeleeWeapon(
-                    WeaponType.CLUB,
-                    "weapon_baton_with_spikes",
-                    new Point(-6, -2).plus(offset)
-                )
+                return new MeleeWeapon({
+                    weaponType: WeaponType.CLUB,
+                    spriteId: "weapon_baton_with_spikes",
+                    offsetFromCenter: new Point(-6, -2).plus(offset),
+                    range: 16,
+                    damage: 1,
+                    canMultiAttack: false,
+                    speed: 1,
+                })
             case WeaponType.PICKAXE:
-                return new MeleeWeapon(
-                    WeaponType.PICKAXE,
-                    "weapon_pickaxe",
-                    new Point(-5, -2).plus(offset)
-                )
+                return new MeleeWeapon({
+                    weaponType: WeaponType.PICKAXE,
+                    spriteId: "weapon_pickaxe",
+                    offsetFromCenter: new Point(-5, -2).plus(offset),
+                    range: 16,
+                    damage: 1,
+                    canMultiAttack: false,
+                    speed: 1,
+                })
             case WeaponType.AXE:
-                return new MeleeWeapon(WeaponType.AXE, "weapon_axe", new Point(-3, -1).plus(offset))
+                return new MeleeWeapon({
+                    weaponType: WeaponType.AXE,
+                    spriteId: "weapon_axe",
+                    offsetFromCenter: new Point(-3, -1).plus(offset),
+                    range: 16,
+                    damage: 1,
+                    canMultiAttack: false,
+                    speed: 1,
+                })
             case WeaponType.SPEAR:
                 return new SpearWeapon() // NPCs can't currently use ranged weapons
             case WeaponType.STAFF_1:

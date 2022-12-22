@@ -8,6 +8,7 @@ import {
 import { Animator } from "brigsby/dist/util"
 import { Tilesets } from "../../graphics/Tilesets"
 import { session } from "../../online/session"
+import { Dude } from "../Dude"
 import { DudeType } from "../DudeType"
 import { Weapon } from "./Weapon"
 import { WeaponType } from "./WeaponType"
@@ -18,33 +19,43 @@ enum State {
     ATTACKING,
 }
 
+type WeaponSpec = {
+    weaponType: WeaponType
+    spriteId: string
+    offsetFromCenter: Point
+    range: number
+    damage: number
+    canMultiAttack: boolean
+    speed: number // TODO
+}
+
 /**
  * TODO: Rewrite this to use dynamic sprite rotations so that we can create some fun variance in attacks + combo animations
  */
 export class MeleeWeapon extends Weapon {
-    private weaponType: WeaponType
+    private spec: WeaponSpec
+
     private weaponSprite: StaticSpriteSource
     private weaponTransform: SpriteTransform
     private offsetFromCenter: Point
     private state: State = State.DRAWN
     private slashSprite: SpriteComponent
-    private _range: number
 
-    constructor(weaponType: WeaponType, spriteId: string, offsetFromCenter: Point) {
+    constructor(spec: WeaponSpec) {
         super()
-        this.start = (startData) => {
-            this.weaponSprite = Tilesets.instance.dungeonCharacters.getTileSource(spriteId)
+        this.spec = spec
+
+        this.start = () => {
+            this.weaponSprite = Tilesets.instance.dungeonCharacters.getTileSource(spec.spriteId)
             this.weaponTransform = new SpriteTransform(
                 Point.ZERO,
                 this.weaponSprite.dimensions
             ).relativeTo(this.dude.animation.transform)
-            this.offsetFromCenter = offsetFromCenter
-            this._range = this.weaponSprite.dimensions.y
+            this.offsetFromCenter = spec.offsetFromCenter
             this.slashSprite = this.entity.addComponent(
                 Tilesets.instance.oneBit.getTileSource("slash").toComponent()
             )
         }
-        this.weaponType = weaponType
     }
 
     update(updateData: UpdateData) {
@@ -62,7 +73,7 @@ export class MeleeWeapon extends Weapon {
     }
 
     getType() {
-        return this.weaponType
+        return this.spec.weaponType
     }
 
     isAttacking() {
@@ -78,7 +89,7 @@ export class MeleeWeapon extends Weapon {
     }
 
     getRange() {
-        return this._range
+        return this.spec.range
     }
 
     attack(newAttack: boolean) {
@@ -99,17 +110,21 @@ export class MeleeWeapon extends Weapon {
 
         const attackDistance = this.getRange() + 4 // add a tiny buffer for small weapons like the dagger to still work
 
-        // TODO maybe only allow big weapons to hit multiple targets
         const enemies = Weapon.getEnemiesInRange(this.dude, attackDistance)
 
         if (session.isHost()) {
-            enemies.forEach((d) => {
-                d.damage(1, {
+            const damageEnemy = (d: Dude) => {
+                d.damage(this.spec.damage, {
                     direction: d.standingPosition.minus(this.dude.standingPosition),
                     knockback: 30,
                     attacker: this.dude,
                 })
-            })
+            }
+            if (this.spec.canMultiAttack) {
+                enemies.forEach(damageEnemy)
+            } else if (enemies.length > 0) {
+                damageEnemy(enemies[0])
+            }
         }
 
         if (this.dude.type === DudeType.PLAYER && enemies.length === 0) {
@@ -129,7 +144,6 @@ export class MeleeWeapon extends Weapon {
         if (this.state === State.DRAWN) {
             pos = offsetFromEdge
         } else if (this.state === State.SHEATHED) {
-            // TODO add side sheath for swords
             // center on back
             pos = offsetFromEdge.plus(new Point(3, -1))
         } else if (this.state === State.ATTACKING) {
