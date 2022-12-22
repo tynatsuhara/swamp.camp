@@ -92,10 +92,7 @@ export class DudeSpawner extends Component {
         const l = camp()
 
         const demons = l.getDudes().filter((d) => d.factions.includes(DudeFaction.DEMONS))
-        if (demons.length > 0) {
-            return // just wait to spawn until all the demons have been killed
-        }
-        const goalDemonCount = Math.random() * 5
+        const goalDemonCount = Math.random() * 5 - demons.length
 
         if (demons.length < goalDemonCount) {
             const openPoints = l
