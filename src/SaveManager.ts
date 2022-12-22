@@ -1,13 +1,15 @@
 import { debug } from "brigsby/dist"
 import { player } from "./characters/player"
 import { Camera } from "./cutscenes/Camera"
+import { CutsceneManager } from "./cutscenes/CutsceneManager"
+import { prettyPrint } from "./debug/JSON"
 import { ONLINE_PLAYER_DUDE_ID_PREFIX } from "./online/syncUtils"
 import { Save, SaveState } from "./saves/SaveGame"
 import { newUUID } from "./saves/uuid"
 import { Singletons } from "./Singletons"
 import { SwampCampGame } from "./SwampCampGame"
-import { HUD } from "./ui/HUD"
 import { PlumePicker } from "./ui/PlumePicker"
+import { UIStateManager } from "./ui/UIStateManager"
 import { EventQueue } from "./world/events/EventQueue"
 import { here, LocationManager } from "./world/locations/LocationManager"
 import { WorldTime } from "./world/WorldTime"
@@ -71,8 +73,20 @@ class SaveManager {
         return this.state
     }
 
+    // TODO: Where is the best place to call autosave() on a schedule?
     autosave() {
-        if (!debug.disableAutosave) {
+        const { isMidCutscene } = CutsceneManager.instance
+        const { isMenuOpen } = UIStateManager.instance
+        const { disableAutosave } = debug
+
+        const skipFlags = { isMidCutscene, isMenuOpen, disableAutosave }
+        const skipAutoSave = Object.values(skipFlags).some((val) => val)
+
+        if (skipAutoSave) {
+            if (debug.showSaveLogs) {
+                console.log(`skipping autosave: ${prettyPrint(skipFlags)}`)
+            }
+        } else {
             this.save()
         }
     }
@@ -112,8 +126,10 @@ class SaveManager {
         }
 
         if (context === "save") {
-            HUD.instance.showSaveIcon()
-            console.log("saved game")
+            // HUD.instance.showSaveIcon()
+            if (debug.showSaveLogs) {
+                console.log("saved game")
+            }
             localStorage.setItem(this.saveKey, JSON.stringify(save))
         }
 
@@ -185,8 +201,8 @@ class SaveManager {
     /**
      * @return true if a save was loaded successfully
      */
-    load(slot: number = -1) {
-        this.saveKey = slot === -1 ? this.saveKey : this.saveKeyForSlot(slot)
+    load(slot: number) {
+        this.saveKey = this.saveKeyForSlot(slot)
 
         // ensures that the file exists
         this.loadSave(this.getSave(this.saveKey))

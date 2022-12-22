@@ -1,4 +1,4 @@
-import { Component, Entity, UpdateData } from "brigsby/dist"
+import { Component, debug, Entity, UpdateData } from "brigsby/dist"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
@@ -55,10 +55,11 @@ export class PauseMenu extends Component {
 
         const buttons: PauseOption[] = [
             // TODO figure out how to handle saving with multiplayer
-            session.isHost() && {
-                text: "SAVE GAME",
-                fn: () => saveManager.save(),
-            },
+            debug.disableAutosave &&
+                session.isHost() && {
+                    text: "[debug] SAVE GAME",
+                    fn: () => saveManager.save(),
+                },
             // {
             //     text: "LOAD LAST SAVE",
             //     fn: () => saveManager.load(),
@@ -100,8 +101,11 @@ export class PauseMenu extends Component {
             },
             this.getFullScreenOption(),
             {
-                text: session.isGuest() ? `LEAVE SESSION` : `MAIN MENU`,
+                text: session.isGuest() ? `LEAVE SESSION` : `SAVE & QUIT`,
                 fn: () => {
+                    if (session.isHost()) {
+                        saveManager.save()
+                    }
                     here().toggleAudio(false)
                     SwampCampGame.instance.loadMainMenu()
                 },

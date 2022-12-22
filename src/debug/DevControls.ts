@@ -238,6 +238,7 @@ debug.groundRenderDisabled ??= false
 debug.showGroundTiles ??= false
 debug.forceMapId ??= ""
 debug.extraSaveSlots ??= 0
+debug.showSaveLogs ??= false
 
 const help = () => {
     let help = "dev controls (enable with debug.enableDevControls=true)"

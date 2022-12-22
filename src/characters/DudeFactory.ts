@@ -1,6 +1,6 @@
 import { Component, Entity, Point, pt } from "brigsby/dist"
 import { PointValue } from "brigsby/dist/Point"
-import { Lists } from "brigsby/dist/util"
+import { Lists, RepeatedInvoker } from "brigsby/dist/util"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Inventory } from "../items/Inventory"
@@ -188,8 +188,16 @@ export class DudeFactory {
 
                 if (session.isHost()) {
                     if (isLocalHostPlayer) {
+                        const autosaver = new RepeatedInvoker(() => {
+                            saveManager.autosave()
+                            return 15_000
+                        })
                         animationName = "knight_f"
-                        additionalComponents = [new HostPlayer(), new CutscenePlayerController()]
+                        additionalComponents = [
+                            new HostPlayer(),
+                            new CutscenePlayerController(),
+                            autosaver,
+                        ]
                         window["player"] = additionalComponents[0]
                     } else {
                         additionalComponents = [new GuestPlayer()]
