@@ -21,14 +21,21 @@ export abstract class Weapon extends Component {
         this.dude = this.entity.getComponent(Dude)
     }
 
+    /**
+     * @returns enemies in attacking range of the given attacker, sorted by increasing distance
+     */
     static getEnemiesInRange(attacker: Dude, attackDistance: number) {
         return here()
             .getDudes()
             .filter((d) => !!d && d !== attacker && d.isEnemy(attacker))
             .filter((d) => attacker.isFacing(d.standingPosition))
-            .filter(
-                (d) => d.standingPosition.distanceTo(attacker.standingPosition) < attackDistance
-            )
+            .map((dude) => ({
+                dude,
+                dist: dude.standingPosition.distanceTo(attacker.standingPosition),
+            }))
+            .filter(({ dist }) => dist < attackDistance)
+            .sort((a, b) => a.dist - b.dist)
+            .map(({ dude }) => dude)
     }
 
     // Called on host and client
