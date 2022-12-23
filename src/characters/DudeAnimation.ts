@@ -1,4 +1,5 @@
 import { Component, pt, UpdateData } from "brigsby/dist"
+import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
 import { AnimatedSpriteComponent, ImageFilter, SpriteTransform } from "brigsby/dist/sprites"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Color } from "../ui/Color"
@@ -53,11 +54,16 @@ export class DudeAnimation extends Component {
 
         const filter = doFlash ? ImageFilters.tint(Color.WHITE) : null
 
-        const result = [
+        const result: RenderMethod[] = [
             this._animation.sprite.filtered(filter).toImageRender(this._transform),
-            ...(this.dude.shield?.getWrappedRenderMethods(filter) ?? []),
-            ...(this.dude.weapon?.getWrappedRenderMethods(filter) ?? []),
         ]
+
+        if (this.dude.shield?.isStarted) {
+            result.push(...(this.dude.shield.getWrappedRenderMethods(filter) ?? []))
+        }
+        if (this.dude.weapon?.isStarted) {
+            result.push(...(this.dude.weapon.getWrappedRenderMethods(filter) ?? []))
+        }
 
         return result
     }
