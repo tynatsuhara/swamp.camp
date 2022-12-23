@@ -17,7 +17,7 @@ export abstract class MeleeAnimation {
     abstract getFrame(
         dude: Dude,
         spriteCache: WeaponSpriteCache
-    ): { sprite: StaticSpriteSource; transform: SpriteTransform }
+    ): { sprite: StaticSpriteSource; transform: SpriteTransform }[]
 
     /**
      * @returns a frame positioned based on the sprite cache configuration

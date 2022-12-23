@@ -1,5 +1,3 @@
-import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
-import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Dude } from "../../Dude"
 import { WeaponSpec } from "../MeleeWeapon"
 import { WeaponSpriteCache } from "../WeaponSpriteCache"
@@ -21,11 +19,8 @@ export class FullSpinAnimation extends MeleeAnimation {
         }
     }
 
-    getFrame(
-        dude: Dude,
-        spriteCache: WeaponSpriteCache
-    ): { sprite: StaticSpriteSource; transform: SpriteTransform } {
-        return this.getFrameBase(dude, spriteCache, this.getAngle())
+    getFrame(dude: Dude, spriteCache: WeaponSpriteCache) {
+        return [this.getFrameBase(dude, spriteCache, this.getAngle())]
     }
 
     private getAngle() {

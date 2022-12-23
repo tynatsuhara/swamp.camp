@@ -195,14 +195,9 @@ export class MeleeWeapon extends Weapon {
     }*/
 
     getWrappedRenderMethods(filter: ImageFilter) {
-        const { sprite, transform } = this.getCurrentAnimation().getFrame(
-            this.dude,
-            spriteCaches[this.spec.spriteId]
-        )
-
-        // transform.depth = this.state == State.SHEATHED ? -0.5 : 0.5
-
-        return [sprite.filtered(filter).toImageRender(transform)]
+        return this.getCurrentAnimation()
+            .getFrame(this.dude, spriteCaches[this.spec.spriteId])
+            .map(({ sprite, transform }) => sprite.filtered(filter).toImageRender(transform))
     }
 
     private getCurrentAnimation() {
