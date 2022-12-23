@@ -9,13 +9,16 @@ export class WeaponSpriteCache {
     private readonly ogCenter: Point
     private readonly rotationPoint: Point
 
-    constructor(baseSprite: StaticSpriteSource, baseSpritePosition: Point, rotationPoint: Point) {
+    /**
+     * @param rotationPoint the point (from the top left of the sprite around which it will rotate)
+     */
+    constructor(baseSprite: StaticSpriteSource, rotationPoint: Point) {
         this.cache[0] = {
             sprite: baseSprite,
-            position: baseSpritePosition,
+            position: Point.ZERO,
         }
         this.baseSprite = baseSprite
-        this.ogCenter = baseSpritePosition.plus(baseSprite.dimensions.floorDiv(2))
+        this.ogCenter = baseSprite.dimensions.floorDiv(2)
         this.rotationPoint = rotationPoint
     }
 

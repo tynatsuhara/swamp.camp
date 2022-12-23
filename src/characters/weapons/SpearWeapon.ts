@@ -37,7 +37,7 @@ export class SpearWeapon extends Weapon {
 
             spriteCache =
                 spriteCache ??
-                new WeaponSpriteCache(baseSprite, this.offsetFromCenter, HAND_POSITION_OFFSET)
+                new WeaponSpriteCache(baseSprite, HAND_POSITION_OFFSET.minus(this.offsetFromCenter))
         }
     }
 
@@ -66,6 +66,7 @@ export class SpearWeapon extends Weapon {
                 this.dude.animation.sprite.dimensions.y
             )
                 .plus(position)
+                .plus(this.offsetFromCenter)
                 .plus(offset)
                 .plus(this.dude.getOffsetRelativeToAnimation())
                 .apply(Math.round),
