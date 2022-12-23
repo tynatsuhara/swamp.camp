@@ -6,7 +6,7 @@ import { WeaponSpec } from "../MeleeWeapon"
 import { WeaponSpriteCache } from "../WeaponSpriteCache"
 
 export abstract class MeleeAnimation {
-    private readonly spec: WeaponSpec
+    readonly spec: WeaponSpec
 
     constructor(spec: WeaponSpec) {
         this.spec = spec

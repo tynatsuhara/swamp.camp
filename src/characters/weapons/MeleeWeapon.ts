@@ -9,7 +9,7 @@ import { Tilesets } from "../../graphics/Tilesets"
 import { session } from "../../online/session"
 import { Dude } from "../Dude"
 import { DudeType } from "../DudeType"
-import { FullSpinAnimation } from "./animations/FullSpinAnimation"
+import { BasicAttackAnimation } from "./animations/BasicAttackAnimation"
 import { IdleAnimation } from "./animations/IdleAnimation"
 import { MeleeAnimation } from "./animations/MeleeAnimation"
 import { SheathedAnimation } from "./animations/SheathedAnimation"
@@ -114,9 +114,9 @@ export class MeleeWeapon extends Weapon {
             return
         }
         if (newAttack && this.state === State.DRAWN) {
-            this.attackAnim = new FullSpinAnimation(this.spec, () => {
-                this.state = State.DRAWN
-            })
+            const onFinish = () => (this.state = State.DRAWN)
+            // this.attackAnim = new FullSpinAnimation(this.spec, onFinish)
+            this.attackAnim = new BasicAttackAnimation(this.spec, onFinish)
             this.state = State.ATTACKING
             // TODO trigger from animation
             setTimeout(() => this.damageEnemies(), 100)
