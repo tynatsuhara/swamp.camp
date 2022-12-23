@@ -20,6 +20,7 @@ export class WeaponSpriteCache {
     }
 
     get(angle: number) {
+        angle = angle % 360
         if (!this.cache[angle]) {
             const rotatedSprite = this.baseSprite.rotated(angle)
             const centerAfterRotation = this.ogCenter.rotatedAround(this.rotationPoint, angle)
