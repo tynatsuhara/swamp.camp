@@ -96,7 +96,7 @@ export class SpearWeapon extends Weapon {
 
         transform.depth = this.state == State.SHEATHED ? -0.5 : 0.5
 
-        return [sprite?.filtered(filter).toImageRender(transform)]
+        return [sprite.filtered(filter).toImageRender(transform)]
     }
 
     getType() {

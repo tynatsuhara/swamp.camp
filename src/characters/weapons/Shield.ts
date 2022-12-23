@@ -39,7 +39,7 @@ export class Shield extends Component {
     }
 
     getWrappedRenderMethods(filter: ImageFilter) {
-        return this.sprite ? [this.sprite.filtered(filter).toImageRender(this.transform)] : []
+        return [this.sprite.filtered(filter).toImageRender(this.transform)]
     }
 
     update(updateData: UpdateData) {

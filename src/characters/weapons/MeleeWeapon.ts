@@ -73,9 +73,7 @@ export class MeleeWeapon extends Weapon {
     }
 
     getWrappedRenderMethods(filter: ImageFilter) {
-        return this.weaponSprite
-            ? [this.weaponSprite.filtered(filter).toImageRender(this.weaponTransform)]
-            : []
+        return [this.weaponSprite.filtered(filter).toImageRender(this.weaponTransform)]
     }
 
     getType() {

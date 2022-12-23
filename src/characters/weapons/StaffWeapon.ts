@@ -237,9 +237,7 @@ export class StaffWeapon extends Weapon {
 
     getWrappedRenderMethods(filter: ImageFilter) {
         return [
-            this.weaponSprite
-                ? this.weaponSprite.filtered(filter).toImageRender(this.weaponTransform)
-                : null,
+            this.weaponSprite.filtered(filter).toImageRender(this.weaponTransform),
             !this.attackPosition
                 ? null
                 : this.targetSprite.toImageRender(
