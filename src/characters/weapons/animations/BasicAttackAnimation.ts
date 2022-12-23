@@ -3,10 +3,7 @@ import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Animator } from "brigsby/dist/util/Animator"
 import { Tilesets } from "../../../graphics/Tilesets"
-import { Dude } from "../../Dude"
-import { WeaponSpec } from "../MeleeWeapon"
-import { WeaponSpriteCache } from "../WeaponSpriteCache"
-import { MeleeAnimation } from "./MeleeAnimation"
+import { AnimationArgs, MeleeAnimation } from "./MeleeAnimation"
 
 // TODO use this if we can make it better than the existing animation
 const FRAMERATE = 30
@@ -33,8 +30,8 @@ export class BasicAttackAnimation extends MeleeAnimation {
     private animator: Animator
     private readonly slashSprite: StaticSpriteSource
 
-    constructor(spec: WeaponSpec, onFinish: () => void) {
-        super(spec)
+    constructor(args: AnimationArgs, onFinish: () => void) {
+        super(args)
         this.animator = new Animator(Animator.frames(8, 40), () => {}, onFinish)
         this.slashSprite = Tilesets.instance.oneBit.getTileSource("slash")
     }
@@ -43,24 +40,22 @@ export class BasicAttackAnimation extends MeleeAnimation {
         this.animator.update(elapsedTimeMillis)
     }
 
-    getFrame(dude: Dude, spriteCache: WeaponSpriteCache) {
+    getFrame() {
         const [offset, rotation] = this.getAttackAnimationPosition()
-        return [
-            this.getFrameBase(dude, spriteCache, rotation, offset),
-            ...this.getSlashSpriteFrame(dude, spriteCache),
-        ]
+        return [this.getFrameBase(rotation, offset), ...this.getSlashSpriteFrame()]
     }
 
-    getSlashSpriteFrame(dude: Dude, spriteCache: WeaponSpriteCache) {
+    getSlashSpriteFrame() {
         if (this.animator.getCurrentFrame() !== 3) {
             return []
         }
         const transform = SpriteTransform.new({
-            depth: dude.animation.transform.depth + 2,
-            mirrorX: dude.getFacingMultiplier() === -1,
-            position: dude.animation.transform.position.plus(
+            depth: this.dude.animation.transform.depth + 2,
+            mirrorX: this.dude.getFacingMultiplier() === -1,
+            position: this.dude.animation.transform.position.plus(
                 new Point(
-                    dude.getFacingMultiplier() * (spriteCache.get(0).sprite.dimensions.y - 10),
+                    this.dude.getFacingMultiplier() *
+                        (this.spriteCache.get(0).sprite.dimensions.y - 10),
                     8
                 )
             ),

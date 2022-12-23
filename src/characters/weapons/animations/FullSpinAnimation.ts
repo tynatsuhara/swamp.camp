@@ -1,14 +1,11 @@
-import { Dude } from "../../Dude"
-import { WeaponSpec } from "../MeleeWeapon"
-import { WeaponSpriteCache } from "../WeaponSpriteCache"
-import { MeleeAnimation } from "./MeleeAnimation"
+import { AnimationArgs, MeleeAnimation } from "./MeleeAnimation"
 
 export class FullSpinAnimation extends MeleeAnimation {
     private timeElapsed = 0
     private readonly onFinish: () => void
 
-    constructor(spec: WeaponSpec, onFinish: () => void) {
-        super(spec)
+    constructor(args: AnimationArgs, onFinish: () => void) {
+        super(args)
         this.onFinish = onFinish
     }
 
@@ -19,8 +16,8 @@ export class FullSpinAnimation extends MeleeAnimation {
         }
     }
 
-    getFrame(dude: Dude, spriteCache: WeaponSpriteCache) {
-        return [this.getFrameBase(dude, spriteCache, this.getAngle())]
+    getFrame() {
+        return [this.getFrameBase(this.getAngle())]
     }
 
     private getAngle() {

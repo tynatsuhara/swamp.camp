@@ -6,7 +6,7 @@ import { Dude } from "../Dude"
 import { DudeType } from "../DudeType"
 import { BasicAttackAnimation } from "./animations/BasicAttackAnimation"
 import { IdleAnimation } from "./animations/IdleAnimation"
-import { MeleeAnimation } from "./animations/MeleeAnimation"
+import { AnimationArgs, MeleeAnimation } from "./animations/MeleeAnimation"
 import { SheathedAnimation } from "./animations/SheathedAnimation"
 import { HAND_POSITION_OFFSET, Weapon } from "./Weapon"
 import { WeaponSpriteCache } from "./WeaponSpriteCache"
@@ -39,6 +39,7 @@ export class MeleeWeapon extends Weapon {
     private idleAnim: MeleeAnimation
     private sheathedAnim: MeleeAnimation
     private attackAnim: MeleeAnimation
+    private animationArgs: AnimationArgs
 
     constructor(spec: WeaponSpec) {
         super()
@@ -53,8 +54,14 @@ export class MeleeWeapon extends Weapon {
                     HAND_POSITION_OFFSET.minus(offsetFromCenter)
                 )
 
-            this.idleAnim = new IdleAnimation(this.spec)
-            this.sheathedAnim = new SheathedAnimation(this.spec)
+            this.animationArgs = {
+                dude: this.dude,
+                spec: this.spec,
+                spriteCache: spriteCaches[spriteId],
+            }
+
+            this.idleAnim = new IdleAnimation(this.animationArgs)
+            this.sheathedAnim = new SheathedAnimation(this.animationArgs)
         }
     }
 
@@ -88,8 +95,8 @@ export class MeleeWeapon extends Weapon {
         }
         if (newAttack && this.state === State.DRAWN) {
             const onFinish = () => (this.state = State.DRAWN)
-            // this.attackAnim = new FullSpinAnimation(this.spec, onFinish)
-            this.attackAnim = new BasicAttackAnimation(this.spec, onFinish)
+            // this.attackAnim = new FullSpinAnimation(this.animationArgs, onFinish)
+            this.attackAnim = new BasicAttackAnimation(this.animationArgs, onFinish)
             this.state = State.ATTACKING
             // TODO trigger from animation
             setTimeout(() => this.damageEnemies(), 100)
@@ -127,7 +134,7 @@ export class MeleeWeapon extends Weapon {
 
     getWrappedRenderMethods(filter: ImageFilter) {
         return this.getCurrentAnimation()
-            .getFrame(this.dude, spriteCaches[this.spec.spriteId])
+            .getFrame()
             .map(({ sprite, transform }) => sprite.filtered(filter).toImageRender(transform))
     }
 

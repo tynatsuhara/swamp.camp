@@ -1,7 +1,7 @@
 import { Point } from "brigsby/dist/Point"
 import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 
-export type AngleSpriteCache = Record<number, { sprite: StaticSpriteSource; position: Point }>
+type AngleSpriteCache = Record<number, { sprite: StaticSpriteSource; position: Point }>
 
 export class WeaponSpriteCache {
     private readonly cache: AngleSpriteCache = {}
@@ -25,6 +25,7 @@ export class WeaponSpriteCache {
     get(angle: number) {
         angle = angle % 360
         if (!this.cache[angle]) {
+            // TODO canvas implementation seems to be less accurate
             const rotatedSprite = this.baseSprite.rotated(angle, "webgl")
             const centerAfterRotation = this.ogCenter.rotatedAround(this.rotationPoint, angle)
             this.cache[angle] = {
