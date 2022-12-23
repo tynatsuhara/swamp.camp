@@ -5,11 +5,14 @@ import {
     SpriteTransform,
     StaticSpriteSource,
 } from "brigsby/dist/sprites"
-import { Animator } from "brigsby/dist/util"
 import { Tilesets } from "../../graphics/Tilesets"
 import { session } from "../../online/session"
 import { Dude } from "../Dude"
 import { DudeType } from "../DudeType"
+import { FullSpinAnimation } from "./animations/FullSpinAnimation"
+import { IdleAnimation } from "./animations/IdleAnimation"
+import { MeleeAnimation } from "./animations/MeleeAnimation"
+import { SheathedAnimation } from "./animations/SheathedAnimation"
 import { HAND_POSITION_OFFSET, Weapon } from "./Weapon"
 import { WeaponSpriteCache } from "./WeaponSpriteCache"
 import { WeaponType } from "./WeaponType"
@@ -20,7 +23,7 @@ enum State {
     ATTACKING,
 }
 
-type WeaponSpec = {
+export type WeaponSpec = {
     weaponType: WeaponType
     spriteId: string
     offsetFromCenter: Point
@@ -30,6 +33,7 @@ type WeaponSpec = {
     speed: number // TODO
 }
 
+// maps sprite ID to sprite cache
 let spriteCaches: Record<string, WeaponSpriteCache> = {}
 
 /**
@@ -38,10 +42,14 @@ let spriteCaches: Record<string, WeaponSpriteCache> = {}
 export class MeleeWeapon extends Weapon {
     private spec: WeaponSpec
 
-    private weaponSprite: StaticSpriteSource
-    private weaponTransform: SpriteTransform
+    // private weaponSprite: StaticSpriteSource
+    // private weaponTransform: SpriteTransform
     private state: State = State.DRAWN
     private slashSprite: SpriteComponent
+
+    private idleAnim: MeleeAnimation
+    private sheathedAnim: MeleeAnimation
+    private attackAnim: MeleeAnimation
 
     constructor(spec: WeaponSpec) {
         super()
@@ -49,32 +57,37 @@ export class MeleeWeapon extends Weapon {
         const { spriteId, offsetFromCenter } = spec
 
         this.start = () => {
-            this.weaponSprite = Tilesets.instance.dungeonCharacters.getTileSource(spriteId)
-            this.weaponTransform = new SpriteTransform(
-                Point.ZERO,
-                this.weaponSprite.dimensions
-            ).relativeTo(this.dude.animation.transform)
+            // this.weaponTransform = new SpriteTransform(
+            //     Point.ZERO,
+            //     this.weaponSprite.dimensions
+            // ).relativeTo(this.dude.animation.transform)
             this.slashSprite = this.entity.addComponent(
                 Tilesets.instance.oneBit.getTileSource("slash").toComponent()
             )
 
             spriteCaches[spriteId] =
                 spriteCaches[spriteId] ??
-                new WeaponSpriteCache(this.weaponSprite, offsetFromCenter, HAND_POSITION_OFFSET)
+                new WeaponSpriteCache(
+                    Tilesets.instance.dungeonCharacters.getTileSource(spriteId),
+                    HAND_POSITION_OFFSET.minus(offsetFromCenter)
+                )
+
+            this.idleAnim = new IdleAnimation(this.spec)
+            this.sheathedAnim = new SheathedAnimation(this.spec)
+            // this.attackAnim = new FullSpinAnimation(spriteCaches[spriteId])
         }
     }
 
-    update(updateData: UpdateData) {
-        if (!!this.animator) {
-            this.animator.update(updateData.elapsedTimeMillis)
-        }
-
-        this.animate()
+    update({ elapsedTimeMillis }: UpdateData) {
+        // if (!!this.animator) {
+        //     this.animator.update(updateData.elapsedTimeMillis)
+        // }
+        this.getCurrentAnimation().update(elapsedTimeMillis)
     }
 
-    getWrappedRenderMethods(filter: ImageFilter) {
-        return [this.weaponSprite.filtered(filter).toImageRender(this.weaponTransform)]
-    }
+    // getWrappedRenderMethods(filter: ImageFilter) {
+    //     return [this.weaponSprite.filtered(filter).toImageRender(this.weaponTransform)]
+    // }
 
     getType() {
         return this.spec.weaponType
@@ -101,9 +114,12 @@ export class MeleeWeapon extends Weapon {
             return
         }
         if (newAttack && this.state === State.DRAWN) {
+            this.attackAnim = new FullSpinAnimation(this.spec, () => {
+                this.state = State.DRAWN
+            })
             this.state = State.ATTACKING
+            // TODO trigger from animation
             setTimeout(() => this.damageEnemies(), 100)
-            this.playAttackAnimation()
         }
     }
 
@@ -136,7 +152,7 @@ export class MeleeWeapon extends Weapon {
         }
     }
 
-    private animate() {
+    /*private animate() {
         const offsetFromEdge = new Point(
             this.dude.animation.transform.dimensions.x / 2 - this.weaponTransform.dimensions.x / 2,
             this.dude.animation.transform.dimensions.y - this.weaponTransform.dimensions.y
@@ -151,9 +167,9 @@ export class MeleeWeapon extends Weapon {
             // center on back
             pos = offsetFromEdge.plus(new Point(3, -1))
         } else if (this.state === State.ATTACKING) {
-            const posWithRotation = this.getAttackAnimationPosition()
-            pos = posWithRotation[0].plus(offsetFromEdge)
-            rotation = posWithRotation[1]
+            const [newPos, newRotation] = this.getAttackAnimationPosition()
+            pos = newPos.plus(offsetFromEdge)
+            rotation = newRotation
         }
 
         this.weaponTransform.rotation = rotation
@@ -176,43 +192,84 @@ export class MeleeWeapon extends Weapon {
                 8
             )
         )
+    }*/
+
+    getWrappedRenderMethods(filter: ImageFilter) {
+        const { sprite, transform } = this.getCurrentAnimation().getFrame(
+            this.dude,
+            spriteCaches[this.spec.spriteId]
+        )
+
+        // transform.depth = this.state == State.SHEATHED ? -0.5 : 0.5
+
+        return [sprite.filtered(filter).toImageRender(transform)]
     }
 
-    private animator: Animator
-    private currentAnimationFrame: number = 0
-    private playAttackAnimation() {
-        this.animator = new Animator(
-            Animator.frames(8, 40),
-            (index) => (this.currentAnimationFrame = index),
-            () => {
-                this.animator = null
-                this.state = State.DRAWN // reset to DRAWN when animation finishes
-            }
-        )
+    private getCurrentAnimation() {
+        if (this.state === State.DRAWN) {
+            return this.idleAnim
+        } else if (this.state === State.SHEATHED) {
+            return this.sheathedAnim
+        } else if (this.state === State.ATTACKING) {
+            return this.attackAnim
+        }
     }
+
+    private getSpriteAndTransform(
+        angle: number,
+        offset = Point.ZERO
+    ): {
+        sprite: StaticSpriteSource
+        transform: SpriteTransform
+    } {
+        const { sprite, position } = spriteCaches[this.spec.spriteId].get(angle)
+        const transform = new SpriteTransform(
+            // convert from "bottom center" to "top left" for the relative sprite
+            new Point(
+                this.dude.animation.sprite.dimensions.x / 2,
+                this.dude.animation.sprite.dimensions.y
+            )
+                .plus(position)
+                .plus(offset)
+                .plus(this.dude.getOffsetRelativeToAnimation())
+                .apply(Math.round),
+            sprite.dimensions
+        ).relativeTo(this.dude.animation.transform)
+        return { sprite, transform }
+    }
+
+    // private animator: Animator
+    // private currentAnimationFrame: number = 0
+    // private playAttackAnimation() {
+    //     this.animator = new Animator(
+    //         Animator.frames(8, 40),
+    //         (index) => (this.currentAnimationFrame = index),
+    //         () => {
+    //             this.animator = null
+    //             this.state = State.DRAWN // reset to DRAWN when animation finishes
+    //         }
+    //     )
+    // }
 
     /**
      * Returns (position, rotation)
      */
-    private getAttackAnimationPosition(): [Point, number] {
-        const swingStartFrame = 3
-        const resettingFrame = 7
+    // private getAttackAnimationPosition(): Point {
+    //     const swingStartFrame = 3
+    //     const resettingFrame = 7
 
-        if (this.currentAnimationFrame < swingStartFrame) {
-            return [new Point(this.currentAnimationFrame * 3, 0), 0]
-        } else if (this.currentAnimationFrame < resettingFrame) {
-            return [
-                new Point(
-                    6 -
-                        this.currentAnimationFrame +
-                        this.weaponTransform.dimensions.y -
-                        swingStartFrame * 3,
-                    Math.floor(this.weaponTransform.dimensions.y / 2 - 1)
-                ),
-                90,
-            ]
-        } else {
-            return [new Point((1 - this.currentAnimationFrame + resettingFrame) * 3, 2), 0]
-        }
-    }
+    //     if (this.currentAnimationFrame < swingStartFrame) {
+    //         return new Point(this.currentAnimationFrame * 3, 0)
+    //     } else if (this.currentAnimationFrame < resettingFrame) {
+    //         return new Point(
+    //             6 -
+    //                 this.currentAnimationFrame +
+    //                 this.weaponTransform.dimensions.y -
+    //                 swingStartFrame * 3,
+    //             Math.floor(this.weaponTransform.dimensions.y / 2 - 1)
+    //         )
+    //     } else {
+    //         return new Point((1 - this.currentAnimationFrame + resettingFrame) * 3, 2)
+    //     }
+    // }
 }
