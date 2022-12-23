@@ -10,7 +10,8 @@ import { Tilesets } from "../../graphics/Tilesets"
 import { session } from "../../online/session"
 import { Dude } from "../Dude"
 import { DudeType } from "../DudeType"
-import { Weapon } from "./Weapon"
+import { HAND_POSITION_OFFSET, Weapon } from "./Weapon"
+import { WeaponSpriteCache } from "./WeaponSpriteCache"
 import { WeaponType } from "./WeaponType"
 
 enum State {
@@ -29,6 +30,8 @@ type WeaponSpec = {
     speed: number // TODO
 }
 
+let spriteCaches: Record<string, WeaponSpriteCache> = {}
+
 /**
  * TODO: Rewrite this to use dynamic sprite rotations so that we can create some fun variance in attacks + combo animations
  */
@@ -37,24 +40,27 @@ export class MeleeWeapon extends Weapon {
 
     private weaponSprite: StaticSpriteSource
     private weaponTransform: SpriteTransform
-    private offsetFromCenter: Point
     private state: State = State.DRAWN
     private slashSprite: SpriteComponent
 
     constructor(spec: WeaponSpec) {
         super()
         this.spec = spec
+        const { spriteId, offsetFromCenter } = spec
 
         this.start = () => {
-            this.weaponSprite = Tilesets.instance.dungeonCharacters.getTileSource(spec.spriteId)
+            this.weaponSprite = Tilesets.instance.dungeonCharacters.getTileSource(spriteId)
             this.weaponTransform = new SpriteTransform(
                 Point.ZERO,
                 this.weaponSprite.dimensions
             ).relativeTo(this.dude.animation.transform)
-            this.offsetFromCenter = spec.offsetFromCenter
             this.slashSprite = this.entity.addComponent(
                 Tilesets.instance.oneBit.getTileSource("slash").toComponent()
             )
+
+            spriteCaches[spriteId] =
+                spriteCaches[spriteId] ??
+                new WeaponSpriteCache(this.weaponSprite, offsetFromCenter, HAND_POSITION_OFFSET)
         }
     }
 
@@ -136,7 +142,7 @@ export class MeleeWeapon extends Weapon {
         const offsetFromEdge = new Point(
             this.dude.animation.transform.dimensions.x / 2 - this.weaponTransform.dimensions.x / 2,
             this.dude.animation.transform.dimensions.y - this.weaponTransform.dimensions.y
-        ).plus(this.offsetFromCenter)
+        ).plus(this.spec.offsetFromCenter)
 
         let pos = new Point(0, 0)
         let rotation = 0

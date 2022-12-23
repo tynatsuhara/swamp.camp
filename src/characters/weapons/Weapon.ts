@@ -1,7 +1,7 @@
 import { Component, Point } from "brigsby/dist"
 import { pt } from "brigsby/dist/Point"
 import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
-import { ImageFilter, StaticSpriteSource } from "brigsby/dist/sprites"
+import { ImageFilter } from "brigsby/dist/sprites"
 import { Hittable } from "../../world/elements/Hittable"
 import { here } from "../../world/locations/LocationManager"
 import { Dude } from "../Dude"
@@ -10,9 +10,6 @@ import { WeaponType } from "./WeaponType"
 // This should be a factor of 90 to make sure we can aim up/down/left/right
 export const WEAPON_ROTATION_INCREMENT = 15
 export const HAND_POSITION_OFFSET = new Point(-4, -6)
-
-// maps rotation -> { sprite, position (relative offset to the original sprite ) }
-export type WeaponSpriteCache = Record<number, { sprite: StaticSpriteSource; position: Point }>
 
 export abstract class Weapon extends Component {
     protected dude: Dude
@@ -116,33 +113,6 @@ export abstract class Weapon extends Component {
         const degrees = (180 / Math.PI) * Math.atan(yDiff / Math.abs(xDiff))
         const result = Math.round(degrees / WEAPON_ROTATION_INCREMENT) * WEAPON_ROTATION_INCREMENT
         return result
-    }
-
-    static initSpriteCache(
-        baseSprite: StaticSpriteSource,
-        baseSpritePosition: Point,
-        rotationPoint: Point
-    ): WeaponSpriteCache {
-        const cache: WeaponSpriteCache = {}
-        const ogCenter = baseSpritePosition.plus(baseSprite.dimensions.floorDiv(2))
-
-        for (let i = -90; i <= 90; i += WEAPON_ROTATION_INCREMENT) {
-            if (i === 0) {
-                cache[i] = {
-                    sprite: baseSprite,
-                    position: baseSpritePosition,
-                }
-            } else {
-                const rotatedSprite = baseSprite.rotated(i)
-                const centerAfterRotation = ogCenter.rotatedAround(rotationPoint, i)
-                cache[i] = {
-                    sprite: rotatedSprite,
-                    position: centerAfterRotation.minus(rotatedSprite.dimensions.floorDiv(2)),
-                }
-            }
-        }
-
-        return cache
     }
 }
 

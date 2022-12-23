@@ -5,7 +5,8 @@ import { Tilesets } from "../../graphics/Tilesets"
 import { Item } from "../../items/Items"
 import { session } from "../../online/session"
 import { spawnThrownProjectile } from "./ThrownProjectile"
-import { HAND_POSITION_OFFSET, Weapon, WeaponSpriteCache } from "./Weapon"
+import { HAND_POSITION_OFFSET, Weapon } from "./Weapon"
+import { WeaponSpriteCache } from "./WeaponSpriteCache"
 import { WeaponType } from "./WeaponType"
 
 enum State {
@@ -36,7 +37,7 @@ export class SpearWeapon extends Weapon {
 
             spriteCache =
                 spriteCache ??
-                Weapon.initSpriteCache(baseSprite, this.offsetFromCenter, HAND_POSITION_OFFSET)
+                new WeaponSpriteCache(baseSprite, this.offsetFromCenter, HAND_POSITION_OFFSET)
         }
     }
 
@@ -57,11 +58,7 @@ export class SpearWeapon extends Weapon {
         sprite: StaticSpriteSource
         transform: SpriteTransform
     } {
-        if (!spriteCache[angle]) {
-            return { sprite: null, transform: null }
-        }
-
-        const { sprite, position } = spriteCache[angle]
+        const { sprite, position } = spriteCache.get(angle)
         const transform = new SpriteTransform(
             // convert from "bottom center" to "top left" for the relative sprite
             new Point(
@@ -96,9 +93,6 @@ export class SpearWeapon extends Weapon {
         }
 
         const { sprite, transform } = this.getSpriteAndTransform(angle, offset)
-        if (!sprite) {
-            return []
-        }
 
         transform.depth = this.state == State.SHEATHED ? -0.5 : 0.5
 
