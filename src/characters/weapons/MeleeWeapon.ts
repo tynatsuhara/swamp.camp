@@ -1,10 +1,5 @@
 import { Point, UpdateData } from "brigsby/dist"
-import {
-    ImageFilter,
-    SpriteComponent,
-    SpriteTransform,
-    StaticSpriteSource,
-} from "brigsby/dist/sprites"
+import { ImageFilter, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Tilesets } from "../../graphics/Tilesets"
 import { session } from "../../online/session"
 import { Dude } from "../Dude"
@@ -36,16 +31,10 @@ export type WeaponSpec = {
 // maps sprite ID to sprite cache
 let spriteCaches: Record<string, WeaponSpriteCache> = {}
 
-/**
- * TODO: Rewrite this to use dynamic sprite rotations so that we can create some fun variance in attacks + combo animations
- */
 export class MeleeWeapon extends Weapon {
     private spec: WeaponSpec
 
-    // private weaponSprite: StaticSpriteSource
-    // private weaponTransform: SpriteTransform
     private state: State = State.DRAWN
-    private slashSprite: SpriteComponent
 
     private idleAnim: MeleeAnimation
     private sheathedAnim: MeleeAnimation
@@ -57,14 +46,6 @@ export class MeleeWeapon extends Weapon {
         const { spriteId, offsetFromCenter } = spec
 
         this.start = () => {
-            // this.weaponTransform = new SpriteTransform(
-            //     Point.ZERO,
-            //     this.weaponSprite.dimensions
-            // ).relativeTo(this.dude.animation.transform)
-            this.slashSprite = this.entity.addComponent(
-                Tilesets.instance.oneBit.getTileSource("slash").toComponent()
-            )
-
             spriteCaches[spriteId] =
                 spriteCaches[spriteId] ??
                 new WeaponSpriteCache(
@@ -74,20 +55,12 @@ export class MeleeWeapon extends Weapon {
 
             this.idleAnim = new IdleAnimation(this.spec)
             this.sheathedAnim = new SheathedAnimation(this.spec)
-            // this.attackAnim = new FullSpinAnimation(spriteCaches[spriteId])
         }
     }
 
     update({ elapsedTimeMillis }: UpdateData) {
-        // if (!!this.animator) {
-        //     this.animator.update(updateData.elapsedTimeMillis)
-        // }
         this.getCurrentAnimation().update(elapsedTimeMillis)
     }
-
-    // getWrappedRenderMethods(filter: ImageFilter) {
-    //     return [this.weaponSprite.filtered(filter).toImageRender(this.weaponTransform)]
-    // }
 
     getType() {
         return this.spec.weaponType
@@ -152,48 +125,6 @@ export class MeleeWeapon extends Weapon {
         }
     }
 
-    /*private animate() {
-        const offsetFromEdge = new Point(
-            this.dude.animation.transform.dimensions.x / 2 - this.weaponTransform.dimensions.x / 2,
-            this.dude.animation.transform.dimensions.y - this.weaponTransform.dimensions.y
-        ).plus(this.spec.offsetFromCenter)
-
-        let pos = new Point(0, 0)
-        let rotation = 0
-
-        if (this.state === State.DRAWN) {
-            pos = offsetFromEdge
-        } else if (this.state === State.SHEATHED) {
-            // center on back
-            pos = offsetFromEdge.plus(new Point(3, -1))
-        } else if (this.state === State.ATTACKING) {
-            const [newPos, newRotation] = this.getAttackAnimationPosition()
-            pos = newPos.plus(offsetFromEdge)
-            rotation = newRotation
-        }
-
-        this.weaponTransform.rotation = rotation
-        this.weaponTransform.mirrorY = this.state == State.SHEATHED
-
-        pos = pos.plus(this.dude.getOffsetRelativeToAnimation())
-
-        this.weaponTransform.position = pos
-
-        // show sword behind character if sheathed
-        this.weaponTransform.depth = this.state == State.SHEATHED ? -0.5 : 0.5
-
-        const frame = this.animator?.getCurrentFrame()
-        this.slashSprite.enabled = frame === 3
-        this.slashSprite.transform.depth = this.dude.animation.transform.depth + 2
-        this.slashSprite.transform.mirrorX = this.weaponTransform.mirrorX
-        this.slashSprite.transform.position = this.dude.animation.transform.position.plus(
-            new Point(
-                (this.weaponTransform.mirrorX ? -1 : 1) * (this.weaponTransform.dimensions.y - 10),
-                8
-            )
-        )
-    }*/
-
     getWrappedRenderMethods(filter: ImageFilter) {
         return this.getCurrentAnimation()
             .getFrame(this.dude, spriteCaches[this.spec.spriteId])
@@ -232,39 +163,4 @@ export class MeleeWeapon extends Weapon {
         ).relativeTo(this.dude.animation.transform)
         return { sprite, transform }
     }
-
-    // private animator: Animator
-    // private currentAnimationFrame: number = 0
-    // private playAttackAnimation() {
-    //     this.animator = new Animator(
-    //         Animator.frames(8, 40),
-    //         (index) => (this.currentAnimationFrame = index),
-    //         () => {
-    //             this.animator = null
-    //             this.state = State.DRAWN // reset to DRAWN when animation finishes
-    //         }
-    //     )
-    // }
-
-    /**
-     * Returns (position, rotation)
-     */
-    // private getAttackAnimationPosition(): Point {
-    //     const swingStartFrame = 3
-    //     const resettingFrame = 7
-
-    //     if (this.currentAnimationFrame < swingStartFrame) {
-    //         return new Point(this.currentAnimationFrame * 3, 0)
-    //     } else if (this.currentAnimationFrame < resettingFrame) {
-    //         return new Point(
-    //             6 -
-    //                 this.currentAnimationFrame +
-    //                 this.weaponTransform.dimensions.y -
-    //                 swingStartFrame * 3,
-    //             Math.floor(this.weaponTransform.dimensions.y / 2 - 1)
-    //         )
-    //     } else {
-    //         return new Point((1 - this.currentAnimationFrame + resettingFrame) * 3, 2)
-    //     }
-    // }
 }
