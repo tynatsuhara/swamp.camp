@@ -1,6 +1,8 @@
+import { getCookingRecipes } from "../../items/CraftingRecipe"
 import { Item } from "../../items/Items"
 import { session } from "../../online/session"
 import { saveManager } from "../../SaveManager"
+import { CraftingMenu } from "../../ui/CraftingMenu"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { Campfire } from "../../world/elements/Campfire"
@@ -39,6 +41,12 @@ export const CAMPFIRE_DIALOGUES: DialogueSet = {
             options.push(
                 new DialogueOption("Take a torch", () => {
                     return completeDialogue(-1)()
+                })
+            )
+            options.push(
+                new DialogueOption("Cook food", () => {
+                    CraftingMenu.instance.open(getCookingRecipes(), "cook")
+                    return completeDialogue(0)()
                 })
             )
         }

@@ -3,10 +3,8 @@ import { Collider } from "brigsby/dist/collision"
 import { PointValue, pt } from "brigsby/dist/Point"
 import { SpriteSource } from "brigsby/dist/sprites"
 import { loadAudio } from "../audio/DeferLoadAudio"
-import { Sounds } from "../audio/Sounds"
 import { Condition } from "../characters/Condition"
 import { Dude } from "../characters/Dude"
-import { player } from "../characters/player"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { WeaponType } from "../characters/weapons/WeaponType"
 import { Icon } from "../graphics/OneBitTileset"
@@ -17,6 +15,7 @@ import { randomByteString } from "../saves/uuid"
 import { ElementType } from "../world/elements/Elements"
 import { here } from "../world/locations/LocationManager"
 import { DroppedItem } from "./DroppedItem"
+import { ItemUtils } from "./ItemUtils"
 import { getTentVariantImageFilter } from "./TentVariants"
 
 export enum Item {
@@ -38,9 +37,10 @@ export enum Item {
     HEART_CONTAINER,
     APOTHECARY,
     POISON_ANTIDOTE,
-    MEAT,
+    RAW_MEAT,
     BLACKBERRIES,
     SMALL_CABIN,
+    COOKED_MEAT,
 
     // weapon values should match the WeaponType enum so we can cast them
     KNIFE = WeaponType.KNIFE,
@@ -182,20 +182,12 @@ export const ITEM_METADATA_MAP = {
         inventoryIcon: "mushroom",
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("mushroom"),
         element: ElementType.MUSHROOM,
-        consumable: {
-            verb: "eat",
-            fn: (consumer) => {
-                if (consumer === player()) {
-                    Sounds.play(...SOUNDS.eat)
-                }
-                if (session.isHost()) {
-                    consumer.heal(1)
-                    if (Math.random() < 0.25) {
-                        consumer.addCondition(Condition.POISONED, 2_500 + Math.random() * 5_000)
-                    }
-                }
-            },
-        },
+        consumable: ItemUtils.consumable("eat", SOUNDS.eat, (consumer) => {
+            consumer.heal(1)
+            if (Math.random() < 0.25) {
+                consumer.addCondition(Condition.POISONED, 2_500 + Math.random() * 5_000)
+            }
+        }),
     }),
     [Item.CHEST]: new ItemSpec({
         displayName: "Chest",
@@ -213,17 +205,9 @@ export const ITEM_METADATA_MAP = {
         displayName: "Weak medicine",
         inventoryIcon: "potion1",
         stackLimit: STACK_SM,
-        consumable: {
-            verb: "drink",
-            fn: (consumer) => {
-                if (consumer === player()) {
-                    Sounds.play(...SOUNDS.drink)
-                }
-                if (session.isHost()) {
-                    consumer.addCondition(Condition.HEALING, 10_000)
-                }
-            },
-        },
+        consumable: ItemUtils.consumable("drink", SOUNDS.drink, (consumer) =>
+            consumer.addCondition(Condition.HEALING, 10_000)
+        ),
     }),
     [Item.HEART_CONTAINER]: new ItemSpec({
         displayName: "Heart container",
@@ -234,48 +218,30 @@ export const ITEM_METADATA_MAP = {
         displayName: "Antidote",
         inventoryIcon: "potion3",
         stackLimit: STACK_SM,
-        consumable: {
-            verb: "drink",
-            fn: (consumer) => {
-                if (consumer === player()) {
-                    Sounds.play(...SOUNDS.drink)
-                }
-                if (session.isHost()) {
-                    consumer.removeCondition(Condition.POISONED)
-                }
-            },
-        },
+        consumable: ItemUtils.consumable("drink", SOUNDS.drink, (consumer) =>
+            consumer.removeCondition(Condition.POISONED)
+        ),
     }),
-    [Item.MEAT]: new ItemSpec({
-        displayName: "Meat",
-        inventoryIcon: "meat1",
-        consumable: {
-            verb: "eat",
-            fn: (consumer) => {
-                if (consumer === player()) {
-                    Sounds.play(...SOUNDS.eat)
-                }
-                if (session.isHost()) {
-                    consumer.heal(1)
-                }
-            },
-        },
+    [Item.RAW_MEAT]: new ItemSpec({
+        displayName: "Raw meat",
+        inventoryIcon: "meat1raw",
+        consumable: ItemUtils.consumable("eat", SOUNDS.eat, (consumer) => {
+            consumer.heal(0.5)
+            if (Math.random() < 0.2) {
+                consumer.addCondition(Condition.POISONED, 1_000)
+            }
+        }),
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("meat1"),
+    }),
+    [Item.COOKED_MEAT]: new ItemSpec({
+        displayName: "Cooked meat",
+        inventoryIcon: "meat1",
+        consumable: ItemUtils.consumable("eat", SOUNDS.eat, (consumer) => consumer.heal(2)),
     }),
     [Item.BLACKBERRIES]: new ItemSpec({
         displayName: "Berries",
         inventoryIcon: "berries",
-        consumable: {
-            verb: "eat",
-            fn: (consumer) => {
-                if (consumer === player()) {
-                    Sounds.play(...SOUNDS.eat)
-                }
-                if (session.isHost()) {
-                    consumer.heal(0.5)
-                }
-            },
-        },
+        consumable: ItemUtils.consumable("eat", SOUNDS.eat, (consumer) => consumer.heal(0.5)),
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("berries"),
     }),
 

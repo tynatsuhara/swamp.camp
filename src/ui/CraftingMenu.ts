@@ -25,6 +25,11 @@ const COLOR_BACKGROUND_BORDER = Color.RED_1
 const COLOR_TEXT_NOT_HOVERED = Color.PINK_3
 const COLOR_LACKING_INGREDIENT = Color.RED_1
 
+const CRAFT_NOISE = "audio/rpg/inventory/metal-small3.wav"
+const COOK_NOISE = "audio/misc/cc0-fireball-01.wav"
+
+type CraftMode = "craft" | "cook"
+
 export class CraftingMenu extends Component {
     static instance: CraftingMenu
 
@@ -41,7 +46,7 @@ export class CraftingMenu extends Component {
     private justCraftedRow = -1 // if this is non-negative, this row was just crafted and will be highlighted
     private justOpened = false // prevent bug where the mouse is held down immediately
     private tooltip = this.e.addComponent(new Tooltip())
-    private readonly craftNoise = "audio/rpg/inventory/metal-small3.wav"
+    private mode: CraftMode
 
     constructor() {
         super()
@@ -52,7 +57,22 @@ export class CraftingMenu extends Component {
         this.canvas.height = this.innerDimensions.y
         this.context = this.canvas.getContext("2d", { alpha: false })
 
-        loadAudio([this.craftNoise])
+        loadAudio([CRAFT_NOISE, COOK_NOISE])
+    }
+
+    close() {
+        this.isOpen = false
+        this.displayEntity = null
+        this.tooltip.clear()
+    }
+
+    open(recipes: CraftingRecipeCategory[], mode: CraftMode = "craft") {
+        this.mode = mode
+        this.isOpen = true
+        this.recipes = recipes
+        this.scrollOffset = 0
+        this.justOpened = true
+        this.selectCategory(0)
     }
 
     update(updateData: UpdateData) {
@@ -88,7 +108,8 @@ export class CraftingMenu extends Component {
             this.justOpened = false
 
             if (this.justCraftedRow !== -1) {
-                this.tooltip.say("Crafted!")
+                // TODO make changeable
+                this.tooltip.say(this.mode === "craft" ? "Crafted!" : "Cooked!")
             }
         }
     }
@@ -103,20 +124,6 @@ export class CraftingMenu extends Component {
         this.selectCategory(
             this.recipeCategory === 0 ? this.recipes.length - 1 : this.recipeCategory - 1
         )
-    }
-
-    close() {
-        this.isOpen = false
-        this.displayEntity = null
-        this.tooltip.clear()
-    }
-
-    open(recipes: CraftingRecipeCategory[]) {
-        this.isOpen = true
-        this.recipes = recipes
-        this.scrollOffset = 0
-        this.justOpened = true
-        this.selectCategory(0)
     }
 
     private selectCategory(category: number) {
@@ -224,7 +231,11 @@ export class CraftingMenu extends Component {
             if (hovered && controls.isMenuClickDown()) {
                 if (this.canCraft(player(), recipe)) {
                     this.doCraftOnHost(recipe)
-                    Sounds.play(this.craftNoise, 0.6)
+                    if (this.mode === "craft") {
+                        Sounds.play(CRAFT_NOISE, 0.6)
+                    } else {
+                        Sounds.play(COOK_NOISE, 0.13)
+                    }
                     this.justCraftedRow = r // set this AFTER crafting
                     setTimeout(() => (this.justCraftedRow = -1), 900)
                 } else {
@@ -244,7 +255,7 @@ export class CraftingMenu extends Component {
                     this.tooltip.say(prefix + "[Need ingredients]")
                 }
             } else if (hovered) {
-                this.tooltip.say(prefix + "[Click to craft]")
+                this.tooltip.say(prefix + `[Click to ${this.mode}]`)
             }
 
             // craftable item

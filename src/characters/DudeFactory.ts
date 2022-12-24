@@ -364,7 +364,12 @@ export class DudeFactory {
                     new NPC(),
                     new Enemy(),
                     new DudeModifier(
-                        (d) => (d.droppedItemSupplier = () => [Item.MEAT, Item.MEAT, Item.MEAT])
+                        (d) =>
+                            (d.droppedItemSupplier = () => [
+                                Item.RAW_MEAT,
+                                Item.RAW_MEAT,
+                                Item.RAW_MEAT,
+                            ])
                     ),
                 ]
                 maxHealth = 5
@@ -379,7 +384,7 @@ export class DudeFactory {
                 additionalComponents = [
                     new NPC(),
                     new Enemy(),
-                    new DudeModifier((d) => (d.droppedItemSupplier = () => [Item.MEAT])),
+                    new DudeModifier((d) => (d.droppedItemSupplier = () => [Item.RAW_MEAT])),
                 ]
                 maxHealth = 2
                 speed *= 1

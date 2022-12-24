@@ -110,3 +110,20 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => {
 
     return [utilities, equipment, buildings]
 }
+
+export const getCookingRecipes = (): CraftingRecipeCategory[] => {
+    return [
+        {
+            // TODO: don't show icon if there's only one category?
+            icon: Tilesets.instance.oneBit.getTileSource("bread"),
+            name: "Food",
+            recipes: [
+                {
+                    desc: "+2 health",
+                    output: Item.COOKED_MEAT,
+                    input: [new ItemStack(Item.RAW_MEAT, 1)],
+                },
+            ],
+        },
+    ]
+}
