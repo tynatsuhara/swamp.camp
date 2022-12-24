@@ -24,7 +24,7 @@
         "webpack-dev-server": "^4.10.0"
     },
     "dependencies": {
-        "brigsby": "^0.7.2",
+        "brigsby": "^0.7.3",
         "trystero": "^0.11.8"
     }
 }
