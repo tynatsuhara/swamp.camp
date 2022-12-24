@@ -95,6 +95,7 @@ export class MeleeWeapon extends Weapon {
         }
         if (newAttack && this.state === State.DRAWN) {
             const onFinish = () => (this.state = State.DRAWN)
+            // TODO: Use multiple animations and combos
             // this.attackAnim = new FullSpinAnimation(this.animationArgs, onFinish)
             this.attackAnim = new BasicAttackAnimation(this.animationArgs, onFinish)
             this.state = State.ATTACKING

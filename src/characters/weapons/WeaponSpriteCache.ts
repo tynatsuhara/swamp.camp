@@ -31,6 +31,7 @@ export class WeaponSpriteCache {
         if (!this.cache[angle]) {
             const rotatedSprite = this.baseSprite.rotated(angle, "canvas")
             const centerAfterRotation = this.ogCenter.rotatedAround(this.rotationPoint, angle)
+            // TODO: persist this cache in the browser
             this.cache[angle] = {
                 sprite: rotatedSprite,
                 position: centerAfterRotation.minus(rotatedSprite.dimensions.floorDiv(2)),
