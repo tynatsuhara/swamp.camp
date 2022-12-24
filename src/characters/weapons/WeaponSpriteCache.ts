@@ -23,10 +23,13 @@ export class WeaponSpriteCache {
     }
 
     get(angle: number) {
+        // normalize angle
         angle = angle % 360
+        if (angle < 0) {
+            angle += 360
+        }
         if (!this.cache[angle]) {
-            // TODO canvas implementation seems to be less accurate
-            const rotatedSprite = this.baseSprite.rotated(angle, "webgl")
+            const rotatedSprite = this.baseSprite.rotated(angle, "canvas")
             const centerAfterRotation = this.ogCenter.rotatedAround(this.rotationPoint, angle)
             this.cache[angle] = {
                 sprite: rotatedSprite,
