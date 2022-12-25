@@ -31,7 +31,7 @@ export const WeaponFactory = {
                 return new MeleeWeapon({
                     weaponType: WeaponType.SWORD,
                     spriteId: "weapon_regular_sword",
-                    offsetFromCenter: new Point(-11, -23).plus(offset),
+                    offsetFromCenter: new Point(-6, -2).plus(offset),
                     range: 20,
                     damage: 1,
                     canMultiAttack: false,

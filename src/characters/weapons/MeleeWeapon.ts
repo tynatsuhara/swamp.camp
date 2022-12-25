@@ -1,4 +1,4 @@
-import { Point, UpdateData } from "brigsby/dist"
+import { Point, pt, UpdateData } from "brigsby/dist"
 import { ImageFilter, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Tilesets } from "../../graphics/Tilesets"
 import { session } from "../../online/session"
@@ -44,15 +44,16 @@ export class MeleeWeapon extends Weapon {
     constructor(spec: WeaponSpec) {
         super()
         this.spec = spec
-        const { spriteId, offsetFromCenter } = spec
+        const { spriteId } = spec
 
         this.start = () => {
+            const baseSprite = Tilesets.instance.dungeonCharacters.getTileSource(spriteId)
+            const baseDims = baseSprite.dimensions
+            spec.offsetFromCenter = spec.offsetFromCenter.minus(pt(baseDims.x / 2, baseDims.y))
+
             spriteCaches[spriteId] =
                 spriteCaches[spriteId] ??
-                new WeaponSpriteCache(
-                    Tilesets.instance.dungeonCharacters.getTileSource(spriteId),
-                    HAND_POSITION_OFFSET.minus(offsetFromCenter)
-                )
+                new WeaponSpriteCache(baseSprite, HAND_POSITION_OFFSET.minus(spec.offsetFromCenter))
 
             this.animationArgs = {
                 dude: this.dude,
@@ -159,10 +160,7 @@ export class MeleeWeapon extends Weapon {
         const { sprite, position } = spriteCaches[this.spec.spriteId].get(angle)
         const transform = new SpriteTransform(
             // convert from "bottom center" to "top left" for the relative sprite
-            new Point(
-                this.dude.animation.sprite.dimensions.x / 2,
-                this.dude.animation.sprite.dimensions.y
-            )
+            pt(this.dude.animation.sprite.dimensions.x / 2, this.dude.animation.sprite.dimensions.y)
                 .plus(position)
                 .plus(offset)
                 .plus(this.dude.getOffsetRelativeToAnimation())
