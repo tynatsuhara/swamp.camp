@@ -98,7 +98,9 @@ class NotificationComponent extends Component {
     }
 
     private getPosition() {
-        const index = NotificationDisplay.instance.getNotifications().indexOf(this.data)
+        const index = NotificationDisplay.instance
+            .getNotifications()
+            .findIndex((n) => this.data.id === n.id)
         const yOffset = 32 * index + OFFSET.y
         const offScreenPos = new Point(Camera.instance.dimensions.x + 10, yOffset)
 
