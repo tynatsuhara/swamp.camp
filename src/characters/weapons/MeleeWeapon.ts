@@ -21,6 +21,7 @@ enum State {
 export type WeaponSpec = {
     weaponType: WeaponType
     spriteId: string
+    // the sprite will be positioned at the bottom center, this offset is relative to that
     offsetFromCenter: Point
     range: number
     damage: number
