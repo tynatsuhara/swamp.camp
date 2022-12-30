@@ -7,6 +7,7 @@ import { session } from "../online/session"
 import { hostOnJoin, hostSessionClose } from "../online/syncGame"
 import { saveManager } from "../SaveManager"
 import { Settings } from "../Settings"
+import { Singletons } from "../Singletons"
 import { SwampCampGame } from "../SwampCampGame"
 import { here } from "../world/locations/LocationManager"
 import { ButtonsMenu, OptionButton } from "./ButtonsMenu"
@@ -20,6 +21,10 @@ import { UIStateManager } from "./UIStateManager"
 type PauseOption = Pick<OptionButton, "text" | "fn" | "onMouseOver" | "onMouseOut">
 
 export class PauseMenu extends Component {
+    static get instance() {
+        return Singletons.getOrCreate(PauseMenu)
+    }
+
     private readonly e: Entity = new Entity([this]) // entity for this component
     private displayEntity: Entity
     private isShiftDown: boolean

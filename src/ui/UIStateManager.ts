@@ -8,6 +8,7 @@ import { DialogueDisplay } from "./DialogueDisplay"
 import { DrawMenu } from "./DrawMenu"
 import { HUD } from "./HUD"
 import { InventoryDisplay } from "./InventoryDisplay"
+import { MenuHints } from "./MenuHints"
 import { NotificationDisplay } from "./NotificationDisplay"
 import { PauseMenu } from "./PauseMenu"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
@@ -24,10 +25,10 @@ export class UIStateManager {
     private readonly inventory = new InventoryDisplay()
     private readonly dialogueDisplay = new DialogueDisplay()
     private readonly placeElementDisplay = new PlaceElementDisplay()
-    private readonly pauseMenu = new PauseMenu()
     private readonly craftingMenu = new CraftingMenu()
     private readonly sellMenu = new TradeMenu()
     private readonly notificationDisplay = new NotificationDisplay()
+    private readonly menuHints = new MenuHints()
     private readonly drawMenu = new DrawMenu() // TODO
 
     // if this is true, input observed by other components (like the player)
@@ -47,7 +48,7 @@ export class UIStateManager {
             this.inventory.isOpen ||
             this.dialogueDisplay.isOpen ||
             this.placeElementDisplay.isOpen ||
-            this.pauseMenu.isOpen ||
+            PauseMenu.instance.isOpen ||
             this.craftingMenu.isOpen ||
             this.sellMenu.isOpen ||
             this.drawMenu.isOpen ||
@@ -59,10 +60,11 @@ export class UIStateManager {
             .concat(this.inventory.getEntities())
             .concat(this.dialogueDisplay.getEntities())
             .concat(this.placeElementDisplay.getEntities())
-            .concat(this.pauseMenu.getEntities())
+            .concat(PauseMenu.instance.getEntities())
             .concat(this.craftingMenu.getEntities())
             .concat(this.sellMenu.getEntities())
             .concat(this.notificationDisplay.getEntities())
             .concat(this.drawMenu.getEntities())
+            .concat(this.menuHints.getEntities())
     }
 }

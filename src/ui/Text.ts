@@ -28,11 +28,12 @@ export enum TextIcon {
     GAMEPAD_X = "öx",
     GAMEPAD_SQUARE = "ö2",
     GAMEPAD_TRIANGLE = "ö3",
-    FACE_VERY_SAD = "ö4",
-    FACE_SAD = "ö5",
-    FACE_NEUTRAL = "ö6",
-    FACE_HAPPY = "ö7",
-    FACE_VERY_HAPPY = "ö8",
+    GAMEPAD_CIRCLE = "ö4",
+    FACE_VERY_SAD = "öa",
+    FACE_SAD = "öb",
+    FACE_NEUTRAL = "öc",
+    FACE_HAPPY = "öd",
+    FACE_VERY_HAPPY = "öe",
 }
 
 const ICON_PLACEHOLDER_PREFIX = "ö"

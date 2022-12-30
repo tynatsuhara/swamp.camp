@@ -209,6 +209,8 @@ class ControlsWrapper extends Component {
             gamepad: () => gamepadInput.isButtonDown(GamepadButton.CIRCLE),
         })
 
+    getCloseMenuButtonString = () => (isGamepadMode ? TextIcon.GAMEPAD_CIRCLE : "[tab]")
+
     isOpenPauseMenuButtonDown = () =>
         check({
             kbm: () => input.isKeyDown(InputKey.TAB),
