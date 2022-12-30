@@ -54,16 +54,11 @@ export class PauseMenu extends Component {
         const tooltip = new Tooltip()
 
         const buttons: PauseOption[] = [
-            // TODO figure out how to handle saving with multiplayer
             debug.disableAutosave &&
                 session.isHost() && {
                     text: "[debug] SAVE GAME",
                     fn: () => saveManager.save(),
                 },
-            // {
-            //     text: "LOAD LAST SAVE",
-            //     fn: () => saveManager.load(),
-            // },
             this.getOnlineOption(tooltip),
             {
                 text: "VIEW CONTROLS",
