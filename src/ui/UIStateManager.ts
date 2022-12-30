@@ -28,7 +28,7 @@ export class UIStateManager {
     private readonly craftingMenu = new CraftingMenu()
     private readonly sellMenu = new TradeMenu()
     private readonly notificationDisplay = new NotificationDisplay()
-    private readonly drawMenu = new DrawMenu()
+    private readonly drawMenu = new DrawMenu() // TODO
 
     // if this is true, input observed by other components (like the player)
     // should be skipped because a menu is open. Other menus should only open
