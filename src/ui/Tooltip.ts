@@ -1,4 +1,4 @@
-import { Component, Point, UpdateData } from "brigsby/dist"
+import { Component, Point, pt, UpdateData } from "brigsby/dist"
 import { ImageRender } from "brigsby/dist/renderer"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
@@ -8,15 +8,14 @@ import { Color } from "./Color"
 import { formatText, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
 
 const DEPTH = Number.MAX_SAFE_INTEGER / 2 + 3
+const MARGIN = 6
+const TEXT_OFFSET = pt(MARGIN, MARGIN - 1)
 
 /**
  * TODO: Maybe make this a singleton on the Cursor class?
  */
 export class Tooltip extends Component {
-    private static readonly margin = 6
-    private static readonly textOffset = new Point(Tooltip.margin, Tooltip.margin - 1)
     private text: string[]
-
     private tiles: ImageRender[] = []
 
     say(text: string) {
@@ -41,11 +40,11 @@ export class Tooltip extends Component {
         const leftPos = position.plus(new Point(TILE_SIZE / 2, -TILE_SIZE)).apply(Math.floor)
         const centerPos = leftPos.plus(new Point(TILE_SIZE, 0))
         const rightPos = leftPos
-            .plus(new Point(width - TILE_SIZE + Tooltip.margin * 2, 0))
+            .plus(new Point(width - TILE_SIZE + MARGIN * 2, 0))
             .apply(Math.floor)
 
         const spacing = 6
-        const centerWidth = new Point(width + Tooltip.margin * 2 - TILE_SIZE * 2, TILE_SIZE)
+        const centerWidth = new Point(width + MARGIN * 2 - TILE_SIZE * 2, TILE_SIZE)
 
         const tiles: ImageRender[] = []
         for (let i = 0; i < (this.text.length - 1) * 2 + 1; i++) {
@@ -98,7 +97,7 @@ export class Tooltip extends Component {
 
         this.tiles = tiles
 
-        const totalWidth = width + Tooltip.margin * 2
+        const totalWidth = width + MARGIN * 2
         if (position.x + totalWidth > updateData.dimensions.x) {
             // shift left
             this.tiles.forEach((t) => (t.position = t.position.plusX(-totalWidth - TILE_SIZE)))
@@ -115,7 +114,7 @@ export class Tooltip extends Component {
                 text: this.text.join("\n"),
                 color: Color.RED_2,
                 position: this.tiles[0].position
-                    .plus(Tooltip.textOffset)
+                    .plus(TEXT_OFFSET)
                     .plusY(-(this.text.length - 1) * (TEXT_SIZE + 4)),
                 depth: DEPTH + 1,
             }),
