@@ -173,7 +173,7 @@ export class MiniMap extends Component {
         const topLeft = new Point(
             padding,
             Camera.instance.dimensions.y - this.smallCanvas.height - padding
-        )
+        ).apply(Math.floor)
 
         const mapRender = new ImageRender(
             this.smallCanvas,
@@ -210,8 +210,4 @@ export class MiniMap extends Component {
             })
         )
     }
-
-    private renderPlayerIndicator
-
-    private playerIndicatorBitmap: ImageBitmap
 }
