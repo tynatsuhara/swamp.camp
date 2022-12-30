@@ -13,8 +13,6 @@ const DEPTH = Number.MAX_SAFE_INTEGER / 2 + 3
  * TODO: Maybe make this a singleton on the Cursor class?
  */
 export class Tooltip extends Component {
-    private position: Point = new Point(0, 0)
-
     private static readonly margin = 6
     private static readonly textOffset = new Point(Tooltip.margin, Tooltip.margin - 1)
     private text: string[]
@@ -35,12 +33,12 @@ export class Tooltip extends Component {
             return
         }
 
-        this.position = controls.getMousePos()
+        const position = controls.getMousePos()
 
         const longestLineLength = Lists.maxBy(this.text, (line) => line.length).length
         const width = longestLineLength * TEXT_PIXEL_WIDTH
 
-        const leftPos = this.position.plus(new Point(TILE_SIZE / 2, -TILE_SIZE)).apply(Math.floor)
+        const leftPos = position.plus(new Point(TILE_SIZE / 2, -TILE_SIZE)).apply(Math.floor)
         const centerPos = leftPos.plus(new Point(TILE_SIZE, 0))
         const rightPos = leftPos
             .plus(new Point(width - TILE_SIZE + Tooltip.margin * 2, 0))
@@ -101,7 +99,7 @@ export class Tooltip extends Component {
         this.tiles = tiles
 
         const totalWidth = width + Tooltip.margin * 2
-        if (this.position.x + totalWidth > updateData.dimensions.x) {
+        if (position.x + totalWidth > updateData.dimensions.x) {
             // shift left
             this.tiles.forEach((t) => (t.position = t.position.plusX(-totalWidth - TILE_SIZE)))
         }
