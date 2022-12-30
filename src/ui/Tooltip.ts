@@ -11,12 +11,20 @@ const DEPTH = Number.MAX_SAFE_INTEGER / 2 + 3
 const MARGIN = 6
 const TEXT_OFFSET = pt(MARGIN, MARGIN - 1)
 
+type TooltipPosition = "mouse" | "bottom-left"
+
 /**
  * TODO: Maybe make this a singleton on the Cursor class?
  */
 export class Tooltip extends Component {
+    private readonly positionMode: TooltipPosition
     private text: string[]
     private tiles: ImageRender[] = []
+
+    constructor(positionMode: TooltipPosition = "mouse") {
+        super()
+        this.positionMode = positionMode
+    }
 
     say(text: string) {
         this.text = text.split("\n")
@@ -27,24 +35,24 @@ export class Tooltip extends Component {
         this.tiles = []
     }
 
-    update(updateData: UpdateData) {
+    update({ dimensions }: UpdateData) {
         if (!this.text) {
             return
         }
 
-        const position = controls.getMousePos()
-
         const longestLineLength = Lists.maxBy(this.text, (line) => line.length).length
-        const width = longestLineLength * TEXT_PIXEL_WIDTH
+        const width = longestLineLength * TEXT_PIXEL_WIDTH + MARGIN * 2
+        const height = this.text.length * TEXT_SIZE + MARGIN * 2
 
-        const leftPos = position.plus(new Point(TILE_SIZE / 2, -TILE_SIZE)).apply(Math.floor)
-        const centerPos = leftPos.plus(new Point(TILE_SIZE, 0))
-        const rightPos = leftPos
-            .plus(new Point(width - TILE_SIZE + MARGIN * 2, 0))
-            .apply(Math.floor)
+        const leftPos =
+            this.positionMode === "mouse"
+                ? this.getPositionMouseMode(width, dimensions)
+                : this.getPositionBottomLeftMode(height, dimensions)
+        const centerPos = leftPos.plusX(TILE_SIZE)
+        const rightPos = leftPos.plusX(width - TILE_SIZE)
 
         const spacing = 6
-        const centerWidth = new Point(width + MARGIN * 2 - TILE_SIZE * 2, TILE_SIZE)
+        const centerWidth = new Point(width - TILE_SIZE * 2, TILE_SIZE)
 
         const tiles: ImageRender[] = []
         for (let i = 0; i < (this.text.length - 1) * 2 + 1; i++) {
@@ -96,12 +104,23 @@ export class Tooltip extends Component {
         }
 
         this.tiles = tiles
+    }
 
-        const totalWidth = width + MARGIN * 2
-        if (position.x + totalWidth > updateData.dimensions.x) {
+    private getPositionMouseMode(width: number, screenDimensions: Point) {
+        const position = controls.getMousePos()
+
+        const leftPos = position.plus(new Point(TILE_SIZE / 2, -TILE_SIZE)).apply(Math.floor)
+
+        if (leftPos.x + width > screenDimensions.x) {
             // shift left
-            this.tiles.forEach((t) => (t.position = t.position.plusX(-totalWidth - TILE_SIZE)))
+            return leftPos.plusX(-width - TILE_SIZE)
         }
+
+        return leftPos
+    }
+
+    private getPositionBottomLeftMode(height: number, screenDimensions: Point) {
+        return pt(3, screenDimensions.y - height).apply(Math.floor)
     }
 
     getRenderMethods() {
