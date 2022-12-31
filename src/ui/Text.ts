@@ -2,6 +2,7 @@ import { Point } from "brigsby/dist"
 import { RenderMethod, TextRender } from "brigsby/dist/renderer"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { ImageFilters } from "../graphics/ImageFilters"
+import { Icon } from "../graphics/OneBitTileset"
 import { Tilesets } from "../graphics/Tilesets"
 import { Color } from "./Color"
 import { UIStateManager } from "./UIStateManager"
@@ -40,11 +41,12 @@ const ICON_PLACEHOLDER_PREFIX = "ö"
 const ICON_PLACEHOLDER_REGEX = /ö./g
 
 // maps placeholder -> one bit key
-const ICON_PLACEHOLDER_MAP = {
+const ICON_PLACEHOLDER_MAP: Record<TextIcon, Icon> = {
     [TextIcon.GAMEPAD_UP]: "gamepad-up",
     [TextIcon.GAMEPAD_X]: "gamepad-x",
     [TextIcon.GAMEPAD_SQUARE]: "gamepad-square",
     [TextIcon.GAMEPAD_TRIANGLE]: "gamepad-triangle",
+    [TextIcon.GAMEPAD_CIRCLE]: "gamepad-circle",
     [TextIcon.FACE_VERY_SAD]: "face-sad2",
     [TextIcon.FACE_SAD]: "face-sad1",
     [TextIcon.FACE_NEUTRAL]: "face-neutral",
