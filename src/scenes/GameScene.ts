@@ -101,7 +101,7 @@ export class GameScene extends Scene {
             TextOverlayManager.instance.shouldPauseBackground
 
         if (!pauseBackground) {
-            uiEntities.unshift(...UIStateManager.instance.get(updateViewsContext.elapsedTimeMillis))
+            uiEntities.unshift(...UIStateManager.instance.get())
             gameEntities.push(
                 ...here().getEntities(),
                 ...LightManager.instance.getEntities(),

@@ -6,6 +6,7 @@ import { controls } from "../Controls"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { ItemStack } from "../items/Inventory"
 import { ITEM_METADATA_MAP } from "../items/Items"
+import { Singletons } from "../Singletons"
 import { ElementFactory } from "../world/elements/ElementFactory"
 import { Elements, ElementType } from "../world/elements/Elements"
 import { ElementUtils } from "../world/elements/ElementUtils"
@@ -13,7 +14,9 @@ import { here } from "../world/locations/LocationManager"
 import { PlaceElementFrame } from "./PlaceElementFrame"
 
 export class PlaceElementDisplay extends Component {
-    static instance: PlaceElementDisplay
+    static get instance() {
+        return Singletons.getOrCreate(PlaceElementDisplay)
+    }
 
     private e: Entity = new Entity([this])
 
@@ -25,11 +28,6 @@ export class PlaceElementDisplay extends Component {
 
     get isOpen() {
         return this.element !== null && this.element !== undefined
-    }
-
-    constructor() {
-        super()
-        PlaceElementDisplay.instance = this
     }
 
     update(updateData: UpdateData) {

@@ -18,6 +18,7 @@ import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Inventory } from "../items/Inventory"
 import { Item, ITEM_METADATA_MAP } from "../items/Items"
 import { saveManager } from "../SaveManager"
+import { Singletons } from "../Singletons"
 import { Color } from "./Color"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
 import { Tooltip } from "./Tooltip"
@@ -47,7 +48,9 @@ const COLOR_ERROR = Color.RED_1
 
 // this is mostly copied from CraftingMenu and InventoryDisplay
 export class TradeMenu extends Component {
-    static instance: TradeMenu
+    static get instance() {
+        return Singletons.getOrCreate(TradeMenu)
+    }
 
     private readonly e: Entity = new Entity([this]) // entity for this component
     private displayEntity: Entity
@@ -70,8 +73,6 @@ export class TradeMenu extends Component {
 
     constructor() {
         super()
-        TradeMenu.instance = this
-
         this.canvas = document.createElement("canvas")
         this.context = this.canvas.getContext("2d", { alpha: false })
     }

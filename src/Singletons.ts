@@ -8,7 +8,7 @@ const singletonMap = new Map<any, any>()
  * You can easily add a static reference in a class like so:
  *
  *    static get instance() {
- *        return Singletons.getOrCreate(this)
+ *        return Singletons.getOrCreate(MySingletonClass)
  *    }
  *
  */

@@ -13,6 +13,7 @@ import { Dude } from "../characters/Dude"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { Singletons } from "../Singletons"
 import { ButtonsMenu } from "./ButtonsMenu"
 import { Color } from "./Color"
 import { formatText, formatTextRows, TextAlign, TEXT_SIZE } from "./Text"
@@ -20,7 +21,9 @@ import { TextTyper } from "./TextTyper"
 import { UIStateManager } from "./UIStateManager"
 
 export class DialogueDisplay extends Component {
-    static instance: DialogueDisplay
+    static get instance() {
+        return Singletons.getOrCreate(DialogueDisplay)
+    }
 
     private static readonly TEXT_BOX_WIDTH = 288
     private static readonly PADDING = TILE_SIZE
@@ -40,11 +43,6 @@ export class DialogueDisplay extends Component {
     }
     get source() {
         return this.dialogueSource
-    }
-
-    constructor() {
-        super()
-        DialogueDisplay.instance = this
     }
 
     lateUpdate(updateData: UpdateData) {

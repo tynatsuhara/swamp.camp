@@ -26,13 +26,16 @@ import { Inventory, ItemStack } from "../items/Inventory"
 import { ItemMetadata, ItemSpec, ITEM_METADATA_MAP } from "../items/Items"
 import { clientSyncFn } from "../online/syncUtils"
 import { saveManager } from "../SaveManager"
+import { Singletons } from "../Singletons"
 import { Color } from "./Color"
 import { TEXT_FONT, TEXT_SIZE } from "./Text"
 import { Tooltip } from "./Tooltip"
 import { UIStateManager } from "./UIStateManager"
 
 export class InventoryDisplay extends Component {
-    static instance: InventoryDisplay
+    static get instance() {
+        return Singletons.getOrCreate(InventoryDisplay)
+    }
 
     private static COLUMNS = 10
 
@@ -67,7 +70,6 @@ export class InventoryDisplay extends Component {
         super()
         this.e.addComponent(this)
         this.tooltip = this.e.addComponent(new Tooltip())
-        InventoryDisplay.instance = this
     }
 
     lateUpdate(updateData: UpdateData) {

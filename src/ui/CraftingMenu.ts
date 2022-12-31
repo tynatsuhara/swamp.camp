@@ -13,6 +13,7 @@ import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { CraftingRecipe, CraftingRecipeCategory } from "../items/CraftingRecipe"
 import { Item, ITEM_METADATA_MAP } from "../items/Items"
 import { clientSyncFn } from "../online/syncUtils"
+import { Singletons } from "../Singletons"
 import { Color } from "./Color"
 import { TEXT_FONT, TEXT_SIZE } from "./Text"
 import { Tooltip } from "./Tooltip"
@@ -27,11 +28,14 @@ const COLOR_LACKING_INGREDIENT = Color.RED_1
 
 const CRAFT_NOISE = "audio/rpg/inventory/metal-small3.wav"
 const COOK_NOISE = "audio/misc/cc0-fireball-01.wav"
+loadAudio([CRAFT_NOISE, COOK_NOISE])
 
 type CraftMode = "craft" | "cook"
 
 export class CraftingMenu extends Component {
-    static instance: CraftingMenu
+    static get instance() {
+        return Singletons.getOrCreate(CraftingMenu)
+    }
 
     private readonly e: Entity = new Entity([this]) // entity for this component
     private displayEntity: Entity
@@ -50,14 +54,11 @@ export class CraftingMenu extends Component {
 
     constructor() {
         super()
-        CraftingMenu.instance = this
 
         this.canvas = document.createElement("canvas")
         this.canvas.width = this.innerDimensions.x
         this.canvas.height = this.innerDimensions.y
         this.context = this.canvas.getContext("2d", { alpha: false })
-
-        loadAudio([CRAFT_NOISE, COOK_NOISE])
     }
 
     close() {

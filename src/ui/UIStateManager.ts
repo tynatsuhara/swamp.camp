@@ -5,7 +5,6 @@ import { spawnMenu } from "../debug/SpawnMenu"
 import { Singletons } from "../Singletons"
 import { CraftingMenu } from "./CraftingMenu"
 import { DialogueDisplay } from "./DialogueDisplay"
-import { DrawMenu } from "./DrawMenu"
 import { HUD } from "./HUD"
 import { InventoryDisplay } from "./InventoryDisplay"
 import { MenuHints } from "./MenuHints"
@@ -22,15 +21,6 @@ export class UIStateManager {
     static UI_SPRITE_DEPTH = Number.MAX_SAFE_INTEGER / 2
     static SCROLL_SPEED = 0.25
 
-    private readonly inventory = new InventoryDisplay()
-    private readonly dialogueDisplay = new DialogueDisplay()
-    private readonly placeElementDisplay = new PlaceElementDisplay()
-    private readonly craftingMenu = new CraftingMenu()
-    private readonly sellMenu = new TradeMenu()
-    private readonly notificationDisplay = new NotificationDisplay()
-    private readonly menuHints = new MenuHints()
-    private readonly drawMenu = new DrawMenu() // TODO
-
     // if this is true, input observed by other components (like the player)
     // should be skipped because a menu is open. Other menus should only open
     // if this is false
@@ -39,32 +29,30 @@ export class UIStateManager {
         return this.captureInput
     }
 
-    get(elapsedMillis: number): Entity[] {
+    get(): Entity[] {
         if (!player()) {
             return []
         }
 
         this.captureInput =
-            this.inventory.isOpen ||
-            this.dialogueDisplay.isOpen ||
-            this.placeElementDisplay.isOpen ||
+            InventoryDisplay.instance.isOpen ||
+            DialogueDisplay.instance.isOpen ||
+            PlaceElementDisplay.instance.isOpen ||
             PauseMenu.instance.isOpen ||
-            this.craftingMenu.isOpen ||
-            this.sellMenu.isOpen ||
-            this.drawMenu.isOpen ||
+            CraftingMenu.instance.isOpen ||
+            TradeMenu.instance.isOpen ||
             spawnMenu.isOpen ||
             TextOverlayManager.instance.isActive
 
         return HUD.instance
             .getEntities()
-            .concat(this.inventory.getEntities())
-            .concat(this.dialogueDisplay.getEntities())
-            .concat(this.placeElementDisplay.getEntities())
+            .concat(InventoryDisplay.instance.getEntities())
+            .concat(DialogueDisplay.instance.getEntities())
+            .concat(PlaceElementDisplay.instance.getEntities())
             .concat(PauseMenu.instance.getEntities())
-            .concat(this.craftingMenu.getEntities())
-            .concat(this.sellMenu.getEntities())
-            .concat(this.notificationDisplay.getEntities())
-            .concat(this.drawMenu.getEntities())
-            .concat(this.menuHints.getEntities())
+            .concat(CraftingMenu.instance.getEntities())
+            .concat(TradeMenu.instance.getEntities())
+            .concat(NotificationDisplay.instance.getEntities())
+            .concat(MenuHints.instance.getEntities()) // put this last since it checks other menus
     }
 }
