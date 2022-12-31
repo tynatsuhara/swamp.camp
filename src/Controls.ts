@@ -167,39 +167,30 @@ class ControlsWrapper extends Component {
 
     getInventoryOptionTwoString = () => (isGamepadMode ? TextIcon.GAMEPAD_TRIANGLE : "[f]")
 
-    isInventoryStackPickUp = () =>
+    isInventoryStackPickUpOrDrop = () =>
         check({
             kbm: () => input.isMouseDown,
-            gamepad: () =>
-                gamepadInput.isButtonDown(GamepadButton.X) ||
-                gamepadInput.isButtonDown(GamepadButton.L1),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.X),
         })
 
-    isInventoryStackDrop = () =>
-        check({
-            kbm: () => input.isMouseDown,
-            gamepad: () =>
-                gamepadInput.isButtonDown(GamepadButton.X) ||
-                gamepadInput.isButtonDown(GamepadButton.R1),
-        })
+    getInventoryStackPickUpOrDropString = () =>
+        isGamepadMode ? TextIcon.GAMEPAD_X : TextIcon.MOUSE_LEFT
 
-    isInventoryStackPickUpHalf = () =>
-        check({
-            kbm: () => input.isRightMouseDown,
-            gamepad: () => gamepadInput.isButtonDown(GamepadButton.L2),
-        })
-
-    isInventoryStackDropOne = () =>
+    isInventoryStackPickUpHalfOrDropOne = () =>
         check({
             kbm: () => input.isRightMouseDown,
             gamepad: () => gamepadInput.isButtonDown(GamepadButton.R2),
         })
+
+    getInventoryStackPickUpHalfOrDropOneString = () => (isGamepadMode ? "R2" : TextIcon.MOUSE_RIGHT)
 
     isInventorySwap = () =>
         check({
             kbm: () => input.isKeyHeld(InputKey.SHIFT) && input.isMouseDown,
             gamepad: () => gamepadInput.isButtonDown(GamepadButton.R3),
         })
+
+    getInventorySwapString = () => (isGamepadMode ? "R3" : "shift + " + TextIcon.MOUSE_RIGHT)
 
     // ======== OTHER MENU STUFF ========
 

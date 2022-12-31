@@ -54,6 +54,12 @@ export class InventoryDisplay extends Component {
     get isOpen() {
         return this.showingInv
     }
+    get isStackHeld() {
+        return !!this.heldStack
+    }
+    get isTrading() {
+        return !!this.tradingInv
+    }
     private canAcceptInput: boolean
     private offset: Point
     private tooltip: Tooltip
@@ -229,8 +235,8 @@ export class InventoryDisplay extends Component {
         }
 
         // dragging
-        const dropFullStack = controls.isInventoryStackDrop()
-        const dropOne = controls.isInventoryStackDropOne()
+        const dropFullStack = controls.isInventoryStackPickUpOrDrop()
+        const dropOne = controls.isInventoryStackPickUpHalfOrDropOne()
 
         if (dropFullStack || dropOne) {
             let actionSuccess = false
@@ -502,8 +508,8 @@ export class InventoryDisplay extends Component {
             return
         }
 
-        const isPickUp = controls.isInventoryStackPickUp()
-        const isPickUpHalf = controls.isInventoryStackPickUpHalf()
+        const isPickUp = controls.isInventoryStackPickUpOrDrop()
+        const isPickUpHalf = controls.isInventoryStackPickUpHalfOrDropOne()
         const isSwap = controls.isInventorySwap()
 
         if (isPickUp || isPickUpHalf || isSwap) {

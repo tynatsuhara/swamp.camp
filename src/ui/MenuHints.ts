@@ -27,19 +27,32 @@ export class MenuHints extends Component {
         const show = (buttonString: string, action: string) => {
             controlsToShow.push(buttonString + " " + action)
         }
-        const showClose = () => show(controls.getCloseMenuButtonString(), "close")
+        const showExit = () => show(controls.getCloseMenuButtonString(), "exit")
 
-        // TODO add all controls
         if (InventoryDisplay.instance.isOpen) {
-            showClose()
+            if (!InventoryDisplay.instance.isStackHeld) {
+                show(controls.getInventoryStackPickUpOrDropString(), "pick up")
+                show(controls.getInventoryStackPickUpHalfOrDropOneString(), "pick up half")
+            } else {
+                show(controls.getInventoryStackPickUpOrDropString(), "drop")
+                show(controls.getInventoryStackPickUpHalfOrDropOneString(), "drop one")
+            }
+            if (InventoryDisplay.instance.isTrading && !InventoryDisplay.instance.isStackHeld) {
+                show(controls.getInventorySwapString(), "swap")
+            }
+            showExit()
         } else if (PlaceElementDisplay.instance.isOpen) {
-            showClose()
+            // TODO
+            showExit()
         } else if (PauseMenu.instance.isOpen) {
-            showClose()
+            // TODO
+            showExit()
         } else if (CraftingMenu.instance.isOpen) {
-            showClose()
+            // TODO
+            showExit()
         } else if (TradeMenu.instance.isOpen) {
-            showClose()
+            // TODO
+            showExit()
         }
 
         if (controlsToShow.length > 0) {
