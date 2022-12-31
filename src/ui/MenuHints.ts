@@ -42,16 +42,14 @@ export class MenuHints extends Component {
             }
             showExit()
         } else if (PlaceElementDisplay.instance.isOpen) {
-            // TODO
+            show(controls.getMenuClickDownString(), "place")
             showExit()
         } else if (PauseMenu.instance.isOpen) {
-            // TODO
             showExit()
         } else if (CraftingMenu.instance.isOpen) {
-            // TODO
+            show(controls.getTabButtonsString(), "tab left/right")
             showExit()
         } else if (TradeMenu.instance.isOpen) {
-            // TODO
             showExit()
         }
 

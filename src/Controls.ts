@@ -220,11 +220,15 @@ class ControlsWrapper extends Component {
             gamepad: () => gamepadInput.isButtonDown(GamepadButton.L1),
         })
 
+    getTabButtonsString = () => (isGamepadMode ? "L1/R1" : "[a/d]")
+
     isMenuClickDown = () =>
         check({
             kbm: () => input.isMouseDown,
             gamepad: () => gamepadInput.isButtonDown(GamepadButton.X),
         })
+
+    getMenuClickDownString = () => (isGamepadMode ? TextIcon.GAMEPAD_X : TextIcon.MOUSE_LEFT)
 
     // ======== PLAYER CONTROLS ========
 
@@ -321,6 +325,7 @@ class ControlsWrapper extends Component {
     }
 
     getScrollDeltaY = () => {
+        // TODO: BUG: Scrolling will also move the mouse >:(
         return isGamepadMode ? deaden(gamepadInput.getRightAxes()).y : input.mouseWheelDeltaY
     }
 
