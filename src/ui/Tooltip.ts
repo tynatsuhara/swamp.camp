@@ -42,12 +42,11 @@ export class Tooltip extends Component {
 
         const longestLineLength = Lists.maxBy(this.text, (line) => line.length).length
         const width = longestLineLength * TEXT_PIXEL_WIDTH + MARGIN * 2
-        const height = this.text.length * TEXT_SIZE + MARGIN * 2
 
         const leftPos =
             this.positionMode === "mouse"
                 ? this.getPositionMouseMode(width, dimensions)
-                : this.getPositionBottomLeftMode(height, dimensions)
+                : this.getPositionBottomLeftMode(dimensions)
         const centerPos = leftPos.plusX(TILE_SIZE)
         const rightPos = leftPos.plusX(width - TILE_SIZE)
 
@@ -119,8 +118,8 @@ export class Tooltip extends Component {
         return leftPos
     }
 
-    private getPositionBottomLeftMode(height: number, screenDimensions: Point) {
-        return pt(3, screenDimensions.y - height).apply(Math.floor)
+    private getPositionBottomLeftMode(screenDimensions: Point) {
+        return pt(3, screenDimensions.y - 20).apply(Math.floor)
     }
 
     getRenderMethods() {
