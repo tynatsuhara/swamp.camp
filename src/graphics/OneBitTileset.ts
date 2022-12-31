@@ -13,8 +13,8 @@ const KEYS = {
     ["gamepad-down"]: new Point(30, 23),
     ["gamepad-left"]: new Point(31, 23),
     ["keycap"]: new Point(25, 15),
-    ["leftClick"]: new Point(29, 15),
-    ["rightClick"]: new Point(30, 15),
+    ["leftClick"]: new Point(29, 32),
+    ["rightClick"]: new Point(30, 32),
 
     ["face-happy1"]: new Point(19, 26),
     ["face-happy2"]: new Point(21, 26),
