@@ -1,4 +1,4 @@
-import { Component, Entity, Point, pt } from "brigsby/dist"
+import { AnonymousComponent, Entity, Point, pt } from "brigsby/dist"
 import { Lists, RepeatedInvoker } from "brigsby/dist/util"
 import { Particles } from "../../graphics/particles/Particles"
 import { TILE_SIZE } from "../../graphics/Tilesets"
@@ -33,7 +33,7 @@ export class MineExitFactory extends ElementFactory<ElementType.MINE_EXIT> {
         let spawnParticle: (lifetime?: number) => number = () => 0
 
         e.addComponent(
-            new Component({
+            new AnonymousComponent({
                 start: () => {
                     const mineData = wl.getFeatureOfType("mineInteriorBackground")
                     const mineDimensions = pt(mineData.width, mineData.height)
