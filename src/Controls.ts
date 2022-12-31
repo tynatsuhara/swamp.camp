@@ -190,7 +190,7 @@ class ControlsWrapper extends Component {
             gamepad: () => gamepadInput.isButtonDown(GamepadButton.R3),
         })
 
-    getInventorySwapString = () => (isGamepadMode ? "R3" : "shift + " + TextIcon.MOUSE_RIGHT)
+    getInventorySwapString = () => (isGamepadMode ? "R3" : "[shift]+" + TextIcon.MOUSE_RIGHT)
 
     // ======== OTHER MENU STUFF ========
 
