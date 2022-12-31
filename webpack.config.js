@@ -30,13 +30,6 @@ module.exports = (_, argv) => ({
         port: 8000,
         static: {
             directory: path.join(__dirname, "static"),
-            staticOptions: {
-                setHeaders: function (res, path, stat) {
-                    if (path.endsWith(".png")) {
-                        res.set("Cache-Control", "public, max-age=604800, immutable")
-                    }
-                },
-            },
         },
     },
     stats: {
