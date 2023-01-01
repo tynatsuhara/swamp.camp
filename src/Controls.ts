@@ -270,11 +270,15 @@ class ControlsWrapper extends Component {
                 gamepadInput.isButtonHeld(GamepadButton.L2),
         })
 
+    getBlockString = () => (isGamepadMode ? "L1" : TextIcon.MOUSE_RIGHT)
+
     isRollDown = () =>
         check({
             kbm: () => input.isKeyDown(InputKey.SHIFT),
             gamepad: () => gamepadInput.isButtonDown(GamepadButton.CIRCLE),
         })
+
+    getRollString = () => (isGamepadMode ? TextIcon.GAMEPAD_CIRCLE : "[shift]")
 
     isJumpDown = () =>
         check({
