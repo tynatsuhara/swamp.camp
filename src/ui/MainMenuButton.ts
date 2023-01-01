@@ -64,7 +64,7 @@ export class MainMenuButton extends Component {
             if (this.hovering) {
                 text = NO_BREAK_SPACE_CHAR.repeat(startSpaces - 2) + "> " + text.trimStart()
             } else {
-                text = NO_BREAK_SPACE_CHAR.repeat(startSpaces - 2) + "> " + text.trimStart()
+                text = NO_BREAK_SPACE_CHAR.repeat(startSpaces) + text.trimStart()
             }
         } else {
             const nbsp = NO_BREAK_SPACE_CHAR + NO_BREAK_SPACE_CHAR
