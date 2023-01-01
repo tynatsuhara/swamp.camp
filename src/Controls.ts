@@ -124,10 +124,8 @@ class ControlsWrapper extends Component {
 
         const currentGamePadMousePos = this.getMousePos()
 
-        // Both left and right stick can be used for mouse
-        const leftStick = deaden(gamepadInput.getLeftAxes())
         const rightStick = deaden(gamepadInput.getRightAxes())
-        const stickInput = leftStick.plus(rightStick).times(elapsedTimeMillis * CURSOR_SENSITIVITY)
+        const stickInput = rightStick.times(elapsedTimeMillis * CURSOR_SENSITIVITY)
 
         const adjustedPos = currentGamePadMousePos.plus(stickInput)
         const bounds = Camera.instance.dimensions.minus(new Point(3, 3))
@@ -325,8 +323,7 @@ class ControlsWrapper extends Component {
     }
 
     getScrollDeltaY = () => {
-        // TODO: BUG: Scrolling will also move the mouse >:(
-        return isGamepadMode ? deaden(gamepadInput.getRightAxes()).y : input.mouseWheelDeltaY
+        return isGamepadMode ? deaden(gamepadInput.getLeftAxes()).y : input.mouseWheelDeltaY
     }
 
     getPlayerFacingDirection = (dude: Dude) => {
