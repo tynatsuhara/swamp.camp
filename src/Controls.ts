@@ -327,17 +327,11 @@ class ControlsWrapper extends Component {
     }
 
     getPlayerFacingDirection = (dude: Dude) => {
-        if (isGamepadMode) {
-            const axis = gamepadInput.getRightAxes().x
-            if (axis < -AXIS_DEAD_ZONE) {
-                return -1
-            } else if (axis > AXIS_DEAD_ZONE) {
-                return 1
-            }
-            return 0
-        } else {
-            return Math.sign(this.translateToWorldSpace(input.mousePos).x - dude.standingPosition.x)
-        }
+        return Math.sign(
+            isGamepadMode
+                ? deadenAxis(gamepadInput.getRightAxes().x)
+                : this.translateToWorldSpace(input.mousePos).x - dude.standingPosition.x
+        )
     }
 
     vibrate = (options: GamepadVibrationOptions) => {
