@@ -25,6 +25,7 @@ export const NO_BREAK_SPACE_CHAR = "∆"
  * and have a corresponding entry in {@link ICON_PLACEHOLDER_MAP}
  */
 export enum TextIcon {
+    GAMEPAD_DOWN = "ö0",
     GAMEPAD_UP = "ö1",
     GAMEPAD_X = "öx",
     GAMEPAD_SQUARE = "ö2",
@@ -44,6 +45,7 @@ const ICON_PLACEHOLDER_REGEX = /ö./g
 
 // maps placeholder -> one bit key
 const ICON_PLACEHOLDER_MAP: Record<TextIcon, Icon> = {
+    [TextIcon.GAMEPAD_DOWN]: "gamepad-down",
     [TextIcon.GAMEPAD_UP]: "gamepad-up",
     [TextIcon.GAMEPAD_X]: "gamepad-x",
     [TextIcon.GAMEPAD_SQUARE]: "gamepad-square",

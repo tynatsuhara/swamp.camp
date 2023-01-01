@@ -294,6 +294,8 @@ class ControlsWrapper extends Component {
             gamepad: () => gamepadInput.isButtonDown(GamepadButton.DOWN),
         })
 
+    getSheathKeyString = () => (isGamepadMode ? TextIcon.GAMEPAD_DOWN : "[f]")
+
     isAttack = (state: ButtonState) =>
         check({
             kbm: () => input.isMouse(MouseButton.LEFT, state),
