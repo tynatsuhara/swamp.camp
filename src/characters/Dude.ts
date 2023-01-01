@@ -300,6 +300,7 @@ export class Dude extends Component implements DialogueSource {
         this.onDamageCallback = syncFn(this.syncId("odmg"), this.onDamageCallback.bind(this))
         this.die = syncFn(this.syncId("die"), this.die.bind(this))
         this.revive = syncFn(this.syncId("rvv"), this.revive.bind(this))
+        this.dissolve = syncFn(this.syncId("dslv"), this.dissolve.bind(this))
 
         // Synchronized client->host functions
 
@@ -874,7 +875,7 @@ export class Dude extends Component implements DialogueSource {
         // remove the body
         setTimeout(() => {
             if (!this.factions.includes(DudeFaction.VILLAGERS)) {
-                this.dissolve()
+                this.dissolveLocal()
             }
             if (this.type !== DudeType.PLAYER) {
                 this.collider.enabled = false
@@ -932,7 +933,12 @@ export class Dude extends Component implements DialogueSource {
         emitApparitionParticles(this.standingPosition, LIGHT_SMOKE_PARTICLES)
     }
 
+    // host only
     dissolve() {
+        this.dissolveLocal()
+    }
+
+    private dissolveLocal() {
         let dissolveChance = 0.1
         const interval = setInterval(() => {
             this.animation.applyFilter(ImageFilters.dissolve(() => dissolveChance))
