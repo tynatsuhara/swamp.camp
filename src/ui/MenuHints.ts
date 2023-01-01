@@ -9,6 +9,9 @@ import { PlaceElementDisplay } from "./PlaceElementDisplay"
 import { Tooltip } from "./Tooltip"
 import { TradeMenu } from "./TradeMenu"
 
+/**
+ * Show controls in the corner for various menus
+ */
 export class MenuHints extends Component {
     private readonly e = new Entity([this])
     private display: Tooltip
@@ -24,9 +27,7 @@ export class MenuHints extends Component {
     update(): void {
         const controlsToShow: string[] = []
 
-        const show = (buttonString: string, action: string) => {
-            controlsToShow.push(buttonString + " " + action)
-        }
+        const show = (button: string, action: string) => controlsToShow.push(`${button} ${action}`)
         const showExit = () => show(controls.getCloseMenuButtonString(), "exit")
 
         if (InventoryDisplay.instance.isOpen) {
@@ -59,8 +60,6 @@ export class MenuHints extends Component {
             this.display.clear()
         }
     }
-
-    show() {}
 
     getEntities() {
         return [this.e]
