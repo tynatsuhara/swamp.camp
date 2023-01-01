@@ -60,7 +60,7 @@ const check = <T>(handlers: InputHandlers<T>) => {
     return gamepadResult
 }
 
-const AXIS_DEAD_ZONE = 0.2
+const AXIS_DEAD_ZONE = 0.3
 const CURSOR_SENSITIVITY = 0.35
 
 const deadenAxis = (axis: number) => {
