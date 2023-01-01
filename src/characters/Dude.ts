@@ -752,7 +752,7 @@ export class Dude extends Component implements DialogueSource {
             console.warn(`guests can't call damage()`)
             return
         }
-        if (dodgeable && (this.rolling || this.jumping)) {
+        if (dodgeable && this.rolling) {
             return
         }
 
