@@ -323,7 +323,7 @@ class ControlsWrapper extends Component {
     }
 
     getScrollDeltaY = () => {
-        return isGamepadMode ? deaden(gamepadInput.getLeftAxes()).y : input.mouseWheelDeltaY
+        return isGamepadMode ? deadenAxis(gamepadInput.getLeftAxes().y) : input.mouseWheelDeltaY
     }
 
     getPlayerFacingDirection = (dude: Dude) => {
