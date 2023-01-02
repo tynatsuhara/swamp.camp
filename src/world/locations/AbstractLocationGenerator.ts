@@ -58,7 +58,7 @@ export abstract class AbstractLocationGenerator {
     // Ground! //
     /////////////
 
-    protected levels(mapRange: number) {
+    protected levels(mapRange: number, skipRationCheck = false) {
         // We want more bottom ledges than top because it looks nicer with the camera "angle"
         const topBottomThreshold = 0.3
         const sideBottomThreshold = 1
@@ -71,7 +71,10 @@ export abstract class AbstractLocationGenerator {
         do {
             console.log("generating levels")
             ;[levelGrid, levelString, topBottomRatio, sideBottomRatio] = this.levelNoise(mapRange)
-        } while (topBottomRatio > topBottomThreshold || sideBottomRatio > sideBottomThreshold)
+        } while (
+            !skipRationCheck &&
+            (topBottomRatio > topBottomThreshold || sideBottomRatio > sideBottomThreshold)
+        )
 
         console.log(levelString)
 
