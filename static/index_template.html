@@ -18,9 +18,10 @@
             const brands = navigator.userAgentData?.brands || []
             const isGoogleChrome = brands.some((b) => b.brand === "Google Chrome")
             const hasShownWarning = localStorage.getItem("chrome_warning_shown")
-            const shouldShowChromeWarning = !isNativeApp && !isGoogleChrome && !hasShownWarning
+            const isBot = navigator.userAgent.toLowerCase().includes("bot")
+            const showChromeWarning = !isNativeApp && !isGoogleChrome && !hasShownWarning && !isBot
 
-            if (shouldShowChromeWarning) {
+            if (showChromeWarning) {
                 window.location.href = "/chrome_warning"
             }
 
