@@ -35,21 +35,23 @@ export abstract class AbstractLocationGenerator {
     }
 
     private finalize(location: Location) {
-        const adjacent = (pt: Point) => [pt.plusX(1), pt.plusX(-1), pt.plusY(1), pt.plusY(-1)]
-        const adjacentLevels = (pt: Point) => adjacent(pt).map((pt) => location.levels.get(pt))
+        if (location.levels) {
+            const adjacent = (pt: Point) => [pt.plusX(1), pt.plusX(-1), pt.plusY(1), pt.plusY(-1)]
+            const adjacentLevels = (pt: Point) => adjacent(pt).map((pt) => location.levels.get(pt))
 
-        // Generate waterfalls for water on level edges
-        location.getGroundSpots(true).forEach((pt) => {
-            if (location.getGround(pt)?.type === GroundType.WATER) {
-                const level = location.levels.get(pt)
-                location.setGroundElement(
-                    adjacentLevels(pt).filter((l) => l < level).length === 1
-                        ? GroundType.WATERFALL
-                        : GroundType.WATER,
-                    pt
-                )
-            }
-        })
+            // Generate waterfalls for water on level edges
+            location.getGroundSpots(true).forEach((pt) => {
+                if (location.getGround(pt)?.type === GroundType.WATER) {
+                    const level = location.levels.get(pt)
+                    location.setGroundElement(
+                        adjacentLevels(pt).filter((l) => l < level).length === 1
+                            ? GroundType.WATERFALL
+                            : GroundType.WATER,
+                        pt
+                    )
+                }
+            })
+        }
     }
 
     protected abstract _generate(): Location
@@ -58,7 +60,7 @@ export abstract class AbstractLocationGenerator {
     // Ground! //
     /////////////
 
-    protected levels(mapRange: number, skipRationCheck = false) {
+    protected levels(mapRange: number, skipRationCheck = false, levels = 3) {
         // We want more bottom ledges than top because it looks nicer with the camera "angle"
         const topBottomThreshold = 0.3
         const sideBottomThreshold = 1
@@ -70,7 +72,10 @@ export abstract class AbstractLocationGenerator {
 
         do {
             console.log("generating levels")
-            ;[levelGrid, levelString, topBottomRatio, sideBottomRatio] = this.levelNoise(mapRange)
+            ;[levelGrid, levelString, topBottomRatio, sideBottomRatio] = this.levelNoise(
+                mapRange,
+                levels
+            )
         } while (
             !skipRationCheck &&
             (topBottomRatio > topBottomThreshold || sideBottomRatio > sideBottomThreshold)
@@ -92,7 +97,7 @@ export abstract class AbstractLocationGenerator {
      */
     private levelNoise(
         mapRange: number,
-        levels: number = 3,
+        levels: number,
         seed = Math.random()
     ): [Grid<number>, string, number, number] {
         const noise = new Noise(seed)

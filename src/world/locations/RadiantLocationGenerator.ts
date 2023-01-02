@@ -22,7 +22,10 @@ export class RadiantLocationGenerator extends AbstractLocationGenerator {
     }
 
     protected _generate(): Location {
-        const levels = Math.random() > 0.7 ? undefined : this.levels(MAP_SIZE / 2, true)
+        const levels =
+            Math.random() > 0.7
+                ? undefined
+                : this.levels(MAP_SIZE / 2, true, Math.ceil(Math.random() > 0.7 ? 3 : 2))
 
         const location = new Location(LocationType.RADIANT, false, true, MAP_SIZE, levels)
 
