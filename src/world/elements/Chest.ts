@@ -58,7 +58,6 @@ export class ChestFactory extends ElementFactory<ElementType.CHEST, SaveData> {
             (interactor) => interactor === player()
         )
 
-        // TODO: BUG: For some reason, NPCs are failing to navigate around chests
         const collider = new NavMeshCollider(wl, pos.times(TILE_SIZE).plus(pt(1, 9)), pt(14, 6))
 
         const e = new Entity([animator, interactable, collider])

@@ -362,14 +362,14 @@ export class Location {
     }
 
     /**
-     * @param isOccupied a function which returns true if the pt cannot be included in a path
+     * @param extraIsOccupiedFilter a function which returns true if the pt cannot be included in a path
      *                   (in addition to points which are globally occupied)
      */
     findPath(
         tileStart: Point,
         tileEnd: Point,
         heuristic: (pt: Point, goal: Point) => number,
-        isOccupied: (pt: Point) => boolean,
+        extraIsOccupiedFilter: (pt: Point) => boolean,
         distance: (a: Point, b: Point) => number
     ) {
         const buffer = 5
@@ -398,7 +398,7 @@ export class Location {
                 if (this.isInterior && !this.ground.get(pt)) {
                     return true
                 }
-                return this.occupied.get(pt) || isOccupied(pt)
+                return this.occupied.get(pt) || extraIsOccupiedFilter(pt)
             },
         })
     }

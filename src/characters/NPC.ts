@@ -1,4 +1,4 @@
-import { debug, Point, UpdateData } from "brigsby/dist"
+import { debug, Point, pt, UpdateData } from "brigsby/dist"
 import { LineRender } from "brigsby/dist/renderer"
 import { Lists } from "brigsby/dist/util"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
@@ -44,7 +44,7 @@ export class NPC extends Simulatable {
     enemyToAttackFilterFn: (enemies: Dude[]) => Dude[] = (enemies) => enemies
     pathFindingHeuristic: (pt: Point, goal: Point) => number = (pt, goal) =>
         pt.manhattanDistanceTo(goal)
-    pathIsOccupied: (pt: Point) => boolean = () => false
+    extraPathIsOccupiedFilter: (pt: Point) => boolean = () => false
 
     findTargetRange = TILE_SIZE * 10
     enemiesPresent = false
@@ -384,7 +384,7 @@ export class NPC extends Simulatable {
         }
 
         if (!this.targetPath || this.targetPath.length === 0) {
-            this.targetPath = this.findPath(this.attackTarget.tile)
+            this.targetPath = this.findPathToAttackTarget(this.attackTarget)
         }
         if (!this.targetPath || this.targetPath.length === 0 || mag < stoppingDist) {
             // TODO: If using a ranged weapon, keep distance from enemies
@@ -524,7 +524,7 @@ export class NPC extends Simulatable {
             }
 
             if (shouldComputePath) {
-                this.targetPath = this.findPath(target.tile)
+                this.targetPath = this.findPathToAttackTarget(target)
             }
 
             this.attackTarget = target
@@ -539,6 +539,25 @@ export class NPC extends Simulatable {
         this._dude.moveTo(pos, true)
     }
 
+    private findPathToAttackTarget(target: Dude) {
+        let targetTile = target.tile
+        if (here().isOccupied(targetTile)) {
+            // If attacktarget is standing in an occupied cell (eg inside a chest)
+            // then the NPC will probably get stuck
+            const pxCenter = target.tile.plus(pt(0.5)).times(TILE_SIZE)
+            const betterChoices = [
+                pxCenter.plusX(TILE_SIZE),
+                pxCenter.plusX(-TILE_SIZE),
+                pxCenter.plusY(TILE_SIZE),
+                pxCenter.plusY(-TILE_SIZE),
+            ]
+            targetTile = pixelPtToTilePt(
+                Lists.minBy(betterChoices, (c) => c.distanceTo(target.standingPosition))
+            )
+        }
+        return this.findPath(targetTile)
+    }
+
     private findPath(targetTilePoint: Point) {
         // TODO: NPCs can sometimes get stuck if their starting square is "occupied"
         const location = here()
@@ -546,7 +565,7 @@ export class NPC extends Simulatable {
             this._dude.tile,
             targetTilePoint,
             this.pathFindingHeuristic,
-            this.pathIsOccupied,
+            this.extraPathIsOccupiedFilter,
             (_, nextSquare) => {
                 const type = location.getGround(nextSquare)?.type
                 if (type === GroundType.LEDGE || Ground.isWater(type)) {

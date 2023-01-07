@@ -126,7 +126,7 @@ export class Enemy extends Component {
         // }
 
         // only traverse water
-        npc.pathIsOccupied = (pt: Point) => {
+        npc.extraPathIsOccupiedFilter = (pt: Point) => {
             return !Ground.isWater(dude.location.getGround(pt)?.type)
         }
     }
