@@ -174,6 +174,8 @@ export class Dude extends Component implements DialogueSource {
     dialogue: string
     private dialogueIndicator = ""
 
+    canBePushed = true
+
     // conditions are synchronized, but the time-based fields only matter on the host
     private conditions: ActiveCondition[] = []
     private name: string

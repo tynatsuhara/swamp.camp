@@ -162,6 +162,7 @@ export abstract class AbstractPlayer extends Component {
             .filter(
                 (d) =>
                     d !== this.dude &&
+                    d.canBePushed &&
                     d.standingPosition.distanceTo(this.dude.standingPosition) <
                         minDistanceToBePushed
             )
