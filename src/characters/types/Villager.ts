@@ -58,6 +58,10 @@ export class Villager extends Component {
                 return Ground.isWater(dude.location.getGround(dude.tile)?.type)
             }
 
+            if (d.type === DudeType.MIMIC) {
+                return !!d.entity.getComponent(NPC).targetedEnemy
+            }
+
             return !d.factions.includes(DudeFaction.VILLAGERS)
         }
     }

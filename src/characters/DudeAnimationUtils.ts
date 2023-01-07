@@ -4,6 +4,7 @@ import { Tilesets } from "../graphics/Tilesets"
 import { saveManager } from "../SaveManager"
 import { Color } from "../ui/Color"
 import { PLUME_COLORS } from "../ui/PlumePicker"
+import { ChestAnimation } from "./ChestAnimation"
 
 const maybeFilter = (characterAnimName: string, blob: any, anim: SpriteAnimation) => {
     if (!anim) {
@@ -44,21 +45,27 @@ const getWalkAnimationSpeed = (characterAnimName: string) => {
 export const DudeAnimationUtils = {
     getCharacterIdleAnimation: (characterAnimName: string, blob: object = {}): SpriteAnimation => {
         const animSpeed = getIdleAnimationSpeed(characterAnimName)
-        const anim =
+        let anim: SpriteAnimation
+
+        if (characterAnimName.startsWith("chest_")) {
+            anim = ChestAnimation.closed()
+        }
+
+        anim ??=
             Tilesets.instance.dungeonCharacters.getTileSetAnimation(
                 `${characterAnimName}_idle_anim`,
                 animSpeed
-            ) ||
+            ) ??
             Tilesets.instance.extraCharacterSet1.getTileSetAnimation(
                 `${characterAnimName}_Idle`,
                 4,
                 animSpeed
-            ) ||
+            ) ??
             Tilesets.instance.extraCharacterSet1.getTileSetAnimation(
                 `${characterAnimName}_Idle + Walk`,
                 4,
                 animSpeed
-            ) ||
+            ) ??
             Tilesets.instance.extraCharacterSet2.getIdleAnimation(characterAnimName, animSpeed)
 
         return maybeFilter(characterAnimName, blob, anim)
@@ -66,21 +73,27 @@ export const DudeAnimationUtils = {
 
     getCharacterWalkAnimation: (characterAnimName: string, blob: object = {}): SpriteAnimation => {
         const animSpeed = getWalkAnimationSpeed(characterAnimName)
-        const anim =
+        let anim: SpriteAnimation
+
+        if (characterAnimName.startsWith("chest_")) {
+            anim = ChestAnimation.mimic()
+        }
+
+        anim ??=
             Tilesets.instance.dungeonCharacters.getTileSetAnimation(
                 `${characterAnimName}_run_anim`,
                 animSpeed
-            ) ||
+            ) ??
             Tilesets.instance.extraCharacterSet1.getTileSetAnimation(
                 `${characterAnimName}_Walk`,
                 4,
                 animSpeed
-            ) ||
+            ) ??
             Tilesets.instance.extraCharacterSet1.getTileSetAnimation(
                 `${characterAnimName}_Idle + Walk`,
                 4,
                 animSpeed
-            ) ||
+            ) ??
             Tilesets.instance.extraCharacterSet2.getWalkAnimation(characterAnimName, animSpeed)
 
         return maybeFilter(characterAnimName, blob, anim)

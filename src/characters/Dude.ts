@@ -169,7 +169,8 @@ export class Dude extends Component implements DialogueSource {
     // manually set a depth for the player sprite
     manualDepth = undefined
 
-    private dialogueInteract: Interactable
+    private interactable: Interactable
+    interactOverride?: (interactor: Dude) => void
     dialogue: string
     private dialogueIndicator = ""
 
@@ -416,19 +417,38 @@ export class Dude extends Component implements DialogueSource {
                 )
             )
 
-            this.dialogueInteract = this.entity.addComponent(
+            this.interactable = this.entity.addComponent(
                 new Interactable(
                     new Point(0, 0),
-                    () => DialogueDisplay.instance.startDialogue(this),
+                    (interactor) => {
+                        if (this.interactOverride) {
+                            this.interactOverride(interactor)
+                        } else {
+                            DialogueDisplay.instance.startDialogue(this)
+                        }
+                    },
                     Point.ZERO,
                     (interactor) => {
-                        if (!this.dialogue || !this.entity.getComponent(NPC)?.canTalk()) {
+                        if (this.interactOverride) {
+                            return true
+                        }
+
+                        if (
+                            // no dialogue available
+                            !this.dialogue ||
+                            this.dialogue === EMPTY_DIALOGUE ||
+                            // we're already talking to them
+                            DialogueDisplay.instance.source === this ||
+                            // NPC must be willing to talk based on their own logic
+                            !this.entity.getComponent(NPC)?.canTalk()
+                        ) {
                             return false
                         }
 
                         if (session.isHost()) {
                             return interactor === player()
                         } else {
+                            // For now, only the crafting dialogue is allowed for guests
                             const canGuestAccessDialogue = [DIP_ENTRYPOINT].includes(this.dialogue)
                             return canGuestAccessDialogue
                         }
@@ -497,13 +517,11 @@ export class Dude extends Component implements DialogueSource {
         }
 
         // position dialogue interact point
-        if (!!this.dialogueInteract) {
-            this.dialogueInteract.position = this.standingPosition.minus(new Point(0, 5))
-            this.dialogueInteract.uiOffset = new Point(0, -TILE_SIZE * 1.5).plus(
+        if (!!this.interactable) {
+            this.interactable.position = this.standingPosition.minus(new Point(0, 5))
+            this.interactable.uiOffset = new Point(0, -TILE_SIZE * 1.5).plus(
                 this.getAnimationOffset()
             )
-            this.dialogueInteract.enabled =
-                this.dialogue !== EMPTY_DIALOGUE && DialogueDisplay.instance.source !== this
         }
 
         this.updateActiveConditions(elapsedTimeMillis)
@@ -1553,11 +1571,7 @@ export class Dude extends Component implements DialogueSource {
 
         // render indicator icon overhead
         let tile: StaticSpriteSource = DudeInteractIndicator.getTile(indicator)
-        if (
-            !tile ||
-            this.dialogueInteract?.isShowingUI ||
-            DialogueDisplay.instance.source === this
-        ) {
+        if (!tile || this.interactable?.isShowingUI || DialogueDisplay.instance.source === this) {
             return []
         } else {
             return [

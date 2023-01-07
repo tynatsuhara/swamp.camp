@@ -40,6 +40,7 @@ export class NPC extends Simulatable {
     private syncData: SyncData
 
     isEnemyFn: (dude: Dude) => boolean = () => false
+    // override logic for selecting a target enemy out of possible options
     enemyToAttackFilterFn: (enemies: Dude[]) => Dude[] = (enemies) => enemies
     pathFindingHeuristic: (pt: Point, goal: Point) => number = (pt, goal) =>
         pt.manhattanDistanceTo(goal)
@@ -449,7 +450,7 @@ export class NPC extends Simulatable {
      * Called on a regular interval (every few seconds)
      * Updates cached tasks, attack targets, etc
      */
-    private decideWhatToDoNext() {
+    decideWhatToDoNext() {
         this.enemiesPresent = this.checkForEnemies()
         if (!this.enemiesPresent) {
             this.task = this.getScheduledTask()

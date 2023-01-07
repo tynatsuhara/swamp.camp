@@ -28,6 +28,7 @@ export enum DudeType {
     FOREST_GUARDIAN,
     GNOLL_SHAMAN,
     GNOLL_OVERSEER,
+    MIMIC,
 }
 
 window["DudeType"] = DudeType

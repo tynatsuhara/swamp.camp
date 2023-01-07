@@ -38,6 +38,7 @@ const SPAWNABLE_TYPES = [
     DudeType.GNOLL_OVERSEER,
     DudeType.CENTAUR,
     DudeType.ELF,
+    DudeType.MIMIC,
 ]
 
 export const spawnMenu = {

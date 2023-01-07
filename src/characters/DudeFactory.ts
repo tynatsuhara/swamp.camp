@@ -33,6 +33,7 @@ import { Berto } from "./types/Berto"
 import { Centaur } from "./types/Centaur"
 import { DudeModifier } from "./types/DudeModifier"
 import { Enemy } from "./types/Enemy"
+import { Mimic } from "./types/Mimic"
 import { ShamanHealer } from "./types/ShamanHealer"
 import { ShroomNPC } from "./types/ShroomNPC"
 import { SpookyVisitor } from "./types/SpookyVisitor"
@@ -487,6 +488,15 @@ export class DudeFactory {
                 maxHealth = 30
                 speed *= 0.7
                 colliderSize = BIG_COLLIDER_SIZE
+                break
+            }
+            case DudeType.MIMIC: {
+                factions = [] // TODO
+                animationName = "chest_mimic"
+                weapon = WeaponType.UNARMED
+                additionalComponents = [new NPC(), new Mimic()]
+                maxHealth = 5
+                speed *= 0.7
                 break
             }
             default: {
