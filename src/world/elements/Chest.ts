@@ -1,4 +1,4 @@
-import { Entity, Point } from "brigsby/dist"
+import { Entity, Point, pt } from "brigsby/dist"
 import { AnimatedSpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { ChestAnimation } from "../../characters/ChestAnimation"
 import { player } from "../../characters/player/index"
@@ -19,7 +19,7 @@ type SaveData = {
 }
 
 export class ChestFactory extends ElementFactory<ElementType.CHEST, SaveData> {
-    dimensions = new Point(1, 1)
+    dimensions = pt(1)
 
     constructor() {
         super(ElementType.CHEST)
@@ -54,15 +54,12 @@ export class ChestFactory extends ElementFactory<ElementType.CHEST, SaveData> {
                 InventoryDisplay.instance.open(() => animator.goToAnimation(1).play(), inventory)
                 animator.goToAnimation(0).play()
             },
-            new Point(0, -17),
+            pt(0, -17),
             (interactor) => interactor === player()
         )
 
-        const collider = new NavMeshCollider(
-            wl,
-            pos.times(TILE_SIZE).plusY(9),
-            new Point(TILE_SIZE, 7)
-        )
+        // TODO: BUG: For some reason, NPCs are failing to navigate around chests
+        const collider = new NavMeshCollider(wl, pos.times(TILE_SIZE).plus(pt(1, 9)), pt(14, 6))
 
         const e = new Entity([animator, interactable, collider])
 
