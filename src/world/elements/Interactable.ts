@@ -10,7 +10,7 @@ import { UIStateManager } from "../../ui/UIStateManager"
 
 export class Interactable extends Component {
     position: Point
-    private readonly fn: () => void
+    private readonly fn: (interactor: Dude) => void
     uiOffset: Point
     private showUI: boolean
     get isShowingUI() {
@@ -22,7 +22,7 @@ export class Interactable extends Component {
 
     constructor(
         position: Point,
-        fn: () => void,
+        fn: (interactor: Dude) => void,
         uiOffset: Point = Point.ZERO,
         isInteractable: (interactor: Dude) => boolean = () => true
     ) {
@@ -31,11 +31,9 @@ export class Interactable extends Component {
         this.fn = fn
         this.uiOffset = uiOffset
         this.isInteractable = (interactor: Dude) => {
-            // TODO: Certain things might be interactable for guests, move this logic up
-            return (
-                (interactor !== player() || !UIStateManager.instance.isMenuOpen) &&
-                isInteractable(interactor)
-            )
+            const isNotLocalPlayer = interactor !== player()
+            const canInteractorInteract = isNotLocalPlayer || !UIStateManager.instance.isMenuOpen
+            return canInteractorInteract && isInteractable(interactor)
         }
     }
 
@@ -45,7 +43,7 @@ export class Interactable extends Component {
 
     // Host AND client can both call this!
     interact(interactor: Dude) {
-        this.fn()
+        this.fn(interactor)
     }
 
     getRenderMethods(): RenderMethod[] {
