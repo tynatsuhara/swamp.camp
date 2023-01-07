@@ -1,7 +1,8 @@
 import { Entity, Point } from "brigsby/dist"
-import { AnimatedSpriteComponent, SpriteAnimation, SpriteTransform } from "brigsby/dist/sprites"
+import { AnimatedSpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
+import { ChestAnimation } from "../../characters/ChestAnimation"
 import { player } from "../../characters/player/index"
-import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
+import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Inventory, ItemStack } from "../../items/Inventory"
 import { randomByteString } from "../../saves/uuid"
 import { InventoryDisplay } from "../../ui/InventoryDisplay"
@@ -31,30 +32,10 @@ export class ChestFactory extends ElementFactory<ElementType.CHEST, SaveData> {
             inventory.load(data.i)
         }
 
-        const tiles =
-            Tilesets.instance.dungeonCharacters.getTileSetAnimationFrames("chest_empty_open_anim")
-        const openSpeed = 80
-        const closeSpeed = 20
         const animator: AnimatedSpriteComponent = new AnimatedSpriteComponent(
             [
-                // opening
-                new SpriteAnimation(
-                    [
-                        [tiles[0], openSpeed],
-                        [tiles[1], openSpeed],
-                        [tiles[2], openSpeed],
-                    ],
-                    () => animator.pause()
-                ),
-                // closing
-                new SpriteAnimation(
-                    [
-                        [tiles[2], closeSpeed],
-                        [tiles[1], closeSpeed],
-                        [tiles[0], closeSpeed],
-                    ],
-                    () => animator.pause()
-                ),
+                ChestAnimation.open("empty", () => animator.pause()),
+                ChestAnimation.close("empty", () => animator.pause()),
             ],
             SpriteTransform.new({
                 position: pos.times(TILE_SIZE),
