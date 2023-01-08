@@ -789,7 +789,7 @@ export class Dude extends Component implements DialogueSource {
 
         if (blocked) {
             emitBlockParticles(this.uuid) // sync fn
-            damage *= 0.25
+            damage = 0
             knockback *= 0.4
         }
 
@@ -837,7 +837,9 @@ export class Dude extends Component implements DialogueSource {
     private onDamageCallback(blocked: boolean) {
         VocalSounds.damage(this)
 
-        this.animation.flash()
+        if (!blocked) {
+            this.animation.flash()
+        }
 
         // Custom callback
         if (this._onDamageCallback) {
