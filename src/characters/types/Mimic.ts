@@ -1,9 +1,11 @@
-import { pt } from "brigsby/dist"
+import { pt, StartData } from "brigsby/dist"
 import { session } from "../../online/session"
+import { Interactable } from "../../world/elements/Interactable"
 import { NavMeshCollider } from "../../world/elements/NavMeshCollider"
 import { NPCSchedules } from "../ai/NPCSchedule"
 import { Dude } from "../Dude"
 import { NPC } from "../NPC"
+import { player } from "../player/index"
 import { Enemy } from "./Enemy"
 
 export class Mimic extends Enemy {
@@ -18,26 +20,39 @@ export class Mimic extends Enemy {
             new NavMeshCollider(dude.location, dude.standingPosition.plus(pt(-7, -7)), pt(14, 6))
         )
 
+        const interactable = this.entity.addComponent(
+            new Interactable(
+                dude.standingPosition.plusY(-5),
+                (interactor) => trigger(interactor),
+                pt(0, -18),
+                (interactor) => interactor === player()
+            )
+        )
+
+        dude.canBePushed = false
         npc.isEnemyFn = () => false
         npc.setSchedule(NPCSchedules.newNoOpSchedule())
 
-        dude.canBePushed = false
-
-        // TODO attack onDamageCallback (needs to propagate attacker)
-        // TODO fix interactable offset to make it match chests
+        // TODO enemies will attack the mimic by default...
 
         const trigger = (target: Dude) => {
             if (session.isHost()) {
+                dude.canBePushed = true
                 npc.isEnemyFn = (d) => d === target
                 // attack right away
                 npc.decideWhatToDoNext()
-
-                dude.canBePushed = true
-
                 collider.delete()
+                interactable.delete()
             }
         }
 
-        dude.interactOverride = (interactor) => trigger(interactor)
+        console.log(interactable)
+
+        dude.setOnDamageCallback((_, attacker) => trigger(attacker))
+    }
+
+    start(startData: StartData): void {
+        const interactable = this.entity.getComponent(Interactable)
+        interactable.uiOffset = interactable.uiOffset.plusY(7)
     }
 }

@@ -169,8 +169,7 @@ export class Dude extends Component implements DialogueSource {
     // manually set a depth for the player sprite
     manualDepth = undefined
 
-    private interactable: Interactable
-    interactOverride?: (interactor: Dude) => void
+    private dialogueInteract: Interactable
     dialogue: string
     private dialogueIndicator = ""
 
@@ -419,22 +418,12 @@ export class Dude extends Component implements DialogueSource {
                 )
             )
 
-            this.interactable = this.entity.addComponent(
+            this.dialogueInteract = this.entity.addComponent(
                 new Interactable(
                     new Point(0, 0),
-                    (interactor) => {
-                        if (this.interactOverride) {
-                            this.interactOverride(interactor)
-                        } else {
-                            DialogueDisplay.instance.startDialogue(this)
-                        }
-                    },
+                    (interactor) => DialogueDisplay.instance.startDialogue(this),
                     Point.ZERO,
                     (interactor) => {
-                        if (this.interactOverride) {
-                            return true
-                        }
-
                         if (
                             // no dialogue available
                             !this.dialogue ||
@@ -519,9 +508,9 @@ export class Dude extends Component implements DialogueSource {
         }
 
         // position dialogue interact point
-        if (!!this.interactable) {
-            this.interactable.position = this.standingPosition.minus(new Point(0, 5))
-            this.interactable.uiOffset = new Point(0, -TILE_SIZE * 1.5).plus(
+        if (!!this.dialogueInteract) {
+            this.dialogueInteract.position = this.standingPosition.plusY(-5)
+            this.dialogueInteract.uiOffset = new Point(0, -TILE_SIZE * 1.5).plus(
                 this.getAnimationOffset()
             )
         }
@@ -817,7 +806,7 @@ export class Dude extends Component implements DialogueSource {
             this.knockback(direction, knockback)
         }
 
-        this.onDamageCallback(blocked) // sync fn
+        this.onDamageCallback(blocked, attacker?.uuid) // sync fn
 
         if (attacker) {
             this.lastAttacker = attacker
@@ -834,7 +823,7 @@ export class Dude extends Component implements DialogueSource {
     }
 
     // sync fn, runs on hosts and guests
-    private onDamageCallback(blocked: boolean) {
+    private onDamageCallback(blocked: boolean, attackerUUID: string) {
         VocalSounds.damage(this)
 
         if (!blocked) {
@@ -843,10 +832,10 @@ export class Dude extends Component implements DialogueSource {
 
         // Custom callback
         if (this._onDamageCallback) {
-            this._onDamageCallback(blocked)
+            this._onDamageCallback(blocked, Dude.get(attackerUUID))
         }
     }
-    private _onDamageCallback: (blocked: boolean) => void
+    private _onDamageCallback: (blocked: boolean, attacker: Dude) => void
     setOnDamageCallback(fn: typeof this._onDamageCallback) {
         this._onDamageCallback = fn
     }
@@ -1575,7 +1564,11 @@ export class Dude extends Component implements DialogueSource {
 
         // render indicator icon overhead
         let tile: StaticSpriteSource = DudeInteractIndicator.getTile(indicator)
-        if (!tile || this.interactable?.isShowingUI || DialogueDisplay.instance.source === this) {
+        if (
+            !tile ||
+            this.dialogueInteract?.isShowingUI ||
+            DialogueDisplay.instance.source === this
+        ) {
             return []
         } else {
             return [

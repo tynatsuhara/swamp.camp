@@ -29,6 +29,7 @@ export class Villager extends Component {
 
         const { npc, dude } = this
 
+        // TODO maybe generalize this into the overall NPC isEnemyFn
         npc.isEnemyFn = (d) => {
             if (!d.entity) {
                 // avoid weird null pointer
@@ -58,6 +59,7 @@ export class Villager extends Component {
                 return Ground.isWater(dude.location.getGround(dude.tile)?.type)
             }
 
+            // Only flee from a mimic if it is no longer pretending to be a chest
             if (d.type === DudeType.MIMIC) {
                 return !!d.entity.getComponent(NPC).targetedEnemy
             }

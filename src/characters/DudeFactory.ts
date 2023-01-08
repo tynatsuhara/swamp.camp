@@ -102,7 +102,7 @@ export class DudeFactory {
     ): Dude {
         return this.syncMake(
             type,
-            standingPosition,
+            standingPosition.apply(Math.floor),
             { uuid: newUUID(), ...existingData },
             location.uuid,
             hasPendingSlot
