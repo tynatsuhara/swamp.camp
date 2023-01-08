@@ -46,8 +46,6 @@ export class Mimic extends Enemy {
             }
         }
 
-        console.log(interactable)
-
         dude.setOnDamageCallback((_, attacker) => trigger(attacker))
     }
 
