@@ -1,9 +1,9 @@
-import { Component, debug, Point, pt } from "brigsby/dist"
+import { Component, debug, Point, pt, UpdateData } from "brigsby/dist"
 import { BoxCollider } from "brigsby/dist/collision"
 import { PointValue } from "brigsby/dist/Point"
 import { RenderMethod } from "brigsby/dist/renderer"
 import { SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
-import { Animator, Lists, RepeatedInvoker } from "brigsby/dist/util"
+import { Animator, Lists, Maths, RepeatedInvoker } from "brigsby/dist/util"
 import { StepSounds } from "../audio/StepSounds"
 import { VocalSounds } from "../audio/VocalSounds"
 import { controls } from "../Controls"
@@ -490,7 +490,7 @@ export class Dude extends Component implements DialogueSource {
         }
     }
 
-    update({ elapsedTimeMillis }) {
+    update({ elapsedTimeMillis, input }: UpdateData) {
         this.animation.transform.depth =
             this.manualDepth ?? this.collider.position.y + this.collider.dimensions.y
 
@@ -1586,6 +1586,10 @@ export class Dude extends Component implements DialogueSource {
 
     log(message: any) {
         console.log(`${DudeType[this.type]}: ${message}`)
+    }
+
+    isPointIntersectingCollider(point: Point) {
+        return Maths.rectContains(this.collider.position, this.collider.dimensions, point)
     }
 
     static get(uuid: string) {
