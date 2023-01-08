@@ -111,6 +111,8 @@ Your work here is not yet done.`,
                 }
             })
 
+        here().removeAllDroppedItems()
+
         // TODO take away resources, impact town stats, etc
 
         CutsceneManager.instance.finishCutscene()

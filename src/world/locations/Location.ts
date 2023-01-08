@@ -545,6 +545,11 @@ export class Location {
         this.droppedItems.delete(item)
     }
 
+    removeAllDroppedItems() {
+        this.droppedItems.forEach((i) => i.entity.selfDestruct())
+        this.droppedItems.clear()
+    }
+
     private saveElements(): SavedElement[] {
         return this.elements.values().map((entity) => {
             const el = new SavedElement()
