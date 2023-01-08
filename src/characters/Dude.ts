@@ -523,8 +523,9 @@ export class Dude extends Component implements DialogueSource {
             here().checkDroppedItemCollision(this)
         }
 
-        if (session.isHost() && WorldTime.instance.time - this.lastDamageTime > 30_000) {
-            this.heal(elapsedTimeMillis / 50_000)
+        // Slow auto-healing out of combat
+        if (session.isHost() && WorldTime.instance.time - this.lastDamageTime > 20_000) {
+            this.heal(elapsedTimeMillis / 30_000)
         }
     }
 
