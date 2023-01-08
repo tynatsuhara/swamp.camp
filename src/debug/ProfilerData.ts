@@ -1,5 +1,5 @@
-import { Component, debug, profiler } from "brigsby/dist"
-import { DudeType } from "../characters/DudeType"
+import { Component, debug, profiler, pt } from "brigsby/dist"
+import { Maths } from "brigsby/dist/util/Maths"
 import { controls } from "../Controls"
 import { pixelPtToTilePt } from "../graphics/Tilesets"
 import { here } from "../world/locations/LocationManager"
@@ -27,15 +27,14 @@ export class ProfilerData extends Component {
 
         here()
             .getDudes()
-            .filter((d) => d.isPointIntersectingCollider(controls.getWorldSpaceMousePos()))
-            .forEach((d) =>
-                profiler.showInfo(
-                    `dude: ${prettyPrint({
-                        uuid: d.uuid,
-                        health: +d.health.toFixed(2),
-                        type: DudeType[d.type],
-                    })}`
+            .filter((d) => {
+                const hoverSize = pt(20, 20)
+                return Maths.rectContains(
+                    d.standingPosition.plus(pt(-hoverSize.x / 2, -hoverSize.y)),
+                    hoverSize,
+                    controls.getWorldSpaceMousePos()
                 )
-            )
+            })
+            .forEach((d) => profiler.showInfo(`dude: ${prettyPrint(d.getProfilerData())}`))
     }
 }

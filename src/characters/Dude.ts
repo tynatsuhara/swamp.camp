@@ -3,7 +3,7 @@ import { BoxCollider } from "brigsby/dist/collision"
 import { PointValue } from "brigsby/dist/Point"
 import { RenderMethod } from "brigsby/dist/renderer"
 import { SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
-import { Animator, Lists, Maths, RepeatedInvoker } from "brigsby/dist/util"
+import { Animator, Lists, RepeatedInvoker } from "brigsby/dist/util"
 import { StepSounds } from "../audio/StepSounds"
 import { VocalSounds } from "../audio/VocalSounds"
 import { controls } from "../Controls"
@@ -1588,9 +1588,11 @@ export class Dude extends Component implements DialogueSource {
         console.log(`${DudeType[this.type]}: ${message}`)
     }
 
-    isPointIntersectingCollider(point: Point) {
-        return Maths.rectContains(this.collider.position, this.collider.dimensions, point)
-    }
+    getProfilerData = () => ({
+        uuid: this.uuid,
+        health: +this.health.toFixed(2),
+        type: DudeType[this.type],
+    })
 
     static get(uuid: string) {
         return dudeCache[uuid]
