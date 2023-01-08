@@ -109,8 +109,7 @@ export class DroppedItem extends Component {
                                 if (session.isHost()) {
                                     dude.inventory.addItem(this.itemType, 1, metadata)
                                 }
-                                here().droppedItems.delete(this)
-                                this.entity.selfDestruct()
+                                here().removeDroppedItem(this)
                                 setTimeout(() => {
                                     Sounds.playAtPoint(
                                         Lists.oneOf(PICK_UP_SOUNDS),

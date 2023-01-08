@@ -1,4 +1,4 @@
-import { Entity, Point } from "brigsby/dist"
+import { Point } from "brigsby/dist"
 import { Collider } from "brigsby/dist/collision"
 import { PointValue, pt } from "brigsby/dist/Point"
 import { SpriteSource } from "brigsby/dist/sprites"
@@ -335,10 +335,6 @@ type SpawnItemArgs = {
     metadata?: ItemMetadata
 }
 
-const addSpawnedItem = (item: DroppedItem) => {
-    here().droppedItems.add(new Entity().addComponent(item))
-}
-
 /**
  * @param position The bottom center where the item should be placed
  */
@@ -357,7 +353,7 @@ export const spawnItem = ({
     const id = randomByteString()
 
     syncSpawnedItem({ id, pos, item, velocity, metadata })
-    addSpawnedItem(
+    here().addDroppedItem(
         new DroppedItem(
             id,
             pt(pos.x, pos.y),
@@ -373,7 +369,7 @@ const syncSpawnedItem = syncFn(
     "spawnItem",
     ({ id, pos, item, velocity, metadata }: SpawnItemArgs & { id: string }) => {
         if (session.isGuest()) {
-            addSpawnedItem(
+            here().addDroppedItem(
                 new DroppedItem(id, pt(pos.x, pos.y), item, pt(velocity.x, velocity.y), metadata)
             )
         }

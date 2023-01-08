@@ -519,7 +519,9 @@ export class Dude extends Component implements DialogueSource {
 
         this.jumpingAnimator?.update(elapsedTimeMillis)
 
-        this.droppedItemPickupCheck()
+        if (this.type === DudeType.PLAYER) {
+            here().checkDroppedItemCollision(this)
+        }
 
         if (session.isHost() && WorldTime.instance.time - this.lastDamageTime > 30_000) {
             this.heal(elapsedTimeMillis / 50_000)
@@ -1474,14 +1476,6 @@ export class Dude extends Component implements DialogueSource {
         const pos = this.tile
         if (pos.x < -range || pos.x > range || pos.y < -range || pos.y > range) {
             return pos.x > range - EAST_COAST_OCEAN_WIDTH ? "ocean" : "swamp"
-        }
-    }
-
-    private droppedItemPickupCheck() {
-        if (this.type === DudeType.PLAYER) {
-            here().droppedItems.forEach((item) => {
-                item.checkCollision(this)
-            })
         }
     }
 

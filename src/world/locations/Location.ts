@@ -39,8 +39,7 @@ export class Location {
     readonly levels = new Grid<number>()
 
     // TODO: Make dropped items saveable
-    // MPTODO: Sync dropped items
-    readonly droppedItems = new Set<DroppedItem>()
+    private readonly droppedItems = new Set<DroppedItem>()
     readonly miscEntities = new Set<Entity>()
 
     private features: Feature<any>[] = []
@@ -529,6 +528,21 @@ export class Location {
         this.getEntities()
             .flatMap((e) => e.getComponents(PointAudio))
             .forEach((aud) => aud.setActive(active))
+    }
+
+    checkDroppedItemCollision(dude: Dude) {
+        this.droppedItems.forEach((item) => {
+            item.checkCollision(dude)
+        })
+    }
+
+    addDroppedItem(item: DroppedItem) {
+        this.droppedItems.add(new Entity().addComponent(item))
+    }
+
+    removeDroppedItem(item: DroppedItem) {
+        item.entity.selfDestruct()
+        this.droppedItems.delete(item)
     }
 
     private saveElements(): SavedElement[] {
