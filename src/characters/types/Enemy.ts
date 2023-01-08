@@ -28,15 +28,33 @@ export class Enemy extends Component {
             dude.droppedItemSupplier = () => [Item.COIN]
         }
 
+        const shouldIgnoreEnemy = (d: Dude) => {
+            // Ignore acquatic creatures
+            if (d.factions.includes(DudeFaction.AQUATIC)) {
+                return true
+            }
+
+            // Only fight a mimic if it is no longer pretending to be a chest
+            if (d.type === DudeType.MIMIC) {
+                return !d.entity.getComponent(NPC).targetedEnemy
+            }
+
+            return false
+        }
+
         npc.isEnemyFn = (d) => {
-            // Default land enemy behavior is to attack anything that isn't in an overlapping faction
-            return (
-                !debug.peacefulMode &&
-                ((d.isEnemy(dude) && !d.factions.includes(DudeFaction.AQUATIC)) ||
-                    // Always attack their last assailant even if they're not normally considered an enemy
-                    (d === dude.lastAttacker &&
-                        WorldTime.instance.time - dude.lastAttackerTime < 10_000))
-            )
+            if (d.factions.includes(DudeFaction.VILLAGERS)) {
+                return !debug.peacefulMode
+            }
+            // Always attack their last assailant even if they're not normally considered an enemy
+            if (
+                d === dude.lastAttacker &&
+                WorldTime.instance.time - dude.lastAttackerTime < 10_000
+            ) {
+                return true
+            }
+            // Attack anything that isn't in an overlapping faction
+            return d.isEnemy(dude) && !shouldIgnoreEnemy(d)
         }
 
         if (dude.factions.includes(DudeFaction.ORCS)) {
@@ -73,14 +91,9 @@ export class Enemy extends Component {
     private demon(dude: Dude, npc: NPC) {
         npc.findTargetRange *= 3
 
+        const isEnemy = npc.isEnemyFn
         // demons only attack enemies in the dark
-        npc.isEnemyFn = (d) => {
-            return (
-                !d.factions.includes(DudeFaction.DEMONS) &&
-                !d.factions.includes(DudeFaction.AQUATIC) &&
-                LightManager.instance.isDark(d.standingPosition)
-            )
-        }
+        npc.isEnemyFn = (d) => isEnemy(d) && LightManager.instance.isDark(d.standingPosition)
 
         // demons only attack roam in the dark
         npc.pathFindingHeuristic = (pt: Point, goal: Point) => {
@@ -108,14 +121,12 @@ export class Enemy extends Component {
     }
 
     private acquatic(dude: Dude, npc: NPC) {
+        const isEnemy = npc.isEnemyFn
         // only attack enemies in the water
-        npc.isEnemyFn = (d) => {
-            return (
-                !d.factions.includes(DudeFaction.AQUATIC) &&
-                Ground.isWater(d.location.getGround(d.tile)?.type) &&
-                Ground.isWater(dude.location.getGround(dude.tile)?.type)
-            )
-        }
+        npc.isEnemyFn = (d) =>
+            isEnemy(d) &&
+            Ground.isWater(d.location.getGround(d.tile)?.type) &&
+            Ground.isWater(dude.location.getGround(dude.tile)?.type)
 
         // npc.pathFindingHeuristic = (pt: Point, goal: Point) => {
         //     const isByLand = [pt.plusX(1), pt.plusX(-1), pt.plusY(1), pt.plusY(-1)].some(

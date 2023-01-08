@@ -1,18 +1,13 @@
 import { Component, pt } from "brigsby/dist"
 import { session } from "../../online/session"
 import { ElementType } from "../../world/elements/Elements"
-import { Ground } from "../../world/ground/Ground"
-import { LightManager } from "../../world/LightManager"
 import { LocationType } from "../../world/locations/LocationManager"
 import { NPCSchedules } from "../ai/NPCSchedule"
 import { Dude } from "../Dude"
-import { DudeFaction } from "../DudeFactory"
 import { DudeType } from "../DudeType"
 import { NPC } from "../NPC"
 import { player } from "../player"
 import { WeaponType } from "../weapons/WeaponType"
-import { Centaur } from "./Centaur"
-import { ShroomNPC } from "./ShroomNPC"
 
 export class Villager extends Component {
     get npc() {
@@ -20,52 +15,6 @@ export class Villager extends Component {
     }
     get dude() {
         return this.entity.getComponent(Dude)
-    }
-
-    awake() {
-        if (session.isGuest()) {
-            return
-        }
-
-        const { npc, dude } = this
-
-        // TODO maybe generalize this into the overall NPC isEnemyFn
-        npc.isEnemyFn = (d) => {
-            if (!d.entity) {
-                // avoid weird null pointer
-                return
-            }
-
-            // Villagers will only flee from demons if the villager is in the dark or really close to the demon
-            if (d.factions.includes(DudeFaction.DEMONS)) {
-                return (
-                    LightManager.instance.isDark(dude.standingPosition) ||
-                    d.standingPosition.distanceTo(dude.standingPosition) < 30
-                )
-            }
-
-            // Villagers only flee from shrooms if the shroom is aggro
-            if (d.factions.includes(DudeFaction.SHROOMS)) {
-                return d.entity.getComponent(ShroomNPC).isAggro()
-            }
-
-            // Villagers only flee from centaurs if the centaur is aggro
-            if (d.factions.includes(DudeFaction.CENTAURS)) {
-                return d.entity.getComponent(Centaur).isAggro()
-            }
-
-            // Villagers only flee from acquatic creatures if they are in water
-            if (d.factions.includes(DudeFaction.AQUATIC)) {
-                return Ground.isWater(dude.location.getGround(dude.tile)?.type)
-            }
-
-            // Only flee from a mimic if it is no longer pretending to be a chest
-            if (d.type === DudeType.MIMIC) {
-                return !!d.entity.getComponent(NPC).targetedEnemy
-            }
-
-            return !d.factions.includes(DudeFaction.VILLAGERS)
-        }
     }
 
     start() {

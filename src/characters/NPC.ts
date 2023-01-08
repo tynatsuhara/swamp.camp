@@ -10,6 +10,7 @@ import { Burnable } from "../world/elements/Burnable"
 import { Campfire } from "../world/elements/Campfire"
 import { ElementType } from "../world/elements/Elements"
 import { Ground, GroundType } from "../world/ground/Ground"
+import { LightManager } from "../world/LightManager"
 import { Location } from "../world/locations/Location"
 import { camp, here } from "../world/locations/LocationManager"
 import { Simulatable } from "../world/Simulatable"
@@ -22,7 +23,11 @@ import { NPCTaskContext } from "./ai/NPCTaskContext"
 import { NPCTaskFactory } from "./ai/NPCTaskFactory"
 import { Condition } from "./Condition"
 import { AttackState, Dude } from "./Dude"
+import { DudeFaction } from "./DudeFactory"
+import { DudeType } from "./DudeType"
 import { player } from "./player"
+import { Centaur } from "./types/Centaur"
+import { ShroomNPC } from "./types/ShroomNPC"
 
 type SyncData = {
     t: string | undefined // target uuid
@@ -39,7 +44,45 @@ export class NPC extends Simulatable {
 
     private syncData: SyncData
 
-    isEnemyFn: (dude: Dude) => boolean = () => false
+    // Default behavior:
+    //   - An enemy is something that will probably attack them
+    //   - Members of the same faction are never enemies
+    isEnemyFn: (dude: Dude) => boolean = (d) => {
+        if (!d.entity || d.factions.some((fac) => this.dude.factions.includes(fac))) {
+            return false
+        }
+
+        // Only fight demons if they're in the dark or really close to the demon
+        if (d.factions.includes(DudeFaction.DEMONS)) {
+            return (
+                LightManager.instance.isDark(this.dude.standingPosition) ||
+                d.standingPosition.distanceTo(this.dude.standingPosition) < 30
+            )
+        }
+
+        // Only fight shrooms if the shroom is aggro
+        if (d.factions.includes(DudeFaction.SHROOMS)) {
+            return d.entity.getComponent(ShroomNPC).isAggro()
+        }
+
+        // Only fight centaurs if the centaur is aggro
+        if (d.factions.includes(DudeFaction.CENTAURS)) {
+            return d.entity.getComponent(Centaur).isAggro()
+        }
+
+        // Only fight acquatic creatures when in the water
+        if (d.factions.includes(DudeFaction.AQUATIC)) {
+            return Ground.isWater(this.dude.location.getGround(this.dude.tile)?.type)
+        }
+
+        // Only fight a mimic if it is no longer pretending to be a chest
+        if (d.type === DudeType.MIMIC) {
+            return !!d.entity.getComponent(NPC).targetedEnemy
+        }
+
+        return false
+    }
+
     // override logic for selecting a target enemy out of possible options
     enemyToAttackFilterFn: (enemies: Dude[]) => Dude[] = (enemies) => enemies
     pathFindingHeuristic: (pt: Point, goal: Point) => number = (pt, goal) =>

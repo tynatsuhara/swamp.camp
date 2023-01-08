@@ -1,4 +1,4 @@
-import { pt, StartData } from "brigsby/dist"
+import { Component, pt } from "brigsby/dist"
 import { session } from "../../online/session"
 import { Interactable } from "../../world/elements/Interactable"
 import { NavMeshCollider } from "../../world/elements/NavMeshCollider"
@@ -8,10 +8,12 @@ import { NPC } from "../NPC"
 import { player } from "../player/index"
 import { Enemy } from "./Enemy"
 
-export class Mimic extends Enemy {
-    awake() {
-        super.awake()
+const TRIGGERED = "triggered"
 
+export class Mimic extends Component {
+    private trigger: () => void
+
+    awake() {
         const dude = this.entity.getComponent(Dude)
         const npc = this.entity.getComponent(NPC)
 
@@ -23,7 +25,7 @@ export class Mimic extends Enemy {
         const interactable = this.entity.addComponent(
             new Interactable(
                 dude.standingPosition.plusY(-5),
-                (interactor) => trigger(interactor),
+                () => this.trigger(),
                 pt(0, -18),
                 (interactor) => interactor === player()
             )
@@ -33,24 +35,28 @@ export class Mimic extends Enemy {
         npc.isEnemyFn = () => false
         npc.setSchedule(NPCSchedules.newNoOpSchedule())
 
-        // TODO enemies will attack the mimic by default...
-
-        const trigger = (target: Dude) => {
+        this.trigger = () => {
             if (session.isHost()) {
                 dude.canBePushed = true
-                npc.isEnemyFn = (d) => d === target
+                this.entity.addComponent(new Enemy())
                 // attack right away
                 npc.decideWhatToDoNext()
                 collider.delete()
                 interactable.delete()
+                dude.blob[TRIGGERED] = true
             }
         }
 
-        dude.setOnDamageCallback((_, attacker) => trigger(attacker))
+        dude.setOnDamageCallback(() => this.trigger())
     }
 
-    start(startData: StartData): void {
+    start() {
         const interactable = this.entity.getComponent(Interactable)
         interactable.uiOffset = interactable.uiOffset.plusY(7)
+
+        // use serialized triggered state
+        if (this.entity.getComponent(Dude).blob[TRIGGERED]) {
+            this.trigger()
+        }
     }
 }
