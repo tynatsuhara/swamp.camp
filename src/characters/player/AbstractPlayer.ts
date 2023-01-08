@@ -208,7 +208,7 @@ export abstract class AbstractPlayer extends Component {
         const interactDistance = 20
         const interactCenter = this.dude.standingPosition.minus(pt(0, 7))
         const interactables = updateData.view.entities
-            .map((e) => e.getComponent(Interactable))
+            .flatMap((e) => e.getComponents(Interactable))
             .filter((e) => e?.enabled)
 
         if (updateUI) {
