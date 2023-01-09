@@ -132,6 +132,7 @@ const KEYS = {
     ["skull2"]: new Point(22, 23),
     ["miniMapPlayer"]: new Point(11, 22),
     ["ladder"]: new Point(0, 6),
+    ["map"]: new Point(16, 27),
 }
 
 export type Icon = keyof typeof KEYS

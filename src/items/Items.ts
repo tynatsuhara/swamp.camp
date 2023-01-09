@@ -41,6 +41,7 @@ export enum Item {
     BLACKBERRIES,
     SMALL_CABIN,
     COOKED_MEAT,
+    EXPLORER_MAP,
 
     // weapon values should match the WeaponType enum so we can cast them
     KNIFE = WeaponType.KNIFE,
@@ -243,6 +244,11 @@ export const ITEM_METADATA_MAP = {
         inventoryIcon: "berries",
         consumable: ItemUtils.consumable("eat", SOUNDS.eat, (consumer) => consumer.heal(0.5)),
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("berries"),
+    }),
+    [Item.EXPLORER_MAP]: new ItemSpec({
+        displayName: "Explorer's Map",
+        inventoryIcon: "map",
+        stackLimit: 1,
     }),
 
     // Locations
