@@ -369,6 +369,8 @@ export class NPC extends Simulatable {
             return
         }
 
+        // TODO: BUG: It seems like enemies won't attack if they're standing at the exact same pt as their target
+
         // TODO maybe switch dynamically between A* and direct walking?
 
         const dist = this.attackTarget.standingPosition.minus(this._dude.standingPosition)
