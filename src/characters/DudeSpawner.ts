@@ -228,16 +228,19 @@ export class DudeSpawner extends Component {
         // distance from (0, 0)
         const distance = (l.range + 2) * TILE_SIZE
 
+        const posOnSideLeftRight = (-l.range + Math.random() * l.size) * TILE_SIZE
         // (assuming all locations are square)
-        // there's a slight possibility this will stick the player
-        // in the water at the top or bottom of the map
-        const posOnSide = Math.random() * l.range * TILE_SIZE
+        const posOnSideTopBottom =
+            l === camp()
+                ? // don't stick em in the ocean
+                  (-l.range + Math.random() * (l.size - EAST_COAST_OCEAN_WIDTH)) * TILE_SIZE
+                : posOnSideLeftRight
 
         const options = {
-            left: pt(-distance, posOnSide),
-            right: pt(distance, posOnSide),
-            top: pt(posOnSide, -distance),
-            bottom: pt(posOnSide, distance),
+            left: pt(-distance, posOnSideLeftRight),
+            right: pt(distance, posOnSideLeftRight),
+            top: pt(posOnSideTopBottom, -distance),
+            bottom: pt(posOnSideTopBottom, distance),
         }
 
         // camp() doesn't permit right side entry since it's the ocean
