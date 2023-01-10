@@ -5,6 +5,7 @@ import { CutscenePlayerController } from "../../cutscenes/CutscenePlayerControll
 import { TextOverlayManager } from "../../cutscenes/TextOverlayManager"
 import { Item } from "../../items/Items"
 import { saveManager } from "../../SaveManager"
+import { NotificationDisplay } from "../../ui/NotificationDisplay"
 import { TextAlign } from "../../ui/Text"
 import { Location } from "../../world/locations/Location"
 import { camp, here, LocationManager } from "../../world/locations/LocationManager"
@@ -60,6 +61,7 @@ export class HostPlayer extends AbstractPlayer {
 
     private checkIsOffMap(updateData: UpdateData) {
         const currentOffMapArea = this.dude.getCurrentOffMapArea()
+        const isInOcean = here() === camp() && currentOffMapArea === "right"
 
         if (
             currentOffMapArea &&
@@ -74,7 +76,7 @@ export class HostPlayer extends AbstractPlayer {
 
         // MPTODO figure out the desired behavior here
         if (
-            this.timeOffMap > 2_500 &&
+            this.timeOffMap > 2_000 &&
             !this.offMapWarningShown &&
             !TextOverlayManager.instance.isActive
         ) {
@@ -92,46 +94,60 @@ export class HostPlayer extends AbstractPlayer {
                     })
                 })
 
-            const isInOcean = here() === camp() && currentOffMapArea === "right"
+            const showDangerWarning = () =>
+                TextOverlayManager.instance.open({
+                    text: [
+                        isInOcean
+                            ? "Venturing into the ocean without a ship is certain death. Turn back while you still can."
+                            : "Venturing deeper into the swamp without a map is certain death. Turn back while you still can.",
+                    ],
+                    finishAction: "OKAY",
+                    onFinish: () => (this.offMapWarningShown = true),
+                    textAlign: TextAlign.CENTER,
+                    pauseBackground: false,
+                })
 
             if (here() === camp()) {
                 const [exploreMap, mapIndex] = this.dude.inventory.find(
                     (stack) => stack?.item === Item.EXPLORER_MAP
                 )
                 if (exploreMap && !isInOcean) {
-                    // Kick off an exploration
+                    // Kick off an expedition
                     this.dude.inventory.setStack(
                         mapIndex,
-                        exploreMap.withMetadata({ active: true }) // TODO determine metadata
+                        exploreMap.withMetadata({ locations: 3 })
                     )
                     const radiantLocation = RadiantLocationGenerator.instance.generate()
                     travelToLocation(radiantLocation)
                 } else {
-                    // Warn the player that they'll die
-                    TextOverlayManager.instance.open({
-                        text: [
-                            isInOcean
-                                ? "Venturing into the ocean without a ship is certain death. Turn back while you still can."
-                                : "Venturing deeper into the swamp alone is certain death. Turn back while you still can.",
-                        ],
-                        finishAction: "OKAY",
-                        onFinish: () => (this.offMapWarningShown = true),
-                        textAlign: TextAlign.CENTER,
-                        pauseBackground: false,
-                    })
+                    showDangerWarning()
                 }
             } else {
-                // TODO update map
                 const [activeMap, mapIndex] = this.dude.inventory.find(
-                    (stack) => stack?.item === Item.EXPLORER_MAP && stack.metadata.active
+                    (stack) => stack?.item === Item.EXPLORER_MAP && stack.metadata.locations
                 )
-                // TODO what if the map is no longer in their inventory? either go to camp or kill 'em
-                // TODO don't enter the next location on the same side you leave from
-                const nextLocation = RadiantLocationGenerator.instance.generate()
+                const lastUsage = activeMap?.metadata.locations === 1
+                // We could make it so they die if they no longer have their map, but that probably won't happen
+                let nextLocation =
+                    activeMap && !lastUsage ? RadiantLocationGenerator.instance.generate() : camp()
+                if (lastUsage) {
+                    this.dude.inventory.removeItemAtIndex(mapIndex)
+                } else {
+                    this.dude.inventory.setStack(
+                        mapIndex,
+                        activeMap.withMetadata({ locations: activeMap.metadata.locations - 1 })
+                    )
+                }
                 const abandonedRadiantLocation = here()
-                travelToLocation(nextLocation).then(() =>
+                travelToLocation(nextLocation).then(() => {
                     LocationManager.instance.delete(abandonedRadiantLocation)
-                )
+                    if (lastUsage) {
+                        NotificationDisplay.instance.push({
+                            icon: "tent",
+                            text: "expedition complete",
+                        })
+                    }
+                })
             }
         } else if (this.timeOffMap > 10_000) {
             this.dude.damage(Number.MAX_SAFE_INTEGER, {})
