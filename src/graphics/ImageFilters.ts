@@ -46,6 +46,28 @@ export const ImageFilters = {
     },
 
     /**
+     * recolors all opaque pixels the given color
+     */
+    overlay: (color: Color, alpha: number) => {
+        const overlayRGB = getRGB(color)
+        return (img: ImageData) => {
+            const result = new ImageData(new Uint8ClampedArray(img.data), img.width, img.height)
+            for (let i = 0; i < result.data.length; i += 4) {
+                if (result.data[i + 3] !== 0) {
+                    const currentRGB = [result.data[i], result.data[i + 1], result.data[i + 2]]
+                    const red = (currentRGB[0] * (255 - alpha) + overlayRGB[0] * alpha) / 255
+                    const green = (currentRGB[1] * (255 - alpha) + overlayRGB[1] * alpha) / 255
+                    const blue = (currentRGB[2] * (255 - alpha) + overlayRGB[2] * alpha) / 255
+                    result.data[i] = red
+                    result.data[i + 1] = green
+                    result.data[i + 2] = blue
+                }
+            }
+            return result
+        }
+    },
+
+    /**
      * makes pixels invisible based on the given probability function
      */
     dissolve: (dissolveProbabilityFn: (pt: Point) => number) => {
