@@ -1465,7 +1465,7 @@ export class Dude extends Component implements DialogueSource {
     delete() {
         this.removeAllConditions()
         this.location.removeDude(this)
-        dudeCache[this.uuid] = undefined
+        delete dudeCache[this.uuid]
         super.delete()
     }
 
@@ -1476,7 +1476,10 @@ export class Dude extends Component implements DialogueSource {
         const range = here().range
         const pos = this.tile
         if (pos.x < -range || pos.x > range || pos.y < -range || pos.y > range) {
-            return pos.x > range - EAST_COAST_OCEAN_WIDTH ? "ocean" : "swamp"
+            if (this.location === camp() && pos.x > range - EAST_COAST_OCEAN_WIDTH) {
+                return "ocean"
+            }
+            return "swamp"
         }
     }
 
