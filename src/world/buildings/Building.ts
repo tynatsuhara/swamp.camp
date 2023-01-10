@@ -4,6 +4,7 @@ import { ElementType } from "../elements/Elements"
 import { ElementUtils } from "../elements/ElementUtils"
 import { Ground } from "../ground/Ground"
 import { Location } from "../locations/Location"
+import { camp } from "../locations/LocationManager"
 
 /**
  * At runtime, a building exterior is built with several components:
@@ -23,5 +24,9 @@ export abstract class BuildingFactory<
         return ElementUtils.rectPoints(pos, this.dimensions)
             .map((pt) => wl.getGround(pt)?.type)
             .every((type) => Ground.isNaturalGround(type))
+    }
+
+    canPlaceInLocation(l: Location) {
+        return l === camp()
     }
 }
