@@ -88,7 +88,7 @@ export class Torch extends Shield {
     }
 
     delete() {
-        this.dude.blob[BLOB_ATTRIBUTE] = undefined
+        delete this.dude.blob[BLOB_ATTRIBUTE]
         this.particles.delete()
         this.audio.delete()
         this.removeLight()
