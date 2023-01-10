@@ -177,15 +177,6 @@ export class MiniMap extends Component {
             Camera.instance.dimensions.y - this.smallCanvas.height - padding
         ).apply(Math.floor)
 
-        // const mapRender = new ImageRender(
-        //     this.smallCanvas,
-        //     Point.ZERO,
-        //     new Point(this.smallCanvas.width, this.smallCanvas.height),
-        //     topLeft,
-        //     new Point(this.smallCanvas.width, this.smallCanvas.height),
-        //     UIStateManager.UI_SPRITE_DEPTH
-        // )
-
         let filter: ImageFilter
         if (LightManager.instance.isTotalDarkness(player().standingPosition)) {
             filter = ImageFilters.overlay(Color.BLACK, 230)
