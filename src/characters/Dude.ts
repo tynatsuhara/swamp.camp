@@ -39,7 +39,6 @@ import { Interactable } from "../world/elements/Interactable"
 import { Pushable } from "../world/elements/Pushable"
 import { Ground } from "../world/ground/Ground"
 import { LightManager } from "../world/LightManager"
-import { EAST_COAST_OCEAN_WIDTH } from "../world/locations/CampLocationGenerator"
 import { Location } from "../world/locations/Location"
 import { camp, here } from "../world/locations/LocationManager"
 import { Residence } from "../world/residences/Residence"
@@ -1469,17 +1468,20 @@ export class Dude extends Component implements DialogueSource {
         super.delete()
     }
 
-    getCurrentOffMapArea(): "swamp" | "ocean" | undefined {
+    getCurrentOffMapArea(): "left" | "right" | "top" | "bottom" | undefined {
         if (this.location.isInterior) {
             return
         }
         const range = here().range
         const pos = this.tile
-        if (pos.x < -range || pos.x > range || pos.y < -range || pos.y > range) {
-            if (this.location === camp() && pos.x > range - EAST_COAST_OCEAN_WIDTH) {
-                return "ocean"
-            }
-            return "swamp"
+        if (pos.x < -range) {
+            return "left"
+        } else if (pos.x > range) {
+            return "right"
+        } else if (pos.y < -range) {
+            return "top"
+        } else if (pos.y > range) {
+            return "bottom"
         }
     }
 

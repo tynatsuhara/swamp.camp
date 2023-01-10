@@ -3,9 +3,12 @@ import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
 import { controls } from "../../Controls"
 import { CutscenePlayerController } from "../../cutscenes/CutscenePlayerController"
 import { TextOverlayManager } from "../../cutscenes/TextOverlayManager"
+import { Item } from "../../items/Items"
 import { saveManager } from "../../SaveManager"
 import { TextAlign } from "../../ui/Text"
+import { Location } from "../../world/locations/Location"
 import { camp, here, LocationManager } from "../../world/locations/LocationManager"
+import { RadiantLocationGenerator } from "../../world/locations/RadiantLocationGenerator"
 import { DudeSpawner } from "../DudeSpawner"
 import { AbstractPlayer } from "./AbstractPlayer"
 import { registerPlayerInstance as registerLocalPlayerInstance } from "./index"
@@ -56,10 +59,10 @@ export class HostPlayer extends AbstractPlayer {
     }
 
     private checkIsOffMap(updateData: UpdateData) {
-        const offMap = this.dude.getCurrentOffMapArea()
+        const currentOffMapArea = this.dude.getCurrentOffMapArea()
 
         if (
-            offMap &&
+            currentOffMapArea &&
             !CutscenePlayerController.instance.enabled &&
             !TextOverlayManager.instance.isActive
         ) {
@@ -75,29 +78,60 @@ export class HostPlayer extends AbstractPlayer {
             !this.offMapWarningShown &&
             !TextOverlayManager.instance.isActive
         ) {
+            const travelToLocation = (l: Location): Promise<void> =>
+                new Promise((resolve) => {
+                    this.timeOffMap = 0
+                    const position = DudeSpawner.instance.getSpawnPosOutsideOfLocation(l, [
+                        currentOffMapArea,
+                    ])
+                    LocationManager.instance.playerLoadLocation(l, position, () => {
+                        CutscenePlayerController.instance.enable()
+                        CutscenePlayerController.instance.startMoving(Point.ZERO.minus(position))
+                        setTimeout(() => CutscenePlayerController.instance.disable(), 1_000)
+                        resolve()
+                    })
+                })
+
+            const isInOcean = here() === camp() && currentOffMapArea === "right"
+
             if (here() === camp()) {
-                TextOverlayManager.instance.open({
-                    text: [
-                        offMap === "ocean"
-                            ? "Venturing into the ocean without a ship is certain death. Turn back while you still can."
-                            : "Venturing deeper into the swamp alone is certain death. Turn back while you still can.",
-                    ],
-                    finishAction: "OKAY",
-                    onFinish: () => (this.offMapWarningShown = true),
-                    textAlign: TextAlign.CENTER,
-                    pauseBackground: false,
-                })
+                const [exploreMap, mapIndex] = this.dude.inventory.find(
+                    (stack) => stack?.item === Item.EXPLORER_MAP
+                )
+                if (exploreMap && !isInOcean) {
+                    // Kick off an exploration
+                    this.dude.inventory.setStack(
+                        mapIndex,
+                        exploreMap.withMetadata({ active: true }) // TODO determine metadata
+                    )
+                    const radiantLocation = RadiantLocationGenerator.instance.generate()
+                    travelToLocation(radiantLocation)
+                } else {
+                    // Warn the player that they'll die
+                    TextOverlayManager.instance.open({
+                        text: [
+                            isInOcean
+                                ? "Venturing into the ocean without a ship is certain death. Turn back while you still can."
+                                : "Venturing deeper into the swamp alone is certain death. Turn back while you still can.",
+                        ],
+                        finishAction: "OKAY",
+                        onFinish: () => (this.offMapWarningShown = true),
+                        textAlign: TextAlign.CENTER,
+                        pauseBackground: false,
+                    })
+                }
             } else {
-                // This is a radiant location — go back to camp
-                this.timeOffMap = 0
-                const position = DudeSpawner.instance.getSpawnPosOutsideOfCamp()
-                const currentLocation = here()
-                LocationManager.instance.playerLoadLocation(camp(), position, () => {
-                    LocationManager.instance.delete(currentLocation)
-                    CutscenePlayerController.instance.enable()
-                    CutscenePlayerController.instance.startMoving(Point.ZERO.minus(position))
-                    setTimeout(() => CutscenePlayerController.instance.disable(), 1_000)
-                })
+                // TODO update map
+                const [activeMap, mapIndex] = this.dude.inventory.find(
+                    (stack) => stack?.item === Item.EXPLORER_MAP && stack.metadata.active
+                )
+                // TODO what if the map is no longer in their inventory? either go to camp or kill 'em
+                // TODO don't enter the next location on the same side you leave from
+                const nextLocation = RadiantLocationGenerator.instance.generate()
+                const abandonedRadiantLocation = here()
+                travelToLocation(nextLocation).then(() =>
+                    LocationManager.instance.delete(abandonedRadiantLocation)
+                )
             }
         } else if (this.timeOffMap > 10_000) {
             this.dude.damage(Number.MAX_SAFE_INTEGER, {})

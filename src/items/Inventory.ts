@@ -76,10 +76,22 @@ export class Inventory {
     }
 
     /**
+     * NOTE: Values can be null!
      * @returns -1 if nothing matches the predicate
      */
     findIndex(predicate: (value: ItemStack | null, index: number) => boolean) {
         return this.stacks.findIndex(predicate)
+    }
+
+    /**
+     * NOTE: Values can be null!
+     * @returns [null, -1] if nothing matches the predicate
+     */
+    find(
+        predicate: (value: ItemStack | null, index: number) => boolean
+    ): [ItemStack | null, number] {
+        const index = this.findIndex(predicate)
+        return [this.stacks[index], index]
     }
 
     getStack(index: number): ItemStack {

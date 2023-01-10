@@ -1,4 +1,4 @@
-import { Component, debug, Entity, Point } from "brigsby/dist"
+import { Component, debug, Entity, pt } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
 import { WorldAudioContext } from "../audio/WorldAudioContext"
 import { TILE_SIZE } from "../graphics/Tilesets"
@@ -78,7 +78,10 @@ export class DudeSpawner extends Component {
 
             console.log(`spawning villager ${visitorTypes}`)
 
-            const dude = DudeFactory.instance.create(visitorType, this.getSpawnPosOutsideOfCamp())
+            const dude = DudeFactory.instance.create(
+                visitorType,
+                this.getSpawnPosOutsideOfLocation()
+            )
             dude.entity.getComponent(Visitor)?.welcome()
         }
     }
@@ -157,7 +160,7 @@ export class DudeSpawner extends Component {
             return
         }
 
-        const spawnPos = this.getSpawnPosOutsideOfCamp()
+        const spawnPos = this.getSpawnPosOutsideOfLocation()
 
         // TODO: Make these values dynamic based on progress
         const leaderCount = 1
@@ -189,7 +192,7 @@ export class DudeSpawner extends Component {
 
     private spawnWildlife() {
         if (this.shouldRandomlySpawn(TimeUnit.DAY * 7)) {
-            DudeFactory.instance.create(DudeType.BEAR, this.getSpawnPosOutsideOfCamp())
+            DudeFactory.instance.create(DudeType.BEAR, this.getSpawnPosOutsideOfLocation())
         }
 
         if (this.shouldRandomlySpawn(TimeUnit.DAY * 3)) {
@@ -198,7 +201,7 @@ export class DudeSpawner extends Component {
     }
 
     spawnWolves() {
-        const leaderSpawnPos = this.getSpawnPosOutsideOfCamp()
+        const leaderSpawnPos = this.getSpawnPosOutsideOfLocation()
         const leader = DudeFactory.instance.create(DudeType.WOLF, leaderSpawnPos)
 
         const spawnPoints = tilesAround(leaderSpawnPos, 3)
@@ -221,21 +224,31 @@ export class DudeSpawner extends Component {
     /**
      * @returns A pixel coordinate (not point)
      */
-    getSpawnPosOutsideOfCamp() {
-        const side = Math.random()
+    getSpawnPosOutsideOfLocation(l = camp(), excludeSides: Side[] = []) {
         // distance from (0, 0)
-        const distance = (camp().range + 2) * TILE_SIZE
-        const posOnSide = Math.random() * camp().range * TILE_SIZE
+        const distance = (l.range + 2) * TILE_SIZE
 
-        if (side < 0.33) {
-            // left
-            return new Point(-distance, posOnSide)
-        } else if (side < 0.66) {
-            // top
-            return new Point(posOnSide, -distance)
-        } else {
-            // bottom
-            return new Point(posOnSide, distance)
+        // (assuming all locations are square)
+        // there's a slight possibility this will stick the player
+        // in the water at the top or bottom of the map
+        const posOnSide = Math.random() * l.range * TILE_SIZE
+
+        const options = {
+            left: pt(-distance, posOnSide),
+            right: pt(distance, posOnSide),
+            top: pt(posOnSide, -distance),
+            bottom: pt(posOnSide, distance),
         }
+
+        // camp() doesn't permit right side entry since it's the ocean
+        if (l === camp()) {
+            delete options.right
+        }
+
+        excludeSides.forEach((s) => delete options[s])
+
+        return Lists.oneOf(Object.values(options))
     }
 }
+
+type Side = "left" | "right" | "top" | "bottom"
