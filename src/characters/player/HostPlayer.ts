@@ -10,6 +10,8 @@ import { TextAlign } from "../../ui/Text"
 import { Location } from "../../world/locations/Location"
 import { camp, here, LocationManager } from "../../world/locations/LocationManager"
 import { RadiantLocationGenerator } from "../../world/locations/RadiantLocationGenerator"
+import { TimeUnit } from "../../world/TimeUnit"
+import { WorldTime } from "../../world/WorldTime"
 import { DudeSpawner } from "../DudeSpawner"
 import { AbstractPlayer } from "./AbstractPlayer"
 import { registerPlayerInstance as registerLocalPlayerInstance } from "./index"
@@ -87,9 +89,10 @@ export class HostPlayer extends AbstractPlayer {
                         currentOffMapArea,
                     ])
                     LocationManager.instance.playerLoadLocation(l, position, () => {
+                        WorldTime.instance.fastForward(TimeUnit.HOUR)
                         CutscenePlayerController.instance.enable()
                         CutscenePlayerController.instance.startMoving(Point.ZERO.minus(position))
-                        setTimeout(() => CutscenePlayerController.instance.disable(), 1_000)
+                        setTimeout(() => CutscenePlayerController.instance.disable(), 1_250)
                         resolve()
                     })
                 })
