@@ -62,7 +62,9 @@ export class PauseMenu extends Component {
             debug.disableAutosave &&
                 session.isHost() && {
                     text: "[debug] SAVE GAME",
-                    fn: () => saveManager.save(),
+                    fn: () =>
+                        saveManager.save() &&
+                        NotificationDisplay.instance.push({ icon: "floppy_drive", text: "saved" }),
                 },
             this.getOnlineOption(tooltip),
             {
