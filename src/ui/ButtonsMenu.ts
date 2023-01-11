@@ -15,6 +15,11 @@ export type OptionButton = {
     hoverColor: string
 }
 
+const MARGIN_TOP = 13
+const MARGIN_BOTTOM = 12
+const MARGIN_SIDE = 9
+const BUTTON_PADDING = 3
+
 // TODO: Update this to use the color replace filter instead of different sprites
 export const ButtonsMenu = {
     render: (
@@ -24,17 +29,12 @@ export const ButtonsMenu = {
     ): Entity => {
         const longestOption = Math.max(...options.map((o) => o.text.length))
 
-        const marginTop = 13
-        const marginBottom = 12
-        const marginSide = 9
-        const buttonPadding = 3
-
         const dimensions = new Point(
-            longestOption * TEXT_PIXEL_WIDTH + marginSide * 2 + TextButton.margin * 2,
-            (options.length - 1) * buttonPadding +
+            longestOption * TEXT_PIXEL_WIDTH + MARGIN_SIDE * 2 + TextButton.margin * 2,
+            (options.length - 1) * BUTTON_PADDING +
                 options.length * TILE_SIZE +
-                marginTop +
-                marginBottom
+                MARGIN_TOP +
+                MARGIN_BOTTOM
         )
 
         const topLeft = centerPos.minus(dimensions.div(2))
@@ -59,7 +59,7 @@ export const ButtonsMenu = {
                             dimensions.x / 2 -
                                 (TEXT_PIXEL_WIDTH * option.text.length) / 2 -
                                 TextButton.margin,
-                            marginTop + i * (TILE_SIZE + buttonPadding)
+                            MARGIN_TOP + i * (TILE_SIZE + BUTTON_PADDING)
                         )
                     ),
                     text: option.text,
