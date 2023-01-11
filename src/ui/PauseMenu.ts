@@ -15,6 +15,7 @@ import { Color } from "./Color"
 import { ControlsUI } from "./ControlsUI"
 import { FullScreenMode } from "./FullScreenMode"
 import { NotificationDisplay } from "./NotificationDisplay"
+import { cycleTipIndex, TipDisplay } from "./Tips"
 import { Tooltip } from "./Tooltip"
 import { UIStateManager } from "./UIStateManager"
 
@@ -40,6 +41,7 @@ export class PauseMenu extends Component {
         ) {
             this.close()
         } else if (pressPauseButton && !UIStateManager.instance.isMenuOpen) {
+            cycleTipIndex(1)
             this.open()
         } else if (this.isOpen) {
             this.refresh()
@@ -130,6 +132,8 @@ export class PauseMenu extends Component {
             })),
             Camera.instance.dimensions.div(2)
         )
+
+        this.displayEntity.addComponent(new TipDisplay())
 
         this.displayEntity.addComponent(tooltip)
     }

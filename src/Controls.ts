@@ -190,6 +190,35 @@ class ControlsWrapper extends Component {
 
     getInventorySwapString = () => (isGamepadMode ? "R3" : "[shift]+" + TextIcon.MOUSE_RIGHT)
 
+    // ======== PAUSE MENU STUFF ========
+
+    isAudioDecreaseModifierHeld = () =>
+        check({
+            kbm: () => input.isKeyHeld(InputKey.SHIFT),
+            gamepad: () => gamepadInput.isButtonHeld(GamepadButton.L1),
+        })
+
+    isOpenPauseMenuButtonDown = () =>
+        check({
+            kbm: () => input.isKeyDown(InputKey.TAB),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.START),
+        })
+
+    isNextTipButtonwDown = () =>
+        check({
+            kbm: () => input.isKeyDown(InputKey.D),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.RIGHT),
+        })
+
+    isPrevTipButtonwDown = () =>
+        check({
+            kbm: () => input.isKeyDown(InputKey.A),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.LEFT),
+        })
+
+    getCycleTipString = () =>
+        isGamepadMode ? `${TextIcon.GAMEPAD_LEFT}/${TextIcon.GAMEPAD_RIGHT}` : "[a/d]"
+
     // ======== OTHER MENU STUFF ========
 
     isCloseMenuButtonDown = () =>
@@ -199,12 +228,6 @@ class ControlsWrapper extends Component {
         })
 
     getCloseMenuButtonString = () => (isGamepadMode ? TextIcon.GAMEPAD_CIRCLE : "[tab]")
-
-    isOpenPauseMenuButtonDown = () =>
-        check({
-            kbm: () => input.isKeyDown(InputKey.TAB),
-            gamepad: () => gamepadInput.isButtonDown(GamepadButton.START),
-        })
 
     isTabRightDown = () =>
         check({
@@ -306,12 +329,6 @@ class ControlsWrapper extends Component {
             gamepad: () =>
                 gamepadInput.isButton(GamepadButton.R1, state) ||
                 gamepadInput.isButton(GamepadButton.R2, state),
-        })
-
-    isAudioDecreaseModifierHeld = () =>
-        check({
-            kbm: () => input.isKeyHeld(InputKey.SHIFT),
-            gamepad: () => gamepadInput.isButtonHeld(GamepadButton.L1),
         })
 
     getMousePos = () => {

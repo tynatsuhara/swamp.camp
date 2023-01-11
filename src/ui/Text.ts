@@ -27,6 +27,8 @@ export const NO_BREAK_SPACE_CHAR = "∆"
 export enum TextIcon {
     GAMEPAD_DOWN = "ö0",
     GAMEPAD_UP = "ö1",
+    GAMEPAD_LEFT = "öf",
+    GAMEPAD_RIGHT = "ög",
     GAMEPAD_X = "öx",
     GAMEPAD_SQUARE = "ö2",
     GAMEPAD_TRIANGLE = "ö3",
@@ -47,6 +49,8 @@ const ICON_PLACEHOLDER_REGEX = /ö./g
 const ICON_PLACEHOLDER_MAP: Record<TextIcon, Icon> = {
     [TextIcon.GAMEPAD_DOWN]: "gamepad-down",
     [TextIcon.GAMEPAD_UP]: "gamepad-up",
+    [TextIcon.GAMEPAD_LEFT]: "gamepad-left",
+    [TextIcon.GAMEPAD_RIGHT]: "gamepad-right",
     [TextIcon.GAMEPAD_X]: "gamepad-x",
     [TextIcon.GAMEPAD_SQUARE]: "gamepad-square",
     [TextIcon.GAMEPAD_TRIANGLE]: "gamepad-triangle",

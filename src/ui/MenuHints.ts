@@ -46,6 +46,7 @@ export class MenuHints extends Component {
             show(controls.getMenuClickDownString(), "place")
             showExit()
         } else if (PauseMenu.instance.isOpen) {
+            show(controls.getCycleTipString(), "tips")
             showExit()
         } else if (CraftingMenu.instance.isOpen) {
             show(controls.getTabButtonsString(), "tab left/right")
