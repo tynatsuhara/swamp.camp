@@ -9,11 +9,14 @@ const MAP_SIZE = 30
 /**
  * Radiant location ideas:
  *   - Orc camp with enslaved villagers and/or treasure
+ *   - Gnoll camp — Will sell you enslaved elves? Or you can attack and free them
  *   - Centaur settlement
  *   - Elf settlement
  *   - Forest guardian with treasure
  *   - Troll with treasure
  *   - Ambush?
+ *   - Misc wildlife
+ *   - Abundance of natural resources
  */
 
 export class RadiantLocationGenerator extends AbstractLocationGenerator {

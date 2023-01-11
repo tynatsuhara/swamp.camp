@@ -1,6 +1,6 @@
-import { Component, Point, UpdateData } from "brigsby/dist"
+import { Component, Point, StartData, UpdateData } from "brigsby/dist"
 import { ImageRender } from "brigsby/dist/renderer"
-import { ImageFilter, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
+import { SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Lists, Maths } from "brigsby/dist/util"
 import { player } from "../characters/player"
 import { controls } from "../Controls"
@@ -15,6 +15,8 @@ import { camp, here } from "../world/locations/LocationManager"
 import { Color, getHex } from "./Color"
 import { UIStateManager } from "./UIStateManager"
 
+type MiniMapTint = "light" | "mid" | "dark"
+
 export class MiniMap extends Component {
     private static readonly SCALE = 12 // full-size pixels per map pixel
     private static readonly PX_PER_HIDDEN_UPDATE = 50 // how many pixels we draw each update() when hidden
@@ -25,6 +27,19 @@ export class MiniMap extends Component {
 
     private bigCanvas: HTMLCanvasElement
     private smallCanvas: HTMLCanvasElement
+
+    private mapSprites: Partial<Record<MiniMapTint, StaticSpriteSource>> = {}
+    private playerIconSprites: Partial<Record<MiniMapTint, StaticSpriteSource>> = {}
+
+    start(startData: StartData): void {
+        this.playerIconSprites.light = Tilesets.instance.oneBit.getTileSource("miniMapPlayer")
+        this.playerIconSprites.mid = this.playerIconSprites.light.filtered(
+            this.getFilterForTint("mid")
+        )
+        this.playerIconSprites.dark = this.playerIconSprites.light.filtered(
+            this.getFilterForTint("dark")
+        )
+    }
 
     update(updateData: UpdateData) {
         this.isShowing =
@@ -38,6 +53,7 @@ export class MiniMap extends Component {
 
     refresh() {
         this.lastPixelDrawn = Point.ZERO
+        this.mapSprites = {}
     }
 
     private renderFullSizeMap() {
@@ -87,7 +103,7 @@ export class MiniMap extends Component {
 
         // Draw the scaled-down canvas
         if (!this.smallCanvas) {
-            this.smallCanvas = document.createElement("canvas")
+            this.smallCanvas = document.createElement("canvas", {})
             this.smallCanvas.width = this.smallCanvas.height = this.bigCanvas.width / MiniMap.SCALE
         }
     }
@@ -105,7 +121,7 @@ export class MiniMap extends Component {
         }
 
         const bigContext = this.bigCanvas.getContext("2d")
-        const smallContext = this.smallCanvas.getContext("2d")
+        const smallContext = this.smallCanvas.getContext("2d", { willReadFrequently: true })
         let drawn = 0
 
         // slowly render in the background, speed up when in foreground
@@ -151,8 +167,15 @@ export class MiniMap extends Component {
                         hexStrings.push(hex)
                     }
                 }
-                smallContext.fillStyle = Lists.mode(hexStrings)
-                smallContext.fillRect(x, y, 1, 1)
+
+                const currColorData = smallContext.getImageData(x, y, 1, 1).data
+                const existingColor = getHex(currColorData[0], currColorData[1], currColorData[2])
+                const newColor = Lists.mode(hexStrings)
+                if (!this.fullyRenderedAtLeastOnce || existingColor !== newColor) {
+                    smallContext.fillStyle = newColor
+                    smallContext.fillRect(x, y, 1, 1)
+                    this.mapSprites = {}
+                }
 
                 this.lastPixelDrawn = new Point(x, y)
 
@@ -177,50 +200,63 @@ export class MiniMap extends Component {
             Camera.instance.dimensions.y - this.smallCanvas.height - padding
         ).apply(Math.floor)
 
-        let filter: ImageFilter
-        if (LightManager.instance.isTotalDarkness(player().standingPosition)) {
-            filter = ImageFilters.overlay(Color.BLACK, 230)
-        } else if (LightManager.instance.isDark(player().standingPosition)) {
-            filter = ImageFilters.overlay(Color.BLACK, 140)
-        }
+        const tint = this.getMiniMapTint()
+        const filter = this.getFilterForTint(tint)
 
-        const mapRender = new StaticSpriteSource(
-            this.smallCanvas,
-            Point.ZERO,
-            new Point(this.smallCanvas.width, this.smallCanvas.height)
-        )
-            .filtered(filter)
-            .toImageRender(
-                SpriteTransform.new({ position: topLeft, depth: UIStateManager.UI_SPRITE_DEPTH })
+        if (!this.mapSprites.light) {
+            this.mapSprites.light = new StaticSpriteSource(
+                this.smallCanvas,
+                Point.ZERO,
+                new Point(this.smallCanvas.width, this.smallCanvas.height)
             )
-
-        return [mapRender, this.getPlayerIndicator(topLeft, filter)]
-    }
-
-    // MPTODO: add multiple!
-    private getPlayerIndicator(topLeft: Point, filter: ImageFilter) {
-        const wl = player().location
-        if (player().location !== camp()) {
-            return null
         }
-        const indicatorSize = 4
+        if (!this.mapSprites[tint]) {
+            this.mapSprites[tint] = this.mapSprites.light.filtered(filter)
+        }
+        const mapRender = this.mapSprites[tint]
 
-        const position = player()
-            .standingPosition.plus(new Point(1, 1).times((wl.size * TILE_SIZE) / 2))
+        // MPTODO: Multiple player indicators?
+        const indicatorSize = 4
+        const playerIndicatorPosition = player()
+            .standingPosition.plus(new Point(1, 1).times((camp().size * TILE_SIZE) / 2))
             .div(MiniMap.SCALE)
             .minus(new Point(indicatorSize / 2, indicatorSize / 2))
             .apply((n) => Math.floor(n))
-            .apply((n) => Maths.clamp(n, 0, (wl.size * TILE_SIZE) / MiniMap.SCALE - indicatorSize))
+            .apply((n) =>
+                Maths.clamp(n, 0, (camp().size * TILE_SIZE) / MiniMap.SCALE - indicatorSize)
+            )
             .plus(topLeft)
 
-        return Tilesets.instance.oneBit
-            .getTileSource("miniMapPlayer")
-            .filtered(filter)
-            .toImageRender(
+        return [
+            mapRender.toImageRender(
+                SpriteTransform.new({ position: topLeft, depth: UIStateManager.UI_SPRITE_DEPTH })
+            ),
+            this.playerIconSprites[tint].toImageRender(
                 SpriteTransform.new({
-                    position,
+                    position: playerIndicatorPosition,
                     depth: UIStateManager.UI_SPRITE_DEPTH,
                 })
-            )
+            ),
+        ]
+    }
+
+    private getMiniMapTint(): MiniMapTint {
+        if (LightManager.instance.isTotalDarkness(player().standingPosition)) {
+            return "dark"
+        } else if (LightManager.instance.isDark(player().standingPosition)) {
+            return "mid"
+        }
+        return "light"
+    }
+
+    private getFilterForTint(tint: MiniMapTint) {
+        switch (tint) {
+            case "light":
+                return null
+            case "mid":
+                return ImageFilters.overlay(Color.BLACK, 140)
+            case "dark":
+                return ImageFilters.overlay(Color.BLACK, 230)
+        }
     }
 }
