@@ -51,6 +51,7 @@ export class MiniMap extends Component {
         this.partiallyRenderDownsampledMap()
     }
 
+    // TODO: Make this only refresh certain points
     refresh() {
         this.lastPixelDrawn = Point.ZERO
         this.mapSprites = {}
@@ -168,10 +169,12 @@ export class MiniMap extends Component {
                     }
                 }
 
-                const currColorData = smallContext.getImageData(x, y, 1, 1).data
-                const existingColor = getHex(currColorData[0], currColorData[1], currColorData[2])
+                const getCurrentColor = () => {
+                    const currColorData = smallContext.getImageData(x, y, 1, 1).data
+                    return getHex(currColorData[0], currColorData[1], currColorData[2])
+                }
                 const newColor = Lists.mode(hexStrings)
-                if (!this.fullyRenderedAtLeastOnce || existingColor !== newColor) {
+                if (!this.fullyRenderedAtLeastOnce || getCurrentColor() !== newColor) {
                     smallContext.fillStyle = newColor
                     smallContext.fillRect(x, y, 1, 1)
                     this.mapSprites = {}
