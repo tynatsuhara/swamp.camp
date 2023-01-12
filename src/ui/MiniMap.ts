@@ -207,7 +207,7 @@ export class MiniMap extends Component {
             })
         )
         const visibility = LightManager.instance.currentVisibility(player().standingPosition)
-        mapOverlayRender.alpha = Math.min(1 - visibility, 0.9)
+        mapOverlayRender.alpha = Math.min(1 - visibility, 0.95)
 
         return [mapRender, mapOverlayRender]
     }
