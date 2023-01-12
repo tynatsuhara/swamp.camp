@@ -83,6 +83,31 @@ export class LightManager extends Component {
     isTotalDarkness = (pixelPt: Point, location: Location = here()) =>
         this.isDarkHelper(pixelPt, location, DarknessMask.VISIBILITY_MULTIPLIER)
 
+    // Returns a value 0-1 where 0 is total darkness and 1 is total light
+    currentVisibility = (pixelPt: Point, location: Location = here()) => {
+        if (this.isDaytime()) {
+            return 1
+        }
+        const locationLightMap = this.lightTiles.get(location)
+        if (!locationLightMap) {
+            return 0
+        }
+        let max = 0
+        for (const { position, diameter } of locationLightMap.values()) {
+            const distance = position.distanceTo(pixelPt)
+            const fullLightDistance = diameter * 0.5
+            if (distance < fullLightDistance) {
+                return 1
+            }
+            const fullDarkDistance = fullLightDistance * DarknessMask.VISIBILITY_MULTIPLIER
+            max = Math.max(
+                max,
+                1 - (distance - fullLightDistance) / (fullDarkDistance - fullLightDistance)
+            )
+        }
+        return max
+    }
+
     /**
      * currently this is O(n) for n light sources in a location — don't call on every update()
      */
@@ -91,9 +116,8 @@ export class LightManager extends Component {
         location: Location,
         tolerableDistanceFromLightMultiplier: number
     ): boolean {
-        const time = WorldTime.instance.time % TimeUnit.DAY
-        if (time >= DarknessMask.SUNRISE_START && time < DarknessMask.SUNSET_END) {
-            return false // daytime
+        if (this.isDaytime()) {
+            return false
         }
         const locationLightMap = this.lightTiles.get(location)
         if (!locationLightMap) {
@@ -105,27 +129,13 @@ export class LightManager extends Component {
         )
     }
 
+    private isDaytime() {
+        const time = WorldTime.instance.time % TimeUnit.DAY
+        return time >= DarknessMask.SUNRISE_START && time < DarknessMask.SUNSET_END
+    }
+
     private getLocationDarkness() {
         const location = here()
-
-        // Get dark when approaching the edge of the map
-        // if (location === camp()) {
-        //     const pos = Player.instance.dude.standingPosition
-        //     const buffer = TILE_SIZE * 8
-        //     const fullDarknessBuffer = TILE_SIZE * 2
-        //     const margin = (camp().size / 2) * TILE_SIZE - buffer - fullDarknessBuffer
-        //     let darkness = 0
-        //     if (pos.x < -margin) {
-        //         darkness = Math.max(darkness, Maths.clamp((pos.x + margin) / -buffer, 0, 1))
-        //     }
-        //     if (pos.y < -margin) {
-        //         darkness = Math.max(darkness, Maths.clamp((pos.y + margin) / -buffer, 0, 1))
-        //     }
-        //     if (pos.y > margin) {
-        //         darkness = Math.max(darkness, Maths.clamp((pos.y - margin) / buffer, 0, 1))
-        //     }
-        //     return darkness
-        // }
 
         if (location.type === LocationType.MINE_INTERIOR) {
             return 0.99
