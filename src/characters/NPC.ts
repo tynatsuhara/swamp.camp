@@ -396,7 +396,7 @@ export class NPC extends Simulatable {
             this.dude.shield &&
             this.dude.isFacing(this.attackTarget.standingPosition) &&
             [AttackState.ATTACKING_SOON, AttackState.ATTACKING_NOW].includes(
-                this.attackTarget?.attackState
+                this.attackTarget.attackState
             )
         ) {
             this.dude.updateBlocking(true)
@@ -433,7 +433,13 @@ export class NPC extends Simulatable {
         }
         if (!this.targetPath || this.targetPath.length === 0 || mag < stoppingDist) {
             // TODO: If using a ranged weapon, keep distance from enemies
-            this._dude.move(updateData.elapsedTimeMillis, Point.ZERO)
+            this._dude.move(
+                updateData.elapsedTimeMillis,
+                Point.ZERO,
+                // make sure they face the target, otherwise enemies can get stuck
+                // if they're standing in the same tile as their target
+                this.attackTarget.standingPosition.x - this._dude.standingPosition.x
+            )
             return
         }
 
