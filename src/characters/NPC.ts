@@ -80,7 +80,7 @@ export class NPC extends Simulatable {
             return !!d.entity.getComponent(NPC).targetedEnemy
         }
 
-        return false
+        return true
     }
 
     // override logic for selecting a target enemy out of possible options
