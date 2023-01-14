@@ -1597,6 +1597,7 @@ export class Dude extends Component implements DialogueSource {
         uuid: this.uuid,
         health: +this.health.toFixed(2),
         type: DudeType[this.type],
+        pos: this.standingPosition.toString(),
     })
 
     static get(uuid: string) {
