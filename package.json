@@ -25,6 +25,6 @@
     },
     "dependencies": {
         "brigsby": "^0.8.3",
-        "trystero": "^0.6.1"
+        "trystero": "^0.11.8"
     }
 }
