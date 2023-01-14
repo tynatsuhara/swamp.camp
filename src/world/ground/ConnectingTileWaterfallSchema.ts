@@ -2,10 +2,10 @@ import { Point } from "brigsby/dist"
 import { ImageRender } from "brigsby/dist/renderer"
 import { SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
-import { GroundRenderer } from "../GroundRenderer"
 import { Location } from "../locations/Location"
 import { ConnectingTileSchema } from "./ConnectingTileSchema"
 import { ConnectingTileWaterSchema } from "./ConnectingTileWaterSchema"
+import { GroundRenderer } from "./GroundRenderer"
 
 export class ConnectingTileWaterfallSchema extends ConnectingTileSchema {
     static readonly DEPTH = GroundRenderer.DEPTH + 10

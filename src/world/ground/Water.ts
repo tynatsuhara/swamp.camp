@@ -1,11 +1,11 @@
 import { Entity, Point } from "brigsby/dist"
 import { SpriteAnimation, SpriteTransform } from "brigsby/dist/sprites"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
-import { GroundRenderer } from "../GroundRenderer"
 import { ConnectingTile } from "./ConnectingTile"
 import { ConnectingTileWaterSchema } from "./ConnectingTileWaterSchema"
 import { GroundType, MakeGroundFuncData } from "./Ground"
 import { GroundComponent } from "./GroundComponent"
+import { GroundRenderer } from "./GroundRenderer"
 
 export const makeWater = (d: MakeGroundFuncData): GroundComponent => {
     const schema = new ConnectingTileWaterSchema()

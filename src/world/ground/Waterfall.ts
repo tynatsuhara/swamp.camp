@@ -6,11 +6,11 @@ import { ImageFilters } from "../../graphics/ImageFilters"
 import { Particles } from "../../graphics/particles/Particles"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Color } from "../../ui/Color"
-import { GroundRenderer } from "../GroundRenderer"
 import { ConnectingTile } from "./ConnectingTile"
 import { ConnectingTileWaterfallSchema } from "./ConnectingTileWaterfallSchema"
 import { GroundType, MakeGroundFuncData } from "./Ground"
 import { GroundComponent } from "./GroundComponent"
+import { GroundRenderer } from "./GroundRenderer"
 import { getAnimatedWaterTileComponent } from "./Water"
 
 const SPLASH_PARTICLE_LIFETIME = 1200

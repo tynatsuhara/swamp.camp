@@ -1,9 +1,9 @@
 import { Entity } from "brigsby/dist"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
-import { GroundRenderer } from "../GroundRenderer"
 import { GroundType, MakeGroundFuncData } from "./Ground"
 import { GroundComponent } from "./GroundComponent"
+import { GroundRenderer } from "./GroundRenderer"
 
 // Function that takes a tileSource and returns a ground generation function for it
 export const makeBasicGround = (d: MakeGroundFuncData) => {

@@ -2,9 +2,9 @@ import { Point } from "brigsby/dist"
 import { ImageRender } from "brigsby/dist/renderer"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
-import { GroundRenderer } from "../GroundRenderer"
 import { Location } from "../locations/Location"
 import { ConnectingTileSchema } from "./ConnectingTileSchema"
+import { GroundRenderer } from "./GroundRenderer"
 
 /**
  * Defines how a type of connecting tiles interacts with other types of connecting tiles.
