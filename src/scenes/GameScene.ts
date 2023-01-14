@@ -33,6 +33,7 @@ import { Elements } from "../world/elements/Elements"
 import { EventQueue } from "../world/events/EventQueue"
 import { QueuedEventType } from "../world/events/QueuedEvent"
 import { GroundRenderer } from "../world/ground/GroundRenderer"
+import { WaterRenderer } from "../world/ground/WaterRenderer"
 import { LightManager } from "../world/LightManager"
 import { CampLocationGenerator } from "../world/locations/CampLocationGenerator"
 import { camp, here, LocationManager } from "../world/locations/LocationManager"
@@ -111,6 +112,7 @@ export class GameScene extends Scene {
             )
             if (!debug.groundRenderDisabled) {
                 gameEntities.push(GroundRenderer.instance.getEntity())
+                gameEntities.push(WaterRenderer.instance.getEntity())
             }
         }
 

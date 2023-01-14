@@ -26,6 +26,7 @@ export class ConnectingTile extends Component {
 
     start() {
         GroundRenderer.instance.clearTile(here(), this.position)
+        // TODO can we just draw to groundrenderer instead of updating every method?
     }
 
     getRenderMethods(): ImageRender[] {

@@ -11,7 +11,7 @@ import { ConnectingTileWaterfallSchema } from "./ConnectingTileWaterfallSchema"
 import { GroundType, MakeGroundFuncData } from "./Ground"
 import { GroundComponent } from "./GroundComponent"
 import { GroundRenderer } from "./GroundRenderer"
-import { getAnimatedWaterTileComponent } from "./Water"
+import { WaterRenderer } from "./WaterRenderer"
 
 const SPLASH_PARTICLE_LIFETIME = 1200
 const SPLASH_PARTICLE_FREQUENCY = 100
@@ -96,7 +96,7 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
         )
     )
 
-    e.addComponent(getAnimatedWaterTileComponent(d.pos))
+    WaterRenderer.instance.setWaterTile(d.wl, d.pos)
 
     e.addComponent(
         new PointAudio(

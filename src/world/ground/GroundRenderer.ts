@@ -18,7 +18,7 @@ export class GroundRenderer {
         return Singletons.getOrCreate(GroundRenderer)
     }
 
-    private locations: Map<Location, HTMLCanvasElement> = new Map<Location, HTMLCanvasElement>()
+    private locations: Map<Location, HTMLCanvasElement> = new Map()
 
     clearTile(wl: Location, position: Point) {
         let canvas = this.locations.get(wl)
