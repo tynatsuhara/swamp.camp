@@ -62,8 +62,9 @@ export class WaterRenderer {
         })
     }
 
-    getCanvases(wl: Location) {
-        return [...(this.locations.get(wl) ?? [])]
+    getCanvas(wl: Location) {
+        const canvases = this.locations.get(wl)
+        return canvases[WATER_ANIMATOR.getCurrentFrame()]
     }
 
     getEntity(): Entity {

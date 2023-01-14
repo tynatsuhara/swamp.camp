@@ -10,6 +10,7 @@ import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { ElementComponent } from "../world/elements/ElementComponent"
 import { GroundComponent } from "../world/ground/GroundComponent"
 import { GroundRenderer } from "../world/ground/GroundRenderer"
+import { WaterRenderer } from "../world/ground/WaterRenderer"
 import { LightManager } from "../world/LightManager"
 import { camp, here } from "../world/locations/LocationManager"
 import { Color, getHex } from "./Color"
@@ -44,7 +45,8 @@ export class MiniMap extends Component {
     private renderFullSizeMap() {
         const wl = camp()
         const ground = GroundRenderer.instance.getCanvas(wl)
-        if (!ground) {
+        const water = WaterRenderer.instance.getCanvas(wl)
+        if (!ground || !water) {
             return
         }
 
@@ -57,6 +59,7 @@ export class MiniMap extends Component {
 
         // draw the ground from the groundrenderer
         context.drawImage(ground, 0, 0)
+        context.drawImage(water, 0, 0)
 
         // draw entities
         const entities = wl.getEntities()
