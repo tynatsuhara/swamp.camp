@@ -28,6 +28,7 @@ export class EventQueue {
                 EventQueue.instance.heap.getContents(true).map((data) => ({
                     ...data,
                     type: QueuedEventType[data.type], // print a human-readable type
+                    clockTime: WorldTime.clockTime(data.time),
                 }))
             )
     }
