@@ -1,4 +1,4 @@
-import { Component, Point } from "brigsby/dist"
+import { Component, Entity, Point } from "brigsby/dist"
 import { ImageRender } from "brigsby/dist/renderer"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
@@ -8,13 +8,20 @@ import { here } from "./locations/LocationManager"
 
 export class VisibleRegionMask extends Component {
     static get instance() {
-        return Singletons.getOrCreate(VisibleRegionMask)
+        return Singletons.getOrCreate(VisibleRegionMask, () =>
+            new Entity().addComponent(new VisibleRegionMask())
+        )
     }
 
     private buffer = 200 // pixels from beyond the edge of the map (useful for covering clipping things)
     private padding = 128 // distance from start of shadows to the edge of the screen
     private rings = 8
     private ringWidth = this.padding / this.rings
+
+    constructor() {
+        super()
+        this.refresh()
+    }
 
     refresh() {
         // only used for exteriors
@@ -84,15 +91,18 @@ export class VisibleRegionMask extends Component {
             context.putImageData(imageData, this.buffer, this.buffer)
             */
 
-        this.getRenderMethods = () => [
-            new ImageRender(
-                canvas,
-                new Point(0, 0),
-                new Point(canvas.width, canvas.height),
-                topLeftPosition.plus(new Point(-this.buffer, -this.buffer)),
-                new Point(canvas.width, canvas.height),
-                DarknessMask.DEPTH - 1 // make sure this goes below the darkness mask
-            ),
-        ]
+        this.getRenderMethods = () => {
+            console.log("dsafsgdh")
+            return [
+                new ImageRender(
+                    canvas,
+                    new Point(0, 0),
+                    new Point(canvas.width, canvas.height),
+                    topLeftPosition.plus(new Point(-this.buffer, -this.buffer)),
+                    new Point(canvas.width, canvas.height),
+                    DarknessMask.DEPTH - 1 // make sure this goes below the darkness mask
+                ),
+            ]
+        }
     }
 }
