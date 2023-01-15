@@ -92,7 +92,6 @@ export class VisibleRegionMask extends Component {
             */
 
         this.getRenderMethods = () => {
-            console.log("dsafsgdh")
             return [
                 new ImageRender(
                     canvas,
