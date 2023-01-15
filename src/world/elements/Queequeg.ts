@@ -103,10 +103,7 @@ export class Queequeg extends Simulatable {
     awake() {
         this.widdershins = this.entity.addComponent(
             DudeAnimationUtils.getCharacterIdleAnimation("widdershins").toComponent(
-                SpriteTransform.new({
-                    depth: this.depth - 1,
-                    mirrorX: true,
-                })
+                SpriteTransform.new({ mirrorX: true })
             )
         )
 
@@ -174,9 +171,10 @@ export class Queequeg extends Simulatable {
         }
 
         this.widdershins.transform.position = this.position.plus(pt(52, -13))
+        this.widdershins.transform.depth = this.depth - 1
 
         // the boat can only fit {positionsByIndex.length} passengers
-        const positionsByIndex = [pt(25, 5), pt(35, 0), pt(45, 3)]
+        const positionsByIndex = [pt(20, 5), pt(30, 0), pt(40, 3)]
 
         this.passengers.forEach((p, i) => {
             if (i >= positionsByIndex.length) {
