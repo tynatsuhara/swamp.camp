@@ -16,6 +16,7 @@ const getTips = () => [
     `When holding a torch, hold ${controls.getBlockString()} to light shit on fire. Be careful!`,
     `Melee attacks can be dodged by rolling with ${controls.getRollString()}.`,
     `Jump over fires and blackberries to avoid taking damage.`,
+    `Blackberries will quickly take over your camp if you don't take time to prune them.`,
     // `A well-timed blocked will stun most melee attackers.`, // TODO implement this
 ]
 
