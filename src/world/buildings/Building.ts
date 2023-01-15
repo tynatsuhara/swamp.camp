@@ -15,6 +15,9 @@ import { camp } from "../locations/LocationManager"
  *   1. Element type
  *   2. "Occupied points" which determines occupied squares in the world grid
  *   3. Misc metadata about the building
+ *
+ * TODO:
+ *   - Add a "construction" process
  */
 export abstract class BuildingFactory<
     Type extends ElementType,
