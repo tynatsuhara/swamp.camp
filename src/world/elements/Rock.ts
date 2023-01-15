@@ -18,6 +18,9 @@ import { NavMeshCollider } from "./NavMeshCollider"
 const MINING_AUDIO = loadAudio(Lists.range(0, 5).map((n) => `audio/impact/impactMining_00${n}.ogg`))
 const MINING_AUDIO_VOLUME = 0.4
 
+export const playMiningSound = (centerPos: Point) =>
+    Sounds.playAtPoint(Lists.oneOf(MINING_AUDIO), MINING_AUDIO_VOLUME, centerPos)
+
 export class RockFactory extends ElementFactory<ElementType.ROCK> {
     readonly dimensions = new Point(1, 1)
 
@@ -71,7 +74,7 @@ export class RockFactory extends ElementFactory<ElementType.ROCK> {
                         return Math.random() > 0.9 ? [Item.IRON] : [Item.ROCK]
                     }
                 },
-                () => Sounds.playAtPoint(Lists.oneOf(MINING_AUDIO), MINING_AUDIO_VOLUME, centerPos),
+                () => playMiningSound(centerPos),
                 () => {}
             )
         )

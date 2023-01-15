@@ -1,6 +1,7 @@
 import { Component, pt } from "brigsby/dist"
 import { session } from "../../online/session"
 import { ElementType } from "../../world/elements/Elements"
+import { playMiningSound } from "../../world/elements/Rock"
 import { LocationType } from "../../world/locations/LocationManager"
 import { NPCSchedules } from "../ai/NPCSchedule"
 import { Dude } from "../Dude"
@@ -44,6 +45,7 @@ export class Villager extends Component {
                     dude.location.type === LocationType.MINE_INTERIOR
                 ) {
                     dude.updateAttacking(true)
+                    playMiningSound(dude.standingPosition)
                 }
                 return 2_000
             }, Math.random() * 2_000)
