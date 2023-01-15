@@ -1,4 +1,4 @@
-import { Component, Entity, Point } from "brigsby/dist"
+import { Component, debug, Entity, Point } from "brigsby/dist"
 import { ImageRender } from "brigsby/dist/renderer"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
@@ -92,6 +92,9 @@ export class VisibleRegionMask extends Component {
             */
 
         this.getRenderMethods = () => {
+            if (debug.disableVisibleRegionMask) {
+                return []
+            }
             return [
                 new ImageRender(
                     canvas,
