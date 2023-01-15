@@ -13,7 +13,7 @@ import { VILLAGER_DIALOGUE } from "./VillagerDialogue"
 export const EMPTY_DIALOGUE = "-"
 
 export class DialogueInstance {
-    private _lines: string[] | (() => string[])
+    private _lines: string[] | (() => string[]) | undefined
     get lines() {
         if (typeof this._lines === "function") {
             this._lines = this._lines()
@@ -33,7 +33,7 @@ export class DialogueInstance {
      *                If the function returns a Dialogue, that will then be prompted.
      */
     constructor(
-        lines: string[] | (() => string[]),
+        lines: string[] | (() => string[]) | undefined,
         next: () => void | NextDialogue,
         options: DialogueOption[],
         indicator: string = DudeInteractIndicator.NONE
@@ -43,6 +43,12 @@ export class DialogueInstance {
         this.options = options.filter((o) => !!o)
         this.indicator = indicator
     }
+}
+
+// When processed by DialogueDisplay, immediately loads the next dialogue
+// Useful for when you want to show a next dialogue without any interstitial text or options
+export const redirectDialogue = (next: () => NextDialogue) => {
+    return new DialogueInstance(undefined, next, [], DudeInteractIndicator.NONE)
 }
 
 // Shorthand functions for creating dialogue

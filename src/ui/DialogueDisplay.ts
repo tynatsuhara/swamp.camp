@@ -124,6 +124,13 @@ export class DialogueDisplay extends Component {
     startDialogue(dialogueSource: DialogueSource) {
         this.dialogueSource = dialogueSource
         this.dialogue = getDialogue(dialogueSource.dialogue)
+
+        // redirect case
+        if (!this.dialogue.lines) {
+            this.completeSourceDialogue(this.dialogue.next)
+            return
+        }
+
         this.lineIndex = 0
 
         this.lineTypers = this.dialogue.lines.map(
