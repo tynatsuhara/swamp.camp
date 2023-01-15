@@ -24,6 +24,10 @@ export class MultiTypeResidence extends Residence {
         return this.residents
     }
 
+    getResidentUUIDs = () => {
+        return Object.values(this.residents).flatMap((values) => values)
+    }
+
     hasCapacity = (type: DudeType) => {
         const capacityForType = this.capacity[type] ?? 0
         const currentlyFilled = this.residents[type] ?? []

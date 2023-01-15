@@ -99,7 +99,7 @@ export class HouseFactory extends BuildingFactory<ElementType.HOUSE> {
 
         const save: () => HouseData = () => ({
             destinationUUID,
-            residents: residence.getResidents(),
+            residents: residence.getResidentUUIDs(),
         })
 
         return e.addComponent(new ElementComponent(this.type, pos, save))

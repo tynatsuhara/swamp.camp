@@ -18,7 +18,7 @@ export class SingleTypeResidence extends Residence {
         this.residents = residents
     }
 
-    getResidents = () => this.residents
+    getResidentUUIDs = () => this.residents
 
     hasCapacity = (type: DudeType) => type === this.type && this.residents.length < this.capacity
 

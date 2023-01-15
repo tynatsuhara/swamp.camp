@@ -15,4 +15,6 @@ export abstract class Residence extends Component {
     abstract claimPendingSlot: (type: DudeType, uuid: string) => void
 
     abstract evictResident: (uuid: string) => void
+
+    abstract getResidentUUIDs: () => string[]
 }
