@@ -68,10 +68,14 @@ export class LocationManager {
                     })
             },
 
-            bulldoze: (type: ElementType) => {
+            bulldoze: (type: ElementType, pct = 1) => {
                 here()
                     .getElementsOfType(type)
-                    .forEach((el) => here().removeElementLocally(el))
+                    .forEach((el) => {
+                        if (Math.random() < pct) {
+                            here().removeElementLocally(el)
+                        }
+                    })
             },
 
             listElements: (type: ElementType) => {
