@@ -66,27 +66,25 @@ export class MiniMap extends Component {
         const mapOffset = (wl.size / 2) * TILE_SIZE
         entities
             .filter((e) => e.getComponent(ElementComponent) || e.getComponent(GroundComponent))
-            .forEach((ec) => {
+            .flatMap((ec) =>
                 ec.components
                     .filter((c) => c?.enabled)
-                    .forEach((c) => {
-                        c.getRenderMethods()
-                            .filter((rm) => rm instanceof ImageRender)
-                            .forEach((rm) => {
-                                const render = rm as ImageRender
-                                context.drawImage(
-                                    render.source,
-                                    render.sourcePosition.x,
-                                    render.sourcePosition.y,
-                                    render.sourceDimensions.x,
-                                    render.sourceDimensions.y,
-                                    render.position.x + mapOffset,
-                                    render.position.y + mapOffset,
-                                    render.dimensions.x,
-                                    render.dimensions.y
-                                )
-                            })
-                    })
+                    .flatMap((c) => c.getRenderMethods().filter((rm) => rm instanceof ImageRender))
+            )
+            .sort((a, b) => a.depth - b.depth)
+            .forEach((rm) => {
+                const render = rm as ImageRender
+                context.drawImage(
+                    render.source,
+                    render.sourcePosition.x,
+                    render.sourcePosition.y,
+                    render.sourceDimensions.x,
+                    render.sourceDimensions.y,
+                    render.position.x + mapOffset,
+                    render.position.y + mapOffset,
+                    render.dimensions.x,
+                    render.dimensions.y
+                )
             })
 
         // Draw the scaled-down canvas
@@ -151,7 +149,8 @@ export class MiniMap extends Component {
                     const hex = getHex(imageData.data[i], imageData.data[i + 1], imageData.data[2])
                     hexStrings.push(hex)
                     // weigh other colors higher than grass color to show non-nature things on the map
-                    if (hex !== Color.GREEN_5) {
+                    if (hex !== Color.GREEN_5 && hex !== Color.GREEN_6) {
+                        hexStrings.push(hex)
                         hexStrings.push(hex)
                     }
                 }
