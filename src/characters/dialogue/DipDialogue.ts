@@ -9,6 +9,7 @@ import { QueuedEventType } from "../../world/events/QueuedEvent"
 import { here } from "../../world/locations/LocationManager"
 import { TimeUnit } from "../../world/TimeUnit"
 import { WorldTime } from "../../world/WorldTime"
+import { DudeType } from "../DudeType"
 import {
     dialogue,
     DialogueOption,
@@ -95,7 +96,8 @@ export const DIP_INTRO_DIALOGUE: DialogueSet = {
                 () => {
                     inv().addItem(Item.TENT, 1, { color: "blue" })
                     EventQueue.instance.addEvent({
-                        type: QueuedEventType.HERALD_ARRIVAL,
+                        type: QueuedEventType.NEW_VILLAGERS_ARRIVAL,
+                        dudeTypes: [DudeType.HERALD],
                         time: WorldTime.instance.tomorrow(TimeUnit.HOUR * 7),
                     })
                     saveAfterDialogueStage()

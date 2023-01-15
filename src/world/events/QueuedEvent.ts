@@ -3,7 +3,6 @@ import { DudeFaction, DudeFactory } from "../../characters/DudeFactory"
 import { DudeSpawner } from "../../characters/DudeSpawner"
 import { DudeType } from "../../characters/DudeType"
 import { NPC } from "../../characters/NPC"
-import { Berto } from "../../characters/types/Berto"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { NotificationDisplay, Notifications } from "../../ui/NotificationDisplay"
 import { Elements, ElementType } from "../elements/Elements"
@@ -17,9 +16,7 @@ import { EventQueue } from "./EventQueue"
 
 export enum QueuedEventType {
     SIMULATE_NPCS,
-    HERALD_ARRIVAL,
-    HERALD_DEPARTURE_CHECK,
-    HERALD_RETURN_WITH_NPC,
+    NEW_VILLAGERS_ARRIVAL,
     DAILY_SCHEDULE, // executes daily at midnight
     ORC_SEIGE,
     COLLECT_TAXES,
@@ -44,59 +41,10 @@ export const getEventQueueHandlers = (): {
         })
     },
 
-    [QueuedEventType.HERALD_ARRIVAL]: () => {
-        DudeFactory.instance.create(
-            DudeType.HERALD,
-            Queequeg.instance.entryTile.times(TILE_SIZE),
-            camp()
-        )
-        NotificationDisplay.instance.push(Notifications.NEW_VILLAGER)
-    },
-
-    [QueuedEventType.HERALD_DEPARTURE_CHECK]: (data) => {
-        const berto = camp().getDude(DudeType.HERALD)
-        if (!berto) {
-            return
-        }
-
-        const goalPosition = Queequeg.instance.entryTile.times(TILE_SIZE)
-        const bertoDistance = berto.standingPosition.distanceTo(goalPosition)
-
-        // check repeatedly until he's at the goal
-        if (bertoDistance > TILE_SIZE * 1.7) {
-            console.log("[Berto] en route -- potentially stuck")
-            EventQueue.instance.addEvent({
-                ...data,
-                time: WorldTime.instance.future({ minutes: 2 }),
-            })
-        } else {
-            const returnTime = WorldTime.instance.future({ hours: 12 })
-            Queequeg.instance.pushPassenger(berto)
-            EventQueue.instance.addEvent({
-                type: QueuedEventType.HERALD_RETURN_WITH_NPC,
-                time: returnTime,
-                dudeTypes: data.dudeTypes,
-            })
-            Queequeg.instance.depart()
-            console.log(
-                `[Berto] left the map and will return at ${WorldTime.clockTime(returnTime)}`
-            )
-        }
-
-        berto.entity.getComponent(Berto).updateSchedule()
-    },
-
-    [QueuedEventType.HERALD_RETURN_WITH_NPC]: (data) => {
+    [QueuedEventType.NEW_VILLAGERS_ARRIVAL]: (data) => {
         NotificationDisplay.instance.push(Notifications.NEW_VILLAGER)
 
-        const berto = camp().getDude(DudeType.HERALD)
-        if (!berto) {
-            throw new Error("berto should exist")
-        }
-
-        berto.entity.getComponent(Berto).updateSchedule()
-
-        const typesToSpawn = (data.dudeTypes || [DudeType.VILLAGER]) as DudeType[]
+        const typesToSpawn = data.dudeTypes as DudeType[]
 
         typesToSpawn.forEach((type) => {
             const dude = DudeFactory.instance.create(
@@ -117,12 +65,6 @@ export const getEventQueueHandlers = (): {
     },
 
     [QueuedEventType.QUEEQUEG_DISEMBARK_PASSENGERS]: () => {
-        const berto = camp().getDude(DudeType.HERALD)
-        if (!berto) {
-            throw new Error("berto should exist")
-        }
-        Queequeg.instance.removePassenger(berto)
-
         Queequeg.instance.getPassengers().forEach((dude) => {
             Queequeg.instance.removePassenger(dude)
         })

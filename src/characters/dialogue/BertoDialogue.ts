@@ -1,10 +1,12 @@
 import { Item } from "../../items/Items"
 import { saveManager } from "../../SaveManager"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
+import { TextIcon } from "../../ui/Text"
 import { SalePackage, TradeMenu } from "../../ui/TradeMenu"
+import { Queequeg } from "../../world/elements/Queequeg"
 import { EventQueue } from "../../world/events/EventQueue"
 import { QueuedEventType } from "../../world/events/QueuedEvent"
-import { here } from "../../world/locations/LocationManager"
+import { camp, LocationManager } from "../../world/locations/LocationManager"
 import { Residence } from "../../world/residences/Residence"
 import { TaxRate } from "../../world/TaxRate"
 import { WorldTime } from "../../world/WorldTime"
@@ -20,16 +22,20 @@ import {
     getExitText,
     NextDialogue,
     option,
+    redirectDialogue,
 } from "./Dialogue"
 
 export const BERTO_STARTING_DIALOGUE = "bert-start"
 const BERT_MENU = "bert-menu",
     BERT_ENTRYPOINT = "bert-menu-intro",
     BERT_VILLAGERS = "bert-villagers",
-    BERT_LEAVING = "bert-leaving",
+    BERT_REQUEST_CONVICTS = "bert-workers",
+    BERT_VILLAGERS_REQUESTED = "bert-vill-req",
     BERT_TAXES = "bert-taxes",
     BERT_TAXES_UPDATED = "bert-taxes-updated",
     BERT_ANNOUNCEMENTS = "bert-announcements"
+
+const KING_NAME = "The Honourable King Bob XVIII"
 
 const getItemsToSell = (): SalePackage[] => {
     return [
@@ -59,10 +65,11 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
     [BERTO_STARTING_DIALOGUE]: () =>
         dialogueWithOptions(
             [
-                "Good morrow! I, Sir Berto of Dube, present myself unto thee as an emissary of The Honourable King Bob XVIII.",
-                "Should thy choose to collect raw materials, I will purchase them on behalf of the Kingdom.",
-                "Upon receipt of a fee and construction of an appropriate dwelling, I can also bring tax-paying subjects to populate thy settlement.",
-                "Tradesmen! Knights! Worthless peons to scrub latrines and polish thine armor!",
+                `Good morrow! I, Sir Berto of Dube, present myself unto thee as an emissary of ${KING_NAME}.`,
+                "Whilst your Excellency clearly excels at adventuring and slaughtering beasts, mine own expertise lies in the logistics of governing settlements.",
+                "As thy subjects work to collect raw resources, I shall facilitate the transport and appropriate payment for such items on behalf of the Kingdom.",
+                "Upon construction of dwellings, I can send for tax-paying subjects to populate thy settlement.",
+                "Tradesmen! Knights! Worthless peons to build homes, scrub latrines, and polish thine armor!",
                 "Art thou interested in any of my services at the moment?",
             ],
             DudeInteractIndicator.IMPORTANT_DIALOGUE,
@@ -91,11 +98,11 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
             )
         }
         options.push(
-            new DialogueOption("What are you buying?", () => {
+            new DialogueOption("What is the Kingdom buying?", () => {
                 TradeMenu.instance.sell(getItemsToSell())
                 return new NextDialogue(BERT_ENTRYPOINT, false)
             }),
-            new DialogueOption("We need a new settler.", () => {
+            new DialogueOption("We need more settlers.", () => {
                 return new NextDialogue(BERT_VILLAGERS, true)
             })
         )
@@ -112,15 +119,16 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
         )
     },
     [BERT_VILLAGERS]: () => fetchNpcDialogue(),
-    [BERT_LEAVING]: () => {
-        let txt = ["I shall return posthaste!"]
+    [BERT_REQUEST_CONVICTS]: () => fetchConvictsDialogue(),
+    [BERT_VILLAGERS_REQUESTED]: () => {
+        const txt = ["I shall send word of your request to the Kingdom."]
         if (!saveManager.getState().hasRecruitedAnyVillagers) {
-            txt = [
-                "I shall return posthaste with thine first settler!",
-                "Upon my return, thou shalt have the option to establish a tax upon thy residents.",
-            ]
+            txt.push(
+                "Once thy new subjects arrive, return to me to establish a tax upon thy residents."
+            )
         }
         return dialogue(txt, () => {
+            Queequeg.instance.depart()
             saveManager.setState({ hasRecruitedAnyVillagers: true })
             return new NextDialogue(BERT_ENTRYPOINT, false)
         })
@@ -145,70 +153,153 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
     },
 }
 
+const fetchNPCs = (...types: DudeType[]) => {
+    EventQueue.instance.addEvent({
+        type: QueuedEventType.NEW_VILLAGERS_ARRIVAL,
+        time: WorldTime.instance.future({ hours: 24 }),
+        dudeTypes: types,
+    })
+}
+
 const fetchNpcDialogue = (): DialogueInstance => {
-    const allResidences = here()
-        .getElements()
-        .flatMap((e) => e.entity.getComponents(Residence))
+    if (!Queequeg.instance.isDocked) {
+        return dialogue([
+            "Our ship has already departed for the mainland. I shall not be addressing any immigration concerns until it has returned.",
+        ])
+    }
 
-    const houseableTypes = [DudeType.VILLAGER, DudeType.NUN, DudeType.CLERIC]
+    let introText = [
+        // "Thy camp contains suitable domiciles for several occupations.",
+        "Which class of settler dost thy request I procure from the Kingdom?",
+    ]
+    if (!saveManager.getState().hasRecruitedAnyVillagers) {
+        introText = [
+            "To begin thy quest to settle this land, thou shalt require the hands of menial labourers.",
+            "The Kingdom has an extensive supply of expendable prisoners, who are already accustomed to living in rough conditions.",
+            `${KING_NAME} has graciously offered thy first shipment of prisoners free of charge.`,
+            "For subsequent shipments, thou shall only be asked to pay a small transportation fee.",
+            "Shall I send for thy first shipment of settlers?",
+        ]
+    }
+    const options: DialogueOption[] = []
 
-    // Residences with capacity for each type
-    const residenceMap = houseableTypes.reduce((map, type) => {
-        const r = allResidences.filter((residence) => residence?.hasCapacity(type))
-        if (r.length > 0) {
-            map.set(type, r)
-        }
-        return map
-    }, new Map<DudeType, Residence[]>())
+    options.push(
+        new DialogueOption(`Bring me some convicts.`, () => {
+            return new NextDialogue(BERT_REQUEST_CONVICTS, true)
+        })
+    )
 
-    if (residenceMap.size === 0) {
+    // TODO fix this for residence type villagers
+
+    // const allResidences = here()
+    //     .getElements()
+    //     .flatMap((e) => e.entity.getComponents(Residence))
+
+    // const houseableTypes = [DudeType.VILLAGER, DudeType.NUN, DudeType.CLERIC]
+
+    // // Residences with capacity for each type
+    // const residenceMap = houseableTypes.reduce((map, type) => {
+    //     const r = allResidences.filter((residence) => residence?.hasCapacity(type))
+    //     if (r.length > 0) {
+    //         map.set(type, r)
+    //     }
+    //     return map
+    // }, new Map<DudeType, Residence[]>())
+
+    // if (residenceMap.size === 0) {
+    //     return dialogue(
+    //         [
+    //             "Alas, thy settlement does not have appropriate lodging for a new settler.",
+    //             "Return to me once thou hast constructed a dwelling.",
+    //         ],
+    //         () => new NextDialogue(BERT_ENTRYPOINT, false)
+    //     )
+    // }
+
+    // const fetchNPCWithResidence = (type: DudeType) => () => {
+    //     residenceMap.get(type)[0].setResidentPending(type)
+    //     fetchNPCs(type)
+    //     return new NextDialogue(BERT_LEAVING, true)
+    // }
+
+    // if (residenceMap.get(DudeType.NUN)) {
+    //     options.push(
+    //         new DialogueOption("The church needs a new nun.", fetchNPCWithResidence(DudeType.NUN))
+    //     )
+    // }
+
+    // if (residenceMap.get(DudeType.CLERIC)) {
+    //     options.push(
+    //         new DialogueOption(
+    //             "The church requires a cleric.",
+    //             fetchNPCWithResidence(DudeType.CLERIC)
+    //         )
+    //     )
+    // }
+
+    options.push(option(getExitText(), BERT_ENTRYPOINT, false))
+
+    return dialogueWithOptions(introText, DudeInteractIndicator.NONE, ...options)
+}
+
+const fetchConvictsDialogue = (): DialogueInstance => {
+    let villagerCost = 5
+    if (!saveManager.getState().hasRecruitedAnyVillagers) {
+        villagerCost = 0
+    }
+
+    if (saveManager.getState().coins < villagerCost) {
         return dialogue(
             [
-                "Alas, thy settlement does not have appropriate lodging for a new settler.",
-                "Return to me once thou hast constructed a dwelling.",
+                "The settlement's coffers are a wee bit bare at the moment.",
+                `You'll need at least ${TextIcon.COIN}${villagerCost} to procure a shipment of workers.`,
             ],
             () => new NextDialogue(BERT_ENTRYPOINT, false)
         )
     }
 
-    const fetchNpc = (type: DudeType) => () => {
-        residenceMap.get(type)[0].setResidentPending(type)
-        EventQueue.instance.addEvent({
-            type: QueuedEventType.HERALD_DEPARTURE_CHECK,
-            time: WorldTime.instance.time,
-            dudeTypes: [type],
-        })
-        here().getDude(DudeType.HERALD).entity.getComponent(Berto).updateSchedule()
-        return new NextDialogue(BERT_LEAVING, true)
+    const homedVillagerUUIDs = new Set(
+        camp()
+            .getElements()
+            .flatMap((e) => e.entity.getComponents(Residence))
+            .flatMap((res) => res.getResidentUUIDs())
+    )
+
+    const homelessVillagers = LocationManager.instance
+        .getLocations()
+        .flatMap((l) => l.getDudes())
+        .filter((d) => d.type === DudeType.VILLAGER)
+        .filter((d) => !homedVillagerUUIDs.has(d.uuid))
+
+    const canGetMoreGenericVillagers = homelessVillagers.length < 10
+
+    if (!canGetMoreGenericVillagers) {
+        return dialogue(
+            [
+                "At present, too many of thy subjects are sleeping in the mud.",
+                "Once thou hast constructed some residences, return to me to resume importing workers.",
+            ],
+            () => new NextDialogue(BERT_ENTRYPOINT, false)
+        )
     }
 
-    const introText = [
-        // "Thy camp contains suitable domiciles for several occupations.",
-        "Which class of settler dost thy request I procure from the Kingdom?",
-    ]
-    const options: DialogueOption[] = []
-
-    if (residenceMap.get(DudeType.VILLAGER)) {
-        options.push(new DialogueOption("Bring me a convict.", fetchNpc(DudeType.VILLAGER)))
-        // if (residenceMap.size === 1) {
-        //     introText = [
-        //         "At present, only felonious peons can be spared by The King.",
-        //         "Shall I return to the Kingdom, bringing word that thou art requesting a settler?",
-        //     ]
-        // }
+    const completeOrder = () => {
+        // TODO play gold clink noise
+        saveManager.setState({ coins: saveManager.getState().coins - villagerCost })
+        fetchNPCs(DudeType.VILLAGER, DudeType.VILLAGER, DudeType.VILLAGER)
+        return new NextDialogue(BERT_VILLAGERS_REQUESTED, true)
     }
 
-    if (residenceMap.get(DudeType.NUN)) {
-        options.push(new DialogueOption("The church needs a new nun.", fetchNpc(DudeType.NUN)))
+    if (villagerCost === 0) {
+        return redirectDialogue(completeOrder)
     }
 
-    if (residenceMap.get(DudeType.CLERIC)) {
-        options.push(new DialogueOption("The church requires a cleric.", fetchNpc(DudeType.CLERIC)))
-    }
-
-    options.push(option(getExitText(), BERT_ENTRYPOINT, false))
-
-    return dialogueWithOptions(introText, DudeInteractIndicator.NONE, ...options)
+    return dialogueWithOptions(
+        [`Art thou willing to pay the fee of ${TextIcon.COIN}${villagerCost} for shipment?`],
+        DudeInteractIndicator.NONE,
+        new DialogueOption("Yes.", completeOrder),
+        option(getExitText(), BERT_ENTRYPOINT, false)
+    )
 }
 
 const adjustTaxRateDialogue = (): DialogueInstance => {
