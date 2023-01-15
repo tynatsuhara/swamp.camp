@@ -12,7 +12,7 @@ import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
 import { UIStateManager } from "./UIStateManager"
 
 export const Notifications: { [key: string]: Notification } = {
-    NEW_VILLAGER: { text: "Someone has arrived!", icon: "personsingle" },
+    NEW_VILLAGER: { text: "The ship has arrived!", icon: "ship" },
 }
 
 const OFFSET = new Point(-4, 4)
