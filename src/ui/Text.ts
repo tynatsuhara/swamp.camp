@@ -40,6 +40,7 @@ export enum TextIcon {
     FACE_NEUTRAL = "öc",
     FACE_HAPPY = "öd",
     FACE_VERY_HAPPY = "öe",
+    COIN = "öh",
 }
 
 const ICON_PLACEHOLDER_PREFIX = "ö"
@@ -62,6 +63,7 @@ const ICON_PLACEHOLDER_MAP: Record<TextIcon, Icon> = {
     [TextIcon.FACE_NEUTRAL]: "face-neutral",
     [TextIcon.FACE_HAPPY]: "face-happy1",
     [TextIcon.FACE_VERY_HAPPY]: "face-happy2",
+    [TextIcon.COIN]: "coin",
 }
 
 export const formatTextRows = (text: string, width: number) => {
