@@ -316,7 +316,10 @@ export class NPC extends Simulatable {
         // previous pausing parameters will only be cleared if pauseEveryMillis is falsey
         if (pauseEveryMillis) {
             const time = WorldTime.instance.time
-            if (time > this.roamNextUnpauseTime) {
+            const shouldNotPause = Ground.isWater(
+                this.dude.location.getGround(this.dude.tile)?.type
+            )
+            if (time > this.roamNextUnpauseTime || shouldNotPause) {
                 this.roamNextPauseTime = WorldTime.instance.time + pauseEveryMillis
                 this.roamNextUnpauseTime = this.roamNextPauseTime + pauseForMillis
             } else if (time > this.roamNextPauseTime) {
