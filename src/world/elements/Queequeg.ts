@@ -1,4 +1,4 @@
-import { Entity, Point, UpdateData } from "brigsby/dist"
+import { Entity, Point, pt, UpdateData } from "brigsby/dist"
 import { BoxCollider } from "brigsby/dist/collision"
 import { AnimatedSpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Lists, RepeatedInvoker } from "brigsby/dist/util"
@@ -21,7 +21,7 @@ type QueequegData = {
 }
 
 export class QueequegFactory extends ElementFactory<ElementType.QUEEQUEG> {
-    dimensions = new Point(6, 3)
+    dimensions = pt(6, 3)
 
     constructor() {
         super(ElementType.QUEEQUEG)
@@ -56,7 +56,7 @@ export class Queequeg extends Simulatable {
 
     private widdershins: AnimatedSpriteComponent
     private collider: BoxCollider
-    private colliderOffset = new Point(32, 20)
+    private colliderOffset = pt(32, 20)
     private dockedPositionX: number
     private atSeaPositionX: number
     private position: Point
@@ -80,13 +80,13 @@ export class Queequeg extends Simulatable {
         wl: Location
     ) {
         super()
-        this.entryTile = tilePoint.plus(new Point(4, 2))
+        this.entryTile = tilePoint.plus(pt(4, 2))
 
         this.dockedPositionX = dockedPositionX
         this.atSeaPositionX = atSeaPositionX
         this.docked = docked
 
-        this.position = new Point(docked ? dockedPositionX : atSeaPositionX, positionY)
+        this.position = pt(docked ? dockedPositionX : atSeaPositionX, positionY)
 
         this.start = () => {
             passengers.map((uuid) => Dude.get(uuid)).forEach((dude) => this.pushPassenger(dude))
@@ -105,7 +105,7 @@ export class Queequeg extends Simulatable {
             )
         )
 
-        this.collider = this.entity.addComponent(new BoxCollider(this.position, new Point(72, 20)))
+        this.collider = this.entity.addComponent(new BoxCollider(this.position, pt(72, 20)))
 
         // Make the ship bob up and down
         this.entity.addComponent(
@@ -126,18 +126,18 @@ export class Queequeg extends Simulatable {
                         Lists.oneOf([Color.WHITE, Color.BLUE_6]),
                         this.position.plus(
                             Lists.oneOf([
-                                new Point(35 + Math.random() * 10, 35),
-                                new Point(45 + Math.random() * 10, 36),
-                                new Point(55 + Math.random() * 10, 38),
-                                new Point(65 + Math.random() * 10, 40),
-                                new Point(75 + Math.random() * 10, 41),
-                                new Point(85 + Math.random() * 10, 41),
+                                pt(35 + Math.random() * 10, 35),
+                                pt(45 + Math.random() * 10, 36),
+                                pt(55 + Math.random() * 10, 38),
+                                pt(65 + Math.random() * 10, 40),
+                                pt(75 + Math.random() * 10, 41),
+                                pt(85 + Math.random() * 10, 41),
                             ])
                         ),
                         this.depth + 5,
                         400,
                         () => Point.ZERO,
-                        new Point(size, size)
+                        pt(size, size)
                     )
                 }
                 return 150
@@ -168,10 +168,10 @@ export class Queequeg extends Simulatable {
                 .minus(this.colliderOffset)
         }
 
-        this.widdershins.transform.position = this.position.plus(new Point(52, -13))
+        this.widdershins.transform.position = this.position.plus(pt(52, -13))
 
         // the boat can only fit {positionsByIndex.length} passengers
-        const positionsByIndex = [new Point(25, 5), new Point(35, 0)]
+        const positionsByIndex = [pt(25, 5), pt(35, 0), pt(45, 3)]
 
         this.passengers.forEach((p, i) => {
             if (i >= positionsByIndex.length) {
@@ -195,10 +195,10 @@ export class Queequeg extends Simulatable {
         const { position, depth } = this
         return [
             Tilesets.instance.largeSprites
-                .get(new Point(8, 0), new Point(this.width, 2))
+                .get(pt(8, 0), pt(this.width, 2))
                 .toImageRender(SpriteTransform.new({ position, depth: depth - 2 })),
             Tilesets.instance.largeSprites
-                .get(new Point(8, 2), new Point(this.width, 3))
+                .get(pt(8, 2), pt(this.width, 3))
                 .toImageRender(SpriteTransform.new({ position, depth: depth + 2 })),
         ]
     }
