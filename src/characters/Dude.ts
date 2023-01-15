@@ -1605,6 +1605,7 @@ export class Dude extends Component implements DialogueSource {
         type: DudeType[this.type],
         pos: this.standingPosition.toString(),
         weapon: WeaponType[this.weaponType],
+        dialogue: this.dialogue,
     })
 
     static get(uuid: string) {
