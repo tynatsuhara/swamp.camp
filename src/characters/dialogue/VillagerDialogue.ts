@@ -16,6 +16,7 @@ export const VILLAGER_DIALOGUE_ENTRYPOINT = "villager-start"
 export enum VillagerJob {
     MINE = "mine",
     HARVEST_WOOD = "chop",
+    DEFEND = "defend",
 }
 
 export const VILLAGER_DIALOGUE: DialogueSet = {
@@ -46,6 +47,10 @@ export const VILLAGER_DIALOGUE: DialogueSet = {
             new DialogueOption("Work on collecting lumber.", () => {
                 return setJob(VillagerJob.HARVEST_WOOD)
             }),
+            new DialogueOption("Keep watch over the town.", () => {
+                return setJob(VillagerJob.DEFEND)
+            }),
+            // TODO construction?
             new DialogueOption("Take some time off.", () => {
                 return setJob(undefined)
             }),

@@ -306,6 +306,9 @@ export class Dude extends Component implements DialogueSource {
         // Synchronized client->host functions
 
         const setWeapon = (type: WeaponType) => {
+            if (this.weaponType === type) {
+                return
+            }
             this.weapon?.delete()
             this._weapon = this.entity.addComponent(WeaponFactory.make(type, this.type))
             this._shield?.setOnBack(false) // keep em in sync
@@ -345,6 +348,9 @@ export class Dude extends Component implements DialogueSource {
         )
 
         const setShield = (type: ShieldType) => {
+            if (this.shieldType === type) {
+                return
+            }
             this.shield?.delete()
             this._shield = this.entity.addComponent(ShieldFactory.make(type, this.type))
             if (this._weapon?.isSheathed()) {
@@ -489,7 +495,7 @@ export class Dude extends Component implements DialogueSource {
         }
     }
 
-    update({ elapsedTimeMillis, input }: UpdateData) {
+    update({ elapsedTimeMillis }: UpdateData) {
         this.animation.transform.depth =
             this.manualDepth ?? this.collider.position.y + this.collider.dimensions.y
 
@@ -1598,6 +1604,7 @@ export class Dude extends Component implements DialogueSource {
         health: +this.health.toFixed(2),
         type: DudeType[this.type],
         pos: this.standingPosition.toString(),
+        weapon: WeaponType[this.weaponType],
     })
 
     static get(uuid: string) {

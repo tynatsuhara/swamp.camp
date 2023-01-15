@@ -94,6 +94,12 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             dude.setWeapon(WeaponType.AXE, -1)
 
             return camp()
+        } else if (job === VillagerJob.DEFEND) {
+            // side effect
+            console.log("club")
+            dude.setWeapon(WeaponType.CLUB, -1)
+
+            return camp()
         }
     }
 
