@@ -298,7 +298,7 @@ export class DudeFactory {
             case DudeType.VILLAGER: {
                 animationName = `prisoner${Math.ceil(Math.random() * 2)}`
                 maxHealth = 4
-                speed *= 0.6
+                speed *= 0.5 + Math.random() * 0.2
                 additionalComponents = [new NPC(), new Villager()]
                 dialogue = VILLAGER_DIALOGUE_ENTRYPOINT
                 break
