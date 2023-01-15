@@ -9,6 +9,7 @@ import { NPC } from "../../characters/NPC"
 import { Particles } from "../../graphics/particles/Particles"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Color } from "../../ui/Color"
+import { HUD } from "../../ui/HUD"
 import { Location } from "../locations/Location"
 import { Simulatable } from "../Simulatable"
 import { ElementComponent } from "./ElementComponent"
@@ -69,6 +70,10 @@ export class Queequeg extends Simulatable {
 
     // where NPCs should walk to
     readonly entryTile: Point
+
+    get isDocked() {
+        return this.docked
+    }
 
     constructor(
         tilePoint: Point,
@@ -205,10 +210,12 @@ export class Queequeg extends Simulatable {
 
     arrive() {
         this.docked = true
+        setTimeout(() => HUD.instance.miniMap.refresh(), 5_000)
     }
 
     depart() {
         this.docked = false
+        setTimeout(() => HUD.instance.miniMap.refresh(), 5_000)
     }
 
     simulate(duration: number): void {
