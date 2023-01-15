@@ -54,6 +54,7 @@ export const VILLAGER_DIALOGUE: DialogueSet = {
             new DialogueOption("Take some time off.", () => {
                 return setJob(undefined)
             }),
+            // TODO night shift?
             option(getExitText(), VILLAGER_DIALOGUE_ENTRYPOINT, false)
         )
     },

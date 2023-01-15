@@ -12,6 +12,7 @@ import { VillagerJob } from "../dialogue/VillagerDialogue"
 import { Dude } from "../Dude"
 import { DudeFaction } from "../DudeFactory"
 import { DudeType } from "../DudeType"
+import { ShieldType } from "../weapons/ShieldType"
 import { WeaponType } from "../weapons/WeaponType"
 import { NPCSchedules } from "./NPCSchedule"
 import { NPCTask } from "./NPCTask"
@@ -34,6 +35,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             // Go home!
             goalLocation = this.findHomeLocation(dude)
             dude.setWeapon(WeaponType.NONE, -1)
+            dude.setShield(ShieldType.NONE, -1)
         }
 
         if (goalLocation && dude.location !== goalLocation) {
@@ -85,20 +87,26 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
                 return
             }
 
-            // side effect
+            // side effects
             dude.setWeapon(WeaponType.PICKAXE, -1)
+            dude.setShield(ShieldType.NONE, -1)
 
             return LocationManager.instance.get(mines[0])
         } else if (job === VillagerJob.HARVEST_WOOD) {
-            // side effect
+            // side effects
             dude.setWeapon(WeaponType.AXE, -1)
+            dude.setShield(ShieldType.NONE, -1)
 
             return camp()
         } else if (job === VillagerJob.DEFEND) {
-            // side effect
+            // side effects
             dude.setWeapon(WeaponType.CLUB, -1)
+            dude.setShield(ShieldType.BASIC, -1)
 
             return camp()
+        } else if (!job) {
+            dude.setWeapon(WeaponType.NONE, -1)
+            dude.setShield(ShieldType.NONE, -1)
         }
     }
 
