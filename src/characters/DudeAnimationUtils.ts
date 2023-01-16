@@ -19,6 +19,8 @@ const maybeFilter = (characterAnimName: string, blob: any, anim: SpriteAnimation
                 ImageFilters.recolor([Color.PINK_2, color[0]], [Color.PINK_3, color[1]])
             )
         }
+    } else if (characterAnimName.startsWith("prisoner")) {
+        // TODO color variations
     }
 
     return anim

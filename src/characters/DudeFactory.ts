@@ -296,7 +296,7 @@ export class DudeFactory {
                 break
             }
             case DudeType.VILLAGER: {
-                animationName = `prisoner${Math.ceil(Math.random() * 2)}`
+                animationName = `prisoner${Math.ceil(Math.random() * 4)}`
                 maxHealth = 4
                 speed *= 0.5 + Math.random() * 0.2
                 additionalComponents = [new NPC(), new Villager()]
