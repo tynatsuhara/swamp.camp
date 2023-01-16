@@ -163,9 +163,12 @@ const fetchNPCs = (...types: DudeType[]) => {
 
 const fetchNpcDialogue = (): DialogueInstance => {
     if (!Queequeg.instance.isDocked) {
-        return dialogue([
-            "Our ship has already departed for the mainland. I shall not be addressing any immigration concerns until it has returned.",
-        ])
+        return dialogue(
+            [
+                "Our ship has already departed for the mainland. I shall not be addressing any immigration concerns until it has returned.",
+            ],
+            () => new NextDialogue(BERT_ENTRYPOINT, false)
+        )
     }
 
     let introText = [
