@@ -25,7 +25,7 @@ export class MineEntranceFactory extends BuildingFactory<ElementType.MINE_ENTRAN
         super(ElementType.MINE_ENTRANCE)
     }
 
-    make(wl: Location, pos: Point, data: Partial<SaveFormat>) {
+    makeBuilding(wl: Location, pos: Point, data: Partial<SaveFormat>) {
         const e = new Entity()
         const pixelPt = pos.times(TILE_SIZE)
 

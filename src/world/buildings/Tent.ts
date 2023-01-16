@@ -25,7 +25,7 @@ export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
         super(ElementType.TENT)
     }
 
-    make(
+    makeBuilding(
         wl: Location,
         pos: Point,
         { color = "taupe", destinationUUID = makeTentInterior(wl, color).uuid }

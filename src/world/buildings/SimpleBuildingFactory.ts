@@ -48,7 +48,7 @@ export class SimpleBuildingFactory<Type extends ElementType> extends BuildingFac
         this.doorHorizontalOffset = doorHorizontalOffset
     }
 
-    make(wl: Location, pos: Point, data: SimpleBuildingData) {
+    makeBuilding(wl: Location, pos: Point, data: SimpleBuildingData) {
         const e = new Entity()
 
         // the interior location UUID
