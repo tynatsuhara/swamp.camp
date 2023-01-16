@@ -192,6 +192,8 @@ export class Campfire extends Component implements DialogueSource {
             const interactingPlayer = Dude.get(dudeUUID)
             if (session.isHost()) {
                 if (logsTransferred === -1) {
+                    // set NONE first to make sure they always get a fully-lit torch
+                    interactingPlayer.setShield(ShieldType.NONE, -1)
                     interactingPlayer.setShield(ShieldType.TORCH, -1)
                 }
                 if (logsTransferred > 0) {
