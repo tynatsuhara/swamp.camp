@@ -173,6 +173,18 @@ export class Location {
         return groundComponent
     }
 
+    // TODO is this useful?
+    reloadElement(tile: Point) {
+        const element = this.getElement(tile)
+        if (!element) {
+            return
+        }
+        const type = element.type
+        const data = element.save()
+        this.removeElementAt(tile.x, tile.y)
+        this.addElement(type, tile, data)
+    }
+
     /**
      * Should only be called on hosts!
      */
