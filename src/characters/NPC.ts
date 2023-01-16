@@ -621,8 +621,14 @@ export class NPC extends Simulatable {
             this.pathFindingHeuristic,
             this.extraPathIsOccupiedFilter,
             (_, nextSquare) => {
-                const type = location.getGround(nextSquare)?.type
-                if (type === GroundType.LEDGE || Ground.isWater(type)) {
+                const ground = location.getGround(nextSquare)
+                const type = ground?.type
+                if (
+                    type === GroundType.LEDGE ||
+                    Ground.isWater(type) ||
+                    // don't encourage being off the map
+                    !ground
+                ) {
                     return 3
                 }
                 const element = location.getElement(nextSquare)
@@ -631,7 +637,7 @@ export class NPC extends Simulatable {
                 }
                 // TODO: Maybe add a fun fireproof enemy in the future :)
                 if (
-                    element?.entity?.getComponent(Burnable)?.isBurning ||
+                    element?.entity?.getComponent(Burnable)?.isBurningAt(nextSquare) ||
                     (element?.type === ElementType.CAMPFIRE &&
                         element.entity.getComponent(Campfire).isBurning)
                 ) {
