@@ -186,6 +186,9 @@ export abstract class AbstractPlayer extends Component {
     private pushingUntil = 0
 
     checkHotKeys(updateData: UpdateData) {
+        if (UIStateManager.instance.isMenuOpen) {
+            return
+        }
         controls.HOT_KEY_OPTIONS.forEach((hotKey) => {
             if (updateData.input.isKeyDown(hotKey)) {
                 const hotKeyItemIndex = this.dude.inventory.findIndex(
