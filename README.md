@@ -2,7 +2,7 @@
 
 ## roadmap
 
-https://trello.com/b/uqYKRQlp/swamp-camp
+https://www.notion.so/tynatsuhara/SWAMP-CAMP-6bff46a32b7e438cbd3329d5c1e09787
 
 ## development
 
