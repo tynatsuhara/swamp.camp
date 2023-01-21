@@ -107,7 +107,7 @@ export class NextDialogue {
      * @param dialogue the unique dialogue key
      * @param open true if the dialogue should be shown immediately
      */
-    constructor(dialogue: string, open: boolean = true) {
+    constructor(dialogue: string, open: boolean) {
         if (!dialogue) {
             throw new Error("dialogue can't be null")
         }

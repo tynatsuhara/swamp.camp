@@ -50,16 +50,19 @@ export const DIP_INTRO_DIALOGUE: DialogueSet = {
     [DIP_1]: () =>
         dialogue(
             ["I'm alright, just shaken up. You sure know how to handle that blade!"],
-            () => new NextDialogue(DIP_BEFRIEND)
+            () => new NextDialogue(DIP_BEFRIEND, true)
         ),
     [DIP_2]: () =>
-        dialogue(["I'm grateful, but I don't have much..."], () => new NextDialogue(DIP_BEFRIEND)),
+        dialogue(
+            ["I'm grateful, but I don't have much..."],
+            () => new NextDialogue(DIP_BEFRIEND, true)
+        ),
     [DIP_3]: () =>
         dialogue(
             [
                 "Swamp Lizard butt is an Orcish delicacy. My species has been hunted to extinction by those savages. I'm the only one left.",
             ],
-            () => new NextDialogue(DIP_BEFRIEND)
+            () => new NextDialogue(DIP_BEFRIEND, true)
         ),
 
     [DIP_BEFRIEND]: () =>
