@@ -1,4 +1,4 @@
-import { Point } from "brigsby/dist"
+import { debug, Entity, Point } from "brigsby/dist"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementFactory } from "../elements/ElementFactory"
 import { ElementType } from "../elements/Elements"
@@ -6,6 +6,7 @@ import { ElementUtils } from "../elements/ElementUtils"
 import { Ground } from "../ground/Ground"
 import { Location } from "../locations/Location"
 import { camp } from "../locations/LocationManager"
+import { ConstructionSite } from "./ConstructionSite"
 
 /**
  * At runtime, a building exterior is built with several components:
@@ -20,7 +21,7 @@ import { camp } from "../locations/LocationManager"
 export abstract class BuildingFactory<
     Type extends ElementType,
     SaveFormat extends object = object
-> extends ElementFactory<Type, SaveFormat> {
+> extends ElementFactory<Type, Partial<SaveFormat>> {
     canPlaceAtPos(wl: Location, pos: Point) {
         return ElementUtils.rectPoints(pos, this.dimensions)
             .map((pt) => wl.getGround(pt)?.type)
@@ -47,8 +48,17 @@ export abstract class BuildingFactory<
         wl: Location,
         pos: Point,
         data: Partial<SaveFormat>
-    ): ElementComponent<Type, SaveFormat> => {
+    ): ElementComponent<Type, Partial<SaveFormat>> => {
         // TODO: Add construction process
+
+        if (debug.enableBuilding) {
+            const isBuilt = !window["no_construct"]
+            if (isBuilt) {
+                const e = new Entity()
+                e.addComponent(new ConstructionSite(pos, this.dimensions))
+                return e.addComponent(new ElementComponent(this.type, pos, () => data))
+            }
+        }
 
         return this.makeBuilding(wl, pos, data)
     }

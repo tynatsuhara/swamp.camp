@@ -68,6 +68,7 @@ const KEYS = {
     hardwood4: new Point(9, 3),
     bench: new Point(18, 5),
     podium: new Point(23, 3),
+    trafficCone: new Point(56, 26),
 }
 
 export class OutdoorTileset extends SingleFileTileLoader<keyof typeof KEYS> {

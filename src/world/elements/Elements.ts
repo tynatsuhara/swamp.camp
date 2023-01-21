@@ -73,6 +73,7 @@ export type ElementDataFormat = {
 }
 
 export class Elements {
+    // TODO get rid of instance
     static get instance() {
         return Singletons.getOrCreate(Elements)
     }

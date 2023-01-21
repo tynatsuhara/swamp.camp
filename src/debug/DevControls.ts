@@ -16,8 +16,8 @@ import { pixelPtToTilePt } from "../graphics/Tilesets"
 import { session } from "../online/session"
 import { DrawMenu } from "../ui/DrawMenu"
 import { UIStateManager } from "../ui/UIStateManager"
-import { ElementType } from "../world/elements/Elements"
-import { Growable } from "../world/elements/Growable"
+import { BuildingFactory } from "../world/buildings/Building"
+import { Elements, ElementType } from "../world/elements/Elements"
 import { GroundType } from "../world/ground/Ground"
 import { camp, here, LocationManager } from "../world/locations/LocationManager"
 import { RadiantLocationGenerator } from "../world/locations/RadiantLocationGenerator"
@@ -178,15 +178,29 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     //         here().removeElementAt(x, y)
     //     },
     // ],
+    // [
+    //     InputKey.PERIOD,
+    //     "grow hovered growable",
+    //     (input) => {
+    //         const growable = here()
+    //             .getElement(pixelPtToTilePt(input.mousePos))
+    //             ?.entity.getComponent(Growable)
+    //         console.log(`growable = ${growable}`)
+    //         growable?.forceGrow()
+    //     },
+    // ],
     [
         InputKey.PERIOD,
-        "grow hovered growable",
+        "finish construction",
         (input) => {
-            const growable = here()
-                .getElement(pixelPtToTilePt(input.mousePos))
-                ?.entity.getComponent(Growable)
-            console.log(`growable = ${growable}`)
-            growable?.forceGrow()
+            window["no_construct"] = true
+            here()
+                .getElements()
+                .forEach((el) => {
+                    if (Elements.instance.getElementFactory(el.type) instanceof BuildingFactory) {
+                        here().reloadElement(el.pos)
+                    }
+                })
         },
     ],
 
@@ -240,6 +254,7 @@ debug.forceMapId ??= ""
 debug.extraSaveSlots ??= 0
 debug.showSaveLogs ??= false
 debug.disableVisibleRegionMask ??= false
+debug.enableBuilding ??= false
 
 const help = () => {
     let help = "dev controls (enable with debug.enableDevControls=true)"
