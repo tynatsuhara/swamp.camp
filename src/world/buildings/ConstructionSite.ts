@@ -1,9 +1,10 @@
-import { Component, Point, pt } from "brigsby/dist"
+import { AnonymousComponent, Component, Point, pt } from "brigsby/dist"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { startDonating } from "../../characters/dialogue/DonationBoxDialogue"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { ItemStack } from "../../items/Inventory"
 import { Item } from "../../items/Items"
+import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { getChestComponents } from "../elements/Chest"
 import { Location } from "../locations/Location"
 
@@ -32,16 +33,25 @@ export class ConstructionSite extends Component {
 
         const chestPos = pos.minus(pt(0.5)).plus(size.div(2)).times(TILE_SIZE)
 
+        const { components, closeAnimation } = getChestComponents(
+            wl,
+            chestPos,
+            () => {
+                startDonating({ onDonationComplete, itemsRequired })
+            },
+            () => !donationComplete
+        )
+
         this.awake = () => {
-            this.entity.addComponents(
-                getChestComponents(
-                    wl,
-                    chestPos,
-                    (onClose) => {
-                        startDonating({ onClose, onDonationComplete, itemsRequired })
+            this.entity.addComponents(components)
+            this.entity.addComponent(
+                new AnonymousComponent({
+                    update: () => {
+                        if (!DialogueDisplay.instance.isOpen) {
+                            closeAnimation()
+                        }
                     },
-                    () => !donationComplete
-                )
+                })
             )
         }
 
@@ -54,12 +64,6 @@ export class ConstructionSite extends Component {
                     })
                 )
             ),
-            // new RectRender({
-            //     depth: UIStateManager.UI_SPRITE_DEPTH,
-            //     position: pos.times(TILE_SIZE),
-            //     dimensions: size.times(TILE_SIZE),
-            //     color: Color.PINK_3,
-            // }),
         ]
     }
 }

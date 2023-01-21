@@ -15,7 +15,6 @@ const DONATION_DIALOGUE = "donate",
     DONATION_COMPLETED = "donate-completed"
 
 type DonationOptions = {
-    onClose: () => void
     onDonationComplete: () => void
     itemsRequired: ItemStack[]
 }
@@ -29,7 +28,7 @@ export const startDonating = (options: DonationOptions) => {
 
 export const DONATION_DIALOGUES: DialogueSet = {
     [DONATION_DIALOGUE]: () => {
-        const { onClose, onDonationComplete, itemsRequired } = currentOptions
+        const { onDonationComplete, itemsRequired } = currentOptions
 
         const hasRequiredMaterials = itemsRequired.every(
             (i) => player().inventory.getItemCount(i.item) > i.count
@@ -41,7 +40,6 @@ export const DONATION_DIALOGUES: DialogueSet = {
 
         const options = [
             new DialogueOption(DialogueConstants.CANCEL_TEXT, () => {
-                onClose()
                 return new NextDialogue(DONATION_DIALOGUE, false)
             }),
         ]
@@ -51,7 +49,6 @@ export const DONATION_DIALOGUES: DialogueSet = {
                 new DialogueOption("Deliver supplies", () => {
                     itemsRequired.forEach((i) => player().inventory.removeItem(i.item, i.count))
                     onDonationComplete()
-                    onClose()
                     return new NextDialogue(DONATION_COMPLETED, true)
                 })
             )
