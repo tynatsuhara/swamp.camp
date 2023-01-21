@@ -1,6 +1,4 @@
-import { saveManager } from "../../SaveManager"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
-import { player } from "../player"
 import { BED_DIALOGUES } from "./BedDialogue"
 import { BERTO_INTRO_DIALOGUE } from "./BertoDialogue"
 import { CAMPFIRE_DIALOGUES } from "./CampfireDialogue"
@@ -74,11 +72,6 @@ export const option = (
 ): DialogueOption => {
     return new DialogueOption(text, () => new NextDialogue(nextDialogue, open))
 }
-export const saveAfterDialogueStage = () => {
-    // save after a delay to account for the next dialogue stage being set
-    setTimeout(() => saveManager.autosave(), 500)
-}
-export const inv = () => player().inventory
 
 export const getExitText = () => "Never mind."
 

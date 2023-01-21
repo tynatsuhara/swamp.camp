@@ -10,16 +10,15 @@ import { here } from "../../world/locations/LocationManager"
 import { TimeUnit } from "../../world/TimeUnit"
 import { WorldTime } from "../../world/WorldTime"
 import { DudeType } from "../DudeType"
+import { player } from "../player/index"
 import {
     dialogue,
     DialogueOption,
     DialogueSet,
     dialogueWithOptions,
     getExitText,
-    inv,
     NextDialogue,
     option,
-    saveAfterDialogueStage,
 } from "./Dialogue"
 
 export const ROCKS_NEEDED_FOR_CAMPFIRE = 8
@@ -97,18 +96,17 @@ export const DIP_INTRO_DIALOGUE: DialogueSet = {
             return dialogue(
                 lines,
                 () => {
-                    inv().addItem(Item.TENT, 1, { color: "blue" })
+                    player().inventory.addItem(Item.TENT, 1, { color: "blue" })
                     EventQueue.instance.addEvent({
                         type: QueuedEventType.NEW_VILLAGERS_ARRIVAL,
                         dudeTypes: [DudeType.HERALD],
                         time: WorldTime.instance.tomorrow(TimeUnit.HOUR * 7),
                     })
-                    saveAfterDialogueStage()
                     return new NextDialogue(DIP_TENT_PLACED, false)
                 },
                 DudeInteractIndicator.IMPORTANT_DIALOGUE
             )
-        } else if (inv().getItemCount(Item.CAMPFIRE) > 0) {
+        } else if (player().inventory.getItemCount(Item.CAMPFIRE) > 0) {
             // campfire has been crafted
             return dialogue(
                 [
@@ -116,7 +114,7 @@ export const DIP_INTRO_DIALOGUE: DialogueSet = {
                 ],
                 () => new NextDialogue(DIP_MAKE_CAMPFIRE, false)
             )
-        } else if (inv().getItemCount(Item.ROCK) >= ROCKS_NEEDED_FOR_CAMPFIRE) {
+        } else if (player().inventory.getItemCount(Item.ROCK) >= ROCKS_NEEDED_FOR_CAMPFIRE) {
             // can craft
             return dialogueWithOptions(
                 [
