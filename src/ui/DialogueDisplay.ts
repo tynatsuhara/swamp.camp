@@ -50,6 +50,11 @@ export class DialogueDisplay extends Component {
             return
         }
 
+        if (controls.isCloseMenuButtonDown()) {
+            this.close()
+            return
+        }
+
         // NOTE: We don't allow the user to close dialogue because it might end up in a weird state
 
         const skipButtonClick = controls.isMenuClickDown() || controls.isInteractDown()
@@ -105,10 +110,11 @@ export class DialogueDisplay extends Component {
             this.dialogueSource.dialogue = EMPTY_DIALOGUE
             this.close()
         } else {
-            this.dialogueSource.dialogue = next.dialogue
             if (next.open) {
-                this.startDialogue(this.dialogueSource)
+                // When a dialogue doesn't terminate (isOpen=false), we don't update the dialogueSource
+                this.startDialogueInternal(this.dialogueSource, next.dialogue)
             } else {
+                this.dialogueSource.dialogue = next.dialogue
                 this.close()
             }
         }
@@ -122,8 +128,12 @@ export class DialogueDisplay extends Component {
     }
 
     startDialogue(dialogueSource: DialogueSource) {
+        this.startDialogueInternal(dialogueSource)
+    }
+
+    private startDialogueInternal(dialogueSource: DialogueSource, dialogueOverride?: string) {
         this.dialogueSource = dialogueSource
-        this.dialogue = getDialogue(dialogueSource.dialogue)
+        this.dialogue = getDialogue(dialogueOverride ?? dialogueSource.dialogue)
 
         // redirect case
         if (!this.dialogue.lines) {
