@@ -472,7 +472,6 @@ export class InventoryDisplay extends Component {
         const hotKeyPrefix = stack.metadata.hotKey
             ? `(${InputKeyString.for(stack.metadata.hotKey)}) `
             : ""
-        const count = stack.count > 1 ? " x" + stack.count : ""
 
         // Only allow actions when in the inventory menu
         const actions: ItemAction[] = this.tradingInv ? [] : getInventoryItemActions(hoverIndex)
@@ -487,8 +486,7 @@ export class InventoryDisplay extends Component {
 
         this.hoverTooltipString = [
             hotKeyPrefix,
-            item.displayName,
-            count,
+            stack.stackString(),
             ...actions.map((action, i) => `\n${interactButtonOrder[i][0]} to ${action.verb}`),
         ].join("")
 

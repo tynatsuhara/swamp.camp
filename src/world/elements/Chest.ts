@@ -53,7 +53,8 @@ export class ChestFactory extends ElementFactory<ElementType.CHEST, SaveData> {
 export const getChestComponents = (
     wl: Location,
     pos: Point,
-    onInteract: (onClose: () => void) => void
+    onInteract: (onClose: () => void) => void,
+    canInteract = () => true
 ): Component[] => {
     const animator: AnimatedSpriteComponent = new AnimatedSpriteComponent(
         [
@@ -78,7 +79,7 @@ export const getChestComponents = (
             animator.goToAnimation(0).play()
         },
         pt(0, -17),
-        (interactor) => interactor === player()
+        (interactor) => interactor === player() && canInteract()
     )
 
     const collider = new NavMeshCollider(wl, pos.times(TILE_SIZE).plus(pt(1, 9)), pt(14, 6))

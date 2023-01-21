@@ -2,6 +2,8 @@ import { Component, Point } from "brigsby/dist"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { startDonating } from "../../characters/dialogue/DonationBoxDialogue"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
+import { ItemStack } from "../../items/Inventory"
+import { Item } from "../../items/Items"
 import { getChestComponents } from "../elements/Chest"
 import { Location } from "../locations/Location"
 
@@ -16,11 +18,27 @@ export class ConstructionSite extends Component {
             pos.plusX(size.x - 1).plusY(size.y - 1),
         ]
 
+        // TODO
+        const itemsRequired: ItemStack[] = [
+            new ItemStack(Item.WOOD, 20),
+            new ItemStack(Item.ROCK, 10),
+        ]
+
+        let donationComplete = false
+        const onDonationComplete = () => {
+            donationComplete = true
+        }
+
         this.awake = () => {
             this.entity.addComponents(
-                getChestComponents(wl, pos, (onClose) => {
-                    startDonating(onClose)
-                })
+                getChestComponents(
+                    wl,
+                    pos,
+                    (onClose) => {
+                        startDonating({ onClose, onDonationComplete, itemsRequired })
+                    },
+                    () => !donationComplete
+                )
             )
         }
 

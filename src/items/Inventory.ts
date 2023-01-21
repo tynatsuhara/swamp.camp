@@ -38,6 +38,11 @@ export class ItemStack {
             doesMetadataMatch(other.metadata, this.metadata)
         )
     }
+
+    stackString() {
+        const count = this.count > 1 ? " x" + this.count : ""
+        return ITEM_METADATA_MAP[this.item].displayName + count
+    }
 }
 
 const doesMetadataMatch = (a: ItemStackMetadata, b: ItemStackMetadata) => {
@@ -53,6 +58,7 @@ export class Inventory {
     readonly uuid: string
     readonly allowTrading: boolean
     private stacks: ItemStack[]
+    // This doesn't currently take metadata into account
     private countMap = new Map<Item, number>()
 
     /**
