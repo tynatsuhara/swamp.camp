@@ -33,7 +33,7 @@ export class ChestFactory extends ElementFactory<ElementType.CHEST, SaveData> {
         }
 
         const e = new Entity(
-            getChestComponents(wl, pos, (onClose) =>
+            getChestComponents(wl, pos.times(TILE_SIZE), (onClose) =>
                 InventoryDisplay.instance.open(onClose, inventory)
             )
         )
@@ -52,7 +52,7 @@ export class ChestFactory extends ElementFactory<ElementType.CHEST, SaveData> {
  */
 export const getChestComponents = (
     wl: Location,
-    pos: Point,
+    pixelPos: Point,
     onInteract: (onClose: () => void) => void,
     canInteract = () => true
 ): Component[] => {
@@ -62,18 +62,15 @@ export const getChestComponents = (
             ChestAnimation.close("empty", () => animator.pause()),
         ],
         SpriteTransform.new({
-            position: pos.times(TILE_SIZE),
-            depth: pos.y * TILE_SIZE + TILE_SIZE,
+            position: pixelPos,
+            depth: pixelPos.y + TILE_SIZE,
         })
     )
 
     animator.pause()
 
     const interactable = new Interactable(
-        pos
-            .times(TILE_SIZE)
-            .plusX(TILE_SIZE / 2)
-            .plusY(10),
+        pixelPos.plusX(TILE_SIZE / 2).plusY(10),
         () => {
             onInteract(() => animator.goToAnimation(1).play())
             animator.goToAnimation(0).play()
@@ -82,7 +79,7 @@ export const getChestComponents = (
         (interactor) => interactor === player() && canInteract()
     )
 
-    const collider = new NavMeshCollider(wl, pos.times(TILE_SIZE).plus(pt(1, 9)), pt(14, 6))
+    const collider = new NavMeshCollider(wl, pixelPos.plus(pt(1, 9)), pt(14, 6))
 
     return [animator, interactable, collider]
 }

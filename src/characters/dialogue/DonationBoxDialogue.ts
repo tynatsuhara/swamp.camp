@@ -49,6 +49,7 @@ export const DONATION_DIALOGUES: DialogueSet = {
         if (hasRequiredMaterials) {
             options.unshift(
                 new DialogueOption("Deliver supplies", () => {
+                    itemsRequired.forEach((i) => player().inventory.removeItem(i.item, i.count))
                     onDonationComplete()
                     onClose()
                     return new NextDialogue(DONATION_COMPLETED, true)
