@@ -1,4 +1,4 @@
-import { Entity, Point, pt } from "brigsby/dist"
+import { Component, Entity, Point, pt } from "brigsby/dist"
 import { AnimatedSpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { ChestAnimation } from "../../characters/ChestAnimation"
 import { player } from "../../characters/player/index"
@@ -32,35 +32,11 @@ export class ChestFactory extends ElementFactory<ElementType.CHEST, SaveData> {
             inventory.load(data.i)
         }
 
-        const animator: AnimatedSpriteComponent = new AnimatedSpriteComponent(
-            [
-                ChestAnimation.open("empty", () => animator.pause()),
-                ChestAnimation.close("empty", () => animator.pause()),
-            ],
-            SpriteTransform.new({
-                position: pos.times(TILE_SIZE),
-                depth: pos.y * TILE_SIZE + TILE_SIZE,
-            })
+        const e = new Entity(
+            getChestComponents(wl, pos, (onClose) =>
+                InventoryDisplay.instance.open(onClose, inventory)
+            )
         )
-
-        animator.pause()
-
-        const interactable = new Interactable(
-            pos
-                .times(TILE_SIZE)
-                .plusX(TILE_SIZE / 2)
-                .plusY(10),
-            () => {
-                InventoryDisplay.instance.open(() => animator.goToAnimation(1).play(), inventory)
-                animator.goToAnimation(0).play()
-            },
-            pt(0, -17),
-            (interactor) => interactor === player()
-        )
-
-        const collider = new NavMeshCollider(wl, pos.times(TILE_SIZE).plus(pt(1, 9)), pt(14, 6))
-
-        const e = new Entity([animator, interactable, collider])
 
         return e.addComponent(
             new ElementComponent(this.type, pos, () => ({
@@ -69,4 +45,43 @@ export class ChestFactory extends ElementFactory<ElementType.CHEST, SaveData> {
             }))
         )
     }
+}
+
+/**
+ * A utility for creating interactice chests
+ */
+export const getChestComponents = (
+    wl: Location,
+    pos: Point,
+    onInteract: (onClose: () => void) => void
+): Component[] => {
+    const animator: AnimatedSpriteComponent = new AnimatedSpriteComponent(
+        [
+            ChestAnimation.open("empty", () => animator.pause()),
+            ChestAnimation.close("empty", () => animator.pause()),
+        ],
+        SpriteTransform.new({
+            position: pos.times(TILE_SIZE),
+            depth: pos.y * TILE_SIZE + TILE_SIZE,
+        })
+    )
+
+    animator.pause()
+
+    const interactable = new Interactable(
+        pos
+            .times(TILE_SIZE)
+            .plusX(TILE_SIZE / 2)
+            .plusY(10),
+        () => {
+            onInteract(() => animator.goToAnimation(1).play())
+            animator.goToAnimation(0).play()
+        },
+        pt(0, -17),
+        (interactor) => interactor === player()
+    )
+
+    const collider = new NavMeshCollider(wl, pos.times(TILE_SIZE).plus(pt(1, 9)), pt(14, 6))
+
+    return [animator, interactable, collider]
 }

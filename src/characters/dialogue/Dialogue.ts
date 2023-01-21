@@ -6,6 +6,7 @@ import { BERTO_INTRO_DIALOGUE } from "./BertoDialogue"
 import { CAMPFIRE_DIALOGUES } from "./CampfireDialogue"
 import { DIP_INTRO_DIALOGUE } from "./DipDialogue"
 import { DOCTOR_DIALOGUE } from "./DoctorDialogue"
+import { DONATION_DIALOGUES } from "./DonationBoxDialogue"
 import { GENERIC_DIALOGUE } from "./GenericDialogue"
 import { SPOOKY_VISITOR_DIALOGUE } from "./SpookyVisitorDialogue"
 import { VILLAGER_DIALOGUE } from "./VillagerDialogue"
@@ -135,6 +136,7 @@ export const getDialogue = (dialogue: string): DialogueInstance | undefined => {
         ...CAMPFIRE_DIALOGUES,
         ...VILLAGER_DIALOGUE,
         ...SPOOKY_VISITOR_DIALOGUE,
+        ...DONATION_DIALOGUES,
     }
 
     const dialogueSupplier = set[dialogue]

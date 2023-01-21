@@ -1,9 +1,12 @@
 import { Component, Point } from "brigsby/dist"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { startDonating } from "../../characters/dialogue/DonationBoxDialogue"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
+import { getChestComponents } from "../elements/Chest"
+import { Location } from "../locations/Location"
 
 export class ConstructionSite extends Component {
-    constructor(pos: Point, size: Point) {
+    constructor(wl: Location, pos: Point, size: Point) {
         super()
 
         const corners = [
@@ -12,6 +15,14 @@ export class ConstructionSite extends Component {
             pos.plusY(size.y - 1),
             pos.plusX(size.x - 1).plusY(size.y - 1),
         ]
+
+        this.awake = () => {
+            this.entity.addComponents(
+                getChestComponents(wl, pos, (onClose) => {
+                    startDonating(onClose)
+                })
+            )
+        }
 
         this.getRenderMethods = () => [
             ...corners.map((c) =>

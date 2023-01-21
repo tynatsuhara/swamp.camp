@@ -55,7 +55,7 @@ export abstract class BuildingFactory<
             const isBuilt = !window["no_construct"]
             if (isBuilt) {
                 const e = new Entity()
-                e.addComponent(new ConstructionSite(pos, this.dimensions))
+                e.addComponent(new ConstructionSite(wl, pos, this.dimensions))
                 return e.addComponent(new ElementComponent(this.type, pos, () => data))
             }
         }
