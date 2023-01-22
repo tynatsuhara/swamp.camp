@@ -35,8 +35,8 @@ export const DONATION_DIALOGUES: DialogueSet = {
         )
         const optionsStr = "\n" + itemsRequired.map((i) => i.stackString()).join("\n")
         const str = hasRequiredMaterials
-            ? `You have the supplies needed to begin construction:${optionsStr}`
-            : `Return with the following supplies to begin construction:${optionsStr}`
+            ? `You have all the supplies needed to begin construction:${optionsStr}`
+            : `Return with these supplies to begin construction:${optionsStr}`
 
         const options = [
             new DialogueOption(DialogueConstants.CANCEL_TEXT, () => {
