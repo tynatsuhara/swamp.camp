@@ -42,7 +42,7 @@ export abstract class BuildingFactory<
     ): ElementComponent<Type, SaveFormat>
 
     /**
-     * readonly to prevent overriding by subclasses
+     * readonly to make overriding by subclasses slightly more difficult
      */
     readonly make = (
         wl: Location,
