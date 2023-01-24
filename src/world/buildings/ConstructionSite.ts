@@ -9,7 +9,9 @@ import { getChestComponents } from "../elements/Chest"
 import { Location } from "../locations/Location"
 
 export class ConstructionSite extends Component {
-    constructor(wl: Location, pos: Point, size: Point) {
+    private built = false
+
+    constructor(wl: Location, pos: Point, size: Point, onBuildComplete: () => void) {
         super()
 
         const corners = [
@@ -29,6 +31,7 @@ export class ConstructionSite extends Component {
         let donationComplete = false
         const onDonationComplete = () => {
             donationComplete = true
+            onBuildComplete()
         }
 
         const chestPos = pos.minus(pt(0.5)).plus(size.div(2)).times(TILE_SIZE)

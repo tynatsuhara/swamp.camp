@@ -84,7 +84,7 @@ export const getInventoryItemActions = (playerInvIndex: number): ItemAction[] =>
     }
 
     if (item.consumable) {
-        const { verb, fn: consumeFn } = item.consumable
+        const { verb } = item.consumable
         actions.push({
             verb,
             actionFn: () => {

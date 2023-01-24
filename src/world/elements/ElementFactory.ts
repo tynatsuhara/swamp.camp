@@ -44,7 +44,7 @@ export abstract class ElementFactory<Type extends ElementType, SaveFormat extend
         return true
     }
 
-    itemMetadataToSaveFormat(metadata: ItemMetadata): SaveFormat {
+    itemMetadataToSaveFormat(metadata: ItemMetadata): Partial<SaveFormat> {
         // factories should override if they can be instantiated
         // from an item and depend on unique item metadata
         return undefined

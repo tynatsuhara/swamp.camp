@@ -1,4 +1,5 @@
 import { debug, Entity, Point } from "brigsby/dist"
+import { ItemMetadata } from "../../items/Items"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementFactory } from "../elements/ElementFactory"
 import { ElementType } from "../elements/Elements"
@@ -21,7 +22,7 @@ import { ConstructionSite } from "./ConstructionSite"
 export abstract class BuildingFactory<
     Type extends ElementType,
     SaveFormat extends object = object
-> extends ElementFactory<Type, Partial<SaveFormat>> {
+> extends ElementFactory<Type, SaveFormat> {
     canPlaceAtPos(wl: Location, pos: Point) {
         return ElementUtils.rectPoints(pos, this.dimensions)
             .map((pt) => wl.getGround(pt)?.type)
@@ -48,18 +49,31 @@ export abstract class BuildingFactory<
         wl: Location,
         pos: Point,
         data: Partial<SaveFormat>
-    ): ElementComponent<Type, Partial<SaveFormat>> => {
+    ): ElementComponent<Type, SaveFormat> => {
         // TODO: Add construction process
 
         if (debug.enableBuilding) {
-            const isBuilt = !window["no_construct"]
-            if (isBuilt) {
+            let underConstruction = data["underConstruction"]
+            const completeConstruction = () => {
+                // todo push dudes away like in PlaceElementFrame
+                underConstruction = undefined
+                wl.reloadElement(pos)
+            }
+
+            if (underConstruction) {
                 const e = new Entity()
-                e.addComponent(new ConstructionSite(wl, pos, this.dimensions))
-                return e.addComponent(new ElementComponent(this.type, pos, () => data))
+                e.addComponent(new ConstructionSite(wl, pos, this.dimensions, completeConstruction))
+                // @ts-ignore ugh
+                return e.addComponent(
+                    new ElementComponent(this.type, pos, () => ({ ...data, underConstruction }))
+                )
             }
         }
 
         return this.makeBuilding(wl, pos, data)
+    }
+
+    itemMetadataToSaveFormat(metadata: ItemMetadata) {
+        return { underConstruction: true } as unknown as Partial<SaveFormat>
     }
 }

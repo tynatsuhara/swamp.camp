@@ -82,8 +82,9 @@ export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
         return e.addComponent(new ElementComponent(ElementType.TENT, pos, () => data))
     }
 
-    itemMetadataToSaveFormat(metadata: ItemMetadata): TentData {
+    itemMetadataToSaveFormat(metadata: ItemMetadata): Partial<TentData> {
         return {
+            ...super.itemMetadataToSaveFormat(metadata),
             color: metadata.color,
             destinationUUID: metadata.destinationUUID,
         }
