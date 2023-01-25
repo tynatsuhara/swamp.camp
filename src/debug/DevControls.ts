@@ -26,7 +26,18 @@ import { WorldTime } from "../world/WorldTime"
 import { spawnMenu } from "./SpawnMenu"
 
 const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
-    [InputKey.BACKSPACE, "toggle profiler", () => (debug.showProfiler = !debug.showProfiler)],
+    [
+        InputKey.BACKSPACE,
+        "toggle profiler",
+        () => {
+            if (debug.showProfiler && !debug.showBigProfiler) {
+                debug.showBigProfiler = true
+            } else {
+                debug.showBigProfiler = false
+                debug.showProfiler = !debug.showProfiler
+            }
+        },
+    ],
     [
         InputKey.P,
         "show/hide spawn menu",

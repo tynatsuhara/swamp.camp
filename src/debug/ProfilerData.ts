@@ -11,7 +11,7 @@ import { prettyPrint } from "./JSON"
  */
 export class ProfilerData extends Component {
     update() {
-        if (!debug.showProfiler) {
+        if (!debug.showProfiler || !debug.showBigProfiler) {
             return
         }
 
