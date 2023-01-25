@@ -1600,10 +1600,10 @@ export class Dude extends Component implements DialogueSource {
     }
 
     getProfilerData = () => ({
-        uuid: this.uuid,
+        uuid: this.uuid.substring(0, 8),
         health: +this.health.toFixed(2),
         type: DudeType[this.type],
-        pos: this.standingPosition.toString(),
+        pos: this.standingPosition.apply(Math.floor).toString(),
         weapon: WeaponType[this.weaponType],
         dialogue: this.dialogue,
     })

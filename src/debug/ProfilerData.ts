@@ -35,6 +35,9 @@ export class ProfilerData extends Component {
                     controls.getWorldSpaceMousePos()
                 )
             })
-            .forEach((d) => profiler.showInfo(`dude: ${prettyPrint(d.getProfilerData())}`))
+            .forEach((d) => {
+                profiler.showInfo(`dude: ${prettyPrint(d.getProfilerData())}`)
+                profiler.showInfo(`blob: ${prettyPrint(d.blob)}`)
+            })
     }
 }
