@@ -24,7 +24,7 @@ const skinAndHairFilter = (blob: any) => {
 
     // side effect (it's easier to do it here than in the factory)
     blob.skinIndex ??= Math.ceil(Math.random() * (skinColors.length - 1))
-    blob.hairIndex = Math.ceil(Math.random() * (hairColors.length - 1))
+    blob.hairIndex ??= Math.ceil(Math.random() * (hairColors.length - 1))
 
     return ImageFilters.recolor(
         [defaultSkin, skinColors[blob.skinIndex]],
