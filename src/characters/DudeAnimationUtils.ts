@@ -6,6 +6,34 @@ import { Color } from "../ui/Color"
 import { PLUME_COLORS } from "../ui/PlumePicker"
 import { ChestAnimation } from "./ChestAnimation"
 
+const skinAndHairFilter = (blob: any) => {
+    const skinColors = [
+        Color.BROWN_1,
+        Color.BROWN_2,
+        Color.BROWN_3,
+        Color.BROWN_4,
+        Color.BROWN_5,
+        Color.BROWN_6,
+    ]
+    const hairColors = [Color.BLACK, Color.TAUPE_1, Color.TAUPE_2, Color.TAUPE_3]
+
+    const defaultSkin = Color.BROWN_4
+    const defaultSkinShadow = Color.BROWN_3
+    const defaultHair = Color.TAUPE_2
+    const defaultHairShadow = Color.TAUPE_1
+
+    // side effect (it's easier to do it here than in the factory)
+    blob.skinIndex ??= Math.ceil(Math.random() * (skinColors.length - 1))
+    blob.hairIndex = Math.ceil(Math.random() * (hairColors.length - 1))
+
+    return ImageFilters.recolor(
+        [defaultSkin, skinColors[blob.skinIndex]],
+        [defaultSkinShadow, skinColors[blob.skinIndex - 1]],
+        [defaultHair, hairColors[blob.hairIndex]],
+        [defaultHairShadow, hairColors[blob.hairIndex - 1]]
+    )
+}
+
 const maybeFilter = (characterAnimName: string, blob: any, anim: SpriteAnimation) => {
     if (!anim) {
         throw new Error(`no animation found for "${characterAnimName}"`)
@@ -20,7 +48,7 @@ const maybeFilter = (characterAnimName: string, blob: any, anim: SpriteAnimation
             )
         }
     } else if (characterAnimName.startsWith("prisoner")) {
-        // TODO color variations
+        return anim.filtered(skinAndHairFilter(blob))
     }
 
     return anim
