@@ -96,7 +96,7 @@ type FormatTextArgs = {
     alignment?: TextAlign
     lineSpacing?: number
     depth?: number
-    dropShadow?: boolean
+    dropShadow?: Color
 }
 
 export const formatText = (args: FormatTextArgs): RenderMethod[] => {
@@ -108,7 +108,7 @@ export const formatText = (args: FormatTextArgs): RenderMethod[] => {
                 ...args,
                 depth: args.depth - 1,
                 position: args.position.plusX(-1).plusY(1),
-                color: Color.RED_1,
+                color: args.dropShadow,
             })
         )
     }

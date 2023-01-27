@@ -8,7 +8,7 @@ import {
     pt,
     UpdateData,
 } from "brigsby/dist"
-import { BasicRenderComponent, TextRender } from "brigsby/dist/renderer"
+import { BasicRenderComponent } from "brigsby/dist/renderer"
 import {
     AnimatedSpriteComponent,
     NineSlice,
@@ -28,7 +28,7 @@ import { clientSyncFn } from "../online/syncUtils"
 import { saveManager } from "../SaveManager"
 import { Singletons } from "../Singletons"
 import { Color } from "./Color"
-import { TEXT_FONT, TEXT_SIZE } from "./Text"
+import { formatText } from "./Text"
 import { Tooltip } from "./Tooltip"
 import { UIStateManager } from "./UIStateManager"
 
@@ -594,8 +594,6 @@ export class InventoryDisplay extends Component {
             Math.floor(screenDimensions.y / 5)
         )
 
-        this.tradingInvOffset = this.offset.plusY(TILE_SIZE * 3.5)
-
         this.displayEntity = new Entity([
             // coins
             new AnimatedSpriteComponent(
@@ -603,20 +601,31 @@ export class InventoryDisplay extends Component {
                 new SpriteTransform(this.offset.plus(this.coinsOffset))
             ),
             new BasicRenderComponent(
-                new TextRender(
-                    `x${saveManager.getState().coins}`,
-                    new Point(9, 1).plus(this.offset).plus(this.coinsOffset),
-                    TEXT_SIZE,
-                    TEXT_FONT,
-                    Color.RED_6,
-                    UIStateManager.UI_SPRITE_DEPTH
-                )
+                ...formatText({
+                    text: `x${saveManager.getState().coins}`,
+                    position: new Point(9, 1).plus(this.offset).plus(this.coinsOffset),
+                    color: Color.RED_6,
+                    depth: UIStateManager.UI_SPRITE_DEPTH,
+                    dropShadow: Color.RED_2,
+                })
             ),
         ])
 
         this.renderInv(this.playerInv)
 
         if (this.tradingInv) {
+            this.tradingInvOffset = this.offset.plusY(TILE_SIZE * 4)
+            this.displayEntity.addComponent(
+                new BasicRenderComponent(
+                    ...formatText({
+                        text: "Chest",
+                        position: this.tradingInvOffset.plusY(-17),
+                        color: Color.WHITE,
+                        depth: UIStateManager.UI_SPRITE_DEPTH + 5,
+                        dropShadow: Color.RED_1,
+                    })
+                )
+            )
             this.renderInv(this.tradingInv)
         }
     }

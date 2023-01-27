@@ -60,7 +60,7 @@ export class TipDisplay extends Component {
             width: WIDTH,
             alignment: TextAlign.CENTER,
             depth: UIStateManager.UI_SPRITE_DEPTH + 5,
-            dropShadow: true,
+            dropShadow: Color.RED_1,
         })
     }
 }
