@@ -74,7 +74,7 @@ export class InventoryDisplay extends Component {
     private canAcceptInput: boolean
     private offset: Point
     private tooltip: Tooltip
-    private readonly coinsOffset = new Point(0, -18)
+    private readonly coinsOffset = new Point(-1, -18)
     private onClose: () => void
     private tradingInv: Inventory
     private tradingInvOffset: Point
@@ -649,7 +649,7 @@ export class InventoryDisplay extends Component {
                         text: "Chest",
                         position: this.tradingInvOffset.plusY(-17),
                         color: Color.WHITE,
-                        depth: UIStateManager.UI_SPRITE_DEPTH + 5,
+                        depth: UIStateManager.UI_SPRITE_DEPTH,
                         dropShadow,
                     })
                 )
