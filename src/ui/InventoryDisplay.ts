@@ -488,8 +488,9 @@ export class InventoryDisplay extends Component {
             ? `(${InputKeyString.for(stack.metadata.hotKey)}) `
             : ""
 
-        // Only allow actions when in the inventory menu
-        const actions: ItemAction[] = this.tradingInv ? [] : getInventoryItemActions(hoverIndex)
+        // Don't allow interactions with things in chests
+        const actions: ItemAction[] =
+            hoverInv === this.tradingInv ? [] : getInventoryItemActions(hoverIndex)
 
         this.checkSetHotKey(hoverIndex, item, updateData)
 
