@@ -595,7 +595,7 @@ export class InventoryDisplay extends Component {
             Math.floor(screenDimensions.y / 5)
         )
 
-        const coinCountShadow = Color.RED_2
+        const dropShadow = Color.RED_1
         const coinAnim = new AnimatedSpriteComponent(
             [Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)],
             new SpriteTransform(this.offset.plus(this.coinsOffset))
@@ -607,7 +607,7 @@ export class InventoryDisplay extends Component {
                 depth: coinAnim.transform.depth - 1,
             })
         )
-        coinAnimDropShadow.applyFilter(ImageFilters.tint(coinCountShadow))
+        coinAnimDropShadow.applyFilter(ImageFilters.tint(dropShadow))
 
         this.displayEntity = new Entity([
             // coins
@@ -619,7 +619,7 @@ export class InventoryDisplay extends Component {
                     position: new Point(9, 1).plus(this.offset).plus(this.coinsOffset),
                     color: Color.RED_6,
                     depth: UIStateManager.UI_SPRITE_DEPTH,
-                    dropShadow: coinCountShadow,
+                    dropShadow,
                 })
             ),
         ])
@@ -635,7 +635,7 @@ export class InventoryDisplay extends Component {
                         position: this.tradingInvOffset.plusY(-17),
                         color: Color.WHITE,
                         depth: UIStateManager.UI_SPRITE_DEPTH + 5,
-                        dropShadow: Color.RED_1,
+                        dropShadow,
                     })
                 )
             )
