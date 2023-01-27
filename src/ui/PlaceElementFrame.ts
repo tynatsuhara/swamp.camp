@@ -13,13 +13,11 @@ import { UIStateManager } from "./UIStateManager"
  * This is a separate component which exists in the game view instead of the UI view, since it aligns with world tile coordinates
  */
 export class PlaceElementFrame extends Component {
-    private readonly dimensions: Point
     private goodTiles: SpriteComponent[]
     private badTiles: SpriteComponent[]
 
-    constructor(dimensions: Point) {
+    constructor(private readonly dimensions: Point) {
         super()
-        this.dimensions = dimensions
         if (
             (this.dimensions.x === 1 && this.dimensions.y > 2) ||
             (this.dimensions.y === 1 && this.dimensions.x !== 1)

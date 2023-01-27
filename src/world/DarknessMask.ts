@@ -34,15 +34,13 @@ export class DarknessMask extends Component {
 
     private readonly context: CanvasRenderingContext2D
     private readonly canvas: HTMLCanvasElement
-    private readonly allowNightVision: boolean
 
-    constructor(allowNightVision: boolean) {
+    constructor(private readonly allowNightVision: boolean) {
         super()
         this.canvas = document.createElement("canvas")
         this.canvas.width = DarknessMask.size
         this.canvas.height = DarknessMask.size
         this.context = this.canvas.getContext("2d")
-        this.allowNightVision = allowNightVision
 
         this.reset(0, 0)
 

@@ -11,18 +11,8 @@ export class ElementComponent<
     Type extends ElementType,
     SaveFormat extends object = object
 > extends Component {
-    readonly type: Type
-    readonly pos: Point
-
-    constructor(type: Type, pos: Point, saveFn: () => SaveFormat) {
+    constructor(readonly type: Type, readonly pos: Point, readonly save: () => SaveFormat) {
         super()
-        this.type = type
-        this.pos = pos
-        this.save = saveFn
-    }
-
-    save(): SaveFormat {
-        throw new Error("aaaaahhh!")
     }
 
     delete() {

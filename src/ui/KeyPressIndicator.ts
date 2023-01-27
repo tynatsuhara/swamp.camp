@@ -7,13 +7,8 @@ import { TEXT_FONT, TEXT_SIZE } from "./Text"
 import { UIStateManager } from "./UIStateManager"
 
 export class KeyPressIndicator extends Component {
-    private readonly pos: Point
-    private readonly key: InputKey
-
-    constructor(pos: Point, key: InputKey) {
+    constructor(private readonly pos: Point, private readonly key: InputKey) {
         super()
-        this.pos = pos
-        this.key = key
     }
 
     getRenderMethods(): RenderMethod[] {

@@ -3,13 +3,8 @@ import { session } from "../../online/session"
 import { WorldTime } from "../WorldTime"
 
 export class Growable extends Component {
-    private nextGrowthTime: number
-    private growFn: () => number | void
-
-    constructor(nextGrowthTime: number, growFn: () => number | void) {
+    constructor(private nextGrowthTime: number, private readonly growFn: () => number | void) {
         super()
-        this.nextGrowthTime = nextGrowthTime
-        this.growFn = growFn
     }
 
     lateUpdate() {

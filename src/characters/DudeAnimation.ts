@@ -10,7 +10,6 @@ import { DudeAnimationUtils } from "./DudeAnimationUtils"
  * Wraps multiple animations and dude-animation-specific logic
  */
 export class DudeAnimation extends Component {
-    private dude: Dude
     private _animation: AnimatedSpriteComponent
     private _transform: SpriteTransform
     get transform() {
@@ -20,15 +19,11 @@ export class DudeAnimation extends Component {
         return this._animation.sprite
     }
 
-    readonly animationName: string
-
-    constructor(dude: Dude, characterAnimName: string) {
+    constructor(private dude: Dude, readonly animationName: string) {
         super()
-        this.dude = dude
-        this.animationName = characterAnimName
-        const idleAnim = DudeAnimationUtils.getCharacterIdleAnimation(characterAnimName, dude.blob)
-        const runAnim = DudeAnimationUtils.getCharacterWalkAnimation(characterAnimName, dude.blob)
-        const jumpAnim = DudeAnimationUtils.getCharacterJumpAnimation(characterAnimName, dude.blob)
+        const idleAnim = DudeAnimationUtils.getCharacterIdleAnimation(this.animationName, dude.blob)
+        const runAnim = DudeAnimationUtils.getCharacterWalkAnimation(this.animationName, dude.blob)
+        const jumpAnim = DudeAnimationUtils.getCharacterJumpAnimation(this.animationName, dude.blob)
         const height = idleAnim.getSprite(0).dimensions.y
         this._animation = new AnimatedSpriteComponent(
             [idleAnim, runAnim, jumpAnim],

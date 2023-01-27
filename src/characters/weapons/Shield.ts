@@ -23,11 +23,9 @@ export class Shield extends Component {
     private blockingActive = false
     private raisedPerc = 0 // for animation
     private timeToRaiseMs = 120
-    readonly type: ShieldType
 
-    constructor(type: ShieldType, spriteId: string, offsetFromCenter = Point.ZERO) {
+    constructor(readonly type: ShieldType, spriteId: string, offsetFromCenter = Point.ZERO) {
         super()
-        this.type = type
         this.offsetFromCenter = offsetFromCenter
         this.awake = () => {
             this.dude = this.entity.getComponent(Dude)

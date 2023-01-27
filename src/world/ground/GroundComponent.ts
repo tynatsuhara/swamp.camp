@@ -6,23 +6,13 @@ import { GroundType } from "./Ground"
  * Elements should no subclass this,
  */
 export class GroundComponent extends Component {
-    readonly type: GroundType
-    readonly tickExclude: boolean
-
     constructor(
-        type: GroundType,
-        saveFn: () => object = () => {
+        readonly type: GroundType,
+        readonly save: () => object = () => {
             return {}
         },
-        tickExclude = false
+        readonly tickExclude = false
     ) {
         super()
-        this.type = type
-        this.save = saveFn
-        this.tickExclude = tickExclude
-    }
-
-    save(): object {
-        throw new Error("yikes")
     }
 }

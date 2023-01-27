@@ -83,13 +83,7 @@ export interface DialogueSource {
 }
 
 export class DialogueOption {
-    readonly text: string
-    readonly next: () => void | NextDialogue
-
-    constructor(text: string, next: () => void | NextDialogue) {
-        this.text = text
-        this.next = next
-    }
+    constructor(readonly text: string, readonly next: () => void | NextDialogue) {}
 }
 
 export class NextDialogue {

@@ -4,18 +4,13 @@ import { Residence } from "./Residence"
 export class SingleTypeResidence extends Residence {
     private static readonly PENDING_RESIDENT = "pending"
 
-    readonly type: DudeType
-    readonly capacity: number
-    readonly locationUUID: string
-
-    private residents: string[]
-
-    constructor(type: DudeType, capacity: number, locationUUID: string, residents: string[]) {
+    constructor(
+        readonly type: DudeType,
+        readonly capacity: number,
+        readonly locationUUID: string,
+        private residents: string[]
+    ) {
         super()
-        this.type = type
-        this.capacity = capacity
-        this.locationUUID = locationUUID
-        this.residents = residents
     }
 
     getResidentUUIDs = () => this.residents

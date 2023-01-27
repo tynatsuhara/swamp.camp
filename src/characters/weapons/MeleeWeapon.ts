@@ -33,8 +33,6 @@ export type WeaponSpec = {
 let spriteCaches: Record<string, WeaponSpriteCache> = {}
 
 export class MeleeWeapon extends Weapon {
-    private spec: WeaponSpec
-
     private state: State = State.DRAWN
 
     private idleAnim: MeleeAnimation
@@ -42,9 +40,8 @@ export class MeleeWeapon extends Weapon {
     private attackAnim: MeleeAnimation
     private animationArgs: AnimationArgs
 
-    constructor(spec: WeaponSpec) {
+    constructor(private spec: WeaponSpec) {
         super()
-        this.spec = spec
         const { spriteId } = spec
 
         this.start = () => {

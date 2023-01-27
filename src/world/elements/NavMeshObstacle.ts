@@ -2,16 +2,11 @@ import { Component, Point } from "brigsby/dist"
 import { Location } from "../locations/Location"
 
 export class NavMeshObstacle extends Component {
-    private readonly location: Location
-    private readonly position: Point
-
     /**
      * @param position tile position
      */
-    constructor(location: Location, position: Point) {
+    constructor(private readonly location: Location, private readonly position: Point) {
         super()
-        this.location = location
-        this.position = position
 
         this.location.setOccupied(this.position, true)
     }

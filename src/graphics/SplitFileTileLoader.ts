@@ -3,11 +3,7 @@ import { SpriteAnimation, StaticSpriteSource } from "brigsby/dist/sprites"
 import { getImage } from "./Tilesets"
 
 export class SplitFileTileLoader {
-    private readonly dirPath: string
-
-    constructor(dirPath: string) {
-        this.dirPath = dirPath
-    }
+    constructor(private readonly dirPath: string) {}
 
     getTileSource(key: string): StaticSpriteSource {
         const image = getImage(`${this.dirPath}/${key}.png`)

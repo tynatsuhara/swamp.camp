@@ -10,15 +10,11 @@ export type ItemStackMetadata = ItemMetadata & {
 }
 
 export class ItemStack {
-    readonly item: Item
-    readonly count: number
-    readonly metadata: Readonly<ItemStackMetadata>
-
-    constructor(item: Item, count: number, metadata: ItemStackMetadata = {}) {
-        this.item = item
-        this.count = count
-        this.metadata = metadata
-    }
+    constructor(
+        readonly item: Item,
+        readonly count: number,
+        readonly metadata: ItemStackMetadata = {}
+    ) {}
 
     withCount(newCount: number) {
         return new ItemStack(this.item, newCount, this.metadata)

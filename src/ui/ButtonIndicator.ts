@@ -5,15 +5,12 @@ import { Tilesets } from "../graphics/Tilesets"
 import { UIStateManager } from "./UIStateManager"
 
 export class ButtonIndicator extends Component {
-    private readonly pos: Point
-    private readonly button: GamepadButton
-    private readonly depth: number
-
-    constructor(pos: Point, button: GamepadButton, depth = UIStateManager.UI_SPRITE_DEPTH) {
+    constructor(
+        private readonly pos: Point,
+        private readonly button: GamepadButton,
+        private readonly depth = UIStateManager.UI_SPRITE_DEPTH
+    ) {
         super()
-        this.pos = pos
-        this.button = button
-        this.depth = depth
     }
 
     getRenderMethods(): RenderMethod[] {

@@ -17,13 +17,11 @@ type TooltipPosition = "mouse" | "bottom-left"
  * TODO: Maybe make this a singleton on the Cursor class?
  */
 export class Tooltip extends Component {
-    private readonly positionMode: TooltipPosition
     private text: string[]
     private tiles: ImageRender[] = []
 
-    constructor(positionMode: TooltipPosition = "mouse") {
+    constructor(private readonly positionMode: TooltipPosition = "mouse") {
         super()
-        this.positionMode = positionMode
     }
 
     say(text: string) {

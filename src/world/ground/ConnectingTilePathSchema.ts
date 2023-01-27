@@ -14,14 +14,12 @@ const CORNER_DIMS = new Point(CORNER_SIZE, CORNER_SIZE)
  * Defines how a type of connecting tiles interacts with other types of connecting tiles.
  */
 export class ConnectingTilePathSchema extends ConnectingTileSchema {
-    private readonly type: GroundType
     private _cap: StaticSpriteSource
     private _single: StaticSpriteSource
     private _corners: StaticSpriteSource
 
-    constructor(type: GroundType) {
+    constructor(private readonly type: GroundType) {
         super()
-        this.type = type
     }
 
     // a tile with one connection (on the bottom)

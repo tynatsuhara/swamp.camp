@@ -95,7 +95,7 @@ export class CampfireFactory extends ElementFactory<ElementType.CAMPFIRE, SaveDa
 
             fire.enabled = logCount > 0
             // fireSize can be in range [1, 5]
-            fire.size = Math.ceil((logCount / Campfire.LOG_CAPACITY) * 5)
+            fire.radius = Math.ceil((logCount / Campfire.LOG_CAPACITY) * 5)
             audio.setMultiplier(logCount === 0 ? 0 : 1)
             const lightCenterPos = pos
                 .times(TILE_SIZE)

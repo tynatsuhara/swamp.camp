@@ -16,20 +16,21 @@ const INTERVAL = 5_000
 const TIME_UNTIL_DESTROY = 15_000
 
 export class Burnable extends RepeatedInvoker {
-    private pts: Point[]
     private burning: boolean
     private burnStart: number
-    private offset: Point
     private depth: number
     private lighting = false
     private timeToLight = 500 + Math.random() * 1000
-    private initialBurning: boolean
 
     get isBurning() {
         return this.burning
     }
 
-    constructor(initialBurning: boolean, pts: Point[], offset: Point = Point.ZERO) {
+    constructor(
+        private initialBurning: boolean,
+        private pts: Point[],
+        private offset: Point = Point.ZERO
+    ) {
         super(() => {
             if (this.burning && session.isHost()) {
                 // spread to adjacent squares
@@ -46,9 +47,6 @@ export class Burnable extends RepeatedInvoker {
             return INTERVAL
         }, INTERVAL + Math.random() * INTERVAL)
 
-        this.initialBurning = initialBurning
-        this.pts = pts
-        this.offset = offset
         this.depth = Math.max(...pts.map((pt) => pt.y + 1)) * TILE_SIZE
     }
 

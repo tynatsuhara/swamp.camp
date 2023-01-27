@@ -5,11 +5,8 @@ export class MainMenuButtonSection {
     static readonly LINE_SPACING = 16
 
     private readonly buttons: MainMenuButton[] = []
-    private readonly topCenter: Point
 
-    constructor(topCenter: Point) {
-        this.topCenter = topCenter
-    }
+    constructor(private readonly topCenter: Point) {}
 
     add(text: string, onClick: () => void, condition = true, onHover: () => void = () => {}) {
         if (condition) {

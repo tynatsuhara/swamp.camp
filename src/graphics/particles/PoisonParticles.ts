@@ -4,12 +4,8 @@ import { Color } from "../../ui/Color"
 import { Particles } from "./Particles"
 
 export class PoisonParticles extends RepeatedInvoker {
-    size: number
-
-    constructor(size: number, positionSupplier: () => Point, depthSupplier?: () => number) {
+    constructor(public size: number, positionSupplier: () => Point, depthSupplier?: () => number) {
         super(() => this.emit(positionSupplier, depthSupplier))
-
-        this.size = size
     }
 
     private emit(positionSupplier: () => Point, depthSupplier?: () => number) {

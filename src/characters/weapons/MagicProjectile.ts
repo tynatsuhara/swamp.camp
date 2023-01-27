@@ -4,16 +4,15 @@ import { here } from "../../world/locations/LocationManager"
 import { Dude } from "../Dude"
 
 class MagicProjectile extends Component {
-    constructor(centerPosition: Point, velocity: Point, attacker?: Dude) {
+    constructor(private centerPosition: Point, private velocity: Point, attacker?: Dude) {
         super()
+    }
+    update({ elapsedTimeMillis }) {
+        this.centerPosition = this.centerPosition.plus(this.velocity.times(elapsedTimeMillis))
+    }
 
-        this.update = ({ elapsedTimeMillis }) => {
-            centerPosition = centerPosition.plus(velocity.times(elapsedTimeMillis))
-        }
-
-        this.getRenderMethods = () => {
-            return [Tilesets.instance.explosions.getSprite(centerPosition)]
-        }
+    getRenderMethods() {
+        return [Tilesets.instance.explosions.getSprite(this.centerPosition)]
     }
 }
 

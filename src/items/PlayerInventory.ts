@@ -40,14 +40,10 @@ const SPECIAL_ITEMS: { [item: number]: SpecialItem } = {
 }
 
 export class PlayerInventory extends Inventory {
-    private playerUUID: string
-
-    constructor(playerUUID: string) {
+    constructor(private readonly playerUUID: string) {
         const syncIdPrefix = Dude.createSyncId(playerUUID, "iv")
 
         super(syncIdPrefix, false)
-
-        this.playerUUID = playerUUID
 
         const pushNotification = syncFn(`${syncIdPrefix}pn`, (item: Item, count: number) => {
             if (player().uuid === playerUUID && !InventoryDisplay.instance.isOpen) {

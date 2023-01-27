@@ -73,7 +73,7 @@ export class Torch extends Shield {
         // one-based index of the DIAMETERS array
         const size =
             DIAMETERS.length - Math.floor((DIAMETERS.length * (now - fireStart)) / LIFESPAN_MILLIS)
-        this.particles.size = size
+        this.particles.radius = size
         const diameter = DIAMETERS[size - 1]
 
         LightManager.instance.addLight(

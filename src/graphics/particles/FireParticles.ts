@@ -9,17 +9,18 @@ const FIRE_COLORS = [Color.RED_3, Color.RED_4, Color.RED_5]
 export class FireParticles extends RepeatedInvoker {
     private lastPos: Point
 
-    size: number
-
-    constructor(radius: number, positionSupplier: () => Point, depthSupplier?: () => number) {
+    constructor(
+        public radius: number,
+        positionSupplier: () => Point,
+        depthSupplier?: () => number
+    ) {
         super(() => this.emit(positionSupplier, depthSupplier))
 
-        this.size = radius
         this.lastPos = positionSupplier()
     }
 
     private emit(positionSupplier: () => Point, depthSupplier?: () => number) {
-        const size = this.size
+        const size = this.radius
         const fireBase = positionSupplier()
         const diff = this.lastPos.minus(fireBase)
         const velocity = diff.normalizedOrZero().times(FIRE_DRIFT_DISTANCE)
