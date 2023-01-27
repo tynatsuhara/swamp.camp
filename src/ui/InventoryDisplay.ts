@@ -20,6 +20,7 @@ import { player } from "../characters/player"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { prettyPrint } from "../debug/JSON"
+import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { getInventoryItemActions, ItemAction } from "../items/getInventoryItemActions"
 import { Inventory, ItemStack } from "../items/Inventory"
@@ -594,19 +595,31 @@ export class InventoryDisplay extends Component {
             Math.floor(screenDimensions.y / 5)
         )
 
+        const coinCountShadow = Color.RED_2
+        const coinAnim = new AnimatedSpriteComponent(
+            [Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)],
+            new SpriteTransform(this.offset.plus(this.coinsOffset))
+        )
+        const coinAnimDropShadow = new AnimatedSpriteComponent(
+            [Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)],
+            SpriteTransform.new({
+                position: this.offset.plus(this.coinsOffset.plusX(-1).plusY(1)),
+                depth: coinAnim.transform.depth - 1,
+            })
+        )
+        coinAnimDropShadow.applyFilter(ImageFilters.tint(coinCountShadow))
+
         this.displayEntity = new Entity([
             // coins
-            new AnimatedSpriteComponent(
-                [Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)],
-                new SpriteTransform(this.offset.plus(this.coinsOffset))
-            ),
+            coinAnim,
+            coinAnimDropShadow,
             new BasicRenderComponent(
                 ...formatText({
                     text: `x${saveManager.getState().coins}`,
                     position: new Point(9, 1).plus(this.offset).plus(this.coinsOffset),
                     color: Color.RED_6,
                     depth: UIStateManager.UI_SPRITE_DEPTH,
-                    dropShadow: Color.RED_2,
+                    dropShadow: coinCountShadow,
                 })
             ),
         ])
