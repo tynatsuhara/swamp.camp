@@ -88,15 +88,7 @@ export const formatTextRows = (text: string, width: number) => {
     return rows
 }
 
-export const formatText = ({
-    text,
-    position,
-    color = Color.RED_2,
-    width = Number.MAX_SAFE_INTEGER,
-    alignment = TextAlign.LEFT,
-    lineSpacing = 4,
-    depth = UIStateManager.UI_SPRITE_DEPTH + 1,
-}: {
+type FormatTextArgs = {
     text: string
     position: Point
     color?: Color
@@ -104,7 +96,35 @@ export const formatText = ({
     alignment?: TextAlign
     lineSpacing?: number
     depth?: number
-}): RenderMethod[] => {
+    dropShadow?: boolean
+}
+
+export const formatText = (args: FormatTextArgs): RenderMethod[] => {
+    const result = formatTextInternal(args)
+
+    if (args.dropShadow) {
+        result.push(
+            ...formatTextInternal({
+                ...args,
+                depth: args.depth - 1,
+                position: args.position.plusX(-1).plusY(1),
+                color: Color.RED_1,
+            })
+        )
+    }
+
+    return result
+}
+
+const formatTextInternal = ({
+    text,
+    position,
+    color = Color.RED_2,
+    width = Number.MAX_SAFE_INTEGER,
+    alignment = TextAlign.LEFT,
+    lineSpacing = 4,
+    depth = UIStateManager.UI_SPRITE_DEPTH + 1,
+}: FormatTextArgs): RenderMethod[] => {
     const rows: string[] = formatTextRows(text, width)
 
     const rowPosition = (r: string, i: number): Point => {

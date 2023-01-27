@@ -53,23 +53,14 @@ export class TipDisplay extends Component {
     }
 
     getRenderMethods() {
-        const depth = UIStateManager.UI_SPRITE_DEPTH + 5
-        const formatTextArgs = {
+        return formatText({
             text: `TIP: ${getTips()[getTipIndex()]}`,
             position: this.position,
             color: Color.WHITE,
             width: WIDTH,
             alignment: TextAlign.CENTER,
-            depth,
-        }
-        return [
-            ...formatText(formatTextArgs),
-            ...formatText({
-                ...formatTextArgs,
-                position: formatTextArgs.position.plusX(-1).plusY(1),
-                color: Color.RED_1,
-                depth: formatTextArgs.depth - 1,
-            }),
-        ]
+            depth: UIStateManager.UI_SPRITE_DEPTH + 5,
+            dropShadow: true,
+        })
     }
 }
