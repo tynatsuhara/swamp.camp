@@ -10,7 +10,7 @@ import { UIStateManager } from "./UIStateManager"
 const getTips = () => [
     `Sheath your weapon with ${controls.getSheathKeyString()} to move faster.`,
     `Blackberries are a good source of food — just try not to walk through them.`,
-    `Mushrooms provide more food as they grow — but they also get more aggressive.`,
+    `Mushrooms provide more food as they grow — but they also act more aggressive.`,
     `Some raw food can make you sick. You can cook food at campfires.`,
     `If you're on fire, rolling with ${controls.getRollString()} will extinguish it faster.`,
     `Use tools to collect resources more efficiently.`,
