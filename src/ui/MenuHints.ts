@@ -31,14 +31,15 @@ export class MenuHints extends Component {
         const showExit = () => show(controls.getCloseMenuButtonString(), "exit")
 
         if (InventoryDisplay.instance.isOpen) {
-            if (!InventoryDisplay.instance.isStackHeld) {
+            const { isHoveringItem, isStackHeld, isTrading } = InventoryDisplay.instance
+            if (isHoveringItem && !isStackHeld) {
                 show(controls.getInventoryStackPickUpOrDropString(), "pick up")
                 show(controls.getInventoryStackPickUpHalfOrDropOneString(), "pick up half")
-            } else {
+            } else if (isStackHeld) {
                 show(controls.getInventoryStackPickUpOrDropString(), "drop")
                 show(controls.getInventoryStackPickUpHalfOrDropOneString(), "drop one")
             }
-            if (InventoryDisplay.instance.isTrading && !InventoryDisplay.instance.isStackHeld) {
+            if (isTrading && !isStackHeld && isHoveringItem) {
                 show(controls.getInventorySwapString(), "swap")
             }
             showExit()

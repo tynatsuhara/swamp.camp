@@ -24,6 +24,10 @@ export class Tooltip extends Component {
         super()
     }
 
+    getText() {
+        return this.text
+    }
+
     say(text: string) {
         this.text = text.split("\n")
     }

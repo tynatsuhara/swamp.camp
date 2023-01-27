@@ -51,6 +51,8 @@ export class InventoryDisplay extends Component {
     private stackSprites: SpriteComponent[] = []
     private showingInv = false
     private hoverTooltipString: string
+    private hoveredInventry: Inventory
+    private hoveredInvIndex: number
 
     get isOpen() {
         return this.showingInv
@@ -61,6 +63,14 @@ export class InventoryDisplay extends Component {
     get isTrading() {
         return !!this.tradingInv
     }
+    get isHoveringItem() {
+        return (
+            !!this.hoveredInventry &&
+            (this.hoveredInventry !== this.heldStackInventory ||
+                this.hoveredInvIndex !== this.heldStackInvIndex)
+        )
+    }
+
     private canAcceptInput: boolean
     private offset: Point
     private tooltip: Tooltip
@@ -102,8 +112,12 @@ export class InventoryDisplay extends Component {
         }
 
         if (hoverIndex > -1 && hoverInv.getStack(hoverIndex)) {
+            this.hoveredInventry = hoverInv
+            this.hoveredInvIndex = hoverIndex
             this.checkMouseHoverActions(hoverInv, hoverIndex, updateData)
         } else {
+            this.hoveredInventry = undefined
+            this.hoveredInvIndex = -1
             this.hoverTooltipString = undefined
         }
 
