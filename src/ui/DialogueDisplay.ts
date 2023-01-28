@@ -41,7 +41,7 @@ export class DialogueDisplay extends Component {
     get isOpen() {
         return !!this.dialogue
     }
-    get source() {
+    get currentSource() {
         return this.dialogueSource
     }
 
@@ -133,7 +133,7 @@ export class DialogueDisplay extends Component {
 
     private startDialogueInternal(dialogueSource: DialogueSource, dialogueOverride?: string) {
         this.dialogueSource = dialogueSource
-        this.dialogue = getDialogue(dialogueOverride ?? dialogueSource.dialogue)
+        this.dialogue = getDialogue(dialogueOverride ?? dialogueSource.dialogue, dialogueSource)
 
         // redirect case
         if (!this.dialogue.lines) {

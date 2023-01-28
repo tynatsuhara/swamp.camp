@@ -1,5 +1,4 @@
 import { Lists } from "brigsby/dist/util/Lists"
-import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { Dude } from "../Dude"
 import {
@@ -14,21 +13,20 @@ import {
 export const VILLAGER_DIALOGUE_ENTRYPOINT = "villager-start"
 
 export enum VillagerJob {
+    NONE = "none",
     MINE = "mine",
     HARVEST_WOOD = "chop",
     DEFEND = "defend",
 }
 
 export const VILLAGER_DIALOGUE: DialogueSet = {
-    [VILLAGER_DIALOGUE_ENTRYPOINT]: () => {
-        // TODO add a different initial dialogue with a "!"
-
-        const villager: Dude = DialogueDisplay.instance.source as Dude
-
+    [VILLAGER_DIALOGUE_ENTRYPOINT]: (villager: Dude) => {
         const setJob = (job: VillagerJob | undefined) => {
             villager.blob["job"] = job
             return new NextDialogue(VILLAGER_DIALOGUE_ENTRYPOINT, false)
         }
+
+        const currentJob = villager?.blob["job"]
 
         return dialogueWithOptions(
             [
@@ -40,7 +38,7 @@ export const VILLAGER_DIALOGUE: DialogueSet = {
                     "At your service, Champion.",
                 ]),
             ],
-            DudeInteractIndicator.NONE,
+            currentJob ? DudeInteractIndicator.NONE : DudeInteractIndicator.QUESTION,
             new DialogueOption("Head down to the mines.", () => {
                 return setJob(VillagerJob.MINE)
             }),
@@ -52,7 +50,7 @@ export const VILLAGER_DIALOGUE: DialogueSet = {
             }),
             // TODO construction?
             new DialogueOption("Take some time off.", () => {
-                return setJob(undefined)
+                return setJob(VillagerJob.NONE)
             }),
             // TODO night shift?
             option(getExitText(), VILLAGER_DIALOGUE_ENTRYPOINT, false)

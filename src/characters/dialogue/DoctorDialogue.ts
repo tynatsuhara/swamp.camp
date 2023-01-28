@@ -1,5 +1,4 @@
 import { Item } from "../../items/Items"
-import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { SalePackage, TradeMenu } from "../../ui/TradeMenu"
 import { Dude } from "../Dude"
@@ -35,9 +34,7 @@ const getItemsToBuy = (): SalePackage[] => {
 }
 
 export const DOCTOR_DIALOGUE: DialogueSet = {
-    [DOCTOR_DIALOGUE_ENTRYPOINT]: () => {
-        const doctor: Dude = DialogueDisplay.instance.source as Dude
-
+    [DOCTOR_DIALOGUE_ENTRYPOINT]: (doctor: Dude) => {
         return dialogueWithOptions(
             ["I offer goods and services to keep the town healthy."],
             DudeInteractIndicator.NONE,

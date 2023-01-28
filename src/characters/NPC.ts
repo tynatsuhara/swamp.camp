@@ -152,7 +152,7 @@ export class NPC extends Simulatable {
 
         this.dude.attackState = AttackState.NOT_ATTACKING
 
-        if (DialogueDisplay.instance.source === this._dude) {
+        if (DialogueDisplay.instance.currentSource === this._dude) {
             // don't move when talking
             this._dude.move(
                 updateData.elapsedTimeMillis,

@@ -434,7 +434,7 @@ export class Dude extends Component implements DialogueSource {
                             !this.dialogue ||
                             this.dialogue === EMPTY_DIALOGUE ||
                             // we're already talking to them
-                            DialogueDisplay.instance.source === this ||
+                            DialogueDisplay.instance.currentSource === this ||
                             // NPC must be willing to talk based on their own logic
                             !this.entity.getComponent(NPC)?.canTalk()
                         ) {
@@ -483,7 +483,7 @@ export class Dude extends Component implements DialogueSource {
             this.doWhileLiving(() => {
                 if (this.dialogue) {
                     this.dialogueIndicator =
-                        getDialogue(this.dialogue)?.indicator ?? DudeInteractIndicator.NONE
+                        getDialogue(this.dialogue, this)?.indicator ?? DudeInteractIndicator.NONE
                 }
                 return 1_000
             })
@@ -1573,7 +1573,7 @@ export class Dude extends Component implements DialogueSource {
         if (
             !tile ||
             this.dialogueInteract?.isShowingUI ||
-            DialogueDisplay.instance.source === this
+            DialogueDisplay.instance.currentSource === this
         ) {
             return []
         } else {

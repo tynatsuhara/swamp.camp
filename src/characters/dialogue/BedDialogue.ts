@@ -1,4 +1,3 @@
-import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { Bed } from "../../world/elements/Bed"
 import { here } from "../../world/locations/LocationManager"
@@ -15,8 +14,7 @@ import { DialogueConstants } from "./DialogueConstants"
 export const BED_DIALOGUE = "bed"
 
 export const BED_DIALOGUES: DialogueSet = {
-    [BED_DIALOGUE]: () => {
-        const bed: Bed = DialogueDisplay.instance.source as Bed
+    [BED_DIALOGUE]: (bed: Bed) => {
         const completeDialogue = new NextDialogue(BED_DIALOGUE, false)
 
         const bedType = bed.isBedroll ? "bedroll" : "bed"

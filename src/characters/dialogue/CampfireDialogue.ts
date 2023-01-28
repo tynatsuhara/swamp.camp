@@ -3,7 +3,6 @@ import { Item } from "../../items/Items"
 import { session } from "../../online/session"
 import { saveManager } from "../../SaveManager"
 import { CraftingMenu } from "../../ui/CraftingMenu"
-import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { Campfire } from "../../world/elements/Campfire"
 import { RestPoint } from "../../world/elements/RestPoint"
@@ -17,10 +16,9 @@ export const CAMPFIRE_DIALOGUE = "campfire"
 export const CAMPFIRE_ADD_LOGS = "campfire-add-logs"
 
 export const CAMPFIRE_DIALOGUES: DialogueSet = {
-    [CAMPFIRE_DIALOGUE]: () => {
+    [CAMPFIRE_DIALOGUE]: (cf: Campfire) => {
         // the fire can be dead, almost dead, partially full, almost entirely full, or totally full
 
-        const cf: Campfire = DialogueDisplay.instance.source as Campfire
         const logCount = cf.logs
 
         const completeDialogue = (logsTransferred: number) => {
@@ -79,10 +77,8 @@ export const CAMPFIRE_DIALOGUES: DialogueSet = {
         )
     },
 
-    [CAMPFIRE_ADD_LOGS]: () => {
+    [CAMPFIRE_ADD_LOGS]: (cf: Campfire) => {
         // the fire can be dead, almost dead, partially full, almost entirely full, or totally full
-
-        const cf: Campfire = DialogueDisplay.instance.source as Campfire
         const logCount = cf.logs
         const playerLogCount = player().inventory.getItemCount(Item.WOOD)
         const logsYouCanAdd = Math.min(Campfire.LOG_CAPACITY - logCount, playerLogCount)

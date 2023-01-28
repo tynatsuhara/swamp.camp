@@ -87,28 +87,28 @@ export class DialogueOption {
 }
 
 export class NextDialogue {
-    readonly dialogue: string
-    readonly open: boolean
-
     /**
      * @param dialogue the unique dialogue key
      * @param open true if the dialogue should be shown immediately
      */
-    constructor(dialogue: string, open: boolean) {
+    constructor(readonly dialogue: string, readonly open: boolean) {
         if (!dialogue) {
             throw new Error("dialogue can't be null")
         }
-        this.dialogue = dialogue
-        this.open = open
     }
 }
 
-export type DialogueSet = { [key: string]: () => DialogueInstance | undefined }
+export type DialogueSet = {
+    [key: string]: (source: DialogueSource) => DialogueInstance | undefined
+}
 
 /**
  * @param dialogue the unique dialogue key
  */
-export const getDialogue = (dialogue: string): DialogueInstance | undefined => {
+export const getDialogue = (
+    dialogue: string,
+    source: DialogueSource
+): DialogueInstance | undefined => {
     if (dialogue === EMPTY_DIALOGUE) {
         return
     }
@@ -130,5 +130,5 @@ export const getDialogue = (dialogue: string): DialogueInstance | undefined => {
     if (!dialogueSupplier) {
         throw new Error("cannot find dialogue " + dialogue)
     }
-    return dialogueSupplier()
+    return dialogueSupplier(source)
 }

@@ -10,6 +10,8 @@ const getIcon = (indicator: string) => {
             return null
         case DudeInteractIndicator.IMPORTANT_DIALOGUE:
             return Tilesets.instance.oneBit.getTileAt(new Point(19, 25))
+        case DudeInteractIndicator.QUESTION:
+            return Tilesets.instance.oneBit.getTileAt(new Point(21, 25))
         case DudeInteractIndicator.ATTACKING_SOON:
             return Tilesets.instance.oneBit.getTileAt(new Point(27, 20))
         case DudeInteractIndicator.ATTACKING_NOW:
@@ -24,6 +26,7 @@ const cache = {}
 export const DudeInteractIndicator = {
     NONE: "",
     IMPORTANT_DIALOGUE: "!",
+    QUESTION: "?",
     ATTACKING_SOON: "o",
     ATTACKING_NOW: "O",
 
