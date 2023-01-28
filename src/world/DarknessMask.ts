@@ -103,6 +103,8 @@ export class DarknessMask extends Component {
     private readonly NIGHT_COLOR = this.colorFromString(Color.BLACK, 1)
     private readonly SUNRISE_COLOR = this.colorFromString(Color.PINK_3, 0.5)
     private readonly DAY_COLOR = this.colorFromString(Color.PINK_4, 0)
+    // TODO add alternate day colors during weather
+    // private readonly DAY_COLOR = this.colorFromString(Color.BLUE_2, 0.5)
     private readonly SUNSET_COLOR = this.colorFromString(Color.BLUE_4, 0.3)
 
     private updateColorForTime(time: number, darknessLevel: number | undefined) {
