@@ -83,7 +83,7 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => {
 
     const buildings: CraftingRecipeCategory = {
         icon: Tilesets.instance.oneBit.getTileAt(new Point(0, 19)),
-        name: "Buildings",
+        name: "Blueprints",
         recipes: [
             {
                 desc: "Houses one settler",
@@ -116,7 +116,7 @@ export const getCookingRecipes = (): CraftingRecipeCategory[] => {
         {
             // TODO: don't show icon if there's only one category?
             icon: Tilesets.instance.oneBit.getTileSource("bread"),
-            name: "Food",
+            name: "Foodstuffs",
             recipes: [
                 {
                     desc: "+2 health",
