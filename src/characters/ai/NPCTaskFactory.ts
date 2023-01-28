@@ -1,4 +1,5 @@
-import { NPCSchedule, NPCScheduleType } from "./NPCSchedule"
+import { NPC } from "../NPC"
+import { NPCScheduleType } from "./NPCSchedule"
 import { NPCTask } from "./NPCTask"
 import { NPCTaskFollowLeader } from "./NPCTaskFollowLeader"
 import { NPCTaskScheduleDefaultVillager } from "./NPCTaskScheduleDefaultVillager"
@@ -7,7 +8,8 @@ import { NPCTaskScheduleGoToSpot } from "./NPCTaskScheduleGoToSpot"
 import { NPCTaskScheduleRoam } from "./NPCTaskScheduleRoam"
 
 export class NPCTaskFactory {
-    static fromSchedule(schedule: NPCSchedule): NPCTask {
+    static fromSchedule(npc: NPC): NPCTask {
+        const schedule = npc.getSchedule()
         switch (schedule.type) {
             case NPCScheduleType.DO_NOTHING:
                 return null

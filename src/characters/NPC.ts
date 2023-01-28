@@ -240,7 +240,7 @@ export class NPC extends Simulatable {
     }
 
     private getScheduledTask(): NPCTask {
-        return NPCTaskFactory.fromSchedule(this.getSchedule())
+        return NPCTaskFactory.fromSchedule(this)
     }
 
     private clearExistingAIState() {
