@@ -33,7 +33,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             goalLocation = this.findWorkLocation(dude) ?? camp()
         } else {
             // Go home!
-            goalLocation = this.findHomeLocation(dude)
+            goalLocation = this.findHomeLocation(dude) ?? camp()
             dude.setWeapon(WeaponType.NONE, -1)
             dude.setShield(ShieldType.NONE, -1)
         }
