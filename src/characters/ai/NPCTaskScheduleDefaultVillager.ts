@@ -104,6 +104,11 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             dude.setShield(ShieldType.BASIC, -1)
 
             return camp()
+        } else if (job === VillagerJob.CONSTRUCTION) {
+            dude.setWeapon(WeaponType.HAMMER, -1)
+            dude.setShield(ShieldType.NONE, -1)
+
+            return camp()
         } else if (!job) {
             dude.setWeapon(WeaponType.NONE, -1)
             dude.setShield(ShieldType.NONE, -1)

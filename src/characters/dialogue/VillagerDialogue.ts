@@ -17,6 +17,7 @@ export enum VillagerJob {
     MINE = "mine",
     HARVEST_WOOD = "chop",
     DEFEND = "defend",
+    CONSTRUCTION = "build",
 }
 
 export const VILLAGER_DIALOGUE: DialogueSet = {
@@ -26,7 +27,7 @@ export const VILLAGER_DIALOGUE: DialogueSet = {
             return new NextDialogue(VILLAGER_DIALOGUE_ENTRYPOINT, false)
         }
 
-        const currentJob = villager?.blob["job"]
+        const currentJob = villager.blob["job"]
 
         return dialogueWithOptions(
             [
@@ -48,7 +49,9 @@ export const VILLAGER_DIALOGUE: DialogueSet = {
             new DialogueOption("Keep watch over the town.", () => {
                 return setJob(VillagerJob.DEFEND)
             }),
-            // TODO construction?
+            new DialogueOption("Help with construction.", () => {
+                return setJob(VillagerJob.CONSTRUCTION)
+            }),
             new DialogueOption("Take some time off.", () => {
                 return setJob(VillagerJob.NONE)
             }),

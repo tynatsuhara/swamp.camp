@@ -20,16 +20,16 @@ const offsetForDudeType = (type: DudeType) => {
 
 export const WeaponFactory = {
     // TODO support additional weapons
-    make(type: WeaponType, dudeType: DudeType): Weapon {
+    make(weaponType: WeaponType, dudeType: DudeType): Weapon {
         const offset = offsetForDudeType(dudeType)
-        switch (type) {
+        switch (weaponType) {
             case WeaponType.NONE:
                 return null
             case WeaponType.UNARMED:
                 return new UnarmedWeapon()
             case WeaponType.SWORD:
                 return new MeleeWeapon({
-                    weaponType: WeaponType.SWORD,
+                    weaponType,
                     spriteId: "weapon_regular_sword",
                     offsetFromCenter: new Point(-6, -2).plus(offset),
                     range: 20,
@@ -39,7 +39,7 @@ export const WeaponFactory = {
                 })
             case WeaponType.CLUB:
                 return new MeleeWeapon({
-                    weaponType: WeaponType.CLUB,
+                    weaponType,
                     spriteId: "weapon_baton_with_spikes",
                     offsetFromCenter: new Point(-6, -2).plus(offset),
                     range: 16,
@@ -49,7 +49,7 @@ export const WeaponFactory = {
                 })
             case WeaponType.PICKAXE:
                 return new MeleeWeapon({
-                    weaponType: WeaponType.PICKAXE,
+                    weaponType,
                     spriteId: "weapon_pickaxe",
                     offsetFromCenter: new Point(-5, -2).plus(offset),
                     range: 16,
@@ -59,7 +59,7 @@ export const WeaponFactory = {
                 })
             case WeaponType.AXE:
                 return new MeleeWeapon({
-                    weaponType: WeaponType.AXE,
+                    weaponType,
                     spriteId: "weapon_axe",
                     offsetFromCenter: new Point(-3, -1).plus(offset),
                     range: 16,
@@ -71,8 +71,18 @@ export const WeaponFactory = {
                 return new SpearWeapon() // NPCs can't currently use ranged weapons
             case WeaponType.STAFF_1:
                 return new StaffWeapon() // Players can't currently use AOE weapons
+            case WeaponType.HAMMER:
+                return new MeleeWeapon({
+                    weaponType,
+                    spriteId: "weapon_hammer",
+                    offsetFromCenter: new Point(-5, -2).plus(offset),
+                    range: 16,
+                    damage: 1,
+                    canMultiAttack: false,
+                    speed: 1,
+                })
             default:
-                throw new Error(`weapon type ${type} is not supported yet`)
+                throw new Error(`weapon type ${weaponType} is not supported yet`)
         }
     },
 }
