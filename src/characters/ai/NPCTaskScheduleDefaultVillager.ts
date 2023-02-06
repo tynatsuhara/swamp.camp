@@ -1,5 +1,6 @@
-import { Point } from "brigsby/dist/Point"
+import { Point, pt } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util"
+import { pixelPtToTilePt, TILE_SIZE } from "../../graphics/Tilesets"
 import { DarknessMask } from "../../world/DarknessMask"
 import { Campfire } from "../../world/elements/Campfire"
 import { ElementType } from "../../world/elements/Elements"
@@ -25,9 +26,9 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
     private homeLocation: Location
     private workLocation: Location
 
-    constructor(npc: NPC) {
+    constructor(private readonly npc: NPC) {
         super()
-        this.closestFirePosition = this.getClosestFire(npc)
+        this.closestFirePosition = this.getClosestFire(npc, TILE_SIZE * 4)
         this.homeLocation = this.findHomeLocation(npc.dude)
         this.workLocation = this.findWorkLocation(npc.dude)
     }
@@ -44,6 +45,10 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             // Are you feeling zen? If not, a staycation is what I recommend.
             // Or better yet, don't be a jerk. Unwind by being a man... and goin' to work.
             goalLocation = this.workLocation ?? camp()
+
+            if (this.getJob()) {
+                this.equipJobGear()
+            }
         } else {
             // Go home!
             goalLocation = this.homeLocation ?? camp()
@@ -89,7 +94,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             return this.findHomeLocation(dude)
         }
 
-        const job = dude.blob["job"] as VillagerJob
+        const job = this.getJob()
 
         if (job === VillagerJob.MINE) {
             const mines = camp()
@@ -100,32 +105,32 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
                 return
             }
 
-            // side effects
-            dude.setWeapon(WeaponType.PICKAXE, -1)
-            dude.setShield(ShieldType.NONE, -1)
-
             return LocationManager.instance.get(mines[0])
-        } else if (job === VillagerJob.HARVEST_WOOD) {
-            // side effects
-            dude.setWeapon(WeaponType.AXE, -1)
-            dude.setShield(ShieldType.NONE, -1)
-
+        } else if (
+            job === VillagerJob.HARVEST_WOOD ||
+            job === VillagerJob.DEFEND ||
+            job === VillagerJob.CONSTRUCTION
+        ) {
             return camp()
-        } else if (job === VillagerJob.DEFEND) {
-            // side effects
-            dude.setWeapon(WeaponType.CLUB, -1)
-            dude.setShield(ShieldType.BASIC, -1)
-
-            return camp()
-        } else if (job === VillagerJob.CONSTRUCTION) {
-            dude.setWeapon(WeaponType.HAMMER, -1)
-            dude.setShield(ShieldType.NONE, -1)
-
-            return camp()
-        } else if (!job) {
-            dude.setWeapon(WeaponType.NONE, -1)
-            dude.setShield(ShieldType.NONE, -1)
         }
+    }
+
+    private equipJobGear() {
+        this.npc.dude.setWeapon(
+            {
+                [VillagerJob.MINE]: WeaponType.PICKAXE,
+                [VillagerJob.HARVEST_WOOD]: WeaponType.AXE,
+                [VillagerJob.DEFEND]: WeaponType.CLUB,
+                [VillagerJob.CONSTRUCTION]: WeaponType.HAMMER,
+            }[this.getJob()] ?? WeaponType.NONE,
+            -1
+        )
+        this.npc.dude.setShield(
+            {
+                [VillagerJob.DEFEND]: ShieldType.BASIC,
+            }[this.getJob()] ?? ShieldType.NONE,
+            -1
+        )
     }
 
     private goToClosestFire(context: NPCTaskContext) {
@@ -146,11 +151,30 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         context.walkTo(this.closestFirePosition.plusY(1))
     }
 
-    private getClosestFire(npc: NPC) {
+    private getClosestFire(npc: NPC, pixelRadius: number) {
+        if (npc.dude.location !== camp()) {
+            return undefined
+        }
+
         const burningFires = npc.dude.location
             .getElementsOfType(ElementType.CAMPFIRE)
             .filter((c) => c.entity.getComponent(Campfire).isBurning)
 
-        return Lists.minBy(burningFires, (e) => e.pos.distanceTo(npc.dude.standingPosition))?.pos
+        const firePos = Lists.minBy(burningFires, (e) =>
+            e.pos.distanceTo(npc.dude.standingPosition)
+        )?.pos
+        if (!firePos) {
+            return undefined
+        }
+        const firePixelPtCenter = firePos.plus(pt(0.5)).times(TILE_SIZE)
+
+        let result = firePos
+        while (result.equals(firePos) || npc.dude.location.isOccupied(result)) {
+            result = pixelPtToTilePt(firePixelPtCenter.randomCircularShift(pixelRadius))
+        }
+
+        return result
     }
+
+    private getJob = () => this.npc.dude.blob["job"] as VillagerJob
 }
