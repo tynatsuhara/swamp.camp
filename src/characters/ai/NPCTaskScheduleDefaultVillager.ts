@@ -1,3 +1,4 @@
+import { Point } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util"
 import { DarknessMask } from "../../world/DarknessMask"
 import { Campfire } from "../../world/elements/Campfire"
@@ -12,6 +13,7 @@ import { VillagerJob } from "../dialogue/VillagerDialogue"
 import { Dude } from "../Dude"
 import { DudeFaction } from "../DudeFactory"
 import { DudeType } from "../DudeType"
+import { NPC } from "../NPC"
 import { ShieldType } from "../weapons/ShieldType"
 import { WeaponType } from "../weapons/WeaponType"
 import { NPCSchedules } from "./NPCSchedule"
@@ -19,6 +21,17 @@ import { NPCTask } from "./NPCTask"
 import { NPCTaskContext } from "./NPCTaskContext"
 
 export class NPCTaskScheduleDefaultVillager extends NPCTask {
+    private closestFirePosition: Point
+    private homeLocation: Location
+    private workLocation: Location
+
+    constructor(npc: NPC) {
+        super()
+        this.closestFirePosition = this.getClosestFire(npc)
+        this.homeLocation = this.findHomeLocation(npc.dude)
+        this.workLocation = this.findWorkLocation(npc.dude)
+    }
+
     performTask(context: NPCTaskContext): void {
         const { dude } = context
         const timeOfDay = WorldTime.instance.time % TimeUnit.DAY
@@ -30,10 +43,10 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         ) {
             // Are you feeling zen? If not, a staycation is what I recommend.
             // Or better yet, don't be a jerk. Unwind by being a man... and goin' to work.
-            goalLocation = this.findWorkLocation(dude) ?? camp()
+            goalLocation = this.workLocation ?? camp()
         } else {
             // Go home!
-            goalLocation = this.findHomeLocation(dude) ?? camp()
+            goalLocation = this.homeLocation ?? camp()
             dude.setWeapon(WeaponType.NONE, -1)
             dude.setShield(ShieldType.NONE, -1)
         }
@@ -123,20 +136,21 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             return
         }
 
-        const burningFires = context.dude.location
-            .getElementsOfType(ElementType.CAMPFIRE)
-            .filter((c) => c.entity.getComponent(Campfire).isBurning)
-
-        if (burningFires.length === 0) {
+        if (!this.closestFirePosition) {
             context.doNothing()
             return
         }
 
-        const closestFire = Lists.minBy(burningFires, (e) =>
-            e.pos.distanceTo(context.dude.standingPosition)
-        )
-
         // this works fine enough ¯\_(ツ)_/¯
-        context.walkTo(closestFire.pos.plusY(1))
+        // TODO after simulating they'll all be at the same spot, add some randomness
+        context.walkTo(this.closestFirePosition.plusY(1))
+    }
+
+    private getClosestFire(npc: NPC) {
+        const burningFires = npc.dude.location
+            .getElementsOfType(ElementType.CAMPFIRE)
+            .filter((c) => c.entity.getComponent(Campfire).isBurning)
+
+        return Lists.minBy(burningFires, (e) => e.pos.distanceTo(npc.dude.standingPosition))?.pos
     }
 }

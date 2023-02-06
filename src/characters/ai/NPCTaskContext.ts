@@ -19,7 +19,12 @@ export interface NPCTaskContext {
     /**
      * Tells the NPC to go to a position
      */
-    walkTo: (p: Point) => void
+    walkTo: (
+        p: Point,
+        options?: {
+            stoppingDistance?: number // TODO
+        }
+    ) => void
 
     /**
      * Roam around aimlessly
