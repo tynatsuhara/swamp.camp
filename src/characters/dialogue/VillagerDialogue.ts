@@ -1,6 +1,7 @@
 import { Lists } from "brigsby/dist/util/Lists"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
 import { Dude } from "../Dude"
+import { NPC } from "../NPC"
 import {
     DialogueOption,
     DialogueSet,
@@ -24,6 +25,7 @@ export const VILLAGER_DIALOGUE: DialogueSet = {
     [VILLAGER_DIALOGUE_ENTRYPOINT]: (villager: Dude) => {
         const setJob = (job: VillagerJob | undefined) => {
             villager.blob["job"] = job
+            villager.entity.getComponent(NPC).decideWhatToDoNext()
             return new NextDialogue(VILLAGER_DIALOGUE_ENTRYPOINT, false)
         }
 
