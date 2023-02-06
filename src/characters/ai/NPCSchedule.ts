@@ -50,6 +50,6 @@ export const NPCSchedules = {
         type: NPCScheduleType.FOLLOW_LEADER,
     }),
 
-    VILLAGER_WAKE_UP_TIME: TimeUnit.HOUR * 8,
+    VILLAGER_WAKE_UP_TIME: TimeUnit.HOUR * 6,
     VILLAGER_GO_HOME_TIME: TimeUnit.HOUR * 18,
 }
