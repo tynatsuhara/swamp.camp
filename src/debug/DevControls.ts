@@ -281,3 +281,5 @@ window["chat"] = (text: string) => {
     sendChat(text)
 }
 receiveChat((text, peerId) => console.log(`[chat] ${peerId} > ${text}`))
+
+window["Point"] = Point
