@@ -28,7 +28,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
 
     constructor(private readonly npc: NPC) {
         super()
-        this.closestFirePosition = this.getClosestFire(npc, TILE_SIZE * 4)
+        this.closestFirePosition = this.getClosestFire(npc)
         this.homeLocation = this.findHomeLocation(npc.dude)
         this.workLocation = this.findWorkLocation(npc.dude)
     }
@@ -147,11 +147,10 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         }
 
         // this works fine enough ¯\_(ツ)_/¯
-        // TODO after simulating they'll all be at the same spot, add some randomness
         context.walkTo(this.closestFirePosition.plusY(1))
     }
 
-    private getClosestFire(npc: NPC, pixelRadius: number) {
+    private getClosestFire(npc: NPC) {
         if (npc.dude.location !== camp()) {
             return undefined
         }
@@ -160,17 +159,21 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             .getElementsOfType(ElementType.CAMPFIRE)
             .filter((c) => c.entity.getComponent(Campfire).isBurning)
 
-        const firePos = Lists.minBy(burningFires, (e) =>
+        const closestFire = Lists.minBy(burningFires, (e) =>
             e.pos.distanceTo(npc.dude.standingPosition)
-        )?.pos
+        )
+        const firePos = closestFire?.pos
         if (!firePos) {
             return undefined
         }
+        const lightRadius = Campfire.getLightSizeForLogCount(
+            closestFire.entity.getComponent(Campfire).logs
+        )
         const firePixelPtCenter = firePos.plus(pt(0.5)).times(TILE_SIZE)
 
         let result = firePos
         while (result.equals(firePos) || npc.dude.location.isOccupied(result)) {
-            result = pixelPtToTilePt(firePixelPtCenter.randomCircularShift(pixelRadius))
+            result = pixelPtToTilePt(firePixelPtCenter.randomCircularShift(lightRadius))
         }
 
         return result
