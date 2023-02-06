@@ -53,9 +53,11 @@ export abstract class BuildingFactory<
         // TODO: Add construction process
 
         if (debug.enableBuilding) {
+            let hasSupplies = data["hasSupplies"]
             let underConstruction = data["underConstruction"]
             const completeConstruction = () => {
                 // todo push dudes away like in PlaceElementFrame
+                hasSupplies = undefined
                 underConstruction = undefined
                 wl.reloadElement(pos)
             }
@@ -65,7 +67,11 @@ export abstract class BuildingFactory<
                 e.addComponent(new ConstructionSite(wl, pos, this.dimensions, completeConstruction))
                 // @ts-ignore ugh
                 return e.addComponent(
-                    new ElementComponent(this.type, pos, () => ({ ...data, underConstruction }))
+                    new ElementComponent(this.type, pos, () => ({
+                        ...data,
+                        hasSupplies,
+                        underConstruction,
+                    }))
                 )
             }
         }

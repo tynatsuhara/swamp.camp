@@ -9,9 +9,9 @@ import { getChestComponents } from "../elements/Chest"
 import { Location } from "../locations/Location"
 
 export class ConstructionSite extends Component {
-    private built = false
+    private donationComplete = false
 
-    constructor(wl: Location, pos: Point, size: Point, onBuildComplete: () => void) {
+    constructor(wl: Location, pos: Point, readonly size: Point, onBuildComplete: () => void) {
         super()
 
         const corners = [
@@ -28,9 +28,8 @@ export class ConstructionSite extends Component {
         ]
 
         // TODO
-        let donationComplete = false
         const onDonationComplete = () => {
-            donationComplete = true
+            this.donationComplete = true
             onBuildComplete()
         }
 
@@ -42,7 +41,7 @@ export class ConstructionSite extends Component {
             () => {
                 startDonating({ onDonationComplete, itemsRequired })
             },
-            () => !donationComplete
+            () => !this.donationComplete
         )
 
         this.awake = () => {

@@ -1,9 +1,11 @@
 import { Point, pt } from "brigsby/dist/Point"
-import { Lists } from "brigsby/dist/util"
+import { Grid, Lists } from "brigsby/dist/util"
 import { pixelPtToTilePt, TILE_SIZE } from "../../graphics/Tilesets"
+import { ConstructionSite } from "../../world/buildings/ConstructionSite"
 import { DarknessMask } from "../../world/DarknessMask"
 import { Campfire } from "../../world/elements/Campfire"
 import { ElementType } from "../../world/elements/Elements"
+import { ElementUtils } from "../../world/elements/ElementUtils"
 import { LightManager } from "../../world/LightManager"
 import { Location } from "../../world/locations/Location"
 import { camp, LocationManager } from "../../world/locations/LocationManager"
@@ -177,6 +179,24 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         }
 
         return result
+    }
+
+    private getConstructionZoneSpots() {
+        const { location, tile } = this.npc.dude
+
+        const constructionPoint = Grid.spiralSearch(
+            tile,
+            // TODO check if it has supplies
+            (pt) => !!location.getElement(pt)?.entity.getComponent(ConstructionSite)
+        )
+
+        if (!constructionPoint) {
+            return []
+        }
+
+        const zoneElement = location.getElement(tile)
+        const zone = zoneElement.entity.getComponent(ConstructionSite)
+        return ElementUtils.rectPoints(zoneElement.pos, zone.size)
     }
 
     private getJob = () => this.npc.dude.blob["job"] as VillagerJob
