@@ -27,12 +27,16 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
     private closestFirePosition: Point
     private homeLocation: Location
     private workLocation: Location
+    private workSpots: Point[] | undefined
 
     constructor(private readonly npc: NPC) {
         super()
         this.closestFirePosition = this.getClosestFire(npc)
         this.homeLocation = this.findHomeLocation(npc.dude)
         this.workLocation = this.findWorkLocation(npc.dude)
+        if (this.getJob() === VillagerJob.CONSTRUCTION) {
+            this.workSpots = this.getConstructionZoneSpots()
+        }
     }
 
     performTask(context: NPCTaskContext): void {
@@ -76,6 +80,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         context.roam(0.5, {
             pauseEveryMillis: 2500 + 2500 * Math.random(),
             pauseForMillis: 2500 + 5000 * Math.random(),
+            goalOptionsSupplier: this.workSpots ? () => this.workSpots : undefined,
         })
     }
 
@@ -194,7 +199,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             return []
         }
 
-        const zoneElement = location.getElement(tile)
+        const zoneElement = location.getElement(constructionPoint)
         const zone = zoneElement.entity.getComponent(ConstructionSite)
         return ElementUtils.rectPoints(zoneElement.pos, zone.size)
     }
