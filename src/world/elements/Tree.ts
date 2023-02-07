@@ -32,6 +32,9 @@ type SaveData = {
     b?: boolean
 }
 
+export const playChoppingSound = (centerPos: Point) =>
+    Sounds.playAtPoint(Lists.oneOf(CHOPPING_AUDIO), CHOPPING_AUDIO_VOLUME, centerPos)
+
 type TreeType = ElementType.TREE_ROUND | ElementType.TREE_POINTY
 
 const CHOPPING_AUDIO = loadAudio(
@@ -133,12 +136,7 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
                         return [getItem()]
                     }
                 },
-                () =>
-                    Sounds.playAtPoint(
-                        Lists.oneOf(CHOPPING_AUDIO),
-                        CHOPPING_AUDIO_VOLUME,
-                        hittableCenter
-                    ),
+                () => playChoppingSound(hittableCenter),
                 () => emitParticles()
             )
         )

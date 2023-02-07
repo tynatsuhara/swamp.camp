@@ -1,7 +1,9 @@
 import { Component, pt } from "brigsby/dist"
 import { session } from "../../online/session"
+import { ConstructionSite } from "../../world/buildings/ConstructionSite"
 import { ElementType } from "../../world/elements/Elements"
 import { playMiningSound } from "../../world/elements/Rock"
+import { playChoppingSound } from "../../world/elements/Tree"
 import { LocationType } from "../../world/locations/LocationManager"
 import { NPCSchedules } from "../ai/NPCSchedule"
 import { Dude } from "../Dude"
@@ -39,13 +41,19 @@ export class Villager extends Component {
         } else {
             npc.setSchedule(NPCSchedules.newDefaultVillagerSchedule())
             dude.doWhileLiving(() => {
-                // swing pickaxe randomly if working in the mines
-                if (
+                const isMining =
                     dude.weaponType === WeaponType.PICKAXE &&
                     dude.location.type === LocationType.MINE_INTERIOR
-                ) {
+                const isDoingConstruction =
+                    dude.weaponType === WeaponType.HAMMER &&
+                    dude.location.getElement(dude.tile)?.entity.getComponent(ConstructionSite)
+                // swing pickaxe randomly if working in the mines
+                if (isMining) {
                     dude.updateAttacking(true)
                     playMiningSound(dude.standingPosition)
+                } else if (isDoingConstruction) {
+                    dude.updateAttacking(true)
+                    playChoppingSound(dude.standingPosition)
                 }
                 return 2_000
             }, Math.random() * 2_000)
