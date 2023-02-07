@@ -43,14 +43,18 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         const { dude } = context
         const timeOfDay = WorldTime.instance.time % TimeUnit.DAY
 
-        let goalLocation: Location
-        if (
+        const shouldBeWorking =
             timeOfDay > NPCSchedules.VILLAGER_WAKE_UP_TIME &&
             timeOfDay < NPCSchedules.VILLAGER_GO_HOME_TIME
-        ) {
+
+        let goalLocation: Location
+        let goalSpots: Point[]
+
+        if (shouldBeWorking) {
             // Are you feeling zen? If not, a staycation is what I recommend.
             // Or better yet, don't be a jerk. Unwind by being a man... and goin' to work.
             goalLocation = this.workLocation ?? camp()
+            goalSpots = this.workSpots
 
             if (this.getJob()) {
                 this.equipJobGear()
@@ -80,7 +84,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         context.roam(0.5, {
             pauseEveryMillis: 2500 + 2500 * Math.random(),
             pauseForMillis: 2500 + 5000 * Math.random(),
-            goalOptionsSupplier: this.workSpots ? () => this.workSpots : undefined,
+            goalOptionsSupplier: goalSpots ? () => goalSpots : undefined,
         })
     }
 
