@@ -33,7 +33,7 @@ export class ConstructionSite extends Component {
             onBuildComplete()
         }
 
-        const chestPos = pos.minus(pt(0.5)).plus(size.div(2)).times(TILE_SIZE)
+        const chestPos = pos.plus(pt(size.x / 2 - 0.5, size.y - 1)).times(TILE_SIZE)
 
         const { components, closeAnimation } = getChestComponents(
             wl,
