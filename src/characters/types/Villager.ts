@@ -4,6 +4,7 @@ import { ConstructionSite } from "../../world/buildings/ConstructionSite"
 import { ElementType } from "../../world/elements/Elements"
 import { playMiningSound } from "../../world/elements/Rock"
 import { playChoppingSound } from "../../world/elements/Tree"
+import { GroundType } from "../../world/ground/Ground"
 import { LocationType } from "../../world/locations/LocationManager"
 import { NPCSchedules } from "../ai/NPCSchedule"
 import { Dude } from "../Dude"
@@ -40,23 +41,36 @@ export class Villager extends Component {
             // no-op
         } else {
             npc.setSchedule(NPCSchedules.newDefaultVillagerSchedule())
-            dude.doWhileLiving(() => {
-                const isMining =
-                    dude.weaponType === WeaponType.PICKAXE &&
-                    dude.location.type === LocationType.MINE_INTERIOR
-                const isDoingConstruction =
-                    dude.weaponType === WeaponType.HAMMER &&
-                    dude.location.getElement(dude.tile)?.entity.getComponent(ConstructionSite)
-                // swing pickaxe randomly if working in the mines
-                if (isMining) {
-                    dude.updateAttacking(true)
-                    playMiningSound(dude.standingPosition)
-                } else if (isDoingConstruction) {
-                    dude.updateAttacking(true)
-                    playChoppingSound(dude.standingPosition)
-                }
-                return 2_000
-            }, Math.random() * 2_000)
+            this.initWorkAnimations()
         }
+    }
+
+    private initWorkAnimations() {
+        this.dude.doWhileLiving(() => {
+            const { weaponType, location, tile, standingPosition } = this.dude
+            const isMining =
+                weaponType === WeaponType.PICKAXE && location.type === LocationType.MINE_INTERIOR
+            const isDoingConstruction =
+                weaponType === WeaponType.HAMMER &&
+                location.getElement(tile)?.entity.getComponent(ConstructionSite)
+            // swing pickaxe randomly if working in the mines
+            if (isMining) {
+                this.dude.updateAttacking(true)
+                playMiningSound(standingPosition)
+            } else if (isDoingConstruction) {
+                this.dude.updateAttacking(true)
+                playChoppingSound(standingPosition)
+                // turn the ground to dirt
+                const hittingTile = tile.plusX(this.dude.getFacingMultiplier())
+                const ground = location.getGround(hittingTile)?.type
+                if (
+                    ground === GroundType.GRASS &&
+                    location.getElement(hittingTile)?.entity.getComponent(ConstructionSite)
+                ) {
+                    location.setGroundElement(GroundType.PATH, hittingTile)
+                }
+            }
+            return 2_000
+        }, Math.random() * 2_000)
     }
 }
