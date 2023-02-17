@@ -7,6 +7,7 @@ import { playChoppingSound } from "../../world/elements/Tree"
 import { GroundType } from "../../world/ground/Ground"
 import { LocationType } from "../../world/locations/LocationManager"
 import { NPCSchedules } from "../ai/NPCSchedule"
+import { VillagerJob } from "../ai/VillagerJob"
 import { Dude } from "../Dude"
 import { DudeType } from "../DudeType"
 import { NPC } from "../NPC"
@@ -17,8 +18,17 @@ export class Villager extends Component {
     get npc() {
         return this.entity.getComponent(NPC)
     }
+
     get dude() {
         return this.entity.getComponent(Dude)
+    }
+
+    get job() {
+        return this.npc.dude.blob["job"] as VillagerJob
+    }
+    set job(job: VillagerJob | undefined) {
+        this.dude.blob["job"] = job
+        this.npc.decideWhatToDoNext()
     }
 
     start() {

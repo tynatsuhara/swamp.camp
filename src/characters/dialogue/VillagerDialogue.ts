@@ -1,7 +1,8 @@
 import { Lists } from "brigsby/dist/util/Lists"
 import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
+import { VillagerJob } from "../ai/VillagerJob"
 import { Dude } from "../Dude"
-import { NPC } from "../NPC"
+import { Villager } from "../types/Villager"
 import {
     DialogueOption,
     DialogueSet,
@@ -13,23 +14,14 @@ import {
 
 export const VILLAGER_DIALOGUE_ENTRYPOINT = "villager-start"
 
-export enum VillagerJob {
-    NONE = "none",
-    MINE = "mine",
-    HARVEST_WOOD = "chop", // TODO
-    DEFEND = "defend",
-    CONSTRUCTION = "build",
-}
-
 export const VILLAGER_DIALOGUE: DialogueSet = {
-    [VILLAGER_DIALOGUE_ENTRYPOINT]: (villager: Dude) => {
+    [VILLAGER_DIALOGUE_ENTRYPOINT]: (villagerDude: Dude) => {
+        const villager = villagerDude.entity.getComponent(Villager)
+
         const setJob = (job: VillagerJob | undefined) => {
-            villager.blob["job"] = job
-            villager.entity.getComponent(NPC).decideWhatToDoNext()
+            villager.job = job
             return new NextDialogue(VILLAGER_DIALOGUE_ENTRYPOINT, false)
         }
-
-        const currentJob = villager.blob["job"]
 
         return dialogueWithOptions(
             [
@@ -41,7 +33,7 @@ export const VILLAGER_DIALOGUE: DialogueSet = {
                     "At your service, Champion.",
                 ]),
             ],
-            currentJob ? DudeInteractIndicator.NONE : DudeInteractIndicator.QUESTION,
+            villager.job ? DudeInteractIndicator.NONE : DudeInteractIndicator.QUESTION,
             new DialogueOption("Head down to the mines.", () => {
                 return setJob(VillagerJob.MINE)
             }),

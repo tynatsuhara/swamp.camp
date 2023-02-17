@@ -12,16 +12,17 @@ import { camp, LocationManager } from "../../world/locations/LocationManager"
 import { Residence } from "../../world/residences/Residence"
 import { TimeUnit } from "../../world/TimeUnit"
 import { WorldTime } from "../../world/WorldTime"
-import { VillagerJob } from "../dialogue/VillagerDialogue"
 import { Dude } from "../Dude"
 import { DudeFaction } from "../DudeFactory"
 import { DudeType } from "../DudeType"
 import { NPC } from "../NPC"
+import { Villager } from "../types/Villager"
 import { ShieldType } from "../weapons/ShieldType"
 import { WeaponType } from "../weapons/WeaponType"
 import { NPCSchedules } from "./NPCSchedule"
 import { NPCTask } from "./NPCTask"
 import { NPCTaskContext } from "./NPCTaskContext"
+import { VillagerJob } from "./VillagerJob"
 
 export class NPCTaskScheduleDefaultVillager extends NPCTask {
     private closestFirePosition: Point
@@ -208,5 +209,5 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         return ElementUtils.rectPoints(zoneElement.pos, zone.size)
     }
 
-    private getJob = () => this.npc.dude.blob["job"] as VillagerJob
+    private getJob = () => this.npc.entity.getComponent(Villager).job
 }
