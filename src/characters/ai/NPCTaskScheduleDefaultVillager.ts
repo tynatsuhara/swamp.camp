@@ -196,11 +196,11 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         const constructionPoint = Grid.spiralSearch(
             tile,
             // TODO check if it has supplies
-            (pt) => !!location.getElement(pt)?.entity.getComponent(ConstructionSite)
+            (pt) => location.getElement(pt)?.entity.getComponent(ConstructionSite)?.hasMaterials()
         )
 
         if (!constructionPoint) {
-            return []
+            return null
         }
 
         const zoneElement = location.getElement(constructionPoint)

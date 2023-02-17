@@ -16,7 +16,7 @@ export const VILLAGER_DIALOGUE_ENTRYPOINT = "villager-start"
 export enum VillagerJob {
     NONE = "none",
     MINE = "mine",
-    HARVEST_WOOD = "chop",
+    HARVEST_WOOD = "chop", // TODO
     DEFEND = "defend",
     CONSTRUCTION = "build",
 }

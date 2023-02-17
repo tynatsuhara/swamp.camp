@@ -64,7 +64,18 @@ export abstract class BuildingFactory<
 
             if (underConstruction) {
                 const e = new Entity()
-                e.addComponent(new ConstructionSite(wl, pos, this.dimensions, completeConstruction))
+                e.addComponent(
+                    new ConstructionSite(
+                        wl,
+                        pos,
+                        this.dimensions,
+                        () => hasSupplies,
+                        () => {
+                            hasSupplies = true
+                        },
+                        completeConstruction
+                    )
+                )
                 // @ts-ignore ugh
                 return e.addComponent(
                     new ElementComponent(this.type, pos, () => ({

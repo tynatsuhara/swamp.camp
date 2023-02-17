@@ -9,9 +9,14 @@ import { getChestComponents } from "../elements/Chest"
 import { Location } from "../locations/Location"
 
 export class ConstructionSite extends Component {
-    private donationComplete = false
-
-    constructor(wl: Location, pos: Point, readonly size: Point, onBuildComplete: () => void) {
+    constructor(
+        wl: Location,
+        pos: Point,
+        readonly size: Point,
+        private readonly getHasMaterials: () => boolean,
+        setHasMaterials: () => void,
+        setBuildComplete: () => void // TODO figure out where this gets called
+    ) {
         super()
 
         const corners = [
@@ -27,21 +32,15 @@ export class ConstructionSite extends Component {
             new ItemStack(Item.ROCK, 10),
         ]
 
-        // TODO
-        const onDonationComplete = () => {
-            this.donationComplete = true
-            onBuildComplete()
-        }
-
         const chestPos = pos.plus(pt(size.x / 2 - 0.5, size.y - 1)).times(TILE_SIZE)
 
         const { components, closeAnimation } = getChestComponents(
             wl,
             chestPos,
             () => {
-                startDonating({ onDonationComplete, itemsRequired })
+                startDonating({ onDonationComplete: setHasMaterials, itemsRequired })
             },
-            () => !this.donationComplete
+            () => !this.hasMaterials()
         )
 
         this.awake = () => {
@@ -67,5 +66,9 @@ export class ConstructionSite extends Component {
                 )
             ),
         ]
+    }
+
+    hasMaterials() {
+        return this.getHasMaterials()
     }
 }
