@@ -21,7 +21,7 @@ import { ShieldType } from "../weapons/ShieldType"
 import { WeaponType } from "../weapons/WeaponType"
 import { NPCSchedules } from "./NPCSchedule"
 import { NPCTask } from "./NPCTask"
-import { NPCTaskContext } from "./NPCTaskContext"
+import { NPCTaskContext, RoamOptions } from "./NPCTaskContext"
 import { VillagerJob } from "./VillagerJob"
 
 export class NPCTaskScheduleDefaultVillager extends NPCTask {
@@ -49,13 +49,27 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             timeOfDay < NPCSchedules.VILLAGER_GO_HOME_TIME
 
         let goalLocation: Location
-        let goalSpots: Point[]
+
+        const roamOptions: RoamOptions = {
+            pauseEveryMillis: 2500 + 2500 * Math.random(),
+            pauseForMillis: 2500 + 5000 * Math.random(),
+        }
 
         if (shouldBeWorking) {
             // Are you feeling zen? If not, a staycation is what I recommend.
             // Or better yet, don't be a jerk. Unwind by being a man... and goin' to work.
             goalLocation = this.workLocation ?? camp()
-            goalSpots = this.workSpots
+
+            if (this.workSpots) {
+                roamOptions.goalOptionsSupplier = () => this.workSpots
+
+                const alreadyAtWorkSpot = this.workSpots.some((spot) => spot.equals(dude.tile))
+                if (!alreadyAtWorkSpot) {
+                    // Go straight to work, no dilly-dallying
+                    roamOptions.pauseEveryMillis = undefined
+                    roamOptions.pauseForMillis = undefined
+                }
+            }
 
             if (this.getJob()) {
                 this.equipJobGear()
@@ -82,11 +96,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         }
 
         // Roam around wherever they're at
-        context.roam(0.5, {
-            pauseEveryMillis: 2500 + 2500 * Math.random(),
-            pauseForMillis: 2500 + 5000 * Math.random(),
-            goalOptionsSupplier: goalSpots ? () => goalSpots : undefined,
-        })
+        context.roam(0.5, roamOptions)
     }
 
     private findHomeLocation(dude: Dude) {

@@ -6,7 +6,7 @@ export enum DudeType {
     HERALD,
     HORNED_DEMON,
     SHROOM,
-    VILLAGER,
+    VILLAGER, // TODO maybe rename this to something like WORKER?
     CENTAUR,
     BEAR,
     ORC_BRUTE,

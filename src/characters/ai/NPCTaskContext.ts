@@ -2,6 +2,13 @@ import { Point } from "brigsby/dist"
 import { Location } from "../../world/locations/Location"
 import { Dude } from "../Dude"
 
+export type RoamOptions = {
+    ptSelectionFilter?: (pt: Point) => boolean
+    goalOptionsSupplier?: () => Point[]
+    pauseEveryMillis?: number
+    pauseForMillis?: number
+}
+
 /**
  * Contains context on the current state of the NPC/world, as well as callbacks
  * that a task can call. All task decisions should be made based on this context.
@@ -24,15 +31,7 @@ export interface NPCTaskContext {
     /**
      * Roam around aimlessly
      */
-    roam: (
-        speedMultiplier: number,
-        options?: {
-            ptSelectionFilter?: (pt: Point) => boolean
-            goalOptionsSupplier?: () => Point[]
-            pauseEveryMillis?: number
-            pauseForMillis?: number
-        }
-    ) => void
+    roam: (speedMultiplier: number, options?: RoamOptions) => void
 
     /**
      * Go to a different location
