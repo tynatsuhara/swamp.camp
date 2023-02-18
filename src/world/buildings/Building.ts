@@ -1,4 +1,4 @@
-import { debug, Entity, Point } from "brigsby/dist"
+import { Entity, Point } from "brigsby/dist"
 import { ItemStack } from "../../items/Inventory"
 import { Item, ItemMetadata } from "../../items/Items"
 import { ElementComponent } from "../elements/ElementComponent"
@@ -58,34 +58,32 @@ export abstract class BuildingFactory<
     ): ElementComponent<Type, SaveFormat> => {
         // TODO: Add construction process
 
-        if (debug.enableBuilding) {
-            let constructionState = data["constructionState"] as ConstructionState
-            const completeConstruction = () => {
-                // todo push dudes away like in PlaceElementFrame
-                constructionState = undefined
-                wl.reloadElement(pos)
-            }
+        let constructionState = data["constructionState"] as ConstructionState
+        const completeConstruction = () => {
+            // todo push dudes away like in PlaceElementFrame
+            constructionState = undefined
+            wl.reloadElement(pos)
+        }
 
-            if (constructionState) {
-                const e = new Entity()
-                e.addComponent(
-                    new ConstructionSite(
-                        wl,
-                        pos,
-                        this.dimensions,
-                        constructionState,
-                        this.getConstructionRequirements().materials,
-                        completeConstruction
-                    )
+        if (constructionState) {
+            const e = new Entity()
+            e.addComponent(
+                new ConstructionSite(
+                    wl,
+                    pos,
+                    this.dimensions,
+                    constructionState,
+                    this.getConstructionRequirements().materials,
+                    completeConstruction
                 )
-                // @ts-ignore ugh
-                return e.addComponent(
-                    new ElementComponent(this.type, pos, () => ({
-                        ...data,
-                        constructionState,
-                    }))
-                )
-            }
+            )
+            // @ts-ignore ugh
+            return e.addComponent(
+                new ElementComponent(this.type, pos, () => ({
+                    ...data,
+                    constructionState,
+                }))
+            )
         }
 
         return this.makeBuilding(wl, pos, data)

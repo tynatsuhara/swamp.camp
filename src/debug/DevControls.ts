@@ -264,7 +264,6 @@ debug.forceMapId ??= ""
 debug.extraSaveSlots ??= 0
 debug.showSaveLogs ??= false
 debug.disableVisibleRegionMask ??= false
-debug.enableBuilding ??= false
 
 const help = () => {
     let help = "dev controls (enable with debug.enableDevControls=true)"

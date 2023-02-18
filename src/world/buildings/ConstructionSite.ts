@@ -12,6 +12,11 @@ export type ConstructionState = {
     hoursLeft: number
 }
 
+/**
+ * TODO Future improvements:
+ *   - Update construction hourly instead of daily
+ *   - Notification (push or Herald) when construction completes
+ */
 export class ConstructionSite extends Component {
     constructor(
         wl: Location,
