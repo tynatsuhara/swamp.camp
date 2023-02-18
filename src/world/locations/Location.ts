@@ -173,7 +173,6 @@ export class Location {
         return groundComponent
     }
 
-    // TODO is this useful?
     reloadElement(tile: Point) {
         const element = this.getElement(tile)
         if (!element) {

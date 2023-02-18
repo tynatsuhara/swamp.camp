@@ -3,19 +3,23 @@ import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { startDonating } from "../../characters/dialogue/DonationBoxDialogue"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { ItemStack } from "../../items/Inventory"
-import { Item } from "../../items/Items"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { getChestComponents } from "../elements/Chest"
 import { Location } from "../locations/Location"
+
+export type ConstructionState = {
+    hasSupplies: boolean
+    hoursLeft: number
+}
 
 export class ConstructionSite extends Component {
     constructor(
         wl: Location,
         pos: Point,
         readonly size: Point,
-        private readonly getHasMaterials: () => boolean,
-        setHasMaterials: () => void,
-        setBuildComplete: () => void // TODO figure out where this gets called
+        private readonly mutableState: ConstructionState,
+        itemsRequired: ItemStack[],
+        private readonly completeConstruction: () => void
     ) {
         super()
 
@@ -26,19 +30,18 @@ export class ConstructionSite extends Component {
             pos.plusX(size.x - 1).plusY(size.y - 1),
         ]
 
-        // TODO
-        const itemsRequired: ItemStack[] = [
-            new ItemStack(Item.WOOD, 20),
-            new ItemStack(Item.ROCK, 10),
-        ]
-
         const chestPos = pos.plus(pt(size.x / 2 - 0.5, size.y - 1)).times(TILE_SIZE)
 
         const { components, closeAnimation } = getChestComponents(
             wl,
             chestPos,
             () => {
-                startDonating({ onDonationComplete: setHasMaterials, itemsRequired })
+                startDonating({
+                    onDonationComplete: () => {
+                        this.mutableState.hasSupplies = true
+                    },
+                    itemsRequired,
+                })
             },
             () => !this.hasMaterials()
         )
@@ -69,6 +72,13 @@ export class ConstructionSite extends Component {
     }
 
     hasMaterials() {
-        return this.getHasMaterials()
+        return !!this.mutableState.hasSupplies
+    }
+
+    makeProgress(hoursWorked: number) {
+        this.mutableState.hoursLeft -= hoursWorked
+        if (this.mutableState.hoursLeft <= 0) {
+            this.completeConstruction()
+        }
     }
 }

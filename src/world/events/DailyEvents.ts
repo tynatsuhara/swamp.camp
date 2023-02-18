@@ -1,0 +1,68 @@
+import { Lists } from "brigsby/dist/util/Lists"
+import { VillagerJob } from "../../characters/ai/VillagerJob"
+import { DudeFaction } from "../../characters/DudeFactory"
+import { DudeType } from "../../characters/DudeType"
+import { Villager } from "../../characters/types/Villager"
+import { ConstructionSite } from "../buildings/ConstructionSite"
+import { Elements, ElementType } from "../elements/Elements"
+import { HittableResource } from "../elements/HittableResource"
+import { camp, LocationManager } from "../locations/LocationManager"
+
+const getAllVillagers = () =>
+    LocationManager.instance
+        .getLocations()
+        .flatMap((l) => l.getDudes())
+        .filter((d) => d.isAlive && d.factions.includes(DudeFaction.VILLAGERS))
+
+export const replenishResources = () => {
+    camp()
+        .getElements()
+        .map((e) => e.entity.getComponent(HittableResource)?.replenish())
+
+    const allSpots = camp().getGroundSpots(true)
+    const spawnResource = (type: ElementType, count: number) => {
+        const typeFactory = Elements.instance.getElementFactory(type)
+        const openTiles = allSpots.filter(
+            (tile) => !camp().isOccupied(tile) && typeFactory.canPlaceAtPos(camp(), tile)
+        )
+        for (let i = 0; i < count; i++) {
+            camp().addElement(type, Lists.oneOf(openTiles))
+        }
+    }
+
+    // Spawn new resources
+    spawnResource(ElementType.ROCK, Math.random() * 5)
+    spawnResource(ElementType.BLACKBERRIES, Math.random() * 3)
+    spawnResource(ElementType.MUSHROOM, Math.round(Math.random()))
+}
+
+export const updateTownStats = () => {
+    const foodAmount = 0 // TODO
+    const villagerCount = LocationManager.instance
+        .getLocations()
+        .flatMap((l) => l.getDudes())
+        .filter((d) => d.isAlive && d.factions.includes(DudeFaction.VILLAGERS)).length
+    // TODO calculate food amount
+}
+
+// TODO
+export const applyVillagerWork = () => {
+    const villagers = getAllVillagers()
+        .filter((v) => v.type === DudeType.VILLAGER)
+        .map((v) => v.entity.getComponent(Villager))
+
+    const constructionWorkers = villagers.filter((v) => v.job === VillagerJob.CONSTRUCTION)
+    const activeConstructionSites = camp()
+        .getElements()
+        .map((e) => e.entity.getComponent(ConstructionSite))
+        .filter((site) => site?.hasMaterials())
+    // construction progress scales linearly by number of workers
+    const hoursWorked = (constructionWorkers.length / activeConstructionSites.length) * 24
+    activeConstructionSites.forEach((site) => site.makeProgress(hoursWorked))
+
+    const miners = villagers.filter((v) => v.job === VillagerJob.MINE)
+    // TODO make progress on mines, collect resources
+
+    const lumberjacks = villagers.filter((v) => v.job === VillagerJob.HARVEST_WOOD)
+    // TODO chop some trees, collect wood
+}

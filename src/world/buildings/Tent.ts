@@ -15,7 +15,7 @@ import { GroundType } from "../ground/Ground"
 import { Location } from "../locations/Location"
 import { LocationManager, LocationType } from "../locations/LocationManager"
 import { Teleporter, TeleporterPrefix, TeleporterSound } from "../Teleporter"
-import { BuildingFactory } from "./Building"
+import { BuildingFactory, ConstructionRequirements } from "./Building"
 import { InteriorUtils } from "./InteriorUtils"
 
 export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
@@ -80,6 +80,11 @@ export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
         )
 
         return e.addComponent(new ElementComponent(ElementType.TENT, pos, () => data))
+    }
+
+    getConstructionRequirements(): ConstructionRequirements {
+        // tents don't require construction
+        return undefined
     }
 
     itemMetadataToSaveFormat(metadata: ItemMetadata): Partial<TentData> {

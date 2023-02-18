@@ -16,8 +16,7 @@ import { pixelPtToTilePt } from "../graphics/Tilesets"
 import { session } from "../online/session"
 import { DrawMenu } from "../ui/DrawMenu"
 import { UIStateManager } from "../ui/UIStateManager"
-import { BuildingFactory } from "../world/buildings/Building"
-import { Elements, ElementType } from "../world/elements/Elements"
+import { ElementType } from "../world/elements/Elements"
 import { GroundType } from "../world/ground/Ground"
 import { camp, here, LocationManager } from "../world/locations/LocationManager"
 import { RadiantLocationGenerator } from "../world/locations/RadiantLocationGenerator"
@@ -181,14 +180,14 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
             // }
         },
     ],
-    // [
-    //     InputKey.PERIOD,
-    //     "delete hovered element",
-    //     (input) => {
-    //         const { x, y } = pixelPtToTilePt(input.mousePos)
-    //         here().removeElementAt(x, y)
-    //     },
-    // ],
+    [
+        InputKey.PERIOD,
+        "delete hovered element",
+        (input) => {
+            const { x, y } = pixelPtToTilePt(input.mousePos)
+            here().removeElementAt(x, y)
+        },
+    ],
     // [
     //     InputKey.PERIOD,
     //     "grow hovered growable",
@@ -200,20 +199,20 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     //         growable?.forceGrow()
     //     },
     // ],
-    [
-        InputKey.PERIOD,
-        "finish construction",
-        (input) => {
-            window["no_construct"] = true
-            here()
-                .getElements()
-                .forEach((el) => {
-                    if (Elements.instance.getElementFactory(el.type) instanceof BuildingFactory) {
-                        here().reloadElement(el.pos)
-                    }
-                })
-        },
-    ],
+    // [
+    //     InputKey.PERIOD,
+    //     "finish construction",
+    //     (input) => {
+    //         window["no_construct"] = true
+    //         here()
+    //             .getElements()
+    //             .forEach((el) => {
+    //                 if (Elements.instance.getElementFactory(el.type) instanceof BuildingFactory) {
+    //                     here().reloadElement(el.pos)
+    //                 }
+    //             })
+    //     },
+    // ],
 
     [
         InputKey.Y,

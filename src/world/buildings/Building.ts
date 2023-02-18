@@ -1,5 +1,6 @@
 import { debug, Entity, Point } from "brigsby/dist"
-import { ItemMetadata } from "../../items/Items"
+import { ItemStack } from "../../items/Inventory"
+import { Item, ItemMetadata } from "../../items/Items"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementFactory } from "../elements/ElementFactory"
 import { ElementType } from "../elements/Elements"
@@ -7,7 +8,12 @@ import { ElementUtils } from "../elements/ElementUtils"
 import { Ground } from "../ground/Ground"
 import { Location } from "../locations/Location"
 import { camp } from "../locations/LocationManager"
-import { ConstructionSite } from "./ConstructionSite"
+import { ConstructionSite, ConstructionState } from "./ConstructionSite"
+
+export type ConstructionRequirements = {
+    hours: number
+    materials: ItemStack[]
+}
 
 /**
  * At runtime, a building exterior is built with several components:
@@ -53,26 +59,22 @@ export abstract class BuildingFactory<
         // TODO: Add construction process
 
         if (debug.enableBuilding) {
-            let hasSupplies = data["hasSupplies"]
-            let underConstruction = data["underConstruction"]
+            let constructionState = data["constructionState"] as ConstructionState
             const completeConstruction = () => {
                 // todo push dudes away like in PlaceElementFrame
-                hasSupplies = undefined
-                underConstruction = undefined
+                constructionState = undefined
                 wl.reloadElement(pos)
             }
 
-            if (underConstruction) {
+            if (constructionState) {
                 const e = new Entity()
                 e.addComponent(
                     new ConstructionSite(
                         wl,
                         pos,
                         this.dimensions,
-                        () => hasSupplies,
-                        () => {
-                            hasSupplies = true
-                        },
+                        constructionState,
+                        this.getConstructionRequirements().materials,
                         completeConstruction
                     )
                 )
@@ -80,8 +82,7 @@ export abstract class BuildingFactory<
                 return e.addComponent(
                     new ElementComponent(this.type, pos, () => ({
                         ...data,
-                        hasSupplies,
-                        underConstruction,
+                        constructionState,
                     }))
                 )
             }
@@ -90,7 +91,27 @@ export abstract class BuildingFactory<
         return this.makeBuilding(wl, pos, data)
     }
 
+    /**
+     * @returns ConstructionRequirements if this building has a construction process.
+     *          Subclasses should override this method to adjust their construction parameters!
+     */
+    getConstructionRequirements(): ConstructionRequirements {
+        return {
+            hours: 5 * 24,
+            materials: [new ItemStack(Item.WOOD, 20), new ItemStack(Item.ROCK, 10)],
+        }
+    }
+
     itemMetadataToSaveFormat(metadata: ItemMetadata) {
-        return { underConstruction: true } as unknown as Partial<SaveFormat>
+        const reqs = this.getConstructionRequirements()
+        if (!reqs) {
+            return undefined
+        }
+
+        const initialConstructionState: ConstructionState = {
+            hasSupplies: false,
+            hoursLeft: reqs.hours,
+        }
+        return { constructionState: initialConstructionState } as unknown as Partial<SaveFormat>
     }
 }

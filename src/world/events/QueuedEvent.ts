@@ -1,17 +1,15 @@
-import { Lists } from "brigsby/dist/util"
-import { DudeFaction, DudeFactory } from "../../characters/DudeFactory"
+import { DudeFactory } from "../../characters/DudeFactory"
 import { DudeSpawner } from "../../characters/DudeSpawner"
 import { DudeType } from "../../characters/DudeType"
 import { NPC } from "../../characters/NPC"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { NotificationDisplay, Notifications } from "../../ui/NotificationDisplay"
-import { Elements, ElementType } from "../elements/Elements"
-import { HittableResource } from "../elements/HittableResource"
 import { Queequeg } from "../elements/Queequeg"
 import { camp, LocationManager } from "../locations/LocationManager"
 import { collectTaxes } from "../TaxRate"
 import { Day, TimeUnit } from "../TimeUnit"
 import { WorldTime } from "../WorldTime"
+import { applyVillagerWork, replenishResources, updateTownStats } from "./DailyEvents"
 import { EventQueue } from "./EventQueue"
 
 export enum QueuedEventType {
@@ -73,7 +71,7 @@ export const getEventQueueHandlers = (): {
     [QueuedEventType.DAILY_SCHEDULE]: () => {
         console.log(`executing daily schedule for ${Day[WorldTime.instance.currentDay]}`)
 
-        // Collect taxes
+        // Collect taxes later in the day
         if (WorldTime.instance.currentDay === Day.MONDAY) {
             EventQueue.instance.addEvent({
                 type: QueuedEventType.COLLECT_TAXES,
@@ -81,34 +79,11 @@ export const getEventQueueHandlers = (): {
             })
         }
 
-        // Replenish resources
-        camp()
-            .getElements()
-            .map((e) => e.entity.getComponent(HittableResource)?.replenish())
+        replenishResources()
 
-        const allSpots = camp().getGroundSpots(true)
-        const spawnResource = (type: ElementType, count: number) => {
-            const typeFactory = Elements.instance.getElementFactory(type)
-            const openTiles = allSpots.filter(
-                (tile) => !camp().isOccupied(tile) && typeFactory.canPlaceAtPos(camp(), tile)
-            )
-            for (let i = 0; i < count; i++) {
-                camp().addElement(type, Lists.oneOf(openTiles))
-            }
-        }
+        updateTownStats()
 
-        // Spawn new resources
-        spawnResource(ElementType.ROCK, Math.random() * 5)
-        spawnResource(ElementType.BLACKBERRIES, Math.random() * 3)
-        spawnResource(ElementType.MUSHROOM, Math.round(Math.random()))
-
-        // Update town stats
-        const foodAmount = 0 // TODO
-        const villagerCount = LocationManager.instance
-            .getLocations()
-            .flatMap((l) => l.getDudes())
-            .filter((d) => d.isAlive && d.factions.includes(DudeFaction.VILLAGERS)).length
-        // TODO calculate food amount
+        applyVillagerWork()
 
         EventQueue.instance.addEvent({
             type: QueuedEventType.DAILY_SCHEDULE,
