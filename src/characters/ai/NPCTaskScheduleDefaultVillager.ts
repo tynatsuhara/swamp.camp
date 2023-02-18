@@ -1,6 +1,7 @@
 import { Point, pt } from "brigsby/dist/Point"
-import { Grid, Lists } from "brigsby/dist/util"
+import { Lists } from "brigsby/dist/util"
 import { pixelPtToTilePt, TILE_SIZE } from "../../graphics/Tilesets"
+import { hash } from "../../utils/hash"
 import { ConstructionSite } from "../../world/buildings/ConstructionSite"
 import { DarknessMask } from "../../world/DarknessMask"
 import { Campfire } from "../../world/elements/Campfire"
@@ -202,20 +203,18 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
     }
 
     private getConstructionZoneSpots() {
-        const { location, tile } = this.npc.dude
+        const zones = camp()
+            .getElements()
+            .filter((e) => e.entity.getComponent(ConstructionSite)?.hasMaterials())
 
-        const constructionPoint = Grid.spiralSearch(
-            tile,
-            // TODO check if it has supplies
-            (pt) => location.getElement(pt)?.entity.getComponent(ConstructionSite)?.hasMaterials()
-        )
-
-        if (!constructionPoint) {
+        if (zones.length === 0) {
             return null
         }
 
-        const zoneElement = location.getElement(constructionPoint)
+        // determine work site in a consistent way
+        const zoneElement = zones[hash(this.npc.dude.uuid) % zones.length]
         const zone = zoneElement.entity.getComponent(ConstructionSite)
+
         return ElementUtils.rectPoints(zoneElement.pos, zone.size)
     }
 
