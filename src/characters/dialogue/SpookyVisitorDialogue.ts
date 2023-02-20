@@ -4,14 +4,14 @@ import { DialogueOption, DialogueSet, dialogueWithOptions, NextDialogue } from "
 
 /**
  * All supported glyphs:
- * ABCČĆDĐEFGHIJKLMNOPQRSŠTUVWXYZŽabcčćdđefghijklmnopqrsštuvwxyzžАБВГҐД
- * ЂЕЁЄЖЗЅИІЇЙЈКЛЉМНЊОПРСТЋУЎФХЦЧЏШЩЪЫЬЭЮЯабвгґдђеёєжзѕиіїйјклљмнњопрст
+ * ABCČĆDĐEFGHIJKLMNOPQRSŠTUVWXYZŽabcčćdđefghijklmnopqrsštuvwxyzžАБВГД
+ * ЂЕЁЄЖЗЅИІЇЙЈКЛЉМНЊОПРСТЋУЎФХЦЧЏШЩЪЫЬЭЮЯабвгдђеёєжзѕиіїйјклљмнњопрст
  * ћуўфхцчџшщъыьэюяΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψω1234
  * 567890‘?’“!”(%)[#]{@}/&\<-+÷×=>®©$€£¥¢:;,.*
  */
 
 const LANGUAGE_CHARACTERS = Array.from(
-    "ČĆĐŠŽčćđšžБГҐДЂЁЄЖЗЅИЇЙЛЉЊПЋЎФЦЧЏШЩЪЫЬЭЮЯбвгґдђёєжзѕиїйклљмнњптћуўфхцчџшщъыьэюяΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψω"
+    "ČĆĐŠŽčćđšžБГДЂЁЄЖЗЅИЇЙЛЉЊПЋЎФЦЧЏШЩЪЫЬЭЮЯбвгдђёєжзѕиїйклљмнњптћуўфхцчџшщъыьэюяΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψω"
 )
 
 const getSentence = (punctuation: string[]) => {
