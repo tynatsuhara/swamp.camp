@@ -13,7 +13,7 @@ import { Interactable } from "../elements/Interactable"
 import { NavMeshCollider } from "../elements/NavMeshCollider"
 import { GroundType } from "../ground/Ground"
 import { Location } from "../locations/Location"
-import { LocationManager, LocationType } from "../locations/LocationManager"
+import { here, LocationManager, LocationType } from "../locations/LocationManager"
 import { Teleporter, TeleporterPrefix, TeleporterSound } from "../Teleporter"
 import { BuildingFactory, ConstructionRequirements } from "./Building"
 import { InteriorUtils } from "./InteriorUtils"
@@ -73,7 +73,12 @@ export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
             new Breakable(
                 interactablePos,
                 tiles.map((t) => t.transform),
-                () => [{ item: Item.TENT, metadata: data }],
+                () => {
+                    // side effect: eject people inside
+                    LocationManager.instance.get(destinationUUID).ejectResidents(here().uuid)
+
+                    return [{ item: Item.TENT, metadata: data }]
+                },
                 () => Sounds.playAtPoint(...TeleporterSound.TENT, tentCenterPos),
                 10
             )

@@ -442,6 +442,13 @@ export class Location {
         return Point.fromString(link)
     }
 
+    ejectResidents(exteriorUUID: string) {
+        const teleporterToExterior = this.getTeleporter(exteriorUUID)
+        this.getDudes().forEach((d) => {
+            this.npcUseTeleporter(d, teleporterToExterior)
+        })
+    }
+
     npcUseTeleporter(dude: Dude, teleporter: Teleporter) {
         const linkedLocation = LocationManager.instance.get(teleporter.to)
         const linkedPosition = this.getTeleporterLinkedPos(teleporter.to, teleporter.id)
