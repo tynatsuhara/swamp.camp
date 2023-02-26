@@ -1,5 +1,5 @@
 import { Lists } from "brigsby/dist/util"
-import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
+import { InteractIndicator } from "../../ui/InteractIndicator"
 import { DialogueOption, DialogueSet, dialogueWithOptions, NextDialogue } from "./Dialogue"
 
 /**
@@ -40,7 +40,7 @@ export const SPOOKY_VISITOR_DIALOGUE: DialogueSet = {
                 "*The mysterious visitor opens their cloak, revealing an array of trinkets.*",
                 getSentence(["?"]),
             ],
-            DudeInteractIndicator.NONE,
+            InteractIndicator.NONE,
             new DialogueOption("Take a look", () => {
                 console.log("TODO: open trade window")
                 new NextDialogue(SPOOKY_VISITOR_STARTING_DIALOGUE, false)

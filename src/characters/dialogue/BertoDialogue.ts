@@ -1,6 +1,6 @@
 import { Item } from "../../items/Items"
 import { saveManager } from "../../SaveManager"
-import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
+import { InteractIndicator } from "../../ui/InteractIndicator"
 import { TextIcon } from "../../ui/Text"
 import { SalePackage, TradeMenu } from "../../ui/TradeMenu"
 import { Queequeg } from "../../world/elements/Queequeg"
@@ -72,7 +72,7 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
                 "Tradesmen! Knights! Worthless peons to build homes, scrub latrines, and polish thine armor!",
                 "Art thou interested in any of my services at the moment?",
             ],
-            DudeInteractIndicator.IMPORTANT_DIALOGUE,
+            InteractIndicator.IMPORTANT_DIALOGUE,
             option("Sure!", BERT_MENU, true),
             option("Maybe later.", BERT_ENTRYPOINT, false)
         ),
@@ -81,9 +81,7 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
         return dialogue(
             [getGreeting()],
             () => new NextDialogue(BERT_MENU, true),
-            announcements.length > 0
-                ? DudeInteractIndicator.IMPORTANT_DIALOGUE
-                : DudeInteractIndicator.NONE
+            announcements.length > 0 ? InteractIndicator.IMPORTANT_DIALOGUE : InteractIndicator.NONE
         )
     },
     [BERT_MENU]: () => {
@@ -113,7 +111,7 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
         }
         return dialogueWithOptions(
             ["How shall I assist thee?"],
-            DudeInteractIndicator.NONE,
+            InteractIndicator.NONE,
             ...options,
             option(getExitText(), BERT_ENTRYPOINT, false)
         )
@@ -242,7 +240,7 @@ const fetchNpcDialogue = (): DialogueInstance => {
 
     options.push(option(getExitText(), BERT_ENTRYPOINT, false))
 
-    return dialogueWithOptions(introText, DudeInteractIndicator.NONE, ...options)
+    return dialogueWithOptions(introText, InteractIndicator.NONE, ...options)
 }
 
 const fetchConvictsDialogue = (): DialogueInstance => {
@@ -299,7 +297,7 @@ const fetchConvictsDialogue = (): DialogueInstance => {
 
     return dialogueWithOptions(
         [`Art thou willing to pay the fee of ${TextIcon.COIN}${villagerCost} for shipment?`],
-        DudeInteractIndicator.NONE,
+        InteractIndicator.NONE,
         new DialogueOption("Yes.", completeOrder),
         option(getExitText(), BERT_ENTRYPOINT, false)
     )
@@ -339,7 +337,7 @@ const adjustTaxRateDialogue = (): DialogueInstance => {
                     : `Presently, the tax rate is ${rateText[currentRate]}.`
             } Dost thou wish to adjust it?`,
         ],
-        DudeInteractIndicator.NONE,
+        InteractIndicator.NONE,
         ...options
     )
 }

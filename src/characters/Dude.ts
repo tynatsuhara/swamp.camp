@@ -2,7 +2,6 @@ import { Component, debug, Point, pt, UpdateData } from "brigsby/dist"
 import { BoxCollider } from "brigsby/dist/collision"
 import { PointValue } from "brigsby/dist/Point"
 import { RenderMethod } from "brigsby/dist/renderer"
-import { SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Animator, Lists, RepeatedInvoker } from "brigsby/dist/util"
 import { StepSounds } from "../audio/StepSounds"
 import { VocalSounds } from "../audio/VocalSounds"
@@ -28,10 +27,9 @@ import { session } from "../online/session"
 import { clientSyncFn, syncData, syncFn } from "../online/syncUtils"
 import { DudeSaveState } from "../saves/DudeSaveState"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
-import { DudeInteractIndicator } from "../ui/DudeInteractIndicator"
 import { HUD } from "../ui/HUD"
+import { InteractIndicator } from "../ui/InteractIndicator"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
-import { UIStateManager } from "../ui/UIStateManager"
 import { Burnable } from "../world/elements/Burnable"
 import { Campfire } from "../world/elements/Campfire"
 import { ElementType } from "../world/elements/Elements"
@@ -483,7 +481,7 @@ export class Dude extends Component implements DialogueSource {
             this.doWhileLiving(() => {
                 if (this.dialogue) {
                     this.dialogueIndicator =
-                        getDialogue(this.dialogue, this)?.indicator ?? DudeInteractIndicator.NONE
+                        getDialogue(this.dialogue, this)?.indicator ?? InteractIndicator.NONE
                 }
                 return 1_000
             })
@@ -1538,7 +1536,7 @@ export class Dude extends Component implements DialogueSource {
     }
 
     private getIndicator(): RenderMethod[] {
-        let indicator = DudeInteractIndicator.NONE
+        let indicator = InteractIndicator.NONE
         if (!this.isAlive) {
             return []
         }
@@ -1547,9 +1545,9 @@ export class Dude extends Component implements DialogueSource {
         const npc = this.entity.getComponent(NPC)
         if (npc?.targetedEnemy === player()) {
             if (this.attackState === AttackState.ATTACKING_SOON) {
-                indicator = DudeInteractIndicator.ATTACKING_SOON
+                indicator = InteractIndicator.ATTACKING_SOON
             } else if (this.attackState === AttackState.ATTACKING_NOW) {
-                indicator = DudeInteractIndicator.ATTACKING_NOW
+                indicator = InteractIndicator.ATTACKING_NOW
             }
         } else if (this.dialogue && this.dialogue != EMPTY_DIALOGUE) {
             indicator = this.dialogueIndicator
@@ -1563,7 +1561,7 @@ export class Dude extends Component implements DialogueSource {
         // }
 
         if (
-            indicator === DudeInteractIndicator.IMPORTANT_DIALOGUE ||
+            indicator === InteractIndicator.IMPORTANT_DIALOGUE ||
             (this.type === DudeType.PLAYER &&
                 this.getCurrentOffMapArea() &&
                 !CutscenePlayerController.instance.enabled)
@@ -1578,31 +1576,14 @@ export class Dude extends Component implements DialogueSource {
             HUD.instance.removeIndicator(this)
         }
 
-        // render indicator icon overhead
-        let tile: StaticSpriteSource = DudeInteractIndicator.getTile(indicator)
-        if (
-            !tile ||
-            this.dialogueInteract?.isShowingUI ||
-            DialogueDisplay.instance.currentSource === this
-        ) {
-            return []
-        } else {
-            return [
-                tile.toImageRender(
-                    new SpriteTransform(
-                        this.standingPosition
-                            .plusY(-28)
-                            .plus(new Point(1, 1).times(-TILE_SIZE / 2))
-                            .plus(this.getAnimationOffset()),
-                        new Point(TILE_SIZE, TILE_SIZE),
-                        0,
-                        false,
-                        false,
-                        UIStateManager.UI_SPRITE_DEPTH
-                    )
-                ),
-            ]
-        }
+        return [
+            InteractIndicator.getImageRender(
+                indicator,
+                this.standingPosition.plusY(-28).plus(this.getAnimationOffset()),
+                this.dialogueInteract?.isShowingUI ||
+                    DialogueDisplay.instance.currentSource === this
+            ),
+        ]
     }
 
     log(message: any) {

@@ -1,6 +1,6 @@
 import { ItemStack } from "../../items/Inventory"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
-import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
+import { InteractIndicator } from "../../ui/InteractIndicator"
 import { player } from "../player/index"
 import {
     dialogue,
@@ -54,7 +54,7 @@ export const DONATION_DIALOGUES: DialogueSet = {
             )
         }
 
-        return dialogueWithOptions([str], DudeInteractIndicator.NONE, ...options)
+        return dialogueWithOptions([str], InteractIndicator.NONE, ...options)
     },
 
     [DONATION_COMPLETED]: () => {

@@ -1,4 +1,4 @@
-import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
+import { InteractIndicator } from "../../ui/InteractIndicator"
 import { BED_DIALOGUES } from "./BedDialogue"
 import { BERTO_INTRO_DIALOGUE } from "./BertoDialogue"
 import { CAMPFIRE_DIALOGUES } from "./CampfireDialogue"
@@ -35,7 +35,7 @@ export class DialogueInstance {
         lines: string[] | (() => string[]) | undefined,
         next: () => void | NextDialogue,
         options: DialogueOption[],
-        indicator: string = DudeInteractIndicator.NONE
+        indicator: string = InteractIndicator.NONE
     ) {
         this._lines = lines
         this.next = next
@@ -47,13 +47,13 @@ export class DialogueInstance {
 // When processed by DialogueDisplay, immediately loads the next dialogue
 // Useful for when you want to show a next dialogue without any interstitial text or options
 export const redirectDialogue = (next: () => NextDialogue) => {
-    return new DialogueInstance(undefined, next, [], DudeInteractIndicator.NONE)
+    return new DialogueInstance(undefined, next, [], InteractIndicator.NONE)
 }
 
 // Shorthand functions for creating dialogue
 export const dialogueWithOptions = (
     lines: string[] | (() => string[]),
-    indicator: string = DudeInteractIndicator.NONE,
+    indicator: string = InteractIndicator.NONE,
     ...options: DialogueOption[]
 ): DialogueInstance => {
     return new DialogueInstance(lines, () => {}, options, indicator)
@@ -61,7 +61,7 @@ export const dialogueWithOptions = (
 export const dialogue = (
     lines: string[],
     next: () => void | NextDialogue = () => {},
-    indicator: string = DudeInteractIndicator.NONE
+    indicator: string = InteractIndicator.NONE
 ): DialogueInstance => {
     return new DialogueInstance(lines, next, [], indicator)
 }

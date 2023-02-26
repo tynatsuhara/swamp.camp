@@ -2,7 +2,7 @@ import { controls } from "../../Controls"
 import { getDipRecipes } from "../../items/CraftingRecipe"
 import { Item } from "../../items/Items"
 import { CraftingMenu } from "../../ui/CraftingMenu"
-import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
+import { InteractIndicator } from "../../ui/InteractIndicator"
 import { ElementType } from "../../world/elements/Elements"
 import { EventQueue } from "../../world/events/EventQueue"
 import { QueuedEventType } from "../../world/events/QueuedEvent"
@@ -40,7 +40,7 @@ export const DIP_INTRO_DIALOGUE: DialogueSet = {
             [
                 "Phew, thanks for your help! They almost had me. I thought for sure that those Orcs were gonna eat my butt.",
             ],
-            DudeInteractIndicator.IMPORTANT_DIALOGUE,
+            InteractIndicator.IMPORTANT_DIALOGUE,
             option("Are you okay?", DIP_1),
             option("I expect a reward.", DIP_2),
             option("... Eat your butt?", DIP_3)
@@ -104,7 +104,7 @@ export const DIP_INTRO_DIALOGUE: DialogueSet = {
                     })
                     return new NextDialogue(DIP_TENT_PLACED, false)
                 },
-                DudeInteractIndicator.IMPORTANT_DIALOGUE
+                InteractIndicator.IMPORTANT_DIALOGUE
             )
         } else if (player().inventory.getItemCount(Item.CAMPFIRE) > 0) {
             // campfire has been crafted
@@ -120,7 +120,7 @@ export const DIP_INTRO_DIALOGUE: DialogueSet = {
                 [
                     `It looks like you have enough rocks and wood. Should we put together a campfire?`,
                 ],
-                DudeInteractIndicator.IMPORTANT_DIALOGUE,
+                InteractIndicator.IMPORTANT_DIALOGUE,
                 new DialogueOption(CRAFT_OPTION, () => {
                     CraftingMenu.instance.open(getDipRecipes())
                     return new NextDialogue(DIP_MAKE_CAMPFIRE, false)
@@ -157,7 +157,7 @@ export const DIP_INTRO_DIALOGUE: DialogueSet = {
                 "One last thing — I can also help make you some basic tools and utilities, if you bring me the necessary resources. Good luck!",
             ],
             () => new NextDialogue(DIP_ENTRYPOINT, false),
-            DudeInteractIndicator.IMPORTANT_DIALOGUE
+            InteractIndicator.IMPORTANT_DIALOGUE
         )
     },
 
@@ -166,7 +166,7 @@ export const DIP_INTRO_DIALOGUE: DialogueSet = {
 
         return dialogueWithOptions(
             ["Can I help you make something?"],
-            DudeInteractIndicator.NONE,
+            InteractIndicator.NONE,
             new DialogueOption(CRAFT_OPTION, () => {
                 CraftingMenu.instance.open(getDipRecipes())
                 return new NextDialogue(DIP_ENTRYPOINT, false)
@@ -183,7 +183,7 @@ export const DIP_INTRO_DIALOGUE: DialogueSet = {
     [DIP_UPGRADES]: () => {
         return dialogueWithOptions(
             ["Can I help you make something?"],
-            DudeInteractIndicator.NONE,
+            InteractIndicator.NONE,
             new DialogueOption(CRAFT_OPTION, () => {
                 CraftingMenu.instance.open(getDipRecipes())
                 return new NextDialogue(DIP_ENTRYPOINT, false)

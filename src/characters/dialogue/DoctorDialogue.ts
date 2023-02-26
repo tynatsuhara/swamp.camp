@@ -1,5 +1,5 @@
 import { Item } from "../../items/Items"
-import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
+import { InteractIndicator } from "../../ui/InteractIndicator"
 import { SalePackage, TradeMenu } from "../../ui/TradeMenu"
 import { Dude } from "../Dude"
 import {
@@ -37,7 +37,7 @@ export const DOCTOR_DIALOGUE: DialogueSet = {
     [DOCTOR_DIALOGUE_ENTRYPOINT]: (doctor: Dude) => {
         return dialogueWithOptions(
             ["I offer goods and services to keep the town healthy."],
-            DudeInteractIndicator.NONE,
+            InteractIndicator.NONE,
             new DialogueOption("What's for sale?", () => {
                 TradeMenu.instance.buy(getItemsToBuy()).from(doctor)
                 return new NextDialogue(DOCTOR_DIALOGUE_ENTRYPOINT, false)

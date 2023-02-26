@@ -1,4 +1,4 @@
-import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
+import { InteractIndicator } from "../../ui/InteractIndicator"
 import { Bed } from "../../world/elements/Bed"
 import { here } from "../../world/locations/LocationManager"
 import { player } from "../player/index"
@@ -24,7 +24,7 @@ export const BED_DIALOGUES: DialogueSet = {
             return dialogue(
                 [`This ${bedType} doesn't belong to you.`],
                 () => completeDialogue,
-                DudeInteractIndicator.NONE
+                InteractIndicator.NONE
             )
         }
 
@@ -56,10 +56,10 @@ export const BED_DIALOGUES: DialogueSet = {
             return dialogue(
                 ["You cannot sleep if your campfire is out."],
                 () => completeDialogue,
-                DudeInteractIndicator.NONE
+                InteractIndicator.NONE
             )
         }
 
-        return dialogueWithOptions([text], DudeInteractIndicator.NONE, ...options)
+        return dialogueWithOptions([text], InteractIndicator.NONE, ...options)
     },
 }

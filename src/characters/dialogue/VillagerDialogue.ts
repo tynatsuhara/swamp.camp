@@ -1,5 +1,5 @@
 import { Lists } from "brigsby/dist/util/Lists"
-import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
+import { InteractIndicator } from "../../ui/InteractIndicator"
 import { VillagerJob } from "../ai/VillagerJob"
 import { Dude } from "../Dude"
 import { Villager } from "../types/Villager"
@@ -33,7 +33,7 @@ export const VILLAGER_DIALOGUE: DialogueSet = {
                     "At your service, Champion.",
                 ]),
             ],
-            villager.job ? DudeInteractIndicator.NONE : DudeInteractIndicator.QUESTION,
+            villager.job ? InteractIndicator.NONE : InteractIndicator.QUESTION,
             new DialogueOption("Head down to the mines.", () => {
                 return setJob(VillagerJob.MINE)
             }),

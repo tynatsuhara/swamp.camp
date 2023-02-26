@@ -3,7 +3,7 @@ import { Item } from "../../items/Items"
 import { session } from "../../online/session"
 import { saveManager } from "../../SaveManager"
 import { CraftingMenu } from "../../ui/CraftingMenu"
-import { DudeInteractIndicator } from "../../ui/DudeInteractIndicator"
+import { InteractIndicator } from "../../ui/InteractIndicator"
 import { Campfire } from "../../world/elements/Campfire"
 import { RestPoint } from "../../world/elements/RestPoint"
 import { TimeUnit } from "../../world/TimeUnit"
@@ -71,7 +71,7 @@ export const CAMPFIRE_DIALOGUES: DialogueSet = {
 
         return dialogueWithOptions(
             [],
-            DudeInteractIndicator.NONE,
+            InteractIndicator.NONE,
             ...options,
             new DialogueOption(DialogueConstants.CANCEL_TEXT, completeDialogue(0))
         )
@@ -103,7 +103,7 @@ export const CAMPFIRE_DIALOGUES: DialogueSet = {
                         ? "You don't have any more logs to add to the fire."
                         : "Adding any more logs to the fire would be dangerous.",
                 ],
-                DudeInteractIndicator.NONE,
+                InteractIndicator.NONE,
                 exitOption
             )
         } else if (logsYouCanAdd === 1) {
@@ -113,7 +113,7 @@ export const CAMPFIRE_DIALOGUES: DialogueSet = {
                         ? "You only have one log to add to the fire."
                         : "The fire is almost too big.",
                 ],
-                DudeInteractIndicator.NONE,
+                InteractIndicator.NONE,
                 new DialogueOption("Add one log", completeDialogue(1)),
                 exitOption
             )
@@ -133,6 +133,6 @@ export const CAMPFIRE_DIALOGUES: DialogueSet = {
             new DialogueOption("Add one log", completeDialogue(1)),
         ]
 
-        return dialogueWithOptions([prompt], DudeInteractIndicator.NONE, ...options, exitOption)
+        return dialogueWithOptions([prompt], InteractIndicator.NONE, ...options, exitOption)
     },
 }
