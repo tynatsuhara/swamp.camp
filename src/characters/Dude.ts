@@ -979,9 +979,7 @@ export class Dude extends Component implements DialogueSource {
             return
         }
 
-        if (this.knockIntervalCallback !== 0) {
-            window.cancelAnimationFrame(this.knockIntervalCallback)
-        }
+        this.cancelKnockbackInterval()
 
         const direction = pt(dx, dy)
         const goal = this.standingPosition.plus(direction.normalized().times(knockback))
@@ -1007,6 +1005,13 @@ export class Dude extends Component implements DialogueSource {
             last = now
         }
         this.knockIntervalCallback = requestAnimationFrame(knock)
+    }
+
+    private cancelKnockbackInterval() {
+        if (this.knockIntervalCallback !== 0) {
+            window.cancelAnimationFrame(this.knockIntervalCallback)
+            this.knockIntervalCallback = 0
+        }
     }
 
     heal(amount: number) {
@@ -1226,6 +1231,11 @@ export class Dude extends Component implements DialogueSource {
     moveTo(point: Point, skipColliderCheck = false, isReceivedFromHost = false) {
         if (session.isGuest() && !isReceivedFromHost) {
             return
+        }
+
+        if (skipColliderCheck) {
+            // prevent screwy movement when knockback occurs when teleporting
+            this.cancelKnockbackInterval()
         }
 
         // movement is done based on top-left corner point
