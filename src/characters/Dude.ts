@@ -1576,12 +1576,15 @@ export class Dude extends Component implements DialogueSource {
             HUD.instance.removeIndicator(this)
         }
 
+        // render indicator icon overhead
+        if (this.dialogueInteract?.isShowingUI || DialogueDisplay.instance.currentSource === this) {
+            return []
+        }
+
         return [
             InteractIndicator.getImageRender(
                 indicator,
-                this.standingPosition.plusY(-28).plus(this.getAnimationOffset()),
-                this.dialogueInteract?.isShowingUI ||
-                    DialogueDisplay.instance.currentSource === this
+                this.standingPosition.plusY(-28).plus(this.getAnimationOffset())
             ),
         ]
     }

@@ -32,8 +32,8 @@ export const InteractIndicator = {
     ATTACKING_SOON: "o",
     ATTACKING_NOW: "O",
 
-    getImageRender: (indicator: string, centerPos: Point, isInteracting: boolean) => {
-        if (indicator === InteractIndicator.NONE || isInteracting) {
+    getImageRender: (indicator: string, centerPos: Point) => {
+        if (indicator === InteractIndicator.NONE) {
             return null
         }
         const tile = cache[indicator] || getIcon(indicator)
