@@ -21,7 +21,7 @@ export class DialogueInstance {
     }
     readonly next: () => void | NextDialogue
     readonly options: DialogueOption[]
-    readonly indicator: string
+    readonly indicator: InteractIndicator
 
     /**
      * @param lines Will be said one-by-one. TODO: Size restrictions based on UI
@@ -35,7 +35,7 @@ export class DialogueInstance {
         lines: string[] | (() => string[]) | undefined,
         next: () => void | NextDialogue,
         options: DialogueOption[],
-        indicator: string = InteractIndicator.NONE
+        indicator: InteractIndicator = InteractIndicator.NONE
     ) {
         this._lines = lines
         this.next = next
@@ -53,7 +53,7 @@ export const redirectDialogue = (next: () => NextDialogue) => {
 // Shorthand functions for creating dialogue
 export const dialogueWithOptions = (
     lines: string[] | (() => string[]),
-    indicator: string = InteractIndicator.NONE,
+    indicator: InteractIndicator = InteractIndicator.NONE,
     ...options: DialogueOption[]
 ): DialogueInstance => {
     return new DialogueInstance(lines, () => {}, options, indicator)
@@ -61,7 +61,7 @@ export const dialogueWithOptions = (
 export const dialogue = (
     lines: string[],
     next: () => void | NextDialogue = () => {},
-    indicator: string = InteractIndicator.NONE
+    indicator: InteractIndicator = InteractIndicator.NONE
 ): DialogueInstance => {
     return new DialogueInstance(lines, next, [], indicator)
 }

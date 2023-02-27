@@ -5,7 +5,7 @@ import { player } from "../../characters/player/index"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Inventory, ItemStack } from "../../items/Inventory"
 import { randomByteString } from "../../saves/uuid"
-import { InteractIndicator } from "../../ui/InteractIndicator"
+import { getInteractIndicatorIcon, InteractIndicator } from "../../ui/InteractIndicator"
 import { InventoryDisplay } from "../../ui/InventoryDisplay"
 import { Location } from "../locations/Location"
 import { ElementComponent } from "./ElementComponent"
@@ -56,7 +56,7 @@ export const getChestComponents = (
     pixelPos: Point,
     onInteract: () => void,
     canInteract = () => true,
-    getIndicator: () => string = () => null
+    getIndicator: () => InteractIndicator = () => null
 ): { components: Component[]; closeAnimation: () => void } => {
     const animator: AnimatedSpriteComponent = new AnimatedSpriteComponent(
         [
@@ -89,12 +89,7 @@ export const getChestComponents = (
             if (!indicatorStr || interactable.isShowingUI) {
                 return []
             }
-            return [
-                InteractIndicator.getImageRender(
-                    indicatorStr,
-                    interactable.position.plusY(-TILE_SIZE)
-                ),
-            ]
+            return [getInteractIndicatorIcon(indicatorStr, interactable.position.plusY(-TILE_SIZE))]
         },
     })
 

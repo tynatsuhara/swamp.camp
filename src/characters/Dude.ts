@@ -28,7 +28,7 @@ import { clientSyncFn, syncData, syncFn } from "../online/syncUtils"
 import { DudeSaveState } from "../saves/DudeSaveState"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { HUD } from "../ui/HUD"
-import { InteractIndicator } from "../ui/InteractIndicator"
+import { getInteractIndicatorIcon, InteractIndicator } from "../ui/InteractIndicator"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { Burnable } from "../world/elements/Burnable"
 import { Campfire } from "../world/elements/Campfire"
@@ -168,7 +168,7 @@ export class Dude extends Component implements DialogueSource {
 
     private dialogueInteract: Interactable
     dialogue: string
-    private dialogueIndicator = ""
+    private dialogueIndicator = InteractIndicator.NONE
 
     canBePushed = true
 
@@ -1582,7 +1582,7 @@ export class Dude extends Component implements DialogueSource {
         }
 
         return [
-            InteractIndicator.getImageRender(
+            getInteractIndicatorIcon(
                 indicator,
                 this.standingPosition.plusY(-28).plus(this.getAnimationOffset())
             ),
