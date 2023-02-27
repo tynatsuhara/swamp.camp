@@ -1,10 +1,11 @@
-import { Component, Entity, Point, pt } from "brigsby/dist"
+import { AnonymousComponent, Component, Entity, Point, pt } from "brigsby/dist"
 import { AnimatedSpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { ChestAnimation } from "../../characters/ChestAnimation"
 import { player } from "../../characters/player/index"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Inventory, ItemStack } from "../../items/Inventory"
 import { randomByteString } from "../../saves/uuid"
+import { InteractIndicator } from "../../ui/InteractIndicator"
 import { InventoryDisplay } from "../../ui/InventoryDisplay"
 import { Location } from "../locations/Location"
 import { ElementComponent } from "./ElementComponent"
@@ -54,7 +55,8 @@ export const getChestComponents = (
     wl: Location,
     pixelPos: Point,
     onInteract: () => void,
-    canInteract = () => true
+    canInteract = () => true,
+    getIndicator: () => string = () => null
 ): { components: Component[]; closeAnimation: () => void } => {
     const animator: AnimatedSpriteComponent = new AnimatedSpriteComponent(
         [
@@ -81,10 +83,25 @@ export const getChestComponents = (
         (interactor) => interactor === player() && canInteract()
     )
 
+    const indicator = new AnonymousComponent({
+        getRenderMethods: () => {
+            const indicatorStr = getIndicator()
+            if (!indicatorStr || interactable.isShowingUI) {
+                return []
+            }
+            return [
+                InteractIndicator.getImageRender(
+                    indicatorStr,
+                    interactable.position.plusY(-TILE_SIZE)
+                ),
+            ]
+        },
+    })
+
     const collider = new NavMeshCollider(wl, pixelPos.plus(pt(1, 9)), pt(14, 6))
 
     return {
-        components: [animator, interactable, collider],
+        components: [animator, interactable, collider, indicator],
         closeAnimation: () => {
             if (isOpen) {
                 animator.goToAnimation(1).play()

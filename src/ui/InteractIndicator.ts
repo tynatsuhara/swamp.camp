@@ -24,6 +24,7 @@ const getIcon = (indicator: string) => {
 
 const cache = {}
 
+// TODO make a better type
 export const InteractIndicator = {
     NONE: "",
     IMPORTANT_DIALOGUE: "!",

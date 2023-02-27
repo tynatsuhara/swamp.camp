@@ -6,13 +6,14 @@ import {
     dialogue,
     DialogueOption,
     DialogueSet,
+    DialogueSource,
     dialogueWithOptions,
     NextDialogue,
 } from "./Dialogue"
 import { DialogueConstants } from "./DialogueConstants"
 
-const DONATION_DIALOGUE = "donate",
-    DONATION_COMPLETED = "donate-completed"
+export const DONATION_DIALOGUE = "donate"
+const DONATION_COMPLETED = "donate-completed"
 
 type DonationOptions = {
     onDonationComplete: () => void
@@ -21,9 +22,9 @@ type DonationOptions = {
 
 let currentOptions: DonationOptions
 
-export const startDonating = (options: DonationOptions) => {
+export const startDonating = (options: DonationOptions, source: DialogueSource) => {
     currentOptions = options
-    DialogueDisplay.instance.startDialogue({ dialogue: DONATION_DIALOGUE })
+    DialogueDisplay.instance.startDialogue(source)
 }
 
 export const DONATION_DIALOGUES: DialogueSet = {

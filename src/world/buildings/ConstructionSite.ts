@@ -1,9 +1,10 @@
 import { AnonymousComponent, Component, Point, pt } from "brigsby/dist"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
-import { startDonating } from "../../characters/dialogue/DonationBoxDialogue"
+import { DONATION_DIALOGUE, startDonating } from "../../characters/dialogue/DonationBoxDialogue"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { ItemStack } from "../../items/Inventory"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
+import { InteractIndicator } from "../../ui/InteractIndicator"
 import { getChestComponents } from "../elements/Chest"
 import { Location } from "../locations/Location"
 
@@ -18,6 +19,8 @@ export type ConstructionState = {
  *   - Notification (push or Herald) when construction completes
  */
 export class ConstructionSite extends Component {
+    dialogue = DONATION_DIALOGUE
+
     constructor(
         wl: Location,
         pos: Point,
@@ -41,14 +44,22 @@ export class ConstructionSite extends Component {
             wl,
             chestPos,
             () => {
-                startDonating({
-                    onDonationComplete: () => {
-                        this.mutableState.hasSupplies = true
+                startDonating(
+                    {
+                        onDonationComplete: () => {
+                            this.mutableState.hasSupplies = true
+                        },
+                        itemsRequired,
                     },
-                    itemsRequired,
-                })
+                    this
+                )
             },
-            () => !this.hasMaterials()
+            () => !this.hasMaterials(),
+            () => {
+                if (!this.hasMaterials() && DialogueDisplay.instance.currentSource !== this) {
+                    return InteractIndicator.IMPORTANT_DIALOGUE
+                }
+            }
         )
 
         this.awake = () => {
