@@ -211,8 +211,9 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             return null
         }
 
-        // determine work site in a consistent way
-        const zoneElement = zones[hash(this.npc.dude.uuid) % zones.length]
+        // determine work site in a consistent way, add day so they mix it up every day
+        const consistentHash = hash(this.npc.dude.uuid + WorldTime.instance.currentDay)
+        const zoneElement = zones[consistentHash % zones.length]
         const zone = zoneElement.entity.getComponent(ConstructionSite)
 
         return ElementUtils.rectPoints(zoneElement.pos, zone.size)
