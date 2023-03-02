@@ -31,9 +31,22 @@ export class MiniMap extends Component {
         this.isShowing =
             !UIStateManager.instance.isMenuOpen && controls.isMapKeyHeld() && here() === camp()
 
+        const wl = camp()
+
+        if (!this.bigCanvas) {
+            this.bigCanvas = document.createElement("canvas")
+            this.bigCanvas.width = this.bigCanvas.height = wl.size * TILE_SIZE
+        }
+
+        if (!this.smallCanvas) {
+            this.smallCanvas = document.createElement("canvas", {})
+            this.smallCanvas.width = this.smallCanvas.height = this.bigCanvas.width / MiniMap.SCALE
+        }
+
         if (this.lastPixelDrawn.equals(Point.ZERO)) {
             this.renderFullSizeMap()
         }
+
         this.partiallyRenderDownsampledMap()
     }
 
@@ -51,10 +64,6 @@ export class MiniMap extends Component {
         }
 
         // first, draw everything onto a full-size canvas
-        if (!this.bigCanvas) {
-            this.bigCanvas = document.createElement("canvas")
-            this.bigCanvas.width = this.bigCanvas.height = wl.size * TILE_SIZE
-        }
         const context = this.bigCanvas.getContext("2d", { willReadFrequently: true })
 
         // draw the ground from the groundrenderer
@@ -86,12 +95,6 @@ export class MiniMap extends Component {
                     render.dimensions.y
                 )
             })
-
-        // Draw the scaled-down canvas
-        if (!this.smallCanvas) {
-            this.smallCanvas = document.createElement("canvas", {})
-            this.smallCanvas.width = this.smallCanvas.height = this.bigCanvas.width / MiniMap.SCALE
-        }
     }
 
     partiallyRenderDownsampledMap() {
