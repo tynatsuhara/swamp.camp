@@ -54,12 +54,15 @@ onmessage = (message: MessageEvent<DrawMiniMap>) => {
                 for (let j = 0; j < scale; j++) {
                     const [r, g, b] = getPixel(i + bigX, j + bigY)
                     const hex = getHex(r, g, b)
-                    hexStrings.push(hex)
+
                     // weigh other colors higher than grass color to show non-nature things on the map
-                    if (hex !== Color.GREEN_5 && hex !== Color.GREEN_6) {
-                        hexStrings.push(hex)
-                        hexStrings.push(hex)
+                    let hexWeight = 3
+                    if (hex === Color.GREEN_5) {
+                        hexWeight = 1
+                    } else if (hex === Color.GREEN_6) {
+                        hexWeight = 2
                     }
+                    hexStrings.push(...Array.from({ length: hexWeight }, () => hex))
                 }
             }
 

@@ -1,3 +1,3 @@
-export const createWorker = (name: "minimap") => {
-    return new Worker(`workers/${name}.js`)
+export const createWorker = (filename: "minimap") => {
+    return new Worker(`workers/${filename}.js`)
 }
