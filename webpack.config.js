@@ -3,6 +3,7 @@ const path = require("path")
 module.exports = (_, argv) => ({
     entry: {
         app: "./src/app.ts",
+        minimap: "./src/workers/minimap.ts",
     },
     module: {
         rules: [

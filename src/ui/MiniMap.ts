@@ -1,31 +1,30 @@
 import { Component, Point } from "brigsby/dist"
 import { ImageRender } from "brigsby/dist/renderer"
 import { SpriteTransform, SpriteTransformOptions, StaticSpriteSource } from "brigsby/dist/sprites"
-import { Lists, Maths } from "brigsby/dist/util"
+import { Maths } from "brigsby/dist/util"
 import { player } from "../characters/player"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { DrawMiniMap, MiniMapDrawn } from "../workers/minimap"
 import { ElementComponent } from "../world/elements/ElementComponent"
 import { GroundComponent } from "../world/ground/GroundComponent"
 import { GroundRenderer } from "../world/ground/GroundRenderer"
 import { WaterRenderer } from "../world/ground/WaterRenderer"
 import { LightManager } from "../world/LightManager"
 import { camp, here } from "../world/locations/LocationManager"
-import { Color, getHex } from "./Color"
+import { Color } from "./Color"
 import { UIStateManager } from "./UIStateManager"
 
 export class MiniMap extends Component {
     private static readonly SCALE = 12 // full-size pixels per map pixel
-    private static readonly PX_PER_HIDDEN_UPDATE = 50 // how many pixels we draw each update() when hidden
-    private static readonly PX_PER_SHOWN_UPDATE = 1000 // how many pixels we draw each update() when showing
-    private lastPixelDrawn = Point.ZERO
+    private needsRefresh = false
     private fullyRenderedAtLeastOnce = false
     private isShowing = false
-
+    private worker: Worker
     private bigCanvas: HTMLCanvasElement
-    private smallCanvas: OffscreenCanvas
+    private smallCanvas: HTMLCanvasElement
 
     update() {
         this.isShowing =
@@ -38,25 +37,36 @@ export class MiniMap extends Component {
             this.bigCanvas.width = this.bigCanvas.height = wl.size * TILE_SIZE
         }
 
-        if (!this.smallCanvas) {
-            this.smallCanvas = document.createElement("canvas", {}).transferControlToOffscreen()
+        if (!this.worker) {
+            this.worker = new Worker("minimap.js")
+            this.smallCanvas = document.createElement("canvas", {})
             this.smallCanvas.width = this.smallCanvas.height = this.bigCanvas.width / MiniMap.SCALE
+            this.worker.onmessage = (response: MessageEvent<MiniMapDrawn>) => {
+                this.fullyRenderedAtLeastOnce = true
+                this.smallCanvas.getContext("2d").putImageData(response.data.imageData, 0, 0)
+            }
         }
 
-        if (this.lastPixelDrawn.equals(Point.ZERO)) {
+        if (this.needsRefresh) {
             this.renderFullSizeMap()
-        }
 
-        this.partiallyRenderDownsampledMap()
+            console.log("sending")
+            const { width, height } = this.bigCanvas
+            const message: DrawMiniMap = {
+                imageData: this.bigCanvas.getContext("2d").getImageData(0, 0, width, height),
+                width,
+                height,
+                // smallCanvas: initSmallCanvas ? this.smallCanvas : undefined,
+                scale: MiniMap.SCALE,
+            }
+            this.worker.postMessage(message)
+
+            this.needsRefresh = false
+        }
     }
 
     refresh() {
-        // no-op since refresh was just called
-        if (this.lastPixelDrawn.equals(Point.ZERO)) {
-            return
-        }
-
-        this.lastPixelDrawn = Point.ZERO
+        this.needsRefresh = true
     }
 
     getRenderMethods() {
@@ -113,83 +123,6 @@ export class MiniMap extends Component {
                     render.dimensions.y
                 )
             })
-    }
-
-    private partiallyRenderDownsampledMap() {
-        if (!this.bigCanvas) {
-            return
-        }
-
-        if (
-            this.lastPixelDrawn.x === this.smallCanvas.width - 1 &&
-            this.lastPixelDrawn.y === this.smallCanvas.height - 1
-        ) {
-            return
-        }
-
-        const bigContext = this.bigCanvas.getContext("2d")
-        const smallContext = this.smallCanvas.getContext("2d")
-        let drawn = 0
-
-        // slowly render in the background, speed up when in foreground
-        const pxToRender =
-            this.isShowing && !this.fullyRenderedAtLeastOnce
-                ? MiniMap.PX_PER_SHOWN_UPDATE
-                : MiniMap.PX_PER_HIDDEN_UPDATE
-
-        // pixels shaved off for each row offset from the top/bottom
-        const cornerShape = [4, 2, 1, 1]
-
-        for (let y = this.lastPixelDrawn.y; y < this.smallCanvas.height; y++) {
-            const start = y === this.lastPixelDrawn.y ? this.lastPixelDrawn.x : 0
-
-            for (let x = start; x < this.smallCanvas.width; x++) {
-                // round the corners
-                if (y < cornerShape.length) {
-                    const rowBlankCount = cornerShape[y]
-                    if (x < rowBlankCount || x >= this.smallCanvas.width - rowBlankCount) {
-                        continue
-                    }
-                } else if (y >= this.smallCanvas.height - cornerShape.length) {
-                    const rowBlankCount = cornerShape[this.smallCanvas.height - y - 1]
-                    if (x < rowBlankCount || x >= this.smallCanvas.width - rowBlankCount) {
-                        continue
-                    }
-                }
-
-                const imageData = bigContext.getImageData(
-                    x * MiniMap.SCALE,
-                    y * MiniMap.SCALE,
-                    MiniMap.SCALE,
-                    MiniMap.SCALE
-                )
-
-                // get the most common color from that square
-                const hexStrings = []
-                for (let i = 0; i < imageData.data.length; i += 4) {
-                    const hex = getHex(imageData.data[i], imageData.data[i + 1], imageData.data[2])
-                    hexStrings.push(hex)
-                    // weigh other colors higher than grass color to show non-nature things on the map
-                    if (hex !== Color.GREEN_5 && hex !== Color.GREEN_6) {
-                        hexStrings.push(hex)
-                        hexStrings.push(hex)
-                    }
-                }
-
-                const newColor = Lists.mode(hexStrings)
-                smallContext.fillStyle = newColor
-                smallContext.fillRect(x, y, 1, 1)
-
-                this.lastPixelDrawn = new Point(x, y)
-
-                drawn++
-                if (drawn === pxToRender) {
-                    return
-                }
-            }
-        }
-
-        this.fullyRenderedAtLeastOnce = true
     }
 
     private mapDarknessOverlay: StaticSpriteSource
