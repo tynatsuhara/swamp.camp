@@ -1,9 +1,16 @@
 const path = require("path")
+const fs = require("fs")
+
+const workers = fs
+    .readdirSync("./src/workers", { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name !== "index")
+    .map(({ name }) => name.replace(".ts", ""))
+    .map((name) => [`workers/${name}`, `./src/workers/${name}.ts`])
 
 module.exports = (_, argv) => ({
     entry: {
         app: "./src/app.ts",
-        minimap: "./src/workers/minimap.ts",
+        ...Object.fromEntries(workers),
     },
     module: {
         rules: [

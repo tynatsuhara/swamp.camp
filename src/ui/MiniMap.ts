@@ -7,6 +7,7 @@ import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { createWorker } from "../workers/index"
 import { DrawMiniMap, MiniMapDrawn } from "../workers/minimap"
 import { ElementComponent } from "../world/elements/ElementComponent"
 import { GroundComponent } from "../world/ground/GroundComponent"
@@ -38,7 +39,7 @@ export class MiniMap extends Component {
         }
 
         if (!this.worker) {
-            this.worker = new Worker("minimap.js")
+            this.worker = createWorker("minimap")
             this.smallCanvas = document.createElement("canvas", {})
             this.smallCanvas.width = this.smallCanvas.height = this.bigCanvas.width / MiniMap.SCALE
             this.worker.onmessage = (response: MessageEvent<MiniMapDrawn>) => {
