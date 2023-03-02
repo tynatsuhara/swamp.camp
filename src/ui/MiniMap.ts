@@ -25,7 +25,7 @@ export class MiniMap extends Component {
     private isShowing = false
 
     private bigCanvas: HTMLCanvasElement
-    private smallCanvas: HTMLCanvasElement
+    private smallCanvas: OffscreenCanvas
 
     update() {
         this.isShowing =
@@ -39,7 +39,7 @@ export class MiniMap extends Component {
         }
 
         if (!this.smallCanvas) {
-            this.smallCanvas = document.createElement("canvas", {})
+            this.smallCanvas = document.createElement("canvas", {}).transferControlToOffscreen()
             this.smallCanvas.width = this.smallCanvas.height = this.bigCanvas.width / MiniMap.SCALE
         }
 
@@ -50,9 +50,27 @@ export class MiniMap extends Component {
         this.partiallyRenderDownsampledMap()
     }
 
-    // TODO: Make this only refresh certain points
     refresh() {
+        // no-op since refresh was just called
+        if (this.lastPixelDrawn.equals(Point.ZERO)) {
+            return
+        }
+
         this.lastPixelDrawn = Point.ZERO
+    }
+
+    getRenderMethods() {
+        if (!this.isShowing || !this.fullyRenderedAtLeastOnce) {
+            return []
+        }
+
+        const padding = 4
+        const topLeft = new Point(
+            padding,
+            Camera.instance.dimensions.y - this.smallCanvas.height - padding
+        ).apply(Math.floor)
+
+        return [...this.getMapSprites(topLeft), this.getPlayerIndicator(topLeft)]
     }
 
     private renderFullSizeMap() {
@@ -97,7 +115,7 @@ export class MiniMap extends Component {
             })
     }
 
-    partiallyRenderDownsampledMap() {
+    private partiallyRenderDownsampledMap() {
         if (!this.bigCanvas) {
             return
         }
@@ -172,20 +190,6 @@ export class MiniMap extends Component {
         }
 
         this.fullyRenderedAtLeastOnce = true
-    }
-
-    getRenderMethods() {
-        if (!this.isShowing || !this.fullyRenderedAtLeastOnce) {
-            return []
-        }
-
-        const padding = 4
-        const topLeft = new Point(
-            padding,
-            Camera.instance.dimensions.y - this.smallCanvas.height - padding
-        ).apply(Math.floor)
-
-        return [...this.getMapSprites(topLeft), this.getPlayerIndicator(topLeft)]
     }
 
     private mapDarknessOverlay: StaticSpriteSource
