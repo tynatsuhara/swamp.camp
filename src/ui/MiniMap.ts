@@ -50,7 +50,6 @@ export class MiniMap extends Component {
         if (this.needsRefresh) {
             this.renderFullSizeMap()
 
-            console.log("sending")
             const { width, height } = this.bigCanvas
             const message: DrawMiniMap = {
                 imageData: this.bigCanvas.getContext("2d").getImageData(0, 0, width, height),
