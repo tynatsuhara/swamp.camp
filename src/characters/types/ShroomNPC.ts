@@ -7,7 +7,8 @@ import { camp } from "../../world/locations/LocationManager"
 import { TimeUnit } from "../../world/TimeUnit"
 import { WorldTime } from "../../world/WorldTime"
 import { Dude } from "../Dude"
-import { DudeFactory } from "../DudeFactory"
+import { DudeFaction, DudeFactory } from "../DudeFactory"
+import { NPC } from "../NPC"
 import { WeaponType } from "../weapons/WeaponType"
 import { Enemy } from "./Enemy"
 
@@ -17,6 +18,7 @@ const NEXT_GROWTH_TIME = "ngt"
 export class ShroomNPC extends Component {
     private dude: Dude
     private enemy: Enemy
+    private npc: NPC
 
     awake() {
         if (session.isGuest()) {
@@ -28,20 +30,32 @@ export class ShroomNPC extends Component {
         this.dude.droppedItemSupplier = () => Lists.repeat(this.dude.blob[SIZE], [Item.MUSHROOM])
         this.dude.blob[NEXT_GROWTH_TIME] = this.dude.blob[NEXT_GROWTH_TIME] || this.nextGrowthTime()
 
+        this.npc = this.dude.entity.getComponent(NPC)
+        const baseIsEnemyFn = this.npc.isEnemyFn
+        this.npc.isEnemyFn = (d) => {
+            if (d.factions.includes(DudeFaction.VILLAGERS)) {
+                return false
+            }
+            return baseIsEnemyFn(d)
+        }
+
+        // big shrooms are automatically aggro
         if (this.dude.blob[SIZE] == 3) {
             this.dude.setWeapon(WeaponType.UNARMED, -1)
             this.enemy = this.entity.addComponent(new Enemy())
         }
 
         // medium shrooms go aggro if hit, lil guys flee
-        this.dude.setOnDamageCallback(() => {
-            // NPC will flee until it has a non-NONE weapon
-            if (this.dude.blob[SIZE] == 2 && !this.dude.weapon) {
-                this.dude.setWeapon(WeaponType.UNARMED, -1)
-            }
-            // Adding enemy component will cause them to flee or engage in combat
-            if (!this.enemy) {
-                this.enemy = this.entity.addComponent(new Enemy())
+        this.dude.setOnDamageCallback((_, attacker) => {
+            if (attacker) {
+                // NPC will flee until it has a non-NONE weapon
+                if (this.dude.blob[SIZE] == 2 && !this.dude.weapon) {
+                    this.dude.setWeapon(WeaponType.UNARMED, -1)
+                }
+                // Adding enemy component will cause them to flee or engage in combat
+                if (!this.enemy) {
+                    this.enemy = this.entity.addComponent(new Enemy())
+                }
             }
         })
     }
@@ -61,10 +75,20 @@ export class ShroomNPC extends Component {
             return
         }
 
-        if (WorldTime.instance.time < this.dude.blob[NEXT_GROWTH_TIME]) {
-            return
+        if (WorldTime.instance.time >= this.dude.blob[NEXT_GROWTH_TIME]) {
+            this.grow()
+        } else if (
+            this.enemy &&
+            !this.npc.targetedEnemy &&
+            this.dude.blob[SIZE] < 3 &&
+            this.dude.lastDamageTime < WorldTime.instance.time - 5_000
+        ) {
+            // recreate the dude entity to reset enemy state
+            this.refresh()
         }
+    }
 
+    private grow() {
         const ogSize = this.dude.blob[SIZE]
         this.dude.blob[NEXT_GROWTH_TIME] = this.nextGrowthTime()
 
@@ -79,11 +103,18 @@ export class ShroomNPC extends Component {
 
         // grow
         const newSize = ogSize + 1
-        this.dude.blob[SIZE] = newSize
+        this.refresh(newSize)
+    }
+
+    private refresh(size = this.dude.blob[SIZE]) {
+        // reset weapon type so shrooms aren't violent on refresh
+        this.dude.setWeapon(WeaponType.NONE, -1)
+
+        this.dude.blob[SIZE] = size
 
         // overwrite the animation
         const newData = this.dude.save()
-        newData.anim = ["SmallMushroom", "NormalMushroom", "LargeMushroom"][newSize - 1]
+        newData.anim = ["SmallMushroom", "NormalMushroom", "LargeMushroom"][size - 1]
 
         const { type, standingPosition, location } = this.dude
 
