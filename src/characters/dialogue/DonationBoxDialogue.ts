@@ -32,7 +32,7 @@ export const DONATION_DIALOGUES: DialogueSet = {
         const { onDonationComplete, itemsRequired } = currentOptions
 
         const hasRequiredMaterials = itemsRequired.every(
-            (i) => player().inventory.getItemCount(i.item) > i.count
+            (i) => player().inventory.getItemCount(i.item) >= i.count
         )
         const optionsStr = "\n" + itemsRequired.map((i) => i.stackString()).join("\n")
         const str = hasRequiredMaterials
