@@ -1068,6 +1068,7 @@ export class Dude extends Component implements DialogueSource {
 
         direction = direction.normalizedOrZero()
 
+        // this will set this.isMoving
         this.updateAnimationFromMovement(direction)
         if (this.syncData.d.x !== direction.x || this.syncData.d.y !== direction.y) {
             this.syncData.d = direction
@@ -1093,8 +1094,16 @@ export class Dude extends Component implements DialogueSource {
             speed *= 0.6
         }
 
+        let environmentPush = Point.ZERO
+
         if (Ground.isWater(ground?.type)) {
             this.removeCondition(Condition.ON_FIRE)
+
+            // TODO: See if we can improve this later
+            // const waterfall = ground.entity.getComponent(Waterfall)
+            // if (waterfall && !this.isJumping) {
+            //     environmentPush = waterfall.direction.times(0.5)
+            // }
 
             if (this.factions.includes(DudeFaction.AQUATIC)) {
                 // don't affect speed
@@ -1120,7 +1129,9 @@ export class Dude extends Component implements DialogueSource {
         }
 
         const walkDistance = elapsedTimeMillis * this.speed * speed * speedMultiplier
-        const walkMovement = this.isMoving ? direction.times(walkDistance) : Point.ZERO
+        const walkMovement = (this.isMoving ? direction.times(walkDistance) : Point.ZERO).plus(
+            environmentPush
+        )
         const standingPosAfterWalk = this.standingPosition.plus(walkMovement)
 
         // Prevent buggy positioning near a ledge

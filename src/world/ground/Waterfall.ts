@@ -1,4 +1,4 @@
-import { Entity, Point } from "brigsby/dist"
+import { Component, Entity, Point, pt } from "brigsby/dist"
 import { SpriteAnimation, SpriteTransform } from "brigsby/dist/sprites"
 import { RepeatedInvoker } from "brigsby/dist/util"
 import { PointAudio } from "../../audio/PointAudio"
@@ -33,57 +33,58 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
     let rotation: number
     let particlePosSupplier: (size: number) => Point
     let particleDirection: (t: number) => Point
+    let pushDirection: Point
 
     if (d.wl.levels.get(d.pos.plusX(-1)) < level) {
         // flowing left
+        pushDirection = pt(-1, 0)
         rotation = 90
         particlePosSupplier = (size) =>
             pixelPos.plus(
-                new Point(
+                pt(
                     sideParticleOffset + Math.random() * 2,
                     Math.floor(Math.random() * TILE_SIZE - size)
                 )
             )
-        particleDirection = (t) => new Point(-t * flowSpeed, 0)
-        waterfallOffset = new Point(sideWaterfallOffset, 0)
+        particleDirection = (t) => pt(-t * flowSpeed, 0)
+        waterfallOffset = pt(sideWaterfallOffset, 0)
     } else if (d.wl.levels.get(d.pos.plusX(1)) < level) {
         // flowing right
+        pushDirection = pt(1, 0)
         rotation = 270
         particlePosSupplier = (size) =>
             pixelPos.plus(
-                new Point(
+                pt(
                     TILE_SIZE - sideParticleOffset - Math.random() * 2,
                     Math.floor(Math.random() * TILE_SIZE - size)
                 )
             )
-        particleDirection = (t) => new Point(t * flowSpeed, 0)
-        waterfallOffset = new Point(-sideWaterfallOffset, 0)
+        particleDirection = (t) => pt(t * flowSpeed, 0)
+        waterfallOffset = pt(-sideWaterfallOffset, 0)
     } else if (d.wl.levels.get(d.pos.plusY(-1)) < level) {
         // flowing up
+        pushDirection = pt(0, -1)
         rotation = 180
         particlePosSupplier = (size) =>
-            pixelPos.plus(
-                new Point(Math.floor(Math.random() * TILE_SIZE - size), 1 + Math.random() * 2)
-            )
-        particleDirection = (t) => new Point(0, -t * flowSpeed)
+            pixelPos.plus(pt(Math.floor(Math.random() * TILE_SIZE - size), 1 + Math.random() * 2))
+        particleDirection = (t) => pt(0, -t * flowSpeed)
         waterSpriteDepth = ConnectingTileWaterfallSchema.DEPTH - 1
         const yOffset = 5
-        waterfallOffset = new Point(0, -yOffset + 1)
+        waterfallOffset = pt(0, -yOffset + 1)
         spriteFilter = ImageFilters.segment((x, y) => y > TILE_SIZE - yOffset)
     } else {
         // flowing down
+        pushDirection = pt(0, 1)
         rotation = 0
         particlePosSupplier = (size) =>
-            pixelPos.plus(
-                new Point(Math.floor(Math.random() * TILE_SIZE - size), 12 + Math.random() * 2)
-            )
-        particleDirection = (t) => new Point(0, t * flowSpeed)
+            pixelPos.plus(pt(Math.floor(Math.random() * TILE_SIZE - size), 12 + Math.random() * 2))
+        particleDirection = (t) => pt(0, t * flowSpeed)
     }
 
     const waterfallSpeed = 150
     e.addComponent(
         new SpriteAnimation(
-            [new Point(1, 1), new Point(2, 1), new Point(1, 2), new Point(2, 2)]
+            [pt(1, 1), pt(2, 1), pt(1, 2), pt(2, 2)]
                 .map((pt) => Tilesets.instance.tilemap.getTileAt(pt))
                 .map((tile) => tile.filtered(spriteFilter))
                 .map((tile) => [tile, waterfallSpeed])
@@ -101,7 +102,7 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
     e.addComponent(
         new PointAudio(
             "/audio/ambiance/waterfall.wav",
-            pixelPos.plus(new Point(TILE_SIZE / 2, TILE_SIZE / 2)),
+            pixelPos.plus(pt(TILE_SIZE / 2, TILE_SIZE / 2)),
             TILE_SIZE * 8,
             0.2
         )
@@ -117,12 +118,20 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
                     GroundRenderer.DEPTH - 1,
                     SPLASH_PARTICLE_LIFETIME,
                     particleDirection,
-                    new Point(size, size)
+                    pt(size, size)
                 )
             }
             return SPLASH_PARTICLE_FREQUENCY
         })
     )
 
+    e.addComponent(new Waterfall(pushDirection))
+
     return e.addComponent(new GroundComponent(GroundType.WATERFALL))
+}
+
+export class Waterfall extends Component {
+    constructor(public readonly direction: Point) {
+        super()
+    }
 }
