@@ -1,4 +1,4 @@
-import { Component, Entity, Point } from "brigsby/dist"
+import { Component, debug, Entity, Point } from "brigsby/dist"
 import { ImageRender } from "brigsby/dist/renderer"
 import { Singletons } from "../../Singletons"
 import { Color, getRGB } from "../../ui/Color"
@@ -10,6 +10,10 @@ export class Particles {
 
     private prefabs = new Map<Color, ImageBitmap>()
     private entity = new Entity()
+
+    get count() {
+        return this.entity.components.length
+    }
 
     clear() {
         this.entity = new Entity()
@@ -46,6 +50,10 @@ export class Particles {
     }
 
     private createParticle(emitFn: (image: ImageBitmap) => void, color: Color) {
+        if (debug.disableParticles) {
+            return
+        }
+
         const prefabBitmap = this.prefabs.get(color)
         if (prefabBitmap) {
             emitFn(prefabBitmap)

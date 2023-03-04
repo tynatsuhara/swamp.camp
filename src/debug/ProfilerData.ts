@@ -1,6 +1,7 @@
 import { Component, debug, profiler, pt } from "brigsby/dist"
 import { Maths } from "brigsby/dist/util/Maths"
 import { controls } from "../Controls"
+import { Particles } from "../graphics/particles/Particles"
 import { pixelPtToTilePt } from "../graphics/Tilesets"
 import { here } from "../world/locations/LocationManager"
 import { WorldTime } from "../world/WorldTime"
@@ -19,6 +20,7 @@ export class ProfilerData extends Component {
         profiler.showInfo(`UI mouse pos: ${controls.getMousePos().apply(Math.floor)}`)
         profiler.showInfo(`mouse tile: ${mouseTile}`)
         profiler.showInfo(`time: ${WorldTime.clockTime()} (${Math.floor(WorldTime.instance.time)})`)
+        profiler.showInfo(`particle count: ${Particles.instance.count})`)
 
         const elementData = here().getElement(mouseTile)?.save()
         if (elementData) {
