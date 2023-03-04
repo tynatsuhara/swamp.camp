@@ -30,6 +30,8 @@ export class NPCTaskScheduleRoam extends NPCTask {
         } else {
             context.roam(0.5, {
                 ptSelectionFilter: isLand,
+                pauseEveryMillis: 2500 + 10_000 * Math.random(),
+                pauseForMillis: 2500 + 5000 * Math.random(),
             })
         }
     }
