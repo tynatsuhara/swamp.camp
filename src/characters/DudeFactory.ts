@@ -373,7 +373,7 @@ export class DudeFactory {
                             ])
                     ),
                 ]
-                maxHealth = 5
+                maxHealth = 10
                 speed *= 0.5
                 colliderSize = BIG_COLLIDER_SIZE
                 break
