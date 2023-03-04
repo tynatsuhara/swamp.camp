@@ -12,7 +12,7 @@ import { GroundRenderer } from "../ground/GroundRenderer"
 import { Location } from "../locations/Location"
 import { camp, LocationManager, LocationType } from "../locations/LocationManager"
 import { Teleporter, TeleporterPrefix } from "../Teleporter"
-import { BuildingFactory } from "./Building"
+import { BuildingFactory, ConstructionRequirements } from "./Building"
 import { InteriorUtils } from "./InteriorUtils"
 
 type SaveFormat = { destinationUUID: string }
@@ -74,6 +74,10 @@ export class MineEntranceFactory extends BuildingFactory<ElementType.MINE_ENTRAN
                 destinationUUID,
             }))
         )
+    }
+
+    getConstructionRequirements(): ConstructionRequirements {
+        return undefined
     }
 
     canPlaceInLocation(wl: Location) {
