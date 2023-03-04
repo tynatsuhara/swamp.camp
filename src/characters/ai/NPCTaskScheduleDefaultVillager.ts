@@ -128,7 +128,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
                 return
             }
 
-            return LocationManager.instance.get(mines[0])
+            return LocationManager.instance.get(this.getWorkLocation(mines))
         } else if (
             job === VillagerJob.HARVEST_WOOD ||
             job === VillagerJob.DEFEND ||
@@ -211,12 +211,15 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             return null
         }
 
-        // determine work site in a consistent way, add day so they mix it up every day
-        const consistentHash = hash(this.npc.dude.uuid + WorldTime.instance.currentDay)
-        const zoneElement = zones[consistentHash % zones.length]
+        const zoneElement = this.getWorkLocation(zones)
         const zone = zoneElement.entity.getComponent(ConstructionSite)
 
         return ElementUtils.rectPoints(zoneElement.pos, zone.size)
+    }
+
+    private getWorkLocation<T>(options: T[]): T {
+        // determine work site in a consistent way, add day so they mix it up every day
+        return options[hash(this.npc.dude.uuid + WorldTime.instance.currentDay) % options.length]
     }
 
     private getJob = () => this.npc.entity.getComponent(Villager).job
