@@ -43,6 +43,8 @@ const KEYS = {
     campfireRing: new Point(14, 8),
     grass1: new Point(22, 10),
     grass2: new Point(22, 11),
+    flower1: new Point(28, 9),
+    flower2: new Point(31, 9),
     rock1: new Point(54, 21),
     rock2: new Point(55, 21),
     rock3: new Point(56, 21),

@@ -52,8 +52,13 @@ class TallGrass extends Component {
         )
         const grassPos = tilePos.times(TILE_SIZE).plus(offset)
 
+        const isFlower = Math.random() < 0.1
+        const tileKey = isFlower
+            ? `flower${Math.ceil(Math.random() * 2)}`
+            : `grass${Math.ceil(Math.random() * 2)}`
+
         const render = Tilesets.instance.outdoorTiles
-            .getTileSource(`grass${Math.ceil(Math.random() * 2)}`)
+            .getTileSource(tileKey)
             .toImageRender(
                 new SpriteTransform(
                     grassPos,
