@@ -283,6 +283,10 @@ export class GameScene extends Scene {
             const buttons = [...dudeTypeButtons, nextPageButton]
 
             result.push(ButtonsMenu.render("white", buttons, Camera.instance.dimensions.div(2)))
+
+            if (controls.isCloseMenuButtonDown()) {
+                spawnMenu.isOpen = false
+            }
         }
 
         if (debug.showProfiler) {
