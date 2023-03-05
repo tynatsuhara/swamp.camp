@@ -167,7 +167,14 @@ export class Dude extends Component implements DialogueSource {
     manualDepth = undefined
 
     private dialogueInteract: Interactable
-    dialogue: string
+    private _dialogue: string
+    get dialogue() {
+        return this._dialogue
+    }
+    set dialogue(val: string) {
+        this._dialogue = val
+        this.updateDialogueIndicator()
+    }
     private dialogueIndicator = InteractIndicator.NONE
 
     canBePushed = true
@@ -490,6 +497,17 @@ export class Dude extends Component implements DialogueSource {
                 VocalSounds.ambient(this)
                 return 1_000 + Math.random() * 5_000
             }, Math.random() * 5_000)
+        }
+    }
+
+    private updateDialogueIndicator() {
+        if (this.isStarted) {
+            if (this.dialogue) {
+                this.dialogueIndicator =
+                    getDialogue(this.dialogue, this)?.indicator ?? InteractIndicator.NONE
+            } else {
+                this.dialogueIndicator = InteractIndicator.NONE
+            }
         }
     }
 
