@@ -122,8 +122,9 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
         InputKey.U,
         "generate radiant location",
         () => {
-            const l = RadiantLocationGenerator.instance.generate()
-            LocationManager.instance.playerLoadLocation(l, Point.ZERO)
+            RadiantLocationGenerator.instance
+                .generate()
+                .then((l) => LocationManager.instance.playerLoadLocation(l, Point.ZERO))
         },
     ],
     [

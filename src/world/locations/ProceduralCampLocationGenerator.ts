@@ -28,7 +28,7 @@ export class ProceduralCampLocationGenerator extends AbstractLocationGenerator {
 
     private readonly TENT_POS = new Point(-3, -3)
 
-    protected _generate(): Location {
+    protected _generate(): Promise<Location> {
         let location: Location
 
         for (let elementsPlaced = false, attempt = 1; !elementsPlaced; attempt++) {
@@ -72,7 +72,7 @@ export class ProceduralCampLocationGenerator extends AbstractLocationGenerator {
             new Point(ProceduralCampLocationGenerator.MAP_RANGE - 6, 10)
         )
 
-        return location
+        return Promise.resolve(location)
     }
 
     private clearPathToCenter(location: Location) {

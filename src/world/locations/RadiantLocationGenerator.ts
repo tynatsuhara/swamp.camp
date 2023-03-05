@@ -24,7 +24,7 @@ export class RadiantLocationGenerator extends AbstractLocationGenerator {
         return Singletons.getOrCreate(RadiantLocationGenerator)
     }
 
-    protected _generate(): Location {
+    protected _generate(): Promise<Location> {
         const levels =
             Math.random() > 0.7
                 ? undefined
@@ -45,7 +45,7 @@ export class RadiantLocationGenerator extends AbstractLocationGenerator {
         this.spawn(location, ElementType.ROCK, 5 + Math.random() * 5)
         this.spawn(location, ElementType.MUSHROOM, 3 + Math.random() * 5)
 
-        return location
+        return Promise.resolve(location)
     }
 
     private getTreeTypeSupplier(): TreeTypeSupplier {

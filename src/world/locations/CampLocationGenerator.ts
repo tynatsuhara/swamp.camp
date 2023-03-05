@@ -37,7 +37,7 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
 
     private map: HTMLImageElement
 
-    protected _generate() {
+    protected async _generate() {
         const mapId = this.pickMap()
         console.log({ mapId })
 

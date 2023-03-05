@@ -82,9 +82,10 @@ export class HostPlayer extends AbstractPlayer {
             !this.offMapWarningShown &&
             !TextOverlayManager.instance.isActive
         ) {
-            const travelToLocation = (l: Location): Promise<void> =>
-                new Promise((resolve) => {
-                    this.timeOffMap = 0
+            const travelToLocation = async (location: Promise<Location>): Promise<void> => {
+                const l = await location
+                return new Promise((resolve) => {
+                    this.timeOffMap = Number.MIN_SAFE_INTEGER // don't re-run this logic until they're in a new location
                     const position = DudeSpawner.instance.getSpawnPosOutsideOfLocation(l, [
                         currentOffMapArea,
                     ])
@@ -96,6 +97,7 @@ export class HostPlayer extends AbstractPlayer {
                         resolve()
                     })
                 })
+            }
 
             const showDangerWarning = () =>
                 TextOverlayManager.instance.open({
@@ -132,7 +134,9 @@ export class HostPlayer extends AbstractPlayer {
                 const lastUsage = activeMap?.metadata.locations === 1
                 // We could make it so they die if they no longer have their map, but that probably won't happen
                 let nextLocation =
-                    activeMap && !lastUsage ? RadiantLocationGenerator.instance.generate() : camp()
+                    activeMap && !lastUsage
+                        ? RadiantLocationGenerator.instance.generate()
+                        : Promise.resolve(camp())
                 if (lastUsage) {
                     this.dude.inventory.removeItemAtIndex(mapIndex)
                 } else {

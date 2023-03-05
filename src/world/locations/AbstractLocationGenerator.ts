@@ -20,15 +20,18 @@ export type TreeTypeSupplier = () => ElementType.TREE_POINTY | ElementType.TREE_
  *   - The center of the location is (0, 0)
  */
 export abstract class AbstractLocationGenerator {
-    generate() {
+    async generate() {
         console.groupCollapsed("map generation")
+        const startTime = new Date().getTime()
 
-        const location = this._generate()
+        const location = await this._generate()
 
         this.finalize(location)
 
         LocationManager.instance.add(location)
 
+        const endTime = new Date().getTime()
+        console.log(`map generation took ${endTime - startTime} ms`)
         console.groupEnd()
 
         return location
@@ -54,7 +57,7 @@ export abstract class AbstractLocationGenerator {
         }
     }
 
-    protected abstract _generate(): Location
+    protected abstract _generate(): Promise<Location>
 
     /////////////
     // Ground! //

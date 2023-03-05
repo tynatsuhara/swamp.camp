@@ -63,20 +63,21 @@ export class GameScene extends Scene {
 
         // World must be initialized before we do anything else
 
-        CampLocationGenerator.instance.generate()
-        LocationManager.instance.loadLocation(camp())
+        CampLocationGenerator.instance.generate().then(() => {
+            LocationManager.instance.loadLocation(camp())
 
-        const playerStartPos = new Point(camp().size, camp().size).times(TILE_SIZE)
-        const playerDude = DudeFactory.instance.create(DudeType.PLAYER, playerStartPos)
+            const playerStartPos = new Point(camp().size, camp().size).times(TILE_SIZE)
+            const playerDude = DudeFactory.instance.create(DudeType.PLAYER, playerStartPos)
 
-        // Camera.instance.clearPosition()
-        Camera.instance.focusOnDude(playerDude)
+            // Camera.instance.clearPosition()
+            Camera.instance.focusOnDude(playerDude)
 
-        CutsceneManager.instance.startCutscene(new IntroCutscene())
+            CutsceneManager.instance.startCutscene(new IntroCutscene())
 
-        EventQueue.instance.addEvent({
-            type: QueuedEventType.SIMULATE_NPCS,
-            time: WorldTime.instance.time + NPC.SCHEDULE_FREQUENCY,
+            EventQueue.instance.addEvent({
+                type: QueuedEventType.SIMULATE_NPCS,
+                time: WorldTime.instance.time + NPC.SCHEDULE_FREQUENCY,
+            })
         })
     }
 
