@@ -18,6 +18,9 @@ import { Teleporter, TeleporterPrefix, TeleporterSound } from "../Teleporter"
 import { BuildingFactory, ConstructionRequirements } from "./Building"
 import { InteriorUtils } from "./InteriorUtils"
 
+export const DIP_TENT_COLOR = "red"
+export const PLAYER_TENT_COLOR = "blue"
+
 export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
     readonly dimensions = new Point(4, 3)
 
@@ -114,7 +117,8 @@ const addTile = (e: Entity, s: string, pos: Point, depth: number, color: TentCol
 
 const makeTentInterior = (outside: Location, color: TentColor): Location => {
     // only the player should have a blue tent
-    const isPlayerTent = color === "blue"
+    const isPlayerTent = color === PLAYER_TENT_COLOR
+    const isDipTent = color === DIP_TENT_COLOR
     const l = new Location(LocationType.TENT_INTERIOR, true, isPlayerTent)
 
     const floorDimensions = new Point(5, 4)

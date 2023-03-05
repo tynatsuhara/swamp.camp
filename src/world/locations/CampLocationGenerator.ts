@@ -3,6 +3,7 @@ import { Grid, Lists } from "brigsby/dist/util"
 import { getImage } from "../../graphics/Tilesets"
 import { Singletons } from "../../Singletons"
 import { Color, getHex } from "../../ui/Color"
+import { DIP_TENT_COLOR } from "../buildings/Tent"
 import { ElementType } from "../elements/Elements"
 import { GroundType } from "../ground/Ground"
 import { AbstractLocationGenerator } from "./AbstractLocationGenerator"
@@ -102,7 +103,7 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
         // sorted from top-left to bottom-right
         const tentSpots = colors
             .entries()
-            .filter(([point, color]) => [LEVEL_1_TENT, LEVEL_2_TENT, LEVEL_3_TENT].includes(color))
+            .filter(([_, color]) => [LEVEL_1_TENT, LEVEL_2_TENT, LEVEL_3_TENT].includes(color))
             .map(([point]) => point)
             .sort((a, b) => (a.x === b.x ? a.y - b.y : a.x - b.x))
 
@@ -112,7 +113,7 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
 
         const tentPos = tentSpots[0].plusX(3)
         location.addElement(ElementType.TENT, tentPos, {
-            color: "red",
+            color: DIP_TENT_COLOR,
         })
     }
 

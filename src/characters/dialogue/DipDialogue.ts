@@ -3,6 +3,7 @@ import { getDipRecipes } from "../../items/CraftingRecipe"
 import { Item } from "../../items/Items"
 import { CraftingMenu } from "../../ui/CraftingMenu"
 import { InteractIndicator } from "../../ui/InteractIndicator"
+import { PLAYER_TENT_COLOR } from "../../world/buildings/Tent"
 import { ElementType } from "../../world/elements/Elements"
 import { EventQueue } from "../../world/events/EventQueue"
 import { QueuedEventType } from "../../world/events/QueuedEvent"
@@ -96,7 +97,7 @@ export const DIP_INTRO_DIALOGUE: DialogueSet = {
             return dialogue(
                 lines,
                 () => {
-                    player().inventory.addItem(Item.TENT, 1, { color: "blue" })
+                    player().inventory.addItem(Item.TENT, 1, { color: PLAYER_TENT_COLOR })
                     EventQueue.instance.addEvent({
                         type: QueuedEventType.NEW_VILLAGERS_ARRIVAL,
                         dudeTypes: [DudeType.HERALD],
