@@ -1,3 +1,5 @@
+import { expose } from "brigsby/dist/Debug"
+
 export const hash = (value: string): number => {
     if (typeof value === "string") {
         return cyrb53(value)
@@ -24,4 +26,4 @@ const cyrb53 = function (str, seed = 0) {
     return 4294967296 * (2097151 & h2) + (h1 >>> 0)
 }
 
-window["hash"] = hash
+expose({ hash })

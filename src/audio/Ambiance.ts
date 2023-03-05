@@ -1,3 +1,4 @@
+import { expose } from "brigsby/dist/Debug"
 import { Lists } from "brigsby/dist/util"
 import { player } from "../characters/player"
 import { Settings } from "../Settings"
@@ -50,7 +51,8 @@ export class Ambiance {
             Ambiance.play(Ambiance.DAY)
         }
 
-        window["currentAmbiance"] = Ambiance.currentAmbiance
+        const { currentAmbiance } = Ambiance
+        expose({ currentAmbiance })
     }
 
     private static play(newAmbiance: AudioPlayer) {

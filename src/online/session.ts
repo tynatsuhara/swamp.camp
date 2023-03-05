@@ -1,3 +1,4 @@
+import { expose } from "brigsby/dist/Debug"
 import { ActionProgress, ActionReceiver, ActionSender, joinRoom, Room, selfId } from "trystero"
 import { base64hash } from "./syncUtils"
 
@@ -165,4 +166,4 @@ export const session = {
 // const actionReceiverHandlers: Record<string, any> = {}
 // const actionProgressHandlers: Record<string, any> = {}
 
-window["session"] = session
+expose({ session })

@@ -1,4 +1,4 @@
-import { Component, Entity, Point, pt } from "brigsby/dist"
+import { Component, Entity, expose, Point, pt } from "brigsby/dist"
 import { PointValue } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
@@ -191,12 +191,12 @@ export class DudeFactory {
                     if (isLocalHostPlayer) {
                         animationName = "knight_f"
                         additionalComponents = [new HostPlayer(), new CutscenePlayerController()]
-                        window["player"] = additionalComponents[0]
+                        expose({ player: additionalComponents[0] })
                     } else {
                         additionalComponents = [new GuestPlayer()]
                         const playerIndex =
                             location.getDudes().filter((d) => d.type === DudeType.PLAYER).length + 1
-                        window[`player${playerIndex}`] = additionalComponents[0]
+                        expose({ [`player${playerIndex}`]: additionalComponents[0] })
                     }
                 } else {
                     /**
@@ -206,7 +206,7 @@ export class DudeFactory {
                      */
                     if (isLocalGuestPlayer) {
                         additionalComponents = [new GuestPlayer(), new CutscenePlayerController()]
-                        window["player"] = additionalComponents[0]
+                        expose({ player: additionalComponents[0] })
                     } else {
                         // This is an uncontrolled player on a different guest's machine
                     }
@@ -218,7 +218,7 @@ export class DudeFactory {
                 maxHealth = Number.MAX_SAFE_INTEGER
                 speed *= 0.7
                 additionalComponents = [new NPC(), new Villager()]
-                window["dip"] = additionalComponents[0]
+                expose({ dip: additionalComponents[0] })
                 break
             }
             case DudeType.HERALD: {
@@ -227,7 +227,7 @@ export class DudeFactory {
                 speed *= 0.6
                 dialogue = BERTO_STARTING_DIALOGUE
                 additionalComponents = [new NPC(), new Villager(), new Berto()]
-                window["berto"] = additionalComponents[0]
+                expose({ berto: additionalComponents[0] })
                 break
             }
             case DudeType.ELF: {

@@ -1,4 +1,4 @@
-import { Point } from "brigsby/dist"
+import { expose, Point } from "brigsby/dist"
 import { Collider } from "brigsby/dist/collision"
 import { PointValue, pt } from "brigsby/dist/Point"
 import { SpriteSource } from "brigsby/dist/sprites"
@@ -73,7 +73,7 @@ export enum Item {
     TORCH,
 }
 
-window["Item"] = Item
+expose({ Item })
 
 // stack limits for consistency
 const STACK_LG = 99

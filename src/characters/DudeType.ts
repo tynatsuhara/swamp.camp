@@ -1,3 +1,5 @@
+import { expose } from "brigsby/dist/Debug"
+
 export enum DudeType {
     PLAYER,
     DIP,
@@ -31,4 +33,4 @@ export enum DudeType {
     MIMIC,
 }
 
-window["DudeType"] = DudeType
+expose({ DudeType })

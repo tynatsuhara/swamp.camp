@@ -1,3 +1,4 @@
+import { expose } from "brigsby/dist/Debug"
 import { BinaryHeap } from "brigsby/dist/util"
 import { session } from "../../online/session"
 import { Singletons } from "../../Singletons"
@@ -23,14 +24,16 @@ export class EventQueue {
             })
         }
 
-        window["eventQueue"] = () =>
-            console.log(
-                EventQueue.instance.heap.getContents(true).map((data) => ({
-                    ...data,
-                    type: QueuedEventType[data.type], // print a human-readable type
-                    clockTime: WorldTime.clockTime(data.time),
-                }))
-            )
+        expose({
+            eventQueue: () =>
+                console.log(
+                    EventQueue.instance.heap.getContents(true).map((data) => ({
+                        ...data,
+                        type: QueuedEventType[data.type], // print a human-readable type
+                        clockTime: WorldTime.clockTime(data.time),
+                    }))
+                ),
+        })
     }
 
     addEvent(event: QueuedEventData) {

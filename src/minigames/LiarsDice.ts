@@ -1,3 +1,5 @@
+import { expose } from "brigsby/dist/Debug"
+
 const FACES = [0, 1, 2, 3, 4, 5]
 const SIDES = 6
 const STARTING_DICE = 5
@@ -203,4 +205,4 @@ const doGame = () => {
     console.log(`${playersInGame[0].name} wins!`)
 }
 
-window["dice"] = doGame
+expose({ dice: doGame })

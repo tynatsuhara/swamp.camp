@@ -1,3 +1,5 @@
+import { expose } from "brigsby/dist"
+
 export enum Condition {
     ON_FIRE,
     POISONED,
@@ -5,7 +7,7 @@ export enum Condition {
     HEALING,
 }
 
-window["Condition"] = Condition
+expose({ Condition })
 
 export type ActiveCondition = {
     condition: Condition

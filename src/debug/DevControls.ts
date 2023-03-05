@@ -2,6 +2,7 @@ import {
     CapturedInput,
     Component,
     debug,
+    expose,
     InputKey,
     InputKeyString,
     Point,
@@ -200,20 +201,6 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     //         growable?.forceGrow()
     //     },
     // ],
-    // [
-    //     InputKey.PERIOD,
-    //     "finish construction",
-    //     (input) => {
-    //         window["no_construct"] = true
-    //         here()
-    //             .getElements()
-    //             .forEach((el) => {
-    //                 if (Elements.instance.getElementFactory(el.type) instanceof BuildingFactory) {
-    //                     here().reloadElement(el.pos)
-    //                 }
-    //             })
-    //     },
-    // ],
 
     [
         InputKey.Y,
@@ -272,14 +259,13 @@ const help = () => {
     const commands = devCommands.map((cmd) => `[${InputKeyString.for(cmd[0])}] ${cmd[1]}`)
     console.log(help + "\n\n" + commands.join("\n"))
 }
-window["help"] = help
 help()
 
 // debug chat
 const [sendChat, receiveChat] = session.action<string>("chat")
-window["chat"] = (text: string) => {
+const chat = (text: string) => {
     sendChat(text)
 }
 receiveChat((text, peerId) => console.log(`[chat] ${peerId} > ${text}`))
 
-window["Point"] = Point
+expose({ help, chat, Point })

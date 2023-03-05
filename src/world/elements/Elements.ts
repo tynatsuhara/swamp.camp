@@ -1,3 +1,4 @@
+import { expose } from "brigsby/dist/Debug"
 import { Singletons } from "../../Singletons"
 import { ApothecaryFactory } from "../buildings/Apothecary"
 import { CabinFactory } from "../buildings/Cabin"
@@ -41,7 +42,7 @@ export enum ElementType {
     BEDROLL,
 }
 
-window["ElementType"] = ElementType
+expose({ ElementType })
 
 const ELEMENT_FACTORIES = {
     [ElementType.TREE_ROUND]: new TreeFactory(ElementType.TREE_ROUND),

@@ -1,4 +1,4 @@
-import { Point, UpdateData } from "brigsby/dist"
+import { expose, Point, UpdateData } from "brigsby/dist"
 import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
 import { controls } from "../../Controls"
 import { CutscenePlayerController } from "../../cutscenes/CutscenePlayerController"
@@ -36,7 +36,8 @@ export class HostPlayer extends AbstractPlayer {
             }, saveInterval)
         )
 
-        window["addItem"] = this.dude.inventory.addItem
+        const { addItem } = this.dude.inventory
+        expose({ addItem })
     }
 
     update(updateData: UpdateData) {
