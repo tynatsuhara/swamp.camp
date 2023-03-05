@@ -23,7 +23,7 @@ export class MiniMap extends Component {
     private needsRefresh = false
     private fullyRenderedAtLeastOnce = false
     private isShowing = false
-    private worker: Worker
+    private redrawMap: (request: DrawMiniMap) => void
     private bigCanvas: HTMLCanvasElement
     private smallCanvas: HTMLCanvasElement
 
@@ -38,28 +38,28 @@ export class MiniMap extends Component {
             this.bigCanvas.width = this.bigCanvas.height = wl.size * TILE_SIZE
         }
 
-        if (!this.worker) {
-            this.worker = createWorker("minimap")
+        if (!this.redrawMap) {
+            const [redraw, onDrawn] = createWorker<DrawMiniMap, MiniMapDrawn>("minimap")
+            this.redrawMap = redraw
             this.smallCanvas = document.createElement("canvas", {})
             this.smallCanvas.width = this.smallCanvas.height = this.bigCanvas.width / MiniMap.SCALE
-            this.worker.onmessage = (response: MessageEvent<MiniMapDrawn>) => {
+            onDrawn((response: MiniMapDrawn) => {
                 this.fullyRenderedAtLeastOnce = true
-                this.smallCanvas.getContext("2d").putImageData(response.data.imageData, 0, 0)
-            }
+                this.smallCanvas.getContext("2d").putImageData(response.imageData, 0, 0)
+            })
         }
 
         if (this.needsRefresh) {
             this.renderFullSizeMap()
 
             const { width, height } = this.bigCanvas
-            const message: DrawMiniMap = {
+            this.redrawMap({
                 imageData: this.bigCanvas.getContext("2d").getImageData(0, 0, width, height),
                 width,
                 height,
                 // smallCanvas: initSmallCanvas ? this.smallCanvas : undefined,
                 scale: MiniMap.SCALE,
-            }
-            this.worker.postMessage(message)
+            })
 
             this.needsRefresh = false
         }
