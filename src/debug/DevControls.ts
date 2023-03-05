@@ -18,8 +18,8 @@ import { DrawMenu } from "../ui/DrawMenu"
 import { UIStateManager } from "../ui/UIStateManager"
 import { ElementType } from "../world/elements/Elements"
 import { GroundType } from "../world/ground/Ground"
+import { LocationFactory } from "../world/locations/LocationFactory"
 import { camp, here, LocationManager } from "../world/locations/LocationManager"
-import { RadiantLocationGenerator } from "../world/locations/RadiantLocationGenerator"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
 import { spawnMenu } from "./SpawnMenu"
@@ -122,8 +122,8 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
         InputKey.U,
         "generate radiant location",
         () => {
-            RadiantLocationGenerator.instance
-                .generate()
+            LocationFactory.instance
+                .newRadiantLocation()
                 .then((l) => LocationManager.instance.playerLoadLocation(l, Point.ZERO))
         },
     ],

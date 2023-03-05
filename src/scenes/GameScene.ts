@@ -35,7 +35,7 @@ import { QueuedEventType } from "../world/events/QueuedEvent"
 import { GroundRenderer } from "../world/ground/GroundRenderer"
 import { WaterRenderer } from "../world/ground/WaterRenderer"
 import { LightManager } from "../world/LightManager"
-import { CampLocationGenerator } from "../world/locations/CampLocationGenerator"
+import { LocationFactory } from "../world/locations/LocationFactory"
 import { camp, here, LocationManager } from "../world/locations/LocationManager"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
@@ -63,7 +63,7 @@ export class GameScene extends Scene {
 
         // World must be initialized before we do anything else
 
-        CampLocationGenerator.instance.generate().then(() => {
+        LocationFactory.instance.newCamp().then(() => {
             LocationManager.instance.loadLocation(camp())
 
             const playerStartPos = new Point(camp().size, camp().size).times(TILE_SIZE)

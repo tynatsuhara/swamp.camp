@@ -8,8 +8,8 @@ import { saveManager } from "../../SaveManager"
 import { NotificationDisplay } from "../../ui/NotificationDisplay"
 import { TextAlign } from "../../ui/Text"
 import { Location } from "../../world/locations/Location"
+import { LocationFactory } from "../../world/locations/LocationFactory"
 import { camp, here, LocationManager } from "../../world/locations/LocationManager"
-import { RadiantLocationGenerator } from "../../world/locations/RadiantLocationGenerator"
 import { TimeUnit } from "../../world/TimeUnit"
 import { WorldTime } from "../../world/WorldTime"
 import { DudeSpawner } from "../DudeSpawner"
@@ -122,8 +122,7 @@ export class HostPlayer extends AbstractPlayer {
                         mapIndex,
                         exploreMap.withMetadata({ locations: 3 })
                     )
-                    const radiantLocation = RadiantLocationGenerator.instance.generate()
-                    travelToLocation(radiantLocation)
+                    travelToLocation(LocationFactory.instance.newRadiantLocation())
                 } else {
                     showDangerWarning()
                 }
@@ -135,7 +134,7 @@ export class HostPlayer extends AbstractPlayer {
                 // We could make it so they die if they no longer have their map, but that probably won't happen
                 let nextLocation =
                     activeMap && !lastUsage
-                        ? RadiantLocationGenerator.instance.generate()
+                        ? LocationFactory.instance.newRadiantLocation()
                         : Promise.resolve(camp())
                 if (lastUsage) {
                     this.dude.inventory.removeItemAtIndex(mapIndex)

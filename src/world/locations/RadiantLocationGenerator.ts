@@ -1,4 +1,3 @@
-import { Singletons } from "../../Singletons"
 import { ElementType } from "../elements/Elements"
 import { AbstractLocationGenerator, TreeTypeSupplier } from "./AbstractLocationGenerator"
 import { Location } from "./Location"
@@ -20,10 +19,6 @@ const MAP_SIZE = 30
  */
 
 export class RadiantLocationGenerator extends AbstractLocationGenerator {
-    static get instance() {
-        return Singletons.getOrCreate(RadiantLocationGenerator)
-    }
-
     protected _generate(): Promise<Location> {
         const levels =
             Math.random() > 0.7

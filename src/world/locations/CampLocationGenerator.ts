@@ -1,7 +1,6 @@
 import { debug, pt } from "brigsby/dist"
 import { Grid, Lists } from "brigsby/dist/util"
 import { getImage } from "../../graphics/Tilesets"
-import { Singletons } from "../../Singletons"
 import { Color, getHex } from "../../ui/Color"
 import { DIP_TENT_COLOR } from "../buildings/Tent"
 import { ElementType } from "../elements/Elements"
@@ -31,10 +30,6 @@ const LEVEL_2_TENT = Color.PINK_2
 const LEVEL_3_TENT = Color.PINK_1
 
 export class CampLocationGenerator extends AbstractLocationGenerator {
-    static get instance() {
-        return Singletons.getOrCreate(CampLocationGenerator)
-    }
-
     private map: HTMLImageElement
 
     protected async _generate() {
