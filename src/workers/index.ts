@@ -1,5 +1,5 @@
 export const createWorker = <Request, Response>(
-    filename: "minimap" | "newlocation"
+    filename: "minimap"
 ): [(data: Request) => void, (callback: (response: Response) => void) => void] => {
     const worker = new Worker(`workers/${filename}.js?v=${window.SWAMP_CAMP.version}`)
     const sender = (data: Request) => {
