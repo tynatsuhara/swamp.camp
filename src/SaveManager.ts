@@ -1,4 +1,4 @@
-import { debug } from "brigsby/dist"
+import { debug, expose } from "brigsby/dist"
 import { player } from "./characters/player"
 import { Camera } from "./cutscenes/Camera"
 import { CutsceneManager } from "./cutscenes/CutsceneManager"
@@ -248,5 +248,6 @@ window.onbeforeunload = () => {
     }
 }
 
-window["getSaveState"] = () => saveManager.getState()
-window["setSaveState"] = (newState: SaveState) => saveManager.setState(newState)
+const getSaveState = () => saveManager.getState()
+const setSaveState = (newState: SaveState) => saveManager.setState(newState)
+expose({ getSaveState, setSaveState })

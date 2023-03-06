@@ -1,4 +1,4 @@
-import { Entity, Point, pt, UpdateData } from "brigsby/dist"
+import { Entity, expose, Point, pt, UpdateData } from "brigsby/dist"
 import { BoxCollider } from "brigsby/dist/collision"
 import { AnimatedSpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Lists, RepeatedInvoker } from "brigsby/dist/util"
@@ -46,7 +46,7 @@ export class QueequegFactory extends ElementFactory<ElementType.QUEEQUEG> {
                 wl
             )
         )
-        window["queequeg"] = ship
+        expose({ queequeg: ship })
 
         return e.addComponent(new ElementComponent(this.type, pos, ship.save))
     }

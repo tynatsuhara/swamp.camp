@@ -1,4 +1,4 @@
-import { Point, pt } from "brigsby/dist"
+import { expose, Point, pt } from "brigsby/dist"
 import { measure } from "brigsby/dist/Profiler"
 import { WorldAudioContext } from "../../audio/WorldAudioContext"
 import { DudeType } from "../../characters/DudeType"
@@ -35,53 +35,55 @@ export class LocationManager {
     }
 
     constructor() {
-        window["locationManager"] = this
-        window["here"] = {
-            uuid: () => here().uuid,
+        expose({
+            locationManager: this,
+            here: {
+                uuid: () => here().uuid,
 
-            listDudes: () => {
-                const ids = {}
-                here()
-                    .getDudes()
-                    .forEach((d) => {
-                        const type = DudeType[d.type]
-                        ids[type] = ids[type] || []
-                        ids[type].push(d.uuid)
-                    })
-                console.log(ids)
-            },
+                listDudes: () => {
+                    const ids = {}
+                    here()
+                        .getDudes()
+                        .forEach((d) => {
+                            const type = DudeType[d.type]
+                            ids[type] = ids[type] || []
+                            ids[type].push(d.uuid)
+                        })
+                    console.log(ids)
+                },
 
-            kill: (type: DudeType) => {
-                here()
-                    .getDudes()
-                    .filter((d) => d.type === type)
-                    .forEach((d) => d.damage(Number.MAX_SAFE_INTEGER))
-            },
+                kill: (type: DudeType) => {
+                    here()
+                        .getDudes()
+                        .filter((d) => d.type === type)
+                        .forEach((d) => d.damage(Number.MAX_SAFE_INTEGER))
+                },
 
-            killEnemies: () => {
-                here()
-                    .getDudes()
-                    .forEach((d) => {
-                        if (d.entity.getComponent(Enemy)) {
-                            d.damage(Number.MAX_SAFE_INTEGER)
-                        }
-                    })
-            },
+                killEnemies: () => {
+                    here()
+                        .getDudes()
+                        .forEach((d) => {
+                            if (d.entity.getComponent(Enemy)) {
+                                d.damage(Number.MAX_SAFE_INTEGER)
+                            }
+                        })
+                },
 
-            bulldoze: (type: ElementType, pct = 1) => {
-                here()
-                    .getElementsOfType(type)
-                    .forEach((el) => {
-                        if (Math.random() < pct) {
-                            here().removeElementLocally(el)
-                        }
-                    })
-            },
+                bulldoze: (type: ElementType, pct = 1) => {
+                    here()
+                        .getElementsOfType(type)
+                        .forEach((el) => {
+                            if (Math.random() < pct) {
+                                here().removeElementLocally(el)
+                            }
+                        })
+                },
 
-            listElements: (type: ElementType) => {
-                console.log(here().getElementsOfType(type))
+                listElements: (type: ElementType) => {
+                    console.log(here().getElementsOfType(type))
+                },
             },
-        }
+        })
     }
 
     /**

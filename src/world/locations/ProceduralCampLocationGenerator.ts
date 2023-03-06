@@ -6,7 +6,7 @@ import { Ground, GroundType } from "../ground/Ground"
 import { AbstractLocationGenerator } from "./AbstractLocationGenerator"
 import { EAST_COAST_OCEAN_WIDTH } from "./CampLocationGenerator"
 import { Location } from "./Location"
-import { here, LocationType } from "./LocationManager"
+import { LocationType } from "./LocationManager"
 
 const COAST_VARIABILITY = 3
 const COAST_OCEAN_WIDTH = EAST_COAST_OCEAN_WIDTH
@@ -205,12 +205,4 @@ export class ProceduralCampLocationGenerator extends AbstractLocationGenerator {
 
         return [pts, str]
     }
-}
-
-// window["levelNoise"] = (...args: any) => console.log(AbstractLocationGenerator.levelNoise(...args)[1])
-// window["waterNoise"] = (...args: any) => console.log(CampLocationGenerator.waterNoise(...args)[1])
-// window["coastNoise"] = (...args: any) => console.log(CampLocationGenerator.coastNoise(...args)[1])
-
-window["river"] = () => {
-    ProceduralCampLocationGenerator.instance.addRiver(here())
 }
