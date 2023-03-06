@@ -3,7 +3,7 @@ const fs = require("fs")
 
 const workers = fs
     .readdirSync("./src/workers", { withFileTypes: true })
-    .filter((entry) => entry.isFile() && entry.name !== "index")
+    .filter((entry) => entry.isFile() && entry.name !== "index.ts")
     .map(({ name }) => name.replace(".ts", ""))
     .map((name) => [`workers/${name}`, `./src/workers/${name}.ts`])
 
