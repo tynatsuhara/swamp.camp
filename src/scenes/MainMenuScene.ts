@@ -111,7 +111,6 @@ export class MainMenuScene extends Scene {
         this.loadAssets().then(() => {
             saveManager.load(slot)
         })
-        this.render(Menu.ROOT) // force re-render
     }
 
     private overwritingSave: Save
@@ -123,7 +122,6 @@ export class MainMenuScene extends Scene {
             SwampCampGame.instance.loadGameScene()
             SwampCampGame.instance.gameScene.newGame()
         })
-        this.render(Menu.ROOT) // force re-render
     }
 
     private lastDimensions: Point

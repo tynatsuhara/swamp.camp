@@ -207,6 +207,8 @@ class SaveManager {
     }
 
     loadSave(save: Save) {
+        const start = new Date().getTime()
+
         this.state = {
             ...new SaveState(), // initialize default values
             ...save.state,
@@ -227,6 +229,8 @@ class SaveManager {
         SwampCampGame.instance.loadGameScene()
 
         Camera.instance.focusOnDude(player())
+
+        console.log(`loading save took ${new Date().getTime() - start} ms`)
     }
 
     private getSave(saveKey: string): Save {
