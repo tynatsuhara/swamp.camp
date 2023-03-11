@@ -3,6 +3,7 @@ import { BoxCollider } from "brigsby/dist/collision"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { Maths } from "brigsby/dist/util"
 import { Dude } from "../../characters/Dude"
+import { DudeType } from "../../characters/DudeType"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Item, spawnItem } from "../../items/Items"
 import { session } from "../../online/session"
@@ -35,8 +36,14 @@ export class HittableResource extends Hittable {
     }
 
     private hitCallback(hitDir: Point, dude: Dude) {
-        this.availableResources--
         this.audioCallback()
+
+        // Only players actually knock out items
+        if (dude.type !== DudeType.PLAYER) {
+            return
+        }
+
+        this.availableResources--
 
         if (
             this.availableResources < 0 &&
