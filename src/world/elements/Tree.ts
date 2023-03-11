@@ -1,4 +1,4 @@
-import { Entity, Point } from "brigsby/dist"
+import { Component, Entity, Point } from "brigsby/dist"
 import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
 import { loadAudio } from "../../audio/DeferLoadAudio"
@@ -52,8 +52,8 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
     make(wl: Location, pos: Point, data: SaveData): ElementComponent<TreeType, SaveData> {
         const maxResourcesCount = 4
 
-        const nextGrowthTime = data.ngt ?? this.nextGrowthTime()
         const size = data.s ?? 1
+        const nextGrowthTime = size < 3 ? data.ngt ?? this.nextGrowthTime() : undefined
         const availableResources = data.a ?? maxResourcesCount
 
         const e = new Entity()
@@ -164,6 +164,8 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
             )
         )
 
+        e.addComponent(new Tree(size === 3))
+
         return e.addComponent(
             new ElementComponent(this.type, pos, () => {
                 return {
@@ -188,5 +190,11 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
     private nextGrowthTime() {
         // grow every 24-48 hours
         return Math.floor(WorldTime.instance.time + TimeUnit.DAY * (1 + Math.random()))
+    }
+}
+
+export class Tree extends Component {
+    constructor(readonly fullyGrown: boolean) {
+        super()
     }
 }
