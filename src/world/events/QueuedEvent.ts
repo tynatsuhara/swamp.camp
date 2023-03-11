@@ -17,7 +17,7 @@ export enum QueuedEventType {
     NEW_VILLAGERS_ARRIVAL,
     DAILY_SCHEDULE, // executes daily at midnight
     ORC_SEIGE,
-    COLLECT_TAXES,
+    DAILY_MORNING,
     QUEEQUEG_DISEMBARK_PASSENGERS,
 }
 
@@ -74,14 +74,12 @@ export const getEventQueueHandlers = (): {
         // Collect taxes later in the day
         if (WorldTime.instance.currentDay === Day.MONDAY) {
             EventQueue.instance.addEvent({
-                type: QueuedEventType.COLLECT_TAXES,
+                type: QueuedEventType.DAILY_MORNING,
                 time: WorldTime.instance.future({ hours: 8 }),
             })
         }
 
         replenishResources()
-
-        updateTownStats()
 
         applyVillagerWork()
 
@@ -91,8 +89,14 @@ export const getEventQueueHandlers = (): {
         })
     },
 
+    [QueuedEventType.DAILY_MORNING]: () => {
+        if (WorldTime.instance.currentDay === Day.MONDAY) {
+            collectTaxes()
+        }
+
+        updateTownStats()
+    },
+
     // TODO: This should wake up the player if they are sleeping
     [QueuedEventType.ORC_SEIGE]: () => DudeSpawner.instance.spawnOrcs(),
-
-    [QueuedEventType.COLLECT_TAXES]: collectTaxes,
 })
