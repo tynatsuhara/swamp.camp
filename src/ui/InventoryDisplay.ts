@@ -181,7 +181,7 @@ export class InventoryDisplay extends Component {
             const inv = Dude.get(dudeUUID).inventory
 
             inv.getStacks().forEach((s, i) => {
-                if (s.metadata?.hotKey === hotKey) {
+                if (s?.metadata?.hotKey === hotKey) {
                     inv.setStack(i, s.withMetadata({ hotKey: undefined }))
                 }
             })
@@ -196,6 +196,7 @@ export class InventoryDisplay extends Component {
     }
 
     refreshView() {
+        console.log("refresh inventory")
         // As long as what we're holding is a subset of the stack in the inventory, don't drop it!
         const { heldStackInventory, heldStackInvIndex, heldStack } = this
         const invStackPostUpdate = heldStackInventory?.getStack(heldStackInvIndex)

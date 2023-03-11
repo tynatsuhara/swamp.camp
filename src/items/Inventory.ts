@@ -100,8 +100,11 @@ export class Inventory {
         return this.stacks[index]
     }
 
-    getStacks() {
-        return this.stacks.filter((s) => !!s)
+    /**
+     * @returns A list of all the stacks, possibly null!
+     */
+    getStacks(): Array<ItemStack | null> {
+        return this.stacks
     }
 
     setStack(index: number, stack: Pick<ItemStack, "item" | "count" | "metadata">) {
