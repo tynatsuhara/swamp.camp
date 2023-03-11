@@ -18,7 +18,11 @@ export class WorldTime extends Component {
     }
 
     get currentDay(): Day {
-        return Math.floor((WorldTime.instance.time % (TimeUnit.DAY * 7)) / TimeUnit.DAY)
+        return Math.floor((this.time % (TimeUnit.DAY * 7)) / TimeUnit.DAY)
+    }
+    // 0-23
+    get currentHour(): number {
+        return Math.floor((this.time % TimeUnit.DAY) / TimeUnit.HOUR)
     }
 
     initialize(time: number) {
