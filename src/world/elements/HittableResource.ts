@@ -11,7 +11,7 @@ import { Hittable } from "./Hittable"
 export class HittableResource extends Hittable {
     private static negativeThreshold = -4
 
-    freeResources: number
+    availableResources: number
     readonly maxResources: number
     private itemSupplier: (hitter: Dude) => Item[]
     private audioCallback: () => void
@@ -20,14 +20,14 @@ export class HittableResource extends Hittable {
     constructor(
         position: Point,
         tileTransforms: SpriteTransform[],
-        freeResources: number,
+        availableResources: number,
         maxResources: number,
         itemSupplier: (hitter: Dude) => Item[],
         audioCallback: () => void = () => {},
         finishCallback: () => void
     ) {
         super(position, tileTransforms, (hitDir, dude) => this.hitCallback(hitDir, dude))
-        this.freeResources = freeResources
+        this.availableResources = availableResources
         this.maxResources = maxResources
         this.itemSupplier = itemSupplier
         this.audioCallback = audioCallback
@@ -35,14 +35,17 @@ export class HittableResource extends Hittable {
     }
 
     private hitCallback(hitDir: Point, dude: Dude) {
-        this.freeResources--
+        this.availableResources--
         this.audioCallback()
 
-        if (this.freeResources < 0 && this.freeResources > HittableResource.negativeThreshold) {
+        if (
+            this.availableResources < 0 &&
+            this.availableResources > HittableResource.negativeThreshold
+        ) {
             return
         }
 
-        const finishingMove = this.freeResources < 0
+        const finishingMove = this.availableResources < 0
         let velocityMultiplier = finishingMove ? 0.6 : 1
         let placeDistance = finishingMove ? 2 : 8
         let itemsOut = finishingMove ? 3 : 1
@@ -75,7 +78,7 @@ export class HittableResource extends Hittable {
 
     replenish() {
         if (!!this.entity && this.enabled) {
-            this.freeResources = Maths.clamp(this.freeResources + 1, 1, this.maxResources)
+            this.availableResources = Maths.clamp(this.availableResources + 1, 1, this.maxResources)
         }
     }
 }

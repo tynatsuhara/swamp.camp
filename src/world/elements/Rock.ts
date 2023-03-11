@@ -85,7 +85,7 @@ export class RockFactory extends ElementFactory<ElementType.ROCK> {
                     v: variation,
                     m: mossy,
                     f: flipped,
-                    a: hittableResource.freeResources,
+                    a: hittableResource.availableResources,
                 }
             })
         )

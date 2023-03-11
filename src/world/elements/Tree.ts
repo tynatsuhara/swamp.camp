@@ -148,7 +148,7 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
                     const treeData: SaveData = {
                         ngt: this.nextGrowthTime(),
                         s: Math.min(size + 1, 3) as 1 | 2 | 3,
-                        a: hittableResource.freeResources,
+                        a: hittableResource.availableResources,
                     }
                     wl.addElement(this.type, pos, treeData)
                 })
@@ -169,7 +169,7 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
                 return {
                     ngt: nextGrowthTime,
                     s: size,
-                    a: hittableResource.freeResources,
+                    a: hittableResource.availableResources,
                     b: burnable.isBurning ? true : undefined,
                 }
             })
