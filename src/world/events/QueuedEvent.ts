@@ -69,19 +69,17 @@ export const getEventQueueHandlers = (): {
     },
 
     [QueuedEventType.DAILY_SCHEDULE]: () => {
-        console.log(`executing daily schedule for ${Day[WorldTime.instance.currentDay]}`)
+        console.log(`executing daily midnight schedule for ${Day[WorldTime.instance.currentDay]}`)
 
-        // Collect taxes later in the day
-        if (WorldTime.instance.currentDay === Day.MONDAY) {
-            EventQueue.instance.addEvent({
-                type: QueuedEventType.DAILY_MORNING,
-                time: WorldTime.instance.future({ hours: 8 }),
-            })
-        }
+        applyVillagerWork()
 
         replenishResources()
 
-        applyVillagerWork()
+        // Some events happen in the morning
+        EventQueue.instance.addEvent({
+            type: QueuedEventType.DAILY_MORNING,
+            time: WorldTime.instance.future({ hours: 8 }),
+        })
 
         EventQueue.instance.addEvent({
             type: QueuedEventType.DAILY_SCHEDULE,
@@ -90,6 +88,8 @@ export const getEventQueueHandlers = (): {
     },
 
     [QueuedEventType.DAILY_MORNING]: () => {
+        console.log(`executing daily morning schedule for ${Day[WorldTime.instance.currentDay]}`)
+
         if (WorldTime.instance.currentDay === Day.MONDAY) {
             collectTaxes()
         }
