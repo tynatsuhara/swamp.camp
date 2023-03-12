@@ -40,10 +40,10 @@ export class ConstructionSite extends Component {
 
         const chestPos = pos.plus(pt(size.x / 2 - 0.5, size.y - 1)).times(TILE_SIZE)
 
-        const { components, closeAnimation } = getChestComponents(
-            wl,
-            chestPos,
-            () => {
+        const { components, closeAnimation } = getChestComponents({
+            location: wl,
+            pixelPos: chestPos,
+            onInteract: () => {
                 startDonating(
                     {
                         onDonationComplete: () => {
@@ -54,13 +54,13 @@ export class ConstructionSite extends Component {
                     this
                 )
             },
-            () => !this.hasMaterials(),
-            () => {
+            canInteract: () => !this.hasMaterials(),
+            getIndicator: () => {
                 if (!this.hasMaterials() && DialogueDisplay.instance.currentSource !== this) {
                     return InteractIndicator.IMPORTANT_DIALOGUE
                 }
-            }
-        )
+            },
+        })
 
         this.awake = () => {
             this.entity.addComponents(components)

@@ -33,9 +33,11 @@ export class ChestFactory extends ElementFactory<ElementType.CHEST, SaveData> {
             inventory.load(data.i)
         }
 
-        const { components, closeAnimation } = getChestComponents(wl, pos.times(TILE_SIZE), () =>
-            InventoryDisplay.instance.open(closeAnimation, inventory)
-        )
+        const { components, closeAnimation } = getChestComponents({
+            location: wl,
+            pixelPos: pos.times(TILE_SIZE),
+            onInteract: () => InventoryDisplay.instance.open(closeAnimation, inventory),
+        })
 
         const e = new Entity(components)
 
@@ -51,13 +53,19 @@ export class ChestFactory extends ElementFactory<ElementType.CHEST, SaveData> {
 /**
  * A utility for creating interactice chests
  */
-export const getChestComponents = (
-    wl: Location,
-    pixelPos: Point,
-    onInteract: () => void,
+export const getChestComponents = ({
+    location: wl,
+    pixelPos,
+    onInteract,
     canInteract = () => true,
-    getIndicator: () => InteractIndicator = () => null
-): { components: Component[]; closeAnimation: () => void } => {
+    getIndicator = () => null,
+}: {
+    location: Location
+    pixelPos: Point
+    onInteract: () => void
+    canInteract?: () => boolean
+    getIndicator?: () => InteractIndicator
+}): { components: Component[]; closeAnimation: () => void } => {
     const animator: AnimatedSpriteComponent = new AnimatedSpriteComponent(
         [
             ChestAnimation.open("empty", () => animator.pause()),
