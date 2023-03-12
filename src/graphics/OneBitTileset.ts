@@ -135,6 +135,7 @@ const KEYS = {
     ["miniMapPlayer"]: pt(11, 22),
     ["ladder"]: pt(0, 6),
     ["map"]: pt(16, 27),
+    ["small-circle"]: pt(27, 20),
 }
 
 export type Icon = keyof typeof KEYS

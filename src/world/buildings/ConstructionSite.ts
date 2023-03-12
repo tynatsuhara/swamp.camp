@@ -4,7 +4,6 @@ import { DONATION_DIALOGUE, startDonating } from "../../characters/dialogue/Dona
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { ItemStack } from "../../items/Inventory"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
-import { InteractIndicator } from "../../ui/InteractIndicator"
 import { getChestComponents } from "../elements/Chest"
 import { Location } from "../locations/Location"
 
@@ -57,7 +56,7 @@ export class ConstructionSite extends Component {
             canInteract: () => !this.hasMaterials(),
             getIndicator: () => {
                 if (!this.hasMaterials() && DialogueDisplay.instance.currentSource !== this) {
-                    return InteractIndicator.IMPORTANT_DIALOGUE
+                    return "!"
                 }
             },
         })

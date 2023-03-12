@@ -2,10 +2,11 @@ import { AnonymousComponent, Component, Entity, Point, pt } from "brigsby/dist"
 import { AnimatedSpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { ChestAnimation } from "../../characters/ChestAnimation"
 import { player } from "../../characters/player/index"
+import { Icon } from "../../graphics/OneBitTileset"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Inventory, ItemStack } from "../../items/Inventory"
 import { randomByteString } from "../../saves/uuid"
-import { getInteractIndicatorIcon, InteractIndicator } from "../../ui/InteractIndicator"
+import { getIconSprite } from "../../ui/IconSprite"
 import { InventoryDisplay } from "../../ui/InventoryDisplay"
 import { Location } from "../locations/Location"
 import { ElementComponent } from "./ElementComponent"
@@ -64,7 +65,7 @@ export const getChestComponents = ({
     pixelPos: Point
     onInteract: () => void
     canInteract?: () => boolean
-    getIndicator?: () => InteractIndicator
+    getIndicator?: () => Icon
 }): { components: Component[]; closeAnimation: () => void } => {
     const animator: AnimatedSpriteComponent = new AnimatedSpriteComponent(
         [
@@ -93,11 +94,11 @@ export const getChestComponents = ({
 
     const indicator = new AnonymousComponent({
         getRenderMethods: () => {
-            const indicatorStr = getIndicator()
-            if (!indicatorStr || interactable.isShowingUI) {
+            const icon = getIndicator()
+            if (!icon || interactable.isShowingUI) {
                 return []
             }
-            return [getInteractIndicatorIcon(indicatorStr, interactable.position.plusY(-TILE_SIZE))]
+            return [getIconSprite(icon, interactable.position.plusY(-TILE_SIZE))]
         },
     })
 

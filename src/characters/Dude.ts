@@ -11,6 +11,7 @@ import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 import { DeathCutscene } from "../cutscenes/DeathCutscene"
 import { IntroCutscene } from "../cutscenes/IntroCutscene"
 import { ImageFilters } from "../graphics/ImageFilters"
+import { Icon } from "../graphics/OneBitTileset"
 import {
     emitApparitionParticles,
     LIGHT_SMOKE_PARTICLES,
@@ -26,9 +27,11 @@ import { Item, ITEM_METADATA_MAP, spawnItem } from "../items/Items"
 import { session } from "../online/session"
 import { clientSyncFn, syncData, syncFn } from "../online/syncUtils"
 import { DudeSaveState } from "../saves/DudeSaveState"
+import { Color } from "../ui/Color"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { HUD } from "../ui/HUD"
-import { getInteractIndicatorIcon, InteractIndicator } from "../ui/InteractIndicator"
+import { getIconSprite } from "../ui/IconSprite"
+import { InteractIndicator } from "../ui/InteractIndicator"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { Burnable } from "../world/elements/Burnable"
 import { Campfire } from "../world/elements/Campfire"
@@ -511,6 +514,24 @@ export class Dude extends Component implements DialogueSource {
         }
     }
 
+    private updateOffscreenIndicator() {
+        if (
+            this.dialogueIndicator === InteractIndicator.IMPORTANT_DIALOGUE ||
+            (this.type === DudeType.PLAYER &&
+                this.getCurrentOffMapArea() &&
+                !CutscenePlayerController.instance.enabled)
+        ) {
+            // update off screen indicator
+            HUD.instance.addIndicator(
+                this,
+                () => this.standingPosition,
+                () => this.location
+            )
+        } else {
+            HUD.instance.removeIndicator(this)
+        }
+    }
+
     update({ elapsedTimeMillis }: UpdateData) {
         this.animation.transform.depth =
             this.manualDepth ?? this.collider.position.y + this.collider.dimensions.y
@@ -535,6 +556,8 @@ export class Dude extends Component implements DialogueSource {
                 this.getAnimationOffset()
             )
         }
+
+        this.updateOffscreenIndicator()
 
         this.updateActiveConditions(elapsedTimeMillis)
 
@@ -1565,21 +1588,34 @@ export class Dude extends Component implements DialogueSource {
     }
 
     private getIndicator(): RenderMethod[] {
-        let indicator = InteractIndicator.NONE
         if (!this.isAlive) {
             return []
         }
 
+        let icon: Icon
+        let iconColor: Color
+
         // little flashing circle right before attacking the player
         const npc = this.entity.getComponent(NPC)
         if (npc?.targetedEnemy === player()) {
-            if (this.attackState === AttackState.ATTACKING_SOON) {
-                indicator = InteractIndicator.ATTACKING_SOON
-            } else if (this.attackState === AttackState.ATTACKING_NOW) {
-                indicator = InteractIndicator.ATTACKING_NOW
+            if (
+                [AttackState.ATTACKING_SOON, AttackState.ATTACKING_NOW].includes(this.attackState)
+            ) {
+                icon = "small-circle"
+            }
+            if (this.attackState === AttackState.ATTACKING_NOW) {
+                iconColor = Color.RED_4
             }
         } else if (this.dialogue && this.dialogue != EMPTY_DIALOGUE) {
-            indicator = this.dialogueIndicator
+            if (this.dialogueIndicator === InteractIndicator.IMPORTANT_DIALOGUE) {
+                icon = "!"
+            } else if (this.dialogueIndicator === InteractIndicator.QUESTION) {
+                icon = "?"
+            }
+        }
+
+        if (!icon) {
+            return []
         }
 
         // if (
@@ -1589,31 +1625,16 @@ export class Dude extends Component implements DialogueSource {
         //     indicator = DudeInteractIndicator.IMPORTANT_DIALOGUE
         // }
 
-        if (
-            indicator === InteractIndicator.IMPORTANT_DIALOGUE ||
-            (this.type === DudeType.PLAYER &&
-                this.getCurrentOffMapArea() &&
-                !CutscenePlayerController.instance.enabled)
-        ) {
-            // update off screen indicator
-            HUD.instance.addIndicator(
-                this,
-                () => this.standingPosition,
-                () => this.location
-            )
-        } else {
-            HUD.instance.removeIndicator(this)
-        }
-
         // render indicator icon overhead
         if (this.dialogueInteract?.isShowingUI || DialogueDisplay.instance.currentSource === this) {
             return []
         }
 
         return [
-            getInteractIndicatorIcon(
-                indicator,
-                this.standingPosition.plusY(-28).plus(this.getAnimationOffset())
+            getIconSprite(
+                icon,
+                this.standingPosition.plusY(-28).plus(this.getAnimationOffset()),
+                iconColor
             ),
         ]
     }
