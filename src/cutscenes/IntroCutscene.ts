@@ -11,7 +11,7 @@ import { saveManager } from "../SaveManager"
 import { ControlsUI } from "../ui/ControlsUI"
 import { HUD } from "../ui/HUD"
 import { Queequeg } from "../world/elements/Queequeg"
-import { here } from "../world/locations/LocationManager"
+import { camp, here } from "../world/locations/LocationManager"
 import { Camera } from "./Camera"
 import { CutsceneManager } from "./CutsceneManager"
 import { CutscenePlayerController } from "./CutscenePlayerController"
@@ -150,7 +150,7 @@ ANOTHER thing - Only one of the explorers returned, and they reported that their
         }
 
         if (!this.orcs) {
-            this.orcs = here()
+            this.orcs = camp()
                 .getDudes()
                 .filter((d) => d.factions.includes(DudeFaction.ORCS))
         }
