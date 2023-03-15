@@ -25,13 +25,13 @@ export class RadiantLocationGenerator extends AbstractLocationGenerator {
                 ? undefined
                 : this.levels(MAP_SIZE / 2, true, Math.ceil(Math.random() > 0.7 ? 3 : 2))
 
-        const location = new LocationImpl(
-            LocationType.RADIANT,
-            false,
-            true,
-            MAP_SIZE,
-            levels
-        ) as Location
+        const location = new LocationImpl({
+            type: LocationType.RADIANT,
+            isInterior: false,
+            allowPlacing: true,
+            size: MAP_SIZE,
+            levels,
+        }) as Location
 
         // make the ground
         this.placeGround(location)

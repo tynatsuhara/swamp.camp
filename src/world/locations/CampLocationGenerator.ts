@@ -41,7 +41,13 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
         const colors = this.getColorGrid()
         const levels = this.createLevels(colors)
 
-        const location = new LocationImpl(LocationType.BASE_CAMP, false, true, MAP_SIZE, levels)
+        const location = new LocationImpl({
+            type: LocationType.BASE_CAMP,
+            isInterior: false,
+            allowPlacing: true,
+            size: MAP_SIZE,
+            levels,
+        })
 
         this.placeGround(location)
         this.addWater(location, colors)

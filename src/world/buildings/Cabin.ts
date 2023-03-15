@@ -22,7 +22,11 @@ export class CabinFactory extends SimpleBuildingFactory<ElementType.CABIN> {
 
 // TODO
 const makeCabinInterior = (outside: Location): Location => {
-    const l = new LocationImpl(LocationType.APOTHECARY_INTERIOR, true, false)
+    const l = new LocationImpl({
+        type: LocationType.APOTHECARY_INTERIOR,
+        isInterior: true,
+        allowPlacing: false,
+    })
 
     return LocationManager.instance.add(l)
 }

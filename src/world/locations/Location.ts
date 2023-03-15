@@ -204,14 +204,21 @@ export class LocationImpl extends Location {
      * @param allowPlacing if the user can place elements here
      * @param size the size of the location in tiles (square), can be omitted for interiors
      */
-    constructor(
-        type: LocationType,
-        isInterior: boolean,
-        allowPlacing: boolean,
-        size?: number,
-        levels?: Grid<number>,
-        uuid = newUUID()
-    ) {
+    constructor({
+        type,
+        isInterior,
+        allowPlacing,
+        size,
+        levels,
+        uuid = newUUID(),
+    }: {
+        type: LocationType
+        isInterior: boolean
+        allowPlacing: boolean
+        size?: number
+        levels?: Grid<number>
+        uuid?: string
+    }) {
         super()
 
         this.type = type
@@ -733,14 +740,14 @@ export class LocationImpl extends Location {
         const size = saveState.size || (saveState.isInterior ? null : 70)
         const levels = saveState.levels ? Grid.deserialize(saveState.levels) : null
 
-        const n = new LocationImpl(
-            saveState.type,
-            saveState.isInterior,
-            saveState.allowPlacing,
+        const n = new LocationImpl({
+            type: saveState.type,
+            isInterior: saveState.isInterior,
+            allowPlacing: saveState.allowPlacing,
             size,
             levels,
-            saveState.uuid
-        )
+            uuid: saveState.uuid,
+        })
 
         saveState.features.forEach((f) => n.addFeature(f.type, f.data))
         n.teleporters = saveState.teleporters

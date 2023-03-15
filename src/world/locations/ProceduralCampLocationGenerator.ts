@@ -37,13 +37,13 @@ export class ProceduralCampLocationGenerator extends AbstractLocationGenerator {
             const [coastNoise] = ProceduralCampLocationGenerator.coastNoise()
             const levels = this.levels(ProceduralCampLocationGenerator.MAP_RANGE)
 
-            location = new LocationImpl(
-                LocationType.BASE_CAMP,
-                false,
-                true,
-                ProceduralCampLocationGenerator.MAP_SIZE,
-                levels
-            )
+            location = new LocationImpl({
+                type: LocationType.BASE_CAMP,
+                isInterior: false,
+                allowPlacing: true,
+                size: ProceduralCampLocationGenerator.MAP_SIZE,
+                levels,
+            })
 
             // make the ground
             this.placeGround(location)

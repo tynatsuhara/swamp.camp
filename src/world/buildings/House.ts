@@ -108,7 +108,11 @@ export class HouseFactory extends BuildingFactory<ElementType.HOUSE> {
 }
 
 const makeHouseInterior = (outside: Location): Location => {
-    const l = new LocationImpl(LocationType.HOUSE_INTERIOR, true, false)
+    const l = new LocationImpl({
+        type: LocationType.HOUSE_INTERIOR,
+        isInterior: true,
+        allowPlacing: false,
+    })
 
     const dimensions = new Point(7, 5)
     const interactablePos = new Point(dimensions.x / 2, dimensions.y).times(TILE_SIZE)

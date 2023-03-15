@@ -91,7 +91,11 @@ export class MineEntranceFactory extends BuildingFactory<ElementType.MINE_ENTRAN
 }
 
 const makeMineInterior = (outside: Location) => {
-    const l = new LocationImpl(LocationType.MINE_INTERIOR, true, false)
+    const l = new LocationImpl({
+        type: LocationType.MINE_INTERIOR,
+        isInterior: true,
+        allowPlacing: false,
+    })
 
     const dimensions = new Point(3, 2)
     InteriorUtils.addBarriers(l, dimensions)

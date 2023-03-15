@@ -120,7 +120,11 @@ const makeTentInterior = (outside: Location, color: TentColor): Location => {
     // only the player should have a blue tent
     const isPlayerTent = color === PLAYER_TENT_COLOR
     const isDipTent = color === DIP_TENT_COLOR
-    const l = new LocationImpl(LocationType.TENT_INTERIOR, true, isPlayerTent)
+    const l = new LocationImpl({
+        type: LocationType.TENT_INTERIOR,
+        isInterior: true,
+        allowPlacing: isPlayerTent,
+    })
 
     const floorDimensions = new Point(5, 4)
     ElementUtils.rectPoints(Point.ZERO, floorDimensions).forEach((p) =>

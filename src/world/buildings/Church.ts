@@ -38,7 +38,11 @@ const CHURCH_TEMPLATE = `
 `
 
 const makeChurchInterior = (outside: Location): Location => {
-    const l = new LocationImpl(LocationType.CHUCH_INTERIOR, true, false)
+    const l = new LocationImpl({
+        type: LocationType.CHUCH_INTERIOR,
+        isInterior: true,
+        allowPlacing: false,
+    })
 
     const dimensions = new Point(7, 9)
     const interactablePos = new Point(dimensions.x / 2, dimensions.y).times(TILE_SIZE)

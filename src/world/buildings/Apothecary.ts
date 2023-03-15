@@ -26,7 +26,11 @@ export class ApothecaryFactory extends SimpleBuildingFactory<ElementType.APOTHEC
 }
 
 const makeApothecaryInterior = (outside: Location): Location => {
-    const l = new LocationImpl(LocationType.APOTHECARY_INTERIOR, true, false)
+    const l = new LocationImpl({
+        type: LocationType.APOTHECARY_INTERIOR,
+        isInterior: true,
+        allowPlacing: false,
+    })
 
     const dimensions = new Point(5, 4)
 
