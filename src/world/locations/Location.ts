@@ -25,14 +25,17 @@ import { LocationManager, LocationType } from "./LocationManager"
 export abstract class Location {
     readonly uuid: string
     readonly type: LocationType
-    readonly levels = new Grid<number>()
 
+    // TODO encapsulate these data structures
+    readonly levels = new Grid<number>()
     readonly miscEntities = new Set<Entity>()
 
+    // TODO allow non-square Locations
     readonly size: number // tile dimensions (square)
     get range() {
         return this.size / 2
     }
+
     readonly isInterior: boolean
     readonly allowPlacing: boolean
 
@@ -92,18 +95,18 @@ export abstract class Location {
      * @returns true if this position in the grid has a solid item
      *          (aka it cannot be walked through)
      */
-    abstract isOccupied(tilePoint: Point)
+    abstract isOccupied(tilePoint: Point): boolean
 
-    abstract setOccupied(tilePoint: Point, occupied: boolean)
+    abstract setOccupied(tilePoint: Point, occupied: boolean): void
 
-    abstract getOccupiedSpots()
+    abstract getOccupiedSpots(): Point[]
 
     /**
      * synced host->client
      */
     abstract removeElementAt: (x: number, y: number) => void
 
-    abstract removeElementLocally(el: ElementComponent<any>)
+    abstract removeElementLocally(el: ElementComponent<any>): void
 
     /**
      * @returns All the reasonable ground spots in the location.
@@ -117,7 +120,7 @@ export abstract class Location {
         heuristic: (pt: Point, goal: Point) => number,
         extraIsOccupiedFilter: (pt: Point) => boolean,
         distance: (a: Point, b: Point) => number
-    )
+    ): Point[]
 
     abstract addTeleporter(t: Teleporter): void
 
@@ -125,42 +128,40 @@ export abstract class Location {
 
     abstract getTeleporterLocations(): Point[]
 
-    ejectResidents(toExteriorUUID: string) {
+    abstract npcUseTeleporter(dude: Dude, teleporter: Teleporter): void
+
+    abstract playerUseTeleporter(to: string, id: string): void
+
+    abstract addFeature<F extends FeatureType>(type: F, data: FeatureData<F>)
+
+    abstract getFeatureOfType<F extends FeatureType>(type: F): FeatureData<F>
+
+    abstract getEntities(): Entity[]
+
+    abstract getDude(dudeType: DudeType): Dude
+
+    abstract save(context: SaveContext): LocationSaveState
+
+    abstract checkDroppedItemCollision(dude: Dude): void
+
+    abstract addDroppedItem(item: DroppedItem): void
+
+    abstract removeDroppedItem(item: DroppedItem): void
+
+    abstract removeAllDroppedItems(): void
+
+    ejectResidents(toExteriorUUID: string): void {
         const teleporterToExterior = this.getTeleporter(toExteriorUUID)
         this.getDudes().forEach((d) => {
             this.npcUseTeleporter(d, teleporterToExterior)
         })
     }
 
-    abstract npcUseTeleporter(dude: Dude, teleporter: Teleporter)
-
-    abstract playerUseTeleporter(to: string, id: string)
-
-    abstract addFeature<F extends FeatureType>(type: F, data: FeatureData<F>)
-
-    abstract getFeatureOfType<F extends FeatureType>(type: F): FeatureData<F>
-
-    abstract getEntities()
-
-    abstract getDude(dudeType: DudeType): Dude
-
-    abstract save(context: SaveContext): LocationSaveState
-
-    toggleAudio(active: boolean) {
+    toggleAudio(active: boolean): void {
         this.getEntities()
             .flatMap((e) => e.getComponents(PointAudio))
             .forEach((aud) => aud.setActive(active))
     }
-
-    abstract checkDroppedItemCollision(dude: Dude)
-
-    abstract addDroppedItem(item: DroppedItem)
-
-    abstract removeDroppedItem(item: DroppedItem)
-
-    abstract removeAllDroppedItems()
-
-    // static abstract load(saveState: LocationSaveState): Location
 }
 
 export class LocationImpl extends Location {
@@ -524,7 +525,7 @@ export class LocationImpl extends Location {
         heuristic: (pt: Point, goal: Point) => number,
         extraIsOccupiedFilter: (pt: Point) => boolean,
         distance: (a: Point, b: Point) => number
-    ) {
+    ): Point[] {
         const buffer = 5
         const range = this.size / 2 + buffer
 
