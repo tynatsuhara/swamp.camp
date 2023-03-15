@@ -199,7 +199,7 @@ export class GameScene extends Scene {
         }
 
         if (debug.showGroundTiles) {
-            const pts = here().getGroundSpots(true)
+            const pts = here().getAllGroundSpots()
             const renders = pts.map(
                 (pt) =>
                     new RectRender({

@@ -88,7 +88,7 @@ Your work here is not yet done.`,
             .forEach((p) => {
                 if (p.getCurrentOffMapArea()) {
                     const newSpot = Lists.findRandom(
-                        camp().getGroundSpots(),
+                        camp().getWalkableGroundSpots(),
                         (pos) =>
                             !Ground.isWater(camp().getGround(pos)?.type) && !camp().isOccupied(pos)
                     )

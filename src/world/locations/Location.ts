@@ -97,10 +97,15 @@ export abstract class Location {
     abstract removeElementLocally(el: ElementComponent<any>): void
 
     /**
-     * @returns All the reasonable ground spots in the location.
+     * @returns All the registered ground spots in the location.
+     */
+    abstract getAllGroundSpots(): Point[]
+
+    /**
+     * @returns All the reasonable ground spots in the location (eg, for possible roaming options).
      *          For exterior locations, excludes the very edge of the map.
      */
-    abstract getGroundSpots(forceGetAll?: boolean): Point[]
+    abstract getWalkableGroundSpots(): Point[]
 
     abstract findPath(
         tileStart: Point,

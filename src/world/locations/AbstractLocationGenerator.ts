@@ -42,7 +42,7 @@ export abstract class AbstractLocationGenerator {
         const adjacentLevels = (pt: Point) => adjacent(pt).map((pt) => location.getLevel(pt))
 
         // Generate waterfalls for water on level edges
-        location.getGroundSpots(true).forEach((pt) => {
+        location.getAllGroundSpots().forEach((pt) => {
             if (location.getGround(pt)?.type === GroundType.WATER) {
                 const level = location.getLevel(pt)
                 location.setGroundElement(

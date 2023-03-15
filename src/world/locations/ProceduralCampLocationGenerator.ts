@@ -110,8 +110,6 @@ export class ProceduralCampLocationGenerator extends AbstractLocationGenerator {
     }
 
     addRiver(location: Location) {
-        location.getGroundSpots().filter((pt) => !location.isOccupied(pt))
-
         const start = new Point(10, 30)
         const end = new Point(-30, -30)
         const heuristicRandomness = 50

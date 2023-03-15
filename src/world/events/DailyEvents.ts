@@ -19,7 +19,7 @@ export const replenishResources = () => {
         .getElements()
         .map((e) => e.entity.getComponent(HittableResource)?.replenish())
 
-    const allSpots = camp().getGroundSpots(true)
+    const allSpots = camp().getAllGroundSpots()
     const spawnResource = (type: ElementType, count: number) => {
         const typeFactory = Elements.instance.getElementFactory(type)
         const openTiles = allSpots.filter(

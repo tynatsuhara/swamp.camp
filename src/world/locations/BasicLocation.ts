@@ -353,11 +353,18 @@ export class BasicLocation extends Location {
     }
 
     /**
-     * @returns All the reasonable ground spots in the location.
+     * @returns All the registered ground spots in the location.
+     */
+    getAllGroundSpots(): Point[] {
+        return this.ground.keys()
+    }
+
+    /**
+     * @returns All the reasonable ground spots in the location (eg, for possible roaming options).
      *          For exterior locations, excludes the very edge of the map.
      */
-    getGroundSpots(forceGetAll = false) {
-        if (this.isInterior || forceGetAll) {
+    getWalkableGroundSpots(): Point[] {
+        if (this.isInterior) {
             return this.ground.keys()
         }
         return this.exteriorFleeingSpots()

@@ -345,7 +345,7 @@ export class NPC extends Simulatable {
         } else if (goalOptionsSupplier) {
             pts = goalOptionsSupplier()
         } else {
-            pts = this._dude.location.getGroundSpots()
+            pts = this._dude.location.getWalkableGroundSpots()
         }
 
         return pts.filter((pt) => !this._dude.location.isOccupied(pt))
