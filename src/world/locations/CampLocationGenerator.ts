@@ -7,7 +7,7 @@ import { ElementType } from "../elements/Elements"
 import { GroundType } from "../ground/Ground"
 import { AbstractLocationGenerator } from "./AbstractLocationGenerator"
 import { Location, LocationImpl } from "./Location"
-import { LocationType } from "./LocationManager"
+import { LocationType } from "./LocationType"
 
 export const EAST_COAST_OCEAN_WIDTH = 12
 

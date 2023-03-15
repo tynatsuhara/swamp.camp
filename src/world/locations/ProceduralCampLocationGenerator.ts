@@ -6,7 +6,7 @@ import { Ground, GroundType } from "../ground/Ground"
 import { AbstractLocationGenerator } from "./AbstractLocationGenerator"
 import { EAST_COAST_OCEAN_WIDTH } from "./CampLocationGenerator"
 import { Location, LocationImpl } from "./Location"
-import { LocationType } from "./LocationManager"
+import { LocationType } from "./LocationType"
 
 const COAST_VARIABILITY = 3
 const COAST_OCEAN_WIDTH = EAST_COAST_OCEAN_WIDTH

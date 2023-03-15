@@ -1,7 +1,7 @@
 import { ElementType } from "../elements/Elements"
 import { AbstractLocationGenerator, TreeTypeSupplier } from "./AbstractLocationGenerator"
 import { Location, LocationImpl } from "./Location"
-import { LocationType } from "./LocationManager"
+import { LocationType } from "./LocationType"
 
 const MAP_SIZE = 30
 

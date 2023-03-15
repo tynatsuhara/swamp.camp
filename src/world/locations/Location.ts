@@ -20,7 +20,8 @@ import { Feature, FeatureData, FeatureType, instantiateFeature } from "../featur
 import { Ground, GroundType, SavedGround } from "../ground/Ground"
 import { GroundComponent } from "../ground/GroundComponent"
 import { Teleporter, TeleporterPrefix, Teleporters, TeleporterSound } from "../Teleporter"
-import { LocationManager, LocationType } from "./LocationManager"
+import { LocationManager } from "./LocationManager"
+import { LocationType } from "./LocationType"
 
 export abstract class Location {
     readonly uuid: string

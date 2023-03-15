@@ -1,7 +1,7 @@
 import { SavedElement } from "../world/elements/Elements"
 import { Feature } from "../world/features/Features"
 import { SavedGround } from "../world/ground/Ground"
-import { LocationType } from "../world/locations/LocationManager"
+import { LocationType } from "../world/locations/LocationType"
 import { DudeSaveState } from "./DudeSaveState"
 
 export class LocationSaveState {

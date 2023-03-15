@@ -18,17 +18,7 @@ import { Simulatable } from "../Simulatable"
 import { TimeUnit } from "../TimeUnit"
 import { VisibleRegionMask } from "../VisibleRegionMask"
 import { Location, LocationImpl } from "./Location"
-
-// TODO move to its own file
-export enum LocationType {
-    BASE_CAMP = "base",
-    TENT_INTERIOR = "tent",
-    MINE_INTERIOR = "mine",
-    HOUSE_INTERIOR = "house",
-    CHUCH_INTERIOR = "church",
-    APOTHECARY_INTERIOR = "apothecary",
-    RADIANT = "radiant",
-}
+import { LocationType } from "./LocationType"
 
 export class LocationManager {
     static get instance() {
