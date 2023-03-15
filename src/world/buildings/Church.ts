@@ -3,7 +3,7 @@ import { DudeType } from "../../characters/DudeType"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { ElementType } from "../elements/Elements"
 import { GroundType } from "../ground/Ground"
-import { Location } from "../locations/Location"
+import { Location, LocationImpl } from "../locations/Location"
 import { LocationManager, LocationType } from "../locations/LocationManager"
 import { Teleporter, TeleporterPrefix } from "../Teleporter"
 import { AsciiInteriorBuilder } from "./AsciiInteriorBuilder"
@@ -37,7 +37,7 @@ const CHURCH_TEMPLATE = `
 `
 
 const makeChurchInterior = (outside: Location): Location => {
-    const l = new Location(LocationType.CHUCH_INTERIOR, true, false)
+    const l = new LocationImpl(LocationType.CHUCH_INTERIOR, true, false)
 
     const dimensions = new Point(7, 9)
     const interactablePos = new Point(dimensions.x / 2, dimensions.y).times(TILE_SIZE)

@@ -9,7 +9,7 @@ import { Interactable } from "../elements/Interactable"
 import { NavMeshCollider } from "../elements/NavMeshCollider"
 import { GroundType } from "../ground/Ground"
 import { GroundRenderer } from "../ground/GroundRenderer"
-import { Location } from "../locations/Location"
+import { Location, LocationImpl } from "../locations/Location"
 import { camp, LocationManager, LocationType } from "../locations/LocationManager"
 import { Teleporter, TeleporterPrefix } from "../Teleporter"
 import { BuildingFactory, ConstructionRequirements } from "./Building"
@@ -90,7 +90,7 @@ export class MineEntranceFactory extends BuildingFactory<ElementType.MINE_ENTRAN
 }
 
 const makeMineInterior = (outside: Location) => {
-    const l = new Location(LocationType.MINE_INTERIOR, true, false)
+    const l = new LocationImpl(LocationType.MINE_INTERIOR, true, false)
 
     const dimensions = new Point(3, 2)
     InteriorUtils.addBarriers(l, dimensions)

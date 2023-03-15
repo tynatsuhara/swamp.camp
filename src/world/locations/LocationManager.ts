@@ -17,8 +17,9 @@ import { ElementType } from "../elements/Elements"
 import { Simulatable } from "../Simulatable"
 import { TimeUnit } from "../TimeUnit"
 import { VisibleRegionMask } from "../VisibleRegionMask"
-import { Location } from "./Location"
+import { Location, LocationImpl } from "./Location"
 
+// TODO move to its own file
 export enum LocationType {
     BASE_CAMP = "base",
     TENT_INTERIOR = "tent",
@@ -152,7 +153,8 @@ export class LocationManager {
     })
 
     private initializeLocation(l: LocationSaveState) {
-        const loadedLocation = Location.load(l)
+        // TODO clean this up when we add different location types
+        const loadedLocation = LocationImpl.load(l)
         this.locations.set(l.uuid, loadedLocation)
     }
 

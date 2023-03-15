@@ -6,7 +6,7 @@ import { DIP_TENT_COLOR } from "../buildings/Tent"
 import { ElementType } from "../elements/Elements"
 import { GroundType } from "../ground/Ground"
 import { AbstractLocationGenerator } from "./AbstractLocationGenerator"
-import { Location } from "./Location"
+import { Location, LocationImpl } from "./Location"
 import { LocationType } from "./LocationManager"
 
 export const EAST_COAST_OCEAN_WIDTH = 12
@@ -41,7 +41,7 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
         const colors = this.getColorGrid()
         const levels = this.createLevels(colors)
 
-        const location = new Location(LocationType.BASE_CAMP, false, true, MAP_SIZE, levels)
+        const location = new LocationImpl(LocationType.BASE_CAMP, false, true, MAP_SIZE, levels)
 
         this.placeGround(location)
         this.addWater(location, colors)

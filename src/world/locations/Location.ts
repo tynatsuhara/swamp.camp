@@ -22,7 +22,148 @@ import { GroundComponent } from "../ground/GroundComponent"
 import { Teleporter, TeleporterPrefix, Teleporters, TeleporterSound } from "../Teleporter"
 import { LocationManager, LocationType } from "./LocationManager"
 
-export class Location {
+export abstract class Location {
+    readonly uuid: string
+    readonly type: LocationType
+    readonly levels = new Grid<number>()
+
+    readonly miscEntities = new Set<Entity>()
+
+    readonly size: number // tile dimensions (square)
+    get range() {
+        return this.size / 2
+    }
+    readonly isInterior: boolean
+    readonly allowPlacing: boolean
+
+    /**
+     * @returns A syncFn which will properly redirects data to elements based on grid position.
+     */
+    abstract elementSyncFn<T extends any[]>(
+        namespace: string,
+        { x, y }: Point,
+        fn: (...args: T) => void
+    ): (...args: T) => void
+
+    abstract getDudes(): Dude[]
+
+    abstract addDude(dude: Dude): void
+
+    abstract removeDude(dude: Dude): void
+
+    abstract setGroundElement(type: GroundType, tilePoint: Point, data?: object): GroundComponent
+
+    abstract reloadElement(tile: Point): void
+
+    /**
+     * Should only be called on hosts!
+     */
+    abstract addElement<T extends ElementType>(
+        type: T,
+        tilePoint: PointValue,
+        data?: Partial<ElementDataFormat[T]>
+    ): ElementComponent<T, ElementDataFormat[T]>
+
+    /**
+     * @returns the first element found of the given type, or undefined if none exist
+     */
+    abstract getElementOfType<T extends ElementType>(
+        type: T
+    ): ElementComponent<T, ElementDataFormat[T]> | undefined
+
+    abstract getElementsOfType<T extends ElementType>(
+        type: T
+    ): ElementComponent<T, ElementDataFormat[T]>[]
+
+    abstract getElements(): ElementComponent<any>[]
+
+    /**
+     * @returns the element component at the position. NOTE this can return an
+     *          element even if this is an "empty" square
+     */
+    abstract getElement(tilePoint: Point)
+
+    /**
+     * @returns the ground component at the position
+     */
+    abstract getGround(tilePoint: Point)
+
+    /**
+     * @returns true if this position in the grid has a solid item
+     *          (aka it cannot be walked through)
+     */
+    abstract isOccupied(tilePoint: Point)
+
+    abstract setOccupied(tilePoint: Point, occupied: boolean)
+
+    abstract getOccupiedSpots()
+
+    /**
+     * synced host->client
+     */
+    abstract removeElementAt: (x: number, y: number) => void
+
+    abstract removeElementLocally(el: ElementComponent<any>)
+
+    /**
+     * @returns All the reasonable ground spots in the location.
+     *          For exterior locations, excludes the very edge of the map.
+     */
+    abstract getGroundSpots(forceGetAll?: boolean): Point[]
+
+    abstract findPath(
+        tileStart: Point,
+        tileEnd: Point,
+        heuristic: (pt: Point, goal: Point) => number,
+        extraIsOccupiedFilter: (pt: Point) => boolean,
+        distance: (a: Point, b: Point) => number
+    )
+
+    abstract addTeleporter(t: Teleporter): void
+
+    abstract getTeleporter(toUUID: string): Teleporter
+
+    abstract getTeleporterLocations(): Point[]
+
+    ejectResidents(toExteriorUUID: string) {
+        const teleporterToExterior = this.getTeleporter(toExteriorUUID)
+        this.getDudes().forEach((d) => {
+            this.npcUseTeleporter(d, teleporterToExterior)
+        })
+    }
+
+    abstract npcUseTeleporter(dude: Dude, teleporter: Teleporter)
+
+    abstract playerUseTeleporter(to: string, id: string)
+
+    abstract addFeature<F extends FeatureType>(type: F, data: FeatureData<F>)
+
+    abstract getFeatureOfType<F extends FeatureType>(type: F): FeatureData<F>
+
+    abstract getEntities()
+
+    abstract getDude(dudeType: DudeType): Dude
+
+    abstract save(context: SaveContext): LocationSaveState
+
+    toggleAudio(active: boolean) {
+        this.getEntities()
+            .flatMap((e) => e.getComponents(PointAudio))
+            .forEach((aud) => aud.setActive(active))
+    }
+
+    abstract checkDroppedItemCollision(dude: Dude)
+
+    abstract addDroppedItem(item: DroppedItem)
+
+    abstract removeDroppedItem(item: DroppedItem)
+
+    abstract removeAllDroppedItems()
+
+    // static abstract load(saveState: LocationSaveState): Location
+}
+
+export class LocationImpl extends Location {
     readonly uuid: string
 
     readonly type: LocationType
@@ -69,6 +210,8 @@ export class Location {
         levels?: Grid<number>,
         uuid = newUUID()
     ) {
+        super()
+
         this.type = type
         this.isInterior = isInterior
         this.allowPlacing = allowPlacing
@@ -275,7 +418,7 @@ export class Location {
         return this.elements.values().filter((el) => el.type === type)
     }
 
-    getElements() {
+    getElements(): ElementComponent<any>[] {
         return this.elements.values()
     }
 
@@ -413,12 +556,12 @@ export class Location {
         })
     }
 
-    addTeleporter(t: Teleporter) {
+    addTeleporter(t: Teleporter): void {
         const teleporterId = Teleporters.teleporterId(t.to, t.id)
         this.teleporters[teleporterId] = t.pos.toString()
     }
 
-    getTeleporter(toUUID: string) {
+    getTeleporter(toUUID: string): Teleporter {
         return Object.entries(this.teleporters)
             .filter((kv) => kv[0].startsWith(toUUID))
             .map((kv) => ({
@@ -428,14 +571,15 @@ export class Location {
             }))[0]
     }
 
-    getTeleporterLocations() {
+    getTeleporterLocations(): Point[] {
         return Object.entries(this.teleporters).map((kv) => Point.fromString(kv[1]))
     }
 
     private getTeleporterLinkedPos(to: string, id: string): Point {
         const dest = LocationManager.instance.get(to)
         const teleporterId = Teleporters.teleporterId(this.uuid, id)
-        const link = dest.teleporters[teleporterId]
+        // TODO clean this up
+        const link = (dest as LocationImpl).teleporters[teleporterId]
         if (!link) {
             throw new Error(`teleporter ${teleporterId} not found`)
         }
@@ -542,12 +686,6 @@ export class Location {
         }
     }
 
-    toggleAudio(active: boolean) {
-        this.getEntities()
-            .flatMap((e) => e.getComponents(PointAudio))
-            .forEach((aud) => aud.setActive(active))
-    }
-
     checkDroppedItemCollision(dude: Dude) {
         this.droppedItems.forEach((item) => {
             item.checkCollision(dude)
@@ -593,7 +731,7 @@ export class Location {
         const size = saveState.size || (saveState.isInterior ? null : 70)
         const levels = saveState.levels ? Grid.deserialize(saveState.levels) : null
 
-        const n = new Location(
+        const n = new LocationImpl(
             saveState.type,
             saveState.isInterior,
             saveState.allowPlacing,
@@ -608,7 +746,7 @@ export class Location {
             n.setGroundElement(el.type, Point.fromString(el.pos), el.obj)
         )
         saveState.elements.forEach((el) => n.loadElement(el.type, el.pos, el.obj))
-        saveState.dudes.forEach((d) => DudeFactory.instance.load(d, n))
+        saveState.dudes.forEach((d) => DudeFactory.instance.load(d, n as Location))
         n.toggleAudio(false)
 
         return n

@@ -4,7 +4,7 @@ import { TILE_SIZE } from "../../graphics/Tilesets"
 import { ElementType } from "../elements/Elements"
 import { ElementUtils } from "../elements/ElementUtils"
 import { GroundType } from "../ground/Ground"
-import { Location } from "../locations/Location"
+import { Location, LocationImpl } from "../locations/Location"
 import { LocationManager, LocationType } from "../locations/LocationManager"
 import { TeleporterPrefix } from "../Teleporter"
 import { InteriorUtils } from "./InteriorUtils"
@@ -25,7 +25,7 @@ export class ApothecaryFactory extends SimpleBuildingFactory<ElementType.APOTHEC
 }
 
 const makeApothecaryInterior = (outside: Location): Location => {
-    const l = new Location(LocationType.APOTHECARY_INTERIOR, true, false)
+    const l = new LocationImpl(LocationType.APOTHECARY_INTERIOR, true, false)
 
     const dimensions = new Point(5, 4)
 

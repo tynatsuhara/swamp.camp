@@ -2,7 +2,7 @@ import { Point } from "brigsby/dist"
 import { DudeType } from "../../characters/DudeType"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { ElementType } from "../elements/Elements"
-import { Location } from "../locations/Location"
+import { Location, LocationImpl } from "../locations/Location"
 import { LocationManager, LocationType } from "../locations/LocationManager"
 import { SimpleBuildingFactory } from "./SimpleBuildingFactory"
 
@@ -21,7 +21,7 @@ export class CabinFactory extends SimpleBuildingFactory<ElementType.CABIN> {
 
 // TODO
 const makeCabinInterior = (outside: Location): Location => {
-    const l = new Location(LocationType.APOTHECARY_INTERIOR, true, false)
+    const l = new LocationImpl(LocationType.APOTHECARY_INTERIOR, true, false)
 
     return LocationManager.instance.add(l)
 }

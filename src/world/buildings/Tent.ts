@@ -12,7 +12,7 @@ import { ElementUtils } from "../elements/ElementUtils"
 import { Interactable } from "../elements/Interactable"
 import { NavMeshCollider } from "../elements/NavMeshCollider"
 import { GroundType } from "../ground/Ground"
-import { Location } from "../locations/Location"
+import { Location, LocationImpl } from "../locations/Location"
 import { here, LocationManager, LocationType } from "../locations/LocationManager"
 import { Teleporter, TeleporterPrefix, TeleporterSound } from "../Teleporter"
 import { BuildingFactory, ConstructionRequirements } from "./Building"
@@ -119,7 +119,7 @@ const makeTentInterior = (outside: Location, color: TentColor): Location => {
     // only the player should have a blue tent
     const isPlayerTent = color === PLAYER_TENT_COLOR
     const isDipTent = color === DIP_TENT_COLOR
-    const l = new Location(LocationType.TENT_INTERIOR, true, isPlayerTent)
+    const l = new LocationImpl(LocationType.TENT_INTERIOR, true, isPlayerTent)
 
     const floorDimensions = new Point(5, 4)
     ElementUtils.rectPoints(Point.ZERO, floorDimensions).forEach((p) =>

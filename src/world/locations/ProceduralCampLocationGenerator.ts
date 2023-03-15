@@ -5,7 +5,7 @@ import { ElementType } from "../elements/Elements"
 import { Ground, GroundType } from "../ground/Ground"
 import { AbstractLocationGenerator } from "./AbstractLocationGenerator"
 import { EAST_COAST_OCEAN_WIDTH } from "./CampLocationGenerator"
-import { Location } from "./Location"
+import { Location, LocationImpl } from "./Location"
 import { LocationType } from "./LocationManager"
 
 const COAST_VARIABILITY = 3
@@ -37,7 +37,7 @@ export class ProceduralCampLocationGenerator extends AbstractLocationGenerator {
             const [coastNoise] = ProceduralCampLocationGenerator.coastNoise()
             const levels = this.levels(ProceduralCampLocationGenerator.MAP_RANGE)
 
-            location = new Location(
+            location = new LocationImpl(
                 LocationType.BASE_CAMP,
                 false,
                 true,
