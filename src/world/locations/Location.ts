@@ -27,20 +27,17 @@ export abstract class Location {
     readonly isInterior: boolean
     readonly allowPlacing: boolean
 
-    /**
-     * @returns A syncFn which will properly redirects data to elements based on grid position.
-     */
-    abstract elementSyncFn<T extends any[]>(
-        namespace: string,
-        { x, y }: Point,
-        fn: (...args: T) => void
-    ): (...args: T) => void
-
-    abstract getDudes(): Dude[]
+    // ==================== Dudes ==================== //
 
     abstract addDude(dude: Dude): void
 
     abstract removeDude(dude: Dude): void
+
+    abstract getDudes(): Dude[]
+
+    abstract getDude(dudeType: DudeType): Dude
+
+    // ==================== Ground ==================== //
 
     abstract setGroundElement(type: GroundType, tilePoint: Point, data?: object): GroundComponent
 
@@ -72,12 +69,30 @@ export abstract class Location {
      * @returns the element component at the position. NOTE this can return an
      *          element even if this is an "empty" square
      */
-    abstract getElement(tilePoint: Point)
+    abstract getElement<T extends ElementType>(tilePoint: Point): ElementComponent<T>
+
+    /**
+     * @returns A syncFn which will properly redirects data to elements based on grid position.
+     */
+    abstract elementSyncFn<T extends any[]>(
+        namespace: string,
+        { x, y }: Point,
+        fn: (...args: T) => void
+    ): (...args: T) => void
+
+    /**
+     * synced host->client
+     */
+    abstract removeElementAt: (x: number, y: number) => void
+
+    abstract removeElementLocally(el: ElementComponent<any>): void
+
+    // ==================== Ground ==================== //
 
     /**
      * @returns the ground component at the position
      */
-    abstract getGround(tilePoint: Point)
+    abstract getGround(tilePoint: Point): GroundComponent
 
     /**
      * @returns true if this position in the grid has a solid item
@@ -88,13 +103,6 @@ export abstract class Location {
     abstract setOccupied(tilePoint: Point, occupied: boolean): void
 
     abstract getOccupiedSpots(): Point[]
-
-    /**
-     * synced host->client
-     */
-    abstract removeElementAt: (x: number, y: number) => void
-
-    abstract removeElementLocally(el: ElementComponent<any>): void
 
     /**
      * @returns All the registered ground spots in the location.
@@ -115,6 +123,8 @@ export abstract class Location {
         distance: (a: Point, b: Point) => number
     ): Point[]
 
+    // ==================== Teleporters ==================== //
+
     abstract addTeleporter(t: Teleporter): void
 
     abstract getTeleporter(toUUID: string): Teleporter
@@ -125,29 +135,35 @@ export abstract class Location {
 
     abstract playerUseTeleporter(to: string, id: string): void
 
-    abstract addFeature<F extends FeatureType>(type: F, data: FeatureData<F>)
+    // ==================== Features ==================== //
+
+    abstract addFeature<F extends FeatureType>(type: F, data: FeatureData<F>): void
 
     abstract getFeatureOfType<F extends FeatureType>(type: F): FeatureData<F>
 
-    abstract getEntities(): Entity[]
+    // ==================== Moving things ==================== //
 
-    abstract getDude(dudeType: DudeType): Dude
+    abstract addProjectile(e: Entity): void
 
-    abstract save(context: SaveContext): LocationSaveState
-
-    abstract checkDroppedItemCollision(dude: Dude): void
+    abstract removeProjectile(e: Entity): void
 
     abstract addDroppedItem(item: DroppedItem): void
 
     abstract removeDroppedItem(item: DroppedItem): void
 
-    abstract removeAllDroppedItems(): void
+    // ==================== Misc ==================== //
 
     abstract getLevel(pt: Point): number
 
-    abstract addProjectile(e: Entity): void
+    abstract checkDroppedItemCollision(dude: Dude): void
 
-    abstract removeProjectile(e: Entity): void
+    abstract removeAllDroppedItems(): void
+
+    abstract save(context: SaveContext): LocationSaveState
+
+    abstract getEntities(): Entity[]
+
+    // ==================== Non-abstract utils ==================== //
 
     ejectResidents(toExteriorUUID: string): void {
         const teleporterToExterior = this.getTeleporter(toExteriorUUID)

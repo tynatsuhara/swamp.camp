@@ -298,7 +298,7 @@ export class BasicLocation extends Location {
     /**
      * @returns the ground component at the position
      */
-    getGround(tilePoint: Point) {
+    getGround(tilePoint: Point): GroundComponent {
         return this.ground.get(tilePoint)
     }
 
