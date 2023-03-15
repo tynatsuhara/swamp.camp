@@ -22,7 +22,7 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
 
     const e = new Entity([new ConnectingTile(schema, d.wl, d.pos)])
 
-    const level = d.wl.levels.get(d.pos)
+    const level = d.wl.getLevel(d.pos)
     const flowSpeed = 0.004
     const sideParticleOffset = 5.5
     const sideWaterfallOffset = 3
@@ -35,7 +35,7 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
     let particleDirection: (t: number) => Point
     let pushDirection: Point
 
-    if (d.wl.levels.get(d.pos.plusX(-1)) < level) {
+    if (d.wl.getLevel(d.pos.plusX(-1)) < level) {
         // flowing left
         pushDirection = pt(-1, 0)
         rotation = 90
@@ -48,7 +48,7 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
             )
         particleDirection = (t) => pt(-t * flowSpeed, 0)
         waterfallOffset = pt(sideWaterfallOffset, 0)
-    } else if (d.wl.levels.get(d.pos.plusX(1)) < level) {
+    } else if (d.wl.getLevel(d.pos.plusX(1)) < level) {
         // flowing right
         pushDirection = pt(1, 0)
         rotation = 270
@@ -61,7 +61,7 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
             )
         particleDirection = (t) => pt(t * flowSpeed, 0)
         waterfallOffset = pt(-sideWaterfallOffset, 0)
-    } else if (d.wl.levels.get(d.pos.plusY(-1)) < level) {
+    } else if (d.wl.getLevel(d.pos.plusY(-1)) < level) {
         // flowing up
         pushDirection = pt(0, -1)
         rotation = 180

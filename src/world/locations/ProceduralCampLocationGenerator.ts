@@ -4,8 +4,9 @@ import { Singletons } from "../../Singletons"
 import { ElementType } from "../elements/Elements"
 import { Ground, GroundType } from "../ground/Ground"
 import { AbstractLocationGenerator } from "./AbstractLocationGenerator"
+import { BasicLocation } from "./BasicLocation"
 import { EAST_COAST_OCEAN_WIDTH } from "./CampLocationGenerator"
-import { Location, LocationImpl } from "./Location"
+import { Location } from "./Location"
 import { LocationType } from "./LocationType"
 
 const COAST_VARIABILITY = 3
@@ -37,7 +38,7 @@ export class ProceduralCampLocationGenerator extends AbstractLocationGenerator {
             const [coastNoise] = ProceduralCampLocationGenerator.coastNoise()
             const levels = this.levels(ProceduralCampLocationGenerator.MAP_RANGE)
 
-            location = new LocationImpl({
+            location = new BasicLocation({
                 type: LocationType.BASE_CAMP,
                 isInterior: false,
                 allowPlacing: true,
@@ -116,14 +117,14 @@ export class ProceduralCampLocationGenerator extends AbstractLocationGenerator {
         const heuristicRandomness = 50
 
         const adjacent = (pt: Point) => [pt.plusX(1), pt.plusX(-1), pt.plusY(1), pt.plusY(-1)]
-        const adjacentLevels = (pt: Point) => adjacent(pt).map((pt) => location.levels.get(pt))
+        const adjacentLevels = (pt: Point) => adjacent(pt).map((pt) => location.getLevel(pt))
 
         const river = location.findPath(
             start,
             end,
             (pt, goal) => pt.distanceTo(goal) + Math.random() * heuristicRandomness,
             (pt) => {
-                const level = location.levels.get(pt)
+                const level = location.getLevel(pt)
                 // for waterfalls to not happen on corners, at least 3 adjacent squares need to be the same level
                 return adjacentLevels(pt).filter((l) => l === level).length < 3
             },
@@ -135,7 +136,7 @@ export class ProceduralCampLocationGenerator extends AbstractLocationGenerator {
         )
 
         river.forEach((pt) => {
-            const level = location.levels.get(pt)
+            const level = location.getLevel(pt)
             location.setGroundElement(
                 adjacentLevels(pt).filter((l) => l < level).length === 1
                     ? GroundType.WATERFALL

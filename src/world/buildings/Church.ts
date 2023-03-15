@@ -3,7 +3,8 @@ import { DudeType } from "../../characters/DudeType"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { ElementType } from "../elements/Elements"
 import { GroundType } from "../ground/Ground"
-import { Location, LocationImpl } from "../locations/Location"
+import { BasicLocation } from "../locations/BasicLocation"
+import { Location } from "../locations/Location"
 import { LocationManager } from "../locations/LocationManager"
 import { LocationType } from "../locations/LocationType"
 import { Teleporter, TeleporterPrefix } from "../Teleporter"
@@ -38,7 +39,7 @@ const CHURCH_TEMPLATE = `
 `
 
 const makeChurchInterior = (outside: Location): Location => {
-    const l = new LocationImpl({
+    const l = new BasicLocation({
         type: LocationType.CHUCH_INTERIOR,
         isInterior: true,
         allowPlacing: false,

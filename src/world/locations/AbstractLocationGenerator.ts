@@ -38,23 +38,21 @@ export abstract class AbstractLocationGenerator {
     }
 
     private finalize(location: Location) {
-        if (location.levels) {
-            const adjacent = (pt: Point) => [pt.plusX(1), pt.plusX(-1), pt.plusY(1), pt.plusY(-1)]
-            const adjacentLevels = (pt: Point) => adjacent(pt).map((pt) => location.levels.get(pt))
+        const adjacent = (pt: Point) => [pt.plusX(1), pt.plusX(-1), pt.plusY(1), pt.plusY(-1)]
+        const adjacentLevels = (pt: Point) => adjacent(pt).map((pt) => location.getLevel(pt))
 
-            // Generate waterfalls for water on level edges
-            location.getGroundSpots(true).forEach((pt) => {
-                if (location.getGround(pt)?.type === GroundType.WATER) {
-                    const level = location.levels.get(pt)
-                    location.setGroundElement(
-                        adjacentLevels(pt).filter((l) => l < level).length === 1
-                            ? GroundType.WATERFALL
-                            : GroundType.WATER,
-                        pt
-                    )
-                }
-            })
-        }
+        // Generate waterfalls for water on level edges
+        location.getGroundSpots(true).forEach((pt) => {
+            if (location.getGround(pt)?.type === GroundType.WATER) {
+                const level = location.getLevel(pt)
+                location.setGroundElement(
+                    adjacentLevels(pt).filter((l) => l < level).length === 1
+                        ? GroundType.WATERFALL
+                        : GroundType.WATER,
+                    pt
+                )
+            }
+        })
     }
 
     protected abstract _generate(): Promise<Location>
@@ -169,7 +167,7 @@ export abstract class AbstractLocationGenerator {
         for (let i = -location.range - 1; i < location.range + 1; i++) {
             for (let j = -location.range - 1; j < location.range + 1; j++) {
                 const pt = new Point(i, j)
-                const thisLevel = location.levels?.get(pt)
+                const thisLevel = location.getLevel(pt)
                 const adjacent = [
                     pt.plus(new Point(0, -1)),
                     pt.plus(new Point(1, -1)),
@@ -181,7 +179,7 @@ export abstract class AbstractLocationGenerator {
                     pt.plus(new Point(-1, -1)),
                 ]
                 const isLedge = adjacent
-                    .map((pt) => location.levels?.get(pt))
+                    .map((pt) => location.getLevel(pt))
                     .some((level) => level < thisLevel)
                 if (isLedge) {
                     location.setGroundElement(GroundType.LEDGE, pt)

@@ -18,18 +18,18 @@ export class ConnectingTileLedgeSchema extends ConnectingTileSchema {
      * Renders the tile source based on the given grid and position
      */
     render(location: Location, position: Point): ImageRender[] {
-        const level = location.levels.get(position)
+        const level = location.getLevel(position)
         const x = position.x
         const y = position.y
 
-        const n = location.levels.get(new Point(x, y - 1))
-        const ne = location.levels.get(new Point(x + 1, y - 1))
-        const e = location.levels.get(new Point(x + 1, y))
-        const se = location.levels.get(new Point(x + 1, y + 1))
-        const s = location.levels.get(new Point(x, y + 1))
-        const sw = location.levels.get(new Point(x - 1, y + 1))
-        const w = location.levels.get(new Point(x - 1, y))
-        const nw = location.levels.get(new Point(x - 1, y - 1))
+        const n = location.getLevel(new Point(x, y - 1))
+        const ne = location.getLevel(new Point(x + 1, y - 1))
+        const e = location.getLevel(new Point(x + 1, y))
+        const se = location.getLevel(new Point(x + 1, y + 1))
+        const s = location.getLevel(new Point(x, y + 1))
+        const sw = location.getLevel(new Point(x - 1, y + 1))
+        const w = location.getLevel(new Point(x - 1, y))
+        const nw = location.getLevel(new Point(x - 1, y - 1))
 
         const render = (source: Point, mirrorX = false) => {
             return Tilesets.instance.tilemap.getTileAt(source).toImageRender(

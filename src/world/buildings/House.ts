@@ -7,7 +7,8 @@ import { ElementType } from "../elements/Elements"
 import { Interactable } from "../elements/Interactable"
 import { NavMeshCollider } from "../elements/NavMeshCollider"
 import { GroundType } from "../ground/Ground"
-import { Location, LocationImpl } from "../locations/Location"
+import { BasicLocation } from "../locations/BasicLocation"
+import { Location } from "../locations/Location"
 import { LocationManager } from "../locations/LocationManager"
 import { LocationType } from "../locations/LocationType"
 import { SingleTypeResidence } from "../residences/SingleTypeResidence"
@@ -108,7 +109,7 @@ export class HouseFactory extends BuildingFactory<ElementType.HOUSE> {
 }
 
 const makeHouseInterior = (outside: Location): Location => {
-    const l = new LocationImpl({
+    const l = new BasicLocation({
         type: LocationType.HOUSE_INTERIOR,
         isInterior: true,
         allowPlacing: false,

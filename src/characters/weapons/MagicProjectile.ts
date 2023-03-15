@@ -22,5 +22,5 @@ export const spawnMagicProjectile = (
     velocity: Point,
     attacker?: Dude
 ) => {
-    here().miscEntities.add(new Entity([new MagicProjectile(centerPosition, velocity, attacker)]))
+    here().addProjectile(new Entity([new MagicProjectile(centerPosition, velocity, attacker)]))
 }

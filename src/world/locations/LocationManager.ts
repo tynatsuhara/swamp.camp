@@ -17,7 +17,8 @@ import { ElementType } from "../elements/Elements"
 import { Simulatable } from "../Simulatable"
 import { TimeUnit } from "../TimeUnit"
 import { VisibleRegionMask } from "../VisibleRegionMask"
-import { Location, LocationImpl } from "./Location"
+import { BasicLocation } from "./BasicLocation"
+import { Location } from "./Location"
 import { LocationType } from "./LocationType"
 
 export class LocationManager {
@@ -144,7 +145,7 @@ export class LocationManager {
 
     private initializeLocation(l: LocationSaveState) {
         // TODO clean this up when we add different location types
-        const loadedLocation = LocationImpl.load(l)
+        const loadedLocation = BasicLocation.load(l)
         this.locations.set(l.uuid, loadedLocation)
     }
 

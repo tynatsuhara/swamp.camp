@@ -44,8 +44,8 @@ export class ConnectingTileWaterfallSchema extends ConnectingTileSchema {
         }
 
         const tilemap = Tilesets.instance.tilemap
-        const level = location.levels.get(position)
-        const flowingSouth = location.levels.get(position.plusY(1)) < level
+        const level = location.getLevel(position)
+        const flowingSouth = location.getLevel(position.plusY(1)) < level
 
         // waterflow flowing south
         if (!w) {
@@ -56,7 +56,7 @@ export class ConnectingTileWaterfallSchema extends ConnectingTileSchema {
         }
 
         // waterfall flowing east/west
-        const flowingEast = location.levels.get(position.plusX(1)) < level
+        const flowingEast = location.getLevel(position.plusX(1)) < level
 
         if (!n) {
             render(tilemap.getTileAt(new Point(3, 0)), flowingEast)

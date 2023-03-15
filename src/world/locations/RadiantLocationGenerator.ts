@@ -1,6 +1,7 @@
 import { ElementType } from "../elements/Elements"
 import { AbstractLocationGenerator, TreeTypeSupplier } from "./AbstractLocationGenerator"
-import { Location, LocationImpl } from "./Location"
+import { BasicLocation } from "./BasicLocation"
+import { Location } from "./Location"
 import { LocationType } from "./LocationType"
 
 const MAP_SIZE = 30
@@ -25,7 +26,7 @@ export class RadiantLocationGenerator extends AbstractLocationGenerator {
                 ? undefined
                 : this.levels(MAP_SIZE / 2, true, Math.ceil(Math.random() > 0.7 ? 3 : 2))
 
-        const location = new LocationImpl({
+        const location = new BasicLocation({
             type: LocationType.RADIANT,
             isInterior: false,
             allowPlacing: true,

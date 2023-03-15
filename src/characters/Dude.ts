@@ -464,7 +464,7 @@ export class Dude extends Component implements DialogueSource {
         }
 
         this.start = () => {
-            this.seaLevel = this.location.levels?.get(this.tile) ?? 0
+            this.seaLevel = this.location.getLevel(this.tile)
 
             if (session.isHost()) {
                 this.claimResidence(type, uuid, hasPendingSlot)
@@ -1195,7 +1195,7 @@ export class Dude extends Component implements DialogueSource {
 
     private getLevelAt(pos: Point) {
         const tilePos = pixelPtToTilePt(pos)
-        const currentLevel = this.location.levels?.get(tilePos) ?? 0
+        const currentLevel = this.location.getLevel(tilePos)
         const ground = this.location.getGround(tilePos)
         if (Ground.isWater(ground?.type)) {
             return currentLevel - 1
@@ -1307,7 +1307,7 @@ export class Dude extends Component implements DialogueSource {
         }
 
         if (skipColliderCheck) {
-            this.seaLevel = this.location.levels?.get(this.tile) ?? 0
+            this.seaLevel = this.location.getLevel(this.tile)
         }
     }
 
