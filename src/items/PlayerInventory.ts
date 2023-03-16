@@ -65,35 +65,11 @@ export class PlayerInventory extends Inventory {
             }
         })
 
-        const equipOnAdd = (item: Item, metadata: ItemStackMetadata) => {
-            const itemData = ITEM_METADATA_MAP[item]
-            const dude = Dude.get(playerUUID)
-            if (!dude) {
-                return // probably happening during save loading
-            }
-
-            // If already equipped, make sure it lines up
-            if (metadata.equipped === "weapon") {
-                Dude.get(playerUUID)?.setWeapon(itemData.equippableWeapon, -1)
-            } else if (metadata.equipped === "shield") {
-                Dude.get(playerUUID)?.setShield(itemData.equippableShield, -1)
-            }
-
-            // Automatically equip if slots are empty
-            if (dude.weaponType === WeaponType.NONE && itemData.equippableWeapon) {
-                dude.equipFirstWeaponInInventory()
-            } else if (dude.shieldType === ShieldType.NONE && itemData.equippableShield) {
-                dude.equipFirstShieldInInventory()
-            }
-        }
-
         const addItem = this.addItem.bind(this)
         this.addItem = (item, count = 1, metadata = {}, quiet = false) => {
             const added = SPECIAL_ITEMS[item]?.noInventorySlot || addItem(item, count, metadata)
 
             if (added) {
-                equipOnAdd(item, metadata)
-
                 // Apply special side effects
                 SPECIAL_ITEMS[item]?.onAdd(count)
 
@@ -104,12 +80,6 @@ export class PlayerInventory extends Inventory {
             }
 
             return added
-        }
-
-        const setStack = this.setStack.bind(this)
-        this.setStack = (index, stack) => {
-            equipOnAdd(stack.item, stack.metadata)
-            setStack(index, stack)
         }
     }
 
