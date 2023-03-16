@@ -464,7 +464,7 @@ export class Dude extends Component implements DialogueSource {
         }
 
         this.start = () => {
-            this.seaLevel = this.location.getLevel(this.tile)
+            this.resetSeaLevel()
 
             if (session.isHost()) {
                 this.claimResidence(type, uuid, hasPendingSlot)
@@ -986,7 +986,7 @@ export class Dude extends Component implements DialogueSource {
         this.layingDownOffset = null
 
         // manually set sea level since it can get screwed up by death + knockback
-        this.seaLevel = this.getLevelAt(this.standingPosition)
+        this.resetSeaLevel()
 
         emitApparitionParticles(this.standingPosition, LIGHT_SMOKE_PARTICLES)
     }
@@ -1205,6 +1205,10 @@ export class Dude extends Component implements DialogueSource {
         return currentLevel
     }
 
+    private resetSeaLevel() {
+        this.seaLevel = this.getLevelAt(this.standingPosition)
+    }
+
     private getVerticalMovement(elapsedTimeMillis: number) {
         let dx = 0
         let dy = 0
@@ -1309,7 +1313,7 @@ export class Dude extends Component implements DialogueSource {
         }
 
         if (skipColliderCheck) {
-            this.seaLevel = this.location.getLevel(this.tile)
+            this.resetSeaLevel()
         }
     }
 
