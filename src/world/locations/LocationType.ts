@@ -1,5 +1,3 @@
-// TODO move to its own file
-
 export enum LocationType {
     BASE_CAMP = "base",
     TENT_INTERIOR = "tent",
