@@ -262,18 +262,18 @@ export class CraftingMenu extends Component {
             // craftable item
             verticalOffset += margin
             const plainIcon = this.getItemIcon(recipe.output)
-            let craftedItemColor: Color
+            let itemColor: Color
             if (hovered) {
                 if (r === this.justCraftedRow) {
-                    craftedItemColor = COLOR_LACKING_INGREDIENT
+                    itemColor = COLOR_LACKING_INGREDIENT
                 } else {
-                    craftedItemColor = COLOR_TEXT_HOVERED
+                    itemColor = COLOR_TEXT_HOVERED
                 }
             } else {
-                craftedItemColor = COLOR_TEXT_NOT_HOVERED
+                itemColor = COLOR_TEXT_NOT_HOVERED
             }
-            this.context.fillStyle = craftedItemColor
-            const craftedItemIcon = this.tintedIcon(plainIcon, craftedItemColor)
+            this.context.fillStyle = itemColor
+            const craftedItemIcon = this.tintedIcon(plainIcon, itemColor)
             this.drawIconAt(craftedItemIcon, margin, verticalOffset)
             this.context.fillText(
                 craftedItem.displayName,
@@ -291,8 +291,8 @@ export class CraftingMenu extends Component {
                     this.context.fillStyle = COLOR_LACKING_INGREDIENT
                     ingredientIcon = this.tintedIcon(ingredientIcon, COLOR_LACKING_INGREDIENT)
                 } else {
-                    this.context.fillStyle = craftedItemColor
-                    ingredientIcon = this.tintedIcon(plainIngredientIcon, craftedItemColor)
+                    this.context.fillStyle = itemColor
+                    ingredientIcon = this.tintedIcon(plainIngredientIcon, itemColor)
                 }
                 // const requiredCount = ingr.count
                 // const countStr = `x${requiredCount}`
