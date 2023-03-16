@@ -25,5 +25,5 @@ Promise.all([
     assets.loadFont(TEXT_FONT, "url(/fonts/press-start-2p.woff2)"),
 ]).then(() => {
     // start the engine (vroom vroom)
-    Engine.start(new SwampCampGame(), canvas)
+    Engine.start(new SwampCampGame(), canvas, { scale: 1 })
 })
