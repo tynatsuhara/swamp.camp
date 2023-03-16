@@ -1137,7 +1137,9 @@ export class Dude extends Component implements DialogueSource {
 
         let environmentPush = Point.ZERO
 
-        if (Ground.isWater(ground?.type)) {
+        const isOffscreenInOcean = here() === camp() && this.getCurrentOffMapArea() === "right"
+
+        if (isOffscreenInOcean || Ground.isWater(ground?.type)) {
             this.removeCondition(Condition.ON_FIRE)
 
             // TODO: See if we can improve this later
