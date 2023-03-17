@@ -17,6 +17,12 @@ export const enum TextAlign {
     RIGHT,
 }
 
+export const enum TextVerticalAlign {
+    TOP,
+    CENTER,
+    BOTTOM,
+}
+
 export const NO_BREAK_SPACE_CHAR = "∆"
 
 /**
@@ -66,7 +72,7 @@ const ICON_PLACEHOLDER_MAP: Record<TextIcon, Icon> = {
     [TextIcon.COIN]: "coin",
 }
 
-export const formatTextRows = (text: string, width: number) => {
+const formatTextRows = (text: string, width: number) => {
     const rawRows = text.split("\n")
     const rows: string[] = []
 
@@ -88,12 +94,17 @@ export const formatTextRows = (text: string, width: number) => {
     return rows
 }
 
+export const formatTextRowCount = (text: string, width: number) => {
+    return formatTextRows(text, width).length
+}
+
 type FormatTextArgs = {
     text: string
     position: Point
     color?: Color
     width?: number
     alignment?: TextAlign
+    verticalAlignment?: TextVerticalAlign
     lineSpacing?: number
     depth?: number
     dropShadow?: Color
@@ -122,19 +133,27 @@ const formatTextInternal = ({
     color = Color.RED_2,
     width = Number.MAX_SAFE_INTEGER,
     alignment = TextAlign.LEFT,
+    verticalAlignment = TextVerticalAlign.TOP,
     lineSpacing = 4,
     depth = UIStateManager.UI_SPRITE_DEPTH + 1,
 }: FormatTextArgs): RenderMethod[] => {
     const rows: string[] = formatTextRows(text, width)
 
     const rowPosition = (r: string, i: number): Point => {
-        let offset = 0
+        let xOffset = 0 // LEFT alignment
+        let yOffset = i * (TEXT_SIZE + lineSpacing) // TOP alignment
         if (alignment === TextAlign.CENTER) {
-            offset = Math.floor((width - r.length * TEXT_PIXEL_WIDTH) / 2)
+            xOffset = Math.floor((width - r.length * TEXT_PIXEL_WIDTH) / 2)
         } else if (alignment === TextAlign.RIGHT) {
-            offset = Math.floor(width - r.length * TEXT_PIXEL_WIDTH)
+            xOffset = Math.floor(width - r.length * TEXT_PIXEL_WIDTH)
         }
-        return position.plus(new Point(offset, i * (TEXT_SIZE + lineSpacing)))
+        const height = rows.length * (TEXT_SIZE + lineSpacing) - lineSpacing
+        if (verticalAlignment === TextVerticalAlign.CENTER) {
+            yOffset -= height / 2
+        } else if (verticalAlignment === TextVerticalAlign.BOTTOM) {
+            yOffset -= height
+        }
+        return position.plus(new Point(xOffset, yOffset))
     }
 
     const iconRenders: RenderMethod[] = []

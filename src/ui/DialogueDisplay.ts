@@ -16,7 +16,7 @@ import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { ButtonsMenu } from "./ButtonsMenu"
 import { Color } from "./Color"
-import { formatText, formatTextRows, TextAlign, TEXT_SIZE } from "./Text"
+import { formatText, formatTextRowCount, TextAlign, TEXT_SIZE } from "./Text"
 import { TextTyper } from "./TextTyper"
 import { UIStateManager } from "./UIStateManager"
 
@@ -167,7 +167,7 @@ export class DialogueDisplay extends Component {
         const width = DialogueDisplay.TEXT_BOX_WIDTH - margin * 2
         const lineSpacing = 4
 
-        const textRows = !line ? 0 : formatTextRows(line, width).length
+        const textRows = !line ? 0 : formatTextRowCount(line, width)
         const topOffset = textRows > 0 ? 2 : 0
         const optionsPadding = textRows > 0 && options > 0 ? 2 : 0
 
