@@ -16,7 +16,7 @@ export class TextOverlayManager extends Component {
 
     private static readonly WIDTH = 240
 
-    static readonly VERTICAL_MARGIN = 72
+    static readonly VERTICAL_MARGIN = 56
     // the bottom of any icons should line up with this Y coordinate
     static readonly TOP_BORDER = TextOverlayManager.VERTICAL_MARGIN - TILE_SIZE
     static readonly DEPTH = Number.MAX_SAFE_INTEGER / 2 + 11_000
