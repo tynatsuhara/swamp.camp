@@ -438,6 +438,7 @@ export class Dude extends Component implements DialogueSource {
                     Point.ZERO,
                     (interactor) => {
                         if (
+                            !this.isAlive ||
                             // no dialogue available
                             !this.dialogue ||
                             this.dialogue === EMPTY_DIALOGUE ||
