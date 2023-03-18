@@ -15,6 +15,7 @@ import { player } from "../characters/player"
 import { spawnMagicProjectile } from "../characters/weapons/MagicProjectile"
 import { pixelPtToTilePt } from "../graphics/Tilesets"
 import { session } from "../online/session"
+import { SwampCampGame } from "../SwampCampGame"
 import { DrawMenu } from "../ui/DrawMenu"
 import { UIStateManager } from "../ui/UIStateManager"
 import { ElementType } from "../world/elements/Elements"
@@ -30,7 +31,11 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
         InputKey.BACKSPACE,
         "toggle profiler",
         () => {
-            if (debug.showProfiler && !debug.showBigProfiler) {
+            if (
+                debug.showProfiler &&
+                !debug.showBigProfiler &&
+                SwampCampGame.instance.scene === SwampCampGame.instance.gameScene
+            ) {
                 debug.showBigProfiler = true
             } else {
                 debug.showBigProfiler = false
