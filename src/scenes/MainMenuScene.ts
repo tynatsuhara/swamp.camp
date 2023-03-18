@@ -35,6 +35,7 @@ enum Menu {
     CREDITS,
     DOWNLOADS,
     MULTIPLAYER,
+    LOADING,
 }
 
 enum SessionLoadingState {
@@ -107,21 +108,26 @@ export class MainMenuScene extends Scene {
         this.loadGame(slot)
     }
 
-    loadGame(slot: number) {
-        this.loadAssets().then(() => {
-            saveManager.load(slot)
-        })
+    async loadGame(slot: number) {
+        await this.loadGameContent()
+        saveManager.load(slot)
     }
 
     private overwritingSave: Save
     private selectedNewGameSlot: number
 
-    newGame() {
-        this.loadAssets().then(() => {
-            saveManager.new(this.selectedNewGameSlot, this.plumes)
-            SwampCampGame.instance.loadGameScene()
-            SwampCampGame.instance.gameScene.newGame()
-        })
+    async newGame() {
+        await this.loadGameContent()
+        saveManager.new(this.selectedNewGameSlot, this.plumes)
+        SwampCampGame.instance.loadGameScene()
+        SwampCampGame.instance.gameScene.newGame()
+    }
+
+    private async loadGameContent() {
+        this.render(Menu.LOADING)
+        await this.loadAssets()
+        // wait 2 frames to make sure the "loading..." message has started showing
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
     }
 
     private lastDimensions: Point
@@ -255,7 +261,7 @@ export class MainMenuScene extends Scene {
                         .getEntity()
                 )
             }
-        } else if (this.waitingForAssets) {
+        } else if (this.waitingForAssets || this.menu === Menu.LOADING) {
             entities.push(new MainMenuButtonSection(menuTop).addText("loading...").getEntity())
         } else if (this.menu === Menu.ROOT) {
             const saveCount = saveManager.getSaveCount()
