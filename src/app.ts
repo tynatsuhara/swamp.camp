@@ -13,17 +13,18 @@ declare global {
     }
 }
 
-// focusing adds an ugly outline, so automatically blur
-const canvas = <HTMLCanvasElement>document.getElementById("canvas")
-canvas.onfocus = () => canvas.blur()
+const start = async () => {
+    await Promise.all([
+        // load all required assets
+        assets.loadImageFiles(getFilesToLoadForMainMenu()),
+        assets.loadFont(TEXT_FONT, "url(/fonts/press-start-2p.woff2)"),
+    ])
 
-initializeLogging()
+    initializeLogging()
 
-Promise.all([
-    // load all required assets
-    assets.loadImageFiles(getFilesToLoadForMainMenu()),
-    assets.loadFont(TEXT_FONT, "url(/fonts/press-start-2p.woff2)"),
-]).then(() => {
-    // start the engine (vroom vroom)
+    const canvas = <HTMLCanvasElement>document.getElementById("canvas")
+
     Engine.start(new SwampCampGame(), canvas, { fixedHeight: 900 })
-})
+}
+
+start()
