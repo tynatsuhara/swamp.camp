@@ -1,6 +1,7 @@
 import { Point } from "brigsby/dist/Point"
+import { renderer } from "brigsby/dist/renderer/Renderer"
 import { ZOOM } from "../SwampCampGame"
-import { TEXT_FONT, TEXT_PIXEL_WIDTH } from "./Text"
+import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
 
 export class TextInput {
     private readonly element: HTMLElement
@@ -64,11 +65,13 @@ export class TextInput {
     reposition(topCenterPos: Point) {
         const elementStyles = this.element.style
         const width = 600
+        const scale = ZOOM * renderer.getScale()
         elementStyles.position = "fixed"
         elementStyles.width = `${600}px`
-        elementStyles.left = `${topCenterPos.x * ZOOM - width / 2}px`
-        elementStyles.top = `${Math.floor(topCenterPos.y * ZOOM) - 4}px`
+        elementStyles.left = `${topCenterPos.x * scale - width / 2}px`
+        elementStyles.top = `${Math.floor(topCenterPos.y * scale) - 4}px`
         elementStyles.textAlign = "center"
+        elementStyles.fontSize = `${TEXT_SIZE * scale}px`
     }
 
     delete(): undefined {
