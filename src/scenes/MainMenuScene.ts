@@ -285,6 +285,12 @@ export class MainMenuScene extends Scene {
                         )
                     )
                     .add(
+                        "Linux",
+                        link(
+                            "https://github.com/tynatsuhara/swamp-camp-native/releases/download/ubuntu-latest/swamp-camp-linux-x64.zip"
+                        )
+                    )
+                    .add(
                         "Mac (Intel)",
                         link(
                             "https://github.com/tylerbonnell/swamp-camp-native/releases/download/macos-latest/swamp-camp-darwin-x64.zip"
