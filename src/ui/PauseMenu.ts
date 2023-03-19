@@ -152,6 +152,10 @@ export class PauseMenu extends Component {
     }
 
     private getFullScreenOption(): PauseOption {
+        if (window.parent !== window) {
+            // this is in an iframe (probably on itch.io), which handles fullscreen itself
+            return
+        }
         if (FullScreenMode.isFullScreen()) {
             return {
                 text: `FULL-SCREEN: ON`,
