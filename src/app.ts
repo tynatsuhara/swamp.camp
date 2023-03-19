@@ -1,4 +1,4 @@
-import { assets, Engine } from "brigsby/dist"
+import { assets, debug, Engine } from "brigsby/dist"
 import { initializeLogging } from "./debug/logging"
 import { getFilesToLoadForMainMenu } from "./graphics/Tilesets"
 import { SwampCampGame } from "./SwampCampGame"
@@ -24,7 +24,7 @@ const start = async () => {
 
     const canvas = <HTMLCanvasElement>document.getElementById("canvas")
 
-    Engine.start(new SwampCampGame(), canvas, { fixedHeight: 900 })
+    Engine.start(new SwampCampGame(), canvas, { fixedHeight: debug.photoMode ? undefined : 900 })
 }
 
 start()
