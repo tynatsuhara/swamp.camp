@@ -8,6 +8,7 @@ import {
     Point,
     UpdateData,
 } from "brigsby/dist"
+import { renderer } from "brigsby/dist/renderer"
 import { DudeFactory } from "../characters/DudeFactory"
 import { DudeSpawner } from "../characters/DudeSpawner"
 import { DudeType } from "../characters/DudeType"
@@ -274,4 +275,4 @@ const chat = (text: string) => {
 }
 receiveChat((text, peerId) => console.log(`[chat] ${peerId} > ${text}`))
 
-expose({ help, chat, Point })
+expose({ help, chat, Point, renderer })
