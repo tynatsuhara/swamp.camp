@@ -38,11 +38,6 @@ export class HittableResource extends Hittable {
     private hitCallback(hitDir: Point, dude: Dude) {
         this.audioCallback()
 
-        // Only players actually knock out items
-        if (dude.type !== DudeType.PLAYER) {
-            return
-        }
-
         this.availableResources--
 
         if (
@@ -57,7 +52,7 @@ export class HittableResource extends Hittable {
         let placeDistance = finishingMove ? 2 : 8
         let itemsOut = finishingMove ? 3 : 1
 
-        if (session.isHost()) {
+        if (session.isHost() && dude.type === DudeType.PLAYER) {
             for (let i = 0; i < itemsOut; i++) {
                 const items = this.itemSupplier(dude)
                 for (const item of items) {

@@ -3,7 +3,6 @@ import { ImageFilter, SpriteTransform, StaticSpriteSource } from "brigsby/dist/s
 import { Tilesets } from "../../graphics/Tilesets"
 import { session } from "../../online/session"
 import { Dude } from "../Dude"
-import { DudeType } from "../DudeType"
 import { BasicAttackAnimation } from "./animations/BasicAttackAnimation"
 import { IdleAnimation } from "./animations/IdleAnimation"
 import { AnimationArgs, MeleeAnimation } from "./animations/MeleeAnimation"
@@ -127,7 +126,7 @@ export class MeleeWeapon extends Weapon {
             }
         }
 
-        if (this.dude.type === DudeType.PLAYER && enemies.length === 0) {
+        if (enemies.length === 0) {
             Weapon.hitResources(this.dude)
         }
     }
