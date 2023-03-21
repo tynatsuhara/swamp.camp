@@ -510,7 +510,7 @@ export class NPC extends Simulatable {
         const nextPt = path[0]
         const nextTile = pixelPtToTilePt(nextPt)
 
-        const isCloseEnough = this._dude.standingPosition.distanceTo(nextPt) < 1
+        const isCloseEnough = this._dude.standingPosition.distanceTo(nextPt) < 4
 
         // Make them face the right direction when traveling straight up/down
         if (facingOverride === 0 && path.length > 1 && nextTile.x === this._dude.tile.x) {
