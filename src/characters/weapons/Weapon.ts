@@ -40,13 +40,13 @@ export abstract class Weapon extends Component {
     static hitResources(dude: Dude) {
         const npc = dude.entity.getComponent(NPC)
 
-        const interactDistance = 20
+        const interactDistance = npc ? 30 : 20
         const interactCenter = dude.standingPosition.minus(new Point(0, 7))
         const elements = npc?.getInteractWithGoal()
             ? [npc.getInteractWithElement()]
             : here().getElements()
         const possibilities = elements
-            .map((e) => e.entity.getComponent(Hittable))
+            .map((e) => e?.entity?.getComponent(Hittable))
             .filter((e) => !!e)
             .filter((e) => dude.isFacing(e.position))
 
