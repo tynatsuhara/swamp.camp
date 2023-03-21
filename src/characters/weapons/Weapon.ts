@@ -5,6 +5,7 @@ import { ImageFilter } from "brigsby/dist/sprites"
 import { Hittable } from "../../world/elements/Hittable"
 import { here } from "../../world/locations/LocationManager"
 import { Dude } from "../Dude"
+import { NPC } from "../NPC"
 import { WeaponType } from "./WeaponType"
 
 // This should be a factor of 90 to make sure we can aim up/down/left/right
@@ -37,10 +38,14 @@ export abstract class Weapon extends Component {
 
     // Called on host and client
     static hitResources(dude: Dude) {
+        const npc = dude.entity.getComponent(NPC)
+
         const interactDistance = 20
         const interactCenter = dude.standingPosition.minus(new Point(0, 7))
-        const possibilities = here()
-            .getElements()
+        const elements = npc?.getInteractWithGoal()
+            ? [npc.getInteractWithElement()]
+            : here().getElements()
+        const possibilities = elements
             .map((e) => e.entity.getComponent(Hittable))
             .filter((e) => !!e)
             .filter((e) => dude.isFacing(e.position))

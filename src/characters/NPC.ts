@@ -510,7 +510,7 @@ export class NPC extends Simulatable {
         const nextPt = path[0]
         const nextTile = pixelPtToTilePt(nextPt)
 
-        const isCloseEnough = this._dude.standingPosition.distanceTo(nextPt) < 4
+        const isCloseEnough = this._dude.standingPosition.distanceTo(nextPt) < 1
 
         // Make them face the right direction when traveling straight up/down
         if (facingOverride === 0 && path.length > 1 && nextTile.x === this._dude.tile.x) {
@@ -658,39 +658,45 @@ export class NPC extends Simulatable {
         return this.findPath(targetTile)
     }
 
+    private getTileCost(tile: Point) {
+        const location = here()
+        const ground = location.getGround(tile)
+        const type = ground?.type
+        if (
+            type === GroundType.LEDGE ||
+            Ground.isWater(type) ||
+            // don't encourage being off the map
+            !ground
+        ) {
+            return 3
+        }
+        const element = location.getElement(tile)
+        if (element?.type === ElementType.BLACKBERRIES) {
+            return 3
+        }
+        // TODO: Maybe add a fun fireproof enemy in the future :)
+        if (
+            element?.entity?.getComponent(Burnable)?.isBurningAt(tile) ||
+            (element?.type === ElementType.CAMPFIRE &&
+                element.entity.getComponent(Campfire).isBurning)
+        ) {
+            return 20
+        }
+        return 1
+    }
+
+    isNicelyWalkable(tile: Point) {
+        return this.getTileCost(tile) === 1
+    }
+
     private findPath(targetTilePoint: Point) {
         // TODO: NPCs can sometimes get stuck if their starting square is "occupied"
-        const location = here()
-        const path = location.findPath(
+        const path = here().findPath(
             this._dude.tile,
             targetTilePoint,
             this.pathFindingHeuristic,
             this.extraPathIsOccupiedFilter,
-            (_, nextSquare) => {
-                const ground = location.getGround(nextSquare)
-                const type = ground?.type
-                if (
-                    type === GroundType.LEDGE ||
-                    Ground.isWater(type) ||
-                    // don't encourage being off the map
-                    !ground
-                ) {
-                    return 3
-                }
-                const element = location.getElement(nextSquare)
-                if (element?.type === ElementType.BLACKBERRIES) {
-                    return 3
-                }
-                // TODO: Maybe add a fun fireproof enemy in the future :)
-                if (
-                    element?.entity?.getComponent(Burnable)?.isBurningAt(nextSquare) ||
-                    (element?.type === ElementType.CAMPFIRE &&
-                        element.entity.getComponent(Campfire).isBurning)
-                ) {
-                    return 20
-                }
-                return 1
-            }
+            (_, nextSquare) => this.getTileCost(nextSquare)
         )
 
         if (!path) {

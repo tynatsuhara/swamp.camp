@@ -93,8 +93,11 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         }
 
         if (shouldBeWorking && this.getJob() === VillagerJob.HARVEST_WOOD) {
-            context.walkTo(...this.getTreeToChop())
-            return
+            const treeArgs = this.getTreeToChop()
+            if (treeArgs) {
+                context.walkTo(...this.getTreeToChop())
+                return
+            }
         }
 
         if (
@@ -254,9 +257,8 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             .map((el) => el?.entity?.getComponent(Tree))
             .filter((tree) => tree?.choppable)
             .flatMap((tree) => {
-                const level = location.getLevel(tree.rootTile)
                 return [tree.rootTile.plusX(1), tree.rootTile.plusX(1)]
-                    .filter((p) => !location.isOccupied(p) && location.getLevel(p) === level)
+                    .filter((p) => !location.isOccupied(p) && this.npc.isNicelyWalkable(p))
                     .map((walkToPos) => {
                         const interactWith = tree.rootTile
                         return [walkToPos, { interactWith, speedMultiplier: 0.5 }] as [
