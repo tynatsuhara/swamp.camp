@@ -1,4 +1,4 @@
-import { debug, Point, pt, UpdateData } from "brigsby/dist"
+import { debug, Point, PointValue, pt, UpdateData } from "brigsby/dist"
 import { LineRender } from "brigsby/dist/renderer"
 import { Lists } from "brigsby/dist/util"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
@@ -255,7 +255,7 @@ export class NPC extends Simulatable {
     }
 
     private walkPath: Point[] = null
-    private interactWith: Point = undefined
+
     private walkTo(tilePt: Point, updateData: UpdateData, options: WalkToOptions = {}) {
         this.interactWith = options.interactWith
         const facingOverrideAtEnd = this.interactWith ? this.interactWith.x - tilePt.x : undefined
@@ -267,7 +267,7 @@ export class NPC extends Simulatable {
         ) {
             // already en route to this spot
         } else if (!this.walkPath || this.walkPath.length === 0) {
-            // only try once per upate() to find a path
+            // only try once per update() to find a path
             this.walkPath = this.findPath(tilePt)
             if (!this.walkPath || this.walkPath.length === 0) {
                 this._dude.move(updateData.elapsedTimeMillis, Point.ZERO, facingOverrideAtEnd)
@@ -285,8 +285,27 @@ export class NPC extends Simulatable {
         )
     }
 
+    getInteractWithGoal() {
+        return this.interactWith
+    }
+    private get interactWith() {
+        const xy: PointValue = this.dude.blob["interactwith"]
+        if (!xy) {
+            return
+        }
+        return new Point(xy.x, xy.y)
+    }
+    private set interactWith(val: Point) {
+        this.dude.blob["interactwith"] = val
+    }
+
     isInteracting() {
-        return !!this.interactWith && this.dude.tile.manhattanDistanceTo(this.interactWith) === 1
+        // rough proxy for "they've walked there and stopped walking"
+        return (
+            !!this.interactWith &&
+            this.dude.tile.manhattanDistanceTo(this.interactWith) <= 2 &&
+            !this.dude.isMoving
+        )
     }
 
     private roamPath: Point[] = null
@@ -307,6 +326,9 @@ export class NPC extends Simulatable {
             pauseForMillis?: number
         } = {}
     ) {
+        // make sure this field gets cleared out if they're no longer walking
+        this.interactWith = undefined
+
         // Compute the roaming path
         if (!this.roamPath || this.roamPath.length === 0) {
             // only try once per upate() to find a path
@@ -485,7 +507,7 @@ export class NPC extends Simulatable {
         const nextPt = path[0]
         const nextTile = pixelPtToTilePt(nextPt)
 
-        const isCloseEnough = this._dude.standingPosition.distanceTo(nextPt) < 8
+        const isCloseEnough = this._dude.standingPosition.distanceTo(nextPt) < 4
 
         // Make them face the right direction when traveling straight up/down
         if (facingOverride === 0 && path.length > 1 && nextTile.x === this._dude.tile.x) {

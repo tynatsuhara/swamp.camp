@@ -1,6 +1,7 @@
 import { Point, pt } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util"
 import { pixelPtToTilePt, TILE_SIZE } from "../../graphics/Tilesets"
+import { tilesAround } from "../../Utils"
 import { hash } from "../../utils/hash"
 import { ConstructionSite } from "../../world/buildings/ConstructionSite"
 import { DarknessMask } from "../../world/DarknessMask"
@@ -32,7 +33,6 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
     private workLocation: Location
 
     private workRoamingSpots: Point[] | undefined
-    private workWalkToArgs: [Point, WalkToOptions] | undefined
 
     constructor(private readonly npc: NPC) {
         super()
@@ -41,8 +41,6 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         this.workLocation = this.findWorkLocation(npc.dude)
         if (this.getJob() === VillagerJob.CONSTRUCTION) {
             this.workRoamingSpots = this.getConstructionZoneSpots()
-        } else if (this.getJob() === VillagerJob.HARVEST_WOOD) {
-            this.workWalkToArgs = this.getTreeChoppingSpots()
         }
     }
 
@@ -94,8 +92,8 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             return
         }
 
-        if (shouldBeWorking && this.workWalkToArgs) {
-            context.walkTo(...this.workWalkToArgs)
+        if (shouldBeWorking && this.getJob() === VillagerJob.HARVEST_WOOD) {
+            context.walkTo(...this.getTreeToChop())
             return
         }
 
@@ -229,11 +227,31 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         return ElementUtils.rectPoints(zoneElement.pos, zone.size)
     }
 
-    private getTreeChoppingSpots() {
+    private getTreeToChop() {
         const location = camp()
-        const options = location
-            .getEntities()
-            .map((e) => e.getComponent(Tree))
+        const currentInteractWithGoal = this.npc.getInteractWithGoal()
+
+        if (
+            currentInteractWithGoal &&
+            location.getElement(currentInteractWithGoal)?.entity?.getComponent(Tree)?.fullyGrown
+        ) {
+            return this.pickTree([currentInteractWithGoal])
+        }
+
+        const nearbyTree = this.pickTree(tilesAround(this.npc.dude.tile, 10))
+        if (nearbyTree) {
+            return nearbyTree
+        }
+
+        return this.pickTree()
+    }
+
+    private pickTree(pts?: Point[]) {
+        const location = camp()
+        const elements = pts ? pts.map((p) => location.getElement(p)) : location.getElements()
+
+        const options = elements
+            .map((el) => el?.entity?.getComponent(Tree))
             .filter((tree) => tree?.fullyGrown)
             .flatMap((tree) => {
                 const level = location.getLevel(tree.rootTile)
@@ -241,12 +259,13 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
                     .filter((p) => !location.isOccupied(p) && location.getLevel(p) === level)
                     .map((walkToPos) => {
                         const interactWith = tree.rootTile
-                        return [
-                            walkToPos,
-                            { interactWith, speedMultiplier: 0.5 },
-                        ] as typeof this.workWalkToArgs
+                        return [walkToPos, { interactWith, speedMultiplier: 0.5 }] as [
+                            Point,
+                            WalkToOptions
+                        ]
                     })
             })
+
         return this.getWorkLocation(options, "hourly")
     }
 
