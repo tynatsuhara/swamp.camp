@@ -288,6 +288,9 @@ export class NPC extends Simulatable {
     getInteractWithGoal() {
         return this.interactWith
     }
+    getInteractWithElement() {
+        return this.dude.location.getElement(this.getInteractWithGoal())
+    }
     private get interactWith() {
         const xy: PointValue = this.dude.blob["interactwith"]
         if (!xy) {

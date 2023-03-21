@@ -194,7 +194,7 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
 }
 
 export class Tree extends Component {
-    constructor(readonly fullyGrown: boolean, readonly rootTile: Point) {
+    constructor(readonly choppable: boolean, readonly rootTile: Point) {
         super()
     }
 }

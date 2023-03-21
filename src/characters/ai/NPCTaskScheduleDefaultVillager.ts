@@ -233,7 +233,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
 
         if (
             currentInteractWithGoal &&
-            location.getElement(currentInteractWithGoal)?.entity?.getComponent(Tree)?.fullyGrown
+            location.getElement(currentInteractWithGoal)?.entity?.getComponent(Tree)?.choppable
         ) {
             return this.pickTree([currentInteractWithGoal])
         }
@@ -252,7 +252,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
 
         const options = elements
             .map((el) => el?.entity?.getComponent(Tree))
-            .filter((tree) => tree?.fullyGrown)
+            .filter((tree) => tree?.choppable)
             .flatMap((tree) => {
                 const level = location.getLevel(tree.rootTile)
                 return [tree.rootTile.plusX(1), tree.rootTile.plusX(1)]

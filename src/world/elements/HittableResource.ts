@@ -38,7 +38,9 @@ export class HittableResource extends Hittable {
     private hitCallback(hitDir: Point, dude: Dude) {
         this.audioCallback()
 
-        this.availableResources--
+        // NPCs take longer to chop trees because they're weak
+        const resourceHitImpact = dude.type === DudeType.PLAYER ? 1 : 0.2
+        this.availableResources -= resourceHitImpact
 
         if (
             this.availableResources < 0 &&

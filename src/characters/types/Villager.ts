@@ -3,7 +3,7 @@ import { session } from "../../online/session"
 import { ConstructionSite } from "../../world/buildings/ConstructionSite"
 import { ElementType } from "../../world/elements/Elements"
 import { playMiningSound } from "../../world/elements/Rock"
-import { playChoppingSound } from "../../world/elements/Tree"
+import { playChoppingSound, Tree } from "../../world/elements/Tree"
 import { GroundType } from "../../world/ground/Ground"
 import { LocationType } from "../../world/locations/LocationType"
 import { NPCSchedules } from "../ai/NPCSchedule"
@@ -63,11 +63,15 @@ export class Villager extends Component {
             const isDoingConstruction =
                 weaponType === WeaponType.HAMMER &&
                 location.getElement(tile)?.entity.getComponent(ConstructionSite)
-            const isChoppingTrees = weaponType === WeaponType.AXE && this.npc.isInteracting()
+            const isChoppingTrees =
+                weaponType === WeaponType.AXE &&
+                this.npc.isInteracting() &&
+                this.npc.getInteractWithElement()?.entity?.getComponent(Tree)?.choppable
             // swing pickaxe randomly if working in the mines
             if (isMining) {
                 this.dude.updateAttacking(true)
                 playMiningSound(standingPosition)
+                return 2_000
             } else if (isDoingConstruction) {
                 this.dude.updateAttacking(true)
                 playChoppingSound(standingPosition)
@@ -80,8 +84,10 @@ export class Villager extends Component {
                 ) {
                     location.setGroundElement(GroundType.PATH, hittingTile)
                 }
+                return 2_000
             } else if (isChoppingTrees) {
                 this.dude.updateAttacking(true)
+                return 1_500
             }
             return 2_000
         }, Math.random() * 2_000)
