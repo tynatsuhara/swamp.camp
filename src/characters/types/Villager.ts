@@ -63,6 +63,7 @@ export class Villager extends Component {
             const isDoingConstruction =
                 weaponType === WeaponType.HAMMER &&
                 location.getElement(tile)?.entity.getComponent(ConstructionSite)
+            const isChoppingTrees = weaponType === WeaponType.AXE && this.npc.isInteracting()
             // swing pickaxe randomly if working in the mines
             if (isMining) {
                 this.dude.updateAttacking(true)
@@ -79,6 +80,8 @@ export class Villager extends Component {
                 ) {
                     location.setGroundElement(GroundType.PATH, hittingTile)
                 }
+            } else if (isChoppingTrees) {
+                this.dude.updateAttacking(true)
             }
             return 2_000
         }, Math.random() * 2_000)

@@ -19,7 +19,7 @@ import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
 import { NPCSchedule, NPCSchedules } from "./ai/NPCSchedule"
 import { NPCTask } from "./ai/NPCTask"
-import { NPCTaskContext } from "./ai/NPCTaskContext"
+import { NPCTaskContext, WalkToOptions } from "./ai/NPCTaskContext"
 import { NPCTaskFactory } from "./ai/NPCTaskFactory"
 import { Condition } from "./Condition"
 import { AttackState, Dude } from "./Dude"
@@ -182,7 +182,7 @@ export class NPC extends Simulatable {
         if (this.task) {
             const context: NPCTaskContext = {
                 dude: this._dude,
-                walkTo: (pt) => this.walkTo(pt, updateData),
+                walkTo: (pt, options) => this.walkTo(pt, updateData, options),
                 roam: (speed, options) => this.doRoam(updateData, speed, options),
                 goToLocation: (location) => this.goToLocation(updateData, location), // TODO
                 doNothing: () => this._dude.move(updateData.elapsedTimeMillis, Point.ZERO),
@@ -245,6 +245,7 @@ export class NPC extends Simulatable {
 
     private clearExistingAIState() {
         this.walkPath = null
+        this.interactWith = null
         this.roamPath = null
         this.attackTarget = null
         this.syncData.t = null
@@ -254,7 +255,11 @@ export class NPC extends Simulatable {
     }
 
     private walkPath: Point[] = null
-    private walkTo(tilePt: Point, updateData: UpdateData, speedMultiplier: number = 1) {
+    private interactWith: Point = undefined
+    private walkTo(tilePt: Point, updateData: UpdateData, options: WalkToOptions = {}) {
+        this.interactWith = options.interactWith
+        const facingOverrideAtEnd = this.interactWith ? this.interactWith.x - tilePt.x : undefined
+
         // Compute the walking path
         if (
             this.walkPath?.length > 0 &&
@@ -265,12 +270,23 @@ export class NPC extends Simulatable {
             // only try once per upate() to find a path
             this.walkPath = this.findPath(tilePt)
             if (!this.walkPath || this.walkPath.length === 0) {
-                this._dude.move(updateData.elapsedTimeMillis, Point.ZERO)
+                this._dude.move(updateData.elapsedTimeMillis, Point.ZERO, facingOverrideAtEnd)
                 return
             }
         }
 
-        this.followPath(this.walkPath, updateData, this.walkPath.length === 1, speedMultiplier)
+        this.followPath(
+            this.walkPath,
+            updateData,
+            this.walkPath.length === 1,
+            options.speedMultiplier,
+            0,
+            facingOverrideAtEnd
+        )
+    }
+
+    isInteracting() {
+        return !!this.interactWith && this.dude.tile.manhattanDistanceTo(this.interactWith) === 1
     }
 
     private roamPath: Point[] = null
@@ -463,7 +479,8 @@ export class NPC extends Simulatable {
         updateData: UpdateData,
         stopWhenClose = false,
         speedMultiplier: number = 1,
-        facingOverride: number = 0
+        facingOverride: number = 0,
+        facingOverrideAtEnd: number = undefined
     ) {
         const nextPt = path[0]
         const nextTile = pixelPtToTilePt(nextPt)
@@ -476,7 +493,11 @@ export class NPC extends Simulatable {
         }
 
         if (isCloseEnough && stopWhenClose) {
-            this._dude.move(updateData.elapsedTimeMillis, Point.ZERO, facingOverride)
+            this._dude.move(
+                updateData.elapsedTimeMillis,
+                Point.ZERO,
+                facingOverrideAtEnd ?? facingOverride
+            )
         } else {
             const oldPosition = this._dude.standingPosition
             this._dude.move(
@@ -703,7 +724,7 @@ export class NPC extends Simulatable {
             return
         }
         const tilePt = pixelPtToTilePt(this.teleporterTarget.pos)
-        this.walkTo(tilePt, updateData, speedMultiplier)
+        this.walkTo(tilePt, updateData, { speedMultiplier })
         if (this._dude.tile.manhattanDistanceTo(tilePt) <= 1) {
             this.useTeleporter(this.teleporterTarget)
         }

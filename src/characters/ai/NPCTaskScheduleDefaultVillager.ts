@@ -7,6 +7,7 @@ import { DarknessMask } from "../../world/DarknessMask"
 import { Campfire } from "../../world/elements/Campfire"
 import { ElementType } from "../../world/elements/Elements"
 import { ElementUtils } from "../../world/elements/ElementUtils"
+import { Tree } from "../../world/elements/Tree"
 import { LightManager } from "../../world/LightManager"
 import { Location } from "../../world/locations/Location"
 import { camp, LocationManager } from "../../world/locations/LocationManager"
@@ -22,14 +23,16 @@ import { ShieldType } from "../weapons/ShieldType"
 import { WeaponType } from "../weapons/WeaponType"
 import { NPCSchedules } from "./NPCSchedule"
 import { NPCTask } from "./NPCTask"
-import { NPCTaskContext, RoamOptions } from "./NPCTaskContext"
+import { NPCTaskContext, RoamOptions, WalkToOptions } from "./NPCTaskContext"
 import { VillagerJob } from "./VillagerJob"
 
 export class NPCTaskScheduleDefaultVillager extends NPCTask {
     private closestFirePosition: Point
     private homeLocation: Location
     private workLocation: Location
-    private workSpots: Point[] | undefined
+
+    private workRoamingSpots: Point[] | undefined
+    private workWalkToArgs: [Point, WalkToOptions] | undefined
 
     constructor(private readonly npc: NPC) {
         super()
@@ -37,7 +40,9 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         this.homeLocation = this.findHomeLocation(npc.dude)
         this.workLocation = this.findWorkLocation(npc.dude)
         if (this.getJob() === VillagerJob.CONSTRUCTION) {
-            this.workSpots = this.getConstructionZoneSpots()
+            this.workRoamingSpots = this.getConstructionZoneSpots()
+        } else if (this.getJob() === VillagerJob.HARVEST_WOOD) {
+            this.workWalkToArgs = this.getTreeChoppingSpots()
         }
     }
 
@@ -57,23 +62,25 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         }
 
         if (shouldBeWorking) {
+            if (this.getJob()) {
+                this.equipJobGear()
+            }
+
             // Are you feeling zen? If not, a staycation is what I recommend.
             // Or better yet, don't be a jerk. Unwind by being a man... and goin' to work.
             goalLocation = this.workLocation ?? camp()
 
-            if (this.workSpots) {
-                roamOptions.goalOptionsSupplier = () => this.workSpots
+            if (this.workRoamingSpots) {
+                roamOptions.goalOptionsSupplier = () => this.workRoamingSpots
 
-                const alreadyAtWorkSpot = this.workSpots.some((spot) => spot.equals(dude.tile))
+                const alreadyAtWorkSpot = this.workRoamingSpots.some((spot) =>
+                    spot.equals(dude.tile)
+                )
                 if (!alreadyAtWorkSpot) {
                     // Go straight to work, no dilly-dallying
                     roamOptions.pauseEveryMillis = undefined
                     roamOptions.pauseForMillis = undefined
                 }
-            }
-
-            if (this.getJob()) {
-                this.equipJobGear()
             }
         } else {
             // Go home!
@@ -84,6 +91,11 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
 
         if (goalLocation && dude.location !== goalLocation) {
             context.goToLocation(goalLocation)
+            return
+        }
+
+        if (shouldBeWorking && this.workWalkToArgs) {
+            context.walkTo(...this.workWalkToArgs)
             return
         }
 
@@ -217,9 +229,34 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         return ElementUtils.rectPoints(zoneElement.pos, zone.size)
     }
 
-    private getWorkLocation<T>(options: T[]): T {
+    private getTreeChoppingSpots() {
+        const location = camp()
+        const options = location
+            .getEntities()
+            .map((e) => e.getComponent(Tree))
+            .filter((tree) => tree?.fullyGrown)
+            .flatMap((tree) => {
+                const level = location.getLevel(tree.rootTile)
+                return [tree.rootTile.plusX(1), tree.rootTile.plusX(1)]
+                    .filter((p) => !location.isOccupied(p) && location.getLevel(p) === level)
+                    .map((walkToPos) => {
+                        const interactWith = tree.rootTile
+                        return [
+                            walkToPos,
+                            { interactWith, speedMultiplier: 0.5 },
+                        ] as typeof this.workWalkToArgs
+                    })
+            })
+        return this.getWorkLocation(options, "hourly")
+    }
+
+    private getWorkLocation<T>(options: T[], changeFrequency: "daily" | "hourly" = "daily"): T {
+        const salt =
+            changeFrequency === "daily"
+                ? WorldTime.instance.currentDay
+                : WorldTime.instance.currentHour
         // determine work site in a consistent way, add day so they mix it up every day
-        return options[hash(this.npc.dude.uuid + WorldTime.instance.currentDay) % options.length]
+        return options[hash(this.npc.dude.uuid + salt) % options.length]
     }
 
     private getJob = () => this.npc.entity.getComponent(Villager).job

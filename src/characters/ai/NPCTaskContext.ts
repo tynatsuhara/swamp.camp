@@ -2,6 +2,11 @@ import { Point } from "brigsby/dist"
 import { Location } from "../../world/locations/Location"
 import { Dude } from "../Dude"
 
+export type WalkToOptions = {
+    speedMultiplier?: number
+    interactWith?: Point
+}
+
 export type RoamOptions = {
     ptSelectionFilter?: (pt: Point) => boolean
     goalOptionsSupplier?: () => Point[]
@@ -26,7 +31,7 @@ export interface NPCTaskContext {
     /**
      * Tells the NPC to go to a position
      */
-    walkTo: (p: Point) => void
+    walkTo: (p: Point, options?: WalkToOptions) => void
 
     /**
      * Roam around aimlessly

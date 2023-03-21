@@ -164,7 +164,7 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
             )
         )
 
-        e.addComponent(new Tree(size === 3))
+        e.addComponent(new Tree(size === 3, pos.plusY(1)))
 
         return e.addComponent(
             new ElementComponent(this.type, pos, () => {
@@ -194,7 +194,7 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
 }
 
 export class Tree extends Component {
-    constructor(readonly fullyGrown: boolean) {
+    constructor(readonly fullyGrown: boolean, readonly rootTile: Point) {
         super()
     }
 }
