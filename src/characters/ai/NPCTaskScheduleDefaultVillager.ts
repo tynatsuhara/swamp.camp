@@ -257,7 +257,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             .map((el) => el?.entity?.getComponent(Tree))
             .filter((tree) => tree?.choppable)
             .flatMap((tree) => {
-                return [tree.rootTile.plusX(1), tree.rootTile.plusX(1)]
+                return [tree.rootTile.plusX(-1), tree.rootTile.plusX(1)]
                     .filter((p) => !location.isOccupied(p) && this.npc.isNicelyWalkable(p))
                     .map((walkToPos) => {
                         const interactWith = tree.rootTile

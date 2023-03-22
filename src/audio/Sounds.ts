@@ -31,6 +31,9 @@ export class Sounds {
      * Plays the sound at the specified point, dropping off ~linearly
      */
     static playAtPoint(path: string, volume: number, point: Point) {
+        if (!player()) {
+            return
+        }
         const range = 160 // 10 tiles, pretty arbitrary
         const distanceToPlayer = player().standingPosition.manhattanDistanceTo(point)
         if (range < distanceToPlayer) {
