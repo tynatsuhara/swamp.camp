@@ -510,6 +510,8 @@ export class NPC extends Simulatable {
         const nextPt = path[0]
         const nextTile = pixelPtToTilePt(nextPt)
 
+        // TODO: We should revisit this implementation for path shifting. It results in NPCs getting stuck on corners.
+        // Maybe we can check if the current point is in between path[0] and path[1]?
         const isCloseEnough = this._dude.standingPosition.distanceTo(nextPt) < 8
 
         // Make them face the right direction when traveling straight up/down
