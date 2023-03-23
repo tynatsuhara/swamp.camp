@@ -1,5 +1,6 @@
 import { Point } from "brigsby/dist"
 import { Grid, Lists, Noise } from "brigsby/dist/util"
+import { adjacent, tilesAround } from "../../Utils"
 import { ElementType } from "../elements/Elements"
 import { GroundType } from "../ground/Ground"
 import { Location } from "./Location"
@@ -38,7 +39,6 @@ export abstract class AbstractLocationGenerator {
     }
 
     private finalize(location: Location) {
-        const adjacent = (pt: Point) => [pt.plusX(1), pt.plusX(-1), pt.plusY(1), pt.plusY(-1)]
         const adjacentLevels = (pt: Point) => adjacent(pt).map((pt) => location.getLevel(pt))
 
         // Generate waterfalls for water on level edges
@@ -168,16 +168,7 @@ export abstract class AbstractLocationGenerator {
             for (let j = -location.range - 1; j < location.range + 1; j++) {
                 const pt = new Point(i, j)
                 const thisLevel = location.getLevel(pt)
-                const adjacent = [
-                    pt.plus(new Point(0, -1)),
-                    pt.plus(new Point(1, -1)),
-                    pt.plus(new Point(1, 0)),
-                    pt.plus(new Point(1, 1)),
-                    pt.plus(new Point(0, 1)),
-                    pt.plus(new Point(-1, 1)),
-                    pt.plus(new Point(-1, 0)),
-                    pt.plus(new Point(-1, -1)),
-                ]
+                const adjacent = tilesAround(pt, 1)
                 const isLedge = adjacent
                     .map((pt) => location.getLevel(pt))
                     .some((level) => level < thisLevel)

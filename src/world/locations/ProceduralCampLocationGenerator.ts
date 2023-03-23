@@ -1,6 +1,7 @@
 import { Point } from "brigsby/dist"
 import { Grid, Noise } from "brigsby/dist/util"
 import { Singletons } from "../../Singletons"
+import { adjacent } from "../../Utils"
 import { ElementType } from "../elements/Elements"
 import { Ground, GroundType } from "../ground/Ground"
 import { AbstractLocationGenerator } from "./AbstractLocationGenerator"
@@ -114,7 +115,6 @@ export class ProceduralCampLocationGenerator extends AbstractLocationGenerator {
         const end = new Point(-30, -30)
         const heuristicRandomness = 50
 
-        const adjacent = (pt: Point) => [pt.plusX(1), pt.plusX(-1), pt.plusY(1), pt.plusY(-1)]
         const adjacentLevels = (pt: Point) => adjacent(pt).map((pt) => location.getLevel(pt))
 
         const river = location.findPath(

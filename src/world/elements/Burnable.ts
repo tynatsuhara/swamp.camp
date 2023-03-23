@@ -6,6 +6,7 @@ import { Particles } from "../../graphics/particles/Particles"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { session } from "../../online/session"
 import { Color } from "../../ui/Color"
+import { adjacent } from "../../Utils"
 import { LightManager } from "../LightManager"
 import { here } from "../locations/LocationManager"
 import { WorldTime } from "../WorldTime"
@@ -35,8 +36,7 @@ export class Burnable extends RepeatedInvoker {
             if (this.burning && session.isHost()) {
                 // spread to adjacent squares
                 this.pts.forEach((pt) => {
-                    const adjacent = [pt.plusX(1), pt.plusX(-1), pt.plusY(1), pt.plusY(-1)]
-                    adjacent.forEach((adj) => {
+                    adjacent(pt).forEach((adj) => {
                         if (Math.random() < 0.3) {
                             here().getElement(adj)?.entity.getComponent(Burnable)?.burn(null, true)
                         }

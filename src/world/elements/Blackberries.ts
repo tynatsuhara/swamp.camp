@@ -6,6 +6,7 @@ import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item, spawnItem } from "../../items/Items"
 import { session } from "../../online/session"
 import { Color } from "../../ui/Color"
+import { adjacent } from "../../Utils"
 import { Ground, GroundType } from "../ground/Ground"
 import { Location } from "../locations/Location"
 import { camp } from "../locations/LocationManager"
@@ -122,8 +123,7 @@ export class BlackberriesFactory extends ElementFactory<ElementType.BLACKBERRIES
 
         e.addComponent(
             new Growable(nextGrowthTime, () => {
-                const adjacentSpots = [pos.plusX(1), pos.plusX(-1), pos.plusY(1), pos.plusY(-1)]
-                const openAdjacentSpots = adjacentSpots.filter(
+                const openAdjacentSpots = adjacent(pos).filter(
                     (pt) => wl.getGround(pt)?.type === GroundType.GRASS && !wl.getElement(pt)
                 )
 
