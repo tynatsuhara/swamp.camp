@@ -46,23 +46,6 @@ export const getInventoryItemActions = (playerInvIndex: number): ItemAction[] =>
     const wl = here()
     const actions: ItemAction[] = []
 
-    if (
-        item.element !== null &&
-        wl.allowPlacing &&
-        Elements.instance.getElementFactory(item.element).canPlaceInLocation(wl)
-    ) {
-        actions.push({
-            verb: "place",
-            actionFn: () => {
-                InventoryDisplay.instance.close()
-                const stack = player().inventory.getStack(playerInvIndex)
-                PlaceElementDisplay.instance.startPlacing(stack, (elementPos) =>
-                    placeOnHost(playerInvIndex, elementPos)
-                )
-            },
-        })
-    }
-
     if (item.equippableWeapon && !stack.metadata.equipped) {
         actions.push({
             verb: "equip",
@@ -79,6 +62,23 @@ export const getInventoryItemActions = (playerInvIndex: number): ItemAction[] =>
             actionFn: () => {
                 player().setShield(item.equippableShield, playerInvIndex) // client sync fn
                 InventoryDisplay.instance.refreshView()
+            },
+        })
+    }
+
+    if (
+        item.element !== null &&
+        wl.allowPlacing &&
+        Elements.instance.getElementFactory(item.element).canPlaceInLocation(wl)
+    ) {
+        actions.push({
+            verb: "place",
+            actionFn: () => {
+                InventoryDisplay.instance.close()
+                const stack = player().inventory.getStack(playerInvIndex)
+                PlaceElementDisplay.instance.startPlacing(stack, (elementPos) =>
+                    placeOnHost(playerInvIndex, elementPos)
+                )
             },
         })
     }
