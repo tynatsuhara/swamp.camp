@@ -331,6 +331,7 @@ export const ITEM_METADATA_MAP = {
         inventoryIcon: "lantern",
         stackLimit: 1,
         equippableShield: ShieldType.LANTERN,
+        element: ElementType.PLACED_LANTERN,
     }),
 }
 

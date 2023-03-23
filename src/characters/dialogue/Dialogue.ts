@@ -6,6 +6,7 @@ import { DIP_INTRO_DIALOGUE } from "./DipDialogue"
 import { DOCTOR_DIALOGUE } from "./DoctorDialogue"
 import { DONATION_DIALOGUES } from "./DonationBoxDialogue"
 import { GENERIC_DIALOGUE } from "./GenericDialogue"
+import { LANTERN_DIALOGUES } from "./LanternDialogue"
 import { SPOOKY_VISITOR_DIALOGUE } from "./SpookyVisitorDialogue"
 import { VILLAGER_DIALOGUE } from "./VillagerDialogue"
 
@@ -124,6 +125,7 @@ export const getDialogue = (
         ...VILLAGER_DIALOGUE,
         ...SPOOKY_VISITOR_DIALOGUE,
         ...DONATION_DIALOGUES,
+        ...LANTERN_DIALOGUES,
     }
 
     const dialogueSupplier = set[dialogue]

@@ -14,6 +14,7 @@ import { CampfireFactory } from "./Campfire"
 import { ChestFactory } from "./Chest"
 import { FurnitureFactory } from "./FurnitureFactory"
 import { MushroomFactory } from "./Mushroom"
+import { PlacedLanternFactory } from "./PlacedLantern"
 import { QueequegFactory } from "./Queequeg"
 import { RockFactory } from "./Rock"
 import { TreeFactory } from "./Tree"
@@ -40,6 +41,7 @@ export enum ElementType {
     BLACKBERRIES,
     CABIN,
     BEDROLL,
+    PLACED_LANTERN,
 }
 
 expose({ ElementType })
@@ -65,6 +67,7 @@ const ELEMENT_FACTORIES = {
     [ElementType.APOTHECARY]: new ApothecaryFactory(),
     [ElementType.BLACKBERRIES]: new BlackberriesFactory(),
     [ElementType.CABIN]: new CabinFactory(),
+    [ElementType.PLACED_LANTERN]: new PlacedLanternFactory(),
 }
 
 export type ElementDataFormat = {
