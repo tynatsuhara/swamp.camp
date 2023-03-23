@@ -933,10 +933,8 @@ export class Dude extends Component implements DialogueSource {
 
         // remove the body
         setTimeout(() => {
-            if (!this.factions.includes(DudeFaction.VILLAGERS)) {
-                this.dissolveLocal()
-            }
             if (this.type !== DudeType.PLAYER) {
+                this.dissolveLocal()
                 this.collider.enabled = false
             }
         }, 1000)
