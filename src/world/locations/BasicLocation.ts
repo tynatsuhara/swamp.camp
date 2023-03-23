@@ -39,7 +39,6 @@ export class BasicLocation extends Location {
     private readonly ground = new Grid<GroundComponent>()
     readonly levels = new Grid<number>()
 
-    // TODO: Make dropped items saveable
     private readonly droppedItems = new Set<DroppedItem>()
 
     private features: Feature<any>[] = []
@@ -561,6 +560,7 @@ export class BasicLocation extends Location {
             allowPlacing: this.allowPlacing,
             size: this.size,
             levels: this.levels?.serialize(),
+            items: [...this.droppedItems.values()].map((item) => item.save()),
         }
     }
 
@@ -625,6 +625,17 @@ export class BasicLocation extends Location {
         )
         saveState.elements.forEach((el) => n.loadElement(el.type, el.pos, el.obj))
         saveState.dudes.forEach((d) => DudeFactory.instance.load(d, n as Location))
+        saveState.items?.forEach((item) =>
+            n.addDroppedItem(
+                new DroppedItem(
+                    item.id,
+                    Point.fromString(item.pos),
+                    item.item,
+                    Point.ZERO,
+                    item.metadata
+                )
+            )
+        )
         n.toggleAudio(false)
 
         return n

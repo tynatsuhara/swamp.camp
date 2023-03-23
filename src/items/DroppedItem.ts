@@ -16,12 +16,20 @@ const PICK_UP_SOUNDS = loadAudio(
     Lists.range(0, 4).map((i) => `audio/impact/impactWood_medium_00${i}.ogg`)
 )
 
+export type DroppedItemSaveState = {
+    id: string
+    pos: string
+    item: Item
+    metadata?: ItemMetadata
+}
+
 export class DroppedItem extends Component {
     static readonly COLLISION_LAYER = "item"
 
     private sprite: SpriteComponent
     private collider: Collider
     private itemType: Item
+    private itemMetadata: ItemMetadata
     private canPickUp = true
 
     /**
@@ -29,7 +37,7 @@ export class DroppedItem extends Component {
      * @param sourceCollider will be ignored to prevent physics issues
      */
     constructor(
-        id: string,
+        private readonly id: string,
         position: Point,
         item: Item,
         velocity: Point,
@@ -39,16 +47,14 @@ export class DroppedItem extends Component {
         super()
 
         this.itemType = item
+        this.itemMetadata = this.itemMetadata
+
         this.start = () => {
             this.sprite = this.entity.addComponent(
                 ITEM_METADATA_MAP[item].droppedIconSupplier(metadata).toComponent()
             )
-            const pos = position.minus(
-                new Point(
-                    this.sprite.transform.dimensions.x / 2,
-                    this.sprite.transform.dimensions.y
-                )
-            )
+            // the position constructor arg specifies the bottom center
+            const pos = position.minus(this.getPointOffset())
             this.sprite.transform.position = pos
 
             this.syncPosition = syncFn(id, ({ x, y }: PointValue) => {
@@ -130,6 +136,19 @@ export class DroppedItem extends Component {
     }
 
     checkCollision: (dude: Dude) => void = () => {}
+
+    save(): DroppedItemSaveState {
+        return {
+            id: this.id,
+            pos: this.sprite.transform.position.plus(this.getPointOffset()).toString(),
+            item: this.itemType,
+            metadata: this.itemMetadata,
+        }
+    }
+
+    private getPointOffset() {
+        return pt(this.sprite.transform.dimensions.x / 2, this.sprite.transform.dimensions.y)
+    }
 
     private reposition(delta = new Point(0, 0)) {
         const colliderOffset = this.collider.position.minus(this.sprite.transform.position)

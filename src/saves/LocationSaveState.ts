@@ -1,3 +1,4 @@
+import { DroppedItemSaveState } from "../items/DroppedItem"
 import { SavedElement } from "../world/elements/Elements"
 import { Feature } from "../world/features/Features"
 import { SavedGround } from "../world/ground/Ground"
@@ -16,4 +17,5 @@ export class LocationSaveState {
     allowPlacing: boolean
     size?: number
     levels?: { [key: string]: number }
+    items?: DroppedItemSaveState[]
 }
