@@ -61,7 +61,7 @@ export class PlaceElementFrame extends Component {
 
     update() {
         const mousePos = controls.getWorldSpaceMousePos()
-        const baseDist = 3
+        const baseDist = 1.2
         // Divide these by 2 since the mouse will be in the center of the frame
         const maxDistX = TILE_SIZE * (baseDist + this.dimensions.x / 2)
         const maxDistY = TILE_SIZE * (baseDist + this.dimensions.y / 2)
