@@ -7,6 +7,7 @@ import { LANTERN_DIALOGUE } from "../../characters/dialogue/LanternDialogue"
 import { player } from "../../characters/player/index"
 import { Lantern } from "../../characters/weapons/Lantern"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
+import { randomByteString } from "../../saves/uuid"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { LightManager } from "../LightManager"
 import { Location } from "../locations/Location"
@@ -15,7 +16,13 @@ import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
 import { Interactable } from "./Interactable"
 
-export class PlacedLanternFactory extends ElementFactory<ElementType.PLACED_LANTERN> {
+type SaveData = {
+    id: string
+    // on: boolean
+    // fuel: number
+}
+
+export class PlacedLanternFactory extends ElementFactory<ElementType.PLACED_LANTERN, SaveData> {
     dimensions = pt(1)
 
     constructor() {
@@ -25,11 +32,13 @@ export class PlacedLanternFactory extends ElementFactory<ElementType.PLACED_LANT
     make(
         wl: Location,
         pos: Point,
-        data: object
-    ): ElementComponent<ElementType.PLACED_LANTERN, object> {
+        data: Partial<SaveData>
+    ): ElementComponent<ElementType.PLACED_LANTERN, SaveData> {
+        data.id ??= randomByteString()
+
         const e = new Entity()
         const position = pos.times(TILE_SIZE).plusY(-4)
-        const depth = position.y + TILE_SIZE // TODO
+        const depth = position.y + TILE_SIZE - 1
         const pixelCenterPos = position.plus(pt(TILE_SIZE / 2, 10))
 
         const sprite = Tilesets.instance.dungeonCharacters
@@ -50,7 +59,7 @@ export class PlacedLanternFactory extends ElementFactory<ElementType.PLACED_LANT
             )
         )
 
-        return e.addComponent(new ElementComponent(this.type, pos, () => ({})))
+        return e.addComponent(new ElementComponent(this.type, pos, () => ({ id: data.id })))
     }
 }
 
@@ -61,7 +70,7 @@ export class PlacedLantern extends Component implements DialogueSource {
         super()
     }
 
-    start() {
+    awake() {
         LightManager.instance.addLight(this.location, this, this.pixelCenterPos, Lantern.DIAMETER)
     }
 

@@ -13,7 +13,7 @@ import { DialogueOption, DialogueSet, dialogueWithOptions, NextDialogue } from "
 import { DialogueConstants } from "./DialogueConstants"
 
 export const CAMPFIRE_DIALOGUE = "campfire"
-export const CAMPFIRE_ADD_LOGS = "campfire-add-logs"
+const CAMPFIRE_ADD_LOGS = "campfire-add-logs"
 
 export const CAMPFIRE_DIALOGUES: DialogueSet = {
     [CAMPFIRE_DIALOGUE]: (cf: Campfire) => {
