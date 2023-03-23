@@ -3,9 +3,11 @@ import { VillagerJob } from "../../characters/ai/VillagerJob"
 import { DudeFaction } from "../../characters/DudeFactory"
 import { DudeType } from "../../characters/DudeType"
 import { Villager } from "../../characters/types/Villager"
+import { adjacent } from "../../Utils"
 import { ConstructionSite } from "../buildings/ConstructionSite"
 import { Elements, ElementType } from "../elements/Elements"
 import { HittableResource } from "../elements/HittableResource"
+import { GroundType } from "../ground/Ground"
 import { camp, LocationManager } from "../locations/LocationManager"
 import { collectTaxes } from "../TaxRate"
 import { Day } from "../TimeUnit"
@@ -14,6 +16,7 @@ import { WorldTime } from "../WorldTime"
 export const doDailyEvents = () => {
     applyVillagerWork()
     replenishResources()
+    spreadGrass()
 }
 
 export const doDailyMorningEvents = () => {
@@ -81,4 +84,23 @@ const applyVillagerWork = () => {
 
     const lumberjacks = villagers.filter((v) => v.job === VillagerJob.HARVEST_WOOD)
     // TODO chop some trees, collect wood
+}
+
+const spreadGrass = () => {
+    const l = camp()
+    l.getAllGroundSpots()
+        .filter((pt) => l.getGround(pt)?.type === GroundType.PATH)
+        .map((pt) => {
+            const adjacentGrass = adjacent(pt).filter(
+                (adj) => l.getGround(adj)?.type === GroundType.GRASS
+            ).length as 0 | 1 | 2 | 3 | 4
+
+            return { pt, adjacentGrass }
+        })
+        .forEach(({ pt, adjacentGrass }) => {
+            const likelyHoodOfSpread = 0.1 * adjacentGrass
+            if (Math.random() < likelyHoodOfSpread) {
+                l.setGroundElement(GroundType.GRASS, pt)
+            }
+        })
 }

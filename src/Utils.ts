@@ -15,6 +15,8 @@ export const tilesAround = (center: Point, radius: number = 1): Point[] => {
     return result
 }
 
+export const adjacent = (pt: Point) => [pt.plusX(1), pt.plusX(-1), pt.plusY(1), pt.plusY(-1)]
+
 export const showBoundingBox = (sprite: ImageRender): RenderMethod[] => {
     const { x: width, y: height } = sprite.dimensions
     const center = new EllipseRender({
