@@ -246,7 +246,7 @@ export const ITEM_METADATA_MAP = {
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("berries"),
     }),
     [Item.EXPLORER_MAP]: new ItemSpec({
-        displayName: "Explorer's Map",
+        displayName: "Explorer's map",
         inventoryIcon: "map",
         stackLimit: 1,
     }),
