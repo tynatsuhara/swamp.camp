@@ -1,6 +1,6 @@
 import { Component, Entity, Point } from "brigsby/dist"
 import { BasicRenderComponent, ImageRender } from "brigsby/dist/renderer"
-import { UIStateManager } from "./UIStateManager"
+import { UI_SPRITE_DEPTH } from "./UiConstants"
 
 const WIDTH = 20
 const HEIGHT = 20
@@ -58,7 +58,7 @@ export class DrawMenu extends Component {
                             new Point(WIDTH, HEIGHT),
                             new Point(50, 50),
                             new Point(WIDTH, HEIGHT),
-                            UIStateManager.UI_SPRITE_DEPTH
+                            UI_SPRITE_DEPTH
                         )
                     ),
                 ]),

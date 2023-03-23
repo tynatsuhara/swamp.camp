@@ -18,9 +18,6 @@ export class UIStateManager {
         return Singletons.getOrCreate(UIStateManager)
     }
 
-    static UI_SPRITE_DEPTH = Number.MAX_SAFE_INTEGER / 2
-    static SCROLL_SPEED = 0.25
-
     // if this is true, input observed by other components (like the player)
     // should be skipped because a menu is open. Other menus should only open
     // if this is false

@@ -5,7 +5,7 @@ import { ImageFilters } from "../graphics/ImageFilters"
 import { Icon } from "../graphics/OneBitTileset"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "./Color"
-import { UIStateManager } from "./UIStateManager"
+import { UI_SPRITE_DEPTH } from "./UiConstants"
 
 const iconSpriteCache: Record<string, StaticSpriteSource> = {}
 
@@ -24,7 +24,7 @@ export const getIconSpriteImageRender = ({
     icon,
     centerPos,
     color = Color.WHITE,
-    depth = UIStateManager.UI_SPRITE_DEPTH,
+    depth = UI_SPRITE_DEPTH,
 }: {
     icon: Icon
     centerPos: Point

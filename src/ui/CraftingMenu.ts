@@ -17,8 +17,8 @@ import { Singletons } from "../Singletons"
 import { Color } from "./Color"
 import { TEXT_FONT, TEXT_SIZE } from "./Text"
 import { Tooltip } from "./Tooltip"
+import { SCROLL_SPEED, UI_SPRITE_DEPTH } from "./UiConstants"
 import { UISounds } from "./UISounds"
-import { UIStateManager } from "./UIStateManager"
 
 const COLOR_TEXT_HOVERED = Color.WHITE
 const COLOR_BACKGROUND = Color.RED_2
@@ -92,9 +92,7 @@ export class CraftingMenu extends Component {
             const rowsTall = 6 // will need to change this if dimensions are adjusted
             const category = this.recipes[this.recipeCategory]
             this.scrollOffset -=
-                controls.getScrollDeltaY() *
-                updateData.elapsedTimeMillis *
-                UIStateManager.SCROLL_SPEED
+                controls.getScrollDeltaY() * updateData.elapsedTimeMillis * SCROLL_SPEED
             this.scrollOffset = Maths.clamp(
                 this.scrollOffset,
                 -Math.max(category.recipes.length, rowsTall) * 24 + this.innerDimensions.y,
@@ -196,7 +194,7 @@ export class CraftingMenu extends Component {
         const { sprites } = NineSlice.makeStretchedNineSliceComponents(
             Tilesets.instance.outdoorTiles.getNineSlice("invBoxFrame"),
             this.dimensions,
-            { position: topLeft, depth: UIStateManager.UI_SPRITE_DEPTH }
+            { position: topLeft, depth: UI_SPRITE_DEPTH }
         )
         this.context.fillStyle = COLOR_BACKGROUND
         this.context.fillRect(0, 0, this.innerDimensions.x, this.innerDimensions.y)
@@ -333,7 +331,7 @@ export class CraftingMenu extends Component {
                 this.innerDimensions,
                 innerOffset.plus(topLeft).apply(Math.floor),
                 this.innerDimensions,
-                UIStateManager.UI_SPRITE_DEPTH - 10
+                UI_SPRITE_DEPTH - 10
             )
         )
 

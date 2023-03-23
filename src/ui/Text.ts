@@ -5,7 +5,7 @@ import { ImageFilters } from "../graphics/ImageFilters"
 import { Icon } from "../graphics/OneBitTileset"
 import { Tilesets } from "../graphics/Tilesets"
 import { Color } from "./Color"
-import { UIStateManager } from "./UIStateManager"
+import { UI_SPRITE_DEPTH } from "./UiConstants"
 
 export const TEXT_PIXEL_WIDTH = 8
 export const TEXT_SIZE = 8
@@ -135,7 +135,7 @@ const formatTextInternal = ({
     alignment = TextAlign.LEFT,
     verticalAlignment = TextVerticalAlign.TOP,
     lineSpacing = 4,
-    depth = UIStateManager.UI_SPRITE_DEPTH + 1,
+    depth = UI_SPRITE_DEPTH + 1,
 }: FormatTextArgs): RenderMethod[] => {
     const rows: string[] = formatTextRows(text, width)
 

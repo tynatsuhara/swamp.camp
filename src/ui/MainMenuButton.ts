@@ -4,8 +4,8 @@ import { controls } from "../Controls"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "./Color"
 import { formatText, NO_BREAK_SPACE_CHAR, TextAlign, TEXT_PIXEL_WIDTH } from "./Text"
+import { UI_SPRITE_DEPTH } from "./UiConstants"
 import { UISounds } from "./UISounds"
-import { UIStateManager } from "./UIStateManager"
 
 export class MainMenuButton extends Component {
     private readonly width: number = 500
@@ -82,7 +82,7 @@ export class MainMenuButton extends Component {
             position: this.centerPos.plusX(-this.width / 2).plusX(offset),
             alignment: TextAlign.LEFT,
             color: this.hovering ? hoverColor : defaultColor,
-            depth: UIStateManager.UI_SPRITE_DEPTH,
+            depth: UI_SPRITE_DEPTH,
         })
     }
 }

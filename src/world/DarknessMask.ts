@@ -7,7 +7,7 @@ import { Lantern } from "../characters/weapons/Lantern"
 import { Torch } from "../characters/weapons/Torch"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Color, getRGB } from "../ui/Color"
-import { UIStateManager } from "../ui/UIStateManager"
+import { UI_SPRITE_DEPTH } from "../ui/UiConstants"
 import { Campfire } from "./elements/Campfire"
 import { TimeUnit } from "./TimeUnit"
 
@@ -19,7 +19,7 @@ import { TimeUnit } from "./TimeUnit"
  * PRE-POPULATING THE BITMAP CACHE. ADD THE DIAMETER TO THE CONSTRUCTOR HERE!
  */
 export class DarknessMask extends Component {
-    static readonly DEPTH = UIStateManager.UI_SPRITE_DEPTH - 100 // make sure all UI goes on top of light
+    static readonly DEPTH = UI_SPRITE_DEPTH - 100 // make sure all UI goes on top of light
 
     // no lights should live outside of this range
     // TODO: make this size dynamic (it will improve performance if we only fill the visible region)

@@ -2,13 +2,13 @@ import { Component, GamepadButton, Point } from "brigsby/dist"
 import { RenderMethod } from "brigsby/dist/renderer"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { Tilesets } from "../graphics/Tilesets"
-import { UIStateManager } from "./UIStateManager"
+import { UI_SPRITE_DEPTH } from "./UiConstants"
 
 export class ButtonIndicator extends Component {
     constructor(
         private readonly pos: Point,
         private readonly button: GamepadButton,
-        private readonly depth = UIStateManager.UI_SPRITE_DEPTH
+        private readonly depth = UI_SPRITE_DEPTH
     ) {
         super()
     }

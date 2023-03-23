@@ -22,7 +22,7 @@ import { Singletons } from "../Singletons"
 import { Color } from "./Color"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
 import { Tooltip } from "./Tooltip"
-import { UIStateManager } from "./UIStateManager"
+import { SCROLL_SPEED, UI_SPRITE_DEPTH } from "./UiConstants"
 
 export enum TradeMode {
     PLAYER_SELLING = "sell",
@@ -86,9 +86,7 @@ export class TradeMenu extends Component {
             this.tooltip.clear()
             const rowsTall = 6 // will need to change this if dimensions are adjusted
             this.scrollOffset -=
-                controls.getScrollDeltaY() *
-                updateData.elapsedTimeMillis *
-                UIStateManager.SCROLL_SPEED
+                controls.getScrollDeltaY() * updateData.elapsedTimeMillis * SCROLL_SPEED
             this.scrollOffset = Maths.clamp(
                 this.scrollOffset,
                 -Math.max(this.items.length, rowsTall) * 24 + this.innerDimensions.y,
@@ -188,7 +186,7 @@ export class TradeMenu extends Component {
                 TEXT_SIZE,
                 TEXT_FONT,
                 Color.RED_6,
-                UIStateManager.UI_SPRITE_DEPTH
+                UI_SPRITE_DEPTH
             )
         )
 
@@ -199,7 +197,7 @@ export class TradeMenu extends Component {
         const { sprites: bgSprites } = NineSlice.makeStretchedNineSliceComponents(
             Tilesets.instance.outdoorTiles.getNineSlice("invBoxFrame"),
             this.dimensions,
-            { position: topLeft, depth: UIStateManager.UI_SPRITE_DEPTH }
+            { position: topLeft, depth: UI_SPRITE_DEPTH }
         )
         this.context.fillStyle = COLOR_BACKGROUND
         this.context.fillRect(0, 0, this.innerDimensions.x, this.innerDimensions.y)
@@ -310,7 +308,7 @@ export class TradeMenu extends Component {
                 this.innerDimensions,
                 innerOffset.plus(topLeft).apply(Math.floor),
                 this.innerDimensions,
-                UIStateManager.UI_SPRITE_DEPTH - 10
+                UI_SPRITE_DEPTH - 10
             )
         )
 

@@ -5,8 +5,8 @@ import { Maths } from "brigsby/dist/util"
 import { controls } from "../Controls"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
+import { UI_SPRITE_DEPTH } from "./UiConstants"
 import { UISounds } from "./UISounds"
-import { UIStateManager } from "./UIStateManager"
 
 export class TextButton extends Component {
     static readonly margin = 6
@@ -76,7 +76,7 @@ export class TextButton extends Component {
                 .toImageRender(new SpriteTransform(rightPos))
 
             Array.from([this.left, this.center, this.right]).forEach(
-                (t) => (t.depth = UIStateManager.UI_SPRITE_DEPTH + 1)
+                (t) => (t.depth = UI_SPRITE_DEPTH + 1)
             )
         }
     }
@@ -110,7 +110,7 @@ export class TextButton extends Component {
                 TEXT_SIZE,
                 TEXT_FONT,
                 this.hovering ? this.hoverColor : this.textColor,
-                UIStateManager.UI_SPRITE_DEPTH + 2
+                UI_SPRITE_DEPTH + 2
             ),
             this.left,
             this.center,

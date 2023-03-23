@@ -23,8 +23,8 @@ import { MainMenuButtonSection } from "../ui/MainMenuButtonSection"
 import { PlumePicker, PLUME_COLORS } from "../ui/PlumePicker"
 import { TEXT_SIZE } from "../ui/Text"
 import { TextInput } from "../ui/TextInput"
+import { UI_SPRITE_DEPTH } from "../ui/UiConstants"
 import { UISounds } from "../ui/UISounds"
-import { UIStateManager } from "../ui/UIStateManager"
 import { DarknessMask } from "../world/DarknessMask"
 
 enum Menu {
@@ -167,7 +167,7 @@ export class MainMenuScene extends Scene {
                     titleDimensions,
                     menuTop.plusX(-titleDimensions.x / 2).plusY(-100 - titleDimensions.y / 2),
                     titleDimensions,
-                    UIStateManager.UI_SPRITE_DEPTH
+                    UI_SPRITE_DEPTH
                 )
             ),
         ])

@@ -9,7 +9,7 @@ import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { Color } from "./Color"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
-import { UIStateManager } from "./UIStateManager"
+import { UI_SPRITE_DEPTH } from "./UiConstants"
 
 export const Notifications: { [key: string]: Notification } = {
     NEW_VILLAGER: { text: "The ship has arrived!", icon: "ship" },
@@ -49,7 +49,7 @@ class NotificationComponent extends Component {
             this.width = textPixelWidth + TILE_SIZE + (!!data.icon ? ICON_WIDTH : 0)
             this.height = TILE_SIZE * 2 - 2
             const position = initialPos ?? this.getPosition()
-            const depth = UIStateManager.UI_SPRITE_DEPTH + 19
+            const depth = UI_SPRITE_DEPTH + 19
 
             const { transform, sprites } = NineSlice.makeStretchedNineSliceComponents(
                 Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"),
@@ -89,7 +89,7 @@ class NotificationComponent extends Component {
                 TEXT_SIZE,
                 TEXT_FONT,
                 Color.RED_2,
-                UIStateManager.UI_SPRITE_DEPTH + 20
+                UI_SPRITE_DEPTH + 20
             ),
         ]
     }

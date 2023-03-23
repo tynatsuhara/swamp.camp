@@ -2,7 +2,7 @@ import { Component, Entity, Point } from "brigsby/dist"
 import { RenderMethod } from "brigsby/dist/renderer"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
-import { UIStateManager } from "../ui/UIStateManager"
+import { UI_SPRITE_DEPTH } from "../ui/UiConstants"
 import { ElementComponent } from "./elements/ElementComponent"
 import { ElementFactory } from "./elements/ElementFactory"
 import { ElementType } from "./elements/Elements"
@@ -63,7 +63,7 @@ export class TeleporterIndicatorFactory extends ElementFactory<
                         Tilesets.instance.oneBit.getTileSource("small_arrow_down").toImageRender(
                             SpriteTransform.new({
                                 position: pos.times(TILE_SIZE),
-                                depth: UIStateManager.UI_SPRITE_DEPTH,
+                                depth: UI_SPRITE_DEPTH,
                             })
                         ),
                     ]

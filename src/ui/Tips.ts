@@ -4,7 +4,7 @@ import { Point, pt } from "brigsby/dist/Point"
 import { controls } from "../Controls"
 import { Color } from "./Color"
 import { formatText, TextAlign, TextVerticalAlign } from "./Text"
-import { UIStateManager } from "./UIStateManager"
+import { UI_SPRITE_DEPTH } from "./UiConstants"
 
 // tips should be kept < 3 lines long
 const getTips = () => [
@@ -60,7 +60,7 @@ export class TipDisplay extends Component {
             width: WIDTH,
             alignment: TextAlign.CENTER,
             verticalAlignment: TextVerticalAlign.CENTER,
-            depth: UIStateManager.UI_SPRITE_DEPTH + 5,
+            depth: UI_SPRITE_DEPTH + 5,
             dropShadow: Color.RED_1,
         })
     }

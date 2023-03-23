@@ -3,7 +3,7 @@ import { NineSlice } from "brigsby/dist/sprites"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { TEXT_PIXEL_WIDTH } from "./Text"
 import { TextButton } from "./TextButton"
-import { UIStateManager } from "./UIStateManager"
+import { UI_SPRITE_DEPTH } from "./UiConstants"
 
 export type OptionButton = {
     text: string
@@ -46,7 +46,7 @@ export const ButtonsMenu = {
                     ? Tilesets.instance.oneBit.getNineSlice("invBoxNW")
                     : Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"),
                 dimensions,
-                { position: topLeft, depth: UIStateManager.UI_SPRITE_DEPTH + 1 }
+                { position: topLeft, depth: UI_SPRITE_DEPTH + 1 }
             )
             sprites.forEach((tile) => e.addComponent(tile))
         }

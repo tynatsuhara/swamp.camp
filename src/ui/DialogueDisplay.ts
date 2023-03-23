@@ -18,7 +18,7 @@ import { ButtonsMenu } from "./ButtonsMenu"
 import { Color } from "./Color"
 import { formatText, formatTextRowCount, TextAlign, TEXT_SIZE } from "./Text"
 import { TextTyper } from "./TextTyper"
-import { UIStateManager } from "./UIStateManager"
+import { UI_SPRITE_DEPTH } from "./UiConstants"
 
 export class DialogueDisplay extends Component {
     static get instance() {
@@ -183,7 +183,7 @@ export class DialogueDisplay extends Component {
         NineSlice.makeStretchedNineSliceComponents(
             Tilesets.instance.outdoorTiles.getNineSlice("dialogueBG"),
             dimensions,
-            { position: topLeft, depth: UIStateManager.UI_SPRITE_DEPTH }
+            { position: topLeft, depth: UI_SPRITE_DEPTH }
         ).sprites.forEach((tile) => this.displayEntity.addComponent(tile))
 
         if (textRows > 0) {

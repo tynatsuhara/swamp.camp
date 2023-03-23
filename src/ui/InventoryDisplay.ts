@@ -31,6 +31,7 @@ import { Singletons } from "../Singletons"
 import { Color } from "./Color"
 import { formatText } from "./Text"
 import { Tooltip } from "./Tooltip"
+import { UI_SPRITE_DEPTH } from "./UiConstants"
 import { UIStateManager } from "./UIStateManager"
 
 export class InventoryDisplay extends Component {
@@ -563,7 +564,7 @@ export class InventoryDisplay extends Component {
             new Point(1 + InventoryDisplay.COLUMNS, 1 + inv.size / InventoryDisplay.COLUMNS),
             {
                 position: offset.minus(new Point(TILE_SIZE / 2, TILE_SIZE / 2)),
-                depth: UIStateManager.UI_SPRITE_DEPTH,
+                depth: UI_SPRITE_DEPTH,
             }
         )
             .sprites.values()
@@ -636,7 +637,7 @@ export class InventoryDisplay extends Component {
                     text: `x${saveManager.getState().coins}`,
                     position: new Point(9, 1).plus(this.offset).plus(this.coinsOffset),
                     color: Color.RED_6,
-                    depth: UIStateManager.UI_SPRITE_DEPTH,
+                    depth: UI_SPRITE_DEPTH,
                     dropShadow,
                 })
             ),
@@ -652,7 +653,7 @@ export class InventoryDisplay extends Component {
                         text: "Chest",
                         position: this.tradingInvOffset.plusY(-17),
                         color: Color.WHITE,
-                        depth: UIStateManager.UI_SPRITE_DEPTH,
+                        depth: UI_SPRITE_DEPTH,
                         dropShadow,
                     })
                 )
@@ -675,7 +676,7 @@ export class InventoryDisplay extends Component {
                     console.log(`missing item metadata for ${stack.item}`)
                 }
                 const c = itemMeta.inventoryIconSupplier().toComponent()
-                c.transform.depth = UIStateManager.UI_SPRITE_DEPTH + 1
+                c.transform.depth = UI_SPRITE_DEPTH + 1
                 tile = this.displayEntity.addComponent(c)
                 tile.transform.position = this.getPositionForInventoryIndex(i, inv)
             }

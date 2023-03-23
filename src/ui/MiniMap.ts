@@ -16,6 +16,7 @@ import { WaterRenderer } from "../world/ground/WaterRenderer"
 import { LightManager } from "../world/LightManager"
 import { camp, here } from "../world/locations/LocationManager"
 import { Color } from "./Color"
+import { UI_SPRITE_DEPTH } from "./UiConstants"
 import { UIStateManager } from "./UIStateManager"
 
 export class MiniMap extends Component {
@@ -138,7 +139,7 @@ export class MiniMap extends Component {
 
         const transformArgs: SpriteTransformOptions = {
             position: topLeft,
-            depth: UIStateManager.UI_SPRITE_DEPTH,
+            depth: UI_SPRITE_DEPTH,
         }
         const mapRender = mapSprite.toImageRender(SpriteTransform.new(transformArgs))
 
@@ -170,7 +171,7 @@ export class MiniMap extends Component {
         return Tilesets.instance.oneBit.getTileSource("miniMapPlayer").toImageRender(
             SpriteTransform.new({
                 position: playerIndicatorPosition,
-                depth: UIStateManager.UI_SPRITE_DEPTH,
+                depth: UI_SPRITE_DEPTH,
             })
         )
     }

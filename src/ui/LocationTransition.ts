@@ -4,7 +4,7 @@ import { Animator } from "brigsby/dist/util"
 import { player } from "../characters/player"
 import { Camera } from "../cutscenes/Camera"
 import { Color } from "./Color"
-import { UIStateManager } from "./UIStateManager"
+import { UI_SPRITE_DEPTH } from "./UiConstants"
 
 const makeCircle = (context: CanvasRenderingContext2D, radius: number, centerPos: Point) => {
     if (radius === 0) {
@@ -85,7 +85,7 @@ export class LocationTransition extends Component {
                 dims,
                 Point.ZERO,
                 dims,
-                UIStateManager.UI_SPRITE_DEPTH + 10_000
+                UI_SPRITE_DEPTH + 10_000
             )
         }
 

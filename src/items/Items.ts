@@ -12,6 +12,8 @@ import { Tilesets } from "../graphics/Tilesets"
 import { session } from "../online/session"
 import { syncFn } from "../online/syncUtils"
 import { randomByteString } from "../saves/uuid"
+import { Color } from "../ui/Color"
+import { getIconSprite } from "../ui/IconSprite"
 import { ElementType } from "../world/elements/Elements"
 import { here } from "../world/locations/LocationManager"
 import { DroppedItem } from "./DroppedItem"
@@ -125,9 +127,8 @@ export class ItemSpec {
         this.consumable = consumable
     }
 
-    // TODO get rid of this, align on getIconSprite
-    inventoryIconSupplier() {
-        return Tilesets.instance.oneBit.getTileSource(this.inventoryIcon)
+    inventoryIconSupplier(color: Color = Color.WHITE) {
+        return getIconSprite({ icon: this.inventoryIcon, color })
     }
 }
 

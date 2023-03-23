@@ -7,7 +7,7 @@ import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Elements } from "../world/elements/Elements"
 import { here } from "../world/locations/LocationManager"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
-import { UIStateManager } from "./UIStateManager"
+import { UI_SPRITE_DEPTH } from "./UiConstants"
 
 /**
  * This is a separate component which exists in the game view instead of the UI view, since it aligns with world tile coordinates
@@ -28,10 +28,10 @@ export class PlaceElementFrame extends Component {
 
     start() {
         this.goodTiles = this.entity.addComponents(this.getTiles("good"))
-        this.goodTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
+        this.goodTiles[0].transform.depth = UI_SPRITE_DEPTH
 
         this.badTiles = this.entity.addComponents(this.getTiles("bad"))
-        this.badTiles[0].transform.depth = UIStateManager.UI_SPRITE_DEPTH
+        this.badTiles[0].transform.depth = UI_SPRITE_DEPTH
     }
 
     private getTiles(suffix: string): SpriteComponent[] {

@@ -4,8 +4,8 @@ import { Maths } from "brigsby/dist/util"
 import { controls } from "../Controls"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "./Color"
+import { UI_SPRITE_DEPTH } from "./UiConstants"
 import { UISounds } from "./UISounds"
-import { UIStateManager } from "./UIStateManager"
 
 // array of [dark, light] pairs
 // TODO support new nanner colors
@@ -94,7 +94,7 @@ export class PlumePicker extends Component {
                     big ? new Point(bigBuffer, bigBuffer).times(2) : Point.ZERO
                 ),
                 color: colors[1],
-                depth: UIStateManager.UI_SPRITE_DEPTH + (big && !hovered ? 2 : hovered ? 1 : 0),
+                depth: UI_SPRITE_DEPTH + (big && !hovered ? 2 : hovered ? 1 : 0),
             })
         })
     }
