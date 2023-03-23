@@ -1,8 +1,6 @@
 import { Point } from "brigsby/dist/Point"
 import { Dude } from "../characters/Dude"
 import { player } from "../characters/player/index"
-import { ShieldType } from "../characters/weapons/ShieldType"
-import { WeaponType } from "../characters/weapons/WeaponType"
 import { session } from "../online/session"
 import { clientSyncFn } from "../online/syncUtils"
 import { InventoryDisplay } from "../ui/InventoryDisplay"
@@ -27,16 +25,7 @@ const placeOnHost = clientSyncFn(
 
         PlaceElementDisplay.instance.finishPlacingOnHost(stack, elementPos)
 
-        if (stack.metadata.equipped === "weapon") {
-            dude.setWeapon(WeaponType.UNARMED, -1)
-        } else if (stack.metadata.equipped === "shield") {
-            dude.setShield(ShieldType.NONE, -1)
-        }
-
-        inv.setStack(
-            invIndex,
-            stack.withCount(stack.count - 1).withMetadata({ equipped: undefined })
-        )
+        inv.removeItemAtIndex(invIndex, 1)
     }
 )
 
