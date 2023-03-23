@@ -35,6 +35,7 @@ export class MenuHints extends Component {
             if (isHoveringItem && !isStackHeld) {
                 show(controls.getInventoryStackPickUpOrDropString(), "pick up")
                 show(controls.getInventoryStackPickUpHalfOrDropOneString(), "pick up half")
+                show("[0-9]", "set hotkey")
             } else if (isStackHeld) {
                 show(controls.getInventoryStackPickUpOrDropString(), "drop")
                 show(controls.getInventoryStackPickUpHalfOrDropOneString(), "drop one")
