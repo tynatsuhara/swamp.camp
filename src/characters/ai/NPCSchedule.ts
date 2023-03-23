@@ -51,5 +51,6 @@ export const NPCSchedules = {
     }),
 
     VILLAGER_WAKE_UP_TIME: TimeUnit.HOUR * 6,
-    VILLAGER_GO_HOME_TIME: TimeUnit.HOUR * 18,
+    VILLAGER_STOP_WORK_TIME: TimeUnit.HOUR * 18,
+    VILLAGER_GO_HOME_TIME: TimeUnit.HOUR * 21,
 }

@@ -48,9 +48,11 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         const { dude } = context
         const timeOfDay = WorldTime.instance.time % TimeUnit.DAY
 
-        const shouldBeWorking =
-            timeOfDay > NPCSchedules.VILLAGER_WAKE_UP_TIME &&
-            timeOfDay < NPCSchedules.VILLAGER_GO_HOME_TIME
+        const { VILLAGER_WAKE_UP_TIME, VILLAGER_STOP_WORK_TIME, VILLAGER_GO_HOME_TIME } =
+            NPCSchedules
+
+        const isTimeBetween = (start: number, end: number) => timeOfDay > start && timeOfDay < end
+        const shouldBeWorking = isTimeBetween(VILLAGER_WAKE_UP_TIME, VILLAGER_STOP_WORK_TIME)
 
         let goalLocation: Location
 
@@ -81,8 +83,10 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
                 }
             }
         } else {
-            // Go home!
-            goalLocation = this.homeLocation ?? camp()
+            // Hang around camp or go home
+            goalLocation = isTimeBetween(VILLAGER_STOP_WORK_TIME, VILLAGER_GO_HOME_TIME)
+                ? camp()
+                : this.homeLocation ?? camp()
             dude.setWeapon(WeaponType.NONE, -1)
             dude.setShield(ShieldType.NONE, -1)
         }

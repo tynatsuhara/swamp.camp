@@ -1,8 +1,10 @@
 import { Item } from "../../items/Items"
 import { InteractIndicator } from "../../ui/InteractIndicator"
 import { SalePackage, TradeMenu } from "../../ui/TradeMenu"
+import { LocationType } from "../../world/locations/LocationType"
 import { Dude } from "../Dude"
 import {
+    dialogue,
     DialogueOption,
     DialogueSet,
     dialogueWithOptions,
@@ -35,6 +37,12 @@ const getItemsToBuy = (): SalePackage[] => {
 
 export const DOCTOR_DIALOGUE: DialogueSet = {
     [DOCTOR_DIALOGUE_ENTRYPOINT]: (doctor: Dude) => {
+        if (doctor.location.type !== LocationType.APOTHECARY_INTERIOR) {
+            return dialogue(
+                ["Visit me at my shop during the day to discuss remedying your various maladies."],
+                () => new NextDialogue(DOCTOR_DIALOGUE_ENTRYPOINT, false)
+            )
+        }
         return dialogueWithOptions(
             ["I offer goods and services to keep the town healthy."],
             InteractIndicator.NONE,
