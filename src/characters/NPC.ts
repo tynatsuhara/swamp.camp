@@ -674,7 +674,7 @@ export class NPC extends Simulatable {
         }
         const element = location.getElement(tile)
         if (element?.type === ElementType.BLACKBERRIES) {
-            return 3
+            return 10
         }
         // TODO: Maybe add a fun fireproof enemy in the future :)
         if (
