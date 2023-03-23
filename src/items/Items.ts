@@ -125,6 +125,7 @@ export class ItemSpec {
         this.consumable = consumable
     }
 
+    // TODO get rid of this, align on getIconSprite
     inventoryIconSupplier() {
         return Tilesets.instance.oneBit.getTileSource(this.inventoryIcon)
     }

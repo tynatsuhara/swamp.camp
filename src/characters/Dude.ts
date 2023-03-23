@@ -30,7 +30,7 @@ import { DudeSaveState } from "../saves/DudeSaveState"
 import { Color } from "../ui/Color"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { HUD } from "../ui/HUD"
-import { getIconSprite } from "../ui/IconSprite"
+import { getIconSpriteImageRender } from "../ui/IconSprite"
 import { InteractIndicator } from "../ui/InteractIndicator"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { Burnable } from "../world/elements/Burnable"
@@ -1636,11 +1636,11 @@ export class Dude extends Component implements DialogueSource {
         }
 
         return [
-            getIconSprite(
+            getIconSpriteImageRender({
                 icon,
-                this.standingPosition.plusY(-28).plus(this.getAnimationOffset()),
-                iconColor
-            ),
+                centerPos: this.standingPosition.plusY(-28).plus(this.getAnimationOffset()),
+                color: iconColor,
+            }),
         ]
     }
 

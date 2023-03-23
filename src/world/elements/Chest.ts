@@ -6,7 +6,7 @@ import { Icon } from "../../graphics/OneBitTileset"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Inventory, ItemStack } from "../../items/Inventory"
 import { randomByteString } from "../../saves/uuid"
-import { getIconSprite } from "../../ui/IconSprite"
+import { getIconSpriteImageRender } from "../../ui/IconSprite"
 import { InventoryDisplay } from "../../ui/InventoryDisplay"
 import { Location } from "../locations/Location"
 import { ElementComponent } from "./ElementComponent"
@@ -99,7 +99,12 @@ export const getChestComponents = ({
             if (!icon || interactable.isShowingUI) {
                 return []
             }
-            return [getIconSprite(icon, interactable.position.plusY(-TILE_SIZE))]
+            return [
+                getIconSpriteImageRender({
+                    icon,
+                    centerPos: interactable.position.plusY(-TILE_SIZE),
+                }),
+            ]
         },
     })
 

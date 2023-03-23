@@ -1,14 +1,15 @@
 import { Point, pt } from "brigsby/dist"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Icon } from "../graphics/OneBitTileset"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
 import { Color } from "./Color"
 import { UIStateManager } from "./UIStateManager"
 
-const iconSpriteCache = {}
+const iconSpriteCache: Record<string, StaticSpriteSource> = {}
 
-export const getIconSprite = (icon: Icon, centerPos: Point, color: Color = Color.WHITE) => {
+export const getIconSprite = ({ icon, color = Color.WHITE }: { icon: Icon; color?: Color }) => {
     const cacheKey = `${icon}${color ?? ""}`
     const sprite =
         iconSpriteCache[cacheKey] ??
@@ -16,14 +17,28 @@ export const getIconSprite = (icon: Icon, centerPos: Point, color: Color = Color
             .getTileSource(icon)
             .filtered(color !== Color.WHITE ? ImageFilters.tint(color) : undefined)
     iconSpriteCache[cacheKey] = sprite
-    return sprite.toImageRender(
+    return sprite
+}
+
+export const getIconSpriteImageRender = ({
+    icon,
+    centerPos,
+    color = Color.WHITE,
+    depth = UIStateManager.UI_SPRITE_DEPTH,
+}: {
+    icon: Icon
+    centerPos: Point
+    color?: Color
+    depth?: number
+}) => {
+    return getIconSprite({ icon, color }).toImageRender(
         new SpriteTransform(
             centerPos.plus(new Point(1, 1).times(-TILE_SIZE / 2)),
             pt(TILE_SIZE),
             0,
             false,
             false,
-            UIStateManager.UI_SPRITE_DEPTH
+            depth
         )
     )
 }
