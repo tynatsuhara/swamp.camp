@@ -7,6 +7,22 @@ import { ConstructionSite } from "../buildings/ConstructionSite"
 import { Elements, ElementType } from "../elements/Elements"
 import { HittableResource } from "../elements/HittableResource"
 import { camp, LocationManager } from "../locations/LocationManager"
+import { collectTaxes } from "../TaxRate"
+import { Day } from "../TimeUnit"
+import { WorldTime } from "../WorldTime"
+
+export const doDailyEvents = () => {
+    applyVillagerWork()
+    replenishResources()
+}
+
+export const doDailyMorningEvents = () => {
+    if (WorldTime.instance.currentDay === Day.MONDAY) {
+        collectTaxes()
+    }
+
+    updateTownStats()
+}
 
 const getAllVillagers = () =>
     LocationManager.instance
@@ -14,7 +30,7 @@ const getAllVillagers = () =>
         .flatMap((l) => l.getDudes())
         .filter((d) => d.isAlive && d.factions.includes(DudeFaction.VILLAGERS))
 
-export const replenishResources = () => {
+const replenishResources = () => {
     camp()
         .getElements()
         .map((e) => e.entity.getComponent(HittableResource)?.replenish())
@@ -36,7 +52,7 @@ export const replenishResources = () => {
     spawnResource(ElementType.MUSHROOM, Math.round(Math.random()))
 }
 
-export const updateTownStats = () => {
+const updateTownStats = () => {
     const foodAmount = 0 // TODO
     const villagerCount = LocationManager.instance
         .getLocations()
@@ -46,7 +62,7 @@ export const updateTownStats = () => {
 }
 
 // TODO
-export const applyVillagerWork = () => {
+const applyVillagerWork = () => {
     const villagers = getAllVillagers()
         .filter((v) => v.type === DudeType.VILLAGER)
         .map((v) => v.entity.getComponent(Villager))

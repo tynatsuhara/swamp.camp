@@ -6,10 +6,9 @@ import { TILE_SIZE } from "../../graphics/Tilesets"
 import { NotificationDisplay, Notifications } from "../../ui/NotificationDisplay"
 import { Queequeg } from "../elements/Queequeg"
 import { camp, LocationManager } from "../locations/LocationManager"
-import { collectTaxes } from "../TaxRate"
 import { Day, TimeUnit } from "../TimeUnit"
 import { WorldTime } from "../WorldTime"
-import { applyVillagerWork, replenishResources, updateTownStats } from "./DailyEvents"
+import { doDailyEvents, doDailyMorningEvents } from "./DailyEvents"
 import { EventQueue } from "./EventQueue"
 
 export enum QueuedEventType {
@@ -70,10 +69,7 @@ export const getEventQueueHandlers = (): {
 
     [QueuedEventType.DAILY_SCHEDULE]: () => {
         console.log(`executing daily midnight schedule for ${Day[WorldTime.instance.currentDay]}`)
-
-        applyVillagerWork()
-
-        replenishResources()
+        doDailyEvents()
 
         // Some events happen in the morning
         EventQueue.instance.addEvent({
@@ -89,12 +85,7 @@ export const getEventQueueHandlers = (): {
 
     [QueuedEventType.DAILY_MORNING]: () => {
         console.log(`executing daily morning schedule for ${Day[WorldTime.instance.currentDay]}`)
-
-        if (WorldTime.instance.currentDay === Day.MONDAY) {
-            collectTaxes()
-        }
-
-        updateTownStats()
+        doDailyMorningEvents()
     },
 
     // TODO: This should wake up the player if they are sleeping
