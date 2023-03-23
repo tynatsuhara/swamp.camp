@@ -37,7 +37,8 @@ export class ChestFactory extends ElementFactory<ElementType.CHEST, SaveData> {
         const { components, closeAnimation } = getChestComponents({
             location: wl,
             pixelPos: pos.times(TILE_SIZE),
-            onInteract: () => InventoryDisplay.instance.open(closeAnimation, inventory),
+            onInteract: () =>
+                InventoryDisplay.instance.open({ onClose: closeAnimation, tradingInv: inventory }),
         })
 
         const e = new Entity(components)

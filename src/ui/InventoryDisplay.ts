@@ -210,7 +210,7 @@ export class InventoryDisplay extends Component {
             // check that they're the same (other than count)
             invStackPostUpdate.equals(this.heldStack.withCount(invStackPostUpdate.count))
 
-        this.open(this.onClose, this.tradingInv)
+        this.open({ onClose: this.onClose, tradingInv: this.tradingInv })
 
         if (rePickUpItem) {
             this.setHeldStack(heldStackInventory, heldStackInvIndex, heldStack)
@@ -589,7 +589,10 @@ export class InventoryDisplay extends Component {
         }
     }
 
-    open(onClose: () => void = null, tradingInv: Inventory = null) {
+    open({
+        onClose = null,
+        tradingInv = null,
+    }: { onClose?: () => void; tradingInv?: Inventory } = {}) {
         this.clearHeldStack()
         this.canAcceptInput = false
 
