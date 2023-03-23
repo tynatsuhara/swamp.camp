@@ -196,7 +196,6 @@ export class InventoryDisplay extends Component {
     }
 
     refreshView() {
-        console.log("refresh inventory")
         // As long as what we're holding is a subset of the stack in the inventory, don't drop it!
         const { heldStackInventory, heldStackInvIndex, heldStack } = this
         const invStackPostUpdate = heldStackInventory?.getStack(heldStackInvIndex)
