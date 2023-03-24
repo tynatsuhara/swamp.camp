@@ -44,6 +44,7 @@ export enum Item {
     SMALL_CABIN,
     COOKED_MEAT,
     EXPLORER_MAP,
+    LAMP_OIL,
 
     // weapon values should match the WeaponType enum so we can cast them
     KNIFE = WeaponType.KNIFE,
@@ -251,6 +252,11 @@ export const ITEM_METADATA_MAP = {
         displayName: "Explorer's map",
         inventoryIcon: "map",
         stackLimit: 1,
+    }),
+    [Item.LAMP_OIL]: new ItemSpec({
+        displayName: "Lamp oil",
+        inventoryIcon: "lighter-fluid",
+        stackLimit: STACK_LG,
     }),
 
     // Locations
