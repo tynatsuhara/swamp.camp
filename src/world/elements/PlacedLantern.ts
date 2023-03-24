@@ -1,4 +1,4 @@
-import { Component } from "brigsby/dist/Component"
+import { UpdateData } from "brigsby/dist/Engine"
 import { Entity } from "brigsby/dist/Entity"
 import { Point, pt } from "brigsby/dist/Point"
 import { SpriteComponent } from "brigsby/dist/sprites/SpriteComponent"
@@ -13,6 +13,8 @@ import { randomByteString } from "../../saves/uuid"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { LightManager } from "../LightManager"
 import { Location } from "../locations/Location"
+import { Simulatable } from "../Simulatable"
+import { TimeUnit } from "../TimeUnit"
 import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
@@ -66,7 +68,7 @@ export class PlacedLanternFactory extends ElementFactory<ElementType.PLACED_LANT
     }
 }
 
-export class PlacedLantern extends Component implements DialogueSource {
+export class PlacedLantern extends Simulatable implements DialogueSource {
     dialogue = LANTERN_DIALOGUE
     private onSprite: SpriteComponent
     private offSprite: SpriteComponent
@@ -78,12 +80,20 @@ export class PlacedLantern extends Component implements DialogueSource {
         return this.position.plus(pt(TILE_SIZE / 2, 10))
     }
 
+    get on() {
+        return this.data.on
+    }
+
     constructor(
         private readonly location: Location,
         private readonly pos: Point,
         private readonly data: SaveData
     ) {
         super()
+    }
+
+    simulate(duration: number): void {
+        this.burn(duration)
     }
 
     awake() {
@@ -105,6 +115,20 @@ export class PlacedLantern extends Component implements DialogueSource {
         this.toggleOnOff()
     }
 
+    update({ elapsedTimeMillis }: UpdateData): void {
+        this.burn(elapsedTimeMillis)
+    }
+
+    private burn(millis: number) {
+        if (this.on) {
+            this.data.fuel -= millis
+            if (this.data.fuel < 0) {
+                this.data.fuel = 0
+                this.toggleOnOff()
+            }
+        }
+    }
+
     save() {
         return this.data
     }
@@ -112,10 +136,6 @@ export class PlacedLantern extends Component implements DialogueSource {
     delete(): void {
         super.delete()
         this.removeLight()
-    }
-
-    isOn() {
-        return this.data.on
     }
 
     toggleOnOff() {
@@ -129,8 +149,23 @@ export class PlacedLantern extends Component implements DialogueSource {
         this.offSprite.enabled = !this.data.on
     }
 
+    getFuelAmount() {
+        return this.data.fuel
+    }
+
     getInvItemMetadata() {
-        return { fuel: 0 } // TODO
+        return { fuel: this.data.fuel }
+    }
+
+    canAddFuel() {
+        return true // TODO enforce max
+    }
+
+    addFuel() {
+        this.data.fuel += TimeUnit.HOUR // TODO amount?
+        if (!this.on) {
+            this.toggleOnOff()
+        }
     }
 
     private addLight() {

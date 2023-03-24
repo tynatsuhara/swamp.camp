@@ -1,19 +1,53 @@
 import { Item } from "../../items/Items"
+import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { InteractIndicator } from "../../ui/InteractIndicator"
+import { InventoryDisplay } from "../../ui/InventoryDisplay"
 import { PlacedLantern } from "../../world/elements/PlacedLantern"
 import { player } from "../player/index"
 import { DialogueOption, DialogueSet, dialogueWithOptions, NextDialogue } from "./Dialogue"
+import { DialogueConstants } from "./DialogueConstants"
 
 export const LANTERN_DIALOGUE = "lantern"
 
 export const LANTERN_DIALOGUES: DialogueSet = {
     [LANTERN_DIALOGUE]: (lantern: PlacedLantern) => {
-        const isOn = lantern.isOn()
+        const isOn = lantern.on
+        const initialFuelAmount = lantern.getFuelAmount()
 
-        const toggleOption = new DialogueOption(`Turn ${isOn ? "off" : "on"}`, () => {
-            lantern.toggleOnOff()
+        const showUpdatedInfo = () => {
+            if (lantern.getFuelAmount() !== initialFuelAmount) {
+                // RAF to prevent bad input (eg the close inv input closing the dialogue)
+                requestAnimationFrame(() => DialogueDisplay.instance.startDialogue(lantern))
+            }
+        }
+
+        const addFuelOption = new DialogueOption(`Add fuel`, () => {
+            InventoryDisplay.instance.open({
+                donating: {
+                    canDonate: (stack) => stack.item === Item.LAMP_OIL && lantern.canAddFuel(),
+                    onDonate: () => {
+                        lantern.addFuel()
+                        if (
+                            !lantern.canAddFuel() ||
+                            player().inventory.getItemCount(Item.LAMP_OIL) === 0
+                        ) {
+                            InventoryDisplay.instance.close()
+                            showUpdatedInfo()
+                        }
+                    },
+                    verb: "add fuel",
+                },
+                onClose: showUpdatedInfo,
+            })
             return new NextDialogue(LANTERN_DIALOGUE, false)
         })
+
+        const toggleOption = initialFuelAmount
+            ? new DialogueOption(`Turn ${isOn ? "off" : "on"}`, () => {
+                  lantern.toggleOnOff()
+                  return new NextDialogue(LANTERN_DIALOGUE, false)
+              })
+            : undefined
 
         const pickUpOption = new DialogueOption("Pick up", () => {
             const added = player().inventory.addItem(Item.LANTERN, 1, lantern.getInvItemMetadata())
@@ -23,6 +57,18 @@ export const LANTERN_DIALOGUES: DialogueSet = {
             return new NextDialogue(LANTERN_DIALOGUE, false)
         })
 
-        return dialogueWithOptions([], InteractIndicator.NONE, toggleOption, pickUpOption)
+        const exitOption = new DialogueOption(
+            DialogueConstants.CANCEL_TEXT,
+            () => new NextDialogue(LANTERN_DIALOGUE, false)
+        )
+
+        return dialogueWithOptions(
+            [`Fuel: ${lantern.getFuelAmount()}`], // TODO
+            InteractIndicator.NONE,
+            addFuelOption,
+            toggleOption,
+            pickUpOption,
+            exitOption
+        )
     },
 }
