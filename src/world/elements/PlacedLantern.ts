@@ -39,7 +39,7 @@ export class PlacedLanternFactory extends ElementFactory<ElementType.PLACED_LANT
         data: Partial<SaveData>
     ): ElementComponent<ElementType.PLACED_LANTERN, SaveData> {
         data.id ??= randomByteString()
-        data.on ??= true
+        data.on ??= false
         data.fuel ??= 0
 
         const e = new Entity()
@@ -62,8 +62,8 @@ export class PlacedLanternFactory extends ElementFactory<ElementType.PLACED_LANT
 
     itemMetadataToSaveFormat(metadata: ItemMetadata): Partial<SaveData> {
         return {
-            on: true,
             fuel: metadata.fuel ?? 0,
+            on: metadata.fuel > 0,
         }
     }
 }
@@ -110,9 +110,7 @@ export class PlacedLantern extends Simulatable implements DialogueSource {
         this.onSprite = sprite("tool_lantern")
         this.offSprite = sprite("tool_lantern_off")
 
-        // let this handle setting up lights, sprite config, etc
-        this.toggleOnOff()
-        this.toggleOnOff()
+        this.updateOnOffState()
     }
 
     update({ elapsedTimeMillis }: UpdateData): void {
@@ -140,13 +138,17 @@ export class PlacedLantern extends Simulatable implements DialogueSource {
 
     toggleOnOff() {
         this.data.on = !this.data.on
-        if (this.data.on) {
+        this.updateOnOffState()
+    }
+
+    private updateOnOffState() {
+        if (this.on) {
             this.addLight()
         } else {
             this.removeLight()
         }
-        this.onSprite.enabled = this.data.on
-        this.offSprite.enabled = !this.data.on
+        this.onSprite.enabled = this.on
+        this.offSprite.enabled = !this.on
     }
 
     getFuelAmount() {
