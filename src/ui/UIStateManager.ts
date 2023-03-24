@@ -26,30 +26,40 @@ export class UIStateManager {
         return this.captureInput
     }
 
+    get menus(): { close: () => void; getEntities: () => Entity[]; isOpen: boolean }[] {
+        return [
+            InventoryDisplay.instance,
+            DialogueDisplay.instance,
+            PlaceElementDisplay.instance,
+            PauseMenu.instance,
+            CraftingMenu.instance,
+            TradeMenu.instance,
+        ]
+    }
+
     get(): Entity[] {
         if (!player()) {
             return []
         }
 
+        // TODO add a common interface for all the menus
         this.captureInput =
-            InventoryDisplay.instance.isOpen ||
-            DialogueDisplay.instance.isOpen ||
-            PlaceElementDisplay.instance.isOpen ||
-            PauseMenu.instance.isOpen ||
-            CraftingMenu.instance.isOpen ||
-            TradeMenu.instance.isOpen ||
+            this.menus.some((m) => m.isOpen) ||
             spawnMenu.isOpen ||
             TextOverlayManager.instance.isActive
 
         return HUD.instance
             .getEntities()
-            .concat(InventoryDisplay.instance.getEntities())
-            .concat(DialogueDisplay.instance.getEntities())
-            .concat(PlaceElementDisplay.instance.getEntities())
-            .concat(PauseMenu.instance.getEntities())
-            .concat(CraftingMenu.instance.getEntities())
-            .concat(TradeMenu.instance.getEntities())
+            .concat(this.menus.flatMap((m) => m.getEntities()))
             .concat(NotificationDisplay.instance.getEntities())
             .concat(MenuHints.instance.getEntities()) // put this last since it checks other menus
+    }
+
+    closeAny() {
+        this.menus.forEach((m) => {
+            if (m.isOpen) {
+                m.close()
+            }
+        })
     }
 }
