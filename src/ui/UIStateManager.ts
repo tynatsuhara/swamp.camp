@@ -42,7 +42,6 @@ export class UIStateManager {
             return []
         }
 
-        // TODO add a common interface for all the menus
         this.captureInput =
             this.menus.some((m) => m.isOpen) ||
             spawnMenu.isOpen ||
