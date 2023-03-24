@@ -4,6 +4,7 @@ import { InteractIndicator } from "../../ui/InteractIndicator"
 import { InventoryDisplay } from "../../ui/InventoryDisplay"
 import { PlacedLantern } from "../../world/elements/PlacedLantern"
 import { player } from "../player/index"
+import { ShieldType } from "../weapons/ShieldType"
 import { DialogueOption, DialogueSet, dialogueWithOptions, NextDialogue } from "./Dialogue"
 import { DialogueConstants } from "./DialogueConstants"
 
@@ -53,6 +54,8 @@ export const LANTERN_DIALOGUES: DialogueSet = {
             const added = player().inventory.addItem(Item.LANTERN, 1, lantern.getInvItemMetadata())
             if (added) {
                 lantern.entity.selfDestruct()
+                const lanternIndex = player().inventory.findIndex((s) => s?.item === Item.LANTERN)
+                player().setShield(ShieldType.LANTERN, lanternIndex)
             }
             return new NextDialogue(LANTERN_DIALOGUE, false)
         })

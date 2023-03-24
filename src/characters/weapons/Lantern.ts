@@ -1,4 +1,4 @@
-import { Point } from "brigsby/dist"
+import { Point, UpdateData } from "brigsby/dist"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { LightManager } from "../../world/LightManager"
 import { here } from "../../world/locations/LocationManager"
@@ -15,7 +15,7 @@ export class Lantern extends Shield {
         super(ShieldType.LANTERN, "tool_lantern")
     }
 
-    update() {
+    update({ elapsedTimeMillis }: UpdateData) {
         const dims = this.dude.animation.transform.dimensions
         this.transform.position = new Point(dims.x / 2, dims.y)
             .plus(this.dude.getOffsetRelativeToAnimation())
@@ -29,6 +29,16 @@ export class Lantern extends Shield {
             this.dude.standingPosition.plusY(-TILE_SIZE / 2).plus(this.dude.getAnimationOffset()),
             Lantern.DIAMETER
         )
+
+        // TODO: Figure out fuel consumption and refueling UX in inventory
+        //     const [invStack, stackIndex] = this.dude.inventory.find(
+        //         (s) => s?.metadata.equipped === "shield"
+        //     )
+        //     // This doesn't really work because it triggers an inventory UI refresh :(
+        //     this.dude.inventory.setStack(
+        //         stackIndex,
+        //         invStack.withMetadata({ fuel: invStack.metadata.fuel - elapsedTimeMillis })
+        //     )
     }
 
     delete() {

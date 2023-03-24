@@ -343,8 +343,7 @@ export const ITEM_METADATA_MAP = {
         displayName: "Lantern",
         displayNameSupplier: (stack) => {
             const fuel = stack.metadata.fuel
-            if (!fuel) return `Lantern`
-            return `Lantern (${fuel})`
+            return `Lantern (${!fuel ? "empty" : Math.floor(fuel)})`
         },
         inventoryIcon: "lantern",
         stackLimit: 1,
