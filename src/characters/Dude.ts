@@ -313,6 +313,8 @@ export class Dude extends Component implements DialogueSource {
 
         // Synchronized client->host functions
 
+        // TODO: Generalize gear slots (lots of code overlap between weapons and shields)
+
         const setWeapon = (type: WeaponType) => {
             if (this.weaponType === type) {
                 return
@@ -339,17 +341,11 @@ export class Dude extends Component implements DialogueSource {
 
                 // update equipped flag in inventory
                 if (session.isHost()) {
-                    const currentWeaponIndex = this.inventory.findIndex(
-                        (s) => s?.metadata?.equipped === "weapon"
-                    )
-                    if (currentWeaponIndex >= 0) {
-                        this.inventory.setStack(
-                            currentWeaponIndex,
-                            this.inventory
-                                .getStack(currentWeaponIndex)
-                                .withMetadata({ equipped: undefined })
-                        )
-                    }
+                    this.inventory.getStacks().forEach((s, index) => {
+                        if (s?.metadata?.equipped === "weapon") {
+                            this.inventory.setStack(index, s.withMetadata({ equipped: undefined }))
+                        }
+                    })
                     if (invIndex > -1) {
                         this.inventory.setStack(
                             invIndex,
@@ -388,17 +384,11 @@ export class Dude extends Component implements DialogueSource {
 
                 // update equipped flag in inventory
                 if (session.isHost()) {
-                    const currentShieldIndex = this.inventory.findIndex(
-                        (s) => s?.metadata?.equipped === "shield"
-                    )
-                    if (currentShieldIndex >= 0) {
-                        this.inventory.setStack(
-                            currentShieldIndex,
-                            this.inventory
-                                .getStack(currentShieldIndex)
-                                .withMetadata({ equipped: undefined })
-                        )
-                    }
+                    this.inventory.getStacks().forEach((s, index) => {
+                        if (s?.metadata?.equipped === "shield") {
+                            this.inventory.setStack(index, s.withMetadata({ equipped: undefined }))
+                        }
+                    })
                     if (invIndex > -1) {
                         this.inventory.setStack(
                             invIndex,
