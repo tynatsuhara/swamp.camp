@@ -32,7 +32,7 @@ export class BasicAttackAnimation extends MeleeAnimation {
 
     constructor(args: AnimationArgs, onFinish: () => void) {
         super(args)
-        this.animator = new Animator(Animator.frames(8, 40), () => {}, onFinish)
+        this.animator = new Animator(Animator.frames(8, 40 / args.spec.speed), () => {}, onFinish)
         this.slashSprite = Tilesets.instance.oneBit.getTileSource("slash")
     }
 

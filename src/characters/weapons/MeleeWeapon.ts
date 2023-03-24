@@ -25,7 +25,7 @@ export type WeaponSpec = {
     range: number
     damage: number
     canMultiAttack: boolean
-    speed: number // TODO
+    speed: number
 }
 
 // maps sprite ID to sprite cache
@@ -98,7 +98,7 @@ export class MeleeWeapon extends Weapon {
             this.attackAnim = new BasicAttackAnimation(this.animationArgs, onFinish)
             this.state = State.ATTACKING
             // TODO trigger from animation
-            setTimeout(() => this.damageEnemies(), 100)
+            setTimeout(() => this.damageEnemies(), 100 / this.spec.speed)
         }
     }
 

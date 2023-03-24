@@ -55,7 +55,7 @@ export const WeaponFactory = {
                     range: 16,
                     damage: 1,
                     canMultiAttack: false,
-                    speed: 1,
+                    speed: 0.75,
                 })
             case WeaponType.AXE:
                 return new MeleeWeapon({
@@ -79,7 +79,7 @@ export const WeaponFactory = {
                     range: 16,
                     damage: 1,
                     canMultiAttack: false,
-                    speed: 1,
+                    speed: 0.75,
                 })
             default:
                 throw new Error(`weapon type ${weaponType} is not supported yet`)
