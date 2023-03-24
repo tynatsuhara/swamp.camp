@@ -505,7 +505,7 @@ export class InventoryDisplay extends Component {
         const stack = hoverInv.getStack(hoverIndex)
         const item = ITEM_METADATA_MAP[stack.item]
         const hotKeyPrefix = stack.metadata.hotKey
-            ? `(${InputKeyString.for(stack.metadata.hotKey)}) `
+            ? `<${InputKeyString.for(stack.metadata.hotKey)}> `
             : ""
 
         let actions: ItemAction[] = []
