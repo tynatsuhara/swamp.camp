@@ -3,7 +3,7 @@ import { Dude } from "../characters/Dude"
 import { player } from "../characters/player/index"
 import { session } from "../online/session"
 import { clientSyncFn } from "../online/syncUtils"
-import { InventoryDisplay } from "../ui/InventoryDisplay"
+import { DonatingOptions, InventoryDisplay } from "../ui/InventoryDisplay"
 import { PlaceElementDisplay } from "../ui/PlaceElementDisplay"
 import { Elements } from "../world/elements/Elements"
 import { here } from "../world/locations/LocationManager"
@@ -36,7 +36,15 @@ const consume = clientSyncFn("consume", "caller-and-host", ({ dudeUUID }, invInd
     ITEM_METADATA_MAP[stack.item].consumable?.fn(dude)
 
     if (session.isHost()) {
-        dude.inventory.setStack(invIndex, stack.withCount(stack.count - 1))
+        dude.inventory.removeItemAtIndex(invIndex, 1)
+    }
+})
+
+// donate the item at a given inventory index
+const donate = clientSyncFn("donate", "caller-and-host", ({ dudeUUID }, invIndex: number) => {
+    const dude = Dude.get(dudeUUID)
+    if (session.isHost()) {
+        dude.inventory.removeItemAtIndex(invIndex, 1)
     }
 })
 
@@ -96,4 +104,24 @@ export const getInventoryItemActions = (playerInvIndex: number): ItemAction[] =>
     }
 
     return actions
+}
+
+export const getInventoryItemDonationActions = (
+    playerInvIndex: number,
+    { canDonate, onDonate, verb }: DonatingOptions
+): ItemAction[] => {
+    const stack = player().inventory.getStack(playerInvIndex)
+    if (!canDonate(stack)) {
+        return []
+    }
+    return [
+        {
+            verb,
+            actionFn: () => {
+                donate(playerInvIndex)
+                InventoryDisplay.instance.refreshView()
+                onDonate()
+            },
+        },
+    ]
 }

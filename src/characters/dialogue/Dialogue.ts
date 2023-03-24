@@ -20,7 +20,7 @@ export class DialogueInstance {
         }
         return this._lines
     }
-    readonly next: () => void | NextDialogue
+    readonly next: () => NextDialogue
     readonly options: DialogueOption[]
     readonly indicator: InteractIndicator
 
@@ -34,7 +34,7 @@ export class DialogueInstance {
      */
     constructor(
         lines: string[] | (() => string[]) | undefined,
-        next: () => void | NextDialogue,
+        next: () => NextDialogue,
         options: DialogueOption[],
         indicator: InteractIndicator = InteractIndicator.NONE
     ) {
@@ -57,11 +57,11 @@ export const dialogueWithOptions = (
     indicator: InteractIndicator = InteractIndicator.NONE,
     ...options: DialogueOption[]
 ): DialogueInstance => {
-    return new DialogueInstance(lines, () => {}, options, indicator)
+    return new DialogueInstance(lines, () => null, options, indicator)
 }
 export const dialogue = (
     lines: string[],
-    next: () => void | NextDialogue = () => {},
+    next: () => NextDialogue = () => null,
     indicator: InteractIndicator = InteractIndicator.NONE
 ): DialogueInstance => {
     return new DialogueInstance(lines, next, [], indicator)
@@ -84,7 +84,7 @@ export interface DialogueSource {
 }
 
 export class DialogueOption {
-    constructor(readonly text: string, readonly next: () => void | NextDialogue) {}
+    constructor(readonly text: string, readonly next: () => NextDialogue) {}
 }
 
 export class NextDialogue {

@@ -1,6 +1,6 @@
 import { Component, Entity, Point } from "brigsby/dist"
 import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
-import { Lists } from "brigsby/dist/util"
+import { Lists, Maths } from "brigsby/dist/util"
 import { PointAudio } from "../../audio/PointAudio"
 import { CAMPFIRE_DIALOGUE } from "../../characters/dialogue/CampfireDialogue"
 import { DialogueSource } from "../../characters/dialogue/Dialogue"
@@ -87,8 +87,6 @@ export class CampfireFactory extends ElementFactory<ElementType.CAMPFIRE, SaveDa
             new PointAudio("audio/ambiance/campfire.ogg", pixelCenterPos, TILE_SIZE * 6)
         )
 
-        // const [sendFireUpdate, receiveFireUpdate] = wl.elementAction<{ logCount: number }>(pos)
-
         const updateFire = (logCount: number) => {
             logSprite.enabled = logCount > Campfire.LOG_CAPACITY / 2
             logSpriteSmall.enabled = logCount > 0 && !logSprite.enabled
@@ -115,8 +113,6 @@ export class CampfireFactory extends ElementFactory<ElementType.CAMPFIRE, SaveDa
         updateFire(data.logs ?? 0)
 
         const updateFireSync = wl.elementSyncFn("fire", pos, updateFire)
-
-        // receiveFireUpdate(({ logCount }) => updateFire(logCount))
 
         const cf = e.addComponent(
             new Campfire(data.id, data.logs ?? 0, data.llct ?? 0, (logCount) => {
@@ -190,14 +186,12 @@ export class Campfire extends Component implements DialogueSource {
 
         this.addLogs = clientSyncFn(id, "all", ({ dudeUUID }, logsTransferred: number) => {
             const interactingPlayer = Dude.get(dudeUUID)
+            logsTransferred = Maths.clamp(logsTransferred, -1, 1)
             if (session.isHost()) {
                 if (logsTransferred === -1) {
                     // set NONE first to make sure they always get a fully-lit torch
                     interactingPlayer.setShield(ShieldType.NONE, -1)
                     interactingPlayer.setShield(ShieldType.TORCH, -1)
-                }
-                if (logsTransferred > 0) {
-                    interactingPlayer.inventory.removeItem(Item.WOOD, logsTransferred)
                 }
             }
             this._addLogs(logsTransferred)

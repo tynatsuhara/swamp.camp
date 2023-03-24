@@ -22,7 +22,11 @@ import { Camera } from "../cutscenes/Camera"
 import { prettyPrint } from "../debug/JSON"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
-import { getInventoryItemActions, ItemAction } from "../items/getInventoryItemActions"
+import {
+    getInventoryItemActions,
+    getInventoryItemDonationActions,
+    ItemAction,
+} from "../items/getInventoryItemActions"
 import { Inventory, ItemStack } from "../items/Inventory"
 import { ItemMetadata, ItemSpec, ITEM_METADATA_MAP } from "../items/Items"
 import { clientSyncFn } from "../online/syncUtils"
@@ -33,6 +37,12 @@ import { formatText } from "./Text"
 import { Tooltip } from "./Tooltip"
 import { UI_SPRITE_DEPTH } from "./UiConstants"
 import { UIStateManager } from "./UIStateManager"
+
+export type DonatingOptions = {
+    canDonate: (stack: ItemStack) => boolean
+    onDonate: () => void
+    verb: string
+}
 
 export class InventoryDisplay extends Component {
     static get instance() {
@@ -82,6 +92,10 @@ export class InventoryDisplay extends Component {
     private canUseItems = false
     private get playerInv() {
         return player().inventory
+    }
+    private donatingOptions: DonatingOptions
+    private get isDonating() {
+        return !!this.donatingOptions
     }
 
     constructor() {
@@ -211,7 +225,12 @@ export class InventoryDisplay extends Component {
             // check that they're the same (other than count)
             invStackPostUpdate.equals(this.heldStack.withCount(invStackPostUpdate.count))
 
-        this.open({ onClose: this.onClose, tradingInv: this.tradingInv })
+        // Open without changing any of the fields
+        this.open({
+            onClose: this.onClose,
+            tradingInv: this.tradingInv,
+            donating: this.donatingOptions,
+        })
 
         if (rePickUpItem) {
             this.setHeldStack(heldStackInventory, heldStackInvIndex, heldStack)
@@ -489,9 +508,13 @@ export class InventoryDisplay extends Component {
             ? `(${InputKeyString.for(stack.metadata.hotKey)}) `
             : ""
 
-        // Don't allow interactions with things in chests
-        const actions: ItemAction[] =
-            hoverInv === this.tradingInv ? [] : getInventoryItemActions(hoverIndex)
+        let actions: ItemAction[] = []
+        if (this.isDonating) {
+            actions = getInventoryItemDonationActions(hoverIndex, this.donatingOptions)
+        } else if (hoverInv !== this.tradingInv) {
+            // Don't allow interactions with things in chests
+            actions = getInventoryItemActions(hoverIndex)
+        }
 
         this.checkSetHotKey(hoverIndex, item, updateData)
 
@@ -593,12 +616,19 @@ export class InventoryDisplay extends Component {
     open({
         onClose = null,
         tradingInv = null,
-    }: { onClose?: () => void; tradingInv?: Inventory } = {}) {
+        donating = null,
+    }: {
+        onClose?: () => void
+        tradingInv?: Inventory
+        donating?: DonatingOptions
+    } = {}) {
         this.clearHeldStack()
         this.canAcceptInput = false
 
         this.onClose = onClose
         this.tradingInv = tradingInv
+        this.donatingOptions = donating
+
         const screenDimensions = Camera.instance.dimensions
         this.showingInv = true
 
@@ -675,7 +705,11 @@ export class InventoryDisplay extends Component {
                 if (!itemMeta) {
                     console.log(`missing item metadata for ${stack.item}`)
                 }
-                const c = itemMeta.inventoryIconSupplier().toComponent()
+                const color =
+                    !this.isDonating || this.donatingOptions.canDonate(stack)
+                        ? Color.WHITE
+                        : Color.RED_1
+                const c = itemMeta.inventoryIconSupplier(color).toComponent()
                 c.transform.depth = UI_SPRITE_DEPTH + 1
                 tile = this.displayEntity.addComponent(c)
                 tile.transform.position = this.getPositionForInventoryIndex(i, inv)

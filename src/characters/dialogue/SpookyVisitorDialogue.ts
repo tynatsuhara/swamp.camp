@@ -43,7 +43,7 @@ export const SPOOKY_VISITOR_DIALOGUE: DialogueSet = {
             InteractIndicator.NONE,
             new DialogueOption("Take a look", () => {
                 console.log("TODO: open trade window")
-                new NextDialogue(SPOOKY_VISITOR_STARTING_DIALOGUE, false)
+                return new NextDialogue(SPOOKY_VISITOR_STARTING_DIALOGUE, false)
             }),
             new DialogueOption(
                 "Back away",

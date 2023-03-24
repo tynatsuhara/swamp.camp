@@ -3,7 +3,9 @@ import { Item } from "../../items/Items"
 import { session } from "../../online/session"
 import { saveManager } from "../../SaveManager"
 import { CraftingMenu } from "../../ui/CraftingMenu"
+import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { InteractIndicator } from "../../ui/InteractIndicator"
+import { InventoryDisplay } from "../../ui/InventoryDisplay"
 import { Campfire } from "../../world/elements/Campfire"
 import { RestPoint } from "../../world/elements/RestPoint"
 import { TimeUnit } from "../../world/TimeUnit"
@@ -79,60 +81,70 @@ export const CAMPFIRE_DIALOGUES: DialogueSet = {
 
     [CAMPFIRE_ADD_LOGS]: (cf: Campfire) => {
         // the fire can be dead, almost dead, partially full, almost entirely full, or totally full
-        const logCount = cf.logs
-        const playerLogCount = player().inventory.getItemCount(Item.WOOD)
-        const logsYouCanAdd = Math.min(Campfire.LOG_CAPACITY - logCount, playerLogCount)
+        const getPlayerLogCount = () => player().inventory.getItemCount(Item.WOOD)
+        const getLogsYouCanAdd = () =>
+            Math.min(Campfire.LOG_CAPACITY - cf.logs, getPlayerLogCount())
         const exitOption = new DialogueOption(
             DialogueConstants.CANCEL_TEXT,
             () => new NextDialogue(CAMPFIRE_DIALOGUE, false)
         )
-        const hoursLeft = (logCount - 1) * Campfire.LOG_DURATION_HOURS
+        const initialLogCount = cf.logs
 
-        const completeDialogue = (logsTransferred: number) => {
-            return () => {
-                cf.addLogs(logsTransferred)
-                // cf.addLogs(logsTransferred)
-                return new NextDialogue(CAMPFIRE_DIALOGUE, false)
-            }
-        }
-
-        if (logsYouCanAdd === 0) {
+        if (getLogsYouCanAdd() === 0) {
             return dialogueWithOptions(
                 [
-                    playerLogCount === 0
+                    getPlayerLogCount() === 0
                         ? "You don't have any more logs to add to the fire."
                         : "Adding any more logs to the fire would be dangerous.",
                 ],
                 InteractIndicator.NONE,
                 exitOption
             )
-        } else if (logsYouCanAdd === 1) {
-            return dialogueWithOptions(
-                [
-                    playerLogCount === 1
-                        ? "You only have one log to add to the fire."
-                        : "The fire is almost too big.",
-                ],
-                InteractIndicator.NONE,
-                new DialogueOption("Add one log", completeDialogue(1)),
-                exitOption
-            )
         }
 
         let prompt: string
-        if (logCount === 1) {
+        if (cf.logs === 1) {
             prompt = `The fire will go out soon.`
-        } else if (logCount === 0) {
+        } else if (cf.logs === 0) {
             prompt = `Add logs to ignite the fire?`
         } else {
-            prompt = `The fire will burn for at least ${hoursLeft} more hours.`
+            prompt = `The fire will burn for at least ${
+                (cf.logs - 1) * Campfire.LOG_DURATION_HOURS
+            } more hours.`
         }
 
-        const options = [
-            new DialogueOption(`Add ${logsYouCanAdd} logs`, completeDialogue(logsYouCanAdd)),
-            new DialogueOption("Add one log", completeDialogue(1)),
-        ]
+        const showUpdatedInfo = () => {
+            // pass the logs fields of the campfire but make it go straight to this dialogue stage
+            if (cf.logs !== initialLogCount) {
+                // RAF to prevent bad input (eg the close inv input closing the dialogue)
+                requestAnimationFrame(() => {
+                    DialogueDisplay.instance.startDialogue({
+                        ...cf,
+                        dialogue: CAMPFIRE_ADD_LOGS,
+                    })
+                })
+            }
+        }
 
-        return dialogueWithOptions([prompt], InteractIndicator.NONE, ...options, exitOption)
+        const addLogsOption = new DialogueOption(`Add logs`, () => {
+            InventoryDisplay.instance.open({
+                donating: {
+                    canDonate: (stack) =>
+                        stack.item === Item.WOOD && cf.logs < Campfire.LOG_CAPACITY,
+                    onDonate: () => {
+                        cf.addLogs(1)
+                        if (getLogsYouCanAdd() === 0) {
+                            InventoryDisplay.instance.close()
+                            showUpdatedInfo()
+                        }
+                    },
+                    verb: "add to fire",
+                },
+                onClose: showUpdatedInfo,
+            })
+            return new NextDialogue(CAMPFIRE_DIALOGUE, false)
+        })
+
+        return dialogueWithOptions([prompt], InteractIndicator.NONE, addLogsOption, exitOption)
     },
 }
