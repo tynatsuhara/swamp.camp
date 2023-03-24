@@ -1418,15 +1418,22 @@ export class Dude extends Component implements DialogueSource {
         const frames = [3, 8, 11, 12, 13, 14, 12, 9, 3]
         this.jumpingAnimator = new Animator(
             Lists.repeat(frames.length, [40]),
-            (i) => (this.jumpingOffset = frames[i]),
+            (i) => {
+                if (this.isAlive) {
+                    this.jumpingOffset = frames[i]
+                }
+            },
             () => {
-                StepSounds.singleFootstepSound(this, 3)
-                this.entity.getComponent(WalkingParticles).land()
                 this.isJumping = false
                 this.wasJumping = true
                 this.animationDirty = true
                 this.jumpingAnimator = undefined
                 this.jumpingOffset = 0
+                if (!this.isAlive) {
+                    return
+                }
+                StepSounds.singleFootstepSound(this, 3)
+                this.entity.getComponent(WalkingParticles).land()
                 this.updateAnimationFromMovement(Point.ZERO)
                 if (this === player()) {
                     controls.vibrate({
