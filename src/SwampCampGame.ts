@@ -1,5 +1,6 @@
 import { debug, Game } from "brigsby/dist"
-import { cleanUpSession as cleanUpExistingSession } from "./online/syncGame"
+import { Dude } from "./characters/Dude"
+import { cleanUpSession } from "./online/syncGame"
 import { GameScene } from "./scenes/GameScene"
 import { MainMenuScene } from "./scenes/MainMenuScene"
 
@@ -32,6 +33,9 @@ export class SwampCampGame extends Game {
     loadMainMenu() {
         this.scene = this.mainMenuScene
         this.mainMenuScene.reset()
-        cleanUpExistingSession()
+
+        // clean up stuff
+        cleanUpSession()
+        Dude.clearLookupCache()
     }
 }

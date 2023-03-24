@@ -116,7 +116,6 @@ export const guestOnJoin = () => {
 }
 
 export const cleanUpSession = () => {
-    Dude.clearLookupCache()
     session.close()
     session.hostId = undefined
     session.initializedPeers = []
