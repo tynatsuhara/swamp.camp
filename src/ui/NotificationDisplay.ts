@@ -6,6 +6,7 @@ import { Camera } from "../cutscenes/Camera"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Icon } from "../graphics/OneBitTileset"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { newUUID } from "../saves/uuid"
 import { Singletons } from "../Singletons"
 import { Color } from "./Color"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
@@ -141,6 +142,8 @@ export class NotificationDisplay extends Component {
             strongMagnitude: 0,
             weakMagnitude: 0.5,
         })
+        // every notification should have an ID
+        notification.id ??= newUUID()
         const component = new NotificationComponent(notification)
         this.notifications.push(component)
         // make sure awake() gets called after the notifications array is updated
