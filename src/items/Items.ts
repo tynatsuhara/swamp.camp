@@ -17,6 +17,7 @@ import { getIconSprite } from "../ui/IconSprite"
 import { ElementType } from "../world/elements/Elements"
 import { here } from "../world/locations/LocationManager"
 import { DroppedItem } from "./DroppedItem"
+import { ItemStack } from "./Inventory"
 import { ItemUtils } from "./ItemUtils"
 import { getTentVariantImageFilter } from "./TentVariants"
 
@@ -91,6 +92,7 @@ export type ItemMetadata = Record<string, any>
 
 export class ItemSpec {
     readonly displayName: string
+    readonly displayNameSupplier?: (stack: ItemStack) => string
     readonly droppedIconSupplier?: (metadata?: ItemMetadata) => SpriteSource
     readonly inventoryIcon: Icon
     readonly stackLimit: number
@@ -101,6 +103,7 @@ export class ItemSpec {
 
     constructor({
         displayName,
+        displayNameSupplier,
         inventoryIcon,
         droppedIconSupplier = () => null,
         stackLimit = STACK_LG,
@@ -110,6 +113,7 @@ export class ItemSpec {
         consumable = null,
     }: {
         displayName: string
+        displayNameSupplier?: (stack: ItemStack) => string
         inventoryIcon: Icon
         droppedIconSupplier?: (metadata?: ItemMetadata) => SpriteSource
         stackLimit?: number
@@ -119,6 +123,7 @@ export class ItemSpec {
         consumable?: Consumable
     }) {
         this.displayName = displayName
+        this.displayNameSupplier = displayNameSupplier
         this.droppedIconSupplier = droppedIconSupplier
         this.inventoryIcon = inventoryIcon
         this.stackLimit = stackLimit
@@ -336,6 +341,11 @@ export const ITEM_METADATA_MAP = {
     }),
     [Item.LANTERN]: new ItemSpec({
         displayName: "Lantern",
+        displayNameSupplier: (stack) => {
+            const fuel = stack.metadata.fuel
+            if (!fuel) return `Lantern`
+            return `Lantern (${fuel})`
+        },
         inventoryIcon: "lantern",
         stackLimit: 1,
         equippableShield: ShieldType.LANTERN,

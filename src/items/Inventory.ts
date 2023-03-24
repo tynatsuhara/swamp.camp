@@ -37,7 +37,8 @@ export class ItemStack {
 
     stackString() {
         const count = this.count > 1 ? " x" + this.count : ""
-        return ITEM_METADATA_MAP[this.item].displayName + count
+        const metadata = ITEM_METADATA_MAP[this.item]
+        return (metadata.displayNameSupplier?.(this) ?? metadata.displayName) + count
     }
 }
 
