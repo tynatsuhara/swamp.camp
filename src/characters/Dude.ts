@@ -606,14 +606,6 @@ export class Dude extends Component implements DialogueSource {
     readonly setWeapon: (type: WeaponType, invIndex: number) => void
     readonly setShield: (type: ShieldType, invIndex: number) => void
 
-    unequipWeapon() {
-        this.setWeapon(WeaponType.UNARMED, -1)
-    }
-
-    unequipShield() {
-        this.setShield(ShieldType.NONE, -1)
-    }
-
     setWeaponAndShieldDrawn(drawn: boolean) {
         this._weapon?.setSheathed(!drawn)
         this._shield?.setOnBack(!drawn)

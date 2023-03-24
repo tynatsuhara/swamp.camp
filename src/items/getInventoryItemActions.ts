@@ -1,6 +1,8 @@
 import { Point } from "brigsby/dist/Point"
 import { Dude } from "../characters/Dude"
 import { player } from "../characters/player/index"
+import { ShieldType } from "../characters/weapons/ShieldType"
+import { WeaponType } from "../characters/weapons/WeaponType"
 import { session } from "../online/session"
 import { clientSyncFn } from "../online/syncUtils"
 import { DonatingOptions, InventoryDisplay } from "../ui/InventoryDisplay"
@@ -68,7 +70,7 @@ export const getInventoryItemActions = (playerInvIndex: number): ItemAction[] =>
             actions.push({
                 verb: "unequip",
                 actionFn: () => {
-                    player().unequipWeapon() // client sync fn
+                    player().setWeapon(WeaponType.UNARMED, -1) // client sync fn
                     InventoryDisplay.instance.refreshView()
                 },
             })
@@ -88,7 +90,7 @@ export const getInventoryItemActions = (playerInvIndex: number): ItemAction[] =>
             actions.push({
                 verb: "unequip",
                 actionFn: () => {
-                    player().unequipShield() // client sync fn
+                    player().setShield(ShieldType.NONE, -1) // client sync fn
                     InventoryDisplay.instance.refreshView()
                 },
             })
