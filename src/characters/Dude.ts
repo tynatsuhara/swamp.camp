@@ -338,7 +338,7 @@ export class Dude extends Component implements DialogueSource {
                 setWeapon(type)
 
                 // update equipped flag in inventory
-                if (session.isHost() && invIndex > -1) {
+                if (session.isHost()) {
                     const currentWeaponIndex = this.inventory.findIndex(
                         (s) => s?.metadata?.equipped === "weapon"
                     )
@@ -350,7 +350,12 @@ export class Dude extends Component implements DialogueSource {
                                 .withMetadata({ equipped: undefined })
                         )
                     }
-                    this.inventory.setStack(invIndex, stack.withMetadata({ equipped: "weapon" }))
+                    if (invIndex > -1) {
+                        this.inventory.setStack(
+                            invIndex,
+                            stack.withMetadata({ equipped: "weapon" })
+                        )
+                    }
                 }
             }
         )
@@ -382,7 +387,7 @@ export class Dude extends Component implements DialogueSource {
                 setShield(type)
 
                 // update equipped flag in inventory
-                if (session.isHost() && invIndex > -1) {
+                if (session.isHost()) {
                     const currentShieldIndex = this.inventory.findIndex(
                         (s) => s?.metadata?.equipped === "shield"
                     )
@@ -394,7 +399,12 @@ export class Dude extends Component implements DialogueSource {
                                 .withMetadata({ equipped: undefined })
                         )
                     }
-                    this.inventory.setStack(invIndex, stack.withMetadata({ equipped: "shield" }))
+                    if (invIndex > -1) {
+                        this.inventory.setStack(
+                            invIndex,
+                            stack.withMetadata({ equipped: "shield" })
+                        )
+                    }
                 }
             }
         )
@@ -605,6 +615,14 @@ export class Dude extends Component implements DialogueSource {
     // client sync functions
     readonly setWeapon: (type: WeaponType, invIndex: number) => void
     readonly setShield: (type: ShieldType, invIndex: number) => void
+
+    unequipWeapon() {
+        this.setWeapon(WeaponType.UNARMED, -1)
+    }
+
+    unequipShield() {
+        this.setShield(ShieldType.NONE, -1)
+    }
 
     setWeaponAndShieldDrawn(drawn: boolean) {
         this._weapon?.setSheathed(!drawn)

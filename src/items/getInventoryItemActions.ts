@@ -55,24 +55,44 @@ export const getInventoryItemActions = (playerInvIndex: number): ItemAction[] =>
     const wl = here()
     const actions: ItemAction[] = []
 
-    if (item.equippableWeapon && !stack.metadata.equipped) {
-        actions.push({
-            verb: "equip",
-            actionFn: () => {
-                player().setWeapon(item.equippableWeapon, playerInvIndex) // client sync fn
-                InventoryDisplay.instance.refreshView()
-            },
-        })
+    if (item.equippableWeapon) {
+        if (!stack.metadata.equipped) {
+            actions.push({
+                verb: "equip",
+                actionFn: () => {
+                    player().setWeapon(item.equippableWeapon, playerInvIndex) // client sync fn
+                    InventoryDisplay.instance.refreshView()
+                },
+            })
+        } else {
+            actions.push({
+                verb: "unequip",
+                actionFn: () => {
+                    player().unequipWeapon() // client sync fn
+                    InventoryDisplay.instance.refreshView()
+                },
+            })
+        }
     }
 
-    if (item.equippableShield && !stack.metadata.equipped) {
-        actions.push({
-            verb: "equip off-hand",
-            actionFn: () => {
-                player().setShield(item.equippableShield, playerInvIndex) // client sync fn
-                InventoryDisplay.instance.refreshView()
-            },
-        })
+    if (item.equippableShield) {
+        if (!stack.metadata.equipped) {
+            actions.push({
+                verb: "equip off-hand",
+                actionFn: () => {
+                    player().setShield(item.equippableShield, playerInvIndex) // client sync fn
+                    InventoryDisplay.instance.refreshView()
+                },
+            })
+        } else {
+            actions.push({
+                verb: "unequip",
+                actionFn: () => {
+                    player().unequipShield() // client sync fn
+                    InventoryDisplay.instance.refreshView()
+                },
+            })
+        }
     }
 
     if (
