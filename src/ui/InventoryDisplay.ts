@@ -28,7 +28,7 @@ import {
     ItemAction,
 } from "../items/getInventoryItemActions"
 import { Inventory, ItemStack } from "../items/Inventory"
-import { ItemMetadata, ItemSpec, ITEM_METADATA_MAP } from "../items/Items"
+import { Item, ItemMetadata, ItemSpec, ITEM_METADATA_MAP } from "../items/Items"
 import { clientSyncFn } from "../online/syncUtils"
 import { saveManager } from "../SaveManager"
 import { Singletons } from "../Singletons"
@@ -508,6 +508,9 @@ export class InventoryDisplay extends Component {
             [controls.getInventoryOptionOneString(), () => controls.isInventoryOptionOneDown()],
             [controls.getInventoryOptionTwoString(), () => controls.isInventoryOptionTwoDown()],
         ]
+        if (actions.length > interactButtonOrder.length) {
+            throw new Error(`too many actions for item ${Item[stack.item]}`)
+        }
 
         this.hoverTooltipString = [
             hotKeyPrefix,
