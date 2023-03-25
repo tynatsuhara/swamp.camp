@@ -1,6 +1,7 @@
 import { Point, UpdateData } from "brigsby/dist"
 import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
 import { TILE_SIZE } from "../../graphics/Tilesets"
+import { Item } from "../../items/Item"
 import { LightManager } from "../../world/LightManager"
 import { here } from "../../world/locations/LocationManager"
 import { Shield } from "./Shield"
@@ -36,9 +37,8 @@ export class Lantern extends Shield {
     }
 
     private burn(duration: number) {
-        // TODO: Figure out fuel consumption and refueling UX in inventory
         const [invStack, stackIndex] = this.dude.inventory.find(
-            (s) => s?.metadata.equipped === "shield"
+            (s) => s?.item === Item.LANTERN && s?.metadata.equipped === "shield"
         )
 
         this.dude.inventory.setStack(

@@ -1,3 +1,4 @@
+import { expose } from "brigsby/dist"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { WeaponType } from "../characters/weapons/WeaponType"
 
@@ -56,3 +57,5 @@ export enum Item {
     LANTERN,
     TORCH,
 }
+
+expose({ Item })

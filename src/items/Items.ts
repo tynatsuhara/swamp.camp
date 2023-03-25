@@ -1,4 +1,4 @@
-import { expose, Point } from "brigsby/dist"
+import { Point } from "brigsby/dist"
 import { Collider } from "brigsby/dist/collision"
 import { PointValue, pt } from "brigsby/dist/Point"
 import { SpriteSource } from "brigsby/dist/sprites"
@@ -22,8 +22,6 @@ import { ItemStack } from "./Inventory"
 import { Item } from "./Item"
 import { ItemUtils } from "./ItemUtils"
 import { getTentVariantImageFilter } from "./TentVariants"
-
-expose({ Item })
 
 // stack limits for consistency
 const STACK_LG = 99

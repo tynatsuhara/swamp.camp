@@ -21,7 +21,7 @@ import { ElementType } from "./Elements"
 import { Interactable } from "./Interactable"
 
 type SaveData = {
-    id: string // TODO
+    id: string // MPTODO
     on: boolean
     fuel: number
 }
