@@ -461,6 +461,8 @@ export class InventoryDisplay extends Component {
                 return
             }
 
+            // TODO: BUG: picking up and dropping an equipped item will unequip it (because we removed onAdd PlayerInventory hook)
+
             const setInvStack = (inv: Inventory, stackIdx: number, stack: ItemStack) => {
                 const newMetadata = { ...stack.metadata }
                 if (invB !== dudeInv) {
