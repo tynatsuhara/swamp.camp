@@ -6,7 +6,7 @@ import { syncFn } from "../online/syncUtils"
 import { saveManager } from "../SaveManager"
 import { InventoryDisplay } from "../ui/InventoryDisplay"
 import { Notification, NotificationDisplay } from "../ui/NotificationDisplay"
-import { Inventory, ItemStackMetadata } from "./Inventory"
+import { Inventory, ItemStack, ItemStackMetadata } from "./Inventory"
 import { Item, ITEM_METADATA_MAP } from "./Items"
 
 type SpecialItem = {
@@ -89,17 +89,34 @@ export class PlayerInventory extends Inventory {
         return SPECIAL_ITEMS[item]?.noInventorySlot || super.canAddItem(item, count, metadata)
     }
 
-    removeItemAtIndex(index: number, amountToRemove = 1): void {
-        const beforeRemoval = this.getStack(index)
-        super.removeItemAtIndex(index, amountToRemove)
-        const afterRemoval = this.getStack(index)
+    setStack(index: number, stack: Pick<ItemStack, "item" | "count" | "metadata">): void {
+        const beforeUpdate = this.getStack(index)
+        super.setStack(index, stack)
+        const afterUpdate = this.getStack(index)
 
-        if (!afterRemoval) {
-            const equipped = beforeRemoval?.metadata?.equipped
+        // unequip
+        if (beforeUpdate?.metadata?.equipped && !afterUpdate?.metadata?.equipped) {
+            const equipped = beforeUpdate.metadata.equipped
             if (equipped === "weapon") {
                 Dude.get(this.playerUUID).setWeapon(WeaponType.UNARMED, -1)
             } else if (equipped === "shield") {
                 Dude.get(this.playerUUID).setShield(ShieldType.NONE, -1)
+            }
+        }
+
+        // equip
+        if (afterUpdate?.metadata?.equipped && !beforeUpdate?.metadata?.equipped) {
+            const equipped = afterUpdate.metadata.equipped
+            if (equipped === "weapon") {
+                Dude.get(this.playerUUID).setWeapon(
+                    ITEM_METADATA_MAP[stack.item].equippableWeapon,
+                    index
+                )
+            } else if (equipped === "shield") {
+                Dude.get(this.playerUUID).setShield(
+                    ITEM_METADATA_MAP[stack.item].equippableShield,
+                    index
+                )
             }
         }
     }

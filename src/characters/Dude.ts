@@ -342,11 +342,11 @@ export class Dude extends Component implements DialogueSource {
                 // update equipped flag in inventory
                 if (session.isHost()) {
                     this.inventory.getStacks().forEach((s, index) => {
-                        if (s?.metadata?.equipped === "weapon") {
+                        if (index !== invIndex && s?.metadata?.equipped === "weapon") {
                             this.inventory.setStack(index, s.withMetadata({ equipped: undefined }))
                         }
                     })
-                    if (invIndex > -1) {
+                    if (invIndex > -1 && stack?.metadata?.equipped !== "weapon") {
                         this.inventory.setStack(
                             invIndex,
                             stack.withMetadata({ equipped: "weapon" })
@@ -385,11 +385,11 @@ export class Dude extends Component implements DialogueSource {
                 // update equipped flag in inventory
                 if (session.isHost()) {
                     this.inventory.getStacks().forEach((s, index) => {
-                        if (s?.metadata?.equipped === "shield") {
+                        if (index !== invIndex && s?.metadata?.equipped === "shield") {
                             this.inventory.setStack(index, s.withMetadata({ equipped: undefined }))
                         }
                     })
-                    if (invIndex > -1) {
+                    if (invIndex > -1 && stack?.metadata?.equipped !== "shield") {
                         this.inventory.setStack(
                             invIndex,
                             stack.withMetadata({ equipped: "shield" })
