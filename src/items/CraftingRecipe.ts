@@ -4,7 +4,7 @@ import { ROCKS_NEEDED_FOR_CAMPFIRE } from "../characters/dialogue/DipDialogue"
 import { Tilesets } from "../graphics/Tilesets"
 import { saveManager } from "../SaveManager"
 import { ItemStack } from "./Inventory"
-import { Item } from "./Items"
+import { Item } from "./Item"
 
 export type CraftingRecipe = {
     desc: String

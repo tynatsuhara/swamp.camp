@@ -1,4 +1,4 @@
-import { Item } from "../../items/Items"
+import { Item } from "../../items/Item"
 import { InteractIndicator } from "../../ui/InteractIndicator"
 import { SalePackage, TradeMenu } from "../../ui/TradeMenu"
 import { LocationType } from "../../world/locations/LocationType"

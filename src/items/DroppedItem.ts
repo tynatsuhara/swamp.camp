@@ -9,7 +9,8 @@ import { Dude } from "../characters/Dude"
 import { session } from "../online/session"
 import { syncFn } from "../online/syncUtils"
 import { here } from "../world/locations/LocationManager"
-import { Item, ItemMetadata, ITEM_METADATA_MAP } from "./Items"
+import { Item } from "./Item"
+import { ItemMetadata, ITEM_METADATA_MAP } from "./Items"
 
 // TODO: Find a better sound effect (this one isn't very audible)
 const PICK_UP_SOUNDS = loadAudio(

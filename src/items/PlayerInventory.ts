@@ -7,7 +7,8 @@ import { saveManager } from "../SaveManager"
 import { InventoryDisplay } from "../ui/InventoryDisplay"
 import { Notification, NotificationDisplay } from "../ui/NotificationDisplay"
 import { Inventory, ItemStack, ItemStackMetadata } from "./Inventory"
-import { Item, ITEM_METADATA_MAP } from "./Items"
+import { Item } from "./Item"
+import { ITEM_METADATA_MAP } from "./Items"
 
 type SpecialItem = {
     // If true, this item doesn't actually go in the inventory

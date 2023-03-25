@@ -1,6 +1,6 @@
 import { Component, UpdateData } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
-import { Item } from "../../items/Items"
+import { Item } from "../../items/Item"
 import { session } from "../../online/session"
 import { ElementType } from "../../world/elements/Elements"
 import { camp } from "../../world/locations/LocationManager"

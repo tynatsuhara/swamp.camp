@@ -1,6 +1,6 @@
 import { Component, debug, Point } from "brigsby/dist"
 import { TILE_SIZE } from "../../graphics/Tilesets"
-import { Item } from "../../items/Items"
+import { Item } from "../../items/Item"
 import { session } from "../../online/session"
 import { Ground } from "../../world/ground/Ground"
 import { LightManager } from "../../world/LightManager"

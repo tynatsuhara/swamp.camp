@@ -1,4 +1,4 @@
-import { Item } from "../../items/Items"
+import { Item } from "../../items/Item"
 import { saveManager } from "../../SaveManager"
 import { InteractIndicator } from "../../ui/InteractIndicator"
 import { TextIcon } from "../../ui/Text"

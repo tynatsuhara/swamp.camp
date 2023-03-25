@@ -1,4 +1,4 @@
-import { Item } from "../../items/Items"
+import { Item } from "../../items/Item"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { InteractIndicator } from "../../ui/InteractIndicator"
 import { InventoryDisplay } from "../../ui/InventoryDisplay"

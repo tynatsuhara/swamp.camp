@@ -1,5 +1,5 @@
 import { getCookingRecipes } from "../../items/CraftingRecipe"
-import { Item } from "../../items/Items"
+import { Item } from "../../items/Item"
 import { session } from "../../online/session"
 import { saveManager } from "../../SaveManager"
 import { CraftingMenu } from "../../ui/CraftingMenu"

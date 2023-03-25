@@ -1,6 +1,6 @@
 import { controls } from "../../Controls"
 import { getDipRecipes } from "../../items/CraftingRecipe"
-import { Item } from "../../items/Items"
+import { Item } from "../../items/Item"
 import { CraftingMenu } from "../../ui/CraftingMenu"
 import { InteractIndicator } from "../../ui/InteractIndicator"
 import { PLAYER_TENT_COLOR } from "../../world/buildings/Tent"

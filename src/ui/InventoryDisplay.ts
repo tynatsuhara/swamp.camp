@@ -28,7 +28,8 @@ import {
     ItemAction,
 } from "../items/getInventoryItemActions"
 import { Inventory, ItemStack } from "../items/Inventory"
-import { Item, ItemMetadata, ItemSpec, ITEM_METADATA_MAP } from "../items/Items"
+import { Item } from "../items/Item"
+import { ItemMetadata, ItemSpec, ITEM_METADATA_MAP } from "../items/Items"
 import { clientSyncFn } from "../online/syncUtils"
 import { saveManager } from "../SaveManager"
 import { Singletons } from "../Singletons"

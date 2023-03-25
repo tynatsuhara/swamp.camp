@@ -1,6 +1,7 @@
 import { Entity, Point } from "brigsby/dist"
 import { ItemStack } from "../../items/Inventory"
-import { Item, ItemMetadata } from "../../items/Items"
+import { Item } from "../../items/Item"
+import { ItemMetadata } from "../../items/Items"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementFactory } from "../elements/ElementFactory"
 import { ElementType } from "../elements/Elements"

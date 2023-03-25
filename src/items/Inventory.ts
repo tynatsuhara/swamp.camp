@@ -3,7 +3,8 @@ import { EquipmentSlot } from "../characters/Equipment"
 import { stringifySorted } from "../debug/JSON"
 import { syncFn } from "../online/syncUtils"
 import { InventoryDisplay } from "../ui/InventoryDisplay"
-import { Item, ItemMetadata, ITEM_METADATA_MAP } from "./Items"
+import { Item } from "./Item"
+import { ItemMetadata, ITEM_METADATA_MAP } from "./Items"
 
 export type ItemStackMetadata = ItemMetadata & {
     hotKey?: InputKey
