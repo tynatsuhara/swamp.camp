@@ -1,4 +1,5 @@
 import { Point, UpdateData } from "brigsby/dist"
+import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { LightManager } from "../../world/LightManager"
 import { here } from "../../world/locations/LocationManager"
@@ -10,12 +11,13 @@ import { ShieldType } from "./ShieldType"
  */
 export class Lantern extends Shield {
     static readonly DIAMETER = 100
+    private repeatedInvoker = new RepeatedInvoker(() => this.burn(500), 0)
 
     constructor() {
         super(ShieldType.LANTERN, "tool_lantern")
     }
 
-    update({ elapsedTimeMillis }: UpdateData) {
+    update(updateData: UpdateData) {
         const dims = this.dude.animation.transform.dimensions
         this.transform.position = new Point(dims.x / 2, dims.y)
             .plus(this.dude.getOffsetRelativeToAnimation())
@@ -30,15 +32,21 @@ export class Lantern extends Shield {
             Lantern.DIAMETER
         )
 
+        this.repeatedInvoker.update(updateData)
+    }
+
+    private burn(duration: number) {
         // TODO: Figure out fuel consumption and refueling UX in inventory
-        //     const [invStack, stackIndex] = this.dude.inventory.find(
-        //         (s) => s?.metadata.equipped === "shield"
-        //     )
-        //     // This doesn't really work because it triggers an inventory UI refresh :(
-        //     this.dude.inventory.setStack(
-        //         stackIndex,
-        //         invStack.withMetadata({ fuel: invStack.metadata.fuel - elapsedTimeMillis })
-        //     )
+        const [invStack, stackIndex] = this.dude.inventory.find(
+            (s) => s?.metadata.equipped === "shield"
+        )
+
+        this.dude.inventory.setStack(
+            stackIndex,
+            invStack.withMetadata({ fuel: invStack.metadata.fuel - duration })
+        )
+
+        return duration
     }
 
     delete() {

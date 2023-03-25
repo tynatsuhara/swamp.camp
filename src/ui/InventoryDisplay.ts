@@ -57,7 +57,7 @@ export class InventoryDisplay extends Component {
     private heldStackSprite: SpriteComponent // non-null when being dragged
 
     private readonly e: Entity = new Entity() // entity for this component
-    private displayEntity: Entity
+    private displayEntity: Entity // this will get destroyed when refreshed
     private lastMousPos: Point
     private stackSprites: SpriteComponent[] = []
     private showingInv = false
@@ -204,24 +204,25 @@ export class InventoryDisplay extends Component {
 
     refreshView() {
         // As long as what we're holding is a subset of the stack in the inventory, don't drop it!
+        // This prevents wonky behavior when two players are digging around in the same chest
         const { heldStackInventory, heldStackInvIndex, heldStack } = this
         const invStackPostUpdate = heldStackInventory?.getStack(heldStackInvIndex)
         const rePickUpItem =
             // we're currently holding something
-            this.heldStack &&
+            this.heldStack?.count > 0 &&
             // and the superset stack is still in the inventory
             invStackPostUpdate &&
-            // held stack should be a subset of the inventory stack
-            this.heldStack.count <= invStackPostUpdate.count &&
-            this.heldStack.count > 0 &&
-            // check that they're the same (other than count)
-            invStackPostUpdate.equals(this.heldStack.withCount(invStackPostUpdate.count))
+            // and they're the same item
+            invStackPostUpdate.item === heldStack.item
 
         // Open without changing any of the fields
         this._open(this.onClose, this.tradingInv, this.donatingOptions)
 
         if (rePickUpItem) {
-            this.setHeldStack(heldStackInventory, heldStackInvIndex, heldStack)
+            const newHeldStack = invStackPostUpdate.withCount(
+                Math.min(invStackPostUpdate.count, heldStack.count)
+            )
+            this.setHeldStack(heldStackInventory, heldStackInvIndex, newHeldStack)
         }
     }
 
@@ -242,9 +243,9 @@ export class InventoryDisplay extends Component {
         const stackSprite =
             this.stackSprites[index + (inv === this.playerInv ? 0 : this.playerInv.size)]
         // create a new sprite which is the "picked up" one
-        this.heldStackSprite = this.displayEntity.addComponent(
-            new SpriteComponent(stackSprite.sprite)
-        )
+        // we put it on the entity rather than DisplayEntity to prevent a flash when refreshing
+        // due to the new DisplayEntity not being rendered
+        this.heldStackSprite = this.entity.addComponent(new SpriteComponent(stackSprite.sprite))
         // center it on the mouse
         this.heldStackSprite.transform.position = controls.getMousePos().minus(pt(TILE_SIZE / 2))
         this.heldStackSprite.transform.depth = stackSprite.transform.depth
@@ -320,9 +321,9 @@ export class InventoryDisplay extends Component {
                 this.refreshView()
             }
         } else {
-            this.heldStackSprite.transform.position = this.heldStackSprite.transform.position.plus(
-                controls.getMousePos().minus(this.lastMousPos)
-            )
+            this.heldStackSprite.transform.position = controls
+                .getMousePos()
+                .minus(pt(TILE_SIZE / 2))
         }
     }
 
