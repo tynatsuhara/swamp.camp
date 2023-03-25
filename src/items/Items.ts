@@ -5,6 +5,7 @@ import { SpriteSource } from "brigsby/dist/sprites"
 import { loadAudio } from "../audio/DeferLoadAudio"
 import { Condition } from "../characters/Condition"
 import { Dude } from "../characters/Dude"
+import { EquipmentSlot, EquipmentType } from "../characters/Equipment"
 import { ShieldType } from "../characters/weapons/ShieldType"
 import { WeaponType } from "../characters/weapons/WeaponType"
 import { Icon } from "../graphics/OneBitTileset"
@@ -97,8 +98,13 @@ export class ItemSpec {
     readonly inventoryIcon: Icon
     readonly stackLimit: number
     readonly element?: ElementType
-    readonly equippableWeapon?: WeaponType
-    readonly equippableShield?: ShieldType
+    readonly equippable: { [E in EquipmentSlot]?: EquipmentType<E> } = {}
+    get equippableWeapon() {
+        return this.equippable.weapon
+    }
+    get equippableShield() {
+        return this.equippable.shield
+    }
     readonly consumable?: Consumable
 
     constructor({
@@ -128,8 +134,8 @@ export class ItemSpec {
         this.inventoryIcon = inventoryIcon
         this.stackLimit = stackLimit
         this.element = element
-        this.equippableWeapon = equippableWeapon
-        this.equippableShield = equippableShield
+        this.equippable.weapon = equippableWeapon
+        this.equippable.shield = equippableShield
         this.consumable = consumable
     }
 

@@ -50,6 +50,7 @@ import { DIP_ENTRYPOINT } from "./dialogue/DipDialogue"
 import { DudeAnimation } from "./DudeAnimation"
 import { DudeFaction } from "./DudeFactory"
 import { DudeType } from "./DudeType"
+import { EquipmentSlot, EquipmentType } from "./Equipment"
 import { NPC } from "./NPC"
 import { player } from "./player/index"
 import { ReadOnlyShield, Shield } from "./weapons/Shield"
@@ -313,8 +314,6 @@ export class Dude extends Component implements DialogueSource {
 
         // Synchronized client->host functions
 
-        // TODO: Generalize gear slots (lots of code overlap between weapons and shields)
-
         const setWeapon = (type: WeaponType) => {
             if (this.weaponType === type) {
                 return
@@ -323,38 +322,6 @@ export class Dude extends Component implements DialogueSource {
             this._weapon = this.entity.addComponent(WeaponFactory.make(type, this.type))
             this._shield?.setOnBack(false) // keep em in sync
         }
-        this.setWeapon = clientSyncFn(
-            this.syncId("eqw"),
-            "all",
-            ({ trusted, dudeUUID }, type: WeaponType, invIndex: number) => {
-                const stack = invIndex === -1 ? null : this.inventory.getStack(invIndex)
-                if (
-                    !trusted &&
-                    (this.uuid !== dudeUUID ||
-                        !this.inventory.getItemCount(type as unknown as Item) ||
-                        ITEM_METADATA_MAP[stack?.item]?.equippableWeapon !== type)
-                ) {
-                    return "reject"
-                }
-
-                setWeapon(type)
-
-                // update equipped flag in inventory
-                if (session.isHost()) {
-                    this.inventory.getStacks().forEach((s, index) => {
-                        if (index !== invIndex && s?.metadata?.equipped === "weapon") {
-                            this.inventory.setStack(index, s.withMetadata({ equipped: undefined }))
-                        }
-                    })
-                    if (invIndex > -1 && stack?.metadata?.equipped !== "weapon") {
-                        this.inventory.setStack(
-                            invIndex,
-                            stack.withMetadata({ equipped: "weapon" })
-                        )
-                    }
-                }
-            }
-        )
 
         const setShield = (type: ShieldType) => {
             if (this.shieldType === type) {
@@ -366,34 +333,42 @@ export class Dude extends Component implements DialogueSource {
                 this._shield?.setOnBack(true) // keep em in sync
             }
         }
-        this.setShield = clientSyncFn(
-            this.syncId("eqs"),
+
+        const slotEquipHanders: { [E in EquipmentSlot]: (t: EquipmentType<E>) => void } = {
+            weapon: setWeapon,
+            shield: setShield,
+        }
+
+        this.equip = clientSyncFn(
+            this.syncId("eqip"),
             "all",
-            ({ trusted, dudeUUID }, type: ShieldType, invIndex: number) => {
+            <E extends EquipmentSlot>(
+                { trusted, dudeUUID },
+                slot: E,
+                type: EquipmentType<E>,
+                invIndex: number
+            ) => {
                 const stack = invIndex === -1 ? null : this.inventory.getStack(invIndex)
                 if (
                     !trusted &&
                     (this.uuid !== dudeUUID ||
                         !this.inventory.getItemCount(type as unknown as Item) ||
-                        ITEM_METADATA_MAP[stack?.item]?.equippableShield !== type)
+                        ITEM_METADATA_MAP[stack?.item]?.equippable[slot] !== type)
                 ) {
                     return "reject"
                 }
 
-                setShield(type)
+                slotEquipHanders[slot]?.(type)
 
                 // update equipped flag in inventory
                 if (session.isHost()) {
                     this.inventory.getStacks().forEach((s, index) => {
-                        if (index !== invIndex && s?.metadata?.equipped === "shield") {
+                        if (index !== invIndex && s?.metadata?.equipped === slot) {
                             this.inventory.setStack(index, s.withMetadata({ equipped: undefined }))
                         }
                     })
-                    if (invIndex > -1 && stack?.metadata?.equipped !== "shield") {
-                        this.inventory.setStack(
-                            invIndex,
-                            stack.withMetadata({ equipped: "shield" })
-                        )
+                    if (invIndex > -1 && stack?.metadata?.equipped !== slot) {
+                        this.inventory.setStack(invIndex, stack.withMetadata({ equipped: slot }))
                     }
                 }
             }
@@ -602,9 +577,20 @@ export class Dude extends Component implements DialogueSource {
         }
     }
 
-    // client sync functions
-    readonly setWeapon: (type: WeaponType, invIndex: number) => void
-    readonly setShield: (type: ShieldType, invIndex: number) => void
+    // client sync function
+    private readonly equip: <E extends EquipmentSlot>(
+        slot: E,
+        type: EquipmentType<E>,
+        invIndex: number
+    ) => void
+
+    setWeapon(type: WeaponType, invIndex: number) {
+        this.equip("weapon", type, invIndex)
+    }
+
+    setShield(type: ShieldType, invIndex: number) {
+        this.equip("shield", type, invIndex)
+    }
 
     setWeaponAndShieldDrawn(drawn: boolean) {
         this._weapon?.setSheathed(!drawn)

@@ -1,4 +1,5 @@
 import { InputKey } from "brigsby/dist"
+import { EquipmentSlot } from "../characters/Equipment"
 import { stringifySorted } from "../debug/JSON"
 import { syncFn } from "../online/syncUtils"
 import { InventoryDisplay } from "../ui/InventoryDisplay"
@@ -6,7 +7,7 @@ import { Item, ItemMetadata, ITEM_METADATA_MAP } from "./Items"
 
 export type ItemStackMetadata = ItemMetadata & {
     hotKey?: InputKey
-    equipped?: "weapon" | "shield" | undefined
+    equipped?: EquipmentSlot | undefined
 }
 
 export class ItemStack {
