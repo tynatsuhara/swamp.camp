@@ -82,7 +82,6 @@ export class InventoryDisplay extends Component {
         )
     }
 
-    private canAcceptInput: boolean
     private offset: Point
     private tooltip: Tooltip
     private readonly coinsOffset = new Point(-1, -18)
@@ -147,10 +146,6 @@ export class InventoryDisplay extends Component {
         }
 
         this.updateTooltip()
-
-        // Because we use lateUpdate, it's possible a user just opened this (eg opened a chest)
-        // We need to prevent double input on a single frame. All input-checking should include this field.
-        this.canAcceptInput = true
     }
 
     private updateTooltip() {
@@ -175,9 +170,6 @@ export class InventoryDisplay extends Component {
     }
 
     private checkSetHotKey(index: number, spec: ItemSpec, updateData: UpdateData) {
-        if (!this.canAcceptInput) {
-            return
-        }
         if (!spec.equippableWeapon && !spec.equippableShield) {
             return
         }
@@ -226,11 +218,7 @@ export class InventoryDisplay extends Component {
             invStackPostUpdate.equals(this.heldStack.withCount(invStackPostUpdate.count))
 
         // Open without changing any of the fields
-        this.open({
-            onClose: this.onClose,
-            tradingInv: this.tradingInv,
-            donating: this.donatingOptions,
-        })
+        this._open(this.onClose, this.tradingInv, this.donatingOptions)
 
         if (rePickUpItem) {
             this.setHeldStack(heldStackInventory, heldStackInvIndex, heldStack)
@@ -265,10 +253,6 @@ export class InventoryDisplay extends Component {
     }
 
     private checkDragAndDrop(hoverInv: Inventory, hoverIndex: number) {
-        if (!this.canAcceptInput) {
-            return
-        }
-
         // dragging
         const dropFullStack = controls.isInventoryStackPickUpOrDrop()
         const dropOne = controls.isInventoryStackPickUpHalfOrDropOne()
@@ -534,7 +518,7 @@ export class InventoryDisplay extends Component {
 
         profiler.showInfo(`item metadata: ${prettyPrint(stack.metadata)}`)
 
-        if (this.canUseItems && this.canAcceptInput) {
+        if (this.canUseItems) {
             actions.forEach((action, i) => {
                 if (interactButtonOrder[i][1]()) {
                     action.actionFn()
@@ -544,10 +528,6 @@ export class InventoryDisplay extends Component {
     }
 
     private checkForPickUp(hoverInv: Inventory, hoverIndex: number) {
-        if (!this.canAcceptInput) {
-            return
-        }
-
         const isPickUp = controls.isInventoryStackPickUpOrDrop()
         const isPickUpHalf = controls.isInventoryStackPickUpHalfOrDropOne()
         const isSwap = controls.isInventorySwap()
@@ -624,12 +604,16 @@ export class InventoryDisplay extends Component {
         tradingInv?: Inventory
         donating?: DonatingOptions
     } = {}) {
+        // RAF to prevent accepting input in lateUpdate on the same frame that input opened the inventory
+        requestAnimationFrame(() => this._open(onClose, tradingInv, donating))
+    }
+
+    private _open(onClose?: () => void, tradingInv?: Inventory, donatingOptions?: DonatingOptions) {
         this.clearHeldStack()
-        this.canAcceptInput = false
 
         this.onClose = onClose
         this.tradingInv = tradingInv
-        this.donatingOptions = donating
+        this.donatingOptions = donatingOptions
 
         const screenDimensions = Camera.instance.dimensions
         this.showingInv = true
