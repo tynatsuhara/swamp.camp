@@ -20,7 +20,6 @@ export class Shield extends Simulatable {
 
     private offsetFromCenter: Point
     private state: State = State.DRAWN
-    // private slashSprite: TileComponent  // TODO try adding particles when someone hits a blocking shield
     private blockingActive = false
     private raisedPerc = 0 // for animation
     private timeToRaiseMs = 120
