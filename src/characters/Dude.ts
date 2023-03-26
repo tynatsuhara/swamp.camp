@@ -1486,21 +1486,37 @@ export class Dude extends Component implements DialogueSource {
         return this.getOffsetRelativeToAnimation().plus(offset)
     }
 
-    getOffsetRelativeToAnimation(): Point {
+    getGearAnimationOffset(fixed = false): Point {
+        const offset = new Point(0, -this.jumpingOffset)
+        return this.getGearOffsetRelativeToAnimation(fixed).plus(offset)
+    }
+
+    /**
+     * @param fixed whether or not the gear is fixed or bouncy
+     * @returns a position aligned with the animation, potentially with a little bit of skewed bounce
+     */
+    getGearOffsetRelativeToAnimation(fixed: boolean) {
+        if (this.isJumping || fixed) {
+            return this.getOffsetRelativeToAnimation()
+        }
+
+        // magic based on the animations
+        const frames = this.isMoving ? [-1, -3, -2, 0] : [0, 1, 1, 0]
+        return new Point(0, frames[this.animation.currentFrame()])
+    }
+
+    /**
+     * @returns A position perfectly aligned with the animation
+     */
+    private getOffsetRelativeToAnimation(): Point {
         if (this.isJumping) {
             // The jumping animation is a single static frame
             return new Point(0, -5)
         }
 
         // magic based on the animations
-        const f = this.animation.currentFrame()
-        let arr: number[]
-        if (!this.isMoving) {
-            arr = [0, 1, 2, 1]
-        } else {
-            arr = [-1, -2, -1, 0]
-        }
-        return new Point(0, arr[f])
+        const frames = this.isMoving ? [-1, -2, -1, 0] : [0, 1, 2, 1]
+        return new Point(0, frames[this.animation.currentFrame()])
     }
 
     save(): DudeSaveState {

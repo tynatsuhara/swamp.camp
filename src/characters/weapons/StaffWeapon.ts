@@ -66,7 +66,7 @@ export class StaffWeapon extends Weapon {
         this.targetAnimator.update(updateData.elapsedTimeMillis)
 
         this.weaponTransform.position = offset
-            .plus(this.dude.getOffsetRelativeToAnimation())
+            .plus(this.dude.getGearOffsetRelativeToAnimation(this.isSheathed()))
             .plus(StaffWeapon.STAFF_ANIMATION[this.currentAnimationFrame])
     }
 

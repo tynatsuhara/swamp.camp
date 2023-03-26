@@ -74,7 +74,7 @@ export class Shield extends Simulatable {
             }
         }
 
-        pos = pos.plus(this.dude.getOffsetRelativeToAnimation())
+        pos = pos.plus(this.dude.getGearOffsetRelativeToAnimation(this.state === State.ON_BACK))
 
         this.transform.position = pos
         this.transform.depth = this.raisedPerc > 0.7 ? 0.75 : -0.75

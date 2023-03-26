@@ -31,7 +31,8 @@ export abstract class MeleeAnimation {
      */
     protected getFrameBase(
         angle: number,
-        offset: Point = Point.ZERO
+        offset: Point = Point.ZERO,
+        fixed = false
     ): { sprite: StaticSpriteSource; transform: SpriteTransform } {
         const { sprite, position } = this.spriteCache.get(angle)
         const transform = SpriteTransform.new({
@@ -42,7 +43,7 @@ export abstract class MeleeAnimation {
                 .plus(position)
                 .plus(this.spec.offsetFromCenter)
                 .plus(offset)
-                .plus(this.dude.getOffsetRelativeToAnimation())
+                .plus(this.dude.getGearOffsetRelativeToAnimation(fixed))
                 .apply(Math.round),
             // .minus(pt(sprite.dimensions.x / 2, sprite.dimensions.y)),
             dimensions: sprite.dimensions,

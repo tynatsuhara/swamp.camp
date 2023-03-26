@@ -1,5 +1,5 @@
 import { Point, pt, UpdateData } from "brigsby/dist"
-import { ImageFilter, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
+import { ImageFilter } from "brigsby/dist/sprites"
 import { Tilesets } from "../../graphics/Tilesets"
 import { session } from "../../online/session"
 import { Dude } from "../Dude"
@@ -145,25 +145,5 @@ export class MeleeWeapon extends Weapon {
         } else if (this.state === State.ATTACKING) {
             return this.attackAnim
         }
-    }
-
-    private getSpriteAndTransform(
-        angle: number,
-        offset = Point.ZERO
-    ): {
-        sprite: StaticSpriteSource
-        transform: SpriteTransform
-    } {
-        const { sprite, position } = spriteCaches[this.spec.spriteId].get(angle)
-        const transform = new SpriteTransform(
-            // convert from "bottom center" to "top left" for the relative sprite
-            pt(this.dude.animation.sprite.dimensions.x / 2, this.dude.animation.sprite.dimensions.y)
-                .plus(position)
-                .plus(offset)
-                .plus(this.dude.getOffsetRelativeToAnimation())
-                .apply(Math.round),
-            sprite.dimensions
-        ).relativeTo(this.dude.animation.transform)
-        return { sprite, transform }
     }
 }

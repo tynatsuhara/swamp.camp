@@ -68,7 +68,7 @@ export class SpearWeapon extends Weapon {
                 .plus(position)
                 .plus(this.offsetFromCenter)
                 .plus(offset)
-                .plus(this.dude.getOffsetRelativeToAnimation())
+                .plus(this.dude.getGearOffsetRelativeToAnimation(this.isSheathed()))
                 .apply(Math.round),
             sprite.dimensions
         ).relativeTo(this.dude.animation.transform)

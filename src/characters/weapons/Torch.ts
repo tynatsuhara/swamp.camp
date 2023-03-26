@@ -52,7 +52,7 @@ export class Torch extends Shield {
         const dims = this.dude.animation.transform.dimensions
 
         let newPos = new Point(dims.x / 2, dims.y)
-            .plus(this.dude.getOffsetRelativeToAnimation())
+            .plus(this.dude.getGearOffsetRelativeToAnimation(false))
             .minus(new Point(-4, 18))
 
         if (this.burning) {
@@ -79,7 +79,9 @@ export class Torch extends Shield {
         LightManager.instance.addLight(
             here(),
             this,
-            this.dude.standingPosition.plusY(-TILE_SIZE / 2).plus(this.dude.getAnimationOffset()),
+            this.dude.standingPosition
+                .plusY(-TILE_SIZE / 2)
+                .plus(this.dude.getGearAnimationOffset()),
             diameter
         )
 
