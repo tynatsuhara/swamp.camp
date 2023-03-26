@@ -21,7 +21,8 @@ import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
 import { Interactable } from "./Interactable"
 
-const FUEL_MAX = TimeUnit.HOUR * 24
+const FUEL_MAX_HOURS = 24
+const FUEL_MAX = TimeUnit.HOUR * FUEL_MAX_HOURS
 const FUEL_PER_OIL_ITEM = TimeUnit.HOUR * 4
 
 type SaveData = {
@@ -73,6 +74,8 @@ export class PlacedLanternFactory extends ElementFactory<ElementType.PLACED_LANT
 }
 
 export class PlacedLantern extends Simulatable implements DialogueSource {
+    static readonly FUEL_MAX_HOURS = FUEL_MAX_HOURS
+
     dialogue = LANTERN_DIALOGUE
     private onSprite: SpriteComponent
     private offSprite: SpriteComponent
@@ -141,7 +144,7 @@ export class PlacedLantern extends Simulatable implements DialogueSource {
     }
 
     canAddFuel() {
-        return this.data.fuel < FUEL_MAX
+        return Math.ceil(this.data.fuel / TimeUnit.HOUR) < FUEL_MAX_HOURS
     }
 
     save() {

@@ -1,8 +1,9 @@
 import { Item } from "../../items/Item"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { InteractIndicator } from "../../ui/InteractIndicator"
-import { InventoryDisplay } from "../../ui/InventoryDisplay"
+import { DonatingOptions, InventoryDisplay } from "../../ui/InventoryDisplay"
 import { PlacedLantern } from "../../world/elements/PlacedLantern"
+import { TimeUnit } from "../../world/TimeUnit"
 import { player } from "../player/index"
 import { ShieldType } from "../weapons/ShieldType"
 import { DialogueOption, DialogueSet, dialogueWithOptions, NextDialogue } from "./Dialogue"
@@ -14,6 +15,8 @@ export const LANTERN_DIALOGUES: DialogueSet = {
     [LANTERN_DIALOGUE]: (lantern: PlacedLantern) => {
         const isOn = lantern.on
         const initialFuelAmount = lantern.getFuelAmount()
+        const canAddFuel = () =>
+            lantern.canAddFuel() && player().inventory.getItemCount(Item.LAMP_OIL) > 0
 
         const showUpdatedInfo = () => {
             if (lantern.getFuelAmount() !== initialFuelAmount) {
@@ -22,26 +25,27 @@ export const LANTERN_DIALOGUES: DialogueSet = {
             }
         }
 
-        const addFuelOption = new DialogueOption("Add fuel", () => {
-            InventoryDisplay.instance.open({
-                donating: {
-                    canDonate: (stack) => stack.item === Item.LAMP_OIL && lantern.canAddFuel(),
-                    onDonate: () => {
-                        lantern.addFuel() // client sync fn
-                        if (
-                            !lantern.canAddFuel() ||
-                            player().inventory.getItemCount(Item.LAMP_OIL) === 0
-                        ) {
-                            InventoryDisplay.instance.close()
-                            showUpdatedInfo()
-                        }
-                    },
-                    verb: "add fuel",
-                },
-                onClose: showUpdatedInfo,
-            })
-            return new NextDialogue(LANTERN_DIALOGUE, false)
-        })
+        const donatingOptions: DonatingOptions = {
+            canDonate: (stack) => stack.item === Item.LAMP_OIL && canAddFuel(),
+            onDonate: () => {
+                lantern.addFuel() // client sync fn
+                if (!lantern.canAddFuel() || player().inventory.getItemCount(Item.LAMP_OIL) === 0) {
+                    InventoryDisplay.instance.close()
+                    showUpdatedInfo()
+                }
+            },
+            verb: "add fuel",
+        }
+
+        const addFuelOption = canAddFuel()
+            ? new DialogueOption("Add fuel", () => {
+                  InventoryDisplay.instance.open({
+                      donating: donatingOptions,
+                      onClose: showUpdatedInfo,
+                  })
+                  return new NextDialogue(LANTERN_DIALOGUE, false)
+              })
+            : undefined
 
         const toggleOption = initialFuelAmount
             ? new DialogueOption(`Turn ${isOn ? "off" : "on"}`, () => {
@@ -65,8 +69,21 @@ export const LANTERN_DIALOGUES: DialogueSet = {
             () => new NextDialogue(LANTERN_DIALOGUE, false)
         )
 
+        const text = (() => {
+            if (initialFuelAmount === 0) {
+                return "The lantern's fuel chamber is empty."
+            }
+            const fuelHours = Math.ceil(initialFuelAmount / TimeUnit.HOUR)
+            if (fuelHours === 1) {
+                return "The lantern will run out of fuel within the hour."
+            } else if (fuelHours === PlacedLantern.FUEL_MAX_HOURS) {
+                return "The lantern's fuel chamber is full."
+            }
+            return `The lantern will burn for about ${fuelHours} more hours.`
+        })()
+
         return dialogueWithOptions(
-            [`Fuel: ${lantern.getFuelAmount()}`], // TODO
+            [text],
             InteractIndicator.NONE,
             addFuelOption,
             toggleOption,
