@@ -108,7 +108,6 @@ export class LocationManager {
         return location
     }
 
-    // MPTODO
     delete(location: Location) {
         this.locations.delete(location.uuid)
     }
