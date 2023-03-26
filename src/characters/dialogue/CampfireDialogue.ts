@@ -11,7 +11,13 @@ import { RestPoint } from "../../world/elements/RestPoint"
 import { TimeUnit } from "../../world/TimeUnit"
 import { WorldTime } from "../../world/WorldTime"
 import { player } from "../player"
-import { DialogueOption, DialogueSet, dialogueWithOptions, NextDialogue } from "./Dialogue"
+import {
+    dialogue,
+    DialogueOption,
+    DialogueSet,
+    dialogueWithOptions,
+    NextDialogue,
+} from "./Dialogue"
 import { DialogueConstants } from "./DialogueConstants"
 
 export const CAMPFIRE_DIALOGUE = "campfire"
@@ -91,14 +97,13 @@ export const CAMPFIRE_DIALOGUES: DialogueSet = {
         const initialLogCount = cf.logs
 
         if (getLogsYouCanAdd() === 0) {
-            return dialogueWithOptions(
+            return dialogue(
                 [
                     getPlayerLogCount() === 0
                         ? "You don't have any more logs to add to the fire."
                         : "Adding any more logs to the fire would be dangerous.",
                 ],
-                InteractIndicator.NONE,
-                exitOption
+                () => new NextDialogue(CAMPFIRE_DIALOGUE, false)
             )
         }
 

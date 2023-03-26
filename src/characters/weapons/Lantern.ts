@@ -1,9 +1,9 @@
 import { Point, UpdateData } from "brigsby/dist"
+import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
-import { TILE_SIZE } from "../../graphics/Tilesets"
+import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Item } from "../../items/Item"
 import { LightManager } from "../../world/LightManager"
-import { here } from "../../world/locations/LocationManager"
 import { Shield } from "./Shield"
 import { ShieldType } from "./ShieldType"
 
@@ -14,8 +14,18 @@ export class Lantern extends Shield {
     static readonly DIAMETER = 100
     private repeatedInvoker = new RepeatedInvoker(() => this.burn(500), 0)
 
+    private onSprite: StaticSpriteSource
+    private offSprite: StaticSpriteSource
+    private fuel: number
+
     constructor() {
         super(ShieldType.LANTERN, "tool_lantern")
+        const { awake } = this
+        this.awake = (awakeData) => {
+            awake(awakeData)
+            this.onSprite = Tilesets.instance.dungeonCharacters.getTileSource("tool_lantern")
+            this.offSprite = Tilesets.instance.dungeonCharacters.getTileSource("tool_lantern_off")
+        }
     }
 
     update(updateData: UpdateData) {
@@ -26,12 +36,17 @@ export class Lantern extends Shield {
 
         this.transform.depth = -0.5
 
-        LightManager.instance.addLight(
-            here(),
-            this,
-            this.dude.standingPosition.plusY(-TILE_SIZE / 2).plus(this.dude.getAnimationOffset()),
-            Lantern.DIAMETER
-        )
+        // TODO can we get rid of the flash that happens when picking up a lantern?
+        if (this.fuel > 0) {
+            LightManager.instance.addLight(
+                this.dude.location,
+                this,
+                this.dude.standingPosition
+                    .plusY(-TILE_SIZE / 2)
+                    .plus(this.dude.getAnimationOffset()),
+                Lantern.DIAMETER
+            )
+        }
 
         this.repeatedInvoker.update(updateData)
     }
@@ -45,12 +60,15 @@ export class Lantern extends Shield {
             (s) => s?.item === Item.LANTERN && s?.metadata.equipped === "shield"
         )
 
-        this.dude.inventory.setStack(
-            stackIndex,
-            invStack.withMetadata({ fuel: invStack.metadata.fuel - duration })
-        )
+        this.fuel = Math.max(invStack.metadata.fuel - duration, 0)
+        this.dude.inventory.setStack(stackIndex, invStack.withMetadata({ fuel: this.fuel }))
 
-        // TODO: Burn out, update sprite and light
+        if (this.fuel > 0) {
+            this.sprite = this.onSprite
+        } else {
+            this.sprite = this.offSprite
+            this.removeLight()
+        }
 
         return duration
     }
