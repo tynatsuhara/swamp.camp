@@ -359,8 +359,6 @@ export class Dude extends Component implements DialogueSource {
                     return "reject"
                 }
 
-                slotEquipHanders[slot]?.(type)
-
                 // update equipped flag in inventory
                 if (session.isHost()) {
                     this.inventory.getStacks().forEach((s, index) => {
@@ -372,6 +370,8 @@ export class Dude extends Component implements DialogueSource {
                         this.inventory.setStack(invIndex, stack.withMetadata({ equipped: slot }))
                     }
                 }
+
+                slotEquipHanders[slot]?.(type)
             }
         )
 

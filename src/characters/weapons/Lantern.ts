@@ -25,6 +25,8 @@ export class Lantern extends Shield {
             awake(awakeData)
             this.onSprite = Tilesets.instance.dungeonCharacters.getTileSource("tool_lantern")
             this.offSprite = Tilesets.instance.dungeonCharacters.getTileSource("tool_lantern_off")
+            this.burn(0) // update fuel state
+            this.updateLight()
         }
     }
 
@@ -36,7 +38,16 @@ export class Lantern extends Shield {
 
         this.transform.depth = -0.5
 
-        // TODO can we get rid of the flash that happens when picking up a lantern?
+        this.updateLight()
+
+        this.repeatedInvoker.update(updateData)
+    }
+
+    simulate(duration: number): void {
+        this.burn(duration)
+    }
+
+    private updateLight() {
         if (this.fuel > 0) {
             LightManager.instance.addLight(
                 this.dude.location,
@@ -47,12 +58,6 @@ export class Lantern extends Shield {
                 Lantern.DIAMETER
             )
         }
-
-        this.repeatedInvoker.update(updateData)
-    }
-
-    simulate(duration: number): void {
-        this.burn(duration)
     }
 
     private burn(duration: number) {
