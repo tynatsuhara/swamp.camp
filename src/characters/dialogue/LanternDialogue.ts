@@ -22,12 +22,12 @@ export const LANTERN_DIALOGUES: DialogueSet = {
             }
         }
 
-        const addFuelOption = new DialogueOption(`Add fuel`, () => {
+        const addFuelOption = new DialogueOption("Add fuel", () => {
             InventoryDisplay.instance.open({
                 donating: {
                     canDonate: (stack) => stack.item === Item.LAMP_OIL && lantern.canAddFuel(),
                     onDonate: () => {
-                        lantern.addFuel()
+                        lantern.addFuel() // client sync fn
                         if (
                             !lantern.canAddFuel() ||
                             player().inventory.getItemCount(Item.LAMP_OIL) === 0

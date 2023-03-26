@@ -1,6 +1,7 @@
-import { Component, Point, UpdateData } from "brigsby/dist"
+import { Point, UpdateData } from "brigsby/dist"
 import { ImageFilter, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Tilesets } from "../../graphics/Tilesets"
+import { Simulatable } from "../../world/Simulatable"
 import { Dude } from "../Dude"
 import { ShieldType } from "./ShieldType"
 
@@ -12,7 +13,7 @@ enum State {
 /**
  * A shield being wielded by a dude
  */
-export class Shield extends Component {
+export class Shield extends Simulatable {
     dude: Dude
     sprite: StaticSpriteSource
     transform: SpriteTransform
@@ -102,6 +103,8 @@ export class Shield extends Component {
     canAttack() {
         return this.state === State.DRAWN && this.raisedPerc < 1
     }
+
+    simulate(duration: number): void {}
 }
 
 export type ReadOnlyShield = Omit<Shield, "setOnBack" | "block">

@@ -17,6 +17,7 @@ import { Color } from "../ui/Color"
 import { getIconSprite } from "../ui/IconSprite"
 import { ElementType } from "../world/elements/Elements"
 import { here } from "../world/locations/LocationManager"
+import { TimeUnit } from "../world/TimeUnit"
 import { DroppedItem } from "./DroppedItem"
 import { ItemStack } from "./Inventory"
 import { Item } from "./Item"
@@ -292,7 +293,11 @@ export const ITEM_METADATA_MAP = {
         displayName: "Lantern",
         displayNameSupplier: (stack) => {
             const fuel = stack.metadata.fuel
-            return `Lantern (${!fuel ? "empty" : Math.floor(fuel)})`
+            if (!fuel) {
+                return `Lantern (no fuel)`
+            }
+            const fuelHours = fuel / TimeUnit.HOUR
+            return `Lantern (${fuelHours < 0.7 ? "low fuel" : `~${Math.ceil(fuelHours)}h fuel`})`
         },
         inventoryIcon: "lantern",
         stackLimit: 1,

@@ -36,6 +36,10 @@ export class Lantern extends Shield {
         this.repeatedInvoker.update(updateData)
     }
 
+    simulate(duration: number): void {
+        this.burn(duration)
+    }
+
     private burn(duration: number) {
         const [invStack, stackIndex] = this.dude.inventory.find(
             (s) => s?.item === Item.LANTERN && s?.metadata.equipped === "shield"
@@ -45,6 +49,8 @@ export class Lantern extends Shield {
             stackIndex,
             invStack.withMetadata({ fuel: invStack.metadata.fuel - duration })
         )
+
+        // TODO: Burn out, update sprite and light
 
         return duration
     }

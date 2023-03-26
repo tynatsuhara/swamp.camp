@@ -132,7 +132,7 @@ export const CAMPFIRE_DIALOGUES: DialogueSet = {
                     canDonate: (stack) =>
                         stack.item === Item.WOOD && cf.logs < Campfire.LOG_CAPACITY,
                     onDonate: () => {
-                        cf.addLogs(1)
+                        cf.addLogs(1) // client sync fn
                         if (getLogsYouCanAdd() === 0) {
                             InventoryDisplay.instance.close()
                             showUpdatedInfo()

@@ -9,6 +9,7 @@ import { player } from "../../characters/player/index"
 import { Lantern } from "../../characters/weapons/Lantern"
 import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { ItemMetadata } from "../../items/Items"
+import { clientSyncFn } from "../../online/syncUtils"
 import { randomByteString } from "../../saves/uuid"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { LightManager } from "../LightManager"
@@ -20,8 +21,11 @@ import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./Elements"
 import { Interactable } from "./Interactable"
 
+const FUEL_MAX = TimeUnit.HOUR * 24
+const FUEL_PER_OIL_ITEM = TimeUnit.HOUR * 4
+
 type SaveData = {
-    id: string // MPTODO
+    id: string
     on: boolean
     fuel: number
 }
@@ -90,11 +94,22 @@ export class PlacedLantern extends Simulatable implements DialogueSource {
         private readonly data: SaveData
     ) {
         super()
+
+        this.addFuel = clientSyncFn(data.id, "all", () => {
+            this.data.fuel = Math.min(this.data.fuel + FUEL_PER_OIL_ITEM, FUEL_MAX)
+            if (!this.on) {
+                this.toggleOnOff()
+            }
+        })
+
+        this.simulate = location.elementSyncFn("sim", pos, (duration) => {
+            this.burn(duration)
+        })
     }
 
-    simulate(duration: number): void {
-        this.burn(duration)
-    }
+    // sync fns
+    addFuel: () => void
+    simulate: (duration: number) => void
 
     awake() {
         const position = this.position
@@ -117,14 +132,16 @@ export class PlacedLantern extends Simulatable implements DialogueSource {
         this.burn(elapsedTimeMillis)
     }
 
-    private burn(millis: number) {
-        if (this.on) {
-            this.data.fuel -= millis
-            if (this.data.fuel < 0) {
-                this.data.fuel = 0
-                this.toggleOnOff()
-            }
-        }
+    getFuelAmount() {
+        return this.data.fuel
+    }
+
+    getInvItemMetadata() {
+        return { fuel: this.data.fuel }
+    }
+
+    canAddFuel() {
+        return this.data.fuel < FUEL_MAX
     }
 
     save() {
@@ -141,6 +158,16 @@ export class PlacedLantern extends Simulatable implements DialogueSource {
         this.updateOnOffState()
     }
 
+    private burn(millis: number) {
+        if (this.on) {
+            this.data.fuel -= millis
+            if (this.data.fuel < 0) {
+                this.data.fuel = 0
+                this.toggleOnOff()
+            }
+        }
+    }
+
     private updateOnOffState() {
         if (this.on) {
             this.addLight()
@@ -149,25 +176,6 @@ export class PlacedLantern extends Simulatable implements DialogueSource {
         }
         this.onSprite.enabled = this.on
         this.offSprite.enabled = !this.on
-    }
-
-    getFuelAmount() {
-        return this.data.fuel
-    }
-
-    getInvItemMetadata() {
-        return { fuel: this.data.fuel }
-    }
-
-    canAddFuel() {
-        return true // TODO enforce max
-    }
-
-    addFuel() {
-        this.data.fuel += TimeUnit.HOUR // TODO amount?
-        if (!this.on) {
-            this.toggleOnOff()
-        }
     }
 
     private addLight() {
