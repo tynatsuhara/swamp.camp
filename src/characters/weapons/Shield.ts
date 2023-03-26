@@ -28,7 +28,6 @@ export class Shield extends Simulatable {
         super()
         this.offsetFromCenter = offsetFromCenter
         this.awake = () => {
-            console.log("shield awake " + spriteId)
             this.dude = this.entity.getComponent(Dude)
             this.sprite = Tilesets.instance.dungeonCharacters.getTileSource(spriteId)
             this.transform = SpriteTransform.new({
