@@ -120,7 +120,7 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
     }
 
     private createLevels(colors: Grid<Color>): Grid<number> {
-        return colors.map((color) => {
+        const levels = colors.map((color) => {
             if ([LEVEL_1_GRASS, LEVEL_1_WATER, LEVEL_1_TENT].includes(color)) {
                 return 0
             } else if ([LEVEL_2_GRASS, LEVEL_2_WATER, LEVEL_2_TENT].includes(color)) {
@@ -130,6 +130,16 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
             }
             console.log(`${color} is not a valid map color`)
         })
+
+        // Extend the levels in the bottom row down an extra row.
+        // This prevents the bottom row from all being a ledge, which would make trees unable to exist there
+        for (let i = -MAP_RANGE; i < MAP_RANGE; i++) {
+            const levelAbove = levels.get(pt(i, MAP_RANGE))
+            console.log(levelAbove)
+            levels.set(pt(i, MAP_RANGE + 1), levelAbove)
+        }
+
+        return levels
     }
 
     private addWater(location: Location, colors: Grid<Color>) {

@@ -47,7 +47,7 @@ const PUSH_AUDIO = loadAudio([
 ])
 
 export class TreeFactory extends ElementFactory<TreeType, SaveData> {
-    readonly dimensions = new Point(1, 2)
+    readonly dimensions = new Point(1, 1)
 
     make(wl: Location, pos: Point, data: SaveData): ElementComponent<TreeType, SaveData> {
         const maxResourcesCount = 4
@@ -58,10 +58,10 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
 
         const e = new Entity()
         const randomOffset = new Point(0, -4).randomlyShifted(2, 4)
-        const depth = (pos.y + 2) * TILE_SIZE + randomOffset.y
+        const depth = (pos.y + 1) * TILE_SIZE + randomOffset.y
 
         const burnable = e.addComponent(
-            new Burnable(!!data.b, size === 3 ? [pos, pos.plusY(1)] : [pos.plusY(1)], randomOffset)
+            new Burnable(!!data.b, size === 3 ? [pos, pos.plusY(-1)] : [pos], randomOffset)
         )
 
         const addTile = (s: string, pos: Point) => {
@@ -81,13 +81,13 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
         let tiles: SpriteComponent[]
         if (size === 3) {
             tiles = [
-                addTile(`${prefix}Top${topVariant}`, pos),
-                addTile(`${prefix}Base${bottomVariant}`, pos.plusY(1)),
+                addTile(`${prefix}Top${topVariant}`, pos.plusY(-1)),
+                addTile(`${prefix}Base${bottomVariant}`, pos),
             ]
         } else if (size == 2) {
-            tiles = [addTile(`${prefix}Small${topVariant}`, pos.plusY(1))]
+            tiles = [addTile(`${prefix}Small${topVariant}`, pos)]
         } else {
-            tiles = [addTile(`${prefix}Sapling`, pos.plusY(1))]
+            tiles = [addTile(`${prefix}Sapling`, pos)]
         }
 
         tiles.forEach((t) => (t.transform.mirrorX = Math.random() > 0.5))
@@ -101,7 +101,7 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
                 : [Color.TAUPE_3, Color.GREEN_4, Color.GREEN_4]
 
         const emitParticles = () => {
-            const position = pos.plus(new Point(0.5, 1)).times(TILE_SIZE).plus(randomOffset)
+            const position = pos.plus(new Point(0.5, 0)).times(TILE_SIZE).plus(randomOffset)
             for (let i = 0; i < 40; i++) {
                 const speed = Math.random() > 0.5 ? 0.01 : 0.03
                 Particles.instance.emitParticle(
@@ -117,7 +117,7 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
 
         const hittableCenter = pos
             .times(TILE_SIZE)
-            .plus(new Point(TILE_SIZE / 2, TILE_SIZE + TILE_SIZE / 2))
+            .plus(new Point(TILE_SIZE / 2, TILE_SIZE / 2))
             .plus(randomOffset) // center of bottom tile
         const hittableResource = e.addComponent(
             new HittableResource(
@@ -157,14 +157,14 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
 
         e.addComponent(
             new Pushable(
-                pos.plusX(0.5).plusY(2).times(TILE_SIZE),
+                pos.plusX(0.5).plusY(1).times(TILE_SIZE),
                 tiles.map((t) => t.transform),
                 () => !hittableResource.isBeingHit(),
                 (dude) => Sounds.playAtPoint(Lists.oneOf(PUSH_AUDIO), 0.2, dude.standingPosition)
             )
         )
 
-        e.addComponent(new Tree(size === 3, pos.plusY(1)))
+        e.addComponent(new Tree(size === 3, pos))
 
         return e.addComponent(
             new ElementComponent(this.type, pos, () => {
@@ -183,7 +183,7 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
     }
 
     canPlaceAtPos(wl: Location, pos: Point) {
-        const ground = wl.getGround(pos.plusY(1))
+        const ground = wl.getGround(pos)
         return Ground.isNaturalGround(ground?.type)
     }
 

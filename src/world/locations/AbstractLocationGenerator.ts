@@ -1,5 +1,5 @@
 import { Point } from "brigsby/dist"
-import { Grid, Lists, Noise } from "brigsby/dist/util"
+import { Grid, Noise } from "brigsby/dist/util"
 import { adjacent, tilesAround } from "../../Utils"
 import { ElementType } from "../elements/Elements"
 import { GroundType } from "../ground/Ground"
@@ -258,10 +258,11 @@ export abstract class AbstractLocationGenerator {
     protected spawnTreesAtEdge(location: Location, treeTypeSupplier?: TreeTypeSupplier) {
         const vignetteEdge = location.range - 1
         const treeline = vignetteEdge - 8
+        const maxDensity = 0.8
 
         const possibilities = []
         for (let x = -location.range; x < location.range; x++) {
-            for (let y = -location.range - 1; y < location.range; y++) {
+            for (let y = -location.range - 1; y <= location.range; y++) {
                 const distToCenter = new Point(x, y).distanceTo(Point.ZERO)
                 const pt = new Point(x, y)
                 if (distToCenter > vignetteEdge) {
@@ -274,8 +275,12 @@ export abstract class AbstractLocationGenerator {
                 }
             }
         }
-        Lists.shuffle(possibilities)
-        possibilities.forEach((pt) => this.spawnTree(location, pt, treeTypeSupplier))
+
+        possibilities.forEach((pt) => {
+            if (Math.random() < maxDensity) {
+                this.spawnTree(location, pt, treeTypeSupplier)
+            }
+        })
     }
 
     protected spawnTrees(location: Location, treeTypeSupplier?: TreeTypeSupplier) {
@@ -296,8 +301,7 @@ export abstract class AbstractLocationGenerator {
         treeTypeSupplier: TreeTypeSupplier = () =>
             Math.random() < 0.7 ? ElementType.TREE_POINTY : ElementType.TREE_ROUND
     ) {
-        const treeBase = pt.plusY(1)
-        if (location.getGround(treeBase)?.type !== GroundType.GRASS) {
+        if (location.getGround(pt)?.type !== GroundType.GRASS) {
             return
         }
         location.addElement(
