@@ -12,9 +12,12 @@ audio files are stored using [Git LFS](https://git-lfs.github.com/) and can be c
 
 ### run locally
 
-`nvm use` to make sure you're using the right version of Node
+#### first-time setup
 
-`npm start` to spin up the Webpack development server
+1. Install Git LFS
+2. `nvm use && nvm ci`
+
+`npm start` to spin up the Webpack development server!
 
 ### formatting
 
