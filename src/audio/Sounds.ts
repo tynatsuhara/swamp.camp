@@ -19,10 +19,13 @@ export class Sounds {
 
         audio.volume = Math.min(1, Settings.getSoundVolume() * volume)
 
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             audio.oncanplay = () => {
                 audio.play()
                 resolve(audio)
+            }
+            audio.onerror = (e) => {
+                reject(e)
             }
         })
     }
