@@ -31,11 +31,16 @@ module.exports = (_, argv) => ({
     },
     devtool: argv.mode === "development" ? "eval-cheap-module-source-map" : "nosources-source-map",
     devServer: {
+        allowedHosts: "all",
+        https: false,
         compress: true,
         hot: false,
         liveReload: false,
         open: false,
         port: 8000,
+        client: {
+            webSocketURL: "auto://0.0.0.0:0/ws",
+        },
         static: {
             directory: path.join(__dirname, "static"),
         },
