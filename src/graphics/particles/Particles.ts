@@ -3,6 +3,8 @@ import { ImageRender } from "brigsby/dist/renderer"
 import { Singletons } from "../../Singletons"
 import { Color, getRGB } from "../../ui/Color"
 
+const MAX_PARTICLES = 4_000
+
 export class Particles {
     static get instance() {
         return Singletons.getOrCreate(Particles)
@@ -85,7 +87,7 @@ class Particle extends Component {
 
         this.update = (updateData) => {
             this.elapsedTime += updateData.elapsedTimeMillis
-            if (this.elapsedTime > lifetime) {
+            if (this.elapsedTime > lifetime || Particles.instance.count > MAX_PARTICLES) {
                 this.delete()
             }
         }
