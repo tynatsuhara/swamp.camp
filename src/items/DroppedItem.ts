@@ -39,7 +39,7 @@ export class DroppedItem extends Component {
      */
     constructor(
         private readonly id: string,
-        position: Point,
+        private readonly initialPosition: Point,
         item: Item,
         velocity: Point,
         metadata?: ItemMetadata,
@@ -55,7 +55,7 @@ export class DroppedItem extends Component {
                 ITEM_METADATA_MAP[item].droppedIconSupplier(metadata).toComponent()
             )
             // the position constructor arg specifies the bottom center
-            const pos = position.minus(this.getPointOffset())
+            const pos = initialPosition.minus(this.getPointOffset())
             this.sprite.transform.position = pos
 
             this.syncPosition = syncFn(id, ({ x, y }: PointValue) => {
@@ -141,7 +141,9 @@ export class DroppedItem extends Component {
     save(): DroppedItemSaveState {
         return {
             id: this.id,
-            pos: this.sprite.transform.position.plus(this.getPointOffset()).toString(),
+            pos: (
+                this.sprite?.transform.position.plus(this.getPointOffset()) ?? this.initialPosition
+            ).toString(),
             item: this.itemType,
             metadata: this.itemMetadata,
         }
