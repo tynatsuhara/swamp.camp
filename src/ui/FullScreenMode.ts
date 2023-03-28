@@ -11,7 +11,7 @@ export const FullScreenMode = {
 
     enter: () => {
         document
-            .getElementById("canvas")
+            .getElementById("column")
             .requestFullscreen({
                 navigationUI: "hide",
             })
