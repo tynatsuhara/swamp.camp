@@ -59,7 +59,6 @@ export class InventoryDisplay extends Component {
 
     private readonly e: Entity = new Entity() // entity for this component
     private displayEntity: Entity // this will get destroyed when refreshed
-    private lastMousPos: Point
     private stackSprites: SpriteComponent[] = []
     private showingInv = false
     private hoverTooltipString: string
@@ -139,7 +138,6 @@ export class InventoryDisplay extends Component {
         // Re-check isOpen because actions could have closed the menu
         if (this.isOpen) {
             this.canUseItems = true
-            this.lastMousPos = controls.getMousePos()
 
             if (!wasHoldingSomething) {
                 this.checkForPickUp(hoverInv, hoverIndex)

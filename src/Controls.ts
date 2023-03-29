@@ -167,7 +167,14 @@ class ControlsWrapper extends Component {
 
     isInventoryStackPickUpOrDrop = () =>
         check({
-            kbm: () => input.isMouseDown,
+            kbm: () => {
+                // on touchscreens, allow real drag and drop
+                if (input.pointerType === "touch") {
+                    return input.isMouseDown || input.isMouseUp
+                }
+                // with a mouse, clicking twice is nicer than holding the mouse down while dragging
+                return input.isMouseDown
+            },
             gamepad: () => gamepadInput.isButtonDown(GamepadButton.X),
         })
 
