@@ -127,3 +127,7 @@ export const getCookingRecipes = (): CraftingRecipeCategory[] => {
         },
     ]
 }
+
+export const getWorkbenchRecipes = (): CraftingRecipeCategory[] => {
+    return []
+}
