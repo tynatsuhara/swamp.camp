@@ -70,7 +70,10 @@ const ELEMENT_FACTORIES = {
     [ElementType.BLACKBERRIES]: new BlackberriesFactory(),
     [ElementType.CABIN]: new CabinFactory(),
     [ElementType.PLACED_LANTERN]: new PlacedLanternFactory(),
-    [ElementType.WORKBENCH]: new FurnitureFactory(ElementType.WORKBENCH, "workbench"),
+    [ElementType.WORKBENCH]: new FurnitureFactory(ElementType.WORKBENCH, "workbench", () => {
+        console.log("fuck")
+        // CraftingMenu.instance.open(getWorkbenchRecipes())
+    }),
 }
 
 export type ElementDataFormat = {
