@@ -213,6 +213,12 @@ export const ITEM_METADATA_MAP = {
         inventoryIcon: "lighter-fluid",
         stackLimit: STACK_LG,
     }),
+    [Item.WORKBENCH]: new ItemSpec({
+        displayName: "Workbench",
+        inventoryIcon: "workbench",
+        stackLimit: 1,
+        element: ElementType.WORKBENCH,
+    }),
 
     // Locations
     [Item.TENT]: new ItemSpec({

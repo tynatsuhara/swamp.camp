@@ -30,6 +30,7 @@ const KEYS = {
     ["meat1"]: pt(16, 28),
     ["meat1raw"]: pt(16, 32),
     ["lighter-fluid"]: pt(15, 32),
+    ["workbench"]: pt(15, 9),
     ["berries"]: pt(18, 32),
     ["bed"]: pt(5, 8),
     ["aoe_target"]: pt(22, 14),

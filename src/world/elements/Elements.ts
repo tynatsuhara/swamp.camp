@@ -20,6 +20,7 @@ import { RockFactory } from "./Rock"
 import { TreeFactory } from "./Tree"
 
 // Elements are things which take up 1+ squares on top of the ground
+
 export enum ElementType {
     TREE_ROUND,
     TREE_POINTY,
@@ -42,6 +43,7 @@ export enum ElementType {
     CABIN,
     BEDROLL,
     PLACED_LANTERN,
+    WORKBENCH,
 }
 
 expose({ ElementType })
@@ -68,6 +70,7 @@ const ELEMENT_FACTORIES = {
     [ElementType.BLACKBERRIES]: new BlackberriesFactory(),
     [ElementType.CABIN]: new CabinFactory(),
     [ElementType.PLACED_LANTERN]: new PlacedLanternFactory(),
+    [ElementType.WORKBENCH]: new FurnitureFactory(ElementType.WORKBENCH, "workbench"),
 }
 
 export type ElementDataFormat = {
