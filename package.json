@@ -15,6 +15,7 @@
     "author": "Tyler Natsuhara",
     "homepage": "https://swamp.camp",
     "devDependencies": {
+        "circular-dependency-plugin": "^5.2.2",
         "prettier": "^2.7.1",
         "ts-loader": "^9.3.1",
         "ts-node": "^10.9.1",

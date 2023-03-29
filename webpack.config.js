@@ -1,5 +1,6 @@
 const path = require("path")
 const fs = require("fs")
+const CircularDependencyPlugin = require("circular-dependency-plugin")
 
 const workers = fs
     .readdirSync("./src/workers", { withFileTypes: true })
@@ -49,4 +50,14 @@ module.exports = (_, argv) => ({
         assets: false,
         modules: false,
     },
+    plugins: [
+        new CircularDependencyPlugin({
+            // exclude detection of files based on a RegExp
+            exclude: /node_modules/,
+            // include specific files based on a RegExp
+            include: /src/,
+            // add errors to webpack instead of warnings
+            failOnError: false,
+        }),
+    ],
 })
