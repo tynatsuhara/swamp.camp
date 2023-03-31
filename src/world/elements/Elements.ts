@@ -1,5 +1,6 @@
 import { expose } from "brigsby/dist/Debug"
 import { Singletons } from "../../Singletons"
+import { UIStateEvents } from "../../ui/UIStateEvents"
 import { ApothecaryFactory } from "../buildings/Apothecary"
 import { CabinFactory } from "../buildings/Cabin"
 import { ChurchFactory } from "../buildings/Church"
@@ -71,8 +72,7 @@ const ELEMENT_FACTORIES = {
     [ElementType.CABIN]: new CabinFactory(),
     [ElementType.PLACED_LANTERN]: new PlacedLanternFactory(),
     [ElementType.WORKBENCH]: new FurnitureFactory(ElementType.WORKBENCH, "workbench", () => {
-        console.log("fuck")
-        // CraftingMenu.instance.open(getWorkbenchRecipes())
+        UIStateEvents.openWorkbenchCraftingMenu()
     }),
 }
 

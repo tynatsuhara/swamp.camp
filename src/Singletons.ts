@@ -1,7 +1,7 @@
 import { ConcreteType } from "brigsby/dist"
 
 type Singleton = {
-    onSingletonDelete?: () => void
+    _onSingletonDelete?: () => void
 }
 
 const singletonMap = new Map<ConcreteType<Singleton>, Singleton>()
@@ -37,7 +37,7 @@ export const Singletons = {
 
     delete: <T>(type: ConcreteType<T>) => {
         const entry = singletonMap.get(type)
-        entry?.onSingletonDelete?.()
+        entry?._onSingletonDelete?.()
         singletonMap.delete(type)
     },
 

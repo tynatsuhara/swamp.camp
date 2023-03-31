@@ -129,5 +129,5 @@ export const getCookingRecipes = (): CraftingRecipeCategory[] => {
 }
 
 export const getWorkbenchRecipes = (): CraftingRecipeCategory[] => {
-    return []
+    return getDipRecipes() // TODO
 }

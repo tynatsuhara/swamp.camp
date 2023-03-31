@@ -10,11 +10,16 @@ import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
-import { CraftingRecipe, CraftingRecipeCategory } from "../items/CraftingRecipe"
+import {
+    CraftingRecipe,
+    CraftingRecipeCategory,
+    getWorkbenchRecipes,
+} from "../items/CraftingRecipe"
 import { Item } from "../items/Item"
 import { ITEM_METADATA_MAP } from "../items/Items"
 import { clientSyncFn } from "../online/syncUtils"
 import { Singletons } from "../Singletons"
+import { EventDispatcher } from "../utils/EventDispatcher"
 import { Color } from "./Color"
 import { TEXT_FONT, TEXT_SIZE } from "./Text"
 import { Tooltip } from "./Tooltip"
@@ -60,6 +65,10 @@ export class CraftingMenu extends Component {
         this.canvas.width = this.innerDimensions.x
         this.canvas.height = this.innerDimensions.y
         this.context = this.canvas.getContext("2d", { alpha: false })
+
+        EventDispatcher.instance.listen("craft-workbench", () => {
+            this.open(getWorkbenchRecipes())
+        })
     }
 
     close() {
