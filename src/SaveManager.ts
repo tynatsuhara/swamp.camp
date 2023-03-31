@@ -6,7 +6,6 @@ import { prettyPrint } from "./debug/JSON"
 import { ONLINE_PLAYER_DUDE_ID_PREFIX } from "./online/syncUtils"
 import { Save, SaveState } from "./saves/SaveGame"
 import { newUUID } from "./saves/uuid"
-import { Singletons } from "./Singletons"
 import { SwampCampGame } from "./SwampCampGame"
 import { PlumePicker } from "./ui/PlumePicker"
 import { UIStateManager } from "./ui/UIStateManager"
@@ -219,8 +218,6 @@ class SaveManager {
         saveDate.setTime(save.timeSaved)
         const timePlayed = new Date(save.state.timePlayed).toISOString().substr(11, 8)
         console.log(`loaded save from ${saveDate} with ${timePlayed} played`)
-
-        Singletons.clear()
 
         WorldTime.instance.initialize(save.worldTime)
         LocationManager.instance.initialize(save.locations)

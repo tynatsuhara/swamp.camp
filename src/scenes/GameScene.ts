@@ -24,7 +24,6 @@ import { spawnMenu } from "../debug/SpawnMenu"
 import { Particles } from "../graphics/particles/Particles"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { DroppedItem } from "../items/DroppedItem"
-import { Singletons } from "../Singletons"
 import { ZOOM } from "../SwampCampGame"
 import { ButtonsMenu, OptionButton } from "../ui/ButtonsMenu"
 import { Color } from "../ui/Color"
@@ -57,8 +56,6 @@ export class GameScene extends Scene {
     }
 
     newGame() {
-        Singletons.clear()
-
         WorldTime.instance.initialize(TimeUnit.HOUR * 18.5)
 
         // World must be initialized before we do anything else

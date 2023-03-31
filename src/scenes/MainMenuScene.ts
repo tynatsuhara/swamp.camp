@@ -17,6 +17,7 @@ import { session, SESSION_ID_LENGTH } from "../online/session"
 import { guestOnJoin } from "../online/syncGame"
 import { saveManager } from "../SaveManager"
 import { Save } from "../saves/SaveGame"
+import { Singletons } from "../Singletons"
 import { IS_NATIVE_APP, SwampCampGame, ZOOM } from "../SwampCampGame"
 import { Cursor } from "../ui/Cursor"
 import { MainMenuButtonSection } from "../ui/MainMenuButtonSection"
@@ -82,6 +83,8 @@ export class MainMenuScene extends Scene {
     }
 
     reset() {
+        Singletons.clear()
+
         this.sessionLoadingState = undefined
 
         resetPlayerInstances()
