@@ -1,6 +1,10 @@
 import { ConcreteType } from "brigsby/dist"
 
-const singletonMap = new Map<any, any>()
+type Singleton = {
+    onSingletonDelete?: () => void
+}
+
+const singletonMap = new Map<ConcreteType<Singleton>, Singleton>()
 
 /**
  * A global cache for managing stateful singletons.
@@ -13,14 +17,17 @@ const singletonMap = new Map<any, any>()
  *
  */
 export const Singletons = {
-    get: <T>(type: ConcreteType<T>): T | undefined => {
-        return singletonMap.get(type)
+    get: <T>(type: ConcreteType<T> & Singleton): T | undefined => {
+        return singletonMap.get(type) as T
     },
 
-    getOrCreate: <T>(type: ConcreteType<T>, supplier: () => T = () => new type()): T => {
+    getOrCreate: <T>(
+        type: ConcreteType<T> & Singleton,
+        supplier: () => T = () => new type()
+    ): T => {
         const s = singletonMap.get(type)
         if (!!s) {
-            return s
+            return s as T
         }
 
         const supplied = supplier()
@@ -28,7 +35,14 @@ export const Singletons = {
         return supplied
     },
 
-    delete: <T>(type: ConcreteType<T>) => singletonMap.delete(type),
+    delete: <T>(type: ConcreteType<T>) => {
+        const entry = singletonMap.get(type)
+        entry?.onSingletonDelete?.()
+        singletonMap.delete(type)
+    },
 
-    clear: () => singletonMap.clear(),
+    clear: () => {
+        const keys = [...singletonMap.keys()]
+        keys.forEach(Singletons.delete)
+    },
 }
