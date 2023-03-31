@@ -12,9 +12,12 @@ body {
     height: 100%;
     -webkit-font-smoothing: none;
     -moz-osx-font-smoothing: none;
-    cursor: url(cursor_3x.png), default;
     overflow: hidden;
     font-variant-ligatures: none;
+}
+
+body {
+    cursor: url(cursor_3x.png), default;
 }
 
 #column {
