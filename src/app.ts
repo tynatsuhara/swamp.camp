@@ -9,6 +9,7 @@ declare global {
         SWAMP_CAMP: {
             version: string
             assets: { [key: string]: string }
+            native: boolean
         }
     }
 }

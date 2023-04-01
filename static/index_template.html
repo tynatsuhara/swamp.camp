@@ -14,18 +14,23 @@
         />
         <title>SWAMP CAMP</title>
         <script>
-            const isNativeApp = !!new URL(window.location.href).searchParams.get("native_app")
+            window["SWAMP_CAMP"] = "%SWAMP_CAMP_DATA%"
+
+            // continue to support nativefier-based native apps
+            if (new URL(window.location.href).searchParams.get("native_app")) {
+                SWAMP_CAMP.native = true
+            }
+
             const brands = navigator.userAgentData?.brands || []
             const isGoogleChrome = brands.some((b) => b.brand === "Google Chrome")
             const hasShownWarning = localStorage.getItem("chrome_warning_shown")
             const isBot = navigator.userAgent.toLowerCase().includes("bot")
-            const showChromeWarning = !isNativeApp && !isGoogleChrome && !hasShownWarning && !isBot
+            const showChromeWarning =
+                !SWAMP_CAMP.native && !isGoogleChrome && !hasShownWarning && !isBot
 
             if (showChromeWarning) {
                 window.location.href = "/chrome_warning"
             }
-
-            window["SWAMP_CAMP"] = "%SWAMP_CAMP_DATA%"
         </script>
         <link rel="stylesheet" type="text/css" href="index.css" />
         <link rel="shortcut icon" href="favicon.png" />

@@ -18,7 +18,7 @@ import { guestOnJoin } from "../online/syncGame"
 import { saveManager } from "../SaveManager"
 import { Save } from "../saves/SaveGame"
 import { Singletons } from "../Singletons"
-import { IS_NATIVE_APP, SwampCampGame, ZOOM } from "../SwampCampGame"
+import { SwampCampGame, ZOOM } from "../SwampCampGame"
 import { Cursor } from "../ui/Cursor"
 import { MainMenuButtonSection } from "../ui/MainMenuButtonSection"
 import { PlumePicker, PLUME_COLORS } from "../ui/PlumePicker"
@@ -46,6 +46,8 @@ enum SessionLoadingState {
 }
 
 let cancelJoinTimeout: NodeJS.Timeout
+
+const IS_NATIVE_APP = window.SWAMP_CAMP.native
 
 export class MainMenuScene extends Scene {
     private plumes: PlumePicker

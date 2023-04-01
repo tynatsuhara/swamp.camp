@@ -7,6 +7,7 @@
         "start": "npm run versionize && webpack serve --mode=development",
         "check": "CYCLE_CHECK=true webpack --mode=development",
         "build:prod": "npm run versionize && webpack --mode=production",
+        "build:native": "IS_NATIVE=true npm run versionize && webpack --mode=production",
         "format": "npx prettier --write ."
     },
     "repository": {

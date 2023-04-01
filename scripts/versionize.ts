@@ -27,6 +27,8 @@ const assets = getFiles(STATICS_DIR)
 
 const version = execSync("git rev-parse HEAD").toString().trim()
 
+const native = process.env.IS_NATIVE === "true"
+
 const data = {
     /**
      * eagerly loaded static files, hashed for cache busting
@@ -36,6 +38,10 @@ const data = {
      * latest git commit hash, for observability
      */
     version,
+    /**
+     * true if this is a native build rather than web
+     */
+    native,
 }
 
 // inject the version map into the window scope via the template
