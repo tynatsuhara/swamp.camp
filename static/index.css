@@ -16,7 +16,7 @@ body {
     font-variant-ligatures: none;
 }
 
-body {
+* {
     cursor: url(cursor_3x.png), default;
 }
 
