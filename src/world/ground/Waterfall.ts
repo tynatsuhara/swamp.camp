@@ -101,7 +101,7 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
 
     e.addComponent(
         new PointAudio(
-            "/audio/ambiance/waterfall.wav",
+            "audio/ambiance/waterfall.wav",
             pixelPos.plus(pt(TILE_SIZE / 2, TILE_SIZE / 2)),
             TILE_SIZE * 8,
             0.2

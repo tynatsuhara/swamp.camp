@@ -89,8 +89,8 @@ export class ItemSpec {
 }
 
 const SOUNDS: { [key: string]: [string, number] } = {
-    drink: ["/audio/rpg/inventory/bottle.wav", 0.2],
-    eat: ["/audio/rpg/NPC/beetle/bite-small.wav", 0.3],
+    drink: ["audio/rpg/inventory/bottle.wav", 0.2],
+    eat: ["audio/rpg/NPC/beetle/bite-small.wav", 0.3],
 }
 loadAudio(Object.values(SOUNDS).map((s) => s[0]))
 
