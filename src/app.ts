@@ -17,7 +17,7 @@ const start = async () => {
     await Promise.all([
         // load all required assets
         assets.loadImageFiles(getFilesToLoadForMainMenu()),
-        assets.loadFont(TEXT_FONT, "url(/fonts/press-start-2p.woff2)"),
+        assets.loadFont(TEXT_FONT, "url(fonts/press-start-2p.woff2)"),
     ])
 
     initializeLogging()
