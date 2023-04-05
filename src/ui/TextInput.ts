@@ -63,14 +63,18 @@ export class TextInput {
     }
 
     reposition(topCenterPos: Point) {
+        let { x, y } = topCenterPos
         const elementStyles = this.element.style
         const width = 600
         const scale = ZOOM * renderer.getScale()
+        const left = x * scale - width / 2
+        const top = y * scale - 8 / renderer.getScale()
         elementStyles.position = "fixed"
         elementStyles.width = `${600}px`
-        elementStyles.left = `${topCenterPos.x * scale - width / 2}px`
-        elementStyles.top = `${Math.floor(topCenterPos.y * scale) - 4}px`
+        elementStyles.left = `${left}px`
+        elementStyles.top = `${top}px`
         elementStyles.textAlign = "center"
+        elementStyles.verticalAlign = "text-bottom"
         elementStyles.fontSize = `${TEXT_SIZE * scale}px`
     }
 
