@@ -6,6 +6,7 @@ import { prettyPrint } from "./debug/JSON"
 import { ONLINE_PLAYER_DUDE_ID_PREFIX } from "./online/syncUtils"
 import { Save, SaveState } from "./saves/SaveGame"
 import { newUUID } from "./saves/uuid"
+import { Singletons } from "./Singletons"
 import { SwampCampGame } from "./SwampCampGame"
 import { PlumePicker } from "./ui/PlumePicker"
 import { UIStateManager } from "./ui/UIStateManager"
@@ -188,6 +189,8 @@ class SaveManager {
     }
 
     new(slot: number, plumePicker: PlumePicker) {
+        Singletons.clear()
+
         // overwrite the save if it already exists
         this.deleteSave(slot)
         this.saveKey = this.saveKeyForSlot(slot)
@@ -206,6 +209,8 @@ class SaveManager {
     }
 
     loadSave(save: Save) {
+        Singletons.clear()
+
         const start = new Date().getTime()
 
         this.state = {
