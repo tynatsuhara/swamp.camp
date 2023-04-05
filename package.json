@@ -8,6 +8,7 @@
         "check": "CYCLE_CHECK=true webpack --mode=development",
         "build:prod": "npm run versionize && webpack --mode=production",
         "build:native": "cross-env IS_NATIVE=true npm run versionize && webpack --mode=production",
+        "build:native:dev": "cross-env IS_NATIVE=true npm run versionize && webpack --mode=development",
         "format": "npx prettier --write ."
     },
     "repository": {

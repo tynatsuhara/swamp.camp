@@ -278,6 +278,17 @@ export class MainMenuScene extends Scene {
                     .add("multiplayer", () => this.render(Menu.MULTIPLAYER))
                     .add("Download", () => this.render(Menu.DOWNLOADS), !IS_NATIVE_APP)
                     .add("Credits", () => this.render(Menu.CREDITS))
+                    .add(
+                        "Quit",
+                        () => {
+                            // add a delay so we still hear the click
+                            setTimeout(
+                                () => document.dispatchEvent(new Event("swamp-camp-quit")),
+                                200
+                            )
+                        },
+                        IS_NATIVE_APP
+                    )
                     .getEntity()
             )
         } else if (this.menu === Menu.DOWNLOADS) {
