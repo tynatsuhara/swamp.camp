@@ -32,11 +32,14 @@ export class TextInput {
         input.style.maxWidth = "400px"
         input.style.padding = "0"
         input.style.caretColor = "transparent"
+        input.style.fontSize = "inherit"
 
         input.oninput = (e) => {
             input.value = input.value.toUpperCase().substring(0, maxLength)
             this.value = input.value
-            input.style.width = `${ZOOM * TEXT_PIXEL_WIDTH * input.value.length}px`
+            // ideally this would update every frame, but users don't change
+            // their screen size mid-game ususally so it's probably fine
+            input.style.width = `${this.scale * TEXT_PIXEL_WIDTH * input.value.length}px`
         }
 
         input.onkeydown = (e) => {
@@ -66,7 +69,7 @@ export class TextInput {
         let { x, y } = topCenterPos
         const elementStyles = this.element.style
         const width = 600
-        const scale = ZOOM * renderer.getScale()
+        const scale = this.scale
         const left = x * scale - width / 2
         const top = y * scale - 8 / renderer.getScale()
         elementStyles.position = "fixed"
@@ -75,6 +78,7 @@ export class TextInput {
         elementStyles.top = `${top}px`
         elementStyles.textAlign = "center"
         elementStyles.verticalAlign = "text-bottom"
+        console.log(TEXT_SIZE * scale)
         elementStyles.fontSize = `${TEXT_SIZE * scale}px`
     }
 
@@ -83,5 +87,9 @@ export class TextInput {
         document.body.removeChild(this.element)
         document.getElementById("canvas").focus()
         return undefined
+    }
+
+    private get scale() {
+        return ZOOM * renderer.getScale()
     }
 }
