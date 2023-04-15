@@ -1,10 +1,8 @@
 import { Point } from "brigsby/dist"
 import { RenderMethod, TextRender } from "brigsby/dist/renderer"
-import { SpriteTransform } from "brigsby/dist/sprites"
-import { ImageFilters } from "../graphics/ImageFilters"
 import { Icon } from "../graphics/OneBitTileset"
-import { Tilesets } from "../graphics/Tilesets"
 import { Color } from "./Color"
+import { getIconSpriteImageRender } from "./IconSprite"
 import { UI_SPRITE_DEPTH } from "./UiConstants"
 
 export const TEXT_PIXEL_WIDTH = 8
@@ -168,18 +166,14 @@ const formatTextInternal = ({
                 ICON_PLACEHOLDER_MAP[row.substring(placeholderIndex, placeholderIndex + 2)]
             if (iconKey) {
                 iconRenders.push(
-                    Tilesets.instance.oneBit
-                        .getTileSource(iconKey)
-                        // TODO cache recolored icons
-                        .filtered(ImageFilters.recolor([Color.WHITE, color]))
-                        .toImageRender(
-                            SpriteTransform.new({
-                                position: rowPosition(row, i)
-                                    .plusY(-4)
-                                    .plusX(placeholderIndex * TEXT_PIXEL_WIDTH),
-                                depth,
-                            })
-                        )
+                    getIconSpriteImageRender({
+                        icon: iconKey,
+                        centerPos: rowPosition(row, i)
+                            .plusX(placeholderIndex * TEXT_PIXEL_WIDTH + 8)
+                            .plusY(4),
+                        color,
+                        depth,
+                    })
                 )
             }
             lineSearchStart = placeholderIndex + 2
