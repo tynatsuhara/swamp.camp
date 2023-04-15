@@ -97,6 +97,8 @@ class ControlsWrapper extends Component {
         if (!gamepadInput || (isGamepadMode && input.mousePosDelta.magnitude() > 0)) {
             isGamepadMode = false
             gamepadMousePos = undefined
+            // check debug as non-gamepad mode
+            checkDebug(updateData.elapsedTimeMillis)
             return
         }
 
@@ -118,8 +120,10 @@ class ControlsWrapper extends Component {
                     FullScreenMode.enter()
                 }
             }
-            checkDebug(updateData.elapsedTimeMillis)
         }
+
+        // check debug as gamepad mode
+        checkDebug(updateData.elapsedTimeMillis)
     }
 
     updateGamepadCursorPosition(elapsedTimeMillis: number) {
@@ -394,7 +398,7 @@ class ControlsWrapper extends Component {
 
 let devToolsOpenCountdown: number
 const checkDebug = (elapsedTimeMillis: number) => {
-    const openDevToolsButtons = [
+    const openDevToolsGamepadButtons = [
         GamepadButton.L1,
         GamepadButton.L2,
         GamepadButton.L3,
@@ -402,7 +406,13 @@ const checkDebug = (elapsedTimeMillis: number) => {
         GamepadButton.R2,
         GamepadButton.R3,
     ]
-    if (openDevToolsButtons.every((b) => gamepadInput.isButtonHeld(b))) {
+    const gamepadTrigger =
+        isGamepadMode && openDevToolsGamepadButtons.every((b) => gamepadInput.isButtonHeld(b))
+
+    const openDevToolsKeyboardButtons = [InputKey.SHIFT, InputKey.SHIFT_RIGHT]
+    const kbTrigger = !isGamepadMode && openDevToolsKeyboardButtons.every((b) => input.isKeyHeld(b))
+
+    if (gamepadTrigger || kbTrigger) {
         if (devToolsOpenCountdown > 0) {
             devToolsOpenCountdown -= elapsedTimeMillis
             if (devToolsOpenCountdown < 0) {
