@@ -25,7 +25,13 @@ const start = async () => {
 
     const canvas = <HTMLCanvasElement>document.getElementById("canvas")
 
-    Engine.start(new SwampCampGame(), canvas, { fixedHeight: debug.photoMode ? undefined : 900 })
+    const fixedHeight = (() => {
+        if (debug.photoMode) return undefined
+        if (debug.fixedHeight) return debug.fixedHeight
+        return 900
+    })()
+
+    Engine.start(new SwampCampGame(), canvas, { fixedHeight })
 }
 
 start()

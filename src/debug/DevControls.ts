@@ -260,6 +260,7 @@ debug.showSaveLogs ??= false
 debug.disableVisibleRegionMask ??= false
 debug.disableParticles ??= false
 debug.photoMode ??= false
+debug.fixedHeight ??= undefined
 
 const help = () => {
     let help = "dev controls (enable with debug.enableDevControls=true)"
