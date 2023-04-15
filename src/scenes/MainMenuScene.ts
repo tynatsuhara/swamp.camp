@@ -51,6 +51,7 @@ const IS_NATIVE_APP = window.SWAMP_CAMP.native
 
 export class MainMenuScene extends Scene {
     private plumes: PlumePicker
+    private knightEntity = new Entity()
     private knight: SpriteComponent
     private title = getImage("images/title.png")
     private darkness: DarknessMask
@@ -95,17 +96,34 @@ export class MainMenuScene extends Scene {
         Music.stop()
         Ambiance.stop()
 
-        this.render(Menu.ROOT)
         this.plumes = new PlumePicker(saveManager.getState().plumeIndex, (color) => {
-            this.knight = new Entity().addComponent(
-                DudeAnimationUtils.getCharacterIdleAnimation("knight_f", {
-                    color,
-                }).toComponent()
-            )
-            this.view = null // force re-render
+            // console.log(color)
+            const newKnightAnimation = DudeAnimationUtils.getCharacterIdleAnimation("knight_f", {
+                color,
+            }).toComponent(this.knight?.transform)
+
+            requestAnimationFrame(() => {
+                if (this.knight) {
+                    this.knightEntity.removeComponent(this.knight)
+                }
+                this.knight = this.knightEntity.addComponent(newKnightAnimation)
+            })
+
+            // if (!this.knight?.entity) {
+            // console.log(this.knight)
+            // } else {
+            //     console.log(this.knight)
+            //     // console.log(this.knight.entity)
+            //     const existingEntity = this.knight.entity
+            //     // console.log(`replace`)
+            //     existingEntity.removeComponent(this.knight)
+            //     existingEntity.addComponent(newKnightAnimation)
+            // }
         })
 
         this.darkness = new Entity().addComponent(new DarknessMask(false))
+
+        this.render(Menu.ROOT)
     }
 
     loadLastSave() {
@@ -148,12 +166,6 @@ export class MainMenuScene extends Scene {
         // we need to re-render this each time since image bitmaps are async
         // this.darkness?.render(dimensions, Point.ZERO)
 
-        // Don't re-render if nothing has changed, since a lot of
-        // these functions involve parsing all of our save slots
-        if (this.view && renderer.getDimensions().equals(this.lastDimensions)) {
-            return [this.view]
-        }
-
         const center = dimensions.floorDiv(2)
         const menuTop = center.plusY(31)
         this.plumes.position = menuTop
@@ -162,6 +174,12 @@ export class MainMenuScene extends Scene {
             .plusX(-17)
             .plusY(-37)
         this.knight.transform.position = knightPos
+
+        // Don't re-render if nothing has changed, since a lot of
+        // these functions involve parsing all of our save slots
+        if (this.view && renderer.getDimensions().equals(this.lastDimensions)) {
+            return [this.view]
+        }
 
         const titleDimensions = new Point(200, 50)
         const title = new Entity([
@@ -190,7 +208,7 @@ export class MainMenuScene extends Scene {
         // by default, render the title and the scene with the knight
         const entities = [
             title,
-            this.knight.entity,
+            this.knightEntity,
             this.darkness.entity,
             ...sceneEntities,
             new Entity([new DevControls()]),
