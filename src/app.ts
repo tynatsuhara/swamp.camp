@@ -4,6 +4,9 @@ import { getFilesToLoadForMainMenu } from "./graphics/Tilesets"
 import { SwampCampGame } from "./SwampCampGame"
 import { TEXT_FONT } from "./ui/Text"
 
+// This is how many "pixels" tall the game will be, unrelated to the screen's actual resolution
+const DEFAULT_FIXED_HEIGHT = 900
+
 declare global {
     interface Window {
         SWAMP_CAMP: {
@@ -28,7 +31,12 @@ const start = async () => {
     const fixedHeight = (() => {
         if (debug.photoMode) return undefined
         if (debug.fixedHeight) return debug.fixedHeight
-        return 900
+        const screenHeight = window.screen.availHeight
+        // We don't want to scale down small or low-resolution screens. Instead, stuff gets squished a bit.
+        if (screenHeight < DEFAULT_FIXED_HEIGHT) {
+            return screenHeight
+        }
+        return DEFAULT_FIXED_HEIGHT
     })()
 
     Engine.start(new SwampCampGame(), canvas, { fixedHeight })
