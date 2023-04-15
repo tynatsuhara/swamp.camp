@@ -180,7 +180,11 @@ class ControlsWrapper extends Component {
                 // with a mouse, clicking twice is nicer than holding the mouse down while dragging
                 return input.isMouseDown
             },
-            gamepad: () => gamepadInput.isButtonDown(GamepadButton.X),
+            gamepad: () =>
+                gamepadInput.isButtonDown(GamepadButton.X) ||
+                // using the touchpads as joysticks is great on Steam Deck
+                gamepadInput.isButtonDown(GamepadButton.R3) ||
+                gamepadInput.isButtonUp(GamepadButton.R3),
         })
 
     getInventoryStackPickUpOrDropString = () =>
@@ -258,7 +262,9 @@ class ControlsWrapper extends Component {
     isMenuClickDown = () =>
         check({
             kbm: () => input.isMouseDown,
-            gamepad: () => gamepadInput.isButtonDown(GamepadButton.X),
+            gamepad: () =>
+                gamepadInput.isButtonDown(GamepadButton.X) ||
+                gamepadInput.isButtonDown(GamepadButton.R3),
         })
 
     getMenuClickDownString = () => (isGamepadMode ? TextIcon.GAMEPAD_X : TextIcon.MOUSE_LEFT)
