@@ -110,12 +110,15 @@ class ControlsWrapper extends Component {
         }
 
         // toggle fullscreen gamepad shortcut
-        if (isGamepadMode && gamepadInput.isButton(GamepadButton.SELECT, ButtonState.DOWN)) {
-            if (FullScreenMode.isFullScreen()) {
-                FullScreenMode.exit()
-            } else {
-                FullScreenMode.enter()
+        if (isGamepadMode) {
+            if (gamepadInput.isButton(GamepadButton.SELECT, ButtonState.DOWN)) {
+                if (FullScreenMode.isFullScreen()) {
+                    FullScreenMode.exit()
+                } else {
+                    FullScreenMode.enter()
+                }
             }
+            checkDebug(updateData.elapsedTimeMillis)
         }
     }
 
@@ -380,6 +383,29 @@ class ControlsWrapper extends Component {
      */
     getRenderMethods = () => {
         return []
+    }
+}
+
+let devToolsOpenCountdown: number
+const checkDebug = (elapsedTimeMillis: number) => {
+    const openDevToolsButtons = [
+        GamepadButton.L1,
+        GamepadButton.L2,
+        GamepadButton.L3,
+        GamepadButton.R1,
+        GamepadButton.R2,
+        GamepadButton.R3,
+    ]
+    if (openDevToolsButtons.every((b) => gamepadInput.isButtonHeld(b))) {
+        if (devToolsOpenCountdown > 0) {
+            devToolsOpenCountdown -= elapsedTimeMillis
+            if (devToolsOpenCountdown < 0) {
+                console.log("[native only] opening devtools")
+                document.dispatchEvent(new Event("swamp-camp-open-devtools"))
+            }
+        }
+    } else {
+        devToolsOpenCountdown = 2_500
     }
 }
 
