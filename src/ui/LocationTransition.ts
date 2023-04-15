@@ -59,7 +59,7 @@ export class LocationTransition extends Component {
         // circles big->small->big
         const radiuses = []
         for (let i = 0; i < FRAMES; i++) {
-            const radius = Math.floor((maxRadius / FRAMES) * i)
+            const radius = Math.ceil((maxRadius / FRAMES) * i)
             radiuses.push(radius)
             if (radiuses.length > 1 && !openOnly) {
                 radiuses.unshift(radius)
