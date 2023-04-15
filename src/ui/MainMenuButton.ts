@@ -2,6 +2,7 @@ import { Component, Point } from "brigsby/dist"
 import { Maths } from "brigsby/dist/util"
 import { controls } from "../Controls"
 import { TILE_SIZE } from "../graphics/Tilesets"
+import { ClickableUI } from "./ClickableUI"
 import { Color } from "./Color"
 import { formatText, NO_BREAK_SPACE_CHAR, TextAlign, TEXT_PIXEL_WIDTH } from "./Text"
 import { UI_SPRITE_DEPTH } from "./UiConstants"
@@ -14,22 +15,39 @@ export class MainMenuButton extends Component {
     private readonly text: string
     private readonly onClick: () => void
     private readonly onHover: () => void
-    private readonly hoverable: boolean
+    readonly hoverable: boolean
     private hovering: boolean = false
 
-    constructor(
-        centerPos: Point,
-        text: string,
-        onClick: () => void,
-        onHover: () => void,
+    constructor({
+        centerPos,
+        text,
+        onClick,
+        onHover,
+        hoverable,
+        autoSelect,
+    }: {
+        centerPos: Point
+        text: string
+        onClick: () => void
+        onHover: () => void
         hoverable: boolean
-    ) {
+        autoSelect: boolean
+    }) {
         super()
         this.centerPos = centerPos.apply(Math.floor)
         this.text = text
         this.onClick = onClick
         this.onHover = onHover
         this.hoverable = hoverable
+
+        this.awake = () => {
+            if (hoverable) {
+                const clickable = this.entity.addComponent(new ClickableUI(centerPos, false))
+                if (autoSelect) {
+                    ClickableUI.select(clickable)
+                }
+            }
+        }
     }
 
     update() {

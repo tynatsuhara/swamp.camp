@@ -6,18 +6,26 @@ export class MainMenuButtonSection {
 
     private readonly buttons: MainMenuButton[] = []
 
-    constructor(private readonly topCenter: Point) {}
+    constructor(private readonly topCenter: Point) {
+        console.log("new button section")
+    }
 
     add(text: string, onClick: () => void, condition = true, onHover: () => void = () => {}) {
         if (condition) {
+            const pos = this.topCenter.plusY(
+                MainMenuButtonSection.LINE_SPACING * this.buttons.length
+            )
+
+            const autoSelect = !this.buttons.some((b) => b?.hoverable)
             this.buttons.push(
-                new MainMenuButton(
-                    this.topCenter.plusY(MainMenuButtonSection.LINE_SPACING * this.buttons.length),
+                new MainMenuButton({
+                    centerPos: pos,
                     text,
                     onClick,
                     onHover,
-                    true
-                )
+                    hoverable: true,
+                    autoSelect,
+                })
             )
         }
         return this
@@ -25,13 +33,16 @@ export class MainMenuButtonSection {
 
     addText(text: string) {
         this.buttons.push(
-            new MainMenuButton(
-                this.topCenter.plusY(MainMenuButtonSection.LINE_SPACING * this.buttons.length),
+            new MainMenuButton({
+                centerPos: this.topCenter.plusY(
+                    MainMenuButtonSection.LINE_SPACING * this.buttons.length
+                ),
                 text,
-                () => {},
-                () => {},
-                false
-            )
+                onClick: () => {},
+                onHover: () => {},
+                hoverable: false,
+                autoSelect: false,
+            })
         )
         return this
     }

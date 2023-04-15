@@ -10,9 +10,10 @@ import {
     InputKey,
     MouseButton,
     Point,
+    PointValue,
     UpdateData,
 } from "brigsby/dist"
-import { Maths } from "brigsby/dist/util"
+import { Maths } from "brigsby/dist/util/Maths"
 import { Dude } from "./characters/Dude"
 import { Camera } from "./cutscenes/Camera"
 import { FullScreenMode } from "./ui/FullScreenMode"
@@ -25,6 +26,14 @@ let isGamepadMode = false
 
 // NOTE: This view is scaled to the UI layer
 let input: CapturedInput
+
+// TODO! TODO! TODO! Track "hasReceivedAnyMouseMovement" to make jumping in immediately with a controller a nicer experience
+
+export type DPadValue =
+    | GamepadButton.UP
+    | GamepadButton.DOWN
+    | GamepadButton.LEFT
+    | GamepadButton.RIGHT
 
 type InputHandlers<T> = {
     /**
@@ -39,21 +48,21 @@ type InputHandlers<T> = {
     gamepad: () => T
 }
 
-const check = <T>(handlers: InputHandlers<T>) => {
+const check = <T>({ kbm, gamepad }: InputHandlers<T>) => {
     if (!input) {
         console.error(
             "Input is being checked before it is initialized. Make sure the controls singleton is updated before anything else."
         )
     }
 
-    const kbmResult = handlers.kbm()
+    const kbmResult = kbm()
     if (kbmResult || !gamepadInput) {
         isGamepadMode = false
         gamepadMousePos = undefined
         return kbmResult
     }
 
-    const gamepadResult = handlers.gamepad()
+    const gamepadResult = gamepad()
     if (gamepadResult) {
         isGamepadMode = true
     }
@@ -136,12 +145,16 @@ class ControlsWrapper extends Component {
         const rightStick = deaden(gamepadInput.getRightAxes())
         const stickInput = rightStick.times(elapsedTimeMillis * CURSOR_SENSITIVITY)
 
-        const adjustedPos = currentGamePadMousePos.plus(stickInput)
+        this.setGamepadCursorPosition(currentGamePadMousePos.plus(stickInput))
+    }
+
+    setGamepadCursorPosition({ x, y }: PointValue) {
+        if (!isGamepadMode || !gamepadInput) {
+            return
+        }
+
         const bounds = Camera.instance.dimensions.minus(new Point(3, 3))
-        gamepadMousePos = new Point(
-            Maths.clamp(adjustedPos.x, 0, bounds.x),
-            Maths.clamp(adjustedPos.y, 0, bounds.y)
-        )
+        gamepadMousePos = new Point(Maths.clamp(x, 0, bounds.x), Maths.clamp(y, 0, bounds.y))
     }
 
     isGamepadMode() {
@@ -272,6 +285,13 @@ class ControlsWrapper extends Component {
         })
 
     getMenuClickDownString = () => (isGamepadMode ? TextIcon.GAMEPAD_X : TextIcon.MOUSE_LEFT)
+
+    isDPadDown = (btn: DPadValue) =>
+        check({ kbm: () => false, gamepad: () => gamepadInput.isButtonDown(btn) })
+
+    isRightStickMoving() {
+        return !deaden(gamepadInput.getRightAxes()).equals(Point.ZERO)
+    }
 
     // ======== PLAYER CONTROLS ========
 
