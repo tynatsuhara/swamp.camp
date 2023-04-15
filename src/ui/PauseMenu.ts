@@ -196,12 +196,20 @@ export class PauseMenu extends Component {
                     session
                         .open(() => hostOnJoin())
                         .then(() => {
-                            navigator.clipboard.writeText(session.getId()).then(() => {
-                                NotificationDisplay.instance.push({
-                                    icon: "copy",
-                                    text: `copied "${session.getId()}"`,
+                            navigator.clipboard
+                                .writeText(session.getId())
+                                .then(() => {
+                                    NotificationDisplay.instance.push({
+                                        icon: "copy",
+                                        text: `copied "${session.getId()}"`,
+                                    })
                                 })
-                            })
+                                .catch((e) => {
+                                    console.warn("cannot access clipboard", e)
+                                })
+                        })
+                        .catch((e) => {
+                            console.error("failed to open session", e)
                         })
                 },
                 onMouseOver: () => tooltip.say("VERY experimental!"),
