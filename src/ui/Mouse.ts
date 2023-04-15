@@ -16,7 +16,7 @@ export const Mouse = {
     },
 
     show: () => {
-        const scale = ZOOM / renderer.getScale()
+        const scale = ZOOM * renderer.getScale()
         // converted from png with https://codepen.io/shshaw/pen/XbxvNj
         const svg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="${9 * scale}" height="${
