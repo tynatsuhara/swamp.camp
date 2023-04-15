@@ -4,6 +4,7 @@ import {
     CapturedInput,
     Component,
     Entity,
+    expose,
     GamepadButton,
     GamepadVibrationOptions,
     InputKey,
@@ -91,6 +92,7 @@ class ControlsWrapper extends Component {
         input = updateData.input
 
         gamepadInput = input.gamepads.find((gp) => gp)
+        expose({ gamepad: gamepadInput })
 
         if (!gamepadInput || (isGamepadMode && input.mousePosDelta.magnitude() > 0)) {
             isGamepadMode = false
