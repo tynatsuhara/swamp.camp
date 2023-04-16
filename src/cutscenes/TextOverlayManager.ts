@@ -97,12 +97,12 @@ export class TextOverlayManager extends Component {
             TextOverlayManager.VERTICAL_MARGIN
         )
 
+        const buttonEdgeMargin = 24
+
         this.getRenderMethods = () => {
             const mouseIconPos = new Point(
-                updateData.dimensions.x -
-                    (updateData.dimensions.x - TextOverlayManager.WIDTH) / 2 -
-                    TILE_SIZE,
-                updateData.dimensions.y - TextOverlayManager.VERTICAL_MARGIN
+                updateData.dimensions.x - buttonEdgeMargin,
+                updateData.dimensions.y - buttonEdgeMargin
             )
             const action =
                 this.index >= this.text.length - 1 && Lists.last(this.text).isFinished
