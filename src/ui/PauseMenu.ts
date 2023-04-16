@@ -123,6 +123,7 @@ export class PauseMenu extends Component {
         const hoverColor = Color.WHITE
 
         this.displayEntity = ButtonsMenu.render(
+            "pause",
             "red",
             buttons.map((obj) => ({
                 ...obj,

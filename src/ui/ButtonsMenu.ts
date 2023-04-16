@@ -23,6 +23,7 @@ const BUTTON_PADDING = 3
 // TODO: Update this to use the color replace filter instead of different sprites
 export const ButtonsMenu = {
     render: (
+        key: string, // for ClickableUI keys
         background: "red" | "white" | "none",
         options: OptionButton[],
         centerPos: Point
@@ -54,6 +55,7 @@ export const ButtonsMenu = {
         options.forEach((option, i) =>
             e.addComponent(
                 new TextButton({
+                    keyPrefix: key,
                     position: topLeft.plus(
                         new Point(
                             dimensions.x / 2 -

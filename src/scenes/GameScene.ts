@@ -280,7 +280,9 @@ export class GameScene extends Scene {
 
             const buttons = [...dudeTypeButtons, nextPageButton]
 
-            result.push(ButtonsMenu.render("white", buttons, Camera.instance.dimensions.div(2)))
+            result.push(
+                ButtonsMenu.render("spawn", "white", buttons, Camera.instance.dimensions.div(2))
+            )
 
             if (controls.isCloseMenuButtonDown()) {
                 spawnMenu.isOpen = false

@@ -42,7 +42,7 @@ export class MainMenuButton extends Component {
 
         this.awake = () => {
             if (hoverable) {
-                const clickable = this.entity.addComponent(new ClickableUI(centerPos, false))
+                const clickable = this.entity.addComponent(new ClickableUI(text, centerPos))
                 if (autoSelect) {
                     ClickableUI.select(clickable)
                 }

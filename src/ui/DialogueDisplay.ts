@@ -213,6 +213,7 @@ export class DialogueDisplay extends Component {
         )
 
         this.optionsEntity = ButtonsMenu.render(
+            `${this.dialogue}/${this.lineIndex}`,
             "none",
             this.dialogue.options.map((o) => {
                 return {

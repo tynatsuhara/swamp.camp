@@ -4,6 +4,7 @@ import { SpriteTransform } from "brigsby/dist/sprites"
 import { Maths } from "brigsby/dist/util"
 import { controls } from "../Controls"
 import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { ClickableUI } from "./ClickableUI"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
 import { UI_SPRITE_DEPTH } from "./UiConstants"
 import { UISounds } from "./UISounds"
@@ -27,6 +28,7 @@ export class TextButton extends Component {
     private hoverColor: string
 
     constructor({
+        keyPrefix,
         position,
         text,
         onClick,
@@ -36,6 +38,7 @@ export class TextButton extends Component {
         textColor,
         hoverColor,
     }: {
+        keyPrefix: string
         position: Point
         text: string
         onClick: () => void
@@ -55,7 +58,9 @@ export class TextButton extends Component {
         this.hoverColor = hoverColor
         this.width = this.text.length * TEXT_PIXEL_WIDTH + TextButton.margin * 2
 
-        this.start = () => {
+        this.awake = () => {
+            this.entity.addComponent(new ClickableUI(keyPrefix + position.toString(), position))
+
             const leftPos = this.position.apply(Math.floor)
             const centerPos = leftPos.plus(new Point(TILE_SIZE, 0))
             const rightPos = leftPos.plus(new Point(this.width - TILE_SIZE, 0)).apply(Math.floor)
