@@ -270,6 +270,15 @@ const help = () => {
 }
 help()
 
+const screenshot = () => {
+    const canvas = <HTMLCanvasElement>document.getElementById("canvas")
+    const data = canvas.toDataURL("image/png")
+    const a = document.createElement("a")
+    a.href = data
+    a.download = `SWAMP_CAMP_${Math.floor(new Date().getTime() / 1000)}.png`
+    a.click()
+}
+
 // debug chat
 const [sendChat, receiveChat] = session.action<string>("chat")
 const chat = (text: string) => {
@@ -277,4 +286,4 @@ const chat = (text: string) => {
 }
 receiveChat((text, peerId) => console.log(`[chat] ${peerId} > ${text}`))
 
-expose({ help, chat, Point, renderer })
+expose({ help, screenshot, chat, Point, renderer })
