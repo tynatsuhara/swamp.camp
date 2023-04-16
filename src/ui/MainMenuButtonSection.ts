@@ -6,9 +6,7 @@ export class MainMenuButtonSection {
 
     private readonly buttons: MainMenuButton[] = []
 
-    constructor(private readonly topCenter: Point) {
-        console.log("new button section")
-    }
+    constructor(private readonly topCenter: Point) {}
 
     add(text: string, onClick: () => void, condition = true, onHover: () => void = () => {}) {
         if (condition) {

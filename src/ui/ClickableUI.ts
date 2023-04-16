@@ -45,7 +45,6 @@ export class ClickableUI extends Component {
         const dpadDown = dpadValues.find((d) => controls.isDPadDown(d))
 
         if (dpadDown && (this === ClickableUI.hovered || !ClickableUI.hovered)) {
-            console.log(`tick ${tick}`)
             const allClickables = view.entities.flatMap((e) => e.getComponents(ClickableUI))
 
             // this ClickableUI isn't being rendered anymore
