@@ -41,7 +41,8 @@ export class ClickableUI extends Component {
             ClickableUI.hoveredUID = undefined
         }
 
-        // TODO: Only apply once in a given frame
+        // TODO Should we support this kind of navigation for keyboards too? arrow keys?
+        //      It might make some of the "isGamepadMode" logic simpler and give a better load-in UX
         const dpadValues: DPadValue[] = [
             GamepadButton.UP,
             GamepadButton.DOWN,
@@ -72,7 +73,6 @@ export class ClickableUI extends Component {
                 c.cursorPos.distanceTo(this.cursorPos)
             )
 
-        // TODO improve selection logic
         const clickable: ClickableUI = (() => {
             switch (dpadDown) {
                 case GamepadButton.UP:

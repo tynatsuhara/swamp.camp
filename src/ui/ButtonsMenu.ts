@@ -55,7 +55,7 @@ export const ButtonsMenu = {
         options.forEach((option, i) =>
             e.addComponent(
                 new TextButton({
-                    keyPrefix: key,
+                    key: `${key}-${i}`,
                     position: topLeft.plus(
                         new Point(
                             dimensions.x / 2 -
