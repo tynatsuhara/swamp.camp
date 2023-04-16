@@ -1,4 +1,6 @@
 import { Component, debug, GamepadButton, Point, UpdateData } from "brigsby/dist"
+import { EllipseRender } from "brigsby/dist/renderer/EllipseRender"
+import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
 import { Lists } from "brigsby/dist/util"
 import { controls, DPadValue } from "../Controls"
 
@@ -91,5 +93,18 @@ export class ClickableUI extends Component {
 
     lateUpdate() {
         this.canUpdate = true
+    }
+
+    getRenderMethods(): RenderMethod[] {
+        if (debug.showClickableUiPoints) {
+            return [
+                new EllipseRender({
+                    depth: Number.MAX_SAFE_INTEGER,
+                    position: this.cursorPos.plus(new Point(-2, -2)),
+                    dimensions: new Point(4, 4),
+                }),
+            ]
+        }
+        return []
     }
 }
