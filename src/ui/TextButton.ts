@@ -59,11 +59,14 @@ export class TextButton extends Component {
         this.width = this.text.length * TEXT_PIXEL_WIDTH + TextButton.margin * 2
 
         this.awake = () => {
-            this.entity.addComponent(new ClickableUI(keyPrefix + position.toString(), position))
-
             const leftPos = this.position.apply(Math.floor)
             const centerPos = leftPos.plus(new Point(TILE_SIZE, 0))
             const rightPos = leftPos.plus(new Point(this.width - TILE_SIZE, 0)).apply(Math.floor)
+
+            const cursorLockPos = leftPos.plusX(this.width / 2)
+            this.entity.addComponent(
+                new ClickableUI(keyPrefix + position.toString(), cursorLockPos)
+            )
 
             this.left = Tilesets.instance.oneBit
                 .getTileSource(`btnLeft_${buttonColor}`)

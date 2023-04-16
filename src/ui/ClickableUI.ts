@@ -31,6 +31,16 @@ export class ClickableUI extends Component {
             ClickableUI.hoveredUID = undefined
         }
 
+        const allClickables = Object.fromEntries(
+            view.entities.flatMap((e) => e.getComponents(ClickableUI)).map((c) => [c.uid, c])
+        )
+
+        // this ClickableUI isn't being rendered anymore
+        if (ClickableUI.hoveredUID && !(ClickableUI.hoveredUID in allClickables)) {
+            console.log("no more clickable")
+            ClickableUI.hoveredUID = undefined
+        }
+
         // TODO: Only apply once in a given frame
         const dpadValues: DPadValue[] = [
             GamepadButton.UP,
@@ -41,16 +51,6 @@ export class ClickableUI extends Component {
         const dpadDown = dpadValues.find((d) => controls.isDPadDown(d))
 
         if (dpadDown && (this.uid === ClickableUI.hoveredUID || !ClickableUI.hoveredUID)) {
-            const allClickables = Object.fromEntries(
-                view.entities.flatMap((e) => e.getComponents(ClickableUI)).map((c) => [c.uid, c])
-            )
-
-            // this ClickableUI isn't being rendered anymore
-            if (ClickableUI.hoveredUID && !(ClickableUI.hoveredUID in allClickables)) {
-                console.log("no more clickable")
-                ClickableUI.hoveredUID = undefined
-            }
-
             const clickableToSelect =
                 this.uid === ClickableUI.hoveredUID
                     ? this.getNextClickable(allClickables, dpadDown)
