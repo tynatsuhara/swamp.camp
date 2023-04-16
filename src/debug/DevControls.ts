@@ -262,6 +262,7 @@ debug.disableParticles ??= false
 debug.photoMode ??= false
 debug.fixedHeight ??= undefined
 debug.dpadMenus ??= false
+debug.staticsHostOverride ??= undefined
 
 const help = () => {
     let help = "dev controls (enable with debug.enableDevControls=true)"

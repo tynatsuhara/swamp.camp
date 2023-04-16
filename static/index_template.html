@@ -31,6 +31,21 @@
             if (showChromeWarning) {
                 window.location.href = "/chrome_warning"
             }
+
+            document.addEventListener("DOMContentLoaded", () => {
+                const debugString = localStorage.getItem("debug_state")
+                const debug = debugString ? JSON.parse(debugString) : undefined
+                const staticsHostOverride = debug?.staticsHostOverride
+                const appScript = document.createElement("script")
+                let scriptUrl = "app.js?q=%JS_BUNDLE_HASH%"
+                if (staticsHostOverride) {
+                    scriptUrl = "https://" + staticsHostOverride + "/" + scriptUrl
+                    console.warn("Loading JavaScript bundle from " + scriptUrl)
+                }
+                appScript.src = scriptUrl
+                appScript.type = "text/javascript"
+                document.body.appendChild(appScript)
+            })
         </script>
         <link rel="stylesheet" type="text/css" href="index.css" />
         <link rel="shortcut icon" href="favicon.png" />
@@ -39,6 +54,5 @@
         <div id="column">
             <canvas id="canvas" tabindex="-1"></canvas>
         </div>
-        <script src="app.js?q=%JS_BUNDLE_HASH%" type="text/javascript"></script>
     </body>
 </html>
