@@ -1,11 +1,15 @@
-import { Component, debug, GamepadButton, Point, UpdateData } from "brigsby/dist"
+import { Component, debug, expose, GamepadButton, Point, UpdateData } from "brigsby/dist"
 import { EllipseRender } from "brigsby/dist/renderer/EllipseRender"
 import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
 import { Lists } from "brigsby/dist/util"
+import { View } from "brigsby/dist/View"
 import { controls, DPadValue } from "../Controls"
 
 export class ClickableUI extends Component {
     private static hoveredUID: string
+    public static get isLockedOn() {
+        return !!ClickableUI.hoveredUID
+    }
 
     private canUpdate = true
 
@@ -13,12 +17,31 @@ export class ClickableUI extends Component {
         super()
     }
 
+    private static getAllClickables(view: View) {
+        return Object.fromEntries(
+            view.entities.flatMap((e) => e.getComponents(ClickableUI)).map((c) => [c.uid, c])
+        )
+    }
+
     static select(clickable: ClickableUI) {
         ClickableUI.hoveredUID = clickable.uid
         controls.setGamepadCursorPosition(clickable.cursorPos)
     }
 
-    update({ view, tick }: UpdateData) {
+    static update(view: View) {
+        // this ClickableUI isn't being rendered anymore
+        if (
+            ClickableUI.hoveredUID &&
+            !(ClickableUI.hoveredUID in ClickableUI.getAllClickables(view))
+        ) {
+            console.log("no more clickable")
+            ClickableUI.hoveredUID = undefined
+        }
+
+        expose({ hoveredClickable: this.hoveredUID })
+    }
+
+    update({ view }: UpdateData) {
         // TODO remove debug flag once this is ready
         if (!debug.dpadMenus) {
             return
@@ -33,15 +56,7 @@ export class ClickableUI extends Component {
             ClickableUI.hoveredUID = undefined
         }
 
-        const allClickables = Object.fromEntries(
-            view.entities.flatMap((e) => e.getComponents(ClickableUI)).map((c) => [c.uid, c])
-        )
-
-        // this ClickableUI isn't being rendered anymore
-        if (ClickableUI.hoveredUID && !(ClickableUI.hoveredUID in allClickables)) {
-            console.log("no more clickable")
-            ClickableUI.hoveredUID = undefined
-        }
+        const allClickables = ClickableUI.getAllClickables(view)
 
         // TODO Should we support this kind of navigation for keyboards too? arrow keys?
         //      It might make some of the "isGamepadMode" logic simpler and give a better load-in UX
