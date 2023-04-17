@@ -196,9 +196,8 @@ class ControlsWrapper extends Component {
             },
             gamepad: () =>
                 gamepadInput.isButtonDown(GamepadButton.X) ||
-                // using the touchpads as joysticks is great on Steam Deck
-                gamepadInput.isButtonDown(GamepadButton.R3) ||
-                gamepadInput.isButtonUp(GamepadButton.R3),
+                // using the touchpads as joysticks is great on Steam
+                gamepadInput.isButtonDown(GamepadButton.R3),
         })
 
     getInventoryStackPickUpOrDropString = () =>
