@@ -21,8 +21,10 @@ import { TextIcon } from "./ui/Text"
 
 // The last gamepad which accepted input. Undefined if the user is using kb/m.
 let gamepadInput: CapturedGamepad | undefined
-let gamepadMousePos: Point | undefined
 let isGamepadMode = false
+
+// A virtual cursor position used for gamepad cursor and ClickableUI navigation
+let cursorPos: Point | undefined
 
 // NOTE: This view is scaled to the UI layer
 let input: CapturedInput
@@ -52,7 +54,6 @@ const check = <T>({ kbm, gamepad }: InputHandlers<T>) => {
     const kbmResult = kbm()
     if (kbmResult || !gamepadInput) {
         isGamepadMode = false
-        gamepadMousePos = undefined
         return kbmResult
     }
 
@@ -95,13 +96,19 @@ class ControlsWrapper extends Component {
         input = updateData.input
 
         gamepadInput = input.gamepads.find((gp) => gp)
-        expose({ gamepad: gamepadInput })
 
-        if (!gamepadInput || (isGamepadMode && input.mousePosDelta.magnitude() > 0)) {
+        if (input.mousePosDelta.magnitude() > 0) {
+            cursorPos = undefined
             isGamepadMode = false
-            gamepadMousePos = undefined
+        }
+
+        expose({ gamepad: gamepadInput, cursorPos })
+
+        if (!gamepadInput) {
+            isGamepadMode = false
+            // gamepadMousePos = undefined
             // check debug as non-gamepad mode
-            checkDebug(updateData.elapsedTimeMillis)
+            checkIfShouldOpenDevTools(updateData.elapsedTimeMillis)
             return
         }
 
@@ -126,7 +133,7 @@ class ControlsWrapper extends Component {
         }
 
         // check debug as gamepad mode
-        checkDebug(updateData.elapsedTimeMillis)
+        checkIfShouldOpenDevTools(updateData.elapsedTimeMillis)
     }
 
     updateGamepadCursorPosition(elapsedTimeMillis: number) {
@@ -134,7 +141,7 @@ class ControlsWrapper extends Component {
             return
         }
 
-        const currentGamePadMousePos = this.getMousePos()
+        const currentGamePadMousePos = this.getCursorPos()
 
         const rightStick = deaden(gamepadInput.getRightAxes())
         const stickInput = rightStick.times(elapsedTimeMillis * CURSOR_SENSITIVITY)
@@ -143,12 +150,8 @@ class ControlsWrapper extends Component {
     }
 
     setGamepadCursorPosition({ x, y }: PointValue) {
-        if (!isGamepadMode || !gamepadInput) {
-            return
-        }
-
         const bounds = Camera.instance.dimensions.minus(new Point(3, 3))
-        gamepadMousePos = new Point(Maths.clamp(x, 0, bounds.x), Maths.clamp(y, 0, bounds.y))
+        cursorPos = new Point(Maths.clamp(x, 0, bounds.x), Maths.clamp(y, 0, bounds.y))
     }
 
     isGamepadMode() {
@@ -302,7 +305,7 @@ class ControlsWrapper extends Component {
                 ),
         })
 
-    isMouseMoving() {
+    isCursorMoving() {
         return (
             (isGamepadMode && deaden(gamepadInput.getRightAxes()).magnitude() > 0) ||
             input.mousePosDelta.magnitude() > 0
@@ -389,18 +392,20 @@ class ControlsWrapper extends Component {
                 gamepadInput.isButton(GamepadButton.R2, state),
         })
 
-    getMousePos = () => {
-        if (isGamepadMode) {
-            if (!gamepadMousePos) {
-                gamepadMousePos = input.mousePos
-            }
-            return gamepadMousePos
-        }
-        return input.mousePos
+    getCursorPos = () => {
+        return cursorPos ?? input.mousePos
+        // gamepadMousePos = input.mousePos
+        // if (isGamepadMode) {
+        //     if (!gamepadMousePos) {
+        //         gamepadMousePos = input.mousePos
+        //     }
+        //     return gamepadMousePos
+        // }
+        // return input.mousePos
     }
 
-    getWorldSpaceMousePos = () => {
-        return this.translateToWorldSpace(this.getMousePos())
+    getWorldSpaceCursorPos = () => {
+        return this.translateToWorldSpace(this.getCursorPos())
     }
 
     getScrollDeltaY = () => {
@@ -433,7 +438,7 @@ class ControlsWrapper extends Component {
 }
 
 let devToolsOpenCountdown: number
-const checkDebug = (elapsedTimeMillis: number) => {
+const checkIfShouldOpenDevTools = (elapsedTimeMillis: number) => {
     const openDevToolsGamepadButtons = [
         GamepadButton.L1,
         GamepadButton.L2,

@@ -32,7 +32,7 @@ export class Cursor extends Component {
 
                 this.cursorRenderMethod = this.cursorSprite.toImageRender(
                     SpriteTransform.new({
-                        position: controls.getMousePos(),
+                        position: controls.getCursorPos(),
                         depth: Number.MAX_SAFE_INTEGER,
                     })
                 )

@@ -149,7 +149,7 @@ export class CraftingMenu extends Component {
             const hovered = Maths.rectContains(
                 position,
                 dims.times(TILE_SIZE),
-                controls.getMousePos()
+                controls.getCursorPos()
             )
 
             result.push(
@@ -217,7 +217,7 @@ export class CraftingMenu extends Component {
         const verticalTextOffset = 13
         let verticalOffset = this.scrollOffset
 
-        const shiftedMousePos = controls.getMousePos().plusY(-this.scrollOffset)
+        const shiftedMousePos = controls.getCursorPos().plusY(-this.scrollOffset)
 
         for (let r = 0; r < recipes.length; r++) {
             const hovered =
@@ -230,7 +230,7 @@ export class CraftingMenu extends Component {
                     // within the frame itself
                     topLeft.plus(innerOffset),
                     this.innerDimensions,
-                    controls.getMousePos()
+                    controls.getCursorPos()
                 )
 
             const recipe = recipes[r]
@@ -316,7 +316,7 @@ export class CraftingMenu extends Component {
                             verticalOffset + margin * 1.5
                         ).plus(topLeft),
                         new Point(TILE_SIZE + margin, TILE_SIZE + margin),
-                        controls.getMousePos()
+                        controls.getCursorPos()
                     )
                 ) {
                     const displayName = ITEM_METADATA_MAP[ingr.item].displayName

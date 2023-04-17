@@ -92,7 +92,7 @@ export class TextButton extends Component {
         this.hovering = Maths.rectContains(
             this.position,
             new Point(this.width, TILE_SIZE),
-            controls.getMousePos()
+            controls.getCursorPos()
         )
         if (this.hovering && !wasHovering) {
             this.onMouseOver?.()

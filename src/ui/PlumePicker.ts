@@ -87,7 +87,7 @@ export class PlumePicker extends Component {
             const position = this.getPositionForIndex(index)
             const dimensions = new Point(TILE_SIZE, TILE_SIZE)
 
-            const hovered = Maths.rectContains(position, dimensions, controls.getMousePos())
+            const hovered = Maths.rectContains(position, dimensions, controls.getCursorPos())
             const big = hovered || this.selected === index
             const bigBuffer = 2
 

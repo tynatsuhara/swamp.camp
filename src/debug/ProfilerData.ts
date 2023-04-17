@@ -16,8 +16,8 @@ export class ProfilerData extends Component {
             return
         }
 
-        const mouseTile = pixelPtToTilePt(controls.getWorldSpaceMousePos())
-        profiler.showInfo(`UI mouse pos: ${controls.getMousePos().apply(Math.floor)}`)
+        const mouseTile = pixelPtToTilePt(controls.getWorldSpaceCursorPos())
+        profiler.showInfo(`UI mouse pos: ${controls.getCursorPos().apply(Math.floor)}`)
         profiler.showInfo(`mouse tile: ${mouseTile}`)
         profiler.showInfo(`time: ${WorldTime.clockTime()} (${Math.floor(WorldTime.instance.time)})`)
         profiler.showInfo(`particle count: ${Particles.instance.count}`)
@@ -35,7 +35,7 @@ export class ProfilerData extends Component {
                 return Maths.rectContains(
                     d.standingPosition.plus(pt(-hoverSize.x / 2, -hoverSize.y)),
                     hoverSize,
-                    controls.getWorldSpaceMousePos()
+                    controls.getWorldSpaceCursorPos()
                 )
             })
             .forEach((d) => {

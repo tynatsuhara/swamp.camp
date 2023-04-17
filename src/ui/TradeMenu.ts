@@ -211,7 +211,7 @@ export class TradeMenu extends Component {
         const verticalTextOffset = 13
         let verticalOffset = this.scrollOffset
 
-        const shiftedMousePos = controls.getMousePos().plusY(-this.scrollOffset)
+        const shiftedMousePos = controls.getCursorPos().plusY(-this.scrollOffset)
 
         for (let r = 0; r < items.length; r++) {
             const hovered =
@@ -224,7 +224,7 @@ export class TradeMenu extends Component {
                     // within the frame itself
                     topLeft.plus(innerOffset),
                     this.innerDimensions,
-                    controls.getMousePos()
+                    controls.getCursorPos()
                 )
 
             const sale = items[r]

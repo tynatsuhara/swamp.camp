@@ -63,7 +63,7 @@ export abstract class AbstractPlayer extends Component {
         // Controls we'll need to pass
         const canMove = !UIStateManager.instance.isMenuOpen || PlaceElementDisplay.instance.isOpen
 
-        const mousePos = controls.getWorldSpaceMousePos()
+        const mousePos = controls.getWorldSpaceCursorPos()
         const centerPos = this.dude.standingPosition.plusY(HAND_POSITION_OFFSET.y)
         const aimingDirection = pt(mousePos.x - centerPos.x, mousePos.y - centerPos.y)
 

@@ -18,7 +18,7 @@ export class ClickableUI extends Component {
     constructor(
         private readonly uid: string,
         private readonly cursorPos: Point,
-        private readonly autofocus: boolean = false
+        private readonly autofocus: boolean = false // TODO
     ) {
         super()
     }
@@ -62,15 +62,13 @@ export class ClickableUI extends Component {
         }
 
         // bail out of dpad mode
-        if (controls.isMouseMoving()) {
+        if (controls.isCursorMoving()) {
             ClickableUI.hoveredUID = undefined
             return
         }
 
         const allClickables = ClickableUI.getAllClickables(view)
 
-        // TODO Should we support this kind of navigation for keyboards too? arrow keys?
-        //      It might make some of the "isGamepadMode" logic simpler and give a better load-in UX
         const directionalValues: Direction[] = ["up", "down", "left", "right"]
         const dpadDown = directionalValues.find((d) => controls.isDirectionButtonDown(d))
 
@@ -97,7 +95,7 @@ export class ClickableUI extends Component {
     }
 
     private getNextClickable(allClickables: Record<string, ClickableUI>, dpadDown: Direction) {
-        const { x, y } = allClickables[ClickableUI.hoveredUID]?.cursorPos ?? controls.getMousePos()
+        const { x, y } = allClickables[ClickableUI.hoveredUID]?.cursorPos ?? controls.getCursorPos()
         const clickableValues = Object.values(allClickables)
 
         const getClickable = (predicate: (c: ClickableUI) => void) =>

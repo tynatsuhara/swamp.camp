@@ -108,7 +108,7 @@ export class Tooltip extends Component {
     }
 
     private getPositionMouseMode(width: number, screenDimensions: Point) {
-        const position = controls.getMousePos()
+        const position = controls.getCursorPos()
 
         const leftPos = position.plus(new Point(TILE_SIZE / 2, -TILE_SIZE)).apply(Math.floor)
 

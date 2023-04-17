@@ -53,7 +53,7 @@ export class MainMenuButton extends Component {
             Maths.rectContains(
                 this.centerPos.plusX(-this.width / 2).plusY(-4),
                 new Point(this.width, TILE_SIZE),
-                controls.getMousePos()
+                controls.getCursorPos()
             )
 
         if (this.hovering) {

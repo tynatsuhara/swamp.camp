@@ -117,7 +117,7 @@ export class InventoryDisplay extends Component {
             return
         }
 
-        const [hoverInv, hoverIndex] = this.getHoveredInventoryIndex(controls.getMousePos())
+        const [hoverInv, hoverIndex] = this.getHoveredInventoryIndex(controls.getCursorPos())
 
         const wasHoldingSomething = !!this.heldStackSprite
 
@@ -246,7 +246,7 @@ export class InventoryDisplay extends Component {
         // due to the new DisplayEntity not being rendered
         this.heldStackSprite = this.entity.addComponent(new SpriteComponent(stackSprite.sprite))
         // center it on the mouse
-        this.heldStackSprite.transform.position = controls.getMousePos().minus(pt(TILE_SIZE / 2))
+        this.heldStackSprite.transform.position = controls.getCursorPos().minus(pt(TILE_SIZE / 2))
         this.heldStackSprite.transform.depth = stackSprite.transform.depth
         // if we're holding all the items, hide the sprite in the slot
         stackSprite.enabled = this.heldStack.count < inv.getStack(index)?.count
@@ -321,7 +321,7 @@ export class InventoryDisplay extends Component {
             }
         } else {
             this.heldStackSprite.transform.position = controls
-                .getMousePos()
+                .getCursorPos()
                 .minus(pt(TILE_SIZE / 2))
         }
     }
