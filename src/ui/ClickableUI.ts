@@ -1,9 +1,11 @@
-import { Component, debug, expose, GamepadButton, Point, UpdateData } from "brigsby/dist"
+import { Component, debug, expose, Point, UpdateData } from "brigsby/dist"
 import { EllipseRender } from "brigsby/dist/renderer/EllipseRender"
 import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
 import { Lists } from "brigsby/dist/util"
 import { View } from "brigsby/dist/View"
-import { controls, DPadValue } from "../Controls"
+import { controls } from "../Controls"
+
+type Direction = "up" | "down" | "left" | "right"
 
 export class ClickableUI extends Component {
     private static hoveredUID: string
@@ -13,7 +15,11 @@ export class ClickableUI extends Component {
 
     private canUpdate = true
 
-    constructor(private readonly uid: string, private readonly cursorPos: Point) {
+    constructor(
+        private readonly uid: string,
+        private readonly cursorPos: Point,
+        private readonly autofocus: boolean = false
+    ) {
         super()
     }
 
@@ -28,6 +34,9 @@ export class ClickableUI extends Component {
         controls.setGamepadCursorPosition(clickable.cursorPos)
     }
 
+    /**
+     * Must be called every frame by the cursor! (Kind of gross, but whatever)
+     */
     static update(view: View) {
         // this ClickableUI isn't being rendered anymore
         if (
@@ -48,25 +57,29 @@ export class ClickableUI extends Component {
         }
 
         // another clickable UI has already accepted input this frame
-        if (!this.canUpdate || !controls.isGamepadMode()) {
+        if (!this.canUpdate) {
             return
         }
 
-        if (controls.isRightStickMoving()) {
+        // bail out of dpad mode
+        if (controls.isMouseMoving()) {
             ClickableUI.hoveredUID = undefined
+            return
         }
 
         const allClickables = ClickableUI.getAllClickables(view)
 
         // TODO Should we support this kind of navigation for keyboards too? arrow keys?
         //      It might make some of the "isGamepadMode" logic simpler and give a better load-in UX
-        const dpadValues: DPadValue[] = [
-            GamepadButton.UP,
-            GamepadButton.DOWN,
-            GamepadButton.LEFT,
-            GamepadButton.RIGHT,
-        ]
-        const dpadDown = dpadValues.find((d) => controls.isDPadDown(d))
+        const directionalValues: Direction[] = ["up", "down", "left", "right"]
+        const dpadDown = directionalValues.find((d) => controls.isDirectionButtonDown(d))
+
+        const select = (clickable: ClickableUI) => {
+            if (clickable) {
+                Object.values(allClickables).forEach((c) => (c.canUpdate = false))
+                ClickableUI.select(clickable)
+            }
+        }
 
         if (dpadDown && (this.uid === ClickableUI.hoveredUID || !ClickableUI.hoveredUID)) {
             const clickableToSelect =
@@ -74,14 +87,16 @@ export class ClickableUI extends Component {
                     ? this.getNextClickable(allClickables, dpadDown)
                     : this
 
-            if (clickableToSelect) {
-                Object.values(allClickables).forEach((c) => (c.canUpdate = false))
-                ClickableUI.select(clickableToSelect)
-            }
+            select(clickableToSelect)
+        } else if (!ClickableUI.hoveredUID) {
+            // const autofocusClickable = Object.values(allClickables).find((c) => c.autofocus)
+            // select(autofocusClickable)
+        } else if (this.uid === ClickableUI.hoveredUID) {
+            // select(this)
         }
     }
 
-    private getNextClickable(allClickables: Record<string, ClickableUI>, dpadDown: DPadValue) {
+    private getNextClickable(allClickables: Record<string, ClickableUI>, dpadDown: Direction) {
         const { x, y } = allClickables[ClickableUI.hoveredUID]?.cursorPos ?? controls.getMousePos()
         const clickableValues = Object.values(allClickables)
 
@@ -92,13 +107,13 @@ export class ClickableUI extends Component {
 
         const clickable: ClickableUI = (() => {
             switch (dpadDown) {
-                case GamepadButton.UP:
+                case "up":
                     return getClickable((c) => c.cursorPos.y < y)
-                case GamepadButton.DOWN:
+                case "down":
                     return getClickable((c) => c.cursorPos.y > y)
-                case GamepadButton.LEFT:
+                case "left":
                     return getClickable((c) => c.cursorPos.x < x)
-                case GamepadButton.RIGHT:
+                case "right":
                     return getClickable((c) => c.cursorPos.x > x)
             }
         })()

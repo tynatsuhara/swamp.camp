@@ -29,12 +29,6 @@ let input: CapturedInput
 
 // TODO! TODO! TODO! Track "hasReceivedAnyMouseMovement" to make jumping in immediately with a controller a nicer experience
 
-export type DPadValue =
-    | GamepadButton.UP
-    | GamepadButton.DOWN
-    | GamepadButton.LEFT
-    | GamepadButton.RIGHT
-
 type InputHandlers<T> = {
     /**
      * If this returns a truthy value, {@link isGamepadMode} will be false
@@ -286,11 +280,33 @@ class ControlsWrapper extends Component {
 
     getMenuClickDownString = () => (isGamepadMode ? TextIcon.GAMEPAD_X : TextIcon.MOUSE_LEFT)
 
-    isDPadDown = (btn: DPadValue) =>
-        check({ kbm: () => false, gamepad: () => gamepadInput.isButtonDown(btn) })
+    isDirectionButtonDown = (btn: "up" | "down" | "left" | "right") =>
+        check({
+            kbm: () =>
+                input.isKeyDown(
+                    {
+                        up: InputKey.UP,
+                        down: InputKey.DOWN,
+                        left: InputKey.LEFT,
+                        right: InputKey.RIGHT,
+                    }[btn]
+                ),
+            gamepad: () =>
+                gamepadInput.isButtonDown(
+                    {
+                        up: GamepadButton.UP,
+                        down: GamepadButton.DOWN,
+                        left: GamepadButton.LEFT,
+                        right: GamepadButton.RIGHT,
+                    }[btn]
+                ),
+        })
 
-    isRightStickMoving() {
-        return !deaden(gamepadInput.getRightAxes()).equals(Point.ZERO)
+    isMouseMoving() {
+        return (
+            (isGamepadMode && deaden(gamepadInput.getRightAxes()).magnitude() > 0) ||
+            input.mousePosDelta.magnitude() > 0
+        )
     }
 
     // ======== PLAYER CONTROLS ========
