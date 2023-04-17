@@ -96,30 +96,37 @@ export class MainMenuScene extends Scene {
         Music.stop()
         Ambiance.stop()
 
-        this.plumes = new PlumePicker(saveManager.getState().plumeIndex, (color) => {
-            // console.log(color)
-            const newKnightAnimation = DudeAnimationUtils.getCharacterIdleAnimation("knight_f", {
-                color,
-            }).toComponent(this.knight?.transform)
+        this.plumes = new PlumePicker(
+            this.getMenuTop(),
+            saveManager.getState().plumeIndex,
+            (color) => {
+                // console.log(color)
+                const newKnightAnimation = DudeAnimationUtils.getCharacterIdleAnimation(
+                    "knight_f",
+                    {
+                        color,
+                    }
+                ).toComponent(this.knight?.transform)
 
-            requestAnimationFrame(() => {
-                if (this.knight) {
-                    this.knightEntity.removeComponent(this.knight)
-                }
-                this.knight = this.knightEntity.addComponent(newKnightAnimation)
-            })
+                requestAnimationFrame(() => {
+                    if (this.knight) {
+                        this.knightEntity.removeComponent(this.knight)
+                    }
+                    this.knight = this.knightEntity.addComponent(newKnightAnimation)
+                })
 
-            // if (!this.knight?.entity) {
-            // console.log(this.knight)
-            // } else {
-            //     console.log(this.knight)
-            //     // console.log(this.knight.entity)
-            //     const existingEntity = this.knight.entity
-            //     // console.log(`replace`)
-            //     existingEntity.removeComponent(this.knight)
-            //     existingEntity.addComponent(newKnightAnimation)
-            // }
-        })
+                // if (!this.knight?.entity) {
+                // console.log(this.knight)
+                // } else {
+                //     console.log(this.knight)
+                //     // console.log(this.knight.entity)
+                //     const existingEntity = this.knight.entity
+                //     // console.log(`replace`)
+                //     existingEntity.removeComponent(this.knight)
+                //     existingEntity.addComponent(newKnightAnimation)
+                // }
+            }
+        )
 
         this.darkness = new Entity().addComponent(new DarknessMask(false))
 
@@ -160,15 +167,21 @@ export class MainMenuScene extends Scene {
         this.view = null // force re-render
     }
 
+    private getDimensions() {
+        return renderer.getDimensions().div(ZOOM)
+    }
+
+    private getMenuTop() {
+        return this.getDimensions().floorDiv(2).plusY(31)
+    }
+
     getViews(updateViewsContext: UpdateViewsContext) {
-        const dimensions = renderer.getDimensions().div(ZOOM)
+        const dimensions = this.getDimensions()
 
         // we need to re-render this each time since image bitmaps are async
         // this.darkness?.render(dimensions, Point.ZERO)
 
-        const center = dimensions.floorDiv(2)
-        const menuTop = center.plusY(31)
-        this.plumes.position = menuTop
+        const menuTop = this.getMenuTop()
         const knightPos = menuTop
             .minus(this.knight.transform.dimensions.floorDiv(2).plusY(24))
             .plusX(-17)

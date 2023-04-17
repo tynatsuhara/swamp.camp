@@ -1,8 +1,9 @@
-import { Component, Entity, Point } from "brigsby/dist"
+import { Component, Entity, Point, pt } from "brigsby/dist"
 import { RectRender, RenderMethod } from "brigsby/dist/renderer"
 import { Maths } from "brigsby/dist/util"
 import { controls } from "../Controls"
 import { TILE_SIZE } from "../graphics/Tilesets"
+import { ClickableUI } from "./ClickableUI"
 import { Color } from "./Color"
 import { UI_SPRITE_DEPTH } from "./UiConstants"
 import { UISounds } from "./UISounds"
@@ -33,8 +34,10 @@ export const PLUME_COLORS: [Color, Color][] = [
     [Color.PINK_4, Color.PINK_5],
 ]
 
+const SQ_SIZE = TILE_SIZE
+const ROW_LENGTH = 9
+
 export class PlumePicker extends Component {
-    position: Point = Point.ZERO // top-center position
     entity = new Entity([this])
     initialColor: number
     selected: number
@@ -42,12 +45,23 @@ export class PlumePicker extends Component {
     private renders: RenderMethod[]
     private readonly callback: (color: number) => void
 
-    constructor(initialColor: number, callback: (color: number) => void) {
+    constructor(
+        private readonly position,
+        initialColor: number,
+        callback: (color: number) => void
+    ) {
         super()
         this.initialColor = initialColor || 0
         this.callback = callback
 
         this.select(this.initialColor)
+    }
+
+    awake() {
+        PLUME_COLORS.forEach((_, index) => {
+            const pos = this.getPositionForIndex(index).plus(pt(SQ_SIZE / 2))
+            this.entity.addComponent(new ClickableUI(`plume-${index}`, pos))
+        })
     }
 
     /**
@@ -69,14 +83,8 @@ export class PlumePicker extends Component {
     }
 
     update() {
-        const sqSize = TILE_SIZE
-        const rowLen = 9
-        const topLeftPos = this.position.plusX((-rowLen * sqSize) / 2)
-
         this.renders = PLUME_COLORS.map((colors, index) => {
-            const position = topLeftPos
-                .plusX((index % rowLen) * TILE_SIZE)
-                .plusY(Math.floor(index / rowLen) * TILE_SIZE)
+            const position = this.getPositionForIndex(index)
             const dimensions = new Point(TILE_SIZE, TILE_SIZE)
 
             const hovered = Maths.rectContains(position, dimensions, controls.getMousePos())
@@ -97,6 +105,13 @@ export class PlumePicker extends Component {
                 depth: UI_SPRITE_DEPTH + (big && !hovered ? 2 : hovered ? 1 : 0),
             })
         })
+    }
+
+    private getPositionForIndex(index: number) {
+        const topLeftPos = this.position.plusX((-ROW_LENGTH * SQ_SIZE) / 2)
+        return topLeftPos
+            .plusX((index % ROW_LENGTH) * TILE_SIZE)
+            .plusY(Math.floor(index / ROW_LENGTH) * TILE_SIZE)
     }
 
     getRenderMethods(): RenderMethod[] {
