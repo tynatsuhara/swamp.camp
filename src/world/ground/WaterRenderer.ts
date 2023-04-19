@@ -10,8 +10,7 @@ import { here } from "../locations/LocationManager"
 const WATER_ANIMATOR = new Animator([750, 750])
 
 /**
- * This is an optimization that pre-renders ground on an offscreen canvas.
- * Not used by all ground types.
+ * This is an optimization that pre-renders water on an offscreen canvas.
  */
 export class WaterRenderer {
     static readonly DEPTH = Number.MIN_SAFE_INTEGER + 5
