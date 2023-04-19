@@ -1,4 +1,5 @@
-import { AnonymousComponent, Entity, InputKey, Point } from "brigsby/dist"
+import { AnonymousComponent, Entity, Point } from "brigsby/dist"
+import { controls } from "../Controls"
 import { MainMenuButton } from "./MainMenuButton"
 
 export class MainMenuButtonSection {
@@ -54,8 +55,8 @@ export class MainMenuButtonSection {
         return new Entity([
             ...this.buttons,
             new AnonymousComponent({
-                update: ({ input }) => {
-                    if (input.isKeyDown(InputKey.BACKSPACE)) {
+                update: () => {
+                    if (controls.isCloseMenuButtonDown()) {
                         this.backFn?.()
                     }
                 },

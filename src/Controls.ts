@@ -252,7 +252,7 @@ class ControlsWrapper extends Component {
 
     isCloseMenuButtonDown = () =>
         check({
-            kbm: () => input.isKeyDown(InputKey.TAB),
+            kbm: () => input.isKeyDown(InputKey.TAB) || input.isKeyDown(InputKey.BACKSPACE),
             gamepad: () => gamepadInput.isButtonDown(GamepadButton.CIRCLE),
         })
 
