@@ -214,10 +214,10 @@ class ControlsWrapper extends Component {
     isInventorySwap = () =>
         check({
             kbm: () => input.isKeyHeld(InputKey.SHIFT) && input.isMouseDown,
-            gamepad: () => gamepadInput.isButtonDown(GamepadButton.R3),
+            gamepad: () => gamepadInput.isButtonDown(GamepadButton.R1),
         })
 
-    getInventorySwapString = () => (isGamepadMode ? "R3" : "[shift]+" + TextIcon.MOUSE_LEFT)
+    getInventorySwapString = () => (isGamepadMode ? "R1" : "[shift]+" + TextIcon.MOUSE_LEFT)
 
     // ======== PAUSE MENU STUFF ========
 
