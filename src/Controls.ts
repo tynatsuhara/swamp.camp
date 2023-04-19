@@ -274,7 +274,7 @@ class ControlsWrapper extends Component {
 
     isMenuClickDown = () =>
         check({
-            kbm: () => input.isMouseDown,
+            kbm: () => input.isMouseDown || input.isKeyDown(InputKey.ENTER),
             gamepad: () =>
                 gamepadInput.isButtonDown(GamepadButton.X) ||
                 gamepadInput.isButtonDown(GamepadButton.R3),
