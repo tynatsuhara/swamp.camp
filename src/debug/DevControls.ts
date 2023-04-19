@@ -29,7 +29,7 @@ import { spawnMenu } from "./SpawnMenu"
 
 const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     [
-        InputKey.BACKSPACE,
+        InputKey.BACKSLASH,
         "toggle profiler",
         () => {
             if (

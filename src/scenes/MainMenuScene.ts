@@ -231,15 +231,16 @@ export class MainMenuScene extends Scene {
 
         if (this.menu === Menu.MULTIPLAYER) {
             if (this.sessionLoadingState) {
+                const backFn = () => {
+                    clearTimeout(cancelJoinTimeout)
+                    this.sessionLoadingState = undefined
+                    session.close()
+                    this.render(Menu.MULTIPLAYER)
+                }
                 entities.push(
-                    new MainMenuButtonSection(menuTop)
+                    new MainMenuButtonSection(menuTop, backFn)
                         .addText(this.sessionLoadingState)
-                        .add("cancel", () => {
-                            clearTimeout(cancelJoinTimeout)
-                            this.sessionLoadingState = undefined
-                            session.close()
-                            this.render(Menu.MULTIPLAYER)
-                        })
+                        .add("cancel", backFn)
                         .getEntity()
                 )
             } else {
@@ -290,7 +291,7 @@ export class MainMenuScene extends Scene {
                 }
 
                 entities.push(
-                    new MainMenuButtonSection(menuTop)
+                    new MainMenuButtonSection(menuTop, cancelJoin)
                         .addLineBreak()
                         .add("connect", joinSession, !this.sessionLoadingState)
                         .add("cancel", cancelJoin)
@@ -323,8 +324,9 @@ export class MainMenuScene extends Scene {
                     .getEntity()
             )
         } else if (this.menu === Menu.DOWNLOADS) {
+            const backFn = () => this.render(Menu.ROOT)
             entities.push(
-                new MainMenuButtonSection(menuTop)
+                new MainMenuButtonSection(menuTop, backFn)
                     .add(
                         "Windows",
                         link(
@@ -349,11 +351,15 @@ export class MainMenuScene extends Scene {
                             "https://github.com/tylerbonnell/swamp-camp-native/releases/tag/macos-apple-silicon"
                         )
                     )
-                    .add("Back", () => this.render(Menu.ROOT))
+                    .add("Back", backFn)
                     .getEntity()
             )
         } else if (this.menu === Menu.LOAD_GAME) {
-            const menu = new MainMenuButtonSection(menuTop)
+            const backFn = () => {
+                this.render(Menu.ROOT)
+                this.resetPlume()
+            }
+            const menu = new MainMenuButtonSection(menuTop, backFn)
             saveManager.getSaves().forEach((save, i) => {
                 if (save) {
                     menu.add(
@@ -364,13 +370,14 @@ export class MainMenuScene extends Scene {
                     )
                 }
             })
-            menu.add("cancel", () => {
-                this.render(Menu.ROOT)
-                this.resetPlume()
-            })
+            menu.add("cancel", backFn)
             entities.push(menu.getEntity())
         } else if (this.menu === Menu.NEW_GAME) {
-            const menu = new MainMenuButtonSection(menuTop)
+            const backFn = () => {
+                this.render(Menu.ROOT)
+                this.resetPlume()
+            }
+            const menu = new MainMenuButtonSection(menuTop, backFn)
             saveManager.getSaves().forEach((save, i) => {
                 menu.add(
                     `slot ${i + 1}: ${
@@ -385,25 +392,24 @@ export class MainMenuScene extends Scene {
                     () => this.showPlumeForSave(i)
                 )
             })
-            menu.add("cancel", () => {
-                this.render(Menu.ROOT)
-                this.resetPlume()
-            })
+            menu.add("cancel", backFn)
             entities.push(menu.getEntity())
         } else if (this.menu === Menu.PICK_COLOR) {
+            const backFn = () => {
+                this.render(Menu.NEW_GAME)
+                this.resetPlume()
+            }
             entities.push(
                 this.plumes.entity,
-                new MainMenuButtonSection(menuTop.plusY(42))
+                new MainMenuButtonSection(menuTop.plusY(42), backFn)
                     .add(`${this.overwritingSave ? "destroy save & " : ""}start`, () =>
                         this.newGame()
                     )
-                    .add("cancel", () => {
-                        this.render(Menu.NEW_GAME)
-                        this.resetPlume()
-                    })
+                    .add("cancel", backFn)
                     .getEntity()
             )
         } else if (this.menu === Menu.CREDITS) {
+            const backFn = () => this.render(Menu.ROOT)
             entities.splice(0) // don't show title and scene
             const creditEntries: [credit: string, fn: () => void][] = [
                 ["a game by Ty Natsuhara", link("https://ty.pizza/")],
@@ -421,7 +427,7 @@ export class MainMenuScene extends Scene {
                 null,
                 ["made with brigsby!", link("https://brigsby.js.org/")],
                 null,
-                ["back", () => this.render(Menu.ROOT)],
+                ["back", backFn],
             ]
             const section = new MainMenuButtonSection(
                 new Point(
@@ -429,7 +435,8 @@ export class MainMenuScene extends Scene {
                     dimensions.y / 2 -
                         (creditEntries.length * MainMenuButtonSection.LINE_SPACING) / 2 +
                         TEXT_SIZE / 2
-                )
+                ),
+                backFn
             )
             creditEntries.forEach((credit) => {
                 if (credit) {

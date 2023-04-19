@@ -1,4 +1,4 @@
-import { Entity, Point } from "brigsby/dist"
+import { AnonymousComponent, Entity, InputKey, Point } from "brigsby/dist"
 import { MainMenuButton } from "./MainMenuButton"
 
 export class MainMenuButtonSection {
@@ -6,7 +6,7 @@ export class MainMenuButtonSection {
 
     private readonly buttons: MainMenuButton[] = []
 
-    constructor(private readonly topCenter: Point) {}
+    constructor(private readonly topCenter: Point, private readonly backFn?: () => void) {}
 
     add(text: string, onClick: () => void, condition = true, onHover: () => void = () => {}) {
         if (condition) {
@@ -50,5 +50,16 @@ export class MainMenuButtonSection {
         return this
     }
 
-    getEntity = () => new Entity(this.buttons)
+    getEntity() {
+        return new Entity([
+            ...this.buttons,
+            new AnonymousComponent({
+                update: ({ input }) => {
+                    if (input.isKeyDown(InputKey.BACKSPACE)) {
+                        this.backFn?.()
+                    }
+                },
+            }),
+        ])
+    }
 }
