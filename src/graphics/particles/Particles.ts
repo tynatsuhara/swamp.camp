@@ -107,7 +107,7 @@ class Particle extends Component {
                 image,
                 Point.ZERO,
                 SIZE,
-                position.plus(velocity(p.elapsedTime)),
+                position.plus(velocity(p.elapsedTime)).apply(Math.round),
                 size,
                 depth
             ),
@@ -129,7 +129,7 @@ class Particle extends Component {
                 image,
                 Point.ZERO,
                 SIZE,
-                positionSupplier().plus(velocity(p.elapsedTime)),
+                positionSupplier().plus(velocity(p.elapsedTime)).apply(Math.round),
                 size,
                 depthSupplier()
             ),
