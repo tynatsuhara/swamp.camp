@@ -49,13 +49,6 @@ export class ClickableUI extends Component {
             ClickableUI.hoveredUID = undefined
         }
 
-        // bail out of dpad mode
-        if (controls.isCursorMoving()) {
-            ClickableUI.hoveredUID = undefined
-            ClickableUI.currentMode = "cursor"
-            return
-        }
-
         expose({ hoveredClickable: this.hoveredUID, currentMode: this.currentMode })
     }
 
@@ -70,6 +63,13 @@ export class ClickableUI extends Component {
 
         // another clickable UI has already accepted input this frame
         if (!this.canUpdate) {
+            return
+        }
+
+        // bail out of dpad mode
+        if (controls.isCursorMoving()) {
+            ClickableUI.hoveredUID = undefined
+            ClickableUI.currentMode = "cursor"
             return
         }
 
