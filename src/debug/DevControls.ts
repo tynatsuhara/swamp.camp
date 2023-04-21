@@ -261,7 +261,6 @@ debug.disableVisibleRegionMask ??= false
 debug.disableParticles ??= false
 debug.photoMode ??= false
 debug.fixedHeight ??= undefined
-debug.dpadMenus ??= false
 debug.staticsHostOverride ??= undefined
 debug.showClickableUiPoints ??= false
 

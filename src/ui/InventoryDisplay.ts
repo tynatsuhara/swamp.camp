@@ -33,6 +33,7 @@ import { ItemMetadata, ItemSpec, ITEM_METADATA_MAP } from "../items/Items"
 import { clientSyncFn } from "../online/syncUtils"
 import { saveManager } from "../SaveManager"
 import { Singletons } from "../Singletons"
+import { ClickableUI } from "./ClickableUI"
 import { Color } from "./Color"
 import { formatText } from "./Text"
 import { Tooltip } from "./Tooltip"
@@ -107,7 +108,7 @@ export class InventoryDisplay extends Component {
         const pressI = controls.isInventoryButtonDown()
         const pressEsc = controls.isCloseMenuButtonDown()
 
-        if (this.isOpen && (pressI || pressEsc)) {
+        if (this.isOpen && pressEsc) {
             this.close()
         } else if (pressI && !UIStateManager.instance.isMenuOpen) {
             this.open()
@@ -702,6 +703,18 @@ export class InventoryDisplay extends Component {
                 tile.transform.position = this.getPositionForInventoryIndex(i, inv)
             }
             this.stackSprites.push(tile)
+        }
+
+        // Clickable UIs
+        for (let i = 0; i < inv.size; i++) {
+            this.displayEntity.addComponent(
+                new ClickableUI(
+                    `inv-${inv.uuid}-${i}`,
+                    this.getPositionForInventoryIndex(i, inv).plus(pt(8, 8)),
+                    i === 0 && inv !== this.tradingInv,
+                    true
+                )
+            )
         }
     }
 

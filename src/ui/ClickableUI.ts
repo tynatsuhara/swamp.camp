@@ -11,8 +11,9 @@ export class ClickableUI extends Component {
     static currentMode: "cursor" | "dpad" = "dpad"
 
     private static hoveredUID: string
-    public static get isLockedOn() {
-        return !!ClickableUI.hoveredUID
+    private static hoveredHideCursor: boolean
+    public static get hideCursor() {
+        return !!ClickableUI.hoveredUID && ClickableUI.hoveredHideCursor
     }
 
     private canUpdate = true
@@ -20,7 +21,8 @@ export class ClickableUI extends Component {
     constructor(
         private readonly uid: string,
         private readonly cursorPos: Point,
-        private readonly autofocus: boolean = false // TODO
+        private readonly autofocus = false,
+        private readonly showCursor = false
     ) {
         super()
     }
@@ -33,6 +35,7 @@ export class ClickableUI extends Component {
 
     static select(clickable: ClickableUI) {
         ClickableUI.hoveredUID = clickable.uid
+        ClickableUI.hoveredHideCursor = !clickable.showCursor
         controls.setGamepadCursorPosition(clickable.cursorPos)
     }
 
@@ -45,7 +48,6 @@ export class ClickableUI extends Component {
             ClickableUI.hoveredUID &&
             !(ClickableUI.hoveredUID in ClickableUI.getAllClickables(view))
         ) {
-            console.log("no more clickable")
             ClickableUI.hoveredUID = undefined
         }
 
@@ -56,11 +58,6 @@ export class ClickableUI extends Component {
      * Update that only runs if there is at least 1 clickable thing on the screen
      */
     update({ view }: UpdateData) {
-        // TODO remove debug flag once this is ready
-        if (!debug.dpadMenus) {
-            return
-        }
-
         // another clickable UI has already accepted input this frame
         if (!this.canUpdate) {
             return

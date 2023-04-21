@@ -1,4 +1,4 @@
-import { Component, debug, Point, UpdateData } from "brigsby/dist"
+import { Component, Point, UpdateData } from "brigsby/dist"
 import { RenderMethod } from "brigsby/dist/renderer"
 import { SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { controls } from "../Controls"
@@ -22,33 +22,29 @@ export class Cursor extends Component {
     update({ view, elapsedTimeMillis, input }: UpdateData): void {
         ClickableUI.update(view)
 
-        this.cursorRenderMethod = undefined
-
-        const cursorShouldBeVisible = !debug.dpadMenus || !ClickableUI.isLockedOn
+        const cursorShouldBeVisible =
+            !ClickableUI.hideCursor && (!controls.isGamepadMode() || this.shouldShowInGamepadMode())
 
         if (controls.isGamepadMode()) {
-            if (this.shouldShowInGamepadMode() && cursorShouldBeVisible) {
-                controls.updateGamepadCursorPosition(elapsedTimeMillis)
+            controls.updateGamepadCursorPosition(elapsedTimeMillis)
+        }
 
+        if (cursorShouldBeVisible) {
+            if (!controls.getCursorPos().equals(input.mousePos)) {
                 this.cursorRenderMethod = this.cursorSprite.toImageRender(
                     SpriteTransform.new({
                         position: controls.getCursorPos(),
                         depth: Number.MAX_SAFE_INTEGER,
                     })
                 )
-            }
-            // use the cursor render method instead of the native mouse
-            Mouse.hide()
-        } else {
-            if (cursorShouldBeVisible) {
-                // RAF to prevent flash of cursor showing up
-                requestAnimationFrame(() => {
-                    Mouse.show()
-                    controls.setGamepadCursorPosition(input.mousePos)
-                })
-            } else {
                 Mouse.hide()
+            } else {
+                controls.setGamepadCursorPosition(input.mousePos)
+                requestAnimationFrame(() => Mouse.show())
             }
+        } else {
+            Mouse.hide()
+            this.cursorRenderMethod = undefined
         }
     }
 
