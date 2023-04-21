@@ -28,9 +28,15 @@ export class Cursor extends Component {
         if (controls.isGamepadMode()) {
             controls.updateGamepadCursorPosition(elapsedTimeMillis)
         }
+        this.cursorRenderMethod = undefined
 
         if (cursorShouldBeVisible) {
-            if (!controls.getCursorPos().equals(input.mousePos)) {
+            const useRenderOnKbm =
+                !controls.isGamepadMode() &&
+                ClickableUI.isActive &&
+                !controls.getCursorPos().equals(input.mousePos)
+            const useRenderOnGamepad = controls.isGamepadMode()
+            if (useRenderOnGamepad || useRenderOnKbm) {
                 this.cursorRenderMethod = this.cursorSprite.toImageRender(
                     SpriteTransform.new({
                         position: controls.getCursorPos(),
@@ -44,7 +50,6 @@ export class Cursor extends Component {
             }
         } else {
             Mouse.hide()
-            this.cursorRenderMethod = undefined
         }
     }
 

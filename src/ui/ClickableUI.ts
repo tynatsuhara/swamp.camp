@@ -12,6 +12,9 @@ export class ClickableUI extends Component {
 
     private static hoveredUID: string
     private static hoveredHideCursor: boolean
+    public static get isActive() {
+        return !!ClickableUI.hoveredUID
+    }
     public static get hideCursor() {
         return !!ClickableUI.hoveredUID && ClickableUI.hoveredHideCursor
     }
@@ -96,6 +99,7 @@ export class ClickableUI extends Component {
         }
     }
 
+    // TODO: Add looping (furthest right -> furthest left, etc)
     private getNextClickable(allClickables: Record<string, ClickableUI>, dpadDown: Direction) {
         const cursorPos =
             allClickables[ClickableUI.hoveredUID]?.cursorPos ?? controls.getCursorPos()
