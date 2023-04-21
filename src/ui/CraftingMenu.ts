@@ -143,7 +143,15 @@ export class CraftingMenu extends Component {
         for (let i = 0; i < this.recipes.length; i++) {
             const category = this.recipes[i]
             const position = topLeft.plusX(i * TILE_SIZE * 2)
-            components.push(new ClickableUI(`craft-${i}`, position.plus(pt(20)), false, true))
+            const selected = i === this.recipeCategory
+            components.push(
+                new ClickableUI(
+                    `craft-${i}-selected:${selected}`,
+                    position.plus(pt(20, 10)),
+                    selected,
+                    true
+                )
+            )
             const dims = new Point(2, 2)
             const hovered = Maths.rectContains(
                 position,
@@ -159,7 +167,7 @@ export class CraftingMenu extends Component {
                 ).sprites.values()
             )
             const icon =
-                i === this.recipeCategory || hovered
+                selected || hovered
                     ? category.icon
                     : this.tintedIcon(category.icon, COLOR_TEXT_NOT_HOVERED)
             components.push(
@@ -239,8 +247,9 @@ export class CraftingMenu extends Component {
             const recipeIndex = recipeIndexStart + r
             const recipe = recipes[recipeIndex]
             const craftedItem = ITEM_METADATA_MAP[recipe.output]
+            const clickableRowKey = `craft-${this.recipeCategory}-${r}`
             clickables.push(
-                new ClickableUI(`craft-${this.recipeCategory}-${r}`, topLeftRowPos, false, true)
+                new ClickableUI(clickableRowKey, topLeftRowPos.plus(pt(14, 5)), false, true)
             )
 
             // craft the item
@@ -317,14 +326,21 @@ export class CraftingMenu extends Component {
                     ingredientIcon = this.tintedIcon(plainIngredientIcon, itemColor)
                 }
                 offsetFromRight += TILE_SIZE + margin
+                const ingrPosition = topLeftRowPos.plus(pt(width - offsetFromRight + 1, margin - 1))
                 renders.push(
                     ingredientIcon.toImageRender(
                         SpriteTransform.new({
-                            position: topLeftRowPos.plus(
-                                pt(width - offsetFromRight + 1, margin - 1)
-                            ),
+                            position: ingrPosition,
                             depth: UI_SPRITE_DEPTH,
                         })
+                    )
+                )
+                clickables.push(
+                    new ClickableUI(
+                        `${clickableRowKey}-${i}`,
+                        ingrPosition.plus(pt(TILE_SIZE / 2)),
+                        false,
+                        true
                     )
                 )
                 if (
