@@ -1176,6 +1176,9 @@ export class Dude extends Component implements DialogueSource {
         if (totalMovement.x !== 0 || totalMovement.y !== 0) {
             const newPos = this.standingPosition.plus(totalMovement)
             this.moveTo(newPos)
+        } else {
+            // Nicely align to the pixel grid when standing still
+            this.moveTo(this.standingPosition.apply(Math.round))
         }
     }
 
