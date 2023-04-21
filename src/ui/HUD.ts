@@ -75,6 +75,7 @@ export class HUD {
             this.locationTransition.entity,
             this.offScreenIndicatorManager.getEntity(),
             this.miniMap.entity,
+            // TODO: Remove the isMenuOpen check once all menus support ClickableUI
             new Entity([new Cursor(() => UIStateManager.instance.isMenuOpen)]),
         ]
 
