@@ -8,6 +8,8 @@ import { controls } from "../Controls"
 type Direction = "up" | "down" | "left" | "right"
 
 export class ClickableUI extends Component {
+    static currentMode: "cursor" | "dpad" = "dpad"
+
     private static hoveredUID: string
     public static get isLockedOn() {
         return !!ClickableUI.hoveredUID
@@ -47,7 +49,7 @@ export class ClickableUI extends Component {
             ClickableUI.hoveredUID = undefined
         }
 
-        expose({ hoveredClickable: this.hoveredUID })
+        expose({ hoveredClickable: this.hoveredUID, currentMode: this.currentMode })
     }
 
     update({ view }: UpdateData) {
@@ -64,6 +66,7 @@ export class ClickableUI extends Component {
         // bail out of dpad mode
         if (controls.isCursorMoving()) {
             ClickableUI.hoveredUID = undefined
+            ClickableUI.currentMode = "cursor"
             return
         }
 
@@ -71,6 +74,9 @@ export class ClickableUI extends Component {
 
         const directionalValues: Direction[] = ["up", "down", "left", "right"]
         const dpadDown = directionalValues.find((d) => controls.isDirectionButtonDown(d))
+        if (dpadDown) {
+            ClickableUI.currentMode = "dpad"
+        }
 
         const select = (clickable: ClickableUI) => {
             if (clickable) {
@@ -86,11 +92,10 @@ export class ClickableUI extends Component {
                     : this
 
             select(clickableToSelect)
-        } else if (!ClickableUI.hoveredUID) {
-            // const autofocusClickable = Object.values(allClickables).find((c) => c.autofocus)
-            // select(autofocusClickable)
+        } else if (!ClickableUI.hoveredUID && this.autofocus && ClickableUI.currentMode == "dpad") {
+            select(this)
         } else if (this.uid === ClickableUI.hoveredUID) {
-            // select(this)
+            select(this)
         }
     }
 
