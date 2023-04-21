@@ -105,19 +105,36 @@ export class ClickableUI extends Component {
             allClickables[ClickableUI.hoveredUID]?.cursorPos ?? controls.getCursorPos()
         const clickableValues = Object.values(allClickables)
 
-        const getClickable = (predicate: (c: ClickableUI) => void) =>
-            Lists.minBy(clickableValues.filter(predicate), (c) => c.cursorPos.distanceTo(cursorPos))
+        const getClickable = (directionPredicate: (c: ClickableUI) => void, vertical: boolean) => {
+            // finds things that are in roughly the same row/column
+            const channelPredicate = (c: ClickableUI) => {
+                const yDiff = Math.abs(cursorPos.y - c.cursorPos.y)
+                const xDiff = Math.abs(cursorPos.x - c.cursorPos.x)
+                return (vertical ? xDiff : yDiff) < 10
+            }
+            return (
+                Lists.minBy(
+                    clickableValues.filter((c) => channelPredicate(c) && directionPredicate(c)),
+                    (c) => c.cursorPos.distanceTo(cursorPos)
+                ) ||
+                // Find anything in that direction
+                Lists.minBy(
+                    clickableValues.filter((c) => directionPredicate(c)),
+                    (c) => c.cursorPos.distanceTo(cursorPos)
+                )
+            )
+        }
 
         const clickable: ClickableUI = (() => {
             switch (dpadDown) {
                 case "up":
-                    return getClickable((c) => c.cursorPos.y < cursorPos.y)
+                    return getClickable((c) => c.cursorPos.y < cursorPos.y, true)
                 case "down":
-                    return getClickable((c) => c.cursorPos.y > cursorPos.y)
+                    return getClickable((c) => c.cursorPos.y > cursorPos.y, true)
                 case "left":
-                    return getClickable((c) => c.cursorPos.x < cursorPos.x)
+                    return getClickable((c) => c.cursorPos.x < cursorPos.x, false)
                 case "right":
-                    return getClickable((c) => c.cursorPos.x > cursorPos.x)
+                    return getClickable((c) => c.cursorPos.x > cursorPos.x, false)
             }
         })()
 
