@@ -89,10 +89,7 @@ export class ClickableUI extends Component {
         }
 
         if (dpadDown && (this.uid === ClickableUI.hoveredUID || !ClickableUI.hoveredUID)) {
-            const clickableToSelect =
-                this.uid === ClickableUI.hoveredUID
-                    ? this.getNextClickable(allClickables, dpadDown)
-                    : this
+            const clickableToSelect = this.getNextClickable(allClickables, dpadDown)
 
             select(clickableToSelect)
         } else if (!ClickableUI.hoveredUID && this.autofocus && ClickableUI.currentMode == "dpad") {
@@ -103,24 +100,23 @@ export class ClickableUI extends Component {
     }
 
     private getNextClickable(allClickables: Record<string, ClickableUI>, dpadDown: Direction) {
-        const { x, y } = allClickables[ClickableUI.hoveredUID]?.cursorPos ?? controls.getCursorPos()
+        const cursorPos =
+            allClickables[ClickableUI.hoveredUID]?.cursorPos ?? controls.getCursorPos()
         const clickableValues = Object.values(allClickables)
 
         const getClickable = (predicate: (c: ClickableUI) => void) =>
-            Lists.minBy(clickableValues.filter(predicate), (c) =>
-                c.cursorPos.distanceTo(this.cursorPos)
-            )
+            Lists.minBy(clickableValues.filter(predicate), (c) => c.cursorPos.distanceTo(cursorPos))
 
         const clickable: ClickableUI = (() => {
             switch (dpadDown) {
                 case "up":
-                    return getClickable((c) => c.cursorPos.y < y)
+                    return getClickable((c) => c.cursorPos.y < cursorPos.y)
                 case "down":
-                    return getClickable((c) => c.cursorPos.y > y)
+                    return getClickable((c) => c.cursorPos.y > cursorPos.y)
                 case "left":
-                    return getClickable((c) => c.cursorPos.x < x)
+                    return getClickable((c) => c.cursorPos.x < cursorPos.x)
                 case "right":
-                    return getClickable((c) => c.cursorPos.x > x)
+                    return getClickable((c) => c.cursorPos.x > cursorPos.x)
             }
         })()
 
