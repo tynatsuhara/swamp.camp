@@ -1,8 +1,10 @@
 import { Point, pt, UpdateData } from "brigsby/dist"
 import { ImageFilter } from "brigsby/dist/sprites"
+import { controls } from "../../Controls"
 import { Tilesets } from "../../graphics/Tilesets"
 import { session } from "../../online/session"
 import { Dude } from "../Dude"
+import { player } from "../player/index"
 import { BasicAttackAnimation } from "./animations/BasicAttackAnimation"
 import { IdleAnimation } from "./animations/IdleAnimation"
 import { AnimationArgs, MeleeAnimation } from "./animations/MeleeAnimation"
@@ -128,6 +130,17 @@ export class MeleeWeapon extends Weapon {
 
         if (enemies.length === 0) {
             Weapon.hitResources(this.dude)
+        }
+        const hitResource = enemies.length === 0 && Weapon.hitResources(this.dude)
+
+        if (this.dude === player() && (enemies.length > 0 || hitResource)) {
+            setTimeout(() => {
+                controls.vibrate({
+                    duration: 70,
+                    strongMagnitude: 0.5,
+                    weakMagnitude: 0.075,
+                })
+            }, 100)
         }
     }
 
