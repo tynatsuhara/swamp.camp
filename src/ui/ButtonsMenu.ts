@@ -52,16 +52,17 @@ export const ButtonsMenu = {
             sprites.forEach((tile) => e.addComponent(tile))
         }
 
-        options.forEach((option, i) =>
+        options.forEach((option, index) =>
             e.addComponent(
                 new TextButton({
-                    key: `${key}-${i}`,
+                    index,
+                    key: `${key}-${index}`,
                     position: topLeft.plus(
                         new Point(
                             dimensions.x / 2 -
                                 (TEXT_PIXEL_WIDTH * option.text.length) / 2 -
                                 TextButton.margin,
-                            MARGIN_TOP + i * (TILE_SIZE + BUTTON_PADDING)
+                            MARGIN_TOP + index * (TILE_SIZE + BUTTON_PADDING)
                         )
                     ),
                     text: option.text,

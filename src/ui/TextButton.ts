@@ -28,6 +28,7 @@ export class TextButton extends Component {
     private hoverColor: string
 
     constructor({
+        index,
         key,
         position,
         text,
@@ -38,6 +39,7 @@ export class TextButton extends Component {
         textColor,
         hoverColor,
     }: {
+        index: number
         key: string
         position: Point
         text: string
@@ -64,7 +66,7 @@ export class TextButton extends Component {
             const rightPos = leftPos.plus(new Point(this.width - TILE_SIZE, 0)).apply(Math.floor)
 
             const cursorLockPos = leftPos.plusX(this.width / 2)
-            this.entity.addComponent(new ClickableUI(key, cursorLockPos))
+            this.entity.addComponent(new ClickableUI(key, cursorLockPos, index === 0))
 
             this.left = Tilesets.instance.oneBit
                 .getTileSource(`btnLeft_${buttonColor}`)

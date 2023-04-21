@@ -61,6 +61,10 @@ export class MainMenuScene extends Scene {
     private sessionLoadingState: SessionLoadingState | undefined
     private sessionIdTextInput: TextInput
 
+    private get showLoadingMessage() {
+        return this.waitingForAssets || this.menu === Menu.LOADING
+    }
+
     private menu = Menu.ROOT
 
     constructor() {
@@ -298,7 +302,7 @@ export class MainMenuScene extends Scene {
                         .getEntity()
                 )
             }
-        } else if (this.waitingForAssets || this.menu === Menu.LOADING) {
+        } else if (this.showLoadingMessage) {
             entities.push(new MainMenuButtonSection(menuTop).addText("loading...").getEntity())
         } else if (this.menu === Menu.ROOT) {
             const saveCount = saveManager.getSaveCount()
@@ -449,7 +453,7 @@ export class MainMenuScene extends Scene {
         }
 
         // Always update the controls entity first
-        entities.unshift(controls.entity, new Entity([new Cursor()]))
+        entities.unshift(controls.entity, new Entity([new Cursor(() => !this.showLoadingMessage)]))
 
         this.view = {
             zoom: ZOOM,
