@@ -710,7 +710,7 @@ export class InventoryDisplay extends Component {
             this.displayEntity.addComponent(
                 new ClickableUI(
                     `inv-${inv.uuid}-${i}`,
-                    this.getPositionForInventoryIndex(i, inv).plus(pt(8, 8)),
+                    this.getPositionForInventoryIndex(i, inv).plus(pt(10)),
                     i === 0 && inv !== this.tradingInv,
                     true
                 )
