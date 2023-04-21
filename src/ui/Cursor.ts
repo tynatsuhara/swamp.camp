@@ -19,7 +19,7 @@ export class Cursor extends Component {
         super()
     }
 
-    update({ view, elapsedTimeMillis }: UpdateData): void {
+    update({ view, elapsedTimeMillis, input }: UpdateData): void {
         ClickableUI.update(view)
 
         this.cursorRenderMethod = undefined
@@ -41,7 +41,11 @@ export class Cursor extends Component {
             Mouse.hide()
         } else {
             if (cursorShouldBeVisible) {
-                Mouse.show()
+                // RAF to prevent flash of cursor showing up
+                requestAnimationFrame(() => {
+                    Mouse.show()
+                    controls.setGamepadCursorPosition(input.mousePos)
+                })
             } else {
                 Mouse.hide()
             }
