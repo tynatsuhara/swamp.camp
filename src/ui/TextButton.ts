@@ -3,11 +3,11 @@ import { ImageRender, TextRender } from "brigsby/dist/renderer"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { Maths } from "brigsby/dist/util"
 import { controls } from "../Controls"
-import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
 import { ClickableUI } from "./ClickableUI"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
-import { UI_SPRITE_DEPTH } from "./UiConstants"
 import { UISounds } from "./UISounds"
+import { UI_SPRITE_DEPTH } from "./UiConstants"
 
 export class TextButton extends Component {
     static readonly margin = 6
@@ -65,7 +65,7 @@ export class TextButton extends Component {
             const centerPos = leftPos.plus(new Point(TILE_SIZE, 0))
             const rightPos = leftPos.plus(new Point(this.width - TILE_SIZE, 0)).apply(Math.floor)
 
-            const cursorLockPos = leftPos.plusX(this.width / 2)
+            const cursorLockPos = leftPos.plusX(this.width / 2).plusY(5)
             this.entity.addComponent(new ClickableUI(key, cursorLockPos, index === 0))
 
             this.left = Tilesets.instance.oneBit
