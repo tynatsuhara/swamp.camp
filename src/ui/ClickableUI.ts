@@ -36,7 +36,7 @@ export class ClickableUI extends Component {
         )
     }
 
-    static select(clickable: ClickableUI) {
+    private static select(clickable: ClickableUI) {
         ClickableUI.hoveredUID = clickable.uid
         ClickableUI.hoveredHideCursor = !clickable.showCursor
         controls.setGamepadCursorPosition(clickable.cursorPos)
@@ -99,8 +99,9 @@ export class ClickableUI extends Component {
 
         if (dpadDown && (this.uid === ClickableUI.hoveredUID || !ClickableUI.hoveredUID)) {
             const clickableToSelect = this.getNextClickable(allClickables, dpadDown)
-
-            select(clickableToSelect)
+            requestAnimationFrame(() => {
+                select(clickableToSelect)
+            })
         } else if (this.uid === ClickableUI.hoveredUID) {
             select(this)
         }
