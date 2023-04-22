@@ -65,7 +65,7 @@ export class TextButton extends Component {
             const centerPos = leftPos.plus(new Point(TILE_SIZE, 0))
             const rightPos = leftPos.plus(new Point(this.width - TILE_SIZE, 0)).apply(Math.floor)
 
-            const cursorLockPos = leftPos.plusX(this.width / 2).plusY(5)
+            const cursorLockPos = leftPos.plusX(this.width / 2).plusY(2)
             this.entity.addComponent(new ClickableUI(key, cursorLockPos, index === 0))
 
             this.left = Tilesets.instance.oneBit
