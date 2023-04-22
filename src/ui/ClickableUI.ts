@@ -54,6 +54,15 @@ export class ClickableUI extends Component {
             ClickableUI.hoveredUID = undefined
         }
 
+        if (!ClickableUI.hoveredUID && ClickableUI.currentMode == "dpad") {
+            const autofocus = Object.values(ClickableUI.getAllClickables(view)).find(
+                (c) => c.autofocus
+            )
+            if (autofocus) {
+                ClickableUI.select(autofocus)
+            }
+        }
+
         expose({ hoveredClickable: this.hoveredUID, currentMode: this.currentMode })
     }
 
@@ -92,8 +101,6 @@ export class ClickableUI extends Component {
             const clickableToSelect = this.getNextClickable(allClickables, dpadDown)
 
             select(clickableToSelect)
-        } else if (!ClickableUI.hoveredUID && this.autofocus && ClickableUI.currentMode == "dpad") {
-            select(this)
         } else if (this.uid === ClickableUI.hoveredUID) {
             select(this)
         }
