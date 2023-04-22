@@ -1,8 +1,6 @@
-import { Point } from "brigsby/dist"
-import { StaticSpriteSource } from "brigsby/dist/sprites"
 import { saveManager } from "../SaveManager"
 import { ROCKS_NEEDED_FOR_CAMPFIRE } from "../characters/dialogue/DipDialogue"
-import { Tilesets } from "../graphics/Tilesets"
+import { Icon } from "../graphics/OneBitTileset"
 import { ItemStack } from "./Inventory"
 import { Item } from "./Item"
 
@@ -13,14 +11,14 @@ export type CraftingRecipe = {
 }
 
 export type CraftingRecipeCategory = {
-    icon: StaticSpriteSource
+    icon: Icon
     name: string
     recipes: CraftingRecipe[]
 }
 
 export const getDipRecipes = (): CraftingRecipeCategory[] => {
     const utilities: CraftingRecipeCategory = {
-        icon: Tilesets.instance.oneBit.getTileAt(new Point(0, 7)),
+        icon: "direction-sign",
         name: "Utilities",
         recipes: [
             {
@@ -50,7 +48,7 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => {
     )
 
     const equipment: CraftingRecipeCategory = {
-        icon: Tilesets.instance.oneBit.getTileAt(new Point(10, 27)),
+        icon: "shovel",
         name: "Equipment",
         recipes: [
             {
@@ -78,6 +76,7 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => {
                 output: Item.LANTERN,
                 input: [new ItemStack(Item.IRON, 2)],
             },
+            // TODO Remove this shit before pushing
             {
                 desc: "Stores junk",
                 output: Item.CHEST,
@@ -108,7 +107,7 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => {
     }
 
     const buildings: CraftingRecipeCategory = {
-        icon: Tilesets.instance.oneBit.getTileAt(new Point(0, 19)),
+        icon: "church",
         name: "Blueprints",
         recipes: [
             {
@@ -141,7 +140,7 @@ export const getCookingRecipes = (): CraftingRecipeCategory[] => {
     return [
         {
             // TODO: don't show icon if there's only one category?
-            icon: Tilesets.instance.oneBit.getTileSource("bread"),
+            icon: "bread",
             name: "Foodstuffs",
             recipes: [
                 {
