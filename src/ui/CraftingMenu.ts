@@ -33,7 +33,7 @@ const COLOR_BACKGROUND = Color.RED_2
 const COLOR_BACKGROUND_BORDER = Color.RED_1
 const COLOR_TEXT_NOT_HOVERED = Color.PINK_3
 const COLOR_LACKING_INGREDIENT = Color.RED_1
-const RECIPES_PER_PAGE = 6
+const RECIPES_PER_PAGE = 5
 
 const CRAFT_NOISE = "audio/rpg/inventory/metal-small3.wav"
 const COOK_NOISE = "audio/misc/cc0-fireball-01.wav"
@@ -52,7 +52,7 @@ export class CraftingMenu extends Component {
     private recipes: CraftingRecipeCategory[]
     private recipeCategory: number
     private page: number = 0
-    private dimensions = new Point(160, 177)
+    private dimensions = new Point(160, 33 + 24 * RECIPES_PER_PAGE)
     private innerDimensions = this.dimensions.minus(new Point(10, 14))
     private justCraftedRow = -1 // if this is non-negative, this row was just crafted and will be highlighted
     private justOpened = false // prevent bug where the mouse is held down immediately
@@ -101,7 +101,10 @@ export class CraftingMenu extends Component {
             this.tooltip.clear()
             const category = this.recipes[this.recipeCategory]
             const screenDimensions = Camera.instance.dimensions
-            const topLeft = screenDimensions.div(2).minus(this.dimensions.div(2)).plusY(-TILE_SIZE)
+            const topLeft = screenDimensions
+                .div(2)
+                .minus(this.dimensions.div(2))
+                .plusY(-TILE_SIZE * 1)
             this.displayEntity = new Entity([
                 ...this.renderCategories(topLeft),
                 ...this.renderRecipes(topLeft, category.recipes),
@@ -383,7 +386,7 @@ export class CraftingMenu extends Component {
         renders.push(
             ...formatText({
                 text: `${this.page + 1}/${this.pages}`,
-                position: topLeft.plusY(this.dimensions.y - 20),
+                position: topLeft.plusY(this.dimensions.y - 19).apply(Math.floor),
                 width: this.dimensions.x,
                 alignment: TextAlign.CENTER,
                 color: COLOR_TEXT_NOT_HOVERED,
