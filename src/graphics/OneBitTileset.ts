@@ -22,6 +22,8 @@ const KEYS = {
     ["face-sad1"]: pt(22, 26),
     ["face-sad2"]: pt(20, 26),
 
+    ["direction-sign"]: pt(0, 7),
+    ["shovel"]: pt(10, 27),
     ["heart"]: pt(26, 22),
     ["potion1"]: pt(16, 25),
     ["potion2"]: pt(17, 25),

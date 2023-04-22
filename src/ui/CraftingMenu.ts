@@ -8,7 +8,7 @@ import { Dude } from "../characters/Dude"
 import { player } from "../characters/player"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
-import { ImageFilters } from "../graphics/ImageFilters"
+import { Icon } from "../graphics/OneBitTileset"
 import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
 import {
     CraftingRecipe,
@@ -22,7 +22,7 @@ import { Singletons } from "../Singletons"
 import { EventDispatcher } from "../utils/EventDispatcher"
 import { ClickableUI } from "./ClickableUI"
 import { Color } from "./Color"
-import { getIconSpriteImageRender } from "./IconSprite"
+import { getIconSprite, getIconSpriteImageRender } from "./IconSprite"
 import { formatText, TEXT_FONT, TEXT_SIZE, TextAlign } from "./Text"
 import { Tooltip } from "./Tooltip"
 import { UI_SPRITE_DEPTH } from "./UiConstants"
@@ -166,10 +166,10 @@ export class CraftingMenu extends Component {
                     { position }
                 ).sprites.values()
             )
-            const icon =
-                selected || hovered
-                    ? category.icon
-                    : this.tintedIcon(category.icon, COLOR_TEXT_NOT_HOVERED)
+            const icon = getIconSprite({
+                icon: category.icon,
+                color: selected || hovered ? COLOR_TEXT_HOVERED : COLOR_TEXT_NOT_HOVERED,
+            })
             components.push(
                 icon.toComponent(
                     new SpriteTransform(
@@ -318,13 +318,13 @@ export class CraftingMenu extends Component {
             let offsetFromRight = 0
             for (let i = 0; i < recipe.input.length; i++) {
                 const ingr = recipe.input[recipe.input.length - i - 1]
-                const plainIngredientIcon = this.getItemIcon(ingr.item)
-                let ingredientIcon: StaticSpriteSource = plainIngredientIcon
-                if (player().inventory.getItemCount(ingr.item) < ingr.count) {
-                    ingredientIcon = this.tintedIcon(ingredientIcon, COLOR_LACKING_INGREDIENT)
-                } else {
-                    ingredientIcon = this.tintedIcon(plainIngredientIcon, itemColor)
-                }
+                const ingredientIcon = getIconSprite({
+                    icon: this.getItemIcon(ingr.item),
+                    color:
+                        player().inventory.getItemCount(ingr.item) < ingr.count
+                            ? COLOR_LACKING_INGREDIENT
+                            : itemColor,
+                })
                 offsetFromRight += TILE_SIZE + margin
                 const ingrPosition = topLeftRowPos.plus(pt(width - offsetFromRight + 1, margin - 1))
                 renders.push(
@@ -439,37 +439,12 @@ export class CraftingMenu extends Component {
         }
     )
 
-    // caching stuff
-    private itemIcons = new Map<Item, StaticSpriteSource>()
-    private tintedIcons = new Map<string, Map<StaticSpriteSource, StaticSpriteSource>>()
-
-    private getItemIcon(item: Item): StaticSpriteSource {
-        const cached = this.itemIcons.get(item)
-        if (!!cached) {
-            return cached
-        }
-        const icon = ITEM_METADATA_MAP[item].inventoryIconSupplier()
-        this.itemIcons.set(item, icon)
-        return icon
+    private getItemIcon(item: Item): Icon {
+        return ITEM_METADATA_MAP[item].inventoryIcon
     }
 
-    // TODO replace with getIconSprite
-    private tintedIcon(icon: StaticSpriteSource, tint: Color): StaticSpriteSource {
-        if (tint === COLOR_TEXT_HOVERED) {
-            return icon
-        }
-        let cache = this.tintedIcons.get(tint)
-        if (!cache) {
-            cache = new Map<StaticSpriteSource, StaticSpriteSource>()
-            this.tintedIcons.set(tint, cache)
-        }
-        const cached = cache.get(icon)
-        if (!!cached) {
-            return cached
-        }
-        const f = icon.filtered(ImageFilters.tint(tint))
-        cache.set(icon, f)
-        return f
+    private tintedIcon(icon: Icon, color: Color): StaticSpriteSource {
+        return getIconSprite({ icon, color })
     }
 
     getEntities(): Entity[] {
