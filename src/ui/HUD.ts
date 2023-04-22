@@ -12,11 +12,13 @@ import { Tilesets } from "../graphics/Tilesets"
 import { Singletons } from "../Singletons"
 import { Location } from "../world/locations/Location"
 import { WorldTime } from "../world/WorldTime"
+import { ClickableUI } from "./ClickableUI"
 import { Color } from "./Color"
 import { Cursor } from "./Cursor"
 import { LocationTransition } from "./LocationTransition"
 import { MiniMap } from "./MiniMap"
 import { OffScreenIndicatorManager } from "./OffScreenIndicatorManager"
+import { PlaceElementDisplay } from "./PlaceElementDisplay"
 import { UIStateManager } from "./UIStateManager"
 
 type HeartFilter = "default" | "poisoned" | "god" | "healing"
@@ -75,8 +77,16 @@ export class HUD {
             this.locationTransition.entity,
             this.offScreenIndicatorManager.getEntity(),
             this.miniMap.entity,
-            // TODO: Remove the isMenuOpen check once all menus support ClickableUI
-            new Entity([new Cursor(() => UIStateManager.instance.isMenuOpen)]),
+            new Entity([
+                new Cursor(
+                    // this is pretty disgusting
+                    () =>
+                        UIStateManager.instance.isMenuOpen &&
+                        (ClickableUI.isActive ||
+                            ClickableUI.currentMode === "cursor" ||
+                            PlaceElementDisplay.instance.isOpen)
+                ),
+            ]),
         ]
 
         return entities

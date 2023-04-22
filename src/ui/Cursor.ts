@@ -2,7 +2,7 @@ import { Component, Point, UpdateData } from "brigsby/dist"
 import { RenderMethod } from "brigsby/dist/renderer"
 import { SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { controls } from "../Controls"
-import { getImage, TILE_SIZE } from "../graphics/Tilesets"
+import { TILE_SIZE, getImage } from "../graphics/Tilesets"
 import { ClickableUI } from "./ClickableUI"
 import { Mouse } from "./Mouse"
 
@@ -15,7 +15,7 @@ export class Cursor extends Component {
 
     private cursorRenderMethod: RenderMethod
 
-    constructor(private readonly shouldShowInGamepadMode: () => boolean = () => true) {
+    constructor(private readonly shouldShowInGamepadMode: () => boolean) {
         super()
     }
 
