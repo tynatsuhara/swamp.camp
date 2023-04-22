@@ -55,7 +55,6 @@ export class CraftingMenu extends Component {
     private dimensions = new Point(160, 33 + 24 * RECIPES_PER_PAGE)
     private innerDimensions = this.dimensions.minus(new Point(10, 14))
     private justCraftedRow = -1 // if this is non-negative, this row was just crafted and will be highlighted
-    private justOpened = false // prevent bug where the mouse is held down immediately
     private tooltip = this.e.addComponent(new Tooltip())
     private mode: CraftMode
 
@@ -78,12 +77,13 @@ export class CraftingMenu extends Component {
     }
 
     open(recipes: CraftingRecipeCategory[], mode: CraftMode = "craft") {
-        this.mode = mode
-        this.isOpen = true
-        this.recipes = recipes
-        this.page = 0
-        this.justOpened = true
-        this.selectCategory(0)
+        requestAnimationFrame(() => {
+            this.mode = mode
+            this.isOpen = true
+            this.recipes = recipes
+            this.page = 0
+            this.selectCategory(0)
+        })
     }
 
     update(updateData: UpdateData) {
@@ -109,7 +109,6 @@ export class CraftingMenu extends Component {
                 ...this.renderCategories(topLeft),
                 ...this.renderRecipes(topLeft, category.recipes),
             ])
-            this.justOpened = false
 
             if (this.justCraftedRow !== -1) {
                 // TODO make changeable
@@ -181,7 +180,7 @@ export class CraftingMenu extends Component {
                 )
             )
 
-            if (!this.justOpened && hovered && controls.isMenuClickDown()) {
+            if (hovered && controls.isMenuClickDown()) {
                 UISounds.playClickSound()
                 requestAnimationFrame(() => this.selectCategory(i))
             }
@@ -196,7 +195,6 @@ export class CraftingMenu extends Component {
     private canCraft(craftingPlayer: Dude, recipe: CraftingRecipe) {
         return (
             this.justCraftedRow === -1 &&
-            !this.justOpened &&
             craftingPlayer.inventory.canAddItem(recipe.output) &&
             recipe.input.every(
                 (input) => craftingPlayer.inventory.getItemCount(input.item) >= input.count
