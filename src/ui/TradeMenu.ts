@@ -1,4 +1,4 @@
-import { Component, Entity, Point, UpdateData } from "brigsby/dist"
+import { Component, Entity, Point, UpdateData, pt } from "brigsby/dist"
 import { BasicRenderComponent, ImageRender, TextRender } from "brigsby/dist/renderer"
 import {
     AnimatedSpriteComponent,
@@ -20,6 +20,7 @@ import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
 import { Inventory } from "../items/Inventory"
 import { Item } from "../items/Item"
 import { ITEM_METADATA_MAP } from "../items/Items"
+import { ClickableUI } from "./ClickableUI"
 import { Color } from "./Color"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
 import { Tooltip } from "./Tooltip"
@@ -46,6 +47,18 @@ const COLOR_BACKGROUND = Color.RED_2
 const COLOR_BACKGROUND_BORDER = Color.RED_1
 const COLOR_TEXT_NOT_HOVERED = Color.PINK_3
 const COLOR_ERROR = Color.RED_1
+
+//
+//
+//
+//
+//
+// TODO: REWRITE THIS TO USE PAGINATION INSTEAD OF SHITTY SCROLLING (ONCE THERE ARE MORE THAN A FEW ITEMS)
+//
+//
+//
+//
+//
 
 // this is mostly copied from CraftingMenu and InventoryDisplay
 export class TradeMenu extends Component {
@@ -119,10 +132,6 @@ export class TradeMenu extends Component {
         return this
     }
 
-    /**
-     * @param sourceInventory should be the player inventory if tradeMode=PLAYER_SELLING,
-     *                        otherwise should be the storekeeper's inventory
-     */
     private open(items: SalePackage[], tradeMode: TradeMode) {
         requestAnimationFrame(() => {
             const longestStr = Lists.maxBy(items.map(this.textForSale), (str) => str.length)
@@ -182,6 +191,7 @@ export class TradeMenu extends Component {
     }
 
     private renderRecipes(topLeft: Point, items: SalePackage[]): Component[] {
+        const clickables: ClickableUI[] = []
         const coinCountComponent = new BasicRenderComponent(
             new TextRender(
                 `x${saveManager.getState().coins}`,
@@ -193,7 +203,7 @@ export class TradeMenu extends Component {
             )
         )
 
-        this.context.imageSmoothingEnabled = false // TODO figure out why text is aliased
+        this.context.imageSmoothingEnabled = false
         this.context.font = `${TEXT_SIZE}px '${TEXT_FONT}'`
 
         // draw background
@@ -216,9 +226,10 @@ export class TradeMenu extends Component {
         const shiftedMousePos = controls.getCursorPos().plusY(-this.scrollOffset)
 
         for (let r = 0; r < items.length; r++) {
+            const topLeftRowPos = topLeft.plusX(margin).plusY(rowHeight * r + margin * 2)
             const hovered =
                 Maths.rectContains(
-                    topLeft.plusX(margin).plusY(rowHeight * r + margin * 2),
+                    topLeftRowPos,
                     new Point(this.innerDimensions.x, rowHeight),
                     shiftedMousePos
                 ) &&
@@ -228,6 +239,10 @@ export class TradeMenu extends Component {
                     this.innerDimensions,
                     controls.getCursorPos()
                 )
+
+            clickables.push(
+                new ClickableUI(`trade-${r}`, topLeftRowPos.plus(pt(14, 5)), r === 0, true)
+            )
 
             const sale = items[r]
             const tradeError = this.getTradeError(sale)
@@ -315,7 +330,7 @@ export class TradeMenu extends Component {
             )
         )
 
-        return [...bgSprites, renderComp, coinCountComponent]
+        return [...bgSprites, renderComp, coinCountComponent, ...clickables]
     }
 
     private textForSale(sale: SalePackage) {
