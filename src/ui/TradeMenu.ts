@@ -7,19 +7,19 @@ import {
     StaticSpriteSource,
 } from "brigsby/dist/sprites"
 import { Lists, Maths } from "brigsby/dist/util"
+import { controls } from "../Controls"
+import { saveManager } from "../SaveManager"
+import { Singletons } from "../Singletons"
 import { loadAudio } from "../audio/DeferLoadAudio"
 import { Sounds } from "../audio/Sounds"
 import { Dude } from "../characters/Dude"
 import { player } from "../characters/player"
-import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { ImageFilters } from "../graphics/ImageFilters"
-import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
 import { Inventory } from "../items/Inventory"
 import { Item } from "../items/Item"
 import { ITEM_METADATA_MAP } from "../items/Items"
-import { saveManager } from "../SaveManager"
-import { Singletons } from "../Singletons"
 import { Color } from "./Color"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
 import { Tooltip } from "./Tooltip"
@@ -67,7 +67,6 @@ export class TradeMenu extends Component {
     }
     private scrollOffset = 0
     private justSoldRow = -1 // if this is non-negative, this row was just sold and will be highlighted
-    private justOpened = false // prevent bug where the mouse is held down immediately
     private tooltip = this.e.addComponent(new Tooltip())
     private tradeMode: TradeMode
     private sourceInventory: Inventory
@@ -94,7 +93,6 @@ export class TradeMenu extends Component {
                 0
             )
             this.displayEntity = new Entity(this.renderRecipes(this.getTopLeft(), this.items))
-            this.justOpened = false
 
             if (this.justSoldRow !== -1) {
                 this.tooltip.say(
@@ -126,23 +124,27 @@ export class TradeMenu extends Component {
      *                        otherwise should be the storekeeper's inventory
      */
     private open(items: SalePackage[], tradeMode: TradeMode) {
-        const longestStr = Lists.maxBy(items.map(this.textForSale), (str) => str.length)
-        this.dimensions = new Point(Math.max(160, 75 + longestStr.length * TEXT_PIXEL_WIDTH), 158)
-        this.canvas.width = this.innerDimensions.x
-        this.canvas.height = this.innerDimensions.y
+        requestAnimationFrame(() => {
+            const longestStr = Lists.maxBy(items.map(this.textForSale), (str) => str.length)
+            this.dimensions = new Point(
+                Math.max(160, 75 + longestStr.length * TEXT_PIXEL_WIDTH),
+                158
+            )
+            this.canvas.width = this.innerDimensions.x
+            this.canvas.height = this.innerDimensions.y
 
-        this.isOpen = true
-        this.items = items
-        this.scrollOffset = 0
-        this.justOpened = true
-        this.tradeMode = tradeMode
+            this.isOpen = true
+            this.items = items
+            this.scrollOffset = 0
+            this.tradeMode = tradeMode
 
-        this.coinEntity = new Entity([
-            new AnimatedSpriteComponent(
-                [Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)],
-                new SpriteTransform(this.getTopLeft().plus(this.coinsOffset))
-            ),
-        ])
+            this.coinEntity = new Entity([
+                new AnimatedSpriteComponent(
+                    [Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)],
+                    new SpriteTransform(this.getTopLeft().plus(this.coinsOffset))
+                ),
+            ])
+        })
     }
 
     /**
@@ -158,7 +160,7 @@ export class TradeMenu extends Component {
     }
 
     private getTradeError(sale: SalePackage) {
-        const canInteract = this.justSoldRow === -1 && !this.justOpened
+        const canInteract = this.justSoldRow === -1
         if (!canInteract) {
             return "oh shit" // not shown
         }
