@@ -76,33 +76,6 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => {
                 output: Item.LANTERN,
                 input: [new ItemStack(Item.IRON, 2)],
             },
-            // TODO Remove this shit before pushing
-            {
-                desc: "Stores junk",
-                output: Item.CHEST,
-                input: [new ItemStack(Item.WOOD, 10)],
-            },
-            {
-                desc: "Snooze to pass time",
-                output: Item.BED,
-                // TODO: This should require something that isn't immediately attainable. Some kind of padding?
-                input: [new ItemStack(Item.WOOD, 10)],
-            },
-            {
-                desc: "Illuminates an area",
-                output: Item.CAMPFIRE,
-                input: [new ItemStack(Item.ROCK, ROCKS_NEEDED_FOR_CAMPFIRE)],
-            },
-            {
-                desc: "Houses one settler",
-                output: Item.HOUSE,
-                input: [new ItemStack(Item.ROCK, 5), new ItemStack(Item.WOOD, 5)],
-            },
-            {
-                desc: "+2 health",
-                output: Item.COOKED_MEAT,
-                input: [new ItemStack(Item.RAW_MEAT, 1)],
-            },
         ],
     }
 
