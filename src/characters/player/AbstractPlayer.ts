@@ -1,5 +1,5 @@
 import { ButtonState, Component, debug, pt, UpdateData } from "brigsby/dist"
-import { PointValue } from "brigsby/dist/Point"
+import { Point, PointValue } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util/Lists"
 import { controls } from "../../Controls"
 import { Camera } from "../../cutscenes/Camera"
@@ -14,10 +14,7 @@ import { HAND_POSITION_OFFSET } from "../weapons/Weapon"
 import { player } from "./index"
 
 export type PlayerControls = {
-    isWalkUpHeld: boolean
-    isWalkDownHeld: boolean
-    isWalkLeftHeld: boolean
-    isWalkRightHeld: boolean
+    walkInput: PointValue
     isBlockHeld: boolean
     playerFacingDirection: number
     isAttackHeld: boolean
@@ -68,10 +65,7 @@ export abstract class AbstractPlayer extends Component {
         const aimingDirection = pt(mousePos.x - centerPos.x, mousePos.y - centerPos.y)
 
         return {
-            isWalkUpHeld: canMove ? controls.isWalkUpHeld() : false,
-            isWalkDownHeld: canMove ? controls.isWalkDownHeld() : false,
-            isWalkLeftHeld: canMove ? controls.isWalkLeftHeld() : false,
-            isWalkRightHeld: canMove ? controls.isWalkRightHeld() : false,
+            walkInput: canMove ? controls.getWalkInput() : Point.ZERO,
             isJumpDown: controls.isJumpDown(),
             isRollDown: controls.isRollDown(),
             isSheathKeyDown: controls.isSheathKeyDown(),
@@ -93,18 +87,8 @@ export abstract class AbstractPlayer extends Component {
             dx = this.dude.rollingMomentum.x
             dy = this.dude.rollingMomentum.y
         } else {
-            if (playerControls.isWalkUpHeld) {
-                dy--
-            }
-            if (playerControls.isWalkDownHeld) {
-                dy++
-            }
-            if (playerControls.isWalkLeftHeld) {
-                dx--
-            }
-            if (playerControls.isWalkRightHeld) {
-                dx++
-            }
+            dx = playerControls.walkInput.x
+            dy = playerControls.walkInput.y
         }
 
         const speedMultiplier =

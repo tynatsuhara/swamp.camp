@@ -11,6 +11,7 @@ import {
     MouseButton,
     Point,
     PointValue,
+    pt,
     UpdateData,
 } from "brigsby/dist"
 import { Maths } from "brigsby/dist/util/Maths"
@@ -52,20 +53,29 @@ const check = <T>({ kbm, gamepad }: InputHandlers<T>) => {
     }
 
     const kbmResult = kbm()
-    if (kbmResult || !gamepadInput) {
+    const isProvidingInput = (result: T) => {
+        if (!result) {
+            return false
+        }
+        if (result instanceof Point) {
+            return !result.equals(Point.ZERO)
+        }
+        return true
+    }
+    if (isProvidingInput(kbmResult) || !gamepadInput) {
         isGamepadMode = false
         return kbmResult
     }
 
     const gamepadResult = gamepad()
-    if (gamepadResult) {
+    if (isProvidingInput(gamepadResult)) {
         isGamepadMode = true
     }
 
     return gamepadResult
 }
 
-const AXIS_DEAD_ZONE = 0.3
+const AXIS_DEAD_ZONE = 0.05
 const CURSOR_SENSITIVITY = 0.35
 
 const deadenAxis = (axis: number) => {
@@ -321,28 +331,14 @@ class ControlsWrapper extends Component {
 
     getInteractButtonString = () => (isGamepadMode ? TextIcon.GAMEPAD_X : "[e]")
 
-    isWalkUpHeld = () =>
+    getWalkInput = () =>
         check({
-            kbm: () => input.isKeyHeld(InputKey.W),
-            gamepad: () => gamepadInput.getLeftAxes().y < -AXIS_DEAD_ZONE,
-        })
-
-    isWalkDownHeld = () =>
-        check({
-            kbm: () => input.isKeyHeld(InputKey.S),
-            gamepad: () => gamepadInput.getLeftAxes().y > AXIS_DEAD_ZONE,
-        })
-
-    isWalkLeftHeld = () =>
-        check({
-            kbm: () => input.isKeyHeld(InputKey.A),
-            gamepad: () => gamepadInput.getLeftAxes().x < -AXIS_DEAD_ZONE,
-        })
-
-    isWalkRightHeld = () =>
-        check({
-            kbm: () => input.isKeyHeld(InputKey.D),
-            gamepad: () => gamepadInput.getLeftAxes().x > AXIS_DEAD_ZONE,
+            kbm: () =>
+                pt(
+                    (input.isKeyHeld(InputKey.A) ? -1 : 0) + (input.isKeyHeld(InputKey.D) ? 1 : 0),
+                    (input.isKeyHeld(InputKey.W) ? -1 : 0) + (input.isKeyHeld(InputKey.S) ? 1 : 0)
+                ),
+            gamepad: () => deaden(gamepadInput.getLeftAxes()),
         })
 
     isBlockHeld = () =>
