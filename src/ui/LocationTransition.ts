@@ -39,6 +39,11 @@ export class LocationTransition extends Component {
     private canvas: HTMLCanvasElement
     private context: CanvasRenderingContext2D
 
+    private transitioning = false
+    get isTransitioning() {
+        return this.transitioning
+    }
+
     constructor() {
         super()
         this.canvas = document.createElement("canvas")
@@ -48,7 +53,19 @@ export class LocationTransition extends Component {
     /**
      * @param callback is called on the frame where the screen is completely blacked out
      */
-    transition(callback: () => void, pauseMillis: number = 360, openOnly = false) {
+    transition({
+        transitionCallback,
+        afterTransitionCallback,
+        pauseMillis = 360,
+        openOnly = false,
+    }: {
+        transitionCallback: () => void
+        afterTransitionCallback?: () => void
+        pauseMillis?: number
+        openOnly?: boolean
+    }) {
+        this.transitioning = true
+
         // make sure it extends to the edge of the screen
         const dims = Camera.instance.dimensions.plusX(1).plusY(1)
         this.canvas.width = dims.x
@@ -105,7 +122,13 @@ export class LocationTransition extends Component {
                     this.render = getRender(frame)
                 }
                 if (frame === transitionFrame) {
-                    callback()
+                    transitionCallback()
+                    setTimeout(() => {
+                        this.transitioning = false
+                        if (afterTransitionCallback) {
+                            afterTransitionCallback()
+                        }
+                    }, 400)
                 }
             },
             () => {

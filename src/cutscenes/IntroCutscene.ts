@@ -1,13 +1,13 @@
 import { Component, Point, UpdateData } from "brigsby/dist"
 import { SpriteTransform } from "brigsby/dist/sprites"
-import { DIP_STARTING_DIALOGUE } from "../characters/dialogue/DipDialogue"
+import { saveManager } from "../SaveManager"
 import { Dude } from "../characters/Dude"
 import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
 import { DudeFaction, DudeFactory } from "../characters/DudeFactory"
 import { DudeType } from "../characters/DudeType"
+import { DIP_STARTING_DIALOGUE } from "../characters/dialogue/DipDialogue"
 import { player } from "../characters/player"
 import { TILE_SIZE } from "../graphics/Tilesets"
-import { saveManager } from "../SaveManager"
 import { ControlsUI } from "../ui/ControlsUI"
 import { HUD } from "../ui/HUD"
 import { Queequeg } from "../world/elements/Queequeg"
@@ -107,7 +107,11 @@ ANOTHER thing - Only one of the explorers returned, and they reported that their
             text,
             finishAction: "START",
             onFinish: () =>
-                HUD.instance.locationTransition.transition(() => this.cutscene(), 100, true),
+                HUD.instance.locationTransition.transition({
+                    transitionCallback: () => this.cutscene(),
+                    pauseMillis: 100,
+                    openOnly: true,
+                }),
             additionalComponents: (index) => [
                 ...charactersAtTop,
                 index === text.length - 1 ? controlsUI : undefined,

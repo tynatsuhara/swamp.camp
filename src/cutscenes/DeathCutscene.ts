@@ -1,18 +1,18 @@
 import { Component, Point } from "brigsby/dist"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
+import { saveManager } from "../SaveManager"
 import { DudeType } from "../characters/DudeType"
 import { Enemy } from "../characters/types/Enemy"
 import { ShroomNPC } from "../characters/types/ShroomNPC"
-import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
-import { saveManager } from "../SaveManager"
+import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
 import { HUD } from "../ui/HUD"
 import { TextAlign } from "../ui/Text"
 import { DarknessMask } from "../world/DarknessMask"
-import { Ground } from "../world/ground/Ground"
-import { camp, here } from "../world/locations/LocationManager"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
+import { Ground } from "../world/ground/Ground"
+import { camp, here } from "../world/locations/LocationManager"
 import { Camera } from "./Camera"
 import { CutsceneManager } from "./CutsceneManager"
 import { TextOverlayManager } from "./TextOverlayManager"
@@ -41,16 +41,19 @@ export class DeathCutscene extends Component {
         const button = Lists.oneOf(["WALK IT OFF", "GET UP", "OW!"])
 
         setTimeout(() => {
-            HUD.instance.locationTransition.transition(() => {
-                // While the text overlay is active, the location transition will pause
-                TextOverlayManager.instance.open({
-                    text: this.getText(),
-                    finishAction: button,
-                    onFinish: () => this.respawn(),
-                    additionalComponents: () => [deathIcon],
-                    textAlign: TextAlign.CENTER,
-                })
-            }, this.TRANSITION_PAUSE)
+            HUD.instance.locationTransition.transition({
+                transitionCallback: () => {
+                    // While the text overlay is active, the location transition will pause
+                    TextOverlayManager.instance.open({
+                        text: this.getText(),
+                        finishAction: button,
+                        onFinish: () => this.respawn(),
+                        additionalComponents: () => [deathIcon],
+                        textAlign: TextAlign.CENTER,
+                    })
+                },
+                pauseMillis: this.TRANSITION_PAUSE,
+            })
         }, this.SHOW_TRANSITION)
     }
 

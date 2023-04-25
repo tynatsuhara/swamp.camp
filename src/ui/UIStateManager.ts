@@ -1,8 +1,8 @@
 import { Entity } from "brigsby/dist"
+import { Singletons } from "../Singletons"
 import { player } from "../characters/player"
 import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
 import { spawnMenu } from "../debug/SpawnMenu"
-import { Singletons } from "../Singletons"
 import { CraftingMenu } from "./CraftingMenu"
 import { DialogueDisplay } from "./DialogueDisplay"
 import { HUD } from "./HUD"
@@ -45,7 +45,8 @@ export class UIStateManager {
         this.captureInput =
             this.menus.some((m) => m.isOpen) ||
             spawnMenu.isOpen ||
-            TextOverlayManager.instance.isActive
+            TextOverlayManager.instance.isActive ||
+            HUD.instance.locationTransition.isTransitioning
 
         return HUD.instance
             .getEntities()

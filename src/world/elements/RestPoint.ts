@@ -1,31 +1,34 @@
 import { Component } from "brigsby/dist"
+import { saveManager } from "../../SaveManager"
 import { DudeType } from "../../characters/DudeType"
 import { NPC } from "../../characters/NPC"
 import { player } from "../../characters/player"
 import { session } from "../../online/session"
 import { syncFn } from "../../online/syncUtils"
-import { saveManager } from "../../SaveManager"
 import { HUD } from "../../ui/HUD"
 import { DarknessMask } from "../DarknessMask"
-import { camp, here } from "../locations/LocationManager"
 import { TimeUnit } from "../TimeUnit"
 import { WorldTime } from "../WorldTime"
+import { camp, here } from "../locations/LocationManager"
 import { Campfire } from "./Campfire"
 import { ElementType } from "./Elements"
 
 const restTransition = syncFn("rest", (hours: number) => {
     const pause = 1200
 
-    HUD.instance.locationTransition.transition(() => {
-        if (session.isHost()) {
-            WorldTime.instance.fastForward(hours * TimeUnit.HOUR)
-            setTimeout(() => saveManager.autosave(), pause + 500)
-            here()
-                .getDudes()
-                .filter((d) => d.type === DudeType.PLAYER)
-                .forEach((d) => d.setWeaponAndShieldDrawn(false))
-        }
-    }, pause)
+    HUD.instance.locationTransition.transition({
+        transitionCallback: () => {
+            if (session.isHost()) {
+                WorldTime.instance.fastForward(hours * TimeUnit.HOUR)
+                setTimeout(() => saveManager.autosave(), pause + 500)
+                here()
+                    .getDudes()
+                    .filter((d) => d.type === DudeType.PLAYER)
+                    .forEach((d) => d.setWeaponAndShieldDrawn(false))
+            }
+        },
+        pauseMillis: pause,
+    })
 })
 
 export class RestPoint extends Component {

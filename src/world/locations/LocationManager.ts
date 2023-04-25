@@ -4,7 +4,6 @@ import { WorldAudioContext } from "../../audio/WorldAudioContext"
 import { DudeType } from "../../characters/DudeType"
 import { Enemy } from "../../characters/types/Enemy"
 import { Camera } from "../../cutscenes/Camera"
-import { CutscenePlayerController } from "../../cutscenes/CutscenePlayerController"
 import { Particles } from "../../graphics/particles/Particles"
 import { session } from "../../online/session"
 import { syncFn } from "../../online/syncUtils"
@@ -195,10 +194,7 @@ export class LocationManager {
             const newLocation = this.get(uuid)
             const newPosition = pt(px, py)
 
-            CutscenePlayerController.instance.enable()
-
-            // load a new location
-            HUD.instance.locationTransition.transition(() => {
+            const transitionCallback = () => {
                 // move the players to the new location's dude store
                 const oldLocation = here()
 
@@ -226,14 +222,12 @@ export class LocationManager {
 
                 // position the player and camera
                 Camera.instance.jumpCutToFocalPoint()
+            }
 
-                setTimeout(() => {
-                    CutscenePlayerController.instance.disable()
-
-                    if (afterTransitionCallback) {
-                        afterTransitionCallback()
-                    }
-                }, 400)
+            // load a new location
+            HUD.instance.locationTransition.transition({
+                transitionCallback,
+                afterTransitionCallback,
             })
         }
     )
