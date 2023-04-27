@@ -4,7 +4,7 @@ import { Color } from "../../ui/Color"
 import { Particles } from "./Particles"
 
 const FIRE_DRIFT_DISTANCE = 1.5
-const FIRE_COLORS = [Color.RED_3, Color.RED_4, Color.RED_5]
+const FIRE_COLORS = [Color.RED_4, Color.RED_5]
 
 export class FireParticles extends RepeatedInvoker {
     private lastPos: Point
