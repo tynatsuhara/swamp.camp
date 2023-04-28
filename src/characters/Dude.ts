@@ -455,7 +455,6 @@ export class Dude extends Component implements DialogueSource {
                     ) {
                         this.damage(0.25, {
                             direction: Point.ZERO.randomCircularShift(1),
-                            knockback: 5,
                             blockable: false,
                             dodgeable: false,
                         })
