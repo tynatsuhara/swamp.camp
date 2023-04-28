@@ -1082,11 +1082,6 @@ export class Dude extends Component implements DialogueSource {
             return
         }
 
-        if (this.knockIntervalCallback !== 0) {
-            // being knocked back, don't let em walk
-            direction = Point.ZERO
-        }
-
         if ((direction.x < 0 && facingOverride === 0) || facingOverride < 0) {
             this.setFacing(true)
         } else if ((direction.x > 0 && facingOverride === 0) || facingOverride > 0) {
@@ -1358,7 +1353,7 @@ export class Dude extends Component implements DialogueSource {
             }
         }
 
-        const animationSpeed = 22.5
+        const animationSpeed = 220.5
         this.isRolling = true
         this.canJumpOrRoll = false
 
