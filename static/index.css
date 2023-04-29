@@ -39,11 +39,6 @@ body {
     height: 800px; */
 }
 
-html,
-body {
-    background-color: #2d1e2f;
-}
-
 body,
 input {
     color: #fcecd1;
@@ -61,6 +56,7 @@ a:hover {
 }
 
 * {
+    background-color: #2d1e2f;
     image-rendering: -moz-crisp-edges; /* Firefox */
     image-rendering: -webkit-crisp-edges; /* Webkit (Safari) */
     image-rendering: pixelated; /* Chrome */
