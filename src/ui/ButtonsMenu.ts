@@ -27,7 +27,7 @@ export const ButtonsMenu = {
         background: "red" | "white" | "none",
         options: OptionButton[],
         centerPos: Point
-    ): { entity: Entity } => {
+    ): { entity: Entity; dimensions: Point } => {
         const longestOption = Math.max(...options.map((o) => o.text.length))
 
         const dimensions = new Point(
@@ -76,6 +76,6 @@ export const ButtonsMenu = {
             )
         )
 
-        return { entity }
+        return { entity, dimensions }
     },
 }

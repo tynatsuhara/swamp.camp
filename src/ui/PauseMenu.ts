@@ -1,4 +1,4 @@
-import { Component, debug, Entity, UpdateData } from "brigsby/dist"
+import { Component, debug, Entity, Point, UpdateData } from "brigsby/dist"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
@@ -48,9 +48,10 @@ export class PauseMenu extends Component {
             this.close()
         } else if (pressPauseButton && !UIStateManager.instance.isMenuOpen) {
             cycleTipIndex(1)
-            this.open()
+            this.open(updateData.dimensions)
         } else if (this.isOpen) {
-            this.refresh()
+            // refresh
+            this.open(updateData.dimensions)
         }
     }
 
@@ -60,11 +61,7 @@ export class PauseMenu extends Component {
         this.menu = Menu.ROOT
     }
 
-    private refresh() {
-        this.open()
-    }
-
-    open() {
+    private open(dimensions: Point) {
         const tooltip = new Tooltip()
 
         const buttons: PauseOption[] = []
@@ -106,12 +103,6 @@ export class PauseMenu extends Component {
         } else if (this.menu === Menu.OPTIONS) {
             buttons.push(
                 {
-                    text: "BACK",
-                    fn: () => {
-                        this.menu = Menu.ROOT
-                    },
-                },
-                {
                     text: `MUSIC (${Settings.getMusicVolume() * 100}%)`,
                     fn: () => {
                         if (this.isShiftDown) {
@@ -141,7 +132,13 @@ export class PauseMenu extends Component {
                         }
                     },
                 },
-                this.getFullScreenOption()
+                this.getFullScreenOption(),
+                {
+                    text: "BACK",
+                    fn: () => {
+                        this.menu = Menu.ROOT
+                    },
+                }
             )
         }
 
@@ -151,7 +148,7 @@ export class PauseMenu extends Component {
         const textColor = Color.PINK_3
         const hoverColor = Color.WHITE
 
-        const { entity: displayEntity } = ButtonsMenu.render(
+        const { entity: displayEntity, dimensions: menuDimensions } = ButtonsMenu.render(
             `pause-${this.menu}`,
             "red",
             buttons
@@ -167,7 +164,9 @@ export class PauseMenu extends Component {
 
         this.displayEntity = displayEntity
 
-        this.displayEntity.addComponent(new TipDisplay())
+        if (this.menu === Menu.ROOT) {
+            this.displayEntity.addComponent(new TipDisplay((dimensions.y - menuDimensions.y) / 4))
+        }
 
         this.displayEntity.addComponent(tooltip)
     }

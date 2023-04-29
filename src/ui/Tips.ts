@@ -3,7 +3,7 @@ import { UpdateData } from "brigsby/dist/Engine"
 import { Point, pt } from "brigsby/dist/Point"
 import { controls } from "../Controls"
 import { Color } from "./Color"
-import { formatText, TextAlign, TextVerticalAlign } from "./Text"
+import { TextAlign, TextVerticalAlign, formatText } from "./Text"
 import { UI_SPRITE_DEPTH } from "./UiConstants"
 
 // tips should be kept < 3 lines long
@@ -42,8 +42,12 @@ const WIDTH = 250
 export class TipDisplay extends Component {
     private position: Point
 
+    constructor(private readonly offsetFromTop: number) {
+        super()
+    }
+
     update({ dimensions }: UpdateData) {
-        this.position = pt((dimensions.x - WIDTH) / 2, 45)
+        this.position = pt((dimensions.x - WIDTH) / 2, this.offsetFromTop)
 
         if (controls.isNextTipButtonwDown()) {
             cycleTipIndex(1)
