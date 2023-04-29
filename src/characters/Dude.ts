@@ -1352,7 +1352,7 @@ export class Dude extends Component implements DialogueSource {
             }
         }
 
-        const animationSpeed = 220.5
+        const animationSpeed = 22.5
         this.isRolling = true
         this.canJumpOrRoll = false
 
