@@ -29,6 +29,10 @@ commit and push to `master`, this will trigger a [Cloudflare pages deployment](h
 
 NOTE: Cloudflare pages has a limit of 25MB per file.
 
+#### native app builds
+
+[swamp-camp-electron](https://github.com/tynatsuhara/swamp-camp-electron) is the repo for native builds and releases.
+
 ## credits & links
 
 additional art by:
