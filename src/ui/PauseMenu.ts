@@ -21,6 +21,11 @@ import { UIStateManager } from "./UIStateManager"
 
 type PauseOption = Pick<OptionButton, "text" | "fn" | "onMouseOver" | "onMouseOut">
 
+enum Menu {
+    ROOT,
+    OPTIONS,
+}
+
 export class PauseMenu extends Component {
     static get instance() {
         return Singletons.getOrCreate(PauseMenu)
@@ -29,6 +34,7 @@ export class PauseMenu extends Component {
     private readonly e: Entity = new Entity([this]) // entity for this component
     private displayEntity: Entity
     private isShiftDown: boolean
+    private menu = Menu.ROOT
     isOpen = false
 
     update(updateData: UpdateData) {
@@ -51,6 +57,7 @@ export class PauseMenu extends Component {
     close() {
         this.isOpen = false
         this.displayEntity = null
+        this.menu = Menu.ROOT
     }
 
     private refresh() {
@@ -60,61 +67,83 @@ export class PauseMenu extends Component {
     open() {
         const tooltip = new Tooltip()
 
-        const buttons: PauseOption[] = [
-            debug.disableAutosave &&
-                session.isHost() && {
-                    text: "[debug] SAVE GAME",
-                    fn: () =>
-                        saveManager.save() &&
-                        NotificationDisplay.instance.push({ icon: "floppy_drive", text: "saved" }),
+        const buttons: PauseOption[] = []
+
+        if (this.menu === Menu.ROOT) {
+            buttons.push(
+                debug.disableAutosave &&
+                    session.isHost() && {
+                        text: "[debug] SAVE GAME",
+                        fn: () =>
+                            saveManager.save() &&
+                            NotificationDisplay.instance.push({
+                                icon: "floppy_drive",
+                                text: "saved",
+                            }),
+                    },
+                this.getOnlineOption(tooltip),
+                {
+                    text: "CONTROLS",
+                    fn: () => this.showControls(),
                 },
-            this.getOnlineOption(tooltip),
-            {
-                text: "VIEW CONTROLS",
-                fn: () => this.showControls(),
-            },
-            {
-                text: `MUSIC (${Settings.getMusicVolume() * 100}%)`,
-                fn: () => {
-                    if (this.isShiftDown) {
-                        Settings.decreaseMusicVolume()
-                    } else {
-                        Settings.increaseMusicVolume()
-                    }
+                {
+                    text: "OPTIONS",
+                    fn: () => {
+                        this.menu = Menu.OPTIONS
+                    },
                 },
-            },
-            {
-                text: `SOUNDS (${Settings.getSoundVolume() * 100}%)`,
-                fn: () => {
-                    if (this.isShiftDown) {
-                        Settings.decreaseSoundVolume()
-                    } else {
-                        Settings.increaseSoundVolume()
-                    }
+                {
+                    text: session.isGuest() ? `LEAVE SESSION` : `SAVE & QUIT`,
+                    fn: () => {
+                        if (session.isHost()) {
+                            saveManager.save()
+                        }
+                        here().toggleAudio(false)
+                        SwampCampGame.instance.loadMainMenu()
+                    },
+                }
+            )
+        } else if (this.menu === Menu.OPTIONS) {
+            buttons.push(
+                {
+                    text: "BACK",
+                    fn: () => {
+                        this.menu = Menu.ROOT
+                    },
                 },
-            },
-            {
-                text: `AMBIENCE (${Settings.getAmbienceVolume() * 100}%)`,
-                fn: () => {
-                    if (this.isShiftDown) {
-                        Settings.decreaseAmbienceVolume()
-                    } else {
-                        Settings.increaseAmbienceVolume()
-                    }
+                {
+                    text: `MUSIC (${Settings.getMusicVolume() * 100}%)`,
+                    fn: () => {
+                        if (this.isShiftDown) {
+                            Settings.decreaseMusicVolume()
+                        } else {
+                            Settings.increaseMusicVolume()
+                        }
+                    },
                 },
-            },
-            this.getFullScreenOption(),
-            {
-                text: session.isGuest() ? `LEAVE SESSION` : `SAVE & QUIT`,
-                fn: () => {
-                    if (session.isHost()) {
-                        saveManager.save()
-                    }
-                    here().toggleAudio(false)
-                    SwampCampGame.instance.loadMainMenu()
+                {
+                    text: `SOUNDS (${Settings.getSoundVolume() * 100}%)`,
+                    fn: () => {
+                        if (this.isShiftDown) {
+                            Settings.decreaseSoundVolume()
+                        } else {
+                            Settings.increaseSoundVolume()
+                        }
+                    },
                 },
-            },
-        ].filter((btn) => !!btn)
+                {
+                    text: `AMBIENCE (${Settings.getAmbienceVolume() * 100}%)`,
+                    fn: () => {
+                        if (this.isShiftDown) {
+                            Settings.decreaseAmbienceVolume()
+                        } else {
+                            Settings.increaseAmbienceVolume()
+                        }
+                    },
+                },
+                this.getFullScreenOption()
+            )
+        }
 
         this.isOpen = true
 
@@ -123,14 +152,16 @@ export class PauseMenu extends Component {
         const hoverColor = Color.WHITE
 
         this.displayEntity = ButtonsMenu.render(
-            "pause",
+            `pause-${this.menu}`,
             "red",
-            buttons.map((obj) => ({
-                ...obj,
-                buttonColor,
-                textColor,
-                hoverColor,
-            })),
+            buttons
+                .filter((btn) => !!btn)
+                .map((obj) => ({
+                    ...obj,
+                    buttonColor,
+                    textColor,
+                    hoverColor,
+                })),
             Camera.instance.dimensions.div(2)
         )
 
