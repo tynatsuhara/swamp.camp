@@ -34,7 +34,6 @@ enum Menu {
     NEW_GAME,
     PICK_COLOR,
     CREDITS,
-    DOWNLOADS,
     MULTIPLAYER,
     LOADING,
 }
@@ -312,7 +311,6 @@ export class MainMenuScene extends Scene {
                     .add("load save", () => this.render(Menu.LOAD_GAME), saveCount > 1)
                     .add("New game", () => this.render(Menu.NEW_GAME))
                     .add("multiplayer", () => this.render(Menu.MULTIPLAYER))
-                    .add("Download", () => this.render(Menu.DOWNLOADS), !IS_NATIVE_APP)
                     .add("Credits", () => this.render(Menu.CREDITS))
                     .add(
                         "Quit",
@@ -325,37 +323,6 @@ export class MainMenuScene extends Scene {
                         },
                         IS_NATIVE_APP
                     )
-                    .getEntity()
-            )
-        } else if (this.menu === Menu.DOWNLOADS) {
-            const backFn = () => this.render(Menu.ROOT)
-            entities.push(
-                new MainMenuButtonSection(menuTop, backFn)
-                    .add(
-                        "Windows",
-                        link(
-                            "https://github.com/tylerbonnell/swamp-camp-native/releases/download/windows-latest/swamp-camp-win32-x64.zip"
-                        )
-                    )
-                    .add(
-                        "Linux",
-                        link(
-                            "https://github.com/tynatsuhara/swamp-camp-native/releases/download/ubuntu-latest/swamp-camp-linux-x64.zip"
-                        )
-                    )
-                    .add(
-                        "Mac (Intel)",
-                        link(
-                            "https://github.com/tylerbonnell/swamp-camp-native/releases/download/macos-latest/swamp-camp-darwin-x64.zip"
-                        )
-                    )
-                    .add(
-                        "Mac (Apple Silicon)",
-                        link(
-                            "https://github.com/tylerbonnell/swamp-camp-native/releases/tag/macos-apple-silicon"
-                        )
-                    )
-                    .add("Back", backFn)
                     .getEntity()
             )
         } else if (this.menu === Menu.LOAD_GAME) {
