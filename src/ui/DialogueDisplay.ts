@@ -1,22 +1,22 @@
 import { Component, Entity, Point, UpdateData } from "brigsby/dist"
 import { BasicRenderComponent } from "brigsby/dist/renderer"
 import { NineSlice } from "brigsby/dist/sprites"
+import { controls } from "../Controls"
+import { Singletons } from "../Singletons"
 import { startTalkingSounds, stopTalkingSounds } from "../audio/Talking"
+import { Dude } from "../characters/Dude"
 import {
     DialogueInstance,
     DialogueSource,
     EMPTY_DIALOGUE,
-    getDialogue,
     NextDialogue,
+    getDialogue,
 } from "../characters/dialogue/Dialogue"
-import { Dude } from "../characters/Dude"
-import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
-import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
-import { Singletons } from "../Singletons"
+import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
 import { ButtonsMenu } from "./ButtonsMenu"
 import { Color } from "./Color"
-import { formatText, formatTextRowCount, TextAlign, TEXT_SIZE } from "./Text"
+import { TEXT_SIZE, TextAlign, formatText, formatTextRowCount } from "./Text"
 import { TextTyper } from "./TextTyper"
 import { UI_SPRITE_DEPTH } from "./UiConstants"
 
@@ -212,7 +212,7 @@ export class DialogueDisplay extends Component {
                 12
         )
 
-        this.optionsEntity = ButtonsMenu.render(
+        const { entity: optionsEntity } = ButtonsMenu.render(
             `${this.dialogue}/${this.lineIndex}`,
             "none",
             this.dialogue.options.map((o) => {
@@ -230,5 +230,7 @@ export class DialogueDisplay extends Component {
             }),
             centeredButtonMenuPos
         )
+
+        this.optionsEntity = optionsEntity
     }
 }

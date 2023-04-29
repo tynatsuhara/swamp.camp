@@ -151,7 +151,7 @@ export class PauseMenu extends Component {
         const textColor = Color.PINK_3
         const hoverColor = Color.WHITE
 
-        this.displayEntity = ButtonsMenu.render(
+        const { entity: displayEntity } = ButtonsMenu.render(
             `pause-${this.menu}`,
             "red",
             buttons
@@ -164,6 +164,8 @@ export class PauseMenu extends Component {
                 })),
             Camera.instance.dimensions.div(2)
         )
+
+        this.displayEntity = displayEntity
 
         this.displayEntity.addComponent(new TipDisplay())
 

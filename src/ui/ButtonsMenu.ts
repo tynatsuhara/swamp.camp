@@ -1,6 +1,6 @@
 import { Entity, Point } from "brigsby/dist"
 import { NineSlice } from "brigsby/dist/sprites"
-import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
 import { TEXT_PIXEL_WIDTH } from "./Text"
 import { TextButton } from "./TextButton"
 import { UI_SPRITE_DEPTH } from "./UiConstants"
@@ -27,7 +27,7 @@ export const ButtonsMenu = {
         background: "red" | "white" | "none",
         options: OptionButton[],
         centerPos: Point
-    ): Entity => {
+    ): { entity: Entity } => {
         const longestOption = Math.max(...options.map((o) => o.text.length))
 
         const dimensions = new Point(
@@ -39,7 +39,7 @@ export const ButtonsMenu = {
         )
 
         const topLeft = centerPos.minus(dimensions.div(2))
-        const e = new Entity()
+        const entity = new Entity()
 
         if (background !== "none") {
             const { sprites } = NineSlice.makeStretchedNineSliceComponents(
@@ -49,11 +49,11 @@ export const ButtonsMenu = {
                 dimensions,
                 { position: topLeft, depth: UI_SPRITE_DEPTH + 1 }
             )
-            sprites.forEach((tile) => e.addComponent(tile))
+            sprites.forEach((tile) => entity.addComponent(tile))
         }
 
         options.forEach((option, index) =>
-            e.addComponent(
+            entity.addComponent(
                 new TextButton({
                     index,
                     key: `${key}-${index}`,
@@ -76,6 +76,6 @@ export const ButtonsMenu = {
             )
         )
 
-        return e
+        return { entity }
     },
 }
