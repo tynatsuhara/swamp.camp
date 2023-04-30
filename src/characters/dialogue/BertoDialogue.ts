@@ -119,7 +119,7 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
     [BERT_VILLAGERS]: () => fetchNpcDialogue(),
     [BERT_REQUEST_CONVICTS]: () => fetchConvictsDialogue(),
     [BERT_VILLAGERS_REQUESTED]: () => {
-        const txt = ["I shall send word of your request to the Kingdom."]
+        const txt = ["I shall send word of thine request to the Kingdom."]
         if (!saveManager.getState().hasRecruitedAnyVillagers) {
             txt.push(
                 "Once thy new subjects arrive, return to me to establish a tax upon thy residents."
@@ -176,7 +176,7 @@ const fetchNpcDialogue = (): DialogueInstance => {
     if (!saveManager.getState().hasRecruitedAnyVillagers) {
         introText = [
             "To begin thy quest to settle this land, thou shalt require the hands of menial labourers.",
-            "The Kingdom has an extensive supply of expendable prisoners, who are already accustomed to living in rough conditions.",
+            "The Kingdom has an extensive supply of expendable prisoners, who are already accustomed to living in squalor.",
             `${KING_NAME} has graciously offered thy first shipment of prisoners free of charge.`,
             "For subsequent shipments, thou shall only be asked to pay a small transportation fee.",
             "Shall I send for thy first shipment of settlers?",
@@ -335,7 +335,7 @@ const adjustTaxRateDialogue = (): DialogueInstance => {
                 currentRate === TaxRate.NONE
                     ? "Presently, thou art not collecting taxes from thy settlers."
                     : `Presently, the tax rate is ${rateText[currentRate]}.`
-            } Dost thou wish to adjust it?`,
+            } Dost thou wish to adjust the rate?`,
         ],
         InteractIndicator.NONE,
         ...options
