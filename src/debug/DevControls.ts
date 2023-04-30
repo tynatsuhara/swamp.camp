@@ -264,6 +264,11 @@ debug.fixedHeight ??= undefined
 debug.staticsHostOverride ??= undefined
 debug.showClickableUiPoints ??= false
 
+// warn for certain overridden fields that are easy to get confused about
+if (debug.peacefulMode) console.warn("peaceful mode is enabled!")
+if (debug.fixedHeight) console.warn("display is using a non-default fixed height!")
+if (debug.staticsHostOverride) console.warn("static assets are loaded from a non-default location!")
+
 const help = () => {
     let help = "dev controls (enable with debug.enableDevControls=true)"
     const commands = devCommands.map((cmd) => `[${InputKeyString.for(cmd[0])}] ${cmd[1]}`)
