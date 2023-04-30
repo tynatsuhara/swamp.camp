@@ -1,6 +1,6 @@
 import { Point } from "brigsby/dist"
-import { Collider } from "brigsby/dist/collision"
 import { PointValue, pt } from "brigsby/dist/Point"
+import { Collider } from "brigsby/dist/collision"
 import { SpriteSource } from "brigsby/dist/sprites"
 import { loadAudio } from "../audio/DeferLoadAudio"
 import { Condition } from "../characters/Condition"
@@ -15,9 +15,9 @@ import { syncFn } from "../online/syncUtils"
 import { randomByteString } from "../saves/uuid"
 import { Color } from "../ui/Color"
 import { getIconSprite } from "../ui/IconSprite"
+import { TimeUnit } from "../world/TimeUnit"
 import { ElementType } from "../world/elements/Elements"
 import { here } from "../world/locations/LocationManager"
-import { TimeUnit } from "../world/TimeUnit"
 import { DroppedItem } from "./DroppedItem"
 import { ItemStack } from "./Inventory"
 import { Item } from "./Item"
@@ -232,31 +232,31 @@ export const ITEM_METADATA_MAP = {
                 .filtered(getTentVariantImageFilter(metadata.color)),
     }),
     [Item.HOUSE]: new ItemSpec({
-        displayName: "House",
+        displayName: "House plan",
         inventoryIcon: "house",
         stackLimit: 1,
         element: ElementType.HOUSE,
     }),
     [Item.SMALL_CABIN]: new ItemSpec({
-        displayName: "Small cabin",
+        displayName: "Small cabin plan",
         inventoryIcon: "cabin",
         stackLimit: 1,
         element: ElementType.CABIN,
     }),
     [Item.APOTHECARY]: new ItemSpec({
-        displayName: "Apothecary",
+        displayName: "Apothecary plan",
         inventoryIcon: "house",
         stackLimit: 1,
         element: ElementType.APOTHECARY,
     }),
     [Item.CHURCH]: new ItemSpec({
-        displayName: "Church",
+        displayName: "Church plan",
         inventoryIcon: "church",
         stackLimit: 1,
         element: ElementType.CHURCH,
     }),
     [Item.MINE_ENTRANCE]: new ItemSpec({
-        displayName: "Mine entrance",
+        displayName: "Mine marker",
         inventoryIcon: "ladder",
         stackLimit: 1,
         element: ElementType.MINE_ENTRANCE,
