@@ -237,6 +237,13 @@ export class DevControls extends Component {
     }
 }
 
+const help = () => {
+    let help = "dev controls (enable with debug.enableDevControls=true)"
+    const commands = devCommands.map((cmd) => `[${InputKeyString.for(cmd[0])}] ${cmd[1]}`)
+    console.log(help + "\n\n" + commands.join("\n"))
+}
+help()
+
 // Set up autocomplete for non-engine debug flags
 debug.enableDevControls ??= false
 debug.disableAutosave ??= false
@@ -268,13 +275,6 @@ debug.showClickableUiPoints ??= false
 if (debug.peacefulMode) console.warn("peaceful mode is enabled!")
 if (debug.fixedHeight) console.warn("display is using a non-default fixed height!")
 if (debug.staticsHostOverride) console.warn("static assets are loaded from a non-default location!")
-
-const help = () => {
-    let help = "dev controls (enable with debug.enableDevControls=true)"
-    const commands = devCommands.map((cmd) => `[${InputKeyString.for(cmd[0])}] ${cmd[1]}`)
-    console.log(help + "\n\n" + commands.join("\n"))
-}
-help()
 
 const screenshot = () => {
     const canvas = <HTMLCanvasElement>document.getElementById("canvas")
