@@ -52,7 +52,7 @@ export class CraftingMenu extends Component {
     private recipes: CraftingRecipeCategory[]
     private recipeCategory: number
     private page: number = 0
-    private dimensions = new Point(160, 33 + 24 * RECIPES_PER_PAGE)
+    private dimensions = new Point(180, 33 + 24 * RECIPES_PER_PAGE)
     private innerDimensions = this.dimensions.minus(new Point(10, 14))
     private justCraftedRow = -1 // if this is non-negative, this row was just crafted and will be highlighted
     private tooltip = this.e.addComponent(new Tooltip())
