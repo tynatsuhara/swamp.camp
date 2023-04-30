@@ -1170,8 +1170,9 @@ export class Dude extends Component implements DialogueSource {
         if (totalMovement.x !== 0 || totalMovement.y !== 0) {
             const newPos = this.standingPosition.plus(totalMovement)
             this.moveTo(newPos)
-        } else {
+        } else if (this.manualDepth === undefined) {
             // Nicely align to the pixel grid when standing still
+            // (only do this if manualDepth is undefined, as a proxy for them not being on the queequeg)
             this.moveTo(this.standingPosition.apply(Math.round))
         }
     }
