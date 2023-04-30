@@ -13,7 +13,7 @@ import {
     getDialogue,
 } from "../characters/dialogue/Dialogue"
 import { Camera } from "../cutscenes/Camera"
-import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
+import { Tilesets } from "../graphics/Tilesets"
 import { ButtonsMenu } from "./ButtonsMenu"
 import { Color } from "./Color"
 import { TEXT_SIZE, TextAlign, formatText, formatTextRowCount } from "./Text"
@@ -26,7 +26,7 @@ export class DialogueDisplay extends Component {
     }
 
     private static readonly TEXT_BOX_WIDTH = 288
-    private static readonly PADDING = TILE_SIZE
+    private static readonly PADDING = 3
     private static readonly BUTTON_HEIGHT = 19
 
     private dialogueSource: DialogueSource
