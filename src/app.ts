@@ -5,7 +5,7 @@ import { SwampCampGame } from "./SwampCampGame"
 import { TEXT_FONT } from "./ui/Text"
 
 // This is how many "pixels" tall the game will be, unrelated to the screen's actual resolution
-const DEFAULT_FIXED_HEIGHT = 800
+const DEFAULT_FIXED_HEIGHT = 850
 
 declare global {
     interface Window {
