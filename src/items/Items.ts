@@ -276,7 +276,7 @@ export const ITEM_METADATA_MAP = {
         equippableWeapon: WeaponType.PICKAXE,
     }),
     [Item.SWORD]: new ItemSpec({
-        displayName: "Sword",
+        displayName: "Basic sword",
         inventoryIcon: "sword",
         stackLimit: 1,
         equippableWeapon: WeaponType.SWORD,
