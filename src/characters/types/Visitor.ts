@@ -20,8 +20,8 @@ export class Visitor extends Component {
         }
 
         const announcement: string = {
-            // TODO herald-ify the language
-            [DudeType.SPOOKY_VISITOR]: "I spotted a spooky person lurking outside the camp...",
+            [DudeType.SPOOKY_VISITOR]:
+                "Thy villagers hath reported a spooky interloper lurking outside the camp...",
         }[this.dude.type]
 
         if (announcement) {
@@ -45,7 +45,7 @@ export class Visitor extends Component {
         super.delete()
     }
 
-    getAnnouncementId() {
+    private getAnnouncementId() {
         return `visitor-${this.dude.uuid}`
     }
 }
