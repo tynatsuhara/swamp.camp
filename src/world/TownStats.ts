@@ -1,8 +1,7 @@
 import { saveManager } from "../SaveManager"
 import { Singletons } from "../Singletons"
 
-// TODO can we clean this all up?
-class TownStat {
+abstract class TownStat {
     readonly id: string
 
     constructor(id: string) {
@@ -10,15 +9,35 @@ class TownStat {
     }
 
     adjust(adjustment: number) {
-        const existingStats = saveManager.getState().townStats || {}
-        const currentValue = existingStats[this.id] || 0
         saveManager.setState({
             townStats: {
-                ...existingStats,
-                [this.id]: currentValue + adjustment,
+                ...this.getExistingStats(),
+                [this.id]: this.getCurrentValue() + adjustment,
             },
         })
         console.log(`new stat value for ${this.id}: ${saveManager.getState().townStats[this.id]}`)
+    }
+
+    getCurrentValue() {
+        return this.getExistingStats()[this.id] ?? 0
+    }
+
+    private getExistingStats() {
+        return saveManager.getState().townStats || {}
+    }
+}
+
+// TODO
+class HappinessStat extends TownStat {
+    constructor() {
+        super("happiness")
+    }
+}
+
+// TODO
+class TheocracyStat extends TownStat {
+    constructor() {
+        super("theocracy")
     }
 }
 
@@ -33,6 +52,6 @@ export class TownStats {
      *   - safety/strength of your military for sending them out (protecting villagers in the forest)
      *   - black magic (converse to theocracy)
      */
-    readonly happiness = new TownStat("happiness")
-    readonly theocracy = new TownStat("theocracy")
+    readonly happiness = new HappinessStat()
+    readonly theocracy = new TheocracyStat()
 }
