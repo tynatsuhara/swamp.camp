@@ -84,7 +84,7 @@ export class IntroCutscene extends Component {
 
 Our explorers have discovered a vast coastal swampland, untamed and full of precious resources.
 
-We believe that the Kingdom could benefit greatly from establishing a settlement in these uncharted lands.`,
+We believe that the kingdom could benefit greatly from establishing a settlement in these uncharted lands.`,
             `... 
 
 However, due to budgetary constraints, you'll be going alone. 
@@ -97,7 +97,7 @@ One other thing - We believe that several other factions may be vying for contro
 
 ANOTHER thing - Only one of the explorers returned, and they reported that their colleagues were devoured by demons in the night.`,
             `...`,
-            `Good luck. Go now, venture into the swamp, and bring glory to the Kingdom!`,
+            `Good luck. Go now, venture into the swamp, and bring glory to the kingdom!`,
             "", // blank page to show controls
         ]
 

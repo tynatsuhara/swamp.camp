@@ -67,7 +67,7 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
             [
                 `Good morrow! I, Sir Berto of Dube, present myself unto thee as an emissary of ${KING_NAME}.`,
                 "Whilst your Excellency clearly excels at adventuring and slaughtering beasts, mine own expertise lies in the logistics of governing settlements.",
-                "As thy subjects work to collect raw resources, I shall facilitate the transport and appropriate payment for such items on behalf of the Kingdom.",
+                "As thy subjects work to collect raw resources, I shall facilitate the transport and appropriate payment for such items on behalf of the kingdom.",
                 "Upon construction of dwellings, I can send for tax-paying subjects to populate thy settlement.",
                 "Tradesmen! Knights! Worthless peons to build homes, scrub latrines, and polish thine armor!",
                 "Art thou interested in any of my services at the moment?",
@@ -96,7 +96,7 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
             )
         }
         options.push(
-            new DialogueOption("What is the Kingdom buying?", () => {
+            new DialogueOption("What is the kingdom buying?", () => {
                 TradeMenu.instance.sell(getItemsToSell())
                 return new NextDialogue(BERT_ENTRYPOINT, false)
             }),
@@ -119,7 +119,7 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
     [BERT_VILLAGERS]: () => fetchNpcDialogue(),
     [BERT_REQUEST_CONVICTS]: () => fetchConvictsDialogue(),
     [BERT_VILLAGERS_REQUESTED]: () => {
-        const txt = ["I shall send word of thine request to the Kingdom."]
+        const txt = ["I shall send word of thine request to the kingdom."]
         if (!saveManager.getState().hasRecruitedAnyVillagers) {
             txt.push(
                 "Once thy new subjects arrive, return to me to establish a tax upon thy residents."
@@ -171,12 +171,12 @@ const fetchNpcDialogue = (): DialogueInstance => {
 
     let introText = [
         // "Thy camp contains suitable domiciles for several occupations.",
-        "Which class of settler dost thy request I procure from the Kingdom?",
+        "Which class of settler dost thy request I procure from the kingdom?",
     ]
     if (!saveManager.getState().hasRecruitedAnyVillagers) {
         introText = [
             "To begin thy quest to settle this land, thou shalt require the hands of menial labourers.",
-            "The Kingdom has an extensive supply of expendable prisoners, who are already accustomed to living in squalor.",
+            "The kingdom has an extensive supply of expendable prisoners, who are already accustomed to living in squalor.",
             `${KING_NAME} has graciously offered thy first shipment of prisoners free of charge.`,
             "For subsequent shipments, thou shall only be asked to pay a small transportation fee.",
             "Shall I send for thy first shipment of settlers?",
