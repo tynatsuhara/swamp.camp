@@ -165,7 +165,9 @@ export class PauseMenu extends Component {
         this.displayEntity = displayEntity
 
         if (this.menu === Menu.ROOT) {
-            this.displayEntity.addComponent(new TipDisplay((dimensions.y - menuDimensions.y) / 4))
+            this.displayEntity.addComponent(
+                new TipDisplay((dimensions.y - menuDimensions.y) / 4 + 8)
+            )
         }
 
         this.displayEntity.addComponent(tooltip)
