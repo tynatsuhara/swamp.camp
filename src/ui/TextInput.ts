@@ -78,7 +78,6 @@ export class TextInput {
         elementStyles.top = `${top}px`
         elementStyles.textAlign = "center"
         elementStyles.verticalAlign = "text-bottom"
-        console.log(TEXT_SIZE * scale)
         elementStyles.fontSize = `${TEXT_SIZE * scale}px`
     }
 
