@@ -92,7 +92,8 @@ export const DIP_INTRO_DIALOGUE: DialogueSet = {
                 )
             }
             lines.push(
-                "Here, I've finished putting together your tent. Find a nice spot and plop it down!"
+                "Here, I've finished putting together your tent. Find a nice spot and plop it down.",
+                "Don't worry too much about the placement. Tents are easy to knock down and place somewhere else!"
             )
             return dialogue(
                 lines,
