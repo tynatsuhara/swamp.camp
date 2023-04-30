@@ -2,16 +2,16 @@ import { saveManager } from "../SaveManager"
 import { Singletons } from "../Singletons"
 import { TaxRate } from "./TaxRate"
 
-type OmitUnderscored<T> = { [K in keyof T as K extends `_${infer _}` ? never : K]: T[K] }
+type OmitUnderscored<T> = { [K in keyof T as K extends `_${string}` ? never : K]: T[K] }
 
 abstract class TownStat {
-    readonly id: string
+    private readonly id: string
 
     constructor(id: string) {
         this.id = id
     }
 
-    get value() {
+    get _value() {
         return this.getExistingStats()[this.id] ?? 0
     }
 
@@ -19,7 +19,7 @@ abstract class TownStat {
         saveManager.setState({
             townStats: {
                 ...this.getExistingStats(),
-                [this.id]: this.value + adjustment,
+                [this.id]: this._value + adjustment,
             },
         })
         console.log(`new stat value for ${this.id}: ${saveManager.getState().townStats[this.id]}`)
@@ -56,9 +56,9 @@ class HappinessStat extends TownStat {
 
     // TODO positive impact based on town upgrades (inn, roads, bridges)
 
-    shouldConsiderStriking = () => this.value <= -30
-    shouldConsiderDeserting = () => this.value <= -40
-    shouldGiveShopDiscounts = () => this.value >= 20
+    shouldConsiderStriking = () => this._value <= -30
+    shouldConsiderDeserting = () => this._value <= -40
+    shouldGiveShopDiscounts = () => this._value >= 20
 }
 
 // TODO
@@ -71,8 +71,8 @@ class TheocracyStat extends TownStat {
     impactMandatoryAttendance = () => this._adjust(3)
     impactDonation = () => this._adjust(10)
 
-    shouldGrantMinorBlessing = () => this.value >= 20
-    shouldGrantMajorBlessing = () => this.value >= 50
+    shouldGrantMinorBlessing = () => this._value >= 20
+    shouldGrantMajorBlessing = () => this._value >= 50
 }
 
 export class TownStats {
@@ -86,11 +86,17 @@ export class TownStats {
      *   - safety/strength of your military for sending them out (protecting villagers in the forest)
      *   - black magic (converse to theocracy)
      */
-    readonly happiness: OmitUnderscored<HappinessStat> = new HappinessStat()
-    readonly theocracy: OmitUnderscored<TheocracyStat> = new TheocracyStat()
+    private readonly _happiness: HappinessStat = new HappinessStat()
+    get happiness(): OmitUnderscored<HappinessStat> {
+        return this._happiness
+    }
+    private readonly _theocracy: TheocracyStat = new TheocracyStat()
+    get theocracy(): OmitUnderscored<TheocracyStat> {
+        return this._theocracy
+    }
 
     getProfilerData = () => ({
-        happiness: this.happiness.value,
-        theocracy: this.theocracy.value,
+        happiness: this._happiness._value,
+        theocracy: this._theocracy._value,
     })
 }
