@@ -2,6 +2,8 @@ import { saveManager } from "../SaveManager"
 import { Singletons } from "../Singletons"
 import { TaxRate } from "./TaxRate"
 
+type OmitUnderscored<T> = { [K in keyof T as K extends `_${infer _}` ? never : K]: T[K] }
+
 abstract class TownStat {
     readonly id: string
 
@@ -84,8 +86,8 @@ export class TownStats {
      *   - safety/strength of your military for sending them out (protecting villagers in the forest)
      *   - black magic (converse to theocracy)
      */
-    readonly happiness = new HappinessStat()
-    readonly theocracy = new TheocracyStat()
+    readonly happiness: OmitUnderscored<HappinessStat> = new HappinessStat()
+    readonly theocracy: OmitUnderscored<TheocracyStat> = new TheocracyStat()
 
     getProfilerData = () => ({
         happiness: this.happiness.value,
