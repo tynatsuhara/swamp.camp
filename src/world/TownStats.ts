@@ -9,18 +9,18 @@ abstract class TownStat {
         this.id = id
     }
 
+    get value() {
+        return this.getExistingStats()[this.id] ?? 0
+    }
+
     _adjust(adjustment: number) {
         saveManager.setState({
             townStats: {
                 ...this.getExistingStats(),
-                [this.id]: this.getCurrentValue() + adjustment,
+                [this.id]: this.value + adjustment,
             },
         })
         console.log(`new stat value for ${this.id}: ${saveManager.getState().townStats[this.id]}`)
-    }
-
-    getCurrentValue() {
-        return this.getExistingStats()[this.id] ?? 0
     }
 
     private getExistingStats() {
@@ -34,6 +34,7 @@ class HappinessStat extends TownStat {
     }
 
     // TODO balance these and hook up to triggers
+    impactHomelessTonight = () => this._adjust(-1)
     impactNoLongerHomeless = () => this._adjust(1)
     impactHeadstonePlaced = () => this._adjust(1)
     impactVillagerKilled = () => this._adjust(-5)
@@ -52,6 +53,10 @@ class HappinessStat extends TownStat {
     impactMandatoryChuchAttendance = () => this._adjust(-3)
 
     // TODO positive impact based on town upgrades (inn, roads, bridges)
+
+    shouldConsiderStriking = () => this.value <= -30
+    shouldConsiderDeserting = () => this.value <= -40
+    shouldGiveShopDiscounts = () => this.value >= 20
 }
 
 // TODO
@@ -63,6 +68,9 @@ class TheocracyStat extends TownStat {
     // TODO balance these and hook up to triggers
     impactMandatoryAttendance = () => this._adjust(3)
     impactDonation = () => this._adjust(10)
+
+    shouldGrantMinorBlessing = () => this.value >= 20
+    shouldGrantMajorBlessing = () => this.value >= 50
 }
 
 export class TownStats {
@@ -78,4 +86,9 @@ export class TownStats {
      */
     readonly happiness = new HappinessStat()
     readonly theocracy = new TheocracyStat()
+
+    getProfilerData = () => ({
+        happiness: this.happiness.value,
+        theocracy: this.theocracy.value,
+    })
 }

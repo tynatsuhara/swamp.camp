@@ -1,10 +1,11 @@
 import { Component, debug, profiler, pt } from "brigsby/dist"
 import { Maths } from "brigsby/dist/util/Maths"
 import { controls } from "../Controls"
-import { Particles } from "../graphics/particles/Particles"
 import { pixelPtToTilePt } from "../graphics/Tilesets"
-import { here } from "../world/locations/LocationManager"
+import { Particles } from "../graphics/particles/Particles"
+import { TownStats } from "../world/TownStats"
 import { WorldTime } from "../world/WorldTime"
+import { here } from "../world/locations/LocationManager"
 import { prettyPrint } from "./JSON"
 
 /**
@@ -22,6 +23,7 @@ export class ProfilerData extends Component {
         profiler.showInfo(`time: ${WorldTime.clockTime()} (${Math.floor(WorldTime.instance.time)})`)
         profiler.showInfo(`particle count: ${Particles.instance.count}`)
         // profiler.showInfo(`level: ${here().getLevel(mouseTile)}`)
+        profiler.showInfo(`stats: ${prettyPrint(TownStats.instance.getProfilerData())}`)
 
         const elementData = here().getElement(mouseTile)?.save()
         if (elementData) {
