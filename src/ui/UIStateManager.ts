@@ -9,6 +9,7 @@ import { HUD } from "./HUD"
 import { InventoryDisplay } from "./InventoryDisplay"
 import { MenuHints } from "./MenuHints"
 import { NotificationDisplay } from "./NotificationDisplay"
+import { OnScreenKeyboard } from "./OnScreenKeyboard"
 import { PauseMenu } from "./PauseMenu"
 import { PlaceElementDisplay } from "./PlaceElementDisplay"
 import { TradeMenu } from "./TradeMenu"
@@ -34,6 +35,7 @@ export class UIStateManager {
             PauseMenu.instance,
             CraftingMenu.instance,
             TradeMenu.instance,
+            OnScreenKeyboard.instance,
         ]
     }
 
