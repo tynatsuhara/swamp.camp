@@ -1,16 +1,15 @@
 import { Component, Entity, Point } from "brigsby/dist"
+import { Singletons } from "../Singletons"
 import { player } from "../characters/player"
-import { ShieldType } from "../characters/weapons/ShieldType"
 import { Camera } from "../cutscenes/Camera"
 import { TILE_SIZE } from "../graphics/Tilesets"
-import { Singletons } from "../Singletons"
 import { DarknessMask } from "./DarknessMask"
-import { Location } from "./locations/Location"
-import { here } from "./locations/LocationManager"
-import { LocationType } from "./locations/LocationType"
 import { TimeUnit } from "./TimeUnit"
 import { VisibleRegionMask } from "./VisibleRegionMask"
 import { WorldTime } from "./WorldTime"
+import { Location } from "./locations/Location"
+import { here } from "./locations/LocationManager"
+import { LocationType } from "./locations/LocationType"
 
 type LightCircle = {
     position: Point
@@ -149,12 +148,10 @@ export class LightManager extends Component {
         // Always provide slight visibility around the player
         const p = player()
         if (p) {
-            if (p.shieldType !== ShieldType.LANTERN) {
-                this.mask.addFaintLightCircle(
-                    p.standingPosition.plusY(-TILE_SIZE / 2).plus(p.getAnimationOffset()),
-                    here().isInterior ? 0.5 : 1
-                )
-            }
+            this.mask.addFaintLightCircle(
+                p.standingPosition.plusY(-TILE_SIZE / 2).plus(p.getAnimationOffset()),
+                here().isInterior ? 0.5 : 1
+            )
         }
 
         const locationLightGrid = this.lightTiles.get(here())
