@@ -240,7 +240,7 @@ export class GameScene extends Scene {
     }
 
     private getUiSpaceDebugEntities(): Entity[] {
-        const result = []
+        const result: Entity[] = []
 
         if (spawnMenu.isOpen) {
             const selectedType = spawnMenu.getSelectedType()
@@ -280,9 +280,13 @@ export class GameScene extends Scene {
 
             const buttons = [...dudeTypeButtons, nextPageButton]
 
-            result.push(
-                ButtonsMenu.render("spawn", "white", buttons, Camera.instance.dimensions.div(2))
+            const { entity: menuEntity } = ButtonsMenu.render(
+                "spawn",
+                "white",
+                buttons,
+                Camera.instance.dimensions.div(2)
             )
+            result.push(menuEntity)
 
             if (controls.isCloseMenuButtonDown()) {
                 spawnMenu.isOpen = false
