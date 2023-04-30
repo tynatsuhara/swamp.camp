@@ -1,5 +1,6 @@
 import { saveManager } from "../SaveManager"
 import { Singletons } from "../Singletons"
+import { TaxRate } from "./TaxRate"
 
 abstract class TownStat {
     readonly id: string
@@ -8,7 +9,7 @@ abstract class TownStat {
         this.id = id
     }
 
-    adjust(adjustment: number) {
+    _adjust(adjustment: number) {
         saveManager.setState({
             townStats: {
                 ...this.getExistingStats(),
@@ -27,11 +28,30 @@ abstract class TownStat {
     }
 }
 
-// TODO
 class HappinessStat extends TownStat {
     constructor() {
         super("happiness")
     }
+
+    // TODO balance these and hook up to triggers
+    impactNoLongerHomeless = () => this._adjust(1)
+    impactHeadstonePlaced = () => this._adjust(1)
+    impactVillagerKilled = () => this._adjust(-5)
+    impactNotEnoughFoodToday = () => this._adjust(-2)
+    impactBlackLungTreated = () => this._adjust(5)
+    impactTaxCollected = (taxRate: TaxRate) =>
+        this._adjust(
+            {
+                [TaxRate.NONE]: 2,
+                [TaxRate.LOW]: 1,
+                [TaxRate.MODERATE]: 0,
+                [TaxRate.HIGH]: -1,
+                [TaxRate.VERY_HIGH]: -2,
+            }[taxRate]
+        )
+    impactMandatoryChuchAttendance = () => this._adjust(-3)
+
+    // TODO positive impact based on town upgrades (inn, roads, bridges)
 }
 
 // TODO
@@ -39,6 +59,10 @@ class TheocracyStat extends TownStat {
     constructor() {
         super("theocracy")
     }
+
+    // TODO balance these and hook up to triggers
+    impactMandatoryAttendance = () => this._adjust(3)
+    impactDonation = () => this._adjust(10)
 }
 
 export class TownStats {
