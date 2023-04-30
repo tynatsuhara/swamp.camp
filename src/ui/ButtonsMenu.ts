@@ -25,13 +25,30 @@ export const ButtonsMenu = {
     render: (
         key: string, // for ClickableUI keys
         background: "red" | "white" | "none",
-        options: OptionButton[],
+        options: Array<OptionButton | Array<OptionButton>>,
         centerPos: Point
     ): { entity: Entity; dimensions: Point } => {
-        const longestOption = Math.max(...options.map((o) => o.text.length))
+        const computeButtonWidth = (txt: string) =>
+            txt.length * TEXT_PIXEL_WIDTH + TextButton.margin * 2
+
+        const computeRowWidth = (row: Array<OptionButton>) => {
+            const length = row["length"] as number
+            return (
+                (row as Array<OptionButton>)
+                    .map((op) => computeButtonWidth(op.text))
+                    .reduce((a, b) => a + b) +
+                (length - 1) * BUTTON_PADDING
+            )
+        }
+
+        const longestRowWidth = Math.max(
+            ...options.map((row) => {
+                return computeRowWidth((row["length"] ? row : [row]) as Array<OptionButton>)
+            })
+        )
 
         const dimensions = new Point(
-            longestOption * TEXT_PIXEL_WIDTH + MARGIN_SIDE * 2 + TextButton.margin * 2,
+            longestRowWidth + MARGIN_SIDE * 2,
             (options.length - 1) * BUTTON_PADDING +
                 options.length * TILE_SIZE +
                 MARGIN_TOP +
@@ -52,29 +69,40 @@ export const ButtonsMenu = {
             sprites.forEach((tile) => entity.addComponent(tile))
         }
 
-        options.forEach((option, index) =>
-            entity.addComponent(
-                new TextButton({
-                    index,
-                    key: `${key}-${index}`,
-                    position: topLeft.plus(
-                        new Point(
-                            dimensions.x / 2 -
-                                (TEXT_PIXEL_WIDTH * option.text.length) / 2 -
-                                TextButton.margin,
-                            MARGIN_TOP + index * (TILE_SIZE + BUTTON_PADDING)
-                        )
-                    ),
-                    text: option.text,
-                    onClick: () => option.fn(),
-                    onMouseOver: () => option.onMouseOver?.(),
-                    onMouseOut: () => option.onMouseOut?.(),
-                    buttonColor: option.buttonColor,
-                    textColor: option.textColor,
-                    hoverColor: option.hoverColor,
-                })
-            )
-        )
+        let overallButtonIndex = 0
+
+        options.forEach((row, rowIndex) => {
+            const options = (row["length"] ? row : [row]) as Array<OptionButton>
+            const rowWidth = computeRowWidth(options)
+            let colOffset = -rowWidth / 2
+
+            options.forEach((option, colIndex) => {
+                const btnWidth = TEXT_PIXEL_WIDTH * option.text.length
+                const colPos = colOffset + dimensions.x / 2
+                // (TEXT_PIXEL_WIDTH * option.text.length) / 2 -
+                // TextButton.margin
+
+                entity.addComponent(
+                    new TextButton({
+                        index: overallButtonIndex,
+                        key: `${key}-${overallButtonIndex}`,
+                        position: topLeft.plus(
+                            new Point(colPos, MARGIN_TOP + rowIndex * (TILE_SIZE + BUTTON_PADDING))
+                        ),
+                        text: option.text,
+                        onClick: () => option.fn(),
+                        onMouseOver: () => option.onMouseOver?.(),
+                        onMouseOut: () => option.onMouseOut?.(),
+                        buttonColor: option.buttonColor,
+                        textColor: option.textColor,
+                        hoverColor: option.hoverColor,
+                    })
+                )
+
+                colOffset += btnWidth + TextButton.margin * 2 + BUTTON_PADDING
+                overallButtonIndex++
+            })
+        })
 
         return { entity, dimensions }
     },
