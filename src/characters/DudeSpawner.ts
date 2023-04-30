@@ -62,6 +62,7 @@ export class DudeSpawner extends Component {
         // this.spawnVisitors()
     }
 
+    // TODO spawn organically
     spawnVisitors(forceSpawn = false) {
         const visitorTypes = [DudeType.SPOOKY_VISITOR]
 
