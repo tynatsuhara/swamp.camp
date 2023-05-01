@@ -2,7 +2,7 @@ import { Point } from "brigsby/dist"
 import { ItemMetadata } from "../../items/Items"
 import { Location } from "../locations/Location"
 import { ElementComponent } from "./ElementComponent"
-import { ElementType } from "./Elements"
+import { ElementType } from "./ElementType"
 
 export abstract class ElementFactory<Type extends ElementType, SaveFormat extends object = object> {
     readonly type: Type

@@ -1,11 +1,11 @@
 import { Component, Entity, Point } from "brigsby/dist"
 import { RenderMethod } from "brigsby/dist/renderer"
 import { SpriteTransform } from "brigsby/dist/sprites"
-import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
 import { UI_SPRITE_DEPTH } from "../ui/UiConstants"
 import { ElementComponent } from "./elements/ElementComponent"
 import { ElementFactory } from "./elements/ElementFactory"
-import { ElementType } from "./elements/Elements"
+import { ElementType } from "./elements/ElementType"
 import { Interactable } from "./elements/Interactable"
 import { Location } from "./locations/Location"
 

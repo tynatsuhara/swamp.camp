@@ -1,13 +1,13 @@
 import { Entity, Point } from "brigsby/dist"
 import { SpriteTransform } from "brigsby/dist/sprites"
-import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
+import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
+import { TeleporterPrefix } from "../Teleporter"
 import { ElementComponent } from "../elements/ElementComponent"
-import { ElementType } from "../elements/Elements"
+import { ElementType } from "../elements/ElementType"
 import { Interactable } from "../elements/Interactable"
 import { NavMeshCollider } from "../elements/NavMeshCollider"
 import { Location } from "../locations/Location"
 import { MultiTypeResidence } from "../residences/MultiTypeResidence"
-import { TeleporterPrefix } from "../Teleporter"
 import { BuildingFactory } from "./Building"
 
 type SimpleBuildingData = {

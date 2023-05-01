@@ -1,7 +1,7 @@
 import { Point } from "brigsby/dist"
 import { DudeType } from "../../characters/DudeType"
 import { TILE_SIZE } from "../../graphics/Tilesets"
-import { ElementType } from "../elements/Elements"
+import { ElementType } from "../elements/ElementType"
 import { BasicLocation } from "../locations/BasicLocation"
 import { Location } from "../locations/Location"
 import { LocationManager } from "../locations/LocationManager"

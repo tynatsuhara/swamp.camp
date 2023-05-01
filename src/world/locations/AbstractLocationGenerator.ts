@@ -1,7 +1,7 @@
 import { Point } from "brigsby/dist"
 import { Grid, Noise } from "brigsby/dist/util"
 import { adjacent, tilesAround } from "../../Utils"
-import { ElementType } from "../elements/Elements"
+import { ElementType } from "../elements/ElementType"
 import { GroundType } from "../ground/Ground"
 import { Location } from "./Location"
 import { LocationManager } from "./LocationManager"

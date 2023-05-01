@@ -1,14 +1,14 @@
 import { Component, Point } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
-import { session } from "../../online/session"
 import { tilesAround } from "../../Utils"
-import { ElementType } from "../../world/elements/Elements"
-import { camp } from "../../world/locations/LocationManager"
+import { session } from "../../online/session"
 import { TimeUnit } from "../../world/TimeUnit"
-import { NPCSchedules } from "../ai/NPCSchedule"
-import { Announcement } from "../dialogue/Announcements"
+import { ElementType } from "../../world/elements/ElementType"
+import { camp } from "../../world/locations/LocationManager"
 import { DudeType } from "../DudeType"
 import { NPC } from "../NPC"
+import { NPCSchedules } from "../ai/NPCSchedule"
+import { Announcement } from "../dialogue/Announcements"
 
 export class Berto extends Component {
     static instance: Berto

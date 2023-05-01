@@ -1,4 +1,4 @@
-import { ElementType } from "../elements/Elements"
+import { ElementType } from "../elements/ElementType"
 import { AbstractLocationGenerator, TreeTypeSupplier } from "./AbstractLocationGenerator"
 import { BasicLocation } from "./BasicLocation"
 import { Location } from "./Location"

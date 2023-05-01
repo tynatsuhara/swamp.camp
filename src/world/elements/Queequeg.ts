@@ -7,14 +7,14 @@ import { DudeAnimationUtils } from "../../characters/DudeAnimationUtils"
 import { DudeType } from "../../characters/DudeType"
 import { NPC } from "../../characters/NPC"
 import { Particles } from "../../graphics/particles/Particles"
-import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
+import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
 import { Color } from "../../ui/Color"
 import { HUD } from "../../ui/HUD"
 import { Location } from "../locations/Location"
 import { Simulatable } from "../Simulatable"
 import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
-import { ElementType } from "./Elements"
+import { ElementType } from "./ElementType"
 
 type QueequegData = {
     docked: boolean

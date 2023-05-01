@@ -11,7 +11,7 @@ import { InventoryDisplay } from "../../ui/InventoryDisplay"
 import { Location } from "../locations/Location"
 import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
-import { ElementType } from "./Elements"
+import { ElementType } from "./ElementType"
 import { Interactable } from "./Interactable"
 import { NavMeshCollider } from "./NavMeshCollider"
 

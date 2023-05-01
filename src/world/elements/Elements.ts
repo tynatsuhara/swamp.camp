@@ -1,6 +1,6 @@
-import { expose } from "brigsby/dist/Debug"
 import { Singletons } from "../../Singletons"
 import { UIStateEvents } from "../../ui/UIStateEvents"
+import { TeleporterIndicatorFactory } from "../TeleporterIndicator"
 import { ApothecaryFactory } from "../buildings/Apothecary"
 import { CabinFactory } from "../buildings/Cabin"
 import { ChurchFactory } from "../buildings/Church"
@@ -8,46 +8,17 @@ import { HouseFactory } from "../buildings/House"
 import { MineEntranceFactory } from "../buildings/MineEntrance"
 import { MineExitFactory } from "../buildings/MineExit"
 import { TentFactory } from "../buildings/Tent"
-import { TeleporterIndicatorFactory } from "../TeleporterIndicator"
 import { BedFactory } from "./Bed"
 import { BlackberriesFactory } from "./Blackberries"
 import { CampfireFactory } from "./Campfire"
 import { ChestFactory } from "./Chest"
+import { ElementType } from "./ElementType"
 import { FurnitureFactory } from "./FurnitureFactory"
 import { MushroomFactory } from "./Mushroom"
 import { PlacedLanternFactory } from "./PlacedLantern"
 import { QueequegFactory } from "./Queequeg"
 import { RockFactory } from "./Rock"
 import { TreeFactory } from "./Tree"
-
-// Elements are things which take up 1+ squares on top of the ground
-
-export enum ElementType {
-    TREE_ROUND,
-    TREE_POINTY,
-    ROCK,
-    TENT,
-    CAMPFIRE,
-    TELEPORTER_INDICATOR,
-    HOUSE,
-    MUSHROOM,
-    CHEST,
-    BED,
-    MINE_ENTRANCE,
-    MINE_EXIT,
-    CHURCH,
-    BENCH,
-    PODIUM,
-    QUEEQUEG,
-    APOTHECARY,
-    BLACKBERRIES,
-    CABIN,
-    BEDROLL,
-    PLACED_LANTERN,
-    WORKBENCH,
-}
-
-expose({ ElementType })
 
 const ELEMENT_FACTORIES = {
     [ElementType.TREE_ROUND]: new TreeFactory(ElementType.TREE_ROUND),

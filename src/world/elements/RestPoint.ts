@@ -11,7 +11,7 @@ import { TimeUnit } from "../TimeUnit"
 import { WorldTime } from "../WorldTime"
 import { camp, here } from "../locations/LocationManager"
 import { Campfire } from "./Campfire"
-import { ElementType } from "./Elements"
+import { ElementType } from "./ElementType"
 
 const restTransition = syncFn("rest", (hours: number) => {
     const pause = 1200

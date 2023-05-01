@@ -1,14 +1,14 @@
 import { AnonymousComponent, Entity, Point, pt } from "brigsby/dist"
 import { Lists, RepeatedInvoker } from "brigsby/dist/util"
-import { Particles } from "../../graphics/particles/Particles"
 import { TILE_SIZE } from "../../graphics/Tilesets"
+import { Particles } from "../../graphics/particles/Particles"
 import { Color } from "../../ui/Color"
+import { WorldTime } from "../WorldTime"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementFactory } from "../elements/ElementFactory"
-import { ElementType } from "../elements/Elements"
+import { ElementType } from "../elements/ElementType"
 import { Interactable } from "../elements/Interactable"
 import { Location } from "../locations/Location"
-import { WorldTime } from "../WorldTime"
 
 export class MineExitFactory extends ElementFactory<ElementType.MINE_EXIT> {
     readonly dimensions = pt(1, 1)
