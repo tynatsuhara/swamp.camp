@@ -1,5 +1,4 @@
-import { Entity, Point, pt } from "brigsby/dist"
-import { BasicRenderComponent } from "brigsby/dist/renderer"
+import { Entity, Point } from "brigsby/dist"
 import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Sounds } from "../../audio/Sounds"
 import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
@@ -153,17 +152,4 @@ const makeTentInterior = (outside: Location, color: TentColor): Location => {
     l.addElement(ElementType.BEDROLL, new Point(Math.floor(Math.random() * floorDimensions.x), 0))
 
     return LocationManager.instance.add(l)
-}
-
-export const tentInteriorSprite = ({ color }: { color: TentColor }) => {
-    const render = Tilesets.instance.largeSprites
-        .getTileSource("tent-interior")
-        .filtered(getTentVariantImageFilter(color))
-        .toImageRender(
-            SpriteTransform.new({
-                position: pt(0, -TILE_SIZE * 3),
-                depth: Number.MIN_SAFE_INTEGER,
-            })
-        )
-    return new Entity([new BasicRenderComponent(render)])
 }
