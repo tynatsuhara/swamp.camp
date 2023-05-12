@@ -23,7 +23,7 @@ export class Particles {
 
     emitComplexParticle(
         color: Color,
-        positionSupplier: () => Point,
+        positionSupplier: (t: number) => Point,
         depthSupplier: () => number,
         lifetime: number,
         velocity: (t: number) => Point = () => Point.ZERO,
@@ -118,7 +118,7 @@ class Particle extends Component {
     static dynamic(
         lifetime: number,
         image: ImageBitmap,
-        positionSupplier: () => Point,
+        positionSupplier: (t: number) => Point,
         depthSupplier: () => number,
         velocity: (t: number) => Point,
         size: Point = new Point(1, 1)
@@ -129,7 +129,7 @@ class Particle extends Component {
                 image,
                 Point.ZERO,
                 SIZE,
-                positionSupplier().plus(velocity(p.elapsedTime)).apply(Math.round),
+                positionSupplier(p.elapsedTime).plus(velocity(p.elapsedTime)).apply(Math.round),
                 size,
                 depthSupplier()
             ),
