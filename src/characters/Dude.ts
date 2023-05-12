@@ -764,15 +764,14 @@ export class Dude extends Component implements DialogueSource {
 
     private emitStunParticles() {
         const particlesCount = 3
+        const speed = 0.004
         for (let i = 0; i < particlesCount; i++) {
-            const speed = 0.004
-            const initialOffset = (i / particlesCount) * (2 * Math.PI)
-
+            const offsetAroundCircle = (i / particlesCount) * (2 * Math.PI)
             Particles.instance.emitComplexParticle(
                 Color.RED_6,
                 (t) => {
                     // rotate clockwise
-                    const scaledTime = t * speed + initialOffset
+                    const scaledTime = t * speed + offsetAroundCircle
                     const offset = pt(Math.cos(scaledTime) * 6, Math.sin(scaledTime) * 3)
                     return this.standingPosition.plusY(-20).plus(offset)
                 },
