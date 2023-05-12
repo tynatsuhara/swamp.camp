@@ -19,6 +19,7 @@ import {
 import { BlackLungParticles } from "../graphics/particles/BlackLungParticles"
 import { emitBlockParticles } from "../graphics/particles/CombatParticles"
 import { FireParticles } from "../graphics/particles/FireParticles"
+import { Particles } from "../graphics/particles/Particles"
 import { PoisonParticles } from "../graphics/particles/PoisonParticles"
 import { WalkingParticles } from "../graphics/particles/WalkingParticles"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
@@ -758,6 +759,28 @@ export class Dude extends Component implements DialogueSource {
         const c = this.conditions.find((c) => c.condition === condition)
         if (c?.expiration) {
             c.expiration -= skipDuration
+        }
+    }
+
+    private emitStunParticles() {
+        const particlesCount = 3
+        for (let i = 0; i < particlesCount; i++) {
+            const speed = 0.004
+            const initialOffset = (i / particlesCount) * (2 * Math.PI)
+
+            Particles.instance.emitComplexParticle(
+                Color.RED_6,
+                (t) => {
+                    // rotate clockwise
+                    const scaledTime = t * speed + initialOffset
+                    const offset = pt(Math.cos(scaledTime) * 6, Math.sin(scaledTime) * 3)
+                    return this.standingPosition.plusY(-20).plus(offset)
+                },
+                () => this.animation.transform.depth,
+                100_000, // TODO duration
+                () => Point.ZERO,
+                pt(2)
+            )
         }
     }
 

@@ -1,5 +1,6 @@
 import { expose } from "brigsby/dist"
 
+// TODO: stunned condition?
 export enum Condition {
     ON_FIRE,
     POISONED,
