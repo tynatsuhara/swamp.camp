@@ -465,10 +465,7 @@ export class Dude extends Component implements DialogueSource {
 
             // Update dialogue indicator
             this.doWhileLiving(() => {
-                if (this.dialogue) {
-                    this.dialogueIndicator =
-                        getDialogue(this.dialogue, this)?.indicator ?? InteractIndicator.NONE
-                }
+                this.updateDialogueIndicator()
                 return 1_000
             })
 
