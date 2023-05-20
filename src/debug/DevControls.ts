@@ -19,7 +19,7 @@ import { session } from "../online/session"
 import { SwampCampGame } from "../SwampCampGame"
 import { DrawMenu } from "../ui/DrawMenu"
 import { UIStateManager } from "../ui/UIStateManager"
-import { ElementType } from "../world/elements/ElementType"
+import { ConstructionSite } from "../world/buildings/ConstructionSite"
 import { GroundType } from "../world/ground/Ground"
 import { LocationFactory } from "../world/locations/LocationFactory"
 import { camp, here, LocationManager } from "../world/locations/LocationManager"
@@ -172,20 +172,12 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
     ],
     [
         InputKey.L,
-        "place blackberries",
+        "complete all construction",
         (input) => {
-            const mouseTilePos = pixelPtToTilePt(input.mousePos)
-            here().addElement(ElementType.BLACKBERRIES, mouseTilePos)
-            // const currentType = here().getGround(mouseTilePos)?.type
-            // if (currentType === GroundType.WATER) {
-            //     here().setGroundElement(GroundType.GRASS, mouseTilePos)
-            // } else if (currentType === GroundType.GRASS) {
-            //     here().setGroundElement(GroundType.WATER, mouseTilePos)
-            // } else if (currentType === GroundType.WATERFALL) {
-            //     here().setGroundElement(GroundType.LEDGE, mouseTilePos)
-            // } else if (currentType === GroundType.LEDGE) {
-            //     here().setGroundElement(GroundType.WATERFALL, mouseTilePos)
-            // }
+            here()
+                .getElements()
+                .map((e) => e.entity.getComponent(ConstructionSite))
+                .forEach((cs) => cs?.makeProgress(1_000_000))
         },
     ],
     [
