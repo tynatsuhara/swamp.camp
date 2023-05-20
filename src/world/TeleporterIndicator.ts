@@ -1,4 +1,4 @@
-import { Component, Entity, Point } from "brigsby/dist"
+import { Component, Entity, Point, PointValue } from "brigsby/dist"
 import { RenderMethod } from "brigsby/dist/renderer"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
@@ -13,6 +13,7 @@ type TeleporterIndicatorSaveData = {
     to: string // the destination uuid (must be different than the current location)
     i: string // stringified position for the interactable
     id: string
+    offset?: PointValue
 }
 
 /**
@@ -62,7 +63,7 @@ export class TeleporterIndicatorFactory extends ElementFactory<
                     return [
                         Tilesets.instance.oneBit.getTileSource("small_arrow_down").toImageRender(
                             SpriteTransform.new({
-                                position: pos.times(TILE_SIZE),
+                                position: pos.times(TILE_SIZE).plus(data.offset ?? Point.ZERO),
                                 depth: UI_SPRITE_DEPTH,
                             })
                         ),

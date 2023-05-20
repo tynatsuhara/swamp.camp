@@ -26,4 +26,6 @@ export const InteriorUtils = {
         const barriers: FeatureData<"barrier">[] = [left, right, top, bottom]
         barriers.forEach((b) => l.addFeature("barrier", b))
     },
+
+    addTeleporter(l: Location) {},
 }

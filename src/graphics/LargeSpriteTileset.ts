@@ -1,12 +1,10 @@
 import { Point, pt } from "brigsby/dist"
 import { StaticSpriteSource } from "brigsby/dist/sprites"
-import { getImage, TILE_SIZE } from "./Tilesets"
+import { TILE_SIZE, getImage } from "./Tilesets"
 
 export class LargeSpriteTileset {
     getTileSource(key: string): StaticSpriteSource {
         switch (key) {
-            case "mine-small":
-                return this.get(Point.ZERO, pt(5, 5))
             case "church":
                 return this.get(pt(16, 0), pt(3, 5))
             case "dr-interior":
@@ -19,6 +17,10 @@ export class LargeSpriteTileset {
                 return this.get(pt(6, 10), pt(3, 5))
             case "cabin-small":
                 return this.get(pt(0, 6), pt(3, 3))
+            case "town-hall":
+                return this.get(pt(5, 17), pt(3, 3))
+            case "town-hall-interior":
+                return this.get(pt(0, 17), pt(4, 5))
             case "tent-interior":
                 return this.get(pt(0, 22), pt(5, 7))
             default:
