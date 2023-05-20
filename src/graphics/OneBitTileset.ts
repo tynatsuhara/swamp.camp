@@ -52,6 +52,7 @@ const KEYS = {
     ["iron"]: pt(31, 0),
     ["mushroom"]: pt(31, 1),
     ["house"]: pt(8, 19),
+    ["town-hall"]: pt(4, 20),
     ["church"]: pt(0, 19),
     ["cabin"]: pt(1, 19),
     ["chest"]: pt(8, 6),

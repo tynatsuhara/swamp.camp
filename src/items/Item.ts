@@ -28,6 +28,7 @@ export enum Item {
     EXPLORER_MAP,
     LAMP_OIL,
     WORKBENCH,
+    TOWN_HALL,
 
     // weapon values should match the WeaponType enum so we can cast them
     KNIFE = WeaponType.KNIFE,

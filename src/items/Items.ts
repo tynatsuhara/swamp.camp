@@ -237,6 +237,12 @@ export const ITEM_METADATA_MAP = {
         stackLimit: 1,
         element: ElementType.HOUSE,
     }),
+    [Item.TOWN_HALL]: new ItemSpec({
+        displayName: "Town hall plan",
+        inventoryIcon: "town-hall",
+        stackLimit: 1,
+        element: ElementType.TOWN_HALL,
+    }),
     [Item.SMALL_CABIN]: new ItemSpec({
         displayName: "Small cabin plan",
         inventoryIcon: "cabin",

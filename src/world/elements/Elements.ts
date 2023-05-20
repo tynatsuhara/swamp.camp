@@ -8,6 +8,7 @@ import { HouseFactory } from "../buildings/House"
 import { MineEntranceFactory } from "../buildings/MineEntrance"
 import { MineExitFactory } from "../buildings/MineExit"
 import { TentFactory } from "../buildings/Tent"
+import { TownHallFactory } from "../buildings/TownHall"
 import { BedFactory } from "./Bed"
 import { BlackberriesFactory } from "./Blackberries"
 import { CampfireFactory } from "./Campfire"
@@ -45,6 +46,7 @@ const ELEMENT_FACTORIES = {
     [ElementType.WORKBENCH]: new FurnitureFactory(ElementType.WORKBENCH, "workbench", () => {
         UIStateEvents.openWorkbenchCraftingMenu()
     }),
+    [ElementType.TOWN_HALL]: new TownHallFactory(),
 }
 
 export type ElementDataFormat = {

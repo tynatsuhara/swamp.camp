@@ -3,6 +3,7 @@ import { saveManager } from "../../SaveManager"
 import { InteractIndicator } from "../../ui/InteractIndicator"
 import { TextIcon } from "../../ui/Text"
 import { SalePackage, TradeMenu } from "../../ui/TradeMenu"
+import { ElementType } from "../../world/elements/ElementType"
 import { Queequeg } from "../../world/elements/Queequeg"
 import { EventQueue } from "../../world/events/EventQueue"
 import { QueuedEventType } from "../../world/events/QueuedEvent"
@@ -11,6 +12,7 @@ import { Residence } from "../../world/residences/Residence"
 import { TaxRate } from "../../world/TaxRate"
 import { WorldTime } from "../../world/WorldTime"
 import { DudeType } from "../DudeType"
+import { player } from "../player"
 import { Berto } from "../types/Berto"
 import { getAnnouncementDialogue } from "./Announcements"
 import {
@@ -33,7 +35,8 @@ const BERT_MENU = "bert-menu",
     BERT_VILLAGERS_REQUESTED = "bert-vill-req",
     BERT_TAXES = "bert-taxes",
     BERT_TAXES_UPDATED = "bert-taxes-updated",
-    BERT_ANNOUNCEMENTS = "bert-announcements"
+    BERT_ANNOUNCEMENTS = "bert-announcements",
+    BERTO_WAITING_FOR_TOWN_HALL = "bert-town-hall"
 
 const KING_NAME = "The Honourable King Bob XVIII"
 
@@ -62,20 +65,51 @@ const getGreeting = () => {
 }
 
 export const BERTO_INTRO_DIALOGUE: DialogueSet = {
-    [BERTO_STARTING_DIALOGUE]: () =>
-        dialogueWithOptions(
+    [BERTO_STARTING_DIALOGUE]: () => {
+        if (!player().inventory.canAddItem(Item.TOWN_HALL)) {
+            return // rare case
+        }
+        return dialogue(
             [
                 `Good morrow! I, Sir Berto of Dube, present myself unto thee as an emissary of ${KING_NAME}.`,
                 "Whilst your Excellency clearly excels at adventuring and slaughtering beasts, mine own expertise lies in the logistics of governing settlements.",
                 "As thy subjects work to collect raw resources, I shall facilitate the transport and appropriate payment for such items on behalf of the kingdom.",
                 "Upon construction of dwellings, I can send for tax-paying subjects to populate thy settlement.",
                 "Tradesmen! Knights! Worthless peons to build homes, scrub latrines, and polish thine armor!",
-                "Art thou interested in any of my services at the moment?",
+                "Before we endeavor to grow this settlement, thou needeth establish an official town hall for purposes of taxation.",
+                "I present to thee, Royal Construction Cones. Plop these upon the land where you see fit to build the town hall.",
+            ],
+            () => {
+                player().inventory.addItem(Item.TOWN_HALL)
+                return new NextDialogue(BERTO_WAITING_FOR_TOWN_HALL, false)
+            },
+            InteractIndicator.IMPORTANT_DIALOGUE
+        )
+    },
+    [BERTO_WAITING_FOR_TOWN_HALL]: () => {
+        const hasPlacedTownHall = !!camp().getElementOfType(ElementType.TOWN_HALL)
+        if (!hasPlacedTownHall) {
+            return dialogue(
+                [
+                    "Return to me once thou hast placed the Royal Construction Cones for the town hall using the plan in your inventory.",
+                ],
+                () => new NextDialogue(BERTO_WAITING_FOR_TOWN_HALL, false),
+                InteractIndicator.NONE
+            )
+        }
+        return dialogueWithOptions(
+            [
+                "An exemplary choice of location! The town hall shall shine like a heavenly beacon of light in this shit-ish swamp.",
+                "Thy next order should be to recruit workers to begin construction.",
+                "Until they arrive, gathering resources for construction would be well-advised.",
+                "I wish I could help, but alas, I have the soft hands of a life-long bureaucrat.",
+                "Wouldst thou desire for me to send for an order of menial labourers?",
             ],
             InteractIndicator.IMPORTANT_DIALOGUE,
-            option("Sure!", BERT_MENU, true),
+            option("Sure!", BERT_VILLAGERS, true),
             option("Maybe later.", BERT_ENTRYPOINT, false)
-        ),
+        )
+    },
     [BERT_ENTRYPOINT]: () => {
         const announcements = Berto.instance.getAnnouncements()
         return dialogue(
@@ -169,26 +203,23 @@ const fetchNpcDialogue = (): DialogueInstance => {
         )
     }
 
-    let introText = [
-        // "Thy camp contains suitable domiciles for several occupations.",
-        "Which class of settler dost thy request I procure from the kingdom?",
-    ]
-    if (!saveManager.getState().hasRecruitedAnyVillagers) {
-        introText = [
-            "To begin thy quest to settle this land, thou shalt require the hands of menial labourers.",
-            "The kingdom has an extensive supply of expendable prisoners, who are already accustomed to living in squalor.",
-            `${KING_NAME} has graciously offered thy first shipment of prisoners free of charge.`,
-            "For subsequent shipments, thou shall only be asked to pay a small transportation fee.",
-            "Shall I send for thy first shipment of settlers?",
-        ]
-    }
-    const options: DialogueOption[] = []
+    const introText = saveManager.getState().hasRecruitedAnyVillagers
+        ? [
+              // "Thy camp contains suitable domiciles for several occupations.",
+              "Which class of settler dost thy request I procure from the kingdom?",
+          ]
+        : [
+              "The kingdom has an extensive supply of expendable prisoners, who are already accustomed to living in squalor.",
+              `${KING_NAME} has graciously offered thy first shipment of prisoners free of charge.`,
+              "For subsequent shipments, thou shall only be asked to pay a small transportation fee.",
+              "Shall I send for thy first shipment of settlers?",
+          ]
 
-    options.push(
+    const options: DialogueOption[] = [
         new DialogueOption(`Bring me some convicts.`, () => {
             return new NextDialogue(BERT_REQUEST_CONVICTS, true)
-        })
-    )
+        }),
+    ]
 
     // TODO fix this for residence type villagers
 
@@ -277,7 +308,7 @@ const fetchConvictsDialogue = (): DialogueInstance => {
     if (!canGetMoreGenericVillagers) {
         return dialogue(
             [
-                "At present, too many of thy subjects are sleeping in the mud.",
+                "At present, too many of thy subjects are sleeping in the mud. It's a bad look.",
                 "Once thou hast constructed some residences, return to me to resume importing workers.",
             ],
             () => new NextDialogue(BERT_ENTRYPOINT, false)
