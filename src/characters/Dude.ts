@@ -204,7 +204,7 @@ export class Dude extends Component implements DialogueSource {
 
     constructor(params: {
         uuid: string
-        hasPendingSlot: boolean
+        hasPendingSlot: boolean // whether or not we have pre-reserved a home residence that they can claim
         type: DudeType
         factions: DudeFaction[]
         characterAnimName: string
@@ -445,7 +445,7 @@ export class Dude extends Component implements DialogueSource {
             this.resetSeaLevel()
 
             if (session.isHost()) {
-                this.claimResidence(type, uuid, hasPendingSlot)
+                this.claimResidence(hasPendingSlot)
 
                 // Damage dudes walking through blackberries
                 this.doWhileLiving(() => {
@@ -1583,7 +1583,9 @@ export class Dude extends Component implements DialogueSource {
         }
     }
 
-    private claimResidence(type: DudeType, uuid: string, hasPendingSlot: boolean) {
+    // private get checkForResidence(rez: Residence) {}
+
+    private claimResidence(hasPendingSlot: boolean) {
         if (!this.factions.includes(DudeFaction.VILLAGERS)) {
             return
         }
@@ -1593,26 +1595,26 @@ export class Dude extends Component implements DialogueSource {
             .flatMap((e) => e.entity.getComponents(Residence))
             .filter((e) => !!e)
 
-        const hasResidence = residences.some((residence) => residence.isHomeOf(uuid))
+        const hasResidence = residences.some((residence) => residence.isHomeOf(this.uuid))
 
         if (hasResidence) {
             return
         }
 
         if (hasPendingSlot) {
-            const pending = residences.filter((res) => res.canClaimPendingSlot(type))
+            const pending = residences.filter((res) => res.canClaimPendingSlot(this.type))
             if (pending.length > 0) {
                 this.log("claimed a pending house slot")
-                pending[0].claimPendingSlot(this.type, uuid)
+                pending[0].claimPendingSlot(this.type, this.uuid)
             }
             return
         }
 
         // Probably spawned via dev controls
-        const availableResidences = residences.filter((res) => res.hasCapacity(type))
+        const availableResidences = residences.filter((res) => res.hasCapacity(this.type))
         if (availableResidences.length > 0) {
             availableResidences[0].setResidentPending(this.type)
-            availableResidences[0].claimPendingSlot(this.type, uuid)
+            availableResidences[0].claimPendingSlot(this.type, this.uuid)
             this.log("claimed a house slot")
         } else {
             // this.log("could not find a home")
