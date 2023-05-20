@@ -63,6 +63,7 @@ export class Interactable extends Component {
         const indicatorPos = this.position
             .minus(new Point(TILE_SIZE / 2, TILE_SIZE / 2))
             .plus(this.uiOffset)
+            .apply(Math.round)
 
         if (controls.isGamepadMode()) {
             return new ButtonIndicator(indicatorPos, GamepadButton.X).getRenderMethods()
