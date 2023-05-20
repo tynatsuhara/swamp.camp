@@ -79,17 +79,18 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => {
         ],
     }
 
-    const buildings: CraftingRecipeCategory = {
-        icon: "church",
-        name: "Blueprints",
-        recipes: [
-            {
-                desc: "Houses one settler",
-                output: Item.HOUSE,
-                input: [new ItemStack(Item.ROCK, 5), new ItemStack(Item.WOOD, 5)],
-            },
-        ],
-    }
+    // TODO: Allow purchasing plans from Berto
+    // const buildings: CraftingRecipeCategory = {
+    //     icon: "church",
+    //     name: "Blueprints",
+    //     recipes: [
+    //         {
+    //             desc: "Houses one settler",
+    //             output: Item.HOUSE,
+    //             input: [new ItemStack(Item.ROCK, 5), new ItemStack(Item.WOOD, 5)],
+    //         },
+    //     ],
+    // }
 
     /*
     const houses = LocationManager.instance
@@ -106,7 +107,7 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => {
     }
     */
 
-    return [utilities, equipment, buildings]
+    return [utilities, equipment]
 }
 
 export const getCookingRecipes = (): CraftingRecipeCategory[] => {
