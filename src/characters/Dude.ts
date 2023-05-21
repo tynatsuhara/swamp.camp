@@ -1583,10 +1583,17 @@ export class Dude extends Component implements DialogueSource {
         }
     }
 
-    // private get checkForResidence(rez: Residence) {}
+    tryToClaimResidence() {
+        this.claimResidence(false)
+    }
+
+    private hasResidence = false // right now, a dude can never lose or change their residence
 
     private claimResidence(hasPendingSlot: boolean) {
         if (!this.factions.includes(DudeFaction.VILLAGERS)) {
+            return
+        }
+        if (this.hasResidence) {
             return
         }
 
@@ -1598,6 +1605,7 @@ export class Dude extends Component implements DialogueSource {
         const hasResidence = residences.some((residence) => residence.isHomeOf(this.uuid))
 
         if (hasResidence) {
+            this.hasResidence = true
             return
         }
 

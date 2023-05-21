@@ -60,10 +60,17 @@ export abstract class BuildingFactory<
         // TODO: Add construction process
 
         let constructionState = data["constructionState"] as ConstructionState
+
+        const letDudesClaim = () => {
+            // let dudes claim this new home, if possible
+            wl.getDudes().forEach((d) => d.tryToClaimResidence())
+        }
+
         const completeConstruction = () => {
             // todo push dudes away like in PlaceElementFrame
             constructionState = undefined
             wl.reloadElement(pos)
+            letDudesClaim()
         }
 
         if (constructionState) {
@@ -85,6 +92,8 @@ export abstract class BuildingFactory<
                     constructionState,
                 }))
             )
+        } else {
+            letDudesClaim()
         }
 
         return this.makeBuilding(wl, pos, data)
