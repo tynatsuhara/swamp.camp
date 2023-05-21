@@ -1,7 +1,6 @@
 import { Point } from "brigsby/dist"
 import { DudeType } from "../../characters/DudeType"
 import { TILE_SIZE } from "../../graphics/Tilesets"
-import { TeleporterPrefix } from "../Teleporter"
 import { ElementType } from "../elements/ElementType"
 import { ElementUtils } from "../elements/ElementUtils"
 import { GroundType } from "../ground/Ground"
@@ -41,16 +40,7 @@ const makeApothecaryInterior = (outside: Location): Location => {
 
     const interactablePos = new Point(1.5, dimensions.y).times(TILE_SIZE)
     InteriorUtils.addBarriers(l, dimensions)
-    l.addTeleporter({
-        to: outside.uuid,
-        pos: interactablePos.plusY(-4),
-        id: TeleporterPrefix.DOOR,
-    })
-    l.addElement(ElementType.TELEPORTER_INDICATOR, new Point(1, dimensions.y), {
-        to: outside.uuid,
-        i: interactablePos.toString(),
-        id: TeleporterPrefix.DOOR,
-    })
+    InteriorUtils.addTeleporter(l, outside, interactablePos)
 
     l.addFeature("sprite", {
         key: "dr-interior",

@@ -1,5 +1,7 @@
 import { Point } from "brigsby/dist"
-import { TILE_SIZE } from "../../graphics/Tilesets"
+import { TILE_SIZE, pixelPtToTilePt } from "../../graphics/Tilesets"
+import { TeleporterPrefix } from "../Teleporter"
+import { ElementType } from "../elements/ElementType"
 import { FeatureData } from "../features/Features"
 import { Location } from "../locations/Location"
 
@@ -27,5 +29,23 @@ export const InteriorUtils = {
         barriers.forEach((b) => l.addFeature("barrier", b))
     },
 
-    addTeleporter(l: Location) {},
+    addTeleporter(
+        l: Location,
+        outside: Location,
+        interactablePos: Point,
+        indicatorOffset?: Point,
+        id = TeleporterPrefix.DOOR
+    ) {
+        l.addTeleporter({
+            to: outside.uuid,
+            pos: interactablePos.plusY(-4),
+            id,
+        })
+        l.addElement(ElementType.TELEPORTER_INDICATOR, pixelPtToTilePt(interactablePos), {
+            to: outside.uuid,
+            i: interactablePos.toString(),
+            id,
+            offset: indicatorOffset,
+        })
+    },
 }

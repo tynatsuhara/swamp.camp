@@ -1,7 +1,6 @@
 import { Point, pt } from "brigsby/dist"
 import { DudeType } from "../../characters/DudeType"
 import { TILE_SIZE } from "../../graphics/Tilesets"
-import { TeleporterPrefix } from "../Teleporter"
 import { ElementType } from "../elements/ElementType"
 import { BasicLocation } from "../locations/BasicLocation"
 import { Location } from "../locations/Location"
@@ -45,17 +44,7 @@ const makeTownHallInterior = (outside: Location): Location => {
     })
 
     const interactablePos = new Point(2, dimensions.y).times(TILE_SIZE)
-    l.addTeleporter({
-        to: outside.uuid,
-        pos: interactablePos.plusY(-4),
-        id: TeleporterPrefix.DOOR,
-    })
-    l.addElement(ElementType.TELEPORTER_INDICATOR, new Point(1.5, dimensions.y), {
-        to: outside.uuid,
-        i: interactablePos.toString(),
-        id: TeleporterPrefix.DOOR,
-        offset: pt(TILE_SIZE / 2, 0),
-    })
+    InteriorUtils.addTeleporter(l, outside, interactablePos, pt(-TILE_SIZE / 2, 0))
 
     return LocationManager.instance.add(l)
 }

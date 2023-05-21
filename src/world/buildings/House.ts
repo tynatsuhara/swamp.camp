@@ -2,7 +2,7 @@ import { Entity, Point } from "brigsby/dist"
 import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { DudeType } from "../../characters/DudeType"
 import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
-import { Teleporter, TeleporterPrefix } from "../Teleporter"
+import { TeleporterPrefix } from "../Teleporter"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/ElementType"
 import { Interactable } from "../elements/Interactable"
@@ -117,19 +117,9 @@ const makeHouseInterior = (outside: Location): Location => {
 
     const dimensions = new Point(7, 5)
     const interactablePos = new Point(dimensions.x / 2, dimensions.y).times(TILE_SIZE)
-    const teleporter: Teleporter = {
-        to: outside.uuid,
-        pos: interactablePos.plusY(-4),
-        id: TeleporterPrefix.DOOR,
-    }
 
     InteriorUtils.addBarriers(l, dimensions)
-    l.addTeleporter(teleporter)
-    l.addElement(ElementType.TELEPORTER_INDICATOR, new Point(3, 5), {
-        to: outside.uuid,
-        i: interactablePos.toString(),
-        id: TeleporterPrefix.DOOR,
-    })
+    InteriorUtils.addTeleporter(l, outside, interactablePos)
 
     const woodType = Math.ceil(Math.random() * 2)
 

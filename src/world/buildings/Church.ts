@@ -59,13 +59,7 @@ const makeChurchInterior = (outside: Location): Location => {
     new AsciiInteriorBuilder(CHURCH_TEMPLATE)
         .map("O", (pos) => l.addElement(ElementType.PODIUM, pos))
         .map("_", (pos) => l.addElement(ElementType.BENCH, pos))
-        .map("T", (pos) =>
-            l.addElement(ElementType.TELEPORTER_INDICATOR, pos, {
-                to: outside.uuid,
-                i: interactablePos.toString(),
-                id: TeleporterPrefix.DOOR,
-            })
-        )
+        .map("T", () => InteriorUtils.addTeleporter(l, outside, interactablePos))
 
     const woodType = Math.ceil(Math.random() * 2)
 

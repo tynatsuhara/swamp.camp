@@ -5,7 +5,7 @@ import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
 import { Item } from "../../items/Item"
 import { ItemMetadata } from "../../items/Items"
 import { TentColor, TentData, getTentVariantImageFilter } from "../../items/TentVariants"
-import { Teleporter, TeleporterPrefix, TeleporterSound } from "../Teleporter"
+import { TeleporterPrefix, TeleporterSound } from "../Teleporter"
 import { Breakable } from "../elements/Breakable"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/ElementType"
@@ -132,20 +132,9 @@ const makeTentInterior = (outside: Location, color: TentColor): Location => {
         l.setGroundElement(GroundType.BASIC, p)
     )
 
-    InteriorUtils.addBarriers(l, floorDimensions)
-
     const interactablePos = new Point(floorDimensions.x / 2, floorDimensions.y).times(TILE_SIZE)
-    const teleporter: Teleporter = {
-        to: outside.uuid,
-        pos: interactablePos.plusY(-4),
-        id: TeleporterPrefix.TENT,
-    }
-    l.addTeleporter(teleporter)
-    l.addElement(ElementType.TELEPORTER_INDICATOR, new Point(2, 4), {
-        to: outside.uuid,
-        i: interactablePos.toString(),
-        id: TeleporterPrefix.TENT,
-    })
+    InteriorUtils.addBarriers(l, floorDimensions)
+    InteriorUtils.addTeleporter(l, outside, interactablePos, undefined, TeleporterPrefix.TENT)
 
     l.addFeature("tentInteriorSprite", { color })
 
