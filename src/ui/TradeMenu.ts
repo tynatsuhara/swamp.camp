@@ -1,11 +1,6 @@
 import { Component, Entity, Point, UpdateData, pt } from "brigsby/dist"
 import { BasicRenderComponent, ImageRender, TextRender } from "brigsby/dist/renderer"
-import {
-    AnimatedSpriteComponent,
-    NineSlice,
-    SpriteTransform,
-    StaticSpriteSource,
-} from "brigsby/dist/sprites"
+import { NineSlice, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Lists, Maths } from "brigsby/dist/util"
 import { controls } from "../Controls"
 import { saveManager } from "../SaveManager"
@@ -20,6 +15,7 @@ import { Item } from "../items/Item"
 import { ITEM_METADATA_MAP } from "../items/Items"
 import { ClickableUI } from "./ClickableUI"
 import { Color } from "./Color"
+import { getGoldCountComponents } from "./GoldCountComponents"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
 import { Tooltip } from "./Tooltip"
 import { UISounds } from "./UISounds"
@@ -140,12 +136,9 @@ export class TradeMenu extends Component {
             this.scrollOffset = 0
             this.tradeMode = tradeMode
 
-            this.coinEntity = new Entity([
-                new AnimatedSpriteComponent(
-                    [Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)],
-                    new SpriteTransform(this.getTopLeft().plus(this.coinsOffset))
-                ),
-            ])
+            this.coinEntity = new Entity(
+                getGoldCountComponents(this.getTopLeft().plus(this.coinsOffset))
+            )
         })
     }
 
