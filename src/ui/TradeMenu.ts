@@ -10,8 +10,6 @@ import { Lists, Maths } from "brigsby/dist/util"
 import { controls } from "../Controls"
 import { saveManager } from "../SaveManager"
 import { Singletons } from "../Singletons"
-import { loadAudio } from "../audio/DeferLoadAudio"
-import { Sounds } from "../audio/Sounds"
 import { Dude } from "../characters/Dude"
 import { player } from "../characters/player"
 import { Camera } from "../cutscenes/Camera"
@@ -24,6 +22,7 @@ import { ClickableUI } from "./ClickableUI"
 import { Color } from "./Color"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
 import { Tooltip } from "./Tooltip"
+import { UISounds } from "./UISounds"
 import { SCROLL_SPEED, UI_SPRITE_DEPTH } from "./UiConstants"
 
 export enum TradeMode {
@@ -36,12 +35,6 @@ export type SalePackage = {
     readonly count: number
     readonly price: number // number of gold
 }
-
-const CLINK_NOISES = loadAudio([
-    "audio/rpg/inventory/coin.wav",
-    "audio/rpg/inventory/coin2.wav",
-    "audio/rpg/inventory/coin3.wav",
-])
 
 const COLOR_BACKGROUND = Color.RED_2
 const COLOR_BACKGROUND_BORDER = Color.RED_1
@@ -249,7 +242,7 @@ export class TradeMenu extends Component {
 
             // trade the item
             if (hovered && controls.isMenuClickDown() && !tradeError) {
-                Sounds.play(Lists.oneOf(CLINK_NOISES), 0.4)
+                UISounds.playMoneySound()
                 this.sourceInventory.removeItem(sale.item, sale.count)
                 if (this.tradeMode === TradeMode.PLAYER_SELLING) {
                     saveManager.setState({

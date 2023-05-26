@@ -3,6 +3,7 @@ import { saveManager } from "../../SaveManager"
 import { InteractIndicator } from "../../ui/InteractIndicator"
 import { TextIcon } from "../../ui/Text"
 import { SalePackage, TradeMenu } from "../../ui/TradeMenu"
+import { UISounds } from "../../ui/UISounds"
 import { ElementType } from "../../world/elements/ElementType"
 import { Queequeg } from "../../world/elements/Queequeg"
 import { EventQueue } from "../../world/events/EventQueue"
@@ -316,8 +317,10 @@ const fetchConvictsDialogue = (): DialogueInstance => {
     }
 
     const completeOrder = () => {
-        // TODO play gold clink noise
-        saveManager.setState({ coins: saveManager.getState().coins - villagerCost })
+        if (villagerCost != 0) {
+            UISounds.playMoneySound()
+            saveManager.setState({ coins: saveManager.getState().coins - villagerCost })
+        }
         fetchNPCs(DudeType.VILLAGER, DudeType.VILLAGER, DudeType.VILLAGER)
         return new NextDialogue(BERT_VILLAGERS_REQUESTED, true)
     }
