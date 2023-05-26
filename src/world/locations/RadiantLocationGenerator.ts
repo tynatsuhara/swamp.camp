@@ -4,7 +4,7 @@ import { BasicLocation } from "./BasicLocation"
 import { Location } from "./Location"
 import { LocationType } from "./LocationType"
 
-const MAP_SIZE = 30
+const MAP_SIZE = 50
 
 /**
  * Radiant location ideas:
