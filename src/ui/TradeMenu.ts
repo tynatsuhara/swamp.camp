@@ -1,6 +1,6 @@
 import { Component, Entity, Point, UpdateData, pt } from "brigsby/dist"
-import { BasicRenderComponent, ImageRender, TextRender } from "brigsby/dist/renderer"
-import { NineSlice, StaticSpriteSource } from "brigsby/dist/sprites"
+import { BasicRenderComponent, RectRender, RenderMethod, TextRender } from "brigsby/dist/renderer"
+import { NineSlice, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Lists, Maths } from "brigsby/dist/util"
 import { controls } from "../Controls"
 import { saveManager } from "../SaveManager"
@@ -8,7 +8,7 @@ import { Singletons } from "../Singletons"
 import { Dude } from "../characters/Dude"
 import { player } from "../characters/player"
 import { Camera } from "../cutscenes/Camera"
-import { ImageFilters } from "../graphics/ImageFilters"
+import { Icon } from "../graphics/OneBitTileset"
 import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
 import { Inventory } from "../items/Inventory"
 import { Item } from "../items/Item"
@@ -16,10 +16,12 @@ import { ITEM_METADATA_MAP } from "../items/Items"
 import { ClickableUI } from "./ClickableUI"
 import { Color } from "./Color"
 import { getGoldCountComponents } from "./GoldCountComponents"
+import { getIconSprite } from "./IconSprite"
+import { PaginatedMenu } from "./PaginatedMenu"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
 import { Tooltip } from "./Tooltip"
 import { UISounds } from "./UISounds"
-import { SCROLL_SPEED, UI_SPRITE_DEPTH } from "./UiConstants"
+import { UI_SPRITE_DEPTH } from "./UiConstants"
 
 export enum TradeMode {
     PLAYER_SELLING = "sell",
@@ -36,21 +38,10 @@ const COLOR_BACKGROUND = Color.RED_2
 const COLOR_BACKGROUND_BORDER = Color.RED_1
 const COLOR_TEXT_NOT_HOVERED = Color.PINK_3
 const COLOR_ERROR = Color.RED_1
-
-//
-//
-//
-//
-//
-// TODO: REWRITE THIS TO USE PAGINATION INSTEAD OF SHITTY SCROLLING (ONCE THERE ARE MORE THAN A FEW ITEMS)
-//
-//
-//
-//
-//
+const ROWS_PER_PAGE = 5
 
 // this is mostly copied from CraftingMenu and InventoryDisplay
-export class TradeMenu extends Component {
+export class TradeMenu extends PaginatedMenu {
     static get instance() {
         return Singletons.getOrCreate(TradeMenu)
     }
@@ -61,22 +52,16 @@ export class TradeMenu extends Component {
     private coinsOffset: Point = new Point(7, -11) // for the spinny coin in the corner
     isOpen = false
     private items: SalePackage[]
-    private canvas: HTMLCanvasElement
-    private context: CanvasRenderingContext2D
-    private dimensions = new Point(160, 158)
+    private dimensions: Point
     private get innerDimensions() {
         return this.dimensions.minus(new Point(10, 14))
     }
-    private scrollOffset = 0
     private justSoldRow = -1 // if this is non-negative, this row was just sold and will be highlighted
     private tooltip = this.e.addComponent(new Tooltip())
     private tradeMode: TradeMode
     private sourceInventory: Inventory
-
-    constructor() {
-        super()
-        this.canvas = document.createElement("canvas")
-        this.context = this.canvas.getContext("2d", { alpha: false })
+    get pages() {
+        return Math.ceil(this.items.length / ROWS_PER_PAGE)
     }
 
     update(updateData: UpdateData) {
@@ -86,14 +71,6 @@ export class TradeMenu extends Component {
 
         if (this.isOpen) {
             this.tooltip.clear()
-            const rowsTall = 6 // will need to change this if dimensions are adjusted
-            this.scrollOffset -=
-                controls.getScrollDeltaY() * updateData.elapsedTimeMillis * SCROLL_SPEED
-            this.scrollOffset = Maths.clamp(
-                this.scrollOffset,
-                -Math.max(this.items.length, rowsTall) * 24 + this.innerDimensions.y,
-                0
-            )
             this.displayEntity = new Entity(this.renderRecipes(this.getTopLeft(), this.items))
 
             if (this.justSoldRow !== -1) {
@@ -126,14 +103,11 @@ export class TradeMenu extends Component {
             const longestStr = Lists.maxBy(items.map(this.textForSale), (str) => str.length)
             this.dimensions = new Point(
                 Math.max(160, 75 + longestStr.length * TEXT_PIXEL_WIDTH),
-                158
+                153
             )
-            this.canvas.width = this.innerDimensions.x
-            this.canvas.height = this.innerDimensions.y
 
             this.isOpen = true
             this.items = items
-            this.scrollOffset = 0
             this.tradeMode = tradeMode
 
             this.coinEntity = new Entity(
@@ -178,19 +152,6 @@ export class TradeMenu extends Component {
 
     private renderRecipes(topLeft: Point, items: SalePackage[]): Component[] {
         const clickables: ClickableUI[] = []
-        const coinCountComponent = new BasicRenderComponent(
-            new TextRender(
-                `x${saveManager.getState().coins}`,
-                new Point(9, 1).plus(topLeft).plus(this.coinsOffset),
-                TEXT_SIZE,
-                TEXT_FONT,
-                Color.RED_6,
-                UI_SPRITE_DEPTH
-            )
-        )
-
-        this.context.imageSmoothingEnabled = false
-        this.context.font = `${TEXT_SIZE}px '${TEXT_FONT}'`
 
         // draw background
         const { sprites: bgSprites } = NineSlice.makeStretchedNineSliceComponents(
@@ -198,18 +159,22 @@ export class TradeMenu extends Component {
             this.dimensions,
             { position: topLeft, depth: UI_SPRITE_DEPTH }
         )
-        this.context.fillStyle = COLOR_BACKGROUND
-        this.context.fillRect(0, 0, this.innerDimensions.x, this.innerDimensions.y)
+
+        const renders: RenderMethod[] = [
+            new RectRender({
+                position: topLeft.plus(this.dimensions.minus(this.innerDimensions).div(2)),
+                dimensions: this.innerDimensions,
+                color: COLOR_BACKGROUND,
+                depth: UI_SPRITE_DEPTH - 1,
+            }),
+        ]
 
         const width = this.innerDimensions.x
         const margin = 4
         const rowHeight = TILE_SIZE + margin * 2
         const innerOffset = this.dimensions.minus(this.innerDimensions).div(2)
-
-        const verticalTextOffset = 13
-        let verticalOffset = this.scrollOffset
-
-        const shiftedMousePos = controls.getCursorPos().plusY(-this.scrollOffset)
+        const textOffset = pt(1, 8)
+        items = items.slice(this.page * ROWS_PER_PAGE, this.page * ROWS_PER_PAGE + ROWS_PER_PAGE)
 
         for (let r = 0; r < items.length; r++) {
             const topLeftRowPos = topLeft.plusX(margin).plusY(rowHeight * r + margin * 2)
@@ -217,7 +182,7 @@ export class TradeMenu extends Component {
                 Maths.rectContains(
                     topLeftRowPos,
                     new Point(this.innerDimensions.x, rowHeight),
-                    shiftedMousePos
+                    controls.getCursorPos()
                 ) &&
                 Maths.rectContains(
                     // within the frame itself
@@ -259,7 +224,6 @@ export class TradeMenu extends Component {
             }
 
             // craftable item
-            verticalOffset += margin
             const plainIcon = this.getItemIcon(sale.item)
             let itemColor: Color = COLOR_TEXT_NOT_HOVERED
             if (hovered) {
@@ -272,101 +236,88 @@ export class TradeMenu extends Component {
             if (tradeError) {
                 itemColor = COLOR_ERROR
             }
-            this.context.fillStyle = itemColor
             const craftedItemIcon = this.tintedIcon(plainIcon, itemColor)
-            this.drawIconAt(craftedItemIcon, margin, verticalOffset)
-            this.context.fillText(
-                this.textForSale(sale),
-                TILE_SIZE + margin * 2,
-                verticalTextOffset + verticalOffset
+            // item title and icon
+            renders.push(
+                craftedItemIcon.toImageRender(
+                    SpriteTransform.new({
+                        position: topLeftRowPos.plus(pt(margin + 1, margin - 1)),
+                        depth: UI_SPRITE_DEPTH,
+                    })
+                ),
+                new TextRender(
+                    this.textForSale(sale),
+                    topLeftRowPos.plusX(TILE_SIZE + margin * 2).plus(textOffset),
+                    TEXT_SIZE,
+                    TEXT_FONT,
+                    itemColor,
+                    UI_SPRITE_DEPTH
+                )
             )
 
             // coinage
-            let offsetFromRight = 0
             const coinIcon = this.getItemIcon(Item.COIN)
-            let ingredientIcon: StaticSpriteSource = this.tintedIcon(
+            const tintedCoinIcon: StaticSpriteSource = this.tintedIcon(
                 coinIcon,
                 itemColor === Color.WHITE ? Color.RED_6 : itemColor
             ) // make coin icon yellow on hover
-            this.context.fillStyle = itemColor
             const countStr = `${sale.price}`
-            offsetFromRight += countStr.length * TEXT_PIXEL_WIDTH + margin
-            this.context.fillText(
-                countStr,
-                width - offsetFromRight,
-                verticalTextOffset + verticalOffset
+            const textOffsetFromRight = countStr.length * TEXT_PIXEL_WIDTH + margin
+            const iconOffsetFromRight = textOffsetFromRight + TILE_SIZE
+            renders.push(
+                new TextRender(
+                    countStr,
+                    topLeftRowPos.plus(pt(width - textOffsetFromRight, 0)).plus(textOffset),
+                    TEXT_SIZE,
+                    TEXT_FONT,
+                    itemColor,
+                    UI_SPRITE_DEPTH
+                ),
+                tintedCoinIcon.toImageRender(
+                    SpriteTransform.new({
+                        position: topLeftRowPos.plus(pt(width - iconOffsetFromRight, margin - 1)),
+                        depth: UI_SPRITE_DEPTH,
+                    })
+                )
             )
-            offsetFromRight += TILE_SIZE
-            this.drawIconAt(ingredientIcon, width - offsetFromRight, verticalOffset)
 
             // draw line
-            verticalOffset += margin + TILE_SIZE
-            this.context.fillStyle = COLOR_BACKGROUND_BORDER
-            this.context.fillRect(margin, verticalOffset, this.innerDimensions.x - 2 * margin, 1)
+            renders.push(
+                new RectRender({
+                    position: topLeftRowPos
+                        .plus(pt(margin + 1, TILE_SIZE + margin * 2 - 1))
+                        .apply(Math.floor),
+                    dimensions: pt(this.innerDimensions.x - 2 * margin, 1),
+                    color: COLOR_BACKGROUND_BORDER,
+                    depth: UI_SPRITE_DEPTH,
+                })
+            )
         }
 
-        const renderComp = new BasicRenderComponent(
-            new ImageRender(
-                this.canvas,
-                Point.ZERO,
-                this.innerDimensions,
-                innerOffset.plus(topLeft).apply(Math.floor),
-                this.innerDimensions,
-                UI_SPRITE_DEPTH - 10
-            )
-        )
-
-        return [...bgSprites, renderComp, coinCountComponent, ...clickables]
+        return [
+            ...bgSprites,
+            new BasicRenderComponent(...renders),
+            ...clickables,
+            ...this.renderPageSelection(topLeft, this.dimensions),
+        ]
     }
 
     private textForSale(sale: SalePackage) {
         return `${sale.count}x ${ITEM_METADATA_MAP[sale.item].displayName}`
     }
 
-    // caching stuff
-    private itemIcons = new Map<Item, StaticSpriteSource>()
-    private tintedIcons = new Map<string, Map<StaticSpriteSource, StaticSpriteSource>>()
-
-    private drawIconAt(icon: StaticSpriteSource, x: number, y: number) {
-        this.context.drawImage(
-            icon.image,
-            icon.position.x,
-            icon.position.y,
-            icon.dimensions.x,
-            icon.dimensions.y,
-            x,
-            y,
-            icon.dimensions.x,
-            icon.dimensions.y
-        )
+    selectPage(page: number) {
+        this.justSoldRow = -1
+        super.selectPage(page)
     }
 
-    private getItemIcon(item: Item): StaticSpriteSource {
-        const cached = this.itemIcons.get(item)
-        if (!!cached) {
-            return cached
-        }
-        const icon = ITEM_METADATA_MAP[item].inventoryIconSupplier()
-        this.itemIcons.set(item, icon)
-        return icon
+    private getItemIcon(item: Item): Icon {
+        return ITEM_METADATA_MAP[item].inventoryIcon
     }
 
-    private tintedIcon(icon: StaticSpriteSource, tint: Color): StaticSpriteSource {
-        if (tint === Color.WHITE) {
-            return icon
-        }
-        let cache = this.tintedIcons.get(tint)
-        if (!cache) {
-            cache = new Map<StaticSpriteSource, StaticSpriteSource>()
-            this.tintedIcons.set(tint, cache)
-        }
-        const cached = cache.get(icon)
-        if (!!cached) {
-            return cached
-        }
-        const f = icon.filtered(ImageFilters.tint(tint))
-        cache.set(icon, f)
-        return f
+    // todo replace with cache
+    private tintedIcon(icon: Icon, color: Color): StaticSpriteSource {
+        return getIconSprite({ icon, color })
     }
 
     getEntities(): Entity[] {

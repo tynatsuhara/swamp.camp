@@ -22,8 +22,9 @@ import { Singletons } from "../Singletons"
 import { EventDispatcher } from "../utils/EventDispatcher"
 import { ClickableUI } from "./ClickableUI"
 import { Color } from "./Color"
-import { getIconSprite, getIconSpriteImageRender } from "./IconSprite"
-import { formatText, TEXT_FONT, TEXT_SIZE, TextAlign } from "./Text"
+import { getIconSprite } from "./IconSprite"
+import { PaginatedMenu } from "./PaginatedMenu"
+import { TEXT_FONT, TEXT_SIZE } from "./Text"
 import { Tooltip } from "./Tooltip"
 import { UI_SPRITE_DEPTH } from "./UiConstants"
 import { UISounds } from "./UISounds"
@@ -41,7 +42,7 @@ loadAudio([CRAFT_NOISE, COOK_NOISE])
 
 type CraftMode = "craft" | "cook"
 
-export class CraftingMenu extends Component {
+export class CraftingMenu extends PaginatedMenu {
     static get instance() {
         return Singletons.getOrCreate(CraftingMenu)
     }
@@ -51,14 +52,13 @@ export class CraftingMenu extends Component {
     isOpen = false
     private recipes: CraftingRecipeCategory[]
     private recipeCategory: number
-    private page: number = 0
     private dimensions = new Point(180, 33 + 24 * RECIPES_PER_PAGE)
     private innerDimensions = this.dimensions.minus(new Point(10, 14))
     private justCraftedRow = -1 // if this is non-negative, this row was just crafted and will be highlighted
     private tooltip = this.e.addComponent(new Tooltip())
     private mode: CraftMode
 
-    private get pages() {
+    get pages() {
         return Math.ceil(this.recipes[this.recipeCategory].recipes.length / RECIPES_PER_PAGE)
     }
 
@@ -134,9 +134,9 @@ export class CraftingMenu extends Component {
         this.selectPage(0)
     }
 
-    private selectPage(page: number) {
+    selectPage(page: number) {
+        super.selectPage(page)
         this.justCraftedRow = -1
-        this.page = page
     }
 
     private renderCategories(topLeft: Point): Component[] {
@@ -373,55 +373,11 @@ export class CraftingMenu extends Component {
             )
         }
 
-        const buttonOffsetX = 14
-        const buttonOffsetY = 16
-        const pageLeftButtonCenterPos = topLeft
-            .plus(pt(buttonOffsetX, this.dimensions.y - buttonOffsetY))
-            .apply(Math.floor)
-        const pageRightButtonCenterPos = topLeft
-            .plus(pt(this.dimensions.x - buttonOffsetX, this.dimensions.y - buttonOffsetY))
-            .apply(Math.floor)
-        renders.push(
-            ...formatText({
-                text: `${this.page + 1}/${this.pages}`,
-                position: topLeft.plusY(this.dimensions.y - 19).apply(Math.floor),
-                width: this.dimensions.x,
-                alignment: TextAlign.CENTER,
-                color: COLOR_TEXT_NOT_HOVERED,
-            })
-        )
-
         return [
             ...sprites,
             ...clickables,
             new BasicRenderComponent(...renders),
-            ...this.renderPageButton(pageLeftButtonCenterPos, this.page > 0, "left"),
-            ...this.renderPageButton(pageRightButtonCenterPos, this.page < this.pages - 1, "right"),
-        ]
-    }
-
-    private renderPageButton(
-        centerPos: Point,
-        active: boolean,
-        key: "left" | "right"
-    ): Component[] {
-        const isHovering = Maths.rectContains(
-            centerPos.minus(pt(TILE_SIZE / 2)),
-            pt(TILE_SIZE),
-            controls.getCursorPos()
-        )
-        const activeColor = isHovering ? COLOR_TEXT_HOVERED : COLOR_TEXT_NOT_HOVERED
-        const render = getIconSpriteImageRender({
-            icon: `small_arrow_${key}`,
-            centerPos,
-            color: active ? activeColor : COLOR_LACKING_INGREDIENT,
-        })
-        if (controls.isMenuClickDown() && isHovering && active) {
-            this.selectPage(key === "left" ? this.page - 1 : this.page + 1)
-        }
-        return [
-            new BasicRenderComponent(render),
-            new ClickableUI(`craft-${key}`, centerPos, false, true),
+            ...this.renderPageSelection(topLeft, this.dimensions),
         ]
     }
 
