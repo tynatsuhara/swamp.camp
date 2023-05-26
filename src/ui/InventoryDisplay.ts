@@ -9,19 +9,13 @@ import {
     UpdateData,
 } from "brigsby/dist"
 import { BasicRenderComponent } from "brigsby/dist/renderer"
-import {
-    AnimatedSpriteComponent,
-    NineSlice,
-    SpriteComponent,
-    SpriteTransform,
-} from "brigsby/dist/sprites"
+import { NineSlice, SpriteComponent } from "brigsby/dist/sprites"
 import { Dude } from "../characters/Dude"
 import { player } from "../characters/player"
 import { controls } from "../Controls"
 import { Camera } from "../cutscenes/Camera"
 import { prettyPrint } from "../debug/JSON"
-import { ImageFilters } from "../graphics/ImageFilters"
-import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
 import {
     getInventoryItemActions,
     getInventoryItemDonationActions,
@@ -29,12 +23,12 @@ import {
 } from "../items/getInventoryItemActions"
 import { Inventory, ItemStack } from "../items/Inventory"
 import { Item } from "../items/Item"
-import { ItemMetadata, ItemSpec, ITEM_METADATA_MAP } from "../items/Items"
+import { ITEM_METADATA_MAP, ItemMetadata, ItemSpec } from "../items/Items"
 import { clientSyncFn } from "../online/syncUtils"
-import { saveManager } from "../SaveManager"
 import { Singletons } from "../Singletons"
 import { ClickableUI } from "./ClickableUI"
 import { Color } from "./Color"
+import { getGoldCountComponents } from "./GoldCountComponents"
 import { formatText } from "./Text"
 import { Tooltip } from "./Tooltip"
 import { UI_SPRITE_DEPTH } from "./UiConstants"
@@ -633,33 +627,8 @@ export class InventoryDisplay extends Component {
         )
 
         const dropShadow = Color.RED_1
-        const coinAnim = new AnimatedSpriteComponent(
-            [Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)],
-            new SpriteTransform(this.offset.plus(this.coinsOffset))
-        )
-        const coinAnimDropShadow = new AnimatedSpriteComponent(
-            [Tilesets.instance.dungeonCharacters.getTileSetAnimation("coin_anim", 150)],
-            SpriteTransform.new({
-                position: this.offset.plus(this.coinsOffset.plusX(-1).plusY(1)),
-                depth: coinAnim.transform.depth - 1,
-            })
-        )
-        coinAnimDropShadow.applyFilter(ImageFilters.tint(dropShadow))
 
-        this.displayEntity = new Entity([
-            // coins
-            coinAnim,
-            coinAnimDropShadow,
-            new BasicRenderComponent(
-                ...formatText({
-                    text: `x${saveManager.getState().coins}`,
-                    position: new Point(9, 1).plus(this.offset).plus(this.coinsOffset),
-                    color: Color.RED_6,
-                    depth: UI_SPRITE_DEPTH,
-                    dropShadow,
-                })
-            ),
-        ])
+        this.displayEntity = new Entity(getGoldCountComponents(this.offset.plus(this.coinsOffset)))
 
         this.renderInv(this.playerInv)
 
