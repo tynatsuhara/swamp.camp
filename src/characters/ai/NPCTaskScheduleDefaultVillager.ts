@@ -130,7 +130,11 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
 
     private findWorkLocation(dude: Dude): Location | undefined {
         // wfh today
-        if (dude.factions.includes(DudeFaction.CLERGY) || dude.type === DudeType.DOCTOR) {
+        if (
+            dude.factions.includes(DudeFaction.CLERGY) ||
+            dude.type === DudeType.DOCTOR ||
+            dude.type === DudeType.HERALD
+        ) {
             return this.findHomeLocation(dude)
         }
 
