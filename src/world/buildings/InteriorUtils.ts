@@ -2,7 +2,9 @@ import { Point } from "brigsby/dist"
 import { TILE_SIZE, pixelPtToTilePt } from "../../graphics/Tilesets"
 import { TeleporterPrefix } from "../Teleporter"
 import { ElementType } from "../elements/ElementType"
+import { ElementUtils } from "../elements/ElementUtils"
 import { FeatureData } from "../features/Features"
+import { GroundType } from "../ground/Ground"
 import { Location } from "../locations/Location"
 
 const BARRIER_WIDTH = 30
@@ -47,5 +49,11 @@ export const InteriorUtils = {
             id,
             offset: indicatorOffset,
         })
+    },
+
+    setWalkableTiles(l: Location, floorDimensions: Point) {
+        ElementUtils.rectPoints(Point.ZERO, floorDimensions).forEach((p) =>
+            l.setGroundElement(GroundType.BASIC, p)
+        )
     },
 }

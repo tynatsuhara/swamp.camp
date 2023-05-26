@@ -24,7 +24,6 @@ export class TownHallFactory extends SimpleBuildingFactory<ElementType.TOWN_HALL
     }
 }
 
-// TODO
 const makeTownHallInterior = (outside: Location): Location => {
     const l = new BasicLocation({
         type: LocationType.APOTHECARY_INTERIOR,
@@ -33,7 +32,7 @@ const makeTownHallInterior = (outside: Location): Location => {
     })
 
     const dimensions = new Point(4, 3)
-
+    InteriorUtils.setWalkableTiles(l, dimensions)
     InteriorUtils.addBarriers(l, dimensions)
 
     l.addFeature("sprite", {
@@ -42,6 +41,15 @@ const makeTownHallInterior = (outside: Location): Location => {
         pixelY: -TILE_SIZE * 2, // offset for wall
         depth: Number.MIN_SAFE_INTEGER,
     })
+
+    l.addFeature("navMeshCollider", {
+        x: TILE_SIZE,
+        y: 0,
+        width: TILE_SIZE * 3,
+        height: TILE_SIZE,
+    })
+
+    l.addElement(ElementType.CHEST, pt(0, 0))
 
     const interactablePos = new Point(2, dimensions.y).times(TILE_SIZE)
     InteriorUtils.addTeleporter(l, outside, interactablePos, pt(-TILE_SIZE / 2, 0))

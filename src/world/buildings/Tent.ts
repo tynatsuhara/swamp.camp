@@ -9,10 +9,8 @@ import { TeleporterPrefix, TeleporterSound } from "../Teleporter"
 import { Breakable } from "../elements/Breakable"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/ElementType"
-import { ElementUtils } from "../elements/ElementUtils"
 import { Interactable } from "../elements/Interactable"
 import { NavMeshCollider } from "../elements/NavMeshCollider"
-import { GroundType } from "../ground/Ground"
 import { BasicLocation } from "../locations/BasicLocation"
 import { Location } from "../locations/Location"
 import { LocationManager, here } from "../locations/LocationManager"
@@ -128,9 +126,7 @@ const makeTentInterior = (outside: Location, color: TentColor): Location => {
     })
 
     const floorDimensions = new Point(4, 3)
-    ElementUtils.rectPoints(Point.ZERO, floorDimensions).forEach((p) =>
-        l.setGroundElement(GroundType.BASIC, p)
-    )
+    InteriorUtils.setWalkableTiles(l, floorDimensions)
 
     const interactablePos = new Point(floorDimensions.x / 2, floorDimensions.y).times(TILE_SIZE)
     InteriorUtils.addBarriers(l, floorDimensions)
