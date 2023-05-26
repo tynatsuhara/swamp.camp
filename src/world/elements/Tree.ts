@@ -99,14 +99,14 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
                 ? [Color.BROWN_4, Color.GREEN_6, Color.GREEN_6]
                 : [Color.TAUPE_3, Color.GREEN_4, Color.GREEN_4]
 
-        const emitParticles = () => {
+        const emitParticles = (count) => {
             const position = pos.plus(new Point(0.5, 0)).times(TILE_SIZE).plus(randomOffset)
-            for (let i = 0; i < 40; i++) {
+            for (let i = 0; i < count; i++) {
                 const speed = Math.random() > 0.5 ? 0.01 : 0.03
                 Particles.instance.emitParticle(
                     Lists.oneOf(particleColors),
                     position.randomCircularShift(10),
-                    (pos.y + 2) * TILE_SIZE,
+                    depth,
                     250 + Math.random() * 250,
                     (t) => new Point(0, t * speed),
                     Math.random() > 0.5 ? new Point(2, 2) : new Point(1, 1)
@@ -135,8 +135,11 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
                         return [getItem()]
                     }
                 },
-                () => playChoppingSound(hittableCenter),
-                () => emitParticles()
+                () => {
+                    playChoppingSound(hittableCenter)
+                    emitParticles(5)
+                },
+                () => emitParticles(40)
             )
         )
 
@@ -159,7 +162,10 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
                 pos.plusX(0.5).plusY(1).times(TILE_SIZE),
                 tiles.map((t) => t.transform),
                 () => !hittableResource.isBeingHit(),
-                (dude) => Sounds.playAtPoint(Lists.oneOf(PUSH_AUDIO), 0.2, dude.standingPosition)
+                (dude) => {
+                    Sounds.playAtPoint(Lists.oneOf(PUSH_AUDIO), 0.2, dude.standingPosition)
+                    emitParticles(Math.random() * 10 - 5)
+                }
             )
         )
 
