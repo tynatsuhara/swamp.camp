@@ -518,6 +518,12 @@ export class BasicLocation extends Location {
         return this.features.find((f) => f.type === type)?.data as unknown as FeatureData<F>
     }
 
+    getFeaturesOfType<F extends FeatureType>(type: F): Array<FeatureData<F>> {
+        return this.features
+            .filter((f) => f.type === type)
+            .map((f) => f?.data as unknown as FeatureData<F>)
+    }
+
     getEntities() {
         return Array.from(this.getDudes().map((d) => d.entity))
             .concat(this.elements.values().map((c) => c.entity))

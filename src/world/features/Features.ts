@@ -3,6 +3,7 @@ import { Location } from "../locations/Location"
 import { barrier } from "./barrier"
 import { mineInteriorBackground } from "./mineInteriorBackground"
 import { navMeshCollider } from "./navMeshCollider"
+import { navMeshPoint } from "./navMeshPoint"
 import { sprite } from "./sprite"
 import { tentInteriorSprite } from "./tentInteriorSprite"
 
@@ -14,6 +15,7 @@ const FEATURES = {
     navMeshCollider,
     tentInteriorSprite,
     mineInteriorBackground,
+    navMeshPoint,
 }
 
 export type FeatureType = keyof typeof FEATURES

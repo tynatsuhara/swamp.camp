@@ -142,6 +142,8 @@ export abstract class Location {
 
     abstract getFeatureOfType<F extends FeatureType>(type: F): FeatureData<F>
 
+    abstract getFeaturesOfType<F extends FeatureType>(type: F): Array<FeatureData<F>>
+
     // ==================== Moving things ==================== //
 
     abstract addProjectile(e: Entity): void
