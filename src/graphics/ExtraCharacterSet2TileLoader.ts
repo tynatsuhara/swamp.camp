@@ -10,6 +10,7 @@ const TILE_WIDTH = 16
 // maps to [column, row]
 const CHARACTERS = new Map([
     ["doctor", [0, 2]],
+    ["mr-bones", [0, 6]],
     ["widdershins", [1, 1]],
     ["prisoner1", [1, 2]],
     ["prisoner2", [1, 3]],

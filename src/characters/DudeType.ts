@@ -8,7 +8,7 @@ export enum DudeType {
     HERALD,
     HORNED_DEMON,
     SHROOM,
-    VILLAGER, // TODO maybe rename this to something like WORKER?
+    VILLAGER,
     CENTAUR,
     BEAR,
     ORC_BRUTE,
@@ -31,6 +31,7 @@ export enum DudeType {
     GNOLL_SHAMAN,
     GNOLL_OVERSEER,
     MIMIC,
+    SKELETON,
 }
 
 expose({ DudeType })

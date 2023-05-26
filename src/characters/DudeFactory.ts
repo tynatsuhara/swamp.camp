@@ -480,6 +480,7 @@ export class DudeFactory {
                 break
             }
             case DudeType.FOREST_GUARDIAN: {
+                // TODO
                 factions = [DudeFaction.VILLAGERS]
                 animationName = "ForestGuardian"
                 weapon = WeaponType.SWORD
@@ -491,10 +492,19 @@ export class DudeFactory {
                 break
             }
             case DudeType.MIMIC: {
-                factions = [] // TODO
+                factions = [] // TODO?
                 animationName = "chest_mimic"
                 weapon = WeaponType.UNARMED
                 additionalComponents = [new NPC(), new Mimic()]
+                maxHealth = 5
+                speed *= 0.7
+                break
+            }
+            case DudeType.SKELETON: {
+                factions = [DudeFaction.UNDEAD]
+                animationName = "mr-bones"
+                weapon = WeaponType.UNARMED
+                additionalComponents = [new NPC(), new Enemy()]
                 maxHealth = 5
                 speed *= 0.7
                 break

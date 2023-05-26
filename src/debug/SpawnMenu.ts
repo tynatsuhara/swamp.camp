@@ -39,6 +39,7 @@ const SPAWNABLE_TYPES = [
     DudeType.CENTAUR,
     DudeType.ELF,
     DudeType.MIMIC,
+    DudeType.SKELETON,
 ]
 
 export const spawnMenu = {
