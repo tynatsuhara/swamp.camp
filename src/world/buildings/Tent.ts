@@ -1,4 +1,4 @@
-import { Entity, Point } from "brigsby/dist"
+import { Entity, Point, pt } from "brigsby/dist"
 import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Sounds } from "../../audio/Sounds"
 import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
@@ -127,14 +127,20 @@ const makeTentInterior = (outside: Location, color: TentColor): Location => {
         allowPlacing: isPlayerTent,
     })
 
-    const floorDimensions = new Point(5, 4)
+    const floorDimensions = new Point(4, 3)
     ElementUtils.rectPoints(Point.ZERO, floorDimensions).forEach((p) =>
         l.setGroundElement(GroundType.BASIC, p)
     )
 
     const interactablePos = new Point(floorDimensions.x / 2, floorDimensions.y).times(TILE_SIZE)
     InteriorUtils.addBarriers(l, floorDimensions)
-    InteriorUtils.addTeleporter(l, outside, interactablePos, undefined, TeleporterPrefix.TENT)
+    InteriorUtils.addTeleporter(
+        l,
+        outside,
+        interactablePos,
+        pt(-TILE_SIZE / 2, 0),
+        TeleporterPrefix.TENT
+    )
 
     l.addFeature("tentInteriorSprite", { color })
 
