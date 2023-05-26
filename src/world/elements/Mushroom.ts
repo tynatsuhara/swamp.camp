@@ -80,7 +80,7 @@ export class MushroomFactory extends ElementFactory<ElementType.MUSHROOM, { ngt:
     }
 
     canPlaceInLocation(wl: Location) {
-        return wl === camp()
+        return !wl.isInterior
     }
 
     canPlaceAtPos(wl: Location, pos: Point) {

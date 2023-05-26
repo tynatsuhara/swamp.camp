@@ -10,7 +10,6 @@ import { session } from "../../online/session"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { GroundRenderer } from "../ground/GroundRenderer"
 import { Location } from "../locations/Location"
-import { camp } from "../locations/LocationManager"
 import { Breakable } from "./Breakable"
 import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
@@ -72,7 +71,7 @@ export class BedFactory extends ElementFactory<BedType> {
     }
 
     canPlaceInLocation(wl: Location) {
-        return wl !== camp()
+        return wl.isInterior
     }
 }
 

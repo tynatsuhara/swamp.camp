@@ -20,7 +20,6 @@ import { TimeUnit } from "../TimeUnit"
 import { WorldTime } from "../WorldTime"
 import { GroundRenderer } from "../ground/GroundRenderer"
 import { Location } from "../locations/Location"
-import { camp } from "../locations/LocationManager"
 import { Breakable } from "./Breakable"
 import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
@@ -153,7 +152,7 @@ export class CampfireFactory extends ElementFactory<ElementType.CAMPFIRE, SaveDa
     }
 
     canPlaceInLocation(wl: Location) {
-        return wl === camp()
+        return !wl.isInterior
     }
 }
 

@@ -37,6 +37,7 @@ export abstract class BuildingFactory<
     }
 
     canPlaceInLocation(l: Location) {
+        // TODO: Change this to !isInterior once the tent teleporter location is fixed
         return l === camp()
     }
 

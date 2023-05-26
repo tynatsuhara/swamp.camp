@@ -12,7 +12,6 @@ import { TimeUnit } from "../TimeUnit"
 import { WorldTime } from "../WorldTime"
 import { Ground, GroundType } from "../ground/Ground"
 import { Location } from "../locations/Location"
-import { camp } from "../locations/LocationManager"
 import { Burnable } from "./Burnable"
 import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
@@ -157,7 +156,7 @@ export class BlackberriesFactory extends ElementFactory<ElementType.BLACKBERRIES
     }
 
     canPlaceInLocation(wl: Location) {
-        return wl === camp()
+        return !wl.isInterior
     }
 
     canPlaceAtPos(wl: Location, pos: Point) {

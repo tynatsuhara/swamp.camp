@@ -8,7 +8,6 @@ import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
 import { Item } from "../../items/Item"
 import { Ground } from "../ground/Ground"
 import { Location } from "../locations/Location"
-import { camp } from "../locations/LocationManager"
 import { ElementComponent } from "./ElementComponent"
 import { ElementFactory } from "./ElementFactory"
 import { ElementType } from "./ElementType"
@@ -92,7 +91,7 @@ export class RockFactory extends ElementFactory<ElementType.ROCK> {
     }
 
     canPlaceInLocation(wl: Location) {
-        return wl === camp()
+        return !wl.isInterior
     }
 
     canPlaceAtPos(wl: Location, pos: Point) {

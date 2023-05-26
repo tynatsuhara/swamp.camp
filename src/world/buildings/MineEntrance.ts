@@ -10,7 +10,7 @@ import { NavMeshCollider } from "../elements/NavMeshCollider"
 import { GroundType } from "../ground/Ground"
 import { BasicLocation } from "../locations/BasicLocation"
 import { Location } from "../locations/Location"
-import { LocationManager, camp } from "../locations/LocationManager"
+import { LocationManager } from "../locations/LocationManager"
 import { LocationType } from "../locations/LocationType"
 import { BuildingFactory, ConstructionRequirements } from "./Building"
 import { InteriorUtils } from "./InteriorUtils"
@@ -81,7 +81,7 @@ export class MineEntranceFactory extends BuildingFactory<ElementType.MINE_ENTRAN
     }
 
     canPlaceInLocation(wl: Location) {
-        return wl === camp()
+        return !wl.isInterior
     }
 
     canPlaceAtPos(wl: Location, pos: Point) {
