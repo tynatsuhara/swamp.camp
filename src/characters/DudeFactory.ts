@@ -503,10 +503,11 @@ export class DudeFactory {
             case DudeType.SKELETON: {
                 factions = [DudeFaction.UNDEAD]
                 animationName = "mr-bones"
-                weapon = WeaponType.UNARMED
+                weapon = WeaponType.SWORD
+                shield = ShieldType.BASIC
                 additionalComponents = [new NPC(), new Enemy()]
                 maxHealth = 5
-                speed *= 0.7
+                speed *= 0.4
                 break
             }
             default: {

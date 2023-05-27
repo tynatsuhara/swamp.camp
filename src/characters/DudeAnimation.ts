@@ -41,23 +41,35 @@ export class DudeAnimation extends Component {
         this.flashUntil = Date.now() + 40
     }
 
+    private cachedAfterDissolve: RenderMethod[]
     getRenderMethods() {
+        // optimization to avoid running this filter every frame
+        if (this.cachedAfterDissolve) {
+            return this.cachedAfterDissolve
+        }
+
         const doFlash = !!this.flashUntil
         if (this.flashUntil < Date.now()) {
             this.flashUntil = 0
         }
 
-        const filter = doFlash ? ImageFilters.tint(Color.WHITE) : null
+        const flashFilter = doFlash ? ImageFilters.tint(Color.WHITE) : null
+
+        const compositeFilter = ImageFilters.composite(flashFilter, this.dissolveFilter)
 
         const result: RenderMethod[] = [
-            this._animation.sprite.filtered(filter).toImageRender(this._transform),
+            this._animation.sprite.filtered(compositeFilter).toImageRender(this._transform),
         ]
 
         if (this.dude.shield?.isStarted) {
-            result.push(...(this.dude.shield.getWrappedRenderMethods(filter) ?? []))
+            result.push(...(this.dude.shield.getWrappedRenderMethods(compositeFilter) ?? []))
         }
         if (this.dude.weapon?.isStarted) {
-            result.push(...(this.dude.weapon.getWrappedRenderMethods(filter) ?? []))
+            result.push(...(this.dude.weapon.getWrappedRenderMethods(compositeFilter) ?? []))
+        }
+
+        if (this.dissolveFilter) {
+            this.cachedAfterDissolve = result
         }
 
         return result
@@ -76,8 +88,10 @@ export class DudeAnimation extends Component {
         this._animation.goToAnimation(index)
     }
 
-    applyFilter(filter: ImageFilter) {
-        this._animation.applyFilter(filter)
+    private dissolveFilter: ImageFilter
+    applyDissolveFilter(dissolveChance: number) {
+        this.cachedAfterDissolve = undefined
+        this.dissolveFilter = ImageFilters.dissolve(() => dissolveChance)
     }
 
     pause() {

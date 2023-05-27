@@ -1,11 +1,30 @@
 import { Point } from "brigsby/dist"
+import { ImageFilter } from "brigsby/dist/sprites"
 import { Color, getRGB } from "../ui/Color"
+import { SeededRandom } from "../utils/SeededRandom"
 
 export const ImageFilters = {
     /**
+     * @param filters Multiple filters which will be applied in order.
+     * @returns undefined if there are no truthy filters!
+     */
+    composite: (...filters: ImageFilter[]): ImageFilter => {
+        filters = filters.filter((f) => !!f)
+        if (filters.length === 0) {
+            return undefined
+        }
+        return (img: ImageData) => {
+            filters.forEach((f) => {
+                img = f(img)
+            })
+            return img
+        }
+    },
+
+    /**
      * any oldColor pixels will be set to newColor
      */
-    recolor: (...colors: [oldColor: Color, newColor: Color][]) => {
+    recolor: (...colors: [oldColor: Color, newColor: Color][]): ImageFilter => {
         const rgbsOld = colors.map(([oldColor, newColor]) => getRGB(oldColor))
         const rgbsNew = colors.map(([oldColor, newColor]) => getRGB(newColor))
         return (img: ImageData) => {
@@ -30,7 +49,7 @@ export const ImageFilters = {
     /**
      * recolors all opaque pixels the given color
      */
-    tint: (color: Color) => {
+    tint: (color: Color): ImageFilter => {
         const rgb = getRGB(color)
         return (img: ImageData) => {
             const result = new ImageData(new Uint8ClampedArray(img.data), img.width, img.height)
@@ -48,7 +67,7 @@ export const ImageFilters = {
     /**
      * recolors all opaque pixels the given color
      */
-    overlay: (color: Color, alpha: number) => {
+    overlay: (color: Color, alpha: number): ImageFilter => {
         const overlayRGB = getRGB(color)
         return (img: ImageData) => {
             const result = new ImageData(new Uint8ClampedArray(img.data), img.width, img.height)
@@ -70,12 +89,13 @@ export const ImageFilters = {
     /**
      * makes pixels invisible based on the given probability function
      */
-    dissolve: (dissolveProbabilityFn: (pt: Point) => number) => {
+    dissolve: (dissolveProbabilityFn: (pt: Point) => number): ImageFilter => {
         return (img: ImageData) => {
+            const random = new SeededRandom(`${img.height}-${img.width}`)
             const result = new ImageData(new Uint8ClampedArray(img.data), img.width, img.height)
             for (let x = 0; x < result.width; x++) {
                 for (let y = 0; y < result.height; y++) {
-                    if (Math.random() < dissolveProbabilityFn(new Point(x, y))) {
+                    if (random.next() < dissolveProbabilityFn(new Point(x, y))) {
                         const i = (x + y * result.width) * 4
                         result.data[i + 3] = 0
                     }
@@ -88,7 +108,7 @@ export const ImageFilters = {
     /**
      * reduces the size of the image by factor (eg shrink(2) halves the image size)
      */
-    shrink: (factor: number) => {
+    shrink: (factor: number): ImageFilter => {
         return (img: ImageData) => {
             const result = new ImageData(
                 Math.floor(img.width / factor),
@@ -111,7 +131,7 @@ export const ImageFilters = {
     /**
      * filters to only include the pixels for which the include function returns true
      */
-    segment: (include: (x: number, y: number) => boolean) => {
+    segment: (include: (x: number, y: number) => boolean): ImageFilter => {
         return (img: ImageData) => {
             const result = new ImageData(new Uint8ClampedArray(img.data), img.width, img.height)
             for (let x = 0; x < result.width; x++) {

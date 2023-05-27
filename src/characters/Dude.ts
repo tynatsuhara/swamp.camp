@@ -10,7 +10,6 @@ import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 import { DeathCutscene } from "../cutscenes/DeathCutscene"
 import { IntroCutscene } from "../cutscenes/IntroCutscene"
-import { ImageFilters } from "../graphics/ImageFilters"
 import { Icon } from "../graphics/OneBitTileset"
 import {
     emitApparitionParticles,
@@ -1003,7 +1002,7 @@ export class Dude extends Component implements DialogueSource {
     private dissolveLocal() {
         let dissolveChance = 0.1
         const interval = setInterval(() => {
-            this.animation.applyFilter(ImageFilters.dissolve(() => dissolveChance))
+            this.animation.applyDissolveFilter(dissolveChance)
             if (dissolveChance >= 1) {
                 this.entity?.selfDestruct()
                 clearInterval(interval)
