@@ -25,6 +25,10 @@ export class LocationManager {
         return Singletons.getOrCreate(LocationManager)
     }
 
+    private currentLocation: Location
+    private locations: Map<string, Location> = new Map() // uuid -> location
+    private _camp: Location
+
     constructor() {
         expose({
             locationManager: this,
@@ -90,9 +94,6 @@ export class LocationManager {
         this.currentLocation = newLocation
         this.simulateLocations(false, TimeUnit.MINUTE)
     }
-    private currentLocation: Location
-
-    private locations: Map<string, Location> = new Map() // uuid -> location
 
     get(uuid: string) {
         return this.locations.get(uuid)
@@ -114,15 +115,14 @@ export class LocationManager {
     /**
      * @deprecated use camp() instead
      */
-    exterior(): Location {
-        if (!this.ext) {
-            this.ext = Array.from(this.locations.values()).find(
+    campLocation(): Location {
+        if (!this._camp) {
+            this._camp = Array.from(this.locations.values()).find(
                 (l) => l.type === LocationType.BASE_CAMP
             )
         }
-        return this.ext
+        return this._camp
     }
-    private ext: Location
 
     getLocations(): Location[] {
         return Array.from(this.locations.values())
@@ -233,5 +233,5 @@ export class LocationManager {
     )
 }
 
-export const camp = () => LocationManager.instance.exterior()
+export const camp = () => LocationManager.instance.campLocation()
 export const here = () => LocationManager.instance.current()
