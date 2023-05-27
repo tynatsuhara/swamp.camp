@@ -22,7 +22,7 @@ import { UIStateManager } from "../ui/UIStateManager"
 import { ConstructionSite } from "../world/buildings/ConstructionSite"
 import { GroundType } from "../world/ground/Ground"
 import { LocationFactory } from "../world/locations/LocationFactory"
-import { camp, here, LocationManager } from "../world/locations/LocationManager"
+import { here, LocationManager } from "../world/locations/LocationManager"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
 import { spawnMenu } from "./SpawnMenu"
@@ -204,7 +204,7 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
         InputKey.Y,
         "vanish spooky visitor(s)",
         () =>
-            camp()
+            here()
                 .getDudes()
                 .filter((d) => d.type === DudeType.SPOOKY_VISITOR)
                 .forEach((d) => d.entity.selfDestruct()),
