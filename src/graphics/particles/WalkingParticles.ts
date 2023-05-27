@@ -1,11 +1,12 @@
 import { Component, Point, UpdateData } from "brigsby/dist"
 import { Dude } from "../../characters/Dude"
+import { DudeType } from "../../characters/DudeType"
 import { Color } from "../../ui/Color"
+import { WorldTime } from "../../world/WorldTime"
 import { Ground } from "../../world/ground/Ground"
 import { GroundRenderer } from "../../world/ground/GroundRenderer"
 import { here } from "../../world/locations/LocationManager"
 import { LocationType } from "../../world/locations/LocationType"
-import { WorldTime } from "../../world/WorldTime"
 import { Particles } from "./Particles"
 
 const MILLIS_BETWEEN_EMISSIONS = 50
@@ -67,7 +68,10 @@ export class WalkingParticles extends Component {
         const groud = here().getGround(this.dude.tile)
         const isInWater = Ground.isWater(groud?.type)
 
+        const noBleed = this.dude.type === DudeType.SKELETON
+
         if (
+            !noBleed &&
             this.dude.health < this.dude.maxHealth &&
             this.dude.lastDamageTime > WorldTime.instance.time - 10_000 &&
             Math.random() < BLOOD_PROBABILITY &&
