@@ -4,6 +4,8 @@ import { session } from "../../online/session"
 import { Dude } from "../Dude"
 import { NPC } from "../NPC"
 
+const PARTICLES_EMITTED_KEY = "did-particle-emit"
+
 export class SpookyVisitor extends Component {
     private npc: NPC
     private dude: Dude
@@ -12,7 +14,11 @@ export class SpookyVisitor extends Component {
     start(startData: StartData) {
         this.npc = this.entity.getComponent(NPC)
         this.dude = this.entity.getComponent(Dude)
-        emitApparitionParticles(this.dude.standingPosition)
+
+        if (!this.dude.blob[PARTICLES_EMITTED_KEY]) {
+            emitApparitionParticles(this.dude.standingPosition)
+            this.dude.blob[PARTICLES_EMITTED_KEY] = true
+        }
     }
 
     update(updateData: UpdateData) {
