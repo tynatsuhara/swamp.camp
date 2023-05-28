@@ -198,10 +198,10 @@ export class Queequeg extends Simulatable {
         const { position, depth } = this
         return [
             Tilesets.instance.largeSprites
-                .get(pt(8, 0), pt(this.width, 2))
+                .get({ position: pt(8, 0), dimensions: pt(this.width, 2) })
                 .toImageRender(SpriteTransform.new({ position, depth: depth - 2 })),
             Tilesets.instance.largeSprites
-                .get(pt(8, 2), pt(this.width, 3))
+                .get({ position: pt(8, 2), dimensions: pt(this.width, 3) })
                 .toImageRender(SpriteTransform.new({ position, depth: depth + 2 })),
         ]
     }

@@ -20,7 +20,7 @@ export const mineInteriorBackground = ({
     const e = new Entity()
 
     const tile = (p: Point, size = pt(1)) => {
-        return Tilesets.instance.largeSprites.get(pt(24, 0).plus(p), size)
+        return Tilesets.instance.largeSprites.get({ position: pt(24, 0).plus(p), dimensions: size })
     }
 
     const topLeft = pt(2, 1)
