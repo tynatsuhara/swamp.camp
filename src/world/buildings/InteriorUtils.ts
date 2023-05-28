@@ -1,11 +1,12 @@
 import { Point } from "brigsby/dist"
 import { TILE_SIZE, pixelPtToTilePt } from "../../graphics/Tilesets"
-import { TeleporterPrefix } from "../Teleporter"
+import { TeleporterSound } from "../Teleporter"
 import { ElementType } from "../elements/ElementType"
 import { ElementUtils } from "../elements/ElementUtils"
 import { FeatureData } from "../features/Features"
 import { GroundType } from "../ground/Ground"
 import { Location } from "../locations/Location"
+import { LocationManager } from "../locations/LocationManager"
 
 const BARRIER_WIDTH = 30
 const SIDE_PADDING = 7
@@ -33,20 +34,26 @@ export const InteriorUtils = {
 
     addTeleporter(
         l: Location,
-        outside: Location,
         interactablePos: Point,
         indicatorOffset?: Point,
-        id = TeleporterPrefix.DOOR
+        sound: TeleporterSound = "door"
     ) {
-        l.addTeleporter({
-            to: outside.uuid,
-            pos: interactablePos.plusY(-4),
-            id,
-        })
+        const teleporterPos = interactablePos.plusY(-4)
+        const teleporterId = l.uuid // use the interior's uuid as the teleporter ID
+
+        LocationManager.instance.setTeleporter(
+            teleporterId,
+            "b",
+            {
+                location: l.uuid,
+                pos: teleporterPos,
+            },
+            sound
+        )
+
         l.addElement(ElementType.TELEPORTER_INDICATOR, pixelPtToTilePt(interactablePos), {
-            to: outside.uuid,
+            teleporterId,
             i: interactablePos.toString(),
-            id,
             offset: indicatorOffset,
         })
     },

@@ -14,7 +14,7 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { ButtonsMenu, OptionButton } from "../ui/ButtonsMenu"
 import { Color } from "../ui/Color"
 import { Elements } from "../world/elements/Elements"
-import { here } from "../world/locations/LocationManager"
+import { here, LocationManager } from "../world/locations/LocationManager"
 import { ProfilerData } from "./ProfilerData"
 import { spawnMenu } from "./SpawnMenu"
 
@@ -113,16 +113,15 @@ export const getWorldSpaceDebugEntity = (): Entity => {
     }
 
     if (debug.showTeleporters) {
-        const pts = here().getTeleporterLocations()
+        const pts = LocationManager.instance.getTeleportersHere()
         const renders = pts.map(
             (pt) =>
                 new EllipseRender({
                     depth: Number.MAX_SAFE_INTEGER,
-                    position: pt.plus(new Point(-2, -2)),
+                    position: new Point(-2, -2).plus(pt),
                     dimensions: new Point(4, 4),
                 })
         )
-
         e.addComponent(new BasicRenderComponent(...renders))
     }
 

@@ -8,11 +8,11 @@ import { ElementFactory } from "./elements/ElementFactory"
 import { ElementType } from "./elements/ElementType"
 import { Interactable } from "./elements/Interactable"
 import { Location } from "./locations/Location"
+import { LocationManager } from "./locations/LocationManager"
 
 type TeleporterIndicatorSaveData = {
-    to: string // the destination uuid (must be different than the current location)
+    teleporterId: string
     i: string // stringified position for the interactable
-    id: string
     offset?: PointValue
 }
 
@@ -38,18 +38,12 @@ export class TeleporterIndicatorFactory extends ElementFactory<
     ): ElementComponent<ElementType.TELEPORTER_INDICATOR, TeleporterIndicatorSaveData> {
         const e = new Entity()
 
-        const destinationUUID = data.to
-        const i = data.i
-        if (!destinationUUID || !i) {
-            throw new Error("teleporter element must have 'to' and 'i' parameters")
-        }
-        const interactPos = Point.fromString(i)
-        const id = data.id
+        const interactPos = Point.fromString(data.i)
 
         const interactComponent = e.addComponent(
             new Interactable(
                 interactPos,
-                () => wl.playerUseTeleporter(destinationUUID, id),
+                () => LocationManager.instance.playerUseTeleporter(data.teleporterId),
                 new Point(0, TILE_SIZE / 2)
             )
         )

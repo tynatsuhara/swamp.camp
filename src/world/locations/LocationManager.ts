@@ -1,6 +1,7 @@
-import { expose, Point, pt } from "brigsby/dist"
+import { expose, Point, PointValue, pt } from "brigsby/dist"
 import { measure } from "brigsby/dist/Profiler"
 import { WorldAudioContext } from "../../audio/WorldAudioContext"
+import { Dude } from "../../characters/Dude"
 import { DudeType } from "../../characters/DudeType"
 import { Enemy } from "../../characters/types/Enemy"
 import { Camera } from "../../cutscenes/Camera"
@@ -14,6 +15,7 @@ import { Singletons } from "../../Singletons"
 import { HUD } from "../../ui/HUD"
 import { ElementType } from "../elements/ElementType"
 import { Simulatable } from "../Simulatable"
+import { Teleporters, TeleporterSide, TeleporterSound, TeleporterV2 } from "../Teleporter"
 import { TimeUnit } from "../TimeUnit"
 import { VisibleRegionMask } from "../VisibleRegionMask"
 import { BasicLocation } from "./BasicLocation"
@@ -28,6 +30,7 @@ export class LocationManager {
     private currentLocation: Location
     private locations: Map<string, Location> = new Map() // uuid -> location
     private _camp: Location
+    private teleporters: Record<string, TeleporterV2> = {}
 
     constructor() {
         expose({
@@ -132,6 +135,7 @@ export class LocationManager {
         return {
             values: Array.from(this.locations.values()).map((l) => l.save(context)),
             currentLocationUUID: this.currentLocation.uuid,
+            teleporters: this.teleporters,
         }
     }
 
@@ -149,6 +153,7 @@ export class LocationManager {
 
     initialize(saveState: LocationManagerSaveState) {
         this.locations = new Map()
+        this.teleporters = saveState.teleporters
         saveState.values.forEach((l) => this.initializeLocation(l))
         this.loadLocation(this.locations.get(saveState.currentLocationUUID))
     }
@@ -231,6 +236,75 @@ export class LocationManager {
             })
         }
     )
+
+    getTeleportersHere(): PointValue[] {
+        return Object.values(this.teleporters)
+            .map((tp) => {
+                if (tp.a.location === this.currentLocation.uuid) {
+                    return tp.a
+                } else if (tp.b.location === this.currentLocation.uuid) {
+                    return tp.b
+                }
+            })
+            .filter((side) => !!side)
+            .map((side) => side.pos)
+    }
+
+    setTeleporter(id: string, side: "a" | "b", data: TeleporterSide, sound?: TeleporterSound) {
+        this.teleporters[id] ??= {}
+        this.teleporters[id][side] = data
+        // only one of the sides needs to set the sound
+        // this makes it simpler since interiors have custom logic but exteriors don't
+        this.teleporters[id].sound ??= sound
+    }
+
+    findTeleporter(
+        from: string,
+        to: string
+    ): { id: string; source: TeleporterSide; dest: TeleporterSide } {
+        return Object.entries(this.teleporters)
+            .map(([id, tp]) => {
+                if (tp.a.location === from && tp.b.location === to) {
+                    return { id, source: tp.a, dest: tp.b }
+                } else if (tp.a.location === from && tp.b.location === to) {
+                    return { id, source: tp.b, dest: tp.a }
+                } else {
+                    return undefined
+                }
+            })
+            .find((result) => !!result)
+    }
+
+    playerUseTeleporter(teleporterId: string) {
+        // teleporter will get executed on the host
+        if (session.isGuest()) {
+            return
+        }
+
+        const teleporter = this.teleporters[teleporterId]
+        const otherSide = teleporter.a.location === here().uuid ? teleporter.b : teleporter.a
+
+        this.playerLoadLocation(
+            LocationManager.instance.get(otherSide.location),
+            pt(otherSide.pos.x, otherSide.pos.y)
+        )
+
+        setTimeout(() => Teleporters.playSound(teleporter), 500)
+    }
+
+    npcUseTeleporter(dude: Dude, teleporterId: string) {
+        const teleporter = this.teleporters[teleporterId]
+        const currentSide = teleporter.a.location === here().uuid ? teleporter.a : teleporter.b
+        const currentLocation = this.get(currentSide.location)
+        const otherSide = currentSide === teleporter.a ? teleporter.b : teleporter.a
+        const otherLocation = this.get(otherSide.location)
+
+        currentLocation.removeDude(dude)
+        otherLocation.addDude(dude)
+        dude.location = otherLocation
+
+        dude.moveTo(pt(otherSide.pos.x, otherSide.pos.y), true)
+    }
 }
 
 export const camp = () => LocationManager.instance.campLocation()

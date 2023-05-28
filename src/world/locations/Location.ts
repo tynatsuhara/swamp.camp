@@ -6,13 +6,13 @@ import { Dude } from "../../characters/Dude"
 import { DudeType } from "../../characters/DudeType"
 import { DroppedItem } from "../../items/DroppedItem"
 import { LocationSaveState } from "../../saves/LocationSaveState"
-import { Teleporter } from "../Teleporter"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/ElementType"
 import { ElementDataFormat } from "../elements/Elements"
 import { FeatureData, FeatureType } from "../features/Features"
 import { GroundType } from "../ground/Ground"
 import { GroundComponent } from "../ground/GroundComponent"
+import { LocationManager } from "./LocationManager"
 import { LocationType } from "./LocationType"
 
 export abstract class Location {
@@ -124,18 +124,6 @@ export abstract class Location {
         distance: (a: Point, b: Point) => number
     ): Point[]
 
-    // ==================== Teleporters ==================== //
-
-    abstract addTeleporter(t: Teleporter): void
-
-    abstract getTeleporter(toUUID: string): Teleporter
-
-    abstract getTeleporterLocations(): Point[]
-
-    abstract npcUseTeleporter(dude: Dude, teleporter: Teleporter): void
-
-    abstract playerUseTeleporter(to: string, id: string): void
-
     // ==================== Features ==================== //
 
     abstract addFeature<F extends FeatureType>(type: F, data: FeatureData<F>): void
@@ -168,10 +156,9 @@ export abstract class Location {
 
     // ==================== Non-abstract utils ==================== //
 
-    ejectResidents(toExteriorUUID: string): void {
-        const teleporterToExterior = this.getTeleporter(toExteriorUUID)
+    ejectResidents(teleporterId: string): void {
         this.getDudes().forEach((d) => {
-            this.npcUseTeleporter(d, teleporterToExterior)
+            LocationManager.instance.npcUseTeleporter(d, teleporterId)
         })
     }
 

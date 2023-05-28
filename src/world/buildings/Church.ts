@@ -1,7 +1,6 @@
 import { Point } from "brigsby/dist"
 import { DudeType } from "../../characters/DudeType"
 import { TILE_SIZE } from "../../graphics/Tilesets"
-import { Teleporter, TeleporterPrefix } from "../Teleporter"
 import { ElementType } from "../elements/ElementType"
 import { GroundType } from "../ground/Ground"
 import { BasicLocation } from "../locations/BasicLocation"
@@ -47,19 +46,13 @@ const makeChurchInterior = (outside: Location): Location => {
 
     const dimensions = new Point(7, 9)
     const interactablePos = new Point(dimensions.x / 2, dimensions.y).times(TILE_SIZE)
-    const teleporter: Teleporter = {
-        to: outside.uuid,
-        pos: interactablePos.plusY(-4),
-        id: TeleporterPrefix.DOOR,
-    }
 
     InteriorUtils.addBarriers(l, dimensions)
-    l.addTeleporter(teleporter)
 
     new AsciiInteriorBuilder(CHURCH_TEMPLATE)
         .map("O", (pos) => l.addElement(ElementType.PODIUM, pos))
         .map("_", (pos) => l.addElement(ElementType.BENCH, pos))
-        .map("T", () => InteriorUtils.addTeleporter(l, outside, interactablePos))
+        .map("T", () => InteriorUtils.addTeleporter(l, interactablePos))
 
     const woodType = Math.ceil(Math.random() * 2)
 

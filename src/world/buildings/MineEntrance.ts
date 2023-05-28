@@ -1,7 +1,6 @@
 import { Entity, Point } from "brigsby/dist"
 import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
-import { Teleporter, TeleporterPrefix } from "../Teleporter"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/ElementType"
 import { ElementUtils } from "../elements/ElementUtils"
@@ -55,16 +54,16 @@ export class MineEntranceFactory extends BuildingFactory<ElementType.MINE_ENTRAN
 
         // Set up teleporter
         const interactablePos = pixelPt.plus(new Point(TILE_SIZE / 2, TILE_SIZE / 2))
-        const doorId = TeleporterPrefix.MINE
-        wl.addTeleporter({
-            to: destinationUUID,
-            pos: interactablePos.plusY(16),
-            id: doorId,
-        })
+        LocationManager.instance.setTeleporter(
+            destinationUUID,
+            "a",
+            { location: wl.uuid, pos: interactablePos.plusY(16) },
+            "mine"
+        )
         e.addComponent(
             new Interactable(
                 interactablePos,
-                () => wl.playerUseTeleporter(destinationUUID, doorId),
+                () => LocationManager.instance.playerUseTeleporter(destinationUUID),
                 new Point(0, -17)
             )
         )
@@ -108,17 +107,15 @@ const makeMineInterior = (outside: Location) => {
     })
 
     const interactablePos = new Point(ladderIndex + 0.5, 0).times(TILE_SIZE)
-    const teleporter: Teleporter = {
-        to: outside.uuid,
-        pos: interactablePos.plusY(12),
-        id: TeleporterPrefix.MINE,
-    }
-    l.addTeleporter(teleporter)
+    LocationManager.instance.setTeleporter(
+        l.uuid,
+        "b",
+        { location: l.uuid, pos: interactablePos.plusY(12) },
+        "mine"
+    )
 
     l.addElement(ElementType.MINE_EXIT, new Point(Math.ceil(dimensions.x / 2), 0), {
-        to: outside.uuid,
         i: interactablePos.toString(),
-        id: TeleporterPrefix.MINE,
     })
 
     // Indicate the open floor points so NPCs can roam

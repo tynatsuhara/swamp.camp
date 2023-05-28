@@ -12,9 +12,8 @@ import { ElementType } from "../world/elements/ElementType"
 import { Ground, GroundType } from "../world/ground/Ground"
 import { LightManager } from "../world/LightManager"
 import { Location } from "../world/locations/Location"
-import { camp, here } from "../world/locations/LocationManager"
+import { camp, here, LocationManager } from "../world/locations/LocationManager"
 import { Simulatable } from "../world/Simulatable"
-import { Teleporter } from "../world/Teleporter"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
 import { NPCSchedule, NPCSchedules } from "./ai/NPCSchedule"
@@ -730,10 +729,11 @@ export class NPC extends Simulatable {
 
     private simulateGoToLocation(goalLocation: Location) {
         const nextLocation = this.getNextLocation(goalLocation)
-        const teleporter = this._dude.location.getTeleporter(nextLocation.uuid)
-        if (teleporter) {
-            this.useTeleporter(teleporter)
-        }
+        this.teleporterTarget = LocationManager.instance.findTeleporter(
+            this.dude.location.uuid,
+            goalLocation.uuid
+        )
+        this.useTeleporter()
     }
 
     private getNextLocation(goalLocation: Location) {
@@ -746,24 +746,30 @@ export class NPC extends Simulatable {
         }
     }
 
-    private teleporterTarget: Teleporter
+    private teleporterTarget: ReturnType<LocationManager["findTeleporter"]>
     private findTeleporter(uuid: string) {
-        if (this.teleporterTarget?.to !== uuid) {
-            this.teleporterTarget = this._dude.location.getTeleporter(uuid)
+        if (this.teleporterTarget?.dest.location !== uuid) {
+            this.teleporterTarget = LocationManager.instance.findTeleporter(
+                this.dude.location.uuid,
+                uuid
+            )
         }
     }
     private goToTeleporter(updateData: UpdateData, speedMultiplier: number = 1) {
         if (!this.teleporterTarget) {
             return
         }
-        const tilePt = pixelPtToTilePt(this.teleporterTarget.pos)
+        const tilePt = pixelPtToTilePt(this.teleporterTarget.source.pos)
         this.walkTo(tilePt, updateData, { speedMultiplier })
         if (this._dude.tile.manhattanDistanceTo(tilePt) <= 1) {
-            this.useTeleporter(this.teleporterTarget)
+            this.useTeleporter()
         }
     }
-    private useTeleporter(teleporter: Teleporter) {
-        this._dude.location.npcUseTeleporter(this._dude, teleporter)
+    private useTeleporter() {
+        if (!this.teleporterTarget) {
+            return
+        }
+        LocationManager.instance.npcUseTeleporter(this._dude, this.teleporterTarget.id)
         this.clearExistingAIState()
     }
     private tilePtToStandingPos(tilePt: Point) {

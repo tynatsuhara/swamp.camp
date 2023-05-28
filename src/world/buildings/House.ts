@@ -2,7 +2,6 @@ import { Entity, Point } from "brigsby/dist"
 import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { DudeType } from "../../characters/DudeType"
 import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
-import { TeleporterPrefix } from "../Teleporter"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/ElementType"
 import { Interactable } from "../elements/Interactable"
@@ -36,12 +35,15 @@ export class HouseFactory extends BuildingFactory<ElementType.HOUSE> {
         const residents = data.residents || []
 
         const interactablePos = pos.plus(new Point(2.5, 3)).times(TILE_SIZE)
-        const doorId = TeleporterPrefix.DOOR
-        wl.addTeleporter({
-            to: destinationUUID,
-            pos: interactablePos.plusY(12),
-            id: doorId,
-        })
+        LocationManager.instance.setTeleporter(
+            destinationUUID,
+            "a",
+            {
+                location: wl.uuid,
+                pos: interactablePos.plusY(12),
+            },
+            "door"
+        )
 
         const basePos = pos.plusX(1)
 
@@ -90,7 +92,7 @@ export class HouseFactory extends BuildingFactory<ElementType.HOUSE> {
         e.addComponent(
             new Interactable(
                 interactablePos,
-                () => wl.playerUseTeleporter(destinationUUID, doorId),
+                () => LocationManager.instance.playerUseTeleporter(destinationUUID),
                 new Point(0, -TILE_SIZE * 1.4)
             )
         )
@@ -119,7 +121,7 @@ const makeHouseInterior = (outside: Location): Location => {
     const interactablePos = new Point(dimensions.x / 2, dimensions.y).times(TILE_SIZE)
 
     InteriorUtils.addBarriers(l, dimensions)
-    InteriorUtils.addTeleporter(l, outside, interactablePos)
+    InteriorUtils.addTeleporter(l, interactablePos)
 
     const woodType = Math.ceil(Math.random() * 2)
 

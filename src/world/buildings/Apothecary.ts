@@ -40,7 +40,7 @@ const makeApothecaryInterior = (outside: Location): Location => {
 
     const interactablePos = new Point(1.5, dimensions.y).times(TILE_SIZE)
     InteriorUtils.addBarriers(l, dimensions)
-    InteriorUtils.addTeleporter(l, outside, interactablePos)
+    InteriorUtils.addTeleporter(l, interactablePos)
 
     l.addFeature("sprite", {
         key: "dr-interior",

@@ -5,7 +5,7 @@ import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
 import { Item } from "../../items/Item"
 import { ItemMetadata } from "../../items/Items"
 import { TentColor, TentData, getTentVariantImageFilter } from "../../items/TentVariants"
-import { TeleporterPrefix, TeleporterSound } from "../Teleporter"
+import { TeleporterSounds } from "../Teleporter"
 import { Breakable } from "../elements/Breakable"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/ElementType"
@@ -13,7 +13,7 @@ import { Interactable } from "../elements/Interactable"
 import { NavMeshCollider } from "../elements/NavMeshCollider"
 import { BasicLocation } from "../locations/BasicLocation"
 import { Location } from "../locations/Location"
-import { LocationManager, here } from "../locations/LocationManager"
+import { LocationManager } from "../locations/LocationManager"
 import { LocationType } from "../locations/LocationType"
 import { BuildingFactory, ConstructionRequirements } from "./Building"
 import { InteriorUtils } from "./InteriorUtils"
@@ -37,13 +37,15 @@ export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
 
         const tentCenterPos = pos.plus(new Point(2, 1)).times(TILE_SIZE)
         const interactablePos = tentCenterPos.plusY(TILE_SIZE)
-        const doorId = TeleporterPrefix.TENT
-        const sourceTeleporter = {
-            to: destinationUUID,
-            pos: interactablePos.plusY(12),
-            id: doorId,
-        }
-        wl.addTeleporter(sourceTeleporter)
+        LocationManager.instance.setTeleporter(
+            destinationUUID,
+            "a",
+            {
+                location: wl.uuid,
+                pos: interactablePos.plusY(12),
+            },
+            "tent"
+        )
 
         const data: TentData = { color, destinationUUID }
 
@@ -67,7 +69,7 @@ export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
         e.addComponent(
             new Interactable(
                 interactablePos,
-                () => wl.playerUseTeleporter(destinationUUID, doorId),
+                () => LocationManager.instance.playerUseTeleporter(destinationUUID),
                 new Point(1, -TILE_SIZE * 1.4)
             )
         )
@@ -78,11 +80,12 @@ export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
                 tiles.map((t) => t.transform),
                 () => {
                     // side effect: eject people inside
-                    LocationManager.instance.get(destinationUUID).ejectResidents(here().uuid)
+                    const tp = LocationManager.instance.findTeleporter(wl.uuid, destinationUUID)
+                    LocationManager.instance.get(destinationUUID).ejectResidents(tp.id)
 
                     return [{ item: Item.TENT, metadata: data }]
                 },
-                () => Sounds.playAtPoint(...TeleporterSound.TENT, tentCenterPos),
+                () => Sounds.playAtPoint(...TeleporterSounds.TENT, tentCenterPos),
                 10
             )
         )
@@ -130,13 +133,7 @@ const makeTentInterior = (outside: Location, color: TentColor): Location => {
 
     const interactablePos = new Point(floorDimensions.x / 2, floorDimensions.y).times(TILE_SIZE)
     InteriorUtils.addBarriers(l, floorDimensions)
-    InteriorUtils.addTeleporter(
-        l,
-        outside,
-        interactablePos,
-        pt(-TILE_SIZE / 2, 0),
-        TeleporterPrefix.TENT
-    )
+    InteriorUtils.addTeleporter(l, interactablePos, pt(-TILE_SIZE / 2, 0), "tent")
 
     l.addFeature("tentInteriorSprite", { color })
 

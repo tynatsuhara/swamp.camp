@@ -9,6 +9,7 @@ import { ElementFactory } from "../elements/ElementFactory"
 import { ElementType } from "../elements/ElementType"
 import { Interactable } from "../elements/Interactable"
 import { Location } from "../locations/Location"
+import { LocationManager } from "../locations/LocationManager"
 
 export class MineExitFactory extends ElementFactory<ElementType.MINE_EXIT> {
     readonly dimensions = pt(1, 1)
@@ -20,13 +21,7 @@ export class MineExitFactory extends ElementFactory<ElementType.MINE_EXIT> {
     make(wl: Location, pos: Point, data: any) {
         const e = new Entity()
 
-        const destinationUUID = data.to
-        const i = data.i // the position for the interactable
-        if (!destinationUUID || !i) {
-            throw new Error("teleporter element must have 'to' and 'i' parameters")
-        }
-        const interactPos = Point.fromString(i)
-        const id = data.id
+        const interactPos = Point.fromString(data.i)
 
         let spawnParticlesAtTime = Number.MAX_SAFE_INTEGER
         let particleCountMultiplier = 1
@@ -75,7 +70,7 @@ export class MineExitFactory extends ElementFactory<ElementType.MINE_EXIT> {
             new Interactable(
                 interactPos,
                 () => {
-                    wl.playerUseTeleporter(destinationUUID, id)
+                    LocationManager.instance.playerUseTeleporter(wl.uuid) // the teleporter ID should match the mine interior's UUID
                     spawnParticlesAtTime = WorldTime.instance.time + 1_000
                 },
                 pt(0, -TILE_SIZE)

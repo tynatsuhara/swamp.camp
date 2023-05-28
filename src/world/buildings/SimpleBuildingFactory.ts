@@ -1,12 +1,12 @@
 import { Entity, Point } from "brigsby/dist"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
-import { TeleporterPrefix } from "../Teleporter"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/ElementType"
 import { Interactable } from "../elements/Interactable"
 import { NavMeshCollider } from "../elements/NavMeshCollider"
 import { Location } from "../locations/Location"
+import { LocationManager } from "../locations/LocationManager"
 import { MultiTypeResidence } from "../residences/MultiTypeResidence"
 import { BuildingFactory } from "./Building"
 
@@ -68,13 +68,9 @@ export class SimpleBuildingFactory<Type extends ElementType> extends BuildingFac
             this.dimensions.y * TILE_SIZE - TILE_SIZE
         ).plus(pixelPos)
 
-        // TODO make configurable?
-        const doorId = TeleporterPrefix.DOOR
-
-        wl.addTeleporter({
-            to: interiorUUID,
+        LocationManager.instance.setTeleporter(interiorUUID, "a", {
+            location: wl.uuid,
             pos: interactablePos.plusY(12),
-            id: doorId,
         })
 
         const depth = interactablePos.y
@@ -100,7 +96,7 @@ export class SimpleBuildingFactory<Type extends ElementType> extends BuildingFac
         e.addComponent(
             new Interactable(
                 interactablePos,
-                () => wl.playerUseTeleporter(interiorUUID, doorId),
+                () => LocationManager.instance.playerUseTeleporter(interiorUUID),
                 new Point(0, -TILE_SIZE * 1.4)
             )
         )

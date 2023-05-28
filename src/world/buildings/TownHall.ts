@@ -52,7 +52,7 @@ const makeTownHallInterior = (outside: Location): Location => {
     l.addElement(ElementType.CHEST, pt(0, 0))
 
     const interactablePos = new Point(2, dimensions.y).times(TILE_SIZE)
-    InteriorUtils.addTeleporter(l, outside, interactablePos, pt(-TILE_SIZE / 2, 0))
+    InteriorUtils.addTeleporter(l, interactablePos, pt(-TILE_SIZE / 2, 0))
 
     return LocationManager.instance.add(l)
 }

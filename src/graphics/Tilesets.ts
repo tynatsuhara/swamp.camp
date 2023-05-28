@@ -1,4 +1,4 @@
-import { assets, Point } from "brigsby/dist"
+import { assets, Point, PointValue, pt } from "brigsby/dist"
 import { SpriteSource, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Singletons } from "../Singletons"
 import { DungeonTilesetII } from "./DungeonTilesetII"
@@ -16,8 +16,8 @@ export const TILE_SIZE = 16
 export const TILE_DIMENSIONS = new Point(TILE_SIZE, TILE_SIZE)
 
 // returns the tile corresponding to the given pixel
-export const pixelPtToTilePt = (pixelPt: Point) => {
-    return pixelPt.apply((n) => Math.floor(n / TILE_SIZE))
+export const pixelPtToTilePt = ({ x, y }: PointValue) => {
+    return pt(x, y).apply((n) => Math.floor(n / TILE_SIZE))
 }
 
 // loaded before the the main menu is rendered

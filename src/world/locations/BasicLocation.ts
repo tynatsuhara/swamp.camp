@@ -2,7 +2,6 @@ import { Entity, Point, pt } from "brigsby/dist"
 import { PointValue } from "brigsby/dist/Point"
 import { Grid } from "brigsby/dist/util"
 import { SaveContext } from "../../SaveManager"
-import { Sounds } from "../../audio/Sounds"
 import { Dude } from "../../characters/Dude"
 import { DudeFactory } from "../../characters/DudeFactory"
 import { DudeType } from "../../characters/DudeType"
@@ -12,7 +11,6 @@ import { ONLINE_PLAYER_DUDE_ID_PREFIX, syncFn } from "../../online/syncUtils"
 import { LocationSaveState } from "../../saves/LocationSaveState"
 import { newUUID } from "../../saves/uuid"
 import { HUD } from "../../ui/HUD"
-import { Teleporter, TeleporterPrefix, TeleporterSound, Teleporters } from "../Teleporter"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/ElementType"
 import { ElementUtils } from "../elements/ElementUtils"
@@ -21,7 +19,6 @@ import { Feature, FeatureData, FeatureType, instantiateFeature } from "../featur
 import { Ground, GroundType, SavedGround } from "../ground/Ground"
 import { GroundComponent } from "../ground/GroundComponent"
 import { Location } from "./Location"
-import { LocationManager } from "./LocationManager"
 import { LocationType } from "./LocationType"
 
 export class BasicLocation extends Location {
@@ -44,7 +41,6 @@ export class BasicLocation extends Location {
 
     private features: Feature<any>[] = []
     private readonly featureEntities: Entity[] = []
-    private teleporters: { [key: string]: string } = {}
 
     // private readonly syncListeners = new Map<string, (...args: any[]) => void>()
     private readonly syncFunctions = new Map<string, (...args: any[]) => void>()
@@ -428,36 +424,6 @@ export class BasicLocation extends Location {
         })
     }
 
-    addTeleporter(t: Teleporter): void {
-        const teleporterId = Teleporters.teleporterId(t.to, t.id)
-        this.teleporters[teleporterId] = t.pos.toString()
-    }
-
-    getTeleporter(toUUID: string): Teleporter {
-        return Object.entries(this.teleporters)
-            .filter((kv) => kv[0].startsWith(toUUID))
-            .map((kv) => ({
-                to: toUUID,
-                pos: Point.fromString(kv[1]),
-                id: Teleporters.getId(kv[0]),
-            }))[0]
-    }
-
-    getTeleporterLocations(): Point[] {
-        return Object.entries(this.teleporters).map((kv) => Point.fromString(kv[1]))
-    }
-
-    private getTeleporterLinkedPos(to: string, id: string): Point {
-        const dest = LocationManager.instance.get(to)
-        const teleporterId = Teleporters.teleporterId(this.uuid, id)
-        // TODO clean this up
-        const link = (dest as BasicLocation).teleporters[teleporterId]
-        if (!link) {
-            throw new Error(`teleporter ${teleporterId} not found`)
-        }
-        return Point.fromString(link)
-    }
-
     private readonly projectiles = new Set<Entity>()
 
     addProjectile(e: Entity): void {
@@ -469,38 +435,6 @@ export class BasicLocation extends Location {
 
     getLevel(pt: Point): number {
         return this.levels?.get(pt) ?? 0
-    }
-
-    npcUseTeleporter(dude: Dude, teleporter: Teleporter) {
-        const linkedLocation = LocationManager.instance.get(teleporter.to)
-        const linkedPosition = this.getTeleporterLinkedPos(teleporter.to, teleporter.id)
-
-        this.removeDude(dude)
-        linkedLocation.addDude(dude)
-        dude.location = linkedLocation
-
-        dude.moveTo(linkedPosition, true)
-    }
-
-    playerUseTeleporter(to: string, id: string) {
-        // teleporter will get executed on the host
-        if (session.isGuest()) {
-            return
-        }
-
-        const linkedLocation = LocationManager.instance.get(to)
-        const linkedPosition = this.getTeleporterLinkedPos(to, id)
-
-        LocationManager.instance.playerLoadLocation(linkedLocation, linkedPosition)
-
-        setTimeout(() => {
-            // play a sound, if applicable
-            if (id.startsWith(TeleporterPrefix.DOOR)) {
-                Sounds.play(...TeleporterSound.DOOR)
-            } else if (id.startsWith(TeleporterPrefix.TENT)) {
-                Sounds.play(...TeleporterSound.TENT)
-            }
-        }, 500)
     }
 
     addFeature<F extends FeatureType>(type: F, data: FeatureData<F>) {
@@ -562,7 +496,6 @@ export class BasicLocation extends Location {
                 })
                 .map((d) => d.save()),
             features: this.features,
-            teleporters: this.teleporters,
             isInterior: this.isInterior,
             allowPlacing: this.allowPlacing,
             size: this.size,
@@ -626,7 +559,6 @@ export class BasicLocation extends Location {
         })
 
         saveState.features.forEach((f) => n.addFeature(f.type, f.data))
-        n.teleporters = saveState.teleporters
         saveState.ground.forEach((el) =>
             n.setGroundElement(el.type, Point.fromString(el.pos), el.obj)
         )
