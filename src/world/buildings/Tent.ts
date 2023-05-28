@@ -93,6 +93,10 @@ export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
         return e.addComponent(new ElementComponent(ElementType.TENT, pos, () => data))
     }
 
+    canPlaceInLocation(l: Location) {
+        return !l.isInterior
+    }
+
     getConstructionRequirements(): ConstructionRequirements {
         // tents don't require construction
         return undefined
