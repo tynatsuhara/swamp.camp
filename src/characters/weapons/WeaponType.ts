@@ -1,3 +1,5 @@
+import { expose } from "brigsby/dist"
+
 export enum WeaponType {
     NONE = 0_99999,
     UNARMED,
@@ -24,3 +26,5 @@ export enum WeaponType {
     SPEAR,
     PICKAXE,
 }
+
+expose({ WeaponType })

@@ -13,6 +13,7 @@ import { camp, here, LocationManager } from "../../world/locations/LocationManag
 import { TimeUnit } from "../../world/TimeUnit"
 import { WorldTime } from "../../world/WorldTime"
 import { DudeSpawner } from "../DudeSpawner"
+import { WeaponType } from "../weapons/WeaponType"
 import { AbstractPlayer } from "./AbstractPlayer"
 import { registerPlayerInstance as registerLocalPlayerInstance } from "./index"
 
@@ -37,7 +38,8 @@ export class HostPlayer extends AbstractPlayer {
         )
 
         const { addItem } = this.dude.inventory
-        expose({ addItem })
+        const setWeapon = (type: WeaponType) => this.dude.setWeapon(type, -1)
+        expose({ addItem, setWeapon })
     }
 
     update(updateData: UpdateData) {
