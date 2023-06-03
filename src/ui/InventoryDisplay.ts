@@ -91,6 +91,7 @@ export class InventoryDisplay extends Component {
     private get isDonating() {
         return !!this.donatingOptions
     }
+    private tradingInvTitle: string
 
     constructor() {
         super()
@@ -595,21 +596,29 @@ export class InventoryDisplay extends Component {
         onClose = null,
         tradingInv = null,
         donating = null,
+        tradingInvTitle,
     }: {
         onClose?: () => void
         tradingInv?: Inventory
         donating?: DonatingOptions
+        tradingInvTitle?: string
     } = {}) {
         // RAF to prevent accepting input in lateUpdate on the same frame that input opened the inventory
-        requestAnimationFrame(() => this._open(onClose, tradingInv, donating))
+        requestAnimationFrame(() => this._open(onClose, tradingInv, donating, tradingInvTitle))
     }
 
-    private _open(onClose?: () => void, tradingInv?: Inventory, donatingOptions?: DonatingOptions) {
+    private _open(
+        onClose?: () => void,
+        tradingInv?: Inventory,
+        donatingOptions?: DonatingOptions,
+        tradingInvTitle?: string
+    ) {
         this.clearHeldStack()
 
         this.onClose = onClose
         this.tradingInv = tradingInv
         this.donatingOptions = donatingOptions
+        this.tradingInvTitle = tradingInvTitle
 
         const screenDimensions = Camera.instance.dimensions
         this.showingInv = true
@@ -637,7 +646,7 @@ export class InventoryDisplay extends Component {
             this.displayEntity.addComponent(
                 new BasicRenderComponent(
                     ...formatText({
-                        text: "Chest",
+                        text: this.tradingInvTitle ?? "Chest",
                         position: this.tradingInvOffset.plusY(-17),
                         color: Color.WHITE,
                         depth: UI_SPRITE_DEPTH,
