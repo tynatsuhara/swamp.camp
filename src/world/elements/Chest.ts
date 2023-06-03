@@ -20,6 +20,13 @@ type SaveData = {
     i: ItemStack[]
 }
 
+const ID_TO_ICON_MAP: Record<string, Icon> = {
+    shared: "fish",
+}
+const ID_TO_TITLE_MAP: Record<string, string> = {
+    shared: "Town provisions",
+}
+
 export class ChestFactory extends ElementFactory<ElementType.CHEST, SaveData> {
     dimensions = pt(1)
 
@@ -38,7 +45,12 @@ export class ChestFactory extends ElementFactory<ElementType.CHEST, SaveData> {
             location: wl,
             pixelPos: pos.times(TILE_SIZE),
             onInteract: () =>
-                InventoryDisplay.instance.open({ onClose: closeAnimation, tradingInv: inventory }),
+                InventoryDisplay.instance.open({
+                    onClose: closeAnimation,
+                    tradingInv: inventory,
+                    tradingInvTitle: ID_TO_TITLE_MAP[id],
+                }),
+            getIndicator: () => ID_TO_ICON_MAP[id],
         })
 
         const e = new Entity(components)

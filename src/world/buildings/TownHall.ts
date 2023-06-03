@@ -18,7 +18,7 @@ export class TownHallFactory extends SimpleBuildingFactory<ElementType.TOWN_HALL
             new Point(5, 4),
             "town-hall",
             makeTownHallInterior,
-            new Point(2, 1.5).times(TILE_SIZE),
+            new Point(3, 2).times(TILE_SIZE),
             { [DudeType.HERALD]: 1 } // TODO?
         )
     }
@@ -31,7 +31,7 @@ const makeTownHallInterior = (outside: Location): Location => {
         allowPlacing: false,
     })
 
-    const dimensions = new Point(4, 3)
+    const dimensions = new Point(5, 4)
     InteriorUtils.setWalkableTiles(l, dimensions)
     InteriorUtils.addBarriers(l, dimensions)
 
@@ -43,16 +43,16 @@ const makeTownHallInterior = (outside: Location): Location => {
     })
 
     l.addFeature("navMeshCollider", {
-        x: TILE_SIZE,
+        x: 0,
         y: 0,
-        width: TILE_SIZE * 3,
+        width: TILE_SIZE * dimensions.x,
         height: TILE_SIZE,
     })
 
-    l.addElement(ElementType.CHEST, pt(0, 0))
+    l.addElement(ElementType.CHEST, pt(0, 0), { id: "shared" }) // TODO figure out food chest mechanics
 
-    const interactablePos = new Point(2, dimensions.y).times(TILE_SIZE)
-    InteriorUtils.addTeleporter(l, interactablePos, pt(-TILE_SIZE / 2, 0))
+    const interactablePos = new Point(2.5, dimensions.y).times(TILE_SIZE)
+    InteriorUtils.addTeleporter(l, interactablePos)
 
     return LocationManager.instance.add(l)
 }

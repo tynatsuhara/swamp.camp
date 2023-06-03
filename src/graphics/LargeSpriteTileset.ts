@@ -18,11 +18,11 @@ export class LargeSpriteTileset {
             case "cabin-small":
                 return this.get({ position: pt(0, 6), dimensions: pt(3, 3) })
             case "town-hall":
-                return this.get({ position: pt(5, 17), dimensions: pt(3, 3) })
+                return this.get({ position: pt(5, 17), dimensions: pt(5, 4) })
             case "town-hall-interior":
-                return this.get({ position: pt(0, 17), dimensions: pt(4, 5) })
+                return this.get({ position: pt(0, 17), dimensions: pt(5, 6) })
             case "tent-interior":
-                return this.get({ position: pt(0, 22), dimensions: pt(5, 7) })
+                return this.get({ position: pt(0, 23), dimensions: pt(5, 7) })
             default:
                 throw new Error(`${key} is not a valid tile`)
         }
