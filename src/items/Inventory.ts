@@ -4,7 +4,7 @@ import { stringifySorted } from "../debug/JSON"
 import { syncFn } from "../online/syncUtils"
 import { InventoryDisplay } from "../ui/InventoryDisplay"
 import { Item } from "./Item"
-import { ItemMetadata, ITEM_METADATA_MAP } from "./Items"
+import { ITEM_METADATA_MAP, ItemMetadata } from "./Items"
 
 export type ItemStackMetadata = ItemMetadata & {
     hotKey?: InputKey
@@ -126,16 +126,26 @@ export class Inventory {
         if (!this.canAddItem(item, count, metadata)) {
             return false
         }
-        return this.addItemInternal(item, count, metadata, true)
+        return this.addItemInternal(item, count, metadata, true) === 0
     }
 
     canAddItem(item: Item, count: number = 1, metadata: ItemStackMetadata = {}): boolean {
-        return this.addItemInternal(item, count, metadata, false)
+        return this.addItemInternal(item, count, metadata, false) === 0
+    }
+
+    /**
+     * @returns The amount added
+     */
+    addMax(item: Item, count: number = 1, metadata: ItemStackMetadata = {}): number {
+        const maxCanAdd = count - this.addItemInternal(item, count, metadata, false)
+        this.addItem(item, maxCanAdd, metadata)
+        return maxCanAdd
     }
 
     /**
      * returns true if the item can be (or was) added
      * @param commit true to actually update the stack
+     * @returns the amount that could not be added
      */
     private addItemInternal(item: Item, count = 1, metadata: ItemStackMetadata, commit: boolean) {
         const stackLimit = ITEM_METADATA_MAP[item].stackLimit
@@ -166,7 +176,7 @@ export class Inventory {
             }
         }
 
-        return leftToAdd === 0
+        return leftToAdd
     }
 
     canAddToStack(index: number, item: Item, count = 1, metadata: ItemStackMetadata = {}) {
