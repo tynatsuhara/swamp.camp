@@ -17,9 +17,9 @@ import { spawnMagicProjectile } from "../characters/weapons/MagicProjectile"
 import { pixelPtToTilePt } from "../graphics/Tilesets"
 import { session } from "../online/session"
 import { SwampCampGame } from "../SwampCampGame"
-import { DrawMenu } from "../ui/DrawMenu"
 import { UIStateManager } from "../ui/UIStateManager"
 import { ConstructionSite } from "../world/buildings/ConstructionSite"
+import { ElementType } from "../world/elements/ElementType"
 import { GroundType } from "../world/ground/Ground"
 import { LocationFactory } from "../world/locations/LocationFactory"
 import { here, LocationManager } from "../world/locations/LocationManager"
@@ -134,15 +134,22 @@ const devCommands: [InputKey, string, (input: CapturedInput) => void][] = [
                 .then((l) => LocationManager.instance.playerLoadLocation(l, Point.ZERO))
         },
     ],
+    // [
+    //     InputKey.V,
+    //     "open/close draw menu",
+    //     () => {
+    //         if (DrawMenu.instance.isOpen) {
+    //             DrawMenu.instance.close()
+    //         } else {
+    //             DrawMenu.instance.open()
+    //         }
+    //     },
+    // ],
     [
         InputKey.V,
-        "open/close draw menu",
-        () => {
-            if (DrawMenu.instance.isOpen) {
-                DrawMenu.instance.close()
-            } else {
-                DrawMenu.instance.open()
-            }
+        "place pile o' logs",
+        (input) => {
+            here().addElement(ElementType.PILE_O_LOGS, pixelPtToTilePt(input.mousePos))
         },
     ],
     [

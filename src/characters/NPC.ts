@@ -438,6 +438,7 @@ export class NPC extends Simulatable {
         if (
             this.dude.shield &&
             this.dude.isFacing(this.attackTarget.standingPosition) &&
+            // TODO: Set/infer attackstate for player?
             [AttackState.ATTACKING_SOON, AttackState.ATTACKING_NOW].includes(
                 this.attackTarget.attackState
             )

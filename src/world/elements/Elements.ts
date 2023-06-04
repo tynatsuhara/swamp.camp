@@ -16,6 +16,7 @@ import { ChestFactory } from "./Chest"
 import { ElementType } from "./ElementType"
 import { FurnitureFactory } from "./FurnitureFactory"
 import { MushroomFactory } from "./Mushroom"
+import { PileOfLogsFactory } from "./PileOfLogs"
 import { PlacedLanternFactory } from "./PlacedLantern"
 import { QueequegFactory } from "./Queequeg"
 import { RockFactory } from "./Rock"
@@ -47,6 +48,7 @@ const ELEMENT_FACTORIES = {
         UIStateEvents.openWorkbenchCraftingMenu()
     }),
     [ElementType.TOWN_HALL]: new TownHallFactory(),
+    [ElementType.PILE_O_LOGS]: new PileOfLogsFactory(),
 }
 
 export type ElementDataFormat = {

@@ -9,12 +9,12 @@ export class NavMeshCollider extends BoxCollider {
 
     constructor(
         location: Location,
-        position: Point,
+        pixelPosition: Point,
         dimensions: Point,
         layer?: string,
         ignoredColliders?: Collider[]
     ) {
-        super(position, dimensions, layer, ignoredColliders)
+        super(pixelPosition, dimensions, layer, ignoredColliders)
         this.location = location
         this.setNavMeshPoints(true)
     }

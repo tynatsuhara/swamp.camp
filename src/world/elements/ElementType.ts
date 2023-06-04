@@ -26,6 +26,7 @@ export enum ElementType {
     PLACED_LANTERN,
     WORKBENCH,
     TOWN_HALL,
+    PILE_O_LOGS,
 }
 
 expose({ ElementType })
