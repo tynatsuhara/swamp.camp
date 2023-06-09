@@ -28,6 +28,14 @@ import { player } from "./player"
 import { Centaur } from "./types/Centaur"
 import { ShroomNPC } from "./types/ShroomNPC"
 
+type NpcOptions = {
+    blockProficiency: number // 0-1
+}
+
+const DEFAULT_OPTIONS: NpcOptions = {
+    blockProficiency: 0.25,
+}
+
 type SyncData = {
     t: string | undefined // target uuid
 }
@@ -93,8 +101,12 @@ export class NPC extends Simulatable {
 
     private task: NPCTask
 
-    constructor() {
+    private options: NpcOptions
+
+    constructor(options: Partial<NpcOptions> = {}) {
         super()
+
+        this.options = { ...DEFAULT_OPTIONS, ...options }
 
         this.awake = () => {
             this._dude = this.entity.getComponent(Dude)
@@ -164,7 +176,7 @@ export class NPC extends Simulatable {
             // re-check the enemy function for dynamic enemy status
             // (such as demons only targeting people in the dark)
             if (this.attackTarget && this.isEnemyFn(this.attackTarget)) {
-                this.doAttack(updateData)
+                this.doCombat(updateData)
             } else {
                 this.doRoam(updateData) // flee
             }
@@ -399,7 +411,7 @@ export class NPC extends Simulatable {
     private readonly PARRY_TIME = 300 + Math.random() * 200
     private nextAttackTime = WorldTime.instance.time + Math.random() * 2000
 
-    private doAttack(updateData: UpdateData) {
+    private doCombat(updateData: UpdateData) {
         if (!this._dude.isAlive) {
             return
         }
@@ -435,14 +447,12 @@ export class NPC extends Simulatable {
                     : AttackState.ATTACKING_SOON
         }
 
-        if (
+        const shouldTryToBlock =
             this.dude.shield &&
             this.dude.isFacing(this.attackTarget.standingPosition) &&
-            // TODO: Set/infer attackstate for player?
-            [AttackState.ATTACKING_SOON, AttackState.ATTACKING_NOW].includes(
-                this.attackTarget.attackState
-            )
-        ) {
+            this.isAttackTargetAttacking()
+
+        if (shouldTryToBlock && this.doCombatBlock()) {
             this.dude.updateBlocking(true)
         } else {
             this.dude.updateBlocking(false)
@@ -494,6 +504,50 @@ export class NPC extends Simulatable {
                 : 0
 
         this.followPath(this.targetPath, updateData, false, 1, facingOverride)
+    }
+
+    // block state
+    private nextBlockCheckTime: number
+    private canBlockRightNow = false
+
+    /**
+     * @returns true if blocking
+     */
+    private doCombatBlock(): boolean {
+        // cache the block state for a while so we don't evaluate it every tick
+        if (WorldTime.instance.time < this.nextBlockCheckTime) {
+            return this.canBlockRightNow
+        }
+
+        this.canBlockRightNow = Math.random() < this.options.blockProficiency
+
+        if (this.canBlockRightNow) {
+            const blockTimeMs = 250 + 250 * Math.random()
+            this.nextBlockCheckTime = WorldTime.instance.time + blockTimeMs
+        } else {
+            this.nextBlockCheckTime = WorldTime.instance.time + 1_000 // TODO: Is this a good value?
+        }
+    }
+
+    private isAttackTargetAttacking(): boolean {
+        if (
+            [AttackState.ATTACKING_SOON, AttackState.ATTACKING_NOW].includes(
+                this.attackTarget.attackState
+            )
+        ) {
+            return true
+        }
+
+        if (
+            this.attackTarget.type === DudeType.PLAYER &&
+            // stopping distance === 0 serves as a proxy for "is a melee weapon"
+            this.attackTarget.weapon?.getStoppingDistance() === 0 &&
+            this.attackTarget.weapon?.isAttacking()
+        ) {
+            return true
+        }
+
+        return false
     }
 
     /**

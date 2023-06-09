@@ -1,17 +1,18 @@
 import { Component, Entity, UpdateData } from "brigsby/dist"
-import { WorldAudioContext } from "../audio/WorldAudioContext"
-import { syncFn } from "../online/syncUtils"
 import { saveManager } from "../SaveManager"
 import { Singletons } from "../Singletons"
+import { WorldAudioContext } from "../audio/WorldAudioContext"
+import { syncFn } from "../online/syncUtils"
+import { Day, TimeUnit } from "./TimeUnit"
 import { EventQueue } from "./events/EventQueue"
 import { LocationManager } from "./locations/LocationManager"
-import { Day, TimeUnit } from "./TimeUnit"
 
 export class WorldTime extends Component {
     static get instance() {
         return Singletons.getOrCreate(WorldTime)
     }
 
+    // TODO add a now() utility
     private _time: number = 0 // millis
     get time() {
         return this._time
