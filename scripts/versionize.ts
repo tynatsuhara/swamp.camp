@@ -6,6 +6,8 @@ import * as path from "path"
 const VERSIONIZED_FILE_TYPES = [".png"]
 const STATICS_DIR = path.join(__dirname, "../static/")
 
+const normalizeFilePath = (filePath: string) => filePath.replace(/\\/g, "/")
+
 /**
  * @returns all full file paths in the given directory
  */
@@ -21,7 +23,9 @@ const hash = (data: string) => crypto.createHash("md5").update(data, "utf8").dig
 const assets = getFiles(STATICS_DIR)
     .filter((fileName) => VERSIONIZED_FILE_TYPES.some((type) => fileName.endsWith(type)))
     .reduce((obj, fileName) => {
-        obj[fileName.replace(STATICS_DIR, "")] = hash(fs.readFileSync(fileName).toString())
+        obj[normalizeFilePath(fileName.replace(STATICS_DIR, ""))] = hash(
+            fs.readFileSync(fileName).toString()
+        )
         return obj
     }, {} as Record<string, string>)
 
