@@ -1,4 +1,4 @@
-import { AnonymousComponent, Component, debug, Point, pt, UpdateData } from "brigsby/dist"
+import { Component, debug, Point, pt, UpdateData } from "brigsby/dist"
 import { BoxCollider } from "brigsby/dist/collision"
 import { PointValue } from "brigsby/dist/Point"
 import { RenderMethod } from "brigsby/dist/renderer"
@@ -535,6 +535,8 @@ export class Dude extends Component implements DialogueSource {
         this.updateActiveConditions(elapsedTimeMillis)
 
         this.jumpingAnimator?.update(elapsedTimeMillis)
+
+        this.rollingAnimator?.update(elapsedTimeMillis)
 
         if (this.type === DudeType.PLAYER) {
             here().checkDroppedItemCollision(this)
@@ -1351,7 +1353,7 @@ export class Dude extends Component implements DialogueSource {
         return this.isRolling
     }
 
-    private rollAnimatorComponent: Component
+    private rollingAnimator: Animator
 
     // has a rolling animation, however janky
     private doRollAnimation() {
@@ -1392,7 +1394,7 @@ export class Dude extends Component implements DialogueSource {
             [315, new Point(-4, 8)],
             [337.5, new Point(-5, 7)],
         ]
-        const rollAnimator = new Animator(
+        this.rollingAnimator = new Animator(
             rotations.map(() => animationSpeed),
             (i) => {
                 const [rotation, offset] = rotations[i]
@@ -1400,16 +1402,10 @@ export class Dude extends Component implements DialogueSource {
             },
             () => {
                 setRotation(0, Point.ZERO)
-                rollAnimator.paused = true
+                this.rollingAnimator.paused = true
                 this.isRolling = false
-                this.rollAnimatorComponent.delete()
-                this.rollAnimatorComponent = null
+                this.rollingAnimator = null
             }
-        )
-        this.rollAnimatorComponent = this.entity.addComponent(
-            new AnonymousComponent({
-                update: ({ elapsedTimeMillis }) => rollAnimator.update(elapsedTimeMillis),
-            })
         )
     }
 
