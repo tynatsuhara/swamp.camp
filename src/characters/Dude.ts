@@ -1,4 +1,4 @@
-import { Component, debug, Point, pt, UpdateData } from "brigsby/dist"
+import { AnonymousComponent, Component, debug, Point, pt, UpdateData } from "brigsby/dist"
 import { BoxCollider } from "brigsby/dist/collision"
 import { PointValue } from "brigsby/dist/Point"
 import { RenderMethod } from "brigsby/dist/renderer"
@@ -1351,6 +1351,8 @@ export class Dude extends Component implements DialogueSource {
         return this.isRolling
     }
 
+    private rollAnimatorComponent: Component
+
     // has a rolling animation, however janky
     private doRollAnimation() {
         if (this === player()) {
@@ -1375,8 +1377,8 @@ export class Dude extends Component implements DialogueSource {
         this.isRolling = true
         this.canJumpOrRoll = false
 
-        setRotation(45, new Point(6, 8))
         const rotations: [number, Point][] = [
+            [45, new Point(6, 8)],
             [90, new Point(6, 10)],
             [112.5, new Point(5, 11)],
             [135, new Point(4, 12)],
@@ -1390,13 +1392,25 @@ export class Dude extends Component implements DialogueSource {
             [315, new Point(-4, 8)],
             [337.5, new Point(-5, 7)],
         ]
-        rotations.forEach(([rotation, offset], i) =>
-            setTimeout(() => setRotation(rotation, offset), animationSpeed * (i + 1))
+        const rollAnimator = new Animator(
+            rotations.map(() => animationSpeed),
+            (i) => {
+                const [rotation, offset] = rotations[i]
+                setRotation(rotation, offset)
+            },
+            () => {
+                setRotation(0, Point.ZERO)
+                rollAnimator.paused = true
+                this.isRolling = false
+                this.rollAnimatorComponent.delete()
+                this.rollAnimatorComponent = null
+            }
         )
-        setTimeout(() => {
-            setRotation(0, Point.ZERO)
-            this.isRolling = false
-        }, animationSpeed * (rotations.length + 1))
+        this.rollAnimatorComponent = this.entity.addComponent(
+            new AnonymousComponent({
+                update: ({ elapsedTimeMillis }) => rollAnimator.update(elapsedTimeMillis),
+            })
+        )
     }
 
     jump() {
