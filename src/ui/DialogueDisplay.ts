@@ -26,7 +26,7 @@ export class DialogueDisplay extends Component {
     }
 
     private static readonly TEXT_BOX_WIDTH = 288
-    private static readonly PADDING = 3
+    private static readonly PADDING = 8
     private static readonly BUTTON_HEIGHT = 19
 
     private dialogueSource: DialogueSource
