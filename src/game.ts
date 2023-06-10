@@ -17,7 +17,7 @@ declare global {
     }
 }
 
-const start = async () => {
+export const start = async () => {
     await Promise.all([
         // load all required assets
         assets.loadImageFiles(getFilesToLoadForMainMenu()),
@@ -41,5 +41,3 @@ const start = async () => {
 
     Engine.start(new SwampCampGame(), canvas, { fixedHeight })
 }
-
-start()

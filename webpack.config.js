@@ -11,6 +11,8 @@ const workers = fs
 module.exports = (_, argv) => {
     const plugins = []
 
+    const native = process.env.IS_NATIVE === "true"
+
     if (process.env.CYCLE_CHECK) {
         plugins.push(
             new CircularDependencyPlugin({
@@ -26,7 +28,7 @@ module.exports = (_, argv) => {
 
     return {
         entry: {
-            app: "./src/app.ts",
+            app: `./src/${native ? "native" : "web"}.ts`,
             ...Object.fromEntries(workers),
         },
         module: {

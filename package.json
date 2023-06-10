@@ -5,10 +5,11 @@
     "scripts": {
         "versionize": "ts-node scripts/versionize.ts",
         "start": "npm run versionize && webpack serve --mode=development",
-        "check": "CYCLE_CHECK=true webpack --mode=development",
+        "start:native": "cross-env IS_NATIVE=true npm run versionize && cross-env IS_NATIVE=true webpack serve --mode=development",
+        "check": "cross-env CYCLE_CHECK=true webpack --mode=development",
         "build:prod": "npm run versionize && webpack --mode=production",
-        "build:native": "cross-env IS_NATIVE=true npm run versionize && webpack --mode=production",
-        "build:native:dev": "cross-env IS_NATIVE=true npm run versionize && webpack --mode=development",
+        "build:native": "cross-env IS_NATIVE=true npm run versionize && cross-env IS_NATIVE=true webpack --mode=production",
+        "build:native:dev": "cross-env IS_NATIVE=true npm run versionize && cross-env IS_NATIVE=true webpack --mode=development",
         "format": "npx prettier --write ."
     },
     "repository": {
