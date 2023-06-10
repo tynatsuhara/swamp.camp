@@ -90,9 +90,13 @@ export class PauseMenu extends Component {
                     },
                 },
                 {
-                    text: session.isGuest() ? `LEAVE SESSION` : `SAVE & QUIT`,
+                    text: session.isGuest()
+                        ? `LEAVE SESSION`
+                        : debug.disableAutosave
+                        ? `QUIT`
+                        : `SAVE & QUIT`,
                     fn: () => {
-                        if (session.isHost()) {
+                        if (session.isHost() && !debug.disableAutosave) {
                             saveManager.save()
                         }
                         here().toggleAudio(false)
