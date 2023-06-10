@@ -1,6 +1,6 @@
 import { assets, Point, PointValue, pt } from "brigsby/dist"
 import { SpriteSource, StaticSpriteSource } from "brigsby/dist/sprites"
-import { Singletons } from "../Singletons"
+import { Singletons } from "../core/Singletons"
 import { DungeonTilesetII } from "./DungeonTilesetII"
 import { ExplosionTileset } from "./ExplosionTileset"
 import { ExtraCharacterSet2TileLoader } from "./ExtraCharacterSet2TileLoader"

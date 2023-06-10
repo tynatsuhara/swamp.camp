@@ -1,12 +1,12 @@
 import { Component, Entity, Point, pt } from "brigsby/dist"
 import { RectRender, RenderMethod } from "brigsby/dist/renderer"
 import { Maths } from "brigsby/dist/util"
-import { controls } from "../Controls"
+import { controls } from "../core/Controls"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { ClickableUI } from "./ClickableUI"
 import { Color } from "./Color"
-import { UI_SPRITE_DEPTH } from "./UiConstants"
 import { UISounds } from "./UISounds"
+import { UI_SPRITE_DEPTH } from "./UiConstants"
 
 // array of [dark, light] pairs
 // TODO support new nanner colors

@@ -1,6 +1,6 @@
 import { assets, Point } from "brigsby/dist"
 import { player } from "../characters/player"
-import { Settings } from "../Settings"
+import { Settings } from "../core/Settings"
 
 /**
  * Used for general purpose one-off sound effects

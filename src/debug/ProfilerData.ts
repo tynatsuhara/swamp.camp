@@ -1,6 +1,6 @@
 import { Component, debug, profiler, pt } from "brigsby/dist"
 import { Maths } from "brigsby/dist/util/Maths"
-import { controls } from "../Controls"
+import { controls } from "../core/Controls"
 import { pixelPtToTilePt } from "../graphics/Tilesets"
 import { Particles } from "../graphics/particles/Particles"
 import { TownStats } from "../world/TownStats"

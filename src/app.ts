@@ -1,7 +1,7 @@
 import { assets, debug, Engine } from "brigsby/dist"
+import { SwampCampGame } from "./core/SwampCampGame"
 import { initializeLogging } from "./debug/logging"
 import { getFilesToLoadForMainMenu } from "./graphics/Tilesets"
-import { SwampCampGame } from "./SwampCampGame"
 import { TEXT_FONT } from "./ui/Text"
 
 // This is how many "pixels" tall the game will be, unrelated to the screen's actual resolution

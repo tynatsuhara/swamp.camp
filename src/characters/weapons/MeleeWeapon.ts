@@ -1,6 +1,6 @@
 import { Point, pt, UpdateData } from "brigsby/dist"
 import { ImageFilter } from "brigsby/dist/sprites"
-import { controls } from "../../Controls"
+import { controls } from "../../core/Controls"
 import { Tilesets } from "../../graphics/Tilesets"
 import { session } from "../../online/session"
 import { Dude } from "../Dude"

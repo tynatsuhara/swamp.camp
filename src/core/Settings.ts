@@ -1,4 +1,4 @@
-import { Music } from "./audio/Music"
+import { Music } from "../audio/Music"
 
 interface SerializedSettings {
     // sound settings are all 0-1

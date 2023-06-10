@@ -1,6 +1,6 @@
 import { UpdateData } from "brigsby/dist"
 import { ActionSender } from "trystero"
-import { controls } from "../../Controls"
+import { controls } from "../../core/Controls"
 import { session } from "../../online/session"
 import { AbstractPlayer, PlayerControls } from "./AbstractPlayer"
 import { registerPlayerInstance } from "./index"

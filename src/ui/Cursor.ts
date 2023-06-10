@@ -1,7 +1,7 @@
 import { Component, Point, UpdateData } from "brigsby/dist"
 import { RenderMethod } from "brigsby/dist/renderer"
 import { SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
-import { controls } from "../Controls"
+import { controls } from "../core/Controls"
 import { TILE_SIZE, getImage } from "../graphics/Tilesets"
 import { ClickableUI } from "./ClickableUI"
 import { Mouse } from "./Mouse"

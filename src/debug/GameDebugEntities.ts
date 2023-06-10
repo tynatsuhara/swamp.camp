@@ -8,7 +8,7 @@ import {
 } from "brigsby/dist/renderer"
 import { DudeType } from "../characters/DudeType"
 import { player } from "../characters/player"
-import { controls } from "../Controls"
+import { controls } from "../core/Controls"
 import { Camera } from "../cutscenes/Camera"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { ButtonsMenu, OptionButton } from "../ui/ButtonsMenu"

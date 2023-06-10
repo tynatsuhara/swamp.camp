@@ -1,7 +1,7 @@
 import { expose } from "brigsby/dist/Debug"
 import { Lists } from "brigsby/dist/util"
 import { player } from "../characters/player"
-import { Settings } from "../Settings"
+import { Settings } from "../core/Settings"
 import { DarknessMask } from "../world/DarknessMask"
 import { LightManager } from "../world/LightManager"
 import { TimeUnit } from "../world/TimeUnit"

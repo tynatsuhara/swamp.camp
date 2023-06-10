@@ -1,7 +1,7 @@
 import { Component, Point } from "brigsby/dist"
 import { BasicRenderComponent } from "brigsby/dist/renderer"
 import { AnimatedSpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
-import { saveManager } from "../SaveManager"
+import { saveManager } from "../core/SaveManager"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets } from "../graphics/Tilesets"
 import { Color } from "./Color"

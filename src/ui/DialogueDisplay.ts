@@ -1,8 +1,6 @@
 import { Component, Entity, Point, UpdateData } from "brigsby/dist"
 import { BasicRenderComponent } from "brigsby/dist/renderer"
 import { NineSlice } from "brigsby/dist/sprites"
-import { controls } from "../Controls"
-import { Singletons } from "../Singletons"
 import { startTalkingSounds, stopTalkingSounds } from "../audio/Talking"
 import { Dude } from "../characters/Dude"
 import {
@@ -12,6 +10,8 @@ import {
     NextDialogue,
     getDialogue,
 } from "../characters/dialogue/Dialogue"
+import { controls } from "../core/Controls"
+import { Singletons } from "../core/Singletons"
 import { Camera } from "../cutscenes/Camera"
 import { Tilesets } from "../graphics/Tilesets"
 import { ButtonsMenu } from "./ButtonsMenu"

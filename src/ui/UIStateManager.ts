@@ -1,6 +1,6 @@
 import { Entity } from "brigsby/dist"
-import { Singletons } from "../Singletons"
 import { player } from "../characters/player"
+import { Singletons } from "../core/Singletons"
 import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
 import { spawnMenu } from "../debug/SpawnMenu"
 import { CraftingMenu } from "./CraftingMenu"

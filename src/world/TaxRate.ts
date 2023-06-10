@@ -1,6 +1,6 @@
 import { DudeFaction } from "../characters/DudeFactory"
 import { DudeType } from "../characters/DudeType"
-import { saveManager } from "../SaveManager"
+import { saveManager } from "../core/SaveManager"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { LocationManager } from "./locations/LocationManager"
 

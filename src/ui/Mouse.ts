@@ -1,5 +1,5 @@
 import { renderer } from "brigsby/dist/renderer/Renderer"
-import { ZOOM } from "../SwampCampGame"
+import { ZOOM } from "../core/SwampCampGame"
 
 export const Mouse = {
     lock: () => {

@@ -1,4 +1,4 @@
-import { Singletons } from "../../Singletons"
+import { Singletons } from "../../core/Singletons"
 import { UIStateEvents } from "../../ui/UIStateEvents"
 import { TeleporterIndicatorFactory } from "../TeleporterIndicator"
 import { ApothecaryFactory } from "../buildings/Apothecary"

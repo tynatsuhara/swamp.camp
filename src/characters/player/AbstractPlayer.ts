@@ -1,7 +1,7 @@
 import { ButtonState, Component, debug, pt, UpdateData } from "brigsby/dist"
 import { Point, PointValue } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util/Lists"
-import { controls } from "../../Controls"
+import { controls } from "../../core/Controls"
 import { Camera } from "../../cutscenes/Camera"
 import { ITEM_METADATA_MAP } from "../../items/Items"
 import { PlaceElementDisplay } from "../../ui/PlaceElementDisplay"

@@ -1,6 +1,6 @@
 import { Component, debug, Entity, Point } from "brigsby/dist"
 import { ImageRender } from "brigsby/dist/renderer"
-import { Singletons } from "../../Singletons"
+import { Singletons } from "../../core/Singletons"
 import { Color, getRGB } from "../../ui/Color"
 
 const MAX_PARTICLES = 4_000

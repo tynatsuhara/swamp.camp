@@ -1,9 +1,9 @@
 import { AnonymousComponent, Entity, Point, pt } from "brigsby/dist"
 import { BasicRenderComponent, ImageRender } from "brigsby/dist/renderer"
 import { Animator } from "brigsby/dist/util/Animator"
+import { Singletons } from "../../core/Singletons"
 import { Camera } from "../../cutscenes/Camera"
-import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
-import { Singletons } from "../../Singletons"
+import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
 import { Location } from "../locations/Location"
 import { here } from "../locations/LocationManager"
 

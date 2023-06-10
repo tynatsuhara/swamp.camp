@@ -1,7 +1,7 @@
 import { Component } from "brigsby/dist/Component"
 import { UpdateData } from "brigsby/dist/Engine"
 import { Point, pt } from "brigsby/dist/Point"
-import { controls } from "../Controls"
+import { controls } from "../core/Controls"
 import { Color } from "./Color"
 import { TextAlign, TextVerticalAlign, formatText } from "./Text"
 import { UI_SPRITE_DEPTH } from "./UiConstants"

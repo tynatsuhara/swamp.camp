@@ -1,8 +1,8 @@
 import { debug, Game } from "brigsby/dist"
-import { Dude } from "./characters/Dude"
-import { cleanUpSession } from "./online/syncGame"
-import { GameScene } from "./scenes/GameScene"
-import { MainMenuScene } from "./scenes/MainMenuScene"
+import { Dude } from "../characters/Dude"
+import { cleanUpSession } from "../online/syncGame"
+import { GameScene } from "../scenes/GameScene"
+import { MainMenuScene } from "../scenes/MainMenuScene"
 
 export const ZOOM = debug.photoMode ? 1 : 3
 

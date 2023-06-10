@@ -1,7 +1,7 @@
 import { Component, debug, Entity, Point } from "brigsby/dist"
 import { ImageRender } from "brigsby/dist/renderer"
+import { Singletons } from "../core/Singletons"
 import { TILE_SIZE } from "../graphics/Tilesets"
-import { Singletons } from "../Singletons"
 import { Color } from "../ui/Color"
 import { DarknessMask } from "./DarknessMask"
 import { here } from "./locations/LocationManager"

@@ -1,5 +1,5 @@
 import { Component, Entity, InputKey, InputKeyString, UpdateData } from "brigsby/dist"
-import { Singletons } from "../Singletons"
+import { Singletons } from "../core/Singletons"
 import { ButtonsMenu, OptionButton } from "./ButtonsMenu"
 import { Color } from "./Color"
 

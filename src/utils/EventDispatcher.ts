@@ -1,4 +1,4 @@
-import { Singletons } from "../Singletons"
+import { Singletons } from "../core/Singletons"
 
 const ID_PREFIX = "swamp-camp-evnt-"
 

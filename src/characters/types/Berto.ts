@@ -1,7 +1,7 @@
 import { Component, Point } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
-import { tilesAround } from "../../Utils"
 import { session } from "../../online/session"
+import { tilesAround } from "../../utils/misc"
 import { TimeUnit } from "../../world/TimeUnit"
 import { ElementType } from "../../world/elements/ElementType"
 import { camp } from "../../world/locations/LocationManager"

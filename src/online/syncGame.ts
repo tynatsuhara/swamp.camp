@@ -1,13 +1,13 @@
 import { Dude } from "../characters/Dude"
 import { DudeFactory } from "../characters/DudeFactory"
 import { player } from "../characters/player/index"
-import { saveManager } from "../SaveManager"
+import { saveManager } from "../core/SaveManager"
+import { SwampCampGame } from "../core/SwampCampGame"
 import { Save } from "../saves/SaveGame"
 import { newUUID } from "../saves/uuid"
-import { SwampCampGame } from "../SwampCampGame"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { computeSessionIdFromPeerId, session } from "./session"
-import { base64hash, ONLINE_PLAYER_DUDE_ID_PREFIX } from "./syncUtils"
+import { ONLINE_PLAYER_DUDE_ID_PREFIX, base64hash } from "./syncUtils"
 
 /**
  * Utilities for syncing game state and logic

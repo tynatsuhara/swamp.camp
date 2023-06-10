@@ -3,7 +3,7 @@ import { EllipseRender } from "brigsby/dist/renderer/EllipseRender"
 import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
 import { Lists } from "brigsby/dist/util"
 import { View } from "brigsby/dist/View"
-import { controls } from "../Controls"
+import { controls } from "../core/Controls"
 
 type Direction = "up" | "down" | "left" | "right"
 

@@ -1,6 +1,6 @@
 import { Component, Point, UpdateData } from "brigsby/dist"
 import { player } from "../characters/player"
-import { Settings } from "../Settings"
+import { Settings } from "../core/Settings"
 
 // We store and use a single instance of each unique audio file because having
 // multiple of the same audio overlapping can result in a weird robotic effect

@@ -1,7 +1,7 @@
 import { SpriteAnimation } from "brigsby/dist/sprites"
+import { saveManager } from "../core/SaveManager"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets } from "../graphics/Tilesets"
-import { saveManager } from "../SaveManager"
 import { Color } from "../ui/Color"
 import { PLUME_COLORS } from "../ui/PlumePicker"
 import { ChestAnimation } from "./ChestAnimation"

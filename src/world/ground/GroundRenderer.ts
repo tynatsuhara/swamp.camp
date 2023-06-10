@@ -1,9 +1,9 @@
 import { Entity, Point } from "brigsby/dist"
 import { BasicRenderComponent, ImageRender } from "brigsby/dist/renderer"
 import { StaticSpriteSource } from "brigsby/dist/sprites"
+import { Singletons } from "../../core/Singletons"
 import { Camera } from "../../cutscenes/Camera"
 import { TILE_SIZE } from "../../graphics/Tilesets"
-import { Singletons } from "../../Singletons"
 import { Location } from "../locations/Location"
 import { here } from "../locations/LocationManager"
 

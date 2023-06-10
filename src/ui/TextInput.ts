@@ -1,6 +1,6 @@
 import { Point } from "brigsby/dist/Point"
 import { renderer } from "brigsby/dist/renderer/Renderer"
-import { ZOOM } from "../SwampCampGame"
+import { ZOOM } from "../core/SwampCampGame"
 import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
 
 export class TextInput {

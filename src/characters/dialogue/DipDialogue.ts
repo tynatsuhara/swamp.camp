@@ -1,4 +1,4 @@
-import { controls } from "../../Controls"
+import { controls } from "../../core/Controls"
 import { getDipRecipes } from "../../items/CraftingRecipe"
 import { Item } from "../../items/Item"
 import { CraftingMenu } from "../../ui/CraftingMenu"

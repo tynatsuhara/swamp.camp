@@ -1,5 +1,5 @@
 import { AnonymousComponent, Entity, Point } from "brigsby/dist"
-import { controls } from "../Controls"
+import { controls } from "../core/Controls"
 import { MainMenuButton } from "./MainMenuButton"
 
 export class MainMenuButtonSection {

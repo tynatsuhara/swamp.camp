@@ -1,5 +1,5 @@
-import { saveManager } from "../SaveManager"
-import { Singletons } from "../Singletons"
+import { saveManager } from "../core/SaveManager"
+import { Singletons } from "../core/Singletons"
 import { TaxRate } from "./TaxRate"
 
 type OmitUnderscored<T> = { [K in keyof T as K extends `_${string}` ? never : K]: T[K] }

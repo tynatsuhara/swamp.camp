@@ -1,7 +1,7 @@
 import { expose } from "brigsby/dist/Debug"
 import { BinaryHeap } from "brigsby/dist/util"
+import { Singletons } from "../../core/Singletons"
 import { session } from "../../online/session"
-import { Singletons } from "../../Singletons"
 import { WorldTime } from "../WorldTime"
 import { getEventQueueHandlers, QueuedEventData, QueuedEventType } from "./QueuedEvent"
 

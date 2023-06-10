@@ -1,4 +1,4 @@
-import { Singletons } from "../../Singletons"
+import { Singletons } from "../../core/Singletons"
 import { CampLocationGenerator } from "./CampLocationGenerator"
 import { RadiantLocationGenerator } from "./RadiantLocationGenerator"
 

@@ -1,6 +1,6 @@
 import { Component, Entity, Point } from "brigsby/dist"
-import { Singletons } from "../Singletons"
 import { player } from "../characters/player"
+import { Singletons } from "../core/Singletons"
 import { Camera } from "../cutscenes/Camera"
 import { TILE_SIZE } from "../graphics/Tilesets"
 import { DarknessMask } from "./DarknessMask"

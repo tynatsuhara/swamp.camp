@@ -1,7 +1,7 @@
+import { saveManager } from "../../core/SaveManager"
 import { getCookingRecipes } from "../../items/CraftingRecipe"
 import { Item } from "../../items/Item"
 import { session } from "../../online/session"
-import { saveManager } from "../../SaveManager"
 import { CraftingMenu } from "../../ui/CraftingMenu"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { InteractIndicator } from "../../ui/InteractIndicator"

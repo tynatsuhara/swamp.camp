@@ -15,10 +15,10 @@ import {
     UpdateData,
 } from "brigsby/dist"
 import { Maths } from "brigsby/dist/util/Maths"
-import { Dude } from "./characters/Dude"
-import { Camera } from "./cutscenes/Camera"
-import { FullScreenMode } from "./ui/FullScreenMode"
-import { TextIcon } from "./ui/Text"
+import { Dude } from "../characters/Dude"
+import { Camera } from "../cutscenes/Camera"
+import { FullScreenMode } from "../ui/FullScreenMode"
+import { TextIcon } from "../ui/Text"
 
 // The last gamepad which accepted input. Undefined if the user is using kb/m.
 let gamepadInput: CapturedGamepad | undefined

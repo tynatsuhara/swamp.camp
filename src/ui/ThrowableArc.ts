@@ -1,6 +1,6 @@
 import { Component, Point } from "brigsby/dist"
 import { LineRender } from "brigsby/dist/renderer"
-import { ZOOM } from "../SwampCampGame"
+import { ZOOM } from "../core/SwampCampGame"
 import { Color } from "./Color"
 
 // WIP

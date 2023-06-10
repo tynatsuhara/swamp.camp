@@ -1,5 +1,5 @@
-import { saveManager } from "../SaveManager"
 import { ROCKS_NEEDED_FOR_CAMPFIRE } from "../characters/dialogue/DipDialogue"
+import { saveManager } from "../core/SaveManager"
 import { Icon } from "../graphics/OneBitTileset"
 import { ItemStack } from "./Inventory"
 import { Item } from "./Item"

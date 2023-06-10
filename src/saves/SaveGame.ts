@@ -6,7 +6,6 @@ import { LocationManagerSaveState } from "./LocationManagerSaveState"
 export class Save {
     version: number
     timeSaved: number
-    saveVersion: number
     locations: LocationManagerSaveState
     worldTime: number
     eventQueue: QueuedEventData[]

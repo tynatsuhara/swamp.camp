@@ -1,5 +1,5 @@
 import { player } from "../characters/player"
-import { Singletons } from "../Singletons"
+import { Singletons } from "../core/Singletons"
 import { Ambiance } from "./Ambiance"
 import { Music } from "./Music"
 

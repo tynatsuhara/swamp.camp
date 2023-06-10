@@ -1,20 +1,20 @@
 import { debug, expose } from "brigsby/dist"
-import { player } from "./characters/player"
-import { Camera } from "./cutscenes/Camera"
-import { CutsceneManager } from "./cutscenes/CutsceneManager"
-import { prettyPrint } from "./debug/JSON"
-import { ONLINE_PLAYER_DUDE_ID_PREFIX } from "./online/syncUtils"
-import { Save, SaveState } from "./saves/SaveGame"
-import { newUUID } from "./saves/uuid"
+import { player } from "../characters/player"
+import { Camera } from "../cutscenes/Camera"
+import { CutsceneManager } from "../cutscenes/CutsceneManager"
+import { prettyPrint } from "../debug/JSON"
+import { ONLINE_PLAYER_DUDE_ID_PREFIX } from "../online/syncUtils"
+import { Save, SaveState } from "../saves/SaveGame"
+import { newUUID } from "../saves/uuid"
+import { PlumePicker } from "../ui/PlumePicker"
+import { UIStateManager } from "../ui/UIStateManager"
+import { WorldTime } from "../world/WorldTime"
+import { EventQueue } from "../world/events/EventQueue"
+import { LocationManager, here } from "../world/locations/LocationManager"
 import { Singletons } from "./Singletons"
 import { SwampCampGame } from "./SwampCampGame"
-import { PlumePicker } from "./ui/PlumePicker"
-import { UIStateManager } from "./ui/UIStateManager"
-import { EventQueue } from "./world/events/EventQueue"
-import { here, LocationManager } from "./world/locations/LocationManager"
-import { WorldTime } from "./world/WorldTime"
 
-const CURRENT_SAVE_FORMAT_VERSION = 3
+const CURRENT_SAVE_FORMAT_VERSION = 3 // TODO bump this when appropriate
 const SLOTS: number = 3 + (debug.extraSaveSlots ?? 0)
 
 /**
@@ -114,7 +114,6 @@ class SaveManager {
         const save: Save = {
             version: CURRENT_SAVE_FORMAT_VERSION,
             timeSaved: Date.now(),
-            saveVersion: 0,
             locations: LocationManager.instance.save(context),
             worldTime: WorldTime.instance.time,
             eventQueue: EventQueue.instance.save(),
