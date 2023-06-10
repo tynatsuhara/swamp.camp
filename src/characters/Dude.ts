@@ -1393,6 +1393,7 @@ export class Dude extends Component implements DialogueSource {
             [292.5, new Point(-3, 9)],
             [315, new Point(-4, 8)],
             [337.5, new Point(-5, 7)],
+            [0, Point.ZERO],
         ]
         this.rollingAnimator = new Animator(
             rotations.map(() => animationSpeed),
@@ -1401,7 +1402,6 @@ export class Dude extends Component implements DialogueSource {
                 setRotation(rotation, offset)
             },
             () => {
-                setRotation(0, Point.ZERO)
                 this.rollingAnimator.paused = true
                 this.isRolling = false
                 this.rollingAnimator = null
