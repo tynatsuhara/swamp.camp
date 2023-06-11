@@ -9,10 +9,10 @@ export type DrawMiniMap = {
 }
 
 export type MiniMapDrawn = {
-    imageData: ImageData
+    imageBitmap: ImageBitmap
 }
 
-onmessage = (message: MessageEvent<DrawMiniMap>) => {
+onmessage = async (message: MessageEvent<DrawMiniMap>) => {
     const { imageData, width, height, scale } = message.data
 
     const smallCanvas = new OffscreenCanvas(width / scale, height / scale)
@@ -72,8 +72,10 @@ onmessage = (message: MessageEvent<DrawMiniMap>) => {
         }
     }
 
+    const bitmap = await createImageBitmap(smallCanvas)
+
     const response: MiniMapDrawn = {
-        imageData: smallContext.getImageData(0, 0, smallCanvas.width, smallCanvas.height),
+        imageBitmap: bitmap,
     }
     postMessage(response)
 }

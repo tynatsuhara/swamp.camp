@@ -44,9 +44,9 @@ export class MiniMap extends Component {
             this.redrawMap = redraw
             this.smallCanvas = document.createElement("canvas", {})
             this.smallCanvas.width = this.smallCanvas.height = this.bigCanvas.width / MiniMap.SCALE
-            onDrawn((response: MiniMapDrawn) => {
+            onDrawn(({ imageBitmap }: MiniMapDrawn) => {
                 this.fullyRenderedAtLeastOnce = true
-                this.smallCanvas.getContext("2d").putImageData(response.imageData, 0, 0)
+                this.smallCanvas.getContext("bitmaprenderer").transferFromImageBitmap(imageBitmap)
             })
         }
 
