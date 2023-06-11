@@ -135,7 +135,6 @@ export class CampLocationGenerator extends AbstractLocationGenerator {
         // This prevents the bottom row from all being a ledge, which would make trees unable to exist there
         for (let i = -MAP_RANGE; i < MAP_RANGE; i++) {
             const levelAbove = levels.get(pt(i, MAP_RANGE))
-            console.log(levelAbove)
             levels.set(pt(i, MAP_RANGE + 1), levelAbove)
         }
 
