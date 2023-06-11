@@ -16,7 +16,7 @@ onmessage = (message: MessageEvent<DrawMiniMap>) => {
     const { imageData, width, height, scale } = message.data
 
     const smallCanvas = new OffscreenCanvas(width / scale, height / scale)
-    const smallContext = smallCanvas.getContext("2d") as OffscreenCanvasRenderingContext2D
+    const smallContext = smallCanvas.getContext("2d")
 
     const getPixel = (x: number, y: number) => {
         const index = (y * width + x) * 4

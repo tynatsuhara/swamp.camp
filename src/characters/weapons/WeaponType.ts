@@ -1,7 +1,7 @@
 import { expose } from "brigsby/dist"
 
 export enum WeaponType {
-    NONE = 0_99999,
+    NONE = 99999,
     UNARMED,
     KNIFE,
     SHITTY_SWORD,
