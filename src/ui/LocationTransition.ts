@@ -55,12 +55,10 @@ export class LocationTransition extends Component {
      */
     transition({
         transitionCallback,
-        afterTransitionCallback,
         pauseMillis = 360,
         openOnly = false,
     }: {
         transitionCallback: () => void
-        afterTransitionCallback?: () => void
         pauseMillis?: number
         openOnly?: boolean
     }) {
@@ -74,6 +72,7 @@ export class LocationTransition extends Component {
         const maxRadius = dims.magnitude()
 
         // circles big->small->big
+        // if openOnly=true, small->big
         const radiuses = []
         for (let i = 0; i < FRAMES; i++) {
             const radius = Math.floor((maxRadius / FRAMES) * i)
@@ -123,12 +122,9 @@ export class LocationTransition extends Component {
                 }
                 if (frame === transitionFrame) {
                     transitionCallback()
-                    setTimeout(() => {
-                        this.transitioning = false
-                        if (afterTransitionCallback) {
-                            afterTransitionCallback()
-                        }
-                    }, 400)
+                } else if (frame === transitionFrame + 15) {
+                    // We do this a bit after the actual transition but before the real "end" to improve UX
+                    this.transitioning = false
                 }
             },
             () => {

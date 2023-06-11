@@ -227,13 +227,12 @@ export class LocationManager {
 
                 // position the player and camera
                 Camera.instance.jumpCutToFocalPoint()
+
+                afterTransitionCallback?.()
             }
 
             // load a new location
-            HUD.instance.locationTransition.transition({
-                transitionCallback,
-                afterTransitionCallback,
-            })
+            HUD.instance.locationTransition.transition({ transitionCallback })
         }
     )
 
