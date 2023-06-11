@@ -113,11 +113,15 @@ export class LocationTransition extends Component {
         const speed = TRANSITION_SPEED / (2 * FRAMES - 1)
 
         this.animator = new Animator(
-            Array.from({ length: radiuses.length }, (v, k) =>
+            Array.from({ length: radiuses.length + 1 }, (v, k) =>
                 k === transitionFrame ? blackScreenSpeed : speed
             ),
             (frame) => {
-                if (!!this.animator && frame !== 0) {
+                // I don't know why the fuck this needs to be here, but without this first
+                // check we'd have a lagging final frame on certain devices
+                if (frame === radiuses.length) {
+                    this.render = null
+                } else if (!!this.animator && frame !== 0) {
                     this.render = getRender(frame)
                 }
                 if (frame === transitionFrame) {
