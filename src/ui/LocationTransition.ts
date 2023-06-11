@@ -51,7 +51,7 @@ export class LocationTransition extends Component {
     }
 
     /**
-     * @param callback is called on the frame where the screen is completely blacked out
+     * @param transitionCallback is called on the frame where the screen is completely blacked out
      */
     transition({
         transitionCallback,
