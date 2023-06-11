@@ -152,8 +152,10 @@ export class MainMenuScene extends Scene {
     async newGame() {
         await this.loadGameContent()
         saveManager.new(this.selectedNewGameSlot, this.plumes)
-        SwampCampGame.instance.loadGameScene()
         SwampCampGame.instance.gameScene.newGame()
+        setTimeout(() => {
+            SwampCampGame.instance.loadGameScene()
+        }, 0)
     }
 
     private async loadGameContent() {
