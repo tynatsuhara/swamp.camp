@@ -162,7 +162,7 @@ export const clientSyncFn = <T extends any[]>(
 
         // propagate
         if (mode === "all" && session.isHost()) {
-            const otherPeers = session.getPeers().filter((p) => p !== peerId)
+            const otherPeers = Object.keys(session.getPeers()).filter((p) => p !== peerId)
             if (result !== "reject" && otherPeers.length > 0) {
                 send(args, otherPeers)
             }

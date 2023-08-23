@@ -77,7 +77,7 @@ export const hostOnJoin = () => {
 }
 
 export const hostSessionClose = () => {
-    session.getPeers().forEach((p) => cleanUpPeer(p))
+    Object.keys(session.getPeers()).forEach((p) => cleanUpPeer(p))
     cleanUpSession()
 }
 

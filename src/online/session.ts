@@ -94,7 +94,7 @@ export const session = {
     getPeers: () => room?.getPeers(),
 
     pingPeers: () => {
-        room.getPeers().forEach((p) =>
+        Object.keys(room.getPeers()).forEach((p) =>
             room.ping(p).then((pingVal) => {
                 console.log(`${p}: ${pingVal} ms`)
             })
