@@ -5,7 +5,7 @@ import { TEXT_FONT, TEXT_PIXEL_WIDTH, TEXT_SIZE } from "./Text"
 
 export class TextInput {
     private readonly element: HTMLElement
-    private readonly cursorFlashInterval: NodeJS.Timer
+    private readonly cursorFlashInterval: NodeJS.Timeout
     private value: string = ""
 
     constructor(prefixText: string, topCenterPos: Point, maxLength: number, onEnter: () => void) {

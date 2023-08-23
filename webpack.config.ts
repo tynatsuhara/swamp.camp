@@ -1,6 +1,8 @@
-const path = require("path")
-const fs = require("fs")
-const CircularDependencyPlugin = require("circular-dependency-plugin")
+import CircularDependencyPlugin from "circular-dependency-plugin"
+import * as fs from "fs"
+import * as path from "path"
+import webpack from "webpack"
+import "webpack-dev-server"
 
 const workers = fs
     .readdirSync("./src/workers", { withFileTypes: true })
@@ -8,7 +10,7 @@ const workers = fs
     .map(({ name }) => name.replace(".ts", ""))
     .map((name) => [`workers/${name}`, `./src/workers/${name}.ts`])
 
-module.exports = (_, argv) => {
+export default (env: string, argv: Record<string, string>): webpack.Configuration => {
     const plugins = []
 
     const native = process.env.IS_NATIVE === "true"

@@ -4,6 +4,12 @@
         "target": "ES2019",
         "lib": ["DOM", "ESNext"],
         "moduleResolution": "Node16",
-        "sourceMap": true
+        "sourceMap": true,
+        "allowSyntheticDefaultImports": true
+    },
+    "ts-node": {
+        "compilerOptions": {
+            "module": "CommonJS"
+        }
     }
 }
