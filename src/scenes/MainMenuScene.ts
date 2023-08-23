@@ -193,6 +193,8 @@ export class MainMenuScene extends Scene {
             .plusY(-37)
         this.knight.transform.position = knightPos
 
+        this.plumes.setMenuTopPosition(this.getMenuTop())
+
         // Don't re-render if nothing has changed, since a lot of
         // these functions involve parsing all of our save slots
         if (this.view && renderer.getDimensions().equals(this.lastDimensions)) {

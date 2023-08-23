@@ -45,16 +45,16 @@ export class PlumePicker extends Component {
     private renders: RenderMethod[]
     private readonly callback: (color: number) => void
 
-    constructor(
-        private readonly position,
-        initialColor: number,
-        callback: (color: number) => void
-    ) {
+    constructor(private position: Point, initialColor: number, callback: (color: number) => void) {
         super()
         this.initialColor = initialColor || 0
         this.callback = callback
 
         this.select(this.initialColor)
+    }
+
+    setMenuTopPosition(position: Point) {
+        this.position = position
     }
 
     awake() {
