@@ -103,7 +103,6 @@ export class MainMenuScene extends Scene {
             this.getMenuTop(),
             saveManager.getState().plumeIndex,
             (color) => {
-                // console.log(color)
                 const newKnightAnimation = DudeAnimationUtils.getCharacterIdleAnimation(
                     "knight_f",
                     {
@@ -117,17 +116,6 @@ export class MainMenuScene extends Scene {
                     }
                     this.knight = this.knightEntity.addComponent(newKnightAnimation)
                 })
-
-                // if (!this.knight?.entity) {
-                // console.log(this.knight)
-                // } else {
-                //     console.log(this.knight)
-                //     // console.log(this.knight.entity)
-                //     const existingEntity = this.knight.entity
-                //     // console.log(`replace`)
-                //     existingEntity.removeComponent(this.knight)
-                //     existingEntity.addComponent(newKnightAnimation)
-                // }
             }
         )
 
@@ -502,7 +490,6 @@ export class MainMenuScene extends Scene {
         // components.push(gb)
 
         // darkness
-        // this.darkness = new DarknessMask(false)
         this.darkness.reset(0, 1)
         this.darkness.addLightCircle(campfirePos.plusX(TILE_SIZE / 2).plusY(TILE_SIZE / 2), 72)
 
