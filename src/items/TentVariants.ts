@@ -8,7 +8,7 @@ const VARIANTS = {
 }
 
 export type TentColor = keyof typeof VARIANTS
-export type TentData = { color: TentColor; destinationUUID: string }
+export type TentData = { color: TentColor; destinationUUID: string; residents: string[] }
 
 export const getTentVariantImageFilter = (color: TentColor) => {
     const schema = VARIANTS[color]

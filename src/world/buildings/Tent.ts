@@ -1,6 +1,7 @@
 import { Entity, Point, pt } from "brigsby/dist"
 import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Sounds } from "../../audio/Sounds"
+import { DudeType } from "../../characters/DudeType"
 import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
 import { Item } from "../../items/Item"
 import { ItemMetadata } from "../../items/Items"
@@ -15,6 +16,7 @@ import { BasicLocation } from "../locations/BasicLocation"
 import { Location } from "../locations/Location"
 import { LocationManager } from "../locations/LocationManager"
 import { LocationType } from "../locations/LocationType"
+import { SingleTypeResidence } from "../residences/SingleTypeResidence"
 import { BuildingFactory, ConstructionRequirements } from "./Building"
 import { InteriorUtils } from "./InteriorUtils"
 
@@ -31,7 +33,7 @@ export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
     makeBuilding(
         wl: Location,
         pos: Point,
-        { color = "taupe", destinationUUID = makeTentInterior(wl, color).uuid }
+        { color = "taupe", destinationUUID = makeTentInterior(wl, color).uuid, residents = [] }
     ) {
         const e = new Entity()
 
@@ -46,8 +48,6 @@ export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
             },
             "tent"
         )
-
-        const data: TentData = { color, destinationUUID }
 
         // Set up tiles
         const depth = (pos.y + 1) * TILE_SIZE + /* prevent clipping */ 1
@@ -74,6 +74,22 @@ export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
             )
         )
 
+        // NOTE: Right now, the residence only works for player and Dip, since those are the only real use cases
+        const dudeTypeForResidence = {
+            [DIP_TENT_COLOR]: DudeType.DIP,
+            [PLAYER_TENT_COLOR]: DudeType.PLAYER,
+        }[color]
+
+        const residence = e.addComponent(
+            new SingleTypeResidence(dudeTypeForResidence, 1, destinationUUID, residents)
+        )
+
+        const getSaveData: () => TentData = () => ({
+            color,
+            destinationUUID,
+            residents: residence.getResidentUUIDs(),
+        })
+
         e.addComponent(
             new Breakable(
                 interactablePos,
@@ -81,16 +97,17 @@ export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
                 () => {
                     // side effect: eject people inside
                     const tp = LocationManager.instance.findTeleporter(wl.uuid, destinationUUID)
+                    // TODO this seems broken
                     LocationManager.instance.get(destinationUUID).ejectResidents(tp.id)
 
-                    return [{ item: Item.TENT, metadata: data }]
+                    return [{ item: Item.TENT, metadata: getSaveData() }]
                 },
                 () => Sounds.playAtPoint(...TeleporterSounds.TENT, tentCenterPos),
                 10
             )
         )
 
-        return e.addComponent(new ElementComponent(ElementType.TENT, pos, () => data))
+        return e.addComponent(new ElementComponent(ElementType.TENT, pos, getSaveData))
     }
 
     canPlaceInLocation(l: Location) {
@@ -107,6 +124,7 @@ export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
             ...super.itemMetadataToSaveFormat(metadata),
             color: metadata.color,
             destinationUUID: metadata.destinationUUID,
+            residents: metadata.residents,
         }
     }
 }
