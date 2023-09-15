@@ -25,6 +25,7 @@ export const NPCSchedules = {
     // stand where you are and do nothing
     newNoOpSchedule: () => ({ type: NPCScheduleType.DO_NOTHING }),
 
+    // TODO remove? (unused)
     // go to a specific spot and hang out there
     newGoToSchedule: (tilePoint: Point) => ({
         type: NPCScheduleType.GO_TO_SPOT,
@@ -39,6 +40,7 @@ export const NPCSchedules = {
         type: NPCScheduleType.DEFAULT_VILLAGER,
     }),
 
+    // TODO remove? (unused)
     // hang out in a specific location, either roaming or at a specific position
     newGoToLocationSchedule: (locationUUID: string, tilePoint?: Point) => ({
         type: NPCScheduleType.GO_TO_LOCATION,

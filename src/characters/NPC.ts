@@ -371,6 +371,7 @@ export class NPC extends Simulatable {
             const shouldNotPause = Ground.isWater(
                 this.dude.location.getGround(this.dude.tile)?.type
             )
+            // TODO: make it so NPCs dont roam immediately on save load?
             if (time > this.roamNextUnpauseTime || shouldNotPause) {
                 this.roamNextPauseTime = WorldTime.instance.time + pauseEveryMillis
                 this.roamNextUnpauseTime = this.roamNextPauseTime + pauseForMillis
