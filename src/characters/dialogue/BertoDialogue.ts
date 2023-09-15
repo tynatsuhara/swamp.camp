@@ -68,7 +68,7 @@ const getGreeting = (hasAnnouncements: boolean) => {
 export const BERTO_INTRO_DIALOGUE: DialogueSet = {
     [BERTO_STARTING_DIALOGUE]: () => {
         if (!player().inventory.canAddItem(Item.TOWN_HALL)) {
-            return // rare case
+            return // rare case, this dialogue is unavailable if there's no inventory space
         }
         return dialogue(
             [
@@ -77,8 +77,8 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
                 "As thy subjects work to collect raw resources, I shall facilitate the transport and appropriate payment for such items on behalf of the kingdom.",
                 "Upon construction of dwellings, I can send for tax-paying subjects to populate thy settlement.",
                 "Tradesmen! Knights! Worthless peons to build homes, scrub latrines, and polish thine armor!",
-                "Before we endeavor to grow this settlement, thou needeth establish an official town hall for purposes of taxation.",
-                "I present to thee, Royal Construction Cones. Plop these upon the land where you see fit to build the town hall.",
+                "Before we endeavor to grow this settlement, thou needeth establish an official town hall to handle administrative filings.",
+                "I present to thee, Royal Construction Cones. Plop these upon the land where thou see fit to erect the town hall!",
             ],
             () => {
                 player().inventory.addItem(Item.TOWN_HALL)
@@ -106,7 +106,6 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
                 "I wish I could help, but alas, I have the soft hands of a life-long bureaucrat.",
                 "Wouldst thou desire for me to send for an order of menial labourers?",
                 // TODO: Once the town hall is constructed, add some dialogue explaining what can be done at the town hall
-                // TODO: Somewhere, explain that it is a prison colony where they are working off debts/crimes?
             ],
             InteractIndicator.IMPORTANT_DIALOGUE,
             option("Sure!", BERT_VILLAGERS, true),
@@ -215,7 +214,8 @@ const fetchNpcDialogue = (): DialogueInstance => {
         : [
               "The kingdom has an extensive supply of expendable prisoners, who are already accustomed to living in squalor.",
               `${KING_NAME} has graciously offered thy first shipment of prisoners free of charge.`,
-              "For subsequent shipments, thou shall only be asked to pay a small transportation fee.",
+              `Most importantly, the colony shan't be required to provide payment for their services!`,
+              "For subsequent shipments of settlers, thou shall only be asked to pay a small transportation fee.",
               "Shall I send for thy first shipment of settlers?",
           ]
 
