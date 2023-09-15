@@ -104,7 +104,8 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
                 "Thy next order should be to recruit workers to begin construction.",
                 "Until they arrive, gathering resources for construction would be well-advised.",
                 "I wish I could help, but alas, I have the soft hands of a life-long bureaucrat.",
-                "Wouldst thou desire for me to send for an order of menial labourers?",
+                "Once the town hall is constructed, it shall be my place of residence as well... In the meantime, I'm sure your tent has room for one more.",
+                "Now, wouldst thou desire for me to send for an order of menial labourers?",
                 // TODO: Once the town hall is constructed, add some dialogue explaining what can be done at the town hall
             ],
             InteractIndicator.IMPORTANT_DIALOGUE,
