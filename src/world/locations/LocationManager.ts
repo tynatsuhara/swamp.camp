@@ -265,7 +265,7 @@ export class LocationManager {
             .map(([id, tp]) => {
                 if (tp.a.location === from && tp.b.location === to) {
                     return { id, source: tp.a, dest: tp.b }
-                } else if (tp.a.location === from && tp.b.location === to) {
+                } else if (tp.b.location === from && tp.a.location === to) {
                     return { id, source: tp.b, dest: tp.a }
                 } else {
                     return undefined
@@ -293,7 +293,8 @@ export class LocationManager {
 
     npcUseTeleporter(dude: Dude, teleporterId: string) {
         const teleporter = this.teleporters[teleporterId]
-        const currentSide = teleporter.a.location === here().uuid ? teleporter.a : teleporter.b
+        const currentSide =
+            teleporter.a.location === dude.location.uuid ? teleporter.a : teleporter.b
         const currentLocation = this.get(currentSide.location)
         const otherSide = currentSide === teleporter.a ? teleporter.b : teleporter.a
         const otherLocation = this.get(otherSide.location)
