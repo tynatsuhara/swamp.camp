@@ -22,6 +22,10 @@ export class TownHallFactory extends SimpleBuildingFactory<ElementType.TOWN_HALL
             { [DudeType.HERALD]: 1 } // TODO?
         )
     }
+
+    onConstructionComplete(): void {
+        console.log("town hall has been built!")
+    }
 }
 
 const makeTownHallInterior = (outside: Location): Location => {

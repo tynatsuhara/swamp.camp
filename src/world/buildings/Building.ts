@@ -40,6 +40,10 @@ export abstract class BuildingFactory<
         return l === camp()
     }
 
+    onConstructionComplete(): void {
+        // override to make this not a no-op
+    }
+
     /**
      * Internal wrapped implementation for
      */
@@ -71,6 +75,7 @@ export abstract class BuildingFactory<
             constructionState = undefined
             wl.reloadElement(pos)
             letDudesClaim()
+            this.onConstructionComplete()
         }
 
         if (constructionState) {

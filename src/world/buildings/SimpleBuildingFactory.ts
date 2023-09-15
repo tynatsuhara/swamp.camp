@@ -96,6 +96,7 @@ export class SimpleBuildingFactory<Type extends ElementType> extends BuildingFac
         e.addComponent(
             new Interactable(
                 interactablePos,
+                // TODO: Allow doors to be locked? Maybe say "the hours are between X and Y" if it's a shop
                 () => LocationManager.instance.playerUseTeleporter(interiorUUID),
                 new Point(0, -TILE_SIZE * 1.4)
             )
