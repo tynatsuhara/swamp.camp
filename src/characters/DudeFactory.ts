@@ -31,6 +31,7 @@ import { HostPlayer } from "./player/HostPlayer"
 import { AquaticNPC } from "./types/AquaticNPC"
 import { Berto } from "./types/Berto"
 import { Centaur } from "./types/Centaur"
+import { Dip } from "./types/Dip"
 import { DudeModifier } from "./types/DudeModifier"
 import { Enemy } from "./types/Enemy"
 import { Mimic } from "./types/Mimic"
@@ -217,7 +218,7 @@ export class DudeFactory {
                 animationName = "lizard_f"
                 maxHealth = Number.MAX_SAFE_INTEGER
                 speed *= 0.7
-                additionalComponents = [new NPC(), new Villager()]
+                additionalComponents = [new NPC(), new Villager(), new Dip()]
                 expose({ dip: additionalComponents[0] })
                 break
             }
