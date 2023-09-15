@@ -1,4 +1,5 @@
 import { Entity, Point } from "brigsby/dist"
+import { Dude } from "../../characters/Dude"
 import { ItemStack } from "../../items/Inventory"
 import { Item } from "../../items/Item"
 import { ItemMetadata } from "../../items/Items"
@@ -61,13 +62,11 @@ export abstract class BuildingFactory<
         pos: Point,
         data: Partial<SaveFormat>
     ): ElementComponent<Type, SaveFormat> => {
-        // TODO: Add construction process
-
         let constructionState = data["constructionState"] as ConstructionState
 
         const letDudesClaim = () => {
             // let dudes claim this new home, if possible
-            wl.getDudes().forEach((d) => d.tryToClaimResidence())
+            Dude.getAll().forEach((d) => d.tryToClaimResidence())
         }
 
         const completeConstruction = () => {

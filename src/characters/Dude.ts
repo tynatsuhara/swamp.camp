@@ -1599,6 +1599,12 @@ export class Dude extends Component implements DialogueSource {
     private hasResidence = false // right now, a dude can never lose or change their residence
 
     private claimResidence(hasPendingSlot: boolean) {
+        // We can have weird race conditions based on the order we instantiate dudes and residences.
+        // If camp doesnt exist yet, don't do anything.
+        if (!camp()) {
+            return
+        }
+
         if (!this.factions.includes(DudeFaction.VILLAGERS)) {
             return
         }
