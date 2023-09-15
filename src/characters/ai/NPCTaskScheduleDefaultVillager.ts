@@ -133,9 +133,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         // If the town hall isn't built yet, the herald will stay with the player
         if (dude.type === DudeType.HERALD) {
             // this doesnt work because the players tent doesnt consider itself a residence. we should fix that
-            const x = this.findHomeLocation(player())
-            console.log(x)
-            return x
+            return this.findHomeLocation(player())
         }
     }
 
