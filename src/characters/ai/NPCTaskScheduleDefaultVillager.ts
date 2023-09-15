@@ -19,6 +19,7 @@ import { Dude } from "../Dude"
 import { DudeFaction } from "../DudeFactory"
 import { DudeType } from "../DudeType"
 import { NPC } from "../NPC"
+import { player } from "../player"
 import { Villager } from "../types/Villager"
 import { ShieldType } from "../weapons/ShieldType"
 import { WeaponType } from "../weapons/WeaponType"
@@ -31,17 +32,14 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
     private closestFirePosition: Point
     private homeLocation: Location
     private workLocation: Location
-
-    private workRoamingSpots: Point[] | undefined
+    private workRoamingConfig: RoamOptions | undefined
 
     constructor(private readonly npc: NPC) {
         super()
         this.closestFirePosition = this.getClosestFire(npc)
         this.homeLocation = this.findHomeLocation(npc.dude)
         this.workLocation = this.findWorkLocation(npc.dude)
-        if (this.getJob() === VillagerJob.CONSTRUCTION) {
-            this.workRoamingSpots = this.getConstructionZoneSpots()
-        }
+        this.workRoamingConfig = this.getWorkRoamingConfig(npc.dude)
     }
 
     performTask(context: NPCTaskContext): void {
@@ -70,12 +68,17 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             // Or better yet, don't be a jerk. Unwind by being a man... and goin' to work.
             goalLocation = this.workLocation ?? camp()
 
-            if (this.workRoamingSpots) {
-                roamOptions.goalOptionsSupplier = () => this.workRoamingSpots
+            if (this.workRoamingConfig) {
+                roamOptions.goalOptionsSupplier = this.workRoamingConfig.goalOptionsSupplier
+                roamOptions.pauseEveryMillis =
+                    this.workRoamingConfig.pauseEveryMillis ?? roamOptions.pauseEveryMillis
+                roamOptions.pauseForMillis =
+                    this.workRoamingConfig.pauseForMillis ?? roamOptions.pauseForMillis
 
-                const alreadyAtWorkSpot = this.workRoamingSpots.some((spot) =>
-                    spot.equals(dude.tile)
-                )
+                const alreadyAtWorkSpot = this.workRoamingConfig
+                    .goalOptionsSupplier()
+                    .some((spot) => spot.equals(dude.tile))
+
                 if (!alreadyAtWorkSpot) {
                     // Go straight to work, no dilly-dallying
                     roamOptions.pauseEveryMillis = undefined
@@ -125,6 +128,14 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
 
         if (houses.length > 0) {
             return LocationManager.instance.get(houses[0].locationUUID)
+        }
+
+        // If the town hall isn't built yet, the herald will stay with the player
+        if (dude.type === DudeType.HERALD) {
+            // this doesnt work because the players tent doesnt consider itself a residence. we should fix that
+            const x = this.findHomeLocation(player())
+            console.log(x)
+            return x
         }
     }
 
@@ -223,19 +234,48 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         return result
     }
 
-    private getConstructionZoneSpots() {
-        const zones = camp()
-            .getElements()
-            .filter((e) => e.entity.getComponent(ConstructionSite)?.hasMaterials())
+    private getWorkRoamingConfig(dude: Dude): RoamOptions {
+        if (this.getJob() === VillagerJob.CONSTRUCTION) {
+            const zones = camp()
+                .getElements()
+                .filter((e) => e.entity.getComponent(ConstructionSite)?.hasMaterials())
 
-        if (zones.length === 0) {
-            return null
+            if (zones.length === 0) {
+                return null
+            }
+
+            const zoneElement = this.getWorkLocation(zones)
+            const zone = zoneElement.entity.getComponent(ConstructionSite)
+
+            return {
+                goalOptionsSupplier: () => ElementUtils.rectPoints(zoneElement.pos, zone.size),
+            }
         }
 
-        const zoneElement = this.getWorkLocation(zones)
-        const zone = zoneElement.entity.getComponent(ConstructionSite)
+        if (dude.type === DudeType.HERALD) {
+            // Go to the campfire closest to the middle of the amp
+            const closestCampfireGoal = Point.ZERO
+            const location = camp()
+            const closestCampfirePoint = location
+                .getElementsOfType(ElementType.CAMPFIRE)
+                .sort(
+                    (a, b) =>
+                        a.pos.distanceTo(closestCampfireGoal) -
+                        b.pos.distanceTo(closestCampfireGoal)
+                )[0]?.pos
 
-        return ElementUtils.rectPoints(zoneElement.pos, zone.size)
+            const tileOptions: Point[] = closestCampfirePoint
+                ? tilesAround(closestCampfirePoint, 5)
+                : tilesAround(Point.ZERO, 10)
+
+            return {
+                goalOptionsSupplier: () => tileOptions,
+                pauseEveryMillis: 2_500,
+                pauseForMillis: 30_000,
+            }
+        }
+
+        return undefined
     }
 
     private getTreeToChop() {
