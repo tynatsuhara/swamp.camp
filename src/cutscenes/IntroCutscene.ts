@@ -79,6 +79,7 @@ export class IntroCutscene extends Component {
             ),
         ]
 
+        // TODO: Should this mention something about the swamp being magical and ever-shifting?
         const text = [
             `Champion, your time has come!
 

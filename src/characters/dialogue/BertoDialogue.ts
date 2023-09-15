@@ -61,7 +61,7 @@ const getItemsToSell = (): SalePackage[] => {
     ]
 }
 
-const getGreeting = () => {
+const getGreeting = (hasAnnouncements: boolean) => {
     return "Tally ho!"
 }
 
@@ -105,6 +105,8 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
                 "Until they arrive, gathering resources for construction would be well-advised.",
                 "I wish I could help, but alas, I have the soft hands of a life-long bureaucrat.",
                 "Wouldst thou desire for me to send for an order of menial labourers?",
+                // TODO: Once the town hall is constructed, add some dialogue explaining what can be done at the town hall
+                // TODO: Somewhere, explain that it is a prison colony where they are working off debts/crimes?
             ],
             InteractIndicator.IMPORTANT_DIALOGUE,
             option("Sure!", BERT_VILLAGERS, true),
@@ -113,10 +115,11 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
     },
     [BERT_ENTRYPOINT]: () => {
         const announcements = Berto.instance.getAnnouncements()
+        const hasAnnouncements = announcements.length > 0
         return dialogue(
-            [getGreeting()],
+            [getGreeting(hasAnnouncements)],
             () => new NextDialogue(BERT_MENU, true),
-            announcements.length > 0 ? InteractIndicator.IMPORTANT_DIALOGUE : InteractIndicator.NONE
+            hasAnnouncements ? InteractIndicator.IMPORTANT_DIALOGUE : InteractIndicator.NONE
         )
     },
     [BERT_MENU]: () => {
