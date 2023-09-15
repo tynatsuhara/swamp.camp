@@ -787,7 +787,7 @@ export class NPC extends Simulatable {
         const nextLocation = this.getNextLocation(goalLocation)
         this.teleporterTarget = LocationManager.instance.findTeleporter(
             this.dude.location.uuid,
-            goalLocation.uuid
+            nextLocation.uuid
         )
         this.useTeleporter()
     }
