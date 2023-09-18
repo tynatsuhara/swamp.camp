@@ -228,7 +228,7 @@ export class DudeFactory {
                 speed *= 0.6
                 dialogue = BERTO_STARTING_DIALOGUE
                 additionalComponents = [new NPC(), new Villager(), new Berto()]
-                expose({ berto: additionalComponents[0] })
+                expose({ berto: additionalComponents[2] })
                 break
             }
             case DudeType.ELF: {
