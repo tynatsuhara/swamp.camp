@@ -1,5 +1,6 @@
 import { Point, pt } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util"
+import { saveManager } from "../../core/SaveManager"
 import { TILE_SIZE, pixelPtToTilePt } from "../../graphics/Tilesets"
 import { hash } from "../../utils/hash"
 import { tilesAround } from "../../utils/misc"
@@ -142,7 +143,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         if (
             dude.factions.includes(DudeFaction.CLERGY) ||
             dude.type === DudeType.DOCTOR ||
-            dude.type === DudeType.HERALD
+            (dude.type === DudeType.HERALD && saveManager.getState().hasTownHall)
         ) {
             return this.findHomeLocation(dude)
         }
