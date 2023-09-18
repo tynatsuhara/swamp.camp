@@ -4,6 +4,7 @@ import { Lists } from "brigsby/dist/util"
 import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
 import { GroundRenderer } from "../ground/GroundRenderer"
 
+// TODO: Eventually we can make it so this isn't square-only by using layered sprites, but it's very low priority
 /**
  * @param width the ground tile width
  * @param height the ground tile height
