@@ -251,7 +251,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             }
         }
 
-        if (dude.type === DudeType.HERALD) {
+        if (dude.type === DudeType.HERALD || dude.type === DudeType.DIP) {
             // Go to the campfire closest to the middle of the amp
             const closestCampfireGoal = Point.ZERO
             const location = camp()
