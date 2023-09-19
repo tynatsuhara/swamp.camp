@@ -114,10 +114,14 @@ export class TradeMenu extends PaginatedMenu {
             )
 
             this.isOpen = true
-            this.coinEntity = new Entity(
-                getGoldCountComponents(this.getTopLeft().plus(this.coinsOffset))
-            )
+            this.refreshCoinCount()
         })
+    }
+
+    private refreshCoinCount() {
+        this.coinEntity = new Entity(
+            getGoldCountComponents(this.getTopLeft().plus(this.coinsOffset))
+        )
     }
 
     private getTopLeft() {
@@ -209,16 +213,20 @@ export class TradeMenu extends PaginatedMenu {
                         coins: saveManager.getState().coins - sale.price,
                     })
                 }
+                this.refreshCoinCount()
                 this.justSoldRow = r
                 setTimeout(() => (this.justSoldRow = -1), 900)
             }
 
+            const desc = ITEM_METADATA_MAP[sale.item].description
+            const prefix = this.tradeMode === TradeMode.PLAYER_BUYING && desc ? `${desc}\n` : ""
+
             if (hovered && tradeError) {
-                this.tooltip.say(`[${tradeError}]`)
+                this.tooltip.say(`${prefix}[${tradeError}]`)
             } else if (hovered) {
                 const totalCount = this.sourceInventory?.getItemCount(sale.item)
                 const countText = this.sourceInventory ? ` ${sale.count}/${totalCount}` : ""
-                this.tooltip.say(`[Click to ${this.tradeMode}${countText}]`)
+                this.tooltip.say(`${prefix}[Click to ${this.tradeMode}${countText}]`)
             }
 
             // craftable item
