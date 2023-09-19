@@ -2,10 +2,12 @@ import { expose } from "brigsby/dist/Debug"
 import { BinaryHeap } from "brigsby/dist/util"
 import { Singletons } from "../../core/Singletons"
 import { session } from "../../online/session"
-import { EventDispatcher } from "../../utils/EventDispatcher"
 import { WorldTime } from "../WorldTime"
 import { getEventQueueHandlers, QueuedEventData, QueuedEventType } from "./QueuedEvent"
 
+/**
+ * These events are serialized, used for the game loop, and only execute on the host!
+ */
 export class EventQueue {
     static get instance() {
         return Singletons.getOrCreate(EventQueue)
@@ -35,17 +37,6 @@ export class EventQueue {
                     }))
                 ),
         })
-
-        EventDispatcher.instance.listen(
-            "gametimeout",
-            ({ fn, delay }: { fn: () => void; delay: number }) => {
-                this.addEvent({
-                    type: QueuedEventType.EPHEMERAL_DELAY,
-                    time: WorldTime.instance.time + delay,
-                    fn,
-                })
-            }
-        )
     }
 
     addEvent(event: QueuedEventData) {
@@ -63,9 +54,7 @@ export class EventQueue {
     }
 
     save(): QueuedEventData[] {
-        return this.heap
-            .getContents()
-            .filter((event) => event.type !== QueuedEventType.EPHEMERAL_DELAY)
+        return this.heap.getContents()
     }
 
     containsEventType(type: QueuedEventType) {

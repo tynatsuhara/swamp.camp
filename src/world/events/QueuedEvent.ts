@@ -18,7 +18,6 @@ export enum QueuedEventType {
     ORC_SEIGE,
     DAILY_MORNING,
     QUEEQUEG_DISEMBARK_PASSENGERS,
-    EPHEMERAL_DELAY, // used in places where we'd typically use setTimeout, but we want to be able to pause
 }
 
 export type QueuedEventData = {
@@ -91,6 +90,4 @@ export const getEventQueueHandlers = (): {
 
     // TODO: This should wake up the player if they are sleeping
     [QueuedEventType.ORC_SEIGE]: () => DudeSpawner.instance.spawnOrcs(),
-
-    [QueuedEventType.EPHEMERAL_DELAY]: ({ fn }) => fn(),
 })

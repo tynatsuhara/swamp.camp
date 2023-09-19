@@ -6,6 +6,7 @@ import { Singletons } from "../core/Singletons"
 import { syncFn } from "../online/syncUtils"
 import { Day, TimeUnit } from "./TimeUnit"
 import { EventQueue } from "./events/EventQueue"
+import { TimeoutQueue } from "./events/TimeoutQueue"
 import { LocationManager } from "./locations/LocationManager"
 
 export class WorldTime extends Component {
@@ -39,6 +40,7 @@ export class WorldTime extends Component {
         if (!isGamePaused()) {
             this._time += updateData.elapsedTimeMillis
             EventQueue.instance.processEvents(this.time)
+            TimeoutQueue.instance.processEvents(this.time)
             WorldAudioContext.instance.time = this.time
         }
     }
