@@ -13,6 +13,7 @@ const KEYS = {
     ["gamepad-down"]: pt(30, 23),
     ["gamepad-left"]: pt(31, 23),
     ["keycap"]: pt(25, 15),
+    ["pause"]: pt(28, 32),
     ["leftClick"]: pt(29, 32),
     ["rightClick"]: pt(30, 32),
 
