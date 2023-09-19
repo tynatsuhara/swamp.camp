@@ -590,7 +590,7 @@ export class NPC extends Simulatable {
                 speedMultiplier
             )
             if (!this._dude.standingPosition.equals(oldPosition)) {
-                this.lastMoveTime = Date.now()
+                this.lastMoveTime = WorldTime.instance.time
             }
         }
 
@@ -601,7 +601,7 @@ export class NPC extends Simulatable {
 
     private lastMoveTime: number
     private stuck() {
-        return Date.now() - this.lastMoveTime > 1000
+        return WorldTime.instance.time - this.lastMoveTime > 1000
     }
 
     /**

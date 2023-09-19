@@ -8,6 +8,8 @@ import { Sounds } from "../audio/Sounds"
 import { Dude } from "../characters/Dude"
 import { session } from "../online/session"
 import { syncFn } from "../online/syncUtils"
+import { WorldTime } from "../world/WorldTime"
+import { requestGameAnimationFrame } from "../world/events/requestGameAnimationFrame"
 import { setGameTimeout } from "../world/events/setGameTimeout"
 import { here } from "../world/locations/LocationManager"
 import { Item } from "./Item"
@@ -78,23 +80,23 @@ export class DroppedItem extends Component {
 
                 this.reposition()
 
-                let last = Date.now()
+                let last = WorldTime.instance.time
                 const move = () => {
                     if (!this.enabled) {
                         return
                     }
-                    const now = Date.now()
+                    const now = WorldTime.instance.time
                     const diff = now - last
                     if (diff > 0) {
                         this.reposition(velocity)
                         velocity = velocity.times(0.6)
                     }
                     if (velocity.magnitude() >= 0.1) {
-                        requestAnimationFrame(move)
+                        requestGameAnimationFrame(move)
                     }
                     last = now
                 }
-                requestAnimationFrame(move)
+                requestGameAnimationFrame(move)
             }
         }
 

@@ -40,6 +40,10 @@ import { Campfire } from "../world/elements/Campfire"
 import { ElementType } from "../world/elements/ElementType"
 import { Interactable } from "../world/elements/Interactable"
 import { Pushable } from "../world/elements/Pushable"
+import {
+    cancelGameAnimationFrame,
+    requestGameAnimationFrame,
+} from "../world/events/requestGameAnimationFrame"
 import { setGameTimeout } from "../world/events/setGameTimeout"
 import { Ground } from "../world/ground/Ground"
 import { LightManager } from "../world/LightManager"
@@ -1005,6 +1009,7 @@ export class Dude extends Component implements DialogueSource {
 
     private dissolveLocal() {
         let dissolveChance = 0.1
+        // TODO pausability?
         const interval = setInterval(() => {
             this.animation.applyDissolveFilter(dissolveChance)
             if (dissolveChance >= 1) {
@@ -1032,9 +1037,9 @@ export class Dude extends Component implements DialogueSource {
         const distToStop = 2
         let intervalsRemaining = 50
 
-        let last = Date.now()
+        let last = WorldTime.instance.time
         const knock = () => {
-            const now = Date.now()
+            const now = WorldTime.instance.time
             const diff = now - last
             if (diff > 0) {
                 this.moveTo(this.standingPosition.lerp((0.15 * diff) / 30, goal))
@@ -1046,16 +1051,16 @@ export class Dude extends Component implements DialogueSource {
             ) {
                 this.knockIntervalCallback = 0
             } else {
-                this.knockIntervalCallback = requestAnimationFrame(knock)
+                this.knockIntervalCallback = requestGameAnimationFrame(knock)
             }
             last = now
         }
-        this.knockIntervalCallback = requestAnimationFrame(knock)
+        this.knockIntervalCallback = requestGameAnimationFrame(knock)
     }
 
     private cancelKnockbackInterval() {
         if (this.knockIntervalCallback !== 0) {
-            window.cancelAnimationFrame(this.knockIntervalCallback)
+            cancelGameAnimationFrame(this.knockIntervalCallback)
             this.knockIntervalCallback = 0
         }
     }
