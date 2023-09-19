@@ -1,6 +1,7 @@
 import { debug, Point, PointValue, pt, UpdateData } from "brigsby/dist"
 import { LineRender } from "brigsby/dist/renderer"
 import { Lists } from "brigsby/dist/util"
+import { isGamePaused } from "../core/PauseState"
 import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { session } from "../online/session"
 import { syncData } from "../online/syncUtils"
@@ -139,7 +140,7 @@ export class NPC extends Simulatable {
     }
 
     update(updateData: UpdateData) {
-        if (session.isGuest()) {
+        if (session.isGuest() || isGamePaused()) {
             return
         }
 

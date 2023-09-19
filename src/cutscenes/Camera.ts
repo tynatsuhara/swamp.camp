@@ -2,6 +2,7 @@ import { debug, Point } from "brigsby/dist"
 import { renderer } from "brigsby/dist/renderer"
 import { Maths } from "brigsby/dist/util"
 import { Dude } from "../characters/Dude"
+import { isGamePaused } from "../core/PauseState"
 import { Singletons } from "../core/Singletons"
 import { ZOOM } from "../core/SwampCampGame"
 import { TILE_SIZE } from "../graphics/Tilesets"
@@ -60,9 +61,13 @@ export class Camera {
 
         if (!this._position) {
             this._position = cameraGoal
-        } else {
-            this._position = this._position.lerp(0.0018 * elapsedTimeMillis, cameraGoal)
         }
+
+        if (isGamePaused()) {
+            return this._position
+        }
+
+        this._position = this._position.lerp(0.0018 * elapsedTimeMillis, cameraGoal)
 
         if (this.shakeDuration > 0) {
             this.shakePower *= 1 - elapsedTimeMillis / this.shakeDuration

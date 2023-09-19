@@ -1,6 +1,7 @@
 import { expose, Point, UpdateData } from "brigsby/dist"
 import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
 import { controls } from "../../core/Controls"
+import { isGamePaused } from "../../core/PauseState"
 import { saveManager } from "../../core/SaveManager"
 import { CutscenePlayerController } from "../../cutscenes/CutscenePlayerController"
 import { TextOverlayManager } from "../../cutscenes/TextOverlayManager"
@@ -44,7 +45,7 @@ export class HostPlayer extends AbstractPlayer {
     }
 
     update(updateData: UpdateData) {
-        if (!this.dude.isAlive) {
+        if (!this.dude.isAlive || isGamePaused()) {
             return
         }
 

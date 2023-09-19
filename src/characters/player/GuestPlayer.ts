@@ -1,6 +1,7 @@
 import { UpdateData } from "brigsby/dist"
 import { ActionSender } from "trystero"
 import { controls } from "../../core/Controls"
+import { isGamePaused } from "../../core/PauseState"
 import { session } from "../../online/session"
 import { AbstractPlayer, PlayerControls } from "./AbstractPlayer"
 import { registerPlayerInstance } from "./index"
@@ -59,6 +60,10 @@ export class GuestPlayer extends AbstractPlayer {
     }
 
     update(updateData: UpdateData): void {
+        if (isGamePaused()) {
+            return
+        }
+
         if (session.isGuest()) {
             // send input to host
             this.sendControls(this.serializeControls())

@@ -1,6 +1,7 @@
 import { Dude } from "../characters/Dude"
 import { DudeFactory } from "../characters/DudeFactory"
 import { player } from "../characters/player/index"
+import { isGamePaused, setGamePaused } from "../core/PauseState"
 import { saveManager } from "../core/SaveManager"
 import { SwampCampGame } from "../core/SwampCampGame"
 import { Save } from "../saves/SaveGame"
@@ -67,6 +68,11 @@ export const hostOnJoin = () => {
     receiveInitWorldAck((_, peerId) => {
         console.log(`received world ack from peer ${peerId}`)
         session.initializedPeers.push(peerId)
+
+        // Since we don't send this every frame, make sure it's synced on join
+        // TODO: Maybe don't actually allow pausing in multiplayer?
+        setGamePaused(isGamePaused())
+
         NotificationDisplay.instance.push({ icon: "personmultiple", text: "someone joined" })
     })
 
