@@ -93,34 +93,31 @@ export class TradeMenu extends PaginatedMenu {
         this.sourceInventory = player().inventory
     }
 
-    buy(items: SalePackage[]) {
+    buy(items: SalePackage[], seller?: Dude) {
         this.open(items, TradeMode.PLAYER_BUYING)
+        this.sourceInventory = seller?.inventory
         return this
     }
 
     private open(items: SalePackage[], tradeMode: TradeMode) {
         requestAnimationFrame(() => {
-            const longestStr = Lists.maxBy(items.map(this.textForSale), (str) => str.length)
+            this.items = items
+            this.tradeMode = tradeMode
+
+            const longestStr = Lists.maxBy(
+                items.map((it) => this.textForSale(it)),
+                (str) => str.length
+            )
             this.dimensions = new Point(
                 Math.max(160, 75 + longestStr.length * TEXT_PIXEL_WIDTH),
                 153
             )
 
             this.isOpen = true
-            this.items = items
-            this.tradeMode = tradeMode
-
             this.coinEntity = new Entity(
                 getGoldCountComponents(this.getTopLeft().plus(this.coinsOffset))
             )
         })
-    }
-
-    /**
-     * Fluent API for opening buy menu
-     */
-    from(dude: Dude) {
-        this.sourceInventory = dude.inventory
     }
 
     private getTopLeft() {
@@ -144,7 +141,7 @@ export class TradeMenu extends PaginatedMenu {
                 return "Inventory full"
             } else if (saveManager.getState().coins < sale.price) {
                 return "Not enough gold"
-            } else if (this.sourceInventory.getItemCount(sale.item) < sale.count) {
+            } else if (this.sourceInventory?.getItemCount(sale.item) < sale.count) {
                 return "Out of stock"
             }
         }
@@ -201,7 +198,7 @@ export class TradeMenu extends PaginatedMenu {
             // trade the item
             if (hovered && controls.isMenuClickDown() && !tradeError) {
                 UISounds.playMoneySound()
-                this.sourceInventory.removeItem(sale.item, sale.count)
+                this.sourceInventory?.removeItem(sale.item, sale.count)
                 if (this.tradeMode === TradeMode.PLAYER_SELLING) {
                     saveManager.setState({
                         coins: saveManager.getState().coins + sale.price,
@@ -217,10 +214,11 @@ export class TradeMenu extends PaginatedMenu {
             }
 
             if (hovered && tradeError) {
-                this.tooltip.say(tradeError)
+                this.tooltip.say(`[${tradeError}]`)
             } else if (hovered) {
-                const totalCount = this.sourceInventory.getItemCount(sale.item)
-                this.tooltip.say(`Click to ${this.tradeMode} ${sale.count}/${totalCount}`)
+                const totalCount = this.sourceInventory?.getItemCount(sale.item)
+                const countText = this.sourceInventory ? ` ${sale.count}/${totalCount}` : ""
+                this.tooltip.say(`[Click to ${this.tradeMode}${countText}]`)
             }
 
             // craftable item
@@ -303,7 +301,8 @@ export class TradeMenu extends PaginatedMenu {
     }
 
     private textForSale(sale: SalePackage) {
-        return `${sale.count}x ${ITEM_METADATA_MAP[sale.item].displayName}`
+        const countPrefix = this.tradeMode === TradeMode.PLAYER_BUYING ? "" : `${sale.count}x `
+        return `${countPrefix}${ITEM_METADATA_MAP[sale.item].displayName}`
     }
 
     selectPage(page: number) {

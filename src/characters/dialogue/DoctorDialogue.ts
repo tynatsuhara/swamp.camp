@@ -4,18 +4,18 @@ import { SalePackage, TradeMenu } from "../../ui/TradeMenu"
 import { LocationType } from "../../world/locations/LocationType"
 import { Dude } from "../Dude"
 import {
-    dialogue,
     DialogueOption,
     DialogueSet,
+    NextDialogue,
+    dialogue,
     dialogueWithOptions,
     getExitText,
-    NextDialogue,
     option,
 } from "./Dialogue"
 
 export const DOCTOR_DIALOGUE_ENTRYPOINT = "doc-start"
 
-const getItemsToBuy = (): SalePackage[] => {
+const getItemsForSale = (): SalePackage[] => {
     return [
         {
             item: Item.WEAK_MEDICINE,
@@ -47,7 +47,7 @@ export const DOCTOR_DIALOGUE: DialogueSet = {
             ["I offer goods and services to keep the town healthy."],
             InteractIndicator.NONE,
             new DialogueOption("What's for sale?", () => {
-                TradeMenu.instance.buy(getItemsToBuy()).from(doctor)
+                TradeMenu.instance.buy(getItemsForSale(), doctor)
                 return new NextDialogue(DOCTOR_DIALOGUE_ENTRYPOINT, false)
             }),
             option(getExitText(), DOCTOR_DIALOGUE_ENTRYPOINT, false)

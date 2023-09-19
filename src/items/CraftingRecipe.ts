@@ -5,7 +5,7 @@ import { ItemStack } from "./Inventory"
 import { Item } from "./Item"
 
 export type CraftingRecipe = {
-    desc: String
+    desc: string // TODO move to Items.ts?
     output: Item
     input: ItemStack[]
 }

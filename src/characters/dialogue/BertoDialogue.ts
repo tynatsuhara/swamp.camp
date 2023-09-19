@@ -138,6 +138,10 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
                 new DialogueOption("What is the kingdom buying?", () => {
                     TradeMenu.instance.sell(getItemsToSell())
                     return new NextDialogue(BERT_ENTRYPOINT, false)
+                }),
+                new DialogueOption("What is the kingdom selling?", () => {
+                    TradeMenu.instance.buy(getItemsForSale())
+                    return new NextDialogue(BERT_ENTRYPOINT, false)
                 })
             )
         }
@@ -390,4 +394,36 @@ const adjustTaxRateDialogue = (): DialogueInstance => {
         InteractIndicator.NONE,
         ...options
     )
+}
+
+const getItemsForSale = (): SalePackage[] => {
+    // TODO: How should we determine when a church can be built?
+    //       Instead of doing it like this, there should be a canBuildChurch
+    //       flag and Berto should deliver an announcement
+
+    // const houses = camp()
+    //     .getElementsOfType(ElementType.HOUSE)
+    //     .flatMap((h) => h.entity.getComponents(Residence))
+
+    // if (houses.length >= 3 && houses.every((h) => h.getResidents().length > 0)) {
+    //     buildings.recipes.push({
+    //         desc: "Church",
+    //         output: Item.CHURCH,
+    //         input: [new ItemStack(Item.ROCK, 5), new ItemStack(Item.WOOD, 5)],
+    //     })
+    // }
+
+    return [
+        {
+            item: Item.MINE_ENTRANCE,
+            count: 1,
+            price: 10,
+        },
+        // TODO: House details (house multiple convicts?) — probably call it "workers' quarters"
+        {
+            item: Item.HOUSE,
+            count: 1,
+            price: 10,
+        },
+    ]
 }
