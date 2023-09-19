@@ -70,15 +70,17 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             goalLocation = this.workLocation ?? camp()
 
             if (this.workRoamingConfig) {
-                roamOptions.goalOptionsSupplier = this.workRoamingConfig.goalOptionsSupplier
-                roamOptions.pauseEveryMillis =
-                    this.workRoamingConfig.pauseEveryMillis ?? roamOptions.pauseEveryMillis
-                roamOptions.pauseForMillis =
-                    this.workRoamingConfig.pauseForMillis ?? roamOptions.pauseForMillis
+                const { goalOptionsSupplier, pauseEveryMillis, pauseForMillis } =
+                    this.workRoamingConfig
 
-                const alreadyAtWorkSpot = this.workRoamingConfig
-                    .goalOptionsSupplier()
-                    .some((spot) => spot.equals(dude.tile))
+                roamOptions.goalOptionsSupplier = goalOptionsSupplier
+                roamOptions.pauseEveryMillis = pauseEveryMillis ?? roamOptions.pauseEveryMillis
+                roamOptions.pauseForMillis = pauseForMillis ?? roamOptions.pauseForMillis
+
+                const alreadyAtWorkSpot =
+                    dude.location === goalLocation &&
+                    (!goalOptionsSupplier ||
+                        goalOptionsSupplier().some((spot) => spot.equals(dude.tile)))
 
                 if (!alreadyAtWorkSpot) {
                     // Go straight to work, no dilly-dallying
@@ -274,6 +276,11 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
                 goalOptionsSupplier: () => tileOptions,
                 pauseEveryMillis: 2_500,
                 pauseForMillis: 30_000,
+            }
+        } else if (dude.type === DudeType.HERALD) {
+            return {
+                pauseEveryMillis: 2_500,
+                pauseForMillis: 15_000,
             }
         }
 
