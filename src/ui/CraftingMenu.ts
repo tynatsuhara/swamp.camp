@@ -269,7 +269,7 @@ export class CraftingMenu extends PaginatedMenu {
                 }
             }
 
-            const prefix = recipe.desc + "\n"
+            const prefix = craftedItem.description + "\n"
             if (hovered && !this.canCraft(player(), recipe)) {
                 if (!player().inventory.canAddItem(recipe.output)) {
                     this.tooltip.say(prefix + "[Inventory full]")

@@ -37,6 +37,7 @@ export type ItemMetadata = Record<string, any>
 
 export class ItemSpec {
     readonly displayName: string
+    readonly description?: string
     readonly displayNameSupplier?: (stack: ItemStack) => string
     readonly droppedIconSupplier?: (metadata?: ItemMetadata) => SpriteSource
     readonly inventoryIcon: Icon
@@ -54,6 +55,7 @@ export class ItemSpec {
     constructor({
         displayName,
         displayNameSupplier,
+        description,
         inventoryIcon,
         droppedIconSupplier = () => null,
         stackLimit = STACK_LG,
@@ -64,6 +66,7 @@ export class ItemSpec {
     }: {
         displayName: string
         displayNameSupplier?: (stack: ItemStack) => string
+        description?: string
         inventoryIcon: Icon
         droppedIconSupplier?: (metadata?: ItemMetadata) => SpriteSource
         stackLimit?: number
@@ -73,6 +76,7 @@ export class ItemSpec {
         consumable?: Consumable
     }) {
         this.displayName = displayName
+        this.description = description
         this.displayNameSupplier = displayNameSupplier
         this.droppedIconSupplier = droppedIconSupplier
         this.inventoryIcon = inventoryIcon
@@ -94,7 +98,7 @@ const SOUNDS: { [key: string]: [string, number] } = {
 }
 loadAudio(Object.values(SOUNDS).map((s) => s[0]))
 
-export const ITEM_METADATA_MAP = {
+export const ITEM_METADATA_MAP: Partial<Record<Item, ItemSpec>> = {
     [Item.COIN]: new ItemSpec({
         displayName: "Coin",
         inventoryIcon: "coin",
@@ -114,6 +118,7 @@ export const ITEM_METADATA_MAP = {
     }),
     [Item.CAMPFIRE]: new ItemSpec({
         displayName: "Campfire",
+        description: "Illuminates an area",
         inventoryIcon: "campfire",
         stackLimit: 1,
         element: ElementType.CAMPFIRE,
@@ -150,12 +155,14 @@ export const ITEM_METADATA_MAP = {
     }),
     [Item.CHEST]: new ItemSpec({
         displayName: "Chest",
+        description: "Stores junk",
         inventoryIcon: "chest",
         stackLimit: 1,
         element: ElementType.CHEST,
     }),
     [Item.BED]: new ItemSpec({
         displayName: "Bed",
+        description: "Snooze to pass time",
         inventoryIcon: "bed",
         stackLimit: 1,
         element: ElementType.BED,
@@ -194,6 +201,7 @@ export const ITEM_METADATA_MAP = {
     }),
     [Item.COOKED_MEAT]: new ItemSpec({
         displayName: "Cooked meat",
+        description: "+2 health",
         inventoryIcon: "meat1",
         consumable: ItemUtils.consumable("eat", SOUNDS.eat, (consumer) => consumer.heal(2)),
     }),
@@ -232,7 +240,8 @@ export const ITEM_METADATA_MAP = {
                 .filtered(getTentVariantImageFilter(metadata.color)),
     }),
     [Item.HOUSE]: new ItemSpec({
-        displayName: "House plan",
+        displayName: "Worker's quarters",
+        description: "Houses one settler", // TODO probably should house more
         inventoryIcon: "house",
         stackLimit: 1,
         element: ElementType.HOUSE,
@@ -262,7 +271,8 @@ export const ITEM_METADATA_MAP = {
         element: ElementType.CHURCH,
     }),
     [Item.MINE_ENTRANCE]: new ItemSpec({
-        displayName: "Mine marker",
+        displayName: "Mineshaft",
+        description: "Entrance to a mine",
         inventoryIcon: "ladder",
         stackLimit: 1,
         element: ElementType.MINE_ENTRANCE,
@@ -271,18 +281,21 @@ export const ITEM_METADATA_MAP = {
     // Weapons
     [Item.AXE]: new ItemSpec({
         displayName: "Axe",
+        description: "Collects extra wood",
         inventoryIcon: "axe",
         stackLimit: 1,
         equippableWeapon: WeaponType.AXE,
     }),
     [Item.PICKAXE]: new ItemSpec({
         displayName: "Pickaxe",
+        description: "Collects extra iron",
         inventoryIcon: "pickaxe",
         stackLimit: 1,
         equippableWeapon: WeaponType.PICKAXE,
     }),
     [Item.SWORD]: new ItemSpec({
         displayName: "Basic sword",
+        description: "Slices and/or dices",
         inventoryIcon: "sword",
         stackLimit: 1,
         equippableWeapon: WeaponType.SWORD,
@@ -311,6 +324,7 @@ export const ITEM_METADATA_MAP = {
             const fuelHours = fuel / TimeUnit.HOUR
             return `Lantern (${fuelHours < 0.7 ? "low fuel" : `~${Math.ceil(fuelHours)}h fuel`})`
         },
+        description: "Portable light source",
         inventoryIcon: "lantern",
         stackLimit: 1,
         equippableShield: ShieldType.LANTERN,

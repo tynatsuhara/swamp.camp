@@ -5,7 +5,6 @@ import { ItemStack } from "./Inventory"
 import { Item } from "./Item"
 
 export type CraftingRecipe = {
-    desc: string // TODO move to Items.ts?
     output: Item
     input: ItemStack[]
 }
@@ -22,7 +21,6 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => {
         name: "Utilities",
         recipes: [
             {
-                desc: "Illuminates an area",
                 output: Item.CAMPFIRE,
                 input: [new ItemStack(Item.ROCK, ROCKS_NEEDED_FOR_CAMPFIRE)],
             },
@@ -35,12 +33,10 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => {
 
     utilities.recipes.push(
         {
-            desc: "Stores junk",
             output: Item.CHEST,
             input: [new ItemStack(Item.WOOD, 10)],
         },
         {
-            desc: "Snooze to pass time",
             output: Item.BED,
             // TODO: This should require something that isn't immediately attainable. Some kind of padding? Wool?
             input: [new ItemStack(Item.WOOD, 10)],
@@ -52,17 +48,14 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => {
         name: "Equipment",
         recipes: [
             {
-                desc: "Collects extra iron",
                 output: Item.PICKAXE,
                 input: [new ItemStack(Item.IRON, 3), new ItemStack(Item.WOOD, 5)],
             },
             {
-                desc: "Collects extra wood",
                 output: Item.AXE,
                 input: [new ItemStack(Item.IRON, 3), new ItemStack(Item.WOOD, 5)],
             },
             {
-                desc: "Slices and/or dices",
                 output: Item.SWORD,
                 input: [new ItemStack(Item.IRON, 3), new ItemStack(Item.WOOD, 5)],
             },
@@ -72,7 +65,6 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => {
             //     input: [new ItemStack(Item.ROCK, 1), new ItemStack(Item.WOOD, 3)],
             // },
             {
-                desc: "Portable light source",
                 output: Item.LANTERN,
                 input: [new ItemStack(Item.IRON, 2)],
             },
@@ -89,13 +81,11 @@ export const getBertoRecipes = (): CraftingRecipeCategory[] => {
         name: "Blueprints",
         recipes: [
             {
-                desc: "Houses one settler",
                 output: Item.MINE_ENTRANCE,
                 input: [new ItemStack(Item.ROCK, 5), new ItemStack(Item.WOOD, 5)],
             },
             // TODO: House details (house multiple convicts?) — probably call it "workers' quarters"
             {
-                desc: "Houses one settler", // TODO probably should house more
                 output: Item.HOUSE,
                 input: [new ItemStack(Item.ROCK, 5), new ItemStack(Item.WOOD, 5)],
             },
@@ -128,7 +118,6 @@ export const getCookingRecipes = (): CraftingRecipeCategory[] => {
             name: "Foodstuffs",
             recipes: [
                 {
-                    desc: "+2 health",
                     output: Item.COOKED_MEAT,
                     input: [new ItemStack(Item.RAW_MEAT, 1)],
                 },

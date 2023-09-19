@@ -139,7 +139,7 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
                     TradeMenu.instance.sell(getItemsToSell())
                     return new NextDialogue(BERT_ENTRYPOINT, false)
                 }),
-                new DialogueOption("What is the kingdom selling?", () => {
+                new DialogueOption("What zoning plans do you have?", () => {
                     TradeMenu.instance.buy(getItemsForSale())
                     return new NextDialogue(BERT_ENTRYPOINT, false)
                 })
