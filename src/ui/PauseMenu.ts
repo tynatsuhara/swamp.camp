@@ -57,8 +57,10 @@ export class PauseMenu extends Component {
         }
     }
 
-    close() {
-        setGamePaused(false)
+    close(unpause = true) {
+        if (unpause) {
+            setGamePaused(false)
+        }
 
         this.isOpen = false
         this.displayEntity = null
@@ -85,7 +87,7 @@ export class PauseMenu extends Component {
                 this.getOnlineOption(tooltip),
                 {
                     text: "CONTROLS",
-                    fn: () => this.showControls(),
+                    fn: () => this.showControls(dimensions),
                 },
                 {
                     text: "OPTIONS",
@@ -181,7 +183,7 @@ export class PauseMenu extends Component {
         this.displayEntity.addComponent(tooltip)
     }
 
-    private showControls() {
+    private showControls(dimensions: Point) {
         const controlsUI = new ControlsUI(TextOverlayManager.VERTICAL_MARGIN)
 
         TextOverlayManager.instance.open({
@@ -189,9 +191,10 @@ export class PauseMenu extends Component {
             finishAction: "COOL",
             additionalComponents: () => [controlsUI],
             pauseBackground: false,
+            onFinish: () => this.render(dimensions),
         })
 
-        this.close()
+        this.close(false)
     }
 
     private getFullScreenOption(): PauseOption {
