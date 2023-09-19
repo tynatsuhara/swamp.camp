@@ -1,7 +1,8 @@
 import { Point, UpdateData } from "brigsby/dist"
 import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { RepeatedInvoker } from "brigsby/dist/util/RepeatedInvoker"
-import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
+import { isGamePaused } from "../../core/PauseState"
+import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
 import { Item } from "../../items/Item"
 import { LightManager } from "../../world/LightManager"
 import { Shield } from "./Shield"
@@ -12,7 +13,7 @@ import { ShieldType } from "./ShieldType"
  */
 export class Lantern extends Shield {
     static readonly DIAMETER = 100
-    private repeatedInvoker = new RepeatedInvoker(() => this.burn(500), 0)
+    private repeatedInvoker = new RepeatedInvoker(() => this.burn(500), 0, isGamePaused)
 
     private onSprite: StaticSpriteSource
     private offSprite: StaticSpriteSource

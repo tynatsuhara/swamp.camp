@@ -6,6 +6,7 @@ import { Dude } from "../../characters/Dude"
 import { DudeAnimationUtils } from "../../characters/DudeAnimationUtils"
 import { DudeType } from "../../characters/DudeType"
 import { NPC } from "../../characters/NPC"
+import { isGamePaused } from "../../core/PauseState"
 import { Particles } from "../../graphics/particles/Particles"
 import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
 import { Color } from "../../ui/Color"
@@ -112,39 +113,49 @@ export class Queequeg extends Simulatable {
 
         // Make the ship bob up and down
         this.entity.addComponent(
-            new RepeatedInvoker((_, index) => {
-                this.position = this.collider
-                    .moveTo(this.position.plus(this.colliderOffset).plusY(index % 2 === 0 ? 1 : -1))
-                    .minus(this.colliderOffset)
-                return Math.random() * 400 + 600
-            })
+            new RepeatedInvoker(
+                (_, index) => {
+                    this.position = this.collider
+                        .moveTo(
+                            this.position.plus(this.colliderOffset).plusY(index % 2 === 0 ? 1 : -1)
+                        )
+                        .minus(this.colliderOffset)
+                    return Math.random() * 400 + 600
+                },
+                0,
+                isGamePaused
+            )
         )
 
         // Add water particles
         this.entity.addComponent(
-            new RepeatedInvoker(() => {
-                for (let i = 0; i < 10; i++) {
-                    const size = Math.ceil(Math.random() * 3)
-                    Particles.instance.emitParticle(
-                        Lists.oneOf([Color.WHITE, Color.BLUE_6]),
-                        this.position.plus(
-                            Lists.oneOf([
-                                pt(35 + Math.random() * 10, 35),
-                                pt(45 + Math.random() * 10, 36),
-                                pt(55 + Math.random() * 10, 38),
-                                pt(65 + Math.random() * 10, 40),
-                                pt(75 + Math.random() * 10, 41),
-                                pt(85 + Math.random() * 10, 41),
-                            ])
-                        ),
-                        this.depth + 5,
-                        400,
-                        () => Point.ZERO,
-                        pt(size, size)
-                    )
-                }
-                return 150
-            })
+            new RepeatedInvoker(
+                () => {
+                    for (let i = 0; i < 10; i++) {
+                        const size = Math.ceil(Math.random() * 3)
+                        Particles.instance.emitParticle(
+                            Lists.oneOf([Color.WHITE, Color.BLUE_6]),
+                            this.position.plus(
+                                Lists.oneOf([
+                                    pt(35 + Math.random() * 10, 35),
+                                    pt(45 + Math.random() * 10, 36),
+                                    pt(55 + Math.random() * 10, 38),
+                                    pt(65 + Math.random() * 10, 40),
+                                    pt(75 + Math.random() * 10, 41),
+                                    pt(85 + Math.random() * 10, 41),
+                                ])
+                            ),
+                            this.depth + 5,
+                            400,
+                            () => Point.ZERO,
+                            pt(size, size)
+                        )
+                    }
+                    return 150
+                },
+                0,
+                isGamePaused
+            )
         )
     }
 

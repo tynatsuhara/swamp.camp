@@ -1480,18 +1480,22 @@ export class Dude extends Component implements DialogueSource {
         }
 
         const invoker = this.entity.addComponent(
-            new RepeatedInvoker(() => {
-                if (!this.isAlive) {
-                    // don't delete the interval because it's possible they'll be revived
-                    return 0
-                }
-                const result = fn()
-                if (result <= 0) {
-                    invoker.delete()
-                    return 0
-                }
-                return result
-            }, initialDelay)
+            new RepeatedInvoker(
+                () => {
+                    if (!this.isAlive) {
+                        // don't delete the interval because it's possible they'll be revived
+                        return 0
+                    }
+                    const result = fn()
+                    if (result <= 0) {
+                        invoker.delete()
+                        return 0
+                    }
+                    return result
+                },
+                initialDelay,
+                isGamePaused
+            )
         )
     }
 

@@ -112,20 +112,24 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
     )
 
     e.addComponent(
-        new RepeatedInvoker(() => {
-            for (let i = 0; i < 5; i++) {
-                const size = Math.floor(Math.random() * 3)
-                Particles.instance.emitParticle(
-                    Color.WHITE,
-                    particlePosSupplier(size),
-                    GroundRenderer.DEPTH - 1,
-                    SPLASH_PARTICLE_LIFETIME,
-                    particleDirection,
-                    pt(size, size)
-                )
-            }
-            return SPLASH_PARTICLE_FREQUENCY
-        })
+        new RepeatedInvoker(
+            () => {
+                for (let i = 0; i < 5; i++) {
+                    const size = Math.floor(Math.random() * 3)
+                    Particles.instance.emitParticle(
+                        Color.WHITE,
+                        particlePosSupplier(size),
+                        GroundRenderer.DEPTH - 1,
+                        SPLASH_PARTICLE_LIFETIME,
+                        particleDirection,
+                        pt(size, size)
+                    )
+                }
+                return SPLASH_PARTICLE_FREQUENCY
+            },
+            0,
+            isGamePaused
+        )
     )
 
     e.addComponent(new Waterfall(pushDirection))

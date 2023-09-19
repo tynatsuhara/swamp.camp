@@ -3,6 +3,7 @@ import { Lists, RepeatedInvoker } from "brigsby/dist/util"
 import { Dude } from "../characters/Dude"
 import { player } from "../characters/player"
 import { controls } from "../core/Controls"
+import { isGamePaused } from "../core/PauseState"
 import { GroundType } from "../world/ground/Ground"
 import { here } from "../world/locations/LocationManager"
 import { Sounds } from "./Sounds"
@@ -35,17 +36,26 @@ export class StepSounds {
             ])
             .then(() =>
                 dude.entity.addComponent(
-                    new RepeatedInvoker(() => {
-                        if (player()) {
-                            if (dude?.isAlive && dude.isMoving && !dude.rolling && !dude.jumping) {
-                                const [sound, volume] = StepSounds.getSound(dude)
-                                if (!!sound) {
-                                    Sounds.playAtPoint(sound, volume, dude.standingPosition)
+                    new RepeatedInvoker(
+                        () => {
+                            if (player()) {
+                                if (
+                                    dude?.isAlive &&
+                                    dude.isMoving &&
+                                    !dude.rolling &&
+                                    !dude.jumping
+                                ) {
+                                    const [sound, volume] = StepSounds.getSound(dude)
+                                    if (!!sound) {
+                                        Sounds.playAtPoint(sound, volume, dude.standingPosition)
+                                    }
                                 }
                             }
-                        }
-                        return StepSounds.SPEED
-                    })
+                            return StepSounds.SPEED
+                        },
+                        0,
+                        isGamePaused
+                    )
                 )
             )
     }

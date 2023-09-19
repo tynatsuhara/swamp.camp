@@ -1,5 +1,6 @@
 import { AnonymousComponent, Entity, Point, pt } from "brigsby/dist"
 import { Lists, RepeatedInvoker } from "brigsby/dist/util"
+import { isGamePaused } from "../../core/PauseState"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Particles } from "../../graphics/particles/Particles"
 import { Color } from "../../ui/Color"
@@ -53,7 +54,7 @@ export class MineExitFactory extends ElementFactory<ElementType.MINE_EXIT> {
                         return (500 + Math.random() * 500) / particleCountMultiplier
                     }
 
-                    e.addComponent(new RepeatedInvoker(() => spawnParticle()))
+                    e.addComponent(new RepeatedInvoker(() => spawnParticle(), 0, isGamePaused))
                 },
                 update: () => {
                     if (WorldTime.instance.time > spawnParticlesAtTime) {
