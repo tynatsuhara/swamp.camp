@@ -8,6 +8,7 @@ import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
 import { Color } from "../ui/Color"
 import { TEXT_PIXEL_WIDTH, TextAlign, formatText } from "../ui/Text"
 import { TextTyper } from "../ui/TextTyper"
+import { UISounds } from "../ui/UISounds"
 
 export class TextOverlayManager extends Component {
     static get instance() {
@@ -84,10 +85,13 @@ export class TextOverlayManager extends Component {
             return
         }
 
-        this.text[this.index].update(
-            !this.firstFrame && controls.isMenuClickDown(),
-            updateData.elapsedTimeMillis
-        )
+        const click = !this.firstFrame && controls.isMenuClickDown()
+
+        if (click) {
+            UISounds.playClickSound()
+        }
+
+        this.text[this.index].update(click, updateData.elapsedTimeMillis)
         const typedText = this.text[this.index]?.getText() ?? ""
 
         this.firstFrame = false
