@@ -7,6 +7,7 @@ import { TextOverlayManager } from "../../cutscenes/TextOverlayManager"
 import { Item } from "../../items/Item"
 import { NotificationDisplay } from "../../ui/NotificationDisplay"
 import { TextAlign } from "../../ui/Text"
+import { setGameTimeout } from "../../world/events/setGameTimeout"
 import { Location } from "../../world/locations/Location"
 import { LocationFactory } from "../../world/locations/LocationFactory"
 import { camp, here, LocationManager } from "../../world/locations/LocationManager"
@@ -96,7 +97,7 @@ export class HostPlayer extends AbstractPlayer {
                         WorldTime.instance.fastForward(TimeUnit.HOUR)
                         CutscenePlayerController.instance.enable()
                         CutscenePlayerController.instance.startMoving(Point.ZERO.minus(position))
-                        setTimeout(() => CutscenePlayerController.instance.disable(), 1_250)
+                        setGameTimeout(() => CutscenePlayerController.instance.disable(), 1_250)
                         resolve()
                     })
                 })

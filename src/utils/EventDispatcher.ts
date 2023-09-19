@@ -19,7 +19,6 @@ export class EventDispatcher {
     }
 
     dispatch(id: string, data?: any) {
-        console.log(`dispatching ${id}`)
         document.dispatchEvent(new CustomEvent(ID_PREFIX + id, { detail: data }))
     }
 

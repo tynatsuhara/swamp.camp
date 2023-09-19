@@ -10,6 +10,7 @@ import { Particles } from "../../graphics/particles/Particles"
 import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
 import { Color } from "../../ui/Color"
 import { HUD } from "../../ui/HUD"
+import { setGameTimeout } from "../events/setGameTimeout"
 import { Location } from "../locations/Location"
 import { Simulatable } from "../Simulatable"
 import { ElementComponent } from "./ElementComponent"
@@ -208,12 +209,12 @@ export class Queequeg extends Simulatable {
 
     arrive() {
         this.docked = true
-        setTimeout(() => HUD.instance.miniMap.refresh(), 5_000)
+        setGameTimeout(() => HUD.instance.miniMap.refresh(), 5_000)
     }
 
     depart() {
         this.docked = false
-        setTimeout(() => HUD.instance.miniMap.refresh(), 5_000)
+        setGameTimeout(() => HUD.instance.miniMap.refresh(), 5_000)
     }
 
     simulate(duration: number): void {

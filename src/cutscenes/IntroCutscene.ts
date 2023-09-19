@@ -11,6 +11,7 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { ControlsUI } from "../ui/ControlsUI"
 import { HUD } from "../ui/HUD"
 import { Queequeg } from "../world/elements/Queequeg"
+import { setGameTimeout } from "../world/events/setGameTimeout"
 import { camp, here } from "../world/locations/LocationManager"
 import { Camera } from "./Camera"
 import { CutsceneManager } from "./CutsceneManager"
@@ -129,19 +130,19 @@ ANOTHER thing - Only one of the explorers returned, and they reported that their
 
         Queequeg.instance.pushPassenger(player())
 
-        setTimeout(() => {
+        setGameTimeout(() => {
             Queequeg.instance.arrive()
         }, this.START_WALKING_IN)
 
-        setTimeout(() => {
+        setGameTimeout(() => {
             Camera.instance.focusOnPoint(this.dip.standingPosition)
         }, this.PAN_TO_DIP)
 
-        setTimeout(() => {
+        setGameTimeout(() => {
             Queequeg.instance.removePassenger(player())
         }, this.GET_OFF_SHIP)
 
-        setTimeout(() => {
+        setGameTimeout(() => {
             this.dip.dialogue = DIP_STARTING_DIALOGUE
             CutscenePlayerController.instance.disable()
             Camera.instance.focusOnDude(player())

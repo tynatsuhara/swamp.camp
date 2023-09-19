@@ -3,6 +3,7 @@ import { SpriteTransform } from "brigsby/dist/sprites"
 import { Animator } from "brigsby/dist/util"
 import { Dude } from "../../characters/Dude"
 import { isGamePaused } from "../../core/PauseState"
+import { setGameTimeout } from "../events/setGameTimeout"
 
 export class Hittable extends Component {
     extraRange = 0
@@ -50,7 +51,7 @@ export class Hittable extends Component {
             isGamePaused
         )
 
-        setTimeout(() => this.onHit(dir, dude), 150)
+        setGameTimeout(() => this.onHit(dir, dude), 150)
     }
 
     isBeingHit() {

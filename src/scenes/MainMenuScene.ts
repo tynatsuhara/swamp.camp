@@ -9,6 +9,7 @@ import { Music } from "../audio/Music"
 import { DudeAnimationUtils } from "../characters/DudeAnimationUtils"
 import { resetPlayerInstances } from "../characters/player"
 import { controls } from "../core/Controls"
+import { setGamePaused } from "../core/PauseState"
 import { saveManager } from "../core/SaveManager"
 import { Singletons } from "../core/Singletons"
 import { SwampCampGame, ZOOM } from "../core/SwampCampGame"
@@ -95,9 +96,10 @@ export class MainMenuScene extends Scene {
 
         resetPlayerInstances()
 
-        // TODO: this isn't fully effective
         Music.stop()
         Ambiance.stop()
+
+        setGamePaused(false)
 
         this.plumes = new PlumePicker(
             this.getMenuTop(),

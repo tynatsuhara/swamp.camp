@@ -1,5 +1,6 @@
 import { Point } from "brigsby/dist/Point"
 import { session } from "../../online/session"
+import { setGameTimeout } from "../../world/events/setGameTimeout"
 import { Condition } from "../Condition"
 import { DudeType } from "../DudeType"
 import { Weapon } from "./Weapon"
@@ -66,7 +67,7 @@ export class UnarmedWeapon extends Weapon {
             conditionDuration: 5_000 + Math.random() * 5_000,
         })
 
-        setTimeout(() => (this.state = State.DRAWN), this.getMillisBetweenAttacks())
+        setGameTimeout(() => (this.state = State.DRAWN), this.getMillisBetweenAttacks())
     }
 
     getMillisBetweenAttacks(): number {

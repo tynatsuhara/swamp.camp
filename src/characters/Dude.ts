@@ -40,6 +40,7 @@ import { Campfire } from "../world/elements/Campfire"
 import { ElementType } from "../world/elements/ElementType"
 import { Interactable } from "../world/elements/Interactable"
 import { Pushable } from "../world/elements/Pushable"
+import { setGameTimeout } from "../world/events/setGameTimeout"
 import { Ground } from "../world/ground/Ground"
 import { LightManager } from "../world/LightManager"
 import { Location } from "../world/locations/Location"
@@ -925,7 +926,7 @@ export class Dude extends Component implements DialogueSource {
                 const velocity = direction
                     .normalizedOrZero()
                     .plus(new Point(Math.random() - 0.5, Math.random() - 0.5).times(randomness))
-                setTimeout(
+                setGameTimeout(
                     () =>
                         spawnItem({
                             pos: this.standingPosition.minus(new Point(0, 2)),
@@ -939,7 +940,7 @@ export class Dude extends Component implements DialogueSource {
         }
 
         // remove the body
-        setTimeout(() => {
+        setGameTimeout(() => {
             if (this.type !== DudeType.PLAYER) {
                 this.dissolveLocal()
                 this.collider.enabled = false
@@ -958,7 +959,7 @@ export class Dude extends Component implements DialogueSource {
         // MPTODO multiplayer death logic
         if (this.type === DudeType.PLAYER) {
             if (CutsceneManager.instance.isCutsceneActive(IntroCutscene)) {
-                setTimeout(() => {
+                setGameTimeout(() => {
                     this.revive()
                     this.addCondition(Condition.HEALING, 10_000)
                 }, 1000 + Math.random() * 1000)
@@ -1343,11 +1344,11 @@ export class Dude extends Component implements DialogueSource {
         this.doRollAnimation()
         this.accelerateConditionExpiration(Condition.ON_FIRE, 500)
         for (let i = 0; i < 3; i++) {
-            setTimeout(() => {
+            setGameTimeout(() => {
                 StepSounds.singleFootstepSound(this, 2)
             }, i * 150)
         }
-        setTimeout(() => (this.canJumpOrRoll = true), 750)
+        setGameTimeout(() => (this.canJumpOrRoll = true), 750)
     }
 
     get rolling() {
@@ -1418,7 +1419,7 @@ export class Dude extends Component implements DialogueSource {
         }
         this.canJumpOrRoll = false
         this.doJumpAnimation()
-        setTimeout(() => (this.canJumpOrRoll = true), 750)
+        setGameTimeout(() => (this.canJumpOrRoll = true), 750)
     }
 
     get jumping() {

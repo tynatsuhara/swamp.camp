@@ -1,6 +1,6 @@
 import { Component, Point } from "brigsby/dist"
-import { BoxCollider, Collider } from "brigsby/dist/collision"
 import { PointValue, pt } from "brigsby/dist/Point"
+import { BoxCollider, Collider } from "brigsby/dist/collision"
 import { SpriteComponent } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
 import { loadAudio } from "../audio/DeferLoadAudio"
@@ -8,9 +8,10 @@ import { Sounds } from "../audio/Sounds"
 import { Dude } from "../characters/Dude"
 import { session } from "../online/session"
 import { syncFn } from "../online/syncUtils"
+import { setGameTimeout } from "../world/events/setGameTimeout"
 import { here } from "../world/locations/LocationManager"
 import { Item } from "./Item"
-import { ItemMetadata, ITEM_METADATA_MAP } from "./Items"
+import { ITEM_METADATA_MAP, ItemMetadata } from "./Items"
 
 // TODO: Find a better sound effect (this one isn't very audible)
 const PICK_UP_SOUNDS = loadAudio(
@@ -110,14 +111,14 @@ export class DroppedItem extends Component {
 
                 if (colliding && this.canPickUp) {
                     this.canPickUp = false
-                    setTimeout(() => {
+                    setGameTimeout(() => {
                         if (dude.isAlive && !!this.entity) {
                             if (dude.inventory.canAddItem(this.itemType, 1)) {
                                 if (session.isHost()) {
                                     dude.inventory.addItem(this.itemType, 1, metadata)
                                 }
                                 here().removeDroppedItem(this)
-                                setTimeout(() => {
+                                setGameTimeout(() => {
                                     Sounds.playAtPoint(
                                         Lists.oneOf(PICK_UP_SOUNDS),
                                         0.15,

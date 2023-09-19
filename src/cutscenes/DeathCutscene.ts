@@ -11,6 +11,7 @@ import { TextAlign } from "../ui/Text"
 import { DarknessMask } from "../world/DarknessMask"
 import { TimeUnit } from "../world/TimeUnit"
 import { WorldTime } from "../world/WorldTime"
+import { setGameTimeout } from "../world/events/setGameTimeout"
 import { Ground } from "../world/ground/Ground"
 import { camp, here } from "../world/locations/LocationManager"
 import { Camera } from "./Camera"
@@ -40,7 +41,7 @@ export class DeathCutscene extends Component {
 
         const button = Lists.oneOf(["WALK IT OFF", "GET UP", "OW!"])
 
-        setTimeout(() => {
+        setGameTimeout(() => {
             HUD.instance.locationTransition.transition({
                 transitionCallback: () => {
                     // While the text overlay is active, the location transition will pause
@@ -98,7 +99,7 @@ Your work here is not yet done.`,
                     p.moveTo(newSpot.times(TILE_SIZE), true)
                 }
 
-                setTimeout(() => p.revive(), 850)
+                setGameTimeout(() => p.revive(), 850)
             })
 
         Camera.instance.jumpCutToFocalPoint()
@@ -120,6 +121,6 @@ Your work here is not yet done.`,
 
         CutsceneManager.instance.finishCutscene()
 
-        setTimeout(() => saveManager.autosave(), 1500)
+        setGameTimeout(() => saveManager.autosave(), 1500)
     }
 }

@@ -10,6 +10,7 @@ import { tilesAround } from "../utils/misc"
 import { DarknessMask } from "../world/DarknessMask"
 import { EventQueue } from "../world/events/EventQueue"
 import { QueuedEventType } from "../world/events/QueuedEvent"
+import { setGameTimeout } from "../world/events/setGameTimeout"
 import { Ground } from "../world/ground/Ground"
 import { LightManager } from "../world/LightManager"
 import { EAST_COAST_OCEAN_WIDTH } from "../world/locations/CampLocationGenerator"
@@ -180,7 +181,7 @@ export class DudeSpawner extends Component {
 
         const orcs = [...leaders, ...followers]
 
-        setTimeout(
+        setGameTimeout(
             () =>
                 NotificationDisplay.instance.push({
                     text: "Orc siege!",

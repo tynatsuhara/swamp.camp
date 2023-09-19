@@ -5,6 +5,7 @@ import { isGamePaused } from "../../core/PauseState"
 import { Tilesets } from "../../graphics/Tilesets"
 import { Item } from "../../items/Item"
 import { session } from "../../online/session"
+import { setGameTimeout } from "../../world/events/setGameTimeout"
 import { spawnThrownProjectile } from "./ThrownProjectile"
 import { HAND_POSITION_OFFSET, Weapon } from "./Weapon"
 import { WeaponSpriteCache } from "./WeaponSpriteCache"
@@ -171,7 +172,7 @@ export class SpearWeapon extends Weapon {
             )
         } else {
             this.state = State.ATTACKING
-            setTimeout(() => this.damageEnemies(), 100)
+            setGameTimeout(() => this.damageEnemies(), 100)
             this.playAttackAnimation()
         }
 

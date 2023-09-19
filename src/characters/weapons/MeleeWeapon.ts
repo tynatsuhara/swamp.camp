@@ -3,6 +3,7 @@ import { ImageFilter } from "brigsby/dist/sprites"
 import { controls } from "../../core/Controls"
 import { Tilesets } from "../../graphics/Tilesets"
 import { session } from "../../online/session"
+import { setGameTimeout } from "../../world/events/setGameTimeout"
 import { Dude } from "../Dude"
 import { player } from "../player/index"
 import { BasicAttackAnimation } from "./animations/BasicAttackAnimation"
@@ -100,7 +101,7 @@ export class MeleeWeapon extends Weapon {
             this.attackAnim = new BasicAttackAnimation(this.animationArgs, onFinish)
             this.state = State.ATTACKING
             // TODO trigger from animation
-            setTimeout(() => this.damageEnemies(), 100 / this.spec.speed)
+            setGameTimeout(() => this.damageEnemies(), 100 / this.spec.speed)
         }
     }
 
@@ -134,7 +135,7 @@ export class MeleeWeapon extends Weapon {
         const hitResource = enemies.length === 0 && Weapon.hitResources(this.dude)
 
         if (this.dude === player() && (enemies.length > 0 || hitResource)) {
-            setTimeout(() => {
+            setGameTimeout(() => {
                 controls.vibrate({
                     duration: 70,
                     strongMagnitude: 0.5,
