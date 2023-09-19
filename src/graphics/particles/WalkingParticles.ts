@@ -2,7 +2,7 @@ import { Component, Point, UpdateData } from "brigsby/dist"
 import { Dude } from "../../characters/Dude"
 import { DudeType } from "../../characters/DudeType"
 import { Color } from "../../ui/Color"
-import { WorldTime } from "../../world/WorldTime"
+import { now } from "../../world/WorldTime"
 import { Ground } from "../../world/ground/Ground"
 import { GroundRenderer } from "../../world/ground/GroundRenderer"
 import { here } from "../../world/locations/LocationManager"
@@ -73,7 +73,7 @@ export class WalkingParticles extends Component {
         if (
             !noBleed &&
             this.dude.health < this.dude.maxHealth &&
-            this.dude.lastDamageTime > WorldTime.instance.time - 10_000 &&
+            this.dude.lastDamageTime > now() - 10_000 &&
             Math.random() < BLOOD_PROBABILITY &&
             Math.random() > this.dude.health / this.dude.maxHealth
         ) {

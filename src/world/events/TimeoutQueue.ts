@@ -1,7 +1,7 @@
 import { BinaryHeap } from "brigsby/dist/util"
 import { Singletons } from "../../core/Singletons"
 import { EventDispatcher } from "../../utils/EventDispatcher"
-import { WorldTime } from "../WorldTime"
+import { now } from "../WorldTime"
 
 /**
  * This class handles events as a drop-in replacement for setTimeout (setGameTimeout).
@@ -19,7 +19,7 @@ export class TimeoutQueue {
             "gametimeout",
             ({ fn, delay }: { fn: () => void; delay: number }) => {
                 this.addEvent({
-                    time: WorldTime.instance.time + delay,
+                    time: now() + delay,
                     fn,
                 })
             }

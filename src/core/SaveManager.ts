@@ -8,7 +8,7 @@ import { Save, SaveState } from "../saves/SaveGame"
 import { newUUID } from "../saves/uuid"
 import { PlumePicker } from "../ui/PlumePicker"
 import { UIStateManager } from "../ui/UIStateManager"
-import { WorldTime } from "../world/WorldTime"
+import { WorldTime, now } from "../world/WorldTime"
 import { EventQueue } from "../world/events/EventQueue"
 import { LocationManager, here } from "../world/locations/LocationManager"
 import { Singletons } from "./Singletons"
@@ -115,7 +115,7 @@ class SaveManager {
             version: CURRENT_SAVE_FORMAT_VERSION,
             timeSaved: Date.now(),
             locations: LocationManager.instance.save(context),
-            worldTime: WorldTime.instance.time,
+            worldTime: now(),
             eventQueue: EventQueue.instance.save(),
             state: {
                 ...this.state,

@@ -8,7 +8,7 @@ import { PlaceElementDisplay } from "../../ui/PlaceElementDisplay"
 import { UIStateManager } from "../../ui/UIStateManager"
 import { Interactable } from "../../world/elements/Interactable"
 import { here } from "../../world/locations/LocationManager"
-import { WorldTime } from "../../world/WorldTime"
+import { now } from "../../world/WorldTime"
 import { Dude } from "../Dude"
 import { HAND_POSITION_OFFSET } from "../weapons/Weapon"
 import { player } from "./index"
@@ -156,14 +156,13 @@ export abstract class AbstractPlayer extends Component {
             d.knockback(d.standingPosition.minus(this.dude.standingPosition), 10)
         )
 
-        const now = WorldTime.instance.time
-        if (dudesToPush.length === 0 && this.pushingUntil < now) {
+        if (dudesToPush.length === 0 && this.pushingUntil < now()) {
             return 1
         }
 
         if (dudesToPush.length > 0) {
             const pushingDuration = 100 // we need to cache this since they won't be colliding every frame
-            this.pushingUntil = Math.max(this.pushingUntil, now + pushingDuration)
+            this.pushingUntil = Math.max(this.pushingUntil, now() + pushingDuration)
         }
 
         return 0.45

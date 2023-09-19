@@ -64,7 +64,7 @@ export class WorldTime extends Component {
         return Math.floor(this.time / TimeUnit.DAY) * TimeUnit.DAY + TimeUnit.DAY + timeOfDay
     }
 
-    static clockTime(time: number = WorldTime.instance.time) {
+    static clockTime(time: number = now()) {
         const hour = Math.floor((time % TimeUnit.DAY) / TimeUnit.HOUR)
         const minute = Math.floor((time % TimeUnit.HOUR) / TimeUnit.MINUTE)
         return `${hour == 0 ? 12 : hour > 12 ? hour - 12 : hour}:${
@@ -72,3 +72,8 @@ export class WorldTime extends Component {
         }${minute} ${hour < 12 ? "AM" : "PM"}`
     }
 }
+
+/**
+ * @returns the current game time, in milliseconds
+ */
+export const now = () => WorldTime.instance.time

@@ -50,7 +50,7 @@ import { LightManager } from "../world/LightManager"
 import { Location } from "../world/locations/Location"
 import { camp, here } from "../world/locations/LocationManager"
 import { Residence } from "../world/residences/Residence"
-import { WorldTime } from "../world/WorldTime"
+import { now } from "../world/WorldTime"
 import { ActiveCondition, Condition } from "./Condition"
 import { DialogueSource, EMPTY_DIALOGUE, getDialogue } from "./dialogue/Dialogue"
 import { DIP_ENTRYPOINT } from "./dialogue/DipDialogue"
@@ -549,7 +549,7 @@ export class Dude extends Component implements DialogueSource {
         }
 
         // Slow auto-healing out of combat
-        if (session.isHost() && WorldTime.instance.time - this.lastDamageTime > 20_000) {
+        if (session.isHost() && now() - this.lastDamageTime > 20_000) {
             this.heal(elapsedTimeMillis / 30_000)
         }
     }
@@ -621,7 +621,7 @@ export class Dude extends Component implements DialogueSource {
      * @param duration if zero, unlimited duration
      */
     addCondition(condition: Condition, duration?: number) {
-        const expiration = duration ? WorldTime.instance.time + duration : undefined
+        const expiration = duration ? now() + duration : undefined
         const existing = this.conditions.find((c) => c.condition === condition)
         if (existing) {
             if (!duration) {
@@ -673,10 +673,10 @@ export class Dude extends Component implements DialogueSource {
         }
 
         this.conditions.forEach((c) => {
-            const timeSinceLastExec = WorldTime.instance.time - c.lastExec
+            const timeSinceLastExec = now() - c.lastExec
 
             if (session.isHost()) {
-                if (c.expiration < WorldTime.instance.time || !this.isAlive) {
+                if (c.expiration < now() || !this.isAlive) {
                     this.removeCondition(c.condition)
                     if (!this.isAlive) {
                         console.log(`removing ${c.condition} because ded`)
@@ -709,7 +709,7 @@ export class Dude extends Component implements DialogueSource {
                             blockable: false,
                             dodgeable: false,
                         })
-                        c.lastExec = WorldTime.instance.time
+                        c.lastExec = now()
                     }
                     return
                 case Condition.POISONED:
@@ -731,7 +731,7 @@ export class Dude extends Component implements DialogueSource {
                             blockable: false,
                             dodgeable: false,
                         })
-                        c.lastExec = WorldTime.instance.time
+                        c.lastExec = now()
                     }
                     return
                 case Condition.BLACK_LUNG:
@@ -870,10 +870,10 @@ export class Dude extends Component implements DialogueSource {
 
         if (attacker) {
             this.lastAttacker = attacker
-            this.lastAttackerTime = WorldTime.instance.time
+            this.lastAttackerTime = now()
         }
 
-        this.syncData.ld = WorldTime.instance.time
+        this.syncData.ld = now()
     }
 
     lastAttacker: Dude
@@ -1037,10 +1037,9 @@ export class Dude extends Component implements DialogueSource {
         const distToStop = 2
         let intervalsRemaining = 50
 
-        let last = WorldTime.instance.time
+        let last = now()
         const knock = () => {
-            const now = WorldTime.instance.time
-            const diff = now - last
+            const diff = now() - last
             if (diff > 0) {
                 this.moveTo(this.standingPosition.lerp((0.15 * diff) / 30, goal))
             }
@@ -1053,7 +1052,7 @@ export class Dude extends Component implements DialogueSource {
             } else {
                 this.knockIntervalCallback = requestGameAnimationFrame(knock)
             }
-            last = now
+            last = now()
         }
         this.knockIntervalCallback = requestGameAnimationFrame(knock)
     }
@@ -1690,7 +1689,7 @@ export class Dude extends Component implements DialogueSource {
 
         // if (
         //     this.factions.includes(DudeFaction.VILLAGERS) &&
-        //     WorldTime.instance.time < this.lastAttackerTime + 10_000
+        //     now() < this.lastAttackerTime + 10_000
         // ) {
         //     indicator = DudeInteractIndicator.IMPORTANT_DIALOGUE
         // }

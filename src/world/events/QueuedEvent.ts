@@ -7,7 +7,7 @@ import { NotificationDisplay, Notifications } from "../../ui/NotificationDisplay
 import { Queequeg } from "../elements/Queequeg"
 import { camp, LocationManager } from "../locations/LocationManager"
 import { Day, TimeUnit } from "../TimeUnit"
-import { WorldTime } from "../WorldTime"
+import { now, WorldTime } from "../WorldTime"
 import { doDailyEvents, doDailyMorningEvents } from "./DailyEvents"
 import { EventQueue } from "./EventQueue"
 
@@ -34,7 +34,7 @@ export const getEventQueueHandlers = (): {
 
         EventQueue.instance.addEvent({
             type: QueuedEventType.SIMULATE_NPCS,
-            time: WorldTime.instance.time + NPC.SCHEDULE_FREQUENCY,
+            time: now() + NPC.SCHEDULE_FREQUENCY,
         })
     },
 

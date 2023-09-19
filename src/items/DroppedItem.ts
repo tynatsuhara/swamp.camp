@@ -8,7 +8,7 @@ import { Sounds } from "../audio/Sounds"
 import { Dude } from "../characters/Dude"
 import { session } from "../online/session"
 import { syncFn } from "../online/syncUtils"
-import { WorldTime } from "../world/WorldTime"
+import { now } from "../world/WorldTime"
 import { requestGameAnimationFrame } from "../world/events/requestGameAnimationFrame"
 import { setGameTimeout } from "../world/events/setGameTimeout"
 import { here } from "../world/locations/LocationManager"
@@ -80,13 +80,12 @@ export class DroppedItem extends Component {
 
                 this.reposition()
 
-                let last = WorldTime.instance.time
+                let last = now()
                 const move = () => {
                     if (!this.enabled) {
                         return
                     }
-                    const now = WorldTime.instance.time
-                    const diff = now - last
+                    const diff = now() - last
                     if (diff > 0) {
                         this.reposition(velocity)
                         velocity = velocity.times(0.6)
@@ -94,7 +93,7 @@ export class DroppedItem extends Component {
                     if (velocity.magnitude() >= 0.1) {
                         requestGameAnimationFrame(move)
                     }
-                    last = now
+                    last = now()
                 }
                 requestGameAnimationFrame(move)
             }

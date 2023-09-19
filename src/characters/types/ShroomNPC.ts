@@ -3,7 +3,7 @@ import { Lists } from "brigsby/dist/util"
 import { Item } from "../../items/Item"
 import { session } from "../../online/session"
 import { TimeUnit } from "../../world/TimeUnit"
-import { WorldTime } from "../../world/WorldTime"
+import { now } from "../../world/WorldTime"
 import { ElementType } from "../../world/elements/ElementType"
 import { camp } from "../../world/locations/LocationManager"
 import { Dude } from "../Dude"
@@ -75,13 +75,13 @@ export class ShroomNPC extends Component {
             return
         }
 
-        if (WorldTime.instance.time >= this.dude.blob[NEXT_GROWTH_TIME]) {
+        if (now() >= this.dude.blob[NEXT_GROWTH_TIME]) {
             this.grow()
         } else if (
             this.enemy &&
             !this.npc.targetedEnemy &&
             this.dude.blob[SIZE] < 3 &&
-            this.dude.lastDamageTime < WorldTime.instance.time - 5_000
+            this.dude.lastDamageTime < now() - 5_000
         ) {
             // recreate the dude entity to reset enemy state
             this.refresh()
@@ -129,6 +129,6 @@ export class ShroomNPC extends Component {
 
     private nextGrowthTime() {
         // grow every 12-24 hours
-        return WorldTime.instance.time + TimeUnit.DAY * (0.5 + Math.random() / 2)
+        return now() + TimeUnit.DAY * (0.5 + Math.random() / 2)
     }
 }

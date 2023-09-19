@@ -7,7 +7,7 @@ import { Item } from "../../items/Item"
 import { spawnItem } from "../../items/Items"
 import { session } from "../../online/session"
 import { TimeUnit } from "../TimeUnit"
-import { WorldTime } from "../WorldTime"
+import { now } from "../WorldTime"
 import { Ground } from "../ground/Ground"
 import { Location } from "../locations/Location"
 import { camp } from "../locations/LocationManager"
@@ -89,6 +89,6 @@ export class MushroomFactory extends ElementFactory<ElementType.MUSHROOM, { ngt:
 
     private nextGrowthTime() {
         // grow every 12-24 hours
-        return Math.floor(WorldTime.instance.time + TimeUnit.DAY * (0.5 + Math.random() / 2))
+        return Math.floor(now() + TimeUnit.DAY * (0.5 + Math.random() / 2))
     }
 }

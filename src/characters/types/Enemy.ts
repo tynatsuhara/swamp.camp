@@ -4,7 +4,7 @@ import { Item } from "../../items/Item"
 import { session } from "../../online/session"
 import { Ground } from "../../world/ground/Ground"
 import { LightManager } from "../../world/LightManager"
-import { WorldTime } from "../../world/WorldTime"
+import { now } from "../../world/WorldTime"
 import { Condition } from "../Condition"
 import { Dude } from "../Dude"
 import { DudeFaction } from "../DudeFactory"
@@ -47,10 +47,7 @@ export class Enemy extends Component {
                 return !debug.peacefulMode
             }
             // Always attack their last assailant even if they're not normally considered an enemy
-            if (
-                d === dude.lastAttacker &&
-                WorldTime.instance.time - dude.lastAttackerTime < 10_000
-            ) {
+            if (d === dude.lastAttacker && now() - dude.lastAttackerTime < 10_000) {
                 return true
             }
             // Attack anything that isn't in an overlapping faction

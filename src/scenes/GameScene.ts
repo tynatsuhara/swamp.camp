@@ -25,7 +25,7 @@ import { LightManager } from "../world/LightManager"
 import { LocationFactory } from "../world/locations/LocationFactory"
 import { camp, here, LocationManager } from "../world/locations/LocationManager"
 import { TimeUnit } from "../world/TimeUnit"
-import { WorldTime } from "../world/WorldTime"
+import { now, WorldTime } from "../world/WorldTime"
 
 export class GameScene extends Scene {
     initialize() {
@@ -61,7 +61,7 @@ export class GameScene extends Scene {
 
             EventQueue.instance.addEvent({
                 type: QueuedEventType.SIMULATE_NPCS,
-                time: WorldTime.instance.time + NPC.SCHEDULE_FREQUENCY,
+                time: now() + NPC.SCHEDULE_FREQUENCY,
             })
         })
     }

@@ -16,7 +16,7 @@ import { Location } from "../world/locations/Location"
 import { camp, here, LocationManager } from "../world/locations/LocationManager"
 import { Simulatable } from "../world/Simulatable"
 import { TimeUnit } from "../world/TimeUnit"
-import { WorldTime } from "../world/WorldTime"
+import { now } from "../world/WorldTime"
 import { NPCSchedule, NPCSchedules } from "./ai/NPCSchedule"
 import { NPCTask } from "./ai/NPCTask"
 import { NPCTaskContext, WalkToOptions } from "./ai/NPCTaskContext"
@@ -368,15 +368,14 @@ export class NPC extends Simulatable {
 
         // previous pausing parameters will only be cleared if pauseEveryMillis is falsey
         if (pauseEveryMillis) {
-            const time = WorldTime.instance.time
             const shouldNotPause = Ground.isWater(
                 this.dude.location.getGround(this.dude.tile)?.type
             )
             // TODO: make it so NPCs dont roam immediately on save load?
-            if (time > this.roamNextUnpauseTime || shouldNotPause) {
-                this.roamNextPauseTime = WorldTime.instance.time + pauseEveryMillis
+            if (now() > this.roamNextUnpauseTime || shouldNotPause) {
+                this.roamNextPauseTime = now() + pauseEveryMillis
                 this.roamNextUnpauseTime = this.roamNextPauseTime + pauseForMillis
-            } else if (time > this.roamNextPauseTime) {
+            } else if (now() > this.roamNextPauseTime) {
                 this._dude.move(updateData.elapsedTimeMillis, Point.ZERO)
                 return
             }
@@ -411,7 +410,7 @@ export class NPC extends Simulatable {
     }
     private targetPath: Point[] = null
     private readonly PARRY_TIME = 300 + Math.random() * 200
-    private nextAttackTime = WorldTime.instance.time + Math.random() * 2000
+    private nextAttackTime = now() + Math.random() * 2000
 
     private doCombat(updateData: UpdateData) {
         if (!this._dude.isAlive) {
@@ -440,7 +439,7 @@ export class NPC extends Simulatable {
                 // the default collider has a width of 10
                 // big entities have a collider width of 15
                 (this._dude.colliderSize.x - 10) * 3
-        const timeLeftUntilCanAttack = this.nextAttackTime - WorldTime.instance.time
+        const timeLeftUntilCanAttack = this.nextAttackTime - now()
 
         if (stoppingDist === 0 && inRangeAndArmed && timeLeftUntilCanAttack < this.PARRY_TIME) {
             this.dude.attackState =
@@ -463,7 +462,7 @@ export class NPC extends Simulatable {
                 this.dude.updateAttacking(true)
                 this.nextAttackTime = Math.max(
                     this.nextAttackTime,
-                    WorldTime.instance.time + weapon.getMillisBetweenAttacks()
+                    now() + weapon.getMillisBetweenAttacks()
                 )
             } else {
                 this.dude.cancelAttacking()
@@ -478,10 +477,7 @@ export class NPC extends Simulatable {
 
         // make sure they always wait at least PARRY_TIME once getting into range
         if (!inRangeAndArmed && timeLeftUntilCanAttack > 0) {
-            this.nextAttackTime = Math.max(
-                this.nextAttackTime,
-                WorldTime.instance.time + this.PARRY_TIME
-            )
+            this.nextAttackTime = Math.max(this.nextAttackTime, now() + this.PARRY_TIME)
         }
 
         if (!this.targetPath || this.targetPath.length === 0) {
@@ -517,7 +513,7 @@ export class NPC extends Simulatable {
      */
     private doCombatBlock(): boolean {
         // cache the block state for a while so we don't evaluate it every tick
-        if (WorldTime.instance.time < this.nextBlockCheckTime) {
+        if (now() < this.nextBlockCheckTime) {
             return this.canBlockRightNow
         }
 
@@ -525,9 +521,9 @@ export class NPC extends Simulatable {
 
         if (this.canBlockRightNow) {
             const blockTimeMs = 250 + 250 * Math.random()
-            this.nextBlockCheckTime = WorldTime.instance.time + blockTimeMs
+            this.nextBlockCheckTime = now() + blockTimeMs
         } else {
-            this.nextBlockCheckTime = WorldTime.instance.time + 1_000 // TODO: Is this a good value?
+            this.nextBlockCheckTime = now() + 1_000 // TODO: Is this a good value?
         }
     }
 
@@ -590,7 +586,7 @@ export class NPC extends Simulatable {
                 speedMultiplier
             )
             if (!this._dude.standingPosition.equals(oldPosition)) {
-                this.lastMoveTime = WorldTime.instance.time
+                this.lastMoveTime = now()
             }
         }
 
@@ -601,7 +597,7 @@ export class NPC extends Simulatable {
 
     private lastMoveTime: number
     private stuck() {
-        return WorldTime.instance.time - this.lastMoveTime > 1000
+        return now() - this.lastMoveTime > 1000
     }
 
     /**

@@ -11,7 +11,7 @@ import { Singletons } from "../core/Singletons"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Tilesets } from "../graphics/Tilesets"
 import { Location } from "../world/locations/Location"
-import { WorldTime } from "../world/WorldTime"
+import { now } from "../world/WorldTime"
 import { ClickableUI } from "./ClickableUI"
 import { Color } from "./Color"
 import { Cursor } from "./Cursor"
@@ -118,8 +118,7 @@ export class HUD {
             if (healing) {
                 const speed = 115
                 const range = 1
-                const time = WorldTime.instance.time
-                const offset = range / 2 + range * Math.sin(Math.floor(time / speed) + i)
+                const offset = range / 2 + range * Math.sin(Math.floor(now() / speed) + i)
                 pos = pos.plusY(Math.floor(offset))
             }
 

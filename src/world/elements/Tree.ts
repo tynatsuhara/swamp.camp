@@ -9,7 +9,7 @@ import { Particles } from "../../graphics/particles/Particles"
 import { Item } from "../../items/Item"
 import { Color } from "../../ui/Color"
 import { TimeUnit } from "../TimeUnit"
-import { WorldTime } from "../WorldTime"
+import { now } from "../WorldTime"
 import { Ground } from "../ground/Ground"
 import { Location } from "../locations/Location"
 import { Burnable } from "./Burnable"
@@ -194,7 +194,7 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
 
     private nextGrowthTime() {
         // grow every 24-48 hours
-        return Math.floor(WorldTime.instance.time + TimeUnit.DAY * (1 + Math.random()))
+        return Math.floor(now() + TimeUnit.DAY * (1 + Math.random()))
     }
 }
 

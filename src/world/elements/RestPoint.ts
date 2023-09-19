@@ -8,7 +8,7 @@ import { syncFn } from "../../online/syncUtils"
 import { HUD } from "../../ui/HUD"
 import { DarknessMask } from "../DarknessMask"
 import { TimeUnit } from "../TimeUnit"
-import { WorldTime } from "../WorldTime"
+import { WorldTime, now } from "../WorldTime"
 import { camp, here } from "../locations/LocationManager"
 import { Campfire } from "./Campfire"
 import { ElementType } from "./ElementType"
@@ -45,7 +45,7 @@ export class RestPoint extends Component {
             return false
         }
 
-        const timeOfDay = WorldTime.instance.time % TimeUnit.DAY
+        const timeOfDay = now() % TimeUnit.DAY
 
         let hoursNeeded = 0
         for (let i = 1; i <= hours; i++) {

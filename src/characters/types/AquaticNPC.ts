@@ -1,6 +1,6 @@
 import { Component } from "brigsby/dist"
+import { now } from "../../world/WorldTime"
 import { Ground } from "../../world/ground/Ground"
-import { WorldTime } from "../../world/WorldTime"
 import { Dude } from "../Dude"
 import { NPC } from "../NPC"
 
@@ -18,10 +18,10 @@ export class AquaticNPC extends Component {
 
     update() {
         const anim = this.dude.animation
-        const shouldBeVisible = WorldTime.instance.time < this.nextCanHideTime || this.isVisible()
+        const shouldBeVisible = now() < this.nextCanHideTime || this.isVisible()
 
         if (!anim.enabled && shouldBeVisible) {
-            this.nextCanHideTime = WorldTime.instance.time + (1500 + Math.random() * 1000)
+            this.nextCanHideTime = now() + (1500 + Math.random() * 1000)
         }
 
         anim.enabled = shouldBeVisible

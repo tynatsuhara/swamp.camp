@@ -1,6 +1,6 @@
 import { Component } from "brigsby/dist"
 import { session } from "../../online/session"
-import { WorldTime } from "../WorldTime"
+import { now } from "../WorldTime"
 
 export class Growable extends Component {
     constructor(private nextGrowthTime: number, private readonly growFn: () => number | void) {
@@ -12,7 +12,7 @@ export class Growable extends Component {
             return
         }
 
-        if (WorldTime.instance.time >= this.nextGrowthTime) {
+        if (now() >= this.nextGrowthTime) {
             this.forceGrow()
         }
     }

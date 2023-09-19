@@ -17,7 +17,7 @@ import { randomByteString } from "../../saves/uuid"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { LightManager } from "../LightManager"
 import { TimeUnit } from "../TimeUnit"
-import { WorldTime } from "../WorldTime"
+import { now } from "../WorldTime"
 import { GroundRenderer } from "../ground/GroundRenderer"
 import { Location } from "../locations/Location"
 import { Breakable } from "./Breakable"
@@ -203,10 +203,7 @@ export class Campfire extends Component implements DialogueSource {
 
     update() {
         const logsBeforeUpdate = this.logs
-        while (
-            this.logs > 0 &&
-            WorldTime.instance.time > this.lastLogConsumedTime + Campfire.LOG_DURATION
-        ) {
+        while (this.logs > 0 && now() > this.lastLogConsumedTime + Campfire.LOG_DURATION) {
             this.lastLogConsumedTime += Campfire.LOG_DURATION
             this.logs--
         }
@@ -217,7 +214,7 @@ export class Campfire extends Component implements DialogueSource {
 
     private _addLogs(count: number) {
         if (this.logs === 0) {
-            this.lastLogConsumedTime = WorldTime.instance.time
+            this.lastLogConsumedTime = now()
         }
         this.logs += count
         this.updateFire(this.logs)
@@ -237,8 +234,7 @@ export class Campfire extends Component implements DialogueSource {
             return duration === 0
         }
         const currentLogTimeLeft =
-            Campfire.LOG_DURATION -
-            (WorldTime.instance.time - this.lastLogConsumedTime) / Campfire.LOG_DURATION
+            Campfire.LOG_DURATION - (now() - this.lastLogConsumedTime) / Campfire.LOG_DURATION
         return duration < (this.logs - 1) * Campfire.LOG_DURATION + currentLogTimeLeft
     }
 

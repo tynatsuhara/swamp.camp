@@ -9,7 +9,7 @@ import { InventoryDisplay } from "../../ui/InventoryDisplay"
 import { Campfire } from "../../world/elements/Campfire"
 import { RestPoint } from "../../world/elements/RestPoint"
 import { TimeUnit } from "../../world/TimeUnit"
-import { WorldTime } from "../../world/WorldTime"
+import { now } from "../../world/WorldTime"
 import { player } from "../player"
 import {
     dialogue,
@@ -61,15 +61,14 @@ export const CAMPFIRE_DIALOGUES: DialogueSet = {
         //       to why they can't rest right now (this could be annoying tho)
         const restPoint = cf.entity.getComponent(RestPoint)
         const restDurationHours = 2
-        const now = WorldTime.instance.time
         if (
             session.isHost() && // MPTODO
             restPoint.canRestFor(restDurationHours, cf) &&
-            saveManager.getState().lastCampfireRestTime < now - 12 * TimeUnit.HOUR
+            saveManager.getState().lastCampfireRestTime < now() - 12 * TimeUnit.HOUR
         ) {
             options.push(
                 new DialogueOption("Rest briefly", () => {
-                    saveManager.setState({ lastCampfireRestTime: now })
+                    saveManager.setState({ lastCampfireRestTime: now() })
                     restPoint.rest(restDurationHours)
                     player().heal(player().maxHealth / 2)
                     return completeDialogue(0)()

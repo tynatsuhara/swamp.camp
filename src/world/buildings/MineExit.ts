@@ -4,7 +4,7 @@ import { isGamePaused } from "../../core/PauseState"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Particles } from "../../graphics/particles/Particles"
 import { Color } from "../../ui/Color"
-import { WorldTime } from "../WorldTime"
+import { now } from "../WorldTime"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementFactory } from "../elements/ElementFactory"
 import { ElementType } from "../elements/ElementType"
@@ -57,7 +57,7 @@ export class MineExitFactory extends ElementFactory<ElementType.MINE_EXIT> {
                     e.addComponent(new RepeatedInvoker(() => spawnParticle(), 0, isGamePaused))
                 },
                 update: () => {
-                    if (WorldTime.instance.time > spawnParticlesAtTime) {
+                    if (now() > spawnParticlesAtTime) {
                         for (let i = 0; i < 10 * particleCountMultiplier; i++) {
                             spawnParticle(Math.random() * 10_000)
                         }
@@ -72,7 +72,7 @@ export class MineExitFactory extends ElementFactory<ElementType.MINE_EXIT> {
                 interactPos,
                 () => {
                     LocationManager.instance.playerUseTeleporter(wl.uuid) // the teleporter ID should match the mine interior's UUID
-                    spawnParticlesAtTime = WorldTime.instance.time + 1_000
+                    spawnParticlesAtTime = now() + 1_000
                 },
                 pt(0, -TILE_SIZE)
             )

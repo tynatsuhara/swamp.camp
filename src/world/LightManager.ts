@@ -6,7 +6,7 @@ import { TILE_SIZE } from "../graphics/Tilesets"
 import { DarknessMask } from "./DarknessMask"
 import { TimeUnit } from "./TimeUnit"
 import { VisibleRegionMask } from "./VisibleRegionMask"
-import { WorldTime } from "./WorldTime"
+import { now } from "./WorldTime"
 import { Location } from "./locations/Location"
 import { here } from "./locations/LocationManager"
 import { LocationType } from "./locations/LocationType"
@@ -130,7 +130,7 @@ export class LightManager extends Component {
     }
 
     private isDaytime() {
-        const time = WorldTime.instance.time % TimeUnit.DAY
+        const time = now() % TimeUnit.DAY
         return time >= DarknessMask.SUNRISE_START && time < DarknessMask.SUNSET_END
     }
 
@@ -143,7 +143,7 @@ export class LightManager extends Component {
     }
 
     private render() {
-        this.mask.reset(WorldTime.instance.time, this.getLocationDarkness())
+        this.mask.reset(now(), this.getLocationDarkness())
 
         // Always provide slight visibility around the player
         const p = player()

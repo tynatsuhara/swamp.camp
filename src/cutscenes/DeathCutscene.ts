@@ -10,7 +10,7 @@ import { HUD } from "../ui/HUD"
 import { TextAlign } from "../ui/Text"
 import { DarknessMask } from "../world/DarknessMask"
 import { TimeUnit } from "../world/TimeUnit"
-import { WorldTime } from "../world/WorldTime"
+import { WorldTime, now } from "../world/WorldTime"
 import { setGameTimeout } from "../world/events/setGameTimeout"
 import { Ground } from "../world/ground/Ground"
 import { camp, here } from "../world/locations/LocationManager"
@@ -81,7 +81,7 @@ Your work here is not yet done.`,
 
     respawn() {
         const respawnTime = DarknessMask.SUNRISE_START + TimeUnit.MINUTE * 10
-        const timeUntilRespawn = WorldTime.instance.tomorrow(respawnTime) - WorldTime.instance.time
+        const timeUntilRespawn = WorldTime.instance.tomorrow(respawnTime) - now()
         WorldTime.instance.fastForward(timeUntilRespawn)
 
         // If the player dies off map, just put them at a random on-map location.

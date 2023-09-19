@@ -8,7 +8,7 @@ import { session } from "../../online/session"
 import { Color } from "../../ui/Color"
 import { adjacent } from "../../utils/misc"
 import { LightManager } from "../LightManager"
-import { WorldTime } from "../WorldTime"
+import { now } from "../WorldTime"
 import { here } from "../locations/LocationManager"
 import { Campfire } from "./Campfire"
 import { ElementComponent } from "./ElementComponent"
@@ -69,7 +69,7 @@ export class Burnable extends RepeatedInvoker {
             return
         }
 
-        if (WorldTime.instance.time - this.burnStart > TIME_UNTIL_DESTROY) {
+        if (now() - this.burnStart > TIME_UNTIL_DESTROY) {
             this.entity.selfDestruct()
         }
 
@@ -87,7 +87,7 @@ export class Burnable extends RepeatedInvoker {
             return
         }
         this.burning = true
-        this.burnStart = WorldTime.instance.time
+        this.burnStart = now()
         this.pts.forEach((pt) => {
             const burnableCenter = pt.plus(new Point(0.5, 0.5)).times(TILE_SIZE).plus(this.offset)
             this.entity.addComponent(

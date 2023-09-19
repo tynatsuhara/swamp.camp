@@ -4,9 +4,9 @@ import { SpriteComponent } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
 import { DroppedItem } from "../../items/DroppedItem"
 import { session } from "../../online/session"
+import { now } from "../../world/WorldTime"
 import { GroundRenderer } from "../../world/ground/GroundRenderer"
 import { here } from "../../world/locations/LocationManager"
-import { WorldTime } from "../../world/WorldTime"
 import { Dude } from "../Dude"
 
 const flightTime = 150
@@ -28,7 +28,7 @@ class ThrownProjectile extends Component {
             this.sprite = this.entity.addComponent(sprite)
             this.velocity = velocity
             this.attacker = attacker
-            this.throwTime = WorldTime.instance.time
+            this.throwTime = now()
 
             const sourceCollider = this.attacker.entity.getComponent(BoxCollider)
 
@@ -56,7 +56,7 @@ class ThrownProjectile extends Component {
             this.sprite.transform.position.y + this.sprite.transform.dimensions.y
 
         const afterPos = this.sprite.transform.position
-        const timesUp = WorldTime.instance.time - this.throwTime > flightTime
+        const timesUp = now() - this.throwTime > flightTime
         const stillMoving = !timesUp && beforePos.distanceTo(afterPos) >= 0.05
 
         if (stillMoving) {

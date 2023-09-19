@@ -16,7 +16,7 @@ import { LightManager } from "../world/LightManager"
 import { EAST_COAST_OCEAN_WIDTH } from "../world/locations/CampLocationGenerator"
 import { camp } from "../world/locations/LocationManager"
 import { TimeUnit } from "../world/TimeUnit"
-import { WorldTime } from "../world/WorldTime"
+import { now, WorldTime } from "../world/WorldTime"
 import { DudeFaction, DudeFactory } from "./DudeFactory"
 import { DudeType } from "./DudeType"
 import { NPC } from "./NPC"
@@ -28,13 +28,12 @@ export class DudeSpawner extends Component {
     }
 
     private static readonly INTERVAL_MILLIS = 30_000
-    private nextUpdate = WorldTime.instance.time
+    private nextUpdate = now()
 
     update() {
-        const now = WorldTime.instance.time
-        if (now > this.nextUpdate) {
+        if (now() > this.nextUpdate) {
             this.spawn()
-            this.nextUpdate = now + DudeSpawner.INTERVAL_MILLIS
+            this.nextUpdate = now() + DudeSpawner.INTERVAL_MILLIS
         }
 
         // Maybe consider moving this code elsewhere later
@@ -89,7 +88,7 @@ export class DudeSpawner extends Component {
     }
 
     private spawnDemons() {
-        const timeOfDay = WorldTime.instance.time % TimeUnit.DAY
+        const timeOfDay = now() % TimeUnit.DAY
         if (timeOfDay >= DarknessMask.SUNRISE_START && timeOfDay < DarknessMask.SUNSET_END) {
             return
         }

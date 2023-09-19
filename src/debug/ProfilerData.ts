@@ -4,7 +4,7 @@ import { controls } from "../core/Controls"
 import { pixelPtToTilePt } from "../graphics/Tilesets"
 import { Particles } from "../graphics/particles/Particles"
 import { TownStats } from "../world/TownStats"
-import { WorldTime } from "../world/WorldTime"
+import { WorldTime, now } from "../world/WorldTime"
 import { here } from "../world/locations/LocationManager"
 import { prettyPrint } from "./JSON"
 
@@ -20,7 +20,7 @@ export class ProfilerData extends Component {
         const mouseTile = pixelPtToTilePt(controls.getWorldSpaceCursorPos())
         profiler.showInfo(`UI mouse pos: ${controls.getCursorPos().apply(Math.floor)}`)
         profiler.showInfo(`mouse tile: ${mouseTile}`)
-        profiler.showInfo(`time: ${WorldTime.clockTime()} (${Math.floor(WorldTime.instance.time)})`)
+        profiler.showInfo(`time: ${WorldTime.clockTime()} (${Math.floor(now())})`)
         profiler.showInfo(`particle count: ${Particles.instance.count}`)
         // profiler.showInfo(`level: ${here().getLevel(mouseTile)}`)
         profiler.showInfo(`stats: ${prettyPrint(TownStats.instance.getProfilerData())}`)

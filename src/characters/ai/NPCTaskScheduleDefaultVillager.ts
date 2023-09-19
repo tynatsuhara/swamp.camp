@@ -7,7 +7,7 @@ import { tilesAround } from "../../utils/misc"
 import { DarknessMask } from "../../world/DarknessMask"
 import { LightManager } from "../../world/LightManager"
 import { TimeUnit } from "../../world/TimeUnit"
-import { WorldTime } from "../../world/WorldTime"
+import { WorldTime, now } from "../../world/WorldTime"
 import { ConstructionSite } from "../../world/buildings/ConstructionSite"
 import { Campfire } from "../../world/elements/Campfire"
 import { ElementType } from "../../world/elements/ElementType"
@@ -45,7 +45,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
 
     performTask(context: NPCTaskContext): void {
         const { dude } = context
-        const timeOfDay = WorldTime.instance.time % TimeUnit.DAY
+        const timeOfDay = now() % TimeUnit.DAY
 
         const { VILLAGER_WAKE_UP_TIME, VILLAGER_STOP_WORK_TIME, VILLAGER_GO_HOME_TIME } =
             NPCSchedules

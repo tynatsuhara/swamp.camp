@@ -9,7 +9,7 @@ import { session } from "../../online/session"
 import { Color } from "../../ui/Color"
 import { adjacent } from "../../utils/misc"
 import { TimeUnit } from "../TimeUnit"
-import { WorldTime } from "../WorldTime"
+import { now } from "../WorldTime"
 import { Ground, GroundType } from "../ground/Ground"
 import { Location } from "../locations/Location"
 import { Burnable } from "./Burnable"
@@ -165,6 +165,6 @@ export class BlackberriesFactory extends ElementFactory<ElementType.BLACKBERRIES
 
     private determineNextGrowthTime() {
         // grow every 12-24 hours
-        return WorldTime.instance.time + TimeUnit.DAY * (0.5 + Math.random() / 2)
+        return now() + TimeUnit.DAY * (0.5 + Math.random() / 2)
     }
 }

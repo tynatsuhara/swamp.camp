@@ -6,7 +6,7 @@ import { Burnable } from "../../world/elements/Burnable"
 import { LightManager } from "../../world/LightManager"
 import { here } from "../../world/locations/LocationManager"
 import { TimeUnit } from "../../world/TimeUnit"
-import { WorldTime } from "../../world/WorldTime"
+import { now } from "../../world/WorldTime"
 import { Shield } from "./Shield"
 import { ShieldType } from "./ShieldType"
 
@@ -30,7 +30,7 @@ export class Torch extends Shield {
 
     start() {
         if (!this.dude.blob[BLOB_ATTRIBUTE]) {
-            this.dude.blob[BLOB_ATTRIBUTE] = WorldTime.instance.time
+            this.dude.blob[BLOB_ATTRIBUTE] = now()
         }
 
         this.particles = this.entity.addComponent(
@@ -62,17 +62,17 @@ export class Torch extends Shield {
 
         this.transform.position = newPos
 
-        const now = WorldTime.instance.time
         const fireStart = this.dude.blob[BLOB_ATTRIBUTE]
 
-        if (now > fireStart + LIFESPAN_MILLIS) {
+        if (now() > fireStart + LIFESPAN_MILLIS) {
             this.dude.equipFirstShieldInInventory()
             return
         }
 
         // one-based index of the DIAMETERS array
         const size =
-            DIAMETERS.length - Math.floor((DIAMETERS.length * (now - fireStart)) / LIFESPAN_MILLIS)
+            DIAMETERS.length -
+            Math.floor((DIAMETERS.length * (now() - fireStart)) / LIFESPAN_MILLIS)
         this.particles.radius = size
         const diameter = DIAMETERS[size - 1]
 
