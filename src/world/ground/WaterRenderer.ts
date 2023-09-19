@@ -1,13 +1,19 @@
 import { AnonymousComponent, Entity, Point, pt } from "brigsby/dist"
 import { BasicRenderComponent, ImageRender } from "brigsby/dist/renderer"
 import { Animator } from "brigsby/dist/util/Animator"
+import { isGamePaused } from "../../core/PauseState"
 import { Singletons } from "../../core/Singletons"
 import { Camera } from "../../cutscenes/Camera"
 import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
 import { Location } from "../locations/Location"
 import { here } from "../locations/LocationManager"
 
-const WATER_ANIMATOR = new Animator([750, 750])
+const WATER_ANIMATOR = new Animator(
+    [750, 750],
+    () => {},
+    () => {},
+    isGamePaused
+)
 
 /**
  * This is an optimization that pre-renders water on an offscreen canvas.

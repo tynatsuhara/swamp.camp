@@ -1,5 +1,6 @@
 import { Point } from "brigsby/dist"
 import { SpriteAnimation, StaticSpriteSource } from "brigsby/dist/sprites"
+import { isGamePaused } from "../core/PauseState"
 import { getImage } from "./Tilesets"
 
 const map = new Map(
@@ -280,7 +281,11 @@ export class DungeonTilesetII {
             return null
         }
 
-        return new SpriteAnimation(frames.map((tileSource) => [tileSource, speed]))
+        return new SpriteAnimation(
+            frames.map((tileSource) => [tileSource, speed]),
+            () => {},
+            isGamePaused
+        )
     }
 
     private getFile(): HTMLImageElement {

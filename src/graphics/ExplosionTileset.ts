@@ -7,6 +7,7 @@ import {
     StaticSpriteSource,
 } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
+import { isGamePaused } from "../core/PauseState"
 import { getImage } from "./Tilesets"
 
 export class ExplosionTileset {
@@ -39,7 +40,11 @@ export class ExplosionTileset {
             return [tileSource, index === 0 ? speed * 3 : speed]
         })
 
-        component = new SpriteAnimation(animation, () => component.delete()).toComponent(
+        component = new SpriteAnimation(
+            animation,
+            () => component.delete(),
+            isGamePaused
+        ).toComponent(
             SpriteTransform.new({
                 position: center.plus(pt(size).div(-2)),
                 depth: center.y + size / 2,

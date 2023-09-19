@@ -2,6 +2,7 @@ import { Point, pt } from "brigsby/dist/Point"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { Animator } from "brigsby/dist/util/Animator"
+import { isGamePaused } from "../../../core/PauseState"
 import { Tilesets } from "../../../graphics/Tilesets"
 import { AnimationArgs, MeleeAnimation } from "./MeleeAnimation"
 
@@ -32,7 +33,12 @@ export class BasicAttackAnimation extends MeleeAnimation {
 
     constructor(args: AnimationArgs, onFinish: () => void) {
         super(args)
-        this.animator = new Animator(Animator.frames(8, 40 / args.spec.speed), () => {}, onFinish)
+        this.animator = new Animator(
+            Animator.frames(8, 40 / args.spec.speed),
+            () => {},
+            onFinish,
+            isGamePaused
+        )
         this.slashSprite = Tilesets.instance.oneBit.getTileSource("slash")
     }
 

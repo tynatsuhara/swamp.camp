@@ -2,9 +2,10 @@ import { Component, Entity, Point, pt } from "brigsby/dist"
 import { SpriteAnimation, SpriteTransform } from "brigsby/dist/sprites"
 import { RepeatedInvoker } from "brigsby/dist/util"
 import { PointAudio } from "../../audio/PointAudio"
+import { isGamePaused } from "../../core/PauseState"
 import { ImageFilters } from "../../graphics/ImageFilters"
+import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
 import { Particles } from "../../graphics/particles/Particles"
-import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { Color } from "../../ui/Color"
 import { ConnectingTile } from "./ConnectingTile"
 import { ConnectingTileWaterfallSchema } from "./ConnectingTileWaterfallSchema"
@@ -87,7 +88,9 @@ export const makeWaterfall = (d: MakeGroundFuncData): GroundComponent => {
             [pt(1, 1), pt(2, 1), pt(1, 2), pt(2, 2)]
                 .map((pt) => Tilesets.instance.tilemap.getTileAt(pt))
                 .map((tile) => tile.filtered(spriteFilter))
-                .map((tile) => [tile, waterfallSpeed])
+                .map((tile) => [tile, waterfallSpeed]),
+            () => {},
+            isGamePaused
         ).toComponent(
             SpriteTransform.new({
                 position: pixelPos.plus(waterfallOffset),

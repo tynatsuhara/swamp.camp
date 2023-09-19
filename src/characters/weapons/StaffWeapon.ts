@@ -1,10 +1,11 @@
 import { Point, UpdateData } from "brigsby/dist"
 import { ImageFilter, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Animator, Lists } from "brigsby/dist/util"
+import { isGamePaused } from "../../core/PauseState"
 import { Camera } from "../../cutscenes/Camera"
 import { ImageFilters } from "../../graphics/ImageFilters"
+import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
 import { Particles } from "../../graphics/particles/Particles"
-import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
 import { session } from "../../online/session"
 import { Color } from "../../ui/Color"
 import { GroundRenderer } from "../../world/ground/GroundRenderer"
@@ -51,7 +52,8 @@ export class StaffWeapon extends Weapon {
                 [StaffWeapon.TARGET_ANIMATION_SPEED, StaffWeapon.TARGET_ANIMATION_SPEED],
                 (i) => {
                     this.targetSprite = i % 2 === 0 ? this.targetSprite1 : this.targetSprite2
-                }
+                },
+                isGamePaused
             )
         }
     }
@@ -138,7 +140,8 @@ export class StaffWeapon extends Weapon {
                 if (this.attackPosition) {
                     this.doAttack()
                 }
-            }
+            },
+            isGamePaused
         )
     }
 

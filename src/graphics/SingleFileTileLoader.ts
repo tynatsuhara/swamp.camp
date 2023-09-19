@@ -1,5 +1,6 @@
 import { Point } from "brigsby/dist"
 import { SpriteAnimation, SpriteSource, StaticSpriteSource } from "brigsby/dist/sprites"
+import { isGamePaused } from "../core/PauseState"
 import { getImage } from "./Tilesets"
 
 export class SingleFileTileLoader<K extends string> {
@@ -61,7 +62,9 @@ export class SingleFileTileLoader<K extends string> {
         return new SpriteAnimation(
             Array.from({ length: frames }, (v, k) => k)
                 .map((index) => this.getTileAt(result.plus(new Point(index, 0))))
-                .map((tileSource) => [tileSource, speed])
+                .map((tileSource) => [tileSource, speed]),
+            () => {},
+            isGamePaused
         )
     }
 

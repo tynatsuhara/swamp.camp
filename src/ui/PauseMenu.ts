@@ -1,5 +1,6 @@
 import { Component, debug, Entity, Point, UpdateData } from "brigsby/dist"
 import { controls } from "../core/Controls"
+import { setGamePaused } from "../core/PauseState"
 import { saveManager } from "../core/SaveManager"
 import { Settings } from "../core/Settings"
 import { Singletons } from "../core/Singletons"
@@ -48,20 +49,23 @@ export class PauseMenu extends Component {
             this.close()
         } else if (pressPauseButton && !UIStateManager.instance.isMenuOpen) {
             cycleTipIndex(1)
-            this.open(updateData.dimensions)
+            setGamePaused(true)
+            this.render(updateData.dimensions)
         } else if (this.isOpen) {
             // refresh
-            this.open(updateData.dimensions)
+            this.render(updateData.dimensions)
         }
     }
 
     close() {
+        setGamePaused(false)
+
         this.isOpen = false
         this.displayEntity = null
         this.menu = Menu.ROOT
     }
 
-    private open(dimensions: Point) {
+    private render(dimensions: Point) {
         const tooltip = new Tooltip()
 
         const buttons: PauseOption[] = []

@@ -2,6 +2,7 @@ import { AnonymousComponent, Component, Entity, Point, pt } from "brigsby/dist"
 import { AnimatedSpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { ChestAnimation } from "../../characters/ChestAnimation"
 import { player } from "../../characters/player/index"
+import { isGamePaused } from "../../core/PauseState"
 import { Icon } from "../../graphics/OneBitTileset"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Inventory, ItemStack } from "../../items/Inventory"
@@ -88,7 +89,8 @@ export const getChestComponents = ({
         SpriteTransform.new({
             position: pixelPos,
             depth: pixelPos.y + TILE_SIZE,
-        })
+        }),
+        isGamePaused
     )
     let isOpen = false
 

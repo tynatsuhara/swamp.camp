@@ -2,6 +2,7 @@ import { Component, Point, UpdateData } from "brigsby/dist"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { Animator } from "brigsby/dist/util"
 import { Dude } from "../../characters/Dude"
+import { isGamePaused } from "../../core/PauseState"
 
 export class Hittable extends Component {
     extraRange = 0
@@ -45,7 +46,8 @@ export class Hittable extends Component {
                     (pt, tr) => (tr.position = pt.plus(dir.times(frames[index])))
                 )
             },
-            () => (this.animator = null)
+            () => (this.animator = null),
+            isGamePaused
         )
 
         setTimeout(() => this.onHit(dir, dude), 150)

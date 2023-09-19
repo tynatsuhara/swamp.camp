@@ -1,5 +1,6 @@
-import { Component, debug, Entity, Point } from "brigsby/dist"
+import { Component, debug, Entity, Point, UpdateData } from "brigsby/dist"
 import { ImageRender } from "brigsby/dist/renderer"
+import { isGamePaused } from "../../core/PauseState"
 import { Singletons } from "../../core/Singletons"
 import { Color, getRGB } from "../../ui/Color"
 
@@ -29,6 +30,10 @@ export class Particles {
         velocity: (t: number) => Point = () => Point.ZERO,
         size: Point = new Point(1, 1)
     ) {
+        if (isGamePaused()) {
+            return
+        }
+
         const emitFn = (image: ImageBitmap) =>
             this.entity.addComponent(
                 Particle.dynamic(lifetime, image, positionSupplier, depthSupplier, velocity, size)
@@ -45,6 +50,10 @@ export class Particles {
         velocity: (t: number) => Point = () => Point.ZERO,
         size: Point = new Point(1, 1)
     ) {
+        if (isGamePaused()) {
+            return
+        }
+
         const emitFn = (image: ImageBitmap) =>
             this.entity.addComponent(Particle.new(lifetime, image, position, depth, velocity, size))
 
@@ -82,14 +91,18 @@ const SIZE = new Point(1, 1)
 class Particle extends Component {
     private elapsedTime = 0
 
-    private constructor(lifetime: number) {
+    private constructor(private readonly lifetime: number) {
         super()
+    }
 
-        this.update = (updateData) => {
-            this.elapsedTime += updateData.elapsedTimeMillis
-            if (this.elapsedTime > lifetime || Particles.instance.count > MAX_PARTICLES) {
-                this.delete()
-            }
+    update({ elapsedTimeMillis }: UpdateData): void {
+        if (isGamePaused()) {
+            return
+        }
+
+        this.elapsedTime += elapsedTimeMillis
+        if (this.elapsedTime > this.lifetime || Particles.instance.count > MAX_PARTICLES) {
+            this.delete()
         }
     }
 

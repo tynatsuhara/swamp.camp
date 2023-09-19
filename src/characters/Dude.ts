@@ -6,6 +6,7 @@ import { Animator, Lists, RepeatedInvoker } from "brigsby/dist/util"
 import { StepSounds } from "../audio/StepSounds"
 import { VocalSounds } from "../audio/VocalSounds"
 import { controls } from "../core/Controls"
+import { isGamePaused } from "../core/PauseState"
 import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
 import { DeathCutscene } from "../cutscenes/DeathCutscene"
@@ -1405,7 +1406,8 @@ export class Dude extends Component implements DialogueSource {
                 this.rollingAnimator.paused = true
                 this.isRolling = false
                 this.rollingAnimator = null
-            }
+            },
+            isGamePaused
         )
     }
 
@@ -1455,7 +1457,8 @@ export class Dude extends Component implements DialogueSource {
                         weakMagnitude: 0.5,
                     })
                 }
-            }
+            },
+            isGamePaused
         )
     }
 

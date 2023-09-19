@@ -2,6 +2,7 @@ import { Component, Point, UpdateData } from "brigsby/dist"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { Animator } from "brigsby/dist/util"
 import { Dude } from "../../characters/Dude"
+import { isGamePaused } from "../../core/PauseState"
 
 /**
  * Something that can be lightly nudged when a dude walks through it
@@ -64,7 +65,8 @@ export class Pushable extends Component {
                     )
                 }
             },
-            () => (this.animator = null)
+            () => (this.animator = null),
+            isGamePaused
         )
 
         this.onPush(dude)

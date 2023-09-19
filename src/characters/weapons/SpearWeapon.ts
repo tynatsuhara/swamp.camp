@@ -1,6 +1,7 @@
 import { Point, UpdateData } from "brigsby/dist"
 import { ImageFilter, SpriteTransform, StaticSpriteSource } from "brigsby/dist/sprites"
 import { Animator } from "brigsby/dist/util"
+import { isGamePaused } from "../../core/PauseState"
 import { Tilesets } from "../../graphics/Tilesets"
 import { Item } from "../../items/Item"
 import { session } from "../../online/session"
@@ -201,7 +202,8 @@ export class SpearWeapon extends Weapon {
                 this.animator = null
                 // TODO: use delayBetweenAttacks to allow NPCs to use spears
                 this.state = State.DRAWN // reset to DRAWN when animation finishes
-            }
+            },
+            isGamePaused
         )
     }
 

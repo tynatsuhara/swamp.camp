@@ -1,5 +1,6 @@
 import { Component, Entity, UpdateData } from "brigsby/dist"
 import { WorldAudioContext } from "../audio/WorldAudioContext"
+import { isGamePaused } from "../core/PauseState"
 import { saveManager } from "../core/SaveManager"
 import { Singletons } from "../core/Singletons"
 import { syncFn } from "../online/syncUtils"
@@ -31,13 +32,15 @@ export class WorldTime extends Component {
     }
 
     update(updateData: UpdateData) {
-        this._time += updateData.elapsedTimeMillis
         saveManager.setState({
             timePlayed: (saveManager.getState().timePlayed || 0) + updateData.elapsedTimeMillis,
         })
 
-        EventQueue.instance.processEvents(this.time)
-        WorldAudioContext.instance.time = this.time
+        if (!isGamePaused()) {
+            this._time += updateData.elapsedTimeMillis
+            EventQueue.instance.processEvents(this.time)
+            WorldAudioContext.instance.time = this.time
+        }
     }
 
     fastForward = syncFn("wt:ff", (duration: number) => {

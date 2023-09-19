@@ -1,4 +1,5 @@
 import { SpriteAnimation } from "brigsby/dist/sprites"
+import { isGamePaused } from "../core/PauseState"
 import { Tilesets } from "../graphics/Tilesets"
 
 type ChestVariant = "empty" | "full" | "mimic"
@@ -11,17 +12,21 @@ const getSprites = (variant: ChestVariant) =>
     Tilesets.instance.dungeonCharacters.getTileSetAnimationFrames(`chest_${variant}_open_anim`)
 
 const closed = () => {
-    return new SpriteAnimation([[getSprites("empty")[0], 0]])
+    return new SpriteAnimation([[getSprites("empty")[0], 0]], () => {}, isGamePaused)
 }
 
 const mimic = () => {
     const sprites = getSprites("mimic")
-    return new SpriteAnimation([
-        [sprites[0], MIMIC_WALK_FRAME_DURATION],
-        [sprites[1], MIMIC_WALK_FRAME_DURATION],
-        [sprites[2], MIMIC_WALK_FRAME_DURATION],
-        [sprites[1], MIMIC_WALK_FRAME_DURATION],
-    ])
+    return new SpriteAnimation(
+        [
+            [sprites[0], MIMIC_WALK_FRAME_DURATION],
+            [sprites[1], MIMIC_WALK_FRAME_DURATION],
+            [sprites[2], MIMIC_WALK_FRAME_DURATION],
+            [sprites[1], MIMIC_WALK_FRAME_DURATION],
+        ],
+        () => {},
+        isGamePaused
+    )
 }
 
 const open = (variant: ChestVariant, onFinish?: () => void) => {
@@ -32,7 +37,8 @@ const open = (variant: ChestVariant, onFinish?: () => void) => {
             [sprites[1], OPEN_FRAME_DURATION],
             [sprites[2], OPEN_FRAME_DURATION],
         ],
-        onFinish
+        onFinish,
+        isGamePaused
     )
 }
 
@@ -44,7 +50,8 @@ const close = (variant: ChestVariant, onFinish?: () => void) => {
             [sprites[1], CLOSE_FRAME_DURATION],
             [sprites[0], CLOSE_FRAME_DURATION],
         ],
-        onFinish
+        onFinish,
+        isGamePaused
     )
 }
 

@@ -1,5 +1,6 @@
 import { Point } from "brigsby/dist"
 import { SpriteAnimation, StaticSpriteSource } from "brigsby/dist/sprites"
+import { isGamePaused } from "../core/PauseState"
 import { getImage } from "./Tilesets"
 
 export class SplitFileTileLoader {
@@ -22,6 +23,10 @@ export class SplitFileTileLoader {
             }
             framesArr.push(image)
         }
-        return new SpriteAnimation(framesArr.map((f) => [f, speed]))
+        return new SpriteAnimation(
+            framesArr.map((f) => [f, speed]),
+            () => {},
+            isGamePaused
+        )
     }
 }

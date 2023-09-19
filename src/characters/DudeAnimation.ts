@@ -1,6 +1,7 @@
 import { Component, pt, UpdateData } from "brigsby/dist"
 import { RenderMethod } from "brigsby/dist/renderer/RenderMethod"
 import { AnimatedSpriteComponent, ImageFilter, SpriteTransform } from "brigsby/dist/sprites"
+import { isGamePaused } from "../core/PauseState"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Color } from "../ui/Color"
 import { Dude } from "./Dude"
@@ -27,7 +28,8 @@ export class DudeAnimation extends Component {
         const height = idleAnim.getSprite(0).dimensions.y
         this._animation = new AnimatedSpriteComponent(
             [idleAnim, runAnim, jumpAnim],
-            new SpriteTransform(pt(0, 28 - height))
+            new SpriteTransform(pt(0, 28 - height)),
+            isGamePaused
         )
         this._transform = this._animation.transform
     }

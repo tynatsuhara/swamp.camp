@@ -1,5 +1,6 @@
 import { Point } from "brigsby/dist"
 import { SpriteAnimation, StaticSpriteSource } from "brigsby/dist/sprites"
+import { isGamePaused } from "../core/PauseState"
 import { getImage } from "./Tilesets"
 
 const ROW_WIDTH = 160
@@ -39,7 +40,9 @@ export class ExtraCharacterSet2TileLoader {
         return new SpriteAnimation(
             Array.from({ length: 4 }, (v, k) => k)
                 .map((index) => this.getTileAt(pos.plusX(TILE_WIDTH * (index + offset))))
-                .map((tileSource) => [tileSource, speed])
+                .map((tileSource) => [tileSource, speed]),
+            () => {},
+            isGamePaused
         )
     }
 
