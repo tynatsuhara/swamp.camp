@@ -28,6 +28,7 @@ export const collectTaxes = () => {
             text: `Collected taxes: ${collected} gold`,
             icon: "coin",
         })
+        // TODO: Maybe you have to visit Berto to collect it
         saveManager.setState({
             coins: coins + collected,
         })

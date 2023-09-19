@@ -61,9 +61,11 @@ const getItemsToSell = (): SalePackage[] => {
     ]
 }
 
-const getGreeting = (hasAnnouncements: boolean) => {
+const getGreeting = () => {
     return "Tally ho!"
 }
+
+// https://academia.com.sg/basics-of-shakespeare-pronouns/ lol
 
 export const BERTO_INTRO_DIALOGUE: DialogueSet = {
     [BERTO_STARTING_DIALOGUE]: () => {
@@ -104,9 +106,8 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
                 "Thy next order should be to recruit workers to begin construction.",
                 "Until they arrive, gathering resources for construction would be well-advised.",
                 "I wish I could help, but alas, I have the soft hands of a life-long bureaucrat.",
-                "Once the town hall is constructed, it shall be my place of residence as well... In the meantime, I'm sure your tent has room for one more.",
+                "Once the town hall is constructed, I shall take up residence there... In the meantime, I'm sure thy tent has room for one more.",
                 "Now, wouldst thou desire for me to send for an order of menial labourers?",
-                // TODO: Once the town hall is constructed, add some dialogue explaining what can be done at the town hall
             ],
             InteractIndicator.IMPORTANT_DIALOGUE,
             option("Sure!", BERT_VILLAGERS, true),
@@ -114,41 +115,49 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
         )
     },
     [BERT_ENTRYPOINT]: () => {
-        const announcements = Berto.instance.getAnnouncements()
-        const hasAnnouncements = announcements.length > 0
         return dialogue(
-            [getGreeting(hasAnnouncements)],
+            [getGreeting()],
             () => new NextDialogue(BERT_MENU, true),
-            hasAnnouncements ? InteractIndicator.IMPORTANT_DIALOGUE : InteractIndicator.NONE
+            Berto.instance.hasAnnouncements()
+                ? InteractIndicator.IMPORTANT_DIALOGUE
+                : InteractIndicator.NONE
         )
     },
     [BERT_MENU]: () => {
+        // Show announcements before anything else
+        if (Berto.instance.hasAnnouncements()) {
+            return redirectDialogue(() => new NextDialogue(BERT_ANNOUNCEMENTS, true))
+        }
+
         const options = []
-        const announcements = Berto.instance.getAnnouncements()
-        if (announcements.length > 0) {
+        const { hasTownHall, hasRecruitedAnyVillagers } = saveManager.getState()
+
+        // selling
+        if (hasTownHall) {
             options.push(
-                new DialogueOption(
-                    "What news is there?",
-                    () => new NextDialogue(BERT_ANNOUNCEMENTS, true)
-                )
+                new DialogueOption("What is the kingdom buying?", () => {
+                    TradeMenu.instance.sell(getItemsToSell())
+                    return new NextDialogue(BERT_ENTRYPOINT, false)
+                })
             )
         }
+
+        // recruiting villagers
         options.push(
-            new DialogueOption("What is the kingdom buying?", () => {
-                TradeMenu.instance.sell(getItemsToSell())
-                return new NextDialogue(BERT_ENTRYPOINT, false)
-            }),
             new DialogueOption("We need more settlers.", () => {
                 return new NextDialogue(BERT_VILLAGERS, true)
             })
         )
-        if (saveManager.getState().hasRecruitedAnyVillagers) {
+
+        // managing taxes
+        if (hasTownHall && hasRecruitedAnyVillagers) {
             options.push(
                 new DialogueOption("Let's talk taxes.", () => new NextDialogue(BERT_TAXES, true))
             )
         }
+
         return dialogueWithOptions(
-            ["How shall I assist thee?"],
+            ["Now, how shall I assist thee?"],
             InteractIndicator.NONE,
             ...options,
             option(getExitText(), BERT_ENTRYPOINT, false)
@@ -157,7 +166,7 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
     [BERT_VILLAGERS]: () => fetchNpcDialogue(),
     [BERT_REQUEST_CONVICTS]: () => fetchConvictsDialogue(),
     [BERT_VILLAGERS_REQUESTED]: () => {
-        const txt = ["I shall send word of thine request to the kingdom."]
+        const txt = ["I shall send word of thy request to the kingdom."]
         if (!saveManager.getState().hasRecruitedAnyVillagers) {
             txt.push(
                 "Once thy new subjects arrive, return to me to establish a tax upon thy residents."
@@ -180,12 +189,15 @@ export const BERTO_INTRO_DIALOGUE: DialogueSet = {
             () => new NextDialogue(BERT_ENTRYPOINT, false)
         ),
     [BERT_ANNOUNCEMENTS]: () => {
-        const a = Berto.instance.shiftAnnouncement()
+        const a = Berto.instance.getAnnouncements()[0]
         if (!a) {
             // This probably shouldn't ever happen
             return dialogue(["Alas, I have no announcements at the moment."])
         }
-        return getAnnouncementDialogue(a, () => new NextDialogue(BERT_ENTRYPOINT, false))
+        return getAnnouncementDialogue(a, () => {
+            Berto.instance.shiftAnnouncement()
+            return new NextDialogue(BERT_MENU, true)
+        })
     },
 }
 

@@ -42,7 +42,7 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => {
         {
             desc: "Snooze to pass time",
             output: Item.BED,
-            // TODO: This should require something that isn't immediately attainable. Some kind of padding?
+            // TODO: This should require something that isn't immediately attainable. Some kind of padding? Wool?
             input: [new ItemStack(Item.WOOD, 10)],
         }
     )
@@ -79,41 +79,51 @@ export const getDipRecipes = (): CraftingRecipeCategory[] => {
         ],
     }
 
-    // TODO: Allow purchasing plans from Berto
-    // const buildings: CraftingRecipeCategory = {
-    //     icon: "church",
-    //     name: "Blueprints",
-    //     recipes: [
-    //         {
-    //             desc: "Houses one settler",
-    //             output: Item.HOUSE,
-    //             input: [new ItemStack(Item.ROCK, 5), new ItemStack(Item.WOOD, 5)],
-    //         },
-    //     ],
+    return [utilities, equipment]
+}
+
+// TODO should these be crafting recipes? Or purchase menu?
+export const getBertoRecipes = (): CraftingRecipeCategory[] => {
+    const buildings: CraftingRecipeCategory = {
+        icon: "church",
+        name: "Blueprints",
+        recipes: [
+            {
+                desc: "Houses one settler",
+                output: Item.MINE_ENTRANCE,
+                input: [new ItemStack(Item.ROCK, 5), new ItemStack(Item.WOOD, 5)],
+            },
+            // TODO: House details (house multiple convicts?) — probably call it "workers' quarters"
+            {
+                desc: "Houses one settler", // TODO probably should house more
+                output: Item.HOUSE,
+                input: [new ItemStack(Item.ROCK, 5), new ItemStack(Item.WOOD, 5)],
+            },
+        ],
+    }
+
+    // TODO: How should we determine when a church can be built?
+    //       Instead of doing it like this, there should be a canBuildChurch
+    //       flag and Berto should deliver an announcement
+
+    // const houses = camp()
+    //     .getElementsOfType(ElementType.HOUSE)
+    //     .flatMap((h) => h.entity.getComponents(Residence))
+
+    // if (houses.length >= 3 && houses.every((h) => h.getResidents().length > 0)) {
+    //     buildings.recipes.push({
+    //         desc: "Church",
+    //         output: Item.CHURCH,
+    //         input: [new ItemStack(Item.ROCK, 5), new ItemStack(Item.WOOD, 5)],
+    //     })
     // }
 
-    /*
-    const houses = LocationManager.instance
-        .exterior()
-        .getElementsOfType(ElementType.HOUSE)
-        .map((h) => h.entity.getComponent(Residence))
-
-    if (houses.length >= 3 && houses.every((h) => h.getResidents().length > 0)) {
-        buildings.recipes.push({
-            desc: "Church",
-            output: Item.CHURCH,
-            input: [new ItemStack(Item.ROCK, 5), new ItemStack(Item.WOOD, 5)],
-        })
-    }
-    */
-
-    return [utilities, equipment]
+    return [buildings]
 }
 
 export const getCookingRecipes = (): CraftingRecipeCategory[] => {
     return [
         {
-            // TODO: don't show icon if there's only one category?
             icon: "bread",
             name: "Foodstuffs",
             recipes: [

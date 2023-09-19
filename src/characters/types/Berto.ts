@@ -36,11 +36,14 @@ export class Berto extends Component {
         return this.npc.dude.blob[ANNOUNCEMENT_KEY] ?? []
     }
 
-    shiftAnnouncement(): Announcement {
+    hasAnnouncements(): boolean {
+        return this.getAnnouncements().length > 0
+    }
+
+    shiftAnnouncement(): void {
         const announcements = this.getAnnouncements()
-        const result = announcements.shift()
+        announcements.shift()
         this.npc.dude.blob[ANNOUNCEMENT_KEY] = announcements
-        return result
     }
 
     removeAnnouncement(id: string) {

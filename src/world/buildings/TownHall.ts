@@ -1,5 +1,7 @@
 import { Point, pt } from "brigsby/dist"
 import { DudeType } from "../../characters/DudeType"
+import { Berto } from "../../characters/types/Berto"
+import { saveManager } from "../../core/SaveManager"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { ElementType } from "../elements/ElementType"
 import { BasicLocation } from "../locations/BasicLocation"
@@ -24,7 +26,8 @@ export class TownHallFactory extends SimpleBuildingFactory<ElementType.TOWN_HALL
     }
 
     onConstructionComplete(): void {
-        console.log("town hall has been built!")
+        saveManager.setState({ hasTownHall: true })
+        Berto.instance.addAnnouncement({ id: "explain-town-hall" })
     }
 }
 

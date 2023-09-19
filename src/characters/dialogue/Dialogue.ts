@@ -48,7 +48,7 @@ export class DialogueInstance {
 // When processed by DialogueDisplay, immediately loads the next dialogue
 // Useful for when you want to show a next dialogue without any interstitial text or options
 export const redirectDialogue = (next: () => NextDialogue) => {
-    return new DialogueInstance(undefined, next, [], InteractIndicator.NONE)
+    return new DialogueInstance(undefined, next, [])
 }
 
 // Shorthand functions for creating dialogue

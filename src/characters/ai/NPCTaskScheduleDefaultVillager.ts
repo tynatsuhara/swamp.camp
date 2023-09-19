@@ -251,7 +251,10 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             }
         }
 
-        if (dude.type === DudeType.HERALD || dude.type === DudeType.DIP) {
+        if (
+            dude.type === DudeType.DIP ||
+            (dude.type === DudeType.HERALD && !saveManager.getState().hasTownHall)
+        ) {
             // Go to the campfire closest to the middle of the amp
             const closestCampfireGoal = Point.ZERO
             const location = camp()
