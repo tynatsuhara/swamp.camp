@@ -211,7 +211,7 @@ export class InventoryDisplay extends Component {
             invStackPostUpdate.item === heldStack.item
 
         // Open without changing any of the fields
-        this._open(this.onClose, this.tradingInv, this.donatingOptions)
+        this._open(this.onClose, this.tradingInv, this.donatingOptions, this.tradingInvTitle)
 
         if (rePickUpItem) {
             const newHeldStack = invStackPostUpdate.withCount(
@@ -596,7 +596,7 @@ export class InventoryDisplay extends Component {
         onClose = null,
         tradingInv = null,
         donating = null,
-        tradingInvTitle,
+        tradingInvTitle = null,
     }: {
         onClose?: () => void
         tradingInv?: Inventory
@@ -608,10 +608,10 @@ export class InventoryDisplay extends Component {
     }
 
     private _open(
-        onClose?: () => void,
-        tradingInv?: Inventory,
-        donatingOptions?: DonatingOptions,
-        tradingInvTitle?: string
+        onClose: () => void | null,
+        tradingInv: Inventory | null,
+        donatingOptions: DonatingOptions | null,
+        tradingInvTitle: string | null
     ) {
         this.clearHeldStack()
 
