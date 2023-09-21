@@ -33,6 +33,7 @@ const KEYS = {
     ["meat1"]: pt(16, 28),
     ["meat1raw"]: pt(16, 32),
     ["meat2"]: pt(17, 28),
+    ["onion"]: pt(17, 32),
     ["cheese"]: pt(18, 28),
     ["apple"]: pt(15, 29),
     ["pear"]: pt(16, 29),
