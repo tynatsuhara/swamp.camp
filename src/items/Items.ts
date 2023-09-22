@@ -211,6 +211,13 @@ export const ITEM_METADATA_MAP: Partial<Record<Item, ItemSpec>> = {
         consumable: ItemUtils.consumable("eat", SOUNDS.eat, (consumer) => consumer.heal(0.5)),
         droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("berries"),
     }),
+    [Item.ONION]: new ItemSpec({
+        displayName: "Magic onion bulb",
+        description: "???",
+        inventoryIcon: "onion",
+        // consumable: ItemUtils.consumable("eat", SOUNDS.eat, (consumer) => consumer.heal(0.5)), // TODO placeable
+        droppedIconSupplier: () => Tilesets.instance.outdoorTiles.getTileSource("berries"), // TODO
+    }),
     [Item.EXPLORER_MAP]: new ItemSpec({
         displayName: "Explorer's map",
         inventoryIcon: "map",

@@ -35,6 +35,7 @@ import { Dip } from "./types/Dip"
 import { DudeModifier } from "./types/DudeModifier"
 import { Enemy } from "./types/Enemy"
 import { Mimic } from "./types/Mimic"
+import { Onion } from "./types/Onion"
 import { ShamanHealer } from "./types/ShamanHealer"
 import { ShroomNPC } from "./types/ShroomNPC"
 import { SpookyVisitor } from "./types/SpookyVisitor"
@@ -464,8 +465,8 @@ export class DudeFactory {
             case DudeType.ONION: {
                 factions = [DudeFaction.VILLAGERS]
                 animationName = "onion"
-                weapon = WeaponType.UNARMED
-                additionalComponents = [new NPC(), new Villager()]
+                weapon = WeaponType.NONE
+                additionalComponents = [new NPC(), new Villager(), new Onion()]
                 maxHealth = 50
                 speed *= 0.7
                 break

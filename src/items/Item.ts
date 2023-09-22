@@ -29,6 +29,7 @@ export enum Item {
     LAMP_OIL,
     WORKBENCH,
     TOWN_HALL,
+    ONION,
 
     // weapon values should match the WeaponType enum so we can cast them
     KNIFE = WeaponType.KNIFE,
