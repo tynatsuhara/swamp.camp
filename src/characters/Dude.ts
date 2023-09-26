@@ -1,7 +1,6 @@
 import { Component, debug, Point, pt, UpdateData } from "brigsby/dist"
 import { BoxCollider } from "brigsby/dist/collision"
 import { PointValue } from "brigsby/dist/Point"
-import { RenderMethod } from "brigsby/dist/renderer"
 import { Animator, Lists, RepeatedInvoker } from "brigsby/dist/util"
 import { StepSounds } from "../audio/StepSounds"
 import { VocalSounds } from "../audio/VocalSounds"
@@ -32,7 +31,6 @@ import { DudeSaveState } from "../saves/DudeSaveState"
 import { Color } from "../ui/Color"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { HUD } from "../ui/HUD"
-import { getIconSpriteImageRender } from "../ui/IconSprite"
 import { InteractIndicator } from "../ui/InteractIndicator"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { Burnable } from "../world/elements/Burnable"
@@ -439,7 +437,8 @@ export class Dude extends Component implements DialogueSource {
                             const canGuestAccessDialogue = [DIP_ENTRYPOINT].includes(this.dialogue)
                             return canGuestAccessDialogue
                         }
-                    }
+                    },
+                    () => this.getIndicator()
                 )
             )
 
@@ -1576,9 +1575,9 @@ export class Dude extends Component implements DialogueSource {
         }
     }
 
-    getRenderMethods(): RenderMethod[] {
-        return this.getIndicator()
-    }
+    // getRenderMethods(): RenderMethod[] {
+    // return this.getIndicator()
+    // }
 
     delete() {
         this.removeAllConditions()
@@ -1656,13 +1655,13 @@ export class Dude extends Component implements DialogueSource {
         }
     }
 
-    private getIndicator(): RenderMethod[] {
+    private getIndicator(): { icon: Icon; color: Color } | undefined {
         if (!this.isAlive) {
-            return []
+            return
         }
 
         let icon: Icon
-        let iconColor: Color
+        let color: Color
 
         // little flashing circle right before attacking the player
         const npc = this.entity.getComponent(NPC)
@@ -1673,7 +1672,7 @@ export class Dude extends Component implements DialogueSource {
                 icon = "small-circle"
             }
             if (this.attackState === AttackState.ATTACKING_NOW) {
-                iconColor = Color.RED_4
+                color = Color.RED_4
             }
         } else if (this.dialogue && this.dialogue != EMPTY_DIALOGUE) {
             if (this.dialogueIndicator === InteractIndicator.IMPORTANT_DIALOGUE) {
@@ -1684,28 +1683,15 @@ export class Dude extends Component implements DialogueSource {
         }
 
         if (!icon) {
-            return []
+            return
         }
-
-        // if (
-        //     this.factions.includes(DudeFaction.VILLAGERS) &&
-        //     now() < this.lastAttackerTime + 10_000
-        // ) {
-        //     indicator = DudeInteractIndicator.IMPORTANT_DIALOGUE
-        // }
 
         // render indicator icon overhead
-        if (this.dialogueInteract?.isShowingUI || DialogueDisplay.instance.currentSource === this) {
-            return []
+        if (DialogueDisplay.instance.currentSource === this) {
+            return
         }
 
-        return [
-            getIconSpriteImageRender({
-                icon,
-                centerPos: this.standingPosition.plusY(-28).plus(this.getAnimationOffset()),
-                color: iconColor,
-            }),
-        ]
+        return { icon, color }
     }
 
     log(message: any) {

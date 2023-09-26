@@ -1,8 +1,6 @@
-import { Component, Entity, Point, PointValue } from "brigsby/dist"
-import { RenderMethod } from "brigsby/dist/renderer"
-import { SpriteTransform } from "brigsby/dist/sprites"
-import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
-import { UI_SPRITE_DEPTH } from "../ui/UiConstants"
+import { Entity, Point, PointValue } from "brigsby/dist"
+import { TILE_SIZE } from "../graphics/Tilesets"
+import { Color } from "../ui/Color"
 import { ElementComponent } from "./elements/ElementComponent"
 import { ElementFactory } from "./elements/ElementFactory"
 import { ElementType } from "./elements/ElementType"
@@ -38,32 +36,14 @@ export class TeleporterIndicatorFactory extends ElementFactory<
     ): ElementComponent<ElementType.TELEPORTER_INDICATOR, TeleporterIndicatorSaveData> {
         const e = new Entity()
 
-        const interactPos = Point.fromString(data.i)
-
-        const interactComponent = e.addComponent(
-            new Interactable(
-                interactPos,
-                () => LocationManager.instance.playerUseTeleporter(data.teleporterId),
-                new Point(0, TILE_SIZE / 2)
-            )
-        )
-
         e.addComponent(
-            new (class extends Component {
-                getRenderMethods(): RenderMethod[] {
-                    if (interactComponent.isShowingUI) {
-                        return []
-                    }
-                    return [
-                        Tilesets.instance.oneBit.getTileSource("small_arrow_down").toImageRender(
-                            SpriteTransform.new({
-                                position: pos.times(TILE_SIZE).plus(data.offset ?? Point.ZERO),
-                                depth: UI_SPRITE_DEPTH,
-                            })
-                        ),
-                    ]
-                }
-            })()
+            new Interactable(
+                Point.fromString(data.i),
+                () => LocationManager.instance.playerUseTeleporter(data.teleporterId),
+                new Point(0, TILE_SIZE / 2),
+                undefined,
+                () => ({ icon: "small_arrow_down", color: Color.WHITE })
+            )
         )
 
         return e.addComponent(

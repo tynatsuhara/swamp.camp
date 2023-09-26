@@ -1,4 +1,4 @@
-import { AnonymousComponent, Component, Entity, Point, pt } from "brigsby/dist"
+import { Component, Entity, Point, pt } from "brigsby/dist"
 import { AnimatedSpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { ChestAnimation } from "../../characters/ChestAnimation"
 import { player } from "../../characters/player/index"
@@ -7,7 +7,7 @@ import { Icon } from "../../graphics/OneBitTileset"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { Inventory, ItemStack } from "../../items/Inventory"
 import { randomByteString } from "../../saves/uuid"
-import { getIconSpriteImageRender } from "../../ui/IconSprite"
+import { Color } from "../../ui/Color"
 import { InventoryDisplay } from "../../ui/InventoryDisplay"
 import { Location } from "../locations/Location"
 import { ElementComponent } from "./ElementComponent"
@@ -104,28 +104,20 @@ export const getChestComponents = ({
             animator.goToAnimation(0).play()
         },
         pt(0, -17),
-        (interactor) => interactor === player() && canInteract()
-    )
-
-    const indicator = new AnonymousComponent({
-        getRenderMethods: () => {
+        (interactor) => interactor === player() && canInteract(),
+        () => {
             const icon = getIndicator()
-            if (!icon || interactable.isShowingUI) {
-                return []
+            if (!icon) {
+                return
             }
-            return [
-                getIconSpriteImageRender({
-                    icon,
-                    centerPos: interactable.position.plusY(-TILE_SIZE),
-                }),
-            ]
-        },
-    })
+            return { icon, color: Color.WHITE }
+        }
+    )
 
     const collider = new NavMeshCollider(wl, pixelPos.plus(pt(1, 9)), pt(14, 6))
 
     return {
-        components: [animator, interactable, collider, indicator],
+        components: [animator, interactable, collider],
         closeAnimation: () => {
             if (isOpen) {
                 animator.goToAnimation(1).play()

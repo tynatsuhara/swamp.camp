@@ -3,8 +3,11 @@ import { EllipseRender, RenderMethod } from "brigsby/dist/renderer"
 import { Dude } from "../../characters/Dude"
 import { player } from "../../characters/player/index"
 import { controls } from "../../core/Controls"
+import { Icon } from "../../graphics/OneBitTileset"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { ButtonIndicator } from "../../ui/ButtonIndicator"
+import { Color } from "../../ui/Color"
+import { getIconSpriteImageRender } from "../../ui/IconSprite"
 import { KeyPressIndicator } from "../../ui/KeyPressIndicator"
 import { UIStateManager } from "../../ui/UIStateManager"
 
@@ -13,9 +16,6 @@ export class Interactable extends Component {
     private readonly fn: (interactor: Dude) => void
     uiOffset: Point
     private showUI: boolean
-    get isShowingUI() {
-        return this.showUI
-    }
 
     // This will be evaluated on both host AND client
     readonly isInteractable: (interactor: Dude) => boolean
@@ -24,7 +24,8 @@ export class Interactable extends Component {
         position: Point,
         fn: (interactor: Dude) => void,
         uiOffset: Point = Point.ZERO,
-        isInteractable: (interactor: Dude) => boolean = () => true
+        isInteractable: (interactor: Dude) => boolean = () => true,
+        private getIndicator?: () => { icon: Icon; color: Color } | undefined
     ) {
         super()
         this.position = position
@@ -56,6 +57,18 @@ export class Interactable extends Component {
                         dimensions: new Point(4, 4),
                     }),
                 ]
+            } else if (this.getIndicator) {
+                const indicator = this.getIndicator()
+                if (indicator) {
+                    const { icon, color } = indicator
+                    return [
+                        getIconSpriteImageRender({
+                            icon,
+                            centerPos: this.position.plus(this.uiOffset).apply(Math.round),
+                            color,
+                        }),
+                    ]
+                }
             }
             return []
         }
