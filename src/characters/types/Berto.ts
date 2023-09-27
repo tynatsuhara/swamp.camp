@@ -30,6 +30,7 @@ export class Berto extends Component {
         const announcements = this.getAnnouncements()
         announcements.push(a)
         this.npc.dude.blob[ANNOUNCEMENT_KEY] = announcements
+        this.npc.dude.updateDialogueIndicator()
     }
 
     getAnnouncements(): Announcement[] {
@@ -44,10 +45,12 @@ export class Berto extends Component {
         const announcements = this.getAnnouncements()
         announcements.shift()
         this.npc.dude.blob[ANNOUNCEMENT_KEY] = announcements
+        this.npc.dude.updateDialogueIndicator()
     }
 
     removeAnnouncement(id: string) {
         this.npc.dude.blob[ANNOUNCEMENT_KEY] = this.getAnnouncements().filter((a) => a.id !== id)
+        this.npc.dude.updateDialogueIndicator()
     }
 }
 

@@ -183,7 +183,9 @@ export class Dude extends Component implements DialogueSource {
     }
     set dialogue(val: string) {
         this._dialogue = val
-        this.updateDialogueIndicator()
+        if (this.isStarted) {
+            this.updateDialogueIndicator()
+        }
     }
     private dialogueIndicator = InteractIndicator.NONE
 
@@ -482,15 +484,14 @@ export class Dude extends Component implements DialogueSource {
         }
     }
 
-    private updateDialogueIndicator() {
-        if (this.isStarted) {
-            if (this.dialogue) {
-                this.dialogueIndicator =
-                    getDialogue(this.dialogue, this)?.indicator ?? InteractIndicator.NONE
-            } else {
-                this.dialogueIndicator = InteractIndicator.NONE
-            }
+    updateDialogueIndicator() {
+        if (this.dialogue) {
+            this.dialogueIndicator =
+                getDialogue(this.dialogue, this)?.indicator ?? InteractIndicator.NONE
+        } else {
+            this.dialogueIndicator = InteractIndicator.NONE
         }
+        this.updateOffscreenIndicator()
     }
 
     private updateOffscreenIndicator() {
