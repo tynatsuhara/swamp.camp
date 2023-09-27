@@ -13,6 +13,7 @@ import { LocationManager } from "../locations/LocationManager"
 import { LocationType } from "../locations/LocationType"
 import { SingleTypeResidence } from "../residences/SingleTypeResidence"
 import { BuildingFactory } from "./Building"
+import { interactableDoorIconSupplier } from "./BuildingUtils"
 import { InteriorUtils } from "./InteriorUtils"
 
 type HouseData = {
@@ -93,7 +94,9 @@ export class HouseFactory extends BuildingFactory<ElementType.HOUSE> {
             new Interactable(
                 interactablePos,
                 () => LocationManager.instance.playerUseTeleporter(destinationUUID),
-                new Point(0, -TILE_SIZE * 1.4)
+                new Point(0, -TILE_SIZE * 1.4),
+                undefined,
+                interactableDoorIconSupplier(destinationUUID)
             )
         )
 

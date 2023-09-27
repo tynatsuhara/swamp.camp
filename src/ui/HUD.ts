@@ -65,6 +65,10 @@ export class HUD {
         this.offScreenIndicatorManager.removeIndicator(key)
     }
 
+    getMarkedLocations() {
+        return this.offScreenIndicatorManager.getMarkedLocations()
+    }
+
     getEntities(): Entity[] {
         this.updateHearts(player().health, player().maxHealth)
 

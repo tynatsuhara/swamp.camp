@@ -11,6 +11,7 @@ import { ElementType } from "../elements/ElementType"
 import { Interactable } from "../elements/Interactable"
 import { Location } from "../locations/Location"
 import { LocationManager } from "../locations/LocationManager"
+import { interactableDoorIconSupplier } from "./BuildingUtils"
 
 export class MineExitFactory extends ElementFactory<ElementType.MINE_EXIT> {
     readonly dimensions = pt(1, 1)
@@ -74,7 +75,9 @@ export class MineExitFactory extends ElementFactory<ElementType.MINE_EXIT> {
                     LocationManager.instance.playerUseTeleporter(wl.uuid) // the teleporter ID should match the mine interior's UUID
                     spawnParticlesAtTime = now() + 1_000
                 },
-                pt(0, -TILE_SIZE)
+                pt(0, -TILE_SIZE),
+                undefined,
+                interactableDoorIconSupplier(wl.uuid)
             )
         )
 

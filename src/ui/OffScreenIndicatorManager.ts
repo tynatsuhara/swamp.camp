@@ -24,6 +24,10 @@ export class OffScreenIndicatorManager {
         }
     }
 
+    getMarkedLocations() {
+        return [...this.map.values()].map((i) => i.locationSupplier())
+    }
+
     getEntity() {
         return this.entity
     }

@@ -271,6 +271,12 @@ export class LocationManager {
             .find((result) => !!result)
     }
 
+    getTeleporterDestination(teleporterId: string) {
+        const teleporter = this.teleporters[teleporterId]
+        const otherSide = teleporter.a.location === here().uuid ? teleporter.b : teleporter.a
+        return otherSide
+    }
+
     playerUseTeleporter(teleporterId: string) {
         // teleporter will get executed on the host
         if (session.isGuest()) {
@@ -278,11 +284,11 @@ export class LocationManager {
         }
 
         const teleporter = this.teleporters[teleporterId]
-        const otherSide = teleporter.a.location === here().uuid ? teleporter.b : teleporter.a
+        const destination = this.getTeleporterDestination(teleporterId)
 
         this.playerLoadLocation(
-            LocationManager.instance.get(otherSide.location),
-            pt(otherSide.pos.x, otherSide.pos.y)
+            LocationManager.instance.get(destination.location),
+            pt(destination.pos.x, destination.pos.y)
         )
 
         setTimeout(() => Teleporters.playSound(teleporter), 500)

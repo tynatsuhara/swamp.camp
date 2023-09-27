@@ -12,6 +12,7 @@ import { Location } from "../locations/Location"
 import { LocationManager } from "../locations/LocationManager"
 import { LocationType } from "../locations/LocationType"
 import { BuildingFactory, ConstructionRequirements } from "./Building"
+import { interactableDoorIconSupplier } from "./BuildingUtils"
 import { InteriorUtils } from "./InteriorUtils"
 
 type SaveFormat = { destinationUUID: string }
@@ -64,7 +65,9 @@ export class MineEntranceFactory extends BuildingFactory<ElementType.MINE_ENTRAN
             new Interactable(
                 interactablePos,
                 () => LocationManager.instance.playerUseTeleporter(destinationUUID),
-                new Point(0, -17)
+                new Point(0, -17),
+                undefined,
+                interactableDoorIconSupplier(destinationUUID)
             )
         )
 

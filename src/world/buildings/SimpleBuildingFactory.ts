@@ -9,6 +9,7 @@ import { Location } from "../locations/Location"
 import { LocationManager } from "../locations/LocationManager"
 import { MultiTypeResidence } from "../residences/MultiTypeResidence"
 import { BuildingFactory } from "./Building"
+import { interactableDoorIconSupplier } from "./BuildingUtils"
 
 type SimpleBuildingData = {
     interiorUUID: string
@@ -98,7 +99,9 @@ export class SimpleBuildingFactory<Type extends ElementType> extends BuildingFac
                 interactablePos,
                 // TODO: Allow doors to be locked? Maybe say "the hours are between X and Y" if it's a shop
                 () => LocationManager.instance.playerUseTeleporter(interiorUUID),
-                new Point(0, -TILE_SIZE * 1.4)
+                new Point(0, -TILE_SIZE * 1.4),
+                undefined,
+                interactableDoorIconSupplier(interiorUUID)
             )
         )
 

@@ -18,6 +18,7 @@ import { LocationManager } from "../locations/LocationManager"
 import { LocationType } from "../locations/LocationType"
 import { SingleTypeResidence } from "../residences/SingleTypeResidence"
 import { BuildingFactory, ConstructionRequirements } from "./Building"
+import { interactableDoorIconSupplier } from "./BuildingUtils"
 import { InteriorUtils } from "./InteriorUtils"
 
 export const DIP_TENT_COLOR = "red"
@@ -70,7 +71,9 @@ export class TentFactory extends BuildingFactory<ElementType.TENT, TentData> {
             new Interactable(
                 interactablePos,
                 () => LocationManager.instance.playerUseTeleporter(destinationUUID),
-                new Point(1, -TILE_SIZE * 1.4)
+                new Point(1, -TILE_SIZE * 1.4),
+                undefined,
+                interactableDoorIconSupplier(destinationUUID)
             )
         )
 
