@@ -150,8 +150,8 @@ const constructMineInterior = (l: Location, growAmount: number) => {
         pts.push(p)
 
         // TODO make this work (canPlaceAtPos etc)
-        if (Math.random() < 0.1) {
-            l.addElement(ElementType.ROCK, p)
+        if (Math.random() < 0.06) {
+            l.addElement(ElementType.ROCK, p, { m: false /* no moss */ })
         }
     }
 

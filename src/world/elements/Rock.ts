@@ -91,10 +91,10 @@ export class RockFactory extends ElementFactory<ElementType.ROCK> {
     }
 
     canPlaceInLocation(wl: Location) {
-        return !wl.isInterior
+        return true
     }
 
     canPlaceAtPos(wl: Location, pos: Point) {
-        return Ground.isNaturalGround(wl.getGround(pos)?.type)
+        return Ground.isWalkableGround(wl.getGround(pos)?.type)
     }
 }

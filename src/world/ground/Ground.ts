@@ -72,4 +72,8 @@ export class Ground {
     static isNaturalGround(type: GroundType) {
         return type === GroundType.GRASS || type === GroundType.PATH
     }
+
+    static isWalkableGround(type: GroundType) {
+        return !this.isWater(type) && type !== GroundType.LEDGE
+    }
 }
