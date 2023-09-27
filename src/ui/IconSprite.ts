@@ -3,13 +3,15 @@ import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { StaticSpriteSource } from "brigsby/dist/sprites/StaticSpriteSource"
 import { ImageFilters } from "../graphics/ImageFilters"
 import { Icon } from "../graphics/OneBitTileset"
-import { Tilesets, TILE_SIZE } from "../graphics/Tilesets"
+import { TILE_SIZE, Tilesets } from "../graphics/Tilesets"
 import { Color } from "./Color"
 import { UI_SPRITE_DEPTH } from "./UiConstants"
 
 const iconSpriteCache: Record<string, StaticSpriteSource> = {}
 
-export const getIconSprite = ({ icon, color = Color.WHITE }: { icon: Icon; color?: Color }) => {
+export type IconDisplay = { icon: Icon; color?: Color }
+
+export const getIconSprite = ({ icon, color = Color.WHITE }: IconDisplay) => {
     const cacheKey = `${icon}${color ?? ""}`
     const sprite =
         iconSpriteCache[cacheKey] ??

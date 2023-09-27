@@ -31,6 +31,7 @@ import { DudeSaveState } from "../saves/DudeSaveState"
 import { Color } from "../ui/Color"
 import { DialogueDisplay } from "../ui/DialogueDisplay"
 import { HUD } from "../ui/HUD"
+import { IconDisplay } from "../ui/IconSprite"
 import { InteractIndicator } from "../ui/InteractIndicator"
 import { NotificationDisplay } from "../ui/NotificationDisplay"
 import { Burnable } from "../world/elements/Burnable"
@@ -1655,7 +1656,7 @@ export class Dude extends Component implements DialogueSource {
         }
     }
 
-    private getIndicator(): { icon: Icon; color: Color } | undefined {
+    private getIndicator(): IconDisplay | undefined {
         if (!this.isAlive) {
             return
         }

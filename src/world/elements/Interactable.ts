@@ -3,11 +3,9 @@ import { EllipseRender, RenderMethod } from "brigsby/dist/renderer"
 import { Dude } from "../../characters/Dude"
 import { player } from "../../characters/player/index"
 import { controls } from "../../core/Controls"
-import { Icon } from "../../graphics/OneBitTileset"
 import { TILE_SIZE } from "../../graphics/Tilesets"
 import { ButtonIndicator } from "../../ui/ButtonIndicator"
-import { Color } from "../../ui/Color"
-import { getIconSpriteImageRender } from "../../ui/IconSprite"
+import { getIconSpriteImageRender, IconDisplay } from "../../ui/IconSprite"
 import { KeyPressIndicator } from "../../ui/KeyPressIndicator"
 import { UIStateManager } from "../../ui/UIStateManager"
 
@@ -25,7 +23,7 @@ export class Interactable extends Component {
         fn: (interactor: Dude) => void,
         uiOffset: Point = Point.ZERO,
         isInteractable: (interactor: Dude) => boolean = () => true,
-        private getIndicator?: () => { icon: Icon; color: Color } | undefined
+        private getIndicator?: () => IconDisplay | undefined
     ) {
         super()
         this.position = position
