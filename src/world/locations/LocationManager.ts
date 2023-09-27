@@ -213,9 +213,6 @@ export class LocationManager {
                         p.moveTo(newPosition, true)
                     })
 
-                // refresh the HUD hide stale data
-                HUD.instance.refresh()
-
                 // actually set the location
                 this.loadLocation(newLocation)
 

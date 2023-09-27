@@ -24,10 +24,6 @@ export class OffScreenIndicatorManager {
         }
     }
 
-    clear() {
-        this.map.clear()
-    }
-
     getEntity() {
         return this.entity
     }

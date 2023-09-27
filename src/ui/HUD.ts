@@ -65,10 +65,6 @@ export class HUD {
         this.offScreenIndicatorManager.removeIndicator(key)
     }
 
-    refresh() {
-        this.offScreenIndicatorManager.clear()
-    }
-
     getEntities(): Entity[] {
         this.updateHearts(player().health, player().maxHealth)
 
