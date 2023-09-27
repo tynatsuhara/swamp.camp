@@ -24,7 +24,7 @@ export class IntroCutscene extends Component {
     private readonly START_WALKING_IN = 1000
     private readonly PAN_TO_DIP = this.START_WALKING_IN + 3000
     private readonly GET_OFF_SHIP = this.PAN_TO_DIP + 500
-    private readonly PAN_BACK = this.GET_OFF_SHIP + 1500
+    private readonly PAN_BACK = this.GET_OFF_SHIP + 3500
 
     private waitingForOrcsToDie = false
     private orcs: Dude[]
