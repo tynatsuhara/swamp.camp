@@ -28,6 +28,8 @@ export class WorldTime extends Component {
         return Math.floor((this.time % TimeUnit.DAY) / TimeUnit.HOUR)
     }
 
+    private readonly timeoutQueue = new TimeoutQueue()
+
     initialize(time: number) {
         this._time = time
     }
@@ -39,8 +41,8 @@ export class WorldTime extends Component {
 
         if (!isGamePaused()) {
             this._time += updateData.elapsedTimeMillis
+            this.timeoutQueue.processEvents(this.time)
             EventQueue.instance.processEvents(this.time)
-            TimeoutQueue.instance.processEvents(this.time)
             WorldAudioContext.instance.time = this.time
         }
     }

@@ -1,5 +1,4 @@
 import { BinaryHeap } from "brigsby/dist/util"
-import { Singletons } from "../../core/Singletons"
 import { EventDispatcher } from "../../utils/EventDispatcher"
 import { now } from "../WorldTime"
 
@@ -8,10 +7,6 @@ import { now } from "../WorldTime"
  * It runs on both hosts and clients!
  */
 export class TimeoutQueue {
-    static get instance() {
-        return Singletons.getOrCreate(TimeoutQueue)
-    }
-
     private heap: BinaryHeap<{ time: number; fn: () => void }> = new BinaryHeap((e) => e.time)
 
     constructor() {
@@ -26,7 +21,7 @@ export class TimeoutQueue {
         )
     }
 
-    addEvent(event: { time: number; fn: () => void }) {
+    private addEvent(event: { time: number; fn: () => void }) {
         this.heap.push(event)
     }
 
