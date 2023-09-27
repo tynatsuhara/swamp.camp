@@ -99,8 +99,6 @@ const makeMineInterior = (outside: Location) => {
         allowPlacing: false,
     })
 
-    // TODO how does growing the mine work?
-
     const pts = [pt(0, 0)]
 
     l.addFeature("mineInteriorBackground", { pts })
@@ -138,6 +136,7 @@ const constructMineInterior = (l: Location, growAmount: number) => {
             .filter((p) => !gridExclude.get(p) && !gridPoints.get(p))
             .forEach((p) => expandPointsGrid.set(p, true))
         const expandPoints = expandPointsGrid.keys().map((p) => {
+            // we're not actually using this right now
             const adjacentExpandedSpots = adjacent(p).filter((p2) => gridPoints.get(p2)).length
             return { p, adjacentExpandedSpots }
         })
@@ -146,14 +145,16 @@ const constructMineInterior = (l: Location, growAmount: number) => {
         const topPriority = expandPoints.filter(
             ({ p }) => gridPoints.get(p.plusY(1)) && gridPoints.get(p.plusY(-1))
         )
-        if (topPriority.length > 0) {
-            pts.push(Lists.oneOf(topPriority).p)
-        } else {
-            pts.push(Lists.oneOf(expandPoints).p)
+
+        const { p } = Lists.oneOf(topPriority.length > 0 ? topPriority : expandPoints)
+        pts.push(p)
+
+        // TODO make this work (canPlaceAtPos etc)
+        if (Math.random() < 0.1) {
+            l.addElement(ElementType.ROCK, p)
         }
     }
 
-    // TODO where do we do this?
     pts.forEach((p) => l.setGroundElement(GroundType.BASIC, pt(p.x, p.y)))
 
     l.addFeature("mineInteriorBackground", { pts })
