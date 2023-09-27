@@ -1,8 +1,11 @@
 import { Entity, Point, pt } from "brigsby/dist"
 import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
+import { Grid, Lists } from "brigsby/dist/util"
 import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
+import { adjacent } from "../../utils/misc"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/ElementType"
+import { ElementUtils } from "../elements/ElementUtils"
 import { Interactable } from "../elements/Interactable"
 import { NavMeshCollider } from "../elements/NavMeshCollider"
 import { GroundType } from "../ground/Ground"
@@ -98,7 +101,7 @@ const makeMineInterior = (outside: Location) => {
 
     // TODO how does growing the mine work?
 
-    const pts = [pt(0, 0), pt(0, 1), pt(1, 0), pt(1, -1)]
+    const pts = [pt(0, 0)]
 
     l.addFeature("mineInteriorBackground", { pts })
 
@@ -113,19 +116,47 @@ const makeMineInterior = (outside: Location) => {
 
     l.addElement(ElementType.MINE_EXIT, Point.ZERO, { i: interactablePos.toString() })
 
-    // Indicate the open floor points so NPCs can roam
-    pts.forEach((p) => l.setGroundElement(GroundType.BASIC, p))
+    constructMineInterior(l, 0)
 
     return LocationManager.instance.add(l)
 }
 
-const resizeMine = (l: Location) => {
-    const bg = l.getFeatureOfType("mineInteriorBackground")
-
-    bg.pts
-
+const constructMineInterior = (l: Location, growAmount: number) => {
+    const { pts } = l.getFeatureOfType("mineInteriorBackground")
     l.removeFeaturesOfType("mineInteriorBackground")
-    l.addFeature("mineInteriorBackground", bg)
+
+    for (let i = 0; i < growAmount; i++) {
+        const excludedPts = ElementUtils.rectPoints(pt(-1, -2), pt(3, 2))
+        const gridExclude = new Grid<boolean>()
+        excludedPts.forEach((p) => gridExclude.set(p, true))
+
+        const gridPoints = new Grid<boolean>()
+        pts.forEach((p) => gridPoints.set(p, true))
+
+        const expandPointsGrid = new Grid<boolean>()
+        pts.flatMap((p) => adjacent(p))
+            .filter((p) => !gridExclude.get(p) && !gridPoints.get(p))
+            .forEach((p) => expandPointsGrid.set(p, true))
+        const expandPoints = expandPointsGrid.keys().map((p) => {
+            const adjacentExpandedSpots = adjacent(p).filter((p2) => gridPoints.get(p2)).length
+            return { p, adjacentExpandedSpots }
+        })
+
+        // a single empty spot with points above and below it isnt very nice
+        const topPriority = expandPoints.filter(
+            ({ p }) => gridPoints.get(p.plusY(1)) && gridPoints.get(p.plusY(-1))
+        )
+        if (topPriority.length > 0) {
+            pts.push(Lists.oneOf(topPriority).p)
+        } else {
+            pts.push(Lists.oneOf(expandPoints).p)
+        }
+    }
+
+    // TODO where do we do this?
+    pts.forEach((p) => l.setGroundElement(GroundType.BASIC, pt(p.x, p.y)))
+
+    l.addFeature("mineInteriorBackground", { pts })
 }
 
-window["resizeMine"] = () => resizeMine(here())
+window["resizeMine"] = () => constructMineInterior(here(), 10)
