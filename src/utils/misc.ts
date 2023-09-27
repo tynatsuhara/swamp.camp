@@ -1,4 +1,4 @@
-import { Point } from "brigsby/dist"
+import { Point, PointValue, pt } from "brigsby/dist"
 import { EllipseRender, ImageRender, LineRender, RenderMethod } from "brigsby/dist/renderer"
 
 export const tilesAround = (center: Point, radius: number = 1): Point[] => {
@@ -15,7 +15,12 @@ export const tilesAround = (center: Point, radius: number = 1): Point[] => {
     return result
 }
 
-export const adjacent = (pt: Point) => [pt.plusX(1), pt.plusX(-1), pt.plusY(1), pt.plusY(-1)]
+export const adjacent = ({ x, y }: PointValue) => [
+    pt(x + 1, y),
+    pt(x - 1, y),
+    pt(x, y + 1),
+    pt(x, y - 1),
+]
 
 export const showBoundingBox = (sprite: ImageRender): RenderMethod[] => {
     const { x: width, y: height } = sprite.dimensions
