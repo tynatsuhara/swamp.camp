@@ -100,9 +100,6 @@ const makeMineInterior = (outside: Location) => {
 
     const pts = [pt(0, 0), pt(0, 1), pt(1, 0), pt(1, -1)]
 
-    // TODO add barriers
-    // InteriorUtils.addBarriers(l, dimensions)
-
     l.addFeature("mineInteriorBackground", { pts })
 
     // The ladder is always at (0, 0)-ish

@@ -1,7 +1,9 @@
 import { Entity, Point, PointValue, pt } from "brigsby/dist"
+import { BoxCollider } from "brigsby/dist/collision"
 import { SpriteTransform } from "brigsby/dist/sprites"
 import { Grid, Lists } from "brigsby/dist/util"
-import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
+import { TILE_DIMENSIONS, TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
+import { adjacent } from "../../utils/misc"
 import { GroundRenderer } from "../ground/GroundRenderer"
 
 /**
@@ -59,7 +61,14 @@ export const mineInteriorBackground = ({ pts }: { pts: PointValue[] }) => {
         )
     })
 
-    // TODO walls
+    const colliderGrid = new Grid<boolean>()
+    pts.flatMap((p) => adjacent(p))
+        .filter((p) => !grid.get(p))
+        .forEach((p) => colliderGrid.set(p, true))
+
+    colliderGrid.keys().forEach((p) => {
+        e.addComponent(new BoxCollider(p.times(TILE_SIZE), TILE_DIMENSIONS))
+    })
 
     // const topLeft = pt(2, 1)
     // const topRight = pt(3, 1)
