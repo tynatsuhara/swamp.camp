@@ -40,7 +40,7 @@ export class BasicLocation extends Location {
     private readonly droppedItems = new Set<DroppedItem>()
 
     private features: Feature<any>[] = []
-    private readonly featureEntities: Entity[] = []
+    private featureEntities: Entity[] = []
 
     // private readonly syncListeners = new Map<string, (...args: any[]) => void>()
     private readonly syncFunctions = new Map<string, (...args: any[]) => void>()
@@ -445,7 +445,16 @@ export class BasicLocation extends Location {
             console.error(`feature ${type} not instantiated! data = ${JSON.stringify(data)}`)
             return
         }
+        ;(entity as any).__FEATURE_ID = type
         this.featureEntities.push(entity)
+    }
+
+    removeFeaturesOfType<F extends FeatureType>(type: F) {
+        this.features = this.features.filter((f) => f.type !== type)
+        const toRemove = new Set<Entity>(
+            this.featureEntities.filter((e) => (e as any).__FEATURE_ID === type)
+        )
+        this.featureEntities = this.featureEntities.filter((fe) => !toRemove.has(fe))
     }
 
     getFeatureOfType<F extends FeatureType>(type: F): FeatureData<F> {

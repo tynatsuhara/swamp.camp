@@ -8,7 +8,7 @@ import { NavMeshCollider } from "../elements/NavMeshCollider"
 import { GroundType } from "../ground/Ground"
 import { BasicLocation } from "../locations/BasicLocation"
 import { Location } from "../locations/Location"
-import { LocationManager } from "../locations/LocationManager"
+import { LocationManager, here } from "../locations/LocationManager"
 import { LocationType } from "../locations/LocationType"
 import { BuildingFactory, ConstructionRequirements } from "./Building"
 import { interactableDoorIconSupplier } from "./BuildingUtils"
@@ -102,7 +102,7 @@ const makeMineInterior = (outside: Location) => {
 
     l.addFeature("mineInteriorBackground", { pts })
 
-    // The ladder is always at (0, 0)-ish
+    // The ladder is always at (0, 0)
     const interactablePos = new Point(0.5, 0).times(TILE_SIZE)
     LocationManager.instance.setTeleporter(
         l.uuid,
@@ -111,15 +111,21 @@ const makeMineInterior = (outside: Location) => {
         "mine"
     )
 
-    l.addElement(ElementType.MINE_EXIT, Point.ZERO, {
-        i: interactablePos.toString(),
-    })
+    l.addElement(ElementType.MINE_EXIT, Point.ZERO, { i: interactablePos.toString() })
 
     // Indicate the open floor points so NPCs can roam
-    // TODO
-    // ElementUtils.rectPoints(Point.ZERO, dimensions).forEach((pt) =>
-    //     l.setGroundElement(GroundType.BASIC, pt)
-    // )
+    pts.forEach((p) => l.setGroundElement(GroundType.BASIC, p))
 
     return LocationManager.instance.add(l)
 }
+
+const resizeMine = (l: Location) => {
+    const bg = l.getFeatureOfType("mineInteriorBackground")
+
+    bg.pts
+
+    l.removeFeaturesOfType("mineInteriorBackground")
+    l.addFeature("mineInteriorBackground", bg)
+}
+
+window["resizeMine"] = () => resizeMine(here())

@@ -128,6 +128,8 @@ export abstract class Location {
 
     abstract addFeature<F extends FeatureType>(type: F, data: FeatureData<F>): void
 
+    abstract removeFeaturesOfType<F extends FeatureType>(type: F): void
+
     abstract getFeatureOfType<F extends FeatureType>(type: F): FeatureData<F>
 
     abstract getFeaturesOfType<F extends FeatureType>(type: F): Array<FeatureData<F>>
