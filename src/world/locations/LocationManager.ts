@@ -154,7 +154,9 @@ export class LocationManager {
     initialize(saveState: LocationManagerSaveState) {
         this.locations = new Map()
         this.teleporters = saveState.teleporters
-        saveState.values.forEach((l) => this.initializeLocation(l))
+        saveState.values.forEach((l) => {
+            this.initializeLocation(l)
+        })
         this.loadLocation(this.locations.get(saveState.currentLocationUUID))
     }
 

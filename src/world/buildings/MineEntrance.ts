@@ -1,9 +1,8 @@
-import { Entity, Point } from "brigsby/dist"
+import { Entity, Point, pt } from "brigsby/dist"
 import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/ElementType"
-import { ElementUtils } from "../elements/ElementUtils"
 import { Interactable } from "../elements/Interactable"
 import { NavMeshCollider } from "../elements/NavMeshCollider"
 import { GroundType } from "../ground/Ground"
@@ -13,7 +12,6 @@ import { LocationManager } from "../locations/LocationManager"
 import { LocationType } from "../locations/LocationType"
 import { BuildingFactory, ConstructionRequirements } from "./Building"
 import { interactableDoorIconSupplier } from "./BuildingUtils"
-import { InteriorUtils } from "./InteriorUtils"
 
 type SaveFormat = { destinationUUID: string }
 
@@ -98,18 +96,17 @@ const makeMineInterior = (outside: Location) => {
         allowPlacing: false,
     })
 
-    const dimensions = new Point(3, 2)
-    InteriorUtils.addBarriers(l, dimensions)
+    // TODO how does growing the mine work?
 
-    const ladderIndex = 1
+    const pts = [pt(0, 0), pt(0, 1), pt(1, 0), pt(1, -1)]
 
-    l.addFeature("mineInteriorBackground", {
-        width: dimensions.x,
-        height: dimensions.y,
-        ladderIndex,
-    })
+    // TODO add barriers
+    // InteriorUtils.addBarriers(l, dimensions)
 
-    const interactablePos = new Point(ladderIndex + 0.5, 0).times(TILE_SIZE)
+    l.addFeature("mineInteriorBackground", { pts })
+
+    // The ladder is always at (0, 0)-ish
+    const interactablePos = new Point(0.5, 0).times(TILE_SIZE)
     LocationManager.instance.setTeleporter(
         l.uuid,
         "b",
@@ -117,14 +114,15 @@ const makeMineInterior = (outside: Location) => {
         "mine"
     )
 
-    l.addElement(ElementType.MINE_EXIT, new Point(Math.ceil(dimensions.x / 2), 0), {
+    l.addElement(ElementType.MINE_EXIT, Point.ZERO, {
         i: interactablePos.toString(),
     })
 
     // Indicate the open floor points so NPCs can roam
-    ElementUtils.rectPoints(Point.ZERO, dimensions).forEach((pt) =>
-        l.setGroundElement(GroundType.BASIC, pt)
-    )
+    // TODO
+    // ElementUtils.rectPoints(Point.ZERO, dimensions).forEach((pt) =>
+    //     l.setGroundElement(GroundType.BASIC, pt)
+    // )
 
     return LocationManager.instance.add(l)
 }

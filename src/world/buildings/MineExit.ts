@@ -1,9 +1,5 @@
-import { AnonymousComponent, Entity, Point, pt } from "brigsby/dist"
-import { Lists, RepeatedInvoker } from "brigsby/dist/util"
-import { isGamePaused } from "../../core/PauseState"
+import { Entity, Point, pt } from "brigsby/dist"
 import { TILE_SIZE } from "../../graphics/Tilesets"
-import { Particles } from "../../graphics/particles/Particles"
-import { Color } from "../../ui/Color"
 import { now } from "../WorldTime"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementFactory } from "../elements/ElementFactory"
@@ -29,44 +25,45 @@ export class MineExitFactory extends ElementFactory<ElementType.MINE_EXIT> {
         let particleCountMultiplier = 1
         let spawnParticle: (lifetime?: number) => number = () => 0
 
-        e.addComponent(
-            new AnonymousComponent({
-                start: () => {
-                    const mineData = wl.getFeatureOfType("mineInteriorBackground")
-                    const mineDimensions = pt(mineData.width, mineData.height)
+        // TODO fix for non-square mines
+        // e.addComponent(
+        //     new AnonymousComponent({
+        //         start: () => {
+        //             const mineData = wl.getFeatureOfType("mineInteriorBackground")
+        //             const mineDimensions = pt(mineData.width, mineData.height)
 
-                    spawnParticlesAtTime = 0
-                    particleCountMultiplier = (mineDimensions.x * mineDimensions.y) / 15
+        //             spawnParticlesAtTime = 0
+        //             particleCountMultiplier = (mineDimensions.x * mineDimensions.y) / 15
 
-                    spawnParticle = (lifetime = 10_000) => {
-                        // create a particle
-                        const pos = mineDimensions
-                            .apply((n) => Math.random() * n * TILE_SIZE)
-                            .plusY(-1.5 * TILE_SIZE) // align with top
-                        Particles.instance.emitParticle(
-                            Lists.oneOf([Color.BLACK, Color.TAUPE_1, Color.TAUPE_2]),
-                            pos,
-                            1_000_000_000,
-                            lifetime,
-                            (t) => pt(0, t * 0.004),
-                            pt(Math.random() > 0.5 ? 1 : 2)
-                        )
+        //             spawnParticle = (lifetime = 10_000) => {
+        //                 // create a particle
+        //                 const pos = mineDimensions
+        //                     .apply((n) => Math.random() * n * TILE_SIZE)
+        //                     .plusY(-1.5 * TILE_SIZE) // align with top
+        //                 Particles.instance.emitParticle(
+        //                     Lists.oneOf([Color.BLACK, Color.TAUPE_1, Color.TAUPE_2]),
+        //                     pos,
+        //                     1_000_000_000,
+        //                     lifetime,
+        //                     (t) => pt(0, t * 0.004),
+        //                     pt(Math.random() > 0.5 ? 1 : 2)
+        //                 )
 
-                        return (500 + Math.random() * 500) / particleCountMultiplier
-                    }
+        //                 return (500 + Math.random() * 500) / particleCountMultiplier
+        //             }
 
-                    e.addComponent(new RepeatedInvoker(() => spawnParticle(), 0, isGamePaused))
-                },
-                update: () => {
-                    if (now() > spawnParticlesAtTime) {
-                        for (let i = 0; i < 10 * particleCountMultiplier; i++) {
-                            spawnParticle(Math.random() * 10_000)
-                        }
-                        spawnParticlesAtTime = Number.MAX_SAFE_INTEGER
-                    }
-                },
-            })
-        )
+        //             e.addComponent(new RepeatedInvoker(() => spawnParticle(), 0, isGamePaused))
+        //         },
+        //         update: () => {
+        //             if (now() > spawnParticlesAtTime) {
+        //                 for (let i = 0; i < 10 * particleCountMultiplier; i++) {
+        //                     spawnParticle(Math.random() * 10_000)
+        //                 }
+        //                 spawnParticlesAtTime = Number.MAX_SAFE_INTEGER
+        //             }
+        //         },
+        //     })
+        // )
 
         e.addComponent(
             new Interactable(
