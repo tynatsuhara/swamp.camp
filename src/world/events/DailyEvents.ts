@@ -5,21 +5,25 @@ import { DudeType } from "../../characters/DudeType"
 import { Villager } from "../../characters/types/Villager"
 import { adjacent } from "../../utils/misc"
 import { ConstructionSite } from "../buildings/ConstructionSite"
+import { MineInterior } from "../buildings/MineInterior"
 import { Elements } from "../elements/Elements"
 import { ElementType } from "../elements/ElementType"
 import { HittableResource } from "../elements/HittableResource"
 import { GroundType } from "../ground/Ground"
 import { camp, LocationManager } from "../locations/LocationManager"
+import { LocationType } from "../locations/LocationType"
 import { collectTaxes } from "../TaxRate"
 import { Day } from "../TimeUnit"
 import { WorldTime } from "../WorldTime"
 
+// runs at midnight
 export const doDailyEvents = () => {
     applyVillagerWork()
     replenishResources()
     spreadGrass()
 }
 
+// runs in the morning, once everyone is awake
 export const doDailyMorningEvents = () => {
     if (WorldTime.instance.currentDay === Day.MONDAY) {
         collectTaxes()
@@ -71,6 +75,7 @@ const applyVillagerWork = () => {
         .filter((v) => v.type === DudeType.VILLAGER)
         .map((v) => v.entity.getComponent(Villager))
 
+    // construction work
     const constructionWorkers = villagers.filter((v) => v.job === VillagerJob.CONSTRUCTION)
     const activeConstructionSites = camp()
         .getElements()
@@ -80,8 +85,21 @@ const applyVillagerWork = () => {
     const hoursWorked = (constructionWorkers.length / activeConstructionSites.length) * 24
     activeConstructionSites.forEach((site) => site.makeProgress(hoursWorked))
 
+    // mining work
     const miners = villagers.filter((v) => v.job === VillagerJob.MINE)
-    // TODO make progress on mines, collect resources
+    const mines = LocationManager.instance
+        .getLocations()
+        .filter((l) => l.type === LocationType.MINE_INTERIOR)
+    const maxSquaresMinedPerMiner = 2
+    if (miners.length > 0 && mines.length > 0) {
+        for (let i = 0; i < miners.length; i++) {
+            MineInterior.expand(
+                Lists.oneOf(mines),
+                Math.ceil(Math.random() * maxSquaresMinedPerMiner)
+            )
+        }
+    }
+    // TODO collect mined resources (chest somewhere?)
 
     const lumberjacks = villagers.filter((v) => v.job === VillagerJob.HARVEST_WOOD)
     // TODO chop some trees, collect wood
