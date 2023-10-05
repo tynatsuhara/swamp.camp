@@ -82,7 +82,7 @@ export class Villager extends Component {
                 return 2_000
             } else if (isDoingConstruction) {
                 this.dude.updateAttacking(true)
-                Sounds.play(Lists.oneOf(DIG_SOUNDS), 0.5)
+                Sounds.playAtPoint(Lists.oneOf(DIG_SOUNDS), 0.5, standingPosition)
                 // turn the ground to dirt
                 const hittingTile = tile.plusX(this.dude.getFacingMultiplier())
                 const ground = location.getGround(hittingTile)?.type
