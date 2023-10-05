@@ -89,6 +89,6 @@ export class MineEntranceFactory extends BuildingFactory<ElementType.MINE_ENTRAN
     }
 
     canPlaceAtPos(wl: Location, pos: Point) {
-        return Ground.isNaturalGround(wl.getGround(pos)?.type)
+        return Ground.isNaturalGround(wl, pos)
     }
 }

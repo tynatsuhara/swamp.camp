@@ -1125,7 +1125,6 @@ export class Dude extends Component implements DialogueSource {
         // Movement calculations and conditions based on movement — only done host-side
 
         const standingTilePos = pixelPtToTilePt(this.standingPosition)
-        const ground = this.location.getGround(standingTilePos)
         const element = this.location.getElement(standingTilePos)
 
         let speed = 1
@@ -1146,7 +1145,7 @@ export class Dude extends Component implements DialogueSource {
 
         const isOffscreenInOcean = here() === camp() && this.getCurrentOffMapArea() === "right"
 
-        if (isOffscreenInOcean || Ground.isWater(ground?.type)) {
+        if (isOffscreenInOcean || Ground.isWater(this.location, standingTilePos)) {
             this.removeCondition(Condition.ON_FIRE)
 
             // TODO: See if we can improve this later
@@ -1209,8 +1208,7 @@ export class Dude extends Component implements DialogueSource {
     private getLevelAt(pos: Point) {
         const tilePos = pixelPtToTilePt(pos)
         const currentLevel = this.location.getLevel(tilePos)
-        const ground = this.location.getGround(tilePos)
-        if (Ground.isWater(ground?.type)) {
+        if (Ground.isWater(this.location, tilePos)) {
             return currentLevel - 1
         }
         return currentLevel
@@ -1341,8 +1339,7 @@ export class Dude extends Component implements DialogueSource {
 
     roll() {
         this.rollingMomentum = new Point(this.syncData.d.x, this.syncData.d.y)
-        const ground = this.location.getGround(this.tile)
-        if (!this.canJumpOrRoll || Ground.isWater(ground?.type)) {
+        if (!this.canJumpOrRoll || Ground.isWater(this.location, this.tile)) {
             return
         }
         this.canJumpOrRoll = false
@@ -1418,8 +1415,7 @@ export class Dude extends Component implements DialogueSource {
     }
 
     jump() {
-        const ground = this.location.getGround(this.tile)
-        if (!this.canJumpOrRoll || Ground.isWater(ground?.type)) {
+        if (!this.canJumpOrRoll || Ground.isWater(this.location, this.tile)) {
             return
         }
         this.canJumpOrRoll = false

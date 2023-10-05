@@ -62,18 +62,21 @@ export class Ground {
     /**
      * used for particles and sinking effects
      */
-    static isWater(type: GroundType) {
+    static isWater(location: Location, tilePos: Point) {
+        const type = location.getGround(tilePos)?.type
         return type === GroundType.WATER || type === GroundType.WATERFALL
     }
 
     /**
      * used for placing things
      */
-    static isNaturalGround(type: GroundType) {
+    static isNaturalGround(location: Location, tilePos: Point) {
+        const type = location.getGround(tilePos)?.type
         return type === GroundType.GRASS || type === GroundType.PATH
     }
 
-    static isWalkableGround(type: GroundType) {
-        return !this.isWater(type) && type !== GroundType.LEDGE
+    static isWalkableGround(location: Location, tilePos: Point) {
+        const type = location.getGround(tilePos)?.type
+        return !this.isWater(location, tilePos) && type !== GroundType.LEDGE
     }
 }

@@ -127,10 +127,7 @@ export class ProceduralCampLocationGenerator extends AbstractLocationGenerator {
                 return adjacentLevels(pt).filter((l) => l === level).length < 3
             },
             // TODO: exclude weird corner case
-            (pt) =>
-                adjacent(pt).some((p) => Ground.isWater(location.getGround(p)?.type))
-                    ? 1
-                    : 1 + Math.random()
+            (pt) => (adjacent(pt).some((p) => Ground.isWater(location, p)) ? 1 : 1 + Math.random())
         )
 
         river.forEach((pt) => {

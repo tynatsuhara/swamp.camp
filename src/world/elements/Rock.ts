@@ -95,6 +95,6 @@ export class RockFactory extends ElementFactory<ElementType.ROCK> {
     }
 
     canPlaceAtPos(wl: Location, pos: Point) {
-        return Ground.isWalkableGround(wl.getGround(pos)?.type)
+        return Ground.isWalkableGround(wl, pos)
     }
 }

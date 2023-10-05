@@ -93,8 +93,7 @@ Your work here is not yet done.`,
                 if (p.getCurrentOffMapArea()) {
                     const newSpot = Lists.findRandom(
                         camp().getWalkableGroundSpots(),
-                        (pos) =>
-                            !Ground.isWater(camp().getGround(pos)?.type) && !camp().isOccupied(pos)
+                        (pos) => !Ground.isWater(camp(), pos) && !camp().isOccupied(pos)
                     )
                     p.moveTo(newSpot.times(TILE_SIZE), true)
                 }

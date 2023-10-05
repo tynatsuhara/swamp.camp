@@ -25,9 +25,7 @@ export class WalkingParticles extends Component {
             return
         }
 
-        const groud = here().getGround(this.dude.tile)
-
-        if (Ground.isWater(groud?.type)) {
+        if (Ground.isWater(here(), this.dude.tile)) {
             const particles = 10 + Math.random() * 5
             for (let i = 0; i < particles; i++) {
                 const moveTimeLimit = 100 + Math.random() * 200
@@ -65,8 +63,7 @@ export class WalkingParticles extends Component {
     }
 
     update(updateData: UpdateData) {
-        const groud = here().getGround(this.dude.tile)
-        const isInWater = Ground.isWater(groud?.type)
+        const isInWater = Ground.isWater(here(), this.dude.tile)
 
         const noBleed = this.dude.type === DudeType.SKELETON
 

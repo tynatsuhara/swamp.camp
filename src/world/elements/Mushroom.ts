@@ -84,7 +84,7 @@ export class MushroomFactory extends ElementFactory<ElementType.MUSHROOM, { ngt:
     }
 
     canPlaceAtPos(wl: Location, pos: Point) {
-        return Ground.isNaturalGround(wl.getGround(pos)?.type)
+        return Ground.isNaturalGround(wl, pos)
     }
 
     private nextGrowthTime() {

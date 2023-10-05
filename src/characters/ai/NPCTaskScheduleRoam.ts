@@ -12,7 +12,7 @@ export class NPCTaskScheduleRoam extends NPCTask {
         const { factions, location, standingPosition } = context.dude
         const tilePos = pixelPtToTilePt(standingPosition)
 
-        const isLand = (pt: Point) => !Ground.isWater(location.getGround(pt)?.type)
+        const isLand = (pt: Point) => !Ground.isWater(location, pt)
 
         if (factions.includes(DudeFaction.DEMONS)) {
             context.roam(LightManager.instance.isDark(standingPosition, location) ? 0.5 : 1, {
@@ -20,7 +20,7 @@ export class NPCTaskScheduleRoam extends NPCTask {
                     isLand(pt) && LightManager.instance.isDark(pt.times(TILE_SIZE), location),
             })
         } else if (factions.includes(DudeFaction.AQUATIC)) {
-            const inWater = Ground.isWater(location.getGround(tilePos)?.type)
+            const inWater = Ground.isWater(location, tilePos)
             context.roam(inWater ? 1 : 0.2, {
                 goalOptionsSupplier: () =>
                     this.getTilesAround(tilePos, inWater ? 5 : 15).filter((pt) => !isLand(pt)),

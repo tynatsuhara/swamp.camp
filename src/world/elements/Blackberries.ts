@@ -160,7 +160,7 @@ export class BlackberriesFactory extends ElementFactory<ElementType.BLACKBERRIES
     }
 
     canPlaceAtPos(wl: Location, pos: Point) {
-        return Ground.isNaturalGround(wl.getGround(pos)?.type)
+        return Ground.isNaturalGround(wl, pos)
     }
 
     private determineNextGrowthTime() {

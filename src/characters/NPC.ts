@@ -10,7 +10,7 @@ import { tilesAround } from "../utils/misc"
 import { Burnable } from "../world/elements/Burnable"
 import { Campfire } from "../world/elements/Campfire"
 import { ElementType } from "../world/elements/ElementType"
-import { Ground, GroundType } from "../world/ground/Ground"
+import { Ground } from "../world/ground/Ground"
 import { LightManager } from "../world/LightManager"
 import { Location } from "../world/locations/Location"
 import { camp, here, LocationManager } from "../world/locations/LocationManager"
@@ -80,7 +80,7 @@ export class NPC extends Simulatable {
 
         // Only fight acquatic creatures when in the water
         if (d.factions.includes(DudeFaction.AQUATIC)) {
-            return Ground.isWater(this.dude.location.getGround(this.dude.tile)?.type)
+            return Ground.isWater(this.dude.location, this.dude.tile)
         }
 
         // Only fight a mimic if it is no longer pretending to be a chest
@@ -368,9 +368,7 @@ export class NPC extends Simulatable {
 
         // previous pausing parameters will only be cleared if pauseEveryMillis is falsey
         if (pauseEveryMillis) {
-            const shouldNotPause = Ground.isWater(
-                this.dude.location.getGround(this.dude.tile)?.type
-            )
+            const shouldNotPause = Ground.isWater(this.dude.location, this.dude.tile)
             // TODO: make it so NPCs dont roam immediately on save load?
             if (now() > this.roamNextUnpauseTime || shouldNotPause) {
                 this.roamNextPauseTime = now() + pauseEveryMillis
@@ -715,10 +713,8 @@ export class NPC extends Simulatable {
     private getTileCost(tile: Point) {
         const location = here()
         const ground = location.getGround(tile)
-        const type = ground?.type
         if (
-            type === GroundType.LEDGE ||
-            Ground.isWater(type) ||
+            !Ground.isWalkableGround(location, tile) ||
             // don't encourage being off the map
             !ground
         ) {

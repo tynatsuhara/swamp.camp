@@ -28,15 +28,14 @@ export class AquaticNPC extends Component {
     }
 
     private isVisible() {
+        const { location, tile, standingPosition } = this.dude
+
         // if not in the water, always visible
-        if (!Ground.isWater(this.dude.location.getGround(this.dude.tile)?.type)) {
+        if (!Ground.isWater(location, tile)) {
             return true
         }
 
         const enemy = this.npc.targetedEnemy
-        return (
-            enemy &&
-            enemy.standingPosition.distanceTo(this.dude.standingPosition) < VISIBLE_DISTANCE
-        )
+        return enemy && enemy.standingPosition.distanceTo(standingPosition) < VISIBLE_DISTANCE
     }
 }

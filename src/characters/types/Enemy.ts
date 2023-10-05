@@ -122,8 +122,8 @@ export class Enemy extends Component {
         // only attack enemies in the water
         npc.isEnemyFn = (d) =>
             isEnemy(d) &&
-            Ground.isWater(d.location.getGround(d.tile)?.type) &&
-            Ground.isWater(dude.location.getGround(dude.tile)?.type)
+            Ground.isWater(d.location, d.tile) &&
+            Ground.isWater(dude.location, dude.tile)
 
         // npc.pathFindingHeuristic = (pt: Point, goal: Point) => {
         //     const isByLand = [pt.plusX(1), pt.plusX(-1), pt.plusY(1), pt.plusY(-1)].some(
@@ -135,7 +135,7 @@ export class Enemy extends Component {
 
         // only traverse water
         npc.extraPathIsOccupiedFilter = (pt: Point) => {
-            return !Ground.isWater(dude.location.getGround(pt)?.type)
+            return !Ground.isWater(dude.location, pt)
         }
     }
 }

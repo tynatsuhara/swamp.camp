@@ -121,9 +121,7 @@ export class DudeSpawner extends Component {
         const thingCount = l.getDudes().filter((d) => d.type === DudeType.SWAMP_THING)
 
         const waterSpots = l.getAllGroundSpots().filter(
-            (pt) =>
-                Ground.isWater(l.getGround(pt)?.type) &&
-                pt.x < camp().size / 2 - EAST_COAST_OCEAN_WIDTH // not in the ocean
+            (p) => Ground.isWater(l, p) && p.x < camp().size / 2 - EAST_COAST_OCEAN_WIDTH // not in the ocean
         )
 
         const goalCount = waterSpots.length / 50

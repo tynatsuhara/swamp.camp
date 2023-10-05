@@ -34,9 +34,9 @@ export abstract class BuildingFactory<
     SaveFormat extends object = object
 > extends ElementFactory<Type, SaveFormat> {
     canPlaceAtPos(wl: Location, pos: Point) {
-        return ElementUtils.rectPoints(pos, this.dimensions)
-            .map((pt) => wl.getGround(pt)?.type)
-            .every((type) => Ground.isNaturalGround(type))
+        return ElementUtils.rectPoints(pos, this.dimensions).every((pt) =>
+            Ground.isNaturalGround(wl, pt)
+        )
     }
 
     canPlaceInLocation(l: Location) {

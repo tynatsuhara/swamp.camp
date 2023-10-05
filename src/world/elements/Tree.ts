@@ -188,8 +188,7 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
     }
 
     canPlaceAtPos(wl: Location, pos: Point) {
-        const ground = wl.getGround(pos)
-        return Ground.isNaturalGround(ground?.type)
+        return Ground.isNaturalGround(wl, pos)
     }
 
     private nextGrowthTime() {
