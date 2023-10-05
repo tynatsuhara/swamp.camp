@@ -251,11 +251,7 @@ export class NPC extends Simulatable {
         return schedule
     }
 
-    private getScheduledTask(): NPCTask {
-        return NPCTaskFactory.fromSchedule(this)
-    }
-
-    private clearExistingAIState() {
+    clearExistingAIState() {
         this.walkPath = null
         this.interactWith = null
         this.roamPath = null
@@ -264,6 +260,10 @@ export class NPC extends Simulatable {
         this.targetPath = null
         this.teleporterTarget = null
         this.task = null
+    }
+
+    private getScheduledTask(): NPCTask {
+        return NPCTaskFactory.fromSchedule(this)
     }
 
     private walkPath: Point[] = null

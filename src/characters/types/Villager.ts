@@ -28,6 +28,7 @@ export class Villager extends Component {
     }
     set job(job: VillagerJob | undefined) {
         this.dude.blob["job"] = job
+        this.npc.clearExistingAIState()
         this.npc.decideWhatToDoNext()
     }
 
