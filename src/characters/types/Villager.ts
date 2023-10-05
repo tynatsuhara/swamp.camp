@@ -49,13 +49,9 @@ export class Villager extends Component {
         if ([DudeType.GUMBALL, DudeType.ONION].includes(dude.type)) {
             npc.setLeader(player())
             npc.setSchedule(NPCSchedules.newFollowLeaderSchedule())
-        } else if (dude.type === DudeType.DIP) {
-            // TODO: Make this a more robust schedule
-            const tentPos = dude.location.getElementOfType(ElementType.TENT).pos
-            npc.setSchedule(NPCSchedules.newGoToSchedule(tentPos.plus(pt(3))))
         } else if ([DudeType.SPOOKY_VISITOR, DudeType.KNIGHT].includes(dude.type)) {
             npc.setSchedule(NPCSchedules.newFreeRoamSchedule())
-        } else if (dude.type === DudeType.HERALD) {
+        } else if (dude.type === DudeType.HERALD || dude.type === DudeType.DIP) {
             // no-op
         } else {
             npc.setSchedule(NPCSchedules.newDefaultVillagerSchedule())
