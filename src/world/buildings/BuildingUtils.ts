@@ -2,6 +2,7 @@ import { HUD } from "../../ui/HUD"
 import { IconDisplay } from "../../ui/IconSprite"
 import { LocationManager, camp, here } from "../locations/LocationManager"
 
+// TODO: BUG: This doesn't work on cold start, since the indicators are only initialized once Start() runs for the Dude
 export const interactableDoorIconSupplier = (
     teleporterId: string,
     fallback?: IconDisplay
