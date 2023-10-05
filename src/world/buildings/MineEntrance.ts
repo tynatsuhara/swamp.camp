@@ -1,11 +1,11 @@
-import { Entity, Point } from "brigsby/dist"
+import { Entity, Point, pt } from "brigsby/dist"
 import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/ElementType"
 import { Interactable } from "../elements/Interactable"
 import { NavMeshCollider } from "../elements/NavMeshCollider"
-import { GroundType } from "../ground/Ground"
+import { Ground } from "../ground/Ground"
 import { Location } from "../locations/Location"
 import { LocationManager } from "../locations/LocationManager"
 import { BuildingFactory, ConstructionRequirements } from "./Building"
@@ -16,7 +16,7 @@ type SaveFormat = { destinationUUID: string }
 
 export class MineEntranceFactory extends BuildingFactory<ElementType.MINE_ENTRANCE, SaveFormat> {
     readonly type = ElementType.MINE_ENTRANCE
-    readonly dimensions = new Point(1, 1)
+    readonly dimensions = pt(3)
 
     constructor() {
         super(ElementType.MINE_ENTRANCE)
@@ -24,7 +24,7 @@ export class MineEntranceFactory extends BuildingFactory<ElementType.MINE_ENTRAN
 
     makeBuilding(wl: Location, pos: Point, data: Partial<SaveFormat>) {
         const e = new Entity()
-        const pixelPt = pos.times(TILE_SIZE)
+        const pixelPt = pos.plus(pt(1)).times(TILE_SIZE)
 
         // the interior location UUID
         const destinationUUID: string = data.destinationUUID ?? MineInterior.make(wl)
@@ -76,7 +76,10 @@ export class MineEntranceFactory extends BuildingFactory<ElementType.MINE_ENTRAN
     }
 
     getConstructionRequirements(): ConstructionRequirements {
-        return undefined
+        return {
+            hours: 24,
+            // no materials required
+        }
     }
 
     canPlaceInLocation(wl: Location) {
@@ -84,6 +87,6 @@ export class MineEntranceFactory extends BuildingFactory<ElementType.MINE_ENTRAN
     }
 
     canPlaceAtPos(wl: Location, pos: Point) {
-        return wl.getGround(pos)?.type === GroundType.PATH
+        return Ground.isNaturalGround(wl.getGround(pos)?.type)
     }
 }

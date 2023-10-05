@@ -14,7 +14,7 @@ import { ConstructionSite, ConstructionState } from "./ConstructionSite"
 
 export type ConstructionRequirements = {
     hours: number
-    materials: ItemStack[]
+    materials?: ItemStack[]
 }
 
 /**
@@ -42,7 +42,7 @@ export abstract class BuildingFactory<
     }
 
     onConstructionComplete(): void {
-        // override to make this not a no-op
+        // subclasses can override to make this not a no-op
     }
 
     /**
@@ -115,6 +115,7 @@ export abstract class BuildingFactory<
     }
 
     itemMetadataToSaveFormat(metadata: ItemMetadata) {
+        // default implementation of buildings is just to serialize the construction state
         const reqs = this.getConstructionRequirements()
         if (!reqs) {
             return undefined

@@ -1,7 +1,7 @@
 import { AnonymousComponent, Component, Point, pt } from "brigsby/dist"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
 import { DONATION_DIALOGUE, startDonating } from "../../characters/dialogue/DonationBoxDialogue"
-import { Tilesets, TILE_SIZE } from "../../graphics/Tilesets"
+import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
 import { ItemStack } from "../../items/Inventory"
 import { DialogueDisplay } from "../../ui/DialogueDisplay"
 import { getChestComponents } from "../elements/Chest"
@@ -39,39 +39,43 @@ export class ConstructionSite extends Component {
 
         const chestPos = pos.plus(pt(size.x / 2 - 0.5, size.y - 1)).times(TILE_SIZE)
 
-        const { components, closeAnimation } = getChestComponents({
-            location: wl,
-            pixelPos: chestPos,
-            onInteract: () => {
-                startDonating(
-                    {
-                        onDonationComplete: () => {
-                            this.mutableState.hasSupplies = true
+        if (!itemsRequired) {
+            this.mutableState.hasSupplies = true
+        } else {
+            const { components, closeAnimation } = getChestComponents({
+                location: wl,
+                pixelPos: chestPos,
+                onInteract: () => {
+                    startDonating(
+                        {
+                            onDonationComplete: () => {
+                                this.mutableState.hasSupplies = true
+                            },
+                            itemsRequired,
                         },
-                        itemsRequired,
-                    },
-                    this
-                )
-            },
-            canInteract: () => !this.hasMaterials(),
-            getIndicator: () => {
-                if (!this.hasMaterials() && DialogueDisplay.instance.currentSource !== this) {
-                    return "!"
-                }
-            },
-        })
+                        this
+                    )
+                },
+                canInteract: () => !this.hasMaterials(),
+                getIndicator: () => {
+                    if (!this.hasMaterials() && DialogueDisplay.instance.currentSource !== this) {
+                        return "!"
+                    }
+                },
+            })
 
-        this.awake = () => {
-            this.entity.addComponents(components)
-            this.entity.addComponent(
-                new AnonymousComponent({
-                    update: () => {
-                        if (!DialogueDisplay.instance.isOpen) {
-                            closeAnimation()
-                        }
-                    },
-                })
-            )
+            this.awake = () => {
+                this.entity.addComponents(components)
+                this.entity.addComponent(
+                    new AnonymousComponent({
+                        update: () => {
+                            if (!DialogueDisplay.instance.isOpen) {
+                                closeAnimation()
+                            }
+                        },
+                    })
+                )
+            }
         }
 
         this.getRenderMethods = () => [
