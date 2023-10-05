@@ -59,15 +59,19 @@ export class Villager extends Component {
     private initWorkAnimations() {
         this.dude.doWhileLiving(() => {
             const { weaponType, location, tile, standingPosition } = this.dude
+
             const isMining =
                 weaponType === WeaponType.PICKAXE && location.type === LocationType.MINE_INTERIOR
+
             const isDoingConstruction =
-                weaponType === WeaponType.HAMMER &&
-                location.getElement(tile)?.entity.getComponent(ConstructionSite)
+                this.job ===
+                location.getElement(tile)?.entity.getComponent(ConstructionSite)?.jobType
+
             const isChoppingTrees =
                 weaponType === WeaponType.AXE &&
                 this.npc.isInteracting() &&
                 this.npc.getInteractWithElement()?.entity?.getComponent(Tree)?.choppable
+
             // swing pickaxe randomly if working in the mines
             if (isMining) {
                 this.dude.updateAttacking(true)
@@ -75,6 +79,7 @@ export class Villager extends Component {
                 return 2_000
             } else if (isDoingConstruction) {
                 this.dude.updateAttacking(true)
+                // TODO better sound?
                 playChoppingSound(standingPosition)
                 // turn the ground to dirt
                 const hittingTile = tile.plusX(this.dude.getFacingMultiplier())

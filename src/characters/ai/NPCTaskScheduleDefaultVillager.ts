@@ -155,7 +155,8 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         if (job === VillagerJob.MINE) {
             const mines = camp()
                 .getElementsOfType(ElementType.MINE_ENTRANCE)
-                .map((el) => el.save().destinationUUID)
+                // if a hole hasn't been dug yet, they're working in the camp
+                .map((el) => el.save().destinationUUID ?? camp().uuid)
 
             if (mines.length === 0) {
                 return
@@ -169,6 +170,67 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         ) {
             return camp()
         }
+    }
+
+    /**
+     * should be called AFTER getworklocation is called!
+     */
+    private getWorkRoamingConfig(dude: Dude): RoamOptions {
+        if (
+            this.getJob() === VillagerJob.CONSTRUCTION ||
+            (this.getJob() === VillagerJob.MINE && this.workLocation === camp())
+        ) {
+            const zones = camp()
+                .getElements()
+                .filter((e) => {
+                    const cs = e.entity.getComponent(ConstructionSite)
+                    return cs?.hasMaterials() && cs?.jobType === this.getJob()
+                })
+
+            if (zones.length === 0) {
+                return null
+            }
+
+            const zoneElement = this.getWorkLocation(zones)
+            const zone = zoneElement.entity.getComponent(ConstructionSite)
+
+            return {
+                goalOptionsSupplier: () => ElementUtils.rectPoints(zoneElement.pos, zone.size),
+            }
+        }
+
+        if (
+            dude.type === DudeType.DIP ||
+            (dude.type === DudeType.HERALD && !saveManager.getState().hasTownHall)
+        ) {
+            // Go to the campfire closest to the middle of the amp
+            const closestCampfireGoal = Point.ZERO
+            const location = camp()
+            const closestCampfirePoint = location
+                .getElementsOfType(ElementType.CAMPFIRE)
+                .sort(
+                    (a, b) =>
+                        a.pos.distanceTo(closestCampfireGoal) -
+                        b.pos.distanceTo(closestCampfireGoal)
+                )[0]?.pos
+
+            const tileOptions: Point[] = closestCampfirePoint
+                ? tilesAround(closestCampfirePoint, 5)
+                : tilesAround(Point.ZERO, 10)
+
+            return {
+                goalOptionsSupplier: () => tileOptions,
+                pauseEveryMillis: 2_500,
+                pauseForMillis: 30_000,
+            }
+        } else if (dude.type === DudeType.HERALD) {
+            return {
+                pauseEveryMillis: 2_500,
+                pauseForMillis: 15_000,
+            }
+        }
+
+        return undefined
     }
 
     private equipJobGear() {
@@ -233,58 +295,6 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         }
 
         return result
-    }
-
-    private getWorkRoamingConfig(dude: Dude): RoamOptions {
-        if (this.getJob() === VillagerJob.CONSTRUCTION) {
-            const zones = camp()
-                .getElements()
-                .filter((e) => e.entity.getComponent(ConstructionSite)?.hasMaterials())
-
-            if (zones.length === 0) {
-                return null
-            }
-
-            const zoneElement = this.getWorkLocation(zones)
-            const zone = zoneElement.entity.getComponent(ConstructionSite)
-
-            return {
-                goalOptionsSupplier: () => ElementUtils.rectPoints(zoneElement.pos, zone.size),
-            }
-        }
-
-        if (
-            dude.type === DudeType.DIP ||
-            (dude.type === DudeType.HERALD && !saveManager.getState().hasTownHall)
-        ) {
-            // Go to the campfire closest to the middle of the amp
-            const closestCampfireGoal = Point.ZERO
-            const location = camp()
-            const closestCampfirePoint = location
-                .getElementsOfType(ElementType.CAMPFIRE)
-                .sort(
-                    (a, b) =>
-                        a.pos.distanceTo(closestCampfireGoal) -
-                        b.pos.distanceTo(closestCampfireGoal)
-                )[0]?.pos
-
-            const tileOptions: Point[] = closestCampfirePoint
-                ? tilesAround(closestCampfirePoint, 5)
-                : tilesAround(Point.ZERO, 10)
-
-            return {
-                goalOptionsSupplier: () => tileOptions,
-                pauseEveryMillis: 2_500,
-                pauseForMillis: 30_000,
-            }
-        } else if (dude.type === DudeType.HERALD) {
-            return {
-                pauseEveryMillis: 2_500,
-                pauseForMillis: 15_000,
-            }
-        }
-
-        return undefined
     }
 
     private getTreeToChop() {

@@ -1,5 +1,6 @@
 import { AnonymousComponent, Component, Point, pt } from "brigsby/dist"
 import { SpriteTransform } from "brigsby/dist/sprites/SpriteTransform"
+import { VillagerJob } from "../../characters/ai/VillagerJob"
 import { DONATION_DIALOGUE, startDonating } from "../../characters/dialogue/DonationBoxDialogue"
 import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
 import { ItemStack } from "../../items/Inventory"
@@ -26,7 +27,8 @@ export class ConstructionSite extends Component {
         readonly size: Point,
         private readonly mutableState: ConstructionState,
         itemsRequired: ItemStack[],
-        private readonly completeConstruction: () => void
+        private readonly completeConstruction: () => void,
+        readonly jobType: VillagerJob
     ) {
         super()
 

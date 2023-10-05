@@ -1,5 +1,6 @@
 import { Entity, Point } from "brigsby/dist"
 import { Dude } from "../../characters/Dude"
+import { VillagerJob } from "../../characters/ai/VillagerJob"
 import { ItemStack } from "../../items/Inventory"
 import { Item } from "../../items/Item"
 import { ItemMetadata } from "../../items/Items"
@@ -15,6 +16,7 @@ import { ConstructionSite, ConstructionState } from "./ConstructionSite"
 export type ConstructionRequirements = {
     hours: number
     materials?: ItemStack[]
+    workerType?: VillagerJob
 }
 
 /**
@@ -86,7 +88,8 @@ export abstract class BuildingFactory<
                     this.dimensions,
                     constructionState,
                     this.getConstructionRequirements().materials,
-                    completeConstruction
+                    completeConstruction,
+                    this.getConstructionRequirements().workerType ?? VillagerJob.CONSTRUCTION
                 )
             )
             // @ts-ignore ugh

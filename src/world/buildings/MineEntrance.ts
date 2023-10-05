@@ -1,5 +1,6 @@
 import { Entity, Point, pt } from "brigsby/dist"
 import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
+import { VillagerJob } from "../../characters/ai/VillagerJob"
 import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/ElementType"
@@ -77,6 +78,7 @@ export class MineEntranceFactory extends BuildingFactory<ElementType.MINE_ENTRAN
 
     getConstructionRequirements(): ConstructionRequirements {
         return {
+            workerType: VillagerJob.MINE,
             hours: 24,
             // no materials required
         }
