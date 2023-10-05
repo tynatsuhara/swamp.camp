@@ -1,9 +1,11 @@
-import { Component, pt } from "brigsby/dist"
+import { Component } from "brigsby/dist"
+import { Lists } from "brigsby/dist/util"
+import { loadAudio } from "../../audio/DeferLoadAudio"
+import { Sounds } from "../../audio/Sounds"
 import { session } from "../../online/session"
 import { ConstructionSite } from "../../world/buildings/ConstructionSite"
-import { ElementType } from "../../world/elements/ElementType"
 import { playMiningSound } from "../../world/elements/Rock"
-import { Tree, playChoppingSound } from "../../world/elements/Tree"
+import { Tree } from "../../world/elements/Tree"
 import { GroundType } from "../../world/ground/Ground"
 import { LocationType } from "../../world/locations/LocationType"
 import { Dude } from "../Dude"
@@ -13,6 +15,11 @@ import { NPCSchedules } from "../ai/NPCSchedule"
 import { VillagerJob } from "../ai/VillagerJob"
 import { player } from "../player"
 import { WeaponType } from "../weapons/WeaponType"
+
+const DIG_SOUNDS = loadAudio([
+    ...[2, 3, 8, 9].map((i) => `audio/nature/Footstep/FootstepGrass0${i}.wav`),
+    "audio/steps/gravel.ogg",
+])
 
 export class Villager extends Component {
     get npc() {
@@ -79,8 +86,7 @@ export class Villager extends Component {
                 return 2_000
             } else if (isDoingConstruction) {
                 this.dude.updateAttacking(true)
-                // TODO better sound?
-                playChoppingSound(standingPosition)
+                Sounds.play(Lists.oneOf(DIG_SOUNDS), 0.5)
                 // turn the ground to dirt
                 const hittingTile = tile.plusX(this.dude.getFacingMultiplier())
                 const ground = location.getGround(hittingTile)?.type

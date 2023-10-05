@@ -8,12 +8,9 @@ import { GroundType } from "../world/ground/Ground"
 import { here } from "../world/locations/LocationManager"
 import { Sounds } from "./Sounds"
 
-const FOOTSTEP_SOUND_DISTANCE = 160
-
 export class StepSounds {
     private static readonly SPEED = 330
 
-    private static readonly GRAVEL_SOUND = "audio/steps/gravel.ogg"
     private static readonly MUD_SOUND = "audio/steps/mud02.ogg"
     private static readonly STONE_SOUND = "audio/steps/stone01.ogg"
     private static readonly WOOD_SOUND = "audio/steps/wood01.ogg"
@@ -27,7 +24,6 @@ export class StepSounds {
     static startFootstepSoundLoop = (dude: Dude) => {
         assets
             .loadAudioFiles([
-                StepSounds.GRAVEL_SOUND,
                 StepSounds.MUD_SOUND,
                 StepSounds.STONE_SOUND,
                 StepSounds.WOOD_SOUND,
