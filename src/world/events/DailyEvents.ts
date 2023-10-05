@@ -75,24 +75,37 @@ const applyVillagerWork = () => {
         .filter((v) => v.type === DudeType.VILLAGER)
         .map((v) => v.entity.getComponent(Villager))
 
-    // construction work
-    const constructionWorkers = villagers.filter((v) => v.job === VillagerJob.CONSTRUCTION)
-    const activeConstructionSites = camp()
-        .getElements()
-        .map((e) => e.entity.getComponent(ConstructionSite))
-        .filter((site) => site?.hasMaterials())
-    // construction progress scales linearly by number of workers
-    const hoursWorked = (constructionWorkers.length / activeConstructionSites.length) * 24
-    activeConstructionSites.forEach((site) => site.makeProgress(hoursWorked))
+    const villagersByJobCount: Partial<Record<VillagerJob, number>> = villagers.reduce(
+        (obj, val) => {
+            obj[val.job] ??= 0
+            obj[val.job]++
+            return obj
+        },
+        {}
+    )
 
-    // mining work
+    // construction work
+    const activeConstructionSitesByWorkerType: Partial<Record<VillagerJob, ConstructionSite[]>> =
+        camp()
+            .getElements()
+            .map((e) => e.entity.getComponent(ConstructionSite))
+            .filter((site) => site?.hasMaterials())
+            .reduce((obj, val) => {
+                obj[val.jobType] ??= []
+                obj[val.jobType].push(val)
+                return obj
+            }, {})
+
+    // apply mining work
     const miners = villagers.filter((v) => v.job === VillagerJob.MINE)
     const mines = LocationManager.instance
         .getLocations()
         .filter((l) => l.type === LocationType.MINE_INTERIOR)
+    const mineDigSites = activeConstructionSitesByWorkerType[VillagerJob.MINE]?.length ?? 0
     const maxSquaresMinedPerMiner = 2
     if (miners.length > 0 && mines.length > 0) {
-        for (let i = 0; i < miners.length; i++) {
+        const mineWorkRatio = mines.length / (mines.length + mineDigSites)
+        for (let i = 0; i < miners.length * mineWorkRatio; i++) {
             MineInterior.expand(
                 Lists.oneOf(mines),
                 Math.ceil(Math.random() * maxSquaresMinedPerMiner)
@@ -101,6 +114,15 @@ const applyVillagerWork = () => {
     }
     // TODO collect mined resources (chest somewhere?)
 
+    // apply construction progress — scales linearly by number of workers
+    Object.keys(activeConstructionSitesByWorkerType).forEach((jobType) => {
+        const workerCount = villagersByJobCount[jobType] ?? 0
+        const sites: ConstructionSite[] = activeConstructionSitesByWorkerType[jobType]
+        const hoursWorked = (workerCount / sites.length) * 24
+        sites.forEach((site) => site.makeProgress(hoursWorked))
+    })
+
+    // apply wood collection
     const lumberjacks = villagers.filter((v) => v.job === VillagerJob.HARVEST_WOOD)
     // TODO chop some trees, collect wood
 }
