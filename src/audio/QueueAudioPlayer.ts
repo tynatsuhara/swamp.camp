@@ -113,7 +113,7 @@ export class QueueAudioPlayer extends AudioPlayer {
             src: file,
             autoplay: true,
             loop: false,
-            html5: true,
+            html5: true, // for streaming (TODO: can be false for native)
             preload: true,
             volume: 0,
         })

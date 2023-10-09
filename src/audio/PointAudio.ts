@@ -42,7 +42,7 @@ export class PointAudio extends Component {
                     volume: 0,
                     loop: true,
                     autoplay: true,
-                    html5: true, // for streaming
+                    html5: true, // for streaming (TODO: can be false for native)
                 }),
                 lastUpdate: 0,
                 nextVolume: 0,
