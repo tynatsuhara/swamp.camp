@@ -1,31 +1,27 @@
-import { assets, Point } from "brigsby/dist"
+import { Point } from "brigsby/dist"
+import { Howl } from "howler"
 import { player } from "../characters/player"
-import { Settings } from "../core/Settings"
 
 /**
  * Used for general purpose one-off sound effects
  */
+// TODO convert to howler
 export class Sounds {
     /**
      * @returns a promise that will resolve when the sound starts playing
      */
-    static play(path: string, volume: number = 1): Promise<HTMLAudioElement> {
-        const audio = assets.getAudioByFileName(path)
+    static play(path: string, volume: number = 1): Promise<Howl> {
+        const sound = new Howl({ src: [path], volume })
 
-        if (!audio?.src) {
-            console.log(`audio file [${path}] not loaded`)
-            return Promise.reject()
-        }
-
-        audio.volume = Math.min(1, Settings.getSoundVolume() * volume)
-
-        return new Promise((resolve, reject) => {
-            audio.oncanplay = () => {
-                audio.play()
-                resolve(audio)
-            }
-            audio.onerror = (e) => {
-                reject(e)
+        return new Promise((resolve) => {
+            if (sound.state() === "loaded") {
+                sound.play()
+                resolve(sound)
+            } else {
+                sound.once("load", () => {
+                    sound.play()
+                    resolve(sound)
+                })
             }
         })
     }

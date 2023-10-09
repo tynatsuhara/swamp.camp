@@ -13,7 +13,7 @@ const AUDIO_FILES = loadAudio(
     Lists.range(0, 22).map((i) => `audio/talkingsynth/TalkingSynth_${i}.wav`)
 )
 
-let currentAudio: HTMLAudioElement
+let currentAudio: Howl
 
 export const startTalkingSounds = (lineLength: number) => {
     let audioOptions: number[]
@@ -32,13 +32,13 @@ export const startTalkingSounds = (lineLength: number) => {
 
     // console.log(`line length = ${lineLength}, playing speech audio ${audioToPlay}`)
 
-    Sounds.play(audioToPlay, VOLUME).then((audio) => {
-        currentAudio = audio
-        audio.onended = () => {
-            if (currentAudio === audio) {
+    Sounds.play(audioToPlay, VOLUME).then((howl) => {
+        currentAudio = howl
+        howl.once("end", () => {
+            if (currentAudio === howl) {
                 currentAudio = null
             }
-        }
+        })
     })
 }
 
