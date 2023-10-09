@@ -1,9 +1,11 @@
-import { Lists } from "brigsby/dist/util"
 import { AudioPlayer } from "./AudioPlayer"
 import { AudioUtils } from "./AudioUtils"
 
+const TIME_BETWEEN_FADE_CHECKS = 200
+
 export class QueueAudioPlayer extends AudioPlayer {
-    private currentAudio: HTMLAudioElement
+    private currentAudio: Howl
+    private currentAudioSrc: string
 
     // the first track is always the current one
     private files: string[]
@@ -12,10 +14,8 @@ export class QueueAudioPlayer extends AudioPlayer {
     private crossFadeDurationMillis: number
     private timeBetweenTracksMillis: number
 
-    private static readonly TIME_BETWEEN_FADE_CHECKS = 200
-
     get fileName() {
-        return Lists.last(this.currentAudio?.src.split("/"))
+        return this.currentAudioSrc
     }
 
     constructor(
@@ -33,20 +33,20 @@ export class QueueAudioPlayer extends AudioPlayer {
 
         // TODO: nice fade in/out between tracks
 
-        setInterval(() => this.checkCrossFadeOut(), 200)
+        setInterval(() => this.checkCrossFadeOut(), TIME_BETWEEN_FADE_CHECKS)
     }
 
     private checkCrossFadeOut() {
-        if (!this.currentAudio || this.crossFading) {
+        if (!this.currentAudio || this.crossFading || this.currentAudio.state() === "loading") {
             return
         }
         // start fading out when we're close to the end
-        const currentTime = 1000 * this.currentAudio.currentTime
+        const currentTime = 1000 * this.currentAudio.seek()
         // make sure we fade to 0 before the end of the song
         const fadeStart =
-            1000 * this.currentAudio.duration -
+            1000 * this.currentAudio.duration() -
             this.crossFadeDurationMillis -
-            QueueAudioPlayer.TIME_BETWEEN_FADE_CHECKS
+            TIME_BETWEEN_FADE_CHECKS
         if (currentTime >= fadeStart) {
             this.crossFading = this.crossFadeOut().then(() => {
                 this.crossFading = null
@@ -93,12 +93,15 @@ export class QueueAudioPlayer extends AudioPlayer {
         this.log(`finished audio: ${this.fileName}`)
 
         this.stop()
-        this.files.push(this.files.shift())
+
         // start next track
         this.playFromStart()
     }
 
     playFromStart() {
+        // go to the next track
+        this.files.push(this.files.shift())
+
         const file = this.files[0]
         if (!file) {
             return
@@ -106,29 +109,37 @@ export class QueueAudioPlayer extends AudioPlayer {
 
         this.log(`started audio: ${this.fileName}`)
 
-        const track = new Audio(file)
+        const track = new Howl({
+            src: file,
+            autoplay: true,
+            loop: false,
+            html5: true,
+            preload: true,
+            volume: 0,
+        })
 
-        track.oncanplaythrough = () => {
+        const start = () => {
+            this.currentAudio = track
+            this.currentAudioSrc = file
             this.crossFadeIn()
-            track.play()
         }
 
-        this.currentAudio = track
+        if (track.state() === "loaded") {
+            start()
+        } else {
+            track.once("load", start)
+        }
     }
 
     stop() {
-        if (this.currentAudio) {
-            this.currentAudio.pause()
-            this.currentAudio.src = ""
-            this.currentAudio = null
-        }
+        this.currentAudio?.stop()
+        this.currentAudio = null
+        this.currentAudioSrc = null
         this.log("audio stopped")
     }
 
     updateAudioElementVolume() {
-        if (!!this.currentAudio) {
-            this.currentAudio.volume = this.getVolume()
-        }
+        this.currentAudio?.volume(this.getVolume())
     }
 
     private setCrossFadeVolume(volume: number) {

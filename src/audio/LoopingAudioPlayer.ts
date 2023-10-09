@@ -2,35 +2,25 @@ import { AudioPlayer } from "./AudioPlayer"
 
 export class LoopingAudioPlayer extends AudioPlayer {
     readonly fileName: string
-    private track: HTMLAudioElement
+    private howl: Howl
 
     constructor(queueId: string, volumeMultiplier: number, fileName: string) {
         super(queueId, volumeMultiplier)
         this.fileName = fileName
+        this.howl = new Howl({ src: fileName, autoplay: false, loop: true, html5: true })
     }
 
     playFromStart() {
         this.stop()
 
-        if (this.track) {
-            // garbage collect
-            this.track.src = ""
-        }
-
-        this.track = new Audio(this.fileName)
-        this.track.loop = true
-        this.track.oncanplaythrough = () => {
-            this.track.play()
-        }
+        this.howl.play()
     }
 
     stop() {
-        this.track?.pause()
+        this.howl?.stop()
     }
 
     updateAudioElementVolume() {
-        if (this.track) {
-            this.track.volume = this.getVolume()
-        }
+        this.howl.volume(this.getVolume())
     }
 }

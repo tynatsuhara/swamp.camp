@@ -44,7 +44,7 @@ export const startTalkingSounds = (lineLength: number) => {
 
 export const stopTalkingSounds = () => {
     if (currentAudio) {
-        currentAudio.pause()
+        currentAudio.stop()
         currentAudio = null
     }
 }
