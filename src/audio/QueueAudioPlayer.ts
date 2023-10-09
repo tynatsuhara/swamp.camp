@@ -1,3 +1,4 @@
+import { IS_NATIVE_APP } from "../utils/NativeUtils"
 import { AudioPlayer } from "./AudioPlayer"
 import { AudioUtils } from "./AudioUtils"
 
@@ -113,7 +114,7 @@ export class QueueAudioPlayer extends AudioPlayer {
             src: file,
             autoplay: true,
             loop: false,
-            html5: true, // for streaming (TODO: can be false for native)
+            html5: !IS_NATIVE_APP, // for streaming
             preload: true,
             volume: 0,
         })

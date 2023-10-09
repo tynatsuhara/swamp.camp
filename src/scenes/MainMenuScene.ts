@@ -26,6 +26,7 @@ import { PLUME_COLORS, PlumePicker } from "../ui/PlumePicker"
 import { TEXT_SIZE } from "../ui/Text"
 import { TextInput } from "../ui/TextInput"
 import { UI_SPRITE_DEPTH } from "../ui/UiConstants"
+import { IS_NATIVE_APP } from "../utils/NativeUtils"
 import { DarknessMask } from "../world/DarknessMask"
 
 enum Menu {
@@ -45,8 +46,6 @@ enum SessionLoadingState {
 }
 
 let cancelJoinTimeout: NodeJS.Timeout
-
-const IS_NATIVE_APP = window.SWAMP_CAMP.native
 
 export class MainMenuScene extends Scene {
     private plumes: PlumePicker

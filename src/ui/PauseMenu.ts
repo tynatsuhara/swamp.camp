@@ -10,6 +10,7 @@ import { CutsceneManager } from "../cutscenes/CutsceneManager"
 import { TextOverlayManager } from "../cutscenes/TextOverlayManager"
 import { session } from "../online/session"
 import { hostOnJoin, hostSessionClose } from "../online/syncGame"
+import { IS_NATIVE_APP } from "../utils/NativeUtils"
 import { here } from "../world/locations/LocationManager"
 import { ButtonsMenu, OptionButton } from "./ButtonsMenu"
 import { Color } from "./Color"
@@ -206,7 +207,7 @@ export class PauseMenu extends Component {
         }
 
         // native apps use OS fullscreen functionality
-        if (window.SWAMP_CAMP.native) {
+        if (IS_NATIVE_APP) {
             return
         }
 

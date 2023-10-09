@@ -1,6 +1,7 @@
 import { Component, Point, UpdateData } from "brigsby/dist"
 import { player } from "../characters/player"
 import { Settings } from "../core/Settings"
+import { IS_NATIVE_APP } from "../utils/NativeUtils"
 
 // We store and use a single instance of each unique audio file because having
 // multiple of the same audio overlapping can result in a weird robotic effect
@@ -42,7 +43,7 @@ export class PointAudio extends Component {
                     volume: 0,
                     loop: true,
                     autoplay: true,
-                    html5: true, // for streaming (TODO: can be false for native)
+                    html5: !IS_NATIVE_APP, // for streaming
                 }),
                 lastUpdate: 0,
                 nextVolume: 0,
