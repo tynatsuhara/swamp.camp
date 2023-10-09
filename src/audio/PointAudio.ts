@@ -6,7 +6,7 @@ import { Settings } from "../core/Settings"
 // multiple of the same audio overlapping can result in a weird robotic effect
 const audioElements: {
     [key: string]: {
-        audio: HTMLAudioElement
+        audio: Howl
         // The last tick this was updated
         lastUpdate: number
         // Volume to be applied in the next update cycle
@@ -37,15 +37,16 @@ export class PointAudio extends Component {
         this.multiplier = multiplier
         if (!audioElements[file]) {
             audioElements[file] = {
-                audio: new Audio(file),
+                audio: new Howl({
+                    src: [file],
+                    volume: 0,
+                    loop: true,
+                    autoplay: true,
+                    html5: true, // for streaming
+                }),
                 lastUpdate: 0,
                 nextVolume: 0,
             }
-        }
-        this.audio.volume = 0 // update() will set volume appropriately
-        this.audio.oncanplaythrough = () => {
-            this.audio.loop = true
-            this.audio.play()
         }
     }
 
@@ -66,7 +67,7 @@ export class PointAudio extends Component {
         // As all the PointAudios of the same type are updated, they compute
         // the maximum volume to apply on the next update iteraton
         if (audioElement.lastUpdate !== tick) {
-            audioElement.audio.volume = audioElement.nextVolume
+            audioElement.audio.volume(audioElement.nextVolume)
             audioElement.nextVolume = volumeByDistance
         } else {
             audioElement.nextVolume = Math.max(volumeByDistance, audioElement.nextVolume)
@@ -77,12 +78,12 @@ export class PointAudio extends Component {
     setActive(active: boolean) {
         this.active = active
         if (!active) {
-            this.audio.volume = 0
+            this.audio.volume(0)
         }
     }
 
     delete() {
-        this.audio.volume = 0
+        this.audio.volume(0)
         super.delete()
     }
 
