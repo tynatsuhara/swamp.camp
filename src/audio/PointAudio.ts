@@ -38,7 +38,7 @@ export class PointAudio extends Component {
         if (!audioElements[file]) {
             audioElements[file] = {
                 audio: new Howl({
-                    src: [file],
+                    src: file,
                     volume: 0,
                     loop: true,
                     autoplay: true,

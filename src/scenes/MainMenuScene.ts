@@ -26,7 +26,6 @@ import { PLUME_COLORS, PlumePicker } from "../ui/PlumePicker"
 import { TEXT_SIZE } from "../ui/Text"
 import { TextInput } from "../ui/TextInput"
 import { UI_SPRITE_DEPTH } from "../ui/UiConstants"
-import { UISounds } from "../ui/UISounds"
 import { DarknessMask } from "../world/DarknessMask"
 
 enum Menu {
@@ -73,7 +72,6 @@ export class MainMenuScene extends Scene {
     }
 
     private async loadAssets(blocking = true) {
-        UISounds.loadAll()
         if (this.allAssetsLoaded) {
             return Promise.resolve()
         }

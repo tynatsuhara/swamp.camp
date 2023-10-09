@@ -11,7 +11,7 @@ export class Sounds {
      * @returns a promise that will resolve when the sound starts playing
      */
     static play(path: string, volume: number = 1): Promise<Howl> {
-        const sound = new Howl({ src: [path], volume })
+        const sound = new Howl({ src: path, volume })
 
         return new Promise((resolve) => {
             if (sound.state() === "loaded") {

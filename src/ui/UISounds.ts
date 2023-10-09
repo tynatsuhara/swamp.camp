@@ -1,4 +1,3 @@
-import { assets } from "brigsby/dist"
 import { Lists } from "brigsby/dist/util"
 import { loadAudio } from "../audio/DeferLoadAudio"
 import { Sounds } from "../audio/Sounds"
@@ -15,7 +14,6 @@ const CLINK_NOISES = loadAudio([
 ])
 
 export const UISounds = {
-    loadAll: () => assets.loadAudioFiles(Object.values(SOUNDS)),
     playClickSound: () => Sounds.play(SOUNDS.CLICK, 0.035),
     playErrorSound: () => Sounds.play(SOUNDS.ERROR_CLICK, 0.15),
     playMoneySound: () => Sounds.play(Lists.oneOf(CLINK_NOISES), 0.4),

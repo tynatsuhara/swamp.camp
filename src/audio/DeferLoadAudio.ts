@@ -1,7 +1,15 @@
-import { assets } from "brigsby/dist"
-
 const audioLoadQueue: string[] = []
 let deferLoad = true
+
+const actuallyLoad = (urls: string[]) => {
+    urls.forEach((url) => {
+        new Howl({
+            src: url,
+            // this is true by default, but we set it to be explicit
+            preload: true,
+        })
+    })
+}
 
 /**
  * Load the provided audio files ASAP, but don't block the main menu from rendering
@@ -11,7 +19,7 @@ export const loadAudio = (urls: string[]) => {
     if (deferLoad) {
         audioLoadQueue.push(...urls)
     } else {
-        assets.loadAudioFiles(urls)
+        actuallyLoad(urls)
     }
     return urls
 }
@@ -21,5 +29,6 @@ export const loadAudio = (urls: string[]) => {
  */
 export const loadDeferredAudio = () => {
     deferLoad = false
-    assets.loadAudioFiles(audioLoadQueue)
+    audioLoadQueue.length = 0
+    actuallyLoad(audioLoadQueue)
 }
