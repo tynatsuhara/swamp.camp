@@ -20,6 +20,7 @@
     "homepage": "https://swamp.camp",
     "devDependencies": {
         "@types/circular-dependency-plugin": "^5.0.5",
+        "@types/howler": "^2.2.9",
         "@types/webpack": "^5.28.2",
         "circular-dependency-plugin": "^5.2.2",
         "cross-env": "^7.0.3",
@@ -33,6 +34,7 @@
     },
     "dependencies": {
         "brigsby": "^0.9.2",
+        "howler": "^2.2.4",
         "trystero": "^0.13.0"
     }
 }

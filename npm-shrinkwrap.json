@@ -9,10 +9,12 @@
             "version": "1.0.0",
             "dependencies": {
                 "brigsby": "^0.9.2",
+                "howler": "^2.2.4",
                 "trystero": "^0.13.0"
             },
             "devDependencies": {
                 "@types/circular-dependency-plugin": "^5.0.5",
+                "@types/howler": "^2.2.9",
                 "@types/webpack": "^5.28.2",
                 "circular-dependency-plugin": "^5.2.2",
                 "cross-env": "^7.0.3",
@@ -1545,6 +1547,12 @@
                 "@types/qs": "*",
                 "@types/range-parser": "*"
             }
+        },
+        "node_modules/@types/howler": {
+            "version": "2.2.9",
+            "resolved": "https://registry.npmjs.org/@types/howler/-/howler-2.2.9.tgz",
+            "integrity": "sha512-kNi8mBM+IAmMzo1xhFlR8pKUWqCz9kEtiT1Xp5hZW0ynQl2wUg0EAm+brsHvhahMzxlADt0Xhu0jV/NHmk/Ibg==",
+            "dev": true
         },
         "node_modules/@types/http-proxy": {
             "version": "1.17.9",
@@ -4413,6 +4421,11 @@
                 "minimalistic-assert": "^1.0.0",
                 "minimalistic-crypto-utils": "^1.0.1"
             }
+        },
+        "node_modules/howler": {
+            "version": "2.2.4",
+            "resolved": "https://registry.npmjs.org/howler/-/howler-2.2.4.tgz",
+            "integrity": "sha512-iARIBPgcQrwtEr+tALF+rapJ8qSc+Set2GJQl7xT1MQzWaVkFebdJhR3alVlSiUf5U7nAANKuj3aWpwerocD5w=="
         },
         "node_modules/hpack.js": {
             "version": "2.1.6",
@@ -11452,6 +11465,12 @@
                 "@types/range-parser": "*"
             }
         },
+        "@types/howler": {
+            "version": "2.2.9",
+            "resolved": "https://registry.npmjs.org/@types/howler/-/howler-2.2.9.tgz",
+            "integrity": "sha512-kNi8mBM+IAmMzo1xhFlR8pKUWqCz9kEtiT1Xp5hZW0ynQl2wUg0EAm+brsHvhahMzxlADt0Xhu0jV/NHmk/Ibg==",
+            "dev": true
+        },
         "@types/http-proxy": {
             "version": "1.17.9",
             "resolved": "https://registry.npmjs.org/@types/http-proxy/-/http-proxy-1.17.9.tgz",
@@ -13685,6 +13704,11 @@
                 "minimalistic-assert": "^1.0.0",
                 "minimalistic-crypto-utils": "^1.0.1"
             }
+        },
+        "howler": {
+            "version": "2.2.4",
+            "resolved": "https://registry.npmjs.org/howler/-/howler-2.2.4.tgz",
+            "integrity": "sha512-iARIBPgcQrwtEr+tALF+rapJ8qSc+Set2GJQl7xT1MQzWaVkFebdJhR3alVlSiUf5U7nAANKuj3aWpwerocD5w=="
         },
         "hpack.js": {
             "version": "2.1.6",
