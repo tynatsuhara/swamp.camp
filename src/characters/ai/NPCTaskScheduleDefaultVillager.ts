@@ -34,6 +34,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
     private homeLocation: Location
     private workLocation: Location
     private workRoamingConfig: RoamOptions | undefined
+    private freeRoamingConfig: RoamOptions | undefined
 
     constructor(private readonly npc: NPC) {
         super()
@@ -41,6 +42,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         this.homeLocation = this.findHomeLocation(npc.dude)
         this.workLocation = this.findWorkLocation(npc.dude)
         this.workRoamingConfig = this.getWorkRoamingConfig(npc.dude)
+        this.freeRoamingConfig = this.getFreeRoamingConfig(npc.dude)
     }
 
     performTask(context: NPCTaskContext): void {
@@ -95,6 +97,14 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
                 : this.homeLocation ?? camp()
             dude.setWeapon(WeaponType.NONE, -1)
             dude.setShield(ShieldType.NONE, -1)
+
+            if (this.freeRoamingConfig) {
+                const { goalOptionsSupplier, pauseEveryMillis, pauseForMillis } =
+                    this.freeRoamingConfig
+                roamOptions.goalOptionsSupplier = goalOptionsSupplier
+                roamOptions.pauseEveryMillis = pauseEveryMillis ?? roamOptions.pauseEveryMillis
+                roamOptions.pauseForMillis = pauseForMillis ?? roamOptions.pauseForMillis
+            }
         }
 
         if (goalLocation && dude.location !== goalLocation) {
@@ -175,7 +185,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
     /**
      * should be called AFTER getworklocation is called!
      */
-    private getWorkRoamingConfig(dude: Dude): RoamOptions {
+    private getWorkRoamingConfig(dude: Dude): RoamOptions | undefined {
         if (
             this.getJob() === VillagerJob.CONSTRUCTION ||
             (this.getJob() === VillagerJob.MINE && this.workLocation === camp())
@@ -203,26 +213,7 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
             dude.type === DudeType.DIP ||
             (dude.type === DudeType.HERALD && !saveManager.getState().hasTownHall)
         ) {
-            // Go to the campfire closest to the middle of the amp
-            const closestCampfireGoal = Point.ZERO
-            const location = camp()
-            const closestCampfirePoint = location
-                .getElementsOfType(ElementType.CAMPFIRE)
-                .sort(
-                    (a, b) =>
-                        a.pos.distanceTo(closestCampfireGoal) -
-                        b.pos.distanceTo(closestCampfireGoal)
-                )[0]?.pos
-
-            const tileOptions: Point[] = closestCampfirePoint
-                ? tilesAround(closestCampfirePoint, 5)
-                : tilesAround(Point.ZERO, 10)
-
-            return {
-                goalOptionsSupplier: () => tileOptions,
-                pauseEveryMillis: 2_500,
-                pauseForMillis: 30_000,
-            }
+            return this.hangNearCenterOfCamp(dude)
         } else if (dude.type === DudeType.HERALD) {
             return {
                 pauseEveryMillis: 2_500,
@@ -231,6 +222,40 @@ export class NPCTaskScheduleDefaultVillager extends NPCTask {
         }
 
         return undefined
+    }
+
+    private getFreeRoamingConfig(dude: Dude): RoamOptions | undefined {
+        if (
+            dude.type === DudeType.DIP ||
+            (dude.type === DudeType.HERALD && !saveManager.getState().hasTownHall)
+        ) {
+            return this.hangNearCenterOfCamp(dude)
+        }
+
+        return undefined
+    }
+
+    private hangNearCenterOfCamp(dude: Dude): RoamOptions {
+        const closestCampfireGoal = Point.ZERO
+        const location = camp()
+        const closestCampfirePoint = location
+            .getElementsOfType(ElementType.CAMPFIRE)
+            .sort(
+                (a, b) =>
+                    a.pos.distanceTo(closestCampfireGoal) - b.pos.distanceTo(closestCampfireGoal)
+            )[0]?.pos
+
+        const tileOptions: Point[] = closestCampfirePoint
+            ? tilesAround(closestCampfirePoint, 5)
+            : tilesAround(Point.ZERO, 10)
+
+        const atCenter = tileOptions.some((p) => dude.tile.equals(p))
+
+        return {
+            goalOptionsSupplier: () => tileOptions,
+            pauseEveryMillis: atCenter ? 2_500 : 10_000,
+            pauseForMillis: atCenter ? 30_000 : 2_500,
+        }
     }
 
     private equipJobGear() {
