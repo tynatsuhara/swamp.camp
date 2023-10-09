@@ -105,8 +105,10 @@ export class PauseMenu extends Component {
                         if (session.isHost() && !debug.disableAutosave) {
                             saveManager.save()
                         }
-                        here().toggleAudio(false)
-                        SwampCampGame.instance.loadMainMenu()
+                        requestAnimationFrame(() => {
+                            here().toggleAudio(false)
+                            SwampCampGame.instance.loadMainMenu()
+                        })
                     },
                 }
             )
