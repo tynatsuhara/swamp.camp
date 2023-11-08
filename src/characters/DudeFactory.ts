@@ -47,15 +47,15 @@ import { WeaponType } from "./weapons/WeaponType"
 export enum DudeFaction {
     VILLAGERS,
     CLERGY,
-    ORCS, // sounds: rpg/npc/ogre
+    ORCS,
     UNDEAD,
-    DEMONS, // sounds: rpg/npc/shade
-    SHROOMS, // sounds: lots of options in rpg/npc/* that could work here
+    DEMONS,
+    SHROOMS,
     CENTAURS,
     GNOLLS,
     BEARS,
-    WOLVES, // sounds: gumball
-    AQUATIC, // sounds: lots of options in rpg/npc/* that could work here
+    WOLVES,
+    AQUATIC,
 }
 
 const DEFAULT_COLLIDER_SIZE = new Point(10, 8)

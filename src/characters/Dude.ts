@@ -1573,10 +1573,6 @@ export class Dude extends Component implements DialogueSource {
         }
     }
 
-    // getRenderMethods(): RenderMethod[] {
-    // return this.getIndicator()
-    // }
-
     delete() {
         this.removeAllConditions()
         this.location.removeDude(this)

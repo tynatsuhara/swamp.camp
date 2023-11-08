@@ -1,15 +1,15 @@
 /* DudeFaction {
-    VILLAGERS,
-    CLERGY,
+    VILLAGERS, // TODO (including player!)
+    CLERGY, // TODO
     ORCS, // sounds: rpg/npc/ogre
-    UNDEAD,
+    UNDEAD, // TODO
     DEMONS, // sounds: rpg/npc/shade
     SHROOMS, // sounds: lots of options in rpg/npc/* that could work here
-    CENTAURS,
-    GNOLLS,
-    BEARS,
-    WOLVES, // sounds: gumball
-    AQUATIC, // sounds: lots of options in rpg/npc/* that could work here
+    CENTAURS, // TODO
+    GNOLLS, // TODO
+    BEARS, // TODO
+    WOLVES, // TODO sounds: gumball
+    AQUATIC, // TODO sounds: lots of options in rpg/npc/* that could work here
 } */
 
 import { Lists } from "brigsby/dist/util/Lists"
