@@ -11,11 +11,13 @@ import { ONLINE_PLAYER_DUDE_ID_PREFIX, syncFn } from "../../online/syncUtils"
 import { LocationSaveState } from "../../saves/LocationSaveState"
 import { newUUID } from "../../saves/uuid"
 import { HUD } from "../../ui/HUD"
+import { tilesAround } from "../../utils/misc"
 import { ElementComponent } from "../elements/ElementComponent"
 import { ElementType } from "../elements/ElementType"
 import { ElementUtils } from "../elements/ElementUtils"
 import { ElementDataFormat, Elements, SavedElement } from "../elements/Elements"
 import { Feature, FeatureData, FeatureType, instantiateFeature } from "../features/Features"
+import { ConnectingTile } from "../ground/ConnectingTile"
 import { Ground, GroundType, SavedGround } from "../ground/Ground"
 import { GroundComponent } from "../ground/GroundComponent"
 import { Location } from "./Location"
@@ -169,6 +171,10 @@ export class BasicLocation extends Location {
         this.ground.get(tilePoint)?.entity.selfDestruct()
         const groundComponent = Ground.instance.make(type, this, tilePoint, data)
         this.ground.set(tilePoint, groundComponent)
+
+        tilesAround(tilePoint).forEach((p) => {
+            this.getGround(p)?.entity?.getComponent(ConnectingTile)?.refresh()
+        })
 
         if (!this.isInterior) {
             HUD.instance.miniMap.refresh()

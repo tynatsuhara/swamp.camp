@@ -9,6 +9,7 @@ export class ConnectingTile extends Component {
     readonly schema: ConnectingTileSchema
     private readonly location: Location
     private readonly position: Point
+    private cachedRenders: ImageRender[]
 
     /**
      * Connecting tiles require a tile grid. The position parameter should be tile-scale, not pixel-scale.
@@ -26,10 +27,16 @@ export class ConnectingTile extends Component {
 
     start() {
         GroundRenderer.instance.clearTile(here(), this.position)
-        // TODO can we just draw to groundrenderer instead of updating every method?
     }
 
     getRenderMethods(): ImageRender[] {
-        return this.schema.render(this.location, this.position)
+        if (!this.cachedRenders) {
+            this.cachedRenders = this.schema.render(this.location, this.position)
+        }
+        return this.cachedRenders
+    }
+
+    refresh() {
+        this.cachedRenders = undefined
     }
 }

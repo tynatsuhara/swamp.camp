@@ -6,6 +6,7 @@ import { ConnectingTile } from "./ConnectingTile"
 /**
  * Defines how a type of connecting tiles interacts with other types of connecting tiles.
  */
+// TODO expose each as a singleton, we dont need one schema per tile since it's stateless
 export abstract class ConnectingTileSchema {
     /**
      * Returns true if one schema can connect to another
