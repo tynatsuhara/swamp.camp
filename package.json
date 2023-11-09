@@ -25,6 +25,7 @@
         "circular-dependency-plugin": "^5.2.2",
         "cross-env": "^7.0.3",
         "prettier": "^2.7.1",
+        "source-map-loader": "^4.0.1",
         "ts-loader": "^9.3.1",
         "ts-node": "^10.9.1",
         "typescript": "^5.1.6",
@@ -33,7 +34,7 @@
         "webpack-dev-server": "^4.10.0"
     },
     "dependencies": {
-        "brigsby": "^0.10.1",
+        "brigsby": "^0.10.3",
         "howler": "^2.2.4",
         "trystero": "^0.13.0"
     }
