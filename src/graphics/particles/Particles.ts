@@ -5,6 +5,11 @@ import { Singletons } from "../../core/Singletons"
 import { Color, getRGB } from "../../ui/Color"
 
 const MAX_PARTICLES = 4_000
+// if we hit MAX_PARTICLES, start expiring early until we have this many particles in the inactive pool
+const PARTICLE_BUFFER_SIZE = 200
+
+let particleSystemEntity: Entity
+let inactivePool: Particle[]
 
 export class Particles {
     static get instance() {
@@ -12,14 +17,21 @@ export class Particles {
     }
 
     private prefabs = new Map<Color, ImageBitmap>()
-    private entity = new Entity()
 
     get count() {
-        return this.entity.components.length
+        return particleSystemEntity.components.length
+    }
+    get inactiveCount() {
+        return inactivePool.length
+    }
+
+    constructor() {
+        this.clear()
     }
 
     clear() {
-        this.entity = new Entity()
+        particleSystemEntity = new Entity()
+        inactivePool = []
     }
 
     emitComplexParticle(
@@ -35,9 +47,7 @@ export class Particles {
         }
 
         const emitFn = (image: ImageBitmap) =>
-            this.entity.addComponent(
-                Particle.dynamic(lifetime, image, positionSupplier, depthSupplier, velocity, size)
-            )
+            Particle.dynamic(lifetime, image, positionSupplier, depthSupplier, velocity, size)
 
         this.createParticle(emitFn, color)
     }
@@ -55,7 +65,7 @@ export class Particles {
         }
 
         const emitFn = (image: ImageBitmap) =>
-            this.entity.addComponent(Particle.new(lifetime, image, position, depth, velocity, size))
+            Particle.new(lifetime, image, position, depth, velocity, size)
 
         this.createParticle(emitFn, color)
     }
@@ -82,18 +92,15 @@ export class Particles {
     }
 
     getEntity() {
-        return this.entity
+        return particleSystemEntity
     }
 }
 
 const SIZE = new Point(1, 1)
 
 class Particle extends Component {
-    private elapsedTime = 0
-
-    private constructor(private readonly lifetime: number) {
-        super()
-    }
+    lifetime: number
+    elapsedTime: number
 
     update({ elapsedTimeMillis }: UpdateData): void {
         if (isGamePaused()) {
@@ -101,9 +108,30 @@ class Particle extends Component {
         }
 
         this.elapsedTime += elapsedTimeMillis
-        if (this.elapsedTime > this.lifetime || Particles.instance.count > MAX_PARTICLES) {
-            this.delete()
+
+        if (
+            this.elapsedTime > this.lifetime ||
+            // expire early
+            (Particles.instance.count >= MAX_PARTICLES &&
+                inactivePool.length < PARTICLE_BUFFER_SIZE)
+        ) {
+            this.enabled = false
+            inactivePool.push(this)
         }
+    }
+
+    private static createParticle(lifetime: number) {
+        let p: Particle
+        if (inactivePool.length > 0) {
+            p = inactivePool.pop()
+        } else {
+            p = new Particle()
+            particleSystemEntity.addComponent(p)
+        }
+        p.enabled = true
+        p.lifetime = lifetime
+        p.elapsedTime = 0
+        return p
     }
 
     static new(
@@ -114,7 +142,7 @@ class Particle extends Component {
         velocity: (t: number) => Point,
         size: Point = new Point(1, 1)
     ) {
-        const p = new Particle(lifetime)
+        const p = this.createParticle(lifetime)
         p.getRenderMethods = () => [
             new ImageRender(
                 image,
@@ -125,7 +153,6 @@ class Particle extends Component {
                 depth
             ),
         ]
-        return p
     }
 
     static dynamic(
@@ -136,7 +163,7 @@ class Particle extends Component {
         velocity: (t: number) => Point,
         size: Point = new Point(1, 1)
     ) {
-        const p = new Particle(lifetime)
+        const p = this.createParticle(lifetime)
         p.getRenderMethods = () => [
             new ImageRender(
                 image,
@@ -147,6 +174,5 @@ class Particle extends Component {
                 depthSupplier()
             ),
         ]
-        return p
     }
 }

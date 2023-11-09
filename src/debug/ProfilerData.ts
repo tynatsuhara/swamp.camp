@@ -21,7 +21,9 @@ export class ProfilerData extends Component {
         profiler.showInfo(`UI mouse pos: ${controls.getCursorPos().apply(Math.floor)}`)
         profiler.showInfo(`mouse tile: ${mouseTile}`)
         profiler.showInfo(`time: ${WorldTime.clockTime()} (${Math.floor(now())})`)
-        profiler.showInfo(`particle count: ${Particles.instance.count}`)
+        profiler.showInfo(
+            `particle count: ${Particles.instance.count} (${Particles.instance.inactiveCount} in pool)`
+        )
         // profiler.showInfo(`level: ${here().getLevel(mouseTile)}`)
         profiler.showInfo(`stats: ${prettyPrint(TownStats.instance.getProfilerData())}`)
 
