@@ -8,7 +8,7 @@
             "name": "swamp.camp",
             "version": "1.0.0",
             "dependencies": {
-                "brigsby": "^0.10.3",
+                "brigsby": "^0.10.4",
                 "howler": "^2.2.4",
                 "trystero": "^0.13.0"
             },
@@ -2339,9 +2339,9 @@
             }
         },
         "node_modules/brigsby": {
-            "version": "0.10.3",
-            "resolved": "https://registry.npmjs.org/brigsby/-/brigsby-0.10.3.tgz",
-            "integrity": "sha512-ykT2GtdZ79Vuz3ccKn7Y9l2jPJX341dUK2rauK2qlOv3KgmJc0oQNSvOAG4T/rWZc3/tEVHhzig5pP230poIJw==",
+            "version": "0.10.4",
+            "resolved": "https://registry.npmjs.org/brigsby/-/brigsby-0.10.4.tgz",
+            "integrity": "sha512-XQurlAQ7FDrfGldeSUe/GFAGd25tCzL2uH5H1HptNgk9JcbtLOPMsei1IFExrIp0GHmiL/kNzcsr+uN5OjgSrQ==",
             "dependencies": {
                 "@types/css-font-loading-module": "0.0.7"
             }
@@ -12189,9 +12189,9 @@
             }
         },
         "brigsby": {
-            "version": "0.10.3",
-            "resolved": "https://registry.npmjs.org/brigsby/-/brigsby-0.10.3.tgz",
-            "integrity": "sha512-ykT2GtdZ79Vuz3ccKn7Y9l2jPJX341dUK2rauK2qlOv3KgmJc0oQNSvOAG4T/rWZc3/tEVHhzig5pP230poIJw==",
+            "version": "0.10.4",
+            "resolved": "https://registry.npmjs.org/brigsby/-/brigsby-0.10.4.tgz",
+            "integrity": "sha512-XQurlAQ7FDrfGldeSUe/GFAGd25tCzL2uH5H1HptNgk9JcbtLOPMsei1IFExrIp0GHmiL/kNzcsr+uN5OjgSrQ==",
             "requires": {
                 "@types/css-font-loading-module": "0.0.7"
             }

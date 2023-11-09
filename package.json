@@ -34,7 +34,7 @@
         "webpack-dev-server": "^4.10.0"
     },
     "dependencies": {
-        "brigsby": "^0.10.3",
+        "brigsby": "^0.10.4",
         "howler": "^2.2.4",
         "trystero": "^0.13.0"
     }
