@@ -39,14 +39,14 @@ export class Music {
         "35_ambient_evil_2.mp3"
     )
 
-    static readonly BATTLE_MUSIC_LOOPS: AudioPlayer[] = [
+    static readonly BATTLE_MUSIC_LOOPS: AudioPlayer[] = Lists.shuffled([
         new LoopingAudioPlayer("battle bop 1", 1, "audio/music/09_knights_theme.mp3"),
         new LoopingAudioPlayer("battle bop 2", 1, "audio/music/14_battle_victory.mp3"),
         new LoopingAudioPlayer("battle bop 3", 1, "audio/music/19_paladins_theme.mp3"),
         new LoopingAudioPlayer("battle bop 4", 1, "audio/music/27_castle_himmendal.mp3"),
         new LoopingAudioPlayer("battle bop 5", 1, "audio/music/28_knights_theme_b.mp3"),
         new LoopingAudioPlayer("battle bop 6", 1, "audio/music/POL-battle-march-short.wav"),
-    ]
+    ])
 
     static currentBattleMusic: LoopingAudioPlayer
 
@@ -61,7 +61,9 @@ export class Music {
         if (ctx.isInBattle) {
             // only play if we don't already have a battle loop going
             if (!Music.BATTLE_MUSIC_LOOPS.includes(Music.currentMusic)) {
-                music = Lists.oneOf(Music.BATTLE_MUSIC_LOOPS)
+                // Start the first in the queue, and put it to the back so we don't repeat it for a while
+                music = Music.BATTLE_MUSIC_LOOPS.shift()
+                Music.BATTLE_MUSIC_LOOPS.push(music)
             }
         } else if (timeOfDay > daytimeFadeOutTime || timeOfDay < daytimeFadeInTime) {
             music = Music.NIGHT_MUSIC
