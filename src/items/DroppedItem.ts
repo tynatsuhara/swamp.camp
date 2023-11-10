@@ -2,8 +2,7 @@ import { Component, Point } from "brigsby/dist"
 import { PointValue, pt } from "brigsby/dist/Point"
 import { BoxCollider, Collider } from "brigsby/dist/collision"
 import { SpriteComponent } from "brigsby/dist/sprites"
-import { Lists } from "brigsby/dist/util"
-import { loadAudio } from "../audio/DeferLoadAudio"
+import { SoundPool } from "../audio/SoundPool"
 import { Sounds } from "../audio/Sounds"
 import { Dude } from "../characters/Dude"
 import { session } from "../online/session"
@@ -15,7 +14,7 @@ import { here } from "../world/locations/LocationManager"
 import { Item } from "./Item"
 import { ITEM_METADATA_MAP, ItemMetadata } from "./Items"
 
-const PICK_UP_SOUNDS = loadAudio(Lists.range(1, 6).map((i) => `audio/m1/pop${i}.ogg`))
+const PICK_UP_SOUNDS = SoundPool.range(5, "audio/m1/pop%%.ogg")
 
 export type DroppedItemSaveState = {
     id: string
@@ -118,7 +117,7 @@ export class DroppedItem extends Component {
                                 here().removeDroppedItem(this)
                                 setGameTimeout(() => {
                                     Sounds.playAtPoint(
-                                        Lists.oneOf(PICK_UP_SOUNDS),
+                                        PICK_UP_SOUNDS.next(),
                                         0.4,
                                         dude.standingPosition
                                     )

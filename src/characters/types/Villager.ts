@@ -1,6 +1,5 @@
 import { Component } from "brigsby/dist"
-import { Lists } from "brigsby/dist/util"
-import { loadAudio } from "../../audio/DeferLoadAudio"
+import { SoundPool } from "../../audio/SoundPool"
 import { Sounds } from "../../audio/Sounds"
 import { session } from "../../online/session"
 import { ConstructionSite } from "../../world/buildings/ConstructionSite"
@@ -16,7 +15,7 @@ import { VillagerJob } from "../ai/VillagerJob"
 import { player } from "../player"
 import { WeaponType } from "../weapons/WeaponType"
 
-const DIG_SOUNDS = loadAudio([
+const DIG_SOUNDS = new SoundPool([
     ...[2, 3, 8, 9].map((i) => `audio/nature/Footstep/FootstepGrass0${i}.wav`),
     "audio/steps/gravel.ogg",
 ])
@@ -82,7 +81,7 @@ export class Villager extends Component {
                 return 2_000
             } else if (isDoingConstruction) {
                 this.dude.updateAttacking(true)
-                Sounds.playAtPoint(Lists.oneOf(DIG_SOUNDS), 0.5, standingPosition)
+                Sounds.playAtPoint(DIG_SOUNDS.next(), 0.5, standingPosition)
                 // turn the ground to dirt
                 const hittingTile = tile.plusX(this.dude.getFacingMultiplier())
                 const ground = location.getGround(hittingTile)?.type

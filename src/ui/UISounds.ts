@@ -1,5 +1,4 @@
-import { Lists } from "brigsby/dist/util"
-import { loadAudio } from "../audio/DeferLoadAudio"
+import { SoundPool } from "../audio/SoundPool"
 import { Sounds } from "../audio/Sounds"
 
 const SOUNDS = {
@@ -7,7 +6,7 @@ const SOUNDS = {
     ERROR_CLICK: "audio/rpg/interface/interface6.wav",
 }
 
-const CLINK_NOISES = loadAudio([
+const CLINK_NOISES = new SoundPool([
     "audio/rpg/inventory/coin.wav",
     "audio/rpg/inventory/coin2.wav",
     "audio/rpg/inventory/coin3.wav",
@@ -16,5 +15,5 @@ const CLINK_NOISES = loadAudio([
 export const UISounds = {
     playClickSound: () => Sounds.play(SOUNDS.CLICK, 0.035),
     playErrorSound: () => Sounds.play(SOUNDS.ERROR_CLICK, 0.15),
-    playMoneySound: () => Sounds.play(Lists.oneOf(CLINK_NOISES), 0.4),
+    playMoneySound: () => Sounds.play(CLINK_NOISES.next(), 0.4),
 }
