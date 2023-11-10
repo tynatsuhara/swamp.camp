@@ -1,8 +1,7 @@
 import { Component, Entity, Point } from "brigsby/dist"
 import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
-import { loadAudio } from "../../audio/DeferLoadAudio"
-import { Sounds } from "../../audio/Sounds"
+import { CommonWorldSounds } from "../../audio/CommonWorldSounds"
 import { WeaponType } from "../../characters/weapons/WeaponType"
 import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
 import { Particles } from "../../graphics/particles/Particles"
@@ -31,19 +30,7 @@ type SaveData = {
     b?: boolean
 }
 
-const playChoppingSound = (centerPos: Point) =>
-    Sounds.playAtPoint(Lists.oneOf(CHOPPING_AUDIO), CHOPPING_AUDIO_VOLUME, centerPos)
-
 type TreeType = ElementType.TREE_ROUND | ElementType.TREE_POINTY
-
-const CHOPPING_AUDIO = loadAudio(
-    Lists.range(0, 5).map((n) => `audio/impact/impactPlank_medium_00${n}.ogg`)
-)
-const CHOPPING_AUDIO_VOLUME = 0.3
-const PUSH_AUDIO = loadAudio([
-    ...Lists.range(1, 10).map((i) => `audio/nature/Footstep/FootstepGrass0${i}.wav`),
-    ...Lists.range(1, 6).map((i) => `audio/nature/Foliage/Foliage0${i}.wav`),
-])
 
 export class TreeFactory extends ElementFactory<TreeType, SaveData> {
     readonly dimensions = new Point(1, 1)
@@ -136,10 +123,14 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
                     }
                 },
                 () => {
-                    playChoppingSound(hittableCenter)
+                    CommonWorldSounds.playWoodChop(hittableCenter)
+                    CommonWorldSounds.playFoliageRustling(hittableCenter)
                     emitParticles(5)
                 },
-                () => emitParticles(40)
+                () => {
+                    emitParticles(40)
+                    CommonWorldSounds.playFoliageRustling(hittableCenter, 0.8)
+                }
             )
         )
 
@@ -163,7 +154,7 @@ export class TreeFactory extends ElementFactory<TreeType, SaveData> {
                 tiles.map((t) => t.transform),
                 () => !hittableResource.isBeingHit(),
                 (dude) => {
-                    Sounds.playAtPoint(Lists.oneOf(PUSH_AUDIO), 0.2, dude.standingPosition)
+                    CommonWorldSounds.playFoliageRustling(hittableCenter)
                     emitParticles(Math.random() * 10 - 5)
                 }
             )

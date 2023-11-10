@@ -1,6 +1,7 @@
 import { Component, Entity, Point } from "brigsby/dist"
 import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Lists, Maths } from "brigsby/dist/util"
+import { CommonWorldSounds } from "../../audio/CommonWorldSounds"
 import { PointAudio } from "../../audio/PointAudio"
 import { Dude } from "../../characters/Dude"
 import { CAMPFIRE_DIALOGUE } from "../../characters/dialogue/CampfireDialogue"
@@ -128,7 +129,10 @@ export class CampfireFactory extends ElementFactory<ElementType.CAMPFIRE, SaveDa
                 () =>
                     Lists.repeat(cf.logs, [{ item: Item.WOOD }]).concat(
                         Lists.repeat(ROCKS_NEEDED_FOR_CAMPFIRE, [{ item: Item.ROCK }])
-                    )
+                    ),
+                () => {
+                    CommonWorldSounds.playWoodChop(pixelCenterPos)
+                }
             )
         )
 

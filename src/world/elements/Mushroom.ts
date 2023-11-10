@@ -43,6 +43,7 @@ export class MushroomFactory extends ElementFactory<ElementType.MUSHROOM, { ngt:
         const hittableCenter = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE / 2, TILE_SIZE / 2))
         e.addComponent(
             new Hittable(hittableCenter, [tile.transform], (dir) => {
+                // TODO some sound
                 e.selfDestruct()
                 const itemDirection = dir.randomlyShifted(0.2).normalized()
                 if (session.isHost()) {

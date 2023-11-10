@@ -1,6 +1,7 @@
 import { Entity, Point } from "brigsby/dist"
 import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
+import { CommonWorldSounds } from "../../audio/CommonWorldSounds"
 import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
 import { Particles } from "../../graphics/particles/Particles"
 import { Item } from "../../items/Item"
@@ -99,6 +100,7 @@ export class BlackberriesFactory extends ElementFactory<ElementType.BLACKBERRIES
         const center = pos.times(TILE_SIZE).plus(new Point(TILE_SIZE / 2, TILE_SIZE / 2))
         e.addComponent(
             new Hittable(center, tileTransforms, (dir) => {
+                CommonWorldSounds.playFoliageRustling(center, 0.8)
                 e.selfDestruct()
                 if (state === State.HAS_BERRIES) {
                     if (session.isHost()) {
