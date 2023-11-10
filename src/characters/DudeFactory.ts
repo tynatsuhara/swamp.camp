@@ -4,7 +4,7 @@ import { Lists } from "brigsby/dist/util"
 import { saveManager } from "../core/SaveManager"
 import { Singletons } from "../core/Singletons"
 import { CutscenePlayerController } from "../cutscenes/CutscenePlayerController"
-import { TILE_SIZE } from "../graphics/Tilesets"
+import { pixelPtToTilePt, TILE_SIZE } from "../graphics/Tilesets"
 import { Inventory } from "../items/Inventory"
 import { Item } from "../items/Item"
 import { PlayerInventory } from "../items/PlayerInventory"
@@ -494,6 +494,12 @@ export class DudeFactory {
                 break
             }
             case DudeType.MIMIC: {
+                // align so it looks the same as a chest item
+                if (!Mimic.isTriggered(blob)) {
+                    standingPosition = pixelPtToTilePt(standingPosition)
+                        .times(TILE_SIZE)
+                        .plus(pt(8, 16))
+                }
                 factions = [] // TODO?
                 animationName = "chest_mimic"
                 weapon = WeaponType.UNARMED

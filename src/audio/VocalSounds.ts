@@ -35,7 +35,7 @@ const { range, oneOf } = Lists
 const DEMON_SOUNDS = loadAudio(range(1, 16).map((i) => `audio/rpg/NPC/shade/shade${i}.wav`))
 const ORC_SOUNDS = loadAudio(range(1, 6).map((i) => `audio/rpg/NPC/ogre/ogre${i}.wav`))
 const SPOOKY_SOUNDS = loadAudio(range(1, 3).map((i) => `audio/m1/spooky_visitor_idle${i}.ogg`))
-const MIMIC_SOUNDS = loadAudio(range(1, 3).map((i) => `audio/m1/mimic${i}.ogg`))
+const MIMIC_SOUNDS = loadAudio(range(1, 5).map((i) => `audio/m1/mimic${i}.ogg`))
 const AQUATIC_IDLE_SOUNDS = loadAudio(range(1, 5).map((i) => `audio/m1/aquatic_idle${i}.ogg`))
 const AQUATIC_ACTIVE_SOUNDS = loadAudio(range(1, 4).map((i) => `audio/m1/aquatic_active${i}.ogg`))
 
@@ -80,6 +80,8 @@ const damage = (d: Dude) => {
         play(d, oneOf(ORC_SOUNDS))
     } else if (d.type === DudeType.SPOOKY_VISITOR) {
         play(d, oneOf(SPOOKY_SOUNDS), { volume: 1 })
+    } else if (d.type === DudeType.MIMIC) {
+        play(d, oneOf(MIMIC_SOUNDS), { volume: 0.75 })
     } else if (d.type === DudeType.SWAMP_THING) {
         play(d, oneOf(AQUATIC_ACTIVE_SOUNDS), { volume: 1 })
     }

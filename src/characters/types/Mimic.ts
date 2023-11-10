@@ -2,9 +2,9 @@ import { Component, pt } from "brigsby/dist"
 import { session } from "../../online/session"
 import { Interactable } from "../../world/elements/Interactable"
 import { NavMeshCollider } from "../../world/elements/NavMeshCollider"
-import { NPCSchedules } from "../ai/NPCSchedule"
 import { Dude } from "../Dude"
 import { NPC } from "../NPC"
+import { NPCSchedules } from "../ai/NPCSchedule"
 import { player } from "../player/index"
 import { Enemy } from "./Enemy"
 
@@ -55,8 +55,12 @@ export class Mimic extends Component {
         interactable.uiOffset = interactable.uiOffset.plusY(7)
 
         // use serialized triggered state
-        if (this.entity.getComponent(Dude).blob[TRIGGERED]) {
+        if (Mimic.isTriggered(this.entity.getComponent(Dude).blob)) {
             this.trigger()
         }
+    }
+
+    static isTriggered(blob: object) {
+        return !!blob[TRIGGERED]
     }
 }
