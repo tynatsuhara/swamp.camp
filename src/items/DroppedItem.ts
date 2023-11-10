@@ -15,10 +15,7 @@ import { here } from "../world/locations/LocationManager"
 import { Item } from "./Item"
 import { ITEM_METADATA_MAP, ItemMetadata } from "./Items"
 
-// TODO: Find a better sound effect (this one isn't very audible)
-const PICK_UP_SOUNDS = loadAudio(
-    Lists.range(0, 4).map((i) => `audio/impact/impactWood_medium_00${i}.ogg`)
-)
+const PICK_UP_SOUNDS = loadAudio(Lists.range(1, 6).map((i) => `audio/m1/pop${i}.ogg`))
 
 export type DroppedItemSaveState = {
     id: string
@@ -122,7 +119,7 @@ export class DroppedItem extends Component {
                                 setGameTimeout(() => {
                                     Sounds.playAtPoint(
                                         Lists.oneOf(PICK_UP_SOUNDS),
-                                        0.15,
+                                        0.4,
                                         dude.standingPosition
                                     )
                                 }, Math.random() * 350)

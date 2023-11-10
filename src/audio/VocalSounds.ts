@@ -1,9 +1,9 @@
 // faction sounds:
 /* DudeFaction {
     VILLAGERS, // TODO (including player!)
-    ORCS, // sounds: rpg/npc/ogre
+    ORCS, // sounds: rpg/npc/ogre ✅
     UNDEAD, // TODO
-    DEMONS, // sounds: rpg/npc/shade
+    DEMONS, // sounds: rpg/npc/shade ✅
     SHROOMS, // sounds: lots of options in rpg/npc/* that could work here
     CENTAURS, // TODO
     GNOLLS + WOLVES, // TODO
@@ -14,12 +14,12 @@
 // special cases:
 /* DudeType {
     PLAYER,
-    SPOOKY_VISITOR,
+    SPOOKY_VISITOR, ✅
     GUMBALL,
     ONION,
     KNIGHT,
     FOREST_GUARDIAN,
-    MIMIC,
+    MIMIC, ✅
     SKELETON,
 } */
 
