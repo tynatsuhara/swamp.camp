@@ -23,67 +23,64 @@
     SKELETON,
 } */
 
-import { Lists } from "brigsby/dist/util/Lists"
 import { Dude } from "../characters/Dude"
 import { DudeFaction } from "../characters/DudeFactory"
 import { DudeType } from "../characters/DudeType"
-import { loadAudio } from "./DeferLoadAudio"
+import { SoundPool } from "./SoundPool"
 import { Sounds } from "./Sounds"
 
-const { range, oneOf } = Lists
-
-const DEMON_SOUNDS = loadAudio(range(1, 16).map((i) => `audio/rpg/NPC/shade/shade${i}.wav`))
-const ORC_SOUNDS = loadAudio(range(1, 6).map((i) => `audio/rpg/NPC/ogre/ogre${i}.wav`))
-const SPOOKY_SOUNDS = loadAudio(range(1, 3).map((i) => `audio/m1/spooky_visitor_idle${i}.ogg`))
-const MIMIC_SOUNDS = loadAudio(range(1, 5).map((i) => `audio/m1/mimic${i}.ogg`))
-const AQUATIC_IDLE_SOUNDS = loadAudio(range(1, 5).map((i) => `audio/m1/aquatic_idle${i}.ogg`))
-const AQUATIC_ACTIVE_SOUNDS = loadAudio(range(1, 4).map((i) => `audio/m1/aquatic_active${i}.ogg`))
+const DEMON_SOUNDS = SoundPool.range(15, "audio/rpg/NPC/shade/shade%%.wav")
+const ORC_SOUNDS = SoundPool.range(5, "audio/rpg/NPC/ogre/ogre%%.wav")
+const SPOOKY_SOUNDS = SoundPool.range(2, "audio/m1/spooky_visitor_idle%%.ogg")
+const MIMIC_SOUNDS = SoundPool.range(4, "audio/m1/mimic%%.ogg")
+const AQUATIC_IDLE_SOUNDS = SoundPool.range(4, "audio/m1/aquatic_idle%%.ogg")
+const AQUATIC_ACTIVE_SOUNDS = SoundPool.range(3, "audio/m1/aquatic_active%%.ogg")
 
 const play = (
     d: Dude,
-    sound: string,
+    sounds: SoundPool,
     { volume = 0.2, chance = 1 }: { volume?: number; chance?: number } = {}
 ) => {
     if (Math.random() < chance) {
-        Sounds.playAtPoint(sound, volume, d.standingPosition)
+        Sounds.playAtPoint(sounds.next(), volume, d.standingPosition)
     }
 }
 
 const ambient = (d: Dude) => {
     if (d.factions.includes(DudeFaction.DEMONS)) {
-        play(d, oneOf(DEMON_SOUNDS))
+        play(d, DEMON_SOUNDS)
     } else if (d.factions.includes(DudeFaction.ORCS)) {
-        play(d, oneOf(ORC_SOUNDS))
+        play(d, ORC_SOUNDS)
     } else if (d.type === DudeType.SPOOKY_VISITOR) {
-        play(d, oneOf(SPOOKY_SOUNDS), { volume: 1, chance: 0.2 })
+        play(d, SPOOKY_SOUNDS, { volume: 1, chance: 0.2 })
     } else if (d.type === DudeType.SWAMP_THING) {
-        play(d, oneOf(AQUATIC_IDLE_SOUNDS), { volume: 0.3 })
+        play(d, AQUATIC_IDLE_SOUNDS, { volume: 0.3 })
     }
 }
 
 const attack = (d: Dude) => {
     if (d.factions.includes(DudeFaction.DEMONS)) {
-        play(d, oneOf(DEMON_SOUNDS))
+        play(d, DEMON_SOUNDS)
     } else if (d.factions.includes(DudeFaction.ORCS)) {
-        play(d, oneOf(ORC_SOUNDS))
+        play(d, ORC_SOUNDS)
     } else if (d.type === DudeType.MIMIC) {
-        play(d, oneOf(MIMIC_SOUNDS), { volume: 0.75 })
+        play(d, MIMIC_SOUNDS, { volume: 0.75 })
     } else if (d.type === DudeType.SWAMP_THING) {
-        play(d, oneOf(AQUATIC_ACTIVE_SOUNDS), { volume: 1 })
+        play(d, AQUATIC_ACTIVE_SOUNDS, { volume: 1 })
     }
 }
 
 const damage = (d: Dude) => {
     if (d.factions.includes(DudeFaction.DEMONS)) {
-        play(d, oneOf(DEMON_SOUNDS))
+        play(d, DEMON_SOUNDS)
     } else if (d.factions.includes(DudeFaction.ORCS)) {
-        play(d, oneOf(ORC_SOUNDS))
+        play(d, ORC_SOUNDS)
     } else if (d.type === DudeType.SPOOKY_VISITOR) {
-        play(d, oneOf(SPOOKY_SOUNDS), { volume: 1 })
+        play(d, SPOOKY_SOUNDS, { volume: 1 })
     } else if (d.type === DudeType.MIMIC) {
-        play(d, oneOf(MIMIC_SOUNDS), { volume: 0.75 })
+        play(d, MIMIC_SOUNDS, { volume: 0.75 })
     } else if (d.type === DudeType.SWAMP_THING) {
-        play(d, oneOf(AQUATIC_ACTIVE_SOUNDS), { volume: 1 })
+        play(d, AQUATIC_ACTIVE_SOUNDS, { volume: 1 })
     }
 }
 
