@@ -1,7 +1,7 @@
 import { Entity, Point } from "brigsby/dist"
 import { SpriteComponent, SpriteTransform } from "brigsby/dist/sprites"
 import { Lists } from "brigsby/dist/util"
-import { loadAudio } from "../../audio/DeferLoadAudio"
+import { SoundPool } from "../../audio/SoundPool"
 import { Sounds } from "../../audio/Sounds"
 import { WeaponType } from "../../characters/weapons/WeaponType"
 import { TILE_SIZE, Tilesets } from "../../graphics/Tilesets"
@@ -14,11 +14,13 @@ import { ElementType } from "./ElementType"
 import { HittableResource } from "./HittableResource"
 import { NavMeshCollider } from "./NavMeshCollider"
 
-const MINING_AUDIO = loadAudio(Lists.range(0, 5).map((n) => `audio/impact/impactMining_00${n}.ogg`))
+const MINING_AUDIO = new SoundPool(
+    Lists.range(0, 5).map((n) => `audio/impact/impactMining_00${n}.ogg`)
+)
 const MINING_AUDIO_VOLUME = 0.4
 
 export const playMiningSound = (centerPos: Point) =>
-    Sounds.playAtPoint(Lists.oneOf(MINING_AUDIO), MINING_AUDIO_VOLUME, centerPos)
+    Sounds.playAtPoint(MINING_AUDIO.next(), MINING_AUDIO_VOLUME, centerPos)
 
 export class RockFactory extends ElementFactory<ElementType.ROCK> {
     readonly dimensions = new Point(1, 1)

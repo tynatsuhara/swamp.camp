@@ -1,38 +1,33 @@
-import { Lists } from "brigsby/dist/util"
-import { loadAudio } from "./DeferLoadAudio"
+import { SoundPool } from "./SoundPool"
 import { Sounds } from "./Sounds"
 
 const VOLUME = 0.4
 
-const SHORT = [17, 18, 19, 21, 6, 4]
-const MEDIUM = [0, 16, 20]
-const MEDIUM_LONG = [3, 9, 5, 1, 8]
-const LONG = [2, 7, 10, 11]
-
-const AUDIO_FILES = loadAudio(
-    Lists.range(0, 22).map((i) => `audio/talkingsynth/TalkingSynth_${i}.wav`)
-)
+const toFilePath = (i: number) => `audio/talkingsynth/TalkingSynth_${i}.wav`
+const SHORT = new SoundPool([17, 18, 19, 21, 6, 4].map(toFilePath))
+const MEDIUM = new SoundPool([0, 16, 20].map(toFilePath))
+const MEDIUM_LONG = new SoundPool([3, 9, 5, 1, 8].map(toFilePath))
+const LONG = new SoundPool([2, 7, 10, 11].map(toFilePath))
 
 let currentAudio: Howl
 
 export const startTalkingSounds = (lineLength: number) => {
-    let audioOptions: number[]
+    let pool: SoundPool
     if (lineLength < 30) {
-        audioOptions = SHORT
+        pool = SHORT
     } else if (lineLength < 60) {
-        audioOptions = MEDIUM
+        pool = MEDIUM
     } else if (lineLength < 90) {
-        audioOptions = MEDIUM_LONG
+        pool = MEDIUM_LONG
     } else {
-        audioOptions = LONG
+        pool = LONG
     }
-    const audioToPlay = AUDIO_FILES[Lists.oneOf(audioOptions)]
 
     stopTalkingSounds()
 
     // console.log(`line length = ${lineLength}, playing speech audio ${audioToPlay}`)
 
-    Sounds.play(audioToPlay, VOLUME).then((howl) => {
+    Sounds.play(pool.next(), VOLUME).then((howl) => {
         currentAudio = howl
         howl.once("end", () => {
             if (currentAudio === howl) {

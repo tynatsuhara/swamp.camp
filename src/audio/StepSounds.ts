@@ -1,4 +1,4 @@
-import { Lists, RepeatedInvoker } from "brigsby/dist/util"
+import { RepeatedInvoker } from "brigsby/dist/util"
 import { Dude } from "../characters/Dude"
 import { player } from "../characters/player"
 import { controls } from "../core/Controls"
@@ -6,15 +6,16 @@ import { isGamePaused } from "../core/PauseState"
 import { GroundType } from "../world/ground/Ground"
 import { here } from "../world/locations/LocationManager"
 import { loadAudio } from "./DeferLoadAudio"
+import { SoundPool } from "./SoundPool"
 import { Sounds } from "./Sounds"
 
 const MUD_SOUND = "audio/steps/mud02.ogg"
 const STONE_SOUND = "audio/steps/stone01.ogg"
 const WOOD_SOUND = "audio/steps/wood01.ogg"
-const WATER_SOUNDS = Lists.range(1, 5).map((i) => `audio/steps/wave_0${i}.flac`)
-const GRASS_SOUNDS = Lists.range(1, 3).map((i) => `audio/steps/leaves0${i}.ogg`)
+const WATER_SOUNDS = SoundPool.range(4, "audio/steps/wave_0%%.flac")
+const GRASS_SOUNDS = SoundPool.range(2, "audio/steps/leaves0%%.ogg")
 
-loadAudio([MUD_SOUND, STONE_SOUND, WOOD_SOUND, ...WATER_SOUNDS, ...GRASS_SOUNDS])
+loadAudio([MUD_SOUND, STONE_SOUND, WOOD_SOUND])
 
 export class StepSounds {
     private static readonly SPEED = 330
@@ -54,7 +55,7 @@ export class StepSounds {
         switch (ground.type) {
             case GroundType.GRASS:
             case GroundType.LEDGE:
-                return [Lists.oneOf(GRASS_SOUNDS), 0.3]
+                return [GRASS_SOUNDS.next(), 0.3]
             case GroundType.BASIC:
             case GroundType.BASIC_NINE_SLICE:
                 return [WOOD_SOUND, 0.15]
@@ -69,7 +70,7 @@ export class StepSounds {
                         weakMagnitude: 0.075,
                     })
                 }
-                return [Lists.oneOf(WATER_SOUNDS), 0.035]
+                return [WATER_SOUNDS.next(), 0.035]
             default:
                 console.log("no mapped sound for ground type")
                 return [undefined, 0]
