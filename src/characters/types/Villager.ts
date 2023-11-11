@@ -54,49 +54,66 @@ export class Villager extends Component {
             // no-op
         } else {
             npc.setSchedule(NPCSchedules.newDefaultVillagerSchedule())
-            this.initWorkAnimations()
+            this.initWorkEffects()
         }
     }
 
-    private initWorkAnimations() {
-        this.dude.doWhileLiving(() => {
-            const { weaponType, location, tile, standingPosition } = this.dude
+    private isMining() {
+        return (
+            this.dude.weaponType === WeaponType.PICKAXE &&
+            this.dude.location.type === LocationType.MINE_INTERIOR
+        )
+    }
+    private isDoingConstruction() {
+        return (
+            this.job ===
+            this.dude.location.getElement(this.dude.tile)?.entity.getComponent(ConstructionSite)
+                ?.jobType
+        )
+    }
+    private isChoppingTrees() {
+        return (
+            this.dude.weaponType === WeaponType.AXE &&
+            this.npc.isInteracting() &&
+            this.npc.getInteractWithElement()?.entity?.getComponent(Tree)?.choppable
+        )
+    }
 
-            const isMining =
-                weaponType === WeaponType.PICKAXE && location.type === LocationType.MINE_INTERIOR
+    private initWorkEffects() {
+        this.dude.onAttackCallback = ({ hitEnemy, hitResource }) => {
+            const { location, tile, standingPosition } = this.dude
 
-            const isDoingConstruction =
-                this.job ===
-                location.getElement(tile)?.entity.getComponent(ConstructionSite)?.jobType
-
-            const isChoppingTrees =
-                weaponType === WeaponType.AXE &&
-                this.npc.isInteracting() &&
-                this.npc.getInteractWithElement()?.entity?.getComponent(Tree)?.choppable
-
-            // swing pickaxe randomly if working in the mines
-            if (isMining) {
-                this.dude.updateAttacking(true)
-                // TODO: If they actually hit a rock in the mine, the sound will play twice
-                CommonWorldSounds.playMiningRock(standingPosition)
-                return 2_000
-            } else if (isDoingConstruction) {
-                this.dude.updateAttacking(true)
-                Sounds.playAtPoint(DIG_SOUNDS.next(), 0.5, standingPosition)
-                // turn the ground to dirt
-                const hittingTile = tile.plusX(this.dude.getFacingMultiplier())
-                const ground = location.getGround(hittingTile)?.type
-                if (
-                    ground === GroundType.GRASS &&
-                    location.getElement(hittingTile)?.entity.getComponent(ConstructionSite)
-                ) {
-                    location.setGroundElement(GroundType.PATH, hittingTile)
+            if (!hitEnemy && !hitResource) {
+                if (this.isMining()) {
+                    CommonWorldSounds.playMiningRock(standingPosition)
+                } else if (this.isDoingConstruction()) {
+                    Sounds.playAtPoint(DIG_SOUNDS.next(), 0.5, standingPosition)
+                    const hittingTile = tile.plusX(this.dude.getFacingMultiplier())
+                    // turn the ground to dirt
+                    const ground = location.getGround(hittingTile)?.type
+                    if (
+                        ground === GroundType.GRASS &&
+                        location.getElement(hittingTile)?.entity.getComponent(ConstructionSite)
+                    ) {
+                        location.setGroundElement(GroundType.PATH, hittingTile)
+                    }
                 }
+            }
+        }
+
+        this.dude.doWhileLiving(() => {
+            // swing pickaxe randomly if working in the mines
+            if (this.isMining()) {
+                this.dude.updateAttacking(true)
                 return 2_000
-            } else if (isChoppingTrees) {
+            } else if (this.isDoingConstruction()) {
+                this.dude.updateAttacking(true)
+                return 2_000
+            } else if (this.isChoppingTrees()) {
                 this.dude.updateAttacking(true)
                 return 1_500
             }
+
             return 2_000
         }, Math.random() * 2_000)
     }

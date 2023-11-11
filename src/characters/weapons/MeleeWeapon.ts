@@ -134,6 +134,12 @@ export class MeleeWeapon extends Weapon {
         }
         const hitResource = enemies.length === 0 && Weapon.hitResources(this.dude)
 
+        this.dude.onAttackCallback({
+            weapon: this.getType(),
+            hitEnemy: enemies.length > 0,
+            hitResource,
+        })
+
         if (this.dude === player() && (enemies.length > 0 || hitResource)) {
             setGameTimeout(() => {
                 controls.vibrate({

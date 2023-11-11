@@ -618,6 +618,14 @@ export class Dude extends Component implements DialogueSource {
         this._weapon?.cancelAttack()
     }
 
+    // Right now this is only called for melee weapons.
+    // Called on client and host!
+    onAttackCallback: (result: {
+        weapon: WeaponType
+        hitEnemy: boolean
+        hitResource: boolean
+    }) => void = () => {}
+
     /**
      * @param duration if zero, unlimited duration
      */
