@@ -1,9 +1,9 @@
 import { Component } from "brigsby/dist"
+import { CommonWorldSounds } from "../../audio/CommonWorldSounds"
 import { SoundPool } from "../../audio/SoundPool"
 import { Sounds } from "../../audio/Sounds"
 import { session } from "../../online/session"
 import { ConstructionSite } from "../../world/buildings/ConstructionSite"
-import { playMiningSound } from "../../world/elements/Rock"
 import { Tree } from "../../world/elements/Tree"
 import { GroundType } from "../../world/ground/Ground"
 import { LocationType } from "../../world/locations/LocationType"
@@ -77,7 +77,8 @@ export class Villager extends Component {
             // swing pickaxe randomly if working in the mines
             if (isMining) {
                 this.dude.updateAttacking(true)
-                playMiningSound(standingPosition)
+                // TODO: If they actually hit a rock in the mine, the sound will play twice
+                CommonWorldSounds.playMiningRock(standingPosition)
                 return 2_000
             } else if (isDoingConstruction) {
                 this.dude.updateAttacking(true)
