@@ -763,7 +763,13 @@ export class Dude extends Component implements DialogueSource {
                     }
                     return
                 case Condition.GOD_MODE:
-                    if (!this.godModeParticles) {
+                    // Remove a bit early to give a signal that they are about to lose invulnerability
+                    if (c.expiration - now() < 5_000) {
+                        if (this.godModeParticles) {
+                            this.entity.removeComponent(this.godModeParticles)
+                            this.godModeParticles = undefined
+                        }
+                    } else if (!this.godModeParticles) {
                         this.godModeParticles = this.entity.addComponent(
                             new MagicHealingParticles([Color.WHITE, Color.BROWN_6])
                         )
