@@ -1,9 +1,5 @@
 # SWAMP CAMP — https://swamp.camp
 
-## roadmap
-
-https://www.notion.so/tynatsuhara/SWAMP-CAMP-6bff46a32b7e438cbd3329d5c1e09787
-
 ## development
 
 ### acquire assets
@@ -25,7 +21,7 @@ audio files are stored using [Git LFS](https://git-lfs.github.com/) and can be c
 
 ### release
 
-commit and push to `master`, this will trigger a [Cloudflare pages deployment](https://dash.cloudflare.com/1f52f961eb89afcf0499eba5f54090d5/pages/view/quest).
+commits to `master` will trigger a [Cloudflare pages deployment](https://dash.cloudflare.com/1f52f961eb89afcf0499eba5f54090d5/pages/view/swamp-camp).
 
 NOTE: Cloudflare pages has a limit of 25MB per file.
 
@@ -44,7 +40,11 @@ additional art by:
 -   https://kenney.nl/ (cc0)
 -   https://opengameart.org/content/explosion-set-1-m484-games (cc0)
 
-fonts:
+color palette:
+
+-   https://lospec.com/palette-list/nanner-pancakes
+
+font:
 
 -   https://www.1001fonts.com/press-start-2p-font.html#license (free for commercial use)
 
@@ -60,11 +60,7 @@ sound effects & music by:
 -   https://opengameart.org/content/nature-sounds-pack (cc-by 4.0)
 -   https://opengameart.org/content/talking-synthesizer (cc-by 4.0)
 
-tentative sound effects & music:
+sound effects & music that might be used in the future:
 
 -   https://opengameart.org/content/swishes-sound-pack (cc0)
--   https://opengameart.org/content/voices-sound-effects-library
-
-# art
-
--   color palette: https://lospec.com/palette-list/nanner-pancakes
+-   https://opengameart.org/content/voices-sound-effects-library (cc-by 3.0)
