@@ -97,7 +97,7 @@ export class HUD {
 
         const healing = player().hasCondition(Condition.HEALING)
         const filter: HeartFilter = (() => {
-            if (debug.godMode) {
+            if (debug.godMode || player().hasCondition(Condition.GOD_MODE)) {
                 return "god"
             } else if (player().hasCondition(Condition.POISONED)) {
                 return "poisoned"

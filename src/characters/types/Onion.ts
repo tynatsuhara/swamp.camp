@@ -6,6 +6,7 @@ import { Item } from "../../items/Item"
 import { session } from "../../online/session"
 import { syncFn } from "../../online/syncUtils"
 import { Color } from "../../ui/Color"
+import { Condition } from "../Condition"
 import { Dude } from "../Dude"
 import { ONION_DIALOGUE_ENTRYPOINT } from "../dialogue/OnionDialogue"
 import { player } from "../player"
@@ -26,6 +27,7 @@ export class Onion extends Component {
 
         if (session.isHost()) {
             player().inventory.addItem(Item.ONION)
+            player().addCondition(Condition.GOD_MODE, 30_000)
             this.entity.selfDestruct()
         }
     }

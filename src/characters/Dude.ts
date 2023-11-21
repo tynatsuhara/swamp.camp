@@ -627,7 +627,7 @@ export class Dude extends Component implements DialogueSource {
     }) => void = () => {}
 
     /**
-     * @param duration if zero, unlimited duration
+     * @param duration in ms — if zero, unlimited duration
      */
     addCondition(condition: Condition, duration?: number) {
         const expiration = duration ? now() + duration : undefined
@@ -858,7 +858,8 @@ export class Dude extends Component implements DialogueSource {
         if (this.isAlive) {
             if (
                 (this.type === DudeType.PLAYER && debug.godMode) ||
-                this.maxHealth === Number.MAX_SAFE_INTEGER
+                this.maxHealth === Number.MAX_SAFE_INTEGER ||
+                this.hasCondition(Condition.GOD_MODE)
             ) {
                 damage = 0
             }

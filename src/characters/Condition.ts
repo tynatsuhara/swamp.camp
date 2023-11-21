@@ -6,6 +6,7 @@ export enum Condition {
     POISONED,
     BLACK_LUNG,
     HEALING,
+    GOD_MODE,
 }
 
 expose({ Condition })
