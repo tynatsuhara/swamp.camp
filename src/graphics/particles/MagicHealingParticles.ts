@@ -6,12 +6,9 @@ import { Color } from "../../ui/Color"
 import { Particles } from "./Particles"
 
 const DRIFT_DISTANCE = 2
-const COLORS = [Color.BLUE_5, Color.BLUE_6]
 
-export class ShamanHealingParticles extends RepeatedInvoker {
-    static readonly PARTICLE_COLORS = COLORS
-
-    constructor() {
+export class MagicHealingParticles extends RepeatedInvoker {
+    constructor(colors: Color[]) {
         let dude: Dude
         let lastPos: Point
 
@@ -21,7 +18,8 @@ export class ShamanHealingParticles extends RepeatedInvoker {
 
             // particles on shaman
             const size = 8
-            const positionSupplier = () => dude.standingPosition.plusY(-8)
+            const positionSupplier = () =>
+                dude.standingPosition.plusY(-8).plus(dude.getAnimationOffset())
             const fireBase = positionSupplier()
             const diff = lastPos.minus(fireBase)
             const velocity = diff.normalizedOrZero().times(DRIFT_DISTANCE)
@@ -32,7 +30,7 @@ export class ShamanHealingParticles extends RepeatedInvoker {
             for (let i = 0; i < size / 2; i++) {
                 const speed = -0.01
                 Particles.instance.emitParticle(
-                    Lists.oneOf(COLORS),
+                    Lists.oneOf(colors),
                     fireBase.randomCircularShift(size),
                     depth,
                     200 + Math.random() * 400,
@@ -46,7 +44,7 @@ export class ShamanHealingParticles extends RepeatedInvoker {
                 const speed = -0.005
                 const baseOffset = Point.ZERO.randomCircularShift(size)
                 Particles.instance.emitComplexParticle(
-                    Lists.oneOf(COLORS),
+                    Lists.oneOf(colors),
                     () => positionSupplier().plus(baseOffset),
                     depthSupplier,
                     700,

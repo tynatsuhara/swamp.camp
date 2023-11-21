@@ -2,20 +2,23 @@ import { Component } from "brigsby/dist/Component"
 import { StartData, UpdateData } from "brigsby/dist/Engine"
 import { pt } from "brigsby/dist/Point"
 import { Lists } from "brigsby/dist/util/Lists"
+import { MagicHealingParticles } from "../../graphics/particles/MagicHealingParticles"
 import { Particles } from "../../graphics/particles/Particles"
-import { ShamanHealingParticles } from "../../graphics/particles/ShamanHealingParticles"
 import { session } from "../../online/session"
+import { Color } from "../../ui/Color"
 import { here } from "../../world/locations/LocationManager"
-import { NPCSchedules } from "../ai/NPCSchedule"
 import { Dude } from "../Dude"
 import { DudeFaction } from "../DudeFactory"
 import { DudeType } from "../DudeType"
 import { NPC } from "../NPC"
+import { NPCSchedules } from "../ai/NPCSchedule"
+
+const PARTICLE_COLORS = [Color.BLUE_5, Color.BLUE_6]
 
 export class ShamanHealer extends Component {
     private dude: Dude
-    private healTargets: Map<Dude, ShamanHealingParticles> = new Map()
-    private selfParticles: ShamanHealingParticles
+    private healTargets: Map<Dude, MagicHealingParticles> = new Map()
+    private selfParticles: MagicHealingParticles
 
     start(startData: StartData): void {
         if (session.isGuest()) {
@@ -23,7 +26,7 @@ export class ShamanHealer extends Component {
         }
 
         this.dude = this.entity.getComponent(Dude)
-        this.selfParticles = this.entity.addComponent(new ShamanHealingParticles())
+        this.selfParticles = this.entity.addComponent(new MagicHealingParticles(PARTICLE_COLORS))
 
         // TODO
         this.dude.entity.getComponent(NPC).setSchedule(NPCSchedules.newNoOpSchedule())
@@ -65,7 +68,7 @@ export class ShamanHealer extends Component {
             for (let i = 0; i < particles; i++) {
                 const midpoint = a.plus(diff.times(Math.random()))
                 Particles.instance.emitParticle(
-                    Lists.oneOf(ShamanHealingParticles.PARTICLE_COLORS),
+                    Lists.oneOf(PARTICLE_COLORS),
                     midpoint.randomCircularShift(5),
                     midpoint.y - centerOffset,
                     400 + Math.random() * 400,
@@ -102,7 +105,7 @@ export class ShamanHealer extends Component {
     }
 
     private addHealTarget(dude: Dude) {
-        const particles = dude.entity.addComponent(new ShamanHealingParticles())
+        const particles = dude.entity.addComponent(new MagicHealingParticles(PARTICLE_COLORS))
         this.healTargets.set(dude, particles)
     }
 

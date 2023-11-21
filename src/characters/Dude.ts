@@ -18,6 +18,7 @@ import {
 import { BlackLungParticles } from "../graphics/particles/BlackLungParticles"
 import { emitBlockParticles } from "../graphics/particles/CombatParticles"
 import { FireParticles } from "../graphics/particles/FireParticles"
+import { MagicHealingParticles } from "../graphics/particles/MagicHealingParticles"
 import { Particles } from "../graphics/particles/Particles"
 import { PoisonParticles } from "../graphics/particles/PoisonParticles"
 import { WalkingParticles } from "../graphics/particles/WalkingParticles"
@@ -669,12 +670,19 @@ export class Dude extends Component implements DialogueSource {
                     this.blackLungParticles = undefined
                 }
                 return
+            case Condition.GOD_MODE:
+                if (this.godModeParticles) {
+                    this.entity.removeComponent(this.godModeParticles)
+                    this.godModeParticles = undefined
+                }
+                return
         }
     }
 
     private fireParticles: FireParticles
     private poisonParticles: PoisonParticles
     private blackLungParticles: BlackLungParticles
+    private godModeParticles: MagicHealingParticles
 
     updateActiveConditions(elapsedTimeMillis: number) {
         if (this.conditions.length === 0) {
@@ -751,6 +759,13 @@ export class Dude extends Component implements DialogueSource {
                                     this.standingPosition.plusY(-8).plus(this.getAnimationOffset()),
                                 () => this.animation.transform.depth + 1
                             )
+                        )
+                    }
+                    return
+                case Condition.GOD_MODE:
+                    if (!this.godModeParticles) {
+                        this.godModeParticles = this.entity.addComponent(
+                            new MagicHealingParticles([Color.WHITE, Color.BROWN_6])
                         )
                     }
                     return
