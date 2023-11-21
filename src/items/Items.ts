@@ -2,7 +2,7 @@ import { Point } from "brigsby/dist"
 import { PointValue, pt } from "brigsby/dist/Point"
 import { Collider } from "brigsby/dist/collision"
 import { SpriteSource } from "brigsby/dist/sprites"
-import { loadAudio } from "../audio/DeferLoadAudio"
+import { CommonWorldSounds } from "../audio/CommonWorldSounds"
 import { Condition } from "../characters/Condition"
 import { Dude } from "../characters/Dude"
 import { EquipmentSlot, EquipmentType } from "../characters/Equipment"
@@ -92,11 +92,10 @@ export class ItemSpec {
     }
 }
 
-const SOUNDS: { [key: string]: [string, number] } = {
-    drink: ["audio/rpg/inventory/bottle.wav", 0.2],
-    eat: ["audio/rpg/NPC/beetle/bite-small.wav", 0.3],
+const SOUNDS: { [key: string]: () => void } = {
+    drink: CommonWorldSounds.playDrinkSound,
+    eat: CommonWorldSounds.playEatSound,
 }
-loadAudio(Object.values(SOUNDS).map((s) => s[0]))
 
 export const ITEM_METADATA_MAP: Partial<Record<Item, ItemSpec>> = {
     [Item.COIN]: new ItemSpec({

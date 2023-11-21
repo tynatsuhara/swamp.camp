@@ -1,4 +1,5 @@
 import { Lists } from "brigsby/dist/util"
+import { CommonWorldSounds } from "../../audio/CommonWorldSounds"
 import { InteractIndicator } from "../../ui/InteractIndicator"
 import { Dude } from "../Dude"
 import {
@@ -20,7 +21,7 @@ export const ONION_DIALOGUE: DialogueSet = {
             ["*The strange sentient onion looks up at you inquisitively.*"],
             InteractIndicator.NONE,
             new DialogueOption(`${Lists.oneOf(ONION_LAST_GOODBYES)} [Eat onion]`, () => {
-                // TODO
+                CommonWorldSounds.playEatSound()
                 return new NextDialogue(ONION_DIALOGUE_ENTRYPOINT, false)
             }),
             option(getExitText(), ONION_DIALOGUE_ENTRYPOINT, false)
