@@ -375,6 +375,7 @@ export class MainMenuScene extends Scene {
             entities.splice(0) // don't show title and scene
             const creditEntries: [credit: string, fn: () => void][] = [
                 ["a game by Ty Natsuhara", link("https://ty.pizza/")],
+                ["[author's note]", link("/note")],
                 null,
                 ["add'l art: Robert Norenberg", link("https://0x72.pl")],
                 ["           Cael Johnson    ", link("https://caeljohnson.artstation.com")],
@@ -385,9 +386,6 @@ export class MainMenuScene extends Scene {
                 ["    sound: BurghRecords    ", link("https://www.edinburghrecords.com")],
                 ["           Antoine Goumain ", link("https://antoinegoumain.fr")],
                 ["           Thor Arisland   ", link("https://tcarisland.no")],
-                // ["           Morten SΘegaard ", link("twitter.com/littlerobotsfx")],  // TODO if we use the "voices" pack
-                null,
-                ["made with brigsby!", link("https://brigsby.js.org/")],
                 null,
                 ["back", backFn],
             ]

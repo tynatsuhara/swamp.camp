@@ -57,8 +57,8 @@ sound effects & music by:
 -   https://opengameart.org/content/different-steps-on-wood-stone-leaves-gravel-and-mud (cc0)
 -   https://freesound.org/people/yewbic/packs/2122/ (cc0)
 -   https://opengameart.org/content/battle-march-epic-orchestral-music-loop (playonloop.com)
--   https://opengameart.org/content/nature-sounds-pack (cc-by 4.0)
--   https://opengameart.org/content/talking-synthesizer (cc-by 4.0)
+-   https://opengameart.org/content/nature-sounds-pack (Antoine Goumain, cc-by 4.0)
+-   https://opengameart.org/content/talking-synthesizer (Thor Arisland, cc-by 4.0)
 
 sound effects & music that might be used in the future:
 
