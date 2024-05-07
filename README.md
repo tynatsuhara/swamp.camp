@@ -1,5 +1,7 @@
 # SWAMP CAMP — https://swamp.camp
 
+![preview](publish/images/visitor.gif)
+
 ## development
 
 ### acquire assets
