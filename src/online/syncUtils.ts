@@ -116,7 +116,7 @@ export const clientSyncFn = <T extends any[]>(
     const wrappedFn = (...args: T) => {
         const hostAuth = {
             trusted: true,
-            dudeUUID: player().uuid,
+            dudeUUID: player()?.uuid,
         }
 
         // offline clientSyncFn is just a normal fn
