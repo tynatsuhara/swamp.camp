@@ -1,6 +1,6 @@
 # SWAMP CAMP — https://swamp.camp
 
-![preview](publish/images/visitor.gif)
+https://github.com/tynatsuhara/swamp.camp/assets/9057187/e9448325-aa9f-4454-bcb3-37e6a3fe4522
 
 ## development
 
