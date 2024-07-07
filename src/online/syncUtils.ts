@@ -7,6 +7,10 @@ export const ONLINE_PLAYER_DUDE_ID_PREFIX = "mp:"
  * A function which can be called on the host, which will be invoked client-side.
  * Args should be serializable!
  * If the client calls this function, it will be a no-op that generates a warning log.
+ *
+ * Example:
+ * const hello = syncFn("id", (name: string) => console.log(`hello ${name}`))
+ * hello("world")  // called on the host, outputs "hello world" for the host and clients
  */
 export const syncFn = <T extends any[], R = void>(
     id: string,
@@ -45,6 +49,10 @@ export const syncFn = <T extends any[], R = void>(
  * The provided data is the initial data on both host and client.
  * The client received data from the host when the object is updated.
  * If the client writes data, it will be a no-op that generates a warning log.
+ *
+ * Example:
+ * const data = syncData("id", { key1: "value", key2: 123 })
+ * data.key1 = "new value"  // performed on host, updates the data for all clients
  */
 export const syncData = <T extends object>(id: string, data: T, onChange = (updated: T) => {}) => {
     const [send, receive] = session.action<T>(id)
@@ -80,7 +88,7 @@ export const syncData = <T extends object>(id: string, data: T, onChange = (upda
                 })
                 onChange(data)
             } else {
-                console.warn("other clients should not be calling syncFn")
+                console.warn("other clients should not be calling syncData")
             }
         }
     })
@@ -151,7 +159,7 @@ export const clientSyncFn = <T extends any[]>(
 
         const auth = {
             trusted: !session.isHost(), // only the host should be untrusting
-            // MPTODO peerToMultiplayerId only gets populated on the host right now
+            // TODO: peerToMultiplayerId only gets populated on the host right now
             dudeUUID: session.isHost()
                 ? ONLINE_PLAYER_DUDE_ID_PREFIX + session.peerToMultiplayerId[peerId]
                 : undefined,
