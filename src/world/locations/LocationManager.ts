@@ -209,10 +209,7 @@ export class LocationManager {
                     .getDudes()
                     .filter((d) => d.type === DudeType.PLAYER)
                     .forEach((p) => {
-                        oldLocation.removeDude(p)
-                        newLocation.addDude(p)
-                        p.location = newLocation
-                        p.moveTo(newPosition, true)
+                        this.changeDudeLocation(p, oldLocation, newLocation, newPosition)
                     })
 
                 // actually set the location
@@ -304,11 +301,21 @@ export class LocationManager {
         const otherSide = currentSide === teleporter.a ? teleporter.b : teleporter.a
         const otherLocation = this.get(otherSide.location)
 
-        currentLocation.removeDude(dude)
-        otherLocation.addDude(dude)
-        dude.location = otherLocation
+        this.changeDudeLocation(dude, currentLocation, otherLocation, otherSide.pos)
+    }
 
-        dude.moveTo(pt(otherSide.pos.x, otherSide.pos.y), true)
+    private changeDudeLocation(
+        dude: Dude,
+        currentLocation: Location,
+        newLocation: Location,
+        newPosition: PointValue
+    ) {
+        // moveTo should be called before addDude to work with chunky locations
+        dude.moveTo(pt(newPosition.x, newPosition.y), true)
+        dude.location = newLocation
+
+        currentLocation.removeDude(dude)
+        newLocation.addDude(dude)
     }
 }
 
