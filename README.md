@@ -2,6 +2,8 @@
 
 https://github.com/tynatsuhara/swamp.camp/assets/9057187/e9448325-aa9f-4454-bcb3-37e6a3fe4522
 
+This game is no longer under active development, but I'm very proud of the work I've done here. Maybe someone out there will find this codebase helpful :)
+
 ## development
 
 ### acquire assets
