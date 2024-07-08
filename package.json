@@ -17,7 +17,7 @@
         "url": "git+https://github.com/tynatsuhara/swamp.camp.git"
     },
     "author": "Tyler Natsuhara",
-    "homepage": "https://swamp.camp",
+    "homepage": "https://github.com/tynatsuhara/swamp.camp/",
     "devDependencies": {
         "@types/circular-dependency-plugin": "^5.0.5",
         "@types/howler": "^2.2.9",
